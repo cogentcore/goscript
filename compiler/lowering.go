@@ -3553,7 +3553,14 @@ func (o *LoweringOwner) lowerEmbeddedMethodForwarders(
 			}
 			targetType := o.tsEmbeddedForwarderTargetType(ctx, field.typ)
 			target := o.embeddedForwarderTargetExpr(ctx, field, selection, targetType)
-			call = target + "." + method.Name() + "(" + strings.Join(callArgs, ", ") + ")"
+			if named := embeddedForwarderValueReceiver(field.typ, selection); named != nil {
+				// A method promoted from a named non-struct type nested in an
+				// embedded struct is a free function taking the field value.
+				callArgs = append([]string{target}, args...)
+				call = o.methodFunctionExpr(ctx, named, method, method.Name()) + "(" + strings.Join(callArgs, ", ") + ")"
+			} else {
+				call = target + "." + method.Name() + "(" + strings.Join(callArgs, ", ") + ")"
+			}
 		}
 		if async {
 			call = "await " + call
@@ -3563,6 +3570,35 @@ func (o *LoweringOwner) lowerEmbeddedMethodForwarders(
 		explicitMethods[method.Name()] = true
 	}
 	return methods
+}
+
+// embeddedForwarderValueReceiver returns the named non-struct, non-interface
+// type that declares the value method of the given selection, when it is
+// nested within the embedded struct field type, or nil otherwise.
+func embeddedForwarderValueReceiver(fieldType types.Type, selection *types.Selection) *types.Named {
+	if selection == nil || len(selection.Index()) <= 1 {
+		return nil
+	}
+	if signature, ok := selection.Obj().Type().(*types.Signature); !ok || signature.Recv() == nil || isPointerType(signature.Recv().Type()) {
+		return nil
+	}
+	typ := fieldType
+	for _, index := range selection.Index()[:len(selection.Index())-1] {
+		structType, ok := types.Unalias(derefPointerType(typ)).Underlying().(*types.Struct)
+		if !ok || index < 0 || index >= structType.NumFields() {
+			return nil
+		}
+		typ = structType.Field(index).Type()
+	}
+	named, ok := types.Unalias(typ).(*types.Named)
+	if !ok {
+		return nil
+	}
+	switch named.Underlying().(type) {
+	case *types.Struct, *types.Interface:
+		return nil
+	}
+	return named.Origin()
 }
 
 func (o *LoweringOwner) embeddedForwarderTargetExpr(
