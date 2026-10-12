@@ -178,6 +178,16 @@ export async function main(): globalThis.Promise<void> {
 	let f = __goscriptTuple1[0]
 	err = __goscriptTuple1[1]
 	await $.println("embedded", $.markAsStructValue($.cloneStructValue(f)).Int(), err == null)
+
+	// A type assertion to reflect.Value, as in text/template.
+	for (let __goscriptRangeTarget0 = $.arrayToSlice<any>([$.interfaceValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.basicInterfaceValue(5, "int")))), "reflect.Value", "reflect.Value"), $.basicInterfaceValue(6, "int")]), __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
+		let data = __goscriptRangeTarget0![__rangeIndex]
+		let [value, __goscriptShadow0] = $.typeAssertTuple<reflect.Value>(data, "reflect.Value")
+		if (!__goscriptShadow0) {
+			$.assignStruct(value, $.markAsStructValue($.cloneStructValue(reflect.ValueOf(data))))
+		}
+		await $.println("assert", __goscriptShadow0, $.markAsStructValue($.cloneStructValue(value)).Int())
+	}
 }
 
 if ($.isMainScript(import.meta)) {

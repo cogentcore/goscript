@@ -62,4 +62,13 @@ func main() {
 	o.Inner = &Inner{B: 9}
 	f, err := reflect.ValueOf(o).FieldByIndexErr([]int{0, 0})
 	println("embedded", f.Int(), err == nil)
+
+	// A type assertion to reflect.Value, as in text/template.
+	for _, data := range []any{reflect.ValueOf(5), 6} {
+		value, ok := data.(reflect.Value)
+		if !ok {
+			value = reflect.ValueOf(data)
+		}
+		println("assert", ok, value.Int())
+	}
 }
