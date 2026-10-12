@@ -358,6 +358,10 @@ export interface Type {
   // Panics if the type's Kind is not Struct or i is out of range.
   Field(i: number): StructField
 
+  // FieldByIndex returns the nested field corresponding to index.
+  // Panics if the type's Kind is not Struct.
+  FieldByIndex(index: $.Slice<number>): StructField
+
   // FieldByName returns the struct field with the given name.
   FieldByName(name: string): [StructField, boolean]
 
@@ -418,6 +422,24 @@ function nonFunctionTypePanic(method: string, t: Type): never {
 }
 
 // InvalidTypeInstance is a singleton type for invalid/zero reflect.Value
+// typeFieldByIndex implements Type.FieldByIndex as in Go: each index after
+// the first selects a field of the previous field's type, following a
+// pointer to a struct.
+function typeFieldByIndex(t: Type, index: $.Slice<number>): StructField {
+  let typ = t
+  let field = new StructField({ Type: t })
+  for (let i = 0; i < $.len(index); i++) {
+    if (i > 0) {
+      typ = field.Type
+      if (typ.Kind() === Ptr && typ.Elem().Kind() === Struct) {
+        typ = typ.Elem()
+      }
+    }
+    field = typ.Field($.index(index, i))
+  }
+  return field
+}
+
 class InvalidTypeClass implements Type {
   Kind(): Kind {
     return Invalid
@@ -463,6 +485,9 @@ class InvalidTypeClass implements Type {
   }
   Field(_i: number): StructField {
     throw new Error('reflect: Field of invalid type')
+  }
+  FieldByIndex(index: $.Slice<number>): StructField {
+    return typeFieldByIndex(this, index)
   }
   FieldByName(_name: string): [StructField, boolean] {
     return [new StructField(), false]
@@ -1619,6 +1644,10 @@ export class BasicType implements Type {
     throw new Error(`reflect: Field of non-struct type ${this._name}`)
   }
 
+  public FieldByIndex(index: $.Slice<number>): StructField {
+    return typeFieldByIndex(this, index)
+  }
+
   public FieldByName(name: string): [StructField, boolean] {
     return typeFieldByName(this, name)
   }
@@ -1841,6 +1870,10 @@ class SliceType implements Type {
     throw new Error('reflect: Field of non-struct type')
   }
 
+  public FieldByIndex(index: $.Slice<number>): StructField {
+    return typeFieldByIndex(this, index)
+  }
+
   public FieldByName(name: string): [StructField, boolean] {
     return typeFieldByName(this, name)
   }
@@ -1969,6 +2002,10 @@ class ArrayType implements Type {
     throw new Error('reflect: Field of non-struct type')
   }
 
+  public FieldByIndex(index: $.Slice<number>): StructField {
+    return typeFieldByIndex(this, index)
+  }
+
   public FieldByName(name: string): [StructField, boolean] {
     return typeFieldByName(this, name)
   }
@@ -2091,6 +2128,10 @@ class PointerType implements Type {
 
   public Field(_i: number): StructField {
     throw new Error('reflect: Field of non-struct type')
+  }
+
+  public FieldByIndex(index: $.Slice<number>): StructField {
+    return typeFieldByIndex(this, index)
   }
 
   public FieldByName(name: string): [StructField, boolean] {
@@ -2294,6 +2335,10 @@ class FunctionType implements Type {
 
   public Field(_i: number): StructField {
     throw new Error('reflect: Field of non-struct type')
+  }
+
+  public FieldByIndex(index: $.Slice<number>): StructField {
+    return typeFieldByIndex(this, index)
   }
 
   public FieldByName(name: string): [StructField, boolean] {
@@ -2682,6 +2727,10 @@ class MapType implements Type {
 
   public Field(_i: number): StructField {
     throw new Error('reflect: Field of non-struct type')
+  }
+
+  public FieldByIndex(index: $.Slice<number>): StructField {
+    return typeFieldByIndex(this, index)
   }
 
   public FieldByName(name: string): [StructField, boolean] {
@@ -3462,6 +3511,10 @@ class StructType implements Type {
     return `struct:${fields}`
   }
 
+  public FieldByIndex(index: $.Slice<number>): StructField {
+    return typeFieldByIndex(this, index)
+  }
+
   public FieldByName(name: string): [StructField, boolean] {
     return typeFieldByName(this, name)
   }
@@ -3771,6 +3824,10 @@ class ChannelType implements Type {
     throw new Error('reflect: Field of non-struct type')
   }
 
+  public FieldByIndex(index: $.Slice<number>): StructField {
+    return typeFieldByIndex(this, index)
+  }
+
   public FieldByName(name: string): [StructField, boolean] {
     return typeFieldByName(this, name)
   }
@@ -3915,6 +3972,10 @@ class InterfaceType implements Type {
 
   public Field(_i: number): StructField {
     throw new Error('reflect: Field of non-struct type')
+  }
+
+  public FieldByIndex(index: $.Slice<number>): StructField {
+    return typeFieldByIndex(this, index)
   }
 
   public FieldByName(name: string): [StructField, boolean] {

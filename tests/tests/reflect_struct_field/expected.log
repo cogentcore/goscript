@@ -1,2 +1,5 @@
 StructField Name: TestField
 StructField Type: string
+FieldByIndex 0: X float64
+FieldByIndex 1,1: B string
+FieldByIndex 2,0: A int
