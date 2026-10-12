@@ -17,6 +17,9 @@ Width: '   hi'
 Precision: '3.14'
 Both: ' 3.14'
 Formatter: byte-v
+Bytes: ab"c "ab\"c" 61622263 61622263 [97 98 34 99]
+String hex: 6869 6869
+Hex flags: 61 62 22 63 0x61622263 0x61 0x62 0x22 0x63 []byte{0x61, 0x62, 0x22, 0x63}
 Append bytes: base-tail
 Buffered writer
 test finished
