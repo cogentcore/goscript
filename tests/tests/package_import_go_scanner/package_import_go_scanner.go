@@ -15,4 +15,13 @@ func main() {
 	errorList.Add(pos, "test error")
 
 	fmt.Printf("ErrorList length: %d\n", len(errorList))
+
+	// End reports the position after the last scanned token.
+	fset := token.NewFileSet()
+	file := fset.AddFile("empty.go", -1, 0)
+	var s scanner.Scanner
+	s.Init(file, nil, nil, 0)
+	fmt.Println("End before Scan:", s.End() == token.NoPos)
+	_, tok, _ := s.Scan()
+	fmt.Println("Scan:", tok.String(), s.End() == file.Pos(0))
 }

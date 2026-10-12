@@ -11,6 +11,16 @@ export function Version(): string {
   return GOVERSION
 }
 
+// GOROOT returns the root of the Go tree, from the GOROOT environment
+// variable if it is set. A JavaScript program has no Go build tree to fall
+// back on, so it returns "" otherwise.
+export function GOROOT(): string {
+  const env = (
+    globalThis as { process?: { env?: Record<string, string | undefined> } }
+  ).process?.env
+  return env?.GOROOT ?? ''
+}
+
 // GOMAXPROCS sets the maximum number of operating system threads
 //
 // JavaScript is single threaded so this always returns 1.

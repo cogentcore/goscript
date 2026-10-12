@@ -7,6 +7,7 @@ func main() {
 	println("GOOS:", runtime.GOOS)
 	println("GOARCH:", runtime.GOARCH)
 	println("Compiler:", runtime.Compiler)
+	_ = runtime.GOROOT() // not stable for the test (depends on the Go installation)
 	// println("Version:", runtime.Version()) - not stable for the test (go.mod may change)
 	// println("NumCPU:", runtime.NumCPU()) - not stable for the test (number of cores may change)
 

@@ -11,6 +11,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("GOOS:", runtime.GOOS)
 	await $.println("GOARCH:", runtime.GOARCH)
 	await $.println("Compiler:", runtime.Compiler)
+	runtime.GOROOT()
 	// println("Version:", runtime.Version()) - not stable for the test (go.mod may change)
 	// println("NumCPU:", runtime.NumCPU()) - not stable for the test (number of cores may change)
 

@@ -77,3 +77,11 @@ export class SockaddrUnix implements Sockaddr {
 }
 
 export class Iovec {}
+
+// SysProcAttr holds optional, operating system-specific attributes for
+// starting a process, of which there are none for js.
+export class SysProcAttr {
+  public clone(): SysProcAttr {
+    return new SysProcAttr()
+  }
+}
