@@ -1,0 +1,5 @@
+ptr struct main.T
+*struct **struct
+nil false
+2 aaa true
+bbb 2.5

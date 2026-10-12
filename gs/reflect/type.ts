@@ -1006,7 +1006,7 @@ export class Value {
     }
     if (this._type.Kind() === Ptr) {
       // A pointer to a struct is the struct object itself.
-      if (this._value === null || this._value === undefined) {
+      if (this.IsNil()) {
         return new Value()
       }
       return new Value(this._value, this._type.Elem())
