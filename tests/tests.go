@@ -727,7 +727,7 @@ func RunGoScriptTestDir(t *testing.T, workspaceDir, testDir string) {
 		t.Fatalf("failed to write runner tsconfig.json to temp dir: %v", phase.Error)
 	}
 
-	if phase := workspace.EnsurePackageJSON(); phase.Failed() {
+	if phase := workspace.EnsurePackageJSON(nil); phase.Failed() {
 		t.Fatalf("failed to write package.json to temp dir: %v", phase.Error)
 	}
 

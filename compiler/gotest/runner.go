@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
+	goscript "github.com/s4wave/goscript"
 	"github.com/s4wave/goscript/compiler"
 	"github.com/s4wave/goscript/compiler/tsworkspace"
 	"golang.org/x/sync/errgroup"
@@ -107,12 +108,27 @@ func (r *Runner) Run(ctx context.Context, req *Request) (*Result, error) {
 		return result, nil
 	}
 
+	// Compile the packages under test.
 	outputRoots := r.compilePackageOutputs(ctx, norm, result)
 
-	if phase := workspace.EnsurePackageJSON(); phase.Failed() {
+	// Find the runtime npm packages the output imports.
+	dependencies, err := runtimeDependencies(outputRoots)
+	if err != nil {
+		markAllFailures(result, OwnerTestRunner, err.Error())
+		return result, nil
+	}
+
+	// Declare and install them in the workspace.
+	if phase := workspace.EnsurePackageJSON(dependencies); phase.Failed() {
 		markAllFailures(result, OwnerTestRunner, phase.Error)
 		return result, nil
 	}
+	if phase := workspace.InstallDependencies(ctx, dependencies); phase.Failed() {
+		markAllFailures(result, OwnerTestRunner, processErrorText(phase))
+		return result, nil
+	}
+
+	// Write the ambient types and project for the runtime backend.
 	nodeTypesAvailable := tsworkspace.NodeTypesPresent(norm.WorkDir, norm.Dir)
 	if norm.RuntimeBackend == RuntimeBackendBrowser {
 		nodeTypesAvailable = false
@@ -1652,4 +1668,15 @@ func diagnosticsHaveErrors(diagnostics []compiler.Diagnostic) bool {
 
 func diagnosticsSummary(diagnostics []compiler.Diagnostic) string {
 	return compiler.FormatDiagnostics(diagnostics)
+}
+
+// runtimeDependencies returns the npm packages that the GoScript runtime
+// declares and that the emitted output roots import, mapping each package
+// name to its version.
+func runtimeDependencies(outputRoots []string) (map[string]string, error) {
+	declared, err := goscript.RuntimeDependencies()
+	if err != nil {
+		return nil, errors.Wrap(err, "read GoScript runtime npm dependencies")
+	}
+	return tsworkspace.ImportedPackages(outputRoots, declared)
 }

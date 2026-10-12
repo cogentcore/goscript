@@ -25,3 +25,18 @@ func TestGsOverrides(t *testing.T) {
 	}
 	t.Logf("Loaded builtin.ts successfully with %d bytes", len(builtinContents))
 }
+
+func TestRuntimeDependencies(t *testing.T) {
+	deps, err := RuntimeDependencies()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(deps) == 0 {
+		t.Fatal("expected runtime npm dependencies")
+	}
+	for name, version := range deps {
+		if version == "" {
+			t.Fatalf("runtime npm dependency %s has no version", name)
+		}
+	}
+}

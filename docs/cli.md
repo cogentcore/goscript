@@ -45,6 +45,12 @@ normal pipeline, writes a TypeScript test runner, typechecks the generated
 workspace, and runs it. Output follows `go test`. A failure before the tests
 run reports the compiler stage that failed.
 
+Some runtime packages import npm packages, such as `pako` for `compress/flate`
+and `@noble/hashes` for `crypto/sha256`. When the compiled tests import one of
+them and it does not resolve from a `node_modules` directory of the workspace or
+an enclosing project, `goscript test` adds it to the workspace `package.json`
+at the version goscript pins and installs it with `bun install`.
+
 | Option | Effect |
 |--------|--------|
 | `--tags <tags>` | Comma-separated Go build tags. |

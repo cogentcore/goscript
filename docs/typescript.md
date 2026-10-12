@@ -41,6 +41,16 @@ What the generated code depends on:
 When a bundler emits JavaScript and TypeScript only typechecks, add
 `"noEmit": true`.
 
+## npm dependencies
+
+A few runtime packages import npm packages: `pako` for `compress/flate` and
+the compression packages built on it, and `@noble/ciphers` and `@noble/hashes`
+for some `crypto` packages. Output that imports one of them needs it installed
+to typecheck, bundle, or run. Adding the `goscript` npm package to the project
+installs them, or install the ones the output imports at the versions in the
+`dependencies` of goscript's `package.json`. Go programs can read those
+versions with `goscript.RuntimeDependencies`.
+
 ## Running the output
 
 Bun reads `tsconfig.json` paths, so `bun run` executes a generated
