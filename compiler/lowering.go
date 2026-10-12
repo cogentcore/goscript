@@ -13389,39 +13389,14 @@ func signatureHasTypeParam(signature *types.Signature, target *types.TypeParam) 
 // restricted to basic types, such as ~int32 | ~int64, so that a conversion
 // to a type parameter with that constraint can change a value's representation.
 func basicTypeSet(constraint types.Type) bool {
-	hasTerms, allBasic := basicTypeTerms(constraint)
-	return hasTerms && allBasic
-}
-
-// basicTypeTerms reports whether the given type set has type terms, and
-// whether all of them are basic types.
-func basicTypeTerms(typ types.Type) (hasTerms bool, allBasic bool) {
-	switch typed := types.Unalias(typ).(type) {
-	case *types.Basic:
-		return true, true
-	case *types.Union:
-		for i := range typed.Len() {
-			terms, basic := basicTypeTerms(typed.Term(i).Type())
-			if !terms || !basic {
-				return true, false
-			}
-		}
-		return true, true
+	var terms []types.Type
+	if !collectTypeSetTerms(constraint, &terms) || len(terms) == 0 {
+		return false
 	}
-	iface, ok := types.Unalias(typ).Underlying().(*types.Interface)
-	if !ok {
-		_, basic := types.Unalias(typ).Underlying().(*types.Basic)
-		return true, basic
-	}
-	allBasic = true
-	for i := range iface.NumEmbeddeds() {
-		terms, basic := basicTypeTerms(iface.EmbeddedType(i))
-		if terms {
-			hasTerms = true
-			allBasic = allBasic && basic
-		}
-	}
-	return hasTerms, allBasic
+	return !slices.ContainsFunc(terms, func(term types.Type) bool {
+		_, basic := types.Unalias(term).Underlying().(*types.Basic)
+		return !basic
+	})
 }
 
 func typeParamInScope(ctx lowerFileContext, target *types.TypeParam) bool {
