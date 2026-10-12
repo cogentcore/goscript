@@ -4,6 +4,9 @@
     "io"
   ],
   "asyncMethods": {
+    "Decoder.Decode": true,
+    "Decoder.More": true,
+    "Decoder.Token": true,
     "Encoder.Encode": true
   }
 }

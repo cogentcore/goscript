@@ -15,6 +15,46 @@ export type Number = string
 export type Token = unknown
 export type Delim = number
 
+// Delim_String returns the delimiter character, as Delim.String does in Go.
+export function Delim_String(d: Delim): string {
+  return String.fromCharCode(d)
+}
+
+// delimToken returns d as a Token holding a Delim, boxed with its Go type
+// as compiled code boxes a named type in an interface, so that type switches
+// and assertions on the token distinguish it from a number.
+function delimToken(d: Delim): Token {
+  return $.namedValueInterfaceValue<Token>(
+    d,
+    'json.Delim',
+    { String: Delim_String },
+    $.basicType('int32', 'json.Delim'),
+    [$.methodSignature('String', [], [$.basicType('string')])],
+  )
+}
+
+// valueToken returns a scanned literal value as a Token. Numbers are boxed
+// as float64 or json.Number values, as compiled code boxes them in an
+// interface, so that they are not mistaken for other numeric types.
+function valueToken(value: unknown, useNumber: boolean): Token {
+  if (useNumber && typeof value === 'string' && isValidFloat(value)) {
+    return $.namedValueInterfaceValue<Token>(
+      value,
+      'json.Number',
+      {
+        Float64: Number_Float64,
+        Int64: Number_Int64,
+        String: Number_String,
+      },
+      $.basicType('string', 'json.Number'),
+    )
+  }
+  if (typeof value === 'number') {
+    return $.basicInterfaceValue<Token>(value, 'float64')
+  }
+  return value
+}
+
 class jsonError extends Error {
   public Error(): string {
     return this.message
@@ -163,56 +203,131 @@ export class UnsupportedValueError extends jsonError {
   }
 }
 
+// decoderReadSize is the size of each read from a Decoder's reader.
+const decoderReadSize = 32 * 1024
+
+// needMore is returned by a Decoder step that needs more input.
+const needMore = Symbol('needMore')
+
 export class Decoder {
   private disallowUnknownFields = false
   private inputOffset = 0
   private useNumber = false
-  // buf holds the fully buffered input; pos is the index of the next unread
+
+  // buf holds the input read so far; pos is the index of the next unread
   // character, so successive Decode/Token calls consume one value at a time and
-  // leave the remainder buffered, like Go's streaming Decoder.
+  // leave the remainder buffered, like Go's streaming Decoder. Input is read in
+  // bounded chunks only as needed to complete the next value.
   private buf = ''
   private pos = 0
-  private filled = false
+  private eof = false
   private readErr: $.GoError = null
+  private chunk = $.makeSlice<number>(decoderReadSize, undefined, 'byte')
+  private utf8 = new TextDecoder()
 
   public constructor(private readonly reader: io.Reader) {}
 
-  private fill(): void {
-    if (this.filled) {
-      return
-    }
-    this.filled = true
-    const [data, err] = readAllSync(this.reader)
-    if (err !== null) {
-      this.readErr = err
-      return
-    }
-    this.buf = $.bytesToString(data)
-  }
+  // readChunk reads the next chunk of input into buf. It returns a Promise
+  // when the reader is asynchronous.
+  private readChunk(): io.Awaitable<void> {
+    return io.mapResult(this.reader.Read(this.chunk), ([n, err]) => {
+      // Decode the bytes read, holding back a split UTF-8 sequence.
+      if (n > 0) {
+        this.buf += this.utf8.decode(
+          $.bytesToUint8Array($.goSlice(this.chunk, 0, n)),
+          { stream: true },
+        )
+      }
 
-  public Decode(v: unknown): $.GoError {
-    this.fill()
-    this.pos = skipJSONWhitespace(this.buf, this.pos)
-    if (this.pos >= this.buf.length) {
-      return this.readErr ?? io.EOF
-    }
-    let end: number
-    try {
-      ;[, end] = scanJSONValue(this.buf, this.pos, this.useNumber)
-    } catch (err) {
-      return goError(err)
-    }
-    const raw = $.stringToBytes(this.buf.slice(this.pos, end))
-    this.pos = end
-    this.inputOffset = jsonByteOffset(this.buf, end)
-    return decode(raw, v, {
-      disallowUnknownFields: this.disallowUnknownFields,
-      useNumber: this.useNumber,
+      // Any error ends the input; only io.EOF is not reported.
+      if (err !== null) {
+        this.eof = true
+        this.buf += this.utf8.decode()
+        if (err !== io.EOF) {
+          this.readErr = err
+        }
+      }
     })
   }
 
+  // run calls step, reading more input while it returns needMore, so the
+  // result is synchronous for a synchronous reader.
+  private run<T>(step: () => T | typeof needMore): io.Awaitable<T> {
+    while (true) {
+      const result = step()
+      if (result !== needMore) {
+        return result
+      }
+      const read = this.readChunk()
+      if (io.isAsync(read)) {
+        return Promise.resolve(read).then(() => this.run(step))
+      }
+    }
+  }
+
+  // scanValue scans the value at pos, returning needMore if the input so
+  // far may end before the value does.
+  private scanValue(): [unknown, number] | typeof needMore {
+    try {
+      // Only a number that reaches the end of the input may continue.
+      const [value, end] = scanJSONValue(this.buf, this.pos, this.useNumber)
+      if (
+        !this.eof &&
+        end >= this.buf.length &&
+        /[-\d]/.test(this.buf[this.pos])
+      ) {
+        return needMore
+      }
+      return [value, end]
+    } catch (err) {
+      // An error at the end of the input may be a value that continues.
+      if (
+        !this.eof &&
+        err instanceof SyntaxError &&
+        Number(err.Offset) >= jsonByteOffset(this.buf, this.buf.length)
+      ) {
+        return needMore
+      }
+      throw err
+    }
+  }
+
+  // consume advances past the scanned input up to end.
+  private consume(end: number): void {
+    this.pos = end
+    this.inputOffset = jsonByteOffset(this.buf, end)
+  }
+
+  public Decode(v: unknown): io.Awaitable<$.GoError> {
+    return this.run(() => {
+      // Find the next value, reading until it is complete.
+      this.pos = skipJSONWhitespace(this.buf, this.pos)
+      if (this.pos >= this.buf.length) {
+        return this.eof ? (this.readErr ?? io.EOF) : needMore
+      }
+      let scanned: ReturnType<Decoder['scanValue']>
+      try {
+        scanned = this.scanValue()
+      } catch (err) {
+        return goError(err)
+      }
+      if (scanned === needMore) {
+        return needMore
+      }
+
+      // Consume the value and decode it into v.
+      const raw = $.stringToBytes(this.buf.slice(this.pos, scanned[1]))
+      this.consume(scanned[1])
+      return decode(raw, v, {
+        disallowUnknownFields: this.disallowUnknownFields,
+        useNumber: this.useNumber,
+      })
+    })
+  }
+
+  // Buffered returns the data remaining in the Decoder's buffer, without
+  // reading more input, as in Go.
   public Buffered(): io.Reader {
-    this.fill()
     return bytes.NewBufferString(this.buf.slice(this.pos))!
   }
 
@@ -224,47 +339,55 @@ export class Decoder {
     return BigInt(this.inputOffset)
   }
 
-  public More(): boolean {
-    this.fill()
-    const next = skipJSONWhitespace(this.buf, this.pos)
-    if (next >= this.buf.length) {
-      return false
-    }
-    const c = this.buf[next]
-    return c !== ']' && c !== '}'
+  public More(): io.Awaitable<boolean> {
+    return this.run(() => {
+      const next = skipJSONWhitespace(this.buf, this.pos)
+      if (next >= this.buf.length) {
+        return this.eof ? false : needMore
+      }
+      const c = this.buf[next]
+      return c !== ']' && c !== '}'
+    })
   }
 
-  public Token(): [Token, $.GoError] {
-    this.fill()
-    let cursor = skipJSONWhitespace(this.buf, this.pos)
-    // Object/array separators are implicit in Go's token stream; skip them.
-    while (cursor < this.buf.length) {
-      const sep = this.buf[cursor]
-      if (sep === ',' || sep === ':') {
-        cursor++
-        cursor = skipJSONWhitespace(this.buf, cursor)
-        continue
+  public Token(): io.Awaitable<[Token, $.GoError]> {
+    return this.run((): [Token, $.GoError] | typeof needMore => {
+      // Object and array separators are implicit in Go's token stream, so
+      // skip them.
+      let cursor = skipJSONWhitespace(this.buf, this.pos)
+      while (this.buf[cursor] === ',' || this.buf[cursor] === ':') {
+        cursor = skipJSONWhitespace(this.buf, cursor + 1)
       }
-      break
-    }
-    this.pos = cursor
-    if (this.pos >= this.buf.length) {
-      return [null, this.readErr ?? io.EOF]
-    }
-    const c = this.buf[this.pos]
-    if (c === '{' || c === '[' || c === '}' || c === ']') {
-      this.pos++
-      this.inputOffset = jsonByteOffset(this.buf, this.pos)
-      return [c.charCodeAt(0), null]
-    }
-    try {
-      const [value, end] = scanJSONValue(this.buf, this.pos, this.useNumber)
-      this.pos = end
-      this.inputOffset = jsonByteOffset(this.buf, end)
-      return [value, null]
-    } catch (err) {
-      return [null, goError(err)]
-    }
+      if (cursor >= this.buf.length) {
+        if (!this.eof) {
+          return needMore
+        }
+        this.pos = cursor
+        return [null, this.readErr ?? io.EOF]
+      }
+
+      // A delimiter is a token by itself.
+      this.pos = cursor
+      const c = this.buf[cursor]
+      if (c === '{' || c === '[' || c === '}' || c === ']') {
+        this.consume(cursor + 1)
+        return [delimToken(c.charCodeAt(0)), null]
+      }
+
+      // Otherwise the token is the next literal value, boxed as Go boxes it.
+      let scanned: ReturnType<Decoder['scanValue']>
+      try {
+        scanned = this.scanValue()
+      } catch (err) {
+        return [null, goError(err)]
+      }
+      if (scanned === needMore) {
+        return needMore
+      }
+      const [value, end] = scanned
+      this.consume(end)
+      return [c === '"' ? value : valueToken(value, this.useNumber), null]
+    })
   }
 
   public UseNumber(): void {
@@ -901,31 +1024,6 @@ function isValidFloat(value: string): boolean {
   return /^[+-]?(?:(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?|inf(?:inity)?|nan)$/i.test(
     value,
   )
-}
-
-function readAllSync(r: io.Reader): [$.Bytes, $.GoError] {
-  const chunks: number[] = []
-  const buf = $.makeSlice<number>(512, undefined, 'byte')
-  while (true) {
-    const read = r.Read(buf)
-    if (io.isAsync(read)) {
-      return [null, $.newError('json: asynchronous reader is unsupported')]
-    }
-    const [n, err] = read
-    if (n > 0) {
-      chunks.push(...$.bytesToUint8Array($.goSlice(buf, 0, n)))
-    }
-    if (err !== null) {
-      // io.EOF is constructed by the runtime with a synchronous Error(), so a
-      // Promise here can never be the EOF sentinel; resolving it would force
-      // the sync Decoder pipeline to become async for no reachable case.
-      const text = err.Error()
-      if (typeof text === 'string' && text === 'EOF') {
-        return [new Uint8Array(chunks), null]
-      }
-      return [null, err]
-    }
-  }
 }
 
 // marshalerResult returns the RawJSON for the result of a MarshalJSON call.

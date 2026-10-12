@@ -13,3 +13,21 @@ big 9007199254740993
 offset 4
 more true
 more false
+héllo 12.5
+x 3
+decode end: true
+delim [ true
+number 1
+string two
+delim { true
+string k
+bool true
+delim } false
+delim ] false
+token end: true
+delim [ true
+json.Number 1.5 1.5
+string s
+delim ] false
+token end: true
+syntax error: true
