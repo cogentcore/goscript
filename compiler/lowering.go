@@ -8683,6 +8683,9 @@ func (o *LoweringOwner) lowerCallArgs(
 			diagnostics = append(diagnostics, argDiagnostics...)
 			if idx < fixedCount {
 				lowered = o.lowerCallArgForTarget(ctx, arg, params.At(idx).Type(), lowered, overrideCall)
+				if !allowAsyncOverrideCallback && !o.overrideAwaitsCallback(ctx, expr.Fun, params.At(idx).Name()) {
+					lowered = o.lowerSyncCallbackArg(ctx, arg, params.At(idx).Type(), lowered)
+				}
 			} else if expr.Ellipsis != token.NoPos && idx == len(expr.Args)-1 {
 				lowered = o.lowerCallArgForTarget(ctx, arg, params.At(fixedCount).Type(), lowered, overrideCall)
 				lowered = "...(" + lowered + " ?? [])"
@@ -8877,6 +8880,9 @@ func (o *LoweringOwner) lowerFixedCallArgs(
 		diagnostics = append(diagnostics, exprDiagnostics...)
 		if params != nil && idx < params.Len() {
 			lowered = o.lowerCallArgForTarget(ctx, expr, params.At(idx).Type(), lowered, overrideCall)
+			if overrideCall && !allowAsyncCallback {
+				lowered = o.lowerSyncCallbackArg(ctx, expr, params.At(idx).Type(), lowered)
+			}
 		}
 		args = append(args, lowered)
 	}
@@ -8921,6 +8927,41 @@ func (o *LoweringOwner) lowerCallArgForTarget(
 		return o.runtimeOwner.QualifiedHelper(RuntimeHelperPointerValueOrNil) + "(" + value + ")!"
 	}
 	return parenthesizeAwaitedExpr(value) + "!"
+}
+
+// lowerSyncCallbackArg adapts a function value passed to a synchronous
+// callback parameter of an override. A function variable, field, or result
+// has an async-compatible type, because it may hold an async function, but
+// the override calls it without awaiting, so each call must return its result
+// synchronously. Function literals and declared functions already have the
+// exact type, and a callback without results has nothing to await.
+func (o *LoweringOwner) lowerSyncCallbackArg(
+	ctx lowerFileContext,
+	expr ast.Expr,
+	targetType types.Type,
+	value string,
+) string {
+	signature := signatureForType(targetType)
+	if signature == nil || signature.Results() == nil || signature.Results().Len() == 0 {
+		return value
+	}
+	pkg := ctx.semPkg.source
+	if tv, ok := pkg.TypesInfo.Types[expr]; ok && tv.IsNil() {
+		return value
+	}
+	switch e := ast.Unparen(expr).(type) {
+	case *ast.FuncLit:
+		return value
+	case *ast.Ident:
+		if _, ok := pkg.TypesInfo.Uses[e].(*types.Func); ok {
+			return value
+		}
+	case *ast.SelectorExpr:
+		if _, ok := pkg.TypesInfo.Uses[e.Sel].(*types.Func); ok {
+			return value
+		}
+	}
+	return o.runtimeOwner.QualifiedHelper(RuntimeHelperSyncFunction) + "(" + value + ")"
 }
 
 func typeParamInterfaceConstraint(typ types.Type) types.Type {
