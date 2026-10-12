@@ -12,7 +12,7 @@ import {
   registerStructType,
   varRef,
 } from '../builtin/index.js'
-import { StructField } from './types.js'
+import { StructField, StructTag_Get } from './types.js'
 import { SelectCase, SelectRecv } from './types.js'
 import {
   Chan,
@@ -501,7 +501,7 @@ describe('TypeFor', () => {
     expect(typ.PkgPath()).toBe('')
     expect(typ.NumField()).toBe(1)
     expect(typ.Field(0).Name).toBe('X')
-    expect(typ.Field(0).Tag.Get('json')).toBe('x')
+    expect(StructTag_Get(typ.Field(0).Tag, 'json')).toBe('x')
     expect(typ.AssignableTo(dynamic)).toBe(true)
     expect(dynamic.AssignableTo(typ)).toBe(true)
   })
@@ -673,7 +673,7 @@ describe('TypeFor', () => {
     expect(fieldsType.Field(1).Anonymous).toBe(true)
     expect(fieldsType.Field(1).Index).toEqual([3])
     expect(fieldsType.Field(1).Offset).toBe(24)
-    expect(fieldsType.Field(1).Tag.Get('json')).toBe('total')
+    expect(StructTag_Get(fieldsType.Field(1).Tag, 'json')).toBe('total')
     expect(fieldsType.Field(2).Type.String()).toBe('[]main.RegisteredStruct')
     expect(fieldsType.Field(2).Type.Elem().String()).toBe(
       'main.RegisteredStruct',

@@ -44,9 +44,10 @@ export { MapIter } from './map.js'
 export { VisibleFields } from './visiblefields.js'
 
 // Export new types and constants
+export type { StructTag } from './types.js'
 export {
-  StructTag,
   StructTag_Get,
+  StructTag_Lookup,
   StructField,
   ValueError,
   Method,
