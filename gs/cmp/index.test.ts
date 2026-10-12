@@ -1,6 +1,14 @@
 import { describe, expect, it } from 'vitest'
 
+import * as $ from '@goscript/builtin/index.js'
+
 import { Compare, Less, Or } from './index.js'
+
+// typeArgs is the descriptor an explicitly instantiated call passes first.
+const typeArgs: $.GenericTypeArgs = {
+  [$.genericTypeArgsMarker]: $.genericTypeArgsBrand,
+  T: { type: 'io.Writer', zero: () => null },
+}
 
 describe('cmp.Compare', () => {
   it('orders ordinary values', () => {
@@ -51,5 +59,13 @@ describe('cmp.Or', () => {
     expect(Or(0n, 5n)).toBe(5n)
     expect(Or('', '')).toBe('')
     expect(Or(false, false)).toBe(false)
+  })
+})
+
+describe('cmp.Or explicitly instantiated', () => {
+  it('skips the type descriptor', () => {
+    const writer = {}
+    expect(Or(typeArgs, null, writer)).toBe(writer)
+    expect(Or(typeArgs, null, null)).toBe(null)
   })
 })
