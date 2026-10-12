@@ -1561,7 +1561,7 @@ func (o *LoweringOwner) lowerGenDecl(ctx lowerFileContext, decl *ast.GenDecl) ([
 							decls = append(decls, loweredDecl{packageInitCall: initName + "()"})
 						}
 						getterCode += "if (((" + declName + ") as any) === undefined) {\n\t\t" +
-							"throw new Error(" + strconv.Quote("goscript package variable "+name.Name+" read before initialization") + ")\n\t}\n"
+							"throw new globalThis.Error(" + strconv.Quote("goscript package variable "+name.Name+" read before initialization") + ")\n\t}\n"
 					} else {
 						initCode := "export function " + initName + "(): void {\n\t" +
 							"if (((" + declName + ") as any) === undefined) {\n\t\t" +

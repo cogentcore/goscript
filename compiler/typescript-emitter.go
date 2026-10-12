@@ -1205,7 +1205,7 @@ func renderSelect(b *strings.Builder, stmt *loweredSelect, indent int) {
 	b.WriteString("}\n")
 	if stmt.returns {
 		writeIndent(b, indent)
-		b.WriteString("throw new Error(\"unreachable select\")\n")
+		b.WriteString("throw new globalThis.Error(\"unreachable select\")\n")
 	}
 }
 
@@ -1239,7 +1239,7 @@ func renderSelectExternalBodies(b *strings.Builder, stmt *loweredSelect, indent 
 	b.WriteString("}\n")
 	if stmt.returns {
 		writeIndent(b, indent)
-		b.WriteString("throw new Error(\"unreachable select\")\n")
+		b.WriteString("throw new globalThis.Error(\"unreachable select\")\n")
 	}
 }
 

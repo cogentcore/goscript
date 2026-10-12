@@ -346,7 +346,7 @@ export class memoryRpcStream {
 		if (__goscriptSelect0HasReturn) {
 			return __goscriptSelect0Value
 		}
-		throw new Error("unreachable select")
+		throw new globalThis.Error("unreachable select")
 		throw new globalThis.Error("goscript: unreachable return")
 	}
 
@@ -374,7 +374,7 @@ export class memoryRpcStream {
 		if (__goscriptSelect1HasReturn) {
 			return __goscriptSelect1Value
 		}
-		throw new Error("unreachable select")
+		throw new globalThis.Error("unreachable select")
 		throw new globalThis.Error("goscript: unreachable return")
 	}
 
@@ -445,7 +445,7 @@ export class memoryRpcContext {
 		if (__goscriptSelect2HasReturn) {
 			return __goscriptSelect2Value
 		}
-		throw new Error("unreachable select")
+		throw new globalThis.Error("unreachable select")
 		throw new globalThis.Error("goscript: unreachable return")
 	}
 
