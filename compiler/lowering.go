@@ -11969,7 +11969,7 @@ func (o *LoweringOwner) lowerNamedValueInterfaceWrapper(
 			return ""
 		}
 	}
-	methods := o.genericMethodDescriptorsForType(ctx, receiver, methodSetType)
+	methods := o.genericMethodDescriptorsForType(ctx, receiver, methodSetType, make(map[types.Type]bool))
 	if methods == "" {
 		return ""
 	}
@@ -13043,6 +13043,7 @@ func (o *LoweringOwner) genericReceiverTypeArgsExprForMethod(
 	ctx lowerFileContext,
 	method *types.Func,
 	methodSetType types.Type,
+	seen map[types.Type]bool,
 ) string {
 	if method == nil || methodSetType == nil {
 		return ""
@@ -13064,7 +13065,7 @@ func (o *LoweringOwner) genericReceiverTypeArgsExprForMethod(
 	}
 	entries := make([]string, 0, len(params))
 	for idx, param := range params {
-		entries = append(entries, param.Obj().Name()+": "+o.genericTypeDescriptorExpr(ctx, receiver.TypeArgs().At(idx)))
+		entries = append(entries, param.Obj().Name()+": "+o.genericTypeDescriptorExprWithSeen(ctx, receiver.TypeArgs().At(idx), seen))
 	}
 	return o.genericTypeArgsLiteral(entries)
 }
@@ -13918,6 +13919,17 @@ func instantiatedTypeArgs(ctx lowerFileContext, callee ast.Expr) *types.TypeList
 }
 
 func (o *LoweringOwner) genericTypeDescriptorExpr(ctx lowerFileContext, typ types.Type) string {
+	return o.genericTypeDescriptorExprWithSeen(ctx, typ, make(map[types.Type]bool))
+}
+
+// genericTypeDescriptorExprWithSeen renders the generic type descriptor for
+// typ. The method descriptors of a type include the descriptors of the type
+// arguments of their receivers, which can refer back to typ, as in
+// type App struct{ Base[*Win] } with type Win struct{ Base[*App] }. seen holds
+// the types whose method descriptors are being rendered, and a type that is
+// already in seen is rendered without methods, so that the generic method
+// calls on it use the receiver's own methods.
+func (o *LoweringOwner) genericTypeDescriptorExprWithSeen(ctx lowerFileContext, typ types.Type, seen map[types.Type]bool) string {
 	if typeParam, ok := types.Unalias(typ).(*types.TypeParam); ok && typeParamInScope(ctx, typeParam) {
 		return "__typeArgs?.[" + strconv.Quote(typeParam.Obj().Name()) + "] ?? { type: " +
 			o.runtimeTypeInfoExpr(typ) + ", zero: () => " + o.lowerZeroValueExprFor(ctx, typ) + " }"
@@ -13926,7 +13938,7 @@ func (o *LoweringOwner) genericTypeDescriptorExpr(ctx lowerFileContext, typ type
 		"type: " + o.runtimeTypeInfoExpr(typ),
 		"zero: () => " + o.lowerZeroValueExprFor(ctx, typ),
 	}
-	if methods := o.genericMethodDescriptors(ctx, typ); methods != "" {
+	if methods := o.genericMethodDescriptors(ctx, typ, seen); methods != "" {
 		parts = append(parts, "methods: "+methods)
 		if signatures := o.genericMethodSignatureDescriptors(typ); signatures != "" &&
 			genericTypeDescriptorNeedsMethodSignatures(typ) {
@@ -13944,19 +13956,26 @@ func genericTypeDescriptorNeedsMethodSignatures(typ types.Type) bool {
 	return namedStructType(named) == nil && !isInterfaceType(named)
 }
 
-func (o *LoweringOwner) genericMethodDescriptors(ctx lowerFileContext, typ types.Type) string {
+func (o *LoweringOwner) genericMethodDescriptors(ctx lowerFileContext, typ types.Type, seen map[types.Type]bool) string {
 	named, methodSetType := genericMethodSetDescriptorTarget(typ)
 	if named == nil {
 		return ""
 	}
-	return o.genericMethodDescriptorsForType(ctx, named, methodSetType)
+	return o.genericMethodDescriptorsForType(ctx, named, methodSetType, seen)
 }
 
 func (o *LoweringOwner) genericMethodDescriptorsForType(
 	ctx lowerFileContext,
 	named *types.Named,
 	methodSetType types.Type,
+	seen map[types.Type]bool,
 ) string {
+	typeKey := types.Unalias(methodSetType)
+	if seen[typeKey] {
+		return ""
+	}
+	seen[typeKey] = true
+	defer delete(seen, typeKey)
 	methodSet := types.NewMethodSet(methodSetType)
 	methods := make([]string, 0, methodSet.Len())
 	for method := range methodSet.Methods() {
@@ -13964,7 +13983,7 @@ func (o *LoweringOwner) genericMethodDescriptorsForType(
 		if method == nil {
 			continue
 		}
-		genericArgs := o.genericReceiverTypeArgsExprForMethod(ctx, method, methodSetType)
+		genericArgs := o.genericReceiverTypeArgsExprForMethod(ctx, method, methodSetType, seen)
 		if namedStructType(named) != nil || isInterfaceType(named) {
 			// A struct receiver may arrive as a VarRef when the caller
 			// converted the address of a variable to the constraint's
