@@ -9251,6 +9251,15 @@ func (o *LoweringOwner) lowerConversionExpr(
 	if isNilExpr(expr.Args[0]) && isPointerType(targetType) {
 		return "null", diagnostics
 	}
+	if typeParam, ok := types.Unalias(targetType).(*types.TypeParam); ok &&
+		typeParamInScope(ctx, typeParam) && !types.Identical(targetType, sourceType) &&
+		basicTypeSet(typeParam.Constraint()) {
+		// The type argument determines the representation of a numeric value,
+		// such as a bigint for int64, so the conversion happens at runtime.
+		return o.runtimeOwner.QualifiedHelper(RuntimeHelperGenericConvert) +
+			"<" + o.tsSliceElemTypeFor(ctx, targetType) + ">(__typeArgs, " +
+			strconv.Quote(typeParam.Obj().Name()) + ", " + value + ")", diagnostics
+	}
 	if isInterfaceType(targetType) {
 		return o.lowerValueForTarget(ctx, expr.Args[0], targetType, value), diagnostics
 	}
@@ -13122,6 +13131,45 @@ func signatureHasTypeParam(signature *types.Signature, target *types.TypeParam) 
 		}
 	}
 	return false
+}
+
+// basicTypeSet reports whether the type set of the given constraint is
+// restricted to basic types, such as ~int32 | ~int64, so that a conversion
+// to a type parameter with that constraint can change a value's representation.
+func basicTypeSet(constraint types.Type) bool {
+	hasTerms, allBasic := basicTypeTerms(constraint)
+	return hasTerms && allBasic
+}
+
+// basicTypeTerms reports whether the given type set has type terms, and
+// whether all of them are basic types.
+func basicTypeTerms(typ types.Type) (hasTerms bool, allBasic bool) {
+	switch typed := types.Unalias(typ).(type) {
+	case *types.Basic:
+		return true, true
+	case *types.Union:
+		for i := range typed.Len() {
+			terms, basic := basicTypeTerms(typed.Term(i).Type())
+			if !terms || !basic {
+				return true, false
+			}
+		}
+		return true, true
+	}
+	iface, ok := types.Unalias(typ).Underlying().(*types.Interface)
+	if !ok {
+		_, basic := types.Unalias(typ).Underlying().(*types.Basic)
+		return true, basic
+	}
+	allBasic = true
+	for i := range iface.NumEmbeddeds() {
+		terms, basic := basicTypeTerms(iface.EmbeddedType(i))
+		if terms {
+			hasTerms = true
+			allBasic = allBasic && basic
+		}
+	}
+	return hasTerms, allBasic
 }
 
 func typeParamInScope(ctx lowerFileContext, target *types.TypeParam) bool {

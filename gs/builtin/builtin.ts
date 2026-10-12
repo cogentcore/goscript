@@ -6,6 +6,7 @@ import {
   structFieldRuntimeKey,
   structValueTypeInfo,
   TypeKind,
+  type GenericTypeArgs,
   type TypeInfo,
 } from './type.js'
 import { writeHostStdoutText } from './hostio.js'
@@ -529,6 +530,56 @@ function uintGeneral(
     truncated += modulo
   }
   return truncated
+}
+
+// genericConvert converts a value to the named type argument, as in the Go
+// conversion T(x) where T is a type parameter. A numeric value takes the
+// representation and width of the type argument's underlying basic type,
+// such as a bigint for int64; any other value is unchanged.
+export function genericConvert<T>(
+  typeArgs: GenericTypeArgs | undefined,
+  name: string,
+  value: unknown,
+): T {
+  const type = typeArgs?.[name]?.type
+  const info = typeof type === 'string' ? getTypeByName(type) : type
+  if (
+    info?.kind !== TypeKind.Basic ||
+    (typeof value !== 'number' && typeof value !== 'bigint')
+  ) {
+    return value as T
+  }
+  switch (info.name) {
+    case 'int64':
+      return int64(value) as T
+    case 'uint64':
+    case 'uintptr':
+      return uint64(value) as T
+    case 'int8':
+      return int(value, 8) as T
+    case 'int16':
+      return int(value, 16) as T
+    case 'int32':
+    case 'rune':
+      return int(value, 32) as T
+    case 'int':
+      return int(value) as T
+    case 'uint8':
+    case 'byte':
+      return uint(value, 8) as T
+    case 'uint16':
+      return uint(value, 16) as T
+    case 'uint32':
+      return uint(value, 32) as T
+    case 'uint':
+      return uint(value, 64) as T
+    case 'float32':
+      return float32(value) as T
+    case 'float64':
+      return Number(value) as T
+    default:
+      return value as T
+  }
 }
 
 // int64 converts a value to a Go int64, preserving the full 64-bit range as a
