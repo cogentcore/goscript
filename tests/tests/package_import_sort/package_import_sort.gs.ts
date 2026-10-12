@@ -3,13 +3,18 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
+import * as reflect from "@goscript/reflect/index.js"
+
 import * as slices from "@goscript/slices/index.js"
 
 import * as sort2 from "@goscript/sort/index.js"
+import "@goscript/reflect/index.js"
 import "@goscript/slices/index.js"
 import "@goscript/sort/index.js"
 
 export type byFreq = $.Slice<number>
+
+export type nameList = $.Slice<string>
 
 export class descending {
 	public declare values: $.Slice<number>
@@ -53,9 +58,9 @@ export class descending {
 	static __typeInfo = $.registerStructType(
 		"main.descending",
 		() => new descending(),
-		() => [{ name: "Len", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }, { name: "Less", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "Swap", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [] }],
+		() => [$.methodSignature("Len", [], [/* @__PURE__ */ $.basicType("int")]), $.methodSignature("Less", [["i", /* @__PURE__ */ $.basicType("int")], ["j", /* @__PURE__ */ $.basicType("int")]], [/* @__PURE__ */ $.basicType("bool")]), $.methodSignature("Swap", [["i", /* @__PURE__ */ $.basicType("int")], ["j", /* @__PURE__ */ $.basicType("int")]])],
 		descending,
-		() => [{ name: "values", key: "values", type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")) }]
+		() => [/* @__PURE__ */ $.structField("values", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")), [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/package_import_sort" })]
 	)
 }
 
@@ -156,7 +161,28 @@ export async function main(): globalThis.Promise<void> {
 	await byFreq_sort(namedSliceSorter, namedSlice)
 	await $.println("Named slice pointer sort:", $.arrayIndex(namedSlice!, 0), $.arrayIndex(namedSlice!, 1), $.arrayIndex(namedSlice!, 2))
 
+	// sort.Slice takes the slice as an any, such as from reflect
+	let anySlice: $.Slice<number> = $.arrayToSlice<number>([3, 1, 2])
+	await sort2.Slice($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(anySlice, "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")))))).Interface(), $.functionValue((i: number, j: number): boolean => {
+		return $.arrayIndex(anySlice!, i) < $.arrayIndex(anySlice!, j)
+	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo)))
+	await $.println("Any slice sort:", $.arrayIndex(anySlice!, 0), $.arrayIndex(anySlice!, 1), $.arrayIndex(anySlice!, 2))
+	await $.println("Any slice sorted:", await sort2.SliceIsSorted($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(anySlice, "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")))))).Interface(), $.functionValue((i: number, j: number): boolean => {
+		return $.arrayIndex(anySlice!, i) < $.arrayIndex(anySlice!, j)
+	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo))))
+
+	// a named slice type with methods passed as an any
+	let names: nameList = ($.arrayToSlice<string>(["c", "a", "b"]) as nameList)
+	await sort2.Slice($.namedValueInterfaceValue<any>(names, "main.nameList", {First: (receiver: any, ...args: any[]) => (nameList_First as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("string"), "main.nameList"), [$.methodSignature("First", [], [/* @__PURE__ */ $.basicType("string")])]), $.functionValue((i: number, j: number): boolean => {
+		return $.stringCompare($.arrayIndex(names!, i), $.arrayIndex(names!, j)) < 0
+	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo)))
+	await $.println("Named slice any sort:", nameList_First(names), $.arrayIndex(names!, 1), $.arrayIndex(names!, 2))
+
 	await $.println("test finished")
+}
+
+export function nameList_First(n: nameList): string {
+	return $.arrayIndex(n!, 0)
 }
 
 if ($.isMainScript(import.meta)) {

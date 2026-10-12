@@ -78,29 +78,37 @@ async function sortIndexRange(
   }
 }
 
+// sliceOf returns the slice in x, which is a Go interface value holding a
+// slice, possibly boxed as a named slice type with methods.
+function sliceOf(x: unknown): $.Slice<unknown> {
+  return ($.isNamedValueBox(x) ? x.__goValue : x) as $.Slice<unknown>
+}
+
 // Slice sorts the slice x given the provided less function
 export async function Slice(
-  x: $.Slice<any>,
+  x: unknown,
   less: LessFunc,
 ): globalThis.Promise<void> {
-  if (!x) return
+  const s = sliceOf(x)
+  if (!s) return
 
-  const n = $.len(x)
+  const n = $.len(s)
   const indices = await sortedIndices(n, less)
-  const sorted = indices.map((index) => $.index(x, index))
+  const sorted = indices.map((index) => $.index(s, index))
   for (let i = 0; i < sorted.length; i++) {
-    setInSlice(x, i, sorted[i])
+    setInSlice(s, i, sorted[i])
   }
 }
 
 // SliceIsSorted reports whether the slice x is sorted according to the provided less function
 export async function SliceIsSorted(
-  x: $.Slice<any>,
+  x: unknown,
   less: LessFunc,
 ): globalThis.Promise<boolean> {
-  if (!x) return true
+  const s = sliceOf(x)
+  if (!s) return true
 
-  const n = $.len(x)
+  const n = $.len(s)
   for (let i = n - 1; i > 0; i--) {
     if (await less(i, i - 1)) {
       return false
@@ -111,7 +119,7 @@ export async function SliceIsSorted(
 
 // SliceStable sorts the slice x while keeping the original order of equal elements
 export async function SliceStable(
-  x: $.Slice<any>,
+  x: unknown,
   less: LessFunc,
 ): globalThis.Promise<void> {
   await Slice(x, less)

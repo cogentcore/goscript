@@ -1,6 +1,9 @@
 package main
 
-import "slices"
+import (
+	"reflect"
+	"slices"
+)
 
 import "sort"
 
@@ -116,5 +119,26 @@ func main() {
 	namedSliceSorter.sort(namedSlice)
 	println("Named slice pointer sort:", namedSlice[0], namedSlice[1], namedSlice[2])
 
+	// sort.Slice takes the slice as an any, such as from reflect
+	anySlice := []int{3, 1, 2}
+	sort.Slice(reflect.ValueOf(anySlice).Interface(), func(i, j int) bool {
+		return anySlice[i] < anySlice[j]
+	})
+	println("Any slice sort:", anySlice[0], anySlice[1], anySlice[2])
+	println("Any slice sorted:", sort.SliceIsSorted(reflect.ValueOf(anySlice).Interface(), func(i, j int) bool {
+		return anySlice[i] < anySlice[j]
+	}))
+
+	// a named slice type with methods passed as an any
+	names := nameList{"c", "a", "b"}
+	sort.Slice(names, func(i, j int) bool {
+		return names[i] < names[j]
+	})
+	println("Named slice any sort:", names.First(), names[1], names[2])
+
 	println("test finished")
 }
+
+type nameList []string
+
+func (n nameList) First() string { return n[0] }
