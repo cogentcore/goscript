@@ -1836,11 +1836,11 @@ export function typeAssert<T>(
     const ok =
       (typeof typeInfo === 'string' && value.__goType === typeInfo) ||
       areTypeInfosIdentical(value.__goTypeInfo, normalizedType)
+    if (!ok) {
+      return failedTypeAssert<T>(typeInfo, normalizedType)
+    }
     return {
-      value:
-        ok ?
-          (('__goValue' in value ? value.__goValue : value) as T)
-        : (null as T),
+      value: ('__goValue' in value ? value.__goValue : value) as T,
       ok,
     }
   }
@@ -1920,8 +1920,15 @@ export function typeAssert<T>(
     }
   }
 
-  // If we get here, the assertion failed
-  // For registered types, use the zero value from the registry
+  return failedTypeAssert<T>(typeInfo, normalizedType)
+}
+
+// failedTypeAssert returns the result of a failed type assertion, which has
+// the zero value of a registered type, as in Go.
+function failedTypeAssert<T>(
+  typeInfo: string | TypeInfo,
+  normalizedType: TypeInfo,
+): TypeAssertResult<T> {
   if (typeof typeInfo === 'string') {
     const registeredType = typeRegistry.get(typeInfo)
     if (registeredType && registeredType.zeroValue !== undefined) {
@@ -1930,7 +1937,6 @@ export function typeAssert<T>(
   } else if (normalizedType.zeroValue !== undefined) {
     return { value: resolveZeroValue<T>(normalizedType.zeroValue), ok: false }
   }
-
   return { value: null as T, ok: false }
 }
 

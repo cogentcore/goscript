@@ -618,6 +618,9 @@ const invalidTypeInstance = new InvalidTypeClass()
 
 // Value is the reflection interface to a Go value - consolidated from all implementations.
 export class Value {
+  // __typeInfo registers Value with the runtime type system (see below).
+  static __typeInfo: $.StructTypeInfo
+
   private _value: ReflectValue
   private _type: Type
   // _parentVarRef tracks the VarRef this value was dereferenced from (for Set support)
@@ -5331,3 +5334,12 @@ export function funcLayout(
     OutCount: 0,
   }
 }
+
+// Value is registered with the runtime type system, so that a type assertion
+// to reflect.Value matches a Value, and yields the zero Value if it fails.
+Value.__typeInfo = $.registerStructType(
+  'reflect.Value',
+  () => new Value(),
+  [],
+  Value,
+)
