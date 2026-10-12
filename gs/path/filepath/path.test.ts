@@ -8,6 +8,7 @@ import {
   writeFileSync,
 } from 'node:fs'
 import { tmpdir } from 'node:os'
+import { ModeSymlink } from '@goscript/io/fs/fs.js'
 import { join } from 'node:path'
 import {
   Base,
@@ -336,6 +337,34 @@ describe('path/filepath - Path manipulation functions', () => {
           'a:a:true',
           'b:b:true',
           'b/file.txt:file.txt:false',
+        ])
+      } finally {
+        rmSync(root, { force: true, recursive: true })
+      }
+    })
+
+    it('should report a symlinked directory as a symlink', async () => {
+      const root = mkdtempSync(join(tmpdir(), 'goscript-filepath-walkdirlink-'))
+      try {
+        mkdirSync(join(root, 'real'))
+        writeFileSync(join(root, 'real', 'inside.txt'), 'ok')
+        symlinkSync(join(root, 'real'), join(root, 'link'))
+
+        const visited: string[] = []
+        const err = await WalkDir(root, (path, d) => {
+          const symlink = (d!.Type() & ModeSymlink) !== 0
+          visited.push(
+            `${path.slice(root.length).replace(/^\/?/, '') || '.'}:${d!.IsDir()}:${symlink}`,
+          )
+          return null
+        })
+
+        expect(err).toBeNull()
+        expect(visited).toEqual([
+          '.:true:false',
+          'link:false:true',
+          'real:true:false',
+          'real/inside.txt:false:false',
         ])
       } finally {
         rmSync(root, { force: true, recursive: true })

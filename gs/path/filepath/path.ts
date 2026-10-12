@@ -1,13 +1,12 @@
 // Package filepath implements utility routines for manipulating filename paths
 // in a way compatible with the target operating system-defined file paths.
 import * as $ from '@goscript/builtin/index.js'
-import {
-  getCurrentWorkingDirectory,
-  getHostRuntime,
-} from '@goscript/builtin/hostio.js'
-import type { DirEntry } from '@goscript/io/fs/fs.js'
-import { ValidPath } from '@goscript/io/fs/fs.js'
+import { getCurrentWorkingDirectory } from '@goscript/builtin/hostio.js'
+import type { DirEntry, FileInfo } from '@goscript/io/fs/fs.js'
+import { ModeSymlink, ValidPath } from '@goscript/io/fs/fs.js'
 import { FileInfoToDirEntry } from '@goscript/io/fs/readdir.js'
+import { SkipAll, SkipDir } from '@goscript/io/fs/walk.js'
+import { Lstat, ReadDir, Readlink } from '@goscript/os/index.js'
 
 type JoinElement = string | $.Slice<string>
 
@@ -27,9 +26,8 @@ function normalizeJoinElements(elem: JoinElement[]): string[] {
 export const Separator = $.stringToRune('/')
 export const ListSeparator = $.stringToRune(':')
 
-// SkipDir Error constants.
-export const SkipDir = $.newError('skip this directory')
-export const SkipAll = $.newError('skip everything and stop the walk')
+// SkipDir and SkipAll are the io/fs values, as in Go.
+export { SkipAll, SkipDir }
 
 // Base returns the last element of path.
 // Trailing path separators are removed before extracting the last element.
@@ -405,12 +403,12 @@ export function EvalSymlinks(path: string): [string, $.GoError] {
     }
     dest += component
 
-    const [stat, statErr] = lstatPath(dest)
+    const [info, statErr] = Lstat(dest)
     if (statErr !== null) {
       return ['', statErr]
     }
-    if (!statIsSymlink(stat!)) {
-      if (!statIsDir(stat!) && end < p.length) {
+    if ((info!.Mode() & ModeSymlink) === 0) {
+      if (!info!.IsDir() && end < p.length) {
         return ['', $.newError('not a directory')]
       }
       start = end
@@ -421,12 +419,12 @@ export function EvalSymlinks(path: string): [string, $.GoError] {
     if (linksWalked > 255) {
       return ['', $.newError('EvalSymlinks: too many links')]
     }
-    const [link, linkErr] = readlinkPath(dest)
+    const [link, linkErr] = Readlink(dest)
     if (linkErr !== null) {
       return ['', linkErr]
     }
-    p = link! + p.slice(end)
-    if (link!.length > 0 && link![0] === '/') {
+    p = link + p.slice(end)
+    if (link.length > 0 && link[0] === '/') {
       // Absolute symlink target: restart from the root.
       dest = '/'
     } else {
@@ -456,12 +454,61 @@ export function Glob(_pattern: string): [string[], $.GoError] {
 // "dir/a". The info argument is the fs.FileInfo for the named path.
 export type WalkFunc = (
   path: string,
-  info: any,
+  info: FileInfo,
   err: $.GoError,
 ) => $.GoError | Promise<$.GoError>
 
-export async function Walk(root: string, walkFn: WalkFunc): Promise<$.GoError> {
-  return await walkHost(root, walkFn)
+// Walk walks the file tree rooted at root, calling fn for each file or
+// directory in lexical order. It reads each entry with Lstat, so it does not
+// follow symbolic links, as in Go.
+export async function Walk(root: string, fn: WalkFunc): Promise<$.GoError> {
+  const [info, statErr] = Lstat(root)
+  let err: $.GoError
+  if (statErr !== null) {
+    err = await fn(root, null, statErr)
+  } else {
+    err = await walk(root, info, fn)
+  }
+  if (err === SkipDir || err === SkipAll) {
+    return null
+  }
+  return err
+}
+
+// walk recursively descends path, calling fn.
+async function walk(
+  path: string,
+  info: FileInfo,
+  fn: WalkFunc,
+): Promise<$.GoError> {
+  if (!info!.IsDir()) {
+    return await fn(path, info, null)
+  }
+
+  const [entries, readErr] = ReadDir(path)
+  let err = await fn(path, info, readErr)
+  // If readErr is set, fn is called twice for path: once before reading the
+  // directory and once after the failure, as in Go.
+  if (readErr !== null || err !== null) {
+    return err
+  }
+
+  for (const entry of $.asArray(entries)) {
+    const filename = Join(path, entry!.Name())
+    const [fileInfo, statErr] = Lstat(filename)
+    if (statErr !== null) {
+      err = await fn(filename, fileInfo, statErr)
+      if (err !== null && err !== SkipDir) {
+        return err
+      }
+      continue
+    }
+    err = await walk(filename, fileInfo, fn)
+    if (err !== null && (!fileInfo!.IsDir() || err !== SkipDir)) {
+      return err
+    }
+  }
+  return null
 }
 
 export type WalkDirFunc = (
@@ -470,11 +517,63 @@ export type WalkDirFunc = (
   err: $.GoError,
 ) => $.GoError | Promise<$.GoError>
 
+// WalkDir walks the file tree rooted at root, calling fn for each file or
+// directory in lexical order. It reads directories with os.ReadDir, whose
+// entries report symbolic links without following them, as in Go.
 export async function WalkDir(
   root: string,
-  walkFn: WalkDirFunc,
+  fn: WalkDirFunc,
 ): Promise<$.GoError> {
-  return await walkDirHost(root, walkFn)
+  const [info, statErr] = Lstat(root)
+  let err: $.GoError
+  if (statErr !== null) {
+    err = await fn(root, null, statErr)
+  } else {
+    err = await walkDir(root, FileInfoToDirEntry(info), fn)
+  }
+  if (err === SkipDir || err === SkipAll) {
+    return null
+  }
+  return err
+}
+
+// walkDir recursively descends path, calling fn.
+async function walkDir(
+  path: string,
+  d: DirEntry,
+  fn: WalkDirFunc,
+): Promise<$.GoError> {
+  let err = await fn(path, d, null)
+  if (err !== null || !d!.IsDir()) {
+    if (err === SkipDir && d!.IsDir()) {
+      // Successfully skipped directory.
+      err = null
+    }
+    return err
+  }
+
+  const [entries, readErr] = ReadDir(path)
+  if (readErr !== null) {
+    // Second call, to report the ReadDir error.
+    err = await fn(path, d, readErr)
+    if (err !== null) {
+      if (err === SkipDir && d!.IsDir()) {
+        err = null
+      }
+      return err
+    }
+  }
+
+  for (const entry of $.asArray(entries)) {
+    err = await walkDir(Join(path, entry!.Name()), entry, fn)
+    if (err !== null) {
+      if (err === SkipDir) {
+        break
+      }
+      return err
+    }
+  }
+  return null
 }
 
 // Localize converts a slash-separated path into an operating system path.
@@ -485,245 +584,4 @@ export function Localize(path: string): [string, $.GoError] {
     return ['', $.newError('invalid path')]
   }
   return [path, null]
-}
-
-type HostStat = {
-  isDirectory?: boolean | (() => boolean)
-  mode?: number
-  mtimeMs?: number
-  size?: number
-}
-
-type HostEntry = {
-  name: string
-  isDir: boolean
-}
-
-function hostError(err: unknown): $.GoError {
-  const message =
-    err instanceof Error ? err.message
-    : typeof err === 'string' ? err
-    : String(err)
-  return { Error: () => message }
-}
-
-function statIsDir(stat: HostStat): boolean {
-  if (typeof stat.isDirectory === 'function') {
-    return stat.isDirectory()
-  }
-  return !!stat.isDirectory
-}
-
-function statIsSymlink(stat: any): boolean {
-  if (typeof stat?.isSymbolicLink === 'function') {
-    return stat.isSymbolicLink()
-  }
-  return !!stat?.isSymlink
-}
-
-function fileInfo(path: string, stat: HostStat): any {
-  return {
-    IsDir: () => statIsDir(stat),
-    ModTime: () => null,
-    Mode: () => (stat.mode ?? 0) + (statIsDir(stat) ? 2147483648 : 0),
-    Name: () => Base(path),
-    Size: () => stat.size ?? 0,
-    Sys: () => stat,
-  }
-}
-
-function dirEntry(path: string, stat: HostStat): DirEntry {
-  return FileInfoToDirEntry(fileInfo(path, stat))
-}
-
-// lstatPath stats a path without following a terminal symlink, matching Go's
-// Walk/WalkDir, which Lstat every entry so a symlinked directory is reported as
-// a symlink and is never descended into. Falls back to stat only when the host
-// exposes no lstat.
-function lstatPath(path: string): [HostStat | null, $.GoError] {
-  const runtime = getHostRuntime()
-  const deno = runtime.deno
-  const denoStat = deno?.lstatSync ?? deno?.statSync
-  if (denoStat) {
-    try {
-      return [denoStat.call(deno, path), null]
-    } catch (err) {
-      return [null, hostError(err)]
-    }
-  }
-
-  const nodeFS = runtime.nodeFS
-  const nodeStat = nodeFS?.lstatSync ?? nodeFS?.statSync
-  if (nodeStat) {
-    try {
-      return [nodeStat.call(nodeFS, path), null]
-    } catch (err) {
-      return [null, hostError(err)]
-    }
-  }
-
-  return [null, $.newError('filesystem not supported')]
-}
-
-function readlinkPath(path: string): [string | null, $.GoError] {
-  const runtime = getHostRuntime()
-  const deno = runtime.deno
-  if (deno?.readLinkSync) {
-    try {
-      return [deno.readLinkSync(path), null]
-    } catch (err) {
-      return [null, hostError(err)]
-    }
-  }
-
-  const nodeFS = runtime.nodeFS
-  if (nodeFS?.readlinkSync) {
-    try {
-      return [String(nodeFS.readlinkSync(path)), null]
-    } catch (err) {
-      return [null, hostError(err)]
-    }
-  }
-
-  return [null, $.newError('filesystem not supported')]
-}
-
-function readDir(path: string): [HostEntry[] | null, $.GoError] {
-  const runtime = getHostRuntime()
-  if (runtime.deno?.readDirSync) {
-    try {
-      const entries: HostEntry[] = []
-      for (const entry of runtime.deno.readDirSync(path)) {
-        entries.push({ name: entry.name, isDir: !!entry.isDirectory })
-      }
-      entries.sort((a, b) => a.name.localeCompare(b.name))
-      return [entries, null]
-    } catch (err) {
-      return [null, hostError(err)]
-    }
-  }
-
-  const nodeFS = runtime.nodeFS
-  if (nodeFS?.readdirSync) {
-    try {
-      const entries = nodeFS
-        .readdirSync(path, { withFileTypes: true })
-        .map((entry: any) => ({
-          name: String(entry.name),
-          isDir:
-            typeof entry.isDirectory === 'function' ?
-              entry.isDirectory()
-            : false,
-        }))
-      entries.sort((a, b) => a.name.localeCompare(b.name))
-      return [entries, null]
-    } catch (err) {
-      return [null, hostError(err)]
-    }
-  }
-
-  return [null, $.newError('filesystem not supported')]
-}
-
-async function walkHost(path: string, walkFn: WalkFunc): Promise<$.GoError> {
-  const [stat, statErr] = lstatPath(path)
-  if (statErr !== null) {
-    return await walkFn(path, null, statErr)
-  }
-
-  const visitErr = await walkFn(path, fileInfo(path, stat!), null)
-  if (visitErr === SkipAll) {
-    return null
-  }
-  if (visitErr !== null) {
-    if (visitErr === SkipDir && statIsDir(stat!)) {
-      return null
-    }
-    return visitErr
-  }
-  if (!statIsDir(stat!)) {
-    return null
-  }
-
-  const [entries, readErr] = readDir(path)
-  if (readErr !== null) {
-    return await walkFn(path, fileInfo(path, stat!), readErr)
-  }
-  for (const entry of entries!) {
-    const err = await walkHost(Join(path, entry.name), walkFn)
-    if (err === SkipDir) {
-      if (entry.isDir) {
-        continue
-      }
-      return err
-    }
-    if (err === SkipAll) {
-      return null
-    }
-    if (err !== null) {
-      return err
-    }
-  }
-  return null
-}
-
-function normalizeWalkDirErr(d: DirEntry, err: $.GoError): $.GoError {
-  if (err === SkipAll) {
-    return null
-  }
-  if (err === SkipDir && d?.IsDir?.()) {
-    return null
-  }
-  return err
-}
-
-function normalizeRootWalkDirErr(err: $.GoError): $.GoError {
-  if (err === SkipAll || err === SkipDir) {
-    return null
-  }
-  return err
-}
-
-async function walkDirHost(
-  path: string,
-  walkFn: WalkDirFunc,
-): Promise<$.GoError> {
-  const [stat, statErr] = lstatPath(path)
-  if (statErr !== null) {
-    return normalizeRootWalkDirErr(await walkFn(path, null, statErr))
-  }
-
-  const d = dirEntry(path, stat!)
-  const visitErr = await walkFn(path, d, null)
-  if (visitErr === SkipAll) {
-    return null
-  }
-  if (visitErr === SkipDir && statIsDir(stat!)) {
-    return null
-  }
-  if (visitErr !== null || !statIsDir(stat!)) {
-    return visitErr
-  }
-
-  const [entries, readErr] = readDir(path)
-  if (readErr !== null) {
-    return normalizeWalkDirErr(d, await walkFn(path, d, readErr))
-  }
-
-  for (const entry of entries!) {
-    const err = await walkDirHost(Join(path, entry.name), walkFn)
-    if (err === SkipDir) {
-      if (entry.isDir) {
-        continue
-      }
-      return err
-    }
-    if (err === SkipAll) {
-      return null
-    }
-    if (err !== null) {
-      return err
-    }
-  }
-  return null
 }
