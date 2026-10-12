@@ -98,7 +98,13 @@ export function assignStruct<T>(
   // The value identifies its layout even when package names collide.
   const info = structValueTypeInfo(source) ?? typeInfo
   const resolved = typeof info === 'string' ? getTypeByName(info) : info
-  if (resolved?.kind === TypeKind.Struct) {
+  // A registered struct without field descriptors or a _fields map (such as
+  // time.Time) keeps its state in private properties, copied by clone below.
+  const opaque =
+    resolved?.kind === TypeKind.Struct &&
+    resolved.fields.length === 0 &&
+    !sourceFields
+  if (resolved?.kind === TypeKind.Struct && !opaque) {
     const destination = targetFields ?? target
     const values = sourceFields ?? source
     for (const field of resolved.fields) {
