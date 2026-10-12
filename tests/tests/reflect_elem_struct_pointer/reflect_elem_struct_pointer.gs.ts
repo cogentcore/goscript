@@ -64,6 +64,36 @@ export async function main(): globalThis.Promise<void> {
 	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(e)).Field(0))).SetString("bbb")
 	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(e)).FieldByName("B"))).SetFloat(2.5)
 	await $.println($.pointerValue<T>(s.value).A, $.pointerValue<T>(s.value).B)
+
+	// Field Values copied into a slice read back what was set through them.
+	let fields: $.Slice<reflect.Value> = $.arrayToSlice<reflect.Value>([$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(e)).Field(0))), $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(e)).Field(1)))])
+	$.markAsStructValue($.cloneStructValue($.arrayIndex(fields!, 0))).SetString("ccc")
+	$.markAsStructValue($.cloneStructValue($.arrayIndex(fields!, 1))).SetFloat(1.5)
+	await $.println($.markAsStructValue($.cloneStructValue($.arrayIndex(fields!, 0))).String(), $.markAsStructValue($.cloneStructValue($.arrayIndex(fields!, 1))).Float(), $.pointerValue<T>(s.value).A, $.pointerValue<T>(s.value).B)
+
+	// Values made by New read back what was set through them, as decoders
+	// building map keys do.
+	let name = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.New($.pointerValueOrNil(reflect.TypeOf(""))!))).Elem()))
+	$.markAsStructValue($.cloneStructValue(name)).SetString("a")
+	await $.println($.markAsStructValue($.cloneStructValue(name)).String(), $.mustTypeAssert<string>($.markAsStructValue($.cloneStructValue(name)).Interface(), /* @__PURE__ */ $.basicType("string")))
+	$.markAsStructValue($.cloneStructValue(name)).SetString("é")
+	await $.println($.markAsStructValue($.cloneStructValue(name)).Len())
+
+	let n = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.New($.pointerValueOrNil(reflect.TypeOf($.basicInterfaceValue(0, "int")))!))).Elem()))
+	$.markAsStructValue($.cloneStructValue(n)).SetInt(7n)
+	let big = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.New($.pointerValueOrNil(reflect.TypeOf($.basicInterfaceValue(0n, "int64")))!))).Elem()))
+	$.markAsStructValue($.cloneStructValue(big)).SetInt(1099511627776n)
+	await $.println($.markAsStructValue($.cloneStructValue(n)).Int(), $.markAsStructValue($.cloneStructValue(big)).Int())
+
+	let f = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.New($.pointerValueOrNil(reflect.TypeOf($.basicInterfaceValue(0.0, "float64")))!))).Elem()))
+	$.markAsStructValue($.cloneStructValue(f)).SetFloat(2.5)
+	let b = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.New($.pointerValueOrNil(reflect.TypeOf(false))!))).Elem()))
+	$.markAsStructValue($.cloneStructValue(b)).SetBool(true)
+	await $.println($.markAsStructValue($.cloneStructValue(f)).Float(), $.markAsStructValue($.cloneStructValue(b)).Bool())
+
+	let sl = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.New($.pointerValueOrNil(reflect.TypeOf($.interfaceValue($.arrayToSlice<string>([]), "[]string", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("string")))))!))).Elem()))
+	$.markAsStructValue($.cloneStructValue(sl)).Set($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.arrayToSlice<string>(["x", "y"]), "[]string", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("string")))))))
+	await $.println($.markAsStructValue($.cloneStructValue(sl)).Len())
 }
 
 if ($.isMainScript(import.meta)) {

@@ -32,4 +32,34 @@ func main() {
 	e.Field(0).SetString("bbb")
 	e.FieldByName("B").SetFloat(2.5)
 	println(s.A, s.B)
+
+	// Field Values copied into a slice read back what was set through them.
+	fields := []reflect.Value{e.Field(0), e.Field(1)}
+	fields[0].SetString("ccc")
+	fields[1].SetFloat(1.5)
+	println(fields[0].String(), fields[1].Float(), s.A, s.B)
+
+	// Values made by New read back what was set through them, as decoders
+	// building map keys do.
+	name := reflect.New(reflect.TypeOf("")).Elem()
+	name.SetString("a")
+	println(name.String(), name.Interface().(string))
+	name.SetString("é")
+	println(name.Len())
+
+	n := reflect.New(reflect.TypeOf(0)).Elem()
+	n.SetInt(7)
+	big := reflect.New(reflect.TypeOf(int64(0))).Elem()
+	big.SetInt(1 << 40)
+	println(n.Int(), big.Int())
+
+	f := reflect.New(reflect.TypeOf(0.0)).Elem()
+	f.SetFloat(2.5)
+	b := reflect.New(reflect.TypeOf(false)).Elem()
+	b.SetBool(true)
+	println(f.Float(), b.Bool())
+
+	sl := reflect.New(reflect.TypeOf([]string{})).Elem()
+	sl.Set(reflect.ValueOf([]string{"x", "y"}))
+	println(sl.Len())
 }

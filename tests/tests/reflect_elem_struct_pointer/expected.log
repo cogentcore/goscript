@@ -3,3 +3,9 @@ ptr struct main.T
 nil false
 2 aaa true
 bbb 2.5
+ccc 1.5 ccc 1.5
+a a
+2
+7 1099511627776
+2.5 true
+2

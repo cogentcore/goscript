@@ -674,6 +674,9 @@ export class Value {
     return cloned
   }
 
+  // currentValue returns the value v refers to. Calling a method copies a
+  // Value, as in Go, so a setter on a copy updates the shared parent VarRef or
+  // struct field but not this Value's own _value; getters read through here.
   private currentValue(): ReflectValue {
     if (this._parentVarRef) {
       return this._parentVarRef.value
@@ -701,14 +704,16 @@ export class Value {
     }
   }
 
-  // Methods required by godoc.txt and used throughout the codebase
-
   // integerValue reads the underlying value as a bigint regardless of whether it
   // is stored as a number (int8..int32/uint8..uint32) or a bigint (int64/uint64).
   private integerValue(): bigint | null {
-    if (typeof this._value === 'bigint') {
-      return this._value
+    // Return a stored bigint.
+    const current = this.currentValue()
+    if (typeof current === 'bigint') {
+      return current
     }
+
+    // Convert an integral number.
     const value = this.numericValue()
     if (value !== null && Number.isInteger(value)) {
       return BigInt(value)
@@ -755,8 +760,9 @@ export class Value {
   }
 
   public Bool(): boolean {
-    if (typeof this._value === 'boolean') {
-      return this._value
+    const current = this.currentValue()
+    if (typeof current === 'boolean') {
+      return current
     }
     throw new Error(
       'reflect: call of reflect.Value.Bool on ' +
@@ -766,15 +772,16 @@ export class Value {
   }
 
   private numericValue(): number | null {
-    if (typeof this._value === 'number') {
-      return this._value
+    const current = this.currentValue()
+    if (typeof current === 'number') {
+      return current
     }
     if (
-      this._value !== null &&
-      typeof this._value === 'object' &&
-      typeof (this._value as { valueOf?: unknown }).valueOf === 'function'
+      current !== null &&
+      typeof current === 'object' &&
+      typeof (current as { valueOf?: unknown }).valueOf === 'function'
     ) {
-      const value = (this._value as { valueOf(): unknown }).valueOf()
+      const value = (current as { valueOf(): unknown }).valueOf()
       if (typeof value === 'number') {
         return value
       }
@@ -783,8 +790,9 @@ export class Value {
   }
 
   public String(): string {
-    if (typeof this._value === 'string') {
-      return this._value
+    const current = this.currentValue()
+    if (typeof current === 'string') {
+      return current
     }
     // Special case for bool values - display as <bool Value>
     if (this._type.Kind() === Bool) {
@@ -794,11 +802,12 @@ export class Value {
   }
 
   public Len(): number {
+    // Measure the collections whose kind is known.
+    const value = this.currentValue()
     if (this.Kind() === Slice || this.Kind() === Array) {
-      return $.len(this._value as any)
+      return $.len(value as any)
     }
     if (this.Kind() === Map) {
-      const value = this.currentValue()
       if (value instanceof globalThis.Map) {
         return value.size
       }
@@ -809,12 +818,8 @@ export class Value {
     }
 
     // Check for slice objects created by $.arrayToSlice
-    if (
-      this._value &&
-      typeof this._value === 'object' &&
-      '__meta__' in this._value
-    ) {
-      const meta = (this._value as { __meta__?: { length?: number } }).__meta__
+    if (value && typeof value === 'object' && '__meta__' in value) {
+      const meta = (value as { __meta__?: { length?: number } }).__meta__
       if (meta && typeof meta.length === 'number') {
         return meta.length
       }
@@ -822,28 +827,29 @@ export class Value {
 
     // Check for typed arrays
     if (
-      this._value instanceof Uint8Array ||
-      this._value instanceof Int8Array ||
-      this._value instanceof Uint16Array ||
-      this._value instanceof Int16Array ||
-      this._value instanceof Uint32Array ||
-      this._value instanceof Int32Array ||
-      this._value instanceof Float32Array ||
-      this._value instanceof Float64Array
+      value instanceof Uint8Array ||
+      value instanceof Int8Array ||
+      value instanceof Uint16Array ||
+      value instanceof Int16Array ||
+      value instanceof Uint32Array ||
+      value instanceof Int32Array ||
+      value instanceof Float32Array ||
+      value instanceof Float64Array
     ) {
-      return this._value.length
+      return value.length
     }
 
     // Check for regular arrays
-    if (globalThis.Array.isArray(this._value)) {
-      return this._value.length
+    if (globalThis.Array.isArray(value)) {
+      return value.length
     }
 
-    // Check for strings
-    if (typeof this._value === 'string') {
-      return this._value.length
+    // Check for strings, measured in bytes
+    if (typeof value === 'string') {
+      return $.len(value)
     }
 
+    // Any other kind has no length.
     throw new Error(
       'reflect: call of reflect.Value.Len on ' +
         Kind_String(this._type.Kind()) +
@@ -1231,11 +1237,16 @@ export class Value {
     this.storeValue(x.value)
   }
 
-  // Additional methods from deleted reflect.gs.ts
+  // Interface returns v's current value as an interface value, boxed with its
+  // named type.
   public Interface(): ReflectValue {
+    // Return the interface value v was made from.
     if (this._interfaceValue !== undefined) {
       return this._interfaceValue
     }
+
+    // Find whether the type or its pointer element is named.
+    const current = this.currentValue()
     const typeInfo = typeInfoFromReflectType(this._type)
     const namedType =
       this._type.Name() !== '' &&
@@ -1245,9 +1256,11 @@ export class Value {
       elemType !== null &&
       elemType.Name() !== '' &&
       (elemType.PkgPath() !== '' || elemType.String().includes('.'))
+
+    // Box a named value with its type.
     if (this._type.Kind() === Struct && namedType) {
       return $.interfaceValue<ReflectValue>(
-        this._value,
+        current,
         this._type.String(),
         typeInfo,
       )
@@ -1257,13 +1270,13 @@ export class Value {
       (this._type.Kind() === Ptr && namedElemType)
     ) {
       return $.namedValueInterfaceValue<ReflectValue>(
-        this._value,
+        current,
         this._type.String(),
         {},
         typeInfo,
       )
     }
-    return this._value
+    return current
   }
 
   public MethodByName(name: string): Value {
