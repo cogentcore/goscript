@@ -70,8 +70,12 @@ func (o *SemanticModelOwner) Build(ctx context.Context, graph *PackageGraph, opt
 	}
 
 	var nodes []*PackageGraphNode
+	var overridePkgs []*types.Package
 	for _, node := range graph.Nodes {
 		if node.OverrideCandidate {
+			if pkg := graph.packagesByPath[node.PkgPath]; pkg != nil && pkg.Types != nil {
+				overridePkgs = append(overridePkgs, pkg.Types)
+			}
 			continue
 		}
 		if graph.packagesByPath[node.PkgPath] == nil {
@@ -141,7 +145,7 @@ func (o *SemanticModelOwner) Build(ctx context.Context, graph *PackageGraph, opt
 	}
 	model.functionCallers = semanticFunctionCallers(model)
 	asyncArgumentSites := asyncArgumentCallSites(model)
-	methodSets, methodSetDiagnostics := o.resolveImplementationMethodSets(ctx, model)
+	methodSets, methodSetDiagnostics := o.resolveImplementationMethodSets(ctx, model, overrideFacts, overridePkgs)
 	diagnostics = append(diagnostics, methodSetDiagnostics...)
 	if diagnosticsHaveErrors(diagnostics) {
 		model.freeze()
@@ -160,7 +164,7 @@ func (o *SemanticModelOwner) Build(ctx context.Context, graph *PackageGraph, opt
 		return model, diagnostics
 	}
 	o.applyUnknownInterfaceAsyncMethods(model, interfaceGraph, anonymousInterfaceGraph)
-	interfaceAsyncEdges, markDiagnostics := o.buildInterfaceAsyncEdges(ctx, model, interfaceGraph)
+	interfaceAsyncEdges, markDiagnostics := o.buildInterfaceAsyncEdges(ctx, model, overrideFacts, interfaceGraph)
 	diagnostics = append(diagnostics, markDiagnostics...)
 	if diagnosticsHaveErrors(diagnostics) {
 		model.freeze()
@@ -1408,9 +1412,15 @@ func anonymousInterfaceImplementations(
 	return implementations
 }
 
+// resolveImplementationMethodSets returns the method sets of the model's
+// concrete types and of the override types with an async method. An override
+// package has no semantic functions, so its types join the implementation
+// graph only to color the interface methods they implement.
 func (o *SemanticModelOwner) resolveImplementationMethodSets(
 	ctx context.Context,
 	model *SemanticModel,
+	overrideFacts *OverrideFacts,
+	overridePkgs []*types.Package,
 ) ([]semanticImplementationMethodSet, []Diagnostic) {
 	var concretes []*types.Named
 	for named, semType := range model.types {
@@ -1421,8 +1431,44 @@ func (o *SemanticModelOwner) resolveImplementationMethodSets(
 			concretes = append(concretes, namedOriginOrSelf(named))
 		}
 	}
+	for _, pkg := range overridePkgs {
+		for _, name := range pkg.Scope().Names() {
+			typeName, _ := pkg.Scope().Lookup(name).(*types.TypeName)
+			if typeName == nil {
+				continue
+			}
+			named, _ := typeName.Type().(*types.Named)
+			if named != nil && !types.IsInterface(named) && overrideTypeHasAsyncMethod(overrideFacts, named) {
+				concretes = append(concretes, named)
+			}
+		}
+	}
 	sortNamedTypes(concretes)
 	return implementationMethodSets(concretes), nil
+}
+
+// overrideTypeHasAsyncMethod reports whether override metadata marks a method
+// of named async.
+func overrideTypeHasAsyncMethod(overrideFacts *OverrideFacts, named *types.Named) bool {
+	for method := range named.Methods() {
+		if overrideMethodAsync(overrideFacts, method) {
+			return true
+		}
+	}
+	return false
+}
+
+// overrideMethodAsync reports whether override metadata marks method async.
+func overrideMethodAsync(overrideFacts *OverrideFacts, method *types.Func) bool {
+	signature, _ := method.Type().(*types.Signature)
+	if method.Pkg() == nil || signature == nil || signature.Recv() == nil {
+		return false
+	}
+	receiver := receiverNamedType(signature.Recv().Type())
+	if receiver == nil {
+		return false
+	}
+	return overrideFacts.IsMethodAsync(method.Pkg().Path(), receiver.Obj().Name()+"."+method.Name())
 }
 
 // interfaceCandidates collects the named interfaces reachable from a
@@ -1592,10 +1638,13 @@ func (o *SemanticModelOwner) applyUnknownInterfaceAsyncMethods(
 
 // buildInterfaceAsyncEdges records the implementation graph on the model and
 // returns the distinct edges from each implementation to the interface methods
-// whose async coloring is still undecided.
+// whose async coloring is still undecided. An async override method has no
+// semantic function; its edges leave asyncOverrideMethod, which is always
+// async.
 func (o *SemanticModelOwner) buildInterfaceAsyncEdges(
 	ctx context.Context,
 	model *SemanticModel,
+	overrideFacts *OverrideFacts,
 	interfaceGraph []semanticInterfaceImplementationGraphEntry,
 ) (interfaceAsyncEdges, []Diagnostic) {
 	model.interfaceImplementations = make([]semanticInterfaceImplementation, 0, len(interfaceGraph))
@@ -1610,6 +1659,8 @@ func (o *SemanticModelOwner) buildInterfaceAsyncEdges(
 			// dropped here rather than resolved again on every pass.
 			if implFn := semanticFunctionFor(model, implMethod); implFn != nil {
 				edges.add(implFn, ifaceMethod)
+			} else if overrideMethodAsync(overrideFacts, implMethod) {
+				edges.add(asyncOverrideMethod, ifaceMethod)
 			}
 		}
 		model.interfaceImplementations = append(model.interfaceImplementations, semanticInterfaceImplementation{

@@ -111,7 +111,7 @@ func TestOverrideRegistryFactsAreImmutable(t *testing.T) {
 	if !slices.Contains(dependencies, "errors") {
 		t.Fatalf("expected fmt dependency on errors, got %v", dependencies)
 	}
-	dependencies = append(dependencies, "mutated")
+	dependencies[0] = "mutated"
 	if len(pkg.files) == 0 {
 		t.Fatalf("expected fmt copy files")
 	}
@@ -373,6 +373,57 @@ func TestCompilePackagesAwaitsOverrideAsyncMethods(t *testing.T) {
 	}
 	if !strings.Contains(string(content), "let [value, ok] = await m.value.Load(\"key\")") {
 		t.Fatalf("override async method call was not awaited:\n%s", string(content))
+	}
+}
+
+func TestCompilePackagesColorsInterfacesOfOverrideAsyncMethods(t *testing.T) {
+	moduleDir := writePackageGraphFixture(t, map[string]string{
+		"go.mod": "module example.test/overrideimpl\n\ngo 1.25.3\n",
+		"main.go": strings.Join([]string{
+			"package main",
+			"import \"example.test/overrideimpl/impl\"",
+			"type Runner interface { Run() int }",
+			"func Use(r Runner) int { return r.Run() }",
+			"func main() { println(Use(impl.New())) }",
+			"",
+		}, "\n"),
+		"impl/impl.go": strings.Join([]string{
+			"package impl",
+			"type Impl struct{}",
+			"func New() *Impl { return &Impl{} }",
+			"func (i *Impl) Run() int { return 1 }",
+			"",
+		}, "\n"),
+	})
+	overrideDir := filepath.Join(t.TempDir(), "gs")
+	writeFixtureFile(t, overrideDir, "example.test/overrideimpl/impl/index.ts", strings.Join([]string{
+		"export class Impl {",
+		"  public async Run(): Promise<number> { return 1 }",
+		"}",
+		"export function New(): Impl { return new Impl() }",
+		"",
+	}, "\n"))
+	writeFixtureFile(t, overrideDir, "example.test/overrideimpl/impl/meta.json", `{"asyncMethods": {"Impl.Run": true}}`)
+	out := filepath.Join(t.TempDir(), "out")
+	comp, err := NewCompiler(&Config{
+		Dir:          moduleDir,
+		OutputPath:   out,
+		OverrideDirs: []string{overrideDir},
+	}, nil, nil)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+
+	if _, err := comp.CompilePackages(context.Background(), "."); err != nil {
+		t.Fatal(err.Error())
+	}
+	content, err := os.ReadFile(filepath.Join(out, "@goscript", "example.test", "overrideimpl", "main.gs.ts"))
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	text := string(content)
+	if !strings.Contains(text, "Run(): number | globalThis.Promise<number>") {
+		t.Fatalf("interface method implemented by an async override was not async:\n%s", text)
 	}
 }
 

@@ -24,6 +24,10 @@ type asyncArgumentCallSite struct {
 // becomes async when any of them does.
 type interfaceAsyncEdges map[*semanticFunction][]*types.Func
 
+// asyncOverrideMethod stands for every override method its package's metadata
+// marks async, as the source of interface async edges.
+var asyncOverrideMethod = &semanticFunction{async: true}
+
 // add records that ifaceMethod waits on implFn, once.
 func (e interfaceAsyncEdges) add(implFn *semanticFunction, ifaceMethod *types.Func) {
 	if !slices.Contains(e[implFn], ifaceMethod) {
