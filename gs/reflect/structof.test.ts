@@ -5,7 +5,7 @@ import { Marshal } from '@goscript/encoding/json/index.js'
 
 import { New, Zero } from './value.js'
 import { MapOf, PointerTo, StructOf, TypeFor, TypeOf } from './type.js'
-import { StructField, StructTag } from './types.js'
+import { StructField } from './types.js'
 import { VisibleFields } from './visiblefields.js'
 
 class EmbeddedWithMethod {
@@ -21,12 +21,12 @@ describe('StructOf', () => {
         new StructField({
           Name: 'Name',
           Type: TypeOf(''),
-          Tag: new StructTag('json:"name"'),
+          Tag: 'json:"name"',
         }),
         new StructField({
           Name: 'Count',
           Type: TypeOf(0),
-          Tag: new StructTag('json:"count"'),
+          Tag: 'json:"count"',
         }),
       ]),
     )

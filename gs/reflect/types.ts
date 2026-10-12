@@ -40,27 +40,21 @@ export type ReflectValue =
 // Import Type and Kind from the main type module
 import { Type, Kind, Value, Kind_String, ChanDir } from './type.js'
 
-type StructFieldInit = Omit<Partial<StructField>, 'Tag'> & {
-  Tag?: StructTag | string
-}
+type StructFieldInit = Partial<StructField>
 
 // StructField Struct field representation.
 export class StructField {
   public Name: string = ''
   public PkgPath: string = ''
   public Type!: Type
-  public Tag: StructTag = new StructTag('')
+  public Tag: StructTag = ''
   public Offset: uintptr = 0
   public Index: number[] = []
   public Anonymous: boolean = false
 
   constructor(init?: StructFieldInit) {
     if (init) {
-      const { Tag, ...rest } = init
-      Object.assign(this, rest)
-      if (Tag !== undefined) {
-        this.Tag = typeof Tag === 'string' ? new StructTag(Tag) : Tag
-      }
+      Object.assign(this, init)
     }
   }
 
@@ -81,36 +75,83 @@ export class StructField {
   }
 }
 
-// StructTag Struct tag type.
-export class StructTag {
-  constructor(private _value: string) {}
+// StructTag is the tag string in a struct field, as in Go.
+export type StructTag = string
 
-  toString(): string {
-    return this._value
-  }
-
-  Get(key: string): string {
-    // Simple tag parsing - in a real implementation this would be more sophisticated
-    const parts = this._value.split(' ')
-    for (const part of parts) {
-      if (part.startsWith(key + ':')) {
-        const value = part.substring(key.length + 1)
-        if (value.startsWith('"') && value.endsWith('"')) {
-          return value.slice(1, -1)
-        }
-        return value
-      }
-    }
-    return ''
-  }
+// StructTag_Get returns the value associated with key in the tag string.
+// If there is no such key in the tag, Get returns the empty string.
+export function StructTag_Get(tag: StructTag, key: string): string {
+  return StructTag_Lookup(tag, key)[0]
 }
 
-// StructTag_Get Wrapper function for GoScript naming convention.
-export function StructTag_Get(tag: StructTag | undefined, key: string): string {
-  if (!tag) {
-    return ''
+// StructTag_Lookup returns the value associated with key in the tag string,
+// and whether the key is present, parsing the conventional format of
+// space-separated key:"value" pairs with quoted values as in Go.
+export function StructTag_Lookup(
+  tag: StructTag,
+  key: string,
+): [string, boolean] {
+  let rest = tag ?? ''
+  while (rest !== '') {
+    // Skip leading space.
+    let i = 0
+    while (i < rest.length && rest[i] === ' ') {
+      i++
+    }
+    rest = rest.slice(i)
+    if (rest === '') {
+      break
+    }
+
+    // Scan to colon. A space, a quote or a control character is a syntax
+    // error. Strictly speaking, control chars include the range [0x7f,
+    // 0x9f], not just [0x00, 0x1f], but in practice, we ignore the
+    // multi-byte control characters as it is simpler to inspect the tag's
+    // bytes than the tag's runes.
+    i = 0
+    while (
+      i < rest.length &&
+      rest.charCodeAt(i) > 0x20 &&
+      rest[i] !== ':' &&
+      rest[i] !== '"' &&
+      rest.charCodeAt(i) !== 0x7f
+    ) {
+      i++
+    }
+    if (
+      i === 0 ||
+      i + 1 >= rest.length ||
+      rest[i] !== ':' ||
+      rest[i + 1] !== '"'
+    ) {
+      break
+    }
+    const name = rest.slice(0, i)
+    rest = rest.slice(i + 1)
+
+    // Scan quoted string to find value.
+    i = 1
+    while (i < rest.length && rest[i] !== '"') {
+      if (rest[i] === '\\') {
+        i++
+      }
+      i++
+    }
+    if (i >= rest.length) {
+      break
+    }
+    const quoted = rest.slice(0, i + 1)
+    rest = rest.slice(i + 1)
+
+    if (key === name) {
+      try {
+        return [JSON.parse(quoted) as string, true]
+      } catch {
+        break
+      }
+    }
   }
-  return tag.Get(key)
+  return ['', false]
 }
 
 export class Method {

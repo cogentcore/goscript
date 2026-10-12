@@ -2,7 +2,6 @@ import {
   Method,
   ReflectValue,
   StructField,
-  StructTag,
   ValueError,
 } from './types.js'
 export { StructField }
@@ -3403,7 +3402,7 @@ class StructType implements Type {
       Name: f.name,
       PkgPath: f.pkgPath,
       Type: f.type,
-      Tag: f.tag ? new StructTag(f.tag) : undefined,
+      Tag: f.tag ?? '',
       Offset: f.offset,
       Index: [...f.index],
       Anonymous: f.anonymous,
@@ -4325,7 +4324,7 @@ export function StructOf(fields: $.Slice<StructField>): Type {
     names.add(field.Name)
 
     const fieldOffset = alignOffset(offset, typeAlignment(field.Type))
-    const tag = field.Tag?.toString()
+    const tag = field.Tag || undefined
     const descriptor: StructFieldDescriptor = {
       name: field.Name,
       key: field.Name === '_' ? `_${idx}` : field.Name,
@@ -4763,7 +4762,7 @@ export function typeInfoFromReflectType(typ: Type): string | $.TypeInfo {
               name: field.Name,
               key: structFieldStorageKey(typ, idx),
               type: field.Type,
-              tag: field.Tag?.toString(),
+              tag: field.Tag || undefined,
               pkgPath: field.PkgPath,
               anonymous: field.Anonymous,
               index: [...field.Index],

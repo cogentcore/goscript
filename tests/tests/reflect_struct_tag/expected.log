@@ -1,0 +1,16 @@
+Name 66 false
+ json: name
+ desc: the name of the item, with spaces
+ default: a b true
+ fields: 10
+Count 22 false
+ json: count,omitempty
+ desc: 
+ default:  false
+ fields: 1
+Plain 0 true
+ json: 
+ desc: 
+ default:  false
+ fields: 0
+two words true
