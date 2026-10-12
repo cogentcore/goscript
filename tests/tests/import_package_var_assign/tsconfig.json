@@ -16,6 +16,7 @@
   },
   "extends": "../../../tests/tsconfig.base.json",
   "include": [
+    "dep/default.gs.ts",
     "dep/dep.gs.ts",
     "dep/index.ts",
     "index.ts",

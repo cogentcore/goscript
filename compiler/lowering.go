@@ -9933,6 +9933,9 @@ func (o *LoweringOwner) lowerSelectorExpr(ctx lowerFileContext, expr *ast.Select
 				if obj != nil && packageVarReadNeedsPointerValue(obj.Type()) {
 					value = o.runtimeOwner.QualifiedHelper(RuntimeHelperPointerValue) +
 						"<" + o.tsNonNilTypeFor(ctx, obj.Type()) + ">(" + value + ")"
+				} else if obj != nil && ctx.model.needsVarRef[obj] {
+					// A variable whose address is taken is stored in a pointer box.
+					value += ".value"
 				}
 				return value, nil
 			}
