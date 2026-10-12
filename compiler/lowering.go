@@ -10390,6 +10390,16 @@ func (o *LoweringOwner) lowerPackageVarAddressExpr(ctx lowerFileContext, expr as
 		if obj == nil || !objectNeedsVarRef(ctx, obj) {
 			return "", false
 		}
+		// A lazily initialized variable in the same file is initialized by
+		// its getter, which returns its VarRef (other files use an alias,
+		// which lowerIdent already reads through the getter).
+		if ctx.lazyPackageVars[obj] && ctx.localAliases[obj] == "" && ctx.identAliases[obj] == "" {
+			value := packageVarGetterName(typed.Name) + "()"
+			if (ctx.asyncFunction || ctx.topLevel) && o.packageVarHasAsyncLazyInit(ctx, obj) {
+				value = "(await " + packageVarInitName(typed.Name) + "(), " + value + ")"
+			}
+			return value, true
+		}
 		return o.lowerIdent(ctx, typed, true), true
 	case *ast.SelectorExpr:
 		if selection := ctx.semPkg.source.TypesInfo.Selections[typed]; selection != nil {
@@ -10410,6 +10420,16 @@ func (o *LoweringOwner) lowerPackageVarAddressExpr(ctx lowerFileContext, expr as
 		obj, _ := ctx.semPkg.source.TypesInfo.Uses[typed.Sel].(*types.Var)
 		if obj == nil || !objectNeedsVarRef(ctx, obj) {
 			return "", false
+		}
+		// A lazily initialized variable is initialized by its getter, which
+		// returns its VarRef.
+		if packageVarIsLazy(ctx, obj) {
+			value := alias + "." + packageVarGetterName(typed.Sel.Name) + "()"
+			if (ctx.asyncFunction || ctx.topLevel) &&
+				o.packageVarNameHasAsyncLazyInit(ctx, pkgName.Imported().Path(), typed.Sel.Name) {
+				value = "(await " + alias + "." + packageVarInitName(typed.Sel.Name) + "(), " + value + ")"
+			}
+			return value, true
 		}
 		return alias + "." + typed.Sel.Name, true
 	default:
