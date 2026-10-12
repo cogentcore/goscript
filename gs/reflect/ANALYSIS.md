@@ -93,8 +93,8 @@ This document analyzes the implementation status of the `gs/reflect/` package co
 
 ### `type StructTag string`
 - **Status**: ✅ **IMPLEMENTED**
-- **Location**: `types.ts:86-104`
-- **Notes**: Class with `Get(key string) string` method for tag parsing
+- **Location**: `types.ts:78-155`
+- **Notes**: A string type, as in Go, with `StructTag_Get` and `StructTag_Lookup` implementing Go's tag parsing
 
 ### `type Type interface{ ... }`
 - **Status**: ✅ **IMPLEMENTED**

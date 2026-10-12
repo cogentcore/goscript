@@ -1,9 +1,4 @@
-import {
-  Method,
-  ReflectValue,
-  StructField,
-  ValueError,
-} from './types.js'
+import { Method, ReflectValue, StructField, ValueError } from './types.js'
 export { StructField }
 import { MapIter } from './map.js'
 import {
@@ -499,7 +494,6 @@ function nonFunctionTypePanic(method: string, t: Type): never {
   throw new Error(`reflect: ${method} of non-func type ${t.String()}`)
 }
 
-// InvalidTypeInstance is a singleton type for invalid/zero reflect.Value
 // typeFieldByIndex implements Type.FieldByIndex as in Go: each index after
 // the first selects a field of the previous field's type, following a
 // pointer to a struct.
@@ -518,6 +512,7 @@ function typeFieldByIndex(t: Type, index: $.Slice<number>): StructField {
   return field
 }
 
+// InvalidTypeClass is the type of an invalid, zero reflect.Value.
 class InvalidTypeClass implements Type {
   Kind(): Kind {
     return Invalid
@@ -617,6 +612,8 @@ class InvalidTypeClass implements Type {
     return typeCanSeq2(this)
   }
 }
+
+// invalidTypeInstance is the singleton type of every invalid reflect.Value.
 const invalidTypeInstance = new InvalidTypeClass()
 
 // Value is the reflection interface to a Go value - consolidated from all implementations.
