@@ -699,11 +699,16 @@ export class Value {
 
   // Methods required by godoc.txt and used throughout the codebase
 
+  // The getters below read currentValue, since a Value is copied when its
+  // methods are called, and a setter on a copy updates the shared parent
+  // VarRef or struct field rather than this Value's own _value.
+
   // integerValue reads the underlying value as a bigint regardless of whether it
   // is stored as a number (int8..int32/uint8..uint32) or a bigint (int64/uint64).
   private integerValue(): bigint | null {
-    if (typeof this._value === 'bigint') {
-      return this._value
+    const current = this.currentValue()
+    if (typeof current === 'bigint') {
+      return current
     }
     const value = this.numericValue()
     if (value !== null && Number.isInteger(value)) {
@@ -751,8 +756,9 @@ export class Value {
   }
 
   public Bool(): boolean {
-    if (typeof this._value === 'boolean') {
-      return this._value
+    const current = this.currentValue()
+    if (typeof current === 'boolean') {
+      return current
     }
     throw new Error(
       'reflect: call of reflect.Value.Bool on ' +
@@ -762,15 +768,16 @@ export class Value {
   }
 
   private numericValue(): number | null {
-    if (typeof this._value === 'number') {
-      return this._value
+    const current = this.currentValue()
+    if (typeof current === 'number') {
+      return current
     }
     if (
-      this._value !== null &&
-      typeof this._value === 'object' &&
-      typeof (this._value as { valueOf?: unknown }).valueOf === 'function'
+      current !== null &&
+      typeof current === 'object' &&
+      typeof (current as { valueOf?: unknown }).valueOf === 'function'
     ) {
-      const value = (this._value as { valueOf(): unknown }).valueOf()
+      const value = (current as { valueOf(): unknown }).valueOf()
       if (typeof value === 'number') {
         return value
       }
@@ -779,8 +786,9 @@ export class Value {
   }
 
   public String(): string {
-    if (typeof this._value === 'string') {
-      return this._value
+    const current = this.currentValue()
+    if (typeof current === 'string') {
+      return current
     }
     // Special case for bool values - display as <bool Value>
     if (this._type.Kind() === Bool) {
@@ -791,7 +799,7 @@ export class Value {
 
   public Len(): number {
     if (this.Kind() === Slice || this.Kind() === Array) {
-      return $.len(this._value as any)
+      return $.len(this.currentValue() as any)
     }
     if (this.Kind() === Map) {
       const value = this.currentValue()
@@ -1232,6 +1240,7 @@ export class Value {
     if (this._interfaceValue !== undefined) {
       return this._interfaceValue
     }
+    const current = this.currentValue()
     const typeInfo = typeInfoFromReflectType(this._type)
     const namedType =
       this._type.Name() !== '' &&
@@ -1243,7 +1252,7 @@ export class Value {
       (elemType.PkgPath() !== '' || elemType.String().includes('.'))
     if (this._type.Kind() === Struct && namedType) {
       return $.interfaceValue<ReflectValue>(
-        this._value,
+        current,
         this._type.String(),
         typeInfo,
       )
@@ -1253,13 +1262,13 @@ export class Value {
       (this._type.Kind() === Ptr && namedElemType)
     ) {
       return $.namedValueInterfaceValue<ReflectValue>(
-        this._value,
+        current,
         this._type.String(),
         {},
         typeInfo,
       )
     }
-    return this._value
+    return current
   }
 
   public MethodByName(name: string): Value {
