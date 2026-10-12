@@ -72,6 +72,7 @@ function formatInt(
   }
   return sign + prefix + digits
 }
+
 // formatHexBytes formats a byte slice or the bytes of a string in hexadecimal
 // for %x and %X, two digits per byte, with the space and # flags as in Go.
 function formatHexBytes(
@@ -79,6 +80,7 @@ function formatHexBytes(
   flags: string,
   upper: boolean,
 ): string {
+  // Read the bytes and the prefix and spacing the flags ask for.
   const bytes =
     typeof value === 'string' ? new TextEncoder().encode(value) : value
   const prefix =
@@ -87,6 +89,8 @@ function formatHexBytes(
       : '0x'
     : ''
   const space = flags.includes(' ')
+
+  // Write two digits per byte, prefixing each spaced byte or only the first.
   let result = ''
   for (let i = 0; i < bytes.length; i++) {
     if (space && i > 0) {

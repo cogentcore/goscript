@@ -88,6 +88,7 @@ export function Add(_ptr: Pointer, _len: IntegerType): Pointer {
 // Slice returns a slice of len elements for a pointer produced by SliceData,
 // sharing its backing array, or the bytes of a pointer produced by StringData.
 export function Slice<T = number>(ptr: Pointer, len: IntegerType): $.Slice<T> {
+  // Only pointers into a slice or a string have memory to read.
   const n = lengthOf(len)
   if (isSliceDataPointer(ptr)) {
     return $.goSlice(ptr.slice as $.Slice<T>, 0, n)
@@ -115,6 +116,7 @@ export function SliceData(slice: $.Slice<unknown> | Uint8Array): Pointer {
 // String returns a string of len bytes for a pointer produced by StringData,
 // or by SliceData for a byte slice.
 export function String(ptr: Pointer, len: IntegerType): string {
+  // Only pointers into a string or a slice have memory to read.
   const n = lengthOf(len)
   if (isStringDataPointer(ptr)) {
     if (n === ptr.value.length && isASCII(ptr.value)) {

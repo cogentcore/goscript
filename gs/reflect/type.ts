@@ -910,6 +910,7 @@ export class Value {
 
   // Slice3 is the 3-index form of the slice operation: it returns v[i:j:k].
   public Slice3(i: number, j: number, k: number): Value {
+    // Only a slice or an array, with indexes within its capacity, slices.
     const value = this.currentValue()
     if (
       (this.Kind() !== Slice && this.Kind() !== Array) ||
@@ -923,6 +924,8 @@ export class Value {
         `reflect.Value.Slice3: slice index out of bounds [${i}:${j}:${k}] with capacity ${capacity}`,
       )
     }
+
+    // Slicing an array yields a slice of its element type.
     const typ = this.Kind() === Array ? SliceOf(this._type.Elem()) : this._type
     return new Value($.goSlice(value as $.Slice<unknown>, i, j, k), typ)
   }
@@ -931,12 +934,15 @@ export class Value {
   // value is ready. The boolean is false if the value is the zero value
   // received because the channel is closed.
   public async Recv(): Promise<[Value, boolean]> {
+    // Only a channel that can receive may be read.
     if (this.Kind() !== Chan) {
       throw new ValueError({ Kind: this.Kind(), Method: 'Recv' })
     }
     if (this._type.ChanDir() === SendDir) {
       throw new Error('reflect: recv on send-only channel')
     }
+
+    // A closed channel yields the zero value and false.
     const result = await $.chanRecvWithOk(
       this.currentValue() as $.Channel<ReflectValue> | null,
     )

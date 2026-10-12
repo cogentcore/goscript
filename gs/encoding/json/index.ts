@@ -283,6 +283,7 @@ export class Encoder {
   // Encode is itself async (see meta.json): such marshalers are awaited
   // before the value is encoded.
   public Encode(v: unknown): io.Awaitable<$.GoError> {
+    // Prepare the value, collecting each MarshalJSON that suspends.
     const pending: PendingMarshal[] = []
     let prepared: unknown
     try {
@@ -293,14 +294,17 @@ export class Encoder {
     if (pending.length === 0) {
       return this.write(prepared)
     }
+
+    // Await every suspended marshaler together, so that none is left with an
+    // unobserved rejection, then fill in their results in order.
     return (async () => {
-      for (const p of pending) {
-        const [data, err] = await p.result
-        try {
-          p.json = marshalerResult(data, err)
-        } catch (marshalErr) {
-          return goError(marshalErr)
+      const results = await Promise.all(pending.map((p) => p.result))
+      try {
+        for (const [i, p] of pending.entries()) {
+          p.json = marshalerResult(...results[i])
         }
+      } catch (marshalErr) {
+        return goError(marshalErr)
       }
       return await this.write(prepared)
     })()

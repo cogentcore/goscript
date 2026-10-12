@@ -4665,6 +4665,7 @@ func gotoStateClusterAt(stmts []ast.Stmt, idx int) (gotoStateCluster, bool) {
 			return true
 		})
 	}
+
 	// When the first target label precedes the first goto, as in a state
 	// machine whose first state jumps to the others, the cluster starts at
 	// that label. Gotos that only return to the start of their own label's
@@ -11285,6 +11286,7 @@ func (o *LoweringOwner) lowerIndexTarget(ctx lowerFileContext, target string, ty
 // type parameter whose type set holds only arrays, such as [3]int | [4]int,
 // which TypeScript does not know to be indexable.
 func (o *LoweringOwner) typeParamIndexedTSType(ctx lowerFileContext, typ types.Type) (string, bool) {
+	// Only a type parameter with type terms has a type set to index.
 	typeParam, ok := types.Unalias(typ).(*types.TypeParam)
 	if !ok {
 		return "", false
@@ -11293,6 +11295,8 @@ func (o *LoweringOwner) typeParamIndexedTSType(ctx lowerFileContext, typ types.T
 	if !collectTypeSetTerms(typeParam.Constraint(), &terms) || len(terms) == 0 {
 		return "", false
 	}
+
+	// Every term must be an array; join their distinct TypeScript types.
 	var tsTypes []string
 	for _, term := range terms {
 		if _, ok := types.Unalias(term).Underlying().(*types.Array); !ok {
@@ -14247,12 +14251,16 @@ func (o *LoweringOwner) genericMethodDescriptorsForType(
 	methodSetType types.Type,
 	seen map[types.Type]bool,
 ) string {
+	// Stop at a type already being described, as when a receiver's type
+	// arguments refer back to it.
 	typeKey := types.Unalias(methodSetType)
 	if seen[typeKey] {
 		return ""
 	}
 	seen[typeKey] = true
 	defer delete(seen, typeKey)
+
+	// Describe each method of the type's method set.
 	methodSet := types.NewMethodSet(methodSetType)
 	methods := make([]string, 0, methodSet.Len())
 	for method := range methodSet.Methods() {
