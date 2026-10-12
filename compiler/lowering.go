@@ -11683,7 +11683,77 @@ func (o *LoweringOwner) lowerValueForTarget(
 			return constantValue
 		}
 	}
+	if o.isOverrideFunctionValueWithInterfaceParams(ctx, expr, targetType) {
+		return o.lowerOverrideFunctionValue(ctx, expr, targetType, value)
+	}
 	return o.lowerValueForTargetTypes(ctx, targetType, sourceType, value, shouldCloneStructValue(expr))
+}
+
+// lowerOverrideFunctionValue adapts an override function with non-empty
+// interface parameters used as a function value. A direct call converts each
+// such argument with pointerValueOrNil, because the override takes the
+// pointed-to value of a pointer and excludes null from its parameter type, so
+// the function value converts its arguments in the same way. A method value
+// or a variadic or generic function is only typed as the target function type.
+func (o *LoweringOwner) lowerOverrideFunctionValue(
+	ctx lowerFileContext,
+	expr ast.Expr,
+	targetType types.Type,
+	value string,
+) string {
+	targetTS := o.tsTypeFor(ctx, targetType)
+	fn := calledFunction(ctx.semPkg.source, unwrapParenExpr(expr))
+	signature, _ := fn.Type().(*types.Signature)
+	target := signatureForType(targetType)
+	if signature.Recv() != nil || signature.Variadic() || signature.TypeParams().Len() > 0 ||
+		target == nil || target.Params().Len() != signature.Params().Len() {
+		return "(" + value + " as " + targetTS + ")"
+	}
+	params := make([]string, 0, signature.Params().Len())
+	args := make([]string, 0, signature.Params().Len())
+	for idx, param := range slices.Collect(signature.Params().Variables()) {
+		name := "__goscriptArg" + strconv.Itoa(idx)
+		params = append(params, name+": "+o.tsTypeFor(ctx, target.Params().At(idx).Type()))
+		if isNonEmptyInterfaceType(param.Type()) {
+			args = append(args, o.runtimeOwner.QualifiedHelper(RuntimeHelperPointerValueOrNil)+"("+name+")!")
+		} else {
+			args = append(args, name)
+		}
+	}
+	return "((__goscriptFn: typeof " + value + ") => (" + strings.Join(params, ", ") + ") => __goscriptFn(" +
+		strings.Join(args, ", ") + "))(" + value + ")"
+}
+
+// isOverrideFunctionValueWithInterfaceParams reports whether expr is a function
+// or method of an override package used as a value of a function target type
+// whose signature has a non-empty interface parameter.
+func (o *LoweringOwner) isOverrideFunctionValueWithInterfaceParams(
+	ctx lowerFileContext,
+	expr ast.Expr,
+	targetType types.Type,
+) bool {
+	if signatureForType(targetType) == nil {
+		return false
+	}
+	switch unwrapParenExpr(expr).(type) {
+	case *ast.Ident, *ast.SelectorExpr, *ast.IndexExpr, *ast.IndexListExpr:
+	default:
+		return false
+	}
+	fn := calledFunction(ctx.semPkg.source, unwrapParenExpr(expr))
+	if fn == nil || !o.callUsesOverridePackage(ctx, unwrapParenExpr(expr)) {
+		return false
+	}
+	signature, _ := fn.Type().(*types.Signature)
+	if signature == nil {
+		return false
+	}
+	for param := range signature.Params().Variables() {
+		if isNonEmptyInterfaceType(param.Type()) {
+			return true
+		}
+	}
+	return false
 }
 
 // lowerNumberIntegerConstantExpr lowers an integer constant stored into a
