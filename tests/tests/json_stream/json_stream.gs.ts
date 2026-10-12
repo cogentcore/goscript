@@ -31,7 +31,7 @@ export async function main(): globalThis.Promise<void> {
 	// Decoder reads one value per call and buffers the rest of the stream.
 	let dec: json.Decoder | $.VarRef<json.Decoder> | null = json.NewDecoder($.pointerValueOrNil($.interfaceValue<io.Reader | null>(strings.NewReader("1 2 3"), "*strings.Reader", /* @__PURE__ */ $.pointerType("strings.Reader")))!)
 	let n: $.VarRef<number> = $.varRef(0)
-	while (json.Decoder.prototype.Decode.call($.pointerValue<json.Decoder>(dec), $.interfaceValue(n, "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int")))) == null) {
+	while (await json.Decoder.prototype.Decode.call($.pointerValue<json.Decoder>(dec), $.interfaceValue(n, "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int")))) == null) {
 		await fmt.Println("decoded", $.basicInterfaceValue(n.value, "int"))
 	}
 
@@ -39,7 +39,7 @@ export async function main(): globalThis.Promise<void> {
 	let und: json.Decoder | $.VarRef<json.Decoder> | null = json.NewDecoder($.pointerValueOrNil($.interfaceValue<io.Reader | null>(strings.NewReader("{\"big\":9007199254740993}"), "*strings.Reader", /* @__PURE__ */ $.pointerType("strings.Reader")))!)
 	json.Decoder.prototype.UseNumber.call($.pointerValue<json.Decoder>(und))
 	let m: $.VarRef<globalThis.Map<string, any> | null> = $.varRef(null! as globalThis.Map<string, any> | null)
-	json.Decoder.prototype.Decode.call($.pointerValue<json.Decoder>(und), $.interfaceValue(m, "*map[string]interface{}", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), { kind: $.TypeKind.Interface, methods: [] }))))
+	await json.Decoder.prototype.Decode.call($.pointerValue<json.Decoder>(und), $.interfaceValue(m, "*map[string]interface{}", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), { kind: $.TypeKind.Interface, methods: [] }))))
 	await fmt.Println("big", $.mapGet<string, any, any>(m.value, "big", null)[0])
 
 	// A malformed document yields a *json.SyntaxError with the Go byte offset.
@@ -56,11 +56,11 @@ export async function main(): globalThis.Promise<void> {
 
 	// Token advances the stream; More reports remaining container elements.
 	let mdec: json.Decoder | $.VarRef<json.Decoder> | null = json.NewDecoder($.pointerValueOrNil($.interfaceValue<io.Reader | null>(strings.NewReader("[10,20]"), "*strings.Reader", /* @__PURE__ */ $.pointerType("strings.Reader")))!)
-	json.Decoder.prototype.Token.call($.pointerValue<json.Decoder>(mdec))
-	await fmt.Println("more", json.Decoder.prototype.More.call($.pointerValue<json.Decoder>(mdec)))
-	json.Decoder.prototype.Token.call($.pointerValue<json.Decoder>(mdec))
-	json.Decoder.prototype.Token.call($.pointerValue<json.Decoder>(mdec))
-	await fmt.Println("more", json.Decoder.prototype.More.call($.pointerValue<json.Decoder>(mdec)))
+	await json.Decoder.prototype.Token.call($.pointerValue<json.Decoder>(mdec))
+	await fmt.Println("more", await json.Decoder.prototype.More.call($.pointerValue<json.Decoder>(mdec)))
+	await json.Decoder.prototype.Token.call($.pointerValue<json.Decoder>(mdec))
+	await json.Decoder.prototype.Token.call($.pointerValue<json.Decoder>(mdec))
+	await fmt.Println("more", await json.Decoder.prototype.More.call($.pointerValue<json.Decoder>(mdec)))
 }
 
 if ($.isMainScript(import.meta)) {

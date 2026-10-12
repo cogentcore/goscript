@@ -1,0 +1,19 @@
+héllo 12.5
+x 3
+eof
+delim [ true
+number 1
+string two
+delim { true
+string k
+bool true
+delim } false
+delim ] false
+token end: true
+delim [
+number 1.5 1.5
+string s
+delim ]
+syntax error: true
+s 7
+t 0

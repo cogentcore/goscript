@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import * as $ from '@goscript/builtin/index.js'
 import * as bytes from '@goscript/bytes/index.js'
+import * as io from '@goscript/io/index.js'
 
 import {
   Compact,
@@ -13,6 +14,7 @@ import {
   Marshal,
   MarshalIndent,
   NewDecoder,
+  type Decoder,
   NewEncoder,
   Number_Float64,
   Number_Int64,
@@ -1163,11 +1165,25 @@ describe('encoding/json override', () => {
   })
 
   it('streams delimiters and values through Token and reports More', () => {
+    // Tokens from a synchronous reader are returned synchronously, with
+    // delimiters and numbers boxed with their Go types.
+    const token = (d: Decoder): [unknown, $.GoError] =>
+      d.Token() as [unknown, $.GoError]
+    const unbox = (t: unknown): unknown =>
+      $.isNamedValueBox(t) ? t.__goValue : t
+    const goType = (t: unknown): string | undefined =>
+      $.isNamedValueBox(t) ? t.__goType : undefined
+
     const tokens = NewDecoder(bytes.NewBufferString('[1]')!)
-    expect(tokens.Token()).toEqual(['['.charCodeAt(0), null])
-    expect(tokens.Token()).toEqual([1, null])
-    expect(tokens.Token()).toEqual([']'.charCodeAt(0), null])
-    expect(tokens.Token()[1]?.Error()).toBe('EOF')
+    const open = token(tokens)
+    expect([unbox(open[0]), open[1]]).toEqual(['['.charCodeAt(0), null])
+    expect(goType(open[0])).toBe('json.Delim')
+    const one = token(tokens)
+    expect([unbox(one[0]), one[1]]).toEqual([1, null])
+    expect(goType(one[0])).toBe('float64')
+    const close = token(tokens)
+    expect([unbox(close[0]), close[1]]).toEqual([']'.charCodeAt(0), null])
+    expect(token(tokens)[1]?.Error()).toBe('EOF')
 
     const more = NewDecoder(bytes.NewBufferString('[1,2]')!)
     more.Token() // consume [
@@ -1176,6 +1192,30 @@ describe('encoding/json override', () => {
     expect(more.More()).toBe(true)
     more.Token() // 2
     expect(more.More()).toBe(false)
+  })
+
+  it('reads values from an asynchronous reader in chunks', async () => {
+    const chunks = ['{"name":"Da', 'na","age":2', '8} ']
+    let reads = 0
+    const reader = {
+      Read: async (p: $.Bytes): Promise<[number, $.GoError]> => {
+        reads++
+        const chunk = chunks.shift()
+        if (chunk === undefined) {
+          return [0, io.EOF]
+        }
+        const data = $.stringToBytes(chunk)
+        const n = $.copy(p, data)
+        return [n, null]
+      },
+    }
+    const decoder = NewDecoder(reader)
+    const target = $.varRef(new Person())
+    expect(await decoder.Decode(target)).toBeNull()
+    expect(target.value._fields.Name).toBe('Dana')
+    expect(target.value._fields.Age).toBe(28)
+    expect(await decoder.Decode(target)).toBe(io.EOF)
+    expect(reads).toBe(4)
   })
 
   it('marshals a RawMessage field without normalizing its token spelling', () => {
