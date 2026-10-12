@@ -25,7 +25,7 @@ export async function __goscript_init_first(): globalThis.Promise<void> {
 
 export function __goscript_get_first(): __goscript_a.holder {
 	if (((first) as any) === undefined) {
-		throw new Error("goscript package variable first read before initialization")
+		throw new globalThis.Error("goscript package variable first read before initialization")
 	}
 	return first
 }

@@ -22,7 +22,7 @@ export async function main(): globalThis.Promise<void> {
 			if (__goscriptSelect0HasReturn) {
 				return __goscriptSelect0Value
 			}
-			throw new Error("unreachable select")
+			throw new globalThis.Error("unreachable select")
 		}, ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo))
 		fn
 	}

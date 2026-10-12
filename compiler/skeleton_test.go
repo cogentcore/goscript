@@ -5213,7 +5213,7 @@ func TestCompilePackagesMarksSelectReturningIfElseCasesUnreachable(t *testing.T)
 	for _, want := range []string{
 		"export async function finish(ctx: context.Context | null, ch: $.Channel<number> | null, client: boolean): globalThis.Promise<[number, $.GoError]>",
 		"if (__goscriptSelect0HasReturn) {",
-		"throw new Error(\"unreachable select\")",
+		"throw new globalThis.Error(\"unreachable select\")",
 	} {
 		if !strings.Contains(text, want) {
 			t.Fatalf("missing %q in generated output:\n%s", want, text)
