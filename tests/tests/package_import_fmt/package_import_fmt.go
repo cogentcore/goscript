@@ -65,6 +65,10 @@ func main() {
 	fmt.Printf("Precision: '%.2f'\n", 3.14159)
 	fmt.Printf("Both: '%5.2f'\n", 3.14159)
 	fmt.Printf("Formatter: %v\n", byteFormatter{prefix: []byte("byte-")})
+	bs := []byte("ab\"c")
+	fmt.Printf("Bytes: %s %q %x %X %v\n", bs, bs, bs, bs, bs)
+	fmt.Printf("String hex: %x %X\n", "hi", "hi")
+	fmt.Printf("Hex flags: % x %#x %# x %#v\n", bs, bs, bs, bs)
 	appended := fmt.Append([]byte("base-"), "tail")
 	fmt.Println("Append bytes:", string(appended))
 	var buf bytes.Buffer

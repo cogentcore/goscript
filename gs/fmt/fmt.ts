@@ -72,6 +72,35 @@ function formatInt(
   }
   return sign + prefix + digits
 }
+// formatHexBytes formats a byte slice or the bytes of a string in hexadecimal
+// for %x and %X, two digits per byte, with the space and # flags as in Go.
+function formatHexBytes(
+  value: Uint8Array | string,
+  flags: string,
+  upper: boolean,
+): string {
+  const bytes =
+    typeof value === 'string' ? new TextEncoder().encode(value) : value
+  const prefix =
+    flags.includes('#') ?
+      upper ? '0X'
+      : '0x'
+    : ''
+  const space = flags.includes(' ')
+  let result = ''
+  for (let i = 0; i < bytes.length; i++) {
+    if (space && i > 0) {
+      result += ' '
+    }
+    if (prefix !== '' && (space || i === 0)) {
+      result += prefix
+    }
+    const hex = bytes[i].toString(16).padStart(2, '0')
+    result += upper ? hex.toUpperCase() : hex
+  }
+  return result
+}
+
 // Simple printf-style formatting implementation for verbs that cannot
 // produce async results (numbers, runes, booleans). Value formatting that can
 // consult Error/String/GoString goes through formatValueMaybe instead.
@@ -105,8 +134,14 @@ function formatValue(value: any, verb: string, flags = ''): string {
       // the Go string(rune) rule (astral intact, invalid -> U+FFFD, no throw).
       return $.runeToString(Number(value))
     case 'x': // hexadecimal lowercase
+      if (value instanceof Uint8Array || typeof value === 'string') {
+        return formatHexBytes(value, flags, false)
+      }
       return formatInt(value, 16, flags, false)
     case 'X': // hexadecimal uppercase
+      if (value instanceof Uint8Array || typeof value === 'string') {
+        return formatHexBytes(value, flags, true)
+      }
       return formatInt(value, 16, flags, true)
     case 'o': // octal
       return formatInt(value, 8, flags, false)
@@ -125,6 +160,9 @@ function formatValue(value: any, verb: string, flags = ''): string {
         // emulate quoted rune; runeToString avoids fromCodePoint throwing on
         // invalid code points and maps them to U+FFFD as Go's %q does.
         return JSON.stringify($.runeToString(value))
+      }
+      if (value instanceof Uint8Array) {
+        return JSON.stringify($.bytesToString(value))
       }
       return JSON.stringify(String(value))
     case 'p': {
@@ -283,6 +321,14 @@ function defaultFormatMaybe(
         )
       }
       return formatPointer(value)
+    }
+    if (value instanceof Uint8Array) {
+      const bytes = globalThis.Array.from(value)
+      if (flags.includes('#')) {
+        const hex = bytes.map((b) => '0x' + b.toString(16))
+        return `[]byte{${hex.join(', ')}}`
+      }
+      return `[${bytes.join(' ')}]`
     }
     if ('__goValue' in value) {
       return defaultFormatMaybe(
