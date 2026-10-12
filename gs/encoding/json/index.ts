@@ -279,11 +279,40 @@ export class Encoder {
 
   public constructor(private readonly writer: io.Writer) {}
 
+  // Encode supports a MarshalJSON that suspends, unlike Marshal, because
+  // Encode is itself async (see meta.json): such marshalers are awaited
+  // before the value is encoded.
   public Encode(v: unknown): io.Awaitable<$.GoError> {
-    const [data, err] =
-      this.indent === '' && this.prefix === '' ?
-        marshalBytes(v, '', '', this.escapeHTML)
-      : marshalBytes(v, this.prefix, this.indent, this.escapeHTML)
+    const pending: PendingMarshal[] = []
+    let prepared: unknown
+    try {
+      prepared = prepareMarshal(v, pending)
+    } catch (err) {
+      return goError(err)
+    }
+    if (pending.length === 0) {
+      return this.write(prepared)
+    }
+    return (async () => {
+      for (const p of pending) {
+        const [data, err] = await p.result
+        try {
+          p.json = marshalerResult(data, err)
+        } catch (marshalErr) {
+          return goError(marshalErr)
+        }
+      }
+      return await this.write(prepared)
+    })()
+  }
+
+  private write(prepared: unknown): io.Awaitable<$.GoError> {
+    const [data, err] = encodeBytes(
+      prepared,
+      this.prefix,
+      this.indent,
+      this.escapeHTML,
+    )
     if (err !== null) {
       return err
     }
@@ -350,6 +379,29 @@ $.registerInterfaceType('json.Unmarshaler', null, [
 // through JSON.parse/stringify, which would normalize numbers like 1e+00 to 1.
 class RawJSON {
   constructor(public raw: string) {}
+}
+
+// PendingMarshal stands in for the result of a MarshalJSON that suspended,
+// until Encoder.Encode awaits it and sets json.
+class PendingMarshal {
+  public json: RawJSON | null = null
+  constructor(public result: PromiseLike<[$.Slice<number>, $.GoError]>) {}
+}
+
+// pendingMarshals collects the PendingMarshals of the value being prepared
+// by prepareMarshal, or is null when a suspending MarshalJSON is an error.
+let pendingMarshals: PendingMarshal[] | null = null
+
+// prepareMarshal prepares v for encoding like marshalValue, adding a
+// PendingMarshal to pending for each MarshalJSON that suspends.
+function prepareMarshal(v: unknown, pending: PendingMarshal[]): unknown {
+  const outer = pendingMarshals
+  pendingMarshals = pending
+  try {
+    return marshalValue(v)
+  } finally {
+    pendingMarshals = outer
+  }
 }
 
 // stripJSONWhitespace removes insignificant whitespace from a JSON document
@@ -445,6 +497,9 @@ function indentJSON(compact: string, prefix: string, indent: string): string {
 function encodeJSON(v: unknown): string {
   if (v instanceof RawJSON) {
     return v.raw
+  }
+  if (v instanceof PendingMarshal) {
+    return v.json!.raw
   }
   if (v === null || v === undefined) {
     return 'null'
@@ -631,8 +686,24 @@ function marshalBytes(
   indent: string,
   escapeHTML: boolean,
 ): [$.Slice<number>, $.GoError] {
+  let prepared: unknown
   try {
-    let text = encodeJSON(marshalValue(v))
+    prepared = marshalValue(v)
+  } catch (err) {
+    return [null, goError(err)]
+  }
+  return encodeBytes(prepared, prefix, indent, escapeHTML)
+}
+
+// encodeBytes encodes a value prepared by marshalValue.
+function encodeBytes(
+  prepared: unknown,
+  prefix: string,
+  indent: string,
+  escapeHTML: boolean,
+): [$.Slice<number>, $.GoError] {
+  try {
+    let text = encodeJSON(prepared)
     if (escapeHTML) {
       text = escapeHTMLString(text)
     }
@@ -853,26 +924,36 @@ function readAllSync(r: io.Reader): [$.Bytes, $.GoError] {
   }
 }
 
+// marshalerResult returns the RawJSON for the result of a MarshalJSON call.
+function marshalerResult(data: $.Slice<number>, err: $.GoError): RawJSON {
+  if (err !== null) {
+    throw new MarshalerError({ Err: err })
+  }
+  const raw = $.bytesToString(data)
+  try {
+    JSON.parse(raw) // validate; preserve exact token spelling below
+  } catch (parseErr) {
+    throw new MarshalerError({ Err: goError(parseErr) })
+  }
+  return new RawJSON(stripJSONWhitespace(raw))
+}
+
 function marshalValue(v: unknown): unknown {
   const marshaler = marshalJSONTarget(v)
   if (marshaler !== null) {
     const result = marshaler.MarshalJSON()
     if (result instanceof Promise) {
-      throw new MarshalerError({
-        Err: $.newError('json: asynchronous MarshalJSON is unsupported'),
-      })
+      if (pendingMarshals === null) {
+        throw new MarshalerError({
+          Err: $.newError('json: asynchronous MarshalJSON is unsupported'),
+        })
+      }
+      const pending = new PendingMarshal(result)
+      pendingMarshals.push(pending)
+      return pending
     }
     const [data, err] = result
-    if (err !== null) {
-      throw new MarshalerError({ Err: err })
-    }
-    const raw = $.bytesToString(data)
-    try {
-      JSON.parse(raw) // validate; preserve exact token spelling below
-    } catch (parseErr) {
-      throw new MarshalerError({ Err: goError(parseErr) })
-    }
-    return new RawJSON(stripJSONWhitespace(raw))
+    return marshalerResult(data, err)
   }
   if ($.isVarRef(v)) {
     return marshalValue(v.value)
