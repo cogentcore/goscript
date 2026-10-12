@@ -840,6 +840,13 @@ export class Value {
     if (this._type.Kind() === Interface) {
       return ValueOf(this._value)
     }
+    if (this._type.Kind() === Ptr) {
+      // A pointer to a struct is the struct object itself.
+      if (this.IsNil()) {
+        return new Value()
+      }
+      return new Value(this._value, this._type.Elem())
+    }
     return new Value(this._value, this._type, this._parentVarRef)
   }
 
