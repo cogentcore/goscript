@@ -166,6 +166,11 @@ export function DeepEqual(
     }
   }
 
+  // Dates (such as within time.Time) have no enumerable fields to compare.
+  if (x instanceof globalThis.Date && y instanceof globalThis.Date) {
+    return x.getTime() === y.getTime()
+  }
+
   // Handle Maps
   if (x instanceof globalThis.Map && y instanceof globalThis.Map) {
     if (x.size !== y.size) {

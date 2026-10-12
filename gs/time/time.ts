@@ -1,16 +1,23 @@
 import * as $ from '../builtin/index.js'
 import { makeChannel, ChannelRef, makeChannelRef } from '../builtin/channel.js'
 
+// zeroTimeMillis is the Unix time in milliseconds of the zero Time,
+// January 1, year 1, 00:00:00 UTC, as in Go.
+const zeroTimeMillis = -62135596800000
+
 // Time represents a time instant with nanosecond precision.
 export class Time {
+  // __typeInfo registers Time with the runtime type system (see below).
+  static __typeInfo: $.StructTypeInfo
+
   private _date: globalThis.Date
   private _nsec: number // nanoseconds within the millisecond
   private _monotonic?: number // high-resolution monotonic timestamp in nanoseconds
   private _location: Location // timezone location
 
   constructor(_props?: {}) {
-    // Default constructor creates a zero time (Unix epoch in UTC)
-    this._date = new globalThis.Date(0)
+    // Default constructor creates the zero time, January 1, year 1, 00:00:00 UTC
+    this._date = new globalThis.Date(zeroTimeMillis)
     this._nsec = 0
     this._monotonic = undefined
     this._location = UTC
@@ -1217,6 +1224,9 @@ export function Date(
 
 // UTC Common locations.
 export const UTC = new Location('UTC', 0)
+
+// Time is registered after UTC is defined, since its zero value uses UTC.
+Time.__typeInfo = $.registerStructType('time.Time', new Time(), [], Time)
 export const Local = new Location('Local')
 
 // FixedZone returns a Location that always uses the given zone name and offset (seconds east of UTC).

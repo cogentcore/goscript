@@ -59,16 +59,17 @@ function zeroReflectValue(typ: Type): ReflectValue {
     case Int8:
     case Int16:
     case Int32:
-    case Int64:
     case Uint:
     case Uint8:
     case Uint16:
     case Uint32:
-    case Uint64:
-    case Uintptr:
     case Float32:
     case Float64:
       return 0
+    case Int64:
+    case Uint64:
+    case Uintptr:
+      return 0n
     case String:
       return ''
     case Slice:
