@@ -490,8 +490,8 @@ func TestPackageGraphCollectsOverrideNativeDependencies(t *testing.T) {
 }
 
 func TestPackageGraphOverrideCandidatesRequirePackageIndex(t *testing.T) {
-	parent := "github.com/aperturerobotics/wasivm/wazero/kernel"
-	child := parent + "/runtime"
+	parent := "github.com/hack-pad/safejs/internal"
+	child := parent + "/catch"
 	facts, diagnostics := NewOverrideRegistryOwner().Facts(context.Background())
 	if diagnosticsHaveErrors(diagnostics) {
 		t.Fatalf("override facts failed: %#v", diagnostics)

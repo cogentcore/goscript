@@ -282,7 +282,7 @@ func TestOverrideRegistryPlansNestedOverrideMetadataDependencies(t *testing.T) {
 	plan, diagnostics := owner.CopyPlan(context.Background(), &CompileRequest{
 		RuntimeEmissionMode: RuntimeEmissionModeEmit,
 	}, &PackageGraph{Nodes: []*PackageGraphNode{{
-		PkgPath:           "github.com/aperturerobotics/wasivm/wazero/kernel/runtime/browser",
+		PkgPath:           "github.com/hack-pad/safejs/internal/catch",
 		OverrideCandidate: true,
 	}}})
 	if diagnosticsHaveErrors(diagnostics) {
@@ -294,14 +294,14 @@ func TestOverrideRegistryPlansNestedOverrideMetadataDependencies(t *testing.T) {
 		packages = append(packages, pkg.path)
 	}
 
-	runtimePkg := "github.com/aperturerobotics/wasivm/wazero/kernel/runtime"
-	browserPkg := "github.com/aperturerobotics/wasivm/wazero/kernel/runtime/browser"
-	for _, pkg := range []string{"builtin", runtimePkg, browserPkg} {
+	depPkg := "syscall/js"
+	nestedPkg := "github.com/hack-pad/safejs/internal/catch"
+	for _, pkg := range []string{"builtin", depPkg, nestedPkg} {
 		if !slices.Contains(packages, pkg) {
 			t.Fatalf("missing %s in copy plan: %v", pkg, packages)
 		}
 	}
-	if slices.Index(packages, runtimePkg) > slices.Index(packages, browserPkg) {
+	if slices.Index(packages, depPkg) > slices.Index(packages, nestedPkg) {
 		t.Fatalf("nested override dependency order is wrong: %v", packages)
 	}
 }
