@@ -10,14 +10,12 @@ permissions:
   pages: write
   id-token: write
 
-# Allow one concurrent deployment
-concurrency:
-  group: 'pages'
-  cancel-in-progress: true
-
 jobs:
+  # Every commit builds to completion, so a newer push never cancels its run.
   build:
     runs-on: ubuntu-latest
+    outputs:
+      latest: ${{ steps.latest.outputs.latest }}
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
@@ -55,7 +53,18 @@ jobs:
         with:
           path: website/dist
 
+      - name: Check for a newer commit
+        id: latest
+        run: |
+          head="$(git ls-remote origin refs/heads/master | cut -f1)"
+          echo "latest=$([[ "$head" == "$GITHUB_SHA" ]] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+
+  # Only the newest master commit deploys; superseded commits skip it.
   deploy:
+    if: ${{ github.event_name == 'workflow_dispatch' || needs.build.outputs.latest == 'true' }}
+    concurrency:
+      group: 'pages'
+      cancel-in-progress: false
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
