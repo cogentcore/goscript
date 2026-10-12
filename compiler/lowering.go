@@ -11875,7 +11875,69 @@ func (o *LoweringOwner) lowerValueForTarget(
 			return constantValue
 		}
 	}
+	if adapted, ok := o.lowerOverrideFunctionValue(ctx, expr, targetType, value); ok {
+		return adapted
+	}
 	return o.lowerValueForTargetTypes(ctx, targetType, sourceType, value, shouldCloneStructValue(expr))
+}
+
+// lowerOverrideFunctionValue adapts a function of an override package with a
+// non-empty interface parameter, used as a value of a function type. A direct
+// call converts each such argument with pointerValueOrNil, because the
+// override takes the pointed-to value of a pointer and excludes null from its
+// parameter type, so the function value converts its arguments in the same
+// way. A method value or a variadic or generic function is only typed as the
+// target function type. It reports false when expr is not such a function.
+func (o *LoweringOwner) lowerOverrideFunctionValue(
+	ctx lowerFileContext,
+	expr ast.Expr,
+	targetType types.Type,
+	value string,
+) (string, bool) {
+	// Only a named function reference to a function type can be adapted.
+	target := signatureForType(targetType)
+	if target == nil {
+		return "", false
+	}
+	expr = unwrapParenExpr(expr)
+	switch expr.(type) {
+	case *ast.Ident, *ast.SelectorExpr, *ast.IndexExpr, *ast.IndexListExpr:
+	default:
+		return "", false
+	}
+
+	// Find an override function with an interface parameter.
+	fn := calledFunction(ctx.semPkg.source, expr)
+	if fn == nil || !o.callUsesOverridePackage(ctx, expr) {
+		return "", false
+	}
+	signature := fn.Signature()
+	params := signature.Params()
+	if !slices.ContainsFunc(slices.Collect(params.Variables()), func(param *types.Var) bool {
+		return isNonEmptyInterfaceType(param.Type())
+	}) {
+		return "", false
+	}
+
+	// Only a plain function can be wrapped parameter by parameter.
+	if signature.Recv() != nil || signature.Variadic() || signature.TypeParams().Len() > 0 ||
+		target.Params().Len() != params.Len() {
+		return "(" + value + " as " + o.tsTypeFor(ctx, targetType) + ")", true
+	}
+
+	// Wrap the function, converting each interface argument.
+	wrapperParams := make([]string, 0, params.Len())
+	args := make([]string, 0, params.Len())
+	for idx := range params.Len() {
+		name := "__goscriptArg" + strconv.Itoa(idx)
+		wrapperParams = append(wrapperParams, name+": "+o.tsTypeFor(ctx, target.Params().At(idx).Type()))
+		if isNonEmptyInterfaceType(params.At(idx).Type()) {
+			name = o.runtimeOwner.QualifiedHelper(RuntimeHelperPointerValueOrNil) + "(" + name + ")!"
+		}
+		args = append(args, name)
+	}
+	return "((__goscriptFn: typeof " + value + ") => (" + strings.Join(wrapperParams, ", ") + ") => __goscriptFn(" +
+		strings.Join(args, ", ") + "))(" + value + ")", true
 }
 
 // lowerNumberIntegerConstantExpr lowers an integer constant stored into a
