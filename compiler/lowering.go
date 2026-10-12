@@ -8711,96 +8711,111 @@ func (o *LoweringOwner) lowerCallableExpr(ctx lowerFileContext, expr ast.Expr, c
 	return callee
 }
 
+// lowerCallArgs lowers the arguments of a call against the callee's
+// signature. Variadic arguments are packed into a slice, except for calls to
+// override packages, which take them as TypeScript rest parameters.
 func (o *LoweringOwner) lowerCallArgs(
 	ctx lowerFileContext,
 	expr *ast.CallExpr,
 	signature *types.Signature,
 ) ([]string, []Diagnostic) {
+	// Override callbacks may suspend only when the override awaits them.
 	overrideCall := o.callUsesOverridePackage(ctx, expr.Fun)
 	allowAsyncOverrideCallback := !overrideCall || o.overrideCallNeedsAwait(ctx, expr.Fun)
+
+	// Spread tuple arguments and special override shapes have their own paths.
 	if args, diagnostics, ok := o.lowerTupleCallArgs(ctx, expr, signature, overrideCall); ok {
 		return args, diagnostics
 	}
 	if overrideCall && isProtobufTextWriteStringerCall(ctx, expr.Fun) {
 		return o.lowerProtobufTextWriteStringerArgs(ctx, expr, signature, allowAsyncOverrideCallback)
 	}
-	if signature != nil && signature.Variadic() && overrideCall && !isBuiltinCallTarget(ctx, expr.Fun) {
-		params := signature.Params()
-		if params == nil || params.Len() == 0 {
-			return o.lowerFixedCallArgs(ctx, expr, signature, overrideCall, allowAsyncOverrideCallback)
-		}
-		fixedCount := params.Len() - 1
-		targetType := params.At(fixedCount).Type()
-		if slice, ok := types.Unalias(targetType).Underlying().(*types.Slice); ok {
-			targetType = slice.Elem()
-		}
-		args := make([]string, 0, len(expr.Args))
-		var diagnostics []Diagnostic
-		for idx, arg := range expr.Args {
-			lowered, argDiagnostics := o.lowerCallArgExpr(ctx, arg, params.At(min(idx, fixedCount)).Type(), allowAsyncOverrideCallback)
-			diagnostics = append(diagnostics, argDiagnostics...)
-			if idx < fixedCount {
-				lowered = o.lowerCallArgForTarget(ctx, arg, params.At(idx).Type(), lowered, overrideCall)
-			} else if expr.Ellipsis != token.NoPos && idx == len(expr.Args)-1 {
-				lowered = o.lowerCallArgForTarget(ctx, arg, params.At(fixedCount).Type(), lowered, overrideCall)
-				lowered = "...(" + lowered + " ?? [])"
-			} else {
-				lowered = o.lowerCallArgForTarget(ctx, arg, targetType, lowered, overrideCall)
-			}
-			args = append(args, lowered)
-		}
-		return args, diagnostics
-	}
-	if signature == nil || !signature.Variadic() ||
-		isBuiltinCallTarget(ctx, expr.Fun) ||
-		overrideCall {
+	if signature == nil || !signature.Variadic() || isBuiltinCallTarget(ctx, expr.Fun) {
 		return o.lowerFixedCallArgs(ctx, expr, signature, overrideCall, allowAsyncOverrideCallback)
 	}
-	params := signature.Params()
-	if params == nil || params.Len() == 0 {
-		return o.lowerFixedCallArgs(ctx, expr, signature, overrideCall, allowAsyncOverrideCallback)
+	if overrideCall {
+		return o.lowerOverrideVariadicCallArgs(ctx, expr, signature, allowAsyncOverrideCallback)
 	}
 
+	// Lower the fixed arguments in place and collect the variadic ones.
+	params := signature.Params()
 	fixedCount := params.Len() - 1
+	variadicType := params.At(fixedCount).Type()
 	args := make([]string, 0, params.Len())
 	var variadicArgs []string
 	var diagnostics []Diagnostic
 	for idx, arg := range expr.Args {
-		targetType := params.At(fixedCount).Type()
+		targetType := variadicType
 		if idx < fixedCount {
 			targetType = params.At(idx).Type()
 		}
 		lowered, argDiagnostics := o.lowerCallArgExpr(ctx, arg, targetType, allowAsyncOverrideCallback)
 		diagnostics = append(diagnostics, argDiagnostics...)
-		if idx < fixedCount {
-			lowered = o.lowerCallArgForTarget(ctx, arg, params.At(idx).Type(), lowered, overrideCall)
-			args = append(args, lowered)
+		if idx < fixedCount || (expr.Ellipsis != token.NoPos && idx == len(expr.Args)-1) {
+			args = append(args, o.lowerCallArgForTarget(ctx, arg, targetType, lowered, false))
 			continue
 		}
-		if expr.Ellipsis != token.NoPos && idx == len(expr.Args)-1 {
-			lowered = o.lowerCallArgForTarget(ctx, arg, params.At(fixedCount).Type(), lowered, overrideCall)
-			args = append(args, lowered)
-			continue
-		}
-		if slice, ok := types.Unalias(params.At(fixedCount).Type()).Underlying().(*types.Slice); ok {
-			lowered = o.lowerCallArgForTarget(ctx, arg, slice.Elem(), lowered, overrideCall)
+		if slice, ok := types.Unalias(variadicType).Underlying().(*types.Slice); ok {
+			lowered = o.lowerCallArgForTarget(ctx, arg, slice.Elem(), lowered, false)
 		}
 		variadicArgs = append(variadicArgs, lowered)
 	}
+
+	// Pack the variadic arguments, unless a slice was passed with ellipsis.
 	if len(expr.Args) < fixedCount || (expr.Ellipsis != token.NoPos && len(args) == params.Len()) {
 		return args, diagnostics
 	}
 	if len(variadicArgs) == 0 {
-		args = append(args, "null")
-		return args, diagnostics
+		return append(args, "null"), diagnostics
 	}
-
 	elemType := "any"
-	if slice, ok := types.Unalias(params.At(fixedCount).Type()).Underlying().(*types.Slice); ok {
+	if slice, ok := types.Unalias(variadicType).Underlying().(*types.Slice); ok {
 		elemType = o.tsTypeFor(ctx, slice.Elem())
 	}
 	args = append(args, o.runtimeOwner.QualifiedHelper(RuntimeHelperArrayToSlice)+
 		"<"+elemType+">(["+strings.Join(variadicArgs, ", ")+"])")
+	return args, diagnostics
+}
+
+// lowerOverrideVariadicCallArgs lowers the arguments of a variadic call to an
+// override package, whose TypeScript signature takes the variadic arguments as
+// a rest parameter. A function value passed to a fixed callback parameter that
+// the override calls without awaiting is adapted to return synchronously.
+func (o *LoweringOwner) lowerOverrideVariadicCallArgs(
+	ctx lowerFileContext,
+	expr *ast.CallExpr,
+	signature *types.Signature,
+	allowAsyncOverrideCallback bool,
+) ([]string, []Diagnostic) {
+	// Each argument after the fixed ones targets the variadic element type.
+	params := signature.Params()
+	fixedCount := params.Len() - 1
+	elemType := params.At(fixedCount).Type()
+	if slice, ok := types.Unalias(elemType).Underlying().(*types.Slice); ok {
+		elemType = slice.Elem()
+	}
+
+	// Lower each argument and spread a slice passed with ellipsis.
+	args := make([]string, 0, len(expr.Args))
+	var diagnostics []Diagnostic
+	for idx, arg := range expr.Args {
+		param := params.At(min(idx, fixedCount))
+		allowAsyncCallback := allowAsyncOverrideCallback || o.overrideAwaitsCallback(ctx, expr.Fun, param.Name())
+		lowered, argDiagnostics := o.lowerCallArgExpr(ctx, arg, param.Type(), allowAsyncCallback)
+		diagnostics = append(diagnostics, argDiagnostics...)
+		switch {
+		case idx < fixedCount:
+			lowered = o.lowerCallArgForTarget(ctx, arg, param.Type(), lowered, true)
+			if !allowAsyncCallback {
+				lowered = o.lowerSyncCallbackArg(ctx, arg, param.Type(), lowered)
+			}
+		case expr.Ellipsis != token.NoPos && idx == len(expr.Args)-1:
+			lowered = "...(" + o.lowerCallArgForTarget(ctx, arg, param.Type(), lowered, true) + " ?? [])"
+		default:
+			lowered = o.lowerCallArgForTarget(ctx, arg, elemType, lowered, true)
+		}
+		args = append(args, lowered)
+	}
 	return args, diagnostics
 }
 
@@ -8911,6 +8926,9 @@ func isProtobufTextWriteStringerCall(ctx lowerFileContext, fun ast.Expr) bool {
 		fn.Name() == "TextWriteStringer"
 }
 
+// lowerFixedCallArgs lowers each argument against its parameter, if any. A
+// function value passed to an override callback parameter that the override
+// calls without awaiting is adapted to return synchronously.
 func (o *LoweringOwner) lowerFixedCallArgs(
 	ctx lowerFileContext,
 	call *ast.CallExpr,
@@ -8918,23 +8936,30 @@ func (o *LoweringOwner) lowerFixedCallArgs(
 	overrideCall bool,
 	allowAsyncOverrideCallback bool,
 ) ([]string, []Diagnostic) {
+	// A call without a known signature lowers its arguments untyped.
 	var params *types.Tuple
 	if signature != nil {
 		params = signature.Params()
 	}
+
+	// Lower each argument against its parameter.
 	args := make([]string, 0, len(call.Args))
 	var diagnostics []Diagnostic
 	for idx, expr := range call.Args {
-		var targetType types.Type
-		allowAsyncCallback := allowAsyncOverrideCallback
-		if params != nil && idx < params.Len() {
-			targetType = params.At(idx).Type()
-			allowAsyncCallback = allowAsyncCallback || o.overrideAwaitsCallback(ctx, call.Fun, params.At(idx).Name())
+		if idx >= params.Len() {
+			lowered, exprDiagnostics := o.lowerCallArgExpr(ctx, expr, nil, allowAsyncOverrideCallback)
+			diagnostics = append(diagnostics, exprDiagnostics...)
+			args = append(args, lowered)
+			continue
 		}
-		lowered, exprDiagnostics := o.lowerCallArgExpr(ctx, expr, targetType, allowAsyncCallback)
+
+		param := params.At(idx)
+		allowAsyncCallback := allowAsyncOverrideCallback || o.overrideAwaitsCallback(ctx, call.Fun, param.Name())
+		lowered, exprDiagnostics := o.lowerCallArgExpr(ctx, expr, param.Type(), allowAsyncCallback)
 		diagnostics = append(diagnostics, exprDiagnostics...)
-		if params != nil && idx < params.Len() {
-			lowered = o.lowerCallArgForTarget(ctx, expr, params.At(idx).Type(), lowered, overrideCall)
+		lowered = o.lowerCallArgForTarget(ctx, expr, param.Type(), lowered, overrideCall)
+		if !allowAsyncCallback {
+			lowered = o.lowerSyncCallbackArg(ctx, expr, param.Type(), lowered)
 		}
 		args = append(args, lowered)
 	}
@@ -8979,6 +9004,45 @@ func (o *LoweringOwner) lowerCallArgForTarget(
 		return o.runtimeOwner.QualifiedHelper(RuntimeHelperPointerValueOrNil) + "(" + value + ")!"
 	}
 	return parenthesizeAwaitedExpr(value) + "!"
+}
+
+// lowerSyncCallbackArg adapts a function value passed to a synchronous
+// callback parameter of an override. A function variable, field, or result
+// has an async-compatible type, because it may hold an async function, but
+// the override calls it without awaiting, so each call must return its result
+// synchronously. Function literals and declared functions already have the
+// exact type, and a callback without results has nothing to await.
+func (o *LoweringOwner) lowerSyncCallbackArg(
+	ctx lowerFileContext,
+	expr ast.Expr,
+	targetType types.Type,
+	value string,
+) string {
+	// Only a callback with results can hand a pending promise to its caller.
+	signature := signatureForType(targetType)
+	if signature == nil || signature.Results().Len() == 0 {
+		return value
+	}
+
+	// Nil, literals, and declared functions already have the exact type.
+	pkg := ctx.semPkg.source
+	if tv, ok := pkg.TypesInfo.Types[expr]; ok && tv.IsNil() {
+		return value
+	}
+	switch e := ast.Unparen(expr).(type) {
+	case *ast.FuncLit:
+		return value
+	case *ast.Ident:
+		if _, ok := pkg.TypesInfo.Uses[e].(*types.Func); ok {
+			return value
+		}
+	case *ast.SelectorExpr:
+		if _, ok := pkg.TypesInfo.Uses[e.Sel].(*types.Func); ok {
+			return value
+		}
+	}
+
+	return o.runtimeOwner.QualifiedHelper(RuntimeHelperSyncFunction) + "(" + value + ")"
 }
 
 func typeParamInterfaceConstraint(typ types.Type) types.Type {

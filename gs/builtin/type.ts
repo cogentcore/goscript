@@ -2317,6 +2317,18 @@ export function syncResult<T>(result: T | globalThis.Promise<T>): T {
   return result
 }
 
+// syncFunction adapts a function value passed to a synchronous callback
+// parameter, which calls it without awaiting, so that each call returns its
+// result synchronously through syncResult.
+export function syncFunction<A extends unknown[], R>(
+  fn: ((...args: A) => R | globalThis.Promise<R>) | null,
+): ((...args: A) => R) | null {
+  if (fn === null) {
+    return null
+  }
+  return (...args: A): R => syncResult(fn(...args))
+}
+
 export interface GenericTypeDescriptor<T = any> {
   type?: TypeInfo | string
   zero?: () => T
