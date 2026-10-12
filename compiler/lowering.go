@@ -5629,6 +5629,9 @@ func (o *LoweringOwner) lowerTupleTargetAssignmentStmt(
 		if stmt, diagnostics, ok := o.lowerStarTargetAssignmentStmt(ctx, lhs, value); ok {
 			return stmt, diagnostics
 		}
+		if setter, ok := o.packageVarSetterForAssignment(ctx, lhs); ok {
+			return loweredStmt{text: setter + "(" + value + ")"}, nil
+		}
 	}
 	left, diagnostics := o.lowerAssignmentTarget(ctx, lhs, declare)
 	if !declare && isStructValueType(assignmentTargetType(ctx, lhs)) {
