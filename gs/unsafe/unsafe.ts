@@ -5,10 +5,42 @@
 import * as $ from '../builtin/index.js'
 
 const stringDataPointer = Symbol('stringDataPointer')
+const sliceDataPointer = Symbol('sliceDataPointer')
 
 interface StringDataPointer {
   [stringDataPointer]: true
   value: string
+}
+
+// SliceDataPointer is the pointer returned by SliceData, which refers to the
+// whole slice so that Slice can return a view sharing its backing array.
+interface SliceDataPointer {
+  [sliceDataPointer]: true
+  slice: $.Slice<unknown> | Uint8Array
+}
+
+function isStringDataPointer(ptr: Pointer): ptr is StringDataPointer {
+  return typeof ptr === 'object' && ptr !== null && stringDataPointer in ptr
+}
+
+function isSliceDataPointer(ptr: Pointer): ptr is SliceDataPointer {
+  return typeof ptr === 'object' && ptr !== null && sliceDataPointer in ptr
+}
+
+// isASCII reports whether s has one byte per character.
+function isASCII(s: string): boolean {
+  for (let i = 0; i < s.length; i++) {
+    if (s.charCodeAt(i) >= 0x80) {
+      return false
+    }
+  }
+  return true
+}
+
+// lengthOf converts an IntegerType length, which is a bigint for 64-bit
+// integer types, to a number.
+function lengthOf(len: IntegerType): number {
+  return typeof len === 'bigint' ? Number(len) : len
 }
 
 // ArbitraryType is a shorthand for an arbitrary Go type; it is not a real type.
@@ -17,9 +49,9 @@ export type ArbitraryType = unknown
 // Pointer is a pointer type but a Pointer value may not be dereferenced.
 export type Pointer = unknown
 
-// IntegerType is a shorthand for an integer type; it is not a real type
-// This is the only type from unsafe that can be meaningfully implemented in JavaScript.
-export type IntegerType = number
+// IntegerType is a shorthand for an integer type; it is not a real type.
+// 64-bit integer types are represented as bigint.
+export type IntegerType = number | bigint
 
 // Alignof returns the alignment of the (type of the) variable in bytes
 // This operation is not meaningful in JavaScript/TypeScript.
@@ -53,42 +85,57 @@ export function Add(_ptr: Pointer, _len: IntegerType): Pointer {
   )
 }
 
-// Slice returns a byte slice for a pointer produced by StringData.
-export function Slice(ptr: Pointer, len: IntegerType): $.Slice<number> {
-  if (
-    typeof ptr === 'object' &&
-    ptr !== null &&
-    stringDataPointer in ptr &&
-    ptr[stringDataPointer] === true &&
-    'value' in ptr &&
-    typeof ptr.value === 'string'
-  ) {
-    return $.goSlice($.stringToBytes(ptr.value), 0, len)
+// Slice returns a slice of len elements for a pointer produced by SliceData,
+// sharing its backing array, or the bytes of a pointer produced by StringData.
+export function Slice<T = number>(ptr: Pointer, len: IntegerType): $.Slice<T> {
+  const n = lengthOf(len)
+  if (isSliceDataPointer(ptr)) {
+    return $.goSlice(ptr.slice as $.Slice<T>, 0, n)
+  }
+  if (isStringDataPointer(ptr)) {
+    return $.goSlice($.stringToBytes(ptr.value), 0, n) as $.Slice<T>
+  }
+  if (ptr === null && n === 0) {
+    return null
   }
   throw new Error(
     'unsafe.Slice is not supported in JavaScript/TypeScript: direct memory access is not available in JavaScript',
   )
 }
 
-// SliceData returns a pointer to the underlying array of the slice
-// This operation is not meaningful in JavaScript/TypeScript.
-export function SliceData(
-  _slice: $.Slice<unknown> | Uint8Array | unknown[],
-): Pointer {
-  throw new Error(
-    'unsafe.SliceData is not supported in JavaScript/TypeScript: direct memory access is not available in JavaScript',
-  )
+// SliceData returns a pointer to the underlying array of the slice,
+// which Slice and String can read. It returns nil for a nil slice.
+export function SliceData(slice: $.Slice<unknown> | Uint8Array): Pointer {
+  if (slice === null) {
+    return null
+  }
+  return { [sliceDataPointer]: true, slice } satisfies SliceDataPointer
 }
 
-// String returns a string value whose underlying bytes start at ptr
-// This operation is not meaningful in JavaScript/TypeScript.
-export function String(_ptr: Pointer, _len: IntegerType): string {
+// String returns a string of len bytes for a pointer produced by StringData,
+// or by SliceData for a byte slice.
+export function String(ptr: Pointer, len: IntegerType): string {
+  const n = lengthOf(len)
+  if (isStringDataPointer(ptr)) {
+    if (n === ptr.value.length && isASCII(ptr.value)) {
+      return ptr.value
+    }
+    return $.bytesToString($.stringToBytes(ptr.value).subarray(0, n))
+  }
+  if (isSliceDataPointer(ptr)) {
+    return $.bytesToString(
+      $.goSlice(ptr.slice as $.Slice<number>, 0, n) as $.Slice<number>,
+    )
+  }
+  if (ptr === null && n === 0) {
+    return ''
+  }
   throw new Error(
     'unsafe.String is not supported in JavaScript/TypeScript: direct memory access is not available in JavaScript',
   )
 }
 
-// StringData returns a pointer that Slice can read as UTF-8 bytes.
+// StringData returns a pointer that Slice and String can read as UTF-8 bytes.
 export function StringData(str: string): Pointer {
   return { [stringDataPointer]: true, value: str } satisfies StringDataPointer
 }

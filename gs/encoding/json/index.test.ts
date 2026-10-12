@@ -1043,6 +1043,37 @@ describe('encoding/json override', () => {
     ])
   })
 
+  it('awaits a MarshalJSON that suspends in Encoder.Encode but not in Marshal', async () => {
+    class AsyncJSON implements Marshaler {
+      constructor(public text: string) {}
+
+      async MarshalJSON(): Promise<[$.Slice<number>, $.GoError]> {
+        await Promise.resolve()
+        return [$.stringToBytes(JSON.stringify(this.text)), null]
+      }
+    }
+
+    const chunks: string[] = []
+    const writer = {
+      Write(p: $.Bytes): [number, $.GoError] {
+        chunks.push($.bytesToString(p))
+        return [$.len(p), null]
+      },
+    }
+    const value = new Map<string, unknown>([
+      ['a', new AsyncJSON('x')],
+      ['b', [new AsyncJSON('y'), 1]],
+    ])
+    expect(await NewEncoder(writer).Encode(value)).toBeNull()
+    expect(chunks).toEqual(['{"a":"x","b":["y",1]}\n'])
+
+    // A synchronous value is still encoded without suspending.
+    expect(NewEncoder(writer).Encode(new Map([['c', 1]]))).toBeNull()
+
+    const [, err] = Marshal(value)
+    expect(err?.Error()).toContain('asynchronous MarshalJSON is unsupported')
+  })
+
   it('validates, compacts, indents, and escapes JSON bytes', () => {
     expect(Valid($.stringToBytes('{"ok":true}'))).toBe(true)
     expect(Valid($.stringToBytes('{'))).toBe(false)

@@ -1,0 +1,12 @@
+String hello
+42 -7
+true 1.5
+name gopher name=gopher
+n=3 x=[1 2]
+Group 2 a 2
+g=[a=x b=2]
+true false
+level=INFO msg="text message" count=3 name="go pher" grp.k=v
+{"level":"DEBUG","msg":"json message","ok":true,"grp":{"i":1}}
+{"level":"WARN","msg":"with","w":"x","sub":{"y":2.5}}
+level=ERROR msg=default err=boom
