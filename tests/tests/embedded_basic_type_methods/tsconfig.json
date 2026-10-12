@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "paths": {
+      "*": [
+        "./*"
+      ],
+      "@goscript/*": [
+        "../../../tests/tests/embedded_basic_type_methods/run/output/@goscript/*",
+        "../../../gs/*",
+        "../../../tests/deps/*"
+      ],
+      "@goscript/github.com/s4wave/goscript/tests/tests/embedded_basic_type_methods/*": [
+        "./*"
+      ]
+    }
+  },
+  "extends": "../../../tests/tsconfig.base.json",
+  "include": [
+    "embedded_basic_type_methods.gs.ts",
+    "index.ts"
+  ]
+}

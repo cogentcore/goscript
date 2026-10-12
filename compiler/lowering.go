@@ -3553,7 +3553,15 @@ func (o *LoweringOwner) lowerEmbeddedMethodForwarders(
 			}
 			targetType := o.tsEmbeddedForwarderTargetType(ctx, field.typ)
 			target := o.embeddedForwarderTargetExpr(ctx, field, selection, targetType)
-			call = target + "." + method.Name() + "(" + strings.Join(callArgs, ", ") + ")"
+			// A value method of a named non-struct type embedded deeper in
+			// the field lowers to a free function taking the receiver value.
+			receiver := methodReceiverNamedType(method)
+			if _, ptrRecv := signature.Recv().Type().(*types.Pointer); !ptrRecv && namedNonInterfaceNonStructType(receiver) {
+				callArgs = append([]string{target}, callArgs...)
+				call = o.methodFunctionExpr(ctx, receiver.Origin(), method, method.Name()) + "(" + strings.Join(callArgs, ", ") + ")"
+			} else {
+				call = target + "." + method.Name() + "(" + strings.Join(callArgs, ", ") + ")"
+			}
 		}
 		if async {
 			call = "await " + call
