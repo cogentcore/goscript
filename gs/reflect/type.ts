@@ -616,8 +616,12 @@ class InvalidTypeClass implements Type {
 // invalidTypeInstance is the singleton type of every invalid reflect.Value.
 const invalidTypeInstance = new InvalidTypeClass()
 
-// Value is the reflection interface to a Go value - consolidated from all implementations.
+// Value is the reflection interface to a Go value.
 export class Value {
+  // __typeInfo is the runtime type of reflect.Value, registered after the
+  // class is defined.
+  static __typeInfo: $.StructTypeInfo
+
   private _value: ReflectValue
   private _type: Type
   // _parentVarRef tracks the VarRef this value was dereferenced from (for Set support)
@@ -5331,3 +5335,12 @@ export function funcLayout(
     OutCount: 0,
   }
 }
+
+// Register Value so a type assertion to reflect.Value matches a Value and
+// yields the zero Value when it fails.
+Value.__typeInfo = $.registerStructType(
+  'reflect.Value',
+  () => new Value(),
+  [],
+  Value,
+)

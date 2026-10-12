@@ -21,3 +21,5 @@ func 9
 slice3 1 2 2
 nil embedded true
 embedded 9 true
+assert true 5
+assert false 6
