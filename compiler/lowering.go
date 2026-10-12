@@ -11141,10 +11141,68 @@ func (o *LoweringOwner) lowerIndexTarget(ctx lowerFileContext, target string, ty
 	if array := pointerToArrayType(typ); array != nil {
 		return o.lowerArrayPointerTarget(ctx, target, typ)
 	}
+	if indexed, ok := o.typeParamIndexedTSType(ctx, typ); ok {
+		return "(" + target + " as " + indexed + ")"
+	}
 	if isNilableType(typ) {
 		return target + "!"
 	}
 	return target
+}
+
+// typeParamIndexedTSType returns the TypeScript type to index a value of a
+// type parameter whose type set holds only arrays, such as [3]int | [4]int,
+// which TypeScript does not know to be indexable.
+func (o *LoweringOwner) typeParamIndexedTSType(ctx lowerFileContext, typ types.Type) (string, bool) {
+	typeParam, ok := types.Unalias(typ).(*types.TypeParam)
+	if !ok {
+		return "", false
+	}
+	var terms []types.Type
+	if !collectTypeSetTerms(typeParam.Constraint(), &terms) || len(terms) == 0 {
+		return "", false
+	}
+	var tsTypes []string
+	for _, term := range terms {
+		if _, ok := types.Unalias(term).Underlying().(*types.Array); !ok {
+			return "", false
+		}
+		ts := o.tsTypeFor(ctx, term)
+		if !slices.Contains(tsTypes, ts) {
+			tsTypes = append(tsTypes, ts)
+		}
+	}
+	return strings.Join(tsTypes, " | "), true
+}
+
+// collectTypeSetTerms appends the type terms of the given constraint to terms,
+// and reports false if the constraint has no type terms to collect.
+func collectTypeSetTerms(typ types.Type, terms *[]types.Type) bool {
+	switch typed := types.Unalias(typ).(type) {
+	case *types.Union:
+		for i := range typed.Len() {
+			if !collectTypeSetTerms(typed.Term(i).Type(), terms) {
+				*terms = append(*terms, typed.Term(i).Type())
+			}
+		}
+		return true
+	case *types.Named, *types.Interface:
+		iface, ok := typed.Underlying().(*types.Interface)
+		if !ok {
+			return false
+		}
+		found := false
+		for i := range iface.NumEmbeddeds() {
+			if collectTypeSetTerms(iface.EmbeddedType(i), terms) {
+				found = true
+			} else if _, isIface := iface.EmbeddedType(i).Underlying().(*types.Interface); !isIface {
+				*terms = append(*terms, iface.EmbeddedType(i))
+				found = true
+			}
+		}
+		return found
+	}
+	return false
 }
 
 func (o *LoweringOwner) lowerArrayPointerTarget(ctx lowerFileContext, target string, typ types.Type) string {
