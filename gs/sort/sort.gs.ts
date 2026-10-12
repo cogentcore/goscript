@@ -1,6 +1,7 @@
 import * as $ from '@goscript/builtin/index.js'
 
 import { compareStrings, lessFloat64 } from './order.js'
+import { SearchFloat64s, SearchInts, SearchStrings } from './search.gs.js'
 
 // Interface defines the methods required for sorting.
 // Less and Swap may be async: a Go type implementing sort.Interface can do
@@ -20,90 +21,85 @@ interface SliceMetadata<T> {
   capacity: number
 }
 
-// IntSlice type for sorting integers.
-export class IntSlice {
-  constructor(private _value: $.Slice<number>) {}
+// IntSlice attaches the methods of Interface to []int, sorting in
+// increasing order. As for other named slice types, the methods are
+// functions taking the slice as the receiver.
+export type IntSlice = $.Slice<number>
 
-  Len(): number {
-    return $.len(this._value)
-  }
-
-  Less(i: number, j: number): boolean {
-    return ($.index(this._value, i) as number) < ($.index(this._value, j) as number)
-  }
-
-  Swap(i: number, j: number): void {
-    const temp = $.index(this._value, i) as number
-    if (Array.isArray(this._value)) {
-      this._value[i] = $.index(this._value, j) as number
-      this._value[j] = temp
-    } else if (this._value && typeof this._value === 'object' && '__meta__' in this._value) {
-      const meta = (this._value as any).__meta__ as SliceMetadata<number>
-      const backing = meta.backing
-      backing[meta.offset + i] = $.index(this._value, j) as number
-      backing[meta.offset + j] = temp
-    }
-  }
+export function IntSlice_Len(x: IntSlice): number {
+  return $.len(x)
 }
 
-// Float64Slice type for sorting float64s.
-export class Float64Slice {
-  constructor(private _value: $.Slice<number>) {}
-
-  Len(): number {
-    return $.len(this._value)
-  }
-
-  Less(i: number, j: number): boolean {
-    return lessFloat64(
-      $.index(this._value, i) as number,
-      $.index(this._value, j) as number,
-    )
-  }
-
-  Swap(i: number, j: number): void {
-    const temp = $.index(this._value, i) as number
-    if (Array.isArray(this._value)) {
-      this._value[i] = $.index(this._value, j) as number
-      this._value[j] = temp
-    } else if (this._value && typeof this._value === 'object' && '__meta__' in this._value) {
-      const meta = (this._value as any).__meta__ as SliceMetadata<number>
-      const backing = meta.backing
-      backing[meta.offset + i] = $.index(this._value, j) as number
-      backing[meta.offset + j] = temp
-    }
-  }
+export function IntSlice_Less(x: IntSlice, i: number, j: number): boolean {
+  return ($.index(x, i) as number) < ($.index(x, j) as number)
 }
 
-// StringSlice type for sorting strings.
-export class StringSlice {
-  constructor(private _value: $.Slice<string>) {}
+export function IntSlice_Swap(x: IntSlice, i: number, j: number): void {
+  swapInSlice(x, i, j)
+}
 
-  Len(): number {
-    return $.len(this._value)
-  }
+export function IntSlice_Search(p: IntSlice, x: number): number {
+  return SearchInts(p, x)
+}
 
-  Less(i: number, j: number): boolean {
-    return (
-      compareStrings(
-        $.index(this._value, i) as string,
-        $.index(this._value, j) as string,
-      ) < 0
-    )
-  }
+export function IntSlice_Sort(x: IntSlice): void {
+  Ints(x)
+}
 
-  Swap(i: number, j: number): void {
-    const temp = $.index(this._value, i) as string
-    if (Array.isArray(this._value)) {
-      this._value[i] = $.index(this._value, j) as string
-      this._value[j] = temp
-    } else if (this._value && typeof this._value === 'object' && '__meta__' in this._value) {
-      const meta = (this._value as any).__meta__ as SliceMetadata<string>
-      const backing = meta.backing
-      backing[meta.offset + i] = $.index(this._value, j) as string
-      backing[meta.offset + j] = temp
-    }
-  }
+// Float64Slice attaches the methods of Interface to []float64, sorting in
+// increasing order, with not-a-number values ordered before other values.
+export type Float64Slice = $.Slice<number>
+
+export function Float64Slice_Len(x: Float64Slice): number {
+  return $.len(x)
+}
+
+export function Float64Slice_Less(
+  x: Float64Slice,
+  i: number,
+  j: number,
+): boolean {
+  return lessFloat64($.index(x, i) as number, $.index(x, j) as number)
+}
+
+export function Float64Slice_Swap(x: Float64Slice, i: number, j: number): void {
+  swapInSlice(x, i, j)
+}
+
+export function Float64Slice_Search(p: Float64Slice, x: number): number {
+  return SearchFloat64s(p, x)
+}
+
+export function Float64Slice_Sort(x: Float64Slice): void {
+  Float64s(x)
+}
+
+// StringSlice attaches the methods of Interface to []string, sorting in
+// increasing order.
+export type StringSlice = $.Slice<string>
+
+export function StringSlice_Len(x: StringSlice): number {
+  return $.len(x)
+}
+
+export function StringSlice_Less(
+  x: StringSlice,
+  i: number,
+  j: number,
+): boolean {
+  return compareStrings($.index(x, i) as string, $.index(x, j) as string) < 0
+}
+
+export function StringSlice_Swap(x: StringSlice, i: number, j: number): void {
+  swapInSlice(x, i, j)
+}
+
+export function StringSlice_Search(p: StringSlice, x: string): number {
+  return SearchStrings(p, x)
+}
+
+export function StringSlice_Sort(x: StringSlice): void {
+  Strings(x)
 }
 
 // Sort sorts data in ascending order as determined by the Less method.
@@ -148,6 +144,27 @@ export function Reverse(data: Interface | null): Interface {
   }
 }
 
+// sortInSlice sorts the elements of slice in place with the given comparison.
+function sortInSlice<T>(slice: $.Slice<T>, compare: (a: T, b: T) => number): void {
+  const n = $.len(slice)
+  if (n < 2) return
+  const values: T[] = []
+  for (let i = 0; i < n; i++) {
+    values.push($.index(slice, i) as T)
+  }
+  values.sort(compare)
+  if (Array.isArray(slice)) {
+    for (let i = 0; i < n; i++) {
+      slice[i] = values[i]
+    }
+  } else if (slice && typeof slice === 'object' && '__meta__' in slice) {
+    const meta = (slice as any).__meta__ as SliceMetadata<T>
+    for (let i = 0; i < n; i++) {
+      meta.backing[meta.offset + i] = values[i]
+    }
+  }
+}
+
 // Helper function to swap elements in a slice
 function swapInSlice<T>(slice: $.Slice<T>, i: number, j: number): void {
   if (!slice) return
@@ -168,15 +185,7 @@ function swapInSlice<T>(slice: $.Slice<T>, i: number, j: number): void {
 
 // Ints sorts a slice of ints in increasing order.
 export function Ints(x: $.Slice<number>): void {
-  if (!x) return
-  
-  const n = $.len(x)
-  // Simple insertion sort
-  for (let i = 1; i < n; i++) {
-    for (let j = i; j > 0 && ($.index(x, j) as number) < ($.index(x, j - 1) as number); j--) {
-      swapInSlice(x, j, j - 1)
-    }
-  }
+  sortInSlice(x, (a, b) => a - b)
 }
 
 // IntsAreSorted reports whether the slice x is sorted in increasing order.
@@ -193,21 +202,13 @@ export function IntsAreSorted(x: $.Slice<number>): boolean {
 }
 
 // Float64s sorts a slice of float64s in increasing order.
+// Not-a-number values are ordered before other values.
 export function Float64s(x: $.Slice<number>): void {
-  if (!x) return
-  
-  const n = $.len(x)
-  // Simple insertion sort
-  for (let i = 1; i < n; i++) {
-    for (
-      let j = i;
-      j > 0 &&
-      lessFloat64($.index(x, j) as number, $.index(x, j - 1) as number);
-      j--
-    ) {
-      swapInSlice(x, j, j - 1)
-    }
-  }
+  sortInSlice(x, (a, b) =>
+    lessFloat64(a, b) ? -1
+    : lessFloat64(b, a) ? 1
+    : 0,
+  )
 }
 
 // Float64sAreSorted reports whether the slice x is sorted in increasing order.
@@ -225,20 +226,7 @@ export function Float64sAreSorted(x: $.Slice<number>): boolean {
 
 // Strings sorts a slice of strings in increasing order.
 export function Strings(x: $.Slice<string>): void {
-  if (!x) return
-  
-  const n = $.len(x)
-  // Simple insertion sort
-  for (let i = 1; i < n; i++) {
-    for (
-      let j = i;
-      j > 0 &&
-      compareStrings($.index(x, j) as string, $.index(x, j - 1) as string) < 0;
-      j--
-    ) {
-      swapInSlice(x, j, j - 1)
-    }
-  }
+  sortInSlice(x, compareStrings)
 }
 
 // StringsAreSorted reports whether the slice x is sorted in increasing order.

@@ -3,13 +3,13 @@ import * as $ from '@goscript/builtin/index.js'
 
 import { Slice, SliceIsSorted, SliceStable } from './slice.gs.js'
 import {
-  Float64Slice,
+  Float64Slice_Less,
   Float64s,
   Float64sAreSorted,
   type Interface,
   IsSorted,
   Sort,
-  StringSlice,
+  StringSlice_Less,
   Strings,
   StringsAreSorted,
 } from './sort.gs.js'
@@ -84,9 +84,7 @@ describe('sort.Slice override', () => {
     expect(Number.isNaN(values![0])).toBe(true)
     expect(values![1]).toBe(1)
     expect(Float64sAreSorted(values)).toBe(true)
-    expect(new Float64Slice($.arrayToSlice([Number.NaN, 1])).Less(0, 1)).toBe(
-      true,
-    )
+    expect(Float64Slice_Less($.arrayToSlice([Number.NaN, 1]), 0, 1)).toBe(true)
   })
 
   it('orders strings by Go UTF-8 byte order', () => {
@@ -98,6 +96,6 @@ describe('sort.Slice override', () => {
 
     expect(values).toEqual([privateUse, astral])
     expect(StringsAreSorted(values)).toBe(true)
-    expect(new StringSlice(values).Less(0, 1)).toBe(true)
+    expect(StringSlice_Less(values, 0, 1)).toBe(true)
   })
 })

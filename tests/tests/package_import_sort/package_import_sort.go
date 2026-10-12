@@ -116,5 +116,20 @@ func main() {
 	namedSliceSorter.sort(namedSlice)
 	println("Named slice pointer sort:", namedSlice[0], namedSlice[1], namedSlice[2])
 
+	// Test the named slice types and their methods.
+	wordSlice := []string{"c", "a", "b"}
+	sort.StringSlice(wordSlice).Sort()
+	println("StringSlice sort:", wordSlice[0], wordSlice[1], wordSlice[2], sort.StringSlice(wordSlice).Search("b"))
+	floatSlice := sort.Float64Slice{2.5, 1.5}
+	floatSlice.Sort()
+	println("Float64Slice sort:", floatSlice.Len(), floatSlice.Less(0, 1), floatSlice.Search(2.5))
+	var sorter sort.Interface = sort.IntSlice([]int{3, 1, 2})
+	sort.Sort(sorter)
+	intSlice := sorter.(sort.IntSlice)
+	println("IntSlice interface sort:", intSlice[0], intSlice[1], intSlice[2], sorter.Len())
+	sort.Sort(sort.Reverse(intSlice))
+	intSlice.Swap(0, 2)
+	println("IntSlice reverse and swap:", intSlice[0], intSlice[1], intSlice[2])
+
 	println("test finished")
 }
