@@ -353,7 +353,7 @@ export class Time {
       }
       // Year patterns
       else if (remaining.startsWith('2006')) {
-        result += year.toString()
+        result += String(year).padStart(4, '0')
         i += 4
         matched = true
       }
@@ -712,7 +712,7 @@ export class Time {
   // String returns the time formatted as a string
   public String(): string {
     // Format as "YYYY-MM-DD HH:MM:SS +0000 UTC" to match Go's format
-    const year = this._date.getUTCFullYear()
+    const year = String(this._date.getUTCFullYear()).padStart(4, '0')
     const month = String(this._date.getUTCMonth() + 1).padStart(2, '0')
     const day = String(this._date.getUTCDate()).padStart(2, '0')
     const hour = String(this._date.getUTCHours()).padStart(2, '0')
