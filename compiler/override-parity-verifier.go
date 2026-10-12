@@ -53,6 +53,7 @@ func (v *OverrideParityVerifier) Verify(
 	graph *PackageGraph,
 	facts *OverrideFacts,
 ) []Diagnostic {
+	// Stop on a finished context or missing inputs.
 	if err := ctx.Err(); err != nil {
 		return []Diagnostic{contextCanceledDiagnostic(err)}
 	}
@@ -60,6 +61,8 @@ func (v *OverrideParityVerifier) Verify(
 		return nil
 	}
 
+	// Check each ledgered override package, then the blocked symbols that
+	// ordinary packages use.
 	var diagnostics []Diagnostic
 	for _, node := range graph.Nodes {
 		if err := ctx.Err(); err != nil {
@@ -135,6 +138,9 @@ func (v *OverrideParityVerifier) VerifyNoDeferred(facts *OverrideFacts, pkgPaths
 	return diagnostics
 }
 
+// verifyOverrideParityPackage checks one package's Go exports against its
+// parity ledger and TypeScript exports. A nil behaviorTests skips the check
+// that each real function has a behavior test.
 func verifyOverrideParityPackage(
 	goVersion string,
 	pkgPath string,
@@ -143,6 +149,7 @@ func verifyOverrideParityPackage(
 	tsExports map[string]typeScriptExport,
 	behaviorTests map[string]bool,
 ) []Diagnostic {
+	// Check each Go export against its ledger entry.
 	goExports := exportedPackageSymbols(goPkg)
 	goExportSet := make(map[string]bool, len(goExports))
 	var diagnostics []Diagnostic
@@ -170,7 +177,7 @@ func verifyOverrideParityPackage(
 				Detail:   pkgPath + "." + symbol.name + " is classified as " + string(entry.Status),
 			})
 		}
-		if entry.Status == overrideParityStatusReal && isPackageLevelFunc(obj) && !behaviorTests[symbol.name] {
+		if behaviorTests != nil && entry.Status == overrideParityStatusReal && isPackageLevelFunc(obj) && !behaviorTests[symbol.name] {
 			diagnostics = append(diagnostics, Diagnostic{
 				Severity: DiagnosticSeverityWarning,
 				Code:     "goscript/overrides:parity-missing-behavior-test",
@@ -240,10 +247,15 @@ func (export typeScriptExport) present() bool {
 	return export.value || export.typ
 }
 
+// exportedPackageSymbols returns goPkg's exported names in order, noting which
+// need a TypeScript value rather than only a type.
 func exportedPackageSymbols(goPkg *types.Package) []goPackageExport {
+	// A package without a scope exports nothing.
 	if goPkg == nil || goPkg.Scope() == nil {
 		return nil
 	}
+
+	// Classify each exported name; Scope.Names is already sorted.
 	names := goPkg.Scope().Names()
 	symbols := make([]goPackageExport, 0, len(names))
 	for _, name := range names {
@@ -257,9 +269,6 @@ func exportedPackageSymbols(goPkg *types.Package) []goPackageExport {
 			requiresValue: !isTypeName || typeNameRequiresValue(typeName),
 		})
 	}
-	slices.SortFunc(symbols, func(a, b goPackageExport) int {
-		return strings.Compare(a.name, b.name)
-	})
 	return symbols
 }
 
@@ -271,10 +280,15 @@ func typeNameRequiresValue(typeName *types.TypeName) bool {
 	return ok
 }
 
+// verifyBlockedOverrideUses reports each use, outside override packages, of a
+// symbol its package's parity ledger blocks.
 func verifyBlockedOverrideUses(graph *PackageGraph, facts *OverrideFacts) []Diagnostic {
+	// Missing inputs have no uses to check.
 	if graph == nil || facts == nil {
 		return nil
 	}
+
+	// Check the identifiers each ordinary package uses from other packages.
 	seen := make(map[string]bool)
 	var diagnostics []Diagnostic
 	for _, node := range graph.Nodes {
@@ -314,7 +328,10 @@ func verifyBlockedOverrideUses(graph *PackageGraph, facts *OverrideFacts) []Diag
 	return diagnostics
 }
 
+// effectiveTypeScriptExports returns the exports reachable from the override
+// package's index.ts through its re-exports.
 func (f *OverrideFacts) effectiveTypeScriptExports(pkgPath string) (map[string]typeScriptExport, error) {
+	// Index the package's sources by path.
 	pkg, _, ok := f.copyPackage(pkgPath)
 	if !ok {
 		return nil, errors.Errorf("override package %q is missing", pkgPath)
@@ -323,6 +340,8 @@ func (f *OverrideFacts) effectiveTypeScriptExports(pkgPath string) (map[string]t
 	for _, file := range pkg.files {
 		files[path.Clean(file.path)] = string(file.data)
 	}
+
+	// Follow the exports from the package entry file.
 	exports := make(map[string]typeScriptExport)
 	visited := make(map[string]bool)
 	if err := collectTypeScriptExports(path.Join(pkgPath, "index.ts"), files, exports, visited); err != nil {
@@ -331,12 +350,15 @@ func (f *OverrideFacts) effectiveTypeScriptExports(pkgPath string) (map[string]t
 	return exports, nil
 }
 
+// collectTypeScriptExports adds the exports of filePath in files to exports,
+// following re-exports and visiting each file once.
 func collectTypeScriptExports(
 	filePath string,
 	files map[string]string,
 	exports map[string]typeScriptExport,
 	visited map[string]bool,
 ) error {
+	// Read the file on its first visit.
 	filePath = path.Clean(filePath)
 	if visited[filePath] {
 		return nil
@@ -346,10 +368,14 @@ func collectTypeScriptExports(
 	if !ok {
 		return errors.Errorf("missing %s", filePath)
 	}
-	localBindings := localTypeScriptBindings(data)
+
+	// Add the declarations the file exports directly.
 	for _, match := range overrideExportDeclarationPattern.FindAllStringSubmatch(data, -1) {
 		addTypeScriptExport(exports, match[2], typeScriptExportForDeclaration(match[1]))
 	}
+
+	// Add named exports of local bindings and named re-exports of other files.
+	localBindings := localTypeScriptBindings(data)
 	for _, match := range overrideExportNamedPattern.FindAllStringSubmatch(data, -1) {
 		namedExports := parseNamedTypeScriptExports(match[2], match[1] != "")
 		if match[3] == "" {
@@ -383,6 +409,8 @@ func collectTypeScriptExports(
 			addTypeScriptExport(exports, namedExport.target, exportShape)
 		}
 	}
+
+	// Add every export of each star re-export.
 	for _, match := range overrideExportAllPattern.FindAllStringSubmatch(data, -1) {
 		target, ok := resolveOverrideExportPath(filePath, match[1])
 		if ok {
@@ -407,10 +435,14 @@ func typeScriptExportForDeclaration(kind string) typeScriptExport {
 	}
 }
 
+// addTypeScriptExport merges export into the shape recorded for name.
 func addTypeScriptExport(exports map[string]typeScriptExport, name string, export typeScriptExport) {
+	// Ignore an unnamed export.
 	if name == "" {
 		return
 	}
+
+	// Union the value and type spaces.
 	current := exports[name]
 	current.value = current.value || export.value
 	current.typ = current.typ || export.typ

@@ -1,14 +1,11 @@
 package goscript
 
 import (
-	"embed"
+	_ "embed"
 	"encoding/json"
 )
 
-// GsOverrides gs/ tree contains hand-written TypeScript packages corresponding to Go packages.
-//
-//go:embed gs
-var GsOverrides embed.FS
+//go:generate go test -run TestGsEmbedCurrent -update .
 
 // packageJSON is the goscript npm package manifest. Its dependencies are the
 // npm packages that the gs/ runtime packages import.

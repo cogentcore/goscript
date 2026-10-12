@@ -41,9 +41,10 @@ type overridePackageFacts struct {
 }
 
 type overridePackageRoot struct {
-	pkgPath string
-	fsys    fs.FS
-	dir     string
+	pkgPath  string
+	fsys     fs.FS
+	dir      string
+	embedded bool
 }
 
 // HasPackage returns true when pkgPath has a GoScript override package.
@@ -72,12 +73,13 @@ func (f *OverrideFacts) parityLedger(pkgPath string) overrideParityLedger {
 	return cloneOverrideParityLedger(pkg.parity)
 }
 
+// behaviorTestSymbols returns the symbols the package's behavior tests
+// exercise, or nil when its tests are unavailable.
 func (f *OverrideFacts) behaviorTestSymbols(pkgPath string) map[string]bool {
 	if f == nil {
 		return nil
 	}
-	pkg := f.packages[pkgPath]
-	return cloneBoolMap(pkg.behaviorTestSymbols)
+	return maps.Clone(f.packages[pkgPath].behaviorTestSymbols)
 }
 
 // IsMethodAsync returns true when override metadata marks a method async.
@@ -119,16 +121,23 @@ func (f *OverrideFacts) copyPackage(pkgPath string) (overrideCopyPackage, []stri
 	return cloneOverrideCopyPackage(pkg.copyPackage), slices.Clone(pkg.dependencies), true
 }
 
+// importPackageRoot returns the override package that provides importPath, the
+// longest package path prefix of the import with an override.
 func (f *OverrideFacts) importPackageRoot(importPath string) (string, bool) {
+	// Nil facts have no packages.
 	if f == nil {
 		return "", false
 	}
+
+	// Reduce the TypeScript import specifier to a package-style path.
 	importPath = strings.TrimPrefix(importPath, "@goscript/")
 	importPath = strings.TrimSuffix(importPath, ".js")
 	importPath = strings.TrimSuffix(importPath, ".ts")
 	if before, ok := strings.CutSuffix(importPath, "/index"); ok {
 		importPath = before
 	}
+
+	// Match the longest prefix that names an override package.
 	parts := strings.Split(importPath, "/")
 	for idx := len(parts); idx > 0; idx-- {
 		candidate := strings.Join(parts[:idx], "/")
@@ -139,23 +148,31 @@ func (f *OverrideFacts) importPackageRoot(importPath string) (string, bool) {
 	return "", false
 }
 
+// buildOverrideFacts reads every override package under overrideDirs and the
+// embedded gs tree. A package in overrideDirs replaces the embedded one.
 func buildOverrideFacts(ctx context.Context, overrideDirs []string) (*OverrideFacts, []Diagnostic) {
+	// Discover the package roots and visit them in a stable order.
 	roots, diagnostics := discoverOverridePackageRoots(overrideDirs)
 	if diagnosticsHaveErrors(diagnostics) {
 		return nil, diagnostics
 	}
-	paths := make([]string, 0, len(roots))
-	for pkgPath := range roots {
-		paths = append(paths, pkgPath)
-	}
-	slices.Sort(paths)
+	paths := slices.Sorted(maps.Keys(roots))
 
+	// Index the golden tests when the compiler runs in its source tree.
+	sourceDir, inSource := findGoscriptSourceDir()
+	var goldenBehaviorTests map[string]map[string]bool
+	if inSource {
+		goldenBehaviorTests = loadGoldenBehaviorTests(filepath.Join(sourceDir, "tests", "tests"))
+	}
+
+	// Build each package's facts, stopping when the context ends.
 	facts := &OverrideFacts{packages: make(map[string]overridePackageFacts, len(paths))}
-	goldenBehaviorTests := loadGoldenBehaviorTests()
 	for _, pkgPath := range paths {
 		if err := ctx.Err(); err != nil {
 			return facts, []Diagnostic{contextCanceledDiagnostic(err)}
 		}
+
+		// Read the package's metadata, parity ledger, and sources.
 		metadata, err := loadOverrideMetadata(roots[pkgPath])
 		if err != nil {
 			diagnostics = append(diagnostics, overrideError("read override metadata", pkgPath, err))
@@ -171,12 +188,23 @@ func buildOverrideFacts(ctx context.Context, overrideDirs []string) (*OverrideFa
 		if diagnosticsHaveErrors(packageDiagnostics) {
 			continue
 		}
-		behaviorTests, err := loadOverrideBehaviorTests(roots[pkgPath], roots)
-		if err != nil {
-			diagnostics = append(diagnostics, overrideError("read override behavior tests", pkgPath, err))
-			continue
+
+		// The embedded gs tree ships without its tests, so its packages read
+		// them from the goscript source tree and go unchecked outside it.
+		var behaviorTests map[string]bool
+		if root := roots[pkgPath]; !root.embedded || inSource {
+			if root.embedded {
+				root.fsys = os.DirFS(sourceDir)
+			}
+			behaviorTests, err = loadOverrideBehaviorTests(root, roots)
+			if err != nil {
+				diagnostics = append(diagnostics, overrideError("read override behavior tests", pkgPath, err))
+				continue
+			}
+			maps.Copy(behaviorTests, goldenBehaviorTests[pkgPath])
 		}
-		maps.Copy(behaviorTests, goldenBehaviorTests[pkgPath])
+
+		// Record the package's facts.
 		facts.packages[pkgPath] = overridePackageFacts{
 			metadata:            cloneOverrideMetadata(metadata),
 			parity:              cloneOverrideParityLedger(parity),
@@ -185,13 +213,13 @@ func buildOverrideFacts(ctx context.Context, overrideDirs []string) (*OverrideFa
 			dependencies:        dependencies,
 		}
 	}
-	if diagnosticsHaveErrors(diagnostics) {
-		return facts, diagnostics
-	}
 	return facts, diagnostics
 }
 
+// discoverOverridePackageRoots finds the override packages in overrideDirs and
+// the embedded gs tree, keyed by Go package path.
 func discoverOverridePackageRoots(overrideDirs []string) (map[string]overridePackageRoot, []Diagnostic) {
+	// Discover the packages in each override directory.
 	roots := make(map[string]overridePackageRoot)
 	var diagnostics []Diagnostic
 	for _, dir := range overrideDirs {
@@ -208,12 +236,17 @@ func discoverOverridePackageRoots(overrideDirs []string) (map[string]overridePac
 			diagnostics = append(diagnostics, overrideError("discover override packages", abs, err))
 		}
 	}
+
+	// Fill the remaining package paths from the embedded gs tree.
 	if err := discoverOverridePackageRootsInFS(roots, gs.GsOverrides, "gs", true); err != nil {
 		diagnostics = append(diagnostics, overrideError("discover override packages", "embedded gs", err))
 	}
 	return roots, diagnostics
 }
 
+// discoverOverridePackageRootsInFS adds a root for each directory under rootDir
+// in fsys that holds an index.ts. An embedded root never replaces one already
+// found.
 func discoverOverridePackageRootsInFS(
 	roots map[string]overridePackageRoot,
 	fsys fs.FS,
@@ -221,30 +254,49 @@ func discoverOverridePackageRootsInFS(
 	embedded bool,
 ) error {
 	return fs.WalkDir(fsys, rootDir, func(filePath string, entry fs.DirEntry, err error) error {
+		// Visit only package entry files.
 		if err != nil {
 			return err
 		}
 		if entry.IsDir() || path.Base(filePath) != "index.ts" {
 			return nil
 		}
-		pkgPath := strings.TrimPrefix(path.Dir(filePath), rootDir+"/")
-		if rootDir == "." {
-			pkgPath = path.Dir(filePath)
+
+		// Name the package by its directory below rootDir.
+		dir := path.Dir(filePath)
+		pkgPath := strings.TrimPrefix(dir, rootDir+"/")
+		if pkgPath == "." {
+			return nil
 		}
-		if pkgPath != "." && pkgPath != "" {
-			if _, exists := roots[pkgPath]; !exists || !embedded {
-				roots[pkgPath] = overridePackageRoot{
-					pkgPath: pkgPath,
-					fsys:    fsys,
-					dir:     path.Dir(filePath),
-				}
+		if _, exists := roots[pkgPath]; !exists || !embedded {
+			roots[pkgPath] = overridePackageRoot{
+				pkgPath:  pkgPath,
+				fsys:     fsys,
+				dir:      dir,
+				embedded: embedded,
 			}
 		}
 		return nil
 	})
 }
 
+// packagePath returns the Go package path of filePath, a path in the root's
+// directory tree.
+func (root overridePackageRoot) packagePath(filePath string) string {
+	return path.Join(root.pkgPath, strings.TrimPrefix(filePath, root.dir))
+}
+
+// ownsDir reports whether dir belongs to the root's package rather than to a
+// nested override package.
+func (root overridePackageRoot) ownsDir(dir string, roots map[string]overridePackageRoot) bool {
+	nestedPkg := root.packagePath(dir)
+	_, nested := roots[nestedPkg]
+	return nestedPkg == root.pkgPath || !nested
+}
+
+// loadOverrideMetadata reads the root's meta.json, which is optional.
 func loadOverrideMetadata(root overridePackageRoot) (OverrideMetadata, error) {
+	// Read the file, treating a missing one as empty metadata.
 	metadata := newOverrideMetadata()
 	data, err := fs.ReadFile(root.fsys, path.Join(root.dir, "meta.json"))
 	if err != nil {
@@ -254,6 +306,7 @@ func loadOverrideMetadata(root overridePackageRoot) (OverrideMetadata, error) {
 		return OverrideMetadata{}, err
 	}
 
+	// Decode the known fields and skip the rest.
 	iter := jsoniter.ParseBytes(data)
 	for field := iter.ReadObject(); field != ""; field = iter.ReadObject() {
 		switch field {
@@ -289,11 +342,14 @@ func loadOverrideMetadata(root overridePackageRoot) (OverrideMetadata, error) {
 	return metadata, nil
 }
 
+// loadOverrideCopyPackage reads the root's TypeScript sources and the override
+// packages they and the metadata depend on.
 func loadOverrideCopyPackage(
 	root overridePackageRoot,
 	roots map[string]overridePackageRoot,
 	metadata OverrideMetadata,
 ) (overrideCopyPackage, []string, []Diagnostic) {
+	// Require the package to be a discovered root.
 	pkgPath := root.pkgPath
 	if _, ok := roots[pkgPath]; !ok {
 		return overrideCopyPackage{}, nil, []Diagnostic{{
@@ -304,11 +360,13 @@ func loadOverrideCopyPackage(
 		}}
 	}
 
+	// Index the package paths so imports resolve to their override package.
 	facts := &OverrideFacts{packages: make(map[string]overridePackageFacts, len(roots))}
 	for root := range roots {
 		facts.packages[root] = overridePackageFacts{}
 	}
 
+	// Seed the dependencies the metadata declares.
 	copyPackage := overrideCopyPackage{path: pkgPath}
 	dependencySet := make(map[string]bool)
 	for _, dependency := range metadata.Dependencies {
@@ -318,18 +376,14 @@ func loadOverrideCopyPackage(
 		}
 	}
 
+	// Copy each source outside nested packages and add the packages it imports.
 	err := fs.WalkDir(root.fsys, root.dir, func(filePath string, entry fs.DirEntry, walkErr error) error {
+		// Skip directories that belong to nested packages.
 		if walkErr != nil {
 			return walkErr
 		}
 		if entry.IsDir() {
-			nestedPkg := strings.TrimPrefix(filePath, root.dir+"/")
-			if root.dir == "." {
-				nestedPkg = filePath
-			} else if nestedPkg != filePath {
-				nestedPkg = path.Join(pkgPath, nestedPkg)
-			}
-			if _, ok := roots[nestedPkg]; nestedPkg != pkgPath && ok {
+			if !root.ownsDir(filePath, roots) {
 				return fs.SkipDir
 			}
 			return nil
@@ -337,18 +391,14 @@ func loadOverrideCopyPackage(
 		if !isOverrideSourceFile(filePath) {
 			return nil
 		}
+
+		// Copy the source under its package path and collect its imports.
 		data, readErr := fs.ReadFile(root.fsys, filePath)
 		if readErr != nil {
 			return readErr
 		}
-		rel := strings.TrimPrefix(filePath, root.dir+"/")
-		if root.dir == "." {
-			rel = filePath
-		} else if rel != filePath {
-			rel = path.Join(pkgPath, rel)
-		}
 		copyPackage.files = append(copyPackage.files, overrideCopyFile{
-			path: rel,
+			path: root.packagePath(filePath),
 			data: data,
 		})
 		for _, imported := range scanOverrideImports(string(data)) {
@@ -363,6 +413,7 @@ func loadOverrideCopyPackage(
 		return overrideCopyPackage{}, nil, []Diagnostic{overrideError("read override package", pkgPath, err)}
 	}
 
+	// Reject a package with no sources and order the ones it has.
 	if len(copyPackage.files) == 0 {
 		return overrideCopyPackage{}, nil, []Diagnostic{{
 			Severity: DiagnosticSeverityError,
@@ -374,32 +425,23 @@ func loadOverrideCopyPackage(
 	slices.SortFunc(copyPackage.files, func(a, b overrideCopyFile) int {
 		return strings.Compare(a.path, b.path)
 	})
-
-	dependencies := make([]string, 0, len(dependencySet))
-	for dependency := range dependencySet {
-		dependencies = append(dependencies, dependency)
-	}
-	slices.Sort(dependencies)
-	return copyPackage, dependencies, nil
+	return copyPackage, slices.Sorted(maps.Keys(dependencySet)), nil
 }
 
+// loadOverrideBehaviorTests returns the package symbols that the root's
+// .test.ts files exercise, excluding nested packages.
 func loadOverrideBehaviorTests(
 	root overridePackageRoot,
 	roots map[string]overridePackageRoot,
 ) (map[string]bool, error) {
 	symbols := make(map[string]bool)
 	err := fs.WalkDir(root.fsys, root.dir, func(filePath string, entry fs.DirEntry, walkErr error) error {
+		// Skip directories that belong to nested packages.
 		if walkErr != nil {
 			return walkErr
 		}
 		if entry.IsDir() {
-			nestedPkg := strings.TrimPrefix(filePath, root.dir+"/")
-			if root.dir == "." {
-				nestedPkg = filePath
-			} else if nestedPkg != filePath {
-				nestedPkg = path.Join(root.pkgPath, nestedPkg)
-			}
-			if _, ok := roots[nestedPkg]; nestedPkg != root.pkgPath && ok {
+			if !root.ownsDir(filePath, roots) {
 				return fs.SkipDir
 			}
 			return nil
@@ -407,6 +449,8 @@ func loadOverrideBehaviorTests(
 		if !strings.HasSuffix(filePath, ".test.ts") {
 			return nil
 		}
+
+		// Add the symbols this test file exercises.
 		data, readErr := fs.ReadFile(root.fsys, filePath)
 		if readErr != nil {
 			return readErr
@@ -420,13 +464,17 @@ func loadOverrideBehaviorTests(
 	return symbols, nil
 }
 
+// scanOverrideBehaviorTestSymbols returns the imported symbols a test file's
+// code uses, by named import or by namespace selector.
 func scanOverrideBehaviorTestSymbols(data string) map[string]bool {
+	// Collect the identifiers in the code outside imports, comments, and strings.
 	body := stripTypeScriptCommentsAndStrings(typeScriptBodyWithoutImports(data))
 	bodyIdentifiers := make(map[string]bool)
 	for _, match := range overrideBehaviorTestIdentifierPattern.FindAllString(body, -1) {
 		bodyIdentifiers[match] = true
 	}
 
+	// Keep each value named import the code uses.
 	symbols := make(map[string]bool)
 	for _, match := range overrideBehaviorTestNamedImportPattern.FindAllStringSubmatch(data, -1) {
 		if match[1] != "" {
@@ -438,6 +486,8 @@ func scanOverrideBehaviorTestSymbols(data string) map[string]bool {
 			}
 		}
 	}
+
+	// Keep each member the code selects from a namespace import.
 	for _, match := range overrideBehaviorTestNamespaceImportPattern.FindAllStringSubmatch(data, -1) {
 		namespaceSelectorPattern := regexp.MustCompile(`\b` + regexp.QuoteMeta(match[1]) + `\.([A-Za-z_$][A-Za-z0-9_$]*)\b`)
 		for _, selector := range namespaceSelectorPattern.FindAllStringSubmatch(body, -1) {
@@ -447,6 +497,8 @@ func scanOverrideBehaviorTestSymbols(data string) map[string]bool {
 	return symbols
 }
 
+// typeScriptBodyWithoutImports blanks the import statements in data, keeping
+// its line structure.
 func typeScriptBodyWithoutImports(data string) string {
 	var body strings.Builder
 	inImport := false
@@ -473,7 +525,10 @@ func typeScriptBodyWithoutImports(data string) string {
 	return body.String()
 }
 
+// stripTypeScriptCommentsAndStrings blanks the comments and string literals in
+// data, keeping its line structure.
 func stripTypeScriptCommentsAndStrings(data string) string {
+	// Track the lexical mode of the current byte.
 	var body strings.Builder
 	const (
 		modeCode = iota
@@ -569,13 +624,12 @@ func stripTypeScriptCommentsAndStrings(data string) string {
 	return body.String()
 }
 
-func loadGoldenBehaviorTests() map[string]map[string]bool {
-	testsDir, ok := findGoldenTestsDir()
-	if !ok {
-		return nil
-	}
+// loadGoldenBehaviorTests returns, per imported package path, the symbols the
+// golden test programs under testsDir use. Unreadable programs are skipped.
+func loadGoldenBehaviorTests(testsDir string) map[string]map[string]bool {
 	result := make(map[string]map[string]bool)
 	_ = filepath.WalkDir(testsDir, func(filePath string, entry fs.DirEntry, err error) error {
+		// Parse each Go source, skipping what cannot be read.
 		if err != nil || entry.IsDir() || filepath.Ext(filePath) != ".go" {
 			return nil
 		}
@@ -583,6 +637,8 @@ func loadGoldenBehaviorTests() map[string]map[string]bool {
 		if parseErr != nil {
 			return nil
 		}
+
+		// Map each import's local name to its package path.
 		importAliases := make(map[string]string)
 		dotImports := make(map[string]bool)
 		for _, spec := range file.Imports {
@@ -605,6 +661,8 @@ func loadGoldenBehaviorTests() map[string]map[string]bool {
 		if len(importAliases) == 0 && len(dotImports) == 0 {
 			return nil
 		}
+
+		// Record each package-qualified selector and dot-imported identifier.
 		ast.Inspect(file, func(node ast.Node) bool {
 			switch expr := node.(type) {
 			case *ast.SelectorExpr:
@@ -629,15 +687,18 @@ func loadGoldenBehaviorTests() map[string]map[string]bool {
 	return result
 }
 
-func findGoldenTestsDir() (string, bool) {
+// findGoscriptSourceDir returns the goscript source tree enclosing the
+// working directory, which holds the gs tests and golden tests.
+func findGoscriptSourceDir() (string, bool) {
 	wd, err := os.Getwd()
 	if err != nil {
 		return "", false
 	}
 	for {
-		candidate := filepath.Join(wd, "tests", "tests")
-		if info, statErr := os.Stat(candidate); statErr == nil && info.IsDir() {
-			return candidate, true
+		_, gsErr := os.Stat(filepath.Join(wd, "gs", "builtin", "index.ts"))
+		info, testsErr := os.Stat(filepath.Join(wd, "tests", "tests"))
+		if gsErr == nil && testsErr == nil && info.IsDir() {
+			return wd, true
 		}
 		parent := filepath.Dir(wd)
 		if parent == wd {
