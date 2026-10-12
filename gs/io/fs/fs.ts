@@ -106,7 +106,7 @@ export function ValidPath(name: string): boolean {
 
 export type File = null | {
   Close(): $.GoError
-  Read(_p0: Uint8Array): [number, $.GoError]
+  Read(_p0: $.Bytes): [number, $.GoError]
   Stat(): [FileInfo, $.GoError]
 }
 
