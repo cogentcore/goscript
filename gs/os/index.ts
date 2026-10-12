@@ -82,6 +82,9 @@ export {
   Stdout,
   Symlink,
   Truncate,
+  __goscript_set_Stderr,
+  __goscript_set_Stdin,
+  __goscript_set_Stdout,
 } from './file_unix_js.gs.js'
 export { Chown, Chtimes, Lchown } from './file_posix_js.gs.js'
 export { Getwd } from './getwd_js.gs.js'

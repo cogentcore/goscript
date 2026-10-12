@@ -50,9 +50,22 @@ const standardOutputFD = 1
 const standardErrorFD = 2
 
 // Stdin, Stdout, and Stderr expose the host process standard streams.
-export const Stdin: File | null = NewFile(standardInputFD, "/dev/stdin")
-export const Stdout: File | null = NewFile(standardOutputFD, "/dev/stdout")
-export const Stderr: File | null = NewFile(standardErrorFD, "/dev/stderr")
+// They are variables in Go, so programs may replace them.
+export let Stdin: File | null = NewFile(standardInputFD, "/dev/stdin")
+export let Stdout: File | null = NewFile(standardOutputFD, "/dev/stdout")
+export let Stderr: File | null = NewFile(standardErrorFD, "/dev/stderr")
+
+export function __goscript_set_Stdin(value: File | $.VarRef<File> | null): void {
+	Stdin = $.pointerValueOrNil(value)
+}
+
+export function __goscript_set_Stdout(value: File | $.VarRef<File> | null): void {
+	Stdout = $.pointerValueOrNil(value)
+}
+
+export function __goscript_set_Stderr(value: File | $.VarRef<File> | null): void {
+	Stderr = $.pointerValueOrNil(value)
+}
 
 // NewFile creates a File from a file descriptor.
 export function NewFile(fd: number, name: string): File | null {
