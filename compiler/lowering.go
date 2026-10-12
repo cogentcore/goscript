@@ -3477,6 +3477,7 @@ func (o *LoweringOwner) lowerEmbeddedMethodForwarders(
 	field semanticField,
 	explicitMethods map[string]bool,
 ) []loweredFunction {
+	// Only an embedded field promotes methods.
 	if !field.embedded {
 		return nil
 	}
@@ -3542,17 +3543,25 @@ func (o *LoweringOwner) lowerEmbeddedMethodForwarders(
 			args = append(args, name)
 			lowered.params = append(lowered.params, loweredParam{name: name, typ: "any"})
 		}
+		// A value method of a named non-struct type, the field's own or one
+		// promoted from deeper in it, is a free function taking the receiver.
+		receiver, target := valueReceiver, "this."+tsStructFieldName(field.name, 0)
+		if receiver == nil {
+			targetType := o.tsEmbeddedForwarderTargetType(ctx, field.typ)
+			target = o.embeddedForwarderTargetExpr(ctx, field, selection, targetType)
+			if named := methodReceiverNamedType(method); !isPointerType(signature.Recv().Type()) && namedNonInterfaceNonStructType(named) {
+				receiver = named.Origin()
+			}
+		}
 		var call string
-		if valueReceiver != nil {
-			callArgs := append([]string{"this." + tsStructFieldName(field.name, 0)}, args...)
-			call = o.methodFunctionExpr(ctx, valueReceiver, method, method.Name()) + "(" + strings.Join(callArgs, ", ") + ")"
+		if receiver != nil {
+			callArgs := append([]string{target}, args...)
+			call = o.methodFunctionExpr(ctx, receiver, method, method.Name()) + "(" + strings.Join(callArgs, ", ") + ")"
 		} else {
 			callArgs := args
 			if genericArgs != "" {
 				callArgs = append([]string{genericArgs}, callArgs...)
 			}
-			targetType := o.tsEmbeddedForwarderTargetType(ctx, field.typ)
-			target := o.embeddedForwarderTargetExpr(ctx, field, selection, targetType)
 			call = target + "." + method.Name() + "(" + strings.Join(callArgs, ", ") + ")"
 		}
 		if async {

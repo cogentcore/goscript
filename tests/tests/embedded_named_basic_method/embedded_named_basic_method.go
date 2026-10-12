@@ -20,6 +20,11 @@ type Engineer struct {
 	Name string
 }
 
+// Lead promotes Rank from the Level within its embedded Engineer.
+type Lead struct {
+	Engineer
+}
+
 func main() {
 	eng := Engineer{Level: 3, Name: "Grace"}
 	println("direct:", eng.Rank("rank: "))
@@ -29,4 +34,9 @@ func main() {
 
 	r = &Engineer{Level: 1, Name: "Ada"}
 	println("pointer:", r.Rank("pointer: "))
+
+	lead := &Lead{Engineer{Level: 4, Name: "Linus"}}
+	println("nested direct:", lead.Rank("lead: "))
+	r = lead
+	println("nested interface:", r.Rank("lead: "))
 }
