@@ -70,5 +70,5 @@ export function Get(): Level {
 }
 
 export function UserPtr(): $.VarRef<Level> | null {
-	return UserLevel
+	return __goscript_get_UserLevel()
 }

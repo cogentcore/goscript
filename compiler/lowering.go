@@ -1988,22 +1988,32 @@ func packageVarIsLazy(ctx lowerFileContext, obj types.Object) bool {
 	return semPkg != nil && semPkg.lazyVars[obj]
 }
 
-func (o *LoweringOwner) packageVarHasAsyncLazyInit(ctx lowerFileContext, obj types.Object) bool {
-	varObj, _ := obj.(*types.Var)
-	if varObj == nil || varObj.Pkg() == nil {
-		return false
+// lazyPackageVarRead returns an expression reading the lazily initialized
+// package variable obj through its getter. qualifier is empty or an import
+// alias followed by a dot. In an async function or at the module top level,
+// the expression first awaits an asynchronous initializer.
+func (o *LoweringOwner) lazyPackageVarRead(ctx lowerFileContext, qualifier string, obj types.Object) string {
+	value := qualifier + packageVarGetterName(obj.Name()) + "()"
+	if !ctx.asyncFunction && !ctx.topLevel || !o.packageVarHasAsyncLazyInit(ctx, obj) {
+		return value
 	}
-	return o.packageVarNameHasAsyncLazyInit(ctx, varObj.Pkg().Path(), varObj.Name())
+	return "(await " + qualifier + packageVarInitName(obj.Name()) + "(), " + value + ")"
 }
 
-func (o *LoweringOwner) packageVarNameHasAsyncLazyInit(ctx lowerFileContext, pkgPath, name string) bool {
-	if ctx.model == nil || pkgPath == "" || name == "" {
+// packageVarHasAsyncLazyInit reports whether the package variable obj has an
+// initializer that must be awaited.
+func (o *LoweringOwner) packageVarHasAsyncLazyInit(ctx lowerFileContext, obj types.Object) bool {
+	// Resolve the package that declares obj.
+	varObj, _ := obj.(*types.Var)
+	if varObj == nil || varObj.Pkg() == nil || ctx.model == nil {
 		return false
 	}
-	semPkg := ctx.model.packages[pkgPath]
+	semPkg := ctx.model.packages[varObj.Pkg().Path()]
 	if semPkg == nil || semPkg.source == nil {
 		return false
 	}
+
+	// Find the initializer among the package's var declarations.
 	initCtx := lowerFileContext{
 		model:     ctx.model,
 		semPkg:    semPkg,
@@ -2022,7 +2032,7 @@ func (o *LoweringOwner) packageVarNameHasAsyncLazyInit(ctx lowerFileContext, pkg
 					continue
 				}
 				for idx, ident := range valueSpec.Names {
-					if ident.Name != name || idx >= len(valueSpec.Values) {
+					if ident.Name != varObj.Name() || idx >= len(valueSpec.Values) {
 						continue
 					}
 					return o.topLevelInitializerNeedsAwait(initCtx, valueSpec.Values[idx])
@@ -8328,11 +8338,16 @@ func lowerIdent(ident *ast.Ident) string {
 	}
 }
 
+// lowerIdent lowers an identifier in an expression. Unless raw, a variable
+// stored in a pointer box is read through its value.
 func (o *LoweringOwner) lowerIdent(ctx lowerFileContext, ident *ast.Ident, raw bool) string {
+	// Keep the predeclared literals.
 	value := lowerIdent(ident)
 	if ident.Name == "nil" || ident.Name == "true" || ident.Name == "false" {
 		return value
 	}
+
+	// Resolve aliases, constants, and imported objects.
 	obj := objectForIdent(ctx, ident)
 	if alias := ctx.identAliases[obj]; alias != "" {
 		if !raw && obj != nil && ctx.identAliasRefs[obj] && ctx.model.needsVarRef[obj] {
@@ -8348,31 +8363,26 @@ func (o *LoweringOwner) lowerIdent(ctx lowerFileContext, ident *ast.Ident, raw b
 	if imported, ok := o.lowerImportedIdent(ctx, obj, value, raw); ok {
 		return imported
 	}
+
+	// Read a variable declared in another file of this package through
+	// that file's module alias.
 	if alias := ctx.localAliases[obj]; alias != "" {
+		qualified := alias + "." + value
 		if ctx.lazyPackageVars[obj] {
-			lazyValue := alias + "." + packageVarGetterName(value) + "()"
-			if (ctx.asyncFunction || ctx.topLevel) && o.packageVarHasAsyncLazyInit(ctx, obj) {
-				lazyValue = "(await " + alias + "." + packageVarInitName(value) + "(), " + lazyValue + ")"
-			}
-			if raw {
-				return lazyValue
-			}
-			return o.lowerPackageVarReadValue(ctx, obj, lazyValue)
+			qualified = o.lazyPackageVarRead(ctx, alias+".", obj)
 		}
 		if raw {
-			return alias + "." + value
+			return qualified
 		}
-		return o.lowerPackageVarReadValue(ctx, obj, alias+"."+value)
+		return o.lowerPackageVarReadValue(ctx, obj, qualified)
 	}
+
+	// Read a variable of this file, unboxed unless raw.
 	if raw {
 		return value
 	}
 	if ctx.lazyPackageVars[obj] {
-		lazyValue := packageVarGetterName(value) + "()"
-		if (ctx.asyncFunction || ctx.topLevel) && o.packageVarHasAsyncLazyInit(ctx, obj) {
-			lazyValue = "(await " + packageVarInitName(value) + "(), " + lazyValue + ")"
-		}
-		return o.lowerPackageVarReadValue(ctx, obj, lazyValue)
+		return o.lowerPackageVarReadValue(ctx, obj, o.lazyPackageVarRead(ctx, "", obj))
 	}
 	if obj != nil && ctx.model.needsVarRef[obj] {
 		return value + ".value"
@@ -8380,7 +8390,10 @@ func (o *LoweringOwner) lowerIdent(ctx lowerFileContext, ident *ast.Ident, raw b
 	return value
 }
 
+// lowerImportedIdent lowers obj when it belongs to an imported package,
+// qualifying value by the import alias.
 func (o *LoweringOwner) lowerImportedIdent(ctx lowerFileContext, obj types.Object, value string, raw bool) (string, bool) {
+	// Find the import alias of the object's package.
 	if obj == nil || obj.Pkg() == nil || ctx.semPkg == nil || obj.Pkg().Path() == ctx.semPkg.pkgPath {
 		return "", false
 	}
@@ -8388,13 +8401,11 @@ func (o *LoweringOwner) lowerImportedIdent(ctx lowerFileContext, obj types.Objec
 	if alias == "" {
 		return "", false
 	}
+
+	// Qualify the object, reading a lazy variable through its getter.
 	qualified := alias + "." + value
 	if packageVarIsLazy(ctx, obj) {
-		qualified = alias + "." + packageVarGetterName(value) + "()"
-		if (ctx.asyncFunction || ctx.topLevel) &&
-			o.packageVarNameHasAsyncLazyInit(ctx, obj.Pkg().Path(), obj.Name()) {
-			qualified = "(await " + alias + "." + packageVarInitName(value) + "(), " + qualified + ")"
-		}
+		qualified = o.lazyPackageVarRead(ctx, alias+".", obj)
 	}
 	if raw {
 		return qualified, true
@@ -9934,11 +9945,7 @@ func (o *LoweringOwner) lowerSelectorExpr(ctx lowerFileContext, expr *ast.Select
 				// Initialize lazy package variables before exposing their values.
 				obj, _ := ctx.semPkg.source.TypesInfo.Uses[expr.Sel].(*types.Var)
 				if packageVarIsLazy(ctx, ctx.semPkg.source.TypesInfo.Uses[expr.Sel]) {
-					value = alias + "." + packageVarGetterName(expr.Sel.Name) + "()"
-					if (ctx.asyncFunction || ctx.topLevel) &&
-						o.packageVarNameHasAsyncLazyInit(ctx, pkgName.Imported().Path(), expr.Sel.Name) {
-						value = "(await " + alias + "." + packageVarInitName(expr.Sel.Name) + "(), " + value + ")"
-					}
+					value = o.lazyPackageVarRead(ctx, alias+".", obj)
 				}
 				if obj != nil && packageVarReadNeedsPointerValue(obj.Type()) {
 					value = o.runtimeOwner.QualifiedHelper(RuntimeHelperPointerValue) +
@@ -10534,6 +10541,12 @@ func (o *LoweringOwner) lowerPackageVarAddressExpr(ctx lowerFileContext, expr as
 		if obj == nil || !objectNeedsVarRef(ctx, obj) {
 			return "", false
 		}
+		// A lazily initialized variable in the same file is initialized by
+		// its getter, which returns its VarRef (other files use an alias,
+		// which lowerIdent already reads through the getter).
+		if ctx.lazyPackageVars[obj] && ctx.localAliases[obj] == "" && ctx.identAliases[obj] == "" {
+			return o.lazyPackageVarRead(ctx, "", obj), true
+		}
 		return o.lowerIdent(ctx, typed, true), true
 	case *ast.SelectorExpr:
 		if selection := ctx.semPkg.source.TypesInfo.Selections[typed]; selection != nil {
@@ -10554,6 +10567,11 @@ func (o *LoweringOwner) lowerPackageVarAddressExpr(ctx lowerFileContext, expr as
 		obj, _ := ctx.semPkg.source.TypesInfo.Uses[typed.Sel].(*types.Var)
 		if obj == nil || !objectNeedsVarRef(ctx, obj) {
 			return "", false
+		}
+		// A lazily initialized variable is initialized by its getter, which
+		// returns its VarRef.
+		if packageVarIsLazy(ctx, obj) {
+			return o.lazyPackageVarRead(ctx, alias+".", obj), true
 		}
 		return alias + "." + typed.Sel.Name, true
 	default:

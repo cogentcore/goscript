@@ -20,6 +20,7 @@
     "dep/dep.gs.ts",
     "dep/index.ts",
     "index.ts",
-    "main.gs.ts"
+    "main.gs.ts",
+    "vars.gs.ts"
   ]
 }
