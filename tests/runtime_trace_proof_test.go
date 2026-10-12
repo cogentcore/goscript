@@ -190,7 +190,7 @@ func compileRunTraceFixture(t *testing.T, fixtureName string) []byte {
 	if phase := workspace.WriteJSON(tsworkspace.PhaseWorkspace, "tsconfig.json", runnerTsConfig); phase.Failed() {
 		t.Fatalf("failed to write runner tsconfig.json: %v", phase.Error)
 	}
-	if phase := workspace.EnsurePackageJSON(); phase.Failed() {
+	if phase := workspace.EnsurePackageJSON(nil); phase.Failed() {
 		t.Fatalf("failed to write package.json: %v", phase.Error)
 	}
 

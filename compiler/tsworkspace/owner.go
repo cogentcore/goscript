@@ -52,11 +52,6 @@ func (o *Owner) WorkDir() string {
 	return o.workDir
 }
 
-// EnsurePackageJSON writes the module package metadata used by Bun.
-func (o *Owner) EnsurePackageJSON() Result {
-	return o.WriteFile(PhaseWorkspace, "package.json", "{\"type\":\"module\"}\n")
-}
-
 // EnsureNodeAmbientTypes writes host runtime declarations needed by emitted tests.
 func (o *Owner) EnsureNodeAmbientTypes() Result {
 	if NodeTypesPresent(o.workDir, o.toolDir) {

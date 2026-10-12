@@ -12,7 +12,7 @@ func TestOwnerWritesWorkspaceFiles(t *testing.T) {
 	dir := t.TempDir()
 	owner := NewOwner(dir, dir)
 
-	if result := owner.EnsurePackageJSON(); result.Failed() {
+	if result := owner.EnsurePackageJSON(nil); result.Failed() {
 		t.Fatalf("write package json: %s", result.Error)
 	}
 	if result := owner.WriteJSON(PhaseWorkspace, "tsconfig.json", map[string]any{
