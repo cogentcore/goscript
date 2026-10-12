@@ -52,6 +52,8 @@ func main() {
 		_ = syscall.F_DUPFD_CLOEXEC
 		_ = syscall.ForkLock
 		_ = iovecs
+		attr := &syscall.SysProcAttr{}
+		_ = attr
 	}
 	var sa4 syscall.SockaddrInet4
 	addr4 := netip.AddrFrom4(sa4.Addr)

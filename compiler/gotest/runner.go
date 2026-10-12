@@ -1022,7 +1022,7 @@ func renderPackageRunner(result PackageResult, req *normalizedRequest) string {
 
 func renderRunner(result PackageResult, req *normalizedRequest) string {
 	var b strings.Builder
-	b.WriteString("import { runTests } from \"@goscript/testing/index.js\"\n")
+	b.WriteString("import { runTests } from \"@goscript/testing/runner.js\"\n")
 	imports := runnerImports(result.Tests)
 	for idx, packagePath := range imports {
 		b.WriteString("import * as pkg")
@@ -1072,7 +1072,7 @@ func renderRunner(result PackageResult, req *normalizedRequest) string {
 func renderBrowserRunner(result PackageResult, req *normalizedRequest) string {
 	var b strings.Builder
 	b.WriteString("import { test } from \"vitest\"\n")
-	b.WriteString("import { runTests } from \"@goscript/testing/index.js\"\n")
+	b.WriteString("import { runTests } from \"@goscript/testing/runner.js\"\n")
 	imports := runnerImports(result.Tests)
 	for idx, packagePath := range imports {
 		b.WriteString("import * as pkg")
@@ -1259,7 +1259,7 @@ func renderCombinedRunner(result *Result, indexes []int, req *normalizedRequest)
 	slices.Sort(imports)
 
 	var b strings.Builder
-	b.WriteString("import { runTests } from \"@goscript/testing/index.js\"\n")
+	b.WriteString("import { runTests } from \"@goscript/testing/runner.js\"\n")
 	for _, packagePath := range imports {
 		b.WriteString("import * as ")
 		b.WriteString(aliases[packagePath])

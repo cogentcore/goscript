@@ -21,6 +21,15 @@ export async function main(): globalThis.Promise<void> {
 	scanner.ErrorList_Add(errorList, $.markAsStructValue($.cloneStructValue(pos)), "test error")
 
 	await fmt.Printf("ErrorList length: %d\n", $.basicInterfaceValue($.len((errorList.value as scanner.ErrorList)), "int"))
+
+	// End reports the position after the last scanned token.
+	let fset: token.FileSet | $.VarRef<token.FileSet> | null = token.NewFileSet()
+	let file: token.File | $.VarRef<token.File> | null = token.FileSet.prototype.AddFile.call($.pointerValue<token.FileSet>(fset), "empty.go", -1, 0)
+	let s: $.VarRef<scanner.Scanner> = $.varRef($.markAsStructValue(new scanner.Scanner()))
+	s.value.Init(file, null, (null as scanner.ErrorHandler | null), 0)
+	await fmt.Println("End before Scan:", s.value.End() == 0)
+	let [, tok, ] = s.value.Scan()
+	await fmt.Println("Scan:", token.Token_String(tok), s.value.End() == token.File.prototype.Pos.call($.pointerValue<token.File>(file), 0))
 }
 
 if ($.isMainScript(import.meta)) {

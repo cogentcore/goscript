@@ -78,6 +78,7 @@ export class Scanner {
   private src: $.Slice<number> = null
   private err: ErrorHandler | null = null
   private done = false
+  private endPos: token.Pos = token.NoPos
 
   public clone(): Scanner {
     const scanner = new Scanner()
@@ -86,6 +87,7 @@ export class Scanner {
     scanner.src = this.src
     scanner.err = this.err
     scanner.done = this.done
+    scanner.endPos = this.endPos
     return scanner
   }
 
@@ -99,14 +101,22 @@ export class Scanner {
     this.src = src
     this.err = err
     this.done = false
+    this.endPos = token.NoPos
   }
 
   public Scan(): [token.Pos, token.Token, string] {
+    this.endPos = this.file?.Pos($.len(this.src)) ?? token.NoPos
     if (this.done) {
-      return [this.file?.Pos($.len(this.src)) ?? token.NoPos, token.EOF, '']
+      return [this.endPos, token.EOF, '']
     }
     this.done = true
     return [this.file?.Pos(0) ?? token.NoPos, token.EOF, '']
+  }
+
+  // End returns the position immediately after the last scanned token,
+  // or token.NoPos if Scan has not been called yet.
+  public End(): token.Pos {
+    return this.endPos
   }
 }
 

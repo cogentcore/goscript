@@ -351,6 +351,20 @@ export function Short(): boolean {
   return shortMode
 }
 
+// testBinary is whether the program is a test runner (see runner.ts).
+let testBinary = false
+
+// Testing reports whether the current code is being run in a test.
+export function Testing(): boolean {
+  return testBinary
+}
+
+// markTestBinary records that the program is a test runner, before the
+// tested packages are initialized.
+export function markTestBinary(): void {
+  testBinary = true
+}
+
 export async function runTests(
   packagePath: string,
   tests: TestCase[],
