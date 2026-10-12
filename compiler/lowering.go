@@ -4624,6 +4624,7 @@ func gotoStateClusterAt(stmts []ast.Stmt, idx int) (gotoStateCluster, bool) {
 	firstLabelIdx := len(stmts)
 	endIdx := -1
 	hasBackward := false
+	targets := make(map[string]bool)
 	for stmtIdx, stmt := range stmts {
 		ast.Inspect(stmt, func(node ast.Node) bool {
 			branch, ok := node.(*ast.BranchStmt)
@@ -4634,6 +4635,7 @@ func gotoStateClusterAt(stmts []ast.Stmt, idx int) (gotoStateCluster, bool) {
 			if !ok {
 				return true
 			}
+			targets[safeIdentifier(branch.Label.Name)] = true
 			if stmtIdx < startIdx {
 				startIdx = stmtIdx
 			}
@@ -4652,8 +4654,27 @@ func gotoStateClusterAt(stmts []ast.Stmt, idx int) (gotoStateCluster, bool) {
 			return true
 		})
 	}
+	// When the first target label precedes the first goto, as in a state
+	// machine whose first state jumps to the others, the cluster starts at
+	// that label. A single target label is a plain backward loop instead.
+	if firstLabelIdx < startIdx && len(targets) > 1 {
+		startIdx = firstLabelIdx
+	}
 	if !hasBackward || startIdx != idx || endIdx < firstLabelIdx || firstLabelIdx == len(stmts) {
 		return gotoStateCluster{}, false
+	}
+
+	// The statements after the last goto or label are only reached by falling
+	// through the last label's segment. When that segment declares variables,
+	// the statements join it, so that the declarations stay in scope for them.
+	lastLabelIdx := firstLabelIdx
+	for _, labelIdx := range labelIndexes {
+		if labelIdx <= endIdx && labelIdx > lastLabelIdx {
+			lastLabelIdx = labelIdx
+		}
+	}
+	if stmtsDeclare(stmts[lastLabelIdx : endIdx+1]) {
+		endIdx = len(stmts) - 1
 	}
 
 	var labels []gotoStateLabel
@@ -4673,6 +4694,25 @@ func gotoStateClusterAt(stmts []ast.Stmt, idx int) (gotoStateCluster, bool) {
 		endIdx:        endIdx,
 		labels:        labels,
 	}, true
+}
+
+// stmtsDeclare reports whether any of the given statements, or the
+// statements they label, declare variables.
+func stmtsDeclare(stmts []ast.Stmt) bool {
+	for _, stmt := range stmts {
+		for labeled, ok := stmt.(*ast.LabeledStmt); ok; labeled, ok = stmt.(*ast.LabeledStmt) {
+			stmt = labeled.Stmt
+		}
+		switch typed := stmt.(type) {
+		case *ast.DeclStmt:
+			return true
+		case *ast.AssignStmt:
+			if typed.Tok == token.DEFINE {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 func (o *LoweringOwner) lowerGotoStateCluster(
