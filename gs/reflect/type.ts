@@ -176,6 +176,87 @@ export const UnsafePointer: Kind = 26
 const canonicalTypes = new globalThis.Map<string, Type>()
 const constructingRegisteredTypes = new globalThis.Map<string, Type>()
 
+// isIntegerKind reports whether k is a signed or unsigned integer kind.
+function isIntegerKind(k: Kind): boolean {
+  return k >= Int && k <= Uintptr
+}
+
+// isFloatKind reports whether k is a floating-point kind.
+function isFloatKind(k: Kind): boolean {
+  return k === Float32 || k === Float64
+}
+
+// convertInteger converts an integer value (truncated toward zero first if
+// it comes from a float) to the representation and width of kind k.
+function convertInteger(x: number | bigint, k: Kind): number | bigint {
+  const n = typeof x === 'bigint' ? x : BigInt(Math.trunc(x))
+  switch (k) {
+    case Int8:
+      return Number(BigInt.asIntN(8, n))
+    case Int16:
+      return Number(BigInt.asIntN(16, n))
+    case Int32:
+      return Number(BigInt.asIntN(32, n))
+    case Int:
+      return Number(BigInt.asIntN(64, n))
+    case Int64:
+      return BigInt.asIntN(64, n)
+    case Uint8:
+      return Number(BigInt.asUintN(8, n))
+    case Uint16:
+      return Number(BigInt.asUintN(16, n))
+    case Uint32:
+      return Number(BigInt.asUintN(32, n))
+    case Uint:
+      return Number(BigInt.asUintN(64, n))
+    default:
+      return BigInt.asUintN(64, n)
+  }
+}
+
+// convertValue converts the raw value x of type ft to the representation
+// of type t, for Value.Convert.
+function convertValue(x: ReflectValue, ft: Type, t: Type): ReflectValue {
+  const from = ft.Kind()
+  const to = t.Kind()
+  const numeric = typeof x === 'number' || typeof x === 'bigint'
+  if (numeric && (isIntegerKind(from) || isFloatKind(from))) {
+    if (isIntegerKind(to)) {
+      return convertInteger(x, to)
+    }
+    if (to === Float32) {
+      return Math.fround(Number(x))
+    }
+    if (to === Float64) {
+      return Number(x)
+    }
+    if (to === String && isIntegerKind(from)) {
+      const r = Number(x)
+      return Number.isInteger(r) && r >= 0 && r <= 0x10ffff ?
+          $.runeToString(r)
+        : '\uFFFD'
+    }
+  }
+  if (from === String && typeof x === 'string' && to === Slice) {
+    if (t.Elem().Kind() === Uint8) {
+      return $.stringToBytes(x)
+    }
+    if (t.Elem().Kind() === Int32) {
+      return $.arrayToSlice($.stringToRunes(x))
+    }
+  }
+  if (from === Slice && to === String) {
+    if (x === null) {
+      return ''
+    }
+    if (ft.Elem().Kind() === Int32) {
+      return $.runesToString(x as $.Slice<number>)
+    }
+    return $.bytesToString(x as $.Slice<number>)
+  }
+  return x
+}
+
 // pointerAddress returns the synthetic address of an object, shared with
 // the runtime's pointer addresses so that addresses never collide.
 function pointerAddress(value: object): number {
@@ -691,6 +772,9 @@ export class Value {
   }
 
   private storeValue(value: ReflectValue): void {
+    if (this.Kind() === Float32 && typeof value === 'number') {
+      value = Math.fround(value)
+    }
     if (this.Kind() === Struct) {
       const target = this.currentValue()
       $.assignStruct(target, value, typeInfoFromReflectType(this._type))
@@ -881,7 +965,10 @@ export class Value {
 
   public Index(i: number): Value {
     if (this.Kind() === Slice || this.Kind() === Array) {
-      const ref = $.indexRef(this.currentValue() as any, i) as $.VarRef<ReflectValue>
+      const ref = $.indexRef(
+        this.currentValue() as any,
+        i,
+      ) as $.VarRef<ReflectValue>
       return new Value(ref.value, this._type.Elem(), ref).withAddressable(
         this.Kind() === Slice || this._addressable,
       )
@@ -1015,8 +1102,7 @@ export class Value {
       '__goValue' in value &&
       $.isVarRef((value as { __goValue: unknown }).__goValue)
     ) {
-      const varRef = (value as { __goValue: $.VarRef<ReflectValue> })
-        .__goValue
+      const varRef = (value as { __goValue: $.VarRef<ReflectValue> }).__goValue
       return new Value(varRef.value, this._type.Elem(), varRef).withAddressable(
         true,
       )
@@ -1196,9 +1282,14 @@ export class Value {
   }
 
   // Convert method needed by iter.ts
+  // Convert returns the value v converted to type t, as a Go conversion
+  // would: numeric values change their representation and width, and
+  // strings convert to and from byte and rune slices.
   public Convert(t: Type): Value {
-    // Simple conversion - in a real implementation this would do type conversion
-    return new Value(this._value, t)
+    if (!this.IsValid()) {
+      throw new ValueError({ Kind: Invalid, Method: 'Convert' })
+    }
+    return new Value(convertValue(this.currentValue(), this.Type(), t), t)
   }
 
   // CanConvert reports whether the value is convertible to type t. The
@@ -1227,8 +1318,7 @@ export class Value {
       this._addressable ||
       (this.Kind() !== Ptr &&
         (this._parentVarRef !== undefined ||
-          (this._parentStruct !== undefined &&
-            this._fieldName !== undefined) ||
+          (this._parentStruct !== undefined && this._fieldName !== undefined) ||
           this._value !== null))
     )
   }
@@ -1622,6 +1712,10 @@ export class Value {
       throw new Error(
         'reflect: call of reflect.Value.SetFloat on ' + k + ' Value',
       )
+    }
+    // A float32 holds a value rounded to float32 precision, as in Go.
+    if (k === Float32) {
+      x = Math.fround(x)
     }
     this._value = x
     if (this._parentVarRef) {
