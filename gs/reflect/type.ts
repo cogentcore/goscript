@@ -1015,7 +1015,12 @@ export class Value {
       return new Value(varRef.value, this._type.Elem(), varRef)
     }
     if (this._type.Kind() === Interface) {
-      return ValueOf(this._value)
+      // The element of a nil interface is the zero Value, as in Go.
+      const value = this.currentValue()
+      if (value === null || value === undefined) {
+        return new Value()
+      }
+      return ValueOf(value)
     }
     if (this._type.Kind() === Ptr) {
       // A pointer to a struct is the struct object itself.

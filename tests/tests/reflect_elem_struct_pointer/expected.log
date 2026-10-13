@@ -9,3 +9,8 @@ a a
 7 1099511627776
 2.5 true
 2
+interface true false
+interface interface
+struct 3
+struct 2
+false
