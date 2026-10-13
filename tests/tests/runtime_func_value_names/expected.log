@@ -1,0 +1,5 @@
+func: main.helperFunc
+imported: strings.ToUpper
+pointer method: main.(*T).PtrMethod-fm
+value method: main.T.ValMethod-fm
+generic method: main.(*G[...]).Get-fm

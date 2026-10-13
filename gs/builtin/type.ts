@@ -2292,22 +2292,62 @@ function typedFunction(
   ) {
     return fn
   }
-  return Object.assign(fn.bind(null), {
+  const wrapper = Object.assign(fn.bind(null), {
     __goTypeName: name,
     __typeInfo: typeInfo,
   })
+  const goName: string | undefined = Reflect.get(fn, '__goFuncName')
+  if (goName !== undefined) {
+    Reflect.set(wrapper, '__goFuncName', goName)
+  }
+  return wrapper
 }
 
+// functionValue returns fn carrying its Go function type, and its Go
+// function name when given, as runtime.FuncForPC reports it.
 export function functionValue<T extends (...args: any[]) => any>(
   fn: T,
   typeInfo: FunctionTypeInfo,
+  goName?: string,
 ): T {
-  return Object.assign(
+  Object.assign(
     fn,
     typeInfo.name ?
       { __typeInfo: typeInfo, __goTypeName: typeInfo.name }
     : { __typeInfo: typeInfo },
   )
+  if (goName !== undefined) {
+    Reflect.set(fn, '__goFuncName', goName)
+  }
+  return fn
+}
+
+// goFunc records the Go name of a declared function used as a value, such
+// as cogentcore.org/core/core.SettingsWindow, so that runtime.FuncForPC
+// reports it. A declared function always has the same name, so the name is
+// recorded on the function itself, and fn is returned.
+export function goFunc<T>(fn: T, goName: string): T {
+  if (
+    typeof fn === 'function' &&
+    Reflect.get(fn, '__goFuncName') === undefined
+  ) {
+    Reflect.set(fn, '__goFuncName', goName)
+  }
+  return fn
+}
+
+// goFunctionName returns the Go name of the function value fn: the name
+// recorded by goFunc or functionValue, or else its JavaScript name without
+// the prefix that binding adds.
+export function goFunctionName(fn: unknown): string {
+  if (typeof fn !== 'function') {
+    return ''
+  }
+  const goName: string | undefined = Reflect.get(fn, '__goFuncName')
+  if (goName !== undefined) {
+    return goName
+  }
+  return fn.name.replace(/^(bound )+/, '')
 }
 
 // syncResult returns the result of a function value called where the caller

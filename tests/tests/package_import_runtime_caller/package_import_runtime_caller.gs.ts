@@ -48,7 +48,7 @@ export async function main(): globalThis.Promise<void> {
 	let info = logSomething()
 	await $.println("info:", !$.stringEqual(info, ""))
 
-	await $.println("funcname:", strings.Contains(funcName($.interfaceValue(helperFunc, "func()", ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo))), "helperFunc"))
+	await $.println("funcname:", strings.Contains(funcName($.interfaceValue($.goFunc(helperFunc, "main.helperFunc"), "func()", ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo))), "helperFunc"))
 
 	let pcs: $.Slice<number> = $.makeSlice<number>(8, undefined, "number")
 	let n = runtime.Callers(1, pcs)
