@@ -924,9 +924,18 @@ export function Scanln(..._a: any[]): [number, $.GoError | null] {
   return [0, $.newError('Scanln not implemented')]
 }
 
-export function Sscan(_str: string, ..._a: any[]): [number, $.GoError | null] {
-  // TODO: Implement scanning from string
-  return [0, $.newError('Sscan not implemented')]
+export function Sscan(str: string, ...a: any[]): [number, $.GoError | null] {
+  const sc = new stringScanner(str)
+  let n = 0
+  for (const target of a) {
+    sc.skipSpace(true)
+    const err = sc.scanOne(target, 'v', 0, true)
+    if (err !== null) {
+      return [n, err]
+    }
+    n++
+  }
+  return [n, null]
 }
 
 export function Sscanf(
@@ -934,62 +943,283 @@ export function Sscanf(
   format: string,
   ...a: any[]
 ): [number, $.GoError | null] {
-  const parts = buildScanPattern(format)
-  if (parts == null) {
-    return [0, $.newError(`unsupported Sscanf format: ${format}`)]
-  }
-  const match = parts.pattern.exec(str)
-  if (match == null) {
-    return [0, $.newError('input does not match format')]
-  }
-
-  let assigned = 0
-  for (let i = 0; i < parts.verbs.length && i < a.length; i++) {
-    const raw = match[i + 1]
-    const value = parts.verbs[i] === 'd' ? Number.parseInt(raw, 10) : raw
-    if (!assignScanValue(a[i], value)) {
-      return [assigned, $.newError('scan destination is not assignable')]
-    }
-    assigned++
-  }
-  return [assigned, null]
-}
-
-function buildScanPattern(
-  format: string,
-): { pattern: RegExp; verbs: string[] } | null {
-  // Anchor at the start only: Go's Sscanf consumes a prefix and allows trailing
-  // input to remain, so no end anchor. A run of whitespace in the format matches
-  // spaces and tabs but not a newline, which Go treats as a record boundary.
-  let source = '^'
-  const verbs: string[] = []
-  for (let i = 0; i < format.length; i++) {
+  const sc = new stringScanner(str)
+  let n = 0
+  let arg = 0
+  for (let i = 0; i < format.length; ) {
     const ch = format[i]
     if (ch !== '%') {
-      source += /\s/.test(ch) ? '[ \\t]+' : escapeRegExp(ch)
+      if (isScanSpace(ch)) {
+        // A run of spaces in the format matches zero or more spaces in the
+        // input, and a newline in the format must match one in the input.
+        let newlines = 0
+        while (i < format.length && isScanSpace(format[i])) {
+          if (format[i] === '\n') newlines++
+          i++
+        }
+        sc.skipSpace(false)
+        for (; newlines > 0; newlines--) {
+          if (sc.peek() !== '\n') {
+            return [n, $.newError('newline in format does not match input')]
+          }
+          sc.pos++
+          sc.skipSpace(false)
+        }
+        continue
+      }
+      if (sc.peek() !== ch) {
+        return [n, $.newError('input does not match format')]
+      }
+      sc.pos++
+      i++
       continue
     }
-    const verb = format[++i]
+    i++
+    let width = 0
+    while (i < format.length && format[i] >= '0' && format[i] <= '9') {
+      width = width * 10 + (format.charCodeAt(i) - 48)
+      i++
+    }
+    const verb = format[i++]
+    if (verb === undefined) {
+      return [n, $.newError('too few operands for format')]
+    }
     if (verb === '%') {
-      source += '%'
+      sc.skipSpace(false)
+      if (sc.peek() !== '%') {
+        return [n, $.newError('missing literal %')]
+      }
+      sc.pos++
       continue
     }
-    if (verb === 'd') {
-      source += '\\s*([+-]?\\d+)' // verbs skip leading whitespace, incl. newlines
-      verbs.push(verb)
-      continue
+    if (arg >= a.length) {
+      return [n, $.newError(`too few operands for format '%${verb}'`)]
     }
-    if (verb === 's') {
-      source += '\\s*(\\S+)'
-      verbs.push(verb)
-      continue
+    if (verb !== 'c') {
+      sc.skipSpace(false)
     }
-    return null
+    const err = sc.scanOne(a[arg++], verb, width, false)
+    if (err !== null) {
+      return [n, err]
+    }
+    n++
   }
-  return { pattern: new RegExp(source), verbs }
+  if (arg < a.length) {
+    return [n, $.newError('too many operands')]
+  }
+  return [n, null]
 }
 
-function assignScanValue(target: any, value: string | number): boolean {
+function isScanSpace(ch: string | undefined): boolean {
+  return ch === ' ' || ch === '\t' || ch === '\r' || ch === '\n'
+}
+
+// scanIntKinds maps the integer kinds to their bit sizes and signedness.
+const scanIntKinds: Record<string, [number, boolean]> = {
+  int: [64, true],
+  int8: [8, true],
+  int16: [16, true],
+  int32: [32, true],
+  rune: [32, true],
+  int64: [64, true],
+  uint: [64, false],
+  uint8: [8, false],
+  byte: [8, false],
+  uint16: [16, false],
+  uint32: [32, false],
+  uint64: [64, false],
+  uintptr: [64, false],
+}
+
+// stringScanner scans values from a string, as for Sscan and Sscanf.
+class stringScanner {
+  public pos = 0
+
+  constructor(private readonly str: string) {}
+
+  peek(): string | undefined {
+    return this.str[this.pos]
+  }
+
+  // skipSpace skips spaces, and newlines too when newlines is true.
+  skipSpace(newlines: boolean): void {
+    while (this.pos < this.str.length) {
+      const ch = this.str[this.pos]
+      if (ch === '\n' && !newlines) {
+        return
+      }
+      if (!isScanSpace(ch)) {
+        return
+      }
+      this.pos++
+    }
+  }
+
+  // token returns the longest prefix of at most width characters (or of any
+  // length when width is 0) whose characters satisfy accept.
+  token(width: number, accept: (ch: string, index: number) => boolean): string {
+    const start = this.pos
+    while (
+      this.pos < this.str.length &&
+      (width === 0 || this.pos - start < width) &&
+      accept(this.str[this.pos], this.pos - start)
+    ) {
+      this.pos++
+    }
+    return this.str.slice(start, this.pos)
+  }
+
+  // scanOne scans a value for the verb into target, which is a pointer.
+  scanOne(
+    target: any,
+    verb: string,
+    width: number,
+    newlineIsSpace: boolean,
+  ): $.GoError | null {
+    const dest = scanDestination(target)
+    if (dest === null) {
+      return $.newError("can't scan type: not a pointer")
+    }
+    if (this.pos >= this.str.length) {
+      return $.newError('unexpected EOF')
+    }
+    if (!newlineIsSpace && this.peek() === '\n' && verb !== 'c') {
+      return $.newError('unexpected newline')
+    }
+    const kind = dest.kind
+    if (kind !== undefined && kind in scanIntKinds) {
+      return this.scanInt(dest.ref, verb, width, scanIntKinds[kind])
+    }
+    if (kind === 'float32' || kind === 'float64') {
+      const tok = this.token(
+        width,
+        (ch, i) =>
+          /[0-9.eEpP_xX]/.test(ch) ||
+          ((ch === '+' || ch === '-') &&
+            (i === 0 || /[eEpP]/.test(this.str[this.pos - 1]))),
+      )
+      const value = Number(tok.replace(/_/g, ''))
+      if (tok === '' || Number.isNaN(value)) {
+        return $.newError(
+          'strconv.ParseFloat: parsing ' +
+            JSON.stringify(tok) +
+            ': invalid syntax',
+        )
+      }
+      dest.ref.value = kind === 'float32' ? Math.fround(value) : value
+      return null
+    }
+    if (kind === 'bool') {
+      const tok = this.token(width, (ch) => /[a-zA-Z0-9]/.test(ch))
+      const value =
+        /^(1|t|T|true|TRUE|True)$/.test(tok) ? true
+        : /^(0|f|F|false|FALSE|False)$/.test(tok) ? false
+        : undefined
+      if (value === undefined) {
+        return $.newError('syntax error scanning boolean')
+      }
+      dest.ref.value = value
+      return null
+    }
+    if (kind === 'string') {
+      const tok =
+        verb === 'c' ?
+          this.token(1, () => true)
+        : this.token(width, (ch) => !isScanSpace(ch))
+      dest.ref.value = tok
+      return null
+    }
+    return $.newError(`can't scan type: ${dest.typeName}`)
+  }
+
+  scanInt(
+    ref: $.VarRef<any>,
+    verb: string,
+    width: number,
+    [bits, signed]: [number, boolean],
+  ): $.GoError | null {
+    if (verb === 'c') {
+      const ch = this.token(1, () => true)
+      ref.value =
+        bits === 64 && !isNumberBacked(ref) ?
+          BigInt(ch.codePointAt(0)!)
+        : ch.codePointAt(0)!
+      return null
+    }
+    let base =
+      verb === 'x' || verb === 'X' ? 16
+      : verb === 'o' ? 8
+      : verb === 'b' ? 2
+      : 10
+    const start = this.pos
+    let sign = ''
+    if (this.peek() === '+' || this.peek() === '-') {
+      sign = this.str[this.pos++]
+    }
+    if (verb === 'v' && this.peek() === '0') {
+      const prefix = this.str[this.pos + 1]?.toLowerCase()
+      if (prefix === 'x' || prefix === 'b' || prefix === 'o') {
+        base =
+          prefix === 'x' ? 16
+          : prefix === 'b' ? 2
+          : 8
+        this.pos += 2
+      }
+    }
+    const remaining = width === 0 ? 0 : Math.max(width - (this.pos - start), 0)
+    if (width !== 0 && remaining === 0) {
+      return $.newError('expected integer')
+    }
+    const digits = this.token(remaining, (ch) => {
+      const d = parseInt(ch, 36)
+      return ch !== '_' && !Number.isNaN(d) && d < base
+    })
+    if (digits === '') {
+      this.pos = start
+      return $.newError('expected integer')
+    }
+    let value: bigint
+    try {
+      value = BigInt(
+        (base === 16 ? '0x'
+        : base === 8 ? '0o'
+        : base === 2 ? '0b'
+        : '') + digits,
+      )
+    } catch {
+      return $.newError('expected integer')
+    }
+    if (sign === '-') {
+      if (!signed) {
+        return $.newError('expected integer')
+      }
+      value = -value
+    }
+    const limit = 1n << BigInt(signed ? bits - 1 : bits)
+    if (
+      (signed && (value >= limit || value < -limit)) ||
+      (!signed && value >= limit)
+    ) {
+      return $.newError(
+        'integer overflow on token ' + this.str.slice(start, this.pos),
+      )
+    }
+    ref.value = bits === 64 && !isNumberBacked(ref) ? value : Number(value)
+    return null
+  }
+}
+
+// isNumberBacked reports whether the 64-bit integer variable ref holds a
+// number, as int and uint do, rather than a bigint.
+function isNumberBacked(ref: $.VarRef<any>): boolean {
+  return typeof ref.value === 'number'
+}
+
+// scanDestination returns the variable that a scan argument points to and
+// the name of its basic type, when known.
+function scanDestination(
+  target: any,
+): { ref: $.VarRef<any>; kind: string | undefined; typeName: string } | null {
   const ref =
     $.isVarRef(target) ? target
     : (
@@ -1000,22 +1230,57 @@ function assignScanValue(target: any, value: string | number): boolean {
       target.__goValue
     : null
   if (ref == null) {
-    return false
+    return null
   }
-  ref.value = value
-  return true
+  const typeName: string = target.__goType ?? ''
+  const info = target.__goTypeInfo
+  const elem = info && typeof info === 'object' ? info.elemType : undefined
+  let kind: string | undefined =
+    elem && typeof elem === 'object' && elem.kind === $.TypeKind.Basic ?
+      elem.name
+    : undefined
+  if (kind === undefined && typeName.startsWith('*')) {
+    const name = typeName.slice(1)
+    if (name in scanIntKinds || /^(float32|float64|bool|string)$/.test(name)) {
+      kind = name
+    }
+  }
+  if (kind === undefined) {
+    // Infer the kind from the current value of the variable.
+    switch (typeof ref.value) {
+      case 'number':
+        kind = Number.isInteger(ref.value) ? 'int' : 'float64'
+        break
+      case 'bigint':
+        kind = 'int64'
+        break
+      case 'string':
+        kind = 'string'
+        break
+      case 'boolean':
+        kind = 'bool'
+        break
+    }
+  }
+  return { ref, kind, typeName }
 }
 
-function escapeRegExp(ch: string): string {
-  return ch.replace(/[\\^$.*+?()[\]{}|]/g, '\\$&')
-}
-
-export function Sscanln(
-  _str: string,
-  ..._a: any[]
-): [number, $.GoError | null] {
-  // TODO: Implement line scanning from string
-  return [0, $.newError('Sscanln not implemented')]
+export function Sscanln(str: string, ...a: any[]): [number, $.GoError | null] {
+  const sc = new stringScanner(str)
+  let n = 0
+  for (const target of a) {
+    sc.skipSpace(false)
+    const err = sc.scanOne(target, 'v', 0, false)
+    if (err !== null) {
+      return [n, err]
+    }
+    n++
+  }
+  sc.skipSpace(false)
+  if (sc.pos < str.length && sc.peek() !== '\n') {
+    return [n, $.newError('expected newline')]
+  }
+  return [n, null]
 }
 
 export function Fscan(_r: any, ..._a: any[]): [number, $.GoError | null] {
