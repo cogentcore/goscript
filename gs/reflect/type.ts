@@ -10,7 +10,6 @@ import {
 import { Zero } from './value.js'
 import { valueSeq, valueSeq2 } from './iter.js'
 import type * as iter from '@goscript/iter/index.js'
-import { DeepEqual } from './deepequal.js'
 import * as $ from '../builtin/index.js'
 
 // rtype is the common implementation of most values.
@@ -174,21 +173,8 @@ export const String: Kind = 24
 export const Struct: Kind = 25
 export const UnsafePointer: Kind = 26
 
-const pointerAddressStride = 0x100000000
-const pointerAddresses = new WeakMap<object, number>()
-let nextPointerAddress = 1
 const canonicalTypes = new globalThis.Map<string, Type>()
 const constructingRegisteredTypes = new globalThis.Map<string, Type>()
-
-function pointerAddress(value: object): number {
-  let address = pointerAddresses.get(value)
-  if (address === undefined) {
-    address = nextPointerAddress * pointerAddressStride
-    nextPointerAddress++
-    pointerAddresses.set(value, address)
-  }
-  return address
-}
 
 function internType(t: Type): Type {
   const key = typeIdentityKey(t)
@@ -1159,7 +1145,7 @@ export class Value {
       if (address !== undefined) {
         return address
       }
-      return pointerAddress(this._value)
+      return $.pointerAddress(this._value)
     }
     if (kind === Slice) {
       const slice = this._value as $.Slice<unknown> | Uint8Array
@@ -1173,7 +1159,7 @@ export class Value {
       }
     }
     if (typeof this._value === 'object' || typeof this._value === 'function') {
-      return pointerAddress(this._value)
+      return $.pointerAddress(this._value)
     }
     return 0
   }
@@ -1377,9 +1363,55 @@ export class Value {
     )
   }
 
+  // IsZero reports whether v is the zero value for its type, as in Go:
+  // reference kinds are zero only when nil, floats only when +0, and arrays
+  // and structs when all their elements and fields are zero.
   public IsZero(): boolean {
-    const zeroVal = Zero(this.Type()).value
-    return DeepEqual(this._value, zeroVal)
+    const value = this.currentValue()
+    switch (this.Kind()) {
+      case Invalid:
+        throw new ValueError({ Kind: Invalid, Method: 'IsZero' })
+      case Bool:
+        return value === false || value === null
+      case String:
+        return value === '' || value === null
+      case Float32:
+      case Float64:
+        return value === null || Object.is(value, 0)
+      case Complex64:
+      case Complex128: {
+        const c = value as $.Complex | null
+        return c === null || (Object.is(c.real, 0) && Object.is(c.imag, 0))
+      }
+      case Chan:
+      case Func:
+      case Interface:
+      case Map:
+      case Ptr:
+      case Slice:
+      case UnsafePointer:
+        return this.IsNil()
+      case Array: {
+        const n = this.Len()
+        for (let i = 0; i < n; i++) {
+          if (!this.Index(i).IsZero()) {
+            return false
+          }
+        }
+        return true
+      }
+      case Struct: {
+        const n = this.NumField()
+        for (let i = 0; i < n; i++) {
+          if (!this.Field(i).IsZero()) {
+            return false
+          }
+        }
+        return true
+      }
+    }
+    // Integer kinds, as number or bigint.
+    return value === null || value === 0 || value === 0n
   }
 
   public typ(): rtype | null {
@@ -1739,9 +1771,74 @@ export class Value {
     return 0 // Simplified - methods not fully implemented
   }
 
-  // Equal reports whether v is equal to u
+  // Equal reports whether v is equal to u, as the == operator would report
+  // for the values they hold: interfaces compare their dynamic values,
+  // pointers and channels compare identity, and arrays and structs compare
+  // their elements and fields.
   public Equal(u: Value): boolean {
-    return DeepEqual(this._value, (u as { value: ReflectValue }).value)
+    // Compare the dynamic values of interfaces.
+    let v: Value = this
+    if (v.Kind() === Interface) {
+      v = v.Elem()
+    }
+    if (u.Kind() === Interface) {
+      u = u.Elem()
+    }
+
+    // Values of different types are unequal, and two invalid values equal.
+    if (!v.IsValid() || !u.IsValid()) {
+      return v.IsValid() === u.IsValid()
+    }
+    if (
+      v.Kind() !== u.Kind() ||
+      typeIdentityKey(v.Type()) !== typeIdentityKey(u.Type())
+    ) {
+      return false
+    }
+
+    // Compare by kind, as == does.
+    switch (v.Kind()) {
+      case Chan:
+      case Ptr:
+      case UnsafePointer:
+        if (v.IsNil() || u.IsNil()) {
+          return v.IsNil() && u.IsNil()
+        }
+        return v.Pointer() === u.Pointer()
+      case Array: {
+        const n = v.Len()
+        for (let i = 0; i < n; i++) {
+          if (!v.Index(i).Equal(u.Index(i))) {
+            return false
+          }
+        }
+        return true
+      }
+      case Struct: {
+        const n = v.NumField()
+        for (let i = 0; i < n; i++) {
+          if (!v.Field(i).Equal(u.Field(i))) {
+            return false
+          }
+        }
+        return true
+      }
+      case Complex64:
+      case Complex128: {
+        const a = v.currentValue() as $.Complex
+        const b = u.currentValue() as $.Complex
+        return a.real === b.real && a.imag === b.imag
+      }
+      case Func:
+      case Map:
+      case Slice:
+        throw new Error(
+          'reflect.Value.Equal: values of type ' +
+            v.Type().String() +
+            ' are not comparable',
+        )
+    }
+    return v.currentValue() === u.currentValue()
   }
 
   // CanInterface reports whether Interface can be used without panicking

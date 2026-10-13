@@ -32,7 +32,9 @@ const fieldReferences = new WeakMap<
 >()
 let nextPointerAddress = 1
 
-function pointerAddress(value: object): number {
+// pointerAddress returns the stable synthetic address of an object, which
+// all runtime and reflect pointer addresses share.
+export function pointerAddress(value: object): number {
   let address = pointerAddresses.get(value)
   if (address === undefined) {
     address = nextPointerAddress * pointerAddressStride
