@@ -11166,9 +11166,65 @@ func (o *LoweringOwner) lowerUnsafePointerRefExpr(
 	if pointer == nil || !isUnsafePointerType(ctx.semPkg.source.TypesInfo.TypeOf(call.Args[0])) {
 		return "", nil, false
 	}
+	if ref, diagnostics, ok := o.lowerUnsafeNumericRefExpr(ctx, pointer.Elem(), call.Args[0]); ok {
+		return ref, diagnostics, true
+	}
 	value, diagnostics := o.lowerExpr(ctx, call.Args[0])
 	return o.runtimeOwner.QualifiedHelper(RuntimeHelperUnsafePointerRef) +
 		"<" + o.tsTypeFor(ctx, pointer.Elem()) + ">(" + value + ")", diagnostics, true
+}
+
+// lowerUnsafeNumericRefExpr lowers the unsafe.Pointer(&x) argument of a
+// conversion to a pointer to targetType, where x and targetType are fixed-size
+// numeric types of the same size, such as (*uint32)(unsafe.Pointer(&f)) for a
+// float32 f, to a reference that reinterprets the bits of x as targetType.
+// This is the common idiom for float bit conversions without the math package.
+func (o *LoweringOwner) lowerUnsafeNumericRefExpr(
+	ctx lowerFileContext,
+	targetType types.Type,
+	arg ast.Expr,
+) (string, []Diagnostic, bool) {
+	call, ok := unwrapParenExpr(arg).(*ast.CallExpr)
+	if !ok || len(call.Args) != 1 || !isUnsafePointerType(typeFromExpr(ctx, call.Fun)) {
+		return "", nil, false
+	}
+	addr, ok := unwrapParenExpr(call.Args[0]).(*ast.UnaryExpr)
+	if !ok || addr.Op != token.AND {
+		return "", nil, false
+	}
+	fromKind, fromSize := fixedSizeNumericKind(ctx.semPkg.source.TypesInfo.TypeOf(addr.X))
+	toKind, toSize := fixedSizeNumericKind(targetType)
+	if fromSize == 0 || fromSize != toSize {
+		return "", nil, false
+	}
+	ref, diagnostics := o.lowerExpr(ctx, addr)
+	return o.runtimeOwner.QualifiedHelper(RuntimeHelperUnsafeNumericRef) +
+		"<" + o.tsTypeFor(ctx, targetType) + ">(" + ref + ", " +
+		strconv.Quote(fromKind) + ", " + strconv.Quote(toKind) + ")", diagnostics, true
+}
+
+// fixedSizeNumericKind returns the Go name and byte size of the basic kind of
+// a fixed-size integer or float type, or a size of 0 for any other type.
+func fixedSizeNumericKind(typ types.Type) (string, int) {
+	if typ == nil {
+		return "", 0
+	}
+	basic, ok := types.Unalias(typ).Underlying().(*types.Basic)
+	if !ok {
+		return "", 0
+	}
+	switch basic.Kind() {
+	case types.Int8, types.Uint8:
+		return basic.Name(), 1
+	case types.Int16, types.Uint16:
+		return basic.Name(), 2
+	case types.Int32, types.Uint32, types.Float32:
+		return basic.Name(), 4
+	case types.Int64, types.Uint64, types.Float64:
+		return basic.Name(), 8
+	default:
+		return "", 0
+	}
 }
 
 func (o *LoweringOwner) lowerUnsafePointerStorageExpr(
