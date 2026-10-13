@@ -31,6 +31,34 @@ func encodeLocalPairing[M localPairingMessage[T], T any](msg M) ([]byte, error) 
 	return msg.MarshalVT()
 }
 
+type setter interface {
+	Has(v int64) bool
+	Set(v int64)
+}
+
+type flag int64
+
+func (f *flag) Has(v int64) bool { return int64(*f)&v != 0 }
+func (f *flag) Set(v int64)      { *f = flag(int64(*f) | v) }
+
+type flagConstraint interface {
+	~int64
+}
+
+// countFlags converts a pointer to a type parameter value to an interface
+// that needs the pointer method set of the type argument.
+func countFlags[T flagConstraint](i T, values []int64) int64 {
+	p := any(&i).(setter)
+	var n int64
+	for _, v := range values {
+		if p.Has(v) {
+			n++
+		}
+	}
+	p.Set(8)
+	return n + int64(i)
+}
+
 func main() {
 	msg, err := decodeLocalPairing[*pairingOffer]([]byte("hi"))
 	if err != nil {
@@ -45,4 +73,11 @@ func main() {
 		return
 	}
 	println("encoded:", string(encoded))
+
+	println("count:", countFlags(flag(3), []int64{1, 2, 4}))
+	var fl flag = 1
+	if s, ok := any(&fl).(setter); ok {
+		s.Set(2)
+	}
+	println("flag:", int64(fl))
 }
