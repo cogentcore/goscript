@@ -359,12 +359,17 @@ export class Func extends EmbeddedValue {
               'runtime error: invalid memory address or nil pointer dereference',
             )
           }
-          return ValueOf(
-            fn(
-              new Value({ raw: this }),
-              args.map((arg) => new Value({ raw: arg })) as $.Slice<Value>,
-            ),
-          )._raw
+          const result = fn(
+            new Value({ raw: this }),
+            args.map((arg) => new Value({ raw: arg })) as $.Slice<Value>,
+          )
+          // A function that suspends returns a promise, which JavaScript
+          // receives in place of the result. The function has run up to its
+          // first suspension, as in an event handler that must act at once.
+          if (result instanceof Promise) {
+            return result.then((value) => ValueOf(value)._raw)
+          }
+          return ValueOf(result)._raw
         },
       })
   }
@@ -438,6 +443,9 @@ function isGoInterfaceValue(value: unknown): value is { __goValue: unknown } {
   )
 }
 
+// FuncOf returns a function that JavaScript can call, which calls fn. If fn
+// suspends, as on a channel operation or a mutex, the call returns a promise
+// that resolves to its result.
 export function FuncOf(
   fn: ((this$: Value, args: $.Slice<Value>) => unknown) | null,
 ): Func {
