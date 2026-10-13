@@ -28,12 +28,12 @@ export class ObjectID {
 
 	public IsZero(): boolean {
 		const s = this;
-		return $.comparableEqual(s, $.markAsStructValue(new ObjectID()))
+		return $.structEqual(s, $.markAsStructValue(new ObjectID()))
 	}
 
 	public Valid(): boolean {
 		const s = this;
-		return !$.comparableEqual(s, $.markAsStructValue(new ObjectID()))
+		return !$.structEqual(s, $.markAsStructValue(new ObjectID()))
 	}
 
 	static {
@@ -58,10 +58,10 @@ export async function main(): globalThis.Promise<void> {
 
 	await $.println("zero is zero:", $.markAsStructValue($.cloneStructValue(zero)).IsZero())
 	await $.println("zero valid:", $.markAsStructValue($.cloneStructValue(zero)).Valid())
-	await $.println("zero equals zero:", $.comparableEqual(zero, otherZero))
+	await $.println("zero equals zero:", $.structEqual(zero, otherZero))
 	await $.println("one valid:", $.markAsStructValue($.cloneStructValue(one)).Valid())
-	await $.println("one equals other one:", $.comparableEqual(one, otherOne))
-	await $.println("one differs:", !$.comparableEqual(one, different))
+	await $.println("one equals other one:", $.structEqual(one, otherOne))
+	await $.println("one differs:", !$.structEqual(one, different))
 }
 
 if ($.isMainScript(import.meta)) {

@@ -89,6 +89,7 @@ const (
 	RuntimeHelperNamedStructConversion RuntimeHelper = "value.namedStructConversion"
 	RuntimeHelperUnsafePointerCast     RuntimeHelper = "value.unsafePointerCast"
 	RuntimeHelperComparableEqual       RuntimeHelper = "value.comparableEqual"
+	RuntimeHelperStructEqual           RuntimeHelper = "value.structEqual"
 	RuntimeHelperPointerEqual          RuntimeHelper = "value.pointerEqual"
 
 	RuntimeHelperVarRef                RuntimeHelper = "varref.varRef"
@@ -357,6 +358,7 @@ func runtimeHelperContracts() []RuntimeHelperContract {
 		runtimeHelper(RuntimeHelperPointerValueOrNil, "pointerValueOrNil", RuntimeHelperCategoryValue),
 		runtimeHelper(RuntimeHelperArrayEqual, "arrayEqual", RuntimeHelperCategoryValue),
 		runtimeHelper(RuntimeHelperComparableEqual, "comparableEqual", RuntimeHelperCategoryValue),
+		runtimeHelper(RuntimeHelperStructEqual, "structEqual", RuntimeHelperCategoryValue),
 		runtimeHelper(RuntimeHelperPointerEqual, "pointerEqual", RuntimeHelperCategoryValue),
 		runtimeHelper(RuntimeHelperVarRef, "varRef", RuntimeHelperCategoryVarRef),
 		runtimeHelper(RuntimeHelperBindStructFields, "bindStructFields", RuntimeHelperCategoryVarRef),

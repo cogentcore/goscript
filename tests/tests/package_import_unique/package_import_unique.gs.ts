@@ -41,8 +41,8 @@ export async function main(): globalThis.Promise<void> {
 	let b = ($.markAsStructValue($.cloneStructValue(_unique.Make($.markAsStructValue(new zone({name: "eth0"}))))) as _unique.Handle<zone>)
 	let c = ($.markAsStructValue($.cloneStructValue(_unique.Make($.markAsStructValue(new zone({name: "eth1"}))))) as _unique.Handle<zone>)
 
-	await $.println($.comparableEqual(a, b))
-	await $.println($.comparableEqual(a, c))
+	await $.println($.structEqual(a, b))
+	await $.println($.structEqual(a, c))
 	await $.println($.markAsStructValue($.cloneStructValue(a)).Value().name)
 }
 

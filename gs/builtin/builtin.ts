@@ -298,6 +298,40 @@ export function comparableEqual(a: unknown, b: unknown): boolean {
   return false
 }
 
+/**
+ * structEqual compares two values of the same struct type, as for == on
+ * operands whose static type is that struct, by comparing their fields.
+ * It ignores the dynamic type that interfaceValue records on a struct
+ * object, since a pointer to a struct is the struct object itself, so a
+ * struct that was passed as a pointer in an interface carries a pointer type.
+ */
+export function structEqual(a: unknown, b: unknown, typeInfo?: TypeInfo | string): boolean {
+  if (a === b) {
+    return true
+  }
+  if (!isStructValue(a) || !isStructValue(b)) {
+    return comparableEqual(a, b)
+  }
+  const info = structValueTypeInfo(a) ?? typeInfo
+  const resolved = typeof info === 'string' ? getTypeByName(info) : info
+  if (resolved?.kind !== TypeKind.Struct) {
+    return fieldsEqual(a._fields, b._fields)
+  }
+  for (const field of resolved.fields) {
+    const key = structFieldRuntimeKey(field)
+    const fieldType =
+      typeof field.type === 'string' ? getTypeByName(field.type) : field.type
+    const equal =
+      fieldType?.kind === TypeKind.Struct ?
+        structEqual(a._fields[key], b._fields[key], fieldType)
+      : comparableEqual(a._fields[key], b._fields[key])
+    if (!equal) {
+      return false
+    }
+  }
+  return true
+}
+
 function isArrayLike(value: unknown): value is ArrayLike<unknown> {
   return Array.isArray(value) || value instanceof Uint8Array
 }
