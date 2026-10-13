@@ -4193,7 +4193,8 @@ class InterfaceType implements Type {
   ) {}
 
   public String(): string {
-    return this._name
+    // Go spells the empty interface type with a space.
+    return this._name === 'interface{}' ? 'interface {}' : this._name
   }
 
   public Kind(): Kind {
@@ -4248,8 +4249,9 @@ class InterfaceType implements Type {
   }
 
   public Name(): string {
+    // An interface type literal is unnamed.
     if (this._name === 'interface{}' || this._name.startsWith('interface {')) {
-      return this._name
+      return ''
     }
     const dotIndex = this._name.lastIndexOf('.')
     if (dotIndex >= 0) {
@@ -4454,8 +4456,12 @@ function getTypeOf(value: ReflectValue): Type {
         '__goTypeInfo' in value &&
         (value as { __goTypeInfo?: $.TypeInfo | string }).__goTypeInfo
       ) {
-        return typeFromTypeInfo(
-          (value as { __goTypeInfo: $.TypeInfo | string }).__goTypeInfo,
+        // A boxed named value carries the signatures of its methods.
+        return typeWithMethodSignatures(
+          typeFromTypeInfo(
+            (value as { __goTypeInfo: $.TypeInfo | string }).__goTypeInfo,
+          ),
+          boxedMethodSignatures(value),
         )
       }
 
@@ -4603,6 +4609,23 @@ function getTypeOf(value: ReflectValue): Type {
     default:
       return new BasicType(Interface, 'interface{}', 16)
   }
+}
+
+// boxedMethodSignatures returns the method signatures of the methods of a
+// boxed named value (see $.namedValueInterfaceValue).
+function boxedMethodSignatures(value: object): $.MethodSignature[] {
+  const signatures: $.MethodSignature[] = []
+  for (const method of Object.values(value)) {
+    const signature =
+      typeof method === 'function' ?
+        (method as { __goscriptMethodSignature?: $.MethodSignature })
+          .__goscriptMethodSignature
+      : undefined
+    if (signature) {
+      signatures.push(signature)
+    }
+  }
+  return signatures
 }
 
 // TypeOf Exported functions as required by godoc.txt.
@@ -5170,6 +5193,10 @@ function interfaceTypeFromInfo(
   seen = new Set<string>(),
 ): Type {
   const methods = info.methods ?? []
+  // A named interface, such as error or io.Reader, is known by its name.
+  if (info.name && !info.name.startsWith('interface')) {
+    return new InterfaceType(info.name, info.name, methods)
+  }
   if (methods.length === 0) {
     return new InterfaceType('interface{}', info.name, methods)
   }

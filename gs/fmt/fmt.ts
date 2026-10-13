@@ -32,6 +32,31 @@ export interface State {
   Write(b: $.Bytes): [number, $.GoError | null]
 }
 
+// The fmt interfaces are registered with the runtime type system, so that
+// type assertions and reflect.TypeFor know them by name.
+$.registerInterfaceType('fmt.Stringer', null, [
+  $.methodSignature('String', [], [$.basicType('string')]),
+])
+$.registerInterfaceType('fmt.GoStringer', null, [
+  $.methodSignature('GoString', [], [$.basicType('string')]),
+])
+$.registerInterfaceType('fmt.State', null, [
+  $.methodSignature('Flag', [['c', $.basicType('int')]], [$.basicType('bool')]),
+  $.methodSignature('Precision', [], [$.basicType('int'), $.basicType('bool')]),
+  $.methodSignature('Width', [], [$.basicType('int'), $.basicType('bool')]),
+  $.methodSignature(
+    'Write',
+    [['b', $.sliceType($.basicType('uint8'))]],
+    [$.basicType('int'), 'error'],
+  ),
+])
+$.registerInterfaceType('fmt.Formatter', null, [
+  $.methodSignature('Format', [
+    ['f', 'fmt.State'],
+    ['verb', $.basicType('int32')],
+  ]),
+])
+
 // formatInt renders an integer value in the given radix, applying Go's # flag
 // (0x/0X/0 base prefix) and +/space sign flags. The sign precedes the prefix,
 // matching fmt's "%+#x" ordering.
