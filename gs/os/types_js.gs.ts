@@ -250,7 +250,7 @@ function joinFilePath(dir: string, name: string): string {
 	return dir.replace(/\/+$/, "") + "/" + name
 }
 
-async function readDirectoryInfos(name: string): Promise<[fs.FileInfo[] | null, $.GoError]> {
+export async function readDirectoryInfos(name: string): Promise<[fs.FileInfo[] | null, $.GoError]> {
 	const denoObj = getDeno()
 	if (denoObj?.readDirSync) {
 		try {

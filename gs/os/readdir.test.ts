@@ -1,10 +1,12 @@
-import { mkdtempSync, rmSync, writeFileSync } from 'node:fs'
+import { mkdtempSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, describe, expect, it } from 'vitest'
 
+import * as fs from '@goscript/io/fs/index.js'
 import * as io from '@goscript/io/index.js'
 
+import { ReadDir } from './dir.gs.js'
 import { Open } from './file_js.gs.js'
 
 const tempRoots: string[] = []
@@ -52,5 +54,23 @@ describe('os file directory reads', () => {
     expect(second).toBeNull()
     expect(secondErr).toBe(io.EOF)
     expect(await dir!.Close()).toBeNull()
+  })
+
+  it('reports each entry mode from os.ReadDir', async () => {
+    const root = makeTempRoot()
+    writeFileSync(join(root, 'run'), 'a', { mode: 0o755 })
+    symlinkSync('run', join(root, 'link'))
+
+    const [entries, readErr] = await ReadDir(root)
+    expect(readErr).toBeNull()
+    const modes = entries?.map((entry) => {
+      const [info, infoErr] = entry!.Info()
+      expect(infoErr).toBeNull()
+      return [entry!.Name(), info!.Mode()]
+    })
+    // A symlink's permission bits differ between hosts, so check only its type.
+    expect(modes?.[0]?.[0]).toBe('link')
+    expect(Number(modes?.[0]?.[1]) & fs.ModeSymlink).not.toBe(0)
+    expect(modes?.[1]).toEqual(['run', 0o755])
   })
 })
