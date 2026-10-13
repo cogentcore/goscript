@@ -38,6 +38,7 @@ func main() {
 	}()
 
 	funcOfValues()
+	valueOfNil()
 }
 
 // wrap passes a function value, rather than a function literal, to
@@ -62,4 +63,28 @@ func funcOfValues() {
 	direct := js.FuncOf(fn)
 	defer direct.Release()
 	println("direct:", direct.Invoke().String())
+}
+
+func features() []any {
+	var out []any
+	return out
+}
+
+// valueOfNil checks that js.ValueOf converts nil []any and map[string]any
+// values to an empty array and an empty object, not to null.
+func valueOfNil() {
+	println("nil slice:", js.ValueOf([]any(nil)).Type().String(), js.ValueOf([]any(nil)).Length())
+	println("nil map:", js.ValueOf(map[string]any(nil)).Type().String())
+
+	desc := map[string]any{
+		"label":            "",
+		"requiredFeatures": features(),
+		"limits":           map[string]any(nil),
+	}
+	v := js.ValueOf(desc)
+	println("nested slice:", v.Get("requiredFeatures").Type().String(), js.Global().Get("Array").Call("isArray", v.Get("requiredFeatures")).Bool())
+	println("nested map:", v.Get("limits").Type().String())
+
+	var nothing any
+	println("nil interface:", js.ValueOf(nothing).Type().String())
 }
