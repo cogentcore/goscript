@@ -362,28 +362,21 @@ export function Append(s: Value, x: Value): Value {
   if (s.Kind() !== Slice) {
     throw new Error('reflect.Append of non-slice')
   }
-
-  const array = getArrayFromValue(s)
-  if (!array) {
-    throw new Error('cannot get array from slice value')
-  }
-
+  const slice = (s as { value: ReflectValue }).value as $.Slice<unknown>
   const newValue = (x as { value: ReflectValue }).value
-  const newArray = [...array, newValue]
-
-  return new Value(newArray, s.Type())
+  return new Value($.append(slice, newValue) as ReflectValue, s.Type())
 }
 
 export function AppendSlice(s: Value, t: Value): Value {
   if (s.Kind() !== Slice || t.Kind() !== Slice) {
     throw new Error('reflect.AppendSlice of non-slice')
   }
-  const left = getArrayFromValue(s)
-  const right = getArrayFromValue(t)
-  if (!left || !right) {
-    throw new Error('cannot get array from slice value')
-  }
-  return new Value([...left, ...right], s.Type())
+  const left = (s as { value: ReflectValue }).value as $.Slice<unknown>
+  const right = (t as { value: ReflectValue }).value as $.Slice<unknown>
+  return new Value(
+    $.append(left, ...$.asArray(right)) as ReflectValue,
+    s.Type(),
+  )
 }
 
 // MakeChan returns a Value representing a new channel with the specified type.

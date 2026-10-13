@@ -987,24 +987,25 @@ export class Value {
         `reflect.Value.Slice: slice index out of bounds [${i}:${j}] with length ${length}`,
       )
     }
+    const value = this.currentValue()
     if (
-      this._value &&
-      typeof this._value === 'object' &&
-      '__meta__' in this._value
+      value &&
+      typeof value === 'object' &&
+      '__meta__' in value
     ) {
       return new Value(
-        $.goSlice(this._value as $.Slice<unknown>, i, j),
+        $.goSlice(value as $.Slice<unknown>, i, j),
         this._type,
       )
     }
-    if (globalThis.Array.isArray(this._value)) {
-      return new Value(this._value.slice(i, j), this._type)
+    if (globalThis.Array.isArray(value)) {
+      return new Value(value.slice(i, j), this._type)
     }
-    if (this._value instanceof Uint8Array) {
-      return new Value(this._value.slice(i, j), this._type)
+    if (value instanceof Uint8Array) {
+      return new Value(value.slice(i, j), this._type)
     }
-    if (typeof this._value === 'string') {
-      return new Value(this._value.slice(i, j), this._type)
+    if (typeof value === 'string') {
+      return new Value(value.slice(i, j), this._type)
     }
     throw new ValueError({ Kind: this.Kind(), Method: 'Slice' })
   }
@@ -1218,21 +1219,22 @@ export class Value {
     ) {
       throw new ValueError({ Kind: kind, Method: 'Pointer' })
     }
-    if (this._value === null || this._value === undefined) {
+    const value = this.currentValue()
+    if (value === null || value === undefined) {
       return 0
     }
-    if ($.isOwnedPointerHandle(this._value)) {
-      return $.ownedPointerAddress(this._value)
+    if ($.isOwnedPointerHandle(value)) {
+      return $.ownedPointerAddress(value)
     }
-    if ($.isVarRef(this._value)) {
-      const address = this._value.__goAddress?.()
+    if ($.isVarRef(value)) {
+      const address = value.__goAddress?.()
       if (address !== undefined) {
         return address
       }
-      return pointerAddress(this._value)
+      return pointerAddress(value)
     }
     if (kind === Slice) {
-      const slice = this._value as $.Slice<unknown> | Uint8Array
+      const slice = value as $.Slice<unknown> | Uint8Array
       try {
         if ($.len(slice) === 0) {
           return 0
@@ -1242,8 +1244,8 @@ export class Value {
         return 0
       }
     }
-    if (typeof this._value === 'object' || typeof this._value === 'function') {
-      return pointerAddress(this._value)
+    if (typeof value === 'object' || typeof value === 'function') {
+      return pointerAddress(value)
     }
     return 0
   }
@@ -1514,12 +1516,12 @@ export class Value {
     }
     const value = this.currentValue()
     if (value === null || value === undefined) {
-      return new MapIter(new globalThis.Map())
+      return new MapIter(new globalThis.Map(), this._type)
     }
     if (!(value instanceof globalThis.Map)) {
       throw new ValueError({ Kind: this.Kind(), Method: 'MapRange' })
     }
-    return new MapIter(value)
+    return new MapIter(value, this._type)
   }
 
   public MapIndex(key: Value): Value {
@@ -1582,7 +1584,7 @@ export class Value {
     }
 
     // Get the underlying channel
-    const channel = this._value
+    const channel = this.currentValue()
     if (!channel || typeof channel !== 'object') {
       throw new Error('reflect: send on invalid channel')
     }
@@ -1793,9 +1795,11 @@ export class Value {
         'reflect: call of reflect.Value.SetLen on ' + this.Kind() + ' Value',
       )
     }
-    if (globalThis.Array.isArray(this._value)) {
-      this._value.length = n
+    const value = this.currentValue() as $.Slice<unknown>
+    if (n < 0 || n > $.cap(value)) {
+      throw new Error('reflect: slice length out of range in SetLen')
     }
+    this.storeValue($.goSlice(value, 0, n) as ReflectValue)
   }
 
   // SetMapIndex sets the element associated with key in the map v to elem
