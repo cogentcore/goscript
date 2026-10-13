@@ -24,8 +24,14 @@ export type VarRef<T> = {
   __goPointer?: OwnedPointerHandle<T>
 }
 
-const pointerAddressStride = 0x100000000
+// pointerAddressStride separates synthetic addresses so that an address plus
+// a struct field offset can be traced back to its object (see objectAtAddress).
+export const pointerAddressStride = 0x100000000
 const pointerAddresses = new WeakMap<object, number>()
+const addressObjects = new globalThis.Map<number, WeakRef<object>>()
+const addressCleanup = new FinalizationRegistry<number>((address) => {
+  addressObjects.delete(address)
+})
 const fieldReferences = new WeakMap<
   object,
   globalThis.Map<PropertyKey, VarRef<unknown>>
@@ -40,8 +46,16 @@ export function pointerAddress(value: object): number {
     address = nextPointerAddress * pointerAddressStride
     nextPointerAddress++
     pointerAddresses.set(value, address)
+    addressObjects.set(address, new WeakRef(value))
+    addressCleanup.register(value, address)
   }
   return address
+}
+
+// objectAtAddress returns the live object a synthetic address was assigned
+// to by pointerAddress, if any.
+export function objectAtAddress(address: number): object | undefined {
+  return addressObjects.get(address)?.deref()
 }
 
 function refPointer<T>(
