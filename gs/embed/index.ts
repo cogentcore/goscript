@@ -25,13 +25,13 @@ export class FS {
     }
     const data = this.files.get(name)
     if (data !== undefined) {
-      return [new embedFile(name, data), null]
+      return [new openFile(name, data), null]
     }
     const entries = this.dirEntries(name)
     if (entries === null) {
       return [null, pathError('open', name, fs.ErrNotExist)]
     }
-    return [new embedFile(name, null, entries), null]
+    return [new openDir(name, entries), null]
   }
 
   ReadDir(name: string): [$.Slice<fs.DirEntry>, $.GoError] {
@@ -74,7 +74,7 @@ export class FS {
     return [new embedFileInfo(baseName(name), 0, fs.ModeDir | 0o555), null]
   }
 
-  private dirEntries(name: string): $.Slice<fs.DirEntry> | null {
+  private dirEntries(name: string): fs.DirEntry[] | null {
     if (!this.dirExists(name)) {
       return null
     }
@@ -119,14 +119,14 @@ export class FS {
   }
 }
 
-class embedFile {
+// openFile is an open regular file, which implements io.Seeker and
+// io.ReaderAt, as in Go.
+class openFile {
   private offset = 0
-  private dirOffset = 0
 
   constructor(
     private readonly name: string,
-    private readonly data: Uint8Array | null,
-    private readonly entries: $.Slice<fs.DirEntry> = [],
+    private readonly data: Uint8Array,
   ) {}
 
   Close(): $.GoError {
@@ -134,9 +134,6 @@ class embedFile {
   }
 
   Read(buffer: Uint8Array): [number, $.GoError] {
-    if (this.data === null) {
-      return [0, pathError('read', this.name, fs.ErrInvalid)]
-    }
     if (this.offset >= this.data.byteLength) {
       return [0, io.EOF]
     }
@@ -146,35 +143,73 @@ class embedFile {
     return [n, null]
   }
 
-  ReadDir(n: number): [$.Slice<fs.DirEntry>, $.GoError] {
-    if (this.data !== null) {
-      return [null, pathError('readdir', this.name, fs.ErrInvalid)]
+  ReadAt(buffer: Uint8Array, offset: bigint): [number, $.GoError] {
+    if (offset < 0n || offset > BigInt(this.data.byteLength)) {
+      return [0, pathError('read', this.name, fs.ErrInvalid)]
     }
-    const allEntries = this.entries ?? []
-    if (n <= 0) {
-      const entries = allEntries.slice(this.dirOffset)
-      this.dirOffset = allEntries.length
-      return [entries, null]
+    const start = Number(offset)
+    const n = Math.min(buffer.byteLength, this.data.byteLength - start)
+    buffer.set(this.data.subarray(start, start + n))
+    return [n, n < buffer.byteLength ? io.EOF : null]
+  }
+
+  Seek(offset: bigint, whence: number): [bigint, $.GoError] {
+    switch (whence) {
+      case io.SeekCurrent:
+        offset += BigInt(this.offset)
+        break
+      case io.SeekEnd:
+        offset += BigInt(this.data.byteLength)
+        break
     }
-    if (this.dirOffset >= allEntries.length) {
-      return [[], io.EOF]
+    if (offset < 0n || offset > BigInt(this.data.byteLength)) {
+      return [0n, pathError('seek', this.name, fs.ErrInvalid)]
     }
-    const entries = allEntries.slice(this.dirOffset, this.dirOffset + n)
-    this.dirOffset += entries.length
-    return [entries, null]
+    this.offset = Number(offset)
+    return [offset, null]
   }
 
   Stat(): [fs.FileInfo, $.GoError] {
-    if (this.data === null) {
-      return [
-        new embedFileInfo(baseName(this.name), 0, fs.ModeDir | 0o555),
-        null,
-      ]
-    }
     return [
       new embedFileInfo(baseName(this.name), this.data.byteLength, 0o444),
       null,
     ]
+  }
+}
+
+// openDir is an open directory.
+class openDir {
+  private offset = 0
+
+  constructor(
+    private readonly name: string,
+    private readonly entries: fs.DirEntry[],
+  ) {}
+
+  Close(): $.GoError {
+    return null
+  }
+
+  Read(_buffer: Uint8Array): [number, $.GoError] {
+    return [0, pathError('read', this.name, fs.ErrInvalid)]
+  }
+
+  ReadDir(n: number): [$.Slice<fs.DirEntry>, $.GoError] {
+    if (n <= 0) {
+      const entries = this.entries.slice(this.offset)
+      this.offset = this.entries.length
+      return [entries, null]
+    }
+    if (this.offset >= this.entries.length) {
+      return [[], io.EOF]
+    }
+    const entries = this.entries.slice(this.offset, this.offset + n)
+    this.offset += entries.length
+    return [entries, null]
+  }
+
+  Stat(): [fs.FileInfo, $.GoError] {
+    return [new embedFileInfo(baseName(this.name), 0, fs.ModeDir | 0o555), null]
   }
 }
 
