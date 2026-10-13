@@ -175,6 +175,7 @@ const (
 	RuntimeHelperSyncResult                     RuntimeHelper = "type.syncResult"
 	RuntimeHelperSyncFunction                   RuntimeHelper = "type.syncFunction"
 	RuntimeHelperNamedFunction                  RuntimeHelper = "type.namedFunction"
+	RuntimeHelperGoFunc                         RuntimeHelper = "type.goFunc"
 	RuntimeHelperGenericZero                    RuntimeHelper = "type.genericZero"
 	RuntimeHelperGenericNew                     RuntimeHelper = "type.genericNew"
 	RuntimeHelperGenericTypeArgsMarker          RuntimeHelper = "type.genericTypeArgsMarker"
@@ -447,6 +448,7 @@ func runtimeHelperContracts() []RuntimeHelperContract {
 		runtimeHelper(RuntimeHelperSyncResult, "syncResult", RuntimeHelperCategoryType),
 		runtimeHelper(RuntimeHelperSyncFunction, "syncFunction", RuntimeHelperCategoryType),
 		runtimeHelper(RuntimeHelperNamedFunction, "namedFunction", RuntimeHelperCategoryType),
+		runtimeHelper(RuntimeHelperGoFunc, "goFunc", RuntimeHelperCategoryType),
 		runtimeHelper(RuntimeHelperGenericZero, "genericZero", RuntimeHelperCategoryType),
 		runtimeHelper(RuntimeHelperGenericNew, "genericNew", RuntimeHelperCategoryType),
 		runtimeHelper(RuntimeHelperGenericTypeArgsMarker, "genericTypeArgsMarker", RuntimeHelperCategoryType),

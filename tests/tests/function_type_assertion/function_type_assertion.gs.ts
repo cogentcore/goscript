@@ -203,7 +203,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 
 	// 8. Type assertion of a declared function to its unnamed type
-	let plain: any = $.interfaceValue(add, "func(a int, b int) int", ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))
+	let plain: any = $.interfaceValue($.goFunc(add, "main.add"), "func(a int, b int) int", ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))
 	let [plainFn, okPlain] = $.typeAssertTuple<((a: number, b: number) => number | globalThis.Promise<number>) | null>(plain, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))
 	if (okPlain) {
 		await $.println(await plainFn!(4, 4))

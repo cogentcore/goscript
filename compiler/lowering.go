@@ -10503,8 +10503,14 @@ func (o *LoweringOwner) lowerMethodValueClosure(
 	if signature == nil {
 		return closure
 	}
+	goName := ""
+	if method, ok := selection.Obj().(*types.Func); ok {
+		if name := methodValueGoName(method); name != "" {
+			goName = ", " + strconv.Quote(name)
+		}
+	}
 	return o.runtimeOwner.QualifiedHelper(RuntimeHelperFunctionValue) +
-		"(" + closure + ", " + o.runtimeFunctionTypeInfo(signature, "") + ")"
+		"(" + closure + ", " + o.runtimeFunctionTypeInfo(signature, "") + goName + ")"
 }
 
 func (o *LoweringOwner) lowerMethodExpressionClosure(ctx lowerFileContext, selection *types.Selection) string {
@@ -12221,7 +12227,78 @@ func (o *LoweringOwner) lowerValueForTarget(
 	if adapted, ok := o.lowerOverrideFunctionValue(ctx, expr, targetType, value); ok {
 		return adapted
 	}
+	if isInterfaceType(targetType) {
+		// A declared function boxed into an interface records its Go name,
+		// which runtime.FuncForPC reports for its reflect Pointer.
+		if goName := declaredFuncGoName(ctx, expr); goName != "" {
+			value = o.runtimeOwner.QualifiedHelper(RuntimeHelperGoFunc) + "(" + value + ", " + strconv.Quote(goName) + ")"
+		}
+	}
 	return o.lowerValueForTargetTypes(ctx, targetType, sourceType, value, shouldCloneStructValue(expr))
+}
+
+// declaredFuncGoName returns the name that the Go runtime gives the
+// non-generic package-level function that expr refers to, such as
+// example.com/pkg.Func, or "" if expr is not such a function.
+func declaredFuncGoName(ctx lowerFileContext, expr ast.Expr) string {
+	var ident *ast.Ident
+	switch e := unwrapParenExpr(expr).(type) {
+	case *ast.Ident:
+		ident = e
+	case *ast.SelectorExpr:
+		ident = e.Sel
+	default:
+		return ""
+	}
+	fn, ok := ctx.semPkg.source.TypesInfo.Uses[ident].(*types.Func)
+	if !ok || fn.Pkg() == nil || fn.Parent() != fn.Pkg().Scope() {
+		return ""
+	}
+	sig, ok := fn.Type().(*types.Signature)
+	if !ok || sig.Recv() != nil || sig.TypeParams().Len() != 0 {
+		return ""
+	}
+	return goRuntimePackageName(fn.Pkg()) + "." + fn.Name()
+}
+
+// methodValueGoName returns the name that the Go runtime gives the method
+// value of method, such as example.com/pkg.(*T).Method-fm, or "" if its
+// receiver type is not named.
+func methodValueGoName(method *types.Func) string {
+	sig, ok := method.Type().(*types.Signature)
+	if !ok || sig.Recv() == nil || method.Pkg() == nil {
+		return ""
+	}
+	recv := types.Unalias(sig.Recv().Type())
+	pointer := false
+	if ptr, ok := recv.(*types.Pointer); ok {
+		pointer = true
+		recv = types.Unalias(ptr.Elem())
+	}
+	named, ok := recv.(*types.Named)
+	if !ok {
+		return ""
+	}
+	typeName := named.Obj().Name()
+	if named.TypeParams().Len() != 0 || named.TypeArgs().Len() != 0 {
+		typeName += "[...]"
+	}
+	if pointer {
+		typeName = "(*" + typeName + ")"
+	}
+	return goRuntimePackageName(named.Obj().Pkg()) + "." + typeName + "." + method.Name() + "-fm"
+}
+
+// goRuntimePackageName returns the package qualifier of Go runtime function
+// names: the import path, or main for the main package.
+func goRuntimePackageName(pkg *types.Package) string {
+	if pkg == nil {
+		return ""
+	}
+	if pkg.Name() == "main" {
+		return "main"
+	}
+	return pkg.Path()
 }
 
 // lowerOverrideFunctionValue adapts a function of an override package with a
