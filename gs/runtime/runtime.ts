@@ -213,14 +213,14 @@ export class Func {
 
 // FuncForPC returns function metadata for a program counter returned by
 // Caller or Callers, or for the Pointer of a function value from reflect,
-// whose name is that of the JavaScript function. It returns nil for any
-// other value.
+// whose name is its Go name where the compiler recorded one, or else that of
+// the JavaScript function. It returns nil for any other value.
 export function FuncForPC(pc: number): Func | null {
   if (frameTable[pc - 1] !== undefined) {
     return new Func(pc)
   }
   const fn = $.objectAtAddress(pc)
-  return typeof fn === 'function' ? new Func(pc, fn.name) : null
+  return typeof fn === 'function' ? new Func(pc, $.goFunctionName(fn)) : null
 }
 
 // StartTrace enables execution tracing.

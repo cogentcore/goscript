@@ -11,8 +11,12 @@ FuncForPC nil: true
 Caller: true true true true
 FuncForPC caller: true true
 Caller(1): true
-FuncForPC func value: true
 Callers: true true true
+FuncForPC func: main.helperFunc
+FuncForPC imported: strings.ToUpper
+FuncForPC pointer method: main.(*counter).PtrMethod-fm
+FuncForPC value method: main.counter.ValMethod-fm
+FuncForPC generic method: main.(*box[...]).Get-fm
 Cleanup stopped
 Finalizer ignored
 locked goroutine ran

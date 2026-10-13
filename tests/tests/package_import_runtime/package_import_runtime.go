@@ -41,6 +41,7 @@ func main() {
 	println("Frames empty:", frame.Line, more)
 	println("FuncForPC nil:", runtime.FuncForPC(0) == nil)
 	callers()
+	funcValueNames()
 
 	box := &struct{ value int }{value: 1}
 	cleanup := runtime.AddCleanup(box, func(value int) {
@@ -66,7 +67,6 @@ func callers() {
 	f := runtime.FuncForPC(pc)
 	println("FuncForPC caller:", f != nil, strings.Contains(f.Name(), "callers"))
 	println("Caller(1):", callerInfo() != "")
-	println("FuncForPC func value:", strings.Contains(funcName(helperFunc), "helperFunc"))
 
 	pcs := make([]uintptr, 8)
 	n := runtime.Callers(1, pcs)
@@ -86,6 +86,29 @@ func funcName(f any) string {
 }
 
 func helperFunc() {}
+
+type counter struct{ n int }
+
+func (c *counter) PtrMethod() int { return c.n }
+
+func (c counter) ValMethod() int { return c.n }
+
+type box[E any] struct{ v E }
+
+func (b *box[E]) Get() E { return b.v }
+
+// funcValueNames prints the Go names of declared functions and method values.
+func funcValueNames() {
+	println("FuncForPC func:", funcName(helperFunc))
+	println("FuncForPC imported:", funcName(strings.ToUpper))
+
+	c := &counter{n: 1}
+	println("FuncForPC pointer method:", funcName(c.PtrMethod))
+	println("FuncForPC value method:", funcName(c.ValMethod))
+
+	b := &box[int]{v: 2}
+	println("FuncForPC generic method:", funcName(b.Get))
+}
 
 // lockOSThread locks a goroutine to its thread and unlocks main's lock from
 // init.
