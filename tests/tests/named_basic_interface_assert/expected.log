@@ -1,0 +1,18 @@
+MyInt as MyInt: true
+MyInt as int32: false
+int32 as MyInt: false
+switch: string
+switch: Name
+switch: json.Number
+switch: MyInt
+switch: int32
+switch: int
+generic: MyInt Name string
+generic stringer: S:q
+generic any stringer: true
+reflect: MyInt main.MyInt
+reflect field: Name MyInt
+equal: true false false
+map: true
+json UseNumber: json.Number
+fmt: 8 p 5

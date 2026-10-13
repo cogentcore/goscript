@@ -12232,6 +12232,9 @@ func (o *LoweringOwner) lowerValueForTargetTypes(
 	if wrapper := o.lowerNamedValueInterfaceWrapper(ctx, targetType, sourceType, value); wrapper != "" {
 		return wrapper
 	}
+	if wrapper := o.lowerNamedBasicInterfaceBox(ctx, targetType, sourceType, value); wrapper != "" {
+		return wrapper
+	}
 	if isInterfaceType(targetType) && !isInterfaceType(sourceType) && isNilableType(sourceType) {
 		return o.lowerInterfaceValueExpr(ctx, targetType, sourceType, value)
 	}
@@ -12368,6 +12371,47 @@ func (o *LoweringOwner) lowerNamedValueInterfaceWrapper(
 		"<" + o.tsTypeFor(ctx, targetType) + ">(" + value + ", " +
 		strconv.Quote(goRuntimeTypeString(sourceType)) + ", " + methods + ", " +
 		o.runtimeTypeInfoExpr(sourceType) + ", " + signatures + ")"
+}
+
+// lowerNamedBasicInterfaceBox boxes a value of a named basic type, or of a
+// type parameter that may be one, converted to an interface type, so that its
+// Go type is known to type assertions and type switches. A raw primitive in an
+// interface has an unnamed basic type. Named basic types with methods for the
+// target interface are boxed by lowerNamedValueInterfaceWrapper.
+func (o *LoweringOwner) lowerNamedBasicInterfaceBox(
+	ctx lowerFileContext,
+	targetType types.Type,
+	sourceType types.Type,
+	value string,
+) string {
+	if targetType == nil || sourceType == nil || !isInterfaceType(targetType) {
+		return ""
+	}
+	if _, ok := types.Unalias(targetType).(*types.TypeParam); ok {
+		return ""
+	}
+	if typeParam, ok := types.Unalias(sourceType).(*types.TypeParam); ok {
+		if !typeParamInScope(ctx, typeParam) {
+			return ""
+		}
+		return o.runtimeOwner.QualifiedHelper(RuntimeHelperTypeParamInterfaceValue) +
+			"<" + o.tsTypeFor(ctx, targetType) + ">(" +
+			value + ", " + o.genericTypeDescriptorExpr(ctx, sourceType) + ")"
+	}
+	if isInterfaceType(sourceType) {
+		return ""
+	}
+	named, ok := types.Unalias(sourceType).(*types.Named)
+	if !ok || named.Obj() == nil {
+		return ""
+	}
+	if _, ok := named.Underlying().(*types.Basic); !ok {
+		return ""
+	}
+	return o.runtimeOwner.QualifiedHelper(RuntimeHelperNamedValueInterfaceValue) +
+		"<" + o.tsTypeFor(ctx, targetType) + ">(" + value + ", " +
+		strconv.Quote(goRuntimeTypeString(sourceType)) + ", {}, " +
+		o.runtimeTypeInfoExpr(sourceType) + ")"
 }
 
 func (o *LoweringOwner) lowerPrimitiveErrorWrapper(ctx lowerFileContext, sourceType types.Type, value string) string {

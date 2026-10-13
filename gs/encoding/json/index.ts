@@ -33,21 +33,46 @@ function delimToken(d: Delim): Token {
   )
 }
 
+// numberBox returns the json.Number for a number literal decoded with
+// UseNumber, boxed as compiled code boxes a json.Number in an interface, so
+// that it is not mistaken for a string.
+function numberBox(literal: string): unknown {
+  return $.namedValueInterfaceValue(
+    literal,
+    'json.Number',
+    {
+      Float64: Number_Float64,
+      Int64: Number_Int64,
+      String: Number_String,
+    },
+    $.basicType('string', 'json.Number'),
+  )
+}
+
+// isNumberBox reports whether value is a boxed json.Number (see numberBox).
+function isNumberBox(
+  value: unknown,
+): value is { __goType: string; __goValue: string } {
+  return $.isNamedValueBox(value) && value.__goType === 'json.Number'
+}
+
+// decodedJSONText returns the JSON text of a decoded value, writing the
+// number literals decoded with UseNumber as numbers.
+function decodedJSONText(decoded: unknown): string {
+  return JSON.stringify(decoded, (_key, value: unknown) =>
+    isNumberBox(value) ? Number(value.__goValue) : value,
+  )
+}
+
 // valueToken returns a scanned literal value as a Token. Numbers are boxed
 // as float64 or json.Number values, as compiled code boxes them in an
 // interface, so that they are not mistaken for other numeric types.
 function valueToken(value: unknown, useNumber: boolean): Token {
+  if (isNumberBox(value)) {
+    return value as Token
+  }
   if (useNumber && typeof value === 'string' && isValidFloat(value)) {
-    return $.namedValueInterfaceValue<Token>(
-      value,
-      'json.Number',
-      {
-        Float64: Number_Float64,
-        Int64: Number_Int64,
-        String: Number_String,
-      },
-      $.basicType('string', 'json.Number'),
-    )
+    return numberBox(value) as Token
   }
   if (typeof value === 'number') {
     return $.basicInterfaceValue<Token>(value, 'float64')
@@ -797,7 +822,7 @@ function scanJSONValue(
       return fail()
     }
     const literal = text.slice(numStart, i)
-    return useNumber ? literal : Number(literal)
+    return useNumber ? numberBox(literal) : Number(literal)
   }
   const value = parseValue()
   return [value, i]
@@ -1328,7 +1353,7 @@ function assignDecodedValue(
     const unmarshaler = unmarshalJSONTarget(target.value)
     if (unmarshaler !== null) {
       const err = unmarshaler.UnmarshalJSON(
-        $.stringToBytes(JSON.stringify(decoded)),
+        $.stringToBytes(decodedJSONText(decoded)),
       )
       if (err !== null) {
         throw err
@@ -1444,7 +1469,7 @@ function assignDecodedFieldValue(
   fieldType: unknown,
 ): void {
   if (isRawMessageType(fieldType)) {
-    target.value = $.stringToBytes(JSON.stringify(decoded))
+    target.value = $.stringToBytes(decodedJSONText(decoded))
     return
   }
   // Decode Map/Slice-typed fields (including nested combinations, e.g.
@@ -1545,7 +1570,7 @@ function decodeValueForType(
   opts: decodeOptions,
 ): unknown {
   if (isRawMessageType(typeInfo) && decoded !== undefined) {
-    return $.stringToBytes(JSON.stringify(decoded))
+    return $.stringToBytes(decodedJSONText(decoded))
   }
   if (decoded === null || decoded === undefined) {
     return decoded
@@ -1562,6 +1587,10 @@ function decodeValueForType(
   const info = resolveTypeInfo(typeInfo)
   if (info === null || $.isInterfaceTypeInfo(info)) {
     return decodeInterfaceValue(decoded)
+  }
+  if (isNumberBox(decoded)) {
+    // A typed target receives the number literal.
+    decoded = decoded.__goValue
   }
   if ($.isPointerTypeInfo(info)) {
     // A *Struct pointee must be constructed directly here, NOT by recursing
@@ -1585,7 +1614,7 @@ function decodeValueForType(
       const unmarshaler = unmarshalJSONTarget(inst)
       if (unmarshaler !== null) {
         const err = unmarshaler.UnmarshalJSON(
-          $.stringToBytes(JSON.stringify(decoded)),
+          $.stringToBytes(decodedJSONText(decoded)),
         )
         if (err !== null) {
           throw err
@@ -1964,6 +1993,7 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
   return (
     value !== null &&
     typeof value === 'object' &&
+    !$.isNamedValueBox(value) &&
     !Array.isArray(value) &&
     !(value instanceof Uint8Array) &&
     !(value instanceof Map)

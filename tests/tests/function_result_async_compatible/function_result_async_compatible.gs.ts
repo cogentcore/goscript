@@ -60,7 +60,7 @@ export function unwrap(v: Value | null): Value | null {
 
 export async function wrapNew(__typeArgs: $.GenericTypeArgs | undefined, newValue: (() => any | globalThis.Promise<any>) | null): globalThis.Promise<(() => Value | null | globalThis.Promise<Value | null>) | null> {
 	return $.functionValue(async (): globalThis.Promise<Value | null> => {
-		return unwrap((await newValue!() as Value | null))
+		return unwrap($.typeParamInterfaceValue<Value | null>(await newValue!(), __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [$.methodSignature("Value", [], [/* @__PURE__ */ $.basicType("int")])] }, zero: () => null }))
 	}, ({ kind: $.TypeKind.Function, params: [], results: ["main.Value"] } as $.FunctionTypeInfo))
 }
 
