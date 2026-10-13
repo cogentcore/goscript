@@ -176,6 +176,89 @@ export const UnsafePointer: Kind = 26
 const canonicalTypes = new globalThis.Map<string, Type>()
 const constructingRegisteredTypes = new globalThis.Map<string, Type>()
 
+// isIntegerKind reports whether k is a signed or unsigned integer kind.
+function isIntegerKind(k: Kind): boolean {
+  return k >= Int && k <= Uintptr
+}
+
+// isFloatKind reports whether k is a floating-point kind.
+function isFloatKind(k: Kind): boolean {
+  return k === Float32 || k === Float64
+}
+
+// convertInteger converts the numeric value x to integer kind k as a Go
+// conversion does, truncating a float toward zero and wrapping to k's width.
+function convertInteger(x: number | bigint, k: Kind): number | bigint {
+  switch (k) {
+    case Int8:
+      return $.int(x, 8)
+    case Int16:
+      return $.int(x, 16)
+    case Int32:
+      return $.int(x, 32)
+    case Int:
+      return $.int(x, 64)
+    case Int64:
+      return $.int64(x)
+    case Uint8:
+      return $.uint(x, 8)
+    case Uint16:
+      return $.uint(x, 16)
+    case Uint32:
+      return $.uint(x, 32)
+    case Uint64:
+      return $.uint64(x)
+    default:
+      // Uint and Uintptr.
+      return $.uint(x, 64)
+  }
+}
+
+// convertValue converts the raw value x of type ft to the representation
+// of type t, for Value.Convert.
+function convertValue(x: ReflectValue, ft: Type, t: Type): ReflectValue {
+  // Numbers change representation and width; an integer becomes a rune.
+  const from = ft.Kind()
+  const to = t.Kind()
+  const numeric = typeof x === 'number' || typeof x === 'bigint'
+  if (numeric && (isIntegerKind(from) || isFloatKind(from))) {
+    if (isIntegerKind(to)) {
+      return convertInteger(x, to)
+    }
+    if (to === Float32) {
+      return $.float32(x)
+    }
+    if (to === Float64) {
+      return Number(x)
+    }
+    if (to === String && isIntegerKind(from)) {
+      return $.runeToString(x)
+    }
+  }
+
+  // Strings convert to and from byte and rune slices.
+  if (from === String && typeof x === 'string' && to === Slice) {
+    if (t.Elem().Kind() === Uint8) {
+      return $.stringToBytes(x)
+    }
+    if (t.Elem().Kind() === Int32) {
+      return $.arrayToSlice($.stringToRunes(x))
+    }
+  }
+  if (from === Slice && to === String) {
+    if (x === null) {
+      return ''
+    }
+    if (ft.Elem().Kind() === Int32) {
+      return $.runesToString(x as $.Slice<number>)
+    }
+    return $.bytesToString(x as $.Slice<number>)
+  }
+
+  // Every other conversion keeps the representation.
+  return x
+}
+
 function internType(t: Type): Type {
   const key = typeIdentityKey(t)
   $.markReflectTypeIdentity(t, key)
@@ -690,12 +773,20 @@ export class Value {
   }
 
   private storeValue(value: ReflectValue): void {
+    // A float32 holds a value rounded to float32 precision, as in Go.
+    if (this.Kind() === Float32 && typeof value === 'number') {
+      value = Math.fround(value)
+    }
+
+    // A struct is copied into its existing storage.
     if (this.Kind() === Struct) {
       const target = this.currentValue()
       $.assignStruct(target, value, typeInfoFromReflectType(this._type))
       this._value = target
       return
     }
+
+    // Write the value and the storage it came from.
     this._value = value
     if (this._parentVarRef) {
       this._parentVarRef.value = value
@@ -1198,9 +1289,14 @@ export class Value {
   }
 
   // Convert method needed by iter.ts
+  // Convert returns the value v converted to type t, as a Go conversion
+  // would: numeric values change their representation and width, and
+  // strings convert to and from byte and rune slices.
   public Convert(t: Type): Value {
-    // Simple conversion - in a real implementation this would do type conversion
-    return new Value(this._value, t)
+    if (!this.IsValid()) {
+      throw new ValueError({ Kind: Invalid, Method: 'Convert' })
+    }
+    return new Value(convertValue(this.currentValue(), this.Type(), t), t)
   }
 
   // CanConvert reports whether the value is convertible to type t. The
@@ -1627,13 +1723,7 @@ export class Value {
         'reflect: call of reflect.Value.SetFloat on ' + k + ' Value',
       )
     }
-    this._value = x
-    if (this._parentVarRef) {
-      this._parentVarRef.value = x
-    }
-    if (this._parentStruct && this._fieldName) {
-      this._parentStruct[this._fieldName] = x
-    }
+    this.storeValue(x)
   }
 
   // SetComplex sets v's underlying value to x
