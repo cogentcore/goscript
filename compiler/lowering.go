@@ -1000,6 +1000,15 @@ func (o *LoweringOwner) analyzeLocalFileReferences(
 		}
 	}
 	inspect := func(node ast.Node) bool {
+		// Instantiations pass descriptors of their type arguments, with zero
+		// value constructors and method tables, which use the types as values.
+		if ident, ok := node.(*ast.Ident); ok {
+			if instance, ok := semPkg.source.TypesInfo.Instances[ident]; ok && instance.TypeArgs != nil {
+				for typeArg := range instance.TypeArgs.Types() {
+					addRuntimeTypeDeps(typeArg)
+				}
+			}
+		}
 		switch typed := node.(type) {
 		case *ast.ValueSpec:
 			if len(typed.Values) == 0 && typed.Type != nil {
