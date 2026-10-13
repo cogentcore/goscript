@@ -9,7 +9,7 @@ Sprintln result:Sprintln result
 Error: error code: 404
 Boolean: true
 Integer: 123
-Float: 3.14159
+Float: 3.141590
 String: hello
 Type: int
 Value: [1 2 3]

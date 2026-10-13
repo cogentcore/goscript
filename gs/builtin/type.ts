@@ -1344,7 +1344,9 @@ export function isArrayValue(value: unknown): boolean {
 }
 
 // arrayValueTypeInfo returns the descriptor a marked array value carries.
-function arrayValueTypeInfo(value: object): string | TypeInfo | undefined {
+export function arrayValueTypeInfo(
+  value: object,
+): string | TypeInfo | undefined {
   const info = (value as any)[ARRAY_VALUE_TYPE]
   return info === true ? undefined : info
 }

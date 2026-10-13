@@ -1256,6 +1256,18 @@ function marshalFieldValue(value: unknown, fieldType: unknown): unknown {
     }
     return new RawJSON(stripJSONWhitespace(raw))
   }
+  // Go encodes a float32 with the shortest digits that round trip at 32 bits;
+  // the float64 nearest those digits serializes with the same digits.
+  const info = resolveTypeInfo(fieldType)
+  if (
+    typeof value === 'number' &&
+    Number.isFinite(value) &&
+    info !== null &&
+    info.kind === $.TypeKind.Basic &&
+    info.name === 'float32'
+  ) {
+    return Number($.formatFloat(value, 'g', -1, 32))
+  }
   return marshalValue(value)
 }
 
@@ -1474,6 +1486,14 @@ function assignDecodedFieldValue(
         return
       }
     }
+    if (
+      typeof decoded === 'number' &&
+      info.kind === $.TypeKind.Basic &&
+      info.name === 'float32'
+    ) {
+      target.value = Math.fround(decoded)
+      return
+    }
   }
   assignDecodedValue(target, decoded, opts)
 }
@@ -1606,6 +1626,14 @@ function decodeValueForType(
       out.set(key, decodeValueForType(value, info.elemType, opts))
     }
     return out
+  }
+  // float32 values are float64 numbers rounded to float32 precision.
+  if (
+    typeof decoded === 'number' &&
+    info.kind === $.TypeKind.Basic &&
+    info.name === 'float32'
+  ) {
+    return Math.fround(decoded)
   }
   // Basic / other kinds: passthrough (RawMessage and []byte-as-base64 are
   // handled by the caller before reaching the generic decoder).
