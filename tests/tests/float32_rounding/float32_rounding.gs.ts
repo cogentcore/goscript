@@ -7,16 +7,16 @@ export async function main(): globalThis.Promise<void> {
 	let sum32: number = 0
 	let sum64: number = 0
 	for (let __rangeIndex = 0; __rangeIndex < 10; __rangeIndex++) {
-		sum32 = $.float32(sum32 + (0.1))
+		sum32 = $.float32(sum32 + (0.10000000149011612))
 		sum64 = sum64 + (0.1)
 	}
 	await $.println("sum32:", sum32)
 	await $.println("sum64:", sum64)
 
-	let onePointOne32 = $.float32(1.1)
+	let onePointOne32 = 1.100000023841858
 	await $.println("widened32:", onePointOne32)
 
-	let max32: number = 3.4028234663852886e38
+	let max32: number = 3.4028234663852886e+38
 	let overflow32 = $.float32(max32 * 2)
 	let finite64 = max32 * 2
 	await $.println("overflow32:", overflow32)

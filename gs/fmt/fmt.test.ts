@@ -346,7 +346,7 @@ describe('fmt spacing rules', () => {
 describe('fmt parseFormat basic cases', () => {
   it('Printf with %d, %s, %f, width and precision', async () => {
     expect(await fmt.Sprintf('n=%d s=%s f=%f', 42, 'ok', 3.5)).toBe(
-      'n=42 s=ok f=3.5',
+      'n=42 s=ok f=3.500000',
     )
     expect(await fmt.Sprintf("'%5s'", 'hi')).toBe("'   hi'")
     expect(await fmt.Sprintf("'%-.3f'", 3.14159)).toBe("'3.142'") // JS rounds

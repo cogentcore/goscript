@@ -102,35 +102,56 @@ export function FormatFloat(f: number, fmt: number, prec: number, bitSize: numbe
 		return (neg ? "-" : "") + formatHexFloat(Math.abs(f), prec, fmtChar === 'X');
 	}
 
-	switch (fmtChar.toLowerCase()) {
+	switch (fmtChar) {
 		case 'e':
-			// Exponential notation
-			if (prec < 0) {
-				return f.toExponential();
-			}
-			return f.toExponential(prec);
-
+		case 'E':
 		case 'f':
-			// Fixed-point notation
-			if (prec < 0) {
-				return f.toString();
-			}
-			return f.toFixed(prec);
-
+		case 'F':
 		case 'g':
-			// Use the more compact of 'e' or 'f'
-			if (prec < 0) {
-				return f.toPrecision();
-			}
-			return f.toPrecision(prec + 1);
+		case 'G':
+			return $.formatFloat(f, fmtChar === 'F' ? 'f' : fmtChar, prec, bitSize);
+
+		case 'b':
+			return formatBinaryFloat(f, bitSize);
 
 		default:
-			// Default to 'g' format
-			if (prec < 0) {
-				return f.toString();
-			}
-			return f.toPrecision(prec + 1);
+			return "%" + fmtChar;
 	}
+}
+
+// formatBinaryFloat renders f in Go's 'b' format, -ddddp±ddd, a decimal
+// integer mantissa and a binary exponent at the given bit size.
+function formatBinaryFloat(f: number, bitSize: number): string {
+	let neg: boolean;
+	let mant: bigint;
+	let exp: number;
+	if (bitSize === 32) {
+		hexConv.setFloat32(0, f);
+		const bits = hexConv.getUint32(0);
+		neg = (bits >>> 31) === 1;
+		exp = (bits >>> 23) & 0xff;
+		mant = BigInt(bits & 0x7fffff);
+		if (exp === 0) {
+			exp++;
+		} else {
+			mant |= 1n << 23n;
+		}
+		exp += -127 - 23;
+	} else {
+		hexConv.setFloat64(0, f);
+		const hi = hexConv.getUint32(0);
+		const lo = hexConv.getUint32(4);
+		neg = (hi >>> 31) === 1;
+		exp = (hi >>> 20) & 0x7ff;
+		mant = (BigInt(hi & 0xfffff) << 32n) | BigInt(lo >>> 0);
+		if (exp === 0) {
+			exp++;
+		} else {
+			mant |= 1n << 52n;
+		}
+		exp += -1023 - 52;
+	}
+	return (neg ? "-" : "") + mant.toString() + "p" + (exp >= 0 ? "+" : "") + String(exp);
 }
 
 // AppendFloat appends the string form of the floating-point number f,
