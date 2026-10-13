@@ -1547,6 +1547,12 @@ function assignDecodedFieldValue(
   // falls through to the untouched generic path exactly as before.
   const info = resolveTypeInfo(fieldType)
   if (info !== null) {
+    // A []byte field decodes from a base64 string even when it is nil, and
+    // so holds no Uint8Array for the generic path to recognize.
+    if (isByteSliceTypeInfo(info) && typeof decoded === 'string') {
+      target.value = base64Decode(decoded)
+      return
+    }
     if ($.isSliceTypeInfo(info) && Array.isArray(decoded)) {
       target.value = decodeValueForType(decoded, info, opts)
       return
@@ -1709,6 +1715,9 @@ function decodeValueForType(
     return $.markAsStructValue(inst)
   }
   if ($.isSliceTypeInfo(info)) {
+    if (isByteSliceTypeInfo(info) && typeof decoded === 'string') {
+      return base64Decode(decoded)
+    }
     if (!Array.isArray(decoded)) {
       return decoded
     }
@@ -2149,6 +2158,20 @@ function base64Encode(data: Uint8Array): string {
     binary += String.fromCharCode(byte)
   }
   return btoa(binary)
+}
+
+// isByteSliceTypeInfo reports whether info describes a []byte, which JSON
+// encodes as a base64 string.
+function isByteSliceTypeInfo(info: $.TypeInfo): boolean {
+  if (!$.isSliceTypeInfo(info)) {
+    return false
+  }
+  const elem = resolveTypeInfo(info.elemType)
+  const name =
+    elem === null ? info.elemType
+    : $.isBasicTypeInfo(elem) ? elem.name
+    : undefined
+  return name === 'uint8' || name === 'byte'
 }
 
 function base64Decode(text: string): Uint8Array {
