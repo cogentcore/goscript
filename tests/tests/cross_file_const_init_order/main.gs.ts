@@ -6,6 +6,8 @@ import * as $ from "@goscript/builtin/index.js"
 import * as __goscript_consts from "./consts.gs.ts"
 
 import * as __goscript_register from "./register.gs.ts"
+
+import * as __goscript_package_init from "./__goscript_package_init.gs.ts"
 import "./consts.gs.ts"
 import "./register.gs.ts"
 
@@ -13,6 +15,8 @@ export async function main(): globalThis.Promise<void> {
 	__goscript_consts.__goscript_get_Default()
 	await $.println("seen:", __goscript_register.Seen)
 }
+
+await __goscript_package_init.__goscript_package_init()
 
 if ($.isMainScript(import.meta)) {
 	await main()

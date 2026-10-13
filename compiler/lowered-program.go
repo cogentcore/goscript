@@ -1,6 +1,9 @@
 package compiler
 
-import "go/token"
+import (
+	"go/token"
+	"go/types"
+)
 
 // LoweredProgram is the compiler-owned IR consumed by TypeScript emission.
 type LoweredProgram struct {
@@ -12,6 +15,9 @@ type loweredPackage struct {
 	pkgPath string
 	name    string
 	files   []*loweredFile
+	// initModule is whether the package has a package init module
+	// (see [lowerPackageInit]).
+	initModule bool
 }
 
 type loweredFile struct {
@@ -23,6 +29,34 @@ type loweredFile struct {
 	typeExports []string
 	exportAll   bool
 	sideEffect  bool
+	// varInits initialize the lazily initialized package variables declared
+	// in this file.
+	varInits []packageInitCall
+	// initFuncs call the init functions declared in this file.
+	initFuncs []packageInitCall
+}
+
+// packageInitCall is a call that initializes a package: the initializer of a
+// lazily initialized package variable, or an init function.
+type packageInitCall struct {
+	// obj is the package variable the call initializes, or nil for an init
+	// function.
+	obj   types.Object
+	name  string
+	async bool
+}
+
+// code returns the statement that makes the call, qualified by the module
+// alias when it is not empty.
+func (c packageInitCall) code(module string) string {
+	call := c.name + "()"
+	if module != "" {
+		call = module + "." + call
+	}
+	if c.async {
+		return "await " + call
+	}
+	return call
 }
 
 type loweredImport struct {
@@ -57,9 +91,11 @@ type loweredDecl struct {
 	indexExport     string
 	typeIndexExport string
 	sideEffect      bool
-	packageInitCall string
-	function        *loweredFunction
-	structType      *loweredStruct
+	// packageInit is the call that initializes the package variable the
+	// declaration declares, run by [lowerPackageInit] instead of emitted.
+	packageInit *packageInitCall
+	function    *loweredFunction
+	structType  *loweredStruct
 }
 
 type loweredStruct struct {

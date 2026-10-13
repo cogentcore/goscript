@@ -227,7 +227,115 @@ func (o *LoweringOwner) lowerPackage(
 	slices.SortFunc(loweredPkg.files, func(a, b *loweredFile) int {
 		return cmp.Compare(a.outputName, b.outputName)
 	})
+	lowerPackageInit(semPkg, loweredPkg)
 	return loweredPkg, diagnostics
+}
+
+// packageInitModule is the output name of the module that initializes a
+// package with more than one file (see [lowerPackageInit]).
+const packageInitModule = "__goscript_package_init.gs.ts"
+
+// lowerPackageInit arranges the initialization of the lazily initialized
+// package variables and the init function calls of the package. Go
+// initializes the package variables of all files in dependency order before
+// calling the init functions in file order. A package with a single file runs
+// them at the end of its module. The files of a package with more than one
+// file can import each other in a cycle, so a file module can be evaluated
+// before another file's declarations, such as a struct class used by an init
+// function. Therefore a package init module, imported by the package index and
+// by the file with the main function, runs them once all of the files have
+// been evaluated.
+func lowerPackageInit(semPkg *semanticPackage, pkg *loweredPackage) {
+	// fileCall is a call and the file that declares its function.
+	type fileCall struct {
+		file *loweredFile
+		call packageInitCall
+	}
+
+	// Order the variable initializers by InitOrder, where variables without
+	// initializers do not appear and so come first, then the init functions.
+	order := make(map[types.Object]int)
+	if semPkg.source != nil && semPkg.source.TypesInfo != nil {
+		for idx, initializer := range semPkg.source.TypesInfo.InitOrder {
+			for _, lhs := range initializer.Lhs {
+				order[lhs] = idx + 1
+			}
+		}
+	}
+	var varInits, initFuncs []fileCall
+	for _, file := range pkg.files {
+		for _, call := range file.varInits {
+			varInits = append(varInits, fileCall{file: file, call: call})
+		}
+		for _, call := range file.initFuncs {
+			initFuncs = append(initFuncs, fileCall{file: file, call: call})
+		}
+	}
+	slices.SortStableFunc(varInits, func(a, b fileCall) int {
+		return cmp.Compare(order[a.call.obj], order[b.call.obj])
+	})
+	calls := slices.Concat(varInits, initFuncs)
+	if len(calls) == 0 {
+		return
+	}
+
+	// A single file runs the calls at the end of its module.
+	if len(pkg.files) == 1 {
+		file := pkg.files[0]
+		for _, c := range calls {
+			file.decls = append(file.decls, loweredDecl{code: c.call.code("")})
+		}
+		return
+	}
+
+	// The package init module imports each file that declares a call, and
+	// runs the calls once.
+	initModule := &loweredFile{outputName: packageInitModule}
+	aliases := make(map[*loweredFile]string)
+	body := []string{"if (initialized) {\n\t\treturn\n\t}", "initialized = true"}
+	for _, c := range calls {
+		alias, ok := aliases[c.file]
+		if !ok {
+			alias = "__goscript_file" + strconv.Itoa(len(aliases))
+			aliases[c.file] = alias
+			initModule.imports = append(initModule.imports, loweredImport{
+				alias:  alias,
+				source: "./" + c.file.outputName,
+			})
+		}
+		if c.call.obj == nil {
+			c.file.decls = append(c.file.decls, loweredDecl{code: "export { " + c.call.name + " }"})
+		}
+		body = append(body, c.call.code(alias))
+	}
+	initModule.decls = []loweredDecl{
+		{code: "let initialized = false"},
+		{code: "export async function __goscript_package_init(): globalThis.Promise<void> {\n\t" +
+			strings.Join(body, "\n\t") + "\n}"},
+	}
+
+	// Runners import the file with the main function directly, so it awaits
+	// the package init module as well.
+	if pkg.name == "main" {
+		for _, file := range pkg.files {
+			if slices.ContainsFunc(file.decls, isMainFunctionDecl) {
+				file.imports = append(file.imports, loweredImport{
+					alias:  "__goscript_package_init",
+					source: "./" + packageInitModule,
+				})
+				file.decls = append(file.decls, loweredDecl{
+					code: "await __goscript_package_init.__goscript_package_init()",
+				})
+			}
+		}
+	}
+	pkg.files = append(pkg.files, initModule)
+	pkg.initModule = true
+}
+
+// isMainFunctionDecl reports whether decl declares the main function.
+func isMainFunctionDecl(decl loweredDecl) bool {
+	return decl.function != nil && decl.function.name == "main"
 }
 
 func sourceFilePath(semPkg *semanticPackage, idx int, file *ast.File) string {
@@ -438,11 +546,11 @@ func (o *LoweringOwner) lowerFile(req lowerFileRequest) (*loweredFile, []Diagnos
 		trimTypeInfo:      trimTypeInfo,
 		displayRoot:       displayRoot,
 	}
-	var packageInitCalls []string
 	appendDecls := func(decls []loweredDecl) {
 		for _, decl := range decls {
-			if decl.packageInitCall != "" {
-				packageInitCalls = append(packageInitCalls, decl.packageInitCall)
+			if decl.packageInit != nil {
+				loweredFile.sideEffect = true
+				loweredFile.varInits = append(loweredFile.varInits, *decl.packageInit)
 				continue
 			}
 			loweredFile.decls = append(loweredFile.decls, decl)
@@ -478,20 +586,15 @@ func (o *LoweringOwner) lowerFile(req lowerFileRequest) (*loweredFile, []Diagnos
 			lowerDecl(decl)
 		}
 	}
-	for _, call := range packageInitCalls {
-		loweredFile.sideEffect = true
-		loweredFile.decls = append(loweredFile.decls, loweredDecl{code: "await " + call})
-	}
 	for _, decl := range loweredFile.decls {
 		if decl.function == nil || !decl.function.init {
 			continue
 		}
-		call := decl.function.name + "()"
-		if decl.function.async {
-			call = "await " + call
-		}
 		loweredFile.sideEffect = true
-		loweredFile.decls = append(loweredFile.decls, loweredDecl{code: call})
+		loweredFile.initFuncs = append(loweredFile.initFuncs, packageInitCall{
+			name:  decl.function.name,
+			async: decl.function.async,
+		})
 	}
 	return loweredFile, diagnostics
 }
@@ -1554,12 +1657,7 @@ func (o *LoweringOwner) lowerGenDecl(ctx lowerFileContext, decl *ast.GenDecl) ([
 							"if (((" + declName + ") as any) === undefined) {\n\t\t" +
 							declName + " = " + value + "\n\t}\n}"
 						decls = append(decls, loweredDecl{code: initCode, indexExport: initIndexExport})
-						readDrivenInit := idx < len(typed.Values) &&
-							asyncLazyInitializerReferencesCyclicOtherFile(ctx, typed.Values[idx]) &&
-							!packageInitFunctionReferencesObject(ctx, obj)
-						if !readDrivenInit {
-							decls = append(decls, loweredDecl{packageInitCall: initName + "()"})
-						}
+						decls = append(decls, loweredDecl{packageInit: &packageInitCall{obj: obj, name: initName, async: true}})
 						getterCode += "if (((" + declName + ") as any) === undefined) {\n\t\t" +
 							"throw new globalThis.Error(" + strconv.Quote("goscript package variable "+name.Name+" read before initialization") + ")\n\t}\n"
 					} else {
@@ -1567,6 +1665,7 @@ func (o *LoweringOwner) lowerGenDecl(ctx lowerFileContext, decl *ast.GenDecl) ([
 							"if (((" + declName + ") as any) === undefined) {\n\t\t" +
 							declName + " = " + value + "\n\t}\n}"
 						decls = append(decls, loweredDecl{code: initCode, indexExport: initIndexExport})
+						decls = append(decls, loweredDecl{packageInit: &packageInitCall{obj: obj, name: initName}})
 						getterCode += "if (((" + declName + ") as any) === undefined) {\n\t\t" +
 							initName + "()\n\t}\n"
 					}
@@ -2110,55 +2209,6 @@ func initializerCallsFunctionReferencingLaterPackageVar(
 	return references
 }
 
-func asyncLazyInitializerReferencesCyclicOtherFile(ctx lowerFileContext, expr ast.Expr) bool {
-	if ctx.semPkg == nil || ctx.semPkg.source == nil || expr == nil {
-		return false
-	}
-	declFiles := packageDeclFiles(ctx.semPkg)
-	for otherFile := range initializerReferencedOtherFiles(ctx.semPkg, declFiles, ctx.sourcePath, expr) {
-		if fileRuntimeReferencesSourceFile(ctx.semPkg, declFiles, otherFile, ctx.sourcePath) {
-			return true
-		}
-	}
-	return false
-}
-
-func packageInitFunctionReferencesObject(ctx lowerFileContext, obj types.Object) bool {
-	if obj == nil || ctx.semPkg == nil || ctx.semPkg.source == nil {
-		return false
-	}
-	references := false
-	for _, file := range ctx.semPkg.source.Syntax {
-		for _, decl := range file.Decls {
-			fnDecl, ok := decl.(*ast.FuncDecl)
-			if !ok || fnDecl.Recv != nil || fnDecl.Name == nil || fnDecl.Name.Name != "init" || fnDecl.Body == nil {
-				continue
-			}
-			ast.Inspect(fnDecl.Body, func(node ast.Node) bool {
-				if references {
-					return false
-				}
-				if _, ok := node.(*ast.FuncLit); ok {
-					return false
-				}
-				ident, ok := node.(*ast.Ident)
-				if !ok {
-					return true
-				}
-				if ctx.semPkg.source.TypesInfo.Uses[ident] == obj {
-					references = true
-					return false
-				}
-				return true
-			})
-			if references {
-				return true
-			}
-		}
-	}
-	return false
-}
-
 func initializerCallsFunctionReferencingOtherFileObject(
 	semPkg *semanticPackage,
 	declFiles map[types.Object]string,
@@ -2236,231 +2286,6 @@ func functionReferencesLaterPackageVar(
 		return true
 	})
 	return references
-}
-
-func initializerReferencedOtherFiles(
-	semPkg *semanticPackage,
-	declFiles map[types.Object]string,
-	sourcePath string,
-	expr ast.Expr,
-) map[string]bool {
-	refs := make(map[string]bool)
-	ast.Inspect(expr, func(node ast.Node) bool {
-		if _, ok := node.(*ast.FuncLit); ok {
-			return false
-		}
-		collectOtherFileReferences(semPkg, declFiles, sourcePath, node, refs)
-		call, ok := node.(*ast.CallExpr)
-		if !ok {
-			return true
-		}
-		fn := calledFunction(semPkg.source, call.Fun)
-		if fn == nil || fn.Pkg() == nil || fn.Pkg().Path() != semPkg.pkgPath {
-			return true
-		}
-		collectFunctionOtherFileReferences(semPkg, declFiles, sourcePath, fn, nil, refs)
-		return true
-	})
-	return refs
-}
-
-func collectFunctionOtherFileReferences(
-	semPkg *semanticPackage,
-	declFiles map[types.Object]string,
-	sourcePath string,
-	fn *types.Func,
-	seen map[*types.Func]bool,
-	refs map[string]bool,
-) {
-	if fn == nil {
-		return
-	}
-	if seen == nil {
-		seen = make(map[*types.Func]bool)
-	}
-	if seen[fn] {
-		return
-	}
-	seen[fn] = true
-	fnDecl := functionDeclForObject(semPkg, fn)
-	if fnDecl == nil || fnDecl.Body == nil {
-		return
-	}
-	ast.Inspect(fnDecl.Body, func(node ast.Node) bool {
-		if _, ok := node.(*ast.FuncLit); ok {
-			return false
-		}
-		collectOtherFileReferences(semPkg, declFiles, sourcePath, node, refs)
-		if call, ok := node.(*ast.CallExpr); ok {
-			called := calledFunction(semPkg.source, call.Fun)
-			if called != nil && called.Pkg() != nil && called.Pkg().Path() == semPkg.pkgPath {
-				collectFunctionOtherFileReferences(semPkg, declFiles, sourcePath, called, seen, refs)
-			}
-		}
-		return true
-	})
-}
-
-func collectOtherFileReferences(
-	semPkg *semanticPackage,
-	declFiles map[types.Object]string,
-	sourcePath string,
-	node ast.Node,
-	refs map[string]bool,
-) {
-	if node == nil {
-		return
-	}
-	if lit, ok := node.(*ast.CompositeLit); ok {
-		collectOtherFileTypeReferences(semPkg, declFiles, sourcePath, semPkg.source.TypesInfo.TypeOf(lit), refs, make(map[types.Type]bool))
-	}
-	switch typed := node.(type) {
-	case *ast.Ident:
-		collectOtherFileObjectReference(declFiles, sourcePath, semPkg.source.TypesInfo.Uses[typed], refs)
-	case *ast.SelectorExpr:
-		collectOtherFileObjectReference(declFiles, sourcePath, semPkg.source.TypesInfo.Uses[typed.Sel], refs)
-		if selection := semPkg.source.TypesInfo.Selections[typed]; selection != nil {
-			collectOtherFileObjectReference(declFiles, sourcePath, selection.Obj(), refs)
-		}
-	}
-}
-
-func collectOtherFileObjectReference(
-	declFiles map[types.Object]string,
-	sourcePath string,
-	obj types.Object,
-	refs map[string]bool,
-) {
-	if obj == nil || obj.Pkg() == nil {
-		return
-	}
-	if declFile := declFiles[obj]; declFile != "" && declFile != sourcePath {
-		refs[declFile] = true
-	}
-}
-
-func collectOtherFileTypeReferences(
-	semPkg *semanticPackage,
-	declFiles map[types.Object]string,
-	sourcePath string,
-	typ types.Type,
-	refs map[string]bool,
-	seen map[types.Type]bool,
-) {
-	if typ == nil || seen[typ] {
-		return
-	}
-	seen[typ] = true
-	if named := namedStructType(typ); named != nil {
-		collectOtherFileObjectReference(declFiles, sourcePath, named.Obj(), refs)
-	}
-	switch typed := types.Unalias(typ).Underlying().(type) {
-	case *types.Array:
-		collectOtherFileTypeReferences(semPkg, declFiles, sourcePath, typed.Elem(), refs, seen)
-	case *types.Slice:
-		collectOtherFileTypeReferences(semPkg, declFiles, sourcePath, typed.Elem(), refs, seen)
-	case *types.Pointer:
-		collectOtherFileTypeReferences(semPkg, declFiles, sourcePath, typed.Elem(), refs, seen)
-	case *types.Map:
-		collectOtherFileTypeReferences(semPkg, declFiles, sourcePath, typed.Key(), refs, seen)
-		collectOtherFileTypeReferences(semPkg, declFiles, sourcePath, typed.Elem(), refs, seen)
-	case *types.Struct:
-		for field := range typed.Fields() {
-			collectOtherFileTypeReferences(semPkg, declFiles, sourcePath, field.Type(), refs, seen)
-		}
-	}
-}
-
-func fileRuntimeReferencesSourceFile(
-	semPkg *semanticPackage,
-	declFiles map[types.Object]string,
-	filePath string,
-	sourcePath string,
-) bool {
-	if semPkg == nil || semPkg.source == nil || filePath == "" || sourcePath == "" {
-		return false
-	}
-	for idx, file := range semPkg.source.Syntax {
-		if sourceFilePath(semPkg, idx, file) != filePath {
-			continue
-		}
-		references := false
-		ast.Inspect(file, func(node ast.Node) bool {
-			if references {
-				return false
-			}
-			if _, ok := node.(*ast.FuncLit); ok {
-				return false
-			}
-			if lit, ok := node.(*ast.CompositeLit); ok &&
-				typeReferencesSourceFile(semPkg, declFiles, lit, sourcePath) {
-				references = true
-				return false
-			}
-			if ident, ok := node.(*ast.Ident); ok &&
-				valueIdentReferencesSourceFile(semPkg, declFiles, ident, sourcePath) {
-				references = true
-				return false
-			}
-			if selector, ok := node.(*ast.SelectorExpr); ok {
-				if valueSelectorReferencesSourceFile(semPkg, declFiles, selector, sourcePath) {
-					references = true
-					return false
-				}
-			}
-			if call, ok := node.(*ast.CallExpr); ok {
-				called := calledFunction(semPkg.source, call.Fun)
-				if called != nil && declFiles[called] == sourcePath {
-					references = true
-					return false
-				}
-			}
-			return true
-		})
-		return references
-	}
-	return false
-}
-
-func valueIdentReferencesSourceFile(
-	semPkg *semanticPackage,
-	declFiles map[types.Object]string,
-	ident *ast.Ident,
-	sourcePath string,
-) bool {
-	if tv, ok := semPkg.source.TypesInfo.Types[ident]; ok && !tv.IsValue() {
-		return false
-	}
-	return declFiles[semPkg.source.TypesInfo.Uses[ident]] == sourcePath
-}
-
-func valueSelectorReferencesSourceFile(
-	semPkg *semanticPackage,
-	declFiles map[types.Object]string,
-	selector *ast.SelectorExpr,
-	sourcePath string,
-) bool {
-	if tv, ok := semPkg.source.TypesInfo.Types[selector]; ok && !tv.IsValue() {
-		return false
-	}
-	if declFiles[semPkg.source.TypesInfo.Uses[selector.Sel]] == sourcePath {
-		return true
-	}
-	if selection := semPkg.source.TypesInfo.Selections[selector]; selection != nil {
-		return declFiles[selection.Obj()] == sourcePath
-	}
-	return false
-}
-
-func typeReferencesSourceFile(
-	semPkg *semanticPackage,
-	declFiles map[types.Object]string,
-	expr ast.Expr,
-	sourcePath string,
-) bool {
-	refs := make(map[string]bool)
-	collectOtherFileTypeReferences(semPkg, declFiles, "", semPkg.source.TypesInfo.TypeOf(expr), refs, make(map[types.Type]bool))
-	return refs[sourcePath]
 }
 
 func functionReferencesOtherFileObject(

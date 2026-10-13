@@ -4,6 +4,8 @@
 import * as $ from "@goscript/builtin/index.js"
 
 import * as __goscript_b from "./b.gs.ts"
+
+import * as __goscript_package_init from "./__goscript_package_init.gs.ts"
 import "./b.gs.ts"
 
 export class holder {
@@ -62,6 +64,8 @@ export async function useFirst(): globalThis.Promise<number> {
 export async function main(): globalThis.Promise<void> {
 	await $.println("main:", await useFirst())
 }
+
+await __goscript_package_init.__goscript_package_init()
 
 if ($.isMainScript(import.meta)) {
 	await main()

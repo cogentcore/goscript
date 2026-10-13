@@ -16,6 +16,7 @@
   },
   "extends": "../../../tests/tsconfig.base.json",
   "include": [
+    "__goscript_package_init.gs.ts",
     "index.ts",
     "load.gs.ts",
     "package_var_error_name.gs.ts"

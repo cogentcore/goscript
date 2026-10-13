@@ -6,6 +6,8 @@ import * as $ from "@goscript/builtin/index.js"
 import * as dep from "@goscript/github.com/s4wave/goscript/tests/tests/import_package_var_assign/dep/index.js"
 
 import * as __goscript_vars from "./vars.gs.ts"
+
+import * as __goscript_package_init from "./__goscript_package_init.gs.ts"
 import "@goscript/github.com/s4wave/goscript/tests/tests/import_package_var_assign/dep/index.js"
 import "./vars.gs.ts"
 
@@ -94,6 +96,8 @@ export async function main(): globalThis.Promise<void> {
 	importedPtr!.value = 8
 	await $.println($.int(dep.__goscript_get_UserLevel().value), $.pointerValue<dep.Level>(dep.UserPtr()))
 }
+
+await __goscript_package_init.__goscript_package_init()
 
 if ($.isMainScript(import.meta)) {
 	await main()

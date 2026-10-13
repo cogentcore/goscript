@@ -4,6 +4,8 @@
 import * as $ from "@goscript/builtin/index.js"
 
 import * as __goscript_load from "./load.gs.ts"
+
+import * as __goscript_package_init from "./__goscript_package_init.gs.ts"
 import "./load.gs.ts"
 
 export let Error: $.GoError = null! as $.GoError
@@ -56,6 +58,8 @@ export async function main(): globalThis.Promise<void> {
 		return __goscriptSelect0Value
 	}
 }
+
+await __goscript_package_init.__goscript_package_init()
 
 if ($.isMainScript(import.meta)) {
 	await main()
