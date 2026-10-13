@@ -55,12 +55,12 @@ export async function main(): globalThis.Promise<void> {
 	let typ = reflect.TypeOf($.interfaceValue($.markAsStructValue(new item()), "main.item", "main.item"))
 	for (let i = 0; i < await $.pointerValue<Exclude<reflect.Type, null>>(typ).NumField(); i++) {
 		let f = $.markAsStructValue($.cloneStructValue(await $.pointerValue<Exclude<reflect.Type, null>>(typ).Field(i)))
-		await $.println(f.Name, tagLen(f.Tag), $.stringEqual(String(f.Tag), ""))
+		await $.println(f.Name, tagLen(f.Tag), $.stringEqual(globalThis.String(f.Tag), ""))
 		await $.println(" json:", reflect.StructTag_Get(f.Tag, "json"))
 		await $.println(" desc:", reflect.StructTag_Get(f.Tag, "desc"))
 		let [def, ok] = reflect.StructTag_Lookup(f.Tag, "default")
 		await $.println(" default:", def, ok)
-		await $.println(" fields:", $.len(strings.Fields(String(f.Tag))))
+		await $.println(" fields:", $.len(strings.Fields(globalThis.String(f.Tag))))
 	}
 	let tag: reflect.StructTag = "a:\"1\" b:\"two words\""
 	await $.println(reflect.StructTag_Get(tag, "b"), $.stringEqual(tag, "a:\"1\" b:\"two words\""))

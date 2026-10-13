@@ -185,7 +185,7 @@ export function encode(rs: $.Slice<number>): string {
 	__goscriptLoop0: for (let __goscriptRangeTarget1 = rs, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget1); __rangeIndex++) {
 		let r = $.int(__goscriptRangeTarget1![__rangeIndex], 32)
 		if ($.int(r, 32) < 0x80) {
-			out = out + (String.fromCodePoint(r))
+			out = out + (globalThis.String.fromCodePoint(r))
 			continue __goscriptLoop0
 		}
 		let __goscriptGotoState1 = "__entry"
@@ -216,7 +216,7 @@ export function encode(rs: $.Slice<number>): string {
 						__goscriptGotoState1 = "terminate"
 						continue __goscriptGotoLoop1
 					}
-					out = out + (("[" + String.fromCodePoint($.int(65 + (c0 % 26), 32))) + "]")
+					out = out + (("[" + globalThis.String.fromCodePoint($.int(65 + (c0 % 26), 32))) + "]")
 					break __goscriptGotoLoop1
 					break
 				}

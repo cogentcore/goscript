@@ -10,8 +10,8 @@ export async function main(): globalThis.Promise<void> {
 	let maxVal = ""
 	let minVal = "~"
 	for (const [__rangeIndex, c] of $.rangeString("3215A")) {
-		maxVal = (() => { const __goscriptMinMax0 = String.fromCodePoint(c); const __goscriptMinMax1 = maxVal; let __goscriptMinMax2 = __goscriptMinMax0; __goscriptMinMax2 = $.stringCompare(__goscriptMinMax2, __goscriptMinMax1) >= 0 ? __goscriptMinMax2 : __goscriptMinMax1; return __goscriptMinMax2 })()
-		minVal = (() => { const __goscriptMinMax3 = String.fromCodePoint(c); const __goscriptMinMax4 = minVal; let __goscriptMinMax5 = __goscriptMinMax3; __goscriptMinMax5 = $.stringCompare(__goscriptMinMax5, __goscriptMinMax4) <= 0 ? __goscriptMinMax5 : __goscriptMinMax4; return __goscriptMinMax5 })()
+		maxVal = (() => { const __goscriptMinMax0 = globalThis.String.fromCodePoint(c); const __goscriptMinMax1 = maxVal; let __goscriptMinMax2 = __goscriptMinMax0; __goscriptMinMax2 = $.stringCompare(__goscriptMinMax2, __goscriptMinMax1) >= 0 ? __goscriptMinMax2 : __goscriptMinMax1; return __goscriptMinMax2 })()
+		minVal = (() => { const __goscriptMinMax3 = globalThis.String.fromCodePoint(c); const __goscriptMinMax4 = minVal; let __goscriptMinMax5 = __goscriptMinMax3; __goscriptMinMax5 = $.stringCompare(__goscriptMinMax5, __goscriptMinMax4) <= 0 ? __goscriptMinMax5 : __goscriptMinMax4; return __goscriptMinMax5 })()
 	}
 	await $.println("loop:", maxVal, minVal)
 

@@ -62,26 +62,26 @@ export async function main(): globalThis.Promise<void> {
 }
 
 export async function checkUint32(x: number, y: number, want: number): globalThis.Promise<void> {
-	let got = $.uint(Math.imul(x, y) >>> 0, 32)
+	let got = $.uint(globalThis.Math.imul(x, y) >>> 0, 32)
 	if ($.uint(got, 32) != $.uint(want, 32)) {
 		await $.println("uint32", $.uint(x, 32), "*", $.uint(y, 32), "got", $.uint(got, 32), "want", $.uint(want, 32))
 	}
 
 	let compound = $.uint(x, 32)
-	compound = Math.imul(compound, $.uint(y, 32)) >>> 0
+	compound = globalThis.Math.imul(compound, $.uint(y, 32)) >>> 0
 	if ($.uint(compound, 32) != $.uint(want, 32)) {
 		await $.println("uint32 *=", $.uint(x, 32), "*", $.uint(y, 32), "got", $.uint(compound, 32), "want", $.uint(want, 32))
 	}
 }
 
 export async function checkInt32(x: number, y: number, want: number): globalThis.Promise<void> {
-	let got = $.int(Math.imul(x, y), 32)
+	let got = $.int(globalThis.Math.imul(x, y), 32)
 	if ($.int(got, 32) != $.int(want, 32)) {
 		await $.println("int32", $.int(x, 32), "*", $.int(y, 32), "got", $.int(got, 32), "want", $.int(want, 32))
 	}
 
 	let compound = $.int(x, 32)
-	compound = Math.imul(compound, $.int(y, 32))
+	compound = globalThis.Math.imul(compound, $.int(y, 32))
 	if ($.int(compound, 32) != $.int(want, 32)) {
 		await $.println("int32 *=", $.int(x, 32), "*", $.int(y, 32), "got", $.int(compound, 32), "want", $.int(want, 32))
 	}

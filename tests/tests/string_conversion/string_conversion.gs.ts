@@ -10,15 +10,15 @@ export async function main(): globalThis.Promise<void> {
 
 	// === string(rune) Conversion ===
 	let r = 65
-	let s = String.fromCodePoint(r)
+	let s = globalThis.String.fromCodePoint(r)
 	await $.println(s)
 
 	let r2: number = 97
-	let s2 = String.fromCodePoint(r2)
+	let s2 = globalThis.String.fromCodePoint(r2)
 	await $.println(s2)
 
 	let r3: number = 0x20AC
-	let s3 = String.fromCodePoint(r3)
+	let s3 = globalThis.String.fromCodePoint(r3)
 	await $.println(s3)
 
 	// === string([]rune) Conversion ===
@@ -68,7 +68,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// string(int32) conversion
 	let i32 = 66
-	let i32String = String.fromCodePoint(i32)
+	let i32String = globalThis.String.fromCodePoint(i32)
 	await $.println(i32String)
 
 	// Test with interface{} type assertion
@@ -83,7 +83,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// === Test string(byte) conversion ===
 	let b: number = 65
-	let byteString = String.fromCodePoint(b)
+	let byteString = globalThis.String.fromCodePoint(b)
 	await $.println(byteString)
 }
 

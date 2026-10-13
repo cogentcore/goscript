@@ -31,7 +31,7 @@ export async function main(): globalThis.Promise<void> {
 
 	let payload: $.Slice<number> = $.makeSlice<number>(257, undefined, "byte")
 	for (let __goscriptRangeTarget0 = payload, i = 0; i < $.len(__goscriptRangeTarget0); i++) {
-		payload![i] = $.uint($.uint(((i * 31) + (Math.trunc(i / 3))) + 7, 8), 8)
+		payload![i] = $.uint($.uint(((i * 31) + (globalThis.Math.trunc(i / 3))) + 7, 8), 8)
 	}
 
 	let tables: $.Slice<{"name": string, "table": $.VarRef<crc32.Table> | null}> = $.arrayToSlice<{"name": string, "table": $.VarRef<crc32.Table> | null}>([$.anonymousStructValue({name: "ieee", table: crc32.IEEETable}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("name", /* @__PURE__ */ $.basicType("string"), [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/hash_crc32" }), /* @__PURE__ */ $.structField("table", /* @__PURE__ */ $.pointerType("crc32.Table"), [1], 16, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/hash_crc32" })] }), $.anonymousStructValue({name: "castagnoli", table: crc32.MakeTable(2197175160)}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("name", /* @__PURE__ */ $.basicType("string"), [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/hash_crc32" }), /* @__PURE__ */ $.structField("table", /* @__PURE__ */ $.pointerType("crc32.Table"), [1], 16, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/hash_crc32" })] }), $.anonymousStructValue({name: "koopman", table: crc32.MakeTable(3945912366)}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("name", /* @__PURE__ */ $.basicType("string"), [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/hash_crc32" }), /* @__PURE__ */ $.structField("table", /* @__PURE__ */ $.pointerType("crc32.Table"), [1], 16, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/hash_crc32" })] }), $.anonymousStructValue({name: "custom", table: crc32.MakeTable(0xd5828281)}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("name", /* @__PURE__ */ $.basicType("string"), [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/hash_crc32" }), /* @__PURE__ */ $.structField("table", /* @__PURE__ */ $.pointerType("crc32.Table"), [1], 16, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/hash_crc32" })] })])
@@ -42,7 +42,7 @@ export async function main(): globalThis.Promise<void> {
 			let length = __goscriptRangeTarget1![__rangeIndex]
 			let data: $.Slice<number> = $.goSlice(payload, undefined, length)
 			let oneShot = $.uint(crc32.Checksum(data, tc.table), 32)
-			let split = Math.trunc(length / 2)
+			let split = globalThis.Math.trunc(length / 2)
 			let updated = $.uint(crc32.Update($.uint(crc32.Update(0, tc.table, $.goSlice(data, undefined, split)), 32), tc.table, $.goSlice(data, split, undefined)), 32)
 			let stream = crc32.New(tc.table)
 			{
