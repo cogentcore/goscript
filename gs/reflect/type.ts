@@ -692,6 +692,17 @@ class InvalidTypeClass implements Type {
 // invalidTypeInstance is the singleton type of every invalid reflect.Value.
 const invalidTypeInstance = new InvalidTypeClass()
 
+// isEmptyObject reports whether value has no own enumerable properties,
+// without listing them all as Object.keys would.
+function isEmptyObject(value: object): boolean {
+  for (const key in value) {
+    if (globalThis.Object.hasOwn(value, key)) {
+      return false
+    }
+  }
+  return true
+}
+
 // Value is the reflection interface to a Go value.
 export class Value {
   // __typeInfo is the runtime type of reflect.Value, registered after the
@@ -725,9 +736,10 @@ export class Value {
       type === null ||
       (typeof value === 'object' &&
         value !== null &&
-        Object.keys(value).length === 0 &&
         !(value instanceof globalThis.Array) &&
-        !(value instanceof globalThis.Map))
+        !(value instanceof globalThis.Map) &&
+        !globalThis.ArrayBuffer.isView(value) &&
+        isEmptyObject(value))
     ) {
       this._value = null
       this._type = invalidTypeInstance
