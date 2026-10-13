@@ -9005,6 +9005,9 @@ func (o *LoweringOwner) lowerCallArgs(
 	if args, diagnostics, ok := o.lowerTupleCallArgs(ctx, expr, signature, overrideCall); ok {
 		return args, diagnostics
 	}
+	if args, diagnostics, ok := o.lowerVariadicTupleCallArgs(ctx, expr, signature, overrideCall); ok {
+		return args, diagnostics
+	}
 	if overrideCall && isProtobufTextWriteStringerCall(ctx, expr.Fun) {
 		return o.lowerProtobufTextWriteStringerArgs(ctx, expr, signature, allowAsyncOverrideCallback)
 	}
@@ -9142,6 +9145,67 @@ func (o *LoweringOwner) lowerTupleCallArgs(
 		parts[idx] = strings.ReplaceAll(part, "__goscriptTupleArg", temp)
 	}
 	body := "const " + temp + " = " + value + "; return " + o.tupleLiteralCast(ctx, params, parts)
+	if strings.Contains(value, "await ") {
+		return []string{"...(await (async () => { " + body + " })())"}, diagnostics, true
+	}
+	return []string{"...(() => { " + body + " })()"}, diagnostics, true
+}
+
+// lowerVariadicTupleCallArgs lowers a call to a variadic function whose only
+// argument is a call returning multiple values, as in f(g()). The results
+// fill the fixed parameters in order, and the remaining results are packed
+// into the variadic slice, or passed as rest arguments to an override.
+func (o *LoweringOwner) lowerVariadicTupleCallArgs(
+	ctx lowerFileContext,
+	expr *ast.CallExpr,
+	signature *types.Signature,
+	overrideCall bool,
+) ([]string, []Diagnostic, bool) {
+	if signature == nil || !signature.Variadic() || len(expr.Args) != 1 ||
+		expr.Ellipsis != token.NoPos || isBuiltinCallTarget(ctx, expr.Fun) {
+		return nil, nil, false
+	}
+	params := signature.Params()
+	fixedCount := params.Len() - 1
+	sourceResults := tupleResultTypes(ctx, expr.Args[0])
+	if sourceResults == nil || sourceResults.Len() < 2 || sourceResults.Len() < fixedCount {
+		return nil, nil, false
+	}
+	variadicType := params.At(fixedCount).Type()
+	elemType := variadicType
+	if slice, ok := types.Unalias(variadicType).Underlying().(*types.Slice); ok {
+		elemType = slice.Elem()
+	}
+
+	// Convert each result to its parameter type, from a temporary tuple.
+	value, diagnostics := o.lowerTupleExpr(ctx, expr.Args[0])
+	temp := ctx.tempName("TupleArg")
+	var parts, partTypes, variadicParts []string
+	for idx := range sourceResults.Len() {
+		part := temp + "[" + strconv.Itoa(idx) + "]"
+		if idx < fixedCount {
+			parts = append(parts, o.lowerValueForTargetTypes(ctx, params.At(idx).Type(), sourceResults.At(idx).Type(), part, false))
+			partTypes = append(partTypes, o.tsTypeFor(ctx, params.At(idx).Type()))
+			continue
+		}
+		converted := o.lowerValueForTargetTypes(ctx, elemType, sourceResults.At(idx).Type(), part, false)
+		if overrideCall {
+			parts = append(parts, converted)
+			partTypes = append(partTypes, o.tsTypeFor(ctx, elemType))
+			continue
+		}
+		variadicParts = append(variadicParts, converted)
+	}
+	if !overrideCall {
+		packed := "null"
+		if len(variadicParts) > 0 {
+			packed = o.runtimeOwner.QualifiedHelper(RuntimeHelperArrayToSlice) +
+				"<" + o.tsTypeFor(ctx, elemType) + ">([" + strings.Join(variadicParts, ", ") + "])"
+		}
+		parts = append(parts, packed)
+		partTypes = append(partTypes, o.tsTypeFor(ctx, variadicType))
+	}
+	body := "const " + temp + " = " + value + "; return [" + strings.Join(parts, ", ") + "] as [" + strings.Join(partTypes, ", ") + "]"
 	if strings.Contains(value, "await ") {
 		return []string{"...(await (async () => { " + body + " })())"}, diagnostics, true
 	}
