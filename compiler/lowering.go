@@ -7680,13 +7680,22 @@ func (o *LoweringOwner) lowerStringConcatExpr(ctx lowerFileContext, expr *ast.Bi
 }
 
 func (o *LoweringOwner) lowerInterfaceEqualityExpr(ctx lowerFileContext, expr *ast.BinaryExpr, left string, right string) (string, bool) {
+	// A comparison with nil tests the interface itself.
 	if isNilExpr(expr.X) || isNilExpr(expr.Y) {
 		return "", false
 	}
+
+	// Go converts the non-interface operand to the interface type, so a named
+	// basic value compares as the boxed value an interface holds.
 	leftType := ctx.semPkg.source.TypesInfo.TypeOf(expr.X)
 	rightType := ctx.semPkg.source.TypesInfo.TypeOf(expr.Y)
-	if !isInterfaceType(leftType) && !isInterfaceType(rightType) {
+	switch leftIface, rightIface := isInterfaceType(leftType), isInterfaceType(rightType); {
+	case !leftIface && !rightIface:
 		return "", false
+	case !rightIface:
+		right = o.lowerValueForTargetTypes(ctx, leftType, rightType, right, false)
+	case !leftIface:
+		left = o.lowerValueForTargetTypes(ctx, rightType, leftType, left, false)
 	}
 	value := o.runtimeOwner.QualifiedHelper(RuntimeHelperComparableEqual) + "(" + left + ", " + right + ")"
 	if expr.Op == token.NEQ {

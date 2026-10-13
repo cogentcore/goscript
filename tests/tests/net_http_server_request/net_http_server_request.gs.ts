@@ -49,7 +49,7 @@ export async function main(): globalThis.Promise<void> {
 		let __goscriptTuple2: any = await io.ReadAll($.pointerValueOrNil(($.pointerValue<http.Request>(r).Body as io.Reader | null))!)
 		let data: $.Slice<number> = __goscriptTuple2[0]
 		let err = __goscriptTuple2[1]
-		await $.println("server:", $.pointerValue<http.Request>(r).Method, $.comparableEqual($.pointerValue<http.Request>(r).Body, $.pointerValue<any>(http.NoBody)), $.len(data), err == null, url.Values_Get($.pointerValue<http.Request>(r).URL.Query(), "x"), $.pointerValue<http.Request>(r).URL.RequestURI())
+		await $.println("server:", $.pointerValue<http.Request>(r).Method, $.comparableEqual($.pointerValue<http.Request>(r).Body, $.interfaceValue<io.ReadCloser | null>($.pointerValue<any>(http.NoBody), "http.noBody", "http.noBody")), $.len(data), err == null, url.Values_Get($.pointerValue<http.Request>(r).URL.Query(), "x"), $.pointerValue<http.Request>(r).URL.RequestURI())
 		await printURL("server", $.pointerValue<http.Request>(r).URL)
 		{
 			let [, __goscriptShadow0] = await $.pointerValue<Exclude<http.ResponseWriter, null>>(w).Write(new Uint8Array([111, 107]))

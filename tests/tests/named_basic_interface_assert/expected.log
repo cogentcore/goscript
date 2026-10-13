@@ -16,3 +16,8 @@ equal: true false false
 map: true
 json UseNumber: json.Number
 fmt: 8 p 5
+var eq: true false true
+const eq: true false
+other: false true false
+boxed eq: true
+any eq: true false
