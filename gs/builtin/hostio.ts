@@ -24,6 +24,7 @@ export type NodeFSModule = {
   fsyncSync?(fd: number): void
   ftruncateSync?(fd: number, len?: number): void
   openSync?(path: string, flags: number | string, mode?: number): number
+  constants?: Record<string, number>
   chmodSync?(path: string, mode: number): void
   chownSync?(path: string, uid: number, gid: number): void
   lchownSync?(path: string, uid: number, gid: number): void
