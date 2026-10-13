@@ -1047,7 +1047,7 @@ describe('encoding/json override', () => {
     ])
   })
 
-  it('awaits a MarshalJSON that suspends in Encoder.Encode but not in Marshal', async () => {
+  it('awaits a MarshalJSON that suspends in Encoder.Encode and Marshal', async () => {
     class AsyncJSON implements Marshaler {
       constructor(public text: string) {}
 
@@ -1074,8 +1074,37 @@ describe('encoding/json override', () => {
     // A synchronous value is still encoded without suspending.
     expect(NewEncoder(writer).Encode(new Map([['c', 1]]))).toBeNull()
 
-    const [, err] = Marshal(value)
-    expect(err?.Error()).toContain('asynchronous MarshalJSON is unsupported')
+    // Marshal returns a Promise when a MarshalJSON suspends; the compiler
+    // awaits it in a program with an async MarshalJSON method.
+    const marshaled = Marshal(value)
+    expect(marshaled).toBeInstanceOf(Promise)
+    const [data, err] = await marshaled
+    expect(err).toBeNull()
+    expect($.bytesToString(data)).toBe('{"a":"x","b":["y",1]}')
+
+    // A synchronous value is still marshaled without suspending.
+    expect($.bytesToString(Marshal(new Map([['c', 1]]))[0])).toBe('{"c":1}')
+  })
+
+  it('awaits an UnmarshalJSON that suspends in Unmarshal', async () => {
+    class AsyncTarget implements Unmarshaler {
+      public text = ''
+
+      async UnmarshalJSON(data: $.Slice<number>): Promise<$.GoError> {
+        await Promise.resolve()
+        this.text = JSON.parse($.bytesToString(data)) as string
+        return this.text === 'bad' ? $.newError('bad text') : null
+      }
+    }
+
+    const target = new AsyncTarget()
+    const result = Unmarshal($.stringToBytes('"hello"'), target)
+    expect(result).toBeInstanceOf(Promise)
+    expect(await result).toBeNull()
+    expect(target.text).toBe('hello')
+
+    const err = await Unmarshal($.stringToBytes('"bad"'), new AsyncTarget())
+    expect(err?.Error()).toBe('bad text')
   })
 
   it('validates, compacts, indents, and escapes JSON bytes', () => {

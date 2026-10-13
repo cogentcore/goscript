@@ -71,6 +71,9 @@ An override package may include a `meta.json` file that defines metadata:
   },
   "asyncCallbacks": {
     "TypeName.MethodName": ["handler"]
+  },
+  "asyncWhenMethods": {
+    "FunctionName": ["MethodName"]
   }
 }
 ```
@@ -80,6 +83,7 @@ An override package may include a `meta.json` file that defines metadata:
 - **dependencies**: Array of package paths this package depends on (relative to `gs/` directory)
 - **asyncMethods**: Object mapping `TypeName.MethodName` to boolean indicating if async
 - **asyncCallbacks**: Object mapping a function name or `TypeName.MethodName` to the names of its function-typed parameters that the runtime stores and awaits. A function literal passed for one lowers as an async function, so its interface calls are awaited. A named parameter is needed because Go often declares such a parameter with an unnamed function type, which carries no async metadata.
+- **asyncWhenMethods**: Object mapping a package-level function name to method names. The function is async in a program where a compiled method with one of those names is async, and synchronous otherwise. `encoding/json` uses it for `Marshal` and `Unmarshal`, which call a `MarshalJSON` or `UnmarshalJSON` that may suspend (for example, one that encodes an image through an `io.Writer`). The override must then return a Promise when such a method suspends, and a plain value otherwise.
 
 ### Example: sync package metadata
 
