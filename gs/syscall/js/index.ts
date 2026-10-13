@@ -392,6 +392,17 @@ export function ValueOf(x: unknown): Value {
   if (x instanceof Func) {
     return x.Value.clone()
   }
+  if ($.isTypedNilValue(x)) {
+    // Like Go, a nil slice converts to an empty array and a nil map to an
+    // empty object.
+    if (x.__goType.startsWith('[]')) {
+      return new Value({ raw: [] })
+    }
+    if (x.__goType.startsWith('map[')) {
+      return new Value({ raw: {} })
+    }
+    return Null()
+  }
   if (isGoInterfaceValue(x)) {
     return ValueOf(x.__goValue)
   }
