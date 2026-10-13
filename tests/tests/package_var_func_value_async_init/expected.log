@@ -1,0 +1,3 @@
+wasm: wasm application/wasm
+dex: application/vnd.android.dex
+application: 2 wasm
