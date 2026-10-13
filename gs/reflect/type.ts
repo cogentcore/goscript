@@ -1839,23 +1839,39 @@ export class Value {
     mapObj.set(keyVal, elemVal)
   }
 
-  // Grow increases the slice's capacity, if necessary
+  // Grow increases the slice's capacity, if necessary, to guarantee space
+  // for another n elements, so that SetLen can extend the length after it.
   public Grow(n: number): void {
     if (this.Kind() !== Slice) {
       throw new Error(
         'reflect: call of reflect.Value.Grow on ' + this.Kind() + ' Value',
       )
     }
-    if (!globalThis.Array.isArray(this._value)) {
+    if (n < 0) {
+      throw new Error('reflect.Value.Grow: negative len')
+    }
+    if (!this.CanSet()) {
+      throw new Error(
+        'reflect: call of reflect.Value.Grow on unaddressable value',
+      )
+    }
+    const value = this.currentValue() as $.Slice<ReflectValue>
+    const len = $.len(value)
+    const cap = $.cap(value)
+    if (cap - len >= n) {
       return
     }
-    // JavaScript arrays grow automatically, but we ensure capacity
-    const currentLen = this._value.length
-    const targetCap = currentLen + n
-    if (this._value.length < targetCap) {
-      this._value.length = targetCap
-      this._value.length = currentLen // Reset to original length
-    }
+    // Grow to at least twice the capacity, as append does, with each new
+    // element a distinct zero value of the element type.
+    const elemType = this._type.Elem()
+    const grown = $.makeSlice(
+      len,
+      Math.max(len + n, 2 * cap),
+      elemType.Kind() === Uint8 ? 'byte' : undefined,
+      () => Zero(elemType).value,
+    )
+    $.copy(grown, value)
+    this.storeValue(grown)
   }
 
   // Cap returns v's capacity

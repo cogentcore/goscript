@@ -7,3 +7,10 @@ false
 2 1 8 9
 1 1
 4 4
+grown: 5 0 40 true
+cap kept: 10
+makeslice: 2 4
+distinct: a true
+bytes: 3 7
+xml: true 2
+xml items: x y

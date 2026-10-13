@@ -295,18 +295,30 @@ function ownedPointerHandleFromPointerArg(
 }
 
 // MakeSlice returns a Value representing a new slice with the specified type, length, and capacity.
-export function MakeSlice(typ: Type | null, len: number, _cap: number): Value {
+export function MakeSlice(typ: Type | null, len: number, cap: number): Value {
   if (typ === null || typ.Kind() !== Slice) {
     throw new Error('reflect.MakeSlice of non-slice type')
   }
+  if (len < 0) {
+    throw new Error('reflect.MakeSlice: negative len')
+  }
+  if (cap < len) {
+    throw new Error('reflect.MakeSlice: len > cap')
+  }
 
-  // Create a slice with the specified length, filled with zero values.
+  // Create a slice with the specified length and capacity, with each
+  // element a distinct zero value, so struct elements are not shared.
   const elemType = typ.Elem()
   if (!elemType) {
     throw new Error('slice type missing element type')
   }
-  const array = new globalThis.Array(len).fill(Zero(elemType).value)
-  return new Value(array, typ)
+  const slice = $.makeSlice(
+    len,
+    cap,
+    elemType.Kind() === Uint8 ? 'byte' : undefined,
+    () => zeroReflectValue(elemType),
+  )
+  return new Value(slice, typ)
 }
 
 // MakeMap returns a Value representing a new map with the specified type.
