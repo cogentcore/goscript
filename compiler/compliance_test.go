@@ -336,7 +336,6 @@ var expectedV2ComplianceGaps = map[string]bool{
 	"generics":                          true,
 	"generics_interface":                true,
 	"generics_leading_int":              true,
-	"hex_escape_sequence":               true,
 	"if_type_assert":                    true,
 	"import_interface":                  true,
 	"index_expr_type_assertion":         true,

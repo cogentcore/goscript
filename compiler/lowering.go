@@ -2980,9 +2980,38 @@ func byteSliceLiteral(data []byte) string {
 
 func lowerGoStringLiteral(value string) string {
 	if utf8.ValidString(value) {
-		return strconv.Quote(value)
+		return quoteJSString(value)
 	}
 	return "$.bytesToString(" + byteSliceLiteral([]byte(value)) + ")"
+}
+
+// quoteJSString returns a double-quoted JavaScript string literal for the
+// valid UTF-8 string value. It quotes like [strconv.Quote], except for the two
+// escapes JavaScript lacks: \a, and \UXXXXXXXX for a rune outside the Basic
+// Multilingual Plane, which JavaScript reads as the letters a and U.
+func quoteJSString(value string) string {
+	quoted := strconv.Quote(value)
+	if !strings.Contains(quoted, `\a`) && !strings.Contains(quoted, `\U`) {
+		return quoted
+	}
+
+	// Quote each rune on its own, so that only the runes strconv.Quote
+	// escapes the JavaScript way are rewritten.
+	var b strings.Builder
+	b.WriteByte('"')
+	for _, r := range value {
+		escaped := strconv.Quote(string(r))
+		escaped = escaped[1 : len(escaped)-1]
+		switch {
+		case r == '\a':
+			escaped = `\x07`
+		case strings.HasPrefix(escaped, `\U`):
+			escaped = `\u{` + strconv.FormatInt(int64(r), 16) + `}`
+		}
+		b.WriteString(escaped)
+	}
+	b.WriteByte('"')
+	return b.String()
 }
 
 func (o *LoweringOwner) lowerTypeSpec(ctx lowerFileContext, spec *ast.TypeSpec) (loweredDecl, []Diagnostic) {
