@@ -22,7 +22,7 @@ export function flags__set(f: $.VarRef<flags> | null, idx: number): void {
 }
 
 export function flags_values(__goscriptReceiver0: flags): [number, number] {
-	let f: $.VarRef<flags> = $.varRef(__goscriptReceiver0)
+	let f: $.VarRef<flags> = $.varRef($.cloneArrayValue(__goscriptReceiver0, "main.flags"))
 	flags__set(f, 0)
 	flags__set(f, 1)
 	return [$.arrayIndex(f.value, 0), $.arrayIndex(f.value, 1) + 1]
