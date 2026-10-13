@@ -38,7 +38,7 @@ export async function main(): globalThis.Promise<void> {
 		await maps.All(m)!(async (k, v) => {
 			// Simple assignment that should trigger the error
 			let [x, y] = getValue()
-			let result = (k + x) + String.fromCodePoint($.int(v + y, 32))
+			let result = (k + x) + $.runeToString($.int(v + y, 32))
 			results = $.append(results, result)
 			return true
 		})
@@ -52,7 +52,7 @@ export async function main(): globalThis.Promise<void> {
 	;await (async () => {
 		await simpleIterator(m)!(async (k, v) => {
 			let [x, y] = getValue()
-			let result = ((k + x) + String.fromCodePoint($.int(v + y, 32))) + "_local"
+			let result = ((k + x) + $.runeToString($.int(v + y, 32))) + "_local"
 			results = $.append(results, result)
 			return true
 		})

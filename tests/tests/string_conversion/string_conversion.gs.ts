@@ -10,15 +10,15 @@ export async function main(): globalThis.Promise<void> {
 
 	// === string(rune) Conversion ===
 	let r = 65
-	let s = String.fromCodePoint(r)
+	let s = $.runeToString(r)
 	await $.println(s)
 
 	let r2: number = 97
-	let s2 = String.fromCodePoint(r2)
+	let s2 = $.runeToString(r2)
 	await $.println(s2)
 
 	let r3: number = 0x20AC
-	let s3 = String.fromCodePoint(r3)
+	let s3 = $.runeToString(r3)
 	await $.println(s3)
 
 	// === string([]rune) Conversion ===
@@ -68,7 +68,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// string(int32) conversion
 	let i32 = 66
-	let i32String = String.fromCodePoint(i32)
+	let i32String = $.runeToString(i32)
 	await $.println(i32String)
 
 	// Test with interface{} type assertion
@@ -83,8 +83,17 @@ export async function main(): globalThis.Promise<void> {
 
 	// === Test string(byte) conversion ===
 	let b: number = 65
-	let byteString = String.fromCodePoint(b)
+	let byteString = $.runeToString(b)
 	await $.println(byteString)
+
+	// === Invalid runes convert to U+FFFD ===
+	let surrogate: number = 0xd800
+	let negative: number = -1
+	let tooBig: number = 0x110000
+	await $.println($.stringEqual($.runeToString(surrogate), "�"), $.stringEqual($.runeToString(negative), "�"), $.stringEqual($.runeToString(tooBig), "�"))
+	let wide: bigint = 128512n
+	let wideBad: bigint = 1099511627776n
+	await $.println($.stringEqual($.runeToString($.int(wide, 32)), "😀"), $.stringEqual($.runeToString(wide), "😀"), $.stringEqual($.runeToString(wideBad), "�"))
 }
 
 if ($.isMainScript(import.meta)) {

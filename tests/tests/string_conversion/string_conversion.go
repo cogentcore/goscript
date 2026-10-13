@@ -82,4 +82,13 @@ func main() {
 	var b byte = 65
 	byteString := string(b)
 	println(byteString)
+
+	// === Invalid runes convert to U+FFFD ===
+	var surrogate rune = 0xd800
+	var negative rune = -1
+	var tooBig rune = 0x110000
+	println(string(surrogate) == "\uFFFD", string(negative) == "\uFFFD", string(tooBig) == "\uFFFD")
+	var wide int64 = 0x1F600
+	var wideBad int64 = 1 << 40
+	println(string(rune(wide)) == "\U0001F600", string(wide) == "\U0001F600", string(wideBad) == "\uFFFD")
 }
