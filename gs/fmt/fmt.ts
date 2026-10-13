@@ -389,7 +389,9 @@ function defaultFormatMaybe(
           element?.kind === $.TypeKind.Array ||
           element?.kind === $.TypeKind.Slice ||
           (element === undefined &&
-            [Struct, ArrayKind, SliceKind].includes(TypeOf(pointee).Kind())))
+            [Struct, ArrayKind, SliceKind].includes(
+              TypeOf(pointee)?.Kind() ?? 0,
+            )))
       ) {
         return joinMaybe(
           [
