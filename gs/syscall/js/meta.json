@@ -1,4 +1,7 @@
 {
   "dependencies": [],
-  "asyncMethods": {}
+  "asyncMethods": {},
+  "asyncCallbacks": {
+    "FuncOf": ["fn"]
+  }
 }
