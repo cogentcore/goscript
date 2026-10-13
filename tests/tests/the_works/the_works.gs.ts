@@ -129,9 +129,9 @@ export class Stack {
 		if ($.len($.pointerValue<Stack>(s).items) == 0) {
 			$.panic("stack underflow")
 		}
-		let v = $.arrayIndex($.pointerValue<Stack>(s).items!, $.len($.pointerValue<Stack>(s).items) - 1)
+		let v = $.copyElement($.arrayIndex($.pointerValue<Stack>(s).items!, $.len($.pointerValue<Stack>(s).items) - 1))
 		$.pointerValue<Stack>(s).items = $.goSlice($.pointerValue<Stack>(s).items, undefined, $.len($.pointerValue<Stack>(s).items) - 1)
-		return v
+		return $.copyElement(v)
 	}
 
 	public Push(__typeArgs: $.GenericTypeArgs | undefined, v: any): void {

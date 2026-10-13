@@ -28,13 +28,13 @@ export class nistCurve {
 
 	public async Add(__typeArgs: $.GenericTypeArgs | undefined, p1: any, p2: any): globalThis.Promise<any> {
 		const curve: nistCurve | $.VarRef<nistCurve> | null = this;
-		return (await $.callGenericMethod(__typeArgs, "Point", "Add", p1, p1, p2) as any)
+		return (await $.callGenericMethod(__typeArgs, "Point", "Add", p1, $.copyElement(p1), $.copyElement(p2)) as any)
 	}
 
 	public Zero(__typeArgs: $.GenericTypeArgs | undefined): any {
 		const curve: nistCurve | $.VarRef<nistCurve> | null = this;
 		let p: any = $.genericZero(__typeArgs, "Point", null)
-		return p
+		return $.copyElement(p)
 	}
 
 	static __typeInfo = $.registerStructType(

@@ -53,9 +53,9 @@ export class Stack {
 			$.panic("pop from empty stack")
 		}
 		let last = $.len($.pointerValue<Stack>(s).items) - 1
-		let value = $.arrayIndex($.pointerValue<Stack>(s).items!, last)
+		let value = $.copyElement($.arrayIndex($.pointerValue<Stack>(s).items!, last))
 		$.pointerValue<Stack>(s).items = $.goSlice($.pointerValue<Stack>(s).items, undefined, last)
-		return [value, true]
+		return [$.copyElement(value), true]
 	}
 
 	public Push(__typeArgs: $.GenericTypeArgs | undefined, value: any): void {
@@ -134,12 +134,12 @@ export class Mapper {
 	public Get(__typeArgs: $.GenericTypeArgs | undefined, key: any): [any, boolean] {
 		const m: Mapper | $.VarRef<Mapper> | null = this;
 		let [value, ok] = $.mapGet<any, any, any>($.pointerValue<Mapper>(m).values, key, null)
-		return [value, ok]
+		return [$.copyElement(value), ok]
 	}
 
 	public Put(__typeArgs: $.GenericTypeArgs | undefined, key: any, value: any): void {
 		let m: Mapper | $.VarRef<Mapper> | null = this;
-		$.mapSet($.pointerValue<Mapper>(m).values, key, value)
+		$.mapSet($.pointerValue<Mapper>(m).values, key, $.copyElement(value))
 	}
 
 	static {
@@ -178,7 +178,7 @@ export class Pair {
 
 	public Swap(__typeArgs: $.GenericTypeArgs | undefined): Pair {
 		const p = this;
-		return $.markAsStructValue(new Pair({First: p.Second, Second: p.First}))
+		return $.markAsStructValue(new Pair({First: $.copyElement(p.Second), Second: $.copyElement(p.First)}))
 	}
 
 	static {
@@ -222,7 +222,7 @@ export function Set_Has(s: Set, __typeArgs: $.GenericTypeArgs | undefined, value
 export async function CloneAll<T>(__typeArgs: $.GenericTypeArgs | undefined, items: $.Slice<T>): globalThis.Promise<$.Slice<T>> {
 	let clones: $.Slice<T> = $.makeSlice<T>(0, $.len(items), undefined, () => ($.genericZero(__typeArgs, "T", null) as T))
 	for (let __goscriptRangeTarget1 = items, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget1); __rangeIndex++) {
-		let item = __goscriptRangeTarget1![__rangeIndex]
+		let item = $.copyElement(__goscriptRangeTarget1![__rangeIndex])
 		clones = $.append(clones, await $.callGenericMethod(__typeArgs, "T", "Clone", item), $.appendZero(() => ($.genericZero(__typeArgs, "T", null) as T)))
 	}
 	return clones
@@ -233,7 +233,7 @@ export function NewMapper(__typeArgs: $.GenericTypeArgs | undefined): Mapper | $
 }
 
 export async function Apply(__typeArgs: $.GenericTypeArgs | undefined, value: any, fn: ((_p0: any) => any | globalThis.Promise<any>) | null): globalThis.Promise<any> {
-	return fn!(value)
+	return fn!($.copyElement(value))
 }
 
 export async function main(): globalThis.Promise<void> {

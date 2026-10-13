@@ -47,12 +47,12 @@ export class impl {
 
 	public Other(__typeArgs: $.GenericTypeArgs | undefined): any {
 		const i: impl | $.VarRef<impl> | null = this;
-		return $.pointerValue<impl>(i).other
+		return $.copyElement($.pointerValue<impl>(i).other)
 	}
 
 	public Value(__typeArgs: $.GenericTypeArgs | undefined): any {
 		const i: impl | $.VarRef<impl> | null = this;
-		return $.pointerValue<impl>(i).value
+		return $.copyElement($.pointerValue<impl>(i).value)
 	}
 
 	static {

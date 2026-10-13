@@ -37,7 +37,7 @@ export class wrapper {
 	public Other(__typeArgs: $.GenericTypeArgs | undefined): any {
 		const w: wrapper | $.VarRef<wrapper> | null = this;
 		let zero: any = $.genericZero(__typeArgs, "E", null)
-		return zero
+		return $.copyElement(zero)
 	}
 
 	public Value(__typeArgs: $.GenericTypeArgs | undefined): any {
@@ -62,7 +62,7 @@ export async function read(__typeArgs: $.GenericTypeArgs | undefined, d: Derived
 }
 
 export function setGeneric(__typeArgs: $.GenericTypeArgs | undefined, w: dep.Wrapper | $.VarRef<dep.Wrapper> | null, value: any): any {
-	return (dep.Keyed.prototype.SetValues.call($.pointerValue<dep.Wrapper>(w).Keyed, {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }, U: __typeArgs?.["U"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }}, value) as any)
+	return (dep.Keyed.prototype.SetValues.call($.pointerValue<dep.Wrapper>(w).Keyed, {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }, U: __typeArgs?.["U"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }}, $.copyElement(value)) as any)
 }
 
 export function setConcrete(w: dep.Wrapper | $.VarRef<dep.Wrapper> | null): string {
