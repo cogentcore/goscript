@@ -66,12 +66,12 @@ export async function sumDoublers(vals: $.Slice<Doubler | null>): globalThis.Pro
 
 export function assertDoubler(__typeArgs: $.GenericTypeArgs | undefined, v: Doubler | null): [any, boolean] {
 	let [out, ok] = $.typeAssertTuple<any>(v, __typeArgs?.["T"]?.type ?? { kind: $.TypeKind.Interface, methods: [$.methodSignature("Double", [], [/* @__PURE__ */ $.basicType("int")])] })
-	return [out, ok]
+	return [$.copyElement(out), ok]
 }
 
 export function assertStringer(__typeArgs: $.GenericTypeArgs | undefined, v: Stringer | null): [any, boolean] {
 	let [out, ok] = $.typeAssertTuple<any>(v, __typeArgs?.["T"]?.type ?? { kind: $.TypeKind.Interface, methods: [$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])] })
-	return [out, ok]
+	return [$.copyElement(out), ok]
 }
 
 export function newMyBool(value: boolean, target: $.VarRef<boolean> | null): $.VarRef<MyBool> | null {

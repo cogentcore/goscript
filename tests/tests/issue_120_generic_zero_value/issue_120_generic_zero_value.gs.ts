@@ -58,7 +58,7 @@ export function StringVal_String(s: StringVal): string {
 
 export function ZeroValue(__typeArgs: $.GenericTypeArgs | undefined): any {
 	let zero: any = $.genericZero(__typeArgs, "T", null)
-	return zero
+	return $.copyElement(zero)
 }
 
 export function ZeroArrayLiteral(__typeArgs: $.GenericTypeArgs | undefined): any {
@@ -73,7 +73,7 @@ export function Sum<T>(__typeArgs: $.GenericTypeArgs | undefined, vals: $.Slice<
 	let sum: any = $.genericZero(__typeArgs, "T", null)
 	// Note: We can't actually add T values in Go without more constraints
 	// This just tests that sum has the right zero value and String() works
-	return sum
+	return $.copyElement(sum)
 }
 
 export async function main(): globalThis.Promise<void> {

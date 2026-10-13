@@ -4,7 +4,7 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export function identity(__typeArgs: $.GenericTypeArgs | undefined, value: any): any {
-	return value
+	return $.copyElement(value)
 }
 
 export async function main(): globalThis.Promise<void> {

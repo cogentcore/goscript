@@ -85,9 +85,9 @@ export class IntValue {
 }
 
 export function Wrap(__typeArgs: $.GenericTypeArgs | undefined, value: any): Box {
-	return $.markAsStructValue(new Box({Value: value}))
+	return $.markAsStructValue(new Box({Value: $.copyElement(value)}))
 }
 
 export function Collect<T>(__typeArgs: $.GenericTypeArgs | undefined, value: any): [$.Slice<T>, $.GoError] {
-	return [$.arrayToSlice<T>([value]), null]
+	return [$.arrayToSlice<T>([$.copyElement(value)]), null]
 }

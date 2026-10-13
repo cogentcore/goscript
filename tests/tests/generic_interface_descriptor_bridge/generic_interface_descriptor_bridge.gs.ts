@@ -48,7 +48,7 @@ export class genericBox {
 
 	public async Wait(__typeArgs: $.GenericTypeArgs | undefined, ctx: context.Context | null, old: any): globalThis.Promise<any> {
 		await $.chanRecv(await $.pointerValue<Exclude<context.Context, null>>(ctx).Done())
-		return old
+		return $.copyElement(old)
 	}
 
 	static __typeInfo = $.registerStructType(

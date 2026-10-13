@@ -40,7 +40,7 @@ export class Impl {
 
 	public Value(__typeArgs: $.GenericTypeArgs | undefined): any {
 		const i: Impl | $.VarRef<Impl> | null = this;
-		return $.pointerValue<Impl>(i).Item
+		return $.copyElement($.pointerValue<Impl>(i).Item)
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -68,7 +68,7 @@ export class Keyed {
 	public SetValues(__typeArgs: $.GenericTypeArgs | undefined, value: any): any {
 		const k: Keyed | $.VarRef<Keyed> | null = this;
 		let zero: any = $.genericZero(__typeArgs, "U", null)
-		return zero
+		return $.copyElement(zero)
 	}
 
 	static __typeInfo = $.registerStructType(

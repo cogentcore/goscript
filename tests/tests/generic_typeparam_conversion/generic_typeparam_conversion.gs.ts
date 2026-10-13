@@ -100,7 +100,7 @@ export function Extended_String(e: Extended): string {
 export function valuesExtended<T, E>(__typeArgs: $.GenericTypeArgs | undefined, values: $.Slice<T>, extended: $.Slice<E>): $.Slice<T> {
 	let res: $.Slice<T> = $.makeSlice<T>($.len(extended), undefined, undefined, () => ($.genericZero(__typeArgs, "T", null) as T))
 	for (let __goscriptRangeTarget0 = extended, i = 0; i < $.len(__goscriptRangeTarget0); i++) {
-		let e = __goscriptRangeTarget0![i]
+		let e = $.copyElement(__goscriptRangeTarget0![i])
 		res![i] = $.genericConvert<T>(__typeArgs, "T", e)
 	}
 	res = $.appendSlice(res, values, $.appendZero(() => ($.genericZero(__typeArgs, "T", null) as T)))

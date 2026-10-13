@@ -7360,6 +7360,9 @@ func (o *LoweringOwner) lowerRangeStmt(ctx lowerFileContext, stmt *ast.RangeStmt
 		// elements are cloned.
 		valueType := ctx.semPkg.source.TypesInfo.TypeOf(stmt.Value)
 		value := o.lowerValueForTargetTypes(ctx, valueType, valueType, indexTarget+"["+indexName+"]", true)
+		if typeParamMayHoldValueType(valueType) {
+			value = o.runtimeOwner.QualifiedHelper(RuntimeHelperCopyElement) + "(" + value + ")"
+		}
 		if stmt.Tok == token.DEFINE {
 			value = o.lowerDeclaredValue(ctx, stmt.Value, value)
 		}
@@ -12598,7 +12601,35 @@ func (o *LoweringOwner) lowerValueForTarget(
 			value = o.runtimeOwner.QualifiedHelper(RuntimeHelperGoFunc) + "(" + value + ", " + strconv.Quote(goName) + ")"
 		}
 	}
-	return o.lowerValueForTargetTypes(ctx, targetType, sourceType, value, shouldCloneStructValue(expr))
+	value = o.lowerValueForTargetTypes(ctx, targetType, sourceType, value, shouldCloneStructValue(expr))
+	if typeParamMayHoldValueType(targetType) && typeParamMayHoldValueType(sourceType) && isStoredValueExpr(ctx, expr) {
+		// A type parameter may be instantiated with a struct or array type,
+		// which Go copies at assignment, so a stored value is copied when it
+		// is one at run time.
+		value = o.runtimeOwner.QualifiedHelper(RuntimeHelperCopyElement) + "(" + value + ")"
+	}
+	return value
+}
+
+// isStoredValueExpr reports whether expr reads a value stored in a variable,
+// field, element or pointer target, rather than producing a new value.
+func isStoredValueExpr(ctx lowerFileContext, expr ast.Expr) bool {
+	switch typed := unwrapParenExpr(expr).(type) {
+	case *ast.Ident:
+		_, ok := ctx.semPkg.source.TypesInfo.ObjectOf(typed).(*types.Var)
+		return ok
+	case *ast.SelectorExpr:
+		if selection := ctx.semPkg.source.TypesInfo.Selections[typed]; selection != nil {
+			return selection.Kind() == types.FieldVal
+		}
+		_, ok := ctx.semPkg.source.TypesInfo.ObjectOf(typed.Sel).(*types.Var)
+		return ok
+	case *ast.IndexExpr:
+		return !isFunctionType(ctx.semPkg.source.TypesInfo.TypeOf(typed))
+	case *ast.StarExpr:
+		return true
+	}
+	return false
 }
 
 // declaredFuncGoName returns the name that the Go runtime gives the
@@ -14400,6 +14431,48 @@ func namedNonInterfaceNonStructType(named *types.Named) bool {
 // isStructValueType reports whether typ is a named struct or a nonempty
 // anonymous struct, which Go copies by value. An empty anonymous struct has no
 // state to copy, so it stays a plain object.
+// typeParamMayHoldValueType reports whether typ is a type parameter whose
+// type set may include a struct or array type, which Go copies by value.
+func typeParamMayHoldValueType(typ types.Type) bool {
+	typeParam, ok := types.Unalias(typ).(*types.TypeParam)
+	if !ok {
+		return false
+	}
+	iface, ok := typeParam.Constraint().Underlying().(*types.Interface)
+	if !ok || iface.IsMethodSet() {
+		return true
+	}
+	return typeSetMayHoldValueType(iface)
+}
+
+// typeSetMayHoldValueType reports whether the type terms of iface may include
+// a struct or array type.
+func typeSetMayHoldValueType(iface *types.Interface) bool {
+	for i := range iface.NumEmbeddeds() {
+		switch embedded := types.Unalias(iface.EmbeddedType(i)).(type) {
+		case *types.Union:
+			for j := range embedded.Len() {
+				switch embedded.Term(j).Type().Underlying().(type) {
+				case *types.Struct, *types.Array, *types.Interface:
+					return true
+				}
+			}
+		default:
+			if inner, ok := embedded.Underlying().(*types.Interface); ok {
+				if typeSetMayHoldValueType(inner) {
+					return true
+				}
+				continue
+			}
+			switch embedded.Underlying().(type) {
+			case *types.Struct, *types.Array:
+				return true
+			}
+		}
+	}
+	return false
+}
+
 func isStructValueType(typ types.Type) bool {
 	if namedStructType(typ) != nil {
 		return true

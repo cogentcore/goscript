@@ -8,7 +8,7 @@ export function modifyGenericSlice(__typeArgs: $.GenericTypeArgs | undefined, s:
 	// For generic slice types, the compiler should generate proper assignment
 	// But currently it may generate: $.indexStringOrBytes(s, i) = v
 	// which is invalid TypeScript syntax
-	s![i] = v
+	s![i] = $.copyElement(v)
 }
 
 export async function main(): globalThis.Promise<void> {

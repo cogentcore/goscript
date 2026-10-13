@@ -11,9 +11,9 @@ export function grow<T>(__typeArgs: $.GenericTypeArgs | undefined, n: number): $
 }
 
 export function siblings<T>(__typeArgs: $.GenericTypeArgs | undefined, value: any): $.Slice<T> {
-	let values: $.Slice<T> = (slices.Insert(null, 0, value) as $.Slice<T>)
+	let values: $.Slice<T> = (slices.Insert(null, 0, $.copyElement(value)) as $.Slice<T>)
 	values = (slices.Delete(values, 0, 1) as $.Slice<T>)
-	return (slices.Concat(values, $.arrayToSlice<T>([value])) as $.Slice<T>)
+	return (slices.Concat(values, $.arrayToSlice<T>([$.copyElement(value)])) as $.Slice<T>)
 }
 
 export async function main(): globalThis.Promise<void> {

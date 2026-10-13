@@ -38,7 +38,7 @@ export class box {
 
 	public Value(__typeArgs: $.GenericTypeArgs | undefined): any {
 		const b: box | $.VarRef<box> | null = this;
-		return $.pointerValue<box>(b).value
+		return $.copyElement($.pointerValue<box>(b).value)
 	}
 
 	static __typeInfo = $.registerStructType(

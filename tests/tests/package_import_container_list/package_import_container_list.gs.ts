@@ -60,7 +60,7 @@ export function newElementPool(__typeArgs: $.GenericTypeArgs | undefined): sync.
 
 export async function pushPooled(__typeArgs: $.GenericTypeArgs | undefined, pool: sync.Pool | $.VarRef<sync.Pool> | null, value: any): globalThis.Promise<pooledElement | $.VarRef<pooledElement> | null> {
 	let element: pooledElement | $.VarRef<pooledElement> | null = $.mustTypeAssert<pooledElement | $.VarRef<pooledElement> | null>(await sync.Pool.prototype.Get.call($.pointerValue<sync.Pool>(pool)), /* @__PURE__ */ $.pointerType("main.pooledElement"))
-	$.pointerValue<pooledElement>(element).Value = value
+	$.pointerValue<pooledElement>(element).Value = $.copyElement(value)
 	return element
 }
 

@@ -90,7 +90,7 @@ export class tree {
 
 	public ["get"](__typeArgs: $.GenericTypeArgs | undefined): any {
 		const tr: tree | $.VarRef<tree> | null = this;
-		return $.pointerValue<tree>(tr).empty
+		return $.copyElement($.pointerValue<tree>(tr).empty)
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -119,7 +119,7 @@ export function varTree(__typeArgs: $.GenericTypeArgs | undefined): tree {
 
 export function zero(__typeArgs: $.GenericTypeArgs | undefined): any {
 	let z: any = $.genericZero(__typeArgs, "T", null)
-	return z
+	return $.copyElement(z)
 }
 
 export function lessEntry(a: entry, b: entry): boolean {
