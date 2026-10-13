@@ -14,3 +14,8 @@ interface interface
 struct 3
 struct 2
 false
+valueof: true true
+addr: true true
+new: true true true true
+new widget: 7
+nil: true true

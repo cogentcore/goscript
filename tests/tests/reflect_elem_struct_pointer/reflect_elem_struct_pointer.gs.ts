@@ -16,6 +16,16 @@ $.registerInterfaceType(
 	[$.methodSignature("Area", [], [/* @__PURE__ */ $.basicType("int")])]
 );
 
+export type node = {
+	AsBase(): base | $.VarRef<base> | null
+}
+
+$.registerInterfaceType(
+	"main.node",
+	null,
+	[$.methodSignature("AsBase", [], [/* @__PURE__ */ $.pointerType("main.base")])]
+);
+
 export class T {
 	public declare A: string
 
@@ -119,6 +129,134 @@ export class holder {
 	)
 }
 
+export class base {
+	public declare This: node | null
+
+	public declare Name: string
+
+	public _fields: {
+		This: node | null
+		Name: string
+	}
+
+	constructor(init?: Partial<{This?: node | null, Name?: string}>) {
+		this._fields = {
+			This: init?.This ?? (null! as node | null),
+			Name: init?.Name ?? ("" as string)
+		}
+	}
+
+	public clone(): base {
+		return $.markAsStructValue(new base(this))
+	}
+
+	public AsBase(): base | $.VarRef<base> | null {
+		const b: base | $.VarRef<base> | null = this;
+		return b
+	}
+
+	public async NewInstance(): globalThis.Promise<node | null> {
+		const b: base | $.VarRef<base> | null = this;
+		return $.mustTypeAssert<node | null>($.markAsStructValue($.cloneStructValue(reflect.New($.pointerValueOrNil(await $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf(($.pointerValue<base>(b).This as any))).Elem())!))).Interface(), "main.node")
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["This", "Name"])
+	}
+
+	static __typeInfo = $.registerStructType(
+		"main.base",
+		() => new base(),
+		() => [$.methodSignature("AsBase", [], [/* @__PURE__ */ $.pointerType("main.base")]), $.methodSignature("NewInstance", [], ["main.node"])],
+		base,
+		() => [/* @__PURE__ */ $.structField("This", "main.node", [0], 0, true), /* @__PURE__ */ $.structField("Name", /* @__PURE__ */ $.basicType("string"), [1], 16, true)]
+	)
+}
+
+export class widget {
+	public declare base: base
+
+	public declare X: number
+
+	public _fields: {
+		base: base
+		X: number
+	}
+
+	constructor(init?: Partial<{base?: base, X?: number}>) {
+		this._fields = {
+			base: init?.base ? $.markAsStructValue($.cloneStructValue(init.base)) : $.markAsStructValue(new base()),
+			X: init?.X ?? (0 as number)
+		}
+	}
+
+	public clone(): widget {
+		return $.markAsStructValue(new widget(this))
+	}
+
+	public AsBase(): any {
+		return $.pointerValue<base>(this.base).AsBase()
+	}
+
+	public async NewInstance(): globalThis.Promise<any> {
+		return await $.pointerValue<base>(this.base).NewInstance()
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["base", "X"])
+	}
+
+	static __typeInfo = $.registerStructType(
+		"main.widget",
+		() => new widget(),
+		() => [$.methodSignature("AsBase", [], [/* @__PURE__ */ $.pointerType("main.base")]), $.methodSignature("NewInstance", [], ["main.node"])],
+		widget,
+		() => [/* @__PURE__ */ $.structField("base", "main.base", [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/reflect_elem_struct_pointer", anonymous: true }), /* @__PURE__ */ $.structField("X", /* @__PURE__ */ $.basicType("int"), [1], 32, true)]
+	)
+}
+
+export class body {
+	public declare widget: widget
+
+	public declare Title: string
+
+	public _fields: {
+		widget: widget
+		Title: string
+	}
+
+	constructor(init?: Partial<{widget?: widget, Title?: string}>) {
+		this._fields = {
+			widget: init?.widget ? $.markAsStructValue($.cloneStructValue(init.widget)) : $.markAsStructValue(new widget()),
+			Title: init?.Title ?? ("" as string)
+		}
+	}
+
+	public clone(): body {
+		return $.markAsStructValue(new body(this))
+	}
+
+	public AsBase(): any {
+		return $.pointerValue<widget>(this.widget).base.AsBase()
+	}
+
+	public async NewInstance(): globalThis.Promise<any> {
+		return await $.pointerValue<widget>(this.widget).base.NewInstance()
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["widget", "Title"])
+	}
+
+	static __typeInfo = $.registerStructType(
+		"main.body",
+		() => new body(),
+		() => [$.methodSignature("AsBase", [], [/* @__PURE__ */ $.pointerType("main.base")]), $.methodSignature("NewInstance", [], ["main.node"])],
+		body,
+		() => [/* @__PURE__ */ $.structField("widget", "main.widget", [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/reflect_elem_struct_pointer", anonymous: true }), /* @__PURE__ */ $.structField("Title", /* @__PURE__ */ $.basicType("string"), [1], 40, true)]
+	)
+}
+
 export function walk(v: reflect.Value): string {
 	if ($.markAsStructValue($.cloneStructValue(v)).Kind() == 22) {
 		if ($.markAsStructValue($.cloneStructValue(v)).IsNil()) {
@@ -138,6 +276,29 @@ export function underlying(v: reflect.Value): reflect.Value {
 		$.assignStruct(v, $.markAsStructValue($.cloneStructValue(e)))
 	}
 	return $.markAsStructValue($.cloneStructValue(v))
+}
+
+export async function structPointers(): globalThis.Promise<void> {
+	let b: body | $.VarRef<body> | null = new body({Title: "body"})
+	$.pointerValue<body>(b).widget.base.This = $.interfaceValue<node | null>(b, "*main.body", /* @__PURE__ */ $.pointerType("main.body"))
+	let [n, ok] = $.typeAssertTuple<node | null>($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(b, "*main.body", /* @__PURE__ */ $.pointerType("main.body"))))).Interface(), "main.node")
+	await $.println("valueof:", ok, ok && ($.pointerEqual($.mustTypeAssert<body | $.VarRef<body> | null>(n, /* @__PURE__ */ $.pointerType("main.body")), b)))
+	let __goscriptTuple0: any = $.typeAssertTuple<body | $.VarRef<body> | null>($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(b, "*main.body", /* @__PURE__ */ $.pointerType("main.body"))))).Elem())).Addr())).Interface(), /* @__PURE__ */ $.pointerType("main.body"))
+	let a: body | $.VarRef<body> | null = __goscriptTuple0[0]
+	ok = __goscriptTuple0[1]
+	await $.println("addr:", ok, $.pointerEqual(a, b))
+
+	let __goscriptTuple1: any = $.typeAssertTuple<body | $.VarRef<body> | null>(await $.pointerValue<body>(b).widget.base.NewInstance(), /* @__PURE__ */ $.pointerType("main.body"))
+	let nb: body | $.VarRef<body> | null = __goscriptTuple1[0]
+	ok = __goscriptTuple1[1]
+	await $.println("new:", ok, !$.pointerEqual(nb, b), $.stringEqual($.pointerValue<body>(nb).Title, ""), $.pointerValue<body>(nb).widget.base.AsBase() != null)
+	let nv = $.markAsStructValue($.cloneStructValue(reflect.New($.pointerValueOrNil(reflect.TypeOf($.interfaceValue($.markAsStructValue(new widget()), "main.widget", "main.widget")))!)))
+	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(nv)).Elem())).FieldByName("X"))).SetInt(7n)
+	await $.println("new widget:", $.pointerValue<widget>($.mustTypeAssert<widget | $.VarRef<widget> | null>($.markAsStructValue($.cloneStructValue(nv)).Interface(), /* @__PURE__ */ $.pointerType("main.widget"))).X)
+
+	let np: body | $.VarRef<body> | null = null! as body | $.VarRef<body> | null
+	let iv = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(np, "*main.body", /* @__PURE__ */ $.pointerType("main.body"))))).Interface()
+	await $.println("nil:", iv != null, $.mustTypeAssert<body | $.VarRef<body> | null>(iv, /* @__PURE__ */ $.pointerType("main.body")) == null)
 }
 
 export async function main(): globalThis.Promise<void> {
@@ -201,6 +362,8 @@ export async function main(): globalThis.Promise<void> {
 
 	let nilAny: $.VarRef<any> = $.varRef(null! as any)
 	await $.println($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(nilAny, "*interface{}", /* @__PURE__ */ $.pointerType({ kind: $.TypeKind.Interface, methods: [] }))))).Elem())).Elem())).IsValid())
+
+	await structPointers()
 }
 
 if ($.isMainScript(import.meta)) {

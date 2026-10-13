@@ -42,6 +42,54 @@ func underlying(v reflect.Value) reflect.Value {
 	return v
 }
 
+type node interface {
+	AsBase() *base
+}
+
+type base struct {
+	This node
+	Name string
+}
+
+func (b *base) AsBase() *base { return b }
+
+// NewInstance makes a new node of the same type, as a tree of embedded
+// struct types does.
+func (b *base) NewInstance() node {
+	return reflect.New(reflect.TypeOf(b.This).Elem()).Interface().(node)
+}
+
+type widget struct {
+	base
+	X int
+}
+
+type body struct {
+	widget
+	Title string
+}
+
+// structPointers shows that a struct pointer from reflect is the pointer
+// itself, which satisfies interfaces, both from ValueOf and from New.
+func structPointers() {
+	b := &body{Title: "body"}
+	b.This = b
+	n, ok := reflect.ValueOf(b).Interface().(node)
+	println("valueof:", ok, ok && n.(*body) == b)
+	a, ok := reflect.ValueOf(b).Elem().Addr().Interface().(*body)
+	println("addr:", ok, a == b)
+
+	nb, ok := b.NewInstance().(*body)
+	println("new:", ok, nb != b, nb.Title == "", nb.AsBase() != nil)
+	nv := reflect.New(reflect.TypeOf(widget{}))
+	nv.Elem().FieldByName("X").SetInt(7)
+	println("new widget:", nv.Interface().(*widget).X)
+
+	var np *body
+	iv := reflect.ValueOf(np).Interface()
+	println("nil:", iv != nil, iv.(*body) == nil)
+}
+
 func main() {
 	s := &T{A: "aaa", B: 3.14}
 	v := reflect.ValueOf(s)
@@ -103,4 +151,6 @@ func main() {
 
 	var nilAny any
 	println(reflect.ValueOf(&nilAny).Elem().Elem().IsValid())
+
+	structPointers()
 }
