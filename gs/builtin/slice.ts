@@ -1896,6 +1896,107 @@ export function unsafePointerRef<T>(address: number | bigint): VarRef<T> {
   }
 }
 
+/** NumericKind is the Go name of a fixed-size integer or float kind. */
+export type NumericKind =
+  | 'int8'
+  | 'int16'
+  | 'int32'
+  | 'int64'
+  | 'uint8'
+  | 'uint16'
+  | 'uint32'
+  | 'uint64'
+  | 'float32'
+  | 'float64'
+
+// numericBits holds the bits of one value being reinterpreted.
+const numericBits = new DataView(new ArrayBuffer(8))
+
+// storeNumericBits writes value of the given kind into numericBits.
+function storeNumericBits(kind: NumericKind, value: unknown): void {
+  switch (kind) {
+    case 'int8':
+      numericBits.setInt8(0, Number(value))
+      break
+    case 'uint8':
+      numericBits.setUint8(0, Number(value))
+      break
+    case 'int16':
+      numericBits.setInt16(0, Number(value))
+      break
+    case 'uint16':
+      numericBits.setUint16(0, Number(value))
+      break
+    case 'int32':
+      numericBits.setInt32(0, Number(value))
+      break
+    case 'uint32':
+      numericBits.setUint32(0, Number(value))
+      break
+    case 'float32':
+      numericBits.setFloat32(0, Number(value))
+      break
+    case 'int64':
+      numericBits.setBigInt64(0, BigInt(value as bigint))
+      break
+    case 'uint64':
+      numericBits.setBigUint64(0, BigInt(value as bigint))
+      break
+    case 'float64':
+      numericBits.setFloat64(0, Number(value))
+      break
+  }
+}
+
+// loadNumericBits reads numericBits as a value of the given kind.
+function loadNumericBits(kind: NumericKind): number | bigint {
+  switch (kind) {
+    case 'int8':
+      return numericBits.getInt8(0)
+    case 'uint8':
+      return numericBits.getUint8(0)
+    case 'int16':
+      return numericBits.getInt16(0)
+    case 'uint16':
+      return numericBits.getUint16(0)
+    case 'int32':
+      return numericBits.getInt32(0)
+    case 'uint32':
+      return numericBits.getUint32(0)
+    case 'float32':
+      return numericBits.getFloat32(0)
+    case 'int64':
+      return numericBits.getBigInt64(0)
+    case 'uint64':
+      return numericBits.getBigUint64(0)
+    case 'float64':
+      return numericBits.getFloat64(0)
+  }
+}
+
+/**
+ * unsafeNumericRef returns a reference that reads and writes the variable
+ * source, of numeric kind from, with its bits reinterpreted as the same-size
+ * numeric kind to, as (*uint32)(unsafe.Pointer(&f)) does for a float32 f.
+ */
+export function unsafeNumericRef<T>(
+  source: VarRef<unknown>,
+  from: NumericKind,
+  to: NumericKind,
+): VarRef<T> {
+  return {
+    get value(): T {
+      storeNumericBits(from, source.value)
+      return loadNumericBits(to) as T
+    },
+    set value(value: T) {
+      storeNumericBits(to, value)
+      source.value = loadNumericBits(from)
+    },
+    __isVarRef: true,
+  }
+}
+
 function byteArrayFromAddress(
   address: number | bigint,
   length: number,
