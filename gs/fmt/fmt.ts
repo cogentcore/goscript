@@ -553,6 +553,22 @@ function applyFormatOptions(
   return apply(formatted)
 }
 
+// starOperand returns the int operand of a * width or precision, or null
+// when the operand is missing or not an integer.
+function starOperand(arg: unknown): number | null {
+  const value =
+    arg != null && typeof arg === 'object' && '__goValue' in arg ?
+      (arg as { __goValue: unknown }).__goValue
+    : arg
+  if (typeof value === 'bigint') {
+    return Number(value)
+  }
+  if (typeof value === 'number' && Number.isInteger(value)) {
+    return value
+  }
+  return null
+}
+
 function parseFormatMaybe(format: string, args: any[]): MaybeString {
   const parts: MaybeString[] = []
   let argIndex = 0
@@ -579,19 +595,46 @@ function parseFormatMaybe(format: string, args: any[]): MaybeString {
           j++
         }
 
-        // Parse width
-        while (j < format.length && format[j] >= '0' && format[j] <= '9') {
-          width += format[j]
+        // Parse width, which * takes from the next operand.
+        let badArg = ''
+        if (format[j] === '*') {
           j++
-        }
-
-        // Parse precision
-        if (j < format.length && format[j] === '.') {
-          j++
+          const n = starOperand(args[argIndex++])
+          if (n === null) {
+            badArg = '%!(BADWIDTH)'
+          } else if (n < 0) {
+            flags += '-'
+            width = String(-n)
+          } else {
+            width = String(n)
+          }
+        } else {
           while (j < format.length && format[j] >= '0' && format[j] <= '9') {
-            precision += format[j]
+            width += format[j]
             j++
           }
+        }
+
+        // Parse precision, which * also takes from the next operand.
+        if (j < format.length && format[j] === '.') {
+          j++
+          if (format[j] === '*') {
+            j++
+            const n = starOperand(args[argIndex++])
+            if (n === null || n < 0) {
+              badArg = '%!(BADPREC)'
+            } else {
+              precision = String(n)
+            }
+          } else {
+            while (j < format.length && format[j] >= '0' && format[j] <= '9') {
+              precision += format[j]
+              j++
+            }
+          }
+        }
+        if (badArg !== '') {
+          parts.push(badArg)
         }
 
         // Get the verb
@@ -849,9 +892,17 @@ function errorfWrappedArgs(format: string, args: any[]): $.GoError[] {
     }
     let j = i + 1
     while (j < format.length && '+-# 0'.includes(format[j])) j++
+    if (format[j] === '*') {
+      j++
+      argIndex++
+    }
     while (j < format.length && format[j] >= '0' && format[j] <= '9') j++
     if (j < format.length && format[j] === '.') {
       j++
+      if (format[j] === '*') {
+        j++
+        argIndex++
+      }
       while (j < format.length && format[j] >= '0' && format[j] <= '9') j++
     }
     if (j < format.length) {
