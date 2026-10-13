@@ -1,4 +1,4 @@
-import { isVarRef } from './varRef.js'
+import { isVarRef, varRef, type VarRef } from './varRef.js'
 import { runtimePanic } from './panic.js'
 
 /**
@@ -2381,6 +2381,23 @@ export function genericZero<T>(
     return zero() as T
   }
   return fallback
+}
+
+// genericNew returns new(T) for the type parameter name. A pointer to a
+// struct is the struct instance itself, as for new of a struct type in
+// non-generic code, so a struct type argument returns its zero value
+// without value semantics. Any other type argument returns a VarRef.
+export function genericNew<T>(
+  typeArgs: GenericTypeArgs | undefined,
+  name: string,
+  fallback: T,
+): T | VarRef<T> {
+  const zero = genericZero(typeArgs, name, fallback)
+  if (isMarkedAsStructValue(zero)) {
+    delete (zero as any)[STRUCT_VALUE_MARKER]
+    return zero
+  }
+  return varRef(zero)
 }
 
 export function callGenericMethod<T>(
