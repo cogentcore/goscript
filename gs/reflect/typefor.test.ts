@@ -301,9 +301,8 @@ describe('TypeFor', () => {
       T: { type: 'main.RecursiveInterface', zero: () => null },
     })
 
-    expect(ifaceType.String()).toBe(
-      'interface { Visit(main.RecursiveInterface) main.RecursiveInterface }',
-    )
+    expect(ifaceType.String()).toBe('main.RecursiveInterface')
+    expect(ifaceType.NumMethod()).toBe(1)
     expect(ifaceType.AssignableTo(ifaceType)).toBe(true)
     expect(TypeOf(new RecursiveImpl()).AssignableTo(ifaceType)).toBe(true)
   })
@@ -656,7 +655,7 @@ describe('TypeFor', () => {
 
     expect(structType.String()).toBe('main.RegisteredStruct')
     expect(structType.Kind()).toBe(Struct)
-    expect(ifaceType.String()).toBe('interface { SomeMethod() }')
+    expect(ifaceType.String()).toBe('main.RegisteredInterface')
 
     const fieldsType = TypeFor({
       T: {

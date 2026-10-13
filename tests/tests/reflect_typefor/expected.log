@@ -1,4 +1,4 @@
-TypeFor interface: interface { SomeMethod() }
+TypeFor interface: main.MyInterface
 TypeFor struct: main.MyStruct
 TypeFor struct kind: true
 TypeFor int: int
@@ -6,4 +6,12 @@ TypeFor int kind: true
 TypeFor imported struct: time.Time
 TypeFor cross-file struct: main.OtherStruct
 Pointer constant: true
+error: true error error 
+error implements: true false
+Stringer: true fmt.Stringer Stringer fmt
+Stringer implements: true false
+Reader: true io.Reader
+namer: true main.namer 1
+any: interface {} true true
+assert fmt.Stringer: true
 reflect_typefor test finished
