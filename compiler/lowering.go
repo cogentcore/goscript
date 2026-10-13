@@ -9412,6 +9412,13 @@ func (o *LoweringOwner) lowerConversionExpr(
 	}
 	value, diagnostics := o.lowerExpr(ctx, expr.Args[0])
 	sourceType := ctx.semPkg.source.TypesInfo.TypeOf(expr.Args[0])
+	// A conversion that keeps the JavaScript value returns its operand
+	// unchanged, so a binary operand must stay grouped where the conversion
+	// is itself an operand, as in float64(n) / float64(a*b).
+	grouped := value
+	if _, ok := ast.Unparen(expr.Args[0]).(*ast.BinaryExpr); ok {
+		grouped = "(" + value + ")"
+	}
 	if isNumericType(targetType) && isUnsafePointerType(sourceType) {
 		if value, addressDiagnostics, ok := o.lowerUnsafePointerIntegerExpr(ctx, expr.Args[0]); ok {
 			return value, append(diagnostics, addressDiagnostics...)
@@ -9458,7 +9465,7 @@ func (o *LoweringOwner) lowerConversionExpr(
 		case overrideNamedStringType(ctx, o, sourceType):
 			return "String(" + value + ")", diagnostics
 		case isStringType(sourceType):
-			return value, diagnostics
+			return grouped, diagnostics
 		case isNumericType(sourceType):
 			// An invalid rune converts to U+FFFD, where String.fromCodePoint throws
 			// or keeps a surrogate.
@@ -9539,7 +9546,7 @@ func (o *LoweringOwner) lowerConversionExpr(
 		// conversions still widen below so their literal type does not narrow,
 		// and named-const references keep flowing through as their symbol.
 		if o.numericConversionKeepsLiteral(ctx, expr.Args[0], targetType) {
-			return value, diagnostics
+			return grouped, diagnostics
 		}
 	}
 	if named := namedFunctionType(targetType); named != nil {
@@ -9552,11 +9559,11 @@ func (o *LoweringOwner) lowerConversionExpr(
 		if _, ok := named.Underlying().(*types.Slice); ok {
 			return "(" + value + " as " + o.tsTypeFor(ctx, targetType) + ")", diagnostics
 		}
-		return value, diagnostics
+		return grouped, diagnostics
 	}
 	if isNumericType(targetType) {
 		if isFloatType(targetType) {
-			converted := value
+			converted := grouped
 			if isBigIntBackedType(sourceType) {
 				converted = "Number(" + value + ")"
 			}
@@ -9582,7 +9589,7 @@ func (o *LoweringOwner) lowerConversionExpr(
 		}
 		return o.runtimeOwner.QualifiedHelper(RuntimeHelperInt) + "(" + value + ")", diagnostics
 	}
-	return value, diagnostics
+	return grouped, diagnostics
 }
 
 // coerceWideHelperResult coerces a bigint result from the int64*/uint64* runtime
