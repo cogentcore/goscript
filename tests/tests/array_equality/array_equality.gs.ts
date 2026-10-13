@@ -5,6 +5,18 @@ import * as $ from "@goscript/builtin/index.js"
 
 export type Hash = Uint8Array
 
+$.registerNamedValueType(
+	"main.Hash",
+	{Valid: (receiver: any, ...args: any[]) => (Hash_Valid as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("Valid", [], [/* @__PURE__ */ $.basicType("bool")])]
+);
+
+$.registerNamedValueType(
+	"*main.Hash",
+	{Valid: (receiver: any, ...args: any[]) => (Hash_Valid as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("Valid", [], [/* @__PURE__ */ $.basicType("bool")])]
+);
+
 export function Hash_Valid(h: Hash): boolean {
 	return !$.arrayEqual(h, $.arrayValue(new Uint8Array(4)))
 }

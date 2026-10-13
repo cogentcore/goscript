@@ -1393,11 +1393,14 @@ export class Value {
       (namedType && this._type.Kind() !== Struct) ||
       (this._type.Kind() === Ptr && namedElemType)
     ) {
+      // Use the registered method set, so the box satisfies interfaces.
+      const registered = $.namedValueMethods(this._type.String())
       return $.namedValueInterfaceValue<ReflectValue>(
         current,
         this._type.String(),
-        {},
+        registered?.methods ?? {},
         typeInfo,
+        registered?.signatures,
       )
     }
     return current

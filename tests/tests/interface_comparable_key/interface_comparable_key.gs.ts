@@ -15,6 +15,18 @@ $.registerInterfaceType(
 
 export type valueHash = Uint8Array
 
+$.registerNamedValueType(
+	"main.valueHash",
+	{Key: (receiver: any, ...args: any[]) => (valueHash_Key as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("Key", [], [{ kind: $.TypeKind.Interface, methods: [] }])]
+);
+
+$.registerNamedValueType(
+	"*main.valueHash",
+	{Key: (receiver: any, ...args: any[]) => (valueHash_Key as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("Key", [], [{ kind: $.TypeKind.Interface, methods: [] }])]
+);
+
 export function valueHash_Key(h: valueHash): any {
 	return $.namedValueInterfaceValue<any>(h, "main.valueHash", {Key: (receiver: any, ...args: any[]) => (valueHash_Key as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, "main.valueHash", [$.methodSignature("Key", [], [{ kind: $.TypeKind.Interface, methods: [] }])])
 }

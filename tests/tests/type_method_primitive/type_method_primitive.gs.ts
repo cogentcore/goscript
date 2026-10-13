@@ -5,6 +5,18 @@ import * as $ from "@goscript/builtin/index.js"
 
 export type MyInt = number
 
+$.registerNamedValueType(
+	"main.MyInt",
+	{Double: (receiver: any, ...args: any[]) => (MyInt_Double as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("Double", [], [/* @__PURE__ */ $.basicType("int")])]
+);
+
+$.registerNamedValueType(
+	"*main.MyInt",
+	{Double: (receiver: any, ...args: any[]) => (MyInt_Double as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("Double", [], [/* @__PURE__ */ $.basicType("int")])]
+);
+
 export type Doubler = {
 	Double(): number
 }
@@ -26,6 +38,12 @@ $.registerInterfaceType(
 );
 
 export type MyBool = boolean
+
+$.registerNamedValueType(
+	"*main.MyBool",
+	{String: (receiver: any, ...args: any[]) => (MyBool_String as any)(receiver, ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])]
+);
 
 export function MyInt_Double(m: MyInt): number {
 	return $.int(m) * 2

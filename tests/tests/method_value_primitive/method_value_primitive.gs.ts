@@ -5,6 +5,18 @@ import * as $ from "@goscript/builtin/index.js"
 
 export type myInt = number
 
+$.registerNamedValueType(
+	"main.myInt",
+	{add: (receiver: any, ...args: any[]) => (myInt_add as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), multiply: (receiver: any, ...args: any[]) => (myInt_multiply as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("add", [["x", /* @__PURE__ */ $.basicType("int")]], [/* @__PURE__ */ $.basicType("int")]), $.methodSignature("multiply", [["x", /* @__PURE__ */ $.basicType("int")], ["y", /* @__PURE__ */ $.basicType("int")]], [/* @__PURE__ */ $.basicType("int")])]
+);
+
+$.registerNamedValueType(
+	"*main.myInt",
+	{add: (receiver: any, ...args: any[]) => (myInt_add as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args)), multiply: (receiver: any, ...args: any[]) => (myInt_multiply as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("add", [["x", /* @__PURE__ */ $.basicType("int")]], [/* @__PURE__ */ $.basicType("int")]), $.methodSignature("multiply", [["x", /* @__PURE__ */ $.basicType("int")], ["y", /* @__PURE__ */ $.basicType("int")]], [/* @__PURE__ */ $.basicType("int")])]
+);
+
 export function myInt_add(m: myInt, x: number): number {
 	return $.int(m) + x
 }

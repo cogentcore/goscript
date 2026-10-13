@@ -5,6 +5,18 @@ import * as $ from "@goscript/builtin/index.js"
 
 export type filters = $.Slice<number>
 
+$.registerNamedValueType(
+	"main.filters",
+	{size: (receiver: any, ...args: any[]) => (filters_size as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("size", [], [/* @__PURE__ */ $.basicType("int")])]
+);
+
+$.registerNamedValueType(
+	"*main.filters",
+	{size: (receiver: any, ...args: any[]) => (filters_size as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("size", [], [/* @__PURE__ */ $.basicType("int")])]
+);
+
 export function filters_size(f: filters): number {
 	return $.len((f as filters))
 }

@@ -5,6 +5,18 @@ import * as $ from "@goscript/builtin/index.js"
 
 export type MySlice = $.Slice<number>
 
+$.registerNamedValueType(
+	"main.MySlice",
+	{Sum: (receiver: any, ...args: any[]) => (MySlice_Sum as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("Sum", [], [/* @__PURE__ */ $.basicType("int")])]
+);
+
+$.registerNamedValueType(
+	"*main.MySlice",
+	{Add: (receiver: any, ...args: any[]) => (MySlice_Add as any)(receiver, ...$.stripGenericTypeArgs(args)), Sum: (receiver: any, ...args: any[]) => (MySlice_Sum as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("Add", [["val", /* @__PURE__ */ $.basicType("int")]]), $.methodSignature("Sum", [], [/* @__PURE__ */ $.basicType("int")])]
+);
+
 export function MySlice_Add(s: $.VarRef<MySlice> | null, val: number): void {
 	s!.value = ($.append(($.pointerValue<MySlice>(s) as MySlice), val) as MySlice)
 }

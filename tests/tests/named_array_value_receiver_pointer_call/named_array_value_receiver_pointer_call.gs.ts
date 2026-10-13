@@ -5,6 +5,18 @@ import * as $ from "@goscript/builtin/index.js"
 
 export type flags = number[]
 
+$.registerNamedValueType(
+	"main.flags",
+	{values: (receiver: any, ...args: any[]) => (flags_values as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("values", [], [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")])]
+);
+
+$.registerNamedValueType(
+	"*main.flags",
+	{set: (receiver: any, ...args: any[]) => (flags__set as any)(receiver, ...$.stripGenericTypeArgs(args)), values: (receiver: any, ...args: any[]) => (flags_values as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("set", [["idx", /* @__PURE__ */ $.basicType("int")]]), $.methodSignature("values", [], [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")])]
+);
+
 export function flags__set(f: $.VarRef<flags> | null, idx: number): void {
 	$.pointerValue<number[]>(f)[idx] = idx + 1
 }

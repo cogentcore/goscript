@@ -5,6 +5,12 @@ import * as $ from "@goscript/builtin/index.js"
 
 export type state = number
 
+$.registerNamedValueType(
+	"*main.state",
+	{set: (receiver: any, ...args: any[]) => (state__set as any)(receiver, ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("set", [["v", /* @__PURE__ */ $.basicType("int")]])]
+);
+
 export function state__set(s: $.VarRef<state> | null, v: number): void {
 	s!.value = $.int(v)
 }

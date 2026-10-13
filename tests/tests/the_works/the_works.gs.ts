@@ -5,6 +5,18 @@ import * as $ from "@goscript/builtin/index.js"
 
 export type Op = number
 
+$.registerNamedValueType(
+	"main.Op",
+	{String: (receiver: any, ...args: any[]) => (Op_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])]
+);
+
+$.registerNamedValueType(
+	"*main.Op",
+	{String: (receiver: any, ...args: any[]) => (Op_String as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])]
+);
+
 export type Report = {
 	Program(): string
 }

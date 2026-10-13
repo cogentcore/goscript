@@ -890,8 +890,12 @@ func (o *LoweringOwner) analyzeLocalFileReferences(
 				}
 			}
 			if named, ok := types.Unalias(typed.Type()).(*types.Named); ok {
+				// A named value type declared here registers its methods at run
+				// time (see lowerNamedValueTypeRegistration), so it uses them as
+				// values.
+				registered := declFile == sourcePath && registersNamedValueMethods(named)
 				for method := range named.Methods() {
-					addObject(method, false)
+					addObject(method, registered)
 				}
 			}
 		case *types.Var:
@@ -2888,7 +2892,58 @@ func (o *LoweringOwner) lowerTypeSpec(ctx lowerFileContext, spec *ast.TypeSpec) 
 		code = "export " + code
 		typeIndexExport = typeName
 	}
+	if registration := o.lowerNamedValueTypeRegistration(ctx, named); registration != "" {
+		return loweredDecl{
+			code:            code + "\n\n" + registration,
+			typeIndexExport: typeIndexExport,
+			sideEffect:      true,
+		}, nil
+	}
 	return loweredDecl{code: code, typeIndexExport: typeIndexExport}, nil
+}
+
+// registersNamedValueMethods reports whether a package-level named type is
+// a non-generic, non-struct, non-interface type with methods, whose method
+// sets lowerNamedValueTypeRegistration registers.
+func registersNamedValueMethods(named *types.Named) bool {
+	if named.TypeParams().Len() != 0 || named.NumMethods() == 0 {
+		return false
+	}
+	obj := named.Obj()
+	if obj == nil || obj.Pkg() == nil || obj.Parent() != obj.Pkg().Scope() {
+		return false
+	}
+	switch named.Underlying().(type) {
+	case *types.Struct, *types.Interface:
+		return false
+	}
+	return true
+}
+
+// lowerNamedValueTypeRegistration registers the method sets of a top-level,
+// non-generic named non-struct type with methods, and of a pointer to it, so
+// that values of the type created at run time, as by reflect, can be boxed
+// into interfaces with their methods.
+func (o *LoweringOwner) lowerNamedValueTypeRegistration(ctx lowerFileContext, named *types.Named) string {
+	if !ctx.topLevel || !registersNamedValueMethods(named) {
+		return ""
+	}
+	var registrations []string
+	for _, methodSetType := range []types.Type{named, types.NewPointer(named)} {
+		if types.NewMethodSet(methodSetType).Len() == 0 {
+			continue
+		}
+		methods := o.genericMethodDescriptorsForType(ctx, named, methodSetType, make(map[types.Type]bool))
+		signatures := o.genericMethodSignatureDescriptors(methodSetType)
+		if methods == "" || signatures == "" {
+			continue
+		}
+		registrations = append(registrations,
+			o.runtimeOwner.QualifiedHelper(RuntimeHelperRegisterNamedValueType)+"(\n\t"+
+				strconv.Quote(goRuntimeTypeString(methodSetType))+",\n\t"+
+				methods+",\n\t"+signatures+"\n);")
+	}
+	return strings.Join(registrations, "\n\n")
 }
 
 func (o *LoweringOwner) lowerInterfaceType(ctx lowerFileContext, semType *semanticType, iface *types.Interface) loweredDecl {
