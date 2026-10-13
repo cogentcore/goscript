@@ -1123,6 +1123,14 @@ func (o *LoweringOwner) analyzeLocalFileReferences(
 				}
 			}
 
+			// Instantiations pass descriptors of their type arguments, with zero
+			// value constructors and method tables, which use the types as values.
+			if instance, ok := semPkg.source.TypesInfo.Instances[typed]; ok && instance.TypeArgs != nil {
+				for typeArg := range instance.TypeArgs.Types() {
+					addRuntimeTypeDeps(typeArg)
+				}
+			}
+
 			// Reuse the maps already read here, preserving TypeOf's precedence:
 			// expression types first, then definitions, then uses. Embedded fields
 			// can have both a definition and a use for the same identifier.
