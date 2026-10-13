@@ -3,8 +3,17 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
+import * as reflect from "@goscript/reflect/index.js"
+
 import * as runtime from "@goscript/runtime/index.js"
+
+import * as strconv from "@goscript/strconv/index.js"
+
+import * as strings from "@goscript/strings/index.js"
+import "@goscript/reflect/index.js"
 import "@goscript/runtime/index.js"
+import "@goscript/strconv/index.js"
+import "@goscript/strings/index.js"
 
 function __goscriptInit0(): void {
 	// Graphics and windowing code locks the main goroutine to the main
@@ -39,6 +48,7 @@ export async function main(): globalThis.Promise<void> {
 	let [frame, more] = runtime.Frames.prototype.Next.call($.pointerValue<runtime.Frames>(frames))
 	await $.println("Frames empty:", frame.Line, more)
 	await $.println("FuncForPC nil:", runtime.FuncForPC(0) == null)
+	await callers()
 
 	let box = $.varRef($.anonymousStructValue({value: 1}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("value", /* @__PURE__ */ $.basicType("int"), [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/package_import_runtime" })] }))
 	let cleanup = $.markAsStructValue($.cloneStructValue(runtime.AddCleanup(box, $.functionValue(async (value: number): globalThis.Promise<void> => {
@@ -55,6 +65,39 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("Finalizer ignored")
 
 	await lockOSThread()
+}
+
+export async function callers(): globalThis.Promise<void> {
+	let __goscriptTuple0: any = runtime.Caller(0)
+	let pc = $.uint(__goscriptTuple0[0], 64)
+	let file = __goscriptTuple0[1]
+	let line = __goscriptTuple0[2]
+	let ok = __goscriptTuple0[3]
+	await $.println("Caller:", ok, $.uint(pc, 64) != 0, !$.stringEqual(file, ""), line > 0)
+	let f: runtime.Func | $.VarRef<runtime.Func> | null = runtime.FuncForPC($.uint(pc, 64))
+	await $.println("FuncForPC caller:", f != null, strings.Contains(runtime.Func.prototype.Name.call($.pointerValue<runtime.Func>(f)), "callers"))
+	await $.println("Caller(1):", !$.stringEqual(callerInfo(), ""))
+	await $.println("FuncForPC func value:", strings.Contains(funcName($.interfaceValue(helperFunc, "func()", ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo))), "helperFunc"))
+
+	let pcs: $.Slice<number> = $.makeSlice<number>(8, undefined, "number")
+	let n = runtime.Callers(1, pcs)
+	let [frame, ] = runtime.Frames.prototype.Next.call($.pointerValue<runtime.Frames>(runtime.CallersFrames($.goSlice(pcs, undefined, n))))
+	await $.println("Callers:", n > 0, frame.Line > 0, strings.Contains(frame.Function, "callers"))
+}
+
+export function callerInfo(): string {
+	let __goscriptTuple1: any = runtime.Caller(1)
+	let pc = $.uint(__goscriptTuple1[0], 64)
+	let file = __goscriptTuple1[1]
+	let line = __goscriptTuple1[2]
+	return $.concatString(($.concatString(($.concatString(($.concatString(runtime.Func.prototype.Name.call($.pointerValue<runtime.Func>(runtime.FuncForPC($.uint(pc, 64)))), " ")), file)), ":")), strconv.Itoa(line))
+}
+
+export function funcName(f: any): string {
+	return runtime.Func.prototype.Name.call($.pointerValue<runtime.Func>(runtime.FuncForPC($.uint($.markAsStructValue($.cloneStructValue(reflect.ValueOf(f))).Pointer(), 64))))
+}
+
+export function helperFunc(): void {
 }
 
 export async function lockOSThread(): globalThis.Promise<void> {

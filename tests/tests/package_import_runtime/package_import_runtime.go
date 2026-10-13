@@ -1,6 +1,11 @@
 package main
 
-import "runtime"
+import (
+	"reflect"
+	"runtime"
+	"strconv"
+	"strings"
+)
 
 func init() {
 	// Graphics and windowing code locks the main goroutine to the main
@@ -35,6 +40,7 @@ func main() {
 	frame, more := frames.Next()
 	println("Frames empty:", frame.Line, more)
 	println("FuncForPC nil:", runtime.FuncForPC(0) == nil)
+	callers()
 
 	box := &struct{ value int }{value: 1}
 	cleanup := runtime.AddCleanup(box, func(value int) {
@@ -52,6 +58,34 @@ func main() {
 
 	lockOSThread()
 }
+
+// callers reports frames of its own stack and names a function value.
+func callers() {
+	pc, file, line, ok := runtime.Caller(0)
+	println("Caller:", ok, pc != 0, file != "", line > 0)
+	f := runtime.FuncForPC(pc)
+	println("FuncForPC caller:", f != nil, strings.Contains(f.Name(), "callers"))
+	println("Caller(1):", callerInfo() != "")
+	println("FuncForPC func value:", strings.Contains(funcName(helperFunc), "helperFunc"))
+
+	pcs := make([]uintptr, 8)
+	n := runtime.Callers(1, pcs)
+	frame, _ := runtime.CallersFrames(pcs[:n]).Next()
+	println("Callers:", n > 0, frame.Line > 0, strings.Contains(frame.Function, "callers"))
+}
+
+// callerInfo names its caller's function, file and line, as logging code does.
+func callerInfo() string {
+	pc, file, line, _ := runtime.Caller(1)
+	return runtime.FuncForPC(pc).Name() + " " + file + ":" + strconv.Itoa(line)
+}
+
+// funcName names a function value, as Cogent Core's types.FuncName does.
+func funcName(f any) string {
+	return runtime.FuncForPC(reflect.ValueOf(f).Pointer()).Name()
+}
+
+func helperFunc() {}
 
 // lockOSThread locks a goroutine to its thread and unlocks main's lock from
 // init.

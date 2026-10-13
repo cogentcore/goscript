@@ -8,6 +8,11 @@ GC called successfully
 Callers empty: 0
 Frames empty: 0 false
 FuncForPC nil: true
+Caller: true true true true
+FuncForPC caller: true true
+Caller(1): true
+FuncForPC func value: true
+Callers: true true true
 Cleanup stopped
 Finalizer ignored
 locked goroutine ran

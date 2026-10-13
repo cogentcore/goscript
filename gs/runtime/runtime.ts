@@ -192,26 +192,35 @@ export function Caller(skip: number): [number, string, number, boolean] {
 
 // Func represents metadata for a function in a stack frame.
 export class Func {
-  constructor(private readonly pc: number = 0) {}
+  constructor(
+    private readonly pc: number = 0,
+    private readonly name: string = frameTable[pc - 1]?.name ?? '',
+  ) {}
 
   public Entry(): number {
     return this.pc
   }
 
-  public FileLine(_pc: number): [string, number] {
-    const frame = frameTable[this.pc - 1]
+  public FileLine(pc: number): [string, number] {
+    const frame = frameTable[pc - 1]
     return frame === undefined ? ['', 0] : [frame.file, frame.line]
   }
 
   public Name(): string {
-    return frameTable[this.pc - 1]?.name ?? ''
+    return this.name
   }
 }
 
 // FuncForPC returns function metadata for a program counter returned by
-// Caller or Callers, or nil for any other value.
+// Caller or Callers, or for the Pointer of a function value from reflect,
+// whose name is that of the JavaScript function. It returns nil for any
+// other value.
 export function FuncForPC(pc: number): Func | null {
-  return frameTable[pc - 1] === undefined ? null : new Func(pc)
+  if (frameTable[pc - 1] !== undefined) {
+    return new Func(pc)
+  }
+  const fn = $.objectAtAddress(pc)
+  return typeof fn === 'function' ? new Func(pc, fn.name) : null
 }
 
 // StartTrace enables execution tracing.
