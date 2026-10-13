@@ -10,5 +10,10 @@ func main() {
 	testJSWasm()
 	testGeneric()
 
+	// goscript cannot run assembly, so it builds with the purego and noasm
+	// tags, which select pure Go code in packages that also ship assembly.
+	testNoAsm()
+	testPureGo()
+
 	println("=== End Build Tags Test ===")
 }

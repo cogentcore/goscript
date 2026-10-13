@@ -19,6 +19,8 @@
     "build_tags.gs.ts",
     "build_tags_generic.gs.ts",
     "build_tags_js.gs.ts",
+    "build_tags_noasm.gs.ts",
+    "build_tags_purego.gs.ts",
     "index.ts"
   ]
 }
