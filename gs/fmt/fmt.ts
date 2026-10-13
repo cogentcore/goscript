@@ -130,12 +130,40 @@ function formatHexBytes(
   return result
 }
 
+// elementwiseVerbs are the verbs that Go applies to each element of a slice or
+// array.
+const elementwiseVerbs = new Set([
+  'd',
+  'f',
+  'F',
+  'q',
+  't',
+  'c',
+  'x',
+  'X',
+  'o',
+  'b',
+  'e',
+  'E',
+  'g',
+  'G',
+])
+
 // Simple printf-style formatting implementation for verbs that cannot
 // produce async results (numbers, runes, booleans). Value formatting that can
 // consult Error/String/GoString goes through formatValueMaybe instead.
 function formatValue(value: any, verb: string, flags = ''): string {
   if (value === null || value === undefined) {
     return '<nil>'
+  }
+
+  // Go applies a verb to each element of a slice or array, as in %q of a
+  // []string or %d of a []int. Byte slices format as a whole for %s, %q, %x
+  // and %X, and are Uint8Arrays rather than JavaScript arrays here.
+  if (Array.isArray(value) && elementwiseVerbs.has(verb)) {
+    return (
+      '[' + value.map((item) => formatValue(item, verb, flags)).join(' ') + ']'
+    )
   }
 
   switch (verb) {
@@ -235,6 +263,13 @@ function formatFloatVerb(
   verb: string,
   precision: string,
 ): string {
+  if (Array.isArray(value)) {
+    return (
+      '[' +
+      value.map((item) => formatFloatVerb(item, verb, precision)).join(' ') +
+      ']'
+    )
+  }
   const bits = floatBits(value) || 64
   let prec = precision === '' ? -1 : parseInt(precision)
   if (prec < 0 && verb !== 'g' && verb !== 'G') {
