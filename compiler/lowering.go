@@ -12421,7 +12421,7 @@ func (o *LoweringOwner) lowerTypeParamPointerInterfaceValue(
 		helper += "<" + target + ">"
 	}
 	return helper + "(" + value + ", __typeArgs?.[" + strconv.Quote(typeParam.Obj().Name()) + "], " +
-		strconv.Quote(goRuntimeTypeString(sourceType)) + ", " + o.runtimeTypeInfoExpr(sourceType) + ")"
+		strconv.Quote(goRuntimeTypeString(sourceType)) + ", " + o.runtimeTypeAssertInfoExpr(ctx, sourceType) + ")"
 }
 
 func (o *LoweringOwner) lowerInterfaceValueExpr(
