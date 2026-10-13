@@ -57,7 +57,7 @@ export class asyncBuffer {
 
 	public async Reset(w: io.Writer | null): globalThis.Promise<void> {
 		const b: asyncBuffer | $.VarRef<asyncBuffer> | null = this;
-		if ($.comparableEqual(b, w)) {
+		if ($.comparableEqual($.interfaceValue<io.Writer | null>(b, "*main.asyncBuffer", /* @__PURE__ */ $.pointerType("main.asyncBuffer")), w)) {
 			await $.println("Reset same writer")
 			return
 		}

@@ -7679,6 +7679,14 @@ func (o *LoweringOwner) lowerInterfaceEqualityExpr(ctx lowerFileContext, expr *a
 	if !isInterfaceType(leftType) && !isInterfaceType(rightType) {
 		return "", false
 	}
+	// Go converts the non-interface operand to the interface type, so a named
+	// basic value compares as the boxed value an interface holds.
+	if isInterfaceType(leftType) && !isInterfaceType(rightType) {
+		right = o.lowerValueForTargetTypes(ctx, leftType, rightType, right, false)
+	}
+	if isInterfaceType(rightType) && !isInterfaceType(leftType) {
+		left = o.lowerValueForTargetTypes(ctx, rightType, leftType, left, false)
+	}
 	value := o.runtimeOwner.QualifiedHelper(RuntimeHelperComparableEqual) + "(" + left + ", " + right + ")"
 	if expr.Op == token.NEQ {
 		value = "!" + value

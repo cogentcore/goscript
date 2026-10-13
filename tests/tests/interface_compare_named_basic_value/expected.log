@@ -1,0 +1,5 @@
+var eq: true false true
+const eq: true false
+other: false true false
+boxed eq: true
+any eq: true false
