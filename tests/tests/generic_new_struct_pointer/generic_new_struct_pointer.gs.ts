@@ -106,7 +106,7 @@ export function newNode(__typeArgs: $.GenericTypeArgs | undefined): any {
 }
 
 export function asNode(__typeArgs: $.GenericTypeArgs | undefined): Node | null {
-	return $.mustTypeAssert<Node | null>($.interfaceValue(newNode({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }}), "*T", /* @__PURE__ */ $.pointerType(__typeArgs?.["T"]?.type ?? { kind: $.TypeKind.Interface, methods: [] })), "main.Node")
+	return $.mustTypeAssert<Node | null>($.typeParamPointerInterfaceValue(newNode({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }}), __typeArgs?.["T"], "*T", /* @__PURE__ */ $.pointerType(__typeArgs?.["T"]?.type ?? { kind: $.TypeKind.Interface, methods: [] })), "main.Node")
 }
 
 export async function initAs(__typeArgs: $.GenericTypeArgs | undefined, n: Node | null, init: ((w: any) => void) | null): globalThis.Promise<void> {
