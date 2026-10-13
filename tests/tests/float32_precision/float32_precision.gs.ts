@@ -87,7 +87,7 @@ export async function main(): globalThis.Promise<void> {
 	let __goscriptTuple0: any = json.Marshal($.interfaceValue($.markAsStructValue($.cloneStructValue(s.value)), "main.T", "main.T"))
 	let b: $.Slice<number> = __goscriptTuple0[0]
 	let j: $.VarRef<T> = $.varRef($.markAsStructValue(new T()))
-	let err = json.Unmarshal(b, $.interfaceValue(j, "*main.T", /* @__PURE__ */ $.pointerType("main.T")))
+	let err: $.GoError = json.Unmarshal(b, $.interfaceValue(j, "*main.T", /* @__PURE__ */ $.pointerType("main.T")))
 	await fmt.Println($.bytesToString(b), $.structEqual(j.value, s.value), $.interfaceValue($.markAsStructValue($.cloneStructValue(j.value)), "main.T", "main.T"), (err as any))
 	let buf: $.VarRef<bytes.Buffer> = $.varRef($.markAsStructValue(new bytes.Buffer()))
 	let enc: json.Encoder | $.VarRef<json.Encoder> | null = json.NewEncoder($.pointerValueOrNil($.interfaceValue<io.Writer | null>(buf, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer")))!)
