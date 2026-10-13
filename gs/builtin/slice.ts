@@ -2092,11 +2092,11 @@ export const runesToString = (runes: Slice<number>): string => {
 // planes), and a negative, out-of-range, or surrogate rune becomes U+FFFD
 // (utf8.RuneError), never a throw. String.fromCharCode truncated astral runes to
 // a single broken UTF-16 unit; String.fromCodePoint preserves the full rune.
-export function runeToString(r: number): string {
+export function runeToString(r: number | bigint): string {
   if (r < 0 || r > 0x10ffff || (r >= 0xd800 && r <= 0xdfff)) {
-    return '�'
+    return '\uFFFD'
   }
-  return String.fromCodePoint(r)
+  return String.fromCodePoint(Number(r))
 }
 
 /**

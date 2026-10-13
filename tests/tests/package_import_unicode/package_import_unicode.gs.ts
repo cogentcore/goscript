@@ -38,23 +38,23 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("\nTesting case conversion:")
 
 	// Test ToUpper
-	await $.println("ToUpper('a'):", String.fromCodePoint(unicode.ToUpper(97)))
-	await $.println("ToUpper('Z'):", String.fromCodePoint(unicode.ToUpper(90)))
+	await $.println("ToUpper('a'):", $.runeToString(unicode.ToUpper(97)))
+	await $.println("ToUpper('Z'):", $.runeToString(unicode.ToUpper(90)))
 
 	// Test ToLower
-	await $.println("ToLower('A'):", String.fromCodePoint(unicode.ToLower(65)))
-	await $.println("ToLower('z'):", String.fromCodePoint(unicode.ToLower(122)))
+	await $.println("ToLower('A'):", $.runeToString(unicode.ToLower(65)))
+	await $.println("ToLower('z'):", $.runeToString(unicode.ToLower(122)))
 
 	// Test ToTitle
-	await $.println("ToTitle('a'):", String.fromCodePoint(unicode.ToTitle(97)))
+	await $.println("ToTitle('a'):", $.runeToString(unicode.ToTitle(97)))
 
 	// Test To function with constants
-	await $.println("To(UpperCase, 'b'):", String.fromCodePoint(unicode.To(0, 98)))
-	await $.println("To(LowerCase, 'C'):", String.fromCodePoint(unicode.To(1, 67)))
+	await $.println("To(UpperCase, 'b'):", $.runeToString(unicode.To(0, 98)))
+	await $.println("To(LowerCase, 'C'):", $.runeToString(unicode.To(1, 67)))
 
 	// Test SimpleFold
-	await $.println("SimpleFold('A'):", String.fromCodePoint(unicode.SimpleFold(65)))
-	await $.println("SimpleFold('a'):", String.fromCodePoint(unicode.SimpleFold(97)))
+	await $.println("SimpleFold('A'):", $.runeToString(unicode.SimpleFold(65)))
+	await $.println("SimpleFold('a'):", $.runeToString(unicode.SimpleFold(97)))
 
 	// Test constants
 	await $.println("\nTesting constants:")

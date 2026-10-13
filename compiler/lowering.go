@@ -9430,7 +9430,9 @@ func (o *LoweringOwner) lowerConversionExpr(
 		case isStringType(sourceType):
 			return value, diagnostics
 		case isNumericType(sourceType):
-			return "String.fromCodePoint(" + value + ")", diagnostics
+			// An invalid rune converts to U+FFFD, where String.fromCodePoint throws
+			// or keeps a surrogate.
+			return o.runtimeOwner.QualifiedHelper(RuntimeHelperRuneToString) + "(" + value + ")", diagnostics
 		default:
 			return o.runtimeOwner.QualifiedHelper(RuntimeHelperGenericBytesOrStringToString) + "(" + value + ")", diagnostics
 		}

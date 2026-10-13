@@ -17,10 +17,10 @@ export async function testFS(fsys: string, expected: $.Slice<string>): globalThi
 
 	for (let __goscriptRangeTarget0 = expected, i = 0; i < $.len(__goscriptRangeTarget0); i++) {
 		let exp = __goscriptRangeTarget0![i]
-		await $.println($.concatString(($.concatString(($.concatString("Expected[", String.fromCodePoint($.int(i + 48, 32)))), "]: ")), exp))
+		await $.println((("Expected[" + $.runeToString($.int(i + 48, 32))) + "]: ") + exp)
 	}
 
-	await $.println($.concatString("File system: ", fsys))
+	await $.println("File system: " + fsys)
 	return null
 }
 
@@ -31,7 +31,7 @@ export async function main(): globalThis.Promise<void> {
 	let err = await TestFS("myfs", expected)
 
 	if (err != null) {
-		await $.println($.concatString("Error: ", await $.pointerValue<Exclude<$.GoError, null>>(err).Error()))
+		await $.println("Error: " + await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 	} else {
 		await $.println("Success!")
 	}
