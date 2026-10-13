@@ -18,6 +18,36 @@ import "@goscript/slices/index.js"
 import "@goscript/strconv/index.js"
 import "@goscript/strings/index.js"
 
+export class Holder {
+	public declare Tags: globalThis.Map<string, number> | null
+
+	public _fields: {
+		Tags: globalThis.Map<string, number> | null
+	}
+
+	constructor(init?: Partial<{Tags?: globalThis.Map<string, number> | null}>) {
+		this._fields = {
+			Tags: init?.Tags ?? (null! as globalThis.Map<string, number> | null)
+		}
+	}
+
+	public clone(): Holder {
+		return $.markAsStructValue(new Holder(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["Tags"])
+	}
+
+	static __typeInfo = $.registerStructType(
+		"main.Holder",
+		() => new Holder(),
+		() => [],
+		Holder,
+		() => [{ name: "Tags", key: "Tags", type: /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("int")) }]
+	)
+}
+
 export class Person {
 	public declare Name: string
 
@@ -115,6 +145,21 @@ export async function main(): globalThis.Promise<void> {
 	// the json/v2 MarshalJSONTo and UnmarshalJSONFrom.
 	let num: fmt.Stringer | null = $.namedValueInterfaceValue<fmt.Stringer | null>(String("12.5"), "json.Number", {Float64: (receiver: any, ...args: any[]) => (json.Number_Float64 as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Int64: (receiver: any, ...args: any[]) => (json.Number_Int64 as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), MarshalJSONTo: (receiver: any, ...args: any[]) => (json.Number_MarshalJSONTo as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), String: (receiver: any, ...args: any[]) => (json.Number_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, /* @__PURE__ */ $.basicType("string", "json.Number"), [$.methodSignature("Float64", [], [/* @__PURE__ */ $.basicType("float64"), "error"]), $.methodSignature("Int64", [], [/* @__PURE__ */ $.basicType("int64"), "error"]), $.methodSignature("MarshalJSONTo", [["enc", /* @__PURE__ */ $.pointerType("jsontext.Encoder")]], ["error"]), $.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])])
 	await $.println("Number as Stringer:", await $.pointerValue<Exclude<fmt.Stringer, null>>(num).String())
+
+	// Decoding an object into a non-nil map adds to the existing entries.
+	let mp: $.VarRef<globalThis.Map<string, number> | null> = $.varRef($.makeMap<string, number>([["a", 1], ["b", 2]]))
+	let to: any = $.interfaceValue(mp, "*map[string]float32", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("float32"))))
+	err = json.Unmarshal(new Uint8Array([123, 34, 98, 34, 58, 53, 44, 34, 99, 34, 58, 51, 125]), to)
+	await $.println("merge any:", err == null, $.len(mp.value), $.mapGet<string, number, number>(mp.value, "a", 0)[0], $.mapGet<string, number, number>(mp.value, "b", 0)[0], $.mapGet<string, number, number>(mp.value, "c", 0)[0])
+	let m2: $.VarRef<globalThis.Map<string, number> | null> = $.varRef($.makeMap<string, number>([["x", 1]]))
+	json.Unmarshal(new Uint8Array([123, 34, 121, 34, 58, 50, 125]), $.interfaceValue(m2, "*map[string]int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("int")))))
+	await $.println("merge typed:", $.len(m2.value), $.mapGet<string, number, number>(m2.value, "x", 0)[0], $.mapGet<string, number, number>(m2.value, "y", 0)[0])
+	let m3: $.VarRef<globalThis.Map<string, number> | null> = $.varRef(null! as globalThis.Map<string, number> | null)
+	json.Unmarshal(new Uint8Array([123, 34, 122, 34, 58, 51, 125]), $.interfaceValue(m3, "*map[string]int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("int")))))
+	await $.println("nil map:", $.len(m3.value), $.mapGet<string, number, number>(m3.value, "z", 0)[0])
+	let h = $.varRef($.markAsStructValue(new Holder({Tags: $.makeMap<string, number>([["keep", 1]])})))
+	json.Unmarshal(new Uint8Array([123, 34, 84, 97, 103, 115, 34, 58, 123, 34, 97, 100, 100, 34, 58, 50, 125, 125]), $.interfaceValue(h, "*main.Holder", /* @__PURE__ */ $.pointerType("main.Holder")))
+	await $.println("merge field:", $.len(h.value.Tags), $.mapGet<string, number, number>(h.value.Tags, "keep", 0)[0], $.mapGet<string, number, number>(h.value.Tags, "add", 0)[0])
 
 	await $.println("encoding/json test finished")
 }

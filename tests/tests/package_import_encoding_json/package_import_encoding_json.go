@@ -8,6 +8,11 @@ import (
 	"strings"
 )
 
+// Holder has a map field that Unmarshal merges into.
+type Holder struct {
+	Tags map[string]int
+}
+
 type Person struct {
 	Name   string `json:"name"`
 	Age    int    `json:"age"`
@@ -62,6 +67,21 @@ func main() {
 	// the json/v2 MarshalJSONTo and UnmarshalJSONFrom.
 	var num fmt.Stringer = json.Number("12.5")
 	println("Number as Stringer:", num.String())
+
+	// Decoding an object into a non-nil map adds to the existing entries.
+	mp := map[string]float32{"a": 1, "b": 2}
+	var to any = &mp
+	err = json.Unmarshal([]byte(`{"b":5,"c":3}`), to)
+	println("merge any:", err == nil, len(mp), mp["a"], mp["b"], mp["c"])
+	m2 := map[string]int{"x": 1}
+	json.Unmarshal([]byte(`{"y":2}`), &m2)
+	println("merge typed:", len(m2), m2["x"], m2["y"])
+	var m3 map[string]int
+	json.Unmarshal([]byte(`{"z":3}`), &m3)
+	println("nil map:", len(m3), m3["z"])
+	h := Holder{Tags: map[string]int{"keep": 1}}
+	json.Unmarshal([]byte(`{"Tags":{"add":2}}`), &h)
+	println("merge field:", len(h.Tags), h.Tags["keep"], h.Tags["add"])
 
 	println("encoding/json test finished")
 }
