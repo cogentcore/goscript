@@ -138,3 +138,17 @@ func TestRuntimeDependencies(t *testing.T) {
 		}
 	}
 }
+
+// TestBrowserTestDependencies checks that package.json lists versioned
+// browser test dependencies.
+func TestBrowserTestDependencies(t *testing.T) {
+	deps, err := BrowserTestDependencies()
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, name := range browserTestPackages {
+		if deps[name] == "" {
+			t.Fatalf("browser test npm dependency %s has no version", name)
+		}
+	}
+}
