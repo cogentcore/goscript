@@ -50,7 +50,7 @@ export async function main(): globalThis.Promise<void> {
 		}
 	}
 
-	let [n, err] = os.File.prototype.Write.call($.pointerValue<os.File>(os.Stdout), new Uint8Array([115, 116, 100, 111, 117, 116, 32, 119, 114, 105, 116, 101, 32, 119, 111, 114, 107, 115, 10]))
+	let [n, err] = await os.File.prototype.Write.call($.pointerValue<os.File>(os.Stdout), new Uint8Array([115, 116, 100, 111, 117, 116, 32, 119, 114, 105, 116, 101, 32, 119, 111, 114, 107, 115, 10]))
 	if (err == null) {
 		await $.println("Stdout write bytes:", n)
 	} else {
@@ -58,7 +58,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 
 	let fileName = "os-runtime-file.txt"
-	let writeErr = os.WriteFile(fileName, new Uint8Array([114, 117, 110, 116, 105, 109, 101, 32, 102, 105, 108, 101, 32, 99, 111, 110, 116, 101, 110, 116, 115]), 0o644)
+	let writeErr = await os.WriteFile(fileName, new Uint8Array([114, 117, 110, 116, 105, 109, 101, 32, 102, 105, 108, 101, 32, 99, 111, 110, 116, 101, 110, 116, 115]), 0o644)
 	if (writeErr == null) {
 		await $.println("WriteFile ok")
 	} else {
@@ -66,7 +66,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 
 	{
-		let __goscriptTuple0: any = os.ReadFile(fileName)
+		let __goscriptTuple0: any = await os.ReadFile(fileName)
 		let data: $.Slice<number> = __goscriptTuple0[0]
 		let readErr = __goscriptTuple0[1]
 		if (readErr == null) {
@@ -77,7 +77,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 
 	{
-		let [info, statErr] = os.Stat(fileName)
+		let [info, statErr] = await os.Stat(fileName)
 		if (statErr == null) {
 			await $.println("Stat name:", await $.pointerValue<Exclude<fs.FileInfo, null>>(info).Name())
 			await $.println("Stat size:", await $.pointerValue<Exclude<fs.FileInfo, null>>(info).Size())
@@ -86,7 +86,7 @@ export async function main(): globalThis.Promise<void> {
 		}
 	}
 
-	let removeErr = os.Remove(fileName)
+	let removeErr = await os.Remove(fileName)
 	if (removeErr == null) {
 		await $.println("Remove ok")
 	} else {
@@ -94,24 +94,24 @@ export async function main(): globalThis.Promise<void> {
 	}
 
 	{
-		let [tempDir, __goscriptShadow0] = os.MkdirTemp("", "os-temp-dir-*")
+		let [tempDir, __goscriptShadow0] = await os.MkdirTemp("", "os-temp-dir-*")
 		if (__goscriptShadow0 == null) {
 			await $.println("MkdirTemp ok")
-			os.RemoveAll(tempDir)
+			await os.RemoveAll(tempDir)
 		} else {
 			await $.println("MkdirTemp error:", await $.pointerValue<Exclude<$.GoError, null>>(__goscriptShadow0).Error())
 		}
 	}
 
 	{
-		let __goscriptTuple1: any = os.CreateTemp("", "os-temp-file-*")
+		let __goscriptTuple1: any = await os.CreateTemp("", "os-temp-file-*")
 		let tempFile: os.File | $.VarRef<os.File> | null = __goscriptTuple1[0]
 		let __goscriptShadow1 = __goscriptTuple1[1]
 		if (__goscriptShadow1 == null) {
 			await $.println("CreateTemp ok")
 			await $.println("CreateTemp name empty:", $.stringEqual(os.File.prototype.Name.call($.pointerValue<os.File>(tempFile)), ""))
-			os.File.prototype.Close.call($.pointerValue<os.File>(tempFile))
-			os.Remove(os.File.prototype.Name.call($.pointerValue<os.File>(tempFile)))
+			await os.File.prototype.Close.call($.pointerValue<os.File>(tempFile))
+			await os.Remove(os.File.prototype.Name.call($.pointerValue<os.File>(tempFile)))
 		} else {
 			await $.println("CreateTemp error:", await $.pointerValue<Exclude<$.GoError, null>>(__goscriptShadow1).Error())
 		}

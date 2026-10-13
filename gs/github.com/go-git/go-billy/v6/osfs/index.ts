@@ -17,24 +17,24 @@ const ErrBaseDirCannotBeRenamed = $.newError('base dir cannot be renamed')
 
 type Filesystem = {
   Chroot(path: string): [Filesystem | null, $.GoError]
-  Create(filename: string): [os.File | null, $.GoError]
+  Create(filename: string): Promise<[os.File | null, $.GoError]>
   Join(...elem: JoinElement[]): string
-  Lstat(filename: string): [fs.FileInfo, $.GoError]
-  MkdirAll(filename: string, perm: fs.FileMode): $.GoError
-  Open(filename: string): [os.File | null, $.GoError]
+  Lstat(filename: string): Promise<[fs.FileInfo, $.GoError]>
+  MkdirAll(filename: string, perm: fs.FileMode): Promise<$.GoError>
+  Open(filename: string): Promise<[os.File | null, $.GoError]>
   OpenFile(
     filename: string,
     flag: number,
     perm: fs.FileMode,
-  ): [os.File | null, $.GoError]
-  ReadDir(path: string): [$.Slice<fs.DirEntry | null>, $.GoError]
-  Readlink(link: string): [string, $.GoError]
-  Remove(filename: string): $.GoError
-  Rename(oldpath: string, newpath: string): $.GoError
+  ): Promise<[os.File | null, $.GoError]>
+  ReadDir(path: string): Promise<[$.Slice<fs.DirEntry | null>, $.GoError]>
+  Readlink(link: string): Promise<[string, $.GoError]>
+  Remove(filename: string): Promise<$.GoError>
+  Rename(oldpath: string, newpath: string): Promise<$.GoError>
   Root(): string
-  Stat(filename: string): [fs.FileInfo, $.GoError]
-  Symlink(target: string, link: string): $.GoError
-  TempFile(dir: string, prefix: string): [os.File | null, $.GoError]
+  Stat(filename: string): Promise<[fs.FileInfo, $.GoError]>
+  Symlink(target: string, link: string): Promise<$.GoError>
+  TempFile(dir: string, prefix: string): Promise<[os.File | null, $.GoError]>
 }
 
 type JoinElement = string | $.Slice<string>
@@ -113,23 +113,23 @@ export class BoundOS {
     return allCapabilities
   }
 
-  public Create(name: string): [os.File | null, $.GoError] {
-    return this.OpenFile(
+  public async Create(name: string): Promise<[os.File | null, $.GoError]> {
+    return await this.OpenFile(
       name,
       os.O_RDWR | os.O_CREATE | os.O_TRUNC,
       defaultCreateMode,
     )
   }
 
-  public Open(name: string): [os.File | null, $.GoError] {
-    return this.OpenFile(name, os.O_RDONLY, 0)
+  public async Open(name: string): Promise<[os.File | null, $.GoError]> {
+    return await this.OpenFile(name, os.O_RDONLY, 0)
   }
 
-  public OpenFile(
+  public async OpenFile(
     name: string,
     flag: number,
     perm: fs.FileMode,
-  ): [os.File | null, $.GoError] {
+  ): Promise<[os.File | null, $.GoError]> {
     const [full, err] = this.abs(name)
     if (err !== null) {
       return [null, err]
@@ -137,46 +137,48 @@ export class BoundOS {
     if ((flag & os.O_CREATE) !== 0) {
       const dir = filepath.Dir(full)
       if (dir !== '.' && dir !== '') {
-        const mkdirErr = os.MkdirAll(dir, defaultDirectoryMode)
+        const mkdirErr = await os.MkdirAll(dir, defaultDirectoryMode)
         if (mkdirErr !== null) {
           return [null, mkdirErr]
         }
       }
     }
-    return os.OpenFile(full, flag, perm)
+    return await os.OpenFile(full, flag, perm)
   }
 
-  public Stat(name: string): [fs.FileInfo, $.GoError] {
+  public async Stat(name: string): Promise<[fs.FileInfo, $.GoError]> {
     const [full, err] = this.abs(name)
     if (err !== null) {
       return [null, err]
     }
-    return os.Stat(full)
+    return await os.Stat(full)
   }
 
-  public Lstat(name: string): [fs.FileInfo, $.GoError] {
+  public async Lstat(name: string): Promise<[fs.FileInfo, $.GoError]> {
     const [full, err] = this.abs(name)
     if (err !== null) {
       return [null, err]
     }
-    return os.Lstat(full)
+    return await os.Lstat(full)
   }
 
-  public ReadDir(name: string): [$.Slice<fs.DirEntry | null>, $.GoError] {
+  public async ReadDir(
+    name: string,
+  ): Promise<[$.Slice<fs.DirEntry | null>, $.GoError]> {
     const [full, err] = this.abs(name)
     if (err !== null) {
       return [null, err]
     }
-    const [file, openErr] = os.Open(full)
+    const [file, openErr] = await os.Open(full)
     if (openErr !== null) {
       return [null, openErr]
     }
-    const [entries, readErr] = file!.ReadDir(-1)
-    const closeErr = file!.Close()
+    const [entries, readErr] = await file!.ReadDir(-1)
+    const closeErr = await file!.Close()
     return [entries, readErr ?? closeErr]
   }
 
-  public Rename(from: string, to: string): $.GoError {
+  public async Rename(from: string, to: string): Promise<$.GoError> {
     if (this.isRoot(from)) {
       return ErrBaseDirCannotBeRenamed
     }
@@ -188,14 +190,17 @@ export class BoundOS {
     if (toErr !== null) {
       return toErr
     }
-    const mkdirErr = os.MkdirAll(filepath.Dir(toFull), defaultDirectoryMode)
+    const mkdirErr = await os.MkdirAll(
+      filepath.Dir(toFull),
+      defaultDirectoryMode,
+    )
     if (mkdirErr !== null) {
       return mkdirErr
     }
-    return os.Rename(fromFull, toFull)
+    return await os.Rename(fromFull, toFull)
   }
 
-  public Remove(name: string): $.GoError {
+  public async Remove(name: string): Promise<$.GoError> {
     if (this.isRoot(name)) {
       return ErrBaseDirCannotBeRemoved
     }
@@ -203,10 +208,10 @@ export class BoundOS {
     if (err !== null) {
       return err
     }
-    return os.Remove(full)
+    return await os.Remove(full)
   }
 
-  public RemoveAll(name: string): $.GoError {
+  public async RemoveAll(name: string): Promise<$.GoError> {
     if (this.isRoot(name)) {
       return ErrBaseDirCannotBeRemoved
     }
@@ -214,48 +219,51 @@ export class BoundOS {
     if (err !== null) {
       return err
     }
-    return os.RemoveAll(full)
+    return await os.RemoveAll(full)
   }
 
-  public MkdirAll(name: string, perm: fs.FileMode): $.GoError {
+  public async MkdirAll(name: string, perm: fs.FileMode): Promise<$.GoError> {
     const [full, err] = this.abs(name)
     if (err !== null) {
       return err
     }
-    return os.MkdirAll(full, perm)
+    return await os.MkdirAll(full, perm)
   }
 
-  public Symlink(target: string, link: string): $.GoError {
+  public async Symlink(target: string, link: string): Promise<$.GoError> {
     const [full, err] = this.abs(link)
     if (err !== null) {
       return err
     }
-    const mkdirErr = os.MkdirAll(filepath.Dir(full), defaultDirectoryMode)
+    const mkdirErr = await os.MkdirAll(filepath.Dir(full), defaultDirectoryMode)
     if (mkdirErr !== null) {
       return mkdirErr
     }
-    return os.Symlink(target, full)
+    return await os.Symlink(target, full)
   }
 
-  public Readlink(link: string): [string, $.GoError] {
+  public async Readlink(link: string): Promise<[string, $.GoError]> {
     const [full, err] = this.abs(link)
     if (err !== null) {
       return ['', err]
     }
-    return os.Readlink(full)
+    return await os.Readlink(full)
   }
 
-  public TempFile(dir: string, prefix: string): [os.File | null, $.GoError] {
+  public async TempFile(
+    dir: string,
+    prefix: string,
+  ): Promise<[os.File | null, $.GoError]> {
     const targetDir = dir === '' ? '.tmp' : dir
     const [fullDir, err] = this.abs(targetDir)
     if (err !== null) {
       return [null, err]
     }
-    const mkdirErr = os.MkdirAll(fullDir, defaultDirectoryMode)
+    const mkdirErr = await os.MkdirAll(fullDir, defaultDirectoryMode)
     if (mkdirErr !== null) {
       return [null, mkdirErr]
     }
-    return os.CreateTemp(fullDir, prefix === '' ? 'tmp-*' : prefix + '*')
+    return await os.CreateTemp(fullDir, prefix === '' ? 'tmp-*' : prefix + '*')
   }
 
   public Join(...elem: JoinElement[]): string {

@@ -6,33 +6,33 @@ import { File } from "./types_js.gs.js";
 
 import * as fs from "@goscript/io/fs/index.js"
 
-export function openRootNolog(name: string): [Root | null, $.GoError] {
+export async function openRootNolog(name: string): Promise<[Root | null, $.GoError]> {
 	return OpenRoot(name)
 }
 
-export function openRootInRoot(r: Root | null, name: string): [Root | null, $.GoError] {
-	return r?.OpenRoot(name) ?? [null, null]
+export async function openRootInRoot(r: Root | null, name: string): Promise<[Root | null, $.GoError]> {
+	return r !== null ? r.OpenRoot(name) : [null, null]
 }
 
-export function newRoot(name: string): [Root | null, $.GoError] {
+export async function newRoot(name: string): Promise<[Root | null, $.GoError]> {
 	return OpenRoot(name)
 }
 
-export function rootOpenFileNolog(r: Root | null, name: string, flag: number, perm: number): [File | null, $.GoError] {
-	return r?.OpenFile(name, flag, perm) ?? OpenFile(name, flag, perm)
+export async function rootOpenFileNolog(r: Root | null, name: string, flag: number, perm: number): Promise<[File | null, $.GoError]> {
+	return r !== null ? r.OpenFile(name, flag, perm) : OpenFile(name, flag, perm)
 }
 
-export function rootStat(r: Root | null, name: string, lstat: boolean): [fs.FileInfo | null, $.GoError] {
+export async function rootStat(r: Root | null, name: string, lstat: boolean): Promise<[fs.FileInfo | null, $.GoError]> {
 	if (r !== null) {
 		return lstat ? r.Lstat(name) : r.Stat(name)
 	}
 	return lstat ? Lstat(name) : Stat(name)
 }
 
-export function rootMkdir(r: Root | null, name: string, perm: number): $.GoError {
-	return r?.Mkdir(name, perm) ?? Mkdir(name, perm)
+export async function rootMkdir(r: Root | null, name: string, perm: number): Promise<$.GoError> {
+	return r !== null ? r.Mkdir(name, perm) : Mkdir(name, perm)
 }
 
-export function rootRemove(r: Root | null, name: string): $.GoError {
-	return r?.Remove(name) ?? Remove(name)
+export async function rootRemove(r: Root | null, name: string): Promise<$.GoError> {
+	return r !== null ? r.Remove(name) : Remove(name)
 }

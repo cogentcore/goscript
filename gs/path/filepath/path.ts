@@ -357,7 +357,7 @@ export function Rel(basepath: string, targpath: string): [string, $.GoError] {
 // realpath, which would always force an absolute result and would not surface
 // Go's per-component ENOTDIR and link-cycle errors. volLen is 0 for a relative
 // input and 1 for an absolute root.
-export function EvalSymlinks(path: string): [string, $.GoError] {
+export async function EvalSymlinks(path: string): Promise<[string, $.GoError]> {
   let p = path
   const volLen = p.length > 0 && p[0] === '/' ? 1 : 0
   const vol = p.slice(0, volLen)
@@ -403,7 +403,7 @@ export function EvalSymlinks(path: string): [string, $.GoError] {
     }
     dest += component
 
-    const [info, statErr] = Lstat(dest)
+    const [info, statErr] = await Lstat(dest)
     if (statErr !== null) {
       return ['', statErr]
     }
@@ -419,7 +419,7 @@ export function EvalSymlinks(path: string): [string, $.GoError] {
     if (linksWalked > 255) {
       return ['', $.newError('EvalSymlinks: too many links')]
     }
-    const [link, linkErr] = Readlink(dest)
+    const [link, linkErr] = await Readlink(dest)
     if (linkErr !== null) {
       return ['', linkErr]
     }
@@ -462,7 +462,7 @@ export type WalkFunc = (
 // directory in lexical order. It reads each entry with Lstat, so it does not
 // follow symbolic links, as in Go.
 export async function Walk(root: string, fn: WalkFunc): Promise<$.GoError> {
-  const [info, statErr] = Lstat(root)
+  const [info, statErr] = await Lstat(root)
   let err: $.GoError
   if (statErr !== null) {
     err = await fn(root, null, statErr)
@@ -485,7 +485,7 @@ async function walk(
     return await fn(path, info, null)
   }
 
-  const [entries, readErr] = ReadDir(path)
+  const [entries, readErr] = await ReadDir(path)
   let err = await fn(path, info, readErr)
   // If readErr is set, fn is called twice for path: once before reading the
   // directory and once after the failure, as in Go.
@@ -495,7 +495,7 @@ async function walk(
 
   for (const entry of $.asArray(entries)) {
     const filename = Join(path, entry!.Name())
-    const [fileInfo, statErr] = Lstat(filename)
+    const [fileInfo, statErr] = await Lstat(filename)
     if (statErr !== null) {
       err = await fn(filename, fileInfo, statErr)
       if (err !== null && err !== SkipDir) {
@@ -524,7 +524,7 @@ export async function WalkDir(
   root: string,
   fn: WalkDirFunc,
 ): Promise<$.GoError> {
-  const [info, statErr] = Lstat(root)
+  const [info, statErr] = await Lstat(root)
   let err: $.GoError
   if (statErr !== null) {
     err = await fn(root, null, statErr)
@@ -552,7 +552,7 @@ async function walkDir(
     return err
   }
 
-  const [entries, readErr] = ReadDir(path)
+  const [entries, readErr] = await ReadDir(path)
   if (readErr !== null) {
     // Second call, to report the ReadDir error.
     err = await fn(path, d, readErr)

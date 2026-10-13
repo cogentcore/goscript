@@ -1,6 +1,7 @@
 import * as $ from "@goscript/builtin/index.js";
 import { ErrUnimplemented } from "./error.gs.js";
-import { createFileInfo, createHostFile, File, getDeno, getEnv, getNodeFS, getPlatform, newHostError } from "./types_js.gs.js";
+import { callbackFSErr, callbackFSResult, createFileInfo, createHostFile, File, getDeno, getEnv, getNodeFS, getPlatform, newHostError } from "./types_js.gs.js";
+import { callbackFSCall, callbackFSPath, getCallbackFS, type CallbackStat } from "./callbackfs.js";
 import { O_APPEND, O_CREATE, O_EXCL, O_RDONLY, O_RDWR, O_SYNC, O_TRUNC, O_WRONLY } from "./file_constants_js.gs.js";
 import { FileInfoToDirEntry } from "@goscript/io/fs/readdir.js"
 
@@ -75,7 +76,7 @@ export function NewFile(fd: number, name: string): File | null {
 	return createHostFile(name, fd)
 }
 
-export function Remove(name: string): $.GoError {
+export async function Remove(name: string): Promise<$.GoError> {
 	const denoObj = getDeno()
 	if (denoObj?.removeSync) {
 		try {
@@ -102,10 +103,19 @@ export function Remove(name: string): $.GoError {
 			return newHostError(err)
 		}
 	}
+	if (getCallbackFS() !== null) {
+		// Remove a file, or else an empty directory, as Go does on Unix.
+		const err = await callbackFSErr("unlink", name)
+		if (err === null) {
+			return null
+		}
+		const dirErr = await callbackFSErr("rmdir", name)
+		return dirErr === null ? null : err
+	}
 	return ErrUnimplemented
 }
 
-export function Link(oldname: string, newname: string): $.GoError {
+export async function Link(oldname: string, newname: string): Promise<$.GoError> {
 	const denoObj = getDeno()
 	if (denoObj?.linkSync) {
 		try {
@@ -124,10 +134,13 @@ export function Link(oldname: string, newname: string): $.GoError {
 			return newHostError(err)
 		}
 	}
+	if (getCallbackFS() !== null) {
+		return callbackFSErr("link", oldname, callbackFSPath(newname))
+	}
 	return ErrUnimplemented
 }
 
-export function Symlink(oldname: string, newname: string): $.GoError {
+export async function Symlink(oldname: string, newname: string): Promise<$.GoError> {
 	const denoObj = getDeno()
 	if (denoObj?.symlinkSync) {
 		try {
@@ -146,10 +159,19 @@ export function Symlink(oldname: string, newname: string): $.GoError {
 			return newHostError(err)
 		}
 	}
+	if (getCallbackFS() !== null) {
+		// The link target is stored as given, so it is not resolved.
+		try {
+			await callbackFSCall(getCallbackFS()!, "symlink", oldname, callbackFSPath(newname))
+			return null
+		} catch (err) {
+			return newHostError(err)
+		}
+	}
 	return ErrUnimplemented
 }
 
-export function Truncate(name: string, size: bigint): $.GoError {
+export async function Truncate(name: string, size: bigint): Promise<$.GoError> {
 	const denoObj = getDeno()
 	if (denoObj?.truncateSync) {
 		try {
@@ -168,10 +190,10 @@ export function Truncate(name: string, size: bigint): $.GoError {
 			return newHostError(err)
 		}
 	}
-	return ErrUnimplemented
+	return callbackFSErr("truncate", name, Number(size))
 }
 
-export function rename(oldname: string, newname: string): $.GoError {
+export async function rename(oldname: string, newname: string): Promise<$.GoError> {
 	const denoObj = getDeno()
 	if (denoObj?.renameSync) {
 		try {
@@ -190,7 +212,7 @@ export function rename(oldname: string, newname: string): $.GoError {
 			return newHostError(err)
 		}
 	}
-	return ErrUnimplemented
+	return callbackFSErr("rename", oldname, callbackFSPath(newname))
 }
 
 // hostOpenFlags converts Go open flags, which use the Linux values, to the
@@ -221,7 +243,7 @@ export function hostOpenFlags(
 	return host
 }
 
-export function openFileNolog(name: string, flag: number, perm: number): [File | null, $.GoError] {
+export async function openFileNolog(name: string, flag: number, perm: number): Promise<[File | null, $.GoError]> {
 	const denoObj = getDeno()
 	if (denoObj?.openSync) {
 		try {
@@ -243,10 +265,20 @@ export function openFileNolog(name: string, flag: number, perm: number): [File |
 			return [null, newHostError(err)]
 		}
 	}
+	const cbfs = getCallbackFS()
+	if (cbfs !== null) {
+		const [fd, err] = await callbackFSResult("open", name, hostOpenFlags(flag, cbfs.constants), perm)
+		if (err !== null) {
+			return [null, err]
+		}
+		const f = createHostFile(name, Number(fd))
+		f.callback = { append: (flag & O_APPEND) !== 0, pos: 0 }
+		return [f, null]
+	}
 	return [null, ErrUnimplemented]
 }
 
-export function openDirNolog(name: string): [File | null, $.GoError] {
+export function openDirNolog(name: string): Promise<[File | null, $.GoError]> {
 	return openFileNolog(name, O_RDONLY, 0)
 }
 
@@ -254,7 +286,7 @@ export function tempDir(): string {
 	return getTempDirPath()
 }
 
-export function readlink(name: string): [string, $.GoError] {
+export async function readlink(name: string): Promise<[string, $.GoError]> {
 	const denoObj = getDeno()
 	if (denoObj?.readLinkSync) {
 		try {
@@ -270,6 +302,10 @@ export function readlink(name: string): [string, $.GoError] {
 		} catch (err) {
 			return ["", newHostError(err)]
 		}
+	}
+	if (getCallbackFS() !== null) {
+		const [target, err] = await callbackFSResult("readlink", name)
+		return err !== null ? ["", err] : [String(target), null]
 	}
 	return ["", ErrUnimplemented]
 }
@@ -301,7 +337,7 @@ export function newFile(fd: number, name: string, _kind: newFileKind, _nonBlocki
 	return NewFile(fd, name)
 }
 
-export function newUnixDirent(parent: string, name: string, _typ: number): [fs.DirEntry | null, $.GoError] {
+export async function newUnixDirent(parent: string, name: string, _typ: number): Promise<[fs.DirEntry | null, $.GoError]> {
 	const fullName = parent === "" || parent === "." ? name : parent.replace(/\/+$/, "") + "/" + name
 	const denoObj = getDeno()
 	if (denoObj?.lstatSync) {
@@ -318,6 +354,10 @@ export function newUnixDirent(parent: string, name: string, _typ: number): [fs.D
 		} catch (err) {
 			return [null, newHostError(err)]
 		}
+	}
+	if (getCallbackFS() !== null) {
+		const [stat, err] = await callbackFSResult("lstat", fullName)
+		return err !== null ? [null, err] : [FileInfoToDirEntry(createFileInfo(name, stat as CallbackStat)), null]
 	}
 	return [null, ErrUnimplemented]
 } 

@@ -29,11 +29,11 @@ describe('embed.FS', () => {
       ),
     )
 
-    const [data, readErr] = ReadFile(fsys, 'config-set.bin')
+    const [data, readErr] = await ReadFile(fsys, 'config-set.bin')
     expect(readErr).toBeNull()
     expect(Array.from(data)).toEqual([1, 2, 3])
     data[0] = 9
-    const [dataAgain, readAgainErr] = ReadFile(fsys, 'config-set.bin')
+    const [dataAgain, readAgainErr] = await ReadFile(fsys, 'config-set.bin')
     expect(readAgainErr).toBeNull()
     expect(Array.from(dataAgain)).toEqual([1, 2, 3])
 

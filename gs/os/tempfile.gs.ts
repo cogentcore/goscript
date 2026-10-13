@@ -1,8 +1,10 @@
 import * as $ from "@goscript/builtin/index.js";
 import { ErrUnimplemented } from "./error.gs.js";
-import { TempDir } from "./file_constants_js.gs.js";
+import { O_CREATE, O_EXCL, O_RDWR, TempDir } from "./file_constants_js.gs.js";
 import { Mkdir } from "./file_js.gs.js";
 import { createHostFile, File, getDeno, getNodeFS, newHostError } from "./types_js.gs.js";
+import { getCallbackFS } from "./callbackfs.js";
+import { openFileNolog } from "./file_unix_js.gs.js";
 
 export function joinPath(dir: string, file: string): string {
   if (dir === "" || dir === ".") {
@@ -49,7 +51,7 @@ function nextRandom(): [string, $.GoError] {
   return [(value >>> 0).toString(10), null]
 }
 
-function createTempFile(path: string): [File | null, $.GoError] {
+async function createTempFile(path: string): Promise<[File | null, $.GoError]> {
   const denoObj = getDeno()
   if (denoObj?.openSync) {
     try {
@@ -74,10 +76,14 @@ function createTempFile(path: string): [File | null, $.GoError] {
     }
   }
 
+  if (getCallbackFS() !== null) {
+    return openFileNolog(path, O_RDWR | O_CREATE | O_EXCL, 0o600)
+  }
+
   return [null, ErrUnimplemented]
 }
 
-export function CreateTemp(dir: string, pattern: string): [File | null, $.GoError] {
+export async function CreateTemp(dir: string, pattern: string): Promise<[File | null, $.GoError]> {
   const template = pattern === "" ? "tmp-*" : pattern
   let lastErr: $.GoError = ErrUnimplemented
   for (let i = 0; i < 16; i++) {
@@ -85,7 +91,7 @@ export function CreateTemp(dir: string, pattern: string): [File | null, $.GoErro
     if (randErr !== null) {
       return [null, randErr]
     }
-    const [file, err] = createTempFile(path)
+    const [file, err] = await createTempFile(path)
     if (err === null) {
       return [file, null]
     }
@@ -94,7 +100,7 @@ export function CreateTemp(dir: string, pattern: string): [File | null, $.GoErro
   return [null, lastErr]
 }
 
-export function MkdirTemp(dir: string, pattern: string): [string, $.GoError] {
+export async function MkdirTemp(dir: string, pattern: string): Promise<[string, $.GoError]> {
   const template = pattern === "" ? "tmp-*" : pattern
   let lastErr: $.GoError = ErrUnimplemented
   for (let i = 0; i < 16; i++) {
@@ -102,7 +108,7 @@ export function MkdirTemp(dir: string, pattern: string): [string, $.GoError] {
     if (randErr !== null) {
       return ["", randErr]
     }
-    const err = Mkdir(path, 0o700)
+    const err = await Mkdir(path, 0o700)
     if (err === null) {
       return [path, null]
     }
