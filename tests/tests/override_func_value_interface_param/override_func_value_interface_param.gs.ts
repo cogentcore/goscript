@@ -41,13 +41,13 @@ export type EncoderFunc = ((w: io.Writer | null) => Encoder | null | globalThis.
 
 export function NewDecoderFunc(__typeArgs: $.GenericTypeArgs | undefined, f: ((r: io.Reader | null) => any | globalThis.Promise<any>) | null): DecoderFunc | null {
 	return $.functionValue(async (r: io.Reader | null): globalThis.Promise<Decoder | null> => {
-		return (await f!(r) as Decoder | null)
+		return $.typeParamInterfaceValue<Decoder | null>(await f!(r), __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [$.methodSignature("Decode", [["v", { kind: $.TypeKind.Interface, methods: [] }]], ["error"])] }, zero: () => null })
 	}, ({ kind: $.TypeKind.Function, params: ["io.Reader"], results: ["main.Decoder"] } as $.FunctionTypeInfo))
 }
 
 export function NewEncoderFunc(__typeArgs: $.GenericTypeArgs | undefined, f: ((w: io.Writer | null) => any | globalThis.Promise<any>) | null): EncoderFunc | null {
 	return $.functionValue(async (w: io.Writer | null): globalThis.Promise<Encoder | null> => {
-		return (await f!(w) as Encoder | null)
+		return $.typeParamInterfaceValue<Encoder | null>(await f!(w), __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [$.methodSignature("Encode", [["v", { kind: $.TypeKind.Interface, methods: [] }]], ["error"])] }, zero: () => null })
 	}, ({ kind: $.TypeKind.Function, params: ["io.Writer"], results: ["main.Encoder"] } as $.FunctionTypeInfo))
 }
 

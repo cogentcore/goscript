@@ -165,6 +165,7 @@ const (
 	RuntimeHelperInterfaceValue           RuntimeHelper = "type.interfaceValue"
 	RuntimeHelperBasicInterfaceValue      RuntimeHelper = "type.basicInterfaceValue"
 	RuntimeHelperNamedValueInterfaceValue RuntimeHelper = "type.namedValueInterfaceValue"
+	RuntimeHelperTypeParamInterfaceValue  RuntimeHelper = "type.typeParamInterfaceValue"
 	RuntimeHelperCallInterfaceMethod      RuntimeHelper = "type.callInterfaceMethod"
 	RuntimeHelperFunctionValue            RuntimeHelper = "type.functionValue"
 	RuntimeHelperSyncResult               RuntimeHelper = "type.syncResult"
@@ -431,6 +432,7 @@ func runtimeHelperContracts() []RuntimeHelperContract {
 		runtimeHelper(RuntimeHelperInterfaceValue, "interfaceValue", RuntimeHelperCategoryType),
 		runtimeHelper(RuntimeHelperBasicInterfaceValue, "basicInterfaceValue", RuntimeHelperCategoryType),
 		runtimeHelper(RuntimeHelperNamedValueInterfaceValue, "namedValueInterfaceValue", RuntimeHelperCategoryType),
+		runtimeHelper(RuntimeHelperTypeParamInterfaceValue, "typeParamInterfaceValue", RuntimeHelperCategoryType),
 		runtimeHelper(RuntimeHelperCallInterfaceMethod, "callInterfaceMethod", RuntimeHelperCategoryType),
 		runtimeHelper(RuntimeHelperFunctionValue, "functionValue", RuntimeHelperCategoryType),
 		runtimeHelper(RuntimeHelperSyncResult, "syncResult", RuntimeHelperCategoryType),

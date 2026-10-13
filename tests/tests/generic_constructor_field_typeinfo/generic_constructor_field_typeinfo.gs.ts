@@ -37,7 +37,7 @@ export class blockType {
 
 	public async Constructor(__typeArgs: $.GenericTypeArgs | undefined): globalThis.Promise<Block | null> {
 		const t: blockType | $.VarRef<blockType> | null = this;
-		return (await $.pointerValue<blockType>(t)._constructor!() as Block | null)
+		return $.typeParamInterfaceValue<Block | null>(await $.pointerValue<blockType>(t)._constructor!(), __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [$.methodSignature("MarshalBlock", [], [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")), "error"]), $.methodSignature("UnmarshalBlock", [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))], ["error"])] }, zero: () => null })
 	}
 
 	public GetBlockTypeID(__typeArgs: $.GenericTypeArgs | undefined): string {

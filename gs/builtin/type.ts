@@ -1909,6 +1909,9 @@ export function typeAssert<T>(
 
   // Match the value against the type, then against registered duplicates of
   // a named type.
+  if (isRawValueOfNamedBasicType(value, normalizedType)) {
+    return failedTypeAssert<T>(typeInfo, normalizedType)
+  }
   if (matchesType(value, normalizedType)) {
     return { value: value as T, ok: true }
   }
@@ -1989,7 +1992,33 @@ export function mustTypeAssert<T>(value: any, typeInfo: string | TypeInfo): T {
  * @returns True if the value matches the type, false otherwise
  */
 export function is(value: any, typeInfo: string | TypeInfo): boolean {
-  return matchesType(value, normalizeTypeInfo(typeInfo))
+  const normalizedType = normalizeTypeInfo(typeInfo)
+  if (isRawValueOfNamedBasicType(value, normalizedType)) {
+    return false
+  }
+  return matchesType(value, normalizedType)
+}
+
+// isRawValueOfNamedBasicType reports whether value is a raw primitive and
+// info a named basic type, which never match as the dynamic type of an
+// interface: an interface holds a value of a named basic type in a box (see
+// namedValueInterfaceValue), so a raw primitive has an unnamed basic type.
+function isRawValueOfNamedBasicType(value: unknown, info: TypeInfo): boolean {
+  return (
+    info.kind === TypeKind.Basic && !!info.typeName && isPrimitiveValue(value)
+  )
+}
+
+// isPrimitiveValue reports whether value is a raw number, string, boolean, or
+// bigint, the representations of basic Go types.
+function isPrimitiveValue(value: unknown): boolean {
+  const kind = typeof value
+  return (
+    kind === 'number' ||
+    kind === 'string' ||
+    kind === 'boolean' ||
+    kind === 'bigint'
+  )
 }
 
 /**
@@ -2218,10 +2247,41 @@ export function namedValueInterfaceValue<T>(
 }
 
 /**
- * isNamedValueBox Reports whether a value is a boxed named-type interface value produced by
- * namedValueInterfaceValue. Both markers are required: an ordinary JS object
- * that merely happens to have a `__goValue` property (legal input elsewhere,
- * e.g. through json.Marshal) is not a box.
+ * typeParamInterfaceValue converts a value of a type parameter to an
+ * interface value. A primitive of a named basic type, or with methods, is
+ * boxed with the methods of the type argument, as namedValueInterfaceValue
+ * boxes a value of a concrete named basic type. Other values are returned
+ * unchanged.
+ */
+export function typeParamInterfaceValue<T = any>(
+  value: unknown,
+  descriptor: GenericTypeDescriptor | undefined,
+): T {
+  if (descriptor?.type === undefined || !isPrimitiveValue(value)) {
+    return value as T
+  }
+  const info = normalizeTypeInfo(descriptor.type)
+  const methods = descriptor.methods ?? {}
+  if (
+    info.kind !== TypeKind.Basic ||
+    (!info.typeName && Object.keys(methods).length === 0)
+  ) {
+    return value as T
+  }
+  return namedValueInterfaceValue<T>(
+    value,
+    info.typeName ?? info.name ?? '',
+    methods,
+    descriptor.type,
+    descriptor.methodSignatures,
+  )
+}
+
+/**
+ * isNamedValueBox reports whether a value is a boxed named-type interface
+ * value produced by namedValueInterfaceValue. Both markers are required: an
+ * ordinary JS object that merely happens to have a `__goValue` property (legal
+ * input elsewhere, e.g. through json.Marshal) is not a box.
  */
 export function isNamedValueBox(
   v: unknown,
