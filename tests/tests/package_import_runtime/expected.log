@@ -10,3 +10,5 @@ Frames empty: 0 false
 FuncForPC nil: true
 Cleanup stopped
 Finalizer ignored
+locked goroutine ran
+main unlocked
