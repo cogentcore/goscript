@@ -41,6 +41,9 @@ func (m *SemanticModel) packageFactDigests() map[string]string {
 	for fn := range m.asyncInterfaceMethodObjs {
 		add("async-interface-method", fn, "")
 	}
+	for fn := range m.asyncOverrideFunctions {
+		add("async-override-function", fn, "")
+	}
 	for obj := range m.needsVarRef {
 		add("var-ref", obj, "")
 	}

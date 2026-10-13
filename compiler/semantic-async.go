@@ -143,6 +143,22 @@ func asyncArgumentFacts(pkg *packages.Package, signature *types.Signature, args 
 	return false, deps
 }
 
+// asyncWhenMethodFunctions maps each method name that override metadata
+// names in asyncWhenMethods to the called override functions it makes async.
+func asyncWhenMethodFunctions(model *SemanticModel, overrideFacts *OverrideFacts) map[string][]*types.Func {
+	asyncWhen := make(map[string][]*types.Func)
+	for called := range model.functionCallers {
+		signature, _ := called.Type().(*types.Signature)
+		if called.Pkg() == nil || signature == nil || signature.Recv() != nil {
+			continue
+		}
+		for _, method := range overrideFacts.AsyncWhenMethods(called.Pkg().Path(), called.Name()) {
+			asyncWhen[method] = append(asyncWhen[method], called)
+		}
+	}
+	return asyncWhen
+}
+
 // asyncColoring propagates async marks to their fixpoint with one worklist.
 //
 // Every rule only adds marks, so each function key is visited once, when it
@@ -161,8 +177,11 @@ type asyncColoring struct {
 	ifaceEdges        interfaceAsyncEdges
 	anonMethodsByImpl map[*types.Func][]*types.Func
 	sitesByDep        map[*types.Func][]*semanticFunction
-	visited           map[*types.Func]bool
-	queue             []*types.Func
+	// overrideFuncsByMethod lists the override functions each compiled method
+	// makes async, per asyncWhenMethods metadata.
+	overrideFuncsByMethod map[*types.Func][]*types.Func
+	visited               map[*types.Func]bool
+	queue                 []*types.Func
 }
 
 // colorAsyncFunctions marks every function and interface method that can
@@ -173,6 +192,7 @@ func colorAsyncFunctions(
 	sites []asyncArgumentCallSite,
 	ifaceEdges interfaceAsyncEdges,
 	anonymousInterfaceGraph []semanticAnonymousInterfaceImplementation,
+	asyncWhen map[string][]*types.Func,
 ) []Diagnostic {
 	if err := ctx.Err(); err != nil {
 		return []Diagnostic{contextCanceledDiagnostic(err)}
@@ -186,6 +206,19 @@ func colorAsyncFunctions(
 		anonMethodsByImpl: make(map[*types.Func][]*types.Func),
 		sitesByDep:        make(map[*types.Func][]*semanticFunction),
 		visited:           make(map[*types.Func]bool),
+	}
+	if len(asyncWhen) != 0 {
+		c.overrideFuncsByMethod = make(map[*types.Func][]*types.Func)
+		for fn, semFn := range model.functions {
+			signature, _ := fn.Type().(*types.Signature)
+			if !semFn.hasBody || signature == nil || signature.Recv() == nil {
+				continue
+			}
+			if funcs := asyncWhen[fn.Name()]; len(funcs) != 0 {
+				c.register(fn)
+				c.overrideFuncsByMethod[fn] = funcs
+			}
+		}
 	}
 	for called := range model.functionCallers {
 		c.register(called)
@@ -239,6 +272,11 @@ func colorAsyncFunctions(
 		}
 		for _, semFn := range c.sitesByDep[key] {
 			c.markFunction(semFn)
+		}
+		for _, overrideFn := range c.overrideFuncsByMethod[key] {
+			if model.markOverrideFunctionAsync(overrideFn) {
+				c.visit(overrideFn)
+			}
 		}
 	}
 	return nil

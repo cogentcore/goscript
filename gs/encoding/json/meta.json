@@ -8,5 +8,16 @@
     "Decoder.More": true,
     "Decoder.Token": true,
     "Encoder.Encode": true
+  },
+  "asyncWhenMethods": {
+    "Marshal": [
+      "MarshalJSON"
+    ],
+    "MarshalIndent": [
+      "MarshalJSON"
+    ],
+    "Unmarshal": [
+      "UnmarshalJSON"
+    ]
   }
 }

@@ -34,6 +34,9 @@ type SemanticModel struct {
 	interfaceImplementations []semanticInterfaceImplementation
 	asyncInterfaceMethods    map[string]bool
 	asyncInterfaceMethodObjs map[*types.Func]bool
+	// asyncOverrideFunctions holds the override functions that metadata makes
+	// async only in a program with an async implementation of a named method.
+	asyncOverrideFunctions map[*types.Func]bool
 	// summaries holds the body summaries the build extracted, by package
 	// path.
 	summaries map[string][]byte
