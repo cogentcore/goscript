@@ -39,11 +39,15 @@ describe('sync.WaitGroup', () => {
 describe('sync.Cond', () => {
   it('exposes the Locker as public field L', async () => {
     const mutex = new Mutex()
-    const cond = new Cond(mutex)
+    const cond = new Cond({ L: mutex })
 
     expect(cond.L).toBe(mutex)
-    await cond.L.Lock()
-    cond.L.Unlock()
+    await cond.L!.Lock()
+    cond.L!.Unlock()
+  })
+
+  it('has a nil Locker as the zero value', () => {
+    expect(new Cond().L).toBe(null)
   })
 })
 
