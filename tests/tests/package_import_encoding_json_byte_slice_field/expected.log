@@ -1,0 +1,7 @@
+{"Width":2,"Image":"AQL6","Frames":["Aw==","BAU="],"Named":{"a":"Bgc="},"Nested":{"Width":0,"Image":"aGk=","Frames":null,"Named":null,"Nested":null}} true
+err: true width: 2
+image: 3 1 250
+frames: 2 2 5
+named: 2 7
+nested: hi
+null image: true true
