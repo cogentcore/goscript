@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    "paths": {
+      "*": [
+        "./*"
+      ],
+      "@goscript/*": [
+        "../../../tests/tests/named_value_interface_implicit_import/run/output/@goscript/*",
+        "../../../gs/*",
+        "../../../tests/deps/*"
+      ],
+      "@goscript/github.com/s4wave/goscript/tests/tests/named_value_interface_implicit_import/*": [
+        "./*"
+      ]
+    }
+  },
+  "extends": "../../../tests/tsconfig.base.json",
+  "include": [
+    "dep/dep.gs.ts",
+    "dep/index.ts",
+    "dep/lookup.gs.ts",
+    "errno/errno.gs.ts",
+    "errno/index.ts",
+    "find_layers.gs.ts",
+    "index.ts",
+    "layers.gs.ts",
+    "local_lookup.gs.ts",
+    "multi_assign.gs.ts",
+    "multi_return.gs.ts",
+    "named_value_interface_implicit_import.gs.ts"
+  ]
+}
