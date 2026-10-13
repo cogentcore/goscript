@@ -342,7 +342,7 @@ export class Func extends EmbeddedValue {
 
   constructor(
     init?: Partial<Func> & {
-      fn?: (this$: Value, args: $.Slice<Value>) => unknown
+      fn?: ((this$: Value, args: $.Slice<Value>) => unknown) | null
     },
   ) {
     super()
@@ -353,6 +353,11 @@ export class Func extends EmbeddedValue {
         raw: function (this: unknown, ...args: unknown[]) {
           if (fn === undefined) {
             return undefined
+          }
+          if (fn === null) {
+            throw new globalThis.Error(
+              'runtime error: invalid memory address or nil pointer dereference',
+            )
           }
           return ValueOf(
             fn(
@@ -434,7 +439,7 @@ function isGoInterfaceValue(value: unknown): value is { __goValue: unknown } {
 }
 
 export function FuncOf(
-  fn: (this$: Value, args: $.Slice<Value>) => unknown,
+  fn: ((this$: Value, args: $.Slice<Value>) => unknown) | null,
 ): Func {
   return new Func({ fn })
 }
