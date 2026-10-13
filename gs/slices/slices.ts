@@ -3,51 +3,11 @@ import * as $ from '@goscript/builtin/index.js'
 import * as cmp from '../cmp/index.js'
 import * as iter from '../iter/index.js'
 
-type MaybePromise<T> = T | globalThis.Promise<T>
-type CompareCallback<T, U = T, R = MaybePromise<number>> =
+type CompareCallback<T, U = T, R = $.MaybePromise<number>> =
   | ((v1: T, v2: U) => R)
   | null
 type PredicateCallback<T, R> = ((value: T) => R) | null
 type EqualCallback<T, U, R> = ((v1: T, v2: U) => R) | null
-
-// CallbackResult is a result of type V settled the way a callback result of
-// type R is: a promise when R is one, so a synchronous callback keeps its
-// caller synchronous.
-type CallbackResult<R, V> =
-  R extends globalThis.Promise<unknown> ? globalThis.Promise<V> : V
-
-// CallbackRun is a function body returning V that yields each callback
-// result and receives it back settled.
-type CallbackRun<V> = Generator<unknown, V, any>
-
-/**
- * runCallbacks drives run, handing each yielded result of callbacks returning
- * R back. It stays synchronous while the callbacks do and continues
- * asynchronously from the first promise, so it returns a promise only when a
- * callback returned one.
- */
-function runCallbacks<R, V>(run: CallbackRun<V>): CallbackResult<R, V> {
-  let step = run.next()
-  while (!step.done) {
-    if (step.value instanceof Promise) {
-      return finishCallbacks(run, step.value) as CallbackResult<R, V>
-    }
-    step = run.next(step.value)
-  }
-  return step.value as CallbackResult<R, V>
-}
-
-// finishCallbacks drives run from a pending callback result to its end.
-async function finishCallbacks<V>(
-  run: CallbackRun<V>,
-  pending: globalThis.Promise<unknown>,
-): globalThis.Promise<V> {
-  let step = run.next(await pending)
-  while (!step.done) {
-    step = run.next(await step.value)
-  }
-  return step.value
-}
 
 /**
  * Compare compares the elements of s1 and s2 using cmp.Compare.
@@ -88,15 +48,15 @@ export function Compare<T extends cmp.Ordered>(
   return 0
 }
 
-export function CompareFunc<T, U, R extends MaybePromise<number>>(
+export function CompareFunc<T, U, R extends $.MaybePromise<number>>(
   s1: $.Slice<T>,
   s2: $.Slice<U>,
   compare: CompareCallback<T, U, R>,
-): CallbackResult<R, number> {
+): $.CallbackResult<R, number> {
   if (compare == null) {
     throw new Error('slices.CompareFunc: nil comparison function')
   }
-  return runCallbacks(
+  return $.runCallbacks(
     (function* () {
       const len1 = $.len(s1)
       const len2 = $.len(s2)
@@ -374,17 +334,17 @@ export function Min<T extends cmp.Ordered>(x: $.Slice<T>): T {
   return min
 }
 
-export function MaxFunc<T, R extends MaybePromise<number>>(
+export function MaxFunc<T, R extends $.MaybePromise<number>>(
   x: $.Slice<T>,
   compare: CompareCallback<T, T, R>,
-): CallbackResult<R, T> {
+): $.CallbackResult<R, T> {
   if (compare == null) {
     throw new Error('slices.MaxFunc: nil comparison function')
   }
   if ($.len(x) === 0) {
     throw new Error('slices.MaxFunc: empty list')
   }
-  return runCallbacks(
+  return $.runCallbacks(
     (function* () {
       let max = (x as any)[0] as T
       for (let i = 1; i < $.len(x); i++) {
@@ -398,17 +358,17 @@ export function MaxFunc<T, R extends MaybePromise<number>>(
   )
 }
 
-export function MinFunc<T, R extends MaybePromise<number>>(
+export function MinFunc<T, R extends $.MaybePromise<number>>(
   x: $.Slice<T>,
   compare: CompareCallback<T, T, R>,
-): CallbackResult<R, T> {
+): $.CallbackResult<R, T> {
   if (compare == null) {
     throw new Error('slices.MinFunc: nil comparison function')
   }
   if ($.len(x) === 0) {
     throw new Error('slices.MinFunc: empty list')
   }
-  return runCallbacks(
+  return $.runCallbacks(
     (function* () {
       let min = (x as any)[0] as T
       for (let i = 1; i < $.len(x); i++) {
@@ -518,14 +478,14 @@ export function Delete<T>(s: $.Slice<T>, i: number, j: number): $.Slice<T> {
   return $.goSlice(s, 0, length - deleteCount) as $.Slice<T>
 }
 
-export function DeleteFunc<T, R extends MaybePromise<boolean>>(
+export function DeleteFunc<T, R extends $.MaybePromise<boolean>>(
   s: $.Slice<T>,
   del: PredicateCallback<T, R>,
-): CallbackResult<R, $.Slice<T>> {
+): $.CallbackResult<R, $.Slice<T>> {
   if (del == null) {
     throw new Error('slices.DeleteFunc: nil delete function')
   }
-  return runCallbacks(
+  return $.runCallbacks(
     (function* () {
       if (s === null || s === undefined) {
         return s
@@ -582,14 +542,14 @@ export function Compact<T>(s: $.Slice<T>): $.Slice<T> {
   return $.goSlice(s, 0, w) as $.Slice<T>
 }
 
-export function CompactFunc<T, R extends MaybePromise<boolean>>(
+export function CompactFunc<T, R extends $.MaybePromise<boolean>>(
   s: $.Slice<T>,
   eq: EqualCallback<T, T, R>,
-): CallbackResult<R, $.Slice<T>> {
+): $.CallbackResult<R, $.Slice<T>> {
   if (eq == null) {
     throw new Error('slices.CompactFunc: nil equality function')
   }
-  return runCallbacks(
+  return $.runCallbacks(
     (function* () {
       if (s === null || s === undefined || $.len(s) < 2) {
         return s
@@ -632,15 +592,15 @@ export function Equal<T>(s1: $.Slice<T>, s2: $.Slice<T>): boolean {
   return true
 }
 
-export function EqualFunc<T, U, R extends MaybePromise<boolean>>(
+export function EqualFunc<T, U, R extends $.MaybePromise<boolean>>(
   s1: $.Slice<T>,
   s2: $.Slice<U>,
   eq: EqualCallback<T, U, R>,
-): CallbackResult<R, boolean> {
+): $.CallbackResult<R, boolean> {
   if (eq == null) {
     throw new Error('slices.EqualFunc: nil equality function')
   }
-  return runCallbacks(
+  return $.runCallbacks(
     (function* () {
       const len1 = $.len(s1)
       if (len1 !== $.len(s2)) {
@@ -665,20 +625,20 @@ export function Index<T>(s: $.Slice<T>, v: T): number {
   return -1
 }
 
-export function IndexFunc<T, R extends MaybePromise<boolean>>(
+export function IndexFunc<T, R extends $.MaybePromise<boolean>>(
   s: $.Slice<T>,
   f: PredicateCallback<T, R>,
-): CallbackResult<R, number> {
+): $.CallbackResult<R, number> {
   if (f == null) {
     throw new Error('slices.IndexFunc: nil predicate function')
   }
-  return runCallbacks(indexFunc(s, f))
+  return $.runCallbacks(indexFunc(s, f))
 }
 
 function* indexFunc<T>(
   s: $.Slice<T>,
-  f: (value: T) => MaybePromise<boolean>,
-): CallbackRun<number> {
+  f: (value: T) => $.MaybePromise<boolean>,
+): $.CallbackRun<number> {
   for (let i = 0; i < $.len(s); i++) {
     if (yield f((s as any)[i] as T)) {
       return i
@@ -691,14 +651,14 @@ export function Contains<T>(s: $.Slice<T>, v: T): boolean {
   return Index(s, v) >= 0
 }
 
-export function ContainsFunc<T, R extends MaybePromise<boolean>>(
+export function ContainsFunc<T, R extends $.MaybePromise<boolean>>(
   s: $.Slice<T>,
   f: PredicateCallback<T, R>,
-): CallbackResult<R, boolean> {
+): $.CallbackResult<R, boolean> {
   if (f == null) {
     throw new Error('slices.ContainsFunc: nil predicate function')
   }
-  return runCallbacks(
+  return $.runCallbacks(
     (function* () {
       return (yield* indexFunc(s, f)) >= 0
     })(),
@@ -777,14 +737,14 @@ export function Grow<T>(
  * @param s The slice to sort in place
  * @param cmp Comparison function
  */
-export function SortFunc<T, R extends MaybePromise<number>>(
+export function SortFunc<T, R extends $.MaybePromise<number>>(
   s: $.Slice<T>,
   cmp: CompareCallback<T, T, R>,
-): CallbackResult<R, void> {
+): $.CallbackResult<R, void> {
   if (cmp == null) {
     throw new Error('slices.SortFunc: nil comparison function')
   }
-  return runCallbacks(
+  return $.runCallbacks(
     (function* () {
       if (s === null || s === undefined || $.len(s) < 2) {
         return
@@ -799,8 +759,8 @@ export function SortFunc<T, R extends MaybePromise<number>>(
 
 function* mergeSort<T>(
   values: T[],
-  cmp: (a: T, b: T) => MaybePromise<number>,
-): CallbackRun<T[]> {
+  cmp: (a: T, b: T) => $.MaybePromise<number>,
+): $.CallbackRun<T[]> {
   if (values.length < 2) {
     return values
   }
@@ -826,14 +786,14 @@ function* mergeSort<T>(
   return out
 }
 
-export function IsSortedFunc<T, R extends MaybePromise<number>>(
+export function IsSortedFunc<T, R extends $.MaybePromise<number>>(
   x: $.Slice<T>,
   cmp: CompareCallback<T, T, R>,
-): CallbackResult<R, boolean> {
+): $.CallbackResult<R, boolean> {
   if (cmp == null) {
     throw new Error('slices.IsSortedFunc: nil comparison function')
   }
-  return runCallbacks(
+  return $.runCallbacks(
     (function* () {
       for (let i = $.len(x) - 1; i > 0; i--) {
         if ((yield cmp((x as any)[i] as T, (x as any)[i - 1] as T)) < 0) {
@@ -846,10 +806,10 @@ export function IsSortedFunc<T, R extends MaybePromise<number>>(
 }
 
 /** SortStableFunc is SortFunc, whose merge sort is stable. */
-export function SortStableFunc<T, R extends MaybePromise<number>>(
+export function SortStableFunc<T, R extends $.MaybePromise<number>>(
   s: $.Slice<T>,
   cmp: CompareCallback<T, T, R>,
-): CallbackResult<R, void> {
+): $.CallbackResult<R, void> {
   if (cmp == null) {
     throw new Error('slices.SortStableFunc: nil comparison function')
   }
@@ -888,15 +848,15 @@ function clearValue<T>(s: $.Slice<T>): T | null {
  * @param cmp Comparison function
  * @returns A tuple of [index, found] where index is the position and found indicates if target was found
  */
-export function BinarySearchFunc<E, T, R extends MaybePromise<number>>(
+export function BinarySearchFunc<E, T, R extends $.MaybePromise<number>>(
   x: $.Slice<E>,
   target: T,
   cmp: CompareCallback<E, T, R>,
-): CallbackResult<R, [number, boolean]> {
+): $.CallbackResult<R, [number, boolean]> {
   if (cmp == null) {
     throw new Error('slices.BinarySearchFunc: nil comparison function')
   }
-  return runCallbacks(binarySearchFunc(x, target, cmp))
+  return $.runCallbacks(binarySearchFunc(x, target, cmp))
 }
 
 // binarySearchFunc narrows to the earliest index not less than target, so
@@ -904,8 +864,8 @@ export function BinarySearchFunc<E, T, R extends MaybePromise<number>>(
 function* binarySearchFunc<E, T>(
   x: $.Slice<E>,
   target: T,
-  cmp: (e: E, t: T) => MaybePromise<number>,
-): CallbackRun<[number, boolean]> {
+  cmp: (e: E, t: T) => $.MaybePromise<number>,
+): $.CallbackRun<[number, boolean]> {
   const n = $.len(x)
   let left = 0
   let right = n
@@ -926,6 +886,6 @@ export function BinarySearch<T extends cmp.Ordered>(
   target: T,
 ): [number, boolean] {
   // cmp.Compare returns synchronously, so the search does too.
-  const result = runCallbacks(binarySearchFunc(x, target, cmp.Compare))
+  const result = $.runCallbacks(binarySearchFunc(x, target, cmp.Compare))
   return result as [number, boolean]
 }

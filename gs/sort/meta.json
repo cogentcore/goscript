@@ -1,11 +1,14 @@
 {
   "asyncFunctions": {
     "IsSorted": true,
+    "Sort": true,
+    "Stable": true
+  },
+  "callbackAsyncFunctions": {
+    "Find": true,
     "Search": true,
     "Slice": true,
     "SliceIsSorted": true,
-    "SliceStable": true,
-    "Sort": true,
-    "Stable": true
+    "SliceStable": true
   }
 }

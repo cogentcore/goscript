@@ -89,6 +89,21 @@ func main() {
 	})
 	println("First index where value >= 5:", searchResult)
 
+	// A predicate that receives from a channel makes Search suspend.
+	gate := make(chan int, 8)
+	for range cap(gate) {
+		gate <- 0
+	}
+	asyncSearch := sort.Search(len(ints), func(i int) bool {
+		return ints[i]+<-gate >= 4
+	})
+	println("First index where value >= 4:", asyncSearch)
+	findIndex, found := sort.Find(len(ints), func(i int) int {
+		return 5 - ints[i]
+	})
+	println("Find 5:", findIndex, found)
+	println("Sorted pair:", sortedPair(2, 1))
+
 	// Test Slice function with custom comparator
 	testSlice := []int{5, 2, 8, 1, 9}
 	slices.Sort(testSlice)
@@ -157,3 +172,12 @@ func main() {
 type nameList []string
 
 func (n nameList) First() string { return n[0] }
+
+// sortedPair stays synchronous: its sort.Slice callback cannot suspend.
+func sortedPair(a, b int) int {
+	pair := []int{a, b}
+	sort.Slice(pair, func(i, j int) bool {
+		return pair[i] < pair[j]
+	})
+	return pair[0]*10 + pair[1]
+}

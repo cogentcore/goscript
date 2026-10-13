@@ -11,6 +11,9 @@ Index of 4 in sorted ints: 3
 Index of 'banana' in sorted strings: 1
 Index of 2.71 in sorted floats: 1
 First index where value >= 5: 4
+First index where value >= 4: 3
+Find 5: 4 true
+Sorted pair: 12
 Custom sorted slice: 1 2 5 8 9
 Async sorted slice: 1 2
 Custom slice is sorted: true

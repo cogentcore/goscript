@@ -362,6 +362,7 @@ imports as `$`:
 | `panic.ts` | `panic`, `recover` |
 | `errors.ts` | `GoError`, `newError` |
 | `builtin.ts` | `print`, `println`, `pointerValue`, integer conversions, 64-bit arithmetic |
+| `callback.ts` | `runCallbacks`, which suspends a callback-taking override only when a callback does |
 | `scheduler.ts` | `queueTask`, which yields one full event-loop turn |
 | `hostio.ts` | host standard output and input |
 | `deferred-package.ts` | late package initialization for `--deferred-function` |

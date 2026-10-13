@@ -6,7 +6,7 @@ import { SearchFloat64s, SearchInts, SearchStrings } from './search.gs.js'
 // Interface defines the methods required for sorting.
 // Less and Swap may be async: a Go type implementing sort.Interface can do
 // async work (e.g. block I/O) in Swap/Less, which transpiles to an async
-// method. Sort/Stable/IsSorted await these, mirroring the async Search closure.
+// method. Sort/Stable/IsSorted await these.
 export interface Interface {
   Len(): number | Promise<number>
   Less(i: number, j: number): boolean | Promise<boolean>

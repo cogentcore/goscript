@@ -49,6 +49,17 @@ describe('sort.Slice override', () => {
     ).toBe(true)
   })
 
+  it('returns synchronously until a less callback suspends', async () => {
+    const values = $.arrayToSlice([3, 1, 2])
+
+    expect(Slice(values, (i, j) => values![i] < values![j])).toBeUndefined()
+    expect(values).toEqual([1, 2, 3])
+
+    const pending = SliceIsSorted(values, async (i, j) => values![i] < values![j])
+    expect(pending).toBeInstanceOf(Promise)
+    expect(await pending).toBe(true)
+  })
+
   it('awaits async Swap/Less in Sort so the data is ordered when it resolves', async () => {
     // A Go type implementing sort.Interface can do async work (e.g. block I/O)
     // in Swap/Less, transpiling to async methods. Sort must await them: a sync

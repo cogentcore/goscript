@@ -51,34 +51,25 @@ import { compareStrings } from './order.js'
 //		})
 //		fmt.Printf("Your number is %d.\n", answer)
 //	}
-type SearchPredicate = (i: number) => boolean | Promise<boolean>
-
-export async function Search(n: number, f: SearchPredicate): Promise<number> {
-	let left = 0
-	let right = n
-	while (left < right) {
-		const mid = Math.floor((left + right) / 2)
-		if (await f(mid)) {
-			right = mid
-		} else {
-			left = mid + 1
-		}
-	}
-	return left
-}
-
-function searchSync(n: number, f: (i: number) => boolean): number {
-	let left = 0
-	let right = n
-	while (left < right) {
-		const mid = Math.floor((left + right) / 2)
-		if (f(mid)) {
-			right = mid
-		} else {
-			left = mid + 1
-		}
-	}
-	return left
+export function Search<R extends $.MaybePromise<boolean>>(
+	n: number,
+	f: (i: number) => R,
+): $.CallbackResult<R, number> {
+	return $.runCallbacks(
+		(function* () {
+			let left = 0
+			let right = n
+			while (left < right) {
+				const mid = Math.floor((left + right) / 2)
+				if (yield f(mid)) {
+					right = mid
+				} else {
+					left = mid + 1
+				}
+			}
+			return left
+		})(),
+	)
 }
 
 // Find uses binary search to find and return the smallest index i in [0, n)
@@ -105,19 +96,26 @@ function searchSync(n: number, f: (i: number) => boolean): number {
 //	} else {
 //	    fmt.Printf("%s not found, would insert at %d", target, i)
 //	}.
-export function Find(n: number, cmp: (i: number) => number): [number, boolean] {
-	let left = 0
-	let right = n
-	while (left < right) {
-		const mid = Math.floor((left + right) / 2)
-		if (cmp(mid) <= 0) {
-			right = mid
-		} else {
-			left = mid + 1
-		}
-	}
-	const found = left < n && cmp(left) === 0
-	return [left, found]
+export function Find<R extends $.MaybePromise<number>>(
+	n: number,
+	cmp: (i: number) => R,
+): $.CallbackResult<R, [number, boolean]> {
+	return $.runCallbacks(
+		(function* (): $.CallbackRun<[number, boolean]> {
+			let left = 0
+			let right = n
+			while (left < right) {
+				const mid = Math.floor((left + right) / 2)
+				if ((yield cmp(mid)) <= 0) {
+					right = mid
+				} else {
+					left = mid + 1
+				}
+			}
+			const found = left < n && (yield cmp(left)) === 0
+			return [left, found]
+		})(),
+	)
 }
 
 // SearchInts searches for x in a sorted slice of ints and returns the index
@@ -125,7 +123,7 @@ export function Find(n: number, cmp: (i: number) => number): [number, boolean] {
 // not present (it could be len(a)).
 // The slice must be sorted in ascending order.
 export function SearchInts(a: $.Slice<number>, x: number): number {
-	return searchSync($.len(a), (i: number) => ($.index(a, i) as number) >= x)
+	return Search($.len(a), (i: number) => ($.index(a, i) as number) >= x)
 }
 
 // SearchFloat64s searches for x in a sorted slice of float64s and returns the index
@@ -133,7 +131,7 @@ export function SearchInts(a: $.Slice<number>, x: number): number {
 // present (it could be len(a)).
 // The slice must be sorted in ascending order.
 export function SearchFloat64s(a: $.Slice<number>, x: number): number {
-	return searchSync($.len(a), (i: number) => ($.index(a, i) as number) >= x)
+	return Search($.len(a), (i: number) => ($.index(a, i) as number) >= x)
 }
 
 // SearchStrings searches for x in a sorted slice of strings and returns the index
@@ -141,7 +139,7 @@ export function SearchFloat64s(a: $.Slice<number>, x: number): number {
 // present (it could be len(a)).
 // The slice must be sorted in ascending order.
 export function SearchStrings(a: $.Slice<string>, x: string): number {
-	return searchSync(
+	return Search(
 		$.len(a),
 		(i: number) => compareStrings($.index(a, i) as string, x) >= 0,
 	)

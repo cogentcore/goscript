@@ -126,10 +126,25 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("Index of 2.71 in sorted floats:", floatIndex)
 
 	// Test generic Search function
-	let searchResult = await sort2.Search($.len(ints), $.functionValue((i: number): boolean => {
+	let searchResult = sort2.Search($.len(ints), $.functionValue((i: number): boolean => {
 		return $.arrayIndex(ints!, i) >= 5
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo)))
 	await $.println("First index where value >= 5:", searchResult)
+
+	// A predicate that receives from a channel makes Search suspend.
+	let gate: $.Channel<number> | null = $.makeChannel<number>(8, 0, "both")
+	for (let __goscriptRangeCount0 = $.cap(gate), __rangeIndex = 0; __rangeIndex < __goscriptRangeCount0; __rangeIndex++) {
+		await $.chanSend(gate, 0)
+	}
+	let asyncSearch = await sort2.Search($.len(ints), $.functionValue(async (i: number): globalThis.Promise<boolean> => {
+		return ($.arrayIndex(ints!, i) + await $.chanRecv(gate)) >= 4
+	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo)))
+	await $.println("First index where value >= 4:", asyncSearch)
+	let [findIndex, found] = sort2.Find($.len(ints), $.functionValue((i: number): number => {
+		return 5 - $.arrayIndex(ints!, i)
+	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo)))
+	await $.println("Find 5:", findIndex, found)
+	await $.println("Sorted pair:", sortedPair(2, 1))
 
 	// Test Slice function with custom comparator
 	let testSlice: $.Slice<number> = $.arrayToSlice<number>([5, 2, 8, 1, 9])
@@ -146,7 +161,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("Async sorted slice:", $.arrayIndex(asyncSlice!, 0), $.arrayIndex(asyncSlice!, 1))
 
 	// Test SliceIsSorted
-	let isSliceSorted = await sort2.SliceIsSorted($.interfaceValue(testSlice, "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"))), $.functionValue((i: number, j: number): boolean => {
+	let isSliceSorted = sort2.SliceIsSorted($.interfaceValue(testSlice, "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"))), $.functionValue((i: number, j: number): boolean => {
 		return $.arrayIndex(testSlice!, i) < $.arrayIndex(testSlice!, j)
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo)))
 	await $.println("Custom slice is sorted:", isSliceSorted)
@@ -163,17 +178,17 @@ export async function main(): globalThis.Promise<void> {
 
 	// sort.Slice takes the slice as an any, such as from reflect
 	let anySlice: $.Slice<number> = $.arrayToSlice<number>([3, 1, 2])
-	await sort2.Slice($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(anySlice, "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")))))).Interface(), $.functionValue((i: number, j: number): boolean => {
+	sort2.Slice($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(anySlice, "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")))))).Interface(), $.functionValue((i: number, j: number): boolean => {
 		return $.arrayIndex(anySlice!, i) < $.arrayIndex(anySlice!, j)
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo)))
 	await $.println("Any slice sort:", $.arrayIndex(anySlice!, 0), $.arrayIndex(anySlice!, 1), $.arrayIndex(anySlice!, 2))
-	await $.println("Any slice sorted:", await sort2.SliceIsSorted($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(anySlice, "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")))))).Interface(), $.functionValue((i: number, j: number): boolean => {
+	await $.println("Any slice sorted:", sort2.SliceIsSorted($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(anySlice, "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")))))).Interface(), $.functionValue((i: number, j: number): boolean => {
 		return $.arrayIndex(anySlice!, i) < $.arrayIndex(anySlice!, j)
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo))))
 
 	// a named slice type with methods passed as an any
 	let names: nameList = ($.arrayToSlice<string>(["c", "a", "b"]) as nameList)
-	await sort2.Slice($.namedValueInterfaceValue<any>(names, "main.nameList", {First: (receiver: any, ...args: any[]) => (nameList_First as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("string"), "main.nameList"), [$.methodSignature("First", [], [/* @__PURE__ */ $.basicType("string")])]), $.functionValue((i: number, j: number): boolean => {
+	sort2.Slice($.namedValueInterfaceValue<any>(names, "main.nameList", {First: (receiver: any, ...args: any[]) => (nameList_First as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("string"), "main.nameList"), [$.methodSignature("First", [], [/* @__PURE__ */ $.basicType("string")])]), $.functionValue((i: number, j: number): boolean => {
 		return $.stringCompare($.arrayIndex(names!, i), $.arrayIndex(names!, j)) < 0
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo)))
 	await $.println("Named slice any sort:", nameList_First(names), $.arrayIndex(names!, 1), $.arrayIndex(names!, 2))
@@ -181,10 +196,10 @@ export async function main(): globalThis.Promise<void> {
 	// Test the named slice types and their methods.
 	let wordSlice: $.Slice<string> = $.arrayToSlice<string>(["c", "a", "b"])
 	await sort2.StringSlice_Sort((wordSlice as sort2.StringSlice))
-	await $.println("StringSlice sort:", $.arrayIndex(wordSlice!, 0), $.arrayIndex(wordSlice!, 1), $.arrayIndex(wordSlice!, 2), await sort2.StringSlice_Search((wordSlice as sort2.StringSlice), "b"))
+	await $.println("StringSlice sort:", $.arrayIndex(wordSlice!, 0), $.arrayIndex(wordSlice!, 1), $.arrayIndex(wordSlice!, 2), sort2.StringSlice_Search((wordSlice as sort2.StringSlice), "b"))
 	let floatSlice: sort2.Float64Slice = ($.arrayToSlice<number>([2.5, 1.5]) as sort2.Float64Slice)
 	await sort2.Float64Slice_Sort(floatSlice)
-	await $.println("Float64Slice sort:", sort2.Float64Slice_Len(floatSlice), sort2.Float64Slice_Less(floatSlice, 0, 1), await sort2.Float64Slice_Search(floatSlice, 2.5))
+	await $.println("Float64Slice sort:", sort2.Float64Slice_Len(floatSlice), sort2.Float64Slice_Less(floatSlice, 0, 1), sort2.Float64Slice_Search(floatSlice, 2.5))
 	let sorter: sort2.Interface | null = $.namedValueInterfaceValue<sort2.Interface | null>(($.arrayToSlice<number>([3, 1, 2]) as sort2.IntSlice), "sort.IntSlice", {Len: (receiver: any, ...args: any[]) => (sort2.IntSlice_Len as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Less: (receiver: any, ...args: any[]) => (sort2.IntSlice_Less as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Search: (receiver: any, ...args: any[]) => (sort2.IntSlice_Search as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Sort: (receiver: any, ...args: any[]) => (sort2.IntSlice_Sort as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Swap: (receiver: any, ...args: any[]) => (sort2.IntSlice_Swap as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"), "sort.IntSlice"), [$.methodSignature("Len", [], [/* @__PURE__ */ $.basicType("int")]), $.methodSignature("Less", [["i", /* @__PURE__ */ $.basicType("int")], ["j", /* @__PURE__ */ $.basicType("int")]], [/* @__PURE__ */ $.basicType("bool")]), $.methodSignature("Search", [["x", /* @__PURE__ */ $.basicType("int")]], [/* @__PURE__ */ $.basicType("int")]), $.methodSignature("Sort"), $.methodSignature("Swap", [["i", /* @__PURE__ */ $.basicType("int")], ["j", /* @__PURE__ */ $.basicType("int")]])])
 	await sort2.Sort($.pointerValueOrNil(sorter)!)
 	let intSlice: sort2.IntSlice = ($.mustTypeAssert<sort2.IntSlice>(sorter, /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"), "sort.IntSlice")) as sort2.IntSlice)
@@ -198,6 +213,14 @@ export async function main(): globalThis.Promise<void> {
 
 export function nameList_First(n: nameList): string {
 	return $.arrayIndex(n!, 0)
+}
+
+export function sortedPair(a: number, b: number): number {
+	let pair: $.Slice<number> = $.arrayToSlice<number>([a, b])
+	sort2.Slice($.interfaceValue(pair, "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"))), $.functionValue((i: number, j: number): boolean => {
+		return $.arrayIndex(pair!, i) < $.arrayIndex(pair!, j)
+	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo)))
+	return ($.arrayIndex(pair!, 0) * 10) + $.arrayIndex(pair!, 1)
 }
 
 if ($.isMainScript(import.meta)) {
