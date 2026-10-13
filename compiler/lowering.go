@@ -1069,6 +1069,7 @@ func (o *LoweringOwner) analyzeLocalFileReferences(
 			addInterfaceArgumentRuntimeDeps(semPkg.source.TypesInfo, typed, addRuntimeTypeDeps)
 			addRuntimeTypeDeps(semPkg.source.TypesInfo.TypeOf(typed.Fun))
 		}
+		addImplicitInterfaceConversionDeps(semPkg.source.TypesInfo, node, addRuntimeTypeDeps)
 		return true
 	}
 	ast.Inspect(file, inspect)
@@ -1152,6 +1153,93 @@ func isReflectTypeForExpr(info *types.Info, expr ast.Expr) bool {
 	}
 	pkgName, _ := info.Uses[ident].(*types.PkgName)
 	return pkgName != nil && pkgName.Imported() != nil && pkgName.Imported().Path() == "reflect"
+}
+
+// addImplicitInterfaceConversionDeps records the runtime type dependencies of
+// values converted to interface types outside of call arguments and composite
+// literals: in return statements, assignments, typed variable declarations,
+// channel sends and explicit conversions. Boxing a value of a named type uses
+// its methods as values, which can come from a package the file only depends
+// on implicitly.
+func addImplicitInterfaceConversionDeps(
+	info *types.Info,
+	node ast.Node,
+	addRuntimeTypeDeps func(types.Type),
+) {
+	if info == nil || node == nil {
+		return
+	}
+	addValue := func(target types.Type, value ast.Expr) {
+		if target != nil && value != nil && typeIsInterface(target) {
+			addRuntimeTypeDeps(info.TypeOf(value))
+		}
+	}
+	switch typed := node.(type) {
+	case *ast.FuncDecl:
+		if typed.Body == nil {
+			return
+		}
+		if obj := info.Defs[typed.Name]; obj != nil {
+			signature, _ := obj.Type().(*types.Signature)
+			addReturnInterfaceValueDeps(signature, typed.Body, addValue)
+		}
+	case *ast.FuncLit:
+		signature, _ := types.Unalias(info.TypeOf(typed)).(*types.Signature)
+		addReturnInterfaceValueDeps(signature, typed.Body, addValue)
+	case *ast.AssignStmt:
+		if typed.Tok != token.ASSIGN || len(typed.Lhs) != len(typed.Rhs) {
+			return
+		}
+		for idx, lhs := range typed.Lhs {
+			addValue(info.TypeOf(lhs), typed.Rhs[idx])
+		}
+	case *ast.ValueSpec:
+		if typed.Type == nil || len(typed.Values) != len(typed.Names) {
+			return
+		}
+		target := info.TypeOf(typed.Type)
+		for _, value := range typed.Values {
+			addValue(target, value)
+		}
+	case *ast.SendStmt:
+		if ch, ok := types.Unalias(info.TypeOf(typed.Chan)).Underlying().(*types.Chan); ok {
+			addValue(ch.Elem(), typed.Value)
+		}
+	case *ast.CallExpr:
+		if len(typed.Args) != 1 {
+			return
+		}
+		if tv, ok := info.Types[typed.Fun]; ok && tv.IsType() {
+			addValue(tv.Type, typed.Args[0])
+		}
+	}
+}
+
+// addReturnInterfaceValueDeps calls addValue for each returned value of body,
+// excluding nested function literals, with its result type.
+func addReturnInterfaceValueDeps(
+	signature *types.Signature,
+	body *ast.BlockStmt,
+	addValue func(types.Type, ast.Expr),
+) {
+	if signature == nil || body == nil || signature.Results().Len() == 0 {
+		return
+	}
+	results := signature.Results()
+	ast.Inspect(body, func(node ast.Node) bool {
+		switch typed := node.(type) {
+		case *ast.FuncLit:
+			return false
+		case *ast.ReturnStmt:
+			if len(typed.Results) != results.Len() {
+				return true
+			}
+			for idx, value := range typed.Results {
+				addValue(results.At(idx).Type(), value)
+			}
+		}
+		return true
+	})
 }
 
 func addCompositeInterfaceValueDeps(
