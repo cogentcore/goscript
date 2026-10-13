@@ -40,7 +40,7 @@ export function Flag_Set(f: $.VarRef<Flag> | null, v: bigint): void {
 
 export async function Describe(__typeArgs: $.GenericTypeArgs | undefined, __goscriptParam0: any, values: $.Slice<bigint>): globalThis.Promise<bigint> {
 	let i: $.VarRef<any> = $.varRef(__goscriptParam0)
-	let p = $.mustTypeAssert<Setter | null>($.typeParamPointerInterfaceValue(i, __typeArgs?.["T"], "*T", /* @__PURE__ */ $.pointerType({ kind: $.TypeKind.Interface, methods: [] })), "main.Setter")
+	let p = $.mustTypeAssert<Setter | null>($.typeParamPointerInterfaceValue(i, __typeArgs?.["T"], "*T", /* @__PURE__ */ $.pointerType(__typeArgs?.["T"]?.type ?? { kind: $.TypeKind.Interface, methods: [] })), "main.Setter")
 	let n: bigint = 0n
 	for (let __goscriptRangeTarget0 = values, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
 		let v = __goscriptRangeTarget0![__rangeIndex]
