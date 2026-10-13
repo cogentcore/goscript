@@ -5,6 +5,8 @@ import * as $ from "@goscript/builtin/index.js"
 
 export type flags = number[]
 
+$.registerNamedType("main.flags", /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2));
+
 $.registerNamedValueType(
 	"main.flags",
 	{values: (receiver: any, ...args: any[]) => (flags_values as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},

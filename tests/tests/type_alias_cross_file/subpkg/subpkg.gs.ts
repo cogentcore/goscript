@@ -5,6 +5,8 @@ import * as $ from "@goscript/builtin/index.js"
 
 export type Value = $.Slice<number>
 
+$.registerNamedType("subpkg.Value", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")));
+
 $.registerNamedValueType(
 	"subpkg.Value",
 	{Clone: (receiver: any, ...args: any[]) => (Value_Clone as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},

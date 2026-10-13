@@ -8,6 +8,8 @@ import "@goscript/unsafe/index.js"
 
 export type shadow = Uint8Array
 
+$.registerNamedType("main.shadow", /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 4));
+
 export async function main(): globalThis.Promise<void> {
 	let buf: $.Slice<number> = new Uint8Array([9, 1, 2, 3, 4]) as $.Slice<number>
 	let ptr: $.VarRef<Uint8Array> | null = $.unsafePointerCast<$.VarRef<Uint8Array> | null>($.arrayPointerFromIndexRef<number>($.indexRef(buf!, 1), 4, 1, 1))
