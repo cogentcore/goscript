@@ -66,6 +66,14 @@ export function Gosched(): Promise<void> {
   })
 }
 
+// LockOSThread wires the calling goroutine to its current operating system
+// thread. JavaScript runs all goroutines on one thread, so this is a no-op.
+export function LockOSThread(): void {}
+
+// UnlockOSThread undoes an earlier call to LockOSThread. It is a no-op, as
+// goroutines always run on the one JavaScript thread.
+export function UnlockOSThread(): void {}
+
 // GoexitError Goexit terminates the current goroutine after deferred calls run. The
 // JavaScript runtime has no goroutine cancellation primitive to resume from, so
 // throw a non-panic sentinel: generated defer stacks still dispose while
