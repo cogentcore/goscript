@@ -107,7 +107,7 @@ describe('time.ParseDuration', () => {
     const [value, err] = ParseDuration('10')
 
     expect(value).toBe(0n)
-    expect(err?.Error()).toBe('time: invalid duration "10"')
+    expect(err?.Error()).toBe('time: missing unit in duration "10"')
   })
 })
 

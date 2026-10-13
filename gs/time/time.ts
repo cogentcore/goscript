@@ -265,7 +265,8 @@ export class Time {
     if (this._location.offsetSeconds !== undefined) {
       // Use the fixed offset from the location
       tzOffsetSeconds = this._location.offsetSeconds
-      isUTC = tzOffsetSeconds === 0 && this._location.name === 'UTC'
+      // Go prints Z for any zero offset, not only for the UTC location.
+      isUTC = tzOffsetSeconds === 0
     } else {
       // Fall back to JavaScript's timezone offset (for local time)
       const tzOffsetMinutesJS = this._date.getTimezoneOffset()
@@ -917,17 +918,14 @@ export function Duration_String(receiver: Duration): string {
   const seconds = Math.floor(remaining / 1e9)
   remaining -= seconds * 1e9
 
+  // As in Go, seconds are always shown, and minutes whenever there are hours.
   let out = sign
   if (hours !== 0) {
-    out += `${hours}h`
-  }
-  if (minutes !== 0) {
+    out += `${hours}h${minutes}m`
+  } else if (minutes !== 0) {
     out += `${minutes}m`
   }
-  if (seconds !== 0 || remaining !== 0) {
-    out += formatSeconds(seconds, remaining)
-  }
-  return out
+  return out + formatSeconds(seconds, remaining)
 }
 
 export function Duration_format(
@@ -1186,33 +1184,19 @@ export function Date(
     throw new Error('time: missing Location in call to Date')
   }
   loc = $.pointerValue(loc)
-  let date: globalThis.Date
-
+  // setFullYear/setUTCFullYear are used instead of the Date constructors,
+  // which map years 0-99 to 1900-1999, and they normalize overflowing fields.
+  const ms = Math.floor(nsec / 1000000)
+  const date = new globalThis.Date(0)
   if (loc.offsetSeconds !== undefined) {
-    // For fixed timezone locations, create the date in the local timezone and then convert to UTC
-    const localTime = globalThis.Date.UTC(
-      year,
-      month - 1,
-      day,
-      hour,
-      min,
-      sec,
-      Math.floor(nsec / 1000000),
-    )
-    // Subtract the offset to convert local time to UTC
-    // (if offset is -7*3600 for PDT, local time - (-7*3600) = local time + 7*3600 = UTC)
-    date = new globalThis.Date(localTime - loc.offsetSeconds * 1000)
+    // For fixed zones, build the wall clock as UTC and subtract the offset.
+    date.setUTCFullYear(year, month - 1, day)
+    date.setUTCHours(hour, min, sec, ms)
+    date.setTime(date.getTime() - loc.offsetSeconds * 1000)
   } else {
-    // For local time or other timezones, use regular Date constructor
-    date = new globalThis.Date(
-      year,
-      month - 1,
-      day,
-      hour,
-      min,
-      sec,
-      Math.floor(nsec / 1000000),
-    )
+    // For local time, use the host's local time zone.
+    date.setFullYear(year, month - 1, day)
+    date.setHours(hour, min, sec, ms)
   }
   return Time.create(
     date,
@@ -1335,279 +1319,1029 @@ export function UnixNano(nsec: bigint): Time {
 // A duration string is a possibly signed sequence of decimal numbers,
 // each with optional fraction and a unit suffix.
 export function ParseDuration(s: string): [Duration, $.GoError] {
-  const regex = /^([+-]?)(\d+(?:\.\d+)?)(ns|us|µs|ms|s|m|h)$/
-  const match = s.match(regex)
+  // [-+]?([0-9]*(\.[0-9]*)?[a-z]+)+
+  const orig = s
+  const invalid = (message = 'invalid duration'): [Duration, $.GoError] => [
+    0n,
+    $.newError('time: ' + message + ' ' + quoteParseValue(orig)),
+  ]
+  const limit = 1n << 63n
+  let d = 0n
+  let neg = false
 
-  if (!match) {
-    return [0n, $.newError(`time: invalid duration "${s}"`)]
+  if (s !== '' && (s[0] === '-' || s[0] === '+')) {
+    neg = s[0] === '-'
+    s = s.slice(1)
   }
-
-  const [, sign, valueStr, unit] = match
-  let value = parseFloat(valueStr)
-  if (sign === '-') value = -value
-
-  let nanoseconds: number
-  switch (unit) {
-    case 'ns':
-      nanoseconds = value
-      break
-    case 'us':
-    case 'µs':
-      nanoseconds = value * 1000
-      break
-    case 'ms':
-      nanoseconds = value * 1000000
-      break
-    case 's':
-      nanoseconds = value * 1000000000
-      break
-    case 'm':
-      nanoseconds = value * 60000000000
-      break
-    case 'h':
-      nanoseconds = value * 3600000000000
-      break
-    default:
-      return [0n, $.newError(`time: unknown unit "${unit}" in duration "${s}"`)]
+  // Special case: if all that is left is "0", this is zero.
+  if (s === '0') {
+    return [0n, null]
   }
+  if (s === '') {
+    return invalid()
+  }
+  while (s !== '') {
+    // The next character must be [0-9.].
+    if (!(s[0] === '.' || isDigitAt(s, 0))) {
+      return invalid()
+    }
+    // Consume [0-9]*.
+    const intDigits = /^[0-9]*/.exec(s)![0]
+    s = s.slice(intDigits.length)
+    let v = intDigits === '' ? 0n : BigInt(intDigits)
+    if (v >= limit) {
+      return invalid()
+    }
+    const pre = intDigits !== ''
 
-  return [BigInt(Math.trunc(nanoseconds)), null]
+    // Consume (\.[0-9]*)?.
+    let post = false
+    let f = 0n
+    let scale = 1
+    if (s !== '' && s[0] === '.') {
+      s = s.slice(1)
+      const fracDigits = /^[0-9]*/.exec(s)![0]
+      s = s.slice(fracDigits.length)
+      post = fracDigits !== ''
+      // Keep only the digits that fit, as Go's leadingFraction does.
+      for (const c of fracDigits) {
+        const y = f * 10n + BigInt(c.charCodeAt(0) - 48)
+        if (f > (limit - 1n) / 10n || y > limit) {
+          break
+        }
+        f = y
+        scale *= 10
+      }
+    }
+    if (!pre && !post) {
+      // No digits (e.g. ".s" or "-.s").
+      return invalid()
+    }
+
+    // Consume unit.
+    const unitText = /^[^0-9.]*/.exec(s)![0]
+    if (unitText === '') {
+      return invalid('missing unit in duration')
+    }
+    s = s.slice(unitText.length)
+    const unit = durationUnits.get(unitText)
+    if (unit === undefined) {
+      return invalid(
+        'unknown unit ' + quoteParseValue(unitText) + ' in duration',
+      )
+    }
+    if (v > limit / unit) {
+      return invalid()
+    }
+    v *= unit
+    if (f > 0n) {
+      // float64 is needed to be nanosecond accurate for fractions of hours.
+      v += BigInt(Math.trunc(Number(f) * (Number(unit) / scale)))
+      if (v > limit) {
+        return invalid()
+      }
+    }
+    d += v
+    if (d > limit) {
+      return invalid()
+    }
+  }
+  if (neg) {
+    return [-d, null]
+  }
+  if (d > limit - 1n) {
+    return invalid()
+  }
+  return [d, null]
 }
 
+const durationUnits = new Map<string, bigint>([
+  ['ns', 1n],
+  ['us', 1000n],
+  ['\u00b5s', 1000n], // U+00B5 = micro symbol
+  ['\u03bcs', 1000n], // U+03BC = Greek letter mu
+  ['ms', 1000000n],
+  ['s', 1000000000n],
+  ['m', 60000000000n],
+  ['h', 3600000000000n],
+])
+
 // Parse parses a formatted string and returns the time value it represents.
+// In the absence of a time zone indicator, Parse returns a time in UTC.
 export function Parse(layout: string, value: string): [Time, $.GoError] {
-  return ParseInLocation(layout, value, UTC)
+  return parseTime(layout, value, UTC, Local)
 }
 
 // ParseInLocation is like Parse but differs in two important ways.
+// First, in the absence of time zone information, Parse interprets a time as UTC;
+// ParseInLocation interprets the time as in the given location.
+// Second, when given a zone offset or abbreviation, Parse tries to match it
+// against the Local location; ParseInLocation uses the given location.
 export function ParseInLocation(
   layout: string,
   value: string,
-  loc: Location,
+  loc: Location | $.VarRef<Location> | null,
 ): [Time, $.GoError] {
-  if (
-    layout === '20060102150405Z0700' ||
-    layout === '20060102150405.999999999Z0700'
-  ) {
-    const match = value.match(
-      /^(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})(?:\.(\d{1,9}))?(Z|[+-]\d{4})$/,
-    )
-    if (match === null) {
-      return [
-        new Time(),
-        $.toGoError(
-          new ParseError(
-            layout,
-            value,
-            '',
-            '',
-            `parsing time "${value}" as "${layout}": cannot parse`,
-          ),
-        ),
-      ]
-    }
+  if (loc === null) {
+    throw new Error('time: missing Location in call to ParseInLocation')
+  }
+  const location = $.pointerValue(loc)
+  return parseTime(layout, value, location, location)
+}
 
-    const year = Number(match[1])
-    const month = Number(match[2])
-    const day = Number(match[3])
-    const hour = Number(match[4])
-    const minute = Number(match[5])
-    const second = Number(match[6])
-    const nanosecond = Number((match[7] ?? '').padEnd(9, '0'))
-    const zone = match[8]
-    let offsetSeconds = 0
-    if (zone !== 'Z') {
-      const sign = zone[0] === '-' ? -1 : 1
-      offsetSeconds =
-        sign * (Number(zone.slice(1, 3)) * 60 + Number(zone.slice(3, 5))) * 60
-    }
+// Layout chunk codes, matching Go's std* constants in time/format.go.
+const stdLongMonth = 1 // "January"
+const stdMonth = 2 // "Jan"
+const stdNumMonth = 3 // "1"
+const stdZeroMonth = 4 // "01"
+const stdLongWeekDay = 5 // "Monday"
+const stdWeekDay = 6 // "Mon"
+const stdDay = 7 // "2"
+const stdUnderDay = 8 // "_2"
+const stdZeroDay = 9 // "02"
+const stdUnderYearDay = 10 // "__2"
+const stdZeroYearDay = 11 // "002"
+const stdHour = 12 // "15"
+const stdHour12 = 13 // "3"
+const stdZeroHour12 = 14 // "03"
+const stdMinute = 15 // "4"
+const stdZeroMinute = 16 // "04"
+const stdSecond = 17 // "5"
+const stdZeroSecond = 18 // "05"
+const stdLongYear = 19 // "2006"
+const stdYear = 20 // "06"
+const stdPM = 21 // "PM"
+const stdpm = 22 // "pm"
+const stdTZ = 23 // "MST"
+const stdISO8601TZ = 24 // "Z0700"
+const stdISO8601SecondsTZ = 25 // "Z070000"
+const stdISO8601ShortTZ = 26 // "Z07"
+const stdISO8601ColonTZ = 27 // "Z07:00"
+const stdISO8601ColonSecondsTZ = 28 // "Z07:00:00"
+const stdNumTZ = 29 // "-0700"
+const stdNumSecondsTz = 30 // "-070000"
+const stdNumShortTZ = 31 // "-07"
+const stdNumColonTZ = 32 // "-07:00"
+const stdNumColonSecondsTZ = 33 // "-07:00:00"
+const stdFracSecond0 = 34 // ".0", ".00", ... trailing zeros included
+const stdFracSecond9 = 35 // ".9", ".99", ... trailing zeros omitted
 
-    const localMillis = globalThis.Date.UTC(
-      year,
-      month - 1,
-      day,
-      hour,
-      minute,
-      second,
-    )
-    const check = new globalThis.Date(localMillis)
-    if (year >= 0 && year < 100) {
-      check.setUTCFullYear(year)
+const std0x = [
+  stdZeroMonth,
+  stdZeroDay,
+  stdZeroHour12,
+  stdZeroMinute,
+  stdZeroSecond,
+  stdYear,
+]
+
+// layoutChunk is one std element found in a layout by nextStdChunk.
+interface layoutChunk {
+  prefix: string
+  std: number
+  // digits is the number of fractional second digits for stdFracSecond*.
+  digits: number
+  suffix: string
+}
+
+function isDigitAt(s: string, i: number): boolean {
+  if (s.length <= i) {
+    return false
+  }
+  const c = s.charCodeAt(i)
+  return c >= 48 && c <= 57
+}
+
+function startsWithLowerCase(s: string): boolean {
+  if (s.length === 0) {
+    return false
+  }
+  const c = s[0]
+  return c >= 'a' && c <= 'z'
+}
+
+// nextStdChunk finds the first occurrence of a std string in layout and
+// returns the text before, the std code, and the text after, as in Go.
+function nextStdChunk(layout: string): layoutChunk {
+  const chunk = (i: number, std: number, n: number, digits = 0) => ({
+    prefix: layout.slice(0, i),
+    std,
+    digits,
+    suffix: layout.slice(i + n),
+  })
+  for (let i = 0; i < layout.length; i++) {
+    const c = layout[i]
+    const rest = layout.slice(i)
+    switch (c) {
+      case 'J':
+        if (rest.startsWith('Jan')) {
+          if (rest.startsWith('January')) {
+            return chunk(i, stdLongMonth, 7)
+          }
+          if (!startsWithLowerCase(rest.slice(3))) {
+            return chunk(i, stdMonth, 3)
+          }
+        }
+        break
+      case 'M':
+        if (rest.startsWith('Mon')) {
+          if (rest.startsWith('Monday')) {
+            return chunk(i, stdLongWeekDay, 6)
+          }
+          if (!startsWithLowerCase(rest.slice(3))) {
+            return chunk(i, stdWeekDay, 3)
+          }
+        }
+        if (rest.startsWith('MST')) {
+          return chunk(i, stdTZ, 3)
+        }
+        break
+      case '0':
+        if (rest.length >= 2 && rest[1] >= '1' && rest[1] <= '6') {
+          return chunk(i, std0x[rest.charCodeAt(1) - 49], 2)
+        }
+        if (rest.startsWith('002')) {
+          return chunk(i, stdZeroYearDay, 3)
+        }
+        break
+      case '1':
+        if (rest.startsWith('15')) {
+          return chunk(i, stdHour, 2)
+        }
+        return chunk(i, stdNumMonth, 1)
+      case '2':
+        if (rest.startsWith('2006')) {
+          return chunk(i, stdLongYear, 4)
+        }
+        return chunk(i, stdDay, 1)
+      case '_':
+        if (rest.length >= 2 && rest[1] === '2') {
+          // _2006 is really a literal _, followed by stdLongYear.
+          if (rest.startsWith('_2006')) {
+            return chunk(i + 1, stdLongYear, 4)
+          }
+          return chunk(i, stdUnderDay, 2)
+        }
+        if (rest.startsWith('__2')) {
+          return chunk(i, stdUnderYearDay, 3)
+        }
+        break
+      case '3':
+        return chunk(i, stdHour12, 1)
+      case '4':
+        return chunk(i, stdMinute, 1)
+      case '5':
+        return chunk(i, stdSecond, 1)
+      case 'P':
+        if (rest.startsWith('PM')) {
+          return chunk(i, stdPM, 2)
+        }
+        break
+      case 'p':
+        if (rest.startsWith('pm')) {
+          return chunk(i, stdpm, 2)
+        }
+        break
+      case '-':
+        if (rest.startsWith('-070000')) {
+          return chunk(i, stdNumSecondsTz, 7)
+        }
+        if (rest.startsWith('-07:00:00')) {
+          return chunk(i, stdNumColonSecondsTZ, 9)
+        }
+        if (rest.startsWith('-0700')) {
+          return chunk(i, stdNumTZ, 5)
+        }
+        if (rest.startsWith('-07:00')) {
+          return chunk(i, stdNumColonTZ, 6)
+        }
+        if (rest.startsWith('-07')) {
+          return chunk(i, stdNumShortTZ, 3)
+        }
+        break
+      case 'Z':
+        if (rest.startsWith('Z070000')) {
+          return chunk(i, stdISO8601SecondsTZ, 7)
+        }
+        if (rest.startsWith('Z07:00:00')) {
+          return chunk(i, stdISO8601ColonSecondsTZ, 9)
+        }
+        if (rest.startsWith('Z0700')) {
+          return chunk(i, stdISO8601TZ, 5)
+        }
+        if (rest.startsWith('Z07:00')) {
+          return chunk(i, stdISO8601ColonTZ, 6)
+        }
+        if (rest.startsWith('Z07')) {
+          return chunk(i, stdISO8601ShortTZ, 3)
+        }
+        break
+      case '.':
+      case ',':
+        if (rest.length >= 2 && (rest[1] === '0' || rest[1] === '9')) {
+          const ch = rest[1]
+          let j = 1
+          while (j < rest.length && rest[j] === ch) {
+            j++
+          }
+          // String of digits must end here; only fractional second is all digits.
+          if (!isDigitAt(rest, j)) {
+            const code = ch === '9' ? stdFracSecond9 : stdFracSecond0
+            return chunk(i, code, j, j - 1)
+          }
+        }
+        break
     }
+  }
+  return { prefix: layout, std: 0, digits: 0, suffix: '' }
+}
+
+const shortMonthNames = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
+]
+const longMonthNames = [
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
+]
+const shortDayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+const longDayNames = [
+  'Sunday',
+  'Monday',
+  'Tuesday',
+  'Wednesday',
+  'Thursday',
+  'Friday',
+  'Saturday',
+]
+
+// parseBad is thrown by the parse helpers and caught by parseTime.
+class parseBad extends Error {}
+
+// lookupName matches a case-insensitive name prefix of val from tab.
+function lookupName(tab: string[], val: string): [number, string] {
+  for (let i = 0; i < tab.length; i++) {
+    const v = tab[i]
     if (
-      month < 1 ||
-      month > 12 ||
-      day < 1 ||
-      check.getUTCFullYear() !== year ||
-      check.getUTCMonth() !== month - 1 ||
-      check.getUTCDate() !== day ||
-      check.getUTCHours() !== hour ||
-      check.getUTCMinutes() !== minute ||
-      check.getUTCSeconds() !== second
+      val.length >= v.length &&
+      val.slice(0, v.length).toLowerCase() === v.toLowerCase()
     ) {
+      return [i, val.slice(v.length)]
+    }
+  }
+  throw new parseBad()
+}
+
+// getnum parses s[0:1] or s[0:2] (fixed forces s[0:2]) as a decimal integer.
+function getnum(s: string, fixed: boolean): [number, string] {
+  if (!isDigitAt(s, 0)) {
+    throw new parseBad()
+  }
+  if (!isDigitAt(s, 1)) {
+    if (fixed) {
+      throw new parseBad()
+    }
+    return [s.charCodeAt(0) - 48, s.slice(1)]
+  }
+  return [(s.charCodeAt(0) - 48) * 10 + (s.charCodeAt(1) - 48), s.slice(2)]
+}
+
+// getnum3 parses s[0:1], s[0:2], or s[0:3] (fixed forces s[0:3]).
+function getnum3(s: string, fixed: boolean): [number, string] {
+  let n = 0
+  let i = 0
+  for (; i < 3 && isDigitAt(s, i); i++) {
+    n = n * 10 + (s.charCodeAt(i) - 48)
+  }
+  if (i === 0 || (fixed && i !== 3)) {
+    throw new parseBad()
+  }
+  return [n, s.slice(i)]
+}
+
+// atoiStrict parses an optionally signed decimal integer occupying all of s.
+function atoiStrict(s: string): number {
+  if (!/^[+-]?[0-9]+$/.test(s)) {
+    throw new parseBad()
+  }
+  return Number(s)
+}
+
+function cutspace(s: string): string {
+  let i = 0
+  while (i < s.length && s[i] === ' ') {
+    i++
+  }
+  return s.slice(i)
+}
+
+// skip removes the given prefix from value, treating runs of spaces as
+// equivalent. It returns null if the prefix does not match.
+function skip(value: string, prefix: string): string | null {
+  while (prefix.length > 0) {
+    if (prefix[0] === ' ') {
+      if (value.length > 0 && value[0] !== ' ') {
+        return null
+      }
+      prefix = cutspace(prefix)
+      value = cutspace(value)
+      continue
+    }
+    if (value.length === 0 || value[0] !== prefix[0]) {
+      return null
+    }
+    prefix = prefix.slice(1)
+    value = value.slice(1)
+  }
+  return value
+}
+
+function commaOrPeriod(c: string | undefined): boolean {
+  return c === '.' || c === ','
+}
+
+// parseNanoseconds parses value[0:nbytes], a separator and digits, as
+// nanoseconds.
+function parseNanoseconds(value: string, nbytes: number): number {
+  if (!commaOrPeriod(value[0])) {
+    throw new parseBad()
+  }
+  if (nbytes > 10) {
+    nbytes = 10
+  }
+  let ns = atoiStrict(value.slice(1, nbytes))
+  for (let i = 0; i < 10 - nbytes; i++) {
+    ns *= 10
+  }
+  return ns
+}
+
+// parseSignedOffset parses a signed timezone offset like "+03" or "-04",
+// returning its length or 0.
+function parseSignedOffset(value: string): number {
+  if (value[0] !== '-' && value[0] !== '+') {
+    return 0
+  }
+  const m = /^[0-9]+/.exec(value.slice(1))
+  if (m === null || Number(m[0]) > 23) {
+    return 0
+  }
+  return 1 + m[0].length
+}
+
+// parseTimeZone parses a time zone abbreviation, returning its length or -1.
+function parseTimeZone(value: string): number {
+  if (value.length < 3) {
+    return -1
+  }
+  if (value.startsWith('ChST') || value.startsWith('MeST')) {
+    return 4
+  }
+  if (value.startsWith('GMT')) {
+    return value.length === 3 ? 3 : 3 + parseSignedOffset(value.slice(3))
+  }
+  if (value[0] === '+' || value[0] === '-') {
+    const n = parseSignedOffset(value)
+    return n > 0 ? n : -1
+  }
+  let nUpper = 0
+  for (; nUpper < 6 && nUpper < value.length; nUpper++) {
+    const c = value[nUpper]
+    if (c < 'A' || c > 'Z') {
+      break
+    }
+  }
+  switch (nUpper) {
+    case 3:
+      return 3
+    case 4:
+      return value[3] === 'T' || value.startsWith('WITA') ? 4 : -1
+    case 5:
+      return value[4] === 'T' ? 5 : -1
+  }
+  return -1
+}
+
+// quoteParseValue quotes s as Go's time package does in ParseError messages.
+function quoteParseValue(s: string): string {
+  let out = '"'
+  for (const c of s) {
+    const code = c.codePointAt(0)!
+    if (code >= 0x80 || code < 0x20) {
+      for (const b of new TextEncoder().encode(c)) {
+        out += '\\x' + b.toString(16).padStart(2, '0')
+      }
+    } else {
+      if (c === '"' || c === '\\') {
+        out += '\\'
+      }
+      out += c
+    }
+  }
+  return out + '"'
+}
+
+function newParseError(
+  layout: string,
+  value: string,
+  layoutElem: string,
+  valueElem: string,
+  message: string,
+): $.GoError {
+  const text =
+    message === '' ?
+      'parsing time ' +
+      quoteParseValue(value) +
+      ' as ' +
+      quoteParseValue(layout) +
+      ': cannot parse ' +
+      quoteParseValue(valueElem) +
+      ' as ' +
+      quoteParseValue(layoutElem)
+    : 'parsing time ' + quoteParseValue(value) + message
+  return $.toGoError(new ParseError(layout, value, layoutElem, valueElem, text))
+}
+
+function isLeap(year: number): boolean {
+  return year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0)
+}
+
+// daysBefore[m] counts the days in a non-leap year before month m begins.
+const daysBefore = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365]
+
+function daysIn(month: number, year: number): number {
+  if (month === 2 && isLeap(year)) {
+    return 29
+  }
+  return daysBefore[month] - daysBefore[month - 1]
+}
+
+// zoneOffsetAt returns loc's offset in seconds east of UTC at the instant ms.
+function zoneOffsetAt(loc: Location, ms: number): number {
+  if (loc.offsetSeconds !== undefined) {
+    return loc.offsetSeconds
+  }
+  return -new globalThis.Date(ms).getTimezoneOffset() * 60
+}
+
+// parseTime is Go's time.parse: it parses value according to layout, using
+// defaultLocation when value has no zone and matching zone offsets and
+// names against local.
+function parseTime(
+  layout: string,
+  value: string,
+  defaultLocation: Location,
+  local: Location,
+): [Time, $.GoError] {
+  const alayout = layout
+  const avalue = value
+  let rangeErrString = ''
+  let amSet = false
+  let pmSet = false
+
+  let year = 0
+  let month = -1
+  let day = -1
+  let yday = -1
+  let hour = 0
+  let min = 0
+  let sec = 0
+  let nsec = 0
+  let z: Location | null = null
+  let zoneOffset = -1
+  let zoneName = ''
+
+  for (;;) {
+    const { prefix, std, digits, suffix } = nextStdChunk(layout)
+    const stdstr = layout.slice(prefix.length, layout.length - suffix.length)
+    const skipped = skip(value, prefix)
+    if (skipped === null) {
+      return [new Time(), newParseError(alayout, avalue, prefix, value, '')]
+    }
+    value = skipped
+    if (std === 0) {
+      if (value.length !== 0) {
+        return [
+          new Time(),
+          newParseError(
+            alayout,
+            avalue,
+            '',
+            value,
+            ': extra text: ' + quoteParseValue(value),
+          ),
+        ]
+      }
+      break
+    }
+    layout = suffix
+    const hold = value
+    try {
+      switch (std) {
+        case stdYear: {
+          if (value.length < 2) {
+            throw new parseBad()
+          }
+          year = atoiStrict(value.slice(0, 2))
+          value = value.slice(2)
+          year += year >= 69 ? 1900 : 2000
+          break
+        }
+        case stdLongYear:
+          if (value.length < 4 || !isDigitAt(value, 0)) {
+            throw new parseBad()
+          }
+          year = atoiStrict(value.slice(0, 4))
+          value = value.slice(4)
+          break
+        case stdMonth:
+          ;[month, value] = lookupName(shortMonthNames, value)
+          month++
+          break
+        case stdLongMonth:
+          ;[month, value] = lookupName(longMonthNames, value)
+          month++
+          break
+        case stdNumMonth:
+        case stdZeroMonth:
+          ;[month, value] = getnum(value, std === stdZeroMonth)
+          if (month <= 0 || month > 12) {
+            rangeErrString = 'month'
+          }
+          break
+        case stdWeekDay:
+          value = lookupName(shortDayNames, value)[1]
+          break
+        case stdLongWeekDay:
+          value = lookupName(longDayNames, value)[1]
+          break
+        case stdDay:
+        case stdUnderDay:
+        case stdZeroDay:
+          if (std === stdUnderDay && value[0] === ' ') {
+            value = value.slice(1)
+          }
+          ;[day, value] = getnum(value, std === stdZeroDay)
+          break
+        case stdUnderYearDay:
+        case stdZeroYearDay:
+          for (let i = 0; i < 2; i++) {
+            if (std === stdUnderYearDay && value[0] === ' ') {
+              value = value.slice(1)
+            }
+          }
+          ;[yday, value] = getnum3(value, std === stdZeroYearDay)
+          break
+        case stdHour:
+          ;[hour, value] = getnum(value, false)
+          if (hour < 0 || hour >= 24) {
+            rangeErrString = 'hour'
+          }
+          break
+        case stdHour12:
+        case stdZeroHour12:
+          ;[hour, value] = getnum(value, std === stdZeroHour12)
+          if (hour < 0 || hour > 12) {
+            rangeErrString = 'hour'
+          }
+          break
+        case stdMinute:
+        case stdZeroMinute:
+          ;[min, value] = getnum(value, std === stdZeroMinute)
+          if (min < 0 || min >= 60) {
+            rangeErrString = 'minute'
+          }
+          break
+        case stdSecond:
+        case stdZeroSecond: {
+          ;[sec, value] = getnum(value, std === stdZeroSecond)
+          if (sec < 0 || sec >= 60) {
+            rangeErrString = 'second'
+            break
+          }
+          // A fractional second in the value but not in the layout.
+          if (
+            value.length >= 2 &&
+            commaOrPeriod(value[0]) &&
+            isDigitAt(value, 1)
+          ) {
+            const next = nextStdChunk(layout).std
+            if (next === stdFracSecond0 || next === stdFracSecond9) {
+              break
+            }
+            let n = 2
+            while (n < value.length && isDigitAt(value, n)) {
+              n++
+            }
+            nsec = parseNanoseconds(value, n)
+            value = value.slice(n)
+          }
+          break
+        }
+        case stdPM:
+        case stdpm: {
+          if (value.length < 2) {
+            throw new parseBad()
+          }
+          const p = value.slice(0, 2)
+          value = value.slice(2)
+          const upper = std === stdPM
+          if (p === (upper ? 'PM' : 'pm')) {
+            pmSet = true
+          } else if (p === (upper ? 'AM' : 'am')) {
+            amSet = true
+          } else {
+            throw new parseBad()
+          }
+          break
+        }
+        case stdISO8601TZ:
+        case stdISO8601ShortTZ:
+        case stdISO8601ColonTZ:
+        case stdISO8601SecondsTZ:
+        case stdISO8601ColonSecondsTZ:
+        case stdNumTZ:
+        case stdNumShortTZ:
+        case stdNumColonTZ:
+        case stdNumSecondsTz:
+        case stdNumColonSecondsTZ: {
+          if (std <= stdISO8601ColonSecondsTZ && value[0] === 'Z') {
+            value = value.slice(1)
+            z = UTC
+            break
+          }
+          let sign: string, hh: string, mm: string, ss: string
+          if (std === stdISO8601ColonTZ || std === stdNumColonTZ) {
+            if (value.length < 6 || value[3] !== ':') {
+              throw new parseBad()
+            }
+            ;[sign, hh, mm, ss] = [
+              value[0],
+              value.slice(1, 3),
+              value.slice(4, 6),
+              '00',
+            ]
+            value = value.slice(6)
+          } else if (std === stdNumShortTZ || std === stdISO8601ShortTZ) {
+            if (value.length < 3) {
+              throw new parseBad()
+            }
+            ;[sign, hh, mm, ss] = [value[0], value.slice(1, 3), '00', '00']
+            value = value.slice(3)
+          } else if (
+            std === stdISO8601ColonSecondsTZ ||
+            std === stdNumColonSecondsTZ
+          ) {
+            if (value.length < 9 || value[3] !== ':' || value[6] !== ':') {
+              throw new parseBad()
+            }
+            ;[sign, hh, mm, ss] = [
+              value[0],
+              value.slice(1, 3),
+              value.slice(4, 6),
+              value.slice(7, 9),
+            ]
+            value = value.slice(9)
+          } else if (std === stdISO8601SecondsTZ || std === stdNumSecondsTz) {
+            if (value.length < 7) {
+              throw new parseBad()
+            }
+            ;[sign, hh, mm, ss] = [
+              value[0],
+              value.slice(1, 3),
+              value.slice(3, 5),
+              value.slice(5, 7),
+            ]
+            value = value.slice(7)
+          } else {
+            if (value.length < 5) {
+              throw new parseBad()
+            }
+            ;[sign, hh, mm, ss] = [
+              value[0],
+              value.slice(1, 3),
+              value.slice(3, 5),
+              '00',
+            ]
+            value = value.slice(5)
+          }
+          const hr = getnum(hh, true)[0]
+          const mn = getnum(mm, true)[0]
+          const sc = getnum(ss, true)[0]
+          // The range tests use > rather than >=, as in Go.
+          if (hr > 24) {
+            rangeErrString = 'time zone offset hour'
+          }
+          if (mn > 60) {
+            rangeErrString = 'time zone offset minute'
+          }
+          if (sc > 60) {
+            rangeErrString = 'time zone offset second'
+          }
+          zoneOffset = (hr * 60 + mn) * 60 + sc
+          if (sign === '-') {
+            zoneOffset = -zoneOffset
+          } else if (sign !== '+') {
+            throw new parseBad()
+          }
+          break
+        }
+        case stdTZ: {
+          if (value.startsWith('UTC')) {
+            z = UTC
+            value = value.slice(3)
+            break
+          }
+          const n = parseTimeZone(value)
+          if (n < 0) {
+            throw new parseBad()
+          }
+          zoneName = value.slice(0, n)
+          value = value.slice(n)
+          break
+        }
+        case stdFracSecond0: {
+          // stdFracSecond0 requires the exact number of digits in the layout.
+          const ndigit = 1 + digits
+          if (value.length < ndigit) {
+            throw new parseBad()
+          }
+          nsec = parseNanoseconds(value, ndigit)
+          value = value.slice(ndigit)
+          break
+        }
+        case stdFracSecond9: {
+          if (
+            value.length < 2 ||
+            !commaOrPeriod(value[0]) ||
+            !isDigitAt(value, 1)
+          ) {
+            // Fractional second omitted.
+            break
+          }
+          // Take any number of digits, even more than asked for.
+          let i = 0
+          while (i + 1 < value.length && isDigitAt(value, i + 1)) {
+            i++
+          }
+          nsec = parseNanoseconds(value, 1 + i)
+          value = value.slice(1 + i)
+          break
+        }
+      }
+    } catch (e) {
+      if (!(e instanceof parseBad)) {
+        throw e
+      }
+      return [new Time(), newParseError(alayout, avalue, stdstr, hold, '')]
+    }
+    if (rangeErrString !== '') {
       return [
         new Time(),
-        $.toGoError(
-          new ParseError(
-            layout,
-            value,
-            '',
-            '',
-            `parsing time "${value}" as "${layout}": cannot parse`,
-          ),
+        newParseError(
+          alayout,
+          avalue,
+          stdstr,
+          value,
+          ': ' + rangeErrString + ' out of range',
         ),
       ]
     }
-
-    return [
-      Time.create(
-        new globalThis.Date(check.getTime() - offsetSeconds * 1000),
-        nanosecond,
-        undefined,
-        zone === 'Z' ? UTC : FixedZone('', offsetSeconds),
-      ),
-      null,
-    ]
+  }
+  if (pmSet && hour < 12) {
+    hour += 12
+  } else if (amSet && hour === 12) {
+    hour = 0
   }
 
-  if (layout === '0601021504Z0700' || layout === '060102150405Z0700') {
-    const withSeconds = layout === '060102150405Z0700'
-    const match = value.match(
-      withSeconds ?
-        /^(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})(Z|[+-]\d{4})$/
-      : /^(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})(Z|[+-]\d{4})$/,
-    )
-    if (match === null) {
+  // Convert yday to day, month.
+  if (yday >= 0) {
+    let d = 0
+    let m = 0
+    if (isLeap(year)) {
+      if (yday === 31 + 29) {
+        m = 2
+        d = 29
+      } else if (yday > 31 + 29) {
+        yday--
+      }
+    }
+    if (yday < 1 || yday > 365) {
       return [
         new Time(),
-        $.toGoError(
-          new ParseError(
-            layout,
-            value,
-            '',
-            '',
-            `parsing time "${value}" as "${layout}": cannot parse`,
-          ),
+        newParseError(alayout, avalue, '', value, ': day-of-year out of range'),
+      ]
+    }
+    if (m === 0) {
+      m = Math.floor((yday - 1) / 31) + 1
+      if (daysBefore[m] < yday) {
+        m++
+      }
+      d = yday - daysBefore[m - 1]
+    }
+    if (month >= 0 && month !== m) {
+      return [
+        new Time(),
+        newParseError(
+          alayout,
+          avalue,
+          '',
+          value,
+          ': day-of-year does not match month',
         ),
       ]
     }
-
-    const shortYear = Number(match[1])
-    const year = shortYear >= 69 ? 1900 + shortYear : 2000 + shortYear
-    const month = Number(match[2])
-    const day = Number(match[3])
-    const hour = Number(match[4])
-    const minute = Number(match[5])
-    const second = withSeconds ? Number(match[6]) : 0
-    const zone = match[withSeconds ? 7 : 6]
-    let offsetSeconds = 0
-    if (zone !== 'Z') {
-      const sign = zone[0] === '-' ? -1 : 1
-      offsetSeconds =
-        sign * (Number(zone.slice(1, 3)) * 60 + Number(zone.slice(3, 5))) * 60
-    }
-
-    const utcMillis =
-      globalThis.Date.UTC(year, month - 1, day, hour, minute, second) -
-      offsetSeconds * 1000
-    const check = new globalThis.Date(utcMillis + offsetSeconds * 1000)
-    if (
-      month < 1 ||
-      month > 12 ||
-      day < 1 ||
-      check.getUTCFullYear() !== year ||
-      check.getUTCMonth() !== month - 1 ||
-      check.getUTCDate() !== day ||
-      check.getUTCHours() !== hour ||
-      check.getUTCMinutes() !== minute ||
-      check.getUTCSeconds() !== second
-    ) {
+    month = m
+    if (day >= 0 && day !== d) {
       return [
         new Time(),
-        $.toGoError(
-          new ParseError(
-            layout,
-            value,
-            '',
-            '',
-            `parsing time "${value}" as "${layout}": cannot parse`,
-          ),
+        newParseError(
+          alayout,
+          avalue,
+          '',
+          value,
+          ': day-of-year does not match day',
         ),
       ]
     }
-
-    return [
-      Time.create(
-        new globalThis.Date(utcMillis),
-        0,
-        undefined,
-        zone === 'Z' ? UTC : FixedZone('', offsetSeconds),
-      ),
-      null,
-    ]
+    day = d
+  } else {
+    if (month < 0) {
+      month = January
+    }
+    if (day < 0) {
+      day = 1
+    }
   }
 
-  // This is a simplified implementation
-  // A full implementation would need to parse according to the layout format
-
-  // Handle common layouts
-  if (layout === RFC3339 || layout === RFC3339Nano) {
-    const date = new globalThis.Date(value)
-    if (isNaN(date.getTime())) {
-      return [
-        new Time(),
-        $.toGoError(
-          new ParseError(
-            layout,
-            value,
-            '',
-            '',
-            `parsing time "${value}" as "${layout}": cannot parse`,
-          ),
-        ),
-      ]
-    }
-    const fraction = value.match(/[.,](\d+)(?:Z|[+-]\d{2}:\d{2})$/)?.[1] ?? ''
-    const nanos = Number(fraction.slice(0, 9).padEnd(9, '0'))
-    return [Time.create(date, nanos % 1000000, undefined, loc), null]
-  }
-
-  if (layout === DateTime || layout === '2006-01-02 15:04:05') {
-    const date = new globalThis.Date(value)
-    if (isNaN(date.getTime())) {
-      return [
-        new Time(),
-        $.toGoError(
-          new ParseError(
-            layout,
-            value,
-            '',
-            '',
-            `parsing time "${value}" as "${layout}": cannot parse`,
-          ),
-        ),
-      ]
-    }
-    return [Time.create(date, 0, undefined, loc), null]
-  }
-
-  // Fallback to standard Date parsing
-  const date = new globalThis.Date(value)
-  if (isNaN(date.getTime())) {
+  // Validate the day of the month.
+  if (day < 1 || day > daysIn(month, year)) {
     return [
       new Time(),
-      $.toGoError(
-        new ParseError(
-          layout,
-          value,
-          '',
-          '',
-          `parsing time "${value}" as "${layout}": cannot parse`,
-        ),
-      ),
+      newParseError(alayout, avalue, '', value, ': day out of range'),
     ]
   }
-  return [Time.create(date, 0, undefined, loc), null]
+
+  if (z !== null) {
+    return [Date(year, month, day, hour, min, sec, nsec, z), null]
+  }
+
+  if (zoneOffset !== -1) {
+    const utc = Date(year, month, day, hour, min, sec, nsec, UTC)
+    const ms = utc.UnixMilli()
+    const instant = Number(ms) - zoneOffset * 1000
+    // Use local if its zone has the given offset at that instant.
+    const localName = local.offsetSeconds !== undefined ? local.name : ''
+    if (
+      zoneOffsetAt(local, instant) === zoneOffset &&
+      (zoneName === '' || localName === zoneName)
+    ) {
+      return [utc.Add(BigInt(-zoneOffset) * Second).In(local), null]
+    }
+    return [
+      utc.Add(BigInt(-zoneOffset) * Second).In(FixedZone(zoneName, zoneOffset)),
+      null,
+    ]
+  }
+
+  if (zoneName !== '') {
+    const utc = Date(year, month, day, hour, min, sec, nsec, UTC)
+    // Use local if it is a fixed zone with this name.
+    if (local.offsetSeconds !== undefined && local.name === zoneName) {
+      return [utc.Add(BigInt(-local.offsetSeconds) * Second).In(local), null]
+    }
+    // Otherwise, create a fake zone with an unknown (zero) offset.
+    let offset = 0
+    if (zoneName.length > 3 && zoneName.startsWith('GMT')) {
+      offset = Number(zoneName.slice(3)) * 3600
+    }
+    return [
+      utc.Add(BigInt(-offset) * Second).In(FixedZone(zoneName, offset)),
+      null,
+    ]
+  }
+
+  return [Date(year, month, day, hour, min, sec, nsec, defaultLocation), null]
 }
 
 // After waits for the duration to elapse and then sends the current time on the returned channel.
