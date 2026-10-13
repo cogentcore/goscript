@@ -13696,12 +13696,17 @@ func (o *LoweringOwner) genericTypeArgsLiteral(entries []string) string {
 		", " + strings.Join(entries, ", ") + "}"
 }
 
+// genericReceiverTypeArgsExprForMethod returns the type arguments literal for
+// calling method, declared on a generic receiver, as a member of the method
+// set of methodSetType, or "" if the receiver is not generic.
 func (o *LoweringOwner) genericReceiverTypeArgsExprForMethod(
 	ctx lowerFileContext,
 	method *types.Func,
 	methodSetType types.Type,
 	seen map[types.Type]bool,
 ) string {
+	// Bind the declared receiver's type parameters, preferring the method set
+	// type's arguments over the declared receiver's own.
 	if method == nil || methodSetType == nil {
 		return ""
 	}
@@ -13710,43 +13715,58 @@ func (o *LoweringOwner) genericReceiverTypeArgsExprForMethod(
 		return ""
 	}
 	params := genericReceiverTypeParams(signature.Recv().Type())
+	return o.receiverTypeArgsLiteral(ctx, params, seen, receiverNamedType(methodSetType), methodReceiverNamedType(method))
+}
+
+// receiverTypeArgsLiteral binds the receiver type parameters params to the
+// type arguments of the first candidate with one argument per parameter. It
+// returns "" if params is empty or no candidate matches.
+func (o *LoweringOwner) receiverTypeArgsLiteral(
+	ctx lowerFileContext,
+	params []*types.TypeParam,
+	seen map[types.Type]bool,
+	candidates ...*types.Named,
+) string {
 	if len(params) == 0 {
 		return ""
 	}
-	receiver := receiverNamedType(methodSetType)
-	if receiver == nil || receiver.TypeArgs() == nil || receiver.TypeArgs().Len() != len(params) {
-		receiver = methodReceiverNamedType(method)
+
+	// Bind each parameter to the matching candidate's argument.
+	for _, receiver := range candidates {
+		if receiver == nil || receiver.TypeArgs().Len() != len(params) {
+			continue
+		}
+		entries := make([]string, 0, len(params))
+		for idx, param := range params {
+			entries = append(entries, param.Obj().Name()+": "+o.genericTypeDescriptorExprWithSeen(ctx, receiver.TypeArgs().At(idx), seen))
+		}
+		return o.genericTypeArgsLiteral(entries)
 	}
-	if receiver == nil || receiver.TypeArgs() == nil || receiver.TypeArgs().Len() != len(params) {
-		return ""
-	}
-	entries := make([]string, 0, len(params))
-	for idx, param := range params {
-		entries = append(entries, param.Obj().Name()+": "+o.genericTypeDescriptorExprWithSeen(ctx, receiver.TypeArgs().At(idx), seen))
-	}
-	return o.genericTypeArgsLiteral(entries)
+	return ""
 }
 
+// genericTypeArgsExprForNamed returns the generic type arguments literal of
+// an instantiated named type, or "" if it is not generic.
+func (o *LoweringOwner) genericTypeArgsExprForNamed(
+	ctx lowerFileContext,
+	named *types.Named,
+	seen map[types.Type]bool,
+) string {
+	if named == nil {
+		return ""
+	}
+	return o.receiverTypeArgsLiteral(ctx, genericReceiverTypeParams(named), seen, named)
+}
+
+// genericReceiverTypeArgsExpr returns the type arguments literal for the
+// generic receiver of a selected method, or "" if the receiver is not generic.
 func (o *LoweringOwner) genericReceiverTypeArgsExpr(ctx lowerFileContext, selection *types.Selection) string {
 	if selection == nil || selection.Obj() == nil {
 		return ""
 	}
-	params := genericReceiverTypeParams(methodReceiverNamedType(selection.Obj()))
-	if len(params) == 0 {
-		return ""
-	}
-	receiver := receiverNamedType(selection.Recv())
-	if receiver == nil || receiver.TypeArgs() == nil || receiver.TypeArgs().Len() != len(params) {
-		receiver = methodReceiverNamedType(selection.Obj())
-	}
-	if receiver == nil || receiver.TypeArgs() == nil || receiver.TypeArgs().Len() != len(params) {
-		return ""
-	}
-	entries := make([]string, 0, len(params))
-	for idx, param := range params {
-		entries = append(entries, param.Obj().Name()+": "+o.genericTypeDescriptorExpr(ctx, receiver.TypeArgs().At(idx)))
-	}
-	return o.genericTypeArgsLiteral(entries)
+	declared := methodReceiverNamedType(selection.Obj())
+	params := genericReceiverTypeParams(declared)
+	return o.receiverTypeArgsLiteral(ctx, params, make(map[types.Type]bool), receiverNamedType(selection.Recv()), declared)
 }
 
 func (o *LoweringOwner) methodSelectionUsesOverridePackage(ctx lowerFileContext, selection *types.Selection) bool {
@@ -14680,12 +14700,20 @@ func (o *LoweringOwner) genericMethodDescriptorsForType(
 	// Describe each method of the type's method set.
 	methodSet := types.NewMethodSet(methodSetType)
 	methods := make([]string, 0, methodSet.Len())
-	for method := range methodSet.Methods() {
-		method, _ := method.Obj().(*types.Func)
+	for selection := range methodSet.Methods() {
+		method, _ := selection.Obj().(*types.Func)
 		if method == nil {
 			continue
 		}
-		genericArgs := o.genericReceiverTypeArgsExprForMethod(ctx, method, methodSetType, seen)
+		// A promoted method is called through the embedding type's
+		// forwarder, which takes that type's own type arguments, if any,
+		// and supplies the embedded type's itself.
+		var genericArgs string
+		if len(selection.Index()) > 1 {
+			genericArgs = o.genericTypeArgsExprForNamed(ctx, receiverNamedType(methodSetType), seen)
+		} else {
+			genericArgs = o.genericReceiverTypeArgsExprForMethod(ctx, method, methodSetType, seen)
+		}
 		if namedStructType(named) != nil || isInterfaceType(named) {
 			// A struct receiver may arrive as a VarRef when the caller
 			// converted the address of a variable to the constraint's
