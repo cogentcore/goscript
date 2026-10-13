@@ -1,0 +1,7 @@
+type: []main.Data elem kind: struct len: 1
+index kind: struct
+type: []float32 elem kind: float32 len: 3
+index kind: float32
+type: []int elem kind: int len: 0
+map type: map[string]main.Data
+pointer type: *main.Data
