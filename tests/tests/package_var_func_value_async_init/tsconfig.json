@@ -16,6 +16,7 @@
   },
   "extends": "../../../tests/tsconfig.base.json",
   "include": [
+    "__goscript_package_init.gs.ts",
     "index.ts",
     "matchers.gs.ts",
     "package_var_func_value_async_init.gs.ts",

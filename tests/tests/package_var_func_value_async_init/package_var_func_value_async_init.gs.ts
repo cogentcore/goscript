@@ -6,6 +6,8 @@ import * as $ from "@goscript/builtin/index.js"
 import * as types from "@goscript/github.com/s4wave/goscript/tests/tests/package_var_func_value_async_init/types/index.js"
 
 import * as __goscript_matchers from "./matchers.gs.ts"
+
+import * as __goscript_package_init from "./__goscript_package_init.gs.ts"
 import "@goscript/github.com/s4wave/goscript/tests/tests/package_var_func_value_async_init/types/index.js"
 import "./matchers.gs.ts"
 
@@ -59,9 +61,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("application:", $.len(Application), $.mapGet<types.Type, string, string>(Application, $.markAsStructValue($.cloneStructValue((await __goscript_init_TypeWasm(), __goscript_get_TypeWasm()))), "")[0])
 }
 
-await __goscript_init_TypeWasm()
-
-await __goscript_init_TypeDex()
+await __goscript_package_init.__goscript_package_init()
 
 if ($.isMainScript(import.meta)) {
 	await main()

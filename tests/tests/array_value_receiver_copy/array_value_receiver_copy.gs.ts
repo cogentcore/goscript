@@ -5,6 +5,18 @@ import * as $ from "@goscript/builtin/index.js"
 
 export type Matrix = number[]
 
+$.registerNamedValueType(
+	"main.Matrix",
+	{Scaled: (receiver: any, ...args: any[]) => (Matrix_Scaled as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Sum: (receiver: any, ...args: any[]) => (Matrix_Sum as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("Scaled", [["s", /* @__PURE__ */ $.basicType("float32")]], ["main.Matrix"]), $.methodSignature("Sum", [], [/* @__PURE__ */ $.basicType("float32")])]
+);
+
+$.registerNamedValueType(
+	"*main.Matrix",
+	{Scale: (receiver: any, ...args: any[]) => (Matrix_Scale as any)(receiver, ...$.stripGenericTypeArgs(args)), Scaled: (receiver: any, ...args: any[]) => (Matrix_Scaled as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args)), Sum: (receiver: any, ...args: any[]) => (Matrix_Sum as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("Scale", [["s", /* @__PURE__ */ $.basicType("float32")]]), $.methodSignature("Scaled", [["s", /* @__PURE__ */ $.basicType("float32")]], ["main.Matrix"]), $.methodSignature("Sum", [], [/* @__PURE__ */ $.basicType("float32")])]
+);
+
 export function Matrix_Scaled(__goscriptReceiver0: Matrix, s: number): Matrix {
 	let m: $.VarRef<Matrix> = $.varRef($.cloneArrayValue(__goscriptReceiver0, "main.Matrix"))
 	Matrix_Scale(m, s)
@@ -28,7 +40,7 @@ export function Matrix_Sum(__goscriptReceiver1: Matrix): number {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let m = $.varRef($.arrayValue([1, 2, 3, 4]))
+	let m = $.varRef($.arrayValue([1, 2, 3, 4], /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 4)))
 	let original = $.cloneArrayValue(m.value, "main.Matrix")
 	let r = $.cloneArrayValue(Matrix_Scaled(m.value, 2), "main.Matrix")
 	await $.println("m:", $.arrayIndex(m.value, 0), $.arrayIndex(m.value, 1), $.arrayIndex(m.value, 2), $.arrayIndex(m.value, 3))
