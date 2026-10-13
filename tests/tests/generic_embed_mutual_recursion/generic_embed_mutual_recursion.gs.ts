@@ -54,7 +54,7 @@ export class AppBase {
 		if ($.len($.pointerValue<AppBase>(a).Windows) == 0) {
 			return null
 		}
-		return ($.arrayIndex($.pointerValue<AppBase>(a).Windows!, 0) as Window | null)
+		return $.typeParamInterfaceValue<Window | null>($.arrayIndex($.pointerValue<AppBase>(a).Windows!, 0), __typeArgs?.["W"] ?? { type: { kind: $.TypeKind.Interface, methods: [$.methodSignature("Name", [], [/* @__PURE__ */ $.basicType("string")])] }, zero: () => null })
 	}
 
 	static {

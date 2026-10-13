@@ -1134,8 +1134,14 @@ describe('encoding/json override', () => {
     const target = $.varRef<Map<string, unknown> | null>(null)
 
     expect(decoder.Decode(target)).toBeNull()
-    expect(target.value?.get('big')).toBe('9007199254740993')
-    expect(target.value?.get('f')).toBe('1e+00')
+    expect(target.value?.get('big')).toMatchObject({
+      __goType: 'json.Number',
+      __goValue: '9007199254740993',
+    })
+    expect(target.value?.get('f')).toMatchObject({
+      __goType: 'json.Number',
+      __goValue: '1e+00',
+    })
   })
 
   it('returns a SyntaxError with the Go byte offset for malformed input', () => {
@@ -1333,7 +1339,10 @@ describe('encoding/json override', () => {
     const numberTarget = $.varRef<Map<string, unknown> | null>(null)
 
     expect(numberDecoder.Decode(numberTarget)).toBeNull()
-    expect(numberTarget.value?.get('n')).toBe('12')
+    expect(numberTarget.value?.get('n')).toMatchObject({
+      __goType: 'json.Number',
+      __goValue: '12',
+    })
 
     const strictReader = bytes.NewBufferString('{"name":"Ada","extra":true}')!
     const strictDecoder = NewDecoder(strictReader)
