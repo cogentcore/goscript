@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"slices"
 	"strconv"
 	"strings"
@@ -56,6 +57,11 @@ func main() {
 	for _, r := range results {
 		println("JSON result:", r)
 	}
+
+	// A Number in an interface carries all of its methods, including
+	// the json/v2 MarshalJSONTo and UnmarshalJSONFrom.
+	var num fmt.Stringer = json.Number("12.5")
+	println("Number as Stringer:", num.String())
 
 	println("encoding/json test finished")
 }

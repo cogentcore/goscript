@@ -897,6 +897,68 @@ export function Number_String(n: Number): string {
   return n
 }
 
+// jsonv2Encoder and jsonv2Decoder are the parts of jsontext.Encoder and
+// jsontext.Decoder used by the jsonv2 methods of Number, which the
+// jsontext override does not otherwise provide.
+interface jsonv2Encoder {
+  WriteValue(value: $.Bytes): $.GoError
+}
+
+interface jsonv2Decoder {
+  ReadValue(): [$.Bytes, $.GoError]
+}
+
+// jsonNumberPattern matches a JSON number literal.
+const jsonNumberPattern = /^-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?$/
+
+// Number_MarshalJSONTo implements jsonv2.MarshalerTo, writing the number,
+// or 0 if it is empty. Numbers are not stringified, since the encoder
+// options are not available.
+export function Number_MarshalJSONTo(
+  n: Number,
+  enc: jsonv2Encoder | $.VarRef<jsonv2Encoder> | null,
+): $.GoError {
+  const text = n === '' ? '0' : n
+  if (!jsonNumberPattern.test(text)) {
+    return $.newError(
+      `cannot parse ${JSON.stringify(text)} as JSON number: invalid syntax`,
+    )
+  }
+  return $.pointerValue(enc).WriteValue($.stringToBytes(text))
+}
+
+// Number_UnmarshalJSONFrom implements jsonv2.UnmarshalerFrom, reading a
+// JSON number, a string containing one, or null, which empties n.
+export function Number_UnmarshalJSONFrom(
+  n: $.VarRef<Number> | Number | null,
+  dec: jsonv2Decoder | $.VarRef<jsonv2Decoder> | null,
+): $.GoError {
+  const [value, err] = $.pointerValue(dec).ReadValue()
+  if (err !== null) {
+    return err
+  }
+  const text = $.bytesToString(value).trim()
+  let result: string
+  if (text === 'null') {
+    result = ''
+  } else if (text.startsWith('"')) {
+    result = JSON.parse(text) as string
+    if (!jsonNumberPattern.test(result)) {
+      return $.newError(
+        `json: cannot unmarshal JSON string into Go json.Number: invalid syntax`,
+      )
+    }
+  } else if (jsonNumberPattern.test(text)) {
+    result = text
+  } else {
+    return $.newError(`json: cannot unmarshal into Go json.Number`)
+  }
+  if ($.isVarRef(n)) {
+    n.value = result
+  }
+  return null
+}
+
 function isValidFloat(value: string): boolean {
   return /^[+-]?(?:(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?|inf(?:inity)?|nan)$/i.test(
     value,
