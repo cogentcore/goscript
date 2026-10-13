@@ -14356,7 +14356,9 @@ func (o *LoweringOwner) callNeedsAwait(ctx lowerFileContext, fun ast.Expr) bool 
 		o.overrideCallNeedsAwait(ctx, fun) ||
 		(!ctx.protobufGeneratedSyncFunction && callUsesFunctionValue(pkg, fun)) ||
 		(ctx.asyncFunction && callUsesInterfaceMethod(pkg, fun)) ||
-		(ctx.asyncFunction && callUsesFunctionIdentifier(pkg, fun))
+		// A package variable initializer can await, as package initialization
+		// is asynchronous, so it awaits a function variable that may suspend.
+		((ctx.asyncFunction || ctx.topLevel) && callUsesFunctionIdentifier(pkg, fun))
 }
 
 func callUsesInterfaceMethod(pkg *packages.Package, fun ast.Expr) bool {
