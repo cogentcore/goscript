@@ -575,7 +575,7 @@ function typeFieldByIndex(t: Type, index: $.Slice<number>): StructField {
   let field = new StructField({ Type: t })
   for (let i = 0; i < $.len(index); i++) {
     if (i > 0) {
-      typ = field.Type
+      typ = field.Type!
       if (typ.Kind() === Ptr && typ.Elem().Kind() === Struct) {
         typ = typ.Elem()
       }
@@ -1201,6 +1201,16 @@ export class Value {
 
   public FieldByName(name: string): Value {
     const [field, ok] = this.Type().FieldByName(name)
+    if (!ok) {
+      return new Value(null, invalidTypeInstance)
+    }
+    return this.FieldByIndex(field.Index)
+  }
+
+  // FieldByNameFunc returns the struct field with a name that satisfies
+  // the match function, or the zero Value if no field was found.
+  public FieldByNameFunc(match: (name: string) => boolean): Value {
+    const [field, ok] = this.Type().FieldByNameFunc(match)
     if (!ok) {
       return new Value(null, invalidTypeInstance)
     }
@@ -3555,23 +3565,23 @@ export function visibleStructFields(t: Type): StructField[] {
       const oldIndex = byName.get(field.Name)
       if (oldIndex !== undefined) {
         const old = fields[oldIndex]
-        if (index.length === old.Index.length) {
+        if (index.length === $.len(old.Index)) {
           old.Name = ''
           add = false
-        } else if (index.length < old.Index.length) {
+        } else if (index.length < $.len(old.Index)) {
           old.Name = ''
         } else {
           add = false
         }
       }
       if (add) {
-        field.Index = [...index]
+        field.Index = $.arrayToSlice([...index])
         byName.set(field.Name, fields.length)
         fields.push(field)
       }
 
       if (field.Anonymous) {
-        let fieldType = field.Type
+        let fieldType = field.Type!
         if (fieldType.Kind() === Ptr) {
           fieldType = fieldType.Elem()
         }
@@ -3841,7 +3851,7 @@ function conversionUnderlyingEqual(
           left.Name !== right.Name ||
           left.PkgPath !== right.PkgPath ||
           left.Anonymous !== right.Anonymous ||
-          !conversionTypeEqual(left.Type, right.Type, seen)
+          !conversionTypeEqual(left.Type!, right.Type!, seen)
         )
           return false
       }
@@ -3889,7 +3899,7 @@ function typeAlignment(typ: Type): number {
     case Struct: {
       let align = 1
       for (let i = 0; i < typ.NumField(); i++) {
-        align = Math.max(align, typeAlignment(typ.Field(i).Type))
+        align = Math.max(align, typeAlignment(typ.Field(i).Type!))
       }
       return align
     }
@@ -5012,12 +5022,12 @@ export function StructOf(fields: $.Slice<StructField>): Type {
     }
     names.add(field.Name)
 
-    const fieldOffset = alignOffset(offset, typeAlignment(field.Type))
+    const fieldOffset = alignOffset(offset, typeAlignment(field.Type!))
     const tag = field.Tag || undefined
     const descriptor: StructFieldDescriptor = {
       name: field.Name,
       key: field.Name === '_' ? `_${idx}` : field.Name,
-      type: field.Type,
+      type: field.Type!,
       ...(tag ? { tag } : {}),
       pkgPath: field.PkgPath,
       anonymous: field.Anonymous,
@@ -5026,7 +5036,7 @@ export function StructOf(fields: $.Slice<StructField>): Type {
       exported: field.IsExported(),
     }
     descriptors.push(descriptor)
-    offset = fieldOffset + field.Type.Size()
+    offset = fieldOffset + field.Type!.Size()
   }
   return internType(
     new StructType('', descriptors, '', structTypeString(descriptors)),
@@ -5069,7 +5079,7 @@ function validateAnonymousStructOfField(field: StructField): void {
   if (!field.Anonymous) {
     return
   }
-  const typ = field.Type
+  const typ = field.Type!
   if (typ.Kind() === Ptr) {
     const elem = typ.Elem()
     if (elem.Kind() === Ptr || elem.Kind() === Interface) {
@@ -5450,11 +5460,11 @@ export function typeInfoFromReflectType(typ: Type): string | $.TypeInfo {
             return {
               name: field.Name,
               key: structFieldStorageKey(typ, idx),
-              type: field.Type,
+              type: field.Type!,
               tag: field.Tag || undefined,
               pkgPath: field.PkgPath,
               anonymous: field.Anonymous,
-              index: [...field.Index],
+              index: [...$.asArray(field.Index)],
               offset: field.Offset,
               exported: field.IsExported(),
             }

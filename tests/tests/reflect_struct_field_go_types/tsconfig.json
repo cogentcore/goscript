@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "paths": {
+      "*": [
+        "./*"
+      ],
+      "@goscript/*": [
+        "../../../tests/tests/reflect_struct_field_go_types/run/output/@goscript/*",
+        "../../../gs/*",
+        "../../../tests/deps/*"
+      ],
+      "@goscript/github.com/s4wave/goscript/tests/tests/reflect_struct_field_go_types/*": [
+        "./*"
+      ]
+    }
+  },
+  "extends": "../../../tests/tsconfig.base.json",
+  "include": [
+    "index.ts",
+    "reflect_struct_field_go_types.gs.ts"
+  ]
+}
