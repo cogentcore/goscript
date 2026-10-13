@@ -5,12 +5,15 @@ import * as $ from "@goscript/builtin/index.js"
 
 import * as json from "@goscript/encoding/json/index.js"
 
+import * as fmt from "@goscript/fmt/index.js"
+
 import * as slices from "@goscript/slices/index.js"
 
 import * as strconv from "@goscript/strconv/index.js"
 
 import * as strings from "@goscript/strings/index.js"
 import "@goscript/encoding/json/index.js"
+import "@goscript/fmt/index.js"
 import "@goscript/slices/index.js"
 import "@goscript/strconv/index.js"
 import "@goscript/strings/index.js"
@@ -107,6 +110,11 @@ export async function main(): globalThis.Promise<void> {
 		let r = __goscriptRangeTarget0![__rangeIndex]
 		await $.println("JSON result:", r)
 	}
+
+	// A Number in an interface carries all of its methods, including
+	// the json/v2 MarshalJSONTo and UnmarshalJSONFrom.
+	let num: fmt.Stringer | null = $.namedValueInterfaceValue<fmt.Stringer | null>(String("12.5"), "json.Number", {Float64: (receiver: any, ...args: any[]) => (json.Number_Float64 as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Int64: (receiver: any, ...args: any[]) => (json.Number_Int64 as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), MarshalJSONTo: (receiver: any, ...args: any[]) => (json.Number_MarshalJSONTo as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), String: (receiver: any, ...args: any[]) => (json.Number_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, /* @__PURE__ */ $.basicType("string", "json.Number"), [$.methodSignature("Float64", [], [/* @__PURE__ */ $.basicType("float64"), "error"]), $.methodSignature("Int64", [], [/* @__PURE__ */ $.basicType("int64"), "error"]), $.methodSignature("MarshalJSONTo", [["enc", /* @__PURE__ */ $.pointerType("jsontext.Encoder")]], ["error"]), $.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])])
+	await $.println("Number as Stringer:", await $.pointerValue<Exclude<fmt.Stringer, null>>(num).String())
 
 	await $.println("encoding/json test finished")
 }

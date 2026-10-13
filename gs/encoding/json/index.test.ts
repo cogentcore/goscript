@@ -18,7 +18,9 @@ import {
   NewEncoder,
   Number_Float64,
   Number_Int64,
+  Number_MarshalJSONTo,
   Number_String,
+  Number_UnmarshalJSONFrom,
   RawMessage_MarshalJSON,
   RawMessage_UnmarshalJSON,
   SyntaxError as JSONSyntaxError,
@@ -1293,6 +1295,35 @@ describe('encoding/json override', () => {
     expect(Number_Int64('9223372036854775808')[1]?.Error()).toContain(
       'value out of range',
     )
+  })
+
+  it('marshals and unmarshals Number through jsontext', () => {
+    // MarshalJSONTo writes the literal, and 0 for an empty Number.
+    const written: string[] = []
+    const enc = {
+      WriteValue(value: $.Bytes): $.GoError {
+        written.push($.bytesToString(value))
+        return null
+      },
+    }
+    expect(Number_MarshalJSONTo('12.5', enc)).toBeNull()
+    expect(Number_MarshalJSONTo('', enc)).toBeNull()
+    expect(written).toEqual(['12.5', '0'])
+    expect(Number_MarshalJSONTo('1x', enc)?.Error()).toContain('invalid syntax')
+
+    // UnmarshalJSONFrom reads a literal, a quoted number, or null.
+    const decode = (text: string) => {
+      const n = $.varRef('7')
+      const err = Number_UnmarshalJSONFrom(n, {
+        ReadValue: (): [$.Bytes, $.GoError] => [$.stringToBytes(text), null],
+      })
+      return [n.value, err?.Error() ?? null]
+    }
+    expect(decode('-3e2')).toEqual(['-3e2', null])
+    expect(decode('"42"')).toEqual(['42', null])
+    expect(decode('null')).toEqual(['', null])
+    expect(decode('"x"')[1]).toContain('invalid syntax')
+    expect(decode('true')[1]).toContain('json.Number')
   })
 
   it('applies decoder UseNumber and DisallowUnknownFields options', () => {
