@@ -26,7 +26,7 @@ export async function main(): globalThis.Promise<void> {
 		using __defer = new $.DisposableStack()
 		await mu.value.Lock()
 		__defer.defer(() => { mu.value.Unlock() })
-		await $.chanSend(done, "handled " + $.markAsStructValue($.cloneStructValue($.arrayIndex(args!, 0))).String())
+		await $.chanSend(done, $.concatString("handled ", $.markAsStructValue($.cloneStructValue($.arrayIndex(args!, 0))).String()))
 		return null
 	}, ({ kind: $.TypeKind.Function, params: ["js.Value", /* @__PURE__ */ $.sliceType("js.Value")], results: [{ kind: $.TypeKind.Interface, methods: [] }] } as $.FunctionTypeInfo)))))
 	__defer.defer(() => { $.markAsStructValue($.cloneStructValue(handler)).Release() })
