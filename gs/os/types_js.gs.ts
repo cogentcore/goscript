@@ -103,7 +103,14 @@ export function getPlatform(): string {
 	return getHostRuntime().platform
 }
 
+// getEnv returns the value of the environment variable name. It reads
+// syscall's environment first, which holds Setenv's values when the
+// environment is kept in memory, as in a browser, and then the host's.
 export function getEnv(name: string): string {
+	const [value, ok] = syscall.Getenv(name)
+	if (ok) {
+		return value
+	}
 	return getHostRuntime().getEnv(name)
 }
 
