@@ -14,9 +14,9 @@ export async function main(): globalThis.Promise<void> {
 
 	let getnum: ((v: string, flag: boolean) => [number, string, $.GoError] | globalThis.Promise<[number, string, $.GoError]>) | null = $.functionValue((v: string, flag: boolean): [number, string, $.GoError] => {
 		if (flag) {
-			return [12, v + "_processed_flag_true", null]
+			return [12, $.concatString(v, "_processed_flag_true"), null]
 		}
-		return [1, v + "_processed_flag_false", null]
+		return [1, $.concatString(v, "_processed_flag_false"), null]
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("bool")], results: [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("string"), "error"] } as $.FunctionTypeInfo))
 
 	let std = 2

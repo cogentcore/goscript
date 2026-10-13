@@ -37,7 +37,7 @@ export class attrs {
 			let vn: number = $.uint(4 + $.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.LittleEndian))).Uint32($.goSlice(bytes, undefined, 4)), 32)
 			let v = $.bytesToString($.goSlice(bytes, 4, vn))
 			bytes = $.goSlice(bytes, vn, undefined)
-			result = $.append(result, (k + "=") + v)
+			result = $.append(result, $.concatString(($.concatString(k, "=")), v))
 		}
 		return result
 	}

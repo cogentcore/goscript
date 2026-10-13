@@ -332,12 +332,13 @@ export function Map(
 ): string {
   if (!mapping) return s
 
+  // As in Go, invalid UTF-8 bytes are mapped as RuneError, and a negative
+  // mapping drops the rune.
   let result = ''
-  for (const char of s) {
-    const codePoint = char.codePointAt(0)
-    if (codePoint !== undefined) {
-      const mapped = mapping(codePoint)
-      result += String.fromCodePoint(mapped)
+  for (const [, r] of $.rangeString(s)) {
+    const mapped = mapping(r)
+    if (mapped >= 0) {
+      result += $.runeToString(mapped)
     }
   }
   return result
@@ -381,9 +382,33 @@ export function ToTitleSpecial(c: unicode.SpecialCase, s: string): string {
   return Map((r) => c.ToTitle(r), s)
 }
 
+// ToValidUTF8 returns a copy of the string s with each run of invalid UTF-8
+// byte sequences replaced by the replacement string, which may be empty.
 export function ToValidUTF8(s: string, replacement: string): string {
-  void replacement
-  return s
+  if (!$.isByteString(s)) {
+    return s
+  }
+  const bytes = $.stringToBytes(s)
+  const repl = $.stringToBytes(replacement)
+  const out: number[] = []
+  let invalid = false // previous byte was from an invalid UTF-8 sequence
+  for (let i = 0; i < bytes.length; ) {
+    const [r, size] = $.decodeRune(bytes, i)
+    if (r === 0xfffd && size === 1) {
+      if (!invalid) {
+        invalid = true
+        out.push(...repl)
+      }
+      i++
+      continue
+    }
+    invalid = false
+    for (let k = 0; k < size; k++) {
+      out.push(bytes[i + k])
+    }
+    i += size
+  }
+  return $.bytesToString(Uint8Array.from(out))
 }
 
 // isSeparator reports whether the rune could mark a word boundary.

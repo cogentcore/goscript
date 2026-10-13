@@ -31,7 +31,7 @@ export async function run(frames: $.Channel<number> | null, done: $.Channel<stri
 					{
 						const __goscriptSelect0Result = __goscriptSelect0Value
 						let result = __goscriptSelect0Result.value
-						out = out + (result)
+						out = $.concatString(out, result)
 						command = false
 						continue
 						break
@@ -70,21 +70,21 @@ export async function run(frames: $.Channel<number> | null, done: $.Channel<stri
 						case 1:
 						{
 							if (command) {
-								out = out + ("busy ")
+								out = $.concatString(out, "busy ")
 								continue
 							}
-							out = out + ("input ")
+							out = $.concatString(out, "input ")
 							break
 						}
 						case 2:
 						{
-							out = out + ("resize ")
+							out = $.concatString(out, "resize ")
 							continue
 							break
 						}
 						case 3:
 						{
-							return out + "close"
+							return $.concatString(out, "close")
 							break
 						}
 					}
@@ -94,7 +94,7 @@ export async function run(frames: $.Channel<number> | null, done: $.Channel<stri
 				{
 					const __goscriptSelect1Result = __goscriptSelect1Value
 					let result = __goscriptSelect1Result.value
-					out = out + (result)
+					out = $.concatString(out, result)
 					command = false
 					break
 				}

@@ -1928,10 +1928,110 @@ function byteArrayFromAddress(
 }
 
 /**
- * stringToRunes returns the Unicode code points of a JavaScript string.
+ * isByteString reports whether str is a Go string holding invalid UTF-8,
+ * which is represented by its bytes rather than by its characters.
+ */
+export function isByteString(str: GoStringValue): boolean {
+  return (
+    str instanceof GoBinaryString ||
+    (typeof str === 'string' && str.startsWith(goBinaryStringPrefix))
+  )
+}
+
+/**
+ * utf8SequenceShape returns the encoded size of the UTF-8 sequence that the
+ * leading byte b0 starts and the accepted range of its second byte, as Go's
+ * utf8 first and acceptRanges tables do. A byte that cannot lead a multibyte
+ * sequence has size 1.
+ */
+export function utf8SequenceShape(
+  b0: number,
+): [size: number, lo: number, hi: number] {
+  if (b0 >= 0xc2 && b0 <= 0xdf) {
+    return [2, 0x80, 0xbf]
+  }
+  if (b0 >= 0xe0 && b0 <= 0xef) {
+    return [3, b0 === 0xe0 ? 0xa0 : 0x80, b0 === 0xed ? 0x9f : 0xbf]
+  }
+  if (b0 >= 0xf0 && b0 <= 0xf4) {
+    return [4, b0 === 0xf0 ? 0x90 : 0x80, b0 === 0xf4 ? 0x8f : 0xbf]
+  }
+  return [1, 0x80, 0xbf]
+}
+
+/**
+ * decodeRune decodes the UTF-8 rune at offset i of p as Go's utf8.DecodeRune
+ * does, returning the rune and its width in bytes. An invalid or incomplete
+ * encoding is RuneError (U+FFFD) with width 1, and the end of p is RuneError
+ * with width 0.
+ */
+export function decodeRune(p: Uint8Array, i: number = 0): [number, number] {
+  const n = p.length - i
+  if (n < 1) {
+    return [0xfffd, 0]
+  }
+  const b0 = p[i]
+  if (b0 < 0x80) {
+    return [b0, 1]
+  }
+  const [size, lo, hi] = utf8SequenceShape(b0)
+  if (size === 1 || n < size) {
+    return [0xfffd, 1]
+  }
+  const b1 = p[i + 1]
+  if (b1 < lo || b1 > hi) {
+    return [0xfffd, 1]
+  }
+  // The leading byte carries 7 - size payload bits.
+  let r = ((b0 & (0x7f >> size)) << 6) | (b1 & 0x3f)
+  for (let k = 2; k < size; k++) {
+    const b = p[i + k]
+    if (b < 0x80 || b > 0xbf) {
+      return [0xfffd, 1]
+    }
+    r = (r << 6) | (b & 0x3f)
+  }
+  return [r, size]
+}
+
+/**
+ * stringRuneBytes returns the Go bytes of a byte string (see isByteString),
+ * or null for a string whose JavaScript characters are its runes.
+ */
+export function stringRuneBytes(str: GoStringValue): Uint8Array | null {
+  return isByteString(str) ? goStringBytes(str) : null
+}
+
+/**
+ * concatString concatenates two Go strings by their bytes.
+ */
+export function concatString(a: GoStringValue, b: GoStringValue): string {
+  if (!isByteString(a) && !isByteString(b)) {
+    return (a as string) + (b as string)
+  }
+  const ab = goStringBytes(a)
+  const bb = goStringBytes(b)
+  const bytes = new Uint8Array(ab.length + bb.length)
+  bytes.set(ab)
+  bytes.set(bb, ab.length)
+  return goStringFromBytes(bytes)
+}
+
+/**
+ * stringToRunes returns the runes of a Go string, as []rune(s) does.
  */
 export const stringToRunes = (str: string): number[] => {
-  return Array.from(str).map((c) => c.codePointAt(0) || 0)
+  const bytes = stringRuneBytes(str)
+  if (bytes === null) {
+    return Array.from(str).map((c) => c.codePointAt(0) || 0)
+  }
+  const runes: number[] = []
+  for (let i = 0; i < bytes.length; ) {
+    const [r, size] = decodeRune(bytes, i)
+    runes.push(r)
+    i += size
+  }
+  return runes
 }
 
 /**
@@ -1939,6 +2039,15 @@ export const stringToRunes = (str: string): number[] => {
  */
 export const rangeString = (str: string): Array<[number, number]> => {
   const pairs: Array<[number, number]> = []
+  const bytes = stringRuneBytes(str)
+  if (bytes !== null) {
+    for (let i = 0; i < bytes.length; ) {
+      const [r, size] = decodeRune(bytes, i)
+      pairs.push([i, r])
+      i += size
+    }
+    return pairs
+  }
   let offset = 0
   for (const char of str) {
     pairs.push([offset, char.codePointAt(0) || 0])
@@ -1948,9 +2057,13 @@ export const rangeString = (str: string): Array<[number, number]> => {
 }
 
 /**
- * stringToRune returns the first Unicode code point, or zero for an empty string.
+ * stringToRune returns the first rune, or zero for an empty string.
  */
 export const stringToRune = (str: string): number => {
+  const bytes = stringRuneBytes(str)
+  if (bytes !== null) {
+    return decodeRune(bytes)[0]
+  }
   if (str.length === 0) {
     return 0
   }

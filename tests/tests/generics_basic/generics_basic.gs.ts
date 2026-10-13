@@ -98,7 +98,7 @@ export class Item {
 		if (i == null) {
 			return null
 		}
-		return new Item({Name: $.pointerValue<Item>(i).Name + " copy"})
+		return new Item({Name: $.concatString($.pointerValue<Item>(i).Name, " copy")})
 	}
 
 	static {

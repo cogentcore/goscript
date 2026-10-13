@@ -29,7 +29,7 @@ export async function main(): globalThis.Promise<void> {
 		http.Header_Set((await $.pointerValue<Exclude<http.ResponseWriter, null>>(w).Header()), "X-Route", "mux")
 		await $.pointerValue<Exclude<http.ResponseWriter, null>>(w).WriteHeader(202)
 		{
-			let [, err] = await $.pointerValue<Exclude<http.ResponseWriter, null>>(w).Write($.stringToBytes("hello " + $.pointerValue<url.URL>($.pointerValue<http.Request>(r).URL).Path))
+			let [, err] = await $.pointerValue<Exclude<http.ResponseWriter, null>>(w).Write($.stringToBytes($.concatString("hello ", $.pointerValue<url.URL>($.pointerValue<http.Request>(r).URL).Path)))
 			if (err != null) {
 				await $.println("write error:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 			}
@@ -38,7 +38,7 @@ export async function main(): globalThis.Promise<void> {
 	http.HandleFunc("/default", $.functionValue(async (w: http.ResponseWriter | null, r: http.Request | $.VarRef<http.Request> | null): globalThis.Promise<void> => {
 		http.Header_Set((await $.pointerValue<Exclude<http.ResponseWriter, null>>(w).Header()), "X-Route", "default")
 		{
-			let [, err] = await $.pointerValue<Exclude<http.ResponseWriter, null>>(w).Write($.stringToBytes("hello " + $.pointerValue<url.URL>($.pointerValue<http.Request>(r).URL).Path))
+			let [, err] = await $.pointerValue<Exclude<http.ResponseWriter, null>>(w).Write($.stringToBytes($.concatString("hello ", $.pointerValue<url.URL>($.pointerValue<http.Request>(r).URL).Path)))
 			if (err != null) {
 				await $.println("write error:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 			}

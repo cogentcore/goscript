@@ -62,7 +62,7 @@ export class wrappedErr {
 
 	public async Error(): globalThis.Promise<string> {
 		const e = this;
-		return "wrapped: " + await $.pointerValue<Exclude<$.GoError, null>>(e.err).Error()
+		return $.concatString("wrapped: ", await $.pointerValue<Exclude<$.GoError, null>>(e.err).Error())
 	}
 
 	public Unwrap(): $.GoError {

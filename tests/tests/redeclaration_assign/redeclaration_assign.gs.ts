@@ -8,7 +8,7 @@ export function returnsOneIntOneBool(): [number, boolean] {
 }
 
 export function shadowTupleInput(value: string): [string, boolean] {
-	return [value + "-inner", true]
+	return [$.concatString(value, "-inner"), true]
 }
 
 export async function shadowCallbackInput(fn: ((_p0: number) => number | globalThis.Promise<number>) | null): globalThis.Promise<[number, boolean]> {

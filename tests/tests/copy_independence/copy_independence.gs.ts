@@ -49,13 +49,13 @@ export async function main(): globalThis.Promise<void> {
 
 	// === Verifying Copy Independence ===
 	// Expected: "hello world"
-	await $.println("pointerCopy (points to original structPointer): Expected: hello world, Actual: " + $.pointerValue<MyStruct>(pointerCopy).MyString)
+	await $.println($.concatString("pointerCopy (points to original structPointer): Expected: hello world, Actual: ", $.pointerValue<MyStruct>(pointerCopy).MyString))
 	// Expected: "original dereferenced copy modified"
-	await $.println("dereferencedStructCopy (modified after copies were made): Expected: original dereferenced copy modified, Actual: " + dereferencedStructCopy.MyString)
+	await $.println($.concatString("dereferencedStructCopy (modified after copies were made): Expected: original dereferenced copy modified, Actual: ", dereferencedStructCopy.MyString))
 	// Expected: "value copy 1"
-	await $.println("valueCopy1: Expected: value copy 1, Actual: " + valueCopy1.MyString)
+	await $.println($.concatString("valueCopy1: Expected: value copy 1, Actual: ", valueCopy1.MyString))
 	// Expected: "value copy 2"
-	await $.println("valueCopy2: Expected: value copy 2, Actual: " + valueCopy2.MyString)
+	await $.println($.concatString("valueCopy2: Expected: value copy 2, Actual: ", valueCopy2.MyString))
 }
 
 if ($.isMainScript(import.meta)) {

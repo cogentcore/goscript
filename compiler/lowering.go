@@ -5396,6 +5396,9 @@ func lowerCompoundAssignValue(
 	if helper, ok := wideIntegerAssignHelper(targetType, tok); ok {
 		return coerceWideHelperResult(runtimeOwner, targetType, runtimeOwner.QualifiedHelper(helper)+"("+left+", "+right+")")
 	}
+	if tok == token.ADD_ASSIGN && isStringType(targetType) {
+		return runtimeOwner.QualifiedHelper(RuntimeHelperStringConcat) + "(" + left + ", " + right + ")"
+	}
 	if tok == token.MUL_ASSIGN {
 		if value, ok := lower32BitIntegerMultiplicationValue(targetType, left, right); ok {
 			return value
@@ -7824,6 +7827,16 @@ func (o *LoweringOwner) lowerStringEqualityExpr(ctx lowerFileContext, expr *ast.
 	return value, true
 }
 
+// lowerStringConcatExpr lowers string concatenation through the runtime, since
+// a string holding invalid UTF-8 is a tagged byte string that a JavaScript +
+// would not concatenate by its bytes.
+func (o *LoweringOwner) lowerStringConcatExpr(ctx lowerFileContext, expr *ast.BinaryExpr, left string, right string) (string, bool) {
+	if expr.Op != token.ADD || !isStringType(ctx.semPkg.source.TypesInfo.TypeOf(expr)) {
+		return "", false
+	}
+	return o.runtimeOwner.QualifiedHelper(RuntimeHelperStringConcat) + "(" + left + ", " + right + ")", true
+}
+
 func (o *LoweringOwner) lowerInterfaceEqualityExpr(ctx lowerFileContext, expr *ast.BinaryExpr, left string, right string) (string, bool) {
 	if isNilExpr(expr.X) || isNilExpr(expr.Y) {
 		return "", false
@@ -8055,6 +8068,9 @@ func (o *LoweringOwner) lowerExpr(ctx lowerFileContext, expr ast.Expr) (string, 
 		}
 		if value, diagnostics, ok := o.lowerStringOrderExpr(ctx, typed, left, right, leftDiagnostics, rightDiagnostics); ok {
 			return value, diagnostics
+		}
+		if value, ok := o.lowerStringConcatExpr(ctx, typed, left, right); ok {
+			return value, append(leftDiagnostics, rightDiagnostics...)
 		}
 		if binaryOperandUsesTypeParam(ctx, typed.X) {
 			left = "(" + left + " as any)"

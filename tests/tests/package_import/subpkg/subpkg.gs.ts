@@ -4,5 +4,5 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export function Greet(name: string): string {
-	return "Hello, " + name
+	return $.concatString("Hello, ", name)
 }

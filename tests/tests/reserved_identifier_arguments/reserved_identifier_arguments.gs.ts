@@ -30,7 +30,7 @@ export class Parser {
 }
 
 export function collect(_arguments: string): string {
-	return _arguments + "!"
+	return $.concatString(_arguments, "!")
 }
 
 export async function main(): globalThis.Promise<void> {

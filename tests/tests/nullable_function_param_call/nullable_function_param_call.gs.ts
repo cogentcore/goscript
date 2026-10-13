@@ -174,7 +174,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// Test the process function with a callback
 	let processFunc: ((data: string) => [string, $.GoError] | globalThis.Promise<[string, $.GoError]>) | null = $.functionValue((data: string): [string, $.GoError] => {
-		return ["processed: " + data, null]
+		return [$.concatString("processed: ", data), null]
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string")], results: [/* @__PURE__ */ $.basicType("string"), "error"] } as $.FunctionTypeInfo))
 
 	let [result, err2] = await processWithCallback("hello", processFunc)

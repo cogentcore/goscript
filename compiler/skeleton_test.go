@@ -5536,7 +5536,7 @@ func TestCompilePackagesWidensErrorInterfaceABI(t *testing.T) {
 		// Concrete implementations become async and await inner error
 		// dispatch whose text may resolve on the microtask queue.
 		"public async Error(): globalThis.Promise<string>",
-		"+ await $.pointerValue<Exclude<$.GoError, null>>($.pointerValue<wrappedError>(w).cause).Error()",
+		", await $.pointerValue<Exclude<$.GoError, null>>($.pointerValue<wrappedError>(w).cause).Error())",
 	} {
 		if !strings.Contains(text, want) {
 			t.Fatalf("missing %q in generated output:\n%s", want, text)

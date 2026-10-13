@@ -32,7 +32,7 @@ export class stream {
 
 	public Close(): string {
 		const s = this;
-		return "close:" + s.name
+		return $.concatString("close:", s.name)
 	}
 
 	static {

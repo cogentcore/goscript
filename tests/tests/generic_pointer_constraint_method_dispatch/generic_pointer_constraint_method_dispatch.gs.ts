@@ -38,7 +38,7 @@ export class pairingOffer {
 
 	public UnmarshalVT(data: $.Slice<number>): $.GoError {
 		let o: pairingOffer | $.VarRef<pairingOffer> | null = this;
-		$.pointerValue<pairingOffer>(o).Note = "decoded:" + $.bytesToString(data)
+		$.pointerValue<pairingOffer>(o).Note = $.concatString("decoded:", $.bytesToString(data))
 		return null
 	}
 

@@ -5,7 +5,7 @@ import * as $ from "@goscript/builtin/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	let greet: ((name: string) => string | globalThis.Promise<string>) | null = $.functionValue((name: string): string => {
-		return "Hello, " + name
+		return $.concatString("Hello, ", name)
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string")], results: [/* @__PURE__ */ $.basicType("string")] } as $.FunctionTypeInfo))
 
 	let message = await greet!("world")

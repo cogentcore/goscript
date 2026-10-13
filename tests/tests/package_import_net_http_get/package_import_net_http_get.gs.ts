@@ -27,7 +27,7 @@ export async function main(): globalThis.Promise<void> {
 			if (readErr != null) {
 				await $.pointerValue<Exclude<http.ResponseWriter, null>>(w).WriteHeader(500)
 				{
-					let [, writeErr] = await $.pointerValue<Exclude<http.ResponseWriter, null>>(w).Write($.stringToBytes("read error: " + await $.pointerValue<Exclude<$.GoError, null>>(readErr).Error()))
+					let [, writeErr] = await $.pointerValue<Exclude<http.ResponseWriter, null>>(w).Write($.stringToBytes($.concatString("read error: ", await $.pointerValue<Exclude<$.GoError, null>>(readErr).Error())))
 					if (writeErr != null) {
 						return
 					}
@@ -37,7 +37,7 @@ export async function main(): globalThis.Promise<void> {
 		}
 		if ($.len(data) != 0) {
 			{
-				let [, writeErr] = await $.pointerValue<Exclude<http.ResponseWriter, null>>(w).Write($.stringToBytes(($.pointerValue<http.Request>(r).Method + ":") + $.bytesToString(data)))
+				let [, writeErr] = await $.pointerValue<Exclude<http.ResponseWriter, null>>(w).Write($.stringToBytes($.concatString(($.concatString($.pointerValue<http.Request>(r).Method, ":")), $.bytesToString(data))))
 				if (writeErr != null) {
 					return
 				}

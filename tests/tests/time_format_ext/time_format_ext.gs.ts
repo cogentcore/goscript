@@ -13,40 +13,40 @@ export async function main(): globalThis.Promise<void> {
 
 	await $.println("--- Specific Time (2025-05-25 17:42:56.123456789 -0700 PDT) ---")
 	// Timezone patterns
-	await $.println("Layout Z07:00  -> " + $.markAsStructValue($.cloneStructValue(t1)).Format("2006-01-02 15:04:05 Z07:00"))
-	await $.println("Layout -07:00  -> " + $.markAsStructValue($.cloneStructValue(t1)).Format("2006-01-02 15:04:05 -07:00"))
-	await $.println("Layout -0700   -> " + $.markAsStructValue($.cloneStructValue(t1)).Format("2006-01-02 15:04:05 -0700"))
-	await $.println("Layout -07     -> " + $.markAsStructValue($.cloneStructValue(t1)).Format("2006-01-02 15:04:05 -07"))
-	await $.println("Layout Z       -> " + $.markAsStructValue($.cloneStructValue(t1)).Format("2006-01-02 15:04:05 Z"))
-	await $.println("Layout MST     -> " + $.markAsStructValue($.cloneStructValue(t1)).Format("2006-01-02 15:04:05 MST"))
+	await $.println($.concatString("Layout Z07:00  -> ", $.markAsStructValue($.cloneStructValue(t1)).Format("2006-01-02 15:04:05 Z07:00")))
+	await $.println($.concatString("Layout -07:00  -> ", $.markAsStructValue($.cloneStructValue(t1)).Format("2006-01-02 15:04:05 -07:00")))
+	await $.println($.concatString("Layout -0700   -> ", $.markAsStructValue($.cloneStructValue(t1)).Format("2006-01-02 15:04:05 -0700")))
+	await $.println($.concatString("Layout -07     -> ", $.markAsStructValue($.cloneStructValue(t1)).Format("2006-01-02 15:04:05 -07")))
+	await $.println($.concatString("Layout Z       -> ", $.markAsStructValue($.cloneStructValue(t1)).Format("2006-01-02 15:04:05 Z")))
+	await $.println($.concatString("Layout MST     -> ", $.markAsStructValue($.cloneStructValue(t1)).Format("2006-01-02 15:04:05 MST")))
 
 	// Nanosecond patterns (fixed)
-	await $.println("Layout .000000000 -> " + $.markAsStructValue($.cloneStructValue(t1)).Format("15:04:05.000000000"))
-	await $.println("Layout .000000   -> " + $.markAsStructValue($.cloneStructValue(t1)).Format("15:04:05.000000"))
-	await $.println("Layout .000      -> " + $.markAsStructValue($.cloneStructValue(t1)).Format("15:04:05.000"))
+	await $.println($.concatString("Layout .000000000 -> ", $.markAsStructValue($.cloneStructValue(t1)).Format("15:04:05.000000000")))
+	await $.println($.concatString("Layout .000000   -> ", $.markAsStructValue($.cloneStructValue(t1)).Format("15:04:05.000000")))
+	await $.println($.concatString("Layout .000      -> ", $.markAsStructValue($.cloneStructValue(t1)).Format("15:04:05.000")))
 
 	// Nanosecond patterns (trimming)
-	await $.println("Layout .999999999 -> " + $.markAsStructValue($.cloneStructValue(t1)).Format("15:04:05.999999999"))
-	await $.println("Layout .999999   -> " + $.markAsStructValue($.cloneStructValue(t1)).Format("15:04:05.999999"))
-	await $.println("Layout .999      -> " + $.markAsStructValue($.cloneStructValue(t1)).Format("15:04:05.999"))
+	await $.println($.concatString("Layout .999999999 -> ", $.markAsStructValue($.cloneStructValue(t1)).Format("15:04:05.999999999")))
+	await $.println($.concatString("Layout .999999   -> ", $.markAsStructValue($.cloneStructValue(t1)).Format("15:04:05.999999")))
+	await $.println($.concatString("Layout .999      -> ", $.markAsStructValue($.cloneStructValue(t1)).Format("15:04:05.999")))
 
 	// Combined layout
-	await $.println("Layout Combined  -> " + $.markAsStructValue($.cloneStructValue(t1)).Format("Mon Jan _2 15:04:05.999999999 Z07:00 2006"))
+	await $.println($.concatString("Layout Combined  -> ", $.markAsStructValue($.cloneStructValue(t1)).Format("Mon Jan _2 15:04:05.999999999 Z07:00 2006")))
 
 	// Fixed time with zero nanoseconds for trimming tests
 	let locPST: time.Location | $.VarRef<time.Location> | null = time.FixedZone("PST", -28800)
 	let t2 = $.markAsStructValue($.cloneStructValue(time.Date(2025, 5, 25, 17, 42, 56, 0, locPST)))
 	await $.println("--- Specific Time (2025-05-25 17:42:56.000 -0800 PST) ---")
-	await $.println("Layout .999 (zero ns) -> " + $.markAsStructValue($.cloneStructValue(t2)).Format("15:04:05.999"))
-	await $.println("Layout .000 (zero ns) -> " + $.markAsStructValue($.cloneStructValue(t2)).Format("15:04:05.000"))
+	await $.println($.concatString("Layout .999 (zero ns) -> ", $.markAsStructValue($.cloneStructValue(t2)).Format("15:04:05.999")))
+	await $.println($.concatString("Layout .000 (zero ns) -> ", $.markAsStructValue($.cloneStructValue(t2)).Format("15:04:05.000")))
 
 	// Fixed UTC time for Z and Z07:00 patterns
 	let t3 = $.markAsStructValue($.cloneStructValue(time.Date(2025, 5, 25, 17, 42, 56, 123456789, time.UTC)))
 	await $.println("--- UTC Time (2025-05-25 17:42:56.123456789 Z) ---")
-	await $.println("Layout Z07:00 (UTC) -> " + $.markAsStructValue($.cloneStructValue(t3)).Format("2006-01-02 15:04:05 Z07:00"))
-	await $.println("Layout Z (UTC)      -> " + $.markAsStructValue($.cloneStructValue(t3)).Format("2006-01-02 15:04:05 Z"))
-	await $.println("Layout -07:00 (UTC) -> " + $.markAsStructValue($.cloneStructValue(t3)).Format("2006-01-02 15:04:05 -07:00"))
-	await $.println("Layout MST (UTC)    -> " + $.markAsStructValue($.cloneStructValue(t3)).Format("2006-01-02 15:04:05 MST"))
+	await $.println($.concatString("Layout Z07:00 (UTC) -> ", $.markAsStructValue($.cloneStructValue(t3)).Format("2006-01-02 15:04:05 Z07:00")))
+	await $.println($.concatString("Layout Z (UTC)      -> ", $.markAsStructValue($.cloneStructValue(t3)).Format("2006-01-02 15:04:05 Z")))
+	await $.println($.concatString("Layout -07:00 (UTC) -> ", $.markAsStructValue($.cloneStructValue(t3)).Format("2006-01-02 15:04:05 -07:00")))
+	await $.println($.concatString("Layout MST (UTC)    -> ", $.markAsStructValue($.cloneStructValue(t3)).Format("2006-01-02 15:04:05 MST")))
 }
 
 if ($.isMainScript(import.meta)) {

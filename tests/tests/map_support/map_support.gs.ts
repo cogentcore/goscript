@@ -62,7 +62,7 @@ export async function main(): globalThis.Promise<void> {
 	let scoreResults: $.Slice<string> = null! as $.Slice<string>
 	for (const [name, grade] of stringMap?.entries() ?? []) {
 		// Using string concatenation to build the output string
-		let result = (("  - Name: " + name) + " Grade: ") + grade
+		let result = $.concatString(($.concatString(($.concatString("  - Name: ", name)), " Grade: ")), grade)
 		scoreResults = $.append(scoreResults, result)
 	}
 
