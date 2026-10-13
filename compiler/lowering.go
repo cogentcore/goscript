@@ -3006,9 +3006,67 @@ func byteSliceLiteral(data []byte) string {
 
 func lowerGoStringLiteral(value string) string {
 	if utf8.ValidString(value) {
-		return strconv.Quote(value)
+		return quoteJSString(value)
 	}
 	return "$.bytesToString(" + byteSliceLiteral([]byte(value)) + ")"
+}
+
+// quoteJSString returns a double-quoted JavaScript string literal for the
+// valid UTF-8 string value. It escapes like [strconv.Quote], but uses only
+// escapes valid in JavaScript: strconv.Quote writes \a and \UXXXXXXXX,
+// which JavaScript reads as the letters a and U.
+func quoteJSString(value string) string {
+	var b strings.Builder
+	b.Grow(len(value) + 2)
+	b.WriteByte('"')
+	for _, r := range value {
+		switch r {
+		case '"':
+			b.WriteString(`\"`)
+		case '\\':
+			b.WriteString(`\\`)
+		case '\n':
+			b.WriteString(`\n`)
+		case '\r':
+			b.WriteString(`\r`)
+		case '\t':
+			b.WriteString(`\t`)
+		case '\b':
+			b.WriteString(`\b`)
+		case '\f':
+			b.WriteString(`\f`)
+		case '\v':
+			b.WriteString(`\v`)
+		default:
+			switch {
+			case r < 0x80 && strconv.IsPrint(r):
+				b.WriteRune(r)
+			case r < 0x80:
+				b.WriteString(`\x`)
+				writeHexDigits(&b, r, 2)
+			case r > 0xffff && !strconv.IsPrint(r):
+				b.WriteString(`\u{`)
+				b.WriteString(strconv.FormatInt(int64(r), 16))
+				b.WriteByte('}')
+			case r == 0x2028 || r == 0x2029 || !strconv.IsPrint(r):
+				b.WriteString(`\u`)
+				writeHexDigits(&b, r, 4)
+			default:
+				b.WriteRune(r)
+			}
+		}
+	}
+	b.WriteByte('"')
+	return b.String()
+}
+
+// writeHexDigits writes r in lowercase hexadecimal, zero-padded to width.
+func writeHexDigits(b *strings.Builder, r rune, width int) {
+	hex := strconv.FormatInt(int64(r), 16)
+	for range width - len(hex) {
+		b.WriteByte('0')
+	}
+	b.WriteString(hex)
 }
 
 func (o *LoweringOwner) lowerTypeSpec(ctx lowerFileContext, spec *ast.TypeSpec) (loweredDecl, []Diagnostic) {
