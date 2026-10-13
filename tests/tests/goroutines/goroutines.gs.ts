@@ -47,10 +47,10 @@ export function __goscript_set_messages(__goscriptValue: $.Channel<Message> | nu
 
 export async function worker(id: number): globalThis.Promise<void> {
 	// Send worker starting message
-	await $.chanSend(messages, $.markAsStructValue(new Message({priority: 10 + id, text: $.concatString(($.concatString("Worker ", String.fromCodePoint($.int(48 + id, 32)))), " starting")})))
+	await $.chanSend(messages, $.markAsStructValue(new Message({priority: 10 + id, text: $.concatString(($.concatString("Worker ", $.runeToString($.int(48 + id, 32)))), " starting")})))
 
 	// Send worker done message
-	await $.chanSend(messages, $.markAsStructValue(new Message({priority: 20 + id, text: $.concatString(($.concatString("Worker ", String.fromCodePoint($.int(48 + id, 32)))), " done")})))
+	await $.chanSend(messages, $.markAsStructValue(new Message({priority: 20 + id, text: $.concatString(($.concatString("Worker ", $.runeToString($.int(48 + id, 32)))), " done")})))
 }
 
 export async function anotherWorker(name: string): globalThis.Promise<void> {

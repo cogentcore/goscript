@@ -17,7 +17,7 @@ export async function testFS(fsys: string, expected: $.Slice<string>): globalThi
 
 	for (let __goscriptRangeTarget0 = expected, i = 0; i < $.len(__goscriptRangeTarget0); i++) {
 		let exp = __goscriptRangeTarget0![i]
-		await $.println($.concatString(($.concatString(($.concatString("Expected[", String.fromCodePoint($.int(i + 48, 32)))), "]: ")), exp))
+		await $.println($.concatString(($.concatString(($.concatString("Expected[", $.runeToString($.int(i + 48, 32)))), "]: ")), exp))
 	}
 
 	await $.println($.concatString("File system: ", fsys))

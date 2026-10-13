@@ -2084,16 +2084,15 @@ export const runesToString = (runes: Slice<number>): string => {
   return out
 }
 
-// runeToString encodes one rune as Go's string(rune) does: a valid Unicode
-// scalar value becomes its character including code points above U+FFFF (astral
-// planes), and a negative, out-of-range, or surrogate rune becomes U+FFFD
-// (utf8.RuneError), never a throw. String.fromCharCode truncated astral runes to
-// a single broken UTF-16 unit; String.fromCodePoint preserves the full rune.
-export function runeToString(r: number): string {
+// runeToString converts an integer to a string as Go's string(r) does: a
+// Unicode scalar value becomes its character, including one above U+FFFF, and
+// a negative, out-of-range, or surrogate value becomes U+FFFD
+// (utf8.RuneError). r is a bigint for a 64-bit integer type.
+export function runeToString(r: number | bigint): string {
   if (r < 0 || r > 0x10ffff || (r >= 0xd800 && r <= 0xdfff)) {
-    return '�'
+    return '\uFFFD'
   }
-  return String.fromCodePoint(r)
+  return String.fromCodePoint(Number(r))
 }
 
 /**

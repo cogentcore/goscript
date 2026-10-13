@@ -116,6 +116,7 @@ const (
 	RuntimeHelperRangeString                  RuntimeHelper = "slice.rangeString"
 	RuntimeHelperStringToRune                 RuntimeHelper = "slice.stringToRune"
 	RuntimeHelperRunesToString                RuntimeHelper = "slice.runesToString"
+	RuntimeHelperRuneToString                 RuntimeHelper = "slice.runeToString"
 	RuntimeHelperStringToBytes                RuntimeHelper = "slice.stringToBytes"
 	RuntimeHelperBytesToString                RuntimeHelper = "slice.bytesToString"
 	RuntimeHelperStringEqual                  RuntimeHelper = "slice.stringEqual"
@@ -383,6 +384,7 @@ func runtimeHelperContracts() []RuntimeHelperContract {
 		runtimeHelper(RuntimeHelperRangeString, "rangeString", RuntimeHelperCategorySlice),
 		runtimeHelper(RuntimeHelperStringToRune, "stringToRune", RuntimeHelperCategorySlice),
 		runtimeHelper(RuntimeHelperRunesToString, "runesToString", RuntimeHelperCategorySlice),
+		runtimeHelper(RuntimeHelperRuneToString, "runeToString", RuntimeHelperCategorySlice),
 		runtimeHelper(RuntimeHelperStringToBytes, "stringToBytes", RuntimeHelperCategorySlice),
 		runtimeHelper(RuntimeHelperBytesToString, "bytesToString", RuntimeHelperCategorySlice),
 		runtimeHelper(RuntimeHelperStringEqual, "stringEqual", RuntimeHelperCategorySlice),
