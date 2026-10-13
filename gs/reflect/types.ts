@@ -1,4 +1,5 @@
 // Common types used throughout the reflect module
+import * as $ from '@goscript/builtin/index.js'
 import type { StringHeaderData } from '@goscript/builtin/index.js'
 
 // uintptr Basic Go types that need TypeScript equivalents.
@@ -46,10 +47,10 @@ type StructFieldInit = Partial<StructField>
 export class StructField {
   public Name: string = ''
   public PkgPath: string = ''
-  public Type!: Type
+  public Type: Type | null = null
   public Tag: StructTag = ''
   public Offset: uintptr = 0
-  public Index: number[] = []
+  public Index: $.Slice<number> = null
   public Anonymous: boolean = false
 
   constructor(init?: StructFieldInit) {
@@ -65,7 +66,7 @@ export class StructField {
       Type: this.Type,
       Tag: this.Tag,
       Offset: this.Offset,
-      Index: [...this.Index],
+      Index: $.arrayToSlice($.asArray(this.Index)),
       Anonymous: this.Anonymous,
     })
   }
@@ -156,7 +157,7 @@ export function StructTag_Lookup(
 
 export class Method {
   public Name = ''
-  public Type!: Type
+  public Type: Type | null = null
   public Func!: ReflectFunc
   public Index = 0
 
