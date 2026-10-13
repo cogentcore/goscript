@@ -4,5 +4,19 @@
     "os",
     "path/filepath"
   ],
-  "asyncMethods": {}
+  "asyncMethods": {
+    "BoundOS.Create": true,
+    "BoundOS.Lstat": true,
+    "BoundOS.MkdirAll": true,
+    "BoundOS.Open": true,
+    "BoundOS.OpenFile": true,
+    "BoundOS.ReadDir": true,
+    "BoundOS.Readlink": true,
+    "BoundOS.Remove": true,
+    "BoundOS.RemoveAll": true,
+    "BoundOS.Rename": true,
+    "BoundOS.Stat": true,
+    "BoundOS.Symlink": true,
+    "BoundOS.TempFile": true
+  }
 }

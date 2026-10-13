@@ -1,5 +1,6 @@
 import * as $ from "@goscript/builtin/index.js";
 import { getDeno } from "./types_js.gs.js";
+import { callbackFSGetwd, getCallbackFS } from "./callbackfs.js";
 
 import * as fs from "@goscript/io/fs/index.js"
 
@@ -21,6 +22,9 @@ export function Getwd(): [string, $.GoError] {
 		} catch {
 			// Fall back to the tracked working directory below.
 		}
+	}
+	if (getCallbackFS() !== null) {
+		return [callbackFSGetwd(), null]
 	}
 	return [currentWorkingDir, null]
 }

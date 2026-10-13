@@ -28,7 +28,7 @@ function joinRootPath(dir: string, name: string): [string, $.GoError] {
 	return [dir.replace(/\/+$/, "") + "/" + name, null]
 }
 
-export function OpenInRoot(dir: string, name: string): [File | null, $.GoError] {
+export async function OpenInRoot(dir: string, name: string): Promise<[File | null, $.GoError]> {
 	const [path, err] = joinRootPath(dir, name)
 	if (err !== null) {
 		return [null, err]
@@ -51,11 +51,11 @@ export class Root {
 		return null
 	}
 
-	public Open(name: string): [File | null, $.GoError] {
+	public async Open(name: string): Promise<[File | null, $.GoError]> {
 		return OpenInRoot(this.name, name)
 	}
 
-	public Create(name: string): [File | null, $.GoError] {
+	public async Create(name: string): Promise<[File | null, $.GoError]> {
 		const [path, err] = joinRootPath(this.name, name)
 		if (err !== null) {
 			return [null, err]
@@ -63,7 +63,7 @@ export class Root {
 		return Create(path)
 	}
 
-	public OpenFile(name: string, flag: number, perm: number): [File | null, $.GoError] {
+	public async OpenFile(name: string, flag: number, perm: number): Promise<[File | null, $.GoError]> {
 		const [path, err] = joinRootPath(this.name, name)
 		if (err !== null) {
 			return [null, err]
@@ -71,7 +71,7 @@ export class Root {
 		return OpenFile(path, flag, perm)
 	}
 
-	public OpenRoot(name: string): [RootType | null, $.GoError] {
+	public async OpenRoot(name: string): Promise<[RootType | null, $.GoError]> {
 		const [path, err] = joinRootPath(this.name, name)
 		if (err !== null) {
 			return [null, err]
@@ -79,7 +79,7 @@ export class Root {
 		return OpenRoot(path)
 	}
 
-	public Mkdir(name: string, perm: number): $.GoError {
+	public async Mkdir(name: string, perm: number): Promise<$.GoError> {
 		const [path, err] = joinRootPath(this.name, name)
 		if (err !== null) {
 			return err
@@ -87,7 +87,7 @@ export class Root {
 		return Mkdir(path, perm)
 	}
 
-	public Remove(name: string): $.GoError {
+	public async Remove(name: string): Promise<$.GoError> {
 		const [path, err] = joinRootPath(this.name, name)
 		if (err !== null) {
 			return err
@@ -95,7 +95,7 @@ export class Root {
 		return Remove(path)
 	}
 
-	public MkdirAll(name: string, perm: number): $.GoError {
+	public async MkdirAll(name: string, perm: number): Promise<$.GoError> {
 		const [path, err] = joinRootPath(this.name, name)
 		if (err !== null) {
 			return err
@@ -103,7 +103,7 @@ export class Root {
 		return MkdirAll(path, perm)
 	}
 
-	public RemoveAll(name: string): $.GoError {
+	public async RemoveAll(name: string): Promise<$.GoError> {
 		const [path, err] = joinRootPath(this.name, name)
 		if (err !== null) {
 			return err
@@ -111,7 +111,7 @@ export class Root {
 		return RemoveAll(path)
 	}
 
-	public Rename(oldname: string, newname: string): $.GoError {
+	public async Rename(oldname: string, newname: string): Promise<$.GoError> {
 		const [oldpath, oldErr] = joinRootPath(this.name, oldname)
 		if (oldErr !== null) {
 			return oldErr
@@ -123,7 +123,7 @@ export class Root {
 		return Rename(oldpath, newpath)
 	}
 
-	public Link(oldname: string, newname: string): $.GoError {
+	public async Link(oldname: string, newname: string): Promise<$.GoError> {
 		const [oldpath, oldErr] = joinRootPath(this.name, oldname)
 		if (oldErr !== null) {
 			return oldErr
@@ -137,7 +137,7 @@ export class Root {
 
 	// Symlink creates newname in the root as a link to oldname, which is the
 	// link's text and is not resolved against the root.
-	public Symlink(oldname: string, newname: string): $.GoError {
+	public async Symlink(oldname: string, newname: string): Promise<$.GoError> {
 		const [path, err] = joinRootPath(this.name, newname)
 		if (err !== null) {
 			return err
@@ -145,7 +145,7 @@ export class Root {
 		return Symlink(oldname, path)
 	}
 
-	public Readlink(name: string): [string, $.GoError] {
+	public async Readlink(name: string): Promise<[string, $.GoError]> {
 		const [path, err] = joinRootPath(this.name, name)
 		if (err !== null) {
 			return ["", err]
@@ -153,7 +153,7 @@ export class Root {
 		return Readlink(path)
 	}
 
-	public ReadFile(name: string): [$.Bytes, $.GoError] {
+	public async ReadFile(name: string): Promise<[$.Bytes, $.GoError]> {
 		const [path, err] = joinRootPath(this.name, name)
 		if (err !== null) {
 			return [null, err]
@@ -161,7 +161,7 @@ export class Root {
 		return ReadFile(path)
 	}
 
-	public WriteFile(name: string, data: $.Bytes, perm: number): $.GoError {
+	public async WriteFile(name: string, data: $.Bytes, perm: number): Promise<$.GoError> {
 		const [path, err] = joinRootPath(this.name, name)
 		if (err !== null) {
 			return err
@@ -169,7 +169,7 @@ export class Root {
 		return WriteFile(path, data, perm)
 	}
 
-	public Chmod(name: string, mode: number): $.GoError {
+	public async Chmod(name: string, mode: number): Promise<$.GoError> {
 		const [path, err] = joinRootPath(this.name, name)
 		if (err !== null) {
 			return err
@@ -177,7 +177,7 @@ export class Root {
 		return Chmod(path, mode)
 	}
 
-	public Chown(name: string, uid: number, gid: number): $.GoError {
+	public async Chown(name: string, uid: number, gid: number): Promise<$.GoError> {
 		const [path, err] = joinRootPath(this.name, name)
 		if (err !== null) {
 			return err
@@ -185,7 +185,7 @@ export class Root {
 		return Chown(path, uid, gid)
 	}
 
-	public Lchown(name: string, uid: number, gid: number): $.GoError {
+	public async Lchown(name: string, uid: number, gid: number): Promise<$.GoError> {
 		const [path, err] = joinRootPath(this.name, name)
 		if (err !== null) {
 			return err
@@ -193,7 +193,7 @@ export class Root {
 		return Lchown(path, uid, gid)
 	}
 
-	public Chtimes(name: string, atime: time.Time, mtime: time.Time): $.GoError {
+	public async Chtimes(name: string, atime: time.Time, mtime: time.Time): Promise<$.GoError> {
 		const [path, err] = joinRootPath(this.name, name)
 		if (err !== null) {
 			return err
@@ -201,7 +201,7 @@ export class Root {
 		return Chtimes(path, atime, mtime)
 	}
 
-	public Stat(name: string): [fs.FileInfo | null, $.GoError] {
+	public async Stat(name: string): Promise<[fs.FileInfo | null, $.GoError]> {
 		const [path, err] = joinRootPath(this.name, name)
 		if (err !== null) {
 			return [null, err]
@@ -209,7 +209,7 @@ export class Root {
 		return statPath(path)
 	}
 
-	public Lstat(name: string): [fs.FileInfo | null, $.GoError] {
+	public async Lstat(name: string): Promise<[fs.FileInfo | null, $.GoError]> {
 		const [path, err] = joinRootPath(this.name, name)
 		if (err !== null) {
 			return [null, err]
@@ -235,8 +235,8 @@ export class Root {
 
 export type RootType = Root
 
-export function OpenRoot(name: string): [Root | null, $.GoError] {
-	const [info, err] = statPath(name)
+export async function OpenRoot(name: string): Promise<[Root | null, $.GoError]> {
+	const [info, err] = await statPath(name)
 	if (err !== null) {
 		return [null, err]
 	}
@@ -267,7 +267,7 @@ class rootFS {
 		this.root = init?.root ?? new Root()
 	}
 
-	public Open(name: string): [fs.File, $.GoError] {
+	public async Open(name: string): Promise<[fs.File, $.GoError]> {
 		return this.root.Open(name)
 	}
 }

@@ -242,7 +242,7 @@ describe('path/filepath - Path manipulation functions', () => {
   })
 
   describe('EvalSymlinks', () => {
-    it('should resolve symlinks against the host filesystem', () => {
+    it('should resolve symlinks against the host filesystem', async () => {
       // realpathSync canonicalizes the temp root (macOS /var -> /private/var) so
       // the expected resolved path uses the same canonical base.
       const root = realpathSync(
@@ -253,7 +253,7 @@ describe('path/filepath - Path manipulation functions', () => {
         writeFileSync(join(root, 'real', 'file.txt'), 'ok')
         symlinkSync(join(root, 'real'), join(root, 'link'))
 
-        const [result, err] = EvalSymlinks(join(root, 'link', 'file.txt'))
+        const [result, err] = await EvalSymlinks(join(root, 'link', 'file.txt'))
         expect(err).toBeNull()
         expect(result).toBe(join(root, 'real', 'file.txt'))
       } finally {
@@ -261,8 +261,8 @@ describe('path/filepath - Path manipulation functions', () => {
       }
     })
 
-    it('should error when a path component does not exist', () => {
-      const [, err] = EvalSymlinks('/goscript-nonexistent-xyz/file')
+    it('should error when a path component does not exist', async () => {
+      const [, err] = await EvalSymlinks('/goscript-nonexistent-xyz/file')
       expect(err).not.toBeNull()
     })
   })

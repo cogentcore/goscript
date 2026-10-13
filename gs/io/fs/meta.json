@@ -3,6 +3,7 @@
     "Glob": true,
     "Lstat": true,
     "ReadDir": true,
+    "ReadFile": true,
     "Stat": true,
     "Sub": true,
     "WalkDir": true

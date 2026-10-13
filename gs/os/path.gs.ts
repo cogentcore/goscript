@@ -9,7 +9,7 @@ import { IsPathSeparator } from "./path_unix.gs.js";
 // directories that MkdirAll creates.
 // If path is already a directory, MkdirAll does nothing
 // and returns nil.
-export function MkdirAll(path: string, perm: number): $.GoError {
+export function MkdirAll(path: string, perm: number): Promise<$.GoError> {
 	return mkdirAllPath(path, perm)
 }
 
@@ -18,7 +18,7 @@ export function MkdirAll(path: string, perm: number): $.GoError {
 // it encounters. If the path does not exist, RemoveAll
 // returns nil (no error).
 // If there is an error, it will be of type [*PathError].
-export function RemoveAll(path: string): $.GoError {
+export function RemoveAll(path: string): Promise<$.GoError> {
 	return removeAllPath(path)
 }
 

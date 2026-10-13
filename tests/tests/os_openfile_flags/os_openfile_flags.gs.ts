@@ -12,19 +12,19 @@ import "@goscript/os/index.js"
 import "@goscript/path/filepath/index.js"
 
 export async function write(name: string, flag: number, data: string): globalThis.Promise<void> {
-	let __goscriptTuple0: any = os.OpenFile(name, flag, 0o644)
+	let __goscriptTuple0: any = await os.OpenFile(name, flag, 0o644)
 	let f: os.File | $.VarRef<os.File> | null = __goscriptTuple0[0]
 	let err = __goscriptTuple0[1]
 	if (err != null) {
 		await $.println("open error:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 		return
 	}
-	os.File.prototype.WriteString.call($.pointerValue<os.File>(f), data)
-	os.File.prototype.Close.call($.pointerValue<os.File>(f))
+	await os.File.prototype.WriteString.call($.pointerValue<os.File>(f), data)
+	await os.File.prototype.Close.call($.pointerValue<os.File>(f))
 }
 
 export async function read(name: string): globalThis.Promise<string> {
-	let __goscriptTuple1: any = os.ReadFile(name)
+	let __goscriptTuple1: any = await os.ReadFile(name)
 	let b: $.Slice<number> = __goscriptTuple1[0]
 	let err = __goscriptTuple1[1]
 	if (err != null) {
@@ -35,24 +35,24 @@ export async function read(name: string): globalThis.Promise<string> {
 
 export async function main(): globalThis.Promise<void> {
 	await using __defer = new $.AsyncDisposableStack()
-	let [dir, err] = os.MkdirTemp("", "openflags")
+	let [dir, err] = await os.MkdirTemp("", "openflags")
 	if (err != null) {
 		await $.println("mkdirtemp error:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 		return
 	}
-	__defer.defer(() => { os.RemoveAll(dir) })
+	__defer.defer(async () => { await os.RemoveAll(dir) })
 	let name = filepath.Join(dir, "f.txt")
 
 	// Create truncates an existing file.
-	os.WriteFile(name, new Uint8Array([97, 32, 109, 117, 99, 104, 32, 108, 111, 110, 103, 101, 114, 32, 102, 105, 114, 115, 116, 32, 108, 105, 110, 101]), 0o644)
-	let __goscriptTuple2: any = os.Create(name)
+	await os.WriteFile(name, new Uint8Array([97, 32, 109, 117, 99, 104, 32, 108, 111, 110, 103, 101, 114, 32, 102, 105, 114, 115, 116, 32, 108, 105, 110, 101]), 0o644)
+	let __goscriptTuple2: any = await os.Create(name)
 	let f: os.File | $.VarRef<os.File> | null = __goscriptTuple2[0]
-	os.File.prototype.WriteString.call($.pointerValue<os.File>(f), "short")
-	os.File.prototype.Close.call($.pointerValue<os.File>(f))
+	await os.File.prototype.WriteString.call($.pointerValue<os.File>(f), "short")
+	await os.File.prototype.Close.call($.pointerValue<os.File>(f))
 	await $.println(await read(name))
 
 	// WriteFile also truncates.
-	os.WriteFile(name, new Uint8Array([120]), 0o644)
+	await os.WriteFile(name, new Uint8Array([120]), 0o644)
 	await $.println(await read(name))
 
 	// O_APPEND adds to the end.
@@ -64,7 +64,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println(await read(name))
 
 	// O_EXCL with O_CREATE fails for an existing file.
-	let __goscriptTuple3: any = os.OpenFile(name, 193, 0o644)
+	let __goscriptTuple3: any = await os.OpenFile(name, 193, 0o644)
 	err = __goscriptTuple3[1]
 	await $.println(err != null, os.IsExist($.pointerValueOrNil(err)!))
 }
