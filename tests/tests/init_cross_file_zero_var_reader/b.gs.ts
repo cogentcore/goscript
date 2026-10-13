@@ -6,6 +6,8 @@ import * as $ from "@goscript/builtin/index.js"
 import type * as reflect from "@goscript/reflect/index.js"
 
 import * as __goscript_a from "./a.gs.ts"
+
+import * as __goscript_package_init from "./__goscript_package_init.gs.ts"
 import "./a.gs.ts"
 
 export var registry: globalThis.Map<number, number> | null
@@ -75,6 +77,8 @@ export async function readTable(): globalThis.Promise<void> {
 
 export async function main(): globalThis.Promise<void> {
 }
+
+await __goscript_package_init.__goscript_package_init()
 
 if ($.isMainScript(import.meta)) {
 	await main()

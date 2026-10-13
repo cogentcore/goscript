@@ -4,6 +4,8 @@
 import * as $ from "@goscript/builtin/index.js"
 
 import * as __goscript_a from "./a.gs.ts"
+
+import * as __goscript_package_init from "./__goscript_package_init.gs.ts"
 import "./a.gs.ts"
 
 function __goscriptInit0(): void {
@@ -16,7 +18,9 @@ export async function main(): globalThis.Promise<void> {
 	await $.println(await __goscript_a.read())
 }
 
-__goscriptInit0()
+export { __goscriptInit0 }
+
+await __goscript_package_init.__goscript_package_init()
 
 if ($.isMainScript(import.meta)) {
 	await main()
