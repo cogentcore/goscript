@@ -36,3 +36,9 @@ marshal text 2025-05-15T01:10:42.123456789Z true
 unmarshal text true true
 unmarshal bad text true true
 marshal json year 10000 err Time.MarshalJSON: year outside of range [0,9999]
+local location true true
+local wall clock matches offset true
+now location true
+unix location true true
+local utc location UTC
+unix equal true

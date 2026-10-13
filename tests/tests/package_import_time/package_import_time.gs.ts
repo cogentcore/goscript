@@ -65,6 +65,20 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("bad time err", badParseErr != null)
 
 	await marshal()
+	await local()
+}
+
+export async function local(): globalThis.Promise<void> {
+	let t = $.markAsStructValue($.cloneStructValue(time.Date(2026, 10, 13, 22, 30, 0, 0, time.UTC)))
+	let l = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(t)).Local()))
+	await $.println("local location", $.pointerEqual($.markAsStructValue($.cloneStructValue(l)).Location(), time.Local), $.markAsStructValue($.cloneStructValue(l)).Equal($.markAsStructValue($.cloneStructValue(t))))
+	let [, off] = $.markAsStructValue($.cloneStructValue(l)).Zone()
+	let wall = (((($.markAsStructValue($.cloneStructValue(l)).Hour() * 3600) + ($.markAsStructValue($.cloneStructValue(l)).Minute() * 60)) - off) + (2 * 86400)) % 86400
+	await $.println("local wall clock matches offset", wall == 81000)
+	await $.println("now location", $.pointerEqual($.markAsStructValue($.cloneStructValue(time.Now())).Location(), time.Local))
+	await $.println("unix location", $.pointerEqual($.markAsStructValue($.cloneStructValue(time.Unix(0n, 0n))).Location(), time.Local), $.pointerEqual($.markAsStructValue($.cloneStructValue(time.UnixMilli(0n))).Location(), time.Local))
+	await $.println("local utc location", time.Location.prototype.String.call($.pointerValue<time.Location>($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(l)).UTC())).Location())))
+	await $.println("unix equal", $.markAsStructValue($.cloneStructValue(time.Unix(1760394600n, 0n))).Equal($.markAsStructValue($.cloneStructValue(time.Date(2025, 10, 13, 22, 30, 0, 0, time.UTC)))))
 }
 
 export async function marshal(): globalThis.Promise<void> {
