@@ -5733,8 +5733,12 @@ func TestCompilePackagesLowersMethodValuesWithFixedParameters(t *testing.T) {
 			t.Fatalf("missing %q in generated output:\n%s", want, text)
 		}
 	}
-	if strings.Contains(text, "...args: any[]") {
-		t.Fatalf("method value lowering still uses spread args:\n%s", text)
+	// Only method values are checked here: named value type method
+	// registrations use the generic method descriptor form.
+	for line := range strings.SplitSeq(text, "\n") {
+		if strings.Contains(line, "$.functionValue(") && strings.Contains(line, "...args: any[]") {
+			t.Fatalf("method value lowering still uses spread args:\n%s", text)
+		}
 	}
 }
 
