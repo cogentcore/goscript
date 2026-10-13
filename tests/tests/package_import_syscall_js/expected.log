@@ -6,6 +6,8 @@ bytes: ABC
 recovered: SyntaxError
 wrapped type: function
 direct: from variable
+handled first
+handled second
 nil slice: object 0
 nil map: object
 nested slice: object true

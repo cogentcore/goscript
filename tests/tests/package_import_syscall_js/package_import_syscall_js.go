@@ -1,6 +1,9 @@
 package main
 
-import "syscall/js"
+import (
+	"sync"
+	"syscall/js"
+)
 
 func main() {
 	global := js.Global()
@@ -38,6 +41,7 @@ func main() {
 	}()
 
 	funcOfValues()
+	funcOfSuspend()
 	valueOfNil()
 }
 
@@ -63,6 +67,25 @@ func funcOfValues() {
 	direct := js.FuncOf(fn)
 	defer direct.Release()
 	println("direct:", direct.Invoke().String())
+}
+
+// funcOfSuspend calls a wrapped callback that locks a mutex, so it may
+// suspend. JavaScript, which calls it, does not wait for it.
+func funcOfSuspend() {
+	var mu sync.Mutex
+	done := make(chan string, 2)
+	handler := wrap(func(this js.Value, args []js.Value) any {
+		mu.Lock()
+		defer mu.Unlock()
+		done <- "handled " + args[0].String()
+		return nil
+	})
+	defer handler.Release()
+
+	handler.Invoke("first")
+	println(<-done)
+	handler.Invoke("second")
+	println(<-done)
 }
 
 func features() []any {

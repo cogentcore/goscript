@@ -3,7 +3,10 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
+import * as sync from "@goscript/sync/index.js"
+
 import * as js from "@goscript/syscall/js/index.js"
+import "@goscript/sync/index.js"
 import "@goscript/syscall/js/index.js"
 
 export async function main(): globalThis.Promise<void> {
@@ -53,6 +56,7 @@ export async function main(): globalThis.Promise<void> {
 		})()
 
 		await funcOfValues()
+		await funcOfSuspend()
 		await valueOfNil()
 		await __defer.dispose()
 	} catch (e) {
@@ -63,16 +67,16 @@ export async function main(): globalThis.Promise<void> {
 	}
 }
 
-export function wrap(fn: ((_this: js.Value, args: $.Slice<js.Value>) => any | globalThis.Promise<any>) | null): js.Func {
+export async function wrap(fn: ((_this: js.Value, args: $.Slice<js.Value>) => any | globalThis.Promise<any>) | null): globalThis.Promise<js.Func> {
 	let jsFunc: ((_this: js.Value, args: $.Slice<js.Value>) => any | globalThis.Promise<any>) | null = $.functionValue(async (_this: js.Value, args: $.Slice<js.Value>): globalThis.Promise<any> => {
 		return fn!($.markAsStructValue($.cloneStructValue(_this)), args)
 	}, ({ kind: $.TypeKind.Function, params: ["js.Value", /* @__PURE__ */ $.sliceType("js.Value")], results: [{ kind: $.TypeKind.Interface, methods: [] }] } as $.FunctionTypeInfo))
-	return $.markAsStructValue($.cloneStructValue(js.FuncOf($.syncFunction(jsFunc))))
+	return $.markAsStructValue($.cloneStructValue(js.FuncOf(jsFunc)))
 }
 
 export async function funcOfValues(): globalThis.Promise<void> {
 	await using __defer = new $.AsyncDisposableStack()
-	let add = $.markAsStructValue($.cloneStructValue(wrap($.functionValue((_this: js.Value, args: $.Slice<js.Value>): any => {
+	let add = $.markAsStructValue($.cloneStructValue(await wrap($.functionValue((_this: js.Value, args: $.Slice<js.Value>): any => {
 		return $.basicInterfaceValue($.markAsStructValue($.cloneStructValue($.arrayIndex(args!, 0))).Int() + $.markAsStructValue($.cloneStructValue($.arrayIndex(args!, 1))).Int(), "int")
 	}, ({ kind: $.TypeKind.Function, params: ["js.Value", /* @__PURE__ */ $.sliceType("js.Value")], results: [{ kind: $.TypeKind.Interface, methods: [] }] } as $.FunctionTypeInfo)))))
 	__defer.defer(() => { $.markAsStructValue($.cloneStructValue(add)).Release() })
@@ -82,9 +86,28 @@ export async function funcOfValues(): globalThis.Promise<void> {
 	fn = $.functionValue((_this: js.Value, args: $.Slice<js.Value>): any => {
 		return "from variable"
 	}, ({ kind: $.TypeKind.Function, params: ["js.Value", /* @__PURE__ */ $.sliceType("js.Value")], results: [{ kind: $.TypeKind.Interface, methods: [] }] } as $.FunctionTypeInfo))
-	let direct = $.markAsStructValue($.cloneStructValue(js.FuncOf($.syncFunction(fn))))
+	let direct = $.markAsStructValue($.cloneStructValue(js.FuncOf(fn)))
 	__defer.defer(() => { $.markAsStructValue($.cloneStructValue(direct)).Release() })
 	await $.println("direct:", $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(direct)).Invoke())).String())
+}
+
+export async function funcOfSuspend(): globalThis.Promise<void> {
+	await using __defer = new $.AsyncDisposableStack()
+	let mu: $.VarRef<sync.Mutex> = $.varRef($.markAsStructValue(new sync.Mutex()))
+	let done: $.Channel<string> | null = $.makeChannel<string>(2, "", "both")
+	let handler = $.markAsStructValue($.cloneStructValue(await wrap($.functionValue(async (_this: js.Value, args: $.Slice<js.Value>): globalThis.Promise<any> => {
+		using __defer = new $.DisposableStack()
+		await mu.value.Lock()
+		__defer.defer(() => { mu.value.Unlock() })
+		await $.chanSend(done, $.concatString("handled ", $.markAsStructValue($.cloneStructValue($.arrayIndex(args!, 0))).String()))
+		return null
+	}, ({ kind: $.TypeKind.Function, params: ["js.Value", /* @__PURE__ */ $.sliceType("js.Value")], results: [{ kind: $.TypeKind.Interface, methods: [] }] } as $.FunctionTypeInfo)))))
+	__defer.defer(() => { $.markAsStructValue($.cloneStructValue(handler)).Release() })
+
+	$.markAsStructValue($.cloneStructValue(handler)).Invoke("first")
+	await $.println(await $.chanRecv(done))
+	$.markAsStructValue($.cloneStructValue(handler)).Invoke("second")
+	await $.println(await $.chanRecv(done))
 }
 
 export function features(): $.Slice<any> {
