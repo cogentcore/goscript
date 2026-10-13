@@ -14,6 +14,8 @@ import "@goscript/sort/index.js"
 
 export type byFreq = $.Slice<number>
 
+$.registerNamedType("main.byFreq", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")));
+
 $.registerNamedValueType(
 	"main.byFreq",
 	{Len: (receiver: any, ...args: any[]) => (byFreq_Len as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Less: (receiver: any, ...args: any[]) => (byFreq_Less as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Swap: (receiver: any, ...args: any[]) => (byFreq_Swap as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
@@ -27,6 +29,8 @@ $.registerNamedValueType(
 );
 
 export type nameList = $.Slice<string>
+
+$.registerNamedType("main.nameList", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("string")));
 
 $.registerNamedValueType(
 	"main.nameList",

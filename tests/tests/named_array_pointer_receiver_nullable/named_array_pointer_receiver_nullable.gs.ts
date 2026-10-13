@@ -5,6 +5,8 @@ import * as $ from "@goscript/builtin/index.js"
 
 export type words = bigint[]
 
+$.registerNamedType("main.words", /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint64"), 1));
+
 $.registerNamedValueType(
 	"*main.words",
 	{Rsh: (receiver: any, ...args: any[]) => (words_Rsh as any)(receiver, ...$.stripGenericTypeArgs(args))},

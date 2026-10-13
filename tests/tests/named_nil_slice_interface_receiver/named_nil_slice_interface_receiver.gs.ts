@@ -15,6 +15,8 @@ $.registerInterfaceType(
 
 export type bytesEncoder = $.Slice<number>
 
+$.registerNamedType("main.bytesEncoder", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")));
+
 $.registerNamedValueType(
 	"main.bytesEncoder",
 	{Len: (receiver: any, ...args: any[]) => (bytesEncoder_Len as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},

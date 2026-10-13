@@ -5,6 +5,8 @@ import * as $ from "@goscript/builtin/index.js"
 
 export type Hash = Uint8Array
 
+$.registerNamedType("main.Hash", /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 4));
+
 $.registerNamedValueType(
 	"main.Hash",
 	{Valid: (receiver: any, ...args: any[]) => (Hash_Valid as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},

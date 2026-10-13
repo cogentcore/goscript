@@ -15,6 +15,8 @@ $.registerInterfaceType(
 
 export type namedSlice = $.Slice<number>
 
+$.registerNamedType("main.namedSlice", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")));
+
 $.registerNamedValueType(
 	"main.namedSlice",
 	{Add: (receiver: any, ...args: any[]) => (namedSlice_Add as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
@@ -29,6 +31,8 @@ $.registerNamedValueType(
 
 export type namedMap = globalThis.Map<string, number> | null
 
+$.registerNamedType("main.namedMap", /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("int")));
+
 $.registerNamedValueType(
 	"main.namedMap",
 	{Add: (receiver: any, ...args: any[]) => (namedMap_Add as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
@@ -42,6 +46,8 @@ $.registerNamedValueType(
 );
 
 export type namedArray = number[]
+
+$.registerNamedType("main.namedArray", /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2));
 
 $.registerNamedValueType(
 	"main.namedArray",
@@ -99,6 +105,8 @@ $.registerNamedValueType(
 
 export type pointerSlice = $.Slice<number>
 
+$.registerNamedType("main.pointerSlice", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")));
+
 $.registerNamedValueType(
 	"*main.pointerSlice",
 	{Add: (receiver: any, ...args: any[]) => (pointerSlice_Add as any)(receiver, ...$.stripGenericTypeArgs(args))},
@@ -106,6 +114,8 @@ $.registerNamedValueType(
 );
 
 export type pointerMap = globalThis.Map<string, number> | null
+
+$.registerNamedType("main.pointerMap", /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("int")));
 
 $.registerNamedValueType(
 	"*main.pointerMap",

@@ -15,6 +15,8 @@ $.registerInterfaceType(
 
 export type valueHash = Uint8Array
 
+$.registerNamedType("main.valueHash", /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 4));
+
 $.registerNamedValueType(
 	"main.valueHash",
 	{Key: (receiver: any, ...args: any[]) => (valueHash_Key as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
