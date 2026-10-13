@@ -2720,7 +2720,24 @@ func lowerConstantValueForType(value constant.Value, typ types.Type) (string, bo
 	if value != nil && value.Kind() == constant.Int && isBigIntBackedType(typ) {
 		return value.ExactString() + "n", true
 	}
+	if isFloat32Type(typ) {
+		if lowered, ok := lowerFloat32ConstantValue(value); ok {
+			return lowered, true
+		}
+	}
 	return lowerConstantValue(value)
+}
+
+// lowerFloat32ConstantValue lowers a numeric constant of a float32 type to
+// its value rounded to float32 precision, which is how float32 values are
+// represented at runtime (see the float32 runtime helper), so that a
+// constant compares equal to the same value computed or converted at runtime.
+func lowerFloat32ConstantValue(value constant.Value) (string, bool) {
+	if value == nil || (value.Kind() != constant.Int && value.Kind() != constant.Float) {
+		return "", false
+	}
+	f, _ := constant.Float64Val(constant.ToFloat(value))
+	return strconv.FormatFloat(float64(float32(f)), 'g', -1, 64), true
 }
 
 func lowerWideIntegerConstantValue(value constant.Value) (string, bool) {
@@ -7973,9 +7990,16 @@ func binaryOperandUsesTypeParam(ctx lowerFileContext, expr ast.Expr) bool {
 }
 
 func (o *LoweringOwner) lowerExpr(ctx lowerFileContext, expr ast.Expr) (string, []Diagnostic) {
-	if value := ctx.semPkg.source.TypesInfo.Types[unwrapParenExpr(expr)].Value; value != nil && value.Kind() == constant.Complex {
-		if constantValue, ok := lowerConstantValue(value); ok {
-			return constantValue, nil
+	if tv := ctx.semPkg.source.TypesInfo.Types[unwrapParenExpr(expr)]; tv.Value != nil {
+		if tv.Value.Kind() == constant.Complex {
+			if constantValue, ok := lowerConstantValue(tv.Value); ok {
+				return constantValue, nil
+			}
+		}
+		if isFloat32Type(tv.Type) {
+			if constantValue, ok := lowerFloat32ConstantValue(tv.Value); ok {
+				return constantValue, nil
+			}
 		}
 	}
 	switch typed := expr.(type) {
@@ -11705,15 +11729,17 @@ func (o *LoweringOwner) lowerArrayCompositeLit(
 
 // lowerArrayValue marks array storage as a Go array value, so bulk slice copies
 // clone it. Arrays of struct or array elements carry their descriptor so the
-// clone can copy each element.
+// clone can copy each element, and arrays of float elements carry it so that
+// fmt formats the elements at their precision.
 func (o *LoweringOwner) lowerArrayValue(storage string, array *types.Array) string {
 	helper := o.runtimeOwner.QualifiedHelper(RuntimeHelperArrayValue)
-	switch types.Unalias(array.Elem()).Underlying().(type) {
-	case *types.Struct, *types.Array:
-		return helper + "(" + storage + ", " + o.runtimeTypeInfoExpr(array) + ")"
-	default:
+	elem := types.Unalias(array.Elem()).Underlying()
+	_, isStruct := elem.(*types.Struct)
+	_, isArray := elem.(*types.Array)
+	if !isStruct && !isArray && !isFloatType(elem) {
 		return helper + "(" + storage + ")"
 	}
+	return helper + "(" + storage + ", " + o.runtimeTypeInfoExpr(array) + ")"
 }
 
 func (o *LoweringOwner) lowerSliceCompositeLit(

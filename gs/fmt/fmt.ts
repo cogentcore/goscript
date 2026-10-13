@@ -117,7 +117,8 @@ function formatValue(value: any, verb: string, flags = ''): string {
     case 'd': // decimal integer
       return formatInt(value, 10, flags, false)
     case 'f': // decimal point, no exponent
-      return Number(value).toString()
+    case 'F':
+      return formatFloatVerb(value, verb, '')
     case 's': // string
       if (typeof value === 'string') return value
       if (value instanceof Uint8Array) return $.bytesToString(value)
@@ -151,14 +152,11 @@ function formatValue(value: any, verb: string, flags = ''): string {
       return formatInt(value, 8, flags, false)
     case 'b': // binary
       return formatInt(value, 2, flags, false)
-    case 'e': // scientific notation lowercase
-      return Number(value).toExponential()
-    case 'E': // scientific notation uppercase
-      return Number(value).toExponential().toUpperCase()
+    case 'e': // scientific notation
+    case 'E':
     case 'g': // %e for large exponents, %f otherwise
-      return Number(value).toPrecision()
-    case 'G': // %E for large exponents, %F otherwise
-      return Number(value).toPrecision().toUpperCase()
+    case 'G':
+      return formatFloatVerb(value, verb, '')
     case 'q': // quoted string / rune
       if (typeof value === 'number' && Number.isInteger(value)) {
         // emulate quoted rune; runeToString avoids fromCodePoint throwing on
@@ -175,6 +173,50 @@ function formatValue(value: any, verb: string, flags = ''): string {
     default:
       return String(value)
   }
+}
+
+// elementTypeInfo returns the element type of a slice or array type, if known.
+function elementTypeInfo(
+  typeInfo?: $.TypeInfo | string,
+): $.TypeInfo | string | undefined {
+  const info =
+    typeof typeInfo === 'string' ? $.getTypeByName(typeInfo) : typeInfo
+  if (info?.kind === $.TypeKind.Slice || info?.kind === $.TypeKind.Array) {
+    return info.elemType
+  }
+  return undefined
+}
+
+// floatBits returns 32 or 64 if the value (or the given type) is a float32 or
+// float64, so that it is formatted at that precision as in Go, or 0 otherwise.
+function floatBits(value: unknown, typeInfo?: $.TypeInfo | string): number {
+  const info =
+    typeInfo ??
+    (value !== null && typeof value === 'object' ?
+      (value as { __goTypeInfo?: $.TypeInfo | string }).__goTypeInfo
+    : undefined)
+  const name =
+    typeof info === 'string' ? info
+    : info?.kind === $.TypeKind.Basic ? info.name
+    : undefined
+  if (name === 'float32') return 32
+  if (name === 'float64') return 64
+  return 0
+}
+
+// formatFloatVerb formats a float for the e, E, f, F, g and G verbs, with an
+// optional precision, as in Go.
+function formatFloatVerb(
+  value: unknown,
+  verb: string,
+  precision: string,
+): string {
+  const bits = floatBits(value) || 64
+  let prec = precision === '' ? -1 : parseInt(precision)
+  if (prec < 0 && verb !== 'g' && verb !== 'G') {
+    prec = 6
+  }
+  return $.formatFloat(Number(value), verb === 'F' ? 'f' : verb, prec, bits)
 }
 
 function hasGoTypeName(value: unknown): value is { __goType: string } {
@@ -246,11 +288,25 @@ function defaultFormatMaybe(
   if (typeof value === 'string')
     return flags.includes('#') ? JSON.stringify(value) : value
   if (typeof value === 'number' || typeof value === 'bigint') {
-    return value.toString()
+    const bits = typeof value === 'number' ? floatBits(value, typeInfo) : 0
+    return bits ?
+        $.formatFloat(value as number, 'g', -1, bits)
+      : value.toString()
   }
   if (Array.isArray(value))
     return joinMaybe(
-      value.map((item) => defaultFormatMaybe(item, flags, depth + 1)),
+      value.map((item) =>
+        defaultFormatMaybe(
+          item,
+          flags,
+          depth + 1,
+          elementTypeInfo(
+            typeInfo ??
+              (value as { __goTypeInfo?: $.TypeInfo | string }).__goTypeInfo ??
+              $.arrayValueTypeInfo(value),
+          ),
+        ),
+      ),
       ' ',
       '[',
       ']',
@@ -339,7 +395,7 @@ function defaultFormatMaybe(
         value.__goValue,
         flags,
         depth,
-        typeInfo,
+        typeInfo ?? value.__goTypeInfo,
         allowMethods,
       )
     }
@@ -459,16 +515,8 @@ function applyFormatOptions(
       } else {
         result = result.padStart(w, flags.includes('0') ? '0' : ' ')
       }
-    } else if (precision && (verb === 'f' || verb === 'e' || verb === 'g')) {
-      const p = parseInt(precision)
-      const num = Number(arg)
-      if (verb === 'f') {
-        result = num.toFixed(p)
-      } else if (verb === 'e') {
-        result = num.toExponential(p)
-      } else if (verb === 'g') {
-        result = num.toPrecision(p)
-      }
+    } else if (precision && 'eEfFgG'.includes(verb)) {
+      result = formatFloatVerb(arg, verb, precision)
 
       if (width) {
         const w = parseInt(width)

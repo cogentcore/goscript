@@ -51,7 +51,7 @@ export function walk(v: reflect.Value): string {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let s: $.VarRef<T | $.VarRef<T> | null> = $.varRef(new T({A: "aaa", B: 3.14}))
+	let s: $.VarRef<T | $.VarRef<T> | null> = $.varRef(new T({A: "aaa", B: 3.140000104904175}))
 	let v = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(s.value, "*main.T", /* @__PURE__ */ $.pointerType("main.T")))))
 	await $.println(reflect.Kind_String($.markAsStructValue($.cloneStructValue(v)).Kind()), reflect.Kind_String($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(v)).Elem())).Kind()), await $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(v)).Elem())).Type()).String())
 	await $.println(walk($.markAsStructValue($.cloneStructValue(v))), walk($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(s, "**main.T", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.pointerType("main.T"))))))))
