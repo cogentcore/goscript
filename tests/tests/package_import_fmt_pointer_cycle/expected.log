@@ -1,0 +1,4 @@
+&{root <nil> [PTR]}
+&{Name:kid Parent:PTR Kids:[]}
+&{PTR main}
+&{{[PTR] PTR} app}
