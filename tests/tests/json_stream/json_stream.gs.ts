@@ -206,7 +206,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// A malformed document yields a *json.SyntaxError with the Go byte offset.
 	let v: $.VarRef<any> = $.varRef(null! as any)
-	let err = json.Unmarshal(new Uint8Array([91, 49, 44, 93]), $.interfaceValue(v, "*interface{}", /* @__PURE__ */ $.pointerType({ kind: $.TypeKind.Interface, methods: [] })))
+	let err: $.GoError = json.Unmarshal(new Uint8Array([91, 49, 44, 93]), $.interfaceValue(v, "*interface{}", /* @__PURE__ */ $.pointerType({ kind: $.TypeKind.Interface, methods: [] })))
 	{
 		let __goscriptTuple0: any = $.typeAssertTuple<json.SyntaxError | $.VarRef<json.SyntaxError> | null>(err, /* @__PURE__ */ $.pointerType("json.SyntaxError"))
 		let se: json.SyntaxError | $.VarRef<json.SyntaxError> | null = __goscriptTuple0[0]

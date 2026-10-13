@@ -5943,13 +5943,73 @@ func (o *LoweringOwner) shortDeclTypeAnnotation(ctx lowerFileContext, lhs ast.Ex
 		}
 		return ": " + typ
 	}
-	if rhs != nil && isIdentLikeExpr(rhs) && isInterfaceType(obj.Type()) {
+	if rhs != nil && isInterfaceType(obj.Type()) && (isIdentLikeExpr(rhs) || (o.callsOverridePackage(ctx, rhs) && isReassignedLocal(ctx, obj))) {
 		return ": " + o.tsVariableTypeFor(ctx, obj.Type(), ctx.model.needsVarRef[obj])
 	}
 	if !shortDeclNeedsTypeAnnotation(obj.Type()) && !(rhs != nil && shortDeclFeedsOwnInit(ctx, obj, rhs)) {
 		return ""
 	}
 	return ": " + o.tsVariableTypeFor(ctx, obj.Type(), ctx.model.needsVarRef[obj])
+}
+
+// callsOverridePackage reports whether expr is a call to a function or method
+// declared by an override package. Hand-written override signatures may
+// return an interface as non-nullable, as reflect's Type.Elem does, so a
+// variable declared from the call needs the Go type's nullable annotation
+// to be assigned a nil-able value later.
+func (o *LoweringOwner) callsOverridePackage(ctx lowerFileContext, expr ast.Expr) bool {
+	if o.overrideOwner == nil {
+		return false
+	}
+	call, _ := ast.Unparen(expr).(*ast.CallExpr)
+	if call == nil {
+		return false
+	}
+	var ident *ast.Ident
+	switch fun := ast.Unparen(call.Fun).(type) {
+	case *ast.Ident:
+		ident = fun
+	case *ast.SelectorExpr:
+		ident = fun.Sel
+	default:
+		return false
+	}
+	fn, _ := ctx.semPkg.source.TypesInfo.Uses[ident].(*types.Func)
+	return fn != nil && fn.Pkg() != nil && o.overrideFacts().HasPackage(fn.Pkg().Path())
+}
+
+// isReassignedLocal reports whether the local variable obj is assigned
+// after its declaration, by an assignment or a redeclaring := in its block.
+func isReassignedLocal(ctx lowerFileContext, obj types.Object) bool {
+	path, _ := astutil.PathEnclosingInterval(ctx.file, obj.Pos(), obj.Pos())
+	var scope ast.Node
+	for _, node := range path {
+		if _, ok := node.(*ast.BlockStmt); ok {
+			scope = node
+			break
+		}
+	}
+	if scope == nil {
+		return false
+	}
+	info := ctx.semPkg.source.TypesInfo
+	assigned := false
+	ast.Inspect(scope, func(node ast.Node) bool {
+		if assigned {
+			return false
+		}
+		assign, ok := node.(*ast.AssignStmt)
+		if !ok {
+			return true
+		}
+		for _, lhs := range assign.Lhs {
+			if ident, ok := ast.Unparen(lhs).(*ast.Ident); ok && ident.Pos() != obj.Pos() && info.ObjectOf(ident) == obj {
+				assigned = true
+			}
+		}
+		return true
+	})
+	return assigned
 }
 
 // shortDeclFeedsOwnInit reports whether obj, declared as obj := init, is read by
