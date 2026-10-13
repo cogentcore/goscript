@@ -5506,7 +5506,7 @@ func integerQuotientAssignValueExpr(targetType types.Type, left string, right st
 	if bits, ok := unsignedIntegerBits(targetType); ok && bits <= 32 {
 		return "(" + left + " / " + right + ") >>> 0", true
 	}
-	return "Math.trunc(" + left + " / " + right + ")", true
+	return "globalThis.Math.trunc(" + left + " / " + right + ")", true
 }
 
 func lower32BitIntegerMultiplicationValue(targetType types.Type, left string, right string) (string, bool) {
@@ -5519,9 +5519,9 @@ func lower32BitIntegerMultiplicationValue(targetType types.Type, left string, ri
 	}
 	switch basic.Kind() {
 	case types.Uint32:
-		return "Math.imul(" + left + ", " + right + ") >>> 0", true
+		return "globalThis.Math.imul(" + left + ", " + right + ") >>> 0", true
 	case types.Int32:
-		return "Math.imul(" + left + ", " + right + ")", true
+		return "globalThis.Math.imul(" + left + ", " + right + ")", true
 	default:
 		return "", false
 	}
@@ -8079,7 +8079,7 @@ func (o *LoweringOwner) lowerExpr(ctx lowerFileContext, expr ast.Expr) (string, 
 			return value, append(leftDiagnostics, rightDiagnostics...)
 		}
 		if typed.Op == token.QUO && isIntegerType(ctx.semPkg.source.TypesInfo.TypeOf(typed)) {
-			return "Math.trunc(" + left + " / " + right + ")", append(leftDiagnostics, rightDiagnostics...)
+			return "globalThis.Math.trunc(" + left + " / " + right + ")", append(leftDiagnostics, rightDiagnostics...)
 		}
 		if typed.Op == token.SHR {
 			if bits, ok := unsignedIntegerBits(ctx.semPkg.source.TypesInfo.TypeOf(typed.X)); ok && bits <= 32 {
@@ -8094,7 +8094,7 @@ func (o *LoweringOwner) lowerExpr(ctx lowerFileContext, expr ast.Expr) (string, 
 			// pair throws "Cannot mix BigInt and other types". The wide-result and
 			// uintShr paths above already ran, so the base here is number-backed:
 			// coerce the bigint count to Number to match Go's count semantics.
-			right = "Number(" + right + ")"
+			right = "globalThis.Number(" + right + ")"
 		}
 		if value, diagnostics, ok := o.lowerStringOrderExpr(ctx, typed, left, right, leftDiagnostics, rightDiagnostics); ok {
 			return value, diagnostics
@@ -9463,7 +9463,7 @@ func (o *LoweringOwner) lowerConversionExpr(
 		case isByteSliceType(sourceType):
 			return o.runtimeOwner.QualifiedHelper(RuntimeHelperBytesToString) + "(" + value + ")", diagnostics
 		case overrideNamedStringType(ctx, o, sourceType):
-			return "String(" + value + ")", diagnostics
+			return "globalThis.String(" + value + ")", diagnostics
 		case isStringType(sourceType):
 			return grouped, diagnostics
 		case isNumericType(sourceType):
@@ -9565,7 +9565,7 @@ func (o *LoweringOwner) lowerConversionExpr(
 		if isFloatType(targetType) {
 			converted := grouped
 			if isBigIntBackedType(sourceType) {
-				converted = "Number(" + value + ")"
+				converted = "globalThis.Number(" + value + ")"
 			}
 			if isFloat32Type(targetType) {
 				converted = o.runtimeOwner.QualifiedHelper(RuntimeHelperFloat32) + "(" + converted + ")"
@@ -9607,7 +9607,7 @@ func coerceWideHelperResult(runtimeOwner *RuntimeContractOwner, resultType types
 	if _, ok := unsignedIntegerBits(resultType); ok {
 		return runtimeOwner.QualifiedHelper(RuntimeHelperUint) + "(" + call + ", 64)"
 	}
-	return "Number(" + call + ")"
+	return "globalThis.Number(" + call + ")"
 }
 
 func (o *LoweringOwner) lowerWideIntegerBinaryExpr(ctx lowerFileContext, expr *ast.BinaryExpr, left string, right string) (string, bool) {
@@ -11359,7 +11359,7 @@ func (o *LoweringOwner) lowerNumberIndexValue(ctx lowerFileContext, expr ast.Exp
 		return value
 	}
 	if isBigIntBackedType(ctx.semPkg.source.TypesInfo.TypeOf(expr)) {
-		return "Number(" + value + ")"
+		return "globalThis.Number(" + value + ")"
 	}
 	return value
 }
@@ -12530,7 +12530,7 @@ func (o *LoweringOwner) lowerZeroValueExprFor(ctx lowerFileContext, typ types.Ty
 			return o.lowerArrayValue("new Uint8Array("+strconv.FormatInt(typed.Len(), 10)+")", typed)
 		}
 		elem := o.lowerZeroValueExprFor(ctx, typed.Elem())
-		return o.lowerArrayValue("Array.from({ length: "+strconv.FormatInt(typed.Len(), 10)+" }, () => "+arrowBodyExpr(elem)+")", typed)
+		return o.lowerArrayValue("globalThis.Array.from({ length: "+strconv.FormatInt(typed.Len(), 10)+" }, () => "+arrowBodyExpr(elem)+")", typed)
 	case *types.Struct:
 		return o.lowerAnonymousStructValue(anonymousStructZeroValueExpr(typed, func(fieldType types.Type) string {
 			return o.lowerZeroValueExprFor(ctx, fieldType)
@@ -13359,7 +13359,7 @@ func zeroValueExpr(typ types.Type) string {
 			return "new Uint8Array(" + strconv.FormatInt(typed.Len(), 10) + ")"
 		}
 		elem := zeroValueExpr(typed.Elem())
-		return "Array.from({ length: " + strconv.FormatInt(typed.Len(), 10) + " }, () => " + arrowBodyExpr(elem) + ")"
+		return "globalThis.Array.from({ length: " + strconv.FormatInt(typed.Len(), 10) + " }, () => " + arrowBodyExpr(elem) + ")"
 	case *types.Struct:
 		return anonymousStructZeroValueExpr(typed, zeroValueExpr)
 	default:

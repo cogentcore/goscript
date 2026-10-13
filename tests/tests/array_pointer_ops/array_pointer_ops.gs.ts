@@ -45,8 +45,8 @@ export class arrays {
 
 	constructor(init?: Partial<{slices?: $.Slice<number>[], items?: item[]}>) {
 		this._fields = {
-			slices: init?.slices !== undefined ? $.cloneArrayValue(init.slices, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")), 1)) : $.arrayValue(Array.from({ length: 1 }, () => null)),
-			items: init?.items !== undefined ? $.cloneArrayValue(init.items, /* @__PURE__ */ $.arrayType("main.item", 1)) : $.arrayValue(Array.from({ length: 1 }, () => $.markAsStructValue(new item())), /* @__PURE__ */ $.arrayType("main.item", 1))
+			slices: init?.slices !== undefined ? $.cloneArrayValue(init.slices, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")), 1)) : $.arrayValue(globalThis.Array.from({ length: 1 }, () => null)),
+			items: init?.items !== undefined ? $.cloneArrayValue(init.items, /* @__PURE__ */ $.arrayType("main.item", 1)) : $.arrayValue(globalThis.Array.from({ length: 1 }, () => $.markAsStructValue(new item())), /* @__PURE__ */ $.arrayType("main.item", 1))
 		}
 	}
 
@@ -120,7 +120,7 @@ export async function main(): globalThis.Promise<void> {
 	$.arrayIndex(rows, 1)[0] = 9
 	await $.println("row copy:", $.int($.arrayIndex($.arrayIndex(rows, 0), 0), 32), $.int($.arrayIndex($.arrayIndex(rows, 0), 1), 32), $.int($.arrayIndex($.arrayIndex(rows, 1), 0), 32), $.int($.arrayIndex($.arrayIndex(rows, 1), 1), 32))
 
-	let buckets: bigint[][] = $.arrayValue(Array.from({ length: 2 }, () => $.arrayValue(Array.from({ length: 3 }, () => 0n))), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint64"), 3), 2))
+	let buckets: bigint[][] = $.arrayValue(globalThis.Array.from({ length: 2 }, () => $.arrayValue(globalThis.Array.from({ length: 3 }, () => 0n))), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint64"), 3), 2))
 	let cache: $.VarRef<bigint[]> | null = $.indexRef(buckets, 1)
 
 	await $.println("len:", 3)

@@ -15,7 +15,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("divide:", $.int(math.Ceil(n / (ny * threads))))
 	await $.println("subtract:", (n - (ny - threads)) == 4194430)
 	await $.println("multiply:", (2 * (ny + threads)) == 132)
-	await $.println("int:", Math.trunc(100 / $.int(Math.trunc((ny * threads) / ny))))
+	await $.println("int:", globalThis.Math.trunc(100 / $.int(globalThis.Math.trunc((ny * threads) / ny))))
 	await $.println("named:", (n / (ny + threads)) > 63550)
 	let f: number = 10
 	await $.println("float:", $.int(f / (ny + 3)) == 2)

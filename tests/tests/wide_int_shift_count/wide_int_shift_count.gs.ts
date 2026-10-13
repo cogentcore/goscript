@@ -8,7 +8,7 @@ export async function main(): globalThis.Promise<void> {
 	let s = $.uint64Mul(($.uint64And(n, 1n)), 4n)
 
 	let b: number = 1
-	b = $.uint(b + ($.uint(1 << Number(s), 8)), 8)
+	b = $.uint(b + ($.uint(1 << globalThis.Number(s), 8)), 8)
 	await $.println("byte-shl-by-uint64", $.uint(b, 8))
 
 	let v = $.uint(($.uintShr(b, s, 8)) & 0x0f, 8)

@@ -56,7 +56,7 @@ export class Outer {
 	constructor(init?: Partial<{Child?: MyStruct, Items?: MyStruct[], Ptr?: MyStruct | $.VarRef<MyStruct> | null}>) {
 		this._fields = {
 			Child: init?.Child ? $.markAsStructValue($.cloneStructValue(init.Child)) : $.markAsStructValue(new MyStruct()),
-			Items: init?.Items !== undefined ? $.cloneArrayValue(init.Items, /* @__PURE__ */ $.arrayType("main.MyStruct", 2)) : $.arrayValue(Array.from({ length: 2 }, () => $.markAsStructValue(new MyStruct())), /* @__PURE__ */ $.arrayType("main.MyStruct", 2)),
+			Items: init?.Items !== undefined ? $.cloneArrayValue(init.Items, /* @__PURE__ */ $.arrayType("main.MyStruct", 2)) : $.arrayValue(globalThis.Array.from({ length: 2 }, () => $.markAsStructValue(new MyStruct())), /* @__PURE__ */ $.arrayType("main.MyStruct", 2)),
 			Ptr: init?.Ptr ?? (null! as MyStruct | $.VarRef<MyStruct> | null)
 		}
 	}

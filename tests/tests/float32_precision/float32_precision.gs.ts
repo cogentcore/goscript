@@ -58,7 +58,7 @@ export async function main(): globalThis.Promise<void> {
 	let f: number = 3.140000104904175
 	let [g, ] = strconv.ParseFloat("3.14", 32)
 	let h = $.float32(g)
-	await fmt.Println(f == h, 0.10000000149011612 == $.float32(g / 31.4), $.basicInterfaceValue(0.10000000149011612, "float32"))
+	await fmt.Println(f == h, 0.10000000149011612 == $.float32((g / 31.4)), $.basicInterfaceValue(0.10000000149011612, "float32"))
 	let s = $.varRef($.markAsStructValue(new T({A: "aaa", B: 3.140000104904175})))
 	let t = $.markAsStructValue(new T({A: "aaa", B: h}))
 	await fmt.Println($.structEqual(s.value, t), $.interfaceValue($.markAsStructValue($.cloneStructValue(s.value)), "main.T", "main.T"), $.interfaceValue($.markAsStructValue($.cloneStructValue(t)), "main.T", "main.T"))

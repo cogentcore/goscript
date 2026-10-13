@@ -90,7 +90,7 @@ export async function main(): globalThis.Promise<void> {
 	let raw: json.RawMessage = ((compact.value.Bytes() as json.RawMessage) as json.RawMessage)
 	let __goscriptTuple0: any = jsontext.Value_MarshalJSON(raw)
 	let rawBytes: $.Slice<number> = __goscriptTuple0[0]
-	let [num, ] = json.Number_Int64(String("42"))
+	let [num, ] = json.Number_Int64(globalThis.String("42"))
 	await $.println("json:", json.Valid(rawBytes), $.bytesToString(rawBytes), num)
 
 	let __goscriptTuple1: any = mime.ParseMediaType("text/plain; charset=utf-8")

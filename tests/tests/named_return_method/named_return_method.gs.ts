@@ -55,7 +55,7 @@ export class content {
 			l = $.int64Sub($.int64($.len($.pointerValue<content>(c).bytes)), off)
 		}
 
-		let btr: $.Slice<number> = $.goSlice($.pointerValue<content>(c).bytes, Number(off), Number($.int64Add(off, l)))
+		let btr: $.Slice<number> = $.goSlice($.pointerValue<content>(c).bytes, globalThis.Number(off), globalThis.Number($.int64Add(off, l)))
 		n = $.copy(b, btr)
 		return [n, err]
 	}

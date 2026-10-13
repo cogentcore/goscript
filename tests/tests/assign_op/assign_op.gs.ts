@@ -13,11 +13,11 @@ export async function main(): globalThis.Promise<void> {
 	await $.println(b)
 
 	let c: number = 16
-	c = Math.trunc(c / 4)
+	c = globalThis.Math.trunc(c / 4)
 	await $.println(c)
 
 	let quotient: number = 5
-	quotient = Math.trunc(quotient / 2)
+	quotient = globalThis.Math.trunc(quotient / 2)
 	await $.println(quotient)
 
 	let unsignedQuotient: number = 5

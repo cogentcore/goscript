@@ -22,7 +22,7 @@ export class descriptor {
 
 	public toJS(): any {
 		const d: descriptor | $.VarRef<descriptor> | null = this;
-		return "descriptor " + $.pointerValue<descriptor>(d).Label
+		return $.concatString("descriptor ", $.pointerValue<descriptor>(d).Label)
 	}
 
 	static {
