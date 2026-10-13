@@ -9028,40 +9028,82 @@ func (o *LoweringOwner) lowerOverrideVariadicCallArgs(
 	return args, diagnostics
 }
 
+// lowerTupleCallArgs lowers a call whose only argument is a call returning
+// several values, as in f(g()). The results fill the parameters in order,
+// each converted to its parameter type. For a variadic f the results past the
+// fixed parameters are packed into the variadic slice, or passed as rest
+// arguments to an override package.
 func (o *LoweringOwner) lowerTupleCallArgs(
 	ctx lowerFileContext,
 	expr *ast.CallExpr,
 	signature *types.Signature,
 	overrideCall bool,
 ) ([]string, []Diagnostic, bool) {
-	if signature == nil || signature.Variadic() || len(expr.Args) != 1 ||
-		isBuiltinCallTarget(ctx, expr.Fun) || overrideCall {
+	// Only a lone multi-value call argument spreads over the parameters.
+	if signature == nil || len(expr.Args) != 1 || expr.Ellipsis != token.NoPos ||
+		isBuiltinCallTarget(ctx, expr.Fun) {
 		return nil, nil, false
 	}
-	params := signature.Params()
 	sourceResults := tupleResultTypes(ctx, expr.Args[0])
-	if params == nil || sourceResults == nil || sourceResults.Len() != params.Len() || sourceResults.Len() < 2 {
+	if sourceResults == nil || sourceResults.Len() < 2 {
 		return nil, nil, false
 	}
+
+	// The results must cover the fixed parameters, and match them exactly
+	// for a non-variadic callee, which an override does not take as a tuple.
+	params := signature.Params()
+	variadic := signature.Variadic()
+	fixedCount := params.Len()
+	var elemType types.Type
+	if variadic {
+		fixedCount--
+		elemType = params.At(fixedCount).Type().Underlying().(*types.Slice).Elem()
+	}
+	if variadic && sourceResults.Len() < fixedCount ||
+		!variadic && (overrideCall || sourceResults.Len() != params.Len()) {
+		return nil, nil, false
+	}
+
+	// Convert each result, read from the tuple placeholder, to its target.
 	value, diagnostics := o.lowerTupleExpr(ctx, expr.Args[0])
-	parts := make([]string, 0, sourceResults.Len())
+	var parts, partTypes, packed []string
 	changed := false
 	for idx := range sourceResults.Len() {
+		target := elemType
+		if idx < fixedCount {
+			target = params.At(idx).Type()
+		}
 		part := "__goscriptTupleArg[" + strconv.Itoa(idx) + "]"
-		converted := o.lowerValueForTargetTypes(ctx, params.At(idx).Type(), sourceResults.At(idx).Type(), part, false)
-		if converted != part {
-			changed = true
+		converted := o.lowerValueForTargetTypes(ctx, target, sourceResults.At(idx).Type(), part, false)
+		changed = changed || converted != part
+		if idx >= fixedCount && !overrideCall {
+			packed = append(packed, converted)
+			continue
 		}
 		parts = append(parts, converted)
+		partTypes = append(partTypes, o.tsTypeFor(ctx, target))
 	}
-	if !changed {
+
+	// A non-override variadic call takes the rest as one slice argument.
+	if variadic && !overrideCall {
+		slice := "null"
+		if len(packed) > 0 {
+			slice = o.runtimeOwner.QualifiedHelper(RuntimeHelperArrayToSlice) +
+				"<" + o.tsTypeFor(ctx, elemType) + ">([" + strings.Join(packed, ", ") + "])"
+		}
+		parts = append(parts, slice)
+		partTypes = append(partTypes, o.tsTypeFor(ctx, params.At(fixedCount).Type()))
+	}
+
+	// Results that fill the parameters with no conversion spread directly.
+	if !variadic && !changed {
 		return []string{"...(" + o.parenthesizedTupleCast(ctx, value, params) + ")"}, diagnostics, true
 	}
 	temp := ctx.tempName("TupleArg")
 	for idx, part := range parts {
 		parts[idx] = strings.ReplaceAll(part, "__goscriptTupleArg", temp)
 	}
-	body := "const " + temp + " = " + value + "; return " + o.tupleLiteralCast(ctx, params, parts)
+	body := "const " + temp + " = " + value + "; return [" + strings.Join(parts, ", ") + "] as [" + strings.Join(partTypes, ", ") + "]"
 	if strings.Contains(value, "await ") {
 		return []string{"...(await (async () => { " + body + " })())"}, diagnostics, true
 	}
@@ -9073,10 +9115,6 @@ func (o *LoweringOwner) parenthesizedTupleCast(ctx lowerFileContext, value strin
 		return "(" + value + ") as " + o.tupleTypeForParams(ctx, params)
 	}
 	return value + " as " + o.tupleTypeForParams(ctx, params)
-}
-
-func (o *LoweringOwner) tupleLiteralCast(ctx lowerFileContext, params *types.Tuple, parts []string) string {
-	return "[" + strings.Join(parts, ", ") + "] as " + o.tupleTypeForParams(ctx, params)
 }
 
 func (o *LoweringOwner) tupleTypeForParams(ctx lowerFileContext, params *types.Tuple) string {

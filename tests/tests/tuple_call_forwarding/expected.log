@@ -1,3 +1,15 @@
 sum: 5
 point: 10 5
 shift: 11 12 13
+names: 2
+name: Widgets-frame
+name: Widgets-tab
+total: 7
+count: 2
+span: 4
+new tab: Text
+names: 2
+name: Text-frame
+name: Text-tab
+sprint: 3 4
+tabs: 1
