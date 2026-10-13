@@ -7,7 +7,11 @@ export type Stack = $.Slice<any>
 
 export type Names = $.Slice<string>
 
+$.registerNamedType("main.Names", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("string")));
+
 export type Text = $.Slice<string>
+
+$.registerNamedType("main.Text", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("string")));
 
 export function Stack_Push(st: $.VarRef<Stack> | null, __typeArgs: $.GenericTypeArgs | undefined, it: $.Slice<any>): void {
 	st!.value = ($.appendSlice(($.pointerValue<Stack>(st) as Stack), it, $.appendZero(() => ($.genericZero(__typeArgs, "T", null) as any))) as Stack)

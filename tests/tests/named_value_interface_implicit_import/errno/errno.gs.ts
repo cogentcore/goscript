@@ -3,6 +3,8 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
+$.registerTypePackagePath("github.com/s4wave/goscript/tests/tests/named_value_interface_implicit_import/errno", ["errno.Errno"])
+
 export type Errno = number
 
 $.registerNamedValueType(

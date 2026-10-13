@@ -6,6 +6,8 @@ import * as $ from "@goscript/builtin/index.js"
 import * as sync from "@goscript/sync/index.js"
 import "@goscript/sync/index.js"
 
+$.registerTypePackagePath("github.com/s4wave/goscript/tests/tests/package_var_func_value_async_init/types", ["types.Type"])
+
 export class Type {
 	public declare Ext: string
 

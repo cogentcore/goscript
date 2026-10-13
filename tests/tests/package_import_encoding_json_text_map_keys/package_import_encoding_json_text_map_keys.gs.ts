@@ -107,7 +107,7 @@ export async function Tokens_UnmarshalText(t: $.VarRef<Tokens> | null, text: $.S
 			return null
 		}
 	}
-	return errors.New("unknown token " + $.bytesToString(text))
+	return errors.New($.concatString("unknown token ", $.bytesToString(text)))
 }
 
 export async function main(): globalThis.Promise<void> {
@@ -125,7 +125,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 
 	let d: $.VarRef<Doc> = $.varRef($.markAsStructValue(new Doc()))
-	let err = await json.Unmarshal(new Uint8Array([123, 34, 75, 105, 110, 100, 34, 58, 34, 67, 111, 109, 109, 101, 110, 116, 34, 44, 34, 75, 105, 110, 100, 115, 34, 58, 91, 34, 75, 101, 121, 119, 111, 114, 100, 34, 44, 34, 66, 97, 99, 107, 103, 114, 111, 117, 110, 100, 34, 93, 44, 34, 83, 116, 121, 108, 101, 115, 34, 58, 123, 34, 120, 34, 58, 123, 34, 67, 111, 109, 109, 101, 110, 116, 34, 58, 34, 103, 114, 97, 121, 34, 125, 125, 44, 34, 67, 111, 117, 110, 116, 115, 34, 58, 123, 34, 49, 34, 58, 50, 44, 34, 45, 51, 34, 58, 52, 125, 44, 34, 66, 105, 103, 34, 58, 123, 34, 57, 48, 48, 55, 49, 57, 57, 50, 53, 52, 55, 52, 48, 57, 57, 51, 34, 58, 34, 98, 105, 103, 34, 125, 125]), $.interfaceValue(d, "*main.Doc", /* @__PURE__ */ $.pointerType("main.Doc")))
+	let err: $.GoError = await json.Unmarshal(new Uint8Array([123, 34, 75, 105, 110, 100, 34, 58, 34, 67, 111, 109, 109, 101, 110, 116, 34, 44, 34, 75, 105, 110, 100, 115, 34, 58, 91, 34, 75, 101, 121, 119, 111, 114, 100, 34, 44, 34, 66, 97, 99, 107, 103, 114, 111, 117, 110, 100, 34, 93, 44, 34, 83, 116, 121, 108, 101, 115, 34, 58, 123, 34, 120, 34, 58, 123, 34, 67, 111, 109, 109, 101, 110, 116, 34, 58, 34, 103, 114, 97, 121, 34, 125, 125, 44, 34, 67, 111, 117, 110, 116, 115, 34, 58, 123, 34, 49, 34, 58, 50, 44, 34, 45, 51, 34, 58, 52, 125, 44, 34, 66, 105, 103, 34, 58, 123, 34, 57, 48, 48, 55, 49, 57, 57, 50, 53, 52, 55, 52, 48, 57, 57, 51, 34, 58, 34, 98, 105, 103, 34, 125, 125]), $.interfaceValue(d, "*main.Doc", /* @__PURE__ */ $.pointerType("main.Doc")))
 	if (err != null) {
 		await $.println("error:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 	}
