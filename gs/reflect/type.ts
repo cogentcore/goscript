@@ -630,6 +630,9 @@ export class Value {
   private _parentStruct?: Record<string, unknown>
   private _fieldName?: string
   private _interfaceValue?: ReflectValue
+  // _addressable is whether the value is addressable, as in Go: an element
+  // of a pointer or slice, or a field or array element of an addressable value.
+  private _addressable = false
 
   constructor(
     value?: ReflectValue | Record<string, never>,
@@ -671,7 +674,14 @@ export class Value {
       this._fieldName,
       this._interfaceValue,
     )
+    cloned._addressable = this._addressable
     return cloned
+  }
+
+  // withAddressable sets whether v is addressable and returns v.
+  private withAddressable(addressable: boolean): Value {
+    this._addressable = addressable
+    return this
   }
 
   // currentValue returns the value v refers to. Calling a method copies a
@@ -879,8 +889,10 @@ export class Value {
 
   public Index(i: number): Value {
     if (this.Kind() === Slice || this.Kind() === Array) {
-      const ref = $.indexRef(this._value as any, i) as $.VarRef<ReflectValue>
-      return new Value(ref.value, this._type.Elem(), ref)
+      const ref = $.indexRef(this.currentValue() as any, i) as $.VarRef<ReflectValue>
+      return new Value(ref.value, this._type.Elem(), ref).withAddressable(
+        this.Kind() === Slice || this._addressable,
+      )
     }
     throw new Error(
       'reflect: call of reflect.Value.Index on ' +
@@ -997,22 +1009,25 @@ export class Value {
   }
 
   public Elem(): Value {
+    const value = this.currentValue()
     // For pointers, unwrap the VarRef and return the element, tracking the parent
-    if (this._type.Kind() === Ptr && $.isVarRef(this._value)) {
-      const varRef = this._value as $.VarRef<ReflectValue>
+    if (this._type.Kind() === Ptr && $.isVarRef(value)) {
+      const varRef = value as $.VarRef<ReflectValue>
       const elemType = this._type.Elem()
-      return new Value(varRef.value, elemType, varRef)
+      return new Value(varRef.value, elemType, varRef).withAddressable(true)
     }
     if (
       this._type.Kind() === Ptr &&
-      this._value &&
-      typeof this._value === 'object' &&
-      '__goValue' in this._value &&
-      $.isVarRef((this._value as { __goValue: unknown }).__goValue)
+      value &&
+      typeof value === 'object' &&
+      '__goValue' in value &&
+      $.isVarRef((value as { __goValue: unknown }).__goValue)
     ) {
-      const varRef = (this._value as { __goValue: $.VarRef<ReflectValue> })
+      const varRef = (value as { __goValue: $.VarRef<ReflectValue> })
         .__goValue
-      return new Value(varRef.value, this._type.Elem(), varRef)
+      return new Value(varRef.value, this._type.Elem(), varRef).withAddressable(
+        true,
+      )
     }
     if (this._type.Kind() === Interface) {
       return ValueOf(this._value)
@@ -1022,9 +1037,9 @@ export class Value {
       if (this.IsNil()) {
         return new Value()
       }
-      return new Value(this._value, this._type.Elem())
+      return new Value(value, this._type.Elem()).withAddressable(true)
     }
-    return new Value(this._value, this._type, this._parentVarRef)
+    return new Value(value, this._type, this._parentVarRef)
   }
 
   public NumField(): number {
@@ -1049,7 +1064,13 @@ export class Value {
       fieldVal = null
     }
     // Pass parent struct and field name so Set() can update the struct
-    return new Value(fieldVal, field.Type, undefined, parentObj, fieldKey)
+    return new Value(
+      fieldVal,
+      field.Type,
+      undefined,
+      parentObj,
+      fieldKey,
+    ).withAddressable(this._addressable)
   }
 
   public FieldByIndex(index: $.Slice<number>): Value {
@@ -1145,7 +1166,7 @@ export class Value {
   }
 
   public UnsafeAddr(): number | $.OwnedPointerHandle<ReflectValue> {
-    if (!this.CanAddr()) {
+    if (!this.canTakeAddress()) {
       throw new ValueError({ Kind: this.Kind(), Method: 'UnsafeAddr' })
     }
     if (this._parentStruct && this._fieldName) {
@@ -1196,17 +1217,27 @@ export class Value {
     return this.Type().ConvertibleTo(t)
   }
 
+  // CanAddr reports whether v is addressable, as in Go.
   public CanAddr(): boolean {
+    return this._addressable
+  }
+
+  // canTakeAddress reports whether Addr and UnsafeAddr can produce a pointer
+  // to v. It is more permissive than CanAddr: any value with storage can be
+  // referenced in GoScript, even one Go would not consider addressable.
+  private canTakeAddress(): boolean {
     return (
-      this.Kind() !== Ptr &&
-      (this._parentVarRef !== undefined ||
-        (this._parentStruct !== undefined && this._fieldName !== undefined) ||
-        this._value !== null)
+      this._addressable ||
+      (this.Kind() !== Ptr &&
+        (this._parentVarRef !== undefined ||
+          (this._parentStruct !== undefined &&
+            this._fieldName !== undefined) ||
+          this._value !== null))
     )
   }
 
   public Addr(): Value {
-    if (!this.CanAddr()) {
+    if (!this.canTakeAddress()) {
       throw new Error('reflect: call of reflect.Value.Addr on invalid Value')
     }
     const ptrType = PointerTo(this.Type())
@@ -1215,6 +1246,10 @@ export class Value {
     }
     if (this._parentVarRef) {
       return new Value(this._parentVarRef, ptrType)
+    }
+    // A pointer to a struct is the struct object itself.
+    if (this.Kind() === Struct) {
+      return new Value(this._value, ptrType)
     }
     return new Value($.varRef(this._value), ptrType)
   }
@@ -4444,8 +4479,18 @@ function getTypeOf(value: ReflectValue): Type {
         return new BasicType(Interface, 'interface{}', 16)
       }
 
-      // Check for VarRef (pointer type in GoScript)
+      // Check for VarRef (pointer type in GoScript). Its static pointer type,
+      // when the compiler tagged it, keeps an interface element type such as
+      // *any, which the current element value does not show.
       if ($.isVarRef(value)) {
+        const tagged = (value as { __goTypeInfo?: $.TypeInfo | string })
+          .__goTypeInfo
+        if (tagged !== undefined) {
+          const taggedType = typeFromTypeInfo(tagged)
+          if (taggedType.Kind() === Ptr) {
+            return taggedType
+          }
+        }
         const elemType = getTypeOf(value.value as ReflectValue)
         return new PointerType(elemType)
       }
@@ -4606,11 +4651,20 @@ function getTypeOf(value: ReflectValue): Type {
 }
 
 // TypeOf Exported functions as required by godoc.txt.
-export function TypeOf(i: ReflectValue): Type {
+// TypeOf returns the dynamic type of i, or nil for a nil interface value.
+export function TypeOf(i: ReflectValue): Type | null {
+  if (i === null || i === undefined) {
+    return null
+  }
   return internType(getTypeOf(i))
 }
 
+// ValueOf returns a Value holding i, or the zero Value for a nil interface
+// value.
 export function ValueOf(i: ReflectValue): Value {
+  if (i === null || i === undefined) {
+    return new Value()
+  }
   const typ = internType(getTypeOf(i))
   if ($.isNamedValueBox(i)) {
     // Named interface boxes contain Go values, which are all reflectable.

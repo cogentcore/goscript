@@ -88,10 +88,10 @@ export function valueSeq(v: Value): iter.Seq<Value> {
       if (t.Elem().Kind() !== Array) {
         break
       }
-      return rangeNum(v.Elem().Len(), TypeOf(0))
+      return rangeNum(v.Elem().Len(), TypeOf(0)!)
     case Array:
     case Slice:
-      return rangeNum(v.Len(), TypeOf(0))
+      return rangeNum(v.Len(), TypeOf(0)!)
     case String:
       return async (_yield: ((v: Value) => iter.YieldResult) | null) => {
         for (const [i] of $.rangeString(v.String())) {
