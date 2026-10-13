@@ -3,11 +3,14 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
+import * as reflect from "@goscript/reflect/index.js"
+
 import * as runtime from "@goscript/runtime/index.js"
 
 import * as strconv from "@goscript/strconv/index.js"
 
 import * as strings from "@goscript/strings/index.js"
+import "@goscript/reflect/index.js"
 import "@goscript/runtime/index.js"
 import "@goscript/strconv/index.js"
 import "@goscript/strings/index.js"
@@ -24,6 +27,13 @@ export function logSomething(): string {
 	return callerInfo()
 }
 
+export function funcName(f: any): string {
+	return runtime.Func.prototype.Name.call($.pointerValue<runtime.Func>(runtime.FuncForPC($.uint($.markAsStructValue($.cloneStructValue(reflect.ValueOf(f))).Pointer(), 64))))
+}
+
+export function helperFunc(): void {
+}
+
 export async function main(): globalThis.Promise<void> {
 	let __goscriptTuple1: any = runtime.Caller(0)
 	let pc = $.uint(__goscriptTuple1[0], 64)
@@ -37,6 +47,8 @@ export async function main(): globalThis.Promise<void> {
 
 	let info = logSomething()
 	await $.println("info:", !$.stringEqual(info, ""))
+
+	await $.println("funcname:", strings.Contains(funcName($.interfaceValue(helperFunc, "func()", ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo))), "helperFunc"))
 
 	let pcs: $.Slice<number> = $.makeSlice<number>(8, undefined, "number")
 	let n = runtime.Callers(1, pcs)

@@ -25,6 +25,20 @@ export type VarRef<T> = {
 }
 
 const pointerAddressStride = 0x100000000
+
+// functionsAtAddress maps the address reflect gives a function value, as
+// Value.Pointer, to the function, so that runtime.FuncForPC can name it.
+const functionsAtAddress = new Map<number, WeakRef<object>>()
+
+// registerFunctionAddress records that the function value fn has address.
+export function registerFunctionAddress(address: number, fn: object): void {
+  functionsAtAddress.set(address, new WeakRef(fn))
+}
+
+// functionAtAddress returns the function value registered at address.
+export function functionAtAddress(address: number): object | undefined {
+  return functionsAtAddress.get(address)?.deref()
+}
 const pointerAddresses = new WeakMap<object, number>()
 const fieldReferences = new WeakMap<
   object,

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"reflect"
 	"runtime"
 	"strconv"
 	"strings"
@@ -18,6 +19,13 @@ func logSomething() string {
 	return callerInfo()
 }
 
+// funcName names a function value, as Cogent Core's types.FuncName does.
+func funcName(f any) string {
+	return runtime.FuncForPC(reflect.ValueOf(f).Pointer()).Name()
+}
+
+func helperFunc() {}
+
 func main() {
 	pc, file, line, ok := runtime.Caller(0)
 	println("caller ok:", ok, pc != 0, file != "", line > 0)
@@ -27,6 +35,8 @@ func main() {
 
 	info := logSomething()
 	println("info:", info != "")
+
+	println("funcname:", strings.Contains(funcName(helperFunc), "helperFunc"))
 
 	pcs := make([]uintptr, 8)
 	n := runtime.Callers(1, pcs)

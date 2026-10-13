@@ -1138,7 +1138,12 @@ export class Value {
         return 0
       }
     }
-    if (typeof this._value === 'object' || typeof this._value === 'function') {
+    if (typeof this._value === 'function') {
+      const address = pointerAddress(this._value)
+      $.registerFunctionAddress(address, this._value)
+      return address
+    }
+    if (typeof this._value === 'object') {
       return pointerAddress(this._value)
     }
     return 0
