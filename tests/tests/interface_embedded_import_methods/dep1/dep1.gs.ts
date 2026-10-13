@@ -6,6 +6,8 @@ import * as $ from "@goscript/builtin/index.js"
 import * as dep2 from "@goscript/github.com/s4wave/goscript/tests/tests/interface_embedded_import_methods/dep2/index.js"
 import "@goscript/github.com/s4wave/goscript/tests/tests/interface_embedded_import_methods/dep2/index.js"
 
+$.registerTypePackagePath("github.com/s4wave/goscript/tests/tests/interface_embedded_import_methods/dep1", ["dep1.Base"])
+
 export type Base = {
 	Use(_p0: dep2.Value | null): dep2.Result | null
 }

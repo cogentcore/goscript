@@ -3,6 +3,8 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
+$.registerTypePackagePath("github.com/s4wave/goscript/tests/tests/import_alias_type_assert_shadow/dep", ["dep.Thing"])
+
 export class Thing {
 	public get Value(): number {
 		return this._fields.Value

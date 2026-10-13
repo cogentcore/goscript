@@ -3,6 +3,8 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
+$.registerTypePackagePath("github.com/s4wave/goscript/tests/tests/defined_external_struct_wrapper/dep", ["dep.hidden", "dep.Public"])
+
 export class hidden {
 	public get label(): string {
 		return this._fields.label

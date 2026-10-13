@@ -322,6 +322,43 @@ function registerTypeInfo(name: string, typeInfo: TypeInfo): void {
   typeRegistry.set(name, typeInfo)
 }
 
+// typePackagePaths maps a named type's runtime name, such as
+// "testdata.Node", to its full package path, for packages whose path
+// differs from their name.
+const typePackagePaths = new Map<string, string>()
+
+/**
+ * registerTypePackagePath records the full package path of the named types
+ * declared in a package whose path differs from its name.
+ *
+ * @param pkgPath The full package path, as reported by reflect PkgPath.
+ * @param typeNames The runtime names of the types, such as "pkg.Type".
+ */
+export function registerTypePackagePath(
+  pkgPath: string,
+  typeNames: string[],
+): void {
+  for (const typeName of typeNames) {
+    typePackagePaths.set(typeName, pkgPath)
+  }
+}
+
+/**
+ * typePackagePath returns the full package path of the named type with the
+ * given runtime name, such as "pkg.Type" or "pkg.Generic[int]", or "" when
+ * the name has no package qualifier.
+ */
+export function typePackagePath(typeName: string): string {
+  const bracket = typeName.indexOf('[')
+  const baseName = bracket >= 0 ? typeName.substring(0, bracket) : typeName
+  const registered = typePackagePaths.get(baseName)
+  if (registered !== undefined) {
+    return registered
+  }
+  const dotIndex = baseName.lastIndexOf('.')
+  return dotIndex > 0 ? baseName.substring(0, dotIndex) : ''
+}
+
 /**
  * registerNamedType registers the runtime type information of a named map,
  * slice or array type under its Go type string, so that code given only the

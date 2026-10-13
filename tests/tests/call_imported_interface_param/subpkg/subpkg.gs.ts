@@ -3,6 +3,8 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
+$.registerTypePackagePath("github.com/s4wave/goscript/tests/tests/call_imported_interface_param/subpkg", ["subpkg.Writer"])
+
 export type Writer = {
 	Write(_p0: $.Slice<number>): [number, $.GoError]
 }

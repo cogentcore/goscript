@@ -34,6 +34,12 @@ type loweredFile struct {
 	varInits []packageInitCall
 	// initFuncs call the init functions declared in this file.
 	initFuncs []packageInitCall
+	// typePackagePath is the package path registered for typePackageNames
+	// when it differs from the package name, so that reflect reports it.
+	typePackagePath string
+	// typePackageNames are the runtime names of the named types declared in
+	// this file.
+	typePackageNames []string
 }
 
 // packageInitCall is a call that initializes a package: the initializer of a

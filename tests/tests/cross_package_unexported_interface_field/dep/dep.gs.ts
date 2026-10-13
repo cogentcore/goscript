@@ -3,6 +3,8 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
+$.registerTypePackagePath("github.com/s4wave/goscript/tests/tests/cross_package_unexported_interface_field/dep", ["dep.hidden", "dep.impl", "dep.Holder"])
+
 export type hidden = {
 	Ping(): string
 }

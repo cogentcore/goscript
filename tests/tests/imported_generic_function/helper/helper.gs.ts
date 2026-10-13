@@ -3,6 +3,8 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
+$.registerTypePackagePath("github.com/s4wave/goscript/tests/tests/imported_generic_function/helper", ["helper.Box", "helper.Value", "helper.IntValue"])
+
 export type Value = {
 	GetValue(): number
 }

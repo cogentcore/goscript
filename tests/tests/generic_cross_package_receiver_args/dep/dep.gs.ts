@@ -3,6 +3,8 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
+$.registerTypePackagePath("github.com/s4wave/goscript/tests/tests/generic_cross_package_receiver_args/dep", ["dep.Provider", "dep.Impl", "dep.Keyed", "dep.Wrapper"])
+
 export type Provider = {
 	Value(__typeArgs: $.GenericTypeArgs | undefined): any
 }

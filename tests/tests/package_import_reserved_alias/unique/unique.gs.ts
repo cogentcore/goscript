@@ -3,6 +3,8 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
+$.registerTypePackagePath("github.com/s4wave/goscript/tests/tests/package_import_reserved_alias/unique", ["unique.Box"])
+
 export class Box {
 	public get Value(): number {
 		return this._fields.Value

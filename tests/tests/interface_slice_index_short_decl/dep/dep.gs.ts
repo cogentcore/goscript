@@ -3,6 +3,8 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
+$.registerTypePackagePath("github.com/s4wave/goscript/tests/tests/interface_slice_index_short_decl/dep", ["dep.Ref"])
+
 export type Ref = {
 	Key(): any
 }

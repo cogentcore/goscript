@@ -3,6 +3,8 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
+$.registerTypePackagePath("github.com/s4wave/goscript/tests/tests/variadic_imported_unexported_option/subpkg", ["subpkg.option", "subpkg.Thing"])
+
 export type option = ((_p0: Thing | $.VarRef<Thing> | null) => void) | null
 
 export class Thing {
