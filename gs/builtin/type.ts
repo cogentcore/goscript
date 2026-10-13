@@ -2219,6 +2219,39 @@ export function namedValueMethods(
   return namedValueMethodRegistry.get(typeName)
 }
 
+/**
+ * typeParamPointerInterfaceValue converts a pointer to a value of a type
+ * parameter to an interface value. When the type argument is a named
+ * non-struct type with a registered method set, the pointer is boxed with the
+ * method set of a pointer to the type argument, as the compiler cannot know it
+ * statically. Otherwise, the pointer is converted as any other pointer.
+ */
+export function typeParamPointerInterfaceValue<T>(
+  value: unknown,
+  typeArg: GenericTypeDescriptor | undefined,
+  typeName: string,
+  typeInfo?: TypeInfo | string,
+): T {
+  const argInfo = typeArg?.type
+  const argName =
+    typeof argInfo === 'string' ? argInfo
+    : argInfo !== undefined ? (argInfo as { typeName?: string }).typeName
+    : undefined
+  if (argName !== undefined && argInfo !== undefined) {
+    const registered = namedValueMethods('*' + argName)
+    if (registered !== undefined) {
+      return namedValueInterfaceValue<T>(
+        value,
+        '*' + argName,
+        registered.methods,
+        pointerType(argInfo),
+        registered.signatures,
+      )
+    }
+  }
+  return interfaceValue<T>(value, typeName, typeInfo)
+}
+
 export function namedValueInterfaceValue<T>(
   value: unknown,
   typeName: string,

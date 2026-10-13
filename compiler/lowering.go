@@ -12173,6 +12173,9 @@ func (o *LoweringOwner) lowerValueForTargetTypes(
 	if wrapper := o.lowerNumericInterfaceWrapper(targetType, sourceType, value); wrapper != "" {
 		return wrapper
 	}
+	if wrapper := o.lowerTypeParamPointerInterfaceValue(ctx, targetType, sourceType, value); wrapper != "" {
+		return wrapper
+	}
 	if isInterfaceType(targetType) && isStructValueType(sourceType) {
 		if cloneStructValue {
 			value = o.lowerStructClone(value)
@@ -12234,6 +12237,35 @@ func (o *LoweringOwner) lowerValueForTargetTypes(
 		}
 	}
 	return value
+}
+
+// lowerTypeParamPointerInterfaceValue converts a pointer to a value of a type
+// parameter in scope to an interface using the runtime type argument, so that
+// the interface value has the method set of a pointer to the type argument.
+func (o *LoweringOwner) lowerTypeParamPointerInterfaceValue(
+	ctx lowerFileContext,
+	targetType types.Type,
+	sourceType types.Type,
+	value string,
+) string {
+	// A type parameter target keeps the value as is.
+	if _, ok := types.Unalias(targetType).(*types.TypeParam); ok || !isInterfaceType(targetType) {
+		return ""
+	}
+	ptr, ok := types.Unalias(sourceType).(*types.Pointer)
+	if !ok {
+		return ""
+	}
+	typeParam, ok := types.Unalias(ptr.Elem()).(*types.TypeParam)
+	if !ok || !typeParamInScope(ctx, typeParam) {
+		return ""
+	}
+	helper := o.runtimeOwner.QualifiedHelper(RuntimeHelperTypeParamPointerInterfaceValue)
+	if target := o.tsTypeFor(ctx, targetType); target != "any" {
+		helper += "<" + target + ">"
+	}
+	return helper + "(" + value + ", __typeArgs?.[" + strconv.Quote(typeParam.Obj().Name()) + "], " +
+		strconv.Quote(goRuntimeTypeString(sourceType)) + ", " + o.runtimeTypeInfoExpr(sourceType) + ")"
 }
 
 func (o *LoweringOwner) lowerInterfaceValueExpr(
