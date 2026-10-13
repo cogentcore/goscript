@@ -6,6 +6,7 @@ import (
 	"slices"
 	"strconv"
 	"strings"
+	"time"
 )
 
 // Holder has a map field that Unmarshal merges into.
@@ -20,6 +21,12 @@ type Enc struct {
 	Frames [][]byte
 	Named  map[string][]byte
 	Nested *Enc
+}
+
+// Event has a time field, which JSON encodes through its MarshalJSON.
+type Event struct {
+	Name string
+	At   time.Time
 }
 
 type Person struct {
@@ -93,6 +100,7 @@ func main() {
 	println("merge field:", len(h.Tags), h.Tags["keep"], h.Tags["add"])
 
 	byteSliceFields()
+	timeField()
 
 	println("encoding/json test finished")
 }
@@ -120,4 +128,14 @@ func byteSliceFields() {
 
 	err = json.Unmarshal([]byte(`{"Image":null}`), d)
 	println("null image:", err == nil, d.Image == nil)
+}
+
+// timeField round-trips a struct with a time.Time field.
+func timeField() {
+	at := time.Date(2025, time.May, 15, 1, 10, 42, 123456789, time.UTC)
+	b, err := json.Marshal(Event{Name: "win", At: at})
+	println(string(b), err == nil)
+	var ev Event
+	err = json.Unmarshal(b, &ev)
+	println("event:", err == nil, ev.Name, ev.At.Equal(at))
 }

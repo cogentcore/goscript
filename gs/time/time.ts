@@ -588,6 +588,67 @@ export class Time {
     return this.AppendBinary(null)
   }
 
+  // MarshalJSON implements json.Marshaler. The time is a quoted string in
+  // RFC 3339 format with sub-second precision.
+  public MarshalJSON(): [$.Bytes, $.GoError] {
+    const [text, err] = this.formatRFC3339('Time.MarshalJSON')
+    if (err !== null) {
+      return [null, err]
+    }
+    return [$.stringToBytes('"' + text + '"'), null]
+  }
+
+  // UnmarshalJSON implements json.Unmarshaler. The time must be a quoted
+  // string in RFC 3339 format; null is a no-op.
+  public UnmarshalJSON(data: $.Bytes): $.GoError {
+    const text = $.bytesToString(data)
+    if (text === 'null') {
+      return null
+    }
+    if (text.length < 2 || text[0] !== '"' || text[text.length - 1] !== '"') {
+      return $.newError('Time.UnmarshalJSON: input is not a JSON string')
+    }
+    return this.setFromRFC3339(text.slice(1, -1))
+  }
+
+  // MarshalText implements encoding.TextMarshaler. The time is formatted
+  // in RFC 3339 format with sub-second precision.
+  public MarshalText(): [$.Bytes, $.GoError] {
+    const [text, err] = this.formatRFC3339('Time.MarshalText')
+    if (err !== null) {
+      return [null, err]
+    }
+    return [$.stringToBytes(text), null]
+  }
+
+  // UnmarshalText implements encoding.TextUnmarshaler. The time must be in
+  // RFC 3339 format.
+  public UnmarshalText(data: $.Bytes): $.GoError {
+    return this.setFromRFC3339($.bytesToString(data))
+  }
+
+  // formatRFC3339 formats t in RFC 3339 format with sub-second precision,
+  // which has a four-digit year. method prefixes the error for a year outside
+  // that range.
+  private formatRFC3339(method: string): [string, $.GoError] {
+    const year = this.Year()
+    if (year < 0 || year > 9999) {
+      return ['', $.newError(method + ': year outside of range [0,9999]')]
+    }
+    return [this.Format(RFC3339Nano), null]
+  }
+
+  // setFromRFC3339 parses value in RFC 3339 format and sets t to the result,
+  // which is the zero Time if value does not parse.
+  private setFromRFC3339(value: string): $.GoError {
+    const [parsed, err] = Parse(RFC3339, value)
+    this._date = parsed._date
+    this._nsec = parsed._nsec
+    this._monotonic = undefined
+    this._location = parsed._location
+    return err
+  }
+
   // Sub returns the duration t-u
   // If both times have monotonic readings, use them for accurate duration calculation
   public Sub(u: Time): Duration {

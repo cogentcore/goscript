@@ -14,4 +14,6 @@ frames: 2 2 5
 named: 2 7
 nested: hi
 null image: true true
+{"Name":"win","At":"2025-05-15T01:10:42.123456789Z"} true
+event: true win true
 encoding/json test finished

@@ -58,4 +58,27 @@ func main() {
 	println("parsed nano", parsed.UTC().Format(time.RFC3339Nano))
 	_, badParseErr := time.Parse(time.RFC3339, "not-a-time")
 	println("bad time err", badParseErr != nil)
+
+	marshal()
+}
+
+// marshal round-trips a time through its JSON and text forms.
+func marshal() {
+	t := time.Date(2025, time.May, 15, 1, 10, 42, 123456789, time.UTC)
+	b, err := t.MarshalJSON()
+	println("marshal json", string(b), err == nil)
+	var u time.Time
+	err = u.UnmarshalJSON(b)
+	println("unmarshal json", err == nil, u.Equal(t))
+	println("unmarshal json null", u.UnmarshalJSON([]byte("null")) == nil, u.Equal(t))
+	println("unmarshal json number err", u.UnmarshalJSON([]byte("12")) != nil)
+
+	text, err := t.MarshalText()
+	println("marshal text", string(text), err == nil)
+	var v time.Time
+	println("unmarshal text", v.UnmarshalText(text) == nil, v.Equal(t))
+	println("unmarshal bad text", v.UnmarshalText([]byte("bad")) != nil, v.IsZero())
+
+	_, err = time.Date(10000, time.January, 1, 0, 0, 0, 0, time.UTC).MarshalJSON()
+	println("marshal json year 10000 err", err.Error())
 }

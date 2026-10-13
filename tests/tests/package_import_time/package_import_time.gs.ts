@@ -63,6 +63,33 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("parsed nano", $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(parsed)).UTC())).Format(time.RFC3339Nano))
 	let [, badParseErr] = time.Parse(time.RFC3339, "not-a-time")
 	await $.println("bad time err", badParseErr != null)
+
+	await marshal()
+}
+
+export async function marshal(): globalThis.Promise<void> {
+	let t = $.markAsStructValue($.cloneStructValue(time.Date(2025, 5, 15, 1, 10, 42, 123456789, time.UTC)))
+	let __goscriptTuple0: any = $.markAsStructValue($.cloneStructValue(t)).MarshalJSON()
+	let b: $.Slice<number> = __goscriptTuple0[0]
+	let err = __goscriptTuple0[1]
+	await $.println("marshal json", $.bytesToString(b), err == null)
+	let u: $.VarRef<time.Time> = $.varRef($.markAsStructValue(new time.Time()))
+	err = u.value.UnmarshalJSON(b)
+	await $.println("unmarshal json", err == null, $.markAsStructValue($.cloneStructValue(u.value)).Equal($.markAsStructValue($.cloneStructValue(t))))
+	await $.println("unmarshal json null", u.value.UnmarshalJSON(new Uint8Array([110, 117, 108, 108])) == null, $.markAsStructValue($.cloneStructValue(u.value)).Equal($.markAsStructValue($.cloneStructValue(t))))
+	await $.println("unmarshal json number err", u.value.UnmarshalJSON(new Uint8Array([49, 50])) != null)
+
+	let __goscriptTuple1: any = $.markAsStructValue($.cloneStructValue(t)).MarshalText()
+	let text: $.Slice<number> = __goscriptTuple1[0]
+	err = __goscriptTuple1[1]
+	await $.println("marshal text", $.bytesToString(text), err == null)
+	let v: $.VarRef<time.Time> = $.varRef($.markAsStructValue(new time.Time()))
+	await $.println("unmarshal text", v.value.UnmarshalText(text) == null, $.markAsStructValue($.cloneStructValue(v.value)).Equal($.markAsStructValue($.cloneStructValue(t))))
+	await $.println("unmarshal bad text", v.value.UnmarshalText(new Uint8Array([98, 97, 100])) != null, $.markAsStructValue($.cloneStructValue(v.value)).IsZero())
+
+	let __goscriptTuple2: any = $.markAsStructValue($.cloneStructValue(time.Date(10000, 1, 1, 0, 0, 0, 0, time.UTC))).MarshalJSON()
+	err = __goscriptTuple2[1]
+	await $.println("marshal json year 10000 err", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 }
 
 if ($.isMainScript(import.meta)) {

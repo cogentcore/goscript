@@ -28,3 +28,11 @@ max duration converted true
 parsed time 2025-05-15T01:10:42Z true
 parsed nano 2025-05-15T01:10:42Z
 bad time err true
+marshal json "2025-05-15T01:10:42.123456789Z" true
+unmarshal json true true
+unmarshal json null true true
+unmarshal json number err true
+marshal text 2025-05-15T01:10:42.123456789Z true
+unmarshal text true true
+unmarshal bad text true true
+marshal json year 10000 err Time.MarshalJSON: year outside of range [0,9999]

@@ -12,11 +12,14 @@ import * as slices from "@goscript/slices/index.js"
 import * as strconv from "@goscript/strconv/index.js"
 
 import * as strings from "@goscript/strings/index.js"
+
+import * as time from "@goscript/time/index.js"
 import "@goscript/encoding/json/index.js"
 import "@goscript/fmt/index.js"
 import "@goscript/slices/index.js"
 import "@goscript/strconv/index.js"
 import "@goscript/strings/index.js"
+import "@goscript/time/index.js"
 
 export class Holder {
 	public declare Tags: globalThis.Map<string, number> | null
@@ -91,6 +94,40 @@ export class Enc {
 		() => [],
 		Enc,
 		() => [{ name: "Width", key: "Width", type: /* @__PURE__ */ $.basicType("int") }, { name: "Image", key: "Image", type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }, { name: "Frames", key: "Frames", type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))) }, { name: "Named", key: "Named", type: /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))) }, { name: "Nested", key: "Nested", type: /* @__PURE__ */ $.pointerType("main.Enc") }]
+	)
+}
+
+export class Event {
+	public declare Name: string
+
+	public declare At: time.Time
+
+	public _fields: {
+		Name: string
+		At: time.Time
+	}
+
+	constructor(init?: Partial<{Name?: string, At?: time.Time}>) {
+		this._fields = {
+			Name: init?.Name ?? ("" as string),
+			At: init?.At ? $.markAsStructValue($.cloneStructValue(init.At)) : $.markAsStructValue(new time.Time())
+		}
+	}
+
+	public clone(): Event {
+		return $.markAsStructValue(new Event(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["Name", "At"])
+	}
+
+	static __typeInfo = $.registerStructType(
+		"main.Event",
+		() => new Event(),
+		() => [],
+		Event,
+		() => [{ name: "Name", key: "Name", type: /* @__PURE__ */ $.basicType("string") }, { name: "At", key: "At", type: "time.Time" }]
 	)
 }
 
@@ -208,6 +245,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("merge field:", $.len(h.value.Tags), $.mapGet<string, number, number>(h.value.Tags, "keep", 0)[0], $.mapGet<string, number, number>(h.value.Tags, "add", 0)[0])
 
 	await byteSliceFields()
+	await timeField()
 
 	await $.println("encoding/json test finished")
 }
@@ -229,6 +267,17 @@ export async function byteSliceFields(): globalThis.Promise<void> {
 
 	err = json.Unmarshal(new Uint8Array([123, 34, 73, 109, 97, 103, 101, 34, 58, 110, 117, 108, 108, 125]), $.interfaceValue(d, "*main.Enc", /* @__PURE__ */ $.pointerType("main.Enc")))
 	await $.println("null image:", err == null, $.pointerValue<Enc>(d).Image == null)
+}
+
+export async function timeField(): globalThis.Promise<void> {
+	let at = $.markAsStructValue($.cloneStructValue(time.Date(2025, 5, 15, 1, 10, 42, 123456789, time.UTC)))
+	let __goscriptTuple3: any = json.Marshal($.interfaceValue($.markAsStructValue(new Event({Name: "win", At: $.markAsStructValue($.cloneStructValue(at))})), "main.Event", "main.Event"))
+	let b: $.Slice<number> = __goscriptTuple3[0]
+	let err = __goscriptTuple3[1]
+	await $.println($.bytesToString(b), err == null)
+	let ev: $.VarRef<Event> = $.varRef($.markAsStructValue(new Event()))
+	err = json.Unmarshal(b, $.interfaceValue(ev, "*main.Event", /* @__PURE__ */ $.pointerType("main.Event")))
+	await $.println("event:", err == null, ev.value.Name, $.markAsStructValue($.cloneStructValue(ev.value.At)).Equal($.markAsStructValue($.cloneStructValue(at))))
 }
 
 if ($.isMainScript(import.meta)) {

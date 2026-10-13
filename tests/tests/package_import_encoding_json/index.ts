@@ -1,1 +1,1 @@
-export { Enc, Holder, Person } from "./package_import_encoding_json.gs.ts"
+export { Enc, Event, Holder, Person } from "./package_import_encoding_json.gs.ts"
