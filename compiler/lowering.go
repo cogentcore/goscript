@@ -13715,6 +13715,27 @@ func (o *LoweringOwner) genericReceiverTypeArgsExprForMethod(
 	return o.genericTypeArgsLiteral(entries)
 }
 
+// genericTypeArgsExprForNamed returns the generic type arguments literal of
+// an instantiated named type, or "" if it is not generic.
+func (o *LoweringOwner) genericTypeArgsExprForNamed(
+	ctx lowerFileContext,
+	named *types.Named,
+	seen map[types.Type]bool,
+) string {
+	if named == nil || named.TypeArgs() == nil || named.TypeArgs().Len() == 0 {
+		return ""
+	}
+	params := named.Origin().TypeParams()
+	if params == nil || params.Len() != named.TypeArgs().Len() {
+		return ""
+	}
+	entries := make([]string, 0, params.Len())
+	for idx := range params.Len() {
+		entries = append(entries, params.At(idx).Obj().Name()+": "+o.genericTypeDescriptorExprWithSeen(ctx, named.TypeArgs().At(idx), seen))
+	}
+	return o.genericTypeArgsLiteral(entries)
+}
+
 func (o *LoweringOwner) genericReceiverTypeArgsExpr(ctx lowerFileContext, selection *types.Selection) string {
 	if selection == nil || selection.Obj() == nil {
 		return ""
@@ -14677,12 +14698,18 @@ func (o *LoweringOwner) genericMethodDescriptorsForType(
 	// Describe each method of the type's method set.
 	methodSet := types.NewMethodSet(methodSetType)
 	methods := make([]string, 0, methodSet.Len())
-	for method := range methodSet.Methods() {
-		method, _ := method.Obj().(*types.Func)
+	for selection := range methodSet.Methods() {
+		method, _ := selection.Obj().(*types.Func)
 		if method == nil {
 			continue
 		}
 		genericArgs := o.genericReceiverTypeArgsExprForMethod(ctx, method, methodSetType, seen)
+		if len(selection.Index()) > 1 {
+			// A promoted method is called through the embedding type's
+			// forwarder, which takes that type's own type arguments, if
+			// any, and supplies the embedded type's itself.
+			genericArgs = o.genericTypeArgsExprForNamed(ctx, receiverNamedType(methodSetType), seen)
+		}
 		if namedStructType(named) != nil || isInterfaceType(named) {
 			// A struct receiver may arrive as a VarRef when the caller
 			// converted the address of a variable to the constraint's
