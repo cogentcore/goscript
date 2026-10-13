@@ -7824,7 +7824,7 @@ func (o *LoweringOwner) lowerStructEqualityExpr(ctx lowerFileContext, expr *ast.
 	if !isStructComparableType(leftType) || !isStructComparableType(rightType) {
 		return "", false
 	}
-	value := o.runtimeOwner.QualifiedHelper(RuntimeHelperComparableEqual) + "(" + left + ", " + right + ")"
+	value := o.runtimeOwner.QualifiedHelper(RuntimeHelperStructEqual) + "(" + left + ", " + right + ")"
 	if expr.Op == token.NEQ {
 		value = "!" + value
 	}
