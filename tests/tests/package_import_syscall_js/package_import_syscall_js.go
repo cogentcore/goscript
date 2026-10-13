@@ -36,4 +36,30 @@ func main() {
 		}()
 		global.Get("JSON").Call("parse", "{")
 	}()
+
+	funcOfValues()
+}
+
+// wrap passes a function value, rather than a function literal, to
+// js.FuncOf, as wrapper packages do.
+func wrap(fn func(this js.Value, args []js.Value) any) js.Func {
+	jsFunc := func(this js.Value, args []js.Value) any {
+		return fn(this, args)
+	}
+	return js.FuncOf(jsFunc)
+}
+
+// funcOfValues wraps a function parameter and a function variable.
+func funcOfValues() {
+	add := wrap(func(this js.Value, args []js.Value) any {
+		return args[0].Int() + args[1].Int()
+	})
+	defer add.Release()
+	println("wrapped type:", add.Type().String())
+
+	var fn func(this js.Value, args []js.Value) any
+	fn = func(this js.Value, args []js.Value) any { return "from variable" }
+	direct := js.FuncOf(fn)
+	defer direct.Release()
+	println("direct:", direct.Invoke().String())
 }

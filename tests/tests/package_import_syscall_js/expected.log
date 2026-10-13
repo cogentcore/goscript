@@ -4,3 +4,5 @@ length: 3
 callback: 42
 bytes: ABC
 recovered: SyntaxError
+wrapped type: function
+direct: from variable
