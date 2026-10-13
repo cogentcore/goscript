@@ -89,9 +89,9 @@ export class Lead {
 
 export function Level_Rank(l: Level, prefix: string): string {
 	if (l > 2) {
-		return prefix + "senior"
+		return $.concatString(prefix, "senior")
 	}
-	return prefix + "junior"
+	return $.concatString(prefix, "junior")
 }
 
 export async function main(): globalThis.Promise<void> {

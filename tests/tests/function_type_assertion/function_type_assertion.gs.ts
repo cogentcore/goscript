@@ -40,7 +40,7 @@ export class FuncContainer {
 }
 
 export function greet(name: string): string {
-	return "Hello, " + name
+	return $.concatString("Hello, ", name)
 }
 
 export function add(a: number, b: number): number {

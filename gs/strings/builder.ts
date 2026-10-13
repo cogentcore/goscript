@@ -37,7 +37,7 @@ export class Builder {
 
   // Len returns the number of accumulated bytes; b.Len() == len(b.String()).
   public Len(): number {
-    return builderValue(this)._content.length
+    return $.len(builderValue(this)._content)
   }
 
   // Cap returns the capacity of the builder's underlying byte slice. It is the
@@ -45,7 +45,7 @@ export class Builder {
   // already written.
   public Cap(): number {
     // For simplicity, return the current length since JavaScript strings are dynamic
-    return builderValue(this)._content.length
+    return $.len(builderValue(this)._content)
   }
 
   // Reset resets the Builder to be empty.
@@ -73,8 +73,7 @@ export class Builder {
     const builder = builderValue(this)
     // Convert byte array to string
     const bytes = $.bytesToUint8Array(p)
-    const str = new TextDecoder('utf-8').decode(bytes)
-    builder._content += str
+    builder._content = $.concatString(builder._content, $.bytesToString(bytes))
     return [$.len(p), null]
   }
 
@@ -83,7 +82,10 @@ export class Builder {
   public WriteByte(c: number): $.GoError {
     builderValue(this).copyCheck()
     const builder = builderValue(this)
-    builder._content += String.fromCharCode(c)
+    builder._content = $.concatString(
+      builder._content,
+      $.bytesToString(Uint8Array.of(c)),
+    )
     return null
   }
 
@@ -92,8 +94,8 @@ export class Builder {
   public WriteRune(r: number): [number, $.GoError] {
     builderValue(this).copyCheck()
     const builder = builderValue(this)
-    const str = String.fromCodePoint(r)
-    builder._content += str
+    const str = $.runeToString(r)
+    builder._content = $.concatString(builder._content, str)
     // Return the byte length of the UTF-8 encoding
     const byteLength = new TextEncoder().encode(str).length
     return [byteLength, null]
@@ -104,8 +106,8 @@ export class Builder {
   public WriteString(s: string): [number, $.GoError] {
     builderValue(this).copyCheck()
     const builder = builderValue(this)
-    builder._content += s
-    return [s.length, null]
+    builder._content = $.concatString(builder._content, s)
+    return [$.len(s), null]
   }
 
   // Register this type with the runtime type system

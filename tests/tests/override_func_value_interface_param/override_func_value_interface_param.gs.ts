@@ -68,7 +68,7 @@ export async function writeBytes(v: any, f: ((w: io.Writer | null) => Encoder | 
 	{
 		let err = await $.pointerValue<Exclude<Encoder, null>>((await f!($.interfaceValue<io.Writer | null>(b, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer"))))).Encode(v)
 		if (err != null) {
-			return "error: " + await $.pointerValue<Exclude<$.GoError, null>>(err).Error()
+			return $.concatString("error: ", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 		}
 	}
 	return b.value.String()

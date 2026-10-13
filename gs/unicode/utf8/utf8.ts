@@ -27,19 +27,31 @@ export function AppendRune(p: $.Bytes, r: number): Uint8Array {
 
 // DecodeLastRune unpacks the last UTF-8 encoding in p and returns the rune and its width in bytes.
 export function DecodeLastRune(p: $.Bytes): [number, number] {
-  const bytes = $.bytesToUint8Array(p)
-  if (bytes.length === 0) {
+  return decodeLastRune($.bytesToUint8Array(p))
+}
+
+// decodeLastRune implements DecodeLastRune as in Go: it backs up to the
+// start of the last rune and decodes it, or returns RuneError with width 1.
+function decodeLastRune(bytes: Uint8Array): [number, number] {
+  const end = bytes.length
+  if (end === 0) {
     return [RuneError, 0]
   }
-
-  // Simple implementation - find the start of the last rune
-  let start = bytes.length - 1
-  while (start > 0 && !RuneStart(bytes[start])) {
-    start--
+  let start = end - 1
+  if (bytes[start] < RuneSelf) {
+    return [bytes[start], 1]
   }
-
-  const [r, size] = DecodeRune(bytes.slice(start))
-  if (start + size !== bytes.length) {
+  const lim = Math.max(end - UTFMax, 0)
+  for (start--; start >= lim; start--) {
+    if (RuneStart(bytes[start])) {
+      break
+    }
+  }
+  if (start < 0) {
+    start = 0
+  }
+  const [r, size] = $.decodeRune(bytes.subarray(start, end))
+  if (start + size !== end) {
     return [RuneError, 1]
   }
   return [r, size]
@@ -47,70 +59,28 @@ export function DecodeLastRune(p: $.Bytes): [number, number] {
 
 // DecodeLastRuneInString is like DecodeLastRune but its input is a string.
 export function DecodeLastRuneInString(s: string): [number, number] {
-  if (s.length === 0) {
-    return [RuneError, 0]
-  }
-
-  // Use JavaScript's built-in Unicode handling
-  const chars = [...s]
-  if (chars.length === 0) {
-    return [RuneError, 0]
-  }
-
-  const lastChar = chars[chars.length - 1]
-  const codePoint = lastChar.codePointAt(0) || RuneError
-  const encoder = new TextEncoder()
-  const encoded = encoder.encode(lastChar)
-  return [codePoint, encoded.length]
+  return decodeLastRune($.stringToBytes(s))
 }
 
 // DecodeRune unpacks the first UTF-8 encoding in p and returns the rune and its width in bytes.
 export function DecodeRune(p: $.Bytes): [number, number] {
-  if (!p?.length) {
-    return [RuneError, 0]
-  }
-
-  if (p![0] < RuneSelf) {
-    return [p![0], 1]
-  }
-
-  // Convert p to Uint8Array to satisfy AllowsSharedBufferSource requirement
-  const bytes = $.normalizeBytes(p)
-
-  // Convert bytes to string and decode
-  const decoder = new TextDecoder('utf-8', { fatal: false })
-  const str = decoder.decode(bytes.slice(0, Math.min(4, bytes.length)))
-  if (str.length === 0 || str === '\uFFFD') {
-    return [RuneError, 1]
-  }
-
-  const codePoint = str.codePointAt(0) || RuneError
-  const char = String.fromCodePoint(codePoint)
-  const encoder = new TextEncoder()
-  const encoded = encoder.encode(char)
-  return [codePoint, encoded.length]
+  return $.decodeRune($.bytesToUint8Array(p))
 }
 
 // DecodeRuneInString is like DecodeRune but its input is a string.
 // Also accepts Bytes for Go's []byte to string conversion pattern.
 export function DecodeRuneInString(s: string | $.Bytes): [number, number] {
-  // Convert Bytes to string if necessary
-  const str = typeof s === 'string' ? s : $.bytesToString(s)
-  if (str.length === 0) {
-    return [RuneError, 0]
+  if (typeof s === 'string' && !$.isByteString(s)) {
+    if (s.length === 0) {
+      return [RuneError, 0]
+    }
+    const codePoint = s.codePointAt(0)!
+    if (codePoint < RuneSelf) {
+      return [codePoint, 1]
+    }
+    return [codePoint, RuneLen(codePoint)]
   }
-
-  const c = str.charCodeAt(0)
-  if (c < RuneSelf) {
-    return [c, 1]
-  }
-
-  // Use JavaScript's built-in Unicode handling
-  const codePoint = str.codePointAt(0) || RuneError
-  const char = String.fromCodePoint(codePoint)
-  const encoder = new TextEncoder()
-  const encoded = encoder.encode(char)
-  return [codePoint, encoded.length]
+  return $.decodeRune($.stringToBytes(s))
 }
 
 // EncodeRune writes into p (which must be large enough) the UTF-8 encoding of the rune.
@@ -142,55 +112,71 @@ export function EncodeRune(p: Uint8Array | $.Slice<number>, r: number): number {
 }
 
 // FullRune reports whether the bytes in p begin with a full UTF-8 encoding of a rune.
+// An invalid encoding is considered a full rune, since it converts to a
+// width-1 error rune.
 export function FullRune(p: $.Bytes): boolean {
-  if ($.len(p) === 0) {
+  return fullRune($.bytesToUint8Array(p))
+}
+
+// fullRune implements FullRune as in Go: only a prefix of a valid encoding
+// that is shorter than the encoding's size is not a full rune.
+function fullRune(bytes: Uint8Array): boolean {
+  const n = bytes.length
+  if (n === 0) {
     return false
   }
-
-  const first = $.indexStringOrBytes(p, 0)
-  if (first < RuneSelf) {
+  const b0 = bytes[0]
+  let size = 1
+  let lo = 0x80
+  let hi = 0xbf
+  if (b0 >= 0xc2 && b0 <= 0xdf) {
+    size = 2
+  } else if (b0 >= 0xe0 && b0 <= 0xef) {
+    size = 3
+    if (b0 === 0xe0) lo = 0xa0
+    else if (b0 === 0xed) hi = 0x9f
+  } else if (b0 >= 0xf0 && b0 <= 0xf4) {
+    size = 4
+    if (b0 === 0xf0) lo = 0x90
+    else if (b0 === 0xf4) hi = 0x8f
+  }
+  if (n >= size) {
     return true
   }
-  if (first < 0xc0) {
+  if (n > 1 && (bytes[1] < lo || bytes[1] > hi)) {
     return true
   }
-  if (first < 0xe0) {
-    return $.len(p) >= 2
+  if (n > 2 && (bytes[2] < 0x80 || bytes[2] > 0xbf)) {
+    return true
   }
-  if (first < 0xf0) {
-    return $.len(p) >= 3
-  }
-  if (first < 0xf8) {
-    return $.len(p) >= 4
-  }
-  return true
+  return false
 }
 
 // FullRuneInString is like FullRune but its input is a string.
 export function FullRuneInString(s: string): boolean {
-  if (s.length === 0) {
-    return false
-  }
-
-  const c = s.charCodeAt(0)
-  if (c < RuneSelf) {
-    return true
-  }
-
-  const [, size] = DecodeRuneInString(s)
-  return size <= s.length && size > 0
+  return fullRune($.stringToBytes(s))
 }
 
 // RuneCount returns the number of runes in p.
 export function RuneCount(p: $.Bytes): number {
-  const decoder = new TextDecoder('utf-8', { fatal: false })
-  const str = decoder.decode($.bytesToUint8Array(p))
-  return [...str].length
+  return runeCount($.bytesToUint8Array(p))
+}
+
+// runeCount counts runes as in Go, where each invalid byte is one rune.
+function runeCount(bytes: Uint8Array): number {
+  let n = 0
+  for (let i = 0; i < bytes.length; n++) {
+    i += $.decodeRune(bytes, i)[1]
+  }
+  return n
 }
 
 // RuneCountInString is like RuneCount but its input is a string.
 export function RuneCountInString(s: string): number {
-  return [...s].length
+  if (!$.isByteString(s)) {
+    return [...s].length
+  }
+  return runeCount($.stringToBytes(s))
 }
 
 // RuneLen returns the number of bytes required to encode the rune.
@@ -215,13 +201,19 @@ export function RuneStart(b: number): boolean {
 
 // Valid reports whether p consists entirely of valid UTF-8-encoded runes.
 export function Valid(p: $.Bytes): boolean {
-  try {
-    const decoder = new TextDecoder('utf-8', { fatal: true })
-    decoder.decode($.bytesToUint8Array(p))
-    return true
-  } catch {
-    return false
+  return valid($.bytesToUint8Array(p))
+}
+
+// valid reports whether every rune of bytes decodes without error.
+function valid(bytes: Uint8Array): boolean {
+  for (let i = 0; i < bytes.length; ) {
+    const [r, size] = $.decodeRune(bytes, i)
+    if (r === RuneError && size === 1) {
+      return false
+    }
+    i += size
   }
+  return true
 }
 
 // ValidRune reports whether r can be legally encoded as UTF-8.
@@ -231,16 +223,8 @@ export function ValidRune(r: number): boolean {
 
 // ValidString reports whether s consists entirely of valid UTF-8-encoded runes.
 export function ValidString(s: string): boolean {
-  // JavaScript strings are always valid UTF-16, but we check for surrogates
-  for (let i = 0; i < s.length; i++) {
-    const code = s.charCodeAt(i)
-    if (code >= 0xd800 && code <= 0xdfff) {
-      // Surrogate pair
-      if (i + 1 >= s.length) return false
-      const next = s.charCodeAt(i + 1)
-      if (code >= 0xdc00 || next < 0xdc00 || next > 0xdfff) return false
-      i++ // Skip the next character as it's part of the surrogate pair
-    }
+  if (!$.isByteString(s)) {
+    return true
   }
-  return true
+  return valid($.stringToBytes(s))
 }

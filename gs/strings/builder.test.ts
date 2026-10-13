@@ -122,7 +122,8 @@ describe('strings/Builder', () => {
       const text = 'Hello 🌟'
       b.WriteString(text)
       expect(b.String()).toBe(text)
-      expect(b.Len()).toBe(text.length)
+      // Len is the length in UTF-8 bytes, as in Go.
+      expect(b.Len()).toBe(10)
     })
   })
 })

@@ -45,7 +45,7 @@ export function walk(v: reflect.Value): string {
 		if ($.markAsStructValue($.cloneStructValue(v)).IsNil()) {
 			return "nil"
 		}
-		return "*" + walk($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(v)).Elem())))
+		return $.concatString("*", walk($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(v)).Elem()))))
 	}
 	return reflect.Kind_String($.markAsStructValue($.cloneStructValue(v)).Kind())
 }

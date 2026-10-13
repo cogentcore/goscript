@@ -52,9 +52,9 @@ export async function main(): globalThis.Promise<void> {
 	let structFromFuncCopy = $.markAsStructValue($.cloneStructValue(structFromFunc))
 	structFromFuncCopy.MyString = "modified function result copy"
 	// Expected: "function result"
-	await $.println("Original struct from function: Expected: function result, Actual: " + structFromFunc.MyString)
+	await $.println($.concatString("Original struct from function: Expected: function result, Actual: ", structFromFunc.MyString))
 	// Expected: "modified function result copy"
-	await $.println("Modified struct from function copy: Expected: modified function result copy, Actual: " + structFromFuncCopy.MyString)
+	await $.println($.concatString("Modified struct from function copy: Expected: modified function result copy, Actual: ", structFromFuncCopy.MyString))
 }
 
 if ($.isMainScript(import.meta)) {

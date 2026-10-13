@@ -121,7 +121,7 @@ export async function main(): globalThis.Promise<void> {
 	let structPointer: MyStruct | $.VarRef<MyStruct> | null = new MyStruct({MyInt: 4, MyString: "hello world"})
 	// === Method Call on Pointer Receiver ===
 	// Calling a method with a pointer receiver (*MyStruct) using a pointer variable.
-	await $.println("Method call on pointer (structPointer): Expected: hello world, Actual: " + MyStruct.prototype.GetMyString.call(structPointer))
+	await $.println($.concatString("Method call on pointer (structPointer): Expected: hello world, Actual: ", MyStruct.prototype.GetMyString.call(structPointer)))
 
 	let setter: setterStruct | $.VarRef<setterStruct> | null = new setterStruct()
 	setterStruct.prototype.set.call(setter, 9)

@@ -15,7 +15,7 @@ export function wrap(open: opener | null): wrapper | null {
 		if (err != null) {
 			return ["", err]
 		}
-		return ["wrapped:" + value, null]
+		return [$.concatString("wrapped:", value), null]
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string")], results: [/* @__PURE__ */ $.basicType("string"), "error"] } as $.FunctionTypeInfo))
 }
 

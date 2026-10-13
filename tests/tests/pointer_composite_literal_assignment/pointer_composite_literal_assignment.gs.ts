@@ -46,7 +46,7 @@ export async function main(): globalThis.Promise<void> {
 	// Expected: 42
 	await $.println("MyInt via pointer: Expected: 42, Actual:", $.pointerValue<MyStruct>(structPointer).MyInt)
 	// Expected: "composite literal pointer"
-	await $.println("MyString via pointer: Expected: composite literal pointer, Actual: " + $.pointerValue<MyStruct>(structPointer).MyString)
+	await $.println($.concatString("MyString via pointer: Expected: composite literal pointer, Actual: ", $.pointerValue<MyStruct>(structPointer).MyString))
 
 	// Modify through the pointer
 	$.pointerValue<MyStruct>(structPointer).MyInt = 99

@@ -4,7 +4,7 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export function _throw(value: string): string {
-	return value + "!"
+	return $.concatString(value, "!")
 }
 
 export async function main(): globalThis.Promise<void> {

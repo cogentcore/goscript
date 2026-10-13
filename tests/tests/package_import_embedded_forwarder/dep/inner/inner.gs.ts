@@ -26,9 +26,9 @@ export class CoreStore {
 	public NewTransaction(write: boolean): tx.Tx | $.VarRef<tx.Tx> | null {
 		const s: CoreStore | $.VarRef<CoreStore> | null = this;
 		if (write) {
-			return new tx.Tx({Name: $.pointerValue<CoreStore>(s).Prefix + ":write"})
+			return new tx.Tx({Name: $.concatString($.pointerValue<CoreStore>(s).Prefix, ":write")})
 		}
-		return new tx.Tx({Name: $.pointerValue<CoreStore>(s).Prefix + ":read"})
+		return new tx.Tx({Name: $.concatString($.pointerValue<CoreStore>(s).Prefix, ":read")})
 	}
 
 	static {

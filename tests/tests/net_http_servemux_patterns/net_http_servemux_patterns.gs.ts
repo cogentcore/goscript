@@ -22,7 +22,7 @@ import "@goscript/net/url/index.js"
 
 export function route(label: string): http.Handler | null {
 	return $.namedValueInterfaceValue<http.Handler | null>($.namedFunction($.functionValue(async (w: http.ResponseWriter | null, r: http.Request | $.VarRef<http.Request> | null): globalThis.Promise<void> => {
-		let body = (((((label + " id=") + http.Request.prototype.PathValue.call($.pointerValue<http.Request>(r), "id")) + " path=") + http.Request.prototype.PathValue.call($.pointerValue<http.Request>(r), "path")) + " pattern=") + $.pointerValue<http.Request>(r).Pattern
+		let body = $.concatString(($.concatString(($.concatString(($.concatString(($.concatString(($.concatString(label, " id=")), http.Request.prototype.PathValue.call($.pointerValue<http.Request>(r), "id"))), " path=")), http.Request.prototype.PathValue.call($.pointerValue<http.Request>(r), "path"))), " pattern=")), $.pointerValue<http.Request>(r).Pattern)
 		{
 			let [, err] = await $.pointerValue<Exclude<http.ResponseWriter, null>>(w).Write($.stringToBytes(body))
 			if (err != null) {
