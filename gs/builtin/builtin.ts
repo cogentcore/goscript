@@ -1,8 +1,8 @@
 import type { Slice, SliceProxy, StringHeaderData } from './slice.js'
 import {
-  getTypeByName,
   isTypeInfoComparable,
   pointerIdentityEqual,
+  resolveTypeInfo,
   structFieldRuntimeKey,
   structValueTypeInfo,
   TypeKind,
@@ -99,7 +99,7 @@ export function assignStruct<T>(
   const targetFields = (target as any)._fields
   const sourceFields = (source as any)._fields
   const info = structValueTypeInfo(source) ?? typeInfo
-  const resolved = typeof info === 'string' ? getTypeByName(info) : info
+  const resolved = resolveTypeInfo(info)
 
   // A registered struct without field descriptors or a _fields map (such as
   // time.Time) keeps its state in private properties, copied by clone below.
@@ -144,7 +144,7 @@ function assignFieldValue(
   source: any,
   typeInfo?: TypeInfo | string,
 ): any {
-  const info = typeof typeInfo === 'string' ? getTypeByName(typeInfo) : typeInfo
+  const info = resolveTypeInfo(typeInfo)
   if (info?.kind === TypeKind.Struct) {
     assignStruct(target, source, info)
     return target
@@ -317,14 +317,13 @@ export function structEqual(
     return comparableEqual(a, b)
   }
   const info = structValueTypeInfo(a) ?? typeInfo
-  const resolved = typeof info === 'string' ? getTypeByName(info) : info
+  const resolved = resolveTypeInfo(info)
   if (resolved?.kind !== TypeKind.Struct) {
     return fieldsEqual(a._fields, b._fields)
   }
   for (const field of resolved.fields) {
     const key = structFieldRuntimeKey(field)
-    const fieldType =
-      typeof field.type === 'string' ? getTypeByName(field.type) : field.type
+    const fieldType = resolveTypeInfo(field.type)
     const equal =
       fieldType?.kind === TypeKind.Struct ?
         structEqual(a._fields[key], b._fields[key], fieldType)
@@ -582,7 +581,7 @@ export function genericConvert<T>(
   value: unknown,
 ): T {
   const type = typeArgs?.[name]?.type
-  const info = typeof type === 'string' ? getTypeByName(type) : type
+  const info = resolveTypeInfo(type)
   if (
     info?.kind !== TypeKind.Basic ||
     (typeof value !== 'number' && typeof value !== 'bigint')

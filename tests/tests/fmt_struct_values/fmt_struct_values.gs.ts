@@ -130,6 +130,146 @@ export class Pointers {
 	)
 }
 
+export class Node {
+	public declare Name: string
+
+	public declare Parent: Node | $.VarRef<Node> | null
+
+	public declare Kids: $.Slice<Node | $.VarRef<Node> | null>
+
+	public _fields: {
+		Name: string
+		Parent: Node | $.VarRef<Node> | null
+		Kids: $.Slice<Node | $.VarRef<Node> | null>
+	}
+
+	constructor(init?: Partial<{Name?: string, Parent?: Node | $.VarRef<Node> | null, Kids?: $.Slice<Node | $.VarRef<Node> | null>}>) {
+		this._fields = {
+			Name: init?.Name ?? ("" as string),
+			Parent: init?.Parent ?? (null! as Node | $.VarRef<Node> | null),
+			Kids: init?.Kids ?? (null! as $.Slice<Node | $.VarRef<Node> | null>)
+		}
+	}
+
+	public clone(): Node {
+		return $.markAsStructValue(new Node(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["Name", "Parent", "Kids"])
+	}
+
+	static __typeInfo = $.registerStructType(
+		"main.Node",
+		() => new Node(),
+		() => [],
+		Node,
+		() => [/* @__PURE__ */ $.structField("Name", /* @__PURE__ */ $.basicType("string"), [0], 0, true), /* @__PURE__ */ $.structField("Parent", /* @__PURE__ */ $.pointerType("main.Node"), [1], 16, true), /* @__PURE__ */ $.structField("Kids", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.pointerType("main.Node")), [2], 24, true)]
+	)
+}
+
+export class Base {
+	public declare Windows: $.Slice<any>
+
+	public declare Active: any
+
+	public _fields: {
+		Windows: $.Slice<any>
+		Active: any
+	}
+
+	constructor(init?: Partial<{Windows?: $.Slice<any>, Active?: any}>) {
+		this._fields = {
+			Windows: init?.Windows ?? (null! as $.Slice<any>),
+			Active: init?.Active ?? (null! as any)
+		}
+	}
+
+	public clone(): Base {
+		return $.markAsStructValue(new Base(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["Windows", "Active"])
+	}
+
+	static __typeInfo = $.registerStructType(
+		"main.Base",
+		() => new Base(),
+		() => [],
+		Base,
+		() => [/* @__PURE__ */ $.structField("Windows", /* @__PURE__ */ $.sliceType({ kind: $.TypeKind.Interface, methods: [] }), [0], 0, true), /* @__PURE__ */ $.structField("Active", { kind: $.TypeKind.Interface, methods: [] }, [1], 0, true)]
+	)
+}
+
+export class App {
+	public declare Base: Base
+
+	public declare Name: string
+
+	public _fields: {
+		Base: Base
+		Name: string
+	}
+
+	constructor(init?: Partial<{Base?: Base, Name?: string}>) {
+		this._fields = {
+			Base: init?.Base ? $.markAsStructValue($.cloneStructValue(init.Base)) : $.markAsStructValue(new Base({Active: null! as Win | $.VarRef<Win> | null})),
+			Name: init?.Name ?? ("" as string)
+		}
+	}
+
+	public clone(): App {
+		return $.markAsStructValue(new App(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["Base", "Name"])
+	}
+
+	static __typeInfo = $.registerStructType(
+		"main.App",
+		() => new App(),
+		() => [],
+		App,
+		() => [/* @__PURE__ */ $.structField("Base", "main.Base", [0], 0, true, { anonymous: true }), /* @__PURE__ */ $.structField("Name", /* @__PURE__ */ $.basicType("string"), [1], 32, true)]
+	)
+}
+
+export class Win {
+	public declare App: App | $.VarRef<App> | null
+
+	public declare Title: string
+
+	public _fields: {
+		App: App | $.VarRef<App> | null
+		Title: string
+	}
+
+	constructor(init?: Partial<{App?: App | $.VarRef<App> | null, Title?: string}>) {
+		this._fields = {
+			App: init?.App ?? (null! as App | $.VarRef<App> | null),
+			Title: init?.Title ?? ("" as string)
+		}
+	}
+
+	public clone(): Win {
+		return $.markAsStructValue(new Win(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["App", "Title"])
+	}
+
+	static __typeInfo = $.registerStructType(
+		"main.Win",
+		() => new Win(),
+		() => [],
+		Win,
+		() => [/* @__PURE__ */ $.structField("App", /* @__PURE__ */ $.pointerType("main.App"), [0], 0, true), /* @__PURE__ */ $.structField("Title", /* @__PURE__ */ $.basicType("string"), [1], 8, true)]
+	)
+}
+
 export async function main(): globalThis.Promise<void> {
 	let value = $.varRef($.markAsStructValue(new Record({Count: 3, name: "hello", Inner: $.markAsStructValue(new Inner({Ready: true}))})))
 	await $.println(await fmt.Sprintf("%v", $.interfaceValue($.markAsStructValue($.cloneStructValue(value.value)), "main.Record", "main.Record")))
@@ -155,6 +295,20 @@ export async function main(): globalThis.Promise<void> {
 	text = strings.ReplaceAll(text, await fmt.Sprintf("%p", $.interfaceValue(count, "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int")))), "<scalar>")
 	text = strings.ReplaceAll(text, await fmt.Sprintf("%p", $.interfaceValue(pointers, "*main.Pointers", /* @__PURE__ */ $.pointerType("main.Pointers"))), "<self>")
 	await $.println(text)
+
+	// Pointers nested in slices and struct cycles print as addresses.
+	let root: Node | $.VarRef<Node> | null = new Node({Name: "root"})
+	let kid: Node | $.VarRef<Node> | null = new Node({Name: "kid", Parent: root})
+	$.pointerValue<Node>(root).Kids = $.append($.pointerValue<Node>(root).Kids, kid, $.appendZeros.nil)
+	let app: App | $.VarRef<App> | null = new App({Name: "app"})
+	let win: Win | $.VarRef<Win> | null = new Win({App: app, Title: "main"})
+	$.pointerValue<App>(app).Base.Windows = $.append($.pointerValue<App>(app).Base.Windows, win, $.appendZeros.nil)
+	$.pointerValue<App>(app).Base.Active = win
+	let names: strings.Replacer | $.VarRef<strings.Replacer> | null = strings.NewReplacer(await fmt.Sprintf("%p", $.interfaceValue(root, "*main.Node", /* @__PURE__ */ $.pointerType("main.Node"))), "<root>", await fmt.Sprintf("%p", $.interfaceValue(kid, "*main.Node", /* @__PURE__ */ $.pointerType("main.Node"))), "<kid>", await fmt.Sprintf("%p", $.interfaceValue(app, "*main.App", /* @__PURE__ */ $.pointerType("main.App"))), "<app>", await fmt.Sprintf("%p", $.interfaceValue(win, "*main.Win", /* @__PURE__ */ $.pointerType("main.Win"))), "<win>")
+	await $.println(strings.Replacer.prototype.Replace.call($.pointerValue<strings.Replacer>(names), await fmt.Sprint($.interfaceValue(root, "*main.Node", /* @__PURE__ */ $.pointerType("main.Node")))))
+	await $.println(strings.Replacer.prototype.Replace.call($.pointerValue<strings.Replacer>(names), await fmt.Sprintf("%+v", $.interfaceValue(kid, "*main.Node", /* @__PURE__ */ $.pointerType("main.Node")))))
+	await $.println(strings.Replacer.prototype.Replace.call($.pointerValue<strings.Replacer>(names), await fmt.Sprint($.interfaceValue(win, "*main.Win", /* @__PURE__ */ $.pointerType("main.Win")))))
+	await $.println(strings.Replacer.prototype.Replace.call($.pointerValue<strings.Replacer>(names), await fmt.Sprint($.interfaceValue(app, "*main.App", /* @__PURE__ */ $.pointerType("main.App")))))
 
 	// Exercise the same log field formatting used by controller shutdown warnings.
 	let output: $.VarRef<bytes.Buffer> = $.varRef($.markAsStructValue(new bytes.Buffer()))

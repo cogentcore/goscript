@@ -410,6 +410,16 @@ export const getTypeByName = (name: string): TypeInfo | undefined => {
 }
 
 /**
+ * resolveTypeInfo returns the type information that info describes, looking up
+ * a type name in the type registry.
+ */
+export function resolveTypeInfo(
+  info?: TypeInfo | string,
+): TypeInfo | undefined {
+  return typeof info === 'string' ? getTypeByName(info) : info
+}
+
+/**
  * TypeAssertResult Represents the result of a type assertion.
  */
 export interface TypeAssertResult<T> {

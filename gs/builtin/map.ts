@@ -2,7 +2,7 @@ import { comparableEqual } from './builtin.js'
 import { GoBinaryString, stringEqual, stringMapKey } from './slice.js'
 import {
   canonicalPointerIdentity,
-  getTypeByName,
+  resolveTypeInfo,
   TypeKind,
   type TypeInfo,
 } from './type.js'
@@ -21,7 +21,7 @@ class GoMap<K, V> extends Map<K, V> {
 
   constructor(keyType?: TypeInfo | string) {
     super()
-    const info = typeof keyType === 'string' ? getTypeByName(keyType) : keyType
+    const info = resolveTypeInfo(keyType)
     this.pointerKeys = info?.kind === TypeKind.Pointer
   }
 

@@ -1,1 +1,1 @@
-export { Inner, Pointers, Record } from "./fmt_struct_values.gs.ts"
+export { App, Base, Inner, Node, Pointers, Record, Win } from "./fmt_struct_values.gs.ts"

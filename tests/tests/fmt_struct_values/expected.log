@@ -10,4 +10,8 @@ main.Record{Count:3, name:"hello", Inner:main.Inner{Ready:true}}
 &{4}
 &{Count:4}
 &{Value:<scalar> Next:<self> Dynamic:<self>}
+&{root <nil> [<kid>]}
+&{Name:kid Parent:<root> Kids:[]}
+&{<app> main}
+&{{[<win>] <win>} app}
 level=warning msg="waiting for controller Execute to return" controller="&{3 hello {true}}"

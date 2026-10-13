@@ -34,6 +34,31 @@ type Pointers struct {
 	Dynamic any
 }
 
+// Node refers to its parent and children, forming a pointer cycle.
+type Node struct {
+	Name   string
+	Parent *Node
+	Kids   []*Node
+}
+
+// Base is a generic type embedded with a pointer to the embedding type.
+type Base[W any] struct {
+	Windows []W
+	Active  W
+}
+
+// App embeds Base with pointers to windows that point back to it.
+type App struct {
+	Base[*Win]
+	Name string
+}
+
+// Win points back to the App that holds it.
+type Win struct {
+	App   *App
+	Title string
+}
+
 // main compares generated value and pointer formatting with native Go.
 func main() {
 	value := Record{Count: 3, name: "hello", Inner: Inner{Ready: true}}
@@ -60,6 +85,25 @@ func main() {
 	text = strings.ReplaceAll(text, fmt.Sprintf("%p", &count), "<scalar>")
 	text = strings.ReplaceAll(text, fmt.Sprintf("%p", &pointers), "<self>")
 	println(text)
+
+	// Pointers nested in slices and struct cycles print as addresses.
+	root := &Node{Name: "root"}
+	kid := &Node{Name: "kid", Parent: root}
+	root.Kids = append(root.Kids, kid)
+	app := &App{Name: "app"}
+	win := &Win{App: app, Title: "main"}
+	app.Windows = append(app.Windows, win)
+	app.Active = win
+	names := strings.NewReplacer(
+		fmt.Sprintf("%p", root), "<root>",
+		fmt.Sprintf("%p", kid), "<kid>",
+		fmt.Sprintf("%p", app), "<app>",
+		fmt.Sprintf("%p", win), "<win>",
+	)
+	println(names.Replace(fmt.Sprint(root)))
+	println(names.Replace(fmt.Sprintf("%+v", kid)))
+	println(names.Replace(fmt.Sprint(win)))
+	println(names.Replace(fmt.Sprint(app)))
 
 	// Exercise the same log field formatting used by controller shutdown warnings.
 	var output bytes.Buffer
