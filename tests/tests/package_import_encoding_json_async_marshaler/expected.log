@@ -1,0 +1,13 @@
+top: {"encoded":"TOP"} true
+top back: top true
+doc: {"Title":"t","Image":{"encoded":"NESTED"},"Note":"n"} true
+indent: {
+ "Title": "t",
+ "Image": {
+  "encoded": "NESTED"
+ },
+ "Note": "n"
+} true
+doc back: t nested n true
+marshal error: true
+unmarshal error: missing encoded image

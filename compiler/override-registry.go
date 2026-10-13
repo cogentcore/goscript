@@ -31,6 +31,11 @@ type OverrideMetadata struct {
 	// literal passed for one lowers as an async function, so its interface
 	// calls await.
 	AsyncCallbacks map[string][]string
+	// AsyncWhenMethods maps a package-level function name to method names. The
+	// function is async in a program where a compiled method with one of those
+	// names is async, such as json.Marshal with an async MarshalJSON, and
+	// synchronous otherwise.
+	AsyncWhenMethods map[string][]string
 }
 
 // OverrideRegistryOwner owns GoScript override package metadata and copy plans.

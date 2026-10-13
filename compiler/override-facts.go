@@ -111,6 +111,16 @@ func (f *OverrideFacts) IsFunctionCallbackAsync(pkgPath, function string) bool {
 	return pkg.metadata.CallbackAsyncFunctions[function]
 }
 
+// AsyncWhenMethods returns the method names whose async implementations make
+// the package-level function async, per override metadata.
+func (f *OverrideFacts) AsyncWhenMethods(pkgPath, function string) []string {
+	if f == nil {
+		return nil
+	}
+	pkg := f.packages[pkgPath]
+	return pkg.metadata.AsyncWhenMethods[function]
+}
+
 // IsFunctionAsync returns true when override metadata marks a package-level function async.
 func (f *OverrideFacts) IsFunctionAsync(pkgPath, function string) bool {
 	if f == nil {
@@ -344,6 +354,12 @@ func loadOverrideMetadata(root overridePackageRoot) (OverrideMetadata, error) {
 			for callee := iter.ReadObject(); callee != ""; callee = iter.ReadObject() {
 				for iter.ReadArray() {
 					metadata.AsyncCallbacks[callee] = append(metadata.AsyncCallbacks[callee], iter.ReadString())
+				}
+			}
+		case "asyncWhenMethods":
+			for function := iter.ReadObject(); function != ""; function = iter.ReadObject() {
+				for iter.ReadArray() {
+					metadata.AsyncWhenMethods[function] = append(metadata.AsyncWhenMethods[function], iter.ReadString())
 				}
 			}
 		default:
@@ -738,6 +754,7 @@ func newOverrideMetadata() OverrideMetadata {
 		CallbackAsyncFunctions: make(map[string]bool),
 		AsyncMethods:           make(map[string]bool),
 		AsyncCallbacks:         make(map[string][]string),
+		AsyncWhenMethods:       make(map[string][]string),
 	}
 }
 
@@ -749,6 +766,7 @@ func cloneOverrideMetadata(metadata OverrideMetadata) OverrideMetadata {
 		CallbackAsyncFunctions: cloneBoolMap(metadata.CallbackAsyncFunctions),
 		AsyncMethods:           cloneBoolMap(metadata.AsyncMethods),
 		AsyncCallbacks:         cloneStringSlicesMap(metadata.AsyncCallbacks),
+		AsyncWhenMethods:       cloneStringSlicesMap(metadata.AsyncWhenMethods),
 	}
 }
 

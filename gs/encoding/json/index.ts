@@ -443,16 +443,10 @@ export class Encoder {
       return this.write(prepared)
     }
 
-    // Await every suspended marshaler together, so that none is left with an
-    // unobserved rejection, then fill in their results in order.
     return (async () => {
-      const results = await Promise.all(pending.map((p) => p.result))
-      try {
-        for (const [i, p] of pending.entries()) {
-          p.json = marshalerResult(...results[i])
-        }
-      } catch (marshalErr) {
-        return goError(marshalErr)
+      const err = await resolvePendingMarshals(pending)
+      if (err !== null) {
+        return err
       }
       return await this.write(prepared)
     })()
@@ -534,15 +528,52 @@ class RawJSON {
 }
 
 // PendingMarshal stands in for the result of a MarshalJSON that suspended,
-// until Encoder.Encode awaits it and sets json.
+// until resolvePendingMarshals awaits it and sets json.
 class PendingMarshal {
   public json: RawJSON | null = null
-  constructor(public result: PromiseLike<[$.Slice<number>, $.GoError]>) {}
+  constructor(public result: Promise<[$.Slice<number>, $.GoError]>) {}
 }
 
-// pendingMarshals collects the PendingMarshals of the value being prepared
-// by prepareMarshal, or is null when a suspending MarshalJSON is an error.
-let pendingMarshals: PendingMarshal[] | null = null
+// pendingMarshals collects the PendingMarshals of the value prepareMarshal is
+// preparing.
+let pendingMarshals: PendingMarshal[] = []
+
+// resolvePendingMarshals awaits every suspended marshaler together, so that
+// none is left with an unobserved rejection, then fills in their results in
+// order. It returns the first marshaler error.
+async function resolvePendingMarshals(
+  pending: PendingMarshal[],
+): Promise<$.GoError> {
+  const results = await Promise.all(pending.map((p) => p.result))
+  try {
+    for (const [i, p] of pending.entries()) {
+      p.json = marshalerResult(...results[i])
+    }
+  } catch (marshalErr) {
+    return goError(marshalErr)
+  }
+  return null
+}
+
+// pendingUnmarshals collects the results of the UnmarshalJSON calls that
+// suspend while decode assigns a value. Each one fills its target in place.
+let pendingUnmarshals: Promise<$.GoError>[] = []
+
+// callUnmarshalJSON calls a decode target's UnmarshalJSON, throwing its
+// error, and records the result when the call suspends.
+function callUnmarshalJSON(
+  unmarshaler: Unmarshaler,
+  data: $.Slice<number>,
+): void {
+  const err: $.MaybePromise<$.GoError> = unmarshaler.UnmarshalJSON(data)
+  if (err instanceof Promise) {
+    pendingUnmarshals.push(err)
+    return
+  }
+  if (err !== null) {
+    throw err
+  }
+}
 
 // prepareMarshal prepares v for encoding like marshalValue, adding a
 // PendingMarshal to pending for each MarshalJSON that suspends.
@@ -832,19 +863,38 @@ export function Marshal(v: unknown): [$.Slice<number>, $.GoError] {
   return marshalBytes(v, '', '', true)
 }
 
+// marshalBytes encodes v. When a MarshalJSON suspends, it returns a Promise
+// of the result instead: the compiler awaits Marshal and MarshalIndent in a
+// program with an async MarshalJSON method (see asyncWhenMethods in
+// meta.json).
 function marshalBytes(
   v: unknown,
   prefix: string,
   indent: string,
   escapeHTML: boolean,
 ): [$.Slice<number>, $.GoError] {
+  // Prepare the value, collecting the MarshalJSON calls that suspend.
+  const pending: PendingMarshal[] = []
   let prepared: unknown
   try {
-    prepared = marshalValue(v)
+    prepared = prepareMarshal(v, pending)
   } catch (err) {
     return [null, goError(err)]
   }
-  return encodeBytes(prepared, prefix, indent, escapeHTML)
+
+  // Encode now unless a marshaler suspended.
+  if (pending.length === 0) {
+    return encodeBytes(prepared, prefix, indent, escapeHTML)
+  }
+  return $.awaitedResult(
+    (async (): Promise<[$.Slice<number>, $.GoError]> => {
+      const err = await resolvePendingMarshals(pending)
+      if (err !== null) {
+        return [null, err]
+      }
+      return encodeBytes(prepared, prefix, indent, escapeHTML)
+    })(),
+  )
 }
 
 // encodeBytes encodes a value prepared by marshalValue.
@@ -942,28 +992,46 @@ export function Unmarshal(data: $.Slice<number>, v: unknown): $.GoError {
   return decode(data, v, {})
 }
 
+// decode decodes data into v. When an UnmarshalJSON suspends, it returns a
+// Promise of the error instead: the compiler awaits Unmarshal in a program
+// with an async UnmarshalJSON method (see asyncWhenMethods in meta.json), and
+// Decoder.Decode is async.
 function decode(
   data: $.Slice<number>,
   v: unknown,
   opts: decodeOptions,
 ): $.GoError {
+  // Assign the decoded value, collecting the UnmarshalJSON calls that suspend.
+  const pending: Promise<$.GoError>[] = []
+  const outer = pendingUnmarshals
+  pendingUnmarshals = pending
   try {
     if (!validUnmarshalTarget(v)) {
       return $.toGoError(new InvalidUnmarshalError())
     }
     const unmarshaler = unmarshalJSONTarget(v)
     if (unmarshaler !== null) {
-      const err = unmarshaler.UnmarshalJSON(data)
-      if (err instanceof Promise) {
-        return $.newError('json: asynchronous UnmarshalJSON is unsupported')
-      }
-      return err
+      callUnmarshalJSON(unmarshaler, data)
+    } else {
+      assignDecodedValue(v, parseJSON(data, opts), opts)
     }
-    assignDecodedValue(v, parseJSON(data, opts), opts)
-    return null
   } catch (err) {
     return goError(err)
+  } finally {
+    pendingUnmarshals = outer
   }
+
+  // Await every suspended unmarshaler together, so that none is left with an
+  // unobserved rejection, and report the first error.
+  if (pending.length === 0) {
+    return null
+  }
+  return $.awaitedResult(
+    (async (): Promise<$.GoError> => {
+      const errs = await Promise.all(pending)
+      return errs.find((err) => err !== null) ?? null
+    })(),
+  )
 }
 
 export function Valid(data: $.Slice<number>): boolean {
@@ -1137,11 +1205,6 @@ function marshalValue(v: unknown): unknown {
   if (marshaler !== null) {
     const result = marshaler.MarshalJSON()
     if (result instanceof Promise) {
-      if (pendingMarshals === null) {
-        throw new MarshalerError({
-          Err: $.newError('json: asynchronous MarshalJSON is unsupported'),
-        })
-      }
       const pending = new PendingMarshal(result)
       pendingMarshals.push(pending)
       return pending
@@ -1349,12 +1412,7 @@ function assignDecodedValue(
   if ($.isVarRef(target)) {
     const unmarshaler = unmarshalJSONTarget(target.value)
     if (unmarshaler !== null) {
-      const err = unmarshaler.UnmarshalJSON(
-        $.stringToBytes(decodedJSONText(decoded)),
-      )
-      if (err !== null) {
-        throw err
-      }
+      callUnmarshalJSON(unmarshaler, $.stringToBytes(decodedJSONText(decoded)))
       return
     }
     if (isStructValue(target.value) && isPlainObject(decoded)) {
@@ -1612,12 +1670,10 @@ function decodeValueForType(
       // itself.
       const unmarshaler = unmarshalJSONTarget(inst)
       if (unmarshaler !== null) {
-        const err = unmarshaler.UnmarshalJSON(
+        callUnmarshalJSON(
+          unmarshaler,
           $.stringToBytes(decodedJSONText(decoded)),
         )
-        if (err !== null) {
-          throw err
-        }
         return inst
       }
       if (isStructValue(inst)) {

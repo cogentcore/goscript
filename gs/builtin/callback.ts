@@ -12,6 +12,13 @@ export type CallbackResult<R, V> =
 // result and receives it back settled.
 export type CallbackRun<V> = Generator<unknown, V, any>
 
+// awaitedResult types a promise as its result, for an override whose Go
+// signature is synchronous but which suspends in a program the compiler
+// awaits it in, per its asyncMethods or asyncWhenMethods metadata.
+export function awaitedResult<T>(promise: globalThis.Promise<T>): T {
+  return promise as T
+}
+
 /**
  * runCallbacks drives run, handing each yielded result of callbacks returning
  * R back. It stays synchronous while the callbacks do and continues

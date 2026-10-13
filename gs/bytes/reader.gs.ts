@@ -205,8 +205,7 @@ export class Reader {
 			}
 			return [n, err]
 		})()
-		// asyncMethods unwraps the promise while the Go io.WriterTo signature stays sync-shaped.
-		return writePromise as unknown as [bigint, $.GoError]
+		return $.awaitedResult(writePromise)
 	}
 
 	// Reset resets the [Reader] to be reading from b.

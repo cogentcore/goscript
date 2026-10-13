@@ -170,7 +170,8 @@ func (o *SemanticModelOwner) Build(ctx context.Context, graph *PackageGraph, opt
 		model.freeze()
 		return model, diagnostics
 	}
-	diagnostics = append(diagnostics, colorAsyncFunctions(ctx, model, asyncArgumentSites, interfaceAsyncEdges, anonymousInterfaceGraph)...)
+	asyncWhen := asyncWhenMethodFunctions(model, overrideFacts)
+	diagnostics = append(diagnostics, colorAsyncFunctions(ctx, model, asyncArgumentSites, interfaceAsyncEdges, anonymousInterfaceGraph, asyncWhen)...)
 	model.freeze()
 	return model, diagnostics
 }
@@ -192,6 +193,7 @@ func newSemanticModel() *SemanticModel {
 		generatedImportTypes:     make(map[string]map[types.Type]bool),
 		asyncInterfaceMethods:    make(map[string]bool),
 		asyncInterfaceMethodObjs: make(map[*types.Func]bool),
+		asyncOverrideFunctions:   make(map[*types.Func]bool),
 		summaries:                make(map[string][]byte),
 	}
 }
@@ -1679,7 +1681,20 @@ func (m *SemanticModel) functionAsync(fn *types.Func) bool {
 	if semFn != nil && semFn.async {
 		return true
 	}
+	if m != nil && m.asyncOverrideFunctions[functionOriginOrSelf(fn)] {
+		return true
+	}
 	return m.interfaceMethodAsync(fn)
+}
+
+// markOverrideFunctionAsync marks the override function fn async and reports
+// whether it was synchronous.
+func (m *SemanticModel) markOverrideFunctionAsync(fn *types.Func) bool {
+	if m == nil || fn == nil || m.asyncOverrideFunctions[fn] {
+		return false
+	}
+	m.asyncOverrideFunctions[fn] = true
+	return true
 }
 
 // markInterfaceMethodAsync marks fn async and reports whether it was
