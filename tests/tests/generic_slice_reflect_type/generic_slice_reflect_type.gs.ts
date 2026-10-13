@@ -53,7 +53,7 @@ export async function describeMap(__typeArgs: $.GenericTypeArgs | undefined, m: 
 }
 
 export async function describePointer(__typeArgs: $.GenericTypeArgs | undefined, p: any): globalThis.Promise<void> {
-	await $.println("pointer type:", await $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.typeParamPointerInterfaceValue(p, __typeArgs?.["E"], "*E", /* @__PURE__ */ $.pointerType({ kind: $.TypeKind.Interface, methods: [] })))).String())
+	await $.println("pointer type:", await $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.typeParamPointerInterfaceValue(p, __typeArgs?.["E"], "*E", /* @__PURE__ */ $.pointerType(__typeArgs?.["E"]?.type ?? { kind: $.TypeKind.Interface, methods: [] })))).String())
 }
 
 export async function main(): globalThis.Promise<void> {
