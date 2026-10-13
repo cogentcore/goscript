@@ -31,7 +31,7 @@ export async function main(): globalThis.Promise<void> {
 	sum = $.uint(sum - (9), 32)
 	await $.println($.uint(sum, 32))
 	let prod: number = 0x10000
-	prod = Math.imul(prod, 0x10000) >>> 0
+	prod = globalThis.Math.imul(prod, 0x10000) >>> 0
 	await $.println($.uint(prod, 32) == 0)
 	let shifted: number = 0x40000000
 	shifted = $.uint(shifted << (1), 32)

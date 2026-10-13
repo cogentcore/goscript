@@ -1,0 +1,8 @@
+names: 1 1.5 String Array Promise
+multiply: 14 14
+unsigned multiply: 3410065408
+divide: 3 -3
+rune string: true
+array: 3 0
+int64 to float: true
+int64 to int: 1048576

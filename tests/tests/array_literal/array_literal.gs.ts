@@ -21,14 +21,14 @@ export async function main(): globalThis.Promise<void> {
 	await $.println(4, $.uint($.arrayIndex(d, 0), 8), $.uint($.arrayIndex(d, 3), 8))
 
 	// Empty struct-array elements and repeated literals retain independent values.
-	let e = $.arrayValue(Array.from({ length: 4096 }, () => $.anonymousStructValue({"value": 0}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("value", /* @__PURE__ */ $.basicType("int"), [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/array_literal" })] })), /* @__PURE__ */ $.arrayType({ kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("value", /* @__PURE__ */ $.basicType("int"), [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/array_literal" })] }, 4096))
-	let f = $.arrayValue(Array.from({ length: 4096 }, () => $.anonymousStructValue({"value": 0}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("value", /* @__PURE__ */ $.basicType("int"), [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/array_literal" })] })), /* @__PURE__ */ $.arrayType({ kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("value", /* @__PURE__ */ $.basicType("int"), [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/array_literal" })] }, 4096))
+	let e = $.arrayValue(globalThis.Array.from({ length: 4096 }, () => $.anonymousStructValue({"value": 0}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("value", /* @__PURE__ */ $.basicType("int"), [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/array_literal" })] })), /* @__PURE__ */ $.arrayType({ kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("value", /* @__PURE__ */ $.basicType("int"), [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/array_literal" })] }, 4096))
+	let f = $.arrayValue(globalThis.Array.from({ length: 4096 }, () => $.anonymousStructValue({"value": 0}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("value", /* @__PURE__ */ $.basicType("int"), [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/array_literal" })] })), /* @__PURE__ */ $.arrayType({ kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("value", /* @__PURE__ */ $.basicType("int"), [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/array_literal" })] }, 4096))
 	$.arrayIndex(e, 0).value = 7
 	$.arrayIndex(e, 4095).value = 9
 	await $.println(4096, $.arrayIndex(e, 0).value, $.arrayIndex(e, 1).value, $.arrayIndex(e, 4095).value, $.arrayIndex(f, 0).value)
 
 	// Nested arrays allocate separate inner arrays for each element.
-	let g = $.arrayValue(Array.from({ length: 2 }, () => $.arrayValue(Array.from({ length: 3 }, () => 0))), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 3), 2))
+	let g = $.arrayValue(globalThis.Array.from({ length: 2 }, () => $.arrayValue(globalThis.Array.from({ length: 3 }, () => 0))), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 3), 2))
 	$.arrayIndex(g, 0)[1] = 11
 	await $.println($.arrayIndex($.arrayIndex(g, 0), 1), $.arrayIndex($.arrayIndex(g, 1), 1))
 }
