@@ -6,57 +6,50 @@ interface ProcessLike {
   env?: ProcessEnv
 }
 
-function hostEnv(): ProcessEnv | undefined {
-  return (globalThis as { process?: ProcessLike }).process?.env
+// memoryEnv holds the environment when the host has none, as in a browser,
+// as Go keeps the environment in memory on js/wasm.
+const memoryEnv: ProcessEnv = {}
+
+// environment returns the host process environment, or memoryEnv when the
+// host has none.
+function environment(): ProcessEnv {
+  return (globalThis as { process?: ProcessLike }).process?.env ?? memoryEnv
 }
 
-// Getenv Environment variable functions using Node.js/browser APIs.
+// Getenv returns the value of the environment variable named by key, and
+// whether it is set.
 export function Getenv(key: string): [string, boolean] {
-  const env = hostEnv()
-  if (env !== undefined) {
-    const value = env[key]
-    return value !== undefined ? [value, true] : ['', false]
-  }
-  return ['', false]
+  const value = environment()[key]
+  return value !== undefined ? [value, true] : ['', false]
 }
 
+// Setenv sets the value of the environment variable named by key.
 export function Setenv(key: string, value: string): $.GoError {
-  const env = hostEnv()
-  if (env !== undefined) {
-    env[key] = value
-    return null
-  }
-  return { Error: () => 'setenv not supported' }
+  environment()[key] = value
+  return null
 }
 
+// Unsetenv unsets the environment variable named by key.
 export function Unsetenv(key: string): $.GoError {
-  const env = hostEnv()
-  if (env !== undefined) {
-    delete env[key]
-    return null
-  }
-  return { Error: () => 'unsetenv not supported' }
+  delete environment()[key]
+  return null
 }
 
+// Clearenv deletes all environment variables.
 export function Clearenv(): void {
-  const env = hostEnv()
-  if (env !== undefined) {
-    for (const key in env) {
-      delete env[key]
-    }
+  const env = environment()
+  for (const key in env) {
+    delete env[key]
   }
 }
 
+// Environ returns the environment as key=value strings.
 export function Environ(): $.Slice<string> {
-  const host = hostEnv()
-  if (host !== undefined) {
-    const values: string[] = []
-    for (const [key, value] of Object.entries(host)) {
-      if (value !== undefined) {
-        values.push(`${key}=${value}`)
-      }
+  const values: string[] = []
+  for (const [key, value] of Object.entries(environment())) {
+    if (value !== undefined) {
+      values.push(`${key}=${value}`)
     }
-    return $.arrayToSlice(values)
   }
-  return $.arrayToSlice([])
+  return $.arrayToSlice(values)
 }
