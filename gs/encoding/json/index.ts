@@ -1307,6 +1307,19 @@ function parseJSON(data: $.Slice<number>, opts: decodeOptions): unknown {
   return value
 }
 
+// storeDecodedValue stores a decoded value into target. As in Go, decoding
+// an object into a non-nil map adds its entries to the existing map rather
+// than replacing it.
+function storeDecodedValue(target: $.VarRef<unknown>, value: unknown): void {
+  if (target.value instanceof Map && value instanceof Map) {
+    for (const [key, elem] of value) {
+      target.value.set(key, elem)
+    }
+    return
+  }
+  target.value = value
+}
+
 function assignDecodedValue(
   target: unknown,
   decoded: unknown,
@@ -1369,13 +1382,13 @@ function assignDecodedValue(
           // pointer-receiver method-set checks on the decoded result.
           ($.isPointerTypeInfo(info) && isPlainObject(decoded))
         ) {
-          target.value = decodeValueForType(decoded, desc, opts)
+          storeDecodedValue(target, decodeValueForType(decoded, desc, opts))
           return
         }
       }
     }
     if (isPlainObject(decoded) || Array.isArray(decoded)) {
-      target.value = decodeInterfaceValue(decoded)
+      storeDecodedValue(target, decodeInterfaceValue(decoded))
       return
     }
     target.value = decoded
