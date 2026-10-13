@@ -15,19 +15,103 @@ $.registerInterfaceType(
 
 export type namedSlice = $.Slice<number>
 
+$.registerNamedValueType(
+	"main.namedSlice",
+	{Add: (receiver: any, ...args: any[]) => (namedSlice_Add as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("Add", [["n", /* @__PURE__ */ $.basicType("int")]], [/* @__PURE__ */ $.basicType("int")])]
+);
+
+$.registerNamedValueType(
+	"*main.namedSlice",
+	{Add: (receiver: any, ...args: any[]) => (namedSlice_Add as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("Add", [["n", /* @__PURE__ */ $.basicType("int")]], [/* @__PURE__ */ $.basicType("int")])]
+);
+
 export type namedMap = globalThis.Map<string, number> | null
+
+$.registerNamedValueType(
+	"main.namedMap",
+	{Add: (receiver: any, ...args: any[]) => (namedMap_Add as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("Add", [["n", /* @__PURE__ */ $.basicType("int")]], [/* @__PURE__ */ $.basicType("int")])]
+);
+
+$.registerNamedValueType(
+	"*main.namedMap",
+	{Add: (receiver: any, ...args: any[]) => (namedMap_Add as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("Add", [["n", /* @__PURE__ */ $.basicType("int")]], [/* @__PURE__ */ $.basicType("int")])]
+);
 
 export type namedArray = number[]
 
+$.registerNamedValueType(
+	"main.namedArray",
+	{Add: (receiver: any, ...args: any[]) => (namedArray_Add as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("Add", [["n", /* @__PURE__ */ $.basicType("int")]], [/* @__PURE__ */ $.basicType("int")])]
+);
+
+$.registerNamedValueType(
+	"*main.namedArray",
+	{Add: (receiver: any, ...args: any[]) => (namedArray_Add as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("Add", [["n", /* @__PURE__ */ $.basicType("int")]], [/* @__PURE__ */ $.basicType("int")])]
+);
+
 export type namedInt = number
+
+$.registerNamedValueType(
+	"main.namedInt",
+	{Add: (receiver: any, ...args: any[]) => (namedInt_Add as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("Add", [["n", /* @__PURE__ */ $.basicType("int")]], [/* @__PURE__ */ $.basicType("int")])]
+);
+
+$.registerNamedValueType(
+	"*main.namedInt",
+	{Add: (receiver: any, ...args: any[]) => (namedInt_Add as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("Add", [["n", /* @__PURE__ */ $.basicType("int")]], [/* @__PURE__ */ $.basicType("int")])]
+);
 
 export type namedFunc = (() => number | globalThis.Promise<number>) | null
 
+$.registerNamedValueType(
+	"main.namedFunc",
+	{Add: (receiver: any, ...args: any[]) => (namedFunc_Add as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("Add", [["n", /* @__PURE__ */ $.basicType("int")]], [/* @__PURE__ */ $.basicType("int")])]
+);
+
+$.registerNamedValueType(
+	"*main.namedFunc",
+	{Add: (receiver: any, ...args: any[]) => (namedFunc_Add as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("Add", [["n", /* @__PURE__ */ $.basicType("int")]], [/* @__PURE__ */ $.basicType("int")])]
+);
+
 export type namedChan = $.Channel<number> | null
+
+$.registerNamedValueType(
+	"main.namedChan",
+	{Add: (receiver: any, ...args: any[]) => (namedChan_Add as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("Add", [["n", /* @__PURE__ */ $.basicType("int")]], [/* @__PURE__ */ $.basicType("int")])]
+);
+
+$.registerNamedValueType(
+	"*main.namedChan",
+	{Add: (receiver: any, ...args: any[]) => (namedChan_Add as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("Add", [["n", /* @__PURE__ */ $.basicType("int")]], [/* @__PURE__ */ $.basicType("int")])]
+);
 
 export type pointerSlice = $.Slice<number>
 
+$.registerNamedValueType(
+	"*main.pointerSlice",
+	{Add: (receiver: any, ...args: any[]) => (pointerSlice_Add as any)(receiver, ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("Add", [["n", /* @__PURE__ */ $.basicType("int")]], [/* @__PURE__ */ $.basicType("int")])]
+);
+
 export type pointerMap = globalThis.Map<string, number> | null
+
+$.registerNamedValueType(
+	"*main.pointerMap",
+	{Add: (receiver: any, ...args: any[]) => (pointerMap_Add as any)(receiver, ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("Add", [["n", /* @__PURE__ */ $.basicType("int")]], [/* @__PURE__ */ $.basicType("int")])]
+);
 
 export function namedSlice_Add(v: namedSlice, n: number): number {
 	return $.len((v as namedSlice)) + n

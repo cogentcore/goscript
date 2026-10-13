@@ -5,6 +5,12 @@ import * as $ from "@goscript/builtin/index.js"
 
 export type words = bigint[]
 
+$.registerNamedValueType(
+	"*main.words",
+	{Rsh: (receiver: any, ...args: any[]) => (words_Rsh as any)(receiver, ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("Rsh", [["n", /* @__PURE__ */ $.basicType("uint")]], [/* @__PURE__ */ $.basicType("uint64")])]
+);
+
 export function setWords(w: $.VarRef<words> | null): [$.VarRef<words> | null, boolean] {
 	$.pointerValue<bigint[]>(w)[0] = 4n
 	return [w, true]

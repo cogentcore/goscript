@@ -8,7 +8,31 @@ import "@goscript/github.com/s4wave/goscript/tests/tests/interface_slice_index_s
 
 export type value = Uint8Array
 
+$.registerNamedValueType(
+	"main.value",
+	{Key: (receiver: any, ...args: any[]) => (value_Key as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("Key", [], [{ kind: $.TypeKind.Interface, methods: [] }])]
+);
+
+$.registerNamedValueType(
+	"*main.value",
+	{Key: (receiver: any, ...args: any[]) => (value_Key as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("Key", [], [{ kind: $.TypeKind.Interface, methods: [] }])]
+);
+
 export type Fixed = $.Slice<dep.Ref | null>
+
+$.registerNamedValueType(
+	"main.Fixed",
+	{Mark: (receiver: any, ...args: any[]) => (Fixed_Mark as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("Mark", [], [/* @__PURE__ */ $.basicType("bool")])]
+);
+
+$.registerNamedValueType(
+	"*main.Fixed",
+	{Mark: (receiver: any, ...args: any[]) => (Fixed_Mark as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("Mark", [], [/* @__PURE__ */ $.basicType("bool")])]
+);
 
 export type Shape = {
 	Mark(): boolean

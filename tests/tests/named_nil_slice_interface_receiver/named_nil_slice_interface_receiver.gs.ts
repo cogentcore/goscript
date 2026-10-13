@@ -15,6 +15,18 @@ $.registerInterfaceType(
 
 export type bytesEncoder = $.Slice<number>
 
+$.registerNamedValueType(
+	"main.bytesEncoder",
+	{Len: (receiver: any, ...args: any[]) => (bytesEncoder_Len as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("Len", [], [/* @__PURE__ */ $.basicType("int")])]
+);
+
+$.registerNamedValueType(
+	"*main.bytesEncoder",
+	{Len: (receiver: any, ...args: any[]) => (bytesEncoder_Len as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("Len", [], [/* @__PURE__ */ $.basicType("int")])]
+);
+
 export function bytesEncoder_Len(b: bytesEncoder): number {
 	return $.len((b as bytesEncoder))
 }

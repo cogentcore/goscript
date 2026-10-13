@@ -11,6 +11,18 @@ import "@goscript/strings/index.js"
 
 export type state = number
 
+$.registerNamedValueType(
+	"main.state",
+	{String: (receiver: any, ...args: any[]) => (state_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])]
+);
+
+$.registerNamedValueType(
+	"*main.state",
+	{String: (receiver: any, ...args: any[]) => (state_String as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])]
+);
+
 export class msg {
 	public declare v: number
 

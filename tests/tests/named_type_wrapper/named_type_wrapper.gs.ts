@@ -5,6 +5,18 @@ import * as $ from "@goscript/builtin/index.js"
 
 export type MyFileMode = number
 
+$.registerNamedValueType(
+	"main.MyFileMode",
+	{String: (receiver: any, ...args: any[]) => (MyFileMode_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])]
+);
+
+$.registerNamedValueType(
+	"*main.MyFileMode",
+	{String: (receiver: any, ...args: any[]) => (MyFileMode_String as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])]
+);
+
 export class FileStatus {
 	public declare mode: MyFileMode
 
