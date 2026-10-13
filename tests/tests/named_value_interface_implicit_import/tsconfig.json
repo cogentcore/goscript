@@ -18,9 +18,15 @@
   "include": [
     "dep/dep.gs.ts",
     "dep/index.ts",
+    "dep/lookup.gs.ts",
     "errno/errno.gs.ts",
     "errno/index.ts",
+    "find_layers.gs.ts",
     "index.ts",
+    "layers.gs.ts",
+    "local_lookup.gs.ts",
+    "multi_assign.gs.ts",
+    "multi_return.gs.ts",
     "named_value_interface_implicit_import.gs.ts"
   ]
 }

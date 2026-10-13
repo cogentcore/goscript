@@ -1169,9 +1169,9 @@ func addImplicitInterfaceConversionDeps(
 	if info == nil || node == nil {
 		return
 	}
-	addValue := func(target types.Type, value ast.Expr) {
-		if target != nil && value != nil && typeIsInterface(target) {
-			addRuntimeTypeDeps(info.TypeOf(value))
+	addValue := func(target, source types.Type) {
+		if target != nil && source != nil && typeIsInterface(target) {
+			addRuntimeTypeDeps(source)
 		}
 	}
 	switch typed := node.(type) {
@@ -1181,62 +1181,92 @@ func addImplicitInterfaceConversionDeps(
 		}
 		if obj := info.Defs[typed.Name]; obj != nil {
 			signature, _ := obj.Type().(*types.Signature)
-			addReturnInterfaceValueDeps(signature, typed.Body, addValue)
+			addReturnInterfaceValueDeps(info, signature, typed.Body, addValue)
 		}
 	case *ast.FuncLit:
 		signature, _ := types.Unalias(info.TypeOf(typed)).(*types.Signature)
-		addReturnInterfaceValueDeps(signature, typed.Body, addValue)
+		addReturnInterfaceValueDeps(info, signature, typed.Body, addValue)
 	case *ast.AssignStmt:
-		if typed.Tok != token.ASSIGN || len(typed.Lhs) != len(typed.Rhs) {
+		if typed.Tok != token.ASSIGN {
 			return
 		}
+		targets := make([]types.Type, len(typed.Lhs))
 		for idx, lhs := range typed.Lhs {
-			addValue(info.TypeOf(lhs), typed.Rhs[idx])
+			targets[idx] = info.TypeOf(lhs)
 		}
+		addValueListDeps(info, targets, typed.Rhs, addValue)
 	case *ast.ValueSpec:
-		if typed.Type == nil || len(typed.Values) != len(typed.Names) {
+		if typed.Type == nil {
 			return
 		}
 		target := info.TypeOf(typed.Type)
-		for _, value := range typed.Values {
-			addValue(target, value)
+		targets := make([]types.Type, len(typed.Names))
+		for idx := range targets {
+			targets[idx] = target
 		}
+		addValueListDeps(info, targets, typed.Values, addValue)
 	case *ast.SendStmt:
 		if ch, ok := types.Unalias(info.TypeOf(typed.Chan)).Underlying().(*types.Chan); ok {
-			addValue(ch.Elem(), typed.Value)
+			addValue(ch.Elem(), info.TypeOf(typed.Value))
 		}
 	case *ast.CallExpr:
 		if len(typed.Args) != 1 {
 			return
 		}
 		if tv, ok := info.Types[typed.Fun]; ok && tv.IsType() {
-			addValue(tv.Type, typed.Args[0])
+			addValue(tv.Type, info.TypeOf(typed.Args[0]))
 		}
+	}
+}
+
+// addValueListDeps calls addValue for each target type with the type of the
+// value assigned to it, including the results of a single multi-value call.
+func addValueListDeps(
+	info *types.Info,
+	targets []types.Type,
+	values []ast.Expr,
+	addValue func(target, source types.Type),
+) {
+	if len(values) == len(targets) {
+		for idx, value := range values {
+			addValue(targets[idx], info.TypeOf(value))
+		}
+		return
+	}
+	if len(values) != 1 {
+		return
+	}
+	tuple, ok := info.TypeOf(values[0]).(*types.Tuple)
+	if !ok || tuple.Len() != len(targets) {
+		return
+	}
+	for idx, target := range targets {
+		addValue(target, tuple.At(idx).Type())
 	}
 }
 
 // addReturnInterfaceValueDeps calls addValue for each returned value of body,
 // excluding nested function literals, with its result type.
 func addReturnInterfaceValueDeps(
+	info *types.Info,
 	signature *types.Signature,
 	body *ast.BlockStmt,
-	addValue func(types.Type, ast.Expr),
+	addValue func(target, source types.Type),
 ) {
 	if signature == nil || body == nil || signature.Results().Len() == 0 {
 		return
 	}
 	results := signature.Results()
+	targets := make([]types.Type, results.Len())
+	for idx := range targets {
+		targets[idx] = results.At(idx).Type()
+	}
 	ast.Inspect(body, func(node ast.Node) bool {
 		switch typed := node.(type) {
 		case *ast.FuncLit:
 			return false
 		case *ast.ReturnStmt:
-			if len(typed.Results) != results.Len() {
-				return true
-			}
-			for idx, value := range typed.Results {
-				addValue(results.At(idx).Type(), value)
-			}
+			addValueListDeps(info, targets, typed.Results, addValue)
 		}
 		return true
 	})

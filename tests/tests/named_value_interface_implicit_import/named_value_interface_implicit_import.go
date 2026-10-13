@@ -28,4 +28,13 @@ func main() {
 
 	lit := func() error { return dep.ErrNotDir }
 	println("func literal:", lit().Error())
+
+	looked, ok := lookup()
+	println("multi-value return:", looked.Error(), ok)
+
+	multi, ok := assignLookup()
+	println("multi-value assign:", multi.Error(), ok)
+
+	local, ok := localLookup()
+	println("local multi-value return:", local.Error(), ok)
 }
