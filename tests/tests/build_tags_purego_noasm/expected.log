@@ -1,0 +1,3 @@
+haveArchSqrt: false
+purego: pure Go implementation
+sqrt(16): 4

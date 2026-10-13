@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "paths": {
+      "*": [
+        "./*"
+      ],
+      "@goscript/*": [
+        "../../../tests/tests/build_tags_purego_noasm/run/output/@goscript/*",
+        "../../../gs/*",
+        "../../../tests/deps/*"
+      ],
+      "@goscript/github.com/s4wave/goscript/tests/tests/build_tags_purego_noasm/*": [
+        "./*"
+      ]
+    }
+  },
+  "extends": "../../../tests/tsconfig.base.json",
+  "include": [
+    "asm.gs.ts",
+    "build_tags_purego_noasm.gs.ts",
+    "index.ts",
+    "noasm.gs.ts",
+    "notpurego.gs.ts",
+    "purego.gs.ts"
+  ]
+}
