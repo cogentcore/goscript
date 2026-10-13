@@ -4,3 +4,8 @@ int16: 5
 uint32 of -1: 4294967295
 uint64 of -1: 18446744073709551615
 int64 of max uint64: -1
+gid H: 43
+uint8 sum: 44 32 156
+int16 sum: -25536 24464 15536
+shift: 0 65534
+int8: -128 -2

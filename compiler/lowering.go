@@ -9556,6 +9556,17 @@ func (o *LoweringOwner) lowerConversionExpr(
 	value, diagnostics := o.lowerExpr(ctx, expr.Args[0])
 	sourceType := ctx.semPkg.source.TypesInfo.TypeOf(expr.Args[0])
 
+	// Arithmetic on an integer type narrower than 64 bits is computed on
+	// JavaScript numbers without wrapping, so the result wraps to its own
+	// width before it is converted, as uint16(a+b) does in Go.
+	if isNumericType(targetType) && isNarrowIntegerArithmetic(ctx, expr.Args[0]) {
+		if bits, ok := unsignedIntegerBits(sourceType); ok && bits < 64 {
+			value = o.runtimeOwner.QualifiedHelper(RuntimeHelperUint) + "(" + value + ", " + strconv.Itoa(bits) + ")"
+		} else if bits, ok := signedIntegerBits(sourceType); ok && bits < 64 {
+			value = o.runtimeOwner.QualifiedHelper(RuntimeHelperInt) + "(" + value + ", " + strconv.Itoa(bits) + ")"
+		}
+	}
+
 	// A conversion that keeps the JavaScript value returns its operand
 	// unchanged, so a binary operand must stay grouped where the conversion
 	// is itself an operand, as in float64(n) / float64(a*b).
@@ -14111,6 +14122,26 @@ func isFloatBinaryArithmeticOperator(tok token.Token) bool {
 	default:
 		return false
 	}
+}
+
+// isNarrowIntegerArithmetic reports whether expr is a non-constant
+// arithmetic expression, which can overflow its integer type.
+func isNarrowIntegerArithmetic(ctx lowerFileContext, expr ast.Expr) bool {
+	expr = ast.Unparen(expr)
+	if tv, ok := ctx.semPkg.source.TypesInfo.Types[expr]; !ok || tv.Value != nil {
+		return false
+	}
+	switch e := expr.(type) {
+	case *ast.BinaryExpr:
+		switch e.Op {
+		case token.ADD, token.SUB, token.MUL, token.SHL:
+			return true
+		}
+	case *ast.UnaryExpr:
+		// The complement ^x is wrapped where it is lowered.
+		return e.Op == token.SUB
+	}
+	return false
 }
 
 func unsignedIntegerBits(typ types.Type) (int, bool) {

@@ -216,7 +216,7 @@ export function encode(rs: $.Slice<number>): string {
 						__goscriptGotoState1 = "terminate"
 						continue __goscriptGotoLoop1
 					}
-					out = $.concatString(out, $.concatString(($.concatString("[", $.runeToString($.int(65 + (c0 % 26), 32)))), "]"))
+					out = $.concatString(out, $.concatString(($.concatString("[", $.runeToString($.int($.uint(65 + (c0 % 26), 8), 32)))), "]"))
 					break __goscriptGotoLoop1
 					break
 				}
