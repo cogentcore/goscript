@@ -8008,6 +8008,9 @@ func (o *LoweringOwner) lowerExpr(ctx lowerFileContext, expr ast.Expr) (string, 
 			}
 		}
 	}
+	if constantValue, ok := lowerUnsafeSizeConstant(ctx, expr); ok {
+		return constantValue, nil
+	}
 	switch typed := expr.(type) {
 	case *ast.BasicLit:
 		return lowerBasicLit(typed), nil
@@ -13957,6 +13960,40 @@ func isFixedWideIntegerType(typ types.Type) bool {
 // coerceWideHelperResult, which keeps values above 2^53 as a runtime bigint to
 // preserve full 64-bit width, matching design/SPEC_DIFFERENCES.md which maps
 // int64/uint64 to bigint and uint/uintptr to the number representation.
+// lowerUnsafeSizeConstant lowers a call of unsafe.Sizeof, unsafe.Alignof, or
+// unsafe.Offsetof to the constant that the type checker computed for it, as Go
+// does at compile time. Such calls have no run-time implementation, so this
+// applies even where the enclosing expression is not constant.
+func lowerUnsafeSizeConstant(ctx lowerFileContext, expr ast.Expr) (string, bool) {
+	call, ok := unwrapParenExpr(expr).(*ast.CallExpr)
+	if !ok {
+		return "", false
+	}
+	var ident *ast.Ident
+	switch fun := unwrapParenExpr(call.Fun).(type) {
+	case *ast.SelectorExpr:
+		ident = fun.Sel
+	case *ast.Ident:
+		ident = fun
+	default:
+		return "", false
+	}
+	builtin, ok := ctx.semPkg.source.TypesInfo.Uses[ident].(*types.Builtin)
+	if !ok {
+		return "", false
+	}
+	switch builtin.Name() {
+	case "Sizeof", "Alignof", "Offsetof":
+	default:
+		return "", false
+	}
+	value := ctx.semPkg.source.TypesInfo.Types[call].Value
+	if value == nil || value.Kind() != constant.Int {
+		return "", false
+	}
+	return lowerConstantValue(value)
+}
+
 func isBigIntBackedType(typ types.Type) bool {
 	basic, ok := types.Unalias(typ).Underlying().(*types.Basic)
 	if !ok {
