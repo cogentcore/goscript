@@ -9404,11 +9404,22 @@ func (o *LoweringOwner) lowerConversionExpr(
 	expr *ast.CallExpr,
 	targetType types.Type,
 ) (string, []Diagnostic) {
+	// A conversion lowers its single operand.
 	if len(expr.Args) != 1 {
 		return "undefined", []Diagnostic{loweringUnsupportedAt(ctx, expr, "call", ctx.semPkg.pkgPath, "unsupported conversion arity")}
 	}
 	value, diagnostics := o.lowerExpr(ctx, expr.Args[0])
 	sourceType := ctx.semPkg.source.TypesInfo.TypeOf(expr.Args[0])
+
+	// A conversion that keeps the JavaScript value returns its operand
+	// unchanged, so a binary operand must stay grouped where the conversion
+	// is itself an operand, as in float64(n) / float64(a*b).
+	grouped := value
+	if _, ok := ast.Unparen(expr.Args[0]).(*ast.BinaryExpr); ok {
+		grouped = "(" + value + ")"
+	}
+
+	// Unsafe pointer conversions keep pointer identity or resolve addresses.
 	if isNumericType(targetType) && isUnsafePointerType(sourceType) {
 		if value, addressDiagnostics, ok := o.lowerUnsafePointerIntegerExpr(ctx, expr.Args[0]); ok {
 			return value, append(diagnostics, addressDiagnostics...)
@@ -9434,6 +9445,8 @@ func (o *LoweringOwner) lowerConversionExpr(
 	if isNilExpr(expr.Args[0]) && isPointerType(targetType) {
 		return "null", diagnostics
 	}
+
+	// Type parameter and interface targets convert by their runtime type.
 	if typeParam, ok := types.Unalias(targetType).(*types.TypeParam); ok &&
 		typeParamInScope(ctx, typeParam) && !types.Identical(targetType, sourceType) &&
 		basicTypeSet(typeParam.Constraint()) {
@@ -9446,6 +9459,8 @@ func (o *LoweringOwner) lowerConversionExpr(
 	if isInterfaceType(targetType) {
 		return o.lowerValueForTarget(ctx, expr.Args[0], targetType, value), diagnostics
 	}
+
+	// String, rune slice and byte slice conversions copy through runtime helpers.
 	if isStringType(targetType) {
 		switch {
 		case isRuneSliceType(sourceType):
@@ -9455,7 +9470,7 @@ func (o *LoweringOwner) lowerConversionExpr(
 		case overrideNamedStringType(ctx, o, sourceType):
 			return "globalThis.String(" + value + ")", diagnostics
 		case isStringType(sourceType):
-			return value, diagnostics
+			return grouped, diagnostics
 		case isNumericType(sourceType):
 			// An invalid rune converts to U+FFFD, where String.fromCodePoint throws
 			// or keeps a surrogate.
@@ -9473,6 +9488,8 @@ func (o *LoweringOwner) lowerConversionExpr(
 		}
 		return o.runtimeOwner.QualifiedHelper(RuntimeHelperStringToBytes) + "(" + value + ")", diagnostics
 	}
+
+	// Slice to array and array pointer conversions copy or alias the elements.
 	if array := pointerToArrayType(targetType); array != nil {
 		if slice, ok := types.Unalias(sourceType).Underlying().(*types.Slice); ok && types.Identical(array.Elem(), slice.Elem()) {
 			result := o.runtimeOwner.QualifiedHelper(RuntimeHelperSliceToArrayPointer) +
@@ -9503,6 +9520,8 @@ func (o *LoweringOwner) lowerConversionExpr(
 			return result, diagnostics
 		}
 	}
+
+	// Struct conversions between identical layouts keep or copy the value.
 	if target := pointerToNamedStructType(targetType); target != nil {
 		source := pointerToNamedStructType(sourceType)
 		if source != nil && !types.Identical(target, source) &&
@@ -9515,6 +9534,8 @@ func (o *LoweringOwner) lowerConversionExpr(
 	if conversion, ok := o.lowerNamedStructConversion(ctx, expr.Args[0], targetType, sourceType, value); ok {
 		return renderNamedStructConversion(conversion), diagnostics
 	}
+
+	// Complex targets and numeric literals keep their constant form.
 	if isComplex64Type(targetType) {
 		if isComplexType(sourceType) {
 			return o.runtimeOwner.QualifiedHelper(RuntimeHelperComplex64) + "(" + value + ")", diagnostics
@@ -9536,9 +9557,11 @@ func (o *LoweringOwner) lowerConversionExpr(
 		// conversions still widen below so their literal type does not narrow,
 		// and named-const references keep flowing through as their symbol.
 		if o.numericConversionKeepsLiteral(ctx, expr.Args[0], targetType) {
-			return value, diagnostics
+			return grouped, diagnostics
 		}
 	}
+
+	// Named function and non-numeric named types wrap or keep the value.
 	if named := namedFunctionType(targetType); named != nil {
 		typeName := runtimeNamedTypeName(named)
 		return o.runtimeOwner.QualifiedHelper(RuntimeHelperNamedFunction) +
@@ -9549,11 +9572,13 @@ func (o *LoweringOwner) lowerConversionExpr(
 		if _, ok := named.Underlying().(*types.Slice); ok {
 			return "(" + value + " as " + o.tsTypeFor(ctx, targetType) + ")", diagnostics
 		}
-		return value, diagnostics
+		return grouped, diagnostics
 	}
+
+	// Numeric conversions round to the target representation.
 	if isNumericType(targetType) {
 		if isFloatType(targetType) {
-			converted := value
+			converted := grouped
 			if isBigIntBackedType(sourceType) {
 				converted = "globalThis.Number(" + value + ")"
 			}
@@ -9579,7 +9604,7 @@ func (o *LoweringOwner) lowerConversionExpr(
 		}
 		return o.runtimeOwner.QualifiedHelper(RuntimeHelperInt) + "(" + value + ")", diagnostics
 	}
-	return value, diagnostics
+	return grouped, diagnostics
 }
 
 // coerceWideHelperResult coerces a bigint result from the int64*/uint64* runtime
