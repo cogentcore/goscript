@@ -8084,6 +8084,15 @@ func (o *LoweringOwner) lowerExpr(ctx lowerFileContext, expr ast.Expr) (string, 
 				return constantValue, nil
 			}
 		}
+
+		// A constant uintptr call, such as unsafe.Sizeof, unsafe.Alignof or
+		// unsafe.Offsetof, lowers to its value: those calls have no runtime
+		// implementation, and Go computes them at compile time.
+		if _, ok := unwrapParenExpr(expr).(*ast.CallExpr); ok && isUintptrType(tv.Type) {
+			if constantValue, ok := lowerConstantValue(tv.Value); ok {
+				return constantValue, nil
+			}
+		}
 	}
 	switch typed := expr.(type) {
 	case *ast.BasicLit:
