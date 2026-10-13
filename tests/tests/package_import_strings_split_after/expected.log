@@ -1,0 +1,80 @@
+input: 3
+SplitAfterN 2: 2
+  [a
+]
+  [b]
+SplitAfter: 2
+  [a
+]
+  [b]
+SplitN 2: 2
+  [a]
+  [b]
+input: 2
+SplitAfterN 2: 2
+  [a
+]
+  []
+SplitAfter: 2
+  [a
+]
+  []
+SplitN 2: 2
+  [a]
+  []
+input: 1
+SplitAfterN 2: 2
+  [
+]
+  []
+SplitAfter: 2
+  [
+]
+  []
+SplitN 2: 2
+  []
+  []
+input: 5
+SplitAfterN 2: 2
+  [a
+]
+  [b
+c]
+SplitAfter: 3
+  [a
+]
+  [b
+]
+  [c]
+SplitN 2: 2
+  [a]
+  [b
+c]
+input: 2
+SplitAfterN 2: 1
+  [ab]
+SplitAfter: 1
+  [ab]
+SplitN 2: 1
+  [ab]
+input: 0
+SplitAfterN 2: 1
+  []
+SplitAfter: 1
+  []
+SplitN 2: 1
+  []
+SplitN empty sep 2: 2
+  [a]
+  [bc]
+SplitAfterN empty sep 2: 2
+  [a]
+  [bc]
+SplitN empty sep 5: 3
+  [a]
+  [b]
+  [c]
+SplitN empty sep -1: 3
+  [a]
+  [b]
+  [c]
