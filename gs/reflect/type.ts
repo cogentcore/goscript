@@ -287,7 +287,9 @@ function mergeTypeMetadata(target: Type, source: Type): void {
   }
 }
 
-function typeIdentityKey(t: Type, seen = new Set<Type>()): string {
+// typeIdentityKey returns a key that two types share exactly when they are
+// identical in Go.
+export function typeIdentityKey(t: Type, seen = new Set<Type>()): string {
   if (seen.has(t)) {
     return `${t.Kind()}:${t.PkgPath()}:${t.Name()}:${t.String()}`
   }
@@ -994,15 +996,8 @@ export class Value {
       )
     }
     const value = this.currentValue()
-    if (
-      value &&
-      typeof value === 'object' &&
-      '__meta__' in value
-    ) {
-      return new Value(
-        $.goSlice(value as $.Slice<unknown>, i, j),
-        this._type,
-      )
+    if (value && typeof value === 'object' && '__meta__' in value) {
+      return new Value($.goSlice(value as $.Slice<unknown>, i, j), this._type)
     }
     if (globalThis.Array.isArray(value)) {
       return new Value(value.slice(i, j), this._type)
