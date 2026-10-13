@@ -28,6 +28,7 @@ import {
   BasicType,
   Invalid,
   structFieldStorageKey,
+  TypeOf,
   typeInfoFromReflectType,
 } from './type.js'
 import {
@@ -207,7 +208,84 @@ export function NewAt(typ: Type | null, p: Pointer | unknown): Value {
       ptrType,
     )
   }
+  if (typeof p === 'number' || typeof p === 'bigint') {
+    const value = pointerAtAddress(typ, Number(p))
+    if (value !== undefined) {
+      return value
+    }
+  }
   throw new Error('reflect.NewAt requires a GoScript-owned pointer')
+}
+
+// pointerAtAddress returns a pointer of type *typ to the value at a synthetic
+// address: an object's address (from Value.Pointer) plus, for a struct, the
+// offset of one of its fields, possibly nested, as unsafe pointer arithmetic
+// computes it.
+function pointerAtAddress(typ: Type, address: number): Value | undefined {
+  const base =
+    Math.floor(address / $.pointerAddressStride) * $.pointerAddressStride
+  const offset = address - base
+  let target: unknown = $.objectAtAddress(base)
+  if (target === undefined) {
+    return undefined
+  }
+  // A variable's address is that of its value; a struct variable's fields
+  // are found by offset in the struct it holds.
+  if ($.isVarRef(target)) {
+    const held = target.value
+    const heldType =
+      held === null || held === undefined ? null : TypeOf(held as ReflectValue)
+    if (heldType === null || heldType.Kind() !== Struct) {
+      return offset === 0 ?
+          new Value(target as $.VarRef<ReflectValue>, PointerTo(typ))
+        : undefined
+    }
+    target = held
+  }
+  if (target === null || typeof target !== 'object') {
+    return undefined
+  }
+  // A struct object is also its own pointer, and may be tagged as one.
+  let structType = TypeOf(target as ReflectValue)
+  if (structType?.Kind() === Ptr) {
+    structType = structType.Elem()
+  }
+  if (structType === null || structType.Kind() !== Struct) {
+    return undefined
+  }
+  if (offset === 0 && structType.String() === typ.String()) {
+    return new Value(target as ReflectValue, PointerTo(typ))
+  }
+  return fieldPointerAtOffset(
+    new Value(target as ReflectValue, structType),
+    typ,
+    offset,
+  )
+}
+
+// fieldPointerAtOffset returns a pointer to the field of struct value v, or
+// of a struct nested in it, at offset with type typ.
+function fieldPointerAtOffset(
+  v: Value,
+  typ: Type,
+  offset: number,
+): Value | undefined {
+  const structType = v.Type()
+  for (let i = 0; i < structType.NumField(); i++) {
+    const field = structType.Field(i)
+    const start = field.Offset
+    if (offset < start || offset >= start + Math.max(field.Type.Size(), 1)) {
+      continue
+    }
+    const fieldValue = v.Field(i)
+    if (offset === start && field.Type.String() === typ.String()) {
+      return fieldValue.Addr()
+    }
+    if (field.Type.Kind() === Struct) {
+      return fieldPointerAtOffset(fieldValue, typ, offset - start)
+    }
+  }
+  return undefined
 }
 
 export function SliceAt(
