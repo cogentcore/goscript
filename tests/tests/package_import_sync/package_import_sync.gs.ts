@@ -139,8 +139,9 @@ export class queue {
 		return $.markAsStructValue(new queue(this))
 	}
 
-	public init(): void {
+	public async lockAndInit(): globalThis.Promise<void> {
 		let q: queue | $.VarRef<queue> | null = this;
+		await $.pointerValue<queue>(q).Mu.Lock()
 		if ($.pointerValue<queue>(q).Cond.L == null) {
 			$.pointerValue<queue>(q).Cond.L = $.interfaceValue<sync.Locker | null>($.fieldRef($.pointerValue<queue>(q)._fields, "Mu"), "*sync.Mutex", /* @__PURE__ */ $.pointerType("sync.Mutex"))
 		}
@@ -148,24 +149,23 @@ export class queue {
 
 	public async pop(): globalThis.Promise<number> {
 		let q: queue | $.VarRef<queue> | null = this;
-		await $.pointerValue<queue>(q).Mu.Lock()
-		queue.prototype.init.call(q)
+		using __defer = new $.DisposableStack()
+		await queue.prototype.lockAndInit.call(q)
+		__defer.defer(() => { $.pointerValue<queue>(q).Mu.Unlock() })
 		while ($.len($.pointerValue<queue>(q).items) == 0) {
 			await $.pointerValue<queue>(q).Cond.Wait()
 		}
 		let v = $.arrayIndex($.pointerValue<queue>(q).items!, 0)
 		$.pointerValue<queue>(q).items = $.goSlice($.pointerValue<queue>(q).items, 1, undefined)
-		$.pointerValue<queue>(q).Mu.Unlock()
 		return v
 	}
 
 	public async push(v: number): globalThis.Promise<void> {
 		let q: queue | $.VarRef<queue> | null = this;
-		await $.pointerValue<queue>(q).Mu.Lock()
-		queue.prototype.init.call(q)
+		await queue.prototype.lockAndInit.call(q)
 		$.pointerValue<queue>(q).items = $.append($.pointerValue<queue>(q).items, v)
-		$.pointerValue<queue>(q).Mu.Unlock()
 		$.pointerValue<queue>(q).Cond.Signal()
+		$.pointerValue<queue>(q).Mu.Unlock()
 	}
 
 	static {
@@ -175,7 +175,7 @@ export class queue {
 	static __typeInfo = $.registerStructType(
 		"main.queue",
 		() => new queue(),
-		() => [{ name: "init", args: [], returns: [] }, { name: "pop", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }, { name: "push", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [] }],
+		() => [{ name: "lockAndInit", args: [], returns: [] }, { name: "pop", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }, { name: "push", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [] }],
 		queue,
 		() => [{ name: "Mu", key: "Mu", type: "sync.Mutex" }, { name: "Cond", key: "Cond", type: "sync.Cond" }, { name: "items", key: "items", type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")) }]
 	)
@@ -328,20 +328,22 @@ export async function condZeroValue(): globalThis.Promise<void> {
 	let zero: sync.Cond = $.markAsStructValue(new sync.Cond())
 	await $.println("zero L is nil:", zero.L == null)
 
+	// The consumer starts first and each push waits for its pop to print,
+	// so that the consumer waits on the Cond for every value.
 	let q: queue | $.VarRef<queue> | null = new queue()
-	let done: $.Channel<boolean> | null = $.makeChannel<boolean>(0, false, "both")
+	let started: $.Channel<boolean> | null = $.makeChannel<boolean>(0, false, "both")
+	let results: $.Channel<number> | null = $.makeChannel<number>(0, 0, "both")
 	queueMicrotask(async () => { await (async (): globalThis.Promise<void> => {
-		let sum = 0
+		await $.chanSend(started, true)
 		for (let __rangeIndex = 0; __rangeIndex < 3; __rangeIndex++) {
-			sum = sum + (await queue.prototype.pop.call(q))
+			await $.chanSend(results, await queue.prototype.pop.call(q))
 		}
-		await $.println("sum:", sum)
-		await $.chanSend(done, true)
 	})() })
-	await queue.prototype.push.call(q, 1)
-	await queue.prototype.push.call(q, 2)
-	await queue.prototype.push.call(q, 3)
-	await $.chanRecv(done)
+	await $.chanRecv(started)
+	for (let i = 1; i <= 3; i++) {
+		await queue.prototype.push.call(q, i * 10)
+		await $.println("got:", await $.chanRecv(results))
+	}
 
 	let c: sync.Cond | $.VarRef<sync.Cond> | null = sync.NewCond($.pointerValueOrNil($.interfaceValue<sync.Locker | null>(new sync.Mutex(), "*sync.Mutex", /* @__PURE__ */ $.pointerType("sync.Mutex")))!)
 	await $.println("NewCond L is nil:", $.pointerValue<sync.Cond>(c).L == null)

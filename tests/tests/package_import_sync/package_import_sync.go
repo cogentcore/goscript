@@ -20,29 +20,28 @@ type queue struct {
 	items []int
 }
 
-func (q *queue) init() {
+func (q *queue) lockAndInit() {
+	q.Mu.Lock()
 	if q.Cond.L == nil {
 		q.Cond.L = &q.Mu
 	}
 }
 
 func (q *queue) push(v int) {
-	q.Mu.Lock()
-	q.init()
+	q.lockAndInit()
 	q.items = append(q.items, v)
-	q.Mu.Unlock()
 	q.Cond.Signal()
+	q.Mu.Unlock()
 }
 
 func (q *queue) pop() int {
-	q.Mu.Lock()
-	q.init()
+	q.lockAndInit()
+	defer q.Mu.Unlock()
 	for len(q.items) == 0 {
 		q.Cond.Wait()
 	}
 	v := q.items[0]
 	q.items = q.items[1:]
-	q.Mu.Unlock()
 	return v
 }
 
@@ -173,25 +172,28 @@ func main() {
 	println("test finished")
 }
 
-// condZeroValue waits on a Cond whose Locker is set after its zero value.
+// condZeroValue waits on a Cond whose Locker is set after its zero value
+// to the address of a Mutex field.
 func condZeroValue() {
 	var zero sync.Cond
 	println("zero L is nil:", zero.L == nil)
 
+	// The consumer starts first and each push waits for its pop to print,
+	// so that the consumer waits on the Cond for every value.
 	q := &queue{}
-	done := make(chan bool)
+	started := make(chan bool)
+	results := make(chan int)
 	go func() {
-		sum := 0
+		started <- true
 		for range 3 {
-			sum += q.pop()
+			results <- q.pop()
 		}
-		println("sum:", sum)
-		done <- true
 	}()
-	q.push(1)
-	q.push(2)
-	q.push(3)
-	<-done
+	<-started
+	for i := 1; i <= 3; i++ {
+		q.push(i * 10)
+		println("got:", <-results)
+	}
 
 	c := sync.NewCond(&sync.Mutex{})
 	println("NewCond L is nil:", c.L == nil)

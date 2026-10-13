@@ -6,6 +6,7 @@
 import {
   comparableEqual,
   GoBinaryString,
+  pointerValue,
   stringEqual,
 } from '@goscript/builtin/index.js'
 
@@ -298,13 +299,15 @@ export class Cond {
 
   // Wait atomically unlocks c.L and suspends execution of the calling goroutine
   public async Wait(): Promise<void> {
-    const l = this.L
-    if (l === null) {
+    // L may hold a reference to a Locker, as &x.Mu of a struct field does,
+    // so it is resolved as compiled code resolves an interface's receiver.
+    if (this.L === null) {
       throw new Error(
         'runtime error: invalid memory address or nil pointer dereference',
       )
     }
-    l.Unlock()
+    const l = pointerValue<Locker>(this.L)
+    await l.Unlock()
 
     return new Promise<void>((resolve) => {
       this._waiters.push(async () => {
