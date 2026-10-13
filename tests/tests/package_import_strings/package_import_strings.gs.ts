@@ -27,6 +27,31 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("Direct:", strings.Builder.prototype.String.call($.pointerValue<strings.Builder>(builderPtr)))
 	await $.println("LastIndexByte:", strings.LastIndexByte("hello", 108))
 	await $.println("LastIndex:", strings.LastIndex("hello", "l"))
+
+	await splits()
+}
+
+export async function show(name: string, parts: $.Slice<string>): globalThis.Promise<void> {
+	let line = name
+	for (let __goscriptRangeTarget0 = parts, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
+		let p = __goscriptRangeTarget0![__rangeIndex]
+		line = $.concatString(line, $.concatString(($.concatString(" [", p)), "]"))
+	}
+	await $.println(line, $.len(parts))
+}
+
+export async function splits(): globalThis.Promise<void> {
+	for (let __goscriptRangeTarget1 = $.arrayToSlice<string>(["a,b", "a,", ",", "a,b,c", "ab", ""]), __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget1); __rangeIndex++) {
+		let s = __goscriptRangeTarget1![__rangeIndex]
+		await show($.concatString(($.concatString("SplitAfterN 2 ", s)), ":"), strings.SplitAfterN(s, ",", 2))
+		await show($.concatString(($.concatString("SplitAfter ", s)), ":"), strings.SplitAfter(s, ","))
+		await show($.concatString(($.concatString("SplitN 2 ", s)), ":"), strings.SplitN(s, ",", 2))
+		await show($.concatString(($.concatString("Split ", s)), ":"), strings.Split(s, ","))
+	}
+	await show("SplitN empty sep 2:", strings.SplitN("abc", "", 2))
+	await show("SplitAfterN empty sep 2:", strings.SplitAfterN("abc", "", 2))
+	await show("SplitN empty sep 5:", strings.SplitN("abc", "", 5))
+	await show("Split empty sep:", strings.Split("abc", ""))
 }
 
 export async function printBuilderPointer(builder: strings.Builder | $.VarRef<strings.Builder> | null): globalThis.Promise<void> {

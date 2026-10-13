@@ -6,3 +6,31 @@ After pointer: Hello World! Pointer
 Direct: Direct make test
 LastIndexByte: 3
 LastIndex: 3
+SplitAfterN 2 a,b: [a,] [b] 2
+SplitAfter a,b: [a,] [b] 2
+SplitN 2 a,b: [a] [b] 2
+Split a,b: [a] [b] 2
+SplitAfterN 2 a,: [a,] [] 2
+SplitAfter a,: [a,] [] 2
+SplitN 2 a,: [a] [] 2
+Split a,: [a] [] 2
+SplitAfterN 2 ,: [,] [] 2
+SplitAfter ,: [,] [] 2
+SplitN 2 ,: [] [] 2
+Split ,: [] [] 2
+SplitAfterN 2 a,b,c: [a,] [b,c] 2
+SplitAfter a,b,c: [a,] [b,] [c] 3
+SplitN 2 a,b,c: [a] [b,c] 2
+Split a,b,c: [a] [b] [c] 3
+SplitAfterN 2 ab: [ab] 1
+SplitAfter ab: [ab] 1
+SplitN 2 ab: [ab] 1
+Split ab: [ab] 1
+SplitAfterN 2 : [] 1
+SplitAfter : [] 1
+SplitN 2 : [] 1
+Split : [] 1
+SplitN empty sep 2: [a] [bc] 2
+SplitAfterN empty sep 2: [a] [bc] 2
+SplitN empty sep 5: [a] [b] [c] 3
+Split empty sep: [a] [b] [c] 3

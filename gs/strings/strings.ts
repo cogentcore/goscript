@@ -187,27 +187,19 @@ export function LastIndexFunc(
 
 // Split slices s into all substrings separated by sep and returns a slice of the substrings between those separators.
 export function Split(s: string, sep: string): $.Slice<string> {
-  if (sep === '') {
-    // Split into individual characters
-    return $.arrayToSlice([...s])
-  }
-  return $.arrayToSlice(s.split(sep))
+  return SplitN(s, sep, -1)
 }
 
 // SplitN slices s into substrings separated by sep and returns a slice of the substrings between those separators.
 export function SplitN(s: string, sep: string, n: number): $.Slice<string> {
-  if (n == 0) {
+  if (n === 0) {
     return $.arrayToSlice([])
   }
   if (n === 1) {
     return $.arrayToSlice([s])
   }
   if (sep === '') {
-    const chars = [...s]
-    if (n < 0) {
-      return $.arrayToSlice(chars)
-    }
-    return $.arrayToSlice(chars.slice(0, n))
+    return $.arrayToSlice(explode(s, n))
   }
 
   const parts = s.split(sep)
@@ -231,15 +223,11 @@ export function SplitAfterN(
   sep: string,
   n: number,
 ): $.Slice<string> {
-  if (n == 0) {
+  if (n === 0) {
     return $.arrayToSlice([])
   }
   if (sep === '') {
-    const chars = [...s]
-    if (n < 0) {
-      return $.arrayToSlice(chars)
-    }
-    return $.arrayToSlice(chars.slice(0, n))
+    return $.arrayToSlice(explode(s, n))
   }
 
   const parts: string[] = []
@@ -254,11 +242,22 @@ export function SplitAfterN(
     count++
   }
 
-  if (start < s.length) {
-    parts.push(s.slice(start))
-  }
+  // The rest of s is always the last substring, even when it is empty
+  // because s ends with sep.
+  parts.push(s.slice(start))
 
   return $.arrayToSlice(parts)
+}
+
+// explode splits s into its characters, at most n of them (n < 0 means no
+// limit), with the rest of s in the last substring, as Go's strings.explode.
+// n must not be 0.
+function explode(s: string, n: number): string[] {
+  const chars = [...s]
+  if (n < 0 || n >= chars.length) {
+    return chars
+  }
+  return [...chars.slice(0, n - 1), chars.slice(n - 1).join('')]
 }
 
 // Fields splits the string s around each instance of one or more consecutive white space characters.
