@@ -3728,12 +3728,25 @@ func (o *LoweringOwner) lowerNamedReceiverMethodDecl(
 	}
 	if len(decl.Recv.List) != 0 && len(decl.Recv.List[0].Names) != 0 {
 		receiverObj := ctx.semPkg.source.TypesInfo.Defs[decl.Recv.List[0].Names[0]]
-		if _, receiverPointer := signature.Recv().Type().(*types.Pointer); !receiverPointer && receiverObj != nil && ctx.model.needsVarRef[receiverObj] {
+		_, receiverPointer := signature.Recv().Type().(*types.Pointer)
+		needsVarRef := !receiverPointer && receiverObj != nil && ctx.model.needsVarRef[receiverObj]
+		// An array value receiver is a copy, so it is cloned when the method
+		// can modify it, as callers pass their array itself.
+		cloneArray := !receiverPointer && receiverObj != nil && isArrayType(receiverObj.Type()) &&
+			(needsVarRef || bodyAssignsTo(ctx, decl.Body, receiverObj))
+		if needsVarRef || cloneArray {
 			rawName := ctx.tempName("Receiver")
 			lowered.params[0].name = rawName
+			value := rawName
+			if cloneArray {
+				value = o.runtimeOwner.QualifiedHelper(RuntimeHelperCloneArrayValue) + "(" + rawName + ", " +
+					o.runtimeTypeInfoExpr(receiverObj.Type()) + ")"
+			}
+			if needsVarRef {
+				value = o.runtimeOwner.QualifiedHelper(RuntimeHelperVarRef) + "(" + value + ")"
+			}
 			lowered.paramBindings = append(lowered.paramBindings, loweredStmt{
-				text: "let " + receiverName + ": " + o.tsVariableTypeFor(ctx, receiverObj.Type(), true) + " = " +
-					o.runtimeOwner.QualifiedHelper(RuntimeHelperVarRef) + "(" + rawName + ")",
+				text: "let " + receiverName + ": " + o.tsVariableTypeFor(ctx, receiverObj.Type(), needsVarRef) + " = " + value,
 			})
 		}
 	}
@@ -3761,6 +3774,52 @@ func (o *LoweringOwner) lowerNamedReceiverMethodDecl(
 		lowered.body = []loweredStmt{{text: zeroReturn}}
 	}
 	return lowered, nil
+}
+
+// bodyAssignsTo reports whether body assigns to obj or to an element or field
+// of it, as in v = x, v[i] = x, v.f++, or a range loop that assigns to them.
+func bodyAssignsTo(ctx lowerFileContext, body *ast.BlockStmt, obj types.Object) bool {
+	if body == nil {
+		return false
+	}
+	assigns := func(expr ast.Expr) bool {
+		for {
+			switch e := expr.(type) {
+			case *ast.ParenExpr:
+				expr = e.X
+			case *ast.IndexExpr:
+				expr = e.X
+			case *ast.SelectorExpr:
+				expr = e.X
+			case *ast.Ident:
+				return ctx.semPkg.source.TypesInfo.Uses[e] == obj
+			default:
+				return false
+			}
+		}
+	}
+	found := false
+	ast.Inspect(body, func(node ast.Node) bool {
+		if found {
+			return false
+		}
+		switch n := node.(type) {
+		case *ast.AssignStmt:
+			for _, lhs := range n.Lhs {
+				if assigns(lhs) {
+					found = true
+				}
+			}
+		case *ast.IncDecStmt:
+			found = assigns(n.X)
+		case *ast.RangeStmt:
+			if n.Tok == token.ASSIGN {
+				found = (n.Key != nil && assigns(n.Key)) || (n.Value != nil && assigns(n.Value))
+			}
+		}
+		return !found
+	})
+	return found
 }
 
 func (o *LoweringOwner) lowerFuncDecl(ctx lowerFileContext, decl *ast.FuncDecl) (*loweredFunction, []Diagnostic) {
