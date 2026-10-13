@@ -63,7 +63,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("shift:", $.uint($.uint($.uint((s << 15) + (s << 15), 16), 32), 32), $.int($.uint($.uint(~s, 16), 16)))
 
 	let i8: number = 127
-	await $.println("int8:", $.int($.int(i8 + 1, 8)), $.int(i8 * 2, 8))
+	await $.println("int8:", $.int($.int(i8 + 1, 8)), ($.int(i8 * 2, 8)))
 }
 
 if ($.isMainScript(import.meta)) {

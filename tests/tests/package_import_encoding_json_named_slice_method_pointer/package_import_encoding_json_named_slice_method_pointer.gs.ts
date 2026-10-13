@@ -8,7 +8,19 @@ import "@goscript/encoding/json/index.js"
 
 export type Maps = $.Slice<MapItem>
 
+$.registerNamedValueType(
+	"*main.Maps",
+	{CopyFrom: (receiver: any, ...args: any[]) => (Maps_CopyFrom as any)(receiver, ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("CopyFrom", [["cp", /* @__PURE__ */ $.sliceType("main.MapItem", "main.Maps")]], ["error"])]
+);
+
 export type Names = globalThis.Map<string, number> | null
+
+$.registerNamedValueType(
+	"*main.Names",
+	{Len: (receiver: any, ...args: any[]) => (Names_Len as any)(receiver, ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("Len", [], [/* @__PURE__ */ $.basicType("int")])]
+);
 
 export class MapItem {
 	public declare Name: string

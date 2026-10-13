@@ -14,7 +14,7 @@ export async function main(): globalThis.Promise<void> {
 	for (const [__rangeIndex, r] of $.rangeString(s)) {
 		await $.println("rune:", $.int(r))
 	}
-	let re: regexp.Regexp | $.VarRef<regexp.Regexp> | null = await regexp.MustCompile(("^" + "[\u0080-\ud7ff\ue000-�𐀀-\u{10ffff}]") + "+$")
+	let re: regexp.Regexp | $.VarRef<regexp.Regexp> | null = await regexp.MustCompile($.concatString(($.concatString("^", "[\u0080-\ud7ff\ue000-�𐀀-\u{10ffff}]")), "+$"))
 	await $.println("match:", await regexp.Regexp.prototype.MatchString.call(re, "é𐀀"), await regexp.Regexp.prototype.MatchString.call(re, "a"))
 }
 

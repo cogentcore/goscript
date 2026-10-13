@@ -20,7 +20,7 @@ export function callerInfo(): string {
 	let pc = $.uint(__goscriptTuple0[0], 64)
 	let file = __goscriptTuple0[1]
 	let line = __goscriptTuple0[2]
-	return (((runtime.Func.prototype.Name.call($.pointerValue<runtime.Func>(runtime.FuncForPC($.uint(pc, 64)))) + " ") + file) + ":") + strconv.Itoa(line)
+	return $.concatString(($.concatString(($.concatString(($.concatString(runtime.Func.prototype.Name.call($.pointerValue<runtime.Func>(runtime.FuncForPC($.uint(pc, 64)))), " ")), file)), ":")), strconv.Itoa(line))
 }
 
 export function logSomething(): string {

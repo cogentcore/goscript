@@ -180,7 +180,7 @@ export async function check(__typeArgs: $.GenericTypeArgs | undefined, w: any): 
 }
 
 export function asFlagger(__typeArgs: $.GenericTypeArgs | undefined, w: any): Flagger | null {
-	return $.mustTypeAssert<Flagger | null>((w as any), "main.Flagger")
+	return $.mustTypeAssert<Flagger | null>($.typeParamInterfaceValue<any>(w, __typeArgs?.["W"] ?? { type: { kind: $.TypeKind.Interface, methods: [$.methodSignature("Is", [["flag", /* @__PURE__ */ $.basicType("int64", "main.Flags")]], [/* @__PURE__ */ $.basicType("bool")]), $.methodSignature("Set", [["flag", /* @__PURE__ */ $.basicType("int64", "main.Flags")]])] }, zero: () => null }), "main.Flagger")
 }
 
 export async function main(): globalThis.Promise<void> {
