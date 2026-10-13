@@ -8911,8 +8911,19 @@ func (o *LoweringOwner) lowerCallArgs(
 		}
 		lowered, argDiagnostics := o.lowerCallArgExpr(ctx, arg, targetType, allowAsyncOverrideCallback)
 		diagnostics = append(diagnostics, argDiagnostics...)
-		if idx < fixedCount || (expr.Ellipsis != token.NoPos && idx == len(expr.Args)-1) {
+		if idx < fixedCount {
 			args = append(args, o.lowerCallArgForTarget(ctx, arg, targetType, lowered, false))
+			continue
+		}
+		if expr.Ellipsis != token.NoPos && idx == len(expr.Args)-1 {
+			lowered = o.lowerCallArgForTarget(ctx, arg, targetType, lowered, false)
+			// A slice of a named type, such as a generic named slice whose
+			// TypeScript type has an any element, is passed as the variadic
+			// parameter's slice type.
+			if argType := ctx.semPkg.source.TypesInfo.TypeOf(arg); argType != nil && !types.Identical(argType, variadicType) {
+				lowered = "(" + lowered + " as " + o.tsTypeFor(ctx, variadicType) + ")"
+			}
+			args = append(args, lowered)
 			continue
 		}
 		if slice, ok := types.Unalias(variadicType).Underlying().(*types.Slice); ok {
