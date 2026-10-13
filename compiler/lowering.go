@@ -3959,10 +3959,45 @@ func (o *LoweringOwner) lowerFuncDecl(ctx lowerFileContext, decl *ast.FuncDecl) 
 		}
 		return lowered, diagnostics
 	}
+	if linked, ok := linknameRuntimeBody(decl); ok {
+		lowered.body = []loweredStmt{{text: linked}}
+		return lowered, nil
+	}
 	if zeroReturn, ok := o.lowerBodylessReturnStmt(functionCtx, signature); ok {
 		lowered.body = []loweredStmt{{text: zeroReturn}}
 	}
 	return lowered, nil
+}
+
+// linknameRuntimeBodies are the bodies of bodyless functions linked to
+// runtime functions that GoScript implements, by linkname target.
+var linknameRuntimeBodies = map[string]string{
+	// runtime.rand returns random bits for the global sources of math/rand
+	// and math/rand/v2, and for hash/maphash seeds.
+	"runtime.rand": "return globalThis.crypto.getRandomValues(new globalThis.BigUint64Array(1))[0]",
+}
+
+// linknameRuntimeBody returns the body for a bodyless function declaration
+// linked by a go:linkname directive to a runtime function in
+// linknameRuntimeBodies.
+func linknameRuntimeBody(decl *ast.FuncDecl) (string, bool) {
+	if decl.Body != nil || decl.Doc == nil {
+		return "", false
+	}
+	for _, comment := range decl.Doc.List {
+		directive, ok := strings.CutPrefix(comment.Text, "//go:linkname ")
+		if !ok {
+			continue
+		}
+		fields := strings.Fields(directive)
+		if len(fields) != 2 || fields[0] != decl.Name.Name {
+			continue
+		}
+		if body, ok := linknameRuntimeBodies[fields[1]]; ok {
+			return body, true
+		}
+	}
+	return "", false
 }
 
 func objectAssignedInBlock(ctx lowerFileContext, obj types.Object, body *ast.BlockStmt) bool {

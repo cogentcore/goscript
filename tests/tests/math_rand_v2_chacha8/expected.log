@@ -72,3 +72,5 @@
 7145070475986108154
 970385357675357639
 11694374632816014221
+v1 distinct: true nonzero: true in range: true
+v2 distinct: true intn in range: true
