@@ -25,7 +25,7 @@ export class FS {
     }
     const data = this.files.get(name)
     if (data !== undefined) {
-      return [new embedFile(name, data), null]
+      return [new embedDataFile(name, data), null]
     }
     const entries = this.dirEntries(name)
     if (entries === null) {
@@ -120,11 +120,11 @@ export class FS {
 }
 
 class embedFile {
-  private offset = 0
+  protected position = 0
   private dirOffset = 0
 
   constructor(
-    private readonly name: string,
+    protected readonly fileName: string,
     private readonly data: Uint8Array | null,
     private readonly entries: $.Slice<fs.DirEntry> = [],
   ) {}
@@ -135,20 +135,20 @@ class embedFile {
 
   Read(buffer: Uint8Array): [number, $.GoError] {
     if (this.data === null) {
-      return [0, pathError('read', this.name, fs.ErrInvalid)]
+      return [0, pathError('read', this.fileName, fs.ErrInvalid)]
     }
-    if (this.offset >= this.data.byteLength) {
+    if (this.position >= this.data.byteLength) {
       return [0, io.EOF]
     }
-    const n = Math.min(buffer.byteLength, this.data.byteLength - this.offset)
-    buffer.set(this.data.subarray(this.offset, this.offset + n))
-    this.offset += n
+    const n = Math.min(buffer.byteLength, this.data.byteLength - this.position)
+    buffer.set(this.data.subarray(this.position, this.position + n))
+    this.position += n
     return [n, null]
   }
 
   ReadDir(n: number): [$.Slice<fs.DirEntry>, $.GoError] {
     if (this.data !== null) {
-      return [null, pathError('readdir', this.name, fs.ErrInvalid)]
+      return [null, pathError('readdir', this.fileName, fs.ErrInvalid)]
     }
     const allEntries = this.entries ?? []
     if (n <= 0) {
@@ -167,14 +167,54 @@ class embedFile {
   Stat(): [fs.FileInfo, $.GoError] {
     if (this.data === null) {
       return [
-        new embedFileInfo(baseName(this.name), 0, fs.ModeDir | 0o555),
+        new embedFileInfo(baseName(this.fileName), 0, fs.ModeDir | 0o555),
         null,
       ]
     }
     return [
-      new embedFileInfo(baseName(this.name), this.data.byteLength, 0o444),
+      new embedFileInfo(baseName(this.fileName), this.data.byteLength, 0o444),
       null,
     ]
+  }
+}
+
+// embedDataFile is an open regular file, which also implements io.Seeker
+// and io.ReaderAt, as in Go.
+class embedDataFile extends embedFile {
+  constructor(
+    name: string,
+    private readonly fileData: Uint8Array,
+  ) {
+    super(name, fileData)
+  }
+
+  Seek(offset: bigint, whence: number): [bigint, $.GoError] {
+    switch (whence) {
+      case io.SeekCurrent:
+        offset += BigInt(this.position)
+        break
+      case io.SeekEnd:
+        offset += BigInt(this.fileData.byteLength)
+        break
+    }
+    if (offset < 0n || offset > BigInt(this.fileData.byteLength)) {
+      return [0n, pathError('seek', this.fileName, fs.ErrInvalid)]
+    }
+    this.position = Number(offset)
+    return [offset, null]
+  }
+
+  ReadAt(buffer: Uint8Array, offset: bigint): [number, $.GoError] {
+    if (offset < 0n || offset > BigInt(this.fileData.byteLength)) {
+      return [0, pathError('read', this.fileName, fs.ErrInvalid)]
+    }
+    const start = Number(offset)
+    const n = Math.min(buffer.byteLength, this.fileData.byteLength - start)
+    buffer.set(this.fileData.subarray(start, start + n))
+    if (n < buffer.byteLength) {
+      return [n, io.EOF]
+    }
+    return [n, null]
   }
 }
 
