@@ -1,0 +1,8 @@
+error: true error error 
+error implements: true false
+Stringer: true fmt.Stringer Stringer fmt
+Stringer implements: true false
+Reader: true io.Reader
+namer: true main.namer 1
+any: interface {} true true
+assert fmt.Stringer: true

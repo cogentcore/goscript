@@ -1,4 +1,4 @@
-TypeFor interface: interface { SomeMethod() }
+TypeFor interface: main.MyInterface
 TypeFor struct: main.MyStruct
 TypeFor struct kind: true
 TypeFor int: int
