@@ -1634,7 +1634,7 @@ func (o *LoweringOwner) topLevelInitializerNeedsAwait(ctx lowerFileContext, expr
 		if !ok {
 			return true
 		}
-		if o.callNeedsAwait(ctx, call.Fun) {
+		if o.callExprNeedsAwait(ctx, call) {
 			needsAwait = true
 			return false
 		}
@@ -5203,7 +5203,7 @@ func (o *LoweringOwner) lowerDeferStmt(ctx lowerFileContext, stmt *ast.DeferStmt
 		diagnostics = append(diagnostics, argDiagnostics...)
 		calleeTemp := ctx.tempName("DeferCallee")
 		call := o.lowerCallableExpr(ctx, stmt.Call.Fun, calleeTemp) + "(" + strings.Join(args, ", ") + ")"
-		call = o.awaitCallIfNeeded(ctx, stmt.Call.Fun, call)
+		call = o.awaitCallIfNeeded(ctx, stmt.Call, call)
 		async := strings.Contains(callee, "await ") || strings.Contains(call, "await ")
 		if ctx.deferState != nil {
 			ctx.deferState.used = true
@@ -8214,7 +8214,7 @@ func (o *LoweringOwner) lowerFuncLitArrowWithAsyncCalls(
 	deferState := &loweredDeferState{}
 	bodyCtx := ctx.withSignature(signature).withAsyncFunction(false).withDeferState(deferState).withoutRangeBranch()
 	asyncCompatibleParams := funcLiteralNeedsAsyncFunctionParamCalls(signature)
-	if allowAsyncCalls && (asyncCompatibleParams || funcLiteralUsesAwaitableCall(ctx, lit)) {
+	if allowAsyncCalls && (asyncCompatibleParams || funcLiteralUsesAwaitableCall(ctx.semPkg.source, lit)) {
 		bodyCtx = bodyCtx.withAsyncFunction(true)
 	}
 	var params []loweredParam
@@ -8257,29 +8257,6 @@ func renderLoweredParams(params []loweredParam) string {
 		rendered = append(rendered, param.name+": "+param.typ)
 	}
 	return strings.Join(rendered, ", ")
-}
-
-func funcLiteralUsesAwaitableCall(ctx lowerFileContext, lit *ast.FuncLit) bool {
-	if lit == nil || lit.Body == nil || ctx.semPkg == nil || ctx.semPkg.source == nil {
-		return false
-	}
-	uses := false
-	ast.Inspect(lit.Body, func(node ast.Node) bool {
-		if uses {
-			return false
-		}
-		if nested, ok := node.(*ast.FuncLit); ok && nested != lit {
-			return false
-		}
-		call, ok := node.(*ast.CallExpr)
-		if !ok {
-			return true
-		}
-		uses = callUsesFunctionIdentifier(ctx.semPkg.source, call.Fun) ||
-			callUsesInterfaceMethod(ctx.semPkg.source, call.Fun)
-		return !uses
-	})
-	return uses
 }
 
 func stmtsContainAwait(stmts []loweredStmt) bool {
@@ -8617,7 +8594,7 @@ func (o *LoweringOwner) lowerCallExpr(ctx lowerFileContext, expr *ast.CallExpr) 
 		}
 		callee := o.lowerCallableExpr(ctx, fun, o.lowerIdent(ctx, fun, false))
 		call := callee + "(" + strings.Join(args, ", ") + ")"
-		return o.awaitCallIfNeeded(ctx, fun, call), diagnostics
+		return o.awaitCallIfNeeded(ctx, expr, call), diagnostics
 	case *ast.SelectorExpr:
 		if selection := ctx.semPkg.source.TypesInfo.Selections[fun]; selection != nil && selection.Kind() == types.MethodVal {
 			if typeParam := receiverTypeParam(selection.Recv()); typeParam != nil {
@@ -8625,11 +8602,11 @@ func (o *LoweringOwner) lowerCallExpr(ctx lowerFileContext, expr *ast.CallExpr) 
 				diagnostics = append(diagnostics, receiverDiagnostics...)
 				if !typeParamInScope(ctx, typeParam) {
 					call := receiverExpr + "." + fun.Sel.Name + "(" + strings.Join(args, ", ") + ")"
-					return o.awaitCallIfNeeded(ctx, fun, call), diagnostics
+					return o.awaitCallIfNeeded(ctx, expr, call), diagnostics
 				}
 				methodArgs := append([]string{"__typeArgs", strconv.Quote(typeParam.Obj().Name()), strconv.Quote(fun.Sel.Name), receiverExpr}, args...)
 				call := o.runtimeOwner.QualifiedHelper(RuntimeHelperCallGenericMethod) + "(" + strings.Join(methodArgs, ", ") + ")"
-				return o.awaitCallIfNeeded(ctx, fun, call), diagnostics
+				return o.awaitCallIfNeeded(ctx, expr, call), diagnostics
 			}
 			// A generic method on a plain receiver takes its own type dictionary.
 			if genericFunctionSignature(ctx, fun) != nil &&
@@ -8646,7 +8623,7 @@ func (o *LoweringOwner) lowerCallExpr(ctx lowerFileContext, expr *ast.CallExpr) 
 					callArgs = append(callArgs, args...)
 					call := o.runtimeOwner.QualifiedHelper(RuntimeHelperCallInterfaceMethod) +
 						"(" + strings.Join(callArgs, ", ") + ")"
-					return o.awaitCallIfNeeded(ctx, fun, call), diagnostics
+					return o.awaitCallIfNeeded(ctx, expr, call), diagnostics
 				}
 				args = append([]string{genericArgs}, args...)
 			}
@@ -8655,15 +8632,15 @@ func (o *LoweringOwner) lowerCallExpr(ctx lowerFileContext, expr *ast.CallExpr) 
 				receiver = receiverNamedType(selection.Recv())
 			}
 			if namedNonInterfaceNonStructType(receiver) {
-				return o.lowerNamedReceiverMethodCall(ctx, fun, args, diagnostics)
+				return o.lowerNamedReceiverMethodCall(ctx, expr, args, diagnostics)
 			}
 			if call, callDiagnostics, ok := o.lowerPointerReceiverMethodCall(ctx, fun, selection, args); ok {
-				return o.awaitCallIfNeeded(ctx, fun, call), append(diagnostics, callDiagnostics...)
+				return o.awaitCallIfNeeded(ctx, expr, call), append(diagnostics, callDiagnostics...)
 			}
 			receiverExpr, receiverDiagnostics := o.lowerMethodReceiverExpr(ctx, fun.X, selection)
 			diagnostics = append(diagnostics, receiverDiagnostics...)
 			call := receiverExpr + "." + fun.Sel.Name + "(" + strings.Join(args, ", ") + ")"
-			return o.awaitCallIfNeeded(ctx, fun, call), diagnostics
+			return o.awaitCallIfNeeded(ctx, expr, call), diagnostics
 		}
 		selector, selectorDiagnostics := o.lowerSelectorExpr(ctx, fun)
 		if genericFunctionSignature(ctx, fun) != nil && !o.callUsesOverridePackage(ctx, fun) {
@@ -8674,7 +8651,7 @@ func (o *LoweringOwner) lowerCallExpr(ctx lowerFileContext, expr *ast.CallExpr) 
 		if unsafePackageFunction(ctx, fun, "Slice") {
 			call = "(" + call + " as " + o.tsTypeFor(ctx, ctx.semPkg.source.TypesInfo.TypeOf(expr)) + ")"
 		}
-		return o.awaitCallIfNeeded(ctx, fun, call), append(diagnostics, selectorDiagnostics...)
+		return o.awaitCallIfNeeded(ctx, expr, call), append(diagnostics, selectorDiagnostics...)
 	case *ast.IndexExpr:
 		if signature := callTargetSignature(ctx, fun); signature != nil {
 			if callTargetSignature(ctx, fun.X) != nil {
@@ -8684,11 +8661,11 @@ func (o *LoweringOwner) lowerCallExpr(ctx lowerFileContext, expr *ast.CallExpr) 
 				}
 				args = o.appendSlicesGrowZeroFactory(ctx, fun.X, expr, args)
 				call := o.lowerCallableExpr(ctx, fun.X, callee) + "(" + strings.Join(args, ", ") + ")"
-				return o.awaitCallIfNeeded(ctx, fun, call), append(diagnostics, calleeDiagnostics...)
+				return o.awaitCallIfNeeded(ctx, expr, call), append(diagnostics, calleeDiagnostics...)
 			}
 			callee, calleeDiagnostics := o.lowerExpr(ctx, fun)
 			call := o.lowerCallableExpr(ctx, fun, callee) + "(" + strings.Join(args, ", ") + ")"
-			return o.awaitCallIfNeeded(ctx, fun, call), append(diagnostics, calleeDiagnostics...)
+			return o.awaitCallIfNeeded(ctx, expr, call), append(diagnostics, calleeDiagnostics...)
 		}
 	case *ast.IndexListExpr:
 		if signature, _ := ctx.semPkg.source.TypesInfo.TypeOf(fun).(*types.Signature); signature != nil {
@@ -8698,7 +8675,7 @@ func (o *LoweringOwner) lowerCallExpr(ctx lowerFileContext, expr *ast.CallExpr) 
 			}
 			args = o.appendSlicesGrowZeroFactory(ctx, fun.X, expr, args)
 			call := o.lowerCallableExpr(ctx, fun.X, callee) + "(" + strings.Join(args, ", ") + ")"
-			return o.awaitCallIfNeeded(ctx, fun, call), append(diagnostics, calleeDiagnostics...)
+			return o.awaitCallIfNeeded(ctx, expr, call), append(diagnostics, calleeDiagnostics...)
 		}
 	case *ast.CallExpr:
 		callee, calleeDiagnostics := o.lowerCallExpr(ctx, fun)
@@ -8710,7 +8687,7 @@ func (o *LoweringOwner) lowerCallExpr(ctx lowerFileContext, expr *ast.CallExpr) 
 		if strings.HasPrefix(callee, "(await ") && ctx.deferState != nil {
 			ctx.deferState.async = true
 		}
-		return o.awaitCallIfNeeded(ctx, fun, call), append(diagnostics, calleeDiagnostics...)
+		return o.awaitCallIfNeeded(ctx, expr, call), append(diagnostics, calleeDiagnostics...)
 	default:
 		if callTargetSignature(ctx, expr.Fun) != nil {
 			callee, calleeDiagnostics := o.lowerExpr(ctx, expr.Fun)
@@ -8718,7 +8695,7 @@ func (o *LoweringOwner) lowerCallExpr(ctx lowerFileContext, expr *ast.CallExpr) 
 				callee = "(" + callee + ")"
 			}
 			call := o.lowerCallableExpr(ctx, expr.Fun, callee) + "(" + strings.Join(args, ", ") + ")"
-			return o.awaitCallIfNeeded(ctx, expr.Fun, call), append(diagnostics, calleeDiagnostics...)
+			return o.awaitCallIfNeeded(ctx, expr, call), append(diagnostics, calleeDiagnostics...)
 		}
 		return "undefined", append(diagnostics, loweringUnsupportedAt(ctx, expr.Fun, "call", ctx.semPkg.pkgPath, errors.Errorf("unsupported call target %T", expr.Fun).Error()))
 	}
@@ -8742,7 +8719,9 @@ func (o *LoweringOwner) lowerCallArgs(
 ) ([]string, []Diagnostic) {
 	// Override callbacks may suspend only when the override awaits them.
 	overrideCall := o.callUsesOverridePackage(ctx, expr.Fun)
-	allowAsyncOverrideCallback := !overrideCall || o.overrideCallNeedsAwait(ctx, expr.Fun)
+	allowAsyncOverrideCallback := !overrideCall ||
+		o.overrideCallNeedsAwait(ctx, expr.Fun) ||
+		o.callbackOverrideCallNeedsAwait(ctx, expr)
 
 	// Spread tuple arguments and special override shapes have their own paths.
 	if args, diagnostics, ok := o.lowerTupleCallArgs(ctx, expr, signature, overrideCall); ok {
@@ -9751,7 +9730,7 @@ func (o *LoweringOwner) lowerNamedStructConversion(
 func (o *LoweringOwner) conversionValueNeedsAwait(ctx lowerFileContext, expr ast.Expr) bool {
 	switch typed := expr.(type) {
 	case *ast.CallExpr:
-		if o.callNeedsAwait(ctx, typed.Fun) || o.conversionValueNeedsAwait(ctx, typed.Fun) {
+		if o.callExprNeedsAwait(ctx, typed) || o.conversionValueNeedsAwait(ctx, typed.Fun) {
 			return true
 		}
 		for _, arg := range typed.Args {
@@ -9815,20 +9794,24 @@ func (o *LoweringOwner) typeUsesOverride(named *types.Named) bool {
 
 func (o *LoweringOwner) lowerNamedReceiverMethodCall(
 	ctx lowerFileContext,
-	selector *ast.SelectorExpr,
+	expr *ast.CallExpr,
 	args []string,
 	diagnostics []Diagnostic,
 ) (string, []Diagnostic) {
+	// Resolve the named type that declares the method.
+	selector := expr.Fun.(*ast.SelectorExpr)
 	selection := ctx.semPkg.source.TypesInfo.Selections[selector]
 	receiver := methodReceiverNamedType(selection.Obj())
 	if receiver == nil {
 		receiver = selectedReceiverNamedType(ctx.semPkg.source, selector, selection)
 	}
+
+	// Call the method function with the receiver as its first argument.
 	receiverExpr, receiverDiagnostics := o.lowerNamedReceiverForMethod(ctx, selector.X, selection)
 	diagnostics = append(diagnostics, receiverDiagnostics...)
 	allArgs := append([]string{receiverExpr}, args...)
 	call := o.methodFunctionExpr(ctx, receiver, selection.Obj(), selector.Sel.Name) + "(" + strings.Join(allArgs, ", ") + ")"
-	return o.awaitCallIfNeeded(ctx, selector, call), diagnostics
+	return o.awaitCallIfNeeded(ctx, expr, call), diagnostics
 }
 
 func (o *LoweringOwner) lowerPointerReceiverMethodCall(
@@ -14146,18 +14129,43 @@ func (o *LoweringOwner) overrideAwaitsCallback(ctx lowerFileContext, fun ast.Exp
 		facts.AwaitsCallback(overrideFunctionCallPackage(pkg, fun), overrideFunctionCallName(pkg, fun), param)
 }
 
-// awaitCallIfNeeded awaits a call that may suspend. A call through a function
-// variable in a synchronous literal cannot await, so it unwraps the result of
-// a function value that returned synchronously.
-func (o *LoweringOwner) awaitCallIfNeeded(ctx lowerFileContext, fun ast.Expr, call string) string {
-	if o.callNeedsAwait(ctx, fun) {
-		return "await " + call
+// callbackOverrideCallNeedsAwait reports whether a call to a callback async
+// override passes a function argument that may suspend.
+func (o *LoweringOwner) callbackOverrideCallNeedsAwait(ctx lowerFileContext, call *ast.CallExpr) bool {
+	if ctx.semPkg == nil || ctx.semPkg.source == nil {
+		return false
 	}
+	ok, suspends, deps := callbackOverrideCallFacts(ctx.semPkg.source, o.overrideFacts(), call)
+	if !ok {
+		return false
+	}
+	return suspends || slices.ContainsFunc(deps, func(dep *types.Func) bool {
+		return o.functionAsync(ctx, dep)
+	})
+}
+
+// callExprNeedsAwait reports whether call may suspend, by its callee or by a
+// function argument it passes to a callback async override.
+func (o *LoweringOwner) callExprNeedsAwait(ctx lowerFileContext, call *ast.CallExpr) bool {
+	return o.callNeedsAwait(ctx, call.Fun) || o.callbackOverrideCallNeedsAwait(ctx, call)
+}
+
+// awaitCallIfNeeded awaits the lowered call when it may suspend. A call
+// through a function variable in a synchronous literal cannot await, so it
+// unwraps the result of a function value that returned synchronously.
+func (o *LoweringOwner) awaitCallIfNeeded(ctx lowerFileContext, call *ast.CallExpr, lowered string) string {
+	// Await a call that may suspend.
+	if o.callExprNeedsAwait(ctx, call) {
+		return "await " + lowered
+	}
+
+	// A function variable in a synchronous literal must have returned a value.
 	pkg := ctx.semPkg.source
+	fun := call.Fun
 	if callUsesFunctionIdentifier(pkg, fun) && signatureForType(pkg.TypesInfo.TypeOf(fun)).Results().Len() > 0 {
-		return o.runtimeOwner.QualifiedHelper(RuntimeHelperSyncResult) + "(" + call + ")"
+		return o.runtimeOwner.QualifiedHelper(RuntimeHelperSyncResult) + "(" + lowered + ")"
 	}
-	return call
+	return lowered
 }
 
 func parenthesizeAwaitedExpr(expr string) string {

@@ -101,6 +101,16 @@ func (f *OverrideFacts) AwaitsCallback(pkgPath, callee, param string) bool {
 	return slices.Contains(pkg.metadata.AsyncCallbacks[callee], param)
 }
 
+// IsFunctionCallbackAsync returns true when override metadata marks a
+// package-level function async exactly when one of its function arguments is.
+func (f *OverrideFacts) IsFunctionCallbackAsync(pkgPath, function string) bool {
+	if f == nil {
+		return false
+	}
+	pkg := f.packages[pkgPath]
+	return pkg.metadata.CallbackAsyncFunctions[function]
+}
+
 // IsFunctionAsync returns true when override metadata marks a package-level function async.
 func (f *OverrideFacts) IsFunctionAsync(pkgPath, function string) bool {
 	if f == nil {
@@ -325,6 +335,10 @@ func loadOverrideMetadata(root overridePackageRoot) (OverrideMetadata, error) {
 		case "asyncFunctions":
 			for function := iter.ReadObject(); function != ""; function = iter.ReadObject() {
 				metadata.AsyncFunctions[function] = iter.ReadBool()
+			}
+		case "callbackAsyncFunctions":
+			for function := iter.ReadObject(); function != ""; function = iter.ReadObject() {
+				metadata.CallbackAsyncFunctions[function] = iter.ReadBool()
 			}
 		case "asyncCallbacks":
 			for callee := iter.ReadObject(); callee != ""; callee = iter.ReadObject() {
@@ -720,19 +734,21 @@ func addBehaviorTestSymbol(index map[string]map[string]bool, pkgPath, symbol str
 
 func newOverrideMetadata() OverrideMetadata {
 	return OverrideMetadata{
-		AsyncFunctions: make(map[string]bool),
-		AsyncMethods:   make(map[string]bool),
-		AsyncCallbacks: make(map[string][]string),
+		AsyncFunctions:         make(map[string]bool),
+		CallbackAsyncFunctions: make(map[string]bool),
+		AsyncMethods:           make(map[string]bool),
+		AsyncCallbacks:         make(map[string][]string),
 	}
 }
 
 func cloneOverrideMetadata(metadata OverrideMetadata) OverrideMetadata {
 	return OverrideMetadata{
-		Dependencies:       slices.Clone(metadata.Dependencies),
-		NativeDependencies: slices.Clone(metadata.NativeDependencies),
-		AsyncFunctions:     cloneBoolMap(metadata.AsyncFunctions),
-		AsyncMethods:       cloneBoolMap(metadata.AsyncMethods),
-		AsyncCallbacks:     cloneStringSlicesMap(metadata.AsyncCallbacks),
+		Dependencies:           slices.Clone(metadata.Dependencies),
+		NativeDependencies:     slices.Clone(metadata.NativeDependencies),
+		AsyncFunctions:         cloneBoolMap(metadata.AsyncFunctions),
+		CallbackAsyncFunctions: cloneBoolMap(metadata.CallbackAsyncFunctions),
+		AsyncMethods:           cloneBoolMap(metadata.AsyncMethods),
+		AsyncCallbacks:         cloneStringSlicesMap(metadata.AsyncCallbacks),
 	}
 }
 

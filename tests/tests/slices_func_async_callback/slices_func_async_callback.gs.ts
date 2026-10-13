@@ -1,0 +1,114 @@
+// Generated file based on slices_func_async_callback.go
+// Updated when compliance tests are re-run, DO NOT EDIT!
+
+import * as $ from "@goscript/builtin/index.js"
+
+import * as slices from "@goscript/slices/index.js"
+import "@goscript/slices/index.js"
+
+export class Process {
+	public declare pid: number
+
+	public declare done: $.Channel<{}> | null
+
+	public _fields: {
+		pid: number
+		done: $.Channel<{}> | null
+	}
+
+	constructor(init?: Partial<{pid?: number, done?: $.Channel<{}> | null}>) {
+		this._fields = {
+			pid: init?.pid ?? (0 as number),
+			done: init?.done ?? (null! as $.Channel<{}> | null)
+		}
+	}
+
+	public clone(): Process {
+		return $.markAsStructValue(new Process(this))
+	}
+
+	public async exited(): globalThis.Promise<boolean> {
+		const p: Process | $.VarRef<Process> | null = this;
+		const [__goscriptSelect0HasReturn, __goscriptSelect0Value] = await $.selectStatement<any, boolean>([
+			{
+				id: 0,
+				isSend: false,
+				channel: $.pointerValue<Process>(p).done,
+				onSelected: async (__goscriptSelect0Result) => {
+					return true
+				}
+			},
+			{
+				id: -1,
+				isSend: false,
+				channel: null,
+				onSelected: async (__goscriptSelect0Result) => {
+					return false
+				}
+			}
+		], true)
+		if (__goscriptSelect0HasReturn) {
+			return __goscriptSelect0Value
+		}
+		throw new globalThis.Error("unreachable select")
+		throw new globalThis.Error("goscript: unreachable return")
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["pid", "done"])
+	}
+
+	static __typeInfo = $.registerStructType(
+		"main.Process",
+		() => new Process(),
+		() => [{ name: "exited", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }],
+		Process,
+		() => [{ name: "pid", key: "pid", type: /* @__PURE__ */ $.basicType("int") }, { name: "done", key: "done", type: /* @__PURE__ */ $.channelType({ kind: $.TypeKind.Struct, methods: [], fields: [] }, "both") }]
+	)
+}
+
+export function isEven(v: number): boolean {
+	return (v % 2) == 0
+}
+
+export function firstEven(values: $.Slice<number>): number {
+	return slices.IndexFunc(values, isEven)
+}
+
+export async function anyExited(procs: $.Slice<Process | $.VarRef<Process> | null>): globalThis.Promise<boolean> {
+	return slices.ContainsFunc(procs, $.functionValue(async (p: Process | $.VarRef<Process> | null): globalThis.Promise<boolean> => await $.pointerValue<Process>(p).exited(), ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.pointerType("main.Process")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo)))
+}
+
+export async function main(): globalThis.Promise<void> {
+	let done: $.Channel<{}> | null = $.makeChannel<{}>(0, {}, "both")
+	done!.close()
+	let procs: $.Slice<Process | $.VarRef<Process> | null> = $.arrayToSlice<Process | $.VarRef<Process> | null>([new Process({pid: 1, done: $.makeChannel<{}>(0, {}, "both")}), new Process({pid: 2, done: done})])
+
+	await $.println("first even:", firstEven($.arrayToSlice<number>([1, 3, 4, 6])))
+	await $.println("any exited:", await anyExited(procs))
+	await $.println("exited index:", await slices.IndexFunc(procs, $.functionValue(async (p: Process | $.VarRef<Process> | null): globalThis.Promise<boolean> => {
+		return await Process.prototype.exited.call(p)
+	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.pointerType("main.Process")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo))))
+
+	// Each comparison receives a zero, which makes cmp async.
+	let ch: $.Channel<number> | null = $.makeChannel<number>(8, 0, "both")
+	for (let __goscriptRangeCount0 = $.cap(ch), __rangeIndex = 0; __rangeIndex < __goscriptRangeCount0; __rangeIndex++) {
+		await $.chanSend(ch, 0)
+	}
+	let cmp: ((a: number, b: number) => number | globalThis.Promise<number>) | null = $.functionValue(async (a: number, b: number): globalThis.Promise<number> => {
+		return (a - b) + (0 * await $.chanRecv(ch))
+	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))
+	let values: $.Slice<number> = $.arrayToSlice<number>([3, 1, 2])
+	await slices.SortStableFunc(values, cmp)
+	await $.println("sorted:", $.arrayIndex(values!, 0), $.arrayIndex(values!, 1), $.arrayIndex(values!, 2))
+
+	let pred: ((v: number) => boolean | globalThis.Promise<boolean>) | null = isEven
+	await $.println("max odd:", slices.MaxFunc($.arrayToSlice<number>([5, 9, 7]), $.functionValue((a: number, b: number): number => {
+		return a - b
+	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))))
+	await $.println("contains even:", await slices.ContainsFunc($.arrayToSlice<number>([1, 2]), pred))
+}
+
+if ($.isMainScript(import.meta)) {
+	await main()
+}

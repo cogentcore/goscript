@@ -9,7 +9,7 @@ import * as slices from "@goscript/slices/index.js"
 import "@goscript/cmp/index.js"
 import "@goscript/slices/index.js"
 
-export function order(prev: $.Slice<string>, hosts: $.Slice<string>): $.Slice<string> {
+export async function order(prev: $.Slice<string>, hosts: $.Slice<string>): globalThis.Promise<$.Slice<string>> {
 	let ranks: globalThis.Map<string, number> | null = $.makeMap<string, number>([])
 	for (let i = $.len(prev) - 1; i >= 0; i--) {
 		$.mapSet(ranks, $.arrayIndex(prev!, i), i)
@@ -26,14 +26,14 @@ export function order(prev: $.Slice<string>, hosts: $.Slice<string>): $.Slice<st
 		return known
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))
 	let ordered: $.Slice<string> = (slices.Clone(hosts) as $.Slice<string>)
-	slices.SortStableFunc(ordered, $.functionValue((a: string, b: string): number => {
-		return cmp.Compare($.syncResult(rank!(a)), $.syncResult(rank!(b)))
+	await slices.SortStableFunc(ordered, $.functionValue(async (a: string, b: string): globalThis.Promise<number> => {
+		return cmp.Compare(await rank!(a), await rank!(b))
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("string")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo)))
 	return ordered
 }
 
 export async function main(): globalThis.Promise<void> {
-	for (let __goscriptRangeTarget0 = order($.arrayToSlice<string>(["c", "a"]), $.arrayToSlice<string>(["x", "a", "y", "c"])), __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
+	for (let __goscriptRangeTarget0 = await order($.arrayToSlice<string>(["c", "a"]), $.arrayToSlice<string>(["x", "a", "y", "c"])), __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
 		let host = __goscriptRangeTarget0![__rangeIndex]
 		await $.println(host)
 	}

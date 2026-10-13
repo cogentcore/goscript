@@ -82,6 +82,13 @@ export function panicValue(value: unknown): unknown {
   return value
 }
 
+// panicMessage formats a thrown value as Go reports an unrecovered panic. A
+// JavaScript error reports its message, not its empty field list.
+export async function panicMessage(err: unknown): Promise<string> {
+  const value = err instanceof GoPanic ? err.value : err
+  return 'panic: ' + (await formatPanicValue(value))
+}
+
 function formatPanicValue(value: unknown): string | PromiseLike<string> {
   if (isThenableText(value)) {
     return value

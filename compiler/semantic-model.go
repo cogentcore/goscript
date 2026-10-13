@@ -902,6 +902,7 @@ func collectFunctionFacts(
 				if !semFn.async && callSuspends(pkg, overrideFacts, typed.Fun) {
 					markFunctionAsync(semFn)
 				}
+				recordCallbackOverrideCall(pkg, overrideFacts, semFn, typed)
 			}
 			return true
 		})
@@ -993,6 +994,7 @@ func recordImmediateFuncLitAsyncFacts(
 			if called != nil {
 				semFn.calls[functionOriginOrSelf(called)] = true
 			}
+			recordCallbackOverrideCall(pkg, overrideFacts, semFn, typed)
 			if semFn.async {
 				break
 			}

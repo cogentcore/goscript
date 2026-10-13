@@ -9,6 +9,7 @@ import {
   AppendSeq,
   Backward,
   BinarySearch,
+  BinarySearchFunc,
   Chunk,
   Clip,
   Clone,
@@ -17,6 +18,7 @@ import {
   CompactFunc,
   CompareFunc,
   Concat,
+  ContainsFunc,
   DeleteFunc,
   Equal,
   EqualFunc,
@@ -231,14 +233,31 @@ describe('slices compatibility helpers', () => {
     expect(Array.from(result ?? [])).toEqual([1, 3])
   })
 
-  it('rejects actual async callback results in sync helpers', () => {
-    expect(() =>
-      CompareFunc(
-        $.arrayToSlice([1]),
-        $.arrayToSlice([2]),
-        async (a, b) => a - b,
-      ),
-    ).toThrow('slices: asynchronous callback result is not supported')
+  it('returns a promise of the same result from async callbacks', async () => {
+    const values = $.arrayToSlice([3, 1, 2])
+    const isTwo = async (v: number) => v === 2
+    const compare = async (a: number, b: number) => a - b
+
+    expect(await IndexFunc(values, isTwo)).toBe(2)
+    expect(await ContainsFunc(values, isTwo)).toBe(true)
+    expect(await MaxFunc(values, compare)).toBe(3)
+    expect(await MinFunc(values, compare)).toBe(1)
+    expect(await CompareFunc(values, $.arrayToSlice([3, 2]), compare)).toBe(-1)
+    expect(await IsSortedFunc(values, compare)).toBe(false)
+    await SortStableFunc(values, compare)
+    expect(Array.from(values ?? [])).toEqual([1, 2, 3])
+    expect(await BinarySearchFunc(values, 2, compare)).toEqual([1, true])
+  })
+
+  it('returns synchronously until a callback suspends', async () => {
+    const values = $.arrayToSlice([1, 2, 3])
+    const result = IndexFunc(values, (v) =>
+      v < 2 ? false : Promise.resolve(v === 3),
+    )
+
+    expect(result).toBeInstanceOf(Promise)
+    expect(await result).toBe(2)
+    expect(IndexFunc(values, (v) => v === 3)).toBe(2)
   })
 })
 

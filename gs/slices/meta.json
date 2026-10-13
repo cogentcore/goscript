@@ -1,9 +1,21 @@
 {
   "asyncFunctions": {
-    "DeleteFunc": true,
-    "SortFunc": true,
     "SortedFunc": true,
     "SortedStableFunc": true
+  },
+  "callbackAsyncFunctions": {
+    "BinarySearchFunc": true,
+    "CompactFunc": true,
+    "CompareFunc": true,
+    "ContainsFunc": true,
+    "DeleteFunc": true,
+    "EqualFunc": true,
+    "IndexFunc": true,
+    "IsSortedFunc": true,
+    "MaxFunc": true,
+    "MinFunc": true,
+    "SortFunc": true,
+    "SortStableFunc": true
   },
   "dependencies": ["cmp", "iter"]
 }

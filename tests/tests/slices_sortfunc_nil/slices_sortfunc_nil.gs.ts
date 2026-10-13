@@ -40,7 +40,7 @@ export async function main(): globalThis.Promise<void> {
 	let fields: $.Slice<field> = null! as $.Slice<field>
 	await $.println("fields before:", fields)
 
-	await slices.SortFunc(fields, $.functionValue((a: field, b: field): number => {
+	slices.SortFunc(fields, $.functionValue((a: field, b: field): number => {
 		if ($.stringCompare(a.name, b.name) < 0) {
 			return -1
 		}

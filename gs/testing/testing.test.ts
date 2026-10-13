@@ -241,4 +241,23 @@ describe('testing.T', () => {
 
     expect(messages).toEqual(['    err=host path missing'])
   })
+
+  it('reports a thrown error by its message', async () => {
+    const t = new T('root')
+    const messages: string[] = []
+    const originalLog = console.log
+    console.log = (message?: unknown) => {
+      messages.push(String(message))
+    }
+    try {
+      const ok = await t.Run('child', () => {
+        throw new Error('callback result is not supported')
+      })
+      expect(ok).toBe(false)
+    } finally {
+      console.log = originalLog
+    }
+
+    expect(messages).toEqual(['    panic: callback result is not supported'])
+  })
 })

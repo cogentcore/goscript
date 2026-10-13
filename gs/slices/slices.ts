@@ -3,14 +3,51 @@ import * as $ from '@goscript/builtin/index.js'
 import * as cmp from '../cmp/index.js'
 import * as iter from '../iter/index.js'
 
-type SyncCallbackResult<T> = T | globalThis.Promise<T>
-type CompareCallback<T, U = T> =
-  | ((v1: T, v2: U) => SyncCallbackResult<number>)
+type MaybePromise<T> = T | globalThis.Promise<T>
+type CompareCallback<T, U = T, R = MaybePromise<number>> =
+  | ((v1: T, v2: U) => R)
   | null
-type PredicateCallback<T> = ((value: T) => SyncCallbackResult<boolean>) | null
-type EqualCallback<T, U = T> =
-  | ((v1: T, v2: U) => SyncCallbackResult<boolean>)
-  | null
+type PredicateCallback<T, R> = ((value: T) => R) | null
+type EqualCallback<T, U, R> = ((v1: T, v2: U) => R) | null
+
+// CallbackResult is a result of type V settled the way a callback result of
+// type R is: a promise when R is one, so a synchronous callback keeps its
+// caller synchronous.
+type CallbackResult<R, V> =
+  R extends globalThis.Promise<unknown> ? globalThis.Promise<V> : V
+
+// CallbackRun is a function body returning V that yields each callback
+// result and receives it back settled.
+type CallbackRun<V> = Generator<unknown, V, any>
+
+/**
+ * runCallbacks drives run, handing each yielded result of callbacks returning
+ * R back. It stays synchronous while the callbacks do and continues
+ * asynchronously from the first promise, so it returns a promise only when a
+ * callback returned one.
+ */
+function runCallbacks<R, V>(run: CallbackRun<V>): CallbackResult<R, V> {
+  let step = run.next()
+  while (!step.done) {
+    if (step.value instanceof Promise) {
+      return finishCallbacks(run, step.value) as CallbackResult<R, V>
+    }
+    step = run.next(step.value)
+  }
+  return step.value as CallbackResult<R, V>
+}
+
+// finishCallbacks drives run from a pending callback result to its end.
+async function finishCallbacks<V>(
+  run: CallbackRun<V>,
+  pending: globalThis.Promise<unknown>,
+): globalThis.Promise<V> {
+  let step = run.next(await pending)
+  while (!step.done) {
+    step = run.next(await step.value)
+  }
+  return step.value
+}
 
 /**
  * Compare compares the elements of s1 and s2 using cmp.Compare.
@@ -51,30 +88,37 @@ export function Compare<T extends cmp.Ordered>(
   return 0
 }
 
-export function CompareFunc<T, U>(
+export function CompareFunc<T, U, R extends MaybePromise<number>>(
   s1: $.Slice<T>,
   s2: $.Slice<U>,
-  compare: CompareCallback<T, U>,
-): number {
+  compare: CompareCallback<T, U, R>,
+): CallbackResult<R, number> {
   if (compare == null) {
     throw new Error('slices.CompareFunc: nil comparison function')
   }
-  const len1 = $.len(s1)
-  const len2 = $.len(s2)
-  const minLen = len1 < len2 ? len1 : len2
-  for (let i = 0; i < minLen; i++) {
-    const result = syncNumber(compare((s1 as any)[i] as T, (s2 as any)[i] as U))
-    if (result !== 0) {
-      return result
-    }
-  }
-  if (len1 < len2) {
-    return -1
-  }
-  if (len1 > len2) {
-    return 1
-  }
-  return 0
+  return runCallbacks(
+    (function* () {
+      const len1 = $.len(s1)
+      const len2 = $.len(s2)
+      const minLen = len1 < len2 ? len1 : len2
+      for (let i = 0; i < minLen; i++) {
+        const result: number = yield compare(
+          (s1 as any)[i] as T,
+          (s2 as any)[i] as U,
+        )
+        if (result !== 0) {
+          return result
+        }
+      }
+      if (len1 < len2) {
+        return -1
+      }
+      if (len1 > len2) {
+        return 1
+      }
+      return 0
+    })(),
+  )
 }
 
 /**
@@ -330,38 +374,52 @@ export function Min<T extends cmp.Ordered>(x: $.Slice<T>): T {
   return min
 }
 
-export function MaxFunc<T>(x: $.Slice<T>, compare: CompareCallback<T>): T {
+export function MaxFunc<T, R extends MaybePromise<number>>(
+  x: $.Slice<T>,
+  compare: CompareCallback<T, T, R>,
+): CallbackResult<R, T> {
   if (compare == null) {
     throw new Error('slices.MaxFunc: nil comparison function')
   }
   if ($.len(x) === 0) {
     throw new Error('slices.MaxFunc: empty list')
   }
-  let max = (x as any)[0] as T
-  for (let i = 1; i < $.len(x); i++) {
-    const value = (x as any)[i] as T
-    if (syncNumber(compare(max, value)) < 0) {
-      max = value
-    }
-  }
-  return max
+  return runCallbacks(
+    (function* () {
+      let max = (x as any)[0] as T
+      for (let i = 1; i < $.len(x); i++) {
+        const value = (x as any)[i] as T
+        if ((yield compare(max, value)) < 0) {
+          max = value
+        }
+      }
+      return max
+    })(),
+  )
 }
 
-export function MinFunc<T>(x: $.Slice<T>, compare: CompareCallback<T>): T {
+export function MinFunc<T, R extends MaybePromise<number>>(
+  x: $.Slice<T>,
+  compare: CompareCallback<T, T, R>,
+): CallbackResult<R, T> {
   if (compare == null) {
     throw new Error('slices.MinFunc: nil comparison function')
   }
   if ($.len(x) === 0) {
     throw new Error('slices.MinFunc: empty list')
   }
-  let min = (x as any)[0] as T
-  for (let i = 1; i < $.len(x); i++) {
-    const value = (x as any)[i] as T
-    if (syncNumber(compare(value, min)) < 0) {
-      min = value
-    }
-  }
-  return min
+  return runCallbacks(
+    (function* () {
+      let min = (x as any)[0] as T
+      for (let i = 1; i < $.len(x); i++) {
+        const value = (x as any)[i] as T
+        if ((yield compare(value, min)) < 0) {
+          min = value
+        }
+      }
+      return min
+    })(),
+  )
 }
 
 export function Collect<T>(seq: iter.Seq<T> | null): $.Slice<T> {
@@ -460,48 +518,32 @@ export function Delete<T>(s: $.Slice<T>, i: number, j: number): $.Slice<T> {
   return $.goSlice(s, 0, length - deleteCount) as $.Slice<T>
 }
 
-export function DeleteFunc<T>(
+export function DeleteFunc<T, R extends MaybePromise<boolean>>(
   s: $.Slice<T>,
-  del: PredicateCallback<T>,
-): SyncCallbackResult<$.Slice<T>> {
+  del: PredicateCallback<T, R>,
+): CallbackResult<R, $.Slice<T>> {
   if (del == null) {
     throw new Error('slices.DeleteFunc: nil delete function')
   }
-  if (s === null || s === undefined) {
-    return s
-  }
-  let w = 0
-  for (let i = 0; i < s.length; i++) {
-    const value = s[i] as T
-    const deleted = del(value)
-    if (deleted instanceof Promise) {
-      return (async (): globalThis.Promise<$.Slice<T>> => {
-        if (!(await deleted)) {
+  return runCallbacks(
+    (function* () {
+      if (s === null || s === undefined) {
+        return s
+      }
+      let w = 0
+      for (let i = 0; i < s.length; i++) {
+        const value = s[i] as T
+        if (!(yield del(value))) {
           s[w] = value
           w++
         }
-        for (let next = i + 1; next < s.length; next++) {
-          const nextValue = s[next] as T
-          if (!(await del(nextValue))) {
-            s[w] = nextValue
-            w++
-          }
-        }
-        for (let next = w; next < s.length; next++) {
-          s[next] = clearValue(s) as T
-        }
-        return $.goSlice(s, 0, w) as $.Slice<T>
-      })()
-    }
-    if (!deleted) {
-      s[w] = value
-      w++
-    }
-  }
-  for (let i = w; i < s.length; i++) {
-    s[i] = clearValue(s) as T
-  }
-  return $.goSlice(s, 0, w) as $.Slice<T>
+      }
+      for (let i = w; i < s.length; i++) {
+        s[i] = clearValue(s) as T
+      }
+      return $.goSlice(s, 0, w) as $.Slice<T>
+    })(),
+  )
 }
 
 export function Replace<T>(
@@ -540,27 +582,31 @@ export function Compact<T>(s: $.Slice<T>): $.Slice<T> {
   return $.goSlice(s, 0, w) as $.Slice<T>
 }
 
-export function CompactFunc<T>(
+export function CompactFunc<T, R extends MaybePromise<boolean>>(
   s: $.Slice<T>,
-  eq: EqualCallback<T>,
-): $.Slice<T> {
+  eq: EqualCallback<T, T, R>,
+): CallbackResult<R, $.Slice<T>> {
   if (eq == null) {
     throw new Error('slices.CompactFunc: nil equality function')
   }
-  if (s === null || s === undefined || $.len(s) < 2) {
-    return s
-  }
-  let w = 1
-  for (let i = 1; i < $.len(s); i++) {
-    if (!syncBoolean(eq((s as any)[i - 1] as T, (s as any)[i] as T))) {
-      ;(s as any)[w] = (s as any)[i]
-      w++
-    }
-  }
-  for (let i = w; i < $.len(s); i++) {
-    ;(s as any)[i] = clearValue(s)
-  }
-  return $.goSlice(s, 0, w) as $.Slice<T>
+  return runCallbacks(
+    (function* () {
+      if (s === null || s === undefined || $.len(s) < 2) {
+        return s
+      }
+      let w = 1
+      for (let i = 1; i < $.len(s); i++) {
+        if (!(yield eq((s as any)[i - 1] as T, (s as any)[i] as T))) {
+          ;(s as any)[w] = (s as any)[i]
+          w++
+        }
+      }
+      for (let i = w; i < $.len(s); i++) {
+        ;(s as any)[i] = clearValue(s)
+      }
+      return $.goSlice(s, 0, w) as $.Slice<T>
+    })(),
+  )
 }
 
 export function Clip<T>(s: $.Slice<T>): $.Slice<T> {
@@ -586,24 +632,28 @@ export function Equal<T>(s1: $.Slice<T>, s2: $.Slice<T>): boolean {
   return true
 }
 
-export function EqualFunc<T, U>(
+export function EqualFunc<T, U, R extends MaybePromise<boolean>>(
   s1: $.Slice<T>,
   s2: $.Slice<U>,
-  eq: EqualCallback<T, U>,
-): boolean {
+  eq: EqualCallback<T, U, R>,
+): CallbackResult<R, boolean> {
   if (eq == null) {
     throw new Error('slices.EqualFunc: nil equality function')
   }
-  const len1 = $.len(s1)
-  if (len1 !== $.len(s2)) {
-    return false
-  }
-  for (let i = 0; i < len1; i++) {
-    if (!syncBoolean(eq((s1 as any)[i] as T, (s2 as any)[i] as U))) {
-      return false
-    }
-  }
-  return true
+  return runCallbacks(
+    (function* () {
+      const len1 = $.len(s1)
+      if (len1 !== $.len(s2)) {
+        return false
+      }
+      for (let i = 0; i < len1; i++) {
+        if (!(yield eq((s1 as any)[i] as T, (s2 as any)[i] as U))) {
+          return false
+        }
+      }
+      return true
+    })(),
+  )
 }
 
 export function Index<T>(s: $.Slice<T>, v: T): number {
@@ -615,12 +665,22 @@ export function Index<T>(s: $.Slice<T>, v: T): number {
   return -1
 }
 
-export function IndexFunc<T>(s: $.Slice<T>, f: PredicateCallback<T>): number {
+export function IndexFunc<T, R extends MaybePromise<boolean>>(
+  s: $.Slice<T>,
+  f: PredicateCallback<T, R>,
+): CallbackResult<R, number> {
   if (f == null) {
     throw new Error('slices.IndexFunc: nil predicate function')
   }
+  return runCallbacks(indexFunc(s, f))
+}
+
+function* indexFunc<T>(
+  s: $.Slice<T>,
+  f: (value: T) => MaybePromise<boolean>,
+): CallbackRun<number> {
   for (let i = 0; i < $.len(s); i++) {
-    if (syncBoolean(f((s as any)[i] as T))) {
+    if (yield f((s as any)[i] as T)) {
       return i
     }
   }
@@ -631,11 +691,18 @@ export function Contains<T>(s: $.Slice<T>, v: T): boolean {
   return Index(s, v) >= 0
 }
 
-export function ContainsFunc<T>(
+export function ContainsFunc<T, R extends MaybePromise<boolean>>(
   s: $.Slice<T>,
-  f: PredicateCallback<T>,
-): boolean {
-  return IndexFunc(s, f) >= 0
+  f: PredicateCallback<T, R>,
+): CallbackResult<R, boolean> {
+  if (f == null) {
+    throw new Error('slices.ContainsFunc: nil predicate function')
+  }
+  return runCallbacks(
+    (function* () {
+      return (yield* indexFunc(s, f)) >= 0
+    })(),
+  )
 }
 
 export function Insert<T>(s: $.Slice<T>, i: number, ...v: T[]): $.Slice<T> {
@@ -710,46 +777,41 @@ export function Grow<T>(
  * @param s The slice to sort in place
  * @param cmp Comparison function
  */
-export async function SortFunc<T>(
+export function SortFunc<T, R extends MaybePromise<number>>(
   s: $.Slice<T>,
-  cmp: CompareCallback<T>,
-): globalThis.Promise<void> {
+  cmp: CompareCallback<T, T, R>,
+): CallbackResult<R, void> {
   if (cmp == null) {
     throw new Error('slices.SortFunc: nil comparison function')
   }
-  if (s === null || s === undefined || $.len(s) < 2) {
-    return
-  }
-  const sorted = await asyncMergeSort(Array.from(s as any as T[]), cmp)
-  for (let i = 0; i < sorted.length; i++) {
-    ;(s as any)[i] = sorted[i]
-  }
+  return runCallbacks(
+    (function* () {
+      if (s === null || s === undefined || $.len(s) < 2) {
+        return
+      }
+      const sorted = yield* mergeSort(Array.from(s as any as T[]), cmp)
+      for (let i = 0; i < sorted.length; i++) {
+        ;(s as any)[i] = sorted[i]
+      }
+    })(),
+  )
 }
 
-async function asyncMergeSort<T>(
+function* mergeSort<T>(
   values: T[],
-  cmp: CompareCallback<T>,
-): globalThis.Promise<T[]> {
+  cmp: (a: T, b: T) => MaybePromise<number>,
+): CallbackRun<T[]> {
   if (values.length < 2) {
     return values
   }
   const mid = Math.floor(values.length / 2)
-  const left = await asyncMergeSort(values.slice(0, mid), cmp)
-  const right = await asyncMergeSort(values.slice(mid), cmp)
-  return asyncMerge(left, right, cmp)
-}
-
-async function asyncMerge<T>(
-  left: T[],
-  right: T[],
-  cmp: CompareCallback<T>,
-): globalThis.Promise<T[]> {
+  const left = yield* mergeSort(values.slice(0, mid), cmp)
+  const right = yield* mergeSort(values.slice(mid), cmp)
   const out: T[] = []
   let li = 0
   let ri = 0
   while (li < left.length && ri < right.length) {
-    const order = await cmp!(left[li], right[ri])
-    if (order <= 0) {
+    if ((yield cmp(left[li], right[ri])) <= 0) {
       out.push(left[li++])
     } else {
       out.push(right[ri++])
@@ -764,32 +826,34 @@ async function asyncMerge<T>(
   return out
 }
 
-export function IsSortedFunc<T>(
+export function IsSortedFunc<T, R extends MaybePromise<number>>(
   x: $.Slice<T>,
-  cmp: CompareCallback<T>,
-): boolean {
+  cmp: CompareCallback<T, T, R>,
+): CallbackResult<R, boolean> {
   if (cmp == null) {
     throw new Error('slices.IsSortedFunc: nil comparison function')
   }
-  for (let i = $.len(x) - 1; i > 0; i--) {
-    if (syncNumber(cmp((x as any)[i] as T, (x as any)[i - 1] as T)) < 0) {
-      return false
-    }
-  }
-  return true
+  return runCallbacks(
+    (function* () {
+      for (let i = $.len(x) - 1; i > 0; i--) {
+        if ((yield cmp((x as any)[i] as T, (x as any)[i - 1] as T)) < 0) {
+          return false
+        }
+      }
+      return true
+    })(),
+  )
 }
 
-export function SortStableFunc<T>(
+/** SortStableFunc is SortFunc, whose merge sort is stable. */
+export function SortStableFunc<T, R extends MaybePromise<number>>(
   s: $.Slice<T>,
-  cmp: CompareCallback<T>,
-): void {
+  cmp: CompareCallback<T, T, R>,
+): CallbackResult<R, void> {
   if (cmp == null) {
     throw new Error('slices.SortStableFunc: nil comparison function')
   }
-  if (s === null || s === undefined) {
-    return
-  }
-  ;(s as any as T[]).sort((a, b) => syncNumber(cmp(a, b)))
+  return SortFunc(s, cmp)
 }
 
 function clearValue<T>(s: $.Slice<T>): T | null {
@@ -824,50 +888,44 @@ function clearValue<T>(s: $.Slice<T>): T | null {
  * @param cmp Comparison function
  * @returns A tuple of [index, found] where index is the position and found indicates if target was found
  */
-export function BinarySearchFunc<E, T>(
+export function BinarySearchFunc<E, T, R extends MaybePromise<number>>(
   x: $.Slice<E>,
   target: T,
-  cmp: CompareCallback<E, T>,
-): [number, boolean] {
+  cmp: CompareCallback<E, T, R>,
+): CallbackResult<R, [number, boolean]> {
   if (cmp == null) {
     throw new Error('slices.BinarySearchFunc: nil comparison function')
   }
+  return runCallbacks(binarySearchFunc(x, target, cmp))
+}
+
+// binarySearchFunc narrows to the earliest index not less than target, so
+// duplicate targets return the first match as Go's BinarySearchFunc does.
+function* binarySearchFunc<E, T>(
+  x: $.Slice<E>,
+  target: T,
+  cmp: (e: E, t: T) => MaybePromise<number>,
+): CallbackRun<[number, boolean]> {
   const n = $.len(x)
   let left = 0
   let right = n
-
-  // Lower-bound search: narrow to the earliest index not less than target so
-  // duplicate targets return the first match, matching Go's BinarySearchFunc.
   while (left < right) {
     const mid = Math.floor((left + right) / 2)
-    if (syncNumber(cmp((x as any)[mid] as E, target)) < 0) {
+    if ((yield cmp((x as any)[mid] as E, target)) < 0) {
       left = mid + 1
     } else {
       right = mid
     }
   }
-
-  const found = left < n && syncNumber(cmp((x as any)[left] as E, target)) === 0
+  const found = left < n && (yield cmp((x as any)[left] as E, target)) === 0
   return [left, found]
-}
-
-function syncNumber(value: SyncCallbackResult<number>): number {
-  if (value instanceof Promise) {
-    throw new Error('slices: asynchronous callback result is not supported')
-  }
-  return value
-}
-
-function syncBoolean(value: SyncCallbackResult<boolean>): boolean {
-  if (value instanceof Promise) {
-    throw new Error('slices: asynchronous callback result is not supported')
-  }
-  return value
 }
 
 export function BinarySearch<T extends cmp.Ordered>(
   x: $.Slice<T>,
   target: T,
 ): [number, boolean] {
-  return BinarySearchFunc(x, target, cmp.Compare)
+  // cmp.Compare returns synchronously, so the search does too.
+  const result = runCallbacks(binarySearchFunc(x, target, cmp.Compare))
+  return result as [number, boolean]
 }

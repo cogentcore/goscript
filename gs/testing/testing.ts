@@ -1,3 +1,4 @@
+import * as $ from '@goscript/builtin/index.js'
 import * as context from '@goscript/context/index.js'
 import * as fmt from '@goscript/fmt/index.js'
 
@@ -102,6 +103,11 @@ export class T {
     this.pushLog(fmt.Sprintf(format, ...args))
   }
 
+  // logPanic logs a value the test threw. Go code cannot name it.
+  public logPanic(err: unknown): void {
+    this.pushLog($.panicMessage(err))
+  }
+
   // pushLog appends an entry formatted by fmt, which may call async
   // transpiled Error() or String() methods. A placeholder holds the entry's
   // position until its text resolves; flushLogs awaits every pending entry
@@ -159,7 +165,7 @@ export class T {
       } else {
         child.Fail()
         if (!(err instanceof TestControl)) {
-          child.Log(err)
+          child.logPanic(err)
         }
       }
     }
@@ -171,7 +177,7 @@ export class T {
       }
       child.Fail()
       if (!(err instanceof TestControl)) {
-        child.Log(err)
+        child.logPanic(err)
       }
     }
     if (child.Failed()) {
@@ -293,7 +299,11 @@ export class B extends T {
       if (isProcessExitError(err)) {
         throw err
       }
-      child.Error(err)
+      // FailNow marks a fatal failure before it throws.
+      if (!(err instanceof TestControl)) {
+        child.Fail()
+        child.logPanic(err)
+      }
     }
     if (child.Failed()) {
       this.Fail()
@@ -394,7 +404,7 @@ export async function runTests(
           } else {
             t.Fail()
             if (!(err instanceof TestControl)) {
-              t.Log(err)
+              t.logPanic(err)
             }
           }
         }

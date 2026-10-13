@@ -143,6 +143,79 @@ func asyncArgumentFacts(pkg *packages.Package, signature *types.Signature, args 
 	return false, deps
 }
 
+// funcLiteralUsesAwaitableCall reports whether lit calls a function variable
+// or an interface method in its own body. Either may reach an implementation
+// that suspends, so the literal awaits it once it is lowered async.
+func funcLiteralUsesAwaitableCall(pkg *packages.Package, lit *ast.FuncLit) bool {
+	if pkg == nil || lit == nil || lit.Body == nil {
+		return false
+	}
+	uses := false
+	ast.Inspect(lit.Body, func(node ast.Node) bool {
+		switch typed := node.(type) {
+		case *ast.FuncLit:
+			return false
+		case *ast.CallExpr:
+			uses = callUsesFunctionIdentifier(pkg, typed.Fun) || callUsesInterfaceMethod(pkg, typed.Fun)
+		}
+		return !uses
+	})
+	return uses
+}
+
+// callbackOverrideCallFacts reports whether a call to an override function
+// that metadata marks callback async always suspends, and otherwise the
+// functions whose async marks decide whether it does. It reports ok false for
+// any other call. A function value argument always suspends, as calling it
+// does, and so does a literal that calls a function variable or an interface
+// method.
+func callbackOverrideCallFacts(
+	pkg *packages.Package,
+	overrideFacts *OverrideFacts,
+	call *ast.CallExpr,
+) (ok, suspends bool, deps []*types.Func) {
+	// Only a callback async override function qualifies.
+	called := calledFunction(pkg, call.Fun)
+	if called == nil || called.Pkg() == nil ||
+		!overrideFacts.IsFunctionCallbackAsync(called.Pkg().Path(), called.Name()) {
+		return false, false, nil
+	}
+
+	// A function value always suspends; literals and declared functions decide.
+	signature, _ := called.Type().(*types.Signature)
+	for _, arg := range call.Args {
+		lit, _ := arg.(*ast.FuncLit)
+		if callUsesFunctionValue(pkg, arg) || callUsesFunctionIdentifier(pkg, arg) ||
+			funcLiteralUsesAwaitableCall(pkg, lit) {
+			return true, true, nil
+		}
+	}
+	suspends, deps = asyncArgumentFacts(pkg, signature, call.Args)
+	return true, suspends, deps
+}
+
+// recordCallbackOverrideCall colors semFn for a call to a callback async
+// override: async now when the call always suspends, and otherwise through a
+// recorded call to each function that decides it.
+func recordCallbackOverrideCall(
+	pkg *packages.Package,
+	overrideFacts *OverrideFacts,
+	semFn *semanticFunction,
+	call *ast.CallExpr,
+) {
+	ok, suspends, deps := callbackOverrideCallFacts(pkg, overrideFacts, call)
+	if !ok {
+		return
+	}
+	if suspends {
+		markFunctionAsync(semFn)
+		return
+	}
+	for _, dep := range deps {
+		semFn.calls[dep] = true
+	}
+}
+
 // asyncColoring propagates async marks to their fixpoint with one worklist.
 //
 // Every rule only adds marks, so each function key is visited once, when it

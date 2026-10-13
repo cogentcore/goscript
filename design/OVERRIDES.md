@@ -65,6 +65,12 @@ An override package may include a `meta.json` file that defines metadata:
 ```json
 {
   "dependencies": ["package1", "package2"],
+  "asyncFunctions": {
+    "FunctionName": true
+  },
+  "callbackAsyncFunctions": {
+    "IndexFunc": true
+  },
   "asyncMethods": {
     "TypeName.MethodName": true,
     "OtherType.Method": false
@@ -78,6 +84,8 @@ An override package may include a `meta.json` file that defines metadata:
 ### Fields
 
 - **dependencies**: Array of package paths this package depends on (relative to `gs/` directory)
+- **asyncFunctions**: Object mapping a package-level function name to boolean indicating if async
+- **callbackAsyncFunctions**: Object mapping a package-level function name to boolean indicating that it calls its function arguments before returning and suspends exactly when one of them does. Its TypeScript returns a promise only when a callback returned one. The compiler awaits a call, and colors its caller async, only when an argument may suspend: a function value, a literal that suspends, or a declared function colored async. `slices.IndexFunc` and `slices.SortFunc` use it, so a synchronous predicate keeps its caller synchronous.
 - **asyncMethods**: Object mapping `TypeName.MethodName` to boolean indicating if async
 - **asyncCallbacks**: Object mapping a function name or `TypeName.MethodName` to the names of its function-typed parameters that the runtime stores and awaits. A function literal passed for one lowers as an async function, so its interface calls are awaited. A named parameter is needed because Go often declares such a parameter with an unnamed function type, which carries no async metadata.
 

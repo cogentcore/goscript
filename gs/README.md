@@ -18,6 +18,9 @@ A package directory contains:
   `dependencies` lists other overrides the package imports, and
   `asyncFunctions` and `asyncMethods` mark calls that suspend, such as
   `Mutex.Lock`. The compiler awaits those calls and colors their callers async.
+  `callbackAsyncFunctions` marks functions such as `slices.IndexFunc` that
+  suspend only when a function argument does, so the compiler awaits only
+  those calls.
 - `godoc.txt`, where present, the upstream `go doc` output kept for reference.
 - `parity.json`, where present, which records each upstream symbol as `real`,
   `deferred`, or `blocked` with a reason.
