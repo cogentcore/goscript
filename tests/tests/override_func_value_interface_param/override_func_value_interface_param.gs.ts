@@ -16,7 +16,7 @@ import "@goscript/io/index.js"
 import "@goscript/strings/index.js"
 
 export type Decoder = {
-	Decode(v: any): $.GoError
+	Decode(v: any): $.GoError | globalThis.Promise<$.GoError>
 }
 
 $.registerInterfaceType(
@@ -79,7 +79,7 @@ export async function main(): globalThis.Promise<void> {
 
 	let newDecoder: ((r: io.Reader | null) => json.Decoder | $.VarRef<json.Decoder> | null | globalThis.Promise<json.Decoder | $.VarRef<json.Decoder> | null>) | null = ((__goscriptFn: typeof json.NewDecoder) => (__goscriptArg0: io.Reader | null) => __goscriptFn($.pointerValueOrNil(__goscriptArg0)!))(json.NewDecoder)
 	let v: $.VarRef<globalThis.Map<string, number> | null> = $.varRef(null! as globalThis.Map<string, number> | null)
-	json.Decoder.prototype.Decode.call($.pointerValue<json.Decoder>(await newDecoder!($.interfaceValue<io.Reader | null>(strings.NewReader("{\"a\": 2}"), "*strings.Reader", /* @__PURE__ */ $.pointerType("strings.Reader")))), $.interfaceValue(v, "*map[string]int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("int")))))
+	await json.Decoder.prototype.Decode.call($.pointerValue<json.Decoder>(await newDecoder!($.interfaceValue<io.Reader | null>(strings.NewReader("{\"a\": 2}"), "*strings.Reader", /* @__PURE__ */ $.pointerType("strings.Reader")))), $.interfaceValue(v, "*map[string]int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("int")))))
 	await $.println($.mapGet<string, number, number>(v.value, "a", 0)[0])
 
 	// The writer is a pointer to a local variable.
