@@ -1201,7 +1201,187 @@ function marshalerResult(data: $.Slice<number>, err: $.GoError): RawJSON {
   return new RawJSON(stripJSONWhitespace(raw))
 }
 
-function marshalValue(v: unknown): unknown {
+// mapKeyTypeName returns the Go type string of a named map key type, such as
+// "pkg.Tokens", or '' for an unnamed key type.
+function mapKeyTypeName(info: $.TypeInfo): string {
+  if (typeof info.typeName === 'string' && info.typeName !== '') {
+    return info.typeName
+  }
+  return info.kind === $.TypeKind.Basic ? '' : (info.name ?? '')
+}
+
+// integerKeyBits returns the bit size and signedness of an integer basic
+// kind name, or null for a non-integer kind.
+function integerKeyBits(kind: string): [number, boolean] | null {
+  switch (kind) {
+    case 'int':
+    case 'int64':
+      return [64, true]
+    case 'int8':
+      return [8, true]
+    case 'int16':
+      return [16, true]
+    case 'int32':
+    case 'rune':
+      return [32, true]
+    case 'uint':
+    case 'uint64':
+    case 'uintptr':
+      return [64, false]
+    case 'uint8':
+    case 'byte':
+      return [8, false]
+    case 'uint16':
+      return [16, false]
+    case 'uint32':
+      return [32, false]
+  }
+  return null
+}
+
+// decodeMapKey converts a JSON object key to a Go map key of keyType, as
+// encoding/json does, and passes it to assign: through UnmarshalText when a
+// pointer to the key type implements encoding.TextUnmarshaler, as is for
+// string kinds, and parsed as a decimal integer for integer kinds.
+function decodeMapKey(key: string, keyType: unknown, assign: Assign): void {
+  const info = resolveTypeInfo(keyType)
+  if (info === null || info.kind !== $.TypeKind.Basic) {
+    assign(key)
+    return
+  }
+  if (hasTextMethod(info, 'UnmarshalText')) {
+    unmarshalText(key, info, assign)
+    return
+  }
+  const kind = info.name ?? ''
+  const bits = integerKeyBits(kind)
+  if (bits === null) {
+    assign(key)
+    return
+  }
+  const typeName = mapKeyTypeName(info)
+  const [size, signed] = bits
+  const typeError = () =>
+    new UnmarshalTypeError({
+      Value: 'number ' + key,
+      Type: typeName !== '' ? typeName : kind,
+    })
+  if (!/^-?[0-9]+$/.test(key)) {
+    throw typeError()
+  }
+  const n = BigInt(key)
+  const min = signed ? -(BigInt(1) << BigInt(size - 1)) : BigInt(0)
+  const max =
+    signed ?
+      (BigInt(1) << BigInt(size - 1)) - BigInt(1)
+    : (BigInt(1) << BigInt(size)) - BigInt(1)
+  if (n < min || n > max) {
+    throw typeError()
+  }
+  assign(
+    kind === 'int64' || kind === 'uint64' || kind === 'uintptr' ? n : Number(n),
+  )
+}
+
+// Assign receives a decoded value. It is called after decoding returns when
+// the value comes from an UnmarshalText method that suspends.
+type Assign = (value: unknown) => void
+
+// unmarshalText decodes text into a value of the named basic type described
+// by info, through the UnmarshalText method of a pointer to it, and passes
+// the value to assign. When UnmarshalText suspends, inside a Unmarshal that
+// awaits its unmarshalers (see pendingUnmarshals), assign is called once it
+// completes.
+function unmarshalText(text: string, info: $.TypeInfo, assign: Assign): void {
+  const typeName = mapKeyTypeName(info)
+  const method = $.namedValueMethods('*' + typeName)!.methods.UnmarshalText
+  const kind = info.name ?? ''
+  const bits = integerKeyBits(kind)
+  const zero: unknown =
+    bits === null ? ''
+    : kind === 'int64' || kind === 'uint64' || kind === 'uintptr' ? BigInt(0)
+    : 0
+  const ref = $.varRef(zero)
+  const err = method(ref, $.stringToBytes(text)) as
+    | $.GoError
+    | PromiseLike<$.GoError>
+  if (err instanceof Promise) {
+    if (pendingUnmarshals === null) {
+      throw $.newError('json: asynchronous UnmarshalText is unsupported')
+    }
+    pendingUnmarshals.push(
+      err.then((result: $.GoError) => {
+        if (result === null || result === undefined) {
+          assign(ref.value)
+          return null
+        }
+        return result
+      }),
+    )
+    return
+  }
+  if (err !== null && err !== undefined) {
+    throw err
+  }
+  assign(ref.value)
+}
+
+// encodeMapKey returns the JSON object key text for a Go map key of keyType,
+// as encoding/json does: through MarshalText when the key type implements
+// encoding.TextMarshaler, and as its decimal or string value otherwise.
+function encodeMapKey(key: unknown, keyType: unknown): string {
+  const info = resolveTypeInfo(keyType)
+  const typeName = info !== null ? mapKeyTypeName(info) : ''
+  const marshalText =
+    typeName !== '' ?
+      $.namedValueMethods(typeName)?.methods.MarshalText
+    : undefined
+  if (marshalText !== undefined) {
+    const result = marshalText(key)
+    if (result instanceof Promise) {
+      throw new MarshalerError({
+        Err: $.newError('json: asynchronous MarshalText is unsupported'),
+      })
+    }
+    const [data, err] = result as [$.Slice<number>, $.GoError]
+    if (err !== null) {
+      throw new MarshalerError({ Err: err })
+    }
+    return $.bytesToString(data)
+  }
+  return String(key)
+}
+
+// hasTextMethod reports whether the named basic type described by info (or
+// a pointer to it, for UnmarshalText) has the given encoding.TextMarshaler
+// or encoding.TextUnmarshaler method.
+function hasTextMethod(
+  info: $.TypeInfo,
+  method: 'MarshalText' | 'UnmarshalText',
+): boolean {
+  if (info.kind !== $.TypeKind.Basic) {
+    return false
+  }
+  const typeName = mapKeyTypeName(info)
+  if (typeName === '') {
+    return false
+  }
+  const name = method === 'UnmarshalText' ? '*' + typeName : typeName
+  return $.namedValueMethods(name)?.methods[method] !== undefined
+}
+
+// goTypeInfoOf returns the type information that a boxed or typed value
+// carries in its __goType property, or null.
+function goTypeInfoOf(v: unknown): unknown {
+  if (v === null || typeof v !== 'object') {
+    return null
+  }
+  const t = Reflect.get(v, '__goType')
+  return typeof t === 'string' && t !== '' ? t : null
+}
+
+function marshalValue(v: unknown, typeInfo?: unknown): unknown {
+  typeInfo ??= goTypeInfoOf(v) ?? undefined
   const marshaler = marshalJSONTarget(v)
   if (marshaler !== null) {
     const result = marshaler.MarshalJSON()
@@ -1214,17 +1394,26 @@ function marshalValue(v: unknown): unknown {
     return marshalerResult(data, err)
   }
   if ($.isVarRef(v)) {
-    return marshalValue(v.value)
+    return marshalValue(v.value, typeInfo)
   }
   // Unwrap a boxed interface{} value (a named/defined type's value, boxed by
   // the runtime as { __goType, __goValue, ... } so it can carry methods)
   // before serializing; otherwise the wrapper object itself leaks into the
   // output instead of the underlying primitive/map/slice it holds.
   if ($.isNamedValueBox(v) && !isStructValue(v)) {
-    return marshalValue((v as { __goValue: unknown }).__goValue)
+    return marshalValue(
+      (v as { __goValue: unknown }).__goValue,
+      (v as { __goType: unknown }).__goType,
+    )
   }
   if (v === null || v === undefined) {
     return null
+  }
+  if (typeof v !== 'object' && typeof v !== 'function') {
+    const textInfo = resolveTypeInfo(typeInfo)
+    if (textInfo !== null && hasTextMethod(textInfo, 'MarshalText')) {
+      return encodeMapKey(v, textInfo)
+    }
   }
   if (typeof v === 'number') {
     if (!Number.isFinite(v)) {
@@ -1238,13 +1427,29 @@ function marshalValue(v: unknown): unknown {
   if (v instanceof Uint8Array) {
     return base64Encode(v)
   }
+  const info = resolveTypeInfo(typeInfo)
   if (Array.isArray(v)) {
-    return v.map(marshalValue)
+    const elemType =
+      info !== null && ($.isSliceTypeInfo(info) || $.isArrayTypeInfo(info)) ?
+        info.elemType
+      : undefined
+    return v.map((el) => marshalValue(el, elemType))
   }
   if (v instanceof Map) {
+    const mapInfo = info !== null && $.isMapTypeInfo(info) ? info : null
+    // Go sorts the keys of an encoded map by their text.
+    const entries = [...v.entries()].map(
+      ([key, value]) =>
+        [encodeMapKey(key, mapInfo?.keyType), value] as [string, unknown],
+    )
+    entries.sort(([a], [b]) =>
+      a < b ? -1
+      : a > b ? 1
+      : 0,
+    )
     const out: Record<string, unknown> = {}
-    for (const [key, value] of v.entries()) {
-      out[String(key)] = marshalValue(value)
+    for (const [key, value] of entries) {
+      out[key] = marshalValue(value, mapInfo?.elemType)
     }
     return out
   }
@@ -1354,7 +1559,7 @@ function marshalFieldValue(value: unknown, fieldType: unknown): unknown {
   ) {
     return Number($.formatFloat(value, 'g', -1, 32))
   }
-  return marshalValue(value)
+  return marshalValue(value, fieldType)
 }
 
 function marshalJSONTarget(value: unknown): Marshaler | null {
@@ -1590,6 +1795,15 @@ function assignDecodedFieldValue(
       storeDecodedValue(target, decodeValueForType(decoded, info, opts))
       return
     }
+    // A field of a named basic type that implements
+    // encoding.TextUnmarshaler, such as an enum, decodes from a string
+    // through UnmarshalText.
+    if (typeof decoded === 'string' && hasTextMethod(info, 'UnmarshalText')) {
+      unmarshalText(decoded, info, (value) => {
+        target.value = value
+      })
+      return
+    }
     // Pointer-to-struct fields (e.g. Items *ItemsSpec) start as nil, so the
     // generic path below has no zero-value instance to populate — construct
     // the pointee via the type-driven decoder. Decode with the Pointer
@@ -1686,6 +1900,7 @@ function decodeValueForType(
   decoded: unknown,
   typeInfo: unknown,
   opts: decodeOptions,
+  assign?: Assign,
 ): unknown {
   if (isRawMessageType(typeInfo) && decoded !== undefined) {
     return $.stringToBytes(decodedJSONText(decoded))
@@ -1763,21 +1978,53 @@ function decodeValueForType(
     if (!Array.isArray(decoded)) {
       return decoded
     }
-    return decoded.map((el) => decodeValueForType(el, info.elemType, opts))
+    const out: unknown[] = new Array(decoded.length)
+    decoded.forEach((el, i) => {
+      out[i] = decodeValueForType(el, info.elemType, opts, (value) => {
+        out[i] = value
+      })
+    })
+    return out
   }
   if ($.isMapTypeInfo(info)) {
     if (!isPlainObject(decoded)) {
       return decoded
     }
-    const out = new Map<string, unknown>()
+    const out = new Map<unknown, unknown>()
     for (const [key, value] of Object.entries(decoded)) {
-      out.set(key, decodeValueForType(value, info.elemType, opts))
+      // The key or the element may be assigned later, when its
+      // UnmarshalText suspends; the entry is set once the key is known.
+      let mapKey: unknown = undefined
+      let hasKey = false
+      let elem = decodeValueForType(value, info.elemType, opts, (v) => {
+        elem = v
+        if (hasKey) {
+          out.set(mapKey, elem)
+        }
+      })
+      decodeMapKey(key, info.keyType, (k) => {
+        mapKey = k
+        hasKey = true
+        out.set(mapKey, elem)
+      })
     }
     return out
   }
   // float32 values are float64 numbers rounded to float32 precision.
   if (typeof decoded === 'number' && isFloat32Type(info)) {
     return Math.fround(decoded)
+  }
+  if (typeof decoded === 'string' && hasTextMethod(info, 'UnmarshalText')) {
+    let result: unknown = undefined
+    let returned = false
+    unmarshalText(decoded, info, (value) => {
+      result = value
+      if (returned) {
+        assign?.(value)
+      }
+    })
+    returned = true
+    return result
   }
   // Basic / other kinds: passthrough (RawMessage and []byte-as-base64 are
   // handled by the caller before reaching the generic decoder).

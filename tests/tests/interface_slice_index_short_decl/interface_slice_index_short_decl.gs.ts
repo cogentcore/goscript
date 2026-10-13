@@ -8,6 +8,8 @@ import "@goscript/github.com/s4wave/goscript/tests/tests/interface_slice_index_s
 
 export type value = Uint8Array
 
+$.registerNamedType("main.value", /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 2));
+
 $.registerNamedValueType(
 	"main.value",
 	{Key: (receiver: any, ...args: any[]) => (value_Key as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
@@ -21,6 +23,8 @@ $.registerNamedValueType(
 );
 
 export type Fixed = $.Slice<dep.Ref | null>
+
+$.registerNamedType("main.Fixed", /* @__PURE__ */ $.sliceType("dep.Ref"));
 
 $.registerNamedValueType(
 	"main.Fixed",

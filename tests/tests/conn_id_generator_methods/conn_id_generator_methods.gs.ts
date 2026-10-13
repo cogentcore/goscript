@@ -25,6 +25,8 @@ $.registerInterfaceType(
 
 export type connRunners = globalThis.Map<connRunner | null, connRunnerCallbacks> | null
 
+$.registerNamedType("main.connRunners", /* @__PURE__ */ $.mapType("main.connRunner", "main.connRunnerCallbacks"));
+
 $.registerNamedValueType(
 	"main.connRunners",
 	{AddConnectionID: (receiver: any, ...args: any[]) => (connRunners_AddConnectionID as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},

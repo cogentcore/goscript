@@ -5,6 +5,8 @@ import * as $ from "@goscript/builtin/index.js"
 
 export type ErrorList = $.Slice<string>
 
+$.registerNamedType("errlist.ErrorList", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("string")));
+
 $.registerNamedValueType(
 	"errlist.ErrorList",
 	{Add: (receiver: any, ...args: any[]) => (ErrorList_Add as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},

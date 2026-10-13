@@ -3058,14 +3058,44 @@ func (o *LoweringOwner) lowerTypeSpec(ctx lowerFileContext, spec *ast.TypeSpec) 
 		code = "export " + code
 		typeIndexExport = typeName
 	}
+	var registrations []string
+	if registration := o.lowerNamedCompositeTypeRegistration(ctx, named); registration != "" {
+		registrations = append(registrations, registration)
+	}
 	if registration := o.lowerNamedValueTypeRegistration(ctx, named); registration != "" {
+		registrations = append(registrations, registration)
+	}
+	if len(registrations) > 0 {
 		return loweredDecl{
-			code:            code + "\n\n" + registration,
+			code:            code + "\n\n" + strings.Join(registrations, "\n\n"),
 			typeIndexExport: typeIndexExport,
 			sideEffect:      true,
 		}, nil
 	}
 	return loweredDecl{code: code, typeIndexExport: typeIndexExport}, nil
+}
+
+// lowerNamedCompositeTypeRegistration registers the runtime type information
+// of a top-level, non-generic named map, slice or array type under its Go
+// type string, so that code given only the type's name, such as
+// encoding/json decoding a field of the type, can resolve its key and
+// element types.
+func (o *LoweringOwner) lowerNamedCompositeTypeRegistration(ctx lowerFileContext, named *types.Named) string {
+	if !ctx.topLevel || named.TypeParams().Len() != 0 {
+		return ""
+	}
+	obj := named.Obj()
+	if obj == nil || obj.Pkg() == nil || obj.Parent() != obj.Pkg().Scope() {
+		return ""
+	}
+	switch named.Underlying().(type) {
+	case *types.Map, *types.Slice, *types.Array:
+	default:
+		return ""
+	}
+	return o.runtimeOwner.QualifiedHelper(RuntimeHelperRegisterNamedType) + "(" +
+		strconv.Quote(goRuntimeTypeString(named)) + ", " +
+		o.runtimeTypeInfoExpr(named.Underlying()) + ");"
 }
 
 // registersNamedValueMethods reports whether a package-level named type is

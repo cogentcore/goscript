@@ -5,6 +5,8 @@ import * as $ from "@goscript/builtin/index.js"
 
 export type filters = $.Slice<number>
 
+$.registerNamedType("main.filters", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")));
+
 $.registerNamedValueType(
 	"main.filters",
 	{size: (receiver: any, ...args: any[]) => (filters_size as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},

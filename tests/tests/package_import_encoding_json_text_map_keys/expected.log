@@ -1,0 +1,13 @@
+len: 2
+keyword: bold background: white
+key is token: true
+key is token: true
+comment: gray
+kind: Comment kinds: 2 Keyword Background
+marshal doc: {"Kind":"Keyword","Kinds":["Comment"],"Styles":null,"Counts":null,"Big":null}
+counts: 2 4
+big: big
+marshal: {"Comment":"gray","Keyword":"bold"}
+marshal ints: {"1":false,"3":true}
+bad error: true
+styles keys: 1 x

@@ -318,6 +318,24 @@ function registerTypeInfo(name: string, typeInfo: TypeInfo): void {
 }
 
 /**
+ * registerNamedType registers the runtime type information of a named map,
+ * slice or array type under its Go type string, so that code given only the
+ * name, such as encoding/json, can resolve its key and element types.
+ *
+ * @param name The Go type string of the named type, e.g. "pkg.Style".
+ * @param underlying The type information of its underlying type.
+ * @returns The registered type information, which carries the name.
+ */
+export function registerNamedType(
+  name: string,
+  underlying: TypeInfo,
+): TypeInfo {
+  const typeInfo = { ...underlying, typeName: name } as TypeInfo
+  registerTypeInfo(name, typeInfo)
+  return typeInfo
+}
+
+/**
  * registerStructType Registers a struct type with the runtime type system.
  *
  * @param name The name of the type.

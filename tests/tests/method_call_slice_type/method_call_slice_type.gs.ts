@@ -5,6 +5,8 @@ import * as $ from "@goscript/builtin/index.js"
 
 export type MySlice = $.Slice<number>
 
+$.registerNamedType("main.MySlice", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")));
+
 $.registerNamedValueType(
 	"main.MySlice",
 	{Sum: (receiver: any, ...args: any[]) => (MySlice_Sum as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},

@@ -4,3 +4,5 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export type Value = $.Slice<number>
+
+$.registerNamedType("dep.Value", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")));

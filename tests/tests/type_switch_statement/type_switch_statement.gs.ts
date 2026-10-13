@@ -5,6 +5,8 @@ import * as $ from "@goscript/builtin/index.js"
 
 export type ObjectIdentifier = $.Slice<number>
 
+$.registerNamedType("main.ObjectIdentifier", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")));
+
 export class RawValue {
 	public declare Tag: number
 
