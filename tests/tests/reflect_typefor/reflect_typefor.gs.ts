@@ -30,6 +30,18 @@ $.registerInterfaceType(
 
 export type Stringy = string
 
+$.registerNamedValueType(
+	"main.Stringy",
+	{String: (receiver: any, ...args: any[]) => (Stringy_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])]
+);
+
+$.registerNamedValueType(
+	"*main.Stringy",
+	{String: (receiver: any, ...args: any[]) => (Stringy_String as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])]
+);
+
 export type namer = {
 	Name(): string
 }

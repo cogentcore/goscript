@@ -25,6 +25,18 @@ $.registerInterfaceType(
 
 export type connRunners = globalThis.Map<connRunner | null, connRunnerCallbacks> | null
 
+$.registerNamedValueType(
+	"main.connRunners",
+	{AddConnectionID: (receiver: any, ...args: any[]) => (connRunners_AddConnectionID as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("AddConnectionID", [["id", /* @__PURE__ */ $.basicType("int")]])]
+);
+
+$.registerNamedValueType(
+	"*main.connRunners",
+	{AddConnectionID: (receiver: any, ...args: any[]) => (connRunners_AddConnectionID as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("AddConnectionID", [["id", /* @__PURE__ */ $.basicType("int")]])]
+);
+
 export class transport {
 	public declare values: globalThis.Map<number, number> | null
 

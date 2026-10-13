@@ -5,6 +5,12 @@ import * as $ from "@goscript/builtin/index.js"
 
 export type ErrorList = $.Slice<string>
 
+$.registerNamedValueType(
+	"*errlist.ErrorList",
+	{Add: (receiver: any, ...args: any[]) => (ErrorList_Add as any)(receiver, ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("Add", [["msg", /* @__PURE__ */ $.basicType("string")]])]
+);
+
 export class AStruct {
 	public declare Msg: string
 

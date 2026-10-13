@@ -18,7 +18,31 @@ $.registerInterfaceType(
 
 export type IntVal = number
 
+$.registerNamedValueType(
+	"main.IntVal",
+	{String: (receiver: any, ...args: any[]) => (IntVal_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])]
+);
+
+$.registerNamedValueType(
+	"*main.IntVal",
+	{String: (receiver: any, ...args: any[]) => (IntVal_String as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])]
+);
+
 export type StringVal = string
+
+$.registerNamedValueType(
+	"main.StringVal",
+	{String: (receiver: any, ...args: any[]) => (StringVal_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])]
+);
+
+$.registerNamedValueType(
+	"*main.StringVal",
+	{String: (receiver: any, ...args: any[]) => (StringVal_String as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])]
+);
 
 export type Pair = number[]
 

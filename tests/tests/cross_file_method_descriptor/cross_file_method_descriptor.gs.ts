@@ -18,6 +18,18 @@ $.registerInterfaceType(
 
 export type mode = number
 
+$.registerNamedValueType(
+	"main.mode",
+	{Run: (receiver: any, ...args: any[]) => (__goscript_method.mode_Run as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("Run", [], [/* @__PURE__ */ $.basicType("string")])]
+);
+
+$.registerNamedValueType(
+	"*main.mode",
+	{Run: (receiver: any, ...args: any[]) => (__goscript_method.mode_Run as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("Run", [], [/* @__PURE__ */ $.basicType("string")])]
+);
+
 export function asRunner(m: mode): runner | null {
 	return $.namedValueInterfaceValue<runner | null>(m, "main.mode", {Run: (receiver: any, ...args: any[]) => (__goscript_method.mode_Run as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, /* @__PURE__ */ $.basicType("int", "main.mode"), [$.methodSignature("Run", [], [/* @__PURE__ */ $.basicType("string")])])
 }

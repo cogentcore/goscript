@@ -23,6 +23,18 @@ export type Name = string
 
 export type Stringy = string
 
+$.registerNamedValueType(
+	"main.Stringy",
+	{String: (receiver: any, ...args: any[]) => (Stringy_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])]
+);
+
+$.registerNamedValueType(
+	"*main.Stringy",
+	{String: (receiver: any, ...args: any[]) => (Stringy_String as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])]
+);
+
 export type stringer = {
 	String(): string
 }
@@ -35,7 +47,31 @@ $.registerInterfaceType(
 
 export type FormatError = string
 
+$.registerNamedValueType(
+	"main.FormatError",
+	{Error: (receiver: any, ...args: any[]) => (FormatError_Error as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("Error", [], [/* @__PURE__ */ $.basicType("string")])]
+);
+
+$.registerNamedValueType(
+	"*main.FormatError",
+	{Error: (receiver: any, ...args: any[]) => (FormatError_Error as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("Error", [], [/* @__PURE__ */ $.basicType("string")])]
+);
+
 export type Code = number
+
+$.registerNamedValueType(
+	"main.Code",
+	{Error: (receiver: any, ...args: any[]) => (Code_Error as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("Error", [], [/* @__PURE__ */ $.basicType("string")])]
+);
+
+$.registerNamedValueType(
+	"*main.Code",
+	{Error: (receiver: any, ...args: any[]) => (Code_Error as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("Error", [], [/* @__PURE__ */ $.basicType("string")])]
+);
 
 export const errConst: FormatError = "const"
 

@@ -5,6 +5,18 @@ import * as $ from "@goscript/builtin/index.js"
 
 export type MyError = number
 
+$.registerNamedValueType(
+	"main.MyError",
+	{Error: (receiver: any, ...args: any[]) => (MyError_Error as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("Error", [], [/* @__PURE__ */ $.basicType("string")])]
+);
+
+$.registerNamedValueType(
+	"*main.MyError",
+	{Error: (receiver: any, ...args: any[]) => (MyError_Error as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("Error", [], [/* @__PURE__ */ $.basicType("string")])]
+);
+
 export const ErrNegative: MyError = -1
 
 export function MyError_Error(e: MyError): string {

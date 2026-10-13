@@ -49,9 +49,45 @@ $.registerInterfaceType(
 
 export type Base = number
 
+$.registerNamedValueType(
+	"main.Base",
+	{String: (receiver: any, ...args: any[]) => (Base_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])]
+);
+
+$.registerNamedValueType(
+	"*main.Base",
+	{String: (receiver: any, ...args: any[]) => (Base_String as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])]
+);
+
 export type Extended = number
 
+$.registerNamedValueType(
+	"main.Extended",
+	{String: (receiver: any, ...args: any[]) => (Extended_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])]
+);
+
+$.registerNamedValueType(
+	"*main.Extended",
+	{String: (receiver: any, ...args: any[]) => (Extended_String as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])]
+);
+
 export type Wide = bigint
+
+$.registerNamedValueType(
+	"main.Wide",
+	{String: (receiver: any, ...args: any[]) => (Wide_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])]
+);
+
+$.registerNamedValueType(
+	"*main.Wide",
+	{String: (receiver: any, ...args: any[]) => (Wide_String as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])]
+);
 
 export function Base_String(b: Base): string {
 	return "base"

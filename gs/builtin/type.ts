@@ -2218,6 +2218,38 @@ export function basicInterfaceValue<T = any>(
   )
 }
 
+// NamedValueMethods holds the method implementations and signatures of a
+// named non-struct type, or a pointer to one, for boxing its values.
+export interface NamedValueMethods {
+  methods: Record<string, (receiver: any, ...args: any[]) => any>
+  signatures: MethodSignature[]
+}
+
+const namedValueMethodRegistry = new Map<string, NamedValueMethods>()
+
+/**
+ * registerNamedValueType registers the method set of a named non-struct type
+ * (or a pointer to one) under its Go type string, so that a value of the type
+ * created at run time, as by reflect, can be boxed with its methods.
+ */
+export function registerNamedValueType(
+  typeName: string,
+  methods: NamedValueMethods['methods'],
+  signatures: MethodSignature[],
+): void {
+  namedValueMethodRegistry.set(typeName, { methods, signatures })
+}
+
+/**
+ * namedValueMethods returns the registered method set of the named
+ * non-struct type (or pointer to one) with the given Go type string.
+ */
+export function namedValueMethods(
+  typeName: string,
+): NamedValueMethods | undefined {
+  return namedValueMethodRegistry.get(typeName)
+}
+
 export function namedValueInterfaceValue<T>(
   value: unknown,
   typeName: string,

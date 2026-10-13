@@ -5,6 +5,18 @@ import * as $ from "@goscript/builtin/index.js"
 
 export type Level = number
 
+$.registerNamedValueType(
+	"main.Level",
+	{Rank: (receiver: any, ...args: any[]) => (Level_Rank as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("Rank", [["prefix", /* @__PURE__ */ $.basicType("string")]], [/* @__PURE__ */ $.basicType("string")])]
+);
+
+$.registerNamedValueType(
+	"*main.Level",
+	{Rank: (receiver: any, ...args: any[]) => (Level_Rank as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("Rank", [["prefix", /* @__PURE__ */ $.basicType("string")]], [/* @__PURE__ */ $.basicType("string")])]
+);
+
 export type Ranker = {
 	Rank(prefix: string): string
 }

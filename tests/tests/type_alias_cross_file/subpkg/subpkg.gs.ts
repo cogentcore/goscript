@@ -5,6 +5,18 @@ import * as $ from "@goscript/builtin/index.js"
 
 export type Value = $.Slice<number>
 
+$.registerNamedValueType(
+	"subpkg.Value",
+	{Clone: (receiver: any, ...args: any[]) => (Value_Clone as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("Clone", [], [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"), "subpkg.Value")])]
+);
+
+$.registerNamedValueType(
+	"*subpkg.Value",
+	{Clone: (receiver: any, ...args: any[]) => (Value_Clone as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("Clone", [], [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"), "subpkg.Value")])]
+);
+
 export function Value_Clone(v: Value): Value {
 	if (v == null) {
 		return (null as Value)

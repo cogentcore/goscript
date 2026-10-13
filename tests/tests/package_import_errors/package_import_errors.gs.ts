@@ -8,6 +8,18 @@ import "@goscript/errors/index.js"
 
 export type scalarErr = number
 
+$.registerNamedValueType(
+	"main.scalarErr",
+	{Error: (receiver: any, ...args: any[]) => (scalarErr_Error as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("Error", [], [/* @__PURE__ */ $.basicType("string")])]
+);
+
+$.registerNamedValueType(
+	"*main.scalarErr",
+	{Error: (receiver: any, ...args: any[]) => (scalarErr_Error as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("Error", [], [/* @__PURE__ */ $.basicType("string")])]
+);
+
 export class customErr {
 	public declare msg: string
 

@@ -5,6 +5,18 @@ import * as $ from "@goscript/builtin/index.js"
 
 export type remoteError = number
 
+$.registerNamedValueType(
+	"main.remoteError",
+	{Error: (receiver: any, ...args: any[]) => (remoteError_Error as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("Error", [], [/* @__PURE__ */ $.basicType("string")])]
+);
+
+$.registerNamedValueType(
+	"*main.remoteError",
+	{Error: (receiver: any, ...args: any[]) => (remoteError_Error as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("Error", [], [/* @__PURE__ */ $.basicType("string")])]
+);
+
 export function remoteError_Error(e: remoteError): string {
 	return "remote error"
 }
