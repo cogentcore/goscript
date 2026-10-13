@@ -3,6 +3,8 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
+$.registerTypePackagePath("github.com/s4wave/goscript/tests/tests/type_alias_cross_file/subpkg", ["subpkg.Value"])
+
 export type Value = $.Slice<number>
 
 $.registerNamedValueType(

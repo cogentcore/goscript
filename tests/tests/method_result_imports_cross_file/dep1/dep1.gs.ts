@@ -6,6 +6,8 @@ import * as $ from "@goscript/builtin/index.js"
 import * as dep2 from "@goscript/github.com/s4wave/goscript/tests/tests/method_result_imports_cross_file/dep2/index.js"
 import "@goscript/github.com/s4wave/goscript/tests/tests/method_result_imports_cross_file/dep2/index.js"
 
+$.registerTypePackagePath("github.com/s4wave/goscript/tests/tests/method_result_imports_cross_file/dep1", ["dep1.maker"])
+
 export class maker {
 	public _fields: {
 	}

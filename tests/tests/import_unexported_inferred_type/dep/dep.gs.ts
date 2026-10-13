@@ -3,6 +3,8 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
+$.registerTypePackagePath("github.com/s4wave/goscript/tests/tests/import_unexported_inferred_type/dep", ["dep.hiddenError"])
+
 export class hiddenError {
 	public _fields: {
 	}

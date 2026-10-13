@@ -3,6 +3,8 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
+$.registerTypePackagePath("github.com/s4wave/goscript/tests/tests/import_type_methods/errlist", ["errlist.ErrorList"])
+
 export type ErrorList = $.Slice<string>
 
 $.registerNamedValueType(

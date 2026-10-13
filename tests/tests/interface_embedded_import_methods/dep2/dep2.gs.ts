@@ -3,6 +3,8 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
+$.registerTypePackagePath("github.com/s4wave/goscript/tests/tests/interface_embedded_import_methods/dep2", ["dep2.Value", "dep2.Result"])
+
 export type Value = {
 	Value(): string
 }

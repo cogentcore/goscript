@@ -2093,13 +2093,7 @@ export class BasicType implements Type {
   }
 
   public PkgPath(): string {
-    if (this._typeName) {
-      const dotIndex = this._typeName.lastIndexOf('.')
-      if (dotIndex > 0) {
-        return this._typeName.substring(0, dotIndex)
-      }
-    }
-    return ''
+    return this._typeName ? $.typePackagePath(this._typeName) : ''
   }
 
   public Name(): string {
@@ -2339,9 +2333,7 @@ class SliceType implements Type {
   }
 
   public PkgPath(): string {
-    if (!this._typeName) return ''
-    const dotIndex = this._typeName.lastIndexOf('.')
-    return dotIndex > 0 ? this._typeName.substring(0, dotIndex) : ''
+    return this._typeName ? $.typePackagePath(this._typeName) : ''
   }
 
   public Name(): string {
@@ -2835,13 +2827,7 @@ class FunctionType implements Type {
   }
 
   public PkgPath(): string {
-    if (this._name !== '') {
-      const dotIndex = this._name.lastIndexOf('.')
-      if (dotIndex > 0) {
-        return this._name.substring(0, dotIndex)
-      }
-    }
-    return ''
+    return this._name !== '' ? $.typePackagePath(this._name) : ''
   }
 
   public Name(): string {
@@ -3966,12 +3952,7 @@ class StructType implements Type {
     if (this._name === '') {
       return ''
     }
-    // Extract package path from full type name (e.g., "main.Person" -> "main")
-    const dotIndex = this._name.lastIndexOf('.')
-    if (dotIndex > 0) {
-      return this._name.substring(0, dotIndex)
-    }
-    return ''
+    return $.typePackagePath(this._name)
   }
 
   public Name(): string {
@@ -4519,11 +4500,7 @@ class InterfaceType implements Type {
     if (isInterfaceLiteral(this._name)) {
       return ''
     }
-    const dotIndex = this._name.lastIndexOf('.')
-    if (dotIndex > 0) {
-      return this._name.substring(0, dotIndex)
-    }
-    return ''
+    return $.typePackagePath(this._name)
   }
 
   public Name(): string {
