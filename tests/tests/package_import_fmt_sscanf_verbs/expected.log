@@ -1,0 +1,12 @@
+g float32: 1 true 1
+f float64: 1 true 25
+d int64 uint8: 2 true -42 200
+02x: 3 true 255 128 0
+1x: 3 true 15 8 0
+struct fields: 2 true 12 3
+s v: 2 true name 7
+t: 1 true true
+bad int: 0 true
+short: 1 true 12
+Sscan: 3 true 3 4 hello
+Sscan float: 1 true 1.25
