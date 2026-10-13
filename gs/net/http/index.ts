@@ -1619,8 +1619,8 @@ export interface FileSystem {
 }
 
 export interface File extends io.Closer, io.Reader, io.Seeker {
-  Readdir(count: number): [$.Slice<fs.FileInfo> | null, $.GoError]
-  Stat(): [fs.FileInfo | null, $.GoError]
+  Readdir(count: number): maybePromise<[$.Slice<fs.FileInfo> | null, $.GoError]>
+  Stat(): maybePromise<[fs.FileInfo | null, $.GoError]>
 }
 
 interface fileServerFileSystem {

@@ -27,7 +27,10 @@ export type FS = null | {
   // Paths containing other characters such as backslash and colon
   // are accepted as valid, but those characters must never be
   // interpreted by an [FS] implementation as path element separators.
-  Open(name: string): [File, $.GoError]
+  //
+  // Open may return a Promise, as for an FS on an asynchronous host
+  // filesystem such as os.DirFS in a browser.
+  Open(name: string): [File, $.GoError] | Promise<[File, $.GoError]>
 }
 
 $.registerInterfaceType(
@@ -105,9 +108,9 @@ export function ValidPath(name: string): boolean {
 }
 
 export type File = null | {
-  Close(): $.GoError
-  Read(_p0: $.Bytes): [number, $.GoError]
-  Stat(): [FileInfo, $.GoError]
+  Close(): $.GoError | Promise<$.GoError>
+  Read(_p0: $.Bytes): [number, $.GoError] | Promise<[number, $.GoError]>
+  Stat(): [FileInfo, $.GoError] | Promise<[FileInfo, $.GoError]>
 }
 
 $.registerInterfaceType(

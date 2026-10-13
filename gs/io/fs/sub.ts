@@ -180,14 +180,14 @@ class subFS {
     return [dir, f!.fixErr(err)]
   }
 
-  public ReadFile(name: string): [Uint8Array, $.GoError] {
+  public async ReadFile(name: string): Promise<[$.Bytes, $.GoError]> {
     const f = this
     let [full, err] = f!.fullName('read', name)
     if (err != null) {
       return [new Uint8Array(0), err]
     }
-    let data: Uint8Array
-    ;[data, err] = ReadFile(f!.fsys, full)
+    let data: $.Bytes
+    ;[data, err] = await ReadFile(f!.fsys, full)
     return [data, f!.fixErr(err)]
   }
 

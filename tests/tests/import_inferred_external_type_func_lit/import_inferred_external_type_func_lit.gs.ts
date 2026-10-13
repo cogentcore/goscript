@@ -13,16 +13,16 @@ export async function main(): globalThis.Promise<void> {
 	await using __defer = new $.AsyncDisposableStack()
 	let fileName = "external-type-func-lit.txt"
 	{
-		let err = os.WriteFile(fileName, new Uint8Array([99, 111, 110, 116, 101, 110, 116, 115]), 0o644)
+		let err = await os.WriteFile(fileName, new Uint8Array([99, 111, 110, 116, 101, 110, 116, 115]), 0o644)
 		if (err != null) {
 			await $.println("write error:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 			return
 		}
 	}
-	__defer.defer(() => { os.Remove(fileName) })
+	__defer.defer(async () => { await os.Remove(fileName) })
 
 	await (async (): globalThis.Promise<void> => {
-		let [info, err] = os.Stat(fileName)
+		let [info, err] = await os.Stat(fileName)
 		if (err != null) {
 			await $.println("stat error:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 			return

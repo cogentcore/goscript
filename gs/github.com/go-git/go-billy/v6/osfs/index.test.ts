@@ -22,107 +22,107 @@ function tempRoot(): string {
 }
 
 describe('go-billy osfs override', () => {
-  it('writes through to the host directory used by os.DirFS', () => {
+  it('writes through to the host directory used by os.DirFS', async () => {
     const root = tempRoot()
     const fsys = New(root)
 
-    const [file, openErr] = fsys.OpenFile(
+    const [file, openErr] = await fsys.OpenFile(
       'README.md',
       os.O_WRONLY | os.O_CREATE | os.O_TRUNC,
       0o666,
     )
     expect(openErr).toBeNull()
-    const [n, writeErr] = file!.Write($.stringToBytes('hello\n'))
+    const [n, writeErr] = await file!.Write($.stringToBytes('hello\n'))
     expect(writeErr).toBeNull()
     expect(n).toBe(6)
-    expect(file!.Close()).toBeNull()
+    expect(await file!.Close()).toBeNull()
 
     expect(readFileSync(join(root, 'README.md'), 'utf8')).toBe('hello\n')
   })
 
-  it('wraps a caller-managed os.Root', () => {
+  it('wraps a caller-managed os.Root', async () => {
     const root = tempRoot()
-    const [openedRoot, openErr] = os.OpenRoot(root)
+    const [openedRoot, openErr] = await os.OpenRoot(root)
     expect(openErr).toBeNull()
 
     const [fsys, fromErr] = FromRoot(openedRoot)
     expect(fromErr).toBeNull()
-    const [file, createErr] = fsys!.Create('from-root.txt')
+    const [file, createErr] = await fsys!.Create('from-root.txt')
     expect(createErr).toBeNull()
-    const [, writeErr] = file!.Write($.stringToBytes('from root'))
+    const [, writeErr] = await file!.Write($.stringToBytes('from root'))
     expect(writeErr).toBeNull()
-    expect(file!.Close()).toBeNull()
-    expect(openedRoot!.Close()).toBeNull()
+    expect(await file!.Close()).toBeNull()
+    expect(await openedRoot!.Close()).toBeNull()
 
     expect(readFileSync(join(root, 'from-root.txt'), 'utf8')).toBe('from root')
   })
 
-  it('rejects a nil os.Root', () => {
+  it('rejects a nil os.Root', async () => {
     const [fsys, err] = FromRoot(null)
 
     expect(fsys).toBeNull()
     expect(err?.Error()).toBe('root must not be nil')
   })
 
-  it('keeps chrooted writes under the child host directory', () => {
+  it('keeps chrooted writes under the child host directory', async () => {
     const root = tempRoot()
     const fsys = New(root)
     const [child, chrootErr] = fsys.Chroot('sub')
     expect(chrootErr).toBeNull()
 
-    const [file, openErr] = child!.Create('nested/file.txt')
+    const [file, openErr] = await child!.Create('nested/file.txt')
     expect(openErr).toBeNull()
-    const [, writeErr] = file!.Write($.stringToBytes('child'))
+    const [, writeErr] = await file!.Write($.stringToBytes('child'))
     expect(writeErr).toBeNull()
-    expect(file!.Close()).toBeNull()
+    expect(await file!.Close()).toBeNull()
 
     expect(readFileSync(join(root, 'sub', 'nested', 'file.txt'), 'utf8')).toBe(
       'child',
     )
   })
 
-  it('rejects parent traversal outside the base directory', () => {
+  it('rejects parent traversal outside the base directory', async () => {
     const root = tempRoot()
     const fsys = New(root)
 
-    const [file, err] = fsys.Open('../escape.txt')
+    const [file, err] = await fsys.Open('../escape.txt')
 
     expect(file).toBeNull()
     expect(err).not.toBeNull()
   })
 
-  it('accepts absolute paths inside the base directory', () => {
+  it('accepts absolute paths inside the base directory', async () => {
     const root = tempRoot()
     const fsys = New(root)
     const absolute = join(root, 'inside.txt')
 
-    const [file, openErr] = fsys.Create(absolute)
+    const [file, openErr] = await fsys.Create(absolute)
     expect(openErr).toBeNull()
-    const [, writeErr] = file!.Write($.stringToBytes('inside'))
+    const [, writeErr] = await file!.Write($.stringToBytes('inside'))
     expect(writeErr).toBeNull()
-    expect(file!.Close()).toBeNull()
+    expect(await file!.Close()).toBeNull()
 
     expect(readFileSync(absolute, 'utf8')).toBe('inside')
   })
 
-  it('rejects absolute paths outside the base directory', () => {
+  it('rejects absolute paths outside the base directory', async () => {
     const root = tempRoot()
     const outside = tempRoot()
     const fsys = New(root)
 
-    const [file, err] = fsys.Create(join(outside, 'outside.txt'))
+    const [file, err] = await fsys.Create(join(outside, 'outside.txt'))
 
     expect(file).toBeNull()
     expect(err).not.toBeNull()
   })
 
-  it('reads host directory entries', () => {
+  it('reads host directory entries', async () => {
     const root = tempRoot()
     writeFileSync(join(root, 'one.txt'), 'one')
     writeFileSync(join(root, 'two.txt'), 'two')
     const fsys = New(root)
 
-    const [entries, err] = fsys.ReadDir('.')
+    const [entries, err] = await fsys.ReadDir('.')
 
     expect(err).toBeNull()
     expect(

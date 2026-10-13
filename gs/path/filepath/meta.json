@@ -1,5 +1,6 @@
 {
   "asyncFunctions": {
+    "EvalSymlinks": true,
     "Walk": true,
     "WalkDir": true
   }

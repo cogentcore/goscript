@@ -4,14 +4,14 @@ import { Time, FileMode } from "./types_js.gs.js";
 
 // Stat returns a [FileInfo] describing the named file.
 // If there is an error, it will be of type [*PathError].
-export function Stat(name: string): [null | {
+export function Stat(name: string): Promise<[null | {
 	IsDir(): boolean
 	ModTime(): any
 	Mode(): any
 	Name(): string
 	Size(): bigint
 	Sys(): null | any
-}, $.GoError] {
+}, $.GoError]> {
 	// testlog.Stat(name) // Testlog not available in JavaScript
 	return statNolog(name)
 }
@@ -24,14 +24,14 @@ export function Stat(name: string): [null | {
 // On Windows, if the file is a reparse point that is a surrogate for another
 // named entity (such as a symbolic link or mounted folder), the returned
 // FileInfo describes the reparse point, and makes no attempt to resolve it.
-export function Lstat(name: string): [null | {
+export function Lstat(name: string): Promise<[null | {
 	IsDir(): boolean
 	ModTime(): Time
 	Mode(): FileMode
 	Name(): string
 	Size(): bigint
 	Sys(): null | any
-}, $.GoError] {
+}, $.GoError]> {
 	// testlog.Stat(name) // Testlog not available in JavaScript
 	return lstatNolog(name)
 }

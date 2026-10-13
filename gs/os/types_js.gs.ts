@@ -15,6 +15,7 @@ import {
 	resetHostRuntimeForTests,
 } from "@goscript/builtin/hostio.js"
 import { newRawConn } from "./rawconn_js.gs.js"
+import { callbackFSCall, callbackFSPath, callbackFSSetwd, getCallbackFS } from "./callbackfs.js"
 
 export type HostStatLike = {
 	isDirectory(): boolean
@@ -61,6 +62,28 @@ function hostErrorTarget(err: unknown): $.GoError {
 	default:
 		return null
 	}
+}
+
+// callbackFSResult calls the named function of the callback filesystem, if
+// the host uses one, with the given path (resolved against the working
+// directory) and arguments. It returns the first result of the call, or
+// ErrUnimplemented when there is no callback filesystem.
+export async function callbackFSResult(name: string, path: string, ...args: unknown[]): Promise<[unknown, $.GoError]> {
+	const cbfs = getCallbackFS()
+	if (cbfs === null) {
+		return [undefined, ErrUnimplemented]
+	}
+	try {
+		return [await callbackFSCall(cbfs, name, callbackFSPath(path), ...args), null]
+	} catch (err) {
+		return [undefined, newHostError(err)]
+	}
+}
+
+// callbackFSErr is like callbackFSResult, for a function with no result.
+export async function callbackFSErr(name: string, path: string, ...args: unknown[]): Promise<$.GoError> {
+	const [, err] = await callbackFSResult(name, path, ...args)
+	return err
 }
 
 export function getNodeFS(): NodeFSModule | null {
@@ -227,7 +250,7 @@ function joinFilePath(dir: string, name: string): string {
 	return dir.replace(/\/+$/, "") + "/" + name
 }
 
-export function readDirectoryInfos(name: string): [fs.FileInfo[] | null, $.GoError] {
+export async function readDirectoryInfos(name: string): Promise<[fs.FileInfo[] | null, $.GoError]> {
 	const denoObj = getDeno()
 	if (denoObj?.readDirSync) {
 		try {
@@ -269,6 +292,21 @@ export function readDirectoryInfos(name: string): [fs.FileInfo[] | null, $.GoErr
 		} catch (err) {
 			return [null, newHostError(err)]
 		}
+	}
+	if (getCallbackFS() !== null) {
+		const [names, err] = await callbackFSResult("readdir", name)
+		if (err !== null) {
+			return [null, err]
+		}
+		const infos: fs.FileInfo[] = []
+		for (const childName of names as string[]) {
+			const [stat, serr] = await callbackFSResult("lstat", joinFilePath(name, childName))
+			if (serr !== null) {
+				return [null, serr]
+			}
+			infos.push(createFileInfo(childName, stat as HostStatLike))
+		}
+		return [infos, null]
 	}
 	return [null, ErrUnimplemented]
 }
@@ -329,6 +367,9 @@ export class File {
 	public dirInfoOffset: number
 	public cachedDirEntries: fs.DirEntry[] | null
 	public cachedDirInfos: fs.FileInfo[] | null
+	// callback is the state of a file opened on the callback filesystem,
+	// whose reads and writes take an explicit position, or null.
+	public callback: callbackFileState | null
 
 	public _fields: {
 		file: file | null;
@@ -342,26 +383,69 @@ export class File {
 		this.dirInfoOffset = 0
 		this.cachedDirEntries = null
 		this.cachedDirInfos = null
+		this.callback = null
 		this._fields = {
 			file: init?.file ?? null
 		}
 	}
 
 	public clone(): File {
-		return new File({
+		const f = new File({
 			closed: this.closed,
 			fd: this.fd,
 			file: this.file,
 			name: this.name,
 		})
+		f.callback = this.callback
+		return f
 	}
 
-	public Readdir(n: number): [$.Slice<fs.FileInfo>, $.GoError] {
+	// callbackCall calls the named function of the callback filesystem with
+	// the file descriptor and the given arguments, returning its first result.
+	private async callbackCall(name: string, ...args: unknown[]): Promise<[unknown, $.GoError]> {
+		const cbfs = getCallbackFS()
+		if (cbfs === null) {
+			return [undefined, ErrUnimplemented]
+		}
+		try {
+			return [await callbackFSCall(cbfs, name, this.fd, ...args), null]
+		} catch (err) {
+			return [undefined, newHostError(err)]
+		}
+	}
+
+	// callbackRead reads into b from the given position of the file on the
+	// callback filesystem, or from its current position when it is null.
+	private async callbackRead(b: Uint8Array, position: number | null): Promise<[number, $.GoError]> {
+		if (b.length === 0) {
+			return [0, null]
+		}
+		const [n, err] = await this.callbackCall("read", b, 0, b.length, position)
+		if (err !== null) {
+			return [0, err]
+		}
+		if (Number(n) === 0) {
+			return [0, io.EOF]
+		}
+		return [Number(n), null]
+	}
+
+	// callbackWrite writes b at the given position of the file on the
+	// callback filesystem, or at its end when it is null.
+	private async callbackWrite(b: Uint8Array, position: number | null): Promise<[number, $.GoError]> {
+		if (b.length === 0) {
+			return [0, null]
+		}
+		const [n, err] = await this.callbackCall("write", b, 0, b.length, position)
+		return [err !== null ? 0 : Number(n), err]
+	}
+
+	public async Readdir(n: number): Promise<[$.Slice<fs.FileInfo>, $.GoError]> {
 		if (this.closed) {
 			return [null, ErrClosed]
 		}
 		if (this.cachedDirInfos === null) {
-			const [infos, err] = readDirectoryInfos(this.name)
+			const [infos, err] = await readDirectoryInfos(this.name)
 			if (err !== null) {
 				return [null, err]
 			}
@@ -373,20 +457,20 @@ export class File {
 		return [out, err]
 	}
 
-	public Readdirnames(n: number): [$.Slice<string>, $.GoError] {
-		const [infos, err] = this.Readdir(n)
+	public async Readdirnames(n: number): Promise<[$.Slice<string>, $.GoError]> {
+		const [infos, err] = await this.Readdir(n)
 		if (err !== null) {
 			return [null, err]
 		}
 		return [$.arrayToSlice((infos ?? []).map((info) => info!.Name())), null]
 	}
 
-	public ReadDir(n: number): [$.Slice<fs.DirEntry>, $.GoError] {
+	public async ReadDir(n: number): Promise<[$.Slice<fs.DirEntry>, $.GoError]> {
 		if (this.closed) {
 			return [null, ErrClosed]
 		}
 		if (this.cachedDirEntries === null) {
-			const [infos, err] = readDirectoryInfos(this.name)
+			const [infos, err] = await readDirectoryInfos(this.name)
 			if (err !== null) {
 				return [null, err]
 			}
@@ -398,16 +482,16 @@ export class File {
 		return [out, err]
 	}
 
-	public readdir(n: number, mode: readdirMode): [$.Slice<string>, $.Slice<fs.DirEntry>, $.Slice<fs.FileInfo>, $.GoError] {
+	public async readdir(n: number, mode: readdirMode): Promise<[$.Slice<string>, $.Slice<fs.DirEntry>, $.Slice<fs.FileInfo>, $.GoError]> {
 		if (mode === readdirName) {
-			const [names, err] = this.Readdirnames(n)
+			const [names, err] = await this.Readdirnames(n)
 			return [names, null, null, err]
 		}
 		if (mode === readdirDirEntry) {
-			const [entries, err] = this.ReadDir(n)
+			const [entries, err] = await this.ReadDir(n)
 			return [null, entries, null, err]
 		}
-		const [infos, err] = this.Readdir(n)
+		const [infos, err] = await this.Readdir(n)
 		return [null, null, infos, err]
 	}
 
@@ -415,7 +499,7 @@ export class File {
 		return this.name
 	}
 
-	public Read(b: $.Bytes): [number, $.GoError] {
+	public async Read(b: $.Bytes): Promise<[number, $.GoError]> {
 		if (this.closed) {
 			return [0, ErrClosed]
 		}
@@ -427,17 +511,24 @@ export class File {
 		}
 		const buf = $.bytesToUint8Array(b)
 		const handle = this.file?.handle
-		const [n, err] =
-			handle && typeof handle.readSync === "function"
-				? readHandle(handle, buf)
-				: readFD(this.fd, buf)
+		let n: number
+		let err: $.GoError
+		if (this.callback !== null) {
+			;[n, err] = await this.callbackRead(buf, this.callback.pos)
+			this.callback.pos += n
+		} else {
+			;[n, err] =
+				handle && typeof handle.readSync === "function"
+					? readHandle(handle, buf)
+					: readFD(this.fd, buf)
+		}
 		if (!(b instanceof Uint8Array) && n > 0) {
 			$.copy(b, buf.subarray(0, n))
 		}
 		return [n, err]
 	}
 
-	public ReadAt(b: $.Bytes, off: bigint): [number, $.GoError] {
+	public async ReadAt(b: $.Bytes, off: bigint): Promise<[number, $.GoError]> {
 		if (this.closed) {
 			return [0, ErrClosed]
 		}
@@ -449,11 +540,18 @@ export class File {
 		}
 		const buf = $.bytesToUint8Array(b)
 		const position = Number(off)
+		if (this.callback !== null) {
+			const [n, err] = await this.callbackRead(buf, position)
+			if (!(b instanceof Uint8Array) && n > 0) {
+				$.copy(b, buf.subarray(0, n))
+			}
+			return [n, err]
+		}
 		const handle = this.file?.handle
 		if (handle && typeof handle.seekSync === "function") {
 			try {
 				handle.seekSync(position, io.SeekStart)
-				return this.Read(b)
+				return await this.Read(b)
 			} catch (err) {
 				return [0, newHostError(err)]
 			}
@@ -488,7 +586,7 @@ export class File {
 		while (true) {
 			const [nr, er] = await (r.Read(buf) as Promise<[number, $.GoError]> | [number, $.GoError])
 			if (nr > 0) {
-				const [nw, ew] = this.Write($.goSlice(buf, 0, nr))
+				const [nw, ew] = await this.Write($.goSlice(buf, 0, nr))
 				if (nw < 0 || nr < nw) {
 					return [BigInt(written), ew ?? io.ErrShortWrite]
 				}
@@ -509,7 +607,7 @@ export class File {
 		}
 	}
 
-	public Write(b: $.Bytes): [number, $.GoError] {
+	public async Write(b: $.Bytes): Promise<[number, $.GoError]> {
 		if (this.closed) {
 			return [0, ErrClosed]
 		}
@@ -520,13 +618,19 @@ export class File {
 			return [0, null]
 		}
 		const buf = $.bytesToUint8Array(b)
+		if (this.callback !== null) {
+			const state = this.callback
+			const [n, err] = await this.callbackWrite(buf, state.append ? null : state.pos)
+			state.pos += n
+			return [n, err]
+		}
 		const handle = this.file?.handle
 		return handle && typeof handle.writeSync === "function"
 			? writeHandle(handle, buf)
 			: writeFD(this.fd, buf)
 	}
 
-	public WriteAt(b: $.Bytes, off: bigint): [number, $.GoError] {
+	public async WriteAt(b: $.Bytes, off: bigint): Promise<[number, $.GoError]> {
 		if (this.closed) {
 			return [0, ErrClosed]
 		}
@@ -538,11 +642,14 @@ export class File {
 		}
 		const buf = $.bytesToUint8Array(b)
 		const position = Number(off)
+		if (this.callback !== null) {
+			return this.callbackWrite(buf, position)
+		}
 		const handle = this.file?.handle
 		if (handle && typeof handle.seekSync === "function") {
 			try {
 				handle.seekSync(position, io.SeekStart)
-				return this.Write(b)
+				return await this.Write(b)
 			} catch (err) {
 				return [0, newHostError(err)]
 			}
@@ -568,7 +675,7 @@ export class File {
 		const buf = $.makeSlice<number>(32 * 1024, undefined, "byte")
 		let written = 0
 		while (true) {
-			const [nr, er] = this.Read(buf)
+			const [nr, er] = await this.Read(buf)
 			if (nr > 0) {
 				const [nw, ew] = await (w.Write($.goSlice(buf, 0, nr)) as Promise<[number, $.GoError]> | [number, $.GoError])
 				if (nw < 0 || nr < nw) {
@@ -591,7 +698,10 @@ export class File {
 		}
 	}
 
-	public Seek(offset: bigint, whence: number): [bigint, $.GoError] {
+	public async Seek(offset: bigint, whence: number): Promise<[bigint, $.GoError]> {
+		if (this.callback !== null) {
+			return this.callbackSeek(Number(offset), whence)
+		}
 		const handle = this.file?.handle
 		if (!handle || typeof handle.seekSync !== "function") {
 			return [0n, ErrUnimplemented]
@@ -603,13 +713,46 @@ export class File {
 		}
 	}
 
-	public WriteString(s: string): [number, $.GoError] {
+	// callbackSeek sets the position for the next read or write of the file
+	// on the callback filesystem, which tracks no position of its own.
+	private async callbackSeek(offset: number, whence: number): Promise<[bigint, $.GoError]> {
+		const state = this.callback!
+		let base = 0
+		switch (whence) {
+		case io.SeekStart:
+			break
+		case io.SeekCurrent:
+			base = state.pos
+			break
+		case io.SeekEnd: {
+			const [info, err] = await this.Stat()
+			if (err !== null) {
+				return [0n, err]
+			}
+			base = Number(info!.Size())
+			break
+		}
+		default:
+			return [0n, ErrInvalid]
+		}
+		if (base + offset < 0) {
+			return [0n, ErrInvalid]
+		}
+		state.pos = base + offset
+		return [BigInt(state.pos), null]
+	}
+
+	public WriteString(s: string): Promise<[number, $.GoError]> {
 		return this.Write($.stringToBytes(s))
 	}
 
-	public Chmod(mode: number): $.GoError {
+	public async Chmod(mode: number): Promise<$.GoError> {
 		if (this.closed) {
 			return ErrClosed
+		}
+		if (this.callback !== null) {
+			const [, err] = await this.callbackCall("fchmod", mode)
+			return err
 		}
 		if (this.name === "") {
 			return ErrUnimplemented
@@ -657,12 +800,17 @@ export class File {
 		return [newRawConn(this), null]
 	}
 
-	public Close(): $.GoError {
+	public async Close(): Promise<$.GoError> {
 		if (this.closed) {
 			return ErrClosed
 		}
 		const handle = this.file?.handle
-		if (handle && typeof handle.close === "function") {
+		if (this.callback !== null) {
+			const [, err] = await this.callbackCall("close")
+			if (err !== null) {
+				return err
+			}
+		} else if (handle && typeof handle.close === "function") {
 			try {
 				handle.close()
 			} catch (err) {
@@ -682,9 +830,13 @@ export class File {
 		return null
 	}
 
-	public Chown(uid: number, gid: number): $.GoError {
+	public async Chown(uid: number, gid: number): Promise<$.GoError> {
 		if (this.closed) {
 			return ErrClosed
+		}
+		if (this.callback !== null) {
+			const [, err] = await this.callbackCall("fchown", uid, gid)
+			return err
 		}
 		if (this.name === "") {
 			return ErrUnimplemented
@@ -710,7 +862,11 @@ export class File {
 		return ErrUnimplemented
 	}
 
-	public Truncate(size: bigint): $.GoError {
+	public async Truncate(size: bigint): Promise<$.GoError> {
+		if (this.callback !== null) {
+			const [, err] = await this.callbackCall("ftruncate", Number(size))
+			return err
+		}
 		const handle = this.file?.handle
 		if (handle && typeof handle.truncateSync === "function") {
 			try {
@@ -732,7 +888,11 @@ export class File {
 		return ErrUnimplemented
 	}
 
-	public Sync(): $.GoError {
+	public async Sync(): Promise<$.GoError> {
+		if (this.callback !== null) {
+			const [, err] = await this.callbackCall("fsync")
+			return err
+		}
 		const handle = this.file?.handle
 		if (handle && typeof handle.syncSync === "function") {
 			try {
@@ -755,6 +915,10 @@ export class File {
 	}
 
 	public Chdir(): $.GoError {
+		if (this.callback !== null) {
+			callbackFSSetwd(this.name)
+			return null
+		}
 		const processObj = (globalThis as any).process
 		if (processObj?.chdir && this.name !== "") {
 			try {
@@ -780,7 +944,11 @@ export class File {
 		return this.fd
 	}
 
-	public Stat(): [fs.FileInfo, $.GoError] {
+	public async Stat(): Promise<[fs.FileInfo, $.GoError]> {
+		if (this.callback !== null) {
+			const [stat, err] = await this.callbackCall("fstat")
+			return err !== null ? [null, err] : [createFileInfo(this.name, stat as HostStatLike), null]
+		}
 		const handle = this.file?.handle
 		if (handle && typeof handle.statSync === "function") {
 			try {
@@ -827,6 +995,15 @@ export class File {
 		File,
 		[{ name: "file", key: "file", type: { kind: $.TypeKind.Pointer, elemType: "file" } }, { name: "name", key: "name", type: { kind: $.TypeKind.Basic, name: "string" } }, { name: "closed", key: "closed", type: { kind: $.TypeKind.Basic, name: "boolean" } }, { name: "fd", key: "fd", type: { kind: $.TypeKind.Basic, name: "number" } }]
 	);
+}
+
+// callbackFileState is the state of a File on the callback filesystem.
+type callbackFileState = {
+	// append is whether the file was opened with O_APPEND, so that writes
+	// go to its end.
+	append: boolean
+	// pos is the position of the next read or write.
+	pos: number
 }
 
 class file {

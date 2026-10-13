@@ -9,8 +9,8 @@ type DirEntry = fs.DirEntry;
 
 // ReadDir reads the directory name and returns its entries sorted by name.
 // Each entry's Info carries the lstat mode, as Go's ReadDir does.
-export function ReadDir(name: string): [$.Slice<DirEntry>, $.GoError] {
-	const [infos, err] = readDirectoryInfos(name)
+export async function ReadDir(name: string): Promise<[$.Slice<DirEntry>, $.GoError]> {
+	const [infos, err] = await readDirectoryInfos(name)
 	if (err !== null) {
 		return [null, err]
 	}
@@ -21,6 +21,6 @@ export function ReadDir(name: string): [$.Slice<DirEntry>, $.GoError] {
 	return [$.arrayToSlice(entries), null]
 }
 
-export function CopyFS(dir: string, fsys: fs.FS): $.GoError {
+export async function CopyFS(dir: string, fsys: fs.FS): Promise<$.GoError> {
 	return ErrUnimplemented
 }
