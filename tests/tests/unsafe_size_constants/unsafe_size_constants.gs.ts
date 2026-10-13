@@ -65,7 +65,7 @@ export class Mixed {
 		this._fields = {
 			Flag: init?.Flag ?? (false as boolean),
 			N: init?.N ?? (0 as number),
-			V: init?.V !== undefined ? $.cloneArrayValue(init.V, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 3)) : $.arrayValue(Array.from({ length: 3 }, () => 0))
+			V: init?.V !== undefined ? $.cloneArrayValue(init.V, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 3)) : $.arrayValue(globalThis.Array.from({ length: 3 }, () => 0), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 3))
 		}
 	}
 
