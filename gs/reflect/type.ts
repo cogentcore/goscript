@@ -2411,10 +2411,10 @@ class SliceType implements Type {
   }
 
   public NumMethod(): number {
-    return 0
+    return typeMethods(this).length
   }
-  public MethodByName(_name: string): [Method, boolean] {
-    return [zeroMethod(), false]
+  public MethodByName(name: string): [Method, boolean] {
+    return typeMethodByName(this, name)
   }
 
   public Len(): number {
@@ -2443,10 +2443,11 @@ class ArrayType implements Type {
   constructor(
     private _elemType: Type,
     private _len: number,
+    private _typeName: string = '',
   ) {}
 
   public String(): string {
-    return `[${this._len}]${this._elemType.String()}`
+    return this._typeName || `[${this._len}]${this._elemType.String()}`
   }
 
   public Kind(): Kind {
@@ -2494,12 +2495,11 @@ class ArrayType implements Type {
   }
 
   public PkgPath(): string {
-    return ''
+    return typeNamePkgPath(this._typeName)
   }
 
   public Name(): string {
-    // Array types are unnamed composite types
-    return ''
+    return typeNameName(this._typeName)
   }
 
   public Field(_i: number): StructField {
@@ -2559,10 +2559,10 @@ class ArrayType implements Type {
   }
 
   public NumMethod(): number {
-    return 0
+    return typeMethods(this).length
   }
-  public MethodByName(_name: string): [Method, boolean] {
-    return [zeroMethod(), false]
+  public MethodByName(name: string): [Method, boolean] {
+    return typeMethodByName(this, name)
   }
 
   public Bits(): number {
@@ -3206,10 +3206,14 @@ class MapType implements Type {
   constructor(
     private _keyType: Type,
     private _elemType: Type,
+    private _typeName: string = '',
   ) {}
 
   public String(): string {
-    return `map[${this._keyType.String()}]${this._elemType.String()}`
+    return (
+      this._typeName ||
+      `map[${this._keyType.String()}]${this._elemType.String()}`
+    )
   }
 
   public Kind(): Kind {
@@ -3257,12 +3261,11 @@ class MapType implements Type {
   }
 
   public PkgPath(): string {
-    return ''
+    return typeNamePkgPath(this._typeName)
   }
 
   public Name(): string {
-    // Map types are unnamed composite types
-    return ''
+    return typeNameName(this._typeName)
   }
 
   public Field(_i: number): StructField {
@@ -3318,10 +3321,10 @@ class MapType implements Type {
   }
 
   public NumMethod(): number {
-    return 0
+    return typeMethods(this).length
   }
-  public MethodByName(_name: string): [Method, boolean] {
-    return [zeroMethod(), false]
+  public MethodByName(name: string): [Method, boolean] {
+    return typeMethodByName(this, name)
   }
 
   public Len(): number {
@@ -3632,7 +3635,27 @@ function methodArgType(arg: $.MethodArg): Type {
   return typeFromTypeInfoWithSeen(arg.type, new Set())
 }
 
+// typeNamePkgPath returns the package path of a qualified type name such as
+// "pkg.Name", or '' for an unnamed type.
+function typeNamePkgPath(typeName: string): string {
+  const dotIndex = typeName.lastIndexOf('.')
+  return dotIndex > 0 ? typeName.substring(0, dotIndex) : ''
+}
+
+// typeNameName returns the name of a qualified type name such as "pkg.Name",
+// or '' for an unnamed type.
+function typeNameName(typeName: string): string {
+  const dotIndex = typeName.lastIndexOf('.')
+  return dotIndex >= 0 ? typeName.substring(dotIndex + 1) : typeName
+}
+
 function typeMethods(t: Type): $.MethodSignature[] {
+  // A named non-struct type, such as a named map, slice or basic type, or a
+  // pointer to one, has its method set registered by its type string.
+  const named = $.namedValueMethods(t.String())
+  if (named !== undefined) {
+    return named.signatures
+  }
   let typeInfo = builtinGetTypeByName(t.String())
   if (!typeInfo && t.Kind() === Ptr) {
     typeInfo = builtinGetTypeByName(t.Elem().String())
@@ -5298,6 +5321,7 @@ function typeFromStructuredTypeInfoWithSeen(
           seen,
         ),
         info.length,
+        info.typeName,
       )
     case $.TypeKind.Basic:
       return StructType.createTypeFromFieldInfo(info, seen)
@@ -5323,6 +5347,7 @@ function typeFromStructuredTypeInfoWithSeen(
           info.elemType ?? { kind: $.TypeKind.Basic, name: 'unknown' },
           seen,
         ),
+        info.typeName,
       )
     case $.TypeKind.Slice:
       return new SliceType(

@@ -1,0 +1,8 @@
+names: main.Names Names slice 1
+grid: main.Grid Grid array 1
+grid Sum: Sum true
+rules: main.Rules Rules map 0 1
+field type: main.Rules map Rules
+ptr methods: 1
+value type: main.Rules *main.Rules
+addr implements Unmarshaler: true
