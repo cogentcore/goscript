@@ -105,7 +105,7 @@ function newStructValue(typ: Type): ReflectValue {
     for (let i = 0; i < typ.NumField(); i++) {
       const field = typ.Field(i)
       const key = structFieldStorageKey(typ, i)
-      value._fields[key] = zeroReflectValue(field.Type)
+      value._fields[key] = zeroReflectValue(field.Type!)
       Object.defineProperty(value, key, {
         enumerable: true,
         configurable: true,
