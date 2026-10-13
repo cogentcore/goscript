@@ -21,6 +21,34 @@ func testFS(fsys string, expected ...string) error {
 	return nil
 }
 
+// Stack is a named generic slice type, spread into a variadic call.
+type Stack[T any] []T
+
+// Push appends items to the stack.
+func (st *Stack[T]) Push(items ...T) {
+	*st = append(*st, items...)
+}
+
+// Names is a named non-generic slice type.
+type Names []string
+
+// Text is a named slice type used as a variadic element.
+type Text []string
+
+// join counts the strings in all of txts.
+func join(txts ...Text) int {
+	n := 0
+	for _, t := range txts {
+		n += len(t)
+	}
+	return n
+}
+
+// count counts names.
+func count(names ...string) int {
+	return len(names)
+}
+
 func main() {
 	expected := []string{"file1.txt", "file2.txt", "file3.txt"}
 
@@ -32,4 +60,12 @@ func main() {
 	} else {
 		println("Success!")
 	}
+
+	// Named slices spread into variadic parameters of their element type.
+	st := make(Stack[Text], 0)
+	st.Push(Text{"a", "b"}, Text{"c"})
+	println("join:", join(st...))
+
+	names := Names{"x", "y", "z"}
+	println("count:", count(names...))
 }

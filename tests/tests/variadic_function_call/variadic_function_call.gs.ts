@@ -6,6 +6,12 @@ import * as $ from "@goscript/builtin/index.js"
 import * as errors from "@goscript/errors/index.js"
 import "@goscript/errors/index.js"
 
+export type Stack = $.Slice<any>
+
+export type Names = $.Slice<string>
+
+export type Text = $.Slice<string>
+
 export async function TestFS(fsys: string, expected: $.Slice<string>): globalThis.Promise<$.GoError> {
 	return testFS(fsys, expected)
 }
@@ -24,6 +30,23 @@ export async function testFS(fsys: string, expected: $.Slice<string>): globalThi
 	return null
 }
 
+export function Stack_Push(st: $.VarRef<Stack> | null, __typeArgs: $.GenericTypeArgs | undefined, items: $.Slice<any>): void {
+	st!.value = ($.appendSlice(($.pointerValue<Stack>(st) as Stack), items, $.appendZero(() => ($.genericZero(__typeArgs, "T", null) as any))) as Stack)
+}
+
+export function join(txts: $.Slice<Text>): number {
+	let n = 0
+	for (let __goscriptRangeTarget1 = txts, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget1); __rangeIndex++) {
+		let t = (__goscriptRangeTarget1![__rangeIndex] as Text)
+		n = n + ($.len((t as Text)))
+	}
+	return n
+}
+
+export function count(names: $.Slice<string>): number {
+	return $.len(names)
+}
+
 export async function main(): globalThis.Promise<void> {
 	let expected: $.Slice<string> = $.arrayToSlice<string>(["file1.txt", "file2.txt", "file3.txt"])
 
@@ -35,6 +58,14 @@ export async function main(): globalThis.Promise<void> {
 	} else {
 		await $.println("Success!")
 	}
+
+	// Named slices spread into variadic parameters of their element type.
+	let st: $.VarRef<Stack> = $.varRef(($.makeSlice<Text>(0) as Stack))
+	Stack_Push(st, {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("string"), "main.Text"), zero: () => null }}, $.arrayToSlice<Text>([($.arrayToSlice<string>(["a", "b"]) as Text), ($.arrayToSlice<string>(["c"]) as Text)]))
+	await $.println("join:", join((st.value as $.Slice<Text>)))
+
+	let names: Names = ($.arrayToSlice<string>(["x", "y", "z"]) as Names)
+	await $.println("count:", count((names as $.Slice<string>)))
 }
 
 if ($.isMainScript(import.meta)) {
