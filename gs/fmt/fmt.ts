@@ -204,7 +204,8 @@ function formatValue(value: any, verb: string, flags = ''): string {
 function elementTypeInfo(
   typeInfo?: $.TypeInfo | string,
 ): $.TypeInfo | string | undefined {
-  const info = typeof typeInfo === 'string' ? $.getTypeByName(typeInfo) : typeInfo
+  const info =
+    typeof typeInfo === 'string' ? $.getTypeByName(typeInfo) : typeInfo
   if (info?.kind === $.TypeKind.Slice || info?.kind === $.TypeKind.Array) {
     return info.elemType
   }
@@ -230,7 +231,11 @@ function floatBits(value: unknown, typeInfo?: $.TypeInfo | string): number {
 
 // formatFloatVerb formats a float for the e, E, f, F, g and G verbs, with an
 // optional precision, as in Go.
-function formatFloatVerb(value: unknown, verb: string, precision: string): string {
+function formatFloatVerb(
+  value: unknown,
+  verb: string,
+  precision: string,
+): string {
   const bits = floatBits(value) || 64
   let prec = precision === '' ? -1 : parseInt(precision)
   if (prec < 0 && verb !== 'g' && verb !== 'G') {
@@ -294,6 +299,36 @@ function formatPointer(value: any): string {
   return '0x' + pointer.Pointer().toString(16)
 }
 
+// formattingStructs holds the storage of the structs being formatted, to
+// detect cycles through pointers that lack type information.
+const formattingStructs = new Set<object>()
+
+/** formatStructFields renders the fields of a struct value. */
+function formatStructFields(
+  value: any,
+  info: $.TypeInfo | undefined,
+  fields: $.StructFieldInfo[],
+  storage: any,
+  flags: string,
+  depth: number,
+  allowMethods: boolean,
+): MaybeString {
+  const parts = fields.map((field) => {
+    const formatted = defaultFormatMaybe(
+      storage[$.structFieldRuntimeKey(field)],
+      flags,
+      depth + 1,
+      field.type,
+      allowMethods && (field.exported ?? /^\p{Lu}/u.test(field.name)),
+    )
+    const prefix =
+      flags.includes('+') || flags.includes('#') ? field.name + ':' : ''
+    return joinMaybe([formatted], '', prefix)
+  })
+  const name = flags.includes('#') ? (info?.name ?? '') : ''
+  return joinMaybe(parts, flags.includes('#') ? ', ' : ' ', name + '{', '}')
+}
+
 /** defaultFormatMaybe renders Go values without exposing their runtime storage. */
 function defaultFormatMaybe(
   value: any,
@@ -302,16 +337,25 @@ function defaultFormatMaybe(
   typeInfo?: $.TypeInfo | string,
   allowMethods = true,
 ): MaybeString {
-  if (value === null || value === undefined) return '<nil>'
+  if (value === null || value === undefined) {
+    // A nil slice or map prints as an empty one, as in Go.
+    const nilInfo =
+      typeof typeInfo === 'string' ? $.getTypeByName(typeInfo) : typeInfo
+    if (nilInfo?.kind === $.TypeKind.Slice) return '[]'
+    if (nilInfo?.kind === $.TypeKind.Map) return 'map[]'
+    return '<nil>'
+  }
   if ($.isTypedNilValue(value)) return '<nil>'
   if (typeof value === 'boolean') return value ? 'true' : 'false'
   if (typeof value === 'string')
     return flags.includes('#') ? JSON.stringify(value) : value
   if (typeof value === 'number' || typeof value === 'bigint') {
     const bits = typeof value === 'number' ? floatBits(value, typeInfo) : 0
-    return bits ? $.formatFloat(value as number, 'g', -1, bits) : value.toString()
+    return bits ?
+        $.formatFloat(value as number, 'g', -1, bits)
+      : value.toString()
   }
-  if (Array.isArray(value))
+  if (Array.isArray(value)) {
     return joinMaybe(
       value.map((item) =>
         defaultFormatMaybe(
@@ -323,12 +367,14 @@ function defaultFormatMaybe(
               (value as { __goTypeInfo?: $.TypeInfo | string }).__goTypeInfo ??
               $.arrayValueTypeInfo(value),
           ),
+          allowMethods,
         ),
       ),
       ' ',
       '[',
       ']',
     )
+  }
   if (typeof value === 'object') {
     // Go consults methods on exported fields, with GoString reserved for %#v.
     const methodValue = $.isVarRef(value) ? value.value : value
@@ -382,7 +428,9 @@ function defaultFormatMaybe(
           element?.kind === $.TypeKind.Array ||
           element?.kind === $.TypeKind.Slice ||
           (element === undefined &&
-            [Struct, ArrayKind, SliceKind].includes(TypeOf(pointee)?.Kind() ?? 0)))
+            [Struct, ArrayKind, SliceKind].includes(
+              TypeOf(pointee)?.Kind() ?? 0,
+            )))
       ) {
         return joinMaybe(
           [
@@ -433,20 +481,25 @@ function defaultFormatMaybe(
             type: $.basicType('unknown'),
           }))
       const storage = value._fields ?? value
-      const parts = fields.map((field) => {
-        const formatted = defaultFormatMaybe(
-          storage[$.structFieldRuntimeKey(field)],
+      // A struct reached again through its own fields is reached through a
+      // pointer, which prints as an address, as Go prints nested pointers.
+      if (formattingStructs.has(storage)) {
+        return formatPointer(value)
+      }
+      formattingStructs.add(storage)
+      try {
+        return formatStructFields(
+          value,
+          info,
+          fields,
+          storage,
           flags,
-          depth + 1,
-          field.type,
-          allowMethods && (field.exported ?? /^\p{Lu}/u.test(field.name)),
+          depth,
+          allowMethods,
         )
-        const prefix =
-          flags.includes('+') || flags.includes('#') ? field.name + ':' : ''
-        return joinMaybe([formatted], '', prefix)
-      })
-      const name = flags.includes('#') ? (info?.name ?? '') : ''
-      return joinMaybe(parts, flags.includes('#') ? ', ' : ' ', name + '{', '}')
+      } finally {
+        formattingStructs.delete(storage)
+      }
     }
     // Basic Map/Set rendering
     if (value instanceof Map) {
