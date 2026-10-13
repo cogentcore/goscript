@@ -1,5 +1,7 @@
 package compiler
 
+import "go/types"
+
 import "go/token"
 
 // LoweredProgram is the compiler-owned IR consumed by TypeScript emission.
@@ -12,6 +14,9 @@ type loweredPackage struct {
 	pkgPath string
 	name    string
 	files   []*loweredFile
+	// initModule is whether the package has a package init module
+	// (see [lowerPackageInit]).
+	initModule bool
 }
 
 type loweredFile struct {
@@ -23,6 +28,17 @@ type loweredFile struct {
 	typeExports []string
 	exportAll   bool
 	sideEffect  bool
+	// varInitCalls are the calls that eagerly initialize the lazily
+	// initialized package variables declared in this file.
+	varInitCalls []packageVarInitCall
+	// initCalls are the calls of the init functions declared in this file.
+	initCalls []string
+}
+
+// packageVarInitCall is a call that initializes a package variable.
+type packageVarInitCall struct {
+	obj  types.Object
+	call string
 }
 
 type loweredImport struct {
@@ -58,8 +74,10 @@ type loweredDecl struct {
 	typeIndexExport string
 	sideEffect      bool
 	packageInitCall string
-	function        *loweredFunction
-	structType      *loweredStruct
+	// packageInitVar is the package variable initialized by packageInitCall.
+	packageInitVar types.Object
+	function       *loweredFunction
+	structType     *loweredStruct
 }
 
 type loweredStruct struct {

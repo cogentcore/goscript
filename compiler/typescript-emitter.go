@@ -1502,6 +1502,11 @@ func renderIndex(pkg *loweredPackage) string {
 		}
 	}
 	slices.Sort(lines)
+	if pkg.initModule {
+		lines = append(lines,
+			"import { __goscript_package_init } from \"./"+packageInitModule+"\"",
+			"await __goscript_package_init()")
+	}
 	if len(lines) == 0 {
 		return ""
 	}

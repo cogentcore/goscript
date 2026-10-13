@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "paths": {
+      "*": [
+        "./*"
+      ],
+      "@goscript/*": [
+        "../../../tests/tests/init_after_package_decls/run/output/@goscript/*",
+        "../../../gs/*",
+        "../../../tests/deps/*"
+      ],
+      "@goscript/github.com/s4wave/goscript/tests/tests/init_after_package_decls/*": [
+        "./*"
+      ]
+    }
+  },
+  "extends": "../../../tests/tsconfig.base.json",
+  "include": [
+    "__goscript_package_init.gs.ts",
+    "field.gs.ts",
+    "index.ts",
+    "main.gs.ts",
+    "type.gs.ts",
+    "types.gs.ts"
+  ]
+}

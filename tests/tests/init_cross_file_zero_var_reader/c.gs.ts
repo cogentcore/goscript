@@ -29,4 +29,4 @@ async function __goscriptInit0(): globalThis.Promise<void> {
 	await __goscript_b.readTable()
 }
 
-await __goscriptInit0()
+export { __goscriptInit0 }

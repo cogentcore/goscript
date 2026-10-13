@@ -1,0 +1,7 @@
+2 int string
+default 1 later
+int
+Later
+Default
+init main.go
+init types.go

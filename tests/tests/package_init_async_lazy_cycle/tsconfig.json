@@ -16,6 +16,7 @@
   },
   "extends": "../../../tests/tsconfig.base.json",
   "include": [
+    "__goscript_package_init.gs.ts",
     "a.gs.ts",
     "b.gs.ts",
     "index.ts"

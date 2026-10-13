@@ -42,4 +42,4 @@ function __goscriptInit0(): void {
 	Seen = 0
 }
 
-__goscriptInit0()
+export { __goscriptInit0 }
