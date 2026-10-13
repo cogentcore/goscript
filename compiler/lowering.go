@@ -9560,6 +9560,12 @@ func (o *LoweringOwner) lowerNewExpr(ctx lowerFileContext, expr *ast.CallExpr) (
 	if named := namedStructType(typ); named != nil {
 		return o.lowerNamedStructZeroValueExpr(ctx, named), nil
 	}
+	if typeParam, ok := types.Unalias(typ).(*types.TypeParam); ok && typeParamInScope(ctx, typeParam) {
+		// A pointer to a struct type argument is the struct instance itself,
+		// so the runtime type argument decides whether new allocates a VarRef.
+		return o.runtimeOwner.QualifiedHelper(RuntimeHelperGenericNew) +
+			"(__typeArgs, " + strconv.Quote(typeParam.Obj().Name()) + ", " + zeroValueExpr(typ) + ")", nil
+	}
 	return o.runtimeOwner.QualifiedHelper(RuntimeHelperVarRef) +
 		"<" + o.tsTypeFor(ctx, typ) + ">(" + o.lowerDeclarationZeroValueExpr(ctx, typ) + ")", nil
 }
@@ -11359,7 +11365,26 @@ func (o *LoweringOwner) lowerPointerStorageExpr(ctx lowerFileContext, expr ast.E
 		return ref, diagnostics
 	}
 	base, diagnostics := o.lowerExpr(ctx, expr)
+	if typeParamPointerInScope(ctx, ctx.semPkg.source.TypesInfo.TypeOf(expr)) {
+		// A pointer to a type parameter may be a struct instance rather than
+		// a VarRef, so stores go through the runtime's pointer storage.
+		return o.runtimeOwner.QualifiedHelper(RuntimeHelperGenericPointerRef) + "(" + base + ").value", diagnostics
+	}
 	return parenthesizeAwaitedExpr(base) + "!.value", diagnostics
+}
+
+// typeParamPointerInScope reports whether typ is a pointer to a type
+// parameter in scope.
+func typeParamPointerInScope(ctx lowerFileContext, typ types.Type) bool {
+	if typ == nil {
+		return false
+	}
+	ptr, ok := types.Unalias(typ).(*types.Pointer)
+	if !ok {
+		return false
+	}
+	typeParam, ok := types.Unalias(ptr.Elem()).(*types.TypeParam)
+	return ok && typeParamInScope(ctx, typeParam)
 }
 
 func (o *LoweringOwner) lowerUnsafeArrayPointerRefExpr(
