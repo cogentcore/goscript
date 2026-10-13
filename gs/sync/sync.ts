@@ -272,11 +272,12 @@ export class Once {
 
 // Cond implements a condition variable, a rendezvous point for goroutines waiting for or announcing the occurrence of an event.
 export class Cond {
-  public L: Locker
+  public L: Locker | null
   private _waiters: Array<() => void> = []
 
-  constructor(l: Locker) {
-    this.L = l
+  // The zero Cond has a nil L, which must be set before calling Wait.
+  constructor(init?: Partial<{ L: Locker | null }>) {
+    this.L = init?.L ?? null
   }
 
   // Broadcast wakes all goroutines waiting on c
@@ -297,11 +298,17 @@ export class Cond {
 
   // Wait atomically unlocks c.L and suspends execution of the calling goroutine
   public async Wait(): Promise<void> {
-    this.L.Unlock()
+    const l = this.L
+    if (l === null) {
+      throw new Error(
+        'runtime error: invalid memory address or nil pointer dereference',
+      )
+    }
+    l.Unlock()
 
     return new Promise<void>((resolve) => {
       this._waiters.push(async () => {
-        await this.L.Lock()
+        await l.Lock()
         resolve()
       })
     })
@@ -309,13 +316,13 @@ export class Cond {
 
   // clone returns a copy of this Cond instance
   public clone(): Cond {
-    return new Cond(this.L)
+    return new Cond({ L: this.L })
   }
 }
 
 // NewCond returns a new Cond with Locker l.
-export function NewCond(l: Locker): Cond {
-  return new Cond(l)
+export function NewCond(l: Locker | null): Cond {
+  return new Cond({ L: l })
 }
 
 function isGoStringKey(value: unknown): value is string | GoBinaryString {

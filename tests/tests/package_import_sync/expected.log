@@ -25,4 +25,7 @@ key1 deleted successfully
 Pool creating new object
 Got from pool: new object
 Got from pool: reused object
+zero L is nil: true
+sum: 6
+NewCond L is nil: false
 test finished
