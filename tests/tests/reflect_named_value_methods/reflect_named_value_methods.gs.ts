@@ -55,7 +55,7 @@ export function Fruits_String(f: Fruits): string {
 
 export function Fruits_SetString(f: $.VarRef<Fruits> | null, s: string): $.GoError {
 	if (!$.stringEqual(s, "Strawberry")) {
-		return errors.New("bad fruit " + s)
+		return errors.New($.concatString("bad fruit ", s))
 	}
 	f!.value = 2
 	return null

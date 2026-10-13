@@ -5,12 +5,36 @@ import * as $ from "@goscript/builtin/index.js"
 
 export type FormatError = string
 
+$.registerNamedValueType(
+	"main.FormatError",
+	{Error: (receiver: any, ...args: any[]) => (FormatError_Error as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("Error", [], [/* @__PURE__ */ $.basicType("string")])]
+);
+
+$.registerNamedValueType(
+	"*main.FormatError",
+	{Error: (receiver: any, ...args: any[]) => (FormatError_Error as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("Error", [], [/* @__PURE__ */ $.basicType("string")])]
+);
+
 export type Code = number
+
+$.registerNamedValueType(
+	"main.Code",
+	{Error: (receiver: any, ...args: any[]) => (Code_Error as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("Error", [], [/* @__PURE__ */ $.basicType("string")])]
+);
+
+$.registerNamedValueType(
+	"*main.Code",
+	{Error: (receiver: any, ...args: any[]) => (Code_Error as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("Error", [], [/* @__PURE__ */ $.basicType("string")])]
+);
 
 export const errConst: FormatError = "const"
 
 export function FormatError_Error(e: FormatError): string {
-	return "format: " + e
+	return $.concatString("format: ", e)
 }
 
 export function Code_Error(c: Code): string {

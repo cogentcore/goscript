@@ -28,7 +28,7 @@ export async function read(name: string): globalThis.Promise<string> {
 	let b: $.Slice<number> = __goscriptTuple1[0]
 	let err = __goscriptTuple1[1]
 	if (err != null) {
-		return "read error: " + await $.pointerValue<Exclude<$.GoError, null>>(err).Error()
+		return $.concatString("read error: ", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 	}
 	return $.bytesToString(b)
 }

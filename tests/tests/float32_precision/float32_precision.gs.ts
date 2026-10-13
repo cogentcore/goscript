@@ -61,7 +61,7 @@ export async function main(): globalThis.Promise<void> {
 	await fmt.Println(f == h, 0.10000000149011612 == $.float32(g / 31.4), $.basicInterfaceValue(0.10000000149011612, "float32"))
 	let s = $.varRef($.markAsStructValue(new T({A: "aaa", B: 3.140000104904175})))
 	let t = $.markAsStructValue(new T({A: "aaa", B: h}))
-	await fmt.Println($.comparableEqual(s.value, t), $.interfaceValue($.markAsStructValue($.cloneStructValue(s.value)), "main.T", "main.T"), $.interfaceValue($.markAsStructValue($.cloneStructValue(t)), "main.T", "main.T"))
+	await fmt.Println($.structEqual(s.value, t), $.interfaceValue($.markAsStructValue($.cloneStructValue(s.value)), "main.T", "main.T"), $.interfaceValue($.markAsStructValue($.cloneStructValue(t)), "main.T", "main.T"))
 
 	// float32 values format with the digits needed at 32 bits
 	await fmt.Println($.basicInterfaceValue(f, "float32"), $.basicInterfaceValue(h, "float32"), $.basicInterfaceValue(f, "float64"))
@@ -88,14 +88,14 @@ export async function main(): globalThis.Promise<void> {
 	let b: $.Slice<number> = __goscriptTuple0[0]
 	let j: $.VarRef<T> = $.varRef($.markAsStructValue(new T()))
 	let err = json.Unmarshal(b, $.interfaceValue(j, "*main.T", /* @__PURE__ */ $.pointerType("main.T")))
-	await fmt.Println($.bytesToString(b), $.comparableEqual(j.value, s.value), $.interfaceValue($.markAsStructValue($.cloneStructValue(j.value)), "main.T", "main.T"), (err as any))
+	await fmt.Println($.bytesToString(b), $.structEqual(j.value, s.value), $.interfaceValue($.markAsStructValue($.cloneStructValue(j.value)), "main.T", "main.T"), (err as any))
 	let buf: $.VarRef<bytes.Buffer> = $.varRef($.markAsStructValue(new bytes.Buffer()))
 	let enc: json.Encoder | $.VarRef<json.Encoder> | null = json.NewEncoder($.pointerValueOrNil($.interfaceValue<io.Writer | null>(buf, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer")))!)
 	json.Encoder.prototype.SetIndent.call($.pointerValue<json.Encoder>(enc), "", "\t")
 	err = await json.Encoder.prototype.Encode.call($.pointerValue<json.Encoder>(enc), $.interfaceValue(s, "*main.T", /* @__PURE__ */ $.pointerType("main.T")))
 	let k: $.VarRef<T> = $.varRef($.markAsStructValue(new T()))
 	let err2 = await json.Decoder.prototype.Decode.call($.pointerValue<json.Decoder>(json.NewDecoder($.pointerValueOrNil($.interfaceValue<io.Reader | null>(bytes.NewReader(buf.value.Bytes()), "*bytes.Reader", /* @__PURE__ */ $.pointerType("bytes.Reader")))!)), $.interfaceValue(k, "*main.T", /* @__PURE__ */ $.pointerType("main.T")))
-	await fmt.Println(buf.value.Len() > 0, $.comparableEqual(k.value, s.value), $.interfaceValue($.markAsStructValue($.cloneStructValue(k.value)), "main.T", "main.T"), (err as any), (err2 as any))
+	await fmt.Println(buf.value.Len() > 0, $.structEqual(k.value, s.value), $.interfaceValue($.markAsStructValue($.cloneStructValue(k.value)), "main.T", "main.T"), (err as any), (err2 as any))
 }
 
 if ($.isMainScript(import.meta)) {

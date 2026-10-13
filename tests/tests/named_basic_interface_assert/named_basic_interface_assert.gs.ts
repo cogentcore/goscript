@@ -23,6 +23,18 @@ export type Name = string
 
 export type Stringy = string
 
+$.registerNamedValueType(
+	"main.Stringy",
+	{String: (receiver: any, ...args: any[]) => (Stringy_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])]
+);
+
+$.registerNamedValueType(
+	"*main.Stringy",
+	{String: (receiver: any, ...args: any[]) => (Stringy_String as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])]
+);
+
 export type stringer = {
 	String(): string
 }
@@ -34,7 +46,7 @@ $.registerInterfaceType(
 );
 
 export function Stringy_String(s: Stringy): string {
-	return "S:" + s
+	return $.concatString("S:", s)
 }
 
 export function toAny(__typeArgs: $.GenericTypeArgs | undefined, v: any): any {
