@@ -163,6 +163,11 @@ export class Time {
     return this._location
   }
 
+  // Local returns t with the location set to local time.
+  public Local(): Time {
+    return Time.create(this._date, this._nsec, undefined, Local)
+  }
+
   // UTC returns t with the location set to UTC.
   public UTC(): Time {
     return Time.create(this._date, this._nsec, undefined, UTC)
@@ -1219,7 +1224,7 @@ export function Now(): Time {
     monotonic = Math.floor(performance.now() * 1000000)
   }
 
-  return Time.create(date, 0, monotonic)
+  return Time.create(date, 0, monotonic, Local)
 }
 
 // Date returns the Time corresponding to
@@ -1348,13 +1353,13 @@ export const TimeOnly = '15:04:05'
 export function Unix(sec: bigint, nsec: bigint = 0n): Time {
   const ms = Number(sec * 1000n + nsec / 1000000n)
   const remainingNsec = Number(nsec % 1000000n)
-  return Time.create(new globalThis.Date(ms), remainingNsec, undefined, UTC)
+  return Time.create(new globalThis.Date(ms), remainingNsec, undefined, Local)
 }
 
 // UnixMilli returns the local Time corresponding to the given Unix time,
 // msec milliseconds since January 1, 1970 UTC.
 export function UnixMilli(msec: bigint): Time {
-  return Time.create(new globalThis.Date(Number(msec)), 0, undefined, UTC)
+  return Time.create(new globalThis.Date(Number(msec)), 0, undefined, Local)
 }
 
 // UnixMicro returns the local Time corresponding to the given Unix time,
@@ -1362,7 +1367,7 @@ export function UnixMilli(msec: bigint): Time {
 export function UnixMicro(usec: bigint): Time {
   const ms = Number(usec / 1000n)
   const nsec = Number(usec % 1000n) * 1000
-  return Time.create(new globalThis.Date(ms), nsec, undefined, UTC)
+  return Time.create(new globalThis.Date(ms), nsec, undefined, Local)
 }
 
 // UnixNano returns the local Time corresponding to the given Unix time,

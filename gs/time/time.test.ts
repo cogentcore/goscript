@@ -288,7 +288,7 @@ describe('time.Time calendar and binary helpers', () => {
     expect(restored.Equal(value)).toBe(true)
     expect(restored.Add(Second).Sub(value)).toBe(Second)
     expect(value.Add(-1n).UnixNano()).toBe(nanos - 1n)
-    expect(UnixMilli(1789067045987n).Format(RFC3339Nano)).toBe(
+    expect(UnixMilli(1789067045987n).UTC().Format(RFC3339Nano)).toBe(
       '2026-09-10T19:04:05.987Z',
     )
   })
