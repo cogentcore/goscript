@@ -109,36 +109,121 @@ export function _decrementGoroutineCount(): void {
   }
 }
 
-// Caller returns details about the calling goroutine's stack.
-// This is a simplified version for goscript.
-export function Caller(_skip: number): [number, string, number, boolean] {
-  // In JavaScript, we can use Error stack trace, but it's limited
-  // Return dummy values for goscript compatibility
-  const pc = 0 // program counter (not meaningful in JS)
-  const file = 'unknown'
-  const line = 0
-  const ok = false // indicate we don't have real stack info
-  return [pc, file, line, ok]
+// stackFrame is a call frame parsed from a JavaScript stack trace.
+interface stackFrame {
+  name: string
+  file: string
+  line: number
+}
+
+// frameTable holds the frames that program counters refer to: the program
+// counter of frameTable[i] is i+1, so that 0 is never a valid one.
+const frameTable: stackFrame[] = []
+
+// frameIndex maps a frame's key to its index in frameTable, so that each
+// distinct call site gets one program counter.
+const frameIndex = new globalThis.Map<string, number>()
+
+// framePC returns the program counter for the frame, registering it in
+// frameTable if needed.
+function framePC(frame: stackFrame): number {
+  const key = frame.name + '\0' + frame.file + '\0' + frame.line
+  let index = frameIndex.get(key)
+  if (index === undefined) {
+    index = frameTable.length
+    frameTable.push(frame)
+    frameIndex.set(key, index)
+  }
+  return index + 1
+}
+
+// v8FrameRe matches a V8 or Bun stack line, such as "at name (file:1:2)",
+// "at async name (file:1:2)" or "at file:1:2".
+const v8FrameRe =
+  /^\s*at (?:async )?(?:(.*?) \((.*):(\d+):\d+\)|(.*):(\d+):\d+)$/
+
+// geckoFrameRe matches a Firefox or Safari stack line, such as
+// "name@file:1:2".
+const geckoFrameRe = /^(.*?)@(.*):(\d+):\d+$/
+
+// currentFrames returns the frames of the current JavaScript stack, with
+// the caller of currentFrames first.
+function currentFrames(limit: number): stackFrame[] {
+  const errorType = globalThis.Error as { stackTraceLimit?: number }
+  const savedLimit = errorType.stackTraceLimit
+  if (typeof savedLimit === 'number' && savedLimit < limit + 1) {
+    errorType.stackTraceLimit = limit + 1
+  }
+  const stack = new globalThis.Error().stack ?? ''
+  if (typeof savedLimit === 'number') {
+    errorType.stackTraceLimit = savedLimit
+  }
+  const frames: stackFrame[] = []
+  for (const text of stack.split('\n')) {
+    const v8 = v8FrameRe.exec(text)
+    if (v8 !== null) {
+      frames.push(
+        v8[2] !== undefined ?
+          { name: v8[1], file: v8[2], line: Number(v8[3]) }
+        : { name: '', file: v8[4], line: Number(v8[5]) },
+      )
+      continue
+    }
+    const gecko = geckoFrameRe.exec(text)
+    if (gecko !== null) {
+      frames.push({ name: gecko[1], file: gecko[2], line: Number(gecko[3]) })
+    }
+  }
+  // Drop the frame of currentFrames itself.
+  return frames.slice(1)
+}
+
+// Caller returns the program counter, file and line of a function on the
+// calling goroutine's stack, using the JavaScript stack trace: skip 0 is
+// the caller of Caller. File and line refer to the generated JavaScript.
+export function Caller(skip: number): [number, string, number, boolean] {
+  const frames = currentFrames(skip + 2)
+  const frame = frames[skip + 1]
+  if (frame === undefined) {
+    return [0, '', 0, false]
+  }
+  return [framePC(frame), frame.file, frame.line, true]
 }
 
 // Func represents metadata for a function in a stack frame.
 export class Func {
+  constructor(
+    private readonly pc: number = 0,
+    private readonly name: string = frameTable[pc - 1]?.name ?? '',
+  ) {}
+
   public Entry(): number {
-    return 0
+    return this.pc
   }
 
   public FileLine(_pc: number): [string, number] {
-    return ['', 0]
+    const frame = frameTable[this.pc - 1]
+    return frame === undefined ? ['', 0] : [frame.file, frame.line]
   }
 
   public Name(): string {
-    return ''
+    return this.name
   }
 }
 
-// FuncForPC returns function metadata for a program counter.
-export function FuncForPC(_pc: number): Func | null {
-  return null
+// FuncForPC returns function metadata for a program counter returned by
+// Caller or Callers, or for the Pointer of a function value from reflect,
+// whose name is that of the JavaScript function. It returns nil for any
+// other value.
+export function FuncForPC(pc: number): Func | null {
+  if (frameTable[pc - 1] !== undefined) {
+    return new Func(pc)
+  }
+  const fn = $.functionAtAddress(pc) as { name?: unknown } | undefined
+  if (fn === undefined) {
+    return null
+  }
+  return new Func(pc, typeof fn.name === 'string' ? fn.name : '')
 }
 
 // StartTrace enables execution tracing.
@@ -184,14 +269,39 @@ export class Frames {
   }
 }
 
-// Callers fills pc with return program counters from the current stack.
-export function Callers(_skip: number, _pc: $.Slice<number>): number {
-  return 0
+// Callers fills pc with the program counters of the calling goroutine's
+// stack, using the JavaScript stack trace: skip 0 is the frame of Callers
+// itself, and 1 is its caller. It returns the number of entries written.
+export function Callers(skip: number, pc: $.Slice<number>): number {
+  const max = $.len(pc)
+  const frames = currentFrames(skip + max).slice(skip)
+  const n = Math.min(max, frames.length)
+  for (let i = 0; i < n; i++) {
+    $.indexRef(pc, i).value = framePC(frames[i])
+  }
+  return n
 }
 
-// CallersFrames returns an iterator over call frames for pcs.
-export function CallersFrames(_callers: $.Slice<number>): Frames {
-  return new Frames()
+// CallersFrames returns an iterator over the call frames of program
+// counters returned by Callers.
+export function CallersFrames(callers: $.Slice<number>): Frames {
+  const frames: Frame[] = []
+  for (let i = 0; i < $.len(callers); i++) {
+    const pc = $.index(callers, i) as number
+    const stack = frameTable[pc - 1]
+    if (stack === undefined) {
+      continue
+    }
+    const frame = new Frame()
+    frame.PC = pc
+    frame.Func = new Func(pc)
+    frame.Function = stack.name
+    frame.File = stack.file
+    frame.Line = stack.line
+    frame.Entry = pc
+    frames.push(frame)
+  }
+  return new Frames(frames)
 }
 
 // Stack writes the current JavaScript stack into buf and returns bytes written.

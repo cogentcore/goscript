@@ -1249,7 +1249,12 @@ export class Value {
         return 0
       }
     }
-    if (typeof value === 'object' || typeof value === 'function') {
+    if (typeof value === 'function') {
+      const address = pointerAddress(value)
+      $.registerFunctionAddress(address, value)
+      return address
+    }
+    if (typeof value === 'object') {
       return pointerAddress(value)
     }
     return 0
