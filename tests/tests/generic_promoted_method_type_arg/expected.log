@@ -1,0 +1,4 @@
+check: true
+interface: true false
+generic outer: true
+generic outer string: true
