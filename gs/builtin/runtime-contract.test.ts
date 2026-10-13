@@ -21,7 +21,12 @@ import {
   chanRecvWithOk,
   fieldRef,
   functionValue,
+  genericNew,
+  genericPointerRef,
   genericZero,
+  isMarkedAsStructValue,
+  isVarRef,
+  markAsStructValue,
   goSlice,
   int,
   arrayPointerFromIndexRef,
@@ -311,14 +316,11 @@ describe('builtin runtime contract helpers', () => {
     const clonedBytes = cloneArrayValue(fixedBytes)
     expect(clonedBytes).toEqual(fixedBytes)
     expect(clonedBytes).not.toBe(fixedBytes)
-    const fixedWords = arrayValue(
-      [arrayValue([1, 2]), arrayValue([3, 4])],
-      {
-        kind: TypeKind.Array,
-        length: 2,
-        elemType: { kind: TypeKind.Array, length: 2, elemType: 'int' },
-      },
-    )
+    const fixedWords = arrayValue([arrayValue([1, 2]), arrayValue([3, 4])], {
+      kind: TypeKind.Array,
+      length: 2,
+      elemType: { kind: TypeKind.Array, length: 2, elemType: 'int' },
+    })
     const clonedWords = cloneArrayValue(fixedWords)
     expect(clonedWords).toEqual(fixedWords)
     expect(clonedWords).not.toBe(fixedWords)
@@ -1054,6 +1056,40 @@ describe('builtin runtime contract helpers', () => {
     }
     expect(genericZero(genericArgs, 'T', null)).toBe(0)
     expect(callGenericMethod(genericArgs, 'T', 'String', 12)).toBe('12')
+  })
+
+  it('allocates and stores through pointers to type parameters', () => {
+    class Point {
+      public _fields: { X: { value: number } }
+      constructor(init?: { X?: number }) {
+        this._fields = { X: { value: init?.X ?? 0 } }
+      }
+      clone(): Point {
+        return markAsStructValue(new Point({ X: this._fields.X.value }))
+      }
+      static __typeInfo = {
+        kind: TypeKind.Struct,
+        name: 'main.Point',
+        fields: [{ name: 'X', type: { kind: TypeKind.Basic, name: 'int' } }],
+        methods: [],
+      }
+    }
+
+    const structArgs = {
+      T: { zero: () => markAsStructValue(new Point()) },
+    }
+    const p = genericNew(structArgs, 'T', null) as Point
+    expect(p).toBeInstanceOf(Point)
+    expect(isVarRef(p)).toBe(false)
+    expect(isMarkedAsStructValue(p)).toBe(false)
+    genericPointerRef(p).value = markAsStructValue(new Point({ X: 3 }))
+    expect(p._fields.X.value).toBe(3)
+
+    const intArgs = { T: { zero: () => 0 } }
+    const ip = genericNew(intArgs, 'T', null)
+    expect(isVarRef(ip)).toBe(true)
+    genericPointerRef(ip).value = 7
+    expect((ip as { value: number }).value).toBe(7)
   })
 
   it('compares anonymous descriptors inside function assertions', () => {

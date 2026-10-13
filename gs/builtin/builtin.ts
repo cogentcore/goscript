@@ -159,6 +159,34 @@ function assignFieldValue(
 }
 
 /**
+ * genericPointerRef returns the storage of a pointer to a type parameter, for
+ * assignments through it such as *p = v. A pointer to a struct is the struct
+ * instance itself, so storing a value copies its fields into the instance;
+ * any other pointer is a VarRef.
+ */
+export function genericPointerRef<T>(
+  pointer: T | VarRef<T> | null | undefined,
+): VarRef<T> {
+  if (pointer === null || pointer === undefined) {
+    runtimePanic(
+      'runtime error: invalid memory address or nil pointer dereference',
+    )
+  }
+  if (isVarRef(pointer)) {
+    return pointer as VarRef<T>
+  }
+  const target = pointer as T
+  return {
+    get value(): T {
+      return target
+    },
+    set value(source: T) {
+      assignStruct(target, source)
+    },
+  }
+}
+
+/**
  * pointerValue unwraps a Go pointer value for generated field, method, and
  * dereference access. Struct pointers may be represented directly as class
  * instances or indirectly as VarRef values when the pointer came from taking a

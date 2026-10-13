@@ -9518,10 +9518,15 @@ func (o *LoweringOwner) lowerMakeExpr(ctx lowerFileContext, expr *ast.CallExpr) 
 	}
 }
 
+// lowerNewExpr lowers new(T) to a pointer to the zero value of T, and new(x)
+// to a pointer to the value of x.
 func (o *LoweringOwner) lowerNewExpr(ctx lowerFileContext, expr *ast.CallExpr) (string, []Diagnostic) {
+	// new takes a single type or value.
 	if len(expr.Args) != 1 {
 		return "undefined", []Diagnostic{loweringUnsupportedAt(ctx, expr, "call", ctx.semPkg.pkgPath, "new requires one argument")}
 	}
+
+	// A value argument is allocated as a VarRef holding that value.
 	argument := expr.Args[0]
 	typ := typeFromExpr(ctx, argument)
 	if typ == nil {
@@ -9537,8 +9542,16 @@ func (o *LoweringOwner) lowerNewExpr(ctx lowerFileContext, expr *ast.CallExpr) (
 		return o.runtimeOwner.QualifiedHelper(RuntimeHelperVarRef) +
 			"<" + o.tsTypeFor(ctx, typ) + ">(" + value + ")", diagnostics
 	}
+
+	// A pointer to a struct is the struct instance itself, so new of a
+	// struct allocates its zero instance, and new of a type parameter lets
+	// the runtime type argument decide whether to allocate a VarRef.
 	if named := namedStructType(typ); named != nil {
 		return o.lowerNamedStructZeroValueExpr(ctx, named), nil
+	}
+	if typeParam, ok := types.Unalias(typ).(*types.TypeParam); ok && typeParamInScope(ctx, typeParam) {
+		return o.runtimeOwner.QualifiedHelper(RuntimeHelperGenericNew) +
+			"(__typeArgs, " + strconv.Quote(typeParam.Obj().Name()) + ", " + zeroValueExpr(typ) + ")", nil
 	}
 	return o.runtimeOwner.QualifiedHelper(RuntimeHelperVarRef) +
 		"<" + o.tsTypeFor(ctx, typ) + ">(" + o.lowerDeclarationZeroValueExpr(ctx, typ) + ")", nil
@@ -11351,7 +11364,9 @@ func sameLoweredSourceExpr(ctx lowerFileContext, left ast.Expr, right ast.Expr) 
 	return false
 }
 
+// lowerPointerStorageExpr lowers the storage that *expr assigns to.
 func (o *LoweringOwner) lowerPointerStorageExpr(ctx lowerFileContext, expr ast.Expr) (string, []Diagnostic) {
+	// Unsafe pointers resolve to the storage they address.
 	if ref, diagnostics, ok := o.lowerUnsafeArrayPointerRefExpr(ctx, expr); ok {
 		return ref + "!.value", diagnostics
 	}
@@ -11361,8 +11376,25 @@ func (o *LoweringOwner) lowerPointerStorageExpr(ctx lowerFileContext, expr ast.E
 	if ref, diagnostics, ok := o.lowerUnsafePointerStorageExpr(ctx, expr); ok {
 		return ref, diagnostics
 	}
+
+	// A pointer to a type parameter may be a struct instance rather than a
+	// VarRef, so stores go through the runtime's pointer storage.
 	base, diagnostics := o.lowerExpr(ctx, expr)
+	if typeParamPointerInScope(ctx, ctx.semPkg.source.TypesInfo.TypeOf(expr)) {
+		return o.runtimeOwner.QualifiedHelper(RuntimeHelperGenericPointerRef) + "(" + base + ").value", diagnostics
+	}
 	return parenthesizeAwaitedExpr(base) + "!.value", diagnostics
+}
+
+// typeParamPointerInScope reports whether typ is a pointer to a type
+// parameter in scope.
+func typeParamPointerInScope(ctx lowerFileContext, typ types.Type) bool {
+	ptr, ok := types.Unalias(typ).(*types.Pointer)
+	if !ok {
+		return false
+	}
+	typeParam, ok := types.Unalias(ptr.Elem()).(*types.TypeParam)
+	return ok && typeParamInScope(ctx, typeParam)
 }
 
 func (o *LoweringOwner) lowerUnsafeArrayPointerRefExpr(

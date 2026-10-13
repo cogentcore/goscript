@@ -78,6 +78,7 @@ const (
 	RuntimeHelperInt64Xor       RuntimeHelper = "builtin.int64Xor"
 
 	RuntimeHelperAssignStruct          RuntimeHelper = "value.assignStruct"
+	RuntimeHelperGenericPointerRef     RuntimeHelper = "value.genericPointerRef"
 	RuntimeHelperMarkAsStructValue     RuntimeHelper = "value.markAsStructValue"
 	RuntimeHelperAnonymousStructValue  RuntimeHelper = "value.anonymousStructValue"
 	RuntimeHelperCloneStructValue      RuntimeHelper = "value.cloneStructValue"
@@ -175,6 +176,7 @@ const (
 	RuntimeHelperSyncFunction                   RuntimeHelper = "type.syncFunction"
 	RuntimeHelperNamedFunction                  RuntimeHelper = "type.namedFunction"
 	RuntimeHelperGenericZero                    RuntimeHelper = "type.genericZero"
+	RuntimeHelperGenericNew                     RuntimeHelper = "type.genericNew"
 	RuntimeHelperGenericTypeArgsMarker          RuntimeHelper = "type.genericTypeArgsMarker"
 	RuntimeHelperGenericTypeArgsBrand           RuntimeHelper = "type.genericTypeArgsBrand"
 	RuntimeHelperStripGenericTypeArgs           RuntimeHelper = "type.stripGenericTypeArgs"
@@ -353,6 +355,7 @@ func runtimeHelperContracts() []RuntimeHelperContract {
 		runtimeHelper(RuntimeHelperInt64Or, "int64Or", RuntimeHelperCategoryBuiltin),
 		runtimeHelper(RuntimeHelperInt64Xor, "int64Xor", RuntimeHelperCategoryBuiltin),
 		runtimeHelper(RuntimeHelperAssignStruct, "assignStruct", RuntimeHelperCategoryValue),
+		runtimeHelper(RuntimeHelperGenericPointerRef, "genericPointerRef", RuntimeHelperCategoryValue),
 		runtimeHelper(RuntimeHelperMarkAsStructValue, "markAsStructValue", RuntimeHelperCategoryValue),
 		runtimeHelper(RuntimeHelperAnonymousStructValue, "anonymousStructValue", RuntimeHelperCategoryValue),
 		runtimeHelper(RuntimeHelperCloneStructValue, "cloneStructValue", RuntimeHelperCategoryValue),
@@ -445,6 +448,7 @@ func runtimeHelperContracts() []RuntimeHelperContract {
 		runtimeHelper(RuntimeHelperSyncFunction, "syncFunction", RuntimeHelperCategoryType),
 		runtimeHelper(RuntimeHelperNamedFunction, "namedFunction", RuntimeHelperCategoryType),
 		runtimeHelper(RuntimeHelperGenericZero, "genericZero", RuntimeHelperCategoryType),
+		runtimeHelper(RuntimeHelperGenericNew, "genericNew", RuntimeHelperCategoryType),
 		runtimeHelper(RuntimeHelperGenericTypeArgsMarker, "genericTypeArgsMarker", RuntimeHelperCategoryType),
 		runtimeHelper(RuntimeHelperGenericTypeArgsBrand, "genericTypeArgsBrand", RuntimeHelperCategoryType),
 		runtimeHelper(RuntimeHelperStripGenericTypeArgs, "stripGenericTypeArgs", RuntimeHelperCategoryType),
