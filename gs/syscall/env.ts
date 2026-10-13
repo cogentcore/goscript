@@ -6,57 +6,43 @@ interface ProcessLike {
   env?: ProcessEnv
 }
 
-function hostEnv(): ProcessEnv | undefined {
-  return (globalThis as { process?: ProcessLike }).process?.env
+// memoryEnv holds the environment when the host has none, as in a browser,
+// as Go keeps the environment in memory on js/wasm.
+const memoryEnv: ProcessEnv = {}
+
+function hostEnv(): ProcessEnv {
+  return (globalThis as { process?: ProcessLike }).process?.env ?? memoryEnv
 }
 
 // Getenv Environment variable functions using Node.js/browser APIs.
 export function Getenv(key: string): [string, boolean] {
-  const env = hostEnv()
-  if (env !== undefined) {
-    const value = env[key]
-    return value !== undefined ? [value, true] : ['', false]
-  }
-  return ['', false]
+  const value = hostEnv()[key]
+  return value !== undefined ? [value, true] : ['', false]
 }
 
 export function Setenv(key: string, value: string): $.GoError {
-  const env = hostEnv()
-  if (env !== undefined) {
-    env[key] = value
-    return null
-  }
-  return { Error: () => 'setenv not supported' }
+  hostEnv()[key] = value
+  return null
 }
 
 export function Unsetenv(key: string): $.GoError {
-  const env = hostEnv()
-  if (env !== undefined) {
-    delete env[key]
-    return null
-  }
-  return { Error: () => 'unsetenv not supported' }
+  delete hostEnv()[key]
+  return null
 }
 
 export function Clearenv(): void {
   const env = hostEnv()
-  if (env !== undefined) {
-    for (const key in env) {
-      delete env[key]
-    }
+  for (const key in env) {
+    delete env[key]
   }
 }
 
 export function Environ(): $.Slice<string> {
-  const host = hostEnv()
-  if (host !== undefined) {
-    const values: string[] = []
-    for (const [key, value] of Object.entries(host)) {
-      if (value !== undefined) {
-        values.push(`${key}=${value}`)
-      }
+  const values: string[] = []
+  for (const [key, value] of Object.entries(hostEnv())) {
+    if (value !== undefined) {
+      values.push(`${key}=${value}`)
     }
-    return $.arrayToSlice(values)
   }
-  return $.arrayToSlice([])
+  return $.arrayToSlice(values)
 }
