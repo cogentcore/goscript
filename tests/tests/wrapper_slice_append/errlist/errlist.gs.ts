@@ -3,6 +3,8 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
+$.registerTypePackagePath("github.com/s4wave/goscript/tests/tests/wrapper_slice_append/errlist", ["errlist.ErrorList", "errlist.AStruct"])
+
 export type ErrorList = $.Slice<string>
 
 $.registerNamedType("errlist.ErrorList", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("string")));

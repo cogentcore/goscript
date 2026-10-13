@@ -3,6 +3,8 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
+$.registerTypePackagePath("github.com/s4wave/goscript/tests/tests/package_import_dot_qualified/dep", ["dep.Box"])
+
 export class Box {
 	public declare N: number
 

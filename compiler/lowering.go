@@ -394,6 +394,7 @@ func (o *LoweringOwner) lowerFile(req lowerFileRequest) (*loweredFile, []Diagnos
 			source: o.runtimeOwner.BuiltinImport().Source,
 		}},
 	}
+	loweredFile.typePackagePath, loweredFile.typePackageNames = fileTypePackagePath(semPkg, file)
 	importAliases := make(map[string]string)
 	importPaths := make(map[string]string)
 	importNames := make(map[string]string)
@@ -15204,6 +15205,37 @@ func (o *LoweringOwner) tsReceiverTypeFor(ctx lowerFileContext, typ types.Type) 
 		}
 	}
 	return o.tsTypeFor(ctx, typ)
+}
+
+// fileTypePackagePath returns the package path and runtime names of the
+// named types declared in file, including local types, when the package
+// path differs from the package name. Runtime type names carry only the
+// package name, so reflect needs the path registered to report PkgPath.
+// Types in package main report "main", as in Go.
+func fileTypePackagePath(semPkg *semanticPackage, file *ast.File) (string, []string) {
+	pkg := semPkg.source.Types
+	if pkg == nil || pkg.Name() == "main" || pkg.Path() == pkg.Name() {
+		return "", nil
+	}
+	var names []string
+	ast.Inspect(file, func(node ast.Node) bool {
+		spec, ok := node.(*ast.TypeSpec)
+		if !ok {
+			return true
+		}
+		obj, _ := semPkg.source.TypesInfo.Defs[spec.Name].(*types.TypeName)
+		if obj == nil || obj.IsAlias() {
+			return true
+		}
+		if named, ok := obj.Type().(*types.Named); ok {
+			names = append(names, runtimeNamedTypeName(named))
+		}
+		return true
+	})
+	if len(names) == 0 {
+		return "", nil
+	}
+	return pkg.Path(), names
 }
 
 func runtimeNamedTypeName(named *types.Named) string {

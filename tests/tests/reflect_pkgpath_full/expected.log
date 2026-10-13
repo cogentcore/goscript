@@ -1,0 +1,8 @@
+struct: github.com/s4wave/goscript/tests/tests/reflect_pkgpath_full/dep Node dep.Node
+pointer elem: github.com/s4wave/goscript/tests/tests/reflect_pkgpath_full/dep Node dep.Node
+basic: github.com/s4wave/goscript/tests/tests/reflect_pkgpath_full/dep Level dep.Level
+interface: github.com/s4wave/goscript/tests/tests/reflect_pkgpath_full/dep Namer dep.Namer
+local: github.com/s4wave/goscript/tests/tests/reflect_pkgpath_full/dep local dep.local
+main: main mainType main.mainType
+generic: github.com/s4wave/goscript/tests/tests/reflect_pkgpath_full/dep
+unnamed: true

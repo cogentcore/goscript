@@ -9,6 +9,8 @@ import * as tx from "@goscript/github.com/s4wave/goscript/tests/tests/package_im
 import "@goscript/github.com/s4wave/goscript/tests/tests/package_import_embedded_forwarder/dep/inner/index.js"
 import "@goscript/github.com/s4wave/goscript/tests/tests/package_import_embedded_forwarder/dep/tx/index.js"
 
+$.registerTypePackagePath("github.com/s4wave/goscript/tests/tests/package_import_embedded_forwarder/dep", ["dep.Store", "dep.BaseStore"])
+
 export type Tx = tx.Tx
 
 export type Store = {

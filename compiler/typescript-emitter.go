@@ -230,6 +230,18 @@ func (o *TypeScriptEmitOwner) renderLoweredFile(pkg *loweredPackage, file *lower
 	if len(file.imports) != 0 {
 		b.WriteString("\n")
 	}
+	if len(file.typePackageNames) != 0 {
+		quoted := make([]string, len(file.typePackageNames))
+		for idx, name := range file.typePackageNames {
+			quoted[idx] = strconv.Quote(name)
+		}
+		b.WriteString(o.runtimeOwner.QualifiedHelper(RuntimeHelperRegisterTypePackagePath))
+		b.WriteString("(")
+		b.WriteString(strconv.Quote(file.typePackagePath))
+		b.WriteString(", [")
+		b.WriteString(strings.Join(quoted, ", "))
+		b.WriteString("])\n\n")
+	}
 	hasMain := false
 	wroteDecl := false
 	writeSeparator := func() {

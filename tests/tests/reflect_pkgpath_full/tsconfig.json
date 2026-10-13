@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "paths": {
+      "*": [
+        "./*"
+      ],
+      "@goscript/*": [
+        "../../../tests/tests/reflect_pkgpath_full/run/output/@goscript/*",
+        "../../../gs/*",
+        "../../../tests/deps/*"
+      ],
+      "@goscript/github.com/s4wave/goscript/tests/tests/reflect_pkgpath_full/*": [
+        "./*"
+      ]
+    }
+  },
+  "extends": "../../../tests/tsconfig.base.json",
+  "include": [
+    "dep/dep.gs.ts",
+    "dep/index.ts",
+    "index.ts",
+    "reflect_pkgpath_full.gs.ts"
+  ]
+}

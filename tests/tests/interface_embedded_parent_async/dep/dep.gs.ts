@@ -3,6 +3,8 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
+$.registerTypePackagePath("github.com/s4wave/goscript/tests/tests/interface_embedded_parent_async/dep", ["dep.Directive"])
+
 export type Directive = {
 	Validate(): $.GoError | globalThis.Promise<$.GoError>
 }

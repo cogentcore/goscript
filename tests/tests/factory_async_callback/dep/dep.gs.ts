@@ -3,6 +3,8 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
+$.registerTypePackagePath("github.com/s4wave/goscript/tests/tests/factory_async_callback/dep", ["dep.Factory", "dep.Bus", "dep.factory"])
+
 export type Factory = {
 	GetConfigID(): string
 }
