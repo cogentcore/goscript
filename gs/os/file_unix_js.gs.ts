@@ -1,7 +1,7 @@
 import * as $ from "@goscript/builtin/index.js";
 import { ErrUnimplemented } from "./error.gs.js";
 import { createFileInfo, createHostFile, File, getDeno, getEnv, getNodeFS, getPlatform, newHostError } from "./types_js.gs.js";
-import { O_APPEND, O_CREATE, O_EXCL, O_RDONLY, O_RDWR, O_TRUNC, O_WRONLY } from "./file_constants_js.gs.js";
+import { O_APPEND, O_CREATE, O_EXCL, O_RDONLY, O_RDWR, O_SYNC, O_TRUNC, O_WRONLY } from "./file_constants_js.gs.js";
 import { FileInfoToDirEntry } from "@goscript/io/fs/readdir.js"
 
 import * as fs from "@goscript/io/fs/index.js"
@@ -193,6 +193,34 @@ export function rename(oldname: string, newname: string): $.GoError {
 	return ErrUnimplemented
 }
 
+// hostOpenFlags converts Go open flags, which use the Linux values, to the
+// flags of the host, which differ on other platforms such as macOS
+// (where O_TRUNC is 0x400 and 0x200 is O_CREAT).
+export function hostOpenFlags(
+	flag: number,
+	constants: Record<string, number> | undefined,
+): number {
+	if (!constants) {
+		return flag
+	}
+	const pairs: [number, string][] = [
+		[O_WRONLY, "O_WRONLY"],
+		[O_RDWR, "O_RDWR"],
+		[O_APPEND, "O_APPEND"],
+		[O_CREATE, "O_CREAT"],
+		[O_EXCL, "O_EXCL"],
+		[O_SYNC, "O_SYNC"],
+		[O_TRUNC, "O_TRUNC"],
+	]
+	let host = constants.O_RDONLY ?? 0
+	for (const [goFlag, name] of pairs) {
+		if ((flag & goFlag) === goFlag && constants[name] !== undefined) {
+			host |= constants[name]
+		}
+	}
+	return host
+}
+
 export function openFileNolog(name: string, flag: number, perm: number): [File | null, $.GoError] {
 	const denoObj = getDeno()
 	if (denoObj?.openSync) {
@@ -209,7 +237,7 @@ export function openFileNolog(name: string, flag: number, perm: number): [File |
 	const nodeFS = getNodeFS()
 	if (nodeFS?.openSync) {
 		try {
-			const fd = nodeFS.openSync(name, flag, perm)
+			const fd = nodeFS.openSync(name, hostOpenFlags(flag, nodeFS.constants), perm)
 			return [createHostFile(name, fd), null]
 		} catch (err) {
 			return [null, newHostError(err)]
