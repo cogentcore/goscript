@@ -84,7 +84,7 @@ export class pairingOffer {
 
 export async function decodeLocalPairing(__typeArgs: $.GenericTypeArgs | undefined, data: $.Slice<number>): globalThis.Promise<[any, $.GoError]> {
 	let msg: $.VarRef<any> = $.varRef($.genericZero(__typeArgs, "T", null))
-	let err = await $.callGenericMethod(__typeArgs, "M", "UnmarshalVT", $.interfaceValue(msg, "*T", /* @__PURE__ */ $.pointerType({ kind: $.TypeKind.Interface, methods: [] })), data)
+	let err = await $.callGenericMethod(__typeArgs, "M", "UnmarshalVT", $.interfaceValue(msg, "*T", /* @__PURE__ */ $.pointerType(__typeArgs?.["T"]?.type ?? { kind: $.TypeKind.Interface, methods: [] })), data)
 	return [msg.value, err]
 }
 

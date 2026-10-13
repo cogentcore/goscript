@@ -12428,13 +12428,22 @@ func (o *LoweringOwner) lowerInterfaceValueExpr(
 	sourceType types.Type,
 	value string,
 ) string {
+	// The helper names the target type when it is narrower than any.
 	helper := o.runtimeOwner.QualifiedHelper(RuntimeHelperInterfaceValue)
 	if target := o.tsTypeFor(ctx, targetType); target != "any" {
 		helper += "<" + target + ">"
 	}
+
+	// Type parameters in scope, such as E in []E, resolve from the runtime
+	// type arguments, so that reflection sees the instantiated type rather
+	// than an empty interface.
+	typeInfo := o.runtimeTypeInfoExpr(sourceType)
+	if typeContainsTypeParam(sourceType) {
+		typeInfo = o.runtimeTypeAssertInfoExpr(ctx, sourceType)
+	}
 	return helper + "(" + value + ", " +
 		strconv.Quote(goRuntimeTypeString(sourceType)) + ", " +
-		o.runtimeTypeInfoExpr(sourceType) + ")"
+		typeInfo + ")"
 }
 
 func (o *LoweringOwner) lowerNumericInterfaceWrapper(

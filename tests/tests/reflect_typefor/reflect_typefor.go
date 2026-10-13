@@ -72,5 +72,33 @@ func main() {
 	_, ok := s.(fmt.Stringer)
 	println("assert fmt.Stringer:", ok)
 
+	genericComposites()
+
 	println("reflect_typefor test finished")
+}
+
+func describe[E any](s []E) {
+	v := reflect.ValueOf(s)
+	println("type:", v.Type().String(), "elem kind:", v.Type().Elem().Kind().String(), "len:", v.Len())
+	if v.Len() > 0 {
+		println("index kind:", v.Index(0).Kind().String())
+	}
+}
+
+func describeMap[K comparable, V any](m map[K]V) {
+	println("map type:", reflect.TypeOf(m).String())
+}
+
+func describePointer[E any](p *E) {
+	println("pointer type:", reflect.TypeOf(p).String())
+}
+
+// genericComposites checks that reflection sees the type arguments of
+// composite types built from type parameters.
+func genericComposites() {
+	describe([]MyStruct{{Name: "a", Age: 1}})
+	describe([]float32{1, 2, 3})
+	describe([]int{})
+	describeMap(map[string]MyStruct{})
+	describePointer(&MyStruct{})
 }

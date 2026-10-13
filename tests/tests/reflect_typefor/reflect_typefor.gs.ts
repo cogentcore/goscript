@@ -162,7 +162,33 @@ export async function main(): globalThis.Promise<void> {
 	let [, ok] = $.typeAssertTuple<fmt.Stringer | null>(s, "fmt.Stringer")
 	await $.println("assert fmt.Stringer:", ok)
 
+	await genericComposites()
+
 	await $.println("reflect_typefor test finished")
+}
+
+export async function describe<E>(__typeArgs: $.GenericTypeArgs | undefined, s: $.Slice<E>): globalThis.Promise<void> {
+	let v = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(s, "[]E", /* @__PURE__ */ $.sliceType(__typeArgs?.["E"]?.type ?? { kind: $.TypeKind.Interface, methods: [] })))))
+	await $.println("type:", await $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(v)).Type()).String(), "elem kind:", reflect.Kind_String((await $.pointerValue<Exclude<reflect.Type, null>>((await $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(v)).Type()).Elem())).Kind())), "len:", $.markAsStructValue($.cloneStructValue(v)).Len())
+	if ($.markAsStructValue($.cloneStructValue(v)).Len() > 0) {
+		await $.println("index kind:", reflect.Kind_String($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(v)).Index(0))).Kind()))
+	}
+}
+
+export async function describeMap(__typeArgs: $.GenericTypeArgs | undefined, m: globalThis.Map<any, any> | null): globalThis.Promise<void> {
+	await $.println("map type:", await $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.interfaceValue(m, "map[K]V", /* @__PURE__ */ $.mapType(__typeArgs?.["K"]?.type ?? { kind: $.TypeKind.Interface, methods: [] }, __typeArgs?.["V"]?.type ?? { kind: $.TypeKind.Interface, methods: [] })))).String())
+}
+
+export async function describePointer(__typeArgs: $.GenericTypeArgs | undefined, p: any): globalThis.Promise<void> {
+	await $.println("pointer type:", await $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.typeParamPointerInterfaceValue(p, __typeArgs?.["E"], "*E", /* @__PURE__ */ $.pointerType(__typeArgs?.["E"]?.type ?? { kind: $.TypeKind.Interface, methods: [] })))).String())
+}
+
+export async function genericComposites(): globalThis.Promise<void> {
+	await describe({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, E: { type: "main.MyStruct", zero: () => $.markAsStructValue(new MyStruct()) }}, $.arrayToSlice<MyStruct>([$.markAsStructValue(new MyStruct({Name: "a", Age: 1}))]))
+	await describe({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, E: { type: /* @__PURE__ */ $.basicType("float32"), zero: () => 0 }}, $.arrayToSlice<number>([1, 2, 3]))
+	await describe({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, E: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }}, $.arrayToSlice<number>([]))
+	await describeMap({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, K: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }, V: { type: "main.MyStruct", zero: () => $.markAsStructValue(new MyStruct()) }}, $.makeMap<string, MyStruct>([]))
+	await describePointer({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, E: { type: "main.MyStruct", zero: () => $.markAsStructValue(new MyStruct()) }}, new MyStruct())
 }
 
 if ($.isMainScript(import.meta)) {
