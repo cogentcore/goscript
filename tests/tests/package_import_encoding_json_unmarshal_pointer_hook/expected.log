@@ -1,2 +1,4 @@
 missing hooks true true
 calls=1 seen={"ignored":0}
+copy: true 2 a 1 b
+names: true 2 2
