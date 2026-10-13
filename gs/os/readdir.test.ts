@@ -22,35 +22,35 @@ function makeTempRoot(): string {
 }
 
 describe('os file directory reads', () => {
-  it('reads host directory entries through os.File', () => {
+  it('reads host directory entries through os.File', async () => {
     const root = makeTempRoot()
     writeFileSync(join(root, 'a.txt'), 'a')
     writeFileSync(join(root, 'b.txt'), 'b')
 
-    const [dir, openErr] = Open(root)
+    const [dir, openErr] = await Open(root)
     expect(openErr).toBeNull()
     expect(dir).not.toBeNull()
-    const [entries, readErr] = dir!.ReadDir(-1)
+    const [entries, readErr] = await dir!.ReadDir(-1)
     expect(readErr).toBeNull()
     expect(entries?.map((entry) => entry!.Name()).sort()).toEqual([
       'a.txt',
       'b.txt',
     ])
-    expect(dir!.Close()).toBeNull()
+    expect(await dir!.Close()).toBeNull()
   })
 
-  it('returns EOF after positive-count directory reads are exhausted', () => {
+  it('returns EOF after positive-count directory reads are exhausted', async () => {
     const root = makeTempRoot()
     writeFileSync(join(root, 'a.txt'), 'a')
 
-    const [dir] = Open(root)
-    const [first, firstErr] = dir!.Readdirnames(1)
+    const [dir] = await Open(root)
+    const [first, firstErr] = await dir!.Readdirnames(1)
     expect(firstErr).toBeNull()
     expect(first).toHaveLength(1)
 
-    const [second, secondErr] = dir!.Readdirnames(1)
+    const [second, secondErr] = await dir!.Readdirnames(1)
     expect(second).toBeNull()
     expect(secondErr).toBe(io.EOF)
-    expect(dir!.Close()).toBeNull()
+    expect(await dir!.Close()).toBeNull()
   })
 })

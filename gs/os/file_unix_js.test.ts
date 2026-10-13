@@ -26,7 +26,7 @@ afterEach(() => {
 })
 
 describe('os stdio', () => {
-  it('exports standard file descriptors', () => {
+  it('exports standard file descriptors', async () => {
     expect(Stdin).not.toBeNull()
     expect(Stdout).not.toBeNull()
     expect(Stderr).not.toBeNull()
@@ -35,7 +35,7 @@ describe('os stdio', () => {
     expect(Stderr!.Fd()).toBe(2)
   })
 
-  it('uses Deno sync stdio when available', () => {
+  it('uses Deno sync stdio when available', async () => {
     const stdoutWriteSync = vi.fn((buffer: Uint8Array) => buffer.length)
     const stdinReadSync = vi.fn((buffer: Uint8Array) => {
       buffer.set([1, 2, 3], 0)
@@ -54,20 +54,20 @@ describe('os stdio', () => {
     const output = NewFile(1, 'stdout')
     const readBuf = new Uint8Array(4)
 
-    const [readN, readErr] = input!.Read(readBuf)
+    const [readN, readErr] = await input!.Read(readBuf)
     expect(readN).toBe(3)
     expect(readErr).toBeNull()
     expect(Array.from(readBuf.slice(0, 3))).toEqual([1, 2, 3])
 
     const writeBuf = new Uint8Array([4, 5, 6])
-    const [writeN, writeErr] = output!.Write(writeBuf)
+    const [writeN, writeErr] = await output!.Write(writeBuf)
     expect(writeN).toBe(3)
     expect(writeErr).toBeNull()
     expect(stdoutWriteSync).toHaveBeenCalledTimes(1)
     expect(stdoutWriteSync).toHaveBeenCalledWith(writeBuf)
   })
 
-  it('uses process builtin fs sync stdio when Deno is unavailable', () => {
+  it('uses process builtin fs sync stdio when Deno is unavailable', async () => {
     const readSync = vi.fn(
       (
         _fd: number,
@@ -103,19 +103,19 @@ describe('os stdio', () => {
     const output = NewFile(1, 'stdout')
     const readBuf = new Uint8Array(2)
 
-    const [readN, readErr] = input!.Read(readBuf)
+    const [readN, readErr] = await input!.Read(readBuf)
     expect(readN).toBe(2)
     expect(readErr).toBeNull()
     expect(Array.from(readBuf)).toEqual([7, 8])
 
     const writeBuf = new Uint8Array([9, 10, 11, 12])
-    const [writeN, writeErr] = output!.Write(writeBuf)
+    const [writeN, writeErr] = await output!.Write(writeBuf)
     expect(writeN).toBe(4)
     expect(writeErr).toBeNull()
     expect(writeSync).toHaveBeenCalledTimes(1)
   })
 
-  it('writes stderr to console.log in browser-like hosts', () => {
+  it('writes stderr to console.log in browser-like hosts', async () => {
     const consoleLog = vi.spyOn(console, 'log').mockImplementation(() => {})
     const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {})
 
@@ -125,7 +125,9 @@ describe('os stdio', () => {
 
     try {
       const stderr = NewFile(2, 'stderr')!
-      const [writeN, writeErr] = stderr.Write(new TextEncoder().encode('err\n'))
+      const [writeN, writeErr] = await stderr.Write(
+        new TextEncoder().encode('err\n'),
+      )
 
       expect(writeN).toBe(4)
       expect(writeErr).toBeNull()
@@ -137,7 +139,7 @@ describe('os stdio', () => {
     }
   })
 
-  it('falls back to process builtin fs when Deno lacks sync stdio', () => {
+  it('falls back to process builtin fs when Deno lacks sync stdio', async () => {
     const readSync = vi.fn(
       (
         _fd: number,
@@ -176,18 +178,18 @@ describe('os stdio', () => {
     const output = NewFile(1, 'stdout')
     const readBuf = new Uint8Array(2)
 
-    const [readN, readErr] = input!.Read(readBuf)
+    const [readN, readErr] = await input!.Read(readBuf)
     expect(readN).toBe(2)
     expect(readErr).toBeNull()
     expect(Array.from(readBuf)).toEqual([5, 6])
 
-    const [writeN, writeErr] = output!.Write(new Uint8Array([7, 8, 9]))
+    const [writeN, writeErr] = await output!.Write(new Uint8Array([7, 8, 9]))
     expect(writeN).toBe(3)
     expect(writeErr).toBeNull()
     expect(writeSync).toHaveBeenCalledTimes(1)
   })
 
-  it('returns EOF on zero-byte reads and ErrClosed after Close', () => {
+  it('returns EOF on zero-byte reads and ErrClosed after Close', async () => {
     const stdinReadSync = vi.fn(() => 0)
 
     ;(globalThis as any).Deno = {
@@ -197,17 +199,17 @@ describe('os stdio', () => {
     resetHostRuntimeForTests()
 
     const input = NewFile(0, 'stdin')!
-    const [readN, readErr] = input.Read(new Uint8Array(1))
+    const [readN, readErr] = await input.Read(new Uint8Array(1))
     expect(readN).toBe(0)
     expect(readErr).toBe(io.EOF)
 
-    expect(input.Close()).toBeNull()
-    const [closedN, closedErr] = input.Read(new Uint8Array(1))
+    expect(await input.Close()).toBeNull()
+    const [closedN, closedErr] = await input.Read(new Uint8Array(1))
     expect(closedN).toBe(0)
     expect(closedErr).toBe(ErrClosed)
   })
 
-  it('retries short writes until the full buffer is written', () => {
+  it('retries short writes until the full buffer is written', async () => {
     const writeSync = vi
       .fn<(buffer: Uint8Array) => number>()
       .mockImplementationOnce((_buffer: Uint8Array) => 2)
@@ -220,14 +222,16 @@ describe('os stdio', () => {
     resetHostRuntimeForTests()
 
     const output = NewFile(1, 'stdout')!
-    const [writeN, writeErr] = output.Write(new Uint8Array([1, 2, 3, 4, 5]))
+    const [writeN, writeErr] = await output.Write(
+      new Uint8Array([1, 2, 3, 4, 5]),
+    )
     expect(writeN).toBe(5)
     expect(writeErr).toBeNull()
     expect(writeSync).toHaveBeenCalledTimes(2)
     expect(Array.from(writeSync.mock.calls[1][0])).toEqual([3, 4, 5])
   })
 
-  it('prefers direct handle read and write methods when available', () => {
+  it('prefers direct handle read and write methods when available', async () => {
     const handle = {
       readSync: vi.fn((buffer: Uint8Array) => {
         buffer.set([11, 12, 13], 0)
@@ -242,19 +246,19 @@ describe('os stdio', () => {
     const file = createHostFile('host-file', 99, handle)
     const readBuf = new Uint8Array(4)
 
-    const [readN, readErr] = file.Read(readBuf)
+    const [readN, readErr] = await file.Read(readBuf)
     expect(readN).toBe(3)
     expect(readErr).toBeNull()
     expect(Array.from(readBuf.slice(0, 3))).toEqual([11, 12, 13])
 
-    const [writeN, writeErr] = file.Write(new Uint8Array([21, 22, 23]))
+    const [writeN, writeErr] = await file.Write(new Uint8Array([21, 22, 23]))
     expect(writeN).toBe(3)
     expect(writeErr).toBeNull()
     expect(handle.writeSync).toHaveBeenCalledTimes(2)
     expect(Array.from(handle.writeSync.mock.calls[1][0])).toEqual([22, 23])
   })
 
-  it('supports ReadAt and WriteAt on process fs descriptors', () => {
+  it('supports ReadAt and WriteAt on process fs descriptors', async () => {
     const readSync = vi.fn(
       (
         _fd: number,
@@ -297,12 +301,12 @@ describe('os stdio', () => {
     const file = createHostFile('descriptor-file', 7)
     const buf = new Uint8Array(3)
 
-    const [readN, readErr] = file.ReadAt(buf, 5n)
+    const [readN, readErr] = await file.ReadAt(buf, 5n)
     expect(readN).toBe(3)
     expect(readErr).toBeNull()
     expect(Array.from(buf)).toEqual([31, 32, 33])
 
-    const [writeN, writeErr] = file.WriteAt(new Uint8Array([41, 42]), 8n)
+    const [writeN, writeErr] = await file.WriteAt(new Uint8Array([41, 42]), 8n)
     expect(writeN).toBe(2)
     expect(writeErr).toBeNull()
     expect(readSync).toHaveBeenCalledTimes(1)

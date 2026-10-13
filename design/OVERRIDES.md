@@ -326,6 +326,31 @@ Run the fixture by its category and directory name:
 go test -timeout 60s -run '^TestCompliance/core/hash_crc32$' ./compiler
 ```
 
+## Host Filesystem
+
+The `os` override accesses files through the first host filesystem it finds:
+
+1. Deno's synchronous file API, when the `Deno` global has it.
+2. The synchronous `node:fs` module of Node.js or Bun.
+3. A callback filesystem on the `fs` global, as in a browser.
+
+The callback filesystem has the callback API of Node.js (`open`, `close`,
+`read`, `write`, `fstat`, `stat`, `lstat`, `mkdir`, `readdir`, `unlink`,
+`rmdir`, `rename`, and so on, each taking a final `callback(err, ...results)`,
+plus `constants` with the `O_*` flags). This is the API that Go's js/wasm port
+calls through the `fs` object of `wasm_exec.js`, so a filesystem written for
+Go's wasm port, such as one over IndexedDB, works unchanged. A program may
+install it at run time: `os` looks for it on each call (`gs/os/callbackfs.ts`).
+Paths are resolved against a working directory that `os.Chdir` sets, and each
+`os.File` tracks its own position, which it passes to `read` and `write`.
+
+Every call to the callback filesystem completes asynchronously, so the `os`
+functions and `File` methods that access files are async (see
+`gs/os/meta.json`), on every host. Since `io.Reader`, `io.Writer` and the
+`io/fs` interfaces are already async where an implementation suspends, this
+only adds `await` to direct calls such as `os.ReadFile`. `io/fs.ReadFile` and
+`fs.FS.Open` may return a Promise for the same reason.
+
 ## Representative Override Packages
 
 | Package      | Description                                          |

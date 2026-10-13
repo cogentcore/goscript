@@ -215,6 +215,7 @@ import "embed"
 //go:embed gs/net/http/parity.json
 //go:embed gs/net/http/pattern.ts
 //go:embed gs/net/http/pprof/index.ts
+//go:embed gs/os/callbackfs.ts
 //go:embed gs/os/dir.gs.ts
 //go:embed gs/os/dir_unix.gs.ts
 //go:embed gs/os/dirent_js.gs.ts

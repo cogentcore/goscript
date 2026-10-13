@@ -8,15 +8,15 @@ import * as $ from '@goscript/builtin/index.js'
 import { DirFS, ErrNoHandle } from './index.js'
 
 describe('os override', () => {
-  it('exports ErrNoHandle', () => {
+  it('exports ErrNoHandle', async () => {
     expect(ErrNoHandle?.Error()).toBe('os: process handle unavailable')
   })
 
-  it('asserts a DirFS file to the io and fs interfaces it implements', () => {
+  it('asserts a DirFS file to the io and fs interfaces it implements', async () => {
     const dir = mkdtempSync(join(tmpdir(), 'goscript-os-dirfs-'))
     try {
       writeFileSync(join(dir, 'a.txt'), 'a')
-      const [f, err] = DirFS(dir).Open('a.txt')
+      const [f, err] = await DirFS(dir).Open('a.txt')
       expect(err).toBeNull()
 
       // The compiler emits these package-qualified names for the assertions.
@@ -24,7 +24,7 @@ describe('os override', () => {
         expect($.typeAssert(f, name).ok, name).toBe(true)
       }
       expect($.typeAssert(f, 'io.ByteReader').ok).toBe(false)
-      expect(f!.Close()).toBeNull()
+      expect(await f!.Close()).toBeNull()
     } finally {
       rmSync(dir, { force: true, recursive: true })
     }

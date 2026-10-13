@@ -30,45 +30,45 @@ function makeTempRoot(): string {
 }
 
 describe('os.Root path operations', () => {
-  it('changes file times inside the root', () => {
+  it('changes file times inside the root', async () => {
     const dir = makeTempRoot()
     writeFileSync(join(dir, 'a.txt'), 'a')
-    const [root, openErr] = OpenRoot(dir)
+    const [root, openErr] = await OpenRoot(dir)
     expect(openErr).toBeNull()
 
     const mtime = time.Unix(1577934245n, 0n)
-    expect(root!.Chtimes('a.txt', mtime, mtime)).toBeNull()
+    expect(await root!.Chtimes('a.txt', mtime, mtime)).toBeNull()
     expect(statSync(join(dir, 'a.txt')).mtime.getTime()).toBe(1577934245000)
 
     // A zero time leaves that file time unchanged.
     const atime = time.Unix(1609470245n, 0n)
-    expect(root!.Chtimes('a.txt', atime, new time.Time())).toBeNull()
+    expect(await root!.Chtimes('a.txt', atime, new time.Time())).toBeNull()
     const st = statSync(join(dir, 'a.txt'))
     expect(st.atime.getTime()).toBe(1609470245000)
     expect(st.mtime.getTime()).toBe(1577934245000)
   })
 
-  it('writes, renames and reads files inside the root', () => {
+  it('writes, renames and reads files inside the root', async () => {
     const dir = makeTempRoot()
-    const [root] = OpenRoot(dir)
+    const [root] = await OpenRoot(dir)
 
-    expect(root!.MkdirAll('x/y', 0o755)).toBeNull()
+    expect(await root!.MkdirAll('x/y', 0o755)).toBeNull()
     expect(
-      root!.WriteFile('x/y/a.txt', $.stringToBytes('hello'), 0o644),
+      await root!.WriteFile('x/y/a.txt', $.stringToBytes('hello'), 0o644),
     ).toBeNull()
-    expect(root!.Rename('x/y/a.txt', 'x/b.txt')).toBeNull()
+    expect(await root!.Rename('x/y/a.txt', 'x/b.txt')).toBeNull()
     expect(readFileSync(join(dir, 'x/b.txt'), 'utf8')).toBe('hello')
-    const [data, readErr] = root!.ReadFile('x/b.txt')
+    const [data, readErr] = await root!.ReadFile('x/b.txt')
     expect(readErr).toBeNull()
     expect($.bytesToString(data)).toBe('hello')
-    expect(root!.RemoveAll('x')).toBeNull()
+    expect(await root!.RemoveAll('x')).toBeNull()
   })
 
-  it('rejects names that leave the root', () => {
-    const [root] = OpenRoot(makeTempRoot())
+  it('rejects names that leave the root', async () => {
+    const [root] = await OpenRoot(makeTempRoot())
 
     const now = time.Now()
-    expect(root!.Chtimes('../a.txt', now, now)).toBe(ErrInvalid)
-    expect(root!.Rename('a.txt', '/tmp/a.txt')).toBe(ErrInvalid)
+    expect(await root!.Chtimes('../a.txt', now, now)).toBe(ErrInvalid)
+    expect(await root!.Rename('a.txt', '/tmp/a.txt')).toBe(ErrInvalid)
   })
 })
