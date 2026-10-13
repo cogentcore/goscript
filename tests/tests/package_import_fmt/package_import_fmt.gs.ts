@@ -5,11 +5,28 @@ import * as $ from "@goscript/builtin/index.js"
 
 import * as bytes from "@goscript/bytes/index.js"
 
+import * as errors from "@goscript/errors/index.js"
+
 import * as fmt from "@goscript/fmt/index.js"
 
 import type * as io from "@goscript/io/index.js"
 import "@goscript/bytes/index.js"
+import "@goscript/errors/index.js"
 import "@goscript/fmt/index.js"
+
+export type num = number
+
+$.registerNamedValueType(
+	"main.num",
+	{String: (receiver: any, ...args: any[]) => (num_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])]
+);
+
+$.registerNamedValueType(
+	"*main.num",
+	{String: (receiver: any, ...args: any[]) => (num_String as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])]
+);
 
 export class byteFormatter {
 	public declare prefix: $.Slice<number>
@@ -45,6 +62,40 @@ export class byteFormatter {
 		() => [{ name: "Format", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [] }],
 		byteFormatter,
 		() => [{ name: "prefix", key: "prefix", type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }]
+	)
+}
+
+export class pos {
+	public declare Line: number
+
+	public declare Char: number
+
+	public _fields: {
+		Line: number
+		Char: number
+	}
+
+	constructor(init?: Partial<{Line?: number, Char?: number}>) {
+		this._fields = {
+			Line: init?.Line ?? (0 as number),
+			Char: init?.Char ?? (0 as number)
+		}
+	}
+
+	public clone(): pos {
+		return $.markAsStructValue(new pos(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["Line", "Char"])
+	}
+
+	static __typeInfo = $.registerStructType(
+		"main.pos",
+		() => new pos(),
+		() => [],
+		pos,
+		() => [{ name: "Line", key: "Line", type: /* @__PURE__ */ $.basicType("int") }, { name: "Char", key: "Char", type: /* @__PURE__ */ $.basicType("int") }]
 	)
 }
 
@@ -108,7 +159,100 @@ export async function main(): globalThis.Promise<void> {
 	await fmt.Fprintln($.pointerValueOrNil($.interfaceValue<io.Writer | null>(buf, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer")))!, "Buffered writer")
 	await fmt.Print(buf.value.String())
 
+	await starWidthPrecision()
+	await scanVerbs()
+
 	await $.println("test finished")
+}
+
+export async function num_String(f: num): globalThis.Promise<string> {
+	return fmt.Sprintf("%.*g", $.basicInterfaceValue(7, "int"), $.basicInterfaceValue($.float32(f), "float32"))
+}
+
+export async function starWidthPrecision(): globalThis.Promise<void> {
+	await fmt.Println(await fmt.Sprintf("[%.*f]", $.basicInterfaceValue(3, "int"), $.basicInterfaceValue(3.14159, "float64")))
+	await fmt.Println(await fmt.Sprintf("[%*d]", $.basicInterfaceValue(5, "int"), $.basicInterfaceValue(42, "int")))
+	await fmt.Println(await fmt.Sprintf("[%*d]", $.basicInterfaceValue(-5, "int"), $.basicInterfaceValue(42, "int")))
+	await fmt.Println(await fmt.Sprintf("[%*.*f]", $.basicInterfaceValue(8, "int"), $.basicInterfaceValue(2, "int"), $.basicInterfaceValue(3.14159, "float64")))
+	await fmt.Println(await fmt.Sprintf("[%.*g]", $.basicInterfaceValue(7, "int"), $.basicInterfaceValue(13.333333015441895, "float32")))
+	await fmt.Println(await fmt.Sprintf("[%.*d] [%s]", $.basicInterfaceValue(-1, "int"), $.basicInterfaceValue(5, "int"), "after"))
+	await fmt.Println(await fmt.Sprintf("[%v]", $.namedValueInterfaceValue<any>(6.666666507720947, "main.num", {String: (receiver: any, ...args: any[]) => (num_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, /* @__PURE__ */ $.basicType("float32", "main.num"), [$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])])))
+	await fmt.Println(await fmt.Sprintf("[%.*d]", "x", $.basicInterfaceValue(5, "int")))
+	let err = fmt.Errorf("%*s: %w", $.basicInterfaceValue(6, "int"), "ctx", (errors.New("base") as any))
+	await fmt.Println((err as any), errors.Unwrap($.pointerValueOrNil(err)!) != null)
+}
+
+export async function scanVerbs(): globalThis.Promise<void> {
+	let f32: $.VarRef<number> = $.varRef(0)
+	let [n, err] = fmt.Sscanf("1.0", "%g", $.interfaceValue(f32, "*float32", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("float32"))))
+	await fmt.Println("g float32:", $.basicInterfaceValue(n, "int"), err == null, $.basicInterfaceValue(f32.value, "float32"))
+
+	let f64: $.VarRef<number> = $.varRef(0)
+	let __goscriptTuple0: any = fmt.Sscanf(" 2.5e1 rest", "%f", $.interfaceValue(f64, "*float64", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("float64"))))
+	n = __goscriptTuple0[0]
+	err = __goscriptTuple0[1]
+	await fmt.Println("f float64:", $.basicInterfaceValue(n, "int"), err == null, $.basicInterfaceValue(f64.value, "float64"))
+
+	let i64: $.VarRef<bigint> = $.varRef(0n)
+	let u8: $.VarRef<number> = $.varRef(0)
+	let __goscriptTuple1: any = fmt.Sscanf("-42,200", "%d,%d", $.interfaceValue(i64, "*int64", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int64"))), $.interfaceValue(u8, "*uint8", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("uint8"))))
+	n = __goscriptTuple1[0]
+	err = __goscriptTuple1[1]
+	await fmt.Println("d int64 uint8:", $.basicInterfaceValue(n, "int"), err == null, $.basicInterfaceValue(i64.value, "int64"), $.basicInterfaceValue(u8.value, "uint8"))
+
+	let r: $.VarRef<number> = $.varRef(0)
+	let g: $.VarRef<number> = $.varRef(0)
+	let b: $.VarRef<number> = $.varRef(0)
+	let __goscriptTuple2: any = fmt.Sscanf("ff8000", "%02x%02x%02x", $.interfaceValue(r, "*uint8", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(g, "*uint8", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(b, "*uint8", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("uint8"))))
+	n = __goscriptTuple2[0]
+	err = __goscriptTuple2[1]
+	await fmt.Println("02x:", $.basicInterfaceValue(n, "int"), err == null, $.basicInterfaceValue(r.value, "uint8"), $.basicInterfaceValue(g.value, "uint8"), $.basicInterfaceValue(b.value, "uint8"))
+	let __goscriptTuple3: any = fmt.Sscanf("f80", "%1x%1x%1x", $.interfaceValue(r, "*uint8", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(g, "*uint8", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(b, "*uint8", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("uint8"))))
+	n = __goscriptTuple3[0]
+	err = __goscriptTuple3[1]
+	await fmt.Println("1x:", $.basicInterfaceValue(n, "int"), err == null, $.basicInterfaceValue(r.value, "uint8"), $.basicInterfaceValue(g.value, "uint8"), $.basicInterfaceValue(b.value, "uint8"))
+
+	let p: pos = $.markAsStructValue(new pos())
+	let __goscriptTuple4: any = fmt.Sscanf("L12C3", "L%dC%d", $.interfaceValue($.fieldRef(p._fields, "Line"), "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int"))), $.interfaceValue($.fieldRef(p._fields, "Char"), "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int"))))
+	n = __goscriptTuple4[0]
+	err = __goscriptTuple4[1]
+	await fmt.Println("struct fields:", $.basicInterfaceValue(n, "int"), err == null, $.basicInterfaceValue(p.Line, "int"), $.basicInterfaceValue(p.Char, "int"))
+
+	let s: $.VarRef<string> = $.varRef("")
+	let v: $.VarRef<number> = $.varRef(0)
+	let __goscriptTuple5: any = fmt.Sscanf("name 7", "%s %v", $.interfaceValue(s, "*string", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("string"))), $.interfaceValue(v, "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int"))))
+	n = __goscriptTuple5[0]
+	err = __goscriptTuple5[1]
+	await fmt.Println("s v:", $.basicInterfaceValue(n, "int"), err == null, s.value, $.basicInterfaceValue(v.value, "int"))
+
+	let bl: $.VarRef<boolean> = $.varRef(false)
+	let __goscriptTuple6: any = fmt.Sscanf("true", "%t", $.interfaceValue(bl, "*bool", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("bool"))))
+	n = __goscriptTuple6[0]
+	err = __goscriptTuple6[1]
+	await fmt.Println("t:", $.basicInterfaceValue(n, "int"), err == null, bl.value)
+
+	let __goscriptTuple7: any = fmt.Sscanf("abc", "%d", $.interfaceValue(v, "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int"))))
+	n = __goscriptTuple7[0]
+	err = __goscriptTuple7[1]
+	await fmt.Println("bad int:", $.basicInterfaceValue(n, "int"), err != null)
+
+	let __goscriptTuple8: any = fmt.Sscanf("12", "%d %d", $.interfaceValue(v, "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int"))), $.interfaceValue(i64, "*int64", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int64"))))
+	n = __goscriptTuple8[0]
+	err = __goscriptTuple8[1]
+	await fmt.Println("short:", $.basicInterfaceValue(n, "int"), err != null, $.basicInterfaceValue(v.value, "int"))
+
+	let a: $.VarRef<number> = $.varRef(0)
+	let c: $.VarRef<number> = $.varRef(0)
+	let word: $.VarRef<string> = $.varRef("")
+	let __goscriptTuple9: any = fmt.Sscan("3  4\n hello", $.interfaceValue(a, "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int"))), $.interfaceValue(c, "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int"))), $.interfaceValue(word, "*string", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("string"))))
+	n = __goscriptTuple9[0]
+	err = __goscriptTuple9[1]
+	await fmt.Println("Sscan:", $.basicInterfaceValue(n, "int"), err == null, $.basicInterfaceValue(a.value, "int"), $.basicInterfaceValue(c.value, "int"), word.value)
+	let fl: $.VarRef<number> = $.varRef(0)
+	let __goscriptTuple10: any = fmt.Sscan("1.25", $.interfaceValue(fl, "*float64", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("float64"))))
+	n = __goscriptTuple10[0]
+	err = __goscriptTuple10[1]
+	await fmt.Println("Sscan float:", $.basicInterfaceValue(n, "int"), err == null, $.basicInterfaceValue(fl.value, "float64"))
 }
 
 if ($.isMainScript(import.meta)) {

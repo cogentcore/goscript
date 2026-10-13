@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 )
 
@@ -75,5 +76,82 @@ func main() {
 	fmt.Fprintln(&buf, "Buffered writer")
 	fmt.Print(buf.String())
 
+	starWidthPrecision()
+	scanVerbs()
+
 	println("test finished")
+}
+
+type num float32
+
+func (f num) String() string {
+	return fmt.Sprintf("%.*g", 7, float32(f))
+}
+
+// starWidthPrecision checks that * takes a width or precision from the next
+// operand, and that %w still binds to the right operand after one.
+func starWidthPrecision() {
+	fmt.Println(fmt.Sprintf("[%.*f]", 3, 3.14159))
+	fmt.Println(fmt.Sprintf("[%*d]", 5, 42))
+	fmt.Println(fmt.Sprintf("[%*d]", -5, 42))
+	fmt.Println(fmt.Sprintf("[%*.*f]", 8, 2, 3.14159))
+	fmt.Println(fmt.Sprintf("[%.*g]", 7, float32(13.333333)))
+	fmt.Println(fmt.Sprintf("[%.*d] [%s]", -1, 5, "after"))
+	fmt.Println(fmt.Sprintf("[%v]", num(6.6666665)))
+	fmt.Println(fmt.Sprintf("[%.*d]", "x", 5))
+	err := fmt.Errorf("%*s: %w", 6, "ctx", errors.New("base"))
+	fmt.Println(err, errors.Unwrap(err) != nil)
+}
+
+type pos struct {
+	Line, Char int
+}
+
+// scanVerbs checks Sscanf verbs, widths and errors, and Sscan.
+func scanVerbs() {
+	var f32 float32
+	n, err := fmt.Sscanf("1.0", "%g", &f32)
+	fmt.Println("g float32:", n, err == nil, f32)
+
+	var f64 float64
+	n, err = fmt.Sscanf(" 2.5e1 rest", "%f", &f64)
+	fmt.Println("f float64:", n, err == nil, f64)
+
+	var i64 int64
+	var u8 uint8
+	n, err = fmt.Sscanf("-42,200", "%d,%d", &i64, &u8)
+	fmt.Println("d int64 uint8:", n, err == nil, i64, u8)
+
+	var r, g, b uint8
+	n, err = fmt.Sscanf("ff8000", "%02x%02x%02x", &r, &g, &b)
+	fmt.Println("02x:", n, err == nil, r, g, b)
+	n, err = fmt.Sscanf("f80", "%1x%1x%1x", &r, &g, &b)
+	fmt.Println("1x:", n, err == nil, r, g, b)
+
+	var p pos
+	n, err = fmt.Sscanf("L12C3", "L%dC%d", &p.Line, &p.Char)
+	fmt.Println("struct fields:", n, err == nil, p.Line, p.Char)
+
+	var s string
+	var v int
+	n, err = fmt.Sscanf("name 7", "%s %v", &s, &v)
+	fmt.Println("s v:", n, err == nil, s, v)
+
+	var bl bool
+	n, err = fmt.Sscanf("true", "%t", &bl)
+	fmt.Println("t:", n, err == nil, bl)
+
+	n, err = fmt.Sscanf("abc", "%d", &v)
+	fmt.Println("bad int:", n, err != nil)
+
+	n, err = fmt.Sscanf("12", "%d %d", &v, &i64)
+	fmt.Println("short:", n, err != nil, v)
+
+	var a, c int
+	var word string
+	n, err = fmt.Sscan("3  4\n hello", &a, &c, &word)
+	fmt.Println("Sscan:", n, err == nil, a, c, word)
+	var fl float64
+	n, err = fmt.Sscan("1.25", &fl)
+	fmt.Println("Sscan float:", n, err == nil, fl)
 }
