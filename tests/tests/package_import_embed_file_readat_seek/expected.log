@@ -1,0 +1,8 @@
+interfaces: true true
+readat: 8 true embedded
+readat end: 5 true world
+seek end: 16 true
+read after seek: world
+seek current: 6
+seek invalid: true
+dir readerat: false

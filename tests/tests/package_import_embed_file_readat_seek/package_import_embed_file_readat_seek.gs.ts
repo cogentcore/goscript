@@ -1,0 +1,69 @@
+// Generated file based on package_import_embed_file_readat_seek.go
+// Updated when compliance tests are re-run, DO NOT EDIT!
+
+import * as $ from "@goscript/builtin/index.js"
+
+import * as embed from "@goscript/embed/index.js"
+
+import * as io from "@goscript/io/index.js"
+
+import * as fs from "@goscript/io/fs/index.js"
+import "@goscript/embed/index.js"
+import "@goscript/io/index.js"
+import "@goscript/io/fs/index.js"
+
+export let files: embed.FS = $.markAsStructValue(new embed.FS(new globalThis.Map<string, Uint8Array>([["data.txt", new Uint8Array([104, 101, 108, 108, 111, 44, 32, 101, 109, 98, 101, 100, 100, 101, 100, 32, 119, 111, 114, 108, 100])]])))
+
+export function __goscript_set_files(__goscriptValue: embed.FS): void {
+	$.assignStruct(files, __goscriptValue)
+}
+
+export async function main(): globalThis.Promise<void> {
+	await using __defer = new $.AsyncDisposableStack()
+	let [f, err] = $.markAsStructValue($.cloneStructValue(files)).Open("data.txt")
+	if (err != null) {
+		await $.println("open error:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+		return
+	}
+	__defer.defer(async () => { await $.pointerValue<Exclude<fs.File, null>>(f).Close() })
+
+	// A regular embedded file implements io.ReaderAt and io.Seeker.
+	let [ra, isReaderAt] = $.typeAssertTuple<io.ReaderAt | null>(f, "io.ReaderAt")
+	let [sk, isSeeker] = $.typeAssertTuple<io.Seeker | null>(f, "io.Seeker")
+	await $.println("interfaces:", isReaderAt, isSeeker)
+
+	let b: $.Slice<number> = $.makeSlice<number>(8, undefined, "byte")
+	let __goscriptTuple0: any = await $.pointerValue<Exclude<io.ReaderAt, null>>(ra).ReadAt(b, 7n)
+	let n = __goscriptTuple0[0]
+	err = __goscriptTuple0[1]
+	await $.println("readat:", n, err == null, $.bytesToString($.goSlice(b, undefined, n)))
+	let __goscriptTuple1: any = await $.pointerValue<Exclude<io.ReaderAt, null>>(ra).ReadAt(b, 16n)
+	n = __goscriptTuple1[0]
+	err = __goscriptTuple1[1]
+	await $.println("readat end:", n, $.comparableEqual(err, io.EOF), $.bytesToString($.goSlice(b, undefined, n)))
+
+	let __goscriptTuple2: any = await $.pointerValue<Exclude<io.Seeker, null>>(sk).Seek(-5n, 2)
+	let pos = __goscriptTuple2[0]
+	err = __goscriptTuple2[1]
+	await $.println("seek end:", pos, err == null)
+	let __goscriptTuple3: any = await $.pointerValue<Exclude<fs.File, null>>(f).Read(b)
+	n = __goscriptTuple3[0]
+	await $.println("read after seek:", $.bytesToString($.goSlice(b, undefined, n)))
+	let __goscriptTuple4: any = await $.pointerValue<Exclude<io.Seeker, null>>(sk).Seek(0n, 0)
+	pos = __goscriptTuple4[0]
+	let __goscriptTuple5: any = await $.pointerValue<Exclude<io.Seeker, null>>(sk).Seek(6n, 1)
+	pos = __goscriptTuple5[0]
+	await $.println("seek current:", pos)
+	let __goscriptTuple6: any = await $.pointerValue<Exclude<io.Seeker, null>>(sk).Seek(-1n, 0)
+	err = __goscriptTuple6[1]
+	await $.println("seek invalid:", err != null)
+
+	// A directory does not.
+	let [d, ] = $.markAsStructValue($.cloneStructValue(files)).Open(".")
+	let [, dirReaderAt] = $.typeAssertTuple<io.ReaderAt | null>(d, "io.ReaderAt")
+	await $.println("dir readerat:", dirReaderAt)
+}
+
+if ($.isMainScript(import.meta)) {
+	await main()
+}
