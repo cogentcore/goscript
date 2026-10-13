@@ -33,6 +33,8 @@ func newTestCommand() *cli.Command {
 	var parallelism int
 	var runtimeGroups bool
 	var browser bool
+	var browserChannel string
+	var browserArgs cli.StringSlice
 	var cpuProfile string
 	var memProfile string
 	var incrementalTypeCheck bool
@@ -57,6 +59,8 @@ func newTestCommand() *cli.Command {
 				OutputRoot:                outputRoot,
 				Parallelism:               parallelism,
 				RuntimeBackend:            testRuntimeBackend(browser),
+				BrowserChannel:            browserChannel,
+				BrowserArgs:               browserArgs.Value(),
 				RuntimeGroups:             runtimeGroups,
 				IncrementalTypeCheck:      incrementalTypeCheck,
 				ProtobufTypeScriptBinding: protobufTypeScriptBinding,
@@ -155,6 +159,16 @@ func newTestCommand() *cli.Command {
 				Name:        "browser",
 				Usage:       "run package runtimes in a Chromium browser",
 				Destination: &browser,
+			},
+			&cli.StringFlag{
+				Name:        "browser-channel",
+				Usage:       "installed browser for --browser, such as chrome or msedge, instead of Playwright's Chromium",
+				Destination: &browserChannel,
+			},
+			&cli.StringSliceFlag{
+				Name:        "browser-arg",
+				Usage:       "additional browser command-line argument for --browser, such as --enable-unsafe-webgpu (repeatable)",
+				Destination: &browserArgs,
 			},
 			&cli.BoolFlag{
 				Name:        "protobuf-ts-binding",

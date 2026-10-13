@@ -42,6 +42,12 @@ type Request struct {
 	Parallelism int
 	// RuntimeBackend selects the JavaScript host used for package runtime tests.
 	RuntimeBackend RuntimeBackend
+	// BrowserChannel selects an installed browser for the browser backend,
+	// such as "chrome", instead of the browser that Playwright downloads.
+	BrowserChannel string
+	// BrowserArgs are additional command-line arguments for the browser
+	// launched by the browser backend, such as "--enable-unsafe-webgpu".
+	BrowserArgs []string
 	// RuntimeGroups allows package runtimes to share worker Bun processes.
 	RuntimeGroups bool
 	// IncrementalTypeCheck reuses TypeScript build-info files inside WorkDir.
@@ -65,6 +71,8 @@ type normalizedRequest struct {
 	OutputRoot                string
 	Parallelism               int
 	RuntimeBackend            RuntimeBackend
+	BrowserChannel            string
+	BrowserArgs               []string
 	RuntimeGroups             bool
 	IncrementalTypeCheck      bool
 }
@@ -180,6 +188,8 @@ func (r *Request) normalize() (*normalizedRequest, error) {
 		OutputRoot:                outputRoot,
 		Parallelism:               parallelism,
 		RuntimeBackend:            runtimeBackend,
+		BrowserChannel:            strings.TrimSpace(r.BrowserChannel),
+		BrowserArgs:               r.BrowserArgs,
 		RuntimeGroups:             r.RuntimeGroups,
 		IncrementalTypeCheck:      r.IncrementalTypeCheck,
 	}, nil

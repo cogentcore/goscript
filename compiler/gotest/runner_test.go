@@ -11,6 +11,7 @@ import (
 	"testing"
 	"time"
 
+	goscript "github.com/s4wave/goscript"
 	"github.com/s4wave/goscript/compiler"
 )
 
@@ -1141,6 +1142,7 @@ func TestRunnerRunsBrowserRuntimeBackend(t *testing.T) {
 		}, "\n"),
 	})
 	workDir := filepath.Join(moduleDir, ".tmp", "browser-runtime")
+	writeBrowserTestPackages(t, moduleDir)
 	writeExecutable(t, filepath.Join(moduleDir, "node_modules", ".bin", "vitest"), strings.Join([]string{
 		"#!/bin/sh",
 		"printf '\\033[22m\\033[39m" + combinedRuntimeResultPrefix + "example.test%%2Fbrowser\\t1\\t7\\tbrowser%%20ok\\n'",
@@ -1188,6 +1190,7 @@ func TestRunnerReportsBrowserRuntimeFailureRecord(t *testing.T) {
 		}, "\n"),
 	})
 	writeExecutable(t, filepath.Join(moduleDir, "node_modules", ".bin", "tsgo"), "#!/bin/sh\nexit 0\n")
+	writeBrowserTestPackages(t, moduleDir)
 	writeExecutable(t, filepath.Join(moduleDir, "node_modules", ".bin", "vitest"), strings.Join([]string{
 		"#!/bin/sh",
 		"printf '\\033[22m\\033[39m" + combinedRuntimeResultPrefix + "example.test%%2Fbrowserfail\\t0\\t3\\tpage%%20exploded\\n'",
@@ -1211,6 +1214,24 @@ func TestRunnerReportsBrowserRuntimeFailureRecord(t *testing.T) {
 	pkg := requirePackageResult(t, result, "example.test/browserfail")
 	if pkg.Action != ActionFail || pkg.Phases.Runtime != PhaseStatusFail || pkg.Error != "page exploded" {
 		t.Fatalf("unexpected browser failure result: %#v", pkg)
+	}
+}
+
+func TestBrowserVitestConfigLaunchOptions(t *testing.T) {
+	// Without launch options the provider keeps its defaults.
+	config := renderBrowserVitestConfig(&normalizedRequest{}, "/out", "runner-0.ts")
+	if !strings.Contains(config, "provider: playwright(),") {
+		t.Fatalf("expected default playwright provider, got:\n%s", config)
+	}
+
+	// A channel and arguments render as Playwright launch options.
+	config = renderBrowserVitestConfig(&normalizedRequest{
+		BrowserChannel: "chrome",
+		BrowserArgs:    []string{"--enable-unsafe-webgpu", "--use-angle=metal"},
+	}, "/out", "runner-0.ts")
+	want := `provider: playwright({ launchOptions: { channel: "chrome", args: ["--enable-unsafe-webgpu", "--use-angle=metal"] } }),`
+	if !strings.Contains(config, want) {
+		t.Fatalf("expected %q in config, got:\n%s", want, config)
 	}
 }
 
@@ -1254,6 +1275,7 @@ func TestRunnerReportsBrowserRuntimeMissingResult(t *testing.T) {
 		}, "\n"),
 	})
 	writeExecutable(t, filepath.Join(moduleDir, "node_modules", ".bin", "tsgo"), "#!/bin/sh\nexit 0\n")
+	writeBrowserTestPackages(t, moduleDir)
 	writeExecutable(t, filepath.Join(moduleDir, "node_modules", ".bin", "vitest"), strings.Join([]string{
 		"#!/bin/sh",
 		"printf 'page exploded before result\\n'",
@@ -1765,6 +1787,26 @@ func writeFixture(t *testing.T, files map[string]string) string {
 		}
 	}
 	return dir
+}
+
+// writeBrowserTestPackages writes stub npm packages for the browser test
+// dependencies, so that the runner finds them installed.
+func writeBrowserTestPackages(t *testing.T, moduleDir string) {
+	t.Helper()
+
+	deps, err := goscript.BrowserTestDependencies()
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	for name := range deps {
+		dir := filepath.Join(moduleDir, "node_modules", filepath.FromSlash(name))
+		if err := os.MkdirAll(dir, 0o755); err != nil {
+			t.Fatal(err.Error())
+		}
+		if err := os.WriteFile(filepath.Join(dir, "package.json"), []byte(`{"name":`+strconv.Quote(name)+`}`), 0o644); err != nil {
+			t.Fatal(err.Error())
+		}
+	}
 }
 
 func writeExecutable(t *testing.T, path string, contents string) {

@@ -2,6 +2,7 @@ package gotest
 
 import (
 	"context"
+	"maps"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -116,6 +117,17 @@ func (r *Runner) Run(ctx context.Context, req *Request) (*Result, error) {
 	if err != nil {
 		markAllFailures(result, OwnerTestRunner, err.Error())
 		return result, nil
+	}
+	if norm.RuntimeBackend == RuntimeBackendBrowser {
+		browserDeps, err := goscript.BrowserTestDependencies()
+		if err != nil {
+			markAllFailures(result, OwnerTestRunner, err.Error())
+			return result, nil
+		}
+		if dependencies == nil {
+			dependencies = make(map[string]string, len(browserDeps))
+		}
+		maps.Copy(dependencies, browserDeps)
 	}
 
 	// Declare and install them in the workspace.
@@ -1425,6 +1437,29 @@ func aggregateTypeCheckFailureOwner(output string) (Owner, bool) {
 	return "", false
 }
 
+// browserLaunchOptions returns the Playwright provider options that select
+// the browser channel and arguments, or "" for the defaults.
+func browserLaunchOptions(req *normalizedRequest) string {
+	// Each request field selects one Playwright launch option.
+	var options []string
+	if req.BrowserChannel != "" {
+		options = append(options, "channel: "+strconv.Quote(req.BrowserChannel))
+	}
+	if len(req.BrowserArgs) > 0 {
+		args := make([]string, len(req.BrowserArgs))
+		for i, arg := range req.BrowserArgs {
+			args[i] = strconv.Quote(arg)
+		}
+		options = append(options, "args: ["+strings.Join(args, ", ")+"]")
+	}
+
+	// Without options the provider keeps its defaults.
+	if len(options) == 0 {
+		return ""
+	}
+	return "{ launchOptions: { " + strings.Join(options, ", ") + " } }"
+}
+
 func renderBrowserVitestConfig(req *normalizedRequest, outputRoot string, runnerFile string) string {
 	outputRoot = filepath.ToSlash(outputRoot)
 	runnerFile = filepath.ToSlash(runnerFile)
@@ -1444,7 +1479,9 @@ func renderBrowserVitestConfig(req *normalizedRequest, outputRoot string, runner
 	b.WriteString("    browser: {\n")
 	b.WriteString("      enabled: true,\n")
 	b.WriteString("      headless: true,\n")
-	b.WriteString("      provider: playwright(),\n")
+	b.WriteString("      provider: playwright(")
+	b.WriteString(browserLaunchOptions(req))
+	b.WriteString("),\n")
 	b.WriteString("      instances: [{ browser: \"chromium\" }],\n")
 	b.WriteString("    },\n")
 	b.WriteString("    testTimeout: ")
