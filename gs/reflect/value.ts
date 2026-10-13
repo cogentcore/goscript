@@ -131,47 +131,11 @@ function newStructValue(typ: Type): ReflectValue {
 }
 
 // Copy copies the contents of src to dst until either dst has been filled
-// or src has been exhausted. It returns the number of elements copied.
+// or src has been exhausted. It returns the number of elements copied. Like
+// the copy builtin, it copies within the slices' lengths, and src may be a
+// string when dst is a byte slice.
 export function Copy(dst: Value, src: Value): number {
-  // Extract the underlying arrays from the Value objects
-  const dstArray = getArrayFromValue(dst)
-  const srcArray = getArrayFromValue(src)
-
-  if (!dstArray || !srcArray) {
-    return 0
-  }
-
-  const count = Math.min(dstArray.length, srcArray.length)
-  for (let i = 0; i < count; i++) {
-    dstArray[i] = srcArray[i]
-  }
-  return count
-}
-
-// Helper function to extract the underlying array from a Value
-function getArrayFromValue(value: Value): unknown[] | null {
-  const val = (value as { value: ReflectValue }).value
-
-  // Check for GoScript slice objects created by $.arrayToSlice
-  if (val && typeof val === 'object' && '__meta__' in val) {
-    const meta = (val as { __meta__?: { backing?: unknown[] } }).__meta__
-    if (meta && meta.backing && globalThis.Array.isArray(meta.backing)) {
-      return meta.backing
-    }
-  }
-
-  // Byte slices use typed arrays so reflect.Copy must mutate their backing
-  // storage directly, just as it does for ordinary GoScript slices.
-  if (globalThis.ArrayBuffer.isView(val) && !(val instanceof DataView)) {
-    return val as unknown as unknown[]
-  }
-
-  // Check for regular JavaScript arrays
-  if (globalThis.Array.isArray(val)) {
-    return val
-  }
-
-  return null
+  return $.copy(dst.value as $.Slice<unknown>, src.value as $.Slice<unknown>)
 }
 
 // Indirect returns the value that v points to.
@@ -252,16 +216,12 @@ export function MakeSlice(typ: Type | null, len: number, _cap: number): Value {
     throw new Error('reflect.MakeSlice of non-slice type')
   }
 
-  // Create a slice with the specified length, filled with zero values
+  // Create a slice with the specified length, filled with zero values.
   const elemType = typ.Elem()
   if (!elemType) {
     throw new Error('slice type missing element type')
   }
-
-  const zeroValue = Zero(elemType)
-  const zeroVal = (zeroValue as { value: ReflectValue }).value
-  const array = new globalThis.Array(len).fill(zeroVal)
-
+  const array = new globalThis.Array(len).fill(Zero(elemType).value)
   return new Value(array, typ)
 }
 
@@ -284,47 +244,36 @@ export function Append(s: Value, x: Value): Value {
   if (s.Kind() !== Slice) {
     throw new Error('reflect.Append of non-slice')
   }
-
-  const array = getArrayFromValue(s)
-  if (!array) {
-    throw new Error('cannot get array from slice value')
-  }
-
-  const newValue = (x as { value: ReflectValue }).value
-  const newArray = [...array, newValue]
-
-  return new Value(newArray, s.Type())
+  return new Value(
+    $.append(s.value as $.Slice<unknown>, x.value) as ReflectValue,
+    s.Type(),
+  )
 }
 
 export function AppendSlice(s: Value, t: Value): Value {
   if (s.Kind() !== Slice || t.Kind() !== Slice) {
     throw new Error('reflect.AppendSlice of non-slice')
   }
-  const left = getArrayFromValue(s)
-  const right = getArrayFromValue(t)
-  if (!left || !right) {
-    throw new Error('cannot get array from slice value')
-  }
-  return new Value([...left, ...right], s.Type())
+  const right = $.asArray(t.value as $.Slice<unknown>)
+  return new Value(
+    $.append(s.value as $.Slice<unknown>, ...right) as ReflectValue,
+    s.Type(),
+  )
 }
 
 // MakeChan returns a Value representing a new channel with the specified type.
 export function MakeChan(typ: Type, buffer: number): Value {
+  // Only a channel type with an element type qualifies.
   if (typ.Kind() !== Chan) {
     throw new Error('reflect.MakeChan of non-chan type')
   }
-
   const elemType = typ.Elem()
   if (!elemType) {
     throw new Error('channel type missing element type')
   }
 
-  // Get the zero value for the channel element type
-  const zeroValue = Zero(elemType)
-  const zeroVal = (zeroValue as { value: ReflectValue }).value
-
-  // Create a channel using the builtin makeChannel function
-  const channel = $.makeChannel(buffer, zeroVal)
+  // A receive from a closed channel yields the element's zero value.
+  const channel = $.makeChannel(buffer, Zero(elemType).value)
   return new Value(channel, typ)
 }
 

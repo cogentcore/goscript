@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest'
+import { asArray, type Slice } from '../builtin/index.js'
 import {
   AppendSlice,
   MakeMapWithSize,
-  MapIter,
   MapOf,
   TypeOf,
   Value,
@@ -10,31 +10,33 @@ import {
 } from './index.js'
 
 describe('MapIter', () => {
-  it('should iterate over map entries with proper typing', () => {
+  it('starts before the first entry and uses the map type', () => {
     const map = new Map<string, number>()
     map.set('one', 1)
     map.set('two', 2)
     map.set('three', 3)
 
-    const iter = new MapIter<string, number>(map)
+    const iter = ValueOf(map).MapRange()!
 
-    expect(iter.current?.done === false).toBe(true)
-    // Key() and Value() return reflect.Value objects now
+    expect(iter.Next()).toBe(true)
     expect(iter.Key().Interface()).toBe('one')
     expect(iter.Value().Interface()).toBe(1)
 
     expect(iter.Next()).toBe(true)
-    expect(iter.current?.done === false).toBe(true)
     expect(iter.Key().Kind()).toBe(24) // String kind
     expect(iter.Value().Kind()).toBe(2) // Int kind
 
+    expect(iter.Next()).toBe(true)
+    expect(iter.Next()).toBe(false)
+
     const newMap = new Map<string, number>()
     newMap.set('reset', 100)
-    iter.Reset(newMap)
+    iter.Reset(ValueOf(newMap))
 
-    expect(iter.current?.done === false).toBe(true)
+    expect(iter.Next()).toBe(true)
     expect(iter.Key().Interface()).toBe('reset')
     expect(iter.Value().Interface()).toBe(100)
+    expect(iter.Next()).toBe(false)
   })
 })
 
@@ -112,6 +114,7 @@ describe('reflect compatibility surface', () => {
 
     const iter = mapValue.MapRange()
 
+    expect(iter?.Next()).toBe(true)
     expect(iter?.Key().Interface()).toBe('alpha')
     expect(mapValue.MapIndex(ValueOf('alpha')).Interface()).toBe(1)
     expect(mapValue.Type().Comparable()).toBe(false)
@@ -122,6 +125,6 @@ describe('reflect compatibility surface', () => {
     const sliced = ValueOf([1, 2, 3, 4]).Slice(1, 3)
     const appended = AppendSlice(sliced, ValueOf([5, 6]))
 
-    expect(appended.Interface()).toEqual([2, 3, 5, 6])
+    expect(asArray(appended.Interface() as Slice<number>)).toEqual([2, 3, 5, 6])
   })
 })
