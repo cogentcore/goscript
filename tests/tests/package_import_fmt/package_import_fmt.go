@@ -77,6 +77,7 @@ func main() {
 	fmt.Print(buf.String())
 
 	starWidthPrecision()
+	sliceVerbs()
 	scanVerbs()
 
 	println("test finished")
@@ -86,6 +87,19 @@ type num float32
 
 func (f num) String() string {
 	return fmt.Sprintf("%.*g", 7, float32(f))
+}
+
+// sliceVerbs checks that a verb, with its width and precision, applies to
+// each element of a slice or array, while a byte slice formats as a whole.
+func sliceVerbs() {
+	fmt.Printf("%q\n", []string{"a", "b c"})
+	fmt.Printf("%d %4d\n", []int{1, 2, 3}, []int{4, 5})
+	fmt.Printf("%x\n", []int{10, 255})
+	fmt.Printf("%.2f %6.1f\n", []float64{1.5, 2.25}, []float64{3.25})
+	fmt.Printf("%t\n", []bool{true, false})
+	fmt.Printf("%q\n", [2]string{"x", "y"})
+	fmt.Printf("%q %x\n", []byte("hi"), []byte("hi"))
+	fmt.Printf("%s %q\n", []string{"a", "b"}, []string{})
 }
 
 // starWidthPrecision checks that * takes a width or precision from the next

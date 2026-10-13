@@ -160,6 +160,7 @@ export async function main(): globalThis.Promise<void> {
 	await fmt.Print(buf.value.String())
 
 	await starWidthPrecision()
+	await sliceVerbs()
 	await scanVerbs()
 
 	await $.println("test finished")
@@ -167,6 +168,17 @@ export async function main(): globalThis.Promise<void> {
 
 export async function num_String(f: num): globalThis.Promise<string> {
 	return fmt.Sprintf("%.*g", $.basicInterfaceValue(7, "int"), $.basicInterfaceValue($.float32(f), "float32"))
+}
+
+export async function sliceVerbs(): globalThis.Promise<void> {
+	await fmt.Printf("%q\n", $.interfaceValue($.arrayToSlice<string>(["a", "b c"]), "[]string", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("string"))))
+	await fmt.Printf("%d %4d\n", $.interfaceValue($.arrayToSlice<number>([1, 2, 3]), "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"))), $.interfaceValue($.arrayToSlice<number>([4, 5]), "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"))))
+	await fmt.Printf("%x\n", $.interfaceValue($.arrayToSlice<number>([10, 255]), "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"))))
+	await fmt.Printf("%.2f %6.1f\n", $.interfaceValue($.arrayToSlice<number>([1.5, 2.25]), "[]float64", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("float64"))), $.interfaceValue($.arrayToSlice<number>([3.25]), "[]float64", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("float64"))))
+	await fmt.Printf("%t\n", $.interfaceValue($.arrayToSlice<boolean>([true, false]), "[]bool", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("bool"))))
+	await fmt.Printf("%q\n", $.arrayValue(["x", "y"]))
+	await fmt.Printf("%q %x\n", $.interfaceValue(new Uint8Array([104, 105]), "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(new Uint8Array([104, 105]), "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))))
+	await fmt.Printf("%s %q\n", $.interfaceValue($.arrayToSlice<string>(["a", "b"]), "[]string", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("string"))), $.interfaceValue($.arrayToSlice<string>([]), "[]string", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("string"))))
 }
 
 export async function starWidthPrecision(): globalThis.Promise<void> {

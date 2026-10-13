@@ -130,6 +130,25 @@ function formatHexBytes(
   return result
 }
 
+// elementwiseVerbs are the verbs that Go applies to each element of a slice or
+// array.
+const elementwiseVerbs = new Set([
+  'd',
+  'f',
+  'F',
+  'q',
+  't',
+  'c',
+  'x',
+  'X',
+  'o',
+  'b',
+  'e',
+  'E',
+  'g',
+  'G',
+])
+
 // Simple printf-style formatting implementation for verbs that cannot
 // produce async results (numbers, runes, booleans). Value formatting that can
 // consult Error/String/GoString goes through formatValueMaybe instead.
@@ -612,6 +631,29 @@ function starOperand(arg: unknown): number | null {
   return null
 }
 
+// formatOperandMaybe formats arg for one verb with its flags, width and
+// precision. Go applies the verb to each element of a slice or array, as in %q
+// of a []string or %5d of a []int. Byte slices are Uint8Arrays rather than
+// JavaScript arrays here, so they format as a whole.
+function formatOperandMaybe(
+  arg: any,
+  verb: string,
+  flags: string,
+  width: string,
+  precision: string,
+): MaybeString {
+  if (Array.isArray(arg) && elementwiseVerbs.has(verb)) {
+    const elems = arg.map((elem) =>
+      formatOperandMaybe(elem, verb, flags, width, precision),
+    )
+    return joinMaybe(elems, ' ', '[', ']')
+  }
+  const formatted =
+    formatWithStateMaybe(arg, verb, flags, width, precision) ??
+    formatValueMaybe(arg, verb, flags)
+  return applyFormatOptions(formatted, arg, verb, flags, width, precision)
+}
+
 function parseFormatMaybe(format: string, args: any[]): MaybeString {
   const parts: MaybeString[] = []
   let argIndex = 0
@@ -685,20 +727,8 @@ function parseFormatMaybe(format: string, args: any[]): MaybeString {
           const verb = format[j]
 
           if (argIndex < args.length) {
-            const arg = args[argIndex]
-            let formatted: MaybeString | null = formatWithStateMaybe(
-              arg,
-              verb,
-              flags,
-              width,
-              precision,
-            )
-            if (formatted === null) {
-              formatted = formatValueMaybe(arg, verb, flags)
-            }
-
             parts.push(
-              applyFormatOptions(formatted, arg, verb, flags, width, precision),
+              formatOperandMaybe(args[argIndex], verb, flags, width, precision),
             )
             argIndex++
           } else {
