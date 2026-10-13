@@ -923,6 +923,7 @@ function decode(
   opts: decodeOptions,
 ): $.GoError {
   try {
+    v = unwrapPointerBox(v)
     if (!validUnmarshalTarget(v)) {
       return $.toGoError(new InvalidUnmarshalError())
     }
@@ -1283,6 +1284,25 @@ function unmarshalJSONTarget(value: unknown): Unmarshaler | null {
   return typeof method === 'function' ? (target as Unmarshaler) : null
 }
 
+// unwrapPointerBox returns the pointer held by an interface box of a
+// pointer type with methods, such as *T for a named slice or map type T,
+// tagged with the box's Go type as interfaceValue tags a plain pointer.
+// A box whose methods include UnmarshalJSON is kept, so that it is called.
+function unwrapPointerBox(value: unknown): unknown {
+  if (!$.isNamedValueBox(value) || unmarshalJSONTarget(value) !== null) {
+    return value
+  }
+  const box = value as {
+    __goType: string
+    __goValue: unknown
+    __goTypeInfo?: $.TypeInfo | string
+  }
+  if (!$.isVarRef(box.__goValue)) {
+    return value
+  }
+  return $.interfaceValue(box.__goValue, box.__goType, box.__goTypeInfo)
+}
+
 function validUnmarshalTarget(value: unknown): boolean {
   if (value === null || value === undefined) {
     return false
@@ -1340,7 +1360,7 @@ function assignDecodedValue(
     // plain JS objects/strings.
     const spelling = unmarshalTargetGoType(target)
     if (spelling !== null) {
-      const desc = goTypeDescriptor(spelling)
+      let desc: unknown = goTypeDescriptor(spelling)
       // An anonymous (inline, unnamed) struct target, e.g. `var loose
       // struct{ Name string "json:\"name\"" }`, carries no _fields/registered
       // type metadata of its own to decode against, so it needs its json
@@ -1355,7 +1375,16 @@ function assignDecodedValue(
         assignAnonymousStructFields(target.value, decoded, anonFields, opts)
         return
       }
-      const info = resolveTypeInfo(desc)
+      let info = resolveTypeInfo(desc)
+      if (info === null) {
+        // A named type that is not registered by name, such as a named
+        // slice or map type, is described by the pointer's type info.
+        const elemInfo = unmarshalTargetElemTypeInfo(target)
+        if (elemInfo !== null) {
+          desc = elemInfo
+          info = elemInfo
+        }
+      }
       if (info !== null) {
         if (
           ($.isSliceTypeInfo(info) && Array.isArray(decoded)) ||
@@ -1483,6 +1512,19 @@ function assignDecodedFieldValue(
 // up named types via $.getTypeByName. Returns null when the descriptor is
 // missing or names a type the runtime has no registration for (e.g. a basic
 // type name like "uint8" — those are handled as plain values).
+// unmarshalTargetElemTypeInfo returns the element type info of the pointer
+// type info that interfaceValue attached to an Unmarshal target, or null.
+function unmarshalTargetElemTypeInfo(target: unknown): $.TypeInfo | null {
+  if (target === null || typeof target !== 'object') {
+    return null
+  }
+  const info = resolveTypeInfo(Reflect.get(target, '__goTypeInfo'))
+  if (info === null || !$.isPointerTypeInfo(info)) {
+    return null
+  }
+  return resolveTypeInfo(info.elemType)
+}
+
 function resolveTypeInfo(t: unknown): $.TypeInfo | null {
   if (typeof t === 'string') {
     return ($.getTypeByName(t) as $.TypeInfo | undefined) ?? null
