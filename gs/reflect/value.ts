@@ -192,7 +192,21 @@ export function New(typ: Type | null): Value {
     return new Value() // Return invalid value for null type
   }
   const ptrType = PointerTo(typ)
+  // A pointer to a struct is the struct object itself, as &T{} is.
+  if (typ.Kind() === Struct) {
+    return new Value(newStructPointer(typ), ptrType)
+  }
   return new Value($.varRef(zeroReflectValue(typ)), ptrType)
+}
+
+// newStructPointer returns a new zero struct of type typ in its pointer
+// form: an instance not marked as a struct value.
+function newStructPointer(typ: Type): ReflectValue {
+  const typeInfo = $.getTypeByName(typ.String())
+  if (typeInfo && $.isStructTypeInfo(typeInfo) && typeInfo.ctor) {
+    return new typeInfo.ctor() as ReflectValue
+  }
+  return newStructValue(typ)
 }
 
 // NewAt returns a Value representing a pointer to the value at p.

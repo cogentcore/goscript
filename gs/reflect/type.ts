@@ -1386,6 +1386,17 @@ export class Value {
       elemType.Name() !== '' &&
       (elemType.PkgPath() !== '' || elemType.String().includes('.'))
 
+    // A pointer to a struct is the struct object itself, whose methods
+    // satisfy interfaces, so it is tagged with its type but not boxed.
+    if (elemType !== null && elemType.Kind() === Struct) {
+      const target = $.isVarRef(current) ? current.value : current
+      return $.interfaceValue<ReflectValue>(
+        target ?? null,
+        this._type.String(),
+        typeInfo,
+      )
+    }
+
     // Box a named value with its type.
     if (this._type.Kind() === Struct && namedType) {
       return $.interfaceValue<ReflectValue>(
