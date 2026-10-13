@@ -26,7 +26,7 @@ export class openOnlyFS {
 		return $.markAsStructValue(new openOnlyFS(this))
 	}
 
-	public async Open(name: string): globalThis.Promise<[fs.File | null, $.GoError]> {
+	public Open(name: string): [fs.File | null, $.GoError] {
 		const o = this;
 		return fstest.MapFS_Open(o.fsys, name)
 	}
