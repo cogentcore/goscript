@@ -227,7 +227,7 @@ function joinFilePath(dir: string, name: string): string {
 	return dir.replace(/\/+$/, "") + "/" + name
 }
 
-function readDirectoryInfos(name: string): [fs.FileInfo[] | null, $.GoError] {
+export function readDirectoryInfos(name: string): [fs.FileInfo[] | null, $.GoError] {
 	const denoObj = getDeno()
 	if (denoObj?.readDirSync) {
 		try {
