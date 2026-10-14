@@ -1489,6 +1489,7 @@ func browserLaunchOptions(req *normalizedRequest) string {
 }
 
 func renderBrowserVitestConfig(req *normalizedRequest, outputRoot string, runnerFile string, sourceDir string) string {
+	// Paths are written with forward slashes, and the timeouts default to 30 s.
 	outputRoot = filepath.ToSlash(outputRoot)
 	runnerFile = filepath.ToSlash(runnerFile)
 	timeoutMS := int64(30000)
@@ -1496,6 +1497,7 @@ func renderBrowserVitestConfig(req *normalizedRequest, outputRoot string, runner
 		timeoutMS = int64(req.Timeout / time.Millisecond)
 	}
 
+	// The config runs the package's runner file.
 	var b strings.Builder
 	b.WriteString("import { defineConfig } from \"vitest/config\"\n")
 	b.WriteString("import { playwright } from \"@vitest/browser-playwright\"\n")
@@ -1505,17 +1507,29 @@ func renderBrowserVitestConfig(req *normalizedRequest, outputRoot string, runner
 	b.WriteString("    include: [")
 	b.WriteString(strconv.Quote(runnerFile))
 	b.WriteString("],\n")
+
+	// The tests run in headless Chromium.
+	// The browser API server listens on 127.0.0.1 rather than localhost, so
+	// that the page opens the address it listens on. With localhost, a server
+	// started while another test run's server holds the port on ::1 binds the
+	// same port on 127.0.0.1, and the browser, resolving localhost to ::1,
+	// connects to the other run's server and never reaches its own.
 	b.WriteString("    browser: {\n")
 	b.WriteString("      enabled: true,\n")
 	b.WriteString("      headless: true,\n")
+	b.WriteString("      api: { host: \"127.0.0.1\" },\n")
 	b.WriteString("      provider: playwright(")
 	b.WriteString(browserLaunchOptions(req))
 	b.WriteString("),\n")
 	b.WriteString("      instances: [{ browser: \"chromium\" }],\n")
+
+	// The page reads the host filesystem through a browser command.
 	b.WriteString("      commands: { " + browserHostFSCommand + ": hostFS(")
 	b.WriteString(strconv.Quote(filepath.ToSlash(sourceDir)))
 	b.WriteString(") },\n")
 	b.WriteString("    },\n")
+
+	// Tests and hooks share the run's timeout.
 	b.WriteString("    testTimeout: ")
 	b.WriteString(strconv.FormatInt(timeoutMS, 10))
 	b.WriteString(",\n")
@@ -1523,11 +1537,15 @@ func renderBrowserVitestConfig(req *normalizedRequest, outputRoot string, runner
 	b.WriteString(strconv.FormatInt(timeoutMS, 10))
 	b.WriteString(",\n")
 	b.WriteString("  },\n")
+
+	// GoScript module imports resolve to the compiled TypeScript output.
 	b.WriteString("  resolve: {\n")
 	b.WriteString("    alias: [\n")
 	b.WriteString("      { find: /^@goscript\\/(.*)\\.js$/, replacement: ")
 	b.WriteString(strconv.Quote(outputRoot + "/@goscript/$1.ts"))
 	b.WriteString(" },\n")
+
+	// Other GoScript paths resolve as they are, and the config ends.
 	b.WriteString("      { find: /^@goscript\\/(.*)$/, replacement: ")
 	b.WriteString(strconv.Quote(outputRoot + "/@goscript/$1"))
 	b.WriteString(" },\n")
