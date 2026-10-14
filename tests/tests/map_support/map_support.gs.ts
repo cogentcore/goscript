@@ -74,8 +74,8 @@ export async function main(): globalThis.Promise<void> {
 			if ($.stringCompare($.arrayIndex(scoreResults!, j), $.arrayIndex(scoreResults!, j + 1)) > 0) {
 				let __goscriptAssign0_0: string = $.arrayIndex(scoreResults!, j + 1)
 				let __goscriptAssign0_1: string = $.arrayIndex(scoreResults!, j)
-				scoreResults![j] = __goscriptAssign0_0
-				scoreResults![j + 1] = __goscriptAssign0_1
+				$.sliceElems(scoreResults!)[$.sliceSlot(scoreResults!, j)] = __goscriptAssign0_0
+				$.sliceElems(scoreResults!)[$.sliceSlot(scoreResults!, j + 1)] = __goscriptAssign0_1
 			}
 		}
 	}

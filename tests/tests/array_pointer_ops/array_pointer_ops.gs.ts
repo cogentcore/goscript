@@ -120,7 +120,7 @@ export function closureArrayAddress(): number {
 export async function main(): globalThis.Promise<void> {
 	let slices = $.arrayValue([$.arrayToSlice<number>([1])])
 	let slicesCopy = $.cloneArrayValue(slices, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")), 1))
-	$.arrayIndex(slicesCopy, 0)![0] = 7
+	$.sliceElems($.arrayIndex(slicesCopy, 0)!)[$.sliceSlot($.arrayIndex(slicesCopy, 0)!, 0)] = 7
 	await $.println("slice sharing:", $.arrayIndex($.arrayIndex(slices, 0)!, 0))
 
 	let structs = $.arrayValue([new item({value: 1}, true)], /* @__PURE__ */ $.arrayType("main.item", 1))
@@ -135,7 +135,7 @@ export async function main(): globalThis.Promise<void> {
 
 	let original = new arrays({slices: $.cloneArrayValue(slices, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")), 1)), items: $.cloneArrayValue(structs, /* @__PURE__ */ $.arrayType("main.item", 1))}, true)
 	let copied = (original).clone()
-	$.arrayIndex(copied.slices, 0)![0] = 8
+	$.sliceElems($.arrayIndex(copied.slices, 0)!)[$.sliceSlot($.arrayIndex(copied.slices, 0)!, 0)] = 8
 	$.arrayIndex(copied.items, 0).value = 8
 	await $.println("array fields:", $.arrayIndex($.arrayIndex(original.slices, 0)!, 0), $.arrayIndex(original.items, 0).value, $.arrayIndex(copied.items, 0).value)
 

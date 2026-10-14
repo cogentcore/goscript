@@ -6,7 +6,7 @@ import * as $ from "@goscript/builtin/index.js"
 export function last(a: $.Slice<number>): number {
 	let __goscriptShadow0 = $.sliceLen(a) - 1
 	for (let i = 0; i < __goscriptShadow0; i++) {
-		a![i + 1] = a![i + 1] + ($.arrayIndex(a!, i))
+		$.sliceElems(a!)[$.sliceSlot(a!, i + 1)] = $.sliceElems(a!)[$.sliceSlot(a!, i + 1)] + ($.arrayIndex(a!, i))
 	}
 	return $.arrayIndex(a!, __goscriptShadow0)
 }

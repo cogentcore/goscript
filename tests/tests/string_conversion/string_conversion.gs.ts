@@ -40,8 +40,8 @@ export async function main(): globalThis.Promise<void> {
 
 	// === Modify []rune and convert back to string ===
 	let mutableRunes: $.Slice<number> = $.stringToRunes("Mutable String")
-	mutableRunes![0] = 109
-	mutableRunes![8] = 115
+	$.sliceElems(mutableRunes!)[$.sliceSlot(mutableRunes!, 0)] = 109
+	$.sliceElems(mutableRunes!)[$.sliceSlot(mutableRunes!, 8)] = 115
 	let modifiedString = $.runesToString(mutableRunes)
 	await $.println(modifiedString)
 

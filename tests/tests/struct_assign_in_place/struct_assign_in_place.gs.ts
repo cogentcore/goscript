@@ -241,7 +241,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println(a.value.In.X, a.value.N)
 
 	let s: $.Slice<Outer> = $.arrayToSlice<Outer>([make1(), make1()])
-	$.assignStruct(s![0], $.arrayIndex(s!, 1))
+	$.assignStruct($.sliceElems(s!)[$.sliceSlot(s!, 0)], $.arrayIndex(s!, 1))
 	$.arrayIndex(s!, 1).In.Y = 20
 	await $.println($.arrayIndex(s!, 0).In.Y, $.arrayIndex(s!, 1).In.Y)
 

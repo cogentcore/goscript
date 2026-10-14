@@ -173,9 +173,9 @@ export class rows {
 		}
 		;(r$ as rows).done = true
 		if ((r$ as rows).blob) {
-			dest![0] = $.interfaceValue<driver.Value | null>(new Uint8Array([100, 117, 114, 97, 98, 108, 101]), "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")))
+			$.sliceElems(dest!)[$.sliceSlot(dest!, 0)] = $.interfaceValue<driver.Value | null>(new Uint8Array([100, 117, 114, 97, 98, 108, 101]), "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")))
 		} else {
-			dest![0] = $.basicInterfaceValue(42n, "int64")
+			$.sliceElems(dest!)[$.sliceSlot(dest!, 0)] = $.basicInterfaceValue(42n, "int64")
 		}
 		return null
 	}

@@ -88,7 +88,7 @@ export class repeatReader {
 		}
 		let n = $.min($.sliceLen(p), (r$ as repeatReader).remaining)
 		for (let __goscriptRangeCount0 = n, i = 0; i < __goscriptRangeCount0; i++) {
-			p![i] = $.uint(i, 8)
+			$.sliceElems(p!)[$.sliceSlot(p!, i)] = $.uint(i, 8)
 		}
 		;(r$ as repeatReader).remaining = (r$ as repeatReader).remaining - (n)
 		return [n, null]

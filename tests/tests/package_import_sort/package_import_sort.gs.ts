@@ -88,8 +88,8 @@ export class descending {
 		let d: descending = this;
 		let __goscriptAssign0_0: number = $.arrayIndex(d.values!, j)
 		let __goscriptAssign0_1: number = $.arrayIndex(d.values!, i)
-		d.values![i] = __goscriptAssign0_0
-		d.values![j] = __goscriptAssign0_1
+		$.sliceElems(d.values!)[$.sliceSlot(d.values!, i)] = __goscriptAssign0_0
+		$.sliceElems(d.values!)[$.sliceSlot(d.values!, j)] = __goscriptAssign0_1
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -117,8 +117,8 @@ export function byFreq_Less(s: byFreq, i: number, j: number): boolean {
 export function byFreq_Swap(s: byFreq, i: number, j: number): void {
 	let __goscriptAssign1_0: number = $.arrayIndex(s!, j)
 	let __goscriptAssign1_1: number = $.arrayIndex(s!, i)
-	s![i] = __goscriptAssign1_0
-	s![j] = __goscriptAssign1_1
+	$.sliceElems(s!)[$.sliceSlot(s!, i)] = __goscriptAssign1_0
+	$.sliceElems(s!)[$.sliceSlot(s!, j)] = __goscriptAssign1_1
 }
 
 export async function main(): globalThis.Promise<void> {

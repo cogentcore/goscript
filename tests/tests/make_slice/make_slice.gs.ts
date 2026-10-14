@@ -45,8 +45,8 @@ export async function main(): globalThis.Promise<void> {
 	// Test 7: Append to slice with extra capacity
 	await $.println("--- Append to slice with extra capacity ---")
 	let s5: $.Slice<number> = $.makeSlice<number>(2, 5, "number")
-	s5![0] = 10
-	s5![1] = 20
+	$.sliceElems(s5!)[$.sliceSlot(s5!, 0)] = 10
+	$.sliceElems(s5!)[$.sliceSlot(s5!, 1)] = 20
 	await $.println("Before append - len:", $.sliceLen(s5), "cap:", $.cap(s5))
 	s5 = $.appendOne(s5, 30)
 	await $.println("After append - len:", $.sliceLen(s5), "cap:", $.cap(s5))
@@ -55,7 +55,7 @@ export async function main(): globalThis.Promise<void> {
 	// Test 8: Append to bytes with extra capacity
 	await $.println("--- Append to bytes with extra capacity ---")
 	let b3: $.Slice<number> = $.makeSlice<number>(1, 10, "byte")
-	b3![0] = 65
+	$.sliceElems(b3!)[$.sliceSlot(b3!, 0)] = 65
 	await $.println("Before append - len:", $.sliceLen(b3), "cap:", $.cap(b3))
 	b3 = $.append(b3, $.uint(66, 8), $.byteSliceHint)
 	await $.println("After append - len:", $.sliceLen(b3), "cap:", $.cap(b3))
@@ -81,7 +81,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("--- Slice operations on made slices ---")
 	let s6: $.Slice<number> = $.makeSlice<number>(10, 20, "number")
 	for (let i = 0; i < 10; i++) {
-		s6![i] = i * 10
+		$.sliceElems(s6!)[$.sliceSlot(s6!, i)] = i * 10
 	}
 	let sub: $.Slice<number> = $.goSlice(s6, 2, 5)
 	await $.println("sub - len:", $.sliceLen(sub), "cap:", $.cap(sub))
@@ -91,9 +91,9 @@ export async function main(): globalThis.Promise<void> {
 	// Test 12: String slices with capacity
 	await $.println("--- String slices with capacity ---")
 	let str: $.Slice<string> = $.makeSlice<string>(3, 8, "string")
-	str![0] = "hello"
-	str![1] = "world"
-	str![2] = "test"
+	$.sliceElems(str!)[$.sliceSlot(str!, 0)] = "hello"
+	$.sliceElems(str!)[$.sliceSlot(str!, 1)] = "world"
+	$.sliceElems(str!)[$.sliceSlot(str!, 2)] = "test"
 	await $.println("str - len:", $.sliceLen(str), "cap:", $.cap(str))
 	await $.println("str[1]:", $.arrayIndex(str!, 1))
 
