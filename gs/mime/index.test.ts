@@ -1,3 +1,4 @@
+import { goString } from '@goscript/builtin/index.js'
 import { describe, expect, it } from 'vitest'
 
 import {
@@ -49,12 +50,12 @@ describe('mime override', () => {
 
     const encoded = FormatMediaType(
       'attachment',
-      new Map([['filename', 'résumé.txt']]),
+      new Map([['filename', goString('résumé.txt')]]),
     )
     expect(encoded).toBe("attachment; filename*=utf-8''r%C3%A9sum%C3%A9.txt")
     const [, encodedParams, encodedErr] = ParseMediaType(encoded)
     expect(encodedErr).toBeNull()
-    expect(encodedParams.get('filename')).toBe('résumé.txt')
+    expect(encodedParams.get('filename')).toBe(goString('résumé.txt'))
     const [, pathParams, pathErr] = ParseMediaType(
       'form-data; filename="C:\\dev\\go.txt"; quoted="a\\"b"',
     )
@@ -92,17 +93,21 @@ describe('mime override', () => {
   it('encodes and decodes RFC 2047 words', () => {
     expect(WordEncoder_Encode(BEncoding, 'utf-8', 'hello')).toBe('hello')
 
-    const bWord = WordEncoder_Encode(BEncoding, 'utf-8', 'héllo')
-    expect(new WordDecoder().Decode(bWord)).toEqual(['héllo', null])
+    const bWord = WordEncoder_Encode(BEncoding, 'utf-8', goString('héllo'))
+    expect(new WordDecoder().Decode(bWord)).toEqual([goString('héllo'), null])
 
     const qWord = WordEncoder_Encode(QEncoding, 'utf-8', 'hello world')
     expect(qWord).toBe('hello world')
 
-    const encodedQWord = WordEncoder_Encode(QEncoding, 'utf-8', 'héllo world')
+    const encodedQWord = WordEncoder_Encode(
+      QEncoding,
+      'utf-8',
+      goString('héllo world'),
+    )
     const [header, err] = new WordDecoder().DecodeHeader(
       `subject ${encodedQWord}`,
     )
     expect(err).toBeNull()
-    expect(header).toBe('subject héllo world')
+    expect(header).toBe(goString('subject héllo world'))
   })
 })
