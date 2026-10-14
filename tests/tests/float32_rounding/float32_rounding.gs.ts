@@ -18,9 +18,21 @@ import "@goscript/fmt/index.js"
 import "@goscript/strconv/index.js"
 
 export class T {
-	public declare A: string
+	public get A(): string {
+		return this._fields.A
+	}
 
-	public declare B: number
+	public set A(value: string) {
+		this._fields.A = value
+	}
+
+	public get B(): number {
+		return this._fields.B
+	}
+
+	public set B(value: number) {
+		this._fields.B = value
+	}
 
 	public _fields: {
 		A: string
@@ -38,8 +50,11 @@ export class T {
 		return $.markAsStructValue(new T(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["A", "B"])
+	public __goscriptAssign(source: T): void {
+		const target = this._fields
+		const values = source._fields
+		target.A = values.A
+		target.B = values.B
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -106,7 +121,7 @@ export async function main(): globalThis.Promise<void> {
 	let __goscriptTuple0: any = json.Marshal($.interfaceValue($.markAsStructValue($.cloneStructValue(s.value)), "main.T", "main.T"))
 	let b: $.Slice<number> = __goscriptTuple0[0]
 	let j: $.VarRef<T> = $.varRef($.markAsStructValue(new T()))
-	let err = json.Unmarshal(b, $.interfaceValue(j, "*main.T", /* @__PURE__ */ $.pointerType("main.T")))
+	let err: $.GoError = json.Unmarshal(b, $.interfaceValue(j, "*main.T", /* @__PURE__ */ $.pointerType("main.T")))
 	await fmt.Println($.bytesToString(b), $.structEqual(j.value, s.value), $.interfaceValue($.markAsStructValue($.cloneStructValue(j.value)), "main.T", "main.T"), (err as any))
 	let buf: $.VarRef<bytes.Buffer> = $.varRef($.markAsStructValue(new bytes.Buffer()))
 	let enc: json.Encoder | $.VarRef<json.Encoder> | null = json.NewEncoder($.pointerValueOrNil($.interfaceValue<io.Writer | null>(buf, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer")))!)

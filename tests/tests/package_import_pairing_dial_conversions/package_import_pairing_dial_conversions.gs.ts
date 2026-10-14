@@ -19,7 +19,13 @@ import "@goscript/io/index.js"
 import "@goscript/net/index.js"
 
 export class recreateError {
-	public declare next: bigint
+	public get next(): bigint {
+		return this._fields.next
+	}
+
+	public set next(value: bigint) {
+		this._fields.next = value
+	}
 
 	public _fields: {
 		next: bigint
@@ -46,14 +52,10 @@ export class recreateError {
 		return "recreate"
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["next"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.recreateError",
 		() => new recreateError(),
-		() => [{ name: "Error", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }],
+		() => [{ name: "Error", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }], pointerReceiver: true }],
 		recreateError,
 		() => [{ name: "next", key: "next", type: /* @__PURE__ */ $.basicType("uint64") }]
 	)
@@ -84,13 +86,13 @@ export class readWriteCloser {
 	}
 
 	public Write(p: $.Slice<number>): [number, $.GoError] {
-		return [$.len(p), null]
+		return [$.sliceLen(p), null]
 	}
 
 	static __typeInfo = $.registerStructType(
 		"main.readWriteCloser",
 		() => new readWriteCloser(),
-		() => [{ name: "Close", args: [], returns: [{ type: "error" }] }, { name: "Read", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("int") }, { type: "error" }] }, { name: "Write", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("int") }, { type: "error" }] }],
+		() => [{ name: "Close", args: [], returns: [{ type: "error" }], pointerReceiver: true }, { name: "Read", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("int") }, { type: "error" }], pointerReceiver: true }, { name: "Write", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("int") }, { type: "error" }], pointerReceiver: true }],
 		readWriteCloser,
 		() => []
 	)
@@ -105,13 +107,28 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("stream", written, err == null, await $.pointerValue<Exclude<io.ReadWriteCloser, null>>(stream).Close() == null)
 
 	let keys: $.Channel<crypto.PublicKey | null> | null = $.makeChannel<crypto.PublicKey | null>(1, null! as crypto.PublicKey | null, "both")
-	await $.chanSend(keys, $.namedValueInterfaceValue<crypto.PublicKey | null>(new Uint8Array([1, 2, 3]) as $.Slice<number>, "ed25519.PublicKey", {Equal: (receiver: any, ...args: any[]) => (ed25519.PublicKey_Equal as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"), "ed25519.PublicKey"), [$.methodSignature("Equal", [["x", "crypto.PublicKey"]], [/* @__PURE__ */ $.basicType("bool")])]))
+	await $.chanSend(keys, $.namedValueInterfaceValue<crypto.PublicKey | null>(new Uint8Array([1, 2, 3]) as $.Slice<number>, "ed25519.PublicKey", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()))
 	let key: ed25519.PublicKey = ($.mustTypeAssert<ed25519.PublicKey>((await $.chanRecv(keys)), /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"), "ed25519.PublicKey")) as ed25519.PublicKey)
-	await $.println("key", $.len((key as ed25519.PublicKey)), $.uint($.arrayIndex(key!, 0), 8))
+	await $.println("key", $.sliceLen((key as ed25519.PublicKey)), $.uint($.arrayIndex(key!, 0), 8))
 
 	let target: $.VarRef<recreateError | $.VarRef<recreateError> | null> = $.varRef(null! as recreateError | $.VarRef<recreateError> | null)
 	let matched = errors.As($.pointerValueOrNil($.interfaceValue<$.GoError>(new recreateError({next: 7n}), "*main.recreateError", /* @__PURE__ */ $.pointerType("main.recreateError")))!, $.interfaceValue(target, "**main.recreateError", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.pointerType("main.recreateError"))))
 	await $.println("error", matched, $.pointerValue<recreateError>(target.value).next)
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= ({Equal: (receiver: any, ...args: any[]) => (ed25519.PublicKey_Equal as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))})
+}
+
+var __goscriptStatic1$value: any
+function __goscriptStatic1(): any {
+	return __goscriptStatic1$value ??= (/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"), "ed25519.PublicKey"))
+}
+
+var __goscriptStatic2$value: any
+function __goscriptStatic2(): any {
+	return __goscriptStatic2$value ??= ([$.methodSignature("Equal", [["x", "crypto.PublicKey"]], [/* @__PURE__ */ $.basicType("bool")])])
 }
 
 var __goscriptAwait: any

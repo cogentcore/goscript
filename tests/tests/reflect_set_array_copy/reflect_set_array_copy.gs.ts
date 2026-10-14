@@ -7,11 +7,29 @@ import * as reflect from "@goscript/reflect/index.js"
 import "@goscript/reflect/index.js"
 
 export class Pose {
-	public declare M: number[]
+	public get M(): number[] {
+		return this._fields.M
+	}
 
-	public declare A: number[]
+	public set M(value: number[]) {
+		this._fields.M = value
+	}
 
-	public declare Inner: {"B": number[]}
+	public get A(): number[] {
+		return this._fields.A
+	}
+
+	public set A(value: number[]) {
+		this._fields.A = value
+	}
+
+	public get Inner(): {"B": number[]} {
+		return this._fields.Inner
+	}
+
+	public set Inner(value: {"B": number[]}) {
+		this._fields.Inner = value
+	}
 
 	public _fields: {
 		M: number[]
@@ -31,8 +49,12 @@ export class Pose {
 		return $.markAsStructValue(new Pose(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["M", "A", "Inner"])
+	public __goscriptAssign(source: Pose): void {
+		const target = this._fields
+		const values = source._fields
+		target.M = $.assignFieldValue(target.M, values.M, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 4))
+		target.A = $.assignFieldValue(target.A, values.A, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2))
+		$.assignStruct(target.Inner, values.Inner)
 	}
 
 	static __typeInfo = $.registerStructType(

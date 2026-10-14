@@ -31,15 +31,45 @@ export type Style = globalThis.Map<Tokens, string> | null
 $.registerNamedType("main.Style", /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("int32", "main.Tokens"), /* @__PURE__ */ $.basicType("string")));
 
 export class Doc {
-	public declare Kind: Tokens
+	public get Kind(): Tokens {
+		return this._fields.Kind
+	}
 
-	public declare Kinds: $.Slice<Tokens>
+	public set Kind(value: Tokens) {
+		this._fields.Kind = value
+	}
 
-	public declare Styles: globalThis.Map<string, Style> | null
+	public get Kinds(): $.Slice<Tokens> {
+		return this._fields.Kinds
+	}
 
-	public declare Counts: globalThis.Map<number, number> | null
+	public set Kinds(value: $.Slice<Tokens>) {
+		this._fields.Kinds = value
+	}
 
-	public declare Big: globalThis.Map<bigint, string> | null
+	public get Styles(): globalThis.Map<string, Style> | null {
+		return this._fields.Styles
+	}
+
+	public set Styles(value: globalThis.Map<string, Style> | null) {
+		this._fields.Styles = value
+	}
+
+	public get Counts(): globalThis.Map<number, number> | null {
+		return this._fields.Counts
+	}
+
+	public set Counts(value: globalThis.Map<number, number> | null) {
+		this._fields.Counts = value
+	}
+
+	public get Big(): globalThis.Map<bigint, string> | null {
+		return this._fields.Big
+	}
+
+	public set Big(value: globalThis.Map<bigint, string> | null) {
+		this._fields.Big = value
+	}
 
 	public _fields: {
 		Kind: Tokens
@@ -63,8 +93,14 @@ export class Doc {
 		return $.markAsStructValue(new Doc(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Kind", "Kinds", "Styles", "Counts", "Big"])
+	public __goscriptAssign(source: Doc): void {
+		const target = this._fields
+		const values = source._fields
+		target.Kind = values.Kind
+		target.Kinds = values.Kinds
+		target.Styles = values.Styles
+		target.Counts = values.Counts
+		target.Big = values.Big
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -97,11 +133,11 @@ export function Tokens_MarshalText(t: Tokens): [$.Slice<number>, $.GoError] {
 }
 
 export async function Tokens_UnmarshalText(t: $.VarRef<Tokens> | null, text: $.Slice<number>): globalThis.Promise<$.GoError> {
-	if ($.len(text) == 0) {
+	if ($.sliceLen(text) == 0) {
 		await $.println("empty token")
 	}
-	for (let __goscriptRangeTarget0 = tokenNames, i = 0; i < $.len(__goscriptRangeTarget0); i++) {
-		let n = __goscriptRangeTarget0![i]
+	for (let __goscriptRangeTarget0 = tokenNames, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), i = 0; i < __goscriptRangeWindow0.length; i++) {
+		let n = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + i] as string)
 		if ($.stringEqual(n, $.bytesToString(text))) {
 			t!.value = $.int($.int(i, 32), 32)
 			return null
@@ -115,7 +151,7 @@ export async function main(): globalThis.Promise<void> {
 	{
 		let err = await json.Unmarshal(new Uint8Array([123, 34, 75, 101, 121, 119, 111, 114, 100, 34, 58, 34, 98, 111, 108, 100, 34, 44, 34, 66, 97, 99, 107, 103, 114, 111, 117, 110, 100, 34, 58, 34, 119, 104, 105, 116, 101, 34, 125]), $.interfaceValue(s, "*main.Style", /* @__PURE__ */ $.pointerType("main.Style")))
 		if (err != null) {
-			await $.println("error:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+			await $.println("error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		}
 	}
 	await $.println("len:", $.len(s.value))
@@ -125,12 +161,12 @@ export async function main(): globalThis.Promise<void> {
 	}
 
 	let d: $.VarRef<Doc> = $.varRef($.markAsStructValue(new Doc()))
-	let err = await json.Unmarshal(new Uint8Array([123, 34, 75, 105, 110, 100, 34, 58, 34, 67, 111, 109, 109, 101, 110, 116, 34, 44, 34, 75, 105, 110, 100, 115, 34, 58, 91, 34, 75, 101, 121, 119, 111, 114, 100, 34, 44, 34, 66, 97, 99, 107, 103, 114, 111, 117, 110, 100, 34, 93, 44, 34, 83, 116, 121, 108, 101, 115, 34, 58, 123, 34, 120, 34, 58, 123, 34, 67, 111, 109, 109, 101, 110, 116, 34, 58, 34, 103, 114, 97, 121, 34, 125, 125, 44, 34, 67, 111, 117, 110, 116, 115, 34, 58, 123, 34, 49, 34, 58, 50, 44, 34, 45, 51, 34, 58, 52, 125, 44, 34, 66, 105, 103, 34, 58, 123, 34, 57, 48, 48, 55, 49, 57, 57, 50, 53, 52, 55, 52, 48, 57, 57, 51, 34, 58, 34, 98, 105, 103, 34, 125, 125]), $.interfaceValue(d, "*main.Doc", /* @__PURE__ */ $.pointerType("main.Doc")))
+	let err: $.GoError = await json.Unmarshal(new Uint8Array([123, 34, 75, 105, 110, 100, 34, 58, 34, 67, 111, 109, 109, 101, 110, 116, 34, 44, 34, 75, 105, 110, 100, 115, 34, 58, 91, 34, 75, 101, 121, 119, 111, 114, 100, 34, 44, 34, 66, 97, 99, 107, 103, 114, 111, 117, 110, 100, 34, 93, 44, 34, 83, 116, 121, 108, 101, 115, 34, 58, 123, 34, 120, 34, 58, 123, 34, 67, 111, 109, 109, 101, 110, 116, 34, 58, 34, 103, 114, 97, 121, 34, 125, 125, 44, 34, 67, 111, 117, 110, 116, 115, 34, 58, 123, 34, 49, 34, 58, 50, 44, 34, 45, 51, 34, 58, 52, 125, 44, 34, 66, 105, 103, 34, 58, 123, 34, 57, 48, 48, 55, 49, 57, 57, 50, 53, 52, 55, 52, 48, 57, 57, 51, 34, 58, 34, 98, 105, 103, 34, 125, 125]), $.interfaceValue(d, "*main.Doc", /* @__PURE__ */ $.pointerType("main.Doc")))
 	if (err != null) {
-		await $.println("error:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+		await $.println("error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	}
 	await $.println("comment:", $.mapGet<Tokens, string, string>($.mapGet<string, Style, Style>(d.value.Styles, "x", null)[0], 2, "")[0])
-	await $.println("kind:", Tokens_String(d.value.Kind), "kinds:", $.len(d.value.Kinds), Tokens_String($.arrayIndex(d.value.Kinds!, 0)), Tokens_String($.arrayIndex(d.value.Kinds!, 1)))
+	await $.println("kind:", Tokens_String(d.value.Kind), "kinds:", $.sliceLen(d.value.Kinds), Tokens_String($.arrayIndex(d.value.Kinds!, 0)), Tokens_String($.arrayIndex(d.value.Kinds!, 1)))
 	let __goscriptTuple0: any = json.Marshal($.interfaceValue($.markAsStructValue(new Doc({Kind: 1, Kinds: $.arrayToSlice<Tokens>([2])})), "main.Doc", "main.Doc"))
 	let b: $.Slice<number> = __goscriptTuple0[0]
 	await $.println("marshal doc:", $.bytesToString(b))
@@ -141,7 +177,7 @@ export async function main(): globalThis.Promise<void> {
 	b = __goscriptTuple1[0]
 	err = __goscriptTuple1[1]
 	if (err != null) {
-		await $.println("error:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+		await $.println("error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	}
 	await $.println("marshal:", $.bytesToString(b))
 	let __goscriptTuple2: any = json.Marshal($.interfaceValue($.makeMap<number, boolean>([[3, true], [1, false]]), "map[int]bool", /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("bool"))))
@@ -157,8 +193,10 @@ export async function main(): globalThis.Promise<void> {
 		keys = $.append(keys, k)
 	}
 	sort.Strings(keys)
-	await $.println("styles keys:", $.len(keys), $.arrayIndex(keys!, 0))
+	await $.println("styles keys:", $.sliceLen(keys), $.arrayIndex(keys!, 0))
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

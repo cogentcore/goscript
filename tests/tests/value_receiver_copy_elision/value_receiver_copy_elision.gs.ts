@@ -4,9 +4,21 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class vec {
-	public declare X: number
+	public get X(): number {
+		return this._fields.X
+	}
 
-	public declare Y: number
+	public set X(value: number) {
+		this._fields.X = value
+	}
+
+	public get Y(): number {
+		return this._fields.Y
+	}
+
+	public set Y(value: number) {
+		this._fields.Y = value
+	}
 
 	public _fields: {
 		X: number
@@ -24,6 +36,13 @@ export class vec {
 		return $.markAsStructValue(new vec(this))
 	}
 
+	public __goscriptAssign(source: vec): void {
+		const target = this._fields
+		const values = source._fields
+		target.X = values.X
+		target.Y = values.Y
+	}
+
 	public Bump(): number {
 		let v: vec = this;
 		v.X++
@@ -35,7 +54,7 @@ export class vec {
 		let f: (() => void) | null = $.functionValue((): void => {
 			v.X = 100
 		}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo))
-		await f!()
+		void (__goscriptAwait = f!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 		return v.X
 	}
 
@@ -60,21 +79,23 @@ export class vec {
 		$.pointerValue<vec>(v).Y++
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["X", "Y"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.vec",
 		() => new vec(),
-		() => [{ name: "Bump", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }, { name: "BumpInClosure", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }, { name: "BumpViaPointer", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }, { name: "Keep", args: [], returns: [{ type: "main.vec" }] }, { name: "Sum", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }, { name: "inc", args: [], returns: [] }],
+		() => [{ name: "Bump", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }, { name: "BumpInClosure", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }, { name: "BumpViaPointer", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }, { name: "Keep", args: [], returns: [{ type: "main.vec" }] }, { name: "Sum", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }, { name: "inc", args: [], returns: [], pointerReceiver: true }],
 		vec,
 		() => [{ name: "X", key: "X", type: /* @__PURE__ */ $.basicType("int") }, { name: "Y", key: "Y", type: /* @__PURE__ */ $.basicType("int") }]
 	)
 }
 
 export class holder {
-	public declare v: vec
+	public get v(): vec {
+		return this._fields.v
+	}
+
+	public set v(value: vec) {
+		this._fields.v = value
+	}
 
 	public _fields: {
 		v: vec
@@ -90,8 +111,10 @@ export class holder {
 		return $.markAsStructValue(new holder(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["v"])
+	public __goscriptAssign(source: holder): void {
+		const target = this._fields
+		const values = source._fields
+		$.assignStruct(target.v, values.v)
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -117,6 +140,8 @@ export async function main(): globalThis.Promise<void> {
 	let p: vec | $.VarRef<vec> | null = a
 	await $.println("via pointer", $.pointerValue<vec>(p).Sum(), $.markAsStructValue($.cloneStructValue($.pointerValue<vec>(p))).Bump(), $.pointerValue<vec>(p).X)
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

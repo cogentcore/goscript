@@ -14,7 +14,13 @@ $.registerInterfaceType(
 );
 
 export class item {
-	public declare value: string
+	public get value(): string {
+		return this._fields.value
+	}
+
+	public set value(value: string) {
+		this._fields.value = value
+	}
 
 	public _fields: {
 		value: string
@@ -44,23 +50,19 @@ export class item {
 		return new item({value: $.pointerValue<item>(i).value})
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["value"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.item",
 		() => new item(),
-		() => [{ name: "CloneVT", args: [], returns: [{ type: /* @__PURE__ */ $.pointerType("main.item") }] }],
+		() => [{ name: "CloneVT", args: [], returns: [{ type: /* @__PURE__ */ $.pointerType("main.item") }], pointerReceiver: true }],
 		item,
 		() => [{ name: "value", key: "value", type: /* @__PURE__ */ $.basicType("string") }]
 	)
 }
 
 export async function cloneSlice<T>(__typeArgs: $.GenericTypeArgs | undefined, items: $.Slice<T>): globalThis.Promise<$.Slice<T>> {
-	let cloned: $.Slice<T> = $.makeSlice<T>(0, $.len(items), undefined, () => ($.genericZero(__typeArgs, "T", null) as T))
-	for (let __goscriptRangeTarget0 = items, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
-		let item = __goscriptRangeTarget0![__rangeIndex]
+	let cloned: $.Slice<T> = $.makeSlice<T>(0, $.sliceLen(items), undefined, () => ($.genericZero(__typeArgs, "T", null) as T))
+	for (let __goscriptRangeTarget0 = items, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
+		let item = $.copyElement((__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as any))
 		cloned = $.append(cloned, (__goscriptAwait = $.callGenericMethod(__typeArgs, "T", "CloneVT", item), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), $.appendZero(() => ($.genericZero(__typeArgs, "T", null) as T)))
 	}
 	return cloned
@@ -68,8 +70,13 @@ export async function cloneSlice<T>(__typeArgs: $.GenericTypeArgs | undefined, i
 
 export async function main(): globalThis.Promise<void> {
 	let items: $.Slice<item | $.VarRef<item> | null> = $.arrayToSlice<item | $.VarRef<item> | null>([new item({value: "first"}), new item({value: "second"})])
-	let cloned: $.Slice<item | $.VarRef<item> | null> = (await cloneSlice({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.pointerType("main.item"), zero: () => null, methods: {CloneVT: (receiver: any, ...args: any[]) => $.pointerValue(receiver).CloneVT(...$.stripGenericTypeArgs(args))} }}, items) as $.Slice<item | $.VarRef<item> | null>)
-	await $.println($.len(cloned), $.pointerValue<item>($.arrayIndex(cloned!, 0)).value, $.pointerValue<item>($.arrayIndex(cloned!, 1)).value, $.pointerEqual($.arrayIndex(cloned!, 0), $.arrayIndex(items!, 0)))
+	let cloned: $.Slice<item | $.VarRef<item> | null> = (await cloneSlice(__goscriptStatic0(), items) as $.Slice<item | $.VarRef<item> | null>)
+	await $.println($.sliceLen(cloned), $.pointerValue<item>($.arrayIndex(cloned!, 0)).value, $.pointerValue<item>($.arrayIndex(cloned!, 1)).value, $.pointerEqual($.arrayIndex(cloned!, 0), $.arrayIndex(items!, 0)))
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.pointerType("main.item"), zero: () => null, methods: {CloneVT: (receiver: any, ...args: any[]) => $.pointerValue(receiver).CloneVT(...$.stripGenericTypeArgs(args))} }})
 }
 
 var __goscriptAwait: any

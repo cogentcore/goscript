@@ -21,7 +21,13 @@ $.registerInterfaceType(
 );
 
 export class Node {
-	public declare Name: string
+	public get Name(): string {
+		return this._fields.Name
+	}
+
+	public set Name(value: string) {
+		this._fields.Name = value
+	}
 
 	public _fields: {
 		Name: string
@@ -37,8 +43,10 @@ export class Node {
 		return $.markAsStructValue(new Node(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Name"])
+	public __goscriptAssign(source: Node): void {
+		const target = this._fields
+		const values = source._fields
+		target.Name = values.Name
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -51,7 +59,13 @@ export class Node {
 }
 
 export class Box {
-	public declare Value: any
+	public get Value(): any {
+		return this._fields.Value
+	}
+
+	public set Value(value: any) {
+		this._fields.Value = value
+	}
 
 	public _fields: {
 		Value: any
@@ -59,7 +73,7 @@ export class Box {
 
 	constructor(init?: Partial<{Value?: any}>) {
 		this._fields = {
-			Value: init?.Value ?? (null! as any)
+			Value: init?.Value !== undefined ? $.copyElement(init.Value) : (null! as any)
 		}
 	}
 
@@ -67,8 +81,10 @@ export class Box {
 		return $.markAsStructValue(new Box(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Value"])
+	public __goscriptAssign(source: Box): void {
+		const target = this._fields
+		const values = source._fields
+		target.Value = $.assignFieldValue(target.Value, values.Value, { kind: $.TypeKind.Interface, methods: [] })
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -82,7 +98,13 @@ export class Box {
 
 export function LocalType(): reflect.Type | null {
 	class local {
-		public declare A: number
+		public get A(): number {
+			return this._fields.A
+		}
+
+		public set A(value: number) {
+			this._fields.A = value
+		}
 
 		public _fields: {
 			A: number
@@ -98,8 +120,10 @@ export function LocalType(): reflect.Type | null {
 			return $.markAsStructValue(new local(this))
 		}
 
-		static {
-			$.bindStructFields(this.prototype, ["A"])
+		public __goscriptAssign(source: local): void {
+			const target = this._fields
+			const values = source._fields
+			target.A = values.A
 		}
 
 		static __typeInfo = $.registerStructType(

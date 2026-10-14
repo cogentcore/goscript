@@ -47,12 +47,22 @@ export class MyType {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let t = reflect.TypeFor({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.MyType", zero: () => $.markAsStructValue(new MyType()), methods: {String: (receiver: any, ...args: any[]) => $.pointerValue(receiver).String(...$.stripGenericTypeArgs(args))} }})
+	let t = reflect.TypeFor(__goscriptStatic0())
 	let ptr = reflect.PointerTo($.pointerValueOrNil(t)!)
-	let iface = reflect.TypeFor({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.Stringer", zero: () => null, methods: {String: (receiver: any, ...args: any[]) => receiver.String(...$.stripGenericTypeArgs(args))} }})
+	let iface = reflect.TypeFor(__goscriptStatic1())
 
 	await $.println("MyType implements Stringer:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(t).Implements($.pointerValueOrNil(iface)!), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	await $.println("*MyType implements Stringer:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(ptr).Implements($.pointerValueOrNil(iface)!), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.MyType", zero: () => $.markAsStructValue(new MyType()), methods: {String: (receiver: any, ...args: any[]) => $.pointerValue(receiver).String(...$.stripGenericTypeArgs(args))} }})
+}
+
+var __goscriptStatic1$value: any
+function __goscriptStatic1(): any {
+	return __goscriptStatic1$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.Stringer", zero: () => null, methods: {String: (receiver: any, ...args: any[]) => receiver.String(...$.stripGenericTypeArgs(args))} }})
 }
 
 var __goscriptAwait: any

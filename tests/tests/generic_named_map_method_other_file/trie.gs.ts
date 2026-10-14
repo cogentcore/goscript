@@ -7,6 +7,8 @@ export type trie = globalThis.Map<number, any> | null
 
 export type names = globalThis.Map<string, number> | null
 
+$.registerNamedType("main.names", /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("int")));
+
 $.registerNamedValueType(
 	"main.names",
 	{add: (receiver: any, ...args: any[]) => (names_add as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
@@ -23,12 +25,12 @@ export function trie_insert(tr: trie, __typeArgs: $.GenericTypeArgs | undefined,
 	{
 		let [old, ok] = $.mapGet<number, any, any>(tr, key, null)
 		if (ok) {
-			return [old, $.len(tr)]
+			return [$.copyElement(old), $.len(tr)]
 		}
 	}
-	$.mapSet(tr, key, val)
+	$.mapSet(tr, key, $.copyElement(val))
 	let zero: any = $.genericZero(__typeArgs, "V", null)
-	return [zero, $.len(tr)]
+	return [$.copyElement(zero), $.len(tr)]
 }
 
 export function names_add(n: names, name: string): number {

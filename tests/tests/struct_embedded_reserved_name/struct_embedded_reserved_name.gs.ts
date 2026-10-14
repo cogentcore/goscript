@@ -4,7 +4,13 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class _object {
-	public declare name: string
+	public get name(): string {
+		return this._fields.name
+	}
+
+	public set name(value: string) {
+		this._fields.name = value
+	}
 
 	public _fields: {
 		name: string
@@ -20,28 +26,42 @@ export class _object {
 		return $.markAsStructValue(new _object(this))
 	}
 
+	public __goscriptAssign(source: _object): void {
+		const target = this._fields
+		const values = source._fields
+		target.name = values.name
+	}
+
 	public Name(): string {
 		const o: _object | $.VarRef<_object> | null = this;
 		return $.pointerValue<_object>(o).name
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["name"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.object",
 		() => new _object(),
-		() => [{ name: "Name", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }],
+		() => [{ name: "Name", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }], pointerReceiver: true }],
 		_object,
 		() => [{ name: "name", key: "name", type: /* @__PURE__ */ $.basicType("string") }]
 	)
 }
 
 export class Var {
-	public declare _object: _object
+	public get _object(): _object {
+		return this._fields._object
+	}
 
-	public declare kind: number
+	public set _object(value: _object) {
+		this._fields._object = value
+	}
+
+	public get kind(): number {
+		return this._fields.kind
+	}
+
+	public set kind(value: number) {
+		this._fields.kind = value
+	}
 
 	public _fields: {
 		_object: _object
@@ -59,25 +79,34 @@ export class Var {
 		return $.markAsStructValue(new Var(this))
 	}
 
-	public Name(): any {
-		return $.pointerValue<_object>(this._object).Name()
+	public __goscriptAssign(source: Var): void {
+		const target = this._fields
+		const values = source._fields
+		$.assignStruct(target._object, values._object)
+		target.kind = values.kind
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["_object", "kind"])
+	public Name(): any {
+		return $.pointerValue<_object>(this._object).Name()
 	}
 
 	static __typeInfo = $.registerStructType(
 		"main.Var",
 		() => new Var(),
-		() => [{ name: "Name", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }],
+		() => [{ name: "Name", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }], pointerReceiver: true }],
 		Var,
 		() => [{ name: "object", key: "_object", type: "main.object", anonymous: true }, { name: "kind", key: "kind", type: /* @__PURE__ */ $.basicType("int") }]
 	)
 }
 
 export class _number {
-	public declare n: number
+	public get n(): number {
+		return this._fields.n
+	}
+
+	public set n(value: number) {
+		this._fields.n = value
+	}
 
 	public _fields: {
 		n: number
@@ -93,8 +122,10 @@ export class _number {
 		return $.markAsStructValue(new _number(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["n"])
+	public __goscriptAssign(source: _number): void {
+		const target = this._fields
+		const values = source._fields
+		target.n = values.n
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -107,9 +138,21 @@ export class _number {
 }
 
 export class Holder {
-	public declare _number: _number | $.VarRef<_number> | null
+	public get _number(): _number | $.VarRef<_number> | null {
+		return this._fields._number
+	}
 
-	public declare _string: string
+	public set _number(value: _number | $.VarRef<_number> | null) {
+		this._fields._number = value
+	}
+
+	public get _string(): string {
+		return this._fields._string
+	}
+
+	public set _string(value: string) {
+		this._fields._string = value
+	}
 
 	public _fields: {
 		_number: _number | $.VarRef<_number> | null
@@ -127,8 +170,11 @@ export class Holder {
 		return $.markAsStructValue(new Holder(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["_number", "_string"])
+	public __goscriptAssign(source: Holder): void {
+		const target = this._fields
+		const values = source._fields
+		target._number = values._number
+		target._string = values._string
 	}
 
 	static __typeInfo = $.registerStructType(

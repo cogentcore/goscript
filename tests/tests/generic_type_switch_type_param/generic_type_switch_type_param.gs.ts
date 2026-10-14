@@ -7,9 +7,21 @@ import * as fmt from "@goscript/fmt/index.js"
 import "@goscript/fmt/index.js"
 
 export class Value {
-	public declare Val: number
+	public get Val(): number {
+		return this._fields.Val
+	}
 
-	public declare Unit: string
+	public set Val(value: number) {
+		this._fields.Val = value
+	}
+
+	public get Unit(): string {
+		return this._fields.Unit
+	}
+
+	public set Unit(value: string) {
+		this._fields.Unit = value
+	}
 
 	public _fields: {
 		Val: number
@@ -27,13 +39,16 @@ export class Value {
 		return $.markAsStructValue(new Value(this))
 	}
 
+	public __goscriptAssign(source: Value): void {
+		const target = this._fields
+		const values = source._fields
+		target.Val = values.Val
+		target.Unit = values.Unit
+	}
+
 	public async String(): globalThis.Promise<string> {
 		const v = this;
 		return fmt.Sprintf("%g%s", $.basicInterfaceValue(v.Val, "float32"), v.Unit)
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["Val", "Unit"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -46,9 +61,21 @@ export class Value {
 }
 
 export class Sides {
-	public declare Top: any
+	public get Top(): any {
+		return this._fields.Top
+	}
 
-	public declare Right: any
+	public set Top(value: any) {
+		this._fields.Top = value
+	}
+
+	public get Right(): any {
+		return this._fields.Right
+	}
+
+	public set Right(value: any) {
+		this._fields.Right = value
+	}
 
 	public _fields: {
 		Top: any
@@ -57,13 +84,20 @@ export class Sides {
 
 	constructor(init?: Partial<{Top?: any, Right?: any}>) {
 		this._fields = {
-			Top: init?.Top ?? (null! as any),
-			Right: init?.Right ?? (null! as any)
+			Top: init?.Top !== undefined ? $.copyElement(init.Top) : (null! as any),
+			Right: init?.Right !== undefined ? $.copyElement(init.Right) : (null! as any)
 		}
 	}
 
 	public clone(): Sides {
 		return $.markAsStructValue(new Sides(this))
+	}
+
+	public __goscriptAssign(source: Sides): void {
+		const target = this._fields
+		const values = source._fields
+		target.Top = $.assignFieldValue(target.Top, values.Top, { kind: $.TypeKind.Interface, methods: [] })
+		target.Right = $.assignFieldValue(target.Right, values.Right, { kind: $.TypeKind.Interface, methods: [] })
 	}
 
 	public async SetAny(__typeArgs: $.GenericTypeArgs | undefined, a: any): globalThis.Promise<string> {
@@ -88,8 +122,8 @@ export class Sides {
 				case $.typeAssert<any>(__goscriptTypeSwitchValue, __typeArgs?.["T"]?.type ?? { kind: $.TypeKind.Interface, methods: [] }).ok:
 					{
 						let val: any = $.typeAssert<any>(__goscriptTypeSwitchValue, __typeArgs?.["T"]?.type ?? { kind: $.TypeKind.Interface, methods: [] }).value
-						let __goscriptAssign0_0: any = val
-						let __goscriptAssign0_1: any = val
+						let __goscriptAssign0_0: any = $.copyElement(val)
+						let __goscriptAssign0_1: any = $.copyElement(val)
 						$.pointerValue<Sides>(s).Top = __goscriptAssign0_0
 						$.pointerValue<Sides>(s).Right = __goscriptAssign0_1
 						return "T"
@@ -98,8 +132,8 @@ export class Sides {
 				case $.typeAssert<any>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.pointerType(__typeArgs?.["T"]?.type ?? { kind: $.TypeKind.Interface, methods: [] })).ok:
 					{
 						let val: any = $.typeAssert<any>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.pointerType(__typeArgs?.["T"]?.type ?? { kind: $.TypeKind.Interface, methods: [] })).value
-						let __goscriptAssign1_0: any = $.pointerValue<any>(val)
-						let __goscriptAssign1_1: any = $.pointerValue<any>(val)
+						let __goscriptAssign1_0: any = $.copyElement($.pointerValue<any>(val))
+						let __goscriptAssign1_1: any = $.copyElement($.pointerValue<any>(val))
 						$.pointerValue<Sides>(s).Top = __goscriptAssign1_0
 						$.pointerValue<Sides>(s).Right = __goscriptAssign1_1
 						return "*T"
@@ -108,8 +142,8 @@ export class Sides {
 				case $.typeAssert<$.Slice<any>>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.sliceType(__typeArgs?.["T"]?.type ?? { kind: $.TypeKind.Interface, methods: [] })).ok:
 					{
 						let val: $.Slice<any> = $.typeAssert<$.Slice<any>>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.sliceType(__typeArgs?.["T"]?.type ?? { kind: $.TypeKind.Interface, methods: [] })).value
-						let __goscriptAssign2_0: any = $.arrayIndex(val!, 0)
-						let __goscriptAssign2_1: any = $.arrayIndex(val!, 1)
+						let __goscriptAssign2_0: any = $.copyElement($.arrayIndex(val!, 0))
+						let __goscriptAssign2_1: any = $.copyElement($.arrayIndex(val!, 1))
 						$.pointerValue<Sides>(s).Top = __goscriptAssign2_0
 						$.pointerValue<Sides>(s).Right = __goscriptAssign2_1
 						return "[]T"
@@ -132,14 +166,10 @@ export class Sides {
 		throw new globalThis.Error("goscript: unreachable return")
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Top", "Right"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.Sides",
 		() => new Sides(),
-		() => [{ name: "SetAny", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }],
+		() => [{ name: "SetAny", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("string") }], pointerReceiver: true }],
 		Sides,
 		() => [{ name: "Top", key: "Top", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "Right", key: "Right", type: { kind: $.TypeKind.Interface, methods: [] } }]
 	)
@@ -147,23 +177,53 @@ export class Sides {
 
 export async function main(): globalThis.Promise<void> {
 	let s: $.VarRef<Sides> = $.varRef($.markAsStructValue(new Sides({Top: $.markAsStructValue(new Value()), Right: $.markAsStructValue(new Value())})))
-	await $.println(await s.value.SetAny({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.Value", zero: () => $.markAsStructValue(new Value()), methods: {String: (receiver: any, ...args: any[]) => $.pointerValue(receiver).String(...$.stripGenericTypeArgs(args))} }}, "3px"))
-	await $.println(await s.value.SetAny({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.Value", zero: () => $.markAsStructValue(new Value()), methods: {String: (receiver: any, ...args: any[]) => $.pointerValue(receiver).String(...$.stripGenericTypeArgs(args))} }}, $.interfaceValue($.markAsStructValue(new Value({Val: 1, Unit: "px"})), "main.Value", "main.Value")), await $.markAsStructValue($.cloneStructValue(s.value.Top)).String())
-	await $.println(await s.value.SetAny({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.Value", zero: () => $.markAsStructValue(new Value()), methods: {String: (receiver: any, ...args: any[]) => $.pointerValue(receiver).String(...$.stripGenericTypeArgs(args))} }}, $.interfaceValue(new Value({Val: 2, Unit: "em"}), "*main.Value", /* @__PURE__ */ $.pointerType("main.Value"))), await $.markAsStructValue($.cloneStructValue(s.value.Right)).String())
-	await $.println(await s.value.SetAny({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.Value", zero: () => $.markAsStructValue(new Value()), methods: {String: (receiver: any, ...args: any[]) => $.pointerValue(receiver).String(...$.stripGenericTypeArgs(args))} }}, $.interfaceValue($.arrayToSlice<Value>([$.markAsStructValue(new Value({Val: 3, Unit: "a"})), $.markAsStructValue(new Value({Val: 4, Unit: "b"}))]), "[]main.Value", /* @__PURE__ */ $.sliceType("main.Value"))), await $.markAsStructValue($.cloneStructValue(s.value.Top)).String(), await $.markAsStructValue($.cloneStructValue(s.value.Right)).String())
-	await $.println(await s.value.SetAny({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.Value", zero: () => $.markAsStructValue(new Value()), methods: {String: (receiver: any, ...args: any[]) => $.pointerValue(receiver).String(...$.stripGenericTypeArgs(args))} }}, $.interfaceValue($.markAsStructValue(new Sides({Top: $.markAsStructValue(new Value({Val: 5, Unit: "c"})), Right: $.markAsStructValue(new Value())})), "main.Sides", "main.Sides")), await $.markAsStructValue($.cloneStructValue(s.value.Top)).String())
-	await $.println(await s.value.SetAny({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.Value", zero: () => $.markAsStructValue(new Value()), methods: {String: (receiver: any, ...args: any[]) => $.pointerValue(receiver).String(...$.stripGenericTypeArgs(args))} }}, $.namedValueInterfaceValue<any>(new Sides({Right: $.markAsStructValue(new Value({Val: 6, Unit: "d"})), Top: $.markAsStructValue(new Value())}), "*main.Sides", {SetAny: (receiver: any, ...args: any[]) => $.pointerValue(receiver).SetAny({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.Value", zero: () => $.markAsStructValue(new Value()), methods: {String: (receiver: any, ...args: any[]) => $.pointerValue(receiver).String(...$.stripGenericTypeArgs(args))} }}, ...$.stripGenericTypeArgs(args))}, /* @__PURE__ */ $.pointerType("main.Sides"), [$.methodSignature("SetAny", [["a", { kind: $.TypeKind.Interface, methods: [] }]], [/* @__PURE__ */ $.basicType("string")])])), await $.markAsStructValue($.cloneStructValue(s.value.Right)).String())
-	await $.println(await s.value.SetAny({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.Value", zero: () => $.markAsStructValue(new Value()), methods: {String: (receiver: any, ...args: any[]) => $.pointerValue(receiver).String(...$.stripGenericTypeArgs(args))} }}, $.basicInterfaceValue(7, "int")))
+	await $.println(await s.value.SetAny(__goscriptStatic0(), "3px"))
+	await $.println(await s.value.SetAny(__goscriptStatic0(), $.interfaceValue($.markAsStructValue(new Value({Val: 1, Unit: "px"})), "main.Value", "main.Value")), await $.markAsStructValue($.cloneStructValue(s.value.Top)).String())
+	await $.println(await s.value.SetAny(__goscriptStatic0(), $.interfaceValue(new Value({Val: 2, Unit: "em"}), "*main.Value", /* @__PURE__ */ $.pointerType("main.Value"))), await $.markAsStructValue($.cloneStructValue(s.value.Right)).String())
+	await $.println(await s.value.SetAny(__goscriptStatic0(), $.interfaceValue($.arrayToSlice<Value>([$.markAsStructValue(new Value({Val: 3, Unit: "a"})), $.markAsStructValue(new Value({Val: 4, Unit: "b"}))]), "[]main.Value", /* @__PURE__ */ $.sliceType("main.Value"))), await $.markAsStructValue($.cloneStructValue(s.value.Top)).String(), await $.markAsStructValue($.cloneStructValue(s.value.Right)).String())
+	await $.println(await s.value.SetAny(__goscriptStatic0(), $.interfaceValue($.markAsStructValue(new Sides({Top: $.markAsStructValue(new Value({Val: 5, Unit: "c"})), Right: $.markAsStructValue(new Value())})), "main.Sides", "main.Sides")), await $.markAsStructValue($.cloneStructValue(s.value.Top)).String())
+	await $.println(await s.value.SetAny(__goscriptStatic0(), $.namedValueInterfaceValue<any>(new Sides({Right: $.markAsStructValue(new Value({Val: 6, Unit: "d"})), Top: $.markAsStructValue(new Value())}), "*main.Sides", __goscriptStatic1(), __goscriptStatic2(), __goscriptStatic3())), await $.markAsStructValue($.cloneStructValue(s.value.Right)).String())
+	await $.println(await s.value.SetAny(__goscriptStatic0(), $.basicInterfaceValue(7, "int")))
 
 	let f: $.VarRef<Sides> = $.varRef($.markAsStructValue(new Sides({Top: 0, Right: 0})))
-	await $.println(await f.value.SetAny({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("float32"), zero: () => 0 }}, $.basicInterfaceValue(1.5, "float32")), f.value.Top)
-	await $.println(await f.value.SetAny({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("float32"), zero: () => 0 }}, $.basicInterfaceValue(1.5, "float64")))
-	await $.println(await f.value.SetAny({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("float32"), zero: () => 0 }}, "x"))
+	await $.println(await f.value.SetAny(__goscriptStatic4(), $.basicInterfaceValue(1.5, "float32")), f.value.Top)
+	await $.println(await f.value.SetAny(__goscriptStatic4(), $.basicInterfaceValue(1.5, "float64")))
+	await $.println(await f.value.SetAny(__goscriptStatic4(), "x"))
 
 	let i: $.VarRef<Sides> = $.varRef($.markAsStructValue(new Sides({Top: 0, Right: 0})))
-	await $.println(await i.value.SetAny({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }}, $.basicInterfaceValue(3, "int")), i.value.Top)
-	await $.println(await i.value.SetAny({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }}, $.basicInterfaceValue(3n, "int64")))
-	await $.println(await i.value.SetAny({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }}, $.basicInterfaceValue(3.5, "float64")))
+	await $.println(await i.value.SetAny(__goscriptStatic5(), $.basicInterfaceValue(3, "int")), i.value.Top)
+	await $.println(await i.value.SetAny(__goscriptStatic5(), $.basicInterfaceValue(3n, "int64")))
+	await $.println(await i.value.SetAny(__goscriptStatic5(), $.basicInterfaceValue(3.5, "float64")))
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.Value", zero: () => $.markAsStructValue(new Value()), methods: {String: (receiver: any, ...args: any[]) => $.pointerValue(receiver).String(...$.stripGenericTypeArgs(args))} }})
+}
+
+var __goscriptStatic1$value: any
+function __goscriptStatic1(): any {
+	return __goscriptStatic1$value ??= ({SetAny: (receiver: any, ...args: any[]) => $.pointerValue(receiver).SetAny(__goscriptStatic0(), ...$.stripGenericTypeArgs(args))})
+}
+
+var __goscriptStatic2$value: any
+function __goscriptStatic2(): any {
+	return __goscriptStatic2$value ??= (/* @__PURE__ */ $.pointerType("main.Sides"))
+}
+
+var __goscriptStatic3$value: any
+function __goscriptStatic3(): any {
+	return __goscriptStatic3$value ??= ([$.methodSignature("SetAny", [["a", { kind: $.TypeKind.Interface, methods: [] }]], [/* @__PURE__ */ $.basicType("string")])])
+}
+
+var __goscriptStatic4$value: any
+function __goscriptStatic4(): any {
+	return __goscriptStatic4$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("float32"), zero: () => 0 }})
+}
+
+var __goscriptStatic5$value: any
+function __goscriptStatic5(): any {
+	return __goscriptStatic5$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }})
 }
 
 if ($.isMainScript(import.meta)) {

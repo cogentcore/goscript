@@ -4,9 +4,21 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class Pos {
-	public declare Ln: number
+	public get Ln(): number {
+		return this._fields.Ln
+	}
 
-	public declare Ch: number
+	public set Ln(value: number) {
+		this._fields.Ln = value
+	}
+
+	public get Ch(): number {
+		return this._fields.Ch
+	}
+
+	public set Ch(value: number) {
+		this._fields.Ch = value
+	}
 
 	public _fields: {
 		Ln: number
@@ -24,8 +36,11 @@ export class Pos {
 		return $.markAsStructValue(new Pos(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Ln", "Ch"])
+	public __goscriptAssign(source: Pos): void {
+		const target = this._fields
+		const values = source._fields
+		target.Ln = values.Ln
+		target.Ch = values.Ch
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -38,13 +53,37 @@ export class Pos {
 }
 
 export class Key {
-	public declare Name: string
+	public get Name(): string {
+		return this._fields.Name
+	}
 
-	public declare At: Pos
+	public set Name(value: string) {
+		this._fields.Name = value
+	}
 
-	public declare On: boolean
+	public get At(): Pos {
+		return this._fields.At
+	}
 
-	public declare F: number
+	public set At(value: Pos) {
+		this._fields.At = value
+	}
+
+	public get On(): boolean {
+		return this._fields.On
+	}
+
+	public set On(value: boolean) {
+		this._fields.On = value
+	}
+
+	public get F(): number {
+		return this._fields.F
+	}
+
+	public set F(value: number) {
+		this._fields.F = value
+	}
 
 	public _fields: {
 		Name: string
@@ -66,8 +105,13 @@ export class Key {
 		return $.markAsStructValue(new Key(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Name", "At", "On", "F"])
+	public __goscriptAssign(source: Key): void {
+		const target = this._fields
+		const values = source._fields
+		target.Name = values.Name
+		$.assignStruct(target.At, values.At)
+		target.On = values.On
+		target.F = values.F
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -80,7 +124,13 @@ export class Key {
 }
 
 export class Rule {
-	public declare Name: string
+	public get Name(): string {
+		return this._fields.Name
+	}
+
+	public set Name(value: string) {
+		this._fields.Name = value
+	}
 
 	public _fields: {
 		Name: string
@@ -96,8 +146,10 @@ export class Rule {
 		return $.markAsStructValue(new Rule(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Name"])
+	public __goscriptAssign(source: Rule): void {
+		const target = this._fields
+		const values = source._fields
+		target.Name = values.Name
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -110,9 +162,21 @@ export class Rule {
 }
 
 export class ScopeRule {
-	public declare Scope: Pos
+	public get Scope(): Pos {
+		return this._fields.Scope
+	}
 
-	public declare Rule: Rule | $.VarRef<Rule> | null
+	public set Scope(value: Pos) {
+		this._fields.Scope = value
+	}
+
+	public get Rule(): Rule | $.VarRef<Rule> | null {
+		return this._fields.Rule
+	}
+
+	public set Rule(value: Rule | $.VarRef<Rule> | null) {
+		this._fields.Rule = value
+	}
 
 	public _fields: {
 		Scope: Pos
@@ -130,8 +194,11 @@ export class ScopeRule {
 		return $.markAsStructValue(new ScopeRule(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Scope", "Rule"])
+	public __goscriptAssign(source: ScopeRule): void {
+		const target = this._fields
+		const values = source._fields
+		$.assignStruct(target.Scope, values.Scope)
+		target.Rule = values.Rule
 	}
 
 	static __typeInfo = $.registerStructType(

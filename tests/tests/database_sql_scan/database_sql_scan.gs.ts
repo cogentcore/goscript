@@ -84,7 +84,7 @@ export class connector {
 	public async ExecContext(_p0: context.Context | null, _p1: string, _p2: $.Slice<driver.NamedValue>): globalThis.Promise<[driver.Result | null, $.GoError]> {
 		const c = this;
 		await time.Sleep(1000000n)
-		return [$.namedValueInterfaceValue<driver.Result | null>(0n, "driver.RowsAffected", {LastInsertId: (receiver: any, ...args: any[]) => (driver.RowsAffected_LastInsertId as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), RowsAffected: (receiver: any, ...args: any[]) => (driver.RowsAffected_RowsAffected as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, /* @__PURE__ */ $.basicType("int64", "driver.RowsAffected"), [$.methodSignature("LastInsertId", [], [/* @__PURE__ */ $.basicType("int64"), "error"]), $.methodSignature("RowsAffected", [], [/* @__PURE__ */ $.basicType("int64"), "error"])]), null]
+		return [$.namedValueInterfaceValue<driver.Result | null>(0n, "driver.RowsAffected", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()), null]
 	}
 
 	public Open(_p0: string): [driver.Conn | null, $.GoError] {
@@ -180,7 +180,7 @@ export class rows {
 	static __typeInfo = $.registerStructType(
 		"main.rows",
 		() => new rows(),
-		() => [$.methodSignature("Close", [], ["error"]), $.methodSignature("Columns", [], [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("string"))]), $.methodSignature("Next", [["dest", /* @__PURE__ */ $.sliceType("driver.Value")]], ["error"])],
+		() => [$.methodSignature("Close", [], ["error"], true), $.methodSignature("Columns", [], [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("string"))], true), $.methodSignature("Next", [["dest", /* @__PURE__ */ $.sliceType("driver.Value")]], ["error"], true)],
 		rows,
 		() => [/* @__PURE__ */ $.structField("done", /* @__PURE__ */ $.basicType("bool"), [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/database_sql_scan" }), /* @__PURE__ */ $.structField("blob", /* @__PURE__ */ $.basicType("bool"), [1], 1, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/database_sql_scan" })]
 	)
@@ -247,15 +247,15 @@ export class columnRows {
 	static __typeInfo = $.registerStructType(
 		"main.columnRows",
 		() => new columnRows(),
-		() => [$.methodSignature("Next", [/* @__PURE__ */ $.sliceType("driver.Value")], ["error"]), $.methodSignature("NextRow", [], ["error"]), $.methodSignature("ScanColumn", [["ctx", "driver.ScanContext"], ["index", /* @__PURE__ */ $.basicType("int")], ["dest", { kind: $.TypeKind.Interface, methods: [] }]], ["error"]), $.methodSignature("Close", [], ["error"]), $.methodSignature("Columns", [], [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("string"))])],
+		() => [$.methodSignature("Next", [/* @__PURE__ */ $.sliceType("driver.Value")], ["error"], true), $.methodSignature("NextRow", [], ["error"], true), $.methodSignature("ScanColumn", [["ctx", "driver.ScanContext"], ["index", /* @__PURE__ */ $.basicType("int")], ["dest", { kind: $.TypeKind.Interface, methods: [] }]], ["error"], true), $.methodSignature("Close", [], ["error"], true), $.methodSignature("Columns", [], [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("string"))], true)],
 		columnRows,
 		() => [/* @__PURE__ */ $.structField("rows", "main.rows", [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/database_sql_scan", anonymous: true })]
 	)
 }
 
 export async function main(): globalThis.Promise<void> {
-	for (let __goscriptRangeTarget0 = $.arrayToSlice<boolean>([false, true]), __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
-		let direct = __goscriptRangeTarget0![__rangeIndex]
+	for (let __goscriptRangeTarget0 = $.arrayToSlice<boolean>([false, true]), __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
+		let direct = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as boolean)
 		let db: sql.DB | $.VarRef<sql.DB> | null = await sql.OpenDB($.interfaceValue<driver.Connector | null>($.markAsStructValue(new connector({direct: direct})), "main.connector", "main.connector"))
 		{
 			let [, err] = await sql.DB.prototype.ExecContext.call(db, context.Background(), "create", null)
@@ -384,13 +384,60 @@ export async function main(): globalThis.Promise<void> {
 			() => [/* @__PURE__ */ $.structField("Value", /* @__PURE__ */ $.basicType("int"), [0], 0, true, { tag: "json:\"second\"" })]
 		)
 	}
-	await $.println("named integer", await $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeFor({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int", "main.namedInt"), zero: () => 0 }})).ConvertibleTo($.pointerValueOrNil(reflect.TypeFor({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int64"), zero: () => 0n }}))!))
-	await $.println("boolean string", await $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeFor({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("bool"), zero: () => false }})).ConvertibleTo($.pointerValueOrNil(reflect.TypeFor({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }}))!))
-	await $.println("byte string", await $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeFor({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")), zero: () => null }})).ConvertibleTo($.pointerValueOrNil(reflect.TypeFor({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }}))!))
-	await $.println("slice array", await $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeFor({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")), zero: () => null }})).ConvertibleTo($.pointerValueOrNil(reflect.TypeFor({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2), zero: () => $.arrayValue(globalThis.Array.from({ length: 2 }, () => 0)) }}))!))
-	await $.println("named elements", await $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeFor({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int", "main.namedInt")), zero: () => null }})).ConvertibleTo($.pointerValueOrNil(reflect.TypeFor({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")), zero: () => null }}))!))
-	await $.println("struct tags", await $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeFor({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.tagged", zero: () => $.markAsStructValue(new tagged()) }})).ConvertibleTo($.pointerValueOrNil(reflect.TypeFor({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.retagged", zero: () => $.markAsStructValue(new retagged()) }}))!))
+	await $.println("named integer", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeFor({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int", "main.namedInt"), zero: () => 0 }})).ConvertibleTo($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic3()))!), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println("boolean string", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeFor(__goscriptStatic5())).ConvertibleTo($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic4()))!), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println("byte string", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeFor(__goscriptStatic6())).ConvertibleTo($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic4()))!), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println("slice array", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeFor(__goscriptStatic8())).ConvertibleTo($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic7()))!), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println("named elements", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeFor({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int", "main.namedInt")), zero: () => null }})).ConvertibleTo($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic8()))!), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println("struct tags", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeFor({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.tagged", zero: () => $.markAsStructValue(new tagged()) }})).ConvertibleTo($.pointerValueOrNil(reflect.TypeFor({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.retagged", zero: () => $.markAsStructValue(new retagged()) }}))!), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 }
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= ({LastInsertId: (receiver: any, ...args: any[]) => (driver.RowsAffected_LastInsertId as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), RowsAffected: (receiver: any, ...args: any[]) => (driver.RowsAffected_RowsAffected as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))})
+}
+
+var __goscriptStatic1$value: any
+function __goscriptStatic1(): any {
+	return __goscriptStatic1$value ??= (/* @__PURE__ */ $.basicType("int64", "driver.RowsAffected"))
+}
+
+var __goscriptStatic2$value: any
+function __goscriptStatic2(): any {
+	return __goscriptStatic2$value ??= ([$.methodSignature("LastInsertId", [], [/* @__PURE__ */ $.basicType("int64"), "error"]), $.methodSignature("RowsAffected", [], [/* @__PURE__ */ $.basicType("int64"), "error"])])
+}
+
+var __goscriptStatic3$value: any
+function __goscriptStatic3(): any {
+	return __goscriptStatic3$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int64"), zero: () => 0n }})
+}
+
+var __goscriptStatic4$value: any
+function __goscriptStatic4(): any {
+	return __goscriptStatic4$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }})
+}
+
+var __goscriptStatic5$value: any
+function __goscriptStatic5(): any {
+	return __goscriptStatic5$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("bool"), zero: () => false }})
+}
+
+var __goscriptStatic6$value: any
+function __goscriptStatic6(): any {
+	return __goscriptStatic6$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")), zero: () => null }})
+}
+
+var __goscriptStatic7$value: any
+function __goscriptStatic7(): any {
+	return __goscriptStatic7$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2), zero: () => $.arrayValue(globalThis.Array.from({ length: 2 }, () => 0)) }})
+}
+
+var __goscriptStatic8$value: any
+function __goscriptStatic8(): any {
+	return __goscriptStatic8$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")), zero: () => null }})
+}
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

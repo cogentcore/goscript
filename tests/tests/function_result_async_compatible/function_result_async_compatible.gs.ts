@@ -14,7 +14,13 @@ $.registerInterfaceType(
 );
 
 export class box {
-	public declare value: number
+	public get value(): number {
+		return this._fields.value
+	}
+
+	public set value(value: number) {
+		this._fields.value = value
+	}
 
 	public _fields: {
 		value: number
@@ -41,14 +47,10 @@ export class box {
 		return $.pointerValue<box>(b).value
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["value"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.box",
 		() => new box(),
-		() => [{ name: "Value", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }],
+		() => [{ name: "Value", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }], pointerReceiver: true }],
 		box,
 		() => [{ name: "value", key: "value", type: /* @__PURE__ */ $.basicType("int") }]
 	)
@@ -71,8 +73,13 @@ export async function wrapNew(__typeArgs: $.GenericTypeArgs | undefined, newValu
 }
 
 export async function main(): globalThis.Promise<void> {
-	let fn: (() => Value | null | globalThis.Promise<Value | null>) | null = await wrapNew({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.pointerType("main.box"), zero: () => null, methods: {Value: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Value(...$.stripGenericTypeArgs(args))} }}, asyncBox)
+	let fn: (() => Value | null | globalThis.Promise<Value | null>) | null = await wrapNew(__goscriptStatic0(), asyncBox)
 	await $.println((__goscriptAwait = $.pointerValue<Exclude<Value, null>>((__goscriptAwait = fn!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)).Value(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.pointerType("main.box"), zero: () => null, methods: {Value: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Value(...$.stripGenericTypeArgs(args))} }})
 }
 
 var __goscriptAwait: any

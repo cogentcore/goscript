@@ -10,9 +10,21 @@ import "@goscript/encoding/json/index.js"
 import "@goscript/reflect/index.js"
 
 export class Node {
-	public declare Name: string
+	public get Name(): string {
+		return this._fields.Name
+	}
 
-	public declare Size: number
+	public set Name(value: string) {
+		this._fields.Name = value
+	}
+
+	public get Size(): number {
+		return this._fields.Size
+	}
+
+	public set Size(value: number) {
+		this._fields.Size = value
+	}
 
 	public _fields: {
 		Name: string
@@ -30,29 +42,32 @@ export class Node {
 		return $.markAsStructValue(new Node(this))
 	}
 
+	public __goscriptAssign(source: Node): void {
+		const target = this._fields
+		const values = source._fields
+		target.Name = values.Name
+		target.Size = values.Size
+	}
+
 	public async UnmarshalJSON(b: $.Slice<number>): globalThis.Promise<$.GoError> {
 		const n: Node | $.VarRef<Node> | null = this;
 		calls++
 		// Unmarshal into a copy of the type without methods, so that this
 		// method is not called again.
 		let v = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(n, "*main.Node", /* @__PURE__ */ $.pointerType("main.Node")))))
-		let t = await $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(v)).Type()).Elem()
-		let fields: $.Slice<reflect.StructField> = $.makeSlice<reflect.StructField>(await $.pointerValue<Exclude<reflect.Type, null>>(t).NumField(), undefined, undefined, () => $.markAsStructValue(new reflect.StructField()))
-		for (let __goscriptRangeTarget0 = fields, i = 0; i < $.len(__goscriptRangeTarget0); i++) {
-			$.assignStruct(fields![i], $.markAsStructValue($.cloneStructValue(await $.pointerValue<Exclude<reflect.Type, null>>(t).Field(i))))
+		let t = (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(v)).Type()).Elem(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+		let fields: $.Slice<reflect.StructField> = $.makeSlice<reflect.StructField>((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(t).NumField(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), undefined, undefined, () => $.markAsStructValue(new reflect.StructField()))
+		for (let __goscriptRangeTarget0 = fields, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), i = 0; i < __goscriptRangeWindow0.length; i++) {
+			$.assignStruct(fields![i], $.markAsStructValue($.cloneStructValue((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(t).Field(i), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))))
 		}
 		let copyType = reflect.PointerTo($.pointerValueOrNil(reflect.StructOf(fields))!)
 		return json.Unmarshal(b, $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(v)).Convert($.pointerValueOrNil(copyType)!))).Interface())
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Name", "Size"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.Node",
 		() => new Node(),
-		() => [$.methodSignature("UnmarshalJSON", [["b", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))]], ["error"])],
+		() => [$.methodSignature("UnmarshalJSON", [["b", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))]], ["error"], true)],
 		Node,
 		() => [/* @__PURE__ */ $.structField("Name", /* @__PURE__ */ $.basicType("string"), [0], 0, true), /* @__PURE__ */ $.structField("Size", /* @__PURE__ */ $.basicType("int"), [1], 16, true)]
 	)
@@ -70,8 +85,10 @@ export async function main(): globalThis.Promise<void> {
 	await $.println(err == null, calls, $.pointerValue<Node>(n).Name, $.pointerValue<Node>(n).Size)
 	let anyN: any = $.interfaceValue(n, "*main.Node", /* @__PURE__ */ $.pointerType("main.Node"))
 	let [, ok] = $.typeAssertTuple<json.Unmarshaler | null>(anyN, "json.Unmarshaler")
-	await $.println(ok, await $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf(anyN)).String())
+	await $.println(ok, (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf(anyN)).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

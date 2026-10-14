@@ -20,7 +20,13 @@ $.registerInterfaceType(
 );
 
 export class Node {
-	public declare Name: string
+	public get Name(): string {
+		return this._fields.Name
+	}
+
+	public set Name(value: string) {
+		this._fields.Name = value
+	}
 
 	public _fields: {
 		Name: string
@@ -36,26 +42,34 @@ export class Node {
 		return $.markAsStructValue(new Node(this))
 	}
 
+	public __goscriptAssign(source: Node): void {
+		const target = this._fields
+		const values = source._fields
+		target.Name = values.Name
+	}
+
 	public GetName(): string {
 		const n: Node | $.VarRef<Node> | null = this;
 		return $.pointerValue<Node>(n).Name
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Name"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.Node",
 		() => new Node(),
-		() => [{ name: "GetName", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }],
+		() => [{ name: "GetName", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }], pointerReceiver: true }],
 		Node,
 		() => [{ name: "Name", key: "Name", type: /* @__PURE__ */ $.basicType("string") }]
 	)
 }
 
 export class Custom {
-	public declare Text: string
+	public get Text(): string {
+		return this._fields.Text
+	}
+
+	public set Text(value: string) {
+		this._fields.Text = value
+	}
 
 	public _fields: {
 		Text: string
@@ -71,6 +85,12 @@ export class Custom {
 		return $.markAsStructValue(new Custom(this))
 	}
 
+	public __goscriptAssign(source: Custom): void {
+		const target = this._fields
+		const values = source._fields
+		target.Text = values.Text
+	}
+
 	public GetName(): string {
 		const c: Custom | $.VarRef<Custom> | null = this;
 		return $.pointerValue<Custom>(c).Text
@@ -82,21 +102,23 @@ export class Custom {
 		return null
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Text"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.Custom",
 		() => new Custom(),
-		() => [{ name: "GetName", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }, { name: "UnmarshalJSON", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: "error" }] }],
+		() => [{ name: "GetName", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }], pointerReceiver: true }, { name: "UnmarshalJSON", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: "error" }], pointerReceiver: true }],
 		Custom,
 		() => [{ name: "Text", key: "Text", type: /* @__PURE__ */ $.basicType("string") }]
 	)
 }
 
 export class Holder {
-	public declare Items: $.Slice<Named | null>
+	public get Items(): $.Slice<Named | null> {
+		return this._fields.Items
+	}
+
+	public set Items(value: $.Slice<Named | null>) {
+		this._fields.Items = value
+	}
 
 	public _fields: {
 		Items: $.Slice<Named | null>
@@ -112,8 +134,10 @@ export class Holder {
 		return $.markAsStructValue(new Holder(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Items"])
+	public __goscriptAssign(source: Holder): void {
+		const target = this._fields
+		const values = source._fields
+		target.Items = values.Items
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -130,7 +154,7 @@ export async function main(): globalThis.Promise<void> {
 	let b: Custom | $.VarRef<Custom> | null = new Custom()
 	let h = $.varRef($.markAsStructValue(new Holder({Items: $.arrayToSlice<Named | null>([$.interfaceValue<Named | null>(a, "*main.Node", /* @__PURE__ */ $.pointerType("main.Node")), $.interfaceValue<Named | null>(b, "*main.Custom", /* @__PURE__ */ $.pointerType("main.Custom"))])})))
 	let err = json.Unmarshal(new Uint8Array([123, 34, 73, 116, 101, 109, 115, 34, 58, 91, 123, 34, 78, 97, 109, 101, 34, 58, 34, 120, 34, 125, 44, 34, 121, 34, 93, 125]), $.interfaceValue(h, "*main.Holder", /* @__PURE__ */ $.pointerType("main.Holder")))
-	await fmt.Println((err as any), $.basicInterfaceValue($.len(h.value.Items), "int"), $.comparableEqual($.arrayIndex(h.value.Items!, 0), $.interfaceValue<Named | null>(a, "*main.Node", /* @__PURE__ */ $.pointerType("main.Node"))), $.pointerValue<Node>(a).Name, $.comparableEqual($.arrayIndex(h.value.Items!, 1), $.interfaceValue<Named | null>(b, "*main.Custom", /* @__PURE__ */ $.pointerType("main.Custom"))), $.pointerValue<Custom>(b).Text)
+	await fmt.Println((err as any), $.basicInterfaceValue($.sliceLen(h.value.Items), "int"), $.comparableEqual($.arrayIndex(h.value.Items!, 0), $.interfaceValue<Named | null>(a, "*main.Node", /* @__PURE__ */ $.pointerType("main.Node"))), $.pointerValue<Node>(a).Name, $.comparableEqual($.arrayIndex(h.value.Items!, 1), $.interfaceValue<Named | null>(b, "*main.Custom", /* @__PURE__ */ $.pointerType("main.Custom"))), $.pointerValue<Custom>(b).Text)
 }
 
 if ($.isMainScript(import.meta)) {

@@ -10,9 +10,21 @@ import "@goscript/encoding/json/index.js"
 import "@goscript/reflect/index.js"
 
 export class Node {
-	public declare A: number
+	public get A(): number {
+		return this._fields.A
+	}
 
-	public declare B: string
+	public set A(value: number) {
+		this._fields.A = value
+	}
+
+	public get B(): string {
+		return this._fields.B
+	}
+
+	public set B(value: string) {
+		this._fields.B = value
+	}
 
 	public _fields: {
 		A: number
@@ -30,6 +42,13 @@ export class Node {
 		return $.markAsStructValue(new Node(this))
 	}
 
+	public __goscriptAssign(source: Node): void {
+		const target = this._fields
+		const values = source._fields
+		target.A = values.A
+		target.B = values.B
+	}
+
 	public MarshalJSON(): [$.Slice<number>, $.GoError] {
 		const n: Node | $.VarRef<Node> | null = this;
 		let __goscriptTuple0: any = json.Marshal($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(n, "*main.Node", /* @__PURE__ */ $.pointerType("main.Node"))))).Elem())).Interface())
@@ -39,10 +58,6 @@ export class Node {
 			return [null, err]
 		}
 		return [$.appendSlice(new Uint8Array([123, 34, 119, 114, 97, 112, 112, 101, 100, 34, 58]), $.append(b, $.uint(125, 8), $.byteSliceHint), $.byteSliceHint), null]
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["A", "B"])
 	}
 
 	static __typeInfo = $.registerStructType(

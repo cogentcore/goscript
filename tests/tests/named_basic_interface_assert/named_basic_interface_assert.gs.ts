@@ -173,22 +173,34 @@ export async function main(): globalThis.Promise<void> {
 	ok = __goscriptTuple1[1]
 	await $.println("int32 as MyInt:", ok)
 
-	for (let __goscriptRangeTarget0 = $.arrayToSlice<any>(["s", $.namedValueInterfaceValue<any>("n", "main.Name", {}, /* @__PURE__ */ $.basicType("string", "main.Name")), $.namedValueInterfaceValue<any>(globalThis.String("1"), "json.Number", {Float64: (receiver: any, ...args: any[]) => (json.Number_Float64 as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Int64: (receiver: any, ...args: any[]) => (json.Number_Int64 as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), MarshalJSONTo: (receiver: any, ...args: any[]) => (json.Number_MarshalJSONTo as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), String: (receiver: any, ...args: any[]) => (json.Number_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, /* @__PURE__ */ $.basicType("string", "json.Number"), [$.methodSignature("Float64", [], [/* @__PURE__ */ $.basicType("float64"), "error"]), $.methodSignature("Int64", [], [/* @__PURE__ */ $.basicType("int64"), "error"]), $.methodSignature("MarshalJSONTo", [["enc", /* @__PURE__ */ $.pointerType("jsontext.Encoder")]], ["error"]), $.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])]), $.namedValueInterfaceValue<any>(1, "main.MyInt", {}, /* @__PURE__ */ $.basicType("int32", "main.MyInt")), $.basicInterfaceValue($.int(2, 32), "int32"), $.basicInterfaceValue(3, "int")]), __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
-		let v = __goscriptRangeTarget0![__rangeIndex]
+	for (let __goscriptRangeTarget0 = $.arrayToSlice<any>(["s", $.namedValueInterfaceValue<any>("n", "main.Name", {}, /* @__PURE__ */ $.basicType("string", "main.Name")), $.namedValueInterfaceValue<any>(globalThis.String("1"), "json.Number", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()), $.namedValueInterfaceValue<any>(1, "main.MyInt", {}, /* @__PURE__ */ $.basicType("int32", "main.MyInt")), $.basicInterfaceValue($.int(2, 32), "int32"), $.basicInterfaceValue(3, "int")]), __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
+		let v = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as any)
 		await $.println("switch:", kind(v))
 	}
 
-	await $.println("generic:", kind(toAny({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int32", "main.MyInt"), zero: () => 0 }}, 6)), kind(toAny({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("string", "main.Name"), zero: () => "" }}, "g")), kind(toAny({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }}, "raw")))
-	await $.println("generic stringer:", await $.pointerValue<Exclude<stringer, null>>(toStringer({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("string", "main.Stringy"), zero: () => "", methods: {String: (receiver: any, ...args: any[]) => (Stringy_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, methodSignatures: [$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])] }}, "q")).String())
-	let __goscriptTuple2: any = $.typeAssertTuple<stringer | null>(toAny({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("string", "main.Stringy"), zero: () => "", methods: {String: (receiver: any, ...args: any[]) => (Stringy_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, methodSignatures: [$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])] }}, "r"), "main.stringer")
+	await $.println("generic:", kind(toAny(__goscriptStatic3(), 6)), kind(toAny(__goscriptStatic4(), "g")), kind(toAny(__goscriptStatic5(), "raw")))
+	await $.println("generic stringer:", (__goscriptAwait = $.pointerValue<Exclude<stringer, null>>(toStringer(__goscriptStatic6(), "q")).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	let __goscriptTuple2: any = $.typeAssertTuple<stringer | null>(toAny(__goscriptStatic6(), "r"), "main.stringer")
 	ok = __goscriptTuple2[1]
 	await $.println("generic any stringer:", ok)
 
-	await $.println("reflect:", kind($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.namedValueInterfaceValue<any>(7, "main.MyInt", {}, /* @__PURE__ */ $.basicType("int32", "main.MyInt"))))).Interface()), await $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf(a)).String())
+	await $.println("reflect:", kind($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.namedValueInterfaceValue<any>(7, "main.MyInt", {}, /* @__PURE__ */ $.basicType("int32", "main.MyInt"))))).Interface()), (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf(a)).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	class holder {
-		public declare N: Name
+		public get N(): Name {
+			return this._fields.N
+		}
 
-		public declare Is: $.Slice<MyInt>
+		public set N(value: Name) {
+			this._fields.N = value
+		}
+
+		public get Is(): $.Slice<MyInt> {
+			return this._fields.Is
+		}
+
+		public set Is(value: $.Slice<MyInt>) {
+			this._fields.Is = value
+		}
 
 		public _fields: {
 			N: Name
@@ -206,8 +218,11 @@ export async function main(): globalThis.Promise<void> {
 			return $.markAsStructValue(new holder(this))
 		}
 
-		static {
-			$.bindStructFields(this.prototype, ["N", "Is"])
+		public __goscriptAssign(source: holder): void {
+			const target = this._fields
+			const values = source._fields
+			target.N = values.N
+			target.Is = values.Is
 		}
 
 		static __typeInfo = $.registerStructType(
@@ -235,7 +250,7 @@ export async function main(): globalThis.Promise<void> {
 	{
 		let err = await json.Decoder.prototype.Decode.call($.pointerValue<json.Decoder>(d), $.interfaceValue(obj, "*map[string]interface{}", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), { kind: $.TypeKind.Interface, methods: [] }))))
 		if (err != null) {
-			await $.println(await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+			await $.println((__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		}
 	}
 	await $.println("json UseNumber:", kind($.mapGet<string, any, any>(obj.value, "n", null)[0]))
@@ -249,9 +264,61 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("other:", $.comparableEqual(_get(1), $.namedValueInterfaceValue<$.GoError>(errMissing, "main.FormatError", {"Error": FormatError_Error}, /* @__PURE__ */ $.basicType("string", "main.FormatError"))), $.comparableEqual(_get(2), $.namedValueInterfaceValue<$.GoError>(3, "main.Code", {"Error": Code_Error}, /* @__PURE__ */ $.basicType("int", "main.Code"))), $.comparableEqual(_get(2), $.namedValueInterfaceValue<$.GoError>(4, "main.Code", {"Error": Code_Error}, /* @__PURE__ */ $.basicType("int", "main.Code"))))
 	let e2: $.GoError = $.namedValueInterfaceValue<$.GoError>("missing", "main.FormatError", {"Error": FormatError_Error}, /* @__PURE__ */ $.basicType("string", "main.FormatError"))
 	await $.println("boxed eq:", $.comparableEqual(err, e2))
-	let ae: any = $.namedValueInterfaceValue<any>(errMissing, "main.FormatError", {Error: (receiver: any, ...args: any[]) => (FormatError_Error as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, /* @__PURE__ */ $.basicType("string", "main.FormatError"), [$.methodSignature("Error", [], [/* @__PURE__ */ $.basicType("string")])])
-	await $.println("any eq:", $.comparableEqual(ae, $.namedValueInterfaceValue<any>(errMissing, "main.FormatError", {Error: (receiver: any, ...args: any[]) => (FormatError_Error as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, /* @__PURE__ */ $.basicType("string", "main.FormatError"), [$.methodSignature("Error", [], [/* @__PURE__ */ $.basicType("string")])])), $.comparableEqual(ae, "missing"))
+	let ae: any = $.namedValueInterfaceValue<any>(errMissing, "main.FormatError", __goscriptStatic7(), __goscriptStatic8(), __goscriptStatic9())
+	await $.println("any eq:", $.comparableEqual(ae, $.namedValueInterfaceValue<any>(errMissing, "main.FormatError", __goscriptStatic7(), __goscriptStatic8(), __goscriptStatic9())), $.comparableEqual(ae, "missing"))
 }
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= ({Float64: (receiver: any, ...args: any[]) => (json.Number_Float64 as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Int64: (receiver: any, ...args: any[]) => (json.Number_Int64 as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), MarshalJSONTo: (receiver: any, ...args: any[]) => (json.Number_MarshalJSONTo as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), String: (receiver: any, ...args: any[]) => (json.Number_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))})
+}
+
+var __goscriptStatic1$value: any
+function __goscriptStatic1(): any {
+	return __goscriptStatic1$value ??= (/* @__PURE__ */ $.basicType("string", "json.Number"))
+}
+
+var __goscriptStatic2$value: any
+function __goscriptStatic2(): any {
+	return __goscriptStatic2$value ??= ([$.methodSignature("Float64", [], [/* @__PURE__ */ $.basicType("float64"), "error"]), $.methodSignature("Int64", [], [/* @__PURE__ */ $.basicType("int64"), "error"]), $.methodSignature("MarshalJSONTo", [["enc", /* @__PURE__ */ $.pointerType("jsontext.Encoder")]], ["error"]), $.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])])
+}
+
+var __goscriptStatic3$value: any
+function __goscriptStatic3(): any {
+	return __goscriptStatic3$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int32", "main.MyInt"), zero: () => 0 }})
+}
+
+var __goscriptStatic4$value: any
+function __goscriptStatic4(): any {
+	return __goscriptStatic4$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("string", "main.Name"), zero: () => "" }})
+}
+
+var __goscriptStatic5$value: any
+function __goscriptStatic5(): any {
+	return __goscriptStatic5$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }})
+}
+
+var __goscriptStatic6$value: any
+function __goscriptStatic6(): any {
+	return __goscriptStatic6$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("string", "main.Stringy"), zero: () => "", methods: {String: (receiver: any, ...args: any[]) => (Stringy_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, methodSignatures: [$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])] }})
+}
+
+var __goscriptStatic7$value: any
+function __goscriptStatic7(): any {
+	return __goscriptStatic7$value ??= ({Error: (receiver: any, ...args: any[]) => (FormatError_Error as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))})
+}
+
+var __goscriptStatic8$value: any
+function __goscriptStatic8(): any {
+	return __goscriptStatic8$value ??= (/* @__PURE__ */ $.basicType("string", "main.FormatError"))
+}
+
+var __goscriptStatic9$value: any
+function __goscriptStatic9(): any {
+	return __goscriptStatic9$value ??= ([$.methodSignature("Error", [], [/* @__PURE__ */ $.basicType("string")])])
+}
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

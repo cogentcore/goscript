@@ -55,7 +55,13 @@ $.registerNamedValueType(
 );
 
 export class Rule {
-	public declare Pattern: string
+	public get Pattern(): string {
+		return this._fields.Pattern
+	}
+
+	public set Pattern(value: string) {
+		this._fields.Pattern = value
+	}
 
 	public _fields: {
 		Pattern: string
@@ -71,8 +77,10 @@ export class Rule {
 		return $.markAsStructValue(new Rule(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Pattern"])
+	public __goscriptAssign(source: Rule): void {
+		const target = this._fields
+		const values = source._fields
+		target.Pattern = values.Pattern
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -85,9 +93,21 @@ export class Rule {
 }
 
 export class xmlState {
-	public declare Name: string
+	public get Name(): string {
+		return this._fields.Name
+	}
 
-	public declare Rules: $.Slice<Rule>
+	public set Name(value: string) {
+		this._fields.Name = value
+	}
+
+	public get Rules(): $.Slice<Rule> {
+		return this._fields.Rules
+	}
+
+	public set Rules(value: $.Slice<Rule>) {
+		this._fields.Rules = value
+	}
 
 	public _fields: {
 		Name: string
@@ -105,8 +125,11 @@ export class xmlState {
 		return $.markAsStructValue(new xmlState(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Name", "Rules"])
+	public __goscriptAssign(source: xmlState): void {
+		const target = this._fields
+		const values = source._fields
+		target.Name = values.Name
+		target.Rules = values.Rules
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -119,7 +142,13 @@ export class xmlState {
 }
 
 export class xmlRules {
-	public declare States: $.Slice<xmlState>
+	public get States(): $.Slice<xmlState> {
+		return this._fields.States
+	}
+
+	public set States(value: $.Slice<xmlState>) {
+		this._fields.States = value
+	}
 
 	public _fields: {
 		States: $.Slice<xmlState>
@@ -135,8 +164,10 @@ export class xmlRules {
 		return $.markAsStructValue(new xmlRules(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["States"])
+	public __goscriptAssign(source: xmlRules): void {
+		const target = this._fields
+		const values = source._fields
+		target.States = values.States
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -149,9 +180,21 @@ export class xmlRules {
 }
 
 export class Lexer {
-	public declare Name: string
+	public get Name(): string {
+		return this._fields.Name
+	}
 
-	public declare Rules: Rules
+	public set Name(value: string) {
+		this._fields.Name = value
+	}
+
+	public get Rules(): Rules {
+		return this._fields.Rules
+	}
+
+	public set Rules(value: Rules) {
+		this._fields.Rules = value
+	}
 
 	public _fields: {
 		Name: string
@@ -169,8 +212,11 @@ export class Lexer {
 		return $.markAsStructValue(new Lexer(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Name", "Rules"])
+	public __goscriptAssign(source: Lexer): void {
+		const target = this._fields
+		const values = source._fields
+		target.Name = values.Name
+		target.Rules = values.Rules
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -194,8 +240,8 @@ export async function Rules_UnmarshalXML(r: $.VarRef<Rules> | null, d: xml.Decod
 	if ($.pointerValue<Rules>(r) == null) {
 		r!.value = $.makeMap<string, $.Slice<Rule>>([])
 	}
-	for (let __goscriptRangeTarget0 = xr.value.States, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
-		let st = $.markAsStructValue($.cloneStructValue(__goscriptRangeTarget0![__rangeIndex]))
+	for (let __goscriptRangeTarget0 = xr.value.States, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
+		let st = $.markAsStructValue($.cloneStructValue((__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as xmlState)))
 		$.mapSet(($.pointerValue<Rules>(r)), st.Name, st.Rules)
 	}
 	return null
@@ -204,12 +250,12 @@ export async function Rules_UnmarshalXML(r: $.VarRef<Rules> | null, d: xml.Decod
 export async function main(): globalThis.Promise<void> {
 	await showArray()
 	let l: $.VarRef<Lexer> = $.varRef($.markAsStructValue(new Lexer()))
-	let t = (await $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.interfaceValue($.markAsStructValue($.cloneStructValue(l.value)), "main.Lexer", "main.Lexer"))).Field(1)).Type
-	await fmt.Println("field type:", await $.pointerValue<Exclude<reflect.Type, null>>(t).String(), $.namedValueInterfaceValue<any>(await $.pointerValue<Exclude<reflect.Type, null>>(t).Kind(), "reflect.Kind", {String: (receiver: any, ...args: any[]) => (reflect.Kind_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, /* @__PURE__ */ $.basicType("uint", "reflect.Kind"), [$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])]), await $.pointerValue<Exclude<reflect.Type, null>>(t).Name())
+	let t = (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.interfaceValue($.markAsStructValue($.cloneStructValue(l.value)), "main.Lexer", "main.Lexer"))).Field(1), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait).Type
+	await fmt.Println("field type:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(t).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), $.namedValueInterfaceValue<any>((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(t).Kind(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), "reflect.Kind", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()), (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(t).Name(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	let pt = reflect.PointerTo($.pointerValueOrNil(t)!)
-	await fmt.Println("ptr methods:", $.basicInterfaceValue(await $.pointerValue<Exclude<reflect.Type, null>>(pt).NumMethod(), "int"))
+	await fmt.Println("ptr methods:", $.basicInterfaceValue((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(pt).NumMethod(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), "int"))
 	let v = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(l, "*main.Lexer", /* @__PURE__ */ $.pointerType("main.Lexer"))))).Elem())).Field(1)))
-	await fmt.Println("value type:", await $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(v)).Type()).String(), await $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(v)).Addr())).Type()).String())
+	await fmt.Println("value type:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(v)).Type()).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(v)).Addr())).Type()).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	let [, ok] = $.typeAssertTuple<xml.Unmarshaler | null>($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(v)).Addr())).Interface(), "xml.Unmarshaler")
 	await fmt.Println("addr implements Unmarshaler:", ok)
 }
@@ -223,15 +269,62 @@ export function Grid_Sum(g: Grid): number {
 }
 
 export async function showArray(): globalThis.Promise<void> {
-	let nt = reflect.TypeOf($.namedValueInterfaceValue<any>($.arrayToSlice<string>(["a"]), "main.Names", {First: (receiver: any, ...args: any[]) => (Names_First as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("string"), "main.Names"), [$.methodSignature("First", [], [/* @__PURE__ */ $.basicType("string")])]))
-	await fmt.Println("names:", await $.pointerValue<Exclude<reflect.Type, null>>(nt).String(), await $.pointerValue<Exclude<reflect.Type, null>>(nt).Name(), $.namedValueInterfaceValue<any>(await $.pointerValue<Exclude<reflect.Type, null>>(nt).Kind(), "reflect.Kind", {String: (receiver: any, ...args: any[]) => (reflect.Kind_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, /* @__PURE__ */ $.basicType("uint", "reflect.Kind"), [$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])]), $.basicInterfaceValue(await $.pointerValue<Exclude<reflect.Type, null>>(nt).NumMethod(), "int"))
-	let gt = reflect.TypeOf($.namedValueInterfaceValue<any>($.arrayValue([1, 2]), "main.Grid", {Sum: (receiver: any, ...args: any[]) => (Grid_Sum as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, "main.Grid", [$.methodSignature("Sum", [], [/* @__PURE__ */ $.basicType("int")])]))
-	await fmt.Println("grid:", await $.pointerValue<Exclude<reflect.Type, null>>(gt).String(), await $.pointerValue<Exclude<reflect.Type, null>>(gt).Name(), $.namedValueInterfaceValue<any>(await $.pointerValue<Exclude<reflect.Type, null>>(gt).Kind(), "reflect.Kind", {String: (receiver: any, ...args: any[]) => (reflect.Kind_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, /* @__PURE__ */ $.basicType("uint", "reflect.Kind"), [$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])]), $.basicInterfaceValue(await $.pointerValue<Exclude<reflect.Type, null>>(gt).NumMethod(), "int"))
+	let nt = reflect.TypeOf($.namedValueInterfaceValue<any>($.arrayToSlice<string>(["a"]), "main.Names", __goscriptStatic3(), __goscriptStatic4(), __goscriptStatic5()))
+	await fmt.Println("names:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(nt).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(nt).Name(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), $.namedValueInterfaceValue<any>((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(nt).Kind(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), "reflect.Kind", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()), $.basicInterfaceValue((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(nt).NumMethod(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), "int"))
+	let gt = reflect.TypeOf($.namedValueInterfaceValue<any>($.arrayValue([1, 2]), "main.Grid", __goscriptStatic6(), __goscriptStatic7(), __goscriptStatic8()))
+	await fmt.Println("grid:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(gt).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(gt).Name(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), $.namedValueInterfaceValue<any>((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(gt).Kind(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), "reflect.Kind", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()), $.basicInterfaceValue((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(gt).NumMethod(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), "int"))
 	let [m, ok] = await $.pointerValue<Exclude<reflect.Type, null>>(gt).MethodByName("Sum")
 	await fmt.Println("grid Sum:", m.Name, ok)
 	let mt = reflect.TypeOf($.interfaceValue($.makeMap<string, $.Slice<Rule>>([]), "main.Rules", "main.Rules"))
-	await fmt.Println("rules:", await $.pointerValue<Exclude<reflect.Type, null>>(mt).String(), await $.pointerValue<Exclude<reflect.Type, null>>(mt).Name(), $.namedValueInterfaceValue<any>(await $.pointerValue<Exclude<reflect.Type, null>>(mt).Kind(), "reflect.Kind", {String: (receiver: any, ...args: any[]) => (reflect.Kind_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, /* @__PURE__ */ $.basicType("uint", "reflect.Kind"), [$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])]), $.basicInterfaceValue(await $.pointerValue<Exclude<reflect.Type, null>>(mt).NumMethod(), "int"), $.basicInterfaceValue(await $.pointerValue<Exclude<reflect.Type, null>>(reflect.PointerTo($.pointerValueOrNil(mt)!)).NumMethod(), "int"))
+	await fmt.Println("rules:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(mt).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(mt).Name(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), $.namedValueInterfaceValue<any>((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(mt).Kind(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), "reflect.Kind", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()), $.basicInterfaceValue((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(mt).NumMethod(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), "int"), $.basicInterfaceValue((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.PointerTo($.pointerValueOrNil(mt)!)).NumMethod(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), "int"))
 }
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= ({String: (receiver: any, ...args: any[]) => (reflect.Kind_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))})
+}
+
+var __goscriptStatic1$value: any
+function __goscriptStatic1(): any {
+	return __goscriptStatic1$value ??= (/* @__PURE__ */ $.basicType("uint", "reflect.Kind"))
+}
+
+var __goscriptStatic2$value: any
+function __goscriptStatic2(): any {
+	return __goscriptStatic2$value ??= ([$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])])
+}
+
+var __goscriptStatic3$value: any
+function __goscriptStatic3(): any {
+	return __goscriptStatic3$value ??= ({First: (receiver: any, ...args: any[]) => (Names_First as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))})
+}
+
+var __goscriptStatic4$value: any
+function __goscriptStatic4(): any {
+	return __goscriptStatic4$value ??= (/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("string"), "main.Names"))
+}
+
+var __goscriptStatic5$value: any
+function __goscriptStatic5(): any {
+	return __goscriptStatic5$value ??= ([$.methodSignature("First", [], [/* @__PURE__ */ $.basicType("string")])])
+}
+
+var __goscriptStatic6$value: any
+function __goscriptStatic6(): any {
+	return __goscriptStatic6$value ??= ({Sum: (receiver: any, ...args: any[]) => (Grid_Sum as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))})
+}
+
+var __goscriptStatic7$value: any
+function __goscriptStatic7(): any {
+	return __goscriptStatic7$value ??= ("main.Grid")
+}
+
+var __goscriptStatic8$value: any
+function __goscriptStatic8(): any {
+	return __goscriptStatic8$value ??= ([$.methodSignature("Sum", [], [/* @__PURE__ */ $.basicType("int")])])
+}
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

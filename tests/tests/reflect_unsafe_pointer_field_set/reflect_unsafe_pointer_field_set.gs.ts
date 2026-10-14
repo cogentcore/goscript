@@ -10,9 +10,21 @@ import "@goscript/reflect/index.js"
 import "@goscript/unsafe/index.js"
 
 export class config {
-	public declare Name: string
+	public get Name(): string {
+		return this._fields.Name
+	}
 
-	public declare UsesCgo: boolean
+	public set Name(value: string) {
+		this._fields.Name = value
+	}
+
+	public get UsesCgo(): boolean {
+		return this._fields.UsesCgo
+	}
+
+	public set UsesCgo(value: boolean) {
+		this._fields.UsesCgo = value
+	}
 
 	public _fields: {
 		Name: string
@@ -30,8 +42,11 @@ export class config {
 		return $.markAsStructValue(new config(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Name", "UsesCgo"])
+	public __goscriptAssign(source: config): void {
+		const target = this._fields
+		const values = source._fields
+		target.Name = values.Name
+		target.UsesCgo = values.UsesCgo
 	}
 
 	static __typeInfo = $.registerStructType(

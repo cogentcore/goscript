@@ -10,7 +10,13 @@ import "@goscript/io/fs/index.js"
 import "@goscript/testing/fstest/index.js"
 
 export class openOnlyFS {
-	public declare fsys: fstest.MapFS
+	public get fsys(): fstest.MapFS {
+		return this._fields.fsys
+	}
+
+	public set fsys(value: fstest.MapFS) {
+		this._fields.fsys = value
+	}
 
 	public _fields: {
 		fsys: fstest.MapFS
@@ -37,10 +43,6 @@ export class openOnlyFS {
 		return fstest.MapFS_Open(o.fsys, name)
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["fsys"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.openOnlyFS",
 		() => new openOnlyFS(),
@@ -60,8 +62,8 @@ export async function main(): globalThis.Promise<void> {
 		await $.println("err:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		return
 	}
-	for (let __goscriptRangeTarget0 = entries, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
-		let entry = __goscriptRangeTarget0![__rangeIndex]
+	for (let __goscriptRangeTarget0 = entries, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
+		let entry = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as fs.DirEntry | null)
 		await $.println((__goscriptAwait = $.pointerValue<Exclude<fs.DirEntry, null>>(entry).Name(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = $.pointerValue<Exclude<fs.DirEntry, null>>(entry).IsDir(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	}
 }

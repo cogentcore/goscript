@@ -25,10 +25,20 @@ export function search<E>(__typeArgs: $.GenericTypeArgs | undefined, dictionary:
 
 export async function main(): globalThis.Promise<void> {
 	let three: $.Slice<number[]> = $.arrayToSlice<number[]>([$.arrayValue([0, 9, 1]), $.arrayValue([10, 19, 2]), $.arrayValue([20, 29, 3])])
-	await $.println($.arrayIndex(search({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, E: { type: /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 3), zero: () => $.arrayValue(globalThis.Array.from({ length: 3 }, () => 0)) }}, three, 15), 2), $.arrayIndex(search({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, E: { type: /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 3), zero: () => $.arrayValue(globalThis.Array.from({ length: 3 }, () => 0)) }}, three, 25), 2), $.arrayIndex(search({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, E: { type: /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 3), zero: () => $.arrayValue(globalThis.Array.from({ length: 3 }, () => 0)) }}, three, 40), 2))
+	await $.println($.arrayIndex(search(__goscriptStatic0(), three, 15), 2), $.arrayIndex(search(__goscriptStatic0(), three, 25), 2), $.arrayIndex(search(__goscriptStatic0(), three, 40), 2))
 	let four: $.Slice<number[]> = $.arrayToSlice<number[]>([$.arrayValue([0, 9, 1, 5]), $.arrayValue([10, 19, 2, 6])])
-	let r = ($.cloneArrayValue(search({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, E: { type: /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 4), zero: () => $.arrayValue(globalThis.Array.from({ length: 4 }, () => 0)) }}, four, 3), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 4)) as number[])
+	let r = ($.cloneArrayValue(search(__goscriptStatic1(), four, 3), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 4)) as number[])
 	await $.println($.arrayIndex(r, 2), $.arrayIndex(r, 3), 4)
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, E: { type: /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 3), zero: () => $.arrayValue(globalThis.Array.from({ length: 3 }, () => 0)) }})
+}
+
+var __goscriptStatic1$value: any
+function __goscriptStatic1(): any {
+	return __goscriptStatic1$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, E: { type: /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 4), zero: () => $.arrayValue(globalThis.Array.from({ length: 4 }, () => 0)) }})
 }
 
 if ($.isMainScript(import.meta)) {

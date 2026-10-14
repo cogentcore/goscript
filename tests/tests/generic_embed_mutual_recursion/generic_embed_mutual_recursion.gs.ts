@@ -25,7 +25,13 @@ $.registerInterfaceType(
 );
 
 export class AppBase {
-	public declare Windows: $.Slice<any>
+	public get Windows(): $.Slice<any> {
+		return this._fields.Windows
+	}
+
+	public set Windows(value: $.Slice<any>) {
+		this._fields.Windows = value
+	}
 
 	public _fields: {
 		Windows: $.Slice<any>
@@ -49,7 +55,7 @@ export class AppBase {
 
 	public async FirstName(__typeArgs: $.GenericTypeArgs | undefined): globalThis.Promise<string> {
 		const a: AppBase | $.VarRef<AppBase> | null = this;
-		if ($.len($.pointerValue<AppBase>(a).Windows) == 0) {
+		if ($.sliceLen($.pointerValue<AppBase>(a).Windows) == 0) {
 			return ""
 		}
 		return $.callGenericMethod(__typeArgs, "W", "Name", $.arrayIndex($.pointerValue<AppBase>(a).Windows!, 0))
@@ -57,29 +63,37 @@ export class AppBase {
 
 	public Window(__typeArgs: $.GenericTypeArgs | undefined): Window | null {
 		const a: AppBase | $.VarRef<AppBase> | null = this;
-		if ($.len($.pointerValue<AppBase>(a).Windows) == 0) {
+		if ($.sliceLen($.pointerValue<AppBase>(a).Windows) == 0) {
 			return null
 		}
 		return $.typeParamInterfaceValue<Window | null>($.arrayIndex($.pointerValue<AppBase>(a).Windows!, 0), __typeArgs?.["W"] ?? { type: { kind: $.TypeKind.Interface, methods: [$.methodSignature("Name", [], [/* @__PURE__ */ $.basicType("string")])] }, zero: () => null })
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Windows"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.AppBase",
 		() => new AppBase(),
-		() => [{ name: "FirstName", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }, { name: "Window", args: [], returns: [{ type: "main.Window" }] }],
+		() => [{ name: "FirstName", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }], pointerReceiver: true }, { name: "Window", args: [], returns: [{ type: "main.Window" }], pointerReceiver: true }],
 		AppBase,
 		() => [{ name: "Windows", key: "Windows", type: /* @__PURE__ */ $.sliceType({ kind: $.TypeKind.Interface, methods: [$.methodSignature("Name", [], [/* @__PURE__ */ $.basicType("string")])] }) }]
 	)
 }
 
 export class WindowBase {
-	public declare App: any
+	public get App(): any {
+		return this._fields.App
+	}
 
-	public declare name: string
+	public set App(value: any) {
+		this._fields.App = value
+	}
+
+	public get name(): string {
+		return this._fields.name
+	}
+
+	public set name(value: string) {
+		this._fields.name = value
+	}
 
 	public _fields: {
 		App: any
@@ -88,7 +102,7 @@ export class WindowBase {
 
 	constructor(init?: Partial<{App?: any, name?: string}>) {
 		this._fields = {
-			App: init?.App ?? (null! as any),
+			App: init?.App !== undefined ? $.copyElement(init.App) : (null! as any),
 			name: init?.name ?? ("" as string)
 		}
 	}
@@ -114,21 +128,23 @@ export class WindowBase {
 		return $.pointerValue<WindowBase>(w).name
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["App", "name"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.WindowBase",
 		() => new WindowBase(),
-		() => [{ name: "AppWindowName", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }, { name: "Name", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }],
+		() => [{ name: "AppWindowName", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }], pointerReceiver: true }, { name: "Name", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }], pointerReceiver: true }],
 		WindowBase,
 		() => [{ name: "App", key: "App", type: { kind: $.TypeKind.Interface, methods: [$.methodSignature("FirstName", [], [/* @__PURE__ */ $.basicType("string")]), $.methodSignature("Window", [], ["main.Window"])] } }, { name: "name", key: "name", type: /* @__PURE__ */ $.basicType("string") }]
 	)
 }
 
 export class MyApp {
-	public declare AppBase: AppBase
+	public get AppBase(): AppBase {
+		return this._fields.AppBase
+	}
+
+	public set AppBase(value: AppBase) {
+		this._fields.AppBase = value
+	}
 
 	public _fields: {
 		AppBase: AppBase
@@ -151,28 +167,30 @@ export class MyApp {
 	}
 
 	public async FirstName(): globalThis.Promise<any> {
-		return await $.pointerValue<AppBase>(this.AppBase).FirstName({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, W: { type: /* @__PURE__ */ $.pointerType("main.MyWindow"), zero: () => null, methods: {AppWindowName: (receiver: any, ...args: any[]) => $.pointerValue(receiver).AppWindowName(...$.stripGenericTypeArgs(args)), Name: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Name(...$.stripGenericTypeArgs(args))} }})
+		return await $.pointerValue<AppBase>(this.AppBase).FirstName(__goscriptStatic0())
 	}
 
 	public Window(): any {
-		return $.pointerValue<AppBase>(this.AppBase).Window({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, W: { type: /* @__PURE__ */ $.pointerType("main.MyWindow"), zero: () => null, methods: {AppWindowName: (receiver: any, ...args: any[]) => $.pointerValue(receiver).AppWindowName(...$.stripGenericTypeArgs(args)), Name: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Name(...$.stripGenericTypeArgs(args))} }})
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["AppBase"])
+		return $.pointerValue<AppBase>(this.AppBase).Window(__goscriptStatic0())
 	}
 
 	static __typeInfo = $.registerStructType(
 		"main.MyApp",
 		() => new MyApp(),
-		() => [{ name: "FirstName", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }, { name: "Window", args: [], returns: [{ type: "main.Window" }] }],
+		() => [{ name: "FirstName", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }], pointerReceiver: true }, { name: "Window", args: [], returns: [{ type: "main.Window" }], pointerReceiver: true }],
 		MyApp,
 		() => [{ name: "AppBase", key: "AppBase", type: "main.AppBase", anonymous: true }]
 	)
 }
 
 export class MyWindow {
-	public declare WindowBase: WindowBase
+	public get WindowBase(): WindowBase {
+		return this._fields.WindowBase
+	}
+
+	public set WindowBase(value: WindowBase) {
+		this._fields.WindowBase = value
+	}
 
 	public _fields: {
 		WindowBase: WindowBase
@@ -195,21 +213,17 @@ export class MyWindow {
 	}
 
 	public async AppWindowName(): globalThis.Promise<any> {
-		return await $.pointerValue<WindowBase>(this.WindowBase).AppWindowName({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, A: { type: /* @__PURE__ */ $.pointerType("main.MyApp"), zero: () => null, methods: {FirstName: (receiver: any, ...args: any[]) => $.pointerValue(receiver).FirstName(...$.stripGenericTypeArgs(args)), Window: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Window(...$.stripGenericTypeArgs(args))} }})
+		return await $.pointerValue<WindowBase>(this.WindowBase).AppWindowName(__goscriptStatic1())
 	}
 
 	public Name(): any {
-		return $.pointerValue<WindowBase>(this.WindowBase).Name({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, A: { type: /* @__PURE__ */ $.pointerType("main.MyApp"), zero: () => null, methods: {FirstName: (receiver: any, ...args: any[]) => $.pointerValue(receiver).FirstName(...$.stripGenericTypeArgs(args)), Window: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Window(...$.stripGenericTypeArgs(args))} }})
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["WindowBase"])
+		return $.pointerValue<WindowBase>(this.WindowBase).Name(__goscriptStatic1())
 	}
 
 	static __typeInfo = $.registerStructType(
 		"main.MyWindow",
 		() => new MyWindow(),
-		() => [{ name: "AppWindowName", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }, { name: "Name", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }],
+		() => [{ name: "AppWindowName", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }], pointerReceiver: true }, { name: "Name", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }], pointerReceiver: true }],
 		MyWindow,
 		() => [{ name: "WindowBase", key: "WindowBase", type: "main.WindowBase", anonymous: true }]
 	)
@@ -221,11 +235,36 @@ export async function main(): globalThis.Promise<void> {
 	$.pointerValue<MyWindow>(w).WindowBase.name = "main"
 	$.pointerValue<MyWindow>(w).WindowBase.App = a
 	$.pointerValue<MyApp>(a).AppBase.Windows = $.append($.pointerValue<MyApp>(a).AppBase.Windows, w, $.appendZeros.nil)
-	let app: App | null = $.namedValueInterfaceValue<App | null>(a, "*main.MyApp", {FirstName: (receiver: any, ...args: any[]) => $.pointerValue(receiver).FirstName(...$.stripGenericTypeArgs(args)), Window: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Window(...$.stripGenericTypeArgs(args))}, /* @__PURE__ */ $.pointerType("main.MyApp"), [$.methodSignature("FirstName", [], [/* @__PURE__ */ $.basicType("string")]), $.methodSignature("Window", [], ["main.Window"])])
+	let app: App | null = $.namedValueInterfaceValue<App | null>(a, "*main.MyApp", __goscriptStatic2(), __goscriptStatic3(), __goscriptStatic4())
 	await $.println((__goscriptAwait = $.pointerValue<Exclude<Window, null>>((__goscriptAwait = $.pointerValue<Exclude<App, null>>(app).Window(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)).Name(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
-	await $.println((__goscriptAwait = $.pointerValue<Exclude<Window, null>>($.pointerValue<MyApp>($.pointerValue<MyWindow>(w).WindowBase.App).AppBase.Window({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, W: { type: /* @__PURE__ */ $.pointerType("main.MyWindow"), zero: () => null, methods: {AppWindowName: (receiver: any, ...args: any[]) => $.pointerValue(receiver).AppWindowName(...$.stripGenericTypeArgs(args)), Name: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Name(...$.stripGenericTypeArgs(args))} }})).Name(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
-	await $.println(await $.pointerValue<MyWindow>(w).WindowBase.AppWindowName({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, A: { type: /* @__PURE__ */ $.pointerType("main.MyApp"), zero: () => null, methods: {FirstName: (receiver: any, ...args: any[]) => $.pointerValue(receiver).FirstName(...$.stripGenericTypeArgs(args)), Window: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Window(...$.stripGenericTypeArgs(args))} }}))
-	await $.println(await $.pointerValue<MyApp>(a).AppBase.FirstName({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, W: { type: /* @__PURE__ */ $.pointerType("main.MyWindow"), zero: () => null, methods: {AppWindowName: (receiver: any, ...args: any[]) => $.pointerValue(receiver).AppWindowName(...$.stripGenericTypeArgs(args)), Name: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Name(...$.stripGenericTypeArgs(args))} }}))
+	await $.println((__goscriptAwait = $.pointerValue<Exclude<Window, null>>($.pointerValue<MyApp>($.pointerValue<MyWindow>(w).WindowBase.App).AppBase.Window(__goscriptStatic0())).Name(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println(await $.pointerValue<MyWindow>(w).WindowBase.AppWindowName(__goscriptStatic1()))
+	await $.println(await $.pointerValue<MyApp>(a).AppBase.FirstName(__goscriptStatic0()))
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, W: { type: /* @__PURE__ */ $.pointerType("main.MyWindow"), zero: () => null, methods: {AppWindowName: (receiver: any, ...args: any[]) => $.pointerValue(receiver).AppWindowName(...$.stripGenericTypeArgs(args)), Name: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Name(...$.stripGenericTypeArgs(args))} }})
+}
+
+var __goscriptStatic1$value: any
+function __goscriptStatic1(): any {
+	return __goscriptStatic1$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, A: { type: /* @__PURE__ */ $.pointerType("main.MyApp"), zero: () => null, methods: {FirstName: (receiver: any, ...args: any[]) => $.pointerValue(receiver).FirstName(...$.stripGenericTypeArgs(args)), Window: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Window(...$.stripGenericTypeArgs(args))} }})
+}
+
+var __goscriptStatic2$value: any
+function __goscriptStatic2(): any {
+	return __goscriptStatic2$value ??= ({FirstName: (receiver: any, ...args: any[]) => $.pointerValue(receiver).FirstName(...$.stripGenericTypeArgs(args)), Window: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Window(...$.stripGenericTypeArgs(args))})
+}
+
+var __goscriptStatic3$value: any
+function __goscriptStatic3(): any {
+	return __goscriptStatic3$value ??= (/* @__PURE__ */ $.pointerType("main.MyApp"))
+}
+
+var __goscriptStatic4$value: any
+function __goscriptStatic4(): any {
+	return __goscriptStatic4$value ??= ([$.methodSignature("FirstName", [], [/* @__PURE__ */ $.basicType("string")]), $.methodSignature("Window", [], ["main.Window"])])
 }
 
 var __goscriptAwait: any

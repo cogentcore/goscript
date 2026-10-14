@@ -10,13 +10,37 @@ import "@goscript/encoding/json/index.js"
 import "@goscript/fmt/index.js"
 
 export class Base {
-	public declare Name: string
+	public get Name(): string {
+		return this._fields.Name
+	}
 
-	public declare Kids: $.Slice<string>
+	public set Name(value: string) {
+		this._fields.Name = value
+	}
 
-	public declare hidden: number
+	public get Kids(): $.Slice<string> {
+		return this._fields.Kids
+	}
 
-	public declare Shadowed: string
+	public set Kids(value: $.Slice<string>) {
+		this._fields.Kids = value
+	}
+
+	public get hidden(): number {
+		return this._fields.hidden
+	}
+
+	public set hidden(value: number) {
+		this._fields.hidden = value
+	}
+
+	public get Shadowed(): string {
+		return this._fields.Shadowed
+	}
+
+	public set Shadowed(value: string) {
+		this._fields.Shadowed = value
+	}
 
 	public _fields: {
 		Name: string
@@ -38,8 +62,13 @@ export class Base {
 		return $.markAsStructValue(new Base(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Name", "Kids", "hidden", "Shadowed"])
+	public __goscriptAssign(source: Base): void {
+		const target = this._fields
+		const values = source._fields
+		target.Name = values.Name
+		target.Kids = values.Kids
+		target.hidden = values.hidden
+		target.Shadowed = values.Shadowed
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -52,7 +81,13 @@ export class Base {
 }
 
 export class inner {
-	public declare Deep: number
+	public get Deep(): number {
+		return this._fields.Deep
+	}
+
+	public set Deep(value: number) {
+		this._fields.Deep = value
+	}
 
 	public _fields: {
 		Deep: number
@@ -68,8 +103,10 @@ export class inner {
 		return $.markAsStructValue(new inner(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Deep"])
+	public __goscriptAssign(source: inner): void {
+		const target = this._fields
+		const values = source._fields
+		target.Deep = values.Deep
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -82,7 +119,13 @@ export class inner {
 }
 
 export class Extra {
-	public declare Note: string
+	public get Note(): string {
+		return this._fields.Note
+	}
+
+	public set Note(value: string) {
+		this._fields.Note = value
+	}
 
 	public _fields: {
 		Note: string
@@ -98,8 +141,10 @@ export class Extra {
 		return $.markAsStructValue(new Extra(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Note"])
+	public __goscriptAssign(source: Extra): void {
+		const target = this._fields
+		const values = source._fields
+		target.Note = values.Note
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -112,19 +157,61 @@ export class Extra {
 }
 
 export class Node {
-	public declare Base: Base
+	public get Base(): Base {
+		return this._fields.Base
+	}
 
-	public declare Extra: Extra | $.VarRef<Extra> | null
+	public set Base(value: Base) {
+		this._fields.Base = value
+	}
 
-	public declare inner: inner
+	public get Extra(): Extra | $.VarRef<Extra> | null {
+		return this._fields.Extra
+	}
 
-	public declare Tagged: Base
+	public set Extra(value: Extra | $.VarRef<Extra> | null) {
+		this._fields.Extra = value
+	}
 
-	public declare Shadowed: string
+	public get inner(): inner {
+		return this._fields.inner
+	}
 
-	public declare Size: number
+	public set inner(value: inner) {
+		this._fields.inner = value
+	}
 
-	public declare _private: boolean
+	public get Tagged(): Base {
+		return this._fields.Tagged
+	}
+
+	public set Tagged(value: Base) {
+		this._fields.Tagged = value
+	}
+
+	public get Shadowed(): string {
+		return this._fields.Shadowed
+	}
+
+	public set Shadowed(value: string) {
+		this._fields.Shadowed = value
+	}
+
+	public get Size(): number {
+		return this._fields.Size
+	}
+
+	public set Size(value: number) {
+		this._fields.Size = value
+	}
+
+	public get _private(): boolean {
+		return this._fields._private
+	}
+
+	public set _private(value: boolean) {
+		this._fields._private = value
+	}
 
 	public _fields: {
 		Base: Base
@@ -152,8 +239,16 @@ export class Node {
 		return $.markAsStructValue(new Node(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Base", "Extra", "inner", "Tagged", "Shadowed", "Size", "_private"])
+	public __goscriptAssign(source: Node): void {
+		const target = this._fields
+		const values = source._fields
+		$.assignStruct(target.Base, values.Base)
+		target.Extra = values.Extra
+		$.assignStruct(target.inner, values.inner)
+		$.assignStruct(target.Tagged, values.Tagged)
+		target.Shadowed = values.Shadowed
+		target.Size = values.Size
+		target._private = values._private
 	}
 
 	static __typeInfo = $.registerStructType(

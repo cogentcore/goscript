@@ -7,15 +7,45 @@ import * as json from "@goscript/encoding/json/index.js"
 import "@goscript/encoding/json/index.js"
 
 export class Node {
-	public declare Name: string
+	public get Name(): string {
+		return this._fields.Name
+	}
 
-	public declare Parent: Node | $.VarRef<Node> | null
+	public set Name(value: string) {
+		this._fields.Name = value
+	}
 
-	public declare Label: string
+	public get Parent(): Node | $.VarRef<Node> | null {
+		return this._fields.Parent
+	}
 
-	public declare Empty: string
+	public set Parent(value: Node | $.VarRef<Node> | null) {
+		this._fields.Parent = value
+	}
 
-	public declare Kept: number
+	public get Label(): string {
+		return this._fields.Label
+	}
+
+	public set Label(value: string) {
+		this._fields.Label = value
+	}
+
+	public get Empty(): string {
+		return this._fields.Empty
+	}
+
+	public set Empty(value: string) {
+		this._fields.Empty = value
+	}
+
+	public get Kept(): number {
+		return this._fields.Kept
+	}
+
+	public set Kept(value: number) {
+		this._fields.Kept = value
+	}
 
 	public _fields: {
 		Name: string
@@ -39,8 +69,14 @@ export class Node {
 		return $.markAsStructValue(new Node(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Name", "Parent", "Label", "Empty", "Kept"])
+	public __goscriptAssign(source: Node): void {
+		const target = this._fields
+		const values = source._fields
+		target.Name = values.Name
+		target.Parent = values.Parent
+		target.Label = values.Label
+		target.Empty = values.Empty
+		target.Kept = values.Kept
 	}
 
 	static __typeInfo = $.registerStructType(

@@ -17,7 +17,13 @@ $.registerInterfaceType(
 );
 
 export class Square {
-	public declare Side: number
+	public get Side(): number {
+		return this._fields.Side
+	}
+
+	public set Side(value: number) {
+		this._fields.Side = value
+	}
 
 	public _fields: {
 		Side: number
@@ -33,13 +39,15 @@ export class Square {
 		return $.markAsStructValue(new Square(this))
 	}
 
+	public __goscriptAssign(source: Square): void {
+		const target = this._fields
+		const values = source._fields
+		target.Side = values.Side
+	}
+
 	public Area(): number {
 		const s = this;
 		return s.Side * s.Side
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["Side"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -66,15 +74,17 @@ export async function main(): globalThis.Promise<void> {
 	// A variable declared from a call result keeps its interface type,
 	// so it can be assigned a nil interface later.
 	let s = first()
-	await $.println(await $.pointerValue<Exclude<Shape, null>>(s).Area())
+	await $.println((__goscriptAwait = $.pointerValue<Exclude<Shape, null>>(s).Area(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	s = find(false)
 	await $.println(s == null)
 
 	// reflect.Type results, as in jinzhu/copier.
-	let elem: reflect.Type | null = await $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.interfaceValue($.arrayToSlice<number>([]), "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"))))).Elem()
+	let elem: reflect.Type | null = (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.interfaceValue($.arrayToSlice<number>([]), "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"))))).Elem(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 	elem = reflect.PtrTo($.pointerValueOrNil(elem)!)
-	await $.println(await $.pointerValue<Exclude<reflect.Type, null>>(elem).String())
+	await $.println((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(elem).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

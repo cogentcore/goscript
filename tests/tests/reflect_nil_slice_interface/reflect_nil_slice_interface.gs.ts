@@ -7,7 +7,13 @@ import * as reflect from "@goscript/reflect/index.js"
 import "@goscript/reflect/index.js"
 
 export class S1 {
-	public declare Name: string
+	public get Name(): string {
+		return this._fields.Name
+	}
+
+	public set Name(value: string) {
+		this._fields.Name = value
+	}
 
 	public _fields: {
 		Name: string
@@ -23,8 +29,10 @@ export class S1 {
 		return $.markAsStructValue(new S1(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Name"])
+	public __goscriptAssign(source: S1): void {
+		const target = this._fields
+		const values = source._fields
+		target.Name = values.Name
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -37,13 +45,37 @@ export class S1 {
 }
 
 export class S5 {
-	public declare K: $.Slice<S1 | $.VarRef<S1> | null>
+	public get K(): $.Slice<S1 | $.VarRef<S1> | null> {
+		return this._fields.K
+	}
 
-	public declare M: globalThis.Map<string, number> | null
+	public set K(value: $.Slice<S1 | $.VarRef<S1> | null>) {
+		this._fields.K = value
+	}
 
-	public declare P: S1 | $.VarRef<S1> | null
+	public get M(): globalThis.Map<string, number> | null {
+		return this._fields.M
+	}
 
-	public declare F: (() => void) | null
+	public set M(value: globalThis.Map<string, number> | null) {
+		this._fields.M = value
+	}
+
+	public get P(): S1 | $.VarRef<S1> | null {
+		return this._fields.P
+	}
+
+	public set P(value: S1 | $.VarRef<S1> | null) {
+		this._fields.P = value
+	}
+
+	public get F(): (() => void) | null {
+		return this._fields.F
+	}
+
+	public set F(value: (() => void) | null) {
+		this._fields.F = value
+	}
 
 	public _fields: {
 		K: $.Slice<S1 | $.VarRef<S1> | null>
@@ -65,8 +97,13 @@ export class S5 {
 		return $.markAsStructValue(new S5(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["K", "M", "P", "F"])
+	public __goscriptAssign(source: S5): void {
+		const target = this._fields
+		const values = source._fields
+		target.K = values.K
+		target.M = values.M
+		target.P = values.P
+		target.F = values.F
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -84,7 +121,7 @@ export async function show(name: string, v: any): globalThis.Promise<void> {
 		await $.println(name, "invalid")
 		return
 	}
-	await $.println(name, reflect.Kind_String($.markAsStructValue($.cloneStructValue(rv)).Kind()), $.markAsStructValue($.cloneStructValue(rv)).IsNil(), await $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(rv)).Type()).String())
+	await $.println(name, reflect.Kind_String($.markAsStructValue($.cloneStructValue(rv)).Kind()), $.markAsStructValue($.cloneStructValue(rv)).IsNil(), (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(rv)).Type()).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 }
 
 export async function main(): globalThis.Promise<void> {
@@ -97,7 +134,7 @@ export async function main(): globalThis.Promise<void> {
 	let v = $.varRef($.markAsStructValue(new S5()))
 	let f = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(v, "*main.S5", /* @__PURE__ */ $.pointerType("main.S5"))))).Elem()))
 	for (let i = 0; i < $.markAsStructValue($.cloneStructValue(f)).NumField(); i++) {
-		await show((await $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(f)).Type()).Field(i)).Name, $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(f)).Field(i))).Interface())
+		await show((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(f)).Type()).Field(i), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait).Name, $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(f)).Field(i))).Interface())
 	}
 	let k = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(f)).Field(0))).Interface()
 	let [, ok] = $.typeAssertTuple<$.Slice<S1 | $.VarRef<S1> | null>>(k, /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.pointerType("main.S1")))
@@ -105,20 +142,20 @@ export async function main(): globalThis.Promise<void> {
 
 	// A nil value keeps a zero Pointer after a round trip through Interface.
 	for (let i = 0; i < $.markAsStructValue($.cloneStructValue(f)).NumField(); i++) {
-		await $.println("pointer", (await $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(f)).Type()).Field(i)).Name, $.uint($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(f)).Field(i))).Interface()))).Pointer(), 64) == 0)
+		await $.println("pointer", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(f)).Type()).Field(i), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait).Name, $.uint($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(f)).Field(i))).Interface()))).Pointer(), 64) == 0)
 	}
 
 	// The address of an unnamed field keeps its pointer type.
 	for (let i = 0; i < $.markAsStructValue($.cloneStructValue(f)).NumField(); i++) {
 		let p = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(f)).Field(i))).Addr())).Interface()
 		let pv = $.markAsStructValue($.cloneStructValue(reflect.ValueOf(p)))
-		await $.println("addr", await $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(pv)).Type()).String(), await $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(pv)).Elem())).Type()).String())
+		await $.println("addr", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(pv)).Type()).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(pv)).Elem())).Type()).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	}
 	let __goscriptTuple0: any = $.typeAssertTuple<$.VarRef<$.Slice<S1 | $.VarRef<S1> | null>> | null>($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(f)).Field(0))).Addr())).Interface(), /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.pointerType("main.S1"))))
 	let kp = __goscriptTuple0[0]
 	ok = __goscriptTuple0[1]
 	kp!.value = $.append($.pointerValue<$.Slice<S1 | $.VarRef<S1> | null>>(kp), new S1({Name: "x"}), $.appendZeros.nil)
-	await $.println("addr assert:", ok, $.len(v.value.K), $.pointerValue<S1>($.arrayIndex(v.value.K!, 0)).Name)
+	await $.println("addr assert:", ok, $.sliceLen(v.value.K), $.pointerValue<S1>($.arrayIndex(v.value.K!, 0)).Name)
 
 	// Unnamed basic, array and slice values keep their types.
 	await show2("int", $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.basicInterfaceValue(3, "int")))))
@@ -127,8 +164,10 @@ export async function main(): globalThis.Promise<void> {
 }
 
 export async function show2(name: string, v: reflect.Value): globalThis.Promise<void> {
-	await $.println(name, await $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.markAsStructValue($.cloneStructValue(v)).Interface()))).Type()).String())
+	await $.println(name, (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.markAsStructValue($.cloneStructValue(v)).Interface()))).Type()).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

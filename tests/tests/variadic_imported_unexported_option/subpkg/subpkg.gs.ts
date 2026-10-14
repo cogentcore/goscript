@@ -3,6 +3,8 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
+$.registerTypePackagePath("github.com/s4wave/goscript/tests/tests/variadic_imported_unexported_option/subpkg", ["subpkg.option", "subpkg.Thing"])
+
 export type option = ((_p0: Thing | $.VarRef<Thing> | null) => void) | null
 
 export class Thing {
@@ -68,9 +70,11 @@ export function WithLabel(l: string): option | null {
 
 export async function New(opts: $.Slice<option | null>): globalThis.Promise<Thing | $.VarRef<Thing> | null> {
 	let t: Thing | $.VarRef<Thing> | null = new Thing()
-	for (let __goscriptRangeTarget0 = opts, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
-		let opt = __goscriptRangeTarget0![__rangeIndex]
-		await opt!(t)
+	for (let __goscriptRangeTarget0 = opts, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
+		let opt = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as option | null)
+		void (__goscriptAwait = opt!(t), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 	}
 	return t
 }
+
+var __goscriptAwait: any

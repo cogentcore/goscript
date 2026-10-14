@@ -22,6 +22,9 @@ export class mainType {
 		return $.markAsStructValue(new mainType(this))
 	}
 
+	public __goscriptAssign(source: mainType): void {
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.mainType",
 		() => new mainType(),
@@ -32,19 +35,26 @@ export class mainType {
 }
 
 export async function show(label: string, t: reflect.Type | null): globalThis.Promise<void> {
-	await $.println($.concatString(label, ":"), await $.pointerValue<Exclude<reflect.Type, null>>(t).PkgPath(), await $.pointerValue<Exclude<reflect.Type, null>>(t).Name(), await $.pointerValue<Exclude<reflect.Type, null>>(t).String())
+	await $.println($.concatString(label, ":"), (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(t).PkgPath(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(t).Name(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(t).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 }
 
 export async function main(): globalThis.Promise<void> {
 	await show("struct", reflect.TypeOf($.interfaceValue($.markAsStructValue(new dep.Node()), "dep.Node", "dep.Node")))
-	await show("pointer elem", await $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.interfaceValue(new dep.Node(), "*dep.Node", /* @__PURE__ */ $.pointerType("dep.Node")))).Elem())
+	await show("pointer elem", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.interfaceValue(new dep.Node(), "*dep.Node", /* @__PURE__ */ $.pointerType("dep.Node")))).Elem(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	await show("basic", reflect.TypeOf($.namedValueInterfaceValue<any>(1, "dep.Level", {}, /* @__PURE__ */ $.basicType("int", "dep.Level"))))
-	await show("interface", reflect.TypeFor({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "dep.Namer", zero: () => null, methods: {Name: (receiver: any, ...args: any[]) => receiver.Name(...$.stripGenericTypeArgs(args))} }}))
+	await show("interface", reflect.TypeFor(__goscriptStatic0()))
 	await show("local", dep.LocalType())
 	await show("main", reflect.TypeOf($.interfaceValue($.markAsStructValue(new mainType()), "main.mainType", "main.mainType")))
-	await $.println("generic:", await $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.interfaceValue($.markAsStructValue(new dep.Box({Value: 0})), "dep.Box", "dep.Box"))).PkgPath())
-	await $.println("unnamed:", $.stringEqual(await $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.interfaceValue($.arrayToSlice<dep.Node>([]), "[]dep.Node", /* @__PURE__ */ $.sliceType("dep.Node")))).PkgPath(), ""))
+	await $.println("generic:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.interfaceValue($.markAsStructValue(new dep.Box({Value: 0})), "dep.Box", "dep.Box"))).PkgPath(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println("unnamed:", $.stringEqual((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.interfaceValue($.arrayToSlice<dep.Node>([]), "[]dep.Node", /* @__PURE__ */ $.sliceType("dep.Node")))).PkgPath(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), ""))
 }
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "dep.Namer", zero: () => null, methods: {Name: (receiver: any, ...args: any[]) => receiver.Name(...$.stripGenericTypeArgs(args))} }})
+}
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

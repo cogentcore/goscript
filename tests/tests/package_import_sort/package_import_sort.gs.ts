@@ -14,6 +14,8 @@ import "@goscript/sort/index.js"
 
 export type byFreq = $.Slice<number>
 
+$.registerNamedType("main.byFreq", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")));
+
 $.registerNamedValueType(
 	"main.byFreq",
 	{Len: (receiver: any, ...args: any[]) => (byFreq_Len as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Less: (receiver: any, ...args: any[]) => (byFreq_Less as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Swap: (receiver: any, ...args: any[]) => (byFreq_Swap as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
@@ -28,6 +30,8 @@ $.registerNamedValueType(
 
 export type nameList = $.Slice<string>
 
+$.registerNamedType("main.nameList", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("string")));
+
 $.registerNamedValueType(
 	"main.nameList",
 	{First: (receiver: any, ...args: any[]) => (nameList_First as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
@@ -41,7 +45,13 @@ $.registerNamedValueType(
 );
 
 export class descending {
-	public declare values: $.Slice<number>
+	public get values(): $.Slice<number> {
+		return this._fields.values
+	}
+
+	public set values(value: $.Slice<number>) {
+		this._fields.values = value
+	}
 
 	public _fields: {
 		values: $.Slice<number>
@@ -65,7 +75,7 @@ export class descending {
 
 	public Len(): number {
 		const d = this;
-		return $.len(d.values)
+		return $.sliceLen(d.values)
 	}
 
 	public Less(i: number, j: number): boolean {
@@ -81,10 +91,6 @@ export class descending {
 		d.values![j] = __goscriptAssign0_1
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["values"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.descending",
 		() => new descending(),
@@ -96,11 +102,11 @@ export class descending {
 
 export async function byFreq_sort(s: $.VarRef<byFreq> | null, a: $.Slice<number>): globalThis.Promise<void> {
 	s!.value = ((a as byFreq) as byFreq)
-	await sort2.Sort($.pointerValueOrNil($.namedValueInterfaceValue<sort2.Interface | null>(s, "*main.byFreq", {Len: (receiver: any, ...args: any[]) => (byFreq_Len as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args)), Less: (receiver: any, ...args: any[]) => (byFreq_Less as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args)), Swap: (receiver: any, ...args: any[]) => (byFreq_Swap as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args)), sort: (receiver: any, ...args: any[]) => (byFreq_sort as any)(receiver, ...$.stripGenericTypeArgs(args))}, /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"), "main.byFreq")), [$.methodSignature("Len", [], [/* @__PURE__ */ $.basicType("int")]), $.methodSignature("Less", [["i", /* @__PURE__ */ $.basicType("int")], ["j", /* @__PURE__ */ $.basicType("int")]], [/* @__PURE__ */ $.basicType("bool")]), $.methodSignature("Swap", [["i", /* @__PURE__ */ $.basicType("int")], ["j", /* @__PURE__ */ $.basicType("int")]]), $.methodSignature("sort", [["a", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"))]])]))!)
+	await sort2.Sort($.pointerValueOrNil($.namedValueInterfaceValue<sort2.Interface | null>(s, "*main.byFreq", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()))!)
 }
 
 export function byFreq_Len(s: byFreq): number {
-	return $.len((s as byFreq))
+	return $.sliceLen((s as byFreq))
 }
 
 export function byFreq_Less(s: byFreq, i: number, j: number): boolean {
@@ -156,7 +162,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("Index of 2.71 in sorted floats:", floatIndex)
 
 	// Test generic Search function
-	let searchResult = sort2.Search($.len(ints), $.functionValue((i: number): boolean => {
+	let searchResult = sort2.Search($.sliceLen(ints), $.functionValue((i: number): boolean => {
 		return $.arrayIndex(ints!, i) >= 5
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo)))
 	await $.println("First index where value >= 5:", searchResult)
@@ -166,11 +172,11 @@ export async function main(): globalThis.Promise<void> {
 	for (let __goscriptRangeCount0 = $.cap(gate), __rangeIndex = 0; __rangeIndex < __goscriptRangeCount0; __rangeIndex++) {
 		await $.chanSend(gate, 0)
 	}
-	let asyncSearch = await sort2.Search($.len(ints), $.functionValue(async (i: number): globalThis.Promise<boolean> => {
+	let asyncSearch = await sort2.Search($.sliceLen(ints), $.functionValue(async (i: number): globalThis.Promise<boolean> => {
 		return ($.arrayIndex(ints!, i) + await $.chanRecv(gate)) >= 4
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo)))
 	await $.println("First index where value >= 4:", asyncSearch)
-	let [findIndex, found] = sort2.Find($.len(ints), $.functionValue((i: number): number => {
+	let [findIndex, found] = sort2.Find($.sliceLen(ints), $.functionValue((i: number): number => {
 		return 5 - $.arrayIndex(ints!, i)
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo)))
 	await $.println("Find 5:", findIndex, found)
@@ -218,7 +224,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// a named slice type with methods passed as an any
 	let names: nameList = ($.arrayToSlice<string>(["c", "a", "b"]) as nameList)
-	sort2.Slice($.namedValueInterfaceValue<any>(names, "main.nameList", {First: (receiver: any, ...args: any[]) => (nameList_First as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("string"), "main.nameList"), [$.methodSignature("First", [], [/* @__PURE__ */ $.basicType("string")])]), $.functionValue((i: number, j: number): boolean => {
+	sort2.Slice($.namedValueInterfaceValue<any>(names, "main.nameList", __goscriptStatic3(), __goscriptStatic4(), __goscriptStatic5()), $.functionValue((i: number, j: number): boolean => {
 		return $.stringCompare($.arrayIndex(names!, i), $.arrayIndex(names!, j)) < 0
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo)))
 	await $.println("Named slice any sort:", nameList_First(names), $.arrayIndex(names!, 1), $.arrayIndex(names!, 2))
@@ -230,11 +236,11 @@ export async function main(): globalThis.Promise<void> {
 	let floatSlice: sort2.Float64Slice = ($.arrayToSlice<number>([2.5, 1.5]) as sort2.Float64Slice)
 	await sort2.Float64Slice_Sort(floatSlice)
 	await $.println("Float64Slice sort:", sort2.Float64Slice_Len(floatSlice), sort2.Float64Slice_Less(floatSlice, 0, 1), sort2.Float64Slice_Search(floatSlice, 2.5))
-	let sorter: sort2.Interface | null = $.namedValueInterfaceValue<sort2.Interface | null>(($.arrayToSlice<number>([3, 1, 2]) as sort2.IntSlice), "sort.IntSlice", {Len: (receiver: any, ...args: any[]) => (sort2.IntSlice_Len as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Less: (receiver: any, ...args: any[]) => (sort2.IntSlice_Less as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Search: (receiver: any, ...args: any[]) => (sort2.IntSlice_Search as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Sort: (receiver: any, ...args: any[]) => (sort2.IntSlice_Sort as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Swap: (receiver: any, ...args: any[]) => (sort2.IntSlice_Swap as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"), "sort.IntSlice"), [$.methodSignature("Len", [], [/* @__PURE__ */ $.basicType("int")]), $.methodSignature("Less", [["i", /* @__PURE__ */ $.basicType("int")], ["j", /* @__PURE__ */ $.basicType("int")]], [/* @__PURE__ */ $.basicType("bool")]), $.methodSignature("Search", [["x", /* @__PURE__ */ $.basicType("int")]], [/* @__PURE__ */ $.basicType("int")]), $.methodSignature("Sort"), $.methodSignature("Swap", [["i", /* @__PURE__ */ $.basicType("int")], ["j", /* @__PURE__ */ $.basicType("int")]])])
+	let sorter: sort2.Interface | null = $.namedValueInterfaceValue<sort2.Interface | null>(($.arrayToSlice<number>([3, 1, 2]) as sort2.IntSlice), "sort.IntSlice", __goscriptStatic6(), __goscriptStatic7(), __goscriptStatic8())
 	await sort2.Sort($.pointerValueOrNil(sorter)!)
 	let intSlice: sort2.IntSlice = ($.mustTypeAssert<sort2.IntSlice>(sorter, /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"), "sort.IntSlice")) as sort2.IntSlice)
 	await $.println("IntSlice interface sort:", $.arrayIndex(intSlice!, 0), $.arrayIndex(intSlice!, 1), $.arrayIndex(intSlice!, 2), (__goscriptAwait = $.pointerValue<Exclude<sort2.Interface, null>>(sorter).Len(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
-	await sort2.Sort($.pointerValueOrNil(sort2.Reverse($.pointerValueOrNil($.namedValueInterfaceValue<sort2.Interface | null>(intSlice, "sort.IntSlice", {Len: (receiver: any, ...args: any[]) => (sort2.IntSlice_Len as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Less: (receiver: any, ...args: any[]) => (sort2.IntSlice_Less as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Search: (receiver: any, ...args: any[]) => (sort2.IntSlice_Search as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Sort: (receiver: any, ...args: any[]) => (sort2.IntSlice_Sort as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Swap: (receiver: any, ...args: any[]) => (sort2.IntSlice_Swap as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"), "sort.IntSlice"), [$.methodSignature("Len", [], [/* @__PURE__ */ $.basicType("int")]), $.methodSignature("Less", [["i", /* @__PURE__ */ $.basicType("int")], ["j", /* @__PURE__ */ $.basicType("int")]], [/* @__PURE__ */ $.basicType("bool")]), $.methodSignature("Search", [["x", /* @__PURE__ */ $.basicType("int")]], [/* @__PURE__ */ $.basicType("int")]), $.methodSignature("Sort"), $.methodSignature("Swap", [["i", /* @__PURE__ */ $.basicType("int")], ["j", /* @__PURE__ */ $.basicType("int")]])]))!))!)
+	await sort2.Sort($.pointerValueOrNil(sort2.Reverse($.pointerValueOrNil($.namedValueInterfaceValue<sort2.Interface | null>(intSlice, "sort.IntSlice", __goscriptStatic6(), __goscriptStatic7(), __goscriptStatic8()))!))!)
 	sort2.IntSlice_Swap(intSlice, 0, 2)
 	await $.println("IntSlice reverse and swap:", $.arrayIndex(intSlice!, 0), $.arrayIndex(intSlice!, 1), $.arrayIndex(intSlice!, 2))
 
@@ -251,6 +257,51 @@ export function sortedPair(a: number, b: number): number {
 		return $.arrayIndex(pair!, i) < $.arrayIndex(pair!, j)
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo)))
 	return ($.arrayIndex(pair!, 0) * 10) + $.arrayIndex(pair!, 1)
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= ({Len: (receiver: any, ...args: any[]) => (byFreq_Len as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args)), Less: (receiver: any, ...args: any[]) => (byFreq_Less as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args)), Swap: (receiver: any, ...args: any[]) => (byFreq_Swap as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args)), sort: (receiver: any, ...args: any[]) => (byFreq_sort as any)(receiver, ...$.stripGenericTypeArgs(args))})
+}
+
+var __goscriptStatic1$value: any
+function __goscriptStatic1(): any {
+	return __goscriptStatic1$value ??= (/* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"), "main.byFreq")))
+}
+
+var __goscriptStatic2$value: any
+function __goscriptStatic2(): any {
+	return __goscriptStatic2$value ??= ([$.methodSignature("Len", [], [/* @__PURE__ */ $.basicType("int")]), $.methodSignature("Less", [["i", /* @__PURE__ */ $.basicType("int")], ["j", /* @__PURE__ */ $.basicType("int")]], [/* @__PURE__ */ $.basicType("bool")]), $.methodSignature("Swap", [["i", /* @__PURE__ */ $.basicType("int")], ["j", /* @__PURE__ */ $.basicType("int")]]), $.methodSignature("sort", [["a", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"))]])])
+}
+
+var __goscriptStatic3$value: any
+function __goscriptStatic3(): any {
+	return __goscriptStatic3$value ??= ({First: (receiver: any, ...args: any[]) => (nameList_First as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))})
+}
+
+var __goscriptStatic4$value: any
+function __goscriptStatic4(): any {
+	return __goscriptStatic4$value ??= (/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("string"), "main.nameList"))
+}
+
+var __goscriptStatic5$value: any
+function __goscriptStatic5(): any {
+	return __goscriptStatic5$value ??= ([$.methodSignature("First", [], [/* @__PURE__ */ $.basicType("string")])])
+}
+
+var __goscriptStatic6$value: any
+function __goscriptStatic6(): any {
+	return __goscriptStatic6$value ??= ({Len: (receiver: any, ...args: any[]) => (sort2.IntSlice_Len as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Less: (receiver: any, ...args: any[]) => (sort2.IntSlice_Less as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Search: (receiver: any, ...args: any[]) => (sort2.IntSlice_Search as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Sort: (receiver: any, ...args: any[]) => (sort2.IntSlice_Sort as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Swap: (receiver: any, ...args: any[]) => (sort2.IntSlice_Swap as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))})
+}
+
+var __goscriptStatic7$value: any
+function __goscriptStatic7(): any {
+	return __goscriptStatic7$value ??= (/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"), "sort.IntSlice"))
+}
+
+var __goscriptStatic8$value: any
+function __goscriptStatic8(): any {
+	return __goscriptStatic8$value ??= ([$.methodSignature("Len", [], [/* @__PURE__ */ $.basicType("int")]), $.methodSignature("Less", [["i", /* @__PURE__ */ $.basicType("int")], ["j", /* @__PURE__ */ $.basicType("int")]], [/* @__PURE__ */ $.basicType("bool")]), $.methodSignature("Search", [["x", /* @__PURE__ */ $.basicType("int")]], [/* @__PURE__ */ $.basicType("int")]), $.methodSignature("Sort"), $.methodSignature("Swap", [["i", /* @__PURE__ */ $.basicType("int")], ["j", /* @__PURE__ */ $.basicType("int")]])])
 }
 
 var __goscriptAwait: any
