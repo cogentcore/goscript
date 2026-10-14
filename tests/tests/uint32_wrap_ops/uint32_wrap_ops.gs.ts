@@ -4,7 +4,7 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export function checksum(c: number): number {
-	return $.uint(c + 2, 32)
+	return $.uint(((c + 2) >>> 0), 32)
 }
 
 export async function main(): globalThis.Promise<void> {
@@ -19,7 +19,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println((65535 as number) == 0xffff)
 	await $.println($.uint(($.uintShr(high, 32, 32)), 32) == 0)
 	let count: number = 0
-	for (let mask = 8; $.uint(mask, 8) <= 24; [mask, count] = [$.uint(mask - 8, 8), count + 1]) {
+	for (let mask = 8; $.uint(mask, 8) <= 24; [mask, count] = [$.uint(((mask - 8) & 0xff), 8), count + 1]) {
 		await $.println($.uint(mask, 8))
 	}
 	await $.println(count)

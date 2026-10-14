@@ -4493,6 +4493,13 @@ func (o *LoweringOwner) lowerStmtInto(ctx lowerFileContext, stmt ast.Stmt, out [
 			return append(out, loweredStmt{text: target + typed.Tok.String()}), diagnostics
 		}
 		expr, diagnostics := o.lowerExpr(ctx, typed.X)
+		op := token.ADD
+		if typed.Tok == token.DEC {
+			op = token.SUB
+		}
+		if value, ok := wrapNarrowIntegerValue(ctx.semPkg.source.TypesInfo.TypeOf(typed.X), expr+" "+op.String()+" 1", op); ok {
+			return append(out, loweredStmt{text: expr + " = " + value}), diagnostics
+		}
 		return append(out, loweredStmt{text: expr + typed.Tok.String()}), diagnostics
 	case *ast.BranchStmt:
 		if typed.Label != nil {
@@ -5662,6 +5669,39 @@ func integerQuotientAssignValueExpr(targetType types.Type, left string, right st
 		return "(" + left + " / " + right + ") >>> 0", true
 	}
 	return "globalThis.Math.trunc(" + left + " / " + right + ")", true
+}
+
+// wrapNarrowIntegerValue wraps the result of an addition, subtraction or
+// left shift of integers narrower than 64 bits, which JavaScript computes
+// without overflow, to the width of its type, as Go does. A JavaScript left
+// shift already wraps to a signed 32-bit result, so it needs no wrapping for
+// int32.
+func wrapNarrowIntegerValue(typ types.Type, value string, op token.Token) (string, bool) {
+	if bits, ok := unsignedIntegerBits(typ); ok {
+		switch bits {
+		case 8:
+			return "((" + value + ") & 0xff)", true
+		case 16:
+			return "((" + value + ") & 0xffff)", true
+		case 32:
+			return "((" + value + ") >>> 0)", true
+		}
+		return "", false
+	}
+	if bits, ok := signedIntegerBits(typ); ok {
+		switch bits {
+		case 8:
+			return "((" + value + ") << 24 >> 24)", true
+		case 16:
+			return "((" + value + ") << 16 >> 16)", true
+		case 32:
+			if op == token.SHL {
+				return "", false
+			}
+			return "((" + value + ") | 0)", true
+		}
+	}
+	return "", false
 }
 
 func lower32BitIntegerMultiplicationValue(targetType types.Type, left string, right string) (string, bool) {
@@ -8260,6 +8300,11 @@ func (o *LoweringOwner) lowerExpr(ctx lowerFileContext, expr ast.Expr) (string, 
 			// uintShr paths above already ran, so the base here is number-backed:
 			// coerce the bigint count to Number to match Go's count semantics.
 			right = "globalThis.Number(" + right + ")"
+		}
+		if typed.Op == token.ADD || typed.Op == token.SUB || typed.Op == token.SHL {
+			if value, ok := wrapNarrowIntegerValue(ctx.semPkg.source.TypesInfo.TypeOf(typed), left+" "+typed.Op.String()+" "+right, typed.Op); ok {
+				return value, append(leftDiagnostics, rightDiagnostics...)
+			}
 		}
 		if value, diagnostics, ok := o.lowerStringOrderExpr(ctx, typed, left, right, leftDiagnostics, rightDiagnostics); ok {
 			return value, diagnostics
