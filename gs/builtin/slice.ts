@@ -2149,10 +2149,31 @@ export const rangeString = (str: string): Array<[number, number]> => {
     }
     return pairs
   }
+  // The UTF-8 length of each rune follows from its code point, which is
+  // much faster than encoding each character. A lone surrogate encodes as
+  // U+FFFD, as TextEncoder does.
   let offset = 0
-  for (const char of str) {
-    pairs.push([offset, char.codePointAt(0) || 0])
-    offset += sharedTextEncoder.encode(char).length
+  for (let i = 0; i < str.length; ) {
+    let r = str.charCodeAt(i)
+    let units = 1
+    if (r >= 0xd800 && r <= 0xdbff && i + 1 < str.length) {
+      const low = str.charCodeAt(i + 1)
+      if (low >= 0xdc00 && low <= 0xdfff) {
+        r = 0x10000 + ((r - 0xd800) << 10) + (low - 0xdc00)
+        units = 2
+      }
+    }
+    pairs.push([offset, r])
+    i += units
+    if (r < 0x80) {
+      offset += 1
+    } else if (r < 0x800) {
+      offset += 2
+    } else if (r < 0x10000) {
+      offset += 3
+    } else {
+      offset += 4
+    }
   }
   return pairs
 }

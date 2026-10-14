@@ -15,6 +15,7 @@ import {
   GoBinaryString,
   goSlice,
   indexString,
+  rangeString,
   indexByteString,
   len,
   makeSlice,
@@ -293,6 +294,26 @@ describe('builtin string byte representation', () => {
     const ascii = 'abc'
     stringToBytes(ascii).fill(0)
     expect(indexString(ascii, 0)).toBe(97)
+  })
+
+  it('ranges over runes with their UTF-8 byte offsets', () => {
+    for (const value of [
+      '',
+      'abc',
+      'aé🙂z€',
+      '你好',
+      'x\ud800y',
+      '\udc00',
+      'a\ud83d',
+    ]) {
+      const want: Array<[number, number]> = []
+      let offset = 0
+      for (const char of value) {
+        want.push([offset, char.codePointAt(0) || 0])
+        offset += new TextEncoder().encode(char).length
+      }
+      expect(rangeString(value)).toEqual(want)
+    }
   })
 
   it('preserves byte-index bounds and non-integer access behavior', () => {
