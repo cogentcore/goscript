@@ -250,7 +250,6 @@ export class Decoder {
   private eof = false
   private readErr: $.GoError = null
   private chunk = $.makeSlice<number>(decoderReadSize, undefined, 'byte')
-  private utf8 = new TextDecoder()
 
   public constructor(private readonly reader: io.Reader) {}
 
@@ -258,18 +257,14 @@ export class Decoder {
   // when the reader is asynchronous.
   private readChunk(): io.Awaitable<void> {
     return io.mapResult(this.reader.Read(this.chunk), ([n, err]) => {
-      // Decode the bytes read, holding back a split UTF-8 sequence.
+      // The buffer holds the bytes read as a Go string.
       if (n > 0) {
-        this.buf += this.utf8.decode(
-          $.bytesToUint8Array($.goSlice(this.chunk, 0, n)),
-          { stream: true },
-        )
+        this.buf += $.bytesToString($.goSlice(this.chunk, 0, n))
       }
 
       // Any error ends the input; only io.EOF is not reported.
       if (err !== null) {
         this.eof = true
-        this.buf += this.utf8.decode()
         if (err !== io.EOF) {
           this.readErr = err
         }
@@ -776,7 +771,7 @@ function scanJSONValue(
         raw += text[i++] ?? ''
       } else if (c === '"') {
         try {
-          return JSON.parse(raw) as string
+          return parseJSONStringLiteral(raw)
         } catch {
           i -= raw.length
           return fail('invalid string literal')
@@ -1829,6 +1824,56 @@ function validUnmarshalTarget(value: unknown): boolean {
     return true
   }
   return unmarshalJSONTarget(value) !== null || isStructValue(value)
+}
+
+// parseJSONStringLiteral returns the Go string of a JSON string literal in a
+// Go string (a string of UTF-8 bytes), validating it with JSON.parse, which
+// keeps the bytes of the literal as they are. A \u escape gives JavaScript
+// text, so a literal with one is decoded here, with each escape encoded as
+// UTF-8, as Go does, and an unpaired surrogate as U+FFFD.
+function parseJSONStringLiteral(raw: string): string {
+  const parsed = JSON.parse(raw) as string
+  if (!raw.includes('\\u')) {
+    return parsed
+  }
+  let out = ''
+  const end = raw.length - 1
+  let start = 1
+  let i = 1
+  while (i < end) {
+    if (raw.charCodeAt(i) !== 0x5c) {
+      i++
+      continue
+    }
+    out += raw.substring(start, i)
+    const e = raw[i + 1]
+    if (e !== 'u') {
+      out += JSON.parse('"' + raw.substring(i, i + 2) + '"') as string
+      i += 2
+      start = i
+      continue
+    }
+    let r = parseInt(raw.substring(i + 2, i + 6), 16)
+    i += 6
+    if (r >= 0xd800 && r < 0xdc00) {
+      if (raw[i] === '\\' && raw[i + 1] === 'u') {
+        const r2 = parseInt(raw.substring(i + 2, i + 6), 16)
+        if (r2 >= 0xdc00 && r2 < 0xe000) {
+          r = 0x10000 + ((r - 0xd800) << 10) + (r2 - 0xdc00)
+          i += 6
+        } else {
+          r = 0xfffd
+        }
+      } else {
+        r = 0xfffd
+      }
+    } else if (r >= 0xdc00 && r < 0xe000) {
+      r = 0xfffd
+    }
+    out += $.runeToString(r)
+    start = i
+  }
+  return out + raw.substring(start, end)
 }
 
 function parseJSON(data: $.Slice<number>, opts: decodeOptions): unknown {

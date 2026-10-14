@@ -165,7 +165,7 @@ describe('jsontext.Value override', () => {
 
   it('escapes JavaScript separators in preserved byte strings', () => {
     const raw = $.varRef<$.Bytes>(
-      $.stringToBytes(`"${String.fromCodePoint(0x2028)}"`),
+      $.stringToBytes(goString(`"${String.fromCodePoint(0x2028)}"`)),
     )
     expect(Value_Compact(raw, EscapeForJS(true))).toBeNull()
     expect($.bytesToString(raw.value)).toBe(goString('"\\u2028"'))
