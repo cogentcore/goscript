@@ -167,8 +167,8 @@ export class Pair {
 
 	constructor(init?: Partial<{First?: any, Second?: any}>) {
 		this._fields = {
-			First: init?.First ?? (null! as any),
-			Second: init?.Second ?? (null! as any)
+			First: init?.First !== undefined ? $.copyElement(init.First) : (null! as any),
+			Second: init?.Second !== undefined ? $.copyElement(init.Second) : (null! as any)
 		}
 	}
 

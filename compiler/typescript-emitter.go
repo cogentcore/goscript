@@ -452,6 +452,7 @@ func renderStruct(b *strings.Builder, structType *loweredStruct, runtimeOwner *R
 	markStructValue := runtimeOwner.QualifiedHelper(RuntimeHelperMarkAsStructValue)
 	cloneStructValue := runtimeOwner.QualifiedHelper(RuntimeHelperCloneStructValue)
 	cloneArrayValue := runtimeOwner.QualifiedHelper(RuntimeHelperCloneArrayValue)
+	copyElement := runtimeOwner.QualifiedHelper(RuntimeHelperCopyElement)
 	registerStructType := runtimeOwner.QualifiedHelper(RuntimeHelperRegisterStructType)
 	if structType.exported {
 		b.WriteString("export ")
@@ -512,6 +513,24 @@ func renderStruct(b *strings.Builder, structType *loweredStruct, runtimeOwner *R
 			b.WriteString(field.runtimeType)
 			b.WriteString(") : ")
 			b.WriteString(field.zero)
+		} else if field.typeParamValue {
+			// A type argument may be a struct or array type, whose values
+			// are copied when they are one at run time.
+			b.WriteString("init?.")
+			b.WriteString(field.name)
+			b.WriteString(" !== undefined ? ")
+			b.WriteString(copyElement)
+			b.WriteString("(init.")
+			b.WriteString(field.name)
+			b.WriteString(") : (")
+			if field.zero == "null" {
+				b.WriteString("null!")
+			} else {
+				b.WriteString(field.zero)
+			}
+			b.WriteString(" as ")
+			b.WriteString(field.typ)
+			b.WriteString(")")
 		} else {
 			b.WriteString("init?.")
 			b.WriteString(field.name)

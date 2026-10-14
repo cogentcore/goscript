@@ -126,6 +126,9 @@ type loweredStructField struct {
 	exported    bool
 	structValue bool
 	arrayValue  bool
+	// typeParamValue reports whether the field's type is a type parameter
+	// that may be instantiated with a struct or array type.
+	typeParamValue bool
 }
 
 type loweredFunction struct {

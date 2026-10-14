@@ -22,7 +22,7 @@ export class box {
 
 	constructor(init?: Partial<{value?: any}>) {
 		this._fields = {
-			value: init?.value ?? (null! as any)
+			value: init?.value !== undefined ? $.copyElement(init.value) : (null! as any)
 		}
 	}
 

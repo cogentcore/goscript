@@ -60,10 +60,10 @@ export class Sides {
 
 	constructor(init?: Partial<{Top?: any, Right?: any, Bottom?: any, Left?: any}>) {
 		this._fields = {
-			Top: init?.Top ?? (null! as any),
-			Right: init?.Right ?? (null! as any),
-			Bottom: init?.Bottom ?? (null! as any),
-			Left: init?.Left ?? (null! as any)
+			Top: init?.Top !== undefined ? $.copyElement(init.Top) : (null! as any),
+			Right: init?.Right !== undefined ? $.copyElement(init.Right) : (null! as any),
+			Bottom: init?.Bottom !== undefined ? $.copyElement(init.Bottom) : (null! as any),
+			Left: init?.Left !== undefined ? $.copyElement(init.Left) : (null! as any)
 		}
 	}
 
@@ -110,8 +110,8 @@ export class box {
 
 	constructor(init?: Partial<{A?: any, B?: any}>) {
 		this._fields = {
-			A: init?.A ?? (null! as any),
-			B: init?.B ?? (null! as any)
+			A: init?.A !== undefined ? $.copyElement(init.A) : (null! as any),
+			B: init?.B !== undefined ? $.copyElement(init.B) : (null! as any)
 		}
 	}
 
@@ -221,6 +221,18 @@ export async function main(): globalThis.Promise<void> {
 	let b = ($.markAsStructValue($.cloneStructValue(makeBox({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.Value", zero: () => $.markAsStructValue(new Value()) }}, $.markAsStructValue(new Value({V: 13}))))) as box)
 	b.A.Set(14)
 	await $.println("box:", b.A.V, b.B.V)
+
+	// Copying a generic struct copies its struct-typed fields, so assigning
+	// to a field of the original leaves the copy unchanged.
+	let orig = $.markAsStructValue(new Sides({Bottom: $.markAsStructValue(new Value({V: 1})), Top: $.markAsStructValue(new Value()), Right: $.markAsStructValue(new Value()), Left: $.markAsStructValue(new Value())}))
+	let cp = $.markAsStructValue($.cloneStructValue(orig))
+	$.assignStruct(cp.Bottom, $.markAsStructValue(new Value({V: 2})))
+	$.assignStruct(orig.Bottom, $.markAsStructValue(new Value({V: 3})))
+	await $.println("struct copy:", orig.Bottom.V, cp.Bottom.V)
+	let orig2 = $.markAsStructValue(new Sides({Top: $.markAsStructValue(new Value({V: 4})), Right: $.markAsStructValue(new Value()), Bottom: $.markAsStructValue(new Value()), Left: $.markAsStructValue(new Value())}))
+	let cp2 = $.markAsStructValue($.cloneStructValue(orig2))
+	orig2.Top.Set(5)
+	await $.println("struct copy method:", orig2.Top.V, cp2.Top.V)
 
 	let si: $.VarRef<Sides> = $.varRef($.markAsStructValue(new Sides({Top: 0, Right: 0, Bottom: 0, Left: 0})))
 	si.value.SetAll({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }}, 4)

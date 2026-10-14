@@ -82,7 +82,7 @@ export class WindowBase {
 
 	constructor(init?: Partial<{App?: any, name?: string}>) {
 		this._fields = {
-			App: init?.App ?? (null! as any),
+			App: init?.App !== undefined ? $.copyElement(init.App) : (null! as any),
 			name: init?.name ?? ("" as string)
 		}
 	}
