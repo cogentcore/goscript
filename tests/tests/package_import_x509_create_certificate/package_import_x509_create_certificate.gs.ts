@@ -109,7 +109,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("create err nil", err == null)
 	await $.println("der nonempty", $.sliceLen(der) != 0)
 	if (err != null) {
-		await $.println("create error", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+		await $.println("create error", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		return
 	}
 
@@ -119,7 +119,7 @@ export async function main(): globalThis.Promise<void> {
 	let cert$: x509.Certificate = cert == null ? $.pointerTarget<x509.Certificate>(cert) : (cert as any).__isVarRef === true ? (cert as any).value : (cert as any).__goValue === undefined ? (cert as any) : $.pointerTarget<x509.Certificate>(cert)
 	await $.println("parse err nil", err == null)
 	if (err != null) {
-		await $.println("parse error", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+		await $.println("parse error", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		return
 	}
 	let keyExt: pkix.Extension = new pkix.Extension(undefined, true)
@@ -142,12 +142,12 @@ export async function main(): globalThis.Promise<void> {
 	err = __goscriptTuple4[1]
 	await $.println("extension unmarshal", err == null, $.sliceLen(decoded.value.PubKey), $.arrayIndex(decoded.value.PubKey!, 0), $.arrayIndex(decoded.value.PubKey!, 5), $.sliceLen(decoded.value.Signature))
 	let pool: x509.CertPool | $.VarRef<x509.CertPool> | null = x509.NewCertPool()
-	await x509.CertPool.prototype.AddCert.call(pool, cert)
-	let __goscriptTuple5: any = await x509.Certificate.prototype.Verify.call(cert, new x509.VerifyOptions({Roots: pool}, true))
+	await (pool !== null && (pool as any).__isVarRef !== true && (pool as any).__goValue === undefined ? (pool as unknown as x509.CertPool).AddCert(cert) : x509.CertPool.prototype.AddCert.call(pool, cert))
+	let __goscriptTuple5: any = await (cert !== null && (cert as any).__isVarRef !== true && (cert as any).__goValue === undefined ? (cert as unknown as x509.Certificate).Verify(new x509.VerifyOptions({Roots: pool}, true)) : x509.Certificate.prototype.Verify.call(cert, new x509.VerifyOptions({Roots: pool}, true)))
 	err = __goscriptTuple5[1]
 	await $.println("verify err nil", err == null)
 	if (err != null) {
-		await $.println("verify error", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+		await $.println("verify error", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		await $.println("verify error type", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf((err as any))).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		{
 			const __goscriptTypeSwitchValue = err

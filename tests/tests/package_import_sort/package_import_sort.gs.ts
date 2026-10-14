@@ -240,7 +240,7 @@ export async function main(): globalThis.Promise<void> {
 	let sorter: sort2.Interface | null = $.namedValueInterfaceValue<sort2.Interface | null>(($.arrayToSlice<number>([3, 1, 2]) as sort2.IntSlice), "sort.IntSlice", __goscriptStatic6(), __goscriptStatic7(), __goscriptStatic8())
 	await sort2.Sort($.pointerValueOrNil(sorter)!)
 	let intSlice: sort2.IntSlice = ($.mustTypeAssert<sort2.IntSlice>(sorter, /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"), "sort.IntSlice")) as sort2.IntSlice)
-	await $.println("IntSlice interface sort:", $.arrayIndex(intSlice!, 0), $.arrayIndex(intSlice!, 1), $.arrayIndex(intSlice!, 2), (__goscriptAwait = $.pointerValue<Exclude<sort2.Interface, null>>(sorter).Len(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println("IntSlice interface sort:", $.arrayIndex(intSlice!, 0), $.arrayIndex(intSlice!, 1), $.arrayIndex(intSlice!, 2), (__goscriptAwait = (sorter !== null && (sorter as any).__isVarRef !== true && (sorter as any).__goValue === undefined ? (sorter as Exclude<sort2.Interface, null>) : $.pointerValue<Exclude<sort2.Interface, null>>(sorter)).Len(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	await sort2.Sort($.pointerValueOrNil(sort2.Reverse($.pointerValueOrNil($.namedValueInterfaceValue<sort2.Interface | null>(intSlice, "sort.IntSlice", __goscriptStatic6(), __goscriptStatic7(), __goscriptStatic8()))!))!)
 	sort2.IntSlice_Swap(intSlice, 0, 2)
 	await $.println("IntSlice reverse and swap:", $.arrayIndex(intSlice!, 0), $.arrayIndex(intSlice!, 1), $.arrayIndex(intSlice!, 2))

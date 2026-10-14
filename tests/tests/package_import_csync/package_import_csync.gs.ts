@@ -37,7 +37,7 @@ export async function main(): globalThis.Promise<void> {
 		// Try to acquire the lock
 		let [relLock, err] = await mtx.value.Lock(ctx)
 		if (err != null) {
-			await $.println("worker", id, "failed to acquire lock:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+			await $.println("worker", id, "failed to acquire lock:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 			return
 		}
 		const __goscriptDeferCallee1 = relLock
@@ -76,9 +76,9 @@ export async function main(): globalThis.Promise<void> {
 		{
 			id: 1,
 			isSend: false,
-			channel: ((__goscriptAwait = $.pointerValue<Exclude<context.Context, null>>(ctx).Done(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as $.Channel<{}> | null),
+			channel: ((__goscriptAwait = (ctx !== null && (ctx as any).__isVarRef !== true && (ctx as any).__goValue === undefined ? (ctx as Exclude<context.Context, null>) : $.pointerValue<Exclude<context.Context, null>>(ctx)).Done(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as $.Channel<{}> | null),
 			onSelected: async (__goscriptSelect0Result) => {
-				await $.println("Test timed out:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>((__goscriptAwait = $.pointerValue<Exclude<context.Context, null>>(ctx).Err(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+				await $.println("Test timed out:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>((__goscriptAwait = (ctx !== null && (ctx as any).__isVarRef !== true && (ctx as any).__goValue === undefined ? (ctx as Exclude<context.Context, null>) : $.pointerValue<Exclude<context.Context, null>>(ctx)).Err(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 			}
 		}
 	], false)

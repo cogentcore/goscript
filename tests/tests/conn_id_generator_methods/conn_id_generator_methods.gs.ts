@@ -174,7 +174,7 @@ export async function connRunners_AddConnectionID(cr: connRunners, id: number): 
 
 export function newConnRunnerCallbacks(runner: connRunner | null): connRunnerCallbacks {
 	return new connRunnerCallbacks({AddConnectionID: $.functionValue(async (id: number): globalThis.Promise<void> => {
-		void (__goscriptAwait = $.pointerValue<Exclude<connRunner, null>>(runner).Add(id), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+		void (__goscriptAwait = (runner !== null && (runner as any).__isVarRef !== true && (runner as any).__goValue === undefined ? (runner as Exclude<connRunner, null>) : $.pointerValue<Exclude<connRunner, null>>(runner)).Add(id), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [] } as $.FunctionTypeInfo))}, true)
 }
 
@@ -182,9 +182,9 @@ export async function testVarRefConversion(): globalThis.Promise<void> {
 	let value = $.varRef(new transport({values: $.makeMap<number, number>()}, true))
 	let source: transport | $.VarRef<transport> | null = value
 	let destination: packetHandlerMap | $.VarRef<packetHandlerMap> | null = $.unsafePointerCast<packetHandlerMap | $.VarRef<packetHandlerMap> | null>(source, packetHandlerMap)
-	packetHandlerMap.prototype.Add.call(destination, 9)
+	void (destination !== null && (destination as any).__isVarRef !== true && (destination as any).__goValue === undefined ? (destination as unknown as packetHandlerMap).Add(9) : packetHandlerMap.prototype.Add.call(destination, 9))
 	value.value = $.assignStruct(value.value, new transport({values: $.makeMap<number, number>()}, true))
-	packetHandlerMap.prototype.Add.call(destination, 10)
+	void (destination !== null && (destination as any).__isVarRef !== true && (destination as any).__goValue === undefined ? (destination as unknown as packetHandlerMap).Add(10) : packetHandlerMap.prototype.Add.call(destination, 10))
 	await $.println("varref destination:", $.mapGet<number, number, number>(value.value.values, 10, 0)[0])
 }
 
@@ -192,7 +192,7 @@ export async function main(): globalThis.Promise<void> {
 	let t: transport | $.VarRef<transport> | null = new transport({values: $.makeMap<number, number>()})
 	let t$: transport = t == null ? $.pointerTarget<transport>(t) : (t as any).__isVarRef === true ? (t as any).value : (t as any).__goValue === undefined ? (t as any) : $.pointerTarget<transport>(t)
 	let runner: packetHandlerMap | $.VarRef<packetHandlerMap> | null = $.unsafePointerCast<packetHandlerMap | $.VarRef<packetHandlerMap> | null>(t, packetHandlerMap)
-	transport.prototype.SourceOnly.call(t, 3)
+	void (t !== null && (t as any).__isVarRef !== true && (t as any).__goValue === undefined ? (t as unknown as transport).SourceOnly(3) : transport.prototype.SourceOnly.call(t, 3))
 	let runnerAgainDest: packetHandlerMap | $.VarRef<packetHandlerMap> | null = $.unsafePointerCast<packetHandlerMap | $.VarRef<packetHandlerMap> | null>(t, packetHandlerMap)
 	let runners: connRunners = $.makeMap<connRunner | null, connRunnerCallbacks>([[$.interfaceValue<connRunner | null>(runner, "*main.packetHandlerMap", /* @__PURE__ */ $.pointerType("main.packetHandlerMap")), newConnRunnerCallbacks($.interfaceValue<connRunner | null>(runner, "*main.packetHandlerMap", /* @__PURE__ */ $.pointerType("main.packetHandlerMap")))]])
 	let sourceInterface: sourceRunner | null = $.interfaceValue<sourceRunner | null>(t, "*main.transport", /* @__PURE__ */ $.pointerType("main.transport"))
@@ -204,8 +204,8 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("destination:", $.mapGet<number, number, number>((t$ as transport).values, 7, 0)[0])
 	await $.println("same pointer:", $.pointerEqual(t, runnerAgain))
 	await $.println("boxed same pointer:", $.pointerEqual(t, runnerAgain))
-	void (__goscriptAwait = $.pointerValue<Exclude<sourceRunner, null>>(sourceInterface).SourceOnly(4), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
-	void (__goscriptAwait = $.pointerValue<Exclude<connRunner, null>>(destinationInterface).Add(8), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+	void (__goscriptAwait = (sourceInterface !== null && (sourceInterface as any).__isVarRef !== true && (sourceInterface as any).__goValue === undefined ? (sourceInterface as Exclude<sourceRunner, null>) : $.pointerValue<Exclude<sourceRunner, null>>(sourceInterface)).SourceOnly(4), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+	void (__goscriptAwait = (destinationInterface !== null && (destinationInterface as any).__isVarRef !== true && (destinationInterface as any).__goValue === undefined ? (destinationInterface as Exclude<connRunner, null>) : $.pointerValue<Exclude<connRunner, null>>(destinationInterface)).Add(8), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 	let pointerValues: globalThis.Map<transport | $.VarRef<transport> | null, number> | null = $.makeMap<transport | $.VarRef<transport> | null, number>([[t, 42]], /* @__PURE__ */ $.pointerType("main.transport"))
 	await $.println("map lookup:", $.mapGet<transport | $.VarRef<transport> | null, number, number>(pointerValues, runnerAgain, 0)[0])
 	await testVarRefConversion()

@@ -245,7 +245,7 @@ export async function main(): globalThis.Promise<void> {
 	;(w$ as MyWindow).WindowBase.App = a;
 	;(a$ as MyApp).AppBase.Windows = $.appendOne((a$ as MyApp).AppBase.Windows, w, $.appendZeros.nil)
 	let app: App | null = $.namedValueInterfaceValue<App | null>(a, "*main.MyApp", __goscriptStatic2(), __goscriptStatic3(), __goscriptStatic4())
-	await $.println((__goscriptAwait = $.pointerValue<Exclude<Window, null>>((__goscriptAwait = $.pointerValue<Exclude<App, null>>(app).Window(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)).Name(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println((__goscriptAwait = $.pointerValue<Exclude<Window, null>>((__goscriptAwait = (app !== null && (app as any).__isVarRef !== true && (app as any).__goValue === undefined ? (app as Exclude<App, null>) : $.pointerValue<Exclude<App, null>>(app)).Window(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)).Name(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	await $.println((__goscriptAwait = $.pointerValue<Exclude<Window, null>>($.pointerValue<MyApp>((w$ as MyWindow).WindowBase.App).AppBase.Window(__goscriptStatic0())).Name(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	await $.println(await (w$ as MyWindow).WindowBase.AppWindowName(__goscriptStatic1()))
 	await $.println(await (a$ as MyApp).AppBase.FirstName(__goscriptStatic0()))

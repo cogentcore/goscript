@@ -52,8 +52,8 @@ export class responseWriter {
 
 export async function main(): globalThis.Promise<void> {
 	let writer: responseWriter | $.VarRef<responseWriter> | null = new responseWriter({header: $.makeMap<string, $.Slice<string>>([])})
-	http.Header_Set(responseWriter.prototype.Header.call(writer), "X-Test", "ok")
-	await $.println(await http.Header_Get(responseWriter.prototype.Header.call(writer), "x-test"))
+	http.Header_Set((writer !== null && (writer as any).__isVarRef !== true && (writer as any).__goValue === undefined ? (writer as unknown as responseWriter).Header() : responseWriter.prototype.Header.call(writer)), "X-Test", "ok")
+	await $.println(await http.Header_Get((writer !== null && (writer as any).__isVarRef !== true && (writer as any).__goValue === undefined ? (writer as unknown as responseWriter).Header() : responseWriter.prototype.Header.call(writer)), "x-test"))
 }
 
 if ($.isMainScript(import.meta)) {

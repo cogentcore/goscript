@@ -111,7 +111,7 @@ export class Scanner {
 export async function main(): globalThis.Promise<void> {
 	let tracker: FileTracker | $.VarRef<FileTracker> | null = new FileTracker({lines: $.arrayToSlice<number>([])})
 	let scanner: Scanner | $.VarRef<Scanner> | null = new Scanner({file: tracker})
-	await Scanner.prototype.next.call(scanner)
+	await (scanner !== null && (scanner as any).__isVarRef !== true && (scanner as any).__goValue === undefined ? (scanner as unknown as Scanner).next() : Scanner.prototype.next.call(scanner))
 	await $.println($.sliceLen($.pointerValue<FileTracker>(tracker).lines))
 }
 

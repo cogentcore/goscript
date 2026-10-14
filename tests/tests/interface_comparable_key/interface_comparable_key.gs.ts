@@ -34,11 +34,11 @@ export function valueHash_Key(h: valueHash): any {
 }
 
 export async function sameKey(a: ref | null, b: ref | null): globalThis.Promise<boolean> {
-	return $.comparableEqual((__goscriptAwait = $.pointerValue<Exclude<ref, null>>(a).Key(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = $.pointerValue<Exclude<ref, null>>(b).Key(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	return $.comparableEqual((__goscriptAwait = (a !== null && (a as any).__isVarRef !== true && (a as any).__goValue === undefined ? (a as Exclude<ref, null>) : $.pointerValue<Exclude<ref, null>>(a)).Key(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = (b !== null && (b as any).__isVarRef !== true && (b as any).__goValue === undefined ? (b as Exclude<ref, null>) : $.pointerValue<Exclude<ref, null>>(b)).Key(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 }
 
 export async function differentKey(a: ref | null, b: ref | null): globalThis.Promise<boolean> {
-	return !$.comparableEqual((__goscriptAwait = $.pointerValue<Exclude<ref, null>>(a).Key(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = $.pointerValue<Exclude<ref, null>>(b).Key(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	return !$.comparableEqual((__goscriptAwait = (a !== null && (a as any).__isVarRef !== true && (a as any).__goValue === undefined ? (a as Exclude<ref, null>) : $.pointerValue<Exclude<ref, null>>(a)).Key(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = (b !== null && (b as any).__isVarRef !== true && (b as any).__goValue === undefined ? (b as Exclude<ref, null>) : $.pointerValue<Exclude<ref, null>>(b)).Key(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 }
 
 export async function main(): globalThis.Promise<void> {

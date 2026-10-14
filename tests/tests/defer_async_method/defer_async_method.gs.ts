@@ -55,7 +55,7 @@ export class AsyncResource {
 export async function main(): globalThis.Promise<void> {
 	await using __defer = new $.AsyncDisposableStack()
 	let res: AsyncResource | $.VarRef<AsyncResource> | null = new AsyncResource({name: "test"})
-	__defer.defer(async () => { await AsyncResource.prototype.Release.call(res) })
+	__defer.defer(async () => { await (res !== null && (res as any).__isVarRef !== true && (res as any).__goValue === undefined ? (res as unknown as AsyncResource).Release() : AsyncResource.prototype.Release.call(res)) })
 	await $.println("main function")
 }
 

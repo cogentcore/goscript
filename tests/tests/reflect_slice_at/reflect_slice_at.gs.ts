@@ -134,16 +134,16 @@ export function fieldValue(obj: any, fld: reflect.StructField): reflect.Value {
 
 export async function newAtOffsets(): globalThis.Promise<void> {
 	let typ = reflect.TypeOf($.interfaceValue((pt.value).clone(), "main.T", "main.T"))
-	let [fld, ] = await $.pointerValue<Exclude<reflect.Type, null>>(typ).FieldByName("Mbr2")
+	let [fld, ] = await (typ !== null && (typ as any).__isVarRef !== true && (typ as any).__goValue === undefined ? (typ as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(typ)).FieldByName("Mbr2")
 	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(fieldValue($.interfaceValue(pt, "*main.T", /* @__PURE__ */ $.pointerType("main.T")), fld))).Elem())).Set($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.basicInterfaceValue(10, "int")))))
 	await $.println("newat-offset:", pt.value.Mbr2)
 
-	let __goscriptTuple0: any = await $.pointerValue<Exclude<reflect.Type, null>>(typ).FieldByName("Mbr1")
+	let __goscriptTuple0: any = await (typ !== null && (typ as any).__isVarRef !== true && (typ as any).__goValue === undefined ? (typ as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(typ)).FieldByName("Mbr1")
 	fld = $.assignStruct(fld, __goscriptTuple0[0])
 	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(fieldValue($.interfaceValue(pt, "*main.T", /* @__PURE__ */ $.pointerType("main.T")), fld))).Elem())).Set($.markAsStructValue($.cloneStructValue(reflect.ValueOf("new"))))
 	await $.println("newat-offset:", pt.value.Mbr1, pt.value.Mbr2)
 
-	let [sf, ] = await $.pointerValue<Exclude<reflect.Type, null>>(typ).FieldByName("S")
+	let [sf, ] = await (typ !== null && (typ as any).__isVarRef !== true && (typ as any).__goValue === undefined ? (typ as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(typ)).FieldByName("S")
 	let [yf, ] = await $.pointerValue<Exclude<reflect.Type, null>>(sf.Type).FieldByName("Y")
 	let ov = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(pt, "*main.T", /* @__PURE__ */ $.pointerType("main.T")))))
 	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.NewAt($.pointerValueOrNil(yf.Type)!, ($.uint($.uint64Add(($.uint($.uint64Add($.markAsStructValue($.cloneStructValue(ov)).Pointer(), sf.Offset), 64)), yf.Offset), 64) as any)))).Elem())).SetString("sub")

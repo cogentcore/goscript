@@ -69,7 +69,7 @@ export async function lookup(key: string): globalThis.Promise<[any, boolean]> {
 }
 
 export async function lookupViaGetter(key: string): globalThis.Promise<[any, boolean]> {
-	return loader.prototype.getLoad.call(defaultLoader)!(key)
+	return (defaultLoader !== null && (defaultLoader as any).__isVarRef !== true && (defaultLoader as any).__goValue === undefined ? (defaultLoader as unknown as loader).getLoad() : loader.prototype.getLoad.call(defaultLoader))!(key)
 }
 
 export async function main(): globalThis.Promise<void> {

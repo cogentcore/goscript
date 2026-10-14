@@ -32,7 +32,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println(h.value.Sum64() == whole)
 
 	let hh: hash.Hash64 | null = $.interfaceValue<hash.Hash64 | null>(h, "*maphash.Hash", /* @__PURE__ */ $.pointerType("maphash.Hash"))
-	await $.println((__goscriptAwait = $.pointerValue<Exclude<hash.Hash64, null>>(hh).Size(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = $.pointerValue<Exclude<hash.Hash64, null>>(hh).BlockSize(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), $.sliceLen(((__goscriptAwait = $.pointerValue<Exclude<hash.Hash64, null>>(hh).Sum(null), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as $.Slice<number>)))
+	await $.println((__goscriptAwait = (hh !== null && (hh as any).__isVarRef !== true && (hh as any).__goValue === undefined ? (hh as Exclude<hash.Hash64, null>) : $.pointerValue<Exclude<hash.Hash64, null>>(hh)).Size(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = (hh !== null && (hh as any).__isVarRef !== true && (hh as any).__goValue === undefined ? (hh as Exclude<hash.Hash64, null>) : $.pointerValue<Exclude<hash.Hash64, null>>(hh)).BlockSize(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), $.sliceLen(((__goscriptAwait = (hh !== null && (hh as any).__isVarRef !== true && (hh as any).__goValue === undefined ? (hh as Exclude<hash.Hash64, null>) : $.pointerValue<Exclude<hash.Hash64, null>>(hh)).Sum(null), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as $.Slice<number>)))
 
 	h.value.Reset()
 	await $.println(h.value.Sum64() == maphash.String($.markAsStructValue($.cloneStructValue(seed)), ""))

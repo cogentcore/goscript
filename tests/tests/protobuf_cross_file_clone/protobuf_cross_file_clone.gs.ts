@@ -17,7 +17,7 @@ export async function main(): globalThis.Promise<void> {
 	let parent: __goscript_parent_pb_ts.Parent | $.VarRef<__goscript_parent_pb_ts.Parent> | null = new __goscript_parent_pb_ts.Parent({Child: new __goscript_child_pb_ts.Child({Name: "hello"}), Children: $.arrayToSlice<__goscript_child_pb_ts.Child | $.VarRef<__goscript_child_pb_ts.Child> | null>([new __goscript_child_pb_ts.Child({Name: "one"}), new __goscript_child_pb_ts.Child({Name: "two"})])})
 	let parent$: __goscript_parent_pb_ts.Parent = parent == null ? $.pointerTarget<__goscript_parent_pb_ts.Parent>(parent) : (parent as any).__isVarRef === true ? (parent as any).value : (parent as any).__goValue === undefined ? (parent as any) : $.pointerTarget<__goscript_parent_pb_ts.Parent>(parent)
 
-	let clone: __goscript_parent_pb_ts.Parent | $.VarRef<__goscript_parent_pb_ts.Parent> | null = __goscript_parent_pb_ts.Parent.prototype.CloneVT.call(parent)
+	let clone: __goscript_parent_pb_ts.Parent | $.VarRef<__goscript_parent_pb_ts.Parent> | null = (parent !== null && (parent as any).__isVarRef !== true && (parent as any).__goValue === undefined ? (parent as unknown as __goscript_parent_pb_ts.Parent).CloneVT() : __goscript_parent_pb_ts.Parent.prototype.CloneVT.call(parent))
 	let clone$: __goscript_parent_pb_ts.Parent = clone == null ? $.pointerTarget<__goscript_parent_pb_ts.Parent>(clone) : (clone as any).__isVarRef === true ? (clone as any).value : (clone as any).__goValue === undefined ? (clone as any) : $.pointerTarget<__goscript_parent_pb_ts.Parent>(clone)
 	await $.println("clone nil:", clone == null)
 	await $.println("child name:", $.pointerValue<__goscript_child_pb_ts.Child>((clone$ as __goscript_parent_pb_ts.Parent).Child).Name)
@@ -28,7 +28,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("children ptr same:", $.pointerEqual($.arrayIndex((clone$ as __goscript_parent_pb_ts.Parent).Children!, 0), $.arrayIndex((parent$ as __goscript_parent_pb_ts.Parent).Children!, 0)))
 
 	// Deep equality after clone.
-	await $.println("equal:", __goscript_parent_pb_ts.Parent.prototype.EqualVT.call(parent, clone))
+	await $.println("equal:", (parent !== null && (parent as any).__isVarRef !== true && (parent as any).__goValue === undefined ? (parent as unknown as __goscript_parent_pb_ts.Parent).EqualVT(clone) : __goscript_parent_pb_ts.Parent.prototype.EqualVT.call(parent, clone)))
 
 	// Mutating the clone must not touch the parent.
 	$.pointerValue<__goscript_child_pb_ts.Child>((clone$ as __goscript_parent_pb_ts.Parent).Child).Name = "changed"

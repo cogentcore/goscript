@@ -68,14 +68,14 @@ export async function main(): globalThis.Promise<void> {
 	let [st, ok] = $.typeAssertTuple<stringer | null>($.markAsStructValue($.cloneStructValue(ev)).Interface(), "main.stringer")
 	await $.println(ok)
 	if (ok) {
-		await $.println((__goscriptAwait = $.pointerValue<Exclude<stringer, null>>(st).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+		await $.println((__goscriptAwait = (st !== null && (st as any).__isVarRef !== true && (st as any).__goValue === undefined ? (st as Exclude<stringer, null>) : $.pointerValue<Exclude<stringer, null>>(st)).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	}
 	let __goscriptTuple0: any = $.typeAssertTuple<setStringer | null>($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(ev)).Addr())).Interface(), "main.setStringer")
 	let ss = __goscriptTuple0[0]
 	ok = __goscriptTuple0[1]
 	await $.println(ok)
 	if (ok) {
-		await $.println((__goscriptAwait = $.pointerValue<Exclude<setStringer, null>>(ss).SetString("Strawberry"), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) == null, fruit.value == 2)
+		await $.println((__goscriptAwait = (ss !== null && (ss as any).__isVarRef !== true && (ss as any).__goValue === undefined ? (ss as Exclude<setStringer, null>) : $.pointerValue<Exclude<setStringer, null>>(ss)).SetString("Strawberry"), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) == null, fruit.value == 2)
 	}
 	let __goscriptTuple1: any = $.typeAssertTuple<setStringer | null>($.markAsStructValue($.cloneStructValue(ev)).Interface(), "main.setStringer")
 	ok = __goscriptTuple1[1]
@@ -86,7 +86,7 @@ export async function main(): globalThis.Promise<void> {
 	{
 		let [s, __goscriptShadow0] = $.typeAssertTuple<stringer | null>($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(nv)).Elem())).Interface(), "main.stringer")
 		if (__goscriptShadow0) {
-			await $.println((__goscriptAwait = $.pointerValue<Exclude<stringer, null>>(s).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+			await $.println((__goscriptAwait = (s !== null && (s as any).__isVarRef !== true && (s as any).__goValue === undefined ? (s as Exclude<stringer, null>) : $.pointerValue<Exclude<stringer, null>>(s)).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		}
 	}
 }

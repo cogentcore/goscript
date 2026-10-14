@@ -35,7 +35,8 @@ export class entry {
 
 	public add(value: number): void {
 		let e: entry | $.VarRef<entry> | null = this;
-		$.pointerValue<entry>(e).value = $.pointerValue<entry>(e).value + (value)
+		const e$: entry = e == null ? $.pointerTarget<entry>(e) : (e as any).__isVarRef === true ? (e as any).value : (e as any).__goValue === undefined ? (e as any) : $.pointerTarget<entry>(e);
+		;(e$ as entry).value = (e$ as entry).value + (value)
 	}
 
 	static __typeInfo = $.registerStructType(

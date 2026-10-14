@@ -19,7 +19,7 @@ export async function ToKey(v: Ref | null): globalThis.Promise<any> {
 	if (v == null) {
 		return null
 	}
-	return $.pointerValue<Exclude<Ref, null>>(v).Key()
+	return (v !== null && (v as any).__isVarRef !== true && (v as any).__goValue === undefined ? (v as Exclude<Ref, null>) : $.pointerValue<Exclude<Ref, null>>(v)).Key()
 }
 
 var __goscriptAwait: any

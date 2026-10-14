@@ -19,13 +19,13 @@ export async function main(): globalThis.Promise<void> {
 	// String() must be synchronous and return a plain string, matching the Go
 	// contract: func (x *M) String() string. A GoScript regression that makes
 	// String() async (returning a Promise) breaks len() and all sync string use.
-	let str = __goscript_protobuf_string_sync_pb_ts.ExampleMsg.prototype.String.call(msg)
+	let str = (msg !== null && (msg as any).__isVarRef !== true && (msg as any).__goValue === undefined ? (msg as unknown as __goscript_protobuf_string_sync_pb_ts.ExampleMsg).String() : __goscript_protobuf_string_sync_pb_ts.ExampleMsg.prototype.String.call(msg))
 	await $.println("len:", $.stringLen(str))
 	await $.println("empty:", $.stringLen(str) == 0)
 	await $.println("prefix ok:", ($.stringLen(str) >= 10) && ($.stringEqual($.sliceStringOrBytes(str, undefined, 10), "ExampleMsg")))
 
 	// MarshalProtoText must also be synchronous.
-	let text = __goscript_protobuf_string_sync_pb_ts.ExampleMsg.prototype.MarshalProtoText.call(msg)
+	let text = (msg !== null && (msg as any).__isVarRef !== true && (msg as any).__goValue === undefined ? (msg as unknown as __goscript_protobuf_string_sync_pb_ts.ExampleMsg).MarshalProtoText() : __goscript_protobuf_string_sync_pb_ts.ExampleMsg.prototype.MarshalProtoText.call(msg))
 	await $.println("text len:", $.stringLen(text))
 	await $.println("text:", text)
 

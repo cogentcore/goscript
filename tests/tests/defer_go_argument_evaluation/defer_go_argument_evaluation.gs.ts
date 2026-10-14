@@ -120,7 +120,7 @@ export async function deferred(): globalThis.Promise<void> {
 	await mu.value.Lock()
 	__defer.defer(() => { mu.value.Unlock() })
 	let q: R | $.VarRef<R> | null = new R({A: 50, B: 60})
-	__defer.defer(async () => { await R.prototype.ShowPtr.call(q, "fixed pointer") })
+	__defer.defer(async () => { await (q !== null && (q as any).__isVarRef !== true && (q as any).__goValue === undefined ? (q as unknown as R).ShowPtr("fixed pointer") : R.prototype.ShowPtr.call(q, "fixed pointer")) })
 	const __goscriptDeferArg1 = n
 	const __goscriptDeferArg2 = await value(4)
 	__defer.defer(async () => { await $.println("println", __goscriptDeferArg1, __goscriptDeferArg2) })

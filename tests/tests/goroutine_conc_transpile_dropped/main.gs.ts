@@ -39,7 +39,7 @@ export async function main(): globalThis.Promise<void> {
 		for (let __rangeIndex = 0; __rangeIndex < 8; __rangeIndex++) {
 			jobs = $.appendOne(jobs, leaf, $.appendZeros.nil)
 		}
-		await conc.ConcurrentQueue.prototype.Enqueue.call(q, jobs)
+		await (q !== null && (q as any).__isVarRef !== true && (q as any).__goValue === undefined ? (q as unknown as conc.ConcurrentQueue).Enqueue(jobs) : conc.ConcurrentQueue.prototype.Enqueue.call(q, jobs))
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo))
 
 	let root: (() => void) | null = $.functionValue(async (): globalThis.Promise<void> => {
@@ -47,15 +47,15 @@ export async function main(): globalThis.Promise<void> {
 		for (let __rangeIndex = 0; __rangeIndex < 16; __rangeIndex++) {
 			jobs = $.appendOne(jobs, child, $.appendZeros.nil)
 		}
-		await conc.ConcurrentQueue.prototype.Enqueue.call(q, jobs)
+		await (q !== null && (q as any).__isVarRef !== true && (q as any).__goValue === undefined ? (q as unknown as conc.ConcurrentQueue).Enqueue(jobs) : conc.ConcurrentQueue.prototype.Enqueue.call(q, jobs))
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo))
 
-	await conc.ConcurrentQueue.prototype.Enqueue.call(q, $.arrayToSlice<(() => void) | null>([root]))
+	await (q !== null && (q as any).__isVarRef !== true && (q as any).__goValue === undefined ? (q as unknown as conc.ConcurrentQueue).Enqueue($.arrayToSlice<(() => void) | null>([root])) : conc.ConcurrentQueue.prototype.Enqueue.call(q, $.arrayToSlice<(() => void) | null>([root])))
 
 	{
-		let err = await conc.ConcurrentQueue.prototype.WaitIdle.call(q, context.Background(), null)
+		let err = await (q !== null && (q as any).__isVarRef !== true && (q as any).__goValue === undefined ? (q as unknown as conc.ConcurrentQueue).WaitIdle(context.Background(), null) : conc.ConcurrentQueue.prototype.WaitIdle.call(q, context.Background(), null))
 		if (err != null) {
-			await $.println("WaitIdle error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+			await $.println("WaitIdle error:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 			return
 		}
 	}

@@ -234,8 +234,8 @@ export class printer {
 
 export async function main(): globalThis.Promise<void> {
 	let p: printer | $.VarRef<printer> | null = new printer()
-	printer.prototype.init.call(p)
-	await printer.prototype.format.call(p, 100)
+	void (p !== null && (p as any).__isVarRef !== true && (p as any).__goValue === undefined ? (p as unknown as printer).init() : printer.prototype.init.call(p))
+	await (p !== null && (p as any).__isVarRef !== true && (p as any).__goValue === undefined ? (p as unknown as printer).format(100) : printer.prototype.format.call(p, 100))
 	await $.println("Formatter test completed")
 }
 

@@ -77,7 +77,8 @@ export class vec {
 
 	public inc(): void {
 		let v: vec | $.VarRef<vec> | null = this;
-		$.pointerValue<vec>(v).Y++
+		const v$: vec = v == null ? $.pointerTarget<vec>(v) : (v as any).__isVarRef === true ? (v as any).value : (v as any).__goValue === undefined ? (v as any) : $.pointerTarget<vec>(v);
+		;(v$ as vec).Y++
 	}
 
 	static __typeInfo = $.registerStructType(

@@ -185,7 +185,7 @@ export function readAfterStore(r: Region, s: State | $.VarRef<State> | null): nu
 }
 
 export function readAfterCall(r: Region, s: State | $.VarRef<State> | null): number {
-	State.prototype.set.call(s, 60)
+	void (s !== null && (s as any).__isVarRef !== true && (s as any).__goValue === undefined ? (s as unknown as State)["set"](60) : State.prototype.set.call(s, 60))
 	return r.Start.Char
 }
 

@@ -57,7 +57,7 @@ export function __goscript_set_Base(__goscriptValue: T | $.VarRef<T> | null): vo
 	Base = __goscriptValue
 }
 
-export let Derived: T | $.VarRef<T> | null = T.prototype.WithDelta.call(Base, 5)
+export let Derived: T | $.VarRef<T> | null = (Base !== null && (Base as any).__isVarRef !== true && (Base as any).__goValue === undefined ? (Base as unknown as T).WithDelta(5) : T.prototype.WithDelta.call(Base, 5))
 
 export function __goscript_set_Derived(__goscriptValue: T | $.VarRef<T> | null): void {
 	Derived = __goscriptValue

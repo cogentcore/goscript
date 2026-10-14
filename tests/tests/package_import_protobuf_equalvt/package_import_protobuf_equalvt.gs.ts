@@ -55,7 +55,7 @@ export class msg {
 
 	public CloneMessageVT(): protobuf_go_lite.CloneMessage | null {
 		const m: msg | $.VarRef<msg> | null = this;
-		return $.interfaceValue<protobuf_go_lite.CloneMessage | null>(msg.prototype.CloneVT.call(m), "*main.msg", /* @__PURE__ */ $.pointerType("main.msg"))
+		return $.interfaceValue<protobuf_go_lite.CloneMessage | null>((m !== null && (m as any).__isVarRef !== true && (m as any).__goValue === undefined ? (m as unknown as msg).CloneVT() : msg.prototype.CloneVT.call(m)), "*main.msg", /* @__PURE__ */ $.pointerType("main.msg"))
 	}
 
 	public CloneVT(): msg | $.VarRef<msg> | null {
@@ -123,7 +123,7 @@ export function state_String(s: state): string {
 export async function main(): globalThis.Promise<void> {
 	let original: msg | $.VarRef<msg> | null = new msg({v: 7})
 	let cloned: msg | $.VarRef<msg> | null = (protobuf_go_lite.CloneVTValue(__goscriptStatic0(), original) as msg | $.VarRef<msg> | null)
-	await $.println("clone:", !$.pointerEqual(cloned, original), msg.prototype.EqualVT.call(cloned, original))
+	await $.println("clone:", !$.pointerEqual(cloned, original), (cloned !== null && (cloned as any).__isVarRef !== true && (cloned as any).__goValue === undefined ? (cloned as unknown as msg).EqualVT(original) : msg.prototype.EqualVT.call(cloned, original)))
 	await $.println("clone-slice:", !$.pointerEqual($.arrayIndex(protobuf_go_lite.CloneVTSlice($.arrayToSlice<msg | $.VarRef<msg> | null>([original]))!, 0), original))
 	let enumSlice: $.Slice<state> = $.arrayToSlice<state>([1, 0])
 	let clonedEnumSlice: $.Slice<state> = (protobuf_go_lite.CloneSlice(enumSlice) as $.Slice<state>)

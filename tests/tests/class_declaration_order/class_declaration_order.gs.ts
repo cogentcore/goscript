@@ -50,7 +50,7 @@ export function __goscript_set_defaultNamed(__goscriptValue: named | null): void
 }
 
 export async function main(): globalThis.Promise<void> {
-	await $.println((__goscriptAwait = $.pointerValue<Exclude<named, null>>(defaultNamed).Name(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println((__goscriptAwait = (defaultNamed !== null && (defaultNamed as any).__isVarRef !== true && (defaultNamed as any).__goValue === undefined ? (defaultNamed as Exclude<named, null>) : $.pointerValue<Exclude<named, null>>(defaultNamed)).Name(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 }
 
 var __goscriptAwait: any

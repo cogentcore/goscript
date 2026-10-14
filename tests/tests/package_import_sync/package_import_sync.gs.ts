@@ -211,7 +211,7 @@ export class queue {
 		let q: queue | $.VarRef<queue> | null = this;
 		using __defer = new $.DisposableStack()
 		const q$: queue = q == null ? $.pointerTarget<queue>(q) : (q as any).__isVarRef === true ? (q as any).value : (q as any).__goValue === undefined ? (q as any) : $.pointerTarget<queue>(q)
-		await queue.prototype.lockAndInit.call(q)
+		await (q !== null && (q as any).__isVarRef !== true && (q as any).__goValue === undefined ? (q as unknown as queue).lockAndInit() : queue.prototype.lockAndInit.call(q))
 		const __goscriptDeferCallee0 = $.functionValue(((__receiver) => () => __receiver.Unlock())((q$ as queue).Mu), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "sync.(*Mutex).Unlock-fm")
 		__defer.defer(() => { __goscriptDeferCallee0() })
 		while ($.sliceLen((q$ as queue).items) == 0) {
@@ -225,7 +225,7 @@ export class queue {
 	public async push(v: number): globalThis.Promise<void> {
 		let q: queue | $.VarRef<queue> | null = this;
 		const q$: queue = q == null ? $.pointerTarget<queue>(q) : (q as any).__isVarRef === true ? (q as any).value : (q as any).__goValue === undefined ? (q as any) : $.pointerTarget<queue>(q)
-		await queue.prototype.lockAndInit.call(q);
+		await (q !== null && (q as any).__isVarRef !== true && (q as any).__goValue === undefined ? (q as unknown as queue).lockAndInit() : queue.prototype.lockAndInit.call(q));
 		;(q$ as queue).items = $.appendOne((q$ as queue).items, v)
 		void (q$ as queue).Cond.Signal()
 		void (q$ as queue).Mu.Unlock()
@@ -395,12 +395,12 @@ export async function condZeroValue(): globalThis.Promise<void> {
 	queueMicrotask(async () => { await (async (): globalThis.Promise<void> => {
 		await $.chanSend(started, true)
 		for (let __rangeIndex = 0; __rangeIndex < 3; __rangeIndex++) {
-			await $.chanSend(results, await queue.prototype.pop.call(q))
+			await $.chanSend(results, await (q !== null && (q as any).__isVarRef !== true && (q as any).__goValue === undefined ? (q as unknown as queue).pop() : queue.prototype.pop.call(q)))
 		}
 	})() })
 	await $.chanRecv(started)
 	for (let i = 1; i <= 3; i++) {
-		await queue.prototype.push.call(q, i * 10)
+		await (q !== null && (q as any).__isVarRef !== true && (q as any).__goValue === undefined ? (q as unknown as queue).push(i * 10) : queue.prototype.push.call(q, i * 10))
 		await $.println("got:", await $.chanRecv(results))
 	}
 

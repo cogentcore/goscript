@@ -38,7 +38,8 @@ export class chunker {
 
 	public advance(chunkSize: number): void {
 		let c: chunker | $.VarRef<chunker> | null = this;
-		$.pointerValue<chunker>(c).pos = $.uint64Add($.pointerValue<chunker>(c).pos, $.uint64(chunkSize))
+		const c$: chunker = c == null ? $.pointerTarget<chunker>(c) : (c as any).__isVarRef === true ? (c as any).value : (c as any).__goValue === undefined ? (c as any) : $.pointerTarget<chunker>(c);
+		;(c$ as chunker).pos = $.uint64Add((c$ as chunker).pos, $.uint64(chunkSize))
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -137,9 +138,9 @@ export async function main(): globalThis.Promise<void> {
 	let src = io.LimitReader($.pointerValueOrNil($.interfaceValue<io.Reader | null>(newRepeatReader(40), "*main.repeatReader", /* @__PURE__ */ $.pointerType("main.repeatReader")))!, 25n)
 	let buf: $.Slice<number> = $.makeSlice<number>(8, undefined, "byte")
 	while (true) {
-		let [nr, err] = await $.pointerValue<Exclude<io.Reader, null>>(src).Read(buf)
+		let [nr, err] = await (src !== null && (src as any).__isVarRef !== true && (src as any).__goValue === undefined ? (src as Exclude<io.Reader, null>) : $.pointerValue<Exclude<io.Reader, null>>(src)).Read(buf)
 		if (nr > 0) {
-			chunker.prototype.advance.call(c, nr)
+			void (c !== null && (c as any).__isVarRef !== true && (c as any).__goValue === undefined ? (c as unknown as chunker).advance(nr) : chunker.prototype.advance.call(c, nr))
 			totalSize = $.uint64Add(totalSize, $.uint64(nr))
 			chkStart = $.uint64Add(chkStart, $.uint64(nr))
 		}
@@ -147,7 +148,7 @@ export async function main(): globalThis.Promise<void> {
 			break
 		}
 		if (err != null) {
-			await $.println("err", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+			await $.println("err", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 			return
 		}
 	}

@@ -36,7 +36,7 @@ export async function main(): globalThis.Promise<void> {
 		await $.println("rune:", $.int(r))
 	}
 	let re: regexp.Regexp | $.VarRef<regexp.Regexp> | null = await regexp.MustCompile($.concatString(($.concatString("^", "[\u0080-\ud7ff\ue000-�𐀀-\u{10ffff}]")), "+$"))
-	await $.println("match:", await regexp.Regexp.prototype.MatchString.call(re, "é𐀀"), await regexp.Regexp.prototype.MatchString.call(re, "a"))
+	await $.println("match:", await (re !== null && (re as any).__isVarRef !== true && (re as any).__goValue === undefined ? (re as unknown as regexp.Regexp).MatchString("é𐀀") : regexp.Regexp.prototype.MatchString.call(re, "é𐀀")), await (re !== null && (re as any).__isVarRef !== true && (re as any).__goValue === undefined ? (re as unknown as regexp.Regexp).MatchString("a") : regexp.Regexp.prototype.MatchString.call(re, "a")))
 }
 
 if ($.isMainScript(import.meta)) {

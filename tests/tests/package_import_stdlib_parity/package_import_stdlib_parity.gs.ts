@@ -111,7 +111,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("scanner:", strings.TrimSpace(scan.value.String()))
 
 	let h: hash.XOF | null = $.interfaceValue<hash.XOF | null>(new xof(undefined, true), "main.xof", "main.xof")
-	await $.println("hash:", (__goscriptAwait = $.pointerValue<Exclude<hash.XOF, null>>(h).BlockSize(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println("hash:", (__goscriptAwait = (h !== null && (h as any).__isVarRef !== true && (h as any).__goValue === undefined ? (h as Exclude<hash.XOF, null>) : $.pointerValue<Exclude<hash.XOF, null>>(h)).BlockSize(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 }
 
 var __goscriptAwait: any

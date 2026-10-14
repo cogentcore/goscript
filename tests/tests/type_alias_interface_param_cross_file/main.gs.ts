@@ -54,7 +54,7 @@ export class sink {
 }
 
 export async function write(tx: __goscript_types.Tx | null, v: dep.Value): globalThis.Promise<void> {
-	void (__goscriptAwait = $.pointerValue<Exclude<__goscript_types.Tx, null>>(tx).Put((v as __goscript_types.Value)), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+	void (__goscriptAwait = (tx !== null && (tx as any).__isVarRef !== true && (tx as any).__goValue === undefined ? (tx as Exclude<__goscript_types.Tx, null>) : $.pointerValue<Exclude<__goscript_types.Tx, null>>(tx)).Put((v as __goscript_types.Value)), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 }
 
 export async function main(): globalThis.Promise<void> {

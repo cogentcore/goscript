@@ -45,7 +45,7 @@ export async function main(): globalThis.Promise<void> {
 		return (a).clone()
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("string")), "slog.Attr"], results: ["slog.Attr"] } as $.FunctionTypeInfo))})), "*slog.JSONHandler", /* @__PURE__ */ $.pointerType("slog.JSONHandler")))
 	await slog.Logger.prototype.Debug.call(jl, "json message", $.arrayToSlice<any>(["ok", true, $.interfaceValue(slog.Group("grp", $.arrayToSlice<any>([$.interfaceValue(slog.Int("i", 1), "slog.Attr", "slog.Attr")])), "slog.Attr", "slog.Attr")]))
-	await slog.Logger.prototype.Warn.call(await slog.Logger.prototype.WithGroup.call(await slog.Logger.prototype.With.call(jl, $.arrayToSlice<any>(["w", "x"])), "sub"), "with", $.arrayToSlice<any>(["y", $.basicInterfaceValue(2.5, "float64")]))
+	await slog.Logger.prototype.Warn.call(await slog.Logger.prototype.WithGroup.call(await (jl !== null && (jl as any).__isVarRef !== true && (jl as any).__goValue === undefined ? (jl as unknown as slog.Logger).With($.arrayToSlice<any>(["w", "x"])) : slog.Logger.prototype.With.call(jl, $.arrayToSlice<any>(["w", "x"]))), "sub"), "with", $.arrayToSlice<any>(["y", $.basicInterfaceValue(2.5, "float64")]))
 	await $.print(buf.value.String())
 
 	let old: slog.Logger | $.VarRef<slog.Logger> | null = slog.Default()

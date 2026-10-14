@@ -60,7 +60,7 @@ export class Buffer {
 }
 
 export async function use(w: Writer | null): globalThis.Promise<void> {
-	await $.pointerValue<Exclude<Writer, null>>(w).Write(new Uint8Array([120]))
+	await (w !== null && (w as any).__isVarRef !== true && (w as any).__goValue === undefined ? (w as Exclude<Writer, null>) : $.pointerValue<Exclude<Writer, null>>(w)).Write(new Uint8Array([120]))
 }
 
 export async function main(): globalThis.Promise<void> {

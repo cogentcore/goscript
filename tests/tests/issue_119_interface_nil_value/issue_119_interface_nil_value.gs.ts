@@ -144,9 +144,9 @@ export async function main(): globalThis.Promise<void> {
 	// Test 2: Calling method on nil receiver should work
 	// The method dispatch uses the type (*Dog) to find Name()
 	// Then passes nil as the receiver
-	await $.println((__goscriptAwait = $.pointerValue<Exclude<Animal, null>>(animal).Name(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println((__goscriptAwait = (animal !== null && (animal as any).__isVarRef !== true && (animal as any).__goValue === undefined ? (animal as Exclude<Animal, null>) : $.pointerValue<Exclude<Animal, null>>(animal)).Name(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	let directNilDog: Dog | $.VarRef<Dog> | null = null! as Dog | $.VarRef<Dog> | null
-	await $.println(Dog.prototype.Name.call(directNilDog))
+	await $.println((directNilDog !== null && (directNilDog as any).__isVarRef !== true && (directNilDog as any).__goValue === undefined ? (directNilDog as unknown as Dog).Name() : Dog.prototype.Name.call(directNilDog)))
 
 	// Test 3: Type assertions preserve the typed nil pointer
 	{

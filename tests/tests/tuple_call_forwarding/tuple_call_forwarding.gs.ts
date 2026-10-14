@@ -186,7 +186,8 @@ export class tabs {
 
 	public async NewTab(name: string): globalThis.Promise<[frame | $.VarRef<frame> | null, tab | $.VarRef<tab> | null]> {
 		let ts: tabs | $.VarRef<tabs> | null = this;
-		$.pointerValue<tabs>(ts).count++
+		const ts$: tabs = ts == null ? $.pointerTarget<tabs>(ts) : (ts as any).__isVarRef === true ? (ts as any).value : (ts as any).__goValue === undefined ? (ts as any) : $.pointerTarget<tabs>(ts);
+		;(ts$ as tabs).count++
 		await $.println("new tab:", name)
 		return newTab(name)
 	}
@@ -229,7 +230,7 @@ export async function names(nodes: $.Slice<Node | null>): globalThis.Promise<voi
 	await $.println("names:", $.sliceLen(nodes))
 	for (let __goscriptRangeTarget0 = nodes, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
 		let n = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as Node | null)
-		await $.println("name:", (__goscriptAwait = $.pointerValue<Exclude<Node, null>>(n).Name(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+		await $.println("name:", (__goscriptAwait = (n !== null && (n as any).__isVarRef !== true && (n as any).__goValue === undefined ? (n as Exclude<Node, null>) : $.pointerValue<Exclude<Node, null>>(n)).Name(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	}
 }
 
@@ -269,7 +270,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("count:", count(...(() => { const __goscriptTupleArg2 = pair(3, 4); return [$.arrayToSlice<number>([__goscriptTupleArg2[0], __goscriptTupleArg2[1]])] as [$.Slice<number>] })()))
 	await $.println("span:", span(...(() => { const __goscriptTupleArg3 = pair(5, 9); return [__goscriptTupleArg3[0], __goscriptTupleArg3[1], null] as [number, number, $.Slice<number>] })()))
 	let ts: tabs | $.VarRef<tabs> | null = new tabs()
-	await names(...(await (async () => { const __goscriptTupleArg4 = await tabs.prototype.NewTab.call(ts, "Text"); return [$.arrayToSlice<Node | null>([$.interfaceValue<Node | null>(__goscriptTupleArg4[0], "*main.frame", /* @__PURE__ */ $.pointerType("main.frame")), $.interfaceValue<Node | null>(__goscriptTupleArg4[1], "*main.tab", /* @__PURE__ */ $.pointerType("main.tab"))])] as [$.Slice<Node | null>] })()))
+	await names(...(await (async () => { const __goscriptTupleArg4 = await (ts !== null && (ts as any).__isVarRef !== true && (ts as any).__goValue === undefined ? (ts as unknown as tabs).NewTab("Text") : tabs.prototype.NewTab.call(ts, "Text")); return [$.arrayToSlice<Node | null>([$.interfaceValue<Node | null>(__goscriptTupleArg4[0], "*main.frame", /* @__PURE__ */ $.pointerType("main.frame")), $.interfaceValue<Node | null>(__goscriptTupleArg4[1], "*main.tab", /* @__PURE__ */ $.pointerType("main.tab"))])] as [$.Slice<Node | null>] })()))
 	await $.println("sprint:", await fmt.Sprint(...(() => { const __goscriptTupleArg5 = pair(3, 4); return [$.basicInterfaceValue(__goscriptTupleArg5[0], "int"), $.basicInterfaceValue(__goscriptTupleArg5[1], "int")] as [any, any] })()))
 	await $.println("tabs:", $.pointerValue<tabs>(ts).count)
 }

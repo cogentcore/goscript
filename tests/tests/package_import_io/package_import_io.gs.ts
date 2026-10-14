@@ -351,8 +351,8 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("WriteString field writer - bytes:", n, "err:", err == null)
 
 	let buf: asyncBuffer | $.VarRef<asyncBuffer> | null = new asyncBuffer()
-	await asyncBuffer.prototype.Reset.call(buf, $.interfaceValue<io.Writer | null>(buf, "*main.asyncBuffer", /* @__PURE__ */ $.pointerType("main.asyncBuffer")))
-	await asyncBuffer.prototype.Reset.call(buf, null)
+	await (buf !== null && (buf as any).__isVarRef !== true && (buf as any).__goValue === undefined ? (buf as unknown as asyncBuffer).Reset($.interfaceValue<io.Writer | null>(buf, "*main.asyncBuffer", /* @__PURE__ */ $.pointerType("main.asyncBuffer"))) : asyncBuffer.prototype.Reset.call(buf, $.interfaceValue<io.Writer | null>(buf, "*main.asyncBuffer", /* @__PURE__ */ $.pointerType("main.asyncBuffer"))))
+	await (buf !== null && (buf as any).__isVarRef !== true && (buf as any).__goValue === undefined ? (buf as unknown as asyncBuffer).Reset(null) : asyncBuffer.prototype.Reset.call(buf, null))
 	let __goscriptTuple1: any = await copyInterfaces(io.Discard, $.interfaceValue<io.Reader | null>(new staticReader(), "*main.staticReader", /* @__PURE__ */ $.pointerType("main.staticReader")))
 	let n64 = __goscriptTuple1[0]
 	err = __goscriptTuple1[1]

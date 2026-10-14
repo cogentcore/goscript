@@ -232,7 +232,8 @@ export class retransmissionQueueInitialAckHandler {
 
 	public async OnLost(_p0: wireFrame | null): globalThis.Promise<void> {
 		let q: retransmissionQueueInitialAckHandler | $.VarRef<retransmissionQueueInitialAckHandler> | null = this;
-		$.pointerValue<retransmissionQueueInitialAckHandler>(q).lost++
+		const q$: retransmissionQueueInitialAckHandler = q == null ? $.pointerTarget<retransmissionQueueInitialAckHandler>(q) : (q as any).__isVarRef === true ? (q as any).value : (q as any).__goValue === undefined ? (q as any) : $.pointerTarget<retransmissionQueueInitialAckHandler>(q);
+		;(q$ as retransmissionQueueInitialAckHandler).lost++
 		await $.println("initial")
 	}
 
@@ -281,7 +282,8 @@ export class retransmissionQueueHandshakeAckHandler {
 
 	public async OnLost(_p0: wireFrame | null): globalThis.Promise<void> {
 		let q: retransmissionQueueHandshakeAckHandler | $.VarRef<retransmissionQueueHandshakeAckHandler> | null = this;
-		$.pointerValue<retransmissionQueueHandshakeAckHandler>(q).lost++
+		const q$: retransmissionQueueHandshakeAckHandler = q == null ? $.pointerTarget<retransmissionQueueHandshakeAckHandler>(q) : (q as any).__isVarRef === true ? (q as any).value : (q as any).__goValue === undefined ? (q as any) : $.pointerTarget<retransmissionQueueHandshakeAckHandler>(q);
+		;(q$ as retransmissionQueueHandshakeAckHandler).lost++
 		await $.println("handshake")
 	}
 
@@ -330,7 +332,8 @@ export class retransmissionQueueAppDataAckHandler {
 
 	public async OnLost(_p0: wireFrame | null): globalThis.Promise<void> {
 		let q: retransmissionQueueAppDataAckHandler | $.VarRef<retransmissionQueueAppDataAckHandler> | null = this;
-		$.pointerValue<retransmissionQueueAppDataAckHandler>(q).lost++
+		const q$: retransmissionQueueAppDataAckHandler = q == null ? $.pointerTarget<retransmissionQueueAppDataAckHandler>(q) : (q as any).__isVarRef === true ? (q as any).value : (q as any).__goValue === undefined ? (q as any) : $.pointerTarget<retransmissionQueueAppDataAckHandler>(q);
+		;(q$ as retransmissionQueueAppDataAckHandler).lost++
 		await $.println("app")
 	}
 
@@ -354,7 +357,7 @@ export async function queueFramesForRetransmission(p: packet | $.VarRef<packet> 
 
 export async function main(): globalThis.Promise<void> {
 	let q: retransmissionQueue | $.VarRef<retransmissionQueue> | null = new retransmissionQueue()
-	let p: packet | $.VarRef<packet> | null = new packet({Frames: $.arrayToSlice<Frame>([(() => { const __goscriptLiteralField0 = retransmissionQueue.prototype.InitialAckHandler.call(q); return new Frame({Frame: $.interfaceValue<wireFrame | null>(new pingFrame(undefined, true), "main.pingFrame", "main.pingFrame"), Handler: __goscriptLiteralField0}, true) })(), (() => { const __goscriptLiteralField1 = retransmissionQueue.prototype.HandshakeAckHandler.call(q); return new Frame({Frame: $.interfaceValue<wireFrame | null>(new pingFrame(undefined, true), "main.pingFrame", "main.pingFrame"), Handler: __goscriptLiteralField1}, true) })(), (() => { const __goscriptLiteralField2 = retransmissionQueue.prototype.AppDataAckHandler.call(q); return new Frame({Frame: $.interfaceValue<wireFrame | null>(new pingFrame(undefined, true), "main.pingFrame", "main.pingFrame"), Handler: __goscriptLiteralField2}, true) })()])})
+	let p: packet | $.VarRef<packet> | null = new packet({Frames: $.arrayToSlice<Frame>([(() => { const __goscriptLiteralField0 = (q !== null && (q as any).__isVarRef !== true && (q as any).__goValue === undefined ? (q as unknown as retransmissionQueue).InitialAckHandler() : retransmissionQueue.prototype.InitialAckHandler.call(q)); return new Frame({Frame: $.interfaceValue<wireFrame | null>(new pingFrame(undefined, true), "main.pingFrame", "main.pingFrame"), Handler: __goscriptLiteralField0}, true) })(), (() => { const __goscriptLiteralField1 = (q !== null && (q as any).__isVarRef !== true && (q as any).__goValue === undefined ? (q as unknown as retransmissionQueue).HandshakeAckHandler() : retransmissionQueue.prototype.HandshakeAckHandler.call(q)); return new Frame({Frame: $.interfaceValue<wireFrame | null>(new pingFrame(undefined, true), "main.pingFrame", "main.pingFrame"), Handler: __goscriptLiteralField1}, true) })(), (() => { const __goscriptLiteralField2 = (q !== null && (q as any).__isVarRef !== true && (q as any).__goValue === undefined ? (q as unknown as retransmissionQueue).AppDataAckHandler() : retransmissionQueue.prototype.AppDataAckHandler.call(q)); return new Frame({Frame: $.interfaceValue<wireFrame | null>(new pingFrame(undefined, true), "main.pingFrame", "main.pingFrame"), Handler: __goscriptLiteralField2}, true) })()])})
 	await queueFramesForRetransmission(p)
 	await $.println("lost:", $.pointerValue<retransmissionQueue>(q).lost)
 	await $.println("done")

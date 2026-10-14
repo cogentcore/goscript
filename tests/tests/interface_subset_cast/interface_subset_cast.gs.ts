@@ -91,15 +91,15 @@ export async function main(): globalThis.Promise<void> {
 	// Cast from larger interface to smaller interface (subset)
 	let i2: MyInterface2 | null = (i1 as MyInterface2 | null)
 
-	await $.println("i1.MyString1():", (__goscriptAwait = $.pointerValue<Exclude<MyInterface1, null>>(i1).MyString1(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
-	await $.println("i1.MyString2():", (__goscriptAwait = $.pointerValue<Exclude<MyInterface1, null>>(i1).MyString2(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
-	await $.println("i2.MyString1():", (__goscriptAwait = $.pointerValue<Exclude<MyInterface2, null>>(i2).MyString1(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println("i1.MyString1():", (__goscriptAwait = (i1 !== null && (i1 as any).__isVarRef !== true && (i1 as any).__goValue === undefined ? (i1 as Exclude<MyInterface1, null>) : $.pointerValue<Exclude<MyInterface1, null>>(i1)).MyString1(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println("i1.MyString2():", (__goscriptAwait = (i1 !== null && (i1 as any).__isVarRef !== true && (i1 as any).__goValue === undefined ? (i1 as Exclude<MyInterface1, null>) : $.pointerValue<Exclude<MyInterface1, null>>(i1)).MyString2(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println("i2.MyString1():", (__goscriptAwait = (i2 !== null && (i2 as any).__isVarRef !== true && (i2 as any).__goValue === undefined ? (i2 as Exclude<MyInterface2, null>) : $.pointerValue<Exclude<MyInterface2, null>>(i2)).MyString1(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
 	// Type assertion from larger to smaller interface
 	let [i3, ok] = $.typeAssertTuple<MyInterface2 | null>(i1, "main.MyInterface2")
 	if (ok) {
 		await $.println("Type assertion successful")
-		await $.println("i3.MyString1():", (__goscriptAwait = $.pointerValue<Exclude<MyInterface2, null>>(i3).MyString1(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+		await $.println("i3.MyString1():", (__goscriptAwait = (i3 !== null && (i3 as any).__isVarRef !== true && (i3 as any).__goValue === undefined ? (i3 as Exclude<MyInterface2, null>) : $.pointerValue<Exclude<MyInterface2, null>>(i3)).MyString1(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	} else {
 		await $.println("Type assertion failed")
 	}

@@ -39,9 +39,9 @@ export async function main(): globalThis.Promise<void> {
 	release!.close()
 
 	{
-		let err = await conc.ConcurrentQueue.prototype.WaitIdle.call(q, context.Background(), null)
+		let err = await (q !== null && (q as any).__isVarRef !== true && (q as any).__goValue === undefined ? (q as unknown as conc.ConcurrentQueue).WaitIdle(context.Background(), null) : conc.ConcurrentQueue.prototype.WaitIdle.call(q, context.Background(), null))
 		if (err != null) {
-			await $.println($.concatString("WaitIdle error: ", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)))
+			await $.println($.concatString("WaitIdle error: ", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)))
 			return
 		}
 	}

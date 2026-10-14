@@ -28,13 +28,13 @@ export async function main(): globalThis.Promise<void> {
 			$.panic((err as any))
 		}
 		{
-			let [, __goscriptShadow0] = await flate.Writer.prototype.Write.call(writer, input)
+			let [, __goscriptShadow0] = await (writer !== null && (writer as any).__isVarRef !== true && (writer as any).__goValue === undefined ? (writer as unknown as flate.Writer).Write(input) : flate.Writer.prototype.Write.call(writer, input))
 			if (__goscriptShadow0 != null) {
 				$.panic((__goscriptShadow0 as any))
 			}
 		}
 		{
-			let __goscriptShadow1 = await flate.Writer.prototype.Close.call(writer)
+			let __goscriptShadow1 = await (writer !== null && (writer as any).__isVarRef !== true && (writer as any).__goValue === undefined ? (writer as unknown as flate.Writer).Close() : flate.Writer.prototype.Close.call(writer))
 			if (__goscriptShadow1 != null) {
 				$.panic((__goscriptShadow1 as any))
 			}
@@ -49,7 +49,7 @@ export async function main(): globalThis.Promise<void> {
 			$.panic((err as any))
 		}
 		{
-			let __goscriptShadow2 = await $.pointerValue<Exclude<io.ReadCloser, null>>(reader).Close()
+			let __goscriptShadow2 = await (reader !== null && (reader as any).__isVarRef !== true && (reader as any).__goValue === undefined ? (reader as Exclude<io.ReadCloser, null>) : $.pointerValue<Exclude<io.ReadCloser, null>>(reader)).Close()
 			if (__goscriptShadow2 != null) {
 				$.panic((__goscriptShadow2 as any))
 			}

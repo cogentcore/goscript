@@ -7,5 +7,5 @@ import * as subpkg from "@goscript/github.com/s4wave/goscript/tests/tests/call_i
 import "@goscript/github.com/s4wave/goscript/tests/tests/call_imported_interface_param/subpkg/index.js"
 
 export async function Use(w: subpkg.Writer | null): globalThis.Promise<void> {
-	await $.pointerValue<Exclude<subpkg.Writer, null>>(w).Write(new Uint8Array([120]))
+	await (w !== null && (w as any).__isVarRef !== true && (w as any).__goValue === undefined ? (w as Exclude<subpkg.Writer, null>) : $.pointerValue<Exclude<subpkg.Writer, null>>(w)).Write(new Uint8Array([120]))
 }

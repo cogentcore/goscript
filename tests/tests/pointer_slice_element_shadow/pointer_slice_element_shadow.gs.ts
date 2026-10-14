@@ -113,12 +113,12 @@ export async function printInterfaceAppendSliceSpareZero(): globalThis.Promise<v
 export async function main(): globalThis.Promise<void> {
 	let o: _object | $.VarRef<_object> | null = new _object()
 	for (let i = 0; i < 4; i++) {
-		let __goscriptShadow0: entry | $.VarRef<entry> | null = _object.prototype.next.call(o)
+		let __goscriptShadow0: entry | $.VarRef<entry> | null = (o !== null && (o as any).__isVarRef !== true && (o as any).__goValue === undefined ? (o as unknown as _object).next() : _object.prototype.next.call(o))
 		$.pointerValue<entry>(__goscriptShadow0).key = "set"
 		await $.println(i, $.pointerValue<entry>(__goscriptShadow0).key)
 	}
 
-	let __goscriptShadow1: entry | $.VarRef<entry> | null = _object.prototype.next.call(o)
+	let __goscriptShadow1: entry | $.VarRef<entry> | null = (o !== null && (o as any).__isVarRef !== true && (o as any).__goValue === undefined ? (o as unknown as _object).next() : _object.prototype.next.call(o))
 	let err: $.GoError = null! as $.GoError
 	let __goscriptTuple0: any = parseKey()
 	$.pointerValue<entry>(__goscriptShadow1).key = __goscriptTuple0[0]
