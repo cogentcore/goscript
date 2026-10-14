@@ -102,7 +102,7 @@ export class readWriteCloser {
 
 export async function main(): globalThis.Promise<void> {
 	let addr: net.Addr | null = $.interfaceValue<net.Addr | null>((() => { const __goscriptLiteralField0 = (net.IPv4(127, 0, 0, 1) as net.IP); return new net.UDPAddr({IP: __goscriptLiteralField0, Port: 443}) })(), "*net.UDPAddr", /* @__PURE__ */ $.pointerType("net.UDPAddr"))
-	await $.println("addr", (__goscriptAwait = $.pointerValue<Exclude<net.Addr, null>>(addr).Network(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), $.pointerValue<net.UDPAddr>($.mustTypeAssert<net.UDPAddr | $.VarRef<net.UDPAddr> | null>(addr, /* @__PURE__ */ $.pointerType("net.UDPAddr"))).Port)
+	await $.println("addr", (__goscriptAwait = $.pointerValue<Exclude<net.Addr, null>>(addr).Network(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), $.pointerValue<net.UDPAddr>(((addr as any)?.__goType === "*net.UDPAddr" && (addr as any).__goValue === undefined && (addr as any).__isTypedNil !== true ? ((addr as any) as net.UDPAddr | $.VarRef<net.UDPAddr> | null) : $.mustTypeAssert<net.UDPAddr | $.VarRef<net.UDPAddr> | null>(addr, /* @__PURE__ */ $.pointerType("net.UDPAddr")))).Port)
 
 	let stream: io.ReadWriteCloser | null = $.interfaceValue<io.ReadWriteCloser | null>(new readWriteCloser(), "*main.readWriteCloser", /* @__PURE__ */ $.pointerType("main.readWriteCloser"))
 	let [written, err] = await $.pointerValue<Exclude<io.ReadWriteCloser, null>>(stream).Write(new Uint8Array([100, 105, 97, 108]))

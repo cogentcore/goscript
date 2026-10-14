@@ -79,7 +79,7 @@ export async function main(): globalThis.Promise<void> {
 	await printList("seed", values)
 
 	let boxed: any = $.interfaceValue(back, "*list.Element", /* @__PURE__ */ $.pointerType("list.Element"))
-	list.List.prototype.MoveToFront.call(values, $.mustTypeAssert<list.Element | $.VarRef<list.Element> | null>(boxed, /* @__PURE__ */ $.pointerType("list.Element")))
+	list.List.prototype.MoveToFront.call(values, ((boxed as any)?.__goType === "*list.Element" && (boxed as any).__goValue === undefined && (boxed as any).__isTypedNil !== true ? ((boxed as any) as list.Element | $.VarRef<list.Element> | null) : $.mustTypeAssert<list.Element | $.VarRef<list.Element> | null>(boxed, /* @__PURE__ */ $.pointerType("list.Element"))))
 	await printList("moved", values)
 
 	await fmt.Println("removed", list.List.prototype.Remove.call(values, middle))

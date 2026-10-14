@@ -6,7 +6,7 @@ import * as $ from "@goscript/builtin/index.js"
 import * as regexp from "@goscript/regexp/index.js"
 import "@goscript/regexp/index.js"
 
-export const nonASCII: string = "[\u0080-\ud7ff\ue000-�𐀀-\u{10ffff}]"
+export const nonASCII: string = "[\xc2\x80-\xed\x9f\xbf\xee\x80\x80-\xef\xbf\xbd\xf0\x90\x80\x80-\xf4\x8f\xbf\xbf]"
 
 export async function main(): globalThis.Promise<void> {
 	// Test hexadecimal escape sequences in string literals
@@ -30,13 +30,14 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("Interpreted string:", s3)
 
 	// Escapes JavaScript lacks, and runes it must escape.
-	let s = "\x07\v\x00\x7f\u{10ffff}𐀀\u2028é"
+	let s = "\x07\x0b\x00\x7f\xf4\x8f\xbf\xbf\xf0\x90\x80\x80\xe2\x80\xa8\xc3\xa9"
 	await $.println("len:", $.stringLen(s))
-	for (const [__rangeIndex, r] of $.rangeString(s)) {
+	for (let __goscriptRunes0 = $.stringRunes(s); __goscriptRunes0.next(); ) {
+		const r = __goscriptRunes0.rune
 		await $.println("rune:", $.int(r))
 	}
-	let re: regexp.Regexp | $.VarRef<regexp.Regexp> | null = await regexp.MustCompile($.concatString(($.concatString("^", "[\u0080-\ud7ff\ue000-�𐀀-\u{10ffff}]")), "+$"))
-	await $.println("match:", await regexp.Regexp.prototype.MatchString.call(re, "é𐀀"), await regexp.Regexp.prototype.MatchString.call(re, "a"))
+	let re: regexp.Regexp | $.VarRef<regexp.Regexp> | null = await regexp.MustCompile($.concatString(($.concatString("^", "[\xc2\x80-\xed\x9f\xbf\xee\x80\x80-\xef\xbf\xbd\xf0\x90\x80\x80-\xf4\x8f\xbf\xbf]")), "+$"))
+	await $.println("match:", await regexp.Regexp.prototype.MatchString.call(re, "\xc3\xa9\xf0\x90\x80\x80"), await regexp.Regexp.prototype.MatchString.call(re, "a"))
 }
 
 if ($.isMainScript(import.meta)) {

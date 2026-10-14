@@ -123,7 +123,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("divide:", globalThis.Math.trunc(a / b), globalThis.Math.trunc(-a / b))
 
 	let r = 128512
-	await $.println("rune string:", $.stringEqual($.runeToString(r), "😀"))
+	await $.println("rune string:", $.stringEqual($.runeToString(r), "\xf0\x9f\x98\x80"))
 
 	let points: point[] = $.arrayValue(globalThis.Array.from({ length: 2 }, () => new point(undefined, true)), /* @__PURE__ */ $.arrayType("main.point", 2))
 	$.arrayIndex(points, 1).x = 3

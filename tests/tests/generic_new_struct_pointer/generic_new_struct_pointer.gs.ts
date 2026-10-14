@@ -160,7 +160,7 @@ export async function main(): globalThis.Promise<void> {
 		$.pointerValue<Widget>(w).Text = "hello"
 		$.pointerValue<Widget>(w).Base.inits++
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.pointerType("main.Widget")], results: [] } as $.FunctionTypeInfo)))
-	let w: Widget | $.VarRef<Widget> | null = $.mustTypeAssert<Widget | $.VarRef<Widget> | null>(n, /* @__PURE__ */ $.pointerType("main.Widget"))
+	let w: Widget | $.VarRef<Widget> | null = ((n as any)?.__goType === "*main.Widget" && (n as any).__goValue === undefined && (n as any).__isTypedNil !== true ? ((n as any) as Widget | $.VarRef<Widget> | null) : $.mustTypeAssert<Widget | $.VarRef<Widget> | null>(n, /* @__PURE__ */ $.pointerType("main.Widget")))
 	let w$: Widget = w == null ? $.pointerTarget<Widget>(w) : (w as any).__isVarRef === true ? (w as any).value : (w as any).__goValue === undefined ? (w as any) : $.pointerTarget<Widget>(w)
 	await $.println("name:", (w$ as Widget).Base.Name(), "text:", (w$ as Widget).Text, "inits:", (w$ as Widget).Base.inits)
 	await $.println("same:", $.comparableEqual($.interfaceValue(w, "*main.Widget", /* @__PURE__ */ $.pointerType("main.Widget")), (n as any)))
