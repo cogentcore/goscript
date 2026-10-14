@@ -80,7 +80,7 @@ export class outer {
 
 export async function main(): globalThis.Promise<void> {
 	// Test creating a StructField value
-	let field = (() => { const __goscriptLiteralField0 = reflect.TypeFor({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }}); return $.markAsStructValue(new reflect.StructField({Name: "TestField", Type: __goscriptLiteralField0})) })()
+	let field = (() => { const __goscriptLiteralField0 = reflect.TypeFor(__goscriptStatic0()); return $.markAsStructValue(new reflect.StructField({Name: "TestField", Type: __goscriptLiteralField0})) })()
 	await $.println("StructField Name:", field.Name)
 	await $.println("StructField Type:", await $.pointerValue<Exclude<reflect.Type, null>>(field.Type).String())
 
@@ -92,6 +92,11 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("FieldByIndex 1,1:", f.Name, await $.pointerValue<Exclude<reflect.Type, null>>(f.Type).String())
 	$.assignStruct(f, $.markAsStructValue($.cloneStructValue(await $.pointerValue<Exclude<reflect.Type, null>>(typ).FieldByIndex($.arrayToSlice<number>([2, 0])))))
 	await $.println("FieldByIndex 2,0:", f.Name, await $.pointerValue<Exclude<reflect.Type, null>>(f.Type).String())
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }})
 }
 
 if ($.isMainScript(import.meta)) {

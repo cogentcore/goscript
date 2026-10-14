@@ -17,11 +17,16 @@ export function siblings<T>(__typeArgs: $.GenericTypeArgs | undefined, value: an
 }
 
 export async function main(): globalThis.Promise<void> {
-	let grown: $.Slice<number> = (grow({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }}, 3) as $.Slice<number>)
+	let grown: $.Slice<number> = (grow(__goscriptStatic0(), 3) as $.Slice<number>)
 	await $.println("grow:", $.len(grown), $.cap(grown))
 
-	let values: $.Slice<number> = (siblings({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }}, 7) as $.Slice<number>)
+	let values: $.Slice<number> = (siblings(__goscriptStatic0(), 7) as $.Slice<number>)
 	await $.println("siblings:", $.len(values), $.arrayIndex(values!, 0))
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }})
 }
 
 if ($.isMainScript(import.meta)) {

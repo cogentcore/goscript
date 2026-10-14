@@ -110,6 +110,11 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("pointer callback", got, err == null)
 }
 
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.pointerType("main.Snapshot"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int")), /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")), "error"] } as $.FunctionTypeInfo), zero: () => null }})
+}
+
 if ($.isMainScript(import.meta)) {
 	await main()
 }

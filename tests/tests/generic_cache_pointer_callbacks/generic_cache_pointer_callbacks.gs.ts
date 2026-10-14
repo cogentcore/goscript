@@ -113,7 +113,7 @@ export function __goscript_set_privateKeyCache(__goscriptValue: cache): void {
 }
 
 export async function privateKeyToCache(k: key | $.VarRef<key> | null): globalThis.Promise<[privateKey | $.VarRef<privateKey> | null, $.GoError]> {
-	const __goscriptReturn0 = await privateKeyCache.value.Get({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, K: { type: "main.key", zero: () => $.markAsStructValue(new key()) }, V: { type: "main.privateKey", zero: () => $.markAsStructValue(new privateKey()) }}, k, $.functionValue((): [privateKey | $.VarRef<privateKey> | null, $.GoError] => {
+	const __goscriptReturn0 = await privateKeyCache.value.Get(__goscriptStatic0(), k, $.functionValue((): [privateKey | $.VarRef<privateKey> | null, $.GoError] => {
 		return [new privateKey({D: $.pointerValue<key>(k).N}), null]
 	}, ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.pointerType("main.privateKey"), "error"] } as $.FunctionTypeInfo)), $.functionValue((v: privateKey | $.VarRef<privateKey> | null): boolean => {
 		return $.pointerValue<privateKey>(v).D == $.pointerValue<key>(k).N
@@ -131,6 +131,11 @@ export async function main(): globalThis.Promise<void> {
 		$.panic((err as any))
 	}
 	await $.println("cached:", $.pointerValue<privateKey>(v).D)
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, K: { type: "main.key", zero: () => $.markAsStructValue(new key()) }, V: { type: "main.privateKey", zero: () => $.markAsStructValue(new privateKey()) }})
 }
 
 if ($.isMainScript(import.meta)) {

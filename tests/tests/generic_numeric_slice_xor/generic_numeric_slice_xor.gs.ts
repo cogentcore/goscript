@@ -13,8 +13,13 @@ export function xorLoop<T>(__typeArgs: $.GenericTypeArgs | undefined, dst: $.Sli
 
 export async function main(): globalThis.Promise<void> {
 	let dst: $.Slice<number> = new Uint8Array([0, 0]) as $.Slice<number>
-	xorLoop({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("uint8"), zero: () => 0 }}, dst, new Uint8Array([1, 3]) as $.Slice<number>, new Uint8Array([2, 1]) as $.Slice<number>)
+	xorLoop(__goscriptStatic0(), dst, new Uint8Array([1, 3]) as $.Slice<number>, new Uint8Array([2, 1]) as $.Slice<number>)
 	await $.println($.uint($.arrayIndex(dst!, 0), 8), $.uint($.arrayIndex(dst!, 1), 8))
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("uint8"), zero: () => 0 }})
 }
 
 if ($.isMainScript(import.meta)) {

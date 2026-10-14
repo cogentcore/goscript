@@ -2428,17 +2428,55 @@ export function namedValueInterfaceValue<T>(
     toString: () => String(value),
     [Symbol.toPrimitive]: () => value as any,
   }
-  for (const [name, method] of Object.entries(methods)) {
-    boxed[name] = (...args: any[]) => method(value, ...args)
-    boxed[name].__goscriptMethodWrapper = true
-    const signature =
-      methodSignatures?.find((candidate) => candidate.name === name) ??
-      wrapperMethodSignatureFromTypeInfo(name, typeInfo)
-    if (signature) {
-      boxed[name].__goscriptMethodSignature = signature
+  for (const entry of namedValueMethodEntries(
+    methods,
+    typeInfo,
+    methodSignatures,
+  )) {
+    const method = entry.method
+    const wrapper: any = (...args: any[]) => method(value, ...args)
+    wrapper.__goscriptMethodWrapper = true
+    if (entry.signature) {
+      wrapper.__goscriptMethodSignature = entry.signature
     }
+    boxed[entry.name] = wrapper
   }
   return boxed as T
+}
+
+interface NamedValueMethodEntry {
+  name: string
+  method: (receiver: any, ...args: any[]) => any
+  signature: MethodSignature | undefined
+}
+
+// namedValueMethodEntries caches the methods of a method table, with their
+// signatures, for a method table that generated code creates once for a type.
+const namedValueMethodCache = new WeakMap<object, NamedValueMethodEntry[]>()
+
+function namedValueMethodEntries(
+  methods: Record<string, (receiver: any, ...args: any[]) => any>,
+  typeInfo?: TypeInfo | string,
+  methodSignatures?: MethodSignature[],
+): NamedValueMethodEntry[] {
+  const cached = namedValueMethodCache.get(methods)
+  if (cached !== undefined) {
+    return cached
+  }
+  const entries = Object.entries(methods).map(([name, method]) => ({
+    name,
+    method,
+    signature:
+      methodSignatures?.find((candidate) => candidate.name === name) ??
+      wrapperMethodSignatureFromTypeInfo(name, typeInfo) ??
+      undefined,
+  }))
+  // Only a method table that comes with its signatures is cached, since
+  // its signatures do not depend on the type info given with it.
+  if (methodSignatures !== undefined) {
+    namedValueMethodCache.set(methods, entries)
+  }
+  return entries
 }
 
 /**

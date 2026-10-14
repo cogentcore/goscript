@@ -3349,9 +3349,12 @@ func TestCompilePackagesEmitsGenericMethodsAliasesAndDictionaries(t *testing.T) 
 		"$.mapSet(seen, 1, {})",
 		"$.genericZero(__typeArgs, \"T\", null)",
 		"return $.callGenericMethod(__typeArgs, \"T\", \"String\", v)",
-		"ZeroValue({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType(\"int\", \"main.MyInt\"), zero: () => 0, methods: {String: (receiver: any, ...args: any[]) => (MyInt_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, methodSignatures: [$.methodSignature(\"String\", [], [/* @__PURE__ */ $.basicType(\"string\")])] }})",
-		"await CallString({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType(\"int\", \"main.MyInt\"), zero: () => 0, methods: {String: (receiver: any, ...args: any[]) => (MyInt_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, methodSignatures: [$.methodSignature(\"String\", [], [/* @__PURE__ */ $.basicType(\"string\")])] }}, zero)",
-		"Sum({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType(\"int\", \"main.MyInt\"), zero: () => 0, methods: {String: (receiver: any, ...args: any[]) => (MyInt_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, methodSignatures: [$.methodSignature(\"String\", [], [/* @__PURE__ */ $.basicType(\"string\")])] }}, null)",
+		"ZeroValue(__goscriptStatic",
+		"??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType(\"int\", \"main.MyInt\"), zero: () => 0, methods: {String: (receiver: any, ...args: any[]) => (MyInt_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, methodSignatures: [$.methodSignature(\"String\", [], [/* @__PURE__ */ $.basicType(\"string\")])] }})",
+		"await CallString(__goscriptStatic",
+		"??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType(\"int\", \"main.MyInt\"), zero: () => 0, methods: {String: (receiver: any, ...args: any[]) => (MyInt_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, methodSignatures: [$.methodSignature(\"String\", [], [/* @__PURE__ */ $.basicType(\"string\")])] }})",
+		"Sum(__goscriptStatic",
+		"??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType(\"int\", \"main.MyInt\"), zero: () => 0, methods: {String: (receiver: any, ...args: any[]) => (MyInt_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, methodSignatures: [$.methodSignature(\"String\", [], [/* @__PURE__ */ $.basicType(\"string\")])] }})",
 	} {
 		if !strings.Contains(text, want) {
 			t.Fatalf("missing %q in generated output:\n%s", want, text)
@@ -3412,7 +3415,8 @@ func TestCompilePackagesInfersGenericTypeArgsFromNamedArgument(t *testing.T) {
 	}
 	text := string(content)
 	for _, want := range []string{
-		"await Get({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: \"genericnamedarg.Source\", zero: () => null, methods: {Load: (receiver: any, ...args: any[]) => receiver.Load(...$.stripGenericTypeArgs(args))} }}, $.markAsStructValue($.cloneStructValue(loader)))",
+		"await Get(__goscriptStatic",
+		"??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: \"genericnamedarg.Source\", zero: () => null, methods: {Load: (receiver: any, ...args: any[]) => receiver.Load(...$.stripGenericTypeArgs(args))} }})",
 		"return $.mustTypeAssert<(() => any | globalThis.Promise<any>) | null>(f, ({ kind: $.TypeKind.Function, params: [], results: [__typeArgs?.[\"T\"]?.type ?? { kind: $.TypeKind.Interface, methods: [] }] } as $.FunctionTypeInfo))!()",
 		"$.mustTypeAssert<any>(v, { kind: $.TypeKind.Interface, methods: [{ name: \"Load\", args: [], returns: [{ name: \"_r0\", type: __typeArgs?.[\"T\"]?.type ?? { kind: $.TypeKind.Interface, methods: [] } }] }] })",
 		"return await $.pointerValue<Exclude<Source, null>>(src).Load()",
@@ -4194,7 +4198,8 @@ func TestCompilePackagesPropagatesAsyncGenericInterfaceMethods(t *testing.T) {
 	for _, want := range []string{
 		"Wait(__typeArgs: $.GenericTypeArgs | undefined, ctx: context.Context | null, old: any): any | globalThis.Promise<any>",
 		"public async Wait(__typeArgs: $.GenericTypeArgs | undefined, ctx: context.Context | null, old: any): globalThis.Promise<any>",
-		"return (await $.callInterfaceMethod($.pointerValue<Exclude<Watchable, null>>(w), \"Wait\", {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType(\"int\"), zero: () => 0 }}, ctx, old) as number)",
+		"return (await $.callInterfaceMethod($.pointerValue<Exclude<Watchable, null>>(w), \"Wait\", __goscriptStatic",
+		"??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType(\"int\"), zero: () => 0 }})",
 	} {
 		if !strings.Contains(text, want) {
 			t.Fatalf("missing %q in generated output:\n%s", want, text)
@@ -4902,8 +4907,13 @@ func TestCompilePackagesPropagatesImportedAsyncGenericInterfaceMethods(t *testin
 		t.Fatal(err.Error())
 	}
 	mainText := string(mainContent)
-	if want := "return (await $.callInterfaceMethod($.pointerValue<Exclude<dep.Watchable, null>>(w), \"Wait\", {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType(\"int\"), zero: () => 0 }}, ctx, old) as number)"; !strings.Contains(mainText, want) {
-		t.Fatalf("missing %q in generated main output:\n%s", want, mainText)
+	for _, want := range []string{
+		"return (await $.callInterfaceMethod($.pointerValue<Exclude<dep.Watchable, null>>(w), \"Wait\", __goscriptStatic",
+		"??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType(\"int\"), zero: () => 0 }})",
+	} {
+		if !strings.Contains(mainText, want) {
+			t.Fatalf("missing %q in generated main output:\n%s", want, mainText)
+		}
 	}
 }
 

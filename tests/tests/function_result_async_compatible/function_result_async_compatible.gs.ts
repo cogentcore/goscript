@@ -65,8 +65,13 @@ export async function wrapNew(__typeArgs: $.GenericTypeArgs | undefined, newValu
 }
 
 export async function main(): globalThis.Promise<void> {
-	let fn: (() => Value | null | globalThis.Promise<Value | null>) | null = await wrapNew({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.pointerType("main.box"), zero: () => null, methods: {Value: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Value(...$.stripGenericTypeArgs(args))} }}, asyncBox)
+	let fn: (() => Value | null | globalThis.Promise<Value | null>) | null = await wrapNew(__goscriptStatic0(), asyncBox)
 	await $.println(await $.pointerValue<Exclude<Value, null>>((await fn!())).Value())
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.pointerType("main.box"), zero: () => null, methods: {Value: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Value(...$.stripGenericTypeArgs(args))} }})
 }
 
 if ($.isMainScript(import.meta)) {

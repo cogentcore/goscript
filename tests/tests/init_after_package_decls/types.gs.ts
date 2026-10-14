@@ -83,8 +83,18 @@ export function TypeByName(name: string): __goscript__type.Type | $.VarRef<__gos
 
 function __goscriptInit0(): void {
 	__goscript_set_order($.append(__goscript_get_order(), "init types.go"))
-	addBuiltin({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }}, "int")
-	addBuiltin({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }}, "string")
+	addBuiltin(__goscriptStatic0(), "int")
+	addBuiltin(__goscriptStatic1(), "string")
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }})
+}
+
+var __goscriptStatic1$value: any
+function __goscriptStatic1(): any {
+	return __goscriptStatic1$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }})
 }
 
 export { __goscriptInit0 }

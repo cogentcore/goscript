@@ -78,22 +78,22 @@ export function Sum<T>(__typeArgs: $.GenericTypeArgs | undefined, vals: $.Slice<
 
 export async function main(): globalThis.Promise<void> {
 	// Test 1: Zero value of IntVal should be 0
-	let zeroInt = (ZeroValue({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int", "main.IntVal"), zero: () => 0, methods: {String: (receiver: any, ...args: any[]) => (IntVal_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, methodSignatures: [$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])] }}) as IntVal)
+	let zeroInt = (ZeroValue(__goscriptStatic0()) as IntVal)
 	await $.println("ZeroValue[IntVal]:", IntVal_String(zeroInt))
 
 	// Test 2: Zero value of StringVal should be ""
-	let zeroStr = (ZeroValue({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("string", "main.StringVal"), zero: () => "", methods: {String: (receiver: any, ...args: any[]) => (StringVal_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, methodSignatures: [$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])] }}) as StringVal)
+	let zeroStr = (ZeroValue(__goscriptStatic1()) as StringVal)
 	await $.println("ZeroValue[StringVal] len:", $.len(StringVal_String(zeroStr)))
 
 	// Test 3: CallString on zero value
-	await $.println("CallString on zero IntVal:", await CallString({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int", "main.IntVal"), zero: () => 0, methods: {String: (receiver: any, ...args: any[]) => (IntVal_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, methodSignatures: [$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])] }}, zeroInt))
-	await $.println("CallString on zero StringVal len:", $.len(await CallString({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("string", "main.StringVal"), zero: () => "", methods: {String: (receiver: any, ...args: any[]) => (StringVal_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, methodSignatures: [$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])] }}, zeroStr)))
+	await $.println("CallString on zero IntVal:", await CallString(__goscriptStatic0(), zeroInt))
+	await $.println("CallString on zero StringVal len:", $.len(await CallString(__goscriptStatic1(), zeroStr)))
 
 	// Test 4: Sum returns zero value
-	let sumInt = (Sum({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int", "main.IntVal"), zero: () => 0, methods: {String: (receiver: any, ...args: any[]) => (IntVal_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, methodSignatures: [$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])] }}, null) as IntVal)
+	let sumInt = (Sum(__goscriptStatic0(), null) as IntVal)
 	await $.println("Sum[IntVal]():", IntVal_String(sumInt))
 
-	let sumStr = (Sum({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("string", "main.StringVal"), zero: () => "", methods: {String: (receiver: any, ...args: any[]) => (StringVal_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, methodSignatures: [$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])] }}, null) as StringVal)
+	let sumStr = (Sum(__goscriptStatic1(), null) as StringVal)
 	await $.println("Sum[StringVal]() len:", $.len(StringVal_String(sumStr)))
 
 	// Test 5: Verify the actual values
@@ -101,9 +101,24 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("zeroStr == \"\":", $.stringEqual(zeroStr, ""))
 
 	// Test 6: T{} returns the instantiated array zero value.
-	let zeroPair = ($.cloneArrayValue(ZeroArrayLiteral({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.Pair", zero: () => $.arrayValue(globalThis.Array.from({ length: 2 }, () => 0)) }}), "main.Pair") as Pair)
+	let zeroPair = ($.cloneArrayValue(ZeroArrayLiteral(__goscriptStatic2()), "main.Pair") as Pair)
 	await $.println("ZeroArrayLiteral[Pair] len:", 2)
 	await $.println("ZeroArrayLiteral[Pair] zero:", ($.arrayIndex(zeroPair, 0) == 0) && ($.arrayIndex(zeroPair, 1) == 0))
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int", "main.IntVal"), zero: () => 0, methods: {String: (receiver: any, ...args: any[]) => (IntVal_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, methodSignatures: [$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])] }})
+}
+
+var __goscriptStatic1$value: any
+function __goscriptStatic1(): any {
+	return __goscriptStatic1$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("string", "main.StringVal"), zero: () => "", methods: {String: (receiver: any, ...args: any[]) => (StringVal_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, methodSignatures: [$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])] }})
+}
+
+var __goscriptStatic2$value: any
+function __goscriptStatic2(): any {
+	return __goscriptStatic2$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.Pair", zero: () => $.arrayValue(globalThis.Array.from({ length: 2 }, () => 0)) }})
 }
 
 if ($.isMainScript(import.meta)) {

@@ -164,7 +164,7 @@ export function newGenericStore(__typeArgs: $.GenericTypeArgs | undefined, value
 }
 
 export async function loadGenericStore(store: GenericStore | null): globalThis.Promise<number> {
-	return (await $.callInterfaceMethod($.pointerValue<Exclude<GenericStore, null>>(store), "Load", {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, V: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }}) as number)
+	return (await $.callInterfaceMethod($.pointerValue<Exclude<GenericStore, null>>(store), "Load", __goscriptStatic0()) as number)
 }
 
 export async function main(): globalThis.Promise<void> {
@@ -181,10 +181,15 @@ export async function main(): globalThis.Promise<void> {
 	let result2 = await processViaInterface($.interfaceValue<AsyncProcessor | null>(simpleProc, "*main.SimpleProcessor", /* @__PURE__ */ $.pointerType("main.SimpleProcessor")), 5)
 	await $.println("SimpleProcessor result:", result2)
 
-	let genericStore = (newGenericStore({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, V: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }}, 7) as GenericStore | null)
+	let genericStore = (newGenericStore(__goscriptStatic0(), 7) as GenericStore | null)
 	await $.println("GenericStore result:", await loadGenericStore(genericStore))
 
 	ch!.close()
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, V: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }})
 }
 
 if ($.isMainScript(import.meta)) {

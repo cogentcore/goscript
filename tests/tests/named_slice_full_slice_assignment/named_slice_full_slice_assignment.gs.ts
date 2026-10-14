@@ -25,7 +25,7 @@ export function filters_size(f: filters): number {
 
 export async function main(): globalThis.Promise<void> {
 	let out: filters = null! as filters
-	let value = $.namedValueInterfaceValue<any>($.arrayToSlice<number>([1, 2, 3]), "main.filters", {size: (receiver: any, ...args: any[]) => (filters_size as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"), "main.filters"), [$.methodSignature("size", [], [/* @__PURE__ */ $.basicType("int")])])
+	let value = $.namedValueInterfaceValue<any>($.arrayToSlice<number>([1, 2, 3]), "main.filters", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2())
 	{
 		let __goscriptTuple0: any = $.typeAssertTuple<filters>(value, /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"), "main.filters"))
 		let c: filters = (__goscriptTuple0[0] as filters)
@@ -39,6 +39,21 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("len:", $.len((out as filters)))
 	await $.println("cap:", $.cap((out as filters)))
 	await $.println("size:", size)
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= ({size: (receiver: any, ...args: any[]) => (filters_size as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))})
+}
+
+var __goscriptStatic1$value: any
+function __goscriptStatic1(): any {
+	return __goscriptStatic1$value ??= (/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"), "main.filters"))
+}
+
+var __goscriptStatic2$value: any
+function __goscriptStatic2(): any {
+	return __goscriptStatic2$value ??= ([$.methodSignature("size", [], [/* @__PURE__ */ $.basicType("int")])])
 }
 
 if ($.isMainScript(import.meta)) {
