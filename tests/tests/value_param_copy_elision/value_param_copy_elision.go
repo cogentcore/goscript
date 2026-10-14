@@ -50,6 +50,13 @@ func address(r Region) *Region {
 	return &r
 }
 
+// readAfterPointer changes its caller's value through a pointer while it
+// reads its parameter.
+func readAfterPointer(r Region, p *Region) int {
+	p.Start.Char = 80
+	return r.Start.Char
+}
+
 var global State
 
 // readGlobal reads its parameter after storing to a package variable.
@@ -78,6 +85,11 @@ func main() {
 	println(s.reg.Start.Char)
 	global.reg.Start.Char = 4
 	println(readGlobal(global.reg), global.reg.Start.Char)
+	loc := s.reg
+	println(readAfterCall(loc, s), loc.Start.Char, s.reg.Start.Char)
+	addr := s.reg
+	ap := &addr
+	println(readAfterPointer(addr, ap), addr.Start.Char)
 	g := s.reg.Later()
 	s.reg.End.Char = 20
 	println(g(), s.reg.Width())

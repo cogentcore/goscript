@@ -22,7 +22,7 @@ export async function verifyCertificate(cert: x509.Certificate | $.VarRef<x509.C
 export async function main(): globalThis.Promise<void> {
 	let now = $.markAsStructValue($.cloneStructValue(time.Unix(1700000000n, 0n)))
 	let cert: x509.Certificate | $.VarRef<x509.Certificate> | null = (() => { const __goscriptLiteralField0 = big.NewInt(1n); const __goscriptLiteralField1 = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(now)).Add(-3600000000000n))); const __goscriptLiteralField2 = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(now)).Add(3600000000000n))); return new x509.Certificate({Raw: new Uint8Array([99, 101, 114, 116, 105, 102, 105, 99, 97, 116, 101]), RawSubject: new Uint8Array([115, 117, 98, 106, 101, 99, 116]), RawIssuer: new Uint8Array([115, 117, 98, 106, 101, 99, 116]), SerialNumber: __goscriptLiteralField0, NotBefore: __goscriptLiteralField1, NotAfter: __goscriptLiteralField2, KeyUsage: 32, BasicConstraintsValid: true, IsCA: true}) })()
-	let err = await verifyCertificate(cert, $.markAsStructValue($.cloneStructValue(now)))
+	let err = await verifyCertificate(cert, now)
 	await $.println("verify err nil", err == null)
 }
 

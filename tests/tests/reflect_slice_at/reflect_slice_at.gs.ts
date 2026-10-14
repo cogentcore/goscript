@@ -139,12 +139,12 @@ export function fieldValue(obj: any, fld: reflect.StructField): reflect.Value {
 export async function newAtOffsets(): globalThis.Promise<void> {
 	let typ = reflect.TypeOf($.interfaceValue((pt.value).clone(), "main.T", "main.T"))
 	let [fld, ] = await $.pointerValue<Exclude<reflect.Type, null>>(typ).FieldByName("Mbr2")
-	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(fieldValue($.interfaceValue(pt, "*main.T", /* @__PURE__ */ $.pointerType("main.T")), $.markAsStructValue($.cloneStructValue(fld))))).Elem())).Set($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.basicInterfaceValue(10, "int")))))
+	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(fieldValue($.interfaceValue(pt, "*main.T", /* @__PURE__ */ $.pointerType("main.T")), fld))).Elem())).Set($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.basicInterfaceValue(10, "int")))))
 	await $.println("newat-offset:", pt.value.Mbr2)
 
 	let __goscriptTuple0: any = await $.pointerValue<Exclude<reflect.Type, null>>(typ).FieldByName("Mbr1")
 	$.assignStruct(fld, __goscriptTuple0[0])
-	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(fieldValue($.interfaceValue(pt, "*main.T", /* @__PURE__ */ $.pointerType("main.T")), $.markAsStructValue($.cloneStructValue(fld))))).Elem())).Set($.markAsStructValue($.cloneStructValue(reflect.ValueOf("new"))))
+	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(fieldValue($.interfaceValue(pt, "*main.T", /* @__PURE__ */ $.pointerType("main.T")), fld))).Elem())).Set($.markAsStructValue($.cloneStructValue(reflect.ValueOf("new"))))
 	await $.println("newat-offset:", pt.value.Mbr1, pt.value.Mbr2)
 
 	let [sf, ] = await $.pointerValue<Exclude<reflect.Type, null>>(typ).FieldByName("S")
@@ -154,7 +154,7 @@ export async function newAtOffsets(): globalThis.Promise<void> {
 	await $.println("newat-offset:", pt.value.S.Y)
 
 	let local: T | $.VarRef<T> | null = new T()
-	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(fieldValue($.interfaceValue(local, "*main.T", /* @__PURE__ */ $.pointerType("main.T")), $.markAsStructValue($.cloneStructValue(fld))))).Elem())).SetString("loc")
+	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(fieldValue($.interfaceValue(local, "*main.T", /* @__PURE__ */ $.pointerType("main.T")), fld))).Elem())).SetString("loc")
 	await $.println("newat-offset:", $.pointerValue<T>(local).Mbr1)
 
 	let v = $.varRef(3)

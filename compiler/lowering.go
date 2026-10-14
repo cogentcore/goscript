@@ -9853,10 +9853,12 @@ func (o *LoweringOwner) lowerFixedCallArgs(
 
 	// A struct parameter that the called function only reads takes the
 	// caller's value without a copy (see funcParamsReadOnly).
-	var paramsReadOnly []bool
+	var paramsReadOnly []valueReadOnlyKind
+	calleeAsync := false
 	if fn := calledFunction(ctx.semPkg.source, ast.Unparen(call.Fun)); fn != nil && !overrideCall {
-		if semFn := semanticFunctionFor(ctx.model, fn); semFn != nil && !o.functionAsync(ctx, fn) {
+		if semFn := semanticFunctionFor(ctx.model, fn); semFn != nil {
 			paramsReadOnly = semFn.paramsReadOnly
+			calleeAsync = o.functionAsync(ctx, fn)
 		}
 	}
 
@@ -9875,7 +9877,8 @@ func (o *LoweringOwner) lowerFixedCallArgs(
 		allowAsyncCallback := allowAsyncOverrideCallback || o.overrideAwaitsCallback(ctx, call.Fun, param.Name())
 		lowered, exprDiagnostics := o.lowerCallArgExpr(ctx, expr, param.Type(), allowAsyncCallback)
 		diagnostics = append(diagnostics, exprDiagnostics...)
-		if idx < len(paramsReadOnly) && paramsReadOnly[idx] && types.Identical(ctx.semPkg.source.TypesInfo.TypeOf(expr), param.Type()) {
+		if idx < len(paramsReadOnly) && types.Identical(ctx.semPkg.source.TypesInfo.TypeOf(expr), param.Type()) &&
+			valueReadOnlyArg(ctx, paramsReadOnly[idx], calleeAsync, expr) {
 			args = append(args, lowered)
 			continue
 		}
@@ -11385,7 +11388,7 @@ func (o *LoweringOwner) lowerMethodReceiverExpr(
 		// passed the value without a copy.
 		if method, _ := selection.Obj().(*types.Func); method != nil {
 			if semFn := semanticFunctionFor(ctx.model, method); semFn != nil &&
-				semFn.receiverReadOnly && !o.functionAsync(ctx, method) {
+				valueReadOnlyArg(ctx, semFn.receiverReadOnly, o.functionAsync(ctx, method), expr) {
 				return receiver, diagnostics
 			}
 		}
@@ -16402,4 +16405,123 @@ func loweringUnsupported(kind string, subject string, detail string) Diagnostic 
 		Message:  "unsupported " + kind + " in v2 lowering seed",
 		Detail:   subject + ": " + detail,
 	}
+}
+
+// valueReadOnlyArg reports whether expr, the value passed for a value
+// receiver or parameter of the given kind, can be passed without a copy. A
+// function that changes no storage but its locals can share any value while
+// it runs, unless it suspends, when other code could change the value. One
+// that may change other storage can share only a value that no other
+// reference reaches (see isUnaliasedLocalValue), even across a suspension,
+// since only the caller, which waits for it, can change that value.
+func valueReadOnlyArg(ctx lowerFileContext, kind valueReadOnlyKind, async bool, expr ast.Expr) bool {
+	switch kind {
+	case valueReadOnly:
+		return !async || isUnaliasedLocalValue(ctx, expr)
+	case valueReadOnlyUnaliased:
+		return isUnaliasedLocalValue(ctx, expr)
+	}
+	return false
+}
+
+// isUnaliasedLocalValue reports whether expr is a local struct variable, or
+// a struct field of one, that no reference other than the variable reaches:
+// its address is never taken, no pointer method is called on it or its
+// fields, no function literal refers to it, and it is not a range variable,
+// which may share an element of the ranged value.
+func isUnaliasedLocalValue(ctx lowerFileContext, expr ast.Expr) bool {
+	info := ctx.semPkg.source.TypesInfo
+	var ident *ast.Ident
+	for ident == nil {
+		switch typed := ast.Unparen(expr).(type) {
+		case *ast.Ident:
+			ident = typed
+		case *ast.SelectorExpr:
+			selection := info.Selections[typed]
+			if selection == nil || selection.Kind() != types.FieldVal || selection.Indirect() {
+				return false
+			}
+			expr = typed.X
+		default:
+			return false
+		}
+	}
+	obj, ok := info.Uses[ident].(*types.Var)
+	if !ok || obj.Pkg() == nil || obj.Parent() == nil || obj.Parent() == obj.Pkg().Scope() ||
+		!isValueCopyType(obj.Type()) || ctx.model.needsVarRef[obj] || ctx.file == nil {
+		return false
+	}
+	if obj.Pos() < ctx.file.Pos() || obj.Pos() >= ctx.file.End() {
+		return false
+	}
+	path, _ := astutil.PathEnclosingInterval(ctx.file, obj.Pos(), obj.Pos())
+	var body *ast.BlockStmt
+	for _, node := range path {
+		switch typed := node.(type) {
+		case *ast.RangeStmt:
+			if (typed.Key != nil && typed.Key.Pos() == obj.Pos()) || (typed.Value != nil && typed.Value.Pos() == obj.Pos()) {
+				return false
+			}
+		case *ast.FuncDecl:
+			body = typed.Body
+		case *ast.FuncLit:
+			body = typed.Body
+		}
+		if body != nil {
+			break
+		}
+	}
+	if body == nil {
+		return false
+	}
+	rootIsObj := func(expr ast.Expr) bool {
+		for {
+			switch typed := ast.Unparen(expr).(type) {
+			case *ast.Ident:
+				return info.Uses[typed] == obj
+			case *ast.SelectorExpr:
+				expr = typed.X
+			case *ast.IndexExpr:
+				expr = typed.X
+			case *ast.SliceExpr:
+				expr = typed.X
+			default:
+				return false
+			}
+		}
+	}
+	aliased := false
+	ast.Inspect(body, func(node ast.Node) bool {
+		if aliased {
+			return false
+		}
+		switch typed := node.(type) {
+		case *ast.FuncLit:
+			ast.Inspect(typed.Body, func(node ast.Node) bool {
+				if ident, ok := node.(*ast.Ident); ok && info.Uses[ident] == obj {
+					aliased = true
+				}
+				return !aliased
+			})
+			return false
+		case *ast.UnaryExpr:
+			aliased = typed.Op == token.AND && rootIsObj(typed.X)
+		case *ast.SliceExpr:
+			aliased = rootIsObj(typed.X)
+		case *ast.SelectorExpr:
+			if selection := info.Selections[typed]; selection != nil && selection.Kind() == types.MethodVal && rootIsObj(typed.X) {
+				if signature, ok := selection.Obj().Type().(*types.Signature); ok && signature.Recv() != nil {
+					_, aliased = signature.Recv().Type().(*types.Pointer)
+				}
+			}
+		}
+		return !aliased
+	})
+	return !aliased
+}
+
+// isValueCopyType reports whether values of typ are structs or arrays, which
+// Go copies where they are assigned.
+func isValueCopyType(typ types.Type) bool {
+	return isStructValueType(typ) || isArrayType(typ)
 }
