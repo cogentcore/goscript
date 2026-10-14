@@ -1348,8 +1348,8 @@ func TestCompilePackagesEmitsBinaryStringLiterals(t *testing.T) {
 	if err != nil {
 		t.Fatal(err.Error())
 	}
-	if !strings.Contains(string(content), "$.bytesToString(new Uint8Array([255, 128, 65]))") {
-		t.Fatalf("binary string literal was not emitted as byte-backed string:\n%s", string(content))
+	if !strings.Contains(string(content), `"\xff\x80A"`) {
+		t.Fatalf("binary string literal was not emitted as a string of its bytes:\n%s", string(content))
 	}
 }
 
