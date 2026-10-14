@@ -459,6 +459,9 @@ func (o *LoweringOwner) lowerFile(req lowerFileRequest) (*loweredFile, []Diagnos
 				source: source,
 				bare:   true,
 			})
+			// The package index must import the file for its blank imports to
+			// run, even when the file declares nothing else.
+			loweredFile.sideEffect = true
 			continue
 		}
 		alias := uniqueImportAlias(safeIdentifier(name), pkgName.Imported().Path(), importAliases, reservedImportAliases)
