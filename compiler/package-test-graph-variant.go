@@ -30,6 +30,8 @@ type PackageTestGraphVariant struct {
 	Diagnostics []Diagnostic
 	// Tests are ordinary TestXxx functions discovered in this variant.
 	Tests []PackageTestFunction
+	// Benchmarks are BenchmarkXxx functions discovered in this variant.
+	Benchmarks []PackageTestFunction
 }
 
 func newPackageTestGraphVariant(pkg *packages.Package, diagnostics []Diagnostic) *PackageTestGraphVariant {
@@ -47,11 +49,15 @@ func newPackageTestGraphVariant(pkg *packages.Package, diagnostics []Diagnostic)
 		CompiledGoFiles: slices.Clone(pkg.CompiledGoFiles),
 		Imports:         imports,
 		Diagnostics:     slices.Clone(diagnostics),
-		Tests:           discoverPackageTestFunctions(pkg),
+		Tests:           discoverPackageTestFunctions(pkg, "Test", "T"),
+		Benchmarks:      discoverPackageTestFunctions(pkg, "Benchmark", "B"),
 	}
 }
 
-func discoverPackageTestFunctions(pkg *packages.Package) []PackageTestFunction {
+// discoverPackageTestFunctions returns the functions in the package whose
+// names have the given prefix (such as Test) and that take a pointer to the
+// given testing type (such as T).
+func discoverPackageTestFunctions(pkg *packages.Package, prefix, testingType string) []PackageTestFunction {
 	if pkg == nil {
 		return nil
 	}
@@ -60,7 +66,7 @@ func discoverPackageTestFunctions(pkg *packages.Package) []PackageTestFunction {
 		testingAliases := fileTestingAliases(file)
 		for _, decl := range file.Decls {
 			fn, _ := decl.(*ast.FuncDecl)
-			if !isOrdinaryTestFuncDecl(fn, testingAliases) {
+			if !isOrdinaryTestFuncDecl(fn, testingAliases, prefix, testingType) {
 				continue
 			}
 			tests = append(tests, PackageTestFunction{
@@ -72,8 +78,9 @@ func discoverPackageTestFunctions(pkg *packages.Package) []PackageTestFunction {
 	return tests
 }
 
-func isOrdinaryTestFuncDecl(fn *ast.FuncDecl, testingAliases map[string]bool) bool {
-	if fn == nil || fn.Recv != nil || !isTestName(fn.Name.Name) || fn.Type == nil {
+func isOrdinaryTestFuncDecl(fn *ast.FuncDecl, testingAliases map[string]bool, prefix, testingType string) bool {
+	// A test is a plain function with the test prefix, no results, and one parameter.
+	if fn == nil || fn.Recv != nil || !isTestName(fn.Name.Name, prefix) || fn.Type == nil {
 		return false
 	}
 	if fn.Type.Results != nil && len(fn.Type.Results.List) != 0 {
@@ -87,7 +94,7 @@ func isOrdinaryTestFuncDecl(fn *ast.FuncDecl, testingAliases map[string]bool) bo
 		return false
 	}
 	ptr, ok := param.Type.(*ast.StarExpr)
-	return ok && isTestingT(ptr.X, testingAliases)
+	return ok && isTestingType(ptr.X, testingAliases, testingType)
 }
 
 func fileTestingAliases(file *ast.File) map[string]bool {
@@ -106,23 +113,26 @@ func fileTestingAliases(file *ast.File) map[string]bool {
 	return aliases
 }
 
-func isTestingT(expr ast.Expr, aliases map[string]bool) bool {
+// isTestingType reports whether expr names the given type of the testing package.
+func isTestingType(expr ast.Expr, aliases map[string]bool, testingType string) bool {
 	switch typed := expr.(type) {
 	case *ast.SelectorExpr:
 		base, _ := typed.X.(*ast.Ident)
-		return base != nil && aliases[base.Name] && typed.Sel.Name == "T"
+		return base != nil && aliases[base.Name] && typed.Sel.Name == testingType
 	case *ast.Ident:
-		return aliases["."] && typed.Name == "T"
+		return aliases["."] && typed.Name == testingType
 	default:
 		return false
 	}
 }
 
-func isTestName(name string) bool {
-	if !strings.HasPrefix(name, "Test") || name == "Test" {
+// isTestName reports whether name is a test function name with the given
+// prefix (such as Test or Benchmark), following the go test rules.
+func isTestName(name, prefix string) bool {
+	if !strings.HasPrefix(name, prefix) || name == prefix {
 		return false
 	}
-	for _, r := range strings.TrimPrefix(name, "Test") {
+	for _, r := range strings.TrimPrefix(name, prefix) {
 		return !unicode.IsLower(r)
 	}
 	return false

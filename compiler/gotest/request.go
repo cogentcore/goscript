@@ -26,6 +26,11 @@ type Request struct {
 	Run string
 	// Count is the number of times to run matched tests.
 	Count int
+	// Bench is the optional Go benchmark name regexp; benchmarks run only
+	// when it is set, as with go test -bench.
+	Bench string
+	// BenchTime is the minimum time to run each benchmark (default 1s).
+	BenchTime time.Duration
 	// Short reports true from testing.Short in generated tests.
 	Short bool
 	// Timeout bounds compile, typecheck, and execution.
@@ -63,6 +68,8 @@ type normalizedRequest struct {
 	ProtobufTypeScriptBinding bool
 	Run                       string
 	Count                     int
+	Bench                     string
+	BenchTime                 time.Duration
 	Short                     bool
 	Timeout                   time.Duration
 	Verbose                   bool
@@ -126,6 +133,15 @@ func (r *Request) normalize() (*normalizedRequest, error) {
 		return nil, errors.New("test count must be positive")
 	}
 
+	// A zero benchmark time defaults to one second.
+	benchTime := r.BenchTime
+	if benchTime == 0 {
+		benchTime = time.Second
+	}
+	if benchTime < 0 {
+		return nil, errors.New("benchmark time must be positive")
+	}
+
 	buildTags := normalizeBuildTags(r.BuildTags)
 	var buildFlags []string
 	if len(buildTags) != 0 {
@@ -180,6 +196,8 @@ func (r *Request) normalize() (*normalizedRequest, error) {
 		ProtobufTypeScriptBinding: r.ProtobufTypeScriptBinding,
 		Run:                       strings.TrimSpace(r.Run),
 		Count:                     count,
+		Bench:                     strings.TrimSpace(r.Bench),
+		BenchTime:                 benchTime,
 		Short:                     r.Short,
 		Timeout:                   r.Timeout,
 		Verbose:                   r.Verbose,

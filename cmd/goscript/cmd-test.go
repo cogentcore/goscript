@@ -24,6 +24,8 @@ func newTestCommand() *cli.Command {
 	var overrideDirs cli.StringSlice
 	var run string
 	var count int
+	var bench string
+	var benchTime time.Duration
 	var short bool
 	var timeout time.Duration
 	var verbose bool
@@ -52,6 +54,8 @@ func newTestCommand() *cli.Command {
 				OverrideDirs:              overrideDirs.Value(),
 				Run:                       run,
 				Count:                     count,
+				Bench:                     bench,
+				BenchTime:                 benchTime,
 				Short:                     short,
 				Timeout:                   timeout,
 				Verbose:                   verbose,
@@ -111,6 +115,17 @@ func newTestCommand() *cli.Command {
 				Usage:       "run each selected test this many times",
 				Destination: &count,
 				Value:       1,
+			},
+			&cli.StringFlag{
+				Name:        "bench",
+				Usage:       "run only benchmarks matching the regexp (none by default)",
+				Destination: &bench,
+			},
+			&cli.DurationFlag{
+				Name:        "benchtime",
+				Usage:       "run each benchmark for at least this long",
+				Destination: &benchTime,
+				Value:       time.Second,
 			},
 			&cli.BoolFlag{
 				Name:        "short",

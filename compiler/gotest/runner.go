@@ -90,6 +90,22 @@ func (r *Runner) Run(ctx context.Context, req *Request) (*Result, error) {
 		return result, nil
 	}
 
+	var benchPattern *regexp.Regexp
+	if norm.Bench != "" {
+		benchPattern, err = regexp.Compile(norm.Bench)
+		if err != nil {
+			diag := compiler.Diagnostic{
+				Severity: compiler.DiagnosticSeverityError,
+				Code:     "goscript/gotest:bench-pattern",
+				Message:  "invalid -bench pattern",
+				Detail:   err.Error(),
+			}
+			result.Diagnostics = append(result.Diagnostics, diag)
+			markAllFailures(result, OwnerPackageGraph, compiler.NewCompileError([]compiler.Diagnostic{diag}).Error())
+			return result, nil
+		}
+	}
+
 	testGraphReq := &compiler.CompileRequest{
 		Patterns:                  slices.Clone(norm.Patterns),
 		Dir:                       norm.Dir,
@@ -103,7 +119,7 @@ func (r *Runner) Run(ctx context.Context, req *Request) (*Result, error) {
 	}
 	testGraph, loadDiagnostics := r.service.PackageGraphOwner().LoadTestGraph(ctx, testGraphReq)
 	result.Diagnostics = append(result.Diagnostics, loadDiagnostics...)
-	result.Packages = packageResults(testGraph, runPattern)
+	result.Packages = packageResults(testGraph, runPattern, benchPattern)
 	if diagnosticsHaveErrors(loadDiagnostics) && len(result.Packages) == 0 {
 		markAllFailures(result, OwnerPackageGraph, diagnosticsSummary(loadDiagnostics))
 		return result, nil
@@ -804,7 +820,7 @@ func compileRunPattern(pattern string) (*regexp.Regexp, error) {
 	return regexp.Compile(pattern)
 }
 
-func packageResults(testGraph *compiler.PackageTestGraph, runPattern *regexp.Regexp) []PackageResult {
+func packageResults(testGraph *compiler.PackageTestGraph, runPattern, benchPattern *regexp.Regexp) []PackageResult {
 	if testGraph == nil {
 		return nil
 	}
@@ -812,8 +828,8 @@ func packageResults(testGraph *compiler.PackageTestGraph, runPattern *regexp.Reg
 	for _, pkg := range testGraph.Packages {
 		result := newSkippedPackageResult(pkg.PackagePath)
 		result.SourceDir = packageSourceDir(pkg)
-		result.Tests = append(result.Tests, packageVariantTests(pkg.SamePackageTests, runPattern)...)
-		result.Tests = append(result.Tests, packageVariantTests(pkg.ExternalPackageTests, runPattern)...)
+		result.Tests = append(result.Tests, packageVariantTests(pkg.SamePackageTests, runPattern, benchPattern)...)
+		result.Tests = append(result.Tests, packageVariantTests(pkg.ExternalPackageTests, runPattern, benchPattern)...)
 		result.TestImports = packageTestImports(pkg)
 		slices.SortFunc(result.Tests, func(a, b Test) int {
 			if a.Name == b.Name {
@@ -902,7 +918,10 @@ func packageTestImports(pkg *compiler.PackageTestGraphPackage) []string {
 	return imports
 }
 
-func packageVariantTests(variant *compiler.PackageTestGraphVariant, runPattern *regexp.Regexp) []Test {
+// packageVariantTests returns the tests of the variant matching runPattern
+// (all if it is nil), and the benchmarks matching benchPattern (none if it
+// is nil).
+func packageVariantTests(variant *compiler.PackageTestGraphVariant, runPattern, benchPattern *regexp.Regexp) []Test {
 	if variant == nil {
 		return nil
 	}
@@ -914,6 +933,19 @@ func packageVariantTests(variant *compiler.PackageTestGraphVariant, runPattern *
 		tests = append(tests, Test{
 			Name:        test.Name,
 			PackagePath: test.PackagePath,
+		})
+	}
+	if benchPattern == nil {
+		return tests
+	}
+	for _, bench := range variant.Benchmarks {
+		if !benchPattern.MatchString(bench.Name) {
+			continue
+		}
+		tests = append(tests, Test{
+			Name:        bench.Name,
+			PackagePath: bench.PackagePath,
+			Benchmark:   true,
 		})
 	}
 	return tests
@@ -1064,33 +1096,16 @@ func renderRunner(result PackageResult, req *normalizedRequest) string {
 	b.WriteString("const result = await runTests(")
 	b.WriteString(strconv.Quote(result.PackagePath))
 	b.WriteString(", [\n")
-	for idx, test := range result.Tests {
-		b.WriteString("\t{ name: ")
-		b.WriteString(strconv.Quote(test.Name))
-		b.WriteString(", fn: async (t) => await pkg")
-		b.WriteString(strconv.Itoa(slices.Index(imports, test.PackagePath)))
-		b.WriteString(".")
-		b.WriteString(test.Name)
-		b.WriteString("(t) }")
-		if idx != len(result.Tests)-1 {
-			b.WriteString(",")
-		}
-		b.WriteString("\n")
-	}
+	writeRunnerTests(&b, "\t", result.Tests, func(test Test) string {
+		return "pkg" + strconv.Itoa(slices.Index(imports, test.PackagePath))
+	})
 	b.WriteString("], { verbose: ")
 	if req.Verbose {
 		b.WriteString("true")
 	} else {
 		b.WriteString("false")
 	}
-	b.WriteString(", count: ")
-	b.WriteString(strconv.Itoa(req.Count))
-	b.WriteString(", short: ")
-	if req.Short {
-		b.WriteString("true")
-	} else {
-		b.WriteString("false")
-	}
+	writeRunOptions(&b, req)
 	b.WriteString(" })\n")
 	b.WriteString("if (!result.ok) {\n\tthrow new Error(\"goscript test failed\")\n}\n")
 	b.WriteString("if (typeof process !== \"undefined\" && process.exit) {\n\tprocess.exit(0)\n}\n")
@@ -1127,33 +1142,16 @@ func renderBrowserRunner(result PackageResult, req *normalizedRequest) string {
 	b.WriteString("\t\tconst result = await runTests(")
 	b.WriteString(strconv.Quote(result.PackagePath))
 	b.WriteString(", [\n")
-	for idx, test := range result.Tests {
-		b.WriteString("\t\t\t{ name: ")
-		b.WriteString(strconv.Quote(test.Name))
-		b.WriteString(", fn: async (t) => await pkg")
-		b.WriteString(strconv.Itoa(slices.Index(imports, test.PackagePath)))
-		b.WriteString(".")
-		b.WriteString(test.Name)
-		b.WriteString("(t) }")
-		if idx != len(result.Tests)-1 {
-			b.WriteString(",")
-		}
-		b.WriteString("\n")
-	}
+	writeRunnerTests(&b, "\t\t\t", result.Tests, func(test Test) string {
+		return "pkg" + strconv.Itoa(slices.Index(imports, test.PackagePath))
+	})
 	b.WriteString("\t\t], { verbose: ")
 	if req.Verbose {
 		b.WriteString("true")
 	} else {
 		b.WriteString("false")
 	}
-	b.WriteString(", count: ")
-	b.WriteString(strconv.Itoa(req.Count))
-	b.WriteString(", short: ")
-	if req.Short {
-		b.WriteString("true")
-	} else {
-		b.WriteString("false")
-	}
+	writeRunOptions(&b, req)
 	b.WriteString(" })\n")
 	b.WriteString("\t\t__goscriptOK = result.ok\n")
 	b.WriteString("\t\tif (!result.ok) {\n")
@@ -1316,14 +1314,7 @@ func renderCombinedRunner(result *Result, indexes []int, req *normalizedRequest)
 	} else {
 		b.WriteString("false")
 	}
-	b.WriteString(", count: ")
-	b.WriteString(strconv.Itoa(req.Count))
-	b.WriteString(", short: ")
-	if req.Short {
-		b.WriteString("true")
-	} else {
-		b.WriteString("false")
-	}
+	writeRunOptions(&b, req)
 	b.WriteString(" })\n")
 	b.WriteString("\t\tok = result.ok\n")
 	b.WriteString("\t} catch (err) {\n")
@@ -1341,23 +1332,49 @@ func renderCombinedRunner(result *Result, indexes []int, req *normalizedRequest)
 		b.WriteString(", ")
 		b.WriteString(strconv.Quote(pkg.SourceDir))
 		b.WriteString(", [\n")
-		for testIdx, test := range pkg.Tests {
-			b.WriteString("\t{ name: ")
-			b.WriteString(strconv.Quote(test.Name))
-			b.WriteString(", fn: async (t) => await ")
-			b.WriteString(aliases[test.PackagePath])
-			b.WriteString(".")
-			b.WriteString(test.Name)
-			b.WriteString("(t) }")
-			if testIdx != len(pkg.Tests)-1 {
-				b.WriteString(",")
-			}
-			b.WriteString("\n")
-		}
+		writeRunnerTests(&b, "\t", pkg.Tests, func(test Test) string {
+			return aliases[test.PackagePath]
+		})
 		b.WriteString("])\n")
 	}
 	b.WriteString("if (typeof process !== \"undefined\" && process.exit) {\n\tprocess.exit(0)\n}\n")
 	return b.String()
+}
+
+// writeRunnerTests writes the runTests entries for the given tests, each on
+// its own line with the given indent, calling the test function exported by
+// the module that alias returns for it.
+func writeRunnerTests(b *strings.Builder, indent string, tests []Test, alias func(Test) string) {
+	for idx, test := range tests {
+		b.WriteString(indent)
+		b.WriteString("{ name: ")
+		b.WriteString(strconv.Quote(test.Name))
+		b.WriteString(", fn: async (t) => await ")
+		b.WriteString(alias(test))
+		b.WriteString(".")
+		b.WriteString(test.Name)
+		b.WriteString("(t)")
+		if test.Benchmark {
+			b.WriteString(", benchmark: true")
+		}
+		b.WriteString(" }")
+		if idx != len(tests)-1 {
+			b.WriteString(",")
+		}
+		b.WriteString("\n")
+	}
+}
+
+// writeRunOptions writes the runTests options that follow the verbose option.
+func writeRunOptions(b *strings.Builder, req *normalizedRequest) {
+	b.WriteString(", count: ")
+	b.WriteString(strconv.Itoa(req.Count))
+	b.WriteString(", short: ")
+	b.WriteString(strconv.FormatBool(req.Short))
+	if req.Bench != "" {
+		b.WriteString(", benchtime: ")
+		b.WriteString(strconv.FormatInt(req.BenchTime.Milliseconds(), 10))
+	}
 }
 
 func writeRuntimeRecordFunction(b *strings.Builder, indent string) {

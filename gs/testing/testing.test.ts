@@ -43,6 +43,86 @@ describe('testing.T', () => {
     expect(t.Failed()).toBe(true)
   })
 
+  it('runs benchmarks after passing tests, ramping b.N to the benchmark time', async () => {
+    const logs: string[] = []
+    const origLog = console.log
+    console.log = (...args: unknown[]) => logs.push(args.join(' '))
+    let maxN = 0
+    let loops = 0
+    try {
+      const result = await runTests(
+        'example.com/bench',
+        [
+          { name: 'TestOK', fn: () => {} },
+          {
+            name: 'BenchmarkN',
+            benchmark: true,
+            fn: (b) => {
+              maxN = Math.max(maxN, b.N)
+              const end = performance.now() + 0.001 * b.N
+              while (performance.now() < end) {
+                // busy wait about one microsecond per iteration
+              }
+            },
+          },
+          {
+            name: 'BenchmarkLoop',
+            benchmark: true,
+            fn: (b) => {
+              b.SetBytes(10)
+              while (b.Loop()) {
+                loops++
+              }
+            },
+          },
+          {
+            name: 'BenchmarkSub',
+            benchmark: true,
+            fn: async (b) => {
+              await b.Run('x', () => {})
+              await b.Run('x', () => {})
+            },
+          },
+        ],
+        { benchtime: 20 },
+      )
+      expect(result.ok).toBe(true)
+    } finally {
+      console.log = origLog
+    }
+    expect(maxN).toBeGreaterThan(100)
+    expect(loops).toBeGreaterThan(1000)
+    const names = logs.map((line) => line.split('\t')[0])
+    expect(names).toEqual([
+      'BenchmarkN',
+      'BenchmarkLoop',
+      'BenchmarkSub/x',
+      'BenchmarkSub/x#01',
+    ])
+    expect(logs[0]).toMatch(/^BenchmarkN\t +\d+\t +[\d.]+ ns\/op$/)
+    expect(logs[1]).toMatch(/ns\/op\t +[\d.]+ MB\/s$/)
+  })
+
+  it('skips benchmarks when a test fails', async () => {
+    const origLog = console.log
+    console.log = () => {}
+    let ran = false
+    try {
+      const result = await runTests(
+        'example.com/bench',
+        [
+          { name: 'TestBad', fn: (t) => t.Error('bad') },
+          { name: 'BenchmarkX', benchmark: true, fn: () => void (ran = true) },
+        ],
+        { benchtime: 1 },
+      )
+      expect(result.ok).toBe(false)
+    } finally {
+      console.log = origLog
+    }
+    expect(ran).toBe(false)
+  })
+
   it('exports the benchmark and fuzz test surfaces used by compiled tests', async () => {
     const b = new B('bench')
     b.N = 2
