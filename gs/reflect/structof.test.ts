@@ -134,7 +134,7 @@ describe('StructOf', () => {
     expect(typ.Field(2).IsExported()).toBe(false)
   })
 
-  it('rejects illegal anonymous fields and embedded method cases', () => {
+  it('applies Go limits on embedded fields with methods', () => {
     const intType = TypeOf(0)
     const embeddedInfo = $.registerStructType(
       'main.EmbeddedWithMethod',
@@ -163,7 +163,7 @@ describe('StructOf', () => {
           }),
         ]),
       ),
-    ).toThrow(/embedded type with methods/)
+    ).not.toThrow()
     expect(() =>
       StructOf(
         $.arrayToSlice([
@@ -172,9 +172,22 @@ describe('StructOf', () => {
             Type: embeddedType,
             Anonymous: true,
           }),
+          new StructField({ Name: 'Count', Type: intType }),
         ]),
       ),
-    ).toThrow(/embedded type with methods/)
+    ).not.toThrow()
+    expect(() =>
+      StructOf(
+        $.arrayToSlice([
+          new StructField({ Name: 'Count', Type: intType }),
+          new StructField({
+            Name: 'EmbeddedWithMethod',
+            Type: embeddedType,
+            Anonymous: true,
+          }),
+        ]),
+      ),
+    ).toThrow(/not first field/)
     expect(() =>
       StructOf(
         $.arrayToSlice([
@@ -207,18 +220,6 @@ describe('StructOf', () => {
             Type: embeddedPointer,
             Anonymous: true,
           }),
-        ]),
-      ),
-    ).toThrow(/embedded type with methods/)
-    expect(() =>
-      StructOf(
-        $.arrayToSlice([
-          new StructField({
-            Name: 'EmbeddedWithMethod',
-            Type: embeddedType,
-            Anonymous: true,
-          }),
-          new StructField({ Name: 'Count', Type: intType }),
         ]),
       ),
     ).toThrow(/embedded type with methods/)

@@ -4988,7 +4988,7 @@ export function StructOf(fields: $.Slice<StructField>): Type {
   let pkgPath = ''
   let offset = 0
   for (const [idx, field] of inputFields.entries()) {
-    validateStructOfField(field, idx)
+    validateStructOfField(field, idx, inputFields.length)
     if (field.PkgPath !== '') {
       if (pkgPath === '') {
         pkgPath = field.PkgPath
@@ -5024,7 +5024,11 @@ export function StructOf(fields: $.Slice<StructField>): Type {
   )
 }
 
-function validateStructOfField(field: StructField, idx: number): void {
+function validateStructOfField(
+  field: StructField,
+  idx: number,
+  count: number,
+): void {
   if (field.Name === '') {
     throw new Error(`reflect.StructOf: field ${idx} has no name`)
   }
@@ -5044,7 +5048,7 @@ function validateStructOfField(field: StructField, idx: number): void {
       `reflect.StructOf: field "${field.Name}" is unexported but missing PkgPath`,
     )
   }
-  validateAnonymousStructOfField(field)
+  validateAnonymousStructOfField(field, idx, count)
 }
 
 function isValidStructFieldName(name: string): boolean {
@@ -5056,11 +5060,22 @@ function isUnexportedStructFieldName(name: string): boolean {
   return name[0] === '_' || (first >= 97 && first <= 122)
 }
 
-function validateAnonymousStructOfField(field: StructField): void {
+// validateAnonymousStructOfField applies Go's StructOf limits on embedded
+// fields with methods: such a field must be the first, and a pointer, or a
+// type stored directly in an interface, must be the only field. As in Go,
+// the methods of an embedded field are not promoted to the new type.
+function validateAnonymousStructOfField(
+  field: StructField,
+  idx: number,
+  count: number,
+): void {
   if (!field.Anonymous) {
     return
   }
   const typ = field.Type
+  if (typ.Kind() === Interface) {
+    return
+  }
   if (typ.Kind() === Ptr) {
     const elem = typ.Elem()
     if (elem.Kind() === Ptr || elem.Kind() === Interface) {
@@ -5068,14 +5083,31 @@ function validateAnonymousStructOfField(field: StructField): void {
         `reflect.StructOf: illegal embedded field type ${typ.String()}`,
       )
     }
-    if (embeddedMethodCount(typ) > 0) {
-      throw new Error('reflect: embedded type with methods not implemented')
-    }
+  }
+  if (embeddedMethodCount(typ) === 0) {
     return
   }
-  if (embeddedMethodCount(typ) > 0) {
-    throw new Error('reflect: embedded type with methods not implemented')
+  if (idx > 0) {
+    throw new Error(
+      'reflect: embedded type with methods not implemented if type is not first field',
+    )
   }
+  if (count > 1 && typ.Kind() === Ptr) {
+    throw new Error(
+      'reflect: embedded type with methods not implemented if there is more than one field',
+    )
+  }
+  if (count > 1 && isDirectInterfaceKind(typ.Kind())) {
+    throw new Error(
+      'reflect: embedded type with methods not implemented for non-pointer type',
+    )
+  }
+}
+
+// isDirectInterfaceKind reports whether values of kind k are stored directly
+// in an interface in Go, being pointer-shaped.
+function isDirectInterfaceKind(k: Kind): boolean {
+  return k === Map || k === Chan || k === Func || k === UnsafePointer
 }
 
 function embeddedMethodCount(typ: Type): number {
