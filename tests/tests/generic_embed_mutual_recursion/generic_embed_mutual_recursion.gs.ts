@@ -249,7 +249,7 @@ export async function main(): globalThis.Promise<void> {
 	let w: MyWindow | $.VarRef<MyWindow> | null = new MyWindow()
 	$.pointerValue<MyWindow>(w).WindowBase.name = "main"
 	$.pointerValue<MyWindow>(w).WindowBase.App = a
-	$.pointerValue<MyApp>(a).AppBase.Windows = $.append($.pointerValue<MyApp>(a).AppBase.Windows, w, $.appendZeros.nil)
+	$.pointerValue<MyApp>(a).AppBase.Windows = $.appendOne($.pointerValue<MyApp>(a).AppBase.Windows, w, $.appendZeros.nil)
 	let app: App | null = $.namedValueInterfaceValue<App | null>(a, "*main.MyApp", __goscriptStatic2(), __goscriptStatic3(), __goscriptStatic4())
 	await $.println((__goscriptAwait = $.pointerValue<Exclude<Window, null>>((__goscriptAwait = $.pointerValue<Exclude<App, null>>(app).Window(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)).Name(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	await $.println((__goscriptAwait = $.pointerValue<Exclude<Window, null>>($.pointerValue<MyApp>($.pointerValue<MyWindow>(w).WindowBase.App).AppBase.Window(__goscriptStatic0())).Name(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))

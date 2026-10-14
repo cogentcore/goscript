@@ -78,12 +78,13 @@ export class _object {
 
 	public next(): entry | $.VarRef<entry> | null {
 		let o: _object | $.VarRef<_object> | null = this;
-		if ($.cap($.pointerValue<_object>(o).entries) > $.sliceLen($.pointerValue<_object>(o).entries)) {
-			$.pointerValue<_object>(o).entries = $.goSlice($.pointerValue<_object>(o).entries, undefined, $.sliceLen($.pointerValue<_object>(o).entries) + 1)
+		const o$ = $.pointerTarget<_object>(o)
+		if ($.cap((o$ as _object).entries) > $.sliceLen((o$ as _object).entries)) {
+			;(o$ as _object).entries = $.goSlice((o$ as _object).entries, undefined, $.sliceLen((o$ as _object).entries) + 1)
 		} else {
-			$.pointerValue<_object>(o).entries = $.append($.pointerValue<_object>(o).entries, new entry(undefined, true))
+			;(o$ as _object).entries = $.appendOne((o$ as _object).entries, new entry(undefined, true))
 		}
-		return $.indexRef($.pointerValue<_object>(o).entries!, $.sliceLen($.pointerValue<_object>(o).entries) - 1)
+		return $.indexRef((o$ as _object).entries!, $.sliceLen((o$ as _object).entries) - 1)
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -101,7 +102,7 @@ export function parseKey(): [string, $.GoError] {
 
 export async function printInterfaceSpareZero(): globalThis.Promise<void> {
 	let values: $.Slice<any> = $.makeSlice<any>(0, 2)
-	values = $.append(values, $.interfaceValue(new entry({key: "value"}, true), "main.entry", "main.entry"), $.appendZeros.nil)
+	values = $.appendOne(values, $.interfaceValue(new entry({key: "value"}, true), "main.entry", "main.entry"), $.appendZeros.nil)
 	values = $.goSlice(values, undefined, 2)
 	await $.println($.arrayIndex(values!, 1) == null)
 }

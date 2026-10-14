@@ -22,7 +22,8 @@ export async function main(): globalThis.Promise<void> {
 		let cb = $.markAsStructValue($.cloneStructValue(js.FuncOf($.functionValue((_this: js.Value, args: $.Slice<js.Value>): any => {
 			return $.basicInterfaceValue($.markAsStructValue($.cloneStructValue($.arrayIndex(args!, 0))).Int() + 1, "int")
 		}, ({ kind: $.TypeKind.Function, params: ["js.Value", /* @__PURE__ */ $.sliceType("js.Value")], results: [{ kind: $.TypeKind.Interface, methods: [] }] } as $.FunctionTypeInfo)))))
-		__defer.defer(() => { $.markAsStructValue($.cloneStructValue(cb)).Release() })
+		const __goscriptDeferCallee0 = $.functionValue(((__receiver) => () => __receiver.Release())($.markAsStructValue($.cloneStructValue(cb))), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "syscall/js.Func.Release-fm")
+		__defer.defer(() => { __goscriptDeferCallee0() })
 		await $.println("callback:", $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(cb)).Invoke($.basicInterfaceValue(41, "int")))).Int())
 
 		let bytes = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(global)).Get("Uint8Array"))).New($.basicInterfaceValue(3, "int"))))
@@ -79,7 +80,8 @@ export async function funcOfValues(): globalThis.Promise<void> {
 	let add = await wrap($.functionValue((_this: js.Value, args: $.Slice<js.Value>): any => {
 		return $.basicInterfaceValue($.markAsStructValue($.cloneStructValue($.arrayIndex(args!, 0))).Int() + $.markAsStructValue($.cloneStructValue($.arrayIndex(args!, 1))).Int(), "int")
 	}, ({ kind: $.TypeKind.Function, params: ["js.Value", /* @__PURE__ */ $.sliceType("js.Value")], results: [{ kind: $.TypeKind.Interface, methods: [] }] } as $.FunctionTypeInfo)))
-	__defer.defer(() => { $.markAsStructValue($.cloneStructValue(add)).Release() })
+	const __goscriptDeferCallee1 = $.functionValue(((__receiver) => () => __receiver.Release())($.markAsStructValue($.cloneStructValue(add))), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "syscall/js.Func.Release-fm")
+	__defer.defer(() => { __goscriptDeferCallee1() })
 	await $.println("wrapped type:", js.Type_String($.markAsStructValue($.cloneStructValue(add)).Type()))
 
 	let fn: ((_this: js.Value, args: $.Slice<js.Value>) => any | globalThis.Promise<any>) | null = null! as ((_this: js.Value, args: $.Slice<js.Value>) => any | globalThis.Promise<any>) | null
@@ -87,7 +89,8 @@ export async function funcOfValues(): globalThis.Promise<void> {
 		return "from variable"
 	}, ({ kind: $.TypeKind.Function, params: ["js.Value", /* @__PURE__ */ $.sliceType("js.Value")], results: [{ kind: $.TypeKind.Interface, methods: [] }] } as $.FunctionTypeInfo))
 	let direct = $.markAsStructValue($.cloneStructValue(js.FuncOf(fn)))
-	__defer.defer(() => { $.markAsStructValue($.cloneStructValue(direct)).Release() })
+	const __goscriptDeferCallee2 = $.functionValue(((__receiver) => () => __receiver.Release())($.markAsStructValue($.cloneStructValue(direct))), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "syscall/js.Func.Release-fm")
+	__defer.defer(() => { __goscriptDeferCallee2() })
 	await $.println("direct:", $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(direct)).Invoke())).String())
 }
 
@@ -102,7 +105,8 @@ export async function funcOfSuspend(): globalThis.Promise<void> {
 		await $.chanSend(done, $.concatString("handled ", $.markAsStructValue($.cloneStructValue($.arrayIndex(args!, 0))).String()))
 		return null
 	}, ({ kind: $.TypeKind.Function, params: ["js.Value", /* @__PURE__ */ $.sliceType("js.Value")], results: [{ kind: $.TypeKind.Interface, methods: [] }] } as $.FunctionTypeInfo)))
-	__defer.defer(() => { $.markAsStructValue($.cloneStructValue(handler)).Release() })
+	const __goscriptDeferCallee3 = $.functionValue(((__receiver) => () => __receiver.Release())($.markAsStructValue($.cloneStructValue(handler))), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "syscall/js.Func.Release-fm")
+	__defer.defer(() => { __goscriptDeferCallee3() })
 
 	$.markAsStructValue($.cloneStructValue(handler)).Invoke("first")
 	await $.println(await $.chanRecv(done))

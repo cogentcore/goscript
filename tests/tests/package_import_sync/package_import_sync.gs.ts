@@ -206,32 +206,35 @@ export class queue {
 
 	public async lockAndInit(): globalThis.Promise<void> {
 		let q: queue | $.VarRef<queue> | null = this;
-		await $.pointerValue<queue>(q).Mu.Lock()
-		if ($.pointerValue<queue>(q).Cond.L == null) {
-			$.pointerValue<queue>(q).Cond.L = $.interfaceValue<sync.Locker | null>($.fieldRef($.pointerValue<queue>(q)._fields, "Mu"), "*sync.Mutex", /* @__PURE__ */ $.pointerType("sync.Mutex"))
+		const q$ = $.pointerTarget<queue>(q)
+		await (q$ as queue).Mu.Lock()
+		if ((q$ as queue).Cond.L == null) {
+			;(q$ as queue).Cond.L = $.interfaceValue<sync.Locker | null>($.fieldRef((q$ as queue)._fields, "Mu"), "*sync.Mutex", /* @__PURE__ */ $.pointerType("sync.Mutex"))
 		}
 	}
 
 	public async pop(): globalThis.Promise<number> {
 		let q: queue | $.VarRef<queue> | null = this;
 		using __defer = new $.DisposableStack()
+		const q$ = $.pointerTarget<queue>(q)
 		await queue.prototype.lockAndInit.call(q)
-		const __goscriptDeferCallee0 = $.functionValue(((__receiver) => () => __receiver.Unlock())($.pointerValue<queue>(q).Mu), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "sync.(*Mutex).Unlock-fm")
+		const __goscriptDeferCallee0 = $.functionValue(((__receiver) => () => __receiver.Unlock())((q$ as queue).Mu), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "sync.(*Mutex).Unlock-fm")
 		__defer.defer(() => { __goscriptDeferCallee0() })
-		while ($.sliceLen($.pointerValue<queue>(q).items) == 0) {
-			await $.pointerValue<queue>(q).Cond.Wait()
+		while ($.sliceLen((q$ as queue).items) == 0) {
+			await (q$ as queue).Cond.Wait()
 		}
-		let v = $.arrayIndex($.pointerValue<queue>(q).items!, 0)
-		$.pointerValue<queue>(q).items = $.goSlice($.pointerValue<queue>(q).items, 1, undefined)
+		let v = $.arrayIndex((q$ as queue).items!, 0);
+		;(q$ as queue).items = $.goSlice((q$ as queue).items, 1, undefined)
 		return v
 	}
 
 	public async push(v: number): globalThis.Promise<void> {
 		let q: queue | $.VarRef<queue> | null = this;
-		await queue.prototype.lockAndInit.call(q)
-		$.pointerValue<queue>(q).items = $.appendOne($.pointerValue<queue>(q).items, v)
-		$.pointerValue<queue>(q).Cond.Signal()
-		$.pointerValue<queue>(q).Mu.Unlock()
+		const q$ = $.pointerTarget<queue>(q)
+		await queue.prototype.lockAndInit.call(q);
+		;(q$ as queue).items = $.appendOne((q$ as queue).items, v)
+		void (q$ as queue).Cond.Signal()
+		void (q$ as queue).Mu.Unlock()
 	}
 
 	static __typeInfo = $.registerStructType(
