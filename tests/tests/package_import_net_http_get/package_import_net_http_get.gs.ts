@@ -35,7 +35,7 @@ export async function main(): globalThis.Promise<void> {
 				return
 			}
 		}
-		if ($.len(data) != 0) {
+		if ($.sliceLen(data) != 0) {
 			{
 				let [, writeErr] = await $.pointerValue<Exclude<http.ResponseWriter, null>>(w).Write($.stringToBytes($.concatString(($.concatString($.pointerValue<http.Request>(r).Method, ":")), $.bytesToString(data))))
 				if (writeErr != null) {

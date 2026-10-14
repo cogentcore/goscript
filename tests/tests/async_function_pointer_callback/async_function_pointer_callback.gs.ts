@@ -42,7 +42,7 @@ export class Snapshot {
 		if (err != null) {
 			return [0, err]
 		}
-		return [$.pointerValue<number>(next) + $.len(results), null]
+		return [$.pointerValue<number>(next) + $.sliceLen(results), null]
 	}
 
 	static __typeInfo = $.registerStructType(

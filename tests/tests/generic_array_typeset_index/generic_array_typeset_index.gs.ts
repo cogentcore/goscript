@@ -6,7 +6,7 @@ import * as $ from "@goscript/builtin/index.js"
 export function search<E>(__typeArgs: $.GenericTypeArgs | undefined, dictionary: $.Slice<E>, r: number): any {
 	let result: any = $.genericZero(__typeArgs, "E", null)
 	let _from = 0
-	let to = $.len(dictionary)
+	let to = $.sliceLen(dictionary)
 	while (to > _from) {
 		let middle: number = globalThis.Math.trunc((_from + to) / 2)
 		let cpRange = $.copyElement($.arrayIndex(dictionary!, middle))

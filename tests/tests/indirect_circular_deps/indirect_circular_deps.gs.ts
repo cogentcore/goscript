@@ -76,8 +76,8 @@ export async function main(): globalThis.Promise<void> {
 
 	await $.println("a1:", a1.BB == null)
 	await $.println("b1:", b1.AA == null)
-	await $.println("a2 has", $.len(a2.BB), "B items")
-	await $.println("b2 has", $.len(b2.AA), "A items")
+	await $.println("a2 has", $.sliceLen(a2.BB), "B items")
+	await $.println("b2 has", $.sliceLen(b2.AA), "A items")
 }
 
 if ($.isMainScript(import.meta)) {

@@ -21,12 +21,12 @@ export async function TestFS(fsys: string, expected: $.Slice<string>): globalThi
 }
 
 export async function testFS(fsys: string, expected: $.Slice<string>): globalThis.Promise<$.GoError> {
-	if ($.len(expected) == 0) {
+	if ($.sliceLen(expected) == 0) {
 		return errors.New("no expected values")
 	}
 
-	for (let __goscriptRangeTarget0 = expected, i = 0; i < $.len(__goscriptRangeTarget0); i++) {
-		let exp = __goscriptRangeTarget0![i]
+	for (let __goscriptRangeTarget0 = expected, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), i = 0; i < __goscriptRangeWindow0.length; i++) {
+		let exp = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + i] as string)
 		await $.println($.concatString(($.concatString(($.concatString("Expected[", $.runeToString($.int(i + 48, 32)))), "]: ")), exp))
 	}
 
@@ -40,15 +40,15 @@ export function Stack_Push(st: $.VarRef<Stack> | null, __typeArgs: $.GenericType
 
 export function join(txts: $.Slice<Text>): number {
 	let n = 0
-	for (let __goscriptRangeTarget1 = txts, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget1); __rangeIndex++) {
-		let t = (__goscriptRangeTarget1![__rangeIndex] as Text)
-		n = n + ($.len((t as Text)))
+	for (let __goscriptRangeTarget1 = txts, __goscriptRangeWindow1 = $.sliceRange(__goscriptRangeTarget1), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow1.length; __rangeIndex++) {
+		let t = ((__goscriptRangeWindow1.backing[__goscriptRangeWindow1.offset + __rangeIndex] as Text) as Text)
+		n = n + ($.sliceLen((t as Text)))
 	}
 	return n
 }
 
 export function count(names: $.Slice<string>): number {
-	return $.len(names)
+	return $.sliceLen(names)
 }
 
 export async function main(): globalThis.Promise<void> {

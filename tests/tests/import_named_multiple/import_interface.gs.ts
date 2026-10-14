@@ -18,10 +18,10 @@ export async function main(): globalThis.Promise<void> {
 
 	await $.println("foo_bar.ToUpper:", result1)
 	await $.println("strings.ToLower:", result2)
-	await $.println("baz.Split length:", $.len(result3))
+	await $.println("baz.Split length:", $.sliceLen(result3))
 	await $.println("baz.Count:", baz.Count("a,b,c", ","))
-	for (let __goscriptRangeTarget0 = result3, i = 0; i < $.len(__goscriptRangeTarget0); i++) {
-		let v = __goscriptRangeTarget0![i]
+	for (let __goscriptRangeTarget0 = result3, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), i = 0; i < __goscriptRangeWindow0.length; i++) {
+		let v = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + i] as string)
 		await $.println("baz.Split[", i, "]:", v)
 	}
 

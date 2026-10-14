@@ -190,8 +190,8 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("embedded", $.markAsStructValue($.cloneStructValue(f)).Int(), err == null)
 
 	// A type assertion to reflect.Value, as in text/template.
-	for (let __goscriptRangeTarget0 = $.arrayToSlice<any>([$.interfaceValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.basicInterfaceValue(5, "int")))), "reflect.Value", "reflect.Value"), $.basicInterfaceValue(6, "int")]), __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
-		let data = __goscriptRangeTarget0![__rangeIndex]
+	for (let __goscriptRangeTarget0 = $.arrayToSlice<any>([$.interfaceValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.basicInterfaceValue(5, "int")))), "reflect.Value", "reflect.Value"), $.basicInterfaceValue(6, "int")]), __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
+		let data = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as any)
 		let [value, __goscriptShadow0] = $.typeAssertTuple<reflect.Value>(data, "reflect.Value")
 		if (!__goscriptShadow0) {
 			$.assignStruct(value, $.markAsStructValue($.cloneStructValue(reflect.ValueOf(data))))

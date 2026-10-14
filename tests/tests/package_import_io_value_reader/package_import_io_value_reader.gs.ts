@@ -24,7 +24,7 @@ export class zeroReader {
 
 	public Read(p: $.Slice<number>): [number, $.GoError] {
 		$.clear(p)
-		return [$.len(p), null]
+		return [$.sliceLen(p), null]
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -41,7 +41,7 @@ export async function main(): globalThis.Promise<void> {
 	let __goscriptTuple0: any = await io.ReadAll($.pointerValueOrNil(io.LimitReader($.interfaceValue<io.Reader | null>($.markAsStructValue(new zeroReader()), "main.zeroReader", "main.zeroReader")!, 3n))!)
 	let data: $.Slice<number> = __goscriptTuple0[0]
 	let err = __goscriptTuple0[1]
-	await $.println("limit:", $.len(data), $.uint($.arrayIndex(data!, 0), 8) == 0, err == null)
+	await $.println("limit:", $.sliceLen(data), $.uint($.arrayIndex(data!, 0), 8) == 0, err == null)
 
 	// Join a bounded zero range with a trailing reader through a spread slice.
 	let rdrs: $.Slice<io.Reader | null> = $.arrayToSlice<io.Reader | null>([io.LimitReader($.interfaceValue<io.Reader | null>($.markAsStructValue(new zeroReader()), "main.zeroReader", "main.zeroReader")!, 2n)])
@@ -49,7 +49,7 @@ export async function main(): globalThis.Promise<void> {
 	let __goscriptTuple1: any = await io.ReadAll($.pointerValueOrNil(io.MultiReader(...(rdrs ?? [])))!)
 	data = __goscriptTuple1[0]
 	err = __goscriptTuple1[1]
-	await $.println("multi:", $.len(data), $.uint($.arrayIndex(data!, 1), 8) == 0, $.bytesToString($.goSlice(data, 2, undefined)), err == null)
+	await $.println("multi:", $.sliceLen(data), $.uint($.arrayIndex(data!, 1), 8) == 0, $.bytesToString($.goSlice(data, 2, undefined)), err == null)
 }
 
 if ($.isMainScript(import.meta)) {

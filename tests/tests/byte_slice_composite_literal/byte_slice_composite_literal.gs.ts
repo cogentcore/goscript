@@ -42,7 +42,7 @@ export async function main(): globalThis.Promise<void> {
 	let b: $.Slice<number> = new Uint8Array([1, 2, 3]) as $.Slice<number>
 	await $.println("non-empty:", b)
 	await $.println("index:", $.uint($.arrayIndex(b!, 0), 8), $.uint($.arrayIndex(b!, 1), 8), $.uint($.arrayIndex(b!, 2), 8))
-	await $.println("len:", $.len(b))
+	await $.println("len:", $.sliceLen(b))
 
 	// Storing the literal in a struct field and reading it back must
 	// preserve the Uint8Array backing without any append repairing it.
@@ -53,12 +53,12 @@ export async function main(): globalThis.Promise<void> {
 	// An empty non-nil []byte literal stays a Uint8Array.
 	let e: $.Slice<number> = new Uint8Array([]) as $.Slice<number>
 	await $.println("empty:", e)
-	await $.println("empty len:", $.len(e))
+	await $.println("empty len:", $.sliceLen(e))
 
 	// A keyed/sparse []byte literal is zero-filled and stays a Uint8Array.
 	let k: $.Slice<number> = new Uint8Array([0, 0, 0, 0, 0, 1]) as $.Slice<number>
 	await $.println("keyed:", k)
-	await $.println("keyed len:", $.len(k))
+	await $.println("keyed len:", $.sliceLen(k))
 
 	// A non-constant element is emitted bare: new Uint8Array truncates it to
 	// uint8 on construction, so 300 folds to 44 without a runtime $.uint wrap,

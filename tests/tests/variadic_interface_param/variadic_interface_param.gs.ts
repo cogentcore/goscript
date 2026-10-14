@@ -5,9 +5,9 @@ import * as $ from "@goscript/builtin/index.js"
 
 export async function testVariadicInterface(name: string, values: $.Slice<any>): globalThis.Promise<void> {
 	await $.println("Name:", name)
-	await $.println("Values count:", $.len(values))
-	for (let __goscriptRangeTarget0 = values, i = 0; i < $.len(__goscriptRangeTarget0); i++) {
-		let v = __goscriptRangeTarget0![i]
+	await $.println("Values count:", $.sliceLen(values))
+	for (let __goscriptRangeTarget0 = values, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), i = 0; i < __goscriptRangeWindow0.length; i++) {
+		let v = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + i] as any)
 		// We can't do much with interface{} values in the compiled output
 		// but we can at least check they're passed correctly
 		if (v != null) {

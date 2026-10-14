@@ -665,10 +665,10 @@ func TestCompilePackagesLowersPackageConstBeforeLocalShadow(t *testing.T) {
 		t.Fatal(err.Error())
 	}
 	text := string(content)
-	if strings.Contains(text, "$.len(buf) < headerLength") || strings.Contains(text, "return headerLength\n\t}") {
+	if strings.Contains(text, "Len(buf) < headerLength") || strings.Contains(text, "return headerLength\n\t}") {
 		t.Fatalf("package const read was emitted through local TDZ shadow:\n%s", text)
 	}
-	if !strings.Contains(text, "$.len(buf) < 4") || !strings.Contains(text, "return 4") {
+	if !strings.Contains(text, "Len(buf) < 4") || !strings.Contains(text, "return 4") {
 		t.Fatalf("package const read was not lowered to a value before local shadow:\n%s", text)
 	}
 	if !strings.Contains(text, "let headerLength = n") {
@@ -971,7 +971,7 @@ func TestCompilePackagesReadsShadowedVarRefStructFieldsOnce(t *testing.T) {
 		t.Fatal(err.Error())
 	}
 	text := string(content)
-	if !strings.Contains(text, "$.len(__goscriptShadow0.value.pad)") {
+	if !strings.Contains(text, "$.sliceLen(__goscriptShadow0.value.pad)") {
 		t.Fatalf("missing single dereference field read:\n%s", text)
 	}
 	if strings.Contains(text, ".value.value.pad") {
@@ -2556,7 +2556,7 @@ func TestCompilePackagesEmitsArraySliceMapStringAndNamedMethods(t *testing.T) {
 		"$.arrayIndex(literal!, 2)",
 		"let list: $.VarRef<MySlice> = $.varRef(null! as MySlice)",
 		"MySlice_Add(list, 7)",
-		"$.indexStringOrBytes(text, 0)",
+		"$.indexString(text, 0)",
 		"MyInt_Double(5)",
 	} {
 		if !strings.Contains(text, want) {
@@ -3575,7 +3575,7 @@ func TestCompilePackagesPacksVariadicCalls(t *testing.T) {
 		"export type Collector = ((label: string, parts: $.Slice<string>) => string | globalThis.Promise<string>) | null",
 		"Join(parts: $.Slice<string>): string",
 		"export function collect(label: string, parts: $.Slice<string>): string",
-		"let part = __goscriptRangeTarget0![__rangeIndex]",
+		"let part = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as string)",
 		"export function maybeErr(parts: $.Slice<string>): $.GoError",
 		"public Join(parts: $.Slice<string>): string",
 		"collect(\"none\", null)",

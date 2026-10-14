@@ -141,8 +141,8 @@ export async function main(): globalThis.Promise<void> {
 		}
 	}
 
-	for (let __goscriptRangeTarget0 = $.arrayToSlice<any>([$.basicInterfaceValue($.int(7, 32), "int32")]), __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
-		let v = __goscriptRangeTarget0![__rangeIndex]
+	for (let __goscriptRangeTarget0 = $.arrayToSlice<any>([$.basicInterfaceValue($.int(7, 32), "int32")]), __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
+		let v = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as any)
 		{
 			const __goscriptTypeSwitchValue = v
 			switch (true) {
@@ -157,8 +157,8 @@ export async function main(): globalThis.Promise<void> {
 	}
 
 	let count = 0
-	for (let __goscriptRangeTarget1 = $.arrayToSlice<any>([$.basicInterfaceValue(1, "int"), "skip", $.basicInterfaceValue(2, "int")]), __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget1); __rangeIndex++) {
-		let v = __goscriptRangeTarget1![__rangeIndex]
+	for (let __goscriptRangeTarget1 = $.arrayToSlice<any>([$.basicInterfaceValue(1, "int"), "skip", $.basicInterfaceValue(2, "int")]), __goscriptRangeWindow1 = $.sliceRange(__goscriptRangeTarget1), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow1.length; __rangeIndex++) {
+		let v = (__goscriptRangeWindow1.backing[__goscriptRangeWindow1.offset + __rangeIndex] as any)
 		{
 			const __goscriptTypeSwitchValue = v
 			switch (true) {
@@ -197,7 +197,7 @@ export async function main(): globalThis.Promise<void> {
 				break
 		}
 	}
-	await $.println("oid", $.len((oid.value as ObjectIdentifier)), $.arrayIndex(oid.value!, 0), ok)
+	await $.println("oid", $.sliceLen((oid.value as ObjectIdentifier)), $.arrayIndex(oid.value!, 0), ok)
 
 	let raw: $.VarRef<RawValue> = $.varRef($.markAsStructValue(new RawValue()))
 	let rawValue: any = $.interfaceValue(raw, "*main.RawValue", /* @__PURE__ */ $.pointerType("main.RawValue"))

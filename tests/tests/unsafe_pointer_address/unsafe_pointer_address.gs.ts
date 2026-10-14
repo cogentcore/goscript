@@ -7,11 +7,11 @@ import * as unsafe from "@goscript/unsafe/index.js"
 import "@goscript/unsafe/index.js"
 
 export function anyOverlap(x: $.Slice<number>, y: $.Slice<number>): boolean {
-	return ((($.len(x) > 0) && ($.len(y) > 0)) && ($.uint($.indexByteAddress(x!, 0, 1), 64) <= $.uint($.indexByteAddress(y!, $.len(y) - 1, 1), 64))) && ($.uint($.indexByteAddress(y!, 0, 1), 64) <= $.uint($.indexByteAddress(x!, $.len(x) - 1, 1), 64))
+	return ((($.sliceLen(x) > 0) && ($.sliceLen(y) > 0)) && ($.uint($.indexByteAddress(x!, 0, 1), 64) <= $.uint($.indexByteAddress(y!, $.sliceLen(y) - 1, 1), 64))) && ($.uint($.indexByteAddress(y!, 0, 1), 64) <= $.uint($.indexByteAddress(x!, $.sliceLen(x) - 1, 1), 64))
 }
 
 export function sameStart(x: $.Slice<number>, y: $.Slice<number>): boolean {
-	return (($.len(x) > 0) && ($.len(y) > 0)) && ($.indexAddress(x!, 0) == $.indexAddress(y!, 0))
+	return (($.sliceLen(x) > 0) && ($.sliceLen(y) > 0)) && ($.indexAddress(x!, 0) == $.indexAddress(y!, 0))
 }
 
 export function parenIndexValue(x: $.Slice<number>, i: number): number {

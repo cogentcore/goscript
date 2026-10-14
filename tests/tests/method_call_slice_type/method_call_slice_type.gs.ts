@@ -25,8 +25,8 @@ export function MySlice_Add(s: $.VarRef<MySlice> | null, val: number): void {
 
 export function MySlice_Sum(s: MySlice): number {
 	let total = 0
-	for (let __goscriptRangeTarget0 = s, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
-		let v = __goscriptRangeTarget0![__rangeIndex]
+	for (let __goscriptRangeTarget0 = s, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
+		let v = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as number)
 		total = total + (v)
 	}
 	return total
@@ -37,7 +37,7 @@ export async function main(): globalThis.Promise<void> {
 	MySlice_Add(myList, 10)
 	MySlice_Add(myList, 20)
 	let ptr: $.VarRef<MySlice> | null = myList
-	await $.println("length:", $.len((myList.value as MySlice)))
+	await $.println("length:", $.sliceLen((myList.value as MySlice)))
 	await $.println("first:", $.arrayIndex(myList.value!, 0))
 	await $.println("second:", $.arrayIndex(myList.value!, 1))
 	await $.println("sum:", MySlice_Sum($.pointerValue<MySlice>(ptr)))

@@ -62,7 +62,7 @@ export class item {
 }
 
 export function tagLen(tag: reflect.StructTag): number {
-	return $.len(tag)
+	return $.stringLen(tag)
 }
 
 export async function main(): globalThis.Promise<void> {
@@ -74,7 +74,7 @@ export async function main(): globalThis.Promise<void> {
 		await $.println(" desc:", reflect.StructTag_Get(f.Tag, "desc"))
 		let [def, ok] = reflect.StructTag_Lookup(f.Tag, "default")
 		await $.println(" default:", def, ok)
-		await $.println(" fields:", $.len(strings.Fields(globalThis.String(f.Tag))))
+		await $.println(" fields:", $.sliceLen(strings.Fields(globalThis.String(f.Tag))))
 	}
 	let tag: reflect.StructTag = "a:\"1\" b:\"two words\""
 	await $.println(reflect.StructTag_Get(tag, "b"), $.stringEqual(tag, "a:\"1\" b:\"two words\""))

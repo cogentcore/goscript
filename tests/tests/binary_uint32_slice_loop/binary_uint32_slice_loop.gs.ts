@@ -7,13 +7,7 @@ import * as binary from "@goscript/encoding/binary/index.js"
 import "@goscript/encoding/binary/index.js"
 
 export class attrs {
-	public get packedData(): string {
-		return this._fields.packedData
-	}
-
-	public set packedData(value: string) {
-		this._fields.packedData = value
-	}
+	public declare packedData: string
 
 	public _fields: {
 		packedData: string
@@ -36,16 +30,20 @@ export class attrs {
 			return null
 		}
 		let bytes: $.Slice<number> = $.stringToBytes(a.packedData)
-		while ($.len(bytes) > 0) {
-			let kn: number = $.uint(((4 + $.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.LittleEndian))).Uint32($.goSlice(bytes, undefined, 4))) >>> 0), 32)
+		while ($.sliceLen(bytes) > 0) {
+			let kn: number = $.uint(4 + $.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.LittleEndian))).Uint32($.goSlice(bytes, undefined, 4)), 32)
 			let k = $.bytesToString($.goSlice(bytes, 4, kn))
 			bytes = $.goSlice(bytes, kn, undefined)
-			let vn: number = $.uint(((4 + $.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.LittleEndian))).Uint32($.goSlice(bytes, undefined, 4))) >>> 0), 32)
+			let vn: number = $.uint(4 + $.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.LittleEndian))).Uint32($.goSlice(bytes, undefined, 4)), 32)
 			let v = $.bytesToString($.goSlice(bytes, 4, vn))
 			bytes = $.goSlice(bytes, vn, undefined)
 			result = $.append(result, $.concatString(($.concatString(k, "=")), v))
 		}
 		return result
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["packedData"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -59,8 +57,8 @@ export class attrs {
 
 export async function main(): globalThis.Promise<void> {
 	let a = $.markAsStructValue(new attrs({packedData: "\x01\x00\x00\x00a\x01\x00\x00\x00b"}))
-	for (let __goscriptRangeTarget0 = $.markAsStructValue($.cloneStructValue(a)).decode(), __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
-		let s = __goscriptRangeTarget0![__rangeIndex]
+	for (let __goscriptRangeTarget0 = $.markAsStructValue($.cloneStructValue(a)).decode(), __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
+		let s = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as string)
 		await $.println(s)
 	}
 }

@@ -42,7 +42,7 @@ export function newQueue(__typeArgs: $.GenericTypeArgs | undefined, capacity: nu
 export async function main(): globalThis.Promise<void> {
 	let q: queue | $.VarRef<queue> | null = (newQueue(__goscriptStatic0(), 2) as queue | $.VarRef<queue> | null)
 	$.pointerValue<queue>(q).buf![0] = 7
-	await $.println($.len($.pointerValue<queue>(q).buf), $.arrayIndex($.pointerValue<queue>(q).buf!, 0))
+	await $.println($.sliceLen($.pointerValue<queue>(q).buf), $.arrayIndex($.pointerValue<queue>(q).buf!, 0))
 }
 
 var __goscriptStatic0$value: any

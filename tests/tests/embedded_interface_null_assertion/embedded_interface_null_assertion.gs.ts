@@ -94,7 +94,7 @@ export class StringReader {
 
 	public Read(p: $.Slice<number>): [number, $.GoError] {
 		let s: StringReader | $.VarRef<StringReader> | null = this;
-		if ($.pointerValue<StringReader>(s).pos >= $.len($.pointerValue<StringReader>(s).data)) {
+		if ($.pointerValue<StringReader>(s).pos >= $.stringLen($.pointerValue<StringReader>(s).data)) {
 			return [0, null]
 		}
 		let n = $.copy(p, $.stringToBytes($.sliceStringOrBytes($.pointerValue<StringReader>(s).data, $.pointerValue<StringReader>(s).pos, undefined)))

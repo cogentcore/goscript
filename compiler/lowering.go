@@ -7384,10 +7384,10 @@ func (o *LoweringOwner) lowerRangeStmt(ctx lowerFileContext, stmt *ast.RangeStmt
 	diagnostics = append(diagnostics, bodyDiagnostics...)
 	rangeTarget := ctx.tempName("RangeTarget")
 	rangeTargetValue := o.lowerArrayPointerTarget(ctx, rangeValue, rangeType)
-	indexTarget := rangeTarget
-	if isNilableType(rangeType) {
-		indexTarget += "!"
-	}
+	// The window of the slice or array is read once, as Go evaluates the
+	// length once, and its elements are read from its backing array
+	// directly, which is much faster than through a slice proxy.
+	rangeWindow := ctx.tempName("RangeWindow")
 	indexName := keyName
 	if indexName == "" {
 		indexName = "__rangeIndex"
@@ -7397,7 +7397,8 @@ func (o *LoweringOwner) lowerRangeStmt(ctx lowerFileContext, stmt *ast.RangeStmt
 		// The value variable holds a copy of the element, so struct and array
 		// elements are cloned.
 		valueType := ctx.semPkg.source.TypesInfo.TypeOf(stmt.Value)
-		value := o.lowerValueForTargetTypes(ctx, valueType, valueType, indexTarget+"["+indexName+"]", true)
+		element := "(" + rangeWindow + ".backing[" + rangeWindow + ".offset + " + indexName + "] as " + o.tsTypeFor(ctx, valueType) + ")"
+		value := o.lowerValueForTargetTypes(ctx, valueType, valueType, element, true)
 		if typeParamMayHoldValueType(valueType) {
 			value = o.runtimeOwner.QualifiedHelper(RuntimeHelperCopyElement) + "(" + value + ")"
 		}
@@ -7408,7 +7409,9 @@ func (o *LoweringOwner) lowerRangeStmt(ctx lowerFileContext, stmt *ast.RangeStmt
 	}
 	return loweredStmt{
 		hasBlock: true,
-		text:     loopPrefix + "for (let " + rangeTarget + " = " + rangeTargetValue + ", " + indexName + " = 0; " + indexName + " < " + o.runtimeOwner.QualifiedHelper(RuntimeHelperLen) + "(" + rangeTarget + "); " + indexName + "++)",
+		text: loopPrefix + "for (let " + rangeTarget + " = " + rangeTargetValue + ", " +
+			rangeWindow + " = " + o.runtimeOwner.QualifiedHelper(RuntimeHelperSliceRange) + "(" + rangeTarget + "), " +
+			indexName + " = 0; " + indexName + " < " + rangeWindow + ".length; " + indexName + "++)",
 		children: children,
 	}, diagnostics
 }
@@ -9055,7 +9058,20 @@ func (o *LoweringOwner) lowerCallExpr(ctx lowerFileContext, expr *ast.CallExpr) 
 					if literalLen, ok := lowerConstantStringLen(ctx, expr.Args[0]); ok {
 						return literalLen, diagnostics
 					}
-					args[0] = o.lowerArrayPointerTarget(ctx, args[0], ctx.semPkg.source.TypesInfo.TypeOf(expr.Args[0]))
+					argType := ctx.semPkg.source.TypesInfo.TypeOf(expr.Args[0])
+					args[0] = o.lowerArrayPointerTarget(ctx, args[0], argType)
+					// The length of a string or slice, known by its static
+					// type, is read without the general len dispatch.
+					if _, isTypeParam := types.Unalias(argType).(*types.TypeParam); !isTypeParam && argType != nil {
+						switch underlying := types.Unalias(argType).Underlying().(type) {
+						case *types.Basic:
+							if underlying.Info()&types.IsString != 0 {
+								return o.runtimeOwner.QualifiedHelper(RuntimeHelperStringLen) + "(" + args[0] + ")", diagnostics
+							}
+						case *types.Slice:
+							return o.runtimeOwner.QualifiedHelper(RuntimeHelperSliceLen) + "(" + args[0] + ")", diagnostics
+						}
+					}
 				}
 				return o.runtimeOwner.QualifiedHelper(RuntimeHelperLen) + "(" + strings.Join(args, ", ") + ")", diagnostics
 			case "max":
@@ -11929,7 +11945,7 @@ func (o *LoweringOwner) lowerIndexExpr(ctx lowerFileContext, expr *ast.IndexExpr
 			return o.runtimeOwner.QualifiedHelper(RuntimeHelperIndexByteString) + "(" + literal.String() + ", " + o.lowerNumberIndexValue(ctx, expr.Index, index) + ")", diagnostics
 		}
 
-		return o.runtimeOwner.QualifiedHelper(RuntimeHelperIndexStringOrBytes) + "(" + target + ", " + o.lowerNumberIndexValue(ctx, expr.Index, index) + ")", diagnostics
+		return o.runtimeOwner.QualifiedHelper(RuntimeHelperIndexString) + "(" + target + ", " + o.lowerNumberIndexValue(ctx, expr.Index, index) + ")", diagnostics
 	case isMapType(targetType):
 		return o.lowerMapGetValue(ctx, expr, target, index), diagnostics
 	default:

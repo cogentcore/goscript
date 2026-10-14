@@ -297,8 +297,8 @@ export class retransmissionQueueAppDataAckHandler {
 }
 
 export async function queueFramesForRetransmission(p: packet | $.VarRef<packet> | null): globalThis.Promise<void> {
-	for (let __goscriptRangeTarget0 = $.pointerValue<packet>(p).Frames, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
-		let f = $.markAsStructValue($.cloneStructValue(__goscriptRangeTarget0![__rangeIndex]))
+	for (let __goscriptRangeTarget0 = $.pointerValue<packet>(p).Frames, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
+		let f = $.markAsStructValue($.cloneStructValue((__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as Frame)))
 		if (f.Handler != null) {
 			await $.pointerValue<Exclude<FrameHandler, null>>(f.Handler).OnLost(f.Frame)
 		}

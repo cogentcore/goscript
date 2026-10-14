@@ -30,7 +30,7 @@ $.registerNamedValueType(
 );
 
 export function bytesEncoder_Len(b: bytesEncoder): number {
-	return $.len((b as bytesEncoder))
+	return $.sliceLen((b as bytesEncoder))
 }
 
 export async function main(): globalThis.Promise<void> {

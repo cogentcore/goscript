@@ -60,12 +60,12 @@ export class _object {
 
 	public next(): entry | $.VarRef<entry> | null {
 		let o: _object | $.VarRef<_object> | null = this;
-		if ($.cap($.pointerValue<_object>(o).entries) > $.len($.pointerValue<_object>(o).entries)) {
-			$.pointerValue<_object>(o).entries = $.goSlice($.pointerValue<_object>(o).entries, undefined, $.len($.pointerValue<_object>(o).entries) + 1)
+		if ($.cap($.pointerValue<_object>(o).entries) > $.sliceLen($.pointerValue<_object>(o).entries)) {
+			$.pointerValue<_object>(o).entries = $.goSlice($.pointerValue<_object>(o).entries, undefined, $.sliceLen($.pointerValue<_object>(o).entries) + 1)
 		} else {
 			$.pointerValue<_object>(o).entries = $.append($.pointerValue<_object>(o).entries, $.markAsStructValue(new entry()))
 		}
-		return $.indexRef($.pointerValue<_object>(o).entries!, $.len($.pointerValue<_object>(o).entries) - 1)
+		return $.indexRef($.pointerValue<_object>(o).entries!, $.sliceLen($.pointerValue<_object>(o).entries) - 1)
 	}
 
 	static __typeInfo = $.registerStructType(

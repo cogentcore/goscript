@@ -41,12 +41,12 @@ export class storage {
 
 	public IsEmpty(): boolean {
 		const s: storage | $.VarRef<storage> | null = this;
-		return $.len($.pointerValue<storage>(s).bytes) == 0
+		return $.sliceLen($.pointerValue<storage>(s).bytes) == 0
 	}
 
 	public Len(): number {
 		const s: storage | $.VarRef<storage> | null = this;
-		return $.len($.pointerValue<storage>(s).bytes)
+		return $.sliceLen($.pointerValue<storage>(s).bytes)
 	}
 
 	public Name(): string {

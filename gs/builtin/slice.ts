@@ -108,12 +108,15 @@ const stringViewBytes: Array<Uint8Array | null> = new Array<Uint8Array | null>(
 // is ASCII, in which case its UTF-16 code units are its bytes. The returned
 // bytes may be shared, so they must not be modified.
 function goStringBytesView(str: GoStringValue): Uint8Array | null {
+  // A binary string holds its bytes, and a short string is not cached.
   if (str instanceof GoBinaryString) {
     return str.bytes
   }
   if (str.length < stringViewMinLength) {
     return asciiString.test(str) ? null : goStringBytes(str)
   }
+
+  // The bytes of a longer string are cached by its length.
   const slot = str.length & (stringViewCacheSize - 1)
   if (stringViewKeys[slot] === str) {
     // An equal string may be a different string object, which takes a full
@@ -126,6 +129,67 @@ function goStringBytesView(str: GoStringValue): Uint8Array | null {
   stringViewKeys[slot] = str
   stringViewBytes[slot] = bytes
   return bytes
+}
+
+// sliceProxyMetas caches the window of each slice proxy that is looked up,
+// so that the runtime can read a slice's backing array directly, without the
+// proxy traps, which are much slower. It is filled when a slice is first
+// looked up rather than when it is made, since append makes many short-lived
+// slices.
+const sliceProxyMetas = new WeakMap<object, GoSliceObject<any>>()
+
+// sliceMeta returns the window of a slice proxy, or of an array with one, or
+// undefined for a plain array.
+function sliceMeta(slice: object): GoSliceObject<any> | undefined {
+  let meta = sliceProxyMetas.get(slice)
+  if (meta === undefined) {
+    meta = (slice as { __meta__?: GoSliceObject<any> }).__meta__
+    if (meta !== undefined) {
+      sliceProxyMetas.set(slice, meta)
+    }
+  }
+  return meta
+}
+
+// SliceRange is the window of a slice or array for a range loop over it.
+export interface SliceRange<T> {
+  backing: ArrayLike<T>
+  offset: number
+  length: number
+}
+
+const emptySliceRange: SliceRange<any> = { backing: [], offset: 0, length: 0 }
+
+/**
+ * sliceRange returns the backing array, offset and length of a slice or
+ * array, so that a range loop over it reads its elements directly, with the
+ * length fixed when the loop starts, as in Go.
+ */
+export function sliceRange<T>(
+  slice: Slice<T> | T[] | null | undefined,
+): SliceRange<T>
+export function sliceRange(
+  slice: Uint8Array | null | undefined,
+): SliceRange<number>
+export function sliceRange<T>(
+  slice: Slice<T> | T[] | Uint8Array | null | undefined,
+): SliceRange<T> {
+  // A nil slice has no elements.
+  if (slice === null || slice === undefined) {
+    return emptySliceRange
+  }
+
+  // A slice proxy is its own window.
+  const meta = sliceMeta(slice)
+  if (meta !== undefined) {
+    return meta
+  }
+
+  // A plain array is a window over itself.
+  if (Array.isArray(slice) || slice instanceof Uint8Array) {
+    return { backing: slice as ArrayLike<T>, offset: 0, length: slice.length }
+  }
+  return { backing: [], offset: 0, length: len(slice as any) }
 }
 
 /**
@@ -919,6 +983,34 @@ export const arrayToSlice = <T>(
 }
 
 /**
+ * sliceLen returns the length of a slice, for an expression whose static
+ * type is a slice type.
+ */
+export function sliceLen(
+  slice: Slice<unknown> | unknown[] | Uint8Array | null | undefined,
+): number {
+  // A nil slice has no elements.
+  if (slice === null || slice === undefined) {
+    return 0
+  }
+
+  // A slice proxy knows its length.
+  const meta = sliceProxyMetas.get(slice)
+  if (meta !== undefined) {
+    return meta.length
+  }
+
+  // A plain array may carry a window of its own.
+  if (Array.isArray(slice) || slice instanceof Uint8Array) {
+    const plainMeta = (slice as any).__meta__ as
+      | GoSliceObject<unknown>
+      | undefined
+    return plainMeta !== undefined ? plainMeta.length : slice.length
+  }
+  return len(slice as any)
+}
+
+/**
  * len returns the Go length of a collection, counting string bytes.
  */
 export const len = <T = unknown, V = unknown>(
@@ -933,6 +1025,15 @@ export const len = <T = unknown, V = unknown>(
     | null
     | undefined,
 ): number => {
+  // An array with a window has the length of the window.
+  if (typeof obj === 'object' && obj !== null && Array.isArray(obj)) {
+    const meta = sliceMeta(obj)
+    if (meta !== undefined) {
+      return meta.length
+    }
+  }
+
+  // Any other value is measured by its kind.
   obj = collectionValue(obj) as typeof obj
   if (obj === null || obj === undefined) {
     return 0
@@ -1578,6 +1679,13 @@ export function arrayIndex<
 >(collection: C, index: number): ArrayIndexValue<C> {
   if (collection === null || collection === undefined) {
     outOfRangeIndex(index, 0)
+  }
+  const meta = sliceMeta(collection)
+  if (meta !== undefined) {
+    if (index < 0 || index >= meta.length) {
+      outOfRangeIndex(index, meta.length)
+    }
+    return meta.backing[meta.offset + index] as ArrayIndexValue<C>
   }
   if (collection instanceof Uint8Array) {
     if (index < 0 || index >= collection.length) {
@@ -2225,6 +2333,7 @@ export const rangeString = (str: string): Array<[number, number]> => {
     }
     return pairs
   }
+
   // The UTF-8 length of each rune follows from its code point, which is
   // much faster than encoding each character. A lone surrogate encodes as
   // U+FFFD, as TextEncoder does.
@@ -2307,6 +2416,7 @@ export const indexString = (
   str: GoStringValue | import('./builtin.js').Bytes,
   index: number,
 ): number => {
+  // A string is read by its bytes, or by its code units when it is ASCII.
   if (isGoStringValue(str)) {
     const bytes = goStringBytesView(str)
     const length = bytes === null ? str.length : bytes.length
@@ -2318,15 +2428,18 @@ export const indexString = (
     }
     return Number.isInteger(index) ?
         (str as string).charCodeAt(index)
-      : (undefined as unknown as number)
+      : goStringBytes(str)[index]
   }
 
+  // A byte slice is read by its elements.
   if (str instanceof Uint8Array) {
     if (index < 0 || index >= str.length) {
       outOfRangeIndex(index, str.length)
     }
     return str[index]
   }
+
+  // A nil value has no elements.
   if (str === null || str === undefined) {
     outOfRangeIndex(index, 0)
   }
@@ -2352,11 +2465,13 @@ export const sliceString = (
   low?: number,
   high?: number,
 ): string => {
+  // The bounds are in bytes, whatever the string's representation.
   const bytes = goStringBytesView(str)
   const length = bytes === null ? str.length : bytes.length
   const actualLow = low === undefined ? 0 : low
   const actualHigh = high === undefined ? length : high
 
+  // An empty window at a valid offset is allowed, and any other bound panics.
   if (actualLow < 0 || actualHigh < actualLow || actualHigh > length) {
     if (actualLow === actualHigh && actualLow >= 0 && actualLow <= length) {
       return ''
@@ -2366,6 +2481,7 @@ export const sliceString = (
     )
   }
 
+  // An ASCII string is sliced by code units, and any other by its bytes.
   if (bytes === null) {
     return (str as string).slice(actualLow, actualHigh)
   }

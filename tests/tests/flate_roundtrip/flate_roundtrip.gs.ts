@@ -15,11 +15,11 @@ import "@goscript/io/index.js"
 export async function main(): globalThis.Promise<void> {
 	// Mixed repeated and distinct bytes exercise dynamic Huffman blocks.
 	let input: $.Slice<number> = $.makeSlice<number>(4096, undefined, "byte")
-	for (let __goscriptRangeTarget0 = input, i = 0; i < $.len(__goscriptRangeTarget0); i++) {
+	for (let __goscriptRangeTarget0 = input, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), i = 0; i < __goscriptRangeWindow0.length; i++) {
 		input![i] = $.uint($.uint((i * 31) ^ (i >> 5), 8), 8)
 	}
-	for (let __goscriptRangeTarget1 = $.arrayToSlice<number>([1, -1, 9]), __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget1); __rangeIndex++) {
-		let level = __goscriptRangeTarget1![__rangeIndex]
+	for (let __goscriptRangeTarget1 = $.arrayToSlice<number>([1, -1, 9]), __goscriptRangeWindow1 = $.sliceRange(__goscriptRangeTarget1), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow1.length; __rangeIndex++) {
+		let level = (__goscriptRangeWindow1.backing[__goscriptRangeWindow1.offset + __rangeIndex] as number)
 		let compressed: $.VarRef<bytes.Buffer> = $.varRef($.markAsStructValue(new bytes.Buffer()))
 		let __goscriptTuple0: any = flate.NewWriter($.interfaceValue<io.Writer | null>(compressed, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer")), level)
 		let writer: flate.Writer | $.VarRef<flate.Writer> | null = __goscriptTuple0[0]
@@ -54,7 +54,7 @@ export async function main(): globalThis.Promise<void> {
 				$.panic((__goscriptShadow2 as any))
 			}
 		}
-		await $.println(level, $.len(output), bytes.Equal(input, output))
+		await $.println(level, $.sliceLen(output), bytes.Equal(input, output))
 	}
 }
 

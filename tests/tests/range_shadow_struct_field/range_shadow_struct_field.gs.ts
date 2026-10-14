@@ -66,8 +66,8 @@ export class Matcher {
 	public Total(): number {
 		const m: Matcher | $.VarRef<Matcher> | null = this;
 		let total = 0
-		for (let __goscriptRangeTarget0 = Matcher.prototype.Blocks.call(m), __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
-			let __goscriptRangeShadow0 = $.markAsStructValue($.cloneStructValue(__goscriptRangeTarget0![__rangeIndex]))
+		for (let __goscriptRangeTarget0 = Matcher.prototype.Blocks.call(m), __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
+			let __goscriptRangeShadow0 = $.markAsStructValue($.cloneStructValue((__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as Match)))
 			total = total + (__goscriptRangeShadow0.Size)
 		}
 		return total

@@ -63,7 +63,7 @@ export class handler {
 				if (err != null) {
 					return [true, err]
 				}
-				total = total + ($.len(srpc.RawMessage.prototype.GetData.call(msg)))
+				total = total + ($.sliceLen(srpc.RawMessage.prototype.GetData.call(msg)))
 			}
 			return [true, await $.pointerValue<Exclude<srpc.Stream, null>>(strm).MsgSend($.interfaceValue<srpc.Message | null>(srpc.NewRawMessage(new Uint8Array([$.uint(total, 8)]) as $.Slice<number>, false), "*srpc.RawMessage", /* @__PURE__ */ $.pointerType("srpc.RawMessage")))]
 		}
@@ -355,7 +355,7 @@ export class memoryRpcStream {
 				return err
 			}
 			let data: $.Slice<number> = rpcstream.RpcStreamPacket.prototype.GetData.call(pkt)
-			if ($.len(data) == 0) {
+			if ($.sliceLen(data) == 0) {
 				continue
 			}
 			return $.pointerValue<Exclude<protobuf_go_lite.Message, null>>(msg).UnmarshalVT(data)
@@ -604,8 +604,8 @@ export async function openHeldStreams(ctx: context.Context | null, client: srpc.
 }
 
 export async function closeHeldStreams(streams: $.Slice<srpc.Stream | null>): globalThis.Promise<boolean> {
-	for (let __goscriptRangeTarget0 = streams, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
-		let strm = __goscriptRangeTarget0![__rangeIndex]
+	for (let __goscriptRangeTarget0 = streams, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
+		let strm = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as srpc.Stream | null)
 		{
 			let err = await $.pointerValue<Exclude<srpc.Stream, null>>(strm).CloseSend()
 			if (err != null) {
@@ -621,7 +621,7 @@ export async function closeHeldStreams(streams: $.Slice<srpc.Stream | null>): gl
 				return false
 			}
 		}
-		if (($.len(srpc.RawMessage.prototype.GetData.call(resp)) != 1) || ($.uint($.arrayIndex(srpc.RawMessage.prototype.GetData.call(resp)!, 0), 8) != 1)) {
+		if (($.sliceLen(srpc.RawMessage.prototype.GetData.call(resp)) != 1) || ($.uint($.arrayIndex(srpc.RawMessage.prototype.GetData.call(resp)!, 0), 8) != 1)) {
 			await $.println("hold response mismatch")
 			return false
 		}
@@ -708,8 +708,8 @@ export async function probeStream(ctx: context.Context | null, client: srpc.Clie
 		}
 	}
 	let data: $.Slice<number> = srpc.RawMessage.prototype.GetData.call(resp)
-	if ($.len(data) != 1) {
-		return [$.len(data), null]
+	if ($.sliceLen(data) != 1) {
+		return [$.sliceLen(data), null]
 	}
 	return [$.int($.arrayIndex(data!, 0)), null]
 }
@@ -958,8 +958,8 @@ export async function exercisePushablePacketWriter(): globalThis.Promise<boolean
 	let pushed: $.Slice<$.Slice<number>> = null! as $.Slice<$.Slice<number>>
 	let ended = false
 	let pushFn = $.markAsStructValue($.cloneStructValue(js.FuncOf($.functionValue(async (_this: js.Value, args: $.Slice<js.Value>): globalThis.Promise<any> => {
-		if ($.len(args) != 1) {
-			await $.println("push arg count:", $.len(args))
+		if ($.sliceLen(args) != 1) {
+			await $.println("push arg count:", $.sliceLen(args))
 			return null
 		}
 		let data: $.Slice<number> = $.makeSlice<number>($.markAsStructValue($.cloneStructValue($.arrayIndex(args!, 0))).Length(), undefined, "byte")
@@ -1000,8 +1000,8 @@ export async function exercisePushablePacketWriter(): globalThis.Promise<boolean
 		await $.println("pushable end missing")
 		return false
 	}
-	if ($.len(pushed) != 2) {
-		await $.println("pushable packets:", $.len(pushed))
+	if ($.sliceLen(pushed) != 2) {
+		await $.println("pushable packets:", $.sliceLen(pushed))
 		return false
 	}
 
@@ -1065,7 +1065,7 @@ export async function main(): globalThis.Promise<void> {
 		await $.println("exec error:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 		return
 	}
-	await $.println("exec bytes:", $.len(srpc.RawMessage.prototype.GetData.call(unaryResp)))
+	await $.println("exec bytes:", $.sliceLen(srpc.RawMessage.prototype.GetData.call(unaryResp)))
 	let __goscriptTuple10: any = await $.pointerValue<Exclude<srpc.Client, null>>(client).NewStream(ctx, "svc", "stream", null)
 	let strm = __goscriptTuple10[0]
 	err = __goscriptTuple10[1]
@@ -1085,8 +1085,8 @@ export async function main(): globalThis.Promise<void> {
 		}
 	}
 	let data: $.Slice<number> = srpc.RawMessage.prototype.GetData.call(resp)
-	if ($.len(data) != 1) {
-		await $.println("stream response length:", $.len(data))
+	if ($.sliceLen(data) != 1) {
+		await $.println("stream response length:", $.sliceLen(data))
 		return
 	}
 	await $.println("stream bytes:", $.uint($.arrayIndex(data!, 0), 8))
@@ -1098,7 +1098,7 @@ export async function main(): globalThis.Promise<void> {
 			return
 		}
 	}
-	await $.println("empty exec bytes:", $.len(srpc.RawMessage.prototype.GetData.call(emptyResp)))
+	await $.println("empty exec bytes:", $.sliceLen(srpc.RawMessage.prototype.GetData.call(emptyResp)))
 
 	let __goscriptTuple11: any = await openHeldStreams(ctx, client, 32)
 	let held: $.Slice<srpc.Stream | null> = __goscriptTuple11[0]

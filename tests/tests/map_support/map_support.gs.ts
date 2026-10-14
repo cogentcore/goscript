@@ -68,7 +68,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// Inline bubble sort for string slice
 	// (avoid importing sort package yet)
-	let n = $.len(scoreResults)
+	let n = $.sliceLen(scoreResults)
 	for (let i = 0; i < (n - 1); i++) {
 		for (let j = 0; j < ((n - i) - 1); j++) {
 			if ($.stringCompare($.arrayIndex(scoreResults!, j), $.arrayIndex(scoreResults!, j + 1)) > 0) {
@@ -80,8 +80,8 @@ export async function main(): globalThis.Promise<void> {
 		}
 	}
 
-	for (let __goscriptRangeTarget0 = scoreResults, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
-		let result = __goscriptRangeTarget0![__rangeIndex]
+	for (let __goscriptRangeTarget0 = scoreResults, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
+		let result = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as string)
 		await $.println(result)
 	}
 }

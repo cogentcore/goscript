@@ -31,7 +31,7 @@ export async function main(): globalThis.Promise<void> {
 		await $.println("open error", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 		return
 	}
-	await $.println("open", err == null, $.len($.pointerValue<zip.Reader>(zr).File))
+	await $.println("open", err == null, $.sliceLen($.pointerValue<zip.Reader>(zr).File))
 	let __goscriptTuple2: any = await zip.File.prototype.Open.call($.arrayIndex($.pointerValue<zip.Reader>(zr).File!, 0))
 	let rc = __goscriptTuple2[0]
 	err = __goscriptTuple2[1]

@@ -124,7 +124,7 @@ $.registerNamedValueType(
 );
 
 export function namedSlice_Add(v: namedSlice, n: number): number {
-	return $.len((v as namedSlice)) + n
+	return $.sliceLen((v as namedSlice)) + n
 }
 
 export function namedMap_Add(v: namedMap, n: number): number {
@@ -148,7 +148,7 @@ export function namedChan_Add(v: namedChan, n: number): number {
 }
 
 export function pointerSlice_Add(v: $.VarRef<pointerSlice> | null, n: number): number {
-	return $.len(($.pointerValue<pointerSlice>(v) as pointerSlice)) + n
+	return $.sliceLen(($.pointerValue<pointerSlice>(v) as pointerSlice)) + n
 }
 
 export function pointerMap_Add(v: $.VarRef<pointerMap> | null, n: number): number {

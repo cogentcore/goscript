@@ -29,7 +29,7 @@ export class MyProcessor {
 	public async Process(data: $.Slice<number>, count: number, _p2: string): globalThis.Promise<[boolean, $.GoError]> {
 		const p = this;
 		// Dummy implementation
-		if ((count > 0) && ($.len(data) > 0)) {
+		if ((count > 0) && ($.sliceLen(data) > 0)) {
 			await $.println("Processing successful")
 			return [true, null]
 		}

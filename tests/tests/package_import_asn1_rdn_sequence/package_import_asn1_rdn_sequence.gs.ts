@@ -15,16 +15,16 @@ export async function main(): globalThis.Promise<void> {
 	let der: $.Slice<number> = __goscriptTuple0[0]
 	let err = __goscriptTuple0[1]
 	await $.println("marshal err nil", err == null)
-	await $.println("der len", $.len(der))
+	await $.println("der len", $.sliceLen(der))
 
 	let output: $.VarRef<pkix.RDNSequence> = $.varRef(null! as pkix.RDNSequence)
 	let __goscriptTuple1: any = await asn1.Unmarshal(der, $.namedValueInterfaceValue<any>(output, "*pkix.RDNSequence", __goscriptStatic3(), __goscriptStatic4(), __goscriptStatic2()))
 	let rest: $.Slice<number> = __goscriptTuple1[0]
 	err = __goscriptTuple1[1]
 	await $.println("unmarshal err nil", err == null)
-	await $.println("rest len", $.len(rest))
-	await $.println("rdn count", $.len((output.value as pkix.RDNSequence)))
-	await $.println("set count", $.len(($.arrayIndex(output.value!, 0) as pkix.RelativeDistinguishedNameSET)))
+	await $.println("rest len", $.sliceLen(rest))
+	await $.println("rdn count", $.sliceLen((output.value as pkix.RDNSequence)))
+	await $.println("set count", $.sliceLen(($.arrayIndex(output.value!, 0) as pkix.RelativeDistinguishedNameSET)))
 	await $.println("oid", asn1.ObjectIdentifier_String($.arrayIndex($.arrayIndex(output.value!, 0)!, 0).Type))
 	await $.println("value", $.mustTypeAssert<string>($.arrayIndex($.arrayIndex(output.value!, 0)!, 0).Value, /* @__PURE__ */ $.basicType("string")))
 }

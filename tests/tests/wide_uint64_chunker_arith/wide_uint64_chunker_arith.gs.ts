@@ -71,7 +71,7 @@ export class repeatReader {
 		if ($.pointerValue<repeatReader>(r).remaining == 0) {
 			return [0, io.EOF]
 		}
-		let n = $.min($.len(p), $.pointerValue<repeatReader>(r).remaining)
+		let n = $.min($.sliceLen(p), $.pointerValue<repeatReader>(r).remaining)
 		for (let __goscriptRangeCount0 = n, i = 0; i < __goscriptRangeCount0; i++) {
 			p![i] = $.uint($.uint(i, 8), 8)
 		}
@@ -107,13 +107,13 @@ export function algorithm(data: $.Slice<number>, n: number, g: $.Slice<bigint>, 
 }
 
 export function uint64Len(g: $.Slice<bigint>): number {
-	return $.uint($.uint($.len(g), 8), 8)
+	return $.uint($.uint($.sliceLen(g), 8), 8)
 }
 
 export async function main(): globalThis.Promise<void> {
 	let g: $.Slice<bigint> = $.arrayToSlice<bigint>([7n, 11n, 22n, 33n])
 	let data: $.Slice<number> = new Uint8Array([1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0]) as $.Slice<number>
-	await $.println("algo", algorithm(data, $.len(data), g, 3n, 1n, 0, 3))
+	await $.println("algo", algorithm(data, $.sliceLen(data), g, 3n, 1n, 0, 3))
 
 	let c: chunker | $.VarRef<chunker> | null = new chunker()
 	let totalSize: bigint = 0n

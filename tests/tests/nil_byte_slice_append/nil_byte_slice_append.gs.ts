@@ -11,7 +11,7 @@ export async function main(): globalThis.Promise<void> {
 	let dst: $.Slice<number> = null! as $.Slice<number>
 	dst = $.appendSlice($.goSlice(dst, undefined, 0), $.goSlice(dAtA, 1, 4), $.byteSliceHint)
 	await $.println("spread nil:", dst)
-	await $.println("spread len:", $.len(dst))
+	await $.println("spread len:", $.sliceLen(dst))
 
 	// Individual-element append onto a nil []byte stays byte-specialized.
 	let single: $.Slice<number> = null! as $.Slice<number>

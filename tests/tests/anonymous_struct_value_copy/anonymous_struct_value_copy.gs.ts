@@ -52,8 +52,8 @@ export async function main(): globalThis.Promise<void> {
 	inner.N = 9
 	await $.println("field:", nested.Inner.N)
 
-	for (let __goscriptRangeTarget0 = s, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
-		let r = $.markAsStructValue($.cloneStructValue(__goscriptRangeTarget0![__rangeIndex]))
+	for (let __goscriptRangeTarget0 = s, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
+		let r = $.markAsStructValue($.cloneStructValue((__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as {"N": number})))
 		r.N = 9
 	}
 	await $.println("range:", $.arrayIndex(s!, 0).N)

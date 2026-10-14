@@ -57,8 +57,8 @@ export async function main(): globalThis.Promise<void> {
 
 	let certificate = $.markAsStructValue(new tls.Certificate({Certificate: $.arrayToSlice<$.Slice<number>>([der]), PrivateKey: $.namedValueInterfaceValue<crypto.PrivateKey | null>(priv, "ed25519.PrivateKey", __goscriptStatic3(), __goscriptStatic4(), __goscriptStatic5()), Leaf: leaf}))
 	let config: tls.Config | $.VarRef<tls.Config> | null = new tls.Config({Certificates: $.arrayToSlice<tls.Certificate>([$.markAsStructValue($.cloneStructValue(certificate))]), MinVersion: 771, NextProtos: $.arrayToSlice<string>(["bifrost"])})
-	await $.println("certificate count", $.len($.pointerValue<tls.Config>(config).Certificates))
-	await $.println("chain count", $.len($.arrayIndex($.pointerValue<tls.Config>(config).Certificates!, 0).Certificate))
+	await $.println("certificate count", $.sliceLen($.pointerValue<tls.Config>(config).Certificates))
+	await $.println("chain count", $.sliceLen($.arrayIndex($.pointerValue<tls.Config>(config).Certificates!, 0).Certificate))
 	await $.println("leaf common name", $.pointerValue<x509.Certificate>($.arrayIndex($.pointerValue<tls.Config>(config).Certificates!, 0).Leaf).Subject.CommonName)
 	await $.println("private key signer", ed25519.PublicKey_Equal($.mustTypeAssert<ed25519.PublicKey>(ed25519.PrivateKey_Public($.mustTypeAssert<ed25519.PrivateKey>($.arrayIndex($.pointerValue<tls.Config>(config).Certificates!, 0).PrivateKey, /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"), "ed25519.PrivateKey"))), /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"), "ed25519.PublicKey")), $.namedValueInterfaceValue<crypto.PublicKey | null>(pub, "ed25519.PublicKey", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2())))
 	await $.println("min version", $.uint($.pointerValue<tls.Config>(config).MinVersion, 16))

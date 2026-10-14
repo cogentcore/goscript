@@ -6,8 +6,8 @@ import * as $ from "@goscript/builtin/index.js"
 export async function main(): globalThis.Promise<void> {
 	let slice: $.Slice<number> = $.arrayToSlice<number>([10, 20, 30, 40, 50])
 	let sum = 0
-	for (let __goscriptRangeTarget0 = slice, idx = 0; idx < $.len(__goscriptRangeTarget0); idx++) {
-		let val = __goscriptRangeTarget0![idx]
+	for (let __goscriptRangeTarget0 = slice, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), idx = 0; idx < __goscriptRangeWindow0.length; idx++) {
+		let val = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + idx] as number)
 		sum = sum + (val)
 		await $.println("Range idx:", idx, "val:", val)
 	}

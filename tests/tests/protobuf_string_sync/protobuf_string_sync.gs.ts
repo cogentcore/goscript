@@ -20,18 +20,18 @@ export async function main(): globalThis.Promise<void> {
 	// contract: func (x *M) String() string. A GoScript regression that makes
 	// String() async (returning a Promise) breaks len() and all sync string use.
 	let str = __goscript_protobuf_string_sync_pb_ts.ExampleMsg.prototype.String.call(msg)
-	await $.println("len:", $.len(str))
-	await $.println("empty:", $.len(str) == 0)
-	await $.println("prefix ok:", ($.len(str) >= 10) && ($.stringEqual($.sliceStringOrBytes(str, undefined, 10), "ExampleMsg")))
+	await $.println("len:", $.stringLen(str))
+	await $.println("empty:", $.stringLen(str) == 0)
+	await $.println("prefix ok:", ($.stringLen(str) >= 10) && ($.stringEqual($.sliceStringOrBytes(str, undefined, 10), "ExampleMsg")))
 
 	// MarshalProtoText must also be synchronous.
 	let text = __goscript_protobuf_string_sync_pb_ts.ExampleMsg.prototype.MarshalProtoText.call(msg)
-	await $.println("text len:", $.len(text))
+	await $.println("text len:", $.stringLen(text))
 	await $.println("text:", text)
 
 	// fmt.Sprintf uses String() internally; a Promise would break formatting.
 	let formatted = await fmt.Sprintf("msg=%v", $.interfaceValue(msg, "*main.ExampleMsg", /* @__PURE__ */ $.pointerType("main.ExampleMsg")))
-	await $.println("formatted len:", $.len(formatted))
+	await $.println("formatted len:", $.stringLen(formatted))
 }
 
 if ($.isMainScript(import.meta)) {

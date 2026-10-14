@@ -79,9 +79,9 @@ export async function main(): globalThis.Promise<void> {
 	// Test SplitList
 	let pathList = "/usr/bin:/usr/local/bin:/bin"
 	let split: $.Slice<string> = filepath.SplitList(pathList)
-	await $.println("SplitList length:", $.len(split))
-	for (let __goscriptRangeTarget0 = split, i = 0; i < $.len(__goscriptRangeTarget0); i++) {
-		let p = __goscriptRangeTarget0![i]
+	await $.println("SplitList length:", $.sliceLen(split))
+	for (let __goscriptRangeTarget0 = split, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), i = 0; i < __goscriptRangeWindow0.length; i++) {
+		let p = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + i] as string)
 		await $.println("SplitList", i, ":", p)
 	}
 

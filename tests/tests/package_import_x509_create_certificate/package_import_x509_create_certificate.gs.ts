@@ -99,7 +99,7 @@ export async function main(): globalThis.Promise<void> {
 	let der: $.Slice<number> = __goscriptTuple2[0]
 	err = __goscriptTuple2[1]
 	await $.println("create err nil", err == null)
-	await $.println("der nonempty", $.len(der) != 0)
+	await $.println("der nonempty", $.sliceLen(der) != 0)
 	if (err != null) {
 		await $.println("create error", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 		return
@@ -114,12 +114,12 @@ export async function main(): globalThis.Promise<void> {
 		return
 	}
 	let keyExt: pkix.Extension = $.markAsStructValue(new pkix.Extension())
-	for (let __goscriptRangeTarget1 = $.pointerValue<x509.Certificate>(cert).Extensions, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget1); __rangeIndex++) {
-		let ext = $.markAsStructValue($.cloneStructValue(__goscriptRangeTarget1![__rangeIndex]))
+	for (let __goscriptRangeTarget1 = $.pointerValue<x509.Certificate>(cert).Extensions, __goscriptRangeWindow1 = $.sliceRange(__goscriptRangeTarget1), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow1.length; __rangeIndex++) {
+		let ext = $.markAsStructValue($.cloneStructValue((__goscriptRangeWindow1.backing[__goscriptRangeWindow1.offset + __rangeIndex] as pkix.Extension)))
 		if (asn1.ObjectIdentifier_Equal(ext.Id, (extensionID as asn1.ObjectIdentifier))) {
 			$.assignStruct(keyExt, $.markAsStructValue($.cloneStructValue(ext)))
-			for (let __goscriptRangeTarget0 = $.pointerValue<x509.Certificate>(cert).UnhandledCriticalExtensions, idx = 0; idx < $.len(__goscriptRangeTarget0); idx++) {
-				let unhandled = (__goscriptRangeTarget0![idx] as asn1.ObjectIdentifier)
+			for (let __goscriptRangeTarget0 = $.pointerValue<x509.Certificate>(cert).UnhandledCriticalExtensions, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), idx = 0; idx < __goscriptRangeWindow0.length; idx++) {
+				let unhandled = ((__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + idx] as asn1.ObjectIdentifier) as asn1.ObjectIdentifier)
 				if (asn1.ObjectIdentifier_Equal(unhandled, (extensionID as asn1.ObjectIdentifier))) {
 					$.pointerValue<x509.Certificate>(cert).UnhandledCriticalExtensions = (slices.Delete($.pointerValue<x509.Certificate>(cert).UnhandledCriticalExtensions, idx, idx + 1) as $.Slice<asn1.ObjectIdentifier>)
 					break
@@ -131,7 +131,7 @@ export async function main(): globalThis.Promise<void> {
 	let decoded: $.VarRef<signedKey> = $.varRef($.markAsStructValue(new signedKey()))
 	let __goscriptTuple4: any = await asn1.Unmarshal(keyExt.Value, $.interfaceValue(decoded, "*main.signedKey", /* @__PURE__ */ $.pointerType("main.signedKey")))
 	err = __goscriptTuple4[1]
-	await $.println("extension unmarshal", err == null, $.len(decoded.value.PubKey), $.uint($.arrayIndex(decoded.value.PubKey!, 0), 8), $.uint($.arrayIndex(decoded.value.PubKey!, 5), 8), $.len(decoded.value.Signature))
+	await $.println("extension unmarshal", err == null, $.sliceLen(decoded.value.PubKey), $.uint($.arrayIndex(decoded.value.PubKey!, 0), 8), $.uint($.arrayIndex(decoded.value.PubKey!, 5), 8), $.sliceLen(decoded.value.Signature))
 	let pool: x509.CertPool | $.VarRef<x509.CertPool> | null = x509.NewCertPool()
 	await x509.CertPool.prototype.AddCert.call(pool, cert)
 	let __goscriptTuple5: any = await x509.Certificate.prototype.Verify.call(cert, $.markAsStructValue(new x509.VerifyOptions({Roots: pool})))

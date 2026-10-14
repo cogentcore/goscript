@@ -6,7 +6,7 @@ import * as $ from "@goscript/builtin/index.js"
 export async function main(): globalThis.Promise<void> {
 	let myStr1 = "testing"
 	await $.println("myStr1:", myStr1)
-	await $.println("len(myStr1):", $.len(myStr1))
+	await $.println("len(myStr1):", $.stringLen(myStr1))
 
 	// Basic slicing
 	await $.println("myStr1[0:2]:", $.sliceStringOrBytes(myStr1, 0, 2))
@@ -31,7 +31,7 @@ export async function main(): globalThis.Promise<void> {
 	// 界: E7 95 8C
 	// Combined: E4 BD A0 E5 A5 BD E4 B8 96 E7 95 8C
 	await $.println("myStr2:", myStr2)
-	await $.println("len(myStr2):", $.len(myStr2))
+	await $.println("len(myStr2):", $.stringLen(myStr2))
 
 	// Slice the first character '你' (3 bytes)
 	await $.println("myStr2[0:3]:", $.sliceStringOrBytes(myStr2, 0, 3))

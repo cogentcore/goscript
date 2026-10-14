@@ -7,16 +7,16 @@ export const lookup: string = $.bytesToString(new Uint8Array([0, 255, 7, 228, 18
 
 export async function main(): globalThis.Promise<void> {
 	let myStr1 = "testing"
-	await $.println("Byte from myStr1[0]:", $.uint($.indexStringOrBytes(myStr1, 0), 8))
-	await $.println("Byte from myStr1[2]:", $.uint($.indexStringOrBytes(myStr1, 2), 8))
-	await $.println("Byte from myStr1[6]:", $.uint($.indexStringOrBytes(myStr1, 6), 8))
+	await $.println("Byte from myStr1[0]:", $.uint($.indexString(myStr1, 0), 8))
+	await $.println("Byte from myStr1[2]:", $.uint($.indexString(myStr1, 2), 8))
+	await $.println("Byte from myStr1[6]:", $.uint($.indexString(myStr1, 6), 8))
 
 	let myStr2 = "你好世界"
 	// String indexing returns UTF-8 bytes, not Unicode code points.
-	await $.println("Byte from myStr2[0]:", $.uint($.indexStringOrBytes(myStr2, 0), 8))
-	await $.println("Byte from myStr2[1]:", $.uint($.indexStringOrBytes(myStr2, 1), 8))
-	await $.println("Byte from myStr2[2]:", $.uint($.indexStringOrBytes(myStr2, 2), 8))
-	await $.println("Byte from myStr2[3]:", $.uint($.indexStringOrBytes(myStr2, 3), 8))
+	await $.println("Byte from myStr2[0]:", $.uint($.indexString(myStr2, 0), 8))
+	await $.println("Byte from myStr2[1]:", $.uint($.indexString(myStr2, 1), 8))
+	await $.println("Byte from myStr2[2]:", $.uint($.indexString(myStr2, 2), 8))
+	await $.println("Byte from myStr2[3]:", $.uint($.indexString(myStr2, 3), 8))
 
 	// Constant lookup tables preserve invalid UTF-8 and control bytes.
 	for (let i = 0; i < 6; i++) {

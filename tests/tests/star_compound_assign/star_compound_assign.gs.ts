@@ -36,11 +36,11 @@ export class holder {
 }
 
 export function trim(h: holder | $.VarRef<holder> | null): void {
-	$.pointerValue<holder>(h).values!.value = $.goSlice(($.pointerValue<$.Slice<number>>($.pointerValue<holder>(h).values)), undefined, $.len($.pointerValue<$.Slice<number>>($.pointerValue<holder>(h).values)) - 1)
+	$.pointerValue<holder>(h).values!.value = $.goSlice(($.pointerValue<$.Slice<number>>($.pointerValue<holder>(h).values)), undefined, $.sliceLen($.pointerValue<$.Slice<number>>($.pointerValue<holder>(h).values)) - 1)
 }
 
 export function trimParen(h: holder | $.VarRef<holder> | null): void {
-	$.pointerValue<holder>(h).values!.value = $.goSlice(($.pointerValue<$.Slice<number>>($.pointerValue<holder>(h).values)), undefined, $.len($.pointerValue<$.Slice<number>>($.pointerValue<holder>(h).values)) - 1)
+	$.pointerValue<holder>(h).values!.value = $.goSlice(($.pointerValue<$.Slice<number>>($.pointerValue<holder>(h).values)), undefined, $.sliceLen($.pointerValue<$.Slice<number>>($.pointerValue<holder>(h).values)) - 1)
 }
 
 export async function main(): globalThis.Promise<void> {
@@ -72,9 +72,9 @@ export async function main(): globalThis.Promise<void> {
 	let values: $.VarRef<$.Slice<number>> = $.varRef($.arrayToSlice<number>([1, 2, 3, 4]))
 	let h: holder | $.VarRef<holder> | null = new holder({values: values})
 	trim(h)
-	await $.println("len after star:", $.len($.pointerValue<$.Slice<number>>($.pointerValue<holder>(h).values)))
+	await $.println("len after star:", $.sliceLen($.pointerValue<$.Slice<number>>($.pointerValue<holder>(h).values)))
 	trimParen(h)
-	await $.println("len after paren star:", $.len($.pointerValue<$.Slice<number>>($.pointerValue<holder>(h).values)))
+	await $.println("len after paren star:", $.sliceLen($.pointerValue<$.Slice<number>>($.pointerValue<holder>(h).values)))
 }
 
 if ($.isMainScript(import.meta)) {

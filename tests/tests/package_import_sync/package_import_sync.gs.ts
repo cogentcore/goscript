@@ -186,7 +186,7 @@ export class queue {
 		using __defer = new $.DisposableStack()
 		await queue.prototype.lockAndInit.call(q)
 		__defer.defer(() => { $.pointerValue<queue>(q).Mu.Unlock() })
-		while ($.len($.pointerValue<queue>(q).items) == 0) {
+		while ($.sliceLen($.pointerValue<queue>(q).items) == 0) {
 			await $.pointerValue<queue>(q).Cond.Wait()
 		}
 		let v = $.arrayIndex($.pointerValue<queue>(q).items!, 0)

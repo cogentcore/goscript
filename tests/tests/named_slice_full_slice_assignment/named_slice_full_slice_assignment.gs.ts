@@ -20,7 +20,7 @@ $.registerNamedValueType(
 );
 
 export function filters_size(f: filters): number {
-	return $.len((f as filters))
+	return $.sliceLen((f as filters))
 }
 
 export async function main(): globalThis.Promise<void> {
@@ -31,12 +31,12 @@ export async function main(): globalThis.Promise<void> {
 		let c: filters = (__goscriptTuple0[0] as filters)
 		let ok = __goscriptTuple0[1]
 		if (ok) {
-			out = ($.goSlice(c, undefined, $.len((c as filters)), $.len((c as filters))) as filters)
+			out = ($.goSlice(c, undefined, $.sliceLen((c as filters)), $.sliceLen((c as filters))) as filters)
 		}
 	}
 	let raw: $.Slice<number> = $.arrayToSlice<number>([4, 5])
 	let size = filters_size((raw as filters))
-	await $.println("len:", $.len((out as filters)))
+	await $.println("len:", $.sliceLen((out as filters)))
 	await $.println("cap:", $.cap((out as filters)))
 	await $.println("size:", size)
 }

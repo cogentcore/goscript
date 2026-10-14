@@ -97,8 +97,8 @@ export async function main(): globalThis.Promise<void> {
 	allMessages = $.append(allMessages, $.markAsStructValue(new Message({priority: 100, text: "Main: All workers completed"})))
 
 	// Sort messages by priority for deterministic order
-	for (let __goscriptRangeTarget0 = allMessages, i = 0; i < $.len(__goscriptRangeTarget0); i++) {
-		for (let j = i + 1; j < $.len(allMessages); j++) {
+	for (let __goscriptRangeTarget0 = allMessages, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), i = 0; i < __goscriptRangeWindow0.length; i++) {
+		for (let j = i + 1; j < $.sliceLen(allMessages); j++) {
 			if ($.arrayIndex(allMessages!, i).priority > $.arrayIndex(allMessages!, j).priority) {
 				let __goscriptAssign0_0: Message = $.markAsStructValue($.cloneStructValue($.arrayIndex(allMessages!, j)))
 				let __goscriptAssign0_1: Message = $.markAsStructValue($.cloneStructValue($.arrayIndex(allMessages!, i)))
@@ -109,8 +109,8 @@ export async function main(): globalThis.Promise<void> {
 	}
 
 	// Print all messages in deterministic order
-	for (let __goscriptRangeTarget1 = allMessages, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget1); __rangeIndex++) {
-		let msg = $.markAsStructValue($.cloneStructValue(__goscriptRangeTarget1![__rangeIndex]))
+	for (let __goscriptRangeTarget1 = allMessages, __goscriptRangeWindow1 = $.sliceRange(__goscriptRangeTarget1), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow1.length; __rangeIndex++) {
+		let msg = $.markAsStructValue($.cloneStructValue((__goscriptRangeWindow1.backing[__goscriptRangeWindow1.offset + __rangeIndex] as Message)))
 		await $.println(msg.priority, msg.text)
 	}
 	await $.println("done")

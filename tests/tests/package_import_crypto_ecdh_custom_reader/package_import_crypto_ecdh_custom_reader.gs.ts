@@ -60,10 +60,10 @@ export class segmentedReader {
 
 	public Read(p: $.Slice<number>): [number, $.GoError] {
 		let r: segmentedReader | $.VarRef<segmentedReader> | null = this;
-		if ($.pointerValue<segmentedReader>(r).offset >= $.len($.pointerValue<segmentedReader>(r).data)) {
+		if ($.pointerValue<segmentedReader>(r).offset >= $.sliceLen($.pointerValue<segmentedReader>(r).data)) {
 			return [0, io.EOF]
 		}
-		let n = (() => { const __goscriptMinMax0 = $.pointerValue<segmentedReader>(r).step; const __goscriptMinMax1 = $.len(p); const __goscriptMinMax2 = $.len($.pointerValue<segmentedReader>(r).data) - $.pointerValue<segmentedReader>(r).offset; let __goscriptMinMax3 = __goscriptMinMax0; __goscriptMinMax3 = $.min(__goscriptMinMax3, __goscriptMinMax1); __goscriptMinMax3 = $.min(__goscriptMinMax3, __goscriptMinMax2); return __goscriptMinMax3 })()
+		let n = (() => { const __goscriptMinMax0 = $.pointerValue<segmentedReader>(r).step; const __goscriptMinMax1 = $.sliceLen(p); const __goscriptMinMax2 = $.sliceLen($.pointerValue<segmentedReader>(r).data) - $.pointerValue<segmentedReader>(r).offset; let __goscriptMinMax3 = __goscriptMinMax0; __goscriptMinMax3 = $.min(__goscriptMinMax3, __goscriptMinMax1); __goscriptMinMax3 = $.min(__goscriptMinMax3, __goscriptMinMax2); return __goscriptMinMax3 })()
 		$.copy(p, $.goSlice($.pointerValue<segmentedReader>(r).data, $.pointerValue<segmentedReader>(r).offset, $.pointerValue<segmentedReader>(r).offset + n))
 		$.pointerValue<segmentedReader>(r).offset = $.pointerValue<segmentedReader>(r).offset + (n)
 		return [n, null]
@@ -118,7 +118,7 @@ export async function main(): globalThis.Promise<void> {
 	let err = __goscriptTuple0[1]
 	await $.println("deterministic err nil", err == null)
 	await $.println("deterministic private matches", bytes.Equal(ecdh.PrivateKey.prototype.Bytes.call($.pointerValue<ecdh.PrivateKey>(deterministic)), $.goSlice(deterministicBytes, undefined, 32)))
-	await $.println("deterministic public len", $.len(ecdh.PublicKey.prototype.Bytes.call($.pointerValue<ecdh.PublicKey>(ecdh.PrivateKey.prototype.PublicKey.call($.pointerValue<ecdh.PrivateKey>(deterministic))))))
+	await $.println("deterministic public len", $.sliceLen(ecdh.PublicKey.prototype.Bytes.call($.pointerValue<ecdh.PublicKey>(ecdh.PrivateKey.prototype.PublicKey.call($.pointerValue<ecdh.PrivateKey>(deterministic))))))
 
 	let segmentedBytes: $.Slice<number> = bytes.Repeat(new Uint8Array([43]) as $.Slice<number>, 64)
 	let __goscriptTuple1: any = await $.pointerValue<Exclude<ecdh.Curve, null>>(ecdh.X25519()).GenerateKey($.pointerValueOrNil($.interfaceValue<io.Reader | null>(new segmentedReader({data: segmentedBytes, step: 5}), "*main.segmentedReader", /* @__PURE__ */ $.pointerType("main.segmentedReader")))!)
@@ -126,7 +126,7 @@ export async function main(): globalThis.Promise<void> {
 	err = __goscriptTuple1[1]
 	await $.println("segmented err nil", err == null)
 	await $.println("segmented private matches", bytes.Equal(ecdh.PrivateKey.prototype.Bytes.call($.pointerValue<ecdh.PrivateKey>(segmented)), $.goSlice(segmentedBytes, undefined, 32)))
-	await $.println("segmented public len", $.len(ecdh.PublicKey.prototype.Bytes.call($.pointerValue<ecdh.PublicKey>(ecdh.PrivateKey.prototype.PublicKey.call($.pointerValue<ecdh.PrivateKey>(segmented))))))
+	await $.println("segmented public len", $.sliceLen(ecdh.PublicKey.prototype.Bytes.call($.pointerValue<ecdh.PublicKey>(ecdh.PrivateKey.prototype.PublicKey.call($.pointerValue<ecdh.PrivateKey>(segmented))))))
 
 	let __goscriptTuple2: any = await $.pointerValue<Exclude<ecdh.Curve, null>>(ecdh.X25519()).GenerateKey($.pointerValueOrNil($.interfaceValue<io.Reader | null>(bytes.NewReader($.goSlice(deterministicBytes, undefined, 31)), "*bytes.Reader", /* @__PURE__ */ $.pointerType("bytes.Reader")))!)
 	let short: ecdh.PrivateKey | $.VarRef<ecdh.PrivateKey> | null = __goscriptTuple2[0]

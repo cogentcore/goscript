@@ -49,7 +49,7 @@ export class AppBase {
 
 	public async FirstName(__typeArgs: $.GenericTypeArgs | undefined): globalThis.Promise<string> {
 		const a: AppBase | $.VarRef<AppBase> | null = this;
-		if ($.len($.pointerValue<AppBase>(a).Windows) == 0) {
+		if ($.sliceLen($.pointerValue<AppBase>(a).Windows) == 0) {
 			return ""
 		}
 		return $.callGenericMethod(__typeArgs, "W", "Name", $.arrayIndex($.pointerValue<AppBase>(a).Windows!, 0))
@@ -57,7 +57,7 @@ export class AppBase {
 
 	public Window(__typeArgs: $.GenericTypeArgs | undefined): Window | null {
 		const a: AppBase | $.VarRef<AppBase> | null = this;
-		if ($.len($.pointerValue<AppBase>(a).Windows) == 0) {
+		if ($.sliceLen($.pointerValue<AppBase>(a).Windows) == 0) {
 			return null
 		}
 		return $.typeParamInterfaceValue<Window | null>($.arrayIndex($.pointerValue<AppBase>(a).Windows!, 0), __typeArgs?.["W"] ?? { type: { kind: $.TypeKind.Interface, methods: [$.methodSignature("Name", [], [/* @__PURE__ */ $.basicType("string")])] }, zero: () => null })

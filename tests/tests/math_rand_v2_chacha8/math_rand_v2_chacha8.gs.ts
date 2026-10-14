@@ -11,7 +11,7 @@ import "@goscript/math/rand/v2/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	let seed: Uint8Array = $.arrayValue(new Uint8Array(32))
-	for (let __goscriptRangeTarget0 = seed, i = 0; i < $.len(__goscriptRangeTarget0); i++) {
+	for (let __goscriptRangeTarget0 = seed, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), i = 0; i < __goscriptRangeWindow0.length; i++) {
 		seed[i] = $.uint($.uint(i + 1, 8), 8)
 	}
 	let r: rand.ChaCha8 | $.VarRef<rand.ChaCha8> | null = rand.NewChaCha8($.cloneArrayValue(seed, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 32)))
@@ -30,9 +30,9 @@ export async function main(): globalThis.Promise<void> {
 	if (err != null) {
 		$.panic((err as any))
 	}
-	await $.println($.len(b))
-	for (let __goscriptRangeTarget1 = b, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget1); __rangeIndex++) {
-		let v = $.uint(__goscriptRangeTarget1![__rangeIndex], 8)
+	await $.println($.sliceLen(b))
+	for (let __goscriptRangeTarget1 = b, __goscriptRangeWindow1 = $.sliceRange(__goscriptRangeTarget1), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow1.length; __rangeIndex++) {
+		let v = $.uint((__goscriptRangeWindow1.backing[__goscriptRangeWindow1.offset + __rangeIndex] as number), 8)
 		await $.println($.uint(v, 8))
 	}
 	let r2: rand.ChaCha8 | $.VarRef<rand.ChaCha8> | null = rand.NewChaCha8($.cloneArrayValue(seed, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 32)))
