@@ -7,7 +7,7 @@ export async function main(): globalThis.Promise<void> {
 	let s = "abc"
 	for (let [__rangeIndex, c] of $.rangeString(s)) {
 		if ($.int(c, 32) >= 97) {
-			c = $.int((c - 97) + 10, 32)
+			c = $.int((((((c - 97) | 0)) + 10) | 0), 32)
 		}
 		await $.println($.int(c))
 	}

@@ -31,10 +31,10 @@ export class attrs {
 		}
 		let bytes: $.Slice<number> = $.stringToBytes(a.packedData)
 		while ($.len(bytes) > 0) {
-			let kn: number = $.uint(4 + $.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.LittleEndian))).Uint32($.goSlice(bytes, undefined, 4)), 32)
+			let kn: number = $.uint(((4 + $.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.LittleEndian))).Uint32($.goSlice(bytes, undefined, 4))) >>> 0), 32)
 			let k = $.bytesToString($.goSlice(bytes, 4, kn))
 			bytes = $.goSlice(bytes, kn, undefined)
-			let vn: number = $.uint(4 + $.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.LittleEndian))).Uint32($.goSlice(bytes, undefined, 4)), 32)
+			let vn: number = $.uint(((4 + $.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.LittleEndian))).Uint32($.goSlice(bytes, undefined, 4))) >>> 0), 32)
 			let v = $.bytesToString($.goSlice(bytes, 4, vn))
 			bytes = $.goSlice(bytes, vn, undefined)
 			result = $.append(result, $.concatString(($.concatString(k, "=")), v))

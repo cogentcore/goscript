@@ -23,14 +23,14 @@ export class bitset {
 	public has(bit: number): boolean {
 		const b: bitset | $.VarRef<bitset> | null = this;
 		let entry = $.indexRef($.pointerValue<bitset>(b).bits, globalThis.Math.trunc(bit / 8))
-		let mask = $.uint($.uint(1, 8) << (bit % 8), 8)
+		let mask = $.uint((($.uint(1, 8) << (bit % 8)) & 0xff), 8)
 		return $.uint(($.pointerValue<number>(entry) & mask), 8) != 0
 	}
 
 	public ["set"](bit: number): void {
 		const b: bitset | $.VarRef<bitset> | null = this;
 		let entry = $.indexRef($.pointerValue<bitset>(b).bits, globalThis.Math.trunc(bit / 8))
-		let mask = $.uint($.uint(1, 8) << (bit % 8), 8)
+		let mask = $.uint((($.uint(1, 8) << (bit % 8)) & 0xff), 8)
 		entry!.value = entry!.value | ($.uint(mask, 8))
 	}
 
