@@ -12,6 +12,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"regexp"
 	"runtime"
 	"slices"
 	"sort"
@@ -11736,13 +11737,38 @@ func (o *LoweringOwner) lowerAssignmentTarget(
 		if element, ok := rangeWindowElement(ctx, typed); ok {
 			return element, nil
 		}
+
+		// The target and index lower as values.
 		target, targetDiagnostics := o.lowerExpr(ctx, typed.X)
 		index, indexDiagnostics := o.lowerExpr(ctx, typed.Index)
 		diagnostics := append(targetDiagnostics, indexDiagnostics...)
+
+		// A slice element is written in its backing array; an array element
+		// in the array itself.
+		if _, ok := types.Unalias(targetType).Underlying().(*types.Slice); ok {
+			return o.lowerSliceElementTarget(ctx, typed, target, targetType, index), diagnostics
+		}
 		return o.lowerIndexTarget(ctx, target, targetType) + "[" + o.lowerNumberIndexValue(ctx, typed.Index, index) + "]", diagnostics
 	default:
 		return o.lowerExpr(ctx, expr)
 	}
+}
+
+// lowerSliceElementTarget returns the assignable reference to element index of
+// the slice target: the slot of its backing array at its offset in the
+// slice's window.
+func (o *LoweringOwner) lowerSliceElementTarget(ctx lowerFileContext, expr *ast.IndexExpr, target string, targetType types.Type, index string) string {
+	slice := o.lowerIndexTarget(ctx, target, targetType)
+	indexValue := o.lowerNumberIndexValue(ctx, expr.Index, index)
+
+	// A slice that can be evaluated twice names its backing array and slot.
+	if isSimpleLoweredOperand(target) {
+		return o.runtimeOwner.QualifiedHelper(RuntimeHelperSliceElems) + "(" + slice + ")[" +
+			o.runtimeOwner.QualifiedHelper(RuntimeHelperSliceSlot) + "(" + slice + ", " + indexValue + ")]"
+	}
+
+	// Any other slice is evaluated once, through a reference to the element.
+	return o.runtimeOwner.QualifiedHelper(RuntimeHelperIndexRef) + "(" + slice + ", " + indexValue + ").value"
 }
 
 func (o *LoweringOwner) lowerAddressExpr(ctx lowerFileContext, expr ast.Expr) (string, []Diagnostic) {
@@ -16792,3 +16818,34 @@ func isTypeParamType(typ types.Type) bool {
 	_, ok := types.Unalias(typ).(*types.TypeParam)
 	return ok
 }
+
+// isSimpleLoweredOperand reports whether a lowered expression can be
+// evaluated twice: identifiers, property reads, non-null assertions and calls
+// of pure runtime readers.
+func isSimpleLoweredOperand(value string) bool {
+	// An await may resolve to something else the second time.
+	if value == "" || strings.Contains(value, "await") {
+		return false
+	}
+
+	// The only calls are of runtime readers without side effects.
+	for _, call := range simpleOperandCalls.FindAllStringSubmatch(value, -1) {
+		switch call[1] {
+		case "$.pointerValue", "$.pointerTarget", "$.arrayIndex":
+		default:
+			return false
+		}
+	}
+
+	// The rest is names, property reads, indexes and assertions.
+	for _, r := range value {
+		if strings.ContainsRune("_$.!()<>, |[]", r) || (r >= 'a' && r <= 'z') || (r >= 'A' && r <= 'Z') || (r >= '0' && r <= '9') {
+			continue
+		}
+		return false
+	}
+	return true
+}
+
+// simpleOperandCalls matches the callee of each call in a lowered expression.
+var simpleOperandCalls = regexp.MustCompile(`([\w$.]+)(?:<[^()]*>)?\(`)
