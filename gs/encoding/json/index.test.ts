@@ -1026,6 +1026,27 @@ describe('encoding/json override', () => {
     expect($.bytesToString(sliceTarget.value[1])).toBe('"raw"')
   })
 
+  it('decodes jsontext.Value, the Go 1.27 spelling of json.RawMessage', () => {
+    // With encoding/json v2 (the default since Go 1.27), json.RawMessage is
+    // an alias for jsontext.Value, so the target carries that spelling.
+    const mapTarget = $.varRef<Map<string, Uint8Array> | null>(new Map())
+    mapTarget.__goType = '*map[string]jsontext.Value'
+    expect(
+      Unmarshal($.stringToBytes('{"a":[{"x":1},2],"b":"raw"}'), mapTarget),
+    ).toBeNull()
+    expect($.bytesToString(mapTarget.value!.get('a')!)).toBe('[{"x":1},2]')
+    expect($.bytesToString(mapTarget.value!.get('b')!)).toBe('"raw"')
+
+    // A slice of raw values keeps each element's text.
+    const sliceTarget = $.varRef<Uint8Array[]>([])
+    sliceTarget.__goType = '*[]jsontext.Value'
+    expect(
+      Unmarshal($.stringToBytes('[{"x":1},"raw"]'), sliceTarget),
+    ).toBeNull()
+    expect($.bytesToString(sliceTarget.value[0])).toBe('{"x":1}')
+    expect($.bytesToString(sliceTarget.value[1])).toBe('"raw"')
+  })
+
   it('encodes JSON to an io.Writer with newline, indentation, and HTML escaping', () => {
     const chunks: string[] = []
     const writer = {
