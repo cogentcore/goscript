@@ -74,7 +74,7 @@ export class _object {
 
 	public next(): entry | $.VarRef<entry> | null {
 		let o: _object | $.VarRef<_object> | null = this;
-		const o$ = $.pointerTarget<_object>(o)
+		const o$: _object = o == null ? $.pointerTarget<_object>(o) : (o as any).__isVarRef === true ? (o as any).value : (o as any).__goValue === undefined ? (o as any) : $.pointerTarget<_object>(o)
 		if ($.cap((o$ as _object).entries) > $.sliceLen((o$ as _object).entries)) {
 			;(o$ as _object).entries = $.goSlice((o$ as _object).entries, undefined, $.sliceLen((o$ as _object).entries) + 1)
 		} else {

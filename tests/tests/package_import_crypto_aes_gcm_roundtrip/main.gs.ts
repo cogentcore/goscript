@@ -135,7 +135,7 @@ export class nestedSealer {
 
 	public async Seal(dst: $.Slice<number>, plaintext: $.Slice<number>): globalThis.Promise<$.Slice<number>> {
 		const s: nestedSealer | $.VarRef<nestedSealer> | null = this;
-		const s$ = $.pointerTarget<nestedSealer>(s)
+		const s$: nestedSealer = s == null ? $.pointerTarget<nestedSealer>(s) : (s as any).__isVarRef === true ? (s as any).value : (s as any).__goValue === undefined ? (s as any) : $.pointerTarget<nestedSealer>(s)
 		return $.pointerValue<Exclude<cipher.AEAD, null>>((s$ as nestedSealer).aead).Seal(dst, (s$ as nestedSealer).nonce, plaintext, (s$ as nestedSealer).aad)
 	}
 

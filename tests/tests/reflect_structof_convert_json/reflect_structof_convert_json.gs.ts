@@ -82,8 +82,9 @@ export function __goscript_set_calls(__goscriptValue: number): void {
 
 export async function main(): globalThis.Promise<void> {
 	let n: Node | $.VarRef<Node> | null = new Node()
+	let n$: Node = n == null ? $.pointerTarget<Node>(n) : (n as any).__isVarRef === true ? (n as any).value : (n as any).__goValue === undefined ? (n as any) : $.pointerTarget<Node>(n)
 	let err = await json.Unmarshal(new Uint8Array([123, 34, 78, 97, 109, 101, 34, 58, 34, 97, 34, 44, 34, 83, 105, 122, 101, 34, 58, 51, 125]), $.interfaceValue(n, "*main.Node", /* @__PURE__ */ $.pointerType("main.Node")))
-	await $.println(err == null, calls, $.pointerValue<Node>(n).Name, $.pointerValue<Node>(n).Size)
+	await $.println(err == null, calls, (n$ as Node).Name, (n$ as Node).Size)
 	let anyN: any = $.interfaceValue(n, "*main.Node", /* @__PURE__ */ $.pointerType("main.Node"))
 	let [, ok] = $.typeAssertTuple<json.Unmarshaler | null>(anyN, "json.Unmarshaler")
 	await $.println(ok, (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf(anyN)).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))

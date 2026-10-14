@@ -371,7 +371,7 @@ export class memoryRpcStream {
 
 	public async Close(): globalThis.Promise<$.GoError> {
 		const m: memoryRpcStream | $.VarRef<memoryRpcStream> | null = this;
-		const m$ = $.pointerTarget<memoryRpcStream>(m)
+		const m$: memoryRpcStream = m == null ? $.pointerTarget<memoryRpcStream>(m) : (m as any).__isVarRef === true ? (m as any).value : (m as any).__goValue === undefined ? (m as any) : $.pointerTarget<memoryRpcStream>(m)
 		await memoryRpcStream.prototype.CloseSend.call(m)
 		await (m$ as memoryRpcStream).cancelLocal.Do($.functionValue(async (): globalThis.Promise<void> => {
 			await (m$ as memoryRpcStream).cancel!()
@@ -381,7 +381,7 @@ export class memoryRpcStream {
 
 	public async CloseSend(): globalThis.Promise<$.GoError> {
 		const m: memoryRpcStream | $.VarRef<memoryRpcStream> | null = this;
-		const m$ = $.pointerTarget<memoryRpcStream>(m)
+		const m$: memoryRpcStream = m == null ? $.pointerTarget<memoryRpcStream>(m) : (m as any).__isVarRef === true ? (m as any).value : (m as any).__goValue === undefined ? (m as any) : $.pointerTarget<memoryRpcStream>(m)
 		await (m$ as memoryRpcStream).closeSend.Do($.functionValue((): void => {
 			void (m$ as memoryRpcStream).send!.close()
 		}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)))
@@ -424,7 +424,7 @@ export class memoryRpcStream {
 
 	public async Recv(): globalThis.Promise<[rpcstream.RpcStreamPacket | $.VarRef<rpcstream.RpcStreamPacket> | null, $.GoError]> {
 		const m: memoryRpcStream | $.VarRef<memoryRpcStream> | null = this;
-		const m$ = $.pointerTarget<memoryRpcStream>(m)
+		const m$: memoryRpcStream = m == null ? $.pointerTarget<memoryRpcStream>(m) : (m as any).__isVarRef === true ? (m as any).value : (m as any).__goValue === undefined ? (m as any) : $.pointerTarget<memoryRpcStream>(m)
 		const [__goscriptSelect0HasReturn, __goscriptSelect0Value] = await $.selectStatement<any, [rpcstream.RpcStreamPacket | $.VarRef<rpcstream.RpcStreamPacket> | null, $.GoError]>([
 			{
 				id: 0,
@@ -457,7 +457,7 @@ export class memoryRpcStream {
 
 	public async Send(pkt: rpcstream.RpcStreamPacket | $.VarRef<rpcstream.RpcStreamPacket> | null): globalThis.Promise<$.GoError> {
 		const m: memoryRpcStream | $.VarRef<memoryRpcStream> | null = this;
-		const m$ = $.pointerTarget<memoryRpcStream>(m)
+		const m$: memoryRpcStream = m == null ? $.pointerTarget<memoryRpcStream>(m) : (m as any).__isVarRef === true ? (m as any).value : (m as any).__goValue === undefined ? (m as any) : $.pointerTarget<memoryRpcStream>(m)
 		const [__goscriptSelect1HasReturn, __goscriptSelect1Value] = await $.selectStatement<any, $.GoError>([
 			{
 				id: 0,
@@ -596,9 +596,10 @@ export async function recvOne(__typeArgs: $.GenericTypeArgs | undefined, strm: s
 
 export function newMemoryRpcContext(): [memoryRpcContext | $.VarRef<memoryRpcContext> | null, (() => void) | null] {
 	let ctx: memoryRpcContext | $.VarRef<memoryRpcContext> | null = new memoryRpcContext({done: $.makeChannel<{}>(0, {}, "both")})
+	let ctx$: memoryRpcContext = ctx == null ? $.pointerTarget<memoryRpcContext>(ctx) : (ctx as any).__isVarRef === true ? (ctx as any).value : (ctx as any).__goValue === undefined ? (ctx as any) : $.pointerTarget<memoryRpcContext>(ctx)
 	return [ctx, $.functionValue(async (): globalThis.Promise<void> => {
-		await $.pointerValue<memoryRpcContext>(ctx).once.Do($.functionValue((): void => {
-			$.pointerValue<memoryRpcContext>(ctx).done!.close()
+		await (ctx$ as memoryRpcContext).once.Do($.functionValue((): void => {
+			void (ctx$ as memoryRpcContext).done!.close()
 		}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)))
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo))]
 }

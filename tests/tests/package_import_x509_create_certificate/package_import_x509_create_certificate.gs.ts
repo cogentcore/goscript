@@ -116,20 +116,21 @@ export async function main(): globalThis.Promise<void> {
 	let __goscriptTuple3: any = await x509.ParseCertificate(der)
 	let cert: x509.Certificate | $.VarRef<x509.Certificate> | null = __goscriptTuple3[0]
 	err = __goscriptTuple3[1]
+	let cert$: x509.Certificate = cert == null ? $.pointerTarget<x509.Certificate>(cert) : (cert as any).__isVarRef === true ? (cert as any).value : (cert as any).__goValue === undefined ? (cert as any) : $.pointerTarget<x509.Certificate>(cert)
 	await $.println("parse err nil", err == null)
 	if (err != null) {
 		await $.println("parse error", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		return
 	}
 	let keyExt: pkix.Extension = new pkix.Extension(undefined, true)
-	for (let __goscriptRangeTarget1 = $.pointerValue<x509.Certificate>(cert).Extensions, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget1), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
+	for (let __goscriptRangeTarget1 = (cert$ as x509.Certificate).Extensions, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget1), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
 		let ext = ((__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as pkix.Extension)).clone()
 		if (asn1.ObjectIdentifier_Equal(ext.Id, (extensionID as asn1.ObjectIdentifier))) {
 			$.assignStruct(keyExt, ext)
-			for (let __goscriptRangeTarget0 = $.pointerValue<x509.Certificate>(cert).UnhandledCriticalExtensions, __goscriptRangeWindow1 = $.sliceRange(__goscriptRangeTarget0), idx = 0; idx < __goscriptRangeWindow1.length; idx++) {
+			for (let __goscriptRangeTarget0 = (cert$ as x509.Certificate).UnhandledCriticalExtensions, __goscriptRangeWindow1 = $.sliceRange(__goscriptRangeTarget0), idx = 0; idx < __goscriptRangeWindow1.length; idx++) {
 				let unhandled = ((__goscriptRangeWindow1.backing[__goscriptRangeWindow1.offset + idx] as asn1.ObjectIdentifier) as asn1.ObjectIdentifier)
 				if (asn1.ObjectIdentifier_Equal(unhandled, (extensionID as asn1.ObjectIdentifier))) {
-					$.pointerValue<x509.Certificate>(cert).UnhandledCriticalExtensions = (slices.Delete($.pointerValue<x509.Certificate>(cert).UnhandledCriticalExtensions, idx, idx + 1) as $.Slice<asn1.ObjectIdentifier>)
+					;(cert$ as x509.Certificate).UnhandledCriticalExtensions = (slices.Delete((cert$ as x509.Certificate).UnhandledCriticalExtensions, idx, idx + 1) as $.Slice<asn1.ObjectIdentifier>)
 					break
 				}
 			}
@@ -174,12 +175,12 @@ export async function main(): globalThis.Promise<void> {
 		return
 	}
 
-	await $.println("serial", await big.Int.prototype.String.call($.pointerValue<x509.Certificate>(cert).SerialNumber))
-	await $.println("common name", $.pointerValue<x509.Certificate>(cert).Subject.CommonName)
-	await $.println("organization", $.arrayIndex($.pointerValue<x509.Certificate>(cert).Subject.Organization!, 0))
-	await $.println("signature algorithm", x509.SignatureAlgorithm_String($.pointerValue<x509.Certificate>(cert).SignatureAlgorithm))
-	await $.println("public key algorithm", x509.PublicKeyAlgorithm_String($.pointerValue<x509.Certificate>(cert).PublicKeyAlgorithm))
-	await $.println("public key equal", ed25519.PublicKey_Equal($.mustTypeAssert<ed25519.PublicKey>($.pointerValue<x509.Certificate>(cert).PublicKey, /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"), "ed25519.PublicKey")), $.namedValueInterfaceValue<crypto.PublicKey | null>(pub, "ed25519.PublicKey", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2())))
+	await $.println("serial", await big.Int.prototype.String.call((cert$ as x509.Certificate).SerialNumber))
+	await $.println("common name", (cert$ as x509.Certificate).Subject.CommonName)
+	await $.println("organization", $.arrayIndex((cert$ as x509.Certificate).Subject.Organization!, 0))
+	await $.println("signature algorithm", x509.SignatureAlgorithm_String((cert$ as x509.Certificate).SignatureAlgorithm))
+	await $.println("public key algorithm", x509.PublicKeyAlgorithm_String((cert$ as x509.Certificate).PublicKeyAlgorithm))
+	await $.println("public key equal", ed25519.PublicKey_Equal($.mustTypeAssert<ed25519.PublicKey>((cert$ as x509.Certificate).PublicKey, /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"), "ed25519.PublicKey")), $.namedValueInterfaceValue<crypto.PublicKey | null>(pub, "ed25519.PublicKey", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2())))
 }
 
 var __goscriptStatic0$value: any

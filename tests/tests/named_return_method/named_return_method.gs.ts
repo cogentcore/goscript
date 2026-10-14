@@ -58,7 +58,7 @@ export class content {
 		const c: content | $.VarRef<content> | null = this;
 		let n: number = 0
 		let err: $.GoError = null! as $.GoError
-		const c$ = $.pointerTarget<content>(c)
+		const c$: content = c == null ? $.pointerTarget<content>(c) : (c as any).__isVarRef === true ? (c as any).value : (c as any).__goValue === undefined ? (c as any) : $.pointerTarget<content>(c)
 		if ((off < 0n) || (off >= $.int64($.sliceLen((c$ as content).bytes)))) {
 			err = null
 			return [n, err]

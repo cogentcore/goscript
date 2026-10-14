@@ -218,26 +218,27 @@ export function readGlobal(r: Region): number {
 
 export async function main(): globalThis.Promise<void> {
 	let s: State | $.VarRef<State> | null = new State({reg: new Region({Start: new Pos({Line: 1, Char: 2}, true), End: new Pos({Line: 1, Char: 10}, true)}, true)})
-	await $.println(width($.pointerValue<State>(s).reg), $.pointerValue<State>(s).reg.Width())
-	await $.println(mutate(($.pointerValue<State>(s).reg).clone()), $.pointerValue<State>(s).reg.Start.Char)
-	await $.println(readAfterStore(($.pointerValue<State>(s).reg).clone(), s), $.pointerValue<State>(s).reg.Start.Char)
-	await $.println(readAfterCall(($.pointerValue<State>(s).reg).clone(), s), $.pointerValue<State>(s).reg.Start.Char)
-	let f: (() => number | globalThis.Promise<number>) | null = later(($.pointerValue<State>(s).reg).clone())
-	$.pointerValue<State>(s).reg.Start.Char = 3
-	await $.println((__goscriptAwait = f!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), $.pointerValue<State>(s).reg.Start.Char)
-	let p: Region | $.VarRef<Region> | null = address(($.pointerValue<State>(s).reg).clone())
+	let s$: State = s == null ? $.pointerTarget<State>(s) : (s as any).__isVarRef === true ? (s as any).value : (s as any).__goValue === undefined ? (s as any) : $.pointerTarget<State>(s)
+	await $.println(width((s$ as State).reg), (s$ as State).reg.Width())
+	await $.println(mutate(((s$ as State).reg).clone()), (s$ as State).reg.Start.Char)
+	await $.println(readAfterStore(((s$ as State).reg).clone(), s), (s$ as State).reg.Start.Char)
+	await $.println(readAfterCall(((s$ as State).reg).clone(), s), (s$ as State).reg.Start.Char)
+	let f: (() => number | globalThis.Promise<number>) | null = later(((s$ as State).reg).clone());
+	;(s$ as State).reg.Start.Char = 3
+	await $.println((__goscriptAwait = f!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (s$ as State).reg.Start.Char)
+	let p: Region | $.VarRef<Region> | null = address(((s$ as State).reg).clone())
 	$.pointerValue<Region>(p).Start.Char = 99
-	await $.println($.pointerValue<State>(s).reg.Start.Char)
+	await $.println((s$ as State).reg.Start.Char)
 	global.reg.Start.Char = 4
 	await $.println(readGlobal((global.reg).clone()), global.reg.Start.Char)
-	let loc = ($.pointerValue<State>(s).reg).clone()
-	await $.println(readAfterCall(loc, s), loc.Start.Char, $.pointerValue<State>(s).reg.Start.Char)
-	let addr = $.varRef(($.pointerValue<State>(s).reg).clone())
+	let loc = ((s$ as State).reg).clone()
+	await $.println(readAfterCall(loc, s), loc.Start.Char, (s$ as State).reg.Start.Char)
+	let addr = $.varRef(((s$ as State).reg).clone())
 	let ap: Region | $.VarRef<Region> | null = addr
 	await $.println(readAfterPointer((addr.value).clone(), ap), addr.value.Start.Char)
-	let g: (() => number | globalThis.Promise<number>) | null = $.markAsStructValue($.cloneStructValue($.pointerValue<State>(s).reg)).Later()
-	$.pointerValue<State>(s).reg.End.Char = 20
-	await $.println((__goscriptAwait = g!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), $.pointerValue<State>(s).reg.Width())
+	let g: (() => number | globalThis.Promise<number>) | null = $.markAsStructValue($.cloneStructValue((s$ as State).reg)).Later();
+	;(s$ as State).reg.End.Char = 20
+	await $.println((__goscriptAwait = g!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (s$ as State).reg.Width())
 }
 
 var __goscriptAwait: any

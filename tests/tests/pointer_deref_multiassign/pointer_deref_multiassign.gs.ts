@@ -66,10 +66,11 @@ export class MyStruct {
 
 export async function main(): globalThis.Promise<void> {
 	let structPointer: MyStruct | $.VarRef<MyStruct> | null = new MyStruct({MyInt: 4, MyString: "hello world"})
+	let structPointer$: MyStruct = structPointer == null ? $.pointerTarget<MyStruct>(structPointer) : (structPointer as any).__isVarRef === true ? (structPointer as any).value : (structPointer as any).__goValue === undefined ? (structPointer as any) : $.pointerTarget<MyStruct>(structPointer)
 	// === Pointer Dereference and Multi-Assignment ===
 	// Dereference structPointer to get a copy of the struct.
 	// Also demonstrates multi-variable assignment and the use of the blank identifier '_'.
-	let dereferencedStructCopy = ($.pointerValue<MyStruct>(structPointer)).clone()
+	let dereferencedStructCopy = ((structPointer$ as MyStruct)).clone()
 	let unusedString = "hello"
 	unusedString
 	dereferencedStructCopy

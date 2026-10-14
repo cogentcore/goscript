@@ -190,6 +190,7 @@ export async function testVarRefConversion(): globalThis.Promise<void> {
 
 export async function main(): globalThis.Promise<void> {
 	let t: transport | $.VarRef<transport> | null = new transport({values: $.makeMap<number, number>()})
+	let t$: transport = t == null ? $.pointerTarget<transport>(t) : (t as any).__isVarRef === true ? (t as any).value : (t as any).__goValue === undefined ? (t as any) : $.pointerTarget<transport>(t)
 	let runner: packetHandlerMap | $.VarRef<packetHandlerMap> | null = $.unsafePointerCast<packetHandlerMap | $.VarRef<packetHandlerMap> | null>(t, packetHandlerMap)
 	transport.prototype.SourceOnly.call(t, 3)
 	let runnerAgainDest: packetHandlerMap | $.VarRef<packetHandlerMap> | null = $.unsafePointerCast<packetHandlerMap | $.VarRef<packetHandlerMap> | null>(t, packetHandlerMap)
@@ -198,9 +199,9 @@ export async function main(): globalThis.Promise<void> {
 	let destinationInterface: connRunner | null = $.interfaceValue<connRunner | null>(runner, "*main.packetHandlerMap", /* @__PURE__ */ $.pointerType("main.packetHandlerMap"))
 	await connRunners_AddConnectionID(runners, 7)
 	let runnerAgain: transport | $.VarRef<transport> | null = $.unsafePointerCast<transport | $.VarRef<transport> | null>(runner, transport)
-	await $.println("source:", $.mapGet<number, number, number>($.pointerValue<transport>(t).values, 3, 0)[0])
+	await $.println("source:", $.mapGet<number, number, number>((t$ as transport).values, 3, 0)[0])
 	await $.println("same destination view:", $.pointerEqual(runner, runnerAgainDest))
-	await $.println("destination:", $.mapGet<number, number, number>($.pointerValue<transport>(t).values, 7, 0)[0])
+	await $.println("destination:", $.mapGet<number, number, number>((t$ as transport).values, 7, 0)[0])
 	await $.println("same pointer:", $.pointerEqual(t, runnerAgain))
 	await $.println("boxed same pointer:", $.pointerEqual(t, runnerAgain))
 	void (__goscriptAwait = $.pointerValue<Exclude<sourceRunner, null>>(sourceInterface).SourceOnly(4), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)

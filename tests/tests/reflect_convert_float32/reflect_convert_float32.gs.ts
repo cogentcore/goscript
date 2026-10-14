@@ -75,14 +75,16 @@ export async function main(): globalThis.Promise<void> {
 	// Setting a float32 rounds to float32 precision, as a Go assignment does.
 	let x = 3.14
 	let s: T | $.VarRef<T> | null = new T({A: "aaa", B: globalThis.Math.fround(x)})
+	let s$: T = s == null ? $.pointerTarget<T>(s) : (s as any).__isVarRef === true ? (s as any).value : (s as any).__goValue === undefined ? (s as any) : $.pointerTarget<T>(s)
 	let d: T | $.VarRef<T> | null = new T()
+	let d$: T = d == null ? $.pointerTarget<T>(d) : (d as any).__isVarRef === true ? (d as any).value : (d as any).__goValue === undefined ? (d as any) : $.pointerTarget<T>(d)
 	let dv = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(d, "*main.T", /* @__PURE__ */ $.pointerType("main.T"))))).Elem()))
 	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(dv)).Field(0))).SetString("aaa")
 	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(dv)).Field(1))).SetFloat(x)
-	await $.println($.pointerValue<T>(s).B == $.pointerValue<T>(d).B, $.stringEqual($.pointerValue<T>(s).A, $.pointerValue<T>(d).A))
+	await $.println((s$ as T).B == (d$ as T).B, $.stringEqual((s$ as T).A, (d$ as T).A))
 	let d2: T | $.VarRef<T> | null = new T()
 	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(d2, "*main.T", /* @__PURE__ */ $.pointerType("main.T"))))).Elem())).Field(1))).Set($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.basicInterfaceValue(x, "float64")))).Convert($.pointerValueOrNil(f32)!))))
-	await $.println($.pointerValue<T>(s).B == $.pointerValue<T>(d2).B)
+	await $.println((s$ as T).B == $.pointerValue<T>(d2).B)
 }
 
 var __goscriptStatic0$value: any

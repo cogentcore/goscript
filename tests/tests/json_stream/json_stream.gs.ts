@@ -64,7 +64,7 @@ export class chanReader {
 
 	public async Read(p: $.Slice<number>): globalThis.Promise<[number, $.GoError]> {
 		let r: chanReader | $.VarRef<chanReader> | null = this;
-		const r$ = $.pointerTarget<chanReader>(r)
+		const r$: chanReader = r == null ? $.pointerTarget<chanReader>(r) : (r as any).__isVarRef === true ? (r as any).value : (r as any).__goValue === undefined ? (r as any) : $.pointerTarget<chanReader>(r)
 		if ($.stringEqual((r$ as chanReader).cur, "")) {
 			let __goscriptRecv0 = await $.chanRecvWithOk((r$ as chanReader).ch)
 			let s = __goscriptRecv0.value
@@ -140,12 +140,13 @@ export class item {
 
 export async function newChanReader(chunks: $.Slice<string>): globalThis.Promise<chanReader | $.VarRef<chanReader> | null> {
 	let r: chanReader | $.VarRef<chanReader> | null = new chanReader({ch: $.makeChannel<string>(0, "", "both")})
+	let r$: chanReader = r == null ? $.pointerTarget<chanReader>(r) : (r as any).__isVarRef === true ? (r as any).value : (r as any).__goValue === undefined ? (r as any) : $.pointerTarget<chanReader>(r)
 	queueMicrotask(async () => { await (async (): globalThis.Promise<void> => {
 		for (let __goscriptRangeTarget0 = chunks, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
 			let c = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as string)
-			await $.chanSend($.pointerValue<chanReader>(r).ch, c)
+			await $.chanSend((r$ as chanReader).ch, c)
 		}
-		$.pointerValue<chanReader>(r).ch!.close()
+		void (r$ as chanReader).ch!.close()
 	})() })
 	return r
 }

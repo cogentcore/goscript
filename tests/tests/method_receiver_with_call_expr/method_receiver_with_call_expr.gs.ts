@@ -76,10 +76,11 @@ export function getProcessor(): ((_p0: State | $.VarRef<State> | null) => void) 
 
 export async function main(): globalThis.Promise<void> {
 	let state: State | $.VarRef<State> | null = new State()
+	let state$: State = state == null ? $.pointerTarget<State>(state) : (state as any).__isVarRef === true ? (state as any).value : (state as any).__goValue === undefined ? (state as any) : $.pointerTarget<State>(state)
 	await State.prototype.Process.call(state)
-	await $.println("value:", $.pointerValue<State>(state).value)
-	let index = $.varRef(7)
-	$.pointerValue<State>(state).index = index
+	await $.println("value:", (state$ as State).value)
+	let index = $.varRef(7);
+	;(state$ as State).index = index
 	State.prototype.markIndex.call(state)
 	await $.println("index:", index.value)
 }

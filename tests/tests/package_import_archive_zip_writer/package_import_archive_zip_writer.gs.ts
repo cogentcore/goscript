@@ -27,19 +27,20 @@ export async function main(): globalThis.Promise<void> {
 	let __goscriptTuple1: any = await zip.NewReader($.interfaceValue<io.ReaderAt | null>(bytes.NewReader(buf.value.Bytes()), "*bytes.Reader", /* @__PURE__ */ $.pointerType("bytes.Reader")), $.int64(buf.value.Len()))
 	let zr: zip.Reader | $.VarRef<zip.Reader> | null = __goscriptTuple1[0]
 	err = __goscriptTuple1[1]
+	let zr$: zip.Reader = zr == null ? $.pointerTarget<zip.Reader>(zr) : (zr as any).__isVarRef === true ? (zr as any).value : (zr as any).__goValue === undefined ? (zr as any) : $.pointerTarget<zip.Reader>(zr)
 	if (err != null) {
 		await $.println("open error", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		return
 	}
-	await $.println("open", err == null, $.sliceLen($.pointerValue<zip.Reader>(zr).File))
-	let __goscriptTuple2: any = await zip.File.prototype.Open.call($.arrayIndex($.pointerValue<zip.Reader>(zr).File!, 0))
+	await $.println("open", err == null, $.sliceLen((zr$ as zip.Reader).File))
+	let __goscriptTuple2: any = await zip.File.prototype.Open.call($.arrayIndex((zr$ as zip.Reader).File!, 0))
 	let rc = __goscriptTuple2[0]
 	err = __goscriptTuple2[1]
 	await $.println("file open", err == null)
 	let __goscriptTuple3: any = await io.ReadAll($.pointerValueOrNil((rc as io.Reader | null))!)
 	let data: $.Slice<number> = __goscriptTuple3[0]
 	err = __goscriptTuple3[1]
-	await $.println("file", $.pointerValue<zip.File>($.arrayIndex($.pointerValue<zip.Reader>(zr).File!, 0)).FileHeader.Name, $.bytesToString(data), err == null)
+	await $.println("file", $.pointerValue<zip.File>($.arrayIndex((zr$ as zip.Reader).File!, 0)).FileHeader.Name, $.bytesToString(data), err == null)
 	err = await $.pointerValue<Exclude<io.ReadCloser, null>>(rc).Close()
 	await $.println("file close", err == null)
 }

@@ -217,7 +217,7 @@ export function makePoint(x: number, y: number, z: number): point | $.VarRef<poi
 }
 
 export function shift(p: point | $.VarRef<point> | null): [point | $.VarRef<point> | null, point | $.VarRef<point> | null, point | $.VarRef<point> | null] {
-	const p$ = $.pointerTarget<point>(p)
+	const p$: point = p == null ? $.pointerTarget<point>(p) : (p as any).__isVarRef === true ? (p as any).value : (p as any).__goValue === undefined ? (p as any) : $.pointerTarget<point>(p)
 	return [new point({x: (p$ as point).x + 1, y: (p$ as point).y}), new point({x: (p$ as point).x + 2, y: (p$ as point).y}), new point({x: (p$ as point).x + 3, y: (p$ as point).y})]
 }
 
@@ -252,7 +252,8 @@ export function span(a: number, b: number, rest: $.Slice<number>): number {
 export async function main(): globalThis.Promise<void> {
 	await $.println("sum:", sum(...(pair(2, 3) as [number, number])))
 	let p: point | $.VarRef<point> | null = makePoint(...(triple(4, 5, 6) as [number, number, number]))
-	await $.println("point:", $.pointerValue<point>(p).x, $.pointerValue<point>(p).y)
+	let p$: point = p == null ? $.pointerTarget<point>(p) : (p as any).__isVarRef === true ? (p as any).value : (p as any).__goValue === undefined ? (p as any) : $.pointerTarget<point>(p)
+	await $.println("point:", (p$ as point).x, (p$ as point).y)
 	let x: point | $.VarRef<point> | null = new point()
 	let y: point | $.VarRef<point> | null = new point()
 	let z: point | $.VarRef<point> | null = new point()

@@ -274,7 +274,7 @@ export class morphismWorker {
 
 	public async lookup(s: Shape | null): globalThis.Promise<Shape | null> {
 		const w: morphismWorker | $.VarRef<morphismWorker> | null = this;
-		const w$ = $.pointerTarget<morphismWorker>(w)
+		const w$: morphismWorker = w == null ? $.pointerTarget<morphismWorker>(w) : (w as any).__isVarRef === true ? (w as any).value : (w as any).__goValue === undefined ? (w as any) : $.pointerTarget<morphismWorker>(w)
 		await $.chanSend((w$ as morphismWorker).ready, true)
 		await $.chanRecv((w$ as morphismWorker).ready)
 		return s

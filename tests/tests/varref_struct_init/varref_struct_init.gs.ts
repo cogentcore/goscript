@@ -47,6 +47,7 @@ export async function main(): globalThis.Promise<void> {
 	// 'val' is a value type, but its address is taken, so it should be varrefed in TS.
 	let val = $.varRef(new MyStruct({MyInt: 10}, true))
 	let ptrToVal: MyStruct | $.VarRef<MyStruct> | null = val
+	let ptrToVal$: MyStruct = ptrToVal == null ? $.pointerTarget<MyStruct>(ptrToVal) : (ptrToVal as any).__isVarRef === true ? (ptrToVal as any).value : (ptrToVal as any).__goValue === undefined ? (ptrToVal as any) : $.pointerTarget<MyStruct>(ptrToVal)
 
 	// Accessing field on varrefed value type: Should generate val.value.MyInt
 	val.value.MyInt = 20
@@ -54,15 +55,16 @@ export async function main(): globalThis.Promise<void> {
 	// Scenario 2: Pointer type
 	// We never take the address of ptr so it should not be varrefed.
 	let ptr: MyStruct | $.VarRef<MyStruct> | null = new MyStruct({MyInt: 30})
+	let ptr$: MyStruct = ptr == null ? $.pointerTarget<MyStruct>(ptr) : (ptr as any).__isVarRef === true ? (ptr as any).value : (ptr as any).__goValue === undefined ? (ptr as any) : $.pointerTarget<MyStruct>(ptr);
 
 	// Accessing field on pointer type: Should generate ptr.MyInt
-	$.pointerValue<MyStruct>(ptr).MyInt = 40
-	await $.println("ptr.MyInt:", $.pointerValue<MyStruct>(ptr).MyInt)
+	;(ptr$ as MyStruct).MyInt = 40
+	await $.println("ptr.MyInt:", (ptr$ as MyStruct).MyInt)
 
 	// Accessing pointer value, should use .value
-	await $.println("ptrToVal.MyInt:", $.pointerValue<MyStruct>(ptrToVal).MyInt)
+	await $.println("ptrToVal.MyInt:", (ptrToVal$ as MyStruct).MyInt)
 
-	let myIntVal = $.pointerValue<MyStruct>(ptrToVal).MyInt
+	let myIntVal = (ptrToVal$ as MyStruct).MyInt
 	await $.println("myIntVal:", myIntVal)
 }
 

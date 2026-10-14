@@ -73,8 +73,9 @@ export async function main(): globalThis.Promise<void> {
 	// Field selector: out.Default = &(*out.Default) keeps the same pointee.
 	let c: Col | $.VarRef<Col> | null = new Col({Name: "c", Default: v})
 	let out: Col | $.VarRef<Col> | null = cloneColField(c)
-	await $.println("field alias same pointee:", $.pointerEqual($.pointerValue<Col>(out).Default, $.pointerValue<Col>(c).Default))
-	$.pointerValue<Col>(out).Default!.value = 30
+	let out$: Col = out == null ? $.pointerTarget<Col>(out) : (out as any).__isVarRef === true ? (out as any).value : (out as any).__goValue === undefined ? (out as any) : $.pointerTarget<Col>(out)
+	await $.println("field alias same pointee:", $.pointerEqual((out$ as Col).Default, $.pointerValue<Col>(c).Default));
+	;(out$ as Col).Default!.value = 30
 	await $.println("field alias write:", v.value)
 }
 

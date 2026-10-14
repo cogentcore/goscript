@@ -192,10 +192,11 @@ export class Holder {
 
 export async function main(): globalThis.Promise<void> {
 	let v: Var | $.VarRef<Var> | null = new Var({_object: new _object({name: "x"}, true)})
-	await $.println($.pointerValue<Var>(v)._object.Name(), $.pointerValue<Var>(v)._object.name, $.pointerValue<Var>(v)._object.Name(), $.pointerValue<Var>(v)._object.name)
-	let o: _object | $.VarRef<_object> | null = $.fieldRef($.pointerValue<Var>(v)._fields, "_object")
+	let v$: Var = v == null ? $.pointerTarget<Var>(v) : (v as any).__isVarRef === true ? (v as any).value : (v as any).__goValue === undefined ? (v as any) : $.pointerTarget<Var>(v)
+	await $.println((v$ as Var)._object.Name(), (v$ as Var)._object.name, (v$ as Var)._object.Name(), (v$ as Var)._object.name)
+	let o: _object | $.VarRef<_object> | null = $.fieldRef((v$ as Var)._fields, "_object")
 	$.pointerValue<_object>(o).name = "y"
-	await $.println($.pointerValue<Var>(v)._object.name)
+	await $.println((v$ as Var)._object.name)
 	let h = new Holder({_number: new _number({n: 3}), _string: "s"}, true)
 	await $.println($.pointerValue<_number>(h._number).n, $.pointerValue<_number>(h._number).n, h._string)
 }

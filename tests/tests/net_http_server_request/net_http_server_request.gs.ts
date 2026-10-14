@@ -19,7 +19,7 @@ import "@goscript/net/http/httptest/index.js"
 import "@goscript/net/url/index.js"
 
 export async function printURL(label: string, u: url.URL | $.VarRef<url.URL> | null): globalThis.Promise<void> {
-	const u$ = $.pointerTarget<url.URL>(u)
+	const u$: url.URL = u == null ? $.pointerTarget<url.URL>(u) : (u as any).__isVarRef === true ? (u as any).value : (u as any).__goValue === undefined ? (u as any) : $.pointerTarget<url.URL>(u)
 	await $.println(label, "string:", url.URL.prototype.String.call(u))
 	await $.println(label, "fields:", (u$ as url.URL).Scheme, (u$ as url.URL).Opaque, (u$ as url.URL).User == null, (u$ as url.URL).Host, (u$ as url.URL).Path, (u$ as url.URL).RawPath, (u$ as url.URL).RawQuery, (u$ as url.URL).Fragment, (u$ as url.URL).RawFragment, (u$ as url.URL).ForceQuery)
 	await $.println(label, "host:", url.URL.prototype.Hostname.call(u), url.URL.prototype.Port.call(u), url.URL.prototype.IsAbs.call(u))
@@ -64,16 +64,18 @@ export async function main(): globalThis.Promise<void> {
 	let __goscriptTuple3: any = await http.Get($.concatString($.pointerValue<httptest.Server>(server).URL, "/?x=1"))
 	let resp: http.Response | $.VarRef<http.Response> | null = __goscriptTuple3[0]
 	let err = __goscriptTuple3[1]
+	let resp$: http.Response = resp == null ? $.pointerTarget<http.Response>(resp) : (resp as any).__isVarRef === true ? (resp as any).value : (resp as any).__goValue === undefined ? (resp as any) : $.pointerTarget<http.Response>(resp)
 	if (err != null) {
 		await $.println("get error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		return
 	}
-	const __goscriptDeferCallee0 = $.functionValue(((__receiver) => () => __receiver.Close())($.pointerValue<Exclude<io.ReadCloser, null>>($.pointerValue<http.Response>(resp).Body)), ({ kind: $.TypeKind.Function, params: [], results: ["error"] } as $.FunctionTypeInfo), "io.Closer.Close-fm")
+	const __goscriptDeferCallee0 = $.functionValue(((__receiver) => () => __receiver.Close())($.pointerValue<Exclude<io.ReadCloser, null>>((resp$ as http.Response).Body)), ({ kind: $.TypeKind.Function, params: [], results: ["error"] } as $.FunctionTypeInfo), "io.Closer.Close-fm")
 	__defer.defer(async () => { await __goscriptDeferCallee0() })
-	await $.println("get status:", $.pointerValue<http.Response>(resp).StatusCode)
+	await $.println("get status:", (resp$ as http.Response).StatusCode)
 
 	let req: http.Request | $.VarRef<http.Request> | null = httptest.NewRequest(http.MethodGet, "/?y=2", null!)
-	await $.println("recorded:", $.pointerValue<http.Request>(req).Body != null, url.Values_Get($.pointerValue<http.Request>(req).URL.Query(), "y"), url.Values_Has($.pointerValue<http.Request>(req).URL.Query(), "z"))
+	let req$: http.Request = req == null ? $.pointerTarget<http.Request>(req) : (req as any).__isVarRef === true ? (req as any).value : (req as any).__goValue === undefined ? (req as any) : $.pointerTarget<http.Request>(req)
+	await $.println("recorded:", (req$ as http.Request).Body != null, url.Values_Get((req$ as http.Request).URL.Query(), "y"), url.Values_Has((req$ as http.Request).URL.Query(), "z"))
 
 	// A parsed *url.URL is a valid request URL.
 	let __goscriptTuple4: any = url.Parse("https://example.com:8443/x?y=1")
@@ -83,12 +85,13 @@ export async function main(): globalThis.Promise<void> {
 		await $.println("parse error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		return
 	}
-	$.pointerValue<http.Request>(req).URL = parsed
-	await $.println("assigned:", url.Values_Get($.pointerValue<http.Request>(req).URL.Query(), "y"), $.pointerValue<http.Request>(req).URL.Hostname(), $.pointerValue<http.Request>(req).URL.Port(), $.pointerValue<http.Request>(req).URL.RequestURI())
+	;(req$ as http.Request).URL = parsed
+	await $.println("assigned:", url.Values_Get((req$ as http.Request).URL.Query(), "y"), (req$ as http.Request).URL.Hostname(), (req$ as http.Request).URL.Port(), (req$ as http.Request).URL.RequestURI())
 
 	// A composite literal takes a *url.URL field directly.
 	let literal: http.Request | $.VarRef<http.Request> | null = new http.Request({Method: http.MethodPost, URL: parsed})
-	await $.println("literal:", $.pointerValue<http.Request>(literal).Method, $.pointerValue<url.URL>($.pointerValue<http.Request>(literal).URL).Host, $.pointerValue<http.Request>(literal).URL.RequestURI())
+	let literal$: http.Request = literal == null ? $.pointerTarget<http.Request>(literal) : (literal as any).__isVarRef === true ? (literal as any).value : (literal as any).__goValue === undefined ? (literal as any) : $.pointerTarget<http.Request>(literal)
+	await $.println("literal:", (literal$ as http.Request).Method, $.pointerValue<url.URL>((literal$ as http.Request).URL).Host, (literal$ as http.Request).URL.RequestURI())
 
 	// RequestURI keeps the escaped path and the query unchanged.
 	let targets: $.Slice<string> = $.arrayToSlice<string>(["/a%2Fb/c?q=a/../b&n=5", "/a/b", "http://example.com", "https://user:secret@example.com:8443/p/q%20r?a=1&b=2#frag%20x", "mailto:joe@example.com?subject=hi", "http://example.com/p?"])

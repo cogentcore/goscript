@@ -48,7 +48,7 @@ export class Image {
 	public async MarshalJSON(): globalThis.Promise<[$.Slice<number>, $.GoError]> {
 		const im: Image | $.VarRef<Image> | null = this;
 		using __defer = new $.DisposableStack()
-		const im$ = $.pointerTarget<Image>(im)
+		const im$: Image = im == null ? $.pointerTarget<Image>(im) : (im as any).__isVarRef === true ? (im as any).value : (im as any).__goValue === undefined ? (im as any) : $.pointerTarget<Image>(im)
 		await mu.value.Lock()
 		const __goscriptDeferCallee0 = $.functionValue(((__receiver) => () => __receiver.Unlock())(mu.value), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "sync.(*Mutex).Unlock-fm")
 		__defer.defer(() => { __goscriptDeferCallee0() })
@@ -176,8 +176,9 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("indent:", $.bytesToString(b2), err == null)
 
 	let back: Doc | $.VarRef<Doc> | null = new Doc()
+	let back$: Doc = back == null ? $.pointerTarget<Doc>(back) : (back as any).__isVarRef === true ? (back as any).value : (back as any).__goValue === undefined ? (back as any) : $.pointerTarget<Doc>(back)
 	err = await json.Unmarshal(b, $.interfaceValue(back, "*main.Doc", /* @__PURE__ */ $.pointerType("main.Doc")))
-	await $.println("doc back:", $.pointerValue<Doc>(back).Title, $.pointerValue<Image>($.pointerValue<Doc>(back).Image).Name, $.pointerValue<Doc>(back).Note, err == null)
+	await $.println("doc back:", (back$ as Doc).Title, $.pointerValue<Image>((back$ as Doc).Image).Name, (back$ as Doc).Note, err == null)
 
 	let __goscriptTuple3: any = await json.Marshal($.interfaceValue(new Doc({Image: new Image({Name: "bad"})}), "*main.Doc", /* @__PURE__ */ $.pointerType("main.Doc")))
 	err = __goscriptTuple3[1]

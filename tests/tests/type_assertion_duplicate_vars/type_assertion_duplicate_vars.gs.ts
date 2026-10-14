@@ -129,15 +129,16 @@ export async function main(): globalThis.Promise<void> {
 	let iface: Interface | null = $.interfaceValue<Interface | null>(new ConcreteA(undefined, true), "main.ConcreteA", "main.ConcreteA")
 
 	let c: Container | $.VarRef<Container> | null = new Container()
+	let c$: Container = c == null ? $.pointerTarget<Container>(c) : (c as any).__isVarRef === true ? (c as any).value : (c as any).__goValue === undefined ? (c as any) : $.pointerTarget<Container>(c)
 
 	// Multiple type assertions that should generate unique variable names
-	let __goscriptTuple0: any = $.typeAssertTuple<ConcreteA>(iface, "main.ConcreteA")
-	$.pointerValue<Container>(c).hasA = __goscriptTuple0[1]
-	let __goscriptTuple1: any = $.typeAssertTuple<ConcreteB>(iface, "main.ConcreteB")
-	$.pointerValue<Container>(c).hasB = __goscriptTuple1[1]
+	let __goscriptTuple0: any = $.typeAssertTuple<ConcreteA>(iface, "main.ConcreteA");
+	;(c$ as Container).hasA = __goscriptTuple0[1]
+	let __goscriptTuple1: any = $.typeAssertTuple<ConcreteB>(iface, "main.ConcreteB");
+	;(c$ as Container).hasB = __goscriptTuple1[1]
 
-	await $.println("hasA:", $.pointerValue<Container>(c).hasA)
-	await $.println("hasB:", $.pointerValue<Container>(c).hasB)
+	await $.println("hasA:", (c$ as Container).hasA)
+	await $.println("hasB:", (c$ as Container).hasB)
 }
 
 if ($.isMainScript(import.meta)) {

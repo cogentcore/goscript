@@ -200,7 +200,7 @@ export class queue {
 
 	public async lockAndInit(): globalThis.Promise<void> {
 		let q: queue | $.VarRef<queue> | null = this;
-		const q$ = $.pointerTarget<queue>(q)
+		const q$: queue = q == null ? $.pointerTarget<queue>(q) : (q as any).__isVarRef === true ? (q as any).value : (q as any).__goValue === undefined ? (q as any) : $.pointerTarget<queue>(q)
 		await (q$ as queue).Mu.Lock()
 		if ((q$ as queue).Cond.L == null) {
 			;(q$ as queue).Cond.L = $.interfaceValue<sync.Locker | null>($.fieldRef((q$ as queue)._fields, "Mu"), "*sync.Mutex", /* @__PURE__ */ $.pointerType("sync.Mutex"))
@@ -210,7 +210,7 @@ export class queue {
 	public async pop(): globalThis.Promise<number> {
 		let q: queue | $.VarRef<queue> | null = this;
 		using __defer = new $.DisposableStack()
-		const q$ = $.pointerTarget<queue>(q)
+		const q$: queue = q == null ? $.pointerTarget<queue>(q) : (q as any).__isVarRef === true ? (q as any).value : (q as any).__goValue === undefined ? (q as any) : $.pointerTarget<queue>(q)
 		await queue.prototype.lockAndInit.call(q)
 		const __goscriptDeferCallee0 = $.functionValue(((__receiver) => () => __receiver.Unlock())((q$ as queue).Mu), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "sync.(*Mutex).Unlock-fm")
 		__defer.defer(() => { __goscriptDeferCallee0() })
@@ -224,7 +224,7 @@ export class queue {
 
 	public async push(v: number): globalThis.Promise<void> {
 		let q: queue | $.VarRef<queue> | null = this;
-		const q$ = $.pointerTarget<queue>(q)
+		const q$: queue = q == null ? $.pointerTarget<queue>(q) : (q as any).__isVarRef === true ? (q as any).value : (q as any).__goValue === undefined ? (q as any) : $.pointerTarget<queue>(q)
 		await queue.prototype.lockAndInit.call(q);
 		;(q$ as queue).items = $.appendOne((q$ as queue).items, v)
 		void (q$ as queue).Cond.Signal()

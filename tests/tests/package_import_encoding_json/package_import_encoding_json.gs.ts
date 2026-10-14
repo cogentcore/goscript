@@ -343,15 +343,16 @@ export async function byteSliceFields(): globalThis.Promise<void> {
 	await $.println($.bytesToString(b), err == null)
 
 	let d: Enc | $.VarRef<Enc> | null = new Enc()
+	let d$: Enc = d == null ? $.pointerTarget<Enc>(d) : (d as any).__isVarRef === true ? (d as any).value : (d as any).__goValue === undefined ? (d as any) : $.pointerTarget<Enc>(d)
 	err = json.Unmarshal(b, $.interfaceValue(d, "*main.Enc", /* @__PURE__ */ $.pointerType("main.Enc")))
-	await $.println("err:", err == null, "width:", $.pointerValue<Enc>(d).Width)
-	await $.println("image:", $.sliceLen($.pointerValue<Enc>(d).Image), $.arrayIndex($.pointerValue<Enc>(d).Image!, 0), $.arrayIndex($.pointerValue<Enc>(d).Image!, 2))
-	await $.println("frames:", $.sliceLen($.pointerValue<Enc>(d).Frames), $.sliceLen($.arrayIndex($.pointerValue<Enc>(d).Frames!, 1)), $.arrayIndex($.arrayIndex($.pointerValue<Enc>(d).Frames!, 1)!, 1))
-	await $.println("named:", $.sliceLen($.mapGet<string, $.Slice<number>, $.Slice<number>>($.pointerValue<Enc>(d).Named, "a", null)[0]), $.arrayIndex($.mapGet<string, $.Slice<number>, $.Slice<number>>($.pointerValue<Enc>(d).Named, "a", null)[0]!, 1))
-	await $.println("nested:", $.bytesToString($.pointerValue<Enc>($.pointerValue<Enc>(d).Nested).Image))
+	await $.println("err:", err == null, "width:", (d$ as Enc).Width)
+	await $.println("image:", $.sliceLen((d$ as Enc).Image), $.arrayIndex((d$ as Enc).Image!, 0), $.arrayIndex((d$ as Enc).Image!, 2))
+	await $.println("frames:", $.sliceLen((d$ as Enc).Frames), $.sliceLen($.arrayIndex((d$ as Enc).Frames!, 1)), $.arrayIndex($.arrayIndex((d$ as Enc).Frames!, 1)!, 1))
+	await $.println("named:", $.sliceLen($.mapGet<string, $.Slice<number>, $.Slice<number>>((d$ as Enc).Named, "a", null)[0]), $.arrayIndex($.mapGet<string, $.Slice<number>, $.Slice<number>>((d$ as Enc).Named, "a", null)[0]!, 1))
+	await $.println("nested:", $.bytesToString($.pointerValue<Enc>((d$ as Enc).Nested).Image))
 
 	err = json.Unmarshal(new Uint8Array([123, 34, 73, 109, 97, 103, 101, 34, 58, 110, 117, 108, 108, 125]), $.interfaceValue(d, "*main.Enc", /* @__PURE__ */ $.pointerType("main.Enc")))
-	await $.println("null image:", err == null, $.pointerValue<Enc>(d).Image == null)
+	await $.println("null image:", err == null, (d$ as Enc).Image == null)
 }
 
 export async function timeField(): globalThis.Promise<void> {

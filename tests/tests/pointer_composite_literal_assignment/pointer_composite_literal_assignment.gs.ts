@@ -57,17 +57,18 @@ export async function main(): globalThis.Promise<void> {
 	// === Pointer Composite Literal Assignment ===
 	// Creating a pointer to a struct directly using a composite literal with &
 	let structPointer: MyStruct | $.VarRef<MyStruct> | null = new MyStruct({MyInt: 42, MyString: "composite literal pointer"})
+	let structPointer$: MyStruct = structPointer == null ? $.pointerTarget<MyStruct>(structPointer) : (structPointer as any).__isVarRef === true ? (structPointer as any).value : (structPointer as any).__goValue === undefined ? (structPointer as any) : $.pointerTarget<MyStruct>(structPointer)
 
 	// Access fields through the pointer
 	// Expected: 42
-	await $.println("MyInt via pointer: Expected: 42, Actual:", $.pointerValue<MyStruct>(structPointer).MyInt)
+	await $.println("MyInt via pointer: Expected: 42, Actual:", (structPointer$ as MyStruct).MyInt)
 	// Expected: "composite literal pointer"
-	await $.println($.concatString("MyString via pointer: Expected: composite literal pointer, Actual: ", $.pointerValue<MyStruct>(structPointer).MyString))
+	await $.println($.concatString("MyString via pointer: Expected: composite literal pointer, Actual: ", (structPointer$ as MyStruct).MyString));
 
 	// Modify through the pointer
-	$.pointerValue<MyStruct>(structPointer).MyInt = 99
+	;(structPointer$ as MyStruct).MyInt = 99
 	// Expected: 99
-	await $.println("MyInt after modification: Expected: 99, Actual:", $.pointerValue<MyStruct>(structPointer).MyInt)
+	await $.println("MyInt after modification: Expected: 99, Actual:", (structPointer$ as MyStruct).MyInt)
 }
 
 if ($.isMainScript(import.meta)) {

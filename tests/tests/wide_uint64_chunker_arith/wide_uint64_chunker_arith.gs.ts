@@ -82,7 +82,7 @@ export class repeatReader {
 
 	public Read(p: $.Slice<number>): [number, $.GoError] {
 		let r: repeatReader | $.VarRef<repeatReader> | null = this;
-		const r$ = $.pointerTarget<repeatReader>(r)
+		const r$: repeatReader = r == null ? $.pointerTarget<repeatReader>(r) : (r as any).__isVarRef === true ? (r as any).value : (r as any).__goValue === undefined ? (r as any) : $.pointerTarget<repeatReader>(r)
 		if ((r$ as repeatReader).remaining == 0) {
 			return [0, io.EOF]
 		}

@@ -44,10 +44,11 @@ export class MyStruct {
 
 export async function main(): globalThis.Promise<void> {
 	let myStruct: MyStruct | $.VarRef<MyStruct> | null = new MyStruct({myPrivate: null})
-	let intVar: $.VarRef<number> = $.varRef(10)
-	$.pointerValue<MyStruct>(myStruct).myPrivate = intVar
+	let myStruct$: MyStruct = myStruct == null ? $.pointerTarget<MyStruct>(myStruct) : (myStruct as any).__isVarRef === true ? (myStruct as any).value : (myStruct as any).__goValue === undefined ? (myStruct as any) : $.pointerTarget<MyStruct>(myStruct)
+	let intVar: $.VarRef<number> = $.varRef(10);
+	;(myStruct$ as MyStruct).myPrivate = intVar
 	intVar.value = 15
-	await $.println($.pointerValue<number>($.pointerValue<MyStruct>(myStruct).myPrivate))
+	await $.println($.pointerValue<number>((myStruct$ as MyStruct).myPrivate))
 }
 
 if ($.isMainScript(import.meta)) {
