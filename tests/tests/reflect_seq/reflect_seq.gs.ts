@@ -131,7 +131,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 	let __goscriptRangeReturn3 = false
 	;await (async () => {
-		await $.markAsStructValue($.cloneStructValue(reflect.ValueOf("hé!"))).Seq2()!(async (i, r) => {
+		await $.markAsStructValue($.cloneStructValue(reflect.ValueOf("h\xc3\xa9!"))).Seq2()!(async (i, r) => {
 			await $.println("string", $.markAsStructValue($.cloneStructValue(i)).Int(), $.markAsStructValue($.cloneStructValue(r)).Int())
 			return true
 		})

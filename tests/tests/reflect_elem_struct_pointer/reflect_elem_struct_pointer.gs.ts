@@ -416,7 +416,7 @@ export async function main(): globalThis.Promise<void> {
 	let name = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.New($.pointerValueOrNil(reflect.TypeOf(""))!))).Elem()))
 	$.markAsStructValue($.cloneStructValue(name)).SetString("a")
 	await $.println($.markAsStructValue($.cloneStructValue(name)).String(), $.mustTypeAssert<string>($.markAsStructValue($.cloneStructValue(name)).Interface(), /* @__PURE__ */ $.basicType("string")))
-	$.markAsStructValue($.cloneStructValue(name)).SetString("é")
+	$.markAsStructValue($.cloneStructValue(name)).SetString("\xc3\xa9")
 	await $.println($.markAsStructValue($.cloneStructValue(name)).Len())
 
 	let n = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.New($.pointerValueOrNil(reflect.TypeOf($.basicInterfaceValue(0, "int")))!))).Elem()))
