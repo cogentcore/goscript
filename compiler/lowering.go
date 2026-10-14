@@ -7088,10 +7088,17 @@ func elideTailReturnAwait(ctx lowerFileContext, result ast.Expr, expr string) st
 // conditionalAwaitCall returns the call of a conditional await made by
 // conditionalAwait, so that it can be returned without awaiting it.
 func conditionalAwaitCall(expr string) (string, bool) {
-	// The wrapper is the text conditionalAwait puts around the call.
+	// The wrapper is the text conditionalAwait puts around the call, with
+	// the assertion of a result type dropped, since the returned call is
+	// checked against the result type of the function that returns it.
 	t := conditionalAwaitTemp
 	prefix := "(" + t + " = "
 	suffix := ", " + t + " instanceof Promise ? await " + t + " : " + t + ")"
+	if typed, ok := strings.CutPrefix(expr, "("); ok && strings.HasPrefix(typed, prefix) && strings.HasSuffix(typed, ")") {
+		if end := strings.LastIndex(typed, suffix+" as "); end >= 0 {
+			expr = typed[:end+len(suffix)]
+		}
+	}
 	if !strings.HasPrefix(expr, prefix) || !strings.HasSuffix(expr, suffix) {
 		return "", false
 	}
@@ -16362,10 +16369,13 @@ const conditionalAwaitTemp = "__goscriptAwait"
 // value that is not a promise still suspends the caller until the microtask
 // queue runs, which is much slower than continuing. The result is assigned to
 // a module variable and tested in one expression without suspending, so that
-// concurrent callers can share it; its value is untyped, since the declared
+// concurrent callers can share it. The variable is untyped, since the declared
 // TypeScript result types of handwritten overrides can differ from those of
-// the Go result types. It returns false for other calls, which are always
-// awaited.
+// the Go result types. A composite result, unlike a basic or interface result,
+// carries element types, so it is asserted to its Go type for the
+// code that consumes it, such as the type inference of a generic call, which
+// cannot infer element types from an untyped value. It returns false for other
+// calls, which are always awaited.
 func (o *LoweringOwner) conditionalAwait(ctx lowerFileContext, call *ast.CallExpr, lowered string) (string, bool) {
 	// Only an async function with a temporary can await conditionally.
 	if ctx.awaitTemp == nil || ctx.semPkg == nil || ctx.semPkg.source == nil || !ctx.asyncFunction {
@@ -16390,6 +16400,14 @@ func (o *LoweringOwner) conditionalAwait(ctx lowerFileContext, call *ast.CallExp
 	*ctx.awaitTemp = true
 	t := conditionalAwaitTemp
 	expr := "(" + t + " = " + lowered + ", " + t + " instanceof Promise ? await " + t + " : " + t + ")"
+	if signature.Results().Len() == 1 {
+		result := signature.Results().At(0).Type()
+		switch result.Underlying().(type) {
+		case *types.Basic, *types.Interface:
+		default:
+			expr = "(" + expr + " as " + o.tsTypeFor(ctx, result) + ")"
+		}
+	}
 	return expr, true
 }
 

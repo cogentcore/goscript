@@ -4198,7 +4198,7 @@ func TestCompilePackagesPropagatesAsyncGenericInterfaceMethods(t *testing.T) {
 	for _, want := range []string{
 		"Wait(__typeArgs: $.GenericTypeArgs | undefined, ctx: context.Context | null, old: any): any | globalThis.Promise<any>",
 		"public async Wait(__typeArgs: $.GenericTypeArgs | undefined, ctx: context.Context | null, old: any): globalThis.Promise<any>",
-		"return ((__goscriptAwait = $.callInterfaceMethod($.pointerValue<Exclude<Watchable, null>>(w), \"Wait\", __goscriptStatic",
+		"return $.callInterfaceMethod($.pointerValue<Exclude<Watchable, null>>(w), \"Wait\", __goscriptStatic0(), ctx, old)\n",
 		"??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType(\"int\"), zero: () => 0 }})",
 	} {
 		if !strings.Contains(text, want) {
@@ -4908,7 +4908,7 @@ func TestCompilePackagesPropagatesImportedAsyncGenericInterfaceMethods(t *testin
 	}
 	mainText := string(mainContent)
 	for _, want := range []string{
-		"return ((__goscriptAwait = $.callInterfaceMethod($.pointerValue<Exclude<dep.Watchable, null>>(w), \"Wait\", __goscriptStatic",
+		"return $.callInterfaceMethod($.pointerValue<Exclude<dep.Watchable, null>>(w), \"Wait\", __goscriptStatic0(), ctx, old)\n",
 		"??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType(\"int\"), zero: () => 0 }})",
 	} {
 		if !strings.Contains(mainText, want) {
