@@ -3,26 +3,33 @@ import { ReflectValue } from './types.js'
 // Swapper returns a function that swaps the elements in the provided slice.
 // Swapper panics if the provided interface is not a slice.
 export function Swapper(slice: ReflectValue): (i: number, j: number) => void {
-  let actualArray: unknown[] | null = null
-
-  // Try to extract the underlying array
+  // A slice is a JavaScript array, or a window on its backing array.
+  let backing: unknown[] | null = null
+  let offset = 0
+  let length = 0
   if (Array.isArray(slice)) {
-    actualArray = slice
+    backing = slice
+    length = slice.length
   } else if (slice && typeof slice === 'object' && '__meta__' in slice) {
-    // GoScript slice object
-    const meta = (slice as { __meta__?: { backing?: unknown[] } }).__meta__
-    if (meta && meta.backing && Array.isArray(meta.backing)) {
-      actualArray = meta.backing
+    const meta = (
+      slice as {
+        __meta__?: { backing?: unknown[]; offset: number; length: number }
+      }
+    ).__meta__
+    if (meta && meta.backing) {
+      backing = meta.backing
+      offset = meta.offset
+      length = meta.length
     }
   }
 
-  if (!actualArray) {
-    // Return a no-op function if we can't extract an array
+  // Any other value has nothing to swap.
+  if (!backing) {
     return () => {}
   }
 
   // Fast path for slices of size 0 and 1. Nothing to swap.
-  switch (actualArray.length) {
+  switch (length) {
     case 0:
       return (_i: number, _j: number): void => {
         throw new Error('reflect: slice index out of range')
@@ -35,18 +42,13 @@ export function Swapper(slice: ReflectValue): (i: number, j: number) => void {
       }
   }
 
-  // Return the swapper function
+  // The swapper exchanges elements of the window in its backing array.
+  const array = backing
   return (i: number, j: number) => {
-    if (
-      actualArray &&
-      i >= 0 &&
-      j >= 0 &&
-      i < actualArray.length &&
-      j < actualArray.length
-    ) {
-      const temp = actualArray[i]
-      actualArray[i] = actualArray[j]
-      actualArray[j] = temp
+    if (i >= 0 && j >= 0 && i < length && j < length) {
+      const temp = array[offset + i]
+      array[offset + i] = array[offset + j]
+      array[offset + j] = temp
     }
   }
 }
