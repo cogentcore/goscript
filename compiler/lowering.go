@@ -5392,7 +5392,9 @@ func (o *LoweringOwner) lowerDeferStmt(ctx lowerFileContext, stmt *ast.DeferStmt
 }
 
 func (o *LoweringOwner) lowerAssignStmt(ctx lowerFileContext, stmt *ast.AssignStmt) ([]loweredStmt, []Diagnostic) {
-	if len(stmt.Rhs) == 1 && isChannelReceiveExpr(stmt.Rhs[0]) {
+	// A compound assignment from a receive lowers as a binary expression.
+	plain := stmt.Tok == token.ASSIGN || stmt.Tok == token.DEFINE
+	if plain && len(stmt.Rhs) == 1 && isChannelReceiveExpr(stmt.Rhs[0]) {
 		return o.lowerChannelReceiveAssignStmt(ctx, stmt)
 	}
 	if len(stmt.Lhs) == 1 && len(stmt.Rhs) == 1 {
