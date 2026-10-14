@@ -305,7 +305,12 @@ export interface Comparable {
 const typeRegistry = new Map<string, TypeInfo>()
 const duplicateTypeRegistry = new Map<string, TypeInfo[]>()
 
+// typeRegistryGeneration counts the registrations of types, so that cached
+// results that depend on the registry can tell when it has changed.
+let typeRegistryGeneration = 0
+
 function registerTypeInfo(name: string, typeInfo: TypeInfo): void {
+  typeRegistryGeneration++
   const existing = typeRegistry.get(name)
   if (existing && existing !== typeInfo) {
     const candidates = duplicateTypeRegistry.get(name) ?? [existing]
@@ -481,11 +486,31 @@ function typeInfoRuntimeName(info: TypeInfo): string | undefined {
 
 function goTypeMatchesTypeInfo(goType: string, info: TypeInfo): boolean {
   const runtimeName = typeInfoRuntimeName(info)
-  return (
-    (runtimeName !== undefined && goType === runtimeName) ||
-    compareTypeStringWithTypeInfo(goType, info)
-  )
+  if (runtimeName !== undefined && goType === runtimeName) {
+    return true
+  }
+  // The comparison parses the type string, so its result is cached on the
+  // type info, until more types are registered.
+  let cache = (info as any)[goTypeMatchCacheKey] as
+    | Map<string, number>
+    | undefined
+  if (cache === undefined) {
+    cache = new globalThis.Map()
+    ;(info as any)[goTypeMatchCacheKey] = cache
+  }
+  const cached = cache.get(goType)
+  if (cached !== undefined && cached >> 1 === typeRegistryGeneration) {
+    return (cached & 1) === 1
+  }
+  const ok = compareTypeStringWithTypeInfo(goType, info)
+  cache.set(goType, (typeRegistryGeneration << 1) | (ok ? 1 : 0))
+  return ok
 }
+
+// goTypeMatchCacheKey holds the cache of goTypeMatchesTypeInfo results on a
+// type info, keyed by the Go type string, with the type registry generation
+// in which each was computed.
+const goTypeMatchCacheKey = Symbol('goTypeMatchCache')
 
 interface TypeInfoComparisonState {
   seenPairs: Set<string>
@@ -567,11 +592,54 @@ export function areTypeInfosIdentical(
   type1InfoOrName: string | TypeInfo,
   type2InfoOrName: string | TypeInfo,
 ): boolean {
+  const simple = simpleTypeInfosIdentical(type1InfoOrName, type2InfoOrName)
+  if (simple !== undefined) {
+    return simple
+  }
   return areTypeInfosIdenticalWithSeen(
     type1InfoOrName,
     type2InfoOrName,
     newTypeInfoComparisonState(),
   )
+}
+
+// simpleTypeInfosIdentical reports whether two type infos are trivially
+// identical or not, or undefined if that takes the full comparison. They are
+// identical when they have the same name, are the same basic type, or are
+// pointers or slices to the same named element type, and not identical when
+// two descriptors differ in their kind or name, as the full comparison finds.
+// Generated code makes a new type info at each use, so these common cases are
+// worth checking first.
+function simpleTypeInfosIdentical(
+  t1: string | TypeInfo,
+  t2: string | TypeInfo,
+): boolean | undefined {
+  if (t1 === t2) {
+    return true
+  }
+  if (typeof t1 === 'string' || typeof t2 === 'string') {
+    return undefined
+  }
+  if (
+    t1.kind !== t2.kind ||
+    t1.name !== t2.name ||
+    (t1.typeName ?? '') !== (t2.typeName ?? '')
+  ) {
+    return false
+  }
+  switch (t1.kind) {
+    case TypeKind.Basic:
+      return t1.name !== undefined ? true : undefined
+    case TypeKind.Pointer:
+    case TypeKind.Slice: {
+      const e1 = (t1 as PointerTypeInfo | SliceTypeInfo).elemType
+      if (typeof e1 === 'string' && e1 === (t2 as PointerTypeInfo).elemType) {
+        return true
+      }
+      return undefined
+    }
+  }
+  return undefined
 }
 
 function areTypeInfosIdenticalWithSeen(
@@ -869,6 +937,37 @@ export function structFieldRuntimeKey(field: StructFieldInfo): string {
  * @returns True if the value matches the interface type, false otherwise.
  */
 function matchesInterfaceType(value: any, info: TypeInfo): boolean {
+  // The result for a value of a registered struct type depends only on its
+  // type, so it is cached on the interface type info for the type, as GopherJS
+  // does, instead of checking the method set each time.
+  const target =
+    value?.__isVarRef === true && 'value' in value ? value.value : value
+  const ctor = typeof target === 'object' ? target?.constructor : undefined
+  if (ctor === undefined || ctor.__typeInfo === undefined) {
+    return matchesInterfaceTypeUncached(value, info)
+  }
+  const goType: string = value.__goType ?? ''
+  let cache = (info as any)[interfaceMatchCacheKey] as
+    | Map<string, { ctor: unknown; ok: boolean }>
+    | undefined
+  if (cache === undefined) {
+    cache = new globalThis.Map()
+    ;(info as any)[interfaceMatchCacheKey] = cache
+  }
+  const cached = cache.get(goType)
+  if (cached !== undefined && cached.ctor === ctor) {
+    return cached.ok
+  }
+  const ok = matchesInterfaceTypeUncached(value, info)
+  cache.set(goType, { ctor, ok })
+  return ok
+}
+
+// interfaceMatchCacheKey holds the cache of matchesInterfaceType results on
+// an interface type info, keyed by the Go type of the value.
+const interfaceMatchCacheKey = Symbol('interfaceMatchCache')
+
+function matchesInterfaceTypeUncached(value: any, info: TypeInfo): boolean {
   // Check basic conditions first
   if (!isInterfaceTypeInfo(info) || value === null || value === undefined) {
     return false
@@ -2134,7 +2233,13 @@ export function interfaceValue<T = any>(
         return typedFunction(value as GoFunction, typeName, typeInfo) as T
       }
     }
-    if (typeof value === 'object') {
+    // A value already boxed as this type keeps its type info, which describes
+    // the same type, so that boxing it again does not redefine its properties.
+    if (
+      typeof value === 'object' &&
+      ((value as any).__goType !== typeName ||
+        (typeInfo !== undefined && (value as any).__goTypeInfo === undefined))
+    ) {
       Object.defineProperty(value, '__goType', {
         value: typeName,
         writable: true,
