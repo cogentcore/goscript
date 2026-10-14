@@ -1401,7 +1401,13 @@ export class Value {
     // A pointer to a struct is the struct object itself, whose methods
     // satisfy interfaces, so it is tagged with its type but not boxed.
     if (elemType !== null && elemType.Kind() === Struct) {
-      const target = $.isVarRef(current) ? current.value : current
+      let target = $.isVarRef(current) ? current.value : current
+      // A pointer to a named struct converted to a pointer to an unnamed
+      // struct type, such as one made by StructOf, has none of the methods
+      // of the named type, so it is a view of the struct without them.
+      if (elemType.Name() === '' && isNamedStructObject(target)) {
+        target = unnamedStructView(target)
+      }
       return $.interfaceValue<ReflectValue>(
         target ?? null,
         this._type.String(),
@@ -5680,3 +5686,66 @@ Value.__typeInfo = $.registerStructType(
   [],
   Value,
 )
+
+// isNamedStructObject reports whether value is an instance of a generated
+// struct class, which has the methods of its named type.
+function isNamedStructObject(value: unknown): value is object {
+  if (value === null || typeof value !== 'object') {
+    return false
+  }
+  const ctor = (value as { constructor?: { __typeInfo?: unknown } }).constructor
+  return ctor !== undefined && ctor !== Object && ctor.__typeInfo !== undefined
+}
+
+// unnamedStructViews keeps one view per struct object, so that pointers to
+// the same struct through the view are equal.
+const unnamedStructViews = new WeakMap<object, object>()
+
+// unnamedStructView returns a view of a struct object that shares its fields
+// but hides the methods of its named type, and has its own Go type tags.
+function unnamedStructView(target: object): object {
+  const existing = unnamedStructViews.get(target)
+  if (existing !== undefined) {
+    return existing
+  }
+  const tags: Record<PropertyKey, unknown> = {}
+  const isTag = (prop: PropertyKey) =>
+    prop === '__goType' || prop === '__goTypeInfo'
+  const view = new Proxy(target, {
+    get(obj, prop) {
+      if (isTag(prop)) {
+        return tags[prop]
+      }
+      const value = Reflect.get(obj, prop, obj)
+      if (
+        typeof value === 'function' &&
+        typeof prop === 'string' &&
+        prop !== 'constructor' &&
+        prop !== 'clone' &&
+        !prop.startsWith('_') &&
+        !Object.prototype.hasOwnProperty.call(obj, prop)
+      ) {
+        return undefined
+      }
+      return value
+    },
+    set(obj, prop, value) {
+      return Reflect.set(obj, prop, value, obj)
+    },
+    has(obj, prop) {
+      if (isTag(prop)) {
+        return prop in tags
+      }
+      return Reflect.has(obj, prop)
+    },
+    defineProperty(obj, prop, descriptor) {
+      if (isTag(prop)) {
+        tags[prop] = descriptor.value
+        return true
+      }
+      return Reflect.defineProperty(obj, prop, descriptor)
+    },
+  })
+  unnamedStructViews.set(target, view)
+  return view
+}
