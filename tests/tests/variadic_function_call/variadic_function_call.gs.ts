@@ -54,7 +54,7 @@ export async function main(): globalThis.Promise<void> {
 	let err = await TestFS("myfs", expected)
 
 	if (err != null) {
-		await $.println($.concatString("Error: ", await $.pointerValue<Exclude<$.GoError, null>>(err).Error()))
+		await $.println($.concatString("Error: ", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)))
 	} else {
 		await $.println("Success!")
 	}
@@ -67,6 +67,8 @@ export async function main(): globalThis.Promise<void> {
 	let names: Names = ($.arrayToSlice<string>(["x", "y", "z"]) as Names)
 	await $.println("count:", count((names as $.Slice<string>)))
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

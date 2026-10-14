@@ -87,7 +87,7 @@ export class Program {
 		return $.functionValue(async (_yield: ((_p0: number, _p1: Instr) => boolean | globalThis.Promise<boolean>) | null): globalThis.Promise<void> => {
 			for (let __goscriptRangeTarget0 = p.Code, pc = 0; pc < $.len(__goscriptRangeTarget0); pc++) {
 				let _in = $.markAsStructValue($.cloneStructValue(__goscriptRangeTarget0![pc]))
-				if (!await _yield!(pc, $.markAsStructValue($.cloneStructValue(_in)))) {
+				if (!(__goscriptAwait = _yield!(pc, $.markAsStructValue($.cloneStructValue(_in))), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)) {
 					return
 				}
 			}
@@ -479,6 +479,8 @@ export async function main(): globalThis.Promise<void> {
 	}
 	await $.println("total steps:", totalSteps)
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

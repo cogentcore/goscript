@@ -55,7 +55,7 @@ export async function cloneSlice<T>(__typeArgs: $.GenericTypeArgs | undefined, i
 	let cloned: $.Slice<T> = $.makeSlice<T>(0, $.len(items), undefined, () => ($.genericZero(__typeArgs, "T", null) as T))
 	for (let __goscriptRangeTarget0 = items, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
 		let item = __goscriptRangeTarget0![__rangeIndex]
-		cloned = $.append(cloned, await $.callGenericMethod(__typeArgs, "T", "CloneVT", item), $.appendZero(() => ($.genericZero(__typeArgs, "T", null) as T)))
+		cloned = $.append(cloned, (__goscriptAwait = $.callGenericMethod(__typeArgs, "T", "CloneVT", item), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), $.appendZero(() => ($.genericZero(__typeArgs, "T", null) as T)))
 	}
 	return cloned
 }
@@ -65,6 +65,8 @@ export async function main(): globalThis.Promise<void> {
 	let cloned: $.Slice<item | $.VarRef<item> | null> = (await cloneSlice({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.pointerType("main.item"), zero: () => null, methods: {CloneVT: (receiver: any, ...args: any[]) => $.pointerValue(receiver).CloneVT(...$.stripGenericTypeArgs(args))} }}, items) as $.Slice<item | $.VarRef<item> | null>)
 	await $.println($.len(cloned), $.pointerValue<item>($.arrayIndex(cloned!, 0)).value, $.pointerValue<item>($.arrayIndex(cloned!, 1)).value, $.pointerEqual($.arrayIndex(cloned!, 0), $.arrayIndex(items!, 0)))
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

@@ -310,18 +310,18 @@ export async function main(): globalThis.Promise<void> {
 	for (let __goscriptRangeTarget0 = $.arrayToSlice<$.Slice<any>>([$.arrayToSlice<any>([null, $.interfaceValue($.markAsStructValue(new cell({n: 1})), "main.cell", "main.cell")]), $.arrayToSlice<any>([$.interfaceValue(new cell(), "*main.cell", /* @__PURE__ */ $.pointerType("main.cell")), $.interfaceValue($.markAsStructValue(new cell({n: 2})), "main.cell", "main.cell")])]), __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
 		let source = __goscriptRangeTarget0![__rangeIndex]
 		let __goscriptShadow0: $.Slice<any> = (slices.Clone(source) as $.Slice<any>)
-		await mutateSecond!(__goscriptShadow0)
+		void (__goscriptAwait = mutateSecond!(__goscriptShadow0), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 		let copied: $.Slice<any> = $.makeSlice<any>($.len(source))
 		$.copy(copied, source)
-		await mutateSecond!(copied)
+		void (__goscriptAwait = mutateSecond!(copied), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 		let __goscriptShadow1: $.Slice<any> = $.appendSlice<any>(null, source, $.appendZeros.nil)
-		await mutateSecond!(__goscriptShadow1)
+		void (__goscriptAwait = mutateSecond!(__goscriptShadow1), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 		await $.println("interface struct:", $.mustTypeAssert<cell>($.arrayIndex(source!, 1), "main.cell").n, $.mustTypeAssert<cell>($.arrayIndex(__goscriptShadow0!, 1), "main.cell").n, $.mustTypeAssert<cell>($.arrayIndex(copied!, 1), "main.cell").n, $.mustTypeAssert<cell>($.arrayIndex(__goscriptShadow1!, 1), "main.cell").n)
 	}
 
 	let appendSeqSource: $.Slice<cell> = $.arrayToSlice<cell>([$.markAsStructValue(new cell({n: 1}))])
 	let appendSeq: ((_yield: ((_p0: cell) => boolean | globalThis.Promise<boolean>) | null) => void) | null = $.functionValue(async (_yield: ((_p0: cell) => boolean | globalThis.Promise<boolean>) | null): globalThis.Promise<void> => {
-		await _yield!($.markAsStructValue($.cloneStructValue($.arrayIndex(appendSeqSource!, 0))))
+		void (__goscriptAwait = _yield!($.markAsStructValue($.cloneStructValue($.arrayIndex(appendSeqSource!, 0)))), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 	}, ({ kind: $.TypeKind.Function, params: [({ kind: $.TypeKind.Function, params: ["main.cell"], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo)], results: [] } as $.FunctionTypeInfo))
 	let appendSeqResult: $.Slice<cell> = (slices.AppendSeq(null, appendSeq) as $.Slice<cell>)
 	$.arrayIndex(appendSeqResult!, 0).n = 9
@@ -344,6 +344,8 @@ export async function main(): globalThis.Promise<void> {
 
 	await $.println("test finished")
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

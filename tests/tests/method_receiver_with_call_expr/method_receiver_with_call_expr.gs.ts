@@ -30,7 +30,7 @@ export class State {
 		// const s = this
 		// ;(getProcessor())!(s)
 		// The semicolon is important to prevent: const s = this(getProcessor())!(s)
-		await getProcessor()!(s)
+		void (__goscriptAwait = getProcessor()!(s), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 	}
 
 	public markIndex(): void {
@@ -67,6 +67,8 @@ export async function main(): globalThis.Promise<void> {
 	State.prototype.markIndex.call(state)
 	await $.println("index:", index.value)
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

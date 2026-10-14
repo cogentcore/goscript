@@ -28,7 +28,7 @@ export class nistCurve {
 
 	public async Add(__typeArgs: $.GenericTypeArgs | undefined, p1: any, p2: any): globalThis.Promise<any> {
 		const curve: nistCurve | $.VarRef<nistCurve> | null = this;
-		return (await $.callGenericMethod(__typeArgs, "Point", "Add", p1, p1, p2) as any)
+		return ((__goscriptAwait = $.callGenericMethod(__typeArgs, "Point", "Add", p1, p1, p2), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as any)
 	}
 
 	public Zero(__typeArgs: $.GenericTypeArgs | undefined): any {
@@ -94,6 +94,8 @@ export async function main(): globalThis.Promise<void> {
 		await $.println("zero")
 	}
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

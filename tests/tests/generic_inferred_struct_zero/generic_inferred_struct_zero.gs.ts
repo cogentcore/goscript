@@ -109,7 +109,7 @@ export async function main(): globalThis.Promise<void> {
 	let tr: tree | $.VarRef<tree> | null = (newTree({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.entry", zero: () => $.markAsStructValue(new entry()) }}, lessEntry) as tree | $.VarRef<tree> | null)
 	let e = ($.markAsStructValue($.cloneStructValue(tree.prototype.get.call(tr, {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.entry", zero: () => $.markAsStructValue(new entry()) }}))) as entry)
 	await $.println("new", e.key == null, e.n)
-	await $.println("less", await $.pointerValue<tree>(tr).less!($.markAsStructValue(new entry({n: 1})), $.markAsStructValue(new entry({n: 2}))))
+	await $.println("less", (__goscriptAwait = $.pointerValue<tree>(tr).less!($.markAsStructValue(new entry({n: 1})), $.markAsStructValue(new entry({n: 2}))), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
 	// Zero values of type-parameter fields in generic constructors.
 	let lit = ($.markAsStructValue($.cloneStructValue(literalTree({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.entry", zero: () => $.markAsStructValue(new entry()) }}))) as tree)
@@ -123,6 +123,8 @@ export async function main(): globalThis.Promise<void> {
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo))) as tree | $.VarRef<tree> | null)
 	await $.println("int", tree.prototype.get.call(ints, {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }}))
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

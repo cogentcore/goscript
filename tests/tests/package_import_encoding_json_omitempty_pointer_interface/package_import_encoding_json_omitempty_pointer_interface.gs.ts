@@ -78,7 +78,7 @@ export async function main(): globalThis.Promise<void> {
 	let out: $.Slice<number> = __goscriptTuple0[0]
 	let err = __goscriptTuple0[1]
 	if (err != null) {
-		await fmt.Println("marshal error:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+		await fmt.Println("marshal error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		return
 	}
 	let text = $.bytesToString(out)
@@ -91,6 +91,8 @@ export async function main(): globalThis.Promise<void> {
 	await fmt.Println("ptrNilIface emitted as null:", strings.Contains(text, "\"ptrNilIface\":null"))
 	await fmt.Println("ptrBool emitted:", strings.Contains(text, "\"ptrBool\":"))
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

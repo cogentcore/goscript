@@ -103,8 +103,10 @@ export async function marshal(): globalThis.Promise<void> {
 
 	let __goscriptTuple2: any = $.markAsStructValue($.cloneStructValue(time.Date(10000, 1, 1, 0, 0, 0, 0, time.UTC))).MarshalJSON()
 	err = __goscriptTuple2[1]
-	await $.println("marshal json year 10000 err", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+	await $.println("marshal json year 10000 err", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

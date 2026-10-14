@@ -151,10 +151,10 @@ export class GenericChannelStore {
 
 export async function processViaInterface(processor: AsyncProcessor | null, input: number): globalThis.Promise<number> {
 	// This call should be awaited in TypeScript since Process is async
-	let result = await $.pointerValue<Exclude<AsyncProcessor, null>>(processor).Process(input)
+	let result = (__goscriptAwait = $.pointerValue<Exclude<AsyncProcessor, null>>(processor).Process(input), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 
 	// This call should NOT be awaited since GetResult is sync
-	let baseResult = await $.pointerValue<Exclude<AsyncProcessor, null>>(processor).GetResult()
+	let baseResult = (__goscriptAwait = $.pointerValue<Exclude<AsyncProcessor, null>>(processor).GetResult(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 
 	return result + baseResult
 }
@@ -164,7 +164,7 @@ export function newGenericStore(__typeArgs: $.GenericTypeArgs | undefined, value
 }
 
 export async function loadGenericStore(store: GenericStore | null): globalThis.Promise<number> {
-	return (await $.callInterfaceMethod($.pointerValue<Exclude<GenericStore, null>>(store), "Load", {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, V: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }}) as number)
+	return ((__goscriptAwait = $.callInterfaceMethod($.pointerValue<Exclude<GenericStore, null>>(store), "Load", {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, V: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }}), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as number)
 }
 
 export async function main(): globalThis.Promise<void> {
@@ -186,6 +186,8 @@ export async function main(): globalThis.Promise<void> {
 
 	ch!.close()
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

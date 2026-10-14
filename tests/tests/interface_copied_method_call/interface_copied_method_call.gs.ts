@@ -44,12 +44,14 @@ export async function callCopied(r: runner | null): globalThis.Promise<void> {
 	void ((): void => {
 		curr = r
 	})()
-	await $.pointerValue<Exclude<runner, null>>(curr).Run()
+	void (__goscriptAwait = $.pointerValue<Exclude<runner, null>>(curr).Run(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 }
 
 export async function main(): globalThis.Promise<void> {
 	await callCopied($.interfaceValue<runner | null>($.markAsStructValue(new task()), "main.task", "main.task"))
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

@@ -22,7 +22,7 @@ export class cache {
 
 	public async Get(__typeArgs: $.GenericTypeArgs | undefined, k: any, _new: (() => [any, $.GoError] | globalThis.Promise<[any, $.GoError]>) | null, check: ((_p0: any) => boolean | globalThis.Promise<boolean>) | null): globalThis.Promise<[any, $.GoError]> {
 		let c: cache | $.VarRef<cache> | null = this;
-		if (($.pointerValue<cache>(c).stored != null) && await check!($.pointerValue<cache>(c).stored)) {
+		if (($.pointerValue<cache>(c).stored != null) && (__goscriptAwait = check!($.pointerValue<cache>(c).stored), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)) {
 			return [$.pointerValue<cache>(c).stored, null]
 		}
 		let [v, err] = await _new!()
@@ -132,6 +132,8 @@ export async function main(): globalThis.Promise<void> {
 	}
 	await $.println("cached:", $.pointerValue<privateKey>(v).D)
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

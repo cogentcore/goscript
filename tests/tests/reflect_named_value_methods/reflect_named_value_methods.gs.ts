@@ -68,14 +68,14 @@ export async function main(): globalThis.Promise<void> {
 	let [st, ok] = $.typeAssertTuple<stringer | null>($.markAsStructValue($.cloneStructValue(ev)).Interface(), "main.stringer")
 	await $.println(ok)
 	if (ok) {
-		await $.println(await $.pointerValue<Exclude<stringer, null>>(st).String())
+		await $.println((__goscriptAwait = $.pointerValue<Exclude<stringer, null>>(st).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	}
 	let __goscriptTuple0: any = $.typeAssertTuple<setStringer | null>($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(ev)).Addr())).Interface(), "main.setStringer")
 	let ss = __goscriptTuple0[0]
 	ok = __goscriptTuple0[1]
 	await $.println(ok)
 	if (ok) {
-		await $.println(await $.pointerValue<Exclude<setStringer, null>>(ss).SetString("Strawberry") == null, $.int(fruit.value, 32) == 2)
+		await $.println((__goscriptAwait = $.pointerValue<Exclude<setStringer, null>>(ss).SetString("Strawberry"), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) == null, $.int(fruit.value, 32) == 2)
 	}
 	let __goscriptTuple1: any = $.typeAssertTuple<setStringer | null>($.markAsStructValue($.cloneStructValue(ev)).Interface(), "main.setStringer")
 	ok = __goscriptTuple1[1]
@@ -86,10 +86,12 @@ export async function main(): globalThis.Promise<void> {
 	{
 		let [s, __goscriptShadow0] = $.typeAssertTuple<stringer | null>($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(nv)).Elem())).Interface(), "main.stringer")
 		if (__goscriptShadow0) {
-			await $.println(await $.pointerValue<Exclude<stringer, null>>(s).String())
+			await $.println((__goscriptAwait = $.pointerValue<Exclude<stringer, null>>(s).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		}
 	}
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

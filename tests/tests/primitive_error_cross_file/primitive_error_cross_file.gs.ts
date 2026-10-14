@@ -13,9 +13,11 @@ export function fail(): $.GoError {
 export async function main(): globalThis.Promise<void> {
 	let err = fail()
 	if (err != null) {
-		await $.println(await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+		await $.println((__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	}
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

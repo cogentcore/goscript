@@ -112,12 +112,12 @@ export async function main(): globalThis.Promise<void> {
 	let callback: $.VarRef<(() => void) | null> = $.varRef(__goscriptTuple0[0])
 	let callbackErr = __goscriptTuple0[1]
 	if (callbackErr != null) {
-		await $.println("Pointer function error:", await $.pointerValue<Exclude<$.GoError, null>>(callbackErr).Error())
+		await $.println("Pointer function error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(callbackErr).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	} else {
 		fnPtr.value.Store(callback)
 		let loadedFn = (fnPtr.value.Load() as $.VarRef<(() => void) | null> | null)
 		if (loadedFn != null) {
-			await ($.pointerValue<(() => void) | null>(loadedFn))!()
+			void (__goscriptAwait = ($.pointerValue<(() => void) | null>(loadedFn))!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 		}
 	}
 
@@ -169,6 +169,8 @@ export async function main(): globalThis.Promise<void> {
 
 	await $.println("atomic test finished")
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

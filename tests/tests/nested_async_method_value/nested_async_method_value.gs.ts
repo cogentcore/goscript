@@ -52,7 +52,7 @@ export class Worker {
 }
 
 export async function run(fn: (() => $.GoError | globalThis.Promise<$.GoError>) | null): globalThis.Promise<void> {
-	let err = await fn!()
+	let err = (__goscriptAwait = fn!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 	if (err == null) {
 		await $.println("func value err: nil")
 	} else {
@@ -65,7 +65,7 @@ export async function main(): globalThis.Promise<void> {
 	await run($.functionValue(((__receiver) => () => __receiver.Spawn())($.pointerValue<Worker>(w)), ({ kind: $.TypeKind.Function, params: [], results: ["error"] } as $.FunctionTypeInfo), "main.(*Worker).Spawn-fm"))
 
 	let s: Spawner | null = $.interfaceValue<Spawner | null>(w, "*main.Worker", /* @__PURE__ */ $.pointerType("main.Worker"))
-	let err = await $.pointerValue<Exclude<Spawner, null>>(s).Spawn()
+	let err = (__goscriptAwait = $.pointerValue<Exclude<Spawner, null>>(s).Spawn(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 	if (err == null) {
 		await $.println("iface err: nil")
 	} else {
@@ -73,6 +73,8 @@ export async function main(): globalThis.Promise<void> {
 	}
 	await $.chanSend($.pointerValue<Worker>(w).ch, 1)
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

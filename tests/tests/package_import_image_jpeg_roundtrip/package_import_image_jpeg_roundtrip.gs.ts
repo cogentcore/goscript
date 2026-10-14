@@ -28,7 +28,7 @@ export async function main(): globalThis.Promise<void> {
 	{
 		let err = await jpeg.Encode($.interfaceValue<io.Writer | null>(buf, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer")), $.interfaceValue<image.Image | null>(im, "*image.RGBA", /* @__PURE__ */ $.pointerType("image.RGBA")), new jpeg.Options({Quality: 90}))
 		if (err != null) {
-			await $.println("encode error:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+			await $.println("encode error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 			return
 		}
 	}
@@ -42,15 +42,17 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("sum:", sum)
 	let [m, err] = await jpeg.Decode($.interfaceValue<io.Reader | null>(bytes.NewReader(b), "*bytes.Reader", /* @__PURE__ */ $.pointerType("bytes.Reader")))
 	if (err != null) {
-		await $.println("decode error:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+		await $.println("decode error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		return
 	}
-	let __goscriptTuple0: any = await $.pointerValue<Exclude<color.Color, null>>((await $.pointerValue<Exclude<image.Image, null>>(m).At(5, 7))).RGBA()
+	let __goscriptTuple0: any = await $.pointerValue<Exclude<color.Color, null>>((__goscriptAwait = $.pointerValue<Exclude<image.Image, null>>(m).At(5, 7), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)).RGBA()
 	let r = $.uint(__goscriptTuple0[0], 32)
 	let g = $.uint(__goscriptTuple0[1], 32)
 	let bb = $.uint(__goscriptTuple0[2], 32)
-	await $.println("bounds:", $.markAsStructValue($.cloneStructValue((await $.pointerValue<Exclude<image.Image, null>>(m).Bounds()))).Dx(), $.markAsStructValue($.cloneStructValue((await $.pointerValue<Exclude<image.Image, null>>(m).Bounds()))).Dy(), "px:", $.uint($.uintShr(r, 8, 32), 32), $.uint($.uintShr(g, 8, 32), 32), $.uint($.uintShr(bb, 8, 32), 32))
+	await $.println("bounds:", $.markAsStructValue($.cloneStructValue((__goscriptAwait = $.pointerValue<Exclude<image.Image, null>>(m).Bounds(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))).Dx(), $.markAsStructValue($.cloneStructValue((__goscriptAwait = $.pointerValue<Exclude<image.Image, null>>(m).Bounds(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))).Dy(), "px:", $.uint($.uintShr(r, 8, 32), 32), $.uint($.uintShr(g, 8, 32), 32), $.uint($.uintShr(bb, 8, 32), 32))
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

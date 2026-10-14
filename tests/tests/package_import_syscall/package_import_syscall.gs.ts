@@ -39,7 +39,7 @@ export async function main(): globalThis.Promise<void> {
 		if (err == null) {
 			await fmt.Println("kill unexpectedly succeeded")
 		} else {
-			await fmt.Println("kill:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+			await fmt.Println("kill:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		}
 	}
 	if (false) {
@@ -82,6 +82,8 @@ export async function main(): globalThis.Promise<void> {
 
 	await fmt.Println("set nonblock ok")
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

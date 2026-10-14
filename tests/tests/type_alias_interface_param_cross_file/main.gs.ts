@@ -45,7 +45,7 @@ export class sink {
 }
 
 export async function write(tx: __goscript_types.Tx | null, v: dep.Value): globalThis.Promise<void> {
-	await $.pointerValue<Exclude<__goscript_types.Tx, null>>(tx).Put((v as __goscript_types.Value))
+	void (__goscriptAwait = $.pointerValue<Exclude<__goscript_types.Tx, null>>(tx).Put((v as __goscript_types.Value)), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 }
 
 export async function main(): globalThis.Promise<void> {
@@ -53,6 +53,8 @@ export async function main(): globalThis.Promise<void> {
 	await write($.interfaceValue<__goscript_types.Tx | null>(s, "*main.sink", /* @__PURE__ */ $.pointerType("main.sink")), (new Uint8Array([1, 2, 3]) as $.Slice<number> as dep.Value))
 	await $.println("size:", $.pointerValue<sink>(s).size)
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

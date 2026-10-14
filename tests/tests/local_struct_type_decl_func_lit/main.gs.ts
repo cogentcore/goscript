@@ -46,8 +46,10 @@ export async function main(): globalThis.Promise<void> {
 		}
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo))
 
-	await run!()
+	void (__goscriptAwait = run!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

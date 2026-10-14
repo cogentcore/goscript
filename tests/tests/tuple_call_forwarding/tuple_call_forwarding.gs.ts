@@ -185,7 +185,7 @@ export async function names(nodes: $.Slice<Node | null>): globalThis.Promise<voi
 	await $.println("names:", $.len(nodes))
 	for (let __goscriptRangeTarget0 = nodes, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
 		let n = __goscriptRangeTarget0![__rangeIndex]
-		await $.println("name:", await $.pointerValue<Exclude<Node, null>>(n).Name())
+		await $.println("name:", (__goscriptAwait = $.pointerValue<Exclude<Node, null>>(n).Name(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	}
 }
 
@@ -228,6 +228,8 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("sprint:", await fmt.Sprint(...(() => { const __goscriptTupleArg5 = pair(3, 4); return [$.basicInterfaceValue(__goscriptTupleArg5[0], "int"), $.basicInterfaceValue(__goscriptTupleArg5[1], "int")] as [any, any] })()))
 	await $.println("tabs:", $.pointerValue<tabs>(ts).count)
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

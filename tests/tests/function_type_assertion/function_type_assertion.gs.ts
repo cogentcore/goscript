@@ -60,7 +60,7 @@ export async function main(): globalThis.Promise<void> {
 	let i: any = $.interfaceValue($.namedFunction(greet, "main.Greeter", ({ kind: $.TypeKind.Function, name: "main.Greeter", params: [/* @__PURE__ */ $.basicType("string")], results: [/* @__PURE__ */ $.basicType("string")] } as $.FunctionTypeInfo)), "main.Greeter", ({ kind: $.TypeKind.Function, name: "main.Greeter", params: [/* @__PURE__ */ $.basicType("string")], results: [/* @__PURE__ */ $.basicType("string")] } as $.FunctionTypeInfo))
 	let [fn, ok] = $.typeAssertTuple<((name: string) => string | globalThis.Promise<string>) | null>(i, ({ kind: $.TypeKind.Function, name: "main.Greeter", params: [/* @__PURE__ */ $.basicType("string")], results: [/* @__PURE__ */ $.basicType("string")] } as $.FunctionTypeInfo))
 	if (ok) {
-		await $.println(await fn!("World"))
+		await $.println((__goscriptAwait = fn!("World"), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	} else {
 		await $.println("Simple assertion failed")
 	}
@@ -70,7 +70,7 @@ export async function main(): globalThis.Promise<void> {
 	let addFn = __goscriptTuple0[0]
 	ok = __goscriptTuple0[1]
 	if (ok) {
-		await $.println(await addFn!(5, 3))
+		await $.println((__goscriptAwait = addFn!(5, 3), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	} else {
 		await $.println("Simple adder assertion failed")
 	}
@@ -81,7 +81,7 @@ export async function main(): globalThis.Promise<void> {
 	let greetFn = __goscriptTuple1[0]
 	ok = __goscriptTuple1[1]
 	if (ok) {
-		await $.println(await greetFn!("Gopher"))
+		await $.println((__goscriptAwait = greetFn!("Gopher"), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	} else {
 		await $.println("Returned function assertion failed")
 	}
@@ -91,7 +91,7 @@ export async function main(): globalThis.Promise<void> {
 	let addFnFromFunc = __goscriptTuple2[0]
 	ok = __goscriptTuple2[1]
 	if (ok) {
-		await $.println(await addFnFromFunc!(10, 20))
+		await $.println((__goscriptAwait = addFnFromFunc!(10, 20), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	} else {
 		await $.println("Returned adder assertion failed")
 	}
@@ -102,7 +102,7 @@ export async function main(): globalThis.Promise<void> {
 	let structFn = __goscriptTuple3[0]
 	ok = __goscriptTuple3[1]
 	if (ok) {
-		await $.println(await structFn!("Struct"))
+		await $.println((__goscriptAwait = structFn!("Struct"), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	} else {
 		await $.println("Struct function assertion failed")
 	}
@@ -112,7 +112,7 @@ export async function main(): globalThis.Promise<void> {
 	let structAdderFn = __goscriptTuple4[0]
 	ok = __goscriptTuple4[1]
 	if (ok) {
-		await $.println(await structAdderFn!(7, 8))
+		await $.println((__goscriptAwait = structAdderFn!(7, 8), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	} else {
 		await $.println("Struct adder assertion failed")
 	}
@@ -126,7 +126,7 @@ export async function main(): globalThis.Promise<void> {
 	let mapFn = __goscriptTuple5[0]
 	ok = __goscriptTuple5[1]
 	if (ok) {
-		await $.println(await mapFn!("Map"))
+		await $.println((__goscriptAwait = mapFn!("Map"), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	} else {
 		await $.println("Map function assertion failed")
 	}
@@ -135,7 +135,7 @@ export async function main(): globalThis.Promise<void> {
 	let mapAdderFn = __goscriptTuple6[0]
 	ok = __goscriptTuple6[1]
 	if (ok) {
-		await $.println(await mapAdderFn!(1, 2))
+		await $.println((__goscriptAwait = mapAdderFn!(1, 2), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	} else {
 		await $.println("Map adder assertion failed")
 	}
@@ -149,7 +149,7 @@ export async function main(): globalThis.Promise<void> {
 	let sliceFn = __goscriptTuple7[0]
 	ok = __goscriptTuple7[1]
 	if (ok) {
-		await $.println(await sliceFn!("Slice"))
+		await $.println((__goscriptAwait = sliceFn!("Slice"), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	} else {
 		await $.println("Slice function assertion failed")
 	}
@@ -157,7 +157,7 @@ export async function main(): globalThis.Promise<void> {
 	let sliceAdderFn = __goscriptTuple8[0]
 	ok = __goscriptTuple8[1]
 	if (ok) {
-		await $.println(await sliceAdderFn!(9, 9))
+		await $.println((__goscriptAwait = sliceAdderFn!(9, 9), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	} else {
 		await $.println("Slice adder assertion failed")
 	}
@@ -206,14 +206,14 @@ export async function main(): globalThis.Promise<void> {
 	let plain: any = $.interfaceValue($.goFunc(add, "main.add"), "func(a int, b int) int", ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))
 	let [plainFn, okPlain] = $.typeAssertTuple<((a: number, b: number) => number | globalThis.Promise<number>) | null>(plain, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))
 	if (okPlain) {
-		await $.println(await plainFn!(4, 4))
+		await $.println((__goscriptAwait = plainFn!(4, 4), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	} else {
 		await $.println("Unnamed function type assertion failed")
 	}
 
 	let [aliasFn, okAlias] = $.typeAssertTuple<((a: number, b: number) => number | globalThis.Promise<number>) | null>(plain, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))
 	if (okAlias) {
-		await $.println(await aliasFn!(6, 6))
+		await $.println((__goscriptAwait = aliasFn!(6, 6), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	} else {
 		await $.println("Alias function type assertion failed")
 	}
@@ -229,6 +229,8 @@ export async function main(): globalThis.Promise<void> {
 	let [, okUnnamed] = $.typeAssertTuple<((a: number, b: number) => number | globalThis.Promise<number>) | null>(j, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))
 	await $.println(okUnnamed)
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

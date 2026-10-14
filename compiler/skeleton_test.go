@@ -3132,7 +3132,7 @@ func TestCompilePackagesAssertsInterfaceMethodReceivers(t *testing.T) {
 	text := string(content)
 	for _, want := range []string{
 		"export type FileInfo = {",
-		"$.println(await $.pointerValue<Exclude<FileInfo, null>>(info).Name())",
+		"$.println((__goscriptAwait = $.pointerValue<Exclude<FileInfo, null>>(info).Name(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))",
 	} {
 		if !strings.Contains(text, want) {
 			t.Fatalf("missing %q in generated output:\n%s", want, text)
@@ -3234,7 +3234,7 @@ func TestCompilePackagesBoxesTypedNilInterfaceValues(t *testing.T) {
 	text := string(content)
 	for _, want := range []string{
 		"return $.interfaceValue<Animal | null>(FindDog(), \"*main.Dog\",",
-		"$.println(await $.pointerValue<Exclude<Animal, null>>(animal).Name())",
+		"$.println((__goscriptAwait = $.pointerValue<Exclude<Animal, null>>(animal).Name(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))",
 		"let a: Animal | null = $.interfaceValue<Animal | null>(dog, \"*main.Dog\",",
 	} {
 		if !strings.Contains(text, want) {
@@ -3415,7 +3415,7 @@ func TestCompilePackagesInfersGenericTypeArgsFromNamedArgument(t *testing.T) {
 		"await Get({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: \"genericnamedarg.Source\", zero: () => null, methods: {Load: (receiver: any, ...args: any[]) => receiver.Load(...$.stripGenericTypeArgs(args))} }}, $.markAsStructValue($.cloneStructValue(loader)))",
 		"return $.mustTypeAssert<(() => any | globalThis.Promise<any>) | null>(f, ({ kind: $.TypeKind.Function, params: [], results: [__typeArgs?.[\"T\"]?.type ?? { kind: $.TypeKind.Interface, methods: [] }] } as $.FunctionTypeInfo))!()",
 		"$.mustTypeAssert<any>(v, { kind: $.TypeKind.Interface, methods: [{ name: \"Load\", args: [], returns: [{ name: \"_r0\", type: __typeArgs?.[\"T\"]?.type ?? { kind: $.TypeKind.Interface, methods: [] } }] }] })",
-		"return await $.pointerValue<Exclude<Source, null>>(src).Load()",
+		"return (__goscriptAwait = $.pointerValue<Exclude<Source, null>>(src).Load(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)",
 	} {
 		if !strings.Contains(text, want) {
 			t.Fatalf("missing %q in generated output:\n%s", want, text)
@@ -3882,7 +3882,7 @@ func TestCompilePackagesLowersRangeOverFunctionIterators(t *testing.T) {
 	}
 	text := string(content)
 	for _, want := range []string{
-		"if (!await _yield!(i, v))",
+		"if (!(__goscriptAwait = _yield!(i, v), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))",
 		"break",
 		"await pairs!(async (i, v) => {",
 		"last = __goscriptRange",
@@ -4194,7 +4194,7 @@ func TestCompilePackagesPropagatesAsyncGenericInterfaceMethods(t *testing.T) {
 	for _, want := range []string{
 		"Wait(__typeArgs: $.GenericTypeArgs | undefined, ctx: context.Context | null, old: any): any | globalThis.Promise<any>",
 		"public async Wait(__typeArgs: $.GenericTypeArgs | undefined, ctx: context.Context | null, old: any): globalThis.Promise<any>",
-		"return (await $.callInterfaceMethod($.pointerValue<Exclude<Watchable, null>>(w), \"Wait\", {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType(\"int\"), zero: () => 0 }}, ctx, old) as number)",
+		"return ((__goscriptAwait = $.callInterfaceMethod($.pointerValue<Exclude<Watchable, null>>(w), \"Wait\", {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType(\"int\"), zero: () => 0 }}, ctx, old), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as number)",
 	} {
 		if !strings.Contains(text, want) {
 			t.Fatalf("missing %q in generated output:\n%s", want, text)
@@ -4545,7 +4545,7 @@ func TestCompilePackagesKeepsOpenEmbeddedInterfaceDispatchAsync(t *testing.T) {
 	text := string(content)
 	for _, want := range []string{
 		"export async function Use(value: dep.Open | null): globalThis.Promise<void>",
-		"await $.pointerValue<Exclude<dep.Open, null>>(value).M()",
+		"(__goscriptAwait = $.pointerValue<Exclude<dep.Open, null>>(value).M(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)",
 	} {
 		if !strings.Contains(text, want) {
 			t.Fatalf("missing %q in generated output:\n%s", want, text)
@@ -4675,7 +4675,7 @@ func TestCompilePackagesMarksFunctionLiteralAsyncForInterfaceMethodCall(t *testi
 	text := string(content)
 	for _, want := range []string{
 		"$.functionValue(async (block: BlockWithRefs | null): globalThis.Promise<$.GoError> => {",
-		"let err = await $.pointerValue<Exclude<BlockWithRefs, null>>(block).ApplyBlockRef(7, ref)",
+		"let err = (__goscriptAwait = $.pointerValue<Exclude<BlockWithRefs, null>>(block).ApplyBlockRef(7, ref), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)",
 	} {
 		if !strings.Contains(text, want) {
 			t.Fatalf("missing %q in generated output:\n%s", want, text)
@@ -4773,7 +4773,7 @@ func TestCompilePackagesMarksFunctionLiteralAsyncForInterfaceMethodTypeSwitch(t 
 	text := string(content)
 	for _, want := range []string{
 		"$.functionValue(async (di: Directive | null): globalThis.Promise<[boolean, $.GoError]> => {",
-		"const __goscriptTypeSwitchValue = await $.pointerValue<Exclude<Directive, null>>(di).GetDirective()",
+		"const __goscriptTypeSwitchValue = (__goscriptAwait = $.pointerValue<Exclude<Directive, null>>(di).GetDirective(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)",
 	} {
 		if !strings.Contains(text, want) {
 			t.Fatalf("missing %q in generated output:\n%s", want, text)
@@ -4902,7 +4902,7 @@ func TestCompilePackagesPropagatesImportedAsyncGenericInterfaceMethods(t *testin
 		t.Fatal(err.Error())
 	}
 	mainText := string(mainContent)
-	if want := "return (await $.callInterfaceMethod($.pointerValue<Exclude<dep.Watchable, null>>(w), \"Wait\", {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType(\"int\"), zero: () => 0 }}, ctx, old) as number)"; !strings.Contains(mainText, want) {
+	if want := "return ((__goscriptAwait = $.callInterfaceMethod($.pointerValue<Exclude<dep.Watchable, null>>(w), \"Wait\", {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType(\"int\"), zero: () => 0 }}, ctx, old), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as number)"; !strings.Contains(mainText, want) {
 		t.Fatalf("missing %q in generated main output:\n%s", want, mainText)
 	}
 }
@@ -5064,7 +5064,7 @@ func TestCompilePackagesAwaitsAsyncInterfaceMethodSingleResultAssignment(t *test
 		t.Fatal(err.Error())
 	}
 	text := string(content)
-	if want := "let err = await $.pointerValue<Exclude<iface.Controller, null>>(c).Execute(ctx)"; !strings.Contains(text, want) {
+	if want := "let err = (__goscriptAwait = $.pointerValue<Exclude<iface.Controller, null>>(c).Execute(ctx), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)"; !strings.Contains(text, want) {
 		t.Fatalf("single-result async interface assignment was not awaited:\n%s", text)
 	}
 }
@@ -5116,7 +5116,7 @@ func TestCompilePackagesAwaitsInterfaceMethodCallInsideAsyncCallerWithoutKnownIm
 		t.Fatal(err.Error())
 	}
 	text := string(content)
-	if want := "let err = await $.pointerValue<Exclude<iface.Controller, null>>(c).Execute(ctx)"; !strings.Contains(text, want) {
+	if want := "let err = (__goscriptAwait = $.pointerValue<Exclude<iface.Controller, null>>(c).Execute(ctx), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)"; !strings.Contains(text, want) {
 		t.Fatalf("async caller did not await interface method with unknown implementation:\n%s", text)
 	}
 }
@@ -5166,7 +5166,7 @@ func TestCompilePackagesMarksNamedFunctionAsyncForInterfaceMethodCallWithoutKnow
 	text := string(content)
 	for _, want := range []string{
 		"export async function Run(ctx: context.Context | null, c: iface.Controller | null): globalThis.Promise<$.GoError>",
-		"let err = await $.pointerValue<Exclude<iface.Controller, null>>(c).Execute(ctx)",
+		"let err = (__goscriptAwait = $.pointerValue<Exclude<iface.Controller, null>>(c).Execute(ctx), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)",
 	} {
 		if !strings.Contains(text, want) {
 			t.Fatalf("missing %q in generated output:\n%s", want, text)
@@ -5536,7 +5536,7 @@ func TestCompilePackagesWidensErrorInterfaceABI(t *testing.T) {
 		// Concrete implementations become async and await inner error
 		// dispatch whose text may resolve on the microtask queue.
 		"public async Error(): globalThis.Promise<string>",
-		", await $.pointerValue<Exclude<$.GoError, null>>($.pointerValue<wrappedError>(w).cause).Error())",
+		", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>($.pointerValue<wrappedError>(w).cause).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))",
 	} {
 		if !strings.Contains(text, want) {
 			t.Fatalf("missing %q in generated output:\n%s", want, text)
@@ -5784,7 +5784,7 @@ func TestCompilePackagesLowersSortSearchCallbackAsAsyncCompatible(t *testing.T) 
 	for _, want := range []string{
 		"return sort.Search(",
 		"$.functionValue(async (i: number): globalThis.Promise<boolean> => {",
-		"let item = await $.pointerValue<Exclude<Items, null>>(items).Get(i)",
+		"let item = (__goscriptAwait = $.pointerValue<Exclude<Items, null>>(items).Get(i), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)",
 	} {
 		if !strings.Contains(text, want) {
 			t.Fatalf("missing %q in generated output:\n%s", want, text)
@@ -6439,7 +6439,7 @@ func TestCompilePackagesAwaitsAsyncErrorMethod(t *testing.T) {
 	}
 	// Dispatching Error() through the error interface must await the
 	// implementation instead of storing a Promise in a string variable.
-	if !strings.Contains(text, "msg = await ") || !strings.Contains(text, ".Error()") {
+	if !strings.Contains(text, "msg = (__goscriptAwait = ") || !strings.Contains(text, "? await __goscriptAwait") || !strings.Contains(text, ".Error()") {
 		t.Fatalf("error interface dispatch did not await async implementation:\n%s", text)
 	}
 }

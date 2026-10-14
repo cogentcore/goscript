@@ -58,7 +58,7 @@ export class wrapper {
 }
 
 export async function read(__typeArgs: $.GenericTypeArgs | undefined, d: Derived | null): globalThis.Promise<any> {
-	return (await $.callInterfaceMethod($.pointerValue<Exclude<Derived, null>>(d), "Value", {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }}) as any)
+	return ((__goscriptAwait = $.callInterfaceMethod($.pointerValue<Exclude<Derived, null>>(d), "Value", {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }}), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as any)
 }
 
 export function setGeneric(__typeArgs: $.GenericTypeArgs | undefined, w: dep.Wrapper | $.VarRef<dep.Wrapper> | null, value: any): any {
@@ -76,6 +76,8 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("generic empty:", $.stringEqual(setGeneric({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }, U: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }}, keyed, 7), ""))
 	await $.println("concrete empty:", $.stringEqual(setConcrete(keyed), ""))
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

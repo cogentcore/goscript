@@ -13,7 +13,7 @@ import "@goscript/net/http/index.js"
 import "@goscript/net/http/httptest/index.js"
 
 export async function setAttachment(w: http.ResponseWriter | null, name: string): globalThis.Promise<void> {
-	http.Header_Set((await $.pointerValue<Exclude<http.ResponseWriter, null>>(w).Header()), "Content-Disposition", mime.FormatMediaType("attachment", $.makeMap<string, string>([["filename", name]])))
+	http.Header_Set((__goscriptAwait = $.pointerValue<Exclude<http.ResponseWriter, null>>(w).Header(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), "Content-Disposition", mime.FormatMediaType("attachment", $.makeMap<string, string>([["filename", name]])))
 }
 
 export async function main(): globalThis.Promise<void> {
@@ -24,6 +24,8 @@ export async function main(): globalThis.Promise<void> {
 	await setAttachment($.interfaceValue<http.ResponseWriter | null>(w, "*httptest.ResponseRecorder", /* @__PURE__ */ $.pointerType("httptest.ResponseRecorder")), "hello.txt")
 	await $.println(await http.Header_Get(httptest.ResponseRecorder.prototype.Header.call($.pointerValue<httptest.ResponseRecorder>(w)), "Content-Disposition"))
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

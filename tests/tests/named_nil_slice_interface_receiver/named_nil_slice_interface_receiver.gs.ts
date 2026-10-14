@@ -34,8 +34,10 @@ export function bytesEncoder_Len(b: bytesEncoder): number {
 export async function main(): globalThis.Promise<void> {
 	let b: bytesEncoder = null! as bytesEncoder
 	let s: sizer | null = $.namedValueInterfaceValue<sizer | null>(b, "main.bytesEncoder", {Len: (receiver: any, ...args: any[]) => (bytesEncoder_Len as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"), "main.bytesEncoder"), [$.methodSignature("Len", [], [/* @__PURE__ */ $.basicType("int")])])
-	await $.println(await $.pointerValue<Exclude<sizer, null>>(s).Len())
+	await $.println((__goscriptAwait = $.pointerValue<Exclude<sizer, null>>(s).Len(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

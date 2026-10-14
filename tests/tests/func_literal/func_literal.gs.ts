@@ -8,9 +8,11 @@ export async function main(): globalThis.Promise<void> {
 		return $.concatString("Hello, ", name)
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string")], results: [/* @__PURE__ */ $.basicType("string")] } as $.FunctionTypeInfo))
 
-	let message = await greet!("world")
+	let message = (__goscriptAwait = greet!("world"), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 	await $.println(message)
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

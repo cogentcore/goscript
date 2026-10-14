@@ -61,7 +61,7 @@ export function asDoubler(v: MyInt): Doubler | null {
 }
 
 export async function sumDoublers(vals: $.Slice<Doubler | null>): globalThis.Promise<number> {
-	return await $.pointerValue<Exclude<Doubler, null>>($.arrayIndex(vals!, 0)).Double() + await $.pointerValue<Exclude<Doubler, null>>($.arrayIndex(vals!, 1)).Double()
+	return (__goscriptAwait = $.pointerValue<Exclude<Doubler, null>>($.arrayIndex(vals!, 0)).Double(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) + (__goscriptAwait = $.pointerValue<Exclude<Doubler, null>>($.arrayIndex(vals!, 1)).Double(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 }
 
 export function assertDoubler(__typeArgs: $.GenericTypeArgs | undefined, v: Doubler | null): [any, boolean] {
@@ -86,13 +86,13 @@ export async function main(): globalThis.Promise<void> {
 
 	// Test storing method reference (this is the failing case)
 	let fn: (() => number | globalThis.Promise<number>) | null = $.functionValue(((__receiver) => () => MyInt_Double(__receiver))(10), ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo), "main.MyInt.Double-fm")
-	await $.println("Method ref call:", await fn!())
+	await $.println("Method ref call:", (__goscriptAwait = fn!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
 	let d: Doubler | null = $.namedValueInterfaceValue<Doubler | null>(12, "main.MyInt", {Double: (receiver: any, ...args: any[]) => (MyInt_Double as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, /* @__PURE__ */ $.basicType("int", "main.MyInt"), [$.methodSignature("Double", [], [/* @__PURE__ */ $.basicType("int")])])
-	await $.println("Interface method call:", await $.pointerValue<Exclude<Doubler, null>>(d).Double())
+	await $.println("Interface method call:", (__goscriptAwait = $.pointerValue<Exclude<Doubler, null>>(d).Double(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
 	let ret = asDoubler(13)
-	await $.println("Returned interface call:", await $.pointerValue<Exclude<Doubler, null>>(ret).Double())
+	await $.println("Returned interface call:", (__goscriptAwait = $.pointerValue<Exclude<Doubler, null>>(ret).Double(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
 	let [asserted, ok] = $.typeAssertTuple<MyInt>(ret, /* @__PURE__ */ $.basicType("int", "main.MyInt"))
 	await $.println("Interface assertion:", $.int(asserted), ok)
@@ -108,13 +108,15 @@ export async function main(): globalThis.Promise<void> {
 
 	let flag: $.VarRef<boolean> = $.varRef(false)
 	let stringer: Stringer | null = $.namedValueInterfaceValue<Stringer | null>(newMyBool(true, flag), "*main.MyBool", {String: (receiver: any, ...args: any[]) => (MyBool_String as any)(receiver, ...$.stripGenericTypeArgs(args))}, /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("bool", "main.MyBool")), [$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])])
-	await $.println("Pointer primitive interface:", await $.pointerValue<Exclude<Stringer, null>>(stringer).String(), flag.value)
+	await $.println("Pointer primitive interface:", (__goscriptAwait = $.pointerValue<Exclude<Stringer, null>>(stringer).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), flag.value)
 
 	let __goscriptTuple1: any = assertStringer({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("bool", "main.MyBool")), zero: () => null, methods: {String: (receiver: any, ...args: any[]) => (MyBool_String as any)(receiver, ...$.stripGenericTypeArgs(args))}, methodSignatures: [$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])] }}, stringer)
 	let genericPointer: $.VarRef<MyBool> | null = (__goscriptTuple1[0] as $.VarRef<MyBool> | null)
 	let genericPointerOK = __goscriptTuple1[1]
 	await $.println("Generic pointer interface assertion:", MyBool_String(genericPointer), genericPointerOK)
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

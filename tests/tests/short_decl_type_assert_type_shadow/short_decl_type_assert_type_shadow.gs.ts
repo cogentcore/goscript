@@ -53,6 +53,8 @@ export async function main(): globalThis.Promise<void> {
 	await $.println(await use($.interfaceValue($.markAsStructValue(new item()), "main.item", "main.item")))
 }
 
+var __goscriptAwait: any
+
 if ($.isMainScript(import.meta)) {
 	await main()
 }

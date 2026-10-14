@@ -12,7 +12,7 @@ export function shadowTupleInput(value: string): [string, boolean] {
 }
 
 export async function shadowCallbackInput(fn: ((_p0: number) => number | globalThis.Promise<number>) | null): globalThis.Promise<[number, boolean]> {
-	return [await fn!(5), true]
+	return [(__goscriptAwait = fn!(5), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), true]
 }
 
 export async function selectResultRedeclare(): globalThis.Promise<void> {
@@ -93,6 +93,8 @@ export async function main(): globalThis.Promise<void> {
 	await typeSwitchCaseRedeclare($.basicInterfaceValue(1, "int"))
 	await typeSwitchCaseRedeclare("two")
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

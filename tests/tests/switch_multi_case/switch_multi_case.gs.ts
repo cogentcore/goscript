@@ -30,7 +30,7 @@ export async function main(): globalThis.Promise<void> {
 			value = __goscriptTuple0[1]
 			err = __goscriptTuple0[2]
 			if (err != null) {
-				await $.println("Error:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+				await $.println("Error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 			}
 			await $.println("Month:", month, "Value:", value)
 			break
@@ -57,7 +57,7 @@ export async function main(): globalThis.Promise<void> {
 			value = __goscriptTuple1[1]
 			err = __goscriptTuple1[2]
 			if (err != null) {
-				await $.println("Error:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+				await $.println("Error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 			}
 			await $.println("Month:", month, "Value:", value)
 			break
@@ -74,6 +74,8 @@ export async function main(): globalThis.Promise<void> {
 		}
 	}
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

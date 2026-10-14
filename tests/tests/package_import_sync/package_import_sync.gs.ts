@@ -238,16 +238,16 @@ export async function main(): globalThis.Promise<void> {
 	let onceFunc: (() => void) | null = sync.OnceFunc($.functionValue(async (): globalThis.Promise<void> => {
 		await $.println("OnceFunc executed")
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)))
-	await onceFunc!()
-	await onceFunc!()
+	void (__goscriptAwait = onceFunc!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+	void (__goscriptAwait = onceFunc!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 
 	// Test OnceValue
 	let onceValue: (() => number | globalThis.Promise<number>) | null = (sync.OnceValue($.functionValue(async (): globalThis.Promise<number> => {
 		await $.println("OnceValue function executed")
 		return 42
 	}, ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))) as (() => number | globalThis.Promise<number>) | null)
-	let val1 = await onceValue!()
-	let val2 = await onceValue!()
+	let val1 = (__goscriptAwait = onceValue!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+	let val2 = (__goscriptAwait = onceValue!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 	await $.println("OnceValue results:", val1, val2)
 
 	// Test sync.Map
@@ -348,6 +348,8 @@ export async function condZeroValue(): globalThis.Promise<void> {
 	let c: sync.Cond | $.VarRef<sync.Cond> | null = sync.NewCond($.pointerValueOrNil($.interfaceValue<sync.Locker | null>(new sync.Mutex(), "*sync.Mutex", /* @__PURE__ */ $.pointerType("sync.Mutex")))!)
 	await $.println("NewCond L is nil:", $.pointerValue<sync.Cond>(c).L == null)
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

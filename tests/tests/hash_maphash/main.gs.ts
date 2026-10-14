@@ -32,7 +32,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println(h.value.Sum64() == whole)
 
 	let hh: hash.Hash64 | null = $.interfaceValue<hash.Hash64 | null>(h, "*maphash.Hash", /* @__PURE__ */ $.pointerType("maphash.Hash"))
-	await $.println(await $.pointerValue<Exclude<hash.Hash64, null>>(hh).Size(), await $.pointerValue<Exclude<hash.Hash64, null>>(hh).BlockSize(), $.len(await $.pointerValue<Exclude<hash.Hash64, null>>(hh).Sum(null)))
+	await $.println((__goscriptAwait = $.pointerValue<Exclude<hash.Hash64, null>>(hh).Size(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = $.pointerValue<Exclude<hash.Hash64, null>>(hh).BlockSize(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), $.len((__goscriptAwait = $.pointerValue<Exclude<hash.Hash64, null>>(hh).Sum(null), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)))
 
 	h.value.Reset()
 	await $.println(h.value.Sum64() == maphash.String($.markAsStructValue($.cloneStructValue(seed)), ""))
@@ -45,6 +45,8 @@ export async function main(): globalThis.Promise<void> {
 
 	await $.println(stripe("block") == stripe("block"), stripe("block") < 4096n)
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

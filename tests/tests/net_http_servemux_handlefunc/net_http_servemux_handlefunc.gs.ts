@@ -26,21 +26,21 @@ export async function serve(handler: http.Handler | null, target: string): globa
 export async function main(): globalThis.Promise<void> {
 	let mux: http.ServeMux | $.VarRef<http.ServeMux> | null = http.NewServeMux()
 	http.ServeMux.prototype.HandleFunc.call($.pointerValue<http.ServeMux>(mux), "/mux", $.functionValue(async (w: http.ResponseWriter | null, r: http.Request | $.VarRef<http.Request> | null): globalThis.Promise<void> => {
-		http.Header_Set((await $.pointerValue<Exclude<http.ResponseWriter, null>>(w).Header()), "X-Route", "mux")
-		await $.pointerValue<Exclude<http.ResponseWriter, null>>(w).WriteHeader(202)
+		http.Header_Set((__goscriptAwait = $.pointerValue<Exclude<http.ResponseWriter, null>>(w).Header(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), "X-Route", "mux")
+		void (__goscriptAwait = $.pointerValue<Exclude<http.ResponseWriter, null>>(w).WriteHeader(202), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 		{
 			let [, err] = await $.pointerValue<Exclude<http.ResponseWriter, null>>(w).Write($.stringToBytes($.concatString("hello ", $.pointerValue<url.URL>($.pointerValue<http.Request>(r).URL).Path)))
 			if (err != null) {
-				await $.println("write error:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+				await $.println("write error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 			}
 		}
 	}, ({ kind: $.TypeKind.Function, params: ["http.ResponseWriter", /* @__PURE__ */ $.pointerType("http.Request")], results: [] } as $.FunctionTypeInfo)))
 	http.HandleFunc("/default", $.functionValue(async (w: http.ResponseWriter | null, r: http.Request | $.VarRef<http.Request> | null): globalThis.Promise<void> => {
-		http.Header_Set((await $.pointerValue<Exclude<http.ResponseWriter, null>>(w).Header()), "X-Route", "default")
+		http.Header_Set((__goscriptAwait = $.pointerValue<Exclude<http.ResponseWriter, null>>(w).Header(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), "X-Route", "default")
 		{
 			let [, err] = await $.pointerValue<Exclude<http.ResponseWriter, null>>(w).Write($.stringToBytes($.concatString("hello ", $.pointerValue<url.URL>($.pointerValue<http.Request>(r).URL).Path)))
 			if (err != null) {
-				await $.println("write error:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+				await $.println("write error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 			}
 		}
 	}, ({ kind: $.TypeKind.Function, params: ["http.ResponseWriter", /* @__PURE__ */ $.pointerType("http.Request")], results: [] } as $.FunctionTypeInfo)))
@@ -49,6 +49,8 @@ export async function main(): globalThis.Promise<void> {
 	await serve($.interfaceValue<http.Handler | null>(mux, "*http.ServeMux", /* @__PURE__ */ $.pointerType("http.ServeMux")), "/missing")
 	await serve($.interfaceValue<http.Handler | null>(http.DefaultServeMux, "*http.ServeMux", /* @__PURE__ */ $.pointerType("http.ServeMux")), "/default")
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

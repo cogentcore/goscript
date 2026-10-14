@@ -15,7 +15,7 @@ export async function main(): globalThis.Promise<void> {
 	{
 		let err = await os.WriteFile(fileName, new Uint8Array([99, 111, 110, 116, 101, 110, 116, 115]), 0o644)
 		if (err != null) {
-			await $.println("write error:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+			await $.println("write error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 			return
 		}
 	}
@@ -24,16 +24,18 @@ export async function main(): globalThis.Promise<void> {
 	await (async (): globalThis.Promise<void> => {
 		let [info, err] = await os.Stat(fileName)
 		if (err != null) {
-			await $.println("stat error:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+			await $.println("stat error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 			return
 		}
 		if (false) {
-			await $.println("size:", await $.pointerValue<Exclude<fs.FileInfo, null>>(info).Size())
+			await $.println("size:", (__goscriptAwait = $.pointerValue<Exclude<fs.FileInfo, null>>(info).Size(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		} else {
 			await $.println("stat closure ok")
 		}
 	})()
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

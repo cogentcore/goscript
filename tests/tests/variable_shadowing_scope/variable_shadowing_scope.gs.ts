@@ -58,7 +58,7 @@ export async function describe(value: any): globalThis.Promise<void> {
 		let __goscriptShadow1 = __goscriptTuple0[0]
 		let ok = __goscriptTuple0[1]
 		if (ok) {
-			await $.println("Shadowed name:", await $.pointerValue<Exclude<named, null>>(__goscriptShadow1).Name())
+			await $.println("Shadowed name:", (__goscriptAwait = $.pointerValue<Exclude<named, null>>(__goscriptShadow1).Name(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 			return
 		}
 	}
@@ -80,6 +80,8 @@ export async function main(): globalThis.Promise<void> {
 	await describe($.interfaceValue($.markAsStructValue(new item()), "main.item", "main.item"))
 	await describe("nope")
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

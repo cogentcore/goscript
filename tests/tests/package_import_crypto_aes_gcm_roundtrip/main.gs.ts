@@ -179,9 +179,9 @@ export async function main(): globalThis.Promise<void> {
 	let aad: $.Slice<number> = new Uint8Array([113, 117, 105, 99, 32, 112, 114, 111, 116, 101, 99, 116, 101, 100, 32, 104, 101, 97, 100, 101, 114])
 	let expected: $.Slice<number> = await $.pointerValue<Exclude<cipher.AEAD, null>>(aead).Seal(null, nonce, plaintext, aad)
 	$.copy($.goSlice(packet, 15, undefined), plaintext)
-	let sealer = $.interfaceValue<packetSealer | null>(new nestedSealer({aead: aead, nonce: nonce, aad: aad}), "*main.nestedSealer", /* @__PURE__ */ $.pointerType("main.nestedSealer"))
-	await $.pointerValue<Exclude<packetSealer, null>>(sealer).Seal($.goSlice(packet, 15, 15), $.goSlice(packet, 15, 15 + $.len(plaintext)))
-	packet = $.goSlice(packet, undefined, $.len(packet) + await $.pointerValue<Exclude<cipher.AEAD, null>>(aead).Overhead())
+	let sealer = $.interfaceValue<packetSealer | null>(new nestedSealer({aead: aead, nonce: nonce, aad: aad}), "*main.nestedSealer", /* @__PURE__ */ $.pointerType("main.nestedSealer"));
+	(__goscriptAwait = $.pointerValue<Exclude<packetSealer, null>>(sealer).Seal($.goSlice(packet, 15, 15), $.goSlice(packet, 15, 15 + $.len(plaintext))), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+	packet = $.goSlice(packet, undefined, $.len(packet) + (__goscriptAwait = $.pointerValue<Exclude<cipher.AEAD, null>>(aead).Overhead(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	await $.println("wrapped shared backing:", bytes.Equal($.goSlice(packet, 15, 15 + $.len(expected)), expected))
 
 	let [randomAEAD, err] = cipher.NewGCMWithRandomNonce($.pointerValueOrNil(block)!)
@@ -189,8 +189,10 @@ export async function main(): globalThis.Promise<void> {
 	let __goscriptTuple2: any = await $.pointerValue<Exclude<cipher.AEAD, null>>(randomAEAD).Open(null, null, $.goSlice(randomSealed, 1, undefined), aad)
 	let randomOpened: $.Slice<number> = __goscriptTuple2[0]
 	let openErr = __goscriptTuple2[1]
-	await $.println("random nonce:", err == null, openErr == null, await $.pointerValue<Exclude<cipher.AEAD, null>>(randomAEAD).NonceSize(), await $.pointerValue<Exclude<cipher.AEAD, null>>(randomAEAD).Overhead(), $.len(randomSealed), $.uint($.arrayIndex(randomSealed!, 0), 8) == 7, bytes.Equal(randomOpened, new Uint8Array([114, 97, 110, 100, 111, 109, 32, 110, 111, 110, 99, 101])))
+	await $.println("random nonce:", err == null, openErr == null, (__goscriptAwait = $.pointerValue<Exclude<cipher.AEAD, null>>(randomAEAD).NonceSize(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = $.pointerValue<Exclude<cipher.AEAD, null>>(randomAEAD).Overhead(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), $.len(randomSealed), $.uint($.arrayIndex(randomSealed!, 0), 8) == 7, bytes.Equal(randomOpened, new Uint8Array([114, 97, 110, 100, 111, 109, 32, 110, 111, 110, 99, 101])))
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

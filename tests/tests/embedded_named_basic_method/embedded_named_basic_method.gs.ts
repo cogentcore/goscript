@@ -111,16 +111,18 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("direct:", Level_Rank(eng.Level, "rank: "))
 
 	let r: Ranker | null = $.interfaceValue<Ranker | null>($.markAsStructValue($.cloneStructValue(eng)), "main.Engineer", "main.Engineer")
-	await $.println("interface:", await $.pointerValue<Exclude<Ranker, null>>(r).Rank("value: "))
+	await $.println("interface:", (__goscriptAwait = $.pointerValue<Exclude<Ranker, null>>(r).Rank("value: "), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
 	r = $.interfaceValue<Ranker | null>(new Engineer({Level: 1, Name: "Ada"}), "*main.Engineer", /* @__PURE__ */ $.pointerType("main.Engineer"))
-	await $.println("pointer:", await $.pointerValue<Exclude<Ranker, null>>(r).Rank("pointer: "))
+	await $.println("pointer:", (__goscriptAwait = $.pointerValue<Exclude<Ranker, null>>(r).Rank("pointer: "), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
 	let lead: Lead | $.VarRef<Lead> | null = new Lead({Engineer: $.markAsStructValue(new Engineer({Level: 4, Name: "Linus"}))})
 	await $.println("nested direct:", Level_Rank($.pointerValue<Lead>(lead).Engineer.Level, "lead: "))
 	r = $.interfaceValue<Ranker | null>(lead, "*main.Lead", /* @__PURE__ */ $.pointerType("main.Lead"))
-	await $.println("nested interface:", await $.pointerValue<Exclude<Ranker, null>>(r).Rank("lead: "))
+	await $.println("nested interface:", (__goscriptAwait = $.pointerValue<Exclude<Ranker, null>>(r).Rank("lead: "), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

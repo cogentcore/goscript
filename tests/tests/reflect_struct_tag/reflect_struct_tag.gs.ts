@@ -53,8 +53,8 @@ export function tagLen(tag: reflect.StructTag): number {
 
 export async function main(): globalThis.Promise<void> {
 	let typ = reflect.TypeOf($.interfaceValue($.markAsStructValue(new item()), "main.item", "main.item"))
-	for (let i = 0; i < await $.pointerValue<Exclude<reflect.Type, null>>(typ).NumField(); i++) {
-		let f = $.markAsStructValue($.cloneStructValue(await $.pointerValue<Exclude<reflect.Type, null>>(typ).Field(i)))
+	for (let i = 0; i < (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(typ).NumField(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait); i++) {
+		let f = $.markAsStructValue($.cloneStructValue((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(typ).Field(i), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)))
 		await $.println(f.Name, tagLen(f.Tag), $.stringEqual(globalThis.String(f.Tag), ""))
 		await $.println(" json:", reflect.StructTag_Get(f.Tag, "json"))
 		await $.println(" desc:", reflect.StructTag_Get(f.Tag, "desc"))
@@ -65,6 +65,8 @@ export async function main(): globalThis.Promise<void> {
 	let tag: reflect.StructTag = "a:\"1\" b:\"two words\""
 	await $.println(reflect.StructTag_Get(tag, "b"), $.stringEqual(tag, "a:\"1\" b:\"two words\""))
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

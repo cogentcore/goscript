@@ -34,7 +34,7 @@ export function __goscript_set_ready(__goscriptValue: number): void {
 }
 
 export async function main(): globalThis.Promise<void> {
-	await $.println((await __goscript_init_ready(), __goscript_get_ready()), await $.pointerValue<Exclude<$.GoError, null>>(Error).Error())
+	await $.println((await __goscript_init_ready(), __goscript_get_ready()), (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(Error).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	const [__goscriptSelect0HasReturn, __goscriptSelect0Value] = await $.selectStatement<any, void>([
 		{
 			id: 0,
@@ -58,6 +58,8 @@ export async function main(): globalThis.Promise<void> {
 		return __goscriptSelect0Value
 	}
 }
+
+var __goscriptAwait: any
 
 await __goscript_package_init.__goscript_package_init()
 

@@ -74,7 +74,7 @@ export class wrappedErr {
 
 	public async Error(): globalThis.Promise<string> {
 		const e = this;
-		return $.concatString("wrapped: ", await $.pointerValue<Exclude<$.GoError, null>>(e.err).Error())
+		return $.concatString("wrapped: ", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(e.err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	}
 
 	public Unwrap(): $.GoError {
@@ -104,8 +104,8 @@ export async function main(): globalThis.Promise<void> {
 	let err1 = errors.New("first error")
 	let err2 = errors.New("second error")
 
-	await $.println("err1:", await $.pointerValue<Exclude<$.GoError, null>>(err1).Error())
-	await $.println("err2:", await $.pointerValue<Exclude<$.GoError, null>>(err2).Error())
+	await $.println("err1:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err1).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println("err2:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err2).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
 	// Test error comparison
 	await $.println("err1 == err2:", $.comparableEqual(err1, err2))
@@ -133,6 +133,8 @@ export async function main(): globalThis.Promise<void> {
 
 	await $.println("test finished")
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

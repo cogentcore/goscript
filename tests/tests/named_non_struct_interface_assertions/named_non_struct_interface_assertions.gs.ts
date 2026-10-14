@@ -130,7 +130,7 @@ export function namedInt_Add(v: namedInt, n: number): number {
 }
 
 export async function namedFunc_Add(v: namedFunc | null, n: number): globalThis.Promise<number> {
-	return await v!() + n
+	return (__goscriptAwait = v!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) + n
 }
 
 export function namedChan_Add(v: namedChan, n: number): number {
@@ -153,7 +153,7 @@ export async function check(value: any): globalThis.Promise<void> {
 		await $.println(false)
 		return
 	}
-	await $.println(ok, await $.pointerValue<Exclude<adder, null>>(__goscriptShadow0).Add(3))
+	await $.println(ok, (__goscriptAwait = $.pointerValue<Exclude<adder, null>>(__goscriptShadow0).Add(3), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 }
 
 export async function main(): globalThis.Promise<void> {
@@ -170,6 +170,8 @@ export async function main(): globalThis.Promise<void> {
 	let mapped: $.VarRef<pointerMap> = $.varRef($.makeMap<string, number>([["one", 1], ["two", 2]]))
 	await check($.namedValueInterfaceValue<any>(mapped, "*main.pointerMap", {Add: (receiver: any, ...args: any[]) => (pointerMap_Add as any)(receiver, ...$.stripGenericTypeArgs(args))}, /* @__PURE__ */ $.pointerType("main.pointerMap"), [$.methodSignature("Add", [["n", /* @__PURE__ */ $.basicType("int")]], [/* @__PURE__ */ $.basicType("int")])]))
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

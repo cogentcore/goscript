@@ -136,8 +136,10 @@ export async function main(): globalThis.Promise<void> {
 }
 
 export async function hold(fn: (() => void) | null): globalThis.Promise<void> {
-	await fn!()
+	void (__goscriptAwait = fn!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

@@ -30,16 +30,18 @@ export async function main(): globalThis.Promise<void> {
 
 	// Method value: binding the receiver to create a function
 	let addFn: ((x: number) => number | globalThis.Promise<number>) | null = $.functionValue(((__receiver) => (x: number) => myInt_add(__receiver, x))(n), ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo), "main.myInt.add-fm")
-	await $.println("addFn(3):", await addFn!(3))
+	await $.println("addFn(3):", (__goscriptAwait = addFn!(3), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
 	let mulFn: ((x: number, y: number) => number | globalThis.Promise<number>) | null = $.functionValue(((__receiver) => (x: number, y: number) => myInt_multiply(__receiver, x, y))(n), ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo), "main.myInt.multiply-fm")
-	await $.println("mulFn(2, 3):", await mulFn!(2, 3))
+	await $.println("mulFn(2, 3):", (__goscriptAwait = mulFn!(2, 3), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
 	// Test with different receiver value
 	let m: myInt = 10
 	let addFn2: ((x: number) => number | globalThis.Promise<number>) | null = $.functionValue(((__receiver) => (x: number) => myInt_add(__receiver, x))(m), ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo), "main.myInt.add-fm")
-	await $.println("addFn2(7):", await addFn2!(7))
+	await $.println("addFn2(7):", (__goscriptAwait = addFn2!(7), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

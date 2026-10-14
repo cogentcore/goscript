@@ -51,14 +51,16 @@ export async function main(): globalThis.Promise<void> {
 	let entries: $.Slice<fs.DirEntry | null> = __goscriptTuple0[0]
 	let err = __goscriptTuple0[1]
 	if (err != null) {
-		await $.println("err:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+		await $.println("err:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		return
 	}
 	for (let __goscriptRangeTarget0 = entries, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
 		let entry = __goscriptRangeTarget0![__rangeIndex]
-		await $.println(await $.pointerValue<Exclude<fs.DirEntry, null>>(entry).Name(), await $.pointerValue<Exclude<fs.DirEntry, null>>(entry).IsDir())
+		await $.println((__goscriptAwait = $.pointerValue<Exclude<fs.DirEntry, null>>(entry).Name(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = $.pointerValue<Exclude<fs.DirEntry, null>>(entry).IsDir(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	}
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

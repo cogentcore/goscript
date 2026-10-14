@@ -32,11 +32,11 @@ export function valueHash_Key(h: valueHash): any {
 }
 
 export async function sameKey(a: ref | null, b: ref | null): globalThis.Promise<boolean> {
-	return $.comparableEqual(await $.pointerValue<Exclude<ref, null>>(a).Key(), await $.pointerValue<Exclude<ref, null>>(b).Key())
+	return $.comparableEqual((__goscriptAwait = $.pointerValue<Exclude<ref, null>>(a).Key(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = $.pointerValue<Exclude<ref, null>>(b).Key(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 }
 
 export async function differentKey(a: ref | null, b: ref | null): globalThis.Promise<boolean> {
-	return !$.comparableEqual(await $.pointerValue<Exclude<ref, null>>(a).Key(), await $.pointerValue<Exclude<ref, null>>(b).Key())
+	return !$.comparableEqual((__goscriptAwait = $.pointerValue<Exclude<ref, null>>(a).Key(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = $.pointerValue<Exclude<ref, null>>(b).Key(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 }
 
 export async function main(): globalThis.Promise<void> {
@@ -47,6 +47,8 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("same:", await sameKey($.namedValueInterfaceValue<ref | null>(a, "main.valueHash", {Key: (receiver: any, ...args: any[]) => (valueHash_Key as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, "main.valueHash", [$.methodSignature("Key", [], [{ kind: $.TypeKind.Interface, methods: [] }])]), $.namedValueInterfaceValue<ref | null>(b, "main.valueHash", {Key: (receiver: any, ...args: any[]) => (valueHash_Key as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, "main.valueHash", [$.methodSignature("Key", [], [{ kind: $.TypeKind.Interface, methods: [] }])])))
 	await $.println("different:", await differentKey($.namedValueInterfaceValue<ref | null>(a, "main.valueHash", {Key: (receiver: any, ...args: any[]) => (valueHash_Key as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, "main.valueHash", [$.methodSignature("Key", [], [{ kind: $.TypeKind.Interface, methods: [] }])]), $.namedValueInterfaceValue<ref | null>(c, "main.valueHash", {Key: (receiver: any, ...args: any[]) => (valueHash_Key as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, "main.valueHash", [$.methodSignature("Key", [], [{ kind: $.TypeKind.Interface, methods: [] }])])))
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

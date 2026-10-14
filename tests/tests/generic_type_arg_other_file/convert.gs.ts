@@ -9,3 +9,5 @@ export async function pointerToJS(__typeArgs: $.GenericTypeArgs | undefined, v: 
 	}
 	return $.callGenericMethod(__typeArgs, "P", "toJS", v)
 }
+
+var __goscriptAwait: any

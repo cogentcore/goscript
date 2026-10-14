@@ -5,7 +5,7 @@ import * as $ from "@goscript/builtin/index.js"
 
 export async function register(cb: (() => void) | null): globalThis.Promise<(() => void) | null> {
 	await $.println("register")
-	await cb!()
+	void (__goscriptAwait = cb!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 	return $.functionValue(async (): globalThis.Promise<void> => {
 		await $.println("release")
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo))
@@ -16,9 +16,11 @@ export async function main(): globalThis.Promise<void> {
 	const __goscriptDeferCallee0 = await register($.functionValue(async (): globalThis.Promise<void> => {
 		await $.println("callback")
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)))
-	__defer.defer(async () => { await __goscriptDeferCallee0!() })
+	__defer.defer(async () => { (__goscriptAwait = __goscriptDeferCallee0!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) })
 	await $.println("body")
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

@@ -282,7 +282,7 @@ export async function queueFramesForRetransmission(p: packet | $.VarRef<packet> 
 	for (let __goscriptRangeTarget0 = $.pointerValue<packet>(p).Frames, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
 		let f = $.markAsStructValue($.cloneStructValue(__goscriptRangeTarget0![__rangeIndex]))
 		if (f.Handler != null) {
-			await $.pointerValue<Exclude<FrameHandler, null>>(f.Handler).OnLost(f.Frame)
+			void (__goscriptAwait = $.pointerValue<Exclude<FrameHandler, null>>(f.Handler).OnLost(f.Frame), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 		}
 	}
 }
@@ -294,6 +294,8 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("lost:", $.pointerValue<retransmissionQueue>(q).lost)
 	await $.println("done")
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

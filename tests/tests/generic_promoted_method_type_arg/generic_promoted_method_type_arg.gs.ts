@@ -175,8 +175,8 @@ export class Single {
 }
 
 export async function check(__typeArgs: $.GenericTypeArgs | undefined, w: any): globalThis.Promise<boolean> {
-	await $.callGenericMethod(__typeArgs, "W", "Set", w, 6n)
-	return await $.callGenericMethod(__typeArgs, "W", "Is", w, 6n) && !await $.callGenericMethod(__typeArgs, "W", "Is", w, 2n)
+	void (__goscriptAwait = $.callGenericMethod(__typeArgs, "W", "Set", w, 6n), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+	return (__goscriptAwait = $.callGenericMethod(__typeArgs, "W", "Is", w, 6n), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) && !(__goscriptAwait = $.callGenericMethod(__typeArgs, "W", "Is", w, 2n), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 }
 
 export function asFlagger(__typeArgs: $.GenericTypeArgs | undefined, w: any): Flagger | null {
@@ -187,13 +187,15 @@ export async function main(): globalThis.Promise<void> {
 	let w: Window | $.VarRef<Window> | null = new Window({Title: "main"})
 	await $.println("check:", await check({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, W: { type: /* @__PURE__ */ $.pointerType("main.Window"), zero: () => null, methods: {Is: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Is(...$.stripGenericTypeArgs(args)), Set: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Set(...$.stripGenericTypeArgs(args))} }}, w))
 	let f = asFlagger({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, W: { type: /* @__PURE__ */ $.pointerType("main.Window"), zero: () => null, methods: {Is: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Is(...$.stripGenericTypeArgs(args)), Set: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Set(...$.stripGenericTypeArgs(args))} }}, new Window())
-	await $.pointerValue<Exclude<Flagger, null>>(f).Set(3n)
-	await $.println("interface:", await $.pointerValue<Exclude<Flagger, null>>(f).Is(3n), await $.pointerValue<Exclude<Flagger, null>>(f).Is(6n))
+	void (__goscriptAwait = $.pointerValue<Exclude<Flagger, null>>(f).Set(3n), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+	await $.println("interface:", (__goscriptAwait = $.pointerValue<Exclude<Flagger, null>>(f).Is(3n), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = $.pointerValue<Exclude<Flagger, null>>(f).Is(6n), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
 	let s: Single | $.VarRef<Single> | null = new Single()
 	await $.println("generic outer:", await check({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, W: { type: /* @__PURE__ */ $.pointerType("main.Single"), zero: () => null, methods: {Is: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Is({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, A: { type: /* @__PURE__ */ $.pointerType("main.App"), zero: () => null }}, ...$.stripGenericTypeArgs(args)), Set: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Set({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, A: { type: /* @__PURE__ */ $.pointerType("main.App"), zero: () => null }}, ...$.stripGenericTypeArgs(args))} }}, s))
 	await $.println("generic outer string:", await check({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, W: { type: /* @__PURE__ */ $.pointerType("main.Single"), zero: () => null, methods: {Is: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Is({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, A: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }}, ...$.stripGenericTypeArgs(args)), Set: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Set({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, A: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }}, ...$.stripGenericTypeArgs(args))} }}, new Single()))
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

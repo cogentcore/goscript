@@ -55,7 +55,9 @@ export async function New(opts: $.Slice<option | null>): globalThis.Promise<Thin
 	let t: Thing | $.VarRef<Thing> | null = new Thing()
 	for (let __goscriptRangeTarget0 = opts, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
 		let opt = __goscriptRangeTarget0![__rangeIndex]
-		await opt!(t)
+		void (__goscriptAwait = opt!(t), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 	}
 	return t
 }
+
+var __goscriptAwait: any

@@ -17,9 +17,11 @@ export function __goscript_set_Factories(__goscriptValue: $.Slice<AddFactoryFunc
 }
 
 export async function main(): globalThis.Promise<void> {
-	let factories: $.Slice<dep.Factory | null> = await $.arrayIndex(Factories!, 0)!($.markAsStructValue(new dep.Bus()))
-	await $.println(await $.pointerValue<Exclude<dep.Factory, null>>($.arrayIndex(factories!, 0)).GetConfigID())
+	let factories: $.Slice<dep.Factory | null> = (__goscriptAwait = $.arrayIndex(Factories!, 0)!($.markAsStructValue(new dep.Bus())), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+	await $.println((__goscriptAwait = $.pointerValue<Exclude<dep.Factory, null>>($.arrayIndex(factories!, 0)).GetConfigID(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

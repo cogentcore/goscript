@@ -21,11 +21,11 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("ValidPath(''):", valid4)
 
 	// Test error constants
-	await $.println("ErrInvalid:", await $.pointerValue<Exclude<$.GoError, null>>(fs.ErrInvalid).Error())
-	await $.println("ErrNotExist:", await $.pointerValue<Exclude<$.GoError, null>>(fs.ErrNotExist).Error())
-	await $.println("ErrExist:", await $.pointerValue<Exclude<$.GoError, null>>(fs.ErrExist).Error())
-	await $.println("ErrPermission:", await $.pointerValue<Exclude<$.GoError, null>>(fs.ErrPermission).Error())
-	await $.println("ErrClosed:", await $.pointerValue<Exclude<$.GoError, null>>(fs.ErrClosed).Error())
+	await $.println("ErrInvalid:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(fs.ErrInvalid).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println("ErrNotExist:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(fs.ErrNotExist).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println("ErrExist:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(fs.ErrExist).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println("ErrPermission:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(fs.ErrPermission).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println("ErrClosed:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(fs.ErrClosed).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
 	// Test all FileMode constants
 	await $.println("ModeDir:", 2147483648)
@@ -58,6 +58,8 @@ export async function main(): globalThis.Promise<void> {
 
 	await $.println("test finished")
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

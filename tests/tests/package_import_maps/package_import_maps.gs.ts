@@ -18,7 +18,7 @@ export function getValue(): [string, number] {
 export function simpleIterator(m: globalThis.Map<string, number> | null): ((_p0: ((_p0: string, _p1: number) => boolean | globalThis.Promise<boolean>) | null) => void) | null {
 	return $.functionValue(async (_yield: ((_p0: string, _p1: number) => boolean | globalThis.Promise<boolean>) | null): globalThis.Promise<void> => {
 		for (const [k, v] of m?.entries() ?? []) {
-			if (!await _yield!(k, v)) {
+			if (!(__goscriptAwait = _yield!(k, v), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)) {
 				break
 			}
 		}
@@ -82,6 +82,8 @@ export async function main(): globalThis.Promise<void> {
 
 	await $.println("test finished")
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

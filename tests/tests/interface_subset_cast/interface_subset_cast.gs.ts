@@ -75,19 +75,21 @@ export async function main(): globalThis.Promise<void> {
 	// Cast from larger interface to smaller interface (subset)
 	let i2: MyInterface2 | null = (i1 as MyInterface2 | null)
 
-	await $.println("i1.MyString1():", await $.pointerValue<Exclude<MyInterface1, null>>(i1).MyString1())
-	await $.println("i1.MyString2():", await $.pointerValue<Exclude<MyInterface1, null>>(i1).MyString2())
-	await $.println("i2.MyString1():", await $.pointerValue<Exclude<MyInterface2, null>>(i2).MyString1())
+	await $.println("i1.MyString1():", (__goscriptAwait = $.pointerValue<Exclude<MyInterface1, null>>(i1).MyString1(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println("i1.MyString2():", (__goscriptAwait = $.pointerValue<Exclude<MyInterface1, null>>(i1).MyString2(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println("i2.MyString1():", (__goscriptAwait = $.pointerValue<Exclude<MyInterface2, null>>(i2).MyString1(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
 	// Type assertion from larger to smaller interface
 	let [i3, ok] = $.typeAssertTuple<MyInterface2 | null>(i1, "main.MyInterface2")
 	if (ok) {
 		await $.println("Type assertion successful")
-		await $.println("i3.MyString1():", await $.pointerValue<Exclude<MyInterface2, null>>(i3).MyString1())
+		await $.println("i3.MyString1():", (__goscriptAwait = $.pointerValue<Exclude<MyInterface2, null>>(i3).MyString1(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	} else {
 		await $.println("Type assertion failed")
 	}
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

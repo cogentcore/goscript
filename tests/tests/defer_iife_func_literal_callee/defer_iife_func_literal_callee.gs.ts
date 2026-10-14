@@ -22,8 +22,10 @@ export async function main(): globalThis.Promise<void> {
 	let stored: (() => void) | null = $.functionValue(async (): globalThis.Promise<void> => {
 		await $.println("value")
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo))
-	await stored!()
+	void (__goscriptAwait = stored!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

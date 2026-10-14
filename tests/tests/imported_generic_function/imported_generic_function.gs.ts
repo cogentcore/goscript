@@ -29,19 +29,21 @@ export async function main(): globalThis.Promise<void> {
 	let values: $.Slice<helper.Value | null> = __goscriptTuple1[0]
 	let err = __goscriptTuple1[1]
 	if (err != null) {
-		await $.println(await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+		await $.println((__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		return
 	}
-	await $.println("collected:", await $.pointerValue<Exclude<helper.Value, null>>($.arrayIndex(values!, 0)).GetValue())
+	await $.println("collected:", (__goscriptAwait = $.pointerValue<Exclude<helper.Value, null>>($.arrayIndex(values!, 0)).GetValue(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	let __goscriptTuple2: any = collectAssigned($.interfaceValue<helper.Value | null>($.markAsStructValue(new helper.IntValue({N: 35})), "helper.IntValue", "helper.IntValue"))
 	let assigned: $.Slice<helper.Value | null> = __goscriptTuple2[0]
 	err = __goscriptTuple2[1]
 	if (err != null) {
-		await $.println(await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+		await $.println((__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		return
 	}
-	await $.println("assigned:", await $.pointerValue<Exclude<helper.Value, null>>($.arrayIndex(assigned!, 0)).GetValue())
+	await $.println("assigned:", (__goscriptAwait = $.pointerValue<Exclude<helper.Value, null>>($.arrayIndex(assigned!, 0)).GetValue(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

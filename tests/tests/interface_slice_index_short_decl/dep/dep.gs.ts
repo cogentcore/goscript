@@ -19,3 +19,5 @@ export async function ToKey(v: Ref | null): globalThis.Promise<any> {
 	}
 	return $.pointerValue<Exclude<Ref, null>>(v).Key()
 }
+
+var __goscriptAwait: any

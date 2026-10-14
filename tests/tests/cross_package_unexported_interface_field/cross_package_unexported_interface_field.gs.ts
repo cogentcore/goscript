@@ -8,8 +8,10 @@ import "@goscript/github.com/s4wave/goscript/tests/tests/cross_package_unexporte
 
 export async function main(): globalThis.Promise<void> {
 	let holder = $.markAsStructValue($.cloneStructValue(dep.NewHolder()))
-	await $.println(await $.pointerValue<Exclude<dep.hidden, null>>(holder.Hidden).Ping())
+	await $.println((__goscriptAwait = $.pointerValue<Exclude<dep.hidden, null>>(holder.Hidden).Ping(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

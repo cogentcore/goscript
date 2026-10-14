@@ -84,7 +84,7 @@ export class pairingOffer {
 
 export async function decodeLocalPairing(__typeArgs: $.GenericTypeArgs | undefined, data: $.Slice<number>): globalThis.Promise<[any, $.GoError]> {
 	let msg: $.VarRef<any> = $.varRef($.genericZero(__typeArgs, "T", null))
-	let err = await $.callGenericMethod(__typeArgs, "M", "UnmarshalVT", $.interfaceValue(msg, "*T", /* @__PURE__ */ $.pointerType(__typeArgs?.["T"]?.type ?? { kind: $.TypeKind.Interface, methods: [] })), data)
+	let err = (__goscriptAwait = $.callGenericMethod(__typeArgs, "M", "UnmarshalVT", $.interfaceValue(msg, "*T", /* @__PURE__ */ $.pointerType(__typeArgs?.["T"]?.type ?? { kind: $.TypeKind.Interface, methods: [] })), data), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 	return [msg.value, err]
 }
 
@@ -106,11 +106,11 @@ export async function countFlags(__typeArgs: $.GenericTypeArgs | undefined, __go
 	let n: bigint = 0n
 	for (let __goscriptRangeTarget0 = values, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
 		let v = __goscriptRangeTarget0![__rangeIndex]
-		if (await $.pointerValue<Exclude<setter, null>>(p).Has(v)) {
+		if ((__goscriptAwait = $.pointerValue<Exclude<setter, null>>(p).Has(v), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)) {
 			n++
 		}
 	}
-	await $.pointerValue<Exclude<setter, null>>(p).Set(8n)
+	void (__goscriptAwait = $.pointerValue<Exclude<setter, null>>(p).Set(8n), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 	return $.int64Add(n, $.int64(i.value))
 }
 
@@ -138,11 +138,13 @@ export async function main(): globalThis.Promise<void> {
 	{
 		let [s, ok] = $.typeAssertTuple<setter | null>($.namedValueInterfaceValue<any>(fl, "*main.flag", {Has: (receiver: any, ...args: any[]) => (flag_Has as any)(receiver, ...$.stripGenericTypeArgs(args)), Set: (receiver: any, ...args: any[]) => (flag_Set as any)(receiver, ...$.stripGenericTypeArgs(args))}, /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int64", "main.flag")), [$.methodSignature("Has", [["v", /* @__PURE__ */ $.basicType("int64")]], [/* @__PURE__ */ $.basicType("bool")]), $.methodSignature("Set", [["v", /* @__PURE__ */ $.basicType("int64")]])]), "main.setter")
 		if (ok) {
-			await $.pointerValue<Exclude<setter, null>>(s).Set(2n)
+			void (__goscriptAwait = $.pointerValue<Exclude<setter, null>>(s).Set(2n), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 		}
 	}
 	await $.println("flag:", $.int64(fl.value))
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

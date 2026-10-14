@@ -100,15 +100,17 @@ export async function main(): globalThis.Promise<void> {
 
 	let [parsed, ] = await strconv.ParseComplex("(1-2i)", 128)
 	await $.println("time:", time.RFC1123, time.Month_String(time.May))
-	await $.println("leaf:", $.uint(bits.Rem32(1, 0, 3), 32), strings.ToValidUTF8("abc", "?"), strconv.FormatComplex(parsed, 102, -1, 128), $.int($.real(parsed)), $.int($.imag(parsed)), 0, await $.pointerValue<Exclude<$.GoError, null>>(os.ErrNoHandle).Error(), strings.ToUpperSpecial((unicode.TurkishCase as unicode.SpecialCase), "go"), $.stringEqual(strings.ToUpperSpecial((unicode.TurkishCase as unicode.SpecialCase), "iki"), "İKİ"))
+	await $.println("leaf:", $.uint(bits.Rem32(1, 0, 3), 32), strings.ToValidUTF8("abc", "?"), strconv.FormatComplex(parsed, 102, -1, 128), $.int($.real(parsed)), $.int($.imag(parsed)), 0, (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(os.ErrNoHandle).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), strings.ToUpperSpecial((unicode.TurkishCase as unicode.SpecialCase), "go"), $.stringEqual(strings.ToUpperSpecial((unicode.TurkishCase as unicode.SpecialCase), "iki"), "İKİ"))
 
 	let scan: $.VarRef<bytes.Buffer> = $.varRef($.markAsStructValue(new bytes.Buffer()))
 	await scanner.PrintError($.pointerValueOrNil($.interfaceValue<io.Writer | null>(scan, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer")))!, $.pointerValueOrNil(errors.New("scan failed"))!)
 	await $.println("scanner:", strings.TrimSpace(scan.value.String()))
 
 	let h: hash.XOF | null = $.interfaceValue<hash.XOF | null>($.markAsStructValue(new xof()), "main.xof", "main.xof")
-	await $.println("hash:", await $.pointerValue<Exclude<hash.XOF, null>>(h).BlockSize())
+	await $.println("hash:", (__goscriptAwait = $.pointerValue<Exclude<hash.XOF, null>>(h).BlockSize(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

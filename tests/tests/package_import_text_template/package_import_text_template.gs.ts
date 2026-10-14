@@ -50,10 +50,12 @@ export async function main(): globalThis.Promise<void> {
 	{
 		let err = await template.Template.prototype.Execute.call(t, $.interfaceValue<io.Writer | null>(os.Stdout, "*os.File", /* @__PURE__ */ $.pointerType("os.File")), $.interfaceValue($.arrayToSlice<item>([$.markAsStructValue(new item({Name: "a", Count: 1})), $.markAsStructValue(new item({Name: "b", Count: 2}))]), "[]main.item", /* @__PURE__ */ $.sliceType("main.item")))
 		if (err != null) {
-			await $.println(await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+			await $.println((__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		}
 	}
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

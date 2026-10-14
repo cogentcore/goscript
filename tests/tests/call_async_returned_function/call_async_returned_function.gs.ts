@@ -23,8 +23,10 @@ export async function main(): globalThis.Promise<void> {
 	// Call the function returned by an async function
 	// This should generate: (await getCallback())!("hello")
 	// NOT: await getCallback()!("hello")
-	await (await getCallback())!("hello")
+	void (__goscriptAwait = (await getCallback())!("hello"), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

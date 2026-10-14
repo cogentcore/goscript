@@ -74,7 +74,7 @@ export async function main(): globalThis.Promise<void> {
 	// Successful type assertion to an inline interface
 	let [g, ok] = $.typeAssertTuple<any>(i, { kind: $.TypeKind.Interface, methods: [{ name: "Greet", args: [], returns: [{ name: "_r0", type: /* @__PURE__ */ $.basicType("string") }] }] })
 	if (ok) {
-		await $.println("Greet assertion successful:", await $.pointerValue<any>(g).Greet())
+		await $.println("Greet assertion successful:", (__goscriptAwait = $.pointerValue<any>(g).Greet(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	} else {
 		await $.println("Greet assertion failed")
 	}
@@ -82,7 +82,7 @@ export async function main(): globalThis.Promise<void> {
 	// Failing type assertion to a different inline interface
 	let [s, ok2] = $.typeAssertTuple<any>(i, { kind: $.TypeKind.Interface, methods: [{ name: "NonExistentMethod", args: [], returns: [{ name: "_r0", type: /* @__PURE__ */ $.basicType("int") }] }] })
 	if (ok2) {
-		await $.println("NonExistentMethod assertion successful (unexpected):", await $.pointerValue<any>(s).NonExistentMethod())
+		await $.println("NonExistentMethod assertion successful (unexpected):", (__goscriptAwait = $.pointerValue<any>(s).NonExistentMethod(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	} else {
 		await $.println("NonExistentMethod assertion failed as expected")
 	}
@@ -94,7 +94,7 @@ export async function main(): globalThis.Promise<void> {
 	// Assert 'j' (which holds MyStringer) to an inline interface that MyStringer satisfies.
 	let [inlineMs, ok4] = $.typeAssertTuple<any>(j, { kind: $.TypeKind.Interface, methods: [{ name: "String", args: [], returns: [{ name: "_r0", type: /* @__PURE__ */ $.basicType("string") }] }] })
 	if (ok4) {
-		await $.println("Inline String assertion successful:", await $.pointerValue<any>(inlineMs).String())
+		await $.println("Inline String assertion successful:", (__goscriptAwait = $.pointerValue<any>(inlineMs).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	} else {
 		await $.println("Inline String assertion failed")
 	}
@@ -105,7 +105,7 @@ export async function main(): globalThis.Promise<void> {
 
 	let [inlineK, ok5] = $.typeAssertTuple<any>(k, { kind: $.TypeKind.Interface, methods: [{ name: "String", args: [], returns: [{ name: "_r0", type: /* @__PURE__ */ $.basicType("string") }] }] })
 	if (ok5) {
-		await $.println("k.(interface{ String() string }) successful:", await $.pointerValue<any>(inlineK).String())
+		await $.println("k.(interface{ String() string }) successful:", (__goscriptAwait = $.pointerValue<any>(inlineK).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	} else {
 		await $.println("k.(interface{ String() string }) failed")
 	}
@@ -124,6 +124,8 @@ export async function main(): globalThis.Promise<void> {
 		await $.println("l.(*struct{ Name string }) failed (unexpected)")
 	}
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

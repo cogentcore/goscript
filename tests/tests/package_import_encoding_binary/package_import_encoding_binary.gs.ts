@@ -17,14 +17,14 @@ export async function main(): globalThis.Promise<void> {
 	{
 		let err = await binary.Write($.pointerValueOrNil($.interfaceValue<io.Writer | null>(buf, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer")))!, $.interfaceValue<binary.ByteOrder | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.BigEndian))), "binary.bigEndian", "binary.bigEndian")!, $.basicInterfaceValue(signed, "int32"))
 		if (err != null) {
-			await $.println("write signed error:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+			await $.println("write signed error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 			return
 		}
 	}
 	{
 		let err = await binary.Write($.pointerValueOrNil($.interfaceValue<io.Writer | null>(buf, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer")))!, $.interfaceValue<binary.ByteOrder | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.BigEndian))), "binary.bigEndian", "binary.bigEndian")!, $.basicInterfaceValue($.uint(3, 32), "uint32"))
 		if (err != null) {
-			await $.println("write unsigned error:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+			await $.println("write unsigned error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 			return
 		}
 	}
@@ -35,6 +35,8 @@ export async function main(): globalThis.Promise<void> {
 		await $.println($.int(b))
 	}
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

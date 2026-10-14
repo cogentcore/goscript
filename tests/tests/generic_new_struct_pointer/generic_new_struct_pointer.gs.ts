@@ -110,7 +110,7 @@ export function asNode(__typeArgs: $.GenericTypeArgs | undefined): Node | null {
 }
 
 export async function initAs(__typeArgs: $.GenericTypeArgs | undefined, n: Node | null, init: ((w: any) => void) | null): globalThis.Promise<void> {
-	await init!($.mustTypeAssert<any>((n as any), /* @__PURE__ */ $.pointerType(__typeArgs?.["T"]?.type ?? { kind: $.TypeKind.Interface, methods: [] })))
+	void (__goscriptAwait = init!($.mustTypeAssert<any>((n as any), /* @__PURE__ */ $.pointerType(__typeArgs?.["T"]?.type ?? { kind: $.TypeKind.Interface, methods: [] }))), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 }
 
 export function store(__typeArgs: $.GenericTypeArgs | undefined, p: any, v: any): void {
@@ -123,7 +123,7 @@ export function load(__typeArgs: $.GenericTypeArgs | undefined, p: any): any {
 
 export async function main(): globalThis.Promise<void> {
 	let n = asNode({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.Widget", zero: () => $.markAsStructValue(new Widget()) }})
-	await $.pointerValue<Exclude<Node, null>>(n).SetName("text")
+	void (__goscriptAwait = $.pointerValue<Exclude<Node, null>>(n).SetName("text"), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 	await initAs({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.Widget", zero: () => $.markAsStructValue(new Widget()) }}, n, $.functionValue((w: Widget | $.VarRef<Widget> | null): void => {
 		$.pointerValue<Widget>(w).Text = "hello"
 		$.pointerValue<Widget>(w).Base.inits++
@@ -146,6 +146,8 @@ export async function main(): globalThis.Promise<void> {
 	ip!.value = ip!.value + (1)
 	await $.println("int:", $.pointerValue<number>(ip), load({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }}, ip))
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

@@ -18,5 +18,7 @@ $.registerInterfaceType(
 );
 
 export async function Read(r: Reader | null): globalThis.Promise<__goscript_alias.Value> {
-	return (await $.pointerValue<Exclude<Reader, null>>(r).Val() as __goscript_alias.Value)
+	return ((__goscriptAwait = $.pointerValue<Exclude<Reader, null>>(r).Val(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as __goscript_alias.Value)
 }
+
+var __goscriptAwait: any

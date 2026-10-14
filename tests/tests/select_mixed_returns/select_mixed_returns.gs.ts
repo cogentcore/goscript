@@ -23,7 +23,7 @@ export async function testMixedReturns(ctx: context.Context | null): globalThis.
 		{
 			id: 0,
 			isSend: false,
-			channel: await $.pointerValue<Exclude<context.Context, null>>(ctx).Done(),
+			channel: (__goscriptAwait = $.pointerValue<Exclude<context.Context, null>>(ctx).Done(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait),
 			onSelected: async (__goscriptSelect0Result) => {
 				await $.println("Context done, returning")
 				return "context_done"
@@ -199,6 +199,8 @@ export async function main(): globalThis.Promise<void> {
 	await $.println()
 	await $.println("All tests completed")
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()
