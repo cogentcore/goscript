@@ -1142,50 +1142,65 @@ export class ParseError extends Error {
   }
 }
 
-// Timer represents a single event timer.
+// Timer represents a single event timer. A Timer made without a duration is
+// the zero Timer, which does not run until it is Reset.
 export class Timer {
-  private _cancel: () => void
+  // _cancel stops the running timer, and is undefined while none runs.
+  private _cancel?: () => void
   private _callback?: () => void
   private _channel = makeChannel(1, new Time(), 'both')
   public C: ChannelRef<Time> = makeChannelRef(this._channel, 'receive')
 
-  constructor(duration: Duration, callback?: () => void) {
+  constructor(duration?: Duration, callback?: () => void) {
     this._callback = callback
-    this._cancel = this.start(duration)
+    if (duration !== undefined) {
+      this._cancel = this.start(duration)
+    }
   }
 
-  // Stop prevents the Timer from firing
+  // Stop prevents the Timer from firing. It reports whether the call stopped
+  // a running timer.
   public Stop(): boolean {
-    this._cancel()
-    return true
+    const cancel = this._cancel
+    this._cancel = undefined
+    cancel?.()
+    return cancel !== undefined
   }
 
-  // Reset changes the timer to expire after duration d
+  // Reset changes the timer to expire after duration d. It reports whether
+  // the timer was running.
   public Reset(d: Duration): boolean {
-    this.Stop()
+    const running = this.Stop()
     this._cancel = this.start(d)
-    return true
+    return running
   }
 
   private start(d: Duration): () => void {
-    if (this._callback) {
-      return startTimer(d, this._callback)
-    }
+    const fire =
+      this._callback ??
+      (() => {
+        this._channel.send(Now()).catch(() => {})
+      })
     return startTimer(d, () => {
-      this._channel.send(Now()).catch(() => {})
+      this._cancel = undefined
+      fire()
     })
   }
 }
 
 // Ticker holds a channel that delivers ticks at intervals.
 export class Ticker {
-  private _interval: ReturnType<typeof setInterval>
+  private _interval?: ReturnType<typeof setInterval>
   private _stopped: boolean = false
   private _channel = makeChannel(1, new Time(), 'both')
   public C: ChannelRef<Time> = makeChannelRef(this._channel, 'receive')
 
-  constructor(duration: Duration) {
-    this._interval = this.start(duration)
+  // A Ticker made without a duration is the zero Ticker, which does not tick
+  // until it is Reset.
+  constructor(duration?: Duration) {
+    if (duration !== undefined) {
+      this._interval = this.start(duration)
+    }
   }
 
   // Stop turns off a ticker

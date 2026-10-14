@@ -2,6 +2,7 @@ package main
 
 import (
 	"math"
+	"sync/atomic"
 	"time"
 )
 
@@ -61,6 +62,7 @@ func main() {
 
 	marshal()
 	local()
+	timers()
 }
 
 // local checks that Now, Unix and Time.Local give local times. The results
@@ -100,4 +102,15 @@ func marshal() {
 
 	_, err = time.Date(10000, time.January, 1, 0, 0, 0, 0, time.UTC).MarshalJSON()
 	println("marshal json year 10000 err", err.Error())
+}
+
+// timers stops and resets a timer held in an atomic pointer, whose type
+// argument has a zero Timer.
+func timers() {
+	var p atomic.Pointer[time.Timer]
+	p.Store(time.NewTimer(time.Hour))
+	t := p.Load()
+	println("timer stop", t.Stop(), t.Stop())
+	println("timer reset", t.Reset(time.Hour), t.Reset(time.Hour))
+	t.Stop()
 }

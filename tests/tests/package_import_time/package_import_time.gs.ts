@@ -5,8 +5,11 @@ import * as $ from "@goscript/builtin/index.js"
 
 import * as math from "@goscript/math/index.js"
 
+import * as atomic from "@goscript/sync/atomic/index.js"
+
 import * as time from "@goscript/time/index.js"
 import "@goscript/math/index.js"
+import "@goscript/sync/atomic/index.js"
 import "@goscript/time/index.js"
 
 export async function main(): globalThis.Promise<void> {
@@ -66,6 +69,7 @@ export async function main(): globalThis.Promise<void> {
 
 	await marshal()
 	await local()
+	await timers()
 }
 
 export async function local(): globalThis.Promise<void> {
@@ -107,6 +111,20 @@ export async function marshal(): globalThis.Promise<void> {
 	let __goscriptTuple2: any = $.markAsStructValue($.cloneStructValue(time.Date(10000, 1, 1, 0, 0, 0, 0, time.UTC))).MarshalJSON()
 	err = __goscriptTuple2[1]
 	await $.println("marshal json year 10000 err", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+}
+
+export async function timers(): globalThis.Promise<void> {
+	let p: $.VarRef<atomic.Pointer<time.Timer>> = $.varRef($.markAsStructValue(new atomic.Pointer<time.Timer>()))
+	p.value.Store(time.NewTimer(3600000000000n))
+	let t: time.Timer | $.VarRef<time.Timer> | null = (p.value.Load() as time.Timer | $.VarRef<time.Timer> | null)
+	await $.println("timer stop", time.Timer.prototype.Stop.call($.pointerValue<time.Timer>(t)), time.Timer.prototype.Stop.call($.pointerValue<time.Timer>(t)))
+	await $.println("timer reset", time.Timer.prototype.Reset.call($.pointerValue<time.Timer>(t), 3600000000000n), time.Timer.prototype.Reset.call($.pointerValue<time.Timer>(t), 3600000000000n))
+	time.Timer.prototype.Stop.call($.pointerValue<time.Timer>(t))
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "time.Timer", zero: () => $.markAsStructValue(new time.Timer()) }})
 }
 
 var __goscriptAwait: any

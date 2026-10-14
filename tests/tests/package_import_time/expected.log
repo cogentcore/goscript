@@ -44,3 +44,5 @@ now location true
 unix location true true
 local utc location UTC
 unix equal true
+timer stop true false
+timer reset false true
