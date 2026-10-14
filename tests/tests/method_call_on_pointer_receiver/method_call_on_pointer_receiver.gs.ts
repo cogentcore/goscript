@@ -101,7 +101,7 @@ export class digest {
 
 	public Write(p: $.Slice<number>): void {
 		let d: digest | $.VarRef<digest> | null = this;
-		$.pointerValue<digest>(d).writes = $.pointerValue<digest>(d).writes + ($.len(p))
+		$.pointerValue<digest>(d).writes = $.pointerValue<digest>(d).writes + ($.sliceLen(p))
 	}
 
 	static {
@@ -132,7 +132,7 @@ export async function main(): globalThis.Promise<void> {
 	{
 		digest.prototype.Write.call(d, pad)
 		let __goscriptShadow0: $.Slice<number> = new Uint8Array([4]) as $.Slice<number>
-		await $.println("shadowed type name after method call:", $.pointerValue<digest>(d).writes, $.len(__goscriptShadow0))
+		await $.println("shadowed type name after method call:", $.pointerValue<digest>(d).writes, $.sliceLen(__goscriptShadow0))
 	}
 }
 

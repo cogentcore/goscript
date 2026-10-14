@@ -96,14 +96,14 @@ export function value_Key(v: value): any {
 }
 
 export function Fixed_Mark(f: Fixed): boolean {
-	return $.len((f as Fixed)) != 0
+	return $.sliceLen((f as Fixed)) != 0
 }
 
 export async function main(): globalThis.Promise<void> {
 	let shapes: $.Slice<Shape | null> = $.arrayToSlice<Shape | null>([$.namedValueInterfaceValue<Shape | null>($.arrayToSlice<dep.Ref | null>([$.namedValueInterfaceValue<dep.Ref | null>($.arrayValue(new Uint8Array([1, 2])), "main.value", {Key: (receiver: any, ...args: any[]) => (value_Key as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, "main.value", [$.methodSignature("Key", [], [{ kind: $.TypeKind.Interface, methods: [] }])])]), "main.Fixed", {Mark: (receiver: any, ...args: any[]) => (Fixed_Mark as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, /* @__PURE__ */ $.sliceType("dep.Ref", "main.Fixed"), [$.methodSignature("Mark", [], [/* @__PURE__ */ $.basicType("bool")])]), $.interfaceValue<Shape | null>($.markAsStructValue(new Action({Result: 1, Filter: $.makeMap<number, dep.Ref | null>([[1, $.namedValueInterfaceValue<dep.Ref | null>($.arrayValue(new Uint8Array([1, 2])), "main.value", {Key: (receiver: any, ...args: any[]) => (value_Key as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, "main.value", [$.methodSignature("Key", [], [{ kind: $.TypeKind.Interface, methods: [] }])])]])})), "main.Action", "main.Action")])
 	let fixed: $.Slice<Fixed> = null! as $.Slice<Fixed>
-	for (let __goscriptRangeTarget0 = shapes, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
-		let shape = __goscriptRangeTarget0![__rangeIndex]
+	for (let __goscriptRangeTarget0 = shapes, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
+		let shape = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as Shape | null)
 		{
 			const __goscriptTypeSwitchValue = shape
 			switch (true) {

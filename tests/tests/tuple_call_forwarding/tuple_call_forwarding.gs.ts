@@ -182,27 +182,27 @@ export function newTab(name: string): [frame | $.VarRef<frame> | null, tab | $.V
 }
 
 export async function names(nodes: $.Slice<Node | null>): globalThis.Promise<void> {
-	await $.println("names:", $.len(nodes))
-	for (let __goscriptRangeTarget0 = nodes, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
-		let n = __goscriptRangeTarget0![__rangeIndex]
+	await $.println("names:", $.sliceLen(nodes))
+	for (let __goscriptRangeTarget0 = nodes, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
+		let n = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as Node | null)
 		await $.println("name:", await $.pointerValue<Exclude<Node, null>>(n).Name())
 	}
 }
 
 export function total(base: number, rest: $.Slice<number>): number {
-	for (let __goscriptRangeTarget1 = rest, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget1); __rangeIndex++) {
-		let r = __goscriptRangeTarget1![__rangeIndex]
+	for (let __goscriptRangeTarget1 = rest, __goscriptRangeWindow1 = $.sliceRange(__goscriptRangeTarget1), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow1.length; __rangeIndex++) {
+		let r = (__goscriptRangeWindow1.backing[__goscriptRangeWindow1.offset + __rangeIndex] as number)
 		base = base + (r)
 	}
 	return base
 }
 
 export function count(v: $.Slice<number>): number {
-	return $.len(v)
+	return $.sliceLen(v)
 }
 
 export function span(a: number, b: number, rest: $.Slice<number>): number {
-	return (b - a) + $.len(rest)
+	return (b - a) + $.sliceLen(rest)
 }
 
 export async function main(): globalThis.Promise<void> {

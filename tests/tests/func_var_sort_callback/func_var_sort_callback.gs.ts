@@ -11,10 +11,10 @@ import "@goscript/slices/index.js"
 
 export async function order(prev: $.Slice<string>, hosts: $.Slice<string>): globalThis.Promise<$.Slice<string>> {
 	let ranks: globalThis.Map<string, number> | null = $.makeMap<string, number>([])
-	for (let i = $.len(prev) - 1; i >= 0; i--) {
+	for (let i = $.sliceLen(prev) - 1; i >= 0; i--) {
 		$.mapSet(ranks, $.arrayIndex(prev!, i), i)
 	}
-	let known = $.len(prev)
+	let known = $.sliceLen(prev)
 
 	let rank: ((host: string) => number | globalThis.Promise<number>) | null = $.functionValue((host: string): number => {
 		{
@@ -33,8 +33,8 @@ export async function order(prev: $.Slice<string>, hosts: $.Slice<string>): glob
 }
 
 export async function main(): globalThis.Promise<void> {
-	for (let __goscriptRangeTarget0 = await order($.arrayToSlice<string>(["c", "a"]), $.arrayToSlice<string>(["x", "a", "y", "c"])), __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
-		let host = __goscriptRangeTarget0![__rangeIndex]
+	for (let __goscriptRangeTarget0 = await order($.arrayToSlice<string>(["c", "a"]), $.arrayToSlice<string>(["x", "a", "y", "c"])), __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
+		let host = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as string)
 		await $.println(host)
 	}
 }

@@ -36,7 +36,7 @@ export async function main(): globalThis.Promise<void> {
 	let inner = reflect.StructOf($.arrayToSlice<reflect.StructField>([$.markAsStructValue(new reflect.StructField({Name: "ID", Type: intType})), $.markAsStructValue(new reflect.StructField({Name: "Label", Type: stringType}))]))
 	let outer = reflect.StructOf($.arrayToSlice<reflect.StructField>([$.markAsStructValue(new reflect.StructField({Name: "Inner", Type: inner, Anonymous: true})), $.markAsStructValue(new reflect.StructField({Name: "Count", Type: intType}))]))
 	let visible: $.Slice<reflect.StructField> = reflect.VisibleFields($.pointerValueOrNil(outer)!)
-	await $.println("visible:", $.len(visible), $.arrayIndex(visible!, 0).Name, $.len($.arrayIndex(visible!, 1).Index), $.arrayIndex($.arrayIndex(visible!, 1).Index!, 0), $.arrayIndex($.arrayIndex(visible!, 1).Index!, 1))
+	await $.println("visible:", $.sliceLen(visible), $.arrayIndex(visible!, 0).Name, $.sliceLen($.arrayIndex(visible!, 1).Index), $.arrayIndex($.arrayIndex(visible!, 1).Index!, 0), $.arrayIndex($.arrayIndex(visible!, 1).Index!, 1))
 
 	let outerValue = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.New($.pointerValueOrNil(outer)!))).Elem()))
 	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(outerValue)).FieldByIndex($.arrayToSlice<number>([0, 0])))).SetInt(9n)

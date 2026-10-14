@@ -65,14 +65,14 @@ export class xof {
 	}
 
 	public Read(p: $.Slice<number>): [number, $.GoError] {
-		return [$.len(p), null]
+		return [$.sliceLen(p), null]
 	}
 
 	public Reset(): void {
 	}
 
 	public Write(p: $.Slice<number>): [number, $.GoError] {
-		return [$.len(p), null]
+		return [$.sliceLen(p), null]
 	}
 
 	static __typeInfo = $.registerStructType(

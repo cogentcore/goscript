@@ -33,16 +33,16 @@ export async function main(): globalThis.Promise<void> {
 
 export async function show(name: string, parts: $.Slice<string>): globalThis.Promise<void> {
 	let line = name
-	for (let __goscriptRangeTarget0 = parts, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
-		let p = __goscriptRangeTarget0![__rangeIndex]
+	for (let __goscriptRangeTarget0 = parts, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
+		let p = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as string)
 		line = $.concatString(line, $.concatString(($.concatString(" [", p)), "]"))
 	}
-	await $.println(line, $.len(parts))
+	await $.println(line, $.sliceLen(parts))
 }
 
 export async function splits(): globalThis.Promise<void> {
-	for (let __goscriptRangeTarget1 = $.arrayToSlice<string>(["a,b", "a,", ",", "a,b,c", "ab", ""]), __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget1); __rangeIndex++) {
-		let s = __goscriptRangeTarget1![__rangeIndex]
+	for (let __goscriptRangeTarget1 = $.arrayToSlice<string>(["a,b", "a,", ",", "a,b,c", "ab", ""]), __goscriptRangeWindow1 = $.sliceRange(__goscriptRangeTarget1), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow1.length; __rangeIndex++) {
+		let s = (__goscriptRangeWindow1.backing[__goscriptRangeWindow1.offset + __rangeIndex] as string)
 		await show($.concatString(($.concatString("SplitAfterN 2 ", s)), ":"), strings.SplitAfterN(s, ",", 2))
 		await show($.concatString(($.concatString("SplitAfter ", s)), ":"), strings.SplitAfter(s, ","))
 		await show($.concatString(($.concatString("SplitN 2 ", s)), ":"), strings.SplitN(s, ",", 2))

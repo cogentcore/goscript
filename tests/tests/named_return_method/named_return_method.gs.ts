@@ -45,14 +45,14 @@ export class content {
 		const c: content | $.VarRef<content> | null = this;
 		let n: number = 0
 		let err: $.GoError = null! as $.GoError
-		if ((off < 0n) || (off >= $.int64($.len($.pointerValue<content>(c).bytes)))) {
+		if ((off < 0n) || (off >= $.int64($.sliceLen($.pointerValue<content>(c).bytes)))) {
 			err = null
 			return [n, err]
 		}
 
-		let l = $.int64($.len(b))
-		if (($.int64Add(off, l)) > $.int64($.len($.pointerValue<content>(c).bytes))) {
-			l = $.int64Sub($.int64($.len($.pointerValue<content>(c).bytes)), off)
+		let l = $.int64($.sliceLen(b))
+		if (($.int64Add(off, l)) > $.int64($.sliceLen($.pointerValue<content>(c).bytes))) {
+			l = $.int64Sub($.int64($.sliceLen($.pointerValue<content>(c).bytes)), off)
 		}
 
 		let btr: $.Slice<number> = $.goSlice($.pointerValue<content>(c).bytes, globalThis.Number(off), globalThis.Number($.int64Add(off, l)))

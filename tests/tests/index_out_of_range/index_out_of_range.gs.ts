@@ -50,12 +50,12 @@ export async function main(): globalThis.Promise<void> {
 	await recoverMsg("string:", $.functionValue(async (): globalThis.Promise<void> => {
 		let s = "abc"
 		let i = 9
-		await $.println($.uint($.indexStringOrBytes(s, i), 8))
+		await $.println($.uint($.indexString(s, i), 8))
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)))
 	await recoverMsg("string-negative:", $.functionValue(async (): globalThis.Promise<void> => {
 		let s = "abc"
 		let i = -1
-		await $.println($.uint($.indexStringOrBytes(s, i), 8))
+		await $.println($.uint($.indexString(s, i), 8))
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)))
 	await recoverMsg("bytes-negative:", $.functionValue(async (): globalThis.Promise<void> => {
 		let b: $.Slice<number> = new Uint8Array([97, 98, 99])

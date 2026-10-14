@@ -68,15 +68,15 @@ export class arrays {
 }
 
 export function fillArray(dst: $.VarRef<Uint8Array> | null): void {
-	for (let __goscriptRangeTarget0 = $.pointerValue<Uint8Array>(dst), i = 0; i < $.len(__goscriptRangeTarget0); i++) {
+	for (let __goscriptRangeTarget0 = $.pointerValue<Uint8Array>(dst), __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), i = 0; i < __goscriptRangeWindow0.length; i++) {
 		$.pointerValue<Uint8Array>(dst)[i] = $.uint($.uint(i + 1, 8), 8)
 	}
 }
 
 export function sumArray(src: $.VarRef<Uint8Array> | null): number {
 	let sum = 0
-	for (let __goscriptRangeTarget1 = $.pointerValue<Uint8Array>(src), __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget1); __rangeIndex++) {
-		let v = $.uint(__goscriptRangeTarget1![__rangeIndex], 8)
+	for (let __goscriptRangeTarget1 = $.pointerValue<Uint8Array>(src), __goscriptRangeWindow1 = $.sliceRange(__goscriptRangeTarget1), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow1.length; __rangeIndex++) {
+		let v = $.uint((__goscriptRangeWindow1.backing[__goscriptRangeWindow1.offset + __rangeIndex] as number), 8)
 		sum = sum + ($.int(v))
 	}
 	return sum
@@ -129,13 +129,13 @@ export async function main(): globalThis.Promise<void> {
 	$.pointerValue<bigint[]>(cache)[1] = 7n
 	await $.println("index:", $.arrayIndex($.pointerValue<bigint[]>(cache), 0), $.arrayIndex($.pointerValue<bigint[]>(cache), 1))
 
-	for (let __goscriptRangeTarget2 = $.pointerValue<bigint[]>(cache), i = 0; i < $.len(__goscriptRangeTarget2); i++) {
-		let x = __goscriptRangeTarget2![i]
+	for (let __goscriptRangeTarget2 = $.pointerValue<bigint[]>(cache), __goscriptRangeWindow2 = $.sliceRange(__goscriptRangeTarget2), i = 0; i < __goscriptRangeWindow2.length; i++) {
+		let x = (__goscriptRangeWindow2.backing[__goscriptRangeWindow2.offset + i] as bigint)
 		await $.println("range:", i, x)
 	}
 
 	let view: $.Slice<bigint> = $.goSlice($.pointerValue<bigint[]>(cache), undefined, undefined)
-	await $.println("slice:", $.len(view), $.arrayIndex(view!, 2))
+	await $.println("slice:", $.sliceLen(view), $.arrayIndex(view!, 2))
 
 	let buf: $.Slice<number> = new Uint8Array([9, 0, 0, 0, 0]) as $.Slice<number>
 	fillArray(($.sliceToArrayPointer<number>($.goSlice(buf, 1, undefined), 4, "byte") as $.VarRef<Uint8Array> | null))

@@ -42,7 +42,7 @@ export async function main(): globalThis.Promise<void> {
 	let second: item | $.VarRef<item> | null = new item({value: "second"})
 	let items: $.Slice<item | $.VarRef<item> | null> = $.arrayToSlice<item | $.VarRef<item> | null>([first, second])
 	let cloned: $.Slice<item | $.VarRef<item> | null> = clone(items)
-	await $.println($.len(cloned), $.pointerValue<item>($.arrayIndex(cloned!, 0)).value, $.pointerValue<item>($.arrayIndex(cloned!, 1)).value)
+	await $.println($.sliceLen(cloned), $.pointerValue<item>($.arrayIndex(cloned!, 0)).value, $.pointerValue<item>($.arrayIndex(cloned!, 1)).value)
 }
 
 if ($.isMainScript(import.meta)) {

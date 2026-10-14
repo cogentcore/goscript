@@ -23,13 +23,13 @@ export async function main(): globalThis.Promise<void> {
 
 	let g = $.markAsStructValue($.cloneStructValue(slog.Group("g", $.arrayToSlice<any>([$.interfaceValue($.markAsStructValue($.cloneStructValue(slog.String("a", "x"))), "slog.Attr", "slog.Attr"), $.interfaceValue($.markAsStructValue($.cloneStructValue(slog.Int("b", 2))), "slog.Attr", "slog.Attr")]))))
 	let attrs: $.Slice<slog.Attr> = $.markAsStructValue($.cloneStructValue(g.Value)).Group()
-	await $.println(slog.Kind_String($.markAsStructValue($.cloneStructValue(g.Value)).Kind()), $.len(attrs), $.arrayIndex(attrs!, 0).Key, await $.markAsStructValue($.cloneStructValue($.arrayIndex(attrs!, 1).Value)).Int64())
+	await $.println(slog.Kind_String($.markAsStructValue($.cloneStructValue(g.Value)).Kind()), $.sliceLen(attrs), $.arrayIndex(attrs!, 0).Key, await $.markAsStructValue($.cloneStructValue($.arrayIndex(attrs!, 1).Value)).Int64())
 	await $.println(await $.markAsStructValue($.cloneStructValue(g)).String())
 	await $.println(await $.markAsStructValue($.cloneStructValue(slog.StringValue("a"))).Equal($.markAsStructValue($.cloneStructValue(slog.StringValue("a")))), await $.markAsStructValue($.cloneStructValue(s)).Equal($.markAsStructValue($.cloneStructValue(slog.StringValue("other")))))
 
 	let buf: $.VarRef<bytes.Buffer> = $.varRef($.markAsStructValue(new bytes.Buffer()))
 	let logger: slog.Logger | $.VarRef<slog.Logger> | null = slog.New($.interfaceValue<slog.Handler | null>(slog.NewTextHandler($.interfaceValue<io.Writer | null>(buf, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer")), new slog.HandlerOptions({ReplaceAttr: $.functionValue((groups: $.Slice<string>, a: slog.Attr): slog.Attr => {
-		if (($.stringEqual(a.Key, slog.TimeKey)) && ($.len(groups) == 0)) {
+		if (($.stringEqual(a.Key, slog.TimeKey)) && ($.sliceLen(groups) == 0)) {
 			return $.markAsStructValue(new slog.Attr())
 		}
 		return $.markAsStructValue($.cloneStructValue(a))
@@ -39,7 +39,7 @@ export async function main(): globalThis.Promise<void> {
 
 	buf.value.Reset()
 	let jl: slog.Logger | $.VarRef<slog.Logger> | null = slog.New($.interfaceValue<slog.Handler | null>(slog.NewJSONHandler($.interfaceValue<io.Writer | null>(buf, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer")), new slog.HandlerOptions({Level: $.namedValueInterfaceValue<slog.Leveler | null>(slog.LevelDebug, "slog.Level", {AppendText: (receiver: any, ...args: any[]) => (slog.Level_AppendText as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Level: (receiver: any, ...args: any[]) => (slog.Level_Level as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), MarshalJSON: (receiver: any, ...args: any[]) => (slog.Level_MarshalJSON as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), MarshalText: (receiver: any, ...args: any[]) => (slog.Level_MarshalText as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), String: (receiver: any, ...args: any[]) => (slog.Level_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, /* @__PURE__ */ $.basicType("int", "slog.Level"), [$.methodSignature("AppendText", [["b", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))]], [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")), "error"]), $.methodSignature("Level", [], [/* @__PURE__ */ $.basicType("int", "slog.Level")]), $.methodSignature("MarshalJSON", [], [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")), "error"]), $.methodSignature("MarshalText", [], [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")), "error"]), $.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])]), ReplaceAttr: $.functionValue((groups: $.Slice<string>, a: slog.Attr): slog.Attr => {
-		if (($.stringEqual(a.Key, slog.TimeKey)) && ($.len(groups) == 0)) {
+		if (($.stringEqual(a.Key, slog.TimeKey)) && ($.sliceLen(groups) == 0)) {
 			return $.markAsStructValue(new slog.Attr())
 		}
 		return $.markAsStructValue($.cloneStructValue(a))

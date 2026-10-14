@@ -30,7 +30,7 @@ export class localReadWriteCloser {
 	}
 
 	public Write(p: $.Slice<number>): [number, $.GoError] {
-		return [$.len(p), null]
+		return [$.sliceLen(p), null]
 	}
 
 	static __typeInfo = $.registerStructType(

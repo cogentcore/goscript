@@ -51,9 +51,9 @@ export async function main(): globalThis.Promise<void> {
 	await $.println($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.basicInterfaceValue(-1, "int")))).Convert($.pointerValueOrNil(reflect.TypeFor({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("uint8"), zero: () => 0 }}))!))).Uint())
 	await $.println($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.basicInterfaceValue($.int(65, 32), "int32")))).Convert($.pointerValueOrNil(reflect.TypeFor({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }}))!))).String())
 	let b: $.Slice<number> = $.mustTypeAssert<$.Slice<number>>($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf("hé"))).Convert($.pointerValueOrNil(reflect.TypeFor({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")), zero: () => null }}))!))).Interface(), /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")))
-	await $.println($.len(b))
+	await $.println($.sliceLen(b))
 	let r: $.Slice<number> = $.mustTypeAssert<$.Slice<number>>($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf("hé"))).Convert($.pointerValueOrNil(reflect.TypeFor({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int32")), zero: () => null }}))!))).Interface(), /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int32")))
-	await $.println($.len(r))
+	await $.println($.sliceLen(r))
 	await $.println($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(new Uint8Array([111, 107]), "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")))))).Convert($.pointerValueOrNil(reflect.TypeFor({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }}))!))).String())
 
 	// Setting a float32 rounds to float32 precision, as a Go assignment does.

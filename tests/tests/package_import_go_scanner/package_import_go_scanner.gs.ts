@@ -20,7 +20,7 @@ export async function main(): globalThis.Promise<void> {
 	let pos = $.markAsStructValue(new token.Position({Filename: "test.go", Line: 1, Column: 1}))
 	scanner.ErrorList_Add(errorList, $.markAsStructValue($.cloneStructValue(pos)), "test error")
 
-	await fmt.Printf("ErrorList length: %d\n", $.basicInterfaceValue($.len((errorList.value as scanner.ErrorList)), "int"))
+	await fmt.Printf("ErrorList length: %d\n", $.basicInterfaceValue($.sliceLen((errorList.value as scanner.ErrorList)), "int"))
 
 	// End reports the position after the last scanned token.
 	let fset: token.FileSet | $.VarRef<token.FileSet> | null = token.NewFileSet()

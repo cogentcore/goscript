@@ -43,8 +43,8 @@ export class item {
 
 export async function main(): globalThis.Promise<void> {
 	let items: $.Slice<item> = $.arrayToSlice<item>([$.markAsStructValue(new item({name: "alpha"})), $.markAsStructValue(new item({name: "beta"}))])
-	for (let __goscriptRangeTarget0 = items, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
-		let item = $.varRef($.markAsStructValue($.cloneStructValue(__goscriptRangeTarget0![__rangeIndex])))
+	for (let __goscriptRangeTarget0 = items, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
+		let item = $.varRef($.markAsStructValue($.cloneStructValue((__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as item))))
 		await $.println(item.value.Name())
 	}
 }

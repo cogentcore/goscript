@@ -98,9 +98,9 @@ export function Extended_String(e: Extended): string {
 }
 
 export function valuesExtended<T, E>(__typeArgs: $.GenericTypeArgs | undefined, values: $.Slice<T>, extended: $.Slice<E>): $.Slice<T> {
-	let res: $.Slice<T> = $.makeSlice<T>($.len(extended), undefined, undefined, () => ($.genericZero(__typeArgs, "T", null) as T))
-	for (let __goscriptRangeTarget0 = extended, i = 0; i < $.len(__goscriptRangeTarget0); i++) {
-		let e = __goscriptRangeTarget0![i]
+	let res: $.Slice<T> = $.makeSlice<T>($.sliceLen(extended), undefined, undefined, () => ($.genericZero(__typeArgs, "T", null) as T))
+	for (let __goscriptRangeTarget0 = extended, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), i = 0; i < __goscriptRangeWindow0.length; i++) {
+		let e = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + i] as any)
 		res![i] = $.genericConvert<T>(__typeArgs, "T", e)
 	}
 	res = $.appendSlice(res, values, $.appendZero(() => ($.genericZero(__typeArgs, "T", null) as T)))
@@ -121,8 +121,8 @@ export function fromConst(__typeArgs: $.GenericTypeArgs | undefined, i: number):
 
 export async function main(): globalThis.Promise<void> {
 	let res: $.Slice<Base> = (valuesExtended({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int32", "main.Base"), zero: () => 0, methods: {String: (receiver: any, ...args: any[]) => (Base_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, methodSignatures: [$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])] }, E: { type: /* @__PURE__ */ $.basicType("int32", "main.Extended"), zero: () => 0, methods: {String: (receiver: any, ...args: any[]) => (Extended_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, methodSignatures: [$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])] }}, $.arrayToSlice<Base>([0, 1]), $.arrayToSlice<Extended>([2, 3, 4])) as $.Slice<Base>)
-	for (let __goscriptRangeTarget1 = res, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget1); __rangeIndex++) {
-		let v = $.int(__goscriptRangeTarget1![__rangeIndex], 32)
+	for (let __goscriptRangeTarget1 = res, __goscriptRangeWindow1 = $.sliceRange(__goscriptRangeTarget1), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow1.length; __rangeIndex++) {
+		let v = $.int((__goscriptRangeWindow1.backing[__goscriptRangeWindow1.offset + __rangeIndex] as Base), 32)
 		await $.println($.int(v), Base_String(v))
 	}
 	let w = (toWide({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int64", "main.Wide"), zero: () => 0n, methods: {String: (receiver: any, ...args: any[]) => (Wide_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, methodSignatures: [$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])] }, E: { type: /* @__PURE__ */ $.basicType("int32", "main.Extended"), zero: () => 0, methods: {String: (receiver: any, ...args: any[]) => (Extended_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, methodSignatures: [$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])] }}, 5) as Wide)

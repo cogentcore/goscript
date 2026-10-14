@@ -77,12 +77,12 @@ export async function main(): globalThis.Promise<void> {
 	let k = $.markAsStructValue(new holder({values: $.makeMap<string, number>([["a", 1], ["b", 2]])}))
 	let sum = 0
 	for (const [__goscriptRangeShadow0, v] of k.values?.entries() ?? []) {
-		sum = sum + ($.len(__goscriptRangeShadow0) + v)
+		sum = sum + ($.stringLen(__goscriptRangeShadow0) + v)
 	}
 	await $.println(sum)
 	let items = $.markAsStructValue(new holder({items: $.arrayToSlice<item>([$.markAsStructValue(new item({value: 3})), $.markAsStructValue(new item({value: 7}))])}))
-	for (let __goscriptRangeTarget0 = items.items, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
-		let __goscriptRangeShadow1 = $.varRef($.markAsStructValue($.cloneStructValue(__goscriptRangeTarget0![__rangeIndex])))
+	for (let __goscriptRangeTarget0 = items.items, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
+		let __goscriptRangeShadow1 = $.varRef($.markAsStructValue($.cloneStructValue((__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as item))))
 		await $.println(__goscriptRangeShadow1.value.increment())
 	}
 	await $.println($.arrayIndex(items.items!, 0).value, $.arrayIndex(items.items!, 1).value)

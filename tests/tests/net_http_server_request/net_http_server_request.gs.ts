@@ -49,7 +49,7 @@ export async function main(): globalThis.Promise<void> {
 		let __goscriptTuple2: any = await io.ReadAll($.pointerValueOrNil(($.pointerValue<http.Request>(r).Body as io.Reader | null))!)
 		let data: $.Slice<number> = __goscriptTuple2[0]
 		let err = __goscriptTuple2[1]
-		await $.println("server:", $.pointerValue<http.Request>(r).Method, $.comparableEqual($.pointerValue<http.Request>(r).Body, $.interfaceValue<io.ReadCloser | null>($.pointerValue<any>(http.NoBody), "http.noBody", "http.noBody")), $.len(data), err == null, url.Values_Get($.pointerValue<http.Request>(r).URL.Query(), "x"), $.pointerValue<http.Request>(r).URL.RequestURI())
+		await $.println("server:", $.pointerValue<http.Request>(r).Method, $.comparableEqual($.pointerValue<http.Request>(r).Body, $.interfaceValue<io.ReadCloser | null>($.pointerValue<any>(http.NoBody), "http.noBody", "http.noBody")), $.sliceLen(data), err == null, url.Values_Get($.pointerValue<http.Request>(r).URL.Query(), "x"), $.pointerValue<http.Request>(r).URL.RequestURI())
 		await printURL("server", $.pointerValue<http.Request>(r).URL)
 		{
 			let [, __goscriptShadow0] = await $.pointerValue<Exclude<http.ResponseWriter, null>>(w).Write(new Uint8Array([111, 107]))
@@ -90,8 +90,8 @@ export async function main(): globalThis.Promise<void> {
 
 	// RequestURI keeps the escaped path and the query unchanged.
 	let targets: $.Slice<string> = $.arrayToSlice<string>(["/a%2Fb/c?q=a/../b&n=5", "/a/b", "http://example.com", "https://user:secret@example.com:8443/p/q%20r?a=1&b=2#frag%20x", "mailto:joe@example.com?subject=hi", "http://example.com/p?"])
-	for (let __goscriptRangeTarget0 = targets, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
-		let target = __goscriptRangeTarget0![__rangeIndex]
+	for (let __goscriptRangeTarget0 = targets, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
+		let target = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as string)
 		let __goscriptTuple5: any = http.NewRequest(http.MethodGet, target, null!)
 		let __goscriptShadow1: http.Request | $.VarRef<http.Request> | null = __goscriptTuple5[0]
 		let __goscriptShadow2 = __goscriptTuple5[1]

@@ -54,7 +54,7 @@ export async function checkInvalidSource(dst: $.Slice<number>, src: $.Slice<numb
 		__defer.defer(async () => { await (async (): globalThis.Promise<void> => {
 			await $.println("invalid source:", $.recover() != null)
 		})() })
-		let high = $.len(src) + 1
+		let high = $.sliceLen(src) + 1
 		$.copyByteRanges(dst, undefined, undefined, src, undefined, high)
 		await __defer.dispose()
 	} catch (e) {

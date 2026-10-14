@@ -10,7 +10,7 @@ export async function main(): globalThis.Promise<void> {
 
 	type MySlice = $.Slice<number>
 	let s: MySlice = ($.makeSlice<number>(5, undefined, "number") as MySlice)
-	await $.println("Length:", $.len((s as MySlice)))
+	await $.println("Length:", $.sliceLen((s as MySlice)))
 
 	// Test make() with named map type
 	type MyMap = globalThis.Map<string, number> | null

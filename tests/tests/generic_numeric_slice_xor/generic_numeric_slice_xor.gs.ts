@@ -4,9 +4,9 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export function xorLoop<T>(__typeArgs: $.GenericTypeArgs | undefined, dst: $.Slice<T>, x: $.Slice<T>, y: $.Slice<T>): void {
-	x = $.goSlice(x, undefined, $.len(dst))
-	y = $.goSlice(y, undefined, $.len(dst))
-	for (let __goscriptRangeTarget0 = dst, i = 0; i < $.len(__goscriptRangeTarget0); i++) {
+	x = $.goSlice(x, undefined, $.sliceLen(dst))
+	y = $.goSlice(y, undefined, $.sliceLen(dst))
+	for (let __goscriptRangeTarget0 = dst, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), i = 0; i < __goscriptRangeWindow0.length; i++) {
 		dst![i] = ($.arrayIndex(x!, i) as any) ^ ($.arrayIndex(y!, i) as any)
 	}
 }

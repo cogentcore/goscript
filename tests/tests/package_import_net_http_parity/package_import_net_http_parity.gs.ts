@@ -28,7 +28,7 @@ export async function main(): globalThis.Promise<void> {
 	let h: http.Header = $.makeMap<string, $.Slice<string>>([])
 	http.Header_Set(h, "content-type", "text/plain")
 	http.Header_Add(h, "content-type", "charset=utf-8")
-	await $.println("header:", http.CanonicalHeaderKey("x-test"), await http.Header_Get(h, "CONTENT-TYPE"), $.len(http.Header_Values(h, "content-type")))
+	await $.println("header:", http.CanonicalHeaderKey("x-test"), await http.Header_Get(h, "CONTENT-TYPE"), $.sliceLen(http.Header_Values(h, "content-type")))
 
 	let [major, minor, ok] = http.ParseHTTPVersion("HTTP/2.0")
 	await $.println("proto:", major, minor, ok)
@@ -42,7 +42,7 @@ export async function main(): globalThis.Promise<void> {
 		return
 	}
 	http.Header_Set($.pointerValue<http.Request>(req).Header, "Cookie", "space=wave")
-	await $.println("request:", $.pointerValue<http.Request>(req).Method, $.pointerValue<url.URL>($.pointerValue<http.Request>(req).URL).Path, http.Request.prototype.ProtoAtLeast.call($.pointerValue<http.Request>(req), 1, 1), $.len(http.Request.prototype.Cookies.call($.pointerValue<http.Request>(req))))
+	await $.println("request:", $.pointerValue<http.Request>(req).Method, $.pointerValue<url.URL>($.pointerValue<http.Request>(req).URL).Path, http.Request.prototype.ProtoAtLeast.call($.pointerValue<http.Request>(req), 1, 1), $.sliceLen(http.Request.prototype.Cookies.call($.pointerValue<http.Request>(req))))
 
 	let rec: httptest.ResponseRecorder | $.VarRef<httptest.ResponseRecorder> | null = httptest.NewRecorder()
 	http.Error($.pointerValueOrNil($.interfaceValue<http.ResponseWriter | null>(rec, "*httptest.ResponseRecorder", /* @__PURE__ */ $.pointerType("httptest.ResponseRecorder")))!, http.ProtocolError.prototype.Error.call($.pointerValue<http.ProtocolError>(http.ErrNotSupported)), 403)

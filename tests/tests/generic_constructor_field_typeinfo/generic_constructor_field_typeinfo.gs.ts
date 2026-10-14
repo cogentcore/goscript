@@ -99,7 +99,7 @@ export async function main(): globalThis.Promise<void> {
 	let blk = await blockType.prototype.Constructor.call(bt, {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.pointerType("main.sampleBlock"), zero: () => null, methods: {MarshalBlock: (receiver: any, ...args: any[]) => $.pointerValue(receiver).MarshalBlock(...$.stripGenericTypeArgs(args)), UnmarshalBlock: (receiver: any, ...args: any[]) => $.pointerValue(receiver).UnmarshalBlock(...$.stripGenericTypeArgs(args))} }})
 	let __goscriptTuple0: any = await $.pointerValue<Exclude<Block, null>>(blk).MarshalBlock()
 	let data: $.Slice<number> = __goscriptTuple0[0]
-	await $.println(blockType.prototype.GetBlockTypeID.call(bt, {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.pointerType("main.sampleBlock"), zero: () => null, methods: {MarshalBlock: (receiver: any, ...args: any[]) => $.pointerValue(receiver).MarshalBlock(...$.stripGenericTypeArgs(args)), UnmarshalBlock: (receiver: any, ...args: any[]) => $.pointerValue(receiver).UnmarshalBlock(...$.stripGenericTypeArgs(args))} }}), $.len(data))
+	await $.println(blockType.prototype.GetBlockTypeID.call(bt, {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.pointerType("main.sampleBlock"), zero: () => null, methods: {MarshalBlock: (receiver: any, ...args: any[]) => $.pointerValue(receiver).MarshalBlock(...$.stripGenericTypeArgs(args)), UnmarshalBlock: (receiver: any, ...args: any[]) => $.pointerValue(receiver).UnmarshalBlock(...$.stripGenericTypeArgs(args))} }}), $.sliceLen(data))
 }
 
 if ($.isMainScript(import.meta)) {

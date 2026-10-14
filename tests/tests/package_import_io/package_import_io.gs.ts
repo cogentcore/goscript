@@ -67,7 +67,7 @@ export class asyncBuffer {
 	public async Write(p: $.Slice<number>): globalThis.Promise<[number, $.GoError]> {
 		const b: asyncBuffer | $.VarRef<asyncBuffer> | null = this;
 		await asyncWrites.value.Load("last")
-		return [$.len(p), null]
+		return [$.sliceLen(p), null]
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -180,11 +180,11 @@ export class asyncReaderAt {
 	public async ReadAt(p: $.Slice<number>, off: bigint): globalThis.Promise<[number, $.GoError]> {
 		const r: asyncReaderAt | $.VarRef<asyncReaderAt> | null = this;
 		await asyncWrites.value.Load("readat")
-		if (off >= $.int64($.len($.pointerValue<asyncReaderAt>(r).data))) {
+		if (off >= $.int64($.sliceLen($.pointerValue<asyncReaderAt>(r).data))) {
 			return [0, io.EOF]
 		}
 		let n = $.copy(p, $.goSlice($.pointerValue<asyncReaderAt>(r).data, globalThis.Number(off), undefined))
-		if (n < $.len(p)) {
+		if (n < $.sliceLen(p)) {
 			return [n, io.EOF]
 		}
 		return [n, null]

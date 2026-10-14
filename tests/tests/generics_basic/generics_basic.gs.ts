@@ -44,15 +44,15 @@ export class Stack {
 
 	public Len(__typeArgs: $.GenericTypeArgs | undefined): number {
 		const s: Stack | $.VarRef<Stack> | null = this;
-		return $.len($.pointerValue<Stack>(s).items)
+		return $.sliceLen($.pointerValue<Stack>(s).items)
 	}
 
 	public Pop(__typeArgs: $.GenericTypeArgs | undefined): [any, boolean] {
 		let s: Stack | $.VarRef<Stack> | null = this;
-		if ($.len($.pointerValue<Stack>(s).items) == 0) {
+		if ($.sliceLen($.pointerValue<Stack>(s).items) == 0) {
 			$.panic("pop from empty stack")
 		}
-		let last = $.len($.pointerValue<Stack>(s).items) - 1
+		let last = $.sliceLen($.pointerValue<Stack>(s).items) - 1
 		let value = $.arrayIndex($.pointerValue<Stack>(s).items!, last)
 		$.pointerValue<Stack>(s).items = $.goSlice($.pointerValue<Stack>(s).items, undefined, last)
 		return [value, true]
@@ -203,8 +203,8 @@ export function min(__typeArgs: $.GenericTypeArgs | undefined, a: any, b: any): 
 
 export function NewSet<T>(__typeArgs: $.GenericTypeArgs | undefined, values: $.Slice<T>): Set {
 	let _set: Set = $.makeMap<any, {}>(undefined, __typeArgs?.["T"]?.type ?? { kind: $.TypeKind.Interface, methods: [] })
-	for (let __goscriptRangeTarget0 = values, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
-		let value = __goscriptRangeTarget0![__rangeIndex]
+	for (let __goscriptRangeTarget0 = values, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
+		let value = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as any)
 		$.mapSet(_set, value, {})
 	}
 	return _set
@@ -220,9 +220,9 @@ export function Set_Has(s: Set, __typeArgs: $.GenericTypeArgs | undefined, value
 }
 
 export async function CloneAll<T>(__typeArgs: $.GenericTypeArgs | undefined, items: $.Slice<T>): globalThis.Promise<$.Slice<T>> {
-	let clones: $.Slice<T> = $.makeSlice<T>(0, $.len(items), undefined, () => ($.genericZero(__typeArgs, "T", null) as T))
-	for (let __goscriptRangeTarget1 = items, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget1); __rangeIndex++) {
-		let item = __goscriptRangeTarget1![__rangeIndex]
+	let clones: $.Slice<T> = $.makeSlice<T>(0, $.sliceLen(items), undefined, () => ($.genericZero(__typeArgs, "T", null) as T))
+	for (let __goscriptRangeTarget1 = items, __goscriptRangeWindow1 = $.sliceRange(__goscriptRangeTarget1), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow1.length; __rangeIndex++) {
+		let item = (__goscriptRangeWindow1.backing[__goscriptRangeWindow1.offset + __rangeIndex] as any)
 		clones = $.append(clones, await $.callGenericMethod(__typeArgs, "T", "Clone", item), $.appendZero(() => ($.genericZero(__typeArgs, "T", null) as T)))
 	}
 	return clones

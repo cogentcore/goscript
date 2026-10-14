@@ -54,8 +54,8 @@ export async function main(): globalThis.Promise<void> {
 		await $.println("err:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 		return
 	}
-	for (let __goscriptRangeTarget0 = entries, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
-		let entry = __goscriptRangeTarget0![__rangeIndex]
+	for (let __goscriptRangeTarget0 = entries, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
+		let entry = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as fs.DirEntry | null)
 		await $.println(await $.pointerValue<Exclude<fs.DirEntry, null>>(entry).Name(), await $.pointerValue<Exclude<fs.DirEntry, null>>(entry).IsDir())
 	}
 }

@@ -86,7 +86,7 @@ export async function main(): globalThis.Promise<void> {
 	let tracker: FileTracker | $.VarRef<FileTracker> | null = new FileTracker({lines: $.arrayToSlice<number>([])})
 	let scanner: Scanner | $.VarRef<Scanner> | null = new Scanner({file: tracker})
 	await Scanner.prototype.next.call(scanner)
-	await $.println($.len($.pointerValue<FileTracker>(tracker).lines))
+	await $.println($.sliceLen($.pointerValue<FileTracker>(tracker).lines))
 }
 
 if ($.isMainScript(import.meta)) {

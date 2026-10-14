@@ -43,7 +43,7 @@ export class genericBox {
 
 	public async Count(__typeArgs: $.GenericTypeArgs | undefined, ctx: context.Context | null, values: $.Slice<any>): globalThis.Promise<number> {
 		await $.chanRecv(await $.pointerValue<Exclude<context.Context, null>>(ctx).Done())
-		return $.len(values)
+		return $.sliceLen(values)
 	}
 
 	public async Wait(__typeArgs: $.GenericTypeArgs | undefined, ctx: context.Context | null, old: any): globalThis.Promise<any> {
@@ -79,7 +79,7 @@ export class intBox {
 
 	public async Count(ctx: context.Context | null, values: $.Slice<number>): globalThis.Promise<number> {
 		await $.chanRecv(await $.pointerValue<Exclude<context.Context, null>>(ctx).Done())
-		return $.len(values)
+		return $.sliceLen(values)
 	}
 
 	public async Wait(ctx: context.Context | null, old: number): globalThis.Promise<number> {

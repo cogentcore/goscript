@@ -30,7 +30,7 @@ export class source {
 	}
 
 	public Read(value: $.Slice<number>): [number, $.GoError] {
-		return [$.len(value), null]
+		return [$.sliceLen(value), null]
 	}
 
 	static __typeInfo = $.registerStructType(

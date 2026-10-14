@@ -131,7 +131,7 @@ export class MapItem {
 }
 
 export function Maps_CopyFrom(km: $.VarRef<Maps> | null, cp: Maps): $.GoError {
-	km!.value = ($.makeSlice<MapItem>(0, $.len((cp as Maps)), undefined, () => $.markAsStructValue(new MapItem())) as Maps)
+	km!.value = ($.makeSlice<MapItem>(0, $.sliceLen((cp as Maps)), undefined, () => $.markAsStructValue(new MapItem())) as Maps)
 	let __goscriptTuple0: any = json.Marshal($.interfaceValue(cp, "main.Maps", /* @__PURE__ */ $.sliceType("main.MapItem", "main.Maps")))
 	let b: $.Slice<number> = __goscriptTuple0[0]
 	let err = __goscriptTuple0[1]
@@ -169,7 +169,7 @@ export async function main(): globalThis.Promise<void> {
 	// UnmarshalJSON, decodes into the value it points to.
 	let maps: $.VarRef<Maps> = $.varRef(null! as Maps)
 	let err = Maps_CopyFrom(maps, ($.arrayToSlice<MapItem>([$.markAsStructValue(new MapItem({Name: "a", Map: $.makeMap<string, number>([["x", 1]])})), $.markAsStructValue(new MapItem({Name: "b"}))]) as Maps))
-	await fmt.Println("copy:", err == null, $.basicInterfaceValue($.len((maps.value as Maps)), "int"), $.arrayIndex(maps.value!, 0).Name, $.basicInterfaceValue($.mapGet<string, number, number>($.arrayIndex(maps.value!, 0).Map, "x", 0)[0], "int"), $.arrayIndex(maps.value!, 1).Name)
+	await fmt.Println("copy:", err == null, $.basicInterfaceValue($.sliceLen((maps.value as Maps)), "int"), $.arrayIndex(maps.value!, 0).Name, $.basicInterfaceValue($.mapGet<string, number, number>($.arrayIndex(maps.value!, 0).Map, "x", 0)[0], "int"), $.arrayIndex(maps.value!, 1).Name)
 
 	let names: $.VarRef<Names> = $.varRef(null! as Names)
 	err = json.Unmarshal(new Uint8Array([123, 34, 112, 34, 58, 49, 44, 34, 113, 34, 58, 50, 125]), $.namedValueInterfaceValue<any>(names, "*main.Names", {Len: (receiver: any, ...args: any[]) => (Names_Len as any)(receiver, ...$.stripGenericTypeArgs(args))}, /* @__PURE__ */ $.pointerType("main.Names"), [$.methodSignature("Len", [], [/* @__PURE__ */ $.basicType("int")])]))

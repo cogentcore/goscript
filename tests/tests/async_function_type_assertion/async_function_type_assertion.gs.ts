@@ -22,7 +22,7 @@ export class Worker {
 
 	public async lookup(network: string): globalThis.Promise<number> {
 		const w: Worker | $.VarRef<Worker> | null = this;
-		await $.chanSend($.pointerValue<Worker>(w).ch, $.len(network))
+		await $.chanSend($.pointerValue<Worker>(w).ch, $.stringLen(network))
 		return await $.chanRecv($.pointerValue<Worker>(w).ch)
 	}
 
@@ -44,7 +44,7 @@ export async function callLookup(fn: ((_p0: string) => number | globalThis.Promi
 }
 
 export function syncLookup(network: string): number {
-	return $.len(network)
+	return $.stringLen(network)
 }
 
 export function chooseLookup(value: any, worker: Worker | $.VarRef<Worker> | null): number {

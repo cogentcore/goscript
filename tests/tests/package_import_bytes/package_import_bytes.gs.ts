@@ -43,8 +43,8 @@ export async function main(): globalThis.Promise<void> {
 
 	// Test Split
 	let split: $.Slice<$.Slice<number>> = bytes.Split(joined, new Uint8Array([32]))
-	await $.println("Split result length:", $.len(split))
-	if ($.len(split) == 2) {
+	await $.println("Split result length:", $.sliceLen(split))
+	if ($.sliceLen(split) == 2) {
 		await $.println("Split works correctly")
 	}
 

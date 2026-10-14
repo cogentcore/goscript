@@ -38,8 +38,8 @@ export class namedItem {
 }
 
 export async function main(): globalThis.Promise<void> {
-	for (let __goscriptRangeTarget0 = $.arrayToSlice<{"name": string, "input": string, "count": number}>([$.anonymousStructValue({name: "first", input: "alpha", count: 1}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("name", /* @__PURE__ */ $.basicType("string"), [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/anonymous_struct_slice" }), /* @__PURE__ */ $.structField("input", /* @__PURE__ */ $.basicType("string"), [1], 16, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/anonymous_struct_slice" }), /* @__PURE__ */ $.structField("count", /* @__PURE__ */ $.basicType("int"), [2], 32, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/anonymous_struct_slice" })] }), $.anonymousStructValue({name: "second", input: "beta", count: 2}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("name", /* @__PURE__ */ $.basicType("string"), [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/anonymous_struct_slice" }), /* @__PURE__ */ $.structField("input", /* @__PURE__ */ $.basicType("string"), [1], 16, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/anonymous_struct_slice" }), /* @__PURE__ */ $.structField("count", /* @__PURE__ */ $.basicType("int"), [2], 32, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/anonymous_struct_slice" })] })]), __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
-		let tt = $.markAsStructValue($.cloneStructValue(__goscriptRangeTarget0![__rangeIndex]))
+	for (let __goscriptRangeTarget0 = $.arrayToSlice<{"name": string, "input": string, "count": number}>([$.anonymousStructValue({name: "first", input: "alpha", count: 1}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("name", /* @__PURE__ */ $.basicType("string"), [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/anonymous_struct_slice" }), /* @__PURE__ */ $.structField("input", /* @__PURE__ */ $.basicType("string"), [1], 16, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/anonymous_struct_slice" }), /* @__PURE__ */ $.structField("count", /* @__PURE__ */ $.basicType("int"), [2], 32, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/anonymous_struct_slice" })] }), $.anonymousStructValue({name: "second", input: "beta", count: 2}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("name", /* @__PURE__ */ $.basicType("string"), [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/anonymous_struct_slice" }), /* @__PURE__ */ $.structField("input", /* @__PURE__ */ $.basicType("string"), [1], 16, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/anonymous_struct_slice" }), /* @__PURE__ */ $.structField("count", /* @__PURE__ */ $.basicType("int"), [2], 32, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/anonymous_struct_slice" })] })]), __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
+		let tt = $.markAsStructValue($.cloneStructValue((__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as {"name": string, "input": string, "count": number})))
 		await $.println(tt.name, tt.input, tt.count)
 	}
 
@@ -49,9 +49,9 @@ export async function main(): globalThis.Promise<void> {
 
 	let __goscriptTuple0: any = buildNamedItems()
 	let items: $.Slice<namedItem> = __goscriptTuple0[0]
-	for (let __goscriptRangeTarget1 = $.goSlice(items, 1, undefined), __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget1); __rangeIndex++) {
-		let item = $.markAsStructValue($.cloneStructValue(__goscriptRangeTarget1![__rangeIndex]))
-		await $.println(item.key, $.len(item.data))
+	for (let __goscriptRangeTarget1 = $.goSlice(items, 1, undefined), __goscriptRangeWindow1 = $.sliceRange(__goscriptRangeTarget1), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow1.length; __rangeIndex++) {
+		let item = $.markAsStructValue($.cloneStructValue((__goscriptRangeWindow1.backing[__goscriptRangeWindow1.offset + __rangeIndex] as namedItem)))
+		await $.println(item.key, $.sliceLen(item.data))
 	}
 }
 

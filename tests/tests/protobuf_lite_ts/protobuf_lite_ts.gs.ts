@@ -22,7 +22,7 @@ export async function main(): globalThis.Promise<void> {
 		return
 	}
 
-	await $.println("data len:", $.len(data))
+	await $.println("data len:", $.sliceLen(data))
 
 	let out: __goscript_protobuf_lite_ts_pb_ts.ExampleMsg | $.VarRef<__goscript_protobuf_lite_ts_pb_ts.ExampleMsg> | null = new __goscript_protobuf_lite_ts_pb_ts.ExampleMsg()
 	err = __goscript_protobuf_lite_ts_pb_ts.ExampleMsg.prototype.UnmarshalVT.call(out, data)
@@ -66,7 +66,7 @@ export async function main(): globalThis.Promise<void> {
 		await $.println("error marshalling oneof:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 		return
 	}
-	await $.println("oneof size matches:", oneofSize == $.len(oneofData))
+	await $.println("oneof size matches:", oneofSize == $.sliceLen(oneofData))
 
 	let oneofOut: __goscript_protobuf_lite_ts_pb_ts.ExampleMsg | $.VarRef<__goscript_protobuf_lite_ts_pb_ts.ExampleMsg> | null = new __goscript_protobuf_lite_ts_pb_ts.ExampleMsg()
 	{

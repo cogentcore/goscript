@@ -219,8 +219,8 @@ export async function main(): globalThis.Promise<void> {
 	// Sort results for deterministic output
 	slices.Sort(results)
 
-	for (let __goscriptRangeTarget0 = results, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
-		let r = __goscriptRangeTarget0![__rangeIndex]
+	for (let __goscriptRangeTarget0 = results, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
+		let r = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as string)
 		await $.println("JSON result:", r)
 	}
 
@@ -260,9 +260,9 @@ export async function byteSliceFields(): globalThis.Promise<void> {
 	let d: Enc | $.VarRef<Enc> | null = new Enc()
 	err = json.Unmarshal(b, $.interfaceValue(d, "*main.Enc", /* @__PURE__ */ $.pointerType("main.Enc")))
 	await $.println("err:", err == null, "width:", $.pointerValue<Enc>(d).Width)
-	await $.println("image:", $.len($.pointerValue<Enc>(d).Image), $.uint($.arrayIndex($.pointerValue<Enc>(d).Image!, 0), 8), $.uint($.arrayIndex($.pointerValue<Enc>(d).Image!, 2), 8))
-	await $.println("frames:", $.len($.pointerValue<Enc>(d).Frames), $.len($.arrayIndex($.pointerValue<Enc>(d).Frames!, 1)), $.uint($.arrayIndex($.arrayIndex($.pointerValue<Enc>(d).Frames!, 1)!, 1), 8))
-	await $.println("named:", $.len($.mapGet<string, $.Slice<number>, $.Slice<number>>($.pointerValue<Enc>(d).Named, "a", null)[0]), $.uint($.arrayIndex($.mapGet<string, $.Slice<number>, $.Slice<number>>($.pointerValue<Enc>(d).Named, "a", null)[0]!, 1), 8))
+	await $.println("image:", $.sliceLen($.pointerValue<Enc>(d).Image), $.uint($.arrayIndex($.pointerValue<Enc>(d).Image!, 0), 8), $.uint($.arrayIndex($.pointerValue<Enc>(d).Image!, 2), 8))
+	await $.println("frames:", $.sliceLen($.pointerValue<Enc>(d).Frames), $.sliceLen($.arrayIndex($.pointerValue<Enc>(d).Frames!, 1)), $.uint($.arrayIndex($.arrayIndex($.pointerValue<Enc>(d).Frames!, 1)!, 1), 8))
+	await $.println("named:", $.sliceLen($.mapGet<string, $.Slice<number>, $.Slice<number>>($.pointerValue<Enc>(d).Named, "a", null)[0]), $.uint($.arrayIndex($.mapGet<string, $.Slice<number>, $.Slice<number>>($.pointerValue<Enc>(d).Named, "a", null)[0]!, 1), 8))
 	await $.println("nested:", $.bytesToString($.pointerValue<Enc>($.pointerValue<Enc>(d).Nested).Image))
 
 	err = json.Unmarshal(new Uint8Array([123, 34, 73, 109, 97, 103, 101, 34, 58, 110, 117, 108, 108, 125]), $.interfaceValue(d, "*main.Enc", /* @__PURE__ */ $.pointerType("main.Enc")))

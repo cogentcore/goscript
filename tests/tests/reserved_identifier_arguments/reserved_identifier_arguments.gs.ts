@@ -17,7 +17,7 @@ export class Parser {
 	}
 
 	public Parse(_arguments: $.Slice<string>): number {
-		return $.len(_arguments)
+		return $.sliceLen(_arguments)
 	}
 
 	static __typeInfo = $.registerStructType(

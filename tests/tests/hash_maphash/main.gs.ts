@@ -32,7 +32,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println(h.value.Sum64() == whole)
 
 	let hh: hash.Hash64 | null = $.interfaceValue<hash.Hash64 | null>(h, "*maphash.Hash", /* @__PURE__ */ $.pointerType("maphash.Hash"))
-	await $.println(await $.pointerValue<Exclude<hash.Hash64, null>>(hh).Size(), await $.pointerValue<Exclude<hash.Hash64, null>>(hh).BlockSize(), $.len(await $.pointerValue<Exclude<hash.Hash64, null>>(hh).Sum(null)))
+	await $.println(await $.pointerValue<Exclude<hash.Hash64, null>>(hh).Size(), await $.pointerValue<Exclude<hash.Hash64, null>>(hh).BlockSize(), $.sliceLen(await $.pointerValue<Exclude<hash.Hash64, null>>(hh).Sum(null)))
 
 	h.value.Reset()
 	await $.println(h.value.Sum64() == maphash.String($.markAsStructValue($.cloneStructValue(seed)), ""))

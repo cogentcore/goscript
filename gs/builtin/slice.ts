@@ -95,6 +95,62 @@ function goStringFromBytes(bytes: Uint8Array): string {
 /**
  * GoSliceObject describes a slice window and its shared backing array.
  */
+// sliceProxyMetas caches the window of each slice proxy that is looked up,
+// so that the runtime can read a slice's backing array directly, without the
+// proxy traps, which are much slower. It is filled when a slice is first
+// looked up rather than when it is made, since append makes many short-lived
+// slices.
+const sliceProxyMetas = new WeakMap<object, GoSliceObject<any>>()
+
+// sliceMeta returns the window of a slice proxy, or of an array with one, or
+// undefined for a plain array.
+function sliceMeta(slice: object): GoSliceObject<any> | undefined {
+  let meta = sliceProxyMetas.get(slice)
+  if (meta === undefined) {
+    meta = (slice as { __meta__?: GoSliceObject<any> }).__meta__
+    if (meta !== undefined) {
+      sliceProxyMetas.set(slice, meta)
+    }
+  }
+  return meta
+}
+
+// SliceRange is the window of a slice or array for a range loop over it.
+export interface SliceRange<T> {
+  backing: ArrayLike<T>
+  offset: number
+  length: number
+}
+
+const emptySliceRange: SliceRange<any> = { backing: [], offset: 0, length: 0 }
+
+/**
+ * sliceRange returns the backing array, offset and length of a slice or
+ * array, so that a range loop over it reads its elements directly, with the
+ * length fixed when the loop starts, as in Go.
+ */
+export function sliceRange<T>(
+  slice: Slice<T> | T[] | null | undefined,
+): SliceRange<T>
+export function sliceRange(
+  slice: Uint8Array | null | undefined,
+): SliceRange<number>
+export function sliceRange<T>(
+  slice: Slice<T> | T[] | Uint8Array | null | undefined,
+): SliceRange<T> {
+  if (slice === null || slice === undefined) {
+    return emptySliceRange
+  }
+  const meta = sliceMeta(slice)
+  if (meta !== undefined) {
+    return meta
+  }
+  if (Array.isArray(slice) || slice instanceof Uint8Array) {
+    return { backing: slice as ArrayLike<T>, offset: 0, length: slice.length }
+  }
+  return { backing: [], offset: 0, length: len(slice as any) }
+}
+
 interface GoSliceObject<T> {
   backing: T[]
   offset: number
@@ -885,6 +941,29 @@ export const arrayToSlice = <T>(
 /**
  * len returns the Go length of a collection, counting string bytes.
  */
+/**
+ * sliceLen returns the length of a slice, for an expression whose static
+ * type is a slice type.
+ */
+export function sliceLen(
+  slice: Slice<unknown> | unknown[] | Uint8Array | null | undefined,
+): number {
+  if (slice === null || slice === undefined) {
+    return 0
+  }
+  const meta = sliceProxyMetas.get(slice)
+  if (meta !== undefined) {
+    return meta.length
+  }
+  if (Array.isArray(slice) || slice instanceof Uint8Array) {
+    const plainMeta = (slice as any).__meta__ as
+      | GoSliceObject<unknown>
+      | undefined
+    return plainMeta !== undefined ? plainMeta.length : slice.length
+  }
+  return len(slice as any)
+}
+
 export const len = <T = unknown, V = unknown>(
   obj:
     | GoStringValue
@@ -897,6 +976,12 @@ export const len = <T = unknown, V = unknown>(
     | null
     | undefined,
 ): number => {
+  if (typeof obj === 'object' && obj !== null && Array.isArray(obj)) {
+    const meta = sliceMeta(obj)
+    if (meta !== undefined) {
+      return meta.length
+    }
+  }
   obj = collectionValue(obj) as typeof obj
   if (obj === null || obj === undefined) {
     return 0
@@ -1542,6 +1627,13 @@ export function arrayIndex<
 >(collection: C, index: number): ArrayIndexValue<C> {
   if (collection === null || collection === undefined) {
     outOfRangeIndex(index, 0)
+  }
+  const meta = sliceMeta(collection)
+  if (meta !== undefined) {
+    if (index < 0 || index >= meta.length) {
+      outOfRangeIndex(index, meta.length)
+    }
+    return meta.backing[meta.offset + index] as ArrayIndexValue<C>
   }
   if (collection instanceof Uint8Array) {
     if (index < 0 || index >= collection.length) {

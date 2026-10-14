@@ -65,8 +65,8 @@ export async function main(): globalThis.Promise<void> {
 	slices.Sort(results)
 
 	// Print sorted results
-	for (let __goscriptRangeTarget0 = results, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
-		let result = __goscriptRangeTarget0![__rangeIndex]
+	for (let __goscriptRangeTarget0 = results, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
+		let result = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as string)
 		await $.println("Result:", result)
 	}
 

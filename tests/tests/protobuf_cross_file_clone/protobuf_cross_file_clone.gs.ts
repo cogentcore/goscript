@@ -20,7 +20,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("clone nil:", clone == null)
 	await $.println("child name:", $.pointerValue<__goscript_child_pb_ts.Child>($.pointerValue<__goscript_parent_pb_ts.Parent>(clone).Child).Name)
 	await $.println("child ptr same:", $.pointerEqual($.pointerValue<__goscript_parent_pb_ts.Parent>(clone).Child, $.pointerValue<__goscript_parent_pb_ts.Parent>(parent).Child))
-	await $.println("children count:", $.len($.pointerValue<__goscript_parent_pb_ts.Parent>(clone).Children))
+	await $.println("children count:", $.sliceLen($.pointerValue<__goscript_parent_pb_ts.Parent>(clone).Children))
 	await $.println("children[0]:", $.pointerValue<__goscript_child_pb_ts.Child>($.arrayIndex($.pointerValue<__goscript_parent_pb_ts.Parent>(clone).Children!, 0)).Name)
 	await $.println("children[1]:", $.pointerValue<__goscript_child_pb_ts.Child>($.arrayIndex($.pointerValue<__goscript_parent_pb_ts.Parent>(clone).Children!, 1)).Name)
 	await $.println("children ptr same:", $.pointerEqual($.arrayIndex($.pointerValue<__goscript_parent_pb_ts.Parent>(clone).Children!, 0), $.arrayIndex($.pointerValue<__goscript_parent_pb_ts.Parent>(parent).Children!, 0)))

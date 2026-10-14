@@ -125,7 +125,7 @@ export async function main(): globalThis.Promise<void> {
 	named.value.byAddr = hosts.value.byAddr
 	await $.println($.arrayIndex((await lookup("127.0.0.1"))!, 0))
 	await $.println($.arrayIndex((await lookupNamed("127.0.0.1"))!, 0))
-	await $.println($.len(await lookup("::1")))
+	await $.println($.sliceLen(await lookup("::1")))
 }
 
 if ($.isMainScript(import.meta)) {

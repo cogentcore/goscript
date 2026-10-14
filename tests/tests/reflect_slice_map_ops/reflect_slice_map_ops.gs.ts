@@ -119,7 +119,7 @@ export async function main(): globalThis.Promise<void> {
 	let s: $.VarRef<$.Slice<number>> = $.varRef($.arrayToSlice<number>([1, 2, 3]))
 	let sv = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(s, "*[]int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"))))))).Elem()))
 	$.markAsStructValue($.cloneStructValue(sv)).SetLen(2)
-	await $.println($.len(s.value), $.cap(s.value))
+	await $.println($.sliceLen(s.value), $.cap(s.value))
 	let a = $.markAsStructValue($.cloneStructValue(reflect.Append($.markAsStructValue($.cloneStructValue(sv)), $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.basicInterfaceValue(9, "int")))))))
 	await $.println($.markAsStructValue($.cloneStructValue(a)).Len(), $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(a)).Index(2))).Int())
 	let b = $.markAsStructValue($.cloneStructValue(reflect.AppendSlice($.markAsStructValue($.cloneStructValue(sv)), $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.arrayToSlice<number>([7, 8]), "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")))))))))
@@ -151,7 +151,7 @@ export async function main(): globalThis.Promise<void> {
 		$.markAsStructValue($.cloneStructValue(hs)).SetLen(__goscriptShadow0 + 1)
 		$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(hs)).Index(__goscriptShadow0))).SetInt($.int64(i * 10))
 	}
-	await $.println("grown:", $.len($.pointerValue<Holder>(h).S), $.arrayIndex($.pointerValue<Holder>(h).S!, 0), $.arrayIndex($.pointerValue<Holder>(h).S!, 4), $.cap($.pointerValue<Holder>(h).S) >= 5)
+	await $.println("grown:", $.sliceLen($.pointerValue<Holder>(h).S), $.arrayIndex($.pointerValue<Holder>(h).S!, 0), $.arrayIndex($.pointerValue<Holder>(h).S!, 4), $.cap($.pointerValue<Holder>(h).S) >= 5)
 
 	// Grow keeps capacity when it is already large enough.
 	let ht = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(h, "*main.Holder", /* @__PURE__ */ $.pointerType("main.Holder"))))).Elem())).Field(1)))
@@ -167,12 +167,12 @@ export async function main(): globalThis.Promise<void> {
 	// MakeSlice of bytes.
 	let bs = $.markAsStructValue($.cloneStructValue(reflect.MakeSlice($.pointerValueOrNil(reflect.TypeFor({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")), zero: () => null }}))!, 3, 3)))
 	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(bs)).Index(1))).SetUint(7n)
-	await $.println("bytes:", $.len($.markAsStructValue($.cloneStructValue(bs)).Bytes()), $.uint($.arrayIndex($.markAsStructValue($.cloneStructValue(bs)).Bytes()!, 1), 8))
+	await $.println("bytes:", $.sliceLen($.markAsStructValue($.cloneStructValue(bs)).Bytes()), $.uint($.arrayIndex($.markAsStructValue($.cloneStructValue(bs)).Bytes()!, 1), 8))
 
 	let d: $.VarRef<Doc> = $.varRef($.markAsStructValue(new Doc()))
 	let err = await xml.Unmarshal(new Uint8Array([60, 100, 111, 99, 62, 60, 105, 116, 101, 109, 62, 60, 78, 97, 109, 101, 62, 120, 60, 47, 78, 97, 109, 101, 62, 60, 47, 105, 116, 101, 109, 62, 60, 105, 116, 101, 109, 62, 60, 78, 97, 109, 101, 62, 121, 60, 47, 78, 97, 109, 101, 62, 60, 47, 105, 116, 101, 109, 62, 60, 47, 100, 111, 99, 62]), $.interfaceValue(d, "*main.Doc", /* @__PURE__ */ $.pointerType("main.Doc")))
-	await $.println("xml:", err == null, $.len(d.value.Items))
-	if ($.len(d.value.Items) == 2) {
+	await $.println("xml:", err == null, $.sliceLen(d.value.Items))
+	if ($.sliceLen(d.value.Items) == 2) {
 		await $.println("xml items:", $.arrayIndex(d.value.Items!, 0).Name, $.arrayIndex(d.value.Items!, 1).Name)
 	}
 }

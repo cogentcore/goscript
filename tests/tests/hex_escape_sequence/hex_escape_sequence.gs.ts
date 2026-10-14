@@ -31,7 +31,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// Escapes JavaScript lacks, and runes it must escape.
 	let s = "\x07\v\x00\x7f\u{10ffff}𐀀\u2028é"
-	await $.println("len:", $.len(s))
+	await $.println("len:", $.stringLen(s))
 	for (const [__rangeIndex, r] of $.rangeString(s)) {
 		await $.println("rune:", $.int(r))
 	}

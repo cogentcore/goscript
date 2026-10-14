@@ -104,8 +104,8 @@ export async function countFlags(__typeArgs: $.GenericTypeArgs | undefined, __go
 	let i: $.VarRef<any> = $.varRef(__goscriptParam0)
 	let p = $.mustTypeAssert<setter | null>($.typeParamPointerInterfaceValue(i, __typeArgs?.["T"], "*T", /* @__PURE__ */ $.pointerType(__typeArgs?.["T"]?.type ?? { kind: $.TypeKind.Interface, methods: [] })), "main.setter")
 	let n: bigint = 0n
-	for (let __goscriptRangeTarget0 = values, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
-		let v = __goscriptRangeTarget0![__rangeIndex]
+	for (let __goscriptRangeTarget0 = values, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
+		let v = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as bigint)
 		if (await $.pointerValue<Exclude<setter, null>>(p).Has(v)) {
 			n++
 		}

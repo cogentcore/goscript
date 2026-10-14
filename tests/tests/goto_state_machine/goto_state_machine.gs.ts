@@ -30,11 +30,11 @@ export class scanner {
 
 	public readByte(): number {
 		let s: scanner | $.VarRef<scanner> | null = this;
-		if ($.pointerValue<scanner>(s).pos >= $.len($.pointerValue<scanner>(s).data)) {
+		if ($.pointerValue<scanner>(s).pos >= $.stringLen($.pointerValue<scanner>(s).data)) {
 			$.pointerValue<scanner>(s).done = true
 			return 0
 		}
-		let c = $.uint($.indexStringOrBytes($.pointerValue<scanner>(s).data, $.pointerValue<scanner>(s).pos), 8)
+		let c = $.uint($.indexString($.pointerValue<scanner>(s).data, $.pointerValue<scanner>(s).pos), 8)
 		$.pointerValue<scanner>(s).pos++
 		return $.uint(c, 8)
 	}
@@ -171,8 +171,8 @@ export class scanner {
 }
 
 export async function main(): globalThis.Promise<void> {
-	for (let __goscriptRangeTarget0 = $.arrayToSlice<string>(["a < b</script>", "x<!-- </script> -->y</script>", "<!x</script>", "no end"]), __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
-		let src = __goscriptRangeTarget0![__rangeIndex]
+	for (let __goscriptRangeTarget0 = $.arrayToSlice<string>(["a < b</script>", "x<!-- </script> -->y</script>", "<!x</script>", "no end"]), __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
+		let src = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as string)
 		let s: scanner | $.VarRef<scanner> | null = new scanner({data: src})
 		let end = scanner.prototype.readScript.call(s)
 		await $.println($.sliceStringOrBytes(src, undefined, end))
@@ -182,8 +182,8 @@ export async function main(): globalThis.Promise<void> {
 
 export function encode(rs: $.Slice<number>): string {
 	let out = ""
-	__goscriptLoop0: for (let __goscriptRangeTarget1 = rs, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget1); __rangeIndex++) {
-		let r = $.int(__goscriptRangeTarget1![__rangeIndex], 32)
+	__goscriptLoop0: for (let __goscriptRangeTarget1 = rs, __goscriptRangeWindow1 = $.sliceRange(__goscriptRangeTarget1), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow1.length; __rangeIndex++) {
+		let r = $.int((__goscriptRangeWindow1.backing[__goscriptRangeWindow1.offset + __rangeIndex] as number), 32)
 		if ($.int(r, 32) < 0x80) {
 			out = $.concatString(out, $.runeToString(r))
 			continue __goscriptLoop0

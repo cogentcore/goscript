@@ -32,10 +32,10 @@ export class fixedReader {
 
 	public Read(p: $.Slice<number>): [number, $.GoError] {
 		let r: fixedReader | $.VarRef<fixedReader> | null = this;
-		if ($.len($.pointerValue<fixedReader>(r).data) == 0) {
+		if ($.sliceLen($.pointerValue<fixedReader>(r).data) == 0) {
 			return [0, io.EOF]
 		}
-		if (($.pointerValue<fixedReader>(r).size > 0) && ($.len(p) > $.pointerValue<fixedReader>(r).size)) {
+		if (($.pointerValue<fixedReader>(r).size > 0) && ($.sliceLen(p) > $.pointerValue<fixedReader>(r).size)) {
 			p = $.goSlice(p, undefined, $.pointerValue<fixedReader>(r).size)
 		}
 		let n = $.copy(p, $.pointerValue<fixedReader>(r).data)

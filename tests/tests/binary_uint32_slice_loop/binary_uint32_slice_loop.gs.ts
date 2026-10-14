@@ -30,7 +30,7 @@ export class attrs {
 			return null
 		}
 		let bytes: $.Slice<number> = $.stringToBytes(a.packedData)
-		while ($.len(bytes) > 0) {
+		while ($.sliceLen(bytes) > 0) {
 			let kn: number = $.uint(4 + $.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.LittleEndian))).Uint32($.goSlice(bytes, undefined, 4)), 32)
 			let k = $.bytesToString($.goSlice(bytes, 4, kn))
 			bytes = $.goSlice(bytes, kn, undefined)
@@ -57,8 +57,8 @@ export class attrs {
 
 export async function main(): globalThis.Promise<void> {
 	let a = $.markAsStructValue(new attrs({packedData: "\x01\x00\x00\x00a\x01\x00\x00\x00b"}))
-	for (let __goscriptRangeTarget0 = $.markAsStructValue($.cloneStructValue(a)).decode(), __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
-		let s = __goscriptRangeTarget0![__rangeIndex]
+	for (let __goscriptRangeTarget0 = $.markAsStructValue($.cloneStructValue(a)).decode(), __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
+		let s = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as string)
 		await $.println(s)
 	}
 }

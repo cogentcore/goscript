@@ -59,7 +59,7 @@ export class descending {
 
 	public Len(): number {
 		const d = this;
-		return $.len(d.values)
+		return $.sliceLen(d.values)
 	}
 
 	public Less(i: number, j: number): boolean {
@@ -94,7 +94,7 @@ export async function byFreq_sort(s: $.VarRef<byFreq> | null, a: $.Slice<number>
 }
 
 export function byFreq_Len(s: byFreq): number {
-	return $.len((s as byFreq))
+	return $.sliceLen((s as byFreq))
 }
 
 export function byFreq_Less(s: byFreq, i: number, j: number): boolean {
@@ -150,7 +150,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("Index of 2.71 in sorted floats:", floatIndex)
 
 	// Test generic Search function
-	let searchResult = sort2.Search($.len(ints), $.functionValue((i: number): boolean => {
+	let searchResult = sort2.Search($.sliceLen(ints), $.functionValue((i: number): boolean => {
 		return $.arrayIndex(ints!, i) >= 5
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo)))
 	await $.println("First index where value >= 5:", searchResult)
@@ -160,11 +160,11 @@ export async function main(): globalThis.Promise<void> {
 	for (let __goscriptRangeCount0 = $.cap(gate), __rangeIndex = 0; __rangeIndex < __goscriptRangeCount0; __rangeIndex++) {
 		await $.chanSend(gate, 0)
 	}
-	let asyncSearch = await sort2.Search($.len(ints), $.functionValue(async (i: number): globalThis.Promise<boolean> => {
+	let asyncSearch = await sort2.Search($.sliceLen(ints), $.functionValue(async (i: number): globalThis.Promise<boolean> => {
 		return ($.arrayIndex(ints!, i) + await $.chanRecv(gate)) >= 4
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo)))
 	await $.println("First index where value >= 4:", asyncSearch)
-	let [findIndex, found] = sort2.Find($.len(ints), $.functionValue((i: number): number => {
+	let [findIndex, found] = sort2.Find($.sliceLen(ints), $.functionValue((i: number): number => {
 		return 5 - $.arrayIndex(ints!, i)
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo)))
 	await $.println("Find 5:", findIndex, found)
