@@ -163,6 +163,67 @@ func TestRunnerReportsShortMode(t *testing.T) {
 	}
 }
 
+func TestRunnerRunsBenchmarks(t *testing.T) {
+	moduleDir := writeFixture(t, map[string]string{
+		"go.mod": "module example.test/bench\n\ngo 1.25.3\n",
+		"value_test.go": strings.Join([]string{
+			"package bench",
+			"",
+			"import \"testing\"",
+			"",
+			"func TestValue(t *testing.T) {}",
+			"",
+			"func BenchmarkSum(b *testing.B) {",
+			"\tsum := 0",
+			"\tfor i := 0; i < b.N; i++ {",
+			"\t\tsum += i",
+			"\t}",
+			"\tif b.N > 1 && sum == 0 {",
+			"\t\tb.Fatal(\"no sum\")",
+			"\t}",
+			"}",
+			"",
+			"func BenchmarkLoop(b *testing.B) {",
+			"\tfor b.Loop() {",
+			"\t}",
+			"}",
+			"",
+			"func BenchmarkOther(b *testing.B) {}",
+			"",
+		}, "\n"),
+	})
+
+	run := func(bench string) *Result {
+		result, err := NewRunner().Run(context.Background(), &Request{
+			Dir:       moduleDir,
+			Patterns:  []string{"."},
+			Bench:     bench,
+			BenchTime: 10 * time.Millisecond,
+			Timeout:   30 * time.Second,
+		})
+		if err != nil {
+			t.Fatalf("run benchmark package: %v", err)
+		}
+		if !result.Passed() {
+			t.Fatalf("expected benchmark package to pass: %#v", result.Packages)
+		}
+		return result
+	}
+
+	output := run("Sum|Loop").Packages[0].Output
+	for _, want := range []string{"BenchmarkSum\t", "BenchmarkLoop\t", " ns/op"} {
+		if !strings.Contains(output, want) {
+			t.Fatalf("expected benchmark output to contain %q:\n%s", want, output)
+		}
+	}
+	if strings.Contains(output, "BenchmarkOther") {
+		t.Fatalf("expected -bench to select benchmarks:\n%s", output)
+	}
+	if output := run("").Packages[0].Output; strings.Contains(output, "Benchmark") {
+		t.Fatalf("expected no benchmarks without -bench:\n%s", output)
+	}
+}
+
 func TestRunnerReportsTesting(t *testing.T) {
 	moduleDir := writeFixture(t, map[string]string{
 		"go.mod": "module example.test/testingmode\n\ngo 1.25.3\n",

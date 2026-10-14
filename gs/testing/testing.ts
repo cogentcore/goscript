@@ -5,15 +5,18 @@ import * as fmt from '@goscript/fmt/index.js'
 export type TestFunc = (t: T) => void | Promise<void>
 export type TB = T | B | F
 
-export type TestCase = {
-  name: string
-  fn: TestFunc
-}
+export type BenchmarkFunc = (b: B) => void | Promise<void>
+
+export type TestCase =
+  | { name: string; fn: TestFunc; benchmark?: false }
+  | { name: string; fn: BenchmarkFunc; benchmark: true }
 
 export type RunOptions = {
   verbose?: boolean
   count?: number
   short?: boolean
+  // benchtime is the minimum time in milliseconds to run each benchmark.
+  benchtime?: number
 }
 
 export type RunResult = {
@@ -283,56 +286,236 @@ export class T {
 export class B extends T {
   public N = 1
 
+  // benchTime is the minimum time in milliseconds to run the benchmark.
+  public benchTime = 1000
+  // verbose is whether to print the logs of the benchmark.
+  public verbose = false
+
+  private timerOn = false
+  private startTime = 0
+  private duration = 0 // milliseconds
+  private bytes = 0
+  private extra = new globalThis.Map<string, number>()
+  private hasSub = false
+  private subNames = new globalThis.Map<string, number>()
+  private loopUsed = false
+  private loopCount = 0
+  private loopNextCheck = 0
+
   constructor(name = 'Benchmark') {
     super(name)
   }
 
-  public async Run(
-    name: string,
-    fn: (b: B) => void | Promise<void>,
-  ): Promise<boolean> {
+  public async Run(name: string, fn: BenchmarkFunc): Promise<boolean> {
+    this.hasSub = true
+    // Repeated names are made unique with a #NN suffix, as in Go.
+    const seen = this.subNames.get(name) ?? 0
+    this.subNames.set(name, seen + 1)
+    if (seen > 0) {
+      name += '#' + String(seen).padStart(2, '0')
+    }
     const child = new B(this.Name() + '/' + name)
-    child.N = this.N
+    child.benchTime = this.benchTime
+    child.verbose = this.verbose
+    const ok = await runBenchmark(child, fn)
+    if (!ok) {
+      this.Fail()
+    }
+    return ok
+  }
+
+  public StartTimer(): void {
+    if (!this.timerOn) {
+      this.startTime = performance.now()
+      this.timerOn = true
+    }
+  }
+
+  public StopTimer(): void {
+    if (this.timerOn) {
+      this.duration += performance.now() - this.startTime
+      this.timerOn = false
+    }
+  }
+
+  public ResetTimer(): void {
+    if (this.timerOn) {
+      this.startTime = performance.now()
+    }
+    this.duration = 0
+  }
+
+  // Elapsed returns the measured elapsed time of the benchmark as a
+  // time.Duration.
+  public Elapsed(): bigint {
+    return BigInt(Math.round(this.elapsedMs() * 1e6))
+  }
+
+  // elapsedMs returns the measured elapsed time in milliseconds.
+  public elapsedMs(): number {
+    if (this.timerOn) {
+      return this.duration + performance.now() - this.startTime
+    }
+    return this.duration
+  }
+
+  // ReportAllocs is a no-op, since allocations are not measured.
+  public ReportAllocs(): void {}
+
+  public SetBytes(bytes: number | bigint): void {
+    this.bytes = Number(bytes)
+  }
+
+  public ReportMetric(n: number, unit: string): void {
+    this.extra.set(unit, n)
+  }
+
+  public RunParallel(fn: (pb: PB) => void): void {
+    fn(new PB(this.N))
+  }
+
+  // Loop reports whether the benchmark should keep running, as in Go: the
+  // first call starts timing, and it returns false once the benchmark has
+  // run for the benchmark time, recording the number of iterations as N.
+  public Loop(): boolean {
+    if (!this.loopUsed) {
+      this.loopUsed = true
+      this.loopCount = 0
+      this.loopNextCheck = 1
+      this.ResetTimer()
+      this.StartTimer()
+    }
+    if (this.loopCount >= this.loopNextCheck) {
+      if (this.elapsedMs() >= this.benchTime || this.loopCount >= 1e9) {
+        this.StopTimer()
+        this.N = this.loopCount
+        return false
+      }
+      // Check the time again after about 5% more iterations.
+      this.loopNextCheck =
+        this.loopCount + Math.max(1, (this.loopCount / 20) | 0)
+    }
+    this.loopCount++
+    return true
+  }
+
+  // runN runs the benchmark function once with N set to n.
+  public async runN(fn: BenchmarkFunc, n: number): Promise<void> {
+    this.N = n
+    this.duration = 0
+    this.timerOn = false
+    this.loopUsed = false
+    this.StartTimer()
     try {
-      await fn(child)
+      await fn(this)
     } catch (err) {
       if (isProcessExitError(err)) {
         throw err
       }
-      // FailNow marks a fatal failure before it throws.
-      if (!(err instanceof TestControl)) {
-        child.Fail()
-        child.logPanic(err)
+      if (err instanceof TestControl && err.kind === 'skip') {
+        // Skipped reports true
+      } else {
+        this.Fail()
+        if (!(err instanceof TestControl)) {
+          this.logPanic(err)
+        }
       }
     }
-    if (child.Failed()) {
-      this.Fail()
-      return false
+    this.StopTimer()
+  }
+
+  // usedLoop reports whether the last run used Loop to set N itself.
+  public usedLoop(): boolean {
+    return this.loopUsed
+  }
+
+  // hasSubBenchmarks reports whether the benchmark ran sub-benchmarks.
+  public hasSubBenchmarks(): boolean {
+    return this.hasSub
+  }
+
+  // result returns the benchmark result line, as printed by go test.
+  public result(): string {
+    let line = this.Name() + '\t' + String(this.N).padStart(10) + '\t'
+    const nsPerOp = this.N > 0 ? (this.duration * 1e6) / this.N : 0
+    line += prettyMetric(nsPerOp, 'ns/op')
+    if (this.bytes > 0 && this.duration > 0) {
+      const mbPerSec = (this.bytes * this.N) / (this.duration / 1000) / 1e6
+      line += '\t' + mbPerSec.toFixed(2).padStart(8) + ' MB/s'
+    }
+    for (const [unit, n] of this.extra) {
+      line += '\t' + prettyMetric(n, unit)
+    }
+    return line
+  }
+}
+
+// prettyMetric formats a benchmark metric with a precision that depends on
+// its magnitude, as go test does.
+function prettyMetric(x: number, unit: string): string {
+  const y = Math.abs(x)
+  let s: string
+  if (y === 0 || y >= 999.95) {
+    s = x.toFixed(0).padStart(10)
+  } else if (y >= 99.995) {
+    s = x.toFixed(1).padStart(12)
+  } else if (y >= 9.9995) {
+    s = x.toFixed(2).padStart(13)
+  } else if (y >= 0.99995) {
+    s = x.toFixed(3).padStart(14)
+  } else if (y >= 0.099995) {
+    s = x.toFixed(4).padStart(15)
+  } else if (y >= 0.0099995) {
+    s = x.toFixed(5).padStart(16)
+  } else {
+    s = x.toFixed(6).padStart(17)
+  }
+  return s + ' ' + unit
+}
+
+// runBenchmark runs the benchmark function with increasing values of b.N
+// until it takes at least b.benchTime, as go test does, and prints the
+// result. It returns whether the benchmark passed.
+async function runBenchmark(b: B, fn: BenchmarkFunc): Promise<boolean> {
+  await b.runN(fn, 1)
+  if (!b.hasSubBenchmarks() && !b.usedLoop()) {
+    let n = 1
+    while (
+      !b.Failed() &&
+      !b.Skipped() &&
+      b.elapsedMs() < b.benchTime &&
+      n < 1e9
+    ) {
+      const last = n
+      const prevMs = Math.max(b.elapsedMs(), 1e-6)
+      n = Math.floor((b.benchTime * b.N) / prevMs)
+      n += Math.floor(n / 5)
+      n = Math.min(n, 100 * last)
+      n = Math.max(n, last + 1)
+      n = Math.min(n, 1e9)
+      await b.runN(fn, n)
+    }
+  }
+  await b.runCleanups()
+  if (b.Failed()) {
+    await b.flushLogs()
+    console.log('--- FAIL: ' + b.Name())
+    return false
+  }
+  if (b.Skipped()) {
+    if (b.verbose) {
+      await b.flushLogs()
+      console.log('--- SKIP: ' + b.Name())
     }
     return true
   }
-
-  public StartTimer(): void {}
-
-  public StopTimer(): void {}
-
-  public ResetTimer(): void {}
-
-  public ReportAllocs(): void {}
-
-  public SetBytes(_bytes: number): void {}
-
-  public ReportMetric(_n: number, _unit: string): void {}
-
-  public RunParallel(_fn: (pb: PB) => void): void {}
-
-  public Loop(): boolean {
-    if (this.N > 0) {
-      this.N--
-      return true
-    }
-    return false
+  if (!b.hasSubBenchmarks()) {
+    console.log(b.result())
   }
+  if (b.verbose) {
+    await b.flushLogs()
+  }
+  return true
 }
 
 export class F extends T {
@@ -346,7 +529,11 @@ export class F extends T {
 }
 
 export class PB {
-  private remaining = 1
+  private remaining: number
+
+  constructor(n = 1) {
+    this.remaining = n
+  }
 
   public Next(): boolean {
     if (this.remaining > 0) {
@@ -385,6 +572,8 @@ export async function runTests(
   const count = options.count ?? 1
   let failed = 0
   let skipped = 0
+  const benchmarks = tests.filter((test) => test.benchmark)
+  tests = tests.filter((test) => !test.benchmark)
   try {
     for (let run = 0; run < count; run++) {
       for (const test of tests) {
@@ -394,7 +583,7 @@ export async function runTests(
         const t = new T(test.name)
         const start = Date.now()
         try {
-          await test.fn(t)
+          await (test.fn as TestFunc)(t)
         } catch (err) {
           if (isProcessExitError(err)) {
             throw err
@@ -426,6 +615,19 @@ export async function runTests(
         if (options.verbose) {
           await t.flushLogs()
           console.log('--- PASS: ' + test.name + ' (' + elapsed + 's)')
+        }
+      }
+    }
+    // As in go test, benchmarks run only if all of the tests pass.
+    if (failed === 0) {
+      for (let run = 0; run < count; run++) {
+        for (const bench of benchmarks) {
+          const b = new B(bench.name)
+          b.benchTime = options.benchtime ?? 1000
+          b.verbose = options.verbose ?? false
+          if (!(await runBenchmark(b, bench.fn as BenchmarkFunc))) {
+            failed++
+          }
         }
       }
     }
