@@ -45,6 +45,26 @@ class TestControl extends Error {
 
 let shortMode = false
 
+// goArgs returns the variadic arguments of a call to a logging method of T.
+// Go code calling the method directly passes them as rest arguments, where
+// an argument of a slice type is boxed with its type. Go code calling it
+// through an interface (such as the TestingT interface of testify) packs
+// them into a slice, as for any variadic Go method, which arrives as the
+// only argument: an unboxed array, or null when there are none.
+function goArgs(args: unknown[]): unknown[] {
+  if (args.length !== 1) {
+    return args
+  }
+  const arg = args[0]
+  if (arg === null) {
+    return []
+  }
+  if (Array.isArray(arg) && !('__goType' in arg)) {
+    return $.asArray(arg)
+  }
+  return args
+}
+
 export class T {
   private readonly testName: string
   private failed = false
@@ -76,30 +96,36 @@ export class T {
   }
 
   public Error(...args: unknown[]): void {
+    args = goArgs(args)
     this.Log(...args)
     this.Fail()
   }
 
   public Errorf(format: string, ...args: unknown[]): void {
+    args = goArgs(args)
     this.pushLog(fmt.Sprintf(format, ...args))
     this.Fail()
   }
 
   public Fatal(...args: unknown[]): never {
+    args = goArgs(args)
     this.Log(...args)
     this.FailNow()
   }
 
   public Fatalf(format: string, ...args: unknown[]): never {
+    args = goArgs(args)
     this.pushLog(fmt.Sprintf(format, ...args))
     this.FailNow()
   }
 
   public Log(...args: unknown[]): void {
+    args = goArgs(args)
     this.pushLog(fmt.Sprintln(...args).then((text) => text.slice(0, -1)))
   }
 
   public Logf(format: string, ...args: unknown[]): void {
+    args = goArgs(args)
     this.pushLog(fmt.Sprintf(format, ...args))
   }
 
@@ -123,11 +149,13 @@ export class T {
   }
 
   public Skip(...args: unknown[]): never {
+    args = goArgs(args)
     this.Log(...args)
     this.SkipNow()
   }
 
   public Skipf(format: string, ...args: unknown[]): never {
+    args = goArgs(args)
     this.pushLog(fmt.Sprintf(format, ...args))
     this.SkipNow()
   }

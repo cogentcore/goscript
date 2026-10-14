@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { existsSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 
+import * as $ from '@goscript/builtin/index.js'
 import { B, F, Short, T, type TB } from './testing.js'
 import { runTests } from './testing.js'
 
@@ -222,6 +223,35 @@ describe('testing.T', () => {
     expect(messages).toEqual([
       '    quoted="key" value=7 stringer=check result number=3 string=ok plain=true',
       '    joined 2 operands',
+    ])
+  })
+
+  it('formats variadic arguments packed by calls through an interface', async () => {
+    const t = new T('root')
+    const messages: string[] = []
+    const originalLog = console.log
+    console.log = (message?: unknown) => {
+      messages.push(String(message))
+    }
+    try {
+      // A call through a Go interface passes the variadic arguments as one
+      // slice, or null when there are none.
+      t.Logf('via %d %s', ['x'.length, 'y'])
+      t.Log(['packed', 2])
+      t.Errorf('none', null)
+      // A slice passed directly is boxed with its type, and stays one operand.
+      const boxed = $.interfaceValue([1, 2], '[]int')
+      t.Logf('direct %v', boxed)
+      await t.flushLogs()
+    } finally {
+      console.log = originalLog
+    }
+
+    expect(messages).toEqual([
+      '    via 1 y',
+      '    packed 2',
+      '    none',
+      '    direct [1 2]',
     ])
   })
 
