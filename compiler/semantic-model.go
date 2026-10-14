@@ -132,6 +132,13 @@ func (o *SemanticModelOwner) Build(ctx context.Context, graph *PackageGraph, opt
 	for _, shard := range shards {
 		model.mergePackage(shard)
 	}
+	// A hand-written override package exports its variables as plain
+	// values, so taking the address of one does not box it in a VarRef.
+	for obj := range model.needsVarRef {
+		if pkg := obj.Pkg(); pkg != nil && overrideFacts.HasPackage(pkg.Path()) && obj.Parent() == pkg.Scope() {
+			delete(model.needsVarRef, obj)
+		}
+	}
 	model.collectVarRefNames()
 	if diagnosticsHaveErrors(diagnostics) {
 		model.freeze()
