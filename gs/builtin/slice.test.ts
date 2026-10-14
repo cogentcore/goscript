@@ -11,12 +11,11 @@ import {
   byteSliceHint,
   bytesFromHex,
   bytesToString,
+  concatString,
   copy,
   copyByteRanges,
-  GoBinaryString,
   goSlice,
   indexString,
-  sliceString,
   rangeString,
   indexByteString,
   len,
@@ -226,11 +225,11 @@ describe('append spare capacity', () => {
     const source = [cell(1)]
 
     const appended = append(source, cell(2))
-    ;arrayIndex(appended, 0).n = 9
+    arrayIndex(appended, 0).n = 9
     expect(source[0].n).toBe(1)
 
     const spread = appendSlice(null, source)
-    ;arrayIndex(spread, 0).n = 8
+    arrayIndex(spread, 0).n = 8
     expect(source[0].n).toBe(1)
   })
 
@@ -289,35 +288,47 @@ describe('builtin string byte representation', () => {
 
   it('keeps binary string bytes and independent conversion buffers', () => {
     const bytes = new Uint8Array([0, 255, 128, 65])
-    for (const value of [bytesToString(bytes), new GoBinaryString(bytes)]) {
-      expect(stringLen(value)).toBe(bytes.length)
-      for (let i = 0; i < bytes.length; i++) {
-        expect(indexString(value, i)).toBe(bytes[i])
-      }
-      stringToBytes(value).fill(0)
-      expect(stringToBytes(value)).toEqual(bytes)
+    const value = bytesToString(bytes)
+    expect(stringLen(value)).toBe(bytes.length)
+    for (let i = 0; i < bytes.length; i++) {
+      expect(indexString(value, i)).toBe(bytes[i])
     }
+    stringToBytes(value).fill(0)
+    expect(stringToBytes(value)).toEqual(bytes)
     const ascii = 'abc'
     stringToBytes(ascii).fill(0)
     expect(indexString(ascii, 0)).toBe(97)
   })
 
+  it('escapes invalid bytes so native string operations see the valid text', () => {
+    const prefix = new TextEncoder().encode('block:')
+    const key = bytesToString(new Uint8Array([...prefix, 1, 0xff, 0x80]))
+    expect(key.startsWith('block:')).toBe(true)
+    expect(stringLen(key)).toBe(9)
+    expect(indexString(key, 7)).toBe(0xff)
+    expect(key < 'gcroot').toBe(true)
+
+    const euro = '€'
+    const head = sliceString(euro, 0, 1)
+    expect(stringLen(head)).toBe(1)
+    expect(concatString(head, sliceString(euro, 1))).toBe(euro)
+    expect(concatString(head, 'x')).toBe(head + 'x')
+  })
+
   it('reads cached long strings correctly across cache slot reuse', () => {
     // Long strings use a small cache of their ASCII-ness or UTF-8 bytes;
     // strings whose lengths share a cache slot must not be confused.
+    const encoder = new TextEncoder()
     const values = [
       'a'.repeat(40),
       'é'.repeat(20), // 40 UTF-16 units, 40 UTF-8 bytes: same slot as above
       'x'.repeat(39) + 'é',
       'b'.repeat(48),
-      bytesToString(new Uint8Array(48).fill(0xff)),
-    ]
+    ].map((value) => [value, encoder.encode(value)] as const)
+    const invalid = new Uint8Array(48).fill(0xff)
+    values.push([bytesToString(invalid), invalid])
     for (let rep = 0; rep < 2; rep++) {
-      for (const value of values) {
-        const bytes =
-          value.startsWith('\uFDD0') ?
-            stringToBytes(value)
-          : new TextEncoder().encode(value)
+      for (const [value, bytes] of values) {
         expect(stringLen(value)).toBe(bytes.length)
         for (let i = 0; i < bytes.length; i++) {
           expect(indexString(value, i)).toBe(bytes[i])

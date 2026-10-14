@@ -1,6 +1,7 @@
 package main
 
 import (
+	"slices"
 	"strings"
 	"unicode"
 	"unicode/utf8"
@@ -63,6 +64,20 @@ func main() {
 		}
 		return r
 	}, "banana"))
+
+	// a binary key keeps its text prefix and orders by its bytes
+	key := "block:\x01\xff\x80"
+	rest, ok := strings.CutPrefix(key, "block:")
+	println(strings.HasPrefix(key, "block:"), ok, len(rest), rest[0], rest[1])
+	keys := []string{"gcroot", key}
+	slices.Sort(keys)
+	println(keys[0] == key, key < "gcroot", strings.Compare(key, "gcroot"))
+	keyed := map[string]int{key: 1}
+	println(keyed["block:\x01\xff\x80"], keyed[string([]byte(key))])
+
+	// bytes split from a sequence join into it again
+	euro := "€"
+	println(len(euro[:1]), euro[:1]+euro[1:] == euro, euro[:2]+"\xac" == euro)
 
 	// decoding at the edges
 	println(utf8.FullRune([]byte{0xe2, 0x82}), utf8.FullRune([]byte{0xe2, 0x28}), utf8.FullRuneInString("\xe2"))

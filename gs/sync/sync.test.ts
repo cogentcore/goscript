@@ -206,8 +206,9 @@ describe('sync.Map', () => {
 
   it('Swap matches equivalent Go string keys', async () => {
     const m = new Map()
-    const text = 'key'
-    const binary = new $.GoBinaryString(new TextEncoder().encode(text))
+    const bytes = new Uint8Array([0x6b, 0xff])
+    const text = $.bytesToString(bytes)
+    const binary = $.bytesToString(bytes.slice())
 
     await m.Store(text, 'old')
     expect(await m.Swap(binary, 'new')).toEqual(['old', true])

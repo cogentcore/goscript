@@ -26,6 +26,10 @@ false 16
 7 8 true
 BadUTF8? BadUTF8 a[x]b[x]
 bnn
+true true 3 1 255
+true true -1
+1 1
+1 true true
 false true false
 65533 1 3 false
 128512 4

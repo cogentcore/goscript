@@ -1,10 +1,5 @@
 import { comparableEqual } from './builtin.js'
-import {
-  GoBinaryString,
-  isArrayOrGoSlice,
-  stringEqual,
-  stringMapKey,
-} from './slice.js'
+import { isArrayOrGoSlice } from './slice.js'
 import {
   canonicalPointerIdentity,
   isStructTypeInfo,
@@ -14,8 +9,8 @@ import {
   type TypeInfo,
 } from './type.js'
 
-// GoMap indexes Go string representations by their canonical byte value and
-// structs whose fields are all strings by their canonical field values.
+// GoMap indexes structs whose fields are all strings by their canonical field
+// values; a string key, being canonical, is its own native Map key.
 // Pointer-key maps use backing identity without inspecting their targets.
 // Iteration retains the original key; object and struct equality stays in the
 // shared comparison path below. Keys without an indexed representation
@@ -23,7 +18,6 @@ import {
 class GoMap<K, V> extends Map<K, V> {
   readonly pointerKeys: boolean
   private pointerIndex?: Map<object, K>
-  private stringKeys?: Map<string, K>
   private structKeys?: Map<string, K[]>
 
   constructor(keyType?: TypeInfo | string) {
@@ -39,12 +33,7 @@ class GoMap<K, V> extends Map<K, V> {
         this.pointerIndex ??= new Map<object, K>()
         this.pointerIndex.set(canonicalPointerIdentity(key), key)
       }
-    } else if (isGoStringKey(key)) {
-      const canonical = stringMapKey(key)
-      this.stringKeys ??= new Map<string, K>()
-      key = this.stringKeys.get(canonical) ?? key
-      this.stringKeys.set(canonical, key)
-    } else {
+    } else if (typeof key !== 'string') {
       const stored = this.structEntry(key)
       if (stored !== undefined) {
         key = stored
@@ -68,14 +57,12 @@ class GoMap<K, V> extends Map<K, V> {
     if (this.pointerKeys) {
       if (typeof key === 'object' && key !== null)
         this.pointerIndex?.delete(canonicalPointerIdentity(key))
-    } else if (isGoStringKey(key)) this.stringKeys?.delete(stringMapKey(key))
-    else this.removeStructKey(stored)
+    } else if (typeof key !== 'string') this.removeStructKey(stored)
     return super.delete(stored)
   }
 
   override clear(): void {
     this.pointerIndex?.clear()
-    this.stringKeys?.clear()
     this.structKeys?.clear()
     super.clear()
   }
@@ -107,8 +94,8 @@ class GoMap<K, V> extends Map<K, V> {
           (this.pointerIndex?.get(canonicalPointerIdentity(key)) ?? key)
         : key
     }
-    if (isGoStringKey(key)) {
-      return this.stringKeys?.get(stringMapKey(key)) ?? key
+    if (typeof key === 'string') {
+      return key
     }
     return this.structEntry(key) ?? key
   }
@@ -201,8 +188,7 @@ function goMapStructKey<K, V>(map: Map<K, V>, key: K): string | undefined {
     !(map instanceof GoMap) ||
     map.pointerKeys ||
     typeof key !== 'object' ||
-    key === null ||
-    isGoStringKey(key)
+    key === null
   ) {
     return undefined
   }
@@ -243,18 +229,7 @@ function findMapEntry<K, V>(
     return { found: true, key, value: map.get(key)! }
   }
   if (map instanceof GoMap && map.pointerKeys) return { found: false }
-  if (isGoStringKey(key)) {
-    if (map instanceof GoMap) return { found: false }
-    for (const [candidate, value] of map.entries()) {
-      if (
-        isGoStringKey(candidate) &&
-        stringEqual(candidate as string, key as string)
-      ) {
-        return { found: true, key: candidate, value }
-      }
-    }
-    return { found: false }
-  }
+  if (typeof key === 'string') return { found: false }
   if (key === null || (typeof key !== 'object' && typeof key !== 'function')) {
     return { found: false }
   }
@@ -267,10 +242,6 @@ function findMapEntry<K, V>(
     }
   }
   return { found: false }
-}
-
-function isGoStringKey(value: unknown): value is string | GoBinaryString {
-  return typeof value === 'string' || value instanceof GoBinaryString
 }
 
 // structMapKey returns the canonical index key for a struct whose fields are
@@ -381,7 +352,7 @@ function structMapKeyField(
   kind: TypeKind | undefined,
 ): string | undefined {
   // Strings and primitives are indexed by their value.
-  if (isGoStringKey(value)) return 's' + stringMapKey(value)
+  if (typeof value === 'string') return 's' + value
   switch (typeof value) {
     case 'number':
       return 'n' + String(value)

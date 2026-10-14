@@ -3,12 +3,7 @@
 // low-level library routines. Higher-level synchronization is better done via
 // channels and communication.
 
-import {
-  comparableEqual,
-  GoBinaryString,
-  pointerValue,
-  stringEqual,
-} from '@goscript/builtin/index.js'
+import { comparableEqual, pointerValue } from '@goscript/builtin/index.js'
 
 // Locker represents an object that can be locked and unlocked.
 export interface Locker {
@@ -328,10 +323,6 @@ export function NewCond(l: Locker | null): Cond {
   return new Cond({ L: l })
 }
 
-function isGoStringKey(value: unknown): value is string | GoBinaryString {
-  return typeof value === 'string' || value instanceof GoBinaryString
-}
-
 // Map is like a Go map[interface{}]interface{} but is safe for concurrent use by multiple goroutines.
 export class Map {
   private _m: RWMutex = new RWMutex()
@@ -466,13 +457,10 @@ export class Map {
     if (this._data.has(key)) {
       return { found: true, key, value: this._data.get(key) }
     }
+    if (typeof key === 'string') {
+      return { found: false }
+    }
     for (const [candidate, value] of this._data.entries()) {
-      if (candidate !== key && isGoStringKey(candidate) && isGoStringKey(key)) {
-        if (stringEqual(candidate, key)) {
-          return { found: true, key: candidate, value }
-        }
-        continue
-      }
       if (candidate !== key && comparableEqual(candidate, key)) {
         return { found: true, key: candidate, value }
       }

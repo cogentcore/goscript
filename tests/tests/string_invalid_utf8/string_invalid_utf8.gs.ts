@@ -3,11 +3,14 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
+import * as slices from "@goscript/slices/index.js"
+
 import * as strings from "@goscript/strings/index.js"
 
 import * as unicode from "@goscript/unicode/index.js"
 
 import * as utf8 from "@goscript/unicode/utf8/index.js"
+import "@goscript/slices/index.js"
 import "@goscript/strings/index.js"
 import "@goscript/unicode/index.js"
 import "@goscript/unicode/utf8/index.js"
@@ -71,6 +74,20 @@ export async function main(): globalThis.Promise<void> {
 		}
 		return r
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int32")], results: [/* @__PURE__ */ $.basicType("int32")] } as $.FunctionTypeInfo)), "banana"))
+
+	// a binary key keeps its text prefix and orders by its bytes
+	let key = $.bytesToString(new Uint8Array([98, 108, 111, 99, 107, 58, 1, 255, 128]))
+	let [rest, ok] = strings.CutPrefix(key, "block:")
+	await $.println(strings.HasPrefix(key, "block:"), ok, $.stringLen(rest), $.indexString(rest, 0), $.indexString(rest, 1))
+	let keys: $.Slice<string> = $.arrayToSlice<string>(["gcroot", key])
+	slices.Sort(keys)
+	await $.println($.stringEqual($.arrayIndex(keys!, 0), key), $.stringCompare(key, "gcroot") < 0, strings.Compare(key, "gcroot"))
+	let keyed: globalThis.Map<string, number> | null = $.makeMap<string, number>([[key, 1]])
+	await $.println($.mapGet<string, number, number>(keyed, $.bytesToString(new Uint8Array([98, 108, 111, 99, 107, 58, 1, 255, 128])), 0)[0], $.mapGet<string, number, number>(keyed, $.bytesToString($.stringToBytes(key)), 0)[0])
+
+	// bytes split from a sequence join into it again
+	let euro = "€"
+	await $.println($.stringLen($.sliceStringOrBytes(euro, undefined, 1)), $.stringEqual(($.concatString($.sliceStringOrBytes(euro, undefined, 1), $.sliceStringOrBytes(euro, 1, undefined))), euro), $.stringEqual(($.concatString($.sliceStringOrBytes(euro, undefined, 2), $.bytesToString(new Uint8Array([172])))), euro))
 
 	// decoding at the edges
 	await $.println(utf8.FullRune(new Uint8Array([226, 130]) as $.Slice<number>), utf8.FullRune(new Uint8Array([226, 40]) as $.Slice<number>), utf8.FullRuneInString($.bytesToString(new Uint8Array([226]))))

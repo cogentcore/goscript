@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 
 import { deleteMapEntry, makeMap, mapGet, mapHas, mapSet } from './map.js'
-import { bytesToString, GoBinaryString } from './slice.js'
+import { bytesToString } from './slice.js'
 import { pointerType } from './type.js'
 
 describe('Go map pointer keys', () => {
@@ -50,28 +50,24 @@ describe('Go map string keys', () => {
   })
 
   it('indexes binary, UTF-8, empty, and stored undefined values consistently', () => {
-    const map = makeMap<string | GoBinaryString, number | undefined>()
+    const map = makeMap<string, number | undefined>()
     for (const bytes of [
       new Uint8Array(),
       new Uint8Array([0, 255, 65]),
       new TextEncoder().encode('你好'),
     ]) {
-      const wrapped = new GoBinaryString(bytes)
-      const key = bytesToString(bytes)
-      mapSet(map, wrapped, 1)
+      const first = bytesToString(bytes)
+      const key = bytesToString(bytes.slice())
+      mapSet(map, first, 1)
       mapSet(map, key, undefined)
       expect(map.size).toBe(1)
       expect(mapGet(map, key, 99)).toEqual([undefined, true])
-      expect(mapGet(map, new GoBinaryString(bytes), 99)).toEqual([
-        undefined,
-        true,
-      ])
-      expect([...map.keys()]).toEqual([wrapped])
+      expect([...map.keys()]).toEqual([first])
       deleteMapEntry(map, key)
       expect(map.size).toBe(0)
       mapSet(map, key, 2)
       map.clear()
-      expect(mapHas(map, wrapped)).toBe(false)
+      expect(mapHas(map, first)).toBe(false)
     }
   })
 })
@@ -102,8 +98,8 @@ describe('Go map string-struct keys', () => {
   })
 
   it('preserves type and binary-field equality inside candidate buckets', () => {
-    const binary = new GoBinaryString(new TextEncoder().encode('value'))
-    const value = (field: string | GoBinaryString, type: string) => ({
+    const binary = bytesToString(new Uint8Array([0x76, 0xff]))
+    const value = (field: string, type: string) => ({
       __goType: type,
       _fields: { field: field },
     })
