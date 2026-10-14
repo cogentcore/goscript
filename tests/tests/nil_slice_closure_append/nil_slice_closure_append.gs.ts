@@ -36,7 +36,7 @@ export class item {
 }
 
 export async function fill(fn: ((_p0: number) => void) | null): globalThis.Promise<void> {
-	await fn!(3)
+	void (__goscriptAwait = fn!(3), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 }
 
 export async function main(): globalThis.Promise<void> {
@@ -48,6 +48,8 @@ export async function main(): globalThis.Promise<void> {
 		await $.println("first:", $.arrayIndex(values!, 0).Value)
 	}
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

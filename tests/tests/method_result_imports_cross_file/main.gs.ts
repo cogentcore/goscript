@@ -27,7 +27,7 @@ export class Holder {
 
 	public async Run(): globalThis.Promise<void> {
 		let v = dep1.Make()
-		await $.println(await $.pointerValue<Exclude<dep2.Value, null>>(v).Value())
+		await $.println((__goscriptAwait = $.pointerValue<Exclude<dep2.Value, null>>(v).Value(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -42,6 +42,8 @@ export class Holder {
 export async function main(): globalThis.Promise<void> {
 	await $.markAsStructValue($.cloneStructValue($.markAsStructValue(new Holder()))).Run()
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

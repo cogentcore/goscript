@@ -64,52 +64,34 @@ export function Fruits_SetString(f: $.VarRef<Fruits> | null, s: string): $.GoErr
 export async function main(): globalThis.Promise<void> {
 	// Values of a named basic type made by reflect keep their methods.
 	let fruit = $.varRef(1)
-	let ev = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.namedValueInterfaceValue<any>(fruit, "*main.Fruits", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2())))).Elem()))
+	let ev = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.namedValueInterfaceValue<any>(fruit, "*main.Fruits", {SetString: (receiver: any, ...args: any[]) => (Fruits_SetString as any)(receiver, ...$.stripGenericTypeArgs(args)), String: (receiver: any, ...args: any[]) => (Fruits_String as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))}, /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int32", "main.Fruits")), [$.methodSignature("SetString", [["s", /* @__PURE__ */ $.basicType("string")]], ["error"]), $.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])])))).Elem()))
 	let [st, ok] = $.typeAssertTuple<stringer | null>($.markAsStructValue($.cloneStructValue(ev)).Interface(), "main.stringer")
 	await $.println(ok)
 	if (ok) {
-		await $.println(await $.pointerValue<Exclude<stringer, null>>(st).String())
+		await $.println((__goscriptAwait = $.pointerValue<Exclude<stringer, null>>(st).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	}
 	let __goscriptTuple0: any = $.typeAssertTuple<setStringer | null>($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(ev)).Addr())).Interface(), "main.setStringer")
 	let ss = __goscriptTuple0[0]
 	ok = __goscriptTuple0[1]
 	await $.println(ok)
 	if (ok) {
-		await $.println(await $.pointerValue<Exclude<setStringer, null>>(ss).SetString("Strawberry") == null, $.int(fruit.value, 32) == 2)
+		await $.println((__goscriptAwait = $.pointerValue<Exclude<setStringer, null>>(ss).SetString("Strawberry"), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) == null, $.int(fruit.value, 32) == 2)
 	}
 	let __goscriptTuple1: any = $.typeAssertTuple<setStringer | null>($.markAsStructValue($.cloneStructValue(ev)).Interface(), "main.setStringer")
 	ok = __goscriptTuple1[1]
 	await $.println(ok)
 
-	let nv = $.markAsStructValue($.cloneStructValue(reflect.New($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic3()))!)))
+	let nv = $.markAsStructValue($.cloneStructValue(reflect.New($.pointerValueOrNil(reflect.TypeFor({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int32", "main.Fruits"), zero: () => 0, methods: {String: (receiver: any, ...args: any[]) => (Fruits_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, methodSignatures: [$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])] }}))!)))
 	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(nv)).Elem())).SetInt(1n)
 	{
 		let [s, __goscriptShadow0] = $.typeAssertTuple<stringer | null>($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(nv)).Elem())).Interface(), "main.stringer")
 		if (__goscriptShadow0) {
-			await $.println(await $.pointerValue<Exclude<stringer, null>>(s).String())
+			await $.println((__goscriptAwait = $.pointerValue<Exclude<stringer, null>>(s).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		}
 	}
 }
 
-var __goscriptStatic0$value: any
-function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({SetString: (receiver: any, ...args: any[]) => (Fruits_SetString as any)(receiver, ...$.stripGenericTypeArgs(args)), String: (receiver: any, ...args: any[]) => (Fruits_String as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))})
-}
-
-var __goscriptStatic1$value: any
-function __goscriptStatic1(): any {
-	return __goscriptStatic1$value ??= (/* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int32", "main.Fruits")))
-}
-
-var __goscriptStatic2$value: any
-function __goscriptStatic2(): any {
-	return __goscriptStatic2$value ??= ([$.methodSignature("SetString", [["s", /* @__PURE__ */ $.basicType("string")]], ["error"]), $.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])])
-}
-
-var __goscriptStatic3$value: any
-function __goscriptStatic3(): any {
-	return __goscriptStatic3$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int32", "main.Fruits"), zero: () => 0, methods: {String: (receiver: any, ...args: any[]) => (Fruits_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, methodSignatures: [$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])] }})
-}
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

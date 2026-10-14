@@ -22,7 +22,7 @@ export async function main(): globalThis.Promise<void> {
 	let wg: $.VarRef<sync.WaitGroup> = $.varRef($.markAsStructValue(new sync.WaitGroup()))
 
 	let [ctx, cancel] = context.WithTimeout($.pointerValueOrNil(context.Background())!, 5000000000n)
-	__defer.defer(async () => { await cancel!() })
+	__defer.defer(async () => { (__goscriptAwait = cancel!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) })
 
 	// Number of goroutines to spawn
 	let numWorkers = 5
@@ -36,10 +36,10 @@ export async function main(): globalThis.Promise<void> {
 		// Try to acquire the lock
 		let [relLock, err] = await mtx.value.Lock(ctx)
 		if (err != null) {
-			await $.println("worker", id, "failed to acquire lock:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+			await $.println("worker", id, "failed to acquire lock:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 			return
 		}
-		__defer.defer(async () => { await relLock!() })
+		__defer.defer(async () => { (__goscriptAwait = relLock!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) })
 
 		// Critical section
 		// println("worker", id, "entered critical section") - non-deterministic, leave commented out
@@ -50,7 +50,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// Start worker goroutines
 	for (let __goscriptRangeCount0 = numWorkers, i = 0; i < __goscriptRangeCount0; i++) {
-		queueMicrotask(async () => { await worker!(i) })
+		queueMicrotask(async () => { (__goscriptAwait = worker!(i), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) })
 	}
 
 	// Wait for all workers to complete or context timeout
@@ -72,9 +72,9 @@ export async function main(): globalThis.Promise<void> {
 		{
 			id: 1,
 			isSend: false,
-			channel: await $.pointerValue<Exclude<context.Context, null>>(ctx).Done(),
+			channel: (__goscriptAwait = $.pointerValue<Exclude<context.Context, null>>(ctx).Done(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait),
 			onSelected: async (__goscriptSelect0Result) => {
-				await $.println("Test timed out:", await $.pointerValue<Exclude<$.GoError, null>>((await $.pointerValue<Exclude<context.Context, null>>(ctx).Err())).Error())
+				await $.println("Test timed out:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>((__goscriptAwait = $.pointerValue<Exclude<context.Context, null>>(ctx).Err(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 			}
 		}
 	], false)
@@ -89,6 +89,8 @@ export async function main(): globalThis.Promise<void> {
 
 	await $.println("success: csync.Mutex test completed")
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

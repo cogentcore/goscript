@@ -28,32 +28,26 @@ export class nistCurve {
 
 	public async Add(__typeArgs: $.GenericTypeArgs | undefined, p1: any, p2: any): globalThis.Promise<any> {
 		const curve: nistCurve | $.VarRef<nistCurve> | null = this;
-		return (await $.callGenericMethod(__typeArgs, "Point", "Add", p1, $.copyElement(p1), $.copyElement(p2)) as any)
+		return ((__goscriptAwait = $.callGenericMethod(__typeArgs, "Point", "Add", p1, p1, p2), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as any)
 	}
 
 	public Zero(__typeArgs: $.GenericTypeArgs | undefined): any {
 		const curve: nistCurve | $.VarRef<nistCurve> | null = this;
 		let p: any = $.genericZero(__typeArgs, "Point", null)
-		return $.copyElement(p)
+		return p
 	}
 
 	static __typeInfo = $.registerStructType(
 		"main.nistCurve",
 		() => new nistCurve(),
-		() => [{ name: "Add", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Interface, methods: [$.methodSignature("Add", [{ kind: $.TypeKind.Interface, methods: [] }, { kind: $.TypeKind.Interface, methods: [] }], [{ kind: $.TypeKind.Interface, methods: [] }])] } }], pointerReceiver: true }, { name: "Zero", args: [], returns: [{ type: { kind: $.TypeKind.Interface, methods: [$.methodSignature("Add", [{ kind: $.TypeKind.Interface, methods: [] }, { kind: $.TypeKind.Interface, methods: [] }], [{ kind: $.TypeKind.Interface, methods: [] }])] } }], pointerReceiver: true }],
+		() => [{ name: "Add", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Interface, methods: [$.methodSignature("Add", [{ kind: $.TypeKind.Interface, methods: [] }, { kind: $.TypeKind.Interface, methods: [] }], [{ kind: $.TypeKind.Interface, methods: [] }])] } }] }, { name: "Zero", args: [], returns: [{ type: { kind: $.TypeKind.Interface, methods: [$.methodSignature("Add", [{ kind: $.TypeKind.Interface, methods: [] }, { kind: $.TypeKind.Interface, methods: [] }], [{ kind: $.TypeKind.Interface, methods: [] }])] } }] }],
 		nistCurve,
 		() => []
 	)
 }
 
 export class point {
-	public get N(): number {
-		return this._fields.N
-	}
-
-	public set N(value: number) {
-		this._fields.N = value
-	}
+	public declare N: number
 
 	public _fields: {
 		N: number
@@ -74,10 +68,14 @@ export class point {
 		return new point({N: $.pointerValue<point>(a).N + $.pointerValue<point>(b).N})
 	}
 
+	static {
+		$.bindStructFields(this.prototype, ["N"])
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.point",
 		() => new point(),
-		() => [{ name: "Add", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.pointerType("main.point") }], pointerReceiver: true }],
+		() => [{ name: "Add", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.pointerType("main.point") }] }],
 		point,
 		() => [{ name: "N", key: "N", type: /* @__PURE__ */ $.basicType("int") }]
 	)
@@ -90,17 +88,14 @@ export function __goscript_set_curve(__goscriptValue: nistCurve | $.VarRef<nistC
 }
 
 export async function main(): globalThis.Promise<void> {
-	let p: point | $.VarRef<point> | null = (await nistCurve.prototype.Add.call(curve, __goscriptStatic0(), new point({N: 2}), new point({N: 3})) as point | $.VarRef<point> | null)
+	let p: point | $.VarRef<point> | null = (await nistCurve.prototype.Add.call(curve, {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, Point: { type: /* @__PURE__ */ $.pointerType("main.point"), zero: () => null, methods: {Add: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Add(...$.stripGenericTypeArgs(args))} }}, new point({N: 2}), new point({N: 3})) as point | $.VarRef<point> | null)
 	await $.println("sum:", $.pointerValue<point>(p).N)
-	if (nistCurve.prototype.Zero.call(curve, __goscriptStatic0()) == null) {
+	if (nistCurve.prototype.Zero.call(curve, {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, Point: { type: /* @__PURE__ */ $.pointerType("main.point"), zero: () => null, methods: {Add: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Add(...$.stripGenericTypeArgs(args))} }}) == null) {
 		await $.println("zero")
 	}
 }
 
-var __goscriptStatic0$value: any
-function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, Point: { type: /* @__PURE__ */ $.pointerType("main.point"), zero: () => null, methods: {Add: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Add(...$.stripGenericTypeArgs(args))} }})
-}
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

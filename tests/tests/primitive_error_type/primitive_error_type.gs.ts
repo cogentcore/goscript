@@ -38,14 +38,14 @@ export async function main(): globalThis.Promise<void> {
 	if (err == null) {
 		await $.println("mayFail(5): no error")
 	} else {
-		await $.println("mayFail(5):", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+		await $.println("mayFail(5):", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	}
 
 	err = mayFail(-1)
 	if (err == null) {
 		await $.println("mayFail(-1): no error")
 	} else {
-		await $.println("mayFail(-1):", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+		await $.println("mayFail(-1):", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	}
 
 	{
@@ -64,6 +64,8 @@ export async function main(): globalThis.Promise<void> {
 		}
 	}
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

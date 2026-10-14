@@ -44,15 +44,15 @@ export class Stack {
 
 	public Len(__typeArgs: $.GenericTypeArgs | undefined): number {
 		const s: Stack | $.VarRef<Stack> | null = this;
-		return $.sliceLen($.pointerValue<Stack>(s).items)
+		return $.len($.pointerValue<Stack>(s).items)
 	}
 
 	public Pop(__typeArgs: $.GenericTypeArgs | undefined): [any, boolean] {
 		let s: Stack | $.VarRef<Stack> | null = this;
-		if ($.sliceLen($.pointerValue<Stack>(s).items) == 0) {
+		if ($.len($.pointerValue<Stack>(s).items) == 0) {
 			$.panic("pop from empty stack")
 		}
-		let last = $.sliceLen($.pointerValue<Stack>(s).items) - 1
+		let last = $.len($.pointerValue<Stack>(s).items) - 1
 		let value = $.arrayIndex($.pointerValue<Stack>(s).items!, last)
 		$.pointerValue<Stack>(s).items = $.goSlice($.pointerValue<Stack>(s).items, undefined, last)
 		return [value, true]
@@ -203,8 +203,8 @@ export function min(__typeArgs: $.GenericTypeArgs | undefined, a: any, b: any): 
 
 export function NewSet<T>(__typeArgs: $.GenericTypeArgs | undefined, values: $.Slice<T>): Set {
 	let _set: Set = $.makeMap<any, {}>(undefined, __typeArgs?.["T"]?.type ?? { kind: $.TypeKind.Interface, methods: [] })
-	for (let __goscriptRangeTarget0 = values, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
-		let value = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as any)
+	for (let __goscriptRangeTarget0 = values, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
+		let value = __goscriptRangeTarget0![__rangeIndex]
 		$.mapSet(_set, value, {})
 	}
 	return _set
@@ -220,10 +220,10 @@ export function Set_Has(s: Set, __typeArgs: $.GenericTypeArgs | undefined, value
 }
 
 export async function CloneAll<T>(__typeArgs: $.GenericTypeArgs | undefined, items: $.Slice<T>): globalThis.Promise<$.Slice<T>> {
-	let clones: $.Slice<T> = $.makeSlice<T>(0, $.sliceLen(items), undefined, () => ($.genericZero(__typeArgs, "T", null) as T))
-	for (let __goscriptRangeTarget1 = items, __goscriptRangeWindow1 = $.sliceRange(__goscriptRangeTarget1), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow1.length; __rangeIndex++) {
-		let item = (__goscriptRangeWindow1.backing[__goscriptRangeWindow1.offset + __rangeIndex] as any)
-		clones = $.append(clones, await $.callGenericMethod(__typeArgs, "T", "Clone", item), $.appendZero(() => ($.genericZero(__typeArgs, "T", null) as T)))
+	let clones: $.Slice<T> = $.makeSlice<T>(0, $.len(items), undefined, () => ($.genericZero(__typeArgs, "T", null) as T))
+	for (let __goscriptRangeTarget1 = items, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget1); __rangeIndex++) {
+		let item = __goscriptRangeTarget1![__rangeIndex]
+		clones = $.append(clones, (__goscriptAwait = $.callGenericMethod(__typeArgs, "T", "Clone", item), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), $.appendZero(() => ($.genericZero(__typeArgs, "T", null) as T)))
 	}
 	return clones
 }
@@ -273,15 +273,17 @@ export async function main(): globalThis.Promise<void> {
 
 	await $.println("=== Function instantiation ===")
 	let applyInt: ((value: number, fn: ((_p0: number) => number | globalThis.Promise<number>) | null) => number | globalThis.Promise<number>) | null = $.functionValue(async (value: any, fn: ((_p0: any) => any | globalThis.Promise<any>) | null): globalThis.Promise<any> => await Apply({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }}, value, fn), ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Interface, methods: [] }, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Interface, methods: [] }], results: [{ kind: $.TypeKind.Interface, methods: [] }] } as $.FunctionTypeInfo)], results: [{ kind: $.TypeKind.Interface, methods: [] }] } as $.FunctionTypeInfo))
-	await $.println("apply:", await applyInt!(21, $.functionValue((n: number): number => {
+	await $.println("apply:", (__goscriptAwait = applyInt!(21, $.functionValue((n: number): number => {
 		return n * 2
-	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))))
+	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
 	await $.println("=== Generic pair method ===")
 	let pair = $.markAsStructValue(new Pair({First: "left", Second: "right"}))
 	let swapped = ($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(pair)).Swap({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }}))) as Pair)
 	await $.println("pair:", swapped.First, swapped.Second)
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

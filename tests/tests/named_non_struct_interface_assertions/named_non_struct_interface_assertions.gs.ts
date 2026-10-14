@@ -140,7 +140,7 @@ export function namedInt_Add(v: namedInt, n: number): number {
 }
 
 export async function namedFunc_Add(v: namedFunc | null, n: number): globalThis.Promise<number> {
-	return await v!() + n
+	return (__goscriptAwait = v!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) + n
 }
 
 export function namedChan_Add(v: namedChan, n: number): number {
@@ -163,7 +163,7 @@ export async function check(value: any): globalThis.Promise<void> {
 		await $.println(false)
 		return
 	}
-	await $.println(ok, await $.pointerValue<Exclude<adder, null>>(__goscriptShadow0).Add(3))
+	await $.println(ok, (__goscriptAwait = $.pointerValue<Exclude<adder, null>>(__goscriptShadow0).Add(3), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 }
 
 export async function main(): globalThis.Promise<void> {
@@ -265,6 +265,8 @@ var __goscriptStatic16$value: any
 function __goscriptStatic16(): any {
 	return __goscriptStatic16$value ??= (/* @__PURE__ */ $.pointerType("main.pointerMap"))
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

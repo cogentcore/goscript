@@ -27,7 +27,7 @@ export async function order(prev: $.Slice<string>, hosts: $.Slice<string>): glob
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))
 	let ordered: $.Slice<string> = (slices.Clone(hosts) as $.Slice<string>)
 	await slices.SortStableFunc(ordered, $.functionValue(async (a: string, b: string): globalThis.Promise<number> => {
-		return cmp.Compare(await rank!(a), await rank!(b))
+		return cmp.Compare((__goscriptAwait = rank!(a), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = rank!(b), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("string")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo)))
 	return ordered
 }
@@ -38,6 +38,8 @@ export async function main(): globalThis.Promise<void> {
 		await $.println(host)
 	}
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

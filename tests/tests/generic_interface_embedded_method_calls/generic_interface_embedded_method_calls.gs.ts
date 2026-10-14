@@ -77,7 +77,7 @@ export class impl {
 }
 
 export async function read(__typeArgs: $.GenericTypeArgs | undefined, d: derived | null): globalThis.Promise<any> {
-	return (await $.callInterfaceMethod($.pointerValue<Exclude<derived, null>>(d), "Value", {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }}) as any)
+	return ((__goscriptAwait = $.callInterfaceMethod($.pointerValue<Exclude<derived, null>>(d), "Value", {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }}), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as any)
 }
 
 export async function main(): globalThis.Promise<void> {
@@ -104,6 +104,8 @@ var __goscriptStatic3$value: any
 function __goscriptStatic3(): any {
 	return __goscriptStatic3$value ??= ([$.methodSignature("Other", [], [/* @__PURE__ */ $.basicType("string")]), $.methodSignature("Value", [], [/* @__PURE__ */ $.basicType("int")])])
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

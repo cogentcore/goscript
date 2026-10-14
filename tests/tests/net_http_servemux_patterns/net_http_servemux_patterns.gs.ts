@@ -26,10 +26,10 @@ export function route(label: string): http.Handler | null {
 		{
 			let [, err] = await $.pointerValue<Exclude<http.ResponseWriter, null>>(w).Write($.stringToBytes(body))
 			if (err != null) {
-				await $.println("write error:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+				await $.println("write error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 			}
 		}
-	}, ({ kind: $.TypeKind.Function, params: ["http.ResponseWriter", /* @__PURE__ */ $.pointerType("http.Request")], results: [] } as $.FunctionTypeInfo)), "http.HandlerFunc", ({ kind: $.TypeKind.Function, name: "http.HandlerFunc", params: ["http.ResponseWriter", /* @__PURE__ */ $.pointerType("http.Request")], results: [] } as $.FunctionTypeInfo)), "http.HandlerFunc", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2())
+	}, ({ kind: $.TypeKind.Function, params: ["http.ResponseWriter", /* @__PURE__ */ $.pointerType("http.Request")], results: [] } as $.FunctionTypeInfo)), "http.HandlerFunc", ({ kind: $.TypeKind.Function, name: "http.HandlerFunc", params: ["http.ResponseWriter", /* @__PURE__ */ $.pointerType("http.Request")], results: [] } as $.FunctionTypeInfo)), "http.HandlerFunc", {ServeHTTP: (receiver: any, ...args: any[]) => (http.HandlerFunc_ServeHTTP as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, ({ kind: $.TypeKind.Function, name: "http.HandlerFunc", params: ["http.ResponseWriter", /* @__PURE__ */ $.pointerType("http.Request")], results: [] } as $.FunctionTypeInfo), [$.methodSignature("ServeHTTP", [["w", "http.ResponseWriter"], ["r", /* @__PURE__ */ $.pointerType("http.Request")]])])
 }
 
 export async function serve(mux: http.ServeMux | $.VarRef<http.ServeMux> | null, req: http.Request | $.VarRef<http.Request> | null): globalThis.Promise<void> {
@@ -123,20 +123,7 @@ export async function main(): globalThis.Promise<void> {
 	await register(mux, "/ok/{id}", route("ok"))
 }
 
-var __goscriptStatic0$value: any
-function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({ServeHTTP: (receiver: any, ...args: any[]) => (http.HandlerFunc_ServeHTTP as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))})
-}
-
-var __goscriptStatic1$value: any
-function __goscriptStatic1(): any {
-	return __goscriptStatic1$value ??= (({ kind: $.TypeKind.Function, name: "http.HandlerFunc", params: ["http.ResponseWriter", /* @__PURE__ */ $.pointerType("http.Request")], results: [] } as $.FunctionTypeInfo))
-}
-
-var __goscriptStatic2$value: any
-function __goscriptStatic2(): any {
-	return __goscriptStatic2$value ??= ([$.methodSignature("ServeHTTP", [["w", "http.ResponseWriter"], ["r", /* @__PURE__ */ $.pointerType("http.Request")]])])
-}
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

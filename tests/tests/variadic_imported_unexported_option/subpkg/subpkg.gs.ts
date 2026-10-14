@@ -3,26 +3,12 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
-$.registerTypePackagePath("github.com/s4wave/goscript/tests/tests/variadic_imported_unexported_option/subpkg", ["subpkg.option", "subpkg.Thing"])
-
 export type option = ((_p0: Thing | $.VarRef<Thing> | null) => void) | null
 
 export class Thing {
-	public get Value(): number {
-		return this._fields.Value
-	}
+	public declare Value: number
 
-	public set Value(value: number) {
-		this._fields.Value = value
-	}
-
-	public get Label(): string {
-		return this._fields.Label
-	}
-
-	public set Label(value: string) {
-		this._fields.Label = value
-	}
+	public declare Label: string
 
 	public _fields: {
 		Value: number
@@ -38,6 +24,10 @@ export class Thing {
 
 	public clone(): Thing {
 		return $.markAsStructValue(new Thing(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["Value", "Label"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -63,9 +53,11 @@ export function WithLabel(l: string): option | null {
 
 export async function New(opts: $.Slice<option | null>): globalThis.Promise<Thing | $.VarRef<Thing> | null> {
 	let t: Thing | $.VarRef<Thing> | null = new Thing()
-	for (let __goscriptRangeTarget0 = opts, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
-		let opt = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as option | null)
-		await opt!(t)
+	for (let __goscriptRangeTarget0 = opts, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
+		let opt = __goscriptRangeTarget0![__rangeIndex]
+		void (__goscriptAwait = opt!(t), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 	}
 	return t
 }
+
+var __goscriptAwait: any

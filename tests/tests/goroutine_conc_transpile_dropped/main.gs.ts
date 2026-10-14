@@ -55,7 +55,7 @@ export async function main(): globalThis.Promise<void> {
 	{
 		let err = await conc.ConcurrentQueue.prototype.WaitIdle.call(q, context.Background(), null)
 		if (err != null) {
-			await $.println("WaitIdle error:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+			await $.println("WaitIdle error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 			return
 		}
 	}
@@ -66,6 +66,8 @@ export async function main(): globalThis.Promise<void> {
 		await $.println("INCOMPLETE")
 	}
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

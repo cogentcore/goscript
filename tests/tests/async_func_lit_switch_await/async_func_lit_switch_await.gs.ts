@@ -26,8 +26,10 @@ export async function main(): globalThis.Promise<void> {
 			}
 		}
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo))
-	await $.println(await fn!(0))
+	await $.println((__goscriptAwait = fn!(0), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

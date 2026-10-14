@@ -22,10 +22,10 @@ export async function main(): globalThis.Promise<void> {
 	await using __defer = new $.AsyncDisposableStack()
 	let [f, err] = $.markAsStructValue($.cloneStructValue(files)).Open("data.txt")
 	if (err != null) {
-		await $.println("open error:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+		await $.println("open error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		return
 	}
-	__defer.defer(async () => { await $.pointerValue<Exclude<fs.File, null>>(f).Close() })
+	__defer.defer(async () => { (__goscriptAwait = $.pointerValue<Exclude<fs.File, null>>(f).Close(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) })
 
 	// A regular embedded file implements io.ReaderAt and io.Seeker.
 	let [ra, isReaderAt] = $.typeAssertTuple<io.ReaderAt | null>(f, "io.ReaderAt")
@@ -63,6 +63,8 @@ export async function main(): globalThis.Promise<void> {
 	let [, dirReaderAt] = $.typeAssertTuple<io.ReaderAt | null>(d, "io.ReaderAt")
 	await $.println("dir readerat:", dirReaderAt)
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

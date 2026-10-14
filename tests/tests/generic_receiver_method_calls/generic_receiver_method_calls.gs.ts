@@ -91,7 +91,7 @@ export function direct(__typeArgs: $.GenericTypeArgs | undefined, b: box | $.Var
 }
 
 export async function throughInterface(__typeArgs: $.GenericTypeArgs | undefined, r: reader | null): globalThis.Promise<any> {
-	return (await $.callInterfaceMethod($.pointerValue<Exclude<reader, null>>(r), "Value", {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }}) as any)
+	return ((__goscriptAwait = $.callInterfaceMethod($.pointerValue<Exclude<reader, null>>(r), "Value", {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }}), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as any)
 }
 
 export function promoted(__typeArgs: $.GenericTypeArgs | undefined, h: holder | $.VarRef<holder> | null): any {
@@ -130,6 +130,8 @@ var __goscriptStatic3$value: any
 function __goscriptStatic3(): any {
 	return __goscriptStatic3$value ??= ([$.methodSignature("Value", [], [/* @__PURE__ */ $.basicType("int")])])
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

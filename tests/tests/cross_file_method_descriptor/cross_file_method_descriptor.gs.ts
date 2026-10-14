@@ -31,27 +31,14 @@ $.registerNamedValueType(
 );
 
 export function asRunner(m: mode): runner | null {
-	return $.namedValueInterfaceValue<runner | null>(m, "main.mode", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2())
+	return $.namedValueInterfaceValue<runner | null>(m, "main.mode", {Run: (receiver: any, ...args: any[]) => (__goscript_method.mode_Run as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, /* @__PURE__ */ $.basicType("int", "main.mode"), [$.methodSignature("Run", [], [/* @__PURE__ */ $.basicType("string")])])
 }
 
 export async function main(): globalThis.Promise<void> {
-	await $.println(await $.pointerValue<Exclude<runner, null>>(asRunner(1)).Run())
+	await $.println((__goscriptAwait = $.pointerValue<Exclude<runner, null>>(asRunner(1)).Run(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 }
 
-var __goscriptStatic0$value: any
-function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({Run: (receiver: any, ...args: any[]) => (__goscript_method.mode_Run as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))})
-}
-
-var __goscriptStatic1$value: any
-function __goscriptStatic1(): any {
-	return __goscriptStatic1$value ??= (/* @__PURE__ */ $.basicType("int", "main.mode"))
-}
-
-var __goscriptStatic2$value: any
-function __goscriptStatic2(): any {
-	return __goscriptStatic2$value ??= ([$.methodSignature("Run", [], [/* @__PURE__ */ $.basicType("string")])])
-}
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

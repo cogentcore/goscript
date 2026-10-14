@@ -332,12 +332,14 @@ export async function main(): globalThis.Promise<void> {
 	rw.value.rawRW.RWMutex.RUnlock()
 	let locker = rw.value.rawRW.RWMutex.RLocker()
 	await $.pointerValue<Exclude<sync.Locker, null>>(locker).Lock()
-	await $.pointerValue<Exclude<sync.Locker, null>>(locker).Unlock()
+	void (__goscriptAwait = $.pointerValue<Exclude<sync.Locker, null>>(locker).Unlock(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 
 	let or = $.markAsStructValue(new outerRunner({rawRunner: $.markAsStructValue(new rawRunner({runner: $.interfaceValue<runner | null>($.markAsStructValue(new runnable()), "main.runnable", "main.runnable")}))}))
 	await $.println($.pointerValue<Exclude<runner, null>>(or.rawRunner.runner).Run())
 	await $.println("ok")
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

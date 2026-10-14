@@ -9,36 +9,36 @@ import "@goscript/github.com/pkg/errors/index.js"
 export async function main(): globalThis.Promise<void> {
 	// Test New
 	let err1 = errors.New("basic error")
-	await $.println("New error:", await $.pointerValue<Exclude<$.GoError, null>>(err1).Error())
+	await $.println("New error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err1).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
 	// Test Errorf
 	let err2 = errors.Errorf("formatted error: %d", $.basicInterfaceValue(42, "int"))
-	await $.println("Errorf error:", await $.pointerValue<Exclude<$.GoError, null>>(err2).Error())
+	await $.println("Errorf error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err2).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
 	// Test WithStack
 	let baseErr = errors.New("base error")
 	let err3 = errors.WithStack($.pointerValueOrNil(baseErr)!)
-	await $.println("WithStack error:", await $.pointerValue<Exclude<$.GoError, null>>(err3).Error())
+	await $.println("WithStack error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err3).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
 	// Test Wrap
 	let err4 = errors.Wrap($.pointerValueOrNil(baseErr)!, "wrapped message")
-	await $.println("Wrap error:", await $.pointerValue<Exclude<$.GoError, null>>(err4).Error())
+	await $.println("Wrap error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err4).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
 	// Test Wrapf
 	let err5 = errors.Wrapf($.pointerValueOrNil(baseErr)!, "wrapped with format: %s", "test")
-	await $.println("Wrapf error:", await $.pointerValue<Exclude<$.GoError, null>>(err5).Error())
+	await $.println("Wrapf error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err5).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
 	// Test WithMessage
 	let err6 = errors.WithMessage($.pointerValueOrNil(baseErr)!, "additional message")
-	await $.println("WithMessage error:", await $.pointerValue<Exclude<$.GoError, null>>(err6).Error())
+	await $.println("WithMessage error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err6).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
 	// Test WithMessagef
 	let err7 = errors.WithMessagef($.pointerValueOrNil(baseErr)!, "additional formatted message: %d", $.basicInterfaceValue(123, "int"))
-	await $.println("WithMessagef error:", await $.pointerValue<Exclude<$.GoError, null>>(err7).Error())
+	await $.println("WithMessagef error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err7).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
 	// Test Cause
 	let cause = errors.Cause($.pointerValueOrNil(err4)!)
-	await $.println("Cause error:", await $.pointerValue<Exclude<$.GoError, null>>(cause).Error())
+	await $.println("Cause error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(cause).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
 	// Test nil handling
 	let nilErr = errors.WithStack(null!)
@@ -60,7 +60,7 @@ export async function main(): globalThis.Promise<void> {
 	// Test Go 1.13 error handling
 	let unwrapped = errors.Unwrap($.pointerValueOrNil(err4)!)
 	if (unwrapped != null) {
-		await $.println("Unwrap error:", await $.pointerValue<Exclude<$.GoError, null>>(unwrapped).Error())
+		await $.println("Unwrap error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(unwrapped).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	}
 
 	// Test Is
@@ -70,6 +70,8 @@ export async function main(): globalThis.Promise<void> {
 
 	await $.println("test finished")
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

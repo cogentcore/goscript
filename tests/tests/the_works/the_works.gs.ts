@@ -85,9 +85,9 @@ export class Program {
 	public Listing(): ((_yield: ((_p0: number, _p1: Instr) => boolean | globalThis.Promise<boolean>) | null) => void) | null {
 		const p = this;
 		return $.functionValue(async (_yield: ((_p0: number, _p1: Instr) => boolean | globalThis.Promise<boolean>) | null): globalThis.Promise<void> => {
-			for (let __goscriptRangeTarget0 = p.Code, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), pc = 0; pc < __goscriptRangeWindow0.length; pc++) {
-				let _in = $.markAsStructValue($.cloneStructValue((__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + pc] as Instr)))
-				if (!await _yield!(pc, $.markAsStructValue($.cloneStructValue(_in)))) {
+			for (let __goscriptRangeTarget0 = p.Code, pc = 0; pc < $.len(__goscriptRangeTarget0); pc++) {
+				let _in = $.markAsStructValue($.cloneStructValue(__goscriptRangeTarget0![pc]))
+				if (!(__goscriptAwait = _yield!(pc, $.markAsStructValue($.cloneStructValue(_in))), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)) {
 					return
 				}
 			}
@@ -126,11 +126,11 @@ export class Stack {
 
 	public Pop(__typeArgs: $.GenericTypeArgs | undefined): any {
 		let s: Stack | $.VarRef<Stack> | null = this;
-		if ($.sliceLen($.pointerValue<Stack>(s).items) == 0) {
+		if ($.len($.pointerValue<Stack>(s).items) == 0) {
 			$.panic("stack underflow")
 		}
-		let v = $.arrayIndex($.pointerValue<Stack>(s).items!, $.sliceLen($.pointerValue<Stack>(s).items) - 1)
-		$.pointerValue<Stack>(s).items = $.goSlice($.pointerValue<Stack>(s).items, undefined, $.sliceLen($.pointerValue<Stack>(s).items) - 1)
+		let v = $.arrayIndex($.pointerValue<Stack>(s).items!, $.len($.pointerValue<Stack>(s).items) - 1)
+		$.pointerValue<Stack>(s).items = $.goSlice($.pointerValue<Stack>(s).items, undefined, $.len($.pointerValue<Stack>(s).items) - 1)
 		return v
 	}
 
@@ -423,13 +423,13 @@ export async function main(): globalThis.Promise<void> {
 
 	let answers: $.Channel<Answer> | null = $.makeChannel<Answer>(0, $.markAsStructValue(new Answer()), "both")
 	let faults: $.Channel<Fault | $.VarRef<Fault> | null> | null = $.makeChannel<Fault | $.VarRef<Fault> | null>(0, null! as Fault | $.VarRef<Fault> | null, "both")
-	for (let __goscriptRangeTarget1 = programs, __goscriptRangeWindow1 = $.sliceRange(__goscriptRangeTarget1), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow1.length; __rangeIndex++) {
-		let p = $.markAsStructValue($.cloneStructValue((__goscriptRangeWindow1.backing[__goscriptRangeWindow1.offset + __rangeIndex] as Program)))
+	for (let __goscriptRangeTarget1 = programs, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget1); __rangeIndex++) {
+		let p = $.markAsStructValue($.cloneStructValue(__goscriptRangeTarget1![__rangeIndex]))
 		queueMicrotask(async () => { await run($.markAsStructValue($.cloneStructValue(p)), answers, faults) })
 	}
 
 	let reports: globalThis.Map<string, Report | null> | null = $.makeMap<string, Report | null>()
-	while ($.len(reports) < $.sliceLen(programs)) {
+	while ($.len(reports) < $.len(programs)) {
 		const [__goscriptSelect0HasReturn, __goscriptSelect0Value] = await $.selectStatement<any, void>([
 			{
 				id: 0,
@@ -456,8 +456,8 @@ export async function main(): globalThis.Promise<void> {
 	}
 
 	let totalSteps = 0
-	for (let __goscriptRangeTarget2 = programs, __goscriptRangeWindow2 = $.sliceRange(__goscriptRangeTarget2), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow2.length; __rangeIndex++) {
-		let p = $.markAsStructValue($.cloneStructValue((__goscriptRangeWindow2.backing[__goscriptRangeWindow2.offset + __rangeIndex] as Program)))
+	for (let __goscriptRangeTarget2 = programs, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget2); __rangeIndex++) {
+		let p = $.markAsStructValue($.cloneStructValue(__goscriptRangeTarget2![__rangeIndex]))
 		{
 			const __goscriptTypeSwitchValue = $.mapGet<string, Report | null, Report | null>(reports, p.Name, null)[0]
 			switch (true) {
@@ -479,6 +479,8 @@ export async function main(): globalThis.Promise<void> {
 	}
 	await $.println("total steps:", totalSteps)
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

@@ -13,7 +13,7 @@ export async function recoverMsg(label: string, fn: (() => void) | null): global
 					{
 						let [err, ok] = $.typeAssertTuple<$.GoError>(r, "error")
 						if (ok) {
-							await $.println(label, await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+							await $.println(label, (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 						} else {
 							await $.println(label, "non-error panic")
 						}
@@ -21,7 +21,7 @@ export async function recoverMsg(label: string, fn: (() => void) | null): global
 				}
 			}
 		})() })
-		await fn!()
+		void (__goscriptAwait = fn!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 		await __defer.dispose()
 	} catch (e) {
 		await __defer.disposePanic(e)
@@ -64,6 +64,8 @@ export async function main(): globalThis.Promise<void> {
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)))
 	await $.println("done")
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

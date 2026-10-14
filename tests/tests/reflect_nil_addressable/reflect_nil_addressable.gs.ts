@@ -7,21 +7,9 @@ import * as reflect from "@goscript/reflect/index.js"
 import "@goscript/reflect/index.js"
 
 export class S {
-	public get A(): number {
-		return this._fields.A
-	}
+	public declare A: number
 
-	public set A(value: number) {
-		this._fields.A = value
-	}
-
-	public get B(): string {
-		return this._fields.B
-	}
-
-	public set B(value: string) {
-		this._fields.B = value
-	}
+	public declare B: string
 
 	public _fields: {
 		A: number
@@ -37,6 +25,10 @@ export class S {
 
 	public clone(): S {
 		return $.markAsStructValue(new S(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["A", "B"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -55,8 +47,8 @@ export async function main(): globalThis.Promise<void> {
 	// A *any keeps its interface element type.
 	let a = $.varRef($.basicInterfaceValue(1, "int"))
 	let pa = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(a, "*interface{}", /* @__PURE__ */ $.pointerType({ kind: $.TypeKind.Interface, methods: [] })))))
-	await $.println($.comparableEqual($.markAsStructValue($.cloneStructValue(pa)).Type(), reflect.TypeFor(__goscriptStatic0())), reflect.Kind_String($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(pa)).Elem())).Kind()), reflect.Kind_String($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(pa)).Elem())).Elem())).Kind()))
-	await $.println($.comparableEqual(await $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeFor(__goscriptStatic0())).Elem(), reflect.TypeFor(__goscriptStatic1())))
+	await $.println($.comparableEqual($.markAsStructValue($.cloneStructValue(pa)).Type(), reflect.TypeFor({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.pointerType({ kind: $.TypeKind.Interface, methods: [] }), zero: () => null }})), reflect.Kind_String($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(pa)).Elem())).Kind()), reflect.Kind_String($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(pa)).Elem())).Elem())).Kind()))
+	await $.println($.comparableEqual((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeFor({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.pointerType({ kind: $.TypeKind.Interface, methods: [] }), zero: () => null }})).Elem(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), reflect.TypeFor({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }})))
 
 	// Only values reached through a pointer or slice are addressable.
 	let v = $.varRef(1)
@@ -68,18 +60,10 @@ export async function main(): globalThis.Promise<void> {
 	// Addr of an addressable value points at it.
 	let e = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(s, "*main.S", /* @__PURE__ */ $.pointerType("main.S"))))).Elem())).Field(0)))
 	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(e)).Addr())).Elem())).SetInt(5n)
-	await $.println(s.value.A, await $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(e)).Addr())).Type()).String())
+	await $.println(s.value.A, (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(e)).Addr())).Type()).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 }
 
-var __goscriptStatic0$value: any
-function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.pointerType({ kind: $.TypeKind.Interface, methods: [] }), zero: () => null }})
-}
-
-var __goscriptStatic1$value: any
-function __goscriptStatic1(): any {
-	return __goscriptStatic1$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }})
-}
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

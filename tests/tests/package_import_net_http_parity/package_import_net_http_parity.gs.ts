@@ -38,7 +38,7 @@ export async function main(): globalThis.Promise<void> {
 	let req: http.Request | $.VarRef<http.Request> | null = __goscriptTuple0[0]
 	let err = __goscriptTuple0[1]
 	if (err != null) {
-		await $.println("request error:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+		await $.println("request error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		return
 	}
 	http.Header_Set($.pointerValue<http.Request>(req).Header, "Cookie", "space=wave")
@@ -56,7 +56,7 @@ export async function main(): globalThis.Promise<void> {
 	let headReq: http.Request | $.VarRef<http.Request> | null = __goscriptTuple1[0]
 	err = __goscriptTuple1[1]
 	if (err != null) {
-		await $.println("head request error:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+		await $.println("head request error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		return
 	}
 	rec = httptest.NewRecorder()
@@ -67,6 +67,8 @@ export async function main(): globalThis.Promise<void> {
 	__defer.defer(() => { httptest.Server.prototype.Close.call($.pointerValue<httptest.Server>(srv)) })
 	await $.println("server:", !$.stringEqual($.pointerValue<httptest.Server>(srv).URL, ""), httptest.Server.prototype.Client.call($.pointerValue<httptest.Server>(srv)) != null, httptest.DefaultRemoteAddr)
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

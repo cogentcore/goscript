@@ -12,12 +12,12 @@ import "@goscript/time/index.js"
 export async function run(ctx: context.Context | null): globalThis.Promise<void> {
 	await using __defer = new $.AsyncDisposableStack()
 	let [sctx, sctxCancel] = context.WithCancel($.pointerValueOrNil(ctx)!)
-	__defer.defer(async () => { await sctxCancel!() })
+	__defer.defer(async () => { (__goscriptAwait = sctxCancel!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) })
 
 	let myCh: $.Channel<{}> | null = $.makeChannel<{}>(0, {}, "both")
 
 	queueMicrotask(async () => { await (async (): globalThis.Promise<void> => {
-		await $.chanRecv(await $.pointerValue<Exclude<context.Context, null>>(sctx).Done())
+		await $.chanRecv((__goscriptAwait = $.pointerValue<Exclude<context.Context, null>>(sctx).Done(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		await $.chanSend(myCh, {})
 	})() })
 
@@ -45,7 +45,7 @@ export async function run(ctx: context.Context | null): globalThis.Promise<void>
 	}
 
 	// Cancel context which should trigger the goroutine
-	await sctxCancel!()
+	void (__goscriptAwait = sctxCancel!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 
 	// Now myCh should become readable
 	await $.chanRecv(myCh)
@@ -59,13 +59,15 @@ export async function main(): globalThis.Promise<void> {
 	await run(ctx)
 
 	let [deadlineCtx, cancel] = context.WithDeadline($.pointerValueOrNil(ctx)!, $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(time.Now())).Add(3600000000000n))))
-	__defer.defer(async () => { await cancel!() })
+	__defer.defer(async () => { (__goscriptAwait = cancel!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) })
 	let [deadline, ok] = await $.pointerValue<Exclude<context.Context, null>>(deadlineCtx).Deadline()
 	await $.println("deadline ok:", ok)
 	await $.println("deadline zero:", $.markAsStructValue($.cloneStructValue(deadline)).IsZero())
 
 	await $.println("test finished")
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

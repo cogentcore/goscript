@@ -17,7 +17,7 @@ export async function main(): globalThis.Promise<void> {
 				await $.println("Current working directory ok")
 			}
 		} else {
-			await $.println("Error getting working directory:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+			await $.println("Error getting working directory:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		}
 	}
 
@@ -46,7 +46,7 @@ export async function main(): globalThis.Promise<void> {
 		if (err == null) {
 			await $.println("Hostname:", hostname)
 		} else {
-			await $.println("Error getting hostname:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+			await $.println("Error getting hostname:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		}
 	}
 
@@ -54,7 +54,7 @@ export async function main(): globalThis.Promise<void> {
 	if (err == null) {
 		await $.println("Stdout write bytes:", n)
 	} else {
-		await $.println("Stdout write error:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+		await $.println("Stdout write error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	}
 
 	let fileName = "os-runtime-file.txt"
@@ -62,7 +62,7 @@ export async function main(): globalThis.Promise<void> {
 	if (writeErr == null) {
 		await $.println("WriteFile ok")
 	} else {
-		await $.println("WriteFile error:", await $.pointerValue<Exclude<$.GoError, null>>(writeErr).Error())
+		await $.println("WriteFile error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(writeErr).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	}
 
 	{
@@ -72,17 +72,17 @@ export async function main(): globalThis.Promise<void> {
 		if (readErr == null) {
 			await $.println("ReadFile data:", $.bytesToString(data))
 		} else {
-			await $.println("ReadFile error:", await $.pointerValue<Exclude<$.GoError, null>>(readErr).Error())
+			await $.println("ReadFile error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(readErr).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		}
 	}
 
 	{
 		let [info, statErr] = await os.Stat(fileName)
 		if (statErr == null) {
-			await $.println("Stat name:", await $.pointerValue<Exclude<fs.FileInfo, null>>(info).Name())
-			await $.println("Stat size:", await $.pointerValue<Exclude<fs.FileInfo, null>>(info).Size())
+			await $.println("Stat name:", (__goscriptAwait = $.pointerValue<Exclude<fs.FileInfo, null>>(info).Name(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+			await $.println("Stat size:", (__goscriptAwait = $.pointerValue<Exclude<fs.FileInfo, null>>(info).Size(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		} else {
-			await $.println("Stat error:", await $.pointerValue<Exclude<$.GoError, null>>(statErr).Error())
+			await $.println("Stat error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(statErr).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		}
 	}
 
@@ -90,7 +90,7 @@ export async function main(): globalThis.Promise<void> {
 	if (removeErr == null) {
 		await $.println("Remove ok")
 	} else {
-		await $.println("Remove error:", await $.pointerValue<Exclude<$.GoError, null>>(removeErr).Error())
+		await $.println("Remove error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(removeErr).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	}
 
 	{
@@ -99,7 +99,7 @@ export async function main(): globalThis.Promise<void> {
 			await $.println("MkdirTemp ok")
 			await os.RemoveAll(tempDir)
 		} else {
-			await $.println("MkdirTemp error:", await $.pointerValue<Exclude<$.GoError, null>>(__goscriptShadow0).Error())
+			await $.println("MkdirTemp error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(__goscriptShadow0).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		}
 	}
 
@@ -113,10 +113,12 @@ export async function main(): globalThis.Promise<void> {
 			await os.File.prototype.Close.call($.pointerValue<os.File>(tempFile))
 			await os.Remove(os.File.prototype.Name.call($.pointerValue<os.File>(tempFile)))
 		} else {
-			await $.println("CreateTemp error:", await $.pointerValue<Exclude<$.GoError, null>>(__goscriptShadow1).Error())
+			await $.println("CreateTemp error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(__goscriptShadow1).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		}
 	}
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

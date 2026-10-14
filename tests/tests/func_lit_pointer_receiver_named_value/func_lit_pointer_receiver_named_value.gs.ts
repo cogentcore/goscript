@@ -16,7 +16,7 @@ export function state__set(s: $.VarRef<state> | null, v: number): void {
 }
 
 export async function call(fn: (() => void) | null): globalThis.Promise<void> {
-	await fn!()
+	void (__goscriptAwait = fn!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 }
 
 export async function main(): globalThis.Promise<void> {
@@ -26,6 +26,8 @@ export async function main(): globalThis.Promise<void> {
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)))
 	await $.println($.int(s.value))
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

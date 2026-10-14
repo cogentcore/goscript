@@ -35,11 +35,13 @@ export async function main(): globalThis.Promise<void> {
 	let ctx = context.Background()
 	let [result2, err] = await WrapperWithError(ctx)
 	if (err != null) {
-		await $.println("Error:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+		await $.println("Error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		return
 	}
 	await $.println("Result2:", result2)
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

@@ -16,7 +16,7 @@ export async function panics(f: (() => void) | null): globalThis.Promise<boolean
 		__defer.defer(() => { ((): void => {
 			panicked = $.recover() != null
 		})() })
-		await f!()
+		void (__goscriptAwait = f!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 		const __goscriptReturn0: boolean = false
 		panicked = __goscriptReturn0
 		__defer.dispose()
@@ -59,6 +59,8 @@ export async function main(): globalThis.Promise<void> {
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo))))
 	await $.println("inexact unchanged", bytes.Equal(inexact, new Uint8Array([1, 2, 3, 4]) as $.Slice<number>))
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

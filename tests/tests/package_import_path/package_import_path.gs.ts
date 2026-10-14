@@ -41,13 +41,15 @@ export async function main(): globalThis.Promise<void> {
 	// Test Match function
 	let [matched, err] = path.Match("*.txt", "file.txt")
 	if (err != null) {
-		await $.println("Match error:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+		await $.println("Match error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	} else {
 		await $.println("Match result:", matched)
 	}
 
 	await $.println("test finished")
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

@@ -5,7 +5,7 @@ import * as $ from "@goscript/builtin/index.js"
 
 export async function wrap(fn: (() => void) | null): globalThis.Promise<(() => void) | null> {
 	return $.functionValue(async (): globalThis.Promise<void> => {
-		await fn!()
+		void (__goscriptAwait = fn!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 		await $.println("wrapped")
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo))
 }
@@ -19,9 +19,11 @@ export async function main(): globalThis.Promise<void> {
 		await $.chanRecv(ch)
 		await $.println("fn")
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)))
-	await wrapped!()
+	void (__goscriptAwait = wrapped!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 	await $.println("done")
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

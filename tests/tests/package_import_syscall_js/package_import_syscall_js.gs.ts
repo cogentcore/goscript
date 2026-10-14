@@ -128,6 +128,8 @@ export async function valueOfNil(): globalThis.Promise<void> {
 	await $.println("nil interface:", js.Type_String($.markAsStructValue($.cloneStructValue(js.ValueOf(nothing))).Type()))
 }
 
+var __goscriptAwait: any
+
 if ($.isMainScript(import.meta)) {
 	await main()
 }

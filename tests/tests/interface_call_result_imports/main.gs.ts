@@ -11,8 +11,10 @@ import "@goscript/github.com/s4wave/goscript/tests/tests/interface_call_result_i
 
 export async function main(): globalThis.Promise<void> {
 	let v = dep1.Make()
-	await $.println(await $.pointerValue<Exclude<dep2.Value, null>>(v).Value())
+	await $.println((__goscriptAwait = $.pointerValue<Exclude<dep2.Value, null>>(v).Value(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

@@ -32,8 +32,8 @@ export async function main(): globalThis.Promise<void> {
 		}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo))
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)] } as $.FunctionTypeInfo))
 
-	let q: conc.ConcurrentQueue | $.VarRef<conc.ConcurrentQueue> | null = await conc.NewConcurrentQueue(2, $.arrayToSlice<(() => void) | null>([await makeJob!(0), await makeJob!(1)]))
-	let [queued, running] = await conc.ConcurrentQueue.prototype.Enqueue.call(q, $.arrayToSlice<(() => void) | null>([await makeJob!(2), await makeJob!(3), await makeJob!(4)]))
+	let q: conc.ConcurrentQueue | $.VarRef<conc.ConcurrentQueue> | null = await conc.NewConcurrentQueue(2, $.arrayToSlice<(() => void) | null>([(__goscriptAwait = makeJob!(0), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = makeJob!(1), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)]))
+	let [queued, running] = await conc.ConcurrentQueue.prototype.Enqueue.call(q, $.arrayToSlice<(() => void) | null>([(__goscriptAwait = makeJob!(2), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = makeJob!(3), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = makeJob!(4), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)]))
 	await $.println($.concatString(($.concatString(($.concatString("queued=", strconv.Itoa(queued))), " running=")), strconv.Itoa(running)))
 
 	release!.close()
@@ -41,13 +41,15 @@ export async function main(): globalThis.Promise<void> {
 	{
 		let err = await conc.ConcurrentQueue.prototype.WaitIdle.call(q, context.Background(), null)
 		if (err != null) {
-			await $.println($.concatString("WaitIdle error: ", await $.pointerValue<Exclude<$.GoError, null>>(err).Error()))
+			await $.println($.concatString("WaitIdle error: ", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)))
 			return
 		}
 	}
 
 	await $.println($.concatString(($.concatString(($.concatString("completed=", strconv.Itoa(count))), " sum=")), strconv.Itoa(sum)))
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

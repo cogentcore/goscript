@@ -42,9 +42,11 @@ export async function main(): globalThis.Promise<void> {
 		return $.markAsStructValue($.cloneStructValue(await $.chanRecv(ch)))
 	}, ({ kind: $.TypeKind.Function, params: [], results: ["main.result"] } as $.FunctionTypeInfo))
 	await $.chanSend(ch, $.markAsStructValue(new result({value: 8})))
-	let got = $.markAsStructValue($.cloneStructValue(await fn!()))
+	let got = $.markAsStructValue($.cloneStructValue((__goscriptAwait = fn!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)))
 	await $.println(got.value)
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

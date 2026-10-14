@@ -17,21 +17,9 @@ $.registerInterfaceType(
 );
 
 export class point {
-	public get x(): number {
-		return this._fields.x
-	}
+	public declare x: number
 
-	public set x(value: number) {
-		this._fields.x = value
-	}
-
-	public get y(): number {
-		return this._fields.y
-	}
-
-	public set y(value: number) {
-		this._fields.y = value
-	}
+	public declare y: number
 
 	public _fields: {
 		x: number
@@ -49,6 +37,10 @@ export class point {
 		return $.markAsStructValue(new point(this))
 	}
 
+	static {
+		$.bindStructFields(this.prototype, ["x", "y"])
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.point",
 		() => new point(),
@@ -59,13 +51,7 @@ export class point {
 }
 
 export class frame {
-	public get name(): string {
-		return this._fields.name
-	}
-
-	public set name(value: string) {
-		this._fields.name = value
-	}
+	public declare name: string
 
 	public _fields: {
 		name: string
@@ -86,23 +72,21 @@ export class frame {
 		return $.pointerValue<frame>(f).name
 	}
 
+	static {
+		$.bindStructFields(this.prototype, ["name"])
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.frame",
 		() => new frame(),
-		() => [{ name: "Name", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }], pointerReceiver: true }],
+		() => [{ name: "Name", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }],
 		frame,
 		() => [{ name: "name", key: "name", type: /* @__PURE__ */ $.basicType("string") }]
 	)
 }
 
 export class tab {
-	public get name(): string {
-		return this._fields.name
-	}
-
-	public set name(value: string) {
-		this._fields.name = value
-	}
+	public declare name: string
 
 	public _fields: {
 		name: string
@@ -123,23 +107,21 @@ export class tab {
 		return $.pointerValue<tab>(t).name
 	}
 
+	static {
+		$.bindStructFields(this.prototype, ["name"])
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.tab",
 		() => new tab(),
-		() => [{ name: "Name", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }], pointerReceiver: true }],
+		() => [{ name: "Name", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }],
 		tab,
 		() => [{ name: "name", key: "name", type: /* @__PURE__ */ $.basicType("string") }]
 	)
 }
 
 export class tabs {
-	public get count(): number {
-		return this._fields.count
-	}
-
-	public set count(value: number) {
-		this._fields.count = value
-	}
+	public declare count: number
 
 	public _fields: {
 		count: number
@@ -162,10 +144,14 @@ export class tabs {
 		return newTab(name)
 	}
 
+	static {
+		$.bindStructFields(this.prototype, ["count"])
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.tabs",
 		() => new tabs(),
-		() => [{ name: "NewTab", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.pointerType("main.frame") }, { type: /* @__PURE__ */ $.pointerType("main.tab") }], pointerReceiver: true }],
+		() => [{ name: "NewTab", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.pointerType("main.frame") }, { type: /* @__PURE__ */ $.pointerType("main.tab") }] }],
 		tabs,
 		() => [{ name: "count", key: "count", type: /* @__PURE__ */ $.basicType("int") }]
 	)
@@ -196,27 +182,27 @@ export function newTab(name: string): [frame | $.VarRef<frame> | null, tab | $.V
 }
 
 export async function names(nodes: $.Slice<Node | null>): globalThis.Promise<void> {
-	await $.println("names:", $.sliceLen(nodes))
-	for (let __goscriptRangeTarget0 = nodes, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
-		let n = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as Node | null)
-		await $.println("name:", await $.pointerValue<Exclude<Node, null>>(n).Name())
+	await $.println("names:", $.len(nodes))
+	for (let __goscriptRangeTarget0 = nodes, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
+		let n = __goscriptRangeTarget0![__rangeIndex]
+		await $.println("name:", (__goscriptAwait = $.pointerValue<Exclude<Node, null>>(n).Name(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	}
 }
 
 export function total(base: number, rest: $.Slice<number>): number {
-	for (let __goscriptRangeTarget1 = rest, __goscriptRangeWindow1 = $.sliceRange(__goscriptRangeTarget1), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow1.length; __rangeIndex++) {
-		let r = (__goscriptRangeWindow1.backing[__goscriptRangeWindow1.offset + __rangeIndex] as number)
+	for (let __goscriptRangeTarget1 = rest, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget1); __rangeIndex++) {
+		let r = __goscriptRangeTarget1![__rangeIndex]
 		base = base + (r)
 	}
 	return base
 }
 
 export function count(v: $.Slice<number>): number {
-	return $.sliceLen(v)
+	return $.len(v)
 }
 
 export function span(a: number, b: number, rest: $.Slice<number>): number {
-	return (b - a) + $.sliceLen(rest)
+	return (b - a) + $.len(rest)
 }
 
 export async function main(): globalThis.Promise<void> {
@@ -242,6 +228,8 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("sprint:", await fmt.Sprint(...(() => { const __goscriptTupleArg5 = pair(3, 4); return [$.basicInterfaceValue(__goscriptTupleArg5[0], "int"), $.basicInterfaceValue(__goscriptTupleArg5[1], "int")] as [any, any] })()))
 	await $.println("tabs:", $.pointerValue<tabs>(ts).count)
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

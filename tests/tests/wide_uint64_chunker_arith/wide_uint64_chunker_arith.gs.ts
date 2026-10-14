@@ -132,7 +132,7 @@ export async function main(): globalThis.Promise<void> {
 			break
 		}
 		if (err != null) {
-			await $.println("err", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+			await $.println("err", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 			return
 		}
 	}
@@ -144,6 +144,8 @@ export async function main(): globalThis.Promise<void> {
 export function newRepeatReader(n: number): repeatReader | $.VarRef<repeatReader> | null {
 	return new repeatReader({remaining: n})
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

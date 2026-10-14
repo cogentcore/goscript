@@ -45,7 +45,7 @@ export async function main(): globalThis.Promise<void> {
 			await $.println("unexpected success:", $.arrayIndex(b, 0), $.arrayIndex(b, 1))
 			continue
 		}
-		await $.println(await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+		await $.println((__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	}
 
 	// Other layout elements.
@@ -54,7 +54,7 @@ export async function main(): globalThis.Promise<void> {
 		let o = $.cloneArrayValue((__goscriptRangeWindow3.backing[__goscriptRangeWindow3.offset + __rangeIndex] as string[]), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("string"), 2))
 		let [t, err] = time.Parse($.arrayIndex(o, 0), $.arrayIndex(o, 1))
 		if (err != null) {
-			await $.println("error:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+			await $.println("error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 			continue
 		}
 		await $.println($.arrayIndex(o, 1), "=>", $.markAsStructValue($.cloneStructValue(t)).Format(time.RFC3339Nano), time.Location.prototype.String.call($.pointerValue<time.Location>($.markAsStructValue($.cloneStructValue(t)).Location())))
@@ -66,7 +66,7 @@ export async function main(): globalThis.Promise<void> {
 		let s = (__goscriptRangeWindow4.backing[__goscriptRangeWindow4.offset + __rangeIndex] as string)
 		let [d, err] = time.ParseDuration(s)
 		if (err != null) {
-			await $.println(await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+			await $.println((__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 			continue
 		}
 		await $.println(s, "=>", time.Duration_String(d))
@@ -77,12 +77,14 @@ export async function main(): globalThis.Promise<void> {
 		let f = $.markAsStructValue($.cloneStructValue((__goscriptRangeWindow5.backing[__goscriptRangeWindow5.offset + __rangeIndex] as {"fmt": string, "value": string, "zone": time.Location | $.VarRef<time.Location> | null})))
 		let [t, err] = time.ParseInLocation(f.fmt, f.value, f.zone)
 		if (err != null) {
-			await $.println("error:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+			await $.println("error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 			continue
 		}
 		await $.println("parsed:", $.markAsStructValue($.cloneStructValue(t)).Format(time.RFC3339Nano), time.Location.prototype.String.call($.pointerValue<time.Location>($.markAsStructValue($.cloneStructValue(t)).Location())), $.markAsStructValue($.cloneStructValue(t)).Unix())
 	}
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

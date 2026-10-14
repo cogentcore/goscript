@@ -104,6 +104,8 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("ZeroArrayLiteral[Pair] zero:", ($.arrayIndex(zeroPair, 0) == 0) && ($.arrayIndex(zeroPair, 1) == 0))
 }
 
+var __goscriptAwait: any
+
 if ($.isMainScript(import.meta)) {
 	await main()
 }

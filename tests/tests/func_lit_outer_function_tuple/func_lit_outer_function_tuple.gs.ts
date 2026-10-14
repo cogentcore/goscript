@@ -50,6 +50,8 @@ export async function main(): globalThis.Promise<void> {
 	}
 }
 
+var __goscriptAwait: any
+
 if ($.isMainScript(import.meta)) {
 	await main()
 }

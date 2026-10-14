@@ -7,13 +7,7 @@ import * as atomic from "@goscript/sync/atomic/index.js"
 import "@goscript/sync/atomic/index.js"
 
 export class pointerNode {
-	public get value(): string {
-		return this._fields.value
-	}
-
-	public set value(value: string) {
-		this._fields.value = value
-	}
+	public declare value: string
 
 	public _fields: {
 		value: string
@@ -27,6 +21,10 @@ export class pointerNode {
 
 	public clone(): pointerNode {
 		return $.markAsStructValue(new pointerNode(this))
+	}
+
+	static {
+		$.bindStructFields(this.prototype, ["value"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -114,12 +112,12 @@ export async function main(): globalThis.Promise<void> {
 	let callback: $.VarRef<(() => void) | null> = $.varRef(__goscriptTuple0[0])
 	let callbackErr = __goscriptTuple0[1]
 	if (callbackErr != null) {
-		await $.println("Pointer function error:", await $.pointerValue<Exclude<$.GoError, null>>(callbackErr).Error())
+		await $.println("Pointer function error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(callbackErr).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	} else {
 		fnPtr.value.Store(callback)
 		let loadedFn = (fnPtr.value.Load() as $.VarRef<(() => void) | null> | null)
 		if (loadedFn != null) {
-			await ($.pointerValue<(() => void) | null>(loadedFn))!()
+			void (__goscriptAwait = ($.pointerValue<(() => void) | null>(loadedFn))!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 		}
 	}
 
@@ -172,20 +170,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("atomic test finished")
 }
 
-var __goscriptStatic0$value: any
-function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }})
-}
-
-var __goscriptStatic1$value: any
-function __goscriptStatic1(): any {
-	return __goscriptStatic1$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), zero: () => null }})
-}
-
-var __goscriptStatic2$value: any
-function __goscriptStatic2(): any {
-	return __goscriptStatic2$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.pointerNode", zero: () => $.markAsStructValue(new pointerNode()) }})
-}
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

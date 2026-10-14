@@ -14,13 +14,7 @@ $.registerInterfaceType(
 );
 
 export class box {
-	public get value(): number {
-		return this._fields.value
-	}
-
-	public set value(value: number) {
-		this._fields.value = value
-	}
+	public declare value: number
 
 	public _fields: {
 		value: number
@@ -41,10 +35,14 @@ export class box {
 		return $.pointerValue<box>(b).value
 	}
 
+	static {
+		$.bindStructFields(this.prototype, ["value"])
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.box",
 		() => new box(),
-		() => [{ name: "Value", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }], pointerReceiver: true }],
+		() => [{ name: "Value", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }],
 		box,
 		() => [{ name: "value", key: "value", type: /* @__PURE__ */ $.basicType("int") }]
 	)
@@ -62,19 +60,16 @@ export function unwrap(v: Value | null): Value | null {
 
 export async function wrapNew(__typeArgs: $.GenericTypeArgs | undefined, newValue: (() => any | globalThis.Promise<any>) | null): globalThis.Promise<(() => Value | null | globalThis.Promise<Value | null>) | null> {
 	return $.functionValue(async (): globalThis.Promise<Value | null> => {
-		return unwrap($.typeParamInterfaceValue<Value | null>(await newValue!(), __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [$.methodSignature("Value", [], [/* @__PURE__ */ $.basicType("int")])] }, zero: () => null }))
+		return unwrap($.typeParamInterfaceValue<Value | null>((__goscriptAwait = newValue!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [$.methodSignature("Value", [], [/* @__PURE__ */ $.basicType("int")])] }, zero: () => null }))
 	}, ({ kind: $.TypeKind.Function, params: [], results: ["main.Value"] } as $.FunctionTypeInfo))
 }
 
 export async function main(): globalThis.Promise<void> {
-	let fn: (() => Value | null | globalThis.Promise<Value | null>) | null = await wrapNew(__goscriptStatic0(), asyncBox)
-	await $.println(await $.pointerValue<Exclude<Value, null>>((await fn!())).Value())
+	let fn: (() => Value | null | globalThis.Promise<Value | null>) | null = await wrapNew({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.pointerType("main.box"), zero: () => null, methods: {Value: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Value(...$.stripGenericTypeArgs(args))} }}, asyncBox)
+	await $.println((__goscriptAwait = $.pointerValue<Exclude<Value, null>>((__goscriptAwait = fn!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)).Value(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 }
 
-var __goscriptStatic0$value: any
-function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.pointerType("main.box"), zero: () => null, methods: {Value: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Value(...$.stripGenericTypeArgs(args))} }})
-}
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

@@ -83,13 +83,13 @@ export async function processInterface(i: any): globalThis.Promise<void> {
 			case $.typeAssert<MyInterface1 | null>(__goscriptTypeSwitchValue, "main.MyInterface1").ok:
 				{
 					let v: MyInterface1 | null = $.typeAssert<MyInterface1 | null>(__goscriptTypeSwitchValue, "main.MyInterface1").value
-					await $.println("MyInterface1:", await $.pointerValue<Exclude<MyInterface1, null>>(v).MyString1(), await $.pointerValue<Exclude<MyInterface1, null>>(v).MyString2())
+					await $.println("MyInterface1:", (__goscriptAwait = $.pointerValue<Exclude<MyInterface1, null>>(v).MyString1(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = $.pointerValue<Exclude<MyInterface1, null>>(v).MyString2(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 				}
 				break
 			case $.typeAssert<MyInterface2 | null>(__goscriptTypeSwitchValue, "main.MyInterface2").ok:
 				{
 					let v: MyInterface2 | null = $.typeAssert<MyInterface2 | null>(__goscriptTypeSwitchValue, "main.MyInterface2").value
-					await $.println("MyInterface2:", await $.pointerValue<Exclude<MyInterface2, null>>(v).MyString1())
+					await $.println("MyInterface2:", (__goscriptAwait = $.pointerValue<Exclude<MyInterface2, null>>(v).MyString1(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 				}
 				break
 			default:
@@ -124,13 +124,13 @@ export async function main(): globalThis.Promise<void> {
 			case $.typeAssert<MyInterface2 | null>(__goscriptTypeSwitchValue, "main.MyInterface2").ok:
 				{
 					let v: MyInterface2 | null = $.typeAssert<MyInterface2 | null>(__goscriptTypeSwitchValue, "main.MyInterface2").value
-					await $.println("Matched MyInterface2 from i1:", await $.pointerValue<Exclude<MyInterface2, null>>(v).MyString1())
+					await $.println("Matched MyInterface2 from i1:", (__goscriptAwait = $.pointerValue<Exclude<MyInterface2, null>>(v).MyString1(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 				}
 				break
 			case $.typeAssert<MyInterface1 | null>(__goscriptTypeSwitchValue, "main.MyInterface1").ok:
 				{
 					let v: MyInterface1 | null = $.typeAssert<MyInterface1 | null>(__goscriptTypeSwitchValue, "main.MyInterface1").value
-					await $.println("Matched MyInterface1 from i1:", await $.pointerValue<Exclude<MyInterface1, null>>(v).MyString1(), await $.pointerValue<Exclude<MyInterface1, null>>(v).MyString2())
+					await $.println("Matched MyInterface1 from i1:", (__goscriptAwait = $.pointerValue<Exclude<MyInterface1, null>>(v).MyString1(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = $.pointerValue<Exclude<MyInterface1, null>>(v).MyString2(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 				}
 				break
 			default:
@@ -142,6 +142,8 @@ export async function main(): globalThis.Promise<void> {
 		}
 	}
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

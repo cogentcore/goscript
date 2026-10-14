@@ -74,3 +74,5 @@ export function Get(): Level {
 export function UserPtr(): $.VarRef<Level> | null {
 	return __goscript_get_UserLevel()
 }
+
+var __goscriptAwait: any

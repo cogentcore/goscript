@@ -72,9 +72,11 @@ export async function main(): globalThis.Promise<void> {
 	let hook: ((fn: ((_p0: string) => number | globalThis.Promise<number>) | null, network: string) => number | globalThis.Promise<number>) | null = $.functionValue(async (fn: ((_p0: string) => number | globalThis.Promise<number>) | null, network: string): globalThis.Promise<number> => {
 		return fn!(network)
 	}, ({ kind: $.TypeKind.Function, params: [({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo), /* @__PURE__ */ $.basicType("string")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))
-	await $.println("hook:", await hook!(syncLookup, "ip"))
+	await $.println("hook:", (__goscriptAwait = hook!(syncLookup, "ip"), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	$.pointerValue<Worker>(worker).ch!.close()
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

@@ -71,16 +71,18 @@ export async function main(): globalThis.Promise<void> {
 	let ok = errors.As($.pointerValueOrNil($.interfaceValue<$.GoError>(err, "*main.wrappedHealthError", /* @__PURE__ */ $.pointerType("main.wrappedHealthError")))!, $.interfaceValue(target, "*main.healthError", /* @__PURE__ */ $.pointerType("main.healthError")))
 	await $.println("matched:", ok)
 	if (ok) {
-		await $.println("health:", await $.pointerValue<Exclude<healthError, null>>(target.value).Health())
+		await $.println("health:", (__goscriptAwait = $.pointerValue<Exclude<healthError, null>>(target.value).Health(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	}
 
 	let healthTarget: $.VarRef<any> = $.varRef(null! as any)
 	ok = errors.As($.pointerValueOrNil($.interfaceValue<$.GoError>(err, "*main.wrappedHealthError", /* @__PURE__ */ $.pointerType("main.wrappedHealthError")))!, $.interfaceValue(healthTarget, "*interface{Health() string}", /* @__PURE__ */ $.pointerType({ kind: $.TypeKind.Interface, methods: [$.methodSignature("Health", [], [/* @__PURE__ */ $.basicType("string")])] })))
 	await $.println("anonymous matched:", ok)
 	if (ok) {
-		await $.println("anonymous health:", await $.pointerValue<any>(healthTarget.value).Health())
+		await $.println("anonymous health:", (__goscriptAwait = $.pointerValue<any>(healthTarget.value).Health(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	}
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

@@ -63,12 +63,12 @@ export async function main(): globalThis.Promise<void> {
 	let v = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.markAsStructValue($.cloneStructValue(p)), "main.Person", "main.Person"))))
 	let t = $.markAsStructValue($.cloneStructValue(v)).Type()
 
-	await $.println("Type:", await $.pointerValue<Exclude<reflect.Type, null>>(t).Name())
-	await $.println("Kind:", reflect.Kind_String((await $.pointerValue<Exclude<reflect.Type, null>>(t).Kind())))
-	await $.println("NumField:", await $.pointerValue<Exclude<reflect.Type, null>>(t).NumField())
+	await $.println("Type:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(t).Name(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println("Kind:", reflect.Kind_String((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(t).Kind(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)))
+	await $.println("NumField:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(t).NumField(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
-	for (let i = 0; i < await $.pointerValue<Exclude<reflect.Type, null>>(t).NumField(); i++) {
-		let sf = $.markAsStructValue($.cloneStructValue(await $.pointerValue<Exclude<reflect.Type, null>>(t).Field(i)))
+	for (let i = 0; i < (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(t).NumField(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait); i++) {
+		let sf = $.markAsStructValue($.cloneStructValue((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(t).Field(i), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)))
 		let fv = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(v)).Field(i)))
 
 		await $.println("Field", i, ":", sf.Name)
@@ -98,6 +98,8 @@ export async function main(): globalThis.Promise<void> {
 		}
 	}
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

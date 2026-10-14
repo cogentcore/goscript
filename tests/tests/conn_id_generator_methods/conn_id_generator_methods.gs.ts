@@ -147,13 +147,13 @@ export class connRunnerCallbacks {
 
 export async function connRunners_AddConnectionID(cr: connRunners, id: number): globalThis.Promise<void> {
 	for (const [__rangeKey, c] of cr?.entries() ?? []) {
-		await c.AddConnectionID!(id)
+		void (__goscriptAwait = c.AddConnectionID!(id), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 	}
 }
 
 export function newConnRunnerCallbacks(runner: connRunner | null): connRunnerCallbacks {
 	return $.markAsStructValue(new connRunnerCallbacks({AddConnectionID: $.functionValue(async (id: number): globalThis.Promise<void> => {
-		await $.pointerValue<Exclude<connRunner, null>>(runner).Add(id)
+		void (__goscriptAwait = $.pointerValue<Exclude<connRunner, null>>(runner).Add(id), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [] } as $.FunctionTypeInfo))}))
 }
 
@@ -182,12 +182,14 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("destination:", $.mapGet<number, number, number>($.pointerValue<transport>(t).values, 7, 0)[0])
 	await $.println("same pointer:", $.pointerEqual(t, runnerAgain))
 	await $.println("boxed same pointer:", $.pointerEqual(t, runnerAgain))
-	await $.pointerValue<Exclude<sourceRunner, null>>(sourceInterface).SourceOnly(4)
-	await $.pointerValue<Exclude<connRunner, null>>(destinationInterface).Add(8)
+	void (__goscriptAwait = $.pointerValue<Exclude<sourceRunner, null>>(sourceInterface).SourceOnly(4), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+	void (__goscriptAwait = $.pointerValue<Exclude<connRunner, null>>(destinationInterface).Add(8), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 	let pointerValues: globalThis.Map<transport | $.VarRef<transport> | null, number> | null = $.makeMap<transport | $.VarRef<transport> | null, number>([[t, 42]], /* @__PURE__ */ $.pointerType("main.transport"))
 	await $.println("map lookup:", $.mapGet<transport | $.VarRef<transport> | null, number, number>(pointerValues, runnerAgain, 0)[0])
 	await testVarRefConversion()
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

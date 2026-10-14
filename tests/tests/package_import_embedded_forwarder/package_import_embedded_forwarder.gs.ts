@@ -79,9 +79,9 @@ export function NewVerboseStore(name: string): VerboseStore | $.VarRef<VerboseSt
 }
 
 export async function useStore(store: Store | null): globalThis.Promise<void> {
-	let read: tx.Tx | $.VarRef<tx.Tx> | null = await $.pointerValue<Exclude<Store, null>>(store).NewTransaction(false)
-	let write: tx.Tx | $.VarRef<tx.Tx> | null = await $.pointerValue<Exclude<Store, null>>(store).NewTransaction(true)
-	await $.println(await $.pointerValue<Exclude<Store, null>>(store).Execute())
+	let read: tx.Tx | $.VarRef<tx.Tx> | null = (__goscriptAwait = $.pointerValue<Exclude<Store, null>>(store).NewTransaction(false), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+	let write: tx.Tx | $.VarRef<tx.Tx> | null = (__goscriptAwait = $.pointerValue<Exclude<Store, null>>(store).NewTransaction(true), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+	await $.println((__goscriptAwait = $.pointerValue<Exclude<Store, null>>(store).Execute(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	await $.println($.pointerValue<dep.Tx>(read).Name)
 	await $.println($.pointerValue<dep.Tx>(write).Name)
 }
@@ -89,6 +89,8 @@ export async function useStore(store: Store | null): globalThis.Promise<void> {
 export async function main(): globalThis.Promise<void> {
 	await useStore($.interfaceValue<Store | null>(NewVerboseStore("outer"), "*main.VerboseStore", /* @__PURE__ */ $.pointerType("main.VerboseStore")))
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

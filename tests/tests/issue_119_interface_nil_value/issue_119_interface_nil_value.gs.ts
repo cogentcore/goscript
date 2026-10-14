@@ -130,7 +130,7 @@ export async function main(): globalThis.Promise<void> {
 	// Test 2: Calling method on nil receiver should work
 	// The method dispatch uses the type (*Dog) to find Name()
 	// Then passes nil as the receiver
-	await $.println(await $.pointerValue<Exclude<Animal, null>>(animal).Name())
+	await $.println((__goscriptAwait = $.pointerValue<Exclude<Animal, null>>(animal).Name(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	let directNilDog: Dog | $.VarRef<Dog> | null = null! as Dog | $.VarRef<Dog> | null
 	await $.println(Dog.prototype.Name.call(directNilDog))
 
@@ -174,6 +174,8 @@ export async function main(): globalThis.Promise<void> {
 		await $.println("b is not nil")
 	}
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

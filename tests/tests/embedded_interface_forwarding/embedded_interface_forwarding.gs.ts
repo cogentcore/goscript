@@ -96,6 +96,8 @@ export async function main(): globalThis.Promise<void> {
 	await $.println(await call($.interfaceValue<Adder | null>(box, "*main.Box", /* @__PURE__ */ $.pointerType("main.Box"))))
 }
 
+var __goscriptAwait: any
+
 if ($.isMainScript(import.meta)) {
 	await main()
 }

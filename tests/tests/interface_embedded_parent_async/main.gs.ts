@@ -65,8 +65,10 @@ export function NewSpecific(): Specific | null {
 
 export async function main(): globalThis.Promise<void> {
 	let s = NewSpecific()
-	await $.println("embedded directive", dep.Accept((s as dep.Directive | null)), await $.pointerValue<Exclude<Specific, null>>(s).Name())
+	await $.println("embedded directive", dep.Accept((s as dep.Directive | null)), (__goscriptAwait = $.pointerValue<Exclude<Specific, null>>(s).Name(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

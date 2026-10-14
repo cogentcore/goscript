@@ -138,7 +138,7 @@ export async function walk(fs: Filesystem | null, path: string, info: FileInfo |
 	// Test case 1: Direct call to nullable function parameter
 	// This should generate: walkFn!(path, info, nil)
 	// But currently generates: walkFn(path, info, nil) - missing !
-	let err = await walkFn!(path, info, null)
+	let err = (__goscriptAwait = walkFn!(path, info, null), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 	if ((err != null) && (!$.comparableEqual(err, SkipDir))) {
 		return err
 	}
@@ -146,7 +146,7 @@ export async function walk(fs: Filesystem | null, path: string, info: FileInfo |
 	// Test case 2: Call with error parameter
 	let walkErr: $.GoError = null
 	// This should also generate: walkFn!(path, info, walkErr)
-	let result = await walkFn!(path, info, walkErr)
+	let result = (__goscriptAwait = walkFn!(path, info, walkErr), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 	if (result != null) {
 		return result
 	}
@@ -174,16 +174,16 @@ export async function main(): globalThis.Promise<void> {
 
 	// Test the walk function with a callback
 	let walkFunc: ((path: string, info: FileInfo | null, err: $.GoError) => $.GoError | globalThis.Promise<$.GoError>) | null = $.functionValue(async (path: string, info: FileInfo | null, err: $.GoError): globalThis.Promise<$.GoError> => {
-		await $.println("Walking:", path, "size:", await $.pointerValue<Exclude<FileInfo, null>>(info).Size())
+		await $.println("Walking:", path, "size:", (__goscriptAwait = $.pointerValue<Exclude<FileInfo, null>>(info).Size(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		if (err != null) {
-			await $.println("Error:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+			await $.println("Error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		}
 		return null
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string"), "main.FileInfo", "error"], results: ["error"] } as $.FunctionTypeInfo))
 
 	let err = await walk($.interfaceValue<Filesystem | null>(fs, "*main.MockFilesystem", /* @__PURE__ */ $.pointerType("main.MockFilesystem")), "/test", $.interfaceValue<FileInfo | null>(fileInfo, "*main.MockFileInfo", /* @__PURE__ */ $.pointerType("main.MockFileInfo")), walkFunc)
 	if (err != null) {
-		await $.println("Walk error:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+		await $.println("Walk error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	}
 
 	// Test the process function with a callback
@@ -193,25 +193,27 @@ export async function main(): globalThis.Promise<void> {
 
 	let [result, err2] = await processWithCallback("hello", processFunc)
 	if (err2 != null) {
-		await $.println("Process error:", await $.pointerValue<Exclude<$.GoError, null>>(err2).Error())
+		await $.println("Process error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err2).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	} else {
 		await $.println("Process result:", result)
 	}
 
 	let [result3, err3] = await maybeProcess("ignored", (null as OptionalProcessFunc | null))
 	if (err3 != null) {
-		await $.println("Optional process error:", await $.pointerValue<Exclude<$.GoError, null>>(err3).Error())
+		await $.println("Optional process error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err3).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	} else {
 		await $.println("Optional process result:", result3)
 	}
 
 	let [result4, err4] = await maybeProcess("world", processFunc)
 	if (err4 != null) {
-		await $.println("Optional process error:", await $.pointerValue<Exclude<$.GoError, null>>(err4).Error())
+		await $.println("Optional process error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err4).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	} else {
 		await $.println("Optional process result:", result4)
 	}
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

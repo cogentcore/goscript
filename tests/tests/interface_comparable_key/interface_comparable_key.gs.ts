@@ -34,11 +34,11 @@ export function valueHash_Key(h: valueHash): any {
 }
 
 export async function sameKey(a: ref | null, b: ref | null): globalThis.Promise<boolean> {
-	return $.comparableEqual(await $.pointerValue<Exclude<ref, null>>(a).Key(), await $.pointerValue<Exclude<ref, null>>(b).Key())
+	return $.comparableEqual((__goscriptAwait = $.pointerValue<Exclude<ref, null>>(a).Key(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = $.pointerValue<Exclude<ref, null>>(b).Key(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 }
 
 export async function differentKey(a: ref | null, b: ref | null): globalThis.Promise<boolean> {
-	return !$.comparableEqual(await $.pointerValue<Exclude<ref, null>>(a).Key(), await $.pointerValue<Exclude<ref, null>>(b).Key())
+	return !$.comparableEqual((__goscriptAwait = $.pointerValue<Exclude<ref, null>>(a).Key(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = $.pointerValue<Exclude<ref, null>>(b).Key(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 }
 
 export async function main(): globalThis.Promise<void> {
@@ -64,6 +64,8 @@ var __goscriptStatic2$value: any
 function __goscriptStatic2(): any {
 	return __goscriptStatic2$value ??= ([$.methodSignature("Key", [], [{ kind: $.TypeKind.Interface, methods: [] }])])
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

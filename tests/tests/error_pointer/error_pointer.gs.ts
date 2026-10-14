@@ -29,9 +29,11 @@ export async function main(): globalThis.Promise<void> {
 	let err: $.VarRef<$.GoError> = $.varRef(null! as $.GoError)
 	setErr(err)
 	if (err.value != null) {
-		await $.println(await $.pointerValue<Exclude<$.GoError, null>>(err.value).Error())
+		await $.println((__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err.value).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	}
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

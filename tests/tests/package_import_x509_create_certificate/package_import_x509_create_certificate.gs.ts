@@ -101,7 +101,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("create err nil", err == null)
 	await $.println("der nonempty", $.sliceLen(der) != 0)
 	if (err != null) {
-		await $.println("create error", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+		await $.println("create error", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		return
 	}
 
@@ -110,7 +110,7 @@ export async function main(): globalThis.Promise<void> {
 	err = __goscriptTuple3[1]
 	await $.println("parse err nil", err == null)
 	if (err != null) {
-		await $.println("parse error", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+		await $.println("parse error", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		return
 	}
 	let keyExt: pkix.Extension = $.markAsStructValue(new pkix.Extension())
@@ -138,8 +138,8 @@ export async function main(): globalThis.Promise<void> {
 	err = __goscriptTuple5[1]
 	await $.println("verify err nil", err == null)
 	if (err != null) {
-		await $.println("verify error", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
-		await $.println("verify error type", await $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf((err as any))).String())
+		await $.println("verify error", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+		await $.println("verify error type", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf((err as any))).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		{
 			const __goscriptTypeSwitchValue = err
 			switch (true) {
@@ -203,6 +203,8 @@ var __goscriptStatic5$value: any
 function __goscriptStatic5(): any {
 	return __goscriptStatic5$value ??= ([$.methodSignature("Equal", [["x", "crypto.PrivateKey"]], [/* @__PURE__ */ $.basicType("bool")]), $.methodSignature("Public", [], ["crypto.PublicKey"]), $.methodSignature("Seed", [], [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))]), $.methodSignature("Sign", [["rand", "io.Reader"], ["message", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))], ["opts", "crypto.SignerOpts"]], [["signature", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))], ["err", "error"]])])
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

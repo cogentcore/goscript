@@ -28,7 +28,7 @@ export async function main(): globalThis.Promise<void> {
 	let zr: zip.Reader | $.VarRef<zip.Reader> | null = __goscriptTuple1[0]
 	err = __goscriptTuple1[1]
 	if (err != null) {
-		await $.println("open error", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+		await $.println("open error", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		return
 	}
 	await $.println("open", err == null, $.sliceLen($.pointerValue<zip.Reader>(zr).File))
@@ -43,6 +43,8 @@ export async function main(): globalThis.Promise<void> {
 	err = await $.pointerValue<Exclude<io.ReadCloser, null>>(rc).Close()
 	await $.println("file close", err == null)
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

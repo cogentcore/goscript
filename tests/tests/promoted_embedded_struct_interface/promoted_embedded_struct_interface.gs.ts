@@ -123,7 +123,7 @@ export class pointerStopStream {
 }
 
 export async function closeIt(c: closer | null): globalThis.Promise<void> {
-	await $.println(await $.pointerValue<Exclude<closer, null>>(c).Close())
+	await $.println((__goscriptAwait = $.pointerValue<Exclude<closer, null>>(c).Close(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 }
 
 export async function main(): globalThis.Promise<void> {
@@ -136,6 +136,8 @@ export async function main(): globalThis.Promise<void> {
 	let promotedPtr = $.markAsStructValue(new pointerStopStream({stream: new stream({name: "embedded pointer"})}))
 	await closeIt($.interfaceValue<closer | null>($.markAsStructValue($.cloneStructValue(promotedPtr)), "main.pointerStopStream", "main.pointerStopStream"))
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

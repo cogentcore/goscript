@@ -550,6 +550,7 @@ func (o *LoweringOwner) lowerFile(req lowerFileRequest) (*loweredFile, []Diagnos
 		trimTypeInfo:      trimTypeInfo,
 		displayRoot:       displayRoot,
 		statics:           &staticPool{names: make(map[string]string)},
+		awaitTemp:         new(bool),
 	}
 	appendDecls := func(decls []loweredDecl) {
 		for _, decl := range decls {
@@ -603,6 +604,9 @@ func (o *LoweringOwner) lowerFile(req lowerFileRequest) (*loweredFile, []Diagnos
 	}
 	for _, static := range ctx.statics.decls {
 		loweredFile.decls = append(loweredFile.decls, loweredDecl{code: static})
+	}
+	if *ctx.awaitTemp {
+		loweredFile.decls = append(loweredFile.decls, loweredDecl{code: "var " + conditionalAwaitTemp + ": any"})
 	}
 	return loweredFile, diagnostics
 }
@@ -1674,6 +1678,9 @@ type lowerFileContext struct {
 	// statics holds the static expressions of the file hoisted out of the
 	// code that would evaluate them each time (see hoistStatic).
 	statics *staticPool
+	// awaitTemp is set when the file uses the temporary variable of
+	// conditional awaits (see conditionalAwait), which is then declared.
+	awaitTemp *bool
 
 	// rangeLabels maps visible labels to their statements in the current yield.
 	rangeLabels map[string]ast.Stmt
@@ -6789,7 +6796,27 @@ func elideTailReturnAwait(ctx lowerFileContext, result ast.Expr, expr string) st
 	if _, ok := unwrapParenExpr(result).(*ast.CallExpr); !ok {
 		return expr
 	}
+	if call, ok := conditionalAwaitCall(expr); ok {
+		return call
+	}
 	return strings.TrimPrefix(expr, "await ")
+}
+
+// conditionalAwaitCall returns the call of a conditional await made by
+// conditionalAwait, so that it can be returned without awaiting it.
+func conditionalAwaitCall(expr string) (string, bool) {
+	t := conditionalAwaitTemp
+	prefix := "(" + t + " = "
+	suffix := ", " + t + " instanceof Promise ? await " + t + " : " + t + ")"
+	if !strings.HasPrefix(expr, prefix) || !strings.HasSuffix(expr, suffix) {
+		return "", false
+	}
+	call := expr[len(prefix) : len(expr)-len(suffix)]
+	// A nested conditional await would make the call text ambiguous.
+	if strings.Contains(call, suffix) {
+		return "", false
+	}
+	return call, true
 }
 
 func singleReturnType(ctx lowerFileContext) types.Type {
@@ -15202,6 +15229,9 @@ func (o *LoweringOwner) callExprNeedsAwait(ctx lowerFileContext, call *ast.CallE
 func (o *LoweringOwner) awaitCallIfNeeded(ctx lowerFileContext, call *ast.CallExpr, lowered string) string {
 	// Await a call that may suspend.
 	if o.callExprNeedsAwait(ctx, call) {
+		if awaited, ok := o.conditionalAwait(ctx, call, lowered); ok {
+			return awaited
+		}
 		return "await " + lowered
 	}
 
@@ -15212,6 +15242,42 @@ func (o *LoweringOwner) awaitCallIfNeeded(ctx lowerFileContext, call *ast.CallEx
 		return o.runtimeOwner.QualifiedHelper(RuntimeHelperSyncResult) + "(" + lowered + ")"
 	}
 	return lowered
+}
+
+// conditionalAwaitTemp is the module variable that holds the result of a
+// call that is awaited only if it returns a promise.
+const conditionalAwaitTemp = "__goscriptAwait"
+
+// conditionalAwait returns the lowered call awaited only if it returns a
+// promise, for a call through a function value or an interface method, which
+// may or may not suspend depending on the function it calls. Awaiting a
+// value that is not a promise still suspends the caller until the microtask
+// queue runs, which is much slower than continuing. The result is assigned to
+// a module variable and tested in one expression without suspending, so that
+// concurrent callers can share it; its value is untyped, since the declared
+// TypeScript result types of handwritten overrides can differ from those of
+// the Go result types. It returns false for other calls, which are always
+// awaited.
+func (o *LoweringOwner) conditionalAwait(ctx lowerFileContext, call *ast.CallExpr, lowered string) (string, bool) {
+	if ctx.awaitTemp == nil || ctx.semPkg == nil || ctx.semPkg.source == nil || !ctx.asyncFunction {
+		return "", false
+	}
+	pkg := ctx.semPkg.source
+	fun := call.Fun
+	if !callUsesFunctionValue(pkg, fun) && !callUsesFunctionIdentifier(pkg, fun) && !callUsesInterfaceMethod(pkg, fun) {
+		return "", false
+	}
+	if o.overrideCallNeedsAwait(ctx, fun) || o.callbackOverrideCallNeedsAwait(ctx, call) {
+		return "", false
+	}
+	signature := signatureForType(pkg.TypesInfo.TypeOf(fun))
+	if signature == nil || signature.Results().Len() > 1 {
+		return "", false
+	}
+	*ctx.awaitTemp = true
+	t := conditionalAwaitTemp
+	expr := "(" + t + " = " + lowered + ", " + t + " instanceof Promise ? await " + t + " : " + t + ")"
+	return expr, true
 }
 
 func parenthesizeAwaitedExpr(expr string) string {

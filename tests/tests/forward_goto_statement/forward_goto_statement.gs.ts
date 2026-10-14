@@ -263,7 +263,7 @@ export function nestedInnerBreakWithGoto(limit: number): number {
 
 export async function rangeFuncBreakIterator(_yield: ((_p0: number) => boolean | globalThis.Promise<boolean>) | null): globalThis.Promise<void> {
 	for (let i = 0; i < 3; i++) {
-		if (!await _yield!(i)) {
+		if (!(__goscriptAwait = _yield!(i), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)) {
 			return
 		}
 	}
@@ -342,6 +342,8 @@ export async function main(): globalThis.Promise<void> {
 		break
 	}
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

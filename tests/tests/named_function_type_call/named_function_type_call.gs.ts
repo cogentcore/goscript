@@ -198,12 +198,12 @@ export class MorphismHolder {
 
 	public async apply(s: Shape | null): globalThis.Promise<number> {
 		const h: MorphismHolder | $.VarRef<MorphismHolder> | null = this;
-		return $.pointerValue<Exclude<Shape, null>>((await $.pointerValue<MorphismHolder>(h).morphism!(s))).Stats()
+		return (__goscriptAwait = $.pointerValue<Exclude<Shape, null>>((__goscriptAwait = $.pointerValue<MorphismHolder>(h).morphism!(s), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)).Stats(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 	}
 
 	public async cloneApply(s: Shape | null): globalThis.Promise<number> {
 		const h: MorphismHolder | $.VarRef<MorphismHolder> | null = this;
-		return $.pointerValue<Exclude<Shape, null>>((await $.pointerValue<MorphismHolder>(cloneMorphism($.pointerValue<MorphismHolder>(h).morphism)).morphism!(s))).Stats()
+		return (__goscriptAwait = $.pointerValue<Exclude<Shape, null>>((__goscriptAwait = $.pointerValue<MorphismHolder>(cloneMorphism($.pointerValue<MorphismHolder>(h).morphism)).morphism!(s), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)).Stats(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -272,7 +272,7 @@ export async function walkWithCustomFunc(fs: Filesystem | null, path: string, in
 	// This should generate: walkFn!(path, info, nil)
 	// But currently generates: walkFn(path, info, nil) - missing !
 	{
-		let err = await walkFn!(path, info, null)
+		let err = (__goscriptAwait = walkFn!(path, info, null), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 		if ((err != null) && (!$.comparableEqual(err, filepath.SkipDir))) {
 			return err
 		}
@@ -282,7 +282,7 @@ export async function walkWithCustomFunc(fs: Filesystem | null, path: string, in
 	let walkErr: $.GoError = null
 	// This should also generate: walkFn!(path, info, walkErr)
 	{
-		let err = await walkFn!(path, info, walkErr)
+		let err = (__goscriptAwait = walkFn!(path, info, walkErr), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 		if ((err != null) && (!$.comparableEqual(err, filepath.SkipDir))) {
 			return err
 		}
@@ -290,7 +290,7 @@ export async function walkWithCustomFunc(fs: Filesystem | null, path: string, in
 
 	// Test case 3: Call in if statement condition
 	// This should generate: walkFn!(path, info, nil)
-	if (await walkFn!(path, info, null) != null) {
+	if ((__goscriptAwait = walkFn!(path, info, null), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) != null) {
 		return filepath.SkipDir
 	}
 
@@ -307,7 +307,7 @@ export async function multiCallback(walkFn: ((path: string, info: FileInfo | nul
 	// Test case 5: Multiple function parameters
 	// Both should generate ! operators
 	{
-		let err = await walkFn!("test", null, null)
+		let err = (__goscriptAwait = walkFn!("test", null, null), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 		if (err != null) {
 			return err
 		}
@@ -320,7 +320,7 @@ export async function indexedCallback(cbs: $.Slice<((_p0: string) => boolean | g
 }
 
 export async function useMorphism(m: ((_p0: Shape | null) => Shape | null | globalThis.Promise<Shape | null>) | null, s: Shape | null): globalThis.Promise<number> {
-	return $.pointerValue<Exclude<Shape, null>>((await m!(s))).Stats()
+	return (__goscriptAwait = $.pointerValue<Exclude<Shape, null>>((__goscriptAwait = m!(s), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)).Stats(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 }
 
 export async function newMorphismHolder(m: ((_p0: Shape | null) => Shape | null | globalThis.Promise<Shape | null>) | null): globalThis.Promise<MorphismHolder | $.VarRef<MorphismHolder> | null> {
@@ -338,17 +338,17 @@ export async function main(): globalThis.Promise<void> {
 	// Test the walk function with custom WalkFunc
 	let walkFunc: ((path: string, info: FileInfo | null, err: $.GoError) => $.GoError | globalThis.Promise<$.GoError>) | null = $.functionValue(async (path: string, info: FileInfo | null, err: $.GoError): globalThis.Promise<$.GoError> => {
 		if (info != null) {
-			await $.println("Walking:", path, "size:", await $.pointerValue<Exclude<FileInfo, null>>(info).Size())
+			await $.println("Walking:", path, "size:", (__goscriptAwait = $.pointerValue<Exclude<FileInfo, null>>(info).Size(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		}
 		if (err != null) {
-			await $.println("Error:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+			await $.println("Error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		}
 		return null
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string"), "main.FileInfo", "error"], results: ["error"] } as $.FunctionTypeInfo))
 
 	let err = await walkWithCustomFunc($.interfaceValue<Filesystem | null>(fs, "*main.MockFilesystem", /* @__PURE__ */ $.pointerType("main.MockFilesystem")), "/test", $.interfaceValue<FileInfo | null>(fileInfo, "*main.MockFileInfo", /* @__PURE__ */ $.pointerType("main.MockFileInfo")), walkFunc)
 	if (err != null) {
-		await $.println("Walk error:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+		await $.println("Walk error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	}
 
 	// Test with processFiles
@@ -359,13 +359,13 @@ export async function main(): globalThis.Promise<void> {
 
 	let err2 = await processFiles("*.go", processFunc)
 	if (err2 != null) {
-		await $.println("Process error:", await $.pointerValue<Exclude<$.GoError, null>>(err2).Error())
+		await $.println("Process error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err2).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	}
 
 	// Test with multiCallback
 	let err3 = await multiCallback(walkFunc, processFunc)
 	if (err3 != null) {
-		await $.println("Multi callback error:", await $.pointerValue<Exclude<$.GoError, null>>(err3).Error())
+		await $.println("Multi callback error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err3).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	}
 
 	await indexedCallback($.arrayToSlice<((_p0: string) => boolean | globalThis.Promise<boolean>) | null>([$.functionValue(async (value: string): globalThis.Promise<boolean> => {
@@ -381,6 +381,8 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("Cloned field morphism:", await MorphismHolder.prototype.cloneApply.call(holder, $.interfaceValue<Shape | null>(shape, "*main.shapeNode", /* @__PURE__ */ $.pointerType("main.shapeNode"))))
 	$.pointerValue<morphismWorker>(worker).ready!.close()
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

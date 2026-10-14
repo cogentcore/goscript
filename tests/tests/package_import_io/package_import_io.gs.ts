@@ -285,10 +285,10 @@ export async function copyInterfaces(dst: io.Writer | null, src: io.Reader | nul
 
 export async function main(): globalThis.Promise<void> {
 	// Test basic error variables
-	await $.println("EOF:", await $.pointerValue<Exclude<$.GoError, null>>(io.EOF).Error())
-	await $.println("ErrClosedPipe:", await $.pointerValue<Exclude<$.GoError, null>>(io.ErrClosedPipe).Error())
-	await $.println("ErrShortWrite:", await $.pointerValue<Exclude<$.GoError, null>>(io.ErrShortWrite).Error())
-	await $.println("ErrUnexpectedEOF:", await $.pointerValue<Exclude<$.GoError, null>>(io.ErrUnexpectedEOF).Error())
+	await $.println("EOF:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(io.EOF).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println("ErrClosedPipe:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(io.ErrClosedPipe).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println("ErrShortWrite:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(io.ErrShortWrite).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println("ErrUnexpectedEOF:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(io.ErrUnexpectedEOF).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
 	// Test seek constants
 	await $.println("SeekStart:", 0)
@@ -402,6 +402,8 @@ export async function main(): globalThis.Promise<void> {
 
 	await $.println("test finished")
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

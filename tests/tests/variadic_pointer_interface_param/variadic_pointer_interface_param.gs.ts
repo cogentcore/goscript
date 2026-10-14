@@ -65,8 +65,10 @@ export function replace(to: Expr | null, exprs: $.Slice<$.VarRef<Expr | null> | 
 export async function main(): globalThis.Promise<void> {
 	let expr: $.VarRef<Expr | null> = $.varRef($.interfaceValue<Expr | null>(new lit({n: 1}), "*main.lit", /* @__PURE__ */ $.pointerType("main.lit")))
 	let next: Expr | null = $.interfaceValue<Expr | null>(new lit({n: 7}), "*main.lit", /* @__PURE__ */ $.pointerType("main.lit"))
-	await $.println(replace(next, $.arrayToSlice<$.VarRef<Expr | null> | null>([expr])), await $.pointerValue<Exclude<Expr, null>>(expr.value).Value())
+	await $.println(replace(next, $.arrayToSlice<$.VarRef<Expr | null> | null>([expr])), (__goscriptAwait = $.pointerValue<Exclude<Expr, null>>(expr.value).Value(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()
