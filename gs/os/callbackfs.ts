@@ -102,12 +102,26 @@ function callbackErrorValue(err: unknown): unknown {
   return new callbackFSError(String(err), '')
 }
 
-let callbackWorkingDir = '/'
+// callbackWorkingDir is the working directory set by callbackFSSetwd, or
+// null before it is set.
+let callbackWorkingDir: string | null = null
 
 // callbackFSGetwd returns the working directory used to resolve relative
 // paths on a callback filesystem, which has no working directory of its own.
+// Until one is set, it is the result of the cwd function of the filesystem,
+// if it has one (such as the host filesystem of browser package tests), or /.
 export function callbackFSGetwd(): string {
-  return callbackWorkingDir
+  if (callbackWorkingDir !== null) {
+    return callbackWorkingDir
+  }
+  const cwd = getCallbackFS()?.cwd
+  if (typeof cwd === 'function') {
+    const dir = (cwd as () => unknown)()
+    if (typeof dir === 'string' && dir.startsWith('/')) {
+      return dir
+    }
+  }
+  return '/'
 }
 
 // callbackFSSetwd sets the working directory used to resolve relative paths
@@ -121,7 +135,7 @@ export function callbackFSSetwd(dir: string): void {
 export function callbackFSPath(path: string): string {
   const full =
     path.startsWith('/') ? path : (
-      callbackWorkingDir.replace(/\/+$/, '') + '/' + path
+      callbackFSGetwd().replace(/\/+$/, '') + '/' + path
     )
   const parts: string[] = []
   for (const part of full.split('/')) {

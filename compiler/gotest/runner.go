@@ -24,7 +24,8 @@ const combinedRuntimeResultPrefix = "__GOSCRIPT_PACKAGE_RESULT__"
 
 const browserAmbientTypesFile = "goscript-browser.d.ts"
 
-const browserAmbientTypes = "declare module \"vitest\" {\n\texport function test(name: string, fn: () => void | Promise<void>): void\n}\n"
+const browserAmbientTypes = "declare module \"vitest\" {\n\texport function test(name: string, fn: () => void | Promise<void>): void\n}\n" +
+	"declare module \"vitest/browser\" {\n\texport const commands: Record<string, (...args: any[]) => Promise<any>>\n}\n"
 
 // runtimeStylePattern matches terminal styles added by runtime reporters.
 var runtimeStylePattern = regexp.MustCompile(`\x1b\[[0-9;]*m`)
@@ -90,6 +91,7 @@ func (r *Runner) Run(ctx context.Context, req *Request) (*Result, error) {
 		return result, nil
 	}
 
+	// An invalid -bench pattern fails every package before any is built.
 	var benchPattern *regexp.Regexp
 	if norm.Bench != "" {
 		benchPattern, err = regexp.Compile(norm.Bench)
@@ -162,9 +164,15 @@ func (r *Runner) Run(ctx context.Context, req *Request) (*Result, error) {
 		nodeTypesAvailable = false
 	}
 	if norm.RuntimeBackend == RuntimeBackendBrowser {
-		if phase := workspace.WriteFile(tsworkspace.PhaseWorkspace, browserAmbientTypesFile, browserAmbientTypes); phase.Failed() {
-			markAllFailures(result, OwnerTestRunner, phase.Error)
-			return result, nil
+		for file, content := range map[string]string{
+			browserAmbientTypesFile: browserAmbientTypes,
+			browserHostFSServerFile: browserHostFSServer,
+			browserHostFSClientFile: browserHostFSClient,
+		} {
+			if phase := workspace.WriteFile(tsworkspace.PhaseWorkspace, file, content); phase.Failed() {
+				markAllFailures(result, OwnerTestRunner, phase.Error)
+				return result, nil
+			}
 		}
 	} else if phase := workspace.EnsureNodeAmbientTypes(); phase.Failed() {
 		markAllFailures(result, OwnerTestRunner, phase.Error)
@@ -614,7 +622,7 @@ func (r *Runner) runPackageBrowserRuntime(
 	if phase := workspace.WriteFile(
 		tsworkspace.PhaseWorkspace,
 		configFile,
-		renderBrowserVitestConfig(req, outputRoot, packageRunnerFile(idx)),
+		renderBrowserVitestConfig(req, outputRoot, packageRunnerFile(idx), result.Packages[idx].SourceDir),
 	); phase.Failed() {
 		result.Packages[idx].Action = ActionFail
 		result.Packages[idx].Owner = OwnerTestRunner
@@ -1114,6 +1122,7 @@ func renderRunner(result PackageResult, req *normalizedRequest) string {
 
 func renderBrowserRunner(result PackageResult, req *normalizedRequest) string {
 	var b strings.Builder
+	b.WriteString("import { hostFSReady } from \"./" + browserHostFSClientFile + "\"\n")
 	b.WriteString("import { test } from \"vitest\"\n")
 	b.WriteString("import { runTests } from \"@goscript/testing/runner.js\"\n")
 	imports := runnerImports(result.Tests)
@@ -1139,6 +1148,7 @@ func renderBrowserRunner(result PackageResult, req *normalizedRequest) string {
 	b.WriteString("\tconsole.log = (...args) => __goscriptLogs.push(args.map((arg) => String(arg)).join(' '))\n")
 	writeRuntimeRecordFunction(&b, "\t")
 	b.WriteString("\ttry {\n")
+	b.WriteString("\t\tawait hostFSReady()\n")
 	b.WriteString("\t\tconst result = await runTests(")
 	b.WriteString(strconv.Quote(result.PackagePath))
 	b.WriteString(", [\n")
@@ -1367,6 +1377,7 @@ func writeRunnerTests(b *strings.Builder, indent string, tests []Test, alias fun
 
 // writeRunOptions writes the runTests options that follow the verbose option.
 func writeRunOptions(b *strings.Builder, req *normalizedRequest) {
+	// Count and short are always passed; the benchmark time only with -bench.
 	b.WriteString(", count: ")
 	b.WriteString(strconv.Itoa(req.Count))
 	b.WriteString(", short: ")
@@ -1477,7 +1488,7 @@ func browserLaunchOptions(req *normalizedRequest) string {
 	return "{ launchOptions: { " + strings.Join(options, ", ") + " } }"
 }
 
-func renderBrowserVitestConfig(req *normalizedRequest, outputRoot string, runnerFile string) string {
+func renderBrowserVitestConfig(req *normalizedRequest, outputRoot string, runnerFile string, sourceDir string) string {
 	outputRoot = filepath.ToSlash(outputRoot)
 	runnerFile = filepath.ToSlash(runnerFile)
 	timeoutMS := int64(30000)
@@ -1487,7 +1498,8 @@ func renderBrowserVitestConfig(req *normalizedRequest, outputRoot string, runner
 
 	var b strings.Builder
 	b.WriteString("import { defineConfig } from \"vitest/config\"\n")
-	b.WriteString("import { playwright } from \"@vitest/browser-playwright\"\n\n")
+	b.WriteString("import { playwright } from \"@vitest/browser-playwright\"\n")
+	b.WriteString("import { hostFS } from \"./" + browserHostFSServerFile + "\"\n\n")
 	b.WriteString("export default defineConfig({\n")
 	b.WriteString("  test: {\n")
 	b.WriteString("    include: [")
@@ -1500,6 +1512,9 @@ func renderBrowserVitestConfig(req *normalizedRequest, outputRoot string, runner
 	b.WriteString(browserLaunchOptions(req))
 	b.WriteString("),\n")
 	b.WriteString("      instances: [{ browser: \"chromium\" }],\n")
+	b.WriteString("      commands: { " + browserHostFSCommand + ": hostFS(")
+	b.WriteString(strconv.Quote(filepath.ToSlash(sourceDir)))
+	b.WriteString(") },\n")
 	b.WriteString("    },\n")
 	b.WriteString("    testTimeout: ")
 	b.WriteString(strconv.FormatInt(timeoutMS, 10))
@@ -1547,6 +1562,7 @@ func renderTypeScriptProject(req *normalizedRequest, outputRoot string, runnerFi
 	b.WriteString("    \"paths\": {\n")
 	if req.RuntimeBackend == RuntimeBackendBrowser {
 		b.WriteString("      \"vitest\": [\"./" + browserAmbientTypesFile + "\"],\n")
+		b.WriteString("      \"vitest/browser\": [\"./" + browserAmbientTypesFile + "\"],\n")
 	}
 	b.WriteString("      \"*\": [\"./*\"],\n")
 	b.WriteString("      \"@goscript/*\": [")
@@ -1610,6 +1626,7 @@ func renderRuntimeTypeScriptProject(req *normalizedRequest, outputRoots []string
 	b.WriteString("    \"paths\": {\n")
 	if req.RuntimeBackend == RuntimeBackendBrowser {
 		b.WriteString("      \"vitest\": [\"./" + browserAmbientTypesFile + "\"],\n")
+		b.WriteString("      \"vitest/browser\": [\"./" + browserAmbientTypesFile + "\"],\n")
 	}
 	b.WriteString("      \"*\": [\"./*\"],\n")
 	b.WriteString("      \"@goscript/*\": [")

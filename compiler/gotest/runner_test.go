@@ -164,6 +164,7 @@ func TestRunnerReportsShortMode(t *testing.T) {
 }
 
 func TestRunnerRunsBenchmarks(t *testing.T) {
+	// The package has one test and three benchmarks.
 	moduleDir := writeFixture(t, map[string]string{
 		"go.mod": "module example.test/bench\n\ngo 1.25.3\n",
 		"value_test.go": strings.Join([]string{
@@ -193,6 +194,7 @@ func TestRunnerRunsBenchmarks(t *testing.T) {
 		}, "\n"),
 	})
 
+	// run passes the package with the given -bench pattern.
 	run := func(bench string) *Result {
 		result, err := NewRunner().Run(context.Background(), &Request{
 			Dir:       moduleDir,
@@ -210,6 +212,7 @@ func TestRunnerRunsBenchmarks(t *testing.T) {
 		return result
 	}
 
+	// The pattern selects the matching benchmarks only.
 	output := run("Sum|Loop").Packages[0].Output
 	for _, want := range []string{"BenchmarkSum\t", "BenchmarkLoop\t", " ns/op"} {
 		if !strings.Contains(output, want) {
@@ -1280,7 +1283,7 @@ func TestRunnerReportsBrowserRuntimeFailureRecord(t *testing.T) {
 
 func TestBrowserVitestConfigLaunchOptions(t *testing.T) {
 	// Without launch options the provider keeps its defaults.
-	config := renderBrowserVitestConfig(&normalizedRequest{}, "/out", "runner-0.ts")
+	config := renderBrowserVitestConfig(&normalizedRequest{}, "/out", "runner-0.ts", "/src/pkg")
 	if !strings.Contains(config, "provider: playwright(),") {
 		t.Fatalf("expected default playwright provider, got:\n%s", config)
 	}
@@ -1289,10 +1292,23 @@ func TestBrowserVitestConfigLaunchOptions(t *testing.T) {
 	config = renderBrowserVitestConfig(&normalizedRequest{
 		BrowserChannel: "chrome",
 		BrowserArgs:    []string{"--enable-unsafe-webgpu", "--use-angle=metal"},
-	}, "/out", "runner-0.ts")
+	}, "/out", "runner-0.ts", "/src/pkg")
 	want := `provider: playwright({ launchOptions: { channel: "chrome", args: ["--enable-unsafe-webgpu", "--use-angle=metal"] } }),`
 	if !strings.Contains(config, want) {
 		t.Fatalf("expected %q in config, got:\n%s", want, config)
+	}
+}
+
+func TestBrowserVitestConfigHostFS(t *testing.T) {
+	// The host filesystem command resolves paths in the package directory.
+	config := renderBrowserVitestConfig(&normalizedRequest{}, "/out", "runner-0.ts", "/src/pkg")
+	for _, want := range []string{
+		`import { hostFS } from "./goscript-browser-hostfs.mts"`,
+		`commands: { goscriptHostFS: hostFS("/src/pkg") },`,
+	} {
+		if !strings.Contains(config, want) {
+			t.Fatalf("expected %q in config, got:\n%s", want, config)
+		}
 	}
 }
 
