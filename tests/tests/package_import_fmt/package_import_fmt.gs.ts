@@ -190,7 +190,7 @@ export async function main(): globalThis.Promise<void> {
 }
 
 export async function num_String(f: num): globalThis.Promise<string> {
-	return fmt.Sprintf("%.*g", $.basicInterfaceValue(7, "int"), $.basicInterfaceValue($.float32(f), "float32"))
+	return fmt.Sprintf("%.*g", $.basicInterfaceValue(7, "int"), $.basicInterfaceValue(f, "float32"))
 }
 
 export async function sliceVerbs(): globalThis.Promise<void> {

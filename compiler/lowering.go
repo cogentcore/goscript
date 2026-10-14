@@ -5780,25 +5780,25 @@ func lowerCompoundAssignValue(
 	case token.ADD_ASSIGN:
 		value := left + " + " + right
 		if isFloat32Type(targetType) {
-			return runtimeOwner.QualifiedHelper(RuntimeHelperFloat32) + "(" + value + ")"
+			return "globalThis.Math.fround(" + value + ")"
 		}
 		return wrapNarrow(value)
 	case token.SUB_ASSIGN:
 		value := left + " - " + right
 		if isFloat32Type(targetType) {
-			return runtimeOwner.QualifiedHelper(RuntimeHelperFloat32) + "(" + value + ")"
+			return "globalThis.Math.fround(" + value + ")"
 		}
 		return wrapNarrow(value)
 	case token.MUL_ASSIGN:
 		value := left + " * " + right
 		if isFloat32Type(targetType) {
-			return runtimeOwner.QualifiedHelper(RuntimeHelperFloat32) + "(" + value + ")"
+			return "globalThis.Math.fround(" + value + ")"
 		}
 		return wrapNarrow(value)
 	case token.QUO_ASSIGN:
 		value := left + " / " + right
 		if isFloat32Type(targetType) {
-			return runtimeOwner.QualifiedHelper(RuntimeHelperFloat32) + "(" + value + ")"
+			return "globalThis.Math.fround(" + value + ")"
 		}
 		return value
 	case token.REM_ASSIGN:
@@ -8614,7 +8614,7 @@ func (o *LoweringOwner) lowerExpr(ctx lowerFileContext, expr ast.Expr) (string, 
 		}
 		value := left + " " + typed.Op.String() + " " + right
 		if isFloat32Type(ctx.semPkg.source.TypesInfo.TypeOf(typed)) && isFloatBinaryArithmeticOperator(typed.Op) {
-			value = o.runtimeOwner.QualifiedHelper(RuntimeHelperFloat32) + "(" + value + ")"
+			value = "globalThis.Math.fround(" + value + ")"
 		}
 		return value, append(leftDiagnostics, rightDiagnostics...)
 	case *ast.UnaryExpr:
@@ -10154,8 +10154,9 @@ func (o *LoweringOwner) lowerConversionExpr(
 			if isBigIntBackedType(sourceType) {
 				converted = "globalThis.Number(" + value + ")"
 			}
-			if isFloat32Type(targetType) {
-				converted = o.runtimeOwner.QualifiedHelper(RuntimeHelperFloat32) + "(" + converted + ")"
+			// A float32 value is already rounded.
+			if isFloat32Type(targetType) && !isFloat32Type(sourceType) {
+				converted = "globalThis.Math.fround(" + converted + ")"
 			}
 			return converted, diagnostics
 		}
@@ -12927,7 +12928,7 @@ func (o *LoweringOwner) lowerNumericConstantExprForTarget(ctx lowerFileContext, 
 	if ok && tv.Value != nil {
 		if isFloat32Type(targetType) {
 			if value, ok := lowerRealNumericConstantExpr(ctx, expr); ok {
-				return o.runtimeOwner.QualifiedHelper(RuntimeHelperFloat32) + "(" + value + ")", true
+				return "globalThis.Math.fround(" + value + ")", true
 			}
 		}
 		if isBigIntBackedType(targetType) && tv.Value.Kind() == constant.Int {

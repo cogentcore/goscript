@@ -73,7 +73,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// Setting a float32 rounds to float32 precision, as a Go assignment does.
 	let x = 3.14
-	let s: T | $.VarRef<T> | null = new T({A: "aaa", B: $.float32(x)})
+	let s: T | $.VarRef<T> | null = new T({A: "aaa", B: globalThis.Math.fround(x)})
 	let d: T | $.VarRef<T> | null = new T()
 	let dv = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(d, "*main.T", /* @__PURE__ */ $.pointerType("main.T"))))).Elem()))
 	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(dv)).Field(0))).SetString("aaa")

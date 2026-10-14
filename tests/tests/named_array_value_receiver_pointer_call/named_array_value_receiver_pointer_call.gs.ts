@@ -54,7 +54,7 @@ export function Matrix_Scaled(__goscriptReceiver1: Matrix, s: number): Matrix {
 
 export function Matrix_Scale(m: $.VarRef<Matrix> | null, s: number): void {
 	for (let __goscriptRangeTarget0 = $.pointerValue<number[]>(m), __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), i = 0; i < __goscriptRangeWindow0.length; i++) {
-		$.pointerValue<number[]>(m)[i] = $.float32($.pointerValue<number[]>(m)[i] * (s))
+		$.pointerValue<number[]>(m)[i] = globalThis.Math.fround($.pointerValue<number[]>(m)[i] * (s))
 	}
 }
 
@@ -62,7 +62,7 @@ export function Matrix_Sum(__goscriptReceiver2: Matrix): number {
 	let m: Matrix = $.cloneArrayValue(__goscriptReceiver2, "main.Matrix")
 	let t: number = 0
 	for (let __goscriptRangeTarget1 = m, __goscriptRangeWindow1 = $.sliceRange(__goscriptRangeTarget1), i = 0; i < __goscriptRangeWindow1.length; i++) {
-		t = $.float32(t + ($.arrayIndex(m, i)))
+		t = globalThis.Math.fround(t + ($.arrayIndex(m, i)))
 		m[i] = 0
 	}
 	return t
