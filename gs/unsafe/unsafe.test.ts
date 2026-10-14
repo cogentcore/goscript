@@ -1,3 +1,4 @@
+import { goString } from '@goscript/builtin/index.js'
 import { describe, it, expect } from 'vitest'
 import * as $ from '../builtin/index.js'
 import * as unsafe from './unsafe.js'
@@ -44,8 +45,12 @@ describe('unsafe package', () => {
   })
 
   it('round-trips StringData and SliceData through String', () => {
-    expect(unsafe.String(unsafe.StringData('héllo'), 6n)).toBe('héllo')
-    expect(unsafe.String(unsafe.StringData('héllo'), 3)).toBe('hé')
+    expect(unsafe.String(unsafe.StringData(goString('héllo')), 6n)).toBe(
+      goString('héllo'),
+    )
+    expect(unsafe.String(unsafe.StringData(goString('héllo')), 3)).toBe(
+      goString('hé'),
+    )
     const b = $.stringToBytes('bytes')
     expect(unsafe.String(unsafe.SliceData(b), 4)).toBe('byte')
     expect(unsafe.String(null, 0)).toBe('')
@@ -58,7 +63,7 @@ describe('unsafe package', () => {
   })
 
   it('round-trips StringData through Slice as UTF-8 bytes', () => {
-    const ptr = unsafe.StringData('你')
+    const ptr = unsafe.StringData(goString('你'))
 
     expect(Array.from(unsafe.Slice(ptr, 3))).toEqual([0xe4, 0xbd, 0xa0])
   })

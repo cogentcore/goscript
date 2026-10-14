@@ -1,3 +1,4 @@
+import { goString, jsString } from '@goscript/builtin/index.js'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { resetHostRuntimeForTests } from '@goscript/builtin/hostio.js'
 import * as $ from '@goscript/builtin/index.js'
@@ -112,18 +113,20 @@ describe('fmt basic value formatting', () => {
   })
 
   it('%c encodes runes including astral planes and invalid code points', async () => {
-    expect(await fmt.Sprintf('%c', 0x597d)).toBe('好')
+    expect(await fmt.Sprintf('%c', 0x597d)).toBe(goString('好'))
     // U+1F600 is above U+FFFF; fromCharCode would have truncated it.
-    expect(await fmt.Sprintf('%c', 0x1f600)).toBe('😀')
-    expect((await fmt.Sprintf('%c', 0x1f600)).codePointAt(0)).toBe(0x1f600)
+    expect(await fmt.Sprintf('%c', 0x1f600)).toBe(goString('😀'))
+    expect(jsString(await fmt.Sprintf('%c', 0x1f600)).codePointAt(0)).toBe(
+      0x1f600,
+    )
     // Invalid code points map to U+FFFD instead of throwing.
-    expect(await fmt.Sprintf('%c', 0x110000)).toBe('�')
-    expect(await fmt.Sprintf('%c', -1)).toBe('�')
+    expect(await fmt.Sprintf('%c', 0x110000)).toBe(goString('�'))
+    expect(await fmt.Sprintf('%c', -1)).toBe(goString('�'))
   })
 
   it('%q on an astral rune does not throw and round-trips the code point', async () => {
-    expect(await fmt.Sprintf('%q', 0x1f600)).toBe(JSON.stringify('😀'))
-    expect(await fmt.Sprintf('%q', 0x110000)).toBe(JSON.stringify('�'))
+    expect(await fmt.Sprintf('%q', 0x1f600)).toBe(goString('"😀"'))
+    expect(await fmt.Sprintf('%q', 0x110000)).toBe(goString('"�"'))
   })
 
   it('uses the same address for %p and scalar pointers nested in structs', async () => {

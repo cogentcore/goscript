@@ -71,8 +71,22 @@ function quoteWith(
 	graphicOnly: boolean,
 ): string {
 	let out = String.fromCharCode(quote);
-	for (const ch of s) {
-		out += appendEscapedRune(ch.codePointAt(0)!, quote, asciiOnly, graphicOnly);
+	for (let i = 0; i < s.length; ) {
+		const c = s.charCodeAt(i);
+		if (c < 0x80) {
+			out += appendEscapedRune(c, quote, asciiOnly, graphicOnly);
+			i++;
+			continue;
+		}
+		const [r, width] = $.decodeRuneInString(s, i);
+		if (width === 1 && r === 0xfffd) {
+			// An invalid byte is escaped as \xNN, as in Go.
+			out += hexEscape("\\x", c, 2);
+			i++;
+			continue;
+		}
+		out += appendEscapedRune(r, quote, asciiOnly, graphicOnly);
+		i += width;
 	}
 	return out + String.fromCharCode(quote);
 }
