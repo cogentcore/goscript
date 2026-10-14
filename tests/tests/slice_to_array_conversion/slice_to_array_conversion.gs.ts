@@ -7,25 +7,25 @@ export async function main(): globalThis.Promise<void> {
 	let values: $.Slice<number> = new Uint8Array([1, 2, 3]) as $.Slice<number>
 	let array = $.cloneArrayValue(($.sliceToArray<number>($.goSlice(values, 1, undefined), 2, "byte") as Uint8Array), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 2))
 
-	await $.println($.uint($.arrayIndex(array, 0), 8), $.uint($.arrayIndex(array, 1), 8))
+	await $.println($.arrayIndex(array, 0), $.arrayIndex(array, 1))
 	values![1] = 9
-	await $.println($.uint($.arrayIndex(array, 0), 8), $.uint($.arrayIndex(values!, 1), 8))
+	await $.println($.arrayIndex(array, 0), $.arrayIndex(values!, 1))
 
 	// Whole-array writes through converted pointers preserve the slice backing.
 	let bytePointer: $.VarRef<Uint8Array> | null = ($.sliceToArrayPointer<number>($.goSlice(values, 1, undefined), 2, "byte") as $.VarRef<Uint8Array> | null)
 	bytePointer!.value = $.arrayValue(new Uint8Array([7, 8]))
-	await $.println("byte write:", $.uint($.arrayIndex(values!, 0), 8), $.uint($.arrayIndex(values!, 1), 8), $.uint($.arrayIndex(values!, 2), 8))
+	await $.println("byte write:", $.arrayIndex(values!, 0), $.arrayIndex(values!, 1), $.arrayIndex(values!, 2))
 	$.pointerValue<Uint8Array>(bytePointer)[0] = 6
-	await $.println("byte alias:", $.uint($.arrayIndex(values!, 1), 8))
+	await $.println("byte alias:", $.arrayIndex(values!, 1))
 
 	let words: $.Slice<number> = $.arrayToSlice<number>([1, 2, 3, 4])
 	let wordPointer: $.VarRef<number[]> | null = $.sliceToArrayPointer<number>($.goSlice(words, 1, undefined), 2)
 	let replacement = $.arrayValue([20, 30])
 	wordPointer!.value = $.cloneArrayValue(replacement, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint16"), 2))
 	replacement[0] = 99
-	await $.println("word write:", $.uint($.arrayIndex(words!, 0), 16), $.uint($.arrayIndex(words!, 1), 16), $.uint($.arrayIndex(words!, 2), 16), $.uint($.arrayIndex(words!, 3), 16))
+	await $.println("word write:", $.arrayIndex(words!, 0), $.arrayIndex(words!, 1), $.arrayIndex(words!, 2), $.arrayIndex(words!, 3))
 	$.pointerValue<number[]>(wordPointer)[1] = 40
-	await $.println("word alias:", $.uint($.arrayIndex(words!, 2), 16))
+	await $.println("word alias:", $.arrayIndex(words!, 2))
 }
 
 if ($.isMainScript(import.meta)) {

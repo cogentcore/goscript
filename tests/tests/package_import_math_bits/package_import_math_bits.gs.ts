@@ -25,26 +25,24 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("TrailingZeros64", bits.TrailingZeros64(0n), bits.TrailingZeros64(1n), bits.TrailingZeros64(2147483648n), bits.TrailingZeros64(4294967295n), bits.TrailingZeros64(9223372036854775807n), bits.TrailingZeros64(9223372036854775808n), bits.TrailingZeros64(17293822569102704640n), bits.TrailingZeros64(18446744073709551615n))
 	await $.println("OnesCount64", bits.OnesCount64(0n), bits.OnesCount64(1n), bits.OnesCount64(2147483648n), bits.OnesCount64(4294967295n), bits.OnesCount64(9223372036854775807n), bits.OnesCount64(9223372036854775808n), bits.OnesCount64(17293822569102704640n), bits.OnesCount64(18446744073709551615n))
 
-	let __goscriptTuple0: any = bits.Mul32(0, 4294967295)
-	let hi = $.uint(__goscriptTuple0[0], 32)
-	let lo32 = $.uint(__goscriptTuple0[1], 32)
-	await $.println("Mul32-zero", $.uint(hi, 32), $.uint(lo32, 32))
-	let __goscriptTuple1: any = bits.Mul32(1, 4294967295)
-	hi = $.uint(__goscriptTuple1[0], 32)
-	lo32 = $.uint(__goscriptTuple1[1], 32)
-	await $.println("Mul32-one-all", $.uint(hi, 32), $.uint(lo32, 32))
-	let __goscriptTuple2: any = bits.Mul32(2147483648, 2)
-	hi = $.uint(__goscriptTuple2[0], 32)
-	lo32 = $.uint(__goscriptTuple2[1], 32)
-	await $.println("Mul32-bit31-double", $.uint(hi, 32), $.uint(lo32, 32))
-	let __goscriptTuple3: any = bits.Mul32(4294967295, 4294967295)
-	hi = $.uint(__goscriptTuple3[0], 32)
-	lo32 = $.uint(__goscriptTuple3[1], 32)
-	await $.println("Mul32-all-all", $.uint(hi, 32), $.uint(lo32, 32))
-	let __goscriptTuple4: any = bits.Mul32(2147483648, 2147483648)
-	hi = $.uint(__goscriptTuple4[0], 32)
-	lo32 = $.uint(__goscriptTuple4[1], 32)
-	await $.println("Mul32-high-high", $.uint(hi, 32), $.uint(lo32, 32))
+	let [hi, lo32] = bits.Mul32(0, 4294967295)
+	await $.println("Mul32-zero", hi, lo32)
+	let __goscriptTuple0: any = bits.Mul32(1, 4294967295)
+	hi = __goscriptTuple0[0]
+	lo32 = __goscriptTuple0[1]
+	await $.println("Mul32-one-all", hi, lo32)
+	let __goscriptTuple1: any = bits.Mul32(2147483648, 2)
+	hi = __goscriptTuple1[0]
+	lo32 = __goscriptTuple1[1]
+	await $.println("Mul32-bit31-double", hi, lo32)
+	let __goscriptTuple2: any = bits.Mul32(4294967295, 4294967295)
+	hi = __goscriptTuple2[0]
+	lo32 = __goscriptTuple2[1]
+	await $.println("Mul32-all-all", hi, lo32)
+	let __goscriptTuple3: any = bits.Mul32(2147483648, 2147483648)
+	hi = __goscriptTuple3[0]
+	lo32 = __goscriptTuple3[1]
+	await $.println("Mul32-high-high", hi, lo32)
 }
 
 if ($.isMainScript(import.meta)) {

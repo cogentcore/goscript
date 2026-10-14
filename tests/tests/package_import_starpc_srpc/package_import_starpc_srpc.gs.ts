@@ -680,7 +680,7 @@ export async function probeConcurrentStreams(ctx: context.Context | null, client
 	let resultCh: $.Channel<streamProbeResult> | null = $.makeChannel<streamProbeResult>(count, $.markAsStructValue(new streamProbeResult()), "both")
 	for (let __goscriptRangeCount2 = count, i = 0; i < __goscriptRangeCount2; i++) {
 		queueMicrotask(async () => { await (async (idx: number): globalThis.Promise<void> => {
-			let [total, err] = await probeStream(ctx, client, $.uint($.uint(idx + 1, 8), 8), $.uint($.uint(idx + 2, 8), 8))
+			let [total, err] = await probeStream(ctx, client, $.uint(idx + 1, 8), $.uint(idx + 2, 8))
 			if (err != null) {
 				await $.chanSend(resultCh, (await (async () => { const __goscriptLiteralField0 = (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait); return $.markAsStructValue(new streamProbeResult({err: __goscriptLiteralField0})) })()))
 				return
@@ -1136,7 +1136,7 @@ export async function main(): globalThis.Promise<void> {
 		await $.println("stream response length:", $.sliceLen(data))
 		return
 	}
-	await $.println("stream bytes:", $.uint($.arrayIndex(data!, 0), 8))
+	await $.println("stream bytes:", $.arrayIndex(data!, 0))
 	let emptyResp: srpc.RawMessage | $.VarRef<srpc.RawMessage> | null = srpc.NewRawMessage(null, false)
 	{
 		let __goscriptShadow6 = (__goscriptAwait = $.pointerValue<Exclude<srpc.Client, null>>(client).ExecCall(ctx, "svc", "empty", $.interfaceValue<srpc.Message | null>(srpc.NewRawMessage(null, false), "*srpc.RawMessage", /* @__PURE__ */ $.pointerType("srpc.RawMessage")), $.interfaceValue<srpc.Message | null>(emptyResp, "*srpc.RawMessage", /* @__PURE__ */ $.pointerType("srpc.RawMessage"))), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)

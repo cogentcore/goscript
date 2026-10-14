@@ -6,7 +6,7 @@ import * as $ from "@goscript/builtin/index.js"
 export async function main(): globalThis.Promise<void> {
 	let buf: $.Slice<number> = new Uint8Array([1, 2, 3]) as $.Slice<number>
 	$.clear(buf)
-	await $.println("bytes:", $.uint($.arrayIndex(buf!, 0), 8), $.uint($.arrayIndex(buf!, 1), 8), $.uint($.arrayIndex(buf!, 2), 8))
+	await $.println("bytes:", $.arrayIndex(buf!, 0), $.arrayIndex(buf!, 1), $.arrayIndex(buf!, 2))
 
 	let nums: $.Slice<number> = $.arrayToSlice<number>([4, 5, 6, 7])
 	$.clear($.goSlice(nums, 1, 3))

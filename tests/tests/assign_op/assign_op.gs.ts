@@ -22,7 +22,7 @@ export async function main(): globalThis.Promise<void> {
 
 	let unsignedQuotient: number = 5
 	unsignedQuotient = (unsignedQuotient / 2) >>> 0
-	await $.println($.uint(unsignedQuotient, 32))
+	await $.println(unsignedQuotient)
 
 	let d: number = 3
 	d = d * (5)

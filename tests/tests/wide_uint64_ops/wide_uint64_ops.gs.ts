@@ -8,7 +8,7 @@ import "@goscript/math/index.js"
 
 export function hash6(u: bigint, h: number): number {
 	const prime6bytes: number = 227718039650203
-	return $.uint($.uint($.uint64Shr(($.uint64Mul(($.uint64Shl(u, 16n)), 227718039650203n)), ($.uint($.uint64And(($.uint($.uint64Sub(64n, h), 64)), 63n), 64))), 32), 32)
+	return $.uint($.uint64Shr(($.uint64Mul(($.uint64Shl(u, 16n)), 227718039650203n)), ($.uint($.uint64And(($.uint($.uint64Sub(64n, h), 64)), 63n), 64))), 32)
 }
 
 export function mix(a: bigint, b: bigint): bigint {
@@ -55,11 +55,11 @@ export async function main(): globalThis.Promise<void> {
 	let wide = 9223372036854775825n
 	let signed = -4611686018427387901n
 	await $.println(wide, signed, (wide))
-	await $.println($.uint(hash6(4328719365n, 14), 32))
+	await $.println(hash6(4328719365n, 14))
 	await $.println(mix(17361641481138401520n, 1085102592571150095n))
-	await $.println($.uint($.uint($.uint64Shr(highAfterMask(4660n), 48n), 32), 32))
-	await $.println($.uint($.uint($.uint64Shr(combineHighLow(4660n, 48879n), 48n), 32), 32))
-	await $.println($.uint($.uint($.uint64And(combineHighLow(4660n, 48879n), 65535n), 32), 32))
+	await $.println($.uint($.uint64Shr(highAfterMask(4660n), 48n), 32))
+	await $.println($.uint($.uint64Shr(combineHighLow(4660n, 48879n), 48n), 32))
+	await $.println($.uint($.uint64And(combineHighLow(4660n, 48879n), 65535n), 32))
 	await $.println(maxUint64Divisor(4114n))
 	await $.println(maxUint64Remainder(4114n))
 	await $.println(setHighBit(maxUint64Remainder(128n)))

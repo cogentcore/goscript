@@ -30,7 +30,7 @@ export function float64frombits(__goscriptParam3: bigint): number {
 }
 
 export async function main(): globalThis.Promise<void> {
-	await $.println($.uint(float32bits(1.5), 32), $.uint(float32bits(1.5), 32) == $.uint(math.Float32bits(1.5), 32))
+	await $.println(float32bits(1.5), float32bits(1.5) == math.Float32bits(1.5))
 	await $.println(float32frombits(0x40490fdb) == math.Float32frombits(0x40490fdb))
 	await $.println(float64bits(-2.5), float64bits(-2.5) == math.Float64bits(-2.5))
 	await $.println(float64frombits(4614256656552045848n) == math.Pi)
