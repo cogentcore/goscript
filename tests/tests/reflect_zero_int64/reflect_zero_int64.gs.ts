@@ -51,7 +51,7 @@ export class timer {
 
 	public Start(): void {
 		let t: timer | $.VarRef<timer> | null = this;
-		$.assignStruct($.pointerValue<timer>(t).start, $.markAsStructValue($.cloneStructValue(time.Now())))
+		$.assignStruct($.pointerValue<timer>(t).start, time.Now())
 	}
 
 	static __typeInfo = $.registerStructType(

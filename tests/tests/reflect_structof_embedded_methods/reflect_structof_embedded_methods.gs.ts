@@ -117,7 +117,7 @@ export async function main(): globalThis.Promise<void> {
 	let nt = reflect.TypeOf($.interfaceValue($.markAsStructValue(new Node()), "main.Node", "main.Node"))
 	let fields: $.Slice<reflect.StructField> = $.makeSlice<reflect.StructField>((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(nt).NumField(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), undefined, undefined, () => $.markAsStructValue(new reflect.StructField()))
 	for (let __goscriptRangeTarget0 = fields, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), i = 0; i < __goscriptRangeWindow0.length; i++) {
-		$.assignStruct(fields![i], $.markAsStructValue($.cloneStructValue((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(nt).Field(i), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))))
+		$.assignStruct(fields![i], (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(nt).Field(i), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	}
 	let st = reflect.StructOf(fields)
 	await $.println((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(st).NumField(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(st).Field(0), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait).Anonymous, (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(st).Field(1), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait).Name)

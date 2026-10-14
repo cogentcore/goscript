@@ -374,7 +374,7 @@ export function underlying(v: reflect.Value): reflect.Value {
 		if (!$.markAsStructValue($.cloneStructValue(e)).IsValid()) {
 			return $.markAsStructValue($.cloneStructValue(v))
 		}
-		$.assignStruct(v, $.markAsStructValue($.cloneStructValue(e)))
+		$.assignStruct(v, e)
 	}
 	return $.markAsStructValue($.cloneStructValue(v))
 }

@@ -5838,9 +5838,17 @@ func (o *LoweringOwner) lowerAssignStmt(ctx lowerFileContext, stmt *ast.AssignSt
 		right, rightDiagnostics := o.lowerExpr(ctx, stmt.Rhs[idx])
 		diagnostics = append(diagnostics, rightDiagnostics...)
 		targetType := assignmentTargetType(ctx, lhs)
+		// A struct assigned to existing storage is copied into it field by
+		// field, so a value of the same type is not copied first.
+		uncopied := right
 		right = o.lowerValueForTarget(ctx, stmt.Rhs[idx], targetType, right)
 		if targetType != nil && genericCallResultUsesTypeParam(ctx, stmt.Rhs[idx]) {
 			right = "(" + right + " as " + o.tsTypeFor(ctx, targetType) + ")"
+			uncopied = "(" + uncopied + " as " + o.tsTypeFor(ctx, targetType) + ")"
+		}
+		if sourceType := ctx.semPkg.source.TypesInfo.TypeOf(stmt.Rhs[idx]); sourceType == nil || targetType == nil ||
+			!types.Identical(sourceType, targetType) {
+			uncopied = right
 		}
 		if setter, ok := o.packageVarSetterForAssignment(ctx, lhs); ok {
 			value, ok := o.packageVarAssignmentValue(ctx, lhs, targetType, right, stmt.Tok)
@@ -5860,7 +5868,7 @@ func (o *LoweringOwner) lowerAssignStmt(ctx lowerFileContext, stmt *ast.AssignSt
 		diagnostics = append(diagnostics, leftDiagnostics...)
 		star, starTarget := unwrapParenExpr(lhs).(*ast.StarExpr)
 		if !isShortDecl && isStructValueType(targetType) {
-			stmts = append(stmts, loweredStmt{text: o.lowerStructAssignment(left, right)})
+			stmts = append(stmts, loweredStmt{text: o.lowerStructAssignment(left, uncopied)})
 			continue
 		}
 		if starTarget && stmt.Tok == token.ASSIGN {

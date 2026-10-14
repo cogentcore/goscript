@@ -213,7 +213,7 @@ export async function main(): globalThis.Promise<void> {
 		let data = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as any)
 		let [value, __goscriptShadow0] = $.typeAssertTuple<reflect.Value>(data, "reflect.Value")
 		if (!__goscriptShadow0) {
-			$.assignStruct(value, $.markAsStructValue($.cloneStructValue(reflect.ValueOf(data))))
+			$.assignStruct(value, reflect.ValueOf(data))
 		}
 		await $.println("assert", __goscriptShadow0, $.markAsStructValue($.cloneStructValue(value)).Int())
 	}
