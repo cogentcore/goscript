@@ -41,6 +41,10 @@ export interface MethodSignature {
   name: string
   args: MethodArg[]
   returns: MethodArg[]
+  // pointerReceiver is set for a method of a type's method set that is only
+  // in the method set of a pointer to the type, such as a method with a
+  // pointer receiver, so it is not called on a value that is not addressable.
+  pointerReceiver?: boolean
 }
 
 /** MethodParameter encodes a type and an optional declared parameter name. */
@@ -54,12 +58,17 @@ export function methodSignature(
   name: string,
   args: readonly MethodParameter[] = [],
   returns: readonly MethodParameter[] = [],
+  pointerReceiver = false,
 ): MethodSignature {
-  return {
+  const signature: MethodSignature = {
     name,
     args: methodParameters(args, '_p'),
     returns: methodParameters(returns, '_r'),
   }
+  if (pointerReceiver) {
+    signature.pointerReceiver = true
+  }
+  return signature
 }
 
 function methodParameters(

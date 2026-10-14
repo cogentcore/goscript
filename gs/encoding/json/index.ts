@@ -1393,9 +1393,16 @@ function goTypeInfoOf(v: unknown): unknown {
   return typeof t === 'string' && t !== '' ? t : null
 }
 
-function marshalValue(v: unknown, typeInfo?: unknown): unknown {
+// marshalValue encodes v of type typeInfo. addressable reports whether v is
+// addressable in Go, as a slice element or a value reached through a pointer
+// is, so that methods with pointer receivers apply to it.
+function marshalValue(
+  v: unknown,
+  typeInfo?: unknown,
+  addressable = false,
+): unknown {
   typeInfo ??= goTypeInfoOf(v) ?? undefined
-  const marshaler = marshalJSONTarget(v)
+  const marshaler = marshalJSONTarget(v, typeInfo, addressable)
   if (marshaler !== null) {
     const result = marshaler.MarshalJSON()
     if (result instanceof Promise) {
@@ -1407,7 +1414,7 @@ function marshalValue(v: unknown, typeInfo?: unknown): unknown {
     return marshalerResult(data, err)
   }
   if ($.isVarRef(v)) {
-    return marshalValue(v.value, typeInfo)
+    return marshalValue(v.value, typeInfo, true)
   }
   // Unwrap a boxed interface{} value (a named/defined type's value, boxed by
   // the runtime as { __goType, __goValue, ... } so it can carry methods)
@@ -1446,7 +1453,10 @@ function marshalValue(v: unknown, typeInfo?: unknown): unknown {
       info !== null && ($.isSliceTypeInfo(info) || $.isArrayTypeInfo(info)) ?
         info.elemType
       : undefined
-    return v.map((el) => marshalValue(el, elemType))
+    // Slice elements are addressable; array elements are when the array is.
+    const elemAddressable =
+      info === null || !$.isArrayTypeInfo(info) || addressable
+    return v.map((el) => marshalValue(el, elemType, elemAddressable))
   }
   if (v instanceof Map) {
     const mapInfo = info !== null && $.isMapTypeInfo(info) ? info : null
@@ -1466,20 +1476,35 @@ function marshalValue(v: unknown, typeInfo?: unknown): unknown {
     }
     return out
   }
-  if (!isStructValue(v)) {
+  // An anonymous struct value stores its fields on the object itself.
+  const anonymousFields =
+    isStructValue(v) ? null : anonymousStructValueFields(v)
+  if (!isStructValue(v) && anonymousFields === null) {
     return v
   }
+  const fieldValues: Record<string, unknown> =
+    isStructValue(v) ? v._fields : (v as Record<string, unknown>)
 
+  // Fields are addressable when the struct is or is reached via a pointer.
+  const fieldsAddressable = !isStructValueType(typeInfo) || addressable
   const out: Record<string, unknown> = {}
-  for (const { jsonName, owner, field } of jsonStructFields(v)) {
+  const fields =
+    anonymousFields !== null ?
+      anonymousFields.map((field) => ({
+        jsonName: jsonFieldName(field.name, field.tag),
+        owner: fieldValues,
+        field,
+      }))
+    : jsonStructFields(v as { _fields: Record<string, unknown> })
+  for (const { jsonName, owner, field } of fields) {
     const value = owner[field.key]
-    if (value === undefined) {
+    if (jsonName === '' || value === undefined) {
       continue
     }
     if (jsonOmitEmpty(field.tag) && isEmptyValue(value, field.type)) {
       continue
     }
-    out[jsonName] = marshalFieldValue(value, field.type)
+    out[jsonName] = marshalFieldValue(value, field.type, fieldsAddressable)
   }
   return out
 }
@@ -1590,7 +1615,11 @@ function isPointerOrInterfaceFieldType(fieldType: unknown): boolean {
   return kind === $.TypeKind.Pointer || kind === $.TypeKind.Interface
 }
 
-function marshalFieldValue(value: unknown, fieldType: unknown): unknown {
+function marshalFieldValue(
+  value: unknown,
+  fieldType: unknown,
+  addressable: boolean,
+): unknown {
   if (isRawMessageType(fieldType)) {
     const target = $.isVarRef(value) ? value.value : value
     if (target === null || target === undefined) {
@@ -1616,10 +1645,45 @@ function marshalFieldValue(value: unknown, fieldType: unknown): unknown {
   ) {
     return Number($.formatFloat(value, 'g', -1, 32))
   }
-  return marshalValue(value, fieldType)
+  return marshalValue(value, fieldType, addressable)
 }
 
-function marshalJSONTarget(value: unknown): Marshaler | null {
+// isStructValueType reports whether typeInfo is a struct type, rather than a
+// pointer to one, so that a value of it has only the value method set.
+function isStructValueType(typeInfo: unknown): boolean {
+  if (typeof typeInfo === 'string') {
+    if (typeInfo.startsWith('*')) {
+      return false
+    }
+    if (typeInfo.startsWith('struct{') || typeInfo.startsWith('struct {')) {
+      return true
+    }
+  }
+  const info = resolveTypeInfo(typeInfo)
+  return info !== null && info.kind === $.TypeKind.Struct
+}
+
+// pointerReceiverMethod reports whether the method name of the struct type
+// typeInfo is only in the method set of a pointer to the type.
+function pointerReceiverMethod(typeInfo: unknown, name: string): boolean {
+  const info = resolveTypeInfo(typeInfo)
+  if (info === null || !$.isStructTypeInfo(info)) {
+    return false
+  }
+  return info.methods.some(
+    (method) => method.name === name && method.pointerReceiver === true,
+  )
+}
+
+// marshalJSONTarget returns value as a Marshaler when its method set has
+// MarshalJSON. As in Go, a struct value that is not addressable does not
+// have the methods with pointer receivers, which lets such a MarshalJSON
+// marshal the value it points to with the default encoding.
+function marshalJSONTarget(
+  value: unknown,
+  typeInfo?: unknown,
+  addressable = true,
+): Marshaler | null {
   const target = $.isVarRef(value) ? value.value : value
   if (target === null || target === undefined) {
     return null
@@ -1628,7 +1692,17 @@ function marshalJSONTarget(value: unknown): Marshaler | null {
     return null
   }
   const method = Reflect.get(target, 'MarshalJSON')
-  return typeof method === 'function' ? (target as Marshaler) : null
+  if (typeof method !== 'function') {
+    return null
+  }
+  if (
+    !addressable &&
+    isStructValueType(typeInfo) &&
+    pointerReceiverMethod(typeInfo, 'MarshalJSON')
+  ) {
+    return null
+  }
+  return target as Marshaler
 }
 
 function unmarshalJSONTarget(value: unknown): Unmarshaler | null {
@@ -2571,6 +2645,25 @@ function structFields(value: {
     return fields
   }
   return Object.keys(value._fields).map((key) => ({ key, name: key }))
+}
+
+// anonymousStructValueFields returns the fields of an anonymous struct
+// value, which carries its descriptor instead of a class, or null for any
+// other value.
+function anonymousStructValueFields(value: unknown): fieldMetadata[] | null {
+  if (value === null || typeof value !== 'object' || Array.isArray(value)) {
+    return null
+  }
+  const info = resolveTypeInfo($.structValueTypeInfo(value))
+  if (info === null || !$.isStructTypeInfo(info)) {
+    return null
+  }
+  return info.fields.map((field) => ({
+    key: $.structFieldRuntimeKey(field),
+    name: field.name,
+    type: field.type,
+    ...(typeof field.tag === 'string' ? { tag: field.tag } : {}),
+  }))
 }
 
 function structFieldMetadata(value: unknown): fieldMetadata[] {

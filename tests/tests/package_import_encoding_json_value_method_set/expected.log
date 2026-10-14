@@ -1,0 +1,6 @@
+{"wrapped":{"A":1,"B":"x"}} true
+{"A":2,"B":"y"} true
+[{"wrapped":{"A":3,"B":""}}] true
+[{"wrapped":{"A":4,"B":""}}] true
+{"N":{"A":5,"B":""}} true
+{"N":{"wrapped":{"A":6,"B":""}}} true

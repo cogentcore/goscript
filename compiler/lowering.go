@@ -3345,28 +3345,58 @@ func (o *LoweringOwner) runtimeMethodAssertSignaturesWithSeen(ctx lowerFileConte
 }
 
 func (o *LoweringOwner) runtimeMethodSignature(method *types.Func, seen map[types.Type]bool) string {
+	return o.runtimeReceiverMethodSignature(method, false, seen)
+}
+
+// runtimeReceiverMethodSignature describes a method of a type's method set.
+// A method that is only in the method set of a pointer to the type, such as
+// one with a pointer receiver, is marked so that the runtime can leave it
+// out of the method set of a value that is not addressable, as Go does.
+func (o *LoweringOwner) runtimeReceiverMethodSignature(method *types.Func, pointerOnly bool, seen map[types.Type]bool) string {
 	helper := o.runtimeOwner.QualifiedHelper(RuntimeHelperMethodSignature)
 	args := []string{strconv.Quote(method.Name())}
 	signature, _ := method.Type().(*types.Signature)
 	if signature != nil {
-		if signature.Params().Len() != 0 || signature.Results().Len() != 0 {
+		if signature.Params().Len() != 0 || signature.Results().Len() != 0 || pointerOnly {
 			args = append(args, o.runtimeMethodParameters(signature.Params(), seen))
 		}
-		if signature.Results().Len() != 0 {
+		if signature.Results().Len() != 0 || pointerOnly {
 			args = append(args, o.runtimeMethodParameters(signature.Results(), seen))
 		}
+	}
+	if pointerOnly {
+		args = append(args, "true")
 	}
 	return helper + "(" + strings.Join(args, ", ") + ")"
 }
 
 func (o *LoweringOwner) runtimeTrimmedMethodSignature(method *types.Func, seen map[types.Type]bool) string {
+	return o.runtimeTrimmedReceiverMethodSignature(method, false, seen)
+}
+
+func (o *LoweringOwner) runtimeTrimmedReceiverMethodSignature(method *types.Func, pointerOnly bool, seen map[types.Type]bool) string {
+	pointerReceiver := ""
+	if pointerOnly {
+		pointerReceiver = ", pointerReceiver: true"
+	}
 	signature, _ := method.Type().(*types.Signature)
 	if signature == nil {
-		return "{ name: " + strconv.Quote(method.Name()) + ", args: [], returns: [] }"
+		return "{ name: " + strconv.Quote(method.Name()) + ", args: [], returns: []" + pointerReceiver + " }"
 	}
 	return "{ name: " + strconv.Quote(method.Name()) +
 		", args: " + o.runtimeTrimmedMethodArgs(signature.Params()) +
-		", returns: " + o.runtimeTrimmedMethodReturns(signature.Results(), seen) + " }"
+		", returns: " + o.runtimeTrimmedMethodReturns(signature.Results(), seen) + pointerReceiver + " }"
+}
+
+// hasPointerReceiver reports whether method is declared with a pointer
+// receiver.
+func hasPointerReceiver(method *types.Func) bool {
+	signature, _ := method.Type().(*types.Signature)
+	if signature == nil || signature.Recv() == nil {
+		return false
+	}
+	_, ok := types.Unalias(signature.Recv().Type()).(*types.Pointer)
+	return ok
 }
 
 func (o *LoweringOwner) runtimeMethodAssertSignature(ctx lowerFileContext, method *types.Func, seen map[types.Type]bool) string {
@@ -3702,9 +3732,11 @@ func (o *LoweringOwner) lowerEmbeddedMethodForwarders(
 	// receiver value, so its forwarders pass the field value instead of
 	// selecting a method on it. Only value methods are promoted this way.
 	var valueReceiver *types.Named
+	var valueMethodSet *types.MethodSet
 	methodSetType := field.typ
 	if named := namedStructType(field.typ); named != nil {
 		methodSetType = types.NewPointer(field.typ)
+		valueMethodSet = types.NewMethodSet(field.typ)
 	} else if pointerToNamedStructType(field.typ) != nil {
 		methodSetType = field.typ
 	} else if _, ok := types.Unalias(field.typ).Underlying().(*types.Interface); ok {
@@ -3731,14 +3763,18 @@ func (o *LoweringOwner) lowerEmbeddedMethodForwarders(
 		if signature == nil {
 			continue
 		}
+		// A method promoted from an embedded struct value is only in the
+		// method set of a pointer to the outer type when it is not in the
+		// method set of the embedded value.
+		pointerOnly := valueMethodSet != nil && valueMethodSet.Lookup(method.Pkg(), method.Name()) == nil
 		async := o.functionAsync(ctx, method)
 		lowered := loweredFunction{
 			async:                   async,
 			sourcePath:              ctx.sourcePath,
 			name:                    methodMemberName(method.Name()),
 			runtimeName:             method.Name(),
-			runtimeSignature:        o.runtimeMethodSignature(method, make(map[types.Type]bool)),
-			runtimeTrimmedSignature: o.runtimeTrimmedMethodSignature(method, make(map[types.Type]bool)),
+			runtimeSignature:        o.runtimeReceiverMethodSignature(method, pointerOnly, make(map[types.Type]bool)),
+			runtimeTrimmedSignature: o.runtimeTrimmedReceiverMethodSignature(method, pointerOnly, make(map[types.Type]bool)),
 			result:                  asyncResultType("any", async),
 			deferState:              &loweredDeferState{},
 		}
@@ -4080,8 +4116,9 @@ func (o *LoweringOwner) lowerFuncDecl(ctx lowerFileContext, decl *ast.FuncDecl) 
 		namedResults:  o.lowerNamedResults(functionCtx, signature),
 	}
 	if decl.Recv != nil {
-		lowered.runtimeSignature = o.runtimeMethodSignature(fnObj, make(map[types.Type]bool))
-		lowered.runtimeTrimmedSignature = o.runtimeTrimmedMethodSignature(fnObj, make(map[types.Type]bool))
+		pointerOnly := hasPointerReceiver(fnObj)
+		lowered.runtimeSignature = o.runtimeReceiverMethodSignature(fnObj, pointerOnly, make(map[types.Type]bool))
+		lowered.runtimeTrimmedSignature = o.runtimeTrimmedReceiverMethodSignature(fnObj, pointerOnly, make(map[types.Type]bool))
 	}
 	if signature.TypeParams() != nil && signature.TypeParams().Len() != 0 {
 		lowered.typeParams = signatureTypeParamNames(signature)
