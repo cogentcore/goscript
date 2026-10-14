@@ -1,5 +1,8 @@
 import type { Slice, SliceProxy, StringHeaderData } from './slice.js'
 import {
+  arrayValueTypeInfo,
+  cloneArrayValue,
+  isArrayValue,
   isTypeInfoComparable,
   pointerIdentityEqual,
   resolveTypeInfo,
@@ -154,6 +157,10 @@ function assignFieldValue(
       target[i] = assignFieldValue(target[i], source[i], info.elemType)
     }
     return target
+  }
+  // An array whose type is not resolved is still copied.
+  if (isArrayValue(source)) {
+    return cloneArrayValue(source, arrayValueTypeInfo(source))
   }
   return source
 }
