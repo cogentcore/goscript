@@ -868,7 +868,11 @@ function areInterfaceTypeInfosIdentical(
 function sortedMethodSignatures(
   methods: MethodSignature[] = [],
 ): MethodSignature[] {
-  return [...methods].sort((left, right) => left.name.localeCompare(right.name))
+  return [...methods].sort((left, right) =>
+    left.name < right.name ? -1
+    : left.name > right.name ? 1
+    : 0,
+  )
 }
 
 function areMethodArgArraysIdentical(

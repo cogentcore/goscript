@@ -56,13 +56,15 @@ describe('strconv append/format coverage (Go semantics)', () => {
   })
 
   it('AppendQuoteToASCII escapes non-ASCII to \\u', () => {
-    expect(appended(AppendQuoteToASCII(prefix(''), 'héllo'))).toBe(
-      '"h\\u00e9llo"',
+    expect(appended(AppendQuoteToASCII(prefix(''), $.goString('héllo')))).toBe(
+      $.goString('"h\\u00e9llo"'),
     )
   })
 
   it('AppendQuoteToGraphic keeps graphic Unicode in place', () => {
-    expect(appended(AppendQuoteToGraphic(prefix(''), '背'))).toBe('"背"')
+    expect(appended(AppendQuoteToGraphic(prefix(''), $.goString('背')))).toBe(
+      $.goString('"背"'),
+    )
   })
 
   it('AppendQuoteRune* quote a single rune', () => {
@@ -70,13 +72,15 @@ describe('strconv append/format coverage (Go semantics)', () => {
     expect(appended(AppendQuoteRuneToASCII(prefix(''), 0x4e16))).toBe(
       "'\\u4e16'",
     )
-    expect(appended(AppendQuoteRuneToGraphic(prefix(''), 0x4e16))).toBe("'世'")
+    expect(appended(AppendQuoteRuneToGraphic(prefix(''), 0x4e16))).toBe(
+      $.goString("'世'"),
+    )
   })
 
   it('QuoteToGraphic and QuoteRune variants match Go', () => {
-    expect(QuoteToGraphic('背\t')).toBe('"背\\t"')
+    expect(QuoteToGraphic($.goString('背\t'))).toBe($.goString('"背\\t"'))
     expect(QuoteRuneToASCII(0x4e16)).toBe("'\\u4e16'")
-    expect(QuoteRuneToGraphic(0x4e16)).toBe("'世'")
+    expect(QuoteRuneToGraphic(0x4e16)).toBe($.goString("'世'"))
   })
 
   it('IsPrint and IsGraphic match Go predicates', () => {

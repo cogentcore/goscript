@@ -91,7 +91,7 @@ export function Stack(): Uint8Array {
 }
 
 export function PrintStack(): void {
-  writeHostStderrText(new TextDecoder().decode(Stack()))
+  writeHostStderrText($.bytesToString(Stack()))
 }
 
 export function ReadBuildInfo(): [BuildInfo | null, boolean] {

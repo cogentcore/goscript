@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest'
+import { goString } from '@goscript/builtin/index.js'
 import { Reader, NewReader } from './reader.js'
 import * as io from '@goscript/io/index.js'
 
@@ -91,10 +92,10 @@ describe('strings/Reader', () => {
     })
 
     it('should read unicode rune', () => {
-      const r = new Reader({ s: '世界' })
+      const r = new Reader({ s: goString('世界') })
 
       const [rune, size, err] = r.ReadRune()
-      expect(rune).toBe(0x4e16) // '世'
+      expect(rune).toBe(0x4e16) // goString('世')
       expect(size).toBeGreaterThan(1)
       expect(err).toBeNull()
     })

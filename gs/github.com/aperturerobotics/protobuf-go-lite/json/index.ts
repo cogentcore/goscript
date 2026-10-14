@@ -744,7 +744,7 @@ export class UnmarshalState {
   public Skip(): void {}
 
   public SkipAndAppendBytes(p: $.Slice<number>): $.Slice<number> {
-    const encoded = new TextEncoder().encode(JSON.stringify(this.value))
+    const encoded = $.stringToBytes(JSON.stringify(this.value))
     return $.append(p, encoded)
   }
 
@@ -859,7 +859,7 @@ export function NewUnmarshalState(
   try {
     return new UnmarshalState({
       config,
-      value: JSON.parse(bytesToString(data)),
+      value: goStringsDeep(JSON.parse($.jsString(bytesToString(data)))),
     })
   } catch (err) {
     const state = new UnmarshalState({ config })
@@ -950,12 +950,31 @@ function sliceValues<T>(
   return Array.from((values ?? []) as Iterable<T>)
 }
 
+// goStringsDeep converts the strings of a value parsed by JSON.parse from
+// JavaScript text to Go strings, including the keys of objects.
+function goStringsDeep(value: unknown): unknown {
+  if (typeof value === 'string') {
+    return $.goString(value)
+  }
+  if (Array.isArray(value)) {
+    return value.map(goStringsDeep)
+  }
+  if (value !== null && typeof value === 'object') {
+    const out: Record<string, unknown> = {}
+    for (const [key, item] of Object.entries(value)) {
+      out[$.goString(key)] = goStringsDeep(item)
+    }
+    return out
+  }
+  return value
+}
+
 function bytesToString(bytes: $.Slice<number>): string {
-  return new TextDecoder().decode(new Uint8Array(sliceValues(bytes)))
+  return $.bytesToString(new Uint8Array(sliceValues(bytes)))
 }
 
 function stringToBytes(value: string): $.Slice<number> {
-  return $.arrayToSlice(Array.from(new TextEncoder().encode(value)))
+  return $.arrayToSlice(Array.from($.stringToBytes(value)))
 }
 
 function recordValue(value: unknown): JSONRecord | null {

@@ -383,7 +383,7 @@ export async function WriteString(
     return await ((w as StringWriter).WriteString(s) as any)
   }
 
-  const bytes = new TextEncoder().encode(s)
+  const bytes = $.stringToBytes(s)
   return await (w.Write(bytes) as any)
 }
 
