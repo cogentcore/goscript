@@ -197,6 +197,11 @@ export function address(__goscriptParam0: Region): Region | $.VarRef<Region> | n
 	return r
 }
 
+export function readAfterPointer(r: Region, p: Region | $.VarRef<Region> | null): number {
+	$.pointerValue<Region>(p).Start.Char = 80
+	return r.Start.Char
+}
+
 export let global: State = $.markAsStructValue(new State())
 
 export function __goscript_set_global(__goscriptValue: State): void {
@@ -222,6 +227,11 @@ export async function main(): globalThis.Promise<void> {
 	await $.println($.pointerValue<State>(s).reg.Start.Char)
 	global.reg.Start.Char = 4
 	await $.println(readGlobal($.markAsStructValue($.cloneStructValue(global.reg))), global.reg.Start.Char)
+	let loc = $.markAsStructValue($.cloneStructValue($.pointerValue<State>(s).reg))
+	await $.println(readAfterCall(loc, s), loc.Start.Char, $.pointerValue<State>(s).reg.Start.Char)
+	let addr = $.varRef($.markAsStructValue($.cloneStructValue($.pointerValue<State>(s).reg)))
+	let ap: Region | $.VarRef<Region> | null = addr
+	await $.println(readAfterPointer($.markAsStructValue($.cloneStructValue(addr.value)), ap), addr.value.Start.Char)
 	let g: (() => number | globalThis.Promise<number>) | null = $.markAsStructValue($.cloneStructValue($.pointerValue<State>(s).reg)).Later()
 	$.pointerValue<State>(s).reg.End.Char = 20
 	await $.println((__goscriptAwait = g!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), $.pointerValue<State>(s).reg.Width())

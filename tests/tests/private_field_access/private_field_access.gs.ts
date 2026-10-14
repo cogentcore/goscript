@@ -64,7 +64,7 @@ export async function accessPrivateField(s: MyStruct): globalThis.Promise<void> 
 
 export async function main(): globalThis.Promise<void> {
 	let s = $.markAsStructValue($.cloneStructValue(NewMyStruct("hello", 123)))
-	await accessPrivateField($.markAsStructValue($.cloneStructValue(s)))
+	await accessPrivateField(s)
 }
 
 if ($.isMainScript(import.meta)) {

@@ -233,7 +233,7 @@ export class columnRows {
 		if (index != 0) {
 			$.panic("unexpected column")
 		}
-		return sql.ConvertAssign($.markAsStructValue($.cloneStructValue(ctx)), dest, $.basicInterfaceValue(42n, "int64"))
+		return sql.ConvertAssign(ctx, dest, $.basicInterfaceValue(42n, "int64"))
 	}
 
 	public Close(): any {
