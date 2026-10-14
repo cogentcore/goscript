@@ -5197,8 +5197,45 @@ function typeWithMethodSignatures(
   return typ
 }
 
+// typeInfoTypes and namedTypeInfoTypes cache the Type of a type info, since
+// building it walks the whole type, and TypeOf and ValueOf need it for every
+// value. Generated code makes a new info object for a pointer type at each
+// use, so those are cached by the registered name they point to.
+const typeInfoTypes = new WeakMap<object, Type>()
+const namedTypeInfoTypes = new globalThis.Map<string, Type>()
+
+// typeInfoCacheKey returns the key of a type info that names a registered
+// type, or a pointer to one, or '' for any other type info.
+function typeInfoCacheKey(info: $.TypeInfo | string): string {
+  if (typeof info === 'string') {
+    return builtinGetTypeByName(info) ? info : ''
+  }
+  if (info.kind === $.TypeKind.Pointer && info.elemType !== undefined) {
+    const elem = typeInfoCacheKey(info.elemType)
+    return elem === '' ? '' : '*' + elem
+  }
+  return ''
+}
+
 function typeFromTypeInfo(info: $.TypeInfo | string): Type {
-  return typeFromTypeInfoWithSeen(info, new Set())
+  const key = typeInfoCacheKey(info)
+  if (key !== '') {
+    let typ = namedTypeInfoTypes.get(key)
+    if (typ === undefined) {
+      typ = typeFromTypeInfoWithSeen(info, new Set())
+      namedTypeInfoTypes.set(key, typ)
+    }
+    return typ
+  }
+  if (typeof info === 'string') {
+    return typeFromTypeInfoWithSeen(info, new Set())
+  }
+  let typ = typeInfoTypes.get(info)
+  if (typ === undefined) {
+    typ = typeFromTypeInfoWithSeen(info, new Set())
+    typeInfoTypes.set(info, typ)
+  }
+  return typ
 }
 
 function typeFromTypeInfoWithSeen(
