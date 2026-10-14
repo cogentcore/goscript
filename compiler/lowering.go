@@ -7238,7 +7238,7 @@ func (o *LoweringOwner) lowerRangeStmt(ctx lowerFileContext, stmt *ast.RangeStmt
 
 	keyName := rangeKeyNameFor(ctx, stmt.Key, aliases)
 	valueName := rangeKeyNameFor(ctx, stmt.Value, aliases)
-	rangeType := ctx.semPkg.source.TypesInfo.TypeOf(stmt.X)
+	rangeType := typeParamCoreType(ctx.semPkg.source.TypesInfo.TypeOf(stmt.X))
 	if isChannelType(rangeType) {
 		body, bodyDiagnostics := o.lowerBlock(bodyCtx.withoutRangeLoopBranches(), stmt.Body)
 		diagnostics = append(diagnostics, bodyDiagnostics...)
@@ -11962,6 +11962,27 @@ func (o *LoweringOwner) typeParamIndexedTSType(ctx lowerFileContext, typ types.T
 		}
 	}
 	return strings.Join(tsTypes, " | "), true
+}
+
+// typeParamCoreType returns the core type of a type parameter whose type
+// terms share one underlying type, such as M ~map[K]V, which range and other
+// operations on the type parameter use. Any other type is returned unchanged.
+func typeParamCoreType(typ types.Type) types.Type {
+	typeParam, ok := types.Unalias(typ).(*types.TypeParam)
+	if !ok {
+		return typ
+	}
+	var terms []types.Type
+	if !collectTypeSetTerms(typeParam.Constraint(), &terms) || len(terms) == 0 {
+		return typ
+	}
+	core := terms[0].Underlying()
+	for _, term := range terms[1:] {
+		if !types.Identical(core, term.Underlying()) {
+			return typ
+		}
+	}
+	return core
 }
 
 // collectTypeSetTerms appends the type terms of the given constraint to terms,
