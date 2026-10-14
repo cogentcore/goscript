@@ -4,9 +4,21 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class Pos {
-	public declare Line: number
+	public get Line(): number {
+		return this._fields.Line
+	}
 
-	public declare Char: number
+	public set Line(value: number) {
+		this._fields.Line = value
+	}
+
+	public get Char(): number {
+		return this._fields.Char
+	}
+
+	public set Char(value: number) {
+		this._fields.Char = value
+	}
 
 	public _fields: {
 		Line: number
@@ -24,8 +36,11 @@ export class Pos {
 		return $.markAsStructValue(new Pos(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Line", "Char"])
+	public __goscriptAssign(source: Pos): void {
+		const target = this._fields
+		const values = source._fields
+		target.Line = values.Line
+		target.Char = values.Char
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -38,9 +53,21 @@ export class Pos {
 }
 
 export class Region {
-	public declare Start: Pos
+	public get Start(): Pos {
+		return this._fields.Start
+	}
 
-	public declare End: Pos
+	public set Start(value: Pos) {
+		this._fields.Start = value
+	}
+
+	public get End(): Pos {
+		return this._fields.End
+	}
+
+	public set End(value: Pos) {
+		this._fields.End = value
+	}
 
 	public _fields: {
 		Start: Pos
@@ -58,6 +85,13 @@ export class Region {
 		return $.markAsStructValue(new Region(this))
 	}
 
+	public __goscriptAssign(source: Region): void {
+		const target = this._fields
+		const values = source._fields
+		$.assignStruct(target.Start, values.Start)
+		$.assignStruct(target.End, values.End)
+	}
+
 	public Later(): (() => number | globalThis.Promise<number>) | null {
 		const r = this;
 		return $.functionValue((): number => {
@@ -70,10 +104,6 @@ export class Region {
 		return r.End.Char - r.Start.Char
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Start", "End"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.Region",
 		() => new Region(),
@@ -84,9 +114,21 @@ export class Region {
 }
 
 export class State {
-	public declare reg: Region
+	public get reg(): Region {
+		return this._fields.reg
+	}
 
-	public declare n: number
+	public set reg(value: Region) {
+		this._fields.reg = value
+	}
+
+	public get n(): number {
+		return this._fields.n
+	}
+
+	public set n(value: number) {
+		this._fields.n = value
+	}
 
 	public _fields: {
 		reg: Region
@@ -104,19 +146,22 @@ export class State {
 		return $.markAsStructValue(new State(this))
 	}
 
+	public __goscriptAssign(source: State): void {
+		const target = this._fields
+		const values = source._fields
+		$.assignStruct(target.reg, values.reg)
+		target.n = values.n
+	}
+
 	public ["set"](c: number): void {
 		let s: State | $.VarRef<State> | null = this;
 		$.pointerValue<State>(s).reg.Start.Char = c
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["reg", "n"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.State",
 		() => new State(),
-		() => [{ name: "set", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [] }],
+		() => [{ name: "set", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [], pointerReceiver: true }],
 		State,
 		() => [{ name: "reg", key: "reg", type: "main.Region" }, { name: "n", key: "n", type: /* @__PURE__ */ $.basicType("int") }]
 	)
@@ -171,7 +216,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println(readAfterCall($.markAsStructValue($.cloneStructValue($.pointerValue<State>(s).reg)), s), $.pointerValue<State>(s).reg.Start.Char)
 	let f: (() => number | globalThis.Promise<number>) | null = later($.markAsStructValue($.cloneStructValue($.pointerValue<State>(s).reg)))
 	$.pointerValue<State>(s).reg.Start.Char = 3
-	await $.println(await f!(), $.pointerValue<State>(s).reg.Start.Char)
+	await $.println((__goscriptAwait = f!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), $.pointerValue<State>(s).reg.Start.Char)
 	let p: Region | $.VarRef<Region> | null = address($.markAsStructValue($.cloneStructValue($.pointerValue<State>(s).reg)))
 	$.pointerValue<Region>(p).Start.Char = 99
 	await $.println($.pointerValue<State>(s).reg.Start.Char)
@@ -179,8 +224,10 @@ export async function main(): globalThis.Promise<void> {
 	await $.println(readGlobal($.markAsStructValue($.cloneStructValue(global.reg))), global.reg.Start.Char)
 	let g: (() => number | globalThis.Promise<number>) | null = $.markAsStructValue($.cloneStructValue($.pointerValue<State>(s).reg)).Later()
 	$.pointerValue<State>(s).reg.End.Char = 20
-	await $.println(await g!(), $.pointerValue<State>(s).reg.Width())
+	await $.println((__goscriptAwait = g!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), $.pointerValue<State>(s).reg.Width())
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()
