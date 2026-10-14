@@ -12,6 +12,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"regexp"
 	"runtime"
 	"slices"
 	"sort"
@@ -11519,6 +11520,13 @@ func (o *LoweringOwner) lowerAssignmentTarget(
 		target, targetDiagnostics := o.lowerExpr(ctx, typed.X)
 		index, indexDiagnostics := o.lowerExpr(ctx, typed.Index)
 		diagnostics := append(targetDiagnostics, indexDiagnostics...)
+		// A slice element is written in its backing array, at its offset
+		// in the slice's window.
+		if _, ok := types.Unalias(targetType).Underlying().(*types.Slice); ok && isSimpleLoweredOperand(target) {
+			slice := o.lowerIndexTarget(ctx, target, targetType)
+			return o.runtimeOwner.QualifiedHelper(RuntimeHelperSliceElems) + "(" + slice + ")[" +
+				o.runtimeOwner.QualifiedHelper(RuntimeHelperSliceSlot) + "(" + slice + ", " + o.lowerNumberIndexValue(ctx, typed.Index, index) + ")]", diagnostics
+		}
 		return o.lowerIndexTarget(ctx, target, targetType) + "[" + o.lowerNumberIndexValue(ctx, typed.Index, index) + "]", diagnostics
 	default:
 		return o.lowerExpr(ctx, expr)
@@ -16546,3 +16554,28 @@ func isTypeParamType(typ types.Type) bool {
 	_, ok := types.Unalias(typ).(*types.TypeParam)
 	return ok
 }
+
+// isSimpleLoweredOperand reports whether a lowered expression can be
+// evaluated twice: identifiers, property reads, non-null assertions and calls
+// of pure runtime readers.
+func isSimpleLoweredOperand(value string) bool {
+	if value == "" || strings.Contains(value, "await") {
+		return false
+	}
+	for _, call := range simpleOperandCalls.FindAllStringSubmatch(value, -1) {
+		switch call[1] {
+		case "$.pointerValue", "$.pointerTarget", "$.arrayIndex":
+		default:
+			return false
+		}
+	}
+	for _, r := range value {
+		if strings.ContainsRune("_$.!()<>, |[]", r) || (r >= 'a' && r <= 'z') || (r >= 'A' && r <= 'Z') || (r >= '0' && r <= '9') {
+			continue
+		}
+		return false
+	}
+	return true
+}
+
+var simpleOperandCalls = regexp.MustCompile(`([\w$.]+)(?:<[^()]*>)?\(`)

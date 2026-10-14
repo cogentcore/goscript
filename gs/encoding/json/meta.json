@@ -1,8 +1,5 @@
 {
-  "dependencies": [
-    "encoding/json/jsontext",
-    "io"
-  ],
+  "dependencies": ["encoding/json/jsontext", "io"],
   "asyncMethods": {
     "Decoder.Decode": true,
     "Decoder.More": true,
@@ -10,15 +7,8 @@
     "Encoder.Encode": true
   },
   "asyncWhenMethods": {
-    "Marshal": [
-      "MarshalJSON"
-    ],
-    "MarshalIndent": [
-      "MarshalJSON"
-    ],
-    "Unmarshal": [
-      "UnmarshalJSON",
-      "UnmarshalText"
-    ]
+    "Marshal": ["MarshalJSON"],
+    "MarshalIndent": ["MarshalJSON"],
+    "Unmarshal": ["UnmarshalJSON", "UnmarshalText"]
   }
 }

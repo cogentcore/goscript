@@ -173,7 +173,7 @@ export function sliceRange<T>(
   }
 
   // A plain array is a window over itself.
-  if (Array.isArray(slice) || slice instanceof Uint8Array) {
+  if (isArrayOrGoSlice(slice) || slice instanceof Uint8Array) {
     return { backing: slice as ArrayLike<T>, offset: 0, length: slice.length }
   }
   return { backing: [], offset: 0, length: len(slice as any) }
@@ -200,6 +200,97 @@ interface ByteAddressSource {
   byteLength: number
   getByte(offset: number): number
   setByte(offset: number, value: number): void
+}
+
+/**
+ * GoSlice is a Go slice that does not cover its whole backing array: a window
+ * of offset, length and capacity on it. It is its own slice metadata, so the
+ * runtime reads the window as a plain property rather than through a proxy
+ * trap. It is not a JavaScript array: code reads and writes its elements
+ * through the runtime helpers, and its iterator and common array methods
+ * read its window.
+ */
+export class GoSlice<T> {
+  target?: T[]
+  constructor(
+    public backing: T[],
+    public offset: number,
+    public length: number,
+    public capacity: number,
+  ) {}
+
+  get __meta__(): GoSliceObject<T> {
+    return this
+  }
+
+  *[Symbol.iterator](): IterableIterator<T> {
+    for (let i = 0; i < this.length; i++) {
+      yield this.backing[this.offset + i]
+    }
+  }
+
+  // window returns a copy of the elements of the slice.
+  window(): T[] {
+    return this.backing.slice(this.offset, this.offset + this.length)
+  }
+
+  slice(start?: number, end?: number): T[] {
+    return this.window().slice(start, end)
+  }
+  map<U>(f: (value: T, index: number, array: T[]) => U): U[] {
+    return this.window().map(f)
+  }
+  filter(f: (value: T, index: number, array: T[]) => unknown): T[] {
+    return this.window().filter(f)
+  }
+  forEach(f: (value: T, index: number, array: T[]) => void): void {
+    this.window().forEach(f)
+  }
+  reduce<U>(f: (acc: U, value: T, index: number, array: T[]) => U, init: U): U {
+    return this.window().reduce(f, init)
+  }
+  indexOf(value: T): number {
+    return this.window().indexOf(value)
+  }
+  includes(value: T): boolean {
+    return this.window().includes(value)
+  }
+  join(sep?: string): string {
+    return this.window().join(sep)
+  }
+  every(f: (value: T, index: number, array: T[]) => unknown): boolean {
+    return this.window().every(f)
+  }
+  some(f: (value: T, index: number, array: T[]) => unknown): boolean {
+    return this.window().some(f)
+  }
+}
+
+// sliceElems returns the array that holds the elements of a slice: the
+// backing array of a window, or the slice itself.
+export function sliceElems(slice: any): any[] {
+  const meta = slice === null ? undefined : sliceMeta(slice)
+  return meta !== undefined ? meta.backing : slice
+}
+
+// sliceSlot returns the index in sliceElems(slice) of element index of the
+// slice, which it checks against the slice's length.
+export function sliceSlot(slice: any, index: number): number {
+  if (slice === null || slice === undefined) {
+    outOfRangeIndex(index, 0)
+  }
+  const meta = sliceMeta(slice)
+  const length = meta !== undefined ? meta.length : slice.length
+  if (index < 0 || index >= length) {
+    outOfRangeIndex(index, length)
+  }
+  return meta !== undefined ? meta.offset + index : index
+}
+
+// isArrayOrGoSlice reports whether value is a JavaScript array or a GoSlice,
+// the values that slices and arrays are represented by.
+export function isArrayOrGoSlice(value: unknown): value is any[] {
+  return Array.isArray(value) || value instanceof GoSlice
 }
 
 /**
@@ -520,13 +611,12 @@ function sliceProxyFromBacking<T>(
   length: number,
   capacity: number,
 ): SliceProxy<T> {
-  // The shared proxy handlers find a slice's window on its target, so each
-  // slice has a target of its own, even where it shares its backing array
-  // with an earlier slice. The handlers read elements and the length from
-  // the window, so the target stays empty.
-  const proxyTargetArray = [] as unknown as SliceProxy<T>
-  proxyTargetArray.__meta__ = { backing, offset, length, capacity }
-  return wrapSliceProxy(proxyTargetArray)
+  return new GoSlice(
+    backing,
+    offset,
+    length,
+    capacity,
+  ) as unknown as SliceProxy<T>
 }
 
 // asArray converts a slice to a JavaScript array.
@@ -547,7 +637,7 @@ export function asArray<T>(slice: Slice<T>): T[] {
     return result
   }
 
-  if (Array.isArray(slice)) {
+  if (isArrayOrGoSlice(slice)) {
     return slice
   }
 
@@ -733,20 +823,12 @@ export const makeSlice = <T>(
     return backingArr as Slice<T>
   }
 
-  const proxyTargetArray = new Array<T>(length)
-  for (let i = 0; i < length; i++) {
-    proxyTargetArray[i] = backingArr[i]
-  }
-
-  const proxy = proxyTargetArray as SliceProxy<T>
-  proxy.__meta__ = {
-    backing: backingArr,
-    offset: 0,
+  return new GoSlice(
+    backingArr,
+    0,
     length,
-    capacity: actualCapacity,
-  }
-
-  return new Proxy(proxy, madeSliceProxyHandler) as SliceProxy<T>
+    actualCapacity,
+  ) as unknown as SliceProxy<T>
 }
 
 /**
@@ -853,7 +935,7 @@ export function goSlice<T>(
   // A slice of a whole array shares its storage, but an array value's marker
   // must not make the slice itself copy like an array, so it gets a view.
   if (
-    Array.isArray(s) &&
+    isArrayOrGoSlice(s) &&
     !isComplexSlice(s) &&
     !isArrayValue(s) &&
     low === 0 &&
@@ -907,17 +989,12 @@ export function goSlice<T>(
     return backing as Slice<T>
   }
 
-  const proxyTargetArray = new Array<T>(newLength)
-
-  const proxy = proxyTargetArray as SliceProxy<T>
-  proxy.__meta__ = {
-    backing,
-    offset: newOffset,
-    length: newLength,
-    capacity: newCap,
-  }
-
-  return new Proxy(proxy, subsliceProxyHandler) as SliceProxy<T>
+  return new GoSlice(
+    backing as T[],
+    newOffset,
+    newLength,
+    newCap,
+  ) as unknown as SliceProxy<T>
 }
 
 /**
@@ -1013,7 +1090,7 @@ export const arrayToSlice = <T>(
   if (depth > 1 && arr.length > 0) {
     for (let i = 0; i < arr.length; i++) {
       const item = arr[i]
-      if (!isComplexSlice(item as any) && Array.isArray(item)) {
+      if (!isComplexSlice(item as any) && isArrayOrGoSlice(item)) {
         arr[i] = arrayToSlice(item as any[], depth - 1) as any
       }
     }
@@ -1041,7 +1118,7 @@ export function sliceLen(
   }
 
   // A plain array may carry a window of its own.
-  if (Array.isArray(slice) || slice instanceof Uint8Array) {
+  if (isArrayOrGoSlice(slice) || slice instanceof Uint8Array) {
     const plainMeta = (slice as any).__meta__ as
       | GoSliceObject<unknown>
       | undefined
@@ -1066,7 +1143,7 @@ export const len = <T = unknown, V = unknown>(
     | undefined,
 ): number => {
   // An array with a window has the length of the window.
-  if (typeof obj === 'object' && obj !== null && Array.isArray(obj)) {
+  if (typeof obj === 'object' && obj !== null && isArrayOrGoSlice(obj)) {
     const meta = sliceMeta(obj)
     if (meta !== undefined) {
       return meta.length
@@ -1087,7 +1164,7 @@ export const len = <T = unknown, V = unknown>(
     return obj.length
   }
 
-  if (Array.isArray(obj)) {
+  if (isArrayOrGoSlice(obj)) {
     const meta = (obj as SliceProxy<T>).__meta__
     if (meta !== undefined) {
       return meta.length
@@ -1133,7 +1210,7 @@ export const cap = <T>(
     return obj.length // Uint8Array capacity is its length
   }
 
-  if (Array.isArray(obj)) {
+  if (isArrayOrGoSlice(obj)) {
     return obj.length
   }
 
@@ -1227,7 +1304,7 @@ function appendZeroValue(sample: unknown): unknown {
   if (sample instanceof Uint8Array) {
     return new Uint8Array(sample.length)
   }
-  if (Array.isArray(sample)) {
+  if (isArrayOrGoSlice(sample)) {
     return sample.map(appendZeroValue)
   }
   if (
@@ -1486,7 +1563,7 @@ function byteElementLength(item: any): number {
   if (item instanceof Uint8Array) {
     return item.length
   }
-  if (isComplexSlice(item) || Array.isArray(item)) {
+  if (isComplexSlice(item) || isArrayOrGoSlice(item)) {
     return len(item as Slice<any>)
   }
   if (typeof item !== 'number') {
@@ -1509,7 +1586,7 @@ function writeByteElements(
       cursor += item.length
       continue
     }
-    if (isComplexSlice(item) || Array.isArray(item)) {
+    if (isComplexSlice(item) || isArrayOrGoSlice(item)) {
       const itemLen = len(item as Slice<any>)
       for (let i = 0; i < itemLen; i++) {
         const value = (item as any)[i]
@@ -1637,7 +1714,7 @@ function copyFromString<T>(
       dstMeta.backing[dstMeta.offset + i] = byteVal as T
       ;(dst as any)[i] = byteVal
     }
-  } else if (Array.isArray(dst)) {
+  } else if (isArrayOrGoSlice(dst)) {
     for (let i = 0; i < count; i++) {
       dst[i] = bytes[i] as T
     }
@@ -1700,7 +1777,7 @@ export function index<T>(
       outOfRangeIndex(index, collection.__meta__.length)
     }
     return collection.__meta__.backing[collection.__meta__.offset + index]
-  } else if (Array.isArray(collection)) {
+  } else if (isArrayOrGoSlice(collection)) {
     if (index < 0 || index >= collection.length) {
       outOfRangeIndex(index, collection.length)
     }
@@ -1756,7 +1833,7 @@ export function arrayIndex<
       collection.__meta__.offset + index
     ] as ArrayIndexValue<C>
   }
-  if (Array.isArray(collection)) {
+  if (isArrayOrGoSlice(collection)) {
     if (index < 0 || index >= collection.length) {
       outOfRangeIndex(index, collection.length)
     }
@@ -1798,7 +1875,7 @@ export function indexRef<T>(
       meta.offset + index,
     )
   }
-  if (Array.isArray(collection)) {
+  if (isArrayOrGoSlice(collection)) {
     if (index < 0 || index >= collection.length) {
       outOfRangeIndex(index, collection.length)
     }
@@ -1970,7 +2047,7 @@ export function indexAddress<T>(
     backing = collection.__meta__.backing
     backingIndex = collection.__meta__.offset + index
     length = collection.__meta__.length
-  } else if (Array.isArray(collection)) {
+  } else if (isArrayOrGoSlice(collection)) {
     backing = collection
     backingIndex = index
     length = collection.length
@@ -2086,7 +2163,7 @@ export function indexByteAddress<T>(
     return base + (collection.__meta__.offset + index) * byteSize
   }
 
-  if (Array.isArray(collection)) {
+  if (isArrayOrGoSlice(collection)) {
     if (index < 0 || index >= collection.length) {
       outOfRangeIndex(index, collection.length)
     }
@@ -2643,7 +2720,7 @@ function byteStringView(value: GoStringBytes): ByteStringView {
   if (value instanceof Uint8Array) {
     return { backing: value, offset: 0, length: value.length }
   }
-  if (Array.isArray(value)) {
+  if (isArrayOrGoSlice(value)) {
     const meta = (value as SliceProxy<number>).__meta__
     if (meta !== undefined) {
       return {
@@ -2711,7 +2788,7 @@ export function stringToBytes(
   if (s === null || s === undefined) {
     return new Uint8Array(0)
   }
-  return new Uint8Array(Array.isArray(s) ? s : [])
+  return new Uint8Array(isArrayOrGoSlice(s) ? s : [])
 }
 
 export type StringHeaderData = {

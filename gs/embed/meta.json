@@ -1,5 +1,3 @@
 {
-  "dependencies": [
-    "io/fs"
-  ]
+  "dependencies": ["io/fs"]
 }

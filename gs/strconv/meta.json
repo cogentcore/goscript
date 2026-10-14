@@ -1,7 +1,5 @@
 {
-  "dependencies": [
-    "errors"
-  ],
+  "dependencies": ["errors"],
   "asyncFunctions": {
     "ParseComplex": true
   },

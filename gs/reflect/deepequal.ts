@@ -1,3 +1,4 @@
+import { isArrayOrGoSlice } from '../builtin/index.js'
 // DeepEqual reports whether x and y are "deeply equal," defined as follows.
 // Two values of identical type are deeply equal if one of the following cases applies.
 // Values of distinct types are never deeply equal.
@@ -87,10 +88,7 @@ export function DeepEqual(
     if (x.__goType !== y.__goType) {
       return false
     }
-    return DeepEqual(
-      x.__goValue as ReflectValue,
-      y.__goValue as ReflectValue,
-    )
+    return DeepEqual(x.__goValue as ReflectValue, y.__goValue as ReflectValue)
   }
   if (isNamedValueBox(x)) {
     return DeepEqual(x.__goValue as ReflectValue, y as ReflectValue)
@@ -186,7 +184,6 @@ export function DeepEqual(
     }
     return true
   }
-
 
   // Handle objects (structs)
   if (typeof x === 'object' && typeof y === 'object') {

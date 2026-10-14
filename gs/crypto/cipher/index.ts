@@ -334,20 +334,13 @@ export function NewGCMWithTagSize(
 export function NewGCMWithRandomNonce(
   block: Block | null,
 ): [AEAD | null, $.GoError] {
-  if (
-    block == null ||
-    block.BlockSize() !== 16 ||
-    !isWebCryptoBlock(block)
-  ) {
+  if (block == null || block.BlockSize() !== 16 || !isWebCryptoBlock(block)) {
     return [
       null,
       $.newError('cipher: NewGCMWithRandomNonce requires aes.Block'),
     ]
   }
-  return [
-    new webCryptoGCMRandomNonce(new webCryptoGCM(block, 12, 16)),
-    null,
-  ]
+  return [new webCryptoGCMRandomNonce(new webCryptoGCM(block, 12, 16)), null]
 }
 
 export function NewCBCDecrypter(_b: Block | null, _iv: $.Bytes): BlockMode {
@@ -414,9 +407,13 @@ class ctrStream implements Stream {
         this.keystreamUsed = 0
         this.incrementCounter()
       }
-      const chunk = Math.min(this.keystream.length - this.keystreamUsed, n - done)
+      const chunk = Math.min(
+        this.keystream.length - this.keystreamUsed,
+        n - done,
+      )
       for (let i = 0; i < chunk; i++) {
-        output[done + i] = input[done + i] ^ this.keystream[this.keystreamUsed + i]
+        output[done + i] =
+          input[done + i] ^ this.keystream[this.keystreamUsed + i]
       }
       done += chunk
       this.keystreamUsed += chunk
@@ -472,24 +469,26 @@ type StreamWriterSink = {
   Write(src: $.Bytes): StreamIOResult | PromiseLike<StreamIOResult>
   Close?(): $.GoError | PromiseLike<$.GoError>
 }
-type MappedIOResult<T> = T extends PromiseLike<StreamIOResult> ?
-  Promise<StreamIOResult>
-: StreamIOResult
+type MappedIOResult<T> =
+  T extends PromiseLike<StreamIOResult> ? Promise<StreamIOResult>
+  : StreamIOResult
 
-type StreamCloseResult<W> = W extends { Close(): infer Result } ?
-  Result | null
-: io.Awaitable<$.GoError>
+type StreamCloseResult<W> =
+  W extends { Close(): infer Result } ? Result | null : io.Awaitable<$.GoError>
 
 // A synchronous delegate must remain synchronous for io.MultiReader and other
 // synchronous consumers. Promise-returning delegates are transformed only after
 // settlement. The conditional type preserves that distinction for TS callers.
-function mapStreamIOResult<T extends StreamIOResult | PromiseLike<StreamIOResult>>(
+function mapStreamIOResult<
+  T extends StreamIOResult | PromiseLike<StreamIOResult>,
+>(
   result: T,
   transform: (result: StreamIOResult) => StreamIOResult,
 ): MappedIOResult<T> {
   return (
-    Array.isArray(result) ? transform(result) : Promise.resolve(result).then(transform)
-  ) as MappedIOResult<T>
+    $.isArrayOrGoSlice(result) ?
+      transform(result)
+    : Promise.resolve(result).then(transform)) as MappedIOResult<T>
 }
 
 export class StreamReader<R extends StreamReaderSource = io.Reader> {
@@ -526,7 +525,9 @@ export class StreamWriter<W extends StreamWriterSink = io.Writer> {
   W: W | null
   Err: $.GoError // Unused; retained for compatibility with Go's public struct.
 
-  constructor(init?: Partial<{ S: Stream | null; W: W | null; Err: $.GoError }>) {
+  constructor(
+    init?: Partial<{ S: Stream | null; W: W | null; Err: $.GoError }>,
+  ) {
     this.S = init?.S ?? null
     this.W = init?.W ?? null
     this.Err = init?.Err ?? null

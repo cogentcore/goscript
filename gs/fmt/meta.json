@@ -13,7 +13,5 @@
     "Sprintf": true,
     "Sprintln": true
   },
-  "dependencies": [
-    "errors"
-  ]
+  "dependencies": ["errors"]
 }

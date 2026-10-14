@@ -1175,7 +1175,7 @@ function appendFormValue(
   if (unwrapped == null) {
     return
   }
-  if (Array.isArray(unwrapped)) {
+  if ($.isArrayOrGoSlice(unwrapped)) {
     for (const item of unwrapped) {
       appendFormValue(params, key, item)
     }

@@ -93,5 +93,4 @@ describe('DeepEqual', () => {
     expect(DeepEqual(box(1, 'int'), 0)).toBe(false)
     expect(DeepEqual(box('x', 'string'), 'x')).toBe(true)
   })
-
 })

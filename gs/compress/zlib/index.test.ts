@@ -63,12 +63,16 @@ describe('compress/zlib override', () => {
   test('reader implements resettable zlib reader contract', async () => {
     const first = $.markAsStructValue(new bytes.Buffer())
     const firstWriter = NewWriter(first)
-    expect((await firstWriter.Write($.stringToBytes('first stream')))[1]).toBeNull()
+    expect(
+      (await firstWriter.Write($.stringToBytes('first stream')))[1],
+    ).toBeNull()
     expect(await firstWriter.Close()).toBeNull()
 
     const second = $.markAsStructValue(new bytes.Buffer())
     const secondWriter = NewWriter(second)
-    expect((await secondWriter.Write($.stringToBytes('second stream')))[1]).toBeNull()
+    expect(
+      (await secondWriter.Write($.stringToBytes('second stream')))[1],
+    ).toBeNull()
     expect(await secondWriter.Close()).toBeNull()
 
     const readerInterface = $.registerInterfaceType(
@@ -101,7 +105,10 @@ describe('compress/zlib override', () => {
     expect(readerErr).toBeNull()
     const [zlibReader, ok] = $.typeAssertTuple<
       io.ReadCloser & {
-        Reset(r: io.Reader | null, dict: $.Bytes | null): io.Awaitable<$.GoError>
+        Reset(
+          r: io.Reader | null,
+          dict: $.Bytes | null,
+        ): io.Awaitable<$.GoError>
       }
     >(reader, readerInterface)
     expect(ok).toBe(true)
@@ -110,7 +117,9 @@ describe('compress/zlib override', () => {
     expect(firstReadErr).toBeNull()
     expect($.bytesToString(firstOut)).toBe('first stream')
 
-    expect(await zlibReader.Reset(bytes.NewReader(second.Bytes()), null)).toBeNull()
+    expect(
+      await zlibReader.Reset(bytes.NewReader(second.Bytes()), null),
+    ).toBeNull()
     const [secondOut, secondReadErr] = await io.ReadAll(zlibReader)
     expect(secondReadErr).toBeNull()
     expect($.bytesToString(secondOut)).toBe('second stream')
@@ -153,7 +162,10 @@ describe('compress/zlib override', () => {
 
     const corrupt = Uint8Array.from(compressed.Bytes())
     corrupt[corrupt.length - 1] ^= 0xff
-    const [corruptReader, headerErr] = await NewReaderDict(bytes.NewReader(corrupt), dict)
+    const [corruptReader, headerErr] = await NewReaderDict(
+      bytes.NewReader(corrupt),
+      dict,
+    )
     expect(headerErr).toBeNull()
     const [, corruptErr] = await io.ReadAll(corruptReader!)
     expect(corruptErr).toBe(ErrChecksum)
@@ -162,7 +174,9 @@ describe('compress/zlib override', () => {
   test('reader reset accepts async generated readers', async () => {
     const compressed = $.markAsStructValue(new bytes.Buffer())
     const writer = NewWriter(compressed)
-    expect((await writer.Write($.stringToBytes('async source stream')))[1]).toBeNull()
+    expect(
+      (await writer.Write($.stringToBytes('async source stream')))[1],
+    ).toBeNull()
     expect(await writer.Close()).toBeNull()
 
     const source = bytes.NewReader(compressed.Bytes())
@@ -193,7 +207,9 @@ describe('compress/zlib override', () => {
       $.interfaceValue($.varRef(sink), '*zlib.asyncWriter'),
     )
 
-    const [written, writeErr] = await writer.Write($.stringToBytes('async zlib sink'))
+    const [written, writeErr] = await writer.Write(
+      $.stringToBytes('async zlib sink'),
+    )
     expect(writeErr).toBeNull()
     expect(written).toBe('async zlib sink'.length)
     expect(await writer.Close()).toBeNull()

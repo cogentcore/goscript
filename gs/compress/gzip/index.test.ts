@@ -92,7 +92,9 @@ describe('compress/gzip override', () => {
   test('reader reset accepts async generated readers', async () => {
     const compressed = $.markAsStructValue(new bytes.Buffer())
     const writer = NewWriter(compressed)
-    expect((await writer.Write($.stringToBytes('async gzip source')))[1]).toBeNull()
+    expect(
+      (await writer.Write($.stringToBytes('async gzip source')))[1],
+    ).toBeNull()
     expect(await writer.Close()).toBeNull()
 
     const source = bytes.NewReader(compressed.Bytes())
@@ -111,7 +113,9 @@ describe('compress/gzip override', () => {
   })
 
   test('invalid gzip bytes return ErrHeader', async () => {
-    const [reader, err] = await NewReader(bytes.NewReader($.stringToBytes('plain invalid header')))
+    const [reader, err] = await NewReader(
+      bytes.NewReader($.stringToBytes('plain invalid header')),
+    )
     expect(reader).toBeNull()
     expect(err).toBe(ErrHeader)
   })
@@ -133,7 +137,7 @@ describe('compress/gzip override', () => {
       const expected = payload.slice()
       const compressed = $.markAsStructValue(new bytes.Buffer())
       const writer = NewWriter(compressed)
-      expect((await writer.Write(payload))).toEqual([payload.length, null])
+      expect(await writer.Write(payload)).toEqual([payload.length, null])
       payload.fill(0)
       expect(await writer.Close()).toBeNull()
 

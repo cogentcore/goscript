@@ -1,7 +1,3 @@
 {
-  "dependencies": [
-    "context",
-    "time",
-    "database/sql/internal"
-  ]
+  "dependencies": ["context", "time", "database/sql/internal"]
 }

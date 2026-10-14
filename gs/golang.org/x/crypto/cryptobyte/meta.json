@@ -1,7 +1,5 @@
 {
-  "dependencies": [
-    "time"
-  ],
+  "dependencies": ["time"],
   "asyncMethods": {
     "BuildError.Error": true
   }

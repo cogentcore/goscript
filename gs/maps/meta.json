@@ -1,6 +1,3 @@
 {
-  "dependencies": [
-    "iter",
-    "unsafe"
-  ]
-} 
+  "dependencies": ["iter", "unsafe"]
+}

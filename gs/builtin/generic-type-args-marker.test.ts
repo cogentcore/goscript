@@ -1,8 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import {
-  genericTypeArgsMarker,
-  stripGenericTypeArgs,
-} from './type.js'
+import { genericTypeArgsMarker, stripGenericTypeArgs } from './type.js'
 
 describe('genericTypeArgsMarker', () => {
   it('is a string constant that survives minification', () => {
@@ -15,7 +12,10 @@ describe('genericTypeArgsMarker', () => {
 
   it('brands descriptors so stripGenericTypeArgs removes them', () => {
     const args: unknown[] = [
-      { [genericTypeArgsMarker]: true, T: { type: { kind: 'basic', name: 'int' } } },
+      {
+        [genericTypeArgsMarker]: true,
+        T: { type: { kind: 'basic', name: 'int' } },
+      },
       'real-arg',
     ]
     const rest = stripGenericTypeArgs(args)

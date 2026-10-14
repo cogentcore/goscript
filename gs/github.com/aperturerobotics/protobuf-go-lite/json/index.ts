@@ -17,7 +17,9 @@ type JSONRecord = Record<string, unknown>
 type Integer64Value = number | bigint
 
 function integer64String(value: Integer64Value): string {
-  return typeof value === 'bigint' ? value.toString() : String(Math.trunc(value))
+  return typeof value === 'bigint' ?
+      value.toString()
+    : String(Math.trunc(value))
 }
 
 export class JsonStream {
@@ -468,7 +470,7 @@ export class UnmarshalState {
   }
 
   public ReadArray(cb: (() => void) | null): void {
-    if (!Array.isArray(this.value)) {
+    if (!$.isArrayOrGoSlice(this.value)) {
       this.SetErrorf('expected JSON array')
       return
     }
@@ -536,7 +538,7 @@ export class UnmarshalState {
     const paths =
       typeof this.value === 'string' ?
         this.value.split(',').filter((part) => part !== '')
-      : Array.isArray(recordValue(this.value)?.paths) ?
+      : $.isArrayOrGoSlice(recordValue(this.value)?.paths) ?
         sliceValues(recordValue(this.value)?.paths as $.Slice<string>)
       : []
     return { GetPaths: () => $.arrayToSlice(paths) }
@@ -760,7 +762,7 @@ export class UnmarshalState {
     if (this.value === null) {
       return 3
     }
-    if (Array.isArray(this.value)) {
+    if ($.isArrayOrGoSlice(this.value)) {
       return 5
     }
     if (typeof this.value === 'object') {
@@ -959,7 +961,7 @@ function stringToBytes(value: string): $.Slice<number> {
 }
 
 function recordValue(value: unknown): JSONRecord | null {
-  if (value == null || Array.isArray(value) || typeof value !== 'object') {
+  if (value == null || $.isArrayOrGoSlice(value) || typeof value !== 'object') {
     return null
   }
   return value as JSONRecord

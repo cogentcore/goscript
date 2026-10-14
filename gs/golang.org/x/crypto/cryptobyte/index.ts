@@ -269,7 +269,8 @@ export class Builder {
     this.result = init?.resultArray ?? bytesArray(init?.result)
     this.fixedSize = init?.fixedSize ?? false
     this.capacityLimit =
-      init?.capacityLimit ?? (init?.result == null ? this.result.length : $.cap(init.result))
+      init?.capacityLimit ??
+      (init?.result == null ? this.result.length : $.cap(init.result))
     this.child = null
     this.offset = 0
     this.pendingLenLen = 0
@@ -410,7 +411,9 @@ export class Builder {
     })
   }
 
-  public AddASN1GeneralizedTime(t: time.Time | $.VarRef<time.Time> | null): void {
+  public AddASN1GeneralizedTime(
+    t: time.Time | $.VarRef<time.Time> | null,
+  ): void {
     const value = $.pointerValue(t)
     this.AddASN1(asn1.GeneralizedTime, (child) => {
       child!.AddBytes(bytesFromString(value.Format('20060102150405Z0700')))
@@ -456,7 +459,7 @@ export class Builder {
     }
     const first = Number((oid as any)[0])
     const second = Number((oid as any)[1])
-    if (first > 2 || second >= 40 && first < 2) {
+    if (first > 2 || (second >= 40 && first < 2)) {
       this.SetError($.newError('cryptobyte: invalid OID'))
       return
     }
@@ -594,8 +597,13 @@ export class Builder {
     if (this.err != null) {
       return
     }
-    if (this.fixedSize && this.result.length + bytes.length > this.capacityLimit) {
-      this.SetError($.newError('cryptobyte: Builder is exceeding its fixed-size buffer'))
+    if (
+      this.fixedSize &&
+      this.result.length + bytes.length > this.capacityLimit
+    ) {
+      this.SetError(
+        $.newError('cryptobyte: Builder is exceeding its fixed-size buffer'),
+      )
       return
     }
     this.result.push(...bytes.map(byte))
@@ -1285,8 +1293,9 @@ function readASN1(
     outTag.value = parsed.tag
   }
   if (out != null) {
-    out.value = skipHeader
-      ? $.goSlice(data, parsed.headerLen, parsed.totalLen)
+    out.value =
+      skipHeader ?
+        $.goSlice(data, parsed.headerLen, parsed.totalLen)
       : $.goSlice(data, 0, parsed.totalLen)
   }
   s!.value = $.goSlice(data, parsed.totalLen)
@@ -1342,7 +1351,11 @@ function readBase128Int(
   return null
 }
 
-function parseFixedDigits(value: string, offset: number, width: number): number | null {
+function parseFixedDigits(
+  value: string,
+  offset: number,
+  width: number,
+): number | null {
   const text = value.slice(offset, offset + width)
   if (!new RegExp(`^[0-9]{${width}}$`).test(text)) {
     return null
@@ -1350,7 +1363,10 @@ function parseFixedDigits(value: string, offset: number, width: number): number 
   return Number(text)
 }
 
-function parseZone(value: string, offset: number): { offsetMinutes: number } | null {
+function parseZone(
+  value: string,
+  offset: number,
+): { offsetMinutes: number } | null {
   if (value[offset] === 'Z' && offset + 1 === value.length) {
     return { offsetMinutes: 0 }
   }
@@ -1408,7 +1424,12 @@ function parseGeneralizedTime(value: string): time.Time | null {
 }
 
 function parseUTCTime(value: string): time.Time | null {
-  if (value.length !== 11 && value.length !== 13 && value.length !== 15 && value.length !== 17) {
+  if (
+    value.length !== 11 &&
+    value.length !== 13 &&
+    value.length !== 15 &&
+    value.length !== 17
+  ) {
     return null
   }
   const yearPart = parseFixedDigits(value, 0, 2)

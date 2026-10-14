@@ -129,7 +129,13 @@ class littleEndian implements ByteOrder, AppendByteOrder {
 
   public AppendUint32(b: $.Slice<number>, v: number): $.Slice<number> {
     const value = Number($.uint(v, 32))
-    return $.append(b, value & 0xff, (value >>> 8) & 0xff, (value >>> 16) & 0xff, value >>> 24)
+    return $.append(
+      b,
+      value & 0xff,
+      (value >>> 8) & 0xff,
+      (value >>> 16) & 0xff,
+      value >>> 24,
+    )
   }
 
   public AppendUint64(b: $.Slice<number>, v: number | bigint): $.Slice<number> {
@@ -213,7 +219,13 @@ class bigEndian implements ByteOrder, AppendByteOrder {
 
   public AppendUint32(b: $.Slice<number>, v: number): $.Slice<number> {
     const value = Number($.uint(v, 32))
-    return $.append(b, value >>> 24, (value >>> 16) & 0xff, (value >>> 8) & 0xff, value & 0xff)
+    return $.append(
+      b,
+      value >>> 24,
+      (value >>> 16) & 0xff,
+      (value >>> 8) & 0xff,
+      value & 0xff,
+    )
   }
 
   public AppendUint64(b: $.Slice<number>, v: number | bigint): $.Slice<number> {
@@ -723,7 +735,7 @@ function decodeTarget(data: unknown): decodedTarget | null {
   if (value instanceof Uint8Array) {
     return { kind: '[]uint8', value, settable: null }
   }
-  if (Array.isArray(value)) {
+  if ($.isArrayOrGoSlice(value)) {
     if (value.every((item) => typeof item === 'boolean')) {
       return { kind: '[]bool', value, settable: null }
     }
@@ -1085,7 +1097,7 @@ function unsupportedKind(data: unknown): string {
   if ($.isVarRef(data)) {
     return 'untyped pointer'
   }
-  if (Array.isArray(data)) {
+  if ($.isArrayOrGoSlice(data)) {
     return 'array'
   }
   if (data === null || data === undefined) {

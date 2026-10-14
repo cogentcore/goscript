@@ -1,3 +1,4 @@
+import { isArrayOrGoSlice } from './slice.js'
 import { comparableEqual } from './builtin.js'
 import { GoBinaryString, stringEqual, stringMapKey } from './slice.js'
 import {
@@ -278,7 +279,11 @@ function isGoStringKey(value: unknown): value is string | GoBinaryString {
 function structMapKey(key: unknown): string | undefined {
   if (typeof key !== 'object' || key === null) return undefined
   const fields = (key as { _fields?: unknown })._fields
-  if (typeof fields !== 'object' || fields === null || Array.isArray(fields)) {
+  if (
+    typeof fields !== 'object' ||
+    fields === null ||
+    isArrayOrGoSlice(fields)
+  ) {
     return undefined
   }
   const plan = structKeyPlan(key, fields)

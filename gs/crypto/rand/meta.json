@@ -1,7 +1,5 @@
 {
-  "dependencies": [
-    "io"
-  ],
+  "dependencies": ["io"],
   "asyncFunctions": {
     "Prime": true,
     "Text": true,

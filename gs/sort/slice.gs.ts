@@ -13,7 +13,7 @@ type LessFunc<R = $.MaybePromise<boolean>> = (i: number, j: number) => R
 function setInSlice<T>(slice: $.Slice<T>, i: number, value: T): void {
   if (!slice) return
 
-  if (Array.isArray(slice) || slice instanceof Uint8Array) {
+  if ($.isArrayOrGoSlice(slice) || slice instanceof Uint8Array) {
     ;(slice as any)[i] = value
   } else if (typeof slice === 'object' && '__meta__' in slice) {
     const meta = (slice as any).__meta__ as SliceMetadata<T>

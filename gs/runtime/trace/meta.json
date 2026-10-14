@@ -1,10 +1,5 @@
 {
-  "dependencies": [
-    "context",
-    "errors",
-    "fmt",
-    "io"
-  ],
+  "dependencies": ["context", "errors", "fmt", "io"],
   "asyncFunctions": {
     "Logf": true,
     "WithRegion": true

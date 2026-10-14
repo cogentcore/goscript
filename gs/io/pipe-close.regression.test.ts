@@ -4,10 +4,18 @@ import * as io from './io.js'
 async function settled<T>(pending: PromiseLike<T> | T): Promise<T> {
   let timer: ReturnType<typeof setTimeout> | undefined
   try {
-    return await Promise.race([Promise.resolve(pending), new Promise<T>((_resolve, reject) => {
-      timer = setTimeout(() => reject(new Error('pipe operation did not settle')), 1000)
-    })])
-  } finally { if (timer !== undefined) clearTimeout(timer) }
+    return await Promise.race([
+      Promise.resolve(pending),
+      new Promise<T>((_resolve, reject) => {
+        timer = setTimeout(
+          () => reject(new Error('pipe operation did not settle')),
+          1000,
+        )
+      }),
+    ])
+  } finally {
+    if (timer !== undefined) clearTimeout(timer)
+  }
 }
 
 describe('pipe close and rendezvous contracts', () => {
@@ -35,10 +43,14 @@ describe('pipe close and rendezvous contracts', () => {
     const first = $.newError('first')
     const later = $.newError('later')
     const [r1, w1] = io.Pipe()
-    r1.CloseWithError(first); r1.CloseWithError(later); r1.Close()
+    r1.CloseWithError(first)
+    r1.CloseWithError(later)
+    r1.Close()
     expect(await w1.Write(null)).toEqual([0, first])
     const [r2, w2] = io.Pipe()
-    w2.CloseWithError(first); w2.CloseWithError(later); w2.Close()
+    w2.CloseWithError(first)
+    w2.CloseWithError(later)
+    w2.Close()
     expect(await r2.Read(null)).toEqual([0, first])
     r2.CloseWithError(later)
     expect(await r2.Read(null)).toEqual([0, io.ErrClosedPipe])
@@ -47,18 +59,31 @@ describe('pipe close and rendezvous contracts', () => {
   it('empty writes and reads rendezvous rather than succeeding early', async () => {
     const [r, w] = io.Pipe()
     let finished = false
-    const writing = Promise.resolve(w.Write(null)).then((result) => { finished = true; return result })
+    const writing = Promise.resolve(w.Write(null)).then((result) => {
+      finished = true
+      return result
+    })
     try {
-      await Promise.resolve(); await Promise.resolve(); await Promise.resolve()
+      await Promise.resolve()
+      await Promise.resolve()
+      await Promise.resolve()
       expect(finished).toBe(false)
       expect(await settled(r.Read(null))).toEqual([0, null])
       expect(await settled(writing)).toEqual([0, null])
-    } finally { r.Close(); w.Close() }
+    } finally {
+      r.Close()
+      w.Close()
+    }
   })
   it('a zero-byte read does not acknowledge a nonempty write', async () => {
     const [r, w] = io.Pipe()
     let finished = false
-    const writing = Promise.resolve(w.Write(new Uint8Array([9]))).then((result) => { finished = true; return result })
+    const writing = Promise.resolve(w.Write(new Uint8Array([9]))).then(
+      (result) => {
+        finished = true
+        return result
+      },
+    )
     try {
       expect(await r.Read(null)).toEqual([0, null])
       expect(finished).toBe(false)
@@ -66,7 +91,10 @@ describe('pipe close and rendezvous contracts', () => {
       expect(await r.Read(p)).toEqual([1, null])
       expect(p[0]).toBe(9)
       expect(await settled(writing)).toEqual([1, null])
-    } finally { r.Close(); w.Close() }
+    } finally {
+      r.Close()
+      w.Close()
+    }
   })
   it('writer close wakes zero-length blocked reads with EOF', async () => {
     const [r, w] = io.Pipe()

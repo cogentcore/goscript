@@ -1,7 +1,5 @@
 {
-  "dependencies": [
-    "io"
-  ],
+  "dependencies": ["io"],
   "asyncMethods": {
     "Curve.GenerateKey": true,
     "x25519Curve.GenerateKey": true

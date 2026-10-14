@@ -17,7 +17,10 @@ import {
   RowsColumnScanner,
   String,
 } from './index.js'
-import { NewScanContext, ScanContextValue } from '@goscript/database/sql/internal/index.js'
+import {
+  NewScanContext,
+  ScanContextValue,
+} from '@goscript/database/sql/internal/index.js'
 import { ScanContext } from './index.js'
 
 function expectGoErrorThrow(fn: () => unknown, message: string): void {

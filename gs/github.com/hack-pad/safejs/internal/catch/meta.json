@@ -3,7 +3,5 @@
     "Try": true,
     "TrySideEffect": true
   },
-  "dependencies": [
-    "syscall/js"
-  ]
+  "dependencies": ["syscall/js"]
 }

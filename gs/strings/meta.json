@@ -1,11 +1,5 @@
 {
-  "dependencies": [
-    "errors",
-    "io",
-    "iter",
-    "unicode",
-    "unicode/utf8"
-  ],
+  "dependencies": ["errors", "io", "iter", "unicode", "unicode/utf8"],
   "asyncMethods": {
     "Reader.WriteTo": true,
     "Replacer.WriteString": true,

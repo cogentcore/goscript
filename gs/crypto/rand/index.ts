@@ -28,40 +28,49 @@ export function Read(b: $.Bytes): io.Awaitable<io.IOResult> {
   return io.runIO(fill(Reader, b))
 }
 
-export function Int(rand: io.Reader | null, max: any): io.Awaitable<[any, $.GoError]> {
-  return io.runIO((function* (): Generator<io.Awaitable<io.IOResult>, [any, $.GoError], io.IOResult> {
-    if (max == null || typeof max.Sign !== 'function' || max.Sign() <= 0) {
-      $.panic('crypto/rand: argument to Int is <= 0')
-    }
-
-    let bitLen = max.BitLen()
-    // (max-1).BitLen() differs from max.BitLen() exactly at powers of two.
-    // Detect that boundary without modifying the caller's big.Int.
-    const topBit = new Uint8Array(Math.ceil(bitLen / 8))
-    topBit[0] = 1 << ((bitLen - 1) % 8)
-    const boundary = new max.constructor()
-    boundary.SetBytes(topBit)
-    if (boundary.Cmp(max) === 0) bitLen--
-    if (bitLen === 0) return [new max.constructor(), null]
-    const byteLen = Math.ceil(bitLen / 8)
-    const excessBits = byteLen * 8 - bitLen
-    const reader = rand ?? Reader
-
-    while (true) {
-      const bytes = new Uint8Array(byteLen)
-      const [, err] = yield* fill(reader, bytes)
-      if (err != null) return [null, err]
-      if (excessBits > 0) {
-        bytes[0] &= 0xff >>> excessBits
+export function Int(
+  rand: io.Reader | null,
+  max: any,
+): io.Awaitable<[any, $.GoError]> {
+  return io.runIO(
+    (function* (): Generator<
+      io.Awaitable<io.IOResult>,
+      [any, $.GoError],
+      io.IOResult
+    > {
+      if (max == null || typeof max.Sign !== 'function' || max.Sign() <= 0) {
+        $.panic('crypto/rand: argument to Int is <= 0')
       }
 
-      const candidate = new max.constructor()
-      candidate.SetBytes(bytes)
-      if (candidate.Cmp(max) < 0) {
-        return [candidate, null]
+      let bitLen = max.BitLen()
+      // (max-1).BitLen() differs from max.BitLen() exactly at powers of two.
+      // Detect that boundary without modifying the caller's big.Int.
+      const topBit = new Uint8Array(Math.ceil(bitLen / 8))
+      topBit[0] = 1 << ((bitLen - 1) % 8)
+      const boundary = new max.constructor()
+      boundary.SetBytes(topBit)
+      if (boundary.Cmp(max) === 0) bitLen--
+      if (bitLen === 0) return [new max.constructor(), null]
+      const byteLen = Math.ceil(bitLen / 8)
+      const excessBits = byteLen * 8 - bitLen
+      const reader = rand ?? Reader
+
+      while (true) {
+        const bytes = new Uint8Array(byteLen)
+        const [, err] = yield* fill(reader, bytes)
+        if (err != null) return [null, err]
+        if (excessBits > 0) {
+          bytes[0] &= 0xff >>> excessBits
+        }
+
+        const candidate = new max.constructor()
+        candidate.SetBytes(bytes)
+        if (candidate.Cmp(max) < 0) {
+          return [candidate, null]
+        }
       }
-    }
-  })())
+    })(),
+  )
 }
 
 export async function Prime(
@@ -152,7 +161,8 @@ function* fill(
     }
     offset += n
     if (offset === $.len(dst)) return [offset, null]
-    if (err != null) return [offset, err === io.EOF && offset > 0 ? io.ErrUnexpectedEOF : err]
+    if (err != null)
+      return [offset, err === io.EOF && offset > 0 ? io.ErrUnexpectedEOF : err]
   }
   return [offset, null]
 }

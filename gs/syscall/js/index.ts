@@ -432,7 +432,7 @@ export function ValueOf(x: unknown): Value {
   if (x instanceof Uint8Array) {
     return new Value({ raw: x })
   }
-  if (Array.isArray(x)) {
+  if ($.isArrayOrGoSlice(x)) {
     return new Value({ raw: x.map((item) => ValueOf(item)._raw) })
   }
   if (x instanceof Map) {

@@ -87,13 +87,16 @@ export async function PrivateKey_Sign(
     return [null, new Ed25519Error('ed25519: expected opts.HashFunc() zero')]
   }
   // An interface box may expose HashFunc without exposing the concrete fields.
-  const boxed = options as (SignerOpts & {
-    __goType?: string
-    __goValue?: Options | $.VarRef<Options>
-  }) | null
-  const concrete = boxed?.__goType === '*ed25519.Options' ?
-    $.pointerValueOrNil(boxed.__goValue)
-  : options
+  const boxed = options as
+    | (SignerOpts & {
+        __goType?: string
+        __goValue?: Options | $.VarRef<Options>
+      })
+    | null
+  const concrete =
+    boxed?.__goType === '*ed25519.Options' ?
+      $.pointerValueOrNil(boxed.__goValue)
+    : options
   if (concrete instanceof Options && concrete.Context !== '') {
     // The WebCrypto backend only implements pure Ed25519. Silently signing
     // without Context would remove the caller's requested domain separation.

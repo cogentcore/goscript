@@ -1,7 +1,5 @@
 {
-  "dependencies": [
-    "unsafe"
-  ],
+  "dependencies": ["unsafe"],
   "asyncMethods": {
     "Locker.Lock": true,
     "Mutex.Lock": true,

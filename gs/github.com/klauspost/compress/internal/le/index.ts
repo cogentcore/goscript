@@ -12,7 +12,7 @@ function byteAt(b: $.Slice<number>, i: number): number {
 
 function isSlice(value: unknown): value is $.Slice<number> {
   return (
-    Array.isArray(value) ||
+    $.isArrayOrGoSlice(value) ||
     value === null ||
     value instanceof Uint8Array ||
     (typeof value === 'object' && value !== undefined && '__meta__' in value)

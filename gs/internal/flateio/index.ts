@@ -48,11 +48,18 @@ class Serial {
   private pending: Promise<unknown> | null = null
 
   run<T>(operation: () => io.Awaitable<T>): io.Awaitable<T> {
-    const result = this.pending == null ? operation() : this.pending.then(operation)
+    const result =
+      this.pending == null ? operation() : this.pending.then(operation)
     if (!io.isAsync(result)) return result
     const tracked = Promise.resolve(result).then(
-      value => { if (this.pending === tracked) this.pending = null; return value },
-      error => { if (this.pending === tracked) this.pending = null; throw error },
+      (value) => {
+        if (this.pending === tracked) this.pending = null
+        return value
+      },
+      (error) => {
+        if (this.pending === tracked) this.pending = null
+        throw error
+      },
     )
     this.pending = tracked
     return tracked
@@ -73,17 +80,35 @@ function word(value: number, littleEndian = false): Uint8Array {
   return bytes
 }
 
-function gzipHeader(header: GzipHeader, level: number): [Uint8Array | null, $.GoError] {
+function gzipHeader(
+  header: GzipHeader,
+  level: number,
+): [Uint8Array | null, $.GoError] {
   const extra = new Uint8Array($.bytesToUint8Array(header.extra))
-  if (extra.length > 65535) return [null, $.newError('gzip.Write: Extra data is too large')]
+  if (extra.length > 65535)
+    return [null, $.newError('gzip.Write: Extra data is too large')]
   for (const value of [header.name, header.comment]) {
     for (const char of value) {
       const code = char.codePointAt(0)!
-      if (code === 0 || code > 255) return [null, $.newError('gzip.Write: non-Latin-1 header string')]
+      if (code === 0 || code > 255)
+        return [null, $.newError('gzip.Write: non-Latin-1 header string')]
     }
   }
-  const flags = (header.extra !== null ? 4 : 0) | (header.name ? 8 : 0) | (header.comment ? 16 : 0)
-  const out = [31, 139, 8, flags, ...word(header.time > 0 ? header.time : 0, true), level === 9 ? 2 : level === 1 ? 4 : 0, header.os & 255]
+  const flags =
+    (header.extra !== null ? 4 : 0) |
+    (header.name ? 8 : 0) |
+    (header.comment ? 16 : 0)
+  const out = [
+    31,
+    139,
+    8,
+    flags,
+    ...word(header.time > 0 ? header.time : 0, true),
+    level === 9 ? 2
+    : level === 1 ? 4
+    : 0,
+    header.os & 255,
+  ]
   if (header.extra !== null) {
     out.push(extra.length & 255, extra.length >>> 8)
     for (const byte of extra) out.push(byte)
@@ -114,28 +139,42 @@ export class Deflater {
     dictionary: $.Bytes = null,
     private readonly header?: () => GzipHeader,
   ) {
-    this.dictionary = dictionary === null ? null : new Uint8Array($.bytesToUint8Array(dictionary))
+    this.dictionary =
+      dictionary === null ? null : (
+        new Uint8Array($.bytesToUint8Array(dictionary))
+      )
     this.checksum = format === 'gzip' ? 0 : 1
   }
 
   Write(p: $.Bytes): io.Awaitable<io.IOResult> {
-    if (this.closed) return [0, this.error ?? $.newError('flate: closed writer')]
+    if (this.closed)
+      return [0, this.error ?? $.newError('flate: closed writer')]
     const input = new Uint8Array($.bytesToUint8Array(p))
     return this.queue.run(() => io.runIO(this.process(input, Z_NO_FLUSH)))
   }
 
   Flush(): io.Awaitable<$.GoError> {
     if (this.closed) return this.error ?? $.newError('flate: closed writer')
-    return this.queue.run(() => io.mapResult(io.runIO(this.process(new Uint8Array(0), Z_SYNC_FLUSH)), ([, err]) => err))
+    return this.queue.run(() =>
+      io.mapResult(
+        io.runIO(this.process(new Uint8Array(0), Z_SYNC_FLUSH)),
+        ([, err]) => err,
+      ),
+    )
   }
 
   Close(): io.Awaitable<$.GoError> {
     if (this.closeResult !== undefined) return this.closeResult
     this.closed = true
-    this.closeResult = this.queue.run(() => io.mapResult(
-      io.runIO(this.process(new Uint8Array(0), Z_FINISH)),
-      ([, err]) => { this.release(); return err },
-    ))
+    this.closeResult = this.queue.run(() =>
+      io.mapResult(
+        io.runIO(this.process(new Uint8Array(0), Z_FINISH)),
+        ([, err]) => {
+          this.release()
+          return err
+        },
+      ),
+    )
     return this.closeResult
   }
 
@@ -163,14 +202,26 @@ export class Deflater {
   }
 
   private *initialize(): Operation<$.GoError> {
-    if (!validLevel(this.level)) return $.newError(`${this.format}: invalid compression level: ${this.level}`)
+    if (!validLevel(this.level))
+      return $.newError(
+        `${this.format}: invalid compression level: ${this.level}`,
+      )
     const stream = new ZStream()
-    const status = zlibDeflateInit2(stream, this.level === -2 ? -1 : this.level, 8, -15, 8, this.level === -2 ? 2 : 0)
-    if (status !== Z_OK) return $.newError(`flate: ${stream.msg || 'initialization failed'}`)
+    const status = zlibDeflateInit2(
+      stream,
+      this.level === -2 ? -1 : this.level,
+      8,
+      -15,
+      8,
+      this.level === -2 ? 2 : 0,
+    )
+    if (status !== Z_OK)
+      return $.newError(`flate: ${stream.msg || 'initialization failed'}`)
     this.stream = stream
     if (this.dictionary != null) {
       const status = zlibDeflateSetDictionary(stream, this.dictionary)
-      if (status !== Z_OK) return $.newError(`flate: ${stream.msg || 'invalid dictionary'}`)
+      if (status !== Z_OK)
+        return $.newError(`flate: ${stream.msg || 'invalid dictionary'}`)
     }
     let header: Uint8Array
     if (this.format === 'gzip') {
@@ -179,17 +230,28 @@ export class Deflater {
       header = data!
     } else {
       const level = this.level === -1 ? 6 : this.level
-      const flags = (level < 2 ? 0 : level < 6 ? 1 : level === 6 ? 2 : 3) << 6
+      const flags =
+        (level < 2 ? 0
+        : level < 6 ? 1
+        : level === 6 ? 2
+        : 3) << 6
       let value = 0x7800 | flags | (this.dictionary != null ? 32 : 0)
-      value += (31 - value % 31) % 31
+      value += (31 - (value % 31)) % 31
       header = new Uint8Array(this.dictionary == null ? 2 : 6)
       header.set([value >>> 8, value & 255])
-      if (this.dictionary != null) header.set(word(adler32(1, this.dictionary, this.dictionary.length, 0)), 2)
+      if (this.dictionary != null)
+        header.set(
+          word(adler32(1, this.dictionary, this.dictionary.length, 0)),
+          2,
+        )
     }
     return yield* this.emit(header)
   }
 
-  private *process(input: Uint8Array, flush: Z_FlushMode): Operation<io.IOResult> {
+  private *process(
+    input: Uint8Array,
+    flush: Z_FlushMode,
+  ): Operation<io.IOResult> {
     if (this.error != null) return [0, this.error]
     if (this.stream == null) {
       this.error = yield* this.initialize()
@@ -209,11 +271,22 @@ export class Deflater {
         const offset = stream.next_in
         const status = zlibDeflate(stream, flush)
         const n = stream.next_in - offset
-        this.checksum = (this.format === 'gzip' ? crc32 : adler32)(this.checksum, input, n, offset)
+        this.checksum = (this.format === 'gzip' ? crc32 : adler32)(
+          this.checksum,
+          input,
+          n,
+          offset,
+        )
         this.size = (this.size + n) >>> 0
         accepted += n
-        if (status !== Z_OK && status !== Z_STREAM_END && status !== Z_BUF_ERROR) {
-          this.error = $.newError(`flate: ${stream.msg || `codec error ${status}`}`)
+        if (
+          status !== Z_OK &&
+          status !== Z_STREAM_END &&
+          status !== Z_BUF_ERROR
+        ) {
+          this.error = $.newError(
+            `flate: ${stream.msg || `codec error ${status}`}`,
+          )
           return [accepted, this.error]
         }
         if (stream.next_out > 0) {
@@ -221,12 +294,18 @@ export class Deflater {
           if (this.error != null) return [accepted, this.error]
         }
         if (status === Z_STREAM_END) {
-          const trailer = this.format === 'gzip' ?
-            new Uint8Array([...word(this.checksum, true), ...word(this.size, true)]) : word(this.checksum)
+          const trailer =
+            this.format === 'gzip' ?
+              new Uint8Array([
+                ...word(this.checksum, true),
+                ...word(this.size, true),
+              ])
+            : word(this.checksum)
           this.error = yield* this.emit(trailer)
           return [accepted, this.error]
         }
-        if (stream.avail_in === 0 && stream.avail_out > 0) return [accepted, null]
+        if (stream.avail_in === 0 && stream.avail_out > 0)
+          return [accepted, null]
       }
     } finally {
       stream.input = released
@@ -255,10 +334,15 @@ class Input {
     this.offset = 0
     this.available = 0
     this.terminal = null
-    const byteReader = reader != null && 'ReadByte' in reader && typeof reader.ReadByte === 'function'
-    const seeker = byteReader && 'Seek' in reader && typeof reader.Seek === 'function'
-    this.byteReader = byteReader && !seeker ? reader as io.Reader & io.ByteReader : null
-    this.seeker = seeker ? reader as io.Reader & io.Seeker : null
+    const byteReader =
+      reader != null &&
+      'ReadByte' in reader &&
+      typeof reader.ReadByte === 'function'
+    const seeker =
+      byteReader && 'Seek' in reader && typeof reader.Seek === 'function'
+    this.byteReader =
+      byteReader && !seeker ? (reader as io.Reader & io.ByteReader) : null
+    this.seeker = seeker ? (reader as io.Reader & io.Seeker) : null
   }
 
   // rewind seeks a bulk-read ByteReader back over the unconsumed bytes.
@@ -276,7 +360,10 @@ class Input {
     this.offset = 0
     if (this.byteReader != null) {
       const [value, err] = yield this.byteReader.ReadByte()
-      if (err != null) { this.terminal = err; return err }
+      if (err != null) {
+        this.terminal = err
+        return err
+      }
       this.buffer[0] = value
       this.available = 1
       return null
@@ -334,9 +421,15 @@ export class Inflater {
   private multistream = true
   private readonly queue = new Serial()
 
-  constructor(private readonly format: Format, private readonly errors: DecodeErrors) {}
+  constructor(
+    private readonly format: Format,
+    private readonly errors: DecodeErrors,
+  ) {}
 
-  Reset(reader: io.Reader | null, dictionary: $.Bytes = null): io.Awaitable<$.GoError> {
+  Reset(
+    reader: io.Reader | null,
+    dictionary: $.Bytes = null,
+  ): io.Awaitable<$.GoError> {
     this.queue.assertIdle()
     this.input.reset(reader == null ? null : $.pointerValue<io.Reader>(reader))
     this.dictionary = new Uint8Array($.bytesToUint8Array(dictionary))
@@ -347,13 +440,17 @@ export class Inflater {
     this.bodyError = null
     this.closed = false
     this.multistream = true
-    return this.queue.run(() => io.mapResult(io.runIO(this.initialize(true)), err => {
-      this.error = err
-      return err
-    }))
+    return this.queue.run(() =>
+      io.mapResult(io.runIO(this.initialize(true)), (err) => {
+        this.error = err
+        return err
+      }),
+    )
   }
 
-  Multistream(enabled: boolean): void { this.multistream = enabled }
+  Multistream(enabled: boolean): void {
+    this.multistream = enabled
+  }
 
   Read(p: $.Bytes): io.Awaitable<io.IOResult> {
     return this.queue.run(() => io.runIO(this.read(p)))
@@ -380,12 +477,26 @@ export class Inflater {
     const fixed = this.format === 'gzip' ? 10 : 2
     for (let index = 0; index < fixed; index++) {
       const [, err] = yield* input.byte(bytes)
-      if (err != null) return err === io.EOF && (index > 0 || this.format === 'zlib') ? io.ErrUnexpectedEOF : err
+      if (err != null)
+        return err === io.EOF && (index > 0 || this.format === 'zlib') ?
+            io.ErrUnexpectedEOF
+          : err
     }
-    const header: GzipHeader = { name: '', comment: '', extra: null, time: 0, os: 255 }
+    const header: GzipHeader = {
+      name: '',
+      comment: '',
+      extra: null,
+      time: 0,
+      os: 255,
+    }
     let dictionary = false
     if (this.format === 'zlib') {
-      if ((bytes[0] & 15) !== 8 || (bytes[0] >>> 4) > 7 || ((bytes[0] << 8) | bytes[1]) % 31 !== 0) return this.errors.header()
+      if (
+        (bytes[0] & 15) !== 8 ||
+        bytes[0] >>> 4 > 7 ||
+        ((bytes[0] << 8) | bytes[1]) % 31 !== 0
+      )
+        return this.errors.header()
       dictionary = (bytes[1] & 32) !== 0
       if (dictionary) {
         let id = 0
@@ -394,18 +505,28 @@ export class Inflater {
           if (err != null) return err === io.EOF ? io.ErrUnexpectedEOF : err
           id = ((id << 8) | b) >>> 0
         }
-        if (id !== (adler32(1, this.dictionary, this.dictionary.length, 0) >>> 0)) return this.errors.dictionary()
+        if (id !== adler32(1, this.dictionary, this.dictionary.length, 0) >>> 0)
+          return this.errors.dictionary()
       }
     } else {
-      if (bytes[0] !== 31 || bytes[1] !== 139 || bytes[2] !== 8 || (bytes[3] & 224) !== 0) return this.errors.header()
+      if (
+        bytes[0] !== 31 ||
+        bytes[1] !== 139 ||
+        bytes[2] !== 8 ||
+        (bytes[3] & 224) !== 0
+      )
+        return this.errors.header()
       const flags = bytes[3]
-      header.time = (bytes[4] | (bytes[5] << 8) | (bytes[6] << 16) | (bytes[7] << 24)) >>> 0
+      header.time =
+        (bytes[4] | (bytes[5] << 8) | (bytes[6] << 16) | (bytes[7] << 24)) >>> 0
       header.os = bytes[9]
       if (flags & 4) {
         const [low, firstErr] = yield* input.byte(bytes)
-        if (firstErr != null) return firstErr === io.EOF ? io.ErrUnexpectedEOF : firstErr
+        if (firstErr != null)
+          return firstErr === io.EOF ? io.ErrUnexpectedEOF : firstErr
         const [high, secondErr] = yield* input.byte(bytes)
-        if (secondErr != null) return secondErr === io.EOF ? io.ErrUnexpectedEOF : secondErr
+        if (secondErr != null)
+          return secondErr === io.EOF ? io.ErrUnexpectedEOF : secondErr
         const extra = new Uint8Array(low | (high << 8))
         for (let i = 0; i < extra.length; i++) {
           const [b, err] = yield* input.byte(bytes)
@@ -414,7 +535,10 @@ export class Inflater {
         }
         header.extra = extra
       }
-      for (const [flag, field] of [[8, 'name'], [16, 'comment']] as const) {
+      for (const [flag, field] of [
+        [8, 'name'],
+        [16, 'comment'],
+      ] as const) {
         if (!(flags & flag)) continue
         let value = ''
         for (let i = 0; ; i++) {
@@ -430,9 +554,11 @@ export class Inflater {
         const data = new Uint8Array(bytes)
         const expected = crc32(0, data, data.length, 0) & 65535
         const [low, firstErr] = yield* input.byte(bytes)
-        if (firstErr != null) return firstErr === io.EOF ? io.ErrUnexpectedEOF : firstErr
+        if (firstErr != null)
+          return firstErr === io.EOF ? io.ErrUnexpectedEOF : firstErr
         const [high, secondErr] = yield* input.byte(bytes)
-        if (secondErr != null) return secondErr === io.EOF ? io.ErrUnexpectedEOF : secondErr
+        if (secondErr != null)
+          return secondErr === io.EOF ? io.ErrUnexpectedEOF : secondErr
         if ((low | (high << 8)) !== expected) return this.errors.header()
       }
     }
@@ -440,7 +566,8 @@ export class Inflater {
     let stream = this.stream
     if (stream == null || zlibInflateReset(stream) !== Z_OK) {
       stream = new ZStream()
-      if (zlibInflateInit2(stream, this.format === 'gzip' ? 31 : 15) !== Z_OK) return $.newError('flate: initialization failed')
+      if (zlibInflateInit2(stream, this.format === 'gzip' ? 31 : 15) !== Z_OK)
+        return $.newError('flate: initialization failed')
       this.stream = stream
     }
     stream.input = new Uint8Array(bytes)
@@ -451,11 +578,13 @@ export class Inflater {
     stream.avail_out = 1
     const status = zlibInflate(stream, Z_NO_FLUSH)
     if (status === Z_NEED_DICT && dictionary) {
-      if (zlibInflateSetDictionary(stream, this.dictionary) !== Z_OK) return this.errors.dictionary()
+      if (zlibInflateSetDictionary(stream, this.dictionary) !== Z_OK)
+        return this.errors.dictionary()
     } else if (status !== Z_OK && status !== Z_BUF_ERROR) {
       return this.errors.header()
     }
-    if (stream.avail_in !== 0 || stream.next_out !== 0) return this.errors.header()
+    if (stream.avail_in !== 0 || stream.next_out !== 0)
+      return this.errors.header()
     stream.input = released
     stream.output = released
     this.ended = false
@@ -472,16 +601,23 @@ export class Inflater {
     // A byte slice is inflated in place; other destinations copy from scratch.
     // The codec only indexes its output, so any backing buffer is valid.
     const direct = p instanceof Uint8Array
-    const output = direct ? p as Uint8Array<ArrayBuffer> : this.scratch ??= new Uint8Array(chunkSize)
+    const output =
+      direct ?
+        (p as Uint8Array<ArrayBuffer>)
+      : (this.scratch ??= new Uint8Array(chunkSize))
     while (true) {
       if (this.ended) {
-        if (this.format === 'zlib' || !this.multistream) { this.error = io.EOF; return [0, this.error] }
+        if (this.format === 'zlib' || !this.multistream) {
+          this.error = io.EOF
+          return [0, this.error]
+        }
         this.error = yield* this.initialize(false)
         if (this.error != null) return [0, this.error]
       }
       const stream = this.stream
       const input = this.input
-      if (stream == null || input.reader == null) return [0, $.newError(`${this.format}: reader is not initialized`)]
+      if (stream == null || input.reader == null)
+        return [0, $.newError(`${this.format}: reader is not initialized`)]
       stream.output = output
       stream.next_out = 0
       stream.avail_out = Math.min($.len(p), output.length)
@@ -502,8 +638,13 @@ export class Inflater {
           input.rewind()
         }
       } else if (status !== Z_OK && status !== Z_BUF_ERROR) {
-        this.error = stream.msg === 'incorrect data check' || stream.msg === 'incorrect length check' ?
-          this.errors.checksum() : $.newError(`flate: ${stream.msg || `codec error ${status}`}`)
+        this.error =
+          (
+            stream.msg === 'incorrect data check' ||
+            stream.msg === 'incorrect length check'
+          ) ?
+            this.errors.checksum()
+          : $.newError(`flate: ${stream.msg || `codec error ${status}`}`)
         if (!this.bodyEnded) this.bodyError = this.error
       }
       if (n > 0) {

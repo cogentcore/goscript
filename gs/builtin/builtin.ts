@@ -1,3 +1,4 @@
+import { isArrayOrGoSlice } from './slice.js'
 import type { Slice, SliceProxy, StringHeaderData } from './slice.js'
 import {
   arrayValueTypeInfo,
@@ -57,7 +58,7 @@ export function clear<T>(v: Slice<T> | Map<unknown, unknown> | null): void {
     }
     return
   }
-  if (Array.isArray(v)) {
+  if (isArrayOrGoSlice(v)) {
     v.fill(clearZeroValue(v))
     return
   }
@@ -415,7 +416,7 @@ export function structEqual(
 }
 
 function isArrayLike(value: unknown): value is ArrayLike<unknown> {
-  return Array.isArray(value) || value instanceof Uint8Array
+  return isArrayOrGoSlice(value) || value instanceof Uint8Array
 }
 
 function hasGoType(value: unknown): value is {
@@ -467,7 +468,9 @@ function isStructValue(value: unknown): value is {
     typeof value === 'object' && value !== null ?
       (value as { _fields?: unknown })._fields
     : undefined
-  return typeof fields === 'object' && fields !== null && !Array.isArray(fields)
+  return (
+    typeof fields === 'object' && fields !== null && !isArrayOrGoSlice(fields)
+  )
 }
 
 function fieldsEqual(
@@ -999,12 +1002,12 @@ export function normalizeBytes(
     bytes &&
     typeof bytes === 'object' &&
     'data' in bytes &&
-    Array.isArray(bytes.data)
+    isArrayOrGoSlice(bytes.data)
   ) {
     return new Uint8Array(bytes.data)
   }
 
-  if (Array.isArray(bytes)) {
+  if (isArrayOrGoSlice(bytes)) {
     return new Uint8Array(bytes)
   }
 
@@ -1035,7 +1038,7 @@ export function sortSlice<T extends string | number | bigint>(
     return
   }
 
-  if (Array.isArray(s)) {
+  if (isArrayOrGoSlice(s)) {
     s.sort(ascendingOrdered)
     return
   }
@@ -1116,7 +1119,7 @@ function bytesLen(bytes: ByteData): number {
 }
 
 function byteAt(bytes: ByteData, index: number): number {
-  if (bytes instanceof Uint8Array || Array.isArray(bytes)) {
+  if (bytes instanceof Uint8Array || isArrayOrGoSlice(bytes)) {
     return bytes[index] ?? 0
   }
   const meta = (bytes as SliceProxy<number>).__meta__
@@ -1140,7 +1143,7 @@ export function bytesToArray(bytes: Bytes | null): number[] {
     return meta.backing.slice(meta.offset, meta.offset + meta.length)
   }
 
-  if (Array.isArray(bytes)) {
+  if (isArrayOrGoSlice(bytes)) {
     return bytes
   }
 
@@ -1201,7 +1204,7 @@ function byteView(bytes: Bytes | null): ByteView {
     const meta = (bytes as SliceProxy<number>).__meta__
     return { data: meta.backing, off: meta.offset, len: meta.length }
   }
-  if (Array.isArray(bytes)) {
+  if (isArrayOrGoSlice(bytes)) {
     return { data: bytes, off: 0, len: bytes.length }
   }
   throw new Error(`Cannot convert bytes of type ${typeof bytes} to array`)

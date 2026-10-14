@@ -12,34 +12,55 @@ function sink(async = false) {
   return {
     chunks,
     Write(p: $.Bytes): io.Awaitable<io.IOResult> {
-      const consume = (): io.IOResult => { chunks.push(new Uint8Array($.bytesToUint8Array(p))); return [$.len(p), null] }
+      const consume = (): io.IOResult => {
+        chunks.push(new Uint8Array($.bytesToUint8Array(p)))
+        return [$.len(p), null]
+      }
       return async ? Promise.resolve().then(consume) : consume()
     },
     bytes: () => Buffer.concat(chunks),
   }
 }
 
-for (const [name, codec, decode] of [['gzip', gzip, gunzipSync], ['zlib', zlib, inflateSync]] as const) {
+for (const [name, codec, decode] of [
+  ['gzip', gzip, gunzipSync],
+  ['zlib', zlib, inflateSync],
+] as const) {
   describe(`${name} incremental writer`, () => {
-    it.each([-2, -1, 0, 1, 6, 9])('flushes decodable prefixes and continues at level %s', async (level) => {
-      const output = sink()
-      const [writer, err] = codec.NewWriterLevel(output, level)
-      expect(err).toBeNull()
-      expect(await writer!.Flush()).toBeNull()
-      expect(decode(output.bytes(), { finishFlush: constants.Z_SYNC_FLUSH }).length).toBe(0)
-      const input = Buffer.from('first piece')
-      expect(writer!.Write(input)).toEqual([input.length, null])
-      input.fill(0)
-      expect(await writer!.Flush()).toBeNull()
-      expect(decode(output.bytes(), { finishFlush: constants.Z_SYNC_FLUSH }).toString()).toBe('first piece')
-      expect(await writer!.Write(Buffer.from(' second piece'))).toEqual([13, null])
-      expect(await writer!.Flush()).toBeNull()
-      expect(await writer!.Close()).toBeNull()
-      expect(decode(output.bytes()).toString()).toBe('first piece second piece')
-      const length = output.bytes().length
-      expect(await writer!.Close()).toBeNull()
-      expect(output.bytes().length).toBe(length)
-    })
+    it.each([-2, -1, 0, 1, 6, 9])(
+      'flushes decodable prefixes and continues at level %s',
+      async (level) => {
+        const output = sink()
+        const [writer, err] = codec.NewWriterLevel(output, level)
+        expect(err).toBeNull()
+        expect(await writer!.Flush()).toBeNull()
+        expect(
+          decode(output.bytes(), { finishFlush: constants.Z_SYNC_FLUSH })
+            .length,
+        ).toBe(0)
+        const input = Buffer.from('first piece')
+        expect(writer!.Write(input)).toEqual([input.length, null])
+        input.fill(0)
+        expect(await writer!.Flush()).toBeNull()
+        expect(
+          decode(output.bytes(), {
+            finishFlush: constants.Z_SYNC_FLUSH,
+          }).toString(),
+        ).toBe('first piece')
+        expect(await writer!.Write(Buffer.from(' second piece'))).toEqual([
+          13,
+          null,
+        ])
+        expect(await writer!.Flush()).toBeNull()
+        expect(await writer!.Close()).toBeNull()
+        expect(decode(output.bytes()).toString()).toBe(
+          'first piece second piece',
+        )
+        const length = output.bytes().length
+        expect(await writer!.Close()).toBeNull()
+        expect(output.bytes().length).toBe(length)
+      },
+    )
     it('owns queued Buffer input and serializes async flush/close operations', async () => {
       const output = sink(true)
       const writer = codec.NewWriter(output)
@@ -57,7 +78,12 @@ for (const [name, codec, decode] of [['gzip', gzip, gunzipSync], ['zlib', zlib, 
     it('retains destination errors and detects short output writes', async () => {
       for (const failure of [null, $.newError('destination failed')]) {
         let calls = 0
-        const writer = codec.NewWriter({ Write: (_p): io.IOResult => { calls++; return [1, failure] } })
+        const writer = codec.NewWriter({
+          Write: (_p): io.IOResult => {
+            calls++
+            return [1, failure]
+          },
+        })
         const [n, err] = await writer.Write(Buffer.from('payload'))
         expect(n).toBe(0)
         expect(err).toBe(failure ?? io.ErrShortWrite)
@@ -67,7 +93,10 @@ for (const [name, codec, decode] of [['gzip', gzip, gunzipSync], ['zlib', zlib, 
         expect(calls).toBe(1)
         const repaired = sink()
         writer.Reset(repaired)
-        expect(await writer.Write(Buffer.from('new stream'))).toEqual([10, null])
+        expect(await writer.Write(Buffer.from('new stream'))).toEqual([
+          10,
+          null,
+        ])
         expect(await writer.Close()).toBeNull()
         expect(decode(repaired.bytes()).toString()).toBe('new stream')
       }
@@ -75,13 +104,18 @@ for (const [name, codec, decode] of [['gzip', gzip, gunzipSync], ['zlib', zlib, 
     it('keeps output chunks bounded for large incompressible input', async () => {
       const input = new Uint8Array(256 * 1024)
       let x = 12345
-      for (let i = 0; i < input.length; i++) { x ^= x << 13; x ^= x >>> 17; x ^= x << 5; input[i] = x }
+      for (let i = 0; i < input.length; i++) {
+        x ^= x << 13
+        x ^= x >>> 17
+        x ^= x << 5
+        input[i] = x
+      }
       const output = sink()
       const writer = codec.NewWriter(output)
       expect(await writer.Write(input)).toEqual([input.length, null])
       expect(output.bytes().length).toBeGreaterThan(32 * 1024)
       expect(await writer.Close()).toBeNull()
-      expect(output.chunks.every(c => c.length <= 32 * 1024)).toBe(true)
+      expect(output.chunks.every((c) => c.length <= 32 * 1024)).toBe(true)
       expect(new Uint8Array(decode(output.bytes()))).toEqual(input)
     })
     it('writes a valid empty stream and rejects writes after close', async () => {
@@ -102,11 +136,16 @@ it('zlib snapshots dictionary storage and retains it across Reset', async () => 
   expect(err).toBeNull()
   dictionary.fill(0)
   for (let pass = 0; pass < 2; pass++) {
-    if (pass) { output.chunks.length = 0; writer!.Reset(output) }
+    if (pass) {
+      output.chunks.length = 0
+      writer!.Reset(output)
+    }
     writer!.Write(expected)
     expect(await writer!.Flush()).toBeNull()
     expect(await writer!.Close()).toBeNull()
-    expect(inflateSync(output.bytes(), { dictionary: expected })).toEqual(expected)
+    expect(inflateSync(output.bytes(), { dictionary: expected })).toEqual(
+      expected,
+    )
   }
 })
 

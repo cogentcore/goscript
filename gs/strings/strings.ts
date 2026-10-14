@@ -308,7 +308,7 @@ export function FieldsFunc(
 // Join concatenates the elements of elems to create a single string. The separator string sep is placed between elements in the resulting string.
 export function Join(elems: $.Slice<string>, sep: string): string {
   const arr = $.asArray(elems)
-  if (!Array.isArray(arr)) {
+  if (!$.isArrayOrGoSlice(arr)) {
     return ''
   }
   return arr.join(sep)

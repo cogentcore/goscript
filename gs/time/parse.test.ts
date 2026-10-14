@@ -48,16 +48,10 @@ describe('time parse/since/until (Go semantics)', () => {
   it('Parse reads ASN.1 GeneralizedTime layouts', () => {
     const layout = '20060102150405.999999999Z0700'
     const [utc, utcErr] = Parse(layout, '21250331123506.123456789Z')
-    const [offset, offsetErr] = Parse(
-      layout,
-      '21250331140506.123456789+0130',
-    )
+    const [offset, offsetErr] = Parse(layout, '21250331140506.123456789+0130')
     const [whole, wholeErr] = Parse(layout, '21250331123506Z')
     const canonicalLayout = '20060102150405Z0700'
-    const [canonical, canonicalErr] = Parse(
-      canonicalLayout,
-      '21250331123506Z',
-    )
+    const [canonical, canonicalErr] = Parse(canonicalLayout, '21250331123506Z')
     expect(utcErr).toBeNull()
     expect(offsetErr).toBeNull()
     expect(offset.UnixNano()).toBe(utc.UnixNano())

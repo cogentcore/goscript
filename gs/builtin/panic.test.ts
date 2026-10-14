@@ -13,7 +13,6 @@ import {
 import { goSlice, index, makeSlice } from './slice.js'
 import { DisposableStack } from './defer.js'
 
-
 // captureThrow returns whatever value the callback throws, or undefined if it
 // did not throw. Go panics surface as a thrown GoPanic in the transpiled
 // runtime, so tests assert on the caught value's shape. Catching here models a

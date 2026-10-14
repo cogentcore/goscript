@@ -1,3 +1,4 @@
+import { isArrayOrGoSlice } from '../builtin/index.js'
 import { ReflectValue } from './types.js'
 
 // Swapper returns a function that swaps the elements in the provided slice.
@@ -6,12 +7,12 @@ export function Swapper(slice: ReflectValue): (i: number, j: number) => void {
   let actualArray: unknown[] | null = null
 
   // Try to extract the underlying array
-  if (Array.isArray(slice)) {
+  if (isArrayOrGoSlice(slice)) {
     actualArray = slice
   } else if (slice && typeof slice === 'object' && '__meta__' in slice) {
     // GoScript slice object
     const meta = (slice as { __meta__?: { backing?: unknown[] } }).__meta__
-    if (meta && meta.backing && Array.isArray(meta.backing)) {
+    if (meta && meta.backing && isArrayOrGoSlice(meta.backing)) {
       actualArray = meta.backing
     }
   }

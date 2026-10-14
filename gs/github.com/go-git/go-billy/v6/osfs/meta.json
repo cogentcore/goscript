@@ -1,9 +1,5 @@
 {
-  "dependencies": [
-    "io/fs",
-    "os",
-    "path/filepath"
-  ],
+  "dependencies": ["io/fs", "os", "path/filepath"],
   "asyncMethods": {
     "BoundOS.Create": true,
     "BoundOS.Lstat": true,

@@ -1,7 +1,5 @@
 {
-  "dependencies": [
-    "internal/flateio"
-  ],
+  "dependencies": ["internal/flateio"],
   "asyncMethods": {
     "Writer.Close": true,
     "Writer.Write": true,

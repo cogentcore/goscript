@@ -7,13 +7,13 @@ function normalizeBytes(b: any): any[] {
   if (b === null || b === undefined) {
     return []
   }
-  if (Array.isArray(b)) {
+  if ($.isArrayOrGoSlice(b)) {
     return b
   }
   if (b instanceof Uint8Array) {
     return Array.from(b)
   }
-  if (b && typeof b === 'object' && 'data' in b && Array.isArray(b.data)) {
+  if (b && typeof b === 'object' && 'data' in b && $.isArrayOrGoSlice(b.data)) {
     return b.data
   }
   return []

@@ -1,3 +1,4 @@
+import { isArrayOrGoSlice } from '../builtin/index.js'
 import { Method, ReflectValue, StructField, ValueError } from './types.js'
 export { StructField }
 import { MapIter } from './map.js'

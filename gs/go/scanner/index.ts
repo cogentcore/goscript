@@ -230,7 +230,7 @@ export async function PrintError(w: io.Writer, err: $.GoError): Promise<void> {
   if (err === null) {
     return
   }
-  if (Array.isArray(err)) {
+  if ($.isArrayOrGoSlice(err)) {
     for (const entry of Array.from((err as ErrorList) ?? [])) {
       if (entry == null) {
         continue

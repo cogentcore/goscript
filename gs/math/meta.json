@@ -1,5 +1,3 @@
 {
-  "dependencies": [
-    "math/bits"
-  ]
-} 
+  "dependencies": ["math/bits"]
+}

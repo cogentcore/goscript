@@ -45,9 +45,7 @@ describe('crypto/cipher override', () => {
       additionalData,
     )
     expect(openErr).toBeNull()
-    expect($.bytesToUint8Array(opened)).toEqual(
-      $.bytesToUint8Array(plaintext),
-    )
+    expect($.bytesToUint8Array(opened)).toEqual($.bytesToUint8Array(plaintext))
   })
 
   it('rejects non-empty explicit nonces', async () => {
@@ -67,12 +65,10 @@ describe('crypto/cipher CTR override', () => {
   const key = hex('2b7e151628aed2a6abf7158809cf4f3c')
   const iv = hex('f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff')
   const plaintext = hex(
-    '6bc1bee22e409f96e93d7e117393172a' +
-      'ae2d8a571e03ac9c9eb76fac45af8e51',
+    '6bc1bee22e409f96e93d7e117393172a' + 'ae2d8a571e03ac9c9eb76fac45af8e51',
   )
   const ciphertext = hex(
-    '874d6191b620e3261bef6864990db6ce' +
-      '9806f66b7970fdff8617187bb9fffdff',
+    '874d6191b620e3261bef6864990db6ce' + '9806f66b7970fdff8617187bb9fffdff',
   )
 
   it('produces the NIST CTR-AES128 vector', () => {

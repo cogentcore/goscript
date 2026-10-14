@@ -1,6 +1,3 @@
 {
-  "dependencies": [
-    "errors",
-    "unicode/utf8"
-  ]
-} 
+  "dependencies": ["errors", "unicode/utf8"]
+}

@@ -16,7 +16,9 @@ describe('syncResult', () => {
 
 describe('syncFunction', () => {
   it('returns the synchronous results of a function value', () => {
-    const add = syncFunction((a: number, b: number): number | Promise<number> => a + b)
+    const add = syncFunction(
+      (a: number, b: number): number | Promise<number> => a + b,
+    )
     expect(add!(1, 2)).toBe(3)
   })
 

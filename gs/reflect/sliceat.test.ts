@@ -55,10 +55,7 @@ describe('reflect owned pointer handles', () => {
 
   it('copies reflected byte slices into typed-array backing', () => {
     const dst = new Uint8Array(3)
-    const copied = Copy(
-      ValueOf(dst),
-      ValueOf(new Uint8Array([7, 8, 9, 10])),
-    )
+    const copied = Copy(ValueOf(dst), ValueOf(new Uint8Array([7, 8, 9, 10])))
 
     expect(copied).toBe(3)
     expect(Array.from(dst)).toEqual([7, 8, 9])

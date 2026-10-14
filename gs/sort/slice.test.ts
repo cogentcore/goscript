@@ -55,7 +55,10 @@ describe('sort.Slice override', () => {
     expect(Slice(values, (i, j) => values![i] < values![j])).toBeUndefined()
     expect(values).toEqual([1, 2, 3])
 
-    const pending = SliceIsSorted(values, async (i, j) => values![i] < values![j])
+    const pending = SliceIsSorted(
+      values,
+      async (i, j) => values![i] < values![j],
+    )
     expect(pending).toBeInstanceOf(Promise)
     expect(await pending).toBe(true)
   })

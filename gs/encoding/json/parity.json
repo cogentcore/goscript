@@ -2,23 +2,38 @@
   "schemaVersion": 1,
   "strict": true,
   "symbols": {
-    "CallMethodsWithLegacySemantics": { "status": "blocked", "reason": "encoding/json v2 legacy-semantics surface; the wasm override implements v1 semantics only" },
+    "CallMethodsWithLegacySemantics": {
+      "status": "blocked",
+      "reason": "encoding/json v2 legacy-semantics surface; the wasm override implements v1 semantics only"
+    },
     "Compact": {
       "status": "real"
     },
     "Decoder": {
       "status": "real"
     },
-    "DefaultOptionsV1": { "status": "blocked", "reason": "encoding/json v2 legacy-semantics surface; the wasm override implements v1 semantics only" },
+    "DefaultOptionsV1": {
+      "status": "blocked",
+      "reason": "encoding/json v2 legacy-semantics surface; the wasm override implements v1 semantics only"
+    },
     "Delim": {
       "status": "real"
     },
     "Encoder": {
       "status": "real"
     },
-    "FormatByteArrayAsArray": { "status": "blocked", "reason": "encoding/json v2 legacy-semantics surface; the wasm override implements v1 semantics only" },
-    "FormatBytesWithLegacySemantics": { "status": "blocked", "reason": "encoding/json v2 legacy-semantics surface; the wasm override implements v1 semantics only" },
-    "FormatDurationAsNano": { "status": "blocked", "reason": "encoding/json v2 legacy-semantics surface; the wasm override implements v1 semantics only" },
+    "FormatByteArrayAsArray": {
+      "status": "blocked",
+      "reason": "encoding/json v2 legacy-semantics surface; the wasm override implements v1 semantics only"
+    },
+    "FormatBytesWithLegacySemantics": {
+      "status": "blocked",
+      "reason": "encoding/json v2 legacy-semantics surface; the wasm override implements v1 semantics only"
+    },
+    "FormatDurationAsNano": {
+      "status": "blocked",
+      "reason": "encoding/json v2 legacy-semantics surface; the wasm override implements v1 semantics only"
+    },
     "HTMLEscape": {
       "status": "real"
     },
@@ -43,8 +58,14 @@
     "MarshalIndent": {
       "status": "real"
     },
-    "MatchCaseSensitiveDelimiter": { "status": "blocked", "reason": "encoding/json v2 legacy-semantics surface; the wasm override implements v1 semantics only" },
-    "MergeWithLegacySemantics": { "status": "blocked", "reason": "encoding/json v2 legacy-semantics surface; the wasm override implements v1 semantics only" },
+    "MatchCaseSensitiveDelimiter": {
+      "status": "blocked",
+      "reason": "encoding/json v2 legacy-semantics surface; the wasm override implements v1 semantics only"
+    },
+    "MergeWithLegacySemantics": {
+      "status": "blocked",
+      "reason": "encoding/json v2 legacy-semantics surface; the wasm override implements v1 semantics only"
+    },
     "NewDecoder": {
       "status": "real"
     },
@@ -54,15 +75,33 @@
     "Number": {
       "status": "real"
     },
-    "OmitEmptyWithLegacySemantics": { "status": "blocked", "reason": "encoding/json v2 legacy-semantics surface; the wasm override implements v1 semantics only" },
-    "Options": { "status": "blocked", "reason": "encoding/json v2 legacy-semantics surface; the wasm override implements v1 semantics only" },
-    "ParseBytesWithLooseRFC4648": { "status": "blocked", "reason": "encoding/json v2 legacy-semantics surface; the wasm override implements v1 semantics only" },
-    "ParseTimeWithLooseRFC3339": { "status": "blocked", "reason": "encoding/json v2 legacy-semantics surface; the wasm override implements v1 semantics only" },
+    "OmitEmptyWithLegacySemantics": {
+      "status": "blocked",
+      "reason": "encoding/json v2 legacy-semantics surface; the wasm override implements v1 semantics only"
+    },
+    "Options": {
+      "status": "blocked",
+      "reason": "encoding/json v2 legacy-semantics surface; the wasm override implements v1 semantics only"
+    },
+    "ParseBytesWithLooseRFC4648": {
+      "status": "blocked",
+      "reason": "encoding/json v2 legacy-semantics surface; the wasm override implements v1 semantics only"
+    },
+    "ParseTimeWithLooseRFC3339": {
+      "status": "blocked",
+      "reason": "encoding/json v2 legacy-semantics surface; the wasm override implements v1 semantics only"
+    },
     "RawMessage": {
       "status": "real"
     },
-    "ReportErrorsWithLegacySemantics": { "status": "blocked", "reason": "encoding/json v2 legacy-semantics surface; the wasm override implements v1 semantics only" },
-    "StringifyWithLegacySemantics": { "status": "blocked", "reason": "encoding/json v2 legacy-semantics surface; the wasm override implements v1 semantics only" },
+    "ReportErrorsWithLegacySemantics": {
+      "status": "blocked",
+      "reason": "encoding/json v2 legacy-semantics surface; the wasm override implements v1 semantics only"
+    },
+    "StringifyWithLegacySemantics": {
+      "status": "blocked",
+      "reason": "encoding/json v2 legacy-semantics surface; the wasm override implements v1 semantics only"
+    },
     "SyntaxError": {
       "status": "real"
     },
@@ -72,7 +111,10 @@
     "Unmarshal": {
       "status": "real"
     },
-    "UnmarshalArrayFromAnyLength": { "status": "blocked", "reason": "encoding/json v2 legacy-semantics surface; the wasm override implements v1 semantics only" },
+    "UnmarshalArrayFromAnyLength": {
+      "status": "blocked",
+      "reason": "encoding/json v2 legacy-semantics surface; the wasm override implements v1 semantics only"
+    },
     "Unmarshaler": {
       "status": "real"
     },
