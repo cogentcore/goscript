@@ -1,4 +1,4 @@
-import { asArray, isSliceProxy, type Slice } from './slice.js'
+import { asArray, isArrayOrGoSlice, isSliceProxy, type Slice } from './slice.js'
 import { isVarRef } from './varRef.js'
 
 // A transpiled Go Error(), String(), or GoString() method may be async, so
@@ -208,7 +208,7 @@ function formatObject(
 
 function getObjectEntries(value: Record<string, any>): [string, any][] {
   const fields = value._fields
-  if (fields && typeof fields === 'object' && !Array.isArray(fields)) {
+  if (fields && typeof fields === 'object' && !isArrayOrGoSlice(fields)) {
     return Object.entries(fields)
   }
 
