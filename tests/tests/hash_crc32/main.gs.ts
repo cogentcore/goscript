@@ -85,7 +85,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 
 	let prefix: $.Slice<number> = new Uint8Array([9, 8, 7]) as $.Slice<number>
-	let summed: $.Slice<number> = (__goscriptAwait = $.pointerValue<Exclude<hash.Hash32, null>>(ieee).Sum($.goSlice(prefix, undefined, $.sliceLen(prefix), $.sliceLen(prefix))), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+	let summed: $.Slice<number> = ((__goscriptAwait = $.pointerValue<Exclude<hash.Hash32, null>>(ieee).Sum($.goSlice(prefix, undefined, $.sliceLen(prefix), $.sliceLen(prefix))), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as $.Slice<number>)
 	if (((($.sliceLen(summed) != ($.sliceLen(prefix) + crc32.Size)) || ($.arrayIndex(summed!, 0) != 9)) || ($.arrayIndex(summed!, 1) != 8)) || ($.arrayIndex(summed!, 2) != 7)) {
 		$.panic("prefix-preserving Sum")
 	}

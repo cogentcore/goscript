@@ -183,7 +183,7 @@ export async function testVarRefConversion(): globalThis.Promise<void> {
 	let source: transport | $.VarRef<transport> | null = value
 	let destination: packetHandlerMap | $.VarRef<packetHandlerMap> | null = $.unsafePointerCast<packetHandlerMap | $.VarRef<packetHandlerMap> | null>(source, packetHandlerMap)
 	packetHandlerMap.prototype.Add.call(destination, 9)
-	$.assignStruct(value.value, new transport({values: $.makeMap<number, number>()}, true))
+	value.value = $.assignStruct(value.value, new transport({values: $.makeMap<number, number>()}, true))
 	packetHandlerMap.prototype.Add.call(destination, 10)
 	await $.println("varref destination:", $.mapGet<number, number, number>(value.value.values, 10, 0)[0])
 }

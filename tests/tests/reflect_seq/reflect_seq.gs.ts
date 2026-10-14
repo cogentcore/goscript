@@ -170,7 +170,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("recv", $.markAsStructValue($.cloneStructValue(v)).Int(), ok)
 	rc!.close()
 	let __goscriptTuple0: any = await $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(rc, "chan int", /* @__PURE__ */ $.channelType(/* @__PURE__ */ $.basicType("int"), "both"))))).Recv()
-	$.assignStruct(v, __goscriptTuple0[0])
+	v = $.assignStruct(v, __goscriptTuple0[0])
 	ok = __goscriptTuple0[1]
 	await $.println("recv closed", $.markAsStructValue($.cloneStructValue(v)).Int(), ok)
 
@@ -209,7 +209,7 @@ export async function main(): globalThis.Promise<void> {
 		let data = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as any)
 		let [value, __goscriptShadow0] = $.typeAssertTuple<reflect.Value>(data, "reflect.Value")
 		if (!__goscriptShadow0) {
-			$.assignStruct(value, reflect.ValueOf(data))
+			value = $.assignStruct(value, reflect.ValueOf(data))
 		}
 		await $.println("assert", __goscriptShadow0, $.markAsStructValue($.cloneStructValue(value)).Int())
 	}

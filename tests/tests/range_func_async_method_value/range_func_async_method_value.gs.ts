@@ -114,7 +114,7 @@ export class Group {
 
 	public async Each(_yield: ((_p0: Group | $.VarRef<Group> | null) => boolean | globalThis.Promise<boolean>) | null): globalThis.Promise<void> {
 		const g: Group | $.VarRef<Group> | null = this;
-		for (let __goscriptRangeTarget0 = (__goscriptAwait = $.pointerValue<Exclude<provider, null>>($.pointerValue<Group>(g).provider).Items(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
+		for (let __goscriptRangeTarget0 = ((__goscriptAwait = $.pointerValue<Exclude<provider, null>>($.pointerValue<Group>(g).provider).Items(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as $.Slice<Group | $.VarRef<Group> | null>), __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
 			let child = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as Group | $.VarRef<Group> | null)
 			if (!(__goscriptAwait = _yield!(child), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)) {
 				return

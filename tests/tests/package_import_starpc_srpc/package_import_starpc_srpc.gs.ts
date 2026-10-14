@@ -429,7 +429,7 @@ export class memoryRpcStream {
 			{
 				id: 0,
 				isSend: false,
-				channel: (__goscriptAwait = $.pointerValue<Exclude<context.Context, null>>((m$ as memoryRpcStream).ctx).Done(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait),
+				channel: ((__goscriptAwait = $.pointerValue<Exclude<context.Context, null>>((m$ as memoryRpcStream).ctx).Done(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as $.Channel<{}> | null),
 				onSelected: async (__goscriptSelect0Result) => {
 					return [null, context.Canceled]
 				}
@@ -462,7 +462,7 @@ export class memoryRpcStream {
 			{
 				id: 0,
 				isSend: false,
-				channel: (__goscriptAwait = $.pointerValue<Exclude<context.Context, null>>((m$ as memoryRpcStream).ctx).Done(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait),
+				channel: ((__goscriptAwait = $.pointerValue<Exclude<context.Context, null>>((m$ as memoryRpcStream).ctx).Done(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as $.Channel<{}> | null),
 				onSelected: async (__goscriptSelect1Result) => {
 					return context.Canceled
 				}
@@ -806,7 +806,7 @@ export function newRoutedRpcStreamClient(ctx: context.Context | null, componentI
 				{
 					id: 0,
 					isSend: false,
-					channel: (__goscriptAwait = $.pointerValue<Exclude<context.Context, null>>(ctx).Done(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait),
+					channel: ((__goscriptAwait = $.pointerValue<Exclude<context.Context, null>>(ctx).Done(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as $.Channel<{}> | null),
 					onSelected: async (__goscriptSelect6Result) => {
 						await memoryRpcStream.prototype.Close.call(client)
 						await memoryRpcStream.prototype.Close.call(server)
@@ -815,7 +815,7 @@ export function newRoutedRpcStreamClient(ctx: context.Context | null, componentI
 				{
 					id: 1,
 					isSend: false,
-					channel: (__goscriptAwait = $.pointerValue<Exclude<context.Context, null>>(callCtx).Done(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait),
+					channel: ((__goscriptAwait = $.pointerValue<Exclude<context.Context, null>>(callCtx).Done(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as $.Channel<{}> | null),
 					onSelected: async (__goscriptSelect6Result) => {
 						await memoryRpcStream.prototype.Close.call(client)
 						await memoryRpcStream.prototype.Close.call(server)

@@ -47,7 +47,7 @@ export async function main(): globalThis.Promise<void> {
 	// Resetting a reusable cell must leave appended entries intact.
 	let current = $.varRef(new cell({width: 7}, true))
 	let cells: $.Slice<cell> = $.appendOne<cell>(null, (current.value).clone())
-	$.assignStruct(current.value, new cell(undefined, true))
+	current.value = $.assignStruct(current.value, new cell(undefined, true))
 	await $.println("cell:", $.arrayIndex(cells!, 0).width, current.value.width)
 
 	// Arrays also copy at the argument boundary.

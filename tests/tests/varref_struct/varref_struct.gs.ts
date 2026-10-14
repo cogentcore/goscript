@@ -135,7 +135,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// Field pointers retain their storage identity across whole-value assignment.
 	let field = $.fieldRef(val.value._fields, "MyInt")
-	$.assignStruct(val.value, new MyStruct({MyInt: 30}, true))
+	val.value = $.assignStruct(val.value, new MyStruct({MyInt: 30}, true))
 	await $.println("field after assignment:", $.pointerValue<number>(field), $.pointerEqual(field, $.fieldRef(val.value._fields, "MyInt")))
 	field!.value = 40
 	await $.println("write through field:", val.value.MyInt, (ptrToVal$ as MyStruct).MyInt)
@@ -153,19 +153,19 @@ export async function main(): globalThis.Promise<void> {
 	let child = $.fieldRef(outer.Child._fields, "MyInt")
 	let item = $.fieldRef($.arrayIndex(outer.Items, 0)._fields, "MyInt")
 	let ptrField = $.fieldRef(outer._fields, "Ptr")
-	$.assignStruct(outer, new Outer({Child: new MyStruct({MyInt: 50}, true), Items: $.arrayValue([new MyStruct({MyInt: 60}, true), new MyStruct(undefined, true)], /* @__PURE__ */ $.arrayType("main.MyStruct", 2)), Ptr: second}, true))
+	outer = $.assignStruct(outer, new Outer({Child: new MyStruct({MyInt: 50}, true), Items: $.arrayValue([new MyStruct({MyInt: 60}, true), new MyStruct(undefined, true)], /* @__PURE__ */ $.arrayType("main.MyStruct", 2)), Ptr: second}, true))
 	await $.println("nested:", $.pointerValue<number>(child), $.pointerValue<number>(item), $.pointerEqual($.pointerValue<MyStruct | $.VarRef<MyStruct> | null>(ptrField), second), $.pointerValue<MyStruct>(first).MyInt)
 	await $.println("nested identity:", $.pointerEqual(child, $.fieldRef(outer.Child._fields, "MyInt")), $.pointerEqual(item, $.fieldRef($.arrayIndex(outer.Items, 0)._fields, "MyInt")), $.pointerEqual(ptrField, $.fieldRef(outer._fields, "Ptr")))
 
 	// Both tuple and parallel assignments update existing variable storage.
 	let __goscriptTuple0: any = pair()
-	$.assignStruct(val.value, __goscriptTuple0[0])
+	val.value = $.assignStruct(val.value, __goscriptTuple0[0])
 	$.assignStruct(global, __goscriptTuple0[1])
 	await $.println("tuple:", $.pointerValue<number>(field), global.MyInt)
 	let globalField = $.fieldRef(global._fields, "MyInt")
 	let __goscriptAssign0_0: MyStruct = (global).clone()
 	let __goscriptAssign0_1: MyStruct = (val.value).clone()
-	$.assignStruct(val.value, __goscriptAssign0_0)
+	val.value = $.assignStruct(val.value, __goscriptAssign0_0)
 	$.assignStruct(global, __goscriptAssign0_1)
 	await $.println("parallel:", $.pointerValue<number>(field), $.pointerValue<number>(globalField))
 	$.assignStruct(global, new MyStruct({MyInt: 90}, true))

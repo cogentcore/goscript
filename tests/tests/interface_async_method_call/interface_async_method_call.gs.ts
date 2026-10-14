@@ -200,7 +200,7 @@ export function newGenericStore(__typeArgs: $.GenericTypeArgs | undefined, value
 }
 
 export async function loadGenericStore(store: GenericStore | null): globalThis.Promise<number> {
-	return ((__goscriptAwait = $.callInterfaceMethod($.pointerValue<Exclude<GenericStore, null>>(store), "Load", __goscriptStatic0()), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as number)
+	return $.callInterfaceMethod($.pointerValue<Exclude<GenericStore, null>>(store), "Load", __goscriptStatic0())
 }
 
 export async function main(): globalThis.Promise<void> {

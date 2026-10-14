@@ -42,7 +42,7 @@ export async function main(): globalThis.Promise<void> {
 		await bcast.value.HoldLock($.functionValue(async (_p0: (() => void) | null, getWaitCh: (() => $.Channel<{}> | null | globalThis.Promise<$.Channel<{}> | null>) | null): globalThis.Promise<void> => {
 			done = completed == 16
 			if (!done) {
-				waitCh = (__goscriptAwait = getWaitCh!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+				waitCh = ((__goscriptAwait = getWaitCh!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as $.Channel<{}> | null)
 			}
 		}, ({ kind: $.TypeKind.Function, params: [({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.channelType({ kind: $.TypeKind.Struct, methods: [], fields: [] }, "receive")] } as $.FunctionTypeInfo)], results: [] } as $.FunctionTypeInfo)))
 		if (done) {
@@ -52,7 +52,7 @@ export async function main(): globalThis.Promise<void> {
 			{
 				id: 0,
 				isSend: false,
-				channel: (__goscriptAwait = $.pointerValue<Exclude<context.Context, null>>(ctx).Done(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait),
+				channel: ((__goscriptAwait = $.pointerValue<Exclude<context.Context, null>>(ctx).Done(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as $.Channel<{}> | null),
 				onSelected: async (__goscriptSelect0Result) => {
 					await $.println("ctx canceled")
 					return $.selectVoidReturn()

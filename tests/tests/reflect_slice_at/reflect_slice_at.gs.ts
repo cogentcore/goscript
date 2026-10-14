@@ -139,7 +139,7 @@ export async function newAtOffsets(): globalThis.Promise<void> {
 	await $.println("newat-offset:", pt.value.Mbr2)
 
 	let __goscriptTuple0: any = await $.pointerValue<Exclude<reflect.Type, null>>(typ).FieldByName("Mbr1")
-	$.assignStruct(fld, __goscriptTuple0[0])
+	fld = $.assignStruct(fld, __goscriptTuple0[0])
 	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(fieldValue($.interfaceValue(pt, "*main.T", /* @__PURE__ */ $.pointerType("main.T")), fld))).Elem())).Set($.markAsStructValue($.cloneStructValue(reflect.ValueOf("new"))))
 	await $.println("newat-offset:", pt.value.Mbr1, pt.value.Mbr2)
 

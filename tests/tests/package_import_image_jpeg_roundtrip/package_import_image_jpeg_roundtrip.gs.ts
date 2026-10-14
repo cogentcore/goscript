@@ -46,7 +46,7 @@ export async function main(): globalThis.Promise<void> {
 		return
 	}
 	let [r, g, bb, ] = await $.pointerValue<Exclude<color.Color, null>>((__goscriptAwait = $.pointerValue<Exclude<image.Image, null>>(m).At(5, 7), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)).RGBA()
-	await $.println("bounds:", (__goscriptAwait = $.pointerValue<Exclude<image.Image, null>>(m).Bounds(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait).Dx(), (__goscriptAwait = $.pointerValue<Exclude<image.Image, null>>(m).Bounds(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait).Dy(), "px:", $.uint($.uintShr(r, 8, 32), 32), $.uint($.uintShr(g, 8, 32), 32), $.uint($.uintShr(bb, 8, 32), 32))
+	await $.println("bounds:", ((__goscriptAwait = $.pointerValue<Exclude<image.Image, null>>(m).Bounds(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as image.Rectangle).Dx(), ((__goscriptAwait = $.pointerValue<Exclude<image.Image, null>>(m).Bounds(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as image.Rectangle).Dy(), "px:", $.uint($.uintShr(r, 8, 32), 32), $.uint($.uintShr(g, 8, 32), 32), $.uint($.uintShr(bb, 8, 32), 32))
 }
 
 var __goscriptAwait: any

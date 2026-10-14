@@ -362,7 +362,7 @@ export function underlying(v: reflect.Value): reflect.Value {
 		if (!$.markAsStructValue($.cloneStructValue(e)).IsValid()) {
 			return $.markAsStructValue($.cloneStructValue(v))
 		}
-		$.assignStruct(v, e)
+		v = $.assignStruct(v, e)
 	}
 	return $.markAsStructValue($.cloneStructValue(v))
 }
@@ -446,7 +446,7 @@ export async function main(): globalThis.Promise<void> {
 	let fv = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(full, "*main.holder", /* @__PURE__ */ $.pointerType("main.holder"))))).Elem()))
 	let u = underlying($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(fv)).Field(0))))
 	await $.println(reflect.Kind_String($.markAsStructValue($.cloneStructValue(u)).Kind()), $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(u)).Field(0))).Int())
-	$.assignStruct(u, underlying($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(fv)).Field(1)))))
+	u = $.assignStruct(u, underlying($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(fv)).Field(1)))))
 	await $.println(reflect.Kind_String($.markAsStructValue($.cloneStructValue(u)).Kind()), $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(u)).Field(0))).Int())
 
 	let nilAny: $.VarRef<any> = $.varRef(null! as any)

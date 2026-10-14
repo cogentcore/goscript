@@ -36,7 +36,7 @@ export class item {
 	public dec(): item {
 		let s: item = this;
 		if (s.n > 0) {
-			$.assignStruct(s, new item({n: s.n - 1}, true))
+			s = $.assignStruct(s, new item({n: s.n - 1}, true))
 		}
 		return (s).clone()
 	}

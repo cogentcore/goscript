@@ -76,7 +76,7 @@ export async function main(): globalThis.Promise<void> {
 		{
 			id: 1,
 			isSend: false,
-			channel: (__goscriptAwait = $.pointerValue<Exclude<context.Context, null>>(ctx).Done(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait),
+			channel: ((__goscriptAwait = $.pointerValue<Exclude<context.Context, null>>(ctx).Done(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as $.Channel<{}> | null),
 			onSelected: async (__goscriptSelect0Result) => {
 				await $.println("Test timed out:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>((__goscriptAwait = $.pointerValue<Exclude<context.Context, null>>(ctx).Err(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 			}

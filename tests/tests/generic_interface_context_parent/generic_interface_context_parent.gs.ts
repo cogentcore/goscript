@@ -85,7 +85,7 @@ export class genericResolver {
 	public async Resolve(__typeArgs: $.GenericTypeArgs | undefined, ctx: context.Context | null, handler: Handler | null): globalThis.Promise<$.GoError> {
 		let [child, cancel] = context.WithCancel($.pointerValueOrNil(ctx)!)
 		void (__goscriptAwait = cancel!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
-		await $.chanRecv((__goscriptAwait = $.pointerValue<Exclude<context.Context, null>>(child).Done(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+		await $.chanRecv(((__goscriptAwait = $.pointerValue<Exclude<context.Context, null>>(child).Done(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as $.Channel<{}> | null))
 		void (__goscriptAwait = $.pointerValue<Exclude<Handler, null>>(handler).Mark(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 		return null
 	}
