@@ -1,6 +1,7 @@
 import {
   arrayValue,
   copyElement,
+  generatedStructClass,
   isArrayValue,
   isMarkedAsStructValue,
   isTypedNilValue,
@@ -901,6 +902,12 @@ export function goSlice<T>(
     }
   }
 
+  // A slice that extends past the length of s reads spare capacity, whose
+  // empty slots get their zero values now.
+  if (high > slen) {
+    fillSpareCapacity(backing, oldOffset + slen, oldOffset + high)
+  }
+
   const newLength = high - low
   const newOffset = oldOffset + low
 
@@ -1363,20 +1370,83 @@ export function append<T>(
 
   const newCapacity = nextAppendCapacity(oldLength, oldCapacity, newLength)
 
+  // The elements are copied into a new backing array, whose spare capacity
+  // gets its zero values when a slice extends into it.
   const newBacking = new Array<T>(newCapacity)
   if (oldLength > 0) {
-    copySliceElements(newBacking, 0, slice as Slice<T>, 0, oldLength)
+    copyGrownElements(newBacking, slice as Slice<T>, oldLength)
   }
   for (let i = 0; i < numAdded; i++) {
     newBacking[oldLength + i] = copyElement(elements[i] as T)
   }
   const sample: unknown = elements[0]
-  zeroFactory ??= () => appendZeroValue(sample) as T
-  for (let i = newLength; i < newCapacity; i++) {
-    newBacking[i] = zeroFactory()
+  setSpareZero(
+    newBacking,
+    newLength,
+    zeroFactory ?? (() => appendZeroValue(sample) as T),
+  )
+  return sliceProxyFromBacking(newBacking, 0, newLength, newCapacity) as any
+}
+
+// spareZero is the property of a grown backing array that holds the zero
+// value factory of its spare capacity, which is left empty until a slice
+// extends into it (see fillSpareCapacity). Most grown slices are only ever
+// appended to, which writes each slot before any slice reads it, so making
+// the zero values of a struct slice's spare capacity up front doubled the
+// cost of appending.
+const spareZero = Symbol('goscript.spareZero')
+
+// setSpareZero records the zero value factory of the spare capacity of
+// backing, past length, if it has any.
+function setSpareZero<T>(backing: T[], length: number, zero: () => T): void {
+  if (length < backing.length) {
+    ;(backing as any)[spareZero] = zero
+  }
+}
+
+// fillSpareCapacity gives the empty slots of backing from start to end their
+// zero values, before a slice extends over them.
+function fillSpareCapacity<T>(backing: T[], start: number, end: number): void {
+  // Only a grown backing array has empty slots.
+  const zero = (backing as any)[spareZero] as (() => T) | undefined
+  if (zero === undefined) {
+    return
+  }
+  for (let i = start; i < end; i++) {
+    if (backing[i] === undefined && !(i in backing)) {
+      backing[i] = zero()
+    }
+  }
+}
+
+// copyGrownElements copies the first count elements of slice into the new
+// backing array of its grown copy. The elements of a slice of one generated
+// struct type, the common case, are cloned directly, which is much faster
+// than copyElement's checks for every kind of value.
+function copyGrownElements<T>(dst: T[], slice: Slice<T>, count: number): void {
+  // Without a struct class, each element is copied as copyElement copies it.
+  const window = sliceRange(slice)
+  const backing = window.backing as any[]
+  const offset = window.offset
+  const cls = generatedStructClass(backing[offset])
+  if (cls === undefined) {
+    copySliceElements(dst, 0, slice, 0, count)
+    return
   }
 
-  return sliceProxyFromBacking(newBacking, 0, newLength, newCapacity) as any
+  // Each element of the class is cloned, and any other copied.
+  for (let i = 0; i < count; i++) {
+    const value = backing[offset + i]
+    dst[i] =
+      (
+        value !== null &&
+        value !== undefined &&
+        value.constructor === cls &&
+        isMarkedAsStructValue(value)
+      ) ?
+        value.clone()
+      : copyElement(value)
+  }
 }
 
 export function appendSlice(
@@ -1460,9 +1530,7 @@ export function appendSlice<T>(
   const zeroFactory =
     appendZeroValueFactory<T>(elementHint) ??
     (() => appendZeroValue(sample) as T)
-  for (let i = newLength; i < newCapacity; i++) {
-    next[i] = zeroFactory()
-  }
+  setSpareZero(next, newLength, zeroFactory)
   return sliceProxyFromBacking(next, 0, newLength, newCapacity)
 }
 
