@@ -236,6 +236,37 @@ export function pointerValue<T>(value: T | VarRef<T> | null | undefined): T {
   return value
 }
 
+// nilPointerTarget stands for the struct that a nil pointer points to: any
+// property access panics as a nil pointer dereference does.
+const nilPointerTarget: object = new Proxy(
+  {},
+  {
+    get(): never {
+      runtimePanic(
+        'runtime error: invalid memory address or nil pointer dereference',
+      )
+    },
+    set(): never {
+      runtimePanic(
+        'runtime error: invalid memory address or nil pointer dereference',
+      )
+    },
+  },
+)
+
+/**
+ * pointerTarget returns the struct that a pointer points to, for a function
+ * that reads it once and then accesses its fields: a nil pointer returns an
+ * object whose field accesses panic, so that the panic happens at a field
+ * access, as in Go, rather than here.
+ */
+export function pointerTarget<T>(value: T | VarRef<T> | null | undefined): T {
+  if (value === null || value === undefined) {
+    return nilPointerTarget as T
+  }
+  return pointerValue(value)
+}
+
 export function pointerValueOrNil<T>(
   value: T | VarRef<T> | null | undefined,
 ): T | null {

@@ -64,18 +64,20 @@ export class Stack {
 
 	public Pop(__typeArgs: $.GenericTypeArgs | undefined): [any, boolean] {
 		let s: Stack | $.VarRef<Stack> | null = this;
-		if ($.sliceLen($.pointerValue<Stack>(s).items) == 0) {
+		const s$ = $.pointerTarget<Stack>(s)
+		if ($.sliceLen((s$ as Stack).items) == 0) {
 			$.panic("pop from empty stack")
 		}
-		let last = $.sliceLen($.pointerValue<Stack>(s).items) - 1
-		let value = $.copyElement($.arrayIndex($.pointerValue<Stack>(s).items!, last))
-		$.pointerValue<Stack>(s).items = $.goSlice($.pointerValue<Stack>(s).items, undefined, last)
+		let last = $.sliceLen((s$ as Stack).items) - 1
+		let value = $.copyElement($.arrayIndex((s$ as Stack).items!, last));
+		;(s$ as Stack).items = $.goSlice((s$ as Stack).items, undefined, last)
 		return [$.copyElement(value), true]
 	}
 
 	public Push(__typeArgs: $.GenericTypeArgs | undefined, value: any): void {
 		let s: Stack | $.VarRef<Stack> | null = this;
-		$.pointerValue<Stack>(s).items = $.append($.pointerValue<Stack>(s).items, value, $.appendZero(() => ($.genericZero(__typeArgs, "T", null) as any)))
+		const s$ = $.pointerTarget<Stack>(s);
+		;(s$ as Stack).items = $.append((s$ as Stack).items, value, $.appendZero(() => ($.genericZero(__typeArgs, "T", null) as any)))
 	}
 
 	static __typeInfo = $.registerStructType(

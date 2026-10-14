@@ -19,8 +19,9 @@ import "@goscript/net/http/httptest/index.js"
 import "@goscript/net/url/index.js"
 
 export async function printURL(label: string, u: url.URL | $.VarRef<url.URL> | null): globalThis.Promise<void> {
+	const u$ = $.pointerTarget<url.URL>(u)
 	await $.println(label, "string:", url.URL.prototype.String.call(u))
-	await $.println(label, "fields:", $.pointerValue<url.URL>(u).Scheme, $.pointerValue<url.URL>(u).Opaque, $.pointerValue<url.URL>(u).User == null, $.pointerValue<url.URL>(u).Host, $.pointerValue<url.URL>(u).Path, $.pointerValue<url.URL>(u).RawPath, $.pointerValue<url.URL>(u).RawQuery, $.pointerValue<url.URL>(u).Fragment, $.pointerValue<url.URL>(u).RawFragment, $.pointerValue<url.URL>(u).ForceQuery)
+	await $.println(label, "fields:", (u$ as url.URL).Scheme, (u$ as url.URL).Opaque, (u$ as url.URL).User == null, (u$ as url.URL).Host, (u$ as url.URL).Path, (u$ as url.URL).RawPath, (u$ as url.URL).RawQuery, (u$ as url.URL).Fragment, (u$ as url.URL).RawFragment, (u$ as url.URL).ForceQuery)
 	await $.println(label, "host:", url.URL.prototype.Hostname.call(u), url.URL.prototype.Port.call(u), url.URL.prototype.IsAbs.call(u))
 	await $.println(label, "redacted:", url.URL.prototype.Redacted.call(u))
 	await $.println(label, "escaped:", url.URL.prototype.EscapedPath.call(u), url.URL.prototype.EscapedFragment.call(u), url.URL.prototype.RequestURI.call(u))

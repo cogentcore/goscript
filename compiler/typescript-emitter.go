@@ -1050,6 +1050,11 @@ func renderStmts(b *strings.Builder, stmts []loweredStmt, indent int) {
 			b.WriteString("}\n")
 			continue
 		}
+		if startsWithASIHazard(stmt.text) {
+			// A statement that starts with a parenthesis or bracket would
+			// continue the previous line's expression.
+			b.WriteString(";")
+		}
 		writeIndentedText(b, stmt.text, indent)
 		if !stmt.hasBlock && len(stmt.children) == 0 {
 			if idx+1 < len(stmts) && needsASIBarrier(stmt, stmts[idx+1]) {
@@ -1071,6 +1076,13 @@ func renderStmts(b *strings.Builder, stmts []loweredStmt, indent int) {
 		writeIndent(b, indent)
 		b.WriteString("}\n")
 	}
+}
+
+// startsWithASIHazard reports whether a statement starts with a parenthesis
+// or bracket, which JavaScript would read as continuing a previous line.
+func startsWithASIHazard(text string) bool {
+	trimmed := strings.TrimLeft(text, " \t")
+	return strings.HasPrefix(trimmed, "(") || strings.HasPrefix(trimmed, "[")
 }
 
 // needsASIBarrier prevents adjacent statements from becoming one JS expression.
@@ -1457,6 +1469,11 @@ func renderSelectCaseStmts(b *strings.Builder, stmts []loweredStmt, indent int) 
 		if strings.TrimSpace(stmt.text) == "return" {
 			b.WriteString("return $.selectVoidReturn()\n")
 			continue
+		}
+		if startsWithASIHazard(stmt.text) {
+			// A statement that starts with a parenthesis or bracket would
+			// continue the previous line's expression.
+			b.WriteString(";")
 		}
 		writeIndentedText(b, stmt.text, indent)
 		if !stmt.hasBlock && len(stmt.children) == 0 {

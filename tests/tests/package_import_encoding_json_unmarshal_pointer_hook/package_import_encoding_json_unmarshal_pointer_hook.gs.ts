@@ -74,8 +74,9 @@ export class Hooked {
 
 	public UnmarshalJSON(data: $.Slice<number>): $.GoError {
 		let h: Hooked | $.VarRef<Hooked> | null = this;
-		$.pointerValue<Hooked>(h).Calls++
-		$.pointerValue<Hooked>(h).Seen = $.bytesToString(data)
+		const h$ = $.pointerTarget<Hooked>(h);
+		;(h$ as Hooked).Calls++;
+		;(h$ as Hooked).Seen = $.bytesToString(data)
 		return null
 	}
 

@@ -7,11 +7,11 @@ export function consume(v: $.VarRef<$.Slice<$.Slice<number>>> | null, n: bigint)
 	while ($.sliceLen($.pointerValue<$.Slice<$.Slice<number>>>(v)) > 0) {
 		let ln0 = $.int64($.sliceLen($.arrayIndex(($.pointerValue<$.Slice<$.Slice<number>>>(v))!, 0)))
 		if (ln0 > n) {
-			($.pointerValue<$.Slice<$.Slice<number>>>(v))![0] = $.goSlice($.arrayIndex(($.pointerValue<$.Slice<$.Slice<number>>>(v))!, 0), globalThis.Number(n), undefined)
+			;($.pointerValue<$.Slice<$.Slice<number>>>(v))![0] = $.goSlice($.arrayIndex(($.pointerValue<$.Slice<$.Slice<number>>>(v))!, 0), globalThis.Number(n), undefined)
 			return
 		}
 		n = $.int64Sub(n, ln0);
-		($.pointerValue<$.Slice<$.Slice<number>>>(v))![0] = null
+		;($.pointerValue<$.Slice<$.Slice<number>>>(v))![0] = null
 		v!.value = $.goSlice(($.pointerValue<$.Slice<$.Slice<number>>>(v)), 1, undefined)
 	}
 }

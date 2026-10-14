@@ -33,9 +33,10 @@ export function route(label: string): http.Handler | null {
 }
 
 export async function serve(mux: http.ServeMux | $.VarRef<http.ServeMux> | null, req: http.Request | $.VarRef<http.Request> | null): globalThis.Promise<void> {
+	const req$ = $.pointerTarget<http.Request>(req)
 	let rec: httptest.ResponseRecorder | $.VarRef<httptest.ResponseRecorder> | null = httptest.NewRecorder()
 	await http.ServeMux.prototype.ServeHTTP.call($.pointerValue<http.ServeMux>(mux), $.pointerValueOrNil($.interfaceValue<http.ResponseWriter | null>(rec, "*httptest.ResponseRecorder", /* @__PURE__ */ $.pointerType("httptest.ResponseRecorder")))!, req)
-	await $.println($.pointerValue<http.Request>(req).Method, $.pointerValue<http.Request>(req).Host, $.pointerValue<url.URL>($.pointerValue<http.Request>(req).URL).Path, "->", $.pointerValue<httptest.ResponseRecorder>(rec).Code, $.pointerValue<bytes.Buffer>($.pointerValue<httptest.ResponseRecorder>(rec).Body).String(), await http.Header_Get(httptest.ResponseRecorder.prototype.Header.call($.pointerValue<httptest.ResponseRecorder>(rec)), "Allow"), await http.Header_Get(httptest.ResponseRecorder.prototype.Header.call($.pointerValue<httptest.ResponseRecorder>(rec)), "Location"))
+	await $.println((req$ as http.Request).Method, (req$ as http.Request).Host, $.pointerValue<url.URL>((req$ as http.Request).URL).Path, "->", $.pointerValue<httptest.ResponseRecorder>(rec).Code, $.pointerValue<bytes.Buffer>($.pointerValue<httptest.ResponseRecorder>(rec).Body).String(), await http.Header_Get(httptest.ResponseRecorder.prototype.Header.call($.pointerValue<httptest.ResponseRecorder>(rec)), "Allow"), await http.Header_Get(httptest.ResponseRecorder.prototype.Header.call($.pointerValue<httptest.ResponseRecorder>(rec)), "Location"))
 }
 
 export async function _get(mux: http.ServeMux | $.VarRef<http.ServeMux> | null, method: string, target: string): globalThis.Promise<void> {

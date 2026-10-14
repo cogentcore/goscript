@@ -86,14 +86,15 @@ export class repeatReader {
 
 	public Read(p: $.Slice<number>): [number, $.GoError] {
 		let r: repeatReader | $.VarRef<repeatReader> | null = this;
-		if ($.pointerValue<repeatReader>(r).remaining == 0) {
+		const r$ = $.pointerTarget<repeatReader>(r)
+		if ((r$ as repeatReader).remaining == 0) {
 			return [0, io.EOF]
 		}
-		let n = $.min($.sliceLen(p), $.pointerValue<repeatReader>(r).remaining)
+		let n = $.min($.sliceLen(p), (r$ as repeatReader).remaining)
 		for (let __goscriptRangeCount0 = n, i = 0; i < __goscriptRangeCount0; i++) {
 			p![i] = $.uint(i, 8)
 		}
-		$.pointerValue<repeatReader>(r).remaining = $.pointerValue<repeatReader>(r).remaining - (n)
+		;(r$ as repeatReader).remaining = (r$ as repeatReader).remaining - (n)
 		return [n, null]
 	}
 

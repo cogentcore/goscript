@@ -45,11 +45,13 @@ export class holder {
 }
 
 export function trim(h: holder | $.VarRef<holder> | null): void {
-	$.pointerValue<holder>(h).values!.value = $.goSlice(($.pointerValue<$.Slice<number>>($.pointerValue<holder>(h).values)), undefined, $.sliceLen($.pointerValue<$.Slice<number>>($.pointerValue<holder>(h).values)) - 1)
+	const h$ = $.pointerTarget<holder>(h);
+	;(h$ as holder).values!.value = $.goSlice(($.pointerValue<$.Slice<number>>((h$ as holder).values)), undefined, $.sliceLen($.pointerValue<$.Slice<number>>((h$ as holder).values)) - 1)
 }
 
 export function trimParen(h: holder | $.VarRef<holder> | null): void {
-	$.pointerValue<holder>(h).values!.value = $.goSlice(($.pointerValue<$.Slice<number>>($.pointerValue<holder>(h).values)), undefined, $.sliceLen($.pointerValue<$.Slice<number>>($.pointerValue<holder>(h).values)) - 1)
+	const h$ = $.pointerTarget<holder>(h);
+	;(h$ as holder).values!.value = $.goSlice(($.pointerValue<$.Slice<number>>((h$ as holder).values)), undefined, $.sliceLen($.pointerValue<$.Slice<number>>((h$ as holder).values)) - 1)
 }
 
 export async function main(): globalThis.Promise<void> {

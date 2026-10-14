@@ -61,7 +61,8 @@ export class Lex {
 
 	public async String(): globalThis.Promise<string> {
 		const lx: Lex | $.VarRef<Lex> | null = this;
-		return fmt.Sprintf("[%s:%d]", $.pointerValue<Lex>(lx).Name, $.basicInterfaceValue($.pointerValue<Lex>(lx).Start, "int"))
+		const lx$ = $.pointerTarget<Lex>(lx)
+		return fmt.Sprintf("[%s:%d]", (lx$ as Lex).Name, $.basicInterfaceValue((lx$ as Lex).Start, "int"))
 	}
 
 	static __typeInfo = $.registerStructType(

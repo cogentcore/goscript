@@ -212,11 +212,12 @@ export class printer {
 
 	public async format(verb: number): globalThis.Promise<void> {
 		const p: printer | $.VarRef<printer> | null = this;
+		const p$ = $.pointerTarget<printer>(p)
 		// Use the formatter
-		if ($.pointerValue<printer>(p).fmt.minus) {
+		if ((p$ as printer).fmt.minus) {
 			await $.println("minus flag set")
 		}
-		if ($.pointerValue<printer>(p).fmt.plus) {
+		if ((p$ as printer).fmt.plus) {
 			await $.println("plus flag set")
 		}
 	}
