@@ -1595,6 +1595,31 @@ export function isMarkedAsStructValue(value: unknown): boolean {
 // copyElement clones a marked struct or array value and returns every other
 // value unchanged. A marked struct with no clone method is returned unchanged
 // rather than panicking.
+/**
+ * generatedStructClass returns the class of value when it is a struct value
+ * of a generated struct class, which copies itself with its clone method,
+ * and undefined otherwise.
+ */
+export function generatedStructClass(value: unknown): object | undefined {
+  // Only a struct value with a clone method of its own class qualifies.
+  if (!isMarkedAsStructValue(value)) {
+    return undefined
+  }
+  const cloneable = value as {
+    __goscriptClone?: unknown
+    clone?: unknown
+    constructor: object
+  }
+  if (
+    ANONYMOUS_STRUCT_TYPE in (value as object) ||
+    typeof cloneable.__goscriptClone === 'function' ||
+    typeof cloneable.clone !== 'function'
+  ) {
+    return undefined
+  }
+  return cloneable.constructor
+}
+
 export function copyElement<T>(value: T): T {
   if (typeof value !== 'object' || value === null) {
     return value
