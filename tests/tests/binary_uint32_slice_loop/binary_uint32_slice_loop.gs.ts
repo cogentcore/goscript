@@ -19,14 +19,17 @@ export class attrs {
 		packedData: string
 	}
 
-	constructor(init?: Partial<{packedData?: string}>) {
+	constructor(init?: Partial<{packedData?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
 			packedData: init?.packedData ?? ("" as string)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): attrs {
-		return $.markAsStructValue(new attrs(this))
+		return new attrs(this, true)
 	}
 
 	public __goscriptAssign(source: attrs): void {
@@ -64,8 +67,8 @@ export class attrs {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let a = $.markAsStructValue(new attrs({packedData: "\x01\x00\x00\x00a\x01\x00\x00\x00b"}))
-	for (let __goscriptRangeTarget0 = a.decode(), __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
+	let a = new attrs({packedData: "\x01\x00\x00\x00a\x01\x00\x00\x00b"}, true)
+	for (let __goscriptRangeTarget0 = $.markAsStructValue($.cloneStructValue(a)).decode(), __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
 		let s = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as string)
 		await $.println(s)
 	}

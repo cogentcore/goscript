@@ -46,7 +46,7 @@ export class bitset {
 		const b: bitset | $.VarRef<bitset> | null = this;
 		let entry = $.indexRef($.pointerValue<bitset>(b).bits, globalThis.Math.trunc(bit / 8))
 		let mask = $.uint((($.uint(1, 8) << (bit % 8)) & 0xff), 8)
-		entry!.value = entry!.value | ($.uint(mask, 8))
+		entry!.value = entry!.value | (mask)
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -62,7 +62,7 @@ export async function main(): globalThis.Promise<void> {
 	let b: $.VarRef<bitset> = $.varRef(new bitset(undefined, true))
 	b.value.set(3)
 	b.value.set(30)
-	await $.println(b.value.has(3), b.value.has(4), b.value.has(30), $.uint($.arrayIndex(b.value.bits, 0), 8), $.uint($.arrayIndex(b.value.bits, 3), 8))
+	await $.println(b.value.has(3), b.value.has(4), b.value.has(30), $.arrayIndex(b.value.bits, 0), $.arrayIndex(b.value.bits, 3))
 }
 
 if ($.isMainScript(import.meta)) {

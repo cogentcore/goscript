@@ -98,7 +98,7 @@ export class arrays {
 
 export function fillArray(dst: $.VarRef<Uint8Array> | null): void {
 	for (let __goscriptRangeTarget0 = $.pointerValue<Uint8Array>(dst), __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), i = 0; i < __goscriptRangeWindow0.length; i++) {
-		$.pointerValue<Uint8Array>(dst)[i] = $.uint($.uint(i + 1, 8), 8)
+		$.pointerValue<Uint8Array>(dst)[i] = $.uint(i + 1, 8)
 	}
 }
 
@@ -147,7 +147,7 @@ export async function main(): globalThis.Promise<void> {
 	let rows = $.arrayValue([$.arrayValue([1, 2]), $.arrayValue([3, 4])], /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int32"), 2), 2))
 	rows[1] = $.cloneArrayValue($.arrayIndex(rows, 0), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int32"), 2))
 	$.arrayIndex(rows, 1)[0] = 9
-	await $.println("row copy:", $.int($.arrayIndex($.arrayIndex(rows, 0), 0), 32), $.int($.arrayIndex($.arrayIndex(rows, 0), 1), 32), $.int($.arrayIndex($.arrayIndex(rows, 1), 0), 32), $.int($.arrayIndex($.arrayIndex(rows, 1), 1), 32))
+	await $.println("row copy:", $.arrayIndex($.arrayIndex(rows, 0), 0), $.arrayIndex($.arrayIndex(rows, 0), 1), $.arrayIndex($.arrayIndex(rows, 1), 0), $.arrayIndex($.arrayIndex(rows, 1), 1))
 
 	let buckets: bigint[][] = $.arrayValue(globalThis.Array.from({ length: 2 }, () => $.arrayValue(globalThis.Array.from({ length: 3 }, () => 0n))), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint64"), 3), 2))
 	let cache: $.VarRef<bigint[]> | null = $.indexRef(buckets, 1)
@@ -168,13 +168,13 @@ export async function main(): globalThis.Promise<void> {
 
 	let buf: $.Slice<number> = new Uint8Array([9, 0, 0, 0, 0]) as $.Slice<number>
 	fillArray(($.sliceToArrayPointer<number>($.goSlice(buf, 1, undefined), 4, "byte") as $.VarRef<Uint8Array> | null))
-	await $.println("converted:", $.uint($.arrayIndex(buf!, 0), 8), $.uint($.arrayIndex(buf!, 1), 8), $.uint($.arrayIndex(buf!, 2), 8), $.uint($.arrayIndex(buf!, 3), 8), $.uint($.arrayIndex(buf!, 4), 8))
+	await $.println("converted:", $.arrayIndex(buf!, 0), $.arrayIndex(buf!, 1), $.arrayIndex(buf!, 2), $.arrayIndex(buf!, 3), $.arrayIndex(buf!, 4))
 	await $.println("converted sum:", sumArray(($.sliceToArrayPointer<number>($.goSlice(buf, 1, undefined), 4, "byte") as $.VarRef<Uint8Array> | null)))
 
 	let literal: $.VarRef<Uint8Array> | null = $.varRef($.arrayValue(new Uint8Array([4, 3, 2, 1])))
 	await $.println("literal sum:", sumArray(literal))
 	fillArray(literal)
-	await $.println("literal filled:", $.uint($.arrayIndex($.pointerValue<Uint8Array>(literal), 0), 8), $.uint($.arrayIndex($.pointerValue<Uint8Array>(literal), 1), 8), $.uint($.arrayIndex($.pointerValue<Uint8Array>(literal), 2), 8), $.uint($.arrayIndex($.pointerValue<Uint8Array>(literal), 3), 8))
+	await $.println("literal filled:", $.arrayIndex($.pointerValue<Uint8Array>(literal), 0), $.arrayIndex($.pointerValue<Uint8Array>(literal), 1), $.arrayIndex($.pointerValue<Uint8Array>(literal), 2), $.arrayIndex($.pointerValue<Uint8Array>(literal), 3))
 	await $.println("closure ptr:", closureArrayAddress())
 }
 

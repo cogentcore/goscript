@@ -13,7 +13,7 @@ export function hello(): void {
 }
 
 export function funcName(f: any): string {
-	return runtime.Func.prototype.Name.call($.pointerValueOrNil(runtime.FuncForPC($.uint($.markAsStructValue($.cloneStructValue(reflect.ValueOf(f))).Pointer(), 64))))
+	return runtime.Func.prototype.Name.call($.pointerValueOrNil(runtime.FuncForPC($.markAsStructValue($.cloneStructValue(reflect.ValueOf(f))).Pointer())))
 }
 
 export async function main(): globalThis.Promise<void> {

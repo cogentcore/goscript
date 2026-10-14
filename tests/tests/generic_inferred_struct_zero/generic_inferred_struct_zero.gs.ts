@@ -25,15 +25,18 @@ export class entry {
 		n: number
 	}
 
-	constructor(init?: Partial<{key?: $.Slice<number>, n?: number}>) {
+	constructor(init?: Partial<{key?: $.Slice<number>, n?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			key: init?.key ?? (null! as $.Slice<number>),
 			n: init?.n ?? (0 as number)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): entry {
-		return $.markAsStructValue(new entry(this))
+		return new entry(this, true)
 	}
 
 	public __goscriptAssign(source: entry): void {
@@ -83,16 +86,19 @@ export class tree {
 		count: number
 	}
 
-	constructor(init?: Partial<{less?: ((a: any, b: any) => boolean | globalThis.Promise<boolean>) | null, empty?: any, count?: number}>) {
+	constructor(init?: Partial<{less?: ((a: any, b: any) => boolean | globalThis.Promise<boolean>) | null, empty?: any, count?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			less: init?.less ?? (null! as ((a: any, b: any) => boolean | globalThis.Promise<boolean>) | null),
 			empty: init?.empty !== undefined ? $.copyElement(init.empty) : (null! as any),
 			count: init?.count ?? (0 as number)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): tree {
-		return $.markAsStructValue(new tree(this))
+		return new tree(this, true)
 	}
 
 	public __goscriptAssign(source: tree): void {
@@ -144,16 +150,16 @@ export function lessEntry(a: entry, b: entry): boolean {
 export async function main(): globalThis.Promise<void> {
 	// Inferred from a function-typed argument.
 	let tr: tree | $.VarRef<tree> | null = (newTree(__goscriptStatic0(), lessEntry) as tree | $.VarRef<tree> | null)
-	let e = ($.markAsStructValue($.cloneStructValue(tree.prototype.get.call(tr, __goscriptStatic0()))) as entry)
+	let e = ((tree.prototype.get.call(tr, __goscriptStatic0())).clone() as entry)
 	await $.println("new", e.key == null, e.n)
-	await $.println("less", (__goscriptAwait = $.pointerValue<tree>(tr).less!($.markAsStructValue(new entry({n: 1})), $.markAsStructValue(new entry({n: 2}))), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println("less", (__goscriptAwait = $.pointerValue<tree>(tr).less!(new entry({n: 1}, true), new entry({n: 2}, true)), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
 	// Zero values of type-parameter fields in generic constructors.
-	let lit = ($.markAsStructValue($.cloneStructValue(literalTree(__goscriptStatic0()))) as tree)
+	let lit = (literalTree(__goscriptStatic0()) as tree)
 	await $.println("literal", lit.empty.key == null, lit.empty.n, lit.count)
-	let v = ($.markAsStructValue($.cloneStructValue(varTree(__goscriptStatic0()))) as tree)
+	let v = (varTree(__goscriptStatic0()) as tree)
 	await $.println("var", v.empty.key == null, v.empty.n)
-	let z = ($.markAsStructValue($.cloneStructValue(zero(__goscriptStatic0()))) as entry)
+	let z = ((zero(__goscriptStatic0())).clone() as entry)
 	await $.println("zero", z.key == null, z.n)
 	let ints: tree | $.VarRef<tree> | null = (newTree(__goscriptStatic1(), $.functionValue((a: number, b: number): boolean => {
 		return a < b
@@ -163,7 +169,7 @@ export async function main(): globalThis.Promise<void> {
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.entry", zero: () => $.markAsStructValue(new entry()) }})
+	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.entry", zero: () => new entry(undefined, true) }})
 }
 
 var __goscriptStatic1$value: any

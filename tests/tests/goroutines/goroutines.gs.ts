@@ -25,15 +25,18 @@ export class Message {
 		text: string
 	}
 
-	constructor(init?: Partial<{priority?: number, text?: string}>) {
+	constructor(init?: Partial<{priority?: number, text?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
 			priority: init?.priority ?? (0 as number),
 			text: init?.text ?? ("" as string)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): Message {
-		return $.markAsStructValue(new Message(this))
+		return new Message(this, true)
 	}
 
 	public __goscriptAssign(source: Message): void {
@@ -54,7 +57,7 @@ export class Message {
 
 export const totalMessages: number = 8
 
-export let messages: $.Channel<Message> | null = $.makeChannel<Message>(0, $.markAsStructValue(new Message()), "both")
+export let messages: $.Channel<Message> | null = $.makeChannel<Message>(0, new Message(undefined, true), "both")
 
 export function __goscript_set_messages(__goscriptValue: $.Channel<Message> | null): void {
 	messages = __goscriptValue
@@ -62,22 +65,22 @@ export function __goscript_set_messages(__goscriptValue: $.Channel<Message> | nu
 
 export async function worker(id: number): globalThis.Promise<void> {
 	// Send worker starting message
-	await $.chanSend(messages, $.markAsStructValue(new Message({priority: 10 + id, text: $.concatString(($.concatString("Worker ", $.runeToString($.int(48 + id, 32)))), " starting")})))
+	await $.chanSend(messages, new Message({priority: 10 + id, text: $.concatString(($.concatString("Worker ", $.runeToString($.int(48 + id, 32)))), " starting")}, true))
 
 	// Send worker done message
-	await $.chanSend(messages, $.markAsStructValue(new Message({priority: 20 + id, text: $.concatString(($.concatString("Worker ", $.runeToString($.int(48 + id, 32)))), " done")})))
+	await $.chanSend(messages, new Message({priority: 20 + id, text: $.concatString(($.concatString("Worker ", $.runeToString($.int(48 + id, 32)))), " done")}, true))
 }
 
 export async function anotherWorker(name: string): globalThis.Promise<void> {
-	await $.chanSend(messages, $.markAsStructValue(new Message({priority: 40, text: $.concatString("Another worker: ", name)})))
+	await $.chanSend(messages, new Message({priority: 40, text: $.concatString("Another worker: ", name)}, true))
 }
 
 export async function main(): globalThis.Promise<void> {
 	// Create a slice to collect all messages
-	let allMessages: $.Slice<Message> = $.makeSlice<Message>(0, 8 + 3, undefined, () => $.markAsStructValue(new Message()))
+	let allMessages: $.Slice<Message> = $.makeSlice<Message>(0, 8 + 3, undefined, () => new Message(undefined, true))
 
 	// Add initial message
-	allMessages = $.append(allMessages, $.markAsStructValue(new Message({priority: 0, text: "Main: Starting workers"})))
+	allMessages = $.append(allMessages, new Message({priority: 0, text: "Main: Starting workers"}, true))
 
 	// Start 3 worker goroutines
 	for (let i = 0; i < 3; i++) {
@@ -89,26 +92,26 @@ export async function main(): globalThis.Promise<void> {
 
 	// Start an anonymous function worker
 	queueMicrotask(async () => { await (async (): globalThis.Promise<void> => {
-		await $.chanSend(messages, $.markAsStructValue(new Message({priority: 50, text: "Anonymous function worker"})))
+		await $.chanSend(messages, new Message({priority: 50, text: "Anonymous function worker"}, true))
 	})() })
 
 	// Add status message
-	allMessages = $.append(allMessages, $.markAsStructValue(new Message({priority: 1, text: "Main: Workers started"})))
+	allMessages = $.append(allMessages, new Message({priority: 1, text: "Main: Workers started"}, true))
 
 	// Collect all messages from goroutines
 	for (let __rangeIndex = 0; __rangeIndex < 8; __rangeIndex++) {
-		allMessages = $.append(allMessages, $.markAsStructValue($.cloneStructValue(await $.chanRecv(messages))))
+		allMessages = $.append(allMessages, (await $.chanRecv(messages)).clone())
 	}
 
 	// Add final message
-	allMessages = $.append(allMessages, $.markAsStructValue(new Message({priority: 100, text: "Main: All workers completed"})))
+	allMessages = $.append(allMessages, new Message({priority: 100, text: "Main: All workers completed"}, true))
 
 	// Sort messages by priority for deterministic order
 	for (let __goscriptRangeTarget0 = allMessages, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), i = 0; i < __goscriptRangeWindow0.length; i++) {
 		for (let j = i + 1; j < $.sliceLen(allMessages); j++) {
 			if ($.arrayIndex(allMessages!, i).priority > $.arrayIndex(allMessages!, j).priority) {
-				let __goscriptAssign0_0: Message = $.markAsStructValue($.cloneStructValue($.arrayIndex(allMessages!, j)))
-				let __goscriptAssign0_1: Message = $.markAsStructValue($.cloneStructValue($.arrayIndex(allMessages!, i)))
+				let __goscriptAssign0_0: Message = ($.arrayIndex(allMessages!, j)).clone()
+				let __goscriptAssign0_1: Message = ($.arrayIndex(allMessages!, i)).clone()
 				$.assignStruct(allMessages![i], __goscriptAssign0_0)
 				$.assignStruct(allMessages![j], __goscriptAssign0_1)
 			}
@@ -117,7 +120,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// Print all messages in deterministic order
 	for (let __goscriptRangeTarget1 = allMessages, __goscriptRangeWindow1 = $.sliceRange(__goscriptRangeTarget1), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow1.length; __rangeIndex++) {
-		let msg = $.markAsStructValue($.cloneStructValue((__goscriptRangeWindow1.backing[__goscriptRangeWindow1.offset + __rangeIndex] as Message)))
+		let msg = ((__goscriptRangeWindow1.backing[__goscriptRangeWindow1.offset + __rangeIndex] as Message)).clone()
 		await $.println(msg.priority, msg.text)
 	}
 	await $.println("done")

@@ -37,16 +37,19 @@ export class Pose {
 		Inner: {"B": number[]}
 	}
 
-	constructor(init?: Partial<{M?: number[], A?: number[], Inner?: {"B": number[]}}>) {
+	constructor(init?: Partial<{M?: number[], A?: number[], Inner?: {"B": number[]}}>, __goscriptValue?: boolean) {
 		this._fields = {
 			M: init?.M !== undefined ? $.cloneArrayValue(init.M, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 4)) : $.arrayValue(globalThis.Array.from({ length: 4 }, () => 0), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 4)),
 			A: init?.A !== undefined ? $.cloneArrayValue(init.A, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2)) : $.arrayValue(globalThis.Array.from({ length: 2 }, () => 0)),
 			Inner: init?.Inner ? $.markAsStructValue($.cloneStructValue(init.Inner)) : $.anonymousStructValue({"B": $.arrayValue(globalThis.Array.from({ length: 2 }, () => 0))}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("B", /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2), [0], 0, true)] })
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): Pose {
-		return $.markAsStructValue(new Pose(this))
+		return new Pose(this, true)
 	}
 
 	public __goscriptAssign(source: Pose): void {
@@ -67,11 +70,11 @@ export class Pose {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let a = $.varRef($.markAsStructValue(new Pose({M: $.arrayValue([1, 2, 3, 4], /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 4)), A: $.arrayValue([5, 6])})))
+	let a = $.varRef(new Pose({M: $.arrayValue([1, 2, 3, 4], /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 4)), A: $.arrayValue([5, 6])}, true))
 	a.value.Inner.B = $.arrayValue([7, 8])
-	let b: $.VarRef<Pose> = $.varRef($.markAsStructValue(new Pose()))
-	let c: $.VarRef<Pose> = $.varRef($.markAsStructValue(new Pose()))
-	let d: $.VarRef<Pose> = $.varRef($.markAsStructValue(new Pose()))
+	let b: $.VarRef<Pose> = $.varRef(new Pose(undefined, true))
+	let c: $.VarRef<Pose> = $.varRef(new Pose(undefined, true))
+	let d: $.VarRef<Pose> = $.varRef(new Pose(undefined, true))
 	let av = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(a, "*main.Pose", /* @__PURE__ */ $.pointerType("main.Pose"))))).Elem()))
 
 	// Set an array field from another array field.

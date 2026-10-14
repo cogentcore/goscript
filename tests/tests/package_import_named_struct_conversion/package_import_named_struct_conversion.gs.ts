@@ -79,9 +79,9 @@ export function asLocal(t: time.Time): LocalTime {
 
 export async function main(): globalThis.Promise<void> {
 	let first = ($.namedStructConversion<LocalTime>($.markAsStructValue($.cloneStructValue(time.Unix(11n, 0n))).UTC())).clone()
-	await $.println("as time:", $.markAsStructValue($.cloneStructValue(asTime((first).clone()))).Unix())
+	await $.println("as time:", $.markAsStructValue($.cloneStructValue(asTime(first))).Unix())
 
-	let second = asLocal($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(time.Unix(22n, 0n))).UTC())))
+	let second = asLocal($.markAsStructValue($.cloneStructValue(time.Unix(22n, 0n))).UTC())
 	await $.println("as local:", $.markAsStructValue($.cloneStructValue($.namedStructConversion<time.Time>(second))).Unix())
 }
 

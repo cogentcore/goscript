@@ -25,15 +25,18 @@ export class MyStruct {
 		MyString: string
 	}
 
-	constructor(init?: Partial<{MyInt?: number, MyString?: string}>) {
+	constructor(init?: Partial<{MyInt?: number, MyString?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
 			MyInt: init?.MyInt ?? (0 as number),
 			MyString: init?.MyString ?? ("" as string)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): MyStruct {
-		return $.markAsStructValue(new MyStruct(this))
+		return new MyStruct(this, true)
 	}
 
 	public __goscriptAssign(source: MyStruct): void {
@@ -58,7 +61,7 @@ export class MyStruct {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let ms = $.markAsStructValue(new MyStruct({MyInt: 1, MyString: "bar"}))
+	let ms = new MyStruct({MyInt: 1, MyString: "bar"}, true)
 	await $.println("Method call on value: Expected: bar, Actual:", ms.GetMyString())
 }
 

@@ -19,14 +19,17 @@ export class Base {
 		Name: string
 	}
 
-	constructor(init?: Partial<{Name?: string}>) {
+	constructor(init?: Partial<{Name?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Name: init?.Name ?? ("" as string)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): Base {
-		return $.markAsStructValue(new Base(this))
+		return new Base(this, true)
 	}
 
 	public __goscriptAssign(source: Base): void {
@@ -76,15 +79,18 @@ export class Node {
 		Value: number
 	}
 
-	constructor(init?: Partial<{Base?: Base, Value?: number}>) {
+	constructor(init?: Partial<{Base?: Base, Value?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
-			Base: init?.Base ? $.markAsStructValue($.cloneStructValue(init.Base)) : $.markAsStructValue(new Base()),
+			Base: init?.Base ? init.Base.clone() : new Base(undefined, true),
 			Value: init?.Value ?? (0 as number)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): Node {
-		return $.markAsStructValue(new Node(this))
+		return new Node(this, true)
 	}
 
 	public __goscriptAssign(source: Node): void {
@@ -114,7 +120,7 @@ export class Node {
 export async function main(): globalThis.Promise<void> {
 	// A struct type built from the fields of Node, whose embedded Base has
 	// methods: Go allows this when Base is the first field.
-	let nt = reflect.TypeOf($.interfaceValue($.markAsStructValue(new Node()), "main.Node", "main.Node"))
+	let nt = reflect.TypeOf($.interfaceValue(new Node(undefined, true), "main.Node", "main.Node"))
 	let fields: $.Slice<reflect.StructField> = $.makeSlice<reflect.StructField>((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(nt).NumField(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), undefined, undefined, () => $.markAsStructValue(new reflect.StructField()))
 	for (let __goscriptRangeTarget0 = fields, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), i = 0; i < __goscriptRangeWindow0.length; i++) {
 		$.assignStruct(fields![i], $.markAsStructValue($.cloneStructValue((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(nt).Field(i), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))))

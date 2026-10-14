@@ -7,13 +7,16 @@ export class Parser {
 	public _fields: {
 	}
 
-	constructor(init?: Partial<{}>) {
+	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
 		this._fields = {
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): Parser {
-		return $.markAsStructValue(new Parser(this))
+		return new Parser(this, true)
 	}
 
 	public __goscriptAssign(source: Parser): void {
@@ -37,7 +40,7 @@ export function collect(_arguments: string): string {
 }
 
 export async function main(): globalThis.Promise<void> {
-	await $.println($.markAsStructValue(new Parser()).Parse($.arrayToSlice<string>(["a", "b"])))
+	await $.println(new Parser(undefined, true).Parse($.arrayToSlice<string>(["a", "b"])))
 	await $.println(collect("ok"))
 }
 

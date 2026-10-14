@@ -49,15 +49,18 @@ export class Instr {
 		Arg: bigint
 	}
 
-	constructor(init?: Partial<{Op?: Op, Arg?: bigint}>) {
+	constructor(init?: Partial<{Op?: Op, Arg?: bigint}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Op: init?.Op ?? (0 as Op),
 			Arg: init?.Arg ?? (0n as bigint)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): Instr {
-		return $.markAsStructValue(new Instr(this))
+		return new Instr(this, true)
 	}
 
 	public __goscriptAssign(source: Instr): void {
@@ -98,15 +101,18 @@ export class Program {
 		Code: $.Slice<Instr>
 	}
 
-	constructor(init?: Partial<{Name?: string, Code?: $.Slice<Instr>}>) {
+	constructor(init?: Partial<{Name?: string, Code?: $.Slice<Instr>}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Name: init?.Name ?? ("" as string),
 			Code: init?.Code ?? (null! as $.Slice<Instr>)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): Program {
-		return $.markAsStructValue(new Program(this))
+		return new Program(this, true)
 	}
 
 	public __goscriptAssign(source: Program): void {
@@ -120,8 +126,8 @@ export class Program {
 		const p = this;
 		return $.functionValue(async (_yield: ((_p0: number, _p1: Instr) => boolean | globalThis.Promise<boolean>) | null): globalThis.Promise<void> => {
 			for (let __goscriptRangeTarget0 = p.Code, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), pc = 0; pc < __goscriptRangeWindow0.length; pc++) {
-				let _in = $.markAsStructValue($.cloneStructValue((__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + pc] as Instr)))
-				if (!(__goscriptAwait = _yield!(pc, $.markAsStructValue($.cloneStructValue(_in))), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)) {
+				let _in = ((__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + pc] as Instr)).clone()
+				if (!(__goscriptAwait = _yield!(pc, (_in).clone()), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)) {
 					return
 				}
 			}
@@ -150,14 +156,17 @@ export class Stack {
 		items: $.Slice<any>
 	}
 
-	constructor(init?: Partial<{items?: $.Slice<any>}>) {
+	constructor(init?: Partial<{items?: $.Slice<any>}>, __goscriptValue?: boolean) {
 		this._fields = {
 			items: init?.items ?? (null! as $.Slice<any>)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): Stack {
-		return $.markAsStructValue(new Stack(this))
+		return new Stack(this, true)
 	}
 
 	public __goscriptAssign(source: Stack): void {
@@ -221,16 +230,19 @@ export class VM {
 		stack: Stack
 	}
 
-	constructor(init?: Partial<{pc?: number, steps?: number, stack?: Stack}>) {
+	constructor(init?: Partial<{pc?: number, steps?: number, stack?: Stack}>, __goscriptValue?: boolean) {
 		this._fields = {
 			pc: init?.pc ?? (0 as number),
 			steps: init?.steps ?? (0 as number),
 			stack: init?.stack ? $.markAsStructValue($.cloneStructValue(init.stack)) : $.markAsStructValue(new Stack())
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): VM {
-		return $.markAsStructValue(new VM(this))
+		return new VM(this, true)
 	}
 
 	public __goscriptAssign(source: VM): void {
@@ -243,7 +255,7 @@ export class VM {
 
 	public Step(code: $.Slice<Instr>): boolean {
 		let vm: VM | $.VarRef<VM> | null = this;
-		let _in = $.markAsStructValue($.cloneStructValue($.arrayIndex(code!, $.pointerValue<VM>(vm).pc)))
+		let _in = ($.arrayIndex(code!, $.pointerValue<VM>(vm).pc)).clone()
 		$.pointerValue<VM>(vm).pc++
 		$.pointerValue<VM>(vm).steps++
 		let s: Stack | $.VarRef<Stack> | null = $.fieldRef($.pointerValue<VM>(vm)._fields, "stack")
@@ -353,16 +365,19 @@ export class Answer {
 		Steps: number
 	}
 
-	constructor(init?: Partial<{Name?: string, Value?: bigint, Steps?: number}>) {
+	constructor(init?: Partial<{Name?: string, Value?: bigint, Steps?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Name: init?.Name ?? ("" as string),
 			Value: init?.Value ?? (0n as bigint),
 			Steps: init?.Steps ?? (0 as number)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): Answer {
-		return $.markAsStructValue(new Answer(this))
+		return new Answer(this, true)
 	}
 
 	public __goscriptAssign(source: Answer): void {
@@ -409,15 +424,18 @@ export class Fault {
 		Reason: string
 	}
 
-	constructor(init?: Partial<{Name?: string, Reason?: string}>) {
+	constructor(init?: Partial<{Name?: string, Reason?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Name: init?.Name ?? ("" as string),
 			Reason: init?.Reason ?? ("" as string)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): Fault {
-		return $.markAsStructValue(new Fault(this))
+		return new Fault(this, true)
 	}
 
 	public __goscriptAssign(source: Fault): void {
@@ -485,7 +503,7 @@ export async function run(p: Program, answers: $.Channel<Answer> | null, faults:
 		let vm: VM | $.VarRef<VM> | null = new VM()
 		while (!VM.prototype.Step.call(vm, p.Code)) {
 		}
-		await $.chanSend(answers, (() => { const __goscriptLiteralField0 = $.pointerValue<VM>(vm).stack.Pop(__goscriptStatic0()); return $.markAsStructValue(new Answer({Name: p.Name, Value: __goscriptLiteralField0, Steps: $.pointerValue<VM>(vm).steps})) })())
+		await $.chanSend(answers, (() => { const __goscriptLiteralField0 = $.pointerValue<VM>(vm).stack.Pop(__goscriptStatic0()); return new Answer({Name: p.Name, Value: __goscriptLiteralField0, Steps: $.pointerValue<VM>(vm).steps}, true) })())
 		await __defer.dispose()
 	} catch (e) {
 		await __defer.disposePanic(e)
@@ -496,11 +514,11 @@ export async function run(p: Program, answers: $.Channel<Answer> | null, faults:
 }
 
 export function factorial(name: string, n: bigint): Program {
-	return $.markAsStructValue(new Program({Name: name, Code: $.arrayToSlice<Instr>([$.markAsStructValue(new Instr({Op: 0, Arg: 1n})), $.markAsStructValue(new Instr({Op: 0, Arg: n})), $.markAsStructValue(new Instr({Op: 3, Arg: 0n})), $.markAsStructValue(new Instr({Op: 2, Arg: 0n})), $.markAsStructValue(new Instr({Op: 7, Arg: 0n})), $.markAsStructValue(new Instr({Op: 3, Arg: 0n})), $.markAsStructValue(new Instr({Op: 5, Arg: 0n})), $.markAsStructValue(new Instr({Op: 1, Arg: 0n})), $.markAsStructValue(new Instr({Op: 8, Arg: 2n})), $.markAsStructValue(new Instr({Op: 4, Arg: 0n})), $.markAsStructValue(new Instr({Op: 9, Arg: 0n}))])}))
+	return new Program({Name: name, Code: $.arrayToSlice<Instr>([new Instr({Op: 0, Arg: 1n}, true), new Instr({Op: 0, Arg: n}, true), new Instr({Op: 3, Arg: 0n}, true), new Instr({Op: 2, Arg: 0n}, true), new Instr({Op: 7, Arg: 0n}, true), new Instr({Op: 3, Arg: 0n}, true), new Instr({Op: 5, Arg: 0n}, true), new Instr({Op: 1, Arg: 0n}, true), new Instr({Op: 8, Arg: 2n}, true), new Instr({Op: 4, Arg: 0n}, true), new Instr({Op: 9, Arg: 0n}, true)])}, true)
 }
 
 export async function main(): globalThis.Promise<void> {
-	let programs: $.Slice<Program> = $.arrayToSlice<Program>([factorial("20!", 20n), factorial("21!", 21n), $.markAsStructValue(new Program({Name: "broken", Code: $.arrayToSlice<Instr>([$.markAsStructValue(new Instr({Op: 0, Arg: 1n})), $.markAsStructValue(new Instr({Op: 6, Arg: 0n})), $.markAsStructValue(new Instr({Op: 9, Arg: 0n}))])}))])
+	let programs: $.Slice<Program> = $.arrayToSlice<Program>([factorial("20!", 20n), factorial("21!", 21n), new Program({Name: "broken", Code: $.arrayToSlice<Instr>([new Instr({Op: 0, Arg: 1n}, true), new Instr({Op: 6, Arg: 0n}, true), new Instr({Op: 9, Arg: 0n}, true)])}, true)])
 
 	await $.println("listing of", $.arrayIndex(programs!, 0).Name)
 	let __goscriptRangeReturn0 = false
@@ -518,11 +536,11 @@ export async function main(): globalThis.Promise<void> {
 		return
 	}
 
-	let answers: $.Channel<Answer> | null = $.makeChannel<Answer>(0, $.markAsStructValue(new Answer()), "both")
+	let answers: $.Channel<Answer> | null = $.makeChannel<Answer>(0, new Answer(undefined, true), "both")
 	let faults: $.Channel<Fault | $.VarRef<Fault> | null> | null = $.makeChannel<Fault | $.VarRef<Fault> | null>(0, null! as Fault | $.VarRef<Fault> | null, "both")
 	for (let __goscriptRangeTarget1 = programs, __goscriptRangeWindow1 = $.sliceRange(__goscriptRangeTarget1), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow1.length; __rangeIndex++) {
-		let p = $.markAsStructValue($.cloneStructValue((__goscriptRangeWindow1.backing[__goscriptRangeWindow1.offset + __rangeIndex] as Program)))
-		queueMicrotask(async () => { await run($.markAsStructValue($.cloneStructValue(p)), answers, faults) })
+		let p = ((__goscriptRangeWindow1.backing[__goscriptRangeWindow1.offset + __rangeIndex] as Program)).clone()
+		queueMicrotask(async () => { await run((p).clone(), answers, faults) })
 	}
 
 	let reports: globalThis.Map<string, Report | null> | null = $.makeMap<string, Report | null>()
@@ -534,7 +552,7 @@ export async function main(): globalThis.Promise<void> {
 				channel: answers,
 				onSelected: async (__goscriptSelect0Result) => {
 					let a = __goscriptSelect0Result.value
-					$.mapSet(reports, a.Name, $.interfaceValue<Report | null>($.markAsStructValue($.cloneStructValue(a)), "main.Answer", "main.Answer"))
+					$.mapSet(reports, a.Name, $.interfaceValue<Report | null>((a).clone(), "main.Answer", "main.Answer"))
 				}
 			},
 			{
@@ -554,7 +572,7 @@ export async function main(): globalThis.Promise<void> {
 
 	let totalSteps = 0
 	for (let __goscriptRangeTarget2 = programs, __goscriptRangeWindow2 = $.sliceRange(__goscriptRangeTarget2), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow2.length; __rangeIndex++) {
-		let p = $.markAsStructValue($.cloneStructValue((__goscriptRangeWindow2.backing[__goscriptRangeWindow2.offset + __rangeIndex] as Program)))
+		let p = ((__goscriptRangeWindow2.backing[__goscriptRangeWindow2.offset + __rangeIndex] as Program)).clone()
 		{
 			const __goscriptTypeSwitchValue = $.mapGet<string, Report | null, Report | null>(reports, p.Name, null)[0]
 			switch (true) {

@@ -51,13 +51,16 @@ export class xof {
 	public _fields: {
 	}
 
-	constructor(init?: Partial<{}>) {
+	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
 		this._fields = {
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): xof {
-		return $.markAsStructValue(new xof(this))
+		return new xof(this, true)
 	}
 
 	public __goscriptAssign(source: xof): void {
@@ -103,13 +106,13 @@ export async function main(): globalThis.Promise<void> {
 
 	let [parsed, ] = await strconv.ParseComplex("(1-2i)", 128)
 	await $.println("time:", time.RFC1123, time.Month_String(time.May))
-	await $.println("leaf:", $.uint(bits.Rem32(1, 0, 3), 32), strings.ToValidUTF8("abc", "?"), strconv.FormatComplex(parsed, 102, -1, 128), $.int($.real(parsed)), $.int($.imag(parsed)), 0, (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(os.ErrNoHandle).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), strings.ToUpperSpecial((unicode.TurkishCase as unicode.SpecialCase), "go"), $.stringEqual(strings.ToUpperSpecial((unicode.TurkishCase as unicode.SpecialCase), "iki"), "İKİ"))
+	await $.println("leaf:", bits.Rem32(1, 0, 3), strings.ToValidUTF8("abc", "?"), strconv.FormatComplex(parsed, 102, -1, 128), $.int($.real(parsed)), $.int($.imag(parsed)), 0, (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(os.ErrNoHandle).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), strings.ToUpperSpecial((unicode.TurkishCase as unicode.SpecialCase), "go"), $.stringEqual(strings.ToUpperSpecial((unicode.TurkishCase as unicode.SpecialCase), "iki"), "İKİ"))
 
 	let scan: $.VarRef<bytes.Buffer> = $.varRef($.markAsStructValue(new bytes.Buffer()))
 	await scanner.PrintError($.pointerValueOrNil($.interfaceValue<io.Writer | null>(scan, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer")))!, $.pointerValueOrNil(errors.New("scan failed"))!)
 	await $.println("scanner:", strings.TrimSpace(scan.value.String()))
 
-	let h: hash.XOF | null = $.interfaceValue<hash.XOF | null>($.markAsStructValue(new xof()), "main.xof", "main.xof")
+	let h: hash.XOF | null = $.interfaceValue<hash.XOF | null>(new xof(undefined, true), "main.xof", "main.xof")
 	await $.println("hash:", (__goscriptAwait = $.pointerValue<Exclude<hash.XOF, null>>(h).BlockSize(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 }
 

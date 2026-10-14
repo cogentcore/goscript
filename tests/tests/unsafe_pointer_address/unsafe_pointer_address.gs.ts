@@ -7,7 +7,7 @@ import * as unsafe from "@goscript/unsafe/index.js"
 import "@goscript/unsafe/index.js"
 
 export function anyOverlap(x: $.Slice<number>, y: $.Slice<number>): boolean {
-	return ((($.sliceLen(x) > 0) && ($.sliceLen(y) > 0)) && ($.uint($.indexByteAddress(x!, 0, 1), 64) <= $.uint($.indexByteAddress(y!, $.sliceLen(y) - 1, 1), 64))) && ($.uint($.indexByteAddress(y!, 0, 1), 64) <= $.uint($.indexByteAddress(x!, $.sliceLen(x) - 1, 1), 64))
+	return ((($.sliceLen(x) > 0) && ($.sliceLen(y) > 0)) && ($.indexByteAddress(x!, 0, 1) <= $.indexByteAddress(y!, $.sliceLen(y) - 1, 1))) && ($.indexByteAddress(y!, 0, 1) <= $.indexByteAddress(x!, $.sliceLen(x) - 1, 1))
 }
 
 export function sameStart(x: $.Slice<number>, y: $.Slice<number>): boolean {
@@ -15,7 +15,7 @@ export function sameStart(x: $.Slice<number>, y: $.Slice<number>): boolean {
 }
 
 export function parenIndexValue(x: $.Slice<number>, i: number): number {
-	return $.uint($.pointerValue<number>(($.indexRef(x!, i))), 8)
+	return $.pointerValue<number>(($.indexRef(x!, i)))
 }
 
 export async function main(): globalThis.Promise<void> {
@@ -28,7 +28,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("separate:", anyOverlap(left, other))
 	await $.println("same:", sameStart(left, $.goSlice(buf, 1, undefined)))
 	await $.println("different:", sameStart(left, right))
-	await $.println("paren:", $.uint(parenIndexValue(buf, 2), 8))
+	await $.println("paren:", parenIndexValue(buf, 2))
 }
 
 if ($.isMainScript(import.meta)) {

@@ -50,14 +50,14 @@ export async function main(): globalThis.Promise<void> {
 	// paths, rather than degrading to a generic Array<number> backing.
 	let b: $.Slice<number> = new Uint8Array([1, 2, 3]) as $.Slice<number>
 	await $.println("non-empty:", b)
-	await $.println("index:", $.uint($.arrayIndex(b!, 0), 8), $.uint($.arrayIndex(b!, 1), 8), $.uint($.arrayIndex(b!, 2), 8))
+	await $.println("index:", $.arrayIndex(b!, 0), $.arrayIndex(b!, 1), $.arrayIndex(b!, 2))
 	await $.println("len:", $.sliceLen(b))
 
 	// Storing the literal in a struct field and reading it back must
 	// preserve the Uint8Array backing without any append repairing it.
 	let h = new holder({data: new Uint8Array([9, 8, 7]) as $.Slice<number>}, true)
 	await $.println("stored:", h.data)
-	await $.println("stored index:", $.uint($.arrayIndex(h.data!, 1), 8))
+	await $.println("stored index:", $.arrayIndex(h.data!, 1))
 
 	// An empty non-nil []byte literal stays a Uint8Array.
 	let e: $.Slice<number> = new Uint8Array([]) as $.Slice<number>
@@ -75,7 +75,7 @@ export async function main(): globalThis.Promise<void> {
 	let n = 300
 	let m: $.Slice<number> = new Uint8Array([$.uint(n, 8), 2]) as $.Slice<number>
 	await $.println("mixed:", m)
-	await $.println("mixed index:", $.uint($.arrayIndex(m!, 0), 8), $.uint($.arrayIndex(m!, 1), 8))
+	await $.println("mixed index:", $.arrayIndex(m!, 0), $.arrayIndex(m!, 1))
 }
 
 if ($.isMainScript(import.meta)) {
