@@ -19,7 +19,6 @@ import (
 	"strconv"
 	"strings"
 	"sync"
-	"unicode/utf8"
 
 	"github.com/pkg/errors"
 	"golang.org/x/sync/errgroup"
@@ -3119,38 +3118,40 @@ func byteSliceLiteral(data []byte) string {
 	return "new Uint8Array([" + strings.Join(values, ", ") + "])"
 }
 
+// lowerGoStringLiteral returns the JavaScript string literal of a Go string
+// constant. A Go string is represented by a JavaScript string with one
+// character per UTF-8 byte, so each byte that is not printable ASCII is
+// written as a \xNN escape.
 func lowerGoStringLiteral(value string) string {
-	if utf8.ValidString(value) {
-		return quoteJSString(value)
-	}
-	return "$.bytesToString(" + byteSliceLiteral([]byte(value)) + ")"
-}
-
-// quoteJSString returns a double-quoted JavaScript string literal for the
-// valid UTF-8 string value. It quotes like [strconv.Quote], except for the two
-// escapes JavaScript lacks: \a, and \UXXXXXXXX for a rune outside the Basic
-// Multilingual Plane, which JavaScript reads as the letters a and U.
-func quoteJSString(value string) string {
-	quoted := strconv.Quote(value)
-	if !strings.Contains(quoted, `\a`) && !strings.Contains(quoted, `\U`) {
-		return quoted
-	}
-
-	// Quote each rune on its own, so that only the runes strconv.Quote
-	// escapes the JavaScript way are rewritten.
+	// The literal has at least a character per byte, and the quotes.
 	var b strings.Builder
+	b.Grow(len(value) + 2)
 	b.WriteByte('"')
-	for _, r := range value {
-		escaped := strconv.Quote(string(r))
-		escaped = escaped[1 : len(escaped)-1]
+
+	// Each byte is written as itself, an escape or its \xNN code.
+	for i := 0; i < len(value); i++ {
+		c := value[i]
 		switch {
-		case r == '\a':
-			escaped = `\x07`
-		case strings.HasPrefix(escaped, `\U`):
-			escaped = `\u{` + strconv.FormatInt(int64(r), 16) + `}`
+		case c == '"':
+			b.WriteString(`\"`)
+		case c == '\\':
+			b.WriteString(`\\`)
+		case c == '\n':
+			b.WriteString(`\n`)
+		case c == '\r':
+			b.WriteString(`\r`)
+		case c == '\t':
+			b.WriteString(`\t`)
+		case c >= 0x20 && c < 0x7f:
+			b.WriteByte(c)
+		default:
+			b.WriteString(`\x`)
+			b.WriteByte("0123456789abcdef"[c>>4])
+			b.WriteByte("0123456789abcdef"[c&0xf])
 		}
-		b.WriteString(escaped)
 	}
+
+	// The closing quote ends the literal.
 	b.WriteByte('"')
 	return b.String()
 }
@@ -14713,7 +14714,7 @@ func runtimeStructFieldInfoExpr(
 		options = append(options, "pkgPath: "+strconv.Quote(pkgPath))
 	}
 	if tag != "" {
-		options = append(options, "tag: "+strconv.Quote(tag))
+		options = append(options, "tag: "+lowerGoStringLiteral(tag))
 	}
 	if anonymous {
 		options = append(options, "anonymous: true")
