@@ -17,7 +17,7 @@ export async function main(): globalThis.Promise<void> {
 }
 
 export function useInFunction(r: number): number {
-	return $.int(r + 1, 32)
+	return $.int(((r + 1) | 0), 32)
 }
 
 if ($.isMainScript(import.meta)) {
