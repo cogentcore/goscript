@@ -1,3 +1,4 @@
+import * as $ from '@goscript/builtin/index.js'
 // Callback filesystem host provider.
 //
 // os uses the synchronous filesystem of Node.js or Deno when there is one.
@@ -71,15 +72,27 @@ export function callbackFSCall(
     )
   }
   return new Promise((resolve, reject) => {
+    // Strings, such as paths, are Go strings, which are converted to and
+    // from the JavaScript text of the filesystem.
     ;(fn as (...fnArgs: unknown[]) => void).call(
       cbfs,
-      ...args,
+      ...args.map((arg) => (typeof arg === 'string' ? $.jsString(arg) : arg)),
       (err: unknown, ...results: unknown[]) => {
         if (err !== null && err !== undefined && err !== false) {
           reject(callbackErrorValue(err))
           return
         }
-        resolve(results[0])
+        const result = results[0]
+        if (typeof result === 'string') {
+          resolve($.goString(result))
+        } else if (
+          Array.isArray(result) &&
+          result.every((item) => typeof item === 'string')
+        ) {
+          resolve(result.map((item) => $.goString(item)))
+        } else {
+          resolve(result)
+        }
       },
     )
   })
@@ -118,7 +131,7 @@ export function callbackFSGetwd(): string {
   if (typeof cwd === 'function') {
     const dir = (cwd as () => unknown)()
     if (typeof dir === 'string' && dir.startsWith('/')) {
-      return dir
+      return $.goString(dir)
     }
   }
   return '/'

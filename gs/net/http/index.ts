@@ -386,7 +386,11 @@ export function Header_sortedKeyValues(
     if (exclude?.get(key) === true) continue
     values.push({ key, values: headerValues })
   }
-  values.sort((a, b) => a.key.localeCompare(b.key))
+  values.sort((a, b) =>
+    a.key < b.key ? -1
+    : a.key > b.key ? 1
+    : 0,
+  )
   return [values, null]
 }
 
@@ -1162,7 +1166,11 @@ function encodeFormData(data: any): string {
     data instanceof Map ? Array.from(data.entries())
     : typeof data === 'object' ? Object.entries(data)
     : []
-  entries.sort(([a], [b]) => String(a).localeCompare(String(b)))
+  entries.sort(([a], [b]) =>
+    String(a) < String(b) ? -1
+    : String(a) > String(b) ? 1
+    : 0,
+  )
   const params = new URLSearchParams()
   for (const [key, value] of entries) {
     appendFormValue(params, String(key), value)
