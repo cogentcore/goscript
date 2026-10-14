@@ -38,37 +38,77 @@ export class GoBinaryString extends String {
 
 type GoStringValue = string | GoBinaryString
 type GoStringBytes = GoStringValue | Slice<number> | Uint8Array
-const goBinaryStringPrefix = '\uFDD0goscript-bytes:'
 
-// asciiString matches strings whose UTF-16 code units are their Go bytes.
-// eslint-disable-next-line no-control-regex
-const asciiString = /^[\x00-\x7f]*$/
+// A Go string is represented by a JavaScript string with one character per
+// UTF-8 byte, so that every character code is 0 to 255, as in GopherJS. Its
+// length, indexing, slicing, comparison, concatenation and use as a map key
+// are then those of the JavaScript string. It is only decoded to or encoded
+// from UTF-16 text at the boundary with JavaScript APIs, by jsString and
+// goString.
 
 function isGoStringValue(value: unknown): value is GoStringValue {
   return typeof value === 'string' || value instanceof GoBinaryString
 }
 
+// asciiText matches JavaScript text whose UTF-16 code units are all ASCII,
+// which is the same as a Go string and as JavaScript text.
+// eslint-disable-next-line no-control-regex
+const asciiText = /^[\x00-\x7f]*$/
+
 // Non-streaming codecs retain no per-call state and can be shared.
 const sharedTextEncoder = new TextEncoder()
-const sharedTextDecoder = new TextDecoder('utf-8', { fatal: true })
+const sharedTextDecoder = new TextDecoder('utf-8')
+
+/**
+ * jsString returns the JavaScript text of a Go string, decoding its UTF-8
+ * bytes, with U+FFFD for invalid UTF-8, for passing it to a JavaScript API.
+ */
+export function jsString(str: GoStringValue | null | undefined): string {
+  if (str === null || str === undefined) {
+    return ''
+  }
+  if (typeof str !== 'string') {
+    str = str.toString()
+  }
+  if (asciiText.test(str) || nonByteText.test(str)) {
+    return str
+  }
+  return sharedTextDecoder.decode(binaryStringToBytes(str))
+}
+
+// nonByteText matches a string with a character that can not be a byte,
+// which is therefore already JavaScript text rather than a Go string, such
+// as a runtime message, and is left as it is by jsString.
+const nonByteText = /[^\x00-\xff]/
+
+/**
+ * goString returns the Go string of JavaScript text, encoding it as UTF-8,
+ * for text that comes from a JavaScript API.
+ */
+export function goString(text: string | null | undefined): string {
+  if (text === null || text === undefined) {
+    return ''
+  }
+  text = String(text)
+  if (asciiText.test(text)) {
+    return text
+  }
+  return bytesToBinaryString(sharedTextEncoder.encode(text))
+}
 
 function goStringBytes(str: GoStringValue): Uint8Array {
   if (str instanceof GoBinaryString) {
     return str.bytes.slice()
   }
-  if (str.startsWith(goBinaryStringPrefix)) {
-    return binaryStringToBytes(str.slice(goBinaryStringPrefix.length))
-  }
-  return sharedTextEncoder.encode(str)
+  return binaryStringToBytes(str)
 }
 
 // stringMapKey gives every Go string representation the same native Map key.
-// Primitive strings, including tagged binary strings, are already canonical.
 export function stringMapKey(value: string | GoBinaryString): string {
   if (typeof value === 'string') {
     return value
   }
-  return goStringFromBytes(value.bytes)
+  return bytesToBinaryString(value.bytes)
 }
 
 function goStringComparableBytes(value: GoStringBytes): Uint8Array {
@@ -85,50 +125,7 @@ function goStringComparableBytes(value: GoStringBytes): Uint8Array {
 }
 
 function goStringFromBytes(bytes: Uint8Array): string {
-  try {
-    return sharedTextDecoder.decode(bytes)
-  } catch {
-    return goBinaryStringPrefix + bytesToBinaryString(bytes)
-  }
-}
-
-// The string view cache remembers, for a few recently used strings, whether
-// each is ASCII (so that its UTF-16 code units are its Go bytes), or else its
-// UTF-8 bytes. Go code commonly takes the length of, indexes, and slices the
-// same string many times in a loop, each of which would otherwise have to
-// scan or encode the whole string, making such loops quadratic.
-const stringViewCacheSize = 8 // must be a power of two
-const stringViewMinLength = 32 // shorter strings are cheap to scan directly
-const stringViewKeys: string[] = new Array<string>(stringViewCacheSize).fill('')
-const stringViewBytes: Array<Uint8Array | null> = new Array<Uint8Array | null>(
-  stringViewCacheSize,
-).fill(null)
-
-// goStringBytesView returns the Go bytes of the given string, or null if it
-// is ASCII, in which case its UTF-16 code units are its bytes. The returned
-// bytes may be shared, so they must not be modified.
-function goStringBytesView(str: GoStringValue): Uint8Array | null {
-  // A binary string holds its bytes, and a short string is not cached.
-  if (str instanceof GoBinaryString) {
-    return str.bytes
-  }
-  if (str.length < stringViewMinLength) {
-    return asciiString.test(str) ? null : goStringBytes(str)
-  }
-
-  // The bytes of a longer string are cached by its length.
-  const slot = str.length & (stringViewCacheSize - 1)
-  if (stringViewKeys[slot] === str) {
-    // An equal string may be a different string object, which takes a full
-    // comparison each time, so we keep this one, which is likely to be used
-    // again, so that later comparisons are by identity.
-    stringViewKeys[slot] = str
-    return stringViewBytes[slot]
-  }
-  const bytes = asciiString.test(str) ? null : goStringBytes(str)
-  stringViewKeys[slot] = str
-  stringViewBytes[slot] = bytes
-  return bytes
+  return bytesToBinaryString(bytes)
 }
 
 // sliceMeta returns the window of a slice proxy, or of an array with one, or
@@ -2258,14 +2255,11 @@ function byteArrayFromAddress(
 }
 
 /**
- * isByteString reports whether str is a Go string holding invalid UTF-8,
- * which is represented by its bytes rather than by its characters.
+ * isByteString reports whether str is held as a string of bytes, which every
+ * Go string now is.
  */
 export function isByteString(str: GoStringValue): boolean {
-  return (
-    str instanceof GoBinaryString ||
-    (typeof str === 'string' && str.startsWith(goBinaryStringPrefix))
-  )
+  return typeof str === 'string' || str instanceof GoBinaryString
 }
 
 /**
@@ -2325,39 +2319,68 @@ export function decodeRune(p: Uint8Array, i: number = 0): [number, number] {
 }
 
 /**
- * stringRuneBytes returns the Go bytes of a byte string (see isByteString),
- * or null for a string whose JavaScript characters are its runes.
+ * decodeRuneInString decodes the UTF-8 rune at byte offset i of a Go string,
+ * as utf8.DecodeRuneInString does, returning the rune and its width.
  */
-export function stringRuneBytes(str: GoStringValue): Uint8Array | null {
-  return isByteString(str) ? goStringBytes(str) : null
+export function decodeRuneInString(
+  str: string,
+  i: number = 0,
+): [number, number] {
+  const n = str.length - i
+  if (n < 1) {
+    return [0xfffd, 0]
+  }
+  const b0 = str.charCodeAt(i)
+  if (b0 < 0x80) {
+    return [b0, 1]
+  }
+  const [size, lo, hi] = utf8SequenceShape(b0)
+  if (size === 1 || n < size) {
+    return [0xfffd, 1]
+  }
+  const b1 = str.charCodeAt(i + 1)
+  if (b1 < lo || b1 > hi) {
+    return [0xfffd, 1]
+  }
+  let r = ((b0 & (0x7f >> size)) << 6) | (b1 & 0x3f)
+  for (let k = 2; k < size; k++) {
+    const b = str.charCodeAt(i + k)
+    if (b < 0x80 || b > 0xbf) {
+      return [0xfffd, 1]
+    }
+    r = (r << 6) | (b & 0x3f)
+  }
+  return [r, size]
 }
 
 /**
- * concatString concatenates two Go strings by their bytes.
+ * stringRuneBytes returns the bytes of a Go string.
+ */
+export function stringRuneBytes(str: GoStringValue): Uint8Array | null {
+  return goStringBytes(str)
+}
+
+/**
+ * concatString concatenates two Go strings.
  */
 export function concatString(a: GoStringValue, b: GoStringValue): string {
-  if (!isByteString(a) && !isByteString(b)) {
-    return (a as string) + (b as string)
-  }
-  const ab = goStringBytes(a)
-  const bb = goStringBytes(b)
-  const bytes = new Uint8Array(ab.length + bb.length)
-  bytes.set(ab)
-  bytes.set(bb, ab.length)
-  return goStringFromBytes(bytes)
+  return a.toString() + b.toString()
 }
 
 /**
  * stringToRunes returns the runes of a Go string, as []rune(s) does.
  */
 export const stringToRunes = (str: string): number[] => {
-  const bytes = stringRuneBytes(str)
-  if (bytes === null) {
-    return Array.from(str).map((c) => c.codePointAt(0) || 0)
-  }
+  str = str.toString()
   const runes: number[] = []
-  for (let i = 0; i < bytes.length; ) {
-    const [r, size] = decodeRune(bytes, i)
+  for (let i = 0; i < str.length; ) {
+    const c = str.charCodeAt(i)
+    if (c < 0x80) {
+      runes.push(c)
+      i++
+      continue
+    }
+    const [r, size] = decodeRuneInString(str, i)
     runes.push(r)
     i += size
   }
@@ -2368,42 +2391,18 @@ export const stringToRunes = (str: string): number[] => {
  * rangeString returns UTF-8 byte offsets and rune values for string iteration.
  */
 export const rangeString = (str: string): Array<[number, number]> => {
+  str = str.toString()
   const pairs: Array<[number, number]> = []
-  const bytes = stringRuneBytes(str)
-  if (bytes !== null) {
-    for (let i = 0; i < bytes.length; ) {
-      const [r, size] = decodeRune(bytes, i)
-      pairs.push([i, r])
-      i += size
-    }
-    return pairs
-  }
-
-  // The UTF-8 length of each rune follows from its code point, which is
-  // much faster than encoding each character. A lone surrogate encodes as
-  // U+FFFD, as TextEncoder does.
-  let offset = 0
   for (let i = 0; i < str.length; ) {
-    let r = str.charCodeAt(i)
-    let units = 1
-    if (r >= 0xd800 && r <= 0xdbff && i + 1 < str.length) {
-      const low = str.charCodeAt(i + 1)
-      if (low >= 0xdc00 && low <= 0xdfff) {
-        r = 0x10000 + ((r - 0xd800) << 10) + (low - 0xdc00)
-        units = 2
-      }
+    const c = str.charCodeAt(i)
+    if (c < 0x80) {
+      pairs.push([i, c])
+      i++
+      continue
     }
-    pairs.push([offset, r])
-    i += units
-    if (r < 0x80) {
-      offset += 1
-    } else if (r < 0x800) {
-      offset += 2
-    } else if (r < 0x10000) {
-      offset += 3
-    } else {
-      offset += 4
-    }
+    const [r, size] = decodeRuneInString(str, i)
+    pairs.push([i, r])
+    i += size
   }
   return pairs
 }
@@ -2412,14 +2411,11 @@ export const rangeString = (str: string): Array<[number, number]> => {
  * stringToRune returns the first rune, or zero for an empty string.
  */
 export const stringToRune = (str: string): number => {
-  const bytes = stringRuneBytes(str)
-  if (bytes !== null) {
-    return decodeRune(bytes)[0]
-  }
+  str = str.toString()
   if (str.length === 0) {
     return 0
   }
-  return str.codePointAt(0) || 0
+  return decodeRuneInString(str, 0)[0]
 }
 
 /**
@@ -2437,14 +2433,38 @@ export const runesToString = (runes: Slice<number>): string => {
 }
 
 // runeToString converts an integer to a string as Go's string(r) does: a
-// Unicode scalar value becomes its character, including one above U+FFFF, and
-// a negative, out-of-range, or surrogate value becomes U+FFFD
-// (utf8.RuneError). r is a bigint for a 64-bit integer type.
+// Unicode scalar value becomes its UTF-8 encoding, and a negative,
+// out-of-range, or surrogate value becomes U+FFFD (utf8.RuneError). r is a
+// bigint for a 64-bit integer type.
 export function runeToString(r: number | bigint): string {
-  if (r < 0 || r > 0x10ffff || (r >= 0xd800 && r <= 0xdfff)) {
-    return '\uFFFD'
+  let n = Number(r)
+  if (
+    n < 0 ||
+    n > 0x10ffff ||
+    (n >= 0xd800 && n <= 0xdfff) ||
+    !Number.isFinite(n)
+  ) {
+    n = 0xfffd
   }
-  return String.fromCodePoint(Number(r))
+  if (n < 0x80) {
+    return String.fromCharCode(n)
+  }
+  if (n < 0x800) {
+    return String.fromCharCode(0xc0 | (n >> 6), 0x80 | (n & 0x3f))
+  }
+  if (n < 0x10000) {
+    return String.fromCharCode(
+      0xe0 | (n >> 12),
+      0x80 | ((n >> 6) & 0x3f),
+      0x80 | (n & 0x3f),
+    )
+  }
+  return String.fromCharCode(
+    0xf0 | (n >> 18),
+    0x80 | ((n >> 12) & 0x3f),
+    0x80 | ((n >> 6) & 0x3f),
+    0x80 | (n & 0x3f),
+  )
 }
 
 /**
@@ -2455,28 +2475,23 @@ export const byte = (n: number): number => {
 }
 
 /**
- * indexString reads a Go string byte with bounds checks; ASCII reads allocate no byte buffer.
+ * indexString reads a Go string byte with bounds checks.
  */
 export const indexString = (
   str: GoStringValue | import('./builtin.js').Bytes,
   index: number,
 ): number => {
-  // A string is read by its bytes, or by its code units when it is ASCII.
-  if (isGoStringValue(str)) {
-    const bytes = goStringBytesView(str)
-    const length = bytes === null ? str.length : bytes.length
-    if (index < 0 || index >= length) {
-      outOfRangeIndex(index, length)
-    }
-    if (bytes !== null) {
-      return bytes[index]
+  if (typeof str === 'string') {
+    if (index < 0 || index >= str.length) {
+      outOfRangeIndex(index, str.length)
     }
     return Number.isInteger(index) ?
-        (str as string).charCodeAt(index)
-      : goStringBytes(str)[index]
+        str.charCodeAt(index)
+      : (undefined as unknown as number)
   }
-
-  // A byte slice is read by its elements.
+  if (str instanceof GoBinaryString) {
+    return indexString(str.toString(), index)
+  }
   if (str instanceof Uint8Array) {
     if (index < 0 || index >= str.length) {
       outOfRangeIndex(index, str.length)
@@ -2499,24 +2514,22 @@ export const indexString = (
 }
 
 /**
- * stringLen returns the Go byte length; ASCII reads allocate no byte buffer.
+ * stringLen returns the Go byte length of a string.
  */
 export const stringLen = (str: GoStringValue): number => {
-  const bytes = goStringBytesView(str)
-  return bytes === null ? str.length : bytes.length
+  return str.length
 }
 
 /**
- * sliceString slices Go bytes, preserving invalid UTF-8 in the binary-string representation.
+ * sliceString slices a Go string by bytes.
  */
 export const sliceString = (
   str: GoStringValue,
   low?: number,
   high?: number,
 ): string => {
-  // The bounds are in bytes, whatever the string's representation.
-  const bytes = goStringBytesView(str)
-  const length = bytes === null ? str.length : bytes.length
+  const text = str.toString()
+  const length = text.length
   const actualLow = low === undefined ? 0 : low
   const actualHigh = high === undefined ? length : high
 
@@ -2529,12 +2542,7 @@ export const sliceString = (
       `runtime error: slice bounds out of range [${actualLow}:${actualHigh}] with length ${length}`,
     )
   }
-
-  // An ASCII string is sliced by code units, and any other by its bytes.
-  if (bytes === null) {
-    return (str as string).slice(actualLow, actualHigh)
-  }
-  return goStringFromBytes(bytes.subarray(actualLow, actualHigh))
+  return text.substring(actualLow, actualHigh)
 }
 
 /** bytesFromHex decodes compiler-emitted constant byte arrays. */
@@ -2564,7 +2572,7 @@ export const bytesToString = (
   } else {
     byteArray = bytes
   }
-  return goStringFromBytes(Uint8Array.from(byteArray))
+  return goStringFromBytes(Uint8Array.from(byteArray, (b) => b & 0xff))
 }
 
 export function stringEqual(
@@ -2595,6 +2603,14 @@ export function stringCompare(
   left: GoStringBytes,
   right: GoStringBytes,
 ): number {
+  // Go strings compare by their bytes, which are their character codes.
+  if (typeof left === 'string' && typeof right === 'string') {
+    return (
+      left < right ? -1
+      : left > right ? 1
+      : 0
+    )
+  }
   if (!isGoStringValue(left) && !isGoStringValue(right)) {
     const leftBytes = byteStringView(left)
     const rightBytes = byteStringView(right)

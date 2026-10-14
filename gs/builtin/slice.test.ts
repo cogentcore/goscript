@@ -16,7 +16,8 @@ import {
   GoBinaryString,
   goSlice,
   indexString,
-  sliceString,
+  jsString,
+  goString,
   rangeString,
   indexByteString,
   len,
@@ -91,19 +92,19 @@ describe('compiler byte constants', () => {
 describe('rune to string encoding (Go string(rune) semantics)', () => {
   it('preserves astral-plane runes above U+FFFF', () => {
     // U+1F600 grinning face; fromCharCode would have truncated to a broken unit.
-    expect(runeToString(0x1f600)).toBe('😀')
-    expect(runeToString(0x1f600).codePointAt(0)).toBe(0x1f600)
-    expect(runeToString(0x597d)).toBe('好')
+    expect(jsString(runeToString(0x1f600))).toBe('😀')
+    expect(jsString(runeToString(0x1f600)).codePointAt(0)).toBe(0x1f600)
+    expect(runeToString(0x597d)).toBe(goString('好'))
   })
 
   it('maps invalid and surrogate runes to U+FFFD, never throwing', () => {
-    expect(runeToString(-1)).toBe('�')
-    expect(runeToString(0x110000)).toBe('�')
-    expect(runeToString(0xd800)).toBe('�')
+    expect(jsString(runeToString(-1))).toBe('�')
+    expect(jsString(runeToString(0x110000))).toBe('�')
+    expect(jsString(runeToString(0xd800))).toBe('�')
   })
 
   it('encodes a rune slice with astral planes intact', () => {
-    expect(runesToString([0x48, 0x69, 0x1f600])).toBe('Hi😀')
+    expect(jsString(runesToString([0x48, 0x69, 0x1f600]))).toBe('Hi😀')
     expect(runesToString([])).toBe('')
   })
 })
@@ -278,8 +279,9 @@ describe('builtin string byte representation', () => {
 
   it.each(['aé🙂z', '你好', '\ud800', '\udc00', 'a\u2028', 'a\u2029'])(
     'keeps UTF-8 byte reads for %j',
-    (value) => {
-      const bytes = new TextEncoder().encode(value)
+    (text) => {
+      const value = goString(text)
+      const bytes = new TextEncoder().encode(text)
       expect(stringLen(value)).toBe(bytes.length)
       for (let i = 0; i < bytes.length; i++) {
         expect(indexString(value, i)).toBe(bytes[i])
@@ -302,33 +304,18 @@ describe('builtin string byte representation', () => {
     expect(indexString(ascii, 0)).toBe(97)
   })
 
-  it('reads cached long strings correctly across cache slot reuse', () => {
-    // Long strings use a small cache of their ASCII-ness or UTF-8 bytes;
-    // strings whose lengths share a cache slot must not be confused.
-    const values = [
-      'a'.repeat(40),
-      'é'.repeat(20), // 40 UTF-16 units, 40 UTF-8 bytes: same slot as above
-      'x'.repeat(39) + 'é',
-      'b'.repeat(48),
-      bytesToString(new Uint8Array(48).fill(0xff)),
-    ]
-    for (let rep = 0; rep < 2; rep++) {
-      for (const value of values) {
-        const bytes =
-          value.startsWith('\uFDD0') ?
-            stringToBytes(value)
-          : new TextEncoder().encode(value)
-        expect(stringLen(value)).toBe(bytes.length)
-        for (let i = 0; i < bytes.length; i++) {
-          expect(indexString(value, i)).toBe(bytes[i])
-        }
-        expect(stringToBytes(sliceString(value, 2, 10))).toEqual(
-          bytes.subarray(2, 10),
-        )
-        expect(() => indexString(value, bytes.length)).toThrow(
-          `index out of range [${bytes.length}]`,
-        )
+  it('represents Go strings by their UTF-8 bytes', () => {
+    for (const text of ['a'.repeat(40), 'é'.repeat(20), 'x'.repeat(39) + 'é']) {
+      const value = goString(text)
+      const bytes = new TextEncoder().encode(text)
+      expect(stringLen(value)).toBe(bytes.length)
+      for (let i = 0; i < bytes.length; i++) {
+        expect(indexString(value, i)).toBe(bytes[i])
       }
+      expect(stringToBytes(sliceString(value, 2, 10))).toEqual(
+        bytes.subarray(2, 10),
+      )
+      expect(jsString(value)).toBe(text)
     }
   })
 
@@ -345,10 +332,12 @@ describe('builtin string byte representation', () => {
       const want: Array<[number, number]> = []
       let offset = 0
       for (const char of value) {
-        want.push([offset, char.codePointAt(0) || 0])
+        const r = char.codePointAt(0) || 0
+        // A lone surrogate is encoded as U+FFFD.
+        want.push([offset, r >= 0xd800 && r <= 0xdfff ? 0xfffd : r])
         offset += new TextEncoder().encode(char).length
       }
-      expect(rangeString(value)).toEqual(want)
+      expect(rangeString(goString(value))).toEqual(want)
     }
   })
 
@@ -392,7 +381,7 @@ describe('builtin string byte representation', () => {
   it('copies UTF-8 strings by bytes', () => {
     const dst = new Uint8Array(3)
 
-    expect(copy(dst, '你')).toBe(3)
+    expect(copy(dst, goString('你'))).toBe(3)
     expect(Array.from(dst)).toEqual([0xe4, 0xbd, 0xa0])
   })
 

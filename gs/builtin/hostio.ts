@@ -1,3 +1,5 @@
+import { jsString } from './slice.js'
+
 export class HostUnsupportedError extends Error {
   constructor() {
     super('operation not implemented in JavaScript environment')
@@ -426,12 +428,14 @@ export function resetHostRuntimeForTests(): void {
   hostRuntimeOwner.reset()
 }
 
+// writeHostStdoutText writes a Go string, decoding its UTF-8 bytes to text.
 export function writeHostStdoutText(data: string): void {
-  getHostRuntime().writeStdoutText(data)
+  getHostRuntime().writeStdoutText(jsString(data))
 }
 
+// writeHostStderrText writes a Go string, decoding its UTF-8 bytes to text.
 export function writeHostStderrText(data: string): void {
-  getHostRuntime().writeStderrText(data)
+  getHostRuntime().writeStderrText(jsString(data))
 }
 
 export function isMainScript(meta: MainScriptMeta): boolean {

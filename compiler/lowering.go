@@ -19,7 +19,6 @@ import (
 	"strconv"
 	"strings"
 	"sync"
-	"unicode/utf8"
 
 	"github.com/pkg/errors"
 	"golang.org/x/sync/errgroup"
@@ -3116,11 +3115,37 @@ func byteSliceLiteral(data []byte) string {
 	return "new Uint8Array([" + strings.Join(values, ", ") + "])"
 }
 
+// lowerGoStringLiteral returns the JavaScript string literal of a Go string
+// constant. A Go string is represented by a JavaScript string with one
+// character per UTF-8 byte, so each byte that is not printable ASCII is
+// written as a \xNN escape.
 func lowerGoStringLiteral(value string) string {
-	if utf8.ValidString(value) {
-		return quoteJSString(value)
+	var b strings.Builder
+	b.Grow(len(value) + 2)
+	b.WriteByte('"')
+	for i := 0; i < len(value); i++ {
+		c := value[i]
+		switch {
+		case c == '"':
+			b.WriteString(`\"`)
+		case c == '\\':
+			b.WriteString(`\\`)
+		case c == '\n':
+			b.WriteString(`\n`)
+		case c == '\r':
+			b.WriteString(`\r`)
+		case c == '\t':
+			b.WriteString(`\t`)
+		case c >= 0x20 && c < 0x7f:
+			b.WriteByte(c)
+		default:
+			b.WriteString(`\x`)
+			b.WriteByte("0123456789abcdef"[c>>4])
+			b.WriteByte("0123456789abcdef"[c&0xf])
+		}
 	}
-	return "$.bytesToString(" + byteSliceLiteral([]byte(value)) + ")"
+	b.WriteByte('"')
+	return b.String()
 }
 
 // quoteJSString returns a double-quoted JavaScript string literal for the
