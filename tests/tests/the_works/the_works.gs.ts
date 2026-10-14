@@ -505,7 +505,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("listing of", $.arrayIndex(programs!, 0).Name)
 	let __goscriptRangeReturn0 = false
 	;await (async () => {
-		await $.arrayIndex(programs!, 0).Listing()!(async (pc, _in) => {
+		await $.markAsStructValue($.cloneStructValue($.arrayIndex(programs!, 0))).Listing()!(async (pc, _in) => {
 			if ((_in.Op == 0) || (_in.Op == 8)) {
 				await $.println(" ", pc, Op_String(_in.Op), _in.Arg)
 				return true

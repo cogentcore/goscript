@@ -393,6 +393,7 @@ func (o *SemanticModelOwner) collectFileDeclarations(
 			semFn := o.addFunction(model, semPkg, fn, position)
 			semFn.hasBody = typed.Body != nil
 			semFn.receiverReadOnly = methodReceiverReadOnly(pkg, typed)
+			semFn.paramsReadOnly = funcParamsReadOnly(pkg, typed)
 			semPkg.functionDecls[fn] = typed
 			semPkg.declarations = append(semPkg.declarations, semanticDeclaration{
 				kind:     "func",
@@ -2398,12 +2399,7 @@ func sourcePosFromTokenPosition(pos token.Position) sourcePosition {
 }
 
 // methodReceiverReadOnly reports whether decl is a method with a value
-// receiver whose body never modifies the receiver: it does not assign to the
-// receiver or anything reached from it, increment it, range into it, take
-// its address, or call a pointer receiver method on it or its fields. This
-// includes function literals in the body. A call of such a method can pass
-// the caller's value without copying it, since Go copies values wherever
-// they are stored.
+// receiver that a call can pass without copying it (see valueVarReadOnly).
 func methodReceiverReadOnly(pkg *packages.Package, decl *ast.FuncDecl) bool {
 	// Only a method with a body and one receiver can be checked.
 	if pkg == nil || decl == nil || decl.Body == nil || decl.Recv == nil || len(decl.Recv.List) != 1 {
@@ -2423,16 +2419,111 @@ func methodReceiverReadOnly(pkg *packages.Package, decl *ast.FuncDecl) bool {
 
 	// An unresolved receiver cannot be checked, so it is assumed to be written.
 	recv := pkg.TypesInfo.Defs[field.Names[0]]
-	if recv == nil {
+	return recv != nil && valueVarReadOnly(pkg, decl, recv)
+}
+
+// funcParamsReadOnly reports, for each parameter of decl, whether it is a
+// struct value that a call can pass without copying it (see
+// valueVarReadOnly).
+func funcParamsReadOnly(pkg *packages.Package, decl *ast.FuncDecl) []bool {
+	if pkg == nil || decl == nil || decl.Body == nil || decl.Type.Params == nil {
+		return nil
+	}
+	var readOnly []bool
+	anyReadOnly := false
+	for _, field := range decl.Type.Params.List {
+		names := field.Names
+		if len(names) == 0 {
+			readOnly = append(readOnly, false)
+			continue
+		}
+		for _, name := range names {
+			obj := pkg.TypesInfo.Defs[name]
+			ok := obj != nil && name.Name != "_" && isStructValueType(obj.Type()) && valueVarReadOnly(pkg, decl, obj)
+			readOnly = append(readOnly, ok)
+			anyReadOnly = anyReadOnly || ok
+		}
+	}
+	if !anyReadOnly {
+		return nil
+	}
+	return readOnly
+}
+
+// callPassesOnlyValues reports whether call is a conversion, a builtin call
+// or a call whose function, receiver and arguments are values that cannot
+// refer to other storage: numbers, strings, booleans, and structs and arrays
+// of them.
+func callPassesOnlyValues(pkg *packages.Package, call *ast.CallExpr) bool {
+	tv, ok := pkg.TypesInfo.Types[call.Fun]
+	if !ok {
 		return false
 	}
+	if tv.IsType() || tv.IsBuiltin() {
+		return true
+	}
+	fun := ast.Unparen(call.Fun)
+	switch typed := fun.(type) {
+	case *ast.Ident:
+		if _, ok := pkg.TypesInfo.Uses[typed].(*types.Func); !ok {
+			return false
+		}
+	case *ast.SelectorExpr:
+		if selection := pkg.TypesInfo.Selections[typed]; selection != nil {
+			if selection.Kind() != types.MethodVal || !isPlainValueType(pkg.TypesInfo.TypeOf(typed.X), 0) {
+				return false
+			}
+		} else if _, ok := pkg.TypesInfo.Uses[typed.Sel].(*types.Func); !ok {
+			return false
+		}
+	default:
+		return false
+	}
+	for _, arg := range call.Args {
+		if !isPlainValueType(pkg.TypesInfo.TypeOf(arg), 0) {
+			return false
+		}
+	}
+	return true
+}
 
-	// rootIsRecv reports whether expr reads or writes through the receiver.
-	rootIsRecv := func(expr ast.Expr) bool {
+// isPlainValueType reports whether values of typ hold no references: basic
+// types, and structs and arrays of them.
+func isPlainValueType(typ types.Type, depth int) bool {
+	if typ == nil || depth > 8 {
+		return false
+	}
+	switch typed := types.Unalias(typ).Underlying().(type) {
+	case *types.Basic:
+		return typed.Kind() != types.UnsafePointer
+	case *types.Array:
+		return isPlainValueType(typed.Elem(), depth+1)
+	case *types.Struct:
+		for idx := range typed.NumFields() {
+			if !isPlainValueType(typed.Field(idx).Type(), depth+1) {
+				return false
+			}
+		}
+		return true
+	}
+	return false
+}
+
+// valueVarReadOnly reports whether the value variable obj, a value receiver
+// or parameter of decl, can share the caller's value instead of a copy. The
+// body must never modify it: it does not assign to it or anything reached
+// from it, increment it, range into it, take its address, or call a pointer
+// receiver method on it or its fields. No function literal may refer to it,
+// since one may run after the call returns. And the body must not store
+// anything except into its own local values, nor pass a reference to a call,
+// so that it cannot change the caller's value through another reference
+// while it reads obj.
+func valueVarReadOnly(pkg *packages.Package, decl *ast.FuncDecl, obj types.Object) bool {
+	rootIsVar := func(expr ast.Expr) bool {
 		for {
 			switch typed := ast.Unparen(expr).(type) {
 			case *ast.Ident:
-				return pkg.TypesInfo.Uses[typed] == recv
+				return pkg.TypesInfo.Uses[typed] == obj
 			case *ast.SelectorExpr:
 				expr = typed.X
 			case *ast.IndexExpr:
@@ -2446,33 +2537,90 @@ func methodReceiverReadOnly(pkg *packages.Package, decl *ast.FuncDecl) bool {
 			}
 		}
 	}
+	// storesLocally reports whether an assignment to lhs stores into a local
+	// variable of decl, not through a pointer, slice, map or package variable.
+	storesLocally := func(lhs ast.Expr) bool {
+		for {
+			switch typed := ast.Unparen(lhs).(type) {
+			case *ast.Ident:
+				if typed.Name == "_" {
+					return true
+				}
+				target := pkg.TypesInfo.ObjectOf(typed)
+				return target != nil && target.Parent() != nil && target.Pkg() != nil &&
+					target.Parent() != target.Pkg().Scope() &&
+					decl.Pos() <= target.Pos() && target.Pos() < decl.End()
+			case *ast.SelectorExpr:
+				selection := pkg.TypesInfo.Selections[typed]
+				if selection == nil || selection.Kind() != types.FieldVal || selection.Indirect() {
+					return false
+				}
+				base := pkg.TypesInfo.TypeOf(typed.X)
+				if base == nil {
+					return false
+				}
+				if _, ptr := types.Unalias(base).Underlying().(*types.Pointer); ptr {
+					return false
+				}
+				lhs = typed.X
+			case *ast.IndexExpr:
+				base := pkg.TypesInfo.TypeOf(typed.X)
+				if base == nil {
+					return false
+				}
+				if _, ok := types.Unalias(base).Underlying().(*types.Array); !ok {
+					return false
+				}
+				lhs = typed.X
+			default:
+				return false
+			}
+		}
+	}
 	readOnly := true
 	ast.Inspect(decl.Body, func(node ast.Node) bool {
 		if !readOnly {
 			return false
 		}
 		switch typed := node.(type) {
+		case *ast.FuncLit:
+			ast.Inspect(typed.Body, func(node ast.Node) bool {
+				if ident, ok := node.(*ast.Ident); ok && pkg.TypesInfo.Uses[ident] == obj {
+					readOnly = false
+				}
+				return readOnly
+			})
 		case *ast.AssignStmt:
 			for _, lhs := range typed.Lhs {
-				if rootIsRecv(lhs) {
+				if rootIsVar(lhs) || (typed.Tok != token.DEFINE && !storesLocally(lhs)) {
 					readOnly = false
 				}
 			}
 		case *ast.IncDecStmt:
-			if rootIsRecv(typed.X) {
+			if rootIsVar(typed.X) || !storesLocally(typed.X) {
 				readOnly = false
 			}
 		case *ast.RangeStmt:
-			if (typed.Key != nil && rootIsRecv(typed.Key)) || (typed.Value != nil && rootIsRecv(typed.Value)) {
-				readOnly = false
+			if typed.Tok == token.ASSIGN {
+				for _, lhs := range []ast.Expr{typed.Key, typed.Value} {
+					if lhs != nil && (rootIsVar(lhs) || !storesLocally(lhs)) {
+						readOnly = false
+					}
+				}
 			}
 		case *ast.UnaryExpr:
-			if typed.Op == token.AND && rootIsRecv(typed.X) {
+			if typed.Op == token.AND && rootIsVar(typed.X) {
+				readOnly = false
+			}
+		case *ast.SendStmt, *ast.GoStmt:
+			readOnly = false
+		case *ast.CallExpr:
+			if !callPassesOnlyValues(pkg, typed) {
 				readOnly = false
 			}
 		case *ast.SelectorExpr:
 			selection := pkg.TypesInfo.Selections[typed]
-			if selection != nil && selection.Kind() == types.MethodVal && rootIsRecv(typed.X) {
+			if selection != nil && selection.Kind() == types.MethodVal && rootIsVar(typed.X) {
 				if signature, ok := selection.Obj().Type().(*types.Signature); ok && signature.Recv() != nil {
 					if _, ptr := signature.Recv().Type().(*types.Pointer); ptr {
 						readOnly = false
