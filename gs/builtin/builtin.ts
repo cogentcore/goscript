@@ -1106,6 +1106,47 @@ function bytesValue(value: unknown): unknown {
   return value
 }
 
+// ByteView is a window of bytes in a backing array, which the byte search
+// functions read in place instead of copying the bytes to an array.
+interface ByteView {
+  data: ArrayLike<number>
+  off: number
+  len: number
+}
+
+const emptyByteView: ByteView = { data: [], off: 0, len: 0 }
+
+// byteView returns the view of the given bytes, without copying them.
+function byteView(bytes: Bytes | null): ByteView {
+  bytes = bytesValue(bytes) as Bytes | null
+  if (bytes === null) return emptyByteView
+  if (bytes instanceof Uint8Array) {
+    return { data: bytes, off: 0, len: bytes.length }
+  }
+  if (isSliceProxy(bytes)) {
+    const meta = (bytes as SliceProxy<number>).__meta__
+    return { data: meta.backing, off: meta.offset, len: meta.length }
+  }
+  if (Array.isArray(bytes)) {
+    return { data: bytes, off: 0, len: bytes.length }
+  }
+  throw new Error(`Cannot convert bytes of type ${typeof bytes} to array`)
+}
+
+// byteViewMatches reports whether the needle occurs in the haystack at the
+// given position, which must leave room for the whole needle.
+function byteViewMatches(h: ByteView, pos: number, n: ByteView): boolean {
+  const hd = h.data
+  const nd = n.data
+  const ho = h.off + pos
+  for (let j = 0; j < n.len; j++) {
+    if (hd[ho + j] !== nd[n.off + j]) {
+      return false
+    }
+  }
+  return true
+}
+
 /**
  * bytesIndexOf finds the first occurrence of subslice in bytes.
  * Returns -1 if not found.
@@ -1116,21 +1157,24 @@ export function bytesIndexOf(
 ): number {
   if (bytes === null || subslice === null) return -1
 
-  const haystack = bytesToArray(bytes)
-  const needle = bytesToArray(subslice)
+  const haystack = byteView(bytes)
+  const needle = byteView(subslice)
 
-  if (needle.length === 0) return 0
-  if (needle.length > haystack.length) return -1
+  if (needle.len === 0) return 0
+  if (needle.len > haystack.len) return -1
+  if (needle.len === 1) {
+    return bytesIndexByteView(haystack, needle.data[needle.off])
+  }
 
-  for (let i = 0; i <= haystack.length - needle.length; i++) {
-    let found = true
-    for (let j = 0; j < needle.length; j++) {
-      if (haystack[i + j] !== needle[j]) {
-        found = false
-        break
-      }
+  const first = needle.data[needle.off]
+  const hd = haystack.data
+  for (let i = 0; i <= haystack.len - needle.len; i++) {
+    if (
+      hd[haystack.off + i] === first &&
+      byteViewMatches(haystack, i, needle)
+    ) {
+      return i
     }
-    if (found) return i
   }
 
   return -1
@@ -1146,23 +1190,29 @@ export function bytesLastIndexOf(
 ): number {
   if (bytes === null || subslice === null) return -1
 
-  const haystack = bytesToArray(bytes)
-  const needle = bytesToArray(subslice)
+  const haystack = byteView(bytes)
+  const needle = byteView(subslice)
 
-  if (needle.length === 0) return haystack.length
-  if (needle.length > haystack.length) return -1
+  if (needle.len === 0) return haystack.len
+  if (needle.len > haystack.len) return -1
 
-  for (let i = haystack.length - needle.length; i >= 0; i--) {
-    let found = true
-    for (let j = 0; j < needle.length; j++) {
-      if (haystack[i + j] !== needle[j]) {
-        found = false
-        break
-      }
-    }
-    if (found) return i
+  for (let i = haystack.len - needle.len; i >= 0; i--) {
+    if (byteViewMatches(haystack, i, needle)) return i
   }
 
+  return -1
+}
+
+// bytesIndexByteView returns the index of the first byte c in the view.
+function bytesIndexByteView(v: ByteView, c: number): number {
+  const d = v.data
+  if (d instanceof Uint8Array) {
+    return d.subarray(v.off, v.off + v.len).indexOf(c)
+  }
+  const end = v.off + v.len
+  for (let i = v.off; i < end; i++) {
+    if (d[i] === c) return i - v.off
+  }
   return -1
 }
 
@@ -1172,9 +1222,7 @@ export function bytesLastIndexOf(
  */
 export function bytesIndexByte(bytes: Bytes | null, c: number): number {
   if (bytes === null) return -1
-
-  const arr = bytesToArray(bytes)
-  return arr.indexOf(c)
+  return bytesIndexByteView(byteView(bytes), c)
 }
 
 /**
@@ -1184,8 +1232,12 @@ export function bytesIndexByte(bytes: Bytes | null, c: number): number {
 export function bytesLastIndexByte(bytes: Bytes | null, c: number): number {
   if (bytes === null) return -1
 
-  const arr = bytesToArray(bytes)
-  return arr.lastIndexOf(c)
+  const v = byteView(bytes)
+  const d = v.data
+  for (let i = v.off + v.len - 1; i >= v.off; i--) {
+    if (d[i] === c) return i - v.off
+  }
+  return -1
 }
 
 /**
@@ -1194,28 +1246,21 @@ export function bytesLastIndexByte(bytes: Bytes | null, c: number): number {
 export function bytesCount(bytes: Bytes | null, sep: Bytes | null): number {
   if (bytes === null || sep === null) return 0
 
-  const haystack = bytesToArray(bytes)
-  const needle = bytesToArray(sep)
+  const haystack = byteView(bytes)
+  const needle = byteView(sep)
 
-  if (needle.length === 0) {
+  if (needle.len === 0) {
     // Empty separators count byte positions, including both ends.
-    return haystack.length + 1
+    return haystack.len + 1
   }
 
   let count = 0
   let pos = 0
 
-  while (pos <= haystack.length - needle.length) {
-    let found = true
-    for (let i = 0; i < needle.length; i++) {
-      if (haystack[pos + i] !== needle[i]) {
-        found = false
-        break
-      }
-    }
-    if (found) {
+  while (pos <= haystack.len - needle.len) {
+    if (byteViewMatches(haystack, pos, needle)) {
       count++
-      pos += needle.length
+      pos += needle.len
     } else {
       pos++
     }
