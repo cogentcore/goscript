@@ -38,6 +38,8 @@ unmarshal bad text true true
 marshal json year 10000 err Time.MarshalJSON: year outside of range [0,9999]
 local location true true
 local wall clock matches offset true
+local zone name is an abbreviation true
+local zone name formats as MST true
 now location true
 unix location true true
 local utc location UTC

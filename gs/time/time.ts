@@ -155,7 +155,7 @@ export class Time {
       return [this._location.name, this._location.offsetSeconds]
     }
     const offset = -this._date.getTimezoneOffset() * 60
-    return [this._location.name, offset]
+    return [localZoneAbbreviation(this._date, offset), offset]
   }
 
   // Location returns the time zone information associated with t
@@ -277,6 +277,7 @@ export class Time {
       const tzOffsetMinutesJS = this._date.getTimezoneOffset()
       tzOffsetSeconds = -tzOffsetMinutesJS * 60 // Convert to seconds, negate because JS offset is opposite
       isUTC = tzOffsetSeconds === 0
+      tzName = localZoneAbbreviation(this._date, tzOffsetSeconds)
     }
 
     let tzSign = '+'
@@ -1278,6 +1279,33 @@ export const UTC = new Location('UTC', 0)
 // Time is registered after UTC is defined, since its zero value uses UTC.
 Time.__typeInfo = $.registerStructType('time.Time', new Time(), [], Time)
 export const Local = new Location('Local')
+
+// localZoneAbbreviation returns the abbreviated name of the host's local time
+// zone at date, such as "CEST" or "EDT", as Go's Time.Zone does. Intl names
+// many zones only by offset, as "GMT+9", in which case the name is the offset
+// in Go's form for zones without an abbreviation, such as "+09" or "+0530".
+function localZoneAbbreviation(
+  date: globalThis.Date,
+  offsetSeconds: number,
+): string {
+  for (const locale of ['en-US', 'en-GB']) {
+    try {
+      const name = new Intl.DateTimeFormat(locale, { timeZoneName: 'short' })
+        .formatToParts(date)
+        .find((part) => part.type === 'timeZoneName')?.value
+      if (name !== undefined && !/^(GMT|UTC)[+-]/.test(name)) {
+        return name
+      }
+    } catch {
+      break
+    }
+  }
+  const sign = offsetSeconds < 0 ? '-' : '+'
+  const abs = Math.abs(offsetSeconds)
+  const hours = String(Math.floor(abs / 3600)).padStart(2, '0')
+  const minutes = Math.floor((abs % 3600) / 60)
+  return sign + hours + (minutes === 0 ? '' : String(minutes).padStart(2, '0'))
+}
 
 // FixedZone returns a Location that always uses the given zone name and offset (seconds east of UTC).
 export function FixedZone(name: string, offset: number): Location {
