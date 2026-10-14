@@ -48,6 +48,29 @@ class TestControl extends Error {
 
 let shortMode = false
 
+// goArgs returns the variadic arguments of a call to a logging method of T.
+// Go code calling the method directly passes them as rest arguments, where
+// an argument of a slice type is boxed with its type. Go code calling it
+// through an interface (such as the TestingT interface of testify) packs
+// them into a slice, as for any variadic Go method, which arrives as the
+// only argument: an unboxed array, or null when there are none.
+function goArgs(args: unknown[]): unknown[] {
+  // Several arguments were passed directly.
+  if (args.length !== 1) {
+    return args
+  }
+
+  // A single argument is a packed slice, which is empty when it is nil.
+  const arg = args[0]
+  if (arg === null) {
+    return []
+  }
+  if (Array.isArray(arg) && !('__goType' in arg)) {
+    return $.asArray(arg)
+  }
+  return args
+}
+
 export class T {
   private readonly testName: string
   private failed = false
@@ -79,30 +102,36 @@ export class T {
   }
 
   public Error(...args: unknown[]): void {
+    args = goArgs(args)
     this.Log(...args)
     this.Fail()
   }
 
   public Errorf(format: string, ...args: unknown[]): void {
+    args = goArgs(args)
     this.pushLog(fmt.Sprintf(format, ...args))
     this.Fail()
   }
 
   public Fatal(...args: unknown[]): never {
+    args = goArgs(args)
     this.Log(...args)
     this.FailNow()
   }
 
   public Fatalf(format: string, ...args: unknown[]): never {
+    args = goArgs(args)
     this.pushLog(fmt.Sprintf(format, ...args))
     this.FailNow()
   }
 
   public Log(...args: unknown[]): void {
+    args = goArgs(args)
     this.pushLog(fmt.Sprintln(...args).then((text) => text.slice(0, -1)))
   }
 
   public Logf(format: string, ...args: unknown[]): void {
+    args = goArgs(args)
     this.pushLog(fmt.Sprintf(format, ...args))
   }
 
@@ -126,11 +155,13 @@ export class T {
   }
 
   public Skip(...args: unknown[]): never {
+    args = goArgs(args)
     this.Log(...args)
     this.SkipNow()
   }
 
   public Skipf(format: string, ...args: unknown[]): never {
+    args = goArgs(args)
     this.pushLog(fmt.Sprintf(format, ...args))
     this.SkipNow()
   }
@@ -307,13 +338,17 @@ export class B extends T {
   }
 
   public async Run(name: string, fn: BenchmarkFunc): Promise<boolean> {
+    // A benchmark with sub-benchmarks prints no result of its own.
     this.hasSub = true
+
     // Repeated names are made unique with a #NN suffix, as in Go.
     const seen = this.subNames.get(name) ?? 0
     this.subNames.set(name, seen + 1)
     if (seen > 0) {
       name += '#' + String(seen).padStart(2, '0')
     }
+
+    // The sub-benchmark runs like the parent and fails it when it fails.
     const child = new B(this.Name() + '/' + name)
     child.benchTime = this.benchTime
     child.verbose = this.verbose
@@ -401,11 +436,14 @@ export class B extends T {
 
   // runN runs the benchmark function once with N set to n.
   public async runN(fn: BenchmarkFunc, n: number): Promise<void> {
+    // Each run starts with a fresh timer.
     this.N = n
     this.duration = 0
     this.timerOn = false
     this.loopUsed = false
     this.StartTimer()
+
+    // A failure is recorded, and the timer stops however the run ends.
     try {
       await fn(this)
     } catch (err) {
@@ -436,6 +474,7 @@ export class B extends T {
 
   // result returns the benchmark result line, as printed by go test.
   public result(): string {
+    // The line is the name, the iteration count, and the metrics.
     let line = this.Name() + '\t' + String(this.N).padStart(10) + '\t'
     const nsPerOp = this.N > 0 ? (this.duration * 1e6) / this.N : 0
     line += prettyMetric(nsPerOp, 'ns/op')
@@ -477,7 +516,10 @@ function prettyMetric(x: number, unit: string): string {
 // until it takes at least b.benchTime, as go test does, and prints the
 // result. It returns whether the benchmark passed.
 async function runBenchmark(b: B, fn: BenchmarkFunc): Promise<boolean> {
+  // One iteration shows whether the benchmark sizes its own loop.
   await b.runN(fn, 1)
+
+  // Otherwise N grows until a run takes the benchmark time.
   if (!b.hasSubBenchmarks() && !b.usedLoop()) {
     let n = 1
     while (
@@ -496,6 +538,8 @@ async function runBenchmark(b: B, fn: BenchmarkFunc): Promise<boolean> {
       await b.runN(fn, n)
     }
   }
+
+  // The outcome is reported as go test does.
   await b.runCleanups()
   if (b.Failed()) {
     await b.flushLogs()

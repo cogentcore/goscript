@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { existsSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 
+import * as $ from '@goscript/builtin/index.js'
 import { B, F, Short, T, type TB } from './testing.js'
 import { runTests } from './testing.js'
 
@@ -44,11 +45,14 @@ describe('testing.T', () => {
   })
 
   it('runs benchmarks after passing tests, ramping b.N to the benchmark time', async () => {
+    // The benchmark output is captured from the console.
     const logs: string[] = []
     const origLog = console.log
     console.log = (...args: unknown[]) => logs.push(args.join(' '))
     let maxN = 0
     let loops = 0
+
+    // One benchmark ramps N, one sizes its own loop, and one has sub-benchmarks.
     try {
       const result = await runTests(
         'example.com/bench',
@@ -90,8 +94,12 @@ describe('testing.T', () => {
     } finally {
       console.log = origLog
     }
+
+    // The ramp reached a large N, and the loop ran until the time was up.
     expect(maxN).toBeGreaterThan(100)
     expect(loops).toBeGreaterThan(1000)
+
+    // The result lines come in order, with repeated sub-benchmark names made unique.
     const names = logs.map((line) => line.split('\t')[0])
     expect(names).toEqual([
       'BenchmarkN',
@@ -99,14 +107,19 @@ describe('testing.T', () => {
       'BenchmarkSub/x',
       'BenchmarkSub/x#01',
     ])
+
+    // The lines have the format of go test.
     expect(logs[0]).toMatch(/^BenchmarkN\t +\d+\t +[\d.]+ ns\/op$/)
     expect(logs[1]).toMatch(/ns\/op\t +[\d.]+ MB\/s$/)
   })
 
   it('skips benchmarks when a test fails', async () => {
+    // The benchmark output is silenced.
     const origLog = console.log
     console.log = () => {}
     let ran = false
+
+    // A failing test fails the run.
     try {
       const result = await runTests(
         'example.com/bench',
@@ -120,6 +133,8 @@ describe('testing.T', () => {
     } finally {
       console.log = origLog
     }
+
+    // The benchmark never ran.
     expect(ran).toBe(false)
   })
 
@@ -302,6 +317,39 @@ describe('testing.T', () => {
     expect(messages).toEqual([
       '    quoted="key" value=7 stringer=check result number=3 string=ok plain=true',
       '    joined 2 operands',
+    ])
+  })
+
+  it('formats variadic arguments packed by calls through an interface', async () => {
+    // The log output is captured from the console.
+    const t = new T('root')
+    const messages: string[] = []
+    const originalLog = console.log
+    console.log = (message?: unknown) => {
+      messages.push(String(message))
+    }
+
+    // The same messages are logged in each form of the call.
+    try {
+      // A call through a Go interface passes the variadic arguments as one
+      // slice, or null when there are none.
+      t.Logf('via %d %s', ['x'.length, 'y'])
+      t.Log(['packed', 2])
+      t.Errorf('none', null)
+      // A slice passed directly is boxed with its type, and stays one operand.
+      const boxed = $.interfaceValue([1, 2], '[]int')
+      t.Logf('direct %v', boxed)
+      await t.flushLogs()
+    } finally {
+      console.log = originalLog
+    }
+
+    // Each form formats the same operands.
+    expect(messages).toEqual([
+      '    via 1 y',
+      '    packed 2',
+      '    none',
+      '    direct [1 2]',
     ])
   })
 
