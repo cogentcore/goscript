@@ -10736,7 +10736,7 @@ func (o *LoweringOwner) lowerPromotedMethodReceiver(
 			return receiver, typ
 		}
 		field := structType.Field(fieldIndex)
-		receiver += "." + field.Name()
+		receiver += "." + tsStructFieldName(field.Name(), fieldIndex)
 		typ = field.Type()
 		if pointer, ok := types.Unalias(typ).Underlying().(*types.Pointer); ok {
 			receiver = o.runtimeOwner.QualifiedHelper(RuntimeHelperPointerValue) +
