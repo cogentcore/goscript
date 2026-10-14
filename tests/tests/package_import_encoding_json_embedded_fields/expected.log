@@ -1,0 +1,3 @@
+{"Name":"a","Kids":["x"],"Note":"n","Deep":7,"tagged":{"Name":"","Kids":null,"Shadowed":""},"Shadowed":"outer","Size":2} <nil>
+<nil> b [y z] m 9 s true 4 t
+{"Name":"","Kids":null,"Deep":0,"tagged":{"Name":"","Kids":null,"Shadowed":""},"Shadowed":"","Size":0}

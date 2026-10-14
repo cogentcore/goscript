@@ -96,6 +96,8 @@ type fieldMetadata = {
   name: string
   tag?: string
   type?: unknown
+  anonymous?: boolean
+  exported?: boolean
 }
 
 export class SyntaxError extends jsonError {
@@ -1253,13 +1255,9 @@ function marshalValue(v: unknown): unknown {
   }
 
   const out: Record<string, unknown> = {}
-  for (const field of structFields(v)) {
-    const value = v._fields[field.key]
+  for (const { jsonName, owner, field } of jsonStructFields(v)) {
+    const value = owner[field.key]
     if (value === undefined) {
-      continue
-    }
-    const jsonName = jsonFieldName(field.name, field.tag)
-    if (jsonName === '') {
       continue
     }
     if (jsonOmitEmpty(field.tag) && isEmptyValue(value, field.type)) {
@@ -1573,38 +1571,123 @@ function assignStructFields(
   decoded: Record<string, unknown>,
   opts: decodeOptions,
 ): void {
-  const fields = structFields(target)
-  const knownNames = new Set<string>()
-  for (const field of fields) {
-    const jsonName = jsonFieldName(field.name, field.tag)
-    if (jsonName !== '') {
-      knownNames.add(jsonName)
-    }
-  }
+  const fields = jsonStructFields(target)
   if (opts.disallowUnknownFields) {
+    const knownNames = new Set(fields.map((field) => field.jsonName))
     for (const key of Object.keys(decoded)) {
       if (!knownNames.has(key)) {
         throw $.newError(`json: unknown field "${key}"`)
       }
     }
   }
-  for (const field of fields) {
-    if (!(field.key in target._fields)) {
+  for (const { jsonName, owner, field } of fields) {
+    if (!(field.key in owner)) {
       continue
     }
-    const jsonName = jsonFieldName(field.name, field.tag)
-    if (
-      jsonName !== '' &&
-      Object.prototype.hasOwnProperty.call(decoded, jsonName)
-    ) {
+    if (Object.prototype.hasOwnProperty.call(decoded, jsonName)) {
       assignDecodedFieldValue(
-        $.fieldRef(target._fields, field.key),
+        $.fieldRef(owner, field.key),
         decoded[jsonName],
         opts,
         field.type,
       )
     }
   }
+}
+
+// jsonStructField is a field of a struct as encoding/json sees it: an
+// exported field of the struct or of a struct embedded in it, with the
+// storage that holds it.
+type jsonStructField = {
+  jsonName: string
+  owner: Record<string, unknown>
+  field: fieldMetadata
+  depth: number
+  tagged: boolean
+}
+
+// jsonStructFields returns the fields of a struct as encoding/json encodes
+// them, in order: the exported fields, with the fields of embedded structs
+// without a JSON name in place of them. Of the fields with the same JSON
+// name, the least nested one is used, or the one with a JSON name among
+// those equally nested, as in Go; otherwise none is.
+function jsonStructFields(value: {
+  _fields: Record<string, unknown>
+}): jsonStructField[] {
+  const all: jsonStructField[] = []
+  const visit = (
+    target: { _fields: Record<string, unknown> },
+    depth: number,
+    seen: Set<object>,
+  ) => {
+    for (const field of structFields(target)) {
+      const tagName = jsonTagValue(field.tag)?.split(',')[0]
+      if (tagName === '-' && !jsonTagValue(field.tag)?.startsWith('-,')) {
+        continue
+      }
+      if (field.anonymous && !tagName) {
+        let inner = target._fields[field.key]
+        if ($.isVarRef(inner)) {
+          inner = inner.value
+        }
+        if (isStructValue(inner)) {
+          if (!seen.has(inner)) {
+            seen.add(inner)
+            visit(inner, depth + 1, seen)
+          }
+          continue
+        }
+        if (inner === null) {
+          continue
+        }
+      }
+      if (!fieldExported(field)) {
+        continue
+      }
+      all.push({
+        jsonName: tagName || field.name,
+        owner: target._fields,
+        field,
+        depth,
+        tagged: !!tagName,
+      })
+    }
+  }
+  visit(value, 0, new Set([value]))
+
+  // Keep the dominant field of each name.
+  const byName = new Map<string, jsonStructField[]>()
+  for (const field of all) {
+    const named = byName.get(field.jsonName)
+    if (named === undefined) {
+      byName.set(field.jsonName, [field])
+    } else {
+      named.push(field)
+    }
+  }
+  return all.filter((field) => {
+    const named = byName.get(field.jsonName)!
+    if (named.length === 1) {
+      return true
+    }
+    const depth = Math.min(...named.map((f) => f.depth))
+    const shallow = named.filter((f) => f.depth === depth)
+    const tagged = shallow.filter((f) => f.tagged)
+    const dominant =
+      shallow.length === 1 ? shallow[0]
+      : tagged.length === 1 ? tagged[0]
+      : null
+    return dominant === field
+  })
+}
+
+// fieldExported reports whether a struct field is exported.
+function fieldExported(field: fieldMetadata): boolean {
+  if (field.exported !== undefined) {
+    return field.exported
+  }
+  const first = field.name[0] ?? ''
+  return first.toUpperCase() === first && first.toLowerCase() !== first
 }
 
 function assignDecodedFieldValue(
@@ -2206,6 +2289,11 @@ function structFieldMetadata(value: unknown): fieldMetadata[] {
         name: field.name,
         type: field.type,
         ...(typeof tag === 'string' ? { tag } : {}),
+        ...(field.anonymous ? { anonymous: true } : {}),
+        ...(typeof field.exported === 'boolean' ? { exported: field.exported }
+        : typeof field.pkgPath === 'string' && field.pkgPath !== '' ?
+          { exported: false }
+        : {}),
       })
     }
     return out
