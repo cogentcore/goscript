@@ -18,7 +18,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// Test empty byte array literal
 	let d = $.arrayValue(new Uint8Array(4))
-	await $.println(4, $.uint($.arrayIndex(d, 0), 8), $.uint($.arrayIndex(d, 3), 8))
+	await $.println(4, $.arrayIndex(d, 0), $.arrayIndex(d, 3))
 
 	// Empty struct-array elements and repeated literals retain independent values.
 	let e = $.arrayValue(globalThis.Array.from({ length: 4096 }, () => $.anonymousStructValue({"value": 0}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("value", /* @__PURE__ */ $.basicType("int"), [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/array_literal" })] })), /* @__PURE__ */ $.arrayType({ kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("value", /* @__PURE__ */ $.basicType("int"), [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/array_literal" })] }, 4096))

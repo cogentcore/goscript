@@ -52,7 +52,7 @@ export class matcher {
 
 export async function main(): globalThis.Promise<void> {
 	let isX: ((r: number) => boolean | globalThis.Promise<boolean>) | null = $.functionValue((r: number): boolean => {
-		return $.int(r, 32) == 120
+		return r == 120
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int32")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo))
 	await $.println(strings.IndexFunc("abxc", $.syncFunction(isX)))
 

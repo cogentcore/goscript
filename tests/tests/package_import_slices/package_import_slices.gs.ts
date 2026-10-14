@@ -368,7 +368,7 @@ export async function main(): globalThis.Promise<void> {
 	let byteClone: $.Slice<number> = (slices.Clone(src) as $.Slice<number>)
 	byteClone![0] = 120
 	byteClone![1] = $.uint(byteClone![1] + (255), 8)
-	await $.println("byte clone:", $.bytesToString(byteClone), $.bytesToString(src), $.uint($.arrayIndex(byteClone!, 1), 8))
+	await $.println("byte clone:", $.bytesToString(byteClone), $.bytesToString(src), $.arrayIndex(byteClone!, 1))
 	await $.println("byte results:", $.bytesToString(slices.Clip($.goSlice(src, undefined, 2))), $.bytesToString(slices.Insert(src, 1, 121)), $.bytesToString(slices.Replace(slices.Clone(src), 0, 2, 113)), $.bytesToString(slices.Repeat(src, 2)), $.bytesToString(slices.Concat(src, new Uint8Array([100, 101]))))
 
 	await $.println("test finished")

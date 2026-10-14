@@ -14,12 +14,12 @@ export function nonZero(buf: Uint8Array): number {
 	ret = $.uint64Or(ret, $.uint64Shr(ret, 4n))
 	ret = $.uint64Or(ret, $.uint64Shr(ret, 2n))
 	ret = $.uint64Or(ret, $.uint64Shr(ret, 1n))
-	return $.int($.int($.uint64And(ret, 1n), 32), 32)
+	return $.int($.uint64And(ret, 1n), 32)
 }
 
 export async function main(): globalThis.Promise<void> {
-	await $.println($.int(nonZero($.arrayValue(new Uint8Array(32))), 32))
-	await $.println($.int(nonZero($.arrayValue(new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]))), 32))
+	await $.println(nonZero($.arrayValue(new Uint8Array(32))))
+	await $.println(nonZero($.arrayValue(new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]))))
 }
 
 if ($.isMainScript(import.meta)) {

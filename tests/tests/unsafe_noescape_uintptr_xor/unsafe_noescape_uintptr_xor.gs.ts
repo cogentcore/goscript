@@ -111,7 +111,7 @@ export class viewStruct {
 }
 
 export function noescape(p: any): any {
-	let x = $.uint((p as any), 64)
+	let x = (p as any)
 	return (x as any)
 }
 

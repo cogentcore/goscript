@@ -531,6 +531,19 @@ const maxSafeUintBigInt = BigInt(Number.MAX_SAFE_INTEGER)
 
 // int truncates a numeric value, wrapping signed values at an explicit width.
 export function int(value: number | bigint | string, bits = 0): number {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    // The JavaScript bitwise operators truncate a finite number and wrap it to
+    // 32 bits as Go's conversions do.
+    if (bits === 32) {
+      return value | 0
+    }
+    if (bits === 16) {
+      return (value << 16) >> 16
+    }
+    if (bits === 8) {
+      return (value << 24) >> 24
+    }
+  }
   if (typeof value === 'string') {
     value = BigInt(value)
   }

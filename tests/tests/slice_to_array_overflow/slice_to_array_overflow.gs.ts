@@ -35,12 +35,12 @@ export async function main(): globalThis.Promise<void> {
 	await recoverMsg("array:", $.functionValue(async (): globalThis.Promise<void> => {
 		let values: $.Slice<number> = new Uint8Array([1, 2]) as $.Slice<number>
 		let arr = $.cloneArrayValue(($.sliceToArray<number>(values, 4, "byte") as Uint8Array), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 4))
-		await $.println($.uint($.arrayIndex(arr, 0), 8))
+		await $.println($.arrayIndex(arr, 0))
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)))
 	await recoverMsg("pointer:", $.functionValue(async (): globalThis.Promise<void> => {
 		let values: $.Slice<number> = new Uint8Array([1, 2]) as $.Slice<number>
 		let arr: $.VarRef<Uint8Array> | null = ($.sliceToArrayPointer<number>(values, 4, "byte") as $.VarRef<Uint8Array> | null)
-		await $.println($.uint($.arrayIndex($.pointerValue<Uint8Array>(arr), 0), 8))
+		await $.println($.arrayIndex($.pointerValue<Uint8Array>(arr), 0))
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)))
 	await $.println("done")
 }
