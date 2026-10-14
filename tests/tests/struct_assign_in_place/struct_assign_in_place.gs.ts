@@ -3,6 +3,8 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
+export type Kind = number
+
 export class Inner {
 	public get X(): number {
 		return this._fields.X
@@ -214,6 +216,51 @@ export class Holder {
 	)
 }
 
+export class Event {
+	public get Kind(): Kind {
+		return this._fields.Kind
+	}
+
+	public set Kind(value: Kind) {
+		this._fields.Kind = value
+	}
+
+	public _fields: {
+		Kind: Kind
+	}
+
+	constructor(init?: Partial<{Kind?: Kind}>, __goscriptValue?: boolean) {
+		this._fields = {
+			Kind: init?.Kind ?? (0 as Kind)
+		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
+	}
+
+	public clone(): Event {
+		return new Event(this, true)
+	}
+
+	public __goscriptAssign(source: Event): void {
+		const target = this._fields
+		const values = source._fields
+		target.Kind = values.Kind
+	}
+
+	static __typeInfo = $.registerStructType(
+		"main.Event",
+		() => new Event(),
+		() => [],
+		Event,
+		() => [{ name: "Kind", key: "Kind", type: /* @__PURE__ */ $.basicType("int", "main.Kind") }]
+	)
+}
+
+export const KindStart: Kind = 1
+
+export const KindValue: Kind = 2
+
+export const KindEnd: Kind = 3
+
 export let global: Outer = new Outer(undefined, true)
 
 export function __goscript_set_global(__goscriptValue: Outer): void {
@@ -228,16 +275,20 @@ export function make1(): Outer {
 	return new Outer({In: new Inner({X: 1, Y: 2}, true), Arr: $.arrayValue([3, 4]), N: 5}, true)
 }
 
+export function nextEvent(k: Kind): [Event, $.GoError] {
+	return [new Event({Kind: k}, true), null]
+}
+
 export async function main(): globalThis.Promise<void> {
 	let a = $.varRef(make1())
 	let b = new Outer(undefined, true)
-	$.assignStruct(b, a.value)
+	b = $.assignStruct(b, a.value)
 	a.value.In.X = 10
 	a.value.Arr[0] = 30
 	await $.println(b.In.X, $.arrayIndex(b.Arr, 0), a.value.In.X, $.arrayIndex(a.value.Arr, 0))
 
 	let p: Outer | $.VarRef<Outer> | null = a
-	$.assignStruct(a.value, $.pointerValue<Outer>(p))
+	a.value = $.assignStruct(a.value, $.pointerValue<Outer>(p))
 	await $.println(a.value.In.X, a.value.N)
 
 	let s: $.Slice<Outer> = $.arrayToSlice<Outer>([make1(), make1()])
@@ -247,7 +298,7 @@ export async function main(): globalThis.Promise<void> {
 
 	let sh: Inner | $.VarRef<Inner> | null = new Inner({X: 7, Y: 8})
 	a.value.Ptr = sh
-	$.assignStruct(b, a.value)
+	b = $.assignStruct(b, a.value)
 	$.pointerValue<Inner>(b.Ptr).X = 70
 	await $.println($.pointerValue<Inner>(a.value.Ptr).X, $.pointerValue<Inner>(sh).X)
 
@@ -256,12 +307,12 @@ export async function main(): globalThis.Promise<void> {
 	await $.println(global.N, b.N)
 
 	let _in: Inner = new Inner(undefined, true)
-	$.assignStruct(_in, a.value.In)
+	_in = $.assignStruct(_in, a.value.In)
 	a.value.In.Y = 99
 	await $.println(_in.Y, a.value.In.Y)
 	let g1 = $.markAsStructValue(new Pair({Key: "a", Val: new Inner({X: 1, Y: 2}, true)}))
 	let g2: Pair = $.markAsStructValue(new Pair({Val: new Inner(undefined, true)}))
-	$.assignStruct(g2, $.markAsStructValue($.cloneStructValue(g1)))
+	g2 = $.assignStruct(g2, $.markAsStructValue($.cloneStructValue(g1)))
 	g1.Val.X = 11
 	await $.println(g2.Val.X, g1.Val.X)
 	let g3: $.VarRef<Pair> = $.varRef($.markAsStructValue(new Pair({Val: new Inner(undefined, true)})))
@@ -270,14 +321,38 @@ export async function main(): globalThis.Promise<void> {
 	await $.println(g3.value.Val.Y, g1.Val.Y)
 	let h1 = $.markAsStructValue(new Holder({P: $.markAsStructValue($.cloneStructValue(g1))}))
 	let h2: Holder = $.markAsStructValue(new Holder())
-	$.assignStruct(h2, $.markAsStructValue($.cloneStructValue(h1)))
+	h2 = $.assignStruct(h2, $.markAsStructValue($.cloneStructValue(h1)))
 	h1.P.Val.X = 33
 	await $.println(h2.P.Val.X, h1.P.Val.X)
 	let m: globalThis.Map<string, Outer> | null = $.makeMap<string, Outer>([["k", (a.value).clone()]])
 	let c = new Outer(undefined, true)
-	$.assignStruct(c, $.mapGet<string, Outer, Outer>(m, "k", new Outer(undefined, true))[0])
+	c = $.assignStruct(c, $.mapGet<string, Outer, Outer>(m, "k", new Outer(undefined, true))[0])
 	c.N = 77
 	await $.println($.mapGet<string, Outer, Outer>(m, "k", new Outer(undefined, true))[0].N, c.N)
+
+	// The kind tested before the loop does not decide the kind inside it.
+	let [ev, err] = nextEvent(1)
+	if (ev.Kind != 1) {
+		return
+	}
+	for (let __goscriptRangeTarget0 = $.arrayToSlice<Kind>([2, 3]), __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
+		let k = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as Kind)
+		let __goscriptTuple0: any = nextEvent(k)
+		ev = $.assignStruct(ev, __goscriptTuple0[0])
+		err = __goscriptTuple0[1]
+		switch (ev.Kind) {
+			case 2:
+			{
+				await $.println("value", err == null)
+				break
+			}
+			case 3:
+			{
+				await $.println("end")
+				break
+			}
+		}
+	}
 }
 
 var __goscriptStatic0$value: any

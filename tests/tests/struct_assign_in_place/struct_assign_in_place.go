@@ -26,6 +26,20 @@ func assignGeneric[T any](dst *Pair[T], src Pair[T]) {
 
 func make1() Outer { return Outer{In: Inner{1, 2}, Arr: [2]int{3, 4}, N: 5} }
 
+// Kind names the kinds of an Event.
+type Kind int
+
+const (
+	KindStart Kind = iota + 1
+	KindValue
+	KindEnd
+)
+
+// Event is a struct that a loop assigns again after testing its kind.
+type Event struct{ Kind Kind }
+
+func nextEvent(k Kind) (Event, error) { return Event{Kind: k}, nil }
+
 func main() {
 	a := make1()
 	b := Outer{}
@@ -76,4 +90,19 @@ func main() {
 	c = m["k"]
 	c.N = 77
 	println(m["k"].N, c.N)
+
+	// The kind tested before the loop does not decide the kind inside it.
+	ev, err := nextEvent(KindStart)
+	if ev.Kind != KindStart {
+		return
+	}
+	for _, k := range []Kind{KindValue, KindEnd} {
+		ev, err = nextEvent(k)
+		switch ev.Kind {
+		case KindValue:
+			println("value", err == nil)
+		case KindEnd:
+			println("end")
+		}
+	}
 }

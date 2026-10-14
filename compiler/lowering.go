@@ -5892,7 +5892,7 @@ func (o *LoweringOwner) lowerAssignStmt(ctx lowerFileContext, stmt *ast.AssignSt
 		diagnostics = append(diagnostics, leftDiagnostics...)
 		star, starTarget := unwrapParenExpr(lhs).(*ast.StarExpr)
 		if !isShortDecl && isStructValueType(targetType) {
-			stmts = append(stmts, loweredStmt{text: o.lowerStructAssignment(left, uncopied)})
+			stmts = append(stmts, loweredStmt{text: o.lowerStructAssignmentTo(ctx, lhs, left, uncopied)})
 			continue
 		}
 		if starTarget && stmt.Tok == token.ASSIGN {
@@ -6394,7 +6394,7 @@ func (o *LoweringOwner) lowerTupleTargetAssignmentStmt(
 	}
 	left, diagnostics := o.lowerAssignmentTarget(ctx, lhs, declare)
 	if !declare && isStructValueType(assignmentTargetType(ctx, lhs)) {
-		return loweredStmt{text: o.lowerStructAssignment(left, value)}, diagnostics
+		return loweredStmt{text: o.lowerStructAssignmentTo(ctx, lhs, left, value)}, diagnostics
 	}
 	prefix := ""
 	if declare {
@@ -6422,7 +6422,6 @@ func (o *LoweringOwner) lowerStarTargetAssignmentStmt(
 	return loweredStmt{text: pointer + " = " + right}, diagnostics, true
 }
 
-// lowerStructAssignment preserves the addresses of an existing struct's fields.
 // structAssignCopiesDeeply reports whether $.assignStruct copies a value of
 // typ into existing storage without sharing any of its mutable parts: every
 // field is a basic value or a reference, or a struct or array of such fields.
@@ -6453,8 +6452,25 @@ func structAssignCopiesDeeply(typ types.Type, depth int) bool {
 	return true
 }
 
+// lowerStructAssignment preserves the addresses of an existing struct's fields.
 func (o *LoweringOwner) lowerStructAssignment(target, value string) string {
 	return o.runtimeOwner.QualifiedHelper(RuntimeHelperAssignStruct) + "(" + target + ", " + value + ")"
+}
+
+// lowerStructAssignmentTo copies value into the existing struct that lhs
+// names. A local variable is also assigned the result, which is the same
+// struct, so that TypeScript forgets what it narrowed about its fields.
+func (o *LoweringOwner) lowerStructAssignmentTo(ctx lowerFileContext, lhs ast.Expr, left, value string) string {
+	assignment := o.lowerStructAssignment(left, value)
+	ident, ok := unwrapParenExpr(lhs).(*ast.Ident)
+	if !ok {
+		return assignment
+	}
+	obj, ok := ctx.semPkg.source.TypesInfo.Uses[ident].(*types.Var)
+	if !ok || obj.Pkg() == nil || obj.Parent() == obj.Pkg().Scope() {
+		return assignment
+	}
+	return left + " = " + assignment
 }
 
 func (o *LoweringOwner) lowerTupleReassignmentStmt(

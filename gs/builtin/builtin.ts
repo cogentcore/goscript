@@ -93,19 +93,21 @@ function clearZeroValue<T>(v: T[]): T {
  * assignStruct copies a prepared struct value into existing storage. Nested
  * structs and arrays retain their addresses; pointer and slice fields receive
  * the source references. The compiler snapshots the right-hand side first.
+ * It returns target, which the compiler assigns back to a local variable so
+ * that TypeScript forgets what it narrowed about the old field values.
  */
 export function assignStruct<T>(
   target: T,
   source: T,
   typeInfo?: TypeInfo | string,
-): void {
+): T {
   if (
     target === null ||
     target === undefined ||
     source === null ||
     source === undefined
   ) {
-    return
+    return target
   }
 
   // A generated struct class copies the fields of a value of its own type
@@ -116,7 +118,7 @@ export function assignStruct<T>(
     (source as any)._fields !== undefined
   ) {
     ;(target as any).__goscriptAssign(source)
-    return
+    return target
   }
 
   // The value identifies its layout even when package names collide.
@@ -142,7 +144,7 @@ export function assignStruct<T>(
         field.type,
       )
     }
-    return
+    return target
   }
   if (!targetFields || !sourceFields) {
     // Structs without a _fields map (e.g. bound protobuf messages) carry their
@@ -155,11 +157,12 @@ export function assignStruct<T>(
     const copied =
       cloneable.__goscriptClone?.() ?? cloneable.clone?.() ?? source
     Object.assign(target as object, copied as object)
-    return
+    return target
   }
   for (const key of Object.keys(sourceFields)) {
     targetFields[key] = sourceFields[key]
   }
+  return target
 }
 
 /** assignFieldValue preserves aggregate storage while replacing reference values. */
