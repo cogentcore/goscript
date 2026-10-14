@@ -227,9 +227,18 @@ export function pointerValue<T>(value: T | VarRef<T> | null | undefined): T {
       'runtime error: invalid memory address or nil pointer dereference',
     )
   }
-  if (isVarRef(value)) {
-    return value.value as T
+
+  // A variable reference holds its value, and a struct that is not a boxed
+  // pointer is its own target. These property reads are much faster than
+  // the type and 'in' checks below, on the many kinds of objects seen here.
+  if ((value as any).__isVarRef === true) {
+    return (value as VarRef<T>).value
   }
+  if ((value as any).__goValue === undefined) {
+    return value as T
+  }
+
+  // A boxed pointer is unwrapped to its target.
   const boxed =
     typeof value === 'object' && value !== null && '__goValue' in value ?
       (value as { __goType?: unknown; __goValue: T | VarRef<T> })
@@ -242,7 +251,7 @@ export function pointerValue<T>(value: T | VarRef<T> | null | undefined): T {
   ) {
     return pointerValue(boxed.__goValue)
   }
-  return value
+  return value as T
 }
 
 // nilPointerTarget stands for the struct that a nil pointer points to: any
