@@ -560,11 +560,22 @@ async function resolvePendingMarshals(
 let pendingUnmarshals: Promise<$.GoError>[] = []
 
 // callUnmarshalJSON calls a decode target's UnmarshalJSON, throwing its
-// error, and records the result when the call suspends.
+// error, and records the result when the call suspends. Once one call has
+// suspended, the later ones run after it, in order, as they do in Go, since
+// an UnmarshalJSON may change the values that a later one decodes into.
 function callUnmarshalJSON(
   unmarshaler: Unmarshaler,
   data: $.Slice<number>,
 ): void {
+  const previous = pendingUnmarshals.at(-1)
+  if (previous !== undefined) {
+    pendingUnmarshals.push(
+      previous.then((err) =>
+        err !== null ? err : unmarshaler.UnmarshalJSON(data),
+      ),
+    )
+    return
+  }
   const err: $.MaybePromise<$.GoError> = unmarshaler.UnmarshalJSON(data)
   if (err instanceof Promise) {
     pendingUnmarshals.push(err)
@@ -1559,6 +1570,59 @@ function assignStructFields(
   }
 }
 
+// reuseInterfacePointerElements sets target to the decoded slice of
+// interfaces value, except that each element that the slice held before
+// decoding a pointer is decoded into that pointer instead, as Go decodes
+// into an existing element, and into the pointer an interface holds. When
+// every element is reused, the slice is left as the UnmarshalJSON calls
+// left it, as in Go, where they may replace elements of the slice.
+function reuseInterfacePointerElements(
+  target: $.VarRef<unknown>,
+  value: unknown,
+  decoded: unknown[],
+  info: $.SliceTypeInfo,
+  opts: decodeOptions,
+): void {
+  const existing = target.value
+  const elemInfo = resolveTypeInfo(info.elemType)
+  if (
+    elemInfo === null ||
+    !$.isInterfaceTypeInfo(elemInfo) ||
+    existing === null ||
+    existing === undefined ||
+    $.len(existing as $.Slice<unknown>) === 0
+  ) {
+    target.value = value
+    return
+  }
+  const old = $.asArray(existing as $.Slice<unknown>)
+  const out = $.asArray(value as $.Slice<unknown>).slice()
+  let reused = 0
+  for (let i = 0; i < out.length && i < old.length; i++) {
+    const elem = old[i]
+    if (!isStructValue(elem) || decoded[i] === null) {
+      continue
+    }
+    const unmarshaler = unmarshalJSONTarget(elem)
+    if (unmarshaler !== null) {
+      callUnmarshalJSON(
+        unmarshaler,
+        $.stringToBytes(decodedJSONText(decoded[i])),
+      )
+    } else if (isPlainObject(decoded[i])) {
+      assignStructFields(elem, decoded[i] as Record<string, unknown>, opts)
+    } else {
+      continue
+    }
+    out[i] = elem
+    reused++
+  }
+  if (reused === out.length && out.length === old.length) {
+    return
+  }
+  target.value = reused === 0 ? value : $.arrayToSlice(out)
+}
+
 function assignDecodedFieldValue(
   target: $.VarRef<unknown>,
   decoded: unknown,
@@ -1583,7 +1647,13 @@ function assignDecodedFieldValue(
       return
     }
     if ($.isSliceTypeInfo(info) && Array.isArray(decoded)) {
-      target.value = decodeValueForType(decoded, info, opts)
+      reuseInterfacePointerElements(
+        target,
+        decodeValueForType(decoded, info, opts),
+        decoded,
+        info,
+        opts,
+      )
       return
     }
     if ($.isMapTypeInfo(info) && isPlainObject(decoded)) {
