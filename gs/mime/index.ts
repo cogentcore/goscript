@@ -182,8 +182,7 @@ export function WordEncoder_Encode(
     return s
   }
   const encoding = String.fromCharCode(e).toLowerCase() === 'q' ? 'Q' : 'B'
-  const body =
-    encoding === 'Q' ? qEncode(s) : base64Encode(new TextEncoder().encode(s))
+  const body = encoding === 'Q' ? qEncode(s) : base64Encode($.stringToBytes(s))
   return `=?${charset}?${encoding}?${body}?=`
 }
 
@@ -260,7 +259,7 @@ function formatMediaTypeDisposition(value: string): string {
 
 function percentEncode(value: string): string {
   let out = ''
-  for (const byte of new TextEncoder().encode(value)) {
+  for (const byte of $.stringToBytes(value)) {
     if (
       (byte >= 0x30 && byte <= 0x39) ||
       (byte >= 0x41 && byte <= 0x5a) ||
@@ -306,7 +305,7 @@ function decode2231Value(value: string): string | null {
   if (charset === 'us-ascii' && bytes.some((byte) => byte > 0x7f)) {
     return null
   }
-  return new TextDecoder('utf-8').decode(bytes)
+  return $.bytesToString(bytes)
 }
 
 function percentDecode(value: string): Uint8Array | null {
@@ -379,7 +378,7 @@ function nodeBuffer(): nodeBufferConstructor | null {
 
 function qEncode(value: string): string {
   let out = ''
-  for (const byte of new TextEncoder().encode(value)) {
+  for (const byte of $.stringToBytes(value)) {
     if (byte === 0x20) {
       out += '_'
       continue
@@ -412,7 +411,7 @@ function qDecode(value: string): string {
     }
     bytes.push(char.charCodeAt(0))
   }
-  return new TextDecoder().decode(new Uint8Array(bytes))
+  return $.bytesToString(new Uint8Array(bytes))
 }
 
 function decodeWord(word: string): string | null {
@@ -425,7 +424,7 @@ function decodeWord(word: string): string | null {
     return null
   }
   if (encoding.toLowerCase() === 'b') {
-    return new TextDecoder().decode(base64Decode(body))
+    return $.bytesToString(base64Decode(body))
   }
   return qDecode(body)
 }

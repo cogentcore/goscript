@@ -12,6 +12,30 @@ import {
   Value,
 } from '@goscript/reflect/type.js'
 
+// padRunes pads the Go string s with fill to width runes, as Go counts a
+// width in runes, before s if left is true or else after it.
+function padRunes(
+  s: string,
+  width: number,
+  fill: string,
+  left: boolean,
+): string {
+  // Each byte that is not a continuation byte starts a rune.
+  let runes = 0
+  for (let i = 0; i < s.length; i++) {
+    if ((s.charCodeAt(i) & 0xc0) !== 0x80) {
+      runes++
+    }
+  }
+
+  // The fill makes up the runes short of width.
+  if (runes >= width) {
+    return s
+  }
+  const pad = fill.repeat(width - runes)
+  return left ? pad + s : s + pad
+}
+
 // Stringer Basic interfaces.
 export interface Stringer {
   String(): string
@@ -106,8 +130,7 @@ function formatHexBytes(
   upper: boolean,
 ): string {
   // Read the bytes and the prefix and spacing the flags ask for.
-  const bytes =
-    typeof value === 'string' ? new TextEncoder().encode(value) : value
+  const bytes = typeof value === 'string' ? $.stringToBytes(value) : value
   const prefix =
     flags.includes('#') ?
       upper ? '0X'
@@ -635,9 +658,9 @@ function applyFormatOptions(
     if (width && !precision) {
       const w = parseInt(width)
       if (flags.includes('-')) {
-        result = result.padEnd(w)
+        result = padRunes(result, w, ' ', false)
       } else {
-        result = result.padStart(w, flags.includes('0') ? '0' : ' ')
+        result = padRunes(result, w, flags.includes('0') ? '0' : ' ', true)
       }
     } else if (precision && 'eEfFgG'.includes(verb)) {
       result = formatFloatVerb(arg, verb, precision)
@@ -645,9 +668,9 @@ function applyFormatOptions(
       if (width) {
         const w = parseInt(width)
         if (flags.includes('-')) {
-          result = result.padEnd(w)
+          result = padRunes(result, w, ' ', false)
         } else {
-          result = result.padStart(w)
+          result = padRunes(result, w, ' ', true)
         }
       }
     }
@@ -908,7 +931,7 @@ async function writeToWriter(
   out: string,
 ): Promise<[number, $.GoError | null]> {
   if (w && w.Write) {
-    return await w.Write(new TextEncoder().encode(out))
+    return await w.Write($.stringToBytes(out))
   }
   return [0, $.newError('Writer does not implement Write method')]
 }
@@ -962,7 +985,7 @@ export async function Appendln(b: $.Bytes, ...a: any[]): Promise<$.Bytes> {
 }
 
 function appendText(b: $.Bytes, result: string): $.Bytes {
-  const encoded = new TextEncoder().encode(result)
+  const encoded = $.stringToBytes(result)
   const base = $.bytesToUint8Array(b)
   const newArray = new Uint8Array(base.length + encoded.length)
   newArray.set(base)
@@ -1298,11 +1321,10 @@ class stringScanner {
     [bits, signed]: [number, boolean],
   ): $.GoError | null {
     if (verb === 'c') {
-      const ch = this.token(1, () => true)
-      ref.value =
-        bits === 64 && !isNumberBacked(ref) ?
-          BigInt(ch.codePointAt(0)!)
-        : ch.codePointAt(0)!
+      // %c reads one rune, of one to four bytes.
+      const [r, size] = $.decodeRuneInString(this.str, this.pos)
+      this.pos += size
+      ref.value = bits === 64 && !isNumberBacked(ref) ? BigInt(r) : r
       return null
     }
     let base =

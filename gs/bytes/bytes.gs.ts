@@ -909,9 +909,9 @@ export function makeASCIISet(chars: string): [asciiSet, boolean] {
 // We avoid bytes.ContainsRune to avoid allocating a temporary copy of s.
 export function containsRune(s: string, r: number): boolean {
 	for (let i = 0; i < s.length; ) {
-		const c = s.codePointAt(i)
+		const [c, size] = $.decodeRuneInString(s, i)
 		if (c === r) return true
-		i += c! > 0xFFFF ? 2 : 1
+		i += size
 	}
 	return false
 }

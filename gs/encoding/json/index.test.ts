@@ -1005,6 +1005,19 @@ describe('encoding/json override', () => {
       'json: unknown field "extra"',
     )
   })
+  it('decodes strings as UTF-8 bytes, including \\u escapes', () => {
+    const target = $.varRef<Map<string, string> | null>(new Map())
+    target.__goType = '*map[string]string'
+    const input = $.goString(
+      '{"raw":"héllo","esc":"h\\u00e9llo","pair":"\\ud83d\\ude00","bad":"\\ud800x"}',
+    )
+    expect(Unmarshal($.stringToBytes(input), target)).toBeNull()
+    expect(target.value!.get('raw')).toBe($.goString('héllo'))
+    expect(target.value!.get('esc')).toBe($.goString('héllo'))
+    expect(target.value!.get('pair')).toBe($.goString('😀'))
+    expect(target.value!.get('bad')).toBe($.goString('\ufffdx'))
+  })
+
   it('decodes json.RawMessage as a map and slice element type', () => {
     // The runtime boxes Unmarshal's `any` target with its Go type spelling
     // (__goType) at the call site; simulate that here the way $.interfaceValue

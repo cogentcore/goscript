@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { goString } from '@goscript/builtin/index.js'
 
 import {
   CanBackquote,
@@ -14,9 +15,9 @@ describe('strconv.Quote (Go escape semantics)', () => {
   it('passes printable ASCII and Unicode through unchanged', () => {
     expect(Quote('hello')).toBe('"hello"')
     // CJK is printable; Go leaves graphic Unicode in place.
-    expect(Quote('背景')).toBe('"背景"')
+    expect(Quote(goString('背景'))).toBe(goString('"背景"'))
     // U+1F600 is graphic; not truncated and not escaped.
-    expect(Quote('😀')).toBe('"😀"')
+    expect(Quote(goString('😀'))).toBe(goString('"😀"'))
   })
 
   it('escapes the quote and backslash', () => {
@@ -36,8 +37,8 @@ describe('strconv.Quote (Go escape semantics)', () => {
 
 describe('strconv.QuoteToASCII', () => {
   it('escapes non-ASCII as \\u and astral as \\U', () => {
-    expect(QuoteToASCII('背景')).toBe('"\\u80cc\\u666f"')
-    expect(QuoteToASCII('😀')).toBe('"\\U0001f600"')
+    expect(QuoteToASCII(goString('背景'))).toBe(goString('"\\u80cc\\u666f"'))
+    expect(QuoteToASCII(goString('😀'))).toBe('"\\U0001f600"')
     expect(QuoteToASCII('hi')).toBe('"hi"')
   })
 })
@@ -46,7 +47,7 @@ describe('strconv.QuoteRune', () => {
   it('quotes printable, control, and astral runes like Go', () => {
     expect(QuoteRune('a'.charCodeAt(0))).toBe("'a'")
     expect(QuoteRune(0x09)).toBe("'\\t'")
-    expect(QuoteRune(0x1f600)).toBe("'😀'")
+    expect(QuoteRune(0x1f600)).toBe(goString("'😀'"))
     expect(QuoteRune(0x27)).toBe("'\\''")
     expect(QuoteRune(0x00)).toBe("'\\x00'")
   })
@@ -62,13 +63,13 @@ describe('strconv.Unquote (Go escape decoding)', () => {
   it('decodes \\x, octal, \\u, and \\U escapes', () => {
     expect(Unquote('"\\x41"')).toEqual(['A', null])
     expect(Unquote('"\\101"')).toEqual(['A', null]) // octal 101 = 'A'
-    expect(Unquote('"\\u0041"')).toEqual(['A', null])
-    expect(Unquote('"\\U0001F600"')).toEqual(['😀', null])
+    expect(Unquote(goString('"\\u0041"'))).toEqual(['A', null])
+    expect(Unquote('"\\U0001F600"')).toEqual([goString('😀'), null])
   })
 
   it('decodes named escapes and passes printable Unicode through', () => {
     expect(Unquote('"a\\tb"')).toEqual(['a\tb', null])
-    expect(Unquote('"é"')).toEqual(['é', null])
+    expect(Unquote(goString('"é"'))).toEqual([goString('é'), null])
   })
 
   it('handles backquoted strings without processing escapes', () => {
@@ -96,7 +97,7 @@ describe('strconv.CanBackquote (Go control rules)', () => {
     expect(CanBackquote('a\nb')).toBe(false)
     expect(CanBackquote('a`b')).toBe(false)
     expect(CanBackquote('a\x7fb')).toBe(false)
-    expect(CanBackquote('\uFEFF')).toBe(false)
+    expect(CanBackquote(goString('\uFEFF'))).toBe(false)
   })
 })
 
@@ -106,6 +107,11 @@ describe('strconv.UnquoteChar (tail + multibyte)', () => {
   })
 
   it('flags multibyte runes from \\u escapes', () => {
-    expect(UnquoteChar('\\u00e9z', 0x22)).toEqual([0xe9, true, 'z', null])
+    expect(UnquoteChar(goString('\\u00e9z'), 0x22)).toEqual([
+      0xe9,
+      true,
+      'z',
+      null,
+    ])
   })
 })

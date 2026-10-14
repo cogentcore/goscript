@@ -70,9 +70,27 @@ function quoteWith(
 	asciiOnly: boolean,
 	graphicOnly: boolean,
 ): string {
+	// Each rune is escaped as needed, an ASCII byte being its own rune.
 	let out = String.fromCharCode(quote);
-	for (const ch of s) {
-		out += appendEscapedRune(ch.codePointAt(0)!, quote, asciiOnly, graphicOnly);
+	for (let i = 0; i < s.length; ) {
+		const c = s.charCodeAt(i);
+		if (c < 0x80) {
+			out += appendEscapedRune(c, quote, asciiOnly, graphicOnly);
+			i++;
+			continue;
+		}
+
+		// An invalid byte is escaped as \xNN, as in Go.
+		const [r, width] = $.decodeRuneInString(s, i);
+		if (width === 1 && r === 0xfffd) {
+			out += hexEscape("\\x", c, 2);
+			i++;
+			continue;
+		}
+
+		// A valid rune is escaped as a whole.
+		out += appendEscapedRune(r, quote, asciiOnly, graphicOnly);
+		i += width;
 	}
 	return out + String.fromCharCode(quote);
 }
