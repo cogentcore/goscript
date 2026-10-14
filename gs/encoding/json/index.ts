@@ -1852,7 +1852,7 @@ function goTypeDescriptor(spelling: string): unknown {
       elemType: goTypeDescriptor(s.slice(1).trim()),
     }
   }
-  if (s === 'json.RawMessage' || s === 'encoding/json.RawMessage') {
+  if (rawMessageTypeNames.has(s)) {
     return 'json.RawMessage'
   }
   if (s === 'any' || s === 'interface{}' || s === 'interface {}') {
@@ -2165,18 +2165,27 @@ function structFieldMetadata(value: unknown): fieldMetadata[] {
   return []
 }
 
+// rawMessageTypeNames are the type spellings of json.RawMessage. With the
+// encoding/json v2 implementation (the default since Go 1.27), RawMessage is
+// an alias for jsontext.Value, so the compiler spells it that way.
+const rawMessageTypeNames = new Set([
+  'json.RawMessage',
+  'encoding/json.RawMessage',
+  'jsontext.Value',
+  'encoding/json/jsontext.Value',
+])
+
 function isRawMessageType(value: unknown): boolean {
-  if (value === 'json.RawMessage' || value === 'encoding/json.RawMessage') {
-    return true
+  if (typeof value === 'string') {
+    return rawMessageTypeNames.has(value)
   }
   if (!isPlainObject(value)) {
     return false
   }
   return (
-    value.typeName === 'json.RawMessage' ||
-    value.typeName === 'encoding/json.RawMessage' ||
-    value.name === 'json.RawMessage' ||
-    value.name === 'encoding/json.RawMessage'
+    (typeof value.typeName === 'string' &&
+      rawMessageTypeNames.has(value.typeName)) ||
+    (typeof value.name === 'string' && rawMessageTypeNames.has(value.name))
   )
 }
 
