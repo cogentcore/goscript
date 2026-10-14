@@ -51,7 +51,7 @@ export class item {
 
 export async function main(): globalThis.Promise<void> {
 	let original = $.markAsStructValue(new item({n: 2}))
-	let out = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(original)).dec()))
+	let out = $.markAsStructValue($.cloneStructValue(original)).dec()
 	await $.println("original:", original.n)
 	await $.println("out:", out.n)
 }

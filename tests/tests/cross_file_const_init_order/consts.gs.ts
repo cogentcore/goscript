@@ -12,7 +12,7 @@ export var Default: __goscript_register.thing
 
 export function __goscript_init_Default(): void {
 	if (((Default) as any) === undefined) {
-		Default = $.markAsStructValue($.cloneStructValue(__goscript_register.newThing()))
+		Default = __goscript_register.newThing()
 	}
 }
 

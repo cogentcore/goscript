@@ -52,7 +52,7 @@ export function copyBox(b: Box): Box {
 
 export async function main(): globalThis.Promise<void> {
 	let original = $.varRef($.markAsStructValue(new Box({Value: 1})))
-	let copied = $.markAsStructValue($.cloneStructValue(copyBox($.markAsStructValue($.cloneStructValue(original.value)))))
+	let copied = copyBox($.markAsStructValue($.cloneStructValue(original.value)))
 	original.value.Value = 3
 	let methodCopy: Box | $.VarRef<Box> | null = Box.prototype.clone.call((original))
 	await $.println("copied:", copied.Value)

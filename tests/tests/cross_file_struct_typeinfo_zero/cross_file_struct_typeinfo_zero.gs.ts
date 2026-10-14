@@ -10,8 +10,8 @@ import "./a.gs.ts"
 import "./b.gs.ts"
 
 export async function main(): globalThis.Promise<void> {
-	let a = $.markAsStructValue($.cloneStructValue(__goscript_a.makeA()))
-	let b = $.markAsStructValue($.cloneStructValue(__goscript_b.makeB()))
+	let a = __goscript_a.makeA()
+	let b = __goscript_b.makeB()
 	await $.println("ok:", a.next == null, b.inner.next == null)
 }
 

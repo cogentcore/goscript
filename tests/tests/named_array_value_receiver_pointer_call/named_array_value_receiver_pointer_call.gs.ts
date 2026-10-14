@@ -79,7 +79,7 @@ export async function main(): globalThis.Promise<void> {
 export async function receiverCopies(): globalThis.Promise<void> {
 	let m = $.varRef($.arrayValue([1, 2, 3, 4], /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 4)))
 	let original = $.cloneArrayValue(m.value, "main.Matrix")
-	let r = $.cloneArrayValue(Matrix_Scaled(m.value, 2), "main.Matrix")
+	let r = Matrix_Scaled(m.value, 2)
 	await $.println("m:", $.arrayIndex(m.value, 0), $.arrayIndex(m.value, 1), $.arrayIndex(m.value, 2), $.arrayIndex(m.value, 3))
 	await $.println("r:", $.arrayIndex(r, 0), $.arrayIndex(r, 1), $.arrayIndex(r, 2), $.arrayIndex(r, 3))
 	await $.println("original equal:", $.arrayEqual(original, m.value))
