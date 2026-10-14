@@ -6,7 +6,7 @@ import * as $ from "@goscript/builtin/index.js"
 export type GID = number
 
 export function lookup(c: number, delta: number): GID {
-	return $.uint($.uint($.uint(c + delta, 16), 32), 32)
+	return $.uint($.uint($.uint(((c + delta) & 0xffff), 16), 32), 32)
 }
 
 export async function main(): globalThis.Promise<void> {
@@ -28,17 +28,17 @@ export async function main(): globalThis.Promise<void> {
 
 	let a: number = 200
 	let b: number = 100
-	await $.println("uint8 sum:", $.uint($.uint($.uint(a + b, 8), 32), 32), $.int($.uint(a * b, 8)), $.uint64($.uint(((a - b) - b) - b, 8)))
+	await $.println("uint8 sum:", $.uint($.uint($.uint(((a + b) & 0xff), 8), 32), 32), $.int($.uint(a * b, 8)), $.uint64($.uint(((((((((a - b) & 0xff)) - b) & 0xff)) - b) & 0xff), 8)))
 
 	let x: number = 30000
 	let y: number = 10000
-	await $.println("int16 sum:", $.int($.int($.int(x + y, 16), 32), 32), $.int64($.int(x * 3, 16)), $.uint($.uint($.int((-x - y) - y, 16), 32), 32))
+	await $.println("int16 sum:", $.int($.int($.int(((x + y) << 16 >> 16), 16), 32), 32), $.int64($.int(x * 3, 16)), $.uint($.uint($.int((((((-x - y) << 16 >> 16)) - y) << 16 >> 16), 16), 32), 32))
 
 	let s: number = 1
-	await $.println("shift:", $.uint($.uint($.uint((s << 15) + (s << 15), 16), 32), 32), $.int($.uint(~s, 16)))
+	await $.println("shift:", $.uint($.uint($.uint((((((s << 15) & 0xffff)) + (((s << 15) & 0xffff))) & 0xffff), 16), 32), 32), $.int($.uint(~s, 16)))
 
 	let i8: number = 127
-	await $.println("int8:", $.int($.int(i8 + 1, 8)), ($.int(i8 * 2, 8)))
+	await $.println("int8:", $.int($.int(((i8 + 1) << 24 >> 24), 8)), ($.int(i8 * 2, 8)))
 }
 
 if ($.isMainScript(import.meta)) {
