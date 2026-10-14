@@ -129,8 +129,8 @@ export async function main(): globalThis.Promise<void> {
 				case $.typeAssert<Fixed>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.sliceType("dep.Ref", "main.Fixed")).ok:
 					{
 						let shape: Fixed = $.typeAssert<Fixed>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.sliceType("dep.Ref", "main.Fixed")).value
-						shape = ($.append((shape as Fixed), $.namedValueInterfaceValue<dep.Ref | null>($.arrayValue(new Uint8Array([3, 4])), "main.value", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()), $.appendZeros.nil) as Fixed)
-						fixed = $.append(fixed, (shape as Fixed), $.appendZeros.nil)
+						shape = ($.appendOne((shape as Fixed), $.namedValueInterfaceValue<dep.Ref | null>($.arrayValue(new Uint8Array([3, 4])), "main.value", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()), $.appendZeros.nil) as Fixed)
+						fixed = $.appendOne(fixed, (shape as Fixed), $.appendZeros.nil)
 					}
 					break
 				case $.typeAssert<Action>(__goscriptTypeSwitchValue, "main.Action").ok:

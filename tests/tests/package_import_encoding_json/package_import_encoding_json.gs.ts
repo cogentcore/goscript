@@ -259,17 +259,17 @@ export async function main(): globalThis.Promise<void> {
 	let b: $.Slice<number> = __goscriptTuple0[0]
 	let err = __goscriptTuple0[1]
 	if (err != null) {
-		results = $.append(results, $.concatString("Marshal error: ", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)))
+		results = $.appendOne(results, $.concatString("Marshal error: ", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)))
 	} else {
-		results = $.append(results, $.concatString("Marshal: ", $.bytesToString(b)))
+		results = $.appendOne(results, $.concatString("Marshal: ", $.bytesToString(b)))
 	}
 	let __goscriptTuple1: any = json.MarshalIndent($.interfaceValue($.markAsStructValue($.cloneStructValue(p)), "main.Person", "main.Person"), "", "  ")
 	let indented: $.Slice<number> = __goscriptTuple1[0]
 	err = __goscriptTuple1[1]
 	if (err != null) {
-		results = $.append(results, $.concatString("MarshalIndent error: ", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)))
+		results = $.appendOne(results, $.concatString("MarshalIndent error: ", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)))
 	} else {
-		results = $.append(results, $.concatString("MarshalIndent: ", strings.ReplaceAll($.bytesToString(indented), "\n", "|")))
+		results = $.appendOne(results, $.concatString("MarshalIndent: ", strings.ReplaceAll($.bytesToString(indented), "\n", "|")))
 	}
 
 	// Unmarshal into a struct
@@ -277,9 +277,9 @@ export async function main(): globalThis.Promise<void> {
 	{
 		let __goscriptShadow0 = json.Unmarshal(new Uint8Array([123, 34, 110, 97, 109, 101, 34, 58, 34, 66, 111, 98, 34, 44, 34, 97, 103, 101, 34, 58, 50, 53, 44, 34, 97, 99, 116, 105, 118, 101, 34, 58, 102, 97, 108, 115, 101, 125]), $.interfaceValue(q, "*main.Person", /* @__PURE__ */ $.pointerType("main.Person")))
 		if (__goscriptShadow0 != null) {
-			results = $.append(results, $.concatString("Unmarshal struct error: ", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(__goscriptShadow0).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)))
+			results = $.appendOne(results, $.concatString("Unmarshal struct error: ", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(__goscriptShadow0).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)))
 		} else {
-			results = $.append(results, $.concatString(($.concatString(($.concatString(($.concatString(($.concatString("Unmarshal struct: Name=", q.value.Name)), ", Age=")), strconv.Itoa(q.value.Age))), ", Active=")), strconv.FormatBool(q.value.Active)))
+			results = $.appendOne(results, $.concatString(($.concatString(($.concatString(($.concatString(($.concatString("Unmarshal struct: Name=", q.value.Name)), ", Age=")), strconv.Itoa(q.value.Age))), ", Active=")), strconv.FormatBool(q.value.Active)))
 		}
 	}
 
@@ -288,12 +288,12 @@ export async function main(): globalThis.Promise<void> {
 	{
 		let __goscriptShadow1 = json.Unmarshal(new Uint8Array([123, 34, 110, 97, 109, 101, 34, 58, 34, 67, 97, 114, 111, 108, 34, 44, 34, 97, 103, 101, 34, 58, 50, 50, 44, 34, 97, 99, 116, 105, 118, 101, 34, 58, 116, 114, 117, 101, 125]), $.interfaceValue(m, "*map[string]interface{}", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), { kind: $.TypeKind.Interface, methods: [] }))))
 		if (__goscriptShadow1 != null) {
-			results = $.append(results, $.concatString("Unmarshal map error: ", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(__goscriptShadow1).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)))
+			results = $.appendOne(results, $.concatString("Unmarshal map error: ", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(__goscriptShadow1).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)))
 		} else {
 			let name = $.mustTypeAssert<string>($.mapGet<string, any, any>(m.value, "name", null)[0], /* @__PURE__ */ $.basicType("string"))
 			let age = $.int($.mustTypeAssert<number>($.mapGet<string, any, any>(m.value, "age", null)[0], /* @__PURE__ */ $.basicType("float64")))
 			let active = $.mustTypeAssert<boolean>($.mapGet<string, any, any>(m.value, "active", null)[0], /* @__PURE__ */ $.basicType("bool"))
-			results = $.append(results, $.concatString(($.concatString(($.concatString(($.concatString(($.concatString("Unmarshal map: name=", name)), ", age=")), strconv.Itoa(age))), ", active=")), strconv.FormatBool(active)))
+			results = $.appendOne(results, $.concatString(($.concatString(($.concatString(($.concatString(($.concatString("Unmarshal map: name=", name)), ", age=")), strconv.Itoa(age))), ", active=")), strconv.FormatBool(active)))
 		}
 	}
 

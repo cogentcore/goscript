@@ -190,7 +190,7 @@ export async function main(): globalThis.Promise<void> {
 
 	let keys: $.Slice<string> = $.arrayToSlice<string>([])
 	for (const [k, __rangeValue] of d.value.Styles?.entries() ?? []) {
-		keys = $.append(keys, k)
+		keys = $.appendOne(keys, k)
 	}
 	sort.Strings(keys)
 	await $.println("styles keys:", $.sliceLen(keys), $.arrayIndex(keys!, 0))
