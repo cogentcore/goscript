@@ -5,7 +5,13 @@ import * as $ from "@goscript/builtin/index.js"
 
 export class cell {
 	// width is the number of buffered characters.
-	public declare width: number
+	public get width(): number {
+		return this._fields.width
+	}
+
+	public set width(value: number) {
+		this._fields.width = value
+	}
 
 	public _fields: {
 		width: number
@@ -19,10 +25,6 @@ export class cell {
 
 	public clone(): cell {
 		return $.markAsStructValue(new cell(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["width"])
 	}
 
 	static __typeInfo = $.registerStructType(

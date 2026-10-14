@@ -14,7 +14,13 @@ $.registerInterfaceType(
 );
 
 export class stream {
-	public declare name: string
+	public get name(): string {
+		return this._fields.name
+	}
+
+	public set name(value: string) {
+		this._fields.name = value
+	}
 
 	public _fields: {
 		name: string
@@ -35,10 +41,6 @@ export class stream {
 		return $.concatString("close:", s.name)
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["name"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.stream",
 		() => new stream(),
@@ -49,7 +51,13 @@ export class stream {
 }
 
 export class stopStream {
-	public declare stream: stream
+	public get stream(): stream {
+		return this._fields.stream
+	}
+
+	public set stream(value: stream) {
+		this._fields.stream = value
+	}
 
 	public _fields: {
 		stream: stream
@@ -69,10 +77,6 @@ export class stopStream {
 		return $.pointerValue<stream>(this.stream).Close()
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["stream"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.stopStream",
 		() => new stopStream(),
@@ -83,7 +87,13 @@ export class stopStream {
 }
 
 export class pointerStopStream {
-	public declare stream: stream | $.VarRef<stream> | null
+	public get stream(): stream | $.VarRef<stream> | null {
+		return this._fields.stream
+	}
+
+	public set stream(value: stream | $.VarRef<stream> | null) {
+		this._fields.stream = value
+	}
 
 	public _fields: {
 		stream: stream | $.VarRef<stream> | null
@@ -101,10 +111,6 @@ export class pointerStopStream {
 
 	public Close(): any {
 		return $.pointerValue<stream>(this.stream).Close()
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["stream"])
 	}
 
 	static __typeInfo = $.registerStructType(

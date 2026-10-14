@@ -14,7 +14,13 @@ $.registerInterfaceType(
 );
 
 export class blockImpl {
-	public declare size: number
+	public get size(): number {
+		return this._fields.size
+	}
+
+	public set size(value: number) {
+		this._fields.size = value
+	}
 
 	public _fields: {
 		size: number
@@ -33,10 +39,6 @@ export class blockImpl {
 	public Size(): number {
 		const b: blockImpl | $.VarRef<blockImpl> | null = this;
 		return $.pointerValue<blockImpl>(b).size
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["size"])
 	}
 
 	static __typeInfo = $.registerStructType(

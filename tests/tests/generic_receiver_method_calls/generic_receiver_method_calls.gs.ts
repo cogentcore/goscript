@@ -14,7 +14,13 @@ $.registerInterfaceType(
 );
 
 export class box {
-	public declare value: any
+	public get value(): any {
+		return this._fields.value
+	}
+
+	public set value(value: any) {
+		this._fields.value = value
+	}
 
 	public _fields: {
 		value: any
@@ -35,10 +41,6 @@ export class box {
 		return $.pointerValue<box>(b).value
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["value"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.box",
 		() => new box(),
@@ -49,7 +51,13 @@ export class box {
 }
 
 export class holder {
-	public declare box: box
+	public get box(): box {
+		return this._fields.box
+	}
+
+	public set box(value: box) {
+		this._fields.box = value
+	}
 
 	public _fields: {
 		box: box
@@ -67,10 +75,6 @@ export class holder {
 
 	public Value(__typeArgs: $.GenericTypeArgs | undefined): any {
 		return $.pointerValue<box>(this.box).Value({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }})
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["box"])
 	}
 
 	static __typeInfo = $.registerStructType(

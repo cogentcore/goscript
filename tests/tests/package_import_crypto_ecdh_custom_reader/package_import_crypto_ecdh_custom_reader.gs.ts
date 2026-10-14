@@ -16,11 +16,29 @@ import "@goscript/errors/index.js"
 import "@goscript/io/index.js"
 
 export class segmentedReader {
-	public declare data: $.Slice<number>
+	public get data(): $.Slice<number> {
+		return this._fields.data
+	}
 
-	public declare offset: number
+	public set data(value: $.Slice<number>) {
+		this._fields.data = value
+	}
 
-	public declare step: number
+	public get offset(): number {
+		return this._fields.offset
+	}
+
+	public set offset(value: number) {
+		this._fields.offset = value
+	}
+
+	public get step(): number {
+		return this._fields.step
+	}
+
+	public set step(value: number) {
+		this._fields.step = value
+	}
 
 	public _fields: {
 		data: $.Slice<number>
@@ -49,10 +67,6 @@ export class segmentedReader {
 		$.copy(p, $.goSlice($.pointerValue<segmentedReader>(r).data, $.pointerValue<segmentedReader>(r).offset, $.pointerValue<segmentedReader>(r).offset + n))
 		$.pointerValue<segmentedReader>(r).offset = $.pointerValue<segmentedReader>(r).offset + (n)
 		return [n, null]
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["data", "offset", "step"])
 	}
 
 	static __typeInfo = $.registerStructType(

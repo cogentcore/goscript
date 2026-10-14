@@ -4,7 +4,13 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class holder {
-	public declare values: $.VarRef<$.Slice<number>> | null
+	public get values(): $.VarRef<$.Slice<number>> | null {
+		return this._fields.values
+	}
+
+	public set values(value: $.VarRef<$.Slice<number>> | null) {
+		this._fields.values = value
+	}
 
 	public _fields: {
 		values: $.VarRef<$.Slice<number>> | null
@@ -18,10 +24,6 @@ export class holder {
 
 	public clone(): holder {
 		return $.markAsStructValue(new holder(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["values"])
 	}
 
 	static __typeInfo = $.registerStructType(

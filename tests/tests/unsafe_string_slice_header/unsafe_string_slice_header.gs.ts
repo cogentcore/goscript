@@ -10,9 +10,21 @@ import "@goscript/reflect/index.js"
 import "@goscript/unsafe/index.js"
 
 export class localSliceHeader {
-	public declare s: string
+	public get s(): string {
+		return this._fields.s
+	}
 
-	public declare cap: number
+	public set s(value: string) {
+		this._fields.s = value
+	}
+
+	public get cap(): number {
+		return this._fields.cap
+	}
+
+	public set cap(value: number) {
+		this._fields.cap = value
+	}
 
 	public _fields: {
 		s: string
@@ -28,10 +40,6 @@ export class localSliceHeader {
 
 	public clone(): localSliceHeader {
 		return $.markAsStructValue(new localSliceHeader(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["s", "cap"])
 	}
 
 	static __typeInfo = $.registerStructType(

@@ -4,7 +4,13 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class frame {
-	public declare name: string
+	public get name(): string {
+		return this._fields.name
+	}
+
+	public set name(value: string) {
+		this._fields.name = value
+	}
 
 	public _fields: {
 		name: string
@@ -20,10 +26,6 @@ export class frame {
 		return $.markAsStructValue(new frame(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["name"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.frame",
 		() => new frame(),
@@ -34,7 +36,13 @@ export class frame {
 }
 
 export class iterator {
-	public declare idx: number
+	public get idx(): number {
+		return this._fields.idx
+	}
+
+	public set idx(value: number) {
+		this._fields.idx = value
+	}
 
 	public _fields: {
 		idx: number
@@ -71,10 +79,6 @@ export class iterator {
 			}
 		}
 		throw new globalThis.Error("goscript: unreachable return")
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["idx"])
 	}
 
 	static __typeInfo = $.registerStructType(

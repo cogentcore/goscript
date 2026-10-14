@@ -50,9 +50,21 @@ export class pingFrame {
 }
 
 export class Frame {
-	public declare Frame: wireFrame | null
+	public get Frame(): wireFrame | null {
+		return this._fields.Frame
+	}
 
-	public declare Handler: FrameHandler | null
+	public set Frame(value: wireFrame | null) {
+		this._fields.Frame = value
+	}
+
+	public get Handler(): FrameHandler | null {
+		return this._fields.Handler
+	}
+
+	public set Handler(value: FrameHandler | null) {
+		this._fields.Handler = value
+	}
 
 	public _fields: {
 		Frame: wireFrame | null
@@ -70,10 +82,6 @@ export class Frame {
 		return $.markAsStructValue(new Frame(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Frame", "Handler"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.Frame",
 		() => new Frame(),
@@ -84,7 +92,13 @@ export class Frame {
 }
 
 export class packet {
-	public declare Frames: $.Slice<Frame>
+	public get Frames(): $.Slice<Frame> {
+		return this._fields.Frames
+	}
+
+	public set Frames(value: $.Slice<Frame>) {
+		this._fields.Frames = value
+	}
 
 	public _fields: {
 		Frames: $.Slice<Frame>
@@ -100,10 +114,6 @@ export class packet {
 		return $.markAsStructValue(new packet(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Frames"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.packet",
 		() => new packet(),
@@ -114,7 +124,13 @@ export class packet {
 }
 
 export class retransmissionQueue {
-	public declare lost: number
+	public get lost(): number {
+		return this._fields.lost
+	}
+
+	public set lost(value: number) {
+		this._fields.lost = value
+	}
 
 	public _fields: {
 		lost: number
@@ -145,10 +161,6 @@ export class retransmissionQueue {
 		return $.interfaceValue<FrameHandler | null>($.unsafePointerCast<retransmissionQueueInitialAckHandler | $.VarRef<retransmissionQueueInitialAckHandler> | null>(q, retransmissionQueueInitialAckHandler), "*main.retransmissionQueueInitialAckHandler", /* @__PURE__ */ $.pointerType("main.retransmissionQueueInitialAckHandler"))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["lost"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.retransmissionQueue",
 		() => new retransmissionQueue(),
@@ -159,7 +171,13 @@ export class retransmissionQueue {
 }
 
 export class retransmissionQueueInitialAckHandler {
-	public declare lost: number
+	public get lost(): number {
+		return this._fields.lost
+	}
+
+	public set lost(value: number) {
+		this._fields.lost = value
+	}
 
 	public _fields: {
 		lost: number
@@ -185,10 +203,6 @@ export class retransmissionQueueInitialAckHandler {
 		await $.println("initial")
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["lost"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.retransmissionQueueInitialAckHandler",
 		() => new retransmissionQueueInitialAckHandler(),
@@ -199,7 +213,13 @@ export class retransmissionQueueInitialAckHandler {
 }
 
 export class retransmissionQueueHandshakeAckHandler {
-	public declare lost: number
+	public get lost(): number {
+		return this._fields.lost
+	}
+
+	public set lost(value: number) {
+		this._fields.lost = value
+	}
 
 	public _fields: {
 		lost: number
@@ -225,10 +245,6 @@ export class retransmissionQueueHandshakeAckHandler {
 		await $.println("handshake")
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["lost"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.retransmissionQueueHandshakeAckHandler",
 		() => new retransmissionQueueHandshakeAckHandler(),
@@ -239,7 +255,13 @@ export class retransmissionQueueHandshakeAckHandler {
 }
 
 export class retransmissionQueueAppDataAckHandler {
-	public declare lost: number
+	public get lost(): number {
+		return this._fields.lost
+	}
+
+	public set lost(value: number) {
+		this._fields.lost = value
+	}
 
 	public _fields: {
 		lost: number
@@ -263,10 +285,6 @@ export class retransmissionQueueAppDataAckHandler {
 		let q: retransmissionQueueAppDataAckHandler | $.VarRef<retransmissionQueueAppDataAckHandler> | null = this;
 		$.pointerValue<retransmissionQueueAppDataAckHandler>(q).lost++
 		await $.println("app")
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["lost"])
 	}
 
 	static __typeInfo = $.registerStructType(

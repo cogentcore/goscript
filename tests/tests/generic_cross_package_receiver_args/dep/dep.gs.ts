@@ -14,7 +14,13 @@ $.registerInterfaceType(
 );
 
 export class Impl {
-	public declare Item: any
+	public get Item(): any {
+		return this._fields.Item
+	}
+
+	public set Item(value: any) {
+		this._fields.Item = value
+	}
 
 	public _fields: {
 		Item: any
@@ -33,10 +39,6 @@ export class Impl {
 	public Value(__typeArgs: $.GenericTypeArgs | undefined): any {
 		const i: Impl | $.VarRef<Impl> | null = this;
 		return $.pointerValue<Impl>(i).Item
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["Item"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -77,7 +79,13 @@ export class Keyed {
 }
 
 export class Wrapper {
-	public declare Keyed: Keyed | $.VarRef<Keyed> | null
+	public get Keyed(): Keyed | $.VarRef<Keyed> | null {
+		return this._fields.Keyed
+	}
+
+	public set Keyed(value: Keyed | $.VarRef<Keyed> | null) {
+		this._fields.Keyed = value
+	}
 
 	public _fields: {
 		Keyed: Keyed | $.VarRef<Keyed> | null
@@ -95,10 +103,6 @@ export class Wrapper {
 
 	public SetValues(__typeArgs: $.GenericTypeArgs | undefined, value: any): any {
 		return $.pointerValue<Keyed>(this.Keyed).SetValues({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }, U: __typeArgs?.["U"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }}, value)
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["Keyed"])
 	}
 
 	static __typeInfo = $.registerStructType(

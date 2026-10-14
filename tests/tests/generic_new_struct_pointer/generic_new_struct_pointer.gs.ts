@@ -15,9 +15,21 @@ $.registerInterfaceType(
 );
 
 export class Base {
-	public declare name: string
+	public get name(): string {
+		return this._fields.name
+	}
 
-	public declare inits: number
+	public set name(value: string) {
+		this._fields.name = value
+	}
+
+	public get inits(): number {
+		return this._fields.inits
+	}
+
+	public set inits(value: number) {
+		this._fields.inits = value
+	}
 
 	public _fields: {
 		name: string
@@ -45,10 +57,6 @@ export class Base {
 		$.pointerValue<Base>(b).name = name
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["name", "inits"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.Base",
 		() => new Base(),
@@ -59,9 +67,21 @@ export class Base {
 }
 
 export class Widget {
-	public declare Base: Base
+	public get Base(): Base {
+		return this._fields.Base
+	}
 
-	public declare Text: string
+	public set Base(value: Base) {
+		this._fields.Base = value
+	}
+
+	public get Text(): string {
+		return this._fields.Text
+	}
+
+	public set Text(value: string) {
+		this._fields.Text = value
+	}
 
 	public _fields: {
 		Base: Base
@@ -85,10 +105,6 @@ export class Widget {
 
 	public SetName(name: any): any {
 		return $.pointerValue<Base>(this.Base).SetName(name)
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["Base", "Text"])
 	}
 
 	static __typeInfo = $.registerStructType(

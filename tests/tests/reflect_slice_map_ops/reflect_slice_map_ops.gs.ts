@@ -10,7 +10,13 @@ import "@goscript/encoding/xml/index.js"
 import "@goscript/reflect/index.js"
 
 export class Item {
-	public declare Name: string
+	public get Name(): string {
+		return this._fields.Name
+	}
+
+	public set Name(value: string) {
+		this._fields.Name = value
+	}
 
 	public _fields: {
 		Name: string
@@ -26,10 +32,6 @@ export class Item {
 		return $.markAsStructValue(new Item(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Name"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.Item",
 		() => new Item(),
@@ -40,9 +42,21 @@ export class Item {
 }
 
 export class Holder {
-	public declare S: $.Slice<number>
+	public get S(): $.Slice<number> {
+		return this._fields.S
+	}
 
-	public declare T: $.Slice<number>
+	public set S(value: $.Slice<number>) {
+		this._fields.S = value
+	}
+
+	public get T(): $.Slice<number> {
+		return this._fields.T
+	}
+
+	public set T(value: $.Slice<number>) {
+		this._fields.T = value
+	}
 
 	public _fields: {
 		S: $.Slice<number>
@@ -60,10 +74,6 @@ export class Holder {
 		return $.markAsStructValue(new Holder(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["S", "T"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.Holder",
 		() => new Holder(),
@@ -74,7 +84,13 @@ export class Holder {
 }
 
 export class Doc {
-	public declare Items: $.Slice<Item>
+	public get Items(): $.Slice<Item> {
+		return this._fields.Items
+	}
+
+	public set Items(value: $.Slice<Item>) {
+		this._fields.Items = value
+	}
 
 	public _fields: {
 		Items: $.Slice<Item>
@@ -88,10 +104,6 @@ export class Doc {
 
 	public clone(): Doc {
 		return $.markAsStructValue(new Doc(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["Items"])
 	}
 
 	static __typeInfo = $.registerStructType(

@@ -4,7 +4,13 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class worker {
-	public declare base: number
+	public get base(): number {
+		return this._fields.base
+	}
+
+	public set base(value: number) {
+		this._fields.base = value
+	}
 
 	public _fields: {
 		base: number
@@ -23,10 +29,6 @@ export class worker {
 	public add(v: number): number {
 		const w: worker | $.VarRef<worker> | null = this;
 		return $.pointerValue<worker>(w).base + v
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["base"])
 	}
 
 	static __typeInfo = $.registerStructType(

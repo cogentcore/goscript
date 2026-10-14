@@ -4,7 +4,13 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class node {
-	public declare next: number
+	public get next(): number {
+		return this._fields.next
+	}
+
+	public set next(value: number) {
+		this._fields.next = value
+	}
 
 	public _fields: {
 		next: number
@@ -20,10 +26,6 @@ export class node {
 		return $.markAsStructValue(new node(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["next"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.node",
 		() => new node(),
@@ -34,7 +36,13 @@ export class node {
 }
 
 export class queue {
-	public declare value: number
+	public get value(): number {
+		return this._fields.value
+	}
+
+	public set value(value: number) {
+		this._fields.value = value
+	}
 
 	public _fields: {
 		value: number
@@ -48,10 +56,6 @@ export class queue {
 
 	public clone(): queue {
 		return $.markAsStructValue(new queue(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["value"])
 	}
 
 	static __typeInfo = $.registerStructType(

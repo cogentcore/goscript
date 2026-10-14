@@ -9,7 +9,13 @@ import type * as iter from "@goscript/iter/index.js"
 import "@goscript/reflect/index.js"
 
 export class Inner {
-	public declare B: number
+	public get B(): number {
+		return this._fields.B
+	}
+
+	public set B(value: number) {
+		this._fields.B = value
+	}
 
 	public _fields: {
 		B: number
@@ -25,10 +31,6 @@ export class Inner {
 		return $.markAsStructValue(new Inner(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["B"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.Inner",
 		() => new Inner(),
@@ -39,9 +41,21 @@ export class Inner {
 }
 
 export class Outer {
-	public declare Inner: Inner | $.VarRef<Inner> | null
+	public get Inner(): Inner | $.VarRef<Inner> | null {
+		return this._fields.Inner
+	}
 
-	public declare C: number
+	public set Inner(value: Inner | $.VarRef<Inner> | null) {
+		this._fields.Inner = value
+	}
+
+	public get C(): number {
+		return this._fields.C
+	}
+
+	public set C(value: number) {
+		this._fields.C = value
+	}
 
 	public _fields: {
 		Inner: Inner | $.VarRef<Inner> | null
@@ -57,10 +71,6 @@ export class Outer {
 
 	public clone(): Outer {
 		return $.markAsStructValue(new Outer(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["Inner", "C"])
 	}
 
 	static __typeInfo = $.registerStructType(

@@ -4,7 +4,13 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class Foo {
-	public declare done: $.Channel<boolean> | null
+	public get done(): $.Channel<boolean> | null {
+		return this._fields.done
+	}
+
+	public set done(value: $.Channel<boolean> | null) {
+		this._fields.done = value
+	}
 
 	public _fields: {
 		done: $.Channel<boolean> | null
@@ -24,10 +30,6 @@ export class Foo {
 		const f: Foo | $.VarRef<Foo> | null = this;
 		await $.println("Foo.Bar called")
 		await $.chanSend($.pointerValue<Foo>(f).done, true)
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["done"])
 	}
 
 	static __typeInfo = $.registerStructType(

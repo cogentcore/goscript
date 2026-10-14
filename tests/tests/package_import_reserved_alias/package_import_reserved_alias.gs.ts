@@ -7,7 +7,13 @@ import * as _unique from "@goscript/github.com/s4wave/goscript/tests/tests/packa
 import "@goscript/github.com/s4wave/goscript/tests/tests/package_import_reserved_alias/unique/index.js"
 
 export class Holder {
-	public declare Box: _unique.Box | $.VarRef<_unique.Box> | null
+	public get Box(): _unique.Box | $.VarRef<_unique.Box> | null {
+		return this._fields.Box
+	}
+
+	public set Box(value: _unique.Box | $.VarRef<_unique.Box> | null) {
+		this._fields.Box = value
+	}
 
 	public _fields: {
 		Box: _unique.Box | $.VarRef<_unique.Box> | null
@@ -21,10 +27,6 @@ export class Holder {
 
 	public clone(): Holder {
 		return $.markAsStructValue(new Holder(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["Box"])
 	}
 
 	static __typeInfo = $.registerStructType(

@@ -13,7 +13,13 @@ import "@goscript/fmt/index.js"
 import "@goscript/sync/index.js"
 
 export class pooledElement {
-	public declare Value: any
+	public get Value(): any {
+		return this._fields.Value
+	}
+
+	public set Value(value: any) {
+		this._fields.Value = value
+	}
 
 	public _fields: {
 		Value: any
@@ -27,10 +33,6 @@ export class pooledElement {
 
 	public clone(): pooledElement {
 		return $.markAsStructValue(new pooledElement(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["Value"])
 	}
 
 	static __typeInfo = $.registerStructType(

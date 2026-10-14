@@ -10,9 +10,21 @@ import "@goscript/reflect/index.js"
 import "@goscript/unsafe/index.js"
 
 export class Sub {
-	public declare X: number
+	public get X(): number {
+		return this._fields.X
+	}
 
-	public declare Y: string
+	public set X(value: number) {
+		this._fields.X = value
+	}
+
+	public get Y(): string {
+		return this._fields.Y
+	}
+
+	public set Y(value: string) {
+		this._fields.Y = value
+	}
 
 	public _fields: {
 		X: number
@@ -30,10 +42,6 @@ export class Sub {
 		return $.markAsStructValue(new Sub(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["X", "Y"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.Sub",
 		() => new Sub(),
@@ -44,11 +52,29 @@ export class Sub {
 }
 
 export class T {
-	public declare Mbr1: string
+	public get Mbr1(): string {
+		return this._fields.Mbr1
+	}
 
-	public declare Mbr2: number
+	public set Mbr1(value: string) {
+		this._fields.Mbr1 = value
+	}
 
-	public declare S: Sub
+	public get Mbr2(): number {
+		return this._fields.Mbr2
+	}
+
+	public set Mbr2(value: number) {
+		this._fields.Mbr2 = value
+	}
+
+	public get S(): Sub {
+		return this._fields.S
+	}
+
+	public set S(value: Sub) {
+		this._fields.S = value
+	}
 
 	public _fields: {
 		Mbr1: string
@@ -66,10 +92,6 @@ export class T {
 
 	public clone(): T {
 		return $.markAsStructValue(new T(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["Mbr1", "Mbr2", "S"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -125,7 +147,13 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("newat-local:", local.value)
 
 	class holder {
-		public declare Count: number
+		public get Count(): number {
+			return this._fields.Count
+		}
+
+		public set Count(value: number) {
+			this._fields.Count = value
+		}
 
 		public _fields: {
 			Count: number
@@ -139,10 +167,6 @@ export async function main(): globalThis.Promise<void> {
 
 		public clone(): holder {
 			return $.markAsStructValue(new holder(this))
-		}
-
-		static {
-			$.bindStructFields(this.prototype, ["Count"])
 		}
 
 		static __typeInfo = $.registerStructType(

@@ -7,11 +7,29 @@ import * as time from "@goscript/time/index.js"
 import "@goscript/time/index.js"
 
 export class LocalTime {
-	public declare wall: bigint
+	public get wall(): bigint {
+		return this._fields.wall
+	}
 
-	public declare ext: bigint
+	public set wall(value: bigint) {
+		this._fields.wall = value
+	}
 
-	public declare loc: time.Location | $.VarRef<time.Location> | null
+	public get ext(): bigint {
+		return this._fields.ext
+	}
+
+	public set ext(value: bigint) {
+		this._fields.ext = value
+	}
+
+	public get loc(): time.Location | $.VarRef<time.Location> | null {
+		return this._fields.loc
+	}
+
+	public set loc(value: time.Location | $.VarRef<time.Location> | null) {
+		this._fields.loc = value
+	}
 
 	public _fields: {
 		wall: bigint
@@ -29,10 +47,6 @@ export class LocalTime {
 
 	public clone(): LocalTime {
 		return $.markAsStructValue(new LocalTime(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["wall", "ext", "loc"])
 	}
 
 	static __typeInfo = $.registerStructType(

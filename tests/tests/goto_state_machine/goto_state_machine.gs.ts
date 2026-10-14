@@ -4,11 +4,29 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class scanner {
-	public declare data: string
+	public get data(): string {
+		return this._fields.data
+	}
 
-	public declare pos: number
+	public set data(value: string) {
+		this._fields.data = value
+	}
 
-	public declare done: boolean
+	public get pos(): number {
+		return this._fields.pos
+	}
+
+	public set pos(value: number) {
+		this._fields.pos = value
+	}
+
+	public get done(): boolean {
+		return this._fields.done
+	}
+
+	public set done(value: boolean) {
+		this._fields.done = value
+	}
 
 	public _fields: {
 		data: string
@@ -155,10 +173,6 @@ export class scanner {
 			break
 		}
 		throw new globalThis.Error("goscript: unreachable return")
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["data", "pos", "done"])
 	}
 
 	static __typeInfo = $.registerStructType(

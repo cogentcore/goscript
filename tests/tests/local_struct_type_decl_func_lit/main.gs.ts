@@ -6,9 +6,21 @@ import * as $ from "@goscript/builtin/index.js"
 export async function main(): globalThis.Promise<void> {
 	let run: (() => void) | null = $.functionValue(async (): globalThis.Promise<void> => {
 		class item {
-			public declare name: string
+			public get name(): string {
+				return this._fields.name
+			}
 
-			public declare count: number
+			public set name(value: string) {
+				this._fields.name = value
+			}
+
+			public get count(): number {
+				return this._fields.count
+			}
+
+			public set count(value: number) {
+				this._fields.count = value
+			}
 
 			public _fields: {
 				name: string
@@ -24,10 +36,6 @@ export async function main(): globalThis.Promise<void> {
 
 			public clone(): item {
 				return $.markAsStructValue(new item(this))
-			}
-
-			static {
-				$.bindStructFields(this.prototype, ["name", "count"])
 			}
 
 			static __typeInfo = $.registerStructType(

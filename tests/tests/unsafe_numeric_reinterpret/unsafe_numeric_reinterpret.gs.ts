@@ -44,7 +44,13 @@ export async function main(): globalThis.Promise<void> {
 	$.unsafeNumericRef<number>(g, "float32", "uint32").value = 0x40000000
 	await $.println(g.value == 2)
 	class pair {
-		public declare f: number
+		public get f(): number {
+			return this._fields.f
+		}
+
+		public set f(value: number) {
+			this._fields.f = value
+		}
 
 		public _fields: {
 			f: number
@@ -58,10 +64,6 @@ export async function main(): globalThis.Promise<void> {
 
 		public clone(): pair {
 			return $.markAsStructValue(new pair(this))
-		}
-
-		static {
-			$.bindStructFields(this.prototype, ["f"])
 		}
 
 		static __typeInfo = $.registerStructType(

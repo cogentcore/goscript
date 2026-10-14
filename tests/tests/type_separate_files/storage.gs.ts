@@ -7,9 +7,21 @@ import * as __goscript_memory from "./memory.gs.ts"
 import "./memory.gs.ts"
 
 export class storage {
-	public declare files: globalThis.Map<string, __goscript_memory.file | $.VarRef<__goscript_memory.file> | null> | null
+	public get files(): globalThis.Map<string, __goscript_memory.file | $.VarRef<__goscript_memory.file> | null> | null {
+		return this._fields.files
+	}
 
-	public declare children: globalThis.Map<string, globalThis.Map<string, __goscript_memory.file | $.VarRef<__goscript_memory.file> | null> | null> | null
+	public set files(value: globalThis.Map<string, __goscript_memory.file | $.VarRef<__goscript_memory.file> | null> | null) {
+		this._fields.files = value
+	}
+
+	public get children(): globalThis.Map<string, globalThis.Map<string, __goscript_memory.file | $.VarRef<__goscript_memory.file> | null> | null> | null {
+		return this._fields.children
+	}
+
+	public set children(value: globalThis.Map<string, globalThis.Map<string, __goscript_memory.file | $.VarRef<__goscript_memory.file> | null> | null> | null) {
+		this._fields.children = value
+	}
 
 	public _fields: {
 		files: globalThis.Map<string, __goscript_memory.file | $.VarRef<__goscript_memory.file> | null> | null
@@ -25,10 +37,6 @@ export class storage {
 
 	public clone(): storage {
 		return $.markAsStructValue(new storage(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["files", "children"])
 	}
 
 	static __typeInfo = $.registerStructType(

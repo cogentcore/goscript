@@ -4,7 +4,13 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class T {
-	public declare val: number
+	public get val(): number {
+		return this._fields.val
+	}
+
+	public set val(value: number) {
+		this._fields.val = value
+	}
 
 	public _fields: {
 		val: number
@@ -23,10 +29,6 @@ export class T {
 	public WithDelta(delta: number): T | $.VarRef<T> | null {
 		const t: T | $.VarRef<T> | null = this;
 		return new T({val: $.pointerValue<T>(t).val + delta})
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["val"])
 	}
 
 	static __typeInfo = $.registerStructType(

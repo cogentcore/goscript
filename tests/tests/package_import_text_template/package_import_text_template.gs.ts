@@ -12,9 +12,21 @@ import "@goscript/os/index.js"
 import "@goscript/text/template/index.js"
 
 export class item {
-	public declare Name: string
+	public get Name(): string {
+		return this._fields.Name
+	}
 
-	public declare Count: number
+	public set Name(value: string) {
+		this._fields.Name = value
+	}
+
+	public get Count(): number {
+		return this._fields.Count
+	}
+
+	public set Count(value: number) {
+		this._fields.Count = value
+	}
 
 	public _fields: {
 		Name: string
@@ -30,10 +42,6 @@ export class item {
 
 	public clone(): item {
 		return $.markAsStructValue(new item(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["Name", "Count"])
 	}
 
 	static __typeInfo = $.registerStructType(

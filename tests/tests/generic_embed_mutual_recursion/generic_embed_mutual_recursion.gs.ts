@@ -25,7 +25,13 @@ $.registerInterfaceType(
 );
 
 export class AppBase {
-	public declare Windows: $.Slice<any>
+	public get Windows(): $.Slice<any> {
+		return this._fields.Windows
+	}
+
+	public set Windows(value: $.Slice<any>) {
+		this._fields.Windows = value
+	}
 
 	public _fields: {
 		Windows: $.Slice<any>
@@ -57,10 +63,6 @@ export class AppBase {
 		return $.typeParamInterfaceValue<Window | null>($.arrayIndex($.pointerValue<AppBase>(a).Windows!, 0), __typeArgs?.["W"] ?? { type: { kind: $.TypeKind.Interface, methods: [$.methodSignature("Name", [], [/* @__PURE__ */ $.basicType("string")])] }, zero: () => null })
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Windows"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.AppBase",
 		() => new AppBase(),
@@ -71,9 +73,21 @@ export class AppBase {
 }
 
 export class WindowBase {
-	public declare App: any
+	public get App(): any {
+		return this._fields.App
+	}
 
-	public declare name: string
+	public set App(value: any) {
+		this._fields.App = value
+	}
+
+	public get name(): string {
+		return this._fields.name
+	}
+
+	public set name(value: string) {
+		this._fields.name = value
+	}
 
 	public _fields: {
 		App: any
@@ -101,10 +115,6 @@ export class WindowBase {
 		return $.pointerValue<WindowBase>(w).name
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["App", "name"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.WindowBase",
 		() => new WindowBase(),
@@ -115,7 +125,13 @@ export class WindowBase {
 }
 
 export class MyApp {
-	public declare AppBase: AppBase
+	public get AppBase(): AppBase {
+		return this._fields.AppBase
+	}
+
+	public set AppBase(value: AppBase) {
+		this._fields.AppBase = value
+	}
 
 	public _fields: {
 		AppBase: AppBase
@@ -139,10 +155,6 @@ export class MyApp {
 		return $.pointerValue<AppBase>(this.AppBase).Window(__goscriptStatic0())
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["AppBase"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.MyApp",
 		() => new MyApp(),
@@ -153,7 +165,13 @@ export class MyApp {
 }
 
 export class MyWindow {
-	public declare WindowBase: WindowBase
+	public get WindowBase(): WindowBase {
+		return this._fields.WindowBase
+	}
+
+	public set WindowBase(value: WindowBase) {
+		this._fields.WindowBase = value
+	}
 
 	public _fields: {
 		WindowBase: WindowBase
@@ -175,10 +193,6 @@ export class MyWindow {
 
 	public Name(): any {
 		return $.pointerValue<WindowBase>(this.WindowBase).Name(__goscriptStatic1())
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["WindowBase"])
 	}
 
 	static __typeInfo = $.registerStructType(

@@ -4,7 +4,13 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class bitset {
-	public declare bits: Uint8Array
+	public get bits(): Uint8Array {
+		return this._fields.bits
+	}
+
+	public set bits(value: Uint8Array) {
+		this._fields.bits = value
+	}
 
 	public _fields: {
 		bits: Uint8Array
@@ -32,10 +38,6 @@ export class bitset {
 		let entry = $.indexRef($.pointerValue<bitset>(b).bits, globalThis.Math.trunc(bit / 8))
 		let mask = $.uint((($.uint(1, 8) << (bit % 8)) & 0xff), 8)
 		entry!.value = entry!.value | ($.uint(mask, 8))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["bits"])
 	}
 
 	static __typeInfo = $.registerStructType(

@@ -4,9 +4,21 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class Format {
-	public declare Name: string
+	public get Name(): string {
+		return this._fields.Name
+	}
 
-	public declare Ext: $.Slice<string>
+	public set Name(value: string) {
+		this._fields.Name = value
+	}
+
+	public get Ext(): $.Slice<string> {
+		return this._fields.Ext
+	}
+
+	public set Ext(value: $.Slice<string>) {
+		this._fields.Ext = value
+	}
 
 	public _fields: {
 		Name: string
@@ -22,10 +34,6 @@ export class Format {
 
 	public clone(): Format {
 		return $.markAsStructValue(new Format(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["Name", "Ext"])
 	}
 
 	static __typeInfo = $.registerStructType(

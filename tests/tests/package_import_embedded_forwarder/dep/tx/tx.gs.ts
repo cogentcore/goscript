@@ -4,7 +4,13 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class Tx {
-	public declare Name: string
+	public get Name(): string {
+		return this._fields.Name
+	}
+
+	public set Name(value: string) {
+		this._fields.Name = value
+	}
 
 	public _fields: {
 		Name: string
@@ -18,10 +24,6 @@ export class Tx {
 
 	public clone(): Tx {
 		return $.markAsStructValue(new Tx(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["Name"])
 	}
 
 	static __typeInfo = $.registerStructType(

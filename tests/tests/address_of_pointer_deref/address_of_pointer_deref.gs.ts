@@ -4,9 +4,21 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class Col {
-	public declare Name: string
+	public get Name(): string {
+		return this._fields.Name
+	}
 
-	public declare Default: $.VarRef<number> | null
+	public set Name(value: string) {
+		this._fields.Name = value
+	}
+
+	public get Default(): $.VarRef<number> | null {
+		return this._fields.Default
+	}
+
+	public set Default(value: $.VarRef<number> | null) {
+		this._fields.Default = value
+	}
 
 	public _fields: {
 		Name: string
@@ -22,10 +34,6 @@ export class Col {
 
 	public clone(): Col {
 		return $.markAsStructValue(new Col(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["Name", "Default"])
 	}
 
 	static __typeInfo = $.registerStructType(

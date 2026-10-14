@@ -16,7 +16,13 @@ import "@goscript/strings/index.js"
 import "@goscript/sync/index.js"
 
 export class Image {
-	public declare Name: string
+	public get Name(): string {
+		return this._fields.Name
+	}
+
+	public set Name(value: string) {
+		this._fields.Name = value
+	}
 
 	public _fields: {
 		Name: string
@@ -62,10 +68,6 @@ export class Image {
 		return null
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Name"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.Image",
 		() => new Image(),
@@ -76,11 +78,29 @@ export class Image {
 }
 
 export class Doc {
-	public declare Title: string
+	public get Title(): string {
+		return this._fields.Title
+	}
 
-	public declare Image: Image | $.VarRef<Image> | null
+	public set Title(value: string) {
+		this._fields.Title = value
+	}
 
-	public declare Note: string
+	public get Image(): Image | $.VarRef<Image> | null {
+		return this._fields.Image
+	}
+
+	public set Image(value: Image | $.VarRef<Image> | null) {
+		this._fields.Image = value
+	}
+
+	public get Note(): string {
+		return this._fields.Note
+	}
+
+	public set Note(value: string) {
+		this._fields.Note = value
+	}
 
 	public _fields: {
 		Title: string
@@ -98,10 +118,6 @@ export class Doc {
 
 	public clone(): Doc {
 		return $.markAsStructValue(new Doc(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["Title", "Image", "Note"])
 	}
 
 	static __typeInfo = $.registerStructType(

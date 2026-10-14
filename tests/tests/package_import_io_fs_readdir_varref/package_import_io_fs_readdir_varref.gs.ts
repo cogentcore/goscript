@@ -10,7 +10,13 @@ import "@goscript/io/fs/index.js"
 import "@goscript/testing/fstest/index.js"
 
 export class openOnlyFS {
-	public declare fsys: fstest.MapFS
+	public get fsys(): fstest.MapFS {
+		return this._fields.fsys
+	}
+
+	public set fsys(value: fstest.MapFS) {
+		this._fields.fsys = value
+	}
 
 	public _fields: {
 		fsys: fstest.MapFS
@@ -29,10 +35,6 @@ export class openOnlyFS {
 	public Open(name: string): [fs.File | null, $.GoError] {
 		const o = this;
 		return fstest.MapFS_Open(o.fsys, name)
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["fsys"])
 	}
 
 	static __typeInfo = $.registerStructType(

@@ -9,7 +9,13 @@ import type * as iter from "@goscript/iter/index.js"
 import "@goscript/slices/index.js"
 
 export class point {
-	public declare x: number
+	public get x(): number {
+		return this._fields.x
+	}
+
+	public set x(value: number) {
+		this._fields.x = value
+	}
 
 	public _fields: {
 		x: number
@@ -23,10 +29,6 @@ export class point {
 
 	public clone(): point {
 		return $.markAsStructValue(new point(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["x"])
 	}
 
 	static __typeInfo = $.registerStructType(

@@ -6,7 +6,13 @@ import * as $ from "@goscript/builtin/index.js"
 export type Number = number
 
 export class Pair {
-	public declare Value: number
+	public get Value(): number {
+		return this._fields.Value
+	}
+
+	public set Value(value: number) {
+		this._fields.Value = value
+	}
 
 	public _fields: {
 		Value: number
@@ -20,10 +26,6 @@ export class Pair {
 
 	public clone(): Pair {
 		return $.markAsStructValue(new Pair(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["Value"])
 	}
 
 	static __typeInfo = $.registerStructType(

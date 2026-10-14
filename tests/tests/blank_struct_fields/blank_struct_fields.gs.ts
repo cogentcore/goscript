@@ -4,11 +4,29 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class padded {
-	public declare _blank0: Uint8Array
+	public get _blank0(): Uint8Array {
+		return this._fields._blank0
+	}
 
-	public declare Value: number
+	public set _blank0(value: Uint8Array) {
+		this._fields._blank0 = value
+	}
 
-	public declare _blank2: Uint8Array
+	public get Value(): number {
+		return this._fields.Value
+	}
+
+	public set Value(value: number) {
+		this._fields.Value = value
+	}
+
+	public get _blank2(): Uint8Array {
+		return this._fields._blank2
+	}
+
+	public set _blank2(value: Uint8Array) {
+		this._fields._blank2 = value
+	}
 
 	public _fields: {
 		_blank0: Uint8Array
@@ -26,10 +44,6 @@ export class padded {
 
 	public clone(): padded {
 		return $.markAsStructValue(new padded(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["_blank0", "Value", "_blank2"])
 	}
 
 	static __typeInfo = $.registerStructType(

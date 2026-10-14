@@ -9,7 +9,13 @@ import * as __goscript_package_init from "./__goscript_package_init.gs.ts"
 import "./b.gs.ts"
 
 export class holder {
-	public declare n: number
+	public get n(): number {
+		return this._fields.n
+	}
+
+	public set n(value: number) {
+		this._fields.n = value
+	}
 
 	public _fields: {
 		n: number
@@ -23,10 +29,6 @@ export class holder {
 
 	public clone(): holder {
 		return $.markAsStructValue(new holder(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["n"])
 	}
 
 	static __typeInfo = $.registerStructType(

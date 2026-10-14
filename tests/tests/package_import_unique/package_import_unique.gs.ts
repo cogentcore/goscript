@@ -7,7 +7,13 @@ import * as _unique from "@goscript/unique/index.js"
 import "@goscript/unique/index.js"
 
 export class zone {
-	public declare name: string
+	public get name(): string {
+		return this._fields.name
+	}
+
+	public set name(value: string) {
+		this._fields.name = value
+	}
 
 	public _fields: {
 		name: string
@@ -21,10 +27,6 @@ export class zone {
 
 	public clone(): zone {
 		return $.markAsStructValue(new zone(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["name"])
 	}
 
 	static __typeInfo = $.registerStructType(

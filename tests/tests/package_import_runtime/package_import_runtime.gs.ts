@@ -16,7 +16,13 @@ import "@goscript/strconv/index.js"
 import "@goscript/strings/index.js"
 
 export class counter {
-	public declare n: number
+	public get n(): number {
+		return this._fields.n
+	}
+
+	public set n(value: number) {
+		this._fields.n = value
+	}
 
 	public _fields: {
 		n: number
@@ -42,10 +48,6 @@ export class counter {
 		return c.n
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["n"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.counter",
 		() => new counter(),
@@ -56,7 +58,13 @@ export class counter {
 }
 
 export class box {
-	public declare v: any
+	public get v(): any {
+		return this._fields.v
+	}
+
+	public set v(value: any) {
+		this._fields.v = value
+	}
 
 	public _fields: {
 		v: any
@@ -75,10 +83,6 @@ export class box {
 	public Get(__typeArgs: $.GenericTypeArgs | undefined): any {
 		const b: box | $.VarRef<box> | null = this;
 		return $.pointerValue<box>(b).v
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["v"])
 	}
 
 	static __typeInfo = $.registerStructType(

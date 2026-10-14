@@ -7,7 +7,13 @@ import * as io from "@goscript/io/index.js"
 import "@goscript/io/index.js"
 
 export class chunker {
-	public declare pos: bigint
+	public get pos(): bigint {
+		return this._fields.pos
+	}
+
+	public set pos(value: bigint) {
+		this._fields.pos = value
+	}
 
 	public _fields: {
 		pos: bigint
@@ -28,10 +34,6 @@ export class chunker {
 		$.pointerValue<chunker>(c).pos = $.uint64Add($.pointerValue<chunker>(c).pos, $.uint64(chunkSize))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["pos"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.chunker",
 		() => new chunker(),
@@ -42,7 +44,13 @@ export class chunker {
 }
 
 export class repeatReader {
-	public declare remaining: number
+	public get remaining(): number {
+		return this._fields.remaining
+	}
+
+	public set remaining(value: number) {
+		this._fields.remaining = value
+	}
 
 	public _fields: {
 		remaining: number
@@ -69,10 +77,6 @@ export class repeatReader {
 		}
 		$.pointerValue<repeatReader>(r).remaining = $.pointerValue<repeatReader>(r).remaining - (n)
 		return [n, null]
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["remaining"])
 	}
 
 	static __typeInfo = $.registerStructType(

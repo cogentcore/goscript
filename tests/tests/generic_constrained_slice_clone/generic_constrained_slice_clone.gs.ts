@@ -14,7 +14,13 @@ $.registerInterfaceType(
 );
 
 export class item {
-	public declare value: string
+	public get value(): string {
+		return this._fields.value
+	}
+
+	public set value(value: string) {
+		this._fields.value = value
+	}
 
 	public _fields: {
 		value: string
@@ -36,10 +42,6 @@ export class item {
 			return null
 		}
 		return new item({value: $.pointerValue<item>(i).value})
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["value"])
 	}
 
 	static __typeInfo = $.registerStructType(

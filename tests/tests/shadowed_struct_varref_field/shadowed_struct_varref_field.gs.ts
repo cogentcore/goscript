@@ -7,9 +7,21 @@ import * as sync from "@goscript/sync/index.js"
 import "@goscript/sync/index.js"
 
 export class table {
-	public declare Mutex: sync.Mutex
+	public get Mutex(): sync.Mutex {
+		return this._fields.Mutex
+	}
 
-	public declare byAddr: globalThis.Map<string, $.Slice<string>> | null
+	public set Mutex(value: sync.Mutex) {
+		this._fields.Mutex = value
+	}
+
+	public get byAddr(): globalThis.Map<string, $.Slice<string>> | null {
+		return this._fields.byAddr
+	}
+
+	public set byAddr(value: globalThis.Map<string, $.Slice<string>> | null) {
+		this._fields.byAddr = value
+	}
 
 	public _fields: {
 		Mutex: sync.Mutex
@@ -37,10 +49,6 @@ export class table {
 
 	public Unlock(): any {
 		return $.pointerValue<sync.Mutex>(this.Mutex).Unlock()
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["Mutex", "byAddr"])
 	}
 
 	static __typeInfo = $.registerStructType(

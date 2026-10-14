@@ -29,7 +29,13 @@ $.registerNamedValueType(
 );
 
 export class byteFormatter {
-	public declare prefix: $.Slice<number>
+	public get prefix(): $.Slice<number> {
+		return this._fields.prefix
+	}
+
+	public set prefix(value: $.Slice<number>) {
+		this._fields.prefix = value
+	}
 
 	public _fields: {
 		prefix: $.Slice<number>
@@ -52,10 +58,6 @@ export class byteFormatter {
 		await $.pointerValue<Exclude<fmt.State, null>>(state).Write(buf)
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["prefix"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.byteFormatter",
 		() => new byteFormatter(),
@@ -66,9 +68,21 @@ export class byteFormatter {
 }
 
 export class pos {
-	public declare Line: number
+	public get Line(): number {
+		return this._fields.Line
+	}
 
-	public declare Char: number
+	public set Line(value: number) {
+		this._fields.Line = value
+	}
+
+	public get Char(): number {
+		return this._fields.Char
+	}
+
+	public set Char(value: number) {
+		this._fields.Char = value
+	}
 
 	public _fields: {
 		Line: number
@@ -84,10 +98,6 @@ export class pos {
 
 	public clone(): pos {
 		return $.markAsStructValue(new pos(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["Line", "Char"])
 	}
 
 	static __typeInfo = $.registerStructType(

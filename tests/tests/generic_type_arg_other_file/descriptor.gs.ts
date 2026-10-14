@@ -4,7 +4,13 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class descriptor {
-	public declare Label: string
+	public get Label(): string {
+		return this._fields.Label
+	}
+
+	public set Label(value: string) {
+		this._fields.Label = value
+	}
 
 	public _fields: {
 		Label: string
@@ -23,10 +29,6 @@ export class descriptor {
 	public toJS(): any {
 		const d: descriptor | $.VarRef<descriptor> | null = this;
 		return $.concatString("descriptor ", $.pointerValue<descriptor>(d).Label)
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["Label"])
 	}
 
 	static __typeInfo = $.registerStructType(

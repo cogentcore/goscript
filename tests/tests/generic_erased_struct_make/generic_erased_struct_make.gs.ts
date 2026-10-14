@@ -4,7 +4,13 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class queue {
-	public declare buf: $.Slice<any>
+	public get buf(): $.Slice<any> {
+		return this._fields.buf
+	}
+
+	public set buf(value: $.Slice<any>) {
+		this._fields.buf = value
+	}
 
 	public _fields: {
 		buf: $.Slice<any>
@@ -18,10 +24,6 @@ export class queue {
 
 	public clone(): queue {
 		return $.markAsStructValue(new queue(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["buf"])
 	}
 
 	static __typeInfo = $.registerStructType(

@@ -7,13 +7,37 @@ import * as unsafe from "@goscript/unsafe/index.js"
 import "@goscript/unsafe/index.js"
 
 export class Data {
-	public declare A: number
+	public get A(): number {
+		return this._fields.A
+	}
 
-	public declare B: number
+	public set A(value: number) {
+		this._fields.A = value
+	}
 
-	public declare C: number
+	public get B(): number {
+		return this._fields.B
+	}
 
-	public declare D: number
+	public set B(value: number) {
+		this._fields.B = value
+	}
+
+	public get C(): number {
+		return this._fields.C
+	}
+
+	public set C(value: number) {
+		this._fields.C = value
+	}
+
+	public get D(): number {
+		return this._fields.D
+	}
+
+	public set D(value: number) {
+		this._fields.D = value
+	}
 
 	public _fields: {
 		A: number
@@ -35,10 +59,6 @@ export class Data {
 		return $.markAsStructValue(new Data(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["A", "B", "C", "D"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.Data",
 		() => new Data(),
@@ -49,11 +69,29 @@ export class Data {
 }
 
 export class Mixed {
-	public declare Flag: boolean
+	public get Flag(): boolean {
+		return this._fields.Flag
+	}
 
-	public declare N: number
+	public set Flag(value: boolean) {
+		this._fields.Flag = value
+	}
 
-	public declare V: number[]
+	public get N(): number {
+		return this._fields.N
+	}
+
+	public set N(value: number) {
+		this._fields.N = value
+	}
+
+	public get V(): number[] {
+		return this._fields.V
+	}
+
+	public set V(value: number[]) {
+		this._fields.V = value
+	}
 
 	public _fields: {
 		Flag: boolean
@@ -71,10 +109,6 @@ export class Mixed {
 
 	public clone(): Mixed {
 		return $.markAsStructValue(new Mixed(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["Flag", "N", "V"])
 	}
 
 	static __typeInfo = $.registerStructType(

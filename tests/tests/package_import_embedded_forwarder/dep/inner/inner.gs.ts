@@ -7,7 +7,13 @@ import * as tx from "@goscript/github.com/s4wave/goscript/tests/tests/package_im
 import "@goscript/github.com/s4wave/goscript/tests/tests/package_import_embedded_forwarder/dep/tx/index.js"
 
 export class CoreStore {
-	public declare Prefix: string
+	public get Prefix(): string {
+		return this._fields.Prefix
+	}
+
+	public set Prefix(value: string) {
+		this._fields.Prefix = value
+	}
 
 	public _fields: {
 		Prefix: string
@@ -29,10 +35,6 @@ export class CoreStore {
 			return new tx.Tx({Name: $.concatString($.pointerValue<CoreStore>(s).Prefix, ":write")})
 		}
 		return new tx.Tx({Name: $.concatString($.pointerValue<CoreStore>(s).Prefix, ":read")})
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["Prefix"])
 	}
 
 	static __typeInfo = $.registerStructType(

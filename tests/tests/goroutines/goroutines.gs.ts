@@ -4,9 +4,21 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class Message {
-	public declare priority: number
+	public get priority(): number {
+		return this._fields.priority
+	}
 
-	public declare text: string
+	public set priority(value: number) {
+		this._fields.priority = value
+	}
+
+	public get text(): string {
+		return this._fields.text
+	}
+
+	public set text(value: string) {
+		this._fields.text = value
+	}
 
 	public _fields: {
 		priority: number
@@ -22,10 +34,6 @@ export class Message {
 
 	public clone(): Message {
 		return $.markAsStructValue(new Message(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["priority", "text"])
 	}
 
 	static __typeInfo = $.registerStructType(

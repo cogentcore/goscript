@@ -83,7 +83,13 @@ export class handler {
 }
 
 export class embeddedStream {
-	public declare Stream: srpc.Stream | null
+	public get Stream(): srpc.Stream | null {
+		return this._fields.Stream
+	}
+
+	public set Stream(value: srpc.Stream | null) {
+		this._fields.Stream = value
+	}
 
 	public _fields: {
 		Stream: srpc.Stream | null
@@ -119,10 +125,6 @@ export class embeddedStream {
 		return await $.pointerValue<Exclude<srpc.Stream | null, null>>(this.Stream).MsgSend(msg)
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Stream"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.embeddedStream",
 		() => new embeddedStream(),
@@ -133,9 +135,21 @@ export class embeddedStream {
 }
 
 export class streamOpenResult {
-	public declare stream: srpc.Stream | null
+	public get stream(): srpc.Stream | null {
+		return this._fields.stream
+	}
 
-	public declare err: $.GoError
+	public set stream(value: srpc.Stream | null) {
+		this._fields.stream = value
+	}
+
+	public get err(): $.GoError {
+		return this._fields.err
+	}
+
+	public set err(value: $.GoError) {
+		this._fields.err = value
+	}
 
 	public _fields: {
 		stream: srpc.Stream | null
@@ -153,10 +167,6 @@ export class streamOpenResult {
 		return $.markAsStructValue(new streamOpenResult(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["stream", "err"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.streamOpenResult",
 		() => new streamOpenResult(),
@@ -167,9 +177,21 @@ export class streamOpenResult {
 }
 
 export class streamProbeResult {
-	public declare total: number
+	public get total(): number {
+		return this._fields.total
+	}
 
-	public declare err: string
+	public set total(value: number) {
+		this._fields.total = value
+	}
+
+	public get err(): string {
+		return this._fields.err
+	}
+
+	public set err(value: string) {
+		this._fields.err = value
+	}
 
 	public _fields: {
 		total: number
@@ -187,10 +209,6 @@ export class streamProbeResult {
 		return $.markAsStructValue(new streamProbeResult(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["total", "err"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.streamProbeResult",
 		() => new streamProbeResult(),
@@ -201,7 +219,13 @@ export class streamProbeResult {
 }
 
 export class rpcStreamServerResult {
-	public declare err: string
+	public get err(): string {
+		return this._fields.err
+	}
+
+	public set err(value: string) {
+		this._fields.err = value
+	}
 
 	public _fields: {
 		err: string
@@ -217,10 +241,6 @@ export class rpcStreamServerResult {
 		return $.markAsStructValue(new rpcStreamServerResult(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["err"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.rpcStreamServerResult",
 		() => new rpcStreamServerResult(),
@@ -231,17 +251,53 @@ export class rpcStreamServerResult {
 }
 
 export class memoryRpcStream {
-	public declare ctx: context.Context | null
+	public get ctx(): context.Context | null {
+		return this._fields.ctx
+	}
 
-	public declare cancel: (() => void) | null
+	public set ctx(value: context.Context | null) {
+		this._fields.ctx = value
+	}
 
-	public declare recv: $.Channel<rpcstream.RpcStreamPacket | $.VarRef<rpcstream.RpcStreamPacket> | null> | null
+	public get cancel(): (() => void) | null {
+		return this._fields.cancel
+	}
 
-	public declare send: $.Channel<rpcstream.RpcStreamPacket | $.VarRef<rpcstream.RpcStreamPacket> | null> | null
+	public set cancel(value: (() => void) | null) {
+		this._fields.cancel = value
+	}
 
-	public declare closeSend: sync.Once
+	public get recv(): $.Channel<rpcstream.RpcStreamPacket | $.VarRef<rpcstream.RpcStreamPacket> | null> | null {
+		return this._fields.recv
+	}
 
-	public declare cancelLocal: sync.Once
+	public set recv(value: $.Channel<rpcstream.RpcStreamPacket | $.VarRef<rpcstream.RpcStreamPacket> | null> | null) {
+		this._fields.recv = value
+	}
+
+	public get send(): $.Channel<rpcstream.RpcStreamPacket | $.VarRef<rpcstream.RpcStreamPacket> | null> | null {
+		return this._fields.send
+	}
+
+	public set send(value: $.Channel<rpcstream.RpcStreamPacket | $.VarRef<rpcstream.RpcStreamPacket> | null> | null) {
+		this._fields.send = value
+	}
+
+	public get closeSend(): sync.Once {
+		return this._fields.closeSend
+	}
+
+	public set closeSend(value: sync.Once) {
+		this._fields.closeSend = value
+	}
+
+	public get cancelLocal(): sync.Once {
+		return this._fields.cancelLocal
+	}
+
+	public set cancelLocal(value: sync.Once) {
+		this._fields.cancelLocal = value
+	}
 
 	public _fields: {
 		ctx: context.Context | null
@@ -378,10 +434,6 @@ export class memoryRpcStream {
 		throw new globalThis.Error("goscript: unreachable return")
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["ctx", "cancel", "recv", "send", "closeSend", "cancelLocal"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.memoryRpcStream",
 		() => new memoryRpcStream(),
@@ -392,9 +444,21 @@ export class memoryRpcStream {
 }
 
 export class memoryRpcContext {
-	public declare done: $.Channel<{}> | null
+	public get done(): $.Channel<{}> | null {
+		return this._fields.done
+	}
 
-	public declare once: sync.Once
+	public set done(value: $.Channel<{}> | null) {
+		this._fields.done = value
+	}
+
+	public get once(): sync.Once {
+		return this._fields.once
+	}
+
+	public set once(value: sync.Once) {
+		this._fields.once = value
+	}
 
 	public _fields: {
 		done: $.Channel<{}> | null
@@ -452,10 +516,6 @@ export class memoryRpcContext {
 	public async Value(key: any): globalThis.Promise<any> {
 		const m: memoryRpcContext | $.VarRef<memoryRpcContext> | null = this;
 		return $.pointerValue<Exclude<context.Context, null>>(context.Background()).Value(key)
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["done", "once"])
 	}
 
 	static __typeInfo = $.registerStructType(

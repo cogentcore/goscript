@@ -4,7 +4,13 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class hidden {
-	public declare label: string
+	public get label(): string {
+		return this._fields.label
+	}
+
+	public set label(value: string) {
+		this._fields.label = value
+	}
 
 	public _fields: {
 		label: string
@@ -20,10 +26,6 @@ export class hidden {
 		return $.markAsStructValue(new hidden(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["label"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"dep.hidden",
 		() => new hidden(),
@@ -34,9 +36,21 @@ export class hidden {
 }
 
 export class Public {
-	public declare Value: string
+	public get Value(): string {
+		return this._fields.Value
+	}
 
-	public declare Hidden: hidden
+	public set Value(value: string) {
+		this._fields.Value = value
+	}
+
+	public get Hidden(): hidden {
+		return this._fields.Hidden
+	}
+
+	public set Hidden(value: hidden) {
+		this._fields.Hidden = value
+	}
 
 	public _fields: {
 		Value: string
@@ -57,10 +71,6 @@ export class Public {
 	public Label(): string {
 		const p: Public | $.VarRef<Public> | null = this;
 		return $.pointerValue<Public>(p).Value
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["Value", "Hidden"])
 	}
 
 	static __typeInfo = $.registerStructType(

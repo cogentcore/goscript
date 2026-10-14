@@ -13,7 +13,13 @@ import "@goscript/io/index.js"
 import "@goscript/sync/index.js"
 
 export class writerHolder {
-	public declare w: io.Writer | null
+	public get w(): io.Writer | null {
+		return this._fields.w
+	}
+
+	public set w(value: io.Writer | null) {
+		this._fields.w = value
+	}
 
 	public _fields: {
 		w: io.Writer | null
@@ -27,10 +33,6 @@ export class writerHolder {
 
 	public clone(): writerHolder {
 		return $.markAsStructValue(new writerHolder(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["w"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -80,7 +82,13 @@ export class asyncBuffer {
 }
 
 export class staticReader {
-	public declare done: boolean
+	public get done(): boolean {
+		return this._fields.done
+	}
+
+	public set done(value: boolean) {
+		this._fields.done = value
+	}
 
 	public _fields: {
 		done: boolean
@@ -106,10 +114,6 @@ export class staticReader {
 		return [4, null]
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["done"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.staticReader",
 		() => new staticReader(),
@@ -120,7 +124,13 @@ export class staticReader {
 }
 
 export class asyncReader {
-	public declare done: boolean
+	public get done(): boolean {
+		return this._fields.done
+	}
+
+	public set done(value: boolean) {
+		this._fields.done = value
+	}
 
 	public _fields: {
 		done: boolean
@@ -147,10 +157,6 @@ export class asyncReader {
 		return [5, null]
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["done"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.asyncReader",
 		() => new asyncReader(),
@@ -161,7 +167,13 @@ export class asyncReader {
 }
 
 export class asyncReaderAt {
-	public declare data: $.Slice<number>
+	public get data(): $.Slice<number> {
+		return this._fields.data
+	}
+
+	public set data(value: $.Slice<number>) {
+		this._fields.data = value
+	}
 
 	public _fields: {
 		data: $.Slice<number>
@@ -190,10 +202,6 @@ export class asyncReaderAt {
 		return [n, null]
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["data"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.asyncReaderAt",
 		() => new asyncReaderAt(),
@@ -204,13 +212,37 @@ export class asyncReaderAt {
 }
 
 export class pipeReadResult {
-	public declare n: number
+	public get n(): number {
+		return this._fields.n
+	}
 
-	public declare data: string
+	public set n(value: number) {
+		this._fields.n = value
+	}
 
-	public declare errNil: boolean
+	public get data(): string {
+		return this._fields.data
+	}
 
-	public declare errEOF: boolean
+	public set data(value: string) {
+		this._fields.data = value
+	}
+
+	public get errNil(): boolean {
+		return this._fields.errNil
+	}
+
+	public set errNil(value: boolean) {
+		this._fields.errNil = value
+	}
+
+	public get errEOF(): boolean {
+		return this._fields.errEOF
+	}
+
+	public set errEOF(value: boolean) {
+		this._fields.errEOF = value
+	}
 
 	public _fields: {
 		n: number
@@ -230,10 +262,6 @@ export class pipeReadResult {
 
 	public clone(): pipeReadResult {
 		return $.markAsStructValue(new pipeReadResult(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["n", "data", "errNil", "errEOF"])
 	}
 
 	static __typeInfo = $.registerStructType(

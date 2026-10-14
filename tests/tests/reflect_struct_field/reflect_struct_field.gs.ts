@@ -7,9 +7,21 @@ import * as reflect from "@goscript/reflect/index.js"
 import "@goscript/reflect/index.js"
 
 export class inner {
-	public declare A: number
+	public get A(): number {
+		return this._fields.A
+	}
 
-	public declare B: string
+	public set A(value: number) {
+		this._fields.A = value
+	}
+
+	public get B(): string {
+		return this._fields.B
+	}
+
+	public set B(value: string) {
+		this._fields.B = value
+	}
 
 	public _fields: {
 		A: number
@@ -27,10 +39,6 @@ export class inner {
 		return $.markAsStructValue(new inner(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["A", "B"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.inner",
 		() => new inner(),
@@ -41,11 +49,29 @@ export class inner {
 }
 
 export class outer {
-	public declare X: number
+	public get X(): number {
+		return this._fields.X
+	}
 
-	public declare In: inner
+	public set X(value: number) {
+		this._fields.X = value
+	}
 
-	public declare P: inner | $.VarRef<inner> | null
+	public get In(): inner {
+		return this._fields.In
+	}
+
+	public set In(value: inner) {
+		this._fields.In = value
+	}
+
+	public get P(): inner | $.VarRef<inner> | null {
+		return this._fields.P
+	}
+
+	public set P(value: inner | $.VarRef<inner> | null) {
+		this._fields.P = value
+	}
 
 	public _fields: {
 		X: number
@@ -63,10 +89,6 @@ export class outer {
 
 	public clone(): outer {
 		return $.markAsStructValue(new outer(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["X", "In", "P"])
 	}
 
 	static __typeInfo = $.registerStructType(

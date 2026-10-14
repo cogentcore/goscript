@@ -4,9 +4,21 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class MyStruct {
-	public declare publicField: string
+	public get publicField(): string {
+		return this._fields.publicField
+	}
 
-	public declare privateField: number
+	public set publicField(value: string) {
+		this._fields.publicField = value
+	}
+
+	public get privateField(): number {
+		return this._fields.privateField
+	}
+
+	public set privateField(value: number) {
+		this._fields.privateField = value
+	}
 
 	public _fields: {
 		publicField: string
@@ -22,10 +34,6 @@ export class MyStruct {
 
 	public clone(): MyStruct {
 		return $.markAsStructValue(new MyStruct(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["publicField", "privateField"])
 	}
 
 	static __typeInfo = $.registerStructType(

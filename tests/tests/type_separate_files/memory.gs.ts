@@ -4,9 +4,21 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class file {
-	public declare name: string
+	public get name(): string {
+		return this._fields.name
+	}
 
-	public declare data: $.Slice<number>
+	public set name(value: string) {
+		this._fields.name = value
+	}
+
+	public get data(): $.Slice<number> {
+		return this._fields.data
+	}
+
+	public set data(value: $.Slice<number>) {
+		this._fields.data = value
+	}
 
 	public _fields: {
 		name: string
@@ -22,10 +34,6 @@ export class file {
 
 	public clone(): file {
 		return $.markAsStructValue(new file(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["name", "data"])
 	}
 
 	static __typeInfo = $.registerStructType(

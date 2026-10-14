@@ -60,9 +60,21 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("is sorted:", slices.IsSorted($.arrayToSlice<number>([1, 2, 3])), slices.IsSorted($.arrayToSlice<number>([1, 3, 2])))
 
 	class item {
-		public declare group: number
+		public get group(): number {
+			return this._fields.group
+		}
 
-		public declare label: string
+		public set group(value: number) {
+			this._fields.group = value
+		}
+
+		public get label(): string {
+			return this._fields.label
+		}
+
+		public set label(value: string) {
+			this._fields.label = value
+		}
 
 		public _fields: {
 			group: number
@@ -78,10 +90,6 @@ export async function main(): globalThis.Promise<void> {
 
 		public clone(): item {
 			return $.markAsStructValue(new item(this))
-		}
-
-		static {
-			$.bindStructFields(this.prototype, ["group", "label"])
 		}
 
 		static __typeInfo = $.registerStructType(
@@ -165,7 +173,13 @@ export async function main(): globalThis.Promise<void> {
 	// Struct elements are values. Mutating a copy or a yielded loop value
 	// must leave the original slice unchanged.
 	class cell {
-		public declare n: number
+		public get n(): number {
+			return this._fields.n
+		}
+
+		public set n(value: number) {
+			this._fields.n = value
+		}
 
 		public _fields: {
 			n: number
@@ -179,10 +193,6 @@ export async function main(): globalThis.Promise<void> {
 
 		public clone(): cell {
 			return $.markAsStructValue(new cell(this))
-		}
-
-		static {
-			$.bindStructFields(this.prototype, ["n"])
 		}
 
 		static __typeInfo = $.registerStructType(

@@ -9,7 +9,13 @@ import "@goscript/unsafe/index.js"
 import "@goscript/sync/index.js"
 
 export class Setting {
-	public declare once: sync.Once
+	public get once(): sync.Once {
+		return this._fields.once
+	}
+
+	public set once(value: sync.Once) {
+		this._fields.once = value
+	}
 
 	public _fields: {
 		once: sync.Once
@@ -30,10 +36,6 @@ export class Setting {
 		await $.pointerValue<Setting>(s).once.Do($.functionValue((): void => {
 		}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)))
 		return ""
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["once"])
 	}
 
 	static __typeInfo = $.registerStructType(

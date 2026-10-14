@@ -4,9 +4,21 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class MyStruct {
-	public declare MyInt: number
+	public get MyInt(): number {
+		return this._fields.MyInt
+	}
 
-	public declare MyString: string
+	public set MyInt(value: number) {
+		this._fields.MyInt = value
+	}
+
+	public get MyString(): string {
+		return this._fields.MyString
+	}
+
+	public set MyString(value: string) {
+		this._fields.MyString = value
+	}
 
 	public _fields: {
 		MyInt: number
@@ -29,10 +41,6 @@ export class MyStruct {
 		return $.pointerValue<MyStruct>(m).MyString
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["MyInt", "MyString"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.MyStruct",
 		() => new MyStruct(),
@@ -43,7 +51,13 @@ export class MyStruct {
 }
 
 export class setterStruct {
-	public declare value: number
+	public get value(): number {
+		return this._fields.value
+	}
+
+	public set value(value: number) {
+		this._fields.value = value
+	}
 
 	public _fields: {
 		value: number
@@ -69,10 +83,6 @@ export class setterStruct {
 		$.pointerValue<setterStruct>(s).value = value
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["value"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.setterStruct",
 		() => new setterStruct(),
@@ -83,7 +93,13 @@ export class setterStruct {
 }
 
 export class digest {
-	public declare writes: number
+	public get writes(): number {
+		return this._fields.writes
+	}
+
+	public set writes(value: number) {
+		this._fields.writes = value
+	}
 
 	public _fields: {
 		writes: number
@@ -102,10 +118,6 @@ export class digest {
 	public Write(p: $.Slice<number>): void {
 		let d: digest | $.VarRef<digest> | null = this;
 		$.pointerValue<digest>(d).writes = $.pointerValue<digest>(d).writes + ($.len(p))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["writes"])
 	}
 
 	static __typeInfo = $.registerStructType(

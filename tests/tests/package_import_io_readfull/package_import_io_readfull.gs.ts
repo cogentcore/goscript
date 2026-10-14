@@ -10,9 +10,21 @@ import "@goscript/bytes/index.js"
 import "@goscript/io/index.js"
 
 export class fixedReader {
-	public declare data: $.Slice<number>
+	public get data(): $.Slice<number> {
+		return this._fields.data
+	}
 
-	public declare size: number
+	public set data(value: $.Slice<number>) {
+		this._fields.data = value
+	}
+
+	public get size(): number {
+		return this._fields.size
+	}
+
+	public set size(value: number) {
+		this._fields.size = value
+	}
 
 	public _fields: {
 		data: $.Slice<number>
@@ -41,10 +53,6 @@ export class fixedReader {
 		let n = $.copy(p, $.pointerValue<fixedReader>(r).data)
 		$.pointerValue<fixedReader>(r).data = $.goSlice($.pointerValue<fixedReader>(r).data, n, undefined)
 		return [n, null]
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["data", "size"])
 	}
 
 	static __typeInfo = $.registerStructType(

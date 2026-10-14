@@ -7,9 +7,21 @@ import * as dep from "@goscript/github.com/s4wave/goscript/tests/tests/defined_e
 import "@goscript/github.com/s4wave/goscript/tests/tests/defined_external_struct_wrapper/dep/index.js"
 
 export class Wrapped {
-	public declare Value: string
+	public get Value(): string {
+		return this._fields.Value
+	}
 
-	public declare Hidden: dep.hidden
+	public set Value(value: string) {
+		this._fields.Value = value
+	}
+
+	public get Hidden(): dep.hidden {
+		return this._fields.Hidden
+	}
+
+	public set Hidden(value: dep.hidden) {
+		this._fields.Hidden = value
+	}
 
 	public _fields: {
 		Value: string
@@ -30,10 +42,6 @@ export class Wrapped {
 	public ["public"](): dep.Public | $.VarRef<dep.Public> | null {
 		const w: Wrapped | $.VarRef<Wrapped> | null = this;
 		return $.unsafePointerCast<dep.Public | $.VarRef<dep.Public> | null>(w, dep.Public)
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["Value", "Hidden"])
 	}
 
 	static __typeInfo = $.registerStructType(

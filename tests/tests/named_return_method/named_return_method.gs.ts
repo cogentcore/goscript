@@ -4,7 +4,13 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class content {
-	public declare bytes: $.Slice<number>
+	public get bytes(): $.Slice<number> {
+		return this._fields.bytes
+	}
+
+	public set bytes(value: $.Slice<number>) {
+		this._fields.bytes = value
+	}
 
 	public _fields: {
 		bytes: $.Slice<number>
@@ -58,10 +64,6 @@ export class content {
 		let btr: $.Slice<number> = $.goSlice($.pointerValue<content>(c).bytes, globalThis.Number(off), globalThis.Number($.int64Add(off, l)))
 		n = $.copy(b, btr)
 		return [n, err]
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["bytes"])
 	}
 
 	static __typeInfo = $.registerStructType(

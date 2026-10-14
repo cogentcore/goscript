@@ -6,9 +6,21 @@ import * as $ from "@goscript/builtin/index.js"
 export type Hash = ObjectID
 
 export class ObjectID {
-	public declare hash: Uint8Array
+	public get hash(): Uint8Array {
+		return this._fields.hash
+	}
 
-	public declare format: number
+	public set hash(value: Uint8Array) {
+		this._fields.hash = value
+	}
+
+	public get format(): number {
+		return this._fields.format
+	}
+
+	public set format(value: number) {
+		this._fields.format = value
+	}
 
 	public _fields: {
 		hash: Uint8Array
@@ -36,10 +48,6 @@ export class ObjectID {
 		return !$.structEqual(s, $.markAsStructValue(new ObjectID()))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["hash", "format"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.ObjectID",
 		() => new ObjectID(),
@@ -50,9 +58,21 @@ export class ObjectID {
 }
 
 export class S {
-	public declare A: string
+	public get A(): string {
+		return this._fields.A
+	}
 
-	public declare B: number
+	public set A(value: string) {
+		this._fields.A = value
+	}
+
+	public get B(): number {
+		return this._fields.B
+	}
+
+	public set B(value: number) {
+		this._fields.B = value
+	}
 
 	public _fields: {
 		A: string
@@ -70,10 +90,6 @@ export class S {
 		return $.markAsStructValue(new S(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["A", "B"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.S",
 		() => new S(),
@@ -84,9 +100,21 @@ export class S {
 }
 
 export class Outer {
-	public declare In: S
+	public get In(): S {
+		return this._fields.In
+	}
 
-	public declare N: number
+	public set In(value: S) {
+		this._fields.In = value
+	}
+
+	public get N(): number {
+		return this._fields.N
+	}
+
+	public set N(value: number) {
+		this._fields.N = value
+	}
 
 	public _fields: {
 		In: S
@@ -102,10 +130,6 @@ export class Outer {
 
 	public clone(): Outer {
 		return $.markAsStructValue(new Outer(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["In", "N"])
 	}
 
 	static __typeInfo = $.registerStructType(

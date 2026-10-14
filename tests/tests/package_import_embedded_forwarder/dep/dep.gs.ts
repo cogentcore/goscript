@@ -22,7 +22,13 @@ $.registerInterfaceType(
 );
 
 export class BaseStore {
-	public declare CoreStore: inner.CoreStore | $.VarRef<inner.CoreStore> | null
+	public get CoreStore(): inner.CoreStore | $.VarRef<inner.CoreStore> | null {
+		return this._fields.CoreStore
+	}
+
+	public set CoreStore(value: inner.CoreStore | $.VarRef<inner.CoreStore> | null) {
+		this._fields.CoreStore = value
+	}
 
 	public _fields: {
 		CoreStore: inner.CoreStore | $.VarRef<inner.CoreStore> | null
@@ -40,10 +46,6 @@ export class BaseStore {
 
 	public NewTransaction(write: any): any {
 		return $.pointerValue<inner.CoreStore>(this.CoreStore).NewTransaction(write)
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["CoreStore"])
 	}
 
 	static __typeInfo = $.registerStructType(

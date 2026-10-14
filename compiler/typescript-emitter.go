@@ -447,6 +447,13 @@ func structZeroValueDeps(structType *loweredStruct, names map[string]bool) []str
 	return deps
 }
 
+// structFieldHasAccessors reports whether a struct field of the given name
+// can have accessors in its class body, which a field named constructor can
+// not, so such a field is bound to its _fields entry at run time instead.
+func structFieldHasAccessors(name string) bool {
+	return name != "constructor"
+}
+
 // renderStruct emits field storage, value-copy operations, methods, and metadata.
 func renderStruct(b *strings.Builder, structType *loweredStruct, runtimeOwner *RuntimeContractOwner, trimTypeInfo bool) {
 	markStructValue := runtimeOwner.QualifiedHelper(RuntimeHelperMarkAsStructValue)
@@ -459,13 +466,34 @@ func renderStruct(b *strings.Builder, structType *loweredStruct, runtimeOwner *R
 	b.WriteString("class ")
 	b.WriteString(structType.name)
 	b.WriteString(" {\n")
+	// Each field gets its own accessors, which read and write its _fields
+	// entry by a literal key, so that the JavaScript engine can optimize each
+	// one, unlike shared accessors that look up the key dynamically.
+	var boundFields []string
 	for _, field := range structType.fields {
 		writeLineComment(b, "\t", field.doc)
-		b.WriteString("\tpublic declare ")
+		if !structFieldHasAccessors(field.name) {
+			boundFields = append(boundFields, field.name)
+			b.WriteString("\tpublic declare ")
+			b.WriteString(field.name)
+			b.WriteString(": ")
+			b.WriteString(field.typ)
+			b.WriteString("\n\n")
+			continue
+		}
+		b.WriteString("\tpublic get ")
 		b.WriteString(field.name)
-		b.WriteString(": ")
+		b.WriteString("(): ")
 		b.WriteString(field.typ)
-		b.WriteString("\n\n")
+		b.WriteString(" {\n\t\treturn this._fields.")
+		b.WriteString(field.name)
+		b.WriteString("\n\t}\n\n\tpublic set ")
+		b.WriteString(field.name)
+		b.WriteString("(value: ")
+		b.WriteString(field.typ)
+		b.WriteString(") {\n\t\tthis._fields.")
+		b.WriteString(field.name)
+		b.WriteString(" = value\n\t}\n\n")
 	}
 	b.WriteString("\tpublic _fields: {\n")
 	for _, field := range structType.fields {
@@ -545,17 +573,17 @@ func renderStruct(b *strings.Builder, structType *loweredStruct, runtimeOwner *R
 		b.WriteString("\n")
 		renderMethod(b, &method)
 	}
-	if len(structType.fields) != 0 || structType.prototypeSetup != "" {
+	if len(boundFields) != 0 || structType.prototypeSetup != "" {
 		b.WriteString("\n\tstatic {\n")
-		if len(structType.fields) != 0 {
+		if len(boundFields) != 0 {
 			b.WriteString("\t\t")
 			b.WriteString(runtimeOwner.QualifiedHelper(RuntimeHelperBindStructFields))
 			b.WriteString("(this.prototype, [")
-			for idx, field := range structType.fields {
+			for idx, name := range boundFields {
 				if idx != 0 {
 					b.WriteString(", ")
 				}
-				b.WriteString(strconv.Quote(field.name))
+				b.WriteString(strconv.Quote(name))
 			}
 			b.WriteString("])\n")
 		}

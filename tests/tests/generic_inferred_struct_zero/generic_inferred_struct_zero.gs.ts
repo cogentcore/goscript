@@ -4,9 +4,21 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class entry {
-	public declare key: $.Slice<number>
+	public get key(): $.Slice<number> {
+		return this._fields.key
+	}
 
-	public declare n: number
+	public set key(value: $.Slice<number>) {
+		this._fields.key = value
+	}
+
+	public get n(): number {
+		return this._fields.n
+	}
+
+	public set n(value: number) {
+		this._fields.n = value
+	}
 
 	public _fields: {
 		key: $.Slice<number>
@@ -24,10 +36,6 @@ export class entry {
 		return $.markAsStructValue(new entry(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["key", "n"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.entry",
 		() => new entry(),
@@ -38,11 +46,29 @@ export class entry {
 }
 
 export class tree {
-	public declare less: ((a: any, b: any) => boolean | globalThis.Promise<boolean>) | null
+	public get less(): ((a: any, b: any) => boolean | globalThis.Promise<boolean>) | null {
+		return this._fields.less
+	}
 
-	public declare empty: any
+	public set less(value: ((a: any, b: any) => boolean | globalThis.Promise<boolean>) | null) {
+		this._fields.less = value
+	}
 
-	public declare count: number
+	public get empty(): any {
+		return this._fields.empty
+	}
+
+	public set empty(value: any) {
+		this._fields.empty = value
+	}
+
+	public get count(): number {
+		return this._fields.count
+	}
+
+	public set count(value: number) {
+		this._fields.count = value
+	}
 
 	public _fields: {
 		less: ((a: any, b: any) => boolean | globalThis.Promise<boolean>) | null
@@ -65,10 +91,6 @@ export class tree {
 	public ["get"](__typeArgs: $.GenericTypeArgs | undefined): any {
 		const tr: tree | $.VarRef<tree> | null = this;
 		return $.pointerValue<tree>(tr).empty
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["less", "empty", "count"])
 	}
 
 	static __typeInfo = $.registerStructType(

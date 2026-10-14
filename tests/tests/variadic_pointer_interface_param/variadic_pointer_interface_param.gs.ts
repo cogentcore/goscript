@@ -14,7 +14,13 @@ $.registerInterfaceType(
 );
 
 export class lit {
-	public declare n: number
+	public get n(): number {
+		return this._fields.n
+	}
+
+	public set n(value: number) {
+		this._fields.n = value
+	}
 
 	public _fields: {
 		n: number
@@ -33,10 +39,6 @@ export class lit {
 	public Value(): number {
 		const l: lit | $.VarRef<lit> | null = this;
 		return $.pointerValue<lit>(l).n
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["n"])
 	}
 
 	static __typeInfo = $.registerStructType(

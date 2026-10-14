@@ -15,9 +15,21 @@ $.registerInterfaceType(
 );
 
 export class blockType {
-	public declare typeID: string
+	public get typeID(): string {
+		return this._fields.typeID
+	}
 
-	public declare _constructor: (() => any | globalThis.Promise<any>) | null
+	public set typeID(value: string) {
+		this._fields.typeID = value
+	}
+
+	public get _constructor(): (() => any | globalThis.Promise<any>) | null {
+		return this._fields._constructor
+	}
+
+	public set _constructor(value: (() => any | globalThis.Promise<any>) | null) {
+		this._fields._constructor = value
+	}
 
 	public _fields: {
 		typeID: string
@@ -43,10 +55,6 @@ export class blockType {
 	public GetBlockTypeID(__typeArgs: $.GenericTypeArgs | undefined): string {
 		const t: blockType | $.VarRef<blockType> | null = this;
 		return $.pointerValue<blockType>(t).typeID
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["typeID", "_constructor"])
 	}
 
 	static __typeInfo = $.registerStructType(

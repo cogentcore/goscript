@@ -4,7 +4,13 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class Match {
-	public declare Size: number
+	public get Size(): number {
+		return this._fields.Size
+	}
+
+	public set Size(value: number) {
+		this._fields.Size = value
+	}
 
 	public _fields: {
 		Size: number
@@ -20,10 +26,6 @@ export class Match {
 		return $.markAsStructValue(new Match(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Size"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.Match",
 		() => new Match(),
@@ -34,7 +36,13 @@ export class Match {
 }
 
 export class Matcher {
-	public declare matches: $.Slice<Match>
+	public get matches(): $.Slice<Match> {
+		return this._fields.matches
+	}
+
+	public set matches(value: $.Slice<Match>) {
+		this._fields.matches = value
+	}
 
 	public _fields: {
 		matches: $.Slice<Match>
@@ -63,10 +71,6 @@ export class Matcher {
 			total = total + (__goscriptRangeShadow0.Size)
 		}
 		return total
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["matches"])
 	}
 
 	static __typeInfo = $.registerStructType(

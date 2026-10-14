@@ -7,9 +7,21 @@ import * as __goscript_field from "./field.gs.ts"
 import "./field.gs.ts"
 
 export class Type {
-	public declare Name: string
+	public get Name(): string {
+		return this._fields.Name
+	}
 
-	public declare Fields: $.Slice<__goscript_field.Field>
+	public set Name(value: string) {
+		this._fields.Name = value
+	}
+
+	public get Fields(): $.Slice<__goscript_field.Field> {
+		return this._fields.Fields
+	}
+
+	public set Fields(value: $.Slice<__goscript_field.Field>) {
+		this._fields.Fields = value
+	}
 
 	public _fields: {
 		Name: string
@@ -35,10 +47,6 @@ export class Type {
 			names = $.append(names, f.Name)
 		}
 		return names
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["Name", "Fields"])
 	}
 
 	static __typeInfo = $.registerStructType(

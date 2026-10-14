@@ -24,7 +24,13 @@ $.registerNamedValueType(
 );
 
 export class msg {
-	public declare v: number
+	public get v(): number {
+		return this._fields.v
+	}
+
+	public set v(value: number) {
+		this._fields.v = value
+	}
 
 	public _fields: {
 		v: number
@@ -80,10 +86,6 @@ export class msg {
 	public UnmarshalVT(_p0: $.Slice<number>): $.GoError {
 		const m: msg | $.VarRef<msg> | null = this;
 		return null
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["v"])
 	}
 
 	static __typeInfo = $.registerStructType(

@@ -4,7 +4,13 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class cache {
-	public declare stored: any
+	public get stored(): any {
+		return this._fields.stored
+	}
+
+	public set stored(value: any) {
+		this._fields.stored = value
+	}
 
 	public _fields: {
 		stored: any
@@ -33,10 +39,6 @@ export class cache {
 		return [v, null]
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["stored"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.cache",
 		() => new cache(),
@@ -47,7 +49,13 @@ export class cache {
 }
 
 export class key {
-	public declare N: number
+	public get N(): number {
+		return this._fields.N
+	}
+
+	public set N(value: number) {
+		this._fields.N = value
+	}
 
 	public _fields: {
 		N: number
@@ -63,10 +71,6 @@ export class key {
 		return $.markAsStructValue(new key(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["N"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.key",
 		() => new key(),
@@ -77,7 +81,13 @@ export class key {
 }
 
 export class privateKey {
-	public declare D: number
+	public get D(): number {
+		return this._fields.D
+	}
+
+	public set D(value: number) {
+		this._fields.D = value
+	}
 
 	public _fields: {
 		D: number
@@ -91,10 +101,6 @@ export class privateKey {
 
 	public clone(): privateKey {
 		return $.markAsStructValue(new privateKey(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["D"])
 	}
 
 	static __typeInfo = $.registerStructType(

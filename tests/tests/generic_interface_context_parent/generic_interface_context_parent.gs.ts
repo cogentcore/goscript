@@ -92,7 +92,13 @@ export class genericResolver {
 }
 
 export class genericValue {
-	public declare value: number
+	public get value(): number {
+		return this._fields.value
+	}
+
+	public set value(value: number) {
+		this._fields.value = value
+	}
 
 	public _fields: {
 		value: number
@@ -111,10 +117,6 @@ export class genericValue {
 	public Get(__typeArgs: $.GenericTypeArgs | undefined): number {
 		const v = this;
 		return v.value
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["value"])
 	}
 
 	static __typeInfo = $.registerStructType(

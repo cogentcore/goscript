@@ -14,9 +14,21 @@ $.registerInterfaceType(
 );
 
 export class MyReader {
-	public declare Reader: Reader | null
+	public get Reader(): Reader | null {
+		return this._fields.Reader
+	}
 
-	public declare name: string
+	public set Reader(value: Reader | null) {
+		this._fields.Reader = value
+	}
+
+	public get name(): string {
+		return this._fields.name
+	}
+
+	public set name(value: string) {
+		this._fields.name = value
+	}
 
 	public _fields: {
 		Reader: Reader | null
@@ -38,10 +50,6 @@ export class MyReader {
 		return $.pointerValue<Exclude<Reader | null, null>>(this.Reader).Read(p)
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Reader", "name"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.MyReader",
 		() => new MyReader(),
@@ -52,9 +60,21 @@ export class MyReader {
 }
 
 export class StringReader {
-	public declare data: string
+	public get data(): string {
+		return this._fields.data
+	}
 
-	public declare pos: number
+	public set data(value: string) {
+		this._fields.data = value
+	}
+
+	public get pos(): number {
+		return this._fields.pos
+	}
+
+	public set pos(value: number) {
+		this._fields.pos = value
+	}
 
 	public _fields: {
 		data: string
@@ -80,10 +100,6 @@ export class StringReader {
 		let n = $.copy(p, $.stringToBytes($.sliceStringOrBytes($.pointerValue<StringReader>(s).data, $.pointerValue<StringReader>(s).pos, undefined)))
 		$.pointerValue<StringReader>(s).pos = $.pointerValue<StringReader>(s).pos + (n)
 		return [n, null]
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["data", "pos"])
 	}
 
 	static __typeInfo = $.registerStructType(

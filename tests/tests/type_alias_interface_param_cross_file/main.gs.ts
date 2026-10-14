@@ -10,7 +10,13 @@ import "@goscript/github.com/s4wave/goscript/tests/tests/type_alias_interface_pa
 import "./types.gs.ts"
 
 export class sink {
-	public declare size: number
+	public get size(): number {
+		return this._fields.size
+	}
+
+	public set size(value: number) {
+		this._fields.size = value
+	}
 
 	public _fields: {
 		size: number
@@ -29,10 +35,6 @@ export class sink {
 	public Put(v: __goscript_types.Value): void {
 		let s: sink | $.VarRef<sink> | null = this;
 		$.pointerValue<sink>(s).size = $.len((v as __goscript_types.Value))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["size"])
 	}
 
 	static __typeInfo = $.registerStructType(

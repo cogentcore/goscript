@@ -4,7 +4,13 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class A {
-	public declare BB: $.Slice<B>
+	public get BB(): $.Slice<B> {
+		return this._fields.BB
+	}
+
+	public set BB(value: $.Slice<B>) {
+		this._fields.BB = value
+	}
 
 	public _fields: {
 		BB: $.Slice<B>
@@ -20,10 +26,6 @@ export class A {
 		return $.markAsStructValue(new A(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["BB"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.A",
 		() => new A(),
@@ -34,7 +36,13 @@ export class A {
 }
 
 export class B {
-	public declare AA: $.Slice<A>
+	public get AA(): $.Slice<A> {
+		return this._fields.AA
+	}
+
+	public set AA(value: $.Slice<A>) {
+		this._fields.AA = value
+	}
 
 	public _fields: {
 		AA: $.Slice<A>
@@ -48,10 +56,6 @@ export class B {
 
 	public clone(): B {
 		return $.markAsStructValue(new B(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["AA"])
 	}
 
 	static __typeInfo = $.registerStructType(

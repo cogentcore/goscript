@@ -40,7 +40,13 @@ $.registerNamedValueType(
 );
 
 export class transport {
-	public declare values: globalThis.Map<number, number> | null
+	public get values(): globalThis.Map<number, number> | null {
+		return this._fields.values
+	}
+
+	public set values(value: globalThis.Map<number, number> | null) {
+		this._fields.values = value
+	}
 
 	public _fields: {
 		values: globalThis.Map<number, number> | null
@@ -61,10 +67,6 @@ export class transport {
 		$.mapSet($.pointerValue<transport>(h).values, id, id)
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["values"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.transport",
 		() => new transport(),
@@ -75,7 +77,13 @@ export class transport {
 }
 
 export class packetHandlerMap {
-	public declare values: globalThis.Map<number, number> | null
+	public get values(): globalThis.Map<number, number> | null {
+		return this._fields.values
+	}
+
+	public set values(value: globalThis.Map<number, number> | null) {
+		this._fields.values = value
+	}
 
 	public _fields: {
 		values: globalThis.Map<number, number> | null
@@ -96,10 +104,6 @@ export class packetHandlerMap {
 		$.mapSet($.pointerValue<packetHandlerMap>(h).values, id, id)
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["values"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.packetHandlerMap",
 		() => new packetHandlerMap(),
@@ -110,7 +114,13 @@ export class packetHandlerMap {
 }
 
 export class connRunnerCallbacks {
-	public declare AddConnectionID: ((_p0: number) => void) | null
+	public get AddConnectionID(): ((_p0: number) => void) | null {
+		return this._fields.AddConnectionID
+	}
+
+	public set AddConnectionID(value: ((_p0: number) => void) | null) {
+		this._fields.AddConnectionID = value
+	}
 
 	public _fields: {
 		AddConnectionID: ((_p0: number) => void) | null
@@ -124,10 +134,6 @@ export class connRunnerCallbacks {
 
 	public clone(): connRunnerCallbacks {
 		return $.markAsStructValue(new connRunnerCallbacks(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["AddConnectionID"])
 	}
 
 	static __typeInfo = $.registerStructType(

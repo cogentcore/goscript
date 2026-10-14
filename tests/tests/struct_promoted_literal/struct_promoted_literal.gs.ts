@@ -5,10 +5,22 @@ import * as $ from "@goscript/builtin/index.js"
 
 export class Person {
 	// Name is the person's name.
-	public declare Name: string
+	public get Name(): string {
+		return this._fields.Name
+	}
+
+	public set Name(value: string) {
+		this._fields.Name = value
+	}
 
 	// Age is the person's age.
-	public declare Age: number
+	public get Age(): number {
+		return this._fields.Age
+	}
+
+	public set Age(value: number) {
+		this._fields.Age = value
+	}
 
 	public _fields: {
 		Name: string
@@ -26,10 +38,6 @@ export class Person {
 		return $.markAsStructValue(new Person(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Name", "Age"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.Person",
 		() => new Person(),
@@ -40,10 +48,22 @@ export class Person {
 }
 
 export class Employee {
-	public declare Person: Person
+	public get Person(): Person {
+		return this._fields.Person
+	}
+
+	public set Person(value: Person) {
+		this._fields.Person = value
+	}
 
 	// ID is the employee identifier.
-	public declare ID: number
+	public get ID(): number {
+		return this._fields.ID
+	}
+
+	public set ID(value: number) {
+		this._fields.ID = value
+	}
 
 	public _fields: {
 		Person: Person
@@ -61,10 +81,6 @@ export class Employee {
 		return $.markAsStructValue(new Employee(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Person", "ID"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.Employee",
 		() => new Employee(),
@@ -76,10 +92,22 @@ export class Employee {
 
 export class Address {
 	// Street is the street address.
-	public declare Street: string
+	public get Street(): string {
+		return this._fields.Street
+	}
+
+	public set Street(value: string) {
+		this._fields.Street = value
+	}
 
 	// City is the city name.
-	public declare City: string
+	public get City(): string {
+		return this._fields.City
+	}
+
+	public set City(value: string) {
+		this._fields.City = value
+	}
 
 	public _fields: {
 		Street: string
@@ -97,10 +125,6 @@ export class Address {
 		return $.markAsStructValue(new Address(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Street", "City"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.Address",
 		() => new Address(),
@@ -111,15 +135,39 @@ export class Address {
 }
 
 export class Manager {
-	public declare Person: Person
+	public get Person(): Person {
+		return this._fields.Person
+	}
 
-	public declare Address: Address
+	public set Person(value: Person) {
+		this._fields.Person = value
+	}
+
+	public get Address(): Address {
+		return this._fields.Address
+	}
+
+	public set Address(value: Address) {
+		this._fields.Address = value
+	}
 
 	// Phone is the contact number.
-	public declare Phone: string
+	public get Phone(): string {
+		return this._fields.Phone
+	}
+
+	public set Phone(value: string) {
+		this._fields.Phone = value
+	}
 
 	// Level is the management level.
-	public declare Level: number
+	public get Level(): number {
+		return this._fields.Level
+	}
+
+	public set Level(value: number) {
+		this._fields.Level = value
+	}
 
 	public _fields: {
 		Person: Person
@@ -141,10 +189,6 @@ export class Manager {
 		return $.markAsStructValue(new Manager(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Person", "Address", "Phone", "Level"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.Manager",
 		() => new Manager(),
@@ -155,10 +199,22 @@ export class Manager {
 }
 
 export class Team {
-	public declare Employee: Employee
+	public get Employee(): Employee {
+		return this._fields.Employee
+	}
+
+	public set Employee(value: Employee) {
+		this._fields.Employee = value
+	}
 
 	// Active records whether the team is enabled.
-	public declare Active: boolean
+	public get Active(): boolean {
+		return this._fields.Active
+	}
+
+	public set Active(value: boolean) {
+		this._fields.Active = value
+	}
 
 	public _fields: {
 		Employee: Employee
@@ -176,10 +232,6 @@ export class Team {
 		return $.markAsStructValue(new Team(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Employee", "Active"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.Team",
 		() => new Team(),
@@ -191,10 +243,22 @@ export class Team {
 
 export class LiteralValue {
 	// Value is the initialized value.
-	public declare Value: any
+	public get Value(): any {
+		return this._fields.Value
+	}
+
+	public set Value(value: any) {
+		this._fields.Value = value
+	}
 
 	// Zero remains uninitialized.
-	public declare Zero: any
+	public get Zero(): any {
+		return this._fields.Zero
+	}
+
+	public set Zero(value: any) {
+		this._fields.Zero = value
+	}
 
 	public _fields: {
 		Value: any
@@ -212,10 +276,6 @@ export class LiteralValue {
 		return $.markAsStructValue(new LiteralValue(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Value", "Zero"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.LiteralValue",
 		() => new LiteralValue(),
@@ -226,7 +286,13 @@ export class LiteralValue {
 }
 
 export class LiteralContainer {
-	public declare LiteralValue: LiteralValue
+	public get LiteralValue(): LiteralValue {
+		return this._fields.LiteralValue
+	}
+
+	public set LiteralValue(value: LiteralValue) {
+		this._fields.LiteralValue = value
+	}
 
 	public _fields: {
 		LiteralValue: LiteralValue
@@ -240,10 +306,6 @@ export class LiteralContainer {
 
 	public clone(): LiteralContainer {
 		return $.markAsStructValue(new LiteralContainer(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["LiteralValue"])
 	}
 
 	static __typeInfo = $.registerStructType(

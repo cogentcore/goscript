@@ -7,9 +7,21 @@ import * as sync from "@goscript/sync/index.js"
 import "@goscript/sync/index.js"
 
 export class embeddedMutex {
-	public declare Mutex: sync.Mutex
+	public get Mutex(): sync.Mutex {
+		return this._fields.Mutex
+	}
 
-	public declare value: number
+	public set Mutex(value: sync.Mutex) {
+		this._fields.Mutex = value
+	}
+
+	public get value(): number {
+		return this._fields.value
+	}
+
+	public set value(value: number) {
+		this._fields.value = value
+	}
 
 	public _fields: {
 		Mutex: sync.Mutex
@@ -39,10 +51,6 @@ export class embeddedMutex {
 		return $.pointerValue<sync.Mutex>(this.Mutex).Unlock()
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Mutex", "value"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.embeddedMutex",
 		() => new embeddedMutex(),
@@ -53,9 +61,21 @@ export class embeddedMutex {
 }
 
 export class embeddedRWMutex {
-	public declare RWMutex: sync.RWMutex
+	public get RWMutex(): sync.RWMutex {
+		return this._fields.RWMutex
+	}
 
-	public declare value: number
+	public set RWMutex(value: sync.RWMutex) {
+		this._fields.RWMutex = value
+	}
+
+	public get value(): number {
+		return this._fields.value
+	}
+
+	public set value(value: number) {
+		this._fields.value = value
+	}
 
 	public _fields: {
 		RWMutex: sync.RWMutex
@@ -101,10 +121,6 @@ export class embeddedRWMutex {
 		return $.pointerValue<sync.RWMutex>(this.RWMutex).Unlock()
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["RWMutex", "value"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.embeddedRWMutex",
 		() => new embeddedRWMutex(),
@@ -115,11 +131,29 @@ export class embeddedRWMutex {
 }
 
 export class queue {
-	public declare Mu: sync.Mutex
+	public get Mu(): sync.Mutex {
+		return this._fields.Mu
+	}
 
-	public declare Cond: sync.Cond
+	public set Mu(value: sync.Mutex) {
+		this._fields.Mu = value
+	}
 
-	public declare items: $.Slice<number>
+	public get Cond(): sync.Cond {
+		return this._fields.Cond
+	}
+
+	public set Cond(value: sync.Cond) {
+		this._fields.Cond = value
+	}
+
+	public get items(): $.Slice<number> {
+		return this._fields.items
+	}
+
+	public set items(value: $.Slice<number>) {
+		this._fields.items = value
+	}
 
 	public _fields: {
 		Mu: sync.Mutex
@@ -166,10 +200,6 @@ export class queue {
 		$.pointerValue<queue>(q).items = $.append($.pointerValue<queue>(q).items, v)
 		$.pointerValue<queue>(q).Cond.Signal()
 		$.pointerValue<queue>(q).Mu.Unlock()
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["Mu", "Cond", "items"])
 	}
 
 	static __typeInfo = $.registerStructType(

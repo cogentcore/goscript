@@ -14,7 +14,13 @@ $.registerInterfaceType(
 );
 
 export class Box {
-	public declare Value: any
+	public get Value(): any {
+		return this._fields.Value
+	}
+
+	public set Value(value: any) {
+		this._fields.Value = value
+	}
 
 	public _fields: {
 		Value: any
@@ -30,10 +36,6 @@ export class Box {
 		return $.markAsStructValue(new Box(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Value"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"helper.Box",
 		() => new Box(),
@@ -44,7 +46,13 @@ export class Box {
 }
 
 export class IntValue {
-	public declare N: number
+	public get N(): number {
+		return this._fields.N
+	}
+
+	public set N(value: number) {
+		this._fields.N = value
+	}
 
 	public _fields: {
 		N: number
@@ -63,10 +71,6 @@ export class IntValue {
 	public GetValue(): number {
 		const v = this;
 		return v.N
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["N"])
 	}
 
 	static __typeInfo = $.registerStructType(

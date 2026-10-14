@@ -7,9 +7,21 @@ import * as reflect from "@goscript/reflect/index.js"
 import "@goscript/reflect/index.js"
 
 export class T {
-	public declare A: string
+	public get A(): string {
+		return this._fields.A
+	}
 
-	public declare B: number
+	public set A(value: string) {
+		this._fields.A = value
+	}
+
+	public get B(): number {
+		return this._fields.B
+	}
+
+	public set B(value: number) {
+		this._fields.B = value
+	}
 
 	public _fields: {
 		A: string
@@ -25,10 +37,6 @@ export class T {
 
 	public clone(): T {
 		return $.markAsStructValue(new T(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["A", "B"])
 	}
 
 	static __typeInfo = $.registerStructType(

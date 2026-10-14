@@ -17,9 +17,21 @@ $.registerInterfaceType(
 );
 
 export class Base {
-	public declare App: any
+	public get App(): any {
+		return this._fields.App
+	}
 
-	public declare flags: Flags
+	public set App(value: any) {
+		this._fields.App = value
+	}
+
+	public get flags(): Flags {
+		return this._fields.flags
+	}
+
+	public set flags(value: Flags) {
+		this._fields.flags = value
+	}
 
 	public _fields: {
 		App: any
@@ -47,10 +59,6 @@ export class Base {
 		$.pointerValue<Base>(b).flags = $.int64Or($.pointerValue<Base>(b).flags, $.int64Shl(1n, flag))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["App", "flags"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.Base",
 		() => new Base(),
@@ -61,7 +69,13 @@ export class Base {
 }
 
 export class App {
-	public declare Name: string
+	public get Name(): string {
+		return this._fields.Name
+	}
+
+	public set Name(value: string) {
+		this._fields.Name = value
+	}
 
 	public _fields: {
 		Name: string
@@ -77,10 +91,6 @@ export class App {
 		return $.markAsStructValue(new App(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Name"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.App",
 		() => new App(),
@@ -91,9 +101,21 @@ export class App {
 }
 
 export class Window {
-	public declare Base: Base
+	public get Base(): Base {
+		return this._fields.Base
+	}
 
-	public declare Title: string
+	public set Base(value: Base) {
+		this._fields.Base = value
+	}
+
+	public get Title(): string {
+		return this._fields.Title
+	}
+
+	public set Title(value: string) {
+		this._fields.Title = value
+	}
 
 	public _fields: {
 		Base: Base
@@ -119,10 +141,6 @@ export class Window {
 		return $.pointerValue<Base>(this.Base).Set(__goscriptStatic0(), flag)
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Base", "Title"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.Window",
 		() => new Window(),
@@ -133,9 +151,21 @@ export class Window {
 }
 
 export class Single {
-	public declare Base: Base
+	public get Base(): Base {
+		return this._fields.Base
+	}
 
-	public declare Count: number
+	public set Base(value: Base) {
+		this._fields.Base = value
+	}
+
+	public get Count(): number {
+		return this._fields.Count
+	}
+
+	public set Count(value: number) {
+		this._fields.Count = value
+	}
 
 	public _fields: {
 		Base: Base
@@ -159,10 +189,6 @@ export class Single {
 
 	public Set(__typeArgs: $.GenericTypeArgs | undefined, flag: any): any {
 		return $.pointerValue<Base>(this.Base).Set({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, A: __typeArgs?.["A"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }}, flag)
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["Base", "Count"])
 	}
 
 	static __typeInfo = $.registerStructType(
