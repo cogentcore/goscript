@@ -5,6 +5,8 @@ import * as $ from "@goscript/builtin/index.js"
 
 export type layers = $.Slice<number>
 
+$.registerNamedType("main.layers", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")));
+
 $.registerNamedValueType(
 	"main.layers",
 	{Error: (receiver: any, ...args: any[]) => (layers_Error as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},

@@ -10,7 +10,11 @@ export type Stack = $.Slice<any>
 
 export type Names = $.Slice<string>
 
+$.registerNamedType("main.Names", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("string")));
+
 export type Text = $.Slice<string>
+
+$.registerNamedType("main.Text", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("string")));
 
 export async function TestFS(fsys: string, expected: $.Slice<string>): globalThis.Promise<$.GoError> {
 	return testFS(fsys, expected)
