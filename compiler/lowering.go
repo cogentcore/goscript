@@ -6730,11 +6730,7 @@ func (o *LoweringOwner) lowerNamedResultReturnWithExplicitTemp(ctx lowerFileCont
 			continue
 		}
 		hasNamedResult = true
-		returnExpr := safeIdentifier(name)
-		if ctx.model.needsVarRef[result] {
-			returnExpr += ".value"
-		}
-		parts = append(parts, returnExpr)
+		parts = append(parts, o.lowerNamedResultValue(ctx, result))
 	}
 	if !hasNamedResult {
 		return "", false
@@ -7089,11 +7085,7 @@ func (o *LoweringOwner) lowerNamedResultReturn(ctx lowerFileContext) (string, bo
 			parts = append(parts, o.lowerDeclarationZeroValueExpr(ctx, result.Type()))
 			continue
 		}
-		returnExpr := safeIdentifier(name)
-		if ctx.model.needsVarRef[result] {
-			returnExpr += ".value"
-		}
-		parts = append(parts, returnExpr)
+		parts = append(parts, o.lowerNamedResultValue(ctx, result))
 	}
 	if !hasNamedResult {
 		return "", false
@@ -7102,6 +7094,71 @@ func (o *LoweringOwner) lowerNamedResultReturn(ctx lowerFileContext) (string, bo
 		return parts[0], true
 	}
 	return "[" + strings.Join(parts, ", ") + "]", true
+}
+
+// lowerNamedResultValue returns the value of a named result to return. A
+// struct or array result that another reference can reach, through its
+// address or a function literal, is copied, so that the caller gets a value
+// of its own.
+func (o *LoweringOwner) lowerNamedResultValue(ctx lowerFileContext, result *types.Var) string {
+	value := safeIdentifier(result.Name())
+	if ctx.model.needsVarRef[result] {
+		value += ".value"
+	}
+	if !isStructValueType(result.Type()) && !isArrayType(result.Type()) {
+		return value
+	}
+	if !ctx.model.needsVarRef[result] && !namedResultUsedInFuncLit(ctx, result) {
+		return value
+	}
+	return o.lowerValueForTargetTypes(ctx, result.Type(), result.Type(), value, true)
+}
+
+// namedResultUsedInFuncLit reports whether a function literal in the function
+// that declares result refers to it.
+func namedResultUsedInFuncLit(ctx lowerFileContext, result *types.Var) bool {
+	if ctx.file == nil || ctx.semPkg == nil || ctx.semPkg.source == nil {
+		return true
+	}
+	var body *ast.BlockStmt
+	ast.Inspect(ctx.file, func(node ast.Node) bool {
+		if body != nil || node == nil || node.Pos() > result.Pos() || node.End() <= result.Pos() {
+			return false
+		}
+		switch typed := node.(type) {
+		case *ast.FuncDecl:
+			if typed.Body != nil && typed.Type.Pos() <= result.Pos() && result.Pos() < typed.Type.End() {
+				body = typed.Body
+			}
+		case *ast.FuncLit:
+			if typed.Type.Pos() <= result.Pos() && result.Pos() < typed.Type.End() {
+				body = typed.Body
+			}
+		}
+		return body == nil
+	})
+	if body == nil {
+		return true
+	}
+	info := ctx.semPkg.source.TypesInfo
+	used := false
+	ast.Inspect(body, func(node ast.Node) bool {
+		if used {
+			return false
+		}
+		lit, ok := node.(*ast.FuncLit)
+		if !ok {
+			return true
+		}
+		ast.Inspect(lit.Body, func(node ast.Node) bool {
+			if ident, ok := node.(*ast.Ident); ok && info.Uses[ident] == result {
+				used = true
+			}
+			return !used
+		})
+		return false
+	})
+	return used
 }
 
 // recoverReturnStmt builds the return statement a defer+recover function runs
@@ -7881,7 +7938,7 @@ func (o *LoweringOwner) lowerSwitchStmt(ctx lowerFileContext, stmt *ast.SwitchSt
 			diagnostics = append(diagnostics, exprDiagnostics...)
 			if compareCases {
 				sourceType := ctx.semPkg.source.TypesInfo.TypeOf(expr)
-				lowered = o.lowerValueForTargetTypes(ctx, tagType, sourceType, lowered, shouldCloneStructValue(expr))
+				lowered = o.lowerValueForTargetTypes(ctx, tagType, sourceType, lowered, o.shouldCloneStructValue(ctx, expr))
 				lowered = o.runtimeOwner.QualifiedHelper(RuntimeHelperComparableEqual) + "(" + compareValue + ", " + lowered + ")"
 			} else if tagType != nil && isBigIntBackedType(tagType) {
 				// A bigint-backed tag (int64/uint64) lowers to a bigint at
@@ -9053,7 +9110,7 @@ func (o *LoweringOwner) lowerCallExpr(ctx lowerFileContext, expr *ast.CallExpr) 
 								slice.Elem(),
 								ctx.semPkg.source.TypesInfo.TypeOf(expr.Args[idx]),
 								args[idx],
-								shouldCloneStructValue(expr.Args[idx]),
+								o.shouldCloneStructValue(ctx, expr.Args[idx]),
 							)
 						}
 					}
@@ -12664,7 +12721,12 @@ func (o *LoweringOwner) lowerMapGetTuple(ctx lowerFileContext, expr *ast.IndexEx
 	mapType, _ := types.Unalias(ctx.semPkg.source.TypesInfo.TypeOf(expr.X)).Underlying().(*types.Map)
 	defaultValue := "undefined"
 	if mapType != nil {
-		index = o.lowerValueForTarget(ctx, expr.Index, mapType.Key(), index)
+		// A lookup only reads its key, so a struct key of the map's key type
+		// is not copied.
+		indexType := ctx.semPkg.source.TypesInfo.TypeOf(expr.Index)
+		if !isStructValueType(mapType.Key()) || indexType == nil || !types.Identical(indexType, mapType.Key()) {
+			index = o.lowerValueForTarget(ctx, expr.Index, mapType.Key(), index)
+		}
 		defaultValue = o.lowerZeroValueExprFor(ctx, mapType.Elem())
 		return o.runtimeOwner.QualifiedHelper(RuntimeHelperMapGet) +
 			"<" + o.tsTypeFor(ctx, mapType.Key()) + ", " + o.tsTypeFor(ctx, mapType.Elem()) + ", " + o.tsTypeFor(ctx, mapType.Elem()) + ">(" +
@@ -12721,7 +12783,7 @@ func (o *LoweringOwner) lowerValueForTarget(
 			value = o.runtimeOwner.QualifiedHelper(RuntimeHelperGoFunc) + "(" + value + ", " + strconv.Quote(goName) + ")"
 		}
 	}
-	value = o.lowerValueForTargetTypes(ctx, targetType, sourceType, value, shouldCloneStructValue(expr))
+	value = o.lowerValueForTargetTypes(ctx, targetType, sourceType, value, o.shouldCloneStructValue(ctx, expr))
 	if typeParamMayHoldValueType(targetType) && typeParamMayHoldValueType(sourceType) && isStoredValueExpr(ctx, expr) {
 		// A type parameter may be instantiated with a struct or array type,
 		// which Go copies at assignment, so a stored value is copied when it
@@ -13775,13 +13837,58 @@ func tsStructFieldName(name string, idx int) string {
 	return safeIdentifier(name)
 }
 
-func shouldCloneStructValue(expr ast.Expr) bool {
-	switch expr.(type) {
+// shouldCloneStructValue reports whether a struct value expr must be copied
+// where Go copies it. A composite literal is a new value, and so is the
+// result of a call of a function or concrete method compiled from Go, since
+// each return copies a stored struct value (see lowerNamedResultValue).
+func (o *LoweringOwner) shouldCloneStructValue(ctx lowerFileContext, expr ast.Expr) bool {
+	switch typed := ast.Unparen(expr).(type) {
 	case *ast.CompositeLit:
 		return false
+	case *ast.CallExpr:
+		return !o.isFreshStructCallResult(ctx, typed)
 	default:
 		return true
 	}
+}
+
+// isFreshStructCallResult reports whether call returns a struct value no other
+// storage refers to: a call of a function or concrete method compiled from Go
+// source. Conversions, function values, interface methods and hand-written
+// override packages may return stored values.
+func (o *LoweringOwner) isFreshStructCallResult(ctx lowerFileContext, call *ast.CallExpr) bool {
+	if ctx.semPkg == nil || ctx.semPkg.source == nil {
+		return false
+	}
+	info := ctx.semPkg.source.TypesInfo
+	if tv, ok := info.Types[call.Fun]; !ok || tv.IsType() || tv.IsBuiltin() {
+		return false
+	}
+	fn := calledFunction(ctx.semPkg.source, ast.Unparen(call.Fun))
+	if fn == nil || fn.Pkg() == nil {
+		return false
+	}
+	signature, _ := fn.Type().(*types.Signature)
+	if signature == nil {
+		return false
+	}
+	if recv := signature.Recv(); recv != nil && types.IsInterface(recv.Type()) {
+		return false
+	}
+	// A generic function returns a value of a type parameter as it is.
+	if origin, _ := fn.Origin().Type().(*types.Signature); origin != nil {
+		for result := range origin.Results().Variables() {
+			if _, ok := types.Unalias(result.Type()).(*types.TypeParam); ok {
+				return false
+			}
+		}
+	}
+	if selector, ok := ast.Unparen(call.Fun).(*ast.SelectorExpr); ok {
+		if selection := info.Selections[selector]; selection != nil && selection.Kind() != types.MethodVal {
+			return false
+		}
+	}
+	return !o.overrideFacts().HasPackage(fn.Pkg().Path())
 }
 
 func constIntExpr(ctx lowerFileContext, expr ast.Expr) (int, bool) {

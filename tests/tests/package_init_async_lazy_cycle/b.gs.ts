@@ -19,7 +19,7 @@ export var first: __goscript_a.holder
 
 export async function __goscript_init_first(): globalThis.Promise<void> {
 	if (((first) as any) === undefined) {
-		first = await $.markAsStructValue($.cloneStructValue(await makeFirst()))
+		first = await makeFirst()
 	}
 }
 

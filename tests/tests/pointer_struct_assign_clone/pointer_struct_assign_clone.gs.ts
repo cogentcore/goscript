@@ -70,7 +70,7 @@ export async function main(): globalThis.Promise<void> {
 	// Test assignment of a struct from a function call
 	let s3 = $.markAsStructValue(new MyStruct({Value: 70}))
 	let p3: MyStruct | $.VarRef<MyStruct> | null = new MyStruct({Value: 80})
-	$.assignStruct($.pointerValue<MyStruct>(p3), $.markAsStructValue($.cloneStructValue(getStruct())))
+	$.assignStruct($.pointerValue<MyStruct>(p3), getStruct())
 	await $.println($.pointerValue<MyStruct>(p3).Value)
 	await $.println(s3.Value)
 

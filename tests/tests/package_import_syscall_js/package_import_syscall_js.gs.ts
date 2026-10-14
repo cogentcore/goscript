@@ -76,9 +76,9 @@ export async function wrap(fn: ((_this: js.Value, args: $.Slice<js.Value>) => an
 
 export async function funcOfValues(): globalThis.Promise<void> {
 	await using __defer = new $.AsyncDisposableStack()
-	let add = $.markAsStructValue($.cloneStructValue(await wrap($.functionValue((_this: js.Value, args: $.Slice<js.Value>): any => {
+	let add = await wrap($.functionValue((_this: js.Value, args: $.Slice<js.Value>): any => {
 		return $.basicInterfaceValue($.markAsStructValue($.cloneStructValue($.arrayIndex(args!, 0))).Int() + $.markAsStructValue($.cloneStructValue($.arrayIndex(args!, 1))).Int(), "int")
-	}, ({ kind: $.TypeKind.Function, params: ["js.Value", /* @__PURE__ */ $.sliceType("js.Value")], results: [{ kind: $.TypeKind.Interface, methods: [] }] } as $.FunctionTypeInfo)))))
+	}, ({ kind: $.TypeKind.Function, params: ["js.Value", /* @__PURE__ */ $.sliceType("js.Value")], results: [{ kind: $.TypeKind.Interface, methods: [] }] } as $.FunctionTypeInfo)))
 	__defer.defer(() => { $.markAsStructValue($.cloneStructValue(add)).Release() })
 	await $.println("wrapped type:", js.Type_String($.markAsStructValue($.cloneStructValue(add)).Type()))
 
@@ -95,13 +95,13 @@ export async function funcOfSuspend(): globalThis.Promise<void> {
 	await using __defer = new $.AsyncDisposableStack()
 	let mu: $.VarRef<sync.Mutex> = $.varRef($.markAsStructValue(new sync.Mutex()))
 	let done: $.Channel<string> | null = $.makeChannel<string>(2, "", "both")
-	let handler = $.markAsStructValue($.cloneStructValue(await wrap($.functionValue(async (_this: js.Value, args: $.Slice<js.Value>): globalThis.Promise<any> => {
+	let handler = await wrap($.functionValue(async (_this: js.Value, args: $.Slice<js.Value>): globalThis.Promise<any> => {
 		using __defer = new $.DisposableStack()
 		await mu.value.Lock()
 		__defer.defer(() => { mu.value.Unlock() })
 		await $.chanSend(done, $.concatString("handled ", $.markAsStructValue($.cloneStructValue($.arrayIndex(args!, 0))).String()))
 		return null
-	}, ({ kind: $.TypeKind.Function, params: ["js.Value", /* @__PURE__ */ $.sliceType("js.Value")], results: [{ kind: $.TypeKind.Interface, methods: [] }] } as $.FunctionTypeInfo)))))
+	}, ({ kind: $.TypeKind.Function, params: ["js.Value", /* @__PURE__ */ $.sliceType("js.Value")], results: [{ kind: $.TypeKind.Interface, methods: [] }] } as $.FunctionTypeInfo)))
 	__defer.defer(() => { $.markAsStructValue($.cloneStructValue(handler)).Release() })
 
 	$.markAsStructValue($.cloneStructValue(handler)).Invoke("first")
