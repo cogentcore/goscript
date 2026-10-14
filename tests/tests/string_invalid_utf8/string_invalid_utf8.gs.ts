@@ -13,7 +13,7 @@ import "@goscript/unicode/index.js"
 import "@goscript/unicode/utf8/index.js"
 
 export async function main(): globalThis.Promise<void> {
-	let s = $.bytesToString(new Uint8Array([66, 97, 100, 85, 84, 70, 56, 226, 226, 161]))
+	let s = "BadUTF8\xe2\xe2\xa1"
 	await $.println($.stringLen(s), utf8.ValidString(s), utf8.RuneCountInString(s))
 
 	// range yields RuneError with width 1 for each invalid byte
@@ -37,7 +37,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println($.sliceLen(runes), $.arrayIndex(runes!, 7), $.arrayIndex(runes!, 9))
 	let bs: $.Slice<number> = $.stringToBytes(s)
 	await $.println($.sliceLen(bs), $.arrayIndex(bs!, 7), $.stringEqual($.bytesToString(bs), s))
-	await $.println($.stringLen($.runesToString(runes)), $.stringEqual($.runesToString(runes), "BadUTF8���"))
+	await $.println($.stringLen($.runesToString(runes)), $.stringEqual($.runesToString(runes), "BadUTF8\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd"))
 
 	// building from runes
 	let b: $.VarRef<strings.Builder> = $.varRef($.markAsStructValue(new strings.Builder()))
@@ -48,23 +48,23 @@ export async function main(): globalThis.Promise<void> {
 		b.value.WriteRune(r)
 	}
 	let out = b.value.String()
-	await $.println($.stringLen(out), $.stringEqual(out, "badutf8���"))
+	await $.println($.stringLen(out), $.stringEqual(out, "badutf8\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd"))
 
 	// concatenation keeps the bytes
 	let c = $.concatString(s, "x")
 	await $.println($.stringLen(c), $.indexString(c, 9), $.indexString(c, 10), utf8.ValidString(c))
 	let d = $.concatString("x", s)
-	await $.println($.stringLen(d), $.indexString(d, 0), $.indexString(d, 8), $.indexString(d, 10), $.stringEqual(d, $.bytesToString(new Uint8Array([120, 66, 97, 100, 85, 84, 70, 56, 226, 226, 161]))))
-	let e = $.concatString(s, "é")
-	await $.println($.stringLen(e), $.indexString(e, 10), $.indexString(e, 11), $.stringEqual(e, $.bytesToString(new Uint8Array([66, 97, 100, 85, 84, 70, 56, 226, 226, 161, 195, 169]))))
+	await $.println($.stringLen(d), $.indexString(d, 0), $.indexString(d, 8), $.indexString(d, 10), $.stringEqual(d, "xBadUTF8\xe2\xe2\xa1"))
+	let e = $.concatString(s, "\xc3\xa9")
+	await $.println($.stringLen(e), $.indexString(e, 10), $.indexString(e, 11), $.stringEqual(e, "BadUTF8\xe2\xe2\xa1\xc3\xa9"))
 	let f = $.concatString($.sliceStringOrBytes(s, undefined, 8), $.sliceStringOrBytes(s, 8, undefined))
 	await $.println($.stringEqual(f, s), $.stringLen(f))
 
 	// strings functions
-	await $.println($.stringEqual(strings.ToLower(s), $.bytesToString(new Uint8Array([98, 97, 100, 117, 116, 102, 56, 226, 226, 161]))), $.stringLen(strings.ToLower(s)))
-	await $.println($.stringEqual(strings.ToUpper(s), $.bytesToString(new Uint8Array([66, 65, 68, 85, 84, 70, 56, 226, 226, 161]))), $.stringLen(strings.ToUpper(s)))
-	await $.println(strings.IndexByte(s, 0xe2), strings.Index(s, $.bytesToString(new Uint8Array([226, 161]))), strings.Contains(s, "UTF"))
-	await $.println(strings.ToValidUTF8(s, "?"), strings.ToValidUTF8(s, ""), strings.ToValidUTF8($.bytesToString(new Uint8Array([97, 255, 98, 195])), "[x]"))
+	await $.println($.stringEqual(strings.ToLower(s), "badutf8\xe2\xe2\xa1"), $.stringLen(strings.ToLower(s)))
+	await $.println($.stringEqual(strings.ToUpper(s), "BADUTF8\xe2\xe2\xa1"), $.stringLen(strings.ToUpper(s)))
+	await $.println(strings.IndexByte(s, 0xe2), strings.Index(s, "\xe2\xa1"), strings.Contains(s, "UTF"))
+	await $.println(strings.ToValidUTF8(s, "?"), strings.ToValidUTF8(s, ""), strings.ToValidUTF8("a\xffb\xc3", "[x]"))
 	await $.println(strings.Map($.functionValue((r: number): number => {
 		if (r == 97) {
 			return -1
@@ -73,11 +73,11 @@ export async function main(): globalThis.Promise<void> {
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int32")], results: [/* @__PURE__ */ $.basicType("int32")] } as $.FunctionTypeInfo)), "banana"))
 
 	// decoding at the edges
-	await $.println(utf8.FullRune(new Uint8Array([226, 130]) as $.Slice<number>), utf8.FullRune(new Uint8Array([226, 40]) as $.Slice<number>), utf8.FullRuneInString($.bytesToString(new Uint8Array([226]))))
-	let __goscriptTuple1: any = utf8.DecodeLastRuneInString($.bytesToString(new Uint8Array([195, 169, 169])))
+	await $.println(utf8.FullRune(new Uint8Array([226, 130]) as $.Slice<number>), utf8.FullRune(new Uint8Array([226, 40]) as $.Slice<number>), utf8.FullRuneInString("\xe2"))
+	let __goscriptTuple1: any = utf8.DecodeLastRuneInString("\xc3\xa9\xa9")
 	r = __goscriptTuple1[0]
 	size = __goscriptTuple1[1]
-	await $.println(r, size, utf8.RuneCount(new Uint8Array([237, 160, 128])), utf8.ValidString($.bytesToString(new Uint8Array([237, 160, 128]))))
+	await $.println(r, size, utf8.RuneCount(new Uint8Array([237, 160, 128])), utf8.ValidString("\xed\xa0\x80"))
 	let __goscriptTuple2: any = utf8.DecodeRune(new Uint8Array([240, 159, 152, 128]))
 	r = __goscriptTuple2[0]
 	size = __goscriptTuple2[1]
