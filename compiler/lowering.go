@@ -10138,8 +10138,12 @@ func (o *LoweringOwner) lowerPointerReceiverMethodCall(
 	}
 	receiverExpr, diagnostics := o.lowerExpr(ctx, selector.X)
 	if o.receiverUsesOverridePackage(signature.Recv().Type()) {
-		receiverExpr = o.runtimeOwner.QualifiedHelper(RuntimeHelperPointerValue) +
-			"<" + o.tsTypeFor(ctx, signature.Recv().Type().(*types.Pointer).Elem()) + ">(" + receiverExpr + ")"
+		if nilReceiverOverrideMethods[method.FullName()] {
+			receiverExpr = o.runtimeOwner.QualifiedHelper(RuntimeHelperPointerValueOrNil) + "(" + receiverExpr + ")"
+		} else {
+			receiverExpr = o.runtimeOwner.QualifiedHelper(RuntimeHelperPointerValue) +
+				"<" + o.tsTypeFor(ctx, signature.Recv().Type().(*types.Pointer).Elem()) + ">(" + receiverExpr + ")"
+		}
 	}
 	if receiverExpr == o.namedTypeExpr(ctx, receiver) {
 		call := o.runtimeOwner.QualifiedHelper(RuntimeHelperPointerValue) +
@@ -10712,6 +10716,14 @@ func (o *LoweringOwner) isOverrideFieldValue(ctx lowerFileContext, expr ast.Expr
 	}
 	selection := ctx.semPkg.source.TypesInfo.Selections[selector]
 	return selection != nil && selection.Kind() == types.FieldVal && o.receiverUsesOverridePackage(selection.Recv())
+}
+
+// nilReceiverOverrideMethods are the pointer-receiver methods of override
+// package types that Go defines for a nil receiver, keyed by their full
+// name. Their receiver is passed through unchanged when it is nil, so the
+// override method handles it instead of the call panicking.
+var nilReceiverOverrideMethods = map[string]bool{
+	"(*runtime.Func).Name": true,
 }
 
 func (o *LoweringOwner) receiverUsesOverridePackage(typ types.Type) bool {
