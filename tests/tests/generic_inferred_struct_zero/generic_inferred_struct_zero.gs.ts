@@ -79,7 +79,7 @@ export class tree {
 	constructor(init?: Partial<{less?: ((a: any, b: any) => boolean | globalThis.Promise<boolean>) | null, empty?: any, count?: number}>) {
 		this._fields = {
 			less: init?.less ?? (null! as ((a: any, b: any) => boolean | globalThis.Promise<boolean>) | null),
-			empty: init?.empty ?? (null! as any),
+			empty: init?.empty !== undefined ? $.copyElement(init.empty) : (null! as any),
 			count: init?.count ?? (0 as number)
 		}
 	}

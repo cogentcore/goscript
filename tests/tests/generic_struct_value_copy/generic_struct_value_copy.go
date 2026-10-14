@@ -116,6 +116,18 @@ func main() {
 	b.A.Set(14)
 	println("box:", b.A.V, b.B.V)
 
+	// Copying a generic struct copies its struct-typed fields, so assigning
+	// to a field of the original leaves the copy unchanged.
+	orig := Sides[Value]{Bottom: Value{V: 1}}
+	cp := orig
+	cp.Bottom = Value{V: 2}
+	orig.Bottom = Value{V: 3}
+	println("struct copy:", orig.Bottom.V, cp.Bottom.V)
+	orig2 := Sides[Value]{Top: Value{V: 4}}
+	cp2 := orig2
+	orig2.Top.Set(5)
+	println("struct copy method:", orig2.Top.V, cp2.Top.V)
+
 	var si Sides[int]
 	si.SetAll(4)
 	si.Left = 5

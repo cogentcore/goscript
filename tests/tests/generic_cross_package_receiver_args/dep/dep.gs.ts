@@ -30,7 +30,7 @@ export class Impl {
 
 	constructor(init?: Partial<{Item?: any}>) {
 		this._fields = {
-			Item: init?.Item ?? (null! as any)
+			Item: init?.Item !== undefined ? $.copyElement(init.Item) : (null! as any)
 		}
 	}
 

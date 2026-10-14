@@ -267,8 +267,8 @@ export class LiteralValue {
 
 	constructor(init?: Partial<{Value?: any, Zero?: any}>) {
 		this._fields = {
-			Value: init?.Value ?? (null! as any),
-			Zero: init?.Zero ?? (null! as any)
+			Value: init?.Value !== undefined ? $.copyElement(init.Value) : (null! as any),
+			Zero: init?.Zero !== undefined ? $.copyElement(init.Zero) : (null! as any)
 		}
 	}
 

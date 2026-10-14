@@ -138,7 +138,7 @@ export class GenericChannelStore {
 	constructor(init?: Partial<{ch?: $.Channel<any> | null, value?: any}>) {
 		this._fields = {
 			ch: init?.ch ?? (null! as $.Channel<any> | null),
-			value: init?.value ?? (null! as any)
+			value: init?.value !== undefined ? $.copyElement(init.value) : (null! as any)
 		}
 	}
 

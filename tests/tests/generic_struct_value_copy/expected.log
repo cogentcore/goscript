@@ -8,4 +8,6 @@ append: 8 7
 map: 10 9
 pair: 12 11
 box: 14 13
+struct copy: 3 2
+struct copy method: 5 4
 ints: 4 5

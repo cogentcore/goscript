@@ -3477,21 +3477,22 @@ func (o *LoweringOwner) lowerStructType(ctx lowerFileContext, semType *semanticT
 			runtimeName = field.name
 		}
 		lowered.fields = append(lowered.fields, loweredStructField{
-			name:        fieldName,
-			runtimeName: runtimeName,
-			typ:         o.tsStructFieldTypeFor(ctx, field.typ),
-			zero:        o.lowerZeroValueExprFor(ctx, field.typ),
-			runtimeType: o.runtimeTypeInfoExpr(field.typ),
-			messageType: protobufTypeScriptBindingMessageType(field.typ),
-			doc:         field.doc,
-			tag:         field.tag,
-			pkgPath:     field.pkgPath,
-			index:       field.index,
-			offset:      field.offset,
-			anonymous:   field.embedded,
-			exported:    field.exported,
-			structValue: structValue,
-			arrayValue:  isArrayType(field.typ),
+			name:           fieldName,
+			runtimeName:    runtimeName,
+			typ:            o.tsStructFieldTypeFor(ctx, field.typ),
+			zero:           o.lowerZeroValueExprFor(ctx, field.typ),
+			runtimeType:    o.runtimeTypeInfoExpr(field.typ),
+			messageType:    protobufTypeScriptBindingMessageType(field.typ),
+			doc:            field.doc,
+			tag:            field.tag,
+			pkgPath:        field.pkgPath,
+			index:          field.index,
+			offset:         field.offset,
+			anonymous:      field.embedded,
+			exported:       field.exported,
+			structValue:    structValue,
+			arrayValue:     isArrayType(field.typ),
+			typeParamValue: typeParamMayHoldValueType(field.typ),
 		})
 	}
 

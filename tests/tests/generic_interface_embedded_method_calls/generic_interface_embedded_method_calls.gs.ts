@@ -48,8 +48,8 @@ export class impl {
 
 	constructor(init?: Partial<{value?: any, other?: any}>) {
 		this._fields = {
-			value: init?.value ?? (null! as any),
-			other: init?.other ?? (null! as any)
+			value: init?.value !== undefined ? $.copyElement(init.value) : (null! as any),
+			other: init?.other !== undefined ? $.copyElement(init.other) : (null! as any)
 		}
 	}
 
