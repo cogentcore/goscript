@@ -30,9 +30,7 @@ export class vec {
 			X: init?.X ?? (0 as number),
 			Y: init?.Y ?? (0 as number)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): vec {
@@ -108,9 +106,7 @@ export class holder {
 		this._fields = {
 			v: init?.v ? init.v.clone() : new vec(undefined, true)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): holder {

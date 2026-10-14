@@ -30,9 +30,7 @@ export class Pos {
 			Ln: init?.Ln ?? (0 as number),
 			Ch: init?.Ch ?? (0 as number)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Pos {
@@ -102,9 +100,7 @@ export class Key {
 			On: init?.On ?? (false as boolean),
 			F: init?.F ?? (0 as number)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Key {
@@ -146,9 +142,7 @@ export class Rule {
 		this._fields = {
 			Name: init?.Name ?? ("" as string)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Rule {
@@ -197,9 +191,7 @@ export class ScopeRule {
 			Scope: init?.Scope ? init.Scope.clone() : new Pos(undefined, true),
 			Rule: init?.Rule ?? (null! as Rule | $.VarRef<Rule> | null)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): ScopeRule {

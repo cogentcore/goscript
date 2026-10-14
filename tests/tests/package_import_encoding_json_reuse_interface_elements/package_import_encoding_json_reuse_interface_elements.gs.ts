@@ -36,9 +36,7 @@ export class Node {
 		this._fields = {
 			Name: init?.Name ?? ("" as string)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Node {
@@ -82,9 +80,7 @@ export class Custom {
 		this._fields = {
 			Text: init?.Text ?? ("" as string)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Custom {
@@ -134,9 +130,7 @@ export class Holder {
 		this._fields = {
 			Items: init?.Items ?? (null! as $.Slice<Named | null>)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Holder {

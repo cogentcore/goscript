@@ -26,9 +26,7 @@ export class Inner {
 		this._fields = {
 			X: init?.X ?? (0 as number)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Inner {
@@ -87,9 +85,7 @@ export class arg {
 			Value: init?.Value ?? (null! as any),
 			Tag: init?.Tag ?? ("" as reflect.StructTag)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): arg {
@@ -145,9 +141,7 @@ export class Outer {
 			Inner: init?.Inner ? init.Inner.clone() : new Inner(undefined, true),
 			Name: init?.Name ?? ("" as string)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Outer {

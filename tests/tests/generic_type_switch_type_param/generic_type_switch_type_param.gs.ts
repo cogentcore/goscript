@@ -33,9 +33,7 @@ export class Value {
 			Val: init?.Val ?? (0 as number),
 			Unit: init?.Unit ?? ("" as string)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Value {
@@ -90,9 +88,7 @@ export class Sides {
 			Top: init?.Top !== undefined ? $.copyElement(init.Top) : (null! as any),
 			Right: init?.Right !== undefined ? $.copyElement(init.Right) : (null! as any)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Sides {

@@ -36,9 +36,7 @@ export class Node {
 			Name: init?.Name ?? ("" as string),
 			Size: init?.Size ?? (0 as number)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Node {

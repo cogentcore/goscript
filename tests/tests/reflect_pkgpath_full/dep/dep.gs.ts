@@ -37,9 +37,7 @@ export class Node {
 		this._fields = {
 			Name: init?.Name ?? ("" as string)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Node {
@@ -78,9 +76,7 @@ export class Box {
 		this._fields = {
 			Value: init?.Value !== undefined ? $.copyElement(init.Value) : (null! as any)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Box {
@@ -120,9 +116,7 @@ export function LocalType(): reflect.Type | null {
 			this._fields = {
 				A: init?.A ?? (0 as number)
 			}
-			if (__goscriptValue) {
-				(this as any)[$.structValueMarker] = true
-			}
+			;(this as any)[$.structValueMarker] = __goscriptValue === true
 		}
 
 		public clone(): local {

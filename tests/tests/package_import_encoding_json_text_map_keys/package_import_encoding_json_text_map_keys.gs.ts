@@ -87,9 +87,7 @@ export class Doc {
 			Counts: init?.Counts ?? (null! as globalThis.Map<number, number> | null),
 			Big: init?.Big ?? (null! as globalThis.Map<bigint, string> | null)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Doc {

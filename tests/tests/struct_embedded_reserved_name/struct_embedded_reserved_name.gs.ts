@@ -20,9 +20,7 @@ export class _object {
 		this._fields = {
 			name: init?.name ?? ("" as string)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): _object {
@@ -76,9 +74,7 @@ export class Var {
 			_object: init?._object ? init._object.clone() : new _object(undefined, true),
 			kind: init?.kind ?? (0 as number)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Var {
@@ -122,9 +118,7 @@ export class _number {
 		this._fields = {
 			n: init?.n ?? (0 as number)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): _number {
@@ -173,9 +167,7 @@ export class Holder {
 			_number: init?._number ?? (null! as _number | $.VarRef<_number> | null),
 			_string: init?._string ?? ("" as string)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Holder {

@@ -23,9 +23,7 @@ export class Base {
 		this._fields = {
 			Name: init?.Name ?? ("" as string)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Base {
@@ -84,9 +82,7 @@ export class Node {
 			Base: init?.Base ? init.Base.clone() : new Base(undefined, true),
 			Value: init?.Value ?? (0 as number)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Node {

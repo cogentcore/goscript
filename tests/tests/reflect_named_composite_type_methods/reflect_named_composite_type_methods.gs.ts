@@ -71,9 +71,7 @@ export class Rule {
 		this._fields = {
 			Pattern: init?.Pattern ?? ("" as string)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Rule {
@@ -122,9 +120,7 @@ export class xmlState {
 			Name: init?.Name ?? ("" as string),
 			Rules: init?.Rules ?? (null! as $.Slice<Rule>)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): xmlState {
@@ -164,9 +160,7 @@ export class xmlRules {
 		this._fields = {
 			States: init?.States ?? (null! as $.Slice<xmlState>)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): xmlRules {
@@ -215,9 +209,7 @@ export class Lexer {
 			Name: init?.Name ?? ("" as string),
 			Rules: init?.Rules ?? (null! as Rules)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Lexer {

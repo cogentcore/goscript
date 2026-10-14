@@ -23,9 +23,7 @@ export class S1 {
 		this._fields = {
 			Name: init?.Name ?? ("" as string)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): S1 {
@@ -94,9 +92,7 @@ export class S5 {
 			P: init?.P ?? (null! as S1 | $.VarRef<S1> | null),
 			F: init?.F ?? (null! as (() => void) | null)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): S5 {

@@ -56,9 +56,7 @@ export class Base {
 			hidden: init?.hidden ?? (0 as number),
 			Shadowed: init?.Shadowed ?? ("" as string)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Base {
@@ -100,9 +98,7 @@ export class inner {
 		this._fields = {
 			Deep: init?.Deep ?? (0 as number)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): inner {
@@ -141,9 +137,7 @@ export class Extra {
 		this._fields = {
 			Note: init?.Note ?? ("" as string)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Extra {
@@ -242,9 +236,7 @@ export class Node {
 			Size: init?.Size ?? (0 as number),
 			_private: init?._private ?? (false as boolean)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Node {

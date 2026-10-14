@@ -43,9 +43,7 @@ export class Lex {
 			Name: init?.Name ?? ("" as string),
 			Start: init?.Start ?? (0 as number)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Lex {
@@ -90,9 +88,7 @@ export class Val {
 		this._fields = {
 			N: init?.N ?? (0 as number)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Val {

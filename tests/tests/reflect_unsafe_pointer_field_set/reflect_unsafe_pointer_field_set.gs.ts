@@ -36,9 +36,7 @@ export class config {
 			Name: init?.Name ?? ("" as string),
 			UsesCgo: init?.UsesCgo ?? (false as boolean)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): config {
