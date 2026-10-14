@@ -17,6 +17,14 @@ func main() {
 	println("nil:", fn.Name() == "")
 	println("pc 0:", runtime.FuncForPC(0).Name() == "")
 
+	// Name of a nil Func field of a runtime.Frame, which is an override type.
+	var frame runtime.Frame
+	println("nil frame func:", frame.Func.Name() == "")
+	callers := make([]uintptr, 1)
+	runtime.Callers(1, callers)
+	f, _ := runtime.CallersFrames(callers).Next()
+	println("frame func:", f.Func.Name() != "x")
+
 	var nilFunc func()
 	println("nil func:", funcName(nilFunc) == "")
 	println("hello:", funcName(hello))

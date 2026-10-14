@@ -10157,6 +10157,13 @@ func (o *LoweringOwner) lowerPointerReceiverMethodCall(
 	if receiver != nil && receiver.Obj() != nil && receiver.Obj().Pkg() != nil {
 		pkgPath := receiver.Obj().Pkg().Path()
 		absent := ctx.importPaths[pkgPath] == "" && !o.hasGeneratedImportPackage(ctx.model, pkgPath)
+		// A nil-safe override method is called through its prototype, since
+		// its receiver may be nil, which has no methods to call.
+		if !absent && nilReceiverOverrideMethods[method.FullName()] {
+			callArgs := append([]string{receiverExpr}, args...)
+			call := namedValueExpr(ctx, receiver) + ".prototype." + selector.Sel.Name + ".call(" + strings.Join(callArgs, ", ") + ")"
+			return call, diagnostics, true
+		}
 		if absent || o.isOverrideFieldValue(ctx, selector.X) {
 			call := receiverExpr + "." + methodMemberName(selector.Sel.Name) + "(" + strings.Join(args, ", ") + ")"
 			return call, diagnostics, true
