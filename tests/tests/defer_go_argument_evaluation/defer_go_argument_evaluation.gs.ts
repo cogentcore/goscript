@@ -56,10 +56,20 @@ export class R {
 		await $.println(tag, $.pointerValue<R>(r).A, $.pointerValue<R>(r).B)
 	}
 
+	public Store(): void {
+		const r = this;
+		stored = (r.A * 10) + r.B
+	}
+
+	public Sum(): number {
+		const r = this;
+		return r.A + r.B
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.R",
 		() => new R(),
-		() => [{ name: "Show", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [] }, { name: "ShowPtr", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [], pointerReceiver: true }],
+		() => [{ name: "Show", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [] }, { name: "ShowPtr", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [], pointerReceiver: true }, { name: "Store", args: [], returns: [] }, { name: "Sum", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }],
 		R,
 		() => [{ name: "A", key: "A", type: /* @__PURE__ */ $.basicType("int") }, { name: "B", key: "B", type: /* @__PURE__ */ $.basicType("int") }]
 	)
@@ -67,6 +77,12 @@ export class R {
 
 export async function show(tag: string, r: R): globalThis.Promise<void> {
 	await $.println(tag, r.A, r.B)
+}
+
+export let stored: number = 0
+
+export function __goscript_set_stored(__goscriptValue: number): void {
+	stored = __goscriptValue
 }
 
 export async function value(n: number): globalThis.Promise<number> {
@@ -112,6 +128,9 @@ export async function deferred(): globalThis.Promise<void> {
 	__defer.defer(async () => { await (async (m: number): globalThis.Promise<void> => {
 		await $.println("literal", m)
 	})(__goscriptDeferArg4) })
+	const __goscriptDeferCallee3 = $.functionValue(((__receiver) => () => __receiver.Store())(r), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "main.R.Store-fm")
+	__defer.defer(() => { __goscriptDeferCallee3() })
+	let sum: (() => number | globalThis.Promise<number>) | null = $.functionValue(((__receiver) => () => __receiver.Sum())(r), ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo), "main.R.Sum-fm")
 	r.A = 5
 	n = 6
 	f = $.functionValue(async (tag: string): globalThis.Promise<void> => {
@@ -119,10 +138,12 @@ export async function deferred(): globalThis.Promise<void> {
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string")], results: [] } as $.FunctionTypeInfo))
 	p = new R({A: 30, B: 40})
 	await $.println("body", r.A, n)
+	await $.println("method value", (__goscriptAwait = sum!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 }
 
 export async function main(): globalThis.Promise<void> {
 	await deferred()
+	await $.println("stored", stored)
 	let wg: $.VarRef<sync.WaitGroup> = $.varRef($.markAsStructValue(new sync.WaitGroup()))
 	wg.value.Add(1)
 	let r = $.markAsStructValue(new R({A: 1, B: 2}))
