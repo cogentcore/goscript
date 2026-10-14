@@ -1,0 +1,16 @@
+direct slice true []*main.S1
+a == nil: false
+any slice true []*main.S1
+K slice true []*main.S1
+M map true map[string]int
+P ptr true *main.S1
+F func true func()
+assert: true false
+addr *[]*main.S1 []*main.S1
+addr *map[string]int map[string]int
+addr **main.S1 *main.S1
+addr *func() func()
+addr assert: true 1 x
+int int
+slice []string
+map map[string]int
