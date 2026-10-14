@@ -1,0 +1,7 @@
+sum 3
+bump 2 1
+ptr 3 2
+closure 100 1
+keep 1 50
+field 3 2 1
+via pointer 3 2 1

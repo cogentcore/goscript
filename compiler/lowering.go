@@ -10694,6 +10694,15 @@ func (o *LoweringOwner) lowerMethodReceiverExpr(
 		return receiver, diagnostics
 	}
 	if isStructValueType(receiverType) || isPointerToStructType(receiverType) {
+		// A method that does not modify its value receiver, and does not
+		// suspend while other code could modify the caller's value, is
+		// passed the value without a copy.
+		if method, _ := selection.Obj().(*types.Func); method != nil {
+			if semFn := semanticFunctionFor(ctx.model, method); semFn != nil &&
+				semFn.receiverReadOnly && !o.functionAsync(ctx, method) {
+				return receiver, diagnostics
+			}
+		}
 		return o.lowerStructClone(receiver), diagnostics
 	}
 	if isInterfaceType(receiverType) {

@@ -57,7 +57,7 @@ export class attrs {
 
 export async function main(): globalThis.Promise<void> {
 	let a = $.markAsStructValue(new attrs({packedData: "\x01\x00\x00\x00a\x01\x00\x00\x00b"}))
-	for (let __goscriptRangeTarget0 = $.markAsStructValue($.cloneStructValue(a)).decode(), __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
+	for (let __goscriptRangeTarget0 = a.decode(), __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
 		let s = __goscriptRangeTarget0![__rangeIndex]
 		await $.println(s)
 	}

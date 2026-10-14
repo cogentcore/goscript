@@ -89,7 +89,7 @@ export function unicodeNames(_u3c6: number, _u3b2: number): [number, number] {
 export async function main(): globalThis.Promise<void> {
 	let p = $.markAsStructValue(new Packer())
 	await $.println(blanks(1, "x"))
-	await $.println($.len($.markAsStructValue($.cloneStructValue(p)).pack(null, null, 0)))
+	await $.println($.len(p.pack(null, null, 0)))
 
 	let f: ((_p0: number, _p1: number) => number | globalThis.Promise<number>) | null = $.functionValue((_p0: number, _p1: number): number => {
 		return 9

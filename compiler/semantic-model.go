@@ -384,6 +384,7 @@ func (o *SemanticModelOwner) collectFileDeclarations(
 			position := sourcePosInFile(tokenFile, typed.Name.Pos())
 			semFn := o.addFunction(model, semPkg, fn, position)
 			semFn.hasBody = typed.Body != nil
+			semFn.receiverReadOnly = methodReceiverReadOnly(pkg, typed)
 			semPkg.functionDecls[fn] = typed
 			semPkg.declarations = append(semPkg.declarations, semanticDeclaration{
 				kind:     "func",
@@ -2386,4 +2387,83 @@ func sourcePosFromTokenPosition(pos token.Position) sourcePosition {
 		line:   pos.Line,
 		column: pos.Column,
 	}
+}
+
+// methodReceiverReadOnly reports whether decl is a method with a value
+// receiver whose body never modifies the receiver: it does not assign to the
+// receiver or anything reached from it, increment it, range into it, take
+// its address, or call a pointer receiver method on it or its fields. This
+// includes function literals in the body. A call of such a method can pass
+// the caller's value without copying it, since Go copies values wherever
+// they are stored.
+func methodReceiverReadOnly(pkg *packages.Package, decl *ast.FuncDecl) bool {
+	if pkg == nil || decl == nil || decl.Body == nil || decl.Recv == nil || len(decl.Recv.List) != 1 {
+		return false
+	}
+	field := decl.Recv.List[0]
+	if _, ok := ast.Unparen(field.Type).(*ast.StarExpr); ok {
+		return false
+	}
+	if len(field.Names) == 0 || field.Names[0].Name == "_" {
+		return true
+	}
+	recv := pkg.TypesInfo.Defs[field.Names[0]]
+	if recv == nil {
+		return false
+	}
+	rootIsRecv := func(expr ast.Expr) bool {
+		for {
+			switch typed := ast.Unparen(expr).(type) {
+			case *ast.Ident:
+				return pkg.TypesInfo.Uses[typed] == recv
+			case *ast.SelectorExpr:
+				expr = typed.X
+			case *ast.IndexExpr:
+				expr = typed.X
+			case *ast.StarExpr:
+				expr = typed.X
+			case *ast.SliceExpr:
+				expr = typed.X
+			default:
+				return false
+			}
+		}
+	}
+	readOnly := true
+	ast.Inspect(decl.Body, func(node ast.Node) bool {
+		if !readOnly {
+			return false
+		}
+		switch typed := node.(type) {
+		case *ast.AssignStmt:
+			for _, lhs := range typed.Lhs {
+				if rootIsRecv(lhs) {
+					readOnly = false
+				}
+			}
+		case *ast.IncDecStmt:
+			if rootIsRecv(typed.X) {
+				readOnly = false
+			}
+		case *ast.RangeStmt:
+			if (typed.Key != nil && rootIsRecv(typed.Key)) || (typed.Value != nil && rootIsRecv(typed.Value)) {
+				readOnly = false
+			}
+		case *ast.UnaryExpr:
+			if typed.Op == token.AND && rootIsRecv(typed.X) {
+				readOnly = false
+			}
+		case *ast.SelectorExpr:
+			selection := pkg.TypesInfo.Selections[typed]
+			if selection != nil && selection.Kind() == types.MethodVal && rootIsRecv(typed.X) {
+				if signature, ok := selection.Obj().Type().(*types.Signature); ok && signature.Recv() != nil {
+					if _, ptr := signature.Recv().Type().(*types.Pointer); ptr {
+						readOnly = false
+					}
+				}
+			}
+		}
+		return readOnly
+	})
+	return readOnly
 }

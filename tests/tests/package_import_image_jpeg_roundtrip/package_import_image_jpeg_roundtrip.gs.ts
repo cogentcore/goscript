@@ -49,7 +49,7 @@ export async function main(): globalThis.Promise<void> {
 	let r = $.uint(__goscriptTuple0[0], 32)
 	let g = $.uint(__goscriptTuple0[1], 32)
 	let bb = $.uint(__goscriptTuple0[2], 32)
-	await $.println("bounds:", $.markAsStructValue($.cloneStructValue((await $.pointerValue<Exclude<image.Image, null>>(m).Bounds()))).Dx(), $.markAsStructValue($.cloneStructValue((await $.pointerValue<Exclude<image.Image, null>>(m).Bounds()))).Dy(), "px:", $.uint($.uintShr(r, 8, 32), 32), $.uint($.uintShr(g, 8, 32), 32), $.uint($.uintShr(bb, 8, 32), 32))
+	await $.println("bounds:", (await $.pointerValue<Exclude<image.Image, null>>(m).Bounds()).Dx(), (await $.pointerValue<Exclude<image.Image, null>>(m).Bounds()).Dy(), "px:", $.uint($.uintShr(r, 8, 32), 32), $.uint($.uintShr(g, 8, 32), 32), $.uint($.uintShr(bb, 8, 32), 32))
 }
 
 if ($.isMainScript(import.meta)) {

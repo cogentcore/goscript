@@ -13,7 +13,7 @@ import "@goscript/log/slog/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	let s = $.markAsStructValue($.cloneStructValue(slog.StringValue("hello")))
-	await $.println(slog.Kind_String($.markAsStructValue($.cloneStructValue(s)).Kind()), await $.markAsStructValue($.cloneStructValue(s)).String())
+	await $.println(slog.Kind_String(s.Kind()), await $.markAsStructValue($.cloneStructValue(s)).String())
 	await $.println(await $.markAsStructValue($.cloneStructValue(slog.IntValue(42))).Int64(), await $.markAsStructValue($.cloneStructValue(slog.Int64Value(-7n))).String())
 	await $.println(await $.markAsStructValue($.cloneStructValue(slog.BoolValue(true))).Bool(), await $.markAsStructValue($.cloneStructValue(slog.Float64Value(1.5))).Float64())
 
@@ -22,8 +22,8 @@ export async function main(): globalThis.Promise<void> {
 	await $.println(await $.markAsStructValue($.cloneStructValue(slog.Int("n", 3))).String(), await $.markAsStructValue($.cloneStructValue(slog.Any("x", $.interfaceValue($.arrayToSlice<number>([1, 2]), "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")))))).String())
 
 	let g = $.markAsStructValue($.cloneStructValue(slog.Group("g", $.arrayToSlice<any>([$.interfaceValue($.markAsStructValue($.cloneStructValue(slog.String("a", "x"))), "slog.Attr", "slog.Attr"), $.interfaceValue($.markAsStructValue($.cloneStructValue(slog.Int("b", 2))), "slog.Attr", "slog.Attr")]))))
-	let attrs: $.Slice<slog.Attr> = $.markAsStructValue($.cloneStructValue(g.Value)).Group()
-	await $.println(slog.Kind_String($.markAsStructValue($.cloneStructValue(g.Value)).Kind()), $.len(attrs), $.arrayIndex(attrs!, 0).Key, await $.markAsStructValue($.cloneStructValue($.arrayIndex(attrs!, 1).Value)).Int64())
+	let attrs: $.Slice<slog.Attr> = g.Value.Group()
+	await $.println(slog.Kind_String(g.Value.Kind()), $.len(attrs), $.arrayIndex(attrs!, 0).Key, await $.markAsStructValue($.cloneStructValue($.arrayIndex(attrs!, 1).Value)).Int64())
 	await $.println(await $.markAsStructValue($.cloneStructValue(g)).String())
 	await $.println(await $.markAsStructValue($.cloneStructValue(slog.StringValue("a"))).Equal($.markAsStructValue($.cloneStructValue(slog.StringValue("a")))), await $.markAsStructValue($.cloneStructValue(s)).Equal($.markAsStructValue($.cloneStructValue(slog.StringValue("other")))))
 

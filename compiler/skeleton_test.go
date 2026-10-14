@@ -6012,7 +6012,8 @@ func TestCompilePackagesUnwrapsImportedVarRefValueMethodReceiver(t *testing.T) {
 		t.Fatal(err.Error())
 	}
 	text := string(content)
-	if !strings.Contains(text, "$.cloneStructValue($.pointerValue<dep.Info>(dep.CPU))") {
+	// Enabled does not modify its receiver, so the value is not copied.
+	if !strings.Contains(text, "$.pointerValue<dep.Info>(dep.CPU).Enabled()") {
 		t.Fatalf("missing imported VarRef receiver unwrap:\n%s", text)
 	}
 	if strings.Contains(text, "$.cloneStructValue(dep.CPU))") {

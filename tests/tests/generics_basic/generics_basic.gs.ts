@@ -279,7 +279,7 @@ export async function main(): globalThis.Promise<void> {
 
 	await $.println("=== Generic pair method ===")
 	let pair = $.markAsStructValue(new Pair({First: "left", Second: "right"}))
-	let swapped = ($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(pair)).Swap({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }}))) as Pair)
+	let swapped = ($.markAsStructValue($.cloneStructValue(pair.Swap({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }}))) as Pair)
 	await $.println("pair:", swapped.First, swapped.Second)
 }
 

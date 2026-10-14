@@ -140,10 +140,10 @@ export async function main(): globalThis.Promise<void> {
 	let otherOne = $.markAsStructValue(new ObjectID({hash: $.arrayValue(new Uint8Array([0, 7, 0, 0]))}))
 	let different = $.markAsStructValue(new ObjectID({hash: $.arrayValue(new Uint8Array([0, 0, 7, 0]))}))
 
-	await $.println("zero is zero:", $.markAsStructValue($.cloneStructValue(zero)).IsZero())
-	await $.println("zero valid:", $.markAsStructValue($.cloneStructValue(zero)).Valid())
+	await $.println("zero is zero:", zero.IsZero())
+	await $.println("zero valid:", zero.Valid())
 	await $.println("zero equals zero:", $.structEqual(zero, otherZero))
-	await $.println("one valid:", $.markAsStructValue($.cloneStructValue(one)).Valid())
+	await $.println("one valid:", one.Valid())
 	await $.println("one equals other one:", $.structEqual(one, otherOne))
 	await $.println("one differs:", !$.structEqual(one, different))
 
