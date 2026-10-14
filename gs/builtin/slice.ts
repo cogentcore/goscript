@@ -171,7 +171,13 @@ export function sliceRange<T>(
     return emptySliceRange
   }
 
-  // A slice proxy is its own window.
+  // A window object is its own window, tested first without reading
+  // __meta__ (see sliceLen).
+  if (slice instanceof GoSlice) {
+    return slice
+  }
+
+  // A slice proxy has its window.
   const meta = sliceMeta(slice)
   if (meta !== undefined) {
     return meta
@@ -1034,6 +1040,16 @@ export function sliceLen(
     return 0
   }
 
+  // A window object and a plain array are the common cases, tested first
+  // without reading __meta__, which is slow on the many kinds of objects
+  // seen here. An array proxy (a window viewed as a Go array) has __meta__.
+  if (slice instanceof GoSlice) {
+    return slice.length
+  }
+  if (Array.isArray(slice) && (slice as any).__meta__ === undefined) {
+    return slice.length
+  }
+
   // A slice proxy knows its length.
   const meta = sliceMeta(slice)
   if (meta !== undefined) {
@@ -1722,6 +1738,23 @@ export function arrayIndex<
   if (collection === null || collection === undefined) {
     outOfRangeIndex(index, 0)
   }
+
+  // A window object and a plain array are the common cases, tested first
+  // without reading __meta__ (see sliceLen).
+  if (collection instanceof GoSlice) {
+    if (index < 0 || index >= collection.length) {
+      outOfRangeIndex(index, collection.length)
+    }
+    return collection.backing[collection.offset + index] as ArrayIndexValue<C>
+  }
+  if (Array.isArray(collection) && (collection as any).__meta__ === undefined) {
+    if (index < 0 || index >= collection.length) {
+      outOfRangeIndex(index, collection.length)
+    }
+    return collection[index] as ArrayIndexValue<C>
+  }
+
+  // A slice proxy or byte view with a window reads its backing array.
   const meta = sliceMeta(collection)
   if (meta !== undefined) {
     if (index < 0 || index >= meta.length) {
