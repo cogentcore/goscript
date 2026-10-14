@@ -63,17 +63,18 @@ export class chanReader {
 
 	public async Read(p: $.Slice<number>): globalThis.Promise<[number, $.GoError]> {
 		let r: chanReader | $.VarRef<chanReader> | null = this;
-		if ($.stringEqual($.pointerValue<chanReader>(r).cur, "")) {
-			let __goscriptRecv0 = await $.chanRecvWithOk($.pointerValue<chanReader>(r).ch)
+		const r$ = $.pointerTarget<chanReader>(r)
+		if ($.stringEqual((r$ as chanReader).cur, "")) {
+			let __goscriptRecv0 = await $.chanRecvWithOk((r$ as chanReader).ch)
 			let s = __goscriptRecv0.value
 			let ok = __goscriptRecv0.ok
 			if (!ok) {
 				return [0, io.EOF]
 			}
-			$.pointerValue<chanReader>(r).cur = s
+			;(r$ as chanReader).cur = s
 		}
-		let n = $.copy(p, $.pointerValue<chanReader>(r).cur)
-		$.pointerValue<chanReader>(r).cur = $.sliceStringOrBytes($.pointerValue<chanReader>(r).cur, n, undefined)
+		let n = $.copy(p, (r$ as chanReader).cur);
+		;(r$ as chanReader).cur = $.sliceStringOrBytes((r$ as chanReader).cur, n, undefined)
 		return [n, null]
 	}
 

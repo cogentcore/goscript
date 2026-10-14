@@ -48,9 +48,10 @@ export class FileTracker {
 
 	public async AddLine(offset: number): globalThis.Promise<void> {
 		let f: FileTracker | $.VarRef<FileTracker> | null = this;
-		await $.pointerValue<FileTracker>(f).mutex.Lock()
-		$.pointerValue<FileTracker>(f).lines = $.append($.pointerValue<FileTracker>(f).lines, offset)
-		$.pointerValue<FileTracker>(f).mutex.Unlock()
+		const f$ = $.pointerTarget<FileTracker>(f)
+		await (f$ as FileTracker).mutex.Lock();
+		;(f$ as FileTracker).lines = $.append((f$ as FileTracker).lines, offset)
+		void (f$ as FileTracker).mutex.Unlock()
 	}
 
 	static __typeInfo = $.registerStructType(

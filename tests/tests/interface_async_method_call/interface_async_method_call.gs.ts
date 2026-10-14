@@ -61,9 +61,10 @@ export class ChannelProcessor {
 
 	public async Process(data: number): globalThis.Promise<number> {
 		const p: ChannelProcessor | $.VarRef<ChannelProcessor> | null = this;
+		const p$ = $.pointerTarget<ChannelProcessor>(p)
 		// Channel operation makes this function async
-		await $.chanSend($.pointerValue<ChannelProcessor>(p).ch, data)
-		let result = await $.chanRecv($.pointerValue<ChannelProcessor>(p).ch)
+		await $.chanSend((p$ as ChannelProcessor).ch, data)
+		let result = await $.chanRecv((p$ as ChannelProcessor).ch)
 		return result * 2
 	}
 
@@ -167,8 +168,9 @@ export class GenericChannelStore {
 
 	public async Load(__typeArgs: $.GenericTypeArgs | undefined): globalThis.Promise<any> {
 		const s: GenericChannelStore | $.VarRef<GenericChannelStore> | null = this;
-		await $.chanSend($.pointerValue<GenericChannelStore>(s).ch, $.copyElement($.pointerValue<GenericChannelStore>(s).value))
-		return await $.chanRecv($.pointerValue<GenericChannelStore>(s).ch)
+		const s$ = $.pointerTarget<GenericChannelStore>(s)
+		await $.chanSend((s$ as GenericChannelStore).ch, $.copyElement((s$ as GenericChannelStore).value))
+		return await $.chanRecv((s$ as GenericChannelStore).ch)
 	}
 
 	static __typeInfo = $.registerStructType(

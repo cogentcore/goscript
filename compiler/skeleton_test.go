@@ -3707,7 +3707,7 @@ func TestCompilePackagesAwaitsFmtWriterOverrides(t *testing.T) {
 	for _, want := range []string{
 		"export async function Use",
 		"await fmt.Fprintf(",
-		"$.pointerValue<writer>(w).buf = $.appendSlice($.pointerValue<writer>(w).buf, p, $.byteSliceHint)",
+		";(w$ as writer).buf = $.appendSlice((w$ as writer).buf, p, $.byteSliceHint)",
 		"return err",
 	} {
 		if !strings.Contains(text, want) {
@@ -4096,8 +4096,8 @@ func TestCompilePackagesEmitsAsyncChannelsSelectAndDefer(t *testing.T) {
 		"Process(v: number): number | globalThis.Promise<number>",
 		"public async Process(v: number): globalThis.Promise<number>",
 		"let ch: $.Channel<number> | null = $.makeChannel<number>(1, 0, \"both\")",
-		"await $.chanSend($.pointerValue<Worker>(w).ch, v)",
-		"return await $.chanRecv($.pointerValue<Worker>(w).ch)",
+		"await $.chanSend((w$ as Worker).ch, v)",
+		"return await $.chanRecv((w$ as Worker).ch)",
 		"await using __defer = new $.AsyncDisposableStack()",
 		"queueMicrotask(async () => { await (async (): globalThis.Promise<void> => {",
 		"$.selectStatement<any, void>([",
@@ -5361,7 +5361,7 @@ func TestCompilePackagesPropagatesImmediateFuncLitAsync(t *testing.T) {
 	text := string(content)
 	for _, want := range []string{
 		"public async lookup(): globalThis.Promise<[number, $.GoError]>",
-		"return resolver.prototype.lookup.call($.pointerValue<resolver>(r).parent)",
+		"return resolver.prototype.lookup.call((r$ as resolver).parent)",
 		"export async function use(r: resolver | $.VarRef<resolver> | null): globalThis.Promise<[number, $.GoError]>",
 		"return resolver.prototype.lookup.call(r)",
 	} {
@@ -5546,7 +5546,7 @@ func TestCompilePackagesWidensErrorInterfaceABI(t *testing.T) {
 		// Concrete implementations become async and await inner error
 		// dispatch whose text may resolve on the microtask queue.
 		"public async Error(): globalThis.Promise<string>",
-		", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>($.pointerValue<wrappedError>(w).cause).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))",
+		", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>((w$ as wrappedError).cause).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))",
 	} {
 		if !strings.Contains(text, want) {
 			t.Fatalf("missing %q in generated output:\n%s", want, text)

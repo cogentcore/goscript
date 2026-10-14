@@ -55,18 +55,20 @@ export class AppBase {
 
 	public async FirstName(__typeArgs: $.GenericTypeArgs | undefined): globalThis.Promise<string> {
 		const a: AppBase | $.VarRef<AppBase> | null = this;
-		if ($.sliceLen($.pointerValue<AppBase>(a).Windows) == 0) {
+		const a$ = $.pointerTarget<AppBase>(a)
+		if ($.sliceLen((a$ as AppBase).Windows) == 0) {
 			return ""
 		}
-		return $.callGenericMethod(__typeArgs, "W", "Name", $.arrayIndex($.pointerValue<AppBase>(a).Windows!, 0))
+		return $.callGenericMethod(__typeArgs, "W", "Name", $.arrayIndex((a$ as AppBase).Windows!, 0))
 	}
 
 	public Window(__typeArgs: $.GenericTypeArgs | undefined): Window | null {
 		const a: AppBase | $.VarRef<AppBase> | null = this;
-		if ($.sliceLen($.pointerValue<AppBase>(a).Windows) == 0) {
+		const a$ = $.pointerTarget<AppBase>(a)
+		if ($.sliceLen((a$ as AppBase).Windows) == 0) {
 			return null
 		}
-		return $.typeParamInterfaceValue<Window | null>($.arrayIndex($.pointerValue<AppBase>(a).Windows!, 0), __typeArgs?.["W"] ?? { type: { kind: $.TypeKind.Interface, methods: [$.methodSignature("Name", [], [/* @__PURE__ */ $.basicType("string")])] }, zero: () => null })
+		return $.typeParamInterfaceValue<Window | null>($.arrayIndex((a$ as AppBase).Windows!, 0), __typeArgs?.["W"] ?? { type: { kind: $.TypeKind.Interface, methods: [$.methodSignature("Name", [], [/* @__PURE__ */ $.basicType("string")])] }, zero: () => null })
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -120,7 +122,8 @@ export class WindowBase {
 
 	public async AppWindowName(__typeArgs: $.GenericTypeArgs | undefined): globalThis.Promise<string> {
 		const w: WindowBase | $.VarRef<WindowBase> | null = this;
-		return $.concatString(($.concatString((__goscriptAwait = $.pointerValue<Exclude<Window, null>>((__goscriptAwait = $.callGenericMethod(__typeArgs, "A", "Window", $.pointerValue<WindowBase>(w).App), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)).Name(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), " via ")), (__goscriptAwait = $.callGenericMethod(__typeArgs, "A", "FirstName", $.pointerValue<WindowBase>(w).App), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+		const w$ = $.pointerTarget<WindowBase>(w)
+		return $.concatString(($.concatString((__goscriptAwait = $.pointerValue<Exclude<Window, null>>((__goscriptAwait = $.callGenericMethod(__typeArgs, "A", "Window", (w$ as WindowBase).App), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)).Name(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), " via ")), (__goscriptAwait = $.callGenericMethod(__typeArgs, "A", "FirstName", (w$ as WindowBase).App), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	}
 
 	public Name(__typeArgs: $.GenericTypeArgs | undefined): string {

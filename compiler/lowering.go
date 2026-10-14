@@ -1639,19 +1639,22 @@ func safeParamName(param *types.Var, idx int) string {
 // lowerFileContext carries source and scope facts through lowering.
 type lowerFileContext struct {
 	// tokenFile resolves positions in the current file without a shared FileSet lookup.
-	tokenFile                     *token.File
-	model                         *SemanticModel
-	semPkg                        *semanticPackage
-	file                          *ast.File
-	importAliases                 map[string]string
-	importPaths                   map[string]string
-	importNames                   map[string]string
-	importObjects                 map[*types.PkgName]string
-	sourcePath                    string
-	localAliases                  map[types.Object]string
-	lazyPackageVars               map[types.Object]bool
-	asyncLazy                     *asyncLazyState
-	identAliases                  map[types.Object]string
+	tokenFile       *token.File
+	model           *SemanticModel
+	semPkg          *semanticPackage
+	file            *ast.File
+	importAliases   map[string]string
+	importPaths     map[string]string
+	importNames     map[string]string
+	importObjects   map[*types.PkgName]string
+	sourcePath      string
+	localAliases    map[types.Object]string
+	lazyPackageVars map[types.Object]bool
+	asyncLazy       *asyncLazyState
+	identAliases    map[types.Object]string
+	// pointerTargets names the locals that hold the struct that a pointer
+	// receiver or parameter points to (see pointerTargetLocals).
+	pointerTargets                map[types.Object]string
 	identAliasRefs                map[types.Object]bool
 	tempNames                     *tempNameOwner
 	signature                     *types.Signature
@@ -4008,8 +4011,12 @@ func (o *LoweringOwner) lowerNamedReceiverMethodDecl(
 	}
 	if decl.Body != nil {
 		bodyCtx := functionCtx.withAsyncFunction(async).withProtobufGeneratedSyncFunction(protobufSync).withDeferState(deferState)
+		targets, prelude := o.pointerTargetLocals(bodyCtx, decl, lowered.receiverAlias)
+		if len(targets) != 0 {
+			bodyCtx.pointerTargets = targets
+		}
 		body, diagnostics := o.lowerBlock(bodyCtx, decl.Body)
-		lowered.body = body
+		lowered.body = append(prelude, body...)
 		if deferState.used {
 			lowered.recoverReturn = o.recoverReturnStmt(bodyCtx, signature)
 			if funcBodyUsesRecover(bodyCtx, decl.Body) {
@@ -4166,8 +4173,12 @@ func (o *LoweringOwner) lowerFuncDecl(ctx lowerFileContext, decl *ast.FuncDecl) 
 	}
 	if decl.Body != nil {
 		bodyCtx := functionCtx.withAsyncFunction(async).withProtobufGeneratedSyncFunction(protobufSync).withDeferState(deferState)
+		targets, prelude := o.pointerTargetLocals(bodyCtx, decl, lowered.receiverAlias)
+		if len(targets) != 0 {
+			bodyCtx.pointerTargets = targets
+		}
 		body, diagnostics := o.lowerBlock(bodyCtx, decl.Body)
-		lowered.body = body
+		lowered.body = append(prelude, body...)
 		if deferState.used {
 			lowered.recoverReturn = o.recoverReturnStmt(bodyCtx, signature)
 			if funcBodyUsesRecover(bodyCtx, decl.Body) {
@@ -11416,12 +11427,125 @@ func (o *LoweringOwner) lowerPointerValueExpr(ctx lowerFileContext, expr ast.Exp
 	if ref, diagnostics, ok := o.lowerUnsafePointerRefExpr(ctx, expr); ok {
 		return ref + ".value", diagnostics
 	}
+	if ident, ok := ast.Unparen(expr).(*ast.Ident); ok && ctx.pointerTargets != nil {
+		if target := ctx.pointerTargets[ctx.semPkg.source.TypesInfo.Uses[ident]]; target != "" {
+			return target, nil
+		}
+	}
 	base, diagnostics := o.lowerExpr(ctx, expr)
 	typeArg := ""
 	if pointer, ok := types.Unalias(ctx.semPkg.source.TypesInfo.TypeOf(expr)).Underlying().(*types.Pointer); ok {
 		typeArg = "<" + o.tsTypeFor(ctx, pointer.Elem()) + ">"
 	}
 	return o.runtimeOwner.QualifiedHelper(RuntimeHelperPointerValue) + typeArg + "(" + base + ")", diagnostics
+}
+
+// pointerTargetLocals returns the locals that hold the structs that the
+// pointer receiver and pointer parameters of decl point to, and the
+// statements that set them, for each such pointer that the body never
+// assigns, does not take the address of, and dereferences at least twice. A
+// read or write of a field through the pointer then reads the local rather
+// than calling $.pointerValue each time. A nil pointer's local panics when a
+// field is read or written, as the dereference does.
+func (o *LoweringOwner) pointerTargetLocals(ctx lowerFileContext, decl *ast.FuncDecl, receiverAlias string) (map[types.Object]string, []loweredStmt) {
+	if decl.Body == nil || ctx.semPkg == nil || ctx.semPkg.source == nil {
+		return nil, nil
+	}
+	info := ctx.semPkg.source.TypesInfo
+	candidates := make(map[types.Object]string)
+	addField := func(field *ast.Field, name string) {
+		if len(field.Names) != 1 {
+			return
+		}
+		obj := info.Defs[field.Names[0]]
+		if obj == nil || field.Names[0].Name == "_" || ctx.model.needsVarRef[obj] || !isPointerToStructType(obj.Type()) {
+			return
+		}
+		if ctx.identAliases != nil && ctx.identAliases[obj] != "" {
+			return
+		}
+		candidates[obj] = name
+	}
+	if decl.Recv != nil && len(decl.Recv.List) == 1 && receiverAlias != "" && receiverAlias != "_" {
+		addField(decl.Recv.List[0], receiverAlias)
+	}
+	if decl.Type.Params != nil {
+		for _, field := range decl.Type.Params.List {
+			if len(field.Names) == 1 {
+				addField(field, safeIdentifier(field.Names[0].Name))
+			}
+		}
+	}
+	if len(candidates) == 0 {
+		return nil, nil
+	}
+
+	// Count the dereferences of each candidate and drop those it assigns or
+	// takes the address of, anywhere in the body.
+	uses := make(map[types.Object]int)
+	ast.Inspect(decl.Body, func(node ast.Node) bool {
+		switch typed := node.(type) {
+		case *ast.AssignStmt:
+			for _, lhs := range typed.Lhs {
+				if ident, ok := ast.Unparen(lhs).(*ast.Ident); ok {
+					delete(candidates, info.ObjectOf(ident))
+				}
+			}
+		case *ast.IncDecStmt:
+			if ident, ok := ast.Unparen(typed.X).(*ast.Ident); ok {
+				delete(candidates, info.ObjectOf(ident))
+			}
+		case *ast.RangeStmt:
+			for _, expr := range []ast.Expr{typed.Key, typed.Value} {
+				if ident, ok := expr.(*ast.Ident); ok {
+					delete(candidates, info.ObjectOf(ident))
+				}
+			}
+		case *ast.UnaryExpr:
+			if ident, ok := ast.Unparen(typed.X).(*ast.Ident); ok && typed.Op == token.AND {
+				delete(candidates, info.Uses[ident])
+			}
+		case *ast.SelectorExpr:
+			if ident, ok := ast.Unparen(typed.X).(*ast.Ident); ok {
+				if selection := info.Selections[typed]; selection != nil && selection.Kind() == types.FieldVal {
+					uses[info.Uses[ident]]++
+				}
+			}
+		}
+		return true
+	})
+	var targets map[types.Object]string
+	var prelude []loweredStmt
+	for _, field := range append(append([]*ast.Field{}, fieldsOf(decl.Recv)...), fieldsOf(decl.Type.Params)...) {
+		if len(field.Names) != 1 {
+			continue
+		}
+		obj := info.Defs[field.Names[0]]
+		name, ok := candidates[obj]
+		if !ok || uses[obj] < 2 {
+			continue
+		}
+		if targets == nil {
+			targets = make(map[types.Object]string)
+		}
+		// The local is read through a type assertion, which TypeScript does
+		// not narrow, since calls between reads may change the fields.
+		target := name + "$"
+		targets[obj] = "(" + target + " as " + o.tsTypeFor(ctx, obj.Type().Underlying().(*types.Pointer).Elem()) + ")"
+		elem := obj.Type().Underlying().(*types.Pointer).Elem()
+		prelude = append(prelude, loweredStmt{
+			text: "const " + name + "$ = " + o.runtimeOwner.QualifiedHelper(RuntimeHelperPointerTarget) +
+				"<" + o.tsTypeFor(ctx, elem) + ">(" + name + ")",
+		})
+	}
+	return targets, prelude
+}
+
+func fieldsOf(list *ast.FieldList) []*ast.Field {
+	if list == nil {
+		return nil
+	}
+	return list.List
 }
 
 func (o *LoweringOwner) lowerUnsafeStringPointerValue(ctx lowerFileContext, expr ast.Expr) (string, []Diagnostic, bool) {

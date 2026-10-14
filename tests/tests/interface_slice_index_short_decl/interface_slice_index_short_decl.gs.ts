@@ -95,10 +95,11 @@ export class Action {
 
 	public SetFilter(k: number, v: dep.Ref | null): void {
 		let a: Action | $.VarRef<Action> | null = this;
-		if ($.pointerValue<Action>(a).Filter == null) {
-			$.pointerValue<Action>(a).Filter = $.makeMap<number, dep.Ref | null>()
+		const a$ = $.pointerTarget<Action>(a)
+		if ((a$ as Action).Filter == null) {
+			;(a$ as Action).Filter = $.makeMap<number, dep.Ref | null>()
 		}
-		$.mapSet($.pointerValue<Action>(a).Filter, k, v)
+		$.mapSet((a$ as Action).Filter, k, v)
 	}
 
 	static __typeInfo = $.registerStructType(

@@ -72,8 +72,9 @@ export class iterator {
 
 	public Next(): [frame, boolean] {
 		let it: iterator | $.VarRef<iterator> | null = this;
-		$.pointerValue<iterator>(it).idx++
-		switch ($.pointerValue<iterator>(it).idx) {
+		const it$ = $.pointerTarget<iterator>(it);
+		;(it$ as iterator).idx++
+		switch ((it$ as iterator).idx) {
 			case 1:
 			{
 				return [$.markAsStructValue(new frame({name: "first"})), true]

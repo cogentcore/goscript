@@ -213,7 +213,8 @@ export function makePoint(x: number, y: number, z: number): point | $.VarRef<poi
 }
 
 export function shift(p: point | $.VarRef<point> | null): [point | $.VarRef<point> | null, point | $.VarRef<point> | null, point | $.VarRef<point> | null] {
-	return [new point({x: $.pointerValue<point>(p).x + 1, y: $.pointerValue<point>(p).y}), new point({x: $.pointerValue<point>(p).x + 2, y: $.pointerValue<point>(p).y}), new point({x: $.pointerValue<point>(p).x + 3, y: $.pointerValue<point>(p).y})]
+	const p$ = $.pointerTarget<point>(p)
+	return [new point({x: (p$ as point).x + 1, y: (p$ as point).y}), new point({x: (p$ as point).x + 2, y: (p$ as point).y}), new point({x: (p$ as point).x + 3, y: (p$ as point).y})]
 }
 
 export function newTab(name: string): [frame | $.VarRef<frame> | null, tab | $.VarRef<tab> | null] {

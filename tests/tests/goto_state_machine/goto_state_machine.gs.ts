@@ -56,17 +56,19 @@ export class scanner {
 
 	public readByte(): number {
 		let s: scanner | $.VarRef<scanner> | null = this;
-		if ($.pointerValue<scanner>(s).pos >= $.stringLen($.pointerValue<scanner>(s).data)) {
-			$.pointerValue<scanner>(s).done = true
+		const s$ = $.pointerTarget<scanner>(s)
+		if ((s$ as scanner).pos >= $.stringLen((s$ as scanner).data)) {
+			;(s$ as scanner).done = true
 			return 0
 		}
-		let c = $.uint($.indexString($.pointerValue<scanner>(s).data, $.pointerValue<scanner>(s).pos), 8)
-		$.pointerValue<scanner>(s).pos++
+		let c = $.uint($.indexString((s$ as scanner).data, (s$ as scanner).pos), 8);
+		;(s$ as scanner).pos++
 		return $.uint(c, 8)
 	}
 
 	public readScript(): number {
 		const s: scanner | $.VarRef<scanner> | null = this;
+		const s$ = $.pointerTarget<scanner>(s)
 		let c: number = 0
 
 		let __goscriptGotoState0 = "scriptData"
@@ -75,8 +77,8 @@ export class scanner {
 				case "scriptData":
 				{
 					c = $.uint(scanner.prototype.readByte.call(s), 8)
-					if ($.pointerValue<scanner>(s).done) {
-						return $.pointerValue<scanner>(s).pos
+					if ((s$ as scanner).done) {
+						return (s$ as scanner).pos
 					}
 					if ($.uint(c, 8) == 60) {
 						__goscriptGotoState0 = "scriptDataLessThanSign"
@@ -91,8 +93,8 @@ export class scanner {
 				case "scriptDataLessThanSign":
 				{
 					c = $.uint(scanner.prototype.readByte.call(s), 8)
-					if ($.pointerValue<scanner>(s).done) {
-						return $.pointerValue<scanner>(s).pos
+					if ((s$ as scanner).done) {
+						return (s$ as scanner).pos
 					}
 					switch (c) {
 						case 47:
@@ -116,7 +118,7 @@ export class scanner {
 				}
 				case "scriptDataEndTagOpen":
 				{
-					return $.pointerValue<scanner>(s).pos - 2
+					return (s$ as scanner).pos - 2
 					__goscriptGotoState0 = "scriptDataEscapeStart"
 					continue __goscriptGotoLoop0
 					break
@@ -125,8 +127,8 @@ export class scanner {
 				{
 					for (var i = 0; i < 2; i++) {
 						c = $.uint(scanner.prototype.readByte.call(s), 8)
-						if ($.pointerValue<scanner>(s).done) {
-							return $.pointerValue<scanner>(s).pos
+						if ((s$ as scanner).done) {
+							return (s$ as scanner).pos
 						}
 						if ($.uint(c, 8) != 45) {
 							__goscriptGotoState0 = "scriptData"
@@ -142,8 +144,8 @@ export class scanner {
 				case "scriptDataEscaped":
 				{
 					c = $.uint(scanner.prototype.readByte.call(s), 8)
-					if ($.pointerValue<scanner>(s).done) {
-						return $.pointerValue<scanner>(s).pos
+					if ((s$ as scanner).done) {
+						return (s$ as scanner).pos
 					}
 					switch (c) {
 						case 45:
@@ -162,8 +164,8 @@ export class scanner {
 				case "scriptDataEscapedDash":
 				{
 					c = $.uint(scanner.prototype.readByte.call(s), 8)
-					if ($.pointerValue<scanner>(s).done) {
-						return $.pointerValue<scanner>(s).pos
+					if ((s$ as scanner).done) {
+						return (s$ as scanner).pos
 					}
 					if ($.uint(c, 8) == 45) {
 						c = $.uint(scanner.prototype.readByte.call(s), 8)

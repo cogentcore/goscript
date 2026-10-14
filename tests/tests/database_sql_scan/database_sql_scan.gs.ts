@@ -165,11 +165,12 @@ export class rows {
 
 	public Next(dest: $.Slice<driver.Value | null>): $.GoError {
 		let r: rows | $.VarRef<rows> | null = this;
-		if ($.pointerValue<rows>(r).done) {
+		const r$ = $.pointerTarget<rows>(r)
+		if ((r$ as rows).done) {
 			return io.EOF
 		}
-		$.pointerValue<rows>(r).done = true
-		if ($.pointerValue<rows>(r).blob) {
+		;(r$ as rows).done = true
+		if ((r$ as rows).blob) {
 			dest![0] = $.interfaceValue<driver.Value | null>(new Uint8Array([100, 117, 114, 97, 98, 108, 101]), "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")))
 		} else {
 			dest![0] = $.basicInterfaceValue(42n, "int64")
@@ -222,10 +223,11 @@ export class columnRows {
 
 	public NextRow(): $.GoError {
 		let r: columnRows | $.VarRef<columnRows> | null = this;
-		if ($.pointerValue<columnRows>(r).rows.done) {
+		const r$ = $.pointerTarget<columnRows>(r)
+		if ((r$ as columnRows).rows.done) {
 			return io.EOF
 		}
-		$.pointerValue<columnRows>(r).rows.done = true
+		;(r$ as columnRows).rows.done = true
 		return null
 	}
 

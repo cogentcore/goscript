@@ -34,8 +34,9 @@ export class Worker {
 
 	public async lookup(network: string): globalThis.Promise<number> {
 		const w: Worker | $.VarRef<Worker> | null = this;
-		await $.chanSend($.pointerValue<Worker>(w).ch, $.stringLen(network))
-		return await $.chanRecv($.pointerValue<Worker>(w).ch)
+		const w$ = $.pointerTarget<Worker>(w)
+		await $.chanSend((w$ as Worker).ch, $.stringLen(network))
+		return await $.chanRecv((w$ as Worker).ch)
 	}
 
 	static __typeInfo = $.registerStructType(

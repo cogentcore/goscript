@@ -68,12 +68,13 @@ export class segmentedReader {
 
 	public Read(p: $.Slice<number>): [number, $.GoError] {
 		let r: segmentedReader | $.VarRef<segmentedReader> | null = this;
-		if ($.pointerValue<segmentedReader>(r).offset >= $.sliceLen($.pointerValue<segmentedReader>(r).data)) {
+		const r$ = $.pointerTarget<segmentedReader>(r)
+		if ((r$ as segmentedReader).offset >= $.sliceLen((r$ as segmentedReader).data)) {
 			return [0, io.EOF]
 		}
-		let n = (() => { const __goscriptMinMax0 = $.pointerValue<segmentedReader>(r).step; const __goscriptMinMax1 = $.sliceLen(p); const __goscriptMinMax2 = $.sliceLen($.pointerValue<segmentedReader>(r).data) - $.pointerValue<segmentedReader>(r).offset; let __goscriptMinMax3 = __goscriptMinMax0; __goscriptMinMax3 = $.min(__goscriptMinMax3, __goscriptMinMax1); __goscriptMinMax3 = $.min(__goscriptMinMax3, __goscriptMinMax2); return __goscriptMinMax3 })()
-		$.copy(p, $.goSlice($.pointerValue<segmentedReader>(r).data, $.pointerValue<segmentedReader>(r).offset, $.pointerValue<segmentedReader>(r).offset + n))
-		$.pointerValue<segmentedReader>(r).offset = $.pointerValue<segmentedReader>(r).offset + (n)
+		let n = (() => { const __goscriptMinMax0 = (r$ as segmentedReader).step; const __goscriptMinMax1 = $.sliceLen(p); const __goscriptMinMax2 = $.sliceLen((r$ as segmentedReader).data) - (r$ as segmentedReader).offset; let __goscriptMinMax3 = __goscriptMinMax0; __goscriptMinMax3 = $.min(__goscriptMinMax3, __goscriptMinMax1); __goscriptMinMax3 = $.min(__goscriptMinMax3, __goscriptMinMax2); return __goscriptMinMax3 })()
+		$.copy(p, $.goSlice((r$ as segmentedReader).data, (r$ as segmentedReader).offset, (r$ as segmentedReader).offset + n));
+		;(r$ as segmentedReader).offset = (r$ as segmentedReader).offset + (n)
 		return [n, null]
 	}
 

@@ -133,7 +133,8 @@ export class nestedSealer {
 
 	public async Seal(dst: $.Slice<number>, plaintext: $.Slice<number>): globalThis.Promise<$.Slice<number>> {
 		const s: nestedSealer | $.VarRef<nestedSealer> | null = this;
-		return $.pointerValue<Exclude<cipher.AEAD, null>>($.pointerValue<nestedSealer>(s).aead).Seal(dst, $.pointerValue<nestedSealer>(s).nonce, plaintext, $.pointerValue<nestedSealer>(s).aad)
+		const s$ = $.pointerTarget<nestedSealer>(s)
+		return $.pointerValue<Exclude<cipher.AEAD, null>>((s$ as nestedSealer).aead).Seal(dst, (s$ as nestedSealer).nonce, plaintext, (s$ as nestedSealer).aad)
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -210,7 +211,7 @@ export async function main(): globalThis.Promise<void> {
 	let expected: $.Slice<number> = await $.pointerValue<Exclude<cipher.AEAD, null>>(aead).Seal(null, nonce, plaintext, aad)
 	$.copy($.goSlice(packet, 15, undefined), plaintext)
 	let sealer = $.interfaceValue<packetSealer | null>(new nestedSealer({aead: aead, nonce: nonce, aad: aad}), "*main.nestedSealer", /* @__PURE__ */ $.pointerType("main.nestedSealer"));
-	(__goscriptAwait = $.pointerValue<Exclude<packetSealer, null>>(sealer).Seal($.goSlice(packet, 15, 15), $.goSlice(packet, 15, 15 + $.sliceLen(plaintext))), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+	;(__goscriptAwait = $.pointerValue<Exclude<packetSealer, null>>(sealer).Seal($.goSlice(packet, 15, 15), $.goSlice(packet, 15, 15 + $.sliceLen(plaintext))), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 	packet = $.goSlice(packet, undefined, $.sliceLen(packet) + (__goscriptAwait = $.pointerValue<Exclude<cipher.AEAD, null>>(aead).Overhead(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	await $.println("wrapped shared backing:", bytes.Equal($.goSlice(packet, 15, 15 + $.sliceLen(expected)), expected))
 

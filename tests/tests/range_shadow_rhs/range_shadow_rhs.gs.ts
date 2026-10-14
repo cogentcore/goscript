@@ -83,8 +83,9 @@ export class item {
 
 	public increment(): number {
 		let i: item | $.VarRef<item> | null = this;
-		$.pointerValue<item>(i).value++
-		return $.pointerValue<item>(i).value
+		const i$ = $.pointerTarget<item>(i);
+		;(i$ as item).value++
+		return (i$ as item).value
 	}
 
 	static __typeInfo = $.registerStructType(
