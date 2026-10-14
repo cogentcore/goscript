@@ -2444,63 +2444,33 @@ export const rangeString = (str: string): Array<[number, number]> => {
 export class StringRunes {
   index = 0
   rune = 0
-  // str is the string, and bytes its Go bytes for a byte string.
+  // str is the string, and pos the byte offset of its next rune.
   private readonly str: string
-  private readonly bytes: Uint8Array | null
-  // pos is the position of the next rune in str (UTF-16 units) or bytes,
-  // and offset its UTF-8 byte offset.
   private pos = 0
-  private offset = 0
 
   constructor(str: string) {
     this.str = str
-    this.bytes = stringRuneBytes(str)
   }
 
   next(): boolean {
-    // A byte string decodes its bytes.
-    if (this.bytes !== null) {
-      return this.nextByte(this.bytes)
-    }
-
-    // The next rune is one UTF-16 unit or a surrogate pair.
+    // The string ends after its last byte.
     const str = this.str
     const pos = this.pos
     if (pos >= str.length) {
       return false
     }
-    let r = str.charCodeAt(pos)
-    let units = 1
-    if (r >= 0xd800 && r <= 0xdbff && pos + 1 < str.length) {
-      const low = str.charCodeAt(pos + 1)
-      if (low >= 0xdc00 && low <= 0xdfff) {
-        r = 0x10000 + ((r - 0xd800) << 10) + (low - 0xdc00)
-        units = 2
-      }
-    }
 
-    // The UTF-8 length of the rune follows from its code point; a lone
-    // surrogate takes three bytes, as U+FFFD does.
-    this.index = this.offset
-    this.rune = r
-    this.pos = pos + units
-    this.offset +=
-      r < 0x80 ? 1
-      : r < 0x800 ? 2
-      : r < 0x10000 ? 3
-      : 4
-    return true
-  }
-
-  // nextByte moves to the next rune of the Go bytes of a byte string.
-  private nextByte(bytes: Uint8Array): boolean {
-    if (this.pos >= bytes.length) {
-      return false
+    // An ASCII byte is its own rune, and other runes are decoded.
+    this.index = pos
+    const c = str.charCodeAt(pos)
+    if (c < 0x80) {
+      this.rune = c
+      this.pos = pos + 1
+      return true
     }
-    const [r, size] = decodeRune(bytes, this.pos)
-    this.index = this.pos
+    const [r, size] = decodeRuneInString(str, pos)
     this.rune = r
-    this.pos += size
+    this.pos = pos + size
     return true
   }
 }
