@@ -31,7 +31,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println(emptyStringFromRunes)
 
 	// === []rune(string) and string([]rune) Round Trip ===
-	let originalString = "你好世界"
+	let originalString = "\xe4\xbd\xa0\xe5\xa5\xbd\xe4\xb8\x96\xe7\x95\x8c"
 	let runesFromString: $.Slice<number> = $.stringToRunes(originalString)
 	let stringFromRunes = $.runesToString(runesFromString)
 	await $.println(originalString)
@@ -51,15 +51,15 @@ export async function main(): globalThis.Promise<void> {
 	let bytes: $.Slice<number> = new Uint8Array([72, 101, 108, 108, 111]) as $.Slice<number>
 	let bytesString = $.bytesToString(bytes)
 	await $.println(bytesString)
-	await $.println($.stringEqual($.bytesToString(new Uint8Array([234, 8, 0]) as $.Slice<number>), $.bytesToString(new Uint8Array([234, 8, 0]))))
-	await $.println($.stringEqual($.bytesToString(new Uint8Array([195, 169]) as $.Slice<number>), "é"))
-	const magic: string = $.bytesToString(new Uint8Array([255, 6, 0, 0, 83, 50, 115, 84, 119, 79]))
+	await $.println($.stringEqual($.bytesToString(new Uint8Array([234, 8, 0]) as $.Slice<number>), "\xea\x08\x00"))
+	await $.println($.stringEqual($.bytesToString(new Uint8Array([195, 169]) as $.Slice<number>), "\xc3\xa9"))
+	const magic: string = "\xff\x06\x00\x00S2sTwO"
 	await $.println((10 as number) == 10)
 	let magicBytes: $.Slice<number> = new Uint8Array([255, 6, 0, 0, 83, 50, 115, 84, 119, 79])
 	await $.println($.sliceLen(magicBytes) == 10)
 	await $.println($.arrayIndex(magicBytes!, 0) == 255)
 	await $.println($.arrayIndex(magicBytes!, 1) == 6)
-	await $.println($.stringEqual($.bytesToString(magicBytes), $.bytesToString(new Uint8Array([255, 6, 0, 0, 83, 50, 115, 84, 119, 79]))))
+	await $.println($.stringEqual($.bytesToString(magicBytes), "\xff\x06\x00\x00S2sTwO"))
 	await $.println((2 as number) == 2)
 	let utf8Bytes: $.Slice<number> = new Uint8Array([195, 169])
 	await $.println($.sliceLen(utf8Bytes) == 2)
@@ -90,10 +90,10 @@ export async function main(): globalThis.Promise<void> {
 	let surrogate: number = 0xd800
 	let negative: number = -1
 	let tooBig: number = 0x110000
-	await $.println($.stringEqual($.runeToString(surrogate), "�"), $.stringEqual($.runeToString(negative), "�"), $.stringEqual($.runeToString(tooBig), "�"))
+	await $.println($.stringEqual($.runeToString(surrogate), "\xef\xbf\xbd"), $.stringEqual($.runeToString(negative), "\xef\xbf\xbd"), $.stringEqual($.runeToString(tooBig), "\xef\xbf\xbd"))
 	let wide: bigint = 128512n
 	let wideBad: bigint = 1099511627776n
-	await $.println($.stringEqual($.runeToString($.int(wide, 32)), "😀"), $.stringEqual($.runeToString(wide), "😀"), $.stringEqual($.runeToString(wideBad), "�"))
+	await $.println($.stringEqual($.runeToString($.int(wide, 32)), "\xf0\x9f\x98\x80"), $.stringEqual($.runeToString(wide), "\xf0\x9f\x98\x80"), $.stringEqual($.runeToString(wideBad), "\xef\xbf\xbd"))
 }
 
 if ($.isMainScript(import.meta)) {

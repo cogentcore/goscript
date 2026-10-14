@@ -3,7 +3,7 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
-export const lookup: string = $.bytesToString(new Uint8Array([0, 255, 7, 228, 189, 160]))
+export const lookup: string = "\x00\xff\x07\xe4\xbd\xa0"
 
 export async function main(): globalThis.Promise<void> {
 	let myStr1 = "testing"
@@ -11,7 +11,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("Byte from myStr1[2]:", $.indexString(myStr1, 2))
 	await $.println("Byte from myStr1[6]:", $.indexString(myStr1, 6))
 
-	let myStr2 = "你好世界"
+	let myStr2 = "\xe4\xbd\xa0\xe5\xa5\xbd\xe4\xb8\x96\xe7\x95\x8c"
 	// String indexing returns UTF-8 bytes, not Unicode code points.
 	await $.println("Byte from myStr2[0]:", $.indexString(myStr2, 0))
 	await $.println("Byte from myStr2[1]:", $.indexString(myStr2, 1))
