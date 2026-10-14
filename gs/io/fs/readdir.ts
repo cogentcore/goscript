@@ -97,9 +97,13 @@ export async function ReadDir(
     ;[list, err] = await dir!.ReadDir(-1)
     if (list) {
       list.sort((a: DirEntry, b: DirEntry): number => {
-        return $.pointerValue<Exclude<DirEntry, null>>(a)
-          .Name()
-          .localeCompare($.pointerValue<Exclude<DirEntry, null>>(b).Name())
+        const x = $.pointerValue<Exclude<DirEntry, null>>(a).Name()
+        const y = $.pointerValue<Exclude<DirEntry, null>>(b).Name()
+        return (
+          x < y ? -1
+          : x > y ? 1
+          : 0
+        )
       })
     }
     return [list, err]

@@ -69,17 +69,17 @@ export class Value {
 
   public Get(p: string): Value {
     this.requireObject('Value.Get')
-    return new Value({ raw: Reflect.get(this._raw as object, p) })
+    return new Value({ raw: Reflect.get(this._raw as object, $.jsString(p)) })
   }
 
   public Set(p: string, x: unknown): void {
     this.requireObject('Value.Set')
-    Reflect.set(this._raw as object, p, ValueOf(x)._raw)
+    Reflect.set(this._raw as object, $.jsString(p), ValueOf(x)._raw)
   }
 
   public Delete(p: string): void {
     this.requireObject('Value.Delete')
-    Reflect.deleteProperty(this._raw as object, p)
+    Reflect.deleteProperty(this._raw as object, $.jsString(p))
   }
 
   public Index(i: number): Value {
@@ -99,6 +99,7 @@ export class Value {
 
   public Call(m: string, ...args: unknown[]): Value {
     this.requireObject('Value.Call')
+    m = $.jsString(m)
     const fn = Reflect.get(this._raw as object, m)
     if (typeof fn !== 'function') {
       $.panic(
@@ -163,7 +164,8 @@ export class Value {
   public String(): string {
     switch (this.Type()) {
       case TypeString:
-        return this._raw as string
+        // JavaScript text becomes a Go string of its UTF-8 bytes.
+        return $.goString(this._raw as string)
       case TypeUndefined:
         return '<undefined>'
       case TypeNull:
@@ -419,12 +421,12 @@ export function ValueOf(x: unknown): Value {
   if (x === null || x === undefined) {
     return Null()
   }
-  if (
-    typeof x === 'boolean' ||
-    typeof x === 'number' ||
-    typeof x === 'string'
-  ) {
+  if (typeof x === 'boolean' || typeof x === 'number') {
     return new Value({ raw: x })
+  }
+  if (typeof x === 'string') {
+    // A Go string becomes JavaScript text.
+    return new Value({ raw: $.jsString(x) })
   }
   if (typeof x === 'bigint') {
     return new Value({ raw: Number(x) })
@@ -438,7 +440,8 @@ export function ValueOf(x: unknown): Value {
   if (x instanceof Map) {
     const out: Record<string, unknown> = {}
     for (const [key, value] of x.entries()) {
-      out[String(key)] = ValueOf(value)._raw
+      out[typeof key === 'string' ? $.jsString(key) : String(key)] =
+        ValueOf(value)._raw
     }
     return new Value({ raw: out })
   }

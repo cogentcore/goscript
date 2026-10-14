@@ -5,6 +5,17 @@ import * as $ from '@goscript/builtin/index.js'
 import { Error as JSError, ValueOf } from './index.js'
 
 describe('syscall/js override', () => {
+  test('converts Go strings to and from JavaScript text', () => {
+    const goStr = $.goString('héllo 😀')
+    const value = ValueOf(goStr)
+    expect(value._raw).toBe('héllo 😀')
+    expect(value.String()).toBe(goStr)
+    const obj = ValueOf({})
+    obj.Set($.goString('clé'), goStr)
+    expect((obj._raw as Record<string, unknown>)['clé']).toBe('héllo 😀')
+    expect(obj.Get($.goString('clé')).String()).toBe(goStr)
+  })
+
   test('ValueOf unwraps generated interface numeric boxes', () => {
     const value = ValueOf(
       $.namedValueInterfaceValue(
