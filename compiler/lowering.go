@@ -1653,8 +1653,11 @@ type lowerFileContext struct {
 	asyncLazy       *asyncLazyState
 	identAliases    map[types.Object]string
 	// pointerTargets names the locals that hold the struct that a pointer
-	// receiver or parameter points to (see pointerTargetLocals).
-	pointerTargets                map[types.Object]string
+	// receiver, parameter or local points to (see pointerTargetLocals).
+	pointerTargets map[types.Object]string
+	// pointerTargetDecls lists the pointer locals in pointerTargets that
+	// each statement declares.
+	pointerTargetDecls            map[ast.Stmt][]*ast.Ident
 	identAliasRefs                map[types.Object]bool
 	tempNames                     *tempNameOwner
 	signature                     *types.Signature
@@ -4025,9 +4028,10 @@ func (o *LoweringOwner) lowerNamedReceiverMethodDecl(
 	}
 	if decl.Body != nil {
 		bodyCtx := functionCtx.withAsyncFunction(async).withProtobufGeneratedSyncFunction(protobufSync).withDeferState(deferState)
-		targets, prelude := o.pointerTargetLocals(bodyCtx, decl, lowered.receiverAlias)
+		targets, targetDecls, prelude := o.pointerTargetLocals(bodyCtx, decl, lowered.receiverAlias)
 		if len(targets) != 0 {
 			bodyCtx.pointerTargets = targets
+			bodyCtx.pointerTargetDecls = targetDecls
 		}
 		body, diagnostics := o.lowerBlock(bodyCtx, decl.Body)
 		lowered.body = append(prelude, body...)
@@ -4187,9 +4191,10 @@ func (o *LoweringOwner) lowerFuncDecl(ctx lowerFileContext, decl *ast.FuncDecl) 
 	}
 	if decl.Body != nil {
 		bodyCtx := functionCtx.withAsyncFunction(async).withProtobufGeneratedSyncFunction(protobufSync).withDeferState(deferState)
-		targets, prelude := o.pointerTargetLocals(bodyCtx, decl, lowered.receiverAlias)
+		targets, targetDecls, prelude := o.pointerTargetLocals(bodyCtx, decl, lowered.receiverAlias)
 		if len(targets) != 0 {
 			bodyCtx.pointerTargets = targets
+			bodyCtx.pointerTargetDecls = targetDecls
 		}
 		body, diagnostics := o.lowerBlock(bodyCtx, decl.Body)
 		lowered.body = append(prelude, body...)
@@ -4642,13 +4647,13 @@ func (o *LoweringOwner) lowerStmtInto(ctx lowerFileContext, stmt ast.Stmt, out [
 				stmts = append(stmts, loweredStmt{text: strings.TrimRight(b.String(), "\n")})
 			}
 		}
-		return append(out, stmts...), diagnostics
+		return o.appendPointerTargetDecls(ctx, typed, append(out, stmts...)), diagnostics
 	case *ast.BlockStmt:
 		body, diagnostics := o.lowerBlock(ctx, typed)
 		return append(out, loweredStmt{hasBlock: true, children: body}), diagnostics
 	case *ast.AssignStmt:
 		stmts, diagnostics := o.lowerAssignStmt(ctx, typed)
-		return append(out, stmts...), diagnostics
+		return o.appendPointerTargetDecls(ctx, typed, append(out, stmts...)), diagnostics
 	case *ast.SendStmt:
 		text, diagnostics := o.lowerSendStmt(ctx, typed)
 		return append(out, loweredStmt{text: text}), diagnostics
@@ -11970,7 +11975,8 @@ func (o *LoweringOwner) lowerPointerValueExpr(ctx lowerFileContext, expr ast.Exp
 		return ref + ".value", diagnostics
 	}
 	if ident, ok := ast.Unparen(expr).(*ast.Ident); ok && ctx.pointerTargets != nil {
-		if target := ctx.pointerTargets[ctx.semPkg.source.TypesInfo.Uses[ident]]; target != "" {
+		obj := ctx.semPkg.source.TypesInfo.Uses[ident]
+		if target := ctx.pointerTargets[obj]; target != "" && ctx.identAliases[obj] == "" {
 			return target, nil
 		}
 	}
@@ -11982,81 +11988,225 @@ func (o *LoweringOwner) lowerPointerValueExpr(ctx lowerFileContext, expr ast.Exp
 	return o.runtimeOwner.QualifiedHelper(RuntimeHelperPointerValue) + typeArg + "(" + base + ")", diagnostics
 }
 
-// pointerTargetLocals returns the locals that hold the structs that the
-// pointer receiver and pointer parameters of decl point to, and the
-// statements that set them, for each such pointer that the body never
-// assigns, does not take the address of, and dereferences at least twice. A
-// read or write of a field through the pointer then reads the local rather
-// than calling $.pointerValue each time. A nil pointer's local panics when a
-// field is read or written, as the dereference does.
-func (o *LoweringOwner) pointerTargetLocals(ctx lowerFileContext, decl *ast.FuncDecl, receiverAlias string) (map[types.Object]string, []loweredStmt) {
+// pointerTargetLocals returns the locals that hold the structs that pointers
+// to structs point to, and the statements that set those of the pointer
+// receiver and parameters of decl. The pointers are the receiver, the
+// parameters, and the locals that a statement of the body declares, that the
+// body never assigns, does not take the address of, and dereferences at least
+// twice. A read or write of a field through the pointer then reads the local
+// rather than calling $.pointerValue each time. A nil pointer's local panics
+// when a field is read or written, as the dereference does. The locals of
+// declared pointers are set after their declarations (see
+// appendPointerTargetDecls), from the statements that decls maps.
+func (o *LoweringOwner) pointerTargetLocals(ctx lowerFileContext, decl *ast.FuncDecl, receiverAlias string) (map[types.Object]string, map[ast.Stmt][]*ast.Ident, []loweredStmt) {
 	// A function without a body or syntax has nothing to analyze.
 	if decl.Body == nil || ctx.semPkg == nil || ctx.semPkg.source == nil {
-		return nil, nil
+		return nil, nil, nil
 	}
 
-	// The candidates are the receiver and parameters that are pointers to
-	// structs, held in no variable reference or alias.
-	info := ctx.semPkg.source.TypesInfo
+	// The candidates are the receiver and parameters, and the locals that
+	// statements declare, that are pointers to structs.
 	candidates := make(map[types.Object]string)
-	addField := func(field *ast.Field, name string) {
-		// A field declares one named variable.
-		if len(field.Names) != 1 {
-			return
+	addParam := func(field *ast.Field, name string) {
+		if len(field.Names) == 1 {
+			o.addPointerTargetCandidate(ctx, candidates, field.Names[0], name)
 		}
-
-		// The variable is a plain pointer to a struct.
-		obj := info.Defs[field.Names[0]]
-		if obj == nil || field.Names[0].Name == "_" || ctx.model.needsVarRef[obj] || !isPointerToStructType(obj.Type()) {
-			return
-		}
-
-		// A variable read through an alias is left alone.
-		if ctx.identAliases != nil && ctx.identAliases[obj] != "" {
-			return
-		}
-		candidates[obj] = name
 	}
-
-	// The receiver and the parameters are the candidates.
 	if decl.Recv != nil && len(decl.Recv.List) == 1 && receiverAlias != "" && receiverAlias != "_" {
-		addField(decl.Recv.List[0], receiverAlias)
+		addParam(decl.Recv.List[0], receiverAlias)
 	}
-	if decl.Type.Params != nil {
-		for _, field := range decl.Type.Params.List {
-			if len(field.Names) == 1 {
-				addField(field, safeIdentifier(field.Names[0].Name))
+	for _, field := range fieldsOf(decl.Type.Params) {
+		if len(field.Names) == 1 {
+			addParam(field, safeIdentifier(field.Names[0].Name))
+		}
+	}
+	declared := o.pointerTargetDeclCandidates(ctx, decl.Body, candidates)
+	if len(candidates) == 0 {
+		return nil, nil, nil
+	}
+
+	// Drop the candidates the body changes, and keep those it dereferences
+	// at least twice.
+	uses := pointerTargetUses(ctx, decl.Body, candidates)
+	targets := make(map[types.Object]string)
+	for obj, name := range candidates {
+		if uses[obj] >= 2 {
+			// The local is read through a type assertion, which TypeScript
+			// does not narrow, since calls between reads may change the
+			// fields.
+			elem := obj.Type().Underlying().(*types.Pointer).Elem()
+			targets[obj] = "(" + name + "$ as " + o.tsTypeFor(ctx, elem) + ")"
+		}
+	}
+	if len(targets) == 0 {
+		return nil, nil, nil
+	}
+
+	// The receiver and parameter locals are set at the start of the body,
+	// in order.
+	var prelude []loweredStmt
+	for _, field := range append(append([]*ast.Field{}, fieldsOf(decl.Recv)...), fieldsOf(decl.Type.Params)...) {
+		if len(field.Names) != 1 {
+			continue
+		}
+		obj := ctx.semPkg.source.TypesInfo.Defs[field.Names[0]]
+		if _, ok := targets[obj]; ok {
+			prelude = append(prelude, loweredStmt{text: "const " + o.pointerTargetLocal(ctx, obj, candidates[obj])})
+		}
+	}
+
+	// The declared locals are set after the statements that declare them.
+	decls := make(map[ast.Stmt][]*ast.Ident)
+	for stmt, idents := range declared {
+		for _, ident := range idents {
+			if _, ok := targets[ctx.semPkg.source.TypesInfo.Defs[ident]]; ok {
+				decls[stmt] = append(decls[stmt], ident)
 			}
 		}
 	}
-	if len(candidates) == 0 {
-		return nil, nil
+	return targets, decls, prelude
+}
+
+// addPointerTargetCandidate adds the variable that ident declares to
+// candidates under name, when it is a plain pointer to a struct, held in no
+// variable reference or alias.
+func (o *LoweringOwner) addPointerTargetCandidate(ctx lowerFileContext, candidates map[types.Object]string, ident *ast.Ident, name string) bool {
+	// The variable is a plain pointer to a struct.
+	obj := ctx.semPkg.source.TypesInfo.Defs[ident]
+	if obj == nil || ident.Name == "_" || ctx.model.needsVarRef[obj] || !isPointerToStructType(obj.Type()) {
+		return false
 	}
 
-	// Count the dereferences of each candidate and drop those it assigns or
-	// takes the address of, anywhere in the body.
+	// A variable read through an alias is left alone.
+	if ctx.identAliases != nil && ctx.identAliases[obj] != "" {
+		return false
+	}
+	candidates[obj] = name
+	return true
+}
+
+// pointerTargetDeclCandidates adds the pointer to struct locals that the
+// statements of the statement lists in body declare to candidates, and
+// returns their identifiers by declaring statement. A function with goto
+// statements has none, since its statements may be lowered out of order.
+func (o *LoweringOwner) pointerTargetDeclCandidates(ctx lowerFileContext, body *ast.BlockStmt, candidates map[types.Object]string) map[ast.Stmt][]*ast.Ident {
+	// A function with goto statements declares no candidates.
+	if blockHasGoto(body) {
+		return nil
+	}
+
+	// add records the candidates that one statement declares.
+	declared := make(map[ast.Stmt][]*ast.Ident)
+	add := func(stmt ast.Stmt, idents []*ast.Ident) {
+		for _, ident := range idents {
+			if o.addPointerTargetCandidate(ctx, candidates, ident, safeIdentifier(ident.Name)) {
+				declared[stmt] = append(declared[stmt], ident)
+			}
+		}
+	}
+
+	// The candidates are declared by short variable declarations and
+	// initialized var declarations in statement lists.
+	ast.Inspect(body, func(node ast.Node) bool {
+		for _, stmt := range stmtListOf(node) {
+			add(stmt, declaredIdents(stmt))
+		}
+		return true
+	})
+	return declared
+}
+
+// stmtListOf returns the statement list of a block, case or select clause.
+func stmtListOf(node ast.Node) []ast.Stmt {
+	// Other nodes have no statement list.
+	switch typed := node.(type) {
+	case *ast.BlockStmt:
+		return typed.List
+	case *ast.CaseClause:
+		return typed.Body
+	case *ast.CommClause:
+		return typed.Body
+	}
+	return nil
+}
+
+// declaredIdents returns the identifiers that a short variable declaration,
+// or a var declaration with values, declares.
+func declaredIdents(stmt ast.Stmt) []*ast.Ident {
+	// A short variable declaration declares its left side.
+	if assign, ok := stmt.(*ast.AssignStmt); ok && assign.Tok == token.DEFINE {
+		var idents []*ast.Ident
+		for _, lhs := range assign.Lhs {
+			if ident, ok := lhs.(*ast.Ident); ok {
+				idents = append(idents, ident)
+			}
+		}
+		return idents
+	}
+
+	// A var declaration declares the names of its specs with values.
+	declStmt, ok := stmt.(*ast.DeclStmt)
+	if !ok {
+		return nil
+	}
+	gen, ok := declStmt.Decl.(*ast.GenDecl)
+	if !ok || gen.Tok != token.VAR {
+		return nil
+	}
+	var idents []*ast.Ident
+	for _, spec := range gen.Specs {
+		if valueSpec, ok := spec.(*ast.ValueSpec); ok && len(valueSpec.Values) != 0 {
+			idents = append(idents, valueSpec.Names...)
+		}
+	}
+	return idents
+}
+
+// blockHasGoto reports whether body has a goto statement.
+func blockHasGoto(body *ast.BlockStmt) bool {
+	// The search stops at the first goto.
+	found := false
+	ast.Inspect(body, func(node ast.Node) bool {
+		if branch, ok := node.(*ast.BranchStmt); ok && branch.Tok == token.GOTO {
+			found = true
+		}
+		return !found
+	})
+	return found
+}
+
+// pointerTargetUses counts the field dereferences of each candidate in body,
+// and drops the candidates that body assigns or takes the address of.
+func pointerTargetUses(ctx lowerFileContext, body *ast.BlockStmt, candidates map[types.Object]string) map[types.Object]int {
+	// drop drops the candidate that expr uses, if any; a declaration of the
+	// candidate itself does not drop it.
+	info := ctx.semPkg.source.TypesInfo
 	uses := make(map[types.Object]int)
-	ast.Inspect(decl.Body, func(node ast.Node) bool {
+	drop := func(expr ast.Expr) {
+		if ident, ok := ast.Unparen(expr).(*ast.Ident); ok && info.Defs[ident] == nil {
+			delete(candidates, info.ObjectOf(ident))
+		}
+	}
+
+	// Assignments, increments, range variables and address operations drop
+	// candidates, and field selections count dereferences.
+	ast.Inspect(body, func(node ast.Node) bool {
 		switch typed := node.(type) {
 		case *ast.AssignStmt:
 			for _, lhs := range typed.Lhs {
-				if ident, ok := ast.Unparen(lhs).(*ast.Ident); ok {
-					delete(candidates, info.ObjectOf(ident))
-				}
+				drop(lhs)
 			}
 		case *ast.IncDecStmt:
-			if ident, ok := ast.Unparen(typed.X).(*ast.Ident); ok {
-				delete(candidates, info.ObjectOf(ident))
-			}
+			drop(typed.X)
 		case *ast.RangeStmt:
 			for _, expr := range []ast.Expr{typed.Key, typed.Value} {
-				if ident, ok := expr.(*ast.Ident); ok {
-					delete(candidates, info.ObjectOf(ident))
+				if expr != nil {
+					drop(expr)
 				}
 			}
 		case *ast.UnaryExpr:
-			if ident, ok := ast.Unparen(typed.X).(*ast.Ident); ok && typed.Op == token.AND {
-				delete(candidates, info.Uses[ident])
+			if typed.Op == token.AND {
+				drop(typed.X)
 			}
 		case *ast.SelectorExpr:
 			if ident, ok := ast.Unparen(typed.X).(*ast.Ident); ok {
@@ -12067,31 +12217,42 @@ func (o *LoweringOwner) pointerTargetLocals(ctx lowerFileContext, decl *ast.Func
 		}
 		return true
 	})
-	var targets map[types.Object]string
-	var prelude []loweredStmt
-	for _, field := range append(append([]*ast.Field{}, fieldsOf(decl.Recv)...), fieldsOf(decl.Type.Params)...) {
-		if len(field.Names) != 1 {
+	return uses
+}
+
+// pointerTargetLocal returns the declaration, without its keyword, of the
+// local that holds the struct that the pointer local name of obj points to.
+// It reads the struct inline, so that each site sees the few kinds of
+// pointers it is passed (a struct or a variable reference), which is much
+// faster than the generic $.pointerTarget, and calls $.pointerTarget for nil
+// and boxed pointers.
+func (o *LoweringOwner) pointerTargetLocal(ctx lowerFileContext, obj types.Object, name string) string {
+	// The pointer is checked for nil, a variable reference, a plain struct,
+	// and anything else, which $.pointerTarget handles.
+	elem := o.tsTypeFor(ctx, obj.Type().Underlying().(*types.Pointer).Elem())
+	slow := o.runtimeOwner.QualifiedHelper(RuntimeHelperPointerTarget) + "<" + elem + ">(" + name + ")"
+	pointer := "(" + name + " as any)"
+	return name + "$: " + elem + " = " + name + " == null ? " + slow +
+		" : " + pointer + ".__isVarRef === true ? " + pointer + ".value" +
+		" : " + pointer + ".__goValue === undefined ? " + pointer + " : " + slow
+}
+
+// appendPointerTargetDecls appends to out the locals that hold the structs
+// that the pointer locals stmt declares point to (see pointerTargetLocals).
+// A local whose name is not its plain identifier here is dropped from the
+// targets, so that its uses dereference it.
+func (o *LoweringOwner) appendPointerTargetDecls(ctx lowerFileContext, stmt ast.Stmt, out []loweredStmt) []loweredStmt {
+	// Each declared target gets its local, unless it has another name here.
+	for _, ident := range ctx.pointerTargetDecls[stmt] {
+		obj := ctx.semPkg.source.TypesInfo.Defs[ident]
+		name := safeIdentifier(ident.Name)
+		if ctx.identAliases[obj] != "" || o.lowerIdent(ctx, ident, false) != name {
+			delete(ctx.pointerTargets, obj)
 			continue
 		}
-		obj := info.Defs[field.Names[0]]
-		name, ok := candidates[obj]
-		if !ok || uses[obj] < 2 {
-			continue
-		}
-		if targets == nil {
-			targets = make(map[types.Object]string)
-		}
-		// The local is read through a type assertion, which TypeScript does
-		// not narrow, since calls between reads may change the fields.
-		target := name + "$"
-		targets[obj] = "(" + target + " as " + o.tsTypeFor(ctx, obj.Type().Underlying().(*types.Pointer).Elem()) + ")"
-		elem := obj.Type().Underlying().(*types.Pointer).Elem()
-		prelude = append(prelude, loweredStmt{
-			text: "const " + name + "$ = " + o.runtimeOwner.QualifiedHelper(RuntimeHelperPointerTarget) +
-				"<" + o.tsTypeFor(ctx, elem) + ">(" + name + ")",
-		})
+		out = append(out, loweredStmt{text: declarationKeyword(ctx) + o.pointerTargetLocal(ctx, obj, name)})
 	}
-	return targets, prelude
+	return out
 }
 
 func fieldsOf(list *ast.FieldList) []*ast.Field {
