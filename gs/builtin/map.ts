@@ -82,6 +82,12 @@ class GoMap<K, V> extends Map<K, V> {
   private structEntry(key: K): K | undefined {
     const canonical = structMapKey(key)
     if (canonical === undefined) return undefined
+    return this.structLookup(key, canonical)
+  }
+
+  // structLookup returns the stored key equal to key, whose canonical index
+  // key is given, or undefined if there is none.
+  structLookup(key: K, canonical: string): K | undefined {
     const bucket = this.structKeys?.get(canonical)
     if (bucket === undefined) return undefined
     for (const member of bucket) {
@@ -105,6 +111,22 @@ class GoMap<K, V> extends Map<K, V> {
   private addStructKey(key: K): void {
     const canonical = structMapKey(key)
     if (canonical === undefined) return
+    this.addStructKeyCanonical(key, canonical)
+  }
+
+  // setStruct sets the value of a struct key, whose canonical index key is
+  // given, computing it only once for the whole operation.
+  setStruct(key: K, canonical: string, value: V): void {
+    const stored = this.structLookup(key, canonical)
+    if (stored === undefined) {
+      this.addStructKeyCanonical(key, canonical)
+      super.set(key, value)
+    } else {
+      super.set(stored, value)
+    }
+  }
+
+  private addStructKeyCanonical(key: K, canonical: string): void {
     this.structKeys ??= new Map<string, K[]>()
     const bucket = this.structKeys.get(canonical)
     if (bucket === undefined) {
@@ -158,8 +180,28 @@ export const mapSet = <K, V>(map: Map<K, V> | null, key: K, value: V): void => {
   if (!map) {
     throw new Error('assign to nil map')
   }
+  const canonical = goMapStructKey(map, key)
+  if (canonical !== undefined) {
+    ;(map as GoMap<K, V>).setStruct(key, canonical, value)
+    return
+  }
   const entry = findMapEntry(map, key)
   map.set(entry.found ? entry.key : key, value)
+}
+
+// goMapStructKey returns the canonical index key of a struct key of a GoMap,
+// or undefined if the map or key is not of that kind.
+function goMapStructKey<K, V>(map: Map<K, V>, key: K): string | undefined {
+  if (
+    !(map instanceof GoMap) ||
+    map.pointerKeys ||
+    typeof key !== 'object' ||
+    key === null ||
+    isGoStringKey(key)
+  ) {
+    return undefined
+  }
+  return structMapKey(key)
 }
 
 // deleteMapEntry removes a key using Go value equality.
@@ -181,6 +223,16 @@ function findMapEntry<K, V>(
 ): { found: false } | { found: true; key: K; value: V } {
   if (!map) {
     return { found: false }
+  }
+  const canonical = goMapStructKey(map, key)
+  if (canonical !== undefined) {
+    const stored = (map as GoMap<K, V>).structLookup(key, canonical)
+    if (stored === undefined) return { found: false }
+    return {
+      found: true,
+      key: stored,
+      value: Map.prototype.get.call(map, stored) as V,
+    }
   }
   if (map.has(key)) {
     return { found: true, key, value: map.get(key)! }
@@ -229,27 +281,71 @@ function structMapKey(key: unknown): string | undefined {
   if (typeof fields !== 'object' || fields === null || Array.isArray(fields)) {
     return undefined
   }
-  const kinds = structFieldKinds(key)
-  const names = Object.keys(fields)
-  const parts: string[] = []
-  for (const name of names.sort()) {
+  const plan = structKeyPlan(key, fields)
+  let text = ''
+  for (let i = 0; i < plan.length; i++) {
+    const field = plan[i]
     const value = structMapKeyField(
-      (fields as Record<string, unknown>)[name],
-      kinds?.get(name),
+      (fields as Record<string, unknown>)[field.name],
+      field.kind,
     )
     if (value === undefined) return undefined
-    parts.push(`${name.length}:${name}${value.length}:${value}`)
+    text += field.prefix + value.length + ':' + value
   }
-  return parts.join('')
+  return text
+}
+
+// StructKeyField is one field of the key plan of a struct type: its runtime
+// name, its kind, and the prefix of its text in the key.
+interface StructKeyField {
+  name: string
+  kind: TypeKind | undefined
+  prefix: string
+}
+
+// structKeyPlans caches the key plan of each struct class, so that
+// structMapKey does not sort the field names and resolve their kinds for
+// every map operation.
+const structKeyPlans = new WeakMap<object, StructKeyField[]>()
+
+// structKeyPlan returns the fields of a struct key in name order, with their
+// kinds, cached for a struct of a registered class.
+function structKeyPlan(key: object, fields: object): StructKeyField[] {
+  // A struct of a registered class shares one plan.
+  const ctor = (key as { constructor?: { __typeInfo?: TypeInfo } }).constructor
+  const cacheable = ctor !== undefined && ctor.__typeInfo !== undefined
+  if (cacheable) {
+    const cached = structKeyPlans.get(ctor)
+    if (cached !== undefined) return cached
+  }
+
+  // The fields are sorted by name so equal keys give equal text.
+  const kinds = structFieldKinds(key)
+  const plan = Object.keys(fields)
+    .sort()
+    .map((name) => ({
+      name,
+      kind: kinds?.get(name),
+      prefix: `${name.length}:${name}`,
+    }))
+
+  // A plan built without field kinds is not cached.
+  if (cacheable && kinds !== undefined) {
+    structKeyPlans.set(ctor, plan)
+  }
+  return plan
 }
 
 // structFieldKinds returns the kind of each field of a struct value by its
 // runtime key, from the type info of its class, or undefined without one.
 function structFieldKinds(value: object): Map<string, TypeKind> | undefined {
+  // The kinds come from the type info of the value's class.
   const ctor = (value as { constructor?: { __typeInfo?: TypeInfo } })
     .constructor
   const info = resolveTypeInfo(ctor?.__typeInfo)
   if (info === undefined || !isStructTypeInfo(info)) return undefined
+
+  // The kinds of a class are computed once.
   let kinds = structFieldKindCache.get(info)
   if (kinds === undefined) {
     kinds = new Map()
@@ -275,6 +371,7 @@ function structMapKeyField(
   value: unknown,
   kind: TypeKind | undefined,
 ): string | undefined {
+  // Strings and primitives are indexed by their value.
   if (isGoStringKey(value)) return 's' + stringMapKey(value)
   switch (typeof value) {
     case 'number':
@@ -284,6 +381,8 @@ function structMapKeyField(
     case 'boolean':
       return value ? 't' : 'f'
   }
+
+  // A pointer is indexed by a number given to its identity.
   if (kind === TypeKind.Pointer) {
     if (value === null || value === undefined) return 'p0'
     if (typeof value !== 'object') return undefined
@@ -295,6 +394,8 @@ function structMapKeyField(
     }
     return 'p' + id
   }
+
+  // A nested struct is indexed by its own key.
   if (kind !== TypeKind.Struct) return undefined
   const nested = structMapKey(value)
   return nested === undefined ? undefined : 'r' + nested
