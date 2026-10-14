@@ -6,6 +6,10 @@ M map true map[string]int
 P ptr true *main.S1
 F func true func()
 assert: true false
+pointer K true
+pointer M true
+pointer P true
+pointer F true
 addr *[]*main.S1 []*main.S1
 addr *map[string]int map[string]int
 addr **main.S1 *main.S1

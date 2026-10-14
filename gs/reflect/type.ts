@@ -1244,7 +1244,7 @@ export class Value {
       throw new ValueError({ Kind: kind, Method: 'Pointer' })
     }
     const value = this.currentValue()
-    if (value === null || value === undefined) {
+    if (value === null || value === undefined || $.isTypedNilValue(value)) {
       return 0
     }
     if ($.isOwnedPointerHandle(value)) {

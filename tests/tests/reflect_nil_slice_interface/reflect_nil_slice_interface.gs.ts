@@ -103,6 +103,11 @@ export async function main(): globalThis.Promise<void> {
 	let [, ok] = $.typeAssertTuple<$.Slice<S1 | $.VarRef<S1> | null>>(k, /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.pointerType("main.S1")))
 	await $.println("assert:", ok, k == null)
 
+	// A nil value keeps a zero Pointer after a round trip through Interface.
+	for (let i = 0; i < $.markAsStructValue($.cloneStructValue(f)).NumField(); i++) {
+		await $.println("pointer", (await $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(f)).Type()).Field(i)).Name, $.uint($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(f)).Field(i))).Interface()))).Pointer(), 64) == 0)
+	}
+
 	// The address of an unnamed field keeps its pointer type.
 	for (let i = 0; i < $.markAsStructValue($.cloneStructValue(f)).NumField(); i++) {
 		let p = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(f)).Field(i))).Addr())).Interface()
