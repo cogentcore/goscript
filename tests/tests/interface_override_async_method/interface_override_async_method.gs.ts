@@ -29,6 +29,12 @@ export class asyncReader {
 		return $.markAsStructValue(new asyncReader(this))
 	}
 
+	public __goscriptAssign(source: asyncReader): void {
+		const target = this._fields
+		const values = source._fields
+		target.ch = values.ch
+	}
+
 	public async Read(b: $.Slice<number>): globalThis.Promise<[number, $.GoError]> {
 		const r = this;
 		await $.chanSend(r.ch, $.sliceLen(b))

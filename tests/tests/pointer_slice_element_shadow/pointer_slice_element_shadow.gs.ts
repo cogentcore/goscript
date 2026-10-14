@@ -26,6 +26,12 @@ export class entry {
 		return $.markAsStructValue(new entry(this))
 	}
 
+	public __goscriptAssign(source: entry): void {
+		const target = this._fields
+		const values = source._fields
+		target.key = values.key
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.entry",
 		() => new entry(),
@@ -56,6 +62,12 @@ export class _object {
 
 	public clone(): _object {
 		return $.markAsStructValue(new _object(this))
+	}
+
+	public __goscriptAssign(source: _object): void {
+		const target = this._fields
+		const values = source._fields
+		target.entries = values.entries
 	}
 
 	public next(): entry | $.VarRef<entry> | null {

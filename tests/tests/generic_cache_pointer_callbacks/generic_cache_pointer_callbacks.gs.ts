@@ -4,7 +4,13 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class cache {
-	public declare stored: any
+	public get stored(): any {
+		return this._fields.stored
+	}
+
+	public set stored(value: any) {
+		this._fields.stored = value
+	}
 
 	public _fields: {
 		stored: any
@@ -20,9 +26,15 @@ export class cache {
 		return $.markAsStructValue(new cache(this))
 	}
 
+	public __goscriptAssign(source: cache): void {
+		const target = this._fields
+		const values = source._fields
+		target.stored = values.stored
+	}
+
 	public async Get(__typeArgs: $.GenericTypeArgs | undefined, k: any, _new: (() => [any, $.GoError] | globalThis.Promise<[any, $.GoError]>) | null, check: ((_p0: any) => boolean | globalThis.Promise<boolean>) | null): globalThis.Promise<[any, $.GoError]> {
 		let c: cache | $.VarRef<cache> | null = this;
-		if (($.pointerValue<cache>(c).stored != null) && (__goscriptAwait = check!($.pointerValue<cache>(c).stored), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)) {
+		if (($.pointerValue<cache>(c).stored != null) && await check!($.pointerValue<cache>(c).stored)) {
 			return [$.pointerValue<cache>(c).stored, null]
 		}
 		let [v, err] = await _new!()
@@ -31,10 +43,6 @@ export class cache {
 		}
 		$.pointerValue<cache>(c).stored = v
 		return [v, null]
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["stored"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -47,7 +55,13 @@ export class cache {
 }
 
 export class key {
-	public declare N: number
+	public get N(): number {
+		return this._fields.N
+	}
+
+	public set N(value: number) {
+		this._fields.N = value
+	}
 
 	public _fields: {
 		N: number
@@ -63,8 +77,10 @@ export class key {
 		return $.markAsStructValue(new key(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["N"])
+	public __goscriptAssign(source: key): void {
+		const target = this._fields
+		const values = source._fields
+		target.N = values.N
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -77,7 +93,13 @@ export class key {
 }
 
 export class privateKey {
-	public declare D: number
+	public get D(): number {
+		return this._fields.D
+	}
+
+	public set D(value: number) {
+		this._fields.D = value
+	}
 
 	public _fields: {
 		D: number
@@ -93,8 +115,10 @@ export class privateKey {
 		return $.markAsStructValue(new privateKey(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["D"])
+	public __goscriptAssign(source: privateKey): void {
+		const target = this._fields
+		const values = source._fields
+		target.D = values.D
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -132,8 +156,6 @@ export async function main(): globalThis.Promise<void> {
 	}
 	await $.println("cached:", $.pointerValue<privateKey>(v).D)
 }
-
-var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

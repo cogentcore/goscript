@@ -23,6 +23,12 @@ export class attrs {
 		return $.markAsStructValue(new attrs(this))
 	}
 
+	public __goscriptAssign(source: attrs): void {
+		const target = this._fields
+		const values = source._fields
+		target.packedData = values.packedData
+	}
+
 	public decode(): $.Slice<string> {
 		const a = this;
 		let result: $.Slice<string> = null! as $.Slice<string>

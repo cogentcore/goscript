@@ -22,7 +22,13 @@ import "@goscript/strings/index.js"
 import "@goscript/time/index.js"
 
 export class Holder {
-	public declare Tags: globalThis.Map<string, number> | null
+	public get Tags(): globalThis.Map<string, number> | null {
+		return this._fields.Tags
+	}
+
+	public set Tags(value: globalThis.Map<string, number> | null) {
+		this._fields.Tags = value
+	}
 
 	public _fields: {
 		Tags: globalThis.Map<string, number> | null
@@ -38,8 +44,10 @@ export class Holder {
 		return $.markAsStructValue(new Holder(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Tags"])
+	public __goscriptAssign(source: Holder): void {
+		const target = this._fields
+		const values = source._fields
+		target.Tags = values.Tags
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -52,15 +60,45 @@ export class Holder {
 }
 
 export class Enc {
-	public declare Width: number
+	public get Width(): number {
+		return this._fields.Width
+	}
 
-	public declare Image: $.Slice<number>
+	public set Width(value: number) {
+		this._fields.Width = value
+	}
 
-	public declare Frames: $.Slice<$.Slice<number>>
+	public get Image(): $.Slice<number> {
+		return this._fields.Image
+	}
 
-	public declare Named: globalThis.Map<string, $.Slice<number>> | null
+	public set Image(value: $.Slice<number>) {
+		this._fields.Image = value
+	}
 
-	public declare Nested: Enc | $.VarRef<Enc> | null
+	public get Frames(): $.Slice<$.Slice<number>> {
+		return this._fields.Frames
+	}
+
+	public set Frames(value: $.Slice<$.Slice<number>>) {
+		this._fields.Frames = value
+	}
+
+	public get Named(): globalThis.Map<string, $.Slice<number>> | null {
+		return this._fields.Named
+	}
+
+	public set Named(value: globalThis.Map<string, $.Slice<number>> | null) {
+		this._fields.Named = value
+	}
+
+	public get Nested(): Enc | $.VarRef<Enc> | null {
+		return this._fields.Nested
+	}
+
+	public set Nested(value: Enc | $.VarRef<Enc> | null) {
+		this._fields.Nested = value
+	}
 
 	public _fields: {
 		Width: number
@@ -84,8 +122,14 @@ export class Enc {
 		return $.markAsStructValue(new Enc(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Width", "Image", "Frames", "Named", "Nested"])
+	public __goscriptAssign(source: Enc): void {
+		const target = this._fields
+		const values = source._fields
+		target.Width = values.Width
+		target.Image = values.Image
+		target.Frames = values.Frames
+		target.Named = values.Named
+		target.Nested = values.Nested
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -98,9 +142,21 @@ export class Enc {
 }
 
 export class Event {
-	public declare Name: string
+	public get Name(): string {
+		return this._fields.Name
+	}
 
-	public declare At: time.Time
+	public set Name(value: string) {
+		this._fields.Name = value
+	}
+
+	public get At(): time.Time {
+		return this._fields.At
+	}
+
+	public set At(value: time.Time) {
+		this._fields.At = value
+	}
 
 	public _fields: {
 		Name: string
@@ -118,8 +174,11 @@ export class Event {
 		return $.markAsStructValue(new Event(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Name", "At"])
+	public __goscriptAssign(source: Event): void {
+		const target = this._fields
+		const values = source._fields
+		target.Name = values.Name
+		$.assignStruct(target.At, values.At)
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -132,11 +191,29 @@ export class Event {
 }
 
 export class Person {
-	public declare Name: string
+	public get Name(): string {
+		return this._fields.Name
+	}
 
-	public declare Age: number
+	public set Name(value: string) {
+		this._fields.Name = value
+	}
 
-	public declare Active: boolean
+	public get Age(): number {
+		return this._fields.Age
+	}
+
+	public set Age(value: number) {
+		this._fields.Age = value
+	}
+
+	public get Active(): boolean {
+		return this._fields.Active
+	}
+
+	public set Active(value: boolean) {
+		this._fields.Active = value
+	}
 
 	public _fields: {
 		Name: string
@@ -156,8 +233,12 @@ export class Person {
 		return $.markAsStructValue(new Person(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Name", "Age", "Active"])
+	public __goscriptAssign(source: Person): void {
+		const target = this._fields
+		const values = source._fields
+		target.Name = values.Name
+		target.Age = values.Age
+		target.Active = values.Active
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -178,7 +259,7 @@ export async function main(): globalThis.Promise<void> {
 	let b: $.Slice<number> = __goscriptTuple0[0]
 	let err = __goscriptTuple0[1]
 	if (err != null) {
-		results = $.append(results, $.concatString("Marshal error: ", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)))
+		results = $.append(results, $.concatString("Marshal error: ", await $.pointerValue<Exclude<$.GoError, null>>(err).Error()))
 	} else {
 		results = $.append(results, $.concatString("Marshal: ", $.bytesToString(b)))
 	}
@@ -186,7 +267,7 @@ export async function main(): globalThis.Promise<void> {
 	let indented: $.Slice<number> = __goscriptTuple1[0]
 	err = __goscriptTuple1[1]
 	if (err != null) {
-		results = $.append(results, $.concatString("MarshalIndent error: ", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)))
+		results = $.append(results, $.concatString("MarshalIndent error: ", await $.pointerValue<Exclude<$.GoError, null>>(err).Error()))
 	} else {
 		results = $.append(results, $.concatString("MarshalIndent: ", strings.ReplaceAll($.bytesToString(indented), "\n", "|")))
 	}
@@ -196,7 +277,7 @@ export async function main(): globalThis.Promise<void> {
 	{
 		let __goscriptShadow0 = json.Unmarshal(new Uint8Array([123, 34, 110, 97, 109, 101, 34, 58, 34, 66, 111, 98, 34, 44, 34, 97, 103, 101, 34, 58, 50, 53, 44, 34, 97, 99, 116, 105, 118, 101, 34, 58, 102, 97, 108, 115, 101, 125]), $.interfaceValue(q, "*main.Person", /* @__PURE__ */ $.pointerType("main.Person")))
 		if (__goscriptShadow0 != null) {
-			results = $.append(results, $.concatString("Unmarshal struct error: ", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(__goscriptShadow0).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)))
+			results = $.append(results, $.concatString("Unmarshal struct error: ", await $.pointerValue<Exclude<$.GoError, null>>(__goscriptShadow0).Error()))
 		} else {
 			results = $.append(results, $.concatString(($.concatString(($.concatString(($.concatString(($.concatString("Unmarshal struct: Name=", q.value.Name)), ", Age=")), strconv.Itoa(q.value.Age))), ", Active=")), strconv.FormatBool(q.value.Active)))
 		}
@@ -207,7 +288,7 @@ export async function main(): globalThis.Promise<void> {
 	{
 		let __goscriptShadow1 = json.Unmarshal(new Uint8Array([123, 34, 110, 97, 109, 101, 34, 58, 34, 67, 97, 114, 111, 108, 34, 44, 34, 97, 103, 101, 34, 58, 50, 50, 44, 34, 97, 99, 116, 105, 118, 101, 34, 58, 116, 114, 117, 101, 125]), $.interfaceValue(m, "*map[string]interface{}", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), { kind: $.TypeKind.Interface, methods: [] }))))
 		if (__goscriptShadow1 != null) {
-			results = $.append(results, $.concatString("Unmarshal map error: ", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(__goscriptShadow1).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)))
+			results = $.append(results, $.concatString("Unmarshal map error: ", await $.pointerValue<Exclude<$.GoError, null>>(__goscriptShadow1).Error()))
 		} else {
 			let name = $.mustTypeAssert<string>($.mapGet<string, any, any>(m.value, "name", null)[0], /* @__PURE__ */ $.basicType("string"))
 			let age = $.int($.mustTypeAssert<number>($.mapGet<string, any, any>(m.value, "age", null)[0], /* @__PURE__ */ $.basicType("float64")))
@@ -227,7 +308,7 @@ export async function main(): globalThis.Promise<void> {
 	// A Number in an interface carries all of its methods, including
 	// the json/v2 MarshalJSONTo and UnmarshalJSONFrom.
 	let num: fmt.Stringer | null = $.namedValueInterfaceValue<fmt.Stringer | null>(globalThis.String("12.5"), "json.Number", {Float64: (receiver: any, ...args: any[]) => (json.Number_Float64 as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Int64: (receiver: any, ...args: any[]) => (json.Number_Int64 as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), MarshalJSONTo: (receiver: any, ...args: any[]) => (json.Number_MarshalJSONTo as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), String: (receiver: any, ...args: any[]) => (json.Number_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, /* @__PURE__ */ $.basicType("string", "json.Number"), [$.methodSignature("Float64", [], [/* @__PURE__ */ $.basicType("float64"), "error"]), $.methodSignature("Int64", [], [/* @__PURE__ */ $.basicType("int64"), "error"]), $.methodSignature("MarshalJSONTo", [["enc", /* @__PURE__ */ $.pointerType("jsontext.Encoder")]], ["error"]), $.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])])
-	await $.println("Number as Stringer:", (__goscriptAwait = $.pointerValue<Exclude<fmt.Stringer, null>>(num).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println("Number as Stringer:", await $.pointerValue<Exclude<fmt.Stringer, null>>(num).String())
 
 	// Decoding an object into a non-nil map adds to the existing entries.
 	let mp: $.VarRef<globalThis.Map<string, number> | null> = $.varRef($.makeMap<string, number>([["a", 1], ["b", 2]]))
@@ -279,8 +360,6 @@ export async function timeField(): globalThis.Promise<void> {
 	err = json.Unmarshal(b, $.interfaceValue(ev, "*main.Event", /* @__PURE__ */ $.pointerType("main.Event")))
 	await $.println("event:", err == null, ev.value.Name, $.markAsStructValue($.cloneStructValue(ev.value.At)).Equal($.markAsStructValue($.cloneStructValue(at))))
 }
-
-var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

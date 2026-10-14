@@ -28,6 +28,9 @@ export class Bus {
 		return $.markAsStructValue(new Bus(this))
 	}
 
+	public __goscriptAssign(source: Bus): void {
+	}
+
 	static __typeInfo = $.registerStructType(
 		"dep.Bus",
 		() => new Bus(),
@@ -48,6 +51,9 @@ export class factory {
 
 	public clone(): factory {
 		return $.markAsStructValue(new factory(this))
+	}
+
+	public __goscriptAssign(source: factory): void {
 	}
 
 	public GetConfigID(__typeArgs: $.GenericTypeArgs | undefined): string {

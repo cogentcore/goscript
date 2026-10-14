@@ -32,6 +32,9 @@ export class listScanner {
 		return $.markAsStructValue(new listScanner(this))
 	}
 
+	public __goscriptAssign(source: listScanner): void {
+	}
+
 	public async Scan(fn: ((_p0: number) => $.GoError | globalThis.Promise<$.GoError>) | null): globalThis.Promise<$.GoError> {
 		return fn!(7)
 	}

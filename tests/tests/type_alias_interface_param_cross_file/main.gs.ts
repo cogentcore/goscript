@@ -32,6 +32,12 @@ export class sink {
 		return $.markAsStructValue(new sink(this))
 	}
 
+	public __goscriptAssign(source: sink): void {
+		const target = this._fields
+		const values = source._fields
+		target.size = values.size
+	}
+
 	public Put(v: __goscript_types.Value): void {
 		let s: sink | $.VarRef<sink> | null = this;
 		$.pointerValue<sink>(s).size = $.sliceLen((v as __goscript_types.Value))

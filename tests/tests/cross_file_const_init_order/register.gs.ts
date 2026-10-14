@@ -19,6 +19,9 @@ export class thing {
 		return $.markAsStructValue(new thing(this))
 	}
 
+	public __goscriptAssign(source: thing): void {
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.thing",
 		() => new thing(),

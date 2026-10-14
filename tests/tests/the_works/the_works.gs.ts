@@ -28,9 +28,21 @@ $.registerInterfaceType(
 );
 
 export class Instr {
-	public declare Op: Op
+	public get Op(): Op {
+		return this._fields.Op
+	}
 
-	public declare Arg: bigint
+	public set Op(value: Op) {
+		this._fields.Op = value
+	}
+
+	public get Arg(): bigint {
+		return this._fields.Arg
+	}
+
+	public set Arg(value: bigint) {
+		this._fields.Arg = value
+	}
 
 	public _fields: {
 		Op: Op
@@ -48,8 +60,11 @@ export class Instr {
 		return $.markAsStructValue(new Instr(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Op", "Arg"])
+	public __goscriptAssign(source: Instr): void {
+		const target = this._fields
+		const values = source._fields
+		target.Op = values.Op
+		target.Arg = values.Arg
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -62,9 +77,21 @@ export class Instr {
 }
 
 export class Program {
-	public declare Name: string
+	public get Name(): string {
+		return this._fields.Name
+	}
 
-	public declare Code: $.Slice<Instr>
+	public set Name(value: string) {
+		this._fields.Name = value
+	}
+
+	public get Code(): $.Slice<Instr> {
+		return this._fields.Code
+	}
+
+	public set Code(value: $.Slice<Instr>) {
+		this._fields.Code = value
+	}
 
 	public _fields: {
 		Name: string
@@ -82,20 +109,23 @@ export class Program {
 		return $.markAsStructValue(new Program(this))
 	}
 
+	public __goscriptAssign(source: Program): void {
+		const target = this._fields
+		const values = source._fields
+		target.Name = values.Name
+		target.Code = values.Code
+	}
+
 	public Listing(): ((_yield: ((_p0: number, _p1: Instr) => boolean | globalThis.Promise<boolean>) | null) => void) | null {
 		const p = this;
 		return $.functionValue(async (_yield: ((_p0: number, _p1: Instr) => boolean | globalThis.Promise<boolean>) | null): globalThis.Promise<void> => {
 			for (let __goscriptRangeTarget0 = p.Code, pc = 0; pc < $.len(__goscriptRangeTarget0); pc++) {
 				let _in = $.markAsStructValue($.cloneStructValue(__goscriptRangeTarget0![pc]))
-				if (!(__goscriptAwait = _yield!(pc, $.markAsStructValue($.cloneStructValue(_in))), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)) {
+				if (!await _yield!(pc, $.markAsStructValue($.cloneStructValue(_in)))) {
 					return
 				}
 			}
 		}, ({ kind: $.TypeKind.Function, params: [({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int"), "main.Instr"], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo)], results: [] } as $.FunctionTypeInfo))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["Name", "Code"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -108,7 +138,13 @@ export class Program {
 }
 
 export class Stack {
-	public declare items: $.Slice<any>
+	public get items(): $.Slice<any> {
+		return this._fields.items
+	}
+
+	public set items(value: $.Slice<any>) {
+		this._fields.items = value
+	}
 
 	public _fields: {
 		items: $.Slice<any>
@@ -122,6 +158,12 @@ export class Stack {
 
 	public clone(): Stack {
 		return $.markAsStructValue(new Stack(this))
+	}
+
+	public __goscriptAssign(source: Stack): void {
+		const target = this._fields
+		const values = source._fields
+		target.items = values.items
 	}
 
 	public Pop(__typeArgs: $.GenericTypeArgs | undefined): any {
@@ -139,10 +181,6 @@ export class Stack {
 		$.pointerValue<Stack>(s).items = $.append($.pointerValue<Stack>(s).items, v, $.appendZero(() => ($.genericZero(__typeArgs, "T", null) as any)))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["items"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.Stack",
 		() => new Stack(),
@@ -153,11 +191,29 @@ export class Stack {
 }
 
 export class VM {
-	public declare pc: number
+	public get pc(): number {
+		return this._fields.pc
+	}
 
-	public declare steps: number
+	public set pc(value: number) {
+		this._fields.pc = value
+	}
 
-	public declare stack: Stack
+	public get steps(): number {
+		return this._fields.steps
+	}
+
+	public set steps(value: number) {
+		this._fields.steps = value
+	}
+
+	public get stack(): Stack {
+		return this._fields.stack
+	}
+
+	public set stack(value: Stack) {
+		this._fields.stack = value
+	}
 
 	public _fields: {
 		pc: number
@@ -175,6 +231,14 @@ export class VM {
 
 	public clone(): VM {
 		return $.markAsStructValue(new VM(this))
+	}
+
+	public __goscriptAssign(source: VM): void {
+		const target = this._fields
+		const values = source._fields
+		target.pc = values.pc
+		target.steps = values.steps
+		$.assignStruct(target.stack, values.stack)
 	}
 
 	public Step(code: $.Slice<Instr>): boolean {
@@ -249,10 +313,6 @@ export class VM {
 		return false
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["pc", "steps", "stack"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.VM",
 		() => new VM(),
@@ -263,11 +323,29 @@ export class VM {
 }
 
 export class Answer {
-	public declare Name: string
+	public get Name(): string {
+		return this._fields.Name
+	}
 
-	public declare Value: bigint
+	public set Name(value: string) {
+		this._fields.Name = value
+	}
 
-	public declare Steps: number
+	public get Value(): bigint {
+		return this._fields.Value
+	}
+
+	public set Value(value: bigint) {
+		this._fields.Value = value
+	}
+
+	public get Steps(): number {
+		return this._fields.Steps
+	}
+
+	public set Steps(value: number) {
+		this._fields.Steps = value
+	}
 
 	public _fields: {
 		Name: string
@@ -287,13 +365,17 @@ export class Answer {
 		return $.markAsStructValue(new Answer(this))
 	}
 
+	public __goscriptAssign(source: Answer): void {
+		const target = this._fields
+		const values = source._fields
+		target.Name = values.Name
+		target.Value = values.Value
+		target.Steps = values.Steps
+	}
+
 	public Program(): string {
 		const a = this;
 		return a.Name
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["Name", "Value", "Steps"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -306,9 +388,21 @@ export class Answer {
 }
 
 export class Fault {
-	public declare Name: string
+	public get Name(): string {
+		return this._fields.Name
+	}
 
-	public declare Reason: string
+	public set Name(value: string) {
+		this._fields.Name = value
+	}
+
+	public get Reason(): string {
+		return this._fields.Reason
+	}
+
+	public set Reason(value: string) {
+		this._fields.Reason = value
+	}
 
 	public _fields: {
 		Name: string
@@ -326,13 +420,16 @@ export class Fault {
 		return $.markAsStructValue(new Fault(this))
 	}
 
+	public __goscriptAssign(source: Fault): void {
+		const target = this._fields
+		const values = source._fields
+		target.Name = values.Name
+		target.Reason = values.Reason
+	}
+
 	public Program(): string {
 		const f: Fault | $.VarRef<Fault> | null = this;
 		return $.pointerValue<Fault>(f).Name
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["Name", "Reason"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -479,8 +576,6 @@ export async function main(): globalThis.Promise<void> {
 	}
 	await $.println("total steps:", totalSteps)
 }
-
-var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

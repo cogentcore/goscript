@@ -36,6 +36,12 @@ export class branch {
 		return $.markAsStructValue(new branch(this))
 	}
 
+	public __goscriptAssign(source: branch): void {
+		const target = this._fields
+		const values = source._fields
+		target.n = values.n
+	}
+
 	public value(): number {
 		const b: branch | $.VarRef<branch> | null = this;
 		return $.pointerValue<branch>(b).n

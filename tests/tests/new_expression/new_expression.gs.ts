@@ -28,6 +28,12 @@ export class Pair {
 		return $.markAsStructValue(new Pair(this))
 	}
 
+	public __goscriptAssign(source: Pair): void {
+		const target = this._fields
+		const values = source._fields
+		target.Value = values.Value
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.Pair",
 		() => new Pair(),

@@ -39,6 +39,13 @@ export class storage {
 		return $.markAsStructValue(new storage(this))
 	}
 
+	public __goscriptAssign(source: storage): void {
+		const target = this._fields
+		const values = source._fields
+		target.files = values.files
+		target.children = values.children
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.storage",
 		() => new storage(),

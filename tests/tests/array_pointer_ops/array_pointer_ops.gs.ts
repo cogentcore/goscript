@@ -26,6 +26,12 @@ export class item {
 		return $.markAsStructValue(new item(this))
 	}
 
+	public __goscriptAssign(source: item): void {
+		const target = this._fields
+		const values = source._fields
+		target.value = values.value
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.item",
 		() => new item(),
@@ -66,6 +72,13 @@ export class arrays {
 
 	public clone(): arrays {
 		return $.markAsStructValue(new arrays(this))
+	}
+
+	public __goscriptAssign(source: arrays): void {
+		const target = this._fields
+		const values = source._fields
+		target.slices = $.assignFieldValue(target.slices, values.slices, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")), 1))
+		target.items = $.assignFieldValue(target.items, values.items, /* @__PURE__ */ $.arrayType("main.item", 1))
 	}
 
 	static __typeInfo = $.registerStructType(

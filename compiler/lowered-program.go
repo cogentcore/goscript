@@ -135,6 +135,11 @@ type loweredStructField struct {
 	// typeParamValue reports whether the field's type is a type parameter
 	// that may be instantiated with a struct or array type.
 	typeParamValue bool
+	// plainValue reports whether the field's values are assigned as they are,
+	// as for basic, pointer, slice, map, function and channel types, unlike
+	// struct and array values, which are copied, and interface and type
+	// parameter values, which may hold struct or array values.
+	plainValue bool
 }
 
 type loweredFunction struct {

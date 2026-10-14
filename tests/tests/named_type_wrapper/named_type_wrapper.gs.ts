@@ -50,6 +50,13 @@ export class FileStatus {
 		return $.markAsStructValue(new FileStatus(this))
 	}
 
+	public __goscriptAssign(source: FileStatus): void {
+		const target = this._fields
+		const values = source._fields
+		target.mode = values.mode
+		target.size = values.size
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.FileStatus",
 		() => new FileStatus(),

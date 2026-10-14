@@ -26,6 +26,12 @@ export class locked {
 		return $.markAsStructValue(new locked(this))
 	}
 
+	public __goscriptAssign(source: locked): void {
+		const target = this._fields
+		const values = source._fields
+		target.value = values.value
+	}
+
 	public Inc(): void {
 		let l: locked | $.VarRef<locked> | null = this;
 		$.pointerValue<locked>(l).value++

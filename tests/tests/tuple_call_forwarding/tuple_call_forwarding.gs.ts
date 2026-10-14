@@ -17,9 +17,21 @@ $.registerInterfaceType(
 );
 
 export class point {
-	public declare x: number
+	public get x(): number {
+		return this._fields.x
+	}
 
-	public declare y: number
+	public set x(value: number) {
+		this._fields.x = value
+	}
+
+	public get y(): number {
+		return this._fields.y
+	}
+
+	public set y(value: number) {
+		this._fields.y = value
+	}
 
 	public _fields: {
 		x: number
@@ -37,8 +49,11 @@ export class point {
 		return $.markAsStructValue(new point(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["x", "y"])
+	public __goscriptAssign(source: point): void {
+		const target = this._fields
+		const values = source._fields
+		target.x = values.x
+		target.y = values.y
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -51,7 +66,13 @@ export class point {
 }
 
 export class frame {
-	public declare name: string
+	public get name(): string {
+		return this._fields.name
+	}
+
+	public set name(value: string) {
+		this._fields.name = value
+	}
 
 	public _fields: {
 		name: string
@@ -67,13 +88,15 @@ export class frame {
 		return $.markAsStructValue(new frame(this))
 	}
 
+	public __goscriptAssign(source: frame): void {
+		const target = this._fields
+		const values = source._fields
+		target.name = values.name
+	}
+
 	public Name(): string {
 		const f: frame | $.VarRef<frame> | null = this;
 		return $.pointerValue<frame>(f).name
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["name"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -86,7 +109,13 @@ export class frame {
 }
 
 export class tab {
-	public declare name: string
+	public get name(): string {
+		return this._fields.name
+	}
+
+	public set name(value: string) {
+		this._fields.name = value
+	}
 
 	public _fields: {
 		name: string
@@ -102,13 +131,15 @@ export class tab {
 		return $.markAsStructValue(new tab(this))
 	}
 
+	public __goscriptAssign(source: tab): void {
+		const target = this._fields
+		const values = source._fields
+		target.name = values.name
+	}
+
 	public Name(): string {
 		const t: tab | $.VarRef<tab> | null = this;
 		return $.pointerValue<tab>(t).name
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["name"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -121,7 +152,13 @@ export class tab {
 }
 
 export class tabs {
-	public declare count: number
+	public get count(): number {
+		return this._fields.count
+	}
+
+	public set count(value: number) {
+		this._fields.count = value
+	}
 
 	public _fields: {
 		count: number
@@ -137,15 +174,17 @@ export class tabs {
 		return $.markAsStructValue(new tabs(this))
 	}
 
+	public __goscriptAssign(source: tabs): void {
+		const target = this._fields
+		const values = source._fields
+		target.count = values.count
+	}
+
 	public async NewTab(name: string): globalThis.Promise<[frame | $.VarRef<frame> | null, tab | $.VarRef<tab> | null]> {
 		let ts: tabs | $.VarRef<tabs> | null = this;
 		$.pointerValue<tabs>(ts).count++
 		await $.println("new tab:", name)
 		return newTab(name)
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["count"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -185,7 +224,7 @@ export async function names(nodes: $.Slice<Node | null>): globalThis.Promise<voi
 	await $.println("names:", $.len(nodes))
 	for (let __goscriptRangeTarget0 = nodes, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
 		let n = __goscriptRangeTarget0![__rangeIndex]
-		await $.println("name:", (__goscriptAwait = $.pointerValue<Exclude<Node, null>>(n).Name(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+		await $.println("name:", await $.pointerValue<Exclude<Node, null>>(n).Name())
 	}
 }
 
@@ -228,8 +267,6 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("sprint:", await fmt.Sprint(...(() => { const __goscriptTupleArg5 = pair(3, 4); return [$.basicInterfaceValue(__goscriptTupleArg5[0], "int"), $.basicInterfaceValue(__goscriptTupleArg5[1], "int")] as [any, any] })()))
 	await $.println("tabs:", $.pointerValue<tabs>(ts).count)
 }
-
-var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

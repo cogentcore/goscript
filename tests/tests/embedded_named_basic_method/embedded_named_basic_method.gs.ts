@@ -60,6 +60,13 @@ export class Engineer {
 		return $.markAsStructValue(new Engineer(this))
 	}
 
+	public __goscriptAssign(source: Engineer): void {
+		const target = this._fields
+		const values = source._fields
+		target.Level = values.Level
+		target.Name = values.Name
+	}
+
 	public Rank(prefix: any): any {
 		return Level_Rank(this.Level, prefix)
 	}
@@ -94,6 +101,12 @@ export class Lead {
 
 	public clone(): Lead {
 		return $.markAsStructValue(new Lead(this))
+	}
+
+	public __goscriptAssign(source: Lead): void {
+		const target = this._fields
+		const values = source._fields
+		$.assignStruct(target.Engineer, values.Engineer)
 	}
 
 	public Rank(prefix: any): any {

@@ -46,6 +46,13 @@ export class MyReader {
 		return $.markAsStructValue(new MyReader(this))
 	}
 
+	public __goscriptAssign(source: MyReader): void {
+		const target = this._fields
+		const values = source._fields
+		target.Reader = $.assignFieldValue(target.Reader, values.Reader, "main.Reader")
+		target.name = values.name
+	}
+
 	public Read(p: any): any {
 		return $.pointerValue<Exclude<Reader | null, null>>(this.Reader).Read(p)
 	}
@@ -90,6 +97,13 @@ export class StringReader {
 
 	public clone(): StringReader {
 		return $.markAsStructValue(new StringReader(this))
+	}
+
+	public __goscriptAssign(source: StringReader): void {
+		const target = this._fields
+		const values = source._fields
+		target.data = values.data
+		target.pos = values.pos
 	}
 
 	public Read(p: $.Slice<number>): [number, $.GoError] {

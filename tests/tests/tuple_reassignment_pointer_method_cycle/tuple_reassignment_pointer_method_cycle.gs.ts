@@ -26,6 +26,12 @@ export class box {
 		return $.markAsStructValue(new box(this))
 	}
 
+	public __goscriptAssign(source: box): void {
+		const target = this._fields
+		const values = source._fields
+		target.value = values.value
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.box",
 		() => new box(),
@@ -46,6 +52,9 @@ export class cursor {
 
 	public clone(): cursor {
 		return $.markAsStructValue(new cursor(this))
+	}
+
+	public __goscriptAssign(source: cursor): void {
 	}
 
 	public rotate(a: box | $.VarRef<box> | null, b: box | $.VarRef<box> | null, c: box | $.VarRef<box> | null): [box | $.VarRef<box> | null, box | $.VarRef<box> | null, box | $.VarRef<box> | null] {

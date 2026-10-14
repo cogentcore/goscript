@@ -26,6 +26,12 @@ export class OtherStruct {
 		return $.markAsStructValue(new OtherStruct(this))
 	}
 
+	public __goscriptAssign(source: OtherStruct): void {
+		const target = this._fields
+		const values = source._fields
+		target.Label = values.Label
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.OtherStruct",
 		() => new OtherStruct(),

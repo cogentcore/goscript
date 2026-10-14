@@ -28,6 +28,12 @@ export class hidden {
 		return $.markAsStructValue(new hidden(this))
 	}
 
+	public __goscriptAssign(source: hidden): void {
+		const target = this._fields
+		const values = source._fields
+		target.label = values.label
+	}
+
 	static __typeInfo = $.registerStructType(
 		"dep.hidden",
 		() => new hidden(),
@@ -68,6 +74,13 @@ export class Public {
 
 	public clone(): Public {
 		return $.markAsStructValue(new Public(this))
+	}
+
+	public __goscriptAssign(source: Public): void {
+		const target = this._fields
+		const values = source._fields
+		target.Value = values.Value
+		$.assignStruct(target.Hidden, values.Hidden)
 	}
 
 	public Label(): string {

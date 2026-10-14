@@ -37,6 +37,9 @@ export class pingFrame {
 		return $.markAsStructValue(new pingFrame(this))
 	}
 
+	public __goscriptAssign(source: pingFrame): void {
+	}
+
 	public Write(): void {
 	}
 
@@ -82,6 +85,13 @@ export class Frame {
 		return $.markAsStructValue(new Frame(this))
 	}
 
+	public __goscriptAssign(source: Frame): void {
+		const target = this._fields
+		const values = source._fields
+		target.Frame = $.assignFieldValue(target.Frame, values.Frame, "main.wireFrame")
+		target.Handler = $.assignFieldValue(target.Handler, values.Handler, "main.FrameHandler")
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.Frame",
 		() => new Frame(),
@@ -114,6 +124,12 @@ export class packet {
 		return $.markAsStructValue(new packet(this))
 	}
 
+	public __goscriptAssign(source: packet): void {
+		const target = this._fields
+		const values = source._fields
+		target.Frames = values.Frames
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.packet",
 		() => new packet(),
@@ -144,6 +160,12 @@ export class retransmissionQueue {
 
 	public clone(): retransmissionQueue {
 		return $.markAsStructValue(new retransmissionQueue(this))
+	}
+
+	public __goscriptAssign(source: retransmissionQueue): void {
+		const target = this._fields
+		const values = source._fields
+		target.lost = values.lost
 	}
 
 	public AppDataAckHandler(): FrameHandler | null {
@@ -193,6 +215,12 @@ export class retransmissionQueueInitialAckHandler {
 		return $.markAsStructValue(new retransmissionQueueInitialAckHandler(this))
 	}
 
+	public __goscriptAssign(source: retransmissionQueueInitialAckHandler): void {
+		const target = this._fields
+		const values = source._fields
+		target.lost = values.lost
+	}
+
 	public OnAcked(_p0: wireFrame | null): void {
 		const q: retransmissionQueueInitialAckHandler | $.VarRef<retransmissionQueueInitialAckHandler> | null = this;
 	}
@@ -235,6 +263,12 @@ export class retransmissionQueueHandshakeAckHandler {
 		return $.markAsStructValue(new retransmissionQueueHandshakeAckHandler(this))
 	}
 
+	public __goscriptAssign(source: retransmissionQueueHandshakeAckHandler): void {
+		const target = this._fields
+		const values = source._fields
+		target.lost = values.lost
+	}
+
 	public OnAcked(_p0: wireFrame | null): void {
 		const q: retransmissionQueueHandshakeAckHandler | $.VarRef<retransmissionQueueHandshakeAckHandler> | null = this;
 	}
@@ -275,6 +309,12 @@ export class retransmissionQueueAppDataAckHandler {
 
 	public clone(): retransmissionQueueAppDataAckHandler {
 		return $.markAsStructValue(new retransmissionQueueAppDataAckHandler(this))
+	}
+
+	public __goscriptAssign(source: retransmissionQueueAppDataAckHandler): void {
+		const target = this._fields
+		const values = source._fields
+		target.lost = values.lost
 	}
 
 	public OnAcked(_p0: wireFrame | null): void {

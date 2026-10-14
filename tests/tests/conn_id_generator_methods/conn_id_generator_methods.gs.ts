@@ -62,6 +62,12 @@ export class transport {
 		return $.markAsStructValue(new transport(this))
 	}
 
+	public __goscriptAssign(source: transport): void {
+		const target = this._fields
+		const values = source._fields
+		target.values = values.values
+	}
+
 	public SourceOnly(id: number): void {
 		let h: transport | $.VarRef<transport> | null = this;
 		$.mapSet($.pointerValue<transport>(h).values, id, id)
@@ -99,6 +105,12 @@ export class packetHandlerMap {
 		return $.markAsStructValue(new packetHandlerMap(this))
 	}
 
+	public __goscriptAssign(source: packetHandlerMap): void {
+		const target = this._fields
+		const values = source._fields
+		target.values = values.values
+	}
+
 	public Add(id: number): void {
 		let h: packetHandlerMap | $.VarRef<packetHandlerMap> | null = this;
 		$.mapSet($.pointerValue<packetHandlerMap>(h).values, id, id)
@@ -134,6 +146,12 @@ export class connRunnerCallbacks {
 
 	public clone(): connRunnerCallbacks {
 		return $.markAsStructValue(new connRunnerCallbacks(this))
+	}
+
+	public __goscriptAssign(source: connRunnerCallbacks): void {
+		const target = this._fields
+		const values = source._fields
+		target.AddConnectionID = values.AddConnectionID
 	}
 
 	static __typeInfo = $.registerStructType(

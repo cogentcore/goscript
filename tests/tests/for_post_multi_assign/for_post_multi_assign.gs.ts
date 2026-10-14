@@ -26,6 +26,12 @@ export class frame {
 		return $.markAsStructValue(new frame(this))
 	}
 
+	public __goscriptAssign(source: frame): void {
+		const target = this._fields
+		const values = source._fields
+		target.name = values.name
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.frame",
 		() => new frame(),
@@ -56,6 +62,12 @@ export class iterator {
 
 	public clone(): iterator {
 		return $.markAsStructValue(new iterator(this))
+	}
+
+	public __goscriptAssign(source: iterator): void {
+		const target = this._fields
+		const values = source._fields
+		target.idx = values.idx
 	}
 
 	public Next(): [frame, boolean] {

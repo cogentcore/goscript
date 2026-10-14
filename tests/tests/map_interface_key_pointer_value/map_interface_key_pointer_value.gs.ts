@@ -36,6 +36,12 @@ export class Table {
 		return $.markAsStructValue(new Table(this))
 	}
 
+	public __goscriptAssign(source: Table): void {
+		const target = this._fields
+		const values = source._fields
+		target.name = values.name
+	}
+
 	public Key(): string {
 		const t: Table | $.VarRef<Table> | null = this;
 		return $.pointerValue<Table>(t).name

@@ -6,9 +6,21 @@ import * as $ from "@goscript/builtin/index.js"
 export type option = ((_p0: Thing | $.VarRef<Thing> | null) => void) | null
 
 export class Thing {
-	public declare Value: number
+	public get Value(): number {
+		return this._fields.Value
+	}
 
-	public declare Label: string
+	public set Value(value: number) {
+		this._fields.Value = value
+	}
+
+	public get Label(): string {
+		return this._fields.Label
+	}
+
+	public set Label(value: string) {
+		this._fields.Label = value
+	}
 
 	public _fields: {
 		Value: number
@@ -26,8 +38,11 @@ export class Thing {
 		return $.markAsStructValue(new Thing(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Value", "Label"])
+	public __goscriptAssign(source: Thing): void {
+		const target = this._fields
+		const values = source._fields
+		target.Value = values.Value
+		target.Label = values.Label
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -55,9 +70,7 @@ export async function New(opts: $.Slice<option | null>): globalThis.Promise<Thin
 	let t: Thing | $.VarRef<Thing> | null = new Thing()
 	for (let __goscriptRangeTarget0 = opts, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
 		let opt = __goscriptRangeTarget0![__rangeIndex]
-		void (__goscriptAwait = opt!(t), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+		await opt!(t)
 	}
 	return t
 }
-
-var __goscriptAwait: any

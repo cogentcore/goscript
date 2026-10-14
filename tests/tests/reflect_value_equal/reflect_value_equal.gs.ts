@@ -39,6 +39,13 @@ export class P {
 		return $.markAsStructValue(new P(this))
 	}
 
+	public __goscriptAssign(source: P): void {
+		const target = this._fields
+		const values = source._fields
+		target.X = values.X
+		target.Y = values.Y
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.P",
 		() => new P(),
@@ -133,6 +140,17 @@ export async function main(): globalThis.Promise<void> {
 
 		public clone(): Z {
 			return $.markAsStructValue(new Z(this))
+		}
+
+		public __goscriptAssign(source: Z): void {
+			const target = this._fields
+			const values = source._fields
+			target.S = values.S
+			target.M = values.M
+			target.P = values.P
+			target.F = values.F
+			target.B = values.B
+			target.T = values.T
 		}
 
 		static __typeInfo = $.registerStructType(

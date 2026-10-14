@@ -42,6 +42,12 @@ export class Stack {
 		return $.markAsStructValue(new Stack(this))
 	}
 
+	public __goscriptAssign(source: Stack): void {
+		const target = this._fields
+		const values = source._fields
+		target.items = values.items
+	}
+
 	public Len(__typeArgs: $.GenericTypeArgs | undefined): number {
 		const s: Stack | $.VarRef<Stack> | null = this;
 		return $.len($.pointerValue<Stack>(s).items)
@@ -93,6 +99,12 @@ export class Item {
 		return $.markAsStructValue(new Item(this))
 	}
 
+	public __goscriptAssign(source: Item): void {
+		const target = this._fields
+		const values = source._fields
+		target.Name = values.Name
+	}
+
 	public Clone(): Item | $.VarRef<Item> | null {
 		const i: Item | $.VarRef<Item> | null = this;
 		if (i == null) {
@@ -129,6 +141,12 @@ export class Mapper {
 
 	public clone(): Mapper {
 		return $.markAsStructValue(new Mapper(this))
+	}
+
+	public __goscriptAssign(source: Mapper): void {
+		const target = this._fields
+		const values = source._fields
+		target.values = values.values
 	}
 
 	public Get(__typeArgs: $.GenericTypeArgs | undefined, key: any): [any, boolean] {
@@ -174,6 +192,13 @@ export class Pair {
 
 	public clone(): Pair {
 		return $.markAsStructValue(new Pair(this))
+	}
+
+	public __goscriptAssign(source: Pair): void {
+		const target = this._fields
+		const values = source._fields
+		target.First = $.assignFieldValue(target.First, values.First, { kind: $.TypeKind.Interface, methods: [] })
+		target.Second = $.assignFieldValue(target.Second, values.Second, { kind: $.TypeKind.Interface, methods: [] })
 	}
 
 	public Swap(__typeArgs: $.GenericTypeArgs | undefined): Pair {

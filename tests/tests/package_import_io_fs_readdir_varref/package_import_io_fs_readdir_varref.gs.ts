@@ -26,6 +26,12 @@ export class openOnlyFS {
 		return $.markAsStructValue(new openOnlyFS(this))
 	}
 
+	public __goscriptAssign(source: openOnlyFS): void {
+		const target = this._fields
+		const values = source._fields
+		target.fsys = values.fsys
+	}
+
 	public Open(name: string): [fs.File | null, $.GoError] {
 		const o = this;
 		return fstest.MapFS_Open(o.fsys, name)

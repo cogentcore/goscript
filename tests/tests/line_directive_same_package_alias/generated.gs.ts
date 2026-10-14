@@ -26,6 +26,12 @@ export class yySymType {
 		return $.markAsStructValue(new yySymType(this))
 	}
 
+	public __goscriptAssign(source: yySymType): void {
+		const target = this._fields
+		const values = source._fields
+		target.value = values.value
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.yySymType",
 		() => new yySymType(),
@@ -46,6 +52,9 @@ export class yyParserImpl {
 
 	public clone(): yyParserImpl {
 		return $.markAsStructValue(new yyParserImpl(this))
+	}
+
+	public __goscriptAssign(source: yyParserImpl): void {
 	}
 
 	static __typeInfo = $.registerStructType(

@@ -26,6 +26,12 @@ export class child {
 		return $.markAsStructValue(new child(this))
 	}
 
+	public __goscriptAssign(source: child): void {
+		const target = this._fields
+		const values = source._fields
+		target.value = values.value
+	}
+
 	public Clone(): child | $.VarRef<child> | null {
 		const c: child | $.VarRef<child> | null = this;
 		if (c == null) {
@@ -64,6 +70,12 @@ export class parent {
 
 	public clone(): parent {
 		return $.markAsStructValue(new parent(this))
+	}
+
+	public __goscriptAssign(source: parent): void {
+		const target = this._fields
+		const values = source._fields
+		target.child = values.child
 	}
 
 	static __typeInfo = $.registerStructType(

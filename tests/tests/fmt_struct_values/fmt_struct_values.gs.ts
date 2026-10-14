@@ -41,6 +41,12 @@ export class Inner {
 		return $.markAsStructValue(new Inner(this))
 	}
 
+	public __goscriptAssign(source: Inner): void {
+		const target = this._fields
+		const values = source._fields
+		target.Ready = values.Ready
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.Inner",
 		() => new Inner(),
@@ -94,6 +100,14 @@ export class Record {
 
 	public clone(): Record {
 		return $.markAsStructValue(new Record(this))
+	}
+
+	public __goscriptAssign(source: Record): void {
+		const target = this._fields
+		const values = source._fields
+		target.Count = values.Count
+		target.name = values.name
+		$.assignStruct(target.Inner, values.Inner)
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -151,6 +165,14 @@ export class Pointers {
 		return $.markAsStructValue(new Pointers(this))
 	}
 
+	public __goscriptAssign(source: Pointers): void {
+		const target = this._fields
+		const values = source._fields
+		target.Value = values.Value
+		target.Next = values.Next
+		target.Dynamic = $.assignFieldValue(target.Dynamic, values.Dynamic, { kind: $.TypeKind.Interface, methods: [] })
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.Pointers",
 		() => new Pointers(),
@@ -203,6 +225,14 @@ export class Node {
 		return $.markAsStructValue(new Node(this))
 	}
 
+	public __goscriptAssign(source: Node): void {
+		const target = this._fields
+		const values = source._fields
+		target.Name = values.Name
+		target.Parent = values.Parent
+		target.Kids = values.Kids
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.Node",
 		() => new Node(),
@@ -243,6 +273,13 @@ export class Base {
 
 	public clone(): Base {
 		return $.markAsStructValue(new Base(this))
+	}
+
+	public __goscriptAssign(source: Base): void {
+		const target = this._fields
+		const values = source._fields
+		target.Windows = values.Windows
+		target.Active = $.assignFieldValue(target.Active, values.Active, { kind: $.TypeKind.Interface, methods: [] })
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -287,6 +324,13 @@ export class App {
 		return $.markAsStructValue(new App(this))
 	}
 
+	public __goscriptAssign(source: App): void {
+		const target = this._fields
+		const values = source._fields
+		$.assignStruct(target.Base, values.Base)
+		target.Name = values.Name
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.App",
 		() => new App(),
@@ -327,6 +371,13 @@ export class Win {
 
 	public clone(): Win {
 		return $.markAsStructValue(new Win(this))
+	}
+
+	public __goscriptAssign(source: Win): void {
+		const target = this._fields
+		const values = source._fields
+		target.App = values.App
+		target.Title = values.Title
 	}
 
 	static __typeInfo = $.registerStructType(

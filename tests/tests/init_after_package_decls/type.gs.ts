@@ -39,6 +39,13 @@ export class Type {
 		return $.markAsStructValue(new Type(this))
 	}
 
+	public __goscriptAssign(source: Type): void {
+		const target = this._fields
+		const values = source._fields
+		target.Name = values.Name
+		target.Fields = values.Fields
+	}
+
 	public FieldNames(): $.Slice<string> {
 		const t: Type | $.VarRef<Type> | null = this;
 		let names: $.Slice<string> = $.arrayToSlice<string>([])

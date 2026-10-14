@@ -56,6 +56,13 @@ export class VerboseStore {
 		return $.markAsStructValue(new VerboseStore(this))
 	}
 
+	public __goscriptAssign(source: VerboseStore): void {
+		const target = this._fields
+		const values = source._fields
+		target.BaseStore = values.BaseStore
+		target.name = values.name
+	}
+
 	public Execute(): string {
 		const s: VerboseStore | $.VarRef<VerboseStore> | null = this;
 		return $.concatString("execute:", $.pointerValue<VerboseStore>(s).name)

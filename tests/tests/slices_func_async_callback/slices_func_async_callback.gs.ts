@@ -39,6 +39,13 @@ export class Process {
 		return $.markAsStructValue(new Process(this))
 	}
 
+	public __goscriptAssign(source: Process): void {
+		const target = this._fields
+		const values = source._fields
+		target.pid = values.pid
+		target.done = values.done
+	}
+
 	public async exited(): globalThis.Promise<boolean> {
 		const p: Process | $.VarRef<Process> | null = this;
 		const [__goscriptSelect0HasReturn, __goscriptSelect0Value] = await $.selectStatement<any, boolean>([

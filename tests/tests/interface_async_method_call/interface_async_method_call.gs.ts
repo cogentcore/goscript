@@ -41,6 +41,12 @@ export class ChannelProcessor {
 		return $.markAsStructValue(new ChannelProcessor(this))
 	}
 
+	public __goscriptAssign(source: ChannelProcessor): void {
+		const target = this._fields
+		const values = source._fields
+		target.ch = values.ch
+	}
+
 	public GetResult(): number {
 		const p: ChannelProcessor | $.VarRef<ChannelProcessor> | null = this;
 		// This method is sync
@@ -83,6 +89,12 @@ export class SimpleProcessor {
 
 	public clone(): SimpleProcessor {
 		return $.markAsStructValue(new SimpleProcessor(this))
+	}
+
+	public __goscriptAssign(source: SimpleProcessor): void {
+		const target = this._fields
+		const values = source._fields
+		target.value = values.value
 	}
 
 	public GetResult(): number {
@@ -128,6 +140,13 @@ export class GenericChannelStore {
 
 	public clone(): GenericChannelStore {
 		return $.markAsStructValue(new GenericChannelStore(this))
+	}
+
+	public __goscriptAssign(source: GenericChannelStore): void {
+		const target = this._fields
+		const values = source._fields
+		target.ch = values.ch
+		target.value = $.assignFieldValue(target.value, values.value, { kind: $.TypeKind.Interface, methods: [] })
 	}
 
 	public async Load(__typeArgs: $.GenericTypeArgs | undefined): globalThis.Promise<any> {

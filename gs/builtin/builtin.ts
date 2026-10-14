@@ -98,6 +98,17 @@ export function assignStruct<T>(
     return
   }
 
+  // A generated struct class copies the fields of a value of its own type
+  // directly, which is much faster than copying them by their type info.
+  if (
+    (target as any).constructor === (source as any).constructor &&
+    typeof (target as any).__goscriptAssign === 'function' &&
+    (source as any)._fields !== undefined
+  ) {
+    ;(target as any).__goscriptAssign(source)
+    return
+  }
+
   // The value identifies its layout even when package names collide.
   const targetFields = (target as any)._fields
   const sourceFields = (source as any)._fields
@@ -142,7 +153,7 @@ export function assignStruct<T>(
 }
 
 /** assignFieldValue preserves aggregate storage while replacing reference values. */
-function assignFieldValue(
+export function assignFieldValue(
   target: any,
   source: any,
   typeInfo?: TypeInfo | string,

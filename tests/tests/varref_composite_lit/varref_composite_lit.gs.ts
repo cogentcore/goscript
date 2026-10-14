@@ -26,6 +26,12 @@ export class MockInode {
 		return $.markAsStructValue(new MockInode(this))
 	}
 
+	public __goscriptAssign(source: MockInode): void {
+		const target = this._fields
+		const values = source._fields
+		target.Value = values.Value
+	}
+
 	public getValue(): number {
 		const m: MockInode | $.VarRef<MockInode> | null = this;
 		return $.pointerValue<MockInode>(m).Value

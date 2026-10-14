@@ -51,6 +51,12 @@ export class byteFormatter {
 		return $.markAsStructValue(new byteFormatter(this))
 	}
 
+	public __goscriptAssign(source: byteFormatter): void {
+		const target = this._fields
+		const values = source._fields
+		target.prefix = values.prefix
+	}
+
 	public async Format(state: fmt.State | null, verb: number): globalThis.Promise<void> {
 		const b = this;
 		let buf: $.Slice<number> = $.appendSlice(new Uint8Array([]) as $.Slice<number>, b.prefix, $.byteSliceHint)
@@ -98,6 +104,13 @@ export class pos {
 
 	public clone(): pos {
 		return $.markAsStructValue(new pos(this))
+	}
+
+	public __goscriptAssign(source: pos): void {
+		const target = this._fields
+		const values = source._fields
+		target.Line = values.Line
+		target.Char = values.Char
 	}
 
 	static __typeInfo = $.registerStructType(

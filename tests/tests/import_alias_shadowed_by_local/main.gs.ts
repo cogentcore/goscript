@@ -29,6 +29,12 @@ export class local {
 		return $.markAsStructValue(new local(this))
 	}
 
+	public __goscriptAssign(source: local): void {
+		const target = this._fields
+		const values = source._fields
+		target.value = values.value
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.local",
 		() => new local(),

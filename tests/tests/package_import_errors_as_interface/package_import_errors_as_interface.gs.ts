@@ -40,6 +40,12 @@ export class wrappedHealthError {
 		return $.markAsStructValue(new wrappedHealthError(this))
 	}
 
+	public __goscriptAssign(source: wrappedHealthError): void {
+		const target = this._fields
+		const values = source._fields
+		target.err = $.assignFieldValue(target.err, values.err, "error")
+	}
+
 	public async Error(): globalThis.Promise<string> {
 		const e: wrappedHealthError | $.VarRef<wrappedHealthError> | null = this;
 		return $.pointerValue<Exclude<$.GoError, null>>($.pointerValue<wrappedHealthError>(e).err).Error()

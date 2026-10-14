@@ -7,9 +7,21 @@ import * as reflect from "@goscript/reflect/index.js"
 import "@goscript/reflect/index.js"
 
 export class inner {
-	public declare A: number
+	public get A(): number {
+		return this._fields.A
+	}
 
-	public declare B: string
+	public set A(value: number) {
+		this._fields.A = value
+	}
+
+	public get B(): string {
+		return this._fields.B
+	}
+
+	public set B(value: string) {
+		this._fields.B = value
+	}
 
 	public _fields: {
 		A: number
@@ -27,8 +39,11 @@ export class inner {
 		return $.markAsStructValue(new inner(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["A", "B"])
+	public __goscriptAssign(source: inner): void {
+		const target = this._fields
+		const values = source._fields
+		target.A = values.A
+		target.B = values.B
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -41,11 +56,29 @@ export class inner {
 }
 
 export class outer {
-	public declare X: number
+	public get X(): number {
+		return this._fields.X
+	}
 
-	public declare In: inner
+	public set X(value: number) {
+		this._fields.X = value
+	}
 
-	public declare P: inner | $.VarRef<inner> | null
+	public get In(): inner {
+		return this._fields.In
+	}
+
+	public set In(value: inner) {
+		this._fields.In = value
+	}
+
+	public get P(): inner | $.VarRef<inner> | null {
+		return this._fields.P
+	}
+
+	public set P(value: inner | $.VarRef<inner> | null) {
+		this._fields.P = value
+	}
 
 	public _fields: {
 		X: number
@@ -65,8 +98,12 @@ export class outer {
 		return $.markAsStructValue(new outer(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["X", "In", "P"])
+	public __goscriptAssign(source: outer): void {
+		const target = this._fields
+		const values = source._fields
+		target.X = values.X
+		$.assignStruct(target.In, values.In)
+		target.P = values.P
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -82,19 +119,17 @@ export async function main(): globalThis.Promise<void> {
 	// Test creating a StructField value
 	let field = (() => { const __goscriptLiteralField0 = reflect.TypeFor({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }}); return $.markAsStructValue(new reflect.StructField({Name: "TestField", Type: __goscriptLiteralField0})) })()
 	await $.println("StructField Name:", field.Name)
-	await $.println("StructField Type:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(field.Type).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println("StructField Type:", await $.pointerValue<Exclude<reflect.Type, null>>(field.Type).String())
 
 	// Type.FieldByIndex selects nested fields, following pointers to structs
 	let typ = reflect.TypeOf($.interfaceValue($.markAsStructValue(new outer()), "main.outer", "main.outer"))
-	let f = $.markAsStructValue($.cloneStructValue((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(typ).FieldByIndex($.arrayToSlice<number>([0])), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)))
-	await $.println("FieldByIndex 0:", f.Name, (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(f.Type).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
-	$.assignStruct(f, $.markAsStructValue($.cloneStructValue((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(typ).FieldByIndex($.arrayToSlice<number>([1, 1])), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))))
-	await $.println("FieldByIndex 1,1:", f.Name, (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(f.Type).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
-	$.assignStruct(f, $.markAsStructValue($.cloneStructValue((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(typ).FieldByIndex($.arrayToSlice<number>([2, 0])), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))))
-	await $.println("FieldByIndex 2,0:", f.Name, (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(f.Type).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	let f = $.markAsStructValue($.cloneStructValue(await $.pointerValue<Exclude<reflect.Type, null>>(typ).FieldByIndex($.arrayToSlice<number>([0]))))
+	await $.println("FieldByIndex 0:", f.Name, await $.pointerValue<Exclude<reflect.Type, null>>(f.Type).String())
+	$.assignStruct(f, $.markAsStructValue($.cloneStructValue(await $.pointerValue<Exclude<reflect.Type, null>>(typ).FieldByIndex($.arrayToSlice<number>([1, 1])))))
+	await $.println("FieldByIndex 1,1:", f.Name, await $.pointerValue<Exclude<reflect.Type, null>>(f.Type).String())
+	$.assignStruct(f, $.markAsStructValue($.cloneStructValue(await $.pointerValue<Exclude<reflect.Type, null>>(typ).FieldByIndex($.arrayToSlice<number>([2, 0])))))
+	await $.println("FieldByIndex 2,0:", f.Name, await $.pointerValue<Exclude<reflect.Type, null>>(f.Type).String())
 }
-
-var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

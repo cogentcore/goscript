@@ -36,6 +36,13 @@ export class MyStruct {
 		return $.markAsStructValue(new MyStruct(this))
 	}
 
+	public __goscriptAssign(source: MyStruct): void {
+		const target = this._fields
+		const values = source._fields
+		target.MyInt = values.MyInt
+		target.MyString = values.MyString
+	}
+
 	public GetMyString(): string {
 		const m: MyStruct | $.VarRef<MyStruct> | null = this;
 		return $.pointerValue<MyStruct>(m).MyString
@@ -71,6 +78,12 @@ export class setterStruct {
 
 	public clone(): setterStruct {
 		return $.markAsStructValue(new setterStruct(this))
+	}
+
+	public __goscriptAssign(source: setterStruct): void {
+		const target = this._fields
+		const values = source._fields
+		target.value = values.value
 	}
 
 	public ["get"](): number {
@@ -113,6 +126,12 @@ export class digest {
 
 	public clone(): digest {
 		return $.markAsStructValue(new digest(this))
+	}
+
+	public __goscriptAssign(source: digest): void {
+		const target = this._fields
+		const values = source._fields
+		target.writes = values.writes
 	}
 
 	public Write(p: $.Slice<number>): void {

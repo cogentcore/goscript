@@ -29,6 +29,12 @@ export class chunker {
 		return $.markAsStructValue(new chunker(this))
 	}
 
+	public __goscriptAssign(source: chunker): void {
+		const target = this._fields
+		const values = source._fields
+		target.pos = values.pos
+	}
+
 	public advance(chunkSize: number): void {
 		let c: chunker | $.VarRef<chunker> | null = this;
 		$.pointerValue<chunker>(c).pos = $.uint64Add($.pointerValue<chunker>(c).pos, $.uint64(chunkSize))
@@ -64,6 +70,12 @@ export class repeatReader {
 
 	public clone(): repeatReader {
 		return $.markAsStructValue(new repeatReader(this))
+	}
+
+	public __goscriptAssign(source: repeatReader): void {
+		const target = this._fields
+		const values = source._fields
+		target.remaining = values.remaining
 	}
 
 	public Read(p: $.Slice<number>): [number, $.GoError] {

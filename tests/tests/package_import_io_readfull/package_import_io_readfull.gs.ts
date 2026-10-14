@@ -42,6 +42,13 @@ export class fixedReader {
 		return $.markAsStructValue(new fixedReader(this))
 	}
 
+	public __goscriptAssign(source: fixedReader): void {
+		const target = this._fields
+		const values = source._fields
+		target.data = values.data
+		target.size = values.size
+	}
+
 	public Read(p: $.Slice<number>): [number, $.GoError] {
 		let r: fixedReader | $.VarRef<fixedReader> | null = this;
 		if ($.sliceLen($.pointerValue<fixedReader>(r).data) == 0) {

@@ -35,6 +35,13 @@ export class blockType {
 		return $.markAsStructValue(new blockType(this))
 	}
 
+	public __goscriptAssign(source: blockType): void {
+		const target = this._fields
+		const values = source._fields
+		target.typeID = values.typeID
+		target._constructor = values._constructor
+	}
+
 	public async Constructor(__typeArgs: $.GenericTypeArgs | undefined): globalThis.Promise<Block | null> {
 		const t: blockType | $.VarRef<blockType> | null = this;
 		return $.typeParamInterfaceValue<Block | null>((__goscriptAwait = $.pointerValue<blockType>(t)._constructor!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [$.methodSignature("MarshalBlock", [], [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")), "error"]), $.methodSignature("UnmarshalBlock", [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))], ["error"])] }, zero: () => null })
@@ -69,6 +76,9 @@ export class sampleBlock {
 
 	public clone(): sampleBlock {
 		return $.markAsStructValue(new sampleBlock(this))
+	}
+
+	public __goscriptAssign(source: sampleBlock): void {
 	}
 
 	public MarshalBlock(): [$.Slice<number>, $.GoError] {

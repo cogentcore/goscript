@@ -17,9 +17,21 @@ $.registerInterfaceType(
 );
 
 export class Base {
-	public declare App: any
+	public get App(): any {
+		return this._fields.App
+	}
 
-	public declare flags: Flags
+	public set App(value: any) {
+		this._fields.App = value
+	}
+
+	public get flags(): Flags {
+		return this._fields.flags
+	}
+
+	public set flags(value: Flags) {
+		this._fields.flags = value
+	}
 
 	public _fields: {
 		App: any
@@ -37,6 +49,13 @@ export class Base {
 		return $.markAsStructValue(new Base(this))
 	}
 
+	public __goscriptAssign(source: Base): void {
+		const target = this._fields
+		const values = source._fields
+		target.App = $.assignFieldValue(target.App, values.App, { kind: $.TypeKind.Interface, methods: [] })
+		target.flags = values.flags
+	}
+
 	public Is(__typeArgs: $.GenericTypeArgs | undefined, flag: Flags): boolean {
 		const b: Base | $.VarRef<Base> | null = this;
 		return ($.int64And($.pointerValue<Base>(b).flags, ($.int64Shl(1n, flag)))) != 0n
@@ -45,10 +64,6 @@ export class Base {
 	public Set(__typeArgs: $.GenericTypeArgs | undefined, flag: Flags): void {
 		let b: Base | $.VarRef<Base> | null = this;
 		$.pointerValue<Base>(b).flags = $.int64Or($.pointerValue<Base>(b).flags, $.int64Shl(1n, flag))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["App", "flags"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -61,7 +76,13 @@ export class Base {
 }
 
 export class App {
-	public declare Name: string
+	public get Name(): string {
+		return this._fields.Name
+	}
+
+	public set Name(value: string) {
+		this._fields.Name = value
+	}
 
 	public _fields: {
 		Name: string
@@ -77,8 +98,10 @@ export class App {
 		return $.markAsStructValue(new App(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Name"])
+	public __goscriptAssign(source: App): void {
+		const target = this._fields
+		const values = source._fields
+		target.Name = values.Name
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -91,9 +114,21 @@ export class App {
 }
 
 export class Window {
-	public declare Base: Base
+	public get Base(): Base {
+		return this._fields.Base
+	}
 
-	public declare Title: string
+	public set Base(value: Base) {
+		this._fields.Base = value
+	}
+
+	public get Title(): string {
+		return this._fields.Title
+	}
+
+	public set Title(value: string) {
+		this._fields.Title = value
+	}
 
 	public _fields: {
 		Base: Base
@@ -111,16 +146,19 @@ export class Window {
 		return $.markAsStructValue(new Window(this))
 	}
 
+	public __goscriptAssign(source: Window): void {
+		const target = this._fields
+		const values = source._fields
+		$.assignStruct(target.Base, values.Base)
+		target.Title = values.Title
+	}
+
 	public Is(flag: any): any {
 		return $.pointerValue<Base>(this.Base).Is({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, A: { type: /* @__PURE__ */ $.pointerType("main.App"), zero: () => null }}, flag)
 	}
 
 	public Set(flag: any): any {
 		return $.pointerValue<Base>(this.Base).Set({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, A: { type: /* @__PURE__ */ $.pointerType("main.App"), zero: () => null }}, flag)
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["Base", "Title"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -133,9 +171,21 @@ export class Window {
 }
 
 export class Single {
-	public declare Base: Base
+	public get Base(): Base {
+		return this._fields.Base
+	}
 
-	public declare Count: number
+	public set Base(value: Base) {
+		this._fields.Base = value
+	}
+
+	public get Count(): number {
+		return this._fields.Count
+	}
+
+	public set Count(value: number) {
+		this._fields.Count = value
+	}
 
 	public _fields: {
 		Base: Base
@@ -153,16 +203,19 @@ export class Single {
 		return $.markAsStructValue(new Single(this))
 	}
 
+	public __goscriptAssign(source: Single): void {
+		const target = this._fields
+		const values = source._fields
+		$.assignStruct(target.Base, values.Base)
+		target.Count = values.Count
+	}
+
 	public Is(__typeArgs: $.GenericTypeArgs | undefined, flag: any): any {
 		return $.pointerValue<Base>(this.Base).Is({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, A: __typeArgs?.["A"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }}, flag)
 	}
 
 	public Set(__typeArgs: $.GenericTypeArgs | undefined, flag: any): any {
 		return $.pointerValue<Base>(this.Base).Set({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, A: __typeArgs?.["A"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }}, flag)
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["Base", "Count"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -175,8 +228,8 @@ export class Single {
 }
 
 export async function check(__typeArgs: $.GenericTypeArgs | undefined, w: any): globalThis.Promise<boolean> {
-	void (__goscriptAwait = $.callGenericMethod(__typeArgs, "W", "Set", w, 6n), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
-	return (__goscriptAwait = $.callGenericMethod(__typeArgs, "W", "Is", w, 6n), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) && !(__goscriptAwait = $.callGenericMethod(__typeArgs, "W", "Is", w, 2n), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+	await $.callGenericMethod(__typeArgs, "W", "Set", w, 6n)
+	return await $.callGenericMethod(__typeArgs, "W", "Is", w, 6n) && !await $.callGenericMethod(__typeArgs, "W", "Is", w, 2n)
 }
 
 export function asFlagger(__typeArgs: $.GenericTypeArgs | undefined, w: any): Flagger | null {
@@ -187,15 +240,13 @@ export async function main(): globalThis.Promise<void> {
 	let w: Window | $.VarRef<Window> | null = new Window({Title: "main"})
 	await $.println("check:", await check({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, W: { type: /* @__PURE__ */ $.pointerType("main.Window"), zero: () => null, methods: {Is: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Is(...$.stripGenericTypeArgs(args)), Set: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Set(...$.stripGenericTypeArgs(args))} }}, w))
 	let f = asFlagger({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, W: { type: /* @__PURE__ */ $.pointerType("main.Window"), zero: () => null, methods: {Is: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Is(...$.stripGenericTypeArgs(args)), Set: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Set(...$.stripGenericTypeArgs(args))} }}, new Window())
-	void (__goscriptAwait = $.pointerValue<Exclude<Flagger, null>>(f).Set(3n), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
-	await $.println("interface:", (__goscriptAwait = $.pointerValue<Exclude<Flagger, null>>(f).Is(3n), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = $.pointerValue<Exclude<Flagger, null>>(f).Is(6n), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.pointerValue<Exclude<Flagger, null>>(f).Set(3n)
+	await $.println("interface:", await $.pointerValue<Exclude<Flagger, null>>(f).Is(3n), await $.pointerValue<Exclude<Flagger, null>>(f).Is(6n))
 
 	let s: Single | $.VarRef<Single> | null = new Single()
 	await $.println("generic outer:", await check({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, W: { type: /* @__PURE__ */ $.pointerType("main.Single"), zero: () => null, methods: {Is: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Is({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, A: { type: /* @__PURE__ */ $.pointerType("main.App"), zero: () => null }}, ...$.stripGenericTypeArgs(args)), Set: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Set({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, A: { type: /* @__PURE__ */ $.pointerType("main.App"), zero: () => null }}, ...$.stripGenericTypeArgs(args))} }}, s))
 	await $.println("generic outer string:", await check({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, W: { type: /* @__PURE__ */ $.pointerType("main.Single"), zero: () => null, methods: {Is: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Is({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, A: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }}, ...$.stripGenericTypeArgs(args)), Set: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Set({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, A: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }}, ...$.stripGenericTypeArgs(args))} }}, new Single()))
 }
-
-var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

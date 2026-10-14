@@ -29,6 +29,9 @@ export class MyType {
 		return $.markAsStructValue(new MyType(this))
 	}
 
+	public __goscriptAssign(source: MyType): void {
+	}
+
 	public String(): string {
 		const m = this;
 		return "MyType"

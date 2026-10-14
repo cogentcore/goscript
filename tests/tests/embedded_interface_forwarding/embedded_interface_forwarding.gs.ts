@@ -36,6 +36,12 @@ export class Box {
 		return $.markAsStructValue(new Box(this))
 	}
 
+	public __goscriptAssign(source: Box): void {
+		const target = this._fields
+		const values = source._fields
+		target.Adder = $.assignFieldValue(target.Adder, values.Adder, "main.Adder")
+	}
+
 	public Add(value: any): any {
 		return $.pointerValue<Exclude<Adder | null, null>>(this.Adder).Add(value)
 	}
@@ -70,6 +76,12 @@ export class Counter {
 
 	public clone(): Counter {
 		return $.markAsStructValue(new Counter(this))
+	}
+
+	public __goscriptAssign(source: Counter): void {
+		const target = this._fields
+		const values = source._fields
+		target.base = values.base
 	}
 
 	public Add(value: number): number {

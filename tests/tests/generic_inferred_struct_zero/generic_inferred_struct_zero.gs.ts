@@ -36,6 +36,13 @@ export class entry {
 		return $.markAsStructValue(new entry(this))
 	}
 
+	public __goscriptAssign(source: entry): void {
+		const target = this._fields
+		const values = source._fields
+		target.key = values.key
+		target.n = values.n
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.entry",
 		() => new entry(),
@@ -86,6 +93,14 @@ export class tree {
 
 	public clone(): tree {
 		return $.markAsStructValue(new tree(this))
+	}
+
+	public __goscriptAssign(source: tree): void {
+		const target = this._fields
+		const values = source._fields
+		target.less = values.less
+		target.empty = $.assignFieldValue(target.empty, values.empty, { kind: $.TypeKind.Interface, methods: [] })
+		target.count = values.count
 	}
 
 	public ["get"](__typeArgs: $.GenericTypeArgs | undefined): any {

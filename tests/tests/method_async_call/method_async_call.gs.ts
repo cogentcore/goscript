@@ -39,6 +39,13 @@ export class FileTracker {
 		return $.markAsStructValue(new FileTracker(this))
 	}
 
+	public __goscriptAssign(source: FileTracker): void {
+		const target = this._fields
+		const values = source._fields
+		$.assignStruct(target.mutex, values.mutex)
+		target.lines = values.lines
+	}
+
 	public async AddLine(offset: number): globalThis.Promise<void> {
 		let f: FileTracker | $.VarRef<FileTracker> | null = this;
 		await $.pointerValue<FileTracker>(f).mutex.Lock()
@@ -76,6 +83,12 @@ export class Scanner {
 
 	public clone(): Scanner {
 		return $.markAsStructValue(new Scanner(this))
+	}
+
+	public __goscriptAssign(source: Scanner): void {
+		const target = this._fields
+		const values = source._fields
+		target.file = values.file
 	}
 
 	public async next(): globalThis.Promise<void> {

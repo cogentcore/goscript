@@ -36,6 +36,12 @@ export class Worker {
 		return $.markAsStructValue(new Worker(this))
 	}
 
+	public __goscriptAssign(source: Worker): void {
+		const target = this._fields
+		const values = source._fields
+		target.ch = values.ch
+	}
+
 	public async Spawn(): globalThis.Promise<$.GoError> {
 		const w: Worker | $.VarRef<Worker> | null = this;
 		queueMicrotask(async () => { await (async (): globalThis.Promise<void> => {

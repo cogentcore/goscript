@@ -58,6 +58,12 @@ export class pairingOffer {
 		return $.markAsStructValue(new pairingOffer(this))
 	}
 
+	public __goscriptAssign(source: pairingOffer): void {
+		const target = this._fields
+		const values = source._fields
+		target.Note = values.Note
+	}
+
 	public MarshalVT(): [$.Slice<number>, $.GoError] {
 		const o: pairingOffer | $.VarRef<pairingOffer> | null = this;
 		return [$.stringToBytes($.pointerValue<pairingOffer>(o).Note), null]

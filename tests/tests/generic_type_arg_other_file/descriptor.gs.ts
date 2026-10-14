@@ -26,6 +26,12 @@ export class descriptor {
 		return $.markAsStructValue(new descriptor(this))
 	}
 
+	public __goscriptAssign(source: descriptor): void {
+		const target = this._fields
+		const values = source._fields
+		target.Label = values.Label
+	}
+
 	public toJS(): any {
 		const d: descriptor | $.VarRef<descriptor> | null = this;
 		return $.concatString("descriptor ", $.pointerValue<descriptor>(d).Label)

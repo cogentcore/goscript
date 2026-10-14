@@ -30,6 +30,9 @@ export class impl {
 		return $.markAsStructValue(new impl(this))
 	}
 
+	public __goscriptAssign(source: impl): void {
+	}
+
 	public async Name(): globalThis.Promise<string> {
 		const i: impl | $.VarRef<impl> | null = this;
 		await $.chanSend(ready, true)

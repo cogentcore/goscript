@@ -35,6 +35,12 @@ export class writerHolder {
 		return $.markAsStructValue(new writerHolder(this))
 	}
 
+	public __goscriptAssign(source: writerHolder): void {
+		const target = this._fields
+		const values = source._fields
+		target.w = $.assignFieldValue(target.w, values.w, "io.Writer")
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.writerHolder",
 		() => new writerHolder(),
@@ -55,6 +61,9 @@ export class asyncBuffer {
 
 	public clone(): asyncBuffer {
 		return $.markAsStructValue(new asyncBuffer(this))
+	}
+
+	public __goscriptAssign(source: asyncBuffer): void {
 	}
 
 	public async Reset(w: io.Writer | null): globalThis.Promise<void> {
@@ -104,6 +113,12 @@ export class staticReader {
 		return $.markAsStructValue(new staticReader(this))
 	}
 
+	public __goscriptAssign(source: staticReader): void {
+		const target = this._fields
+		const values = source._fields
+		target.done = values.done
+	}
+
 	public Read(p: $.Slice<number>): [number, $.GoError] {
 		let r: staticReader | $.VarRef<staticReader> | null = this;
 		if ($.pointerValue<staticReader>(r).done) {
@@ -144,6 +159,12 @@ export class asyncReader {
 
 	public clone(): asyncReader {
 		return $.markAsStructValue(new asyncReader(this))
+	}
+
+	public __goscriptAssign(source: asyncReader): void {
+		const target = this._fields
+		const values = source._fields
+		target.done = values.done
 	}
 
 	public async Read(p: $.Slice<number>): globalThis.Promise<[number, $.GoError]> {
@@ -187,6 +208,12 @@ export class asyncReaderAt {
 
 	public clone(): asyncReaderAt {
 		return $.markAsStructValue(new asyncReaderAt(this))
+	}
+
+	public __goscriptAssign(source: asyncReaderAt): void {
+		const target = this._fields
+		const values = source._fields
+		target.data = values.data
 	}
 
 	public async ReadAt(p: $.Slice<number>, off: bigint): globalThis.Promise<[number, $.GoError]> {
@@ -262,6 +289,15 @@ export class pipeReadResult {
 
 	public clone(): pipeReadResult {
 		return $.markAsStructValue(new pipeReadResult(this))
+	}
+
+	public __goscriptAssign(source: pipeReadResult): void {
+		const target = this._fields
+		const values = source._fields
+		target.n = values.n
+		target.data = values.data
+		target.errNil = values.errNil
+		target.errEOF = values.errEOF
 	}
 
 	static __typeInfo = $.registerStructType(

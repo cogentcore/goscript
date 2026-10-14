@@ -29,6 +29,12 @@ export class Simple {
 		return $.markAsStructValue(new Simple(this))
 	}
 
+	public __goscriptAssign(source: Simple): void {
+		const target = this._fields
+		const values = source._fields
+		target.X = values.X
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.Simple",
 		() => new Simple(),

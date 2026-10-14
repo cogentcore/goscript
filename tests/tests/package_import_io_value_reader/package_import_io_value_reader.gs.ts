@@ -22,6 +22,9 @@ export class zeroReader {
 		return $.markAsStructValue(new zeroReader(this))
 	}
 
+	public __goscriptAssign(source: zeroReader): void {
+	}
+
 	public Read(p: $.Slice<number>): [number, $.GoError] {
 		$.clear(p)
 		return [$.sliceLen(p), null]

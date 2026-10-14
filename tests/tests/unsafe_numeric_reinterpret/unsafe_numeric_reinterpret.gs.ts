@@ -66,6 +66,12 @@ export async function main(): globalThis.Promise<void> {
 			return $.markAsStructValue(new pair(this))
 		}
 
+		public __goscriptAssign(source: pair): void {
+			const target = this._fields
+			const values = source._fields
+			target.f = values.f
+		}
+
 		static __typeInfo = $.registerStructType(
 			"main.pair",
 			() => new pair(),

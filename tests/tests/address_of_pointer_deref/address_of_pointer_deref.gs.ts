@@ -36,6 +36,13 @@ export class Col {
 		return $.markAsStructValue(new Col(this))
 	}
 
+	public __goscriptAssign(source: Col): void {
+		const target = this._fields
+		const values = source._fields
+		target.Name = values.Name
+		target.Default = values.Default
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.Col",
 		() => new Col(),

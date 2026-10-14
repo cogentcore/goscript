@@ -37,6 +37,12 @@ export class customErr {
 		return $.markAsStructValue(new customErr(this))
 	}
 
+	public __goscriptAssign(source: customErr): void {
+		const target = this._fields
+		const values = source._fields
+		target.msg = values.msg
+	}
+
 	public Error(): string {
 		const e: customErr | $.VarRef<customErr> | null = this;
 		return $.pointerValue<customErr>(e).msg
@@ -70,6 +76,12 @@ export class wrappedErr {
 
 	public clone(): wrappedErr {
 		return $.markAsStructValue(new wrappedErr(this))
+	}
+
+	public __goscriptAssign(source: wrappedErr): void {
+		const target = this._fields
+		const values = source._fields
+		target.err = $.assignFieldValue(target.err, values.err, "error")
 	}
 
 	public async Error(): globalThis.Promise<string> {

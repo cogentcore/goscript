@@ -39,6 +39,12 @@ export class wrappedAEAD {
 		return $.markAsStructValue(new wrappedAEAD(this))
 	}
 
+	public __goscriptAssign(source: wrappedAEAD): void {
+		const target = this._fields
+		const values = source._fields
+		target.inner = $.assignFieldValue(target.inner, values.inner, "cipher.AEAD")
+	}
+
 	public async NonceSize(): globalThis.Promise<number> {
 		const w: wrappedAEAD | $.VarRef<wrappedAEAD> | null = this;
 		return $.pointerValue<Exclude<cipher.AEAD, null>>($.pointerValue<wrappedAEAD>(w).inner).NonceSize()
@@ -95,6 +101,14 @@ export class nestedSealer {
 
 	public clone(): nestedSealer {
 		return $.markAsStructValue(new nestedSealer(this))
+	}
+
+	public __goscriptAssign(source: nestedSealer): void {
+		const target = this._fields
+		const values = source._fields
+		target.aead = $.assignFieldValue(target.aead, values.aead, "cipher.AEAD")
+		target.nonce = values.nonce
+		target.aad = values.aad
 	}
 
 	public async Seal(dst: $.Slice<number>, plaintext: $.Slice<number>): globalThis.Promise<$.Slice<number>> {

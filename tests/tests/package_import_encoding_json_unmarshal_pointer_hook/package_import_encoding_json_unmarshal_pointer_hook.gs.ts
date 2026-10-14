@@ -26,9 +26,21 @@ $.registerNamedValueType(
 );
 
 export class Hooked {
-	public declare Calls: number
+	public get Calls(): number {
+		return this._fields.Calls
+	}
 
-	public declare Seen: string
+	public set Calls(value: number) {
+		this._fields.Calls = value
+	}
+
+	public get Seen(): string {
+		return this._fields.Seen
+	}
+
+	public set Seen(value: string) {
+		this._fields.Seen = value
+	}
 
 	public _fields: {
 		Calls: number
@@ -46,15 +58,18 @@ export class Hooked {
 		return $.markAsStructValue(new Hooked(this))
 	}
 
+	public __goscriptAssign(source: Hooked): void {
+		const target = this._fields
+		const values = source._fields
+		target.Calls = values.Calls
+		target.Seen = values.Seen
+	}
+
 	public UnmarshalJSON(data: $.Slice<number>): $.GoError {
 		let h: Hooked | $.VarRef<Hooked> | null = this;
 		$.pointerValue<Hooked>(h).Calls++
 		$.pointerValue<Hooked>(h).Seen = $.bytesToString(data)
 		return null
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["Calls", "Seen"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -67,7 +82,13 @@ export class Hooked {
 }
 
 export class Box {
-	public declare Value: Hooked | $.VarRef<Hooked> | null
+	public get Value(): Hooked | $.VarRef<Hooked> | null {
+		return this._fields.Value
+	}
+
+	public set Value(value: Hooked | $.VarRef<Hooked> | null) {
+		this._fields.Value = value
+	}
 
 	public _fields: {
 		Value: Hooked | $.VarRef<Hooked> | null
@@ -83,8 +104,10 @@ export class Box {
 		return $.markAsStructValue(new Box(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Value"])
+	public __goscriptAssign(source: Box): void {
+		const target = this._fields
+		const values = source._fields
+		target.Value = values.Value
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -97,9 +120,21 @@ export class Box {
 }
 
 export class MapItem {
-	public declare Name: string
+	public get Name(): string {
+		return this._fields.Name
+	}
 
-	public declare Map: globalThis.Map<string, number> | null
+	public set Name(value: string) {
+		this._fields.Name = value
+	}
+
+	public get Map(): globalThis.Map<string, number> | null {
+		return this._fields.Map
+	}
+
+	public set Map(value: globalThis.Map<string, number> | null) {
+		this._fields.Map = value
+	}
 
 	public _fields: {
 		Name: string
@@ -117,8 +152,11 @@ export class MapItem {
 		return $.markAsStructValue(new MapItem(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Name", "Map"])
+	public __goscriptAssign(source: MapItem): void {
+		const target = this._fields
+		const values = source._fields
+		target.Name = values.Name
+		target.Map = values.Map
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -159,7 +197,7 @@ export async function main(): globalThis.Promise<void> {
 	{
 		let err = json.Unmarshal(new Uint8Array([123, 34, 118, 97, 108, 117, 101, 34, 58, 123, 34, 105, 103, 110, 111, 114, 101, 100, 34, 58, 48, 125, 125]), $.interfaceValue(box, "*main.Box", /* @__PURE__ */ $.pointerType("main.Box")))
 		if (err != null) {
-			await fmt.Println("unmarshal error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+			await fmt.Println("unmarshal error:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
 			return
 		}
 	}
@@ -175,8 +213,6 @@ export async function main(): globalThis.Promise<void> {
 	err = json.Unmarshal(new Uint8Array([123, 34, 112, 34, 58, 49, 44, 34, 113, 34, 58, 50, 125]), $.namedValueInterfaceValue<any>(names, "*main.Names", {Len: (receiver: any, ...args: any[]) => (Names_Len as any)(receiver, ...$.stripGenericTypeArgs(args))}, /* @__PURE__ */ $.pointerType("main.Names"), [$.methodSignature("Len", [], [/* @__PURE__ */ $.basicType("int")])]))
 	await fmt.Println("names:", err == null, $.basicInterfaceValue(Names_Len(names), "int"), $.basicInterfaceValue($.mapGet<string, number, number>(names.value, "q", 0)[0], "int"))
 }
-
-var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

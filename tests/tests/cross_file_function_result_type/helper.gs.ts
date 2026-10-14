@@ -26,6 +26,12 @@ export class token {
 		return $.markAsStructValue(new token(this))
 	}
 
+	public __goscriptAssign(source: token): void {
+		const target = this._fields
+		const values = source._fields
+		target.value = values.value
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.token",
 		() => new token(),

@@ -30,6 +30,12 @@ export class MyStruct {
 		return $.markAsStructValue(new MyStruct(this))
 	}
 
+	public __goscriptAssign(source: MyStruct): void {
+		const target = this._fields
+		const values = source._fields
+		target.MyInt = values.MyInt
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.MyStruct",
 		() => new MyStruct(),
@@ -83,6 +89,14 @@ export class Outer {
 
 	public clone(): Outer {
 		return $.markAsStructValue(new Outer(this))
+	}
+
+	public __goscriptAssign(source: Outer): void {
+		const target = this._fields
+		const values = source._fields
+		$.assignStruct(target.Child, values.Child)
+		target.Items = $.assignFieldValue(target.Items, values.Items, /* @__PURE__ */ $.arrayType("main.MyStruct", 2))
+		target.Ptr = values.Ptr
 	}
 
 	static __typeInfo = $.registerStructType(

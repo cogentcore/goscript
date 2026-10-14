@@ -26,6 +26,12 @@ export class code {
 		return $.markAsStructValue(new code(this))
 	}
 
+	public __goscriptAssign(source: code): void {
+		const target = this._fields
+		const values = source._fields
+		target.len = values.len
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.code",
 		() => new code(),

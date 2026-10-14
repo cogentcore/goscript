@@ -26,6 +26,12 @@ export class bitset {
 		return $.markAsStructValue(new bitset(this))
 	}
 
+	public __goscriptAssign(source: bitset): void {
+		const target = this._fields
+		const values = source._fields
+		target.bits = $.assignFieldValue(target.bits, values.bits, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 4))
+	}
+
 	public has(bit: number): boolean {
 		const b: bitset | $.VarRef<bitset> | null = this;
 		let entry = $.indexRef($.pointerValue<bitset>(b).bits, globalThis.Math.trunc(bit / 8))

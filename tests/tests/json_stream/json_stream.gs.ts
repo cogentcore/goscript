@@ -54,6 +54,13 @@ export class chanReader {
 		return $.markAsStructValue(new chanReader(this))
 	}
 
+	public __goscriptAssign(source: chanReader): void {
+		const target = this._fields
+		const values = source._fields
+		target.ch = values.ch
+		target.cur = values.cur
+	}
+
 	public async Read(p: $.Slice<number>): globalThis.Promise<[number, $.GoError]> {
 		let r: chanReader | $.VarRef<chanReader> | null = this;
 		if ($.stringEqual($.pointerValue<chanReader>(r).cur, "")) {
@@ -110,6 +117,13 @@ export class item {
 
 	public clone(): item {
 		return $.markAsStructValue(new item(this))
+	}
+
+	public __goscriptAssign(source: item): void {
+		const target = this._fields
+		const values = source._fields
+		target.A = values.A
+		target.B = values.B
 	}
 
 	static __typeInfo = $.registerStructType(

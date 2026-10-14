@@ -26,6 +26,12 @@ export class content {
 		return $.markAsStructValue(new content(this))
 	}
 
+	public __goscriptAssign(source: content): void {
+		const target = this._fields
+		const values = source._fields
+		target.bytes = values.bytes
+	}
+
 	public ProcessData(input: number): [number, string, boolean] {
 		const c: content | $.VarRef<content> | null = this;
 		let result: number = 0

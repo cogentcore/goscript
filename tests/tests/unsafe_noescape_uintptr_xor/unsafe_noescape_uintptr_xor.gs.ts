@@ -39,6 +39,13 @@ export class sourceStruct {
 		return $.markAsStructValue(new sourceStruct(this))
 	}
 
+	public __goscriptAssign(source: sourceStruct): void {
+		const target = this._fields
+		const values = source._fields
+		target.flag = values.flag
+		target.data = values.data
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.sourceStruct",
 		() => new sourceStruct(),
@@ -79,6 +86,13 @@ export class viewStruct {
 
 	public clone(): viewStruct {
 		return $.markAsStructValue(new viewStruct(this))
+	}
+
+	public __goscriptAssign(source: viewStruct): void {
+		const target = this._fields
+		const values = source._fields
+		target.flag = values.flag
+		target.data = values.data
 	}
 
 	static __typeInfo = $.registerStructType(

@@ -26,6 +26,12 @@ export class base {
 		return $.markAsStructValue(new base(this))
 	}
 
+	public __goscriptAssign(source: base): void {
+		const target = this._fields
+		const values = source._fields
+		target.value = values.value
+	}
+
 	public Add(n: number): number {
 		const b: base | $.VarRef<base> | null = this;
 		return $.pointerValue<base>(b).value + n
@@ -61,6 +67,12 @@ export class wrapper {
 
 	public clone(): wrapper {
 		return $.markAsStructValue(new wrapper(this))
+	}
+
+	public __goscriptAssign(source: wrapper): void {
+		const target = this._fields
+		const values = source._fields
+		$.assignStruct(target.base, values.base)
 	}
 
 	public Add(n: any): any {

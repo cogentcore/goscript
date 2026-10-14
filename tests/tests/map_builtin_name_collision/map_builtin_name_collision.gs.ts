@@ -26,6 +26,12 @@ export class Map {
 		return $.markAsStructValue(new Map(this))
 	}
 
+	public __goscriptAssign(source: Map): void {
+		const target = this._fields
+		const values = source._fields
+		target.values = values.values
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.Map",
 		() => new Map(),

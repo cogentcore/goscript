@@ -7,7 +7,13 @@ import * as atomic from "@goscript/sync/atomic/index.js"
 import "@goscript/sync/atomic/index.js"
 
 export class pointerNode {
-	public declare value: string
+	public get value(): string {
+		return this._fields.value
+	}
+
+	public set value(value: string) {
+		this._fields.value = value
+	}
 
 	public _fields: {
 		value: string
@@ -23,8 +29,10 @@ export class pointerNode {
 		return $.markAsStructValue(new pointerNode(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["value"])
+	public __goscriptAssign(source: pointerNode): void {
+		const target = this._fields
+		const values = source._fields
+		target.value = values.value
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -112,12 +120,12 @@ export async function main(): globalThis.Promise<void> {
 	let callback: $.VarRef<(() => void) | null> = $.varRef(__goscriptTuple0[0])
 	let callbackErr = __goscriptTuple0[1]
 	if (callbackErr != null) {
-		await $.println("Pointer function error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(callbackErr).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+		await $.println("Pointer function error:", await $.pointerValue<Exclude<$.GoError, null>>(callbackErr).Error())
 	} else {
 		fnPtr.value.Store(callback)
 		let loadedFn = (fnPtr.value.Load() as $.VarRef<(() => void) | null> | null)
 		if (loadedFn != null) {
-			void (__goscriptAwait = ($.pointerValue<(() => void) | null>(loadedFn))!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+			await ($.pointerValue<(() => void) | null>(loadedFn))!()
 		}
 	}
 
@@ -169,8 +177,6 @@ export async function main(): globalThis.Promise<void> {
 
 	await $.println("atomic test finished")
 }
-
-var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

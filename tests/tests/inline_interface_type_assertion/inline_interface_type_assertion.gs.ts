@@ -26,6 +26,9 @@ export class Greeter {
 		return $.markAsStructValue(new Greeter(this))
 	}
 
+	public __goscriptAssign(source: Greeter): void {
+	}
+
 	public Greet(): string {
 		const g = this;
 		return "Hello from Greeter"
@@ -51,6 +54,9 @@ export class MyStringer {
 
 	public clone(): MyStringer {
 		return $.markAsStructValue(new MyStringer(this))
+	}
+
+	public __goscriptAssign(source: MyStringer): void {
 	}
 
 	public String(): string {

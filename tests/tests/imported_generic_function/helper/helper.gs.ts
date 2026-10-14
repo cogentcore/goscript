@@ -38,6 +38,12 @@ export class Box {
 		return $.markAsStructValue(new Box(this))
 	}
 
+	public __goscriptAssign(source: Box): void {
+		const target = this._fields
+		const values = source._fields
+		target.Value = $.assignFieldValue(target.Value, values.Value, { kind: $.TypeKind.Interface, methods: [] })
+	}
+
 	static __typeInfo = $.registerStructType(
 		"helper.Box",
 		() => new Box(),
@@ -68,6 +74,12 @@ export class IntValue {
 
 	public clone(): IntValue {
 		return $.markAsStructValue(new IntValue(this))
+	}
+
+	public __goscriptAssign(source: IntValue): void {
+		const target = this._fields
+		const values = source._fields
+		target.N = values.N
 	}
 
 	public GetValue(): number {

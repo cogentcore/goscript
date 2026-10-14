@@ -26,6 +26,12 @@ export class entry {
 		return $.markAsStructValue(new entry(this))
 	}
 
+	public __goscriptAssign(source: entry): void {
+		const target = this._fields
+		const values = source._fields
+		target.value = values.value
+	}
+
 	public add(value: number): void {
 		let e: entry | $.VarRef<entry> | null = this;
 		$.pointerValue<entry>(e).value = $.pointerValue<entry>(e).value + (value)

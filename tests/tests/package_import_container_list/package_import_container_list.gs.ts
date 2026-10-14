@@ -35,6 +35,12 @@ export class pooledElement {
 		return $.markAsStructValue(new pooledElement(this))
 	}
 
+	public __goscriptAssign(source: pooledElement): void {
+		const target = this._fields
+		const values = source._fields
+		target.Value = $.assignFieldValue(target.Value, values.Value, { kind: $.TypeKind.Interface, methods: [] })
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.pooledElement",
 		() => new pooledElement(),

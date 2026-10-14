@@ -466,6 +466,52 @@ func structFieldHasAccessors(name string) bool {
 	return name != "constructor"
 }
 
+// renderStructAssign emits the __goscriptAssign method, which copies the
+// fields of another value of the struct type into this one by literal keys.
+// assignStruct uses it instead of copying the fields by their type info,
+// which is much slower.
+func renderStructAssign(b *strings.Builder, structType *loweredStruct, runtimeOwner *RuntimeContractOwner) {
+	// The method copies each field of source into the receiver by its kind.
+	b.WriteString("\n\tpublic __goscriptAssign(source: ")
+	b.WriteString(structType.name)
+	b.WriteString("): void {\n")
+	if len(structType.fields) != 0 {
+		b.WriteString("\t\tconst target = this._fields\n")
+		b.WriteString("\t\tconst values = source._fields\n")
+	}
+	for _, field := range structType.fields {
+		b.WriteString("\t\t")
+		switch {
+		case field.plainValue:
+			b.WriteString("target.")
+			b.WriteString(field.name)
+			b.WriteString(" = values.")
+			b.WriteString(field.name)
+		case field.structValue:
+			b.WriteString(runtimeOwner.QualifiedHelper(RuntimeHelperAssignStruct))
+			b.WriteString("(target.")
+			b.WriteString(field.name)
+			b.WriteString(", values.")
+			b.WriteString(field.name)
+			b.WriteString(")")
+		default:
+			b.WriteString("target.")
+			b.WriteString(field.name)
+			b.WriteString(" = ")
+			b.WriteString(runtimeOwner.QualifiedHelper(RuntimeHelperAssignFieldValue))
+			b.WriteString("(target.")
+			b.WriteString(field.name)
+			b.WriteString(", values.")
+			b.WriteString(field.name)
+			b.WriteString(", ")
+			b.WriteString(field.runtimeType)
+			b.WriteString(")")
+		}
+		b.WriteString("\n")
+	}
+	b.WriteString("\t}\n")
+}
+
 // renderStruct emits field storage, value-copy operations, methods, and metadata.
 func renderStruct(b *strings.Builder, structType *loweredStruct, runtimeOwner *RuntimeContractOwner, trimTypeInfo bool) {
 	markStructValue := runtimeOwner.QualifiedHelper(RuntimeHelperMarkAsStructValue)
@@ -479,6 +525,7 @@ func renderStruct(b *strings.Builder, structType *loweredStruct, runtimeOwner *R
 	b.WriteString("class ")
 	b.WriteString(structType.name)
 	b.WriteString(" {\n")
+
 	// Each field gets its own accessors, which read and write its _fields
 	// entry by a literal key, so that the JavaScript engine can optimize each
 	// one, unlike shared accessors that look up the key dynamically.
@@ -508,6 +555,8 @@ func renderStruct(b *strings.Builder, structType *loweredStruct, runtimeOwner *R
 		b.WriteString(field.name)
 		b.WriteString(" = value\n\t}\n\n")
 	}
+
+	// The fields are stored in one object, which the accessors read and write.
 	b.WriteString("\tpublic _fields: {\n")
 	for _, field := range structType.fields {
 		b.WriteString("\t\t")
@@ -517,6 +566,8 @@ func renderStruct(b *strings.Builder, structType *loweredStruct, runtimeOwner *R
 		b.WriteString("\n")
 	}
 	b.WriteString("\t}\n\n")
+
+	// The constructor copies each initial value in by its kind.
 	b.WriteString("\tconstructor(init?: Partial<{")
 	for idx, field := range structType.fields {
 		if idx != 0 {
@@ -600,6 +651,7 @@ func renderStruct(b *strings.Builder, structType *loweredStruct, runtimeOwner *R
 	b.WriteString("(new ")
 	b.WriteString(structType.name)
 	b.WriteString("(this))\n\t}\n")
+	renderStructAssign(b, structType, runtimeOwner)
 	for _, method := range structType.methods {
 		b.WriteString("\n")
 		renderMethod(b, &method)

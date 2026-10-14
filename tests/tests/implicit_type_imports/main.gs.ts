@@ -21,6 +21,9 @@ export class localReadWriteCloser {
 		return $.markAsStructValue(new localReadWriteCloser(this))
 	}
 
+	public __goscriptAssign(source: localReadWriteCloser): void {
+	}
+
 	public Close(): $.GoError {
 		return null
 	}

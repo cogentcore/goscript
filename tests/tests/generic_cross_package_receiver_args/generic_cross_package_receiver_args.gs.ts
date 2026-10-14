@@ -34,6 +34,12 @@ export class wrapper {
 		return $.markAsStructValue(new wrapper(this))
 	}
 
+	public __goscriptAssign(source: wrapper): void {
+		const target = this._fields
+		const values = source._fields
+		target.Impl = values.Impl
+	}
+
 	public Other(__typeArgs: $.GenericTypeArgs | undefined): any {
 		const w: wrapper | $.VarRef<wrapper> | null = this;
 		let zero: any = $.genericZero(__typeArgs, "E", null)

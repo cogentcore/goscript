@@ -36,6 +36,12 @@ export class lit {
 		return $.markAsStructValue(new lit(this))
 	}
 
+	public __goscriptAssign(source: lit): void {
+		const target = this._fields
+		const values = source._fields
+		target.n = values.n
+	}
+
 	public Value(): number {
 		const l: lit | $.VarRef<lit> | null = this;
 		return $.pointerValue<lit>(l).n

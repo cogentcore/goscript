@@ -36,6 +36,12 @@ export class stream {
 		return $.markAsStructValue(new stream(this))
 	}
 
+	public __goscriptAssign(source: stream): void {
+		const target = this._fields
+		const values = source._fields
+		target.name = values.name
+	}
+
 	public Close(): string {
 		const s = this;
 		return $.concatString("close:", s.name)
@@ -73,6 +79,12 @@ export class stopStream {
 		return $.markAsStructValue(new stopStream(this))
 	}
 
+	public __goscriptAssign(source: stopStream): void {
+		const target = this._fields
+		const values = source._fields
+		$.assignStruct(target.stream, values.stream)
+	}
+
 	public Close(): any {
 		return $.pointerValue<stream>(this.stream).Close()
 	}
@@ -107,6 +119,12 @@ export class pointerStopStream {
 
 	public clone(): pointerStopStream {
 		return $.markAsStructValue(new pointerStopStream(this))
+	}
+
+	public __goscriptAssign(source: pointerStopStream): void {
+		const target = this._fields
+		const values = source._fields
+		target.stream = values.stream
 	}
 
 	public Close(): any {

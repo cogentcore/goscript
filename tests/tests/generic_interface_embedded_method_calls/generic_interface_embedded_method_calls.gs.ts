@@ -57,6 +57,13 @@ export class impl {
 		return $.markAsStructValue(new impl(this))
 	}
 
+	public __goscriptAssign(source: impl): void {
+		const target = this._fields
+		const values = source._fields
+		target.value = $.assignFieldValue(target.value, values.value, { kind: $.TypeKind.Interface, methods: [] })
+		target.other = $.assignFieldValue(target.other, values.other, { kind: $.TypeKind.Interface, methods: [] })
+	}
+
 	public Other(__typeArgs: $.GenericTypeArgs | undefined): any {
 		const i: impl | $.VarRef<impl> | null = this;
 		return $.copyElement($.pointerValue<impl>(i).other)

@@ -25,6 +25,9 @@ export class source {
 		return $.markAsStructValue(new source(this))
 	}
 
+	public __goscriptAssign(source: source): void {
+	}
+
 	public Val(): __goscript_alias.Value {
 		return (new Uint8Array([111, 107]) as __goscript_alias.Value)
 	}

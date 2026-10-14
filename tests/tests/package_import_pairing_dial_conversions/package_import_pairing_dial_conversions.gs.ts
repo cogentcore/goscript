@@ -35,6 +35,12 @@ export class recreateError {
 		return $.markAsStructValue(new recreateError(this))
 	}
 
+	public __goscriptAssign(source: recreateError): void {
+		const target = this._fields
+		const values = source._fields
+		target.next = values.next
+	}
+
 	public Error(): string {
 		const e: recreateError | $.VarRef<recreateError> | null = this;
 		return "recreate"
@@ -64,6 +70,9 @@ export class readWriteCloser {
 
 	public clone(): readWriteCloser {
 		return $.markAsStructValue(new readWriteCloser(this))
+	}
+
+	public __goscriptAssign(source: readWriteCloser): void {
 	}
 
 	public Close(): $.GoError {

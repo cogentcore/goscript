@@ -26,6 +26,12 @@ export class item {
 		return $.markAsStructValue(new item(this))
 	}
 
+	public __goscriptAssign(source: item): void {
+		const target = this._fields
+		const values = source._fields
+		target.n = values.n
+	}
+
 	public dec(): item {
 		let s: item = this;
 		if (s.n > 0) {

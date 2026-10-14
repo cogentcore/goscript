@@ -126,6 +126,22 @@ export class formatter {
 		return $.markAsStructValue(new formatter(this))
 	}
 
+	public __goscriptAssign(source: formatter): void {
+		const target = this._fields
+		const values = source._fields
+		target.wid = values.wid
+		target.prec = values.prec
+		target.widPresent = values.widPresent
+		target.precPresent = values.precPresent
+		target.minus = values.minus
+		target.plus = values.plus
+		target.sharp = values.sharp
+		target.space = values.space
+		target.zero = values.zero
+		target.plusV = values.plusV
+		target.sharpV = values.sharpV
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.formatter",
 		() => new formatter(),
@@ -178,6 +194,14 @@ export class printer {
 
 	public clone(): printer {
 		return $.markAsStructValue(new printer(this))
+	}
+
+	public __goscriptAssign(source: printer): void {
+		const target = this._fields
+		const values = source._fields
+		target.buf = values.buf
+		target.arg = $.assignFieldValue(target.arg, values.arg, { kind: $.TypeKind.Interface, methods: [] })
+		$.assignStruct(target.fmt, values.fmt)
 	}
 
 	public async format(verb: number): globalThis.Promise<void> {

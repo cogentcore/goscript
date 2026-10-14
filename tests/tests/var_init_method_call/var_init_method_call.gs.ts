@@ -26,6 +26,12 @@ export class T {
 		return $.markAsStructValue(new T(this))
 	}
 
+	public __goscriptAssign(source: T): void {
+		const target = this._fields
+		const values = source._fields
+		target.val = values.val
+	}
+
 	public WithDelta(delta: number): T | $.VarRef<T> | null {
 		const t: T | $.VarRef<T> | null = this;
 		return new T({val: $.pointerValue<T>(t).val + delta})

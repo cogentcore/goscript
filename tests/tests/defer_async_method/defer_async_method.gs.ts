@@ -26,6 +26,12 @@ export class AsyncResource {
 		return $.markAsStructValue(new AsyncResource(this))
 	}
 
+	public __goscriptAssign(source: AsyncResource): void {
+		const target = this._fields
+		const values = source._fields
+		target.name = values.name
+	}
+
 	public async Release(): globalThis.Promise<void> {
 		const r: AsyncResource | $.VarRef<AsyncResource> | null = this;
 		let ch: $.Channel<boolean> | null = $.makeChannel<boolean>(1, false, "both")

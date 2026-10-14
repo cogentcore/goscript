@@ -35,6 +35,12 @@ export class label {
 		return $.markAsStructValue(new label(this))
 	}
 
+	public __goscriptAssign(source: label): void {
+		const target = this._fields
+		const values = source._fields
+		target.value = values.value
+	}
+
 	public Format(): string {
 		const l = this;
 		let state: __goscript_helper.helperState | $.VarRef<__goscript_helper.helperState> | null = __goscript_helper.newHelperState()

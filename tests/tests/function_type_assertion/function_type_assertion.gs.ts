@@ -32,6 +32,12 @@ export class FuncContainer {
 		return $.markAsStructValue(new FuncContainer(this))
 	}
 
+	public __goscriptAssign(source: FuncContainer): void {
+		const target = this._fields
+		const values = source._fields
+		target.myFunc = $.assignFieldValue(target.myFunc, values.myFunc, { kind: $.TypeKind.Interface, methods: [] })
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.FuncContainer",
 		() => new FuncContainer(),

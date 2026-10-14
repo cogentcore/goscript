@@ -39,6 +39,12 @@ export class raw {
 		return $.markAsStructValue(new raw(this))
 	}
 
+	public __goscriptAssign(source: raw): void {
+		const target = this._fields
+		const values = source._fields
+		$.assignStruct(target.Mutex, values.Mutex)
+	}
+
 	public Lock(): any {
 		return $.pointerValue<sync.Mutex>(this.Mutex).Lock()
 	}
@@ -83,6 +89,12 @@ export class outer {
 		return $.markAsStructValue(new outer(this))
 	}
 
+	public __goscriptAssign(source: outer): void {
+		const target = this._fields
+		const values = source._fields
+		$.assignStruct(target.raw, values.raw)
+	}
+
 	public Lock(): any {
 		return $.pointerValue<raw>(this.raw).Mutex.Lock()
 	}
@@ -125,6 +137,12 @@ export class rawRW {
 
 	public clone(): rawRW {
 		return $.markAsStructValue(new rawRW(this))
+	}
+
+	public __goscriptAssign(source: rawRW): void {
+		const target = this._fields
+		const values = source._fields
+		$.assignStruct(target.RWMutex, values.RWMutex)
 	}
 
 	public Lock(): any {
@@ -187,6 +205,12 @@ export class outerRW {
 		return $.markAsStructValue(new outerRW(this))
 	}
 
+	public __goscriptAssign(source: outerRW): void {
+		const target = this._fields
+		const values = source._fields
+		$.assignStruct(target.rawRW, values.rawRW)
+	}
+
 	public Lock(): any {
 		return $.pointerValue<rawRW>(this.rawRW).RWMutex.Lock()
 	}
@@ -247,6 +271,12 @@ export class rawRunner {
 		return $.markAsStructValue(new rawRunner(this))
 	}
 
+	public __goscriptAssign(source: rawRunner): void {
+		const target = this._fields
+		const values = source._fields
+		target.runner = $.assignFieldValue(target.runner, values.runner, "main.runner")
+	}
+
 	public Run(): any {
 		return $.pointerValue<Exclude<runner | null, null>>(this.runner).Run()
 	}
@@ -283,6 +313,12 @@ export class outerRunner {
 		return $.markAsStructValue(new outerRunner(this))
 	}
 
+	public __goscriptAssign(source: outerRunner): void {
+		const target = this._fields
+		const values = source._fields
+		$.assignStruct(target.rawRunner, values.rawRunner)
+	}
+
 	public Run(): any {
 		return $.pointerValue<any>($.pointerValue<rawRunner>(this.rawRunner).runner).Run()
 	}
@@ -307,6 +343,9 @@ export class runnable {
 
 	public clone(): runnable {
 		return $.markAsStructValue(new runnable(this))
+	}
+
+	public __goscriptAssign(source: runnable): void {
 	}
 
 	public Run(): string {

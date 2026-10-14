@@ -36,6 +36,13 @@ export class floatInfo {
 		return $.markAsStructValue(new floatInfo(this))
 	}
 
+	public __goscriptAssign(source: floatInfo): void {
+		const target = this._fields
+		const values = source._fields
+		target.mantbits = values.mantbits
+		target.expbits = values.expbits
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.floatInfo",
 		() => new floatInfo(),

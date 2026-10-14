@@ -28,6 +28,12 @@ export class Box {
 		return $.markAsStructValue(new Box(this))
 	}
 
+	public __goscriptAssign(source: Box): void {
+		const target = this._fields
+		const values = source._fields
+		target.Value = values.Value
+	}
+
 	static __typeInfo = $.registerStructType(
 		"unique.Box",
 		() => new Box(),
