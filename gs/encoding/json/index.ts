@@ -1355,6 +1355,45 @@ function encodeMapKey(key: unknown, keyType: unknown): string {
 // hasTextMethod reports whether the named basic type described by info (or
 // a pointer to it, for UnmarshalText) has the given encoding.TextMarshaler
 // or encoding.TextUnmarshaler method.
+// textUnmarshalerElemInfo returns the type information of the named basic
+// type that a pointer target points to, when it implements
+// encoding.TextUnmarshaler, or null.
+function textUnmarshalerElemInfo(target: unknown): $.TypeInfo | null {
+  const pointer = $.resolveTypeInfo(
+    Reflect.get(target as object, '__goTypeInfo') as $.TypeInfo | string,
+  )
+  if (
+    pointer === undefined ||
+    pointer === null ||
+    !$.isPointerTypeInfo(pointer)
+  ) {
+    return null
+  }
+  const elem = $.resolveTypeInfo(pointer.elemType)
+  if (elem === undefined || elem === null) {
+    return null
+  }
+  return hasTextMethod(elem, 'UnmarshalText') ? elem : null
+}
+
+// textUnmarshalerSliceInfo returns the type information of the slice that
+// a pointer target points to, when its elements are of a named basic type
+// that implements encoding.TextUnmarshaler, or null.
+function textUnmarshalerSliceInfo(target: unknown): $.TypeInfo | null {
+  const pointer = $.resolveTypeInfo(
+    Reflect.get(target as object, '__goTypeInfo') as $.TypeInfo | string,
+  )
+  if (!pointer || !$.isPointerTypeInfo(pointer)) {
+    return null
+  }
+  const slice = $.resolveTypeInfo(pointer.elemType)
+  if (!slice || !$.isSliceTypeInfo(slice)) {
+    return null
+  }
+  const elem = $.resolveTypeInfo(slice.elemType)
+  return elem && hasTextMethod(elem, 'UnmarshalText') ? slice : null
+}
+
 function hasTextMethod(
   info: $.TypeInfo,
   method: 'MarshalText' | 'UnmarshalText',
@@ -1653,6 +1692,18 @@ function assignDecodedValue(
       callUnmarshalJSON(unmarshaler, $.stringToBytes(decodedJSONText(decoded)))
       return
     }
+    // A pointer to a named basic type that implements
+    // encoding.TextUnmarshaler, such as an enum, decodes from a string
+    // through UnmarshalText.
+    if (typeof decoded === 'string') {
+      const info = textUnmarshalerElemInfo(target)
+      if (info !== null) {
+        unmarshalText(decoded, info, (value) => {
+          target.value = value
+        })
+        return
+      }
+    }
     if (isStructValue(target.value) && isPlainObject(decoded)) {
       assignStructFields(target.value, decoded, opts)
       return
@@ -1668,6 +1719,14 @@ function assignDecodedValue(
     // is what makes e.g. `var m map[string]json.RawMessage` or
     // `var m map[string]*Property` populate real typed elements instead of
     // plain JS objects/strings.
+    // A slice of a named basic type with a text method, such as []Enum,
+    // decodes by the structured type information of the target, which keeps
+    // the element type's methods that its spelling below cannot.
+    const elemSlice = textUnmarshalerSliceInfo(target)
+    if (elemSlice !== null && Array.isArray(decoded)) {
+      target.value = decodeValueForType(decoded, elemSlice, opts)
+      return
+    }
     const spelling = unmarshalTargetGoType(target)
     if (spelling !== null) {
       let desc: unknown = goTypeDescriptor(spelling)
