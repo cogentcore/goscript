@@ -5470,6 +5470,16 @@ function typeFromTypeInfoWithSeen(
   info: $.TypeInfo | string,
   seen: Set<string>,
 ): Type {
+  // A type that typeFromTypeInfo already built is complete, so a nested use
+  // of it, such as a field of another struct, takes it rather than building
+  // it again.
+  const key = typeInfoCacheKey(info)
+  if (key !== '') {
+    const cached = namedTypeInfoTypes.get(key)
+    if (cached !== undefined) {
+      return cached
+    }
+  }
   if (typeof info === 'string') {
     const registered = builtinGetTypeByName(info)
     if (registered) {
@@ -5493,7 +5503,11 @@ function typeFromTypeInfoWithSeen(
       seen.add(recursiveName)
       try {
         typ.replaceDescriptors(structFieldsFromTypeInfo(info, seen))
-        return internType(typ)
+        const interned = internType(typ)
+        if (key !== '') {
+          namedTypeInfoTypes.set(key, interned)
+        }
+        return interned
       } finally {
         seen.delete(recursiveName)
         constructingRegisteredTypes.delete(recursiveName)
