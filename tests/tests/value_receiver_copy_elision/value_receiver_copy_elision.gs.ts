@@ -132,7 +132,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("bump", $.markAsStructValue($.cloneStructValue(a.value)).Bump(), a.value.X)
 	await $.println("ptr", $.markAsStructValue($.cloneStructValue(a.value)).BumpViaPointer(), a.value.Y)
 	await $.println("closure", await $.markAsStructValue($.cloneStructValue(a.value)).BumpInClosure(), a.value.X)
-	let k = $.markAsStructValue($.cloneStructValue(a.value.Keep()))
+	let k = a.value.Keep()
 	k.X = 50
 	await $.println("keep", a.value.X, k.X)
 	let h = $.markAsStructValue(new holder({v: $.markAsStructValue($.cloneStructValue(a.value))}))

@@ -273,11 +273,11 @@ export async function main(): globalThis.Promise<void> {
 	$.mapSet(m, "a", $.markAsStructValue($.cloneStructValue(a.value)))
 	await $.println("map:", $.mapGet<string, Value, Value>(m, "a", $.markAsStructValue(new Value()))[0].V, $.mapGet<string, Value, Value>(m, "b", $.markAsStructValue(new Value()))[0].V)
 
-	let p = ($.cloneArrayValue(pair(__goscriptStatic0(), $.markAsStructValue(new Value({V: 11}))), /* @__PURE__ */ $.arrayType("main.Value", 2)) as Value[])
+	let p = (pair(__goscriptStatic0(), $.markAsStructValue(new Value({V: 11}))) as Value[])
 	$.arrayIndex(p, 0).Set(12)
 	await $.println("pair:", $.arrayIndex(p, 0).V, $.arrayIndex(p, 1).V)
 
-	let b = ($.markAsStructValue($.cloneStructValue(makeBox(__goscriptStatic0(), $.markAsStructValue(new Value({V: 13}))))) as box)
+	let b = (makeBox(__goscriptStatic0(), $.markAsStructValue(new Value({V: 13}))) as box)
 	b.A.Set(14)
 	await $.println("box:", b.A.V, b.B.V)
 

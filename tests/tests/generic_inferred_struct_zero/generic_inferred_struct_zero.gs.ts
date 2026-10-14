@@ -149,9 +149,9 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("less", (__goscriptAwait = $.pointerValue<tree>(tr).less!($.markAsStructValue(new entry({n: 1})), $.markAsStructValue(new entry({n: 2}))), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
 	// Zero values of type-parameter fields in generic constructors.
-	let lit = ($.markAsStructValue($.cloneStructValue(literalTree(__goscriptStatic0()))) as tree)
+	let lit = (literalTree(__goscriptStatic0()) as tree)
 	await $.println("literal", lit.empty.key == null, lit.empty.n, lit.count)
-	let v = ($.markAsStructValue($.cloneStructValue(varTree(__goscriptStatic0()))) as tree)
+	let v = (varTree(__goscriptStatic0()) as tree)
 	await $.println("var", v.empty.key == null, v.empty.n)
 	let z = ($.markAsStructValue($.cloneStructValue(zero(__goscriptStatic0()))) as entry)
 	await $.println("zero", z.key == null, z.n)

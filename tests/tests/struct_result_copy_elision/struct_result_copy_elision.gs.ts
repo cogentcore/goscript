@@ -4,9 +4,21 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class Pos {
-	public declare Line: number
+	public get Line(): number {
+		return this._fields.Line
+	}
 
-	public declare Char: number
+	public set Line(value: number) {
+		this._fields.Line = value
+	}
+
+	public get Char(): number {
+		return this._fields.Char
+	}
+
+	public set Char(value: number) {
+		this._fields.Char = value
+	}
 
 	public _fields: {
 		Line: number
@@ -24,8 +36,11 @@ export class Pos {
 		return $.markAsStructValue(new Pos(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Line", "Char"])
+	public __goscriptAssign(source: Pos): void {
+		const target = this._fields
+		const values = source._fields
+		target.Line = values.Line
+		target.Char = values.Char
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -38,9 +53,21 @@ export class Pos {
 }
 
 export class Region {
-	public declare Start: Pos
+	public get Start(): Pos {
+		return this._fields.Start
+	}
 
-	public declare End: Pos
+	public set Start(value: Pos) {
+		this._fields.Start = value
+	}
+
+	public get End(): Pos {
+		return this._fields.End
+	}
+
+	public set End(value: Pos) {
+		this._fields.End = value
+	}
 
 	public _fields: {
 		Start: Pos
@@ -58,8 +85,11 @@ export class Region {
 		return $.markAsStructValue(new Region(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Start", "End"])
+	public __goscriptAssign(source: Region): void {
+		const target = this._fields
+		const values = source._fields
+		$.assignStruct(target.Start, values.Start)
+		$.assignStruct(target.End, values.End)
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -72,9 +102,21 @@ export class Region {
 }
 
 export class Rule {
-	public declare Name: string
+	public get Name(): string {
+		return this._fields.Name
+	}
 
-	public declare pos: Pos
+	public set Name(value: string) {
+		this._fields.Name = value
+	}
+
+	public get pos(): Pos {
+		return this._fields.pos
+	}
+
+	public set pos(value: Pos) {
+		this._fields.pos = value
+	}
 
 	public _fields: {
 		Name: string
@@ -92,6 +134,13 @@ export class Rule {
 		return $.markAsStructValue(new Rule(this))
 	}
 
+	public __goscriptAssign(source: Rule): void {
+		const target = this._fields
+		const values = source._fields
+		target.Name = values.Name
+		$.assignStruct(target.pos, values.pos)
+	}
+
 	public Pos(): Pos {
 		const r: Rule | $.VarRef<Rule> | null = this;
 		return $.markAsStructValue($.cloneStructValue($.pointerValue<Rule>(r).pos))
@@ -102,23 +151,31 @@ export class Rule {
 		return $.markAsStructValue($.cloneStructValue(r.pos))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Name", "pos"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.Rule",
 		() => new Rule(),
-		() => [{ name: "Pos", args: [], returns: [{ type: "main.Pos" }] }, { name: "ValuePos", args: [], returns: [{ type: "main.Pos" }] }],
+		() => [{ name: "Pos", args: [], returns: [{ type: "main.Pos" }], pointerReceiver: true }, { name: "ValuePos", args: [], returns: [{ type: "main.Pos" }] }],
 		Rule,
 		() => [{ name: "Name", key: "Name", type: /* @__PURE__ */ $.basicType("string") }, { name: "pos", key: "pos", type: "main.Pos" }]
 	)
 }
 
 export class key {
-	public declare a: number
+	public get a(): number {
+		return this._fields.a
+	}
 
-	public declare b: number
+	public set a(value: number) {
+		this._fields.a = value
+	}
+
+	public get b(): number {
+		return this._fields.b
+	}
+
+	public set b(value: number) {
+		this._fields.b = value
+	}
 
 	public _fields: {
 		a: number
@@ -136,8 +193,11 @@ export class key {
 		return $.markAsStructValue(new key(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["a", "b"])
+	public __goscriptAssign(source: key): void {
+		const target = this._fields
+		const values = source._fields
+		target.a = values.a
+		target.b = values.b
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -195,7 +255,7 @@ export function region(r: Region | $.VarRef<Region> | null): Region {
 }
 
 export function identity(__typeArgs: $.GenericTypeArgs | undefined, v: any): any {
-	return v
+	return $.copyElement(v)
 }
 
 export async function main(): globalThis.Promise<void> {
@@ -204,7 +264,7 @@ export async function main(): globalThis.Promise<void> {
 	p.Line = 10
 	await $.println($.pointerValue<Rule>(r).pos.Line, p.Line)
 
-	let v = $.markAsStructValue($.cloneStructValue($.pointerValue<Rule>(r))).ValuePos()
+	let v = $.pointerValue<Rule>(r).ValuePos()
 	v.Char = 20
 	await $.println($.pointerValue<Rule>(r).pos.Char, v.Char)
 
@@ -229,7 +289,7 @@ export async function main(): globalThis.Promise<void> {
 	cp.Start.Line = 99
 	await $.println(src.value.Start.Line, cp.Start.Line)
 
-	let id = ($.markAsStructValue($.cloneStructValue(identity({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.Region", zero: () => $.markAsStructValue(new Region()) }}, $.markAsStructValue($.cloneStructValue(src.value))))) as Region)
+	let id = ($.markAsStructValue($.cloneStructValue(identity(__goscriptStatic0(), $.markAsStructValue($.cloneStructValue(src.value))))) as Region)
 	id.End.Char = 42
 	await $.println(src.value.End.Char, id.End.Char)
 
@@ -255,6 +315,11 @@ export async function main(): globalThis.Promise<void> {
 	let got = $.markAsStructValue($.cloneStructValue($.mapGet<Pos, Region, Region>(m2, q, $.markAsStructValue(new Region()))[0]))
 	got.Start.Line = 100
 	await $.println($.mapGet<Pos, Region, Region>(m2, q, $.markAsStructValue(new Region()))[0].Start.Line, got.Start.Line)
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.Region", zero: () => $.markAsStructValue(new Region()) }})
 }
 
 if ($.isMainScript(import.meta)) {
