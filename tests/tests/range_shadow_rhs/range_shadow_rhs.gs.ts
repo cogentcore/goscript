@@ -36,6 +36,13 @@ export class holder {
 		return $.markAsStructValue(new holder(this))
 	}
 
+	public __goscriptAssign(source: holder): void {
+		const target = this._fields
+		const values = source._fields
+		target.values = values.values
+		target.items = values.items
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.holder",
 		() => new holder(),
@@ -66,6 +73,12 @@ export class item {
 
 	public clone(): item {
 		return $.markAsStructValue(new item(this))
+	}
+
+	public __goscriptAssign(source: item): void {
+		const target = this._fields
+		const values = source._fields
+		target.value = values.value
 	}
 
 	public increment(): number {

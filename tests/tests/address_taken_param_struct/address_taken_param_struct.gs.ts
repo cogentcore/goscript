@@ -36,6 +36,13 @@ export class Format {
 		return $.markAsStructValue(new Format(this))
 	}
 
+	public __goscriptAssign(source: Format): void {
+		const target = this._fields
+		const values = source._fields
+		target.Name = values.Name
+		target.Ext = values.Ext
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.Format",
 		() => new Format(),

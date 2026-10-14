@@ -33,6 +33,12 @@ export class Snapshot {
 		return $.markAsStructValue(new Snapshot(this))
 	}
 
+	public __goscriptAssign(source: Snapshot): void {
+		const target = this._fields
+		const values = source._fields
+		target.base = values.base
+	}
+
 	public async Apply(n: number, cb: ((n: number) => [$.VarRef<number> | null, $.Slice<number>, $.GoError] | globalThis.Promise<[$.VarRef<number> | null, $.Slice<number>, $.GoError]>) | null): globalThis.Promise<[number, $.GoError]> {
 		const s: Snapshot | $.VarRef<Snapshot> | null = this;
 		let __goscriptTuple0: any = await cb!($.pointerValue<Snapshot>(s).base + n)
@@ -75,6 +81,12 @@ export class Host {
 
 	public clone(): Host {
 		return $.markAsStructValue(new Host(this))
+	}
+
+	public __goscriptAssign(source: Host): void {
+		const target = this._fields
+		const values = source._fields
+		$.assignStruct(target.process, values.process)
 	}
 
 	public processor(): ((n: number) => [number, $.GoError] | globalThis.Promise<[number, $.GoError]>) | null {

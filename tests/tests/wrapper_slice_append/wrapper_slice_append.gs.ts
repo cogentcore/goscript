@@ -39,6 +39,13 @@ export class parser {
 		return $.markAsStructValue(new parser(this))
 	}
 
+	public __goscriptAssign(source: parser): void {
+		const target = this._fields
+		const values = source._fields
+		target.errors = values.errors
+		$.assignStruct(target.astruct, values.astruct)
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.parser",
 		() => new parser(),

@@ -38,6 +38,13 @@ export class Thing {
 		return $.markAsStructValue(new Thing(this))
 	}
 
+	public __goscriptAssign(source: Thing): void {
+		const target = this._fields
+		const values = source._fields
+		target.Value = values.Value
+		target.Label = values.Label
+	}
+
 	static __typeInfo = $.registerStructType(
 		"subpkg.Thing",
 		() => new Thing(),

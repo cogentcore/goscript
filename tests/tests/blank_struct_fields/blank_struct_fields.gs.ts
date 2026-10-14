@@ -46,6 +46,14 @@ export class padded {
 		return $.markAsStructValue(new padded(this))
 	}
 
+	public __goscriptAssign(source: padded): void {
+		const target = this._fields
+		const values = source._fields
+		target._blank0 = $.assignFieldValue(target._blank0, values._blank0, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 2))
+		target.Value = values.Value
+		target._blank2 = $.assignFieldValue(target._blank2, values._blank2, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 3))
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.padded",
 		() => new padded(),

@@ -31,6 +31,12 @@ export class Buffer {
 		return $.markAsStructValue(new Buffer(this))
 	}
 
+	public __goscriptAssign(source: Buffer): void {
+		const target = this._fields
+		const values = source._fields
+		target.data = values.data
+	}
+
 	public Write(p: $.Slice<number>): [number, $.GoError] {
 		let b: Buffer | $.VarRef<Buffer> | null = this;
 		$.pointerValue<Buffer>(b).data = $.appendSlice($.pointerValue<Buffer>(b).data, p, $.byteSliceHint)

@@ -36,6 +36,13 @@ export class MyStruct {
 		return $.markAsStructValue(new MyStruct(this))
 	}
 
+	public __goscriptAssign(source: MyStruct): void {
+		const target = this._fields
+		const values = source._fields
+		target.MyInt = values.MyInt
+		target.MyString = values.MyString
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.MyStruct",
 		() => new MyStruct(),
@@ -76,6 +83,13 @@ export class NestedStruct {
 
 	public clone(): NestedStruct {
 		return $.markAsStructValue(new NestedStruct(this))
+	}
+
+	public __goscriptAssign(source: NestedStruct): void {
+		const target = this._fields
+		const values = source._fields
+		target.Value = values.Value
+		$.assignStruct(target.InnerStruct, values.InnerStruct)
 	}
 
 	static __typeInfo = $.registerStructType(

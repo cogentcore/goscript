@@ -39,6 +39,13 @@ export class table {
 		return $.markAsStructValue(new table(this))
 	}
 
+	public __goscriptAssign(source: table): void {
+		const target = this._fields
+		const values = source._fields
+		$.assignStruct(target.Mutex, values.Mutex)
+		target.byAddr = values.byAddr
+	}
+
 	public Lock(): any {
 		return $.pointerValue<sync.Mutex>(this.Mutex).Lock()
 	}

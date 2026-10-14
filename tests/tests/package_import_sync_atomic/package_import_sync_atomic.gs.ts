@@ -29,6 +29,12 @@ export class pointerNode {
 		return $.markAsStructValue(new pointerNode(this))
 	}
 
+	public __goscriptAssign(source: pointerNode): void {
+		const target = this._fields
+		const values = source._fields
+		target.value = values.value
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.pointerNode",
 		() => new pointerNode(),

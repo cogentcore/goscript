@@ -49,6 +49,14 @@ export class LocalTime {
 		return $.markAsStructValue(new LocalTime(this))
 	}
 
+	public __goscriptAssign(source: LocalTime): void {
+		const target = this._fields
+		const values = source._fields
+		target.wall = values.wall
+		target.ext = values.ext
+		target.loc = values.loc
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.LocalTime",
 		() => new LocalTime(),

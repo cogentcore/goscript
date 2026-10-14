@@ -29,6 +29,12 @@ export class responseWriter {
 		return $.markAsStructValue(new responseWriter(this))
 	}
 
+	public __goscriptAssign(source: responseWriter): void {
+		const target = this._fields
+		const values = source._fields
+		target.header = values.header
+	}
+
 	public Header(): http.Header {
 		const w: responseWriter | $.VarRef<responseWriter> | null = this;
 		return $.pointerValue<responseWriter>(w).header

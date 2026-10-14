@@ -46,6 +46,12 @@ export class msg {
 		return $.markAsStructValue(new msg(this))
 	}
 
+	public __goscriptAssign(source: msg): void {
+		const target = this._fields
+		const values = source._fields
+		target.v = values.v
+	}
+
 	public CloneMessageVT(): protobuf_go_lite.CloneMessage | null {
 		const m: msg | $.VarRef<msg> | null = this;
 		return $.interfaceValue<protobuf_go_lite.CloneMessage | null>(msg.prototype.CloneVT.call(m), "*main.msg", /* @__PURE__ */ $.pointerType("main.msg"))

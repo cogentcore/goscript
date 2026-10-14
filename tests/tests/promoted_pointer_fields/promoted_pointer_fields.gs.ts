@@ -26,6 +26,12 @@ export class counter {
 		return $.markAsStructValue(new counter(this))
 	}
 
+	public __goscriptAssign(source: counter): void {
+		const target = this._fields
+		const values = source._fields
+		target.value = values.value
+	}
+
 	public Load(): number {
 		const c: counter | $.VarRef<counter> | null = this;
 		return $.pointerValue<counter>(c).value
@@ -73,6 +79,13 @@ export class inner {
 		return $.markAsStructValue(new inner(this))
 	}
 
+	public __goscriptAssign(source: inner): void {
+		const target = this._fields
+		const values = source._fields
+		target.name = values.name
+		$.assignStruct(target.count, values.count)
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.inner",
 		() => new inner(),
@@ -103,6 +116,12 @@ export class outer {
 
 	public clone(): outer {
 		return $.markAsStructValue(new outer(this))
+	}
+
+	public __goscriptAssign(source: outer): void {
+		const target = this._fields
+		const values = source._fields
+		target.inner = values.inner
 	}
 
 	static __typeInfo = $.registerStructType(

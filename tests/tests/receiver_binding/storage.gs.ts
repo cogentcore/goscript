@@ -39,6 +39,13 @@ export class storage {
 		return $.markAsStructValue(new storage(this))
 	}
 
+	public __goscriptAssign(source: storage): void {
+		const target = this._fields
+		const values = source._fields
+		target.bytes = values.bytes
+		target.name = values.name
+	}
+
 	public IsEmpty(): boolean {
 		const s: storage | $.VarRef<storage> | null = this;
 		return $.len($.pointerValue<storage>(s).bytes) == 0

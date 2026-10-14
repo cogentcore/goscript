@@ -77,6 +77,14 @@ export class MockFileInfo {
 		return $.markAsStructValue(new MockFileInfo(this))
 	}
 
+	public __goscriptAssign(source: MockFileInfo): void {
+		const target = this._fields
+		const values = source._fields
+		target.name = values.name
+		target.size = values.size
+		target.isDir = values.isDir
+	}
+
 	public IsDir(): boolean {
 		const m: MockFileInfo | $.VarRef<MockFileInfo> | null = this;
 		return $.pointerValue<MockFileInfo>(m).isDir
@@ -112,6 +120,9 @@ export class MockFilesystem {
 
 	public clone(): MockFilesystem {
 		return $.markAsStructValue(new MockFilesystem(this))
+	}
+
+	public __goscriptAssign(source: MockFilesystem): void {
 	}
 
 	public ReadDir(path: string): [$.Slice<FileInfo | null>, $.GoError] {

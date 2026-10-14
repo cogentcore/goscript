@@ -27,6 +27,12 @@ export class cell {
 		return $.markAsStructValue(new cell(this))
 	}
 
+	public __goscriptAssign(source: cell): void {
+		const target = this._fields
+		const values = source._fields
+		target.width = values.width
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.cell",
 		() => new cell(),

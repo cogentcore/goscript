@@ -29,6 +29,12 @@ export class zone {
 		return $.markAsStructValue(new zone(this))
 	}
 
+	public __goscriptAssign(source: zone): void {
+		const target = this._fields
+		const values = source._fields
+		target.name = values.name
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.zone",
 		() => new zone(),

@@ -49,6 +49,13 @@ export class Person {
 		return $.markAsStructValue(new Person(this))
 	}
 
+	public __goscriptAssign(source: Person): void {
+		const target = this._fields
+		const values = source._fields
+		target.Name = values.Name
+		target.Age = values.Age
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.Person",
 		() => new Person(),

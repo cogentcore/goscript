@@ -85,6 +85,14 @@ export class MockFileInfo {
 		return $.markAsStructValue(new MockFileInfo(this))
 	}
 
+	public __goscriptAssign(source: MockFileInfo): void {
+		const target = this._fields
+		const values = source._fields
+		target.name = values.name
+		target.size = values.size
+		target.isDir = values.isDir
+	}
+
 	public IsDir(): boolean {
 		const m: MockFileInfo | $.VarRef<MockFileInfo> | null = this;
 		return $.pointerValue<MockFileInfo>(m).isDir
@@ -120,6 +128,9 @@ export class MockFilesystem {
 
 	public clone(): MockFilesystem {
 		return $.markAsStructValue(new MockFilesystem(this))
+	}
+
+	public __goscriptAssign(source: MockFilesystem): void {
 	}
 
 	public ReadDir(path: string): [$.Slice<FileInfo | null>, $.GoError] {
@@ -159,6 +170,12 @@ export class shapeNode {
 		return $.markAsStructValue(new shapeNode(this))
 	}
 
+	public __goscriptAssign(source: shapeNode): void {
+		const target = this._fields
+		const values = source._fields
+		target.value = values.value
+	}
+
 	public Stats(): number {
 		const s: shapeNode | $.VarRef<shapeNode> | null = this;
 		return $.pointerValue<shapeNode>(s).value
@@ -194,6 +211,12 @@ export class MorphismHolder {
 
 	public clone(): MorphismHolder {
 		return $.markAsStructValue(new MorphismHolder(this))
+	}
+
+	public __goscriptAssign(source: MorphismHolder): void {
+		const target = this._fields
+		const values = source._fields
+		target.morphism = values.morphism
 	}
 
 	public async apply(s: Shape | null): globalThis.Promise<number> {
@@ -236,6 +259,12 @@ export class morphismWorker {
 
 	public clone(): morphismWorker {
 		return $.markAsStructValue(new morphismWorker(this))
+	}
+
+	public __goscriptAssign(source: morphismWorker): void {
+		const target = this._fields
+		const values = source._fields
+		target.ready = values.ready
 	}
 
 	public async lookup(s: Shape | null): globalThis.Promise<Shape | null> {

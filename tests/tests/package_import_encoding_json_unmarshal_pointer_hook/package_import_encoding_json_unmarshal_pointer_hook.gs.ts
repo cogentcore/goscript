@@ -58,6 +58,13 @@ export class Hooked {
 		return $.markAsStructValue(new Hooked(this))
 	}
 
+	public __goscriptAssign(source: Hooked): void {
+		const target = this._fields
+		const values = source._fields
+		target.Calls = values.Calls
+		target.Seen = values.Seen
+	}
+
 	public UnmarshalJSON(data: $.Slice<number>): $.GoError {
 		let h: Hooked | $.VarRef<Hooked> | null = this;
 		$.pointerValue<Hooked>(h).Calls++
@@ -95,6 +102,12 @@ export class Box {
 
 	public clone(): Box {
 		return $.markAsStructValue(new Box(this))
+	}
+
+	public __goscriptAssign(source: Box): void {
+		const target = this._fields
+		const values = source._fields
+		target.Value = values.Value
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -137,6 +150,13 @@ export class MapItem {
 
 	public clone(): MapItem {
 		return $.markAsStructValue(new MapItem(this))
+	}
+
+	public __goscriptAssign(source: MapItem): void {
+		const target = this._fields
+		const values = source._fields
+		target.Name = values.Name
+		target.Map = values.Map
 	}
 
 	static __typeInfo = $.registerStructType(

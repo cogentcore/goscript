@@ -19,6 +19,9 @@ export class Server {
 		return $.markAsStructValue(new Server(this))
 	}
 
+	public __goscriptAssign(source: Server): void {
+	}
+
 	public async Handle(rwc: io.ReadWriteCloser | null): globalThis.Promise<void> {
 		await $.pointerValue<Exclude<io.ReadWriteCloser, null>>(rwc).Close()
 	}

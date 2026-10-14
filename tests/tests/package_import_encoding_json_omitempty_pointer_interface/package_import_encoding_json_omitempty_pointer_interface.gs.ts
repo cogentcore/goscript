@@ -105,6 +105,19 @@ export class Payload {
 		return $.markAsStructValue(new Payload(this))
 	}
 
+	public __goscriptAssign(source: Payload): void {
+		const target = this._fields
+		const values = source._fields
+		target.Ptr = values.Ptr
+		target.IfaceZero = $.assignFieldValue(target.IfaceZero, values.IfaceZero, { kind: $.TypeKind.Interface, methods: [] })
+		target.IfaceFalse = $.assignFieldValue(target.IfaceFalse, values.IfaceFalse, { kind: $.TypeKind.Interface, methods: [] })
+		target.IfaceEmptyString = $.assignFieldValue(target.IfaceEmptyString, values.IfaceEmptyString, { kind: $.TypeKind.Interface, methods: [] })
+		target.IfaceEmptySlice = $.assignFieldValue(target.IfaceEmptySlice, values.IfaceEmptySlice, { kind: $.TypeKind.Interface, methods: [] })
+		target.IfaceEmptyMap = $.assignFieldValue(target.IfaceEmptyMap, values.IfaceEmptyMap, { kind: $.TypeKind.Interface, methods: [] })
+		target.PtrNilIface = values.PtrNilIface
+		target.PtrBool = values.PtrBool
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.Payload",
 		() => new Payload(),

@@ -26,6 +26,12 @@ export class queue {
 		return $.markAsStructValue(new queue(this))
 	}
 
+	public __goscriptAssign(source: queue): void {
+		const target = this._fields
+		const values = source._fields
+		target.buf = values.buf
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.queue",
 		() => new queue(),

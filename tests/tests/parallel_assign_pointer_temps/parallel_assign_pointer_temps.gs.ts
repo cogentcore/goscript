@@ -26,6 +26,12 @@ export class node {
 		return $.markAsStructValue(new node(this))
 	}
 
+	public __goscriptAssign(source: node): void {
+		const target = this._fields
+		const values = source._fields
+		target.next = values.next
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.node",
 		() => new node(),
@@ -56,6 +62,12 @@ export class queue {
 
 	public clone(): queue {
 		return $.markAsStructValue(new queue(this))
+	}
+
+	public __goscriptAssign(source: queue): void {
+		const target = this._fields
+		const values = source._fields
+		target.value = values.value
 	}
 
 	static __typeInfo = $.registerStructType(

@@ -26,6 +26,9 @@ export class impl {
 		return $.markAsStructValue(new impl(this))
 	}
 
+	public __goscriptAssign(source: impl): void {
+	}
+
 	public Ping(): string {
 		return "pong"
 	}
@@ -60,6 +63,12 @@ export class Holder {
 
 	public clone(): Holder {
 		return $.markAsStructValue(new Holder(this))
+	}
+
+	public __goscriptAssign(source: Holder): void {
+		const target = this._fields
+		const values = source._fields
+		target.Hidden = $.assignFieldValue(target.Hidden, values.Hidden, "dep.hidden")
 	}
 
 	static __typeInfo = $.registerStructType(

@@ -85,6 +85,13 @@ export class MyStruct {
 		return $.markAsStructValue(new MyStruct(this))
 	}
 
+	public __goscriptAssign(source: MyStruct): void {
+		const target = this._fields
+		const values = source._fields
+		target.Name = values.Name
+		target.Age = values.Age
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.MyStruct",
 		() => new MyStruct(),
@@ -105,6 +112,9 @@ export class myErr {
 
 	public clone(): myErr {
 		return $.markAsStructValue(new myErr(this))
+	}
+
+	public __goscriptAssign(source: myErr): void {
 	}
 
 	public Error(): string {

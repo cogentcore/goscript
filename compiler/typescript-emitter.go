@@ -454,6 +454,51 @@ func structFieldHasAccessors(name string) bool {
 	return name != "constructor"
 }
 
+// renderStructAssign emits the __goscriptAssign method, which copies the
+// fields of another value of the struct type into this one by literal keys.
+// assignStruct uses it instead of copying the fields by their type info,
+// which is much slower.
+func renderStructAssign(b *strings.Builder, structType *loweredStruct, runtimeOwner *RuntimeContractOwner) {
+	b.WriteString("\n\tpublic __goscriptAssign(source: ")
+	b.WriteString(structType.name)
+	b.WriteString("): void {\n")
+	if len(structType.fields) != 0 {
+		b.WriteString("\t\tconst target = this._fields\n")
+		b.WriteString("\t\tconst values = source._fields\n")
+	}
+	for _, field := range structType.fields {
+		b.WriteString("\t\t")
+		switch {
+		case field.plainValue:
+			b.WriteString("target.")
+			b.WriteString(field.name)
+			b.WriteString(" = values.")
+			b.WriteString(field.name)
+		case field.structValue:
+			b.WriteString(runtimeOwner.QualifiedHelper(RuntimeHelperAssignStruct))
+			b.WriteString("(target.")
+			b.WriteString(field.name)
+			b.WriteString(", values.")
+			b.WriteString(field.name)
+			b.WriteString(")")
+		default:
+			b.WriteString("target.")
+			b.WriteString(field.name)
+			b.WriteString(" = ")
+			b.WriteString(runtimeOwner.QualifiedHelper(RuntimeHelperAssignFieldValue))
+			b.WriteString("(target.")
+			b.WriteString(field.name)
+			b.WriteString(", values.")
+			b.WriteString(field.name)
+			b.WriteString(", ")
+			b.WriteString(field.runtimeType)
+			b.WriteString(")")
+		}
+		b.WriteString("\n")
+	}
+	b.WriteString("\t}\n")
+}
+
 // renderStruct emits field storage, value-copy operations, methods, and metadata.
 func renderStruct(b *strings.Builder, structType *loweredStruct, runtimeOwner *RuntimeContractOwner, trimTypeInfo bool) {
 	markStructValue := runtimeOwner.QualifiedHelper(RuntimeHelperMarkAsStructValue)
@@ -569,6 +614,7 @@ func renderStruct(b *strings.Builder, structType *loweredStruct, runtimeOwner *R
 	b.WriteString("(new ")
 	b.WriteString(structType.name)
 	b.WriteString("(this))\n\t}\n")
+	renderStructAssign(b, structType, runtimeOwner)
 	for _, method := range structType.methods {
 		b.WriteString("\n")
 		renderMethod(b, &method)

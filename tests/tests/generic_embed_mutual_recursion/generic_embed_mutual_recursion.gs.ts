@@ -47,6 +47,12 @@ export class AppBase {
 		return $.markAsStructValue(new AppBase(this))
 	}
 
+	public __goscriptAssign(source: AppBase): void {
+		const target = this._fields
+		const values = source._fields
+		target.Windows = values.Windows
+	}
+
 	public async FirstName(__typeArgs: $.GenericTypeArgs | undefined): globalThis.Promise<string> {
 		const a: AppBase | $.VarRef<AppBase> | null = this;
 		if ($.len($.pointerValue<AppBase>(a).Windows) == 0) {
@@ -105,6 +111,13 @@ export class WindowBase {
 		return $.markAsStructValue(new WindowBase(this))
 	}
 
+	public __goscriptAssign(source: WindowBase): void {
+		const target = this._fields
+		const values = source._fields
+		target.App = $.assignFieldValue(target.App, values.App, { kind: $.TypeKind.Interface, methods: [$.methodSignature("FirstName", [], [/* @__PURE__ */ $.basicType("string")]), $.methodSignature("Window", [], ["main.Window"])] })
+		target.name = values.name
+	}
+
 	public async AppWindowName(__typeArgs: $.GenericTypeArgs | undefined): globalThis.Promise<string> {
 		const w: WindowBase | $.VarRef<WindowBase> | null = this;
 		return $.concatString(($.concatString(await $.pointerValue<Exclude<Window, null>>((await $.callGenericMethod(__typeArgs, "A", "Window", $.pointerValue<WindowBase>(w).App))).Name(), " via ")), await $.callGenericMethod(__typeArgs, "A", "FirstName", $.pointerValue<WindowBase>(w).App))
@@ -147,6 +160,12 @@ export class MyApp {
 		return $.markAsStructValue(new MyApp(this))
 	}
 
+	public __goscriptAssign(source: MyApp): void {
+		const target = this._fields
+		const values = source._fields
+		$.assignStruct(target.AppBase, values.AppBase)
+	}
+
 	public async FirstName(): globalThis.Promise<any> {
 		return await $.pointerValue<AppBase>(this.AppBase).FirstName({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, W: { type: /* @__PURE__ */ $.pointerType("main.MyWindow"), zero: () => null, methods: {AppWindowName: (receiver: any, ...args: any[]) => $.pointerValue(receiver).AppWindowName(...$.stripGenericTypeArgs(args)), Name: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Name(...$.stripGenericTypeArgs(args))} }})
 	}
@@ -185,6 +204,12 @@ export class MyWindow {
 
 	public clone(): MyWindow {
 		return $.markAsStructValue(new MyWindow(this))
+	}
+
+	public __goscriptAssign(source: MyWindow): void {
+		const target = this._fields
+		const values = source._fields
+		$.assignStruct(target.WindowBase, values.WindowBase)
 	}
 
 	public async AppWindowName(): globalThis.Promise<any> {

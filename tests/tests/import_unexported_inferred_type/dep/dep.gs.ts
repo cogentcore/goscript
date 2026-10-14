@@ -16,6 +16,9 @@ export class hiddenError {
 		return $.markAsStructValue(new hiddenError(this))
 	}
 
+	public __goscriptAssign(source: hiddenError): void {
+	}
+
 	public Error(): string {
 		return "closed"
 	}

@@ -46,6 +46,14 @@ export class requestKey {
 		return $.markAsStructValue(new requestKey(this))
 	}
 
+	public __goscriptAssign(source: requestKey): void {
+		const target = this._fields
+		const values = source._fields
+		target.soID = values.soID
+		target.inviteID = values.inviteID
+		target.peerID = values.peerID
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.requestKey",
 		() => new requestKey(),
@@ -86,6 +94,13 @@ export class node {
 
 	public clone(): node {
 		return $.markAsStructValue(new node(this))
+	}
+
+	public __goscriptAssign(source: node): void {
+		const target = this._fields
+		const values = source._fields
+		target.value = values.value
+		target.next = values.next
 	}
 
 	static __typeInfo = $.registerStructType(

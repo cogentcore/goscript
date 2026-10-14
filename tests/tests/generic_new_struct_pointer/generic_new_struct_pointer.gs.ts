@@ -47,6 +47,13 @@ export class Base {
 		return $.markAsStructValue(new Base(this))
 	}
 
+	public __goscriptAssign(source: Base): void {
+		const target = this._fields
+		const values = source._fields
+		target.name = values.name
+		target.inits = values.inits
+	}
+
 	public Name(): string {
 		const b: Base | $.VarRef<Base> | null = this;
 		return $.pointerValue<Base>(b).name
@@ -97,6 +104,13 @@ export class Widget {
 
 	public clone(): Widget {
 		return $.markAsStructValue(new Widget(this))
+	}
+
+	public __goscriptAssign(source: Widget): void {
+		const target = this._fields
+		const values = source._fields
+		$.assignStruct(target.Base, values.Base)
+		target.Text = values.Text
 	}
 
 	public Name(): any {

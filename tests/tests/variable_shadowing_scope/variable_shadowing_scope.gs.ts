@@ -26,6 +26,9 @@ export class item {
 		return $.markAsStructValue(new item(this))
 	}
 
+	public __goscriptAssign(source: item): void {
+	}
+
 	public Name(): string {
 		return "item"
 	}

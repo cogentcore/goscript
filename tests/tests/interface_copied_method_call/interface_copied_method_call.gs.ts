@@ -26,6 +26,9 @@ export class task {
 		return $.markAsStructValue(new task(this))
 	}
 
+	public __goscriptAssign(source: task): void {
+	}
+
 	public async Run(): globalThis.Promise<void> {
 		await $.println("run")
 	}

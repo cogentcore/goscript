@@ -36,6 +36,12 @@ export class box {
 		return $.markAsStructValue(new box(this))
 	}
 
+	public __goscriptAssign(source: box): void {
+		const target = this._fields
+		const values = source._fields
+		target.value = $.assignFieldValue(target.value, values.value, { kind: $.TypeKind.Interface, methods: [] })
+	}
+
 	public Value(__typeArgs: $.GenericTypeArgs | undefined): any {
 		const b: box | $.VarRef<box> | null = this;
 		return $.pointerValue<box>(b).value
@@ -71,6 +77,12 @@ export class holder {
 
 	public clone(): holder {
 		return $.markAsStructValue(new holder(this))
+	}
+
+	public __goscriptAssign(source: holder): void {
+		const target = this._fields
+		const values = source._fields
+		$.assignStruct(target.box, values.box)
 	}
 
 	public Value(__typeArgs: $.GenericTypeArgs | undefined): any {

@@ -38,6 +38,13 @@ export class Person {
 		return $.markAsStructValue(new Person(this))
 	}
 
+	public __goscriptAssign(source: Person): void {
+		const target = this._fields
+		const values = source._fields
+		target.Name = values.Name
+		target.Age = values.Age
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.Person",
 		() => new Person(),
@@ -79,6 +86,13 @@ export class Employee {
 
 	public clone(): Employee {
 		return $.markAsStructValue(new Employee(this))
+	}
+
+	public __goscriptAssign(source: Employee): void {
+		const target = this._fields
+		const values = source._fields
+		$.assignStruct(target.Person, values.Person)
+		target.ID = values.ID
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -123,6 +137,13 @@ export class Address {
 
 	public clone(): Address {
 		return $.markAsStructValue(new Address(this))
+	}
+
+	public __goscriptAssign(source: Address): void {
+		const target = this._fields
+		const values = source._fields
+		target.Street = values.Street
+		target.City = values.City
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -189,6 +210,15 @@ export class Manager {
 		return $.markAsStructValue(new Manager(this))
 	}
 
+	public __goscriptAssign(source: Manager): void {
+		const target = this._fields
+		const values = source._fields
+		$.assignStruct(target.Person, values.Person)
+		$.assignStruct(target.Address, values.Address)
+		target.Phone = values.Phone
+		target.Level = values.Level
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.Manager",
 		() => new Manager(),
@@ -230,6 +260,13 @@ export class Team {
 
 	public clone(): Team {
 		return $.markAsStructValue(new Team(this))
+	}
+
+	public __goscriptAssign(source: Team): void {
+		const target = this._fields
+		const values = source._fields
+		$.assignStruct(target.Employee, values.Employee)
+		target.Active = values.Active
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -276,6 +313,13 @@ export class LiteralValue {
 		return $.markAsStructValue(new LiteralValue(this))
 	}
 
+	public __goscriptAssign(source: LiteralValue): void {
+		const target = this._fields
+		const values = source._fields
+		target.Value = $.assignFieldValue(target.Value, values.Value, { kind: $.TypeKind.Interface, methods: [] })
+		target.Zero = $.assignFieldValue(target.Zero, values.Zero, { kind: $.TypeKind.Interface, methods: [] })
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.LiteralValue",
 		() => new LiteralValue(),
@@ -306,6 +350,12 @@ export class LiteralContainer {
 
 	public clone(): LiteralContainer {
 		return $.markAsStructValue(new LiteralContainer(this))
+	}
+
+	public __goscriptAssign(source: LiteralContainer): void {
+		const target = this._fields
+		const values = source._fields
+		$.assignStruct(target.LiteralValue, values.LiteralValue)
 	}
 
 	static __typeInfo = $.registerStructType(

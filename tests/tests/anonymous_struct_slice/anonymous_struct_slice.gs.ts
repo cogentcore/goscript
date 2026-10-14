@@ -36,6 +36,13 @@ export class namedItem {
 		return $.markAsStructValue(new namedItem(this))
 	}
 
+	public __goscriptAssign(source: namedItem): void {
+		const target = this._fields
+		const values = source._fields
+		target.key = values.key
+		target.data = values.data
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.namedItem",
 		() => new namedItem(),

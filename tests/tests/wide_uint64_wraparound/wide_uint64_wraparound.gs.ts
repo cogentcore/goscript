@@ -16,6 +16,9 @@ export class BigInt {
 		return $.markAsStructValue(new BigInt(this))
 	}
 
+	public __goscriptAssign(source: BigInt): void {
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.BigInt",
 		() => new BigInt(),

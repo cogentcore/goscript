@@ -39,6 +39,13 @@ export class Wrapped {
 		return $.markAsStructValue(new Wrapped(this))
 	}
 
+	public __goscriptAssign(source: Wrapped): void {
+		const target = this._fields
+		const values = source._fields
+		target.Value = values.Value
+		$.assignStruct(target.Hidden, values.Hidden)
+	}
+
 	public ["public"](): dep.Public | $.VarRef<dep.Public> | null {
 		const w: Wrapped | $.VarRef<Wrapped> | null = this;
 		return $.unsafePointerCast<dep.Public | $.VarRef<dep.Public> | null>(w, dep.Public)

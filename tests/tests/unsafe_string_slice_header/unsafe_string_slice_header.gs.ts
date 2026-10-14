@@ -42,6 +42,13 @@ export class localSliceHeader {
 		return $.markAsStructValue(new localSliceHeader(this))
 	}
 
+	public __goscriptAssign(source: localSliceHeader): void {
+		const target = this._fields
+		const values = source._fields
+		target.s = values.s
+		target.cap = values.cap
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.localSliceHeader",
 		() => new localSliceHeader(),

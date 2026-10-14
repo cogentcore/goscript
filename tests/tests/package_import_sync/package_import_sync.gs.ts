@@ -39,6 +39,13 @@ export class embeddedMutex {
 		return $.markAsStructValue(new embeddedMutex(this))
 	}
 
+	public __goscriptAssign(source: embeddedMutex): void {
+		const target = this._fields
+		const values = source._fields
+		$.assignStruct(target.Mutex, values.Mutex)
+		target.value = values.value
+	}
+
 	public Lock(): any {
 		return $.pointerValue<sync.Mutex>(this.Mutex).Lock()
 	}
@@ -91,6 +98,13 @@ export class embeddedRWMutex {
 
 	public clone(): embeddedRWMutex {
 		return $.markAsStructValue(new embeddedRWMutex(this))
+	}
+
+	public __goscriptAssign(source: embeddedRWMutex): void {
+		const target = this._fields
+		const values = source._fields
+		$.assignStruct(target.RWMutex, values.RWMutex)
+		target.value = values.value
 	}
 
 	public Lock(): any {
@@ -171,6 +185,14 @@ export class queue {
 
 	public clone(): queue {
 		return $.markAsStructValue(new queue(this))
+	}
+
+	public __goscriptAssign(source: queue): void {
+		const target = this._fields
+		const values = source._fields
+		$.assignStruct(target.Mu, values.Mu)
+		$.assignStruct(target.Cond, values.Cond)
+		target.items = values.items
 	}
 
 	public async lockAndInit(): globalThis.Promise<void> {

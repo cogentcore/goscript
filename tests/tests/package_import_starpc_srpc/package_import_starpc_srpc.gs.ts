@@ -40,6 +40,9 @@ export class handler {
 		return $.markAsStructValue(new handler(this))
 	}
 
+	public __goscriptAssign(source: handler): void {
+	}
+
 	public GetMethodIDs(): $.Slice<string> {
 		return $.arrayToSlice<string>(["method", "stream", "hold", "empty"])
 	}
@@ -105,6 +108,12 @@ export class embeddedStream {
 		return $.markAsStructValue(new embeddedStream(this))
 	}
 
+	public __goscriptAssign(source: embeddedStream): void {
+		const target = this._fields
+		const values = source._fields
+		target.Stream = $.assignFieldValue(target.Stream, values.Stream, "srpc.Stream")
+	}
+
 	public async Close(): globalThis.Promise<any> {
 		return await $.pointerValue<Exclude<srpc.Stream | null, null>>(this.Stream).Close()
 	}
@@ -167,6 +176,13 @@ export class streamOpenResult {
 		return $.markAsStructValue(new streamOpenResult(this))
 	}
 
+	public __goscriptAssign(source: streamOpenResult): void {
+		const target = this._fields
+		const values = source._fields
+		target.stream = $.assignFieldValue(target.stream, values.stream, "srpc.Stream")
+		target.err = $.assignFieldValue(target.err, values.err, "error")
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.streamOpenResult",
 		() => new streamOpenResult(),
@@ -209,6 +225,13 @@ export class streamProbeResult {
 		return $.markAsStructValue(new streamProbeResult(this))
 	}
 
+	public __goscriptAssign(source: streamProbeResult): void {
+		const target = this._fields
+		const values = source._fields
+		target.total = values.total
+		target.err = values.err
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.streamProbeResult",
 		() => new streamProbeResult(),
@@ -239,6 +262,12 @@ export class rpcStreamServerResult {
 
 	public clone(): rpcStreamServerResult {
 		return $.markAsStructValue(new rpcStreamServerResult(this))
+	}
+
+	public __goscriptAssign(source: rpcStreamServerResult): void {
+		const target = this._fields
+		const values = source._fields
+		target.err = values.err
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -321,6 +350,17 @@ export class memoryRpcStream {
 
 	public clone(): memoryRpcStream {
 		return $.markAsStructValue(new memoryRpcStream(this))
+	}
+
+	public __goscriptAssign(source: memoryRpcStream): void {
+		const target = this._fields
+		const values = source._fields
+		target.ctx = $.assignFieldValue(target.ctx, values.ctx, "context.Context")
+		target.cancel = values.cancel
+		target.recv = values.recv
+		target.send = values.send
+		$.assignStruct(target.closeSend, values.closeSend)
+		$.assignStruct(target.cancelLocal, values.cancelLocal)
 	}
 
 	public async Close(): globalThis.Promise<$.GoError> {
@@ -474,6 +514,13 @@ export class memoryRpcContext {
 
 	public clone(): memoryRpcContext {
 		return $.markAsStructValue(new memoryRpcContext(this))
+	}
+
+	public __goscriptAssign(source: memoryRpcContext): void {
+		const target = this._fields
+		const values = source._fields
+		target.done = values.done
+		$.assignStruct(target.once, values.once)
 	}
 
 	public Deadline(): [time.Time, boolean] {

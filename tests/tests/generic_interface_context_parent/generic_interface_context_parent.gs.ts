@@ -49,6 +49,9 @@ export class handler {
 		return $.markAsStructValue(new handler(this))
 	}
 
+	public __goscriptAssign(source: handler): void {
+	}
+
 	public Mark(): void {
 	}
 
@@ -72,6 +75,9 @@ export class genericResolver {
 
 	public clone(): genericResolver {
 		return $.markAsStructValue(new genericResolver(this))
+	}
+
+	public __goscriptAssign(source: genericResolver): void {
 	}
 
 	public async Resolve(__typeArgs: $.GenericTypeArgs | undefined, ctx: context.Context | null, handler: Handler | null): globalThis.Promise<$.GoError> {
@@ -112,6 +118,12 @@ export class genericValue {
 
 	public clone(): genericValue {
 		return $.markAsStructValue(new genericValue(this))
+	}
+
+	public __goscriptAssign(source: genericValue): void {
+		const target = this._fields
+		const values = source._fields
+		target.value = values.value
 	}
 
 	public Get(__typeArgs: $.GenericTypeArgs | undefined): number {

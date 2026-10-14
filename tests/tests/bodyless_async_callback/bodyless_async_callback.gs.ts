@@ -31,6 +31,12 @@ export class Setting {
 		return $.markAsStructValue(new Setting(this))
 	}
 
+	public __goscriptAssign(source: Setting): void {
+		const target = this._fields
+		const values = source._fields
+		$.assignStruct(target.once, values.once)
+	}
+
 	public async Value(): globalThis.Promise<string> {
 		const s: Setting | $.VarRef<Setting> | null = this;
 		await $.pointerValue<Setting>(s).once.Do($.functionValue((): void => {

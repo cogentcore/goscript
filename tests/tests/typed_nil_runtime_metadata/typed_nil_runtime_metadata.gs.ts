@@ -29,6 +29,9 @@ export class source {
 		return $.markAsStructValue(new source(this))
 	}
 
+	public __goscriptAssign(source: source): void {
+	}
+
 	public Read(value: $.Slice<number>): [number, $.GoError] {
 		return [$.len(value), null]
 	}

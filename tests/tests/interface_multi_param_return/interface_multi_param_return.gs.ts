@@ -26,6 +26,9 @@ export class MyProcessor {
 		return $.markAsStructValue(new MyProcessor(this))
 	}
 
+	public __goscriptAssign(source: MyProcessor): void {
+	}
+
 	public async Process(data: $.Slice<number>, count: number, _p2: string): globalThis.Promise<[boolean, $.GoError]> {
 		const p = this;
 		// Dummy implementation

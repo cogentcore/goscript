@@ -36,6 +36,13 @@ export class file {
 		return $.markAsStructValue(new file(this))
 	}
 
+	public __goscriptAssign(source: file): void {
+		const target = this._fields
+		const values = source._fields
+		target.name = values.name
+		target.data = values.data
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.file",
 		() => new file(),
@@ -76,6 +83,13 @@ export class storage {
 
 	public clone(): storage {
 		return $.markAsStructValue(new storage(this))
+	}
+
+	public __goscriptAssign(source: storage): void {
+		const target = this._fields
+		const values = source._fields
+		target.files = values.files
+		target.children = values.children
 	}
 
 	static __typeInfo = $.registerStructType(

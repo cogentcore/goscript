@@ -29,6 +29,12 @@ export class item {
 		return $.markAsStructValue(new item(this))
 	}
 
+	public __goscriptAssign(source: item): void {
+		const target = this._fields
+		const values = source._fields
+		target.Text = values.Text
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.item",
 		() => new item(),
@@ -59,6 +65,12 @@ export class arena {
 
 	public clone(): arena {
 		return $.markAsStructValue(new arena(this))
+	}
+
+	public __goscriptAssign(source: arena): void {
+		const target = this._fields
+		const values = source._fields
+		target.data = values.data
 	}
 
 	public New(__typeArgs: $.GenericTypeArgs | undefined): any {

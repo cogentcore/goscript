@@ -3348,6 +3348,7 @@ func (o *LoweringOwner) lowerStructType(ctx lowerFileContext, semType *semanticT
 			exported:    field.exported,
 			structValue: structValue,
 			arrayValue:  isArrayType(field.typ),
+			plainValue:  isPlainAssignType(field.typ),
 		})
 	}
 
@@ -7886,6 +7887,19 @@ func (o *LoweringOwner) lowerNumericComparisonOperands(ctx lowerFileContext, exp
 		right = o.lowerValueForTarget(ctx, expr.Y, leftType, right)
 	}
 	return left, right
+}
+
+// isPlainAssignType reports whether values of the type are assigned as they
+// are, without copying (see loweredStructField.plainValue).
+func isPlainAssignType(typ types.Type) bool {
+	if _, ok := types.Unalias(typ).(*types.TypeParam); ok {
+		return false
+	}
+	switch types.Unalias(typ).Underlying().(type) {
+	case *types.Basic, *types.Pointer, *types.Slice, *types.Map, *types.Signature, *types.Chan:
+		return true
+	}
+	return false
 }
 
 func isArrayType(typ types.Type) bool {

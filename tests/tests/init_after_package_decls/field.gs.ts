@@ -31,6 +31,12 @@ export class Field {
 		return $.markAsStructValue(new Field(this))
 	}
 
+	public __goscriptAssign(source: Field): void {
+		const target = this._fields
+		const values = source._fields
+		target.Name = values.Name
+	}
+
 	public Owner(): __goscript__type.Type | $.VarRef<__goscript__type.Type> | null {
 		const f = this;
 		return __goscript_types.TypeByName(f.Name)

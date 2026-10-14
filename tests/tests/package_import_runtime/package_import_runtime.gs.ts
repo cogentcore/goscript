@@ -38,6 +38,12 @@ export class counter {
 		return $.markAsStructValue(new counter(this))
 	}
 
+	public __goscriptAssign(source: counter): void {
+		const target = this._fields
+		const values = source._fields
+		target.n = values.n
+	}
+
 	public PtrMethod(): number {
 		const c: counter | $.VarRef<counter> | null = this;
 		return $.pointerValue<counter>(c).n
@@ -78,6 +84,12 @@ export class box {
 
 	public clone(): box {
 		return $.markAsStructValue(new box(this))
+	}
+
+	public __goscriptAssign(source: box): void {
+		const target = this._fields
+		const values = source._fields
+		target.v = $.assignFieldValue(target.v, values.v, { kind: $.TypeKind.Interface, methods: [] })
 	}
 
 	public Get(__typeArgs: $.GenericTypeArgs | undefined): any {

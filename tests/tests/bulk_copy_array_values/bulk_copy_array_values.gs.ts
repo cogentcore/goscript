@@ -31,6 +31,12 @@ export class point {
 		return $.markAsStructValue(new point(this))
 	}
 
+	public __goscriptAssign(source: point): void {
+		const target = this._fields
+		const values = source._fields
+		target.x = values.x
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.point",
 		() => new point(),

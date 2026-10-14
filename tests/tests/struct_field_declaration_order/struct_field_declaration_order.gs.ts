@@ -26,6 +26,12 @@ export class inner {
 		return $.markAsStructValue(new inner(this))
 	}
 
+	public __goscriptAssign(source: inner): void {
+		const target = this._fields
+		const values = source._fields
+		target.value = values.value
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.inner",
 		() => new inner(),
@@ -56,6 +62,12 @@ export class outer {
 
 	public clone(): outer {
 		return $.markAsStructValue(new outer(this))
+	}
+
+	public __goscriptAssign(source: outer): void {
+		const target = this._fields
+		const values = source._fields
+		$.assignStruct(target.inner, values.inner)
 	}
 
 	static __typeInfo = $.registerStructType(

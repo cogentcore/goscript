@@ -77,6 +77,13 @@ export class Action {
 		return $.markAsStructValue(new Action(this))
 	}
 
+	public __goscriptAssign(source: Action): void {
+		const target = this._fields
+		const values = source._fields
+		target.Result = values.Result
+		target.Filter = values.Filter
+	}
+
 	public Mark(): boolean {
 		const a = this;
 		return a.Filter != null

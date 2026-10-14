@@ -26,6 +26,12 @@ export class Counter {
 		return $.markAsStructValue(new Counter(this))
 	}
 
+	public __goscriptAssign(source: Counter): void {
+		const target = this._fields
+		const values = source._fields
+		target.value = values.value
+	}
+
 	public PointerAfterIncrement(): Counter | $.VarRef<Counter> | null {
 		let c = $.varRef(this);
 		c.value.value++

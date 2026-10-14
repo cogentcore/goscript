@@ -32,6 +32,12 @@ export class matcher {
 		return $.markAsStructValue(new matcher(this))
 	}
 
+	public __goscriptAssign(source: matcher): void {
+		const target = this._fields
+		const values = source._fields
+		target.match = values.match
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.matcher",
 		() => new matcher(),

@@ -42,6 +42,13 @@ export class Sub {
 		return $.markAsStructValue(new Sub(this))
 	}
 
+	public __goscriptAssign(source: Sub): void {
+		const target = this._fields
+		const values = source._fields
+		target.X = values.X
+		target.Y = values.Y
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.Sub",
 		() => new Sub(),
@@ -92,6 +99,14 @@ export class T {
 
 	public clone(): T {
 		return $.markAsStructValue(new T(this))
+	}
+
+	public __goscriptAssign(source: T): void {
+		const target = this._fields
+		const values = source._fields
+		target.Mbr1 = values.Mbr1
+		target.Mbr2 = values.Mbr2
+		$.assignStruct(target.S, values.S)
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -167,6 +182,12 @@ export async function main(): globalThis.Promise<void> {
 
 		public clone(): holder {
 			return $.markAsStructValue(new holder(this))
+		}
+
+		public __goscriptAssign(source: holder): void {
+			const target = this._fields
+			const values = source._fields
+			target.Count = values.Count
 		}
 
 		static __typeInfo = $.registerStructType(

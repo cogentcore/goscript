@@ -26,6 +26,12 @@ export class buffer {
 		return $.markAsStructValue(new buffer(this))
 	}
 
+	public __goscriptAssign(source: buffer): void {
+		const target = this._fields
+		const values = source._fields
+		target.buf = values.buf
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.buffer",
 		() => new buffer(),

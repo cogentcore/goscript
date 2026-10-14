@@ -29,6 +29,12 @@ export class aValue {
 		return $.markAsStructValue(new aValue(this))
 	}
 
+	public __goscriptAssign(source: aValue): void {
+		const target = this._fields
+		const values = source._fields
+		target.next = values.next
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.aValue",
 		() => new aValue(),

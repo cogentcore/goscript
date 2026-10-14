@@ -31,6 +31,12 @@ export class holder {
 		return $.markAsStructValue(new holder(this))
 	}
 
+	public __goscriptAssign(source: holder): void {
+		const target = this._fields
+		const values = source._fields
+		target.n = values.n
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.holder",
 		() => new holder(),

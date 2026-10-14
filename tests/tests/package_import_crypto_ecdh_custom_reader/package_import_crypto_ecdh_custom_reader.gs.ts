@@ -58,6 +58,14 @@ export class segmentedReader {
 		return $.markAsStructValue(new segmentedReader(this))
 	}
 
+	public __goscriptAssign(source: segmentedReader): void {
+		const target = this._fields
+		const values = source._fields
+		target.data = values.data
+		target.offset = values.offset
+		target.step = values.step
+	}
+
 	public Read(p: $.Slice<number>): [number, $.GoError] {
 		let r: segmentedReader | $.VarRef<segmentedReader> | null = this;
 		if ($.pointerValue<segmentedReader>(r).offset >= $.len($.pointerValue<segmentedReader>(r).data)) {
@@ -89,6 +97,9 @@ export class failingReader {
 
 	public clone(): failingReader {
 		return $.markAsStructValue(new failingReader(this))
+	}
+
+	public __goscriptAssign(source: failingReader): void {
 	}
 
 	public Read(p: $.Slice<number>): [number, $.GoError] {

@@ -38,6 +38,13 @@ export async function main(): globalThis.Promise<void> {
 				return $.markAsStructValue(new item(this))
 			}
 
+			public __goscriptAssign(source: item): void {
+				const target = this._fields
+				const values = source._fields
+				target.name = values.name
+				target.count = values.count
+			}
+
 			static __typeInfo = $.registerStructType(
 				"main.item",
 				() => new item(),

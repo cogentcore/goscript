@@ -26,6 +26,12 @@ export class worker {
 		return $.markAsStructValue(new worker(this))
 	}
 
+	public __goscriptAssign(source: worker): void {
+		const target = this._fields
+		const values = source._fields
+		target.base = values.base
+	}
+
 	public add(v: number): number {
 		const w: worker | $.VarRef<worker> | null = this;
 		return $.pointerValue<worker>(w).base + v

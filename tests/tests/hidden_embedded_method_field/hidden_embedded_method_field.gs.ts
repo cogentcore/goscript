@@ -16,6 +16,9 @@ export class embedded {
 		return $.markAsStructValue(new embedded(this))
 	}
 
+	public __goscriptAssign(source: embedded): void {
+	}
+
 	public Database(): string {
 		return "method"
 	}
@@ -60,6 +63,13 @@ export class holder {
 
 	public clone(): holder {
 		return $.markAsStructValue(new holder(this))
+	}
+
+	public __goscriptAssign(source: holder): void {
+		const target = this._fields
+		const values = source._fields
+		target.Database = values.Database
+		$.assignStruct(target.embedded, values.embedded)
 	}
 
 	static __typeInfo = $.registerStructType(

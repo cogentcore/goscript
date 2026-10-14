@@ -26,6 +26,12 @@ export class Foo {
 		return $.markAsStructValue(new Foo(this))
 	}
 
+	public __goscriptAssign(source: Foo): void {
+		const target = this._fields
+		const values = source._fields
+		target.done = values.done
+	}
+
 	public async Bar(): globalThis.Promise<void> {
 		const f: Foo | $.VarRef<Foo> | null = this;
 		await $.println("Foo.Bar called")

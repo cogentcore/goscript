@@ -16,6 +16,9 @@ export class Parser {
 		return $.markAsStructValue(new Parser(this))
 	}
 
+	public __goscriptAssign(source: Parser): void {
+	}
+
 	public Parse(_arguments: $.Slice<string>): number {
 		return $.len(_arguments)
 	}

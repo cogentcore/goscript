@@ -26,6 +26,12 @@ export class Worker {
 		return $.markAsStructValue(new Worker(this))
 	}
 
+	public __goscriptAssign(source: Worker): void {
+		const target = this._fields
+		const values = source._fields
+		target.ch = values.ch
+	}
+
 	public async lookup(network: string): globalThis.Promise<number> {
 		const w: Worker | $.VarRef<Worker> | null = this;
 		await $.chanSend($.pointerValue<Worker>(w).ch, $.len(network))

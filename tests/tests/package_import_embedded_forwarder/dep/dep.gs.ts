@@ -44,6 +44,12 @@ export class BaseStore {
 		return $.markAsStructValue(new BaseStore(this))
 	}
 
+	public __goscriptAssign(source: BaseStore): void {
+		const target = this._fields
+		const values = source._fields
+		target.CoreStore = values.CoreStore
+	}
+
 	public NewTransaction(write: any): any {
 		return $.pointerValue<inner.CoreStore>(this.CoreStore).NewTransaction(write)
 	}

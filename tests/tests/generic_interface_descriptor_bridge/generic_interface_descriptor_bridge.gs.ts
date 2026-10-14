@@ -41,6 +41,9 @@ export class genericBox {
 		return $.markAsStructValue(new genericBox(this))
 	}
 
+	public __goscriptAssign(source: genericBox): void {
+	}
+
 	public async Count(__typeArgs: $.GenericTypeArgs | undefined, ctx: context.Context | null, values: $.Slice<any>): globalThis.Promise<number> {
 		await $.chanRecv(await $.pointerValue<Exclude<context.Context, null>>(ctx).Done())
 		return $.len(values)
@@ -81,6 +84,12 @@ export class intBox {
 
 	public clone(): intBox {
 		return $.markAsStructValue(new intBox(this))
+	}
+
+	public __goscriptAssign(source: intBox): void {
+		const target = this._fields
+		const values = source._fields
+		target.id = values.id
 	}
 
 	public async Count(ctx: context.Context | null, values: $.Slice<number>): globalThis.Promise<number> {

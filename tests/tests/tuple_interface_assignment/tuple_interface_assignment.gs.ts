@@ -26,6 +26,9 @@ export class concrete {
 		return $.markAsStructValue(new concrete(this))
 	}
 
+	public __goscriptAssign(source: concrete): void {
+	}
+
 	public Read(): number {
 		return 7
 	}

@@ -42,6 +42,13 @@ export class timer {
 		return $.markAsStructValue(new timer(this))
 	}
 
+	public __goscriptAssign(source: timer): void {
+		const target = this._fields
+		const values = source._fields
+		$.assignStruct(target.start, values.start)
+		target.total = values.total
+	}
+
 	public Start(): void {
 		let t: timer | $.VarRef<timer> | null = this;
 		$.assignStruct($.pointerValue<timer>(t).start, $.markAsStructValue($.cloneStructValue(time.Now())))

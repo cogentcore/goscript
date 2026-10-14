@@ -38,6 +38,12 @@ export class Image {
 		return $.markAsStructValue(new Image(this))
 	}
 
+	public __goscriptAssign(source: Image): void {
+		const target = this._fields
+		const values = source._fields
+		target.Name = values.Name
+	}
+
 	public async MarshalJSON(): globalThis.Promise<[$.Slice<number>, $.GoError]> {
 		const im: Image | $.VarRef<Image> | null = this;
 		using __defer = new $.DisposableStack()
@@ -118,6 +124,14 @@ export class Doc {
 
 	public clone(): Doc {
 		return $.markAsStructValue(new Doc(this))
+	}
+
+	public __goscriptAssign(source: Doc): void {
+		const target = this._fields
+		const values = source._fields
+		target.Title = values.Title
+		target.Image = values.Image
+		target.Note = values.Note
 	}
 
 	static __typeInfo = $.registerStructType(

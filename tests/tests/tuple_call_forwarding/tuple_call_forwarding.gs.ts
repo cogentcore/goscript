@@ -49,6 +49,13 @@ export class point {
 		return $.markAsStructValue(new point(this))
 	}
 
+	public __goscriptAssign(source: point): void {
+		const target = this._fields
+		const values = source._fields
+		target.x = values.x
+		target.y = values.y
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.point",
 		() => new point(),
@@ -79,6 +86,12 @@ export class frame {
 
 	public clone(): frame {
 		return $.markAsStructValue(new frame(this))
+	}
+
+	public __goscriptAssign(source: frame): void {
+		const target = this._fields
+		const values = source._fields
+		target.name = values.name
 	}
 
 	public Name(): string {
@@ -118,6 +131,12 @@ export class tab {
 		return $.markAsStructValue(new tab(this))
 	}
 
+	public __goscriptAssign(source: tab): void {
+		const target = this._fields
+		const values = source._fields
+		target.name = values.name
+	}
+
 	public Name(): string {
 		const t: tab | $.VarRef<tab> | null = this;
 		return $.pointerValue<tab>(t).name
@@ -153,6 +172,12 @@ export class tabs {
 
 	public clone(): tabs {
 		return $.markAsStructValue(new tabs(this))
+	}
+
+	public __goscriptAssign(source: tabs): void {
+		const target = this._fields
+		const values = source._fields
+		target.count = values.count
 	}
 
 	public async NewTab(name: string): globalThis.Promise<[frame | $.VarRef<frame> | null, tab | $.VarRef<tab> | null]> {

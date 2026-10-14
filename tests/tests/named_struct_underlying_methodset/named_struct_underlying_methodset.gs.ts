@@ -26,6 +26,9 @@ export class Base {
 		return $.markAsStructValue(new Base(this))
 	}
 
+	public __goscriptAssign(source: Base): void {
+	}
+
 	public String(): string {
 		return "base"
 	}
@@ -50,6 +53,9 @@ export class Derived {
 
 	public clone(): Derived {
 		return $.markAsStructValue(new Derived(this))
+	}
+
+	public __goscriptAssign(source: Derived): void {
 	}
 
 	public Own(): string {

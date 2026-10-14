@@ -56,6 +56,15 @@ export class multiplyCase {
 		return $.markAsStructValue(new multiplyCase(this))
 	}
 
+	public __goscriptAssign(source: multiplyCase): void {
+		const target = this._fields
+		const values = source._fields
+		target.x = values.x
+		target.y = values.y
+		target.unsigned = values.unsigned
+		target.signed = values.signed
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.multiplyCase",
 		() => new multiplyCase(),

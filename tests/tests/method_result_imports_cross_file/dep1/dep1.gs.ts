@@ -19,6 +19,9 @@ export class maker {
 		return $.markAsStructValue(new maker(this))
 	}
 
+	public __goscriptAssign(source: maker): void {
+	}
+
 	public Value(): string {
 		return "ok"
 	}

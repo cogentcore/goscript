@@ -36,6 +36,12 @@ export class listProvider {
 		return $.markAsStructValue(new listProvider(this))
 	}
 
+	public __goscriptAssign(source: listProvider): void {
+		const target = this._fields
+		const values = source._fields
+		target.items = values.items
+	}
+
 	public Items(): $.Slice<Group | $.VarRef<Group> | null> {
 		const p: listProvider | $.VarRef<listProvider> | null = this;
 		return $.pointerValue<listProvider>(p).items
@@ -81,6 +87,13 @@ export class Group {
 
 	public clone(): Group {
 		return $.markAsStructValue(new Group(this))
+	}
+
+	public __goscriptAssign(source: Group): void {
+		const target = this._fields
+		const values = source._fields
+		target.provider = $.assignFieldValue(target.provider, values.provider, "main.provider")
+		target.seen = values.seen
 	}
 
 	public async Build(): globalThis.Promise<void> {

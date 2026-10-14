@@ -36,6 +36,12 @@ export class blankImpl {
 		return $.markAsStructValue(new blankImpl(this))
 	}
 
+	public __goscriptAssign(source: blankImpl): void {
+		const target = this._fields
+		const values = source._fields
+		target.value = values.value
+	}
+
 	public Value(): number {
 		const b: blankImpl | $.VarRef<blankImpl> | null = this;
 		return $.pointerValue<blankImpl>(b).value
@@ -61,6 +67,9 @@ export class Packer {
 
 	public clone(): Packer {
 		return $.markAsStructValue(new Packer(this))
+	}
+
+	public __goscriptAssign(source: Packer): void {
 	}
 
 	public pack(msg: $.Slice<number>, _p1: globalThis.Map<string, number> | null, _p2: number): $.Slice<number> {

@@ -30,6 +30,12 @@ export class Promise {
 		return $.markAsStructValue(new Promise(this))
 	}
 
+	public __goscriptAssign(source: Promise): void {
+		const target = this._fields
+		const values = source._fields
+		target.value = values.value
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.Promise",
 		() => new Promise(),
@@ -70,6 +76,13 @@ export class point {
 
 	public clone(): point {
 		return $.markAsStructValue(new point(this))
+	}
+
+	public __goscriptAssign(source: point): void {
+		const target = this._fields
+		const values = source._fields
+		target.x = values.x
+		target.y = values.y
 	}
 
 	static __typeInfo = $.registerStructType(

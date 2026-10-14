@@ -38,6 +38,13 @@ export class ObjectID {
 		return $.markAsStructValue(new ObjectID(this))
 	}
 
+	public __goscriptAssign(source: ObjectID): void {
+		const target = this._fields
+		const values = source._fields
+		target.hash = $.assignFieldValue(target.hash, values.hash, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 4))
+		target.format = values.format
+	}
+
 	public IsZero(): boolean {
 		const s = this;
 		return $.structEqual(s, $.markAsStructValue(new ObjectID()))
@@ -90,6 +97,13 @@ export class S {
 		return $.markAsStructValue(new S(this))
 	}
 
+	public __goscriptAssign(source: S): void {
+		const target = this._fields
+		const values = source._fields
+		target.A = values.A
+		target.B = values.B
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.S",
 		() => new S(),
@@ -130,6 +144,13 @@ export class Outer {
 
 	public clone(): Outer {
 		return $.markAsStructValue(new Outer(this))
+	}
+
+	public __goscriptAssign(source: Outer): void {
+		const target = this._fields
+		const values = source._fields
+		$.assignStruct(target.In, values.In)
+		target.N = values.N
 	}
 
 	static __typeInfo = $.registerStructType(

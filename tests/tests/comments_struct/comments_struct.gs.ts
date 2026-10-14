@@ -38,6 +38,13 @@ export class TestStruct {
 		return $.markAsStructValue(new TestStruct(this))
 	}
 
+	public __goscriptAssign(source: TestStruct): void {
+		const target = this._fields
+		const values = source._fields
+		target.IntField = values.IntField
+		target.StringField = values.StringField
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.TestStruct",
 		() => new TestStruct(),

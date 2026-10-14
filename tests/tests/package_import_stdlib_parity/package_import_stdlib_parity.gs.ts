@@ -60,6 +60,9 @@ export class xof {
 		return $.markAsStructValue(new xof(this))
 	}
 
+	public __goscriptAssign(source: xof): void {
+	}
+
 	public BlockSize(): number {
 		return 1
 	}

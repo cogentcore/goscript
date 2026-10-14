@@ -68,6 +68,13 @@ export class signedKey {
 		return $.markAsStructValue(new signedKey(this))
 	}
 
+	public __goscriptAssign(source: signedKey): void {
+		const target = this._fields
+		const values = source._fields
+		target.PubKey = values.PubKey
+		target.Signature = values.Signature
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.signedKey",
 		() => new signedKey(),

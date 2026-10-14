@@ -26,6 +26,12 @@ export class cache {
 		return $.markAsStructValue(new cache(this))
 	}
 
+	public __goscriptAssign(source: cache): void {
+		const target = this._fields
+		const values = source._fields
+		target.stored = values.stored
+	}
+
 	public async Get(__typeArgs: $.GenericTypeArgs | undefined, k: any, _new: (() => [any, $.GoError] | globalThis.Promise<[any, $.GoError]>) | null, check: ((_p0: any) => boolean | globalThis.Promise<boolean>) | null): globalThis.Promise<[any, $.GoError]> {
 		let c: cache | $.VarRef<cache> | null = this;
 		if (($.pointerValue<cache>(c).stored != null) && await check!($.pointerValue<cache>(c).stored)) {
@@ -71,6 +77,12 @@ export class key {
 		return $.markAsStructValue(new key(this))
 	}
 
+	public __goscriptAssign(source: key): void {
+		const target = this._fields
+		const values = source._fields
+		target.N = values.N
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.key",
 		() => new key(),
@@ -101,6 +113,12 @@ export class privateKey {
 
 	public clone(): privateKey {
 		return $.markAsStructValue(new privateKey(this))
+	}
+
+	public __goscriptAssign(source: privateKey): void {
+		const target = this._fields
+		const values = source._fields
+		target.D = values.D
 	}
 
 	static __typeInfo = $.registerStructType(

@@ -36,6 +36,12 @@ export class blockImpl {
 		return $.markAsStructValue(new blockImpl(this))
 	}
 
+	public __goscriptAssign(source: blockImpl): void {
+		const target = this._fields
+		const values = source._fields
+		target.size = values.size
+	}
+
 	public Size(): number {
 		const b: blockImpl | $.VarRef<blockImpl> | null = this;
 		return $.pointerValue<blockImpl>(b).size

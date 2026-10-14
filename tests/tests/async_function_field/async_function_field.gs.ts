@@ -29,6 +29,12 @@ export class loader {
 		return $.markAsStructValue(new loader(this))
 	}
 
+	public __goscriptAssign(source: loader): void {
+		const target = this._fields
+		const values = source._fields
+		target.load = values.load
+	}
+
 	public getLoad(): ((_p0: string) => [any, boolean] | globalThis.Promise<[any, boolean]>) | null {
 		const l: loader | $.VarRef<loader> | null = this;
 		return $.pointerValue<loader>(l).load

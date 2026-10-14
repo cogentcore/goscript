@@ -54,6 +54,13 @@ export class connector {
 		return $.markAsStructValue(new connector(this))
 	}
 
+	public __goscriptAssign(source: connector): void {
+		const target = this._fields
+		const values = source._fields
+		target.direct = values.direct
+		target.blob = values.blob
+	}
+
 	public Begin(): [driver.Tx | null, $.GoError] {
 		const c = this;
 		return [null, driver.ErrSkip]
@@ -141,6 +148,13 @@ export class rows {
 		return $.markAsStructValue(new rows(this))
 	}
 
+	public __goscriptAssign(source: rows): void {
+		const target = this._fields
+		const values = source._fields
+		target.done = values.done
+		target.blob = values.blob
+	}
+
 	public Close(): $.GoError {
 		return null
 	}
@@ -193,6 +207,12 @@ export class columnRows {
 
 	public clone(): columnRows {
 		return $.markAsStructValue(new columnRows(this))
+	}
+
+	public __goscriptAssign(source: columnRows): void {
+		const target = this._fields
+		const values = source._fields
+		$.assignStruct(target.rows, values.rows)
 	}
 
 	public Next(_p0: $.Slice<driver.Value | null>): $.GoError {
@@ -313,6 +333,12 @@ export async function main(): globalThis.Promise<void> {
 			return $.markAsStructValue(new tagged(this))
 		}
 
+		public __goscriptAssign(source: tagged): void {
+			const target = this._fields
+			const values = source._fields
+			target.Value = values.Value
+		}
+
 		static __typeInfo = $.registerStructType(
 			"main.tagged",
 			() => new tagged(),
@@ -342,6 +368,12 @@ export async function main(): globalThis.Promise<void> {
 
 		public clone(): retagged {
 			return $.markAsStructValue(new retagged(this))
+		}
+
+		public __goscriptAssign(source: retagged): void {
+			const target = this._fields
+			const values = source._fields
+			target.Value = values.Value
 		}
 
 		static __typeInfo = $.registerStructType(

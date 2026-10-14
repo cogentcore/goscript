@@ -28,6 +28,12 @@ export class RawValue {
 		return $.markAsStructValue(new RawValue(this))
 	}
 
+	public __goscriptAssign(source: RawValue): void {
+		const target = this._fields
+		const values = source._fields
+		target.Tag = values.Tag
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.RawValue",
 		() => new RawValue(),

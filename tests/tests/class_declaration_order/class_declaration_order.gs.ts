@@ -26,6 +26,9 @@ export class lateType {
 		return $.markAsStructValue(new lateType(this))
 	}
 
+	public __goscriptAssign(source: lateType): void {
+	}
+
 	public Name(): string {
 		return "late"
 	}

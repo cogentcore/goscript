@@ -92,6 +92,13 @@ export async function main(): globalThis.Promise<void> {
 			return $.markAsStructValue(new item(this))
 		}
 
+		public __goscriptAssign(source: item): void {
+			const target = this._fields
+			const values = source._fields
+			target.group = values.group
+			target.label = values.label
+		}
+
 		static __typeInfo = $.registerStructType(
 			"main.item",
 			() => new item(),
@@ -193,6 +200,12 @@ export async function main(): globalThis.Promise<void> {
 
 		public clone(): cell {
 			return $.markAsStructValue(new cell(this))
+		}
+
+		public __goscriptAssign(source: cell): void {
+			const target = this._fields
+			const values = source._fields
+			target.n = values.n
 		}
 
 		static __typeInfo = $.registerStructType(

@@ -29,6 +29,12 @@ export class CoreStore {
 		return $.markAsStructValue(new CoreStore(this))
 	}
 
+	public __goscriptAssign(source: CoreStore): void {
+		const target = this._fields
+		const values = source._fields
+		target.Prefix = values.Prefix
+	}
+
 	public NewTransaction(write: boolean): tx.Tx | $.VarRef<tx.Tx> | null {
 		const s: CoreStore | $.VarRef<CoreStore> | null = this;
 		if (write) {

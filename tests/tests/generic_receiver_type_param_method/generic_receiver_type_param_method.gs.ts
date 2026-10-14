@@ -26,6 +26,9 @@ export class nistCurve {
 		return $.markAsStructValue(new nistCurve(this))
 	}
 
+	public __goscriptAssign(source: nistCurve): void {
+	}
+
 	public async Add(__typeArgs: $.GenericTypeArgs | undefined, p1: any, p2: any): globalThis.Promise<any> {
 		const curve: nistCurve | $.VarRef<nistCurve> | null = this;
 		return (await $.callGenericMethod(__typeArgs, "Point", "Add", p1, p1, p2) as any)
@@ -67,6 +70,12 @@ export class point {
 
 	public clone(): point {
 		return $.markAsStructValue(new point(this))
+	}
+
+	public __goscriptAssign(source: point): void {
+		const target = this._fields
+		const values = source._fields
+		target.N = values.N
 	}
 
 	public Add(a: point | $.VarRef<point> | null, b: point | $.VarRef<point> | null): point | $.VarRef<point> | null {

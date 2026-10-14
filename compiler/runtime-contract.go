@@ -78,6 +78,7 @@ const (
 	RuntimeHelperInt64Xor       RuntimeHelper = "builtin.int64Xor"
 
 	RuntimeHelperAssignStruct          RuntimeHelper = "value.assignStruct"
+	RuntimeHelperAssignFieldValue      RuntimeHelper = "value.assignFieldValue"
 	RuntimeHelperGenericPointerRef     RuntimeHelper = "value.genericPointerRef"
 	RuntimeHelperMarkAsStructValue     RuntimeHelper = "value.markAsStructValue"
 	RuntimeHelperAnonymousStructValue  RuntimeHelper = "value.anonymousStructValue"
@@ -356,6 +357,7 @@ func runtimeHelperContracts() []RuntimeHelperContract {
 		runtimeHelper(RuntimeHelperInt64Or, "int64Or", RuntimeHelperCategoryBuiltin),
 		runtimeHelper(RuntimeHelperInt64Xor, "int64Xor", RuntimeHelperCategoryBuiltin),
 		runtimeHelper(RuntimeHelperAssignStruct, "assignStruct", RuntimeHelperCategoryValue),
+		runtimeHelper(RuntimeHelperAssignFieldValue, "assignFieldValue", RuntimeHelperCategoryValue),
 		runtimeHelper(RuntimeHelperGenericPointerRef, "genericPointerRef", RuntimeHelperCategoryValue),
 		runtimeHelper(RuntimeHelperMarkAsStructValue, "markAsStructValue", RuntimeHelperCategoryValue),
 		runtimeHelper(RuntimeHelperAnonymousStructValue, "anonymousStructValue", RuntimeHelperCategoryValue),

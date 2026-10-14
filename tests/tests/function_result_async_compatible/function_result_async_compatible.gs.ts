@@ -36,6 +36,12 @@ export class box {
 		return $.markAsStructValue(new box(this))
 	}
 
+	public __goscriptAssign(source: box): void {
+		const target = this._fields
+		const values = source._fields
+		target.value = values.value
+	}
+
 	public Value(): number {
 		const b: box | $.VarRef<box> | null = this;
 		return $.pointerValue<box>(b).value

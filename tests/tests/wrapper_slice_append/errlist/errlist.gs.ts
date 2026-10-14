@@ -34,6 +34,12 @@ export class AStruct {
 		return $.markAsStructValue(new AStruct(this))
 	}
 
+	public __goscriptAssign(source: AStruct): void {
+		const target = this._fields
+		const values = source._fields
+		target.Msg = values.Msg
+	}
+
 	public Set(msg: string): void {
 		let a: AStruct | $.VarRef<AStruct> | null = this;
 		$.pointerValue<AStruct>(a).Msg = msg

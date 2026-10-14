@@ -32,6 +32,12 @@ export class Item {
 		return $.markAsStructValue(new Item(this))
 	}
 
+	public __goscriptAssign(source: Item): void {
+		const target = this._fields
+		const values = source._fields
+		target.Name = values.Name
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.Item",
 		() => new Item(),
@@ -74,6 +80,13 @@ export class Holder {
 		return $.markAsStructValue(new Holder(this))
 	}
 
+	public __goscriptAssign(source: Holder): void {
+		const target = this._fields
+		const values = source._fields
+		target.S = values.S
+		target.T = values.T
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.Holder",
 		() => new Holder(),
@@ -104,6 +117,12 @@ export class Doc {
 
 	public clone(): Doc {
 		return $.markAsStructValue(new Doc(this))
+	}
+
+	public __goscriptAssign(source: Doc): void {
+		const target = this._fields
+		const values = source._fields
+		target.Items = values.Items
 	}
 
 	static __typeInfo = $.registerStructType(

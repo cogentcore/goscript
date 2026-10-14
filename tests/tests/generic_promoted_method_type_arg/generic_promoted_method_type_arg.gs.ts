@@ -49,6 +49,13 @@ export class Base {
 		return $.markAsStructValue(new Base(this))
 	}
 
+	public __goscriptAssign(source: Base): void {
+		const target = this._fields
+		const values = source._fields
+		target.App = $.assignFieldValue(target.App, values.App, { kind: $.TypeKind.Interface, methods: [] })
+		target.flags = values.flags
+	}
+
 	public Is(__typeArgs: $.GenericTypeArgs | undefined, flag: Flags): boolean {
 		const b: Base | $.VarRef<Base> | null = this;
 		return ($.int64And($.pointerValue<Base>(b).flags, ($.int64Shl(1n, flag)))) != 0n
@@ -91,6 +98,12 @@ export class App {
 		return $.markAsStructValue(new App(this))
 	}
 
+	public __goscriptAssign(source: App): void {
+		const target = this._fields
+		const values = source._fields
+		target.Name = values.Name
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.App",
 		() => new App(),
@@ -131,6 +144,13 @@ export class Window {
 
 	public clone(): Window {
 		return $.markAsStructValue(new Window(this))
+	}
+
+	public __goscriptAssign(source: Window): void {
+		const target = this._fields
+		const values = source._fields
+		$.assignStruct(target.Base, values.Base)
+		target.Title = values.Title
 	}
 
 	public Is(flag: any): any {
@@ -181,6 +201,13 @@ export class Single {
 
 	public clone(): Single {
 		return $.markAsStructValue(new Single(this))
+	}
+
+	public __goscriptAssign(source: Single): void {
+		const target = this._fields
+		const values = source._fields
+		$.assignStruct(target.Base, values.Base)
+		target.Count = values.Count
 	}
 
 	public Is(__typeArgs: $.GenericTypeArgs | undefined, flag: any): any {

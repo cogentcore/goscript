@@ -26,6 +26,12 @@ export class helperState {
 		return $.markAsStructValue(new helperState(this))
 	}
 
+	public __goscriptAssign(source: helperState): void {
+		const target = this._fields
+		const values = source._fields
+		target.text = values.text
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.helperState",
 		() => new helperState(),

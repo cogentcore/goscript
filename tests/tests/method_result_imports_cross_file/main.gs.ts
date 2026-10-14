@@ -25,6 +25,9 @@ export class Holder {
 		return $.markAsStructValue(new Holder(this))
 	}
 
+	public __goscriptAssign(source: Holder): void {
+	}
+
 	public async Run(): globalThis.Promise<void> {
 		let v = dep1.Make()
 		await $.println(await $.pointerValue<Exclude<dep2.Value, null>>(v).Value())

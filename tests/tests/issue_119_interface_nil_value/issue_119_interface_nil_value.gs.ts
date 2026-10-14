@@ -36,6 +36,12 @@ export class Dog {
 		return $.markAsStructValue(new Dog(this))
 	}
 
+	public __goscriptAssign(source: Dog): void {
+		const target = this._fields
+		const values = source._fields
+		target.name = values.name
+	}
+
 	public Name(): string {
 		const d: Dog | $.VarRef<Dog> | null = this;
 		if (d == null) {
@@ -74,6 +80,12 @@ export class Cat {
 
 	public clone(): Cat {
 		return $.markAsStructValue(new Cat(this))
+	}
+
+	public __goscriptAssign(source: Cat): void {
+		const target = this._fields
+		const values = source._fields
+		target.name = values.name
 	}
 
 	public Name(): string {

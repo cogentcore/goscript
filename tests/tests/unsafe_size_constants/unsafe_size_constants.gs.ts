@@ -59,6 +59,15 @@ export class Data {
 		return $.markAsStructValue(new Data(this))
 	}
 
+	public __goscriptAssign(source: Data): void {
+		const target = this._fields
+		const values = source._fields
+		target.A = values.A
+		target.B = values.B
+		target.C = values.C
+		target.D = values.D
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.Data",
 		() => new Data(),
@@ -109,6 +118,14 @@ export class Mixed {
 
 	public clone(): Mixed {
 		return $.markAsStructValue(new Mixed(this))
+	}
+
+	public __goscriptAssign(source: Mixed): void {
+		const target = this._fields
+		const values = source._fields
+		target.Flag = values.Flag
+		target.N = values.N
+		target.V = $.assignFieldValue(target.V, values.V, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 3))
 	}
 
 	static __typeInfo = $.registerStructType(

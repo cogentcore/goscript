@@ -26,6 +26,9 @@ export class ConcreteA {
 		return $.markAsStructValue(new ConcreteA(this))
 	}
 
+	public __goscriptAssign(source: ConcreteA): void {
+	}
+
 	public Method(): string {
 		const c = this;
 		return "A"
@@ -51,6 +54,9 @@ export class ConcreteB {
 
 	public clone(): ConcreteB {
 		return $.markAsStructValue(new ConcreteB(this))
+	}
+
+	public __goscriptAssign(source: ConcreteB): void {
 	}
 
 	public Method(): string {
@@ -98,6 +104,13 @@ export class Container {
 
 	public clone(): Container {
 		return $.markAsStructValue(new Container(this))
+	}
+
+	public __goscriptAssign(source: Container): void {
+		const target = this._fields
+		const values = source._fields
+		target.hasA = values.hasA
+		target.hasB = values.hasB
 	}
 
 	static __typeInfo = $.registerStructType(

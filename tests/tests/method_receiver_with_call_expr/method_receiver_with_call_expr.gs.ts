@@ -36,6 +36,13 @@ export class State {
 		return $.markAsStructValue(new State(this))
 	}
 
+	public __goscriptAssign(source: State): void {
+		const target = this._fields
+		const values = source._fields
+		target.value = values.value
+		target.index = values.index
+	}
+
 	public async Process(): globalThis.Promise<void> {
 		const s: State | $.VarRef<State> | null = this;
 		// This should generate:

@@ -26,6 +26,12 @@ export class MyStruct {
 		return $.markAsStructValue(new MyStruct(this))
 	}
 
+	public __goscriptAssign(source: MyStruct): void {
+		const target = this._fields
+		const values = source._fields
+		target.Value = values.Value
+	}
+
 	public DoesNotUseReceiver(): number {
 		const m: MyStruct | $.VarRef<MyStruct> | null = this;
 		return 42

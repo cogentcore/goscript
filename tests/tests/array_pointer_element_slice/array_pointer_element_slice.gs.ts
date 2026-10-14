@@ -36,6 +36,13 @@ export class node {
 		return $.markAsStructValue(new node(this))
 	}
 
+	public __goscriptAssign(source: node): void {
+		const target = this._fields
+		const values = source._fields
+		target.sub = values.sub
+		target.sub0 = $.assignFieldValue(target.sub0, values.sub0, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.pointerType("main.node"), 1))
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.node",
 		() => new node(),

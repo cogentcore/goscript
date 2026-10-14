@@ -46,6 +46,9 @@ export class B {
 		return $.markAsStructValue(new B(this))
 	}
 
+	public __goscriptAssign(source: B): void {
+	}
+
 	public MethodB(valB: B | $.VarRef<B> | null): void {
 		const b: B | $.VarRef<B> | null = this;
 	}

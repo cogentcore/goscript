@@ -59,6 +59,13 @@ export class T {
 		return $.markAsStructValue(new T(this))
 	}
 
+	public __goscriptAssign(source: T): void {
+		const target = this._fields
+		const values = source._fields
+		target.A = values.A
+		target.B = values.B
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.T",
 		() => new T(),
@@ -89,6 +96,12 @@ export class square {
 
 	public clone(): square {
 		return $.markAsStructValue(new square(this))
+	}
+
+	public __goscriptAssign(source: square): void {
+		const target = this._fields
+		const values = source._fields
+		target.Side = values.Side
 	}
 
 	public Area(): number {
@@ -138,6 +151,13 @@ export class holder {
 		return $.markAsStructValue(new holder(this))
 	}
 
+	public __goscriptAssign(source: holder): void {
+		const target = this._fields
+		const values = source._fields
+		target.S = $.assignFieldValue(target.S, values.S, "main.shape")
+		target.A = $.assignFieldValue(target.A, values.A, { kind: $.TypeKind.Interface, methods: [] })
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.holder",
 		() => new holder(),
@@ -178,6 +198,13 @@ export class base {
 
 	public clone(): base {
 		return $.markAsStructValue(new base(this))
+	}
+
+	public __goscriptAssign(source: base): void {
+		const target = this._fields
+		const values = source._fields
+		target.This = $.assignFieldValue(target.This, values.This, "main.node")
+		target.Name = values.Name
 	}
 
 	public AsBase(): base | $.VarRef<base> | null {
@@ -232,6 +259,13 @@ export class widget {
 		return $.markAsStructValue(new widget(this))
 	}
 
+	public __goscriptAssign(source: widget): void {
+		const target = this._fields
+		const values = source._fields
+		$.assignStruct(target.base, values.base)
+		target.X = values.X
+	}
+
 	public AsBase(): any {
 		return $.pointerValue<base>(this.base).AsBase()
 	}
@@ -280,6 +314,13 @@ export class body {
 
 	public clone(): body {
 		return $.markAsStructValue(new body(this))
+	}
+
+	public __goscriptAssign(source: body): void {
+		const target = this._fields
+		const values = source._fields
+		$.assignStruct(target.widget, values.widget)
+		target.Title = values.Title
 	}
 
 	public AsBase(): any {

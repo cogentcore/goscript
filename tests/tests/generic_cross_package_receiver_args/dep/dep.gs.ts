@@ -36,6 +36,12 @@ export class Impl {
 		return $.markAsStructValue(new Impl(this))
 	}
 
+	public __goscriptAssign(source: Impl): void {
+		const target = this._fields
+		const values = source._fields
+		target.Item = $.assignFieldValue(target.Item, values.Item, { kind: $.TypeKind.Interface, methods: [] })
+	}
+
 	public Value(__typeArgs: $.GenericTypeArgs | undefined): any {
 		const i: Impl | $.VarRef<Impl> | null = this;
 		return $.pointerValue<Impl>(i).Item
@@ -61,6 +67,9 @@ export class Keyed {
 
 	public clone(): Keyed {
 		return $.markAsStructValue(new Keyed(this))
+	}
+
+	public __goscriptAssign(source: Keyed): void {
 	}
 
 	public SetValues(__typeArgs: $.GenericTypeArgs | undefined, value: any): any {
@@ -99,6 +108,12 @@ export class Wrapper {
 
 	public clone(): Wrapper {
 		return $.markAsStructValue(new Wrapper(this))
+	}
+
+	public __goscriptAssign(source: Wrapper): void {
+		const target = this._fields
+		const values = source._fields
+		target.Keyed = values.Keyed
 	}
 
 	public SetValues(__typeArgs: $.GenericTypeArgs | undefined, value: any): any {

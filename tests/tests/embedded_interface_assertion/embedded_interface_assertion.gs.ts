@@ -47,6 +47,9 @@ export class MyStruct {
 		return $.markAsStructValue(new MyStruct(this))
 	}
 
+	public __goscriptAssign(source: MyStruct): void {
+	}
+
 	public Close(): $.GoError {
 		const m = this;
 		// Dummy implementation

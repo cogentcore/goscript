@@ -60,6 +60,13 @@ export class Instr {
 		return $.markAsStructValue(new Instr(this))
 	}
 
+	public __goscriptAssign(source: Instr): void {
+		const target = this._fields
+		const values = source._fields
+		target.Op = values.Op
+		target.Arg = values.Arg
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.Instr",
 		() => new Instr(),
@@ -100,6 +107,13 @@ export class Program {
 
 	public clone(): Program {
 		return $.markAsStructValue(new Program(this))
+	}
+
+	public __goscriptAssign(source: Program): void {
+		const target = this._fields
+		const values = source._fields
+		target.Name = values.Name
+		target.Code = values.Code
 	}
 
 	public Listing(): ((_yield: ((_p0: number, _p1: Instr) => boolean | globalThis.Promise<boolean>) | null) => void) | null {
@@ -144,6 +158,12 @@ export class Stack {
 
 	public clone(): Stack {
 		return $.markAsStructValue(new Stack(this))
+	}
+
+	public __goscriptAssign(source: Stack): void {
+		const target = this._fields
+		const values = source._fields
+		target.items = values.items
 	}
 
 	public Pop(__typeArgs: $.GenericTypeArgs | undefined): any {
@@ -211,6 +231,14 @@ export class VM {
 
 	public clone(): VM {
 		return $.markAsStructValue(new VM(this))
+	}
+
+	public __goscriptAssign(source: VM): void {
+		const target = this._fields
+		const values = source._fields
+		target.pc = values.pc
+		target.steps = values.steps
+		$.assignStruct(target.stack, values.stack)
 	}
 
 	public Step(code: $.Slice<Instr>): boolean {
@@ -337,6 +365,14 @@ export class Answer {
 		return $.markAsStructValue(new Answer(this))
 	}
 
+	public __goscriptAssign(source: Answer): void {
+		const target = this._fields
+		const values = source._fields
+		target.Name = values.Name
+		target.Value = values.Value
+		target.Steps = values.Steps
+	}
+
 	public Program(): string {
 		const a = this;
 		return a.Name
@@ -382,6 +418,13 @@ export class Fault {
 
 	public clone(): Fault {
 		return $.markAsStructValue(new Fault(this))
+	}
+
+	public __goscriptAssign(source: Fault): void {
+		const target = this._fields
+		const values = source._fields
+		target.Name = values.Name
+		target.Reason = values.Reason
 	}
 
 	public Program(): string {

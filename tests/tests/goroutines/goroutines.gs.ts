@@ -36,6 +36,13 @@ export class Message {
 		return $.markAsStructValue(new Message(this))
 	}
 
+	public __goscriptAssign(source: Message): void {
+		const target = this._fields
+		const values = source._fields
+		target.priority = values.priority
+		target.text = values.text
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.Message",
 		() => new Message(),

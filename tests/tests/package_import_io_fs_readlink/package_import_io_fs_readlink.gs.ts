@@ -19,6 +19,9 @@ export class emptyFS {
 		return $.markAsStructValue(new emptyFS(this))
 	}
 
+	public __goscriptAssign(source: emptyFS): void {
+	}
+
 	public Open(name: string): [fs.File | null, $.GoError] {
 		return [null, fs.ErrNotExist]
 	}
@@ -43,6 +46,9 @@ export class linkFS {
 
 	public clone(): linkFS {
 		return $.markAsStructValue(new linkFS(this))
+	}
+
+	public __goscriptAssign(source: linkFS): void {
 	}
 
 	public Lstat(name: string): [fs.FileInfo | null, $.GoError] {

@@ -27,6 +27,12 @@ export async function main(): globalThis.Promise<void> {
 			return $.markAsStructValue(new result(this))
 		}
 
+		public __goscriptAssign(source: result): void {
+			const target = this._fields
+			const values = source._fields
+			target.value = values.value
+		}
+
 		static __typeInfo = $.registerStructType(
 			"main.result",
 			() => new result(),

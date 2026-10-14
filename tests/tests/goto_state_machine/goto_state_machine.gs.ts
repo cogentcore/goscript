@@ -46,6 +46,14 @@ export class scanner {
 		return $.markAsStructValue(new scanner(this))
 	}
 
+	public __goscriptAssign(source: scanner): void {
+		const target = this._fields
+		const values = source._fields
+		target.data = values.data
+		target.pos = values.pos
+		target.done = values.done
+	}
+
 	public readByte(): number {
 		let s: scanner | $.VarRef<scanner> | null = this;
 		if ($.pointerValue<scanner>(s).pos >= $.len($.pointerValue<scanner>(s).data)) {

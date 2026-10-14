@@ -29,6 +29,9 @@ export class PathJoiner {
 		return $.markAsStructValue(new PathJoiner(this))
 	}
 
+	public __goscriptAssign(source: PathJoiner): void {
+	}
+
 	public Join(elem: $.Slice<string>): string {
 		const p = this;
 		let result: $.VarRef<strings.Builder> = $.varRef($.markAsStructValue(new strings.Builder()))

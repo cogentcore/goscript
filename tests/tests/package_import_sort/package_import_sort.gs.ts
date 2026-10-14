@@ -63,6 +63,12 @@ export class descending {
 		return $.markAsStructValue(new descending(this))
 	}
 
+	public __goscriptAssign(source: descending): void {
+		const target = this._fields
+		const values = source._fields
+		target.values = values.values
+	}
+
 	public Len(): number {
 		const d = this;
 		return $.len(d.values)

@@ -26,6 +26,12 @@ export class Match {
 		return $.markAsStructValue(new Match(this))
 	}
 
+	public __goscriptAssign(source: Match): void {
+		const target = this._fields
+		const values = source._fields
+		target.Size = values.Size
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.Match",
 		() => new Match(),
@@ -56,6 +62,12 @@ export class Matcher {
 
 	public clone(): Matcher {
 		return $.markAsStructValue(new Matcher(this))
+	}
+
+	public __goscriptAssign(source: Matcher): void {
+		const target = this._fields
+		const values = source._fields
+		target.matches = values.matches
 	}
 
 	public Blocks(): $.Slice<Match> {
