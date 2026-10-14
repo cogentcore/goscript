@@ -74,15 +74,18 @@ export class MyStruct {
 		Age: number
 	}
 
-	constructor(init?: Partial<{Name?: string, Age?: number}>) {
+	constructor(init?: Partial<{Name?: string, Age?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Name: init?.Name ?? ("" as string),
 			Age: init?.Age ?? (0 as number)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): MyStruct {
-		return $.markAsStructValue(new MyStruct(this))
+		return new MyStruct(this, true)
 	}
 
 	public __goscriptAssign(source: MyStruct): void {
@@ -105,13 +108,16 @@ export class myErr {
 	public _fields: {
 	}
 
-	constructor(init?: Partial<{}>) {
+	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
 		this._fields = {
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): myErr {
-		return $.markAsStructValue(new myErr(this))
+		return new myErr(this, true)
 	}
 
 	public __goscriptAssign(source: myErr): void {
@@ -202,7 +208,7 @@ export async function describePointer(__typeArgs: $.GenericTypeArgs | undefined,
 }
 
 export async function genericComposites(): globalThis.Promise<void> {
-	await describe(__goscriptStatic13(), $.arrayToSlice<MyStruct>([$.markAsStructValue(new MyStruct({Name: "a", Age: 1}))]))
+	await describe(__goscriptStatic13(), $.arrayToSlice<MyStruct>([new MyStruct({Name: "a", Age: 1}, true)]))
 	await describe(__goscriptStatic14(), $.arrayToSlice<number>([1, 2, 3]))
 	await describe(__goscriptStatic15(), $.arrayToSlice<number>([]))
 	await describeMap(__goscriptStatic16(), $.makeMap<string, MyStruct>([]))
@@ -216,7 +222,7 @@ function __goscriptStatic0(): any {
 
 var __goscriptStatic1$value: any
 function __goscriptStatic1(): any {
-	return __goscriptStatic1$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.MyStruct", zero: () => $.markAsStructValue(new MyStruct()) }})
+	return __goscriptStatic1$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.MyStruct", zero: () => new MyStruct(undefined, true) }})
 }
 
 var __goscriptStatic2$value: any
@@ -231,7 +237,7 @@ function __goscriptStatic3(): any {
 
 var __goscriptStatic4$value: any
 function __goscriptStatic4(): any {
-	return __goscriptStatic4$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.OtherStruct", zero: () => $.markAsStructValue(new __goscript_other.OtherStruct()) }})
+	return __goscriptStatic4$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.OtherStruct", zero: () => new __goscript_other.OtherStruct(undefined, true) }})
 }
 
 var __goscriptStatic5$value: any
@@ -276,7 +282,7 @@ function __goscriptStatic12(): any {
 
 var __goscriptStatic13$value: any
 function __goscriptStatic13(): any {
-	return __goscriptStatic13$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, E: { type: "main.MyStruct", zero: () => $.markAsStructValue(new MyStruct()) }})
+	return __goscriptStatic13$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, E: { type: "main.MyStruct", zero: () => new MyStruct(undefined, true) }})
 }
 
 var __goscriptStatic14$value: any
@@ -291,7 +297,7 @@ function __goscriptStatic15(): any {
 
 var __goscriptStatic16$value: any
 function __goscriptStatic16(): any {
-	return __goscriptStatic16$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, K: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }, V: { type: "main.MyStruct", zero: () => $.markAsStructValue(new MyStruct()) }})
+	return __goscriptStatic16$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, K: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }, V: { type: "main.MyStruct", zero: () => new MyStruct(undefined, true) }})
 }
 
 var __goscriptAwait: any

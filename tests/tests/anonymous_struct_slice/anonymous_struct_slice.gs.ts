@@ -25,15 +25,18 @@ export class namedItem {
 		data: $.Slice<number>
 	}
 
-	constructor(init?: Partial<{key?: string, data?: $.Slice<number>}>) {
+	constructor(init?: Partial<{key?: string, data?: $.Slice<number>}>, __goscriptValue?: boolean) {
 		this._fields = {
 			key: init?.key ?? ("" as string),
 			data: init?.data ?? (null! as $.Slice<number>)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): namedItem {
-		return $.markAsStructValue(new namedItem(this))
+		return new namedItem(this, true)
 	}
 
 	public __goscriptAssign(source: namedItem): void {
@@ -65,13 +68,13 @@ export async function main(): globalThis.Promise<void> {
 	let __goscriptTuple0: any = buildNamedItems()
 	let items: $.Slice<namedItem> = __goscriptTuple0[0]
 	for (let __goscriptRangeTarget1 = $.goSlice(items, 1, undefined), __goscriptRangeWindow1 = $.sliceRange(__goscriptRangeTarget1), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow1.length; __rangeIndex++) {
-		let item = $.markAsStructValue($.cloneStructValue((__goscriptRangeWindow1.backing[__goscriptRangeWindow1.offset + __rangeIndex] as namedItem)))
+		let item = ((__goscriptRangeWindow1.backing[__goscriptRangeWindow1.offset + __rangeIndex] as namedItem)).clone()
 		await $.println(item.key, $.sliceLen(item.data))
 	}
 }
 
 export function buildNamedItems(): [$.Slice<namedItem>, boolean] {
-	return [$.arrayToSlice<namedItem>([$.markAsStructValue(new namedItem({key: "skip", data: new Uint8Array([0]) as $.Slice<number>})), $.markAsStructValue(new namedItem({key: "keep", data: new Uint8Array([1, 2, 3]) as $.Slice<number>}))]), true]
+	return [$.arrayToSlice<namedItem>([new namedItem({key: "skip", data: new Uint8Array([0]) as $.Slice<number>}, true), new namedItem({key: "keep", data: new Uint8Array([1, 2, 3]) as $.Slice<number>}, true)]), true]
 }
 
 if ($.isMainScript(import.meta)) {

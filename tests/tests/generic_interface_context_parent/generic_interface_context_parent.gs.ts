@@ -40,13 +40,16 @@ export class handler {
 	public _fields: {
 	}
 
-	constructor(init?: Partial<{}>) {
+	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
 		this._fields = {
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): handler {
-		return $.markAsStructValue(new handler(this))
+		return new handler(this, true)
 	}
 
 	public __goscriptAssign(source: handler): void {
@@ -68,13 +71,16 @@ export class genericResolver {
 	public _fields: {
 	}
 
-	constructor(init?: Partial<{}>) {
+	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
 		this._fields = {
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): genericResolver {
-		return $.markAsStructValue(new genericResolver(this))
+		return new genericResolver(this, true)
 	}
 
 	public __goscriptAssign(source: genericResolver): void {
@@ -110,14 +116,17 @@ export class genericValue {
 		value: number
 	}
 
-	constructor(init?: Partial<{value?: number}>) {
+	constructor(init?: Partial<{value?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			value: init?.value ?? (0 as number)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): genericValue {
-		return $.markAsStructValue(new genericValue(this))
+		return new genericValue(this, true)
 	}
 
 	public __goscriptAssign(source: genericValue): void {
@@ -143,7 +152,7 @@ export class genericValue {
 export async function main(): globalThis.Promise<void> {
 	let resolver: Resolver | null = $.namedValueInterfaceValue<Resolver | null>(new genericResolver(), "*main.genericResolver", __goscriptStatic1(), __goscriptStatic2(), __goscriptStatic3())
 	{
-		let err = (__goscriptAwait = $.pointerValue<Exclude<Resolver, null>>(resolver).Resolve(context.Background(), $.interfaceValue<Handler | null>($.markAsStructValue(new handler()), "main.handler", "main.handler")), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+		let err = (__goscriptAwait = $.pointerValue<Exclude<Resolver, null>>(resolver).Resolve(context.Background(), $.interfaceValue<Handler | null>(new handler(undefined, true), "main.handler", "main.handler")), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 		if (err != null) {
 			await $.println("resolve failed")
 			return

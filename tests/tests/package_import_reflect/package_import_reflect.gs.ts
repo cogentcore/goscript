@@ -38,15 +38,18 @@ export class Person {
 		Age: number
 	}
 
-	constructor(init?: Partial<{Name?: string, Age?: number}>) {
+	constructor(init?: Partial<{Name?: string, Age?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Name: init?.Name ?? ("" as string),
 			Age: init?.Age ?? (0 as number)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): Person {
-		return $.markAsStructValue(new Person(this))
+		return new Person(this, true)
 	}
 
 	public __goscriptAssign(source: Person): void {
@@ -153,12 +156,12 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("Dst after copy:", $.arrayIndex(dst!, 0), $.arrayIndex(dst!, 1))
 
 	// Test struct reflection
-	let person = $.markAsStructValue(new Person({Name: "Alice", Age: 30}))
+	let person = new Person({Name: "Alice", Age: 30}, true)
 	let personType = reflect.TypeFor(__goscriptStatic4())
 	await $.println("Struct type:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(personType).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	await $.println("Struct kind:", reflect.Kind_String((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(personType).Kind(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)))
 
-	let personVal = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.markAsStructValue($.cloneStructValue(person)), "main.Person", "main.Person"))))
+	let personVal = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue((person).clone(), "main.Person", "main.Person"))))
 	await $.println("Struct value type:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(personVal)).Type()).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
 	// Test with different kinds
@@ -346,7 +349,7 @@ function __goscriptStatic3(): any {
 
 var __goscriptStatic4$value: any
 function __goscriptStatic4(): any {
-	return __goscriptStatic4$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.Person", zero: () => $.markAsStructValue(new Person()) }})
+	return __goscriptStatic4$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.Person", zero: () => new Person(undefined, true) }})
 }
 
 var __goscriptAwait: any

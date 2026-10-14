@@ -25,14 +25,17 @@ export class label {
 		value: string
 	}
 
-	constructor(init?: Partial<{value?: string}>) {
+	constructor(init?: Partial<{value?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
 			value: init?.value ?? ("" as string)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): label {
-		return $.markAsStructValue(new label(this))
+		return new label(this, true)
 	}
 
 	public __goscriptAssign(source: label): void {
@@ -57,7 +60,7 @@ export class label {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let item = $.markAsStructValue(new label({value: "go"}))
+	let item = new label({value: "go"}, true)
 	await $.println(item.Format())
 }
 

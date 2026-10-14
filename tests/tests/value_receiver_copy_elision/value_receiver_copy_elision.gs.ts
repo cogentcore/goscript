@@ -25,15 +25,18 @@ export class vec {
 		Y: number
 	}
 
-	constructor(init?: Partial<{X?: number, Y?: number}>) {
+	constructor(init?: Partial<{X?: number, Y?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			X: init?.X ?? (0 as number),
 			Y: init?.Y ?? (0 as number)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): vec {
-		return $.markAsStructValue(new vec(this))
+		return new vec(this, true)
 	}
 
 	public __goscriptAssign(source: vec): void {
@@ -66,7 +69,7 @@ export class vec {
 
 	public Keep(): vec {
 		const v = this;
-		return $.markAsStructValue($.cloneStructValue(v))
+		return (v).clone()
 	}
 
 	public Sum(): number {
@@ -101,14 +104,17 @@ export class holder {
 		v: vec
 	}
 
-	constructor(init?: Partial<{v?: vec}>) {
+	constructor(init?: Partial<{v?: vec}>, __goscriptValue?: boolean) {
 		this._fields = {
-			v: init?.v ? $.markAsStructValue($.cloneStructValue(init.v)) : $.markAsStructValue(new vec())
+			v: init?.v ? init.v.clone() : new vec(undefined, true)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): holder {
-		return $.markAsStructValue(new holder(this))
+		return new holder(this, true)
 	}
 
 	public __goscriptAssign(source: holder): void {
@@ -127,7 +133,7 @@ export class holder {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let a = $.varRef($.markAsStructValue(new vec({X: 1, Y: 2})))
+	let a = $.varRef(new vec({X: 1, Y: 2}, true))
 	await $.println("sum", a.value.Sum())
 	await $.println("bump", $.markAsStructValue($.cloneStructValue(a.value)).Bump(), a.value.X)
 	await $.println("ptr", $.markAsStructValue($.cloneStructValue(a.value)).BumpViaPointer(), a.value.Y)
@@ -135,7 +141,7 @@ export async function main(): globalThis.Promise<void> {
 	let k = a.value.Keep()
 	k.X = 50
 	await $.println("keep", a.value.X, k.X)
-	let h = $.markAsStructValue(new holder({v: $.markAsStructValue($.cloneStructValue(a.value))}))
+	let h = new holder({v: a.value}, true)
 	await $.println("field", h.v.Sum(), $.markAsStructValue($.cloneStructValue(h.v)).Bump(), h.v.X)
 	let p: vec | $.VarRef<vec> | null = a
 	await $.println("via pointer", $.pointerValue<vec>(p).Sum(), $.markAsStructValue($.cloneStructValue($.pointerValue<vec>(p))).Bump(), $.pointerValue<vec>(p).X)

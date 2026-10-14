@@ -19,14 +19,17 @@ export class item {
 		Text: string
 	}
 
-	constructor(init?: Partial<{Text?: string}>) {
+	constructor(init?: Partial<{Text?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Text: init?.Text ?? ("" as string)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): item {
-		return $.markAsStructValue(new item(this))
+		return new item(this, true)
 	}
 
 	public __goscriptAssign(source: item): void {
@@ -57,14 +60,17 @@ export class arena {
 		data: $.Slice<any>
 	}
 
-	constructor(init?: Partial<{data?: $.Slice<any>}>) {
+	constructor(init?: Partial<{data?: $.Slice<any>}>, __goscriptValue?: boolean) {
 		this._fields = {
 			data: init?.data ?? (null! as $.Slice<any>)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): arena {
-		return $.markAsStructValue(new arena(this))
+		return new arena(this, true)
 	}
 
 	public __goscriptAssign(source: arena): void {
@@ -102,7 +108,7 @@ export async function main(): globalThis.Promise<void> {
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.item", zero: () => $.markAsStructValue(new item()) }})
+	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.item", zero: () => new item(undefined, true) }})
 }
 
 if ($.isMainScript(import.meta)) {

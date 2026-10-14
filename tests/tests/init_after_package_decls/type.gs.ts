@@ -28,15 +28,18 @@ export class Type {
 		Fields: $.Slice<__goscript_field.Field>
 	}
 
-	constructor(init?: Partial<{Name?: string, Fields?: $.Slice<__goscript_field.Field>}>) {
+	constructor(init?: Partial<{Name?: string, Fields?: $.Slice<__goscript_field.Field>}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Name: init?.Name ?? ("" as string),
 			Fields: init?.Fields ?? (null! as $.Slice<__goscript_field.Field>)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): Type {
-		return $.markAsStructValue(new Type(this))
+		return new Type(this, true)
 	}
 
 	public __goscriptAssign(source: Type): void {
@@ -50,7 +53,7 @@ export class Type {
 		const t: Type | $.VarRef<Type> | null = this;
 		let names: $.Slice<string> = $.arrayToSlice<string>([])
 		for (let __goscriptRangeTarget0 = $.pointerValue<Type>(t).Fields, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
-			let f = $.markAsStructValue($.cloneStructValue((__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as __goscript_field.Field)))
+			let f = ((__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as __goscript_field.Field)).clone()
 			names = $.append(names, f.Name)
 		}
 		return names

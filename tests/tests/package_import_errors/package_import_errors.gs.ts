@@ -33,14 +33,17 @@ export class customErr {
 		msg: string
 	}
 
-	constructor(init?: Partial<{msg?: string}>) {
+	constructor(init?: Partial<{msg?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
 			msg: init?.msg ?? ("" as string)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): customErr {
-		return $.markAsStructValue(new customErr(this))
+		return new customErr(this, true)
 	}
 
 	public __goscriptAssign(source: customErr): void {
@@ -76,14 +79,17 @@ export class wrappedErr {
 		err: $.GoError
 	}
 
-	constructor(init?: Partial<{err?: $.GoError}>) {
+	constructor(init?: Partial<{err?: $.GoError}>, __goscriptValue?: boolean) {
 		this._fields = {
 			err: init?.err ?? (null! as $.GoError)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): wrappedErr {
-		return $.markAsStructValue(new wrappedErr(this))
+		return new wrappedErr(this, true)
 	}
 
 	public __goscriptAssign(source: wrappedErr): void {
@@ -132,7 +138,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("nilErr == nil:", nilErr == null)
 
 	let typedErr: customErr | $.VarRef<customErr> | null = new customErr({msg: "typed error"})
-	let __goscriptTuple0: any = errors.AsType(__goscriptStatic0(), $.interfaceValue<$.GoError>($.markAsStructValue(new wrappedErr({err: $.interfaceValue<$.GoError>(typedErr, "*main.customErr", /* @__PURE__ */ $.pointerType("main.customErr"))})), "main.wrappedErr", "main.wrappedErr")!)
+	let __goscriptTuple0: any = errors.AsType(__goscriptStatic0(), $.interfaceValue<$.GoError>(new wrappedErr({err: $.interfaceValue<$.GoError>(typedErr, "*main.customErr", /* @__PURE__ */ $.pointerType("main.customErr"))}, true), "main.wrappedErr", "main.wrappedErr")!)
 	let matched: customErr | $.VarRef<customErr> | null = (__goscriptTuple0[0] as customErr | $.VarRef<customErr> | null)
 	let ok = __goscriptTuple0[1]
 	await $.println("AsType matched:", ok)

@@ -36,7 +36,7 @@ export async function main(): globalThis.Promise<void> {
 	let err = __goscriptTuple0[2]
 	await $.println("keygen err nil", err == null)
 
-	let template: x509.Certificate | $.VarRef<x509.Certificate> | null = (() => { const __goscriptLiteralField0 = big.NewInt(84n); const __goscriptLiteralField1 = $.markAsStructValue($.cloneStructValue(time.Unix(1700000000n, 0n))); const __goscriptLiteralField2 = $.markAsStructValue($.cloneStructValue(time.Unix(1700003600n, 0n))); return new x509.Certificate({SerialNumber: __goscriptLiteralField0, Subject: $.markAsStructValue(new pkix.Name({CommonName: "bifrost.goscript.test"})), NotBefore: __goscriptLiteralField1, NotAfter: __goscriptLiteralField2, KeyUsage: 1, ExtKeyUsage: $.arrayToSlice<x509.ExtKeyUsage>([1, 2]), BasicConstraintsValid: true}) })()
+	let template: x509.Certificate | $.VarRef<x509.Certificate> | null = (() => { const __goscriptLiteralField0 = big.NewInt(84n); const __goscriptLiteralField1 = $.markAsStructValue($.cloneStructValue(time.Unix(1700000000n, 0n))); const __goscriptLiteralField2 = $.markAsStructValue($.cloneStructValue(time.Unix(1700003600n, 0n))); return new x509.Certificate({SerialNumber: __goscriptLiteralField0, Subject: new pkix.Name({CommonName: "bifrost.goscript.test"}, true), NotBefore: __goscriptLiteralField1, NotAfter: __goscriptLiteralField2, KeyUsage: 1, ExtKeyUsage: $.arrayToSlice<x509.ExtKeyUsage>([1, 2]), BasicConstraintsValid: true}) })()
 	let __goscriptTuple1: any = await x509.CreateCertificate(rand.Reader, template, template, $.namedValueInterfaceValue<any>(pub, "ed25519.PublicKey", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()), $.namedValueInterfaceValue<any>(priv, "ed25519.PrivateKey", __goscriptStatic3(), __goscriptStatic4(), __goscriptStatic5()))
 	let der: $.Slice<number> = __goscriptTuple1[0]
 	err = __goscriptTuple1[1]
@@ -55,8 +55,8 @@ export async function main(): globalThis.Promise<void> {
 		return
 	}
 
-	let certificate = $.markAsStructValue(new tls.Certificate({Certificate: $.arrayToSlice<$.Slice<number>>([der]), PrivateKey: $.namedValueInterfaceValue<crypto.PrivateKey | null>(priv, "ed25519.PrivateKey", __goscriptStatic3(), __goscriptStatic4(), __goscriptStatic5()), Leaf: leaf}))
-	let config: tls.Config | $.VarRef<tls.Config> | null = new tls.Config({Certificates: $.arrayToSlice<tls.Certificate>([$.markAsStructValue($.cloneStructValue(certificate))]), MinVersion: 771, NextProtos: $.arrayToSlice<string>(["bifrost"])})
+	let certificate = new tls.Certificate({Certificate: $.arrayToSlice<$.Slice<number>>([der]), PrivateKey: $.namedValueInterfaceValue<crypto.PrivateKey | null>(priv, "ed25519.PrivateKey", __goscriptStatic3(), __goscriptStatic4(), __goscriptStatic5()), Leaf: leaf}, true)
+	let config: tls.Config | $.VarRef<tls.Config> | null = new tls.Config({Certificates: $.arrayToSlice<tls.Certificate>([(certificate).clone()]), MinVersion: 771, NextProtos: $.arrayToSlice<string>(["bifrost"])})
 	await $.println("certificate count", $.sliceLen($.pointerValue<tls.Config>(config).Certificates))
 	await $.println("chain count", $.sliceLen($.arrayIndex($.pointerValue<tls.Config>(config).Certificates!, 0).Certificate))
 	await $.println("leaf common name", $.pointerValue<x509.Certificate>($.arrayIndex($.pointerValue<tls.Config>(config).Certificates!, 0).Leaf).Subject.CommonName)

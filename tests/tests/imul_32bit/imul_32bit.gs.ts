@@ -43,17 +43,20 @@ export class multiplyCase {
 		signed: number
 	}
 
-	constructor(init?: Partial<{x?: number, y?: number, unsigned?: number, signed?: number}>) {
+	constructor(init?: Partial<{x?: number, y?: number, unsigned?: number, signed?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			x: init?.x ?? (0 as number),
 			y: init?.y ?? (0 as number),
 			unsigned: init?.unsigned ?? (0 as number),
 			signed: init?.signed ?? (0 as number)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): multiplyCase {
-		return $.markAsStructValue(new multiplyCase(this))
+		return new multiplyCase(this, true)
 	}
 
 	public __goscriptAssign(source: multiplyCase): void {
@@ -75,10 +78,10 @@ export class multiplyCase {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let cases: $.Slice<multiplyCase> = $.arrayToSlice<multiplyCase>([$.markAsStructValue(new multiplyCase({x: 65535, y: 65535, unsigned: 4294836225, signed: -131071})), $.markAsStructValue(new multiplyCase({x: 134217729, y: 134217729, unsigned: 268435457, signed: 268435457})), $.markAsStructValue(new multiplyCase({x: 4294967295, y: 4294967295, unsigned: 1, signed: 1})), $.markAsStructValue(new multiplyCase({x: 4294967295, y: 3221225473, unsigned: 1073741823, signed: 1073741823})), $.markAsStructValue(new multiplyCase({x: 4294967295, y: 134217729, unsigned: 4160749567, signed: -134217729}))])
+	let cases: $.Slice<multiplyCase> = $.arrayToSlice<multiplyCase>([new multiplyCase({x: 65535, y: 65535, unsigned: 4294836225, signed: -131071}, true), new multiplyCase({x: 134217729, y: 134217729, unsigned: 268435457, signed: 268435457}, true), new multiplyCase({x: 4294967295, y: 4294967295, unsigned: 1, signed: 1}, true), new multiplyCase({x: 4294967295, y: 3221225473, unsigned: 1073741823, signed: 1073741823}, true), new multiplyCase({x: 4294967295, y: 134217729, unsigned: 4160749567, signed: -134217729}, true)])
 
 	for (let __goscriptRangeTarget0 = cases, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
-		let tc = $.markAsStructValue($.cloneStructValue((__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as multiplyCase)))
+		let tc = ((__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as multiplyCase)).clone()
 		await checkUint32($.uint(tc.x, 32), $.uint(tc.y, 32), $.uint(tc.unsigned, 32))
 		await checkInt32($.int($.int(tc.x, 32), 32), $.int($.int(tc.y, 32), 32), $.int(tc.signed, 32))
 	}

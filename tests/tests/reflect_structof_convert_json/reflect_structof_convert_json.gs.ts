@@ -31,15 +31,18 @@ export class Node {
 		Size: number
 	}
 
-	constructor(init?: Partial<{Name?: string, Size?: number}>) {
+	constructor(init?: Partial<{Name?: string, Size?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Name: init?.Name ?? ("" as string),
 			Size: init?.Size ?? (0 as number)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): Node {
-		return $.markAsStructValue(new Node(this))
+		return new Node(this, true)
 	}
 
 	public __goscriptAssign(source: Node): void {

@@ -25,15 +25,18 @@ export class holder {
 		items: $.Slice<item>
 	}
 
-	constructor(init?: Partial<{values?: globalThis.Map<string, number> | null, items?: $.Slice<item>}>) {
+	constructor(init?: Partial<{values?: globalThis.Map<string, number> | null, items?: $.Slice<item>}>, __goscriptValue?: boolean) {
 		this._fields = {
 			values: init?.values ?? (null! as globalThis.Map<string, number> | null),
 			items: init?.items ?? (null! as $.Slice<item>)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): holder {
-		return $.markAsStructValue(new holder(this))
+		return new holder(this, true)
 	}
 
 	public __goscriptAssign(source: holder): void {
@@ -65,14 +68,17 @@ export class item {
 		value: number
 	}
 
-	constructor(init?: Partial<{value?: number}>) {
+	constructor(init?: Partial<{value?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			value: init?.value ?? (0 as number)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): item {
-		return $.markAsStructValue(new item(this))
+		return new item(this, true)
 	}
 
 	public __goscriptAssign(source: item): void {
@@ -97,15 +103,15 @@ export class item {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let k = $.markAsStructValue(new holder({values: $.makeMap<string, number>([["a", 1], ["b", 2]])}))
+	let k = new holder({values: $.makeMap<string, number>([["a", 1], ["b", 2]])}, true)
 	let sum = 0
 	for (const [__goscriptRangeShadow0, v] of k.values?.entries() ?? []) {
 		sum = sum + ($.stringLen(__goscriptRangeShadow0) + v)
 	}
 	await $.println(sum)
-	let items = $.markAsStructValue(new holder({items: $.arrayToSlice<item>([$.markAsStructValue(new item({value: 3})), $.markAsStructValue(new item({value: 7}))])}))
+	let items = new holder({items: $.arrayToSlice<item>([new item({value: 3}, true), new item({value: 7}, true)])}, true)
 	for (let __goscriptRangeTarget0 = items.items, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
-		let __goscriptRangeShadow1 = $.varRef($.markAsStructValue($.cloneStructValue((__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as item))))
+		let __goscriptRangeShadow1 = $.varRef(((__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as item)).clone())
 		await $.println(__goscriptRangeShadow1.value.increment())
 	}
 	await $.println($.arrayIndex(items.items!, 0).value, $.arrayIndex(items.items!, 1).value)

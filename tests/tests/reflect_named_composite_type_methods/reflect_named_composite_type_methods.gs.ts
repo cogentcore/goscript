@@ -67,14 +67,17 @@ export class Rule {
 		Pattern: string
 	}
 
-	constructor(init?: Partial<{Pattern?: string}>) {
+	constructor(init?: Partial<{Pattern?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Pattern: init?.Pattern ?? ("" as string)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): Rule {
-		return $.markAsStructValue(new Rule(this))
+		return new Rule(this, true)
 	}
 
 	public __goscriptAssign(source: Rule): void {
@@ -114,15 +117,18 @@ export class xmlState {
 		Rules: $.Slice<Rule>
 	}
 
-	constructor(init?: Partial<{Name?: string, Rules?: $.Slice<Rule>}>) {
+	constructor(init?: Partial<{Name?: string, Rules?: $.Slice<Rule>}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Name: init?.Name ?? ("" as string),
 			Rules: init?.Rules ?? (null! as $.Slice<Rule>)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): xmlState {
-		return $.markAsStructValue(new xmlState(this))
+		return new xmlState(this, true)
 	}
 
 	public __goscriptAssign(source: xmlState): void {
@@ -154,14 +160,17 @@ export class xmlRules {
 		States: $.Slice<xmlState>
 	}
 
-	constructor(init?: Partial<{States?: $.Slice<xmlState>}>) {
+	constructor(init?: Partial<{States?: $.Slice<xmlState>}>, __goscriptValue?: boolean) {
 		this._fields = {
 			States: init?.States ?? (null! as $.Slice<xmlState>)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): xmlRules {
-		return $.markAsStructValue(new xmlRules(this))
+		return new xmlRules(this, true)
 	}
 
 	public __goscriptAssign(source: xmlRules): void {
@@ -201,15 +210,18 @@ export class Lexer {
 		Rules: Rules
 	}
 
-	constructor(init?: Partial<{Name?: string, Rules?: Rules}>) {
+	constructor(init?: Partial<{Name?: string, Rules?: Rules}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Name: init?.Name ?? ("" as string),
 			Rules: init?.Rules ?? (null! as Rules)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): Lexer {
-		return $.markAsStructValue(new Lexer(this))
+		return new Lexer(this, true)
 	}
 
 	public __goscriptAssign(source: Lexer): void {
@@ -230,7 +242,7 @@ export class Lexer {
 
 export async function Rules_UnmarshalXML(r: $.VarRef<Rules> | null, d: xml.Decoder | $.VarRef<xml.Decoder> | null, __goscriptParam0: xml.StartElement): globalThis.Promise<$.GoError> {
 	let start: $.VarRef<xml.StartElement> = $.varRef(__goscriptParam0)
-	let xr = $.varRef($.markAsStructValue(new xmlRules()))
+	let xr = $.varRef(new xmlRules(undefined, true))
 	{
 		let err = await xml.Decoder.prototype.DecodeElement.call(d, $.interfaceValue(xr, "*main.xmlRules", /* @__PURE__ */ $.pointerType("main.xmlRules")), start)
 		if (err != null) {
@@ -241,7 +253,7 @@ export async function Rules_UnmarshalXML(r: $.VarRef<Rules> | null, d: xml.Decod
 		r!.value = $.makeMap<string, $.Slice<Rule>>([])
 	}
 	for (let __goscriptRangeTarget0 = xr.value.States, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
-		let st = $.markAsStructValue($.cloneStructValue((__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as xmlState)))
+		let st = ((__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as xmlState)).clone()
 		$.mapSet(($.pointerValue<Rules>(r)), st.Name, st.Rules)
 	}
 	return null
@@ -249,8 +261,8 @@ export async function Rules_UnmarshalXML(r: $.VarRef<Rules> | null, d: xml.Decod
 
 export async function main(): globalThis.Promise<void> {
 	await showArray()
-	let l: $.VarRef<Lexer> = $.varRef($.markAsStructValue(new Lexer()))
-	let t = (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.interfaceValue($.markAsStructValue($.cloneStructValue(l.value)), "main.Lexer", "main.Lexer"))).Field(1), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait).Type
+	let l: $.VarRef<Lexer> = $.varRef(new Lexer(undefined, true))
+	let t = (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.interfaceValue((l.value).clone(), "main.Lexer", "main.Lexer"))).Field(1), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait).Type
 	await fmt.Println("field type:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(t).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), $.namedValueInterfaceValue<any>((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(t).Kind(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), "reflect.Kind", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()), (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(t).Name(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	let pt = reflect.PointerTo($.pointerValueOrNil(t)!)
 	await fmt.Println("ptr methods:", $.basicInterfaceValue((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(pt).NumMethod(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), "int"))

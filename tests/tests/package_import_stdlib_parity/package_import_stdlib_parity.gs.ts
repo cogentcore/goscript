@@ -51,13 +51,16 @@ export class xof {
 	public _fields: {
 	}
 
-	constructor(init?: Partial<{}>) {
+	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
 		this._fields = {
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): xof {
-		return $.markAsStructValue(new xof(this))
+		return new xof(this, true)
 	}
 
 	public __goscriptAssign(source: xof): void {
@@ -109,7 +112,7 @@ export async function main(): globalThis.Promise<void> {
 	await scanner.PrintError($.pointerValueOrNil($.interfaceValue<io.Writer | null>(scan, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer")))!, $.pointerValueOrNil(errors.New("scan failed"))!)
 	await $.println("scanner:", strings.TrimSpace(scan.value.String()))
 
-	let h: hash.XOF | null = $.interfaceValue<hash.XOF | null>($.markAsStructValue(new xof()), "main.xof", "main.xof")
+	let h: hash.XOF | null = $.interfaceValue<hash.XOF | null>(new xof(undefined, true), "main.xof", "main.xof")
 	await $.println("hash:", (__goscriptAwait = $.pointerValue<Exclude<hash.XOF, null>>(h).BlockSize(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 }
 

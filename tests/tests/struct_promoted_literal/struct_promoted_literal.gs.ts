@@ -27,15 +27,18 @@ export class Person {
 		Age: number
 	}
 
-	constructor(init?: Partial<{Name?: string, Age?: number}>) {
+	constructor(init?: Partial<{Name?: string, Age?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Name: init?.Name ?? ("" as string),
 			Age: init?.Age ?? (0 as number)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): Person {
-		return $.markAsStructValue(new Person(this))
+		return new Person(this, true)
 	}
 
 	public __goscriptAssign(source: Person): void {
@@ -77,15 +80,18 @@ export class Employee {
 		ID: number
 	}
 
-	constructor(init?: Partial<{Person?: Person, ID?: number}>) {
+	constructor(init?: Partial<{Person?: Person, ID?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
-			Person: init?.Person ? $.markAsStructValue($.cloneStructValue(init.Person)) : $.markAsStructValue(new Person()),
+			Person: init?.Person ? init.Person.clone() : new Person(undefined, true),
 			ID: init?.ID ?? (0 as number)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): Employee {
-		return $.markAsStructValue(new Employee(this))
+		return new Employee(this, true)
 	}
 
 	public __goscriptAssign(source: Employee): void {
@@ -128,15 +134,18 @@ export class Address {
 		City: string
 	}
 
-	constructor(init?: Partial<{Street?: string, City?: string}>) {
+	constructor(init?: Partial<{Street?: string, City?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Street: init?.Street ?? ("" as string),
 			City: init?.City ?? ("" as string)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): Address {
-		return $.markAsStructValue(new Address(this))
+		return new Address(this, true)
 	}
 
 	public __goscriptAssign(source: Address): void {
@@ -197,17 +206,20 @@ export class Manager {
 		Level: number
 	}
 
-	constructor(init?: Partial<{Person?: Person, Address?: Address, Phone?: string, Level?: number}>) {
+	constructor(init?: Partial<{Person?: Person, Address?: Address, Phone?: string, Level?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
-			Person: init?.Person ? $.markAsStructValue($.cloneStructValue(init.Person)) : $.markAsStructValue(new Person()),
-			Address: init?.Address ? $.markAsStructValue($.cloneStructValue(init.Address)) : $.markAsStructValue(new Address()),
+			Person: init?.Person ? init.Person.clone() : new Person(undefined, true),
+			Address: init?.Address ? init.Address.clone() : new Address(undefined, true),
 			Phone: init?.Phone ?? ("" as string),
 			Level: init?.Level ?? (0 as number)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): Manager {
-		return $.markAsStructValue(new Manager(this))
+		return new Manager(this, true)
 	}
 
 	public __goscriptAssign(source: Manager): void {
@@ -251,15 +263,18 @@ export class Team {
 		Active: boolean
 	}
 
-	constructor(init?: Partial<{Employee?: Employee, Active?: boolean}>) {
+	constructor(init?: Partial<{Employee?: Employee, Active?: boolean}>, __goscriptValue?: boolean) {
 		this._fields = {
-			Employee: init?.Employee ? $.markAsStructValue($.cloneStructValue(init.Employee)) : $.markAsStructValue(new Employee()),
+			Employee: init?.Employee ? init.Employee.clone() : new Employee(undefined, true),
 			Active: init?.Active ?? (false as boolean)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): Team {
-		return $.markAsStructValue(new Team(this))
+		return new Team(this, true)
 	}
 
 	public __goscriptAssign(source: Team): void {
@@ -302,15 +317,18 @@ export class LiteralValue {
 		Zero: any
 	}
 
-	constructor(init?: Partial<{Value?: any, Zero?: any}>) {
+	constructor(init?: Partial<{Value?: any, Zero?: any}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Value: init?.Value !== undefined ? $.copyElement(init.Value) : (null! as any),
 			Zero: init?.Zero !== undefined ? $.copyElement(init.Zero) : (null! as any)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): LiteralValue {
-		return $.markAsStructValue(new LiteralValue(this))
+		return new LiteralValue(this, true)
 	}
 
 	public __goscriptAssign(source: LiteralValue): void {
@@ -342,14 +360,17 @@ export class LiteralContainer {
 		LiteralValue: LiteralValue
 	}
 
-	constructor(init?: Partial<{LiteralValue?: LiteralValue}>) {
+	constructor(init?: Partial<{LiteralValue?: LiteralValue}>, __goscriptValue?: boolean) {
 		this._fields = {
 			LiteralValue: init?.LiteralValue ? $.markAsStructValue($.cloneStructValue(init.LiteralValue)) : $.markAsStructValue(new LiteralValue({Value: null, Zero: null}))
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): LiteralContainer {
-		return $.markAsStructValue(new LiteralContainer(this))
+		return new LiteralContainer(this, true)
 	}
 
 	public __goscriptAssign(source: LiteralContainer): void {
@@ -373,19 +394,19 @@ export async function main(): globalThis.Promise<void> {
 		await $.println("evaluate", value)
 		return value
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string")], results: [/* @__PURE__ */ $.basicType("string")] } as $.FunctionTypeInfo))
-	let m = (await (async () => { const __goscriptStructLiteral0: Manager = new Manager(); __goscriptStructLiteral0.Person = $.markAsStructValue(new Person()); __goscriptStructLiteral0.Person.Name = (__goscriptAwait = name!("promoted"), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait); __goscriptStructLiteral0.Address = $.markAsStructValue(new Address()); __goscriptStructLiteral0.Address.City = (__goscriptAwait = name!("city"), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait); __goscriptStructLiteral0.Person.Age = 42; __goscriptStructLiteral0.Phone = (__goscriptAwait = name!("phone"), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait); __goscriptStructLiteral0.Address.Street = (__goscriptAwait = name!("street"), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait); return $.markAsStructValue(__goscriptStructLiteral0) })())
+	let m = (await (async () => { const __goscriptStructLiteral0: Manager = new Manager(); __goscriptStructLiteral0.Person = new Person(undefined, true); __goscriptStructLiteral0.Person.Name = (__goscriptAwait = name!("promoted"), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait); __goscriptStructLiteral0.Address = new Address(undefined, true); __goscriptStructLiteral0.Address.City = (__goscriptAwait = name!("city"), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait); __goscriptStructLiteral0.Person.Age = 42; __goscriptStructLiteral0.Phone = (__goscriptAwait = name!("phone"), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait); __goscriptStructLiteral0.Address.Street = (__goscriptAwait = name!("street"), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait); return $.markAsStructValue(__goscriptStructLiteral0) })())
 	await $.println(m.Person.Name, m.Person.Age, m.Address.Street, m.Address.City, m.Phone, m.Level)
 
 	// Nested embeddings retain independent value copies and zero fields.
-	let team: Team | $.VarRef<Team> | null = (() => { const __goscriptStructLiteral1: Team = new Team(); __goscriptStructLiteral1.Employee = $.markAsStructValue(new Employee()); __goscriptStructLiteral1.Employee.Person = $.markAsStructValue(new Person()); __goscriptStructLiteral1.Employee.Person.Name = "nested"; __goscriptStructLiteral1.Employee.ID = 7; __goscriptStructLiteral1.Active = true; return __goscriptStructLiteral1 })()
-	let copy = $.markAsStructValue($.cloneStructValue($.pointerValue<Team>(team)))
+	let team: Team | $.VarRef<Team> | null = (() => { const __goscriptStructLiteral1: Team = new Team(); __goscriptStructLiteral1.Employee = new Employee(undefined, true); __goscriptStructLiteral1.Employee.Person = new Person(undefined, true); __goscriptStructLiteral1.Employee.Person.Name = "nested"; __goscriptStructLiteral1.Employee.ID = 7; __goscriptStructLiteral1.Active = true; return __goscriptStructLiteral1 })()
+	let copy = ($.pointerValue<Team>(team)).clone()
 	copy.Employee.Person.Name = "copy"
 	await $.println($.pointerValue<Team>(team).Employee.Person.Name, copy.Employee.Person.Name, $.pointerValue<Team>(team).Employee.Person.Age, $.pointerValue<Team>(team).Employee.ID, $.pointerValue<Team>(team).Active)
-	let items: $.Slice<Team | $.VarRef<Team> | null> = $.arrayToSlice<Team | $.VarRef<Team> | null>([(() => { const __goscriptStructLiteral2: Team = new Team(); __goscriptStructLiteral2.Employee = $.markAsStructValue(new Employee()); __goscriptStructLiteral2.Employee.Person = $.markAsStructValue(new Person()); __goscriptStructLiteral2.Employee.Person.Name = "inferred"; return __goscriptStructLiteral2 })()])
+	let items: $.Slice<Team | $.VarRef<Team> | null> = $.arrayToSlice<Team | $.VarRef<Team> | null>([(() => { const __goscriptStructLiteral2: Team = new Team(); __goscriptStructLiteral2.Employee = new Employee(undefined, true); __goscriptStructLiteral2.Employee.Person = new Person(undefined, true); __goscriptStructLiteral2.Employee.Person.Name = "inferred"; return __goscriptStructLiteral2 })()])
 	await $.println($.pointerValue<Team>($.arrayIndex(items!, 0)).Employee.Person.Name, $.pointerValue<Team>($.arrayIndex(items!, 0)).Employee.ID)
 
 	// Anonymous and generic structs use the same promoted field paths.
-	let anonymous = (() => { const __goscriptStructLiteral3: {"Person": Person, "Enabled": boolean} = $.anonymousStructValue({"Person": $.markAsStructValue(new Person()), "Enabled": false}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("Person", "main.Person", [0], 0, true, { anonymous: true }), /* @__PURE__ */ $.structField("Enabled", /* @__PURE__ */ $.basicType("bool"), [1], 24, true)] }); __goscriptStructLiteral3.Person = $.markAsStructValue(new Person()); __goscriptStructLiteral3.Person.Name = "anonymous"; __goscriptStructLiteral3.Enabled = true; return __goscriptStructLiteral3 })()
+	let anonymous = (() => { const __goscriptStructLiteral3: {"Person": Person, "Enabled": boolean} = $.anonymousStructValue({"Person": new Person(undefined, true), "Enabled": false}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("Person", "main.Person", [0], 0, true, { anonymous: true }), /* @__PURE__ */ $.structField("Enabled", /* @__PURE__ */ $.basicType("bool"), [1], 24, true)] }); __goscriptStructLiteral3.Person = new Person(undefined, true); __goscriptStructLiteral3.Person.Name = "anonymous"; __goscriptStructLiteral3.Enabled = true; return __goscriptStructLiteral3 })()
 	await $.println(anonymous.Person.Name, anonymous.Person.Age, anonymous.Enabled)
 	let text = (() => { const __goscriptStructLiteral4: LiteralContainer = new LiteralContainer(); __goscriptStructLiteral4.LiteralValue = $.markAsStructValue(new LiteralValue({Value: "", Zero: ""})); __goscriptStructLiteral4.LiteralValue.Value = "generic"; return $.markAsStructValue(__goscriptStructLiteral4) })()
 	let wide = (() => { const __goscriptStructLiteral5: LiteralContainer = new LiteralContainer(); __goscriptStructLiteral5.LiteralValue = $.markAsStructValue(new LiteralValue({Value: 0n, Zero: 0n})); __goscriptStructLiteral5.LiteralValue.Value = 17n; return $.markAsStructValue(__goscriptStructLiteral5) })()
