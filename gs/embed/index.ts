@@ -10,12 +10,10 @@ export class FS {
     this.files = files ?? new Map()
   }
 
+  // clone shares the files, which an FS never changes and copies when it
+  // returns their bytes, as a Go FS value shares them.
   clone(): FS {
-    const files = new Map<string, Uint8Array>()
-    for (const [name, data] of this.files) {
-      files.set(name, data.slice())
-    }
-    return $.markAsStructValue(new FS(files))
+    return $.markAsStructValue(new FS(this.files))
   }
 
   Open(name: string): [fs.File, $.GoError] {
