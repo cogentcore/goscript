@@ -7173,8 +7173,10 @@ func tupleResultTypes(ctx lowerFileContext, expr ast.Expr) *types.Tuple {
 	if tuple, ok := ctx.semPkg.source.TypesInfo.TypeOf(expr).(*types.Tuple); ok {
 		return tuple
 	}
+	// A conversion to a function type yields one function value, not the
+	// results of its signature.
 	call, ok := ast.Unparen(expr).(*ast.CallExpr)
-	if !ok {
+	if !ok || ctx.semPkg.source.TypesInfo.Types[call.Fun].IsType() {
 		return nil
 	}
 	signature := callTargetSignature(ctx, call.Fun)

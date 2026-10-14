@@ -49,6 +49,20 @@ func count(names ...string) int {
 	return len(names)
 }
 
+// Handler is a named function type with several results.
+type Handler func(name string) (bool, error)
+
+// countHandlers calls each of handlers and counts the ones that handled name.
+func countHandlers(name string, handlers ...Handler) int {
+	n := 0
+	for _, h := range handlers {
+		if ok, _ := h(name); ok {
+			n++
+		}
+	}
+	return n
+}
+
 func main() {
 	expected := []string{"file1.txt", "file2.txt", "file3.txt"}
 
@@ -68,4 +82,9 @@ func main() {
 
 	names := Names{"x", "y", "z"}
 	println("count:", count(names...))
+
+	// A conversion to a multi-result function type is one variadic argument.
+	println("handlers:", countHandlers("x", Handler(func(name string) (bool, error) {
+		return name == "x", nil
+	})))
 }

@@ -16,6 +16,8 @@ export type Text = $.Slice<string>
 
 $.registerNamedType("main.Text", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("string")));
 
+export type Handler = ((name: string) => [boolean, $.GoError] | globalThis.Promise<[boolean, $.GoError]>) | null
+
 export async function TestFS(fsys: string, expected: $.Slice<string>): globalThis.Promise<$.GoError> {
 	return testFS(fsys, expected)
 }
@@ -51,6 +53,20 @@ export function count(names: $.Slice<string>): number {
 	return $.sliceLen(names)
 }
 
+export async function countHandlers(name: string, handlers: $.Slice<Handler | null>): globalThis.Promise<number> {
+	let n = 0
+	for (let __goscriptRangeTarget2 = handlers, __goscriptRangeWindow2 = $.sliceRange(__goscriptRangeTarget2), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow2.length; __rangeIndex++) {
+		let h = (__goscriptRangeWindow2.backing[__goscriptRangeWindow2.offset + __rangeIndex] as Handler | null)
+		{
+			let [ok, ] = await h!(name)
+			if (ok) {
+				n++
+			}
+		}
+	}
+	return n
+}
+
 export async function main(): globalThis.Promise<void> {
 	let expected: $.Slice<string> = $.arrayToSlice<string>(["file1.txt", "file2.txt", "file3.txt"])
 
@@ -70,6 +86,11 @@ export async function main(): globalThis.Promise<void> {
 
 	let names: Names = ($.arrayToSlice<string>(["x", "y", "z"]) as Names)
 	await $.println("count:", count((names as $.Slice<string>)))
+
+	// A conversion to a multi-result function type is one variadic argument.
+	await $.println("handlers:", await countHandlers("x", $.arrayToSlice<Handler | null>([$.namedFunction($.functionValue((name: string): [boolean, $.GoError] => {
+		return [$.stringEqual(name, "x"), null]
+	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string")], results: [/* @__PURE__ */ $.basicType("bool"), "error"] } as $.FunctionTypeInfo)), "main.Handler", ({ kind: $.TypeKind.Function, name: "main.Handler", params: [/* @__PURE__ */ $.basicType("string")], results: [/* @__PURE__ */ $.basicType("bool"), "error"] } as $.FunctionTypeInfo))])))
 }
 
 var __goscriptStatic0$value: any
