@@ -1,4 +1,6 @@
 nil: true
 pc 0: true
+nil frame func: true
+frame func: true
 nil func: true
 hello: main.hello
