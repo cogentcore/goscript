@@ -57,6 +57,36 @@ describe('compress/gzip override', () => {
     expect($.bytesToString(out)).toBe('hello gzip world')
   })
 
+  test('writes header names in Latin-1 and reads them back as UTF-8', async () => {
+    // A name with a non-ASCII Latin-1 rune is one byte per rune in the header.
+    const name = $.goString('café')
+    const buf = $.markAsStructValue(new bytes.Buffer())
+    const writer = NewWriter(buf)
+    writer.Name = name
+    writer.Comment = $.goString('ñ')
+    expect((await writer.Write($.stringToBytes('x')))[1]).toBeNull()
+    expect(await writer.Close()).toBeNull()
+    const data = buf.Bytes()!
+    const header = $.bytesToUint8Array(data).subarray(10, 17)
+    expect(Array.from(header)).toEqual([0x63, 0x61, 0x66, 0xe9, 0, 0xf1, 0])
+
+    // Reading the header decodes the Latin-1 bytes to the same Go strings.
+    const [reader, readerErr] = await NewReader(bytes.NewReader(data))
+    expect(readerErr).toBeNull()
+    expect(reader!.Name).toBe(name)
+    expect(reader!.Comment).toBe($.goString('ñ'))
+  })
+
+  test('rejects header names that are not Latin-1', async () => {
+    // A rune beyond Latin-1 or an invalid UTF-8 byte fails the write.
+    for (const name of [$.goString('€'), $.bytesToString(new Uint8Array([0xe9]))]) {
+      const writer = NewWriter($.markAsStructValue(new bytes.Buffer()))
+      writer.Name = name
+      const [, err] = await writer.Write($.stringToBytes('x'))
+      expect(err?.Error()).toBe('gzip.Write: non-Latin-1 header string')
+    }
+  })
+
   test('reader collects bulk input in chunks', async () => {
     const input = $.makeSlice<number>(128 * 1024, undefined, 'byte')
     let state = 0x12345678

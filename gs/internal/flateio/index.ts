@@ -76,11 +76,13 @@ function word(value: number, littleEndian = false): Uint8Array {
 function gzipHeader(header: GzipHeader, level: number): [Uint8Array | null, $.GoError] {
   const extra = new Uint8Array($.bytesToUint8Array(header.extra))
   if (extra.length > 65535) return [null, $.newError('gzip.Write: Extra data is too large')]
+  // The name and comment are written in Latin-1, as Go does, so each of
+  // their runes must be a nonzero Latin-1 character.
+  const latin1: Uint8Array[] = []
   for (const value of [header.name, header.comment]) {
-    for (const char of value) {
-      const code = char.codePointAt(0)!
-      if (code === 0 || code > 255) return [null, $.newError('gzip.Write: non-Latin-1 header string')]
-    }
+    const [bytes, ok] = latin1Bytes(value)
+    if (!ok) return [null, $.newError('gzip.Write: non-Latin-1 header string')]
+    latin1.push(bytes)
   }
   const flags = (header.extra !== null ? 4 : 0) | (header.name ? 8 : 0) | (header.comment ? 16 : 0)
   const out = [31, 139, 8, flags, ...word(header.time > 0 ? header.time : 0, true), level === 9 ? 2 : level === 1 ? 4 : 0, header.os & 255]
@@ -88,13 +90,34 @@ function gzipHeader(header: GzipHeader, level: number): [Uint8Array | null, $.Go
     out.push(extra.length & 255, extra.length >>> 8)
     for (const byte of extra) out.push(byte)
   }
-  for (const value of [header.name, header.comment]) {
-    if (value) {
-      for (const char of value) out.push(char.charCodeAt(0))
+  for (const bytes of latin1) {
+    if (bytes.length > 0) {
+      for (const byte of bytes) out.push(byte)
       out.push(0)
     }
   }
   return [new Uint8Array(out), null]
+}
+
+// latin1Bytes returns the Latin-1 bytes of the runes of a Go string, and
+// false if one of its runes is zero or not a Latin-1 character, or one of its
+// bytes is not valid UTF-8.
+function latin1Bytes(value: string): [Uint8Array, boolean] {
+  const bytes: number[] = []
+  for (let i = 0; i < value.length; ) {
+    const [r, width] = $.decodeRuneInString(value, i)
+    if (r === 0 || r > 255 || (r === 0xfffd && width === 1)) return [new Uint8Array(0), false]
+    bytes.push(r)
+    i += width
+  }
+  return [new Uint8Array(bytes), true]
+}
+
+// latin1String returns the Go string, in UTF-8, of Latin-1 bytes.
+function latin1String(bytes: number[]): string {
+  let value = ''
+  for (const byte of bytes) value += $.runeToString(byte)
+  return value
 }
 
 export class Deflater {
@@ -416,15 +439,16 @@ export class Inflater {
       }
       for (const [flag, field] of [[8, 'name'], [16, 'comment']] as const) {
         if (!(flags & flag)) continue
-        let value = ''
+        // The zero-terminated Latin-1 string is read as UTF-8, as Go does.
+        const value: number[] = []
         for (let i = 0; ; i++) {
           if (i === 512) return this.errors.header()
           const [b, err] = yield* input.byte(bytes)
           if (err != null) return err === io.EOF ? io.ErrUnexpectedEOF : err
           if (b === 0) break
-          value += String.fromCharCode(b)
+          value.push(b)
         }
-        header[field] = value
+        header[field] = latin1String(value)
       }
       if (flags & 2) {
         const data = new Uint8Array(bytes)
