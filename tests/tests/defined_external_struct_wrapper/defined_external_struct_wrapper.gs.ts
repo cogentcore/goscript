@@ -39,7 +39,7 @@ export class Wrapped {
 	static __typeInfo = $.registerStructType(
 		"main.Wrapped",
 		() => new Wrapped(),
-		() => [{ name: "public", args: [], returns: [{ type: /* @__PURE__ */ $.pointerType("dep.Public") }] }],
+		() => [{ name: "public", args: [], returns: [{ type: /* @__PURE__ */ $.pointerType("dep.Public") }], pointerReceiver: true }],
 		Wrapped,
 		() => [{ name: "Value", key: "Value", type: /* @__PURE__ */ $.basicType("string") }, { name: "Hidden", key: "Hidden", type: "dep.hidden" }]
 	)

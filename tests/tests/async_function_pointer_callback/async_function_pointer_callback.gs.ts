@@ -46,7 +46,7 @@ export class Snapshot {
 	static __typeInfo = $.registerStructType(
 		"main.Snapshot",
 		() => new Snapshot(),
-		() => [{ name: "Apply", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("int") }, { type: "error" }] }],
+		() => [{ name: "Apply", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("int") }, { type: "error" }], pointerReceiver: true }],
 		Snapshot,
 		() => [{ name: "base", key: "base", type: /* @__PURE__ */ $.basicType("int") }]
 	)
@@ -90,7 +90,7 @@ export class Host {
 	static __typeInfo = $.registerStructType(
 		"main.Host",
 		() => new Host(),
-		() => [{ name: "processor", args: [], returns: [{ type: ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int"), "error"] } as $.FunctionTypeInfo) }] }],
+		() => [{ name: "processor", args: [], returns: [{ type: ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int"), "error"] } as $.FunctionTypeInfo) }], pointerReceiver: true }],
 		Host,
 		() => [{ name: "process", key: "process", type: "atomic.Pointer" }]
 	)

@@ -51,7 +51,7 @@ export class wrapper {
 	static __typeInfo = $.registerStructType(
 		"main.wrapper",
 		() => new wrapper(),
-		() => [{ name: "Other", args: [], returns: [{ type: { kind: $.TypeKind.Interface, methods: [] } }] }, { name: "Value", args: [], returns: [{ type: { kind: $.TypeKind.Interface, methods: [] } }] }],
+		() => [{ name: "Other", args: [], returns: [{ type: { kind: $.TypeKind.Interface, methods: [] } }], pointerReceiver: true }, { name: "Value", args: [], returns: [{ type: { kind: $.TypeKind.Interface, methods: [] } }] }],
 		wrapper,
 		() => [{ name: "Impl", key: "Impl", type: /* @__PURE__ */ $.pointerType("dep.Impl"), anonymous: true }]
 	)

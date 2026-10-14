@@ -76,7 +76,7 @@ export class arg {
 	static __typeInfo = $.registerStructType(
 		"main.arg",
 		() => new arg(),
-		() => [$.methodSignature("label", [], [/* @__PURE__ */ $.basicType("string")])],
+		() => [$.methodSignature("label", [], [/* @__PURE__ */ $.basicType("string")], true)],
 		arg,
 		() => [/* @__PURE__ */ $.structField("Name", /* @__PURE__ */ $.basicType("string"), [0], 0, true), /* @__PURE__ */ $.structField("Value", { kind: $.TypeKind.Interface, methods: [] }, [1], 16, true), /* @__PURE__ */ $.structField("Tag", /* @__PURE__ */ $.basicType("string", "reflect.StructTag"), [2], 32, true)]
 	)

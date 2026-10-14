@@ -40,7 +40,7 @@ export class CoreStore {
 	static __typeInfo = $.registerStructType(
 		"inner.CoreStore",
 		() => new CoreStore(),
-		() => [{ name: "NewTransaction", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.pointerType("tx.Tx") }] }],
+		() => [{ name: "NewTransaction", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.pointerType("tx.Tx") }], pointerReceiver: true }],
 		CoreStore,
 		() => [{ name: "Prefix", key: "Prefix", type: /* @__PURE__ */ $.basicType("string") }]
 	)

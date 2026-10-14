@@ -32,7 +32,7 @@ export class descriptor {
 	static __typeInfo = $.registerStructType(
 		"main.descriptor",
 		() => new descriptor(),
-		() => [{ name: "toJS", args: [], returns: [{ type: { kind: $.TypeKind.Interface, methods: [] } }] }],
+		() => [{ name: "toJS", args: [], returns: [{ type: { kind: $.TypeKind.Interface, methods: [] } }], pointerReceiver: true }],
 		descriptor,
 		() => [{ name: "Label", key: "Label", type: /* @__PURE__ */ $.basicType("string") }]
 	)

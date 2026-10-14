@@ -53,7 +53,7 @@ export class cursor {
 	static __typeInfo = $.registerStructType(
 		"main.cursor",
 		() => new cursor(),
-		() => [{ name: "rotate", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.pointerType("main.box") }, { type: /* @__PURE__ */ $.pointerType("main.box") }, { type: /* @__PURE__ */ $.pointerType("main.box") }] }],
+		() => [{ name: "rotate", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.pointerType("main.box") }, { type: /* @__PURE__ */ $.pointerType("main.box") }, { type: /* @__PURE__ */ $.pointerType("main.box") }], pointerReceiver: true }],
 		cursor,
 		() => []
 	)

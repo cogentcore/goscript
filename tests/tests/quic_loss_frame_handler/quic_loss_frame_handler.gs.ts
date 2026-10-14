@@ -152,7 +152,7 @@ export class retransmissionQueue {
 	static __typeInfo = $.registerStructType(
 		"main.retransmissionQueue",
 		() => new retransmissionQueue(),
-		() => [{ name: "AppDataAckHandler", args: [], returns: [{ type: "main.FrameHandler" }] }, { name: "HandshakeAckHandler", args: [], returns: [{ type: "main.FrameHandler" }] }, { name: "InitialAckHandler", args: [], returns: [{ type: "main.FrameHandler" }] }],
+		() => [{ name: "AppDataAckHandler", args: [], returns: [{ type: "main.FrameHandler" }], pointerReceiver: true }, { name: "HandshakeAckHandler", args: [], returns: [{ type: "main.FrameHandler" }], pointerReceiver: true }, { name: "InitialAckHandler", args: [], returns: [{ type: "main.FrameHandler" }], pointerReceiver: true }],
 		retransmissionQueue,
 		() => [{ name: "lost", key: "lost", type: /* @__PURE__ */ $.basicType("int") }]
 	)
@@ -192,7 +192,7 @@ export class retransmissionQueueInitialAckHandler {
 	static __typeInfo = $.registerStructType(
 		"main.retransmissionQueueInitialAckHandler",
 		() => new retransmissionQueueInitialAckHandler(),
-		() => [{ name: "OnAcked", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [] }, { name: "OnLost", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [] }],
+		() => [{ name: "OnAcked", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [], pointerReceiver: true }, { name: "OnLost", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [], pointerReceiver: true }],
 		retransmissionQueueInitialAckHandler,
 		() => [{ name: "lost", key: "lost", type: /* @__PURE__ */ $.basicType("int") }]
 	)
@@ -232,7 +232,7 @@ export class retransmissionQueueHandshakeAckHandler {
 	static __typeInfo = $.registerStructType(
 		"main.retransmissionQueueHandshakeAckHandler",
 		() => new retransmissionQueueHandshakeAckHandler(),
-		() => [{ name: "OnAcked", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [] }, { name: "OnLost", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [] }],
+		() => [{ name: "OnAcked", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [], pointerReceiver: true }, { name: "OnLost", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [], pointerReceiver: true }],
 		retransmissionQueueHandshakeAckHandler,
 		() => [{ name: "lost", key: "lost", type: /* @__PURE__ */ $.basicType("int") }]
 	)
@@ -272,7 +272,7 @@ export class retransmissionQueueAppDataAckHandler {
 	static __typeInfo = $.registerStructType(
 		"main.retransmissionQueueAppDataAckHandler",
 		() => new retransmissionQueueAppDataAckHandler(),
-		() => [{ name: "OnAcked", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [] }, { name: "OnLost", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [] }],
+		() => [{ name: "OnAcked", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [], pointerReceiver: true }, { name: "OnLost", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [], pointerReceiver: true }],
 		retransmissionQueueAppDataAckHandler,
 		() => [{ name: "lost", key: "lost", type: /* @__PURE__ */ $.basicType("int") }]
 	)

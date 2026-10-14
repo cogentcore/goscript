@@ -164,7 +164,7 @@ export class scanner {
 	static __typeInfo = $.registerStructType(
 		"main.scanner",
 		() => new scanner(),
-		() => [{ name: "readByte", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("uint8") }] }, { name: "readScript", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }],
+		() => [{ name: "readByte", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("uint8") }], pointerReceiver: true }, { name: "readScript", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }], pointerReceiver: true }],
 		scanner,
 		() => [{ name: "data", key: "data", type: /* @__PURE__ */ $.basicType("string") }, { name: "pos", key: "pos", type: /* @__PURE__ */ $.basicType("int") }, { name: "done", key: "done", type: /* @__PURE__ */ $.basicType("bool") }]
 	)

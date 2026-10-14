@@ -52,7 +52,7 @@ export class blockType {
 	static __typeInfo = $.registerStructType(
 		"main.blockType",
 		() => new blockType(),
-		() => [{ name: "Constructor", args: [], returns: [{ type: "main.Block" }] }, { name: "GetBlockTypeID", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }],
+		() => [{ name: "Constructor", args: [], returns: [{ type: "main.Block" }], pointerReceiver: true }, { name: "GetBlockTypeID", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }], pointerReceiver: true }],
 		blockType,
 		() => [{ name: "typeID", key: "typeID", type: /* @__PURE__ */ $.basicType("string") }, { name: "constructor", key: "_constructor", type: ({ kind: $.TypeKind.Function, params: [], results: [{ kind: $.TypeKind.Interface, methods: [$.methodSignature("MarshalBlock", [], [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")), "error"]), $.methodSignature("UnmarshalBlock", [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))], ["error"])] }] } as $.FunctionTypeInfo) }]
 	)
@@ -82,7 +82,7 @@ export class sampleBlock {
 	static __typeInfo = $.registerStructType(
 		"main.sampleBlock",
 		() => new sampleBlock(),
-		() => [{ name: "MarshalBlock", args: [], returns: [{ type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }, { type: "error" }] }, { name: "UnmarshalBlock", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: "error" }] }],
+		() => [{ name: "MarshalBlock", args: [], returns: [{ type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }, { type: "error" }], pointerReceiver: true }, { name: "UnmarshalBlock", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: "error" }], pointerReceiver: true }],
 		sampleBlock,
 		() => []
 	)

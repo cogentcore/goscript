@@ -49,7 +49,7 @@ export class pairingOffer {
 	static __typeInfo = $.registerStructType(
 		"main.pairingOffer",
 		() => new pairingOffer(),
-		() => [{ name: "MarshalVT", args: [], returns: [{ type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }, { type: "error" }] }, { name: "UnmarshalVT", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: "error" }] }],
+		() => [{ name: "MarshalVT", args: [], returns: [{ type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }, { type: "error" }], pointerReceiver: true }, { name: "UnmarshalVT", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: "error" }], pointerReceiver: true }],
 		pairingOffer,
 		() => [{ name: "Note", key: "Note", type: /* @__PURE__ */ $.basicType("string") }]
 	)

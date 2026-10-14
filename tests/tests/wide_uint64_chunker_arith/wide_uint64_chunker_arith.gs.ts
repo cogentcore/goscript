@@ -35,7 +35,7 @@ export class chunker {
 	static __typeInfo = $.registerStructType(
 		"main.chunker",
 		() => new chunker(),
-		() => [{ name: "advance", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [] }],
+		() => [{ name: "advance", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [], pointerReceiver: true }],
 		chunker,
 		() => [{ name: "pos", key: "pos", type: /* @__PURE__ */ $.basicType("uint64") }]
 	)
@@ -78,7 +78,7 @@ export class repeatReader {
 	static __typeInfo = $.registerStructType(
 		"main.repeatReader",
 		() => new repeatReader(),
-		() => [{ name: "Read", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("int") }, { type: "error" }] }],
+		() => [{ name: "Read", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("int") }, { type: "error" }], pointerReceiver: true }],
 		repeatReader,
 		() => [{ name: "remaining", key: "remaining", type: /* @__PURE__ */ $.basicType("int") }]
 	)

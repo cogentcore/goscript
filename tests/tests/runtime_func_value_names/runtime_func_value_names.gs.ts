@@ -46,7 +46,7 @@ export class T {
 	static __typeInfo = $.registerStructType(
 		"main.T",
 		() => new T(),
-		() => [$.methodSignature("PtrMethod", [], [/* @__PURE__ */ $.basicType("int")]), $.methodSignature("ValMethod", [], [/* @__PURE__ */ $.basicType("int")])],
+		() => [$.methodSignature("PtrMethod", [], [/* @__PURE__ */ $.basicType("int")], true), $.methodSignature("ValMethod", [], [/* @__PURE__ */ $.basicType("int")])],
 		T,
 		() => [/* @__PURE__ */ $.structField("n", /* @__PURE__ */ $.basicType("int"), [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/runtime_func_value_names" })]
 	)
@@ -81,7 +81,7 @@ export class G {
 	static __typeInfo = $.registerStructType(
 		"main.G",
 		() => new G(),
-		() => [$.methodSignature("Get", [], [{ kind: $.TypeKind.Interface, methods: [] }])],
+		() => [$.methodSignature("Get", [], [{ kind: $.TypeKind.Interface, methods: [] }], true)],
 		G,
 		() => [/* @__PURE__ */ $.structField("v", { kind: $.TypeKind.Interface, methods: [] }, [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/runtime_func_value_names" })]
 	)

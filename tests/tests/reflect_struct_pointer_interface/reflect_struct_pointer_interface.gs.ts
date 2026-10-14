@@ -54,7 +54,7 @@ export class Base {
 	static __typeInfo = $.registerStructType(
 		"main.Base",
 		() => new Base(),
-		() => [$.methodSignature("AsBase", [], [/* @__PURE__ */ $.pointerType("main.Base")]), $.methodSignature("NewInstance", [], ["main.Node"])],
+		() => [$.methodSignature("AsBase", [], [/* @__PURE__ */ $.pointerType("main.Base")], true), $.methodSignature("NewInstance", [], ["main.Node"], true)],
 		Base,
 		() => [/* @__PURE__ */ $.structField("This", "main.Node", [0], 0, true), /* @__PURE__ */ $.structField("Name", /* @__PURE__ */ $.basicType("string"), [1], 16, true)]
 	)
@@ -96,7 +96,7 @@ export class Widget {
 	static __typeInfo = $.registerStructType(
 		"main.Widget",
 		() => new Widget(),
-		() => [$.methodSignature("AsBase", [], [/* @__PURE__ */ $.pointerType("main.Base")]), $.methodSignature("NewInstance", [], ["main.Node"])],
+		() => [$.methodSignature("AsBase", [], [/* @__PURE__ */ $.pointerType("main.Base")], true), $.methodSignature("NewInstance", [], ["main.Node"], true)],
 		Widget,
 		() => [/* @__PURE__ */ $.structField("Base", "main.Base", [0], 0, true, { anonymous: true }), /* @__PURE__ */ $.structField("X", /* @__PURE__ */ $.basicType("int"), [1], 32, true)]
 	)
@@ -138,7 +138,7 @@ export class Body {
 	static __typeInfo = $.registerStructType(
 		"main.Body",
 		() => new Body(),
-		() => [$.methodSignature("AsBase", [], [/* @__PURE__ */ $.pointerType("main.Base")]), $.methodSignature("NewInstance", [], ["main.Node"])],
+		() => [$.methodSignature("AsBase", [], [/* @__PURE__ */ $.pointerType("main.Base")], true), $.methodSignature("NewInstance", [], ["main.Node"], true)],
 		Body,
 		() => [/* @__PURE__ */ $.structField("Widget", "main.Widget", [0], 0, true, { anonymous: true }), /* @__PURE__ */ $.structField("Title", /* @__PURE__ */ $.basicType("string"), [1], 40, true)]
 	)

@@ -68,7 +68,7 @@ export class Public {
 	static __typeInfo = $.registerStructType(
 		"dep.Public",
 		() => new Public(),
-		() => [{ name: "Label", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }],
+		() => [{ name: "Label", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }], pointerReceiver: true }],
 		Public,
 		() => [{ name: "Value", key: "Value", type: /* @__PURE__ */ $.basicType("string") }, { name: "Hidden", key: "Hidden", type: "dep.hidden" }]
 	)

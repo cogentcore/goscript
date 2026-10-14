@@ -67,7 +67,7 @@ export class Deque {
 	static __typeInfo = $.registerStructType(
 		"main.Deque",
 		() => new Deque(),
-		() => [{ name: "Next", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }, { name: "Send", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [] }, { name: "lockAndInit", args: [], returns: [] }],
+		() => [{ name: "Next", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }], pointerReceiver: true }, { name: "Send", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [], pointerReceiver: true }, { name: "lockAndInit", args: [], returns: [], pointerReceiver: true }],
 		Deque,
 		() => [{ name: "Mu", key: "Mu", type: "sync.Mutex" }, { name: "Cond", key: "Cond", type: "sync.Cond" }, { name: "Items", key: "Items", type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")) }]
 	)

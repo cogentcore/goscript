@@ -56,7 +56,7 @@ export class myErr {
 	static __typeInfo = $.registerStructType(
 		"main.myErr",
 		() => new myErr(),
-		() => [$.methodSignature("Error", [], [/* @__PURE__ */ $.basicType("string")])],
+		() => [$.methodSignature("Error", [], [/* @__PURE__ */ $.basicType("string")], true)],
 		myErr,
 		() => []
 	)

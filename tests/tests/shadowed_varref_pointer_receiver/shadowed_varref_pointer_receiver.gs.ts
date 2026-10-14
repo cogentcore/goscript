@@ -37,7 +37,7 @@ export class locked {
 	static __typeInfo = $.registerStructType(
 		"main.locked",
 		() => new locked(),
-		() => [{ name: "Inc", args: [], returns: [] }, { name: "Value", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }],
+		() => [{ name: "Inc", args: [], returns: [], pointerReceiver: true }, { name: "Value", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }], pointerReceiver: true }],
 		locked,
 		() => [{ name: "value", key: "value", type: /* @__PURE__ */ $.basicType("int") }]
 	)

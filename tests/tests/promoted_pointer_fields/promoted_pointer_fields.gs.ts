@@ -32,7 +32,7 @@ export class counter {
 	static __typeInfo = $.registerStructType(
 		"main.counter",
 		() => new counter(),
-		() => [{ name: "Load", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }],
+		() => [{ name: "Load", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }], pointerReceiver: true }],
 		counter,
 		() => [{ name: "value", key: "value", type: /* @__PURE__ */ $.basicType("int") }]
 	)

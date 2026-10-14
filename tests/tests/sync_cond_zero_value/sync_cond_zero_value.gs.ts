@@ -67,7 +67,7 @@ export class queue {
 	static __typeInfo = $.registerStructType(
 		"main.queue",
 		() => new queue(),
-		() => [{ name: "init", args: [], returns: [] }, { name: "pop", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }, { name: "push", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [] }],
+		() => [{ name: "init", args: [], returns: [], pointerReceiver: true }, { name: "pop", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }], pointerReceiver: true }, { name: "push", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [], pointerReceiver: true }],
 		queue,
 		() => [{ name: "Mu", key: "Mu", type: "sync.Mutex" }, { name: "Cond", key: "Cond", type: "sync.Cond" }, { name: "items", key: "items", type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")) }]
 	)

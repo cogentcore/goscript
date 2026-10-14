@@ -35,7 +35,7 @@ export class responseWriter {
 	static __typeInfo = $.registerStructType(
 		"main.responseWriter",
 		() => new responseWriter(),
-		() => [{ name: "Header", args: [], returns: [{ type: "http.Header" }] }],
+		() => [{ name: "Header", args: [], returns: [{ type: "http.Header" }], pointerReceiver: true }],
 		responseWriter,
 		() => [{ name: "header", key: "header", type: "http.Header" }]
 	)

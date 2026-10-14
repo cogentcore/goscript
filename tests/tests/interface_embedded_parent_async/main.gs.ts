@@ -47,7 +47,7 @@ export class impl {
 	static __typeInfo = $.registerStructType(
 		"main.impl",
 		() => new impl(),
-		() => [{ name: "Name", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }, { name: "Validate", args: [], returns: [{ type: "error" }] }],
+		() => [{ name: "Name", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }], pointerReceiver: true }, { name: "Validate", args: [], returns: [{ type: "error" }], pointerReceiver: true }],
 		impl,
 		() => []
 	)
