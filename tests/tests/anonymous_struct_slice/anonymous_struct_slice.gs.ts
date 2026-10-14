@@ -62,7 +62,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 
 	let x = $.anonymousStructValue({Name: "third", Offsets: (null as $.Slice<number>), Count: 3}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("Name", /* @__PURE__ */ $.basicType("string"), [0], 0, true), /* @__PURE__ */ $.structField("Offsets", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")), [1], 16, true), /* @__PURE__ */ $.structField("Count", /* @__PURE__ */ $.basicType("int"), [2], 40, true)] })
-	x.Offsets = $.append(x.Offsets, 5)
+	x.Offsets = $.appendOne(x.Offsets, 5)
 	await $.println(x.Name, $.arrayIndex(x.Offsets!, 0), x.Count)
 
 	let __goscriptTuple0: any = buildNamedItems()

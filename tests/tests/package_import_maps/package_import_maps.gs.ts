@@ -39,7 +39,7 @@ export async function main(): globalThis.Promise<void> {
 			// Simple assignment that should trigger the error
 			let [x, y] = getValue()
 			let result = $.concatString(($.concatString(k, x)), $.runeToString($.int(v + y, 32)))
-			results = $.append(results, result)
+			results = $.appendOne(results, result)
 			return true
 		})
 	})()
@@ -53,7 +53,7 @@ export async function main(): globalThis.Promise<void> {
 		await simpleIterator(m)!(async (k, v) => {
 			let [x, y] = getValue()
 			let result = $.concatString(($.concatString(($.concatString(k, x)), $.runeToString($.int(v + y, 32)))), "_local")
-			results = $.append(results, result)
+			results = $.appendOne(results, result)
 			return true
 		})
 	})()

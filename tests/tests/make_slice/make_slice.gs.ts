@@ -48,7 +48,7 @@ export async function main(): globalThis.Promise<void> {
 	s5![0] = 10
 	s5![1] = 20
 	await $.println("Before append - len:", $.sliceLen(s5), "cap:", $.cap(s5))
-	s5 = $.append(s5, 30)
+	s5 = $.appendOne(s5, 30)
 	await $.println("After append - len:", $.sliceLen(s5), "cap:", $.cap(s5))
 	await $.println("s5[2]:", $.arrayIndex(s5!, 2))
 

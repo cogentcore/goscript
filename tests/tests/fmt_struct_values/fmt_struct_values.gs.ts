@@ -439,10 +439,10 @@ export async function main(): globalThis.Promise<void> {
 	// Pointers nested in slices and struct cycles print as addresses.
 	let root: Node | $.VarRef<Node> | null = new Node({Name: "root"})
 	let kid: Node | $.VarRef<Node> | null = new Node({Name: "kid", Parent: root})
-	$.pointerValue<Node>(root).Kids = $.append($.pointerValue<Node>(root).Kids, kid, $.appendZeros.nil)
+	$.pointerValue<Node>(root).Kids = $.appendOne($.pointerValue<Node>(root).Kids, kid, $.appendZeros.nil)
 	let app: App | $.VarRef<App> | null = new App({Name: "app"})
 	let win: Win | $.VarRef<Win> | null = new Win({App: app, Title: "main"})
-	$.pointerValue<App>(app).Base.Windows = $.append($.pointerValue<App>(app).Base.Windows, win, $.appendZeros.nil)
+	$.pointerValue<App>(app).Base.Windows = $.appendOne($.pointerValue<App>(app).Base.Windows, win, $.appendZeros.nil)
 	$.pointerValue<App>(app).Base.Active = win
 	let names: strings.Replacer | $.VarRef<strings.Replacer> | null = strings.NewReplacer(await fmt.Sprintf("%p", $.interfaceValue(root, "*main.Node", /* @__PURE__ */ $.pointerType("main.Node"))), "<root>", await fmt.Sprintf("%p", $.interfaceValue(kid, "*main.Node", /* @__PURE__ */ $.pointerType("main.Node"))), "<kid>", await fmt.Sprintf("%p", $.interfaceValue(app, "*main.App", /* @__PURE__ */ $.pointerType("main.App"))), "<app>", await fmt.Sprintf("%p", $.interfaceValue(win, "*main.Win", /* @__PURE__ */ $.pointerType("main.Win"))), "<win>")
 	await $.println(strings.Replacer.prototype.Replace.call($.pointerValue<strings.Replacer>(names), await fmt.Sprint($.interfaceValue(root, "*main.Node", /* @__PURE__ */ $.pointerType("main.Node")))))
