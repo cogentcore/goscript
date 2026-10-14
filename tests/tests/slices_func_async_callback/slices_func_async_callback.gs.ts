@@ -61,7 +61,7 @@ export class Process {
 	static __typeInfo = $.registerStructType(
 		"main.Process",
 		() => new Process(),
-		() => [{ name: "exited", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }],
+		() => [{ name: "exited", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }], pointerReceiver: true }],
 		Process,
 		() => [{ name: "pid", key: "pid", type: /* @__PURE__ */ $.basicType("int") }, { name: "done", key: "done", type: /* @__PURE__ */ $.channelType({ kind: $.TypeKind.Struct, methods: [], fields: [] }, "both") }]
 	)

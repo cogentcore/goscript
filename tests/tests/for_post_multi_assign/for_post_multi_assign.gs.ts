@@ -80,7 +80,7 @@ export class iterator {
 	static __typeInfo = $.registerStructType(
 		"main.iterator",
 		() => new iterator(),
-		() => [{ name: "Next", args: [], returns: [{ type: "main.frame" }, { type: /* @__PURE__ */ $.basicType("bool") }] }],
+		() => [{ name: "Next", args: [], returns: [{ type: "main.frame" }, { type: /* @__PURE__ */ $.basicType("bool") }], pointerReceiver: true }],
 		iterator,
 		() => [{ name: "idx", key: "idx", type: /* @__PURE__ */ $.basicType("int") }]
 	)

@@ -89,7 +89,7 @@ export class Action {
 	static __typeInfo = $.registerStructType(
 		"main.Action",
 		() => new Action(),
-		() => [{ name: "Mark", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "SetFilter", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [] }],
+		() => [{ name: "Mark", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "SetFilter", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [], pointerReceiver: true }],
 		Action,
 		() => [{ name: "Result", key: "Result", type: /* @__PURE__ */ $.basicType("int") }, { name: "Filter", key: "Filter", type: /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("int"), "dep.Ref") }]
 	)

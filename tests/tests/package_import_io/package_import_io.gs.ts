@@ -73,7 +73,7 @@ export class asyncBuffer {
 	static __typeInfo = $.registerStructType(
 		"main.asyncBuffer",
 		() => new asyncBuffer(),
-		() => [{ name: "Reset", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [] }, { name: "Write", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("int") }, { type: "error" }] }],
+		() => [{ name: "Reset", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [], pointerReceiver: true }, { name: "Write", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("int") }, { type: "error" }], pointerReceiver: true }],
 		asyncBuffer,
 		() => []
 	)
@@ -113,7 +113,7 @@ export class staticReader {
 	static __typeInfo = $.registerStructType(
 		"main.staticReader",
 		() => new staticReader(),
-		() => [{ name: "Read", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("int") }, { type: "error" }] }],
+		() => [{ name: "Read", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("int") }, { type: "error" }], pointerReceiver: true }],
 		staticReader,
 		() => [{ name: "done", key: "done", type: /* @__PURE__ */ $.basicType("bool") }]
 	)
@@ -154,7 +154,7 @@ export class asyncReader {
 	static __typeInfo = $.registerStructType(
 		"main.asyncReader",
 		() => new asyncReader(),
-		() => [{ name: "Read", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("int") }, { type: "error" }] }],
+		() => [{ name: "Read", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("int") }, { type: "error" }], pointerReceiver: true }],
 		asyncReader,
 		() => [{ name: "done", key: "done", type: /* @__PURE__ */ $.basicType("bool") }]
 	)
@@ -197,7 +197,7 @@ export class asyncReaderAt {
 	static __typeInfo = $.registerStructType(
 		"main.asyncReaderAt",
 		() => new asyncReaderAt(),
-		() => [{ name: "ReadAt", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("int") }, { type: "error" }] }],
+		() => [{ name: "ReadAt", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("int") }, { type: "error" }], pointerReceiver: true }],
 		asyncReaderAt,
 		() => [{ name: "data", key: "data", type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }]
 	)

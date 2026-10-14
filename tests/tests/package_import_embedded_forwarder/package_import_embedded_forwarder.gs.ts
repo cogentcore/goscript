@@ -60,7 +60,7 @@ export class VerboseStore {
 	static __typeInfo = $.registerStructType(
 		"main.VerboseStore",
 		() => new VerboseStore(),
-		() => [{ name: "Execute", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }, { name: "NewTransaction", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.pointerType("tx.Tx") }] }],
+		() => [{ name: "Execute", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }], pointerReceiver: true }, { name: "NewTransaction", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.pointerType("tx.Tx") }] }],
 		VerboseStore,
 		() => [{ name: "BaseStore", key: "BaseStore", type: /* @__PURE__ */ $.pointerType("dep.BaseStore"), anonymous: true }, { name: "name", key: "name", type: /* @__PURE__ */ $.basicType("string") }]
 	)

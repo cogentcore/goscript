@@ -42,7 +42,7 @@ export class Impl {
 	static __typeInfo = $.registerStructType(
 		"dep.Impl",
 		() => new Impl(),
-		() => [{ name: "Value", args: [], returns: [{ type: { kind: $.TypeKind.Interface, methods: [] } }] }],
+		() => [{ name: "Value", args: [], returns: [{ type: { kind: $.TypeKind.Interface, methods: [] } }], pointerReceiver: true }],
 		Impl,
 		() => [{ name: "Item", key: "Item", type: { kind: $.TypeKind.Interface, methods: [] } }]
 	)
@@ -70,7 +70,7 @@ export class Keyed {
 	static __typeInfo = $.registerStructType(
 		"dep.Keyed",
 		() => new Keyed(),
-		() => [{ name: "SetValues", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Interface, methods: [] } }] }],
+		() => [{ name: "SetValues", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Interface, methods: [] } }], pointerReceiver: true }],
 		Keyed,
 		() => []
 	)

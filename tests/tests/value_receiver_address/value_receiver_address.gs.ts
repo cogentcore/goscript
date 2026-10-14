@@ -38,7 +38,7 @@ export class Counter {
 	static __typeInfo = $.registerStructType(
 		"main.Counter",
 		() => new Counter(),
-		() => [{ name: "PointerAfterIncrement", args: [], returns: [{ type: /* @__PURE__ */ $.pointerType("main.Counter") }] }, { name: "Value", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }],
+		() => [{ name: "PointerAfterIncrement", args: [], returns: [{ type: /* @__PURE__ */ $.pointerType("main.Counter") }] }, { name: "Value", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }], pointerReceiver: true }],
 		Counter,
 		() => [{ name: "value", key: "value", type: /* @__PURE__ */ $.basicType("int") }]
 	)

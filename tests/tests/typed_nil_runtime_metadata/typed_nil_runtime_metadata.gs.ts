@@ -36,7 +36,7 @@ export class source {
 	static __typeInfo = $.registerStructType(
 		"main.source",
 		() => new source(),
-		() => [$.methodSignature("Read", [["value", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))]], [/* @__PURE__ */ $.basicType("int"), "error"])],
+		() => [$.methodSignature("Read", [["value", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))]], [/* @__PURE__ */ $.basicType("int"), "error"], true)],
 		source,
 		() => []
 	)

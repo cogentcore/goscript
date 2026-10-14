@@ -70,7 +70,7 @@ export class Stack {
 	static __typeInfo = $.registerStructType(
 		"main.Stack",
 		() => new Stack(),
-		() => [{ name: "Len", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }, { name: "Pop", args: [], returns: [{ type: { kind: $.TypeKind.Interface, methods: [] } }, { type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "Push", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [] }],
+		() => [{ name: "Len", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }], pointerReceiver: true }, { name: "Pop", args: [], returns: [{ type: { kind: $.TypeKind.Interface, methods: [] } }, { type: /* @__PURE__ */ $.basicType("bool") }], pointerReceiver: true }, { name: "Push", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [], pointerReceiver: true }],
 		Stack,
 		() => [{ name: "items", key: "items", type: /* @__PURE__ */ $.sliceType({ kind: $.TypeKind.Interface, methods: [] }) }]
 	)
@@ -108,7 +108,7 @@ export class Item {
 	static __typeInfo = $.registerStructType(
 		"main.Item",
 		() => new Item(),
-		() => [{ name: "Clone", args: [], returns: [{ type: /* @__PURE__ */ $.pointerType("main.Item") }] }],
+		() => [{ name: "Clone", args: [], returns: [{ type: /* @__PURE__ */ $.pointerType("main.Item") }], pointerReceiver: true }],
 		Item,
 		() => [{ name: "Name", key: "Name", type: /* @__PURE__ */ $.basicType("string") }]
 	)
@@ -149,7 +149,7 @@ export class Mapper {
 	static __typeInfo = $.registerStructType(
 		"main.Mapper",
 		() => new Mapper(),
-		() => [{ name: "Get", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Interface, methods: [] } }, { type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "Put", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [] }],
+		() => [{ name: "Get", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: { kind: $.TypeKind.Interface, methods: [] } }, { type: /* @__PURE__ */ $.basicType("bool") }], pointerReceiver: true }, { name: "Put", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [], pointerReceiver: true }],
 		Mapper,
 		() => [{ name: "values", key: "values", type: /* @__PURE__ */ $.mapType({ kind: $.TypeKind.Interface, methods: [] }, { kind: $.TypeKind.Interface, methods: [] }) }]
 	)

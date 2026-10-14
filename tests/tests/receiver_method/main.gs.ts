@@ -37,7 +37,7 @@ export class MyStruct {
 	static __typeInfo = $.registerStructType(
 		"main.MyStruct",
 		() => new MyStruct(),
-		() => [{ name: "DoesNotUseReceiver", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }, { name: "UsesReceiver", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }],
+		() => [{ name: "DoesNotUseReceiver", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }], pointerReceiver: true }, { name: "UsesReceiver", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }], pointerReceiver: true }],
 		MyStruct,
 		() => [{ name: "Value", key: "Value", type: /* @__PURE__ */ $.basicType("int") }]
 	)

@@ -33,7 +33,7 @@ export class Foo {
 	static __typeInfo = $.registerStructType(
 		"main.Foo",
 		() => new Foo(),
-		() => [{ name: "Bar", args: [], returns: [] }],
+		() => [{ name: "Bar", args: [], returns: [], pointerReceiver: true }],
 		Foo,
 		() => [{ name: "done", key: "done", type: /* @__PURE__ */ $.channelType(/* @__PURE__ */ $.basicType("bool"), "both") }]
 	)

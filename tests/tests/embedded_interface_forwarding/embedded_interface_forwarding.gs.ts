@@ -76,7 +76,7 @@ export class Counter {
 	static __typeInfo = $.registerStructType(
 		"main.Counter",
 		() => new Counter(),
-		() => [{ name: "Add", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }],
+		() => [{ name: "Add", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("int") }], pointerReceiver: true }],
 		Counter,
 		() => [{ name: "base", key: "base", type: /* @__PURE__ */ $.basicType("int") }]
 	)

@@ -42,7 +42,7 @@ export class timer {
 	static __typeInfo = $.registerStructType(
 		"main.timer",
 		() => new timer(),
-		() => [$.methodSignature("Start")],
+		() => [$.methodSignature("Start", [], [], true)],
 		timer,
 		() => [/* @__PURE__ */ $.structField("start", "time.Time", [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/reflect_zero_int64" }), /* @__PURE__ */ $.structField("total", /* @__PURE__ */ $.basicType("int64", "time.Duration"), [1], 24, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/reflect_zero_int64" })]
 	)

@@ -49,7 +49,7 @@ export class counter {
 	static __typeInfo = $.registerStructType(
 		"main.counter",
 		() => new counter(),
-		() => [$.methodSignature("PtrMethod", [], [/* @__PURE__ */ $.basicType("int")]), $.methodSignature("ValMethod", [], [/* @__PURE__ */ $.basicType("int")])],
+		() => [$.methodSignature("PtrMethod", [], [/* @__PURE__ */ $.basicType("int")], true), $.methodSignature("ValMethod", [], [/* @__PURE__ */ $.basicType("int")])],
 		counter,
 		() => [/* @__PURE__ */ $.structField("n", /* @__PURE__ */ $.basicType("int"), [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/package_import_runtime" })]
 	)
@@ -84,7 +84,7 @@ export class box {
 	static __typeInfo = $.registerStructType(
 		"main.box",
 		() => new box(),
-		() => [$.methodSignature("Get", [], [{ kind: $.TypeKind.Interface, methods: [] }])],
+		() => [$.methodSignature("Get", [], [{ kind: $.TypeKind.Interface, methods: [] }], true)],
 		box,
 		() => [/* @__PURE__ */ $.structField("v", { kind: $.TypeKind.Interface, methods: [] }, [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/package_import_runtime" })]
 	)

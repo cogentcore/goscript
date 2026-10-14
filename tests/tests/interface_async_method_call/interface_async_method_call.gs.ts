@@ -62,7 +62,7 @@ export class ChannelProcessor {
 	static __typeInfo = $.registerStructType(
 		"main.ChannelProcessor",
 		() => new ChannelProcessor(),
-		() => [{ name: "GetResult", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }, { name: "Process", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }],
+		() => [{ name: "GetResult", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }], pointerReceiver: true }, { name: "Process", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("int") }], pointerReceiver: true }],
 		ChannelProcessor,
 		() => [{ name: "ch", key: "ch", type: /* @__PURE__ */ $.channelType(/* @__PURE__ */ $.basicType("int"), "both") }]
 	)
@@ -103,7 +103,7 @@ export class SimpleProcessor {
 	static __typeInfo = $.registerStructType(
 		"main.SimpleProcessor",
 		() => new SimpleProcessor(),
-		() => [{ name: "GetResult", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }, { name: "Process", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }],
+		() => [{ name: "GetResult", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }], pointerReceiver: true }, { name: "Process", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("int") }], pointerReceiver: true }],
 		SimpleProcessor,
 		() => [{ name: "value", key: "value", type: /* @__PURE__ */ $.basicType("int") }]
 	)
@@ -143,7 +143,7 @@ export class GenericChannelStore {
 	static __typeInfo = $.registerStructType(
 		"main.GenericChannelStore",
 		() => new GenericChannelStore(),
-		() => [{ name: "Load", args: [], returns: [{ type: { kind: $.TypeKind.Interface, methods: [] } }] }],
+		() => [{ name: "Load", args: [], returns: [{ type: { kind: $.TypeKind.Interface, methods: [] } }], pointerReceiver: true }],
 		GenericChannelStore,
 		() => [{ name: "ch", key: "ch", type: /* @__PURE__ */ $.channelType({ kind: $.TypeKind.Interface, methods: [] }, "both") }, { name: "value", key: "value", type: { kind: $.TypeKind.Interface, methods: [] } }]
 	)

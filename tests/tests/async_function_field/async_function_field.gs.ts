@@ -35,7 +35,7 @@ export class loader {
 	static __typeInfo = $.registerStructType(
 		"main.loader",
 		() => new loader(),
-		() => [{ name: "getLoad", args: [], returns: [{ type: ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string")], results: [{ kind: $.TypeKind.Interface, methods: [] }, /* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo) }] }],
+		() => [{ name: "getLoad", args: [], returns: [{ type: ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string")], results: [{ kind: $.TypeKind.Interface, methods: [] }, /* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo) }], pointerReceiver: true }],
 		loader,
 		() => [{ name: "load", key: "load", type: ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string")], results: [{ kind: $.TypeKind.Interface, methods: [] }, /* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo) }]
 	)

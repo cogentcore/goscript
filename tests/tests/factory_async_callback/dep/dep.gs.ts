@@ -56,7 +56,7 @@ export class factory {
 	static __typeInfo = $.registerStructType(
 		"dep.factory",
 		() => new factory(),
-		() => [{ name: "GetConfigID", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }],
+		() => [{ name: "GetConfigID", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }], pointerReceiver: true }],
 		factory,
 		() => []
 	)

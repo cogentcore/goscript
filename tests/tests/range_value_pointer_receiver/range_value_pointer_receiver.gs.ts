@@ -35,7 +35,7 @@ export class item {
 	static __typeInfo = $.registerStructType(
 		"main.item",
 		() => new item(),
-		() => [{ name: "Name", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }],
+		() => [{ name: "Name", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }], pointerReceiver: true }],
 		item,
 		() => [{ name: "name", key: "name", type: /* @__PURE__ */ $.basicType("string") }]
 	)
