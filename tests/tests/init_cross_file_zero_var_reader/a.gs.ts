@@ -51,7 +51,7 @@ export var stringType: reflect.Type | null
 
 export function __goscript_init_stringType(): void {
 	if (((stringType) as any) === undefined) {
-		stringType = reflect.TypeFor({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }})
+		stringType = reflect.TypeFor(__goscriptStatic0())
 	}
 }
 
@@ -64,4 +64,9 @@ export function __goscript_get_stringType(): reflect.Type | null {
 
 export function __goscript_set_stringType(__goscriptValue: reflect.Type | null): void {
 	stringType = __goscriptValue
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }})
 }

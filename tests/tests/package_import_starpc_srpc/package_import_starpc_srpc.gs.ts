@@ -655,7 +655,7 @@ export async function probeStream(ctx: context.Context | null, client: srpc.Clie
 }
 
 export function newRoutedRpcStreamClient(ctx: context.Context | null, componentID: string, getter: rpcstream.RpcStreamGetter | null, waitAck: boolean, results: $.Channel<rpcStreamServerResult> | null): srpc.Client | null {
-	return rpcstream.NewRpcStreamClient({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.pointerType("main.memoryRpcStream"), zero: () => null, methods: {Close: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Close(...$.stripGenericTypeArgs(args)), CloseSend: (receiver: any, ...args: any[]) => $.pointerValue(receiver).CloseSend(...$.stripGenericTypeArgs(args)), Context: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Context(...$.stripGenericTypeArgs(args)), MsgRecv: (receiver: any, ...args: any[]) => $.pointerValue(receiver).MsgRecv(...$.stripGenericTypeArgs(args)), MsgSend: (receiver: any, ...args: any[]) => $.pointerValue(receiver).MsgSend(...$.stripGenericTypeArgs(args)), Recv: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Recv(...$.stripGenericTypeArgs(args)), Send: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Send(...$.stripGenericTypeArgs(args))} }}, $.functionValue(async (callCtx: context.Context | null): globalThis.Promise<[memoryRpcStream | $.VarRef<memoryRpcStream> | null, $.GoError]> => {
+	return rpcstream.NewRpcStreamClient(__goscriptStatic0(), $.functionValue(async (callCtx: context.Context | null): globalThis.Promise<[memoryRpcStream | $.VarRef<memoryRpcStream> | null, $.GoError]> => {
 		let __goscriptTuple4: any = newMemoryRpcStreamPair()
 		let client: memoryRpcStream | $.VarRef<memoryRpcStream> | null = __goscriptTuple4[0]
 		let server: memoryRpcStream | $.VarRef<memoryRpcStream> | null = __goscriptTuple4[1]
@@ -785,7 +785,7 @@ export async function exerciseRpcStreamHandle(): globalThis.Promise<boolean> {
 			return [$.namedValueInterfaceValue<srpc.Invoker | null>($.namedFunction($.functionValue(async (serviceID: string, methodID: string, strm: srpc.Stream | null): globalThis.Promise<[boolean, $.GoError]> => {
 				await $.chanSend(invoked, ($.stringEqual(serviceID, "svc")) && ($.stringEqual(methodID, "method")))
 				return [true, null]
-			}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("string"), "srpc.Stream"], results: [/* @__PURE__ */ $.basicType("bool"), "error"] } as $.FunctionTypeInfo)), "srpc.InvokerFunc", ({ kind: $.TypeKind.Function, name: "srpc.InvokerFunc", params: [/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("string"), "srpc.Stream"], results: [/* @__PURE__ */ $.basicType("bool"), "error"] } as $.FunctionTypeInfo)), "srpc.InvokerFunc", {InvokeMethod: (receiver: any, ...args: any[]) => (srpc.InvokerFunc_InvokeMethod as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, ({ kind: $.TypeKind.Function, name: "srpc.InvokerFunc", params: [/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("string"), "srpc.Stream"], results: [/* @__PURE__ */ $.basicType("bool"), "error"] } as $.FunctionTypeInfo), [$.methodSignature("InvokeMethod", [["serviceID", /* @__PURE__ */ $.basicType("string")], ["methodID", /* @__PURE__ */ $.basicType("string")], ["strm", "srpc.Stream"]], [/* @__PURE__ */ $.basicType("bool"), "error"])]), (null as (() => void) | null), null]
+			}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("string"), "srpc.Stream"], results: [/* @__PURE__ */ $.basicType("bool"), "error"] } as $.FunctionTypeInfo)), "srpc.InvokerFunc", ({ kind: $.TypeKind.Function, name: "srpc.InvokerFunc", params: [/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("string"), "srpc.Stream"], results: [/* @__PURE__ */ $.basicType("bool"), "error"] } as $.FunctionTypeInfo)), "srpc.InvokerFunc", __goscriptStatic1(), __goscriptStatic2(), __goscriptStatic3()), (null as (() => void) | null), null]
 		}, ({ kind: $.TypeKind.Function, params: ["context.Context", /* @__PURE__ */ $.basicType("string"), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)], results: ["srpc.Invoker", ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "error"] } as $.FunctionTypeInfo))))
 	})() })
 
@@ -995,7 +995,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.pointerValue<Exclude<srpc.Mux, null>>(mux).Register($.interfaceValue<srpc.Handler | null>($.markAsStructValue(new handler()), "main.handler", "main.handler"))
 	await $.pointerValue<Exclude<srpc.Mux, null>>(mux).InvokeMethod("svc", "method", null)
 	closeEmbedded
-	$.functionValue(async (strm: srpc.StreamRecv | null): globalThis.Promise<$.GoError> => await recvOne({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }}, strm), ({ kind: $.TypeKind.Function, params: ["srpc.StreamRecv"], results: ["error"] } as $.FunctionTypeInfo))
+	$.functionValue(async (strm: srpc.StreamRecv | null): globalThis.Promise<$.GoError> => await recvOne(__goscriptStatic4(), strm), ({ kind: $.TypeKind.Function, params: ["srpc.StreamRecv"], results: ["error"] } as $.FunctionTypeInfo))
 	srpc.NewRawMessage(new Uint8Array([1, 2, 3]) as $.Slice<number>, true)
 	let server: srpc.Server | $.VarRef<srpc.Server> | null = srpc.NewServer((mux as srpc.Invoker | null))
 	let client = srpc.NewClient(srpc.NewServerPipe(server))
@@ -1066,6 +1066,31 @@ export async function main(): globalThis.Promise<void> {
 	}
 	await $.println("rpcstream pressure: ok")
 	await $.println("success: native starpc srpc")
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.pointerType("main.memoryRpcStream"), zero: () => null, methods: {Close: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Close(...$.stripGenericTypeArgs(args)), CloseSend: (receiver: any, ...args: any[]) => $.pointerValue(receiver).CloseSend(...$.stripGenericTypeArgs(args)), Context: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Context(...$.stripGenericTypeArgs(args)), MsgRecv: (receiver: any, ...args: any[]) => $.pointerValue(receiver).MsgRecv(...$.stripGenericTypeArgs(args)), MsgSend: (receiver: any, ...args: any[]) => $.pointerValue(receiver).MsgSend(...$.stripGenericTypeArgs(args)), Recv: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Recv(...$.stripGenericTypeArgs(args)), Send: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Send(...$.stripGenericTypeArgs(args))} }})
+}
+
+var __goscriptStatic1$value: any
+function __goscriptStatic1(): any {
+	return __goscriptStatic1$value ??= ({InvokeMethod: (receiver: any, ...args: any[]) => (srpc.InvokerFunc_InvokeMethod as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))})
+}
+
+var __goscriptStatic2$value: any
+function __goscriptStatic2(): any {
+	return __goscriptStatic2$value ??= (({ kind: $.TypeKind.Function, name: "srpc.InvokerFunc", params: [/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("string"), "srpc.Stream"], results: [/* @__PURE__ */ $.basicType("bool"), "error"] } as $.FunctionTypeInfo))
+}
+
+var __goscriptStatic3$value: any
+function __goscriptStatic3(): any {
+	return __goscriptStatic3$value ??= ([$.methodSignature("InvokeMethod", [["serviceID", /* @__PURE__ */ $.basicType("string")], ["methodID", /* @__PURE__ */ $.basicType("string")], ["strm", "srpc.Stream"]], [/* @__PURE__ */ $.basicType("bool"), "error"])])
+}
+
+var __goscriptStatic4$value: any
+function __goscriptStatic4(): any {
+	return __goscriptStatic4$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }})
 }
 
 if ($.isMainScript(import.meta)) {

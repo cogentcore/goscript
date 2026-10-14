@@ -186,56 +186,56 @@ export class VM {
 		switch (_in.Op) {
 			case 0:
 			{
-				Stack.prototype.Push.call(s, {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int64"), zero: () => 0n }}, _in.Arg)
+				Stack.prototype.Push.call(s, __goscriptStatic0(), _in.Arg)
 				break
 			}
 			case 1:
 			{
-				let v = (Stack.prototype.Pop.call(s, {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int64"), zero: () => 0n }}) as bigint)
-				Stack.prototype.Push.call(s, {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int64"), zero: () => 0n }}, v)
-				Stack.prototype.Push.call(s, {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int64"), zero: () => 0n }}, v)
+				let v = (Stack.prototype.Pop.call(s, __goscriptStatic0()) as bigint)
+				Stack.prototype.Push.call(s, __goscriptStatic0(), v)
+				Stack.prototype.Push.call(s, __goscriptStatic0(), v)
 				break
 			}
 			case 2:
 			{
-				let b = (Stack.prototype.Pop.call(s, {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int64"), zero: () => 0n }}) as bigint)
-				let a = (Stack.prototype.Pop.call(s, {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int64"), zero: () => 0n }}) as bigint)
-				Stack.prototype.Push.call(s, {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int64"), zero: () => 0n }}, a)
-				Stack.prototype.Push.call(s, {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int64"), zero: () => 0n }}, b)
-				Stack.prototype.Push.call(s, {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int64"), zero: () => 0n }}, a)
+				let b = (Stack.prototype.Pop.call(s, __goscriptStatic0()) as bigint)
+				let a = (Stack.prototype.Pop.call(s, __goscriptStatic0()) as bigint)
+				Stack.prototype.Push.call(s, __goscriptStatic0(), a)
+				Stack.prototype.Push.call(s, __goscriptStatic0(), b)
+				Stack.prototype.Push.call(s, __goscriptStatic0(), a)
 				break
 			}
 			case 3:
 			{
-				let b = (Stack.prototype.Pop.call(s, {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int64"), zero: () => 0n }}) as bigint)
-				let a = (Stack.prototype.Pop.call(s, {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int64"), zero: () => 0n }}) as bigint)
-				Stack.prototype.Push.call(s, {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int64"), zero: () => 0n }}, b)
-				Stack.prototype.Push.call(s, {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int64"), zero: () => 0n }}, a)
+				let b = (Stack.prototype.Pop.call(s, __goscriptStatic0()) as bigint)
+				let a = (Stack.prototype.Pop.call(s, __goscriptStatic0()) as bigint)
+				Stack.prototype.Push.call(s, __goscriptStatic0(), b)
+				Stack.prototype.Push.call(s, __goscriptStatic0(), a)
 				break
 			}
 			case 4:
 			{
-				Stack.prototype.Pop.call(s, {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int64"), zero: () => 0n }})
+				Stack.prototype.Pop.call(s, __goscriptStatic0())
 				break
 			}
 			case 5:
 			{
-				Stack.prototype.Push.call(s, {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int64"), zero: () => 0n }}, $.int64Sub(Stack.prototype.Pop.call(s, {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int64"), zero: () => 0n }}), 1n))
+				Stack.prototype.Push.call(s, __goscriptStatic0(), $.int64Sub(Stack.prototype.Pop.call(s, __goscriptStatic0()), 1n))
 				break
 			}
 			case 6:
 			{
-				Stack.prototype.Push.call(s, {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int64"), zero: () => 0n }}, $.int64Add(Stack.prototype.Pop.call(s, {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int64"), zero: () => 0n }}), Stack.prototype.Pop.call(s, {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int64"), zero: () => 0n }})))
+				Stack.prototype.Push.call(s, __goscriptStatic0(), $.int64Add(Stack.prototype.Pop.call(s, __goscriptStatic0()), Stack.prototype.Pop.call(s, __goscriptStatic0())))
 				break
 			}
 			case 7:
 			{
-				Stack.prototype.Push.call(s, {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int64"), zero: () => 0n }}, $.int64Mul(Stack.prototype.Pop.call(s, {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int64"), zero: () => 0n }}), Stack.prototype.Pop.call(s, {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int64"), zero: () => 0n }})))
+				Stack.prototype.Push.call(s, __goscriptStatic0(), $.int64Mul(Stack.prototype.Pop.call(s, __goscriptStatic0()), Stack.prototype.Pop.call(s, __goscriptStatic0())))
 				break
 			}
 			case 8:
 			{
-				if (Stack.prototype.Pop.call(s, {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int64"), zero: () => 0n }}) != 0n) {
+				if (Stack.prototype.Pop.call(s, __goscriptStatic0()) != 0n) {
 					$.pointerValue<VM>(vm).pc = $.int(_in.Arg)
 				}
 				break
@@ -388,7 +388,7 @@ export async function run(p: Program, answers: $.Channel<Answer> | null, faults:
 		let vm: VM | $.VarRef<VM> | null = new VM()
 		while (!VM.prototype.Step.call(vm, p.Code)) {
 		}
-		await $.chanSend(answers, (() => { const __goscriptLiteralField0 = $.pointerValue<VM>(vm).stack.Pop({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int64"), zero: () => 0n }}); return $.markAsStructValue(new Answer({Name: p.Name, Value: __goscriptLiteralField0, Steps: $.pointerValue<VM>(vm).steps})) })())
+		await $.chanSend(answers, (() => { const __goscriptLiteralField0 = $.pointerValue<VM>(vm).stack.Pop(__goscriptStatic0()); return $.markAsStructValue(new Answer({Name: p.Name, Value: __goscriptLiteralField0, Steps: $.pointerValue<VM>(vm).steps})) })())
 		await __defer.dispose()
 	} catch (e) {
 		await __defer.disposePanic(e)
@@ -478,6 +478,11 @@ export async function main(): globalThis.Promise<void> {
 		}
 	}
 	await $.println("total steps:", totalSteps)
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int64"), zero: () => 0n }})
 }
 
 if ($.isMainScript(import.meta)) {

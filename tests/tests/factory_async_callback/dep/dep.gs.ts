@@ -66,5 +66,25 @@ export async function NewFactory(b: Bus): globalThis.Promise<Factory | null> {
 	let ch: $.Channel<{}> | null = $.makeChannel<{}>(1, {}, "both")
 	await $.chanSend(ch, {})
 	await $.chanRecv(ch)
-	return $.namedValueInterfaceValue<Factory | null>(new factory(), "*dep.factory", {GetConfigID: (receiver: any, ...args: any[]) => $.pointerValue(receiver).GetConfigID({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "dep.Bus", zero: () => $.markAsStructValue(new Bus()) }}, ...$.stripGenericTypeArgs(args))}, /* @__PURE__ */ $.pointerType("dep.factory"), [$.methodSignature("GetConfigID", [], [/* @__PURE__ */ $.basicType("string")])])
+	return $.namedValueInterfaceValue<Factory | null>(new factory(), "*dep.factory", __goscriptStatic1(), __goscriptStatic2(), __goscriptStatic3())
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "dep.Bus", zero: () => $.markAsStructValue(new Bus()) }})
+}
+
+var __goscriptStatic1$value: any
+function __goscriptStatic1(): any {
+	return __goscriptStatic1$value ??= ({GetConfigID: (receiver: any, ...args: any[]) => $.pointerValue(receiver).GetConfigID(__goscriptStatic0(), ...$.stripGenericTypeArgs(args))})
+}
+
+var __goscriptStatic2$value: any
+function __goscriptStatic2(): any {
+	return __goscriptStatic2$value ??= (/* @__PURE__ */ $.pointerType("dep.factory"))
+}
+
+var __goscriptStatic3$value: any
+function __goscriptStatic3(): any {
+	return __goscriptStatic3$value ??= ([$.methodSignature("GetConfigID", [], [/* @__PURE__ */ $.basicType("string")])])
 }

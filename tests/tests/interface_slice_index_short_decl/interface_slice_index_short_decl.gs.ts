@@ -92,7 +92,7 @@ export class Action {
 }
 
 export function value_Key(v: value): any {
-	return $.namedValueInterfaceValue<any>(v, "main.value", {Key: (receiver: any, ...args: any[]) => (value_Key as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, "main.value", [$.methodSignature("Key", [], [{ kind: $.TypeKind.Interface, methods: [] }])])
+	return $.namedValueInterfaceValue<any>(v, "main.value", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2())
 }
 
 export function Fixed_Mark(f: Fixed): boolean {
@@ -100,7 +100,7 @@ export function Fixed_Mark(f: Fixed): boolean {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let shapes: $.Slice<Shape | null> = $.arrayToSlice<Shape | null>([$.namedValueInterfaceValue<Shape | null>($.arrayToSlice<dep.Ref | null>([$.namedValueInterfaceValue<dep.Ref | null>($.arrayValue(new Uint8Array([1, 2])), "main.value", {Key: (receiver: any, ...args: any[]) => (value_Key as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, "main.value", [$.methodSignature("Key", [], [{ kind: $.TypeKind.Interface, methods: [] }])])]), "main.Fixed", {Mark: (receiver: any, ...args: any[]) => (Fixed_Mark as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, /* @__PURE__ */ $.sliceType("dep.Ref", "main.Fixed"), [$.methodSignature("Mark", [], [/* @__PURE__ */ $.basicType("bool")])]), $.interfaceValue<Shape | null>($.markAsStructValue(new Action({Result: 1, Filter: $.makeMap<number, dep.Ref | null>([[1, $.namedValueInterfaceValue<dep.Ref | null>($.arrayValue(new Uint8Array([1, 2])), "main.value", {Key: (receiver: any, ...args: any[]) => (value_Key as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, "main.value", [$.methodSignature("Key", [], [{ kind: $.TypeKind.Interface, methods: [] }])])]])})), "main.Action", "main.Action")])
+	let shapes: $.Slice<Shape | null> = $.arrayToSlice<Shape | null>([$.namedValueInterfaceValue<Shape | null>($.arrayToSlice<dep.Ref | null>([$.namedValueInterfaceValue<dep.Ref | null>($.arrayValue(new Uint8Array([1, 2])), "main.value", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2())]), "main.Fixed", __goscriptStatic3(), __goscriptStatic4(), __goscriptStatic5()), $.interfaceValue<Shape | null>($.markAsStructValue(new Action({Result: 1, Filter: $.makeMap<number, dep.Ref | null>([[1, $.namedValueInterfaceValue<dep.Ref | null>($.arrayValue(new Uint8Array([1, 2])), "main.value", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2())]])})), "main.Action", "main.Action")])
 	let fixed: $.Slice<Fixed> = null! as $.Slice<Fixed>
 	for (let __goscriptRangeTarget0 = shapes, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
 		let shape = __goscriptRangeTarget0![__rangeIndex]
@@ -110,7 +110,7 @@ export async function main(): globalThis.Promise<void> {
 				case $.typeAssert<Fixed>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.sliceType("dep.Ref", "main.Fixed")).ok:
 					{
 						let shape: Fixed = $.typeAssert<Fixed>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.sliceType("dep.Ref", "main.Fixed")).value
-						shape = ($.append((shape as Fixed), $.namedValueInterfaceValue<dep.Ref | null>($.arrayValue(new Uint8Array([3, 4])), "main.value", {Key: (receiver: any, ...args: any[]) => (value_Key as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, "main.value", [$.methodSignature("Key", [], [{ kind: $.TypeKind.Interface, methods: [] }])]), $.appendZeros.nil) as Fixed)
+						shape = ($.append((shape as Fixed), $.namedValueInterfaceValue<dep.Ref | null>($.arrayValue(new Uint8Array([3, 4])), "main.value", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()), $.appendZeros.nil) as Fixed)
 						fixed = $.append(fixed, (shape as Fixed), $.appendZeros.nil)
 					}
 					break
@@ -137,6 +137,36 @@ export async function main(): globalThis.Promise<void> {
 	if (await dep.ToKey(fv) != null) {
 		await $.println("ok")
 	}
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= ({Key: (receiver: any, ...args: any[]) => (value_Key as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))})
+}
+
+var __goscriptStatic1$value: any
+function __goscriptStatic1(): any {
+	return __goscriptStatic1$value ??= ("main.value")
+}
+
+var __goscriptStatic2$value: any
+function __goscriptStatic2(): any {
+	return __goscriptStatic2$value ??= ([$.methodSignature("Key", [], [{ kind: $.TypeKind.Interface, methods: [] }])])
+}
+
+var __goscriptStatic3$value: any
+function __goscriptStatic3(): any {
+	return __goscriptStatic3$value ??= ({Mark: (receiver: any, ...args: any[]) => (Fixed_Mark as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))})
+}
+
+var __goscriptStatic4$value: any
+function __goscriptStatic4(): any {
+	return __goscriptStatic4$value ??= (/* @__PURE__ */ $.sliceType("dep.Ref", "main.Fixed"))
+}
+
+var __goscriptStatic5$value: any
+function __goscriptStatic5(): any {
+	return __goscriptStatic5$value ??= ([$.methodSignature("Mark", [], [/* @__PURE__ */ $.basicType("bool")])])
 }
 
 if ($.isMainScript(import.meta)) {

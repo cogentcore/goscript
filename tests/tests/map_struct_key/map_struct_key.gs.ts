@@ -107,12 +107,17 @@ export async function main(): globalThis.Promise<void> {
 	let __goscriptAssign0_1: node | $.VarRef<node> | null = right
 	$.pointerValue<node>(left).next = __goscriptAssign0_0
 	$.pointerValue<node>(right).next = __goscriptAssign0_1
-	let cyclic: globalThis.Map<node | $.VarRef<node> | null, number> | null = (newMap({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, K: { type: /* @__PURE__ */ $.pointerType("main.node"), zero: () => null }, V: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }}) as globalThis.Map<node | $.VarRef<node> | null, number> | null)
+	let cyclic: globalThis.Map<node | $.VarRef<node> | null, number> | null = (newMap(__goscriptStatic0()) as globalThis.Map<node | $.VarRef<node> | null, number> | null)
 	let __goscriptAssign1_0: number = 3
 	let __goscriptAssign1_1: number = 4
 	$.mapSet(cyclic, left, __goscriptAssign1_0)
 	$.mapSet(cyclic, right, __goscriptAssign1_1)
 	await $.println("cyclic pointer keys:", $.len(cyclic), $.mapGet<node | $.VarRef<node> | null, number, number>(cyclic, left, 0)[0], $.mapGet<node | $.VarRef<node> | null, number, number>(cyclic, right, 0)[0])
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, K: { type: /* @__PURE__ */ $.pointerType("main.node"), zero: () => null }, V: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }})
 }
 
 if ($.isMainScript(import.meta)) {

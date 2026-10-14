@@ -46,6 +46,11 @@ export async function main(): globalThis.Promise<void> {
 	await $.println($.markAsStructValue($.cloneStructValue(a)).Value().name)
 }
 
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.zone", zero: () => $.markAsStructValue(new zone()) }})
+}
+
 if ($.isMainScript(import.meta)) {
 	await main()
 }

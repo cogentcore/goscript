@@ -133,12 +133,12 @@ export async function main(): globalThis.Promise<void> {
 	// Values read after a Set through the same Value see the new contents.
 	let m: $.VarRef<globalThis.Map<string, number> | null> = $.varRef($.makeMap<string, number>([["old", 0]]))
 	let mv = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(m, "*map[string]int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("int"))))))).Elem()))
-	$.markAsStructValue($.cloneStructValue(mv)).Set($.markAsStructValue($.cloneStructValue(reflect.MakeMap($.pointerValueOrNil(reflect.TypeFor({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("int")), zero: () => null }}))!))))
+	$.markAsStructValue($.cloneStructValue(mv)).Set($.markAsStructValue($.cloneStructValue(reflect.MakeMap($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic0()))!))))
 	$.markAsStructValue($.cloneStructValue(mv)).SetMapIndex($.markAsStructValue($.cloneStructValue(reflect.ValueOf("k"))), $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.basicInterfaceValue(1, "int")))))
 	await $.println($.len(m.value), $.markAsStructValue($.cloneStructValue(mv)).Len())
 	let t: $.VarRef<$.Slice<number>> = $.varRef($.arrayToSlice<number>([0]))
 	let tv = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(t, "*[]int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"))))))).Elem()))
-	$.markAsStructValue($.cloneStructValue(tv)).Set($.markAsStructValue($.cloneStructValue(reflect.MakeSlice($.pointerValueOrNil(reflect.TypeFor({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")), zero: () => null }}))!, 2, 2))))
+	$.markAsStructValue($.cloneStructValue(tv)).Set($.markAsStructValue($.cloneStructValue(reflect.MakeSlice($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic1()))!, 2, 2))))
 	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(tv)).Index(1))).SetInt(4n)
 	await $.println($.arrayIndex(t.value!, 1), $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(tv)).Slice(1, 2))).Index(0))).Int())
 
@@ -159,13 +159,13 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("cap kept:", $.markAsStructValue($.cloneStructValue(ht)).Cap())
 
 	// MakeSlice honors the capacity and zeroes each struct element.
-	let ms = $.markAsStructValue($.cloneStructValue(reflect.MakeSlice($.pointerValueOrNil(reflect.TypeFor({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.sliceType("main.Item"), zero: () => null }}))!, 2, 4)))
+	let ms = $.markAsStructValue($.cloneStructValue(reflect.MakeSlice($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic2()))!, 2, 4)))
 	await $.println("makeslice:", $.markAsStructValue($.cloneStructValue(ms)).Len(), $.markAsStructValue($.cloneStructValue(ms)).Cap())
 	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(ms)).Index(0))).Field(0))).SetString("a")
 	await $.println("distinct:", $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(ms)).Index(0))).Field(0))).String(), $.stringEqual($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(ms)).Index(1))).Field(0))).String(), ""))
 
 	// MakeSlice of bytes.
-	let bs = $.markAsStructValue($.cloneStructValue(reflect.MakeSlice($.pointerValueOrNil(reflect.TypeFor({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")), zero: () => null }}))!, 3, 3)))
+	let bs = $.markAsStructValue($.cloneStructValue(reflect.MakeSlice($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic3()))!, 3, 3)))
 	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(bs)).Index(1))).SetUint(7n)
 	await $.println("bytes:", $.len($.markAsStructValue($.cloneStructValue(bs)).Bytes()), $.uint($.arrayIndex($.markAsStructValue($.cloneStructValue(bs)).Bytes()!, 1), 8))
 
@@ -175,6 +175,26 @@ export async function main(): globalThis.Promise<void> {
 	if ($.len(d.value.Items) == 2) {
 		await $.println("xml items:", $.arrayIndex(d.value.Items!, 0).Name, $.arrayIndex(d.value.Items!, 1).Name)
 	}
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("int")), zero: () => null }})
+}
+
+var __goscriptStatic1$value: any
+function __goscriptStatic1(): any {
+	return __goscriptStatic1$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")), zero: () => null }})
+}
+
+var __goscriptStatic2$value: any
+function __goscriptStatic2(): any {
+	return __goscriptStatic2$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.sliceType("main.Item"), zero: () => null }})
+}
+
+var __goscriptStatic3$value: any
+function __goscriptStatic3(): any {
+	return __goscriptStatic3$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")), zero: () => null }})
 }
 
 if ($.isMainScript(import.meta)) {

@@ -75,11 +75,16 @@ export async function main(): globalThis.Promise<void> {
 
 	await fmt.Println("removed", list.List.prototype.Remove.call(values, middle))
 	await printList("final", values)
-	let pool: sync.Pool | $.VarRef<sync.Pool> | null = newElementPool({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }})
-	let pooled: pooledElement | $.VarRef<pooledElement> | null = (await pushPooled({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }}, pool, "pooled") as pooledElement | $.VarRef<pooledElement> | null)
+	let pool: sync.Pool | $.VarRef<sync.Pool> | null = newElementPool(__goscriptStatic0())
+	let pooled: pooledElement | $.VarRef<pooledElement> | null = (await pushPooled(__goscriptStatic0(), pool, "pooled") as pooledElement | $.VarRef<pooledElement> | null)
 	await fmt.Println("pool", $.pointerValue<pooledElement>(pooled).Value)
 	sync.Pool.prototype.Put.call($.pointerValue<sync.Pool>(pool), $.interfaceValue(pooled, "*main.pooledElement", /* @__PURE__ */ $.pointerType("main.pooledElement")))
-	await fmt.Println("pool-reused", $.pointerValue<pooledElement>(await pushPooled({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }}, pool, "reused")).Value)
+	await fmt.Println("pool-reused", $.pointerValue<pooledElement>(await pushPooled(__goscriptStatic0(), pool, "reused")).Value)
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }})
 }
 
 if ($.isMainScript(import.meta)) {

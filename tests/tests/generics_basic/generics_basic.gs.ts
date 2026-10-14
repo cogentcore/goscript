@@ -238,49 +238,74 @@ export async function Apply(__typeArgs: $.GenericTypeArgs | undefined, value: an
 
 export async function main(): globalThis.Promise<void> {
 	await $.println("=== Generic constraints ===")
-	await $.println("min:", min({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }}, 8, 3), min({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int", "main.Score"), zero: () => 0 }}, 9, 4), min({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }}, "go", "ts"))
+	await $.println("min:", min(__goscriptStatic0(), 8, 3), min(__goscriptStatic1(), 9, 4), min(__goscriptStatic2(), "go", "ts"))
 
 	await $.println("=== Generic stack ===")
 	let stack: $.VarRef<Stack> = $.varRef($.markAsStructValue(new Stack()))
-	stack.value.Push({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }}, 10)
-	stack.value.Push({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }}, 20)
-	let __goscriptTuple0: any = stack.value.Pop({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }})
+	stack.value.Push(__goscriptStatic0(), 10)
+	stack.value.Push(__goscriptStatic0(), 20)
+	let __goscriptTuple0: any = stack.value.Pop(__goscriptStatic0())
 	let value = (__goscriptTuple0[0] as number)
 	let ok = __goscriptTuple0[1]
-	await $.println("pop:", value, ok, stack.value.Len({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }}))
-	let __goscriptTuple1: any = stack.value.Pop({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }})
+	await $.println("pop:", value, ok, stack.value.Len(__goscriptStatic0()))
+	let __goscriptTuple1: any = stack.value.Pop(__goscriptStatic0())
 	value = (__goscriptTuple1[0] as number)
 	ok = __goscriptTuple1[1]
-	await $.println("pop:", value, ok, stack.value.Len({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }}))
+	await $.println("pop:", value, ok, stack.value.Len(__goscriptStatic0()))
 
 	await $.println("=== Generic map alias ===")
-	let seen: Set = (NewSet({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }}, $.arrayToSlice<string>(["go", "ts"])) as Set)
-	Set_Add(seen, {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }}, "wasm")
-	await $.println("set:", Set_Has(seen, {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }}, "go"), Set_Has(seen, {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }}, "rust"), $.len(seen))
+	let seen: Set = (NewSet(__goscriptStatic2(), $.arrayToSlice<string>(["go", "ts"])) as Set)
+	Set_Add(seen, __goscriptStatic2(), "wasm")
+	await $.println("set:", Set_Has(seen, __goscriptStatic2(), "go"), Set_Has(seen, __goscriptStatic2(), "rust"), $.len(seen))
 
 	await $.println("=== Interface constraint ===")
 	let items: $.Slice<Item | $.VarRef<Item> | null> = $.arrayToSlice<Item | $.VarRef<Item> | null>([new Item({Name: "alpha"}), new Item({Name: "beta"})])
-	let clones: $.Slice<Item | $.VarRef<Item> | null> = (await CloneAll({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.pointerType("main.Item"), zero: () => null, methods: {Clone: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Clone(...$.stripGenericTypeArgs(args))} }}, items) as $.Slice<Item | $.VarRef<Item> | null>)
+	let clones: $.Slice<Item | $.VarRef<Item> | null> = (await CloneAll(__goscriptStatic3(), items) as $.Slice<Item | $.VarRef<Item> | null>)
 	await $.println("clone:", $.pointerValue<Item>($.arrayIndex(clones!, 0)).Name, $.pointerValue<Item>($.arrayIndex(clones!, 1)).Name, $.pointerEqual($.arrayIndex(clones!, 0), $.arrayIndex(items!, 0)))
 
 	await $.println("=== Generic struct with map field ===")
-	let mapper: Mapper | $.VarRef<Mapper> | null = (NewMapper({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, K: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }, V: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }}) as Mapper | $.VarRef<Mapper> | null)
-	Mapper.prototype.Put.call(mapper, {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, K: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }, V: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }}, "answer", 42)
-	let __goscriptTuple2: any = Mapper.prototype.Get.call(mapper, {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, K: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }, V: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }}, "answer")
+	let mapper: Mapper | $.VarRef<Mapper> | null = (NewMapper(__goscriptStatic4()) as Mapper | $.VarRef<Mapper> | null)
+	Mapper.prototype.Put.call(mapper, __goscriptStatic4(), "answer", 42)
+	let __goscriptTuple2: any = Mapper.prototype.Get.call(mapper, __goscriptStatic4(), "answer")
 	let answer = (__goscriptTuple2[0] as number)
 	let found = __goscriptTuple2[1]
 	await $.println("mapper:", answer, found)
 
 	await $.println("=== Function instantiation ===")
-	let applyInt: ((value: number, fn: ((_p0: number) => number | globalThis.Promise<number>) | null) => number | globalThis.Promise<number>) | null = $.functionValue(async (value: any, fn: ((_p0: any) => any | globalThis.Promise<any>) | null): globalThis.Promise<any> => await Apply({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }}, value, fn), ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Interface, methods: [] }, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Interface, methods: [] }], results: [{ kind: $.TypeKind.Interface, methods: [] }] } as $.FunctionTypeInfo)], results: [{ kind: $.TypeKind.Interface, methods: [] }] } as $.FunctionTypeInfo))
+	let applyInt: ((value: number, fn: ((_p0: number) => number | globalThis.Promise<number>) | null) => number | globalThis.Promise<number>) | null = $.functionValue(async (value: any, fn: ((_p0: any) => any | globalThis.Promise<any>) | null): globalThis.Promise<any> => await Apply(__goscriptStatic0(), value, fn), ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Interface, methods: [] }, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Interface, methods: [] }], results: [{ kind: $.TypeKind.Interface, methods: [] }] } as $.FunctionTypeInfo)], results: [{ kind: $.TypeKind.Interface, methods: [] }] } as $.FunctionTypeInfo))
 	await $.println("apply:", await applyInt!(21, $.functionValue((n: number): number => {
 		return n * 2
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))))
 
 	await $.println("=== Generic pair method ===")
 	let pair = $.markAsStructValue(new Pair({First: "left", Second: "right"}))
-	let swapped = ($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(pair)).Swap({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }}))) as Pair)
+	let swapped = ($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(pair)).Swap(__goscriptStatic2()))) as Pair)
 	await $.println("pair:", swapped.First, swapped.Second)
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }})
+}
+
+var __goscriptStatic1$value: any
+function __goscriptStatic1(): any {
+	return __goscriptStatic1$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int", "main.Score"), zero: () => 0 }})
+}
+
+var __goscriptStatic2$value: any
+function __goscriptStatic2(): any {
+	return __goscriptStatic2$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }})
+}
+
+var __goscriptStatic3$value: any
+function __goscriptStatic3(): any {
+	return __goscriptStatic3$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.pointerType("main.Item"), zero: () => null, methods: {Clone: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Clone(...$.stripGenericTypeArgs(args))} }})
+}
+
+var __goscriptStatic4$value: any
+function __goscriptStatic4(): any {
+	return __goscriptStatic4$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, K: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }, V: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }})
 }
 
 if ($.isMainScript(import.meta)) {

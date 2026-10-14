@@ -61,11 +61,16 @@ export async function main(): globalThis.Promise<void> {
 
 	// Named slices spread into variadic parameters of their element type.
 	let st: $.VarRef<Stack> = $.varRef(($.makeSlice<Text>(0) as Stack))
-	Stack_Push(st, {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("string"), "main.Text"), zero: () => null }}, $.arrayToSlice<Text>([($.arrayToSlice<string>(["a", "b"]) as Text), ($.arrayToSlice<string>(["c"]) as Text)]))
+	Stack_Push(st, __goscriptStatic0(), $.arrayToSlice<Text>([($.arrayToSlice<string>(["a", "b"]) as Text), ($.arrayToSlice<string>(["c"]) as Text)]))
 	await $.println("join:", join((st.value as $.Slice<Text>)))
 
 	let names: Names = ($.arrayToSlice<string>(["x", "y", "z"]) as Names)
 	await $.println("count:", count((names as $.Slice<string>)))
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("string"), "main.Text"), zero: () => null }})
 }
 
 if ($.isMainScript(import.meta)) {

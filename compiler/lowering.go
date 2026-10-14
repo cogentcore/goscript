@@ -545,6 +545,7 @@ func (o *LoweringOwner) lowerFile(req lowerFileRequest) (*loweredFile, []Diagnos
 		protobufTSAdapter: protobufTypeScriptAdapter,
 		trimTypeInfo:      trimTypeInfo,
 		displayRoot:       displayRoot,
+		statics:           &staticPool{names: make(map[string]string)},
 	}
 	appendDecls := func(decls []loweredDecl) {
 		for _, decl := range decls {
@@ -596,7 +597,103 @@ func (o *LoweringOwner) lowerFile(req lowerFileRequest) (*loweredFile, []Diagnos
 			async: decl.function.async,
 		})
 	}
+	for _, static := range ctx.statics.decls {
+		loweredFile.decls = append(loweredFile.decls, loweredDecl{code: static})
+	}
 	return loweredFile, diagnostics
+}
+
+// typeIsHoistable reports whether the runtime descriptors of the type can be
+// hoisted to the top level of the file (see hoistStatic): it has no type
+// parameters and refers to no named types declared inside a function.
+func typeIsHoistable(typ types.Type) bool {
+	return !typeContainsTypeParam(typ) && !typeContainsLocalNamed(typ, make(map[types.Type]bool))
+}
+
+// typeContainsLocalNamed reports whether the type refers to a named type
+// declared inside a function.
+func typeContainsLocalNamed(typ types.Type, seen map[types.Type]bool) bool {
+	if typ == nil || seen[typ] {
+		return false
+	}
+	seen[typ] = true
+	switch t := types.Unalias(typ).(type) {
+	case *types.Named:
+		obj := t.Obj()
+		if obj != nil && obj.Pkg() != nil && obj.Parent() != obj.Pkg().Scope() {
+			return true
+		}
+		if args := t.TypeArgs(); args != nil {
+			for arg := range args.Types() {
+				if typeContainsLocalNamed(arg, seen) {
+					return true
+				}
+			}
+		}
+		return typeContainsLocalNamed(t.Underlying(), seen)
+	case *types.Pointer:
+		return typeContainsLocalNamed(t.Elem(), seen)
+	case *types.Slice:
+		return typeContainsLocalNamed(t.Elem(), seen)
+	case *types.Array:
+		return typeContainsLocalNamed(t.Elem(), seen)
+	case *types.Chan:
+		return typeContainsLocalNamed(t.Elem(), seen)
+	case *types.Map:
+		return typeContainsLocalNamed(t.Key(), seen) || typeContainsLocalNamed(t.Elem(), seen)
+	case *types.Struct:
+		for field := range t.Fields() {
+			if typeContainsLocalNamed(field.Type(), seen) {
+				return true
+			}
+		}
+	case *types.Signature:
+		for v := range t.Params().Variables() {
+			if typeContainsLocalNamed(v.Type(), seen) {
+				return true
+			}
+		}
+		for v := range t.Results().Variables() {
+			if typeContainsLocalNamed(v.Type(), seen) {
+				return true
+			}
+		}
+	case *types.Interface:
+		for method := range t.Methods() {
+			if typeContainsLocalNamed(method.Type(), seen) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+// staticPool holds the static expressions hoisted out of the code of a file,
+// each evaluated once, the first time it is used, by a getter function.
+type staticPool struct {
+	// names maps each hoisted expression to the name of its getter.
+	names map[string]string
+	// decls are the declarations of the getters.
+	decls []string
+}
+
+// hoistStatic returns a call of a getter that evaluates the given expression
+// once, the first time it is called, for an expression whose value does not
+// depend on where it is evaluated, such as the method table of a type, which
+// would otherwise be created each time the code runs. The value is computed
+// lazily so that the declarations it refers to are initialized by then.
+func (o *LoweringOwner) hoistStatic(ctx lowerFileContext, expr string) string {
+	if ctx.statics == nil {
+		return expr
+	}
+	name, ok := ctx.statics.names[expr]
+	if !ok {
+		name = "__goscriptStatic" + strconv.Itoa(len(ctx.statics.decls))
+		ctx.statics.names[expr] = name
+		ctx.statics.decls = append(ctx.statics.decls,
+			"var "+name+"$value: any\nfunction "+name+"(): any {\n\treturn "+name+"$value ??= ("+expr+")\n}")
+	}
+	return name + "()"
 }
 
 func (o *LoweringOwner) addGeneratedTypeImports(
@@ -1560,6 +1657,9 @@ type lowerFileContext struct {
 	topLevel                      bool
 	protobufTSAdapter             bool
 	trimTypeInfo                  bool
+	// statics holds the static expressions of the file hoisted out of the
+	// code that would evaluate them each time (see hoistStatic).
+	statics *staticPool
 
 	// rangeLabels maps visible labels to their statements in the current yield.
 	rangeLabels map[string]ast.Stmt
@@ -12760,10 +12860,18 @@ func (o *LoweringOwner) lowerNamedValueInterfaceWrapper(
 	if signatures == "" {
 		return ""
 	}
+	typeInfo := o.runtimeTypeInfoExpr(sourceType)
+	// Without type parameters, the method table, type info and method
+	// signatures of the type are the same each time, so they are created once.
+	if typeIsHoistable(sourceType) && typeIsHoistable(targetType) {
+		methods = o.hoistStatic(ctx, methods)
+		typeInfo = o.hoistStatic(ctx, typeInfo)
+		signatures = o.hoistStatic(ctx, signatures)
+	}
 	return o.runtimeOwner.QualifiedHelper(RuntimeHelperNamedValueInterfaceValue) +
 		"<" + o.tsTypeFor(ctx, targetType) + ">(" + value + ", " +
 		strconv.Quote(goRuntimeTypeString(sourceType)) + ", " + methods + ", " +
-		o.runtimeTypeInfoExpr(sourceType) + ", " + signatures + ")"
+		typeInfo + ", " + signatures + ")"
 }
 
 // lowerNamedBasicInterfaceBox boxes a value of a named basic type, or of a
@@ -13908,8 +14016,15 @@ func (o *LoweringOwner) receiverTypeArgsLiteral(
 			continue
 		}
 		entries := make([]string, 0, len(params))
+		static := true
 		for idx, param := range params {
+			if !typeIsHoistable(receiver.TypeArgs().At(idx)) {
+				static = false
+			}
 			entries = append(entries, param.Obj().Name()+": "+o.genericTypeDescriptorExprWithSeen(ctx, receiver.TypeArgs().At(idx), seen))
+		}
+		if static {
+			return o.hoistStatic(ctx, o.genericTypeArgsLiteral(entries))
 		}
 		return o.genericTypeArgsLiteral(entries)
 	}
@@ -14785,6 +14900,7 @@ func (o *LoweringOwner) genericTypeArgsExpr(ctx lowerFileContext, callee ast.Exp
 	typeParams := signature.TypeParams()
 	instanceArgs := instantiatedTypeArgs(ctx, callee)
 	entries := make([]string, 0, typeParams.Len())
+	static := true
 	for idx := range typeParams.Len() {
 		var typ types.Type
 		if idx < len(typeArgExprs) {
@@ -14795,10 +14911,18 @@ func (o *LoweringOwner) genericTypeArgsExpr(ctx lowerFileContext, callee ast.Exp
 		if typ == nil {
 			continue
 		}
+		if !typeIsHoistable(typ) {
+			static = false
+		}
 		entries = append(entries, typeParams.At(idx).Obj().Name()+": "+o.genericTypeDescriptorExpr(ctx, typ))
 	}
 	if len(entries) == 0 {
 		return "undefined"
+	}
+	// Type arguments without type parameters are the same at each call, so
+	// they are created once.
+	if static {
+		return o.hoistStatic(ctx, o.genericTypeArgsLiteral(entries))
 	}
 	return o.genericTypeArgsLiteral(entries)
 }

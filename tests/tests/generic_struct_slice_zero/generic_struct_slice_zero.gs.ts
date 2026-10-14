@@ -79,9 +79,14 @@ export class arena {
 
 export async function main(): globalThis.Promise<void> {
 	let a: $.VarRef<arena> = $.varRef($.markAsStructValue(new arena()))
-	let value: item | $.VarRef<item> | null = (a.value.New({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.item", zero: () => $.markAsStructValue(new item()) }}) as item | $.VarRef<item> | null)
+	let value: item | $.VarRef<item> | null = (a.value.New(__goscriptStatic0()) as item | $.VarRef<item> | null)
 	$.pointerValue<item>(value).Text = "ok"
 	await $.println($.pointerValue<item>(value).Text)
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.item", zero: () => $.markAsStructValue(new item()) }})
 }
 
 if ($.isMainScript(import.meta)) {

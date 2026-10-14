@@ -116,22 +116,42 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("nilErr == nil:", nilErr == null)
 
 	let typedErr: customErr | $.VarRef<customErr> | null = new customErr({msg: "typed error"})
-	let __goscriptTuple0: any = errors.AsType({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, E: { type: /* @__PURE__ */ $.pointerType("main.customErr"), zero: () => null, methods: {Error: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Error(...$.stripGenericTypeArgs(args))} }}, $.interfaceValue<$.GoError>($.markAsStructValue(new wrappedErr({err: $.interfaceValue<$.GoError>(typedErr, "*main.customErr", /* @__PURE__ */ $.pointerType("main.customErr"))})), "main.wrappedErr", "main.wrappedErr")!)
+	let __goscriptTuple0: any = errors.AsType(__goscriptStatic0(), $.interfaceValue<$.GoError>($.markAsStructValue(new wrappedErr({err: $.interfaceValue<$.GoError>(typedErr, "*main.customErr", /* @__PURE__ */ $.pointerType("main.customErr"))})), "main.wrappedErr", "main.wrappedErr")!)
 	let matched: customErr | $.VarRef<customErr> | null = (__goscriptTuple0[0] as customErr | $.VarRef<customErr> | null)
 	let ok = __goscriptTuple0[1]
 	await $.println("AsType matched:", ok)
 	if (ok) {
 		await $.println("AsType message:", $.pointerValue<customErr>(matched).msg)
 	}
-	let __goscriptTuple1: any = errors.AsType({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, E: { type: /* @__PURE__ */ $.pointerType("main.customErr"), zero: () => null, methods: {Error: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Error(...$.stripGenericTypeArgs(args))} }}, $.pointerValueOrNil(err1)!)
+	let __goscriptTuple1: any = errors.AsType(__goscriptStatic0(), $.pointerValueOrNil(err1)!)
 	ok = __goscriptTuple1[1]
 	await $.println("AsType missing:", ok)
 
 	let scalarTarget: $.VarRef<scalarErr> = $.varRef(0)
-	await $.println("As scalar missing:", errors.As($.pointerValueOrNil(err1)!, $.namedValueInterfaceValue<any>(scalarTarget, "*main.scalarErr", {Error: (receiver: any, ...args: any[]) => (scalarErr_Error as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))}, /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("uint8", "main.scalarErr")), [$.methodSignature("Error", [], [/* @__PURE__ */ $.basicType("string")])])), $.uint(scalarTarget.value, 8))
-	await $.println("As scalar matched:", errors.As($.namedValueInterfaceValue<$.GoError>(42, "main.scalarErr", {"Error": scalarErr_Error}, /* @__PURE__ */ $.basicType("uint8", "main.scalarErr"))!, $.namedValueInterfaceValue<any>(scalarTarget, "*main.scalarErr", {Error: (receiver: any, ...args: any[]) => (scalarErr_Error as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))}, /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("uint8", "main.scalarErr")), [$.methodSignature("Error", [], [/* @__PURE__ */ $.basicType("string")])])), $.uint(scalarTarget.value, 8))
+	await $.println("As scalar missing:", errors.As($.pointerValueOrNil(err1)!, $.namedValueInterfaceValue<any>(scalarTarget, "*main.scalarErr", __goscriptStatic1(), __goscriptStatic2(), __goscriptStatic3())), $.uint(scalarTarget.value, 8))
+	await $.println("As scalar matched:", errors.As($.namedValueInterfaceValue<$.GoError>(42, "main.scalarErr", {"Error": scalarErr_Error}, /* @__PURE__ */ $.basicType("uint8", "main.scalarErr"))!, $.namedValueInterfaceValue<any>(scalarTarget, "*main.scalarErr", __goscriptStatic1(), __goscriptStatic2(), __goscriptStatic3())), $.uint(scalarTarget.value, 8))
 
 	await $.println("test finished")
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, E: { type: /* @__PURE__ */ $.pointerType("main.customErr"), zero: () => null, methods: {Error: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Error(...$.stripGenericTypeArgs(args))} }})
+}
+
+var __goscriptStatic1$value: any
+function __goscriptStatic1(): any {
+	return __goscriptStatic1$value ??= ({Error: (receiver: any, ...args: any[]) => (scalarErr_Error as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))})
+}
+
+var __goscriptStatic2$value: any
+function __goscriptStatic2(): any {
+	return __goscriptStatic2$value ??= (/* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("uint8", "main.scalarErr")))
+}
+
+var __goscriptStatic3$value: any
+function __goscriptStatic3(): any {
+	return __goscriptStatic3$value ??= ([$.methodSignature("Error", [], [/* @__PURE__ */ $.basicType("string")])])
 }
 
 if ($.isMainScript(import.meta)) {

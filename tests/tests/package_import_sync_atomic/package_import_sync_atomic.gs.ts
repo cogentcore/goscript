@@ -170,6 +170,21 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("atomic test finished")
 }
 
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }})
+}
+
+var __goscriptStatic1$value: any
+function __goscriptStatic1(): any {
+	return __goscriptStatic1$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), zero: () => null }})
+}
+
+var __goscriptStatic2$value: any
+function __goscriptStatic2(): any {
+	return __goscriptStatic2$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.pointerNode", zero: () => $.markAsStructValue(new pointerNode()) }})
+}
+
 if ($.isMainScript(import.meta)) {
 	await main()
 }

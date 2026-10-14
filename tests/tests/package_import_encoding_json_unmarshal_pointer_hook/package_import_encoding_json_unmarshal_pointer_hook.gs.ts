@@ -138,7 +138,7 @@ export function Maps_CopyFrom(km: $.VarRef<Maps> | null, cp: Maps): $.GoError {
 	if (err != null) {
 		return err
 	}
-	return json.Unmarshal(b, $.namedValueInterfaceValue<any>(km, "*main.Maps", {CopyFrom: (receiver: any, ...args: any[]) => (Maps_CopyFrom as any)(receiver, ...$.stripGenericTypeArgs(args))}, /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.sliceType("main.MapItem", "main.Maps")), [$.methodSignature("CopyFrom", [["cp", /* @__PURE__ */ $.sliceType("main.MapItem", "main.Maps")]], ["error"])]))
+	return json.Unmarshal(b, $.namedValueInterfaceValue<any>(km, "*main.Maps", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()))
 }
 
 export function Names_Len(n: $.VarRef<Names> | null): number {
@@ -172,8 +172,38 @@ export async function main(): globalThis.Promise<void> {
 	await fmt.Println("copy:", err == null, $.basicInterfaceValue($.len((maps.value as Maps)), "int"), $.arrayIndex(maps.value!, 0).Name, $.basicInterfaceValue($.mapGet<string, number, number>($.arrayIndex(maps.value!, 0).Map, "x", 0)[0], "int"), $.arrayIndex(maps.value!, 1).Name)
 
 	let names: $.VarRef<Names> = $.varRef(null! as Names)
-	err = json.Unmarshal(new Uint8Array([123, 34, 112, 34, 58, 49, 44, 34, 113, 34, 58, 50, 125]), $.namedValueInterfaceValue<any>(names, "*main.Names", {Len: (receiver: any, ...args: any[]) => (Names_Len as any)(receiver, ...$.stripGenericTypeArgs(args))}, /* @__PURE__ */ $.pointerType("main.Names"), [$.methodSignature("Len", [], [/* @__PURE__ */ $.basicType("int")])]))
+	err = json.Unmarshal(new Uint8Array([123, 34, 112, 34, 58, 49, 44, 34, 113, 34, 58, 50, 125]), $.namedValueInterfaceValue<any>(names, "*main.Names", __goscriptStatic3(), __goscriptStatic4(), __goscriptStatic5()))
 	await fmt.Println("names:", err == null, $.basicInterfaceValue(Names_Len(names), "int"), $.basicInterfaceValue($.mapGet<string, number, number>(names.value, "q", 0)[0], "int"))
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= ({CopyFrom: (receiver: any, ...args: any[]) => (Maps_CopyFrom as any)(receiver, ...$.stripGenericTypeArgs(args))})
+}
+
+var __goscriptStatic1$value: any
+function __goscriptStatic1(): any {
+	return __goscriptStatic1$value ??= (/* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.sliceType("main.MapItem", "main.Maps")))
+}
+
+var __goscriptStatic2$value: any
+function __goscriptStatic2(): any {
+	return __goscriptStatic2$value ??= ([$.methodSignature("CopyFrom", [["cp", /* @__PURE__ */ $.sliceType("main.MapItem", "main.Maps")]], ["error"])])
+}
+
+var __goscriptStatic3$value: any
+function __goscriptStatic3(): any {
+	return __goscriptStatic3$value ??= ({Len: (receiver: any, ...args: any[]) => (Names_Len as any)(receiver, ...$.stripGenericTypeArgs(args))})
+}
+
+var __goscriptStatic4$value: any
+function __goscriptStatic4(): any {
+	return __goscriptStatic4$value ??= (/* @__PURE__ */ $.pointerType("main.Names"))
+}
+
+var __goscriptStatic5$value: any
+function __goscriptStatic5(): any {
+	return __goscriptStatic5$value ??= ([$.methodSignature("Len", [], [/* @__PURE__ */ $.basicType("int")])])
 }
 
 if ($.isMainScript(import.meta)) {

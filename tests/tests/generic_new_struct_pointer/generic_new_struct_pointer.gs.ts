@@ -122,9 +122,9 @@ export function load(__typeArgs: $.GenericTypeArgs | undefined, p: any): any {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let n = asNode({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.Widget", zero: () => $.markAsStructValue(new Widget()) }})
+	let n = asNode(__goscriptStatic0())
 	await $.pointerValue<Exclude<Node, null>>(n).SetName("text")
-	await initAs({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.Widget", zero: () => $.markAsStructValue(new Widget()) }}, n, $.functionValue((w: Widget | $.VarRef<Widget> | null): void => {
+	await initAs(__goscriptStatic0(), n, $.functionValue((w: Widget | $.VarRef<Widget> | null): void => {
 		$.pointerValue<Widget>(w).Text = "hello"
 		$.pointerValue<Widget>(w).Base.inits++
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.pointerType("main.Widget")], results: [] } as $.FunctionTypeInfo)))
@@ -132,19 +132,29 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("name:", $.pointerValue<Widget>(w).Base.Name(), "text:", $.pointerValue<Widget>(w).Text, "inits:", $.pointerValue<Widget>(w).Base.inits)
 	await $.println("same:", $.comparableEqual($.interfaceValue(w, "*main.Widget", /* @__PURE__ */ $.pointerType("main.Widget")), (n as any)))
 
-	let p: Widget | $.VarRef<Widget> | null = (newNode({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.Widget", zero: () => $.markAsStructValue(new Widget()) }}) as Widget | $.VarRef<Widget> | null)
-	store({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.Widget", zero: () => $.markAsStructValue(new Widget()) }}, p, $.markAsStructValue(new Widget({Text: "stored"})))
-	await $.println("stored:", $.pointerValue<Widget>(p).Text, load({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.Widget", zero: () => $.markAsStructValue(new Widget()) }}, p).Text)
+	let p: Widget | $.VarRef<Widget> | null = (newNode(__goscriptStatic0()) as Widget | $.VarRef<Widget> | null)
+	store(__goscriptStatic0(), p, $.markAsStructValue(new Widget({Text: "stored"})))
+	await $.println("stored:", $.pointerValue<Widget>(p).Text, load(__goscriptStatic0(), p).Text)
 
-	let q: Widget | $.VarRef<Widget> | null = (newNode({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.Widget", zero: () => $.markAsStructValue(new Widget()) }}) as Widget | $.VarRef<Widget> | null)
-	let v = ($.markAsStructValue($.cloneStructValue(load({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.Widget", zero: () => $.markAsStructValue(new Widget()) }}, q))) as Widget)
+	let q: Widget | $.VarRef<Widget> | null = (newNode(__goscriptStatic0()) as Widget | $.VarRef<Widget> | null)
+	let v = ($.markAsStructValue($.cloneStructValue(load(__goscriptStatic0(), q))) as Widget)
 	v.Text = "copy"
 	await $.println("copy is independent:", $.stringEqual($.pointerValue<Widget>(q).Text, ""), v.Text)
 
-	let ip = (newNode({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }}) as $.VarRef<number> | null)
-	store({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }}, ip, 7)
+	let ip = (newNode(__goscriptStatic1()) as $.VarRef<number> | null)
+	store(__goscriptStatic1(), ip, 7)
 	ip!.value = ip!.value + (1)
-	await $.println("int:", $.pointerValue<number>(ip), load({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }}, ip))
+	await $.println("int:", $.pointerValue<number>(ip), load(__goscriptStatic1(), ip))
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.Widget", zero: () => $.markAsStructValue(new Widget()) }})
+}
+
+var __goscriptStatic1$value: any
+function __goscriptStatic1(): any {
+	return __goscriptStatic1$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }})
 }
 
 if ($.isMainScript(import.meta)) {

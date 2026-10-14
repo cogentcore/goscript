@@ -115,7 +115,7 @@ export async function countFlags(__typeArgs: $.GenericTypeArgs | undefined, __go
 }
 
 export async function main(): globalThis.Promise<void> {
-	let __goscriptTuple0: any = await decodeLocalPairing({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, M: { type: /* @__PURE__ */ $.pointerType("main.pairingOffer"), zero: () => null, methods: {MarshalVT: (receiver: any, ...args: any[]) => $.pointerValue(receiver).MarshalVT(...$.stripGenericTypeArgs(args)), UnmarshalVT: (receiver: any, ...args: any[]) => $.pointerValue(receiver).UnmarshalVT(...$.stripGenericTypeArgs(args))} }, T: { type: "main.pairingOffer", zero: () => $.markAsStructValue(new pairingOffer()) }}, new Uint8Array([104, 105]))
+	let __goscriptTuple0: any = await decodeLocalPairing(__goscriptStatic0(), new Uint8Array([104, 105]))
 	let msg = (__goscriptTuple0[0] as pairingOffer)
 	let err = __goscriptTuple0[1]
 	if (err != null) {
@@ -124,7 +124,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 	await $.println(msg.Note)
 
-	let __goscriptTuple1: any = await encodeLocalPairing({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, M: { type: /* @__PURE__ */ $.pointerType("main.pairingOffer"), zero: () => null, methods: {MarshalVT: (receiver: any, ...args: any[]) => $.pointerValue(receiver).MarshalVT(...$.stripGenericTypeArgs(args)), UnmarshalVT: (receiver: any, ...args: any[]) => $.pointerValue(receiver).UnmarshalVT(...$.stripGenericTypeArgs(args))} }, T: { type: "main.pairingOffer", zero: () => $.markAsStructValue(new pairingOffer()) }}, new pairingOffer({Note: "note"}))
+	let __goscriptTuple1: any = await encodeLocalPairing(__goscriptStatic0(), new pairingOffer({Note: "note"}))
 	let encoded: $.Slice<number> = __goscriptTuple1[0]
 	err = __goscriptTuple1[1]
 	if (err != null) {
@@ -133,15 +133,40 @@ export async function main(): globalThis.Promise<void> {
 	}
 	await $.println("encoded:", $.bytesToString(encoded))
 
-	await $.println("count:", await countFlags({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int64", "main.flag"), zero: () => 0n }}, 3n, $.arrayToSlice<bigint>([1n, 2n, 4n])))
+	await $.println("count:", await countFlags(__goscriptStatic1(), 3n, $.arrayToSlice<bigint>([1n, 2n, 4n])))
 	let fl: $.VarRef<flag> = $.varRef(1n)
 	{
-		let [s, ok] = $.typeAssertTuple<setter | null>($.namedValueInterfaceValue<any>(fl, "*main.flag", {Has: (receiver: any, ...args: any[]) => (flag_Has as any)(receiver, ...$.stripGenericTypeArgs(args)), Set: (receiver: any, ...args: any[]) => (flag_Set as any)(receiver, ...$.stripGenericTypeArgs(args))}, /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int64", "main.flag")), [$.methodSignature("Has", [["v", /* @__PURE__ */ $.basicType("int64")]], [/* @__PURE__ */ $.basicType("bool")]), $.methodSignature("Set", [["v", /* @__PURE__ */ $.basicType("int64")]])]), "main.setter")
+		let [s, ok] = $.typeAssertTuple<setter | null>($.namedValueInterfaceValue<any>(fl, "*main.flag", __goscriptStatic2(), __goscriptStatic3(), __goscriptStatic4()), "main.setter")
 		if (ok) {
 			await $.pointerValue<Exclude<setter, null>>(s).Set(2n)
 		}
 	}
 	await $.println("flag:", $.int64(fl.value))
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, M: { type: /* @__PURE__ */ $.pointerType("main.pairingOffer"), zero: () => null, methods: {MarshalVT: (receiver: any, ...args: any[]) => $.pointerValue(receiver).MarshalVT(...$.stripGenericTypeArgs(args)), UnmarshalVT: (receiver: any, ...args: any[]) => $.pointerValue(receiver).UnmarshalVT(...$.stripGenericTypeArgs(args))} }, T: { type: "main.pairingOffer", zero: () => $.markAsStructValue(new pairingOffer()) }})
+}
+
+var __goscriptStatic1$value: any
+function __goscriptStatic1(): any {
+	return __goscriptStatic1$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int64", "main.flag"), zero: () => 0n }})
+}
+
+var __goscriptStatic2$value: any
+function __goscriptStatic2(): any {
+	return __goscriptStatic2$value ??= ({Has: (receiver: any, ...args: any[]) => (flag_Has as any)(receiver, ...$.stripGenericTypeArgs(args)), Set: (receiver: any, ...args: any[]) => (flag_Set as any)(receiver, ...$.stripGenericTypeArgs(args))})
+}
+
+var __goscriptStatic3$value: any
+function __goscriptStatic3(): any {
+	return __goscriptStatic3$value ??= (/* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int64", "main.flag")))
+}
+
+var __goscriptStatic4$value: any
+function __goscriptStatic4(): any {
+	return __goscriptStatic4$value ??= ([$.methodSignature("Has", [["v", /* @__PURE__ */ $.basicType("int64")]], [/* @__PURE__ */ $.basicType("bool")]), $.methodSignature("Set", [["v", /* @__PURE__ */ $.basicType("int64")]])])
 }
 
 if ($.isMainScript(import.meta)) {

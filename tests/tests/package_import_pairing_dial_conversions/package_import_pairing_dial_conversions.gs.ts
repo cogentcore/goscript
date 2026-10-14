@@ -96,13 +96,28 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("stream", written, err == null, await $.pointerValue<Exclude<io.ReadWriteCloser, null>>(stream).Close() == null)
 
 	let keys: $.Channel<crypto.PublicKey | null> | null = $.makeChannel<crypto.PublicKey | null>(1, null! as crypto.PublicKey | null, "both")
-	await $.chanSend(keys, $.namedValueInterfaceValue<crypto.PublicKey | null>(new Uint8Array([1, 2, 3]) as $.Slice<number>, "ed25519.PublicKey", {Equal: (receiver: any, ...args: any[]) => (ed25519.PublicKey_Equal as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"), "ed25519.PublicKey"), [$.methodSignature("Equal", [["x", "crypto.PublicKey"]], [/* @__PURE__ */ $.basicType("bool")])]))
+	await $.chanSend(keys, $.namedValueInterfaceValue<crypto.PublicKey | null>(new Uint8Array([1, 2, 3]) as $.Slice<number>, "ed25519.PublicKey", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()))
 	let key: ed25519.PublicKey = ($.mustTypeAssert<ed25519.PublicKey>((await $.chanRecv(keys)), /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"), "ed25519.PublicKey")) as ed25519.PublicKey)
 	await $.println("key", $.len((key as ed25519.PublicKey)), $.uint($.arrayIndex(key!, 0), 8))
 
 	let target: $.VarRef<recreateError | $.VarRef<recreateError> | null> = $.varRef(null! as recreateError | $.VarRef<recreateError> | null)
 	let matched = errors.As($.pointerValueOrNil($.interfaceValue<$.GoError>(new recreateError({next: 7n}), "*main.recreateError", /* @__PURE__ */ $.pointerType("main.recreateError")))!, $.interfaceValue(target, "**main.recreateError", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.pointerType("main.recreateError"))))
 	await $.println("error", matched, $.pointerValue<recreateError>(target.value).next)
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= ({Equal: (receiver: any, ...args: any[]) => (ed25519.PublicKey_Equal as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))})
+}
+
+var __goscriptStatic1$value: any
+function __goscriptStatic1(): any {
+	return __goscriptStatic1$value ??= (/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"), "ed25519.PublicKey"))
+}
+
+var __goscriptStatic2$value: any
+function __goscriptStatic2(): any {
+	return __goscriptStatic2$value ??= ([$.methodSignature("Equal", [["x", "crypto.PublicKey"]], [/* @__PURE__ */ $.basicType("bool")])])
 }
 
 if ($.isMainScript(import.meta)) {
