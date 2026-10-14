@@ -4,7 +4,9 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export async function main(): globalThis.Promise<void> {
-	for (const [i, r] of $.rangeString("a¢€")) {
+	for (let __goscriptRunes0 = $.stringRunes("a¢€"); __goscriptRunes0.next(); ) {
+		const i = __goscriptRunes0.index
+		const r = __goscriptRunes0.rune
 		await $.println(i, r)
 	}
 }

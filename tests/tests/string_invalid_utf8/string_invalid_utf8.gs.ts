@@ -20,7 +20,9 @@ export async function main(): globalThis.Promise<void> {
 	await $.println($.stringLen(s), utf8.ValidString(s), utf8.RuneCountInString(s))
 
 	// range yields RuneError with width 1 for each invalid byte
-	for (const [i, r] of $.rangeString(s)) {
+	for (let __goscriptRunes0 = $.stringRunes(s); __goscriptRunes0.next(); ) {
+		const i = __goscriptRunes0.index
+		const r = __goscriptRunes0.rune
 		await $.println(i, r)
 	}
 
@@ -44,7 +46,8 @@ export async function main(): globalThis.Promise<void> {
 
 	// building from runes
 	let b: $.VarRef<strings.Builder> = $.varRef($.markAsStructValue(new strings.Builder()))
-	for (let [__rangeIndex, r] of $.rangeString(s)) {
+	for (let __goscriptRunes1 = $.stringRunes(s); __goscriptRunes1.next(); ) {
+		let r = __goscriptRunes1.rune
 		if (unicode.IsUpper(r)) {
 			r = unicode.ToLower(r)
 		}

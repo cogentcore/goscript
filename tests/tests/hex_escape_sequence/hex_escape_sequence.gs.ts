@@ -32,7 +32,8 @@ export async function main(): globalThis.Promise<void> {
 	// Escapes JavaScript lacks, and runes it must escape.
 	let s = "\x07\v\x00\x7f\u{10ffff}𐀀\u2028é"
 	await $.println("len:", $.stringLen(s))
-	for (const [__rangeIndex, r] of $.rangeString(s)) {
+	for (let __goscriptRunes0 = $.stringRunes(s); __goscriptRunes0.next(); ) {
+		const r = __goscriptRunes0.rune
 		await $.println("rune:", $.int(r))
 	}
 	let re: regexp.Regexp | $.VarRef<regexp.Regexp> | null = await regexp.MustCompile($.concatString(($.concatString("^", "[\u0080-\ud7ff\ue000-�𐀀-\u{10ffff}]")), "+$"))
