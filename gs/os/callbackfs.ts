@@ -9,6 +9,7 @@
 // completes asynchronously, which is why the os functions and File methods
 // that access files are async.
 
+import * as $ from '@goscript/builtin/index.js'
 import { getHostRuntime } from '@goscript/builtin/hostio.js'
 
 // CallbackFS is a filesystem with the callback API of Node.js, where each
@@ -71,15 +72,17 @@ export function callbackFSCall(
     )
   }
   return new Promise((resolve, reject) => {
+    // Strings, such as paths, are Go strings, which are converted to and
+    // from the JavaScript text of the filesystem.
     ;(fn as (...fnArgs: unknown[]) => void).call(
       cbfs,
-      ...args,
+      ...hostArgs(args),
       (err: unknown, ...results: unknown[]) => {
         if (err !== null && err !== undefined && err !== false) {
           reject(callbackErrorValue(err))
           return
         }
-        resolve(results[0])
+        resolve(goStringResult(results[0]))
       },
     )
   })
@@ -102,6 +105,28 @@ function callbackErrorValue(err: unknown): unknown {
   return new callbackFSError(String(err), '')
 }
 
+// hostArgs returns the arguments of a host filesystem function with each Go
+// string, such as a path, converted to JavaScript text.
+export function hostArgs(args: unknown[]): unknown[] {
+  return args.map((arg) => (typeof arg === 'string' ? $.jsString(arg) : arg))
+}
+
+// goStringResult returns the result of a host filesystem function with a
+// string, or each string of a list of them such as directory entry names,
+// converted from JavaScript text to a Go string.
+export function goStringResult(result: unknown): unknown {
+  if (typeof result === 'string') {
+    return $.goString(result)
+  }
+  if (
+    Array.isArray(result) &&
+    result.every((item) => typeof item === 'string')
+  ) {
+    return result.map((item) => $.goString(item))
+  }
+  return result
+}
+
 // callbackWorkingDir is the working directory set by callbackFSSetwd, or
 // null before it is set.
 let callbackWorkingDir: string | null = null
@@ -118,7 +143,7 @@ export function callbackFSGetwd(): string {
   if (typeof cwd === 'function') {
     const dir = (cwd as () => unknown)()
     if (typeof dir === 'string' && dir.startsWith('/')) {
-      return dir
+      return $.goString(dir)
     }
   }
   return '/'

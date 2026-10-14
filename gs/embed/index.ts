@@ -98,9 +98,15 @@ export class FS {
         : new embedFileInfo(childName, data.byteLength, 0o444)
       entries.set(childName, new embedDirEntry(info))
     }
-    return Array.from(entries.values()).sort((a, b) =>
-      a!.Name().localeCompare(b!.Name()),
-    )
+    return Array.from(entries.values()).sort((a, b) => {
+      const x = a!.Name()
+      const y = b!.Name()
+      return (
+        x < y ? -1
+        : x > y ? 1
+        : 0
+      )
+    })
   }
 
   private dirExists(name: string): boolean {

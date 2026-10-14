@@ -17,7 +17,7 @@ export async function ReadDir(name: string): Promise<[$.Slice<DirEntry>, $.GoErr
 	const entries = infos!
 		.map((info) => FileInfoToDirEntry(info))
 		.filter((entry): entry is DirEntry => entry !== null)
-	entries.sort((a, b) => (a?.Name() ?? "").localeCompare(b?.Name() ?? ""))
+	entries.sort((a, b) => { const x = a?.Name() ?? "", y = b?.Name() ?? ""; return x < y ? -1 : x > y ? 1 : 0 })
 	return [$.arrayToSlice(entries), null]
 }
 
