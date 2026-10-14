@@ -1,0 +1,151 @@
+// Generated file based on map_range_struct_key_copy.go
+// Updated when compliance tests are re-run, DO NOT EDIT!
+
+import * as $ from "@goscript/builtin/index.js"
+
+export class Pos {
+	public get Line(): number {
+		return this._fields.Line
+	}
+
+	public set Line(value: number) {
+		this._fields.Line = value
+	}
+
+	public get Char(): number {
+		return this._fields.Char
+	}
+
+	public set Char(value: number) {
+		this._fields.Char = value
+	}
+
+	public _fields: {
+		Line: number
+		Char: number
+	}
+
+	constructor(init?: Partial<{Line?: number, Char?: number}>) {
+		this._fields = {
+			Line: init?.Line ?? (0 as number),
+			Char: init?.Char ?? (0 as number)
+		}
+	}
+
+	public clone(): Pos {
+		return $.markAsStructValue(new Pos(this))
+	}
+
+	public __goscriptAssign(source: Pos): void {
+		const target = this._fields
+		const values = source._fields
+		target.Line = values.Line
+		target.Char = values.Char
+	}
+
+	static __typeInfo = $.registerStructType(
+		"main.Pos",
+		() => new Pos(),
+		() => [],
+		Pos,
+		() => [{ name: "Line", key: "Line", type: /* @__PURE__ */ $.basicType("int") }, { name: "Char", key: "Char", type: /* @__PURE__ */ $.basicType("int") }]
+	)
+}
+
+export class Key {
+	public get P(): Pos {
+		return this._fields.P
+	}
+
+	public set P(value: Pos) {
+		this._fields.P = value
+	}
+
+	public get Name(): string {
+		return this._fields.Name
+	}
+
+	public set Name(value: string) {
+		this._fields.Name = value
+	}
+
+	public _fields: {
+		P: Pos
+		Name: string
+	}
+
+	constructor(init?: Partial<{P?: Pos, Name?: string}>) {
+		this._fields = {
+			P: init?.P ? $.markAsStructValue($.cloneStructValue(init.P)) : $.markAsStructValue(new Pos()),
+			Name: init?.Name ?? ("" as string)
+		}
+	}
+
+	public clone(): Key {
+		return $.markAsStructValue(new Key(this))
+	}
+
+	public __goscriptAssign(source: Key): void {
+		const target = this._fields
+		const values = source._fields
+		$.assignStruct(target.P, values.P)
+		target.Name = values.Name
+	}
+
+	static __typeInfo = $.registerStructType(
+		"main.Key",
+		() => new Key(),
+		() => [],
+		Key,
+		() => [{ name: "P", key: "P", type: "main.Pos" }, { name: "Name", key: "Name", type: /* @__PURE__ */ $.basicType("string") }]
+	)
+}
+
+export async function main(): globalThis.Promise<void> {
+	let m: globalThis.Map<Pos, string> | null = $.makeMap<Pos, string>([[$.markAsStructValue(new Pos({Line: 1, Char: 2})), "a"]])
+	for (let [__goscriptRangeKey0, __rangeValue] of m?.entries() ?? []) {
+		let k = $.markAsStructValue($.cloneStructValue(__goscriptRangeKey0))
+		k.Line = 77
+	}
+	for (let [__goscriptRangeKey1, v] of m?.entries() ?? []) {
+		let k = $.markAsStructValue($.cloneStructValue(__goscriptRangeKey1))
+		k.Char = 88
+		await $.println(v, k.Line, k.Char)
+	}
+	await $.println($.len(m), $.mapGet<Pos, string, string>(m, $.markAsStructValue(new Pos({Line: 1, Char: 2})), "")[0])
+	for (const [k, __rangeValue] of m?.entries() ?? []) {
+		await $.println(k.Line, k.Char)
+	}
+
+	let n: globalThis.Map<Key, number> | null = $.makeMap<Key, number>([[$.markAsStructValue(new Key({P: $.markAsStructValue(new Pos({Line: 3, Char: 4})), Name: "x"})), 5]])
+	let saved: $.Slice<Key> = null! as $.Slice<Key>
+	for (let [__goscriptRangeKey2, __rangeValue] of n?.entries() ?? []) {
+		let k = $.markAsStructValue($.cloneStructValue(__goscriptRangeKey2))
+		saved = $.append(saved, $.markAsStructValue($.cloneStructValue(k)))
+		k.P.Line = 9
+	}
+	await $.println($.mapGet<Key, number, number>(n, $.markAsStructValue(new Key({P: $.markAsStructValue(new Pos({Line: 3, Char: 4})), Name: "x"})), 0)[0], $.arrayIndex(saved!, 0).P.Line)
+
+	let vals: globalThis.Map<string, Pos> | null = $.makeMap<string, Pos>([["v", $.markAsStructValue(new Pos({Line: 5, Char: 6}))]])
+	for (let [__rangeKey, __goscriptRangeValue0] of vals?.entries() ?? []) {
+		let v = $.markAsStructValue($.cloneStructValue(__goscriptRangeValue0))
+		v.Line = 66
+	}
+	let arrs: globalThis.Map<string, number[]> | null = $.makeMap<string, number[]>([["a", $.arrayValue([1, 2])]])
+	for (let [__rangeKey, __goscriptRangeValue1] of arrs?.entries() ?? []) {
+		let a = $.cloneArrayValue(__goscriptRangeValue1, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2))
+		a[0] = 9
+	}
+	await $.println($.mapGet<string, Pos, Pos>(vals, "v", $.markAsStructValue(new Pos()))[0].Line, $.arrayIndex($.mapGet<string, number[], number[]>(arrs, "a", $.arrayValue(globalThis.Array.from({ length: 2 }, () => 0)))[0], 0))
+
+	let last: Pos = $.markAsStructValue(new Pos())
+	for (let [__goscriptRangeKey3, __rangeValue] of m?.entries() ?? []) {
+		last = $.markAsStructValue($.cloneStructValue(__goscriptRangeKey3))
+		last.Line = 55
+	}
+	await $.println($.mapGet<Pos, string, string>(m, $.markAsStructValue(new Pos({Line: 1, Char: 2})), "")[0], last.Line)
+}
+
+if ($.isMainScript(import.meta)) {
+	await main()
+}
