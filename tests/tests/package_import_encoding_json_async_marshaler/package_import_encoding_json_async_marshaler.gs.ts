@@ -51,7 +51,8 @@ export class Image {
 		const im: Image | $.VarRef<Image> | null = this;
 		using __defer = new $.DisposableStack()
 		await mu.value.Lock()
-		__defer.defer(() => { mu.value.Unlock() })
+		const __goscriptDeferCallee0 = $.functionValue(((__receiver) => () => __receiver.Unlock())(mu.value), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "sync.(*Mutex).Unlock-fm")
+		__defer.defer(() => { __goscriptDeferCallee0() })
 		if ($.stringEqual($.pointerValue<Image>(im).Name, "bad")) {
 			return [null, errors.New("cannot marshal bad image")]
 		}
@@ -62,7 +63,8 @@ export class Image {
 		let im: Image | $.VarRef<Image> | null = this;
 		using __defer = new $.DisposableStack()
 		await mu.value.Lock()
-		__defer.defer(() => { mu.value.Unlock() })
+		const __goscriptDeferCallee1 = $.functionValue(((__receiver) => () => __receiver.Unlock())(mu.value), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "sync.(*Mutex).Unlock-fm")
+		__defer.defer(() => { __goscriptDeferCallee1() })
 		let m: $.VarRef<globalThis.Map<string, string> | null> = $.varRef(null! as globalThis.Map<string, string> | null)
 		{
 			let err = await json.Unmarshal(b, $.interfaceValue(m, "*map[string]string", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("string")))))

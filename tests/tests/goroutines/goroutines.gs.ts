@@ -84,7 +84,8 @@ export async function main(): globalThis.Promise<void> {
 
 	// Start 3 worker goroutines
 	for (let i = 0; i < 3; i++) {
-		queueMicrotask(async () => { await worker(i) })
+		const __goscriptDeferArg0 = i
+		queueMicrotask(async () => { await worker(__goscriptDeferArg0) })
 	}
 
 	// Start another worker goroutine

@@ -12,7 +12,8 @@ import "@goscript/time/index.js"
 export async function run(ctx: context.Context | null): globalThis.Promise<void> {
 	await using __defer = new $.AsyncDisposableStack()
 	let [sctx, sctxCancel] = context.WithCancel($.pointerValueOrNil(ctx)!)
-	__defer.defer(async () => { (__goscriptAwait = sctxCancel!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) })
+	const __goscriptDeferCallee0 = sctxCancel
+	__defer.defer(async () => { (__goscriptAwait = __goscriptDeferCallee0!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) })
 
 	let myCh: $.Channel<{}> | null = $.makeChannel<{}>(0, {}, "both")
 
@@ -59,7 +60,8 @@ export async function main(): globalThis.Promise<void> {
 	await run(ctx)
 
 	let [deadlineCtx, cancel] = context.WithDeadline($.pointerValueOrNil(ctx)!, $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(time.Now())).Add(3600000000000n))))
-	__defer.defer(async () => { (__goscriptAwait = cancel!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) })
+	const __goscriptDeferCallee1 = cancel
+	__defer.defer(async () => { (__goscriptAwait = __goscriptDeferCallee1!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) })
 	let [deadline, ok] = await $.pointerValue<Exclude<context.Context, null>>(deadlineCtx).Deadline()
 	await $.println("deadline ok:", ok)
 	await $.println("deadline zero:", $.markAsStructValue($.cloneStructValue(deadline)).IsZero())

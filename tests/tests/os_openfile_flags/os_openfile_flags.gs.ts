@@ -40,7 +40,8 @@ export async function main(): globalThis.Promise<void> {
 		await $.println("mkdirtemp error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		return
 	}
-	__defer.defer(async () => { await os.RemoveAll(dir) })
+	const __goscriptDeferArg0 = dir
+	__defer.defer(async () => { await os.RemoveAll(__goscriptDeferArg0) })
 	let name = filepath.Join(dir, "f.txt")
 
 	// Create truncates an existing file.

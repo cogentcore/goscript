@@ -1661,20 +1661,24 @@ type lowerFileContext struct {
 	protobufGeneratedSyncFunction bool
 	functionTypeDepth             int
 	deferState                    *loweredDeferState
-	rangeBranch                   *loweredRangeBranch
-	rangeBreak                    bool
-	rangeContinue                 bool
-	gotoLabels                    map[string]bool
-	forwardGotos                  map[string]bool
-	gotoStateLabels               map[string]bool
-	gotoStateVar                  string
-	gotoStateLoop                 string
-	functionScopedDecls           bool
-	loopLabel                     string
-	switchBreak                   bool
-	topLevel                      bool
-	protobufTSAdapter             bool
-	trimTypeInfo                  bool
+	// hoistArgsCall is the call of a defer or go statement, whose arguments
+	// are evaluated into the temporaries of hoistedArgs (see lowerCallArgs).
+	hoistArgsCall       *ast.CallExpr
+	hoistedArgs         *[]string
+	rangeBranch         *loweredRangeBranch
+	rangeBreak          bool
+	rangeContinue       bool
+	gotoLabels          map[string]bool
+	forwardGotos        map[string]bool
+	gotoStateLabels     map[string]bool
+	gotoStateVar        string
+	gotoStateLoop       string
+	functionScopedDecls bool
+	loopLabel           string
+	switchBreak         bool
+	topLevel            bool
+	protobufTSAdapter   bool
+	trimTypeInfo        bool
 	// statics holds the static expressions of the file hoisted out of the
 	// code that would evaluate them each time (see hoistStatic).
 	statics *staticPool
@@ -5547,34 +5551,120 @@ func (o *LoweringOwner) lowerSendStmt(ctx lowerFileContext, stmt *ast.SendStmt) 
 func (o *LoweringOwner) lowerGoStmt(ctx lowerFileContext, stmt *ast.GoStmt) (string, []Diagnostic) {
 	goCtx := ctx
 	goCtx.deferState = nil
-	call, diagnostics := o.lowerCallExpr(goCtx, stmt.Call)
-	return "queueMicrotask(async () => { " + call + " })", diagnostics
+	prelude, call, diagnostics := o.lowerStatementCall(goCtx, stmt.Call)
+	return prelude + "queueMicrotask(async () => { " + call + " })", diagnostics
+}
+
+// lowerStatementCall lowers the call of a defer or go statement, which
+// evaluates the function value and the arguments where the statement runs and
+// calls the function later. It returns the statements that evaluate them,
+// each ending in a newline, and the call that reads their results.
+func (o *LoweringOwner) lowerStatementCall(ctx lowerFileContext, call *ast.CallExpr) (string, string, []Diagnostic) {
+	var hoisted []string
+	argCtx := ctx
+	argCtx.hoistArgsCall = call
+	argCtx.hoistedArgs = &hoisted
+	if statementCallNeedsCalleeValue(ctx, call) {
+		callee, diagnostics := o.lowerExpr(ctx, call.Fun)
+		calleeTemp := ctx.tempName("DeferCallee")
+		hoisted = append(hoisted, "const "+calleeTemp+" = "+callee)
+		args, argDiagnostics := o.lowerCallArgs(argCtx, call, callTargetSignature(ctx, call.Fun))
+		diagnostics = append(diagnostics, argDiagnostics...)
+		text := o.lowerCallableExpr(ctx, call.Fun, calleeTemp) + "(" + strings.Join(args, ", ") + ")"
+		text = o.awaitCallIfNeeded(ctx, call, text)
+		return hoistedPrelude(hoisted), text, diagnostics
+	}
+	text, diagnostics := o.lowerCallExpr(argCtx, call)
+	return hoistedPrelude(hoisted), text, diagnostics
+}
+
+// fixedPointerReceiver reports whether the receiver x of the method selection
+// is a pointer whose value is the same wherever it is evaluated.
+func fixedPointerReceiver(ctx lowerFileContext, x ast.Expr, selection *types.Selection) bool {
+	signature, _ := selection.Obj().Type().(*types.Signature)
+	if signature == nil || signature.Recv() == nil {
+		return false
+	}
+	if _, ptr := signature.Recv().Type().(*types.Pointer); !ptr || len(selection.Index()) != 1 {
+		return false
+	}
+	ident, ok := ast.Unparen(x).(*ast.Ident)
+	if !ok {
+		return false
+	}
+	obj, ok := ctx.semPkg.source.TypesInfo.Uses[ident].(*types.Var)
+	if !ok || obj.Pkg() == nil || obj.Parent() == obj.Pkg().Scope() {
+		return false
+	}
+	if _, ptr := types.Unalias(obj.Type()).Underlying().(*types.Pointer); !ptr {
+		// The receiver is the variable's address.
+		return true
+	}
+	if ctx.model.needsVarRef[obj] {
+		return false
+	}
+	path, _ := astutil.PathEnclosingInterval(ctx.file, obj.Pos(), obj.Pos())
+	for _, node := range path {
+		if _, ok := node.(*ast.BlockStmt); ok {
+			return !isReassignedLocal(ctx, obj)
+		}
+		if _, ok := node.(*ast.FuncType); ok {
+			return false
+		}
+	}
+	return false
+}
+
+func hoistedPrelude(hoisted []string) string {
+	if len(hoisted) == 0 {
+		return ""
+	}
+	return strings.Join(hoisted, "\n") + "\n"
+}
+
+// statementCallNeedsCalleeValue reports whether the function that a defer or
+// go statement calls is a value to evaluate at the statement: a method, whose
+// receiver Go evaluates there, or a function variable. A declared function,
+// a builtin and a function literal are called directly.
+func statementCallNeedsCalleeValue(ctx lowerFileContext, call *ast.CallExpr) bool {
+	info := ctx.semPkg.source.TypesInfo
+	fun := ast.Unparen(call.Fun)
+	if index, ok := fun.(*ast.IndexExpr); ok {
+		fun = ast.Unparen(index.X)
+	} else if index, ok := fun.(*ast.IndexListExpr); ok {
+		fun = ast.Unparen(index.X)
+	}
+	switch typed := fun.(type) {
+	case *ast.FuncLit:
+		return false
+	case *ast.Ident:
+		switch info.Uses[typed].(type) {
+		case *types.Func, *types.Builtin, *types.TypeName:
+			return false
+		}
+		return true
+	case *ast.SelectorExpr:
+		if selection := info.Selections[typed]; selection != nil {
+			// A method is evaluated as a method value, which binds its
+			// receiver, unless its receiver is a pointer that cannot change:
+			// the address of a variable, or a local pointer variable that is
+			// never assigned again.
+			if selection.Kind() == types.MethodVal && fixedPointerReceiver(ctx, typed.X, selection) {
+				return false
+			}
+			return true
+		}
+		switch info.Uses[typed.Sel].(type) {
+		case *types.Func, *types.Builtin, *types.TypeName:
+			return false
+		}
+		return true
+	}
+	return true
 }
 
 func (o *LoweringOwner) lowerDeferStmt(ctx lowerFileContext, stmt *ast.DeferStmt) (string, []Diagnostic) {
-	if nestedCall, ok := stmt.Call.Fun.(*ast.CallExpr); ok {
-		callee, diagnostics := o.lowerCallExpr(ctx, nestedCall)
-		args, argDiagnostics := o.lowerCallArgs(ctx, stmt.Call, callTargetSignature(ctx, stmt.Call.Fun))
-		diagnostics = append(diagnostics, argDiagnostics...)
-		calleeTemp := ctx.tempName("DeferCallee")
-		call := o.lowerCallableExpr(ctx, stmt.Call.Fun, calleeTemp) + "(" + strings.Join(args, ", ") + ")"
-		call = o.awaitCallIfNeeded(ctx, stmt.Call, call)
-		async := strings.Contains(callee, "await ") || strings.Contains(call, "await ")
-		if ctx.deferState != nil {
-			ctx.deferState.used = true
-			if async {
-				ctx.deferState.async = true
-			}
-			if deferCallMayRecover(ctx, stmt.Call) {
-				ctx.deferState.recover = true
-			}
-		}
-		if async {
-			return "const " + calleeTemp + " = " + callee + "\n__defer.defer(async () => { " + call + " })", diagnostics
-		}
-		return "const " + calleeTemp + " = " + callee + "\n__defer.defer(() => { " + call + " })", diagnostics
-	}
-	call, diagnostics := o.lowerCallExpr(ctx, stmt.Call)
+	prelude, call, diagnostics := o.lowerStatementCall(ctx, stmt.Call)
 	async := strings.Contains(call, "await ")
 	if ctx.deferState != nil {
 		ctx.deferState.used = true
@@ -5586,9 +5676,9 @@ func (o *LoweringOwner) lowerDeferStmt(ctx lowerFileContext, stmt *ast.DeferStmt
 		}
 	}
 	if async {
-		return "__defer.defer(async () => { " + call + " })", diagnostics
+		return prelude + "__defer.defer(async () => { " + call + " })", diagnostics
 	}
-	return "__defer.defer(() => { " + call + " })", diagnostics
+	return prelude + "__defer.defer(() => { " + call + " })", diagnostics
 }
 
 func (o *LoweringOwner) lowerAssignStmt(ctx lowerFileContext, stmt *ast.AssignStmt) ([]loweredStmt, []Diagnostic) {
@@ -9341,6 +9431,54 @@ func (o *LoweringOwner) lowerCallableExpr(ctx lowerFileContext, expr ast.Expr, c
 // signature. Variadic arguments are packed into a slice, except for calls to
 // override packages, which take them as TypeScript rest parameters.
 func (o *LoweringOwner) lowerCallArgs(
+	ctx lowerFileContext,
+	expr *ast.CallExpr,
+	signature *types.Signature,
+) ([]string, []Diagnostic) {
+	if ctx.hoistArgsCall != expr || ctx.hoistedArgs == nil {
+		return o.lowerCallArgValues(ctx, expr, signature)
+	}
+	// The arguments of a deferred or go call are evaluated where the
+	// statement runs, so each is stored in a temporary that the call reads.
+	hoisted := ctx.hoistedArgs
+	ctx.hoistArgsCall, ctx.hoistedArgs = nil, nil
+	args, diagnostics := o.lowerCallArgValues(ctx, expr, signature)
+	for idx, arg := range args {
+		if isHoistFreeArg(arg) {
+			continue
+		}
+		spread := strings.HasPrefix(arg, "...")
+		value := arg
+		if spread {
+			value = strings.TrimPrefix(arg, "...")
+		}
+		temp := ctx.tempName("DeferArg")
+		*hoisted = append(*hoisted, "const "+temp+" = "+value)
+		if spread {
+			temp = "..." + temp
+		}
+		args[idx] = temp
+	}
+	return args, diagnostics
+}
+
+// isHoistFreeArg reports whether a lowered argument is a literal, whose value
+// does not depend on when it is evaluated.
+func isHoistFreeArg(arg string) bool {
+	if arg == "null" || arg == "undefined" || arg == "true" || arg == "false" {
+		return true
+	}
+	if _, err := strconv.ParseFloat(arg, 64); err == nil {
+		return true
+	}
+	if len(arg) >= 2 && arg[0] == '"' && arg[len(arg)-1] == '"' && !strings.ContainsAny(arg[1:len(arg)-1], "\\\"") {
+		return true
+	}
+	return false
+}
+
+// lowerCallArgValues lowers the arguments of a call (see lowerCallArgs).
+func (o *LoweringOwner) lowerCallArgValues(
 	ctx lowerFileContext,
 	expr *ast.CallExpr,
 	signature *types.Signature,

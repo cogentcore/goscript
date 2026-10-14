@@ -7,7 +7,8 @@ export async function main(): globalThis.Promise<void> {
 	let x: any = $.interfaceValue($.functionValue(async (): globalThis.Promise<void> => {
 		await $.println("goroutine executed")
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)), "func()", ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo))
-	queueMicrotask(async () => { (__goscriptAwait = $.mustTypeAssert<(() => void) | null>(x, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo))!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) })
+	const __goscriptDeferCallee0 = $.mustTypeAssert<(() => void) | null>(x, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo))
+	queueMicrotask(async () => { (__goscriptAwait = __goscriptDeferCallee0!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) })
 	await $.println("main finished")
 }
 
