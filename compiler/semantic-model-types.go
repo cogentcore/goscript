@@ -145,11 +145,11 @@ type semanticFunction struct {
 	// receiverReadOnly reports whether the function is a method with a value
 	// receiver that its body never modifies, so that a call need not copy
 	// the receiver (see methodReceiverReadOnly).
-	receiverReadOnly bool
+	receiverReadOnly valueReadOnlyKind
 	// paramsReadOnly reports, for each parameter, whether a call need not
 	// copy its struct value (see funcParamsReadOnly). It is nil when no
 	// parameter is.
-	paramsReadOnly []bool
+	paramsReadOnly []valueReadOnlyKind
 	async          bool
 	deferred       bool
 	// calls holds the origins of the functions the body calls outside

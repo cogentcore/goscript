@@ -2400,48 +2400,78 @@ func sourcePosFromTokenPosition(pos token.Position) sourcePosition {
 
 // methodReceiverReadOnly reports whether decl is a method with a value
 // receiver that a call can pass without copying it (see valueVarReadOnly).
-func methodReceiverReadOnly(pkg *packages.Package, decl *ast.FuncDecl) bool {
+func methodReceiverReadOnly(pkg *packages.Package, decl *ast.FuncDecl) valueReadOnlyKind {
 	// Only a method with a body and one receiver can be checked.
 	if pkg == nil || decl == nil || decl.Body == nil || decl.Recv == nil || len(decl.Recv.List) != 1 {
-		return false
+		return valueNotReadOnly
 	}
 
 	// A pointer receiver shares the caller's value instead of holding a copy.
 	field := decl.Recv.List[0]
 	if _, ok := ast.Unparen(field.Type).(*ast.StarExpr); ok {
-		return false
+		return valueNotReadOnly
 	}
 
 	// An unnamed receiver cannot be written.
 	if len(field.Names) == 0 || field.Names[0].Name == "_" {
-		return true
+		return valueReadOnly
 	}
 
 	// An unresolved receiver cannot be checked, so it is assumed to be written.
 	recv := pkg.TypesInfo.Defs[field.Names[0]]
-	return recv != nil && valueVarReadOnly(pkg, decl, recv)
+	if recv == nil {
+		return valueNotReadOnly
+	}
+	return valueVarReadOnly(pkg, decl, recv)
+}
+
+// exprRootIdent returns the identifier that expr reads or writes a part of
+// through fields, elements, slices and dereferences, or nil for any other
+// expression.
+func exprRootIdent(expr ast.Expr) *ast.Ident {
+	for {
+		switch typed := ast.Unparen(expr).(type) {
+		case *ast.Ident:
+			return typed
+		case *ast.SelectorExpr:
+			expr = typed.X
+		case *ast.IndexExpr:
+			expr = typed.X
+		case *ast.StarExpr:
+			expr = typed.X
+		case *ast.SliceExpr:
+			expr = typed.X
+		default:
+			return nil
+		}
+	}
 }
 
 // funcParamsReadOnly reports, for each parameter of decl, whether it is a
 // struct value that a call can pass without copying it (see
 // valueVarReadOnly).
-func funcParamsReadOnly(pkg *packages.Package, decl *ast.FuncDecl) []bool {
+func funcParamsReadOnly(pkg *packages.Package, decl *ast.FuncDecl) []valueReadOnlyKind {
+	// A function without a body or parameters has none to share.
 	if pkg == nil || decl == nil || decl.Body == nil || decl.Type.Params == nil {
 		return nil
 	}
-	var readOnly []bool
+
+	// Judge each named struct parameter; others are not read only.
+	var readOnly []valueReadOnlyKind
 	anyReadOnly := false
 	for _, field := range decl.Type.Params.List {
 		names := field.Names
 		if len(names) == 0 {
-			readOnly = append(readOnly, false)
+			readOnly = append(readOnly, valueNotReadOnly)
 			continue
 		}
 		for _, name := range names {
-			obj := pkg.TypesInfo.Defs[name]
-			ok := obj != nil && name.Name != "_" && isStructValueType(obj.Type()) && valueVarReadOnly(pkg, decl, obj)
-			readOnly = append(readOnly, ok)
-			anyReadOnly = anyReadOnly || ok
+			kind := valueNotReadOnly
+			if obj := pkg.TypesInfo.Defs[name]; obj != nil && name.Name != "_" && isStructValueType(obj.Type()) {
+				kind = valueVarReadOnly(pkg, decl, obj)
+			}
+			readOnly = append(readOnly, kind)
+			anyReadOnly = anyReadOnly || kind != valueNotReadOnly
 		}
 	}
 	if !anyReadOnly {
@@ -2455,6 +2485,7 @@ func funcParamsReadOnly(pkg *packages.Package, decl *ast.FuncDecl) []bool {
 // refer to other storage: numbers, strings, booleans, and structs and arrays
 // of them.
 func callPassesOnlyValues(pkg *packages.Package, call *ast.CallExpr) bool {
+	// A conversion or builtin passes only its arguments.
 	tv, ok := pkg.TypesInfo.Types[call.Fun]
 	if !ok {
 		return false
@@ -2462,6 +2493,8 @@ func callPassesOnlyValues(pkg *packages.Package, call *ast.CallExpr) bool {
 	if tv.IsType() || tv.IsBuiltin() {
 		return true
 	}
+
+	// The function and receiver are values too.
 	fun := ast.Unparen(call.Fun)
 	switch typed := fun.(type) {
 	case *ast.Ident:
@@ -2509,34 +2542,38 @@ func isPlainValueType(typ types.Type, depth int) bool {
 	return false
 }
 
+// valueReadOnlyKind says when a call can pass a value receiver or parameter
+// without copying it (see valueVarReadOnly).
+type valueReadOnlyKind uint8
+
+const (
+	// valueNotReadOnly is a value that the function may change or keep.
+	valueNotReadOnly valueReadOnlyKind = iota
+	// valueReadOnlyUnaliased is a value that the function only reads, but
+	// while it may change other storage, so that the caller passes only a
+	// value that no other reference can reach without a copy.
+	valueReadOnlyUnaliased
+	// valueReadOnly is a value that the function only reads, while it
+	// changes no storage but its own locals.
+	valueReadOnly
+)
+
 // valueVarReadOnly reports whether the value variable obj, a value receiver
 // or parameter of decl, can share the caller's value instead of a copy. The
 // body must never modify it: it does not assign to it or anything reached
 // from it, increment it, range into it, take its address, or call a pointer
 // receiver method on it or its fields. No function literal may refer to it,
-// since one may run after the call returns. And the body must not store
-// anything except into its own local values, nor pass a reference to a call,
-// so that it cannot change the caller's value through another reference
-// while it reads obj.
-func valueVarReadOnly(pkg *packages.Package, decl *ast.FuncDecl, obj types.Object) bool {
+// since one may run after the call returns. Any caller's value can be shared
+// when the body also stores nothing except into its own local values and
+// passes no reference to a call, so that it cannot change the caller's value
+// through another reference while it reads obj; otherwise only a value that
+// no other reference reaches can be (see isUnaliasedLocalValue).
+func valueVarReadOnly(pkg *packages.Package, decl *ast.FuncDecl, obj types.Object) valueReadOnlyKind {
+	// rootIsVar reports whether expr reads or writes a part of obj.
 	rootIsVar := func(expr ast.Expr) bool {
-		for {
-			switch typed := ast.Unparen(expr).(type) {
-			case *ast.Ident:
-				return pkg.TypesInfo.Uses[typed] == obj
-			case *ast.SelectorExpr:
-				expr = typed.X
-			case *ast.IndexExpr:
-				expr = typed.X
-			case *ast.StarExpr:
-				expr = typed.X
-			case *ast.SliceExpr:
-				expr = typed.X
-			default:
-				return false
-			}
-		}
+		return pkg.TypesInfo.Uses[exprRootIdent(expr)] == obj
 	}
+
 	// storesLocally reports whether an assignment to lhs stores into a local
 	// variable of decl, not through a pointer, slice, map or package variable.
 	storesLocally := func(lhs ast.Expr) bool {
@@ -2577,58 +2614,62 @@ func valueVarReadOnly(pkg *packages.Package, decl *ast.FuncDecl, obj types.Objec
 			}
 		}
 	}
-	readOnly := true
+
+	// changed records that the body may change obj or keep it, and shared
+	// that it may change other storage, which may be obj's caller's value.
+	changed, shared := false, false
 	ast.Inspect(decl.Body, func(node ast.Node) bool {
-		if !readOnly {
+		if changed {
 			return false
 		}
 		switch typed := node.(type) {
 		case *ast.FuncLit:
 			ast.Inspect(typed.Body, func(node ast.Node) bool {
 				if ident, ok := node.(*ast.Ident); ok && pkg.TypesInfo.Uses[ident] == obj {
-					readOnly = false
+					changed = true
 				}
-				return readOnly
+				return !changed
 			})
 		case *ast.AssignStmt:
 			for _, lhs := range typed.Lhs {
-				if rootIsVar(lhs) || (typed.Tok != token.DEFINE && !storesLocally(lhs)) {
-					readOnly = false
-				}
+				changed = changed || rootIsVar(lhs)
+				shared = shared || (typed.Tok != token.DEFINE && !storesLocally(lhs))
 			}
 		case *ast.IncDecStmt:
-			if rootIsVar(typed.X) || !storesLocally(typed.X) {
-				readOnly = false
-			}
+			changed = changed || rootIsVar(typed.X)
+			shared = shared || !storesLocally(typed.X)
 		case *ast.RangeStmt:
 			if typed.Tok == token.ASSIGN {
 				for _, lhs := range []ast.Expr{typed.Key, typed.Value} {
-					if lhs != nil && (rootIsVar(lhs) || !storesLocally(lhs)) {
-						readOnly = false
+					if lhs != nil {
+						changed = changed || rootIsVar(lhs)
+						shared = shared || !storesLocally(lhs)
 					}
 				}
 			}
 		case *ast.UnaryExpr:
-			if typed.Op == token.AND && rootIsVar(typed.X) {
-				readOnly = false
-			}
+			changed = changed || (typed.Op == token.AND && rootIsVar(typed.X))
 		case *ast.SendStmt, *ast.GoStmt:
-			readOnly = false
+			changed = true
 		case *ast.CallExpr:
-			if !callPassesOnlyValues(pkg, typed) {
-				readOnly = false
-			}
+			shared = shared || !callPassesOnlyValues(pkg, typed)
 		case *ast.SelectorExpr:
 			selection := pkg.TypesInfo.Selections[typed]
 			if selection != nil && selection.Kind() == types.MethodVal && rootIsVar(typed.X) {
 				if signature, ok := selection.Obj().Type().(*types.Signature); ok && signature.Recv() != nil {
 					if _, ptr := signature.Recv().Type().(*types.Pointer); ptr {
-						readOnly = false
+						changed = true
 					}
 				}
 			}
 		}
-		return readOnly
+		return !changed
 	})
-	return readOnly
+	switch {
+	case changed:
+		return valueNotReadOnly
+	case shared:
+		return valueReadOnlyUnaliased
+	}
+	return valueReadOnly
 }
