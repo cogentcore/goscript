@@ -8,8 +8,9 @@ import (
 // goScriptBuildTags are the build tags added to every goscript build.
 // goscript cannot run assembly, so the conventional purego and noasm tags
 // select pure Go implementations in packages that provide them; otherwise
-// assembly-backed functions would have no Go body to compile.
-var goScriptBuildTags = []string{"goscript", "purego", "noasm"}
+// assembly-backed functions would have no Go body to compile. math/big
+// selects its pure Go arithmetic with math_big_pure_go.
+var goScriptBuildTags = []string{"goscript", "purego", "noasm", "math_big_pure_go"}
 
 // goScriptBuildFlags returns flags with goScriptBuildTags added to its -tags
 // value, or a -tags flag carrying them when flags has none.
