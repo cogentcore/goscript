@@ -792,6 +792,14 @@ export class Value {
       value = Math.fround(value)
     }
 
+    // An array is copied, so it does not share storage with its source.
+    if (this.Kind() === Array) {
+      value = $.cloneArrayValue(
+        value,
+        typeInfoFromReflectType(this._type),
+      ) as ReflectValue
+    }
+
     // A struct is copied into its existing storage.
     if (this.Kind() === Struct) {
       const target = this.currentValue()
