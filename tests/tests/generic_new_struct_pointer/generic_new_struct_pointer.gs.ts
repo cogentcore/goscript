@@ -36,15 +36,16 @@ export class Base {
 		inits: number
 	}
 
-	constructor(init?: Partial<{name?: string, inits?: number}>) {
+	constructor(init?: Partial<{name?: string, inits?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			name: init?.name ?? ("" as string),
 			inits: init?.inits ?? (0 as number)
 		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Base {
-		return $.markAsStructValue(new Base(this))
+		return new Base(this, true)
 	}
 
 	public __goscriptAssign(source: Base): void {
@@ -95,15 +96,16 @@ export class Widget {
 		Text: string
 	}
 
-	constructor(init?: Partial<{Base?: Base, Text?: string}>) {
+	constructor(init?: Partial<{Base?: Base, Text?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
-			Base: init?.Base ? $.markAsStructValue($.cloneStructValue(init.Base)) : $.markAsStructValue(new Base()),
+			Base: init?.Base ? init.Base.clone() : new Base(undefined, true),
 			Text: init?.Text ?? ("" as string)
 		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Widget {
-		return $.markAsStructValue(new Widget(this))
+		return new Widget(this, true)
 	}
 
 	public __goscriptAssign(source: Widget): void {
@@ -163,11 +165,11 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("same:", $.comparableEqual($.interfaceValue(w, "*main.Widget", /* @__PURE__ */ $.pointerType("main.Widget")), (n as any)))
 
 	let p: Widget | $.VarRef<Widget> | null = (newNode(__goscriptStatic0()) as Widget | $.VarRef<Widget> | null)
-	store(__goscriptStatic0(), p, $.markAsStructValue(new Widget({Text: "stored"})))
+	store(__goscriptStatic0(), p, new Widget({Text: "stored"}, true))
 	await $.println("stored:", $.pointerValue<Widget>(p).Text, load(__goscriptStatic0(), p).Text)
 
 	let q: Widget | $.VarRef<Widget> | null = (newNode(__goscriptStatic0()) as Widget | $.VarRef<Widget> | null)
-	let v = ($.markAsStructValue($.cloneStructValue(load(__goscriptStatic0(), q))) as Widget)
+	let v = ((load(__goscriptStatic0(), q)).clone() as Widget)
 	v.Text = "copy"
 	await $.println("copy is independent:", $.stringEqual($.pointerValue<Widget>(q).Text, ""), v.Text)
 
@@ -179,7 +181,7 @@ export async function main(): globalThis.Promise<void> {
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.Widget", zero: () => $.markAsStructValue(new Widget()) }})
+	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.Widget", zero: () => new Widget(undefined, true) }})
 }
 
 var __goscriptStatic1$value: any

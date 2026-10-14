@@ -57,7 +57,7 @@ export async function main(): globalThis.Promise<void> {
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.zone", zero: () => $.markAsStructValue(new zone()) }})
+	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.zone", zero: () => new zone(undefined, true) }})
 }
 
 if ($.isMainScript(import.meta)) {

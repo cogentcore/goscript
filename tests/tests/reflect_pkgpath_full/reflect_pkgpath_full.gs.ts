@@ -13,13 +13,14 @@ export class mainType {
 	public _fields: {
 	}
 
-	constructor(init?: Partial<{}>) {
+	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
 		this._fields = {
 		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): mainType {
-		return $.markAsStructValue(new mainType(this))
+		return new mainType(this, true)
 	}
 
 	public __goscriptAssign(source: mainType): void {
@@ -39,12 +40,12 @@ export async function show(label: string, t: reflect.Type | null): globalThis.Pr
 }
 
 export async function main(): globalThis.Promise<void> {
-	await show("struct", reflect.TypeOf($.interfaceValue($.markAsStructValue(new dep.Node()), "dep.Node", "dep.Node")))
+	await show("struct", reflect.TypeOf($.interfaceValue(new dep.Node(undefined, true), "dep.Node", "dep.Node")))
 	await show("pointer elem", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.interfaceValue(new dep.Node(), "*dep.Node", /* @__PURE__ */ $.pointerType("dep.Node")))).Elem(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	await show("basic", reflect.TypeOf($.namedValueInterfaceValue<any>(1, "dep.Level", {}, /* @__PURE__ */ $.basicType("int", "dep.Level"))))
 	await show("interface", reflect.TypeFor(__goscriptStatic0()))
 	await show("local", dep.LocalType())
-	await show("main", reflect.TypeOf($.interfaceValue($.markAsStructValue(new mainType()), "main.mainType", "main.mainType")))
+	await show("main", reflect.TypeOf($.interfaceValue(new mainType(undefined, true), "main.mainType", "main.mainType")))
 	await $.println("generic:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.interfaceValue($.markAsStructValue(new dep.Box({Value: 0})), "dep.Box", "dep.Box"))).PkgPath(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	await $.println("unnamed:", $.stringEqual((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.interfaceValue($.arrayToSlice<dep.Node>([]), "[]dep.Node", /* @__PURE__ */ $.sliceType("dep.Node")))).PkgPath(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), ""))
 }

@@ -38,15 +38,16 @@ export class Person {
 		Age: number
 	}
 
-	constructor(init?: Partial<{Name?: string, Age?: number}>) {
+	constructor(init?: Partial<{Name?: string, Age?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Name: init?.Name ?? ("" as string),
 			Age: init?.Age ?? (0 as number)
 		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Person {
-		return $.markAsStructValue(new Person(this))
+		return new Person(this, true)
 	}
 
 	public __goscriptAssign(source: Person): void {
@@ -66,11 +67,11 @@ export class Person {
 }
 
 export function reflectOverlap(x: $.Slice<number>, y: $.Slice<number>): boolean {
-	return ((($.sliceLen(x) > 0) && ($.sliceLen(y) > 0)) && ($.uint($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.indexRef(x!, 0), "*byte", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("uint8")))))).Pointer(), 64) <= $.uint($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.indexRef(y!, $.sliceLen(y) - 1), "*byte", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("uint8")))))).Pointer(), 64))) && ($.uint($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.indexRef(y!, 0), "*byte", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("uint8")))))).Pointer(), 64) <= $.uint($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.indexRef(x!, $.sliceLen(x) - 1), "*byte", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("uint8")))))).Pointer(), 64))
+	return ((($.sliceLen(x) > 0) && ($.sliceLen(y) > 0)) && ($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.indexRef(x!, 0), "*byte", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("uint8")))))).Pointer() <= $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.indexRef(y!, $.sliceLen(y) - 1), "*byte", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("uint8")))))).Pointer())) && ($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.indexRef(y!, 0), "*byte", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("uint8")))))).Pointer() <= $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.indexRef(x!, $.sliceLen(x) - 1), "*byte", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("uint8")))))).Pointer())
 }
 
 export function reflectSameStart(x: $.Slice<number>, y: $.Slice<number>): boolean {
-	return (($.sliceLen(x) > 0) && ($.sliceLen(y) > 0)) && ($.uint($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.indexRef(x!, 0), "*byte", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("uint8")))))).Pointer(), 64) == $.uint($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.indexRef(y!, 0), "*byte", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("uint8")))))).Pointer(), 64))
+	return (($.sliceLen(x) > 0) && ($.sliceLen(y) > 0)) && ($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.indexRef(x!, 0), "*byte", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("uint8")))))).Pointer() == $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.indexRef(y!, 0), "*byte", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("uint8")))))).Pointer())
 }
 
 export async function main(): globalThis.Promise<void> {
@@ -153,12 +154,12 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("Dst after copy:", $.arrayIndex(dst!, 0), $.arrayIndex(dst!, 1))
 
 	// Test struct reflection
-	let person = $.markAsStructValue(new Person({Name: "Alice", Age: 30}))
+	let person = new Person({Name: "Alice", Age: 30}, true)
 	let personType = reflect.TypeFor(__goscriptStatic4())
 	await $.println("Struct type:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(personType).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	await $.println("Struct kind:", reflect.Kind_String((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(personType).Kind(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)))
 
-	let personVal = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.markAsStructValue($.cloneStructValue(person)), "main.Person", "main.Person"))))
+	let personVal = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue((person).clone(), "main.Person", "main.Person"))))
 	await $.println("Struct value type:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(personVal)).Type()).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
 	// Test with different kinds
@@ -233,9 +234,9 @@ export async function main(): globalThis.Promise<void> {
 
 	// Test type methods
 	await $.println("Type size methods:")
-	await $.println("Int size:", $.uint((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeFor(__goscriptStatic0())).Size(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), 64))
-	await $.println("String size:", $.uint((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeFor(__goscriptStatic1())).Size(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), 64))
-	await $.println("Slice size:", $.uint((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeFor(__goscriptStatic2())).Size(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), 64))
+	await $.println("Int size:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeFor(__goscriptStatic0())).Size(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println("String size:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeFor(__goscriptStatic1())).Size(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println("Slice size:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeFor(__goscriptStatic2())).Size(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
 	// Test enhanced API surface - functions to implement
 	await $.println("Enhanced API tests:")
@@ -287,7 +288,7 @@ export async function main(): globalThis.Promise<void> {
 	// Test channel reflection properties
 	await $.println("Chan elem type:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(chanType).Elem(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	await $.println("Chan elem kind:", reflect.Kind_String((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(chanType).Elem(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)).Kind(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)))
-	await $.println("Chan size:", $.uint((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(chanType).Size(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), 64))
+	await $.println("Chan size:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(chanType).Size(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
 	// Test Value.Pointer on addressable slice elements.
 	let pointerBuf: $.Slice<number> = new Uint8Array([1, 2, 3, 4]) as $.Slice<number>
@@ -346,7 +347,7 @@ function __goscriptStatic3(): any {
 
 var __goscriptStatic4$value: any
 function __goscriptStatic4(): any {
-	return __goscriptStatic4$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.Person", zero: () => $.markAsStructValue(new Person()) }})
+	return __goscriptStatic4$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.Person", zero: () => new Person(undefined, true) }})
 }
 
 var __goscriptAwait: any

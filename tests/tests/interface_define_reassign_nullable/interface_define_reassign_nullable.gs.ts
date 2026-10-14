@@ -29,14 +29,15 @@ export class Square {
 		Side: number
 	}
 
-	constructor(init?: Partial<{Side?: number}>) {
+	constructor(init?: Partial<{Side?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Side: init?.Side ?? (0 as number)
 		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Square {
-		return $.markAsStructValue(new Square(this))
+		return new Square(this, true)
 	}
 
 	public __goscriptAssign(source: Square): void {
@@ -61,13 +62,13 @@ export class Square {
 
 export function find(ok: boolean): Shape | null {
 	if (ok) {
-		return $.interfaceValue<Shape | null>($.markAsStructValue(new Square({Side: 2})), "main.Square", "main.Square")
+		return $.interfaceValue<Shape | null>(new Square({Side: 2}, true), "main.Square", "main.Square")
 	}
 	return null
 }
 
 export function first(): Shape | null {
-	return $.interfaceValue<Shape | null>($.markAsStructValue(new Square({Side: 3})), "main.Square", "main.Square")
+	return $.interfaceValue<Shape | null>(new Square({Side: 3}, true), "main.Square", "main.Square")
 }
 
 export async function main(): globalThis.Promise<void> {

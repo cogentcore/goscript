@@ -19,14 +19,15 @@ export class S1 {
 		Name: string
 	}
 
-	constructor(init?: Partial<{Name?: string}>) {
+	constructor(init?: Partial<{Name?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Name: init?.Name ?? ("" as string)
 		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): S1 {
-		return $.markAsStructValue(new S1(this))
+		return new S1(this, true)
 	}
 
 	public __goscriptAssign(source: S1): void {
@@ -84,17 +85,18 @@ export class S5 {
 		F: (() => void) | null
 	}
 
-	constructor(init?: Partial<{K?: $.Slice<S1 | $.VarRef<S1> | null>, M?: globalThis.Map<string, number> | null, P?: S1 | $.VarRef<S1> | null, F?: (() => void) | null}>) {
+	constructor(init?: Partial<{K?: $.Slice<S1 | $.VarRef<S1> | null>, M?: globalThis.Map<string, number> | null, P?: S1 | $.VarRef<S1> | null, F?: (() => void) | null}>, __goscriptValue?: boolean) {
 		this._fields = {
 			K: init?.K ?? (null! as $.Slice<S1 | $.VarRef<S1> | null>),
 			M: init?.M ?? (null! as globalThis.Map<string, number> | null),
 			P: init?.P ?? (null! as S1 | $.VarRef<S1> | null),
 			F: init?.F ?? (null! as (() => void) | null)
 		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): S5 {
-		return $.markAsStructValue(new S5(this))
+		return new S5(this, true)
 	}
 
 	public __goscriptAssign(source: S5): void {
@@ -131,7 +133,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("a == nil:", a == null)
 	await show("any", a)
 
-	let v = $.varRef($.markAsStructValue(new S5()))
+	let v = $.varRef(new S5(undefined, true))
 	let f = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(v, "*main.S5", /* @__PURE__ */ $.pointerType("main.S5"))))).Elem()))
 	for (let i = 0; i < $.markAsStructValue($.cloneStructValue(f)).NumField(); i++) {
 		await show((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(f)).Type()).Field(i), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait).Name, $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(f)).Field(i))).Interface())
@@ -142,7 +144,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// A nil value keeps a zero Pointer after a round trip through Interface.
 	for (let i = 0; i < $.markAsStructValue($.cloneStructValue(f)).NumField(); i++) {
-		await $.println("pointer", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(f)).Type()).Field(i), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait).Name, $.uint($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(f)).Field(i))).Interface()))).Pointer(), 64) == 0)
+		await $.println("pointer", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(f)).Type()).Field(i), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait).Name, $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(f)).Field(i))).Interface()))).Pointer() == 0)
 	}
 
 	// The address of an unnamed field keeps its pointer type.
@@ -154,7 +156,7 @@ export async function main(): globalThis.Promise<void> {
 	let __goscriptTuple0: any = $.typeAssertTuple<$.VarRef<$.Slice<S1 | $.VarRef<S1> | null>> | null>($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(f)).Field(0))).Addr())).Interface(), /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.pointerType("main.S1"))))
 	let kp = __goscriptTuple0[0]
 	ok = __goscriptTuple0[1]
-	kp!.value = $.append($.pointerValue<$.Slice<S1 | $.VarRef<S1> | null>>(kp), new S1({Name: "x"}), $.appendZeros.nil)
+	kp!.value = $.appendOne($.pointerValue<$.Slice<S1 | $.VarRef<S1> | null>>(kp), new S1({Name: "x"}), $.appendZeros.nil)
 	await $.println("addr assert:", ok, $.sliceLen(v.value.K), $.pointerValue<S1>($.arrayIndex(v.value.K!, 0)).Name)
 
 	// Unnamed basic, array and slice values keep their types.

@@ -162,13 +162,9 @@ export async function main(): globalThis.Promise<void> {
 }
 
 export async function callers(): globalThis.Promise<void> {
-	let __goscriptTuple0: any = runtime.Caller(0)
-	let pc = $.uint(__goscriptTuple0[0], 64)
-	let file = __goscriptTuple0[1]
-	let line = __goscriptTuple0[2]
-	let ok = __goscriptTuple0[3]
-	await $.println("Caller:", ok, $.uint(pc, 64) != 0, !$.stringEqual(file, ""), line > 0)
-	let f: runtime.Func | $.VarRef<runtime.Func> | null = runtime.FuncForPC($.uint(pc, 64))
+	let [pc, file, line, ok] = runtime.Caller(0)
+	await $.println("Caller:", ok, pc != 0, !$.stringEqual(file, ""), line > 0)
+	let f: runtime.Func | $.VarRef<runtime.Func> | null = runtime.FuncForPC(pc)
 	await $.println("FuncForPC caller:", f != null, strings.Contains(runtime.Func.prototype.Name.call($.pointerValueOrNil(f)), "callers"))
 	await $.println("Caller(1):", !$.stringEqual(callerInfo(), ""))
 
@@ -179,15 +175,12 @@ export async function callers(): globalThis.Promise<void> {
 }
 
 export function callerInfo(): string {
-	let __goscriptTuple1: any = runtime.Caller(1)
-	let pc = $.uint(__goscriptTuple1[0], 64)
-	let file = __goscriptTuple1[1]
-	let line = __goscriptTuple1[2]
-	return $.concatString(($.concatString(($.concatString(($.concatString(runtime.Func.prototype.Name.call($.pointerValueOrNil(runtime.FuncForPC($.uint(pc, 64)))), " ")), file)), ":")), strconv.Itoa(line))
+	let [pc, file, line, ] = runtime.Caller(1)
+	return $.concatString(($.concatString(($.concatString(($.concatString(runtime.Func.prototype.Name.call($.pointerValueOrNil(runtime.FuncForPC(pc))), " ")), file)), ":")), strconv.Itoa(line))
 }
 
 export function funcName(f: any): string {
-	return runtime.Func.prototype.Name.call($.pointerValueOrNil(runtime.FuncForPC($.uint($.markAsStructValue($.cloneStructValue(reflect.ValueOf(f))).Pointer(), 64))))
+	return runtime.Func.prototype.Name.call($.pointerValueOrNil(runtime.FuncForPC($.markAsStructValue($.cloneStructValue(reflect.ValueOf(f))).Pointer())))
 }
 
 export function helperFunc(): void {

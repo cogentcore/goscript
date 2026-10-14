@@ -11,19 +11,19 @@ export async function main(): globalThis.Promise<void> {
 	await $.println($.uint(((u + 1) >>> 0), 32), $.uint(((u + u) >>> 0), 32), $.uint(((z - 1) >>> 0), 32))
 	let q: number = 2147483647
 	q = ((q + 1) | 0)
-	await $.println($.int(q, 32))
+	await $.println(q)
 	q = ((q - 1) | 0)
-	await $.println($.int(q, 32), $.int(((q + q) | 0), 32))
+	await $.println(q, $.int(((q + q) | 0), 32))
 	let a: fixed = 2560000
 	let b: fixed = 1920000
 	await $.println($.int((((globalThis.Math.trunc((globalThis.Math.imul(a, a)) / 64)) + (globalThis.Math.trunc((globalThis.Math.imul(b, b)) / 64))) | 0), 32), $.int((((((a + b) | 0)) + 2147483647) | 0), 32))
 	let i8: number = 127
 	i8 = ((i8 + 1) << 24 >> 24)
-	await $.println($.int(i8, 8), $.int((($.int(-128, 8) - i8) << 24 >> 24), 8))
+	await $.println(i8, $.int((($.int(-128, 8) - i8) << 24 >> 24), 8))
 	let u16: number = 65535
 	u16 = ((u16 + 1) & 0xffff)
 	let one = 1
-	await $.println($.uint(u16, 16), $.uint((((((one << 15) & 0xffff)) << 1) & 0xffff), 16))
+	await $.println(u16, $.uint((((((one << 15) & 0xffff)) << 1) & 0xffff), 16))
 	let u8: number = 200
 	await $.println($.uint(((u8 + 100) & 0xff), 8), $.uint(((u8 << 1) & 0xff), 8))
 }

@@ -19,13 +19,14 @@ export class Bus {
 	public _fields: {
 	}
 
-	constructor(init?: Partial<{}>) {
+	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
 		this._fields = {
 		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Bus {
-		return $.markAsStructValue(new Bus(this))
+		return new Bus(this, true)
 	}
 
 	public __goscriptAssign(source: Bus): void {
@@ -44,13 +45,14 @@ export class factory {
 	public _fields: {
 	}
 
-	constructor(init?: Partial<{}>) {
+	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
 		this._fields = {
 		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): factory {
-		return $.markAsStructValue(new factory(this))
+		return new factory(this, true)
 	}
 
 	public __goscriptAssign(source: factory): void {
@@ -79,7 +81,7 @@ export async function NewFactory(b: Bus): globalThis.Promise<Factory | null> {
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "dep.Bus", zero: () => $.markAsStructValue(new Bus()) }})
+	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "dep.Bus", zero: () => new Bus(undefined, true) }})
 }
 
 var __goscriptStatic1$value: any

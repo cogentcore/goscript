@@ -31,15 +31,16 @@ export class config {
 		UsesCgo: boolean
 	}
 
-	constructor(init?: Partial<{Name?: string, UsesCgo?: boolean}>) {
+	constructor(init?: Partial<{Name?: string, UsesCgo?: boolean}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Name: init?.Name ?? ("" as string),
 			UsesCgo: init?.UsesCgo ?? (false as boolean)
 		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): config {
-		return $.markAsStructValue(new config(this))
+		return new config(this, true)
 	}
 
 	public __goscriptAssign(source: config): void {

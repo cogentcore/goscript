@@ -207,15 +207,16 @@ export async function main(): globalThis.Promise<void> {
 			Is: $.Slice<MyInt>
 		}
 
-		constructor(init?: Partial<{N?: Name, Is?: $.Slice<MyInt>}>) {
+		constructor(init?: Partial<{N?: Name, Is?: $.Slice<MyInt>}>, __goscriptValue?: boolean) {
 			this._fields = {
 				N: init?.N ?? ("" as Name),
 				Is: init?.Is ?? (null! as $.Slice<MyInt>)
 			}
+			;(this as any)[$.structValueMarker] = __goscriptValue === true
 		}
 
 		public clone(): holder {
-			return $.markAsStructValue(new holder(this))
+			return new holder(this, true)
 		}
 
 		public __goscriptAssign(source: holder): void {

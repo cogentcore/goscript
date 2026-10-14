@@ -33,14 +33,15 @@ export class Node {
 		Name: string
 	}
 
-	constructor(init?: Partial<{Name?: string}>) {
+	constructor(init?: Partial<{Name?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Name: init?.Name ?? ("" as string)
 		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Node {
-		return $.markAsStructValue(new Node(this))
+		return new Node(this, true)
 	}
 
 	public __goscriptAssign(source: Node): void {
@@ -71,14 +72,15 @@ export class Box {
 		Value: any
 	}
 
-	constructor(init?: Partial<{Value?: any}>) {
+	constructor(init?: Partial<{Value?: any}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Value: init?.Value !== undefined ? $.copyElement(init.Value) : (null! as any)
 		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Box {
-		return $.markAsStructValue(new Box(this))
+		return new Box(this, true)
 	}
 
 	public __goscriptAssign(source: Box): void {
@@ -110,14 +112,15 @@ export function LocalType(): reflect.Type | null {
 			A: number
 		}
 
-		constructor(init?: Partial<{A?: number}>) {
+		constructor(init?: Partial<{A?: number}>, __goscriptValue?: boolean) {
 			this._fields = {
 				A: init?.A ?? (0 as number)
 			}
+			;(this as any)[$.structValueMarker] = __goscriptValue === true
 		}
 
 		public clone(): local {
-			return $.markAsStructValue(new local(this))
+			return new local(this, true)
 		}
 
 		public __goscriptAssign(source: local): void {

@@ -64,7 +64,7 @@ export function stringBytes(__goscriptParam0: string): $.Slice<number> {
 	let b: $.VarRef<$.Slice<number>> = $.varRef(null! as $.Slice<number>)
 	let strh: reflect.StringHeader | $.VarRef<reflect.StringHeader> | null = $.unsafePointerCast<reflect.StringHeader | $.VarRef<reflect.StringHeader> | null>($.stringHeaderRef(s))
 	let sh: reflect.SliceHeader | $.VarRef<reflect.SliceHeader> | null = $.unsafePointerCast<reflect.SliceHeader | $.VarRef<reflect.SliceHeader> | null>($.sliceHeaderRef(b))
-	$.pointerValue<reflect.SliceHeader>(sh).Data = $.uint($.pointerValue<reflect.StringHeader>(strh).Data, 64)
+	$.pointerValue<reflect.SliceHeader>(sh).Data = $.pointerValue<reflect.StringHeader>(strh).Data
 	$.pointerValue<reflect.SliceHeader>(sh).Len = $.pointerValue<reflect.StringHeader>(strh).Len
 	$.pointerValue<reflect.SliceHeader>(sh).Cap = $.pointerValue<reflect.StringHeader>(strh).Len
 	return b.value
@@ -80,9 +80,9 @@ export function samePointers(s: $.VarRef<string> | null, b: $.VarRef<$.Slice<num
 
 export async function main(): globalThis.Promise<void> {
 	let b: $.Slice<number> = stringBytes("abc")
-	await $.println($.sliceLen(b), $.cap(b), $.uint($.arrayIndex(b!, 0), 8), $.uint($.arrayIndex(b!, 1), 8), $.uint($.arrayIndex(b!, 2), 8))
+	await $.println($.sliceLen(b), $.cap(b), $.arrayIndex(b!, 0), $.arrayIndex(b!, 1), $.arrayIndex(b!, 2))
 	let local: $.Slice<number> = localStringBytes("wxyz")
-	await $.println($.sliceLen(local), $.cap(local), $.uint($.arrayIndex(local!, 0), 8), $.uint($.arrayIndex(local!, 3), 8))
+	await $.println($.sliceLen(local), $.cap(local), $.arrayIndex(local!, 0), $.arrayIndex(local!, 3))
 	let str = $.varRef("pointer")
 	let bytes: $.VarRef<$.Slice<number>> = $.varRef(new Uint8Array([103, 111]))
 	let [sp, bp] = samePointers(str, bytes)

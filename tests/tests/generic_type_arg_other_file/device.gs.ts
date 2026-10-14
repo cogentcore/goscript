@@ -15,5 +15,5 @@ export async function create(d: __goscript_descriptor.descriptor | $.VarRef<__go
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.descriptor", zero: () => $.markAsStructValue(new __goscript_descriptor.descriptor()) }, P: { type: /* @__PURE__ */ $.pointerType("main.descriptor"), zero: () => null, methods: {toJS: (receiver: any, ...args: any[]) => $.pointerValue(receiver).toJS(...$.stripGenericTypeArgs(args))} }})
+	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.descriptor", zero: () => new __goscript_descriptor.descriptor(undefined, true) }, P: { type: /* @__PURE__ */ $.pointerType("main.descriptor"), zero: () => null, methods: {toJS: (receiver: any, ...args: any[]) => $.pointerValue(receiver).toJS(...$.stripGenericTypeArgs(args))} }})
 }

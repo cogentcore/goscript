@@ -9,14 +9,14 @@ export async function main(): globalThis.Promise<void> {
 
 	let b: number = 1
 	b = $.uint(b + ($.uint(((1 << globalThis.Number(s)) & 0xff), 8)), 8)
-	await $.println("byte-shl-by-uint64", $.uint(b, 8))
+	await $.println("byte-shl-by-uint64", b)
 
 	let v = $.uint(($.uintShr(b, s, 8)) & 0x0f, 8)
-	await $.println("byte-shr-by-uint64", $.uint(v, 8))
+	await $.println("byte-shr-by-uint64", v)
 
 	let w: number = 1
-	w = $.uint(w << ($.uint($.uint(s, 16), 16)), 16)
-	await $.println("uint16-shlassign", $.uint(w, 16))
+	w = $.uint(w << ($.uint(s, 16)), 16)
+	await $.println("uint16-shlassign", w)
 }
 
 if ($.isMainScript(import.meta)) {

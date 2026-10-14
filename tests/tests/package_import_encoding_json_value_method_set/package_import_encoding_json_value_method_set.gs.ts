@@ -31,15 +31,16 @@ export class Node {
 		B: string
 	}
 
-	constructor(init?: Partial<{A?: number, B?: string}>) {
+	constructor(init?: Partial<{A?: number, B?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
 			A: init?.A ?? (0 as number),
 			B: init?.B ?? ("" as string)
 		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Node {
-		return $.markAsStructValue(new Node(this))
+		return new Node(this, true)
 	}
 
 	public __goscriptAssign(source: Node): void {
@@ -75,12 +76,12 @@ export async function main(): globalThis.Promise<void> {
 	let err = __goscriptTuple1[1]
 	await $.println($.bytesToString(b), err == null)
 
-	let __goscriptTuple2: any = json.Marshal($.interfaceValue($.markAsStructValue(new Node({A: 2, B: "y"})), "main.Node", "main.Node"))
+	let __goscriptTuple2: any = json.Marshal($.interfaceValue(new Node({A: 2, B: "y"}, true), "main.Node", "main.Node"))
 	b = __goscriptTuple2[0]
 	err = __goscriptTuple2[1]
 	await $.println($.bytesToString(b), err == null)
 
-	let __goscriptTuple3: any = json.Marshal($.interfaceValue($.arrayToSlice<Node>([$.markAsStructValue(new Node({A: 3}))]), "[]main.Node", /* @__PURE__ */ $.sliceType("main.Node")))
+	let __goscriptTuple3: any = json.Marshal($.interfaceValue($.arrayToSlice<Node>([new Node({A: 3}, true)]), "[]main.Node", /* @__PURE__ */ $.sliceType("main.Node")))
 	b = __goscriptTuple3[0]
 	err = __goscriptTuple3[1]
 	await $.println($.bytesToString(b), err == null)
@@ -90,7 +91,7 @@ export async function main(): globalThis.Promise<void> {
 	err = __goscriptTuple4[1]
 	await $.println($.bytesToString(b), err == null)
 
-	let v: {"N": Node} = $.anonymousStructValue({"N": $.markAsStructValue(new Node())}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("N", "main.Node", [0], 0, true)] })
+	let v: {"N": Node} = $.anonymousStructValue({"N": new Node(undefined, true)}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("N", "main.Node", [0], 0, true)] })
 	v.N.A = 5
 	let __goscriptTuple5: any = json.Marshal($.interfaceValue($.markAsStructValue($.cloneStructValue(v)), "struct{N main.Node}", { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("N", "main.Node", [0], 0, true)] }))
 	b = __goscriptTuple5[0]

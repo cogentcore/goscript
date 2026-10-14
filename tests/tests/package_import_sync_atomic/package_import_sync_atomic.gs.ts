@@ -191,7 +191,7 @@ function __goscriptStatic1(): any {
 
 var __goscriptStatic2$value: any
 function __goscriptStatic2(): any {
-	return __goscriptStatic2$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.pointerNode", zero: () => $.markAsStructValue(new pointerNode()) }})
+	return __goscriptStatic2$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.pointerNode", zero: () => new pointerNode(undefined, true) }})
 }
 
 var __goscriptAwait: any

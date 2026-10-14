@@ -43,15 +43,16 @@ export class connector {
 		blob: boolean
 	}
 
-	constructor(init?: Partial<{direct?: boolean, blob?: boolean}>) {
+	constructor(init?: Partial<{direct?: boolean, blob?: boolean}>, __goscriptValue?: boolean) {
 		this._fields = {
 			direct: init?.direct ?? (false as boolean),
 			blob: init?.blob ?? (false as boolean)
 		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): connector {
-		return $.markAsStructValue(new connector(this))
+		return new connector(this, true)
 	}
 
 	public __goscriptAssign(source: connector): void {
@@ -73,12 +74,12 @@ export class connector {
 
 	public Connect(_p0: context.Context | null): [driver.Conn | null, $.GoError] {
 		const c = this;
-		return [$.interfaceValue<driver.Conn | null>($.markAsStructValue($.cloneStructValue(c)), "main.connector", "main.connector"), null]
+		return [$.interfaceValue<driver.Conn | null>((c).clone(), "main.connector", "main.connector"), null]
 	}
 
 	public Driver(): driver.Driver | null {
 		const c = this;
-		return $.interfaceValue<driver.Driver | null>($.markAsStructValue($.cloneStructValue(c)), "main.connector", "main.connector")
+		return $.interfaceValue<driver.Driver | null>((c).clone(), "main.connector", "main.connector")
 	}
 
 	public async ExecContext(_p0: context.Context | null, _p1: string, _p2: $.Slice<driver.NamedValue>): globalThis.Promise<[driver.Result | null, $.GoError]> {
@@ -89,7 +90,7 @@ export class connector {
 
 	public Open(_p0: string): [driver.Conn | null, $.GoError] {
 		const c = this;
-		return [$.interfaceValue<driver.Conn | null>($.markAsStructValue($.cloneStructValue(c)), "main.connector", "main.connector"), null]
+		return [$.interfaceValue<driver.Conn | null>((c).clone(), "main.connector", "main.connector"), null]
 	}
 
 	public Prepare(_p0: string): [driver.Stmt | null, $.GoError] {
@@ -137,15 +138,16 @@ export class rows {
 		blob: boolean
 	}
 
-	constructor(init?: Partial<{done?: boolean, blob?: boolean}>) {
+	constructor(init?: Partial<{done?: boolean, blob?: boolean}>, __goscriptValue?: boolean) {
 		this._fields = {
 			done: init?.done ?? (false as boolean),
 			blob: init?.blob ?? (false as boolean)
 		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): rows {
-		return $.markAsStructValue(new rows(this))
+		return new rows(this, true)
 	}
 
 	public __goscriptAssign(source: rows): void {
@@ -200,14 +202,15 @@ export class columnRows {
 		rows: rows
 	}
 
-	constructor(init?: Partial<{rows?: rows}>) {
+	constructor(init?: Partial<{rows?: rows}>, __goscriptValue?: boolean) {
 		this._fields = {
-			rows: init?.rows ? $.markAsStructValue($.cloneStructValue(init.rows)) : $.markAsStructValue(new rows())
+			rows: init?.rows ? init.rows.clone() : new rows(undefined, true)
 		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): columnRows {
-		return $.markAsStructValue(new columnRows(this))
+		return new columnRows(this, true)
 	}
 
 	public __goscriptAssign(source: columnRows): void {
@@ -258,7 +261,7 @@ export class columnRows {
 export async function main(): globalThis.Promise<void> {
 	for (let __goscriptRangeTarget0 = $.arrayToSlice<boolean>([false, true]), __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
 		let direct = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as boolean)
-		let db: sql.DB | $.VarRef<sql.DB> | null = await sql.OpenDB($.interfaceValue<driver.Connector | null>($.markAsStructValue(new connector({direct: direct})), "main.connector", "main.connector"))
+		let db: sql.DB | $.VarRef<sql.DB> | null = await sql.OpenDB($.interfaceValue<driver.Connector | null>(new connector({direct: direct}, true), "main.connector", "main.connector"))
 		{
 			let [, err] = await sql.DB.prototype.ExecContext.call(db, context.Background(), "create", null)
 			if (err != null) {
@@ -288,7 +291,7 @@ export async function main(): globalThis.Promise<void> {
 		}
 	}
 	await $.println("zero context", value.value)
-	let db: sql.DB | $.VarRef<sql.DB> | null = await sql.OpenDB($.interfaceValue<driver.Connector | null>($.markAsStructValue(new connector({blob: true})), "main.connector", "main.connector"))
+	let db: sql.DB | $.VarRef<sql.DB> | null = await sql.OpenDB($.interfaceValue<driver.Connector | null>(new connector({blob: true}, true), "main.connector", "main.connector"))
 	let data: $.VarRef<$.Slice<number>> = $.varRef(null! as $.Slice<number>)
 	{
 		let err = await sql.Row.prototype.Scan.call(await sql.DB.prototype.QueryRow.call(db, "blob", null), $.arrayToSlice<any>([$.interfaceValue(data, "*[]byte", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))))]))
@@ -325,14 +328,15 @@ export async function main(): globalThis.Promise<void> {
 			Value: number
 		}
 
-		constructor(init?: Partial<{Value?: number}>) {
+		constructor(init?: Partial<{Value?: number}>, __goscriptValue?: boolean) {
 			this._fields = {
 				Value: init?.Value ?? (0 as number)
 			}
+			;(this as any)[$.structValueMarker] = __goscriptValue === true
 		}
 
 		public clone(): tagged {
-			return $.markAsStructValue(new tagged(this))
+			return new tagged(this, true)
 		}
 
 		public __goscriptAssign(source: tagged): void {
@@ -362,14 +366,15 @@ export async function main(): globalThis.Promise<void> {
 			Value: number
 		}
 
-		constructor(init?: Partial<{Value?: number}>) {
+		constructor(init?: Partial<{Value?: number}>, __goscriptValue?: boolean) {
 			this._fields = {
 				Value: init?.Value ?? (0 as number)
 			}
+			;(this as any)[$.structValueMarker] = __goscriptValue === true
 		}
 
 		public clone(): retagged {
-			return $.markAsStructValue(new retagged(this))
+			return new retagged(this, true)
 		}
 
 		public __goscriptAssign(source: retagged): void {

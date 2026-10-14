@@ -16,14 +16,15 @@ export class Match {
 		Size: number
 	}
 
-	constructor(init?: Partial<{Size?: number}>) {
+	constructor(init?: Partial<{Size?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Size: init?.Size ?? (0 as number)
 		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Match {
-		return $.markAsStructValue(new Match(this))
+		return new Match(this, true)
 	}
 
 	public __goscriptAssign(source: Match): void {
@@ -54,14 +55,15 @@ export class Matcher {
 		matches: $.Slice<Match>
 	}
 
-	constructor(init?: Partial<{matches?: $.Slice<Match>}>) {
+	constructor(init?: Partial<{matches?: $.Slice<Match>}>, __goscriptValue?: boolean) {
 		this._fields = {
 			matches: init?.matches ?? (null! as $.Slice<Match>)
 		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Matcher {
-		return $.markAsStructValue(new Matcher(this))
+		return new Matcher(this, true)
 	}
 
 	public __goscriptAssign(source: Matcher): void {
@@ -79,7 +81,7 @@ export class Matcher {
 		const m: Matcher | $.VarRef<Matcher> | null = this;
 		let total = 0
 		for (let __goscriptRangeTarget0 = Matcher.prototype.Blocks.call(m), __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
-			let __goscriptRangeShadow0 = $.markAsStructValue($.cloneStructValue((__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as Match)))
+			let __goscriptRangeShadow0 = ((__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as Match)).clone()
 			total = total + (__goscriptRangeShadow0.Size)
 		}
 		return total
@@ -95,7 +97,7 @@ export class Matcher {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let m: Matcher | $.VarRef<Matcher> | null = new Matcher({matches: $.arrayToSlice<Match>([$.markAsStructValue(new Match({Size: 3})), $.markAsStructValue(new Match({Size: 4}))])})
+	let m: Matcher | $.VarRef<Matcher> | null = new Matcher({matches: $.arrayToSlice<Match>([new Match({Size: 3}, true), new Match({Size: 4}, true)])})
 	await $.println(Matcher.prototype.Total.call(m))
 }
 

@@ -51,15 +51,16 @@ export class Hooked {
 		Seen: string
 	}
 
-	constructor(init?: Partial<{Calls?: number, Seen?: string}>) {
+	constructor(init?: Partial<{Calls?: number, Seen?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Calls: init?.Calls ?? (0 as number),
 			Seen: init?.Seen ?? ("" as string)
 		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Hooked {
-		return $.markAsStructValue(new Hooked(this))
+		return new Hooked(this, true)
 	}
 
 	public __goscriptAssign(source: Hooked): void {
@@ -99,14 +100,15 @@ export class Box {
 		Value: Hooked | $.VarRef<Hooked> | null
 	}
 
-	constructor(init?: Partial<{Value?: Hooked | $.VarRef<Hooked> | null}>) {
+	constructor(init?: Partial<{Value?: Hooked | $.VarRef<Hooked> | null}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Value: init?.Value ?? (null! as Hooked | $.VarRef<Hooked> | null)
 		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Box {
-		return $.markAsStructValue(new Box(this))
+		return new Box(this, true)
 	}
 
 	public __goscriptAssign(source: Box): void {
@@ -146,15 +148,16 @@ export class MapItem {
 		Map: globalThis.Map<string, number> | null
 	}
 
-	constructor(init?: Partial<{Name?: string, Map?: globalThis.Map<string, number> | null}>) {
+	constructor(init?: Partial<{Name?: string, Map?: globalThis.Map<string, number> | null}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Name: init?.Name ?? ("" as string),
 			Map: init?.Map ?? (null! as globalThis.Map<string, number> | null)
 		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): MapItem {
-		return $.markAsStructValue(new MapItem(this))
+		return new MapItem(this, true)
 	}
 
 	public __goscriptAssign(source: MapItem): void {
@@ -174,7 +177,7 @@ export class MapItem {
 }
 
 export function Maps_CopyFrom(km: $.VarRef<Maps> | null, cp: Maps): $.GoError {
-	km!.value = ($.makeSlice<MapItem>(0, $.sliceLen((cp as Maps)), undefined, () => $.markAsStructValue(new MapItem())) as Maps)
+	km!.value = ($.makeSlice<MapItem>(0, $.sliceLen((cp as Maps)), undefined, () => new MapItem(undefined, true)) as Maps)
 	let __goscriptTuple0: any = json.Marshal($.interfaceValue(cp, "main.Maps", /* @__PURE__ */ $.sliceType("main.MapItem", "main.Maps")))
 	let b: $.Slice<number> = __goscriptTuple0[0]
 	let err = __goscriptTuple0[1]
@@ -198,7 +201,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// A non-nil *T field with UnmarshalJSON must use the hook before any
 	// pointer-to-struct population path can inspect fields.
-	let box = $.varRef($.markAsStructValue(new Box({Value: new Hooked({Seen: "before"})})))
+	let box = $.varRef(new Box({Value: new Hooked({Seen: "before"})}, true))
 	{
 		let err = json.Unmarshal(new Uint8Array([123, 34, 118, 97, 108, 117, 101, 34, 58, 123, 34, 105, 103, 110, 111, 114, 101, 100, 34, 58, 48, 125, 125]), $.interfaceValue(box, "*main.Box", /* @__PURE__ */ $.pointerType("main.Box")))
 		if (err != null) {
@@ -211,7 +214,7 @@ export async function main(): globalThis.Promise<void> {
 	// A pointer to a named slice or map type with methods, but no
 	// UnmarshalJSON, decodes into the value it points to.
 	let maps: $.VarRef<Maps> = $.varRef(null! as Maps)
-	let err = Maps_CopyFrom(maps, ($.arrayToSlice<MapItem>([$.markAsStructValue(new MapItem({Name: "a", Map: $.makeMap<string, number>([["x", 1]])})), $.markAsStructValue(new MapItem({Name: "b"}))]) as Maps))
+	let err = Maps_CopyFrom(maps, ($.arrayToSlice<MapItem>([new MapItem({Name: "a", Map: $.makeMap<string, number>([["x", 1]])}, true), new MapItem({Name: "b"}, true)]) as Maps))
 	await fmt.Println("copy:", err == null, $.basicInterfaceValue($.sliceLen((maps.value as Maps)), "int"), $.arrayIndex(maps.value!, 0).Name, $.basicInterfaceValue($.mapGet<string, number, number>($.arrayIndex(maps.value!, 0).Map, "x", 0)[0], "int"), $.arrayIndex(maps.value!, 1).Name)
 
 	let names: $.VarRef<Names> = $.varRef(null! as Names)

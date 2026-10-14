@@ -70,15 +70,16 @@ export class Action {
 		Filter: globalThis.Map<number, dep.Ref | null> | null
 	}
 
-	constructor(init?: Partial<{Result?: number, Filter?: globalThis.Map<number, dep.Ref | null> | null}>) {
+	constructor(init?: Partial<{Result?: number, Filter?: globalThis.Map<number, dep.Ref | null> | null}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Result: init?.Result ?? (0 as number),
 			Filter: init?.Filter ?? (null! as globalThis.Map<number, dep.Ref | null> | null)
 		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Action {
-		return $.markAsStructValue(new Action(this))
+		return new Action(this, true)
 	}
 
 	public __goscriptAssign(source: Action): void {
@@ -120,7 +121,7 @@ export function Fixed_Mark(f: Fixed): boolean {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let shapes: $.Slice<Shape | null> = $.arrayToSlice<Shape | null>([$.namedValueInterfaceValue<Shape | null>($.arrayToSlice<dep.Ref | null>([$.namedValueInterfaceValue<dep.Ref | null>($.arrayValue(new Uint8Array([1, 2])), "main.value", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2())]), "main.Fixed", __goscriptStatic3(), __goscriptStatic4(), __goscriptStatic5()), $.interfaceValue<Shape | null>($.markAsStructValue(new Action({Result: 1, Filter: $.makeMap<number, dep.Ref | null>([[1, $.namedValueInterfaceValue<dep.Ref | null>($.arrayValue(new Uint8Array([1, 2])), "main.value", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2())]])})), "main.Action", "main.Action")])
+	let shapes: $.Slice<Shape | null> = $.arrayToSlice<Shape | null>([$.namedValueInterfaceValue<Shape | null>($.arrayToSlice<dep.Ref | null>([$.namedValueInterfaceValue<dep.Ref | null>($.arrayValue(new Uint8Array([1, 2])), "main.value", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2())]), "main.Fixed", __goscriptStatic3(), __goscriptStatic4(), __goscriptStatic5()), $.interfaceValue<Shape | null>(new Action({Result: 1, Filter: $.makeMap<number, dep.Ref | null>([[1, $.namedValueInterfaceValue<dep.Ref | null>($.arrayValue(new Uint8Array([1, 2])), "main.value", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2())]])}, true), "main.Action", "main.Action")])
 	let fixed: $.Slice<Fixed> = null! as $.Slice<Fixed>
 	for (let __goscriptRangeTarget0 = shapes, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
 		let shape = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as Shape | null)
@@ -130,8 +131,8 @@ export async function main(): globalThis.Promise<void> {
 				case $.typeAssert<Fixed>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.sliceType("dep.Ref", "main.Fixed")).ok:
 					{
 						let shape: Fixed = $.typeAssert<Fixed>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.sliceType("dep.Ref", "main.Fixed")).value
-						shape = ($.append((shape as Fixed), $.namedValueInterfaceValue<dep.Ref | null>($.arrayValue(new Uint8Array([3, 4])), "main.value", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()), $.appendZeros.nil) as Fixed)
-						fixed = $.append(fixed, (shape as Fixed), $.appendZeros.nil)
+						shape = ($.appendOne((shape as Fixed), $.namedValueInterfaceValue<dep.Ref | null>($.arrayValue(new Uint8Array([3, 4])), "main.value", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()), $.appendZeros.nil) as Fixed)
+						fixed = $.appendOne(fixed, (shape as Fixed), $.appendZeros.nil)
 					}
 					break
 				case $.typeAssert<Action>(__goscriptTypeSwitchValue, "main.Action").ok:

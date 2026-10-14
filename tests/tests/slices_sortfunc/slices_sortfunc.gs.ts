@@ -28,15 +28,16 @@ export class Person {
 		Age: number
 	}
 
-	constructor(init?: Partial<{Name?: string, Age?: number}>) {
+	constructor(init?: Partial<{Name?: string, Age?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Name: init?.Name ?? ("" as string),
 			Age: init?.Age ?? (0 as number)
 		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Person {
-		return $.markAsStructValue(new Person(this))
+		return new Person(this, true)
 	}
 
 	public __goscriptAssign(source: Person): void {
@@ -56,7 +57,7 @@ export class Person {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let people: $.Slice<Person> = $.arrayToSlice<Person>([$.markAsStructValue(new Person({Name: "Charlie", Age: 30})), $.markAsStructValue(new Person({Name: "Alice", Age: 25})), $.markAsStructValue(new Person({Name: "Bob", Age: 35}))])
+	let people: $.Slice<Person> = $.arrayToSlice<Person>([new Person({Name: "Charlie", Age: 30}, true), new Person({Name: "Alice", Age: 25}, true), new Person({Name: "Bob", Age: 35}, true)])
 
 	slices.SortFunc(people, $.functionValue((a: Person, b: Person): number => {
 		if (a.Age < b.Age) {
@@ -69,7 +70,7 @@ export async function main(): globalThis.Promise<void> {
 	}, ({ kind: $.TypeKind.Function, params: ["main.Person", "main.Person"], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo)))
 
 	for (let __goscriptRangeTarget0 = people, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
-		let p = $.markAsStructValue($.cloneStructValue((__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as Person)))
+		let p = ((__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as Person)).clone()
 		await $.println(p.Name, p.Age)
 	}
 }

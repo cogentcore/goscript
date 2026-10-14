@@ -34,16 +34,17 @@ export class Node {
 		Next: Node | $.VarRef<Node> | null
 	}
 
-	constructor(init?: Partial<{Name?: string, Count?: number, Next?: Node | $.VarRef<Node> | null}>) {
+	constructor(init?: Partial<{Name?: string, Count?: number, Next?: Node | $.VarRef<Node> | null}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Name: init?.Name ?? ("" as string),
 			Count: init?.Count ?? (0 as number),
 			Next: init?.Next ?? (null! as Node | $.VarRef<Node> | null)
 		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Node {
-		return $.markAsStructValue(new Node(this))
+		return new Node(this, true)
 	}
 
 	public __goscriptAssign(source: Node): void {
@@ -93,14 +94,15 @@ export class Holder {
 		items: $.Slice<Node>
 	}
 
-	constructor(init?: Partial<{items?: $.Slice<Node>}>) {
+	constructor(init?: Partial<{items?: $.Slice<Node>}>, __goscriptValue?: boolean) {
 		this._fields = {
 			items: init?.items ?? (null! as $.Slice<Node>)
 		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Holder {
-		return $.markAsStructValue(new Holder(this))
+		return new Holder(this, true)
 	}
 
 	public __goscriptAssign(source: Holder): void {
@@ -171,7 +173,7 @@ export async function main(): globalThis.Promise<void> {
 	let nn: Node | $.VarRef<Node> | null = null! as Node | $.VarRef<Node> | null
 	await $.println(Node.prototype.Len.call(nn))
 
-	let h: Holder | $.VarRef<Holder> | null = new Holder({items: $.arrayToSlice<Node>([$.markAsStructValue(new Node({Name: "p"})), $.markAsStructValue(new Node({Name: "q"}))])})
+	let h: Holder | $.VarRef<Holder> | null = new Holder({items: $.arrayToSlice<Node>([new Node({Name: "p"}, true), new Node({Name: "q"}, true)])})
 	Holder.prototype.touch.call(h, 1)
 	await $.println($.arrayIndex($.pointerValue<Holder>(h).items!, 1).Name, $.arrayIndex($.pointerValue<Holder>(h).items!, 1).Count)
 }

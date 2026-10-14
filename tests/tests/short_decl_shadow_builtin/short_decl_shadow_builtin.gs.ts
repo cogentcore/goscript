@@ -18,7 +18,7 @@ export function capacity(a: $.Slice<number>): number {
 }
 
 export function grow(a: $.Slice<number>): $.Slice<number> {
-	let __goscriptShadow2: $.Slice<number> = $.append(a, 4)
+	let __goscriptShadow2: $.Slice<number> = $.appendOne(a, 4)
 	return __goscriptShadow2
 }
 

@@ -7,7 +7,7 @@ import * as dep from "@goscript/github.com/s4wave/goscript/tests/tests/cross_pac
 import "@goscript/github.com/s4wave/goscript/tests/tests/cross_package_unexported_interface_field/dep/index.js"
 
 export async function main(): globalThis.Promise<void> {
-	let holder = $.markAsStructValue($.cloneStructValue(dep.NewHolder()))
+	let holder = dep.NewHolder()
 	await $.println((__goscriptAwait = $.pointerValue<Exclude<dep.hidden, null>>(holder.Hidden).Ping(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 }
 

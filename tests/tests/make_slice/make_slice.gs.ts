@@ -59,8 +59,8 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("Before append - len:", $.sliceLen(b3), "cap:", $.cap(b3))
 	b3 = $.append(b3, $.uint(66, 8), $.byteSliceHint)
 	await $.println("After append - len:", $.sliceLen(b3), "cap:", $.cap(b3))
-	await $.println("b3[0]:", $.uint($.arrayIndex(b3!, 0), 8))
-	await $.println("b3[1]:", $.uint($.arrayIndex(b3!, 1), 8))
+	await $.println("b3[0]:", $.arrayIndex(b3!, 0))
+	await $.println("b3[1]:", $.arrayIndex(b3!, 1))
 
 	// Test 9: Large capacity slice
 	await $.println("--- Large capacity slice ---")

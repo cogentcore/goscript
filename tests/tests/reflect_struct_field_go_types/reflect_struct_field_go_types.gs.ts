@@ -22,14 +22,15 @@ export class Inner {
 		X: number
 	}
 
-	constructor(init?: Partial<{X?: number}>) {
+	constructor(init?: Partial<{X?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			X: init?.X ?? (0 as number)
 		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Inner {
-		return $.markAsStructValue(new Inner(this))
+		return new Inner(this, true)
 	}
 
 	public __goscriptAssign(source: Inner): void {
@@ -78,16 +79,17 @@ export class arg {
 		Tag: reflect.StructTag
 	}
 
-	constructor(init?: Partial<{Name?: string, Value?: any, Tag?: reflect.StructTag}>) {
+	constructor(init?: Partial<{Name?: string, Value?: any, Tag?: reflect.StructTag}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Name: init?.Name ?? ("" as string),
 			Value: init?.Value ?? (null! as any),
 			Tag: init?.Tag ?? ("" as reflect.StructTag)
 		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): arg {
-		return $.markAsStructValue(new arg(this))
+		return new arg(this, true)
 	}
 
 	public __goscriptAssign(source: arg): void {
@@ -134,15 +136,16 @@ export class Outer {
 		Name: string
 	}
 
-	constructor(init?: Partial<{Inner?: Inner, Name?: string}>) {
+	constructor(init?: Partial<{Inner?: Inner, Name?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
-			Inner: init?.Inner ? $.markAsStructValue($.cloneStructValue(init.Inner)) : $.markAsStructValue(new Inner()),
+			Inner: init?.Inner ? init.Inner.clone() : new Inner(undefined, true),
 			Name: init?.Name ?? ("" as string)
 		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Outer {
-		return $.markAsStructValue(new Outer(this))
+		return new Outer(this, true)
 	}
 
 	public __goscriptAssign(source: Outer): void {
@@ -169,12 +172,12 @@ export async function main(): globalThis.Promise<void> {
 	await $.println(f.Name, (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(f.Type).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), reflect.StructTag_Get(f.Tag, "json"))
 
 	// Index is a []int that can be appended to.
-	let [_of, ] = await $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.interfaceValue($.markAsStructValue(new Outer()), "main.Outer", "main.Outer"))).FieldByName("X")
+	let [_of, ] = await $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.interfaceValue(new Outer(undefined, true), "main.Outer", "main.Outer"))).FieldByName("X")
 	_of.Index = $.appendSlice($.arrayToSlice<number>([9]), _of.Index)
 	await $.println($.sliceLen(_of.Index), $.arrayIndex(_of.Index!, 0), $.arrayIndex(_of.Index!, 1), $.arrayIndex(_of.Index!, 2))
 
 	// Value.FieldByNameFunc finds a field by a name predicate.
-	let val = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.markAsStructValue(new Outer({Inner: $.markAsStructValue(new Inner({X: 5})), Name: "n"})), "main.Outer", "main.Outer"))))
+	let val = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(new Outer({Inner: new Inner({X: 5}, true), Name: "n"}, true), "main.Outer", "main.Outer"))))
 	let fv = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(val)).FieldByNameFunc($.functionValue((n: string): boolean => {
 		return strings.EqualFold(n, "name")
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo)))))

@@ -15,8 +15,8 @@ import "@goscript/io/index.js"
 export async function main(): globalThis.Promise<void> {
 	let sum = $.cloneArrayValue(await sha256.Sum256(new Uint8Array([97, 98, 99])), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 32))
 	await $.println("sum len", 32)
-	await $.println("sum first", $.uint($.arrayIndex(sum, 0), 8))
-	await $.println("sum last", $.uint($.arrayIndex(sum, 31), 8))
+	await $.println("sum first", $.arrayIndex(sum, 0))
+	await $.println("sum last", $.arrayIndex(sum, 31))
 
 	let h: hash.Hash | null = sha256.New()
 	let [n, err] = await $.pointerValue<Exclude<hash.Hash, null>>(h).Write(new Uint8Array([97]))
@@ -27,13 +27,13 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("write bc", n, err == null)
 	let stream: $.Slice<number> = await $.pointerValue<Exclude<hash.Hash, null>>(h).Sum(new Uint8Array([1, 2]) as $.Slice<number>)
 	await $.println("stream len", $.sliceLen(stream))
-	await $.println("stream prefix", $.uint($.arrayIndex(stream!, 0), 8), $.uint($.arrayIndex(stream!, 1), 8))
-	await $.println("stream digest", $.uint($.arrayIndex(stream!, 2), 8), $.uint($.arrayIndex(stream!, 33), 8))
+	await $.println("stream prefix", $.arrayIndex(stream!, 0), $.arrayIndex(stream!, 1))
+	await $.println("stream digest", $.arrayIndex(stream!, 2), $.arrayIndex(stream!, 33))
 
 	let backing: $.Slice<number> = $.makeSlice<number>(sha256.Size, undefined, "byte")
 	let backed: $.Slice<number> = await $.pointerValue<Exclude<hash.Hash, null>>(h).Sum($.goSlice(backing, undefined, 0))
 	await $.println("backed len", $.sliceLen(backed), $.sliceLen(backing))
-	await $.println("backed digest", $.uint($.arrayIndex(backing!, 0), 8), $.uint($.arrayIndex(backing!, 31), 8), $.uint($.arrayIndex(backed!, 0), 8), $.uint($.arrayIndex(backed!, 31), 8))
+	await $.println("backed digest", $.arrayIndex(backing!, 0), $.arrayIndex(backing!, 31), $.arrayIndex(backed!, 0), $.arrayIndex(backed!, 31))
 }
 
 if ($.isMainScript(import.meta)) {

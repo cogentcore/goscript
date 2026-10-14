@@ -51,7 +51,7 @@ export class FileTracker {
 		let f: FileTracker | $.VarRef<FileTracker> | null = this;
 		const f$ = $.pointerTarget<FileTracker>(f)
 		await (f$ as FileTracker).mutex.Lock();
-		;(f$ as FileTracker).lines = $.append((f$ as FileTracker).lines, offset)
+		;(f$ as FileTracker).lines = $.appendOne((f$ as FileTracker).lines, offset)
 		void (f$ as FileTracker).mutex.Unlock()
 	}
 

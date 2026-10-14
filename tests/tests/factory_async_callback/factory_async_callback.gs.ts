@@ -9,7 +9,7 @@ import "@goscript/github.com/s4wave/goscript/tests/tests/factory_async_callback/
 export type AddFactoryFunc = ((b: dep.Bus) => $.Slice<dep.Factory | null> | globalThis.Promise<$.Slice<dep.Factory | null>>) | null
 
 export let Factories: $.Slice<AddFactoryFunc | null> = $.arrayToSlice<AddFactoryFunc | null>([$.functionValue(async (b: dep.Bus): globalThis.Promise<$.Slice<dep.Factory | null>> => {
-	return $.arrayToSlice<dep.Factory | null>([await dep.NewFactory($.markAsStructValue($.cloneStructValue(b)))])
+	return $.arrayToSlice<dep.Factory | null>([await dep.NewFactory((b).clone())])
 }, ({ kind: $.TypeKind.Function, params: ["dep.Bus"], results: [/* @__PURE__ */ $.sliceType("dep.Factory")] } as $.FunctionTypeInfo))])
 
 export function __goscript_set_Factories(__goscriptValue: $.Slice<AddFactoryFunc | null>): void {
@@ -17,7 +17,7 @@ export function __goscript_set_Factories(__goscriptValue: $.Slice<AddFactoryFunc
 }
 
 export async function main(): globalThis.Promise<void> {
-	let factories: $.Slice<dep.Factory | null> = (__goscriptAwait = $.arrayIndex(Factories!, 0)!($.markAsStructValue(new dep.Bus())), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+	let factories: $.Slice<dep.Factory | null> = (__goscriptAwait = $.arrayIndex(Factories!, 0)!(new dep.Bus(undefined, true)), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 	await $.println((__goscriptAwait = $.pointerValue<Exclude<dep.Factory, null>>($.arrayIndex(factories!, 0)).GetConfigID(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 }
 

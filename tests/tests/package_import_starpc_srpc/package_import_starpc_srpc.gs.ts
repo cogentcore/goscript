@@ -31,13 +31,14 @@ export class handler {
 	public _fields: {
 	}
 
-	constructor(init?: Partial<{}>) {
+	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
 		this._fields = {
 		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): handler {
-		return $.markAsStructValue(new handler(this))
+		return new handler(this, true)
 	}
 
 	public __goscriptAssign(source: handler): void {
@@ -98,14 +99,15 @@ export class embeddedStream {
 		Stream: srpc.Stream | null
 	}
 
-	constructor(init?: Partial<{Stream?: srpc.Stream | null}>) {
+	constructor(init?: Partial<{Stream?: srpc.Stream | null}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Stream: init?.Stream ?? (null! as srpc.Stream | null)
 		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): embeddedStream {
-		return $.markAsStructValue(new embeddedStream(this))
+		return new embeddedStream(this, true)
 	}
 
 	public __goscriptAssign(source: embeddedStream): void {
@@ -165,15 +167,16 @@ export class streamOpenResult {
 		err: $.GoError
 	}
 
-	constructor(init?: Partial<{stream?: srpc.Stream | null, err?: $.GoError}>) {
+	constructor(init?: Partial<{stream?: srpc.Stream | null, err?: $.GoError}>, __goscriptValue?: boolean) {
 		this._fields = {
 			stream: init?.stream ?? (null! as srpc.Stream | null),
 			err: init?.err ?? (null! as $.GoError)
 		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): streamOpenResult {
-		return $.markAsStructValue(new streamOpenResult(this))
+		return new streamOpenResult(this, true)
 	}
 
 	public __goscriptAssign(source: streamOpenResult): void {
@@ -214,15 +217,16 @@ export class streamProbeResult {
 		err: string
 	}
 
-	constructor(init?: Partial<{total?: number, err?: string}>) {
+	constructor(init?: Partial<{total?: number, err?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
 			total: init?.total ?? (0 as number),
 			err: init?.err ?? ("" as string)
 		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): streamProbeResult {
-		return $.markAsStructValue(new streamProbeResult(this))
+		return new streamProbeResult(this, true)
 	}
 
 	public __goscriptAssign(source: streamProbeResult): void {
@@ -254,14 +258,15 @@ export class rpcStreamServerResult {
 		err: string
 	}
 
-	constructor(init?: Partial<{err?: string}>) {
+	constructor(init?: Partial<{err?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
 			err: init?.err ?? ("" as string)
 		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): rpcStreamServerResult {
-		return $.markAsStructValue(new rpcStreamServerResult(this))
+		return new rpcStreamServerResult(this, true)
 	}
 
 	public __goscriptAssign(source: rpcStreamServerResult): void {
@@ -337,7 +342,7 @@ export class memoryRpcStream {
 		cancelLocal: sync.Once
 	}
 
-	constructor(init?: Partial<{ctx?: context.Context | null, cancel?: (() => void) | null, recv?: $.Channel<rpcstream.RpcStreamPacket | $.VarRef<rpcstream.RpcStreamPacket> | null> | null, send?: $.Channel<rpcstream.RpcStreamPacket | $.VarRef<rpcstream.RpcStreamPacket> | null> | null, closeSend?: sync.Once, cancelLocal?: sync.Once}>) {
+	constructor(init?: Partial<{ctx?: context.Context | null, cancel?: (() => void) | null, recv?: $.Channel<rpcstream.RpcStreamPacket | $.VarRef<rpcstream.RpcStreamPacket> | null> | null, send?: $.Channel<rpcstream.RpcStreamPacket | $.VarRef<rpcstream.RpcStreamPacket> | null> | null, closeSend?: sync.Once, cancelLocal?: sync.Once}>, __goscriptValue?: boolean) {
 		this._fields = {
 			ctx: init?.ctx ?? (null! as context.Context | null),
 			cancel: init?.cancel ?? (null! as (() => void) | null),
@@ -346,10 +351,11 @@ export class memoryRpcStream {
 			closeSend: init?.closeSend ? $.markAsStructValue($.cloneStructValue(init.closeSend)) : $.markAsStructValue(new sync.Once()),
 			cancelLocal: init?.cancelLocal ? $.markAsStructValue($.cloneStructValue(init.cancelLocal)) : $.markAsStructValue(new sync.Once())
 		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): memoryRpcStream {
-		return $.markAsStructValue(new memoryRpcStream(this))
+		return new memoryRpcStream(this, true)
 	}
 
 	public __goscriptAssign(source: memoryRpcStream): void {
@@ -509,15 +515,16 @@ export class memoryRpcContext {
 		once: sync.Once
 	}
 
-	constructor(init?: Partial<{done?: $.Channel<{}> | null, once?: sync.Once}>) {
+	constructor(init?: Partial<{done?: $.Channel<{}> | null, once?: sync.Once}>, __goscriptValue?: boolean) {
 		this._fields = {
 			done: init?.done ?? (null! as $.Channel<{}> | null),
 			once: init?.once ? $.markAsStructValue($.cloneStructValue(init.once)) : $.markAsStructValue(new sync.Once())
 		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): memoryRpcContext {
-		return $.markAsStructValue(new memoryRpcContext(this))
+		return new memoryRpcContext(this, true)
 	}
 
 	public __goscriptAssign(source: memoryRpcContext): void {
@@ -609,7 +616,7 @@ export function newMemoryRpcStreamPair(): [memoryRpcStream | $.VarRef<memoryRpcS
 }
 
 export async function openHeldStreams(ctx: context.Context | null, client: srpc.Client | null, count: number): globalThis.Promise<[$.Slice<srpc.Stream | null>, boolean]> {
-	let resultCh: $.Channel<streamOpenResult> | null = $.makeChannel<streamOpenResult>(count, $.markAsStructValue(new streamOpenResult()), "both")
+	let resultCh: $.Channel<streamOpenResult> | null = $.makeChannel<streamOpenResult>(count, new streamOpenResult(undefined, true), "both")
 	for (let __goscriptRangeCount0 = count, i = 0; i < __goscriptRangeCount0; i++) {
 		const __goscriptDeferArg0 = i
 		queueMicrotask(async () => { await (async (idx: number): globalThis.Promise<void> => {
@@ -617,7 +624,7 @@ export async function openHeldStreams(ctx: context.Context | null, client: srpc.
 			if (err == null) {
 				err = (__goscriptAwait = $.pointerValue<Exclude<srpc.Stream, null>>(strm).MsgSend($.interfaceValue<srpc.Message | null>(srpc.NewRawMessage(new Uint8Array([$.uint(idx, 8)]) as $.Slice<number>, false), "*srpc.RawMessage", /* @__PURE__ */ $.pointerType("srpc.RawMessage"))), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 			}
-			await $.chanSend(resultCh, $.markAsStructValue(new streamOpenResult({stream: strm, err: err})))
+			await $.chanSend(resultCh, new streamOpenResult({stream: strm, err: err}, true))
 		})(__goscriptDeferArg0) })
 	}
 
@@ -682,16 +689,16 @@ export async function closeHeldStreams(streams: $.Slice<srpc.Stream | null>): gl
 }
 
 export async function probeConcurrentStreams(ctx: context.Context | null, client: srpc.Client | null, count: number): globalThis.Promise<boolean> {
-	let resultCh: $.Channel<streamProbeResult> | null = $.makeChannel<streamProbeResult>(count, $.markAsStructValue(new streamProbeResult()), "both")
+	let resultCh: $.Channel<streamProbeResult> | null = $.makeChannel<streamProbeResult>(count, new streamProbeResult(undefined, true), "both")
 	for (let __goscriptRangeCount2 = count, i = 0; i < __goscriptRangeCount2; i++) {
 		const __goscriptDeferArg1 = i
 		queueMicrotask(async () => { await (async (idx: number): globalThis.Promise<void> => {
 			let [total, err] = await probeStream(ctx, client, $.uint(idx + 1, 8), $.uint(idx + 2, 8))
 			if (err != null) {
-				await $.chanSend(resultCh, (await (async () => { const __goscriptLiteralField0 = (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait); return $.markAsStructValue(new streamProbeResult({err: __goscriptLiteralField0})) })()))
+				await $.chanSend(resultCh, (await (async () => { const __goscriptLiteralField0 = (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait); return new streamProbeResult({err: __goscriptLiteralField0}, true) })()))
 				return
 			}
-			await $.chanSend(resultCh, $.markAsStructValue(new streamProbeResult({total: total})))
+			await $.chanSend(resultCh, new streamProbeResult({total: total}, true))
 		})(__goscriptDeferArg1) })
 	}
 
@@ -780,7 +787,7 @@ export function newRoutedRpcStreamClient(ctx: context.Context | null, componentI
 						id: 0,
 						isSend: true,
 						channel: results,
-						value: (await (async () => { const __goscriptLiteralField1 = (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait); return $.markAsStructValue(new rpcStreamServerResult({err: __goscriptLiteralField1})) })()),
+						value: (await (async () => { const __goscriptLiteralField1 = (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait); return new rpcStreamServerResult({err: __goscriptLiteralField1}, true) })()),
 					},
 					{
 						id: -1,
@@ -825,14 +832,14 @@ export function newRoutedRpcStreamClient(ctx: context.Context | null, componentI
 export async function exerciseRpcStreamClientPressure(ctx: context.Context | null): globalThis.Promise<boolean> {
 	let mux = srpc.NewMux(null)
 	{
-		let err = (__goscriptAwait = $.pointerValue<Exclude<srpc.Mux, null>>(mux).Register($.interfaceValue<srpc.Handler | null>($.markAsStructValue(new handler()), "main.handler", "main.handler")), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+		let err = (__goscriptAwait = $.pointerValue<Exclude<srpc.Mux, null>>(mux).Register($.interfaceValue<srpc.Handler | null>(new handler(undefined, true), "main.handler", "main.handler")), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 		if (err != null) {
 			await $.println("rpcstream pressure register error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 			return false
 		}
 	}
 
-	let results: $.Channel<rpcStreamServerResult> | null = $.makeChannel<rpcStreamServerResult>(8, $.markAsStructValue(new rpcStreamServerResult()), "both")
+	let results: $.Channel<rpcStreamServerResult> | null = $.makeChannel<rpcStreamServerResult>(8, new rpcStreamServerResult(undefined, true), "both")
 	let getter: ((ctx: context.Context | null, componentID: string, released: (() => void) | null) => [srpc.Invoker | null, (() => void) | null, $.GoError] | globalThis.Promise<[srpc.Invoker | null, (() => void) | null, $.GoError]>) | null = $.functionValue((ctx: context.Context | null, componentID: string, released: (() => void) | null): [srpc.Invoker | null, (() => void) | null, $.GoError] => {
 		if ((!$.stringEqual(componentID, "component-root")) && (!$.stringEqual(componentID, "component-space"))) {
 			return [null, (null as (() => void) | null), null]
@@ -1108,7 +1115,7 @@ export async function main(): globalThis.Promise<void> {
 	__defer.defer(async () => { (__goscriptAwait = __goscriptDeferCallee2!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) })
 
 	let mux = srpc.NewMux(null);
-	;(__goscriptAwait = $.pointerValue<Exclude<srpc.Mux, null>>(mux).Register($.interfaceValue<srpc.Handler | null>($.markAsStructValue(new handler()), "main.handler", "main.handler")), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+	;(__goscriptAwait = $.pointerValue<Exclude<srpc.Mux, null>>(mux).Register($.interfaceValue<srpc.Handler | null>(new handler(undefined, true), "main.handler", "main.handler")), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 	await $.pointerValue<Exclude<srpc.Mux, null>>(mux).InvokeMethod("svc", "method", null)
 	closeEmbedded
 	$.functionValue(async (strm: srpc.StreamRecv | null): globalThis.Promise<$.GoError> => await recvOne(__goscriptStatic4(), strm), ({ kind: $.TypeKind.Function, params: ["srpc.StreamRecv"], results: ["error"] } as $.FunctionTypeInfo))

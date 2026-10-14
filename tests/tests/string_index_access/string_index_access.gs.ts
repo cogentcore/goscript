@@ -7,20 +7,20 @@ export const lookup: string = $.bytesToString(new Uint8Array([0, 255, 7, 228, 18
 
 export async function main(): globalThis.Promise<void> {
 	let myStr1 = "testing"
-	await $.println("Byte from myStr1[0]:", $.uint($.indexString(myStr1, 0), 8))
-	await $.println("Byte from myStr1[2]:", $.uint($.indexString(myStr1, 2), 8))
-	await $.println("Byte from myStr1[6]:", $.uint($.indexString(myStr1, 6), 8))
+	await $.println("Byte from myStr1[0]:", $.indexString(myStr1, 0))
+	await $.println("Byte from myStr1[2]:", $.indexString(myStr1, 2))
+	await $.println("Byte from myStr1[6]:", $.indexString(myStr1, 6))
 
 	let myStr2 = "你好世界"
 	// String indexing returns UTF-8 bytes, not Unicode code points.
-	await $.println("Byte from myStr2[0]:", $.uint($.indexString(myStr2, 0), 8))
-	await $.println("Byte from myStr2[1]:", $.uint($.indexString(myStr2, 1), 8))
-	await $.println("Byte from myStr2[2]:", $.uint($.indexString(myStr2, 2), 8))
-	await $.println("Byte from myStr2[3]:", $.uint($.indexString(myStr2, 3), 8))
+	await $.println("Byte from myStr2[0]:", $.indexString(myStr2, 0))
+	await $.println("Byte from myStr2[1]:", $.indexString(myStr2, 1))
+	await $.println("Byte from myStr2[2]:", $.indexString(myStr2, 2))
+	await $.println("Byte from myStr2[3]:", $.indexString(myStr2, 3))
 
 	// Constant lookup tables preserve invalid UTF-8 and control bytes.
 	for (let i = 0; i < 6; i++) {
-		await $.println("constant byte", $.uint($.indexByteString("\x00\xff\x07\xe4\xbd\xa0", i), 8))
+		await $.println("constant byte", $.indexByteString("\x00\xff\x07\xe4\xbd\xa0", i))
 	}
 	await checkBounds(-1)
 	await checkBounds(6)
@@ -32,7 +32,7 @@ export async function checkBounds(index: number): globalThis.Promise<void> {
 		__defer.defer(async () => { await (async (): globalThis.Promise<void> => {
 			await $.println("out of bounds", $.recover() != null)
 		})() })
-		await $.println($.uint($.indexByteString("\x00\xff\x07\xe4\xbd\xa0", index), 8))
+		await $.println($.indexByteString("\x00\xff\x07\xe4\xbd\xa0", index))
 		await __defer.dispose()
 	} catch (e) {
 		await __defer.disposePanic(e)

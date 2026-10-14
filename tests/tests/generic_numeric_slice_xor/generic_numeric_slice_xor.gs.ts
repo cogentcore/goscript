@@ -7,14 +7,14 @@ export function xorLoop<T>(__typeArgs: $.GenericTypeArgs | undefined, dst: $.Sli
 	x = $.goSlice(x, undefined, $.sliceLen(dst))
 	y = $.goSlice(y, undefined, $.sliceLen(dst))
 	for (let __goscriptRangeTarget0 = dst, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), i = 0; i < __goscriptRangeWindow0.length; i++) {
-		(__goscriptRangeWindow0.backing as any[])[__goscriptRangeWindow0.offset + i] = ($.arrayIndex(x!, i) as any) ^ ($.arrayIndex(y!, i) as any)
+		;(__goscriptRangeWindow0.backing as any[])[__goscriptRangeWindow0.offset + i] = ($.arrayIndex(x!, i) as any) ^ ($.arrayIndex(y!, i) as any)
 	}
 }
 
 export async function main(): globalThis.Promise<void> {
 	let dst: $.Slice<number> = new Uint8Array([0, 0]) as $.Slice<number>
 	xorLoop(__goscriptStatic0(), dst, new Uint8Array([1, 3]) as $.Slice<number>, new Uint8Array([2, 1]) as $.Slice<number>)
-	await $.println($.uint($.arrayIndex(dst!, 0), 8), $.uint($.arrayIndex(dst!, 1), 8))
+	await $.println($.arrayIndex(dst!, 0), $.arrayIndex(dst!, 1))
 }
 
 var __goscriptStatic0$value: any

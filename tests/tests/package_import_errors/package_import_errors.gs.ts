@@ -33,14 +33,15 @@ export class customErr {
 		msg: string
 	}
 
-	constructor(init?: Partial<{msg?: string}>) {
+	constructor(init?: Partial<{msg?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
 			msg: init?.msg ?? ("" as string)
 		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): customErr {
-		return $.markAsStructValue(new customErr(this))
+		return new customErr(this, true)
 	}
 
 	public __goscriptAssign(source: customErr): void {
@@ -76,14 +77,15 @@ export class wrappedErr {
 		err: $.GoError
 	}
 
-	constructor(init?: Partial<{err?: $.GoError}>) {
+	constructor(init?: Partial<{err?: $.GoError}>, __goscriptValue?: boolean) {
 		this._fields = {
 			err: init?.err ?? (null! as $.GoError)
 		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): wrappedErr {
-		return $.markAsStructValue(new wrappedErr(this))
+		return new wrappedErr(this, true)
 	}
 
 	public __goscriptAssign(source: wrappedErr): void {
@@ -132,7 +134,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("nilErr == nil:", nilErr == null)
 
 	let typedErr: customErr | $.VarRef<customErr> | null = new customErr({msg: "typed error"})
-	let __goscriptTuple0: any = errors.AsType(__goscriptStatic0(), $.interfaceValue<$.GoError>($.markAsStructValue(new wrappedErr({err: $.interfaceValue<$.GoError>(typedErr, "*main.customErr", /* @__PURE__ */ $.pointerType("main.customErr"))})), "main.wrappedErr", "main.wrappedErr")!)
+	let __goscriptTuple0: any = errors.AsType(__goscriptStatic0(), $.interfaceValue<$.GoError>(new wrappedErr({err: $.interfaceValue<$.GoError>(typedErr, "*main.customErr", /* @__PURE__ */ $.pointerType("main.customErr"))}, true), "main.wrappedErr", "main.wrappedErr")!)
 	let matched: customErr | $.VarRef<customErr> | null = (__goscriptTuple0[0] as customErr | $.VarRef<customErr> | null)
 	let ok = __goscriptTuple0[1]
 	await $.println("AsType matched:", ok)
@@ -144,8 +146,8 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("AsType missing:", ok)
 
 	let scalarTarget: $.VarRef<scalarErr> = $.varRef(0)
-	await $.println("As scalar missing:", errors.As($.pointerValueOrNil(err1)!, $.namedValueInterfaceValue<any>(scalarTarget, "*main.scalarErr", __goscriptStatic1(), __goscriptStatic2(), __goscriptStatic3())), $.uint(scalarTarget.value, 8))
-	await $.println("As scalar matched:", errors.As($.namedValueInterfaceValue<$.GoError>(42, "main.scalarErr", {"Error": scalarErr_Error}, /* @__PURE__ */ $.basicType("uint8", "main.scalarErr"))!, $.namedValueInterfaceValue<any>(scalarTarget, "*main.scalarErr", __goscriptStatic1(), __goscriptStatic2(), __goscriptStatic3())), $.uint(scalarTarget.value, 8))
+	await $.println("As scalar missing:", errors.As($.pointerValueOrNil(err1)!, $.namedValueInterfaceValue<any>(scalarTarget, "*main.scalarErr", __goscriptStatic1(), __goscriptStatic2(), __goscriptStatic3())), scalarTarget.value)
+	await $.println("As scalar matched:", errors.As($.namedValueInterfaceValue<$.GoError>(42, "main.scalarErr", {"Error": scalarErr_Error}, /* @__PURE__ */ $.basicType("uint8", "main.scalarErr"))!, $.namedValueInterfaceValue<any>(scalarTarget, "*main.scalarErr", __goscriptStatic1(), __goscriptStatic2(), __goscriptStatic3())), scalarTarget.value)
 
 	await $.println("test finished")
 }

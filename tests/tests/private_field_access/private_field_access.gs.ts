@@ -65,7 +65,7 @@ export async function accessPrivateField(s: MyStruct): globalThis.Promise<void> 
 
 export async function main(): globalThis.Promise<void> {
 	let s = NewMyStruct("hello", 123)
-	await accessPrivateField((s).clone())
+	await accessPrivateField(s)
 }
 
 if ($.isMainScript(import.meta)) {

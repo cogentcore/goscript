@@ -48,13 +48,14 @@ export class Image {
 	public async MarshalJSON(): globalThis.Promise<[$.Slice<number>, $.GoError]> {
 		const im: Image | $.VarRef<Image> | null = this;
 		using __defer = new $.DisposableStack()
+		const im$ = $.pointerTarget<Image>(im)
 		await mu.value.Lock()
 		const __goscriptDeferCallee0 = $.functionValue(((__receiver) => () => __receiver.Unlock())(mu.value), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "sync.(*Mutex).Unlock-fm")
 		__defer.defer(() => { __goscriptDeferCallee0() })
-		if ($.stringEqual($.pointerValue<Image>(im).Name, "bad")) {
+		if ($.stringEqual((im$ as Image).Name, "bad")) {
 			return [null, errors.New("cannot marshal bad image")]
 		}
-		return await json.Marshal($.interfaceValue($.makeMap<string, string>([["encoded", strings.ToUpper($.pointerValue<Image>(im).Name)]]), "map[string]string", /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("string"))))
+		return await json.Marshal($.interfaceValue($.makeMap<string, string>([["encoded", strings.ToUpper((im$ as Image).Name)]]), "map[string]string", /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("string"))))
 	}
 
 	public async UnmarshalJSON(b: $.Slice<number>): globalThis.Promise<$.GoError> {

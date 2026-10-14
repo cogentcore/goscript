@@ -25,15 +25,16 @@ export class Inner {
 		Y: number
 	}
 
-	constructor(init?: Partial<{X?: number, Y?: number}>) {
+	constructor(init?: Partial<{X?: number, Y?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			X: init?.X ?? (0 as number),
 			Y: init?.Y ?? (0 as number)
 		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Inner {
-		return $.markAsStructValue(new Inner(this))
+		return new Inner(this, true)
 	}
 
 	public __goscriptAssign(source: Inner): void {
@@ -92,17 +93,18 @@ export class Outer {
 		N: number
 	}
 
-	constructor(init?: Partial<{In?: Inner, Arr?: number[], Ptr?: Inner | $.VarRef<Inner> | null, N?: number}>) {
+	constructor(init?: Partial<{In?: Inner, Arr?: number[], Ptr?: Inner | $.VarRef<Inner> | null, N?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
-			In: init?.In ? $.markAsStructValue($.cloneStructValue(init.In)) : $.markAsStructValue(new Inner()),
+			In: init?.In ? init.In.clone() : new Inner(undefined, true),
 			Arr: init?.Arr !== undefined ? $.cloneArrayValue(init.Arr, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2)) : $.arrayValue(globalThis.Array.from({ length: 2 }, () => 0)),
 			Ptr: init?.Ptr ?? (null! as Inner | $.VarRef<Inner> | null),
 			N: init?.N ?? (0 as number)
 		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Outer {
-		return $.markAsStructValue(new Outer(this))
+		return new Outer(this, true)
 	}
 
 	public __goscriptAssign(source: Outer): void {
@@ -145,15 +147,16 @@ export class Pair {
 		Val: any
 	}
 
-	constructor(init?: Partial<{Key?: string, Val?: any}>) {
+	constructor(init?: Partial<{Key?: string, Val?: any}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Key: init?.Key ?? ("" as string),
 			Val: init?.Val !== undefined ? $.copyElement(init.Val) : (null! as any)
 		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Pair {
-		return $.markAsStructValue(new Pair(this))
+		return new Pair(this, true)
 	}
 
 	public __goscriptAssign(source: Pair): void {
@@ -185,14 +188,15 @@ export class Holder {
 		P: Pair
 	}
 
-	constructor(init?: Partial<{P?: Pair}>) {
+	constructor(init?: Partial<{P?: Pair}>, __goscriptValue?: boolean) {
 		this._fields = {
 			P: init?.P ? $.markAsStructValue($.cloneStructValue(init.P)) : $.markAsStructValue(new Pair({Val: null}))
 		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Holder {
-		return $.markAsStructValue(new Holder(this))
+		return new Holder(this, true)
 	}
 
 	public __goscriptAssign(source: Holder): void {
@@ -210,7 +214,7 @@ export class Holder {
 	)
 }
 
-export let global: Outer = $.markAsStructValue(new Outer())
+export let global: Outer = new Outer(undefined, true)
 
 export function __goscript_set_global(__goscriptValue: Outer): void {
 	$.assignStruct(global, __goscriptValue)
@@ -221,12 +225,12 @@ export function assignGeneric(__typeArgs: $.GenericTypeArgs | undefined, dst: Pa
 }
 
 export function make1(): Outer {
-	return $.markAsStructValue(new Outer({In: $.markAsStructValue(new Inner({X: 1, Y: 2})), Arr: $.arrayValue([3, 4]), N: 5}))
+	return new Outer({In: new Inner({X: 1, Y: 2}, true), Arr: $.arrayValue([3, 4]), N: 5}, true)
 }
 
 export async function main(): globalThis.Promise<void> {
-	let a = $.varRef($.markAsStructValue($.cloneStructValue(make1())))
-	let b = $.markAsStructValue(new Outer())
+	let a = $.varRef(make1())
+	let b = new Outer(undefined, true)
 	$.assignStruct(b, a.value)
 	a.value.In.X = 10
 	a.value.Arr[0] = 30
@@ -236,7 +240,7 @@ export async function main(): globalThis.Promise<void> {
 	$.assignStruct(a.value, $.pointerValue<Outer>(p))
 	await $.println(a.value.In.X, a.value.N)
 
-	let s: $.Slice<Outer> = $.arrayToSlice<Outer>([$.markAsStructValue($.cloneStructValue(make1())), $.markAsStructValue($.cloneStructValue(make1()))])
+	let s: $.Slice<Outer> = $.arrayToSlice<Outer>([make1(), make1()])
 	$.assignStruct(s![0], $.arrayIndex(s!, 1))
 	$.arrayIndex(s!, 1).In.Y = 20
 	await $.println($.arrayIndex(s!, 0).In.Y, $.arrayIndex(s!, 1).In.Y)
@@ -251,17 +255,17 @@ export async function main(): globalThis.Promise<void> {
 	b.N = 50
 	await $.println(global.N, b.N)
 
-	let _in: Inner = $.markAsStructValue(new Inner())
+	let _in: Inner = new Inner(undefined, true)
 	$.assignStruct(_in, a.value.In)
 	a.value.In.Y = 99
 	await $.println(_in.Y, a.value.In.Y)
-	let g1 = $.markAsStructValue(new Pair({Key: "a", Val: $.markAsStructValue(new Inner({X: 1, Y: 2}))}))
-	let g2: Pair = $.markAsStructValue(new Pair({Val: $.markAsStructValue(new Inner())}))
+	let g1 = $.markAsStructValue(new Pair({Key: "a", Val: new Inner({X: 1, Y: 2}, true)}))
+	let g2: Pair = $.markAsStructValue(new Pair({Val: new Inner(undefined, true)}))
 	$.assignStruct(g2, $.markAsStructValue($.cloneStructValue(g1)))
 	g1.Val.X = 11
 	await $.println(g2.Val.X, g1.Val.X)
-	let g3: $.VarRef<Pair> = $.varRef($.markAsStructValue(new Pair({Val: $.markAsStructValue(new Inner())})))
-	assignGeneric(__goscriptStatic0(), g3, $.markAsStructValue($.cloneStructValue(g1)))
+	let g3: $.VarRef<Pair> = $.varRef($.markAsStructValue(new Pair({Val: new Inner(undefined, true)})))
+	assignGeneric(__goscriptStatic0(), g3, g1)
 	g1.Val.Y = 22
 	await $.println(g3.value.Val.Y, g1.Val.Y)
 	let h1 = $.markAsStructValue(new Holder({P: $.markAsStructValue($.cloneStructValue(g1))}))
@@ -269,16 +273,16 @@ export async function main(): globalThis.Promise<void> {
 	$.assignStruct(h2, $.markAsStructValue($.cloneStructValue(h1)))
 	h1.P.Val.X = 33
 	await $.println(h2.P.Val.X, h1.P.Val.X)
-	let m: globalThis.Map<string, Outer> | null = $.makeMap<string, Outer>([["k", $.markAsStructValue($.cloneStructValue(a.value))]])
-	let c = $.markAsStructValue(new Outer())
-	$.assignStruct(c, $.mapGet<string, Outer, Outer>(m, "k", $.markAsStructValue(new Outer()))[0])
+	let m: globalThis.Map<string, Outer> | null = $.makeMap<string, Outer>([["k", (a.value).clone()]])
+	let c = new Outer(undefined, true)
+	$.assignStruct(c, $.mapGet<string, Outer, Outer>(m, "k", new Outer(undefined, true))[0])
 	c.N = 77
-	await $.println($.mapGet<string, Outer, Outer>(m, "k", $.markAsStructValue(new Outer()))[0].N, c.N)
+	await $.println($.mapGet<string, Outer, Outer>(m, "k", new Outer(undefined, true))[0].N, c.N)
 }
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.Inner", zero: () => $.markAsStructValue(new Inner()) }})
+	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.Inner", zero: () => new Inner(undefined, true) }})
 }
 
 if ($.isMainScript(import.meta)) {

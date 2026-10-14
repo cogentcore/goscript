@@ -16,14 +16,15 @@ export class cache {
 		stored: any
 	}
 
-	constructor(init?: Partial<{stored?: any}>) {
+	constructor(init?: Partial<{stored?: any}>, __goscriptValue?: boolean) {
 		this._fields = {
 			stored: init?.stored ?? (null! as any)
 		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): cache {
-		return $.markAsStructValue(new cache(this))
+		return new cache(this, true)
 	}
 
 	public __goscriptAssign(source: cache): void {
@@ -68,14 +69,15 @@ export class key {
 		N: number
 	}
 
-	constructor(init?: Partial<{N?: number}>) {
+	constructor(init?: Partial<{N?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			N: init?.N ?? (0 as number)
 		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): key {
-		return $.markAsStructValue(new key(this))
+		return new key(this, true)
 	}
 
 	public __goscriptAssign(source: key): void {
@@ -106,14 +108,15 @@ export class privateKey {
 		D: number
 	}
 
-	constructor(init?: Partial<{D?: number}>) {
+	constructor(init?: Partial<{D?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			D: init?.D ?? (0 as number)
 		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): privateKey {
-		return $.markAsStructValue(new privateKey(this))
+		return new privateKey(this, true)
 	}
 
 	public __goscriptAssign(source: privateKey): void {
@@ -161,7 +164,7 @@ export async function main(): globalThis.Promise<void> {
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, K: { type: "main.key", zero: () => $.markAsStructValue(new key()) }, V: { type: "main.privateKey", zero: () => $.markAsStructValue(new privateKey()) }})
+	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, K: { type: "main.key", zero: () => new key(undefined, true) }, V: { type: "main.privateKey", zero: () => new privateKey(undefined, true) }})
 }
 
 var __goscriptAwait: any

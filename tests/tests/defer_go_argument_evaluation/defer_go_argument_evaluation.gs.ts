@@ -28,15 +28,16 @@ export class R {
 		B: number
 	}
 
-	constructor(init?: Partial<{A?: number, B?: number}>) {
+	constructor(init?: Partial<{A?: number, B?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			A: init?.A ?? (0 as number),
 			B: init?.B ?? (0 as number)
 		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): R {
-		return $.markAsStructValue(new R(this))
+		return new R(this, true)
 	}
 
 	public __goscriptAssign(source: R): void {
@@ -53,7 +54,8 @@ export class R {
 
 	public async ShowPtr(tag: string): globalThis.Promise<void> {
 		const r: R | $.VarRef<R> | null = this;
-		await $.println(tag, $.pointerValue<R>(r).A, $.pointerValue<R>(r).B)
+		const r$ = $.pointerTarget<R>(r)
+		await $.println(tag, (r$ as R).A, (r$ as R).B)
 	}
 
 	public Store(): void {
@@ -100,13 +102,13 @@ export async function two(a: number, b: number): globalThis.Promise<void> {
 
 export async function deferred(): globalThis.Promise<void> {
 	await using __defer = new $.AsyncDisposableStack()
-	let r = $.markAsStructValue(new R({A: 1, B: 2}))
+	let r = new R({A: 1, B: 2}, true)
 	let n = 3
 	let f: ((tag: string) => void) | null = $.functionValue(async (tag: string): globalThis.Promise<void> => {
 		await $.println(tag, "first function")
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string")], results: [] } as $.FunctionTypeInfo))
 	let p: R | $.VarRef<R> | null = new R({A: 10, B: 20})
-	const __goscriptDeferArg0 = $.markAsStructValue($.cloneStructValue(r))
+	const __goscriptDeferArg0 = (r).clone()
 	__defer.defer(async () => { await show("arg", __goscriptDeferArg0) })
 	const __goscriptDeferCallee0 = $.functionValue(((__receiver) => (tag: string) => __receiver.Show(tag))($.markAsStructValue($.cloneStructValue(r))), ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string")], results: [] } as $.FunctionTypeInfo), "main.R.Show-fm")
 	__defer.defer(async () => { await __goscriptDeferCallee0("receiver") })
@@ -146,10 +148,10 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("stored", stored)
 	let wg: $.VarRef<sync.WaitGroup> = $.varRef($.markAsStructValue(new sync.WaitGroup()))
 	wg.value.Add(1)
-	let r = $.markAsStructValue(new R({A: 1, B: 2}))
-	const __goscriptDeferArg5 = $.markAsStructValue($.cloneStructValue(r))
+	let r = new R({A: 1, B: 2}, true)
+	const __goscriptDeferArg5 = (r).clone()
 	queueMicrotask(async () => { await (async (r: R): globalThis.Promise<void> => {
-		await show("go", $.markAsStructValue($.cloneStructValue(r)))
+		await show("go", (r).clone())
 		wg.value.Done()
 	})(__goscriptDeferArg5) })
 	r.A = 9

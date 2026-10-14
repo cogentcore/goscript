@@ -33,7 +33,7 @@ export async function main(): globalThis.Promise<void> {
 export function hasData(buf: $.Slice<number>): boolean {
 	for (let __goscriptRangeTarget0 = buf, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
 		let b = $.uint((__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as number), 8)
-		if ($.uint(b, 8) != 0) {
+		if (b != 0) {
 			return true
 		}
 	}
@@ -42,8 +42,8 @@ export function hasData(buf: $.Slice<number>): boolean {
 
 export function isBase32(token: string): boolean {
 	for (let i = 0; i < $.stringLen(token); i++) {
-		let c = $.uint($.indexString(token, i), 8)
-		if (!((($.uint(c, 8) >= 65) && ($.uint(c, 8) <= 90)) || (($.uint(c, 8) >= 50) && ($.uint(c, 8) <= 55)))) {
+		let c = $.indexString(token, i)
+		if (!(((c >= 65) && (c <= 90)) || ((c >= 50) && (c <= 55)))) {
 			return false
 		}
 	}

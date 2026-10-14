@@ -16,14 +16,15 @@ export class _object {
 		name: string
 	}
 
-	constructor(init?: Partial<{name?: string}>) {
+	constructor(init?: Partial<{name?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
 			name: init?.name ?? ("" as string)
 		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): _object {
-		return $.markAsStructValue(new _object(this))
+		return new _object(this, true)
 	}
 
 	public __goscriptAssign(source: _object): void {
@@ -68,15 +69,16 @@ export class Var {
 		kind: number
 	}
 
-	constructor(init?: Partial<{_object?: _object, kind?: number}>) {
+	constructor(init?: Partial<{_object?: _object, kind?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
-			_object: init?._object ? $.markAsStructValue($.cloneStructValue(init._object)) : $.markAsStructValue(new _object()),
+			_object: init?._object ? init._object.clone() : new _object(undefined, true),
 			kind: init?.kind ?? (0 as number)
 		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Var {
-		return $.markAsStructValue(new Var(this))
+		return new Var(this, true)
 	}
 
 	public __goscriptAssign(source: Var): void {
@@ -112,14 +114,15 @@ export class _number {
 		n: number
 	}
 
-	constructor(init?: Partial<{n?: number}>) {
+	constructor(init?: Partial<{n?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			n: init?.n ?? (0 as number)
 		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): _number {
-		return $.markAsStructValue(new _number(this))
+		return new _number(this, true)
 	}
 
 	public __goscriptAssign(source: _number): void {
@@ -159,15 +162,16 @@ export class Holder {
 		_string: string
 	}
 
-	constructor(init?: Partial<{_number?: _number | $.VarRef<_number> | null, _string?: string}>) {
+	constructor(init?: Partial<{_number?: _number | $.VarRef<_number> | null, _string?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
 			_number: init?._number ?? (null! as _number | $.VarRef<_number> | null),
 			_string: init?._string ?? ("" as string)
 		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Holder {
-		return $.markAsStructValue(new Holder(this))
+		return new Holder(this, true)
 	}
 
 	public __goscriptAssign(source: Holder): void {
@@ -187,12 +191,12 @@ export class Holder {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let v: Var | $.VarRef<Var> | null = new Var({_object: $.markAsStructValue(new _object({name: "x"}))})
+	let v: Var | $.VarRef<Var> | null = new Var({_object: new _object({name: "x"}, true)})
 	await $.println($.pointerValue<Var>(v)._object.Name(), $.pointerValue<Var>(v)._object.name, $.pointerValue<Var>(v)._object.Name(), $.pointerValue<Var>(v)._object.name)
 	let o: _object | $.VarRef<_object> | null = $.fieldRef($.pointerValue<Var>(v)._fields, "_object")
 	$.pointerValue<_object>(o).name = "y"
 	await $.println($.pointerValue<Var>(v)._object.name)
-	let h = $.markAsStructValue(new Holder({_number: new _number({n: 3}), _string: "s"}))
+	let h = new Holder({_number: new _number({n: 3}), _string: "s"}, true)
 	await $.println($.pointerValue<_number>(h._number).n, $.pointerValue<_number>(h._number).n, h._string)
 }
 

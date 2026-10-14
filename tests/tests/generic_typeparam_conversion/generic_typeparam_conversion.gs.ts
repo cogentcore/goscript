@@ -132,9 +132,9 @@ export async function main(): globalThis.Promise<void> {
 	let b = (__goscriptTuple0[1] as Wide)
 	await $.println($.int64Add($.int64(a), $.int64(b)))
 	let __goscriptTuple1: any = fromConst(__goscriptStatic3(), 300)
-	let c = ($.uint(__goscriptTuple1[0], 8) as number)
-	let d = ($.uint(__goscriptTuple1[1], 8) as number)
-	await $.println($.uint(c, 8), $.uint(d, 8))
+	let c = (__goscriptTuple1[0] as number)
+	let d = (__goscriptTuple1[1] as number)
+	await $.println(c, d)
 }
 
 var __goscriptStatic0$value: any
