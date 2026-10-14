@@ -1086,20 +1086,23 @@ export function Runes(s: $.Bytes): $.Slice<number> {
 		return null
 	}
 	
+	// The runes are decoded from the bytes in place: ASCII directly, and
+	// other runes by $.decodeRune, which gives RuneError and size 1 for
+	// invalid UTF-8 as utf8.DecodeRune does. Slicing s for each rune, as
+	// utf8.DecodeRune needs, made a new slice for each rune.
+	const bytes = $.bytesToUint8Array(s)
 	const result: number[] = []
-	
-	for (let i = 0; i < $.len(s); ) {
-		const [r, size] = utf8.DecodeRune($.goSlice(s, i, undefined))
-		if (size <= 0) {
-			// Invalid UTF-8, add replacement character
-			result.push(utf8.RuneError)
+	for (let i = 0; i < bytes.length; ) {
+		const b = bytes[i]
+		if (b < 0x80) {
+			result.push(b)
 			i++
-		} else {
-			result.push(r)
-			i += size
+			continue
 		}
+		const [r, size] = $.decodeRune(bytes, i)
+		result.push(r)
+		i += size
 	}
-	
 	return $.arrayToSlice(result)
 }
 
