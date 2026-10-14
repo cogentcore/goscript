@@ -20,18 +20,18 @@ export async function main(): globalThis.Promise<void> {
 	let start = 1
 	let stop = 4
 	n = $.copyByteRanges(bytes, start + 1, undefined, bytes, start, stop)
-	await $.println("byte right:", n, $.uint($.arrayIndex(bytes!, 0), 8), $.uint($.arrayIndex(bytes!, 1), 8), $.uint($.arrayIndex(bytes!, 2), 8), $.uint($.arrayIndex(bytes!, 3), 8), $.uint($.arrayIndex(bytes!, 4), 8))
+	await $.println("byte right:", n, $.arrayIndex(bytes!, 0), $.arrayIndex(bytes!, 1), $.arrayIndex(bytes!, 2), $.arrayIndex(bytes!, 3), $.arrayIndex(bytes!, 4))
 	n = $.copyByteRanges(bytes, undefined, stop - 1, bytes, start + 1, undefined)
-	await $.println("byte left:", n, $.uint($.arrayIndex(bytes!, 0), 8), $.uint($.arrayIndex(bytes!, 1), 8), $.uint($.arrayIndex(bytes!, 2), 8), $.uint($.arrayIndex(bytes!, 3), 8), $.uint($.arrayIndex(bytes!, 4), 8))
+	await $.println("byte left:", n, $.arrayIndex(bytes!, 0), $.arrayIndex(bytes!, 1), $.arrayIndex(bytes!, 2), $.arrayIndex(bytes!, 3), $.arrayIndex(bytes!, 4))
 
 	// Explicit high bounds may extend into spare capacity; omitted highs may not.
 	let backing: $.Slice<number> = new Uint8Array([10, 11, 12, 13, 14, 15]) as $.Slice<number>
 	let dst: $.Slice<number> = $.goSlice(backing, 1, 2, 5)
 	let src: $.Slice<number> = new Uint8Array([7, 8, 9]) as $.Slice<number>
 	n = $.copyByteRanges(dst, 1, 4, src, undefined, undefined)
-	await $.println("capacity:", n, $.uint($.arrayIndex(backing!, 0), 8), $.uint($.arrayIndex(backing!, 1), 8), $.uint($.arrayIndex(backing!, 2), 8), $.uint($.arrayIndex(backing!, 3), 8), $.uint($.arrayIndex(backing!, 4), 8), $.uint($.arrayIndex(backing!, 5), 8))
+	await $.println("capacity:", n, $.arrayIndex(backing!, 0), $.arrayIndex(backing!, 1), $.arrayIndex(backing!, 2), $.arrayIndex(backing!, 3), $.arrayIndex(backing!, 4), $.arrayIndex(backing!, 5))
 	n = $.copyByteRanges(dst, undefined, undefined, src, undefined, undefined)
-	await $.println("length:", n, $.uint($.arrayIndex(backing!, 1), 8), $.uint($.arrayIndex(backing!, 2), 8))
+	await $.println("length:", n, $.arrayIndex(backing!, 1), $.arrayIndex(backing!, 2))
 
 	// Bounds with calls preserve their observable evaluation sequence.
 	n = $.copy($.goSlice(dst, await bound(0), undefined), $.goSlice(src, await bound(1), undefined))

@@ -80,24 +80,24 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("oneof round trip value:", $.uint($.arrayIndex(__goscript_protobuf_lite_ts_pb_ts.ExampleMsg.prototype.GetChoiceData.call(oneofOut)!, 2), 8))
 
 	let __goscriptTuple3: any = protobuf_go_lite.DecodeVarintUint32(new Uint8Array([172, 2]) as $.Slice<number>, 0)
-	let u32 = $.uint(__goscriptTuple3[0], 32)
+	let u32 = __goscriptTuple3[0]
 	let idx = __goscriptTuple3[1]
 	err = __goscriptTuple3[2]
 	if (err != null) {
 		await $.println("error decoding uint32:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		return
 	}
-	await $.println("varint uint32:", $.uint(u32, 32), idx)
+	await $.println("varint uint32:", u32, idx)
 
 	let __goscriptTuple4: any = protobuf_go_lite.DecodeVarintInt32(new Uint8Array([255, 255, 255, 255, 15]) as $.Slice<number>, 0)
-	let i32 = $.int(__goscriptTuple4[0], 32)
+	let i32 = __goscriptTuple4[0]
 	idx = __goscriptTuple4[1]
 	err = __goscriptTuple4[2]
 	if (err != null) {
 		await $.println("error decoding int32:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		return
 	}
-	await $.println("varint int32:", $.int(i32, 32), idx)
+	await $.println("varint int32:", i32, idx)
 
 	let __goscriptTuple5: any = protobuf_go_lite.DecodeVarintInt64(new Uint8Array([172, 2]) as $.Slice<number>, 0)
 	let i64 = __goscriptTuple5[0]
@@ -110,14 +110,14 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("varint int64:", i64, idx)
 
 	let __goscriptTuple6: any = protobuf_go_lite.DecodeFixed32(new Uint8Array([68, 51, 34, 17]) as $.Slice<number>, 0)
-	let fixed32 = $.uint(__goscriptTuple6[0], 32)
+	let fixed32 = __goscriptTuple6[0]
 	idx = __goscriptTuple6[1]
 	err = __goscriptTuple6[2]
 	if (err != null) {
 		await $.println("error decoding fixed32:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		return
 	}
-	await $.println("fixed32:", $.uint(fixed32, 32), idx)
+	await $.println("fixed32:", fixed32, idx)
 
 	let __goscriptTuple7: any = protobuf_go_lite.DecodeFixed64(new Uint8Array([136, 119, 102, 85, 68, 51, 34, 17]) as $.Slice<number>, 0)
 	let fixed = __goscriptTuple7[0]

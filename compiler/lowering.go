@@ -6510,7 +6510,8 @@ func (o *LoweringOwner) tupleAssignmentNeedsTargetConversion(ctx lowerFileContex
 			return true
 		}
 		value := "__tupleValue"
-		if o.lowerValueForTargetTypes(ctx, targetType, sourceResults.At(idx).Type(), value, false) != value {
+		if !sameIntegerRepresentation(targetType, sourceResults.At(idx).Type()) &&
+			o.lowerValueForTargetTypes(ctx, targetType, sourceResults.At(idx).Type(), value, false) != value {
 			return true
 		}
 	}
@@ -6532,7 +6533,10 @@ func (o *LoweringOwner) lowerTupleAssignmentValueForTarget(
 	if targetType == nil {
 		return value
 	}
-	value = o.lowerValueForTargetTypes(ctx, targetType, sourceResults.At(idx).Type(), value, false)
+	// Each return wraps an integer result to its width.
+	if !sameIntegerRepresentation(targetType, sourceResults.At(idx).Type()) {
+		value = o.lowerValueForTargetTypes(ctx, targetType, sourceResults.At(idx).Type(), value, false)
+	}
 	if genericCallTupleResultTypeParamIndexes(ctx, stmt.Rhs[0])[idx] {
 		return "(" + value + " as " + o.tsTypeFor(ctx, targetType) + ")"
 	}
@@ -6871,7 +6875,10 @@ func (o *LoweringOwner) lowerTupleReturnValue(ctx lowerFileContext, expr ast.Exp
 	for idx := range sourceResults.Len() {
 		part := temp + "[" + strconv.Itoa(idx) + "]"
 		targetType := ctx.signature.Results().At(idx).Type()
-		converted := o.lowerValueForTargetTypes(ctx, targetType, sourceResults.At(idx).Type(), part, false)
+		converted := part
+		if !sameIntegerRepresentation(targetType, sourceResults.At(idx).Type()) {
+			converted = o.lowerValueForTargetTypes(ctx, targetType, sourceResults.At(idx).Type(), part, false)
+		}
 		if genericResults[idx] {
 			converted = "(" + converted + " as " + o.tsTypeFor(ctx, targetType) + ")"
 		}
@@ -12711,6 +12718,9 @@ func (o *LoweringOwner) lowerValueForTarget(
 			return constantValue
 		}
 	}
+	if sameIntegerRepresentation(targetType, sourceType) && isNormalizedIntegerExpr(ctx, expr) {
+		return value
+	}
 	if adapted, ok := o.lowerOverrideFunctionValue(ctx, expr, targetType, value); ok {
 		return adapted
 	}
@@ -14895,6 +14905,51 @@ func isFixedWideIntegerType(typ types.Type) bool {
 // coerceWideHelperResult, which keeps values above 2^53 as a runtime bigint to
 // preserve full 64-bit width, matching design/SPEC_DIFFERENCES.md which maps
 // int64/uint64 to bigint and uint/uintptr to the number representation.
+// sameIntegerRepresentation reports whether target and source are integer
+// types of the same kind, whose values need no conversion between them.
+func sameIntegerRepresentation(target types.Type, source types.Type) bool {
+	if target == nil || source == nil {
+		return false
+	}
+	targetBasic, ok := types.Unalias(target).Underlying().(*types.Basic)
+	if !ok || targetBasic.Info()&types.IsInteger == 0 || targetBasic.Info()&types.IsUntyped != 0 {
+		return false
+	}
+	sourceBasic, ok := types.Unalias(source).Underlying().(*types.Basic)
+	return ok && sourceBasic.Kind() == targetBasic.Kind()
+}
+
+// isNormalizedIntegerExpr reports whether expr reads an integer value that is
+// already wrapped to the width of its type: a stored value or the result of a
+// call or conversion, which each assignment, return and conversion wraps, but
+// not the result of arithmetic, which may be wrapped by the conversion at its
+// use.
+func isNormalizedIntegerExpr(ctx lowerFileContext, expr ast.Expr) bool {
+	switch typed := ast.Unparen(expr).(type) {
+	case *ast.Ident:
+		_, ok := ctx.semPkg.source.TypesInfo.ObjectOf(typed).(*types.Var)
+		return ok
+	case *ast.SelectorExpr:
+		if selection := ctx.semPkg.source.TypesInfo.Selections[typed]; selection != nil {
+			return selection.Kind() == types.FieldVal
+		}
+		_, ok := ctx.semPkg.source.TypesInfo.ObjectOf(typed.Sel).(*types.Var)
+		return ok
+	case *ast.IndexExpr:
+		// An element of an array that a converted pointer reinterprets may
+		// hold another type's value.
+		_, conversion := ast.Unparen(typed.X).(*ast.CallExpr)
+		return !conversion
+	case *ast.StarExpr:
+		_, conversion := ast.Unparen(typed.X).(*ast.CallExpr)
+		return !conversion
+	case *ast.CallExpr:
+		// A conversion to an integer type wraps its value too.
+		return true
+	}
+	return false
+}
+
 func isBigIntBackedType(typ types.Type) bool {
 	basic, ok := types.Unalias(typ).Underlying().(*types.Basic)
 	if !ok {

@@ -9,10 +9,8 @@ import "@goscript/unicode/utf8/index.js"
 export async function checkBytes(label: string, b: $.Slice<number>): globalThis.Promise<void> {
 	await $.println(label, "RuneCount:", utf8.RuneCount(b))
 	await $.println(label, "Valid:", utf8.Valid(b))
-	let __goscriptTuple0: any = utf8.DecodeLastRune(b)
-	let r = $.int(__goscriptTuple0[0], 32)
-	let size = __goscriptTuple0[1]
-	await $.println(label, "Last rune:", $.int(r, 32), "size:", size)
+	let [r, size] = utf8.DecodeLastRune(b)
+	await $.println(label, "Last rune:", r, "size:", size)
 }
 
 export async function main(): globalThis.Promise<void> {
@@ -24,10 +22,8 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("Rune count:", count)
 
 	// Test DecodeRuneInString
-	let __goscriptTuple1: any = utf8.DecodeRuneInString(s)
-	let r = $.int(__goscriptTuple1[0], 32)
-	let size = __goscriptTuple1[1]
-	await $.println("First rune:", $.int(r, 32), "size:", size)
+	let [r, size] = utf8.DecodeRuneInString(s)
+	await $.println("First rune:", r, "size:", size)
 
 	// Test ValidString
 	let valid = utf8.ValidString(s)
@@ -41,10 +37,8 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("Byte rune count:", byteCount)
 
 	// Test DecodeRune
-	let __goscriptTuple2: any = utf8.DecodeRune(b)
-	let br = $.int(__goscriptTuple2[0], 32)
-	let bsize = __goscriptTuple2[1]
-	await $.println("First rune from bytes:", $.int(br, 32), "size:", bsize)
+	let [br, bsize] = utf8.DecodeRune(b)
+	await $.println("First rune from bytes:", br, "size:", bsize)
 
 	// Test Valid
 	let bvalid = utf8.Valid(b)

@@ -114,7 +114,7 @@ export async function main(): globalThis.Promise<void> {
 
 	let a = 7
 	let b = 2
-	let w = $.int($.int(a, 32), 32)
+	let w = $.int(a, 32)
 	await $.println("multiply:", a * b, $.int(globalThis.Math.imul(w, $.int(b, 32)), 32))
 	let u: number = 4000000000
 	await $.println("unsigned multiply:", $.uint(globalThis.Math.imul(u, 3) >>> 0, 32))
