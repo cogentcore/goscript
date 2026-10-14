@@ -270,6 +270,48 @@ function hasGoTypeName(value: unknown): value is { __goType: string } {
   )
 }
 
+// pointerReceiverOnly reports whether value is a struct value, rather than
+// a pointer to one, whose method name has a pointer receiver, so that the
+// value does not have the method in Go. A struct value is known by its
+// declared type, or else by the type it was boxed with in an interface.
+function pointerReceiverOnly(
+  value: any,
+  typeInfo: $.TypeInfo | string | undefined,
+  name: string,
+): boolean {
+  // Only an object can have methods.
+  if (value === null || typeof value !== 'object') {
+    return false
+  }
+
+  // A pointer already has the pointer method set.
+  const declared = $.resolveTypeInfo(typeInfo)
+  if (declared?.kind === $.TypeKind.Pointer) {
+    return false
+  }
+
+  // An interface or type parameter holds a struct value only when it is marked as one.
+  if (declared?.kind !== $.TypeKind.Struct) {
+    const tag = value.__goType
+    if (
+      typeof tag !== 'string' ||
+      tag.startsWith('*') ||
+      !$.isMarkedAsStructValue(value)
+    ) {
+      return false
+    }
+  }
+
+  // The struct type declares the method on its pointer receiver.
+  const info = $.resolveTypeInfo(value.constructor?.__typeInfo)
+  return (
+    info?.kind === $.TypeKind.Struct &&
+    info.methods.some(
+      (method) => method.name === name && method.pointerReceiver === true,
+    )
+  )
+}
+
 // hasGoString reports whether value implements the GoStringer interface. Go
 // invokes GoString only for the %#v verb, never for %v, %s, or Sprint.
 function hasGoString(value: unknown): value is { GoString: () => string } {
@@ -398,7 +440,8 @@ function defaultFormatMaybe(
     if (
       allowMethods &&
       !flags.includes('#') &&
-      typeof methodValue?.Error === 'function'
+      typeof methodValue?.Error === 'function' &&
+      !pointerReceiverOnly(methodValue, typeInfo, 'Error')
     ) {
       try {
         return toMaybeString(methodValue.Error())
@@ -409,7 +452,8 @@ function defaultFormatMaybe(
     if (
       allowMethods &&
       !flags.includes('#') &&
-      typeof methodValue?.String === 'function'
+      typeof methodValue?.String === 'function' &&
+      !pointerReceiverOnly(methodValue, typeInfo, 'String')
     ) {
       try {
         return toMaybeString(methodValue.String())
