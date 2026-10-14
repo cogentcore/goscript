@@ -11113,7 +11113,15 @@ func (o *LoweringOwner) lowerPackageVarAddressExpr(ctx lowerFileContext, expr as
 			return "", false
 		}
 		obj, _ := ctx.semPkg.source.TypesInfo.Uses[typed.Sel].(*types.Var)
-		if obj == nil || !objectNeedsVarRef(ctx, obj) {
+		if obj == nil {
+			return "", false
+		}
+		// A hand-written override package exports its variables as plain
+		// values, so the address refers to the variable's current value.
+		if obj.Pkg() != nil && o.overrideFacts().HasPackage(obj.Pkg().Path()) {
+			return o.runtimeOwner.QualifiedHelper(RuntimeHelperVarRef) + "(" + alias + "." + typed.Sel.Name + ")", true
+		}
+		if !objectNeedsVarRef(ctx, obj) {
 			return "", false
 		}
 		// A lazily initialized variable is initialized by its getter, which
