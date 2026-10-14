@@ -1411,11 +1411,19 @@ export function canonicalPointerIdentity(value: object): object {
   return value
 }
 
+// pointerAliasesMade records that a pointer view aliases another pointer's
+// storage, before which distinct pointers are never equal.
+let pointerAliasesMade = false
+
 function markPointerAlias(source: object, view: object): void {
+  pointerAliasesMade = true
   pointerIdentities.set(view, canonicalPointerIdentity(source))
 }
 
 function pointerBackingIdentityEqual(a: object, b: object): boolean {
+  if (!pointerAliasesMade) {
+    return false
+  }
   const aIdentity = pointerIdentities.get(a)
   return aIdentity !== undefined && aIdentity === pointerIdentities.get(b)
 }
