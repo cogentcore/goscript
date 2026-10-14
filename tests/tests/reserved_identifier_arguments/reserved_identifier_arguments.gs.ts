@@ -37,7 +37,7 @@ export function collect(_arguments: string): string {
 }
 
 export async function main(): globalThis.Promise<void> {
-	await $.println($.markAsStructValue($.cloneStructValue($.markAsStructValue(new Parser()))).Parse($.arrayToSlice<string>(["a", "b"])))
+	await $.println($.markAsStructValue(new Parser()).Parse($.arrayToSlice<string>(["a", "b"])))
 	await $.println(collect("ok"))
 }
 

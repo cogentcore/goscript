@@ -505,7 +505,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("listing of", $.arrayIndex(programs!, 0).Name)
 	let __goscriptRangeReturn0 = false
 	;await (async () => {
-		await $.markAsStructValue($.cloneStructValue($.arrayIndex(programs!, 0))).Listing()!(async (pc, _in) => {
+		await $.arrayIndex(programs!, 0).Listing()!(async (pc, _in) => {
 			if ((_in.Op == 0) || (_in.Op == 8)) {
 				await $.println(" ", pc, Op_String(_in.Op), _in.Arg)
 				return true
@@ -562,7 +562,7 @@ export async function main(): globalThis.Promise<void> {
 					{
 						let r: Answer = $.markAsStructValue($.cloneStructValue($.typeAssert<Answer>(__goscriptTypeSwitchValue, "main.Answer").value))
 						totalSteps = totalSteps + (r.Steps)
-						await $.println($.markAsStructValue($.cloneStructValue(r)).Program(), "=", r.Value, "in", r.Steps, "steps")
+						await $.println(r.Program(), "=", r.Value, "in", r.Steps, "steps")
 					}
 					break
 				case $.typeAssert<Fault | $.VarRef<Fault> | null>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.pointerType("main.Fault")).ok:

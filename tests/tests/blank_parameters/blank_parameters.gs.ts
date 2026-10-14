@@ -14,13 +14,7 @@ $.registerInterfaceType(
 );
 
 export class blankImpl {
-	public get value(): number {
-		return this._fields.value
-	}
-
-	public set value(value: number) {
-		this._fields.value = value
-	}
+	public declare value: number
 
 	public _fields: {
 		value: number
@@ -36,21 +30,19 @@ export class blankImpl {
 		return $.markAsStructValue(new blankImpl(this))
 	}
 
-	public __goscriptAssign(source: blankImpl): void {
-		const target = this._fields
-		const values = source._fields
-		target.value = values.value
-	}
-
 	public Value(): number {
 		const b: blankImpl | $.VarRef<blankImpl> | null = this;
 		return $.pointerValue<blankImpl>(b).value
 	}
 
+	static {
+		$.bindStructFields(this.prototype, ["value"])
+	}
+
 	static __typeInfo = $.registerStructType(
 		"main.blankImpl",
 		() => new blankImpl(),
-		() => [{ name: "Value", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }], pointerReceiver: true }],
+		() => [{ name: "Value", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }],
 		blankImpl,
 		() => [{ name: "value", key: "value", type: /* @__PURE__ */ $.basicType("int") }]
 	)
@@ -67,9 +59,6 @@ export class Packer {
 
 	public clone(): Packer {
 		return $.markAsStructValue(new Packer(this))
-	}
-
-	public __goscriptAssign(source: Packer): void {
 	}
 
 	public pack(msg: $.Slice<number>, _p1: globalThis.Map<string, number> | null, _p2: number): $.Slice<number> {
@@ -100,18 +89,16 @@ export function unicodeNames(_u3c6: number, _u3b2: number): [number, number] {
 export async function main(): globalThis.Promise<void> {
 	let p = $.markAsStructValue(new Packer())
 	await $.println(blanks(1, "x"))
-	await $.println($.sliceLen($.markAsStructValue($.cloneStructValue(p)).pack(null, null, 0)))
+	await $.println($.len(p.pack(null, null, 0)))
 
 	let f: ((_p0: number, _p1: number) => number | globalThis.Promise<number>) | null = $.functionValue((_p0: number, _p1: number): number => {
 		return 9
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))
-	await $.println((__goscriptAwait = f!(1, 2), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println(await f!(1, 2))
 
 	let [left, right] = unicodeNames(3, 4)
 	await $.println(left, right)
 }
-
-var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

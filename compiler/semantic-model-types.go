@@ -142,8 +142,12 @@ type semanticFunction struct {
 	receiverPointer bool
 	position        sourcePosition
 	hasBody         bool
-	async           bool
-	deferred        bool
+	// receiverReadOnly reports whether the function is a method with a value
+	// receiver that its body never modifies, so that a call need not copy
+	// the receiver (see methodReceiverReadOnly).
+	receiverReadOnly bool
+	async            bool
+	deferred         bool
 	// calls holds the origins of the functions the body calls outside
 	// function literals other than immediately invoked ones.
 	calls map[*types.Func]bool

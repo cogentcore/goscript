@@ -58,7 +58,7 @@ export class label {
 
 export async function main(): globalThis.Promise<void> {
 	let item = $.markAsStructValue(new label({value: "go"}))
-	await $.println($.markAsStructValue($.cloneStructValue(item)).Format())
+	await $.println(item.Format())
 }
 
 if ($.isMainScript(import.meta)) {

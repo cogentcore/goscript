@@ -3202,6 +3202,7 @@ func (o *LoweringOwner) lowerTypeSpec(ctx lowerFileContext, spec *ast.TypeSpec) 
 // encoding/json decoding a field of the type, can resolve its key and
 // element types.
 func (o *LoweringOwner) lowerNamedCompositeTypeRegistration(ctx lowerFileContext, named *types.Named) string {
+	// A generic or local type has no single Go type string to register.
 	if !ctx.topLevel || named.TypeParams().Len() != 0 {
 		return ""
 	}
@@ -3382,6 +3383,7 @@ func (o *LoweringOwner) runtimeTrimmedMethodSignature(method *types.Func, seen m
 }
 
 func (o *LoweringOwner) runtimeTrimmedReceiverMethodSignature(method *types.Func, pointerOnly bool, seen map[types.Type]bool) string {
+	// Only a pointer-receiver method is marked, as it is not in the value's method set.
 	pointerReceiver := ""
 	if pointerOnly {
 		pointerReceiver = ", pointerReceiver: true"
@@ -6005,9 +6007,12 @@ func (o *LoweringOwner) shortDeclTypeAnnotation(ctx lowerFileContext, lhs ast.Ex
 // variable declared from the call needs the Go type's nullable annotation
 // to be assigned a nil-able value later.
 func (o *LoweringOwner) callsOverridePackage(ctx lowerFileContext, expr ast.Expr) bool {
+	// Without override packages, no call can reach one.
 	if o.overrideOwner == nil {
 		return false
 	}
+
+	// Only a call can reach an override package function.
 	call, _ := ast.Unparen(expr).(*ast.CallExpr)
 	if call == nil {
 		return false
@@ -6028,6 +6033,7 @@ func (o *LoweringOwner) callsOverridePackage(ctx lowerFileContext, expr ast.Expr
 // isReassignedLocal reports whether the local variable obj is assigned
 // after its declaration, by an assignment or a redeclaring := in its block.
 func isReassignedLocal(ctx lowerFileContext, obj types.Object) bool {
+	// The variable is scoped to the innermost block that declares it.
 	path, _ := astutil.PathEnclosingInterval(ctx.file, obj.Pos(), obj.Pos())
 	var scope ast.Node
 	for _, node := range path {
@@ -6042,9 +6048,12 @@ func isReassignedLocal(ctx lowerFileContext, obj types.Object) bool {
 	info := ctx.semPkg.source.TypesInfo
 	assigned := false
 	ast.Inspect(scope, func(node ast.Node) bool {
+		// Stop walking once an assignment is found.
 		if assigned {
 			return false
 		}
+
+		// Only an assignment can change the variable.
 		assign, ok := node.(*ast.AssignStmt)
 		if !ok {
 			return true
@@ -6259,6 +6268,7 @@ func (o *LoweringOwner) lowerShortDeclShadowAliases(
 			if def == nil || objectDeclaredInAssignRHS(used, assign) {
 				return
 			}
+
 			// A package or builtin function is not a value, so its old value
 			// needs no alias: it is still lowered by name after the new
 			// binding, as in len := len(a).
@@ -6806,6 +6816,7 @@ func elideTailReturnAwait(ctx lowerFileContext, result ast.Expr, expr string) st
 // conditionalAwaitCall returns the call of a conditional await made by
 // conditionalAwait, so that it can be returned without awaiting it.
 func conditionalAwaitCall(expr string) (string, bool) {
+	// The wrapper is the text conditionalAwait puts around the call.
 	t := conditionalAwaitTemp
 	prefix := "(" + t + " = "
 	suffix := ", " + t + " instanceof Promise ? await " + t + " : " + t + ")"
@@ -6813,6 +6824,7 @@ func conditionalAwaitCall(expr string) (string, bool) {
 		return "", false
 	}
 	call := expr[len(prefix) : len(expr)-len(suffix)]
+
 	// A nested conditional await would make the call text ambiguous.
 	if strings.Contains(call, suffix) {
 		return "", false
@@ -7412,6 +7424,7 @@ func (o *LoweringOwner) lowerRangeStmt(ctx lowerFileContext, stmt *ast.RangeStmt
 	diagnostics = append(diagnostics, bodyDiagnostics...)
 	rangeTarget := ctx.tempName("RangeTarget")
 	rangeTargetValue := o.lowerArrayPointerTarget(ctx, rangeValue, rangeType)
+
 	// The window of the slice or array is read once, as Go evaluates the
 	// length once, and its elements are read from its backing array
 	// directly, which is much faster than through a slice proxy.
@@ -11057,6 +11070,15 @@ func (o *LoweringOwner) lowerMethodReceiverExpr(
 		return receiver, diagnostics
 	}
 	if isStructValueType(receiverType) || isPointerToStructType(receiverType) {
+		// A method that does not modify its value receiver, and does not
+		// suspend while other code could modify the caller's value, is
+		// passed the value without a copy.
+		if method, _ := selection.Obj().(*types.Func); method != nil {
+			if semFn := semanticFunctionFor(ctx.model, method); semFn != nil &&
+				semFn.receiverReadOnly && !o.functionAsync(ctx, method) {
+				return receiver, diagnostics
+			}
+		}
 		return o.lowerStructClone(receiver), diagnostics
 	}
 	if isInterfaceType(receiverType) {
@@ -12086,10 +12108,13 @@ func (o *LoweringOwner) typeParamIndexedTSType(ctx lowerFileContext, typ types.T
 // terms share one underlying type, such as M ~map[K]V, which range and other
 // operations on the type parameter use. Any other type is returned unchanged.
 func typeParamCoreType(typ types.Type) types.Type {
+	// Only a type parameter has a type set to resolve.
 	typeParam, ok := types.Unalias(typ).(*types.TypeParam)
 	if !ok {
 		return typ
 	}
+
+	// All the terms of the type set must share one underlying type.
 	var terms []types.Type
 	if !collectTypeSetTerms(typeParam.Constraint(), &terms) || len(terms) == 0 {
 		return typ
@@ -13189,6 +13214,7 @@ func (o *LoweringOwner) lowerNamedValueInterfaceWrapper(
 		return ""
 	}
 	typeInfo := o.runtimeTypeInfoExpr(sourceType)
+
 	// Without type parameters, the method table, type info and method
 	// signatures of the type are the same each time, so they are created once.
 	if typeIsHoistable(sourceType) && typeIsHoistable(targetType) {
@@ -14529,10 +14555,13 @@ func namedNonInterfaceNonStructType(named *types.Named) bool {
 // typeParamMayHoldValueType reports whether typ is a type parameter whose
 // type set may include a struct or array type, which Go copies by value.
 func typeParamMayHoldValueType(typ types.Type) bool {
+	// Only a type parameter can stand for a type chosen by the caller.
 	typeParam, ok := types.Unalias(typ).(*types.TypeParam)
 	if !ok {
 		return false
 	}
+
+	// A method-set constraint admits any type, including a struct.
 	iface, ok := typeParam.Constraint().Underlying().(*types.Interface)
 	if !ok || iface.IsMethodSet() {
 		return true
@@ -15273,9 +15302,12 @@ const conditionalAwaitTemp = "__goscriptAwait"
 // the Go result types. It returns false for other calls, which are always
 // awaited.
 func (o *LoweringOwner) conditionalAwait(ctx lowerFileContext, call *ast.CallExpr, lowered string) (string, bool) {
+	// Only an async function with a temporary can await conditionally.
 	if ctx.awaitTemp == nil || ctx.semPkg == nil || ctx.semPkg.source == nil || !ctx.asyncFunction {
 		return "", false
 	}
+
+	// Only a call whose callee is not known statically may return a promise.
 	pkg := ctx.semPkg.source
 	fun := call.Fun
 	if !callUsesFunctionValue(pkg, fun) && !callUsesFunctionIdentifier(pkg, fun) && !callUsesInterfaceMethod(pkg, fun) {
@@ -15288,6 +15320,8 @@ func (o *LoweringOwner) conditionalAwait(ctx lowerFileContext, call *ast.CallExp
 	if signature == nil || signature.Results().Len() > 1 {
 		return "", false
 	}
+
+	// The call is stored once and awaited only when it returned a promise.
 	*ctx.awaitTemp = true
 	t := conditionalAwaitTemp
 	expr := "(" + t + " = " + lowered + ", " + t + " instanceof Promise ? await " + t + " : " + t + ")"
@@ -15328,6 +15362,7 @@ func (o *LoweringOwner) genericTypeArgsExpr(ctx lowerFileContext, callee ast.Exp
 	if len(entries) == 0 {
 		return "undefined"
 	}
+
 	// Type arguments without type parameters are the same at each call, so
 	// they are created once.
 	if static {
@@ -15655,16 +15690,22 @@ func (o *LoweringOwner) tsReceiverTypeFor(ctx lowerFileContext, typ types.Type) 
 // package name, so reflect needs the path registered to report PkgPath.
 // Types in package main report "main", as in Go.
 func fileTypePackagePath(semPkg *semanticPackage, file *ast.File) (string, []string) {
+	// Package main and a package whose path is its name need no registration.
 	pkg := semPkg.source.Types
 	if pkg == nil || pkg.Name() == "main" || pkg.Path() == pkg.Name() {
 		return "", nil
 	}
+
+	// The names are the types declared in the file, in source order.
 	var names []string
 	ast.Inspect(file, func(node ast.Node) bool {
+		// Only a declared type of the file is registered.
 		spec, ok := node.(*ast.TypeSpec)
 		if !ok {
 			return true
 		}
+
+		// An alias names an existing type, so it has no type of its own to register.
 		obj, _ := semPkg.source.TypesInfo.Defs[spec.Name].(*types.TypeName)
 		if obj == nil || obj.IsAlias() {
 			return true
