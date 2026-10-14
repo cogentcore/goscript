@@ -1447,6 +1447,17 @@ export class Value {
         registered?.signatures,
       )
     }
+    // Box an unnamed value with its type, as the compiler does when it
+    // converts the value to an interface. A nil slice, map, func, chan or
+    // pointer then keeps its type, so the interface is not nil, and a
+    // pointer such as *[]T reports its type to reflect.ValueOf.
+    if (this._type.Kind() !== Interface) {
+      return $.interfaceValue<ReflectValue>(
+        current,
+        this._type.String(),
+        typeInfo,
+      )
+    }
     return current
   }
 
