@@ -4285,6 +4285,7 @@ func (o *LoweringOwner) lowerMapRangeBinding(
 	fallback string,
 	tempPrefix string,
 	declare bool,
+	body *ast.BlockStmt,
 ) (string, []loweredStmt, []Diagnostic) {
 	if expr == nil {
 		return fallback, nil, nil
@@ -4294,6 +4295,15 @@ func (o *LoweringOwner) lowerMapRangeBinding(
 	}
 	if declare {
 		obj := rangeBindingObject(ctx, expr)
+		if name != "" && obj != nil && !ctx.model.needsVarRef[obj] &&
+			isValueCopyType(obj.Type()) && rangeValueBindingMayChange(ctx, obj, body) {
+			// A map holds its own keys and values, so a struct or array
+			// that the body changes is a copy.
+			rawName := ctx.tempName(tempPrefix)
+			return rawName, []loweredStmt{{
+				text: "let " + name + " = " + o.lowerValueForTargetTypes(ctx, obj.Type(), obj.Type(), rawName, true),
+			}}, nil
+		}
 		if name == "" || obj == nil || !ctx.model.needsVarRef[obj] {
 			if name != "" {
 				return name, nil, nil
@@ -4312,7 +4322,80 @@ func (o *LoweringOwner) lowerMapRangeBinding(
 	}
 	rawName := ctx.tempName(tempPrefix)
 	left, diagnostics := o.lowerAssignmentTarget(ctx, expr, false)
-	return rawName, []loweredStmt{{text: left + " = " + rawName}}, diagnostics
+	value := rawName
+	if typ := ctx.semPkg.source.TypesInfo.TypeOf(expr); typ != nil && isValueCopyType(typ) {
+		value = o.lowerValueForTargetTypes(ctx, typ, typ, rawName, true)
+	}
+	return rawName, []loweredStmt{{text: left + " = " + value}}, diagnostics
+}
+
+// isValueCopyType reports whether values of typ are structs or arrays, which
+// Go copies where they are assigned.
+func isValueCopyType(typ types.Type) bool {
+	return isStructValueType(typ) || isArrayType(typ)
+}
+
+// rangeValueBindingMayChange reports whether the range body may change the
+// struct or array variable obj or let another reference reach it: it assigns
+// to it or into it, takes its address, calls a pointer method on it, or
+// refers to it from a function literal.
+func rangeValueBindingMayChange(ctx lowerFileContext, obj types.Object, body *ast.BlockStmt) bool {
+	if body == nil {
+		return false
+	}
+	info := ctx.semPkg.source.TypesInfo
+	rootIsObj := func(expr ast.Expr) bool {
+		for {
+			switch typed := ast.Unparen(expr).(type) {
+			case *ast.Ident:
+				return info.Uses[typed] == obj
+			case *ast.SelectorExpr:
+				expr = typed.X
+			case *ast.IndexExpr:
+				expr = typed.X
+			case *ast.SliceExpr:
+				expr = typed.X
+			default:
+				return false
+			}
+		}
+	}
+	changes := false
+	ast.Inspect(body, func(node ast.Node) bool {
+		if changes {
+			return false
+		}
+		switch typed := node.(type) {
+		case *ast.AssignStmt:
+			for _, lhs := range typed.Lhs {
+				changes = changes || rootIsObj(lhs)
+			}
+		case *ast.IncDecStmt:
+			changes = rootIsObj(typed.X)
+		case *ast.RangeStmt:
+			changes = (typed.Key != nil && rootIsObj(typed.Key)) || (typed.Value != nil && rootIsObj(typed.Value))
+		case *ast.UnaryExpr:
+			changes = typed.Op == token.AND && rootIsObj(typed.X)
+		case *ast.SliceExpr:
+			// Slicing an array takes its address.
+			changes = rootIsObj(typed.X)
+		case *ast.FuncLit:
+			ast.Inspect(typed.Body, func(node ast.Node) bool {
+				if ident, ok := node.(*ast.Ident); ok && info.Uses[ident] == obj {
+					changes = true
+				}
+				return !changes
+			})
+		case *ast.SelectorExpr:
+			if selection := info.Selections[typed]; selection != nil && selection.Kind() == types.MethodVal && rootIsObj(typed.X) {
+				if signature, ok := selection.Obj().Type().(*types.Signature); ok && signature.Recv() != nil {
+					_, changes = signature.Recv().Type().(*types.Pointer)
+				}
+			}
+		}
+		return !changes
+	})
+	return changes
 }
 
 func rangeBindingObject(ctx lowerFileContext, expr ast.Expr) types.Object {
@@ -7534,8 +7617,8 @@ func (o *LoweringOwner) lowerRangeStmt(ctx lowerFileContext, stmt *ast.RangeStmt
 		if strings.HasPrefix(rangeTarget, "await ") {
 			rangeTarget = "(" + rangeTarget + ")"
 		}
-		key, keyBindings, keyDiagnostics := o.lowerMapRangeBinding(ctx, stmt.Key, keyName, "__rangeKey", "RangeKey", stmt.Tok == token.DEFINE)
-		value, valueBindings, valueDiagnostics := o.lowerMapRangeBinding(ctx, stmt.Value, valueName, "__rangeValue", "RangeValue", stmt.Tok == token.DEFINE)
+		key, keyBindings, keyDiagnostics := o.lowerMapRangeBinding(ctx, stmt.Key, keyName, "__rangeKey", "RangeKey", stmt.Tok == token.DEFINE, stmt.Body)
+		value, valueBindings, valueDiagnostics := o.lowerMapRangeBinding(ctx, stmt.Value, valueName, "__rangeValue", "RangeValue", stmt.Tok == token.DEFINE, stmt.Body)
 		diagnostics = append(diagnostics, keyDiagnostics...)
 		diagnostics = append(diagnostics, valueDiagnostics...)
 		binding := "const"
