@@ -36,6 +36,11 @@ func main() {
 	_, ok := k.([]*S1)
 	println("assert:", ok, k == nil)
 
+	// A nil value keeps a zero Pointer after a round trip through Interface.
+	for i := 0; i < f.NumField(); i++ {
+		println("pointer", f.Type().Field(i).Name, reflect.ValueOf(f.Field(i).Interface()).Pointer() == 0)
+	}
+
 	// The address of an unnamed field keeps its pointer type.
 	for i := 0; i < f.NumField(); i++ {
 		p := f.Field(i).Addr().Interface()
