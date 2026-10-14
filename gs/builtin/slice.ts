@@ -1586,61 +1586,91 @@ export function indexRef<T>(
     if (index < 0 || index >= collection.length) {
       outOfRangeIndex(index, collection.length)
     }
-    const ref: VarRef<T> = {
-      get value() {
-        return collection[index] as T
-      },
-      set value(value: T) {
-        collection[index] = value as number
-      },
-      __isVarRef: true,
-      __goAddress: () => indexAddress(collection, index),
-      __goCollection: collection,
-      __goIndex: index,
-    }
-    ref.__goPointer = collectionPointer(ref, collection, index)
-    return ref
+    return new ArrayIndexReference(collection as unknown as T[], index)
   }
   if (isComplexSlice(collection)) {
     if (index < 0 || index >= collection.__meta__.length) {
       outOfRangeIndex(index, collection.__meta__.length)
     }
-    const backingIndex = collection.__meta__.offset + index
-    const ref: VarRef<T> = {
-      get value() {
-        return collection.__meta__.backing[backingIndex]
-      },
-      set value(value: T) {
-        collection[index] = value
-      },
-      __isVarRef: true,
-      __goAddress: () => indexAddress(collection, index),
-      __goCollection: collection,
-      __goIndex: index,
-    }
-    ref.__goPointer = collectionPointer(ref, collection, index)
-    return ref
+    return new SliceIndexReference(
+      collection,
+      index,
+      collection.__meta__.offset + index,
+    )
   }
   if (Array.isArray(collection)) {
     if (index < 0 || index >= collection.length) {
       outOfRangeIndex(index, collection.length)
     }
-    const ref: VarRef<T> = {
-      get value() {
-        return collection[index]
-      },
-      set value(value: T) {
-        collection[index] = value
-      },
-      __isVarRef: true,
-      __goAddress: () => indexAddress(collection, index),
-      __goCollection: collection,
-      __goIndex: index,
-    }
-    ref.__goPointer = collectionPointer(ref, collection, index)
-    return ref
+    return new ArrayIndexReference(collection, index)
   }
   runtimePanic('runtime error: index on unsupported type')
+}
+
+// ArrayIndexReference is the reference to an element of a JavaScript array or
+// byte array, which allocates its pointer machinery only when its pointer or
+// address is requested.
+class ArrayIndexReference<T> implements VarRef<T> {
+  readonly __isVarRef = true
+  private pointer?: OwnedPointerHandle<T>
+
+  constructor(
+    readonly __goCollection: T[],
+    readonly __goIndex: number,
+  ) {}
+
+  get value(): T {
+    return this.__goCollection[this.__goIndex]
+  }
+
+  set value(value: T) {
+    this.__goCollection[this.__goIndex] = value
+  }
+
+  get __goPointer(): OwnedPointerHandle<T> {
+    return (this.pointer ??= collectionPointer(
+      this,
+      this.__goCollection,
+      this.__goIndex,
+    ))
+  }
+
+  get __goAddress(): () => number {
+    return this.__goPointer.__goAddress
+  }
+}
+
+// SliceIndexReference is the reference to an element of a slice with slice
+// metadata, at the given index of its backing array.
+class SliceIndexReference<T> implements VarRef<T> {
+  readonly __isVarRef = true
+  private pointer?: OwnedPointerHandle<T>
+
+  constructor(
+    readonly __goCollection: SliceProxy<T>,
+    readonly __goIndex: number,
+    private readonly backingIndex: number,
+  ) {}
+
+  get value(): T {
+    return this.__goCollection.__meta__.backing[this.backingIndex]
+  }
+
+  set value(value: T) {
+    this.__goCollection[this.__goIndex] = value
+  }
+
+  get __goPointer(): OwnedPointerHandle<T> {
+    return (this.pointer ??= collectionPointer(
+      this,
+      this.__goCollection,
+      this.__goIndex,
+    ))
+  }
+
+  get __goAddress(): () => number {
+    return this.__goPointer.__goAddress
+  }
 }
 
 function collectionPointer<T>(
