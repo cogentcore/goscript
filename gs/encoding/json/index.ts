@@ -1488,18 +1488,66 @@ function marshalValue(v: unknown, typeInfo?: unknown): unknown {
 
 // jsonOmitEmpty reports whether the struct tag carries the `,omitempty` option.
 function jsonOmitEmpty(tag: string | undefined): boolean {
-  if (tag === undefined || !tag.startsWith('json:"')) {
+  const value = jsonTagValue(tag)
+  if (value === undefined) {
     return false
   }
-  const end = tag.indexOf('"', 'json:"'.length)
-  if (end < 0) {
-    return false
+  return value.split(',').slice(1).includes('omitempty')
+}
+
+// jsonTagValue returns the value of the json key in a struct tag, or
+// undefined when there is none. It follows reflect.StructTag.Lookup, so the
+// json key need not come first, as in `copier:"-" json:"-"`.
+function jsonTagValue(tag: string | undefined): string | undefined {
+  let rest = tag ?? ''
+  while (rest !== '') {
+    rest = rest.replace(/^ +/, '')
+    if (rest === '') {
+      break
+    }
+    // Scan to the colon; a space, quote or control character ends the tag.
+    let i = 0
+    while (
+      i < rest.length &&
+      rest.charCodeAt(i) > 0x20 &&
+      rest[i] !== ':' &&
+      rest[i] !== '"' &&
+      rest.charCodeAt(i) !== 0x7f
+    ) {
+      i++
+    }
+    if (
+      i === 0 ||
+      i + 1 >= rest.length ||
+      rest[i] !== ':' ||
+      rest[i + 1] !== '"'
+    ) {
+      break
+    }
+    const name = rest.slice(0, i)
+    rest = rest.slice(i + 1)
+    // Scan the quoted value, skipping escaped characters.
+    i = 1
+    while (i < rest.length && rest[i] !== '"') {
+      if (rest[i] === '\\') {
+        i++
+      }
+      i++
+    }
+    if (i >= rest.length) {
+      break
+    }
+    const quoted = rest.slice(0, i + 1)
+    rest = rest.slice(i + 1)
+    if (name === 'json') {
+      try {
+        return JSON.parse(quoted) as string
+      } catch {
+        return undefined
+      }
+    }
   }
-  return tag
-    .slice('json:"'.length, end)
-    .split(',')
-    .slice(1)
-    .includes('omitempty')
+  return undefined
 }
 
 // isEmptyValue mirrors Go encoding/json: zero numbers/strings/bools, empty
@@ -2571,14 +2619,11 @@ function escapeHTMLString(text: string): string {
 }
 
 function jsonFieldName(fieldName: string, tag: string | undefined): string {
-  if (tag === undefined || !tag.startsWith('json:"')) {
+  const value = jsonTagValue(tag)
+  if (value === undefined) {
     return fieldName
   }
-  const end = tag.indexOf('"', 'json:"'.length)
-  if (end < 0) {
-    return fieldName
-  }
-  const name = tag.slice('json:"'.length, end).split(',')[0]
+  const name = value.split(',')[0]
   if (name === '-') {
     return ''
   }
