@@ -158,7 +158,7 @@ export class Hash {
 
 // Hasher hashes and compares values of type T.
 export interface Hasher<T = any> {
-  Hash(h: Hash | null, v: T): void
+  Hash(h: Hash | $.VarRef<Hash> | null, v: T): void
   Equal(x: T, y: T): boolean
 }
 
@@ -168,7 +168,7 @@ export class ComparableHasher<T = any> {
     return this
   }
 
-  public Hash(h: Hash | null, v: T): void {
+  public Hash(h: Hash | $.VarRef<Hash> | null, v: T): void {
     WriteComparable(h, v)
   }
 
@@ -221,8 +221,12 @@ export function Comparable<T = any>(seed: Seed, v: T): bigint {
 }
 
 // WriteComparable adds x to the data hashed by h.
-export function WriteComparable<T = any>(h: Hash | null, x: T): void {
-  writeValue(h!, x)
+// A *Hash of a variable whose address is taken is a VarRef.
+export function WriteComparable<T = any>(
+  h: Hash | $.VarRef<Hash> | null,
+  x: T,
+): void {
+  writeValue($.pointerValue<Hash>(h), x)
 }
 
 // objectIDs gives pointers, maps, and channels a stable identity, matching
