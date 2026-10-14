@@ -13541,11 +13541,49 @@ func tsNativeMapType(keyType, elemType string) string {
 }
 
 func (o *LoweringOwner) lowerTypeAssertExpr(ctx lowerFileContext, expr *ast.TypeAssertExpr) (string, []Diagnostic) {
+	// The generic assertion checks the value against the type's descriptor.
 	value, diagnostics := o.lowerExpr(ctx, expr.X)
 	targetType := ctx.semPkg.source.TypesInfo.TypeOf(expr.Type)
-	return o.runtimeOwner.QualifiedHelper(RuntimeHelperMustTypeAssert) +
-		"<" + o.tsTypeAssertionTypeFor(ctx, targetType) + ">(" +
-		value + ", " + o.runtimeTypeAssertInfoExpr(ctx, targetType) + ")", diagnostics
+	tsType := o.tsTypeAssertionTypeFor(ctx, targetType)
+	assert := o.runtimeOwner.QualifiedHelper(RuntimeHelperMustTypeAssert) +
+		"<" + tsType + ">(" + value + ", " + o.runtimeTypeAssertInfoExpr(ctx, targetType) + ")"
+
+	// A variable asserted to a pointer to a named struct type is first
+	// checked inline against the Go type name it was boxed with (see
+	// $.interfaceValue), which is much faster than the generic assertion.
+	// Boxed pointer values and typed nils take the generic path.
+	if name, ok := pointerAssertTypeName(targetType); ok && isPlainVariableRead(value) {
+		boxed := "(" + value + " as any)"
+		return "(" + boxed + "?.__goType === " + strconv.Quote(name) + " && " + boxed + ".__goValue === undefined && " +
+			boxed + ".__isTypedNil !== true ? (" + boxed + " as " + tsType + ") : " + assert + ")", diagnostics
+	}
+	return assert, diagnostics
+}
+
+// pointerAssertTypeName returns the Go type name that $.interfaceValue boxes
+// a pointer of typ with, for an unnamed pointer to a named struct type that
+// is not generic.
+func pointerAssertTypeName(typ types.Type) (string, bool) {
+	// The type is a pointer to a named struct type.
+	pointer, ok := types.Unalias(typ).(*types.Pointer)
+	if !ok {
+		return "", false
+	}
+	named := namedStructType(pointer.Elem())
+	if named == nil || named.TypeArgs().Len() != 0 || named.TypeParams().Len() != 0 {
+		return "", false
+	}
+	return goRuntimeTypeString(typ), true
+}
+
+// plainVariableRead matches the lowering of a read of a variable, which can
+// be repeated without side effects.
+var plainVariableRead = regexp.MustCompile(`^[A-Za-z_$][A-Za-z0-9_$]*(\.value)?$`)
+
+// isPlainVariableRead reports whether value is the lowering of a read of a
+// variable.
+func isPlainVariableRead(value string) bool {
+	return plainVariableRead.MatchString(value)
 }
 
 func (o *LoweringOwner) lowerTupleExpr(ctx lowerFileContext, expr ast.Expr) (string, []Diagnostic) {
