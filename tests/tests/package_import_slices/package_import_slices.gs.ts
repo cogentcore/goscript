@@ -267,7 +267,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// append copies struct elements into new backing, including variadic sources.
 	let appendSrc: $.Slice<cell> = $.arrayToSlice<cell>([$.markAsStructValue(new cell({n: 1}))])
-	let appended: $.Slice<cell> = $.append(appendSrc, $.markAsStructValue(new cell({n: 2})))
+	let appended: $.Slice<cell> = $.appendOne(appendSrc, $.markAsStructValue(new cell({n: 2})))
 	$.arrayIndex(appended!, 0).n = 9
 	await $.println("append realloc:", $.arrayIndex(appendSrc!, 0).n)
 	let appendSpread: $.Slice<cell> = $.appendSlice<cell>(null, appendSrc)

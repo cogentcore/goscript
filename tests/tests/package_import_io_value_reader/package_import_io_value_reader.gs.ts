@@ -48,7 +48,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// Join a bounded zero range with a trailing reader through a spread slice.
 	let rdrs: $.Slice<io.Reader | null> = $.arrayToSlice<io.Reader | null>([io.LimitReader($.interfaceValue<io.Reader | null>($.markAsStructValue(new zeroReader()), "main.zeroReader", "main.zeroReader")!, 2n)])
-	rdrs = $.append(rdrs, $.interfaceValue<io.Reader | null>(strings.NewReader("ab"), "*strings.Reader", /* @__PURE__ */ $.pointerType("strings.Reader")), $.appendZeros.nil)
+	rdrs = $.appendOne(rdrs, $.interfaceValue<io.Reader | null>(strings.NewReader("ab"), "*strings.Reader", /* @__PURE__ */ $.pointerType("strings.Reader")), $.appendZeros.nil)
 	let __goscriptTuple1: any = await io.ReadAll($.pointerValueOrNil(io.MultiReader(...(rdrs ?? [])))!)
 	data = __goscriptTuple1[0]
 	err = __goscriptTuple1[1]

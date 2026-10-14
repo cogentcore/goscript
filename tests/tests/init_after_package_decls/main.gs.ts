@@ -34,12 +34,12 @@ export function __goscript_set_Later(__goscriptValue: string): void {
 }
 
 export function newLater(): string {
-	__goscript_types.__goscript_set_order($.append(__goscript_types.__goscript_get_order(), "Later"))
+	__goscript_types.__goscript_set_order($.appendOne(__goscript_types.__goscript_get_order(), "Later"))
 	return "later"
 }
 
 function __goscriptInit0(): void {
-	__goscript_types.__goscript_set_order($.append(__goscript_types.__goscript_get_order(), "init main.go"))
+	__goscript_types.__goscript_set_order($.appendOne(__goscript_types.__goscript_get_order(), "init main.go"))
 }
 
 export async function main(): globalThis.Promise<void> {

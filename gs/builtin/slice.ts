@@ -1244,6 +1244,35 @@ function appendZeroValue(sample: unknown): unknown {
 }
 
 /**
+ * appendOne appends one value that the caller already copied, as Go copies
+ * an appended struct or array, to a slice of non-byte elements. It writes into
+ * spare capacity directly and leaves growth to append, with the optional
+ * zero hint the compiler passes for the new capacity.
+ */
+export function appendOne<T>(
+  slice: Slice<T> | null,
+  value: unknown,
+  zeroHint?: unknown,
+): Slice<T> {
+  if (slice !== null && slice !== undefined) {
+    const meta = sliceMeta(slice)
+    if (meta !== undefined && meta.length < meta.capacity) {
+      meta.backing[meta.offset + meta.length] = value as T
+      return sliceProxyFromBacking(
+        meta.backing as T[],
+        meta.offset,
+        meta.length + 1,
+        meta.capacity,
+      )
+    }
+  }
+  if (zeroHint === undefined) {
+    return append(slice, value)
+  }
+  return append(slice, value, zeroHint)
+}
+
+/**
  * append returns an extended slice, sharing its backing array when capacity permits.
  */
 export function append(slice: Uint8Array, ...elements: unknown[]): Uint8Array

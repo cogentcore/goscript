@@ -75,7 +75,7 @@ export class _object {
 		if ($.cap($.pointerValue<_object>(o).entries) > $.sliceLen($.pointerValue<_object>(o).entries)) {
 			$.pointerValue<_object>(o).entries = $.goSlice($.pointerValue<_object>(o).entries, undefined, $.sliceLen($.pointerValue<_object>(o).entries) + 1)
 		} else {
-			$.pointerValue<_object>(o).entries = $.append($.pointerValue<_object>(o).entries, $.markAsStructValue(new entry()))
+			$.pointerValue<_object>(o).entries = $.appendOne($.pointerValue<_object>(o).entries, $.markAsStructValue(new entry()))
 		}
 		return $.indexRef($.pointerValue<_object>(o).entries!, $.sliceLen($.pointerValue<_object>(o).entries) - 1)
 	}
@@ -95,7 +95,7 @@ export function parseKey(): [string, $.GoError] {
 
 export async function printInterfaceSpareZero(): globalThis.Promise<void> {
 	let values: $.Slice<any> = $.makeSlice<any>(0, 2)
-	values = $.append(values, $.interfaceValue($.markAsStructValue(new entry({key: "value"})), "main.entry", "main.entry"), $.appendZeros.nil)
+	values = $.appendOne(values, $.interfaceValue($.markAsStructValue(new entry({key: "value"})), "main.entry", "main.entry"), $.appendZeros.nil)
 	values = $.goSlice(values, undefined, 2)
 	await $.println($.arrayIndex(values!, 1) == null)
 }

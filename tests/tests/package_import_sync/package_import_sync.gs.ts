@@ -219,7 +219,7 @@ export class queue {
 	public async push(v: number): globalThis.Promise<void> {
 		let q: queue | $.VarRef<queue> | null = this;
 		await queue.prototype.lockAndInit.call(q)
-		$.pointerValue<queue>(q).items = $.append($.pointerValue<queue>(q).items, v)
+		$.pointerValue<queue>(q).items = $.appendOne($.pointerValue<queue>(q).items, v)
 		$.pointerValue<queue>(q).Cond.Signal()
 		$.pointerValue<queue>(q).Mu.Unlock()
 	}

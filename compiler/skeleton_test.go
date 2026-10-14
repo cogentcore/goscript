@@ -454,7 +454,7 @@ func TestCompilePackagesAssignsLazyPackageVarsDirectly(t *testing.T) {
 		t.Fatal(err.Error())
 	}
 	text := string(content)
-	if !strings.Contains(text, "__goscript_set_table($.append(__goscript_get_table(), 2))") {
+	if !strings.Contains(text, "__goscript_set_table($.appendOne(__goscript_get_table(), 2))") {
 		t.Fatalf("missing lazy package var assignment through setter:\n%s", text)
 	}
 	if strings.Contains(text, "__goscript_get_table() =") {
@@ -2547,7 +2547,7 @@ func TestCompilePackagesEmitsArraySliceMapStringAndNamedMethods(t *testing.T) {
 		"let slice: $.Slice<number> = $.makeSlice<number>(0, 2, \"number\")",
 		"let empty: $.Slice<number> = $.arrayToSlice<number>([])",
 		"let literal: $.Slice<number> = $.arrayToSlice<number>([1, 2])",
-		"literal = $.append(literal, 3)",
+		"literal = $.appendOne(literal, 3)",
 		"slice![0] = $.arrayIndex(arr, 1)",
 		"let m: globalThis.Map<string, number> | null = $.makeMap<string, number>()",
 		"$.mapSet(m, \"one\", 1)",

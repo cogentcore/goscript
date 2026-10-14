@@ -55,7 +55,7 @@ export class node {
 export async function main(): globalThis.Promise<void> {
 	let root: node | $.VarRef<node> | null = new node()
 	let child: node | $.VarRef<node> | null = new node()
-	$.pointerValue<node>(root).sub = $.append($.goSlice($.pointerValue<node>(root).sub0, undefined, 0), child, $.appendZeros.nil)
+	$.pointerValue<node>(root).sub = $.appendOne($.goSlice($.pointerValue<node>(root).sub0, undefined, 0), child, $.appendZeros.nil)
 
 	await $.println($.sliceLen($.pointerValue<node>(root).sub), $.pointerEqual($.arrayIndex($.pointerValue<node>(root).sub!, 0), child))
 }
