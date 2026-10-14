@@ -23,9 +23,7 @@ export class bValue {
 		this._fields = {
 			inner: init?.inner ? init.inner.clone() : new __goscript_a.aValue(undefined, true)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): bValue {

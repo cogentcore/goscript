@@ -38,9 +38,7 @@ export class Holder {
 		this._fields = {
 			Tags: init?.Tags ?? (null! as globalThis.Map<string, number> | null)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Holder {
@@ -119,9 +117,7 @@ export class Enc {
 			Named: init?.Named ?? (null! as globalThis.Map<string, $.Slice<number>> | null),
 			Nested: init?.Nested ?? (null! as Enc | $.VarRef<Enc> | null)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Enc {
@@ -174,9 +170,7 @@ export class Event {
 			Name: init?.Name ?? ("" as string),
 			At: init?.At ? $.markAsStructValue($.cloneStructValue(init.At)) : $.markAsStructValue(new time.Time())
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Event {
@@ -236,9 +230,7 @@ export class Person {
 			Age: init?.Age ?? (0 as number),
 			Active: init?.Active ?? (false as boolean)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Person {

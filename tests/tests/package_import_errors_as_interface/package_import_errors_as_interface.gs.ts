@@ -34,9 +34,7 @@ export class wrappedHealthError {
 		this._fields = {
 			err: init?.err ?? (null! as $.GoError)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): wrappedHealthError {

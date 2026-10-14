@@ -24,9 +24,7 @@ export class Promise {
 		this._fields = {
 			value: init?.value ?? ("" as string)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Promise {
@@ -75,9 +73,7 @@ export class point {
 			x: init?.x ?? (0 as number),
 			y: init?.y ?? (0 as number)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): point {

@@ -41,9 +41,7 @@ export class blockType {
 			typeID: init?.typeID ?? ("" as string),
 			_constructor: init?._constructor ?? (null! as (() => any | globalThis.Promise<any>) | null)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): blockType {
@@ -83,9 +81,7 @@ export class sampleBlock {
 	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
 		this._fields = {
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): sampleBlock {

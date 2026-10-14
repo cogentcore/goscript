@@ -22,9 +22,7 @@ export class Job {
 		this._fields = {
 			Value: init?.Value ?? ("" as string)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Job {

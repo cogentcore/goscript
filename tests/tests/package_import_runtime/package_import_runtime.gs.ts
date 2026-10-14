@@ -32,9 +32,7 @@ export class counter {
 		this._fields = {
 			n: init?.n ?? (0 as number)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): counter {
@@ -83,9 +81,7 @@ export class box {
 		this._fields = {
 			v: init?.v !== undefined ? $.copyElement(init.v) : (null! as any)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): box {

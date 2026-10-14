@@ -32,9 +32,7 @@ export class Image {
 		this._fields = {
 			Name: init?.Name ?? ("" as string)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Image {
@@ -125,9 +123,7 @@ export class Doc {
 			Image: init?.Image ?? (null! as Image | $.VarRef<Image> | null),
 			Note: init?.Note ?? ("" as string)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Doc {

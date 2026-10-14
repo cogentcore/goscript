@@ -30,9 +30,7 @@ export class MyStruct {
 			publicField: init?.publicField ?? ("" as string),
 			privateField: init?.privateField ?? (0 as number)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): MyStruct {

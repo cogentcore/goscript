@@ -40,9 +40,7 @@ export class MyStruct {
 			PointerField: init?.PointerField ?? (null! as $.VarRef<number> | null),
 			interfaceField: init?.interfaceField ?? (null! as MyInterface | null)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): MyStruct {

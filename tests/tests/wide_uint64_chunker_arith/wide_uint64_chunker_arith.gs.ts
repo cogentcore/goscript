@@ -23,9 +23,7 @@ export class chunker {
 		this._fields = {
 			pos: init?.pos ?? (0n as bigint)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): chunker {
@@ -69,9 +67,7 @@ export class repeatReader {
 		this._fields = {
 			remaining: init?.remaining ?? (0 as number)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): repeatReader {

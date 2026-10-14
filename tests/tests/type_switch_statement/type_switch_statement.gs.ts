@@ -24,9 +24,7 @@ export class RawValue {
 		this._fields = {
 			Tag: init?.Tag ?? (0 as number)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): RawValue {

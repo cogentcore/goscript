@@ -20,9 +20,7 @@ export class MyStruct {
 		this._fields = {
 			myPrivate: init?.myPrivate ?? (null! as $.VarRef<number> | null)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): MyStruct {

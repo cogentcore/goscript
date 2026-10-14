@@ -29,9 +29,7 @@ export class writerHolder {
 		this._fields = {
 			w: init?.w ?? (null! as io.Writer | null)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): writerHolder {
@@ -60,9 +58,7 @@ export class asyncBuffer {
 	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
 		this._fields = {
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): asyncBuffer {
@@ -113,9 +109,7 @@ export class staticReader {
 		this._fields = {
 			done: init?.done ?? (false as boolean)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): staticReader {
@@ -165,9 +159,7 @@ export class asyncReader {
 		this._fields = {
 			done: init?.done ?? (false as boolean)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): asyncReader {
@@ -218,9 +210,7 @@ export class asyncReaderAt {
 		this._fields = {
 			data: init?.data ?? (null! as $.Slice<number>)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): asyncReaderAt {
@@ -303,9 +293,7 @@ export class pipeReadResult {
 			errNil: init?.errNil ?? (false as boolean),
 			errEOF: init?.errEOF ?? (false as boolean)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): pipeReadResult {

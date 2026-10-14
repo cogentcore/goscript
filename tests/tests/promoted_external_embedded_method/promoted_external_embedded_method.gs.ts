@@ -33,9 +33,7 @@ export class raw {
 		this._fields = {
 			Mutex: init?.Mutex ? $.markAsStructValue($.cloneStructValue(init.Mutex)) : $.markAsStructValue(new sync.Mutex())
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): raw {
@@ -86,9 +84,7 @@ export class outer {
 		this._fields = {
 			raw: init?.raw ? init.raw.clone() : new raw(undefined, true)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): outer {
@@ -139,9 +135,7 @@ export class rawRW {
 		this._fields = {
 			RWMutex: init?.RWMutex ? $.markAsStructValue($.cloneStructValue(init.RWMutex)) : $.markAsStructValue(new sync.RWMutex())
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): rawRW {
@@ -208,9 +202,7 @@ export class outerRW {
 		this._fields = {
 			rawRW: init?.rawRW ? init.rawRW.clone() : new rawRW(undefined, true)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): outerRW {
@@ -277,9 +269,7 @@ export class rawRunner {
 		this._fields = {
 			runner: init?.runner ?? (null! as runner | null)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): rawRunner {
@@ -322,9 +312,7 @@ export class outerRunner {
 		this._fields = {
 			rawRunner: init?.rawRunner ? init.rawRunner.clone() : new rawRunner(undefined, true)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): outerRunner {
@@ -357,9 +345,7 @@ export class runnable {
 	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
 		this._fields = {
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): runnable {

@@ -25,9 +25,7 @@ export class Inner {
 		this._fields = {
 			B: init?.B ?? (0 as number)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Inner {
@@ -76,9 +74,7 @@ export class Outer {
 			Inner: init?.Inner ?? (null! as Inner | $.VarRef<Inner> | null),
 			C: init?.C ?? (0 as number)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Outer {

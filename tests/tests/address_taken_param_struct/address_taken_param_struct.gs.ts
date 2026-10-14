@@ -30,9 +30,7 @@ export class Format {
 			Name: init?.Name ?? ("" as string),
 			Ext: init?.Ext ?? (null! as $.Slice<string>)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Format {

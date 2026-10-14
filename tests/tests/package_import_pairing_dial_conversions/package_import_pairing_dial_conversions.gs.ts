@@ -35,9 +35,7 @@ export class recreateError {
 		this._fields = {
 			next: init?.next ?? (0n as bigint)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): recreateError {
@@ -71,9 +69,7 @@ export class readWriteCloser {
 	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
 		this._fields = {
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): readWriteCloser {

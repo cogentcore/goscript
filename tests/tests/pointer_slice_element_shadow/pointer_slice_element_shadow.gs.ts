@@ -20,9 +20,7 @@ export class entry {
 		this._fields = {
 			key: init?.key ?? ("" as string)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): entry {
@@ -61,9 +59,7 @@ export class _object {
 		this._fields = {
 			entries: init?.entries ?? (null! as $.Slice<entry>)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): _object {

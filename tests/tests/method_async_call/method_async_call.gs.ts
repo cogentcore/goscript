@@ -33,9 +33,7 @@ export class FileTracker {
 			mutex: init?.mutex ? $.markAsStructValue($.cloneStructValue(init.mutex)) : $.markAsStructValue(new sync.Mutex()),
 			lines: init?.lines ?? (null! as $.Slice<number>)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): FileTracker {
@@ -83,9 +81,7 @@ export class Scanner {
 		this._fields = {
 			file: init?.file ?? (null! as FileTracker | $.VarRef<FileTracker> | null)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Scanner {

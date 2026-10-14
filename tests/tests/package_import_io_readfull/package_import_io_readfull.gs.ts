@@ -36,9 +36,7 @@ export class fixedReader {
 			data: init?.data ?? (null! as $.Slice<number>),
 			size: init?.size ?? (0 as number)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): fixedReader {

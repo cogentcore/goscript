@@ -40,9 +40,7 @@ export class padded {
 			Value: init?.Value ?? (0 as number),
 			_blank2: init?._blank2 !== undefined ? $.cloneArrayValue(init._blank2, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 3)) : $.arrayValue(new Uint8Array(3))
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): padded {

@@ -20,9 +20,7 @@ export class worker {
 		this._fields = {
 			base: init?.base ?? (0 as number)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): worker {

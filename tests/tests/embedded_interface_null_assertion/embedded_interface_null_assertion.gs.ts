@@ -40,9 +40,7 @@ export class MyReader {
 			Reader: init?.Reader ?? (null! as Reader | null),
 			name: init?.name ?? ("" as string)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): MyReader {
@@ -96,9 +94,7 @@ export class StringReader {
 			data: init?.data ?? ("" as string),
 			pos: init?.pos ?? (0 as number)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): StringReader {

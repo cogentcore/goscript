@@ -20,9 +20,7 @@ export class holder {
 		this._fields = {
 			values: init?.values ?? (null! as $.VarRef<$.Slice<number>> | null)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): holder {

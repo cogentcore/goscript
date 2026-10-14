@@ -32,9 +32,7 @@ export async function main(): globalThis.Promise<void> {
 					name: init?.name ?? ("" as string),
 					count: init?.count ?? (0 as number)
 				}
-				if (__goscriptValue) {
-					(this as any)[$.structValueMarker] = true
-				}
+				;(this as any)[$.structValueMarker] = __goscriptValue === true
 			}
 
 			public clone(): item {

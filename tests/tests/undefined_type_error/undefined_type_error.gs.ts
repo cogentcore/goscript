@@ -120,9 +120,7 @@ export class formatter {
 			plusV: init?.plusV ?? (false as boolean),
 			sharpV: init?.sharpV ?? (false as boolean)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): formatter {
@@ -193,9 +191,7 @@ export class printer {
 			arg: init?.arg ?? (null! as any),
 			fmt: init?.fmt ? init.fmt.clone() : new formatter(undefined, true)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): printer {

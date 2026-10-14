@@ -20,9 +20,7 @@ export class descriptor {
 		this._fields = {
 			Label: init?.Label ?? ("" as string)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): descriptor {

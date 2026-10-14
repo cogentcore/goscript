@@ -33,9 +33,7 @@ export class Process {
 			pid: init?.pid ?? (0 as number),
 			done: init?.done ?? (null! as $.Channel<{}> | null)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Process {

@@ -44,9 +44,7 @@ export class FileStatus {
 			mode: init?.mode ?? (0 as MyFileMode),
 			size: init?.size ?? (0n as bigint)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): FileStatus {

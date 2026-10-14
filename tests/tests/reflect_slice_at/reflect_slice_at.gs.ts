@@ -36,9 +36,7 @@ export class Sub {
 			X: init?.X ?? (0 as number),
 			Y: init?.Y ?? ("" as string)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Sub {
@@ -98,9 +96,7 @@ export class T {
 			Mbr2: init?.Mbr2 ?? (0 as number),
 			S: init?.S ? init.S.clone() : new Sub(undefined, true)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): T {
@@ -184,9 +180,7 @@ export async function main(): globalThis.Promise<void> {
 			this._fields = {
 				Count: init?.Count ?? (0 as number)
 			}
-			if (__goscriptValue) {
-				(this as any)[$.structValueMarker] = true
-			}
+			;(this as any)[$.structValueMarker] = __goscriptValue === true
 		}
 
 		public clone(): holder {

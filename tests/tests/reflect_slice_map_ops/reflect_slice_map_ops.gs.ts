@@ -26,9 +26,7 @@ export class Item {
 		this._fields = {
 			Name: init?.Name ?? ("" as string)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Item {
@@ -77,9 +75,7 @@ export class Holder {
 			S: init?.S ?? (null! as $.Slice<number>),
 			T: init?.T ?? (null! as $.Slice<number>)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Holder {
@@ -119,9 +115,7 @@ export class Doc {
 		this._fields = {
 			Items: init?.Items ?? (null! as $.Slice<Item>)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Doc {

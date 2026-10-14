@@ -23,9 +23,7 @@ export class Holder {
 		this._fields = {
 			Box: init?.Box ?? (null! as _unique.Box | $.VarRef<_unique.Box> | null)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Holder {

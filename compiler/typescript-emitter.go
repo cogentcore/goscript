@@ -649,11 +649,16 @@ func renderStruct(b *strings.Builder, structType *loweredStruct, runtimeOwner *R
 		}
 		b.WriteString("\n")
 	}
+
 	// A struct value carries the marker as its own property, set here so
-	// that each class stores it at one site.
-	b.WriteString("\t\t}\n\t\tif (__goscriptValue) {\n\t\t\t(this as any)[")
+	// that each class stores it at one site. Every instance has the
+	// property, false for a pointer's struct, so that all instances of a
+	// class have one shape and marking one later changes no shape.
+	b.WriteString("\t\t}\n\t\t;(this as any)[")
 	b.WriteString(structValueMarker)
-	b.WriteString("] = true\n\t\t}\n\t}\n\n")
+	b.WriteString("] = __goscriptValue === true\n\t}\n\n")
+
+	// The clone method copies the struct through its constructor.
 	b.WriteString("\tpublic ")
 	b.WriteString(structType.cloneMethod)
 	b.WriteString("(): ")
@@ -661,11 +666,15 @@ func renderStruct(b *strings.Builder, structType *loweredStruct, runtimeOwner *R
 	b.WriteString(" {\n\t\treturn new ")
 	b.WriteString(structType.name)
 	b.WriteString("(this, true)\n\t}\n")
+
+	// The assign method and the methods follow the clone method.
 	renderStructAssign(b, structType, runtimeOwner)
 	for _, method := range structType.methods {
 		b.WriteString("\n")
 		renderMethod(b, &method)
 	}
+
+	// A static block binds the fields and sets up the prototype.
 	if len(boundFields) != 0 || structType.prototypeSetup != "" {
 		b.WriteString("\n\tstatic {\n")
 		if len(boundFields) != 0 {
@@ -687,6 +696,8 @@ func renderStruct(b *strings.Builder, structType *loweredStruct, runtimeOwner *R
 		}
 		b.WriteString("\t}\n")
 	}
+
+	// The type info registers the struct with the runtime.
 	b.WriteString("\n\tstatic __typeInfo = ")
 	b.WriteString(registerStructType)
 	b.WriteString("(\n")

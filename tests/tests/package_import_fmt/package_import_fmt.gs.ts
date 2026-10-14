@@ -45,9 +45,7 @@ export class byteFormatter {
 		this._fields = {
 			prefix: init?.prefix ?? (null! as $.Slice<number>)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): byteFormatter {
@@ -103,9 +101,7 @@ export class pos {
 			Line: init?.Line ?? (0 as number),
 			Char: init?.Char ?? (0 as number)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): pos {

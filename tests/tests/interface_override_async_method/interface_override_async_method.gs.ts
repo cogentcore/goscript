@@ -23,9 +23,7 @@ export class asyncReader {
 		this._fields = {
 			ch: init?.ch ?? (null! as $.Channel<number> | null)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): asyncReader {

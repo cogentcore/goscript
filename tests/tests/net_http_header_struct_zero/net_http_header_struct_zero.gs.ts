@@ -23,9 +23,7 @@ export class responseWriter {
 		this._fields = {
 			header: init?.header ?? (null! as http.Header)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): responseWriter {

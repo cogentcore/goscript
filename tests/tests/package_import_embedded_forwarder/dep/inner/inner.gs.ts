@@ -25,9 +25,7 @@ export class CoreStore {
 		this._fields = {
 			Prefix: init?.Prefix ?? ("" as string)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): CoreStore {
