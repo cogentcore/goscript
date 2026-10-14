@@ -142,7 +142,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// A nil value keeps a zero Pointer after a round trip through Interface.
 	for (let i = 0; i < $.markAsStructValue($.cloneStructValue(f)).NumField(); i++) {
-		await $.println("pointer", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(f)).Type()).Field(i), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait).Name, $.uint($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(f)).Field(i))).Interface()))).Pointer(), 64) == 0)
+		await $.println("pointer", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(f)).Type()).Field(i), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait).Name, $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(f)).Field(i))).Interface()))).Pointer() == 0)
 	}
 
 	// The address of an unnamed field keeps its pointer type.

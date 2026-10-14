@@ -24,7 +24,7 @@ export async function main(): globalThis.Promise<void> {
 	let err = await json.Decoder.prototype.Decode.call($.pointerValue<json.Decoder>(dec), $.namedValueInterfaceValue<any>(raw, "*jsontext.Value", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()))
 	await $.println("RawMessage:", $.bytesToString(raw.value), err == null)
 	await $.println("RawMessage EOF:", $.comparableEqual(await json.Decoder.prototype.Decode.call($.pointerValue<json.Decoder>(dec), $.namedValueInterfaceValue<any>(raw, "*jsontext.Value", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2())), io.EOF))
-	await $.println("RawMessage valid:", jsontext.Value_IsValid(raw.value), $.uint(jsontext.Value_Kind(raw.value), 8))
+	await $.println("RawMessage valid:", jsontext.Value_IsValid(raw.value), jsontext.Value_Kind(raw.value))
 	await $.println("RawMessage format:", jsontext.Value_Format(raw) == null, $.bytesToString(raw.value))
 
 	let formatted: $.VarRef<json.RawMessage> = $.varRef((new Uint8Array([123, 34, 120, 34, 58, 32, 34, 60, 34, 125]) as json.RawMessage))

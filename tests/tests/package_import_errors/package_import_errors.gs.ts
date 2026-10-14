@@ -144,8 +144,8 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("AsType missing:", ok)
 
 	let scalarTarget: $.VarRef<scalarErr> = $.varRef(0)
-	await $.println("As scalar missing:", errors.As($.pointerValueOrNil(err1)!, $.namedValueInterfaceValue<any>(scalarTarget, "*main.scalarErr", __goscriptStatic1(), __goscriptStatic2(), __goscriptStatic3())), $.uint(scalarTarget.value, 8))
-	await $.println("As scalar matched:", errors.As($.namedValueInterfaceValue<$.GoError>(42, "main.scalarErr", {"Error": scalarErr_Error}, /* @__PURE__ */ $.basicType("uint8", "main.scalarErr"))!, $.namedValueInterfaceValue<any>(scalarTarget, "*main.scalarErr", __goscriptStatic1(), __goscriptStatic2(), __goscriptStatic3())), $.uint(scalarTarget.value, 8))
+	await $.println("As scalar missing:", errors.As($.pointerValueOrNil(err1)!, $.namedValueInterfaceValue<any>(scalarTarget, "*main.scalarErr", __goscriptStatic1(), __goscriptStatic2(), __goscriptStatic3())), scalarTarget.value)
+	await $.println("As scalar matched:", errors.As($.namedValueInterfaceValue<$.GoError>(42, "main.scalarErr", {"Error": scalarErr_Error}, /* @__PURE__ */ $.basicType("uint8", "main.scalarErr"))!, $.namedValueInterfaceValue<any>(scalarTarget, "*main.scalarErr", __goscriptStatic1(), __goscriptStatic2(), __goscriptStatic3())), scalarTarget.value)
 
 	await $.println("test finished")
 }

@@ -66,11 +66,11 @@ export class Person {
 }
 
 export function reflectOverlap(x: $.Slice<number>, y: $.Slice<number>): boolean {
-	return ((($.sliceLen(x) > 0) && ($.sliceLen(y) > 0)) && ($.uint($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.indexRef(x!, 0), "*byte", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("uint8")))))).Pointer(), 64) <= $.uint($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.indexRef(y!, $.sliceLen(y) - 1), "*byte", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("uint8")))))).Pointer(), 64))) && ($.uint($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.indexRef(y!, 0), "*byte", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("uint8")))))).Pointer(), 64) <= $.uint($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.indexRef(x!, $.sliceLen(x) - 1), "*byte", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("uint8")))))).Pointer(), 64))
+	return ((($.sliceLen(x) > 0) && ($.sliceLen(y) > 0)) && ($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.indexRef(x!, 0), "*byte", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("uint8")))))).Pointer() <= $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.indexRef(y!, $.sliceLen(y) - 1), "*byte", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("uint8")))))).Pointer())) && ($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.indexRef(y!, 0), "*byte", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("uint8")))))).Pointer() <= $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.indexRef(x!, $.sliceLen(x) - 1), "*byte", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("uint8")))))).Pointer())
 }
 
 export function reflectSameStart(x: $.Slice<number>, y: $.Slice<number>): boolean {
-	return (($.sliceLen(x) > 0) && ($.sliceLen(y) > 0)) && ($.uint($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.indexRef(x!, 0), "*byte", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("uint8")))))).Pointer(), 64) == $.uint($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.indexRef(y!, 0), "*byte", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("uint8")))))).Pointer(), 64))
+	return (($.sliceLen(x) > 0) && ($.sliceLen(y) > 0)) && ($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.indexRef(x!, 0), "*byte", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("uint8")))))).Pointer() == $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.indexRef(y!, 0), "*byte", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("uint8")))))).Pointer())
 }
 
 export async function main(): globalThis.Promise<void> {
@@ -233,9 +233,9 @@ export async function main(): globalThis.Promise<void> {
 
 	// Test type methods
 	await $.println("Type size methods:")
-	await $.println("Int size:", $.uint((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeFor(__goscriptStatic0())).Size(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), 64))
-	await $.println("String size:", $.uint((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeFor(__goscriptStatic1())).Size(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), 64))
-	await $.println("Slice size:", $.uint((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeFor(__goscriptStatic2())).Size(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), 64))
+	await $.println("Int size:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeFor(__goscriptStatic0())).Size(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println("String size:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeFor(__goscriptStatic1())).Size(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println("Slice size:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeFor(__goscriptStatic2())).Size(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
 	// Test enhanced API surface - functions to implement
 	await $.println("Enhanced API tests:")
@@ -287,7 +287,7 @@ export async function main(): globalThis.Promise<void> {
 	// Test channel reflection properties
 	await $.println("Chan elem type:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(chanType).Elem(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	await $.println("Chan elem kind:", reflect.Kind_String((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(chanType).Elem(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)).Kind(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)))
-	await $.println("Chan size:", $.uint((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(chanType).Size(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), 64))
+	await $.println("Chan size:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(chanType).Size(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
 	// Test Value.Pointer on addressable slice elements.
 	let pointerBuf: $.Slice<number> = new Uint8Array([1, 2, 3, 4]) as $.Slice<number>

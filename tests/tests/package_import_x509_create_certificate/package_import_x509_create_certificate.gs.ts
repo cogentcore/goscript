@@ -138,7 +138,7 @@ export async function main(): globalThis.Promise<void> {
 	let decoded: $.VarRef<signedKey> = $.varRef($.markAsStructValue(new signedKey()))
 	let __goscriptTuple4: any = await asn1.Unmarshal(keyExt.Value, $.interfaceValue(decoded, "*main.signedKey", /* @__PURE__ */ $.pointerType("main.signedKey")))
 	err = __goscriptTuple4[1]
-	await $.println("extension unmarshal", err == null, $.sliceLen(decoded.value.PubKey), $.uint($.arrayIndex(decoded.value.PubKey!, 0), 8), $.uint($.arrayIndex(decoded.value.PubKey!, 5), 8), $.sliceLen(decoded.value.Signature))
+	await $.println("extension unmarshal", err == null, $.sliceLen(decoded.value.PubKey), $.arrayIndex(decoded.value.PubKey!, 0), $.arrayIndex(decoded.value.PubKey!, 5), $.sliceLen(decoded.value.Signature))
 	let pool: x509.CertPool | $.VarRef<x509.CertPool> | null = x509.NewCertPool()
 	await x509.CertPool.prototype.AddCert.call(pool, cert)
 	let __goscriptTuple5: any = await x509.Certificate.prototype.Verify.call(cert, $.markAsStructValue(new x509.VerifyOptions({Roots: pool})))

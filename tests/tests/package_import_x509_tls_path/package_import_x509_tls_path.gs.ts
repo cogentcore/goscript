@@ -61,7 +61,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("chain count", $.sliceLen($.arrayIndex($.pointerValue<tls.Config>(config).Certificates!, 0).Certificate))
 	await $.println("leaf common name", $.pointerValue<x509.Certificate>($.arrayIndex($.pointerValue<tls.Config>(config).Certificates!, 0).Leaf).Subject.CommonName)
 	await $.println("private key signer", ed25519.PublicKey_Equal($.mustTypeAssert<ed25519.PublicKey>(ed25519.PrivateKey_Public($.mustTypeAssert<ed25519.PrivateKey>($.arrayIndex($.pointerValue<tls.Config>(config).Certificates!, 0).PrivateKey, /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"), "ed25519.PrivateKey"))), /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"), "ed25519.PublicKey")), $.namedValueInterfaceValue<crypto.PublicKey | null>(pub, "ed25519.PublicKey", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2())))
-	await $.println("min version", $.uint($.pointerValue<tls.Config>(config).MinVersion, 16))
+	await $.println("min version", $.pointerValue<tls.Config>(config).MinVersion)
 	await $.println("next proto", $.arrayIndex($.pointerValue<tls.Config>(config).NextProtos!, 0))
 
 	let cache = tls.NewLRUClientSessionCache(2)

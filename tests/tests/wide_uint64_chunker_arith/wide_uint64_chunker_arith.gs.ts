@@ -85,7 +85,7 @@ export class repeatReader {
 		}
 		let n = $.min($.sliceLen(p), $.pointerValue<repeatReader>(r).remaining)
 		for (let __goscriptRangeCount0 = n, i = 0; i < __goscriptRangeCount0; i++) {
-			p![i] = $.uint($.uint(i, 8), 8)
+			p![i] = $.uint(i, 8)
 		}
 		$.pointerValue<repeatReader>(r).remaining = $.pointerValue<repeatReader>(r).remaining - (n)
 		return [n, null]
@@ -119,7 +119,7 @@ export function algorithm(data: $.Slice<number>, n: number, g: $.Slice<bigint>, 
 }
 
 export function uint64Len(g: $.Slice<bigint>): number {
-	return $.uint($.uint($.sliceLen(g), 8), 8)
+	return $.uint($.sliceLen(g), 8)
 }
 
 export async function main(): globalThis.Promise<void> {

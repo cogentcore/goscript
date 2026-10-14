@@ -139,7 +139,7 @@ export async function Tokens_UnmarshalText(t: $.VarRef<Tokens> | null, text: $.S
 	for (let __goscriptRangeTarget0 = tokenNames, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), i = 0; i < __goscriptRangeWindow0.length; i++) {
 		let n = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + i] as string)
 		if ($.stringEqual(n, $.bytesToString(text))) {
-			t!.value = $.int($.int(i, 32), 32)
+			t!.value = $.int(i, 32)
 			return null
 		}
 	}
@@ -157,7 +157,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("len:", $.len(s.value))
 	await $.println("keyword:", $.mapGet<Tokens, string, string>(s.value, 1, "")[0], "background:", $.mapGet<Tokens, string, string>(s.value, 0, "")[0])
 	for (const [k, __rangeValue] of s.value?.entries() ?? []) {
-		await $.println("key is token:", ($.int(k, 32) == 1) || ($.int(k, 32) == 0))
+		await $.println("key is token:", (k == 1) || (k == 0))
 	}
 
 	let d: $.VarRef<Doc> = $.varRef($.markAsStructValue(new Doc()))

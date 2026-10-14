@@ -57,14 +57,14 @@ export async function main(): globalThis.Promise<void> {
 	await $.println((10 as number) == 10)
 	let magicBytes: $.Slice<number> = new Uint8Array([255, 6, 0, 0, 83, 50, 115, 84, 119, 79])
 	await $.println($.sliceLen(magicBytes) == 10)
-	await $.println($.uint($.arrayIndex(magicBytes!, 0), 8) == 255)
-	await $.println($.uint($.arrayIndex(magicBytes!, 1), 8) == 6)
+	await $.println($.arrayIndex(magicBytes!, 0) == 255)
+	await $.println($.arrayIndex(magicBytes!, 1) == 6)
 	await $.println($.stringEqual($.bytesToString(magicBytes), $.bytesToString(new Uint8Array([255, 6, 0, 0, 83, 50, 115, 84, 119, 79]))))
 	await $.println((2 as number) == 2)
 	let utf8Bytes: $.Slice<number> = new Uint8Array([195, 169])
 	await $.println($.sliceLen(utf8Bytes) == 2)
-	await $.println($.uint($.arrayIndex(utf8Bytes!, 0), 8) == 195)
-	await $.println($.uint($.arrayIndex(utf8Bytes!, 1), 8) == 169)
+	await $.println($.arrayIndex(utf8Bytes!, 0) == 195)
+	await $.println($.arrayIndex(utf8Bytes!, 1) == 169)
 
 	// string(int32) conversion
 	let i32 = 66

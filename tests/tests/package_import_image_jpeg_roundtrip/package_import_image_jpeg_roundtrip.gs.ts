@@ -21,7 +21,7 @@ export async function main(): globalThis.Promise<void> {
 	let im: image.RGBA | $.VarRef<image.RGBA> | null = image.NewRGBA($.markAsStructValue($.cloneStructValue(image.Rect(0, 0, 16, 16))))
 	for (let y = 0; y < 16; y++) {
 		for (let x = 0; x < 16; x++) {
-			await image.RGBA.prototype.Set.call(im, x, y, $.interfaceValue<color.Color | null>($.markAsStructValue(new color.RGBA({R: $.uint($.uint(x * 16, 8), 8), G: $.uint($.uint(y * 16, 8), 8), B: 128, A: 255})), "color.RGBA", "color.RGBA"))
+			await image.RGBA.prototype.Set.call(im, x, y, $.interfaceValue<color.Color | null>($.markAsStructValue(new color.RGBA({R: $.uint(x * 16, 8), G: $.uint(y * 16, 8), B: 128, A: 255})), "color.RGBA", "color.RGBA"))
 		}
 	}
 	let buf: $.VarRef<bytes.Buffer> = $.varRef($.markAsStructValue(new bytes.Buffer()))
@@ -45,10 +45,7 @@ export async function main(): globalThis.Promise<void> {
 		await $.println("decode error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		return
 	}
-	let __goscriptTuple0: any = await $.pointerValue<Exclude<color.Color, null>>((__goscriptAwait = $.pointerValue<Exclude<image.Image, null>>(m).At(5, 7), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)).RGBA()
-	let r = $.uint(__goscriptTuple0[0], 32)
-	let g = $.uint(__goscriptTuple0[1], 32)
-	let bb = $.uint(__goscriptTuple0[2], 32)
+	let [r, g, bb, ] = await $.pointerValue<Exclude<color.Color, null>>((__goscriptAwait = $.pointerValue<Exclude<image.Image, null>>(m).At(5, 7), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)).RGBA()
 	await $.println("bounds:", (__goscriptAwait = $.pointerValue<Exclude<image.Image, null>>(m).Bounds(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait).Dx(), (__goscriptAwait = $.pointerValue<Exclude<image.Image, null>>(m).Bounds(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait).Dy(), "px:", $.uint($.uintShr(r, 8, 32), 32), $.uint($.uintShr(g, 8, 32), 32), $.uint($.uintShr(bb, 8, 32), 32))
 }
 
