@@ -155,7 +155,7 @@ export async function callers(): globalThis.Promise<void> {
 	let ok = __goscriptTuple0[3]
 	await $.println("Caller:", ok, $.uint(pc, 64) != 0, !$.stringEqual(file, ""), line > 0)
 	let f: runtime.Func | $.VarRef<runtime.Func> | null = runtime.FuncForPC($.uint(pc, 64))
-	await $.println("FuncForPC caller:", f != null, strings.Contains(runtime.Func.prototype.Name.call($.pointerValue<runtime.Func>(f)), "callers"))
+	await $.println("FuncForPC caller:", f != null, strings.Contains(runtime.Func.prototype.Name.call($.pointerValueOrNil(f)), "callers"))
 	await $.println("Caller(1):", !$.stringEqual(callerInfo(), ""))
 
 	let pcs: $.Slice<number> = $.makeSlice<number>(8, undefined, "number")
@@ -169,11 +169,11 @@ export function callerInfo(): string {
 	let pc = $.uint(__goscriptTuple1[0], 64)
 	let file = __goscriptTuple1[1]
 	let line = __goscriptTuple1[2]
-	return $.concatString(($.concatString(($.concatString(($.concatString(runtime.Func.prototype.Name.call($.pointerValue<runtime.Func>(runtime.FuncForPC($.uint(pc, 64)))), " ")), file)), ":")), strconv.Itoa(line))
+	return $.concatString(($.concatString(($.concatString(($.concatString(runtime.Func.prototype.Name.call($.pointerValueOrNil(runtime.FuncForPC($.uint(pc, 64)))), " ")), file)), ":")), strconv.Itoa(line))
 }
 
 export function funcName(f: any): string {
-	return runtime.Func.prototype.Name.call($.pointerValue<runtime.Func>(runtime.FuncForPC($.uint($.markAsStructValue($.cloneStructValue(reflect.ValueOf(f))).Pointer(), 64))))
+	return runtime.Func.prototype.Name.call($.pointerValueOrNil(runtime.FuncForPC($.uint($.markAsStructValue($.cloneStructValue(reflect.ValueOf(f))).Pointer(), 64))))
 }
 
 export function helperFunc(): void {

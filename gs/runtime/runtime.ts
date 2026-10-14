@@ -206,8 +206,9 @@ export class Func {
     return frame === undefined ? ['', 0] : [frame.file, frame.line]
   }
 
+  // Name returns the name of the function, or "" for a nil Func, as in Go.
   public Name(): string {
-    return this.name
+    return (this as Func | null)?.name ?? ''
   }
 }
 

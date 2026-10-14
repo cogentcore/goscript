@@ -1,0 +1,4 @@
+nil: true
+pc 0: true
+nil func: true
+hello: main.hello
