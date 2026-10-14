@@ -311,9 +311,7 @@ export function isArrayOrGoSlice(
 /**
  * SliceProxy exposes a shared backing window through array operations.
  */
-export type SliceProxy<T> = T[] & {
-  __meta__: GoSliceObject<T>
-}
+export type SliceProxy<T> = GoSlice<T>
 
 type ByteSliceMeta = Omit<GoSliceObject<number>, 'backing'> & {
   backing: Uint8Array
@@ -399,74 +397,6 @@ const sliceProxyOwnTraps = {
   },
 }
 
-// windowSliceProxyHandler routes the indexed reads and writes of a slice
-// proxy through the backing window of its target's metadata. The handlers
-// are shared by all proxies, so that making a slice allocates no handler or
-// closures.
-const windowSliceProxyHandler: ProxyHandler<SliceProxy<any>> = {
-  ...sliceProxyOwnTraps,
-  get(target, prop, receiver) {
-    // The window answers for itself before any other property.
-    const meta = target.__meta__
-    if (prop === '__meta__') {
-      return meta
-    }
-
-    // An index reads the backing array, inside the length only.
-    const index = sliceIndexProperty(prop)
-    if (index >= 0) {
-      if (index < meta.length) {
-        return meta.backing[meta.offset + index]
-      }
-      outOfRangeIndex(index, meta.length)
-    }
-
-    // The length is the window's.
-    if (prop === 'length') {
-      return meta.length
-    }
-
-    // Sorting works on the window, not the target.
-    if (prop === 'sort') {
-      return sliceProxySortMethod(meta, receiver as SliceProxy<any>)
-    }
-
-    // So do the methods that iterate.
-    if (
-      prop === 'slice' ||
-      prop === 'map' ||
-      prop === 'filter' ||
-      prop === 'reduce' ||
-      prop === 'forEach' ||
-      prop === Symbol.iterator
-    ) {
-      return sliceProxyBackingMethod(meta, prop)
-    }
-
-    return Reflect.get(target, prop)
-  },
-
-  set(target, prop, value): boolean {
-    // An index writes the backing array, inside the length only.
-    const meta = target.__meta__
-    const index = sliceIndexProperty(prop)
-    if (index >= 0) {
-      if (index < meta.length) {
-        meta.backing[meta.offset + index] = value
-        return true
-      }
-      outOfRangeIndex(index, meta.length)
-    }
-
-    // The length and the window are not assignable.
-    if (prop === 'length' || prop === '__meta__') {
-      return false
-    }
-
-    return Reflect.set(target, prop, value)
-  },
-}
-
 // subsliceProxyHandler is the shared handler of the slice proxies that
 // goSlice makes. Unlike the window handler, it lets a write at the length
 // extend the slice into its spare capacity.
@@ -540,64 +470,6 @@ const subsliceProxyHandler: ProxyHandler<SliceProxy<any>> = {
   },
 }
 
-// madeSliceProxyHandler is the shared handler of the slice proxies that
-// makeSlice makes, whose targets hold a copy of the elements.
-const madeSliceProxyHandler: ProxyHandler<SliceProxy<any>> = {
-  get(target: SliceProxy<any>, prop: string | symbol): any {
-    // The window answers for itself before any other property.
-    const meta = target.__meta__
-    if (prop === '__meta__') {
-      return meta
-    }
-
-    // An index reads the backing array, inside the length only.
-    const index = sliceIndexProperty(prop)
-    if (index >= 0) {
-      if (index < meta.length) {
-        return meta.backing[meta.offset + index]
-      }
-      runtimePanic(`Slice index out of range: ${index} >= ${meta.length}`)
-    }
-
-    // The length is the window's.
-    if (prop === 'length') {
-      return meta.length
-    }
-
-    return Reflect.get(target, prop)
-  },
-
-  set(target: SliceProxy<any>, prop: string | symbol, value: any): boolean {
-    // An index writes the backing array and the target's copy of it.
-    const meta = target.__meta__
-    const index = sliceIndexProperty(prop)
-    if (index >= 0) {
-      if (index < meta.length) {
-        meta.backing[meta.offset + index] = value
-        target[index] = value
-        return true
-      }
-      runtimePanic(`Slice index out of range: ${index} >= ${meta.length}`)
-    }
-
-    // The length and the window are not assignable.
-    if (prop === 'length' || prop === '__meta__') {
-      return false
-    }
-
-    return Reflect.set(target, prop, value)
-  },
-}
-
-/**
- * wrapSliceProxy routes indexed reads and writes through the backing window.
- */
-function wrapSliceProxy<T>(proxy: SliceProxy<T>): SliceProxy<T> {
-  proxy.__meta__.target = proxy
-
-  return new Proxy(proxy, windowSliceProxyHandler) as SliceProxy<T>
-}
-
 function sliceProxyBackingMethod<T>(
   meta: GoSliceObject<T>,
   prop: string | symbol,
@@ -635,14 +507,14 @@ function sliceProxyFromBacking<T>(
   length: number,
   capacity: number,
 ): SliceProxy<T> {
-  // The shared proxy handlers find a slice's window on its target, so each
-  // slice has a target of its own, even where it shares its backing array
-  // with an earlier slice. The handlers read elements and the length from
-  // the window, so the target stays empty.
-  const proxyTargetArray: SliceProxy<T> = Object.assign([], {
-    __meta__: { backing, offset, length, capacity },
-  })
-  return wrapSliceProxy(proxyTargetArray)
+  // Each slice is a window object of its own, even where it shares its
+  // backing array with an earlier slice.
+  return new GoSlice(
+    backing,
+    offset,
+    length,
+    capacity,
+  ) as unknown as SliceProxy<T>
 }
 
 // asArray converts a slice to a JavaScript array.
@@ -705,12 +577,23 @@ export function sliceToArrayPointer<T>(
   length: number,
   _typeHint?: string,
 ): VarRef<T[] | Uint8Array> {
+  // The slice holds the whole array.
   if (len(slice) < length) {
     runtimePanic(
       `runtime error: cannot convert slice with length ${len(slice)} to array or pointer to array with length ${length}`,
     )
   }
-  const view = goSlice(slice as Slice<T>, 0, length) as T[] | Uint8Array
+
+  // A Go array is a JavaScript array, so a window is seen through a proxy
+  // that reads and writes its backing array.
+  let view = goSlice(slice as Slice<T>, 0, length) as T[] | Uint8Array
+  if (view instanceof GoSlice) {
+    const target = [] as unknown as { __meta__: GoSliceObject<T> }
+    target.__meta__ = view
+    view = new Proxy(target, subsliceProxyHandler) as unknown as T[]
+  }
+
+  // The pointer reads the view, and storing an array copies into it.
   const ref = varRef(view)
   Object.defineProperty(ref, 'value', {
     get: () => view,
@@ -845,24 +728,17 @@ export const makeSlice = <T>(
     backingArr[i] = zeroValue()
   }
 
+  // A slice that covers its whole backing array is the array; any other is a
+  // window on it.
   if (length === actualCapacity) {
     return backingArr as Slice<T>
   }
-
-  const proxyTargetArray = new Array<T>(length)
-  for (let i = 0; i < length; i++) {
-    proxyTargetArray[i] = backingArr[i]
-  }
-
-  const proxy = proxyTargetArray as SliceProxy<T>
-  proxy.__meta__ = {
-    backing: backingArr,
-    offset: 0,
+  return new GoSlice(
+    backingArr,
+    0,
     length,
-    capacity: actualCapacity,
-  }
-
-  return new Proxy(proxy, madeSliceProxyHandler) as SliceProxy<T>
+    actualCapacity,
+  ) as unknown as SliceProxy<T>
 }
 
 /**
@@ -1023,17 +899,12 @@ export function goSlice<T>(
     return backing as Slice<T>
   }
 
-  const proxyTargetArray = new Array<T>(newLength)
-
-  const proxy = proxyTargetArray as SliceProxy<T>
-  proxy.__meta__ = {
-    backing,
-    offset: newOffset,
-    length: newLength,
-    capacity: newCap,
-  }
-
-  return new Proxy(proxy, subsliceProxyHandler) as SliceProxy<T>
+  return new GoSlice(
+    backing as T[],
+    newOffset,
+    newLength,
+    newCap,
+  ) as unknown as SliceProxy<T>
 }
 
 /**

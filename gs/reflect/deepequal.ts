@@ -109,61 +109,25 @@ export function DeepEqual(
     return false
   }
 
-  // Handle arrays (including GoScript slices)
-  if (globalThis.Array.isArray(x) && globalThis.Array.isArray(y)) {
-    if (x.length !== y.length) {
+  // Handle arrays and slices, which are JavaScript arrays or windows on a
+  // backing array.
+  const xs = sliceWindow(x)
+  const ys = sliceWindow(y)
+  if (xs !== null && ys !== null) {
+    if (xs.length !== ys.length) {
       return false
     }
-    for (let i = 0; i < x.length; i++) {
-      if (!DeepEqual(x[i], y[i])) {
+    for (let i = 0; i < xs.length; i++) {
+      if (
+        !DeepEqual(
+          xs.backing[xs.offset + i] as ReflectValue,
+          ys.backing[ys.offset + i] as ReflectValue,
+        )
+      ) {
         return false
       }
     }
     return true
-  }
-
-  // Handle GoScript slice objects with __meta__ structure
-  if (x && y && typeof x === 'object' && typeof y === 'object') {
-    // Check if both are GoScript slices
-    if ('__meta__' in x && '__meta__' in y) {
-      const xMeta = (
-        x as { __meta__?: { backing?: unknown[]; length?: number } }
-      ).__meta__
-      const yMeta = (
-        y as { __meta__?: { backing?: unknown[]; length?: number } }
-      ).__meta__
-
-      if (
-        xMeta &&
-        yMeta &&
-        'backing' in xMeta &&
-        'backing' in yMeta &&
-        'length' in xMeta &&
-        'length' in yMeta &&
-        globalThis.Array.isArray(xMeta.backing) &&
-        globalThis.Array.isArray(yMeta.backing) &&
-        typeof xMeta.length === 'number' &&
-        typeof yMeta.length === 'number'
-      ) {
-        // Compare lengths
-        if (xMeta.length !== yMeta.length) {
-          return false
-        }
-
-        // Compare elements
-        for (let i = 0; i < xMeta.length; i++) {
-          if (
-            !DeepEqual(
-              xMeta.backing[i] as ReflectValue,
-              yMeta.backing[i] as ReflectValue,
-            )
-          ) {
-            return false
-          }
-        }
-        return true
-      }
-    }
   }
 
   // Dates (such as within time.Time) have no enumerable fields to compare.
@@ -186,7 +150,6 @@ export function DeepEqual(
     }
     return true
   }
-
 
   // Handle objects (structs)
   if (typeof x === 'object' && typeof y === 'object') {
@@ -222,4 +185,38 @@ export function DeepEqual(
 
   // For primitive values, use direct comparison
   return x === y
+}
+
+// sliceWindow returns the elements of a JavaScript array or of a slice window
+// as a backing array, offset and length, or null for any other value.
+function sliceWindow(
+  value: unknown,
+): { backing: ArrayLike<unknown>; offset: number; length: number } | null {
+  // An array is a window over itself.
+  if (globalThis.Array.isArray(value)) {
+    return { backing: value, offset: 0, length: value.length }
+  }
+
+  // A slice window carries its backing array, offset and length.
+  if (value !== null && typeof value === 'object' && '__meta__' in value) {
+    const meta = (
+      value as {
+        __meta__?: { backing?: unknown; offset?: number; length?: number }
+      }
+    ).__meta__
+    if (
+      meta &&
+      globalThis.Array.isArray(meta.backing) &&
+      typeof meta.length === 'number'
+    ) {
+      return {
+        backing: meta.backing,
+        offset: meta.offset ?? 0,
+        length: meta.length,
+      }
+    }
+  }
+
+  // Any other value is not a slice.
+  return null
 }

@@ -1,3 +1,4 @@
+import { arrayIndex, sliceElems, sliceSlot } from './slice.js'
 import { describe, expect, it, vi } from 'vitest'
 
 import { makeMap, mapGet, mapSet } from './map.js'
@@ -174,7 +175,7 @@ describe('append spare capacity', () => {
     values = append(values, 2)
     values = append(values, 3)
 
-    expect(goSlice(values, undefined, 4)[3]).toBe(0)
+    expect(arrayIndex(goSlice(values, undefined, 4), 3)).toBe(0)
   })
 
   it('zero-initializes struct elements exposed by reslicing', () => {
@@ -183,7 +184,7 @@ describe('append spare capacity', () => {
     values = append(values, markAsStructValue(new Item()), zeroHint)
     values = append(values, markAsStructValue(new Item()), zeroHint)
 
-    const zero = goSlice(values, undefined, 4)[3]
+    const zero = arrayIndex(goSlice(values, undefined, 4), 3)
     expect(zero).toBeInstanceOf(Item)
     expect(zero.value).toBe(0)
   })
@@ -196,9 +197,9 @@ describe('append spare capacity', () => {
     }
 
     const expanded = goSlice(values, undefined, 8)
-    expanded[5].value = 7
-    expect(expanded[6].value).toBe(0)
-    expect(expanded[5]).not.toBe(expanded[6])
+    arrayIndex(expanded, 5).value = 7
+    expect(arrayIndex(expanded, 6).value).toBe(0)
+    expect(arrayIndex(expanded, 5)).not.toBe(arrayIndex(expanded, 6))
   })
 
   it('zero-initializes appendSlice spare capacity from a static hint', () => {
@@ -208,7 +209,7 @@ describe('append spare capacity', () => {
     values = appendSlice(values, source, appendZeros.nil)
     values = appendSlice(values, source, appendZeros.nil)
 
-    expect(goSlice(values, undefined, 4)[3]).toBeNull()
+    expect(arrayIndex(goSlice(values, undefined, 4), 3)).toBeNull()
   })
 
   it('copies struct elements when append reallocates or spreads a slice', () => {
@@ -225,22 +226,26 @@ describe('append spare capacity', () => {
     const source = [cell(1)]
 
     const appended = append(source, cell(2))
-    ;(appended as Cell[])[0].n = 9
+    ;arrayIndex(appended, 0).n = 9
     expect(source[0].n).toBe(1)
 
     const spread = appendSlice(null, source)
-    ;(spread as Cell[])[0].n = 8
+    ;arrayIndex(spread, 0).n = 8
     expect(source[0].n).toBe(1)
   })
 
   it('snapshots an overlapping variadic append before writing', () => {
     const source = makeSlice<number>(2, 4, 'number')
-    source[0] = 1
-    source[1] = 2
+    sliceElems(source)[sliceSlot(source, 0)] = 1
+    sliceElems(source)[sliceSlot(source, 1)] = 2
 
     const out = appendSlice(goSlice(source, 0, 1), source)
 
-    expect([out[0], out[1], out[2]]).toEqual([1, 1, 2])
+    expect([
+      arrayIndex(out, 0),
+      arrayIndex(out, 1),
+      arrayIndex(out, 2),
+    ]).toEqual([1, 1, 2])
   })
 
   it('uses the static interface zero instead of the dynamic element type', () => {
@@ -249,7 +254,7 @@ describe('append spare capacity', () => {
     values = append(values, dynamic, appendZeros.nil)
     values = append(values, dynamic, appendZeros.nil)
 
-    expect(goSlice(values, undefined, 4)[3]).toBeNull()
+    expect(arrayIndex(goSlice(values, undefined, 4), 3)).toBeNull()
   })
 })
 
