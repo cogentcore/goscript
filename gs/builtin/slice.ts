@@ -1872,8 +1872,13 @@ export function indexByteAddress<T>(
  * unsafePointerRef resolves a byte-addressed synthetic unsafe pointer created
  * by indexByteAddress back to an addressable byte reference.
  */
-export function unsafePointerRef<T>(address: number | bigint): VarRef<T> {
-  const numericAddress = Number(address)
+export function unsafePointerRef<T>(address: unknown): VarRef<T> {
+  // A pointer converted to unsafe.Pointer, such as by reflect's
+  // Value.UnsafePointer, is still the variable reference itself.
+  if (isVarRef(address)) {
+    return address as VarRef<T>
+  }
+  const numericAddress = Number(address as number | bigint)
   const base = Math.floor(numericAddress / addressStride) * addressStride
   const source = byteAddressSources.get(base)
   if (source === undefined) {
