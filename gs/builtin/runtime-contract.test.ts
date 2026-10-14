@@ -89,6 +89,7 @@ import {
   unsupportedPointerRef,
   unsafePointerRef,
   varRef,
+  goString,
 } from './index.js'
 
 const originalDeno = (globalThis as any).Deno
@@ -363,7 +364,7 @@ describe('builtin runtime contract helpers', () => {
     expect(mapGet(m, 'missing', 0)).toEqual([0, false])
 
     expect(newError('bad')?.Error()).toBe('bad')
-    expect(rangeString('a¢€')).toEqual([
+    expect(rangeString(goString('a¢€'))).toEqual([
       [0, 97],
       [1, 162],
       [3, 8364],

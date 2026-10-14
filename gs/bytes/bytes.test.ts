@@ -1,5 +1,13 @@
 import * as $ from '@goscript/builtin/index.js'
-import { Clone, Equal, IndexFunc, Replace, Runes } from './index.js'
+import {
+  Clone,
+  Equal,
+  IndexAny,
+  IndexFunc,
+  Replace,
+  Runes,
+  Trim,
+} from './index.js'
 import { describe, expect, test } from 'vitest'
 
 const rep = (s: string, old: string, n: string, count: number): string =>
@@ -33,6 +41,13 @@ describe('bytes', () => {
     expect(rep('abc', '', '-', 2)).toBe('-a-bc')
     expect(rep('abc', '', '-', -1)).toBe('-a-b-c-')
     expect(rep('aaa', 'a', 'b', -1)).toBe('bbb')
+  })
+
+  test('cutsets and char sets match runes by their UTF-8 bytes', () => {
+    const e = $.goString('é')
+    const s = $.stringToBytes($.goString('éaé'))
+    expect($.bytesToString(Trim(s, e))).toBe('a')
+    expect(IndexAny($.stringToBytes($.goString('aé')), e)).toBe(1)
   })
 
   test('Equal treats nil and empty byte slices as equivalent', () => {

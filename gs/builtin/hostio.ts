@@ -1,4 +1,4 @@
-import { stringToBytes } from './slice.js'
+import { jsString, stringToBytes } from './slice.js'
 
 export class HostUnsupportedError extends Error {
   constructor() {
@@ -83,6 +83,8 @@ export type DenoFileLike = DenoStream & {
 
 type HostReadFD = (fd: number, buffer: Uint8Array) => number | null
 type HostWriteFD = (fd: number, buffer: Uint8Array) => number
+// HostTextWrite writes a Go string: its UTF-8 bytes to a file descriptor, or
+// its decoded text to the console.
 type HostTextWrite = (data: string) => void
 
 export type HostRuntime = {
@@ -367,7 +369,7 @@ function detectHostRuntime(): HostRuntime {
       )
       return
     }
-    fallbackConsoleLogWriter()(data)
+    fallbackConsoleLogWriter()(jsString(data))
   }
   const writeStderrText: HostTextWrite = (data: string) => {
     const handle = getStdioHandle(2)
@@ -383,7 +385,7 @@ function detectHostRuntime(): HostRuntime {
       )
       return
     }
-    fallbackConsoleLogWriter()(data)
+    fallbackConsoleLogWriter()(jsString(data))
   }
 
   return {
@@ -429,10 +431,12 @@ export function resetHostRuntimeForTests(): void {
   hostRuntimeOwner.reset()
 }
 
+// writeHostStdoutText writes a Go string to standard output.
 export function writeHostStdoutText(data: string): void {
   getHostRuntime().writeStdoutText(data)
 }
 
+// writeHostStderrText writes a Go string to standard error.
 export function writeHostStderrText(data: string): void {
   getHostRuntime().writeStderrText(data)
 }

@@ -1000,7 +1000,7 @@ export function Duration_format(
   buf: $.VarRef<number[]>,
 ): number {
   const text = Duration_String(receiver)
-  const bytes = Array.from(new TextEncoder().encode(text))
+  const bytes = Array.from($.stringToBytes(text))
   const start = Math.max(0, buf.value.length - bytes.length)
   for (
     let idx = 0;
@@ -1025,7 +1025,7 @@ function formatSubsecond(nanos: number): string {
     return formatUnit(nanos, 1e6, 'ms')
   }
   if (nanos >= 1e3) {
-    return formatUnit(nanos, 1e3, '\u00b5s')
+    return formatUnit(nanos, 1e3, '\xc2\xb5s') // µs in UTF-8
   }
   return `${nanos}ns`
 }
@@ -1532,8 +1532,8 @@ export function ParseDuration(s: string): [Duration, $.GoError] {
 const durationUnits = new Map<string, bigint>([
   ['ns', 1n],
   ['us', 1000n],
-  ['\u00b5s', 1000n], // U+00B5 = micro symbol
-  ['\u03bcs', 1000n], // U+03BC = Greek letter mu
+  ['\xc2\xb5s', 1000n], // U+00B5 = micro symbol, in UTF-8
+  ['\xce\xbcs', 1000n], // U+03BC = Greek letter mu, in UTF-8
   ['ms', 1000000n],
   ['s', 1000000000n],
   ['m', 60000000000n],
@@ -1959,19 +1959,16 @@ function parseTimeZone(value: string): number {
   return -1
 }
 
-// utf8Encoder encodes the runes that quoteParseValue escapes.
-const utf8Encoder = new TextEncoder()
-
-// quoteParseValue quotes s as Go's time package does in ParseError messages.
+// quoteParseValue quotes s as Go's time package does in ParseError messages,
+// escaping the bytes of control and non-ASCII characters as \xNN.
 function quoteParseValue(s: string): string {
   let out = '"'
-  for (const c of s) {
-    const code = c.codePointAt(0)!
+  for (let i = 0; i < s.length; i++) {
+    const code = s.charCodeAt(i)
     if (code >= 0x80 || code < 0x20) {
-      for (const b of utf8Encoder.encode(c)) {
-        out += '\\x' + b.toString(16).padStart(2, '0')
-      }
+      out += '\\x' + code.toString(16).padStart(2, '0')
     } else {
+      const c = s[i]
       if (c === '"' || c === '\\') {
         out += '\\'
       }

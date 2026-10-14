@@ -65,7 +65,7 @@ describe('time.Duration_String', () => {
     expect(Duration_String(2n * Second)).toBe('2s')
     expect(Duration_String(9n * Millisecond)).toBe('9ms')
     expect(Duration_String(1500n * Microsecond)).toBe('1.5ms')
-    expect(Duration_String(1500n)).toBe('1.5\u00b5s')
+    expect(Duration_String(1500n)).toBe($.goString('1.5\u00b5s'))
     expect(Duration_String(12n)).toBe('12ns')
   })
 })
@@ -98,7 +98,7 @@ describe('time.ParseDuration', () => {
   it('parses signed fractional durations across Go units', () => {
     expect(ParseDuration('1.5h')).toEqual([90n * Minute, null])
     expect(ParseDuration('-250ms')).toEqual([-250n * Millisecond, null])
-    expect(ParseDuration('12µs')).toEqual([12n * Microsecond, null])
+    expect(ParseDuration($.goString('12µs'))).toEqual([12n * Microsecond, null])
     expect(ParseDuration('7us')).toEqual([7n * Microsecond, null])
     expect(ParseDuration('42ns')).toEqual([42n, null])
   })

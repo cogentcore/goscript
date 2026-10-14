@@ -70,15 +70,8 @@ export function DecodeRune(p: $.Bytes): [number, number] {
 // DecodeRuneInString is like DecodeRune but its input is a string.
 // Also accepts Bytes for Go's []byte to string conversion pattern.
 export function DecodeRuneInString(s: string | $.Bytes): [number, number] {
-  if (typeof s === 'string' && !$.isByteString(s)) {
-    if (s.length === 0) {
-      return [RuneError, 0]
-    }
-    const codePoint = s.codePointAt(0)!
-    if (codePoint < RuneSelf) {
-      return [codePoint, 1]
-    }
-    return [codePoint, RuneLen(codePoint)]
+  if (typeof s === 'string') {
+    return $.decodeRuneInString(s, 0)
   }
   return $.decodeRune($.stringToBytes(s))
 }
@@ -91,9 +84,7 @@ export function EncodeRune(p: Uint8Array | $.Slice<number>, r: number): number {
     r = RuneError
   }
 
-  const str = String.fromCodePoint(r)
-  const encoder = new TextEncoder()
-  const encoded = encoder.encode(str)
+  const encoded = $.stringToBytes($.runeToString(r))
 
   // Handle both Uint8Array and Slice types
   if (p instanceof Uint8Array) {
@@ -161,10 +152,11 @@ function runeCount(bytes: Uint8Array): number {
 
 // RuneCountInString is like RuneCount but its input is a string.
 export function RuneCountInString(s: string): number {
-  if (!$.isByteString(s)) {
-    return [...s].length
+  let n = 0
+  for (let i = 0; i < s.length; n++) {
+    i += s.charCodeAt(i) < RuneSelf ? 1 : $.decodeRuneInString(s, i)[1]
   }
-  return runeCount($.stringToBytes(s))
+  return n
 }
 
 // RuneLen returns the number of bytes required to encode the rune.
@@ -177,9 +169,7 @@ export function RuneLen(r: number): number {
     return 1
   }
 
-  const str = String.fromCodePoint(r)
-  const encoder = new TextEncoder()
-  return encoder.encode(str).length
+  return $.runeToString(r).length
 }
 
 // RuneStart reports whether the byte could be the first byte of an encoded, possibly invalid rune.
@@ -211,8 +201,16 @@ export function ValidRune(r: number): boolean {
 
 // ValidString reports whether s consists entirely of valid UTF-8-encoded runes.
 export function ValidString(s: string): boolean {
-  if (!$.isByteString(s)) {
-    return true
+  for (let i = 0; i < s.length; ) {
+    if (s.charCodeAt(i) < RuneSelf) {
+      i++
+      continue
+    }
+    const [r, size] = $.decodeRuneInString(s, i)
+    if (r === RuneError && size === 1) {
+      return false
+    }
+    i += size
   }
-  return valid($.stringToBytes(s))
+  return true
 }

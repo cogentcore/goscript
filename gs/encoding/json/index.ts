@@ -250,7 +250,6 @@ export class Decoder {
   private eof = false
   private readErr: $.GoError = null
   private chunk = $.makeSlice<number>(decoderReadSize, undefined, 'byte')
-  private utf8 = new TextDecoder()
 
   public constructor(private readonly reader: io.Reader) {}
 
@@ -258,18 +257,14 @@ export class Decoder {
   // when the reader is asynchronous.
   private readChunk(): io.Awaitable<void> {
     return io.mapResult(this.reader.Read(this.chunk), ([n, err]) => {
-      // Decode the bytes read, holding back a split UTF-8 sequence.
+      // The buffer holds the bytes read as a Go string.
       if (n > 0) {
-        this.buf += this.utf8.decode(
-          $.bytesToUint8Array($.goSlice(this.chunk, 0, n)),
-          { stream: true },
-        )
+        this.buf += $.bytesToString($.goSlice(this.chunk, 0, n))
       }
 
       // Any error ends the input; only io.EOF is not reported.
       if (err !== null) {
         this.eof = true
-        this.buf += this.utf8.decode()
         if (err !== io.EOF) {
           this.readErr = err
         }
@@ -776,7 +771,7 @@ function scanJSONValue(
         raw += text[i++] ?? ''
       } else if (c === '"') {
         try {
-          return JSON.parse(raw) as string
+          return parseJSONStringLiteral(raw)
         } catch {
           i -= raw.length
           return fail('invalid string literal')
@@ -1829,6 +1824,67 @@ function validUnmarshalTarget(value: unknown): boolean {
     return true
   }
   return unmarshalJSONTarget(value) !== null || isStructValue(value)
+}
+
+// parseJSONStringLiteral returns the Go string of a JSON string literal in a
+// Go string (a string of UTF-8 bytes), validating it with JSON.parse, which
+// keeps the bytes of the literal as they are. A \u escape gives JavaScript
+// text, so a literal with one is decoded here, with each escape encoded as
+// UTF-8, as Go does, and an unpaired surrogate as U+FFFD.
+function parseJSONStringLiteral(raw: string): string {
+  // JSON.parse validates the literal, whose result is right without \u.
+  const parsed = JSON.parse(raw) as string
+  if (!raw.includes('\\u')) {
+    return parsed
+  }
+
+  // The literal between its quotes is copied up to each escape.
+  let out = ''
+  const end = raw.length - 1
+  let start = 1
+  let i = 1
+  while (i < end) {
+    // Bytes other than a backslash are copied as they are.
+    if (raw.charCodeAt(i) !== 0x5c) {
+      i++
+      continue
+    }
+    out += raw.substring(start, i)
+
+    // A \u escape gives the UTF-8 bytes of its rune, and another escape
+    // its ASCII character.
+    if (raw[i + 1] === 'u') {
+      const [r, next] = jsonUnicodeEscape(raw, i)
+      out += $.runeToString(r)
+      i = next
+    } else {
+      out += JSON.parse('"' + raw.substring(i, i + 2) + '"') as string
+      i += 2
+    }
+    start = i
+  }
+  return out + raw.substring(start, end)
+}
+
+// jsonUnicodeEscape decodes the \u escape at offset i of a JSON string
+// literal, with the low surrogate escape that follows a high one, returning
+// the rune, or U+FFFD for an unpaired surrogate, and the offset after it.
+function jsonUnicodeEscape(raw: string, i: number): [number, number] {
+  // A rune outside the surrogates is the escape's value.
+  const r = parseInt(raw.substring(i + 2, i + 6), 16)
+  i += 6
+  if (r < 0xd800 || r >= 0xe000) {
+    return [r, i]
+  }
+
+  // A high surrogate pairs with a following low surrogate escape.
+  if (r < 0xdc00 && raw[i] === '\\' && raw[i + 1] === 'u') {
+    const r2 = parseInt(raw.substring(i + 2, i + 6), 16)
+    if (r2 >= 0xdc00 && r2 < 0xe000) {
+      return [0x10000 + ((r - 0xd800) << 10) + (r2 - 0xdc00), i + 6]
+    }
+  }
+  return [0xfffd, i]
 }
 
 function parseJSON(data: $.Slice<number>, opts: decodeOptions): unknown {

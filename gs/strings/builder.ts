@@ -37,7 +37,7 @@ export class Builder {
 
   // Len returns the number of accumulated bytes; b.Len() == len(b.String()).
   public Len(): number {
-    return $.len(builderValue(this)._content)
+    return builderValue(this)._content.length
   }
 
   // Cap returns the capacity of the builder's underlying byte slice. It is the
@@ -72,7 +72,7 @@ export class Builder {
     builderValue(this).copyCheck()
     const builder = builderValue(this)
     const bytes = $.bytesToUint8Array(p)
-    builder._content = $.concatString(builder._content, $.bytesToString(bytes))
+    builder._content += $.bytesToString(bytes)
     return [$.len(p), null]
   }
 
@@ -81,10 +81,7 @@ export class Builder {
   public WriteByte(c: number): $.GoError {
     builderValue(this).copyCheck()
     const builder = builderValue(this)
-    builder._content = $.concatString(
-      builder._content,
-      $.bytesToString(Uint8Array.of(c)),
-    )
+    builder._content += String.fromCharCode(c & 0xff)
     return null
   }
 
@@ -94,8 +91,8 @@ export class Builder {
     builderValue(this).copyCheck()
     const builder = builderValue(this)
     const str = $.runeToString(r)
-    builder._content = $.concatString(builder._content, str)
-    return [$.len(str), null]
+    builder._content += str
+    return [str.length, null]
   }
 
   // WriteString appends the contents of s to b's buffer.
@@ -103,8 +100,8 @@ export class Builder {
   public WriteString(s: string): [number, $.GoError] {
     builderValue(this).copyCheck()
     const builder = builderValue(this)
-    builder._content = $.concatString(builder._content, s)
-    return [$.len(s), null]
+    builder._content += s
+    return [s.length, null]
   }
 
   // Register this type with the runtime type system
