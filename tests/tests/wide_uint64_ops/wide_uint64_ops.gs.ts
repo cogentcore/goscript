@@ -33,7 +33,7 @@ export function maxUint64Remainder(d: bigint): bigint {
 
 export function setHighBit(idx: bigint): boolean {
 	let words: $.Slice<bigint> = $.arrayToSlice<bigint>([0n, 0n])
-	words![globalThis.Number($.uint64Div(idx, 64n))] = $.uint64Or(words![globalThis.Number($.uint64Div(idx, 64n))], $.uint64Shl(1n, ($.uint64Mod(idx, 64n))))
+	$.sliceElems(words!)[$.sliceSlot(words!, globalThis.Number($.uint64Div(idx, 64n)))] = $.uint64Or($.sliceElems(words!)[$.sliceSlot(words!, globalThis.Number($.uint64Div(idx, 64n)))], $.uint64Shl(1n, ($.uint64Mod(idx, 64n))))
 	return $.arrayIndex(words!, 1) != 0n
 }
 

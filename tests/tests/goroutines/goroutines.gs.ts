@@ -112,7 +112,7 @@ export async function main(): globalThis.Promise<void> {
 				let __goscriptAssign0_0: Message = ($.arrayIndex(allMessages!, j)).clone()
 				let __goscriptAssign0_1: Message = (((__goscriptRangeWindow0.backing as any[])[__goscriptRangeWindow0.offset + i] as Message)).clone()
 				$.assignStruct((__goscriptRangeWindow0.backing as any[])[__goscriptRangeWindow0.offset + i], __goscriptAssign0_0)
-				$.assignStruct(allMessages![j], __goscriptAssign0_1)
+				$.assignStruct($.sliceElems(allMessages!)[$.sliceSlot(allMessages!, j)], __goscriptAssign0_1)
 			}
 		}
 	}

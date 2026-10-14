@@ -19,7 +19,7 @@ export async function main(): globalThis.Promise<void> {
 	// This should trigger the "unhandled LHS expression in destructuring: *ast.IndexExpr" error
 	let __goscriptTuple0: any = returnIntAndString()
 	intArray[0] = __goscriptTuple0[0]
-	stringSlice![1] = __goscriptTuple0[1]
+	$.sliceElems(stringSlice!)[$.sliceSlot(stringSlice!, 1)] = __goscriptTuple0[1]
 
 	await $.println("intArray[0]:", $.arrayIndex(intArray, 0))
 	await $.println("stringSlice[1]:", $.arrayIndex(stringSlice!, 1))

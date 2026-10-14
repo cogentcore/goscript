@@ -17,9 +17,9 @@ export async function main(): globalThis.Promise<void> {
 	await $.println($.cap(s2))
 
 	// Assign values
-	s![0] = 10
-	s![4] = 20
-	s2![1] = "hello"
+	$.sliceElems(s!)[$.sliceSlot(s!, 0)] = 10
+	$.sliceElems(s!)[$.sliceSlot(s!, 4)] = 20
+	$.sliceElems(s2!)[$.sliceSlot(s2!, 1)] = "hello"
 
 	await $.println($.arrayIndex(s!, 0))
 	await $.println($.arrayIndex(s!, 4))
@@ -69,7 +69,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("--- Modify slice, check array ---")
 	let modArr = $.arrayValue([10, 20, 30])
 	let modSlice: $.Slice<number> = $.goSlice(modArr, undefined, undefined)
-	modSlice![1] = 25
+	$.sliceElems(modSlice!)[$.sliceSlot(modSlice!, 1)] = 25
 	await $.println($.arrayIndex(modArr, 1))
 	await $.println($.arrayIndex(modSlice!, 1))
 
@@ -121,7 +121,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println($.cap(subSlice2))
 	await $.println($.arrayIndex(subSlice2!, 0))
 	await $.println($.arrayIndex(subSlice2!, 1))
-	subSlice2![0] = 22
+	$.sliceElems(subSlice2!)[$.sliceSlot(subSlice2!, 0)] = 22
 	await $.println($.arrayIndex(subSlice1!, 1))
 	await $.println($.arrayIndex(baseSlice!, 2))
 
@@ -215,8 +215,8 @@ export async function main(): globalThis.Promise<void> {
 
 	// Create a slice of slices where inner slice has capacity for append
 	let sliceOfSlicesWithCap: $.Slice<$.Slice<number>> = $.arrayToSlice<$.Slice<number>>([$.arrayToSlice<number>([1, 2, 3]), $.makeSlice<number>(2, 5, "number"), $.arrayToSlice<number>([6, 7, 8, 9])])
-	$.arrayIndex(sliceOfSlicesWithCap!, 1)![0] = 40
-	$.arrayIndex(sliceOfSlicesWithCap!, 1)![1] = 50
+	$.sliceElems($.arrayIndex(sliceOfSlicesWithCap!, 1)!)[$.sliceSlot($.arrayIndex(sliceOfSlicesWithCap!, 1)!, 0)] = 40
+	$.sliceElems($.arrayIndex(sliceOfSlicesWithCap!, 1)!)[$.sliceSlot($.arrayIndex(sliceOfSlicesWithCap!, 1)!, 1)] = 50
 
 	await $.println("--- Append to inner slice with capacity ---")
 	let innerSliceWithCap: $.Slice<number> = $.arrayIndex(sliceOfSlicesWithCap!, 1)
@@ -257,7 +257,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// Modify element in sub-slice of slices (should affect original)
 	await $.println("--- Modify element in sub-slice of slices ---")
-	$.arrayIndex(subSliceOfSlices!, 0)![1] = 55
+	$.sliceElems($.arrayIndex(subSliceOfSlices!, 0)!)[$.sliceSlot($.arrayIndex(subSliceOfSlices!, 0)!, 1)] = 55
 	await $.println("sliceOfSlices[1][1] after sub-slice modification:", $.arrayIndex($.arrayIndex(sliceOfSlices!, 1)!, 1))
 
 	// Append a new slice to the slice of slices
@@ -281,13 +281,13 @@ export async function main(): globalThis.Promise<void> {
 	// unless they still share the underlying array and the modification is within the shared capacity.
 	// Let's test this carefully.
 	await $.println("--- Modify appended existing slice ---")
-	existingSlice![0] = 205
+	$.sliceElems(existingSlice!)[$.sliceSlot(existingSlice!, 0)] = 205
 	await $.println("sliceOfSlices[4][0] after modifying existingSlice:", $.arrayIndex($.arrayIndex(sliceOfSlices!, 4)!, 0))
 
 	// If we modify an element in the slice within sliceOfSlices, it *should* affect the original existingSlice
 	// if they share the underlying array.
 	await $.println("--- Modify slice within sliceOfSlices ---")
-	$.arrayIndex(sliceOfSlices!, 4)![1] = 215
+	$.sliceElems($.arrayIndex(sliceOfSlices!, 4)!)[$.sliceSlot($.arrayIndex(sliceOfSlices!, 4)!, 1)] = 215
 	await $.println("existingSlice[1] after modifying slice within sliceOfSlices:", $.arrayIndex(existingSlice!, 1))
 
 	// Create a slice of slices using make
@@ -297,9 +297,9 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("Capacity of makeSliceOfSlices:", $.cap(makeSliceOfSlices))
 
 	// Initialize inner slices
-	makeSliceOfSlices![0] = $.arrayToSlice<number>([1000, 2000])
-	makeSliceOfSlices![1] = $.makeSlice<number>(1, 3, "number")
-	$.arrayIndex(makeSliceOfSlices!, 1)![0] = 3000
+	$.sliceElems(makeSliceOfSlices!)[$.sliceSlot(makeSliceOfSlices!, 0)] = $.arrayToSlice<number>([1000, 2000])
+	$.sliceElems(makeSliceOfSlices!)[$.sliceSlot(makeSliceOfSlices!, 1)] = $.makeSlice<number>(1, 3, "number")
+	$.sliceElems($.arrayIndex(makeSliceOfSlices!, 1)!)[$.sliceSlot($.arrayIndex(makeSliceOfSlices!, 1)!, 0)] = 3000
 
 	await $.println("makeSliceOfSlices[0][1]:", $.arrayIndex($.arrayIndex(makeSliceOfSlices!, 0)!, 1))
 	await $.println("makeSliceOfSlices[1][0]:", $.arrayIndex($.arrayIndex(makeSliceOfSlices!, 1)!, 0))

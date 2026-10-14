@@ -41,7 +41,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 
 	let cloned: $.Slice<number> = (slices.Clone(s) as $.Slice<number>)
-	cloned![0] = 99
+	$.sliceElems(cloned!)[$.sliceSlot(cloned!, 0)] = 99
 	await $.println("clone first:", $.arrayIndex(cloned!, 0), "original first:", $.arrayIndex(s!, 0), "same len:", $.sliceLen(cloned) == $.sliceLen(s))
 	let nilSlice: $.Slice<number> = null! as $.Slice<number>
 	await $.println("nil clone:", slices.Clone(nilSlice) == null)
@@ -280,8 +280,8 @@ export async function main(): globalThis.Promise<void> {
 	let overlap: $.Slice<number> = $.makeSlice<number>(2, 4, "number")
 	let __goscriptAssign0_0: number = 1
 	let __goscriptAssign0_1: number = 2
-	overlap![0] = __goscriptAssign0_0
-	overlap![1] = __goscriptAssign0_1
+	$.sliceElems(overlap!)[$.sliceSlot(overlap!, 0)] = __goscriptAssign0_0
+	$.sliceElems(overlap!)[$.sliceSlot(overlap!, 1)] = __goscriptAssign0_1
 	let overlapped: $.Slice<number> = $.appendSlice($.goSlice(overlap, undefined, 1), overlap)
 	await $.println("append overlap:", $.arrayIndex(overlapped!, 0), $.arrayIndex(overlapped!, 1), $.arrayIndex(overlapped!, 2))
 
@@ -362,8 +362,8 @@ export async function main(): globalThis.Promise<void> {
 	// Byte slice results hold bytes and feed byte operations.
 	let src: $.Slice<number> = new Uint8Array([97, 98, 99])
 	let byteClone: $.Slice<number> = (slices.Clone(src) as $.Slice<number>)
-	byteClone![0] = 120
-	byteClone![1] = $.uint(byteClone![1] + (255), 8)
+	$.sliceElems(byteClone!)[$.sliceSlot(byteClone!, 0)] = 120
+	$.sliceElems(byteClone!)[$.sliceSlot(byteClone!, 1)] = $.uint($.sliceElems(byteClone!)[$.sliceSlot(byteClone!, 1)] + (255), 8)
 	await $.println("byte clone:", $.bytesToString(byteClone), $.bytesToString(src), $.arrayIndex(byteClone!, 1))
 	await $.println("byte results:", $.bytesToString(slices.Clip($.goSlice(src, undefined, 2))), $.bytesToString(slices.Insert(src, 1, 121)), $.bytesToString(slices.Replace(slices.Clone(src), 0, 2, 113)), $.bytesToString(slices.Repeat(src, 2)), $.bytesToString(slices.Concat(src, new Uint8Array([100, 101]))))
 

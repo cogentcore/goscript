@@ -78,7 +78,7 @@ export async function main(): globalThis.Promise<void> {
 	let m: $.Slice<$.Slice<number>> = $.arrayToSlice<$.Slice<number>>([$.arrayToSlice<number>([1, 2]), $.arrayToSlice<number>([3, 4])])
 	for (let __goscriptRangeTarget4 = m, __goscriptRangeWindow3 = $.sliceRange(__goscriptRangeTarget4), i = 0; i < __goscriptRangeWindow3.length; i++) {
 		for (let __goscriptRangeTarget3 = ((__goscriptRangeWindow3.backing as any[])[__goscriptRangeWindow3.offset + i] as $.Slice<number>), __goscriptRangeWindow4 = $.sliceRange(__goscriptRangeTarget3), j = 0; j < __goscriptRangeWindow4.length; j++) {
-			;((__goscriptRangeWindow3.backing as any[])[__goscriptRangeWindow3.offset + i] as $.Slice<number>)![j] = ((__goscriptRangeWindow3.backing as any[])[__goscriptRangeWindow3.offset + i] as $.Slice<number>)![j] * (10)
+			$.indexRef(((__goscriptRangeWindow3.backing as any[])[__goscriptRangeWindow3.offset + i] as $.Slice<number>)!, j).value = $.indexRef(((__goscriptRangeWindow3.backing as any[])[__goscriptRangeWindow3.offset + i] as $.Slice<number>)!, j).value * (10)
 		}
 	}
 	await $.println($.arrayIndex($.arrayIndex(m!, 0)!, 1), $.arrayIndex($.arrayIndex(m!, 1)!, 0))
@@ -91,7 +91,7 @@ export async function main(): globalThis.Promise<void> {
 		if (i == 0) {
 			void (__goscriptAwait = grow!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 		}
-		ys![i] = ys![i] + (1)
+		$.sliceElems(ys!)[$.sliceSlot(ys!, i)] = $.sliceElems(ys!)[$.sliceSlot(ys!, i)] + (1)
 	}
 	await $.println($.sliceLen(ys), $.arrayIndex(ys!, 0), $.arrayIndex(ys!, 2), $.arrayIndex(ys!, 3))
 

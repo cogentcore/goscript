@@ -8,7 +8,7 @@ export async function main(): globalThis.Promise<void> {
 	let array = $.cloneArrayValue(($.sliceToArray<number>($.goSlice(values, 1, undefined), 2, "byte") as Uint8Array), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 2))
 
 	await $.println($.arrayIndex(array, 0), $.arrayIndex(array, 1))
-	values![1] = 9
+	$.sliceElems(values!)[$.sliceSlot(values!, 1)] = 9
 	await $.println($.arrayIndex(array, 0), $.arrayIndex(values!, 1))
 
 	// Whole-array writes through converted pointers preserve the slice backing.

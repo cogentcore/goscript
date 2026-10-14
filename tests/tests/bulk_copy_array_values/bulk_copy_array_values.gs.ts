@@ -92,7 +92,7 @@ export async function main(): globalThis.Promise<void> {
 
 	let shared: $.Slice<$.Slice<number>> = $.arrayToSlice<$.Slice<number>>([$.arrayToSlice<number>([1])])
 	let sharedCopies: $.Slice<$.Slice<number>> = (slices.Clone(shared) as $.Slice<$.Slice<number>>)
-	$.arrayIndex(sharedCopies!, 0)![0] = 9
+	$.sliceElems($.arrayIndex(sharedCopies!, 0)!)[$.sliceSlot($.arrayIndex(sharedCopies!, 0)!, 0)] = 9
 	await $.println("slice elements share:", $.arrayIndex($.arrayIndex(shared!, 0)!, 0))
 }
 

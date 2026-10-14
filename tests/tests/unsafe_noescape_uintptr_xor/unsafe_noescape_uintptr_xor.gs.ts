@@ -130,7 +130,7 @@ export async function main(): globalThis.Promise<void> {
 
 	let inline: $.Slice<number> = inlineSlice(values)
 	await $.println("inline:", $.arrayIndex(inline!, 0), $.arrayIndex(inline!, 1))
-	inline![0] = 9
+	$.sliceElems(inline!)[$.sliceSlot(inline!, 0)] = 9
 	await $.println("updated:", $.arrayIndex(values!, 0))
 
 	let src: $.VarRef<sourceStruct> = $.varRef(new sourceStruct(undefined, true))
