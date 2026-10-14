@@ -386,7 +386,7 @@ export function Header_sortedKeyValues(
     if (exclude?.get(key) === true) continue
     values.push({ key, values: headerValues })
   }
-  values.sort((a, b) => a.key.localeCompare(b.key))
+  values.sort((a, b) => $.stringCompare(a.key, b.key))
   return [values, null]
 }
 
@@ -1162,7 +1162,11 @@ function encodeFormData(data: any): string {
     data instanceof Map ? Array.from(data.entries())
     : typeof data === 'object' ? Object.entries(data)
     : []
-  entries.sort(([a], [b]) => String(a).localeCompare(String(b)))
+  entries.sort(([a], [b]) =>
+    String(a) < String(b) ? -1
+    : String(a) > String(b) ? 1
+    : 0,
+  )
   const params = new URLSearchParams()
   for (const [key, value] of entries) {
     appendFormValue(params, String(key), value)
@@ -1789,11 +1793,7 @@ async function serveDirectory(
       name: entry!.Name(),
       directory: entry!.IsDir(),
     }))
-    .sort((a, b) =>
-      a.name < b.name ? -1
-      : a.name > b.name ? 1
-      : 0,
-    )
+    .sort((a, b) => $.stringCompare(a.name, b.name))
   let body =
     '<!doctype html>\n<meta name="viewport" content="width=device-width">\n<pre>\n'
   for (const entry of names) {

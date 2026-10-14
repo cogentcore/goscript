@@ -15,7 +15,7 @@ import {
 	resetHostRuntimeForTests,
 } from "@goscript/builtin/hostio.js"
 import { newRawConn } from "./rawconn_js.gs.js"
-import { callbackFSCall, callbackFSPath, callbackFSSetwd, getCallbackFS } from "./callbackfs.js"
+import { callbackFSCall, callbackFSPath, callbackFSSetwd, getCallbackFS, goStringResult, hostArgs } from "./callbackfs.js"
 
 export type HostStatLike = {
 	isDirectory(): boolean
@@ -91,8 +91,43 @@ export async function callbackFSErr(name: string, path: string, ...args: unknown
 	return err
 }
 
+// getNodeFS returns the host's Node fs module, wrapped so that its functions
+// take Go strings, such as paths, and return Go strings, such as directory
+// entry names, converting them from and to JavaScript text.
 export function getNodeFS(): NodeFSModule | null {
-	return getHostRuntime().nodeFS
+	// There may be no Node fs module.
+	const raw = getHostRuntime().nodeFS
+	if (raw === null || raw === undefined) {
+		return null
+	}
+
+	// The wrapper is made once for each module.
+	if (raw !== goStringNodeFSRaw) {
+		goStringNodeFSRaw = raw
+		goStringNodeFS = goStringFunctions(raw) as NodeFSModule
+	}
+	return goStringNodeFS
+}
+
+let goStringNodeFSRaw: NodeFSModule | null = null
+let goStringNodeFS: NodeFSModule | null = null
+
+// goStringFunctions wraps the functions of a host module so that their string
+// arguments are Go strings and their string results are returned as Go
+// strings.
+function goStringFunctions(module: object): object {
+	return new Proxy(module, {
+		get(target, prop) {
+			// Properties other than functions are left as they are.
+			const value = Reflect.get(target, prop)
+			if (typeof value !== "function") {
+				return value
+			}
+
+			// A function converts its strings.
+			return (...args: unknown[]) => goStringResult(value.apply(target, hostArgs(args)))
+		},
+	})
 }
 
 export function getDeno(): any | null {
@@ -111,7 +146,7 @@ export function getEnv(name: string): string {
 	if (ok) {
 		return value
 	}
-	return getHostRuntime().getEnv(name)
+	return $.goString(getHostRuntime().getEnv($.jsString(name)))
 }
 
 export function getDenoStream(fd: number): DenoStream | null {
@@ -284,7 +319,7 @@ export async function readDirectoryInfos(name: string): Promise<[fs.FileInfo[] |
 	if (nodeFS?.readdirSync) {
 		try {
 			const infos = nodeFS.readdirSync(name, { withFileTypes: true }).map((entry: any) => {
-				const childName = String(entry.name)
+				const childName = $.goString(String(entry.name))
 				const childPath = joinFilePath(name, childName)
 				if (nodeFS.lstatSync) {
 					try {

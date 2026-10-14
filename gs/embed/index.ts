@@ -99,7 +99,7 @@ export class FS {
       entries.set(childName, new embedDirEntry(info))
     }
     return Array.from(entries.values()).sort((a, b) =>
-      a!.Name().localeCompare(b!.Name()),
+      $.stringCompare(a!.Name(), b!.Name()),
     )
   }
 

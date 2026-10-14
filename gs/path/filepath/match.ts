@@ -311,10 +311,13 @@ function readDir(path: string): HostDirEntry[] | null {
   if (denoObj?.readDirSync) {
     try {
       const entries: HostDirEntry[] = []
-      for (const entry of denoObj.readDirSync(path)) {
-        entries.push({ name: entry.name, isDir: !!entry.isDirectory })
+      for (const entry of denoObj.readDirSync($.jsString(path))) {
+        entries.push({
+          name: $.goString(entry.name),
+          isDir: !!entry.isDirectory,
+        })
       }
-      entries.sort((a, b) => a.name.localeCompare(b.name))
+      entries.sort((a, b) => $.stringCompare(a.name, b.name))
       return entries
     } catch {
       return null
@@ -325,15 +328,15 @@ function readDir(path: string): HostDirEntry[] | null {
   if (nodeFS?.readdirSync) {
     try {
       const entries = nodeFS
-        .readdirSync(path, { withFileTypes: true })
+        .readdirSync($.jsString(path), { withFileTypes: true })
         .map((entry: any) => ({
-          name: String(entry.name),
+          name: $.goString(String(entry.name)),
           isDir:
             typeof entry.isDirectory === 'function' ?
               entry.isDirectory()
             : false,
         }))
-      entries.sort((a, b) => a.name.localeCompare(b.name))
+      entries.sort((a, b) => $.stringCompare(a.name, b.name))
       return entries
     } catch {
       return null
@@ -347,7 +350,7 @@ function exists(path: string): boolean {
   const runtime = getHostRuntime()
   if (runtime.deno?.statSync) {
     try {
-      runtime.deno.statSync(path)
+      runtime.deno.statSync($.jsString(path))
       return true
     } catch {
       return false
@@ -357,7 +360,7 @@ function exists(path: string): boolean {
   const nodeFS = runtime.nodeFS
   if (nodeFS?.statSync) {
     try {
-      nodeFS.statSync(path)
+      nodeFS.statSync($.jsString(path))
       return true
     } catch {
       return false
@@ -371,7 +374,7 @@ function isDir(path: string, nodeFS?: NodeFSModule | null): boolean {
   const runtime = getHostRuntime()
   if (runtime.deno?.statSync) {
     try {
-      return !!runtime.deno.statSync(path).isDirectory
+      return !!runtime.deno.statSync($.jsString(path)).isDirectory
     } catch {
       return false
     }
@@ -380,7 +383,7 @@ function isDir(path: string, nodeFS?: NodeFSModule | null): boolean {
   const fs = nodeFS ?? runtime.nodeFS
   if (fs?.statSync) {
     try {
-      const stat = fs.statSync(path)
+      const stat = fs.statSync($.jsString(path))
       return typeof stat.isDirectory === 'function' ? stat.isDirectory() : false
     } catch {
       return false
