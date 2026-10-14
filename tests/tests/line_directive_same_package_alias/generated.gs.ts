@@ -16,14 +16,17 @@ export class yySymType {
 		value: number
 	}
 
-	constructor(init?: Partial<{value?: number}>) {
+	constructor(init?: Partial<{value?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			value: init?.value ?? (0 as number)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): yySymType {
-		return $.markAsStructValue(new yySymType(this))
+		return new yySymType(this, true)
 	}
 
 	public __goscriptAssign(source: yySymType): void {
@@ -45,13 +48,16 @@ export class yyParserImpl {
 	public _fields: {
 	}
 
-	constructor(init?: Partial<{}>) {
+	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
 		this._fields = {
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): yyParserImpl {
-		return $.markAsStructValue(new yyParserImpl(this))
+		return new yyParserImpl(this, true)
 	}
 
 	public __goscriptAssign(source: yyParserImpl): void {

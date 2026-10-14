@@ -38,15 +38,18 @@ export class point {
 		y: number
 	}
 
-	constructor(init?: Partial<{x?: number, y?: number}>) {
+	constructor(init?: Partial<{x?: number, y?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			x: init?.x ?? (0 as number),
 			y: init?.y ?? (0 as number)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): point {
-		return $.markAsStructValue(new point(this))
+		return new point(this, true)
 	}
 
 	public __goscriptAssign(source: point): void {
@@ -78,14 +81,17 @@ export class frame {
 		name: string
 	}
 
-	constructor(init?: Partial<{name?: string}>) {
+	constructor(init?: Partial<{name?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
 			name: init?.name ?? ("" as string)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): frame {
-		return $.markAsStructValue(new frame(this))
+		return new frame(this, true)
 	}
 
 	public __goscriptAssign(source: frame): void {
@@ -121,14 +127,17 @@ export class tab {
 		name: string
 	}
 
-	constructor(init?: Partial<{name?: string}>) {
+	constructor(init?: Partial<{name?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
 			name: init?.name ?? ("" as string)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): tab {
-		return $.markAsStructValue(new tab(this))
+		return new tab(this, true)
 	}
 
 	public __goscriptAssign(source: tab): void {
@@ -164,14 +173,17 @@ export class tabs {
 		count: number
 	}
 
-	constructor(init?: Partial<{count?: number}>) {
+	constructor(init?: Partial<{count?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			count: init?.count ?? (0 as number)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): tabs {
-		return $.markAsStructValue(new tabs(this))
+		return new tabs(this, true)
 	}
 
 	public __goscriptAssign(source: tabs): void {

@@ -39,15 +39,18 @@ export class FileStatus {
 		size: bigint
 	}
 
-	constructor(init?: Partial<{mode?: MyFileMode, size?: bigint}>) {
+	constructor(init?: Partial<{mode?: MyFileMode, size?: bigint}>, __goscriptValue?: boolean) {
 		this._fields = {
 			mode: init?.mode ?? (0 as MyFileMode),
 			size: init?.size ?? (0n as bigint)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): FileStatus {
-		return $.markAsStructValue(new FileStatus(this))
+		return new FileStatus(this, true)
 	}
 
 	public __goscriptAssign(source: FileStatus): void {
@@ -77,7 +80,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("Mode string:", MyFileMode_String(mode))
 
 	// Test using in struct
-	let status = $.markAsStructValue(new FileStatus({mode: 493, size: 1024n}))
+	let status = new FileStatus({mode: 493, size: 1024n}, true)
 
 	await $.println("Status mode:", $.int(status.mode))
 	await $.println("Status size:", status.size)

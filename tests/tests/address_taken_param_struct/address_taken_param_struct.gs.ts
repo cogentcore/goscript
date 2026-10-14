@@ -25,15 +25,18 @@ export class Format {
 		Ext: $.Slice<string>
 	}
 
-	constructor(init?: Partial<{Name?: string, Ext?: $.Slice<string>}>) {
+	constructor(init?: Partial<{Name?: string, Ext?: $.Slice<string>}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Name: init?.Name ?? ("" as string),
 			Ext: init?.Ext ?? (null! as $.Slice<string>)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): Format {
-		return $.markAsStructValue(new Format(this))
+		return new Format(this, true)
 	}
 
 	public __goscriptAssign(source: Format): void {
@@ -75,7 +78,7 @@ export function registerFormat(__goscriptParam0: Format): void {
 }
 
 export async function main(): globalThis.Promise<void> {
-	registerFormat($.markAsStructValue(new Format({Name: "json", Ext: $.arrayToSlice<string>(["json"])})))
+	registerFormat(new Format({Name: "json", Ext: $.arrayToSlice<string>(["json"])}, true))
 	await $.println($.pointerValue<Format>($.mapGet<string, Format | $.VarRef<Format> | null, Format | $.VarRef<Format> | null>(byName, "json", null)[0]).Name)
 	await $.println($.pointerValue<Format>($.mapGet<string, Format | $.VarRef<Format> | null, Format | $.VarRef<Format> | null>(byExt, "json", null)[0]).Name)
 	$.pointerValue<Format>($.mapGet<string, Format | $.VarRef<Format> | null, Format | $.VarRef<Format> | null>(byName, "json", null)[0]).Name = "mutated"

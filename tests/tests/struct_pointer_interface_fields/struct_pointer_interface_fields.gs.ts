@@ -35,15 +35,18 @@ export class MyStruct {
 		interfaceField: MyInterface | null
 	}
 
-	constructor(init?: Partial<{PointerField?: $.VarRef<number> | null, interfaceField?: MyInterface | null}>) {
+	constructor(init?: Partial<{PointerField?: $.VarRef<number> | null, interfaceField?: MyInterface | null}>, __goscriptValue?: boolean) {
 		this._fields = {
 			PointerField: init?.PointerField ?? (null! as $.VarRef<number> | null),
 			interfaceField: init?.interfaceField ?? (null! as MyInterface | null)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): MyStruct {
-		return $.markAsStructValue(new MyStruct(this))
+		return new MyStruct(this, true)
 	}
 
 	public __goscriptAssign(source: MyStruct): void {
@@ -63,7 +66,7 @@ export class MyStruct {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let s = $.markAsStructValue(new MyStruct())
+	let s = new MyStruct(undefined, true)
 	await $.println(s.PointerField == null)
 	await $.println(s.interfaceField == null)
 

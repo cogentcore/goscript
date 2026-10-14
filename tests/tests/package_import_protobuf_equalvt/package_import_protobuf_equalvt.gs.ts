@@ -36,14 +36,17 @@ export class msg {
 		v: number
 	}
 
-	constructor(init?: Partial<{v?: number}>) {
+	constructor(init?: Partial<{v?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			v: init?.v ?? (0 as number)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): msg {
-		return $.markAsStructValue(new msg(this))
+		return new msg(this, true)
 	}
 
 	public __goscriptAssign(source: msg): void {

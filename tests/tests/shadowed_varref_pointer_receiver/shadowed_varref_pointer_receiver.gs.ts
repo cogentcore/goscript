@@ -16,14 +16,17 @@ export class locked {
 		value: number
 	}
 
-	constructor(init?: Partial<{value?: number}>) {
+	constructor(init?: Partial<{value?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			value: init?.value ?? (0 as number)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): locked {
-		return $.markAsStructValue(new locked(this))
+		return new locked(this, true)
 	}
 
 	public __goscriptAssign(source: locked): void {
@@ -52,7 +55,7 @@ export class locked {
 }
 
 export function newLocked(value: number): locked {
-	return $.markAsStructValue(new locked({value: value}))
+	return new locked({value: value}, true)
 }
 
 export async function main(): globalThis.Promise<void> {

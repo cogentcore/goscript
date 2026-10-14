@@ -34,16 +34,19 @@ export class MyStruct {
 		myBool: boolean
 	}
 
-	constructor(init?: Partial<{MyInt?: number, MyString?: string, myBool?: boolean}>) {
+	constructor(init?: Partial<{MyInt?: number, MyString?: string, myBool?: boolean}>, __goscriptValue?: boolean) {
 		this._fields = {
 			MyInt: init?.MyInt ?? (0 as number),
 			MyString: init?.MyString ?? ("" as string),
 			myBool: init?.myBool ?? (false as boolean)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): MyStruct {
-		return $.markAsStructValue(new MyStruct(this))
+		return new MyStruct(this, true)
 	}
 
 	public __goscriptAssign(source: MyStruct): void {
@@ -79,7 +82,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("ptr.myBool (assigned):", $.pointerValue<MyStruct>(ptr).myBool)
 
 	// Test assignment to a dereferenced new struct
-	let s: MyStruct = $.markAsStructValue($.cloneStructValue($.pointerValue<MyStruct>(new MyStruct())))
+	let s: MyStruct = ($.pointerValue<MyStruct>(new MyStruct())).clone()
 	await $.println("s.MyInt (default):", s.MyInt)
 	await $.println("s.MyString (default):", s.MyString)
 	await $.println("s.myBool (default):", s.myBool)

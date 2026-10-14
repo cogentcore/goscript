@@ -25,14 +25,17 @@ export class pooledElement {
 		Value: any
 	}
 
-	constructor(init?: Partial<{Value?: any}>) {
+	constructor(init?: Partial<{Value?: any}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Value: init?.Value !== undefined ? $.copyElement(init.Value) : (null! as any)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): pooledElement {
-		return $.markAsStructValue(new pooledElement(this))
+		return new pooledElement(this, true)
 	}
 
 	public __goscriptAssign(source: pooledElement): void {

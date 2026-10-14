@@ -37,14 +37,17 @@ export class AppBase {
 		Windows: $.Slice<any>
 	}
 
-	constructor(init?: Partial<{Windows?: $.Slice<any>}>) {
+	constructor(init?: Partial<{Windows?: $.Slice<any>}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Windows: init?.Windows ?? (null! as $.Slice<any>)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): AppBase {
-		return $.markAsStructValue(new AppBase(this))
+		return new AppBase(this, true)
 	}
 
 	public __goscriptAssign(source: AppBase): void {
@@ -100,15 +103,18 @@ export class WindowBase {
 		name: string
 	}
 
-	constructor(init?: Partial<{App?: any, name?: string}>) {
+	constructor(init?: Partial<{App?: any, name?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
 			App: init?.App !== undefined ? $.copyElement(init.App) : (null! as any),
 			name: init?.name ?? ("" as string)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): WindowBase {
-		return $.markAsStructValue(new WindowBase(this))
+		return new WindowBase(this, true)
 	}
 
 	public __goscriptAssign(source: WindowBase): void {
@@ -150,14 +156,17 @@ export class MyApp {
 		AppBase: AppBase
 	}
 
-	constructor(init?: Partial<{AppBase?: AppBase}>) {
+	constructor(init?: Partial<{AppBase?: AppBase}>, __goscriptValue?: boolean) {
 		this._fields = {
 			AppBase: init?.AppBase ? $.markAsStructValue($.cloneStructValue(init.AppBase)) : $.markAsStructValue(new AppBase())
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): MyApp {
-		return $.markAsStructValue(new MyApp(this))
+		return new MyApp(this, true)
 	}
 
 	public __goscriptAssign(source: MyApp): void {
@@ -196,14 +205,17 @@ export class MyWindow {
 		WindowBase: WindowBase
 	}
 
-	constructor(init?: Partial<{WindowBase?: WindowBase}>) {
+	constructor(init?: Partial<{WindowBase?: WindowBase}>, __goscriptValue?: boolean) {
 		this._fields = {
 			WindowBase: init?.WindowBase ? $.markAsStructValue($.cloneStructValue(init.WindowBase)) : $.markAsStructValue(new WindowBase({App: null! as MyApp | $.VarRef<MyApp> | null}))
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): MyWindow {
-		return $.markAsStructValue(new MyWindow(this))
+		return new MyWindow(this, true)
 	}
 
 	public __goscriptAssign(source: MyWindow): void {

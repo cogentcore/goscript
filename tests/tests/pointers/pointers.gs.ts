@@ -16,14 +16,17 @@ export class MyStruct {
 		Val: number
 	}
 
-	constructor(init?: Partial<{Val?: number}>) {
+	constructor(init?: Partial<{Val?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Val: init?.Val ?? (0 as number)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): MyStruct {
-		return $.markAsStructValue(new MyStruct(this))
+		return new MyStruct(this, true)
 	}
 
 	public __goscriptAssign(source: MyStruct): void {
@@ -42,8 +45,8 @@ export class MyStruct {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let s1 = $.varRef($.markAsStructValue(new MyStruct({Val: 1})))
-	let s2 = $.varRef($.markAsStructValue(new MyStruct({Val: 2})))
+	let s1 = $.varRef(new MyStruct({Val: 1}, true))
+	let s2 = $.varRef(new MyStruct({Val: 2}, true))
 
 	let p1: $.VarRef<MyStruct | $.VarRef<MyStruct> | null> = $.varRef(s1)
 	let p2: $.VarRef<MyStruct | $.VarRef<MyStruct> | null> = $.varRef(s1)
@@ -81,7 +84,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// --- Modifications through Pointers ---
 	await $.println("\n--- Modifications ---")
-	$.assignStruct($.pointerValue<MyStruct>(p1.value), $.markAsStructValue(new MyStruct({Val: 10})))
+	$.assignStruct($.pointerValue<MyStruct>(p1.value), new MyStruct({Val: 10}, true))
 	await $.println("After *p1 = {Val: 10}:")
 	await $.println("  s1.Val:", s1.value.Val)
 	await $.println("  (*p2).Val:", ($.pointerValue<MyStruct>(p2.value)).Val)
@@ -89,7 +92,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("  (***ppp1).Val:", ($.pointerValue<MyStruct>($.pointerValue<MyStruct | $.VarRef<MyStruct> | null>($.pointerValue<$.VarRef<MyStruct | $.VarRef<MyStruct> | null> | null>(ppp1)))).Val)
 	await $.println("  s2.Val:", s2.value.Val)
 
-	$.assignStruct($.pointerValue<MyStruct>($.pointerValue<MyStruct | $.VarRef<MyStruct> | null>(pp3)), $.markAsStructValue(new MyStruct({Val: 20})))
+	$.assignStruct($.pointerValue<MyStruct>($.pointerValue<MyStruct | $.VarRef<MyStruct> | null>(pp3)), new MyStruct({Val: 20}, true))
 	await $.println("After **pp3 = {Val: 20}:")
 	await $.println("  s2.Val:", s2.value.Val)
 	await $.println("  (*p3).Val:", ($.pointerValue<MyStruct>(p3.value)).Val)

@@ -23,14 +23,17 @@ export class Snapshot {
 		base: number
 	}
 
-	constructor(init?: Partial<{base?: number}>) {
+	constructor(init?: Partial<{base?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			base: init?.base ?? (0 as number)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): Snapshot {
-		return $.markAsStructValue(new Snapshot(this))
+		return new Snapshot(this, true)
 	}
 
 	public __goscriptAssign(source: Snapshot): void {
@@ -73,14 +76,17 @@ export class Host {
 		process: atomic.Pointer<Process>
 	}
 
-	constructor(init?: Partial<{process?: atomic.Pointer<Process>}>) {
+	constructor(init?: Partial<{process?: atomic.Pointer<Process>}>, __goscriptValue?: boolean) {
 		this._fields = {
 			process: init?.process ? $.markAsStructValue($.cloneStructValue(init.process)) : $.markAsStructValue(new atomic.Pointer<Process>())
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): Host {
-		return $.markAsStructValue(new Host(this))
+		return new Host(this, true)
 	}
 
 	public __goscriptAssign(source: Host): void {

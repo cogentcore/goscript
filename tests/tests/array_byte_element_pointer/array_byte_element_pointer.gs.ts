@@ -16,14 +16,17 @@ export class bitset {
 		bits: Uint8Array
 	}
 
-	constructor(init?: Partial<{bits?: Uint8Array}>) {
+	constructor(init?: Partial<{bits?: Uint8Array}>, __goscriptValue?: boolean) {
 		this._fields = {
 			bits: init?.bits !== undefined ? $.cloneArrayValue(init.bits, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 4)) : $.arrayValue(new Uint8Array(4))
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): bitset {
-		return $.markAsStructValue(new bitset(this))
+		return new bitset(this, true)
 	}
 
 	public __goscriptAssign(source: bitset): void {
@@ -56,7 +59,7 @@ export class bitset {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let b: $.VarRef<bitset> = $.varRef($.markAsStructValue(new bitset()))
+	let b: $.VarRef<bitset> = $.varRef(new bitset(undefined, true))
 	b.value.set(3)
 	b.value.set(30)
 	await $.println(b.value.has(3), b.value.has(4), b.value.has(30), $.uint($.arrayIndex(b.value.bits, 0), 8), $.uint($.arrayIndex(b.value.bits, 3), 8))

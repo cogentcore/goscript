@@ -16,14 +16,17 @@ export class Result {
 		ok: boolean
 	}
 
-	constructor(init?: Partial<{ok?: boolean}>) {
+	constructor(init?: Partial<{ok?: boolean}>, __goscriptValue?: boolean) {
 		this._fields = {
 			ok: init?.ok ?? (false as boolean)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): Result {
-		return $.markAsStructValue(new Result(this))
+		return new Result(this, true)
 	}
 
 	public __goscriptAssign(source: Result): void {
@@ -43,7 +46,7 @@ export class Result {
 
 export async function main(): globalThis.Promise<void> {
 	let x: any = $.basicInterfaceValue(42, "int")
-	let result = $.markAsStructValue(new Result())
+	let result = new Result(undefined, true)
 
 	// This should trigger the error: ok expression is not an identifier: *ast.SelectorExpr
 	// The 'ok' variable is result.ok (a selector expression) instead of a simple identifier

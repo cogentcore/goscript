@@ -26,14 +26,17 @@ export class lit {
 		n: number
 	}
 
-	constructor(init?: Partial<{n?: number}>) {
+	constructor(init?: Partial<{n?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			n: init?.n ?? (0 as number)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): lit {
-		return $.markAsStructValue(new lit(this))
+		return new lit(this, true)
 	}
 
 	public __goscriptAssign(source: lit): void {

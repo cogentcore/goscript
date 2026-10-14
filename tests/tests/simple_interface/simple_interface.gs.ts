@@ -16,14 +16,17 @@ export class MyStruct {
 		Value: number
 	}
 
-	constructor(init?: Partial<{Value?: number}>) {
+	constructor(init?: Partial<{Value?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Value: init?.Value ?? (0 as number)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): MyStruct {
-		return $.markAsStructValue(new MyStruct(this))
+		return new MyStruct(this, true)
 	}
 
 	public __goscriptAssign(source: MyStruct): void {
@@ -42,7 +45,7 @@ export class MyStruct {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let original = $.varRef($.markAsStructValue(new MyStruct({Value: 30})))
+	let original = $.varRef(new MyStruct({Value: 30}, true))
 	let pAlias: MyStruct | $.VarRef<MyStruct> | null = original
 
 	let jAlias: any = $.interfaceValue(pAlias, "*main.MyStruct", /* @__PURE__ */ $.pointerType("main.MyStruct"))

@@ -7,13 +7,16 @@ export class BigInt {
 	public _fields: {
 	}
 
-	constructor(init?: Partial<{}>) {
+	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
 		this._fields = {
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): BigInt {
-		return $.markAsStructValue(new BigInt(this))
+		return new BigInt(this, true)
 	}
 
 	public __goscriptAssign(source: BigInt): void {

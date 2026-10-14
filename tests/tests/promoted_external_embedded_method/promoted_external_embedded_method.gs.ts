@@ -29,14 +29,17 @@ export class raw {
 		Mutex: sync.Mutex
 	}
 
-	constructor(init?: Partial<{Mutex?: sync.Mutex}>) {
+	constructor(init?: Partial<{Mutex?: sync.Mutex}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Mutex: init?.Mutex ? $.markAsStructValue($.cloneStructValue(init.Mutex)) : $.markAsStructValue(new sync.Mutex())
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): raw {
-		return $.markAsStructValue(new raw(this))
+		return new raw(this, true)
 	}
 
 	public __goscriptAssign(source: raw): void {
@@ -79,14 +82,17 @@ export class outer {
 		raw: raw
 	}
 
-	constructor(init?: Partial<{raw?: raw}>) {
+	constructor(init?: Partial<{raw?: raw}>, __goscriptValue?: boolean) {
 		this._fields = {
-			raw: init?.raw ? $.markAsStructValue($.cloneStructValue(init.raw)) : $.markAsStructValue(new raw())
+			raw: init?.raw ? init.raw.clone() : new raw(undefined, true)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): outer {
-		return $.markAsStructValue(new outer(this))
+		return new outer(this, true)
 	}
 
 	public __goscriptAssign(source: outer): void {
@@ -129,14 +135,17 @@ export class rawRW {
 		RWMutex: sync.RWMutex
 	}
 
-	constructor(init?: Partial<{RWMutex?: sync.RWMutex}>) {
+	constructor(init?: Partial<{RWMutex?: sync.RWMutex}>, __goscriptValue?: boolean) {
 		this._fields = {
 			RWMutex: init?.RWMutex ? $.markAsStructValue($.cloneStructValue(init.RWMutex)) : $.markAsStructValue(new sync.RWMutex())
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): rawRW {
-		return $.markAsStructValue(new rawRW(this))
+		return new rawRW(this, true)
 	}
 
 	public __goscriptAssign(source: rawRW): void {
@@ -195,14 +204,17 @@ export class outerRW {
 		rawRW: rawRW
 	}
 
-	constructor(init?: Partial<{rawRW?: rawRW}>) {
+	constructor(init?: Partial<{rawRW?: rawRW}>, __goscriptValue?: boolean) {
 		this._fields = {
-			rawRW: init?.rawRW ? $.markAsStructValue($.cloneStructValue(init.rawRW)) : $.markAsStructValue(new rawRW())
+			rawRW: init?.rawRW ? init.rawRW.clone() : new rawRW(undefined, true)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): outerRW {
-		return $.markAsStructValue(new outerRW(this))
+		return new outerRW(this, true)
 	}
 
 	public __goscriptAssign(source: outerRW): void {
@@ -261,14 +273,17 @@ export class rawRunner {
 		runner: runner | null
 	}
 
-	constructor(init?: Partial<{runner?: runner | null}>) {
+	constructor(init?: Partial<{runner?: runner | null}>, __goscriptValue?: boolean) {
 		this._fields = {
 			runner: init?.runner ?? (null! as runner | null)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): rawRunner {
-		return $.markAsStructValue(new rawRunner(this))
+		return new rawRunner(this, true)
 	}
 
 	public __goscriptAssign(source: rawRunner): void {
@@ -303,14 +318,17 @@ export class outerRunner {
 		rawRunner: rawRunner
 	}
 
-	constructor(init?: Partial<{rawRunner?: rawRunner}>) {
+	constructor(init?: Partial<{rawRunner?: rawRunner}>, __goscriptValue?: boolean) {
 		this._fields = {
-			rawRunner: init?.rawRunner ? $.markAsStructValue($.cloneStructValue(init.rawRunner)) : $.markAsStructValue(new rawRunner())
+			rawRunner: init?.rawRunner ? init.rawRunner.clone() : new rawRunner(undefined, true)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): outerRunner {
-		return $.markAsStructValue(new outerRunner(this))
+		return new outerRunner(this, true)
 	}
 
 	public __goscriptAssign(source: outerRunner): void {
@@ -336,13 +354,16 @@ export class runnable {
 	public _fields: {
 	}
 
-	constructor(init?: Partial<{}>) {
+	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
 		this._fields = {
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): runnable {
-		return $.markAsStructValue(new runnable(this))
+		return new runnable(this, true)
 	}
 
 	public __goscriptAssign(source: runnable): void {
@@ -362,18 +383,18 @@ export class runnable {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let o: $.VarRef<outer> = $.varRef($.markAsStructValue(new outer()))
+	let o: $.VarRef<outer> = $.varRef(new outer(undefined, true))
 	await o.value.raw.Mutex.Lock()
 	o.value.raw.Mutex.Unlock()
 
-	let rw: $.VarRef<outerRW> = $.varRef($.markAsStructValue(new outerRW()))
+	let rw: $.VarRef<outerRW> = $.varRef(new outerRW(undefined, true))
 	await rw.value.rawRW.RWMutex.RLock()
 	rw.value.rawRW.RWMutex.RUnlock()
 	let locker = rw.value.rawRW.RWMutex.RLocker()
 	await $.pointerValue<Exclude<sync.Locker, null>>(locker).Lock()
 	void (__goscriptAwait = $.pointerValue<Exclude<sync.Locker, null>>(locker).Unlock(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 
-	let or = $.markAsStructValue(new outerRunner({rawRunner: $.markAsStructValue(new rawRunner({runner: $.interfaceValue<runner | null>($.markAsStructValue(new runnable()), "main.runnable", "main.runnable")}))}))
+	let or = new outerRunner({rawRunner: new rawRunner({runner: $.interfaceValue<runner | null>(new runnable(undefined, true), "main.runnable", "main.runnable")}, true)}, true)
 	await $.println($.pointerValue<Exclude<runner, null>>(or.rawRunner.runner).Run())
 	await $.println("ok")
 }

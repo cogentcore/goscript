@@ -16,14 +16,17 @@ export class Map {
 		values: globalThis.Map<string, number> | null
 	}
 
-	constructor(init?: Partial<{values?: globalThis.Map<string, number> | null}>) {
+	constructor(init?: Partial<{values?: globalThis.Map<string, number> | null}>, __goscriptValue?: boolean) {
 		this._fields = {
 			values: init?.values ?? (null! as globalThis.Map<string, number> | null)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): Map {
-		return $.markAsStructValue(new Map(this))
+		return new Map(this, true)
 	}
 
 	public __goscriptAssign(source: Map): void {
@@ -42,7 +45,7 @@ export class Map {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let m = $.markAsStructValue(new Map({values: $.makeMap<string, number>([["one", 1]])}))
+	let m = new Map({values: $.makeMap<string, number>([["one", 1]])}, true)
 	let [got, ok] = $.mapGet<string, number, number>(m.values, "one", 0)
 	await $.println(got, ok)
 }

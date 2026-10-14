@@ -10,13 +10,16 @@ export class thing {
 	public _fields: {
 	}
 
-	constructor(init?: Partial<{}>) {
+	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
 		this._fields = {
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): thing {
-		return $.markAsStructValue(new thing(this))
+		return new thing(this, true)
 	}
 
 	public __goscriptAssign(source: thing): void {
@@ -38,7 +41,7 @@ export function __goscript_set_Seen(__goscriptValue: number): void {
 }
 
 export function newThing(): thing {
-	return $.markAsStructValue(new thing())
+	return new thing(undefined, true)
 }
 
 function __goscriptInit0(): void {

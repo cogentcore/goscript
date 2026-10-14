@@ -22,14 +22,17 @@ export class sink {
 		size: number
 	}
 
-	constructor(init?: Partial<{size?: number}>) {
+	constructor(init?: Partial<{size?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			size: init?.size ?? (0 as number)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): sink {
-		return $.markAsStructValue(new sink(this))
+		return new sink(this, true)
 	}
 
 	public __goscriptAssign(source: sink): void {

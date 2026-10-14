@@ -41,14 +41,17 @@ export class byteFormatter {
 		prefix: $.Slice<number>
 	}
 
-	constructor(init?: Partial<{prefix?: $.Slice<number>}>) {
+	constructor(init?: Partial<{prefix?: $.Slice<number>}>, __goscriptValue?: boolean) {
 		this._fields = {
 			prefix: init?.prefix ?? (null! as $.Slice<number>)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): byteFormatter {
-		return $.markAsStructValue(new byteFormatter(this))
+		return new byteFormatter(this, true)
 	}
 
 	public __goscriptAssign(source: byteFormatter): void {
@@ -95,15 +98,18 @@ export class pos {
 		Char: number
 	}
 
-	constructor(init?: Partial<{Line?: number, Char?: number}>) {
+	constructor(init?: Partial<{Line?: number, Char?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Line: init?.Line ?? (0 as number),
 			Char: init?.Char ?? (0 as number)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): pos {
-		return $.markAsStructValue(new pos(this))
+		return new pos(this, true)
 	}
 
 	public __goscriptAssign(source: pos): void {
@@ -171,7 +177,7 @@ export async function main(): globalThis.Promise<void> {
 	await fmt.Printf("Width: '%5s'\n", "hi")
 	await fmt.Printf("Precision: '%.2f'\n", $.basicInterfaceValue(3.14159, "float64"))
 	await fmt.Printf("Both: '%5.2f'\n", $.basicInterfaceValue(3.14159, "float64"))
-	await fmt.Printf("Formatter: %v\n", $.interfaceValue($.markAsStructValue(new byteFormatter({prefix: new Uint8Array([98, 121, 116, 101, 45])})), "main.byteFormatter", "main.byteFormatter"))
+	await fmt.Printf("Formatter: %v\n", $.interfaceValue(new byteFormatter({prefix: new Uint8Array([98, 121, 116, 101, 45])}, true), "main.byteFormatter", "main.byteFormatter"))
 	let bs: $.Slice<number> = new Uint8Array([97, 98, 34, 99])
 	await fmt.Printf("Bytes: %s %q %x %X %v\n", $.interfaceValue(bs, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(bs, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(bs, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(bs, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(bs, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))))
 	await fmt.Printf("String hex: %x %X\n", "hi", "hi")
@@ -247,7 +253,7 @@ export async function scanVerbs(): globalThis.Promise<void> {
 	err = __goscriptTuple3[1]
 	await fmt.Println("1x:", $.basicInterfaceValue(n, "int"), err == null, $.basicInterfaceValue(r.value, "uint8"), $.basicInterfaceValue(g.value, "uint8"), $.basicInterfaceValue(b.value, "uint8"))
 
-	let p: pos = $.markAsStructValue(new pos())
+	let p: pos = new pos(undefined, true)
 	let __goscriptTuple4: any = fmt.Sscanf("L12C3", "L%dC%d", $.interfaceValue($.fieldRef(p._fields, "Line"), "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int"))), $.interfaceValue($.fieldRef(p._fields, "Char"), "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int"))))
 	n = __goscriptTuple4[0]
 	err = __goscriptTuple4[1]

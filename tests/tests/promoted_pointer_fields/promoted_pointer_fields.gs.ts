@@ -16,14 +16,17 @@ export class counter {
 		value: number
 	}
 
-	constructor(init?: Partial<{value?: number}>) {
+	constructor(init?: Partial<{value?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			value: init?.value ?? (0 as number)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): counter {
-		return $.markAsStructValue(new counter(this))
+		return new counter(this, true)
 	}
 
 	public __goscriptAssign(source: counter): void {
@@ -68,15 +71,18 @@ export class inner {
 		count: counter
 	}
 
-	constructor(init?: Partial<{name?: string, count?: counter}>) {
+	constructor(init?: Partial<{name?: string, count?: counter}>, __goscriptValue?: boolean) {
 		this._fields = {
 			name: init?.name ?? ("" as string),
-			count: init?.count ? $.markAsStructValue($.cloneStructValue(init.count)) : $.markAsStructValue(new counter())
+			count: init?.count ? init.count.clone() : new counter(undefined, true)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): inner {
-		return $.markAsStructValue(new inner(this))
+		return new inner(this, true)
 	}
 
 	public __goscriptAssign(source: inner): void {
@@ -108,14 +114,17 @@ export class outer {
 		inner: inner | $.VarRef<inner> | null
 	}
 
-	constructor(init?: Partial<{inner?: inner | $.VarRef<inner> | null}>) {
+	constructor(init?: Partial<{inner?: inner | $.VarRef<inner> | null}>, __goscriptValue?: boolean) {
 		this._fields = {
 			inner: init?.inner ?? (null! as inner | $.VarRef<inner> | null)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): outer {
-		return $.markAsStructValue(new outer(this))
+		return new outer(this, true)
 	}
 
 	public __goscriptAssign(source: outer): void {
@@ -134,7 +143,7 @@ export class outer {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let o: outer | $.VarRef<outer> | null = new outer({inner: new inner({name: "ready", count: $.markAsStructValue(new counter({value: 7}))})})
+	let o: outer | $.VarRef<outer> | null = new outer({inner: new inner({name: "ready", count: new counter({value: 7}, true)})})
 
 	await $.println("name:", $.pointerValue<inner>($.pointerValue<outer>(o).inner).name)
 	$.pointerValue<inner>($.pointerValue<outer>(o).inner).name = "done"

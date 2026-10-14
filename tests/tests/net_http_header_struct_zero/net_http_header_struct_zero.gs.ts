@@ -19,14 +19,17 @@ export class responseWriter {
 		header: http.Header
 	}
 
-	constructor(init?: Partial<{header?: http.Header}>) {
+	constructor(init?: Partial<{header?: http.Header}>, __goscriptValue?: boolean) {
 		this._fields = {
 			header: init?.header ?? (null! as http.Header)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): responseWriter {
-		return $.markAsStructValue(new responseWriter(this))
+		return new responseWriter(this, true)
 	}
 
 	public __goscriptAssign(source: responseWriter): void {

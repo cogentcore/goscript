@@ -26,14 +26,17 @@ export class listProvider {
 		items: $.Slice<Group | $.VarRef<Group> | null>
 	}
 
-	constructor(init?: Partial<{items?: $.Slice<Group | $.VarRef<Group> | null>}>) {
+	constructor(init?: Partial<{items?: $.Slice<Group | $.VarRef<Group> | null>}>, __goscriptValue?: boolean) {
 		this._fields = {
 			items: init?.items ?? (null! as $.Slice<Group | $.VarRef<Group> | null>)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): listProvider {
-		return $.markAsStructValue(new listProvider(this))
+		return new listProvider(this, true)
 	}
 
 	public __goscriptAssign(source: listProvider): void {
@@ -78,15 +81,18 @@ export class Group {
 		seen: boolean
 	}
 
-	constructor(init?: Partial<{provider?: provider | null, seen?: boolean}>) {
+	constructor(init?: Partial<{provider?: provider | null, seen?: boolean}>, __goscriptValue?: boolean) {
 		this._fields = {
 			provider: init?.provider ?? (null! as provider | null),
 			seen: init?.seen ?? (false as boolean)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): Group {
-		return $.markAsStructValue(new Group(this))
+		return new Group(this, true)
 	}
 
 	public __goscriptAssign(source: Group): void {

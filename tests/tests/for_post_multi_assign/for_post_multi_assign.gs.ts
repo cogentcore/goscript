@@ -16,14 +16,17 @@ export class frame {
 		name: string
 	}
 
-	constructor(init?: Partial<{name?: string}>) {
+	constructor(init?: Partial<{name?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
 			name: init?.name ?? ("" as string)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): frame {
-		return $.markAsStructValue(new frame(this))
+		return new frame(this, true)
 	}
 
 	public __goscriptAssign(source: frame): void {
@@ -54,14 +57,17 @@ export class iterator {
 		idx: number
 	}
 
-	constructor(init?: Partial<{idx?: number}>) {
+	constructor(init?: Partial<{idx?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			idx: init?.idx ?? (0 as number)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): iterator {
-		return $.markAsStructValue(new iterator(this))
+		return new iterator(this, true)
 	}
 
 	public __goscriptAssign(source: iterator): void {
@@ -76,17 +82,17 @@ export class iterator {
 		switch ($.pointerValue<iterator>(it).idx) {
 			case 1:
 			{
-				return [$.markAsStructValue(new frame({name: "first"})), true]
+				return [new frame({name: "first"}, true), true]
 				break
 			}
 			case 2:
 			{
-				return [$.markAsStructValue(new frame({name: "second"})), true]
+				return [new frame({name: "second"}, true), true]
 				break
 			}
 			default:
 			{
-				return [$.markAsStructValue(new frame()), false]
+				return [new frame(undefined, true), false]
 				break
 			}
 		}

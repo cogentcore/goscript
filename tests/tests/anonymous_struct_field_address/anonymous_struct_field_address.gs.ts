@@ -16,14 +16,17 @@ export class entry {
 		value: number
 	}
 
-	constructor(init?: Partial<{value?: number}>) {
+	constructor(init?: Partial<{value?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			value: init?.value ?? (0 as number)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): entry {
-		return $.markAsStructValue(new entry(this))
+		return new entry(this, true)
 	}
 
 	public __goscriptAssign(source: entry): void {
@@ -46,7 +49,7 @@ export class entry {
 	)
 }
 
-export let box: {"table": entry[]} = $.anonymousStructValue({"table": $.arrayValue(globalThis.Array.from({ length: 2 }, () => $.markAsStructValue(new entry())), /* @__PURE__ */ $.arrayType("main.entry", 2))}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("table", /* @__PURE__ */ $.arrayType("main.entry", 2), [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/anonymous_struct_field_address" })] })
+export let box: {"table": entry[]} = $.anonymousStructValue({"table": $.arrayValue(globalThis.Array.from({ length: 2 }, () => new entry(undefined, true)), /* @__PURE__ */ $.arrayType("main.entry", 2))}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("table", /* @__PURE__ */ $.arrayType("main.entry", 2), [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/anonymous_struct_field_address" })] })
 
 export function __goscript_set_box(__goscriptValue: {"table": entry[]}): void {
 	$.assignStruct(box, __goscriptValue)

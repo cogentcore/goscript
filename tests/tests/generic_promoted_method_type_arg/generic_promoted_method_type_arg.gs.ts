@@ -38,15 +38,18 @@ export class Base {
 		flags: Flags
 	}
 
-	constructor(init?: Partial<{App?: any, flags?: Flags}>) {
+	constructor(init?: Partial<{App?: any, flags?: Flags}>, __goscriptValue?: boolean) {
 		this._fields = {
 			App: init?.App !== undefined ? $.copyElement(init.App) : (null! as any),
 			flags: init?.flags ?? (0n as Flags)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): Base {
-		return $.markAsStructValue(new Base(this))
+		return new Base(this, true)
 	}
 
 	public __goscriptAssign(source: Base): void {
@@ -88,14 +91,17 @@ export class App {
 		Name: string
 	}
 
-	constructor(init?: Partial<{Name?: string}>) {
+	constructor(init?: Partial<{Name?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Name: init?.Name ?? ("" as string)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): App {
-		return $.markAsStructValue(new App(this))
+		return new App(this, true)
 	}
 
 	public __goscriptAssign(source: App): void {
@@ -135,15 +141,18 @@ export class Window {
 		Title: string
 	}
 
-	constructor(init?: Partial<{Base?: Base, Title?: string}>) {
+	constructor(init?: Partial<{Base?: Base, Title?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Base: init?.Base ? $.markAsStructValue($.cloneStructValue(init.Base)) : $.markAsStructValue(new Base({App: null! as App | $.VarRef<App> | null})),
 			Title: init?.Title ?? ("" as string)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): Window {
-		return $.markAsStructValue(new Window(this))
+		return new Window(this, true)
 	}
 
 	public __goscriptAssign(source: Window): void {
@@ -192,15 +201,18 @@ export class Single {
 		Count: number
 	}
 
-	constructor(init?: Partial<{Base?: Base, Count?: number}>) {
+	constructor(init?: Partial<{Base?: Base, Count?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Base: init?.Base ? $.markAsStructValue($.cloneStructValue(init.Base)) : $.markAsStructValue(new Base({App: null})),
 			Count: init?.Count ?? (0 as number)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): Single {
-		return $.markAsStructValue(new Single(this))
+		return new Single(this, true)
 	}
 
 	public __goscriptAssign(source: Single): void {

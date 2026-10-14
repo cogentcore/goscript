@@ -19,14 +19,17 @@ export class loader {
 		load: ((_p0: string) => [any, boolean] | globalThis.Promise<[any, boolean]>) | null
 	}
 
-	constructor(init?: Partial<{load?: ((_p0: string) => [any, boolean] | globalThis.Promise<[any, boolean]>) | null}>) {
+	constructor(init?: Partial<{load?: ((_p0: string) => [any, boolean] | globalThis.Promise<[any, boolean]>) | null}>, __goscriptValue?: boolean) {
 		this._fields = {
 			load: init?.load ?? (null! as ((_p0: string) => [any, boolean] | globalThis.Promise<[any, boolean]>) | null)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): loader {
-		return $.markAsStructValue(new loader(this))
+		return new loader(this, true)
 	}
 
 	public __goscriptAssign(source: loader): void {

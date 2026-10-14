@@ -16,14 +16,17 @@ export class holder {
 		data: $.Slice<number>
 	}
 
-	constructor(init?: Partial<{data?: $.Slice<number>}>) {
+	constructor(init?: Partial<{data?: $.Slice<number>}>, __goscriptValue?: boolean) {
 		this._fields = {
 			data: init?.data ?? (null! as $.Slice<number>)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): holder {
-		return $.markAsStructValue(new holder(this))
+		return new holder(this, true)
 	}
 
 	public __goscriptAssign(source: holder): void {
@@ -52,7 +55,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// Storing the literal in a struct field and reading it back must
 	// preserve the Uint8Array backing without any append repairing it.
-	let h = $.markAsStructValue(new holder({data: new Uint8Array([9, 8, 7]) as $.Slice<number>}))
+	let h = new holder({data: new Uint8Array([9, 8, 7]) as $.Slice<number>}, true)
 	await $.println("stored:", h.data)
 	await $.println("stored index:", $.uint($.arrayIndex(h.data!, 1), 8))
 

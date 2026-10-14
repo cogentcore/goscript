@@ -21,14 +21,17 @@ export class Setting {
 		once: sync.Once
 	}
 
-	constructor(init?: Partial<{once?: sync.Once}>) {
+	constructor(init?: Partial<{once?: sync.Once}>, __goscriptValue?: boolean) {
 		this._fields = {
 			once: init?.once ? $.markAsStructValue($.cloneStructValue(init.once)) : $.markAsStructValue(new sync.Once())
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): Setting {
-		return $.markAsStructValue(new Setting(this))
+		return new Setting(this, true)
 	}
 
 	public __goscriptAssign(source: Setting): void {

@@ -16,14 +16,17 @@ export class item {
 		Value: number
 	}
 
-	constructor(init?: Partial<{Value?: number}>) {
+	constructor(init?: Partial<{Value?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Value: init?.Value ?? (0 as number)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): item {
-		return $.markAsStructValue(new item(this))
+		return new item(this, true)
 	}
 
 	public __goscriptAssign(source: item): void {
@@ -48,7 +51,7 @@ export async function fill(fn: ((_p0: number) => void) | null): globalThis.Promi
 export async function main(): globalThis.Promise<void> {
 	let values: $.Slice<item> = null! as $.Slice<item>
 	await fill($.functionValue((value: number): void => {
-		values = $.append(values, $.markAsStructValue(new item({Value: value})))
+		values = $.append(values, new item({Value: value}, true))
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [] } as $.FunctionTypeInfo)))
 	if ($.sliceLen(values) != 0) {
 		await $.println("first:", $.arrayIndex(values!, 0).Value)

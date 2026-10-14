@@ -26,14 +26,17 @@ export class stream {
 		name: string
 	}
 
-	constructor(init?: Partial<{name?: string}>) {
+	constructor(init?: Partial<{name?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
 			name: init?.name ?? ("" as string)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): stream {
-		return $.markAsStructValue(new stream(this))
+		return new stream(this, true)
 	}
 
 	public __goscriptAssign(source: stream): void {
@@ -69,14 +72,17 @@ export class stopStream {
 		stream: stream
 	}
 
-	constructor(init?: Partial<{stream?: stream}>) {
+	constructor(init?: Partial<{stream?: stream}>, __goscriptValue?: boolean) {
 		this._fields = {
-			stream: init?.stream ? $.markAsStructValue($.cloneStructValue(init.stream)) : $.markAsStructValue(new stream())
+			stream: init?.stream ? init.stream.clone() : new stream(undefined, true)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): stopStream {
-		return $.markAsStructValue(new stopStream(this))
+		return new stopStream(this, true)
 	}
 
 	public __goscriptAssign(source: stopStream): void {
@@ -111,14 +117,17 @@ export class pointerStopStream {
 		stream: stream | $.VarRef<stream> | null
 	}
 
-	constructor(init?: Partial<{stream?: stream | $.VarRef<stream> | null}>) {
+	constructor(init?: Partial<{stream?: stream | $.VarRef<stream> | null}>, __goscriptValue?: boolean) {
 		this._fields = {
 			stream: init?.stream ?? (null! as stream | $.VarRef<stream> | null)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): pointerStopStream {
-		return $.markAsStructValue(new pointerStopStream(this))
+		return new pointerStopStream(this, true)
 	}
 
 	public __goscriptAssign(source: pointerStopStream): void {
@@ -145,14 +154,14 @@ export async function closeIt(c: closer | null): globalThis.Promise<void> {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let value = $.markAsStructValue(new stopStream({stream: $.markAsStructValue(new stream({name: "value"}))}))
-	await closeIt($.interfaceValue<closer | null>($.markAsStructValue($.cloneStructValue(value)), "main.stopStream", "main.stopStream"))
+	let value = new stopStream({stream: new stream({name: "value"}, true)}, true)
+	await closeIt($.interfaceValue<closer | null>((value).clone(), "main.stopStream", "main.stopStream"))
 
-	let ptr: stopStream | $.VarRef<stopStream> | null = new stopStream({stream: $.markAsStructValue(new stream({name: "pointer"}))})
+	let ptr: stopStream | $.VarRef<stopStream> | null = new stopStream({stream: new stream({name: "pointer"}, true)})
 	await closeIt($.interfaceValue<closer | null>(ptr, "*main.stopStream", /* @__PURE__ */ $.pointerType("main.stopStream")))
 
-	let promotedPtr = $.markAsStructValue(new pointerStopStream({stream: new stream({name: "embedded pointer"})}))
-	await closeIt($.interfaceValue<closer | null>($.markAsStructValue($.cloneStructValue(promotedPtr)), "main.pointerStopStream", "main.pointerStopStream"))
+	let promotedPtr = new pointerStopStream({stream: new stream({name: "embedded pointer"})}, true)
+	await closeIt($.interfaceValue<closer | null>((promotedPtr).clone(), "main.pointerStopStream", "main.pointerStopStream"))
 }
 
 var __goscriptAwait: any

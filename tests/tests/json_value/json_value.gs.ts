@@ -37,16 +37,19 @@ export class Person {
 		Active: boolean
 	}
 
-	constructor(init?: Partial<{Name?: string, Age?: number, Active?: boolean}>) {
+	constructor(init?: Partial<{Name?: string, Age?: number, Active?: boolean}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Name: init?.Name ?? ("" as string),
 			Age: init?.Age ?? (0 as number),
 			Active: init?.Active ?? (false as boolean)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): Person {
-		return $.markAsStructValue(new Person(this))
+		return new Person(this, true)
 	}
 
 	public __goscriptAssign(source: Person): void {
@@ -67,8 +70,8 @@ export class Person {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let p = $.markAsStructValue(new Person({Name: "Alice", Age: 30, Active: true}))
-	let v = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.markAsStructValue($.cloneStructValue(p)), "main.Person", "main.Person"))))
+	let p = new Person({Name: "Alice", Age: 30, Active: true}, true)
+	let v = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue((p).clone(), "main.Person", "main.Person"))))
 	let t = $.markAsStructValue($.cloneStructValue(v)).Type()
 
 	await $.println("Type:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(t).Name(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))

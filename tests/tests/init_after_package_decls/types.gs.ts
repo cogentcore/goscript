@@ -68,7 +68,7 @@ export function __goscript_set_order(__goscriptValue: $.Slice<string>): void {
 
 export function newDefault(): __goscript__type.Type | $.VarRef<__goscript__type.Type> | null {
 	__goscript_set_order($.append(__goscript_get_order(), "Default"))
-	return new __goscript__type.Type({Name: "default", Fields: $.arrayToSlice<__goscript_field.Field>([$.markAsStructValue(new __goscript_field.Field({Name: "x"}))])})
+	return new __goscript__type.Type({Name: "default", Fields: $.arrayToSlice<__goscript_field.Field>([new __goscript_field.Field({Name: "x"}, true)])})
 }
 
 export function addBuiltin(__typeArgs: $.GenericTypeArgs | undefined, name: string): void {

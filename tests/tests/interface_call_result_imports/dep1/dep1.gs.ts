@@ -12,13 +12,16 @@ export class maker {
 	public _fields: {
 	}
 
-	constructor(init?: Partial<{}>) {
+	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
 		this._fields = {
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): maker {
-		return $.markAsStructValue(new maker(this))
+		return new maker(this, true)
 	}
 
 	public __goscriptAssign(source: maker): void {
@@ -38,5 +41,5 @@ export class maker {
 }
 
 export function Make(): dep2.Value | null {
-	return $.interfaceValue<dep2.Value | null>($.markAsStructValue(new maker()), "dep1.maker", "dep1.maker")
+	return $.interfaceValue<dep2.Value | null>(new maker(undefined, true), "dep1.maker", "dep1.maker")
 }

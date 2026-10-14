@@ -65,16 +65,19 @@ export class MockFileInfo {
 		isDir: boolean
 	}
 
-	constructor(init?: Partial<{name?: string, size?: bigint, isDir?: boolean}>) {
+	constructor(init?: Partial<{name?: string, size?: bigint, isDir?: boolean}>, __goscriptValue?: boolean) {
 		this._fields = {
 			name: init?.name ?? ("" as string),
 			size: init?.size ?? (0n as bigint),
 			isDir: init?.isDir ?? (false as boolean)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): MockFileInfo {
-		return $.markAsStructValue(new MockFileInfo(this))
+		return new MockFileInfo(this, true)
 	}
 
 	public __goscriptAssign(source: MockFileInfo): void {
@@ -113,13 +116,16 @@ export class MockFilesystem {
 	public _fields: {
 	}
 
-	constructor(init?: Partial<{}>) {
+	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
 		this._fields = {
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): MockFilesystem {
-		return $.markAsStructValue(new MockFilesystem(this))
+		return new MockFilesystem(this, true)
 	}
 
 	public __goscriptAssign(source: MockFilesystem): void {

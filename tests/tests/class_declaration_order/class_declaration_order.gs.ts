@@ -17,13 +17,16 @@ export class lateType {
 	public _fields: {
 	}
 
-	constructor(init?: Partial<{}>) {
+	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
 		this._fields = {
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): lateType {
-		return $.markAsStructValue(new lateType(this))
+		return new lateType(this, true)
 	}
 
 	public __goscriptAssign(source: lateType): void {

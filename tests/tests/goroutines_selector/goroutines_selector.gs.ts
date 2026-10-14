@@ -16,14 +16,17 @@ export class Foo {
 		done: $.Channel<boolean> | null
 	}
 
-	constructor(init?: Partial<{done?: $.Channel<boolean> | null}>) {
+	constructor(init?: Partial<{done?: $.Channel<boolean> | null}>, __goscriptValue?: boolean) {
 		this._fields = {
 			done: init?.done ?? (null! as $.Channel<boolean> | null)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): Foo {
-		return $.markAsStructValue(new Foo(this))
+		return new Foo(this, true)
 	}
 
 	public __goscriptAssign(source: Foo): void {

@@ -7,7 +7,7 @@ import * as __goscript_generated from "./generated.gs.ts"
 import "./generated.gs.ts"
 
 export async function main(): globalThis.Promise<void> {
-	let sym: __goscript_generated.yySymType = $.markAsStructValue(new __goscript_generated.yySymType())
+	let sym: __goscript_generated.yySymType = new __goscript_generated.yySymType(undefined, true)
 	sym.value = 3
 	let parser: __goscript_generated.yyParserImpl | $.VarRef<__goscript_generated.yyParserImpl> | null = __goscript_generated.yyNewParser()
 	await $.println(sym.value, parser != null)

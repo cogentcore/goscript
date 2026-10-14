@@ -28,15 +28,18 @@ export class Process {
 		done: $.Channel<{}> | null
 	}
 
-	constructor(init?: Partial<{pid?: number, done?: $.Channel<{}> | null}>) {
+	constructor(init?: Partial<{pid?: number, done?: $.Channel<{}> | null}>, __goscriptValue?: boolean) {
 		this._fields = {
 			pid: init?.pid ?? (0 as number),
 			done: init?.done ?? (null! as $.Channel<{}> | null)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): Process {
-		return $.markAsStructValue(new Process(this))
+		return new Process(this, true)
 	}
 
 	public __goscriptAssign(source: Process): void {

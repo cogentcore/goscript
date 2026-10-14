@@ -12,7 +12,7 @@ import "@goscript/github.com/aperturerobotics/util/broadcast/index.js"
 export const workers: number = 16
 
 export async function main(): globalThis.Promise<void> {
-	let bcast: $.VarRef<broadcast.Broadcast> = $.varRef($.markAsStructValue(new broadcast.Broadcast()))
+	let bcast: $.VarRef<broadcast.Broadcast> = $.varRef(new broadcast.Broadcast(undefined, true))
 	let completed = 0
 
 	for (let w = 0; w < 16; w++) {

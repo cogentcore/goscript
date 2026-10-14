@@ -26,14 +26,17 @@ export class Dog {
 		name: string
 	}
 
-	constructor(init?: Partial<{name?: string}>) {
+	constructor(init?: Partial<{name?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
 			name: init?.name ?? ("" as string)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): Dog {
-		return $.markAsStructValue(new Dog(this))
+		return new Dog(this, true)
 	}
 
 	public __goscriptAssign(source: Dog): void {
@@ -72,14 +75,17 @@ export class Cat {
 		name: string
 	}
 
-	constructor(init?: Partial<{name?: string}>) {
+	constructor(init?: Partial<{name?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
 			name: init?.name ?? ("" as string)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): Cat {
-		return $.markAsStructValue(new Cat(this))
+		return new Cat(this, true)
 	}
 
 	public __goscriptAssign(source: Cat): void {

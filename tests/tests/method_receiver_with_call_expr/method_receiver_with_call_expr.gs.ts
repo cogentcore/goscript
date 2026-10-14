@@ -25,15 +25,18 @@ export class State {
 		index: $.VarRef<number> | null
 	}
 
-	constructor(init?: Partial<{value?: number, index?: $.VarRef<number> | null}>) {
+	constructor(init?: Partial<{value?: number, index?: $.VarRef<number> | null}>, __goscriptValue?: boolean) {
 		this._fields = {
 			value: init?.value ?? (0 as number),
 			index: init?.index ?? (null! as $.VarRef<number> | null)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): State {
-		return $.markAsStructValue(new State(this))
+		return new State(this, true)
 	}
 
 	public __goscriptAssign(source: State): void {

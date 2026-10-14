@@ -15,7 +15,7 @@ import "@goscript/time/index.js"
 export async function verifyCertificate(cert: x509.Certificate | $.VarRef<x509.Certificate> | null, now: time.Time): globalThis.Promise<$.GoError> {
 	let pool: x509.CertPool | $.VarRef<x509.CertPool> | null = x509.NewCertPool()
 	await x509.CertPool.prototype.AddCert.call(pool, cert)
-	let [, err] = await x509.Certificate.prototype.Verify.call(cert, $.markAsStructValue(new x509.VerifyOptions({Roots: pool, CurrentTime: $.markAsStructValue($.cloneStructValue(now)), KeyUsages: $.arrayToSlice<x509.ExtKeyUsage>([0])})))
+	let [, err] = await x509.Certificate.prototype.Verify.call(cert, new x509.VerifyOptions({Roots: pool, CurrentTime: $.markAsStructValue($.cloneStructValue(now)), KeyUsages: $.arrayToSlice<x509.ExtKeyUsage>([0])}, true))
 	return err
 }
 

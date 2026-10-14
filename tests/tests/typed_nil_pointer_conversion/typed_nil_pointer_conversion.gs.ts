@@ -16,14 +16,17 @@ export class node {
 		next: node | $.VarRef<node> | null
 	}
 
-	constructor(init?: Partial<{next?: node | $.VarRef<node> | null}>) {
+	constructor(init?: Partial<{next?: node | $.VarRef<node> | null}>, __goscriptValue?: boolean) {
 		this._fields = {
 			next: init?.next ?? (null! as node | $.VarRef<node> | null)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): node {
-		return $.markAsStructValue(new node(this))
+		return new node(this, true)
 	}
 
 	public __goscriptAssign(source: node): void {

@@ -17,13 +17,16 @@ export class concrete {
 	public _fields: {
 	}
 
-	constructor(init?: Partial<{}>) {
+	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
 		this._fields = {
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): concrete {
-		return $.markAsStructValue(new concrete(this))
+		return new concrete(this, true)
 	}
 
 	public __goscriptAssign(source: concrete): void {

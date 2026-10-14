@@ -19,14 +19,17 @@ export class field {
 		name: string
 	}
 
-	constructor(init?: Partial<{name?: string}>) {
+	constructor(init?: Partial<{name?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
 			name: init?.name ?? ("" as string)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): field {
-		return $.markAsStructValue(new field(this))
+		return new field(this, true)
 	}
 
 	public __goscriptAssign(source: field): void {

@@ -26,14 +26,17 @@ export class blankImpl {
 		value: number
 	}
 
-	constructor(init?: Partial<{value?: number}>) {
+	constructor(init?: Partial<{value?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			value: init?.value ?? (0 as number)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): blankImpl {
-		return $.markAsStructValue(new blankImpl(this))
+		return new blankImpl(this, true)
 	}
 
 	public __goscriptAssign(source: blankImpl): void {
@@ -60,13 +63,16 @@ export class Packer {
 	public _fields: {
 	}
 
-	constructor(init?: Partial<{}>) {
+	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
 		this._fields = {
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): Packer {
-		return $.markAsStructValue(new Packer(this))
+		return new Packer(this, true)
 	}
 
 	public __goscriptAssign(source: Packer): void {
@@ -98,7 +104,7 @@ export function unicodeNames(_u3c6: number, _u3b2: number): [number, number] {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let p = $.markAsStructValue(new Packer())
+	let p = new Packer(undefined, true)
 	await $.println(blanks(1, "x"))
 	await $.println($.sliceLen(p.pack(null, null, 0)))
 

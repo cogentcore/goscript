@@ -12,13 +12,16 @@ export class localReadWriteCloser {
 	public _fields: {
 	}
 
-	constructor(init?: Partial<{}>) {
+	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
 		this._fields = {
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): localReadWriteCloser {
-		return $.markAsStructValue(new localReadWriteCloser(this))
+		return new localReadWriteCloser(this, true)
 	}
 
 	public __goscriptAssign(source: localReadWriteCloser): void {

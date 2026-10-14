@@ -21,13 +21,16 @@ export class impl {
 	public _fields: {
 	}
 
-	constructor(init?: Partial<{}>) {
+	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
 		this._fields = {
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): impl {
-		return $.markAsStructValue(new impl(this))
+		return new impl(this, true)
 	}
 
 	public __goscriptAssign(source: impl): void {

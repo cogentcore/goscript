@@ -16,13 +16,16 @@ export class source {
 	public _fields: {
 	}
 
-	constructor(init?: Partial<{}>) {
+	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
 		this._fields = {
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): source {
-		return $.markAsStructValue(new source(this))
+		return new source(this, true)
 	}
 
 	public __goscriptAssign(source: source): void {
@@ -42,8 +45,8 @@ export class source {
 }
 
 export async function main(): globalThis.Promise<void> {
-	await $.println($.bytesToString(await __goscript_iterator.Read($.interfaceValue<__goscript_iterator.Reader | null>($.markAsStructValue(new source()), "main.source", "main.source"))))
-	await $.println($.bytesToString(subpkg.Value_Clone((await __goscript_iterator.Read($.interfaceValue<__goscript_iterator.Reader | null>($.markAsStructValue(new source()), "main.source", "main.source"))))))
+	await $.println($.bytesToString(await __goscript_iterator.Read($.interfaceValue<__goscript_iterator.Reader | null>(new source(undefined, true), "main.source", "main.source"))))
+	await $.println($.bytesToString(subpkg.Value_Clone((await __goscript_iterator.Read($.interfaceValue<__goscript_iterator.Reader | null>(new source(undefined, true), "main.source", "main.source"))))))
 }
 
 if ($.isMainScript(import.meta)) {

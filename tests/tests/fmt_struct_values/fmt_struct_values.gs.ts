@@ -31,14 +31,17 @@ export class Inner {
 		Ready: boolean
 	}
 
-	constructor(init?: Partial<{Ready?: boolean}>) {
+	constructor(init?: Partial<{Ready?: boolean}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Ready: init?.Ready ?? (false as boolean)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): Inner {
-		return $.markAsStructValue(new Inner(this))
+		return new Inner(this, true)
 	}
 
 	public __goscriptAssign(source: Inner): void {
@@ -90,16 +93,19 @@ export class Record {
 		Inner: Inner
 	}
 
-	constructor(init?: Partial<{Count?: number, name?: string, Inner?: Inner}>) {
+	constructor(init?: Partial<{Count?: number, name?: string, Inner?: Inner}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Count: init?.Count ?? (0 as number),
 			name: init?.name ?? ("" as string),
-			Inner: init?.Inner ? $.markAsStructValue($.cloneStructValue(init.Inner)) : $.markAsStructValue(new Inner())
+			Inner: init?.Inner ? init.Inner.clone() : new Inner(undefined, true)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): Record {
-		return $.markAsStructValue(new Record(this))
+		return new Record(this, true)
 	}
 
 	public __goscriptAssign(source: Record): void {
@@ -153,16 +159,19 @@ export class Pointers {
 		Dynamic: any
 	}
 
-	constructor(init?: Partial<{Value?: $.VarRef<number> | null, Next?: Pointers | $.VarRef<Pointers> | null, Dynamic?: any}>) {
+	constructor(init?: Partial<{Value?: $.VarRef<number> | null, Next?: Pointers | $.VarRef<Pointers> | null, Dynamic?: any}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Value: init?.Value ?? (null! as $.VarRef<number> | null),
 			Next: init?.Next ?? (null! as Pointers | $.VarRef<Pointers> | null),
 			Dynamic: init?.Dynamic ?? (null! as any)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): Pointers {
-		return $.markAsStructValue(new Pointers(this))
+		return new Pointers(this, true)
 	}
 
 	public __goscriptAssign(source: Pointers): void {
@@ -213,16 +222,19 @@ export class Node {
 		Kids: $.Slice<Node | $.VarRef<Node> | null>
 	}
 
-	constructor(init?: Partial<{Name?: string, Parent?: Node | $.VarRef<Node> | null, Kids?: $.Slice<Node | $.VarRef<Node> | null>}>) {
+	constructor(init?: Partial<{Name?: string, Parent?: Node | $.VarRef<Node> | null, Kids?: $.Slice<Node | $.VarRef<Node> | null>}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Name: init?.Name ?? ("" as string),
 			Parent: init?.Parent ?? (null! as Node | $.VarRef<Node> | null),
 			Kids: init?.Kids ?? (null! as $.Slice<Node | $.VarRef<Node> | null>)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): Node {
-		return $.markAsStructValue(new Node(this))
+		return new Node(this, true)
 	}
 
 	public __goscriptAssign(source: Node): void {
@@ -264,15 +276,18 @@ export class Base {
 		Active: any
 	}
 
-	constructor(init?: Partial<{Windows?: $.Slice<any>, Active?: any}>) {
+	constructor(init?: Partial<{Windows?: $.Slice<any>, Active?: any}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Windows: init?.Windows ?? (null! as $.Slice<any>),
 			Active: init?.Active !== undefined ? $.copyElement(init.Active) : (null! as any)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): Base {
-		return $.markAsStructValue(new Base(this))
+		return new Base(this, true)
 	}
 
 	public __goscriptAssign(source: Base): void {
@@ -313,15 +328,18 @@ export class App {
 		Name: string
 	}
 
-	constructor(init?: Partial<{Base?: Base, Name?: string}>) {
+	constructor(init?: Partial<{Base?: Base, Name?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Base: init?.Base ? $.markAsStructValue($.cloneStructValue(init.Base)) : $.markAsStructValue(new Base({Active: null! as Win | $.VarRef<Win> | null})),
 			Name: init?.Name ?? ("" as string)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): App {
-		return $.markAsStructValue(new App(this))
+		return new App(this, true)
 	}
 
 	public __goscriptAssign(source: App): void {
@@ -362,15 +380,18 @@ export class Win {
 		Title: string
 	}
 
-	constructor(init?: Partial<{App?: App | $.VarRef<App> | null, Title?: string}>) {
+	constructor(init?: Partial<{App?: App | $.VarRef<App> | null, Title?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
 			App: init?.App ?? (null! as App | $.VarRef<App> | null),
 			Title: init?.Title ?? ("" as string)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): Win {
-		return $.markAsStructValue(new Win(this))
+		return new Win(this, true)
 	}
 
 	public __goscriptAssign(source: Win): void {
@@ -390,13 +411,13 @@ export class Win {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let value = $.varRef($.markAsStructValue(new Record({Count: 3, name: "hello", Inner: $.markAsStructValue(new Inner({Ready: true}))})))
-	await $.println(await fmt.Sprintf("%v", $.interfaceValue($.markAsStructValue($.cloneStructValue(value.value)), "main.Record", "main.Record")))
-	await $.println(await fmt.Sprintf("%+v", $.interfaceValue($.markAsStructValue($.cloneStructValue(value.value)), "main.Record", "main.Record")))
+	let value = $.varRef(new Record({Count: 3, name: "hello", Inner: new Inner({Ready: true}, true)}, true))
+	await $.println(await fmt.Sprintf("%v", $.interfaceValue((value.value).clone(), "main.Record", "main.Record")))
+	await $.println(await fmt.Sprintf("%+v", $.interfaceValue((value.value).clone(), "main.Record", "main.Record")))
 	await $.println(await fmt.Sprintf("%v", $.interfaceValue(value, "*main.Record", /* @__PURE__ */ $.pointerType("main.Record"))))
 	await $.println(await fmt.Sprintf("%+v", $.interfaceValue(value, "*main.Record", /* @__PURE__ */ $.pointerType("main.Record"))))
 	await $.println(await fmt.Sprint($.interfaceValue(value, "*main.Record", /* @__PURE__ */ $.pointerType("main.Record"))))
-	await $.println(await fmt.Sprintf("%#v", $.interfaceValue($.markAsStructValue($.cloneStructValue(value.value)), "main.Record", "main.Record")))
+	await $.println(await fmt.Sprintf("%#v", $.interfaceValue((value.value).clone(), "main.Record", "main.Record")))
 	await $.println(await fmt.Sprintf("%#v", $.interfaceValue(value, "*main.Record", /* @__PURE__ */ $.pointerType("main.Record"))))
 
 	let anonymous = $.varRef($.anonymousStructValue({Count: 4}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("Count", /* @__PURE__ */ $.basicType("int"), [0], 0, true)] }))
@@ -407,7 +428,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// Addresses differ across runtimes; their identity and surrounding text agree.
 	let count = $.varRef(7)
-	let pointers = $.varRef($.markAsStructValue(new Pointers({Value: count})))
+	let pointers = $.varRef(new Pointers({Value: count}, true))
 	pointers.value.Next = pointers
 	pointers.value.Dynamic = $.interfaceValue(pointers, "*main.Pointers", /* @__PURE__ */ $.pointerType("main.Pointers"))
 	let text = await fmt.Sprintf("%+v", $.interfaceValue(pointers, "*main.Pointers", /* @__PURE__ */ $.pointerType("main.Pointers")))

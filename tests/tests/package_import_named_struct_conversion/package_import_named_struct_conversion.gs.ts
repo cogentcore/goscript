@@ -37,16 +37,19 @@ export class LocalTime {
 		loc: time.Location | $.VarRef<time.Location> | null
 	}
 
-	constructor(init?: Partial<{wall?: bigint, ext?: bigint, loc?: time.Location | $.VarRef<time.Location> | null}>) {
+	constructor(init?: Partial<{wall?: bigint, ext?: bigint, loc?: time.Location | $.VarRef<time.Location> | null}>, __goscriptValue?: boolean) {
 		this._fields = {
 			wall: init?.wall ?? (0n as bigint),
 			ext: init?.ext ?? (0n as bigint),
 			loc: init?.loc ?? (null! as time.Location | $.VarRef<time.Location> | null)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): LocalTime {
-		return $.markAsStructValue(new LocalTime(this))
+		return new LocalTime(this, true)
 	}
 
 	public __goscriptAssign(source: LocalTime): void {
@@ -71,12 +74,12 @@ export function asTime(t: LocalTime): time.Time {
 }
 
 export function asLocal(t: time.Time): LocalTime {
-	return $.markAsStructValue($.cloneStructValue($.namedStructConversion<LocalTime>(t)))
+	return ($.namedStructConversion<LocalTime>(t)).clone()
 }
 
 export async function main(): globalThis.Promise<void> {
-	let first = $.markAsStructValue($.cloneStructValue($.namedStructConversion<LocalTime>($.markAsStructValue($.cloneStructValue(time.Unix(11n, 0n))).UTC())))
-	await $.println("as time:", $.markAsStructValue($.cloneStructValue(asTime($.markAsStructValue($.cloneStructValue(first))))).Unix())
+	let first = ($.namedStructConversion<LocalTime>($.markAsStructValue($.cloneStructValue(time.Unix(11n, 0n))).UTC())).clone()
+	await $.println("as time:", $.markAsStructValue($.cloneStructValue(asTime((first).clone()))).Unix())
 
 	let second = asLocal($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(time.Unix(22n, 0n))).UTC())))
 	await $.println("as local:", $.markAsStructValue($.cloneStructValue($.namedStructConversion<time.Time>(second))).Unix())
