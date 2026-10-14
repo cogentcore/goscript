@@ -31,15 +31,18 @@ export class localSliceHeader {
 		cap: number
 	}
 
-	constructor(init?: Partial<{s?: string, cap?: number}>) {
+	constructor(init?: Partial<{s?: string, cap?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			s: init?.s ?? ("" as string),
 			cap: init?.cap ?? (0 as number)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): localSliceHeader {
-		return $.markAsStructValue(new localSliceHeader(this))
+		return new localSliceHeader(this, true)
 	}
 
 	public __goscriptAssign(source: localSliceHeader): void {

@@ -16,14 +16,17 @@ export class queue {
 		buf: $.Slice<any>
 	}
 
-	constructor(init?: Partial<{buf?: $.Slice<any>}>) {
+	constructor(init?: Partial<{buf?: $.Slice<any>}>, __goscriptValue?: boolean) {
 		this._fields = {
 			buf: init?.buf ?? (null! as $.Slice<any>)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): queue {
-		return $.markAsStructValue(new queue(this))
+		return new queue(this, true)
 	}
 
 	public __goscriptAssign(source: queue): void {

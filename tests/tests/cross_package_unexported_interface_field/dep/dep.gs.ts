@@ -19,13 +19,16 @@ export class impl {
 	public _fields: {
 	}
 
-	constructor(init?: Partial<{}>) {
+	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
 		this._fields = {
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): impl {
-		return $.markAsStructValue(new impl(this))
+		return new impl(this, true)
 	}
 
 	public __goscriptAssign(source: impl): void {
@@ -57,14 +60,17 @@ export class Holder {
 		Hidden: hidden | null
 	}
 
-	constructor(init?: Partial<{Hidden?: hidden | null}>) {
+	constructor(init?: Partial<{Hidden?: hidden | null}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Hidden: init?.Hidden ?? (null! as hidden | null)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): Holder {
-		return $.markAsStructValue(new Holder(this))
+		return new Holder(this, true)
 	}
 
 	public __goscriptAssign(source: Holder): void {
@@ -83,5 +89,5 @@ export class Holder {
 }
 
 export function NewHolder(): Holder {
-	return $.markAsStructValue(new Holder({Hidden: $.interfaceValue<hidden | null>($.markAsStructValue(new impl()), "dep.impl", "dep.impl")}))
+	return new Holder({Hidden: $.interfaceValue<hidden | null>(new impl(undefined, true), "dep.impl", "dep.impl")}, true)
 }

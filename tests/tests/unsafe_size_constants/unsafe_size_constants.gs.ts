@@ -46,17 +46,20 @@ export class Data {
 		D: number
 	}
 
-	constructor(init?: Partial<{A?: number, B?: number, C?: number, D?: number}>) {
+	constructor(init?: Partial<{A?: number, B?: number, C?: number, D?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			A: init?.A ?? (0 as number),
 			B: init?.B ?? (0 as number),
 			C: init?.C ?? (0 as number),
 			D: init?.D ?? (0 as number)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): Data {
-		return $.markAsStructValue(new Data(this))
+		return new Data(this, true)
 	}
 
 	public __goscriptAssign(source: Data): void {
@@ -108,16 +111,19 @@ export class Mixed {
 		V: number[]
 	}
 
-	constructor(init?: Partial<{Flag?: boolean, N?: number, V?: number[]}>) {
+	constructor(init?: Partial<{Flag?: boolean, N?: number, V?: number[]}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Flag: init?.Flag ?? (false as boolean),
 			N: init?.N ?? (0 as number),
 			V: init?.V !== undefined ? $.cloneArrayValue(init.V, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 3)) : $.arrayValue(globalThis.Array.from({ length: 3 }, () => 0), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 3))
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): Mixed {
-		return $.markAsStructValue(new Mixed(this))
+		return new Mixed(this, true)
 	}
 
 	public __goscriptAssign(source: Mixed): void {
@@ -140,7 +146,7 @@ export class Mixed {
 export const dataSize: number = 16
 
 export async function main(): globalThis.Promise<void> {
-	let m: Mixed = $.markAsStructValue(new Mixed())
+	let m: Mixed = new Mixed(undefined, true)
 	let n = 10
 	await $.println("data size:", 16, 16)
 	await $.println("bytes for 10:", 160)

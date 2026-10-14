@@ -19,14 +19,17 @@ export class Holder {
 		Box: _unique.Box | $.VarRef<_unique.Box> | null
 	}
 
-	constructor(init?: Partial<{Box?: _unique.Box | $.VarRef<_unique.Box> | null}>) {
+	constructor(init?: Partial<{Box?: _unique.Box | $.VarRef<_unique.Box> | null}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Box: init?.Box ?? (null! as _unique.Box | $.VarRef<_unique.Box> | null)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): Holder {
-		return $.markAsStructValue(new Holder(this))
+		return new Holder(this, true)
 	}
 
 	public __goscriptAssign(source: Holder): void {
@@ -45,7 +48,7 @@ export class Holder {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let holder = (() => { const __goscriptLiteralField0 = _unique.NewBox(7); return $.markAsStructValue(new Holder({Box: __goscriptLiteralField0})) })()
+	let holder = (() => { const __goscriptLiteralField0 = _unique.NewBox(7); return new Holder({Box: __goscriptLiteralField0}, true) })()
 	await $.println("box:", $.pointerValue<_unique.Box>(holder.Box).Value)
 }
 

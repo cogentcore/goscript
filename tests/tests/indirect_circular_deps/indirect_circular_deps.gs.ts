@@ -16,14 +16,17 @@ export class A {
 		BB: $.Slice<B>
 	}
 
-	constructor(init?: Partial<{BB?: $.Slice<B>}>) {
+	constructor(init?: Partial<{BB?: $.Slice<B>}>, __goscriptValue?: boolean) {
 		this._fields = {
 			BB: init?.BB ?? (null! as $.Slice<B>)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): A {
-		return $.markAsStructValue(new A(this))
+		return new A(this, true)
 	}
 
 	public __goscriptAssign(source: A): void {
@@ -54,14 +57,17 @@ export class B {
 		AA: $.Slice<A>
 	}
 
-	constructor(init?: Partial<{AA?: $.Slice<A>}>) {
+	constructor(init?: Partial<{AA?: $.Slice<A>}>, __goscriptValue?: boolean) {
 		this._fields = {
 			AA: init?.AA ?? (null! as $.Slice<A>)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): B {
-		return $.markAsStructValue(new B(this))
+		return new B(this, true)
 	}
 
 	public __goscriptAssign(source: B): void {
@@ -80,11 +86,11 @@ export class B {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let a1 = $.markAsStructValue(new A())
-	let b1 = $.markAsStructValue(new B())
+	let a1 = new A(undefined, true)
+	let b1 = new B(undefined, true)
 
-	let a2 = $.markAsStructValue(new A({BB: $.arrayToSlice<B>([$.markAsStructValue($.cloneStructValue(b1))])}))
-	let b2 = $.markAsStructValue(new B({AA: $.arrayToSlice<A>([$.markAsStructValue($.cloneStructValue(a1))])}))
+	let a2 = new A({BB: $.arrayToSlice<B>([(b1).clone()])}, true)
+	let b2 = new B({AA: $.arrayToSlice<A>([(a1).clone()])}, true)
 
 	await $.println("a1:", a1.BB == null)
 	await $.println("b1:", b1.AA == null)

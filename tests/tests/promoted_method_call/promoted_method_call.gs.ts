@@ -16,14 +16,17 @@ export class base {
 		value: number
 	}
 
-	constructor(init?: Partial<{value?: number}>) {
+	constructor(init?: Partial<{value?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			value: init?.value ?? (0 as number)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): base {
-		return $.markAsStructValue(new base(this))
+		return new base(this, true)
 	}
 
 	public __goscriptAssign(source: base): void {
@@ -59,14 +62,17 @@ export class wrapper {
 		base: base
 	}
 
-	constructor(init?: Partial<{base?: base}>) {
+	constructor(init?: Partial<{base?: base}>, __goscriptValue?: boolean) {
 		this._fields = {
-			base: init?.base ? $.markAsStructValue($.cloneStructValue(init.base)) : $.markAsStructValue(new base())
+			base: init?.base ? init.base.clone() : new base(undefined, true)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): wrapper {
-		return $.markAsStructValue(new wrapper(this))
+		return new wrapper(this, true)
 	}
 
 	public __goscriptAssign(source: wrapper): void {
@@ -89,7 +95,7 @@ export class wrapper {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let w: wrapper | $.VarRef<wrapper> | null = new wrapper({base: $.markAsStructValue(new base({value: 3}))})
+	let w: wrapper | $.VarRef<wrapper> | null = new wrapper({base: new base({value: 3}, true)})
 	await $.println($.pointerValue<wrapper>(w).base.Add(4))
 
 	let add: ((n: number) => number | globalThis.Promise<number>) | null = $.functionValue(((__receiver) => (n: number) => __receiver.Add(n))($.pointerValue<wrapper>(w).base), ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo), "main.(*base).Add-fm")

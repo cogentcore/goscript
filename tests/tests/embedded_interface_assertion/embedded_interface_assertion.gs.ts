@@ -38,13 +38,16 @@ export class MyStruct {
 	public _fields: {
 	}
 
-	constructor(init?: Partial<{}>) {
+	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
 		this._fields = {
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): MyStruct {
-		return $.markAsStructValue(new MyStruct(this))
+		return new MyStruct(this, true)
 	}
 
 	public __goscriptAssign(source: MyStruct): void {
@@ -73,8 +76,8 @@ export class MyStruct {
 
 export async function main(): globalThis.Promise<void> {
 	let rwc: ReadCloser | null = null! as ReadCloser | null
-	let s = $.markAsStructValue(new MyStruct())
-	rwc = $.interfaceValue<ReadCloser | null>($.markAsStructValue($.cloneStructValue(s)), "main.MyStruct", "main.MyStruct")
+	let s = new MyStruct(undefined, true)
+	rwc = $.interfaceValue<ReadCloser | null>((s).clone(), "main.MyStruct", "main.MyStruct")
 
 	let [, ok] = $.typeAssertTuple<ReadCloser | null>(rwc, "main.ReadCloser")
 	if (ok) {

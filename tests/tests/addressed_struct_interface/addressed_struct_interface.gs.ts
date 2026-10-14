@@ -26,14 +26,17 @@ export class Buffer {
 		data: $.Slice<number>
 	}
 
-	constructor(init?: Partial<{data?: $.Slice<number>}>) {
+	constructor(init?: Partial<{data?: $.Slice<number>}>, __goscriptValue?: boolean) {
 		this._fields = {
 			data: init?.data ?? (null! as $.Slice<number>)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): Buffer {
-		return $.markAsStructValue(new Buffer(this))
+		return new Buffer(this, true)
 	}
 
 	public __goscriptAssign(source: Buffer): void {
@@ -62,7 +65,7 @@ export async function use(w: Writer | null): globalThis.Promise<void> {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let b: $.VarRef<Buffer> = $.varRef($.markAsStructValue(new Buffer()))
+	let b: $.VarRef<Buffer> = $.varRef(new Buffer(undefined, true))
 	await use($.interfaceValue<Writer | null>(b, "*main.Buffer", /* @__PURE__ */ $.pointerType("main.Buffer")))
 	await $.println($.bytesToString(b.value.data))
 }

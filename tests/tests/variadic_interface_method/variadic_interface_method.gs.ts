@@ -20,13 +20,16 @@ export class PathJoiner {
 	public _fields: {
 	}
 
-	constructor(init?: Partial<{}>) {
+	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
 		this._fields = {
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): PathJoiner {
-		return $.markAsStructValue(new PathJoiner(this))
+		return new PathJoiner(this, true)
 	}
 
 	public __goscriptAssign(source: PathJoiner): void {
@@ -55,7 +58,7 @@ export class PathJoiner {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let b: Basic | null = $.interfaceValue<Basic | null>($.markAsStructValue(new PathJoiner()), "main.PathJoiner", "main.PathJoiner")
+	let b: Basic | null = $.interfaceValue<Basic | null>(new PathJoiner(undefined, true), "main.PathJoiner", "main.PathJoiner")
 
 	// Test with multiple arguments
 	let result1 = (__goscriptAwait = $.pointerValue<Exclude<Basic, null>>(b).Join($.arrayToSlice<string>(["path", "to", "file"])), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)

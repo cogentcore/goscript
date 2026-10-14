@@ -20,14 +20,17 @@ export class Promise {
 		value: string
 	}
 
-	constructor(init?: Partial<{value?: string}>) {
+	constructor(init?: Partial<{value?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
 			value: init?.value ?? ("" as string)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): Promise {
-		return $.markAsStructValue(new Promise(this))
+		return new Promise(this, true)
 	}
 
 	public __goscriptAssign(source: Promise): void {
@@ -67,15 +70,18 @@ export class point {
 		y: number
 	}
 
-	constructor(init?: Partial<{x?: number, y?: number}>) {
+	constructor(init?: Partial<{x?: number, y?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			x: init?.x ?? (0 as number),
 			y: init?.y ?? (0 as number)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): point {
-		return $.markAsStructValue(new point(this))
+		return new point(this, true)
 	}
 
 	public __goscriptAssign(source: point): void {
@@ -109,7 +115,7 @@ export function __goscript_set_Array(__goscriptValue: $.Slice<string>): void {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let p = $.markAsStructValue(new Promise({value: "Promise"}))
+	let p = new Promise({value: "Promise"}, true)
 	await $.println("names:", 1, 1.5, String(1), $.arrayIndex(Array!, 0), p.value)
 
 	let a = 7
@@ -123,7 +129,7 @@ export async function main(): globalThis.Promise<void> {
 	let r = 128512
 	await $.println("rune string:", $.stringEqual($.runeToString(r), "😀"))
 
-	let points: point[] = $.arrayValue(globalThis.Array.from({ length: 2 }, () => $.markAsStructValue(new point())), /* @__PURE__ */ $.arrayType("main.point", 2))
+	let points: point[] = $.arrayValue(globalThis.Array.from({ length: 2 }, () => new point(undefined, true)), /* @__PURE__ */ $.arrayType("main.point", 2))
 	$.arrayIndex(points, 1).x = 3
 	await $.println("array:", $.arrayIndex(points, 1).x, $.arrayIndex(points, 0).y)
 

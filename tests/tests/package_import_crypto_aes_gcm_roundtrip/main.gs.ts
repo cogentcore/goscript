@@ -35,14 +35,17 @@ export class wrappedAEAD {
 		inner: cipher.AEAD | null
 	}
 
-	constructor(init?: Partial<{inner?: cipher.AEAD | null}>) {
+	constructor(init?: Partial<{inner?: cipher.AEAD | null}>, __goscriptValue?: boolean) {
 		this._fields = {
 			inner: init?.inner ?? (null! as cipher.AEAD | null)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): wrappedAEAD {
-		return $.markAsStructValue(new wrappedAEAD(this))
+		return new wrappedAEAD(this, true)
 	}
 
 	public __goscriptAssign(source: wrappedAEAD): void {
@@ -111,16 +114,19 @@ export class nestedSealer {
 		aad: $.Slice<number>
 	}
 
-	constructor(init?: Partial<{aead?: cipher.AEAD | null, nonce?: $.Slice<number>, aad?: $.Slice<number>}>) {
+	constructor(init?: Partial<{aead?: cipher.AEAD | null, nonce?: $.Slice<number>, aad?: $.Slice<number>}>, __goscriptValue?: boolean) {
 		this._fields = {
 			aead: init?.aead ?? (null! as cipher.AEAD | null),
 			nonce: init?.nonce ?? (null! as $.Slice<number>),
 			aad: init?.aad ?? (null! as $.Slice<number>)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): nestedSealer {
-		return $.markAsStructValue(new nestedSealer(this))
+		return new nestedSealer(this, true)
 	}
 
 	public __goscriptAssign(source: nestedSealer): void {

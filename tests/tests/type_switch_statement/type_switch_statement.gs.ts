@@ -20,14 +20,17 @@ export class RawValue {
 		Tag: number
 	}
 
-	constructor(init?: Partial<{Tag?: number}>) {
+	constructor(init?: Partial<{Tag?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Tag: init?.Tag ?? (0 as number)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): RawValue {
-		return $.markAsStructValue(new RawValue(this))
+		return new RawValue(this, true)
 	}
 
 	public __goscriptAssign(source: RawValue): void {
@@ -205,7 +208,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 	await $.println("oid", $.sliceLen((oid.value as ObjectIdentifier)), $.arrayIndex(oid.value!, 0), ok)
 
-	let raw: $.VarRef<RawValue> = $.varRef($.markAsStructValue(new RawValue()))
+	let raw: $.VarRef<RawValue> = $.varRef(new RawValue(undefined, true))
 	let rawValue: any = $.interfaceValue(raw, "*main.RawValue", /* @__PURE__ */ $.pointerType("main.RawValue"))
 	{
 		const __goscriptTypeSwitchValue = rawValue
@@ -223,7 +226,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("raw", raw.value.Tag, ok)
 
 	// A case variable holds a copy of a struct or array dynamic value.
-	let boxed: any = $.interfaceValue($.markAsStructValue(new RawValue({Tag: 1})), "main.RawValue", "main.RawValue")
+	let boxed: any = $.interfaceValue(new RawValue({Tag: 1}, true), "main.RawValue", "main.RawValue")
 	{
 		const __goscriptTypeSwitchValue = boxed
 		switch (true) {
@@ -261,7 +264,7 @@ export function parseObjectIdentifier(): [ObjectIdentifier, boolean] {
 }
 
 export function parseRawValue(): [RawValue, boolean] {
-	return [$.markAsStructValue(new RawValue({Tag: 9})), true]
+	return [new RawValue({Tag: 9}, true), true]
 }
 
 if ($.isMainScript(import.meta)) {

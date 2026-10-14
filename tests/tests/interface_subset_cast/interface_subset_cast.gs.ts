@@ -46,15 +46,18 @@ export class MyStruct {
 		Value2: string
 	}
 
-	constructor(init?: Partial<{Value1?: string, Value2?: string}>) {
+	constructor(init?: Partial<{Value1?: string, Value2?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Value1: init?.Value1 ?? ("" as string),
 			Value2: init?.Value2 ?? ("" as string)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): MyStruct {
-		return $.markAsStructValue(new MyStruct(this))
+		return new MyStruct(this, true)
 	}
 
 	public __goscriptAssign(source: MyStruct): void {
@@ -84,8 +87,8 @@ export class MyStruct {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let s = $.markAsStructValue(new MyStruct({Value1: "hello", Value2: "world"}))
-	let i1: MyInterface1 | null = $.interfaceValue<MyInterface1 | null>($.markAsStructValue($.cloneStructValue(s)), "main.MyStruct", "main.MyStruct")
+	let s = new MyStruct({Value1: "hello", Value2: "world"}, true)
+	let i1: MyInterface1 | null = $.interfaceValue<MyInterface1 | null>((s).clone(), "main.MyStruct", "main.MyStruct")
 
 	// Cast from larger interface to smaller interface (subset)
 	let i2: MyInterface2 | null = (i1 as MyInterface2 | null)

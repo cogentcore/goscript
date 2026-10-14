@@ -16,14 +16,17 @@ export class OtherStruct {
 		Label: string
 	}
 
-	constructor(init?: Partial<{Label?: string}>) {
+	constructor(init?: Partial<{Label?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Label: init?.Label ?? ("" as string)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): OtherStruct {
-		return $.markAsStructValue(new OtherStruct(this))
+		return new OtherStruct(this, true)
 	}
 
 	public __goscriptAssign(source: OtherStruct): void {

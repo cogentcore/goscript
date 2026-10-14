@@ -19,14 +19,17 @@ export class zone {
 		name: string
 	}
 
-	constructor(init?: Partial<{name?: string}>) {
+	constructor(init?: Partial<{name?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
 			name: init?.name ?? ("" as string)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): zone {
-		return $.markAsStructValue(new zone(this))
+		return new zone(this, true)
 	}
 
 	public __goscriptAssign(source: zone): void {
@@ -45,9 +48,9 @@ export class zone {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let a = ($.markAsStructValue($.cloneStructValue(_unique.Make($.markAsStructValue(new zone({name: "eth0"}))))) as _unique.Handle<zone>)
-	let b = ($.markAsStructValue($.cloneStructValue(_unique.Make($.markAsStructValue(new zone({name: "eth0"}))))) as _unique.Handle<zone>)
-	let c = ($.markAsStructValue($.cloneStructValue(_unique.Make($.markAsStructValue(new zone({name: "eth1"}))))) as _unique.Handle<zone>)
+	let a = ($.markAsStructValue($.cloneStructValue(_unique.Make(new zone({name: "eth0"}, true)))) as _unique.Handle<zone>)
+	let b = ($.markAsStructValue($.cloneStructValue(_unique.Make(new zone({name: "eth0"}, true)))) as _unique.Handle<zone>)
+	let c = ($.markAsStructValue($.cloneStructValue(_unique.Make(new zone({name: "eth1"}, true)))) as _unique.Handle<zone>)
 
 	await $.println($.structEqual(a, b))
 	await $.println($.structEqual(a, c))

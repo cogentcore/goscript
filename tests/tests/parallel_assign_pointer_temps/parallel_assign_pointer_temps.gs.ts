@@ -16,14 +16,17 @@ export class node {
 		next: number
 	}
 
-	constructor(init?: Partial<{next?: number}>) {
+	constructor(init?: Partial<{next?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			next: init?.next ?? (0 as number)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): node {
-		return $.markAsStructValue(new node(this))
+		return new node(this, true)
 	}
 
 	public __goscriptAssign(source: node): void {
@@ -54,14 +57,17 @@ export class queue {
 		value: number
 	}
 
-	constructor(init?: Partial<{value?: number}>) {
+	constructor(init?: Partial<{value?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			value: init?.value ?? (0 as number)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): queue {
-		return $.markAsStructValue(new queue(this))
+		return new queue(this, true)
 	}
 
 	public __goscriptAssign(source: queue): void {
@@ -88,7 +94,7 @@ export async function main(): globalThis.Promise<void> {
 	right = __goscriptAssign0_1
 	await $.println($.pointerValue<queue>(left).value, $.pointerValue<queue>(right).value)
 
-	let nodes = $.arrayValue([$.markAsStructValue(new node({next: 1})), $.markAsStructValue(new node({next: 0}))], /* @__PURE__ */ $.arrayType("main.node", 2))
+	let nodes = $.arrayValue([new node({next: 1}, true), new node({next: 0}, true)], /* @__PURE__ */ $.arrayType("main.node", 2))
 	let pc = 0
 	let inst: node | $.VarRef<node> | null = $.indexRef(nodes, pc)
 	let __goscriptAssign1_0: number = $.pointerValue<node>(inst).next

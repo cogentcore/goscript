@@ -31,15 +31,18 @@ export class Sub {
 		Y: string
 	}
 
-	constructor(init?: Partial<{X?: number, Y?: string}>) {
+	constructor(init?: Partial<{X?: number, Y?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
 			X: init?.X ?? (0 as number),
 			Y: init?.Y ?? ("" as string)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): Sub {
-		return $.markAsStructValue(new Sub(this))
+		return new Sub(this, true)
 	}
 
 	public __goscriptAssign(source: Sub): void {
@@ -89,16 +92,19 @@ export class T {
 		S: Sub
 	}
 
-	constructor(init?: Partial<{Mbr1?: string, Mbr2?: number, S?: Sub}>) {
+	constructor(init?: Partial<{Mbr1?: string, Mbr2?: number, S?: Sub}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Mbr1: init?.Mbr1 ?? ("" as string),
 			Mbr2: init?.Mbr2 ?? (0 as number),
-			S: init?.S ? $.markAsStructValue($.cloneStructValue(init.S)) : $.markAsStructValue(new Sub())
+			S: init?.S ? init.S.clone() : new Sub(undefined, true)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): T {
-		return $.markAsStructValue(new T(this))
+		return new T(this, true)
 	}
 
 	public __goscriptAssign(source: T): void {
@@ -118,7 +124,7 @@ export class T {
 	)
 }
 
-export let pt: $.VarRef<T> = $.varRef($.markAsStructValue(new T()))
+export let pt: $.VarRef<T> = $.varRef(new T(undefined, true))
 
 export function __goscript_set_pt(__goscriptValue: T): void {
 	$.assignStruct(pt.value, __goscriptValue)
@@ -131,7 +137,7 @@ export function fieldValue(obj: any, fld: reflect.StructField): reflect.Value {
 }
 
 export async function newAtOffsets(): globalThis.Promise<void> {
-	let typ = reflect.TypeOf($.interfaceValue($.markAsStructValue($.cloneStructValue(pt.value)), "main.T", "main.T"))
+	let typ = reflect.TypeOf($.interfaceValue((pt.value).clone(), "main.T", "main.T"))
 	let [fld, ] = await $.pointerValue<Exclude<reflect.Type, null>>(typ).FieldByName("Mbr2")
 	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(fieldValue($.interfaceValue(pt, "*main.T", /* @__PURE__ */ $.pointerType("main.T")), $.markAsStructValue($.cloneStructValue(fld))))).Elem())).Set($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.basicInterfaceValue(10, "int")))))
 	await $.println("newat-offset:", pt.value.Mbr2)
@@ -174,14 +180,17 @@ export async function main(): globalThis.Promise<void> {
 			Count: number
 		}
 
-		constructor(init?: Partial<{Count?: number}>) {
+		constructor(init?: Partial<{Count?: number}>, __goscriptValue?: boolean) {
 			this._fields = {
 				Count: init?.Count ?? (0 as number)
+			}
+			if (__goscriptValue) {
+				(this as any)[$.structValueMarker] = true
 			}
 		}
 
 		public clone(): holder {
-			return $.markAsStructValue(new holder(this))
+			return new holder(this, true)
 		}
 
 		public __goscriptAssign(source: holder): void {

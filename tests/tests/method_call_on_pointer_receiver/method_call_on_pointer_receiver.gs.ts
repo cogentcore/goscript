@@ -25,15 +25,18 @@ export class MyStruct {
 		MyString: string
 	}
 
-	constructor(init?: Partial<{MyInt?: number, MyString?: string}>) {
+	constructor(init?: Partial<{MyInt?: number, MyString?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
 			MyInt: init?.MyInt ?? (0 as number),
 			MyString: init?.MyString ?? ("" as string)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): MyStruct {
-		return $.markAsStructValue(new MyStruct(this))
+		return new MyStruct(this, true)
 	}
 
 	public __goscriptAssign(source: MyStruct): void {
@@ -70,14 +73,17 @@ export class setterStruct {
 		value: number
 	}
 
-	constructor(init?: Partial<{value?: number}>) {
+	constructor(init?: Partial<{value?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			value: init?.value ?? (0 as number)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): setterStruct {
-		return $.markAsStructValue(new setterStruct(this))
+		return new setterStruct(this, true)
 	}
 
 	public __goscriptAssign(source: setterStruct): void {
@@ -118,14 +124,17 @@ export class digest {
 		writes: number
 	}
 
-	constructor(init?: Partial<{writes?: number}>) {
+	constructor(init?: Partial<{writes?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			writes: init?.writes ?? (0 as number)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): digest {
-		return $.markAsStructValue(new digest(this))
+		return new digest(this, true)
 	}
 
 	public __goscriptAssign(source: digest): void {

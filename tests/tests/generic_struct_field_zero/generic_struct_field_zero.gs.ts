@@ -16,14 +16,17 @@ export class box {
 		Value: any
 	}
 
-	constructor(init?: Partial<{Value?: any}>) {
+	constructor(init?: Partial<{Value?: any}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Value: init?.Value !== undefined ? $.copyElement(init.Value) : (null! as any)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): box {
-		return $.markAsStructValue(new box(this))
+		return new box(this, true)
 	}
 
 	public __goscriptAssign(source: box): void {
@@ -54,14 +57,17 @@ export class point {
 		X: number
 	}
 
-	constructor(init?: Partial<{X?: number}>) {
+	constructor(init?: Partial<{X?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			X: init?.X ?? (0 as number)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): point {
-		return $.markAsStructValue(new point(this))
+		return new point(this, true)
 	}
 
 	public __goscriptAssign(source: point): void {
@@ -89,7 +95,7 @@ export async function main(): globalThis.Promise<void> {
 	let mapBox: box = $.markAsStructValue(new box({Value: null! as globalThis.Map<string, number> | null}))
 	await $.println("map", mapBox.Value == null)
 
-	let pointBox: box = $.markAsStructValue(new box({Value: $.markAsStructValue(new point())}))
+	let pointBox: box = $.markAsStructValue(new box({Value: new point(undefined, true)}))
 	await $.println("struct", pointBox.Value.X)
 
 	let explicit = $.markAsStructValue(new box({Value: 0}))

@@ -28,14 +28,17 @@ export class counter {
 		n: number
 	}
 
-	constructor(init?: Partial<{n?: number}>) {
+	constructor(init?: Partial<{n?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			n: init?.n ?? (0 as number)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): counter {
-		return $.markAsStructValue(new counter(this))
+		return new counter(this, true)
 	}
 
 	public __goscriptAssign(source: counter): void {
@@ -76,14 +79,17 @@ export class box {
 		v: any
 	}
 
-	constructor(init?: Partial<{v?: any}>) {
+	constructor(init?: Partial<{v?: any}>, __goscriptValue?: boolean) {
 		this._fields = {
 			v: init?.v !== undefined ? $.copyElement(init.v) : (null! as any)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): box {
-		return $.markAsStructValue(new box(this))
+		return new box(this, true)
 	}
 
 	public __goscriptAssign(source: box): void {

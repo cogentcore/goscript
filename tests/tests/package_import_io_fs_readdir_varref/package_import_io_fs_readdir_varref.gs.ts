@@ -22,14 +22,17 @@ export class openOnlyFS {
 		fsys: fstest.MapFS
 	}
 
-	constructor(init?: Partial<{fsys?: fstest.MapFS}>) {
+	constructor(init?: Partial<{fsys?: fstest.MapFS}>, __goscriptValue?: boolean) {
 		this._fields = {
 			fsys: init?.fsys ?? (null! as fstest.MapFS)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): openOnlyFS {
-		return $.markAsStructValue(new openOnlyFS(this))
+		return new openOnlyFS(this, true)
 	}
 
 	public __goscriptAssign(source: openOnlyFS): void {
@@ -55,7 +58,7 @@ export class openOnlyFS {
 export async function main(): globalThis.Promise<void> {
 	let fsys: fstest.MapFS = $.makeMap<string, fstest.MapFile | $.VarRef<fstest.MapFile> | null>([["b.txt", new fstest.MapFile({Data: new Uint8Array([98])})], ["a.txt", new fstest.MapFile({Data: new Uint8Array([97])})], ["dir/nested.txt", new fstest.MapFile({Data: new Uint8Array([110, 101, 115, 116, 101, 100])})]])
 
-	let __goscriptTuple0: any = await fs.ReadDir($.interfaceValue<fs.FS | null>($.markAsStructValue(new openOnlyFS({fsys: fsys})), "main.openOnlyFS", "main.openOnlyFS")!, ".")
+	let __goscriptTuple0: any = await fs.ReadDir($.interfaceValue<fs.FS | null>(new openOnlyFS({fsys: fsys}, true), "main.openOnlyFS", "main.openOnlyFS")!, ".")
 	let entries: $.Slice<fs.DirEntry | null> = __goscriptTuple0[0]
 	let err = __goscriptTuple0[1]
 	if (err != null) {

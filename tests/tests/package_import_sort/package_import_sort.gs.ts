@@ -57,14 +57,17 @@ export class descending {
 		values: $.Slice<number>
 	}
 
-	constructor(init?: Partial<{values?: $.Slice<number>}>) {
+	constructor(init?: Partial<{values?: $.Slice<number>}>, __goscriptValue?: boolean) {
 		this._fields = {
 			values: init?.values ?? (null! as $.Slice<number>)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): descending {
-		return $.markAsStructValue(new descending(this))
+		return new descending(this, true)
 	}
 
 	public __goscriptAssign(source: descending): void {
@@ -203,8 +206,8 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("Custom slice is sorted:", isSliceSorted)
 
 	// Test custom sort.Interface values.
-	let custom = $.markAsStructValue(new descending({values: $.arrayToSlice<number>([1, 3, 2])}))
-	await sort2.Sort($.interfaceValue<sort2.Interface | null>($.markAsStructValue($.cloneStructValue(custom)), "main.descending", "main.descending")!)
+	let custom = new descending({values: $.arrayToSlice<number>([1, 3, 2])}, true)
+	await sort2.Sort($.interfaceValue<sort2.Interface | null>((custom).clone(), "main.descending", "main.descending")!)
 	await $.println("Custom interface sort:", $.arrayIndex(custom.values!, 0), $.arrayIndex(custom.values!, 1), $.arrayIndex(custom.values!, 2))
 
 	let namedSlice: $.Slice<number> = $.arrayToSlice<number>([4, 1, 3])

@@ -28,14 +28,17 @@ export class AStruct {
 		Msg: string
 	}
 
-	constructor(init?: Partial<{Msg?: string}>) {
+	constructor(init?: Partial<{Msg?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Msg: init?.Msg ?? ("" as string)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): AStruct {
-		return $.markAsStructValue(new AStruct(this))
+		return new AStruct(this, true)
 	}
 
 	public __goscriptAssign(source: AStruct): void {

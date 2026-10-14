@@ -17,13 +17,16 @@ export class item {
 	public _fields: {
 	}
 
-	constructor(init?: Partial<{}>) {
+	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
 		this._fields = {
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): item {
-		return $.markAsStructValue(new item(this))
+		return new item(this, true)
 	}
 
 	public __goscriptAssign(source: item): void {
@@ -80,7 +83,7 @@ export async function main(): globalThis.Promise<void> {
 		}
 	}
 	await $.println("Completed successfully")
-	await describe($.interfaceValue($.markAsStructValue(new item()), "main.item", "main.item"))
+	await describe($.interfaceValue(new item(undefined, true), "main.item", "main.item"))
 	await describe("nope")
 }
 

@@ -25,15 +25,18 @@ export class file {
 		data: $.Slice<number>
 	}
 
-	constructor(init?: Partial<{name?: string, data?: $.Slice<number>}>) {
+	constructor(init?: Partial<{name?: string, data?: $.Slice<number>}>, __goscriptValue?: boolean) {
 		this._fields = {
 			name: init?.name ?? ("" as string),
 			data: init?.data ?? (null! as $.Slice<number>)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): file {
-		return $.markAsStructValue(new file(this))
+		return new file(this, true)
 	}
 
 	public __goscriptAssign(source: file): void {

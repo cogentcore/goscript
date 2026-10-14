@@ -16,14 +16,17 @@ export class Counter {
 		value: number
 	}
 
-	constructor(init?: Partial<{value?: number}>) {
+	constructor(init?: Partial<{value?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			value: init?.value ?? (0 as number)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): Counter {
-		return $.markAsStructValue(new Counter(this))
+		return new Counter(this, true)
 	}
 
 	public __goscriptAssign(source: Counter): void {
@@ -53,7 +56,7 @@ export class Counter {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let original = $.varRef($.markAsStructValue(new Counter({value: 10})))
+	let original = $.varRef(new Counter({value: 10}, true))
 	let pointerFromValue: Counter | $.VarRef<Counter> | null = $.markAsStructValue($.cloneStructValue(original.value)).PointerAfterIncrement()
 
 	await $.println("Value receiver pointer value:", Counter.prototype.Value.call(pointerFromValue))

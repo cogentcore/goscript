@@ -26,14 +26,17 @@ export class blockImpl {
 		size: number
 	}
 
-	constructor(init?: Partial<{size?: number}>) {
+	constructor(init?: Partial<{size?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			size: init?.size ?? (0 as number)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): blockImpl {
-		return $.markAsStructValue(new blockImpl(this))
+		return new blockImpl(this, true)
 	}
 
 	public __goscriptAssign(source: blockImpl): void {

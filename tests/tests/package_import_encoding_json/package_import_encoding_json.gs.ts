@@ -34,14 +34,17 @@ export class Holder {
 		Tags: globalThis.Map<string, number> | null
 	}
 
-	constructor(init?: Partial<{Tags?: globalThis.Map<string, number> | null}>) {
+	constructor(init?: Partial<{Tags?: globalThis.Map<string, number> | null}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Tags: init?.Tags ?? (null! as globalThis.Map<string, number> | null)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): Holder {
-		return $.markAsStructValue(new Holder(this))
+		return new Holder(this, true)
 	}
 
 	public __goscriptAssign(source: Holder): void {
@@ -108,7 +111,7 @@ export class Enc {
 		Nested: Enc | $.VarRef<Enc> | null
 	}
 
-	constructor(init?: Partial<{Width?: number, Image?: $.Slice<number>, Frames?: $.Slice<$.Slice<number>>, Named?: globalThis.Map<string, $.Slice<number>> | null, Nested?: Enc | $.VarRef<Enc> | null}>) {
+	constructor(init?: Partial<{Width?: number, Image?: $.Slice<number>, Frames?: $.Slice<$.Slice<number>>, Named?: globalThis.Map<string, $.Slice<number>> | null, Nested?: Enc | $.VarRef<Enc> | null}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Width: init?.Width ?? (0 as number),
 			Image: init?.Image ?? (null! as $.Slice<number>),
@@ -116,10 +119,13 @@ export class Enc {
 			Named: init?.Named ?? (null! as globalThis.Map<string, $.Slice<number>> | null),
 			Nested: init?.Nested ?? (null! as Enc | $.VarRef<Enc> | null)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): Enc {
-		return $.markAsStructValue(new Enc(this))
+		return new Enc(this, true)
 	}
 
 	public __goscriptAssign(source: Enc): void {
@@ -163,15 +169,18 @@ export class Event {
 		At: time.Time
 	}
 
-	constructor(init?: Partial<{Name?: string, At?: time.Time}>) {
+	constructor(init?: Partial<{Name?: string, At?: time.Time}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Name: init?.Name ?? ("" as string),
 			At: init?.At ? $.markAsStructValue($.cloneStructValue(init.At)) : $.markAsStructValue(new time.Time())
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): Event {
-		return $.markAsStructValue(new Event(this))
+		return new Event(this, true)
 	}
 
 	public __goscriptAssign(source: Event): void {
@@ -221,16 +230,19 @@ export class Person {
 		Active: boolean
 	}
 
-	constructor(init?: Partial<{Name?: string, Age?: number, Active?: boolean}>) {
+	constructor(init?: Partial<{Name?: string, Age?: number, Active?: boolean}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Name: init?.Name ?? ("" as string),
 			Age: init?.Age ?? (0 as number),
 			Active: init?.Active ?? (false as boolean)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): Person {
-		return $.markAsStructValue(new Person(this))
+		return new Person(this, true)
 	}
 
 	public __goscriptAssign(source: Person): void {
@@ -254,8 +266,8 @@ export async function main(): globalThis.Promise<void> {
 	let results: $.Slice<string> = null! as $.Slice<string>
 
 	// Marshal a simple struct
-	let p = $.markAsStructValue(new Person({Name: "Alice", Age: 30, Active: true}))
-	let __goscriptTuple0: any = json.Marshal($.interfaceValue($.markAsStructValue($.cloneStructValue(p)), "main.Person", "main.Person"))
+	let p = new Person({Name: "Alice", Age: 30, Active: true}, true)
+	let __goscriptTuple0: any = json.Marshal($.interfaceValue((p).clone(), "main.Person", "main.Person"))
 	let b: $.Slice<number> = __goscriptTuple0[0]
 	let err = __goscriptTuple0[1]
 	if (err != null) {
@@ -263,7 +275,7 @@ export async function main(): globalThis.Promise<void> {
 	} else {
 		results = $.append(results, $.concatString("Marshal: ", $.bytesToString(b)))
 	}
-	let __goscriptTuple1: any = json.MarshalIndent($.interfaceValue($.markAsStructValue($.cloneStructValue(p)), "main.Person", "main.Person"), "", "  ")
+	let __goscriptTuple1: any = json.MarshalIndent($.interfaceValue((p).clone(), "main.Person", "main.Person"), "", "  ")
 	let indented: $.Slice<number> = __goscriptTuple1[0]
 	err = __goscriptTuple1[1]
 	if (err != null) {
@@ -273,7 +285,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 
 	// Unmarshal into a struct
-	let q: $.VarRef<Person> = $.varRef($.markAsStructValue(new Person()))
+	let q: $.VarRef<Person> = $.varRef(new Person(undefined, true))
 	{
 		let __goscriptShadow0 = json.Unmarshal(new Uint8Array([123, 34, 110, 97, 109, 101, 34, 58, 34, 66, 111, 98, 34, 44, 34, 97, 103, 101, 34, 58, 50, 53, 44, 34, 97, 99, 116, 105, 118, 101, 34, 58, 102, 97, 108, 115, 101, 125]), $.interfaceValue(q, "*main.Person", /* @__PURE__ */ $.pointerType("main.Person")))
 		if (__goscriptShadow0 != null) {
@@ -321,7 +333,7 @@ export async function main(): globalThis.Promise<void> {
 	let m3: $.VarRef<globalThis.Map<string, number> | null> = $.varRef(null! as globalThis.Map<string, number> | null)
 	json.Unmarshal(new Uint8Array([123, 34, 122, 34, 58, 51, 125]), $.interfaceValue(m3, "*map[string]int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("int")))))
 	await $.println("nil map:", $.len(m3.value), $.mapGet<string, number, number>(m3.value, "z", 0)[0])
-	let h = $.varRef($.markAsStructValue(new Holder({Tags: $.makeMap<string, number>([["keep", 1]])})))
+	let h = $.varRef(new Holder({Tags: $.makeMap<string, number>([["keep", 1]])}, true))
 	json.Unmarshal(new Uint8Array([123, 34, 84, 97, 103, 115, 34, 58, 123, 34, 97, 100, 100, 34, 58, 50, 125, 125]), $.interfaceValue(h, "*main.Holder", /* @__PURE__ */ $.pointerType("main.Holder")))
 	await $.println("merge field:", $.len(h.value.Tags), $.mapGet<string, number, number>(h.value.Tags, "keep", 0)[0], $.mapGet<string, number, number>(h.value.Tags, "add", 0)[0])
 
@@ -352,11 +364,11 @@ export async function byteSliceFields(): globalThis.Promise<void> {
 
 export async function timeField(): globalThis.Promise<void> {
 	let at = $.markAsStructValue($.cloneStructValue(time.Date(2025, 5, 15, 1, 10, 42, 123456789, time.UTC)))
-	let __goscriptTuple3: any = json.Marshal($.interfaceValue($.markAsStructValue(new Event({Name: "win", At: $.markAsStructValue($.cloneStructValue(at))})), "main.Event", "main.Event"))
+	let __goscriptTuple3: any = json.Marshal($.interfaceValue(new Event({Name: "win", At: $.markAsStructValue($.cloneStructValue(at))}, true), "main.Event", "main.Event"))
 	let b: $.Slice<number> = __goscriptTuple3[0]
 	let err = __goscriptTuple3[1]
 	await $.println($.bytesToString(b), err == null)
-	let ev: $.VarRef<Event> = $.varRef($.markAsStructValue(new Event()))
+	let ev: $.VarRef<Event> = $.varRef(new Event(undefined, true))
 	err = json.Unmarshal(b, $.interfaceValue(ev, "*main.Event", /* @__PURE__ */ $.pointerType("main.Event")))
 	await $.println("event:", err == null, ev.value.Name, $.markAsStructValue($.cloneStructValue(ev.value.At)).Equal($.markAsStructValue($.cloneStructValue(at))))
 }

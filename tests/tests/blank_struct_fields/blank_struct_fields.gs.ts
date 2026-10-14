@@ -34,16 +34,19 @@ export class padded {
 		_blank2: Uint8Array
 	}
 
-	constructor(init?: Partial<{_blank0?: Uint8Array, Value?: number, _blank2?: Uint8Array}>) {
+	constructor(init?: Partial<{_blank0?: Uint8Array, Value?: number, _blank2?: Uint8Array}>, __goscriptValue?: boolean) {
 		this._fields = {
 			_blank0: init?._blank0 !== undefined ? $.cloneArrayValue(init._blank0, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 2)) : $.arrayValue(new Uint8Array(2)),
 			Value: init?.Value ?? (0 as number),
 			_blank2: init?._blank2 !== undefined ? $.cloneArrayValue(init._blank2, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 3)) : $.arrayValue(new Uint8Array(3))
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): padded {
-		return $.markAsStructValue(new padded(this))
+		return new padded(this, true)
 	}
 
 	public __goscriptAssign(source: padded): void {
@@ -63,7 +66,7 @@ export class padded {
 	)
 }
 
-export let featureBlock: {"_blank0": padded, "Enabled": boolean, "_blank2": padded} = $.anonymousStructValue({"_blank0": $.markAsStructValue(new padded()), "Enabled": false, "_blank2": $.markAsStructValue(new padded())}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("_", "main.padded", [0], 0, false, { key: "_blank0", pkgPath: "github.com/s4wave/goscript/tests/tests/blank_struct_fields" }), /* @__PURE__ */ $.structField("Enabled", /* @__PURE__ */ $.basicType("bool"), [1], 24, true), /* @__PURE__ */ $.structField("_", "main.padded", [2], 32, false, { key: "_blank2", pkgPath: "github.com/s4wave/goscript/tests/tests/blank_struct_fields" })] })
+export let featureBlock: {"_blank0": padded, "Enabled": boolean, "_blank2": padded} = $.anonymousStructValue({"_blank0": new padded(undefined, true), "Enabled": false, "_blank2": new padded(undefined, true)}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("_", "main.padded", [0], 0, false, { key: "_blank0", pkgPath: "github.com/s4wave/goscript/tests/tests/blank_struct_fields" }), /* @__PURE__ */ $.structField("Enabled", /* @__PURE__ */ $.basicType("bool"), [1], 24, true), /* @__PURE__ */ $.structField("_", "main.padded", [2], 32, false, { key: "_blank2", pkgPath: "github.com/s4wave/goscript/tests/tests/blank_struct_fields" })] })
 
 export function __goscript_set_featureBlock(__goscriptValue: {"_blank0": padded, "Enabled": boolean, "_blank2": padded}): void {
 	$.assignStruct(featureBlock, __goscriptValue)
@@ -73,8 +76,8 @@ export async function main(): globalThis.Promise<void> {
 	featureBlock.Enabled = true
 	await $.println(featureBlock.Enabled)
 
-	let original = $.markAsStructValue(new padded({Value: 7}))
-	let copy = $.markAsStructValue($.cloneStructValue(original))
+	let original = new padded({Value: 7}, true)
+	let copy = (original).clone()
 	copy.Value = 8
 	await $.println(original.Value, copy.Value)
 }

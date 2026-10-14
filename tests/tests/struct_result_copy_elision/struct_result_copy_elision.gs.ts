@@ -13,15 +13,18 @@ export class Pos {
 		Char: number
 	}
 
-	constructor(init?: Partial<{Line?: number, Char?: number}>) {
+	constructor(init?: Partial<{Line?: number, Char?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Line: init?.Line ?? (0 as number),
 			Char: init?.Char ?? (0 as number)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): Pos {
-		return $.markAsStructValue(new Pos(this))
+		return new Pos(this, true)
 	}
 
 	static {
@@ -47,15 +50,18 @@ export class Region {
 		End: Pos
 	}
 
-	constructor(init?: Partial<{Start?: Pos, End?: Pos}>) {
+	constructor(init?: Partial<{Start?: Pos, End?: Pos}>, __goscriptValue?: boolean) {
 		this._fields = {
-			Start: init?.Start ? $.markAsStructValue($.cloneStructValue(init.Start)) : $.markAsStructValue(new Pos()),
-			End: init?.End ? $.markAsStructValue($.cloneStructValue(init.End)) : $.markAsStructValue(new Pos())
+			Start: init?.Start ? init.Start.clone() : new Pos(undefined, true),
+			End: init?.End ? init.End.clone() : new Pos(undefined, true)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): Region {
-		return $.markAsStructValue(new Region(this))
+		return new Region(this, true)
 	}
 
 	static {
@@ -81,25 +87,28 @@ export class Rule {
 		pos: Pos
 	}
 
-	constructor(init?: Partial<{Name?: string, pos?: Pos}>) {
+	constructor(init?: Partial<{Name?: string, pos?: Pos}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Name: init?.Name ?? ("" as string),
-			pos: init?.pos ? $.markAsStructValue($.cloneStructValue(init.pos)) : $.markAsStructValue(new Pos())
+			pos: init?.pos ? init.pos.clone() : new Pos(undefined, true)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): Rule {
-		return $.markAsStructValue(new Rule(this))
+		return new Rule(this, true)
 	}
 
 	public Pos(): Pos {
 		const r: Rule | $.VarRef<Rule> | null = this;
-		return $.markAsStructValue($.cloneStructValue($.pointerValue<Rule>(r).pos))
+		return ($.pointerValue<Rule>(r).pos).clone()
 	}
 
 	public ValuePos(): Pos {
 		const r = this;
-		return $.markAsStructValue($.cloneStructValue(r.pos))
+		return (r.pos).clone()
 	}
 
 	static {
@@ -125,15 +134,18 @@ export class key {
 		b: number
 	}
 
-	constructor(init?: Partial<{a?: number, b?: number}>) {
+	constructor(init?: Partial<{a?: number, b?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			a: init?.a ?? (0 as number),
 			b: init?.b ?? (0 as number)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): key {
-		return $.markAsStructValue(new key(this))
+		return new key(this, true)
 	}
 
 	static {
@@ -149,7 +161,7 @@ export class key {
 	)
 }
 
-export let global: Pos = $.markAsStructValue(new Pos())
+export let global: Pos = new Pos(undefined, true)
 
 export function __goscript_set_global(__goscriptValue: Pos): void {
 	$.assignStruct(global, __goscriptValue)
@@ -162,36 +174,36 @@ export function __goscript_set_saved(__goscriptValue: Pos | $.VarRef<Pos> | null
 }
 
 export function globalPos(): Pos {
-	return $.markAsStructValue($.cloneStructValue(global))
+	return (global).clone()
 }
 
 export function named(): Pos {
-	let p: $.VarRef<Pos> = $.varRef($.markAsStructValue(new Pos()))
+	let p: $.VarRef<Pos> = $.varRef(new Pos(undefined, true))
 	saved = p
 	p.value.Line = 3
-	return $.markAsStructValue($.cloneStructValue(p.value))
+	return (p.value).clone()
 }
 
 export function namedDefer(): Pos {
-	let p: Pos = $.markAsStructValue(new Pos())
+	let p: Pos = new Pos(undefined, true)
 	using __defer = new $.DisposableStack()
 	__defer.defer(() => { ((): void => {
 		p.Char = 9
 	})() })
 	p.Line = 4
-	const __goscriptReturn0: Pos = $.markAsStructValue($.cloneStructValue(p))
+	const __goscriptReturn0: Pos = (p).clone()
 	p = __goscriptReturn0
 	__defer.dispose()
-	return $.markAsStructValue($.cloneStructValue(p))
+	return (p).clone()
 	throw new globalThis.Error("goscript: unreachable return")
 }
 
 export function makeRegion(l: number): Region {
-	return $.markAsStructValue(new Region({Start: $.markAsStructValue(new Pos({Line: l, Char: 1})), End: $.markAsStructValue(new Pos({Line: l, Char: 2}))}))
+	return new Region({Start: new Pos({Line: l, Char: 1}, true), End: new Pos({Line: l, Char: 2}, true)}, true)
 }
 
 export function region(r: Region | $.VarRef<Region> | null): Region {
-	return $.markAsStructValue($.cloneStructValue($.pointerValue<Region>(r)))
+	return ($.pointerValue<Region>(r)).clone()
 }
 
 export function identity(__typeArgs: $.GenericTypeArgs | undefined, v: any): any {
@@ -199,7 +211,7 @@ export function identity(__typeArgs: $.GenericTypeArgs | undefined, v: any): any
 }
 
 export async function main(): globalThis.Promise<void> {
-	let r: Rule | $.VarRef<Rule> | null = new Rule({Name: "r", pos: $.markAsStructValue(new Pos({Line: 1, Char: 2}))})
+	let r: Rule | $.VarRef<Rule> | null = new Rule({Name: "r", pos: new Pos({Line: 1, Char: 2}, true)})
 	let p = Rule.prototype.Pos.call(r)
 	p.Line = 10
 	await $.println($.pointerValue<Rule>(r).pos.Line, p.Line)
@@ -208,7 +220,7 @@ export async function main(): globalThis.Promise<void> {
 	v.Char = 20
 	await $.println($.pointerValue<Rule>(r).pos.Char, v.Char)
 
-	$.assignStruct(global, $.markAsStructValue(new Pos({Line: 5, Char: 6})))
+	$.assignStruct(global, new Pos({Line: 5, Char: 6}, true))
 	let g = globalPos()
 	g.Line = 50
 	await $.println(global.Line, g.Line)
@@ -224,37 +236,37 @@ export async function main(): globalThis.Promise<void> {
 	reg.Start.Line = 70
 	await $.println(reg.Start.Line, reg.End.Line)
 
-	let src = $.varRef($.markAsStructValue(new Region({Start: $.markAsStructValue(new Pos({Line: 1, Char: 1}))})))
+	let src = $.varRef(new Region({Start: new Pos({Line: 1, Char: 1}, true)}, true))
 	let cp = region(src)
 	cp.Start.Line = 99
 	await $.println(src.value.Start.Line, cp.Start.Line)
 
-	let id = ($.markAsStructValue($.cloneStructValue(identity({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.Region", zero: () => $.markAsStructValue(new Region()) }}, $.markAsStructValue($.cloneStructValue(src.value))))) as Region)
+	let id = ((identity({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.Region", zero: () => new Region(undefined, true) }}, (src.value).clone())).clone() as Region)
 	id.End.Char = 42
 	await $.println(src.value.End.Char, id.End.Char)
 
-	let arr: Pos[] = $.arrayValue(globalThis.Array.from({ length: 2 }, () => $.markAsStructValue(new Pos())), /* @__PURE__ */ $.arrayType("main.Pos", 2))
+	let arr: Pos[] = $.arrayValue(globalThis.Array.from({ length: 2 }, () => new Pos(undefined, true)), /* @__PURE__ */ $.arrayType("main.Pos", 2))
 	$.assignStruct(arr[0], Rule.prototype.Pos.call(r))
 	$.arrayIndex(arr, 0).Line = 11
 	await $.println($.pointerValue<Rule>(r).pos.Line, $.arrayIndex(arr, 0).Line)
 
 	let m: globalThis.Map<key, number> | null = $.makeMap<key, number>([])
-	let k = $.markAsStructValue(new key({a: 1, b: 2}))
-	$.mapSet(m, $.markAsStructValue($.cloneStructValue(k)), 1)
+	let k = new key({a: 1, b: 2}, true)
+	$.mapSet(m, (k).clone(), 1)
 	k.a = 5
 	let [, ok] = $.mapGet<key, number, number>(m, k, 0)
-	await $.println($.len(m), ok, $.mapGet<key, number, number>(m, $.markAsStructValue(new key({a: 1, b: 2})), 0)[0])
+	await $.println($.len(m), ok, $.mapGet<key, number, number>(m, new key({a: 1, b: 2}, true), 0)[0])
 	k.a = 1
 	await $.println($.mapGet<key, number, number>(m, k, 0)[0])
-	$.deleteMapEntry(m, $.markAsStructValue($.cloneStructValue(k)))
+	$.deleteMapEntry(m, (k).clone())
 	await $.println($.len(m))
 
 	let m2: globalThis.Map<Pos, Region> | null = $.makeMap<Pos, Region>([])
 	$.mapSet(m2, Rule.prototype.Pos.call(r), makeRegion(1))
 	let q = Rule.prototype.Pos.call(r)
-	let got = $.markAsStructValue($.cloneStructValue($.mapGet<Pos, Region, Region>(m2, q, $.markAsStructValue(new Region()))[0]))
+	let got = ($.mapGet<Pos, Region, Region>(m2, q, new Region(undefined, true))[0]).clone()
 	got.Start.Line = 100
-	await $.println($.mapGet<Pos, Region, Region>(m2, q, $.markAsStructValue(new Region()))[0].Start.Line, got.Start.Line)
+	await $.println($.mapGet<Pos, Region, Region>(m2, q, new Region(undefined, true))[0].Start.Line, got.Start.Line)
 }
 
 if ($.isMainScript(import.meta)) {

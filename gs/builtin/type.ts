@@ -1290,6 +1290,10 @@ function isNumberElementType(typeInfo: string | TypeInfo | undefined): boolean {
 // Symbol used to mark struct instances that represent values (not pointers)
 const STRUCT_VALUE_MARKER = Symbol('structValue')
 
+// structValueMarker is the property that marks an object as a struct value,
+// which the constructors of generated struct classes set themselves.
+export const structValueMarker: symbol = STRUCT_VALUE_MARKER
+
 // markAsStructValue Mark a struct instance as representing a value (not pointer).
 export function markAsStructValue<T>(value: T): T {
   if (typeof value === 'object' && value !== null) {

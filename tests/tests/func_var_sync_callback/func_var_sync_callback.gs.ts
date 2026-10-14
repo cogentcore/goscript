@@ -22,14 +22,17 @@ export class matcher {
 		match: ((r: number) => boolean | globalThis.Promise<boolean>) | null
 	}
 
-	constructor(init?: Partial<{match?: ((r: number) => boolean | globalThis.Promise<boolean>) | null}>) {
+	constructor(init?: Partial<{match?: ((r: number) => boolean | globalThis.Promise<boolean>) | null}>, __goscriptValue?: boolean) {
 		this._fields = {
 			match: init?.match ?? (null! as ((r: number) => boolean | globalThis.Promise<boolean>) | null)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): matcher {
-		return $.markAsStructValue(new matcher(this))
+		return new matcher(this, true)
 	}
 
 	public __goscriptAssign(source: matcher): void {
@@ -54,7 +57,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println(strings.IndexFunc("abxc", $.syncFunction(isX)))
 
 	// A function value in a struct field.
-	let m = $.markAsStructValue(new matcher({match: isX}))
+	let m = new matcher({match: isX}, true)
 	await $.println(strings.IndexFunc("xyz", $.syncFunction(m.match)), strings.LastIndexFunc("axbx", $.syncFunction(m.match)))
 
 	let env: globalThis.Map<string, string> | null = $.makeMap<string, string>([["A", "1"]])

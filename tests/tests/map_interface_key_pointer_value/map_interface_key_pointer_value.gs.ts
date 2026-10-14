@@ -26,14 +26,17 @@ export class Table {
 		name: string
 	}
 
-	constructor(init?: Partial<{name?: string}>) {
+	constructor(init?: Partial<{name?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
 			name: init?.name ?? ("" as string)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): Table {
-		return $.markAsStructValue(new Table(this))
+		return new Table(this, true)
 	}
 
 	public __goscriptAssign(source: Table): void {

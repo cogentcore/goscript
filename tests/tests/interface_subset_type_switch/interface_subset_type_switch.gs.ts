@@ -46,15 +46,18 @@ export class MyStruct {
 		Value2: string
 	}
 
-	constructor(init?: Partial<{Value1?: string, Value2?: string}>) {
+	constructor(init?: Partial<{Value1?: string, Value2?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Value1: init?.Value1 ?? ("" as string),
 			Value2: init?.Value2 ?? ("" as string)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): MyStruct {
-		return $.markAsStructValue(new MyStruct(this))
+		return new MyStruct(this, true)
 	}
 
 	public __goscriptAssign(source: MyStruct): void {
@@ -110,18 +113,18 @@ export async function processInterface(i: any): globalThis.Promise<void> {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let s = $.markAsStructValue(new MyStruct({Value1: "hello", Value2: "world"}))
+	let s = new MyStruct({Value1: "hello", Value2: "world"}, true)
 
 	// Test with MyInterface1
-	let i1: MyInterface1 | null = $.interfaceValue<MyInterface1 | null>($.markAsStructValue($.cloneStructValue(s)), "main.MyStruct", "main.MyStruct")
+	let i1: MyInterface1 | null = $.interfaceValue<MyInterface1 | null>((s).clone(), "main.MyStruct", "main.MyStruct")
 	await processInterface((i1 as any))
 
 	// Test with MyInterface2
-	let i2: MyInterface2 | null = $.interfaceValue<MyInterface2 | null>($.markAsStructValue($.cloneStructValue(s)), "main.MyStruct", "main.MyStruct")
+	let i2: MyInterface2 | null = $.interfaceValue<MyInterface2 | null>((s).clone(), "main.MyStruct", "main.MyStruct")
 	await processInterface((i2 as any))
 
 	// Test with concrete type
-	await processInterface($.interfaceValue($.markAsStructValue($.cloneStructValue(s)), "main.MyStruct", "main.MyStruct"))
+	await processInterface($.interfaceValue((s).clone(), "main.MyStruct", "main.MyStruct"))
 
 	// Type switch with subset casting
 	let i3: any = (i1 as any)

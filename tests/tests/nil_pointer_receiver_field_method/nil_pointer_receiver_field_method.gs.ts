@@ -16,14 +16,17 @@ export class child {
 		value: string
 	}
 
-	constructor(init?: Partial<{value?: string}>) {
+	constructor(init?: Partial<{value?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
 			value: init?.value ?? ("" as string)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): child {
-		return $.markAsStructValue(new child(this))
+		return new child(this, true)
 	}
 
 	public __goscriptAssign(source: child): void {
@@ -62,14 +65,17 @@ export class parent {
 		child: child | $.VarRef<child> | null
 	}
 
-	constructor(init?: Partial<{child?: child | $.VarRef<child> | null}>) {
+	constructor(init?: Partial<{child?: child | $.VarRef<child> | null}>, __goscriptValue?: boolean) {
 		this._fields = {
 			child: init?.child ?? (null! as child | $.VarRef<child> | null)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): parent {
-		return $.markAsStructValue(new parent(this))
+		return new parent(this, true)
 	}
 
 	public __goscriptAssign(source: parent): void {
@@ -88,7 +94,7 @@ export class parent {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let p: parent = $.markAsStructValue(new parent())
+	let p: parent = new parent(undefined, true)
 	if (child.prototype.Clone.call(p.child) == null) {
 		await $.println("nil clone")
 	}

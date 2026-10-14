@@ -43,15 +43,18 @@ export class chanReader {
 		cur: string
 	}
 
-	constructor(init?: Partial<{ch?: $.Channel<string> | null, cur?: string}>) {
+	constructor(init?: Partial<{ch?: $.Channel<string> | null, cur?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
 			ch: init?.ch ?? (null! as $.Channel<string> | null),
 			cur: init?.cur ?? ("" as string)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): chanReader {
-		return $.markAsStructValue(new chanReader(this))
+		return new chanReader(this, true)
 	}
 
 	public __goscriptAssign(source: chanReader): void {
@@ -108,15 +111,18 @@ export class item {
 		B: number
 	}
 
-	constructor(init?: Partial<{A?: string, B?: number}>) {
+	constructor(init?: Partial<{A?: string, B?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			A: init?.A ?? ("" as string),
 			B: init?.B ?? (0 as number)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): item {
-		return $.markAsStructValue(new item(this))
+		return new item(this, true)
 	}
 
 	public __goscriptAssign(source: item): void {
@@ -242,7 +248,7 @@ export async function main(): globalThis.Promise<void> {
 	// split across its chunks.
 	let bdec: json.Decoder | $.VarRef<json.Decoder> | null = json.NewDecoder($.pointerValueOrNil($.interfaceValue<io.Reader | null>(bufio.NewReader($.interfaceValue<io.Reader | null>(await newChanReader($.arrayToSlice<string>(["{\"A\": \"h", $.bytesToString(new Uint8Array([195])), $.bytesToString(new Uint8Array([169, 108, 108, 111, 34, 44, 32, 34, 66, 34, 58, 32, 49])), "2.5}", "\n{\"A\": \"x\", \"B\": 3}"])), "*main.chanReader", /* @__PURE__ */ $.pointerType("main.chanReader"))), "*bufio.Reader", /* @__PURE__ */ $.pointerType("bufio.Reader")))!)
 	while (true) {
-		let it: $.VarRef<item> = $.varRef($.markAsStructValue(new item()))
+		let it: $.VarRef<item> = $.varRef(new item(undefined, true))
 		{
 			let __goscriptShadow0 = await json.Decoder.prototype.Decode.call($.pointerValue<json.Decoder>(bdec), $.interfaceValue(it, "*main.item", /* @__PURE__ */ $.pointerType("main.item")))
 			if (__goscriptShadow0 != null) {
@@ -261,7 +267,7 @@ export async function main(): globalThis.Promise<void> {
 	await printTokens(ndec)
 
 	// A syntax error is reported without waiting for the rest of the input.
-	let it: $.VarRef<item> = $.varRef($.markAsStructValue(new item()))
+	let it: $.VarRef<item> = $.varRef(new item(undefined, true))
 	err = await json.Decoder.prototype.Decode.call($.pointerValue<json.Decoder>(json.NewDecoder($.pointerValueOrNil($.interfaceValue<io.Reader | null>(await newChanReader($.arrayToSlice<string>(["{\"A\": ]", " more"])), "*main.chanReader", /* @__PURE__ */ $.pointerType("main.chanReader")))!)), $.interfaceValue(it, "*main.item", /* @__PURE__ */ $.pointerType("main.item")))
 	await fmt.Println("syntax error:", err != null)
 }

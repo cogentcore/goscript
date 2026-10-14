@@ -25,15 +25,18 @@ export class Point {
 		Y: number
 	}
 
-	constructor(init?: Partial<{X?: number, Y?: number}>) {
+	constructor(init?: Partial<{X?: number, Y?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			X: init?.X ?? (0 as number),
 			Y: init?.Y ?? (0 as number)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): Point {
-		return $.markAsStructValue(new Point(this))
+		return new Point(this, true)
 	}
 
 	public __goscriptAssign(source: Point): void {
@@ -57,7 +60,7 @@ export function getCoords(): [number, number] {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let p: Point = $.markAsStructValue(new Point())
+	let p: Point = new Point(undefined, true)
 	// p.X and p.Y are *ast.SelectorExpr
 	// test writeMultiVarAssignFromCall in WriteStmtAssign
 	let __goscriptTuple0: any = getCoords()

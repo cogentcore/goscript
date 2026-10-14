@@ -9,13 +9,16 @@ export class hiddenError {
 	public _fields: {
 	}
 
-	constructor(init?: Partial<{}>) {
+	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
 		this._fields = {
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): hiddenError {
-		return $.markAsStructValue(new hiddenError(this))
+		return new hiddenError(this, true)
 	}
 
 	public __goscriptAssign(source: hiddenError): void {
@@ -34,7 +37,7 @@ export class hiddenError {
 	)
 }
 
-export let ErrClosed: hiddenError = $.markAsStructValue(new hiddenError())
+export let ErrClosed: hiddenError = new hiddenError(undefined, true)
 
 export function __goscript_set_ErrClosed(__goscriptValue: hiddenError): void {
 	$.assignStruct(ErrClosed, __goscriptValue)

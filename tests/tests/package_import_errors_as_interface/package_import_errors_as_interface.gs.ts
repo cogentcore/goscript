@@ -30,14 +30,17 @@ export class wrappedHealthError {
 		err: $.GoError
 	}
 
-	constructor(init?: Partial<{err?: $.GoError}>) {
+	constructor(init?: Partial<{err?: $.GoError}>, __goscriptValue?: boolean) {
 		this._fields = {
 			err: init?.err ?? (null! as $.GoError)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): wrappedHealthError {
-		return $.markAsStructValue(new wrappedHealthError(this))
+		return new wrappedHealthError(this, true)
 	}
 
 	public __goscriptAssign(source: wrappedHealthError): void {

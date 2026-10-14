@@ -28,15 +28,18 @@ export class Wrapped {
 		Hidden: dep.hidden
 	}
 
-	constructor(init?: Partial<{Value?: string, Hidden?: dep.hidden}>) {
+	constructor(init?: Partial<{Value?: string, Hidden?: dep.hidden}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Value: init?.Value ?? ("" as string),
-			Hidden: init?.Hidden ? $.markAsStructValue($.cloneStructValue(init.Hidden)) : $.markAsStructValue(new dep.hidden())
+			Hidden: init?.Hidden ? init.Hidden.clone() : new dep.hidden(undefined, true)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): Wrapped {
-		return $.markAsStructValue(new Wrapped(this))
+		return new Wrapped(this, true)
 	}
 
 	public __goscriptAssign(source: Wrapped): void {

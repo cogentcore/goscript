@@ -46,16 +46,19 @@ export class segmentedReader {
 		step: number
 	}
 
-	constructor(init?: Partial<{data?: $.Slice<number>, offset?: number, step?: number}>) {
+	constructor(init?: Partial<{data?: $.Slice<number>, offset?: number, step?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			data: init?.data ?? (null! as $.Slice<number>),
 			offset: init?.offset ?? (0 as number),
 			step: init?.step ?? (0 as number)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): segmentedReader {
-		return $.markAsStructValue(new segmentedReader(this))
+		return new segmentedReader(this, true)
 	}
 
 	public __goscriptAssign(source: segmentedReader): void {
@@ -90,13 +93,16 @@ export class failingReader {
 	public _fields: {
 	}
 
-	constructor(init?: Partial<{}>) {
+	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
 		this._fields = {
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): failingReader {
-		return $.markAsStructValue(new failingReader(this))
+		return new failingReader(this, true)
 	}
 
 	public __goscriptAssign(source: failingReader): void {

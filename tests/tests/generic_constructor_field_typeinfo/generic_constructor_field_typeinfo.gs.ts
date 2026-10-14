@@ -36,15 +36,18 @@ export class blockType {
 		_constructor: (() => any | globalThis.Promise<any>) | null
 	}
 
-	constructor(init?: Partial<{typeID?: string, _constructor?: (() => any | globalThis.Promise<any>) | null}>) {
+	constructor(init?: Partial<{typeID?: string, _constructor?: (() => any | globalThis.Promise<any>) | null}>, __goscriptValue?: boolean) {
 		this._fields = {
 			typeID: init?.typeID ?? ("" as string),
 			_constructor: init?._constructor ?? (null! as (() => any | globalThis.Promise<any>) | null)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): blockType {
-		return $.markAsStructValue(new blockType(this))
+		return new blockType(this, true)
 	}
 
 	public __goscriptAssign(source: blockType): void {
@@ -77,13 +80,16 @@ export class sampleBlock {
 	public _fields: {
 	}
 
-	constructor(init?: Partial<{}>) {
+	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
 		this._fields = {
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): sampleBlock {
-		return $.markAsStructValue(new sampleBlock(this))
+		return new sampleBlock(this, true)
 	}
 
 	public __goscriptAssign(source: sampleBlock): void {

@@ -10,13 +10,16 @@ export class Server {
 	public _fields: {
 	}
 
-	constructor(init?: Partial<{}>) {
+	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
 		this._fields = {
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): Server {
-		return $.markAsStructValue(new Server(this))
+		return new Server(this, true)
 	}
 
 	public __goscriptAssign(source: Server): void {

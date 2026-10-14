@@ -81,6 +81,7 @@ const (
 	RuntimeHelperAssignFieldValue      RuntimeHelper = "value.assignFieldValue"
 	RuntimeHelperGenericPointerRef     RuntimeHelper = "value.genericPointerRef"
 	RuntimeHelperMarkAsStructValue     RuntimeHelper = "value.markAsStructValue"
+	RuntimeHelperStructValueMarker     RuntimeHelper = "value.structValueMarker"
 	RuntimeHelperAnonymousStructValue  RuntimeHelper = "value.anonymousStructValue"
 	RuntimeHelperCloneStructValue      RuntimeHelper = "value.cloneStructValue"
 	RuntimeHelperCloneArrayValue       RuntimeHelper = "value.cloneArrayValue"
@@ -367,6 +368,7 @@ func runtimeHelperContracts() []RuntimeHelperContract {
 		runtimeHelper(RuntimeHelperAssignFieldValue, "assignFieldValue", RuntimeHelperCategoryValue),
 		runtimeHelper(RuntimeHelperGenericPointerRef, "genericPointerRef", RuntimeHelperCategoryValue),
 		runtimeHelper(RuntimeHelperMarkAsStructValue, "markAsStructValue", RuntimeHelperCategoryValue),
+		runtimeHelper(RuntimeHelperStructValueMarker, "structValueMarker", RuntimeHelperCategoryValue),
 		runtimeHelper(RuntimeHelperAnonymousStructValue, "anonymousStructValue", RuntimeHelperCategoryValue),
 		runtimeHelper(RuntimeHelperCloneStructValue, "cloneStructValue", RuntimeHelperCategoryValue),
 		runtimeHelper(RuntimeHelperCloneArrayValue, "cloneArrayValue", RuntimeHelperCategoryValue),

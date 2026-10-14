@@ -18,14 +18,17 @@ export class Job {
 		Value: string
 	}
 
-	constructor(init?: Partial<{Value?: string}>) {
+	constructor(init?: Partial<{Value?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Value: init?.Value ?? ("" as string)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): Job {
-		return $.markAsStructValue(new Job(this))
+		return new Job(this, true)
 	}
 
 	public __goscriptAssign(source: Job): void {

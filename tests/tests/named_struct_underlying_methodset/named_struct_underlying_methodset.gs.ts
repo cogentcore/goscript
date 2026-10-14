@@ -17,13 +17,16 @@ export class Base {
 	public _fields: {
 	}
 
-	constructor(init?: Partial<{}>) {
+	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
 		this._fields = {
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): Base {
-		return $.markAsStructValue(new Base(this))
+		return new Base(this, true)
 	}
 
 	public __goscriptAssign(source: Base): void {
@@ -46,13 +49,16 @@ export class Derived {
 	public _fields: {
 	}
 
-	constructor(init?: Partial<{}>) {
+	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
 		this._fields = {
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): Derived {
-		return $.markAsStructValue(new Derived(this))
+		return new Derived(this, true)
 	}
 
 	public __goscriptAssign(source: Derived): void {
@@ -72,11 +78,11 @@ export class Derived {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let base: any = $.interfaceValue($.markAsStructValue(new Base()), "main.Base", "main.Base")
+	let base: any = $.interfaceValue(new Base(undefined, true), "main.Base", "main.Base")
 	let [, baseOK] = $.typeAssertTuple<Stringer | null>(base, "main.Stringer")
 	await $.println("base implements Stringer:", baseOK)
 
-	let derived: any = $.interfaceValue($.markAsStructValue(new Derived()), "main.Derived", "main.Derived")
+	let derived: any = $.interfaceValue(new Derived(undefined, true), "main.Derived", "main.Derived")
 	let [, derivedOK] = $.typeAssertTuple<Stringer | null>(derived, "main.Stringer")
 	await $.println("derived implements Stringer:", derivedOK)
 }

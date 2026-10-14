@@ -19,14 +19,17 @@ export class aValue {
 		next: __goscript_b.bValue | $.VarRef<__goscript_b.bValue> | null
 	}
 
-	constructor(init?: Partial<{next?: __goscript_b.bValue | $.VarRef<__goscript_b.bValue> | null}>) {
+	constructor(init?: Partial<{next?: __goscript_b.bValue | $.VarRef<__goscript_b.bValue> | null}>, __goscriptValue?: boolean) {
 		this._fields = {
 			next: init?.next ?? (null! as __goscript_b.bValue | $.VarRef<__goscript_b.bValue> | null)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): aValue {
-		return $.markAsStructValue(new aValue(this))
+		return new aValue(this, true)
 	}
 
 	public __goscriptAssign(source: aValue): void {
@@ -45,5 +48,5 @@ export class aValue {
 }
 
 export function makeA(): aValue {
-	return $.markAsStructValue(new aValue())
+	return new aValue(undefined, true)
 }

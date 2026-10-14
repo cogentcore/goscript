@@ -16,14 +16,17 @@ export class item {
 		values: $.Slice<number>
 	}
 
-	constructor(init?: Partial<{values?: $.Slice<number>}>) {
+	constructor(init?: Partial<{values?: $.Slice<number>}>, __goscriptValue?: boolean) {
 		this._fields = {
 			values: init?.values ?? (null! as $.Slice<number>)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): item {
-		return $.markAsStructValue(new item(this))
+		return new item(this, true)
 	}
 
 	public __goscriptAssign(source: item): void {
@@ -42,9 +45,9 @@ export class item {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let items: globalThis.Map<string, item> | null = $.makeMap<string, item>([["one", $.markAsStructValue(new item({values: $.arrayToSlice<number>([1, 2, 3])}))]])
+	let items: globalThis.Map<string, item> | null = $.makeMap<string, item>([["one", new item({values: $.arrayToSlice<number>([1, 2, 3])}, true)]])
 	{
-		let [__goscriptShadow0, ok] = $.mapGet<string, item, item>(items, "one", $.markAsStructValue(new item()))
+		let [__goscriptShadow0, ok] = $.mapGet<string, item, item>(items, "one", new item(undefined, true))
 		if (ok) {
 			await $.println("values:", $.sliceLen(__goscriptShadow0.values))
 		}

@@ -31,15 +31,18 @@ export class fixedReader {
 		size: number
 	}
 
-	constructor(init?: Partial<{data?: $.Slice<number>, size?: number}>) {
+	constructor(init?: Partial<{data?: $.Slice<number>, size?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			data: init?.data ?? (null! as $.Slice<number>),
 			size: init?.size ?? (0 as number)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): fixedReader {
-		return $.markAsStructValue(new fixedReader(this))
+		return new fixedReader(this, true)
 	}
 
 	public __goscriptAssign(source: fixedReader): void {

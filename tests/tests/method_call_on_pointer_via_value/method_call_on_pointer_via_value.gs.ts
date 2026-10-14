@@ -16,14 +16,17 @@ export class MyStruct {
 		MyInt: number
 	}
 
-	constructor(init?: Partial<{MyInt?: number}>) {
+	constructor(init?: Partial<{MyInt?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			MyInt: init?.MyInt ?? (0 as number)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): MyStruct {
-		return $.markAsStructValue(new MyStruct(this))
+		return new MyStruct(this, true)
 	}
 
 	public __goscriptAssign(source: MyStruct): void {
@@ -53,7 +56,7 @@ export class MyStruct {
 
 export async function main(): globalThis.Promise<void> {
 	// Create a struct value
-	let msValue = $.varRef($.markAsStructValue(new MyStruct({MyInt: 100})))
+	let msValue = $.varRef(new MyStruct({MyInt: 100}, true))
 
 	// === Method Call on Pointer Receiver via Value ===
 	// Call the pointer-receiver method using the value variable.

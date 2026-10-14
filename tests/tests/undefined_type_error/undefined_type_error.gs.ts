@@ -106,7 +106,7 @@ export class formatter {
 		sharpV: boolean
 	}
 
-	constructor(init?: Partial<{wid?: number, prec?: number, widPresent?: boolean, precPresent?: boolean, minus?: boolean, plus?: boolean, sharp?: boolean, space?: boolean, zero?: boolean, plusV?: boolean, sharpV?: boolean}>) {
+	constructor(init?: Partial<{wid?: number, prec?: number, widPresent?: boolean, precPresent?: boolean, minus?: boolean, plus?: boolean, sharp?: boolean, space?: boolean, zero?: boolean, plusV?: boolean, sharpV?: boolean}>, __goscriptValue?: boolean) {
 		this._fields = {
 			wid: init?.wid ?? (0 as number),
 			prec: init?.prec ?? (0 as number),
@@ -120,10 +120,13 @@ export class formatter {
 			plusV: init?.plusV ?? (false as boolean),
 			sharpV: init?.sharpV ?? (false as boolean)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): formatter {
-		return $.markAsStructValue(new formatter(this))
+		return new formatter(this, true)
 	}
 
 	public __goscriptAssign(source: formatter): void {
@@ -184,16 +187,19 @@ export class printer {
 		fmt: formatter
 	}
 
-	constructor(init?: Partial<{buf?: $.Slice<number>, arg?: any, fmt?: formatter}>) {
+	constructor(init?: Partial<{buf?: $.Slice<number>, arg?: any, fmt?: formatter}>, __goscriptValue?: boolean) {
 		this._fields = {
 			buf: init?.buf ?? (null! as $.Slice<number>),
 			arg: init?.arg ?? (null! as any),
-			fmt: init?.fmt ? $.markAsStructValue($.cloneStructValue(init.fmt)) : $.markAsStructValue(new formatter())
+			fmt: init?.fmt ? init.fmt.clone() : new formatter(undefined, true)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): printer {
-		return $.markAsStructValue(new printer(this))
+		return new printer(this, true)
 	}
 
 	public __goscriptAssign(source: printer): void {
@@ -217,7 +223,7 @@ export class printer {
 
 	public init(): void {
 		let p: printer | $.VarRef<printer> | null = this;
-		$.assignStruct($.pointerValue<printer>(p).fmt, $.markAsStructValue(new formatter()))
+		$.assignStruct($.pointerValue<printer>(p).fmt, new formatter(undefined, true))
 	}
 
 	static __typeInfo = $.registerStructType(

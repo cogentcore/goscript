@@ -28,15 +28,18 @@ export class parser {
 		astruct: errlist.AStruct
 	}
 
-	constructor(init?: Partial<{errors?: errlist.ErrorList, astruct?: errlist.AStruct}>) {
+	constructor(init?: Partial<{errors?: errlist.ErrorList, astruct?: errlist.AStruct}>, __goscriptValue?: boolean) {
 		this._fields = {
 			errors: init?.errors ?? (null! as errlist.ErrorList),
-			astruct: init?.astruct ? $.markAsStructValue($.cloneStructValue(init.astruct)) : $.markAsStructValue(new errlist.AStruct())
+			astruct: init?.astruct ? init.astruct.clone() : new errlist.AStruct(undefined, true)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): parser {
-		return $.markAsStructValue(new parser(this))
+		return new parser(this, true)
 	}
 
 	public __goscriptAssign(source: parser): void {
@@ -56,7 +59,7 @@ export class parser {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let p: parser = $.markAsStructValue(new parser())
+	let p: parser = new parser(undefined, true)
 	// this Add method does not work:
 	errlist.ErrorList_Add($.fieldRef(p._fields, "errors"), "error")
 	await $.println($.arrayIndex(p.errors!, 0))

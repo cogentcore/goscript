@@ -19,14 +19,17 @@ export class asyncReader {
 		ch: $.Channel<number> | null
 	}
 
-	constructor(init?: Partial<{ch?: $.Channel<number> | null}>) {
+	constructor(init?: Partial<{ch?: $.Channel<number> | null}>, __goscriptValue?: boolean) {
 		this._fields = {
 			ch: init?.ch ?? (null! as $.Channel<number> | null)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): asyncReader {
-		return $.markAsStructValue(new asyncReader(this))
+		return new asyncReader(this, true)
 	}
 
 	public __goscriptAssign(source: asyncReader): void {
@@ -50,7 +53,7 @@ export class asyncReader {
 	)
 }
 
-export let Reader: io.Reader | null = $.interfaceValue<io.Reader | null>($.markAsStructValue(new asyncReader({ch: $.makeChannel<number>(1, 0, "both")})), "main.asyncReader", "main.asyncReader")
+export let Reader: io.Reader | null = $.interfaceValue<io.Reader | null>(new asyncReader({ch: $.makeChannel<number>(1, 0, "both")}, true), "main.asyncReader", "main.asyncReader")
 
 export function __goscript_set_Reader(__goscriptValue: io.Reader | null): void {
 	Reader = __goscriptValue

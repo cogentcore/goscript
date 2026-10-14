@@ -25,15 +25,18 @@ export class MyStruct {
 		privateField: number
 	}
 
-	constructor(init?: Partial<{publicField?: string, privateField?: number}>) {
+	constructor(init?: Partial<{publicField?: string, privateField?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			publicField: init?.publicField ?? ("" as string),
 			privateField: init?.privateField ?? (0 as number)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): MyStruct {
-		return $.markAsStructValue(new MyStruct(this))
+		return new MyStruct(this, true)
 	}
 
 	public __goscriptAssign(source: MyStruct): void {
@@ -53,7 +56,7 @@ export class MyStruct {
 }
 
 export function NewMyStruct(pub: string, priv: number): MyStruct {
-	return $.markAsStructValue(new MyStruct({publicField: pub, privateField: priv}))
+	return new MyStruct({publicField: pub, privateField: priv}, true)
 }
 
 export async function accessPrivateField(s: MyStruct): globalThis.Promise<void> {
@@ -64,7 +67,7 @@ export async function accessPrivateField(s: MyStruct): globalThis.Promise<void> 
 
 export async function main(): globalThis.Promise<void> {
 	let s = NewMyStruct("hello", 123)
-	await accessPrivateField($.markAsStructValue($.cloneStructValue(s)))
+	await accessPrivateField((s).clone())
 }
 
 if ($.isMainScript(import.meta)) {

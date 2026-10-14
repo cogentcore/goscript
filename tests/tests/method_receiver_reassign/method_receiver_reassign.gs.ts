@@ -16,14 +16,17 @@ export class item {
 		n: number
 	}
 
-	constructor(init?: Partial<{n?: number}>) {
+	constructor(init?: Partial<{n?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			n: init?.n ?? (0 as number)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): item {
-		return $.markAsStructValue(new item(this))
+		return new item(this, true)
 	}
 
 	public __goscriptAssign(source: item): void {
@@ -35,9 +38,9 @@ export class item {
 	public dec(): item {
 		let s: item = this;
 		if (s.n > 0) {
-			$.assignStruct(s, $.markAsStructValue(new item({n: s.n - 1})))
+			$.assignStruct(s, new item({n: s.n - 1}, true))
 		}
-		return $.markAsStructValue($.cloneStructValue(s))
+		return (s).clone()
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -50,7 +53,7 @@ export class item {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let original = $.markAsStructValue(new item({n: 2}))
+	let original = new item({n: 2}, true)
 	let out = $.markAsStructValue($.cloneStructValue(original)).dec()
 	await $.println("original:", original.n)
 	await $.println("out:", out.n)

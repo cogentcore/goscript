@@ -22,14 +22,17 @@ export class FuncContainer {
 		myFunc: any
 	}
 
-	constructor(init?: Partial<{myFunc?: any}>) {
+	constructor(init?: Partial<{myFunc?: any}>, __goscriptValue?: boolean) {
 		this._fields = {
 			myFunc: init?.myFunc ?? (null! as any)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): FuncContainer {
-		return $.markAsStructValue(new FuncContainer(this))
+		return new FuncContainer(this, true)
 	}
 
 	public __goscriptAssign(source: FuncContainer): void {
@@ -105,7 +108,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 
 	// 3. Type assertion of a function in a struct field
-	let container = $.markAsStructValue(new FuncContainer({myFunc: $.interfaceValue($.namedFunction(greet, "main.Greeter", ({ kind: $.TypeKind.Function, name: "main.Greeter", params: [/* @__PURE__ */ $.basicType("string")], results: [/* @__PURE__ */ $.basicType("string")] } as $.FunctionTypeInfo)), "main.Greeter", ({ kind: $.TypeKind.Function, name: "main.Greeter", params: [/* @__PURE__ */ $.basicType("string")], results: [/* @__PURE__ */ $.basicType("string")] } as $.FunctionTypeInfo))}))
+	let container = new FuncContainer({myFunc: $.interfaceValue($.namedFunction(greet, "main.Greeter", ({ kind: $.TypeKind.Function, name: "main.Greeter", params: [/* @__PURE__ */ $.basicType("string")], results: [/* @__PURE__ */ $.basicType("string")] } as $.FunctionTypeInfo)), "main.Greeter", ({ kind: $.TypeKind.Function, name: "main.Greeter", params: [/* @__PURE__ */ $.basicType("string")], results: [/* @__PURE__ */ $.basicType("string")] } as $.FunctionTypeInfo))}, true)
 	let __goscriptTuple3: any = $.typeAssertTuple<((name: string) => string | globalThis.Promise<string>) | null>(container.myFunc, ({ kind: $.TypeKind.Function, name: "main.Greeter", params: [/* @__PURE__ */ $.basicType("string")], results: [/* @__PURE__ */ $.basicType("string")] } as $.FunctionTypeInfo))
 	let structFn = __goscriptTuple3[0]
 	ok = __goscriptTuple3[1]
@@ -115,7 +118,7 @@ export async function main(): globalThis.Promise<void> {
 		await $.println("Struct function assertion failed")
 	}
 
-	let adderContainer = $.markAsStructValue(new FuncContainer({myFunc: $.interfaceValue($.namedFunction(add, "main.Adder", ({ kind: $.TypeKind.Function, name: "main.Adder", params: [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo)), "main.Adder", ({ kind: $.TypeKind.Function, name: "main.Adder", params: [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))}))
+	let adderContainer = new FuncContainer({myFunc: $.interfaceValue($.namedFunction(add, "main.Adder", ({ kind: $.TypeKind.Function, name: "main.Adder", params: [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo)), "main.Adder", ({ kind: $.TypeKind.Function, name: "main.Adder", params: [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))}, true)
 	let __goscriptTuple4: any = $.typeAssertTuple<((a: number, b: number) => number | globalThis.Promise<number>) | null>(adderContainer.myFunc, ({ kind: $.TypeKind.Function, name: "main.Adder", params: [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))
 	let structAdderFn = __goscriptTuple4[0]
 	ok = __goscriptTuple4[1]

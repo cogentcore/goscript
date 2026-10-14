@@ -131,6 +131,9 @@ type loweredStructField struct {
 	anonymous   bool
 	exported    bool
 	structValue bool
+	// directClone records that a struct value field is copied by its own
+	// clone method (see isGeneratedStructClass).
+	directClone bool
 	arrayValue  bool
 	// typeParamValue reports whether the field's type is a type parameter
 	// that may be instantiated with a struct or array type.

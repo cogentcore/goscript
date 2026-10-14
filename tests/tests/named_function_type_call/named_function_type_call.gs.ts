@@ -73,16 +73,19 @@ export class MockFileInfo {
 		isDir: boolean
 	}
 
-	constructor(init?: Partial<{name?: string, size?: bigint, isDir?: boolean}>) {
+	constructor(init?: Partial<{name?: string, size?: bigint, isDir?: boolean}>, __goscriptValue?: boolean) {
 		this._fields = {
 			name: init?.name ?? ("" as string),
 			size: init?.size ?? (0n as bigint),
 			isDir: init?.isDir ?? (false as boolean)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): MockFileInfo {
-		return $.markAsStructValue(new MockFileInfo(this))
+		return new MockFileInfo(this, true)
 	}
 
 	public __goscriptAssign(source: MockFileInfo): void {
@@ -121,13 +124,16 @@ export class MockFilesystem {
 	public _fields: {
 	}
 
-	constructor(init?: Partial<{}>) {
+	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
 		this._fields = {
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): MockFilesystem {
-		return $.markAsStructValue(new MockFilesystem(this))
+		return new MockFilesystem(this, true)
 	}
 
 	public __goscriptAssign(source: MockFilesystem): void {
@@ -160,14 +166,17 @@ export class shapeNode {
 		value: number
 	}
 
-	constructor(init?: Partial<{value?: number}>) {
+	constructor(init?: Partial<{value?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			value: init?.value ?? (0 as number)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): shapeNode {
-		return $.markAsStructValue(new shapeNode(this))
+		return new shapeNode(this, true)
 	}
 
 	public __goscriptAssign(source: shapeNode): void {
@@ -203,14 +212,17 @@ export class MorphismHolder {
 		morphism: ((_p0: Shape | null) => Shape | null | globalThis.Promise<Shape | null>) | null
 	}
 
-	constructor(init?: Partial<{morphism?: ((_p0: Shape | null) => Shape | null | globalThis.Promise<Shape | null>) | null}>) {
+	constructor(init?: Partial<{morphism?: ((_p0: Shape | null) => Shape | null | globalThis.Promise<Shape | null>) | null}>, __goscriptValue?: boolean) {
 		this._fields = {
 			morphism: init?.morphism ?? (null! as ((_p0: Shape | null) => Shape | null | globalThis.Promise<Shape | null>) | null)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): MorphismHolder {
-		return $.markAsStructValue(new MorphismHolder(this))
+		return new MorphismHolder(this, true)
 	}
 
 	public __goscriptAssign(source: MorphismHolder): void {
@@ -251,14 +263,17 @@ export class morphismWorker {
 		ready: $.Channel<boolean> | null
 	}
 
-	constructor(init?: Partial<{ready?: $.Channel<boolean> | null}>) {
+	constructor(init?: Partial<{ready?: $.Channel<boolean> | null}>, __goscriptValue?: boolean) {
 		this._fields = {
 			ready: init?.ready ?? (null! as $.Channel<boolean> | null)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): morphismWorker {
-		return $.markAsStructValue(new morphismWorker(this))
+		return new morphismWorker(this, true)
 	}
 
 	public __goscriptAssign(source: morphismWorker): void {
