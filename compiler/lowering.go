@@ -1663,8 +1663,13 @@ type lowerFileContext struct {
 	deferState                    *loweredDeferState
 	// hoistArgsCall is the call of a defer or go statement, whose arguments
 	// are evaluated into the temporaries of hoistedArgs (see lowerCallArgs).
-	hoistArgsCall       *ast.CallExpr
-	hoistedArgs         *[]string
+	hoistArgsCall *ast.CallExpr
+	hoistedArgs   *[]string
+	// copyValues is whether the struct values lowered are read after the
+	// expression that lowers them, as by a method value or a defer or go
+	// statement, so that they are copied even for a method or function that
+	// only reads them.
+	copyValues          bool
 	rangeBranch         *loweredRangeBranch
 	rangeBreak          bool
 	rangeContinue       bool
@@ -5563,8 +5568,11 @@ func (o *LoweringOwner) lowerStatementCall(ctx lowerFileContext, call *ast.CallE
 	argCtx := ctx
 	argCtx.hoistArgsCall = call
 	argCtx.hoistedArgs = &hoisted
+	argCtx.copyValues = true
 	if statementCallNeedsCalleeValue(ctx, call) {
-		callee, diagnostics := o.lowerExpr(ctx, call.Fun)
+		calleeCtx := ctx
+		calleeCtx.copyValues = true
+		callee, diagnostics := o.lowerExpr(calleeCtx, call.Fun)
 		calleeTemp := ctx.tempName("DeferCallee")
 		hoisted = append(hoisted, "const "+calleeTemp+" = "+callee)
 		args, argDiagnostics := o.lowerCallArgs(argCtx, call, callTargetSignature(ctx, call.Fun))
@@ -10767,7 +10775,11 @@ func (o *LoweringOwner) lowerSelectorExpr(ctx lowerFileContext, expr *ast.Select
 				methodExpr := o.methodFunctionExpr(ctx, namedReceiver, selection.Obj(), expr.Sel.Name)
 				return o.lowerMethodValueClosure(ctx, selection, receiverExpr, methodExpr, true), diagnostics
 			}
-			receiver, diagnostics := o.lowerMethodReceiverExpr(ctx, expr.X, selection)
+			// The method value is called later, so it gets a copy of a value
+			// receiver even for a method that only reads it.
+			receiverCtx := ctx
+			receiverCtx.copyValues = true
+			receiver, diagnostics := o.lowerMethodReceiverExpr(receiverCtx, expr.X, selection)
 			return o.lowerMethodValueClosure(ctx, selection, receiver, "__receiver."+expr.Sel.Name, false), diagnostics
 		case types.MethodExpr:
 			if receiver := receiverNamedType(selection.Recv()); namedNonInterfaceNonStructType(receiver) {
@@ -11211,7 +11223,7 @@ func (o *LoweringOwner) lowerMethodReceiverExpr(
 		// A method that does not modify its value receiver, and does not
 		// suspend while other code could modify the caller's value, is
 		// passed the value without a copy.
-		if method, _ := selection.Obj().(*types.Func); method != nil {
+		if method, _ := selection.Obj().(*types.Func); method != nil && !ctx.copyValues {
 			if semFn := semanticFunctionFor(ctx.model, method); semFn != nil &&
 				semFn.receiverReadOnly && !o.functionAsync(ctx, method) {
 				return receiver, diagnostics
