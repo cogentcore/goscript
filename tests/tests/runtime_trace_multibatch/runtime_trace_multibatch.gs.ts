@@ -72,17 +72,17 @@ export async function main(): globalThis.Promise<void> {
 	{
 		let err = trace.Start($.pointerValueOrNil($.interfaceValue<io.Writer | null>(sink, "*main.byteSink", /* @__PURE__ */ $.pointerType("main.byteSink")))!)
 		if (err != null) {
-			await fmt.Println("ERROR:" + await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+			await fmt.Println($.concatString("ERROR:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error()))
 			return
 		}
 	}
 
 	for (let i = 0; i < 4000; i++) {
 		let n = strconv.Itoa(i)
-		let __goscriptTuple0: any = trace.NewTask($.pointerValueOrNil(context.Background())!, "multibatch-task-" + n)
+		let __goscriptTuple0: any = trace.NewTask($.pointerValueOrNil(context.Background())!, $.concatString("multibatch-task-", n))
 		let ctx = __goscriptTuple0[0]
 		let task: trace.Task | $.VarRef<trace.Task> | null = __goscriptTuple0[1]
-		trace.Log($.pointerValueOrNil(ctx)!, "multibatch-key", "multibatch-message-" + n)
+		trace.Log($.pointerValueOrNil(ctx)!, "multibatch-key", $.concatString("multibatch-message-", n))
 		trace.Task.prototype.End.call($.pointerValue<trace.Task>(task))
 	}
 

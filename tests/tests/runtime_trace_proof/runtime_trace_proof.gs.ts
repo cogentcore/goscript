@@ -67,7 +67,7 @@ export async function main(): globalThis.Promise<void> {
 	{
 		let err = trace.Start($.pointerValueOrNil($.interfaceValue<io.Writer | null>(sink, "*main.byteSink", /* @__PURE__ */ $.pointerType("main.byteSink")))!)
 		if (err != null) {
-			await fmt.Println("ERROR:" + await $.pointerValue<Exclude<$.GoError, null>>(err).Error())
+			await fmt.Println($.concatString("ERROR:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error()))
 			return
 		}
 	}
