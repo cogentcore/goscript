@@ -1592,10 +1592,12 @@ export function indexRef<T>(
     if (index < 0 || index >= collection.__meta__.length) {
       outOfRangeIndex(index, collection.__meta__.length)
     }
+    const meta = collection.__meta__
     return new SliceIndexReference(
       collection,
       index,
-      collection.__meta__.offset + index,
+      meta.backing,
+      meta.offset + index,
     )
   }
   if (Array.isArray(collection)) {
@@ -1649,11 +1651,14 @@ class SliceIndexReference<T> implements VarRef<T> {
   constructor(
     readonly __goCollection: SliceProxy<T>,
     readonly __goIndex: number,
+    private readonly backing: T[],
     private readonly backingIndex: number,
   ) {}
 
+  // A slice keeps its backing array, so the element is read from it directly
+  // rather than through the slice proxy.
   get value(): T {
-    return this.__goCollection.__meta__.backing[this.backingIndex]
+    return this.backing[this.backingIndex]
   }
 
   set value(value: T) {
