@@ -21,6 +21,8 @@ $.registerNamedValueType(
 
 export type Matrix = number[]
 
+$.registerNamedType("main.Matrix", /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 4));
+
 $.registerNamedValueType(
 	"main.Matrix",
 	{Scaled: (receiver: any, ...args: any[]) => (Matrix_Scaled as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Sum: (receiver: any, ...args: any[]) => (Matrix_Sum as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
