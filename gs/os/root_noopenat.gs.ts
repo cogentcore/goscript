@@ -1,5 +1,6 @@
 import * as $ from "@goscript/builtin/index.js";
-import { Mkdir, OpenFile, Remove } from "./file_js.gs.js";
+import { Mkdir, OpenFile } from "./file_js.gs.js";
+import { Remove } from "./file_unix_js.gs.js";
 import { Root, OpenRoot } from "./root_js.gs.js";
 import { Lstat, Stat } from "./stat_js.gs.js";
 import { File } from "./types_js.gs.js";

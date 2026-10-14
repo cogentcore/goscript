@@ -1,6 +1,6 @@
 import * as $ from "@goscript/builtin/index.js";
 import { ErrUnimplemented } from "./error.gs.js";
-import { callbackFSErr, callbackFSInvoke, callbackFSResult, createFileInfo, createHostFile, File, getDeno, getEnv, getNodeFS, getPlatform, newHostError } from "./types_js.gs.js";
+import { callbackFSErr, callbackFSInvoke, callbackFSResult, createFileInfo, createHostFile, File, getDeno, getNodeFS, getPlatform, newHostError } from "./types_js.gs.js";
 import { callbackFSPath, getCallbackFS, type CallbackStat } from "./callbackfs.js";
 import { O_APPEND, O_CREATE, O_EXCL, O_RDONLY, O_RDWR, O_SYNC, O_TRUNC, O_WRONLY } from "./file_constants_js.gs.js";
 import { FileInfoToDirEntry } from "@goscript/io/fs/readdir.js"
@@ -9,16 +9,6 @@ import * as fs from "@goscript/io/fs/index.js"
 
 function getDevNullPath(): string {
 	return getPlatform() === "win32" ? "NUL" : "/dev/null"
-}
-
-function getTempDirPath(): string {
-	for (const key of ["TMPDIR", "TEMP", "TMP"]) {
-		const value = getEnv(key)
-		if (value !== "") {
-			return value
-		}
-	}
-	return getPlatform() === "win32" ? "." : "/tmp"
 }
 
 function openOptionsFromFlags(flag: number): {
@@ -278,11 +268,7 @@ export function openDirNolog(name: string): Promise<[File | null, $.GoError]> {
 	return openFileNolog(name, O_RDONLY, 0)
 }
 
-export function tempDir(): string {
-	return getTempDirPath()
-}
-
-export async function readlink(name: string): Promise<[string, $.GoError]> {
+export async function Readlink(name: string): Promise<[string, $.GoError]> {
 	const denoObj = getDeno()
 	if (denoObj?.readLinkSync) {
 		try {

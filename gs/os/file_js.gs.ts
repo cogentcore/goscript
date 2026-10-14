@@ -4,8 +4,8 @@ import { File } from "./types_js.gs.js";
 import { callbackFSErr, callbackFSResult, getDeno, getNodeFS, newHostError } from "./types_js.gs.js";
 import { callbackFSSetwd, getCallbackFS } from "./callbackfs.js";
 import { O_CREATE, O_RDONLY, O_RDWR, O_TRUNC, O_WRONLY } from "./file_constants_js.gs.js";
-import { Link as linkPath, openFileNolog, readlink, Remove as removePath, rename as renamePath, Symlink as symlinkPath, Truncate as truncatePath } from "./file_unix_js.gs.js";
-import { Lstat as lstatPath, Stat as statPath } from "./stat_js.gs.js";
+import { openFileNolog, rename as renamePath } from "./file_unix_js.gs.js";
+import { Lstat, Stat } from "./stat_js.gs.js";
 import { ValidPath } from "@goscript/io/fs/index.js"
 
 import * as errors from "@goscript/errors/index.js"
@@ -123,10 +123,6 @@ export async function MkdirAll(path: string, perm: number): Promise<$.GoError> {
   return ErrUnimplemented
 }
 
-export function Remove(name: string): Promise<$.GoError> {
-  return removePath(name)
-}
-
 export async function RemoveAll(path: string): Promise<$.GoError> {
   const denoObj = getDeno()
   if (denoObj?.removeSync) {
@@ -172,7 +168,7 @@ export async function Chdir(dir: string): Promise<$.GoError> {
     }
   }
   if (getCallbackFS() !== null) {
-    const [info, err] = await statPath(dir)
+    const [info, err] = await Stat(dir)
     if (err !== null) {
       return err
     }
@@ -212,30 +208,6 @@ export async function Chmod(name: string, mode: number): Promise<$.GoError> {
 
 export function Rename(oldpath: string, newpath: string): Promise<$.GoError> {
   return renamePath(oldpath, newpath)
-}
-
-export function Stat(name: string): Promise<[fs.FileInfo, $.GoError]> {
-  return statPath(name)
-}
-
-export function Lstat(name: string): Promise<[fs.FileInfo, $.GoError]> {
-  return lstatPath(name)
-}
-
-export function Link(oldname: string, newname: string): Promise<$.GoError> {
-  return linkPath(oldname, newname)
-}
-
-export function Symlink(oldname: string, newname: string): Promise<$.GoError> {
-  return symlinkPath(oldname, newname)
-}
-
-export function Readlink(name: string): Promise<[string, $.GoError]> {
-  return readlink(name)
-}
-
-export function Truncate(name: string, size: bigint): Promise<$.GoError> {
-  return truncatePath(name, size)
 }
 
 export function DirFS(dir: string): fs.FS {
@@ -313,7 +285,7 @@ async function writeFileCallback(name: string, data: Uint8Array, perm: number): 
 // mkdirAllCallback creates the directory path and any missing parents on
 // the callback filesystem, which Go's js/wasm port does one level at a time.
 async function mkdirAllCallback(path: string, perm: number): Promise<$.GoError> {
-  const [info, err] = await statPath(path)
+  const [info, err] = await Stat(path)
   if (err === null) {
     return info!.IsDir() ? null : ErrExist
   }
@@ -326,7 +298,7 @@ async function mkdirAllCallback(path: string, perm: number): Promise<$.GoError> 
   }
   const merr = await callbackFSErr("mkdir", path, perm)
   if (merr !== null) {
-    const [info2, err2] = await lstatPath(path)
+    const [info2, err2] = await Lstat(path)
     if (err2 === null && info2!.IsDir()) {
       return null
     }
@@ -337,7 +309,7 @@ async function mkdirAllCallback(path: string, perm: number): Promise<$.GoError> 
 // removeAllCallback removes path and any children it contains from the
 // callback filesystem, ignoring a path that does not exist.
 async function removeAllCallback(path: string): Promise<$.GoError> {
-  const [info, err] = await lstatPath(path)
+  const [info, err] = await Lstat(path)
   if (err !== null) {
     return errors.Is(err, fs.ErrNotExist) ? null : err
   }

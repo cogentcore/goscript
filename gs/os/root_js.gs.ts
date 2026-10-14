@@ -1,9 +1,8 @@
 import * as $ from "@goscript/builtin/index.js";
 import { ErrInvalid } from "./error.gs.js";
-import { Chmod, Create, Mkdir, MkdirAll, Open, OpenFile, ReadFile, Remove, RemoveAll, Rename, WriteFile } from "./file_js.gs.js";
-import { Readlink } from "./file_constants_js.gs.js";
+import { Chmod, Create, Mkdir, MkdirAll, Open, OpenFile, ReadFile, RemoveAll, Rename, WriteFile } from "./file_js.gs.js";
 import { Chown, Chtimes, Lchown } from "./file_posix_js.gs.js";
-import { Link, Symlink } from "./file_unix_js.gs.js";
+import { Link, Readlink, Remove, Symlink } from "./file_unix_js.gs.js";
 import { Lstat as lstatPath, Stat as statPath } from "./stat_js.gs.js";
 import { File } from "./types_js.gs.js";
 

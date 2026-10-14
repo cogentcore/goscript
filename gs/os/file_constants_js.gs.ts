@@ -1,7 +1,6 @@
 import * as $ from "@goscript/builtin/index.js";
 import { ErrUnimplemented } from "./error.gs.js";
-import { callbackFSResult, getDeno, getEnv, getNodeFS, getPlatform, newHostError } from "./types_js.gs.js";
-import { getCallbackFS } from "./callbackfs.js";
+import { getEnv, getPlatform } from "./types_js.gs.js";
 
 function pickFirstEnv(keys: string[]): string {
 	for (const key of keys) {
@@ -89,30 +88,6 @@ export class LinkError {
 		const e = this
 		return e.Err
 	}
-}
-
-export async function Readlink(name: string): Promise<[string, $.GoError]> {
-	const denoObj = getDeno()
-	if (denoObj?.readLinkSync) {
-		try {
-			return [denoObj.readLinkSync(name), null]
-		} catch (err) {
-			return ["", newHostError(err)]
-		}
-	}
-	const nodeFS = getNodeFS()
-	if (nodeFS?.readlinkSync) {
-		try {
-			return [nodeFS.readlinkSync(name), null]
-		} catch (err) {
-			return ["", newHostError(err)]
-		}
-	}
-	if (getCallbackFS() !== null) {
-		const [target, err] = await callbackFSResult("readlink", name)
-		return err !== null ? ["", err] : [String(target), null]
-	}
-	return ["", ErrUnimplemented]
 }
 
 export function TempDir(): string {
