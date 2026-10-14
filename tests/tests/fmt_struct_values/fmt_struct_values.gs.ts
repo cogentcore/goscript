@@ -237,7 +237,7 @@ export class Base {
 	constructor(init?: Partial<{Windows?: $.Slice<any>, Active?: any}>) {
 		this._fields = {
 			Windows: init?.Windows ?? (null! as $.Slice<any>),
-			Active: init?.Active ?? (null! as any)
+			Active: init?.Active !== undefined ? $.copyElement(init.Active) : (null! as any)
 		}
 	}
 

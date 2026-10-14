@@ -40,7 +40,7 @@ export class Base {
 
 	constructor(init?: Partial<{App?: any, flags?: Flags}>) {
 		this._fields = {
-			App: init?.App ?? (null! as any),
+			App: init?.App !== undefined ? $.copyElement(init.App) : (null! as any),
 			flags: init?.flags ?? (0n as Flags)
 		}
 	}

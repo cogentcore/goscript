@@ -72,7 +72,7 @@ export class box {
 
 	constructor(init?: Partial<{v?: any}>) {
 		this._fields = {
-			v: init?.v ?? (null! as any)
+			v: init?.v !== undefined ? $.copyElement(init.v) : (null! as any)
 		}
 	}
 
@@ -82,7 +82,7 @@ export class box {
 
 	public Get(__typeArgs: $.GenericTypeArgs | undefined): any {
 		const b: box | $.VarRef<box> | null = this;
-		return $.pointerValue<box>(b).v
+		return $.copyElement($.pointerValue<box>(b).v)
 	}
 
 	static __typeInfo = $.registerStructType(
