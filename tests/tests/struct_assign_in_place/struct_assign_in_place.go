@@ -11,6 +11,19 @@ type Outer struct {
 
 var global Outer
 
+type Pair[T any] struct {
+	Key string
+	Val T
+}
+
+type Holder[T any] struct {
+	P Pair[T]
+}
+
+func assignGeneric[T any](dst *Pair[T], src Pair[T]) {
+	*dst = src
+}
+
 func make1() Outer { return Outer{In: Inner{1, 2}, Arr: [2]int{3, 4}, N: 5} }
 
 func main() {
@@ -44,6 +57,20 @@ func main() {
 	in = a.In
 	a.In.Y = 99
 	println(in.Y, a.In.Y)
+	g1 := Pair[Inner]{"a", Inner{1, 2}}
+	var g2 Pair[Inner]
+	g2 = g1
+	g1.Val.X = 11
+	println(g2.Val.X, g1.Val.X)
+	var g3 Pair[Inner]
+	assignGeneric(&g3, g1)
+	g1.Val.Y = 22
+	println(g3.Val.Y, g1.Val.Y)
+	h1 := Holder[Inner]{P: g1}
+	var h2 Holder[Inner]
+	h2 = h1
+	h1.P.Val.X = 33
+	println(h2.P.Val.X, h1.P.Val.X)
 	m := map[string]Outer{"k": a}
 	c := Outer{}
 	c = m["k"]

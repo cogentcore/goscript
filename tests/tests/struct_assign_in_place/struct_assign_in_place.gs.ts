@@ -123,10 +123,101 @@ export class Outer {
 	)
 }
 
+export class Pair {
+	public get Key(): string {
+		return this._fields.Key
+	}
+
+	public set Key(value: string) {
+		this._fields.Key = value
+	}
+
+	public get Val(): any {
+		return this._fields.Val
+	}
+
+	public set Val(value: any) {
+		this._fields.Val = value
+	}
+
+	public _fields: {
+		Key: string
+		Val: any
+	}
+
+	constructor(init?: Partial<{Key?: string, Val?: any}>) {
+		this._fields = {
+			Key: init?.Key ?? ("" as string),
+			Val: init?.Val !== undefined ? $.copyElement(init.Val) : (null! as any)
+		}
+	}
+
+	public clone(): Pair {
+		return $.markAsStructValue(new Pair(this))
+	}
+
+	public __goscriptAssign(source: Pair): void {
+		const target = this._fields
+		const values = source._fields
+		target.Key = values.Key
+		target.Val = $.assignFieldValue(target.Val, values.Val, { kind: $.TypeKind.Interface, methods: [] })
+	}
+
+	static __typeInfo = $.registerStructType(
+		"main.Pair",
+		() => new Pair(),
+		() => [],
+		Pair,
+		() => [{ name: "Key", key: "Key", type: /* @__PURE__ */ $.basicType("string") }, { name: "Val", key: "Val", type: { kind: $.TypeKind.Interface, methods: [] } }]
+	)
+}
+
+export class Holder {
+	public get P(): Pair {
+		return this._fields.P
+	}
+
+	public set P(value: Pair) {
+		this._fields.P = value
+	}
+
+	public _fields: {
+		P: Pair
+	}
+
+	constructor(init?: Partial<{P?: Pair}>) {
+		this._fields = {
+			P: init?.P ? $.markAsStructValue($.cloneStructValue(init.P)) : $.markAsStructValue(new Pair({Val: null}))
+		}
+	}
+
+	public clone(): Holder {
+		return $.markAsStructValue(new Holder(this))
+	}
+
+	public __goscriptAssign(source: Holder): void {
+		const target = this._fields
+		const values = source._fields
+		$.assignStruct(target.P, values.P)
+	}
+
+	static __typeInfo = $.registerStructType(
+		"main.Holder",
+		() => new Holder(),
+		() => [],
+		Holder,
+		() => [{ name: "P", key: "P", type: "main.Pair" }]
+	)
+}
+
 export let global: Outer = $.markAsStructValue(new Outer())
 
 export function __goscript_set_global(__goscriptValue: Outer): void {
 	$.assignStruct(global, __goscriptValue)
+}
+
+export function assignGeneric(__typeArgs: $.GenericTypeArgs | undefined, dst: Pair | $.VarRef<Pair> | null, src: Pair): void {
+	$.assignStruct($.pointerValue<Pair>(dst), $.markAsStructValue($.cloneStructValue(src)))
 }
 
 export function make1(): Outer {
@@ -164,11 +255,30 @@ export async function main(): globalThis.Promise<void> {
 	$.assignStruct(_in, a.value.In)
 	a.value.In.Y = 99
 	await $.println(_in.Y, a.value.In.Y)
+	let g1 = $.markAsStructValue(new Pair({Key: "a", Val: $.markAsStructValue(new Inner({X: 1, Y: 2}))}))
+	let g2: Pair = $.markAsStructValue(new Pair({Val: $.markAsStructValue(new Inner())}))
+	$.assignStruct(g2, $.markAsStructValue($.cloneStructValue(g1)))
+	g1.Val.X = 11
+	await $.println(g2.Val.X, g1.Val.X)
+	let g3: $.VarRef<Pair> = $.varRef($.markAsStructValue(new Pair({Val: $.markAsStructValue(new Inner())})))
+	assignGeneric(__goscriptStatic0(), g3, $.markAsStructValue($.cloneStructValue(g1)))
+	g1.Val.Y = 22
+	await $.println(g3.value.Val.Y, g1.Val.Y)
+	let h1 = $.markAsStructValue(new Holder({P: $.markAsStructValue($.cloneStructValue(g1))}))
+	let h2: Holder = $.markAsStructValue(new Holder())
+	$.assignStruct(h2, $.markAsStructValue($.cloneStructValue(h1)))
+	h1.P.Val.X = 33
+	await $.println(h2.P.Val.X, h1.P.Val.X)
 	let m: globalThis.Map<string, Outer> | null = $.makeMap<string, Outer>([["k", $.markAsStructValue($.cloneStructValue(a.value))]])
 	let c = $.markAsStructValue(new Outer())
 	$.assignStruct(c, $.mapGet<string, Outer, Outer>(m, "k", $.markAsStructValue(new Outer()))[0])
 	c.N = 77
 	await $.println($.mapGet<string, Outer, Outer>(m, "k", $.markAsStructValue(new Outer()))[0].N, c.N)
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.Inner", zero: () => $.markAsStructValue(new Inner()) }})
 }
 
 if ($.isMainScript(import.meta)) {

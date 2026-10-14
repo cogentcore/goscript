@@ -5847,7 +5847,7 @@ func (o *LoweringOwner) lowerAssignStmt(ctx lowerFileContext, stmt *ast.AssignSt
 			uncopied = "(" + uncopied + " as " + o.tsTypeFor(ctx, targetType) + ")"
 		}
 		if sourceType := ctx.semPkg.source.TypesInfo.TypeOf(stmt.Rhs[idx]); sourceType == nil || targetType == nil ||
-			!types.Identical(sourceType, targetType) {
+			!types.Identical(sourceType, targetType) || !structAssignCopiesDeeply(targetType, 0) {
 			uncopied = right
 		}
 		if setter, ok := o.packageVarSetterForAssignment(ctx, lhs); ok {
@@ -6399,6 +6399,36 @@ func (o *LoweringOwner) lowerStarTargetAssignmentStmt(
 }
 
 // lowerStructAssignment preserves the addresses of an existing struct's fields.
+// structAssignCopiesDeeply reports whether $.assignStruct copies a value of
+// typ into existing storage without sharing any of its mutable parts: every
+// field is a basic value or a reference, or a struct or array of such fields.
+// A field of a type parameter, which the struct's assign method copies as it
+// is, may hold a struct or array value.
+func structAssignCopiesDeeply(typ types.Type, depth int) bool {
+	if depth > 16 {
+		return false
+	}
+	switch typed := types.Unalias(typ).(type) {
+	case *types.TypeParam:
+		return false
+	case *types.Named:
+		if typed.TypeArgs().Len() != 0 {
+			return false
+		}
+	}
+	switch typed := types.Unalias(typ).Underlying().(type) {
+	case *types.Struct:
+		for idx := range typed.NumFields() {
+			if !structAssignCopiesDeeply(typed.Field(idx).Type(), depth+1) {
+				return false
+			}
+		}
+	case *types.Array:
+		return structAssignCopiesDeeply(typed.Elem(), depth+1)
+	}
+	return true
+}
+
 func (o *LoweringOwner) lowerStructAssignment(target, value string) string {
 	return o.runtimeOwner.QualifiedHelper(RuntimeHelperAssignStruct) + "(" + target + ", " + value + ")"
 }
