@@ -121,16 +121,18 @@ export class Sides {
 
 	public SetAll(__typeArgs: $.GenericTypeArgs | undefined, val: any): void {
 		let s: Sides | $.VarRef<Sides> | null = this;
-		$.pointerValue<Sides>(s).Top = $.copyElement(val)
-		$.pointerValue<Sides>(s).Right = $.copyElement(val)
-		$.pointerValue<Sides>(s).Bottom = $.copyElement(val)
-		$.pointerValue<Sides>(s).Left = $.copyElement(val)
+		const s$ = $.pointerTarget<Sides>(s);
+		;(s$ as Sides).Top = $.copyElement(val);
+		;(s$ as Sides).Right = $.copyElement(val);
+		;(s$ as Sides).Bottom = $.copyElement(val);
+		;(s$ as Sides).Left = $.copyElement(val)
 	}
 
 	public SetHorizontal(__typeArgs: $.GenericTypeArgs | undefined, val: any): void {
 		let s: Sides | $.VarRef<Sides> | null = this;
-		$.pointerValue<Sides>(s).Right = $.copyElement(val)
-		$.pointerValue<Sides>(s).Left = $.copyElement(val)
+		const s$ = $.pointerTarget<Sides>(s);
+		;(s$ as Sides).Right = $.copyElement(val);
+		;(s$ as Sides).Left = $.copyElement(val)
 	}
 
 	static __typeInfo = $.registerStructType(

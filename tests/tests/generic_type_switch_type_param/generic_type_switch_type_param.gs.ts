@@ -102,20 +102,21 @@ export class Sides {
 
 	public async SetAny(__typeArgs: $.GenericTypeArgs | undefined, a: any): globalThis.Promise<string> {
 		let s: Sides | $.VarRef<Sides> | null = this;
+		const s$ = $.pointerTarget<Sides>(s)
 		{
 			const __goscriptTypeSwitchValue = a
 			switch (true) {
 				case $.typeAssert<Sides>(__goscriptTypeSwitchValue, "main.Sides").ok:
 					{
 						let val: Sides = $.markAsStructValue($.cloneStructValue($.typeAssert<Sides>(__goscriptTypeSwitchValue, "main.Sides").value))
-						$.assignStruct($.pointerValue<Sides>(s), $.markAsStructValue($.cloneStructValue(val)))
+						$.assignStruct((s$ as Sides), $.markAsStructValue($.cloneStructValue(val)))
 						return "Sides[T]"
 					}
 					break
 				case $.typeAssert<Sides | $.VarRef<Sides> | null>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.pointerType("main.Sides")).ok:
 					{
 						let val: Sides | $.VarRef<Sides> | null = $.typeAssert<Sides | $.VarRef<Sides> | null>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.pointerType("main.Sides")).value
-						$.assignStruct($.pointerValue<Sides>(s), $.markAsStructValue($.cloneStructValue($.pointerValue<Sides>(val))))
+						$.assignStruct((s$ as Sides), $.markAsStructValue($.cloneStructValue($.pointerValue<Sides>(val))))
 						return "*Sides[T]"
 					}
 					break
@@ -123,9 +124,9 @@ export class Sides {
 					{
 						let val: any = $.typeAssert<any>(__goscriptTypeSwitchValue, __typeArgs?.["T"]?.type ?? { kind: $.TypeKind.Interface, methods: [] }).value
 						let __goscriptAssign0_0: any = $.copyElement(val)
-						let __goscriptAssign0_1: any = $.copyElement(val)
-						$.pointerValue<Sides>(s).Top = __goscriptAssign0_0
-						$.pointerValue<Sides>(s).Right = __goscriptAssign0_1
+						let __goscriptAssign0_1: any = $.copyElement(val);
+						;(s$ as Sides).Top = __goscriptAssign0_0;
+						;(s$ as Sides).Right = __goscriptAssign0_1
 						return "T"
 					}
 					break
@@ -133,9 +134,9 @@ export class Sides {
 					{
 						let val: any = $.typeAssert<any>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.pointerType(__typeArgs?.["T"]?.type ?? { kind: $.TypeKind.Interface, methods: [] })).value
 						let __goscriptAssign1_0: any = $.copyElement($.pointerValue<any>(val))
-						let __goscriptAssign1_1: any = $.copyElement($.pointerValue<any>(val))
-						$.pointerValue<Sides>(s).Top = __goscriptAssign1_0
-						$.pointerValue<Sides>(s).Right = __goscriptAssign1_1
+						let __goscriptAssign1_1: any = $.copyElement($.pointerValue<any>(val));
+						;(s$ as Sides).Top = __goscriptAssign1_0;
+						;(s$ as Sides).Right = __goscriptAssign1_1
 						return "*T"
 					}
 					break
@@ -143,9 +144,9 @@ export class Sides {
 					{
 						let val: $.Slice<any> = $.typeAssert<$.Slice<any>>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.sliceType(__typeArgs?.["T"]?.type ?? { kind: $.TypeKind.Interface, methods: [] })).value
 						let __goscriptAssign2_0: any = $.copyElement($.arrayIndex(val!, 0))
-						let __goscriptAssign2_1: any = $.copyElement($.arrayIndex(val!, 1))
-						$.pointerValue<Sides>(s).Top = __goscriptAssign2_0
-						$.pointerValue<Sides>(s).Right = __goscriptAssign2_1
+						let __goscriptAssign2_1: any = $.copyElement($.arrayIndex(val!, 1));
+						;(s$ as Sides).Top = __goscriptAssign2_0;
+						;(s$ as Sides).Right = __goscriptAssign2_1
 						return "[]T"
 					}
 					break

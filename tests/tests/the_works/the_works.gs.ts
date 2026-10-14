@@ -168,17 +168,19 @@ export class Stack {
 
 	public Pop(__typeArgs: $.GenericTypeArgs | undefined): any {
 		let s: Stack | $.VarRef<Stack> | null = this;
-		if ($.sliceLen($.pointerValue<Stack>(s).items) == 0) {
+		const s$ = $.pointerTarget<Stack>(s)
+		if ($.sliceLen((s$ as Stack).items) == 0) {
 			$.panic("stack underflow")
 		}
-		let v = $.copyElement($.arrayIndex($.pointerValue<Stack>(s).items!, $.sliceLen($.pointerValue<Stack>(s).items) - 1))
-		$.pointerValue<Stack>(s).items = $.goSlice($.pointerValue<Stack>(s).items, undefined, $.sliceLen($.pointerValue<Stack>(s).items) - 1)
+		let v = $.copyElement($.arrayIndex((s$ as Stack).items!, $.sliceLen((s$ as Stack).items) - 1));
+		;(s$ as Stack).items = $.goSlice((s$ as Stack).items, undefined, $.sliceLen((s$ as Stack).items) - 1)
 		return $.copyElement(v)
 	}
 
 	public Push(__typeArgs: $.GenericTypeArgs | undefined, v: any): void {
 		let s: Stack | $.VarRef<Stack> | null = this;
-		$.pointerValue<Stack>(s).items = $.append($.pointerValue<Stack>(s).items, v, $.appendZero(() => ($.genericZero(__typeArgs, "T", null) as any)))
+		const s$ = $.pointerTarget<Stack>(s);
+		;(s$ as Stack).items = $.append((s$ as Stack).items, v, $.appendZero(() => ($.genericZero(__typeArgs, "T", null) as any)))
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -243,10 +245,11 @@ export class VM {
 
 	public Step(code: $.Slice<Instr>): boolean {
 		let vm: VM | $.VarRef<VM> | null = this;
-		let _in = $.markAsStructValue($.cloneStructValue($.arrayIndex(code!, $.pointerValue<VM>(vm).pc)))
-		$.pointerValue<VM>(vm).pc++
-		$.pointerValue<VM>(vm).steps++
-		let s: Stack | $.VarRef<Stack> | null = $.fieldRef($.pointerValue<VM>(vm)._fields, "stack")
+		const vm$ = $.pointerTarget<VM>(vm)
+		let _in = $.markAsStructValue($.cloneStructValue($.arrayIndex(code!, (vm$ as VM).pc)));
+		;(vm$ as VM).pc++;
+		;(vm$ as VM).steps++
+		let s: Stack | $.VarRef<Stack> | null = $.fieldRef((vm$ as VM)._fields, "stack")
 		switch (_in.Op) {
 			case 0:
 			{
@@ -300,7 +303,7 @@ export class VM {
 			case 8:
 			{
 				if (Stack.prototype.Pop.call(s, __goscriptStatic0()) != 0n) {
-					$.pointerValue<VM>(vm).pc = $.int(_in.Arg)
+					;(vm$ as VM).pc = $.int(_in.Arg)
 				}
 				break
 			}

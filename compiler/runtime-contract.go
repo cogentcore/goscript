@@ -88,6 +88,7 @@ const (
 	RuntimeHelperCopyElement           RuntimeHelper = "value.copyElement"
 	RuntimeHelperArrayValue            RuntimeHelper = "value.arrayValue"
 	RuntimeHelperPointerValue          RuntimeHelper = "value.pointerValue"
+	RuntimeHelperPointerTarget         RuntimeHelper = "value.pointerTarget"
 	RuntimeHelperPointerValueOrNil     RuntimeHelper = "value.pointerValueOrNil"
 	RuntimeHelperArrayEqual            RuntimeHelper = "value.arrayEqual"
 	RuntimeHelperNamedStructConversion RuntimeHelper = "value.namedStructConversion"
@@ -375,6 +376,7 @@ func runtimeHelperContracts() []RuntimeHelperContract {
 		runtimeHelper(RuntimeHelperCopyElement, "copyElement", RuntimeHelperCategoryValue),
 		runtimeHelper(RuntimeHelperArrayValue, "arrayValue", RuntimeHelperCategoryValue),
 		runtimeHelper(RuntimeHelperPointerValue, "pointerValue", RuntimeHelperCategoryValue),
+		runtimeHelper(RuntimeHelperPointerTarget, "pointerTarget", RuntimeHelperCategoryValue),
 		runtimeHelper(RuntimeHelperNamedStructConversion, "namedStructConversion", RuntimeHelperCategoryValue),
 		runtimeHelper(RuntimeHelperUnsafePointerCast, "unsafePointerCast", RuntimeHelperCategoryValue),
 		runtimeHelper(RuntimeHelperPointerValueOrNil, "pointerValueOrNil", RuntimeHelperCategoryValue),

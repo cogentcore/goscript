@@ -130,11 +130,12 @@ export class staticReader {
 
 	public Read(p: $.Slice<number>): [number, $.GoError] {
 		let r: staticReader | $.VarRef<staticReader> | null = this;
-		if ($.pointerValue<staticReader>(r).done) {
+		const r$ = $.pointerTarget<staticReader>(r)
+		if ((r$ as staticReader).done) {
 			return [0, io.EOF]
 		}
-		$.copy(p, new Uint8Array([99, 111, 112, 121]))
-		$.pointerValue<staticReader>(r).done = true
+		$.copy(p, new Uint8Array([99, 111, 112, 121]));
+		;(r$ as staticReader).done = true
 		return [4, null]
 	}
 
@@ -181,12 +182,13 @@ export class asyncReader {
 
 	public async Read(p: $.Slice<number>): globalThis.Promise<[number, $.GoError]> {
 		let r: asyncReader | $.VarRef<asyncReader> | null = this;
+		const r$ = $.pointerTarget<asyncReader>(r)
 		await asyncWrites.value.Load("read")
-		if ($.pointerValue<asyncReader>(r).done) {
+		if ((r$ as asyncReader).done) {
 			return [0, io.EOF]
 		}
-		$.copy(p, new Uint8Array([97, 115, 121, 110, 99]))
-		$.pointerValue<asyncReader>(r).done = true
+		$.copy(p, new Uint8Array([97, 115, 121, 110, 99]));
+		;(r$ as asyncReader).done = true
 		return [5, null]
 	}
 
@@ -233,11 +235,12 @@ export class asyncReaderAt {
 
 	public async ReadAt(p: $.Slice<number>, off: bigint): globalThis.Promise<[number, $.GoError]> {
 		const r: asyncReaderAt | $.VarRef<asyncReaderAt> | null = this;
+		const r$ = $.pointerTarget<asyncReaderAt>(r)
 		await asyncWrites.value.Load("readat")
-		if (off >= $.int64($.sliceLen($.pointerValue<asyncReaderAt>(r).data))) {
+		if (off >= $.int64($.sliceLen((r$ as asyncReaderAt).data))) {
 			return [0, io.EOF]
 		}
-		let n = $.copy(p, $.goSlice($.pointerValue<asyncReaderAt>(r).data, globalThis.Number(off), undefined))
+		let n = $.copy(p, $.goSlice((r$ as asyncReaderAt).data, globalThis.Number(off), undefined))
 		if (n < $.sliceLen(p)) {
 			return [n, io.EOF]
 		}

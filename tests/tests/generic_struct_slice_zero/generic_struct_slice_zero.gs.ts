@@ -75,13 +75,14 @@ export class arena {
 
 	public New(__typeArgs: $.GenericTypeArgs | undefined): any {
 		let a: arena | $.VarRef<arena> | null = this;
-		if ($.sliceLen($.pointerValue<arena>(a).data) == $.cap($.pointerValue<arena>(a).data)) {
-			let nextSize = 1
-			$.pointerValue<arena>(a).data = (slices.Grow(null, nextSize, () => ($.genericZero(__typeArgs, "T", null) as any)) as $.Slice<any>)
+		const a$ = $.pointerTarget<arena>(a)
+		if ($.sliceLen((a$ as arena).data) == $.cap((a$ as arena).data)) {
+			let nextSize = 1;
+			;(a$ as arena).data = (slices.Grow(null, nextSize, () => ($.genericZero(__typeArgs, "T", null) as any)) as $.Slice<any>)
 		}
-		let index = $.sliceLen($.pointerValue<arena>(a).data)
-		$.pointerValue<arena>(a).data = $.goSlice($.pointerValue<arena>(a).data, undefined, index + 1)
-		return $.indexRef($.pointerValue<arena>(a).data!, index)
+		let index = $.sliceLen((a$ as arena).data);
+		;(a$ as arena).data = $.goSlice((a$ as arena).data, undefined, index + 1)
+		return $.indexRef((a$ as arena).data!, index)
 	}
 
 	static __typeInfo = $.registerStructType(
