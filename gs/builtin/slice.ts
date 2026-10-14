@@ -2334,8 +2334,25 @@ export function decodeRuneInString(
   if (b0 < 0x80) {
     return [b0, 1]
   }
-  const [size, lo, hi] = utf8SequenceShape(b0)
-  if (size === 1 || n < size) {
+  // The size of the sequence and the range of its second byte follow from
+  // the leading byte, as in utf8SequenceShape, inlined to avoid allocating.
+  let size: number
+  let lo = 0x80
+  let hi = 0xbf
+  if (b0 >= 0xc2 && b0 <= 0xdf) {
+    size = 2
+  } else if (b0 >= 0xe0 && b0 <= 0xef) {
+    size = 3
+    if (b0 === 0xe0) lo = 0xa0
+    else if (b0 === 0xed) hi = 0x9f
+  } else if (b0 >= 0xf0 && b0 <= 0xf4) {
+    size = 4
+    if (b0 === 0xf0) lo = 0x90
+    else if (b0 === 0xf4) hi = 0x8f
+  } else {
+    return [0xfffd, 1]
+  }
+  if (n < size) {
     return [0xfffd, 1]
   }
   const b1 = str.charCodeAt(i + 1)
@@ -2694,14 +2711,35 @@ function collectionValue(value: unknown): unknown {
   return value
 }
 
+// bytesToBinaryString returns the Go string of bytes, one character per
+// byte. ASCII bytes, the usual case, are decoded natively, which is fastest;
+// others are converted in chunks, as spreading a large array is very slow.
 function bytesToBinaryString(bytes: Uint8Array): string {
-  const chunkSize = 0x8000
+  let ascii = true
+  for (let i = 0; i < bytes.length; i++) {
+    if (bytes[i] >= 0x80) {
+      ascii = false
+      break
+    }
+  }
+  if (ascii && bytes.length > 16) {
+    return asciiDecoder.decode(bytes)
+  }
+  const chunkSize = 0x2000
+  if (bytes.length <= chunkSize) {
+    return String.fromCharCode.apply(null, bytes as unknown as number[])
+  }
   let out = ''
   for (let i = 0; i < bytes.length; i += chunkSize) {
-    out += String.fromCharCode(...bytes.subarray(i, i + chunkSize))
+    out += String.fromCharCode.apply(
+      null,
+      bytes.subarray(i, i + chunkSize) as unknown as number[],
+    )
   }
   return out
 }
+
+const asciiDecoder = new TextDecoder('utf-8')
 
 function binaryStringToBytes(value: string): Uint8Array {
   const out = new Uint8Array(value.length)
