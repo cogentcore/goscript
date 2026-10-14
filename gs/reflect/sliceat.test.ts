@@ -70,7 +70,7 @@ describe('reflect owned pointer handles', () => {
     const bytes = new Value(values, byteSliceType).Bytes()
 
     expect(Array.from(bytes ?? [])).toEqual([1, 2, 3])
-    bytes![1] = 9
+    $.sliceElems(bytes!)[$.sliceSlot(bytes!, 1)] = 9
     expect(values).toEqual([1, 9, 3])
     expect(new Value(null, byteSliceType).Bytes()).toBeNull()
     expect(Array.from(ValueOf('go').Bytes() ?? [])).toEqual([103, 111])

@@ -124,7 +124,7 @@ async function sum(
 }
 
 function appendDigest(prefix: $.Bytes, digest: Uint8Array): $.Bytes {
-  return $.append(prefix as any, ...digest) as $.Bytes
+  return $.appendSlice(prefix as any, digest, $.byteSliceHint) as $.Bytes
 }
 
 function createNodeHash(algorithm: ShaAlgorithm): NodeCryptoHash | null {

@@ -716,7 +716,7 @@ function encodeJSON(v: unknown): string {
   if (t === 'string') {
     return JSON.stringify(v)
   }
-  if (Array.isArray(v)) {
+  if ($.isArrayOrGoSlice(v)) {
     return '[' + v.map(encodeJSON).join(',') + ']'
   }
   if (t === 'object') {
@@ -1530,7 +1530,7 @@ function marshalValue(
 
   // A slice, array or map encodes its elements by their types.
   const info = resolveTypeInfo(typeInfo)
-  if (Array.isArray(v)) {
+  if ($.isArrayOrGoSlice(v)) {
     const elemType =
       info !== null && ($.isSliceTypeInfo(info) || $.isArrayTypeInfo(info)) ?
         info.elemType
@@ -1683,7 +1683,7 @@ function isEmptyValue(v: unknown, fieldType?: unknown): boolean {
   if (typeof t === 'boolean') {
     return t === false
   }
-  if (Array.isArray(t) || t instanceof Uint8Array) {
+  if ($.isArrayOrGoSlice(t) || t instanceof Uint8Array) {
     return t.length === 0
   }
   if (t instanceof Map) {
@@ -1900,7 +1900,7 @@ function assignDecodedValue(
     // decodes by the structured type information of the target, which keeps
     // the element type's methods that its spelling below cannot.
     const elemSlice = textUnmarshalerSliceInfo(target)
-    if (elemSlice !== null && Array.isArray(decoded)) {
+    if (elemSlice !== null && $.isArrayOrGoSlice(decoded)) {
       target.value = decodeValueForType(decoded, elemSlice, opts)
       return
     }
@@ -1933,7 +1933,7 @@ function assignDecodedValue(
       }
       if (info !== null) {
         if (
-          ($.isSliceTypeInfo(info) && Array.isArray(decoded)) ||
+          ($.isSliceTypeInfo(info) && $.isArrayOrGoSlice(decoded)) ||
           ($.isMapTypeInfo(info) && isPlainObject(decoded)) ||
           // A top-level *Struct var (e.g. `var p *pkg.T`) needs the same
           // type-driven Pointer handling as a pointer-typed struct field or
@@ -1949,7 +1949,7 @@ function assignDecodedValue(
         }
       }
     }
-    if (isPlainObject(decoded) || Array.isArray(decoded)) {
+    if (isPlainObject(decoded) || $.isArrayOrGoSlice(decoded)) {
       storeDecodedValue(target, decodeInterfaceValue(decoded))
       return
     }
@@ -2364,7 +2364,7 @@ function decodeValueForType(
     if (isByteSliceTypeInfo(info) && typeof decoded === 'string') {
       return base64Decode(decoded)
     }
-    if (!Array.isArray(decoded)) {
+    if (!$.isArrayOrGoSlice(decoded)) {
       return decoded
     }
     const out: unknown[] = new Array(decoded.length)
@@ -2434,7 +2434,7 @@ function decodeValueForType(
 // `case map[string]any:` and calls Map-only methods like .entries() on those
 // elements panics with "entries is not a function".
 function decodeInterfaceValue(decoded: unknown): unknown {
-  if (Array.isArray(decoded)) {
+  if ($.isArrayOrGoSlice(decoded)) {
     return decoded.map((el) => decodeInterfaceValue(el))
   }
   if (isPlainObject(decoded)) {
@@ -2614,7 +2614,7 @@ function anonymousStructFields(desc: unknown): fieldMetadata[] | null {
   }
   const fields = (desc as { anonymousStructFields?: unknown })
     .anonymousStructFields
-  return Array.isArray(fields) ? (fields as fieldMetadata[]) : null
+  return $.isArrayOrGoSlice(fields) ? (fields as fieldMetadata[]) : null
 }
 
 // assignAnonymousStructFields populates an anonymous-struct value (a plain
@@ -2736,7 +2736,7 @@ function isStructValue(
     fields !== null &&
     fields !== undefined &&
     typeof fields === 'object' &&
-    !Array.isArray(fields)
+    !$.isArrayOrGoSlice(fields)
   )
 }
 
@@ -2745,7 +2745,7 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
     value !== null &&
     typeof value === 'object' &&
     !$.isNamedValueBox(value) &&
-    !Array.isArray(value) &&
+    !$.isArrayOrGoSlice(value) &&
     !(value instanceof Uint8Array) &&
     !(value instanceof Map)
   )
@@ -2765,7 +2765,11 @@ function structFields(value: {
 // value, which carries its descriptor instead of a class, or null for any
 // other value.
 function anonymousStructValueFields(value: unknown): fieldMetadata[] | null {
-  if (value === null || typeof value !== 'object' || Array.isArray(value)) {
+  if (
+    value === null ||
+    typeof value !== 'object' ||
+    $.isArrayOrGoSlice(value)
+  ) {
     return null
   }
   const info = resolveTypeInfo($.structValueTypeInfo(value))
@@ -2801,7 +2805,7 @@ function structFieldMetadata(value: unknown): fieldMetadata[] {
     return []
   }
   const fields = Reflect.get(typeInfo, 'fields')
-  if (Array.isArray(fields)) {
+  if ($.isArrayOrGoSlice(fields)) {
     const out: fieldMetadata[] = []
     for (const field of fields) {
       if (!$.isStructFieldInfo(field)) {

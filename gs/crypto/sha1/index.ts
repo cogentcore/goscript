@@ -93,7 +93,7 @@ async function sum(data: $.Bytes): Promise<Uint8Array> {
 }
 
 function appendDigest(prefix: $.Bytes, digest: Uint8Array): $.Bytes {
-  return $.append(prefix as any, ...digest) as $.Bytes
+  return $.appendSlice(prefix as any, digest, $.byteSliceHint) as $.Bytes
 }
 
 function createNodeHash(): NodeCryptoHash | null {

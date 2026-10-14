@@ -229,7 +229,12 @@ export function IsEqualVTSlice<T>(
     return false
   }
   for (let i = 0; i < $.len(s1); i++) {
-    if (!IsEqualVT((s1 as any)[i] as T, (s2 as any)[i] as T)) {
+    if (
+      !IsEqualVT(
+        $.arrayIndex(s1 as any, i) as T,
+        $.arrayIndex(s2 as any, i) as T,
+      )
+    ) {
       return false
     }
   }
@@ -827,7 +832,7 @@ export function MarshalBoundMessageToSizedBufferVT<T>(
   const offset = $.len(dAtA) - byteCount
   const src = $.asArray(bytes)
   for (let i = 0; i < src.length; i++) {
-    ;(dAtA as any)[offset + i] = src[i]
+    $.sliceElems(dAtA)[$.sliceSlot(dAtA, offset + i)] = src[i]
   }
   return [byteCount, null]
 }
@@ -1422,7 +1427,7 @@ function setByte(b: $.Slice<number>, idx: number, value: number): void {
   if (b == null) {
     throw new Error('assignment to nil byte slice')
   }
-  b[idx] = value & 0xff
+  $.sliceElems(b)[$.sliceSlot(b, idx)] = value & 0xff
 }
 
 function toInt32(v: number | bigint): number {

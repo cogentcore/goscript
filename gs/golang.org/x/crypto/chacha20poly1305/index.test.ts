@@ -1,3 +1,4 @@
+import * as $ from '@goscript/builtin/index.js'
 import { describe, expect, test } from 'vitest'
 
 import { New, NewX, NonceSize, NonceSizeX, Overhead } from './index.js'
@@ -37,7 +38,7 @@ describe('chacha20poly1305 override', () => {
       hex('68656c6c6f'),
       null,
     )
-    sealed![0] ^= 1
+    $.sliceElems(sealed!)[$.sliceSlot(sealed!, 0)] ^= 1
 
     const [opened, openErr] = aead!.Open(
       null,

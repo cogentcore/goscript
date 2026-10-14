@@ -115,7 +115,7 @@ export function LastIndex(s: $.Bytes, sep: $.Bytes): number {
 	}
 	
 	if ($.len(sep) === 1) {
-		return $.bytesLastIndexByte(s, sep![0])
+		return $.bytesLastIndexByte(s, $.arrayIndex(sep!, 0))
 	}
 	
 	return $.bytesLastIndexOf(s, sep)
@@ -185,7 +185,7 @@ export function IndexAny(s: $.Bytes, chars: string): number {
 	if (allASCII) {
 		// ASCII optimization
 		for (let i = 0; i < $.len(s); i++) {
-			const b = s![i]
+			const b = $.arrayIndex(s!, i)
 			if (b < utf8.RuneSelf && chars.indexOf(String.fromCharCode(b)) >= 0) {
 				return i
 			}
@@ -233,7 +233,7 @@ export function LastIndexAny(s: $.Bytes, chars: string): number {
 	if (allASCII) {
 		// ASCII optimization - search backwards
 		for (let i = $.len(s) - 1; i >= 0; i--) {
-			const b = s![i]
+			const b = $.arrayIndex(s!, i)
 			if (b < utf8.RuneSelf && chars.indexOf(String.fromCharCode(b)) >= 0) {
 				return i
 			}
@@ -369,7 +369,7 @@ export function FieldsFunc(s: $.Bytes, f: ((p0: number) => boolean) | null): $.S
 	
 	for (let i = 0; i < $.len(s); ) {
 		let size = 1
-		let r = s![i]
+		let r = $.arrayIndex(s!, i)
 		
 		if (r >= utf8.RuneSelf) {
 			const [rune, runeSize] = utf8.DecodeRune($.goSlice(s, i, undefined))
@@ -408,8 +408,8 @@ export function Join(s: $.Slice<$.Bytes>, sep: $.Bytes): $.Bytes {
 
 	// Just return a copy for single element
 	if ($.len(s) === 1) {
-		if (s![0] === null) return new Uint8Array(0)
-		return $.bytesToUint8Array(s![0]).slice()
+		if ($.arrayIndex(s!, 0) === null) return new Uint8Array(0)
+		return $.bytesToUint8Array($.arrayIndex(s!, 0)).slice()
 	}
 
 	// Calculate total length needed
@@ -417,7 +417,7 @@ export function Join(s: $.Slice<$.Bytes>, sep: $.Bytes): $.Bytes {
 	const sepLen = sep === null ? 0 : $.len(sep)
 	
 	for (let i = 0; i < $.len(s); i++) {
-		const elem = s![i]
+		const elem = $.arrayIndex(s!, i)
 		if (elem !== null) {
 			totalLen += $.len(elem)
 		}
@@ -438,7 +438,7 @@ export function Join(s: $.Slice<$.Bytes>, sep: $.Bytes): $.Bytes {
 			pos += sepLen
 		}
 		
-		const elem = s![i]
+		const elem = $.arrayIndex(s!, i)
 		if (elem !== null) {
 			const elemBytes = $.bytesToUint8Array(elem)
 			result.set(elemBytes, pos)
@@ -499,7 +499,7 @@ export function Map(mapping: ((r: number) => number) | null, s: $.Bytes): $.Byte
 		const [r, size] = utf8.DecodeRune($.goSlice(s, i, undefined))
 		if (size <= 0) {
 			// Invalid UTF-8, copy the byte as-is
-			result.push(s![i])
+			result.push($.arrayIndex(s!, i))
 			i++
 		} else {
 			const mappedR = mapping(r)
@@ -571,7 +571,7 @@ export function ToUpper(s: $.Bytes): $.Bytes {
 		const [r, size] = utf8.DecodeRune($.goSlice(s, i, undefined))
 		if (size <= 0) {
 			// Invalid UTF-8, copy the byte as-is
-			result.push(s![i])
+			result.push($.arrayIndex(s!, i))
 			i++
 		} else {
 			// Convert rune to uppercase
@@ -606,7 +606,7 @@ export function ToLower(s: $.Bytes): $.Bytes {
 		const [r, size] = utf8.DecodeRune($.goSlice(s, i, undefined))
 		if (size <= 0) {
 			// Invalid UTF-8, copy the byte as-is
-			result.push(s![i])
+			result.push($.arrayIndex(s!, i))
 			i++
 		} else {
 			// Convert rune to lowercase
@@ -671,7 +671,7 @@ export function ToValidUTF8(s: $.Bytes, replacement: $.Bytes): $.Bytes {
 			i++
 		} else {
 			for (let j = 0; j < size; j++) {
-				result.push(s![i + j])
+				result.push($.arrayIndex(s!, i + j))
 			}
 			i += size
 		}
@@ -718,7 +718,7 @@ export function Title(s: $.Bytes): $.Bytes {
 		const [r, size] = utf8.DecodeRune($.goSlice(s, i, undefined))
 		if (size <= 0) {
 			// Invalid UTF-8, copy the byte as-is
-			result.push(s![i])
+			result.push($.arrayIndex(s!, i))
 			i++
 			prevIsSep = true
 		} else {
@@ -960,7 +960,7 @@ export function trimLeftByte(s: $.Bytes, c: number): $.Bytes {
 	if (s === null) return null
 	
 	for (let i = 0; i < $.len(s); i++) {
-		if (s![i] !== c) {
+		if ($.arrayIndex(s!, i) !== c) {
 			return $.goSlice(s, i, undefined)
 		}
 	}
@@ -972,7 +972,7 @@ export function trimLeftASCII(s: $.Bytes, _as: asciiSet): $.Bytes {
 	if (s === null) return null
 	
 	for (let i = 0; i < $.len(s); i++) {
-		const b = s![i]
+		const b = $.arrayIndex(s!, i)
 		if (b >= utf8.RuneSelf || !_as.contains(b)) {
 			return $.goSlice(s, i, undefined)
 		}
@@ -1025,7 +1025,7 @@ export function trimRightByte(s: $.Bytes, c: number): $.Bytes {
 	if (s === null) return null
 	
 	for (let i = $.len(s) - 1; i >= 0; i--) {
-		if (s![i] !== c) {
+		if ($.arrayIndex(s!, i) !== c) {
 			return $.goSlice(s, undefined, i + 1)
 		}
 	}
@@ -1037,7 +1037,7 @@ export function trimRightASCII(s: $.Bytes, _as: asciiSet): $.Bytes {
 	if (s === null) return null
 	
 	for (let i = $.len(s) - 1; i >= 0; i--) {
-		const b = s![i]
+		const b = $.arrayIndex(s!, i)
 		if (b >= utf8.RuneSelf || !_as.contains(b)) {
 			return $.goSlice(s, undefined, i + 1)
 		}
@@ -1141,7 +1141,7 @@ export function Replace(s: $.Bytes, old: $.Bytes, _new: $.Bytes, n: number): $.B
 				const [, size] = utf8.DecodeRune($.goSlice(s, start, undefined))
 				const wid = size > 0 ? size : 1
 				for (let j = 0; j < wid; j++) {
-					result.push(s![start + j])
+					result.push($.arrayIndex(s!, start + j))
 				}
 				start += wid
 			}
@@ -1150,7 +1150,7 @@ export function Replace(s: $.Bytes, old: $.Bytes, _new: $.Bytes, n: number): $.B
 
 		// Append the untouched remainder after the last insertion.
 		for (let j = start; j < $.len(s); j++) {
-			result.push(s![j])
+			result.push($.arrayIndex(s!, j))
 		}
 
 		return new Uint8Array(result)
@@ -1220,7 +1220,7 @@ export function EqualFold(s: $.Bytes, t: $.Bytes): boolean {
 		
 		if (ssize <= 0 || tsize <= 0) {
 			// Invalid UTF-8, fall back to byte comparison
-			if (s![si] !== t![ti]) return false
+			if ($.arrayIndex(s!, si) !== $.arrayIndex(t!, ti)) return false
 			si++
 			ti++
 			continue

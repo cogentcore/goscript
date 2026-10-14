@@ -64,7 +64,7 @@ describe('compress/gzip override', () => {
       state ^= state << 13
       state ^= state >>> 17
       state ^= state << 5
-      input[idx] = state & 0xff
+      $.sliceElems(input)[$.sliceSlot(input, idx)] = state & 0xff
     }
 
     const compressed = $.markAsStructValue(new bytes.Buffer())

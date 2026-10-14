@@ -443,7 +443,7 @@ export class URL {
 		if (!strings.HasPrefix($.arrayIndex(elem!, 0), "/")) {
 			// Return a relative path if u is relative,
 			// but ensure that it contains no ../ elements.
-			elem![0] = "/" + $.arrayIndex(elem!, 0)
+			$.sliceElems(elem!)[$.sliceSlot(elem!, 0)] = "/" + $.arrayIndex(elem!, 0)
 			p = $.sliceStringOrBytes(path2.Join(...(elem ?? [])), 1, undefined)
 		} else {
 			p = path2.Join(...(elem ?? []))
@@ -753,7 +753,7 @@ export function escape(s: string, mode: __goscript_encoding_table.encoding): str
 		$.copy(t, s)
 		for (let i = 0; i < $.len(s); i++) {
 			if ($.uint($.indexStringOrBytes(s, i), 8) == 32) {
-				t![i] = 43
+				$.sliceElems(t!)[$.sliceSlot(t!, i)] = 43
 			}
 		}
 		return $.bytesToString(t)
@@ -765,21 +765,21 @@ export function escape(s: string, mode: __goscript_encoding_table.encoding): str
 		switch ((true as boolean)) {
 			case ($.uint(c, 8) == 32) && ($.uint(mode, 8) == 32):
 			{
-				t![j] = 43
+				$.sliceElems(t!)[$.sliceSlot(t!, j)] = 43
 				j++
 				break
 			}
 			case shouldEscape($.uint(c, 8), $.uint(mode, 8)):
 			{
-				t![j] = 37
-				t![j + 1] = $.uint($.indexByteString("\x30\x31\x32\x33\x34\x35\x36\x37\x38\x39\x41\x42\x43\x44\x45\x46", $.uintShr(c, 4, 8)), 8)
-				t![j + 2] = $.uint($.indexByteString("\x30\x31\x32\x33\x34\x35\x36\x37\x38\x39\x41\x42\x43\x44\x45\x46", c & 15), 8)
+				$.sliceElems(t!)[$.sliceSlot(t!, j)] = 37
+				$.sliceElems(t!)[$.sliceSlot(t!, j + 1)] = $.uint($.indexByteString("\x30\x31\x32\x33\x34\x35\x36\x37\x38\x39\x41\x42\x43\x44\x45\x46", $.uintShr(c, 4, 8)), 8)
+				$.sliceElems(t!)[$.sliceSlot(t!, j + 2)] = $.uint($.indexByteString("\x30\x31\x32\x33\x34\x35\x36\x37\x38\x39\x41\x42\x43\x44\x45\x46", c & 15), 8)
 				j = j + (3)
 				break
 			}
 			default:
 			{
-				t![j] = $.uint(c, 8)
+				$.sliceElems(t!)[$.sliceSlot(t!, j)] = $.uint(c, 8)
 				j++
 				break
 			}
@@ -1324,16 +1324,16 @@ export function Values_Encode(v: Values): string {
 	let keys: $.Slice<string> = $.makeSlice<string>($.len(v), undefined, "string")
 	let i: number = 0
 	for (const [k, __rangeValue] of v?.entries() ?? []) {
-		keys![i] = k
+		$.sliceElems(keys!)[$.sliceSlot(keys!, i)] = k
 		i++
 	}
 	slices.Sort(keys)
 	for (let __goscriptRangeTarget3 = keys, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget3); __rangeIndex++) {
-		let k = __goscriptRangeTarget3![__rangeIndex]
+		let k = $.arrayIndex(__goscriptRangeTarget3!, __rangeIndex)
 		let vs: $.Slice<string> = $.mapGet<string, $.Slice<string>, $.Slice<string>>(v, k, null)[0]
 		let keyEscaped = QueryEscape(k)
 		for (let __goscriptRangeTarget2 = vs, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget2); __rangeIndex++) {
-			let v = __goscriptRangeTarget2![__rangeIndex]
+			let v = $.arrayIndex(__goscriptRangeTarget2!, __rangeIndex)
 			if (buf.value.Len() > 0) {
 				buf.value.WriteByte(38)
 			}

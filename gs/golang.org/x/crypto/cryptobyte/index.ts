@@ -454,8 +454,8 @@ export class Builder {
       this.SetError($.newError('cryptobyte: invalid OID'))
       return
     }
-    const first = Number((oid as any)[0])
-    const second = Number((oid as any)[1])
+    const first = Number($.arrayIndex(oid as any, 0))
+    const second = Number($.arrayIndex(oid as any, 1))
     if (first > 2 || second >= 40 && first < 2) {
       this.SetError($.newError('cryptobyte: invalid OID'))
       return
@@ -463,7 +463,7 @@ export class Builder {
     this.AddASN1(asn1.OBJECT_IDENTIFIER, (child) => {
       child!.addBase128Int(first * 40 + second)
       for (let i = 2; i < $.len(oid); i++) {
-        child!.addBase128Int(Number((oid as any)[i]))
+        child!.addBase128Int(Number($.arrayIndex(oid as any, i)))
       }
     })
   }

@@ -106,7 +106,10 @@ export class stringFinder {
       if (j < 0) {
         return i + 1
       }
-      i += max(f!.badCharSkip![$.indexString(text, i)], f!.goodSuffixSkip![j])
+      i += max(
+        f!.badCharSkip![$.indexString(text, i)],
+        $.arrayIndex(f!.goodSuffixSkip!, j),
+      )
     }
     return -1
   }
@@ -145,7 +148,8 @@ export function makeStringFinder(pattern: string): stringFinder | null {
       lastPrefix = i + 1
     }
     // lastPrefix is the shift, and (last-i) is len(suffix).
-    f!.goodSuffixSkip![i] = lastPrefix + last - i
+    $.sliceElems(f!.goodSuffixSkip!)[$.sliceSlot(f!.goodSuffixSkip!, i)] =
+      lastPrefix + last - i
   }
   // Second pass: find repeats of pattern's suffix starting from the front.
 
@@ -162,7 +166,9 @@ export function makeStringFinder(pattern: string): stringFinder | null {
       $.indexString(pattern, last - lenSuffix)
     ) {
       // (last-i) is the shift, and lenSuffix is len(suffix).
-      f!.goodSuffixSkip![last - lenSuffix] = lenSuffix + last - i
+      $.sliceElems(f!.goodSuffixSkip!)[
+        $.sliceSlot(f!.goodSuffixSkip!, last - lenSuffix)
+      ] = lenSuffix + last - i
     }
   }
 

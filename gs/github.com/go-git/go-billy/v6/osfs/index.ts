@@ -76,7 +76,7 @@ function normalizeOptions(
     const slice = opts[0] ?? null
     const out: Option[] = []
     for (let i = 0; i < $.len(slice); i++) {
-      out.push(slice![i])
+      out.push($.arrayIndex(slice!, i))
     }
     return out
   }

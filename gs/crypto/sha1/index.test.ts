@@ -28,8 +28,8 @@ describe('crypto/sha1 override', () => {
     const backing = $.makeSlice<number>(Size, undefined, 'byte')
     const out = await h.Sum($.goSlice(backing, 0, 0))
     expect(out.length).toBe(Size)
-    expect(backing[0]).toBe(out[0])
-    expect(backing[Size - 1]).toBe(out[Size - 1])
+    expect($.arrayIndex(backing, 0)).toBe(out[0])
+    expect($.arrayIndex(backing, Size - 1)).toBe(out[Size - 1])
     expect(toHex($.bytesToUint8Array(backing))).toBe(
       nodeHash(new TextEncoder().encode('abc')),
     )

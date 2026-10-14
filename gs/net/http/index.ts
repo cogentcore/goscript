@@ -368,7 +368,9 @@ export function Header_WriteSubset(
 
 export function Header__get(h: HeaderValue, key: string): string {
   const values = headerMap(h)?.get(key)
-  return values == null || values.length === 0 ? '' : String(values[0])
+  return values == null || values.length === 0 ?
+      ''
+    : String($.arrayIndex(values, 0))
 }
 
 export function Header_has(h: HeaderValue, key: string): boolean {
@@ -928,7 +930,9 @@ export class Request {
 
   public FormValue(key: string): string {
     const values = this.URL?.Query()?.get(key)
-    return values == null || values.length === 0 ? '' : String(values[0])
+    return values == null || values.length === 0 ?
+        ''
+      : String($.arrayIndex(values, 0))
   }
 }
 
@@ -1175,7 +1179,7 @@ function appendFormValue(
   if (unwrapped == null) {
     return
   }
-  if (Array.isArray(unwrapped)) {
+  if ($.isArrayOrGoSlice(unwrapped)) {
     for (const item of unwrapped) {
       appendFormValue(params, key, item)
     }

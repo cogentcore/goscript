@@ -44,7 +44,7 @@ describe('bytes', () => {
     expect($.bytesToString(source)).toBe('zbc')
     expect($.bytesToString(cloned)).toBe('abc')
 
-    cloned[1] = 0x79
+    $.sliceElems(cloned)[$.sliceSlot(cloned, 1)] = 0x79
     expect($.bytesToString(cloned)).toBe('ayc')
     expect($.bytesToString(source)).toBe('zbc')
   })

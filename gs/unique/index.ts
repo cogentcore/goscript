@@ -89,7 +89,7 @@ function normalize(
   if ($.isVarRef(value)) {
     return { $varRef: normalize(value.value, seen, nextID) }
   }
-  if (Array.isArray(value)) {
+  if ($.isArrayOrGoSlice(value)) {
     return value.map((entry) => normalize(entry, seen, nextID))
   }
   if (value instanceof Map) {

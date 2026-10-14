@@ -257,7 +257,7 @@ function writeValue(h: Hash, v: unknown): void {
     h.WriteByte(0)
     return
   }
-  if (Array.isArray(v)) {
+  if ($.isArrayOrGoSlice(v)) {
     h.WriteByte(6)
     for (const item of v) {
       writeValue(h, item)

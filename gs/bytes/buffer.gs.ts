@@ -323,7 +323,7 @@ export class Buffer {
 		if (!ok) {
 			m = b.grow(1)
 		}
-		b.buf![m] = c
+		$.sliceElems(b.buf!)[$.sliceSlot(b.buf!, m)] = c
 		return null
 	}
 
@@ -418,7 +418,7 @@ export class Buffer {
 			b.Reset()
 			return [0, io.EOF]
 		}
-		let c = b.buf![b.off]
+		let c = $.arrayIndex(b.buf!, b.off)
 		b.off++
 		b.lastRead = -1
 		return [c, null]
@@ -436,7 +436,7 @@ export class Buffer {
 			b.Reset()
 			return [0, 0, io.EOF]
 		}
-		let c = b.buf![b.off]
+		let c = $.arrayIndex(b.buf!, b.off)
 		if (c < utf8.RuneSelf) {
 			b.off++
 			b.lastRead = 1

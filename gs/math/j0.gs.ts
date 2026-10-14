@@ -207,8 +207,8 @@ export function pzero(x: number): number {
 	}
 	
 	const z = 1 / (x * x);
-	const r = p.value![0] + z * (p.value![1] + z * (p.value![2] + z * (p.value![3] + z * (p.value![4] + z * p.value![5]))));
-	const s = 1 + z * (q.value![0] + z * (q.value![1] + z * (q.value![2] + z * (q.value![3] + z * q.value![4]))));
+	const r = $.arrayIndex(p.value!, 0) + z * ($.arrayIndex(p.value!, 1) + z * ($.arrayIndex(p.value!, 2) + z * ($.arrayIndex(p.value!, 3) + z * ($.arrayIndex(p.value!, 4) + z * $.arrayIndex(p.value!, 5)))));
+	const s = 1 + z * ($.arrayIndex(q.value!, 0) + z * ($.arrayIndex(q.value!, 1) + z * ($.arrayIndex(q.value!, 2) + z * ($.arrayIndex(q.value!, 3) + z * $.arrayIndex(q.value!, 4)))));
 	return 1 + r / s;
 }
 
@@ -250,8 +250,8 @@ export function qzero(x: number): number {
 	}
 	
 	const z = 1 / (x * x);
-	const r = p.value![0] + z * (p.value![1] + z * (p.value![2] + z * (p.value![3] + z * (p.value![4] + z * p.value![5]))));
-	const s = 1 + z * (q.value![0] + z * (q.value![1] + z * (q.value![2] + z * (q.value![3] + z * (q.value![4] + z * q.value![5])))));
+	const r = $.arrayIndex(p.value!, 0) + z * ($.arrayIndex(p.value!, 1) + z * ($.arrayIndex(p.value!, 2) + z * ($.arrayIndex(p.value!, 3) + z * ($.arrayIndex(p.value!, 4) + z * $.arrayIndex(p.value!, 5)))));
+	const s = 1 + z * ($.arrayIndex(q.value!, 0) + z * ($.arrayIndex(q.value!, 1) + z * ($.arrayIndex(q.value!, 2) + z * ($.arrayIndex(q.value!, 3) + z * ($.arrayIndex(q.value!, 4) + z * $.arrayIndex(q.value!, 5))))));
 	return (-0.125 + r / s) / x;
 }
 

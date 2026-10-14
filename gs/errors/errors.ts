@@ -94,13 +94,11 @@ export function Unwrap(err: $.GoError): $.GoError {
       return result
     }
     // Handle case where Unwrap returns []error
-    if (
-      Array.isArray(result) &&
-      result.length > 0 &&
-      result[0] &&
-      typeof result[0].Error === 'function'
-    ) {
-      return result[0]
+    if ($.isArrayOrGoSlice(result) && $.len(result) > 0) {
+      const first = $.arrayIndex(result, 0) as $.GoError
+      if (first && typeof (first as { Error?: unknown }).Error === 'function') {
+        return first
+      }
     }
   }
 
@@ -173,9 +171,9 @@ function isTypeInfo(value: unknown): value is $.TypeInfo {
     case $.TypeKind.Channel:
       return true
     case $.TypeKind.Struct:
-      return 'fields' in value && Array.isArray(value.fields)
+      return 'fields' in value && $.isArrayOrGoSlice(value.fields)
     case $.TypeKind.Interface:
-      return 'methods' in value && Array.isArray(value.methods)
+      return 'methods' in value && $.isArrayOrGoSlice(value.methods)
     default:
       return false
   }
@@ -212,7 +210,7 @@ function isInTree(
   // a target in any position matches, not just the first.
   if (typeof (err as any).Unwrap === 'function') {
     const result = (err as any).Unwrap()
-    if (Array.isArray(result)) {
+    if ($.isArrayOrGoSlice(result)) {
       for (const wrappedErr of result) {
         if (
           wrappedErr !== null &&
@@ -271,7 +269,7 @@ export function As(err: $.GoError, target: any): boolean {
   // child so a match in any position is found.
   if (typeof (err as any).Unwrap === 'function') {
     const result = (err as any).Unwrap()
-    if (Array.isArray(result)) {
+    if ($.isArrayOrGoSlice(result)) {
       for (const wrappedErr of result) {
         if (wrappedErr !== null && As(wrappedErr, target)) {
           return true
@@ -358,7 +356,7 @@ function asType(
 
   if (typeof (err as any).Unwrap === 'function') {
     const result = (err as any).Unwrap()
-    if (Array.isArray(result)) {
+    if ($.isArrayOrGoSlice(result)) {
       for (const wrappedErr of result) {
         if (wrappedErr && typeof wrappedErr.Error === 'function') {
           const [matched, matchedOK] = asType(wrappedErr, typeInfo, zero)

@@ -37,7 +37,7 @@ describe('unsafe package', () => {
     const s = $.arrayToSlice<number>([1, 2, 3])
     const view = unsafe.Slice<number>(unsafe.SliceData(s), 2n)
     expect($.len(view)).toBe(2)
-    view![0] = 9
+    $.sliceElems(view!)[$.sliceSlot(view!, 0)] = 9
     expect(s![0]).toBe(9)
     expect(unsafe.SliceData(null)).toBe(null)
     expect(unsafe.Slice(null, 0)).toBe(null)

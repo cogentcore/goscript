@@ -92,8 +92,8 @@ export function FieldsSeq(s: $.Bytes): iter.Seq<$.Bytes> {
 		let start = -1
 		for (let i = 0; i < $.len(s); ) {
 			let size = 1
-			let r = (s![i] as number)
-			let isSpace = asciiSpace![s![i]] != 0
+			let r = ($.arrayIndex(s!, i) as number)
+			let isSpace = asciiSpace![$.arrayIndex(s!, i)] != 0
 			if (r >= utf8.RuneSelf) {
 				;[r, size] = utf8.DecodeRune($.goSlice(s, i, undefined))
 				isSpace = unicode.IsSpace(r)
@@ -125,7 +125,7 @@ export function FieldsFuncSeq(s: $.Bytes, f: ((p0: number) => boolean) | null): 
 		let start = -1
 		for (let i = 0; i < $.len(s); ) {
 			let size = 1
-			let r = (s![i] as number)
+			let r = ($.arrayIndex(s!, i) as number)
 			if (r >= utf8.RuneSelf) {
 				;[r, size] = utf8.DecodeRune($.goSlice(s, i, undefined))
 			}

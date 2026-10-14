@@ -153,9 +153,9 @@ function sortInSlice<T>(slice: $.Slice<T>, compare: (a: T, b: T) => number): voi
     values.push($.index(slice, i) as T)
   }
   values.sort(compare)
-  if (Array.isArray(slice)) {
+  if ($.isArrayOrGoSlice(slice)) {
     for (let i = 0; i < n; i++) {
-      slice[i] = values[i]
+      $.sliceElems(slice)[$.sliceSlot(slice, i)] = values[i]
     }
   } else if (slice && typeof slice === 'object' && '__meta__' in slice) {
     const meta = (slice as any).__meta__ as SliceMetadata<T>
@@ -170,11 +170,11 @@ function swapInSlice<T>(slice: $.Slice<T>, i: number, j: number): void {
   if (!slice) return
   
   const temp = $.index(slice, i)
-  if (Array.isArray(slice)) {
+  if ($.isArrayOrGoSlice(slice)) {
     const val_j = $.index(slice, j)
     const val_i = temp
-    slice[i] = val_j as T
-    slice[j] = val_i as T
+    $.sliceElems(slice)[$.sliceSlot(slice, i)] = val_j as T
+    $.sliceElems(slice)[$.sliceSlot(slice, j)] = val_i as T
   } else if (typeof slice === 'object' && '__meta__' in slice) {
     const meta = (slice as any).__meta__ as SliceMetadata<T>
     const backing = meta.backing

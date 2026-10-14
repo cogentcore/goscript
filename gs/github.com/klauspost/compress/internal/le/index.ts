@@ -7,12 +7,12 @@ function index(value: unknown): number {
 }
 
 function byteAt(b: $.Slice<number>, i: number): number {
-  return b![i] ?? 0
+  return $.arrayIndex(b!, i) ?? 0
 }
 
 function isSlice(value: unknown): value is $.Slice<number> {
   return (
-    Array.isArray(value) ||
+    $.isArrayOrGoSlice(value) ||
     value === null ||
     value instanceof Uint8Array ||
     (typeof value === 'object' && value !== undefined && '__meta__' in value)
@@ -82,15 +82,15 @@ export function Load64(
 }
 
 export function Store16(b: $.Slice<number>, v: number): void {
-  b![0] = v & 0xff
-  b![1] = (v >> 8) & 0xff
+  $.sliceElems(b!)[$.sliceSlot(b!, 0)] = v & 0xff
+  $.sliceElems(b!)[$.sliceSlot(b!, 1)] = (v >> 8) & 0xff
 }
 
 export function Store32(b: $.Slice<number>, v: number): void {
-  b![0] = v & 0xff
-  b![1] = (v >> 8) & 0xff
-  b![2] = (v >> 16) & 0xff
-  b![3] = (v >> 24) & 0xff
+  $.sliceElems(b!)[$.sliceSlot(b!, 0)] = v & 0xff
+  $.sliceElems(b!)[$.sliceSlot(b!, 1)] = (v >> 8) & 0xff
+  $.sliceElems(b!)[$.sliceSlot(b!, 2)] = (v >> 16) & 0xff
+  $.sliceElems(b!)[$.sliceSlot(b!, 3)] = (v >> 24) & 0xff
 }
 
 export function Store64(
@@ -104,12 +104,12 @@ export function Store64(
   const off = genericCall ? index(iOrV) : index(bOrI)
   const v = genericCall ? maybeV : iOrV
   const value = BigInt(v as number | bigint) & ((1n << 64n) - 1n)
-  b![off] = Number(value & 0xffn)
-  b![off + 1] = Number((value >> 8n) & 0xffn)
-  b![off + 2] = Number((value >> 16n) & 0xffn)
-  b![off + 3] = Number((value >> 24n) & 0xffn)
-  b![off + 4] = Number((value >> 32n) & 0xffn)
-  b![off + 5] = Number((value >> 40n) & 0xffn)
-  b![off + 6] = Number((value >> 48n) & 0xffn)
-  b![off + 7] = Number((value >> 56n) & 0xffn)
+  $.sliceElems(b!)[$.sliceSlot(b!, off)] = Number(value & 0xffn)
+  $.sliceElems(b!)[$.sliceSlot(b!, off + 1)] = Number((value >> 8n) & 0xffn)
+  $.sliceElems(b!)[$.sliceSlot(b!, off + 2)] = Number((value >> 16n) & 0xffn)
+  $.sliceElems(b!)[$.sliceSlot(b!, off + 3)] = Number((value >> 24n) & 0xffn)
+  $.sliceElems(b!)[$.sliceSlot(b!, off + 4)] = Number((value >> 32n) & 0xffn)
+  $.sliceElems(b!)[$.sliceSlot(b!, off + 5)] = Number((value >> 40n) & 0xffn)
+  $.sliceElems(b!)[$.sliceSlot(b!, off + 6)] = Number((value >> 48n) & 0xffn)
+  $.sliceElems(b!)[$.sliceSlot(b!, off + 7)] = Number((value >> 56n) & 0xffn)
 }
