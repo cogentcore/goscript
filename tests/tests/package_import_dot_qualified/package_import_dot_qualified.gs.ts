@@ -7,7 +7,7 @@ import * as dep from "@goscript/github.com/s4wave/goscript/tests/tests/package_i
 import "@goscript/github.com/s4wave/goscript/tests/tests/package_import_dot_qualified/dep/index.js"
 
 export async function main(): globalThis.Promise<void> {
-	let box = $.markAsStructValue($.cloneStructValue(dep.NewBox(3)))
+	let box = dep.NewBox(3)
 	await $.println(dep.Double(dep.Value), box.N)
 }
 

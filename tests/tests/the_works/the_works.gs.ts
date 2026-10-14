@@ -500,7 +500,7 @@ export function factorial(name: string, n: bigint): Program {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let programs: $.Slice<Program> = $.arrayToSlice<Program>([$.markAsStructValue($.cloneStructValue(factorial("20!", 20n))), $.markAsStructValue($.cloneStructValue(factorial("21!", 21n))), $.markAsStructValue(new Program({Name: "broken", Code: $.arrayToSlice<Instr>([$.markAsStructValue(new Instr({Op: 0, Arg: 1n})), $.markAsStructValue(new Instr({Op: 6, Arg: 0n})), $.markAsStructValue(new Instr({Op: 9, Arg: 0n}))])}))])
+	let programs: $.Slice<Program> = $.arrayToSlice<Program>([factorial("20!", 20n), factorial("21!", 21n), $.markAsStructValue(new Program({Name: "broken", Code: $.arrayToSlice<Instr>([$.markAsStructValue(new Instr({Op: 0, Arg: 1n})), $.markAsStructValue(new Instr({Op: 6, Arg: 0n})), $.markAsStructValue(new Instr({Op: 9, Arg: 0n}))])}))])
 
 	await $.println("listing of", $.arrayIndex(programs!, 0).Name)
 	let __goscriptRangeReturn0 = false
