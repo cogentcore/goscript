@@ -52,7 +52,7 @@ export async function main(): globalThis.Promise<void> {
 				channel: result,
 				onSelected: async (__goscriptSelect0Result) => {
 					let r = __goscriptSelect0Result.value
-					results = $.append(results, r)
+					results = $.appendOne(results, r)
 				}
 			},
 			{

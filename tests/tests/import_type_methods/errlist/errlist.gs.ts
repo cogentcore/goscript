@@ -22,5 +22,5 @@ $.registerNamedValueType(
 );
 
 export function ErrorList_Add(p: ErrorList, msg: string): ErrorList {
-	return ($.append((p as ErrorList), msg) as ErrorList)
+	return ($.appendOne((p as ErrorList), msg) as ErrorList)
 }

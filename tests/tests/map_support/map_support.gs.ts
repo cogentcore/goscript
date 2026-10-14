@@ -63,7 +63,7 @@ export async function main(): globalThis.Promise<void> {
 	for (const [name, grade] of stringMap?.entries() ?? []) {
 		// Using string concatenation to build the output string
 		let result = $.concatString(($.concatString(($.concatString("  - Name: ", name)), " Grade: ")), grade)
-		scoreResults = $.append(scoreResults, result)
+		scoreResults = $.appendOne(scoreResults, result)
 	}
 
 	// Inline bubble sort for string slice

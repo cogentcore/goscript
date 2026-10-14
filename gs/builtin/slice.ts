@@ -300,10 +300,13 @@ const sliceProxyOwnTraps = {
 const windowSliceProxyHandler: ProxyHandler<SliceProxy<any>> = {
   ...sliceProxyOwnTraps,
   get(target, prop, receiver) {
+    // The window answers for itself before any other property.
     const meta = target.__meta__
     if (prop === '__meta__') {
       return meta
     }
+
+    // An index reads the backing array, inside the length only.
     const index = sliceIndexProperty(prop)
     if (index >= 0) {
       if (index < meta.length) {
@@ -312,14 +315,17 @@ const windowSliceProxyHandler: ProxyHandler<SliceProxy<any>> = {
       outOfRangeIndex(index, meta.length)
     }
 
+    // The length is the window's.
     if (prop === 'length') {
       return meta.length
     }
 
+    // Sorting works on the window, not the target.
     if (prop === 'sort') {
       return sliceProxySortMethod(meta, receiver as SliceProxy<any>)
     }
 
+    // So do the methods that iterate.
     if (
       prop === 'slice' ||
       prop === 'map' ||
@@ -335,6 +341,7 @@ const windowSliceProxyHandler: ProxyHandler<SliceProxy<any>> = {
   },
 
   set(target, prop, value): boolean {
+    // An index writes the backing array, inside the length only.
     const meta = target.__meta__
     const index = sliceIndexProperty(prop)
     if (index >= 0) {
@@ -345,6 +352,7 @@ const windowSliceProxyHandler: ProxyHandler<SliceProxy<any>> = {
       outOfRangeIndex(index, meta.length)
     }
 
+    // The length and the window are not assignable.
     if (prop === 'length' || prop === '__meta__') {
       return false
     }
@@ -354,35 +362,37 @@ const windowSliceProxyHandler: ProxyHandler<SliceProxy<any>> = {
 }
 
 // subsliceProxyHandler is the shared handler of the slice proxies that
-// goSlice makes.
+// goSlice makes. Unlike the window handler, it lets a write at the length
+// extend the slice into its spare capacity.
 const subsliceProxyHandler: ProxyHandler<SliceProxy<any>> = {
   ...sliceProxyOwnTraps,
   get(target, prop, receiver) {
+    // The window answers for itself before any other property.
+    const meta = target.__meta__
     if (prop === '__meta__') {
-      return target.__meta__
+      return meta
     }
+
+    // An index reads the backing array, inside the length only.
     const index = sliceIndexProperty(prop)
     if (index >= 0) {
-      if (index < target.__meta__.length) {
-        return target.__meta__.backing[target.__meta__.offset + index]
+      if (index < meta.length) {
+        return meta.backing[meta.offset + index]
       }
-      runtimePanic(
-        `Slice index out of range: ${index} >= ${target.__meta__.length}`,
-      )
+      runtimePanic(`Slice index out of range: ${index} >= ${meta.length}`)
     }
 
+    // The length is the window's.
     if (prop === 'length') {
-      return target.__meta__.length
+      return meta.length
     }
 
-    if (prop === '__meta__') {
-      return target.__meta__
-    }
-
+    // Sorting works on the window, not the target.
     if (prop === 'sort') {
-      return sliceProxySortMethod(target.__meta__, receiver as SliceProxy<any>)
+      return sliceProxySortMethod(meta, receiver as SliceProxy<any>)
     }
 
+    // So do the methods that iterate.
     if (
       prop === 'slice' ||
       prop === 'map' ||
@@ -391,32 +401,31 @@ const subsliceProxyHandler: ProxyHandler<SliceProxy<any>> = {
       prop === 'forEach' ||
       prop === Symbol.iterator
     ) {
-      return sliceProxyBackingMethod(target.__meta__, prop)
+      return sliceProxyBackingMethod(meta, prop)
     }
 
     return Reflect.get(target, prop)
   },
 
   set(target, prop, value): boolean {
+    // An index writes the backing array, inside the length or at the length
+    // when the capacity has room.
+    const meta = target.__meta__
     const index = sliceIndexProperty(prop)
     if (index >= 0) {
-      if (index < target.__meta__.length) {
-        target.__meta__.backing[target.__meta__.offset + index] = value
+      if (index < meta.length) {
+        meta.backing[meta.offset + index] = value
         return true
       }
-      if (
-        index === target.__meta__.length &&
-        target.__meta__.length < target.__meta__.capacity
-      ) {
-        target.__meta__.backing[target.__meta__.offset + index] = value
-        target.__meta__.length++
+      if (index === meta.length && meta.length < meta.capacity) {
+        meta.backing[meta.offset + index] = value
+        meta.length++
         return true
       }
-      runtimePanic(
-        `Slice index out of range: ${index} >= ${target.__meta__.length}`,
-      )
+      runtimePanic(`Slice index out of range: ${index} >= ${meta.length}`)
     }
 
+    // The length and the window are not assignable.
     if (prop === 'length' || prop === '__meta__') {
       return false
     }
@@ -426,46 +435,46 @@ const subsliceProxyHandler: ProxyHandler<SliceProxy<any>> = {
 }
 
 // madeSliceProxyHandler is the shared handler of the slice proxies that
-// makeSlice makes.
+// makeSlice makes, whose targets hold a copy of the elements.
 const madeSliceProxyHandler: ProxyHandler<SliceProxy<any>> = {
-  get(target: any, prop: string | symbol): any {
+  get(target: SliceProxy<any>, prop: string | symbol): any {
+    // The window answers for itself before any other property.
+    const meta = target.__meta__
     if (prop === '__meta__') {
-      return target.__meta__
+      return meta
     }
+
+    // An index reads the backing array, inside the length only.
     const index = sliceIndexProperty(prop)
     if (index >= 0) {
-      if (index < target.__meta__.length) {
-        return target.__meta__.backing[target.__meta__.offset + index]
+      if (index < meta.length) {
+        return meta.backing[meta.offset + index]
       }
-      runtimePanic(
-        `Slice index out of range: ${index} >= ${target.__meta__.length}`,
-      )
+      runtimePanic(`Slice index out of range: ${index} >= ${meta.length}`)
     }
 
+    // The length is the window's.
     if (prop === 'length') {
-      return target.__meta__.length
-    }
-
-    if (prop === '__meta__') {
-      return target.__meta__
+      return meta.length
     }
 
     return Reflect.get(target, prop)
   },
 
-  set(target: any, prop: string | symbol, value: any): boolean {
+  set(target: SliceProxy<any>, prop: string | symbol, value: any): boolean {
+    // An index writes the backing array and the target's copy of it.
+    const meta = target.__meta__
     const index = sliceIndexProperty(prop)
     if (index >= 0) {
-      if (index < target.__meta__.length) {
-        target.__meta__.backing[target.__meta__.offset + index] = value
+      if (index < meta.length) {
+        meta.backing[meta.offset + index] = value
         target[index] = value
         return true
       }
-      runtimePanic(
-        `Slice index out of range: ${index} >= ${target.__meta__.length}`,
-      )
+      runtimePanic(`Slice index out of range: ${index} >= ${meta.length}`)
     }
 
+    // The length and the window are not assignable.
     if (prop === 'length' || prop === '__meta__') {
       return false
     }
@@ -524,8 +533,9 @@ function sliceProxyFromBacking<T>(
   // slice has a target of its own, even where it shares its backing array
   // with an earlier slice. The handlers read elements and the length from
   // the window, so the target stays empty.
-  const proxyTargetArray = [] as unknown as SliceProxy<T>
-  proxyTargetArray.__meta__ = { backing, offset, length, capacity }
+  const proxyTargetArray: SliceProxy<T> = Object.assign([], {
+    __meta__: { backing, offset, length, capacity },
+  })
   return wrapSliceProxy(proxyTargetArray)
 }
 
@@ -1241,6 +1251,35 @@ function appendZeroValue(sample: unknown): unknown {
     }
   }
   return null
+}
+
+/**
+ * appendOne appends one value that the caller already copied, as Go copies
+ * an appended struct or array, to a slice of non-byte elements. It writes into
+ * spare capacity directly and leaves growth to append, with the optional
+ * zero hint the compiler passes for the new capacity.
+ */
+export function appendOne<T>(
+  slice: Slice<T> | null,
+  value: unknown,
+  zeroHint?: unknown,
+): Slice<T> {
+  if (slice !== null && slice !== undefined) {
+    const meta = sliceMeta(slice)
+    if (meta !== undefined && meta.length < meta.capacity) {
+      meta.backing[meta.offset + meta.length] = value as T
+      return sliceProxyFromBacking(
+        meta.backing as T[],
+        meta.offset,
+        meta.length + 1,
+        meta.capacity,
+      )
+    }
+  }
+  if (zeroHint === undefined) {
+    return append(slice, value)
+  }
+  return append(slice, value, zeroHint)
 }
 
 /**

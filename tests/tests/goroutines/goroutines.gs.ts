@@ -77,7 +77,7 @@ export async function main(): globalThis.Promise<void> {
 	let allMessages: $.Slice<Message> = $.makeSlice<Message>(0, 8 + 3, undefined, () => $.markAsStructValue(new Message()))
 
 	// Add initial message
-	allMessages = $.append(allMessages, $.markAsStructValue(new Message({priority: 0, text: "Main: Starting workers"})))
+	allMessages = $.appendOne(allMessages, $.markAsStructValue(new Message({priority: 0, text: "Main: Starting workers"})))
 
 	// Start 3 worker goroutines
 	for (let i = 0; i < 3; i++) {
@@ -94,15 +94,15 @@ export async function main(): globalThis.Promise<void> {
 	})() })
 
 	// Add status message
-	allMessages = $.append(allMessages, $.markAsStructValue(new Message({priority: 1, text: "Main: Workers started"})))
+	allMessages = $.appendOne(allMessages, $.markAsStructValue(new Message({priority: 1, text: "Main: Workers started"})))
 
 	// Collect all messages from goroutines
 	for (let __rangeIndex = 0; __rangeIndex < 8; __rangeIndex++) {
-		allMessages = $.append(allMessages, $.markAsStructValue($.cloneStructValue(await $.chanRecv(messages))))
+		allMessages = $.appendOne(allMessages, $.markAsStructValue($.cloneStructValue(await $.chanRecv(messages))))
 	}
 
 	// Add final message
-	allMessages = $.append(allMessages, $.markAsStructValue(new Message({priority: 100, text: "Main: All workers completed"})))
+	allMessages = $.appendOne(allMessages, $.markAsStructValue(new Message({priority: 100, text: "Main: All workers completed"})))
 
 	// Sort messages by priority for deterministic order
 	for (let __goscriptRangeTarget0 = allMessages, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), i = 0; i < __goscriptRangeWindow0.length; i++) {

@@ -51,7 +51,7 @@ export class Type {
 		let names: $.Slice<string> = $.arrayToSlice<string>([])
 		for (let __goscriptRangeTarget0 = $.pointerValue<Type>(t).Fields, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
 			let f = $.markAsStructValue($.cloneStructValue((__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as __goscript_field.Field)))
-			names = $.append(names, f.Name)
+			names = $.appendOne(names, f.Name)
 		}
 		return names
 	}

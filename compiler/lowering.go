@@ -9316,6 +9316,14 @@ func (o *LoweringOwner) lowerCallExpr(ctx lowerFileContext, expr *ast.CallExpr) 
 					}
 				}
 				appendHelper := o.runtimeOwner.QualifiedHelper(RuntimeHelperAppend)
+				// One value of a type that the arguments above already copied,
+				// and that is not a byte, appends without the variadic helper.
+				if expr.Ellipsis == token.NoPos && len(args) == 2 {
+					if slice, ok := types.Unalias(ctx.semPkg.source.TypesInfo.TypeOf(expr)).Underlying().(*types.Slice); ok &&
+						!isByteType(slice.Elem()) && !isTypeParamType(slice.Elem()) {
+						appendHelper = o.runtimeOwner.QualifiedHelper(RuntimeHelperAppendOne)
+					}
+				}
 				if expr.Ellipsis != token.NoPos && len(args) > 1 {
 					last := len(args) - 1
 					spread := args[last]
@@ -16532,8 +16540,9 @@ func isUnaliasedLocalValue(ctx lowerFileContext, expr ast.Expr) bool {
 	return !aliased
 }
 
-// isValueCopyType reports whether values of typ are structs or arrays, which
-// Go copies where they are assigned.
-func isValueCopyType(typ types.Type) bool {
-	return isStructValueType(typ) || isArrayType(typ)
+// isTypeParamType reports whether typ is a type parameter, whose values may
+// be structs or arrays that the runtime copies.
+func isTypeParamType(typ types.Type) bool {
+	_, ok := types.Unalias(typ).(*types.TypeParam)
+	return ok
 }

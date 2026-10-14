@@ -20,7 +20,7 @@ $.registerNamedValueType(
 );
 
 export function MySlice_Add(s: $.VarRef<MySlice> | null, val: number): void {
-	s!.value = ($.append(($.pointerValue<MySlice>(s) as MySlice), val) as MySlice)
+	s!.value = ($.appendOne(($.pointerValue<MySlice>(s) as MySlice), val) as MySlice)
 }
 
 export function MySlice_Sum(s: MySlice): number {
