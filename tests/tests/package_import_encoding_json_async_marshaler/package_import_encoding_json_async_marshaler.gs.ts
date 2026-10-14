@@ -71,7 +71,7 @@ export class Image {
 	static __typeInfo = $.registerStructType(
 		"main.Image",
 		() => new Image(),
-		() => [{ name: "MarshalJSON", args: [], returns: [{ type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }, { type: "error" }] }, { name: "UnmarshalJSON", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: "error" }] }],
+		() => [{ name: "MarshalJSON", args: [], returns: [{ type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }, { type: "error" }], pointerReceiver: true }, { name: "UnmarshalJSON", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: "error" }], pointerReceiver: true }],
 		Image,
 		() => [{ name: "Name", key: "Name", type: /* @__PURE__ */ $.basicType("string") }]
 	)

@@ -44,7 +44,7 @@ export class box {
 	static __typeInfo = $.registerStructType(
 		"main.box",
 		() => new box(),
-		() => [{ name: "Value", args: [], returns: [{ type: { kind: $.TypeKind.Interface, methods: [] } }] }],
+		() => [{ name: "Value", args: [], returns: [{ type: { kind: $.TypeKind.Interface, methods: [] } }], pointerReceiver: true }],
 		box,
 		() => [{ name: "value", key: "value", type: { kind: $.TypeKind.Interface, methods: [] } }]
 	)
@@ -80,7 +80,7 @@ export class holder {
 	static __typeInfo = $.registerStructType(
 		"main.holder",
 		() => new holder(),
-		() => [{ name: "Value", args: [], returns: [{ type: { kind: $.TypeKind.Interface, methods: [] } }] }],
+		() => [{ name: "Value", args: [], returns: [{ type: { kind: $.TypeKind.Interface, methods: [] } }], pointerReceiver: true }],
 		holder,
 		() => [{ name: "box", key: "box", type: "main.box", anonymous: true }]
 	)

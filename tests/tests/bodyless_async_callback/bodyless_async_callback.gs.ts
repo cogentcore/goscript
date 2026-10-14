@@ -41,7 +41,7 @@ export class Setting {
 	static __typeInfo = $.registerStructType(
 		"main.Setting",
 		() => new Setting(),
-		() => [{ name: "Value", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }],
+		() => [{ name: "Value", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }], pointerReceiver: true }],
 		Setting,
 		() => [{ name: "once", key: "once", type: "sync.Once" }]
 	)

@@ -70,7 +70,7 @@ export class transport {
 	static __typeInfo = $.registerStructType(
 		"main.transport",
 		() => new transport(),
-		() => [{ name: "SourceOnly", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [] }],
+		() => [{ name: "SourceOnly", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [], pointerReceiver: true }],
 		transport,
 		() => [{ name: "values", key: "values", type: /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")) }]
 	)
@@ -107,7 +107,7 @@ export class packetHandlerMap {
 	static __typeInfo = $.registerStructType(
 		"main.packetHandlerMap",
 		() => new packetHandlerMap(),
-		() => [{ name: "Add", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [] }],
+		() => [{ name: "Add", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [], pointerReceiver: true }],
 		packetHandlerMap,
 		() => [{ name: "values", key: "values", type: /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")) }]
 	)

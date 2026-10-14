@@ -44,7 +44,7 @@ export class lit {
 	static __typeInfo = $.registerStructType(
 		"main.lit",
 		() => new lit(),
-		() => [{ name: "Value", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }],
+		() => [{ name: "Value", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }], pointerReceiver: true }],
 		lit,
 		() => [{ name: "n", key: "n", type: /* @__PURE__ */ $.basicType("int") }]
 	)

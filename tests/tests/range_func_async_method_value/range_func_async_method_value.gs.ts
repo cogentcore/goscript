@@ -44,7 +44,7 @@ export class listProvider {
 	static __typeInfo = $.registerStructType(
 		"main.listProvider",
 		() => new listProvider(),
-		() => [{ name: "Items", args: [], returns: [{ type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.pointerType("main.Group")) }] }],
+		() => [{ name: "Items", args: [], returns: [{ type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.pointerType("main.Group")) }], pointerReceiver: true }],
 		listProvider,
 		() => [{ name: "items", key: "items", type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.pointerType("main.Group")) }]
 	)
@@ -110,7 +110,7 @@ export class Group {
 	static __typeInfo = $.registerStructType(
 		"main.Group",
 		() => new Group(),
-		() => [{ name: "Build", args: [], returns: [] }, { name: "Each", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [] }],
+		() => [{ name: "Build", args: [], returns: [], pointerReceiver: true }, { name: "Each", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [], pointerReceiver: true }],
 		Group,
 		() => [{ name: "provider", key: "provider", type: "main.provider" }, { name: "seen", key: "seen", type: /* @__PURE__ */ $.basicType("bool") }]
 	)

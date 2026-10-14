@@ -53,7 +53,7 @@ export class B {
 	static __typeInfo = $.registerStructType(
 		"main.B",
 		() => new B(),
-		() => [{ name: "MethodB", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [] }],
+		() => [{ name: "MethodB", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [], pointerReceiver: true }],
 		B,
 		() => []
 	)

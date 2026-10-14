@@ -54,7 +54,7 @@ export class table {
 	static __typeInfo = $.registerStructType(
 		"main.table",
 		() => new table(),
-		() => [{ name: "Lock", args: [], returns: [] }, { name: "TryLock", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "Unlock", args: [], returns: [] }],
+		() => [{ name: "Lock", args: [], returns: [], pointerReceiver: true }, { name: "TryLock", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }], pointerReceiver: true }, { name: "Unlock", args: [], returns: [], pointerReceiver: true }],
 		table,
 		() => [{ name: "Mutex", key: "Mutex", type: "sync.Mutex", anonymous: true }, { name: "byAddr", key: "byAddr", type: /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("string"))) }]
 	)

@@ -34,7 +34,7 @@ export class base {
 	static __typeInfo = $.registerStructType(
 		"main.base",
 		() => new base(),
-		() => [{ name: "Add", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }],
+		() => [{ name: "Add", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("int") }], pointerReceiver: true }],
 		base,
 		() => [{ name: "value", key: "value", type: /* @__PURE__ */ $.basicType("int") }]
 	)
@@ -70,7 +70,7 @@ export class wrapper {
 	static __typeInfo = $.registerStructType(
 		"main.wrapper",
 		() => new wrapper(),
-		() => [{ name: "Add", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }],
+		() => [{ name: "Add", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("int") }], pointerReceiver: true }],
 		wrapper,
 		() => [{ name: "base", key: "base", type: "main.base", anonymous: true }]
 	)

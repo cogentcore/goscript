@@ -164,7 +164,7 @@ export class Stack {
 	static __typeInfo = $.registerStructType(
 		"main.Stack",
 		() => new Stack(),
-		() => [{ name: "Pop", args: [], returns: [{ type: { kind: $.TypeKind.Interface, methods: [] } }] }, { name: "Push", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [] }],
+		() => [{ name: "Pop", args: [], returns: [{ type: { kind: $.TypeKind.Interface, methods: [] } }], pointerReceiver: true }, { name: "Push", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [], pointerReceiver: true }],
 		Stack,
 		() => [{ name: "items", key: "items", type: /* @__PURE__ */ $.sliceType({ kind: $.TypeKind.Interface, methods: [] }) }]
 	)
@@ -288,7 +288,7 @@ export class VM {
 	static __typeInfo = $.registerStructType(
 		"main.VM",
 		() => new VM(),
-		() => [{ name: "Step", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }],
+		() => [{ name: "Step", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }], pointerReceiver: true }],
 		VM,
 		() => [{ name: "pc", key: "pc", type: /* @__PURE__ */ $.basicType("int") }, { name: "steps", key: "steps", type: /* @__PURE__ */ $.basicType("int") }, { name: "stack", key: "stack", type: "main.Stack" }]
 	)
@@ -392,7 +392,7 @@ export class Fault {
 	static __typeInfo = $.registerStructType(
 		"main.Fault",
 		() => new Fault(),
-		() => [{ name: "Program", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }],
+		() => [{ name: "Program", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }], pointerReceiver: true }],
 		Fault,
 		() => [{ name: "Name", key: "Name", type: /* @__PURE__ */ $.basicType("string") }, { name: "Reason", key: "Reason", type: /* @__PURE__ */ $.basicType("string") }]
 	)

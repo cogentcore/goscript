@@ -49,7 +49,7 @@ export class FileTracker {
 	static __typeInfo = $.registerStructType(
 		"main.FileTracker",
 		() => new FileTracker(),
-		() => [{ name: "AddLine", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [] }],
+		() => [{ name: "AddLine", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [], pointerReceiver: true }],
 		FileTracker,
 		() => [{ name: "mutex", key: "mutex", type: "sync.Mutex" }, { name: "lines", key: "lines", type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")) }]
 	)
@@ -86,7 +86,7 @@ export class Scanner {
 	static __typeInfo = $.registerStructType(
 		"main.Scanner",
 		() => new Scanner(),
-		() => [{ name: "next", args: [], returns: [] }],
+		() => [{ name: "next", args: [], returns: [], pointerReceiver: true }],
 		Scanner,
 		() => [{ name: "file", key: "file", type: /* @__PURE__ */ $.pointerType("main.FileTracker") }]
 	)

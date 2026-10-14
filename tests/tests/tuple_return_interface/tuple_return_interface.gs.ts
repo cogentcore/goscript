@@ -44,7 +44,7 @@ export class blockImpl {
 	static __typeInfo = $.registerStructType(
 		"main.blockImpl",
 		() => new blockImpl(),
-		() => [{ name: "Size", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }],
+		() => [{ name: "Size", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }], pointerReceiver: true }],
 		blockImpl,
 		() => [{ name: "size", key: "size", type: /* @__PURE__ */ $.basicType("int") }]
 	)

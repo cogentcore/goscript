@@ -199,7 +199,7 @@ export class printer {
 	static __typeInfo = $.registerStructType(
 		"main.printer",
 		() => new printer(),
-		() => [{ name: "format", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [] }, { name: "init", args: [], returns: [] }],
+		() => [{ name: "format", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [], pointerReceiver: true }, { name: "init", args: [], returns: [], pointerReceiver: true }],
 		printer,
 		() => [{ name: "buf", key: "buf", type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }, { name: "arg", key: "arg", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "fmt", key: "fmt", type: "main.formatter" }]
 	)

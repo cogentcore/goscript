@@ -85,7 +85,7 @@ export class genericResolver {
 	static __typeInfo = $.registerStructType(
 		"main.genericResolver",
 		() => new genericResolver(),
-		() => [{ name: "Resolve", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: "error" }] }],
+		() => [{ name: "Resolve", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: "error" }], pointerReceiver: true }],
 		genericResolver,
 		() => []
 	)

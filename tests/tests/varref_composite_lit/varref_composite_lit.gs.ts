@@ -34,7 +34,7 @@ export class MockInode {
 	static __typeInfo = $.registerStructType(
 		"main.MockInode",
 		() => new MockInode(),
-		() => [{ name: "getValue", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }],
+		() => [{ name: "getValue", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }], pointerReceiver: true }],
 		MockInode,
 		() => [{ name: "Value", key: "Value", type: /* @__PURE__ */ $.basicType("int") }]
 	)

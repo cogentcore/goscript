@@ -54,7 +54,7 @@ export class raw {
 	static __typeInfo = $.registerStructType(
 		"main.raw",
 		() => new raw(),
-		() => [{ name: "Lock", args: [], returns: [] }, { name: "TryLock", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "Unlock", args: [], returns: [] }],
+		() => [{ name: "Lock", args: [], returns: [], pointerReceiver: true }, { name: "TryLock", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }], pointerReceiver: true }, { name: "Unlock", args: [], returns: [], pointerReceiver: true }],
 		raw,
 		() => [{ name: "Mutex", key: "Mutex", type: "sync.Mutex", anonymous: true }]
 	)
@@ -98,7 +98,7 @@ export class outer {
 	static __typeInfo = $.registerStructType(
 		"main.outer",
 		() => new outer(),
-		() => [{ name: "Lock", args: [], returns: [] }, { name: "TryLock", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "Unlock", args: [], returns: [] }],
+		() => [{ name: "Lock", args: [], returns: [], pointerReceiver: true }, { name: "TryLock", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }], pointerReceiver: true }, { name: "Unlock", args: [], returns: [], pointerReceiver: true }],
 		outer,
 		() => [{ name: "raw", key: "raw", type: "main.raw", anonymous: true }]
 	)
@@ -158,7 +158,7 @@ export class rawRW {
 	static __typeInfo = $.registerStructType(
 		"main.rawRW",
 		() => new rawRW(),
-		() => [{ name: "Lock", args: [], returns: [] }, { name: "RLock", args: [], returns: [] }, { name: "RLocker", args: [], returns: [{ type: "sync.Locker" }] }, { name: "RUnlock", args: [], returns: [] }, { name: "TryLock", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "TryRLock", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "Unlock", args: [], returns: [] }],
+		() => [{ name: "Lock", args: [], returns: [], pointerReceiver: true }, { name: "RLock", args: [], returns: [], pointerReceiver: true }, { name: "RLocker", args: [], returns: [{ type: "sync.Locker" }], pointerReceiver: true }, { name: "RUnlock", args: [], returns: [], pointerReceiver: true }, { name: "TryLock", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }], pointerReceiver: true }, { name: "TryRLock", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }], pointerReceiver: true }, { name: "Unlock", args: [], returns: [], pointerReceiver: true }],
 		rawRW,
 		() => [{ name: "RWMutex", key: "RWMutex", type: "sync.RWMutex", anonymous: true }]
 	)
@@ -218,7 +218,7 @@ export class outerRW {
 	static __typeInfo = $.registerStructType(
 		"main.outerRW",
 		() => new outerRW(),
-		() => [{ name: "Lock", args: [], returns: [] }, { name: "RLock", args: [], returns: [] }, { name: "RLocker", args: [], returns: [{ type: "sync.Locker" }] }, { name: "RUnlock", args: [], returns: [] }, { name: "TryLock", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "TryRLock", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "Unlock", args: [], returns: [] }],
+		() => [{ name: "Lock", args: [], returns: [], pointerReceiver: true }, { name: "RLock", args: [], returns: [], pointerReceiver: true }, { name: "RLocker", args: [], returns: [{ type: "sync.Locker" }], pointerReceiver: true }, { name: "RUnlock", args: [], returns: [], pointerReceiver: true }, { name: "TryLock", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }], pointerReceiver: true }, { name: "TryRLock", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }], pointerReceiver: true }, { name: "Unlock", args: [], returns: [], pointerReceiver: true }],
 		outerRW,
 		() => [{ name: "rawRW", key: "rawRW", type: "main.rawRW", anonymous: true }]
 	)

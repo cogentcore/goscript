@@ -47,7 +47,7 @@ export class Dog {
 	static __typeInfo = $.registerStructType(
 		"main.Dog",
 		() => new Dog(),
-		() => [{ name: "Name", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }],
+		() => [{ name: "Name", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }], pointerReceiver: true }],
 		Dog,
 		() => [{ name: "name", key: "name", type: /* @__PURE__ */ $.basicType("string") }]
 	)
@@ -87,7 +87,7 @@ export class Cat {
 	static __typeInfo = $.registerStructType(
 		"main.Cat",
 		() => new Cat(),
-		() => [{ name: "Name", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }],
+		() => [{ name: "Name", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }], pointerReceiver: true }],
 		Cat,
 		() => [{ name: "name", key: "name", type: /* @__PURE__ */ $.basicType("string") }]
 	)

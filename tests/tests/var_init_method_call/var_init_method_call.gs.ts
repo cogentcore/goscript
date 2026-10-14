@@ -34,7 +34,7 @@ export class T {
 	static __typeInfo = $.registerStructType(
 		"main.T",
 		() => new T(),
-		() => [{ name: "WithDelta", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.pointerType("main.T") }] }],
+		() => [{ name: "WithDelta", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.pointerType("main.T") }], pointerReceiver: true }],
 		T,
 		() => [{ name: "val", key: "val", type: /* @__PURE__ */ $.basicType("int") }]
 	)

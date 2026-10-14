@@ -75,7 +75,7 @@ export class arena {
 	static __typeInfo = $.registerStructType(
 		"main.arena",
 		() => new arena(),
-		() => [{ name: "New", args: [], returns: [{ type: /* @__PURE__ */ $.pointerType({ kind: $.TypeKind.Interface, methods: [] }) }] }],
+		() => [{ name: "New", args: [], returns: [{ type: /* @__PURE__ */ $.pointerType({ kind: $.TypeKind.Interface, methods: [] }) }], pointerReceiver: true }],
 		arena,
 		() => [{ name: "data", key: "data", type: /* @__PURE__ */ $.sliceType({ kind: $.TypeKind.Interface, methods: [] }) }]
 	)

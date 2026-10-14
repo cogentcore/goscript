@@ -34,7 +34,7 @@ export class worker {
 	static __typeInfo = $.registerStructType(
 		"main.worker",
 		() => new worker(),
-		() => [{ name: "add", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }],
+		() => [{ name: "add", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("int") }], pointerReceiver: true }],
 		worker,
 		() => [{ name: "base", key: "base", type: /* @__PURE__ */ $.basicType("int") }]
 	)

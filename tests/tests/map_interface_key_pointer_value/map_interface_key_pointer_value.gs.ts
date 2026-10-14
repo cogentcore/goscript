@@ -44,7 +44,7 @@ export class Table {
 	static __typeInfo = $.registerStructType(
 		"main.Table",
 		() => new Table(),
-		() => [{ name: "Key", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }],
+		() => [{ name: "Key", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }], pointerReceiver: true }],
 		Table,
 		() => [{ name: "name", key: "name", type: /* @__PURE__ */ $.basicType("string") }]
 	)

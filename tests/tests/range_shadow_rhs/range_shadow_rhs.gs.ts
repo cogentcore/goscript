@@ -77,7 +77,7 @@ export class item {
 	static __typeInfo = $.registerStructType(
 		"main.item",
 		() => new item(),
-		() => [{ name: "increment", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }],
+		() => [{ name: "increment", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }], pointerReceiver: true }],
 		item,
 		() => [{ name: "value", key: "value", type: /* @__PURE__ */ $.basicType("int") }]
 	)

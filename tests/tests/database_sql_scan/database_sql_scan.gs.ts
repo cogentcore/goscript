@@ -166,7 +166,7 @@ export class rows {
 	static __typeInfo = $.registerStructType(
 		"main.rows",
 		() => new rows(),
-		() => [$.methodSignature("Close", [], ["error"]), $.methodSignature("Columns", [], [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("string"))]), $.methodSignature("Next", [["dest", /* @__PURE__ */ $.sliceType("driver.Value")]], ["error"])],
+		() => [$.methodSignature("Close", [], ["error"], true), $.methodSignature("Columns", [], [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("string"))], true), $.methodSignature("Next", [["dest", /* @__PURE__ */ $.sliceType("driver.Value")]], ["error"], true)],
 		rows,
 		() => [/* @__PURE__ */ $.structField("done", /* @__PURE__ */ $.basicType("bool"), [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/database_sql_scan" }), /* @__PURE__ */ $.structField("blob", /* @__PURE__ */ $.basicType("bool"), [1], 1, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/database_sql_scan" })]
 	)
@@ -227,7 +227,7 @@ export class columnRows {
 	static __typeInfo = $.registerStructType(
 		"main.columnRows",
 		() => new columnRows(),
-		() => [$.methodSignature("Next", [/* @__PURE__ */ $.sliceType("driver.Value")], ["error"]), $.methodSignature("NextRow", [], ["error"]), $.methodSignature("ScanColumn", [["ctx", "driver.ScanContext"], ["index", /* @__PURE__ */ $.basicType("int")], ["dest", { kind: $.TypeKind.Interface, methods: [] }]], ["error"]), $.methodSignature("Close", [], ["error"]), $.methodSignature("Columns", [], [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("string"))])],
+		() => [$.methodSignature("Next", [/* @__PURE__ */ $.sliceType("driver.Value")], ["error"], true), $.methodSignature("NextRow", [], ["error"], true), $.methodSignature("ScanColumn", [["ctx", "driver.ScanContext"], ["index", /* @__PURE__ */ $.basicType("int")], ["dest", { kind: $.TypeKind.Interface, methods: [] }]], ["error"], true), $.methodSignature("Close", [], ["error"], true), $.methodSignature("Columns", [], [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("string"))], true)],
 		columnRows,
 		() => [/* @__PURE__ */ $.structField("rows", "main.rows", [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/database_sql_scan", anonymous: true })]
 	)

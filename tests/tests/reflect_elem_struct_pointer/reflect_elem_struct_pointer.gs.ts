@@ -193,7 +193,7 @@ export class base {
 	static __typeInfo = $.registerStructType(
 		"main.base",
 		() => new base(),
-		() => [$.methodSignature("AsBase", [], [/* @__PURE__ */ $.pointerType("main.base")]), $.methodSignature("NewInstance", [], ["main.node"])],
+		() => [$.methodSignature("AsBase", [], [/* @__PURE__ */ $.pointerType("main.base")], true), $.methodSignature("NewInstance", [], ["main.node"], true)],
 		base,
 		() => [/* @__PURE__ */ $.structField("This", "main.node", [0], 0, true), /* @__PURE__ */ $.structField("Name", /* @__PURE__ */ $.basicType("string"), [1], 16, true)]
 	)
@@ -243,7 +243,7 @@ export class widget {
 	static __typeInfo = $.registerStructType(
 		"main.widget",
 		() => new widget(),
-		() => [$.methodSignature("AsBase", [], [/* @__PURE__ */ $.pointerType("main.base")]), $.methodSignature("NewInstance", [], ["main.node"])],
+		() => [$.methodSignature("AsBase", [], [/* @__PURE__ */ $.pointerType("main.base")], true), $.methodSignature("NewInstance", [], ["main.node"], true)],
 		widget,
 		() => [/* @__PURE__ */ $.structField("base", "main.base", [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/reflect_elem_struct_pointer", anonymous: true }), /* @__PURE__ */ $.structField("X", /* @__PURE__ */ $.basicType("int"), [1], 32, true)]
 	)
@@ -293,7 +293,7 @@ export class body {
 	static __typeInfo = $.registerStructType(
 		"main.body",
 		() => new body(),
-		() => [$.methodSignature("AsBase", [], [/* @__PURE__ */ $.pointerType("main.base")]), $.methodSignature("NewInstance", [], ["main.node"])],
+		() => [$.methodSignature("AsBase", [], [/* @__PURE__ */ $.pointerType("main.base")], true), $.methodSignature("NewInstance", [], ["main.node"], true)],
 		body,
 		() => [/* @__PURE__ */ $.structField("widget", "main.widget", [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/reflect_elem_struct_pointer", anonymous: true }), /* @__PURE__ */ $.structField("Title", /* @__PURE__ */ $.basicType("string"), [1], 40, true)]
 	)

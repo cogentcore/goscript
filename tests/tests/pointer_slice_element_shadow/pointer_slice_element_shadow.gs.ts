@@ -71,7 +71,7 @@ export class _object {
 	static __typeInfo = $.registerStructType(
 		"main.object",
 		() => new _object(),
-		() => [{ name: "next", args: [], returns: [{ type: /* @__PURE__ */ $.pointerType("main.entry") }] }],
+		() => [{ name: "next", args: [], returns: [{ type: /* @__PURE__ */ $.pointerType("main.entry") }], pointerReceiver: true }],
 		_object,
 		() => [{ name: "entries", key: "entries", type: /* @__PURE__ */ $.sliceType("main.entry") }]
 	)

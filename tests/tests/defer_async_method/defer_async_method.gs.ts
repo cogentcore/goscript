@@ -39,7 +39,7 @@ export class AsyncResource {
 	static __typeInfo = $.registerStructType(
 		"main.AsyncResource",
 		() => new AsyncResource(),
-		() => [{ name: "Release", args: [], returns: [] }],
+		() => [{ name: "Release", args: [], returns: [], pointerReceiver: true }],
 		AsyncResource,
 		() => [{ name: "name", key: "name", type: /* @__PURE__ */ $.basicType("string") }]
 	)

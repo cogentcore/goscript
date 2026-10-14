@@ -34,7 +34,7 @@ export class Box {
 	static __typeInfo = $.registerStructType(
 		"main.Box",
 		() => new Box(),
-		() => [{ name: "clone", args: [], returns: [{ type: /* @__PURE__ */ $.pointerType("main.Box") }] }],
+		() => [{ name: "clone", args: [], returns: [{ type: /* @__PURE__ */ $.pointerType("main.Box") }], pointerReceiver: true }],
 		Box,
 		() => [{ name: "Value", key: "Value", type: /* @__PURE__ */ $.basicType("int") }]
 	)

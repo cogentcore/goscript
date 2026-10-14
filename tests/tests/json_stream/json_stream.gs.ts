@@ -73,7 +73,7 @@ export class chanReader {
 	static __typeInfo = $.registerStructType(
 		"main.chanReader",
 		() => new chanReader(),
-		() => [{ name: "Read", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("int") }, { type: "error" }] }],
+		() => [{ name: "Read", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("int") }, { type: "error" }], pointerReceiver: true }],
 		chanReader,
 		() => [{ name: "ch", key: "ch", type: /* @__PURE__ */ $.channelType(/* @__PURE__ */ $.basicType("string"), "both") }, { name: "cur", key: "cur", type: /* @__PURE__ */ $.basicType("string") }]
 	)

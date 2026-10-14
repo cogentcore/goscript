@@ -89,7 +89,7 @@ export class frame {
 	static __typeInfo = $.registerStructType(
 		"main.frame",
 		() => new frame(),
-		() => [{ name: "Name", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }],
+		() => [{ name: "Name", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }], pointerReceiver: true }],
 		frame,
 		() => [{ name: "name", key: "name", type: /* @__PURE__ */ $.basicType("string") }]
 	)
@@ -126,7 +126,7 @@ export class tab {
 	static __typeInfo = $.registerStructType(
 		"main.tab",
 		() => new tab(),
-		() => [{ name: "Name", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }],
+		() => [{ name: "Name", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }], pointerReceiver: true }],
 		tab,
 		() => [{ name: "name", key: "name", type: /* @__PURE__ */ $.basicType("string") }]
 	)
@@ -165,7 +165,7 @@ export class tabs {
 	static __typeInfo = $.registerStructType(
 		"main.tabs",
 		() => new tabs(),
-		() => [{ name: "NewTab", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.pointerType("main.frame") }, { type: /* @__PURE__ */ $.pointerType("main.tab") }] }],
+		() => [{ name: "NewTab", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.pointerType("main.frame") }, { type: /* @__PURE__ */ $.pointerType("main.tab") }], pointerReceiver: true }],
 		tabs,
 		() => [{ name: "count", key: "count", type: /* @__PURE__ */ $.basicType("int") }]
 	)

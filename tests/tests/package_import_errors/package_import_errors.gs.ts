@@ -51,7 +51,7 @@ export class customErr {
 	static __typeInfo = $.registerStructType(
 		"main.customErr",
 		() => new customErr(),
-		() => [{ name: "Error", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }],
+		() => [{ name: "Error", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }], pointerReceiver: true }],
 		customErr,
 		() => [{ name: "msg", key: "msg", type: /* @__PURE__ */ $.basicType("string") }]
 	)

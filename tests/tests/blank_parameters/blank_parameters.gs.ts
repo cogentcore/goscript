@@ -44,7 +44,7 @@ export class blankImpl {
 	static __typeInfo = $.registerStructType(
 		"main.blankImpl",
 		() => new blankImpl(),
-		() => [{ name: "Value", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }],
+		() => [{ name: "Value", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }], pointerReceiver: true }],
 		blankImpl,
 		() => [{ name: "value", key: "value", type: /* @__PURE__ */ $.basicType("int") }]
 	)

@@ -44,7 +44,7 @@ export class branch {
 	static __typeInfo = $.registerStructType(
 		"main.branch",
 		() => new branch(),
-		() => [{ name: "value", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }],
+		() => [{ name: "value", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }], pointerReceiver: true }],
 		branch,
 		() => [{ name: "n", key: "n", type: /* @__PURE__ */ $.basicType("int") }]
 	)

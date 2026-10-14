@@ -47,7 +47,7 @@ export class Worker {
 	static __typeInfo = $.registerStructType(
 		"main.Worker",
 		() => new Worker(),
-		() => [{ name: "Spawn", args: [], returns: [{ type: "error" }] }],
+		() => [{ name: "Spawn", args: [], returns: [{ type: "error" }], pointerReceiver: true }],
 		Worker,
 		() => [{ name: "ch", key: "ch", type: /* @__PURE__ */ $.channelType(/* @__PURE__ */ $.basicType("int"), "both") }]
 	)

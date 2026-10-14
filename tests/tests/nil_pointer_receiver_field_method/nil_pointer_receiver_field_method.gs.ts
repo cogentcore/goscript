@@ -37,7 +37,7 @@ export class child {
 	static __typeInfo = $.registerStructType(
 		"main.child",
 		() => new child(),
-		() => [{ name: "Clone", args: [], returns: [{ type: /* @__PURE__ */ $.pointerType("main.child") }] }],
+		() => [{ name: "Clone", args: [], returns: [{ type: /* @__PURE__ */ $.pointerType("main.child") }], pointerReceiver: true }],
 		child,
 		() => [{ name: "value", key: "value", type: /* @__PURE__ */ $.basicType("string") }]
 	)

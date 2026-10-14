@@ -33,7 +33,7 @@ export class concrete {
 	static __typeInfo = $.registerStructType(
 		"main.concrete",
 		() => new concrete(),
-		() => [{ name: "Read", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }],
+		() => [{ name: "Read", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }], pointerReceiver: true }],
 		concrete,
 		() => []
 	)

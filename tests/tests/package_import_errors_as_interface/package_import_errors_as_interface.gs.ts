@@ -58,7 +58,7 @@ export class wrappedHealthError {
 	static __typeInfo = $.registerStructType(
 		"main.wrappedHealthError",
 		() => new wrappedHealthError(),
-		() => [{ name: "Error", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }, { name: "Health", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }, { name: "Unwrap", args: [], returns: [{ type: "error" }] }],
+		() => [{ name: "Error", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }], pointerReceiver: true }, { name: "Health", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }], pointerReceiver: true }, { name: "Unwrap", args: [], returns: [{ type: "error" }], pointerReceiver: true }],
 		wrappedHealthError,
 		() => [{ name: "err", key: "err", type: "error" }]
 	)

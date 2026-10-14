@@ -54,7 +54,7 @@ export class State {
 	static __typeInfo = $.registerStructType(
 		"main.State",
 		() => new State(),
-		() => [{ name: "Process", args: [], returns: [] }, { name: "markIndex", args: [], returns: [] }],
+		() => [{ name: "Process", args: [], returns: [], pointerReceiver: true }, { name: "markIndex", args: [], returns: [], pointerReceiver: true }],
 		State,
 		() => [{ name: "value", key: "value", type: /* @__PURE__ */ $.basicType("int") }, { name: "index", key: "index", type: /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int")) }]
 	)

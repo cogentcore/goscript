@@ -60,7 +60,7 @@ export class Base {
 	static __typeInfo = $.registerStructType(
 		"main.Base",
 		() => new Base(),
-		() => [{ name: "Name", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }, { name: "SetName", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [] }],
+		() => [{ name: "Name", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }], pointerReceiver: true }, { name: "SetName", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [], pointerReceiver: true }],
 		Base,
 		() => [{ name: "name", key: "name", type: /* @__PURE__ */ $.basicType("string") }, { name: "inits", key: "inits", type: /* @__PURE__ */ $.basicType("int") }]
 	)
@@ -110,7 +110,7 @@ export class Widget {
 	static __typeInfo = $.registerStructType(
 		"main.Widget",
 		() => new Widget(),
-		() => [{ name: "Name", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }, { name: "SetName", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [] }],
+		() => [{ name: "Name", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }], pointerReceiver: true }, { name: "SetName", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [], pointerReceiver: true }],
 		Widget,
 		() => [{ name: "Base", key: "Base", type: "main.Base", anonymous: true }, { name: "Text", key: "Text", type: /* @__PURE__ */ $.basicType("string") }]
 	)
