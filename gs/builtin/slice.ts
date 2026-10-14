@@ -253,11 +253,52 @@ function outOfRangeIndex(index: number, length: number): never {
   )
 }
 
+// sliceProxyOwnTraps describe the elements of a slice proxy as own
+// properties of it, read from its window, since its target holds none.
+const sliceProxyOwnTraps = {
+  getOwnPropertyDescriptor(
+    target: SliceProxy<any>,
+    prop: string | symbol,
+  ): PropertyDescriptor | undefined {
+    const meta = target.__meta__
+    const index = sliceIndexProperty(prop)
+    if (index >= 0 && index < meta.length) {
+      return {
+        value: meta.backing[meta.offset + index],
+        writable: true,
+        enumerable: true,
+        configurable: true,
+      }
+    }
+    return Reflect.getOwnPropertyDescriptor(target, prop)
+  },
+  has(target: SliceProxy<any>, prop: string | symbol): boolean {
+    const index = sliceIndexProperty(prop)
+    if (index >= 0) {
+      return index < target.__meta__.length
+    }
+    return Reflect.has(target, prop)
+  },
+  ownKeys(target: SliceProxy<any>): (string | symbol)[] {
+    const keys: (string | symbol)[] = []
+    for (let i = 0; i < target.__meta__.length; i++) {
+      keys.push(String(i))
+    }
+    for (const key of Reflect.ownKeys(target)) {
+      if (sliceIndexProperty(key) < 0) {
+        keys.push(key)
+      }
+    }
+    return keys
+  },
+}
+
 // windowSliceProxyHandler routes the indexed reads and writes of a slice
 // proxy through the backing window of its target's metadata. The handlers
 // are shared by all proxies, so that making a slice allocates no handler or
 // closures.
 const windowSliceProxyHandler: ProxyHandler<SliceProxy<any>> = {
+  ...sliceProxyOwnTraps,
   get(target, prop, receiver) {
     const meta = target.__meta__
     if (prop === '__meta__') {
@@ -299,7 +340,6 @@ const windowSliceProxyHandler: ProxyHandler<SliceProxy<any>> = {
     if (index >= 0) {
       if (index < meta.length) {
         meta.backing[meta.offset + index] = value
-        target[index] = value
         return true
       }
       outOfRangeIndex(index, meta.length)
@@ -316,6 +356,7 @@ const windowSliceProxyHandler: ProxyHandler<SliceProxy<any>> = {
 // subsliceProxyHandler is the shared handler of the slice proxies that
 // goSlice makes.
 const subsliceProxyHandler: ProxyHandler<SliceProxy<any>> = {
+  ...sliceProxyOwnTraps,
   get(target, prop, receiver) {
     if (prop === '__meta__') {
       return target.__meta__
@@ -361,7 +402,6 @@ const subsliceProxyHandler: ProxyHandler<SliceProxy<any>> = {
     if (index >= 0) {
       if (index < target.__meta__.length) {
         target.__meta__.backing[target.__meta__.offset + index] = value
-        target[index] = value
         return true
       }
       if (
@@ -369,7 +409,6 @@ const subsliceProxyHandler: ProxyHandler<SliceProxy<any>> = {
         target.__meta__.length < target.__meta__.capacity
       ) {
         target.__meta__.backing[target.__meta__.offset + index] = value
-        target[index] = value
         target.__meta__.length++
         return true
       }
@@ -480,7 +519,6 @@ function sliceProxyFromBacking<T>(
   offset: number,
   length: number,
   capacity: number,
-  _target?: T[],
 ): SliceProxy<T> {
   // The shared proxy handlers find a slice's window on its target, so each
   // slice has a target of its own, even where it shares its backing array
@@ -1255,7 +1293,6 @@ export function append<T>(
   let oldCapacity: number
   let isOriginalComplex = false
   let originalBacking: T[] | undefined = undefined
-  let originalTarget: T[] | undefined = undefined
   let originalOffset = 0
 
   if (slice === null || slice === undefined) {
@@ -1266,7 +1303,6 @@ export function append<T>(
     oldCapacity = meta.capacity
     isOriginalComplex = true
     originalBacking = meta.backing
-    originalTarget = meta.target
     originalOffset = meta.offset
   } else {
     oldLength = (slice as T[]).length
@@ -1278,16 +1314,12 @@ export function append<T>(
     for (let i = 0; i < numAdded; i++) {
       const value = copyElement(elements[i] as T)
       originalBacking[originalOffset + oldLength + i] = value
-      if (originalTarget !== undefined) {
-        originalTarget[oldLength + i] = value
-      }
     }
     return sliceProxyFromBacking(
       originalBacking,
       originalOffset,
       newLength,
       oldCapacity,
-      originalTarget,
     ) as any
   }
 
@@ -1367,17 +1399,11 @@ export function appendSlice<T>(
         0,
         count,
       )
-      if (meta.target !== undefined) {
-        for (let i = 0; i < count; i++) {
-          meta.target[oldLength + i] = meta.backing[meta.offset + oldLength + i]
-        }
-      }
       return sliceProxyFromBacking(
         meta.backing,
         meta.offset,
         newLength,
         meta.capacity,
-        meta.target,
       )
     }
   }
@@ -1620,9 +1646,6 @@ export function copySliceElements<T>(
     const i = backward ? count - 1 - step : step
     const value = copyElement(srcBacking[srcStart + i] as T)
     dstBacking[dstStart + i] = value
-    if (dstMeta?.target !== undefined) {
-      dstMeta.target[dstIndex + i] = value
-    }
   }
 }
 
