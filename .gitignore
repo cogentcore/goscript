@@ -12,5 +12,6 @@ out
 .tmp
 tests/tests/tests.browser.test.ts
 tests/tests/__screenshots__
+tests/tests/*/actual.log
 website/public/goscript.wasm
 website/public/wasm_exec.js
