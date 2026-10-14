@@ -35,7 +35,7 @@ export class cache {
 
 	public async Get(__typeArgs: $.GenericTypeArgs | undefined, k: any, _new: (() => [any, $.GoError] | globalThis.Promise<[any, $.GoError]>) | null, check: ((_p0: any) => boolean | globalThis.Promise<boolean>) | null): globalThis.Promise<[any, $.GoError]> {
 		let c: cache | $.VarRef<cache> | null = this;
-		const c$ = $.pointerTarget<cache>(c)
+		const c$: cache = c == null ? $.pointerTarget<cache>(c) : (c as any).__isVarRef === true ? (c as any).value : (c as any).__goValue === undefined ? (c as any) : $.pointerTarget<cache>(c)
 		if (((c$ as cache).stored != null) && (__goscriptAwait = check!((c$ as cache).stored), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)) {
 			return [(c$ as cache).stored, null]
 		}
@@ -141,7 +141,7 @@ export function __goscript_set_privateKeyCache(__goscriptValue: cache): void {
 }
 
 export async function privateKeyToCache(k: key | $.VarRef<key> | null): globalThis.Promise<[privateKey | $.VarRef<privateKey> | null, $.GoError]> {
-	const k$ = $.pointerTarget<key>(k)
+	const k$: key = k == null ? $.pointerTarget<key>(k) : (k as any).__isVarRef === true ? (k as any).value : (k as any).__goValue === undefined ? (k as any) : $.pointerTarget<key>(k)
 	const __goscriptReturn0 = await privateKeyCache.value.Get(__goscriptStatic0(), k, $.functionValue((): [privateKey | $.VarRef<privateKey> | null, $.GoError] => {
 		return [new privateKey({D: (k$ as key).N}), null]
 	}, ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.pointerType("main.privateKey"), "error"] } as $.FunctionTypeInfo)), $.functionValue((v: privateKey | $.VarRef<privateKey> | null): boolean => {

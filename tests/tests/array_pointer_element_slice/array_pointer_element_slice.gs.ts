@@ -55,10 +55,11 @@ export class node {
 
 export async function main(): globalThis.Promise<void> {
 	let root: node | $.VarRef<node> | null = new node()
-	let child: node | $.VarRef<node> | null = new node()
-	$.pointerValue<node>(root).sub = $.appendOne($.goSlice($.pointerValue<node>(root).sub0, undefined, 0), child, $.appendZeros.nil)
+	let root$: node = root == null ? $.pointerTarget<node>(root) : (root as any).__isVarRef === true ? (root as any).value : (root as any).__goValue === undefined ? (root as any) : $.pointerTarget<node>(root)
+	let child: node | $.VarRef<node> | null = new node();
+	;(root$ as node).sub = $.appendOne($.goSlice((root$ as node).sub0, undefined, 0), child, $.appendZeros.nil)
 
-	await $.println($.sliceLen($.pointerValue<node>(root).sub), $.pointerEqual($.arrayIndex($.pointerValue<node>(root).sub!, 0), child))
+	await $.println($.sliceLen((root$ as node).sub), $.pointerEqual($.arrayIndex((root$ as node).sub!, 0), child))
 }
 
 if ($.isMainScript(import.meta)) {

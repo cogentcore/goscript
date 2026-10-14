@@ -60,11 +60,12 @@ export async function main(): globalThis.Promise<void> {
 	// Test assignment from a pointer to a struct (should not clone)
 	let s2: MyStruct | $.VarRef<MyStruct> | null = new MyStruct({Value: 40})
 	let p2: MyStruct | $.VarRef<MyStruct> | null = new MyStruct({Value: 50})
-	$.assignStruct($.pointerValue<MyStruct>(p2), $.pointerValue<MyStruct>(s2))
-	await $.println($.pointerValue<MyStruct>(p2).Value)
+	let p2$: MyStruct = p2 == null ? $.pointerTarget<MyStruct>(p2) : (p2 as any).__isVarRef === true ? (p2 as any).value : (p2 as any).__goValue === undefined ? (p2 as any) : $.pointerTarget<MyStruct>(p2)
+	$.assignStruct((p2$ as MyStruct), $.pointerValue<MyStruct>(s2))
+	await $.println((p2$ as MyStruct).Value)
 
 	$.pointerValue<MyStruct>(s2).Value = 60
-	await $.println($.pointerValue<MyStruct>(p2).Value)
+	await $.println((p2$ as MyStruct).Value)
 	// GoScript should replicate this by cloning if the RHS is a struct value.
 	// In *p2 = *s2, *s2 is a struct value.
 

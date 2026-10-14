@@ -59,7 +59,7 @@ export class Lex {
 
 	public async String(): globalThis.Promise<string> {
 		const lx: Lex | $.VarRef<Lex> | null = this;
-		const lx$ = $.pointerTarget<Lex>(lx)
+		const lx$: Lex = lx == null ? $.pointerTarget<Lex>(lx) : (lx as any).__isVarRef === true ? (lx as any).value : (lx as any).__goValue === undefined ? (lx as any) : $.pointerTarget<Lex>(lx)
 		return fmt.Sprintf("[%s:%d]", (lx$ as Lex).Name, $.basicInterfaceValue((lx$ as Lex).Start, "int"))
 	}
 

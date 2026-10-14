@@ -178,6 +178,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// Grow then SetLen, as encoding/xml and encoding/json do.
 	let h: Holder | $.VarRef<Holder> | null = new Holder({T: $.makeSlice<number>(1, 10, "number")})
+	let h$: Holder = h == null ? $.pointerTarget<Holder>(h) : (h as any).__isVarRef === true ? (h as any).value : (h as any).__goValue === undefined ? (h as any) : $.pointerTarget<Holder>(h)
 	let hs = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(h, "*main.Holder", /* @__PURE__ */ $.pointerType("main.Holder"))))).Elem())).Field(0)))
 	for (let i = 0; i < 5; i++) {
 		let __goscriptShadow0 = $.markAsStructValue($.cloneStructValue(hs)).Len()
@@ -185,7 +186,7 @@ export async function main(): globalThis.Promise<void> {
 		$.markAsStructValue($.cloneStructValue(hs)).SetLen(__goscriptShadow0 + 1)
 		$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(hs)).Index(__goscriptShadow0))).SetInt($.int64(i * 10))
 	}
-	await $.println("grown:", $.sliceLen($.pointerValue<Holder>(h).S), $.arrayIndex($.pointerValue<Holder>(h).S!, 0), $.arrayIndex($.pointerValue<Holder>(h).S!, 4), $.cap($.pointerValue<Holder>(h).S) >= 5)
+	await $.println("grown:", $.sliceLen((h$ as Holder).S), $.arrayIndex((h$ as Holder).S!, 0), $.arrayIndex((h$ as Holder).S!, 4), $.cap((h$ as Holder).S) >= 5)
 
 	// Grow keeps capacity when it is already large enough.
 	let ht = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(h, "*main.Holder", /* @__PURE__ */ $.pointerType("main.Holder"))))).Elem())).Field(1)))

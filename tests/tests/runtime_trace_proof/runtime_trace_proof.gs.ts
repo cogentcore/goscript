@@ -46,7 +46,7 @@ export class byteSink {
 
 	public Write(p: $.Slice<number>): [number, $.GoError] {
 		let s: byteSink | $.VarRef<byteSink> | null = this;
-		const s$ = $.pointerTarget<byteSink>(s);
+		const s$: byteSink = s == null ? $.pointerTarget<byteSink>(s) : (s as any).__isVarRef === true ? (s as any).value : (s as any).__goValue === undefined ? (s as any) : $.pointerTarget<byteSink>(s);
 		;(s$ as byteSink).data = $.appendSlice((s$ as byteSink).data, p, $.byteSliceHint)
 		return [$.sliceLen(p), null]
 	}
@@ -66,8 +66,8 @@ export function toHex(b: $.Slice<number>): string {
 	let out: $.Slice<number> = $.makeSlice<number>($.sliceLen(b) * 2, undefined, "byte")
 	for (let __goscriptRangeTarget0 = b, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), i = 0; i < __goscriptRangeWindow0.length; i++) {
 		let c = $.uint((__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + i] as number), 8)
-		out![i * 2] = $.indexByteString("\x30\x31\x32\x33\x34\x35\x36\x37\x38\x39\x61\x62\x63\x64\x65\x66", $.uintShr(c, 4, 8))
-		out![(i * 2) + 1] = $.indexByteString("\x30\x31\x32\x33\x34\x35\x36\x37\x38\x39\x61\x62\x63\x64\x65\x66", c & 0x0f)
+		$.sliceElems(out!)[$.sliceSlot(out!, i * 2)] = $.indexByteString("\x30\x31\x32\x33\x34\x35\x36\x37\x38\x39\x61\x62\x63\x64\x65\x66", $.uintShr(c, 4, 8))
+		$.sliceElems(out!)[$.sliceSlot(out!, (i * 2) + 1)] = $.indexByteString("\x30\x31\x32\x33\x34\x35\x36\x37\x38\x39\x61\x62\x63\x64\x65\x66", c & 0x0f)
 	}
 	return $.bytesToString(out)
 }

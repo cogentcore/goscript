@@ -124,7 +124,7 @@ export class staticReader {
 
 	public Read(p: $.Slice<number>): [number, $.GoError] {
 		let r: staticReader | $.VarRef<staticReader> | null = this;
-		const r$ = $.pointerTarget<staticReader>(r)
+		const r$: staticReader = r == null ? $.pointerTarget<staticReader>(r) : (r as any).__isVarRef === true ? (r as any).value : (r as any).__goValue === undefined ? (r as any) : $.pointerTarget<staticReader>(r)
 		if ((r$ as staticReader).done) {
 			return [0, io.EOF]
 		}
@@ -174,7 +174,7 @@ export class asyncReader {
 
 	public async Read(p: $.Slice<number>): globalThis.Promise<[number, $.GoError]> {
 		let r: asyncReader | $.VarRef<asyncReader> | null = this;
-		const r$ = $.pointerTarget<asyncReader>(r)
+		const r$: asyncReader = r == null ? $.pointerTarget<asyncReader>(r) : (r as any).__isVarRef === true ? (r as any).value : (r as any).__goValue === undefined ? (r as any) : $.pointerTarget<asyncReader>(r)
 		await asyncWrites.value.Load("read")
 		if ((r$ as asyncReader).done) {
 			return [0, io.EOF]
@@ -225,7 +225,7 @@ export class asyncReaderAt {
 
 	public async ReadAt(p: $.Slice<number>, off: bigint): globalThis.Promise<[number, $.GoError]> {
 		const r: asyncReaderAt | $.VarRef<asyncReaderAt> | null = this;
-		const r$ = $.pointerTarget<asyncReaderAt>(r)
+		const r$: asyncReaderAt = r == null ? $.pointerTarget<asyncReaderAt>(r) : (r as any).__isVarRef === true ? (r as any).value : (r as any).__goValue === undefined ? (r as any) : $.pointerTarget<asyncReaderAt>(r)
 		await asyncWrites.value.Load("readat")
 		if (off >= $.int64($.sliceLen((r$ as asyncReaderAt).data))) {
 			return [0, io.EOF]

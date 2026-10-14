@@ -385,9 +385,10 @@ export async function main(): globalThis.Promise<void> {
 
 	// Nested embeddings retain independent value copies and zero fields.
 	let team: Team | $.VarRef<Team> | null = (() => { const __goscriptStructLiteral1: Team = new Team(); __goscriptStructLiteral1.Employee = new Employee(undefined, true); __goscriptStructLiteral1.Employee.Person = new Person(undefined, true); __goscriptStructLiteral1.Employee.Person.Name = "nested"; __goscriptStructLiteral1.Employee.ID = 7; __goscriptStructLiteral1.Active = true; return __goscriptStructLiteral1 })()
-	let copy = ($.pointerValue<Team>(team)).clone()
+	let team$: Team = team == null ? $.pointerTarget<Team>(team) : (team as any).__isVarRef === true ? (team as any).value : (team as any).__goValue === undefined ? (team as any) : $.pointerTarget<Team>(team)
+	let copy = ((team$ as Team)).clone()
 	copy.Employee.Person.Name = "copy"
-	await $.println($.pointerValue<Team>(team).Employee.Person.Name, copy.Employee.Person.Name, $.pointerValue<Team>(team).Employee.Person.Age, $.pointerValue<Team>(team).Employee.ID, $.pointerValue<Team>(team).Active)
+	await $.println((team$ as Team).Employee.Person.Name, copy.Employee.Person.Name, (team$ as Team).Employee.Person.Age, (team$ as Team).Employee.ID, (team$ as Team).Active)
 	let items: $.Slice<Team | $.VarRef<Team> | null> = $.arrayToSlice<Team | $.VarRef<Team> | null>([(() => { const __goscriptStructLiteral2: Team = new Team(); __goscriptStructLiteral2.Employee = new Employee(undefined, true); __goscriptStructLiteral2.Employee.Person = new Person(undefined, true); __goscriptStructLiteral2.Employee.Person.Name = "inferred"; return __goscriptStructLiteral2 })()])
 	await $.println($.pointerValue<Team>($.arrayIndex(items!, 0)).Employee.Person.Name, $.pointerValue<Team>($.arrayIndex(items!, 0)).Employee.ID)
 

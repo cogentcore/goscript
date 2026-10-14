@@ -120,6 +120,7 @@ export async function main(): globalThis.Promise<void> {
 	let valueCopy2 = (original.value).clone()
 	// pointerCopy holds the memory address of 'original'.
 	let pointerCopy: MyStruct | $.VarRef<MyStruct> | null = original
+	let pointerCopy$: MyStruct = pointerCopy == null ? $.pointerTarget<MyStruct>(pointerCopy) : (pointerCopy as any).__isVarRef === true ? (pointerCopy as any).value : (pointerCopy as any).__goValue === undefined ? (pointerCopy as any) : $.pointerTarget<MyStruct>(pointerCopy)
 
 	// Modifications to value copies do not affect the original or other copies.
 	valueCopy1.MyString = "value copy 1"
@@ -139,11 +140,11 @@ export async function main(): globalThis.Promise<void> {
 	// Demonstrate how modifications via a pointer affect the original struct.
 	await $.println("\nPointer Behavior Test:")
 	// Show the state of 'original' before modification via the pointer.
-	await $.println($.concatString("  Before pointer modification - original.MyString: ", original.value.MyString))
+	await $.println($.concatString("  Before pointer modification - original.MyString: ", original.value.MyString));
 
 	// Modify the struct 'original' *through* the pointerCopy.
-	$.pointerValue<MyStruct>(pointerCopy).MyString = "modified through pointer"
-	$.pointerValue<MyStruct>(pointerCopy).MyInt = 100
+	;(pointerCopy$ as MyStruct).MyString = "modified through pointer";
+	;(pointerCopy$ as MyStruct).MyInt = 100
 
 	// Show the state of 'original' *after* modification via the pointer.
 	// Both fields reflect the changes made through pointerCopy.

@@ -40,7 +40,7 @@ export class Buffer {
 
 	public Write(p: $.Slice<number>): [number, $.GoError] {
 		let b: Buffer | $.VarRef<Buffer> | null = this;
-		const b$ = $.pointerTarget<Buffer>(b);
+		const b$: Buffer = b == null ? $.pointerTarget<Buffer>(b) : (b as any).__isVarRef === true ? (b as any).value : (b as any).__goValue === undefined ? (b as any) : $.pointerTarget<Buffer>(b);
 		;(b$ as Buffer).data = $.appendSlice((b$ as Buffer).data, p, $.byteSliceHint)
 		return [$.sliceLen(p), null]
 	}

@@ -67,17 +67,18 @@ export class MyStruct {
 export async function main(): globalThis.Promise<void> {
 	// Test new(MyStruct)
 	let ptr: MyStruct | $.VarRef<MyStruct> | null = new MyStruct()
-	await $.println("ptr.MyInt (default):", $.pointerValue<MyStruct>(ptr).MyInt)
-	await $.println("ptr.MyString (default):", $.pointerValue<MyStruct>(ptr).MyString)
-	await $.println("ptr.myBool (default):", $.pointerValue<MyStruct>(ptr).myBool)
+	let ptr$: MyStruct = ptr == null ? $.pointerTarget<MyStruct>(ptr) : (ptr as any).__isVarRef === true ? (ptr as any).value : (ptr as any).__goValue === undefined ? (ptr as any) : $.pointerTarget<MyStruct>(ptr)
+	await $.println("ptr.MyInt (default):", (ptr$ as MyStruct).MyInt)
+	await $.println("ptr.MyString (default):", (ptr$ as MyStruct).MyString)
+	await $.println("ptr.myBool (default):", (ptr$ as MyStruct).myBool);
 
-	$.pointerValue<MyStruct>(ptr).MyInt = 42
-	$.pointerValue<MyStruct>(ptr).MyString = "hello"
-	$.pointerValue<MyStruct>(ptr).myBool = true
+	;(ptr$ as MyStruct).MyInt = 42;
+	;(ptr$ as MyStruct).MyString = "hello";
+	;(ptr$ as MyStruct).myBool = true
 
-	await $.println("ptr.MyInt (assigned):", $.pointerValue<MyStruct>(ptr).MyInt)
-	await $.println("ptr.MyString (assigned):", $.pointerValue<MyStruct>(ptr).MyString)
-	await $.println("ptr.myBool (assigned):", $.pointerValue<MyStruct>(ptr).myBool)
+	await $.println("ptr.MyInt (assigned):", (ptr$ as MyStruct).MyInt)
+	await $.println("ptr.MyString (assigned):", (ptr$ as MyStruct).MyString)
+	await $.println("ptr.myBool (assigned):", (ptr$ as MyStruct).myBool)
 
 	// Test assignment to a dereferenced new struct
 	let s: MyStruct = ($.pointerValue<MyStruct>(new MyStruct())).clone()

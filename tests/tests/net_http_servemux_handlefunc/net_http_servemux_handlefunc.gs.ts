@@ -19,8 +19,9 @@ import "@goscript/net/url/index.js"
 
 export async function serve(handler: http.Handler | null, target: string): globalThis.Promise<void> {
 	let rec: httptest.ResponseRecorder | $.VarRef<httptest.ResponseRecorder> | null = httptest.NewRecorder()
+	let rec$: httptest.ResponseRecorder = rec == null ? $.pointerTarget<httptest.ResponseRecorder>(rec) : (rec as any).__isVarRef === true ? (rec as any).value : (rec as any).__goValue === undefined ? (rec as any) : $.pointerTarget<httptest.ResponseRecorder>(rec)
 	await $.pointerValue<Exclude<http.Handler, null>>(handler).ServeHTTP($.pointerValueOrNil($.interfaceValue<http.ResponseWriter | null>(rec, "*httptest.ResponseRecorder", /* @__PURE__ */ $.pointerType("httptest.ResponseRecorder")))!, httptest.NewRequest(http.MethodGet, target, null!))
-	await $.println(target, "->", $.pointerValue<httptest.ResponseRecorder>(rec).Code, await http.Header_Get(httptest.ResponseRecorder.prototype.Header.call($.pointerValue<httptest.ResponseRecorder>(rec)), "X-Route"), $.pointerValue<bytes.Buffer>($.pointerValue<httptest.ResponseRecorder>(rec).Body).String())
+	await $.println(target, "->", (rec$ as httptest.ResponseRecorder).Code, await http.Header_Get(httptest.ResponseRecorder.prototype.Header.call($.pointerValue<httptest.ResponseRecorder>(rec)), "X-Route"), $.pointerValue<bytes.Buffer>((rec$ as httptest.ResponseRecorder).Body).String())
 }
 
 export async function main(): globalThis.Promise<void> {

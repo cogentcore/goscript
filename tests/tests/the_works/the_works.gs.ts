@@ -171,7 +171,7 @@ export class Stack {
 
 	public Pop(__typeArgs: $.GenericTypeArgs | undefined): any {
 		let s: Stack | $.VarRef<Stack> | null = this;
-		const s$ = $.pointerTarget<Stack>(s)
+		const s$: Stack = s == null ? $.pointerTarget<Stack>(s) : (s as any).__isVarRef === true ? (s as any).value : (s as any).__goValue === undefined ? (s as any) : $.pointerTarget<Stack>(s)
 		if ($.sliceLen((s$ as Stack).items) == 0) {
 			$.panic("stack underflow")
 		}
@@ -182,7 +182,7 @@ export class Stack {
 
 	public Push(__typeArgs: $.GenericTypeArgs | undefined, v: any): void {
 		let s: Stack | $.VarRef<Stack> | null = this;
-		const s$ = $.pointerTarget<Stack>(s);
+		const s$: Stack = s == null ? $.pointerTarget<Stack>(s) : (s as any).__isVarRef === true ? (s as any).value : (s as any).__goValue === undefined ? (s as any) : $.pointerTarget<Stack>(s);
 		;(s$ as Stack).items = $.append((s$ as Stack).items, v, $.appendZero(() => ($.genericZero(__typeArgs, "T", null) as any)))
 	}
 
@@ -249,7 +249,7 @@ export class VM {
 
 	public Step(code: $.Slice<Instr>): boolean {
 		let vm: VM | $.VarRef<VM> | null = this;
-		const vm$ = $.pointerTarget<VM>(vm)
+		const vm$: VM = vm == null ? $.pointerTarget<VM>(vm) : (vm as any).__isVarRef === true ? (vm as any).value : (vm as any).__goValue === undefined ? (vm as any) : $.pointerTarget<VM>(vm)
 		let _in = ($.arrayIndex(code!, (vm$ as VM).pc)).clone();
 		;(vm$ as VM).pc++;
 		;(vm$ as VM).steps++
@@ -492,9 +492,10 @@ export async function run(p: Program, answers: $.Channel<Answer> | null, faults:
 			}
 		})() })
 		let vm: VM | $.VarRef<VM> | null = new VM()
+		let vm$: VM = vm == null ? $.pointerTarget<VM>(vm) : (vm as any).__isVarRef === true ? (vm as any).value : (vm as any).__goValue === undefined ? (vm as any) : $.pointerTarget<VM>(vm)
 		while (!VM.prototype.Step.call(vm, p.Code)) {
 		}
-		await $.chanSend(answers, (() => { const __goscriptLiteralField0 = $.pointerValue<VM>(vm).stack.Pop(__goscriptStatic0()); return new Answer({Name: p.Name, Value: __goscriptLiteralField0, Steps: $.pointerValue<VM>(vm).steps}, true) })())
+		await $.chanSend(answers, (() => { const __goscriptLiteralField0 = (vm$ as VM).stack.Pop(__goscriptStatic0()); return new Answer({Name: p.Name, Value: __goscriptLiteralField0, Steps: (vm$ as VM).steps}, true) })())
 		await __defer.dispose()
 	} catch (e) {
 		await __defer.disposePanic(e)

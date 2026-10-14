@@ -54,7 +54,7 @@ export class R {
 
 	public async ShowPtr(tag: string): globalThis.Promise<void> {
 		const r: R | $.VarRef<R> | null = this;
-		const r$ = $.pointerTarget<R>(r)
+		const r$: R = r == null ? $.pointerTarget<R>(r) : (r as any).__isVarRef === true ? (r as any).value : (r as any).__goValue === undefined ? (r as any) : $.pointerTarget<R>(r)
 		await $.println(tag, (r$ as R).A, (r$ as R).B)
 	}
 

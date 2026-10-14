@@ -264,13 +264,14 @@ export function identity(__typeArgs: $.GenericTypeArgs | undefined, v: any): any
 
 export async function main(): globalThis.Promise<void> {
 	let r: Rule | $.VarRef<Rule> | null = new Rule({Name: "r", pos: new Pos({Line: 1, Char: 2}, true)})
+	let r$: Rule = r == null ? $.pointerTarget<Rule>(r) : (r as any).__isVarRef === true ? (r as any).value : (r as any).__goValue === undefined ? (r as any) : $.pointerTarget<Rule>(r)
 	let p = Rule.prototype.Pos.call(r)
 	p.Line = 10
-	await $.println($.pointerValue<Rule>(r).pos.Line, p.Line)
+	await $.println((r$ as Rule).pos.Line, p.Line)
 
-	let v = $.pointerValue<Rule>(r).ValuePos()
+	let v = (r$ as Rule).ValuePos()
 	v.Char = 20
-	await $.println($.pointerValue<Rule>(r).pos.Char, v.Char)
+	await $.println((r$ as Rule).pos.Char, v.Char)
 
 	$.assignStruct(global, new Pos({Line: 5, Char: 6}, true))
 	let g = globalPos()
@@ -300,7 +301,7 @@ export async function main(): globalThis.Promise<void> {
 	let arr: Pos[] = $.arrayValue(globalThis.Array.from({ length: 2 }, () => new Pos(undefined, true)), /* @__PURE__ */ $.arrayType("main.Pos", 2))
 	$.assignStruct(arr[0], Rule.prototype.Pos.call(r))
 	$.arrayIndex(arr, 0).Line = 11
-	await $.println($.pointerValue<Rule>(r).pos.Line, $.arrayIndex(arr, 0).Line)
+	await $.println((r$ as Rule).pos.Line, $.arrayIndex(arr, 0).Line)
 
 	let m: globalThis.Map<key, number> | null = $.makeMap<key, number>([])
 	let k = new key({a: 1, b: 2}, true)

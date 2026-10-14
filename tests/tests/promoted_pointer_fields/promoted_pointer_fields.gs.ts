@@ -138,11 +138,12 @@ export class outer {
 
 export async function main(): globalThis.Promise<void> {
 	let o: outer | $.VarRef<outer> | null = new outer({inner: new inner({name: "ready", count: new counter({value: 7}, true)})})
+	let o$: outer = o == null ? $.pointerTarget<outer>(o) : (o as any).__isVarRef === true ? (o as any).value : (o as any).__goValue === undefined ? (o as any) : $.pointerTarget<outer>(o)
 
-	await $.println("name:", $.pointerValue<inner>($.pointerValue<outer>(o).inner).name)
-	$.pointerValue<inner>($.pointerValue<outer>(o).inner).name = "done"
-	await $.println("renamed:", $.pointerValue<inner>($.pointerValue<outer>(o).inner).name, $.pointerValue<inner>($.pointerValue<outer>(o).inner).name)
-	await $.println("count:", $.pointerValue<inner>($.pointerValue<outer>(o).inner).count.Load())
+	await $.println("name:", $.pointerValue<inner>((o$ as outer).inner).name)
+	$.pointerValue<inner>((o$ as outer).inner).name = "done"
+	await $.println("renamed:", $.pointerValue<inner>((o$ as outer).inner).name, $.pointerValue<inner>((o$ as outer).inner).name)
+	await $.println("count:", $.pointerValue<inner>((o$ as outer).inner).count.Load())
 }
 
 if ($.isMainScript(import.meta)) {

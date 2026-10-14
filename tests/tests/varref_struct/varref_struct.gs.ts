@@ -124,12 +124,13 @@ export async function main(): globalThis.Promise<void> {
 	// 'val' is a value type, but its address is taken, so it should be varrefed in TS.
 	let val = $.varRef(new MyStruct({MyInt: 10}, true))
 	let ptrToVal: MyStruct | $.VarRef<MyStruct> | null = val
+	let ptrToVal$: MyStruct = ptrToVal == null ? $.pointerTarget<MyStruct>(ptrToVal) : (ptrToVal as any).__isVarRef === true ? (ptrToVal as any).value : (ptrToVal as any).__goValue === undefined ? (ptrToVal as any) : $.pointerTarget<MyStruct>(ptrToVal)
 
 	// Accessing pointer value, should use .value
-	await $.println("ptrToVal.MyInt:", $.pointerValue<MyStruct>(ptrToVal).MyInt)
+	await $.println("ptrToVal.MyInt:", (ptrToVal$ as MyStruct).MyInt)
 
 	// Accessing pointer value, should use .value
-	let myIntVal = $.pointerValue<MyStruct>(ptrToVal).MyInt
+	let myIntVal = (ptrToVal$ as MyStruct).MyInt
 	await $.println("myIntVal:", myIntVal)
 
 	// Field pointers retain their storage identity across whole-value assignment.
@@ -137,7 +138,7 @@ export async function main(): globalThis.Promise<void> {
 	$.assignStruct(val.value, new MyStruct({MyInt: 30}, true))
 	await $.println("field after assignment:", $.pointerValue<number>(field), $.pointerEqual(field, $.fieldRef(val.value._fields, "MyInt")))
 	field!.value = 40
-	await $.println("write through field:", val.value.MyInt, $.pointerValue<MyStruct>(ptrToVal).MyInt)
+	await $.println("write through field:", val.value.MyInt, (ptrToVal$ as MyStruct).MyInt)
 
 	// TypeScript keywords use the same storage key for reads and addresses.
 	let keywords = $.anonymousStructValue({_catch: 5}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("catch", /* @__PURE__ */ $.basicType("int"), [0], 0, false, { key: "_catch", pkgPath: "github.com/s4wave/goscript/tests/tests/varref_struct" })] })

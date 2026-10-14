@@ -72,7 +72,7 @@ export class Hooked {
 
 	public UnmarshalJSON(data: $.Slice<number>): $.GoError {
 		let h: Hooked | $.VarRef<Hooked> | null = this;
-		const h$ = $.pointerTarget<Hooked>(h);
+		const h$: Hooked = h == null ? $.pointerTarget<Hooked>(h) : (h as any).__isVarRef === true ? (h as any).value : (h as any).__goValue === undefined ? (h as any) : $.pointerTarget<Hooked>(h);
 		;(h$ as Hooked).Calls++;
 		;(h$ as Hooked).Seen = $.bytesToString(data)
 		return null

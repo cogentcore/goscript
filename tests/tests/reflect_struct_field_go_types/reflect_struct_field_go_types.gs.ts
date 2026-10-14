@@ -168,7 +168,8 @@ export async function main(): globalThis.Promise<void> {
 	// A StructField literal takes a Type that may be nil, as reflect.TypeOf
 	// returns.
 	let a: arg | $.VarRef<arg> | null = new arg({Name: "Arg", Value: $.basicInterfaceValue(3, "int"), Tag: "json:\"arg\""})
-	let f = (() => { const __goscriptLiteralField0 = arg.prototype.label.call(a); const __goscriptLiteralField1 = reflect.TypeOf($.pointerValue<arg>(a).Value); return $.markAsStructValue(new reflect.StructField({Name: __goscriptLiteralField0, Type: __goscriptLiteralField1, Tag: $.pointerValue<arg>(a).Tag})) })()
+	let a$: arg = a == null ? $.pointerTarget<arg>(a) : (a as any).__isVarRef === true ? (a as any).value : (a as any).__goValue === undefined ? (a as any) : $.pointerTarget<arg>(a)
+	let f = (() => { const __goscriptLiteralField0 = arg.prototype.label.call(a); const __goscriptLiteralField1 = reflect.TypeOf((a$ as arg).Value); return $.markAsStructValue(new reflect.StructField({Name: __goscriptLiteralField0, Type: __goscriptLiteralField1, Tag: (a$ as arg).Tag})) })()
 	await $.println(f.Name, (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(f.Type).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), reflect.StructTag_Get(f.Tag, "json"))
 
 	// Index is a []int that can be appended to.

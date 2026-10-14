@@ -85,7 +85,7 @@ export class item {
 
 	public increment(): number {
 		let i: item | $.VarRef<item> | null = this;
-		const i$ = $.pointerTarget<item>(i);
+		const i$: item = i == null ? $.pointerTarget<item>(i) : (i as any).__isVarRef === true ? (i as any).value : (i as any).__goValue === undefined ? (i as any) : $.pointerTarget<item>(i);
 		;(i$ as item).value++
 		return (i$ as item).value
 	}

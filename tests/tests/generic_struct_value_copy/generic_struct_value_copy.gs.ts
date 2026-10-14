@@ -123,7 +123,7 @@ export class Sides {
 
 	public SetAll(__typeArgs: $.GenericTypeArgs | undefined, val: any): void {
 		let s: Sides | $.VarRef<Sides> | null = this;
-		const s$ = $.pointerTarget<Sides>(s);
+		const s$: Sides = s == null ? $.pointerTarget<Sides>(s) : (s as any).__isVarRef === true ? (s as any).value : (s as any).__goValue === undefined ? (s as any) : $.pointerTarget<Sides>(s);
 		;(s$ as Sides).Top = $.copyElement(val);
 		;(s$ as Sides).Right = $.copyElement(val);
 		;(s$ as Sides).Bottom = $.copyElement(val);
@@ -132,7 +132,7 @@ export class Sides {
 
 	public SetHorizontal(__typeArgs: $.GenericTypeArgs | undefined, val: any): void {
 		let s: Sides | $.VarRef<Sides> | null = this;
-		const s$ = $.pointerTarget<Sides>(s);
+		const s$: Sides = s == null ? $.pointerTarget<Sides>(s) : (s as any).__isVarRef === true ? (s as any).value : (s as any).__goValue === undefined ? (s as any) : $.pointerTarget<Sides>(s);
 		;(s$ as Sides).Right = $.copyElement(val);
 		;(s$ as Sides).Left = $.copyElement(val)
 	}

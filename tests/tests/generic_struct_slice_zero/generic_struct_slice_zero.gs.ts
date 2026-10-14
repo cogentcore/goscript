@@ -77,7 +77,7 @@ export class arena {
 
 	public New(__typeArgs: $.GenericTypeArgs | undefined): any {
 		let a: arena | $.VarRef<arena> | null = this;
-		const a$ = $.pointerTarget<arena>(a)
+		const a$: arena = a == null ? $.pointerTarget<arena>(a) : (a as any).__isVarRef === true ? (a as any).value : (a as any).__goValue === undefined ? (a as any) : $.pointerTarget<arena>(a)
 		if ($.sliceLen((a$ as arena).data) == $.cap((a$ as arena).data)) {
 			let nextSize = 1;
 			;(a$ as arena).data = (slices.Grow(null, nextSize, () => ($.genericZero(__typeArgs, "T", null) as any)) as $.Slice<any>)
@@ -99,8 +99,9 @@ export class arena {
 export async function main(): globalThis.Promise<void> {
 	let a: $.VarRef<arena> = $.varRef($.markAsStructValue(new arena()))
 	let value: item | $.VarRef<item> | null = (a.value.New(__goscriptStatic0()) as item | $.VarRef<item> | null)
-	$.pointerValue<item>(value).Text = "ok"
-	await $.println($.pointerValue<item>(value).Text)
+	let value$: item = value == null ? $.pointerTarget<item>(value) : (value as any).__isVarRef === true ? (value as any).value : (value as any).__goValue === undefined ? (value as any) : $.pointerTarget<item>(value);
+	;(value$ as item).Text = "ok"
+	await $.println((value$ as item).Text)
 }
 
 var __goscriptStatic0$value: any

@@ -37,12 +37,13 @@ export async function main(): globalThis.Promise<void> {
 	let __goscriptTuple0: any = http.NewRequest(http.MethodPut, "https://example.invalid/path?q=1", $.interfaceValue<io.Reader | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(http.NoBody))), "http.noBody", "http.noBody")!)
 	let req: http.Request | $.VarRef<http.Request> | null = __goscriptTuple0[0]
 	let err = __goscriptTuple0[1]
+	let req$: http.Request = req == null ? $.pointerTarget<http.Request>(req) : (req as any).__isVarRef === true ? (req as any).value : (req as any).__goValue === undefined ? (req as any) : $.pointerTarget<http.Request>(req)
 	if (err != null) {
 		await $.println("request error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		return
 	}
-	http.Header_Set($.pointerValue<http.Request>(req).Header, "Cookie", "space=wave")
-	await $.println("request:", $.pointerValue<http.Request>(req).Method, $.pointerValue<url.URL>($.pointerValue<http.Request>(req).URL).Path, http.Request.prototype.ProtoAtLeast.call($.pointerValue<http.Request>(req), 1, 1), $.sliceLen(http.Request.prototype.Cookies.call($.pointerValue<http.Request>(req))))
+	http.Header_Set((req$ as http.Request).Header, "Cookie", "space=wave")
+	await $.println("request:", (req$ as http.Request).Method, $.pointerValue<url.URL>((req$ as http.Request).URL).Path, http.Request.prototype.ProtoAtLeast.call($.pointerValue<http.Request>(req), 1, 1), $.sliceLen(http.Request.prototype.Cookies.call($.pointerValue<http.Request>(req))))
 
 	let rec: httptest.ResponseRecorder | $.VarRef<httptest.ResponseRecorder> | null = httptest.NewRecorder()
 	http.Error($.pointerValueOrNil($.interfaceValue<http.ResponseWriter | null>(rec, "*httptest.ResponseRecorder", /* @__PURE__ */ $.pointerType("httptest.ResponseRecorder")))!, http.ProtocolError.prototype.Error.call($.pointerValue<http.ProtocolError>(http.ErrNotSupported)), 403)

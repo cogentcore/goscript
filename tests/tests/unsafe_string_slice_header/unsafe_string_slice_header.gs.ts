@@ -63,10 +63,12 @@ export function stringBytes(__goscriptParam0: string): $.Slice<number> {
 	let s: $.VarRef<string> = $.varRef(__goscriptParam0)
 	let b: $.VarRef<$.Slice<number>> = $.varRef(null! as $.Slice<number>)
 	let strh: reflect.StringHeader | $.VarRef<reflect.StringHeader> | null = $.unsafePointerCast<reflect.StringHeader | $.VarRef<reflect.StringHeader> | null>($.stringHeaderRef(s))
+	let strh$: reflect.StringHeader = strh == null ? $.pointerTarget<reflect.StringHeader>(strh) : (strh as any).__isVarRef === true ? (strh as any).value : (strh as any).__goValue === undefined ? (strh as any) : $.pointerTarget<reflect.StringHeader>(strh)
 	let sh: reflect.SliceHeader | $.VarRef<reflect.SliceHeader> | null = $.unsafePointerCast<reflect.SliceHeader | $.VarRef<reflect.SliceHeader> | null>($.sliceHeaderRef(b))
-	$.pointerValue<reflect.SliceHeader>(sh).Data = $.pointerValue<reflect.StringHeader>(strh).Data
-	$.pointerValue<reflect.SliceHeader>(sh).Len = $.pointerValue<reflect.StringHeader>(strh).Len
-	$.pointerValue<reflect.SliceHeader>(sh).Cap = $.pointerValue<reflect.StringHeader>(strh).Len
+	let sh$: reflect.SliceHeader = sh == null ? $.pointerTarget<reflect.SliceHeader>(sh) : (sh as any).__isVarRef === true ? (sh as any).value : (sh as any).__goValue === undefined ? (sh as any) : $.pointerTarget<reflect.SliceHeader>(sh);
+	;(sh$ as reflect.SliceHeader).Data = (strh$ as reflect.StringHeader).Data;
+	;(sh$ as reflect.SliceHeader).Len = (strh$ as reflect.StringHeader).Len;
+	;(sh$ as reflect.SliceHeader).Cap = (strh$ as reflect.StringHeader).Len
 	return b.value
 }
 
