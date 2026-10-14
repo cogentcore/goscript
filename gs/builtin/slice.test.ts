@@ -17,6 +17,8 @@ import {
   goSlice,
   indexString,
   rangeString,
+  stringRunes,
+  bytesToString,
   indexByteString,
   len,
   makeSlice,
@@ -360,7 +362,26 @@ describe('builtin string byte representation', () => {
         offset += new TextEncoder().encode(char).length
       }
       expect(rangeString(value)).toEqual(want)
+      const got: Array<[number, number]> = []
+      for (const runes = stringRunes(value); runes.next(); ) {
+        got.push([runes.index, runes.rune])
+      }
+      expect(got).toEqual(want)
     }
+
+    // A byte string (invalid UTF-8) steps through its bytes.
+    const bytes = bytesToString(new Uint8Array([0x61, 0xff, 0xc3, 0xa9, 0x62]))
+    const got: Array<[number, number]> = []
+    for (const runes = stringRunes(bytes); runes.next(); ) {
+      got.push([runes.index, runes.rune])
+    }
+    expect(got).toEqual(rangeString(bytes))
+    expect(got).toEqual([
+      [0, 0x61],
+      [1, 0xfffd],
+      [2, 0xe9],
+      [4, 0x62],
+    ])
   })
 
   it('preserves byte-index bounds and non-integer access behavior', () => {
