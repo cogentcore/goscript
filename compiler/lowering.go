@@ -1698,6 +1698,9 @@ type lowerFileContext struct {
 	// statics holds the static expressions of the file hoisted out of the
 	// code that would evaluate them each time (see hoistStatic).
 	statics *staticPool
+	// loopWindows are the slices whose windows enclosing loops read once,
+	// whose elements and lengths read the window (see loopSliceWindows).
+	loopWindows []loopSliceWindow
 	// awaitTemp is set when the file uses the temporary variable of
 	// conditional awaits (see conditionalAwait), which is then declared.
 	awaitTemp *bool
@@ -7497,17 +7500,31 @@ func (o *LoweringOwner) lowerForStmt(ctx lowerFileContext, stmt *ast.ForStmt) (l
 			initPrelude = prelude
 		}
 	}
+
+	// The slices that the loop indexes read their windows once (see
+	// loopSliceWindows), declared in the init clause, which must then be
+	// empty or a declaration.
+	windows, windowDecls := o.loopSliceWindows(ctx, stmt, nil, "", stmt.Init, stmt.Cond, stmt.Post, stmt.Body)
 	if stmt.Init == nil && stmt.Post == nil {
+		// A loop with only a condition reads its windows in the init clause
+		// of a for loop.
+		loopCtx = loopCtx.withLoopSliceWindows(windows)
+		bodyCtx = bodyCtx.withLoopSliceWindows(windows)
 		cond := "true"
 		var diagnostics []Diagnostic
 		if stmt.Cond != nil {
 			var condDiagnostics []Diagnostic
-			cond, condDiagnostics = o.lowerExpr(ctx, stmt.Cond)
+			cond, condDiagnostics = o.lowerExpr(loopCtx, stmt.Cond)
 			diagnostics = append(diagnostics, condDiagnostics...)
 		}
 		body, bodyDiagnostics := o.lowerBlock(bodyCtx, stmt.Body)
 		diagnostics = append(diagnostics, bodyDiagnostics...)
+
+		// The loop runs while its condition holds.
 		text := "while (" + cond + ")"
+		if len(windowDecls) != 0 {
+			text = "for (let " + strings.Join(windowDecls, ", ") + "; " + cond + "; )"
+		}
 		if loopLabel != "" {
 			text = loopLabel + ": " + text
 		}
@@ -7518,6 +7535,7 @@ func (o *LoweringOwner) lowerForStmt(ctx lowerFileContext, stmt *ast.ForStmt) (l
 		}, diagnostics
 	}
 
+	// Other loops lower their three clauses into a for loop.
 	init := ""
 	var diagnostics []Diagnostic
 	if stmt.Init != nil {
@@ -7525,6 +7543,15 @@ func (o *LoweringOwner) lowerForStmt(ctx lowerFileContext, stmt *ast.ForStmt) (l
 		diagnostics = append(diagnostics, initDiagnostics...)
 		init = lowered
 	}
+
+	// The windows join an init clause that is empty or a declaration.
+	if withWindows, ok := prependLoopInit(init, windowDecls); ok {
+		init = withWindows
+		loopCtx = loopCtx.withLoopSliceWindows(windows)
+		bodyCtx = bodyCtx.withLoopSliceWindows(windows)
+	}
+
+	// The condition and post statement read through the windows.
 	cond := ""
 	if stmt.Cond != nil {
 		var condDiagnostics []Diagnostic
@@ -7537,6 +7564,8 @@ func (o *LoweringOwner) lowerForStmt(ctx lowerFileContext, stmt *ast.ForStmt) (l
 		diagnostics = append(diagnostics, postDiagnostics...)
 		post = lowered
 	}
+
+	// So does the body, which the init prelude, if any, precedes.
 	body, bodyDiagnostics := o.lowerBlock(bodyCtx, stmt.Body)
 	diagnostics = append(diagnostics, bodyDiagnostics...)
 	text := "for (" + init + "; " + cond + "; " + post + ")"
@@ -7698,7 +7727,11 @@ func (o *LoweringOwner) lowerRangeStmt(ctx lowerFileContext, stmt *ast.RangeStmt
 		}, diagnostics
 	}
 	if isIntegerRangeType(rangeType) {
-		body, bodyDiagnostics := o.lowerBlock(bodyCtx.withoutRangeLoopBranches(), stmt.Body)
+		// The slices that the loop indexes read their windows once (see
+		// loopSliceWindows).
+		windows, windowDecls := o.loopSliceWindows(ctx, stmt, nil, "", stmt.Key, stmt.Value, stmt.Body)
+		intCtx := bodyCtx.withoutRangeLoopBranches().withLoopSliceWindows(windows)
+		body, bodyDiagnostics := o.lowerBlock(intCtx, stmt.Body)
 		diagnostics = append(diagnostics, bodyDiagnostics...)
 		if keyName == "" {
 			keyName = "__rangeIndex"
@@ -7715,6 +7748,7 @@ func (o *LoweringOwner) lowerRangeStmt(ctx lowerFileContext, stmt *ast.RangeStmt
 			bound = ctx.tempName("RangeCount")
 			init = bound + " = " + rangeValue + ", " + init
 		}
+		init = strings.Join(append(windowDecls, init), ", ")
 		return loweredStmt{
 			hasBlock: true,
 			text:     loopPrefix + "for (let " + init + "; " + keyName + " < " + bound + "; " + keyName + "++)",
@@ -7789,6 +7823,19 @@ func (o *LoweringOwner) lowerRangeStmt(ctx lowerFileContext, stmt *ast.RangeStmt
 	if access, ok := rangeElementAccessFor(ctx, stmt, rangeType, rangeWindow, indexName); ok {
 		loopCtx.rangeElements = append(append([]rangeElementAccess(nil), ctx.rangeElements...), access)
 	}
+
+	// The slices that the loop indexes read their windows once (see
+	// loopSliceWindows); the slice ranged over uses the loop's window.
+	var ranged types.Object
+	if ident, ok := ast.Unparen(stmt.X).(*ast.Ident); ok {
+		if _, isSlice := types.Unalias(rangeType).Underlying().(*types.Slice); isSlice {
+			ranged = ctx.semPkg.source.TypesInfo.Uses[ident]
+		}
+	}
+	windows, windowDecls := o.loopSliceWindows(ctx, stmt, ranged, rangeWindow, stmt.Key, stmt.Value, stmt.Body)
+	loopCtx = loopCtx.withLoopSliceWindows(windows)
+
+	// The body reads the elements through the range target's window.
 	body, bodyDiagnostics := o.lowerBlock(loopCtx, stmt.Body)
 	diagnostics = append(diagnostics, bodyDiagnostics...)
 	rangeTarget := ctx.tempName("RangeTarget")
@@ -7812,7 +7859,7 @@ func (o *LoweringOwner) lowerRangeStmt(ctx lowerFileContext, stmt *ast.RangeStmt
 		hasBlock: true,
 		text: loopPrefix + "for (let " + rangeTarget + " = " + rangeTargetValue + ", " +
 			rangeWindow + " = " + o.runtimeOwner.QualifiedHelper(RuntimeHelperSliceRange) + "(" + rangeTarget + "), " +
-			indexName + " = 0; " + indexName + " < " + rangeWindow + ".length; " + indexName + "++)",
+			strings.Join(append(windowDecls, indexName+" = 0"), ", ") + "; " + indexName + " < " + rangeWindow + ".length; " + indexName + "++)",
 		children: children,
 	}, diagnostics
 }
@@ -9634,6 +9681,9 @@ func (o *LoweringOwner) lowerCallExpr(ctx lowerFileContext, expr *ast.CallExpr) 
 								return o.runtimeOwner.QualifiedHelper(RuntimeHelperStringLen) + "(" + args[0] + ")", diagnostics
 							}
 						case *types.Slice:
+							if length, ok := loopWindowLen(ctx, expr.Args[0]); ok {
+								return length, diagnostics
+							}
 							return o.runtimeOwner.QualifiedHelper(RuntimeHelperSliceLen) + "(" + args[0] + ")", diagnostics
 						}
 					}
@@ -11823,6 +11873,9 @@ func (o *LoweringOwner) lowerAssignmentTarget(
 		if element, ok := rangeWindowElement(ctx, typed); ok {
 			return element, nil
 		}
+		if element, diagnostics, ok := o.loopWindowElement(ctx, typed); ok {
+			return element, diagnostics
+		}
 
 		// The target and index lower as values.
 		target, targetDiagnostics := o.lowerExpr(ctx, typed.X)
@@ -12953,6 +13006,10 @@ func (o *LoweringOwner) lowerIndexExpr(ctx lowerFileContext, expr *ast.IndexExpr
 	if element, ok := rangeWindowElement(ctx, expr); ok {
 		elemType := ctx.semPkg.source.TypesInfo.TypeOf(expr)
 		return "(" + element + " as " + o.tsTypeFor(ctx, elemType) + ")", nil
+	}
+	if element, diagnostics, ok := o.loopWindowElement(ctx, expr); ok {
+		elemType := ctx.semPkg.source.TypesInfo.TypeOf(expr)
+		return "(" + element + " as " + o.tsTypeFor(ctx, elemType) + ")", diagnostics
 	}
 	target, targetDiagnostics := o.lowerExpr(ctx, expr.X)
 	index, indexDiagnostics := o.lowerExpr(ctx, expr.Index)

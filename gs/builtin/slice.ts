@@ -312,6 +312,17 @@ export function sliceSlot(slice: any, index: number): number {
   return meta !== undefined ? meta.offset + index : index
 }
 
+// windowSlot returns the index in window.backing of element index of a slice
+// whose window a loop read once (see sliceRange), which it checks against the
+// window's length.
+export function windowSlot(window: SliceRange<any>, index: number): number {
+  // An index outside the window panics, as in Go.
+  if (index < 0 || index >= window.length) {
+    outOfRangeIndex(index, window.length)
+  }
+  return window.offset + index
+}
+
 // isArrayOrGoSlice reports whether value is a JavaScript array or a GoSlice,
 // the values that slices and arrays are represented by.
 export function isArrayOrGoSlice(

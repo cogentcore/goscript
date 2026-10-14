@@ -1,4 +1,4 @@
-import { arrayIndex, sliceElems, sliceSlot } from './slice.js'
+import { arrayIndex, sliceElems, sliceSlot, windowSlot } from './slice.js'
 import { describe, expect, it, vi } from 'vitest'
 
 import { makeMap, mapGet, mapSet } from './map.js'
@@ -15,6 +15,7 @@ import {
   copy,
   copyByteRanges,
   goSlice,
+  sliceRange,
   indexString,
   rangeString,
   indexByteString,
@@ -29,6 +30,22 @@ import {
   stringToBytes,
 } from './slice.js'
 import { markAsStructValue } from './type.js'
+
+describe('loop slice windows', () => {
+  it('offsets checked indexes into the backing array of a window', () => {
+    const base = [1, 2, 3, 4, 5]
+    const window = sliceRange(goSlice(base, 1, 4))
+    expect(window.backing[windowSlot(window, 0)]).toBe(2)
+    expect(window.backing[windowSlot(window, 2)]).toBe(4)
+    expect(() => windowSlot(window, 3)).toThrow(
+      'index out of range [3] with length 3',
+    )
+    expect(() => windowSlot(window, -1)).toThrow('index out of range [-1]')
+    expect(() => windowSlot(sliceRange(null), 0)).toThrow(
+      'index out of range [0] with length 0',
+    )
+  })
+})
 
 describe('byte range copies', () => {
   it('copies overlapping views of the same buffer with memmove semantics', () => {
