@@ -4,7 +4,13 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class helperState {
-	public declare text: string
+	public get text(): string {
+		return this._fields.text
+	}
+
+	public set text(value: string) {
+		this._fields.text = value
+	}
 
 	public _fields: {
 		text: string
@@ -18,10 +24,6 @@ export class helperState {
 
 	public clone(): helperState {
 		return $.markAsStructValue(new helperState(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["text"])
 	}
 
 	static __typeInfo = $.registerStructType(

@@ -4,7 +4,13 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class inner {
-	public declare value: number
+	public get value(): number {
+		return this._fields.value
+	}
+
+	public set value(value: number) {
+		this._fields.value = value
+	}
 
 	public _fields: {
 		value: number
@@ -20,10 +26,6 @@ export class inner {
 		return $.markAsStructValue(new inner(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["value"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.inner",
 		() => new inner(),
@@ -34,7 +36,13 @@ export class inner {
 }
 
 export class outer {
-	public declare inner: inner
+	public get inner(): inner {
+		return this._fields.inner
+	}
+
+	public set inner(value: inner) {
+		this._fields.inner = value
+	}
 
 	public _fields: {
 		inner: inner
@@ -48,10 +56,6 @@ export class outer {
 
 	public clone(): outer {
 		return $.markAsStructValue(new outer(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["inner"])
 	}
 
 	static __typeInfo = $.registerStructType(

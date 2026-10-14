@@ -4,7 +4,13 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class Worker {
-	public declare ch: $.Channel<number> | null
+	public get ch(): $.Channel<number> | null {
+		return this._fields.ch
+	}
+
+	public set ch(value: $.Channel<number> | null) {
+		this._fields.ch = value
+	}
 
 	public _fields: {
 		ch: $.Channel<number> | null
@@ -24,10 +30,6 @@ export class Worker {
 		const w: Worker | $.VarRef<Worker> | null = this;
 		await $.chanSend($.pointerValue<Worker>(w).ch, $.len(network))
 		return await $.chanRecv($.pointerValue<Worker>(w).ch)
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["ch"])
 	}
 
 	static __typeInfo = $.registerStructType(

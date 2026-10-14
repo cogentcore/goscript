@@ -4,7 +4,13 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class item {
-	public declare n: number
+	public get n(): number {
+		return this._fields.n
+	}
+
+	public set n(value: number) {
+		this._fields.n = value
+	}
 
 	public _fields: {
 		n: number
@@ -26,10 +32,6 @@ export class item {
 			$.assignStruct(s, $.markAsStructValue(new item({n: s.n - 1})))
 		}
 		return $.markAsStructValue($.cloneStructValue(s))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["n"])
 	}
 
 	static __typeInfo = $.registerStructType(

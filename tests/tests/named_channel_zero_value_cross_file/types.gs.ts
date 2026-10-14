@@ -6,7 +6,13 @@ import * as $ from "@goscript/builtin/index.js"
 export type Jobs = $.Channel<Job> | null
 
 export class Job {
-	public declare Value: string
+	public get Value(): string {
+		return this._fields.Value
+	}
+
+	public set Value(value: string) {
+		this._fields.Value = value
+	}
 
 	public _fields: {
 		Value: string
@@ -20,10 +26,6 @@ export class Job {
 
 	public clone(): Job {
 		return $.markAsStructValue(new Job(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["Value"])
 	}
 
 	static __typeInfo = $.registerStructType(

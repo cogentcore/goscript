@@ -1948,8 +1948,8 @@ func TestCompilePackagesEmitsStructMethodsAndPointerAssertions(t *testing.T) {
 	text := string(content)
 	for _, want := range []string{
 		"export class Counter",
-		"// Value counts reads.\n\tpublic declare Value: number",
-		"$.bindStructFields(this.prototype, [\"Value\", \"ID\"])",
+		"// Value counts reads.\n\tpublic get Value(): number",
+		"public get ID(): ObjectID",
 		"public clone(): Counter",
 		"public Read(): number",
 		"public Set(v: number): void",
@@ -2208,8 +2208,8 @@ func TestCompilePackagesDoesNotEmitHiddenEmbeddedMethodOverField(t *testing.T) {
 	}
 	text := string(content)
 	for _, want := range []string{
-		"public declare Database: string",
-		"$.bindStructFields(this.prototype, [\"Database\", \"embedded\"])",
+		"public get Database(): string",
+		"public get embedded(): embedded",
 		"return h.Database",
 	} {
 		if !strings.Contains(text, want) {

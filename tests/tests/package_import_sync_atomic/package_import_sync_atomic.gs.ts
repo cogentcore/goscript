@@ -7,7 +7,13 @@ import * as atomic from "@goscript/sync/atomic/index.js"
 import "@goscript/sync/atomic/index.js"
 
 export class pointerNode {
-	public declare value: string
+	public get value(): string {
+		return this._fields.value
+	}
+
+	public set value(value: string) {
+		this._fields.value = value
+	}
 
 	public _fields: {
 		value: string
@@ -21,10 +27,6 @@ export class pointerNode {
 
 	public clone(): pointerNode {
 		return $.markAsStructValue(new pointerNode(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["value"])
 	}
 
 	static __typeInfo = $.registerStructType(

@@ -4,11 +4,29 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class requestKey {
-	public declare soID: string
+	public get soID(): string {
+		return this._fields.soID
+	}
 
-	public declare inviteID: string
+	public set soID(value: string) {
+		this._fields.soID = value
+	}
 
-	public declare peerID: string
+	public get inviteID(): string {
+		return this._fields.inviteID
+	}
+
+	public set inviteID(value: string) {
+		this._fields.inviteID = value
+	}
+
+	public get peerID(): string {
+		return this._fields.peerID
+	}
+
+	public set peerID(value: string) {
+		this._fields.peerID = value
+	}
 
 	public _fields: {
 		soID: string
@@ -28,10 +46,6 @@ export class requestKey {
 		return $.markAsStructValue(new requestKey(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["soID", "inviteID", "peerID"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.requestKey",
 		() => new requestKey(),
@@ -42,9 +56,21 @@ export class requestKey {
 }
 
 export class node {
-	public declare value: string
+	public get value(): string {
+		return this._fields.value
+	}
 
-	public declare next: node | $.VarRef<node> | null
+	public set value(value: string) {
+		this._fields.value = value
+	}
+
+	public get next(): node | $.VarRef<node> | null {
+		return this._fields.next
+	}
+
+	public set next(value: node | $.VarRef<node> | null) {
+		this._fields.next = value
+	}
 
 	public _fields: {
 		value: string
@@ -60,10 +86,6 @@ export class node {
 
 	public clone(): node {
 		return $.markAsStructValue(new node(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["value", "next"])
 	}
 
 	static __typeInfo = $.registerStructType(

@@ -7,11 +7,29 @@ import * as json from "@goscript/encoding/json/index.js"
 import "@goscript/encoding/json/index.js"
 
 export class Person {
-	public declare Name: string
+	public get Name(): string {
+		return this._fields.Name
+	}
 
-	public declare Age: number
+	public set Name(value: string) {
+		this._fields.Name = value
+	}
 
-	public declare Active: boolean
+	public get Age(): number {
+		return this._fields.Age
+	}
+
+	public set Age(value: number) {
+		this._fields.Age = value
+	}
+
+	public get Active(): boolean {
+		return this._fields.Active
+	}
+
+	public set Active(value: boolean) {
+		this._fields.Active = value
+	}
 
 	public _fields: {
 		Name: string
@@ -29,10 +47,6 @@ export class Person {
 
 	public clone(): Person {
 		return $.markAsStructValue(new Person(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["Name", "Age", "Active"])
 	}
 
 	static __typeInfo = $.registerStructType(

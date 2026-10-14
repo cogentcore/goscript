@@ -17,9 +17,21 @@ $.registerInterfaceType(
 );
 
 export class point {
-	public declare x: number
+	public get x(): number {
+		return this._fields.x
+	}
 
-	public declare y: number
+	public set x(value: number) {
+		this._fields.x = value
+	}
+
+	public get y(): number {
+		return this._fields.y
+	}
+
+	public set y(value: number) {
+		this._fields.y = value
+	}
 
 	public _fields: {
 		x: number
@@ -37,10 +49,6 @@ export class point {
 		return $.markAsStructValue(new point(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["x", "y"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.point",
 		() => new point(),
@@ -51,7 +59,13 @@ export class point {
 }
 
 export class frame {
-	public declare name: string
+	public get name(): string {
+		return this._fields.name
+	}
+
+	public set name(value: string) {
+		this._fields.name = value
+	}
 
 	public _fields: {
 		name: string
@@ -72,10 +86,6 @@ export class frame {
 		return $.pointerValue<frame>(f).name
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["name"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.frame",
 		() => new frame(),
@@ -86,7 +96,13 @@ export class frame {
 }
 
 export class tab {
-	public declare name: string
+	public get name(): string {
+		return this._fields.name
+	}
+
+	public set name(value: string) {
+		this._fields.name = value
+	}
 
 	public _fields: {
 		name: string
@@ -107,10 +123,6 @@ export class tab {
 		return $.pointerValue<tab>(t).name
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["name"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.tab",
 		() => new tab(),
@@ -121,7 +133,13 @@ export class tab {
 }
 
 export class tabs {
-	public declare count: number
+	public get count(): number {
+		return this._fields.count
+	}
+
+	public set count(value: number) {
+		this._fields.count = value
+	}
 
 	public _fields: {
 		count: number
@@ -142,10 +160,6 @@ export class tabs {
 		$.pointerValue<tabs>(ts).count++
 		await $.println("new tab:", name)
 		return newTab(name)
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["count"])
 	}
 
 	static __typeInfo = $.registerStructType(

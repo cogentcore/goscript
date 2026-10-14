@@ -5,10 +5,22 @@ import * as $ from "@goscript/builtin/index.js"
 
 export class TestStruct {
 	// IntField is a commented integer field.
-	public declare IntField: number
+	public get IntField(): number {
+		return this._fields.IntField
+	}
+
+	public set IntField(value: number) {
+		this._fields.IntField = value
+	}
 
 	// StringField is a commented string field.
-	public declare StringField: string
+	public get StringField(): string {
+		return this._fields.StringField
+	}
+
+	public set StringField(value: string) {
+		this._fields.StringField = value
+	}
 
 	public _fields: {
 		IntField: number
@@ -24,10 +36,6 @@ export class TestStruct {
 
 	public clone(): TestStruct {
 		return $.markAsStructValue(new TestStruct(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["IntField", "StringField"])
 	}
 
 	static __typeInfo = $.registerStructType(

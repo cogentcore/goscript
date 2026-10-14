@@ -25,9 +25,21 @@ $.registerInterfaceType(
 );
 
 export class MyStruct {
-	public declare Value1: string
+	public get Value1(): string {
+		return this._fields.Value1
+	}
 
-	public declare Value2: string
+	public set Value1(value: string) {
+		this._fields.Value1 = value
+	}
+
+	public get Value2(): string {
+		return this._fields.Value2
+	}
+
+	public set Value2(value: string) {
+		this._fields.Value2 = value
+	}
 
 	public _fields: {
 		Value1: string
@@ -53,10 +65,6 @@ export class MyStruct {
 	public MyString2(): string {
 		const m = this;
 		return m.Value2
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["Value1", "Value2"])
 	}
 
 	static __typeInfo = $.registerStructType(

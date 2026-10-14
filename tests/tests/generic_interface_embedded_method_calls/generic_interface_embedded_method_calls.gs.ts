@@ -25,9 +25,21 @@ $.registerInterfaceType(
 );
 
 export class impl {
-	public declare value: any
+	public get value(): any {
+		return this._fields.value
+	}
 
-	public declare other: any
+	public set value(value: any) {
+		this._fields.value = value
+	}
+
+	public get other(): any {
+		return this._fields.other
+	}
+
+	public set other(value: any) {
+		this._fields.other = value
+	}
 
 	public _fields: {
 		value: any
@@ -53,10 +65,6 @@ export class impl {
 	public Value(__typeArgs: $.GenericTypeArgs | undefined): any {
 		const i: impl | $.VarRef<impl> | null = this;
 		return $.pointerValue<impl>(i).value
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["value", "other"])
 	}
 
 	static __typeInfo = $.registerStructType(

@@ -19,7 +19,13 @@ import "@goscript/github.com/sirupsen/logrus/index.js"
 
 export class Inner {
 	// Ready is included even when it is false.
-	public declare Ready: boolean
+	public get Ready(): boolean {
+		return this._fields.Ready
+	}
+
+	public set Ready(value: boolean) {
+		this._fields.Ready = value
+	}
 
 	public _fields: {
 		Ready: boolean
@@ -35,10 +41,6 @@ export class Inner {
 		return $.markAsStructValue(new Inner(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Ready"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.Inner",
 		() => new Inner(),
@@ -50,13 +52,31 @@ export class Inner {
 
 export class Record {
 	// Count is the numeric field.
-	public declare Count: number
+	public get Count(): number {
+		return this._fields.Count
+	}
+
+	public set Count(value: number) {
+		this._fields.Count = value
+	}
 
 	// name is visible to formatting despite being unexported.
-	public declare name: string
+	public get name(): string {
+		return this._fields.name
+	}
+
+	public set name(value: string) {
+		this._fields.name = value
+	}
 
 	// Inner is a nested value.
-	public declare Inner: Inner
+	public get Inner(): Inner {
+		return this._fields.Inner
+	}
+
+	public set Inner(value: Inner) {
+		this._fields.Inner = value
+	}
 
 	public _fields: {
 		Count: number
@@ -76,10 +96,6 @@ export class Record {
 		return $.markAsStructValue(new Record(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Count", "name", "Inner"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.Record",
 		() => new Record(),
@@ -91,13 +107,31 @@ export class Record {
 
 export class Pointers {
 	// Value points to a scalar, which formats as an address.
-	public declare Value: $.VarRef<number> | null
+	public get Value(): $.VarRef<number> | null {
+		return this._fields.Value
+	}
+
+	public set Value(value: $.VarRef<number> | null) {
+		this._fields.Value = value
+	}
 
 	// Next can point back to this record.
-	public declare Next: Pointers | $.VarRef<Pointers> | null
+	public get Next(): Pointers | $.VarRef<Pointers> | null {
+		return this._fields.Next
+	}
+
+	public set Next(value: Pointers | $.VarRef<Pointers> | null) {
+		this._fields.Next = value
+	}
 
 	// Dynamic holds a pointer behind an interface.
-	public declare Dynamic: any
+	public get Dynamic(): any {
+		return this._fields.Dynamic
+	}
+
+	public set Dynamic(value: any) {
+		this._fields.Dynamic = value
+	}
 
 	public _fields: {
 		Value: $.VarRef<number> | null
@@ -117,10 +151,6 @@ export class Pointers {
 		return $.markAsStructValue(new Pointers(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Value", "Next", "Dynamic"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.Pointers",
 		() => new Pointers(),
@@ -131,11 +161,29 @@ export class Pointers {
 }
 
 export class Node {
-	public declare Name: string
+	public get Name(): string {
+		return this._fields.Name
+	}
 
-	public declare Parent: Node | $.VarRef<Node> | null
+	public set Name(value: string) {
+		this._fields.Name = value
+	}
 
-	public declare Kids: $.Slice<Node | $.VarRef<Node> | null>
+	public get Parent(): Node | $.VarRef<Node> | null {
+		return this._fields.Parent
+	}
+
+	public set Parent(value: Node | $.VarRef<Node> | null) {
+		this._fields.Parent = value
+	}
+
+	public get Kids(): $.Slice<Node | $.VarRef<Node> | null> {
+		return this._fields.Kids
+	}
+
+	public set Kids(value: $.Slice<Node | $.VarRef<Node> | null>) {
+		this._fields.Kids = value
+	}
 
 	public _fields: {
 		Name: string
@@ -155,10 +203,6 @@ export class Node {
 		return $.markAsStructValue(new Node(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Name", "Parent", "Kids"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.Node",
 		() => new Node(),
@@ -169,9 +213,21 @@ export class Node {
 }
 
 export class Base {
-	public declare Windows: $.Slice<any>
+	public get Windows(): $.Slice<any> {
+		return this._fields.Windows
+	}
 
-	public declare Active: any
+	public set Windows(value: $.Slice<any>) {
+		this._fields.Windows = value
+	}
+
+	public get Active(): any {
+		return this._fields.Active
+	}
+
+	public set Active(value: any) {
+		this._fields.Active = value
+	}
 
 	public _fields: {
 		Windows: $.Slice<any>
@@ -189,10 +245,6 @@ export class Base {
 		return $.markAsStructValue(new Base(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Windows", "Active"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.Base",
 		() => new Base(),
@@ -203,9 +255,21 @@ export class Base {
 }
 
 export class App {
-	public declare Base: Base
+	public get Base(): Base {
+		return this._fields.Base
+	}
 
-	public declare Name: string
+	public set Base(value: Base) {
+		this._fields.Base = value
+	}
+
+	public get Name(): string {
+		return this._fields.Name
+	}
+
+	public set Name(value: string) {
+		this._fields.Name = value
+	}
 
 	public _fields: {
 		Base: Base
@@ -223,10 +287,6 @@ export class App {
 		return $.markAsStructValue(new App(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Base", "Name"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.App",
 		() => new App(),
@@ -237,9 +297,21 @@ export class App {
 }
 
 export class Win {
-	public declare App: App | $.VarRef<App> | null
+	public get App(): App | $.VarRef<App> | null {
+		return this._fields.App
+	}
 
-	public declare Title: string
+	public set App(value: App | $.VarRef<App> | null) {
+		this._fields.App = value
+	}
+
+	public get Title(): string {
+		return this._fields.Title
+	}
+
+	public set Title(value: string) {
+		this._fields.Title = value
+	}
 
 	public _fields: {
 		App: App | $.VarRef<App> | null
@@ -255,10 +327,6 @@ export class Win {
 
 	public clone(): Win {
 		return $.markAsStructValue(new Win(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["App", "Title"])
 	}
 
 	static __typeInfo = $.registerStructType(

@@ -7,7 +7,13 @@ import * as json from "@goscript/encoding/json/index.js"
 import "@goscript/encoding/json/index.js"
 
 export class Simple {
-	public declare X: number
+	public get X(): number {
+		return this._fields.X
+	}
+
+	public set X(value: number) {
+		this._fields.X = value
+	}
 
 	public _fields: {
 		X: number
@@ -21,10 +27,6 @@ export class Simple {
 
 	public clone(): Simple {
 		return $.markAsStructValue(new Simple(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["X"])
 	}
 
 	static __typeInfo = $.registerStructType(

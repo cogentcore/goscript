@@ -7,9 +7,21 @@ import * as unsafe from "@goscript/unsafe/index.js"
 import "@goscript/unsafe/index.js"
 
 export class sourceStruct {
-	public declare flag: boolean
+	public get flag(): boolean {
+		return this._fields.flag
+	}
 
-	public declare data: $.Slice<number>
+	public set flag(value: boolean) {
+		this._fields.flag = value
+	}
+
+	public get data(): $.Slice<number> {
+		return this._fields.data
+	}
+
+	public set data(value: $.Slice<number>) {
+		this._fields.data = value
+	}
 
 	public _fields: {
 		flag: boolean
@@ -27,10 +39,6 @@ export class sourceStruct {
 		return $.markAsStructValue(new sourceStruct(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["flag", "data"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.sourceStruct",
 		() => new sourceStruct(),
@@ -41,9 +49,21 @@ export class sourceStruct {
 }
 
 export class viewStruct {
-	public declare flag: boolean
+	public get flag(): boolean {
+		return this._fields.flag
+	}
 
-	public declare data: $.Slice<number>
+	public set flag(value: boolean) {
+		this._fields.flag = value
+	}
+
+	public get data(): $.Slice<number> {
+		return this._fields.data
+	}
+
+	public set data(value: $.Slice<number>) {
+		this._fields.data = value
+	}
 
 	public _fields: {
 		flag: boolean
@@ -59,10 +79,6 @@ export class viewStruct {
 
 	public clone(): viewStruct {
 		return $.markAsStructValue(new viewStruct(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["flag", "data"])
 	}
 
 	static __typeInfo = $.registerStructType(

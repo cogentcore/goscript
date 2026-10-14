@@ -18,7 +18,13 @@ $.registerInterfaceType(
 );
 
 export class wrapper {
-	public declare Impl: dep.Impl | $.VarRef<dep.Impl> | null
+	public get Impl(): dep.Impl | $.VarRef<dep.Impl> | null {
+		return this._fields.Impl
+	}
+
+	public set Impl(value: dep.Impl | $.VarRef<dep.Impl> | null) {
+		this._fields.Impl = value
+	}
 
 	public _fields: {
 		Impl: dep.Impl | $.VarRef<dep.Impl> | null
@@ -42,10 +48,6 @@ export class wrapper {
 
 	public Value(__typeArgs: $.GenericTypeArgs | undefined): any {
 		return $.pointerValue<dep.Impl>(this.Impl).Value({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }})
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["Impl"])
 	}
 
 	static __typeInfo = $.registerStructType(

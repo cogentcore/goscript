@@ -6,7 +6,13 @@ import * as $ from "@goscript/builtin/index.js"
 export type ObjectIdentifier = $.Slice<number>
 
 export class RawValue {
-	public declare Tag: number
+	public get Tag(): number {
+		return this._fields.Tag
+	}
+
+	public set Tag(value: number) {
+		this._fields.Tag = value
+	}
 
 	public _fields: {
 		Tag: number
@@ -20,10 +26,6 @@ export class RawValue {
 
 	public clone(): RawValue {
 		return $.markAsStructValue(new RawValue(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["Tag"])
 	}
 
 	static __typeInfo = $.registerStructType(

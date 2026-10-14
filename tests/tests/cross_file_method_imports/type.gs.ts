@@ -13,7 +13,13 @@ import "./helper.gs.ts"
 import "./method.gs.ts"
 
 export class label {
-	public declare value: string
+	public get value(): string {
+		return this._fields.value
+	}
+
+	public set value(value: string) {
+		this._fields.value = value
+	}
 
 	public _fields: {
 		value: string
@@ -33,10 +39,6 @@ export class label {
 		const l = this;
 		let state: __goscript_helper.helperState | $.VarRef<__goscript_helper.helperState> | null = __goscript_helper.newHelperState()
 		return $.concatString(strings.ToUpper(l.value), $.pointerValue<__goscript_helper.helperState>(state).text)
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["value"])
 	}
 
 	static __typeInfo = $.registerStructType(

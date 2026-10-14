@@ -14,7 +14,13 @@ $.registerInterfaceType(
 );
 
 export class branch {
-	public declare n: number
+	public get n(): number {
+		return this._fields.n
+	}
+
+	public set n(value: number) {
+		this._fields.n = value
+	}
 
 	public _fields: {
 		n: number
@@ -33,10 +39,6 @@ export class branch {
 	public value(): number {
 		const b: branch | $.VarRef<branch> | null = this;
 		return $.pointerValue<branch>(b).n
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["n"])
 	}
 
 	static __typeInfo = $.registerStructType(

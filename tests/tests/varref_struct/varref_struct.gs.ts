@@ -8,7 +8,13 @@ import "@goscript/reflect/index.js"
 
 export class MyStruct {
 	// MyInt is shared through pointers to this storage.
-	public declare MyInt: number
+	public get MyInt(): number {
+		return this._fields.MyInt
+	}
+
+	public set MyInt(value: number) {
+		this._fields.MyInt = value
+	}
 
 	public _fields: {
 		MyInt: number
@@ -24,10 +30,6 @@ export class MyStruct {
 		return $.markAsStructValue(new MyStruct(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["MyInt"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.MyStruct",
 		() => new MyStruct(),
@@ -39,13 +41,31 @@ export class MyStruct {
 
 export class Outer {
 	// Child is copied in place during assignment.
-	public declare Child: MyStruct
+	public get Child(): MyStruct {
+		return this._fields.Child
+	}
+
+	public set Child(value: MyStruct) {
+		this._fields.Child = value
+	}
 
 	// Items retains the addresses of array elements.
-	public declare Items: MyStruct[]
+	public get Items(): MyStruct[] {
+		return this._fields.Items
+	}
+
+	public set Items(value: MyStruct[]) {
+		this._fields.Items = value
+	}
 
 	// Ptr is replaced rather than copied through its pointee.
-	public declare Ptr: MyStruct | $.VarRef<MyStruct> | null
+	public get Ptr(): MyStruct | $.VarRef<MyStruct> | null {
+		return this._fields.Ptr
+	}
+
+	public set Ptr(value: MyStruct | $.VarRef<MyStruct> | null) {
+		this._fields.Ptr = value
+	}
 
 	public _fields: {
 		Child: MyStruct
@@ -63,10 +83,6 @@ export class Outer {
 
 	public clone(): Outer {
 		return $.markAsStructValue(new Outer(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["Child", "Items", "Ptr"])
 	}
 
 	static __typeInfo = $.registerStructType(

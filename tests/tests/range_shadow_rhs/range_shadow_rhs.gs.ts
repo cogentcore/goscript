@@ -4,9 +4,21 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class holder {
-	public declare values: globalThis.Map<string, number> | null
+	public get values(): globalThis.Map<string, number> | null {
+		return this._fields.values
+	}
 
-	public declare items: $.Slice<item>
+	public set values(value: globalThis.Map<string, number> | null) {
+		this._fields.values = value
+	}
+
+	public get items(): $.Slice<item> {
+		return this._fields.items
+	}
+
+	public set items(value: $.Slice<item>) {
+		this._fields.items = value
+	}
 
 	public _fields: {
 		values: globalThis.Map<string, number> | null
@@ -24,10 +36,6 @@ export class holder {
 		return $.markAsStructValue(new holder(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["values", "items"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.holder",
 		() => new holder(),
@@ -38,7 +46,13 @@ export class holder {
 }
 
 export class item {
-	public declare value: number
+	public get value(): number {
+		return this._fields.value
+	}
+
+	public set value(value: number) {
+		this._fields.value = value
+	}
 
 	public _fields: {
 		value: number
@@ -58,10 +72,6 @@ export class item {
 		let i: item | $.VarRef<item> | null = this;
 		$.pointerValue<item>(i).value++
 		return $.pointerValue<item>(i).value
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["value"])
 	}
 
 	static __typeInfo = $.registerStructType(

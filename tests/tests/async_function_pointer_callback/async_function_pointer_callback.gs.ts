@@ -11,7 +11,13 @@ export type Process = ((snap: Snapshot | $.VarRef<Snapshot> | null, n: number) =
 export type SnapFunc = ((n: number) => [$.VarRef<number> | null, $.Slice<number>, $.GoError] | globalThis.Promise<[$.VarRef<number> | null, $.Slice<number>, $.GoError]>) | null
 
 export class Snapshot {
-	public declare base: number
+	public get base(): number {
+		return this._fields.base
+	}
+
+	public set base(value: number) {
+		this._fields.base = value
+	}
 
 	public _fields: {
 		base: number
@@ -39,10 +45,6 @@ export class Snapshot {
 		return [$.pointerValue<number>(next) + $.len(results), null]
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["base"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.Snapshot",
 		() => new Snapshot(),
@@ -53,7 +55,13 @@ export class Snapshot {
 }
 
 export class Host {
-	public declare process: atomic.Pointer<Process>
+	public get process(): atomic.Pointer<Process> {
+		return this._fields.process
+	}
+
+	public set process(value: atomic.Pointer<Process>) {
+		this._fields.process = value
+	}
 
 	public _fields: {
 		process: atomic.Pointer<Process>
@@ -81,10 +89,6 @@ export class Host {
 				return await ($.pointerValue<Process>(cb))!(snap, n)
 			}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int")), /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")), "error"] } as $.FunctionTypeInfo)))
 		}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int"), "error"] } as $.FunctionTypeInfo))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["process"])
 	}
 
 	static __typeInfo = $.registerStructType(

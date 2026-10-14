@@ -19,7 +19,13 @@ import "@goscript/io/index.js"
 import "@goscript/net/index.js"
 
 export class recreateError {
-	public declare next: bigint
+	public get next(): bigint {
+		return this._fields.next
+	}
+
+	public set next(value: bigint) {
+		this._fields.next = value
+	}
 
 	public _fields: {
 		next: bigint
@@ -38,10 +44,6 @@ export class recreateError {
 	public Error(): string {
 		const e: recreateError | $.VarRef<recreateError> | null = this;
 		return "recreate"
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["next"])
 	}
 
 	static __typeInfo = $.registerStructType(

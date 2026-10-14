@@ -4,7 +4,13 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class child {
-	public declare value: string
+	public get value(): string {
+		return this._fields.value
+	}
+
+	public set value(value: string) {
+		this._fields.value = value
+	}
 
 	public _fields: {
 		value: string
@@ -28,10 +34,6 @@ export class child {
 		return new child({value: $.pointerValue<child>(c).value})
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["value"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.child",
 		() => new child(),
@@ -42,7 +44,13 @@ export class child {
 }
 
 export class parent {
-	public declare child: child | $.VarRef<child> | null
+	public get child(): child | $.VarRef<child> | null {
+		return this._fields.child
+	}
+
+	public set child(value: child | $.VarRef<child> | null) {
+		this._fields.child = value
+	}
 
 	public _fields: {
 		child: child | $.VarRef<child> | null
@@ -56,10 +64,6 @@ export class parent {
 
 	public clone(): parent {
 		return $.markAsStructValue(new parent(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["child"])
 	}
 
 	static __typeInfo = $.registerStructType(

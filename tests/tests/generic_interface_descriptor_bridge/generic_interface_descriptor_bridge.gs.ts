@@ -61,7 +61,13 @@ export class genericBox {
 }
 
 export class intBox {
-	public declare id: number
+	public get id(): number {
+		return this._fields.id
+	}
+
+	public set id(value: number) {
+		this._fields.id = value
+	}
 
 	public _fields: {
 		id: number
@@ -85,10 +91,6 @@ export class intBox {
 	public async Wait(ctx: context.Context | null, old: number): globalThis.Promise<number> {
 		await $.chanRecv(await $.pointerValue<Exclude<context.Context, null>>(ctx).Done())
 		return old
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["id"])
 	}
 
 	static __typeInfo = $.registerStructType(

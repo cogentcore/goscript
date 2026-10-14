@@ -4,7 +4,13 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class locked {
-	public declare value: number
+	public get value(): number {
+		return this._fields.value
+	}
+
+	public set value(value: number) {
+		this._fields.value = value
+	}
 
 	public _fields: {
 		value: number
@@ -28,10 +34,6 @@ export class locked {
 	public Value(): number {
 		const l: locked | $.VarRef<locked> | null = this;
 		return $.pointerValue<locked>(l).value
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["value"])
 	}
 
 	static __typeInfo = $.registerStructType(

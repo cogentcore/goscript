@@ -4,9 +4,21 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class MyStruct {
-	public declare MyInt: number
+	public get MyInt(): number {
+		return this._fields.MyInt
+	}
 
-	public declare MyString: string
+	public set MyInt(value: number) {
+		this._fields.MyInt = value
+	}
+
+	public get MyString(): string {
+		return this._fields.MyString
+	}
+
+	public set MyString(value: string) {
+		this._fields.MyString = value
+	}
 
 	public _fields: {
 		MyInt: number
@@ -24,10 +36,6 @@ export class MyStruct {
 		return $.markAsStructValue(new MyStruct(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["MyInt", "MyString"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.MyStruct",
 		() => new MyStruct(),
@@ -38,9 +46,21 @@ export class MyStruct {
 }
 
 export class NestedStruct {
-	public declare Value: number
+	public get Value(): number {
+		return this._fields.Value
+	}
 
-	public declare InnerStruct: MyStruct
+	public set Value(value: number) {
+		this._fields.Value = value
+	}
+
+	public get InnerStruct(): MyStruct {
+		return this._fields.InnerStruct
+	}
+
+	public set InnerStruct(value: MyStruct) {
+		this._fields.InnerStruct = value
+	}
 
 	public _fields: {
 		Value: number
@@ -56,10 +76,6 @@ export class NestedStruct {
 
 	public clone(): NestedStruct {
 		return $.markAsStructValue(new NestedStruct(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["Value", "InnerStruct"])
 	}
 
 	static __typeInfo = $.registerStructType(

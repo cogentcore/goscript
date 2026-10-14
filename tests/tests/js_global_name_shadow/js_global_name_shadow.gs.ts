@@ -8,7 +8,13 @@ export type Family = number
 export type Number = number
 
 export class Promise {
-	public declare value: string
+	public get value(): string {
+		return this._fields.value
+	}
+
+	public set value(value: string) {
+		this._fields.value = value
+	}
 
 	public _fields: {
 		value: string
@@ -24,10 +30,6 @@ export class Promise {
 		return $.markAsStructValue(new Promise(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["value"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.Promise",
 		() => new Promise(),
@@ -38,9 +40,21 @@ export class Promise {
 }
 
 export class point {
-	public declare x: number
+	public get x(): number {
+		return this._fields.x
+	}
 
-	public declare y: number
+	public set x(value: number) {
+		this._fields.x = value
+	}
+
+	public get y(): number {
+		return this._fields.y
+	}
+
+	public set y(value: number) {
+		this._fields.y = value
+	}
 
 	public _fields: {
 		x: number
@@ -56,10 +70,6 @@ export class point {
 
 	public clone(): point {
 		return $.markAsStructValue(new point(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["x", "y"])
 	}
 
 	static __typeInfo = $.registerStructType(

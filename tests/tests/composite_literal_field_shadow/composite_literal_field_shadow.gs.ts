@@ -4,7 +4,13 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class buffer {
-	public declare buf: $.Slice<number>
+	public get buf(): $.Slice<number> {
+		return this._fields.buf
+	}
+
+	public set buf(value: $.Slice<number>) {
+		this._fields.buf = value
+	}
 
 	public _fields: {
 		buf: $.Slice<number>
@@ -18,10 +24,6 @@ export class buffer {
 
 	public clone(): buffer {
 		return $.markAsStructValue(new buffer(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["buf"])
 	}
 
 	static __typeInfo = $.registerStructType(

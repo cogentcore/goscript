@@ -10,7 +10,13 @@ import "@goscript/os/index.js"
 import "@goscript/strings/index.js"
 
 export class matcher {
-	public declare match: ((r: number) => boolean | globalThis.Promise<boolean>) | null
+	public get match(): ((r: number) => boolean | globalThis.Promise<boolean>) | null {
+		return this._fields.match
+	}
+
+	public set match(value: ((r: number) => boolean | globalThis.Promise<boolean>) | null) {
+		this._fields.match = value
+	}
 
 	public _fields: {
 		match: ((r: number) => boolean | globalThis.Promise<boolean>) | null
@@ -24,10 +30,6 @@ export class matcher {
 
 	public clone(): matcher {
 		return $.markAsStructValue(new matcher(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["match"])
 	}
 
 	static __typeInfo = $.registerStructType(

@@ -7,7 +7,13 @@ import * as errlist from "@goscript/github.com/s4wave/goscript/tests/tests/impor
 import "@goscript/github.com/s4wave/goscript/tests/tests/import_type_methods/errlist/index.js"
 
 export class parser {
-	public declare errors: errlist.ErrorList
+	public get errors(): errlist.ErrorList {
+		return this._fields.errors
+	}
+
+	public set errors(value: errlist.ErrorList) {
+		this._fields.errors = value
+	}
 
 	public _fields: {
 		errors: errlist.ErrorList
@@ -21,10 +27,6 @@ export class parser {
 
 	public clone(): parser {
 		return $.markAsStructValue(new parser(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["errors"])
 	}
 
 	static __typeInfo = $.registerStructType(

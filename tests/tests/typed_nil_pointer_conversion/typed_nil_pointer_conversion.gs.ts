@@ -4,7 +4,13 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class node {
-	public declare next: node | $.VarRef<node> | null
+	public get next(): node | $.VarRef<node> | null {
+		return this._fields.next
+	}
+
+	public set next(value: node | $.VarRef<node> | null) {
+		this._fields.next = value
+	}
 
 	public _fields: {
 		next: node | $.VarRef<node> | null
@@ -18,10 +24,6 @@ export class node {
 
 	public clone(): node {
 		return $.markAsStructValue(new node(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["next"])
 	}
 
 	static __typeInfo = $.registerStructType(

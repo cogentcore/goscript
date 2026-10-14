@@ -21,7 +21,13 @@ $.registerNamedValueType(
 );
 
 export class customErr {
-	public declare msg: string
+	public get msg(): string {
+		return this._fields.msg
+	}
+
+	public set msg(value: string) {
+		this._fields.msg = value
+	}
 
 	public _fields: {
 		msg: string
@@ -42,10 +48,6 @@ export class customErr {
 		return $.pointerValue<customErr>(e).msg
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["msg"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.customErr",
 		() => new customErr(),
@@ -56,7 +58,13 @@ export class customErr {
 }
 
 export class wrappedErr {
-	public declare err: $.GoError
+	public get err(): $.GoError {
+		return this._fields.err
+	}
+
+	public set err(value: $.GoError) {
+		this._fields.err = value
+	}
 
 	public _fields: {
 		err: $.GoError
@@ -80,10 +88,6 @@ export class wrappedErr {
 	public Unwrap(): $.GoError {
 		const e = this;
 		return e.err
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["err"])
 	}
 
 	static __typeInfo = $.registerStructType(

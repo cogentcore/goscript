@@ -42,7 +42,13 @@ $.registerInterfaceType(
 );
 
 export class pairingOffer {
-	public declare Note: string
+	public get Note(): string {
+		return this._fields.Note
+	}
+
+	public set Note(value: string) {
+		this._fields.Note = value
+	}
 
 	public _fields: {
 		Note: string
@@ -67,10 +73,6 @@ export class pairingOffer {
 		let o: pairingOffer | $.VarRef<pairingOffer> | null = this;
 		$.pointerValue<pairingOffer>(o).Note = $.concatString("decoded:", $.bytesToString(data))
 		return null
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["Note"])
 	}
 
 	static __typeInfo = $.registerStructType(

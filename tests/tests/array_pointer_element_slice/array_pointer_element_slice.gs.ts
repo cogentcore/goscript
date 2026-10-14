@@ -4,9 +4,21 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class node {
-	public declare sub: $.Slice<node | $.VarRef<node> | null>
+	public get sub(): $.Slice<node | $.VarRef<node> | null> {
+		return this._fields.sub
+	}
 
-	public declare sub0: (node | $.VarRef<node> | null)[]
+	public set sub(value: $.Slice<node | $.VarRef<node> | null>) {
+		this._fields.sub = value
+	}
+
+	public get sub0(): (node | $.VarRef<node> | null)[] {
+		return this._fields.sub0
+	}
+
+	public set sub0(value: (node | $.VarRef<node> | null)[]) {
+		this._fields.sub0 = value
+	}
 
 	public _fields: {
 		sub: $.Slice<node | $.VarRef<node> | null>
@@ -22,10 +34,6 @@ export class node {
 
 	public clone(): node {
 		return $.markAsStructValue(new node(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["sub", "sub0"])
 	}
 
 	static __typeInfo = $.registerStructType(

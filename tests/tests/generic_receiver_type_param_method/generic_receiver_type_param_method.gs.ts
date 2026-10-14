@@ -47,7 +47,13 @@ export class nistCurve {
 }
 
 export class point {
-	public declare N: number
+	public get N(): number {
+		return this._fields.N
+	}
+
+	public set N(value: number) {
+		this._fields.N = value
+	}
 
 	public _fields: {
 		N: number
@@ -66,10 +72,6 @@ export class point {
 	public Add(a: point | $.VarRef<point> | null, b: point | $.VarRef<point> | null): point | $.VarRef<point> | null {
 		const p: point | $.VarRef<point> | null = this;
 		return new point({N: $.pointerValue<point>(a).N + $.pointerValue<point>(b).N})
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["N"])
 	}
 
 	static __typeInfo = $.registerStructType(

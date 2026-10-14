@@ -4,7 +4,13 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class item {
-	public declare value: number
+	public get value(): number {
+		return this._fields.value
+	}
+
+	public set value(value: number) {
+		this._fields.value = value
+	}
 
 	public _fields: {
 		value: number
@@ -20,10 +26,6 @@ export class item {
 		return $.markAsStructValue(new item(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["value"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.item",
 		() => new item(),
@@ -34,9 +36,21 @@ export class item {
 }
 
 export class arrays {
-	public declare slices: $.Slice<number>[]
+	public get slices(): $.Slice<number>[] {
+		return this._fields.slices
+	}
 
-	public declare items: item[]
+	public set slices(value: $.Slice<number>[]) {
+		this._fields.slices = value
+	}
+
+	public get items(): item[] {
+		return this._fields.items
+	}
+
+	public set items(value: item[]) {
+		this._fields.items = value
+	}
 
 	public _fields: {
 		slices: $.Slice<number>[]
@@ -52,10 +66,6 @@ export class arrays {
 
 	public clone(): arrays {
 		return $.markAsStructValue(new arrays(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["slices", "items"])
 	}
 
 	static __typeInfo = $.registerStructType(

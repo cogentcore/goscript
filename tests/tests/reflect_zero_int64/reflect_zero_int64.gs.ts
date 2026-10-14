@@ -10,9 +10,21 @@ import "@goscript/reflect/index.js"
 import "@goscript/time/index.js"
 
 export class timer {
-	public declare start: time.Time
+	public get start(): time.Time {
+		return this._fields.start
+	}
 
-	public declare total: time.Duration
+	public set start(value: time.Time) {
+		this._fields.start = value
+	}
+
+	public get total(): time.Duration {
+		return this._fields.total
+	}
+
+	public set total(value: time.Duration) {
+		this._fields.total = value
+	}
 
 	public _fields: {
 		start: time.Time
@@ -33,10 +45,6 @@ export class timer {
 	public Start(): void {
 		let t: timer | $.VarRef<timer> | null = this;
 		$.assignStruct($.pointerValue<timer>(t).start, $.markAsStructValue($.cloneStructValue(time.Now())))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["start", "total"])
 	}
 
 	static __typeInfo = $.registerStructType(

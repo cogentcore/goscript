@@ -4,7 +4,13 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class entry {
-	public declare key: string
+	public get key(): string {
+		return this._fields.key
+	}
+
+	public set key(value: string) {
+		this._fields.key = value
+	}
 
 	public _fields: {
 		key: string
@@ -20,10 +26,6 @@ export class entry {
 		return $.markAsStructValue(new entry(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["key"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.entry",
 		() => new entry(),
@@ -34,7 +36,13 @@ export class entry {
 }
 
 export class _object {
-	public declare entries: $.Slice<entry>
+	public get entries(): $.Slice<entry> {
+		return this._fields.entries
+	}
+
+	public set entries(value: $.Slice<entry>) {
+		this._fields.entries = value
+	}
 
 	public _fields: {
 		entries: $.Slice<entry>
@@ -58,10 +66,6 @@ export class _object {
 			$.pointerValue<_object>(o).entries = $.append($.pointerValue<_object>(o).entries, $.markAsStructValue(new entry()))
 		}
 		return $.indexRef($.pointerValue<_object>(o).entries!, $.len($.pointerValue<_object>(o).entries) - 1)
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["entries"])
 	}
 
 	static __typeInfo = $.registerStructType(

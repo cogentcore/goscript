@@ -22,9 +22,21 @@ import "@goscript/reflect/index.js"
 import "@goscript/time/index.js"
 
 export class connector {
-	public declare direct: boolean
+	public get direct(): boolean {
+		return this._fields.direct
+	}
 
-	public declare blob: boolean
+	public set direct(value: boolean) {
+		this._fields.direct = value
+	}
+
+	public get blob(): boolean {
+		return this._fields.blob
+	}
+
+	public set blob(value: boolean) {
+		this._fields.blob = value
+	}
 
 	public _fields: {
 		direct: boolean
@@ -87,10 +99,6 @@ export class connector {
 		return [$.interfaceValue<driver.Rows | null>(new rows({blob: c.blob}), "*main.rows", /* @__PURE__ */ $.pointerType("main.rows")), null]
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["direct", "blob"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.connector",
 		() => new connector(),
@@ -101,9 +109,21 @@ export class connector {
 }
 
 export class rows {
-	public declare done: boolean
+	public get done(): boolean {
+		return this._fields.done
+	}
 
-	public declare blob: boolean
+	public set done(value: boolean) {
+		this._fields.done = value
+	}
+
+	public get blob(): boolean {
+		return this._fields.blob
+	}
+
+	public set blob(value: boolean) {
+		this._fields.blob = value
+	}
 
 	public _fields: {
 		done: boolean
@@ -143,10 +163,6 @@ export class rows {
 		return null
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["done", "blob"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.rows",
 		() => new rows(),
@@ -157,7 +173,13 @@ export class rows {
 }
 
 export class columnRows {
-	public declare rows: rows
+	public get rows(): rows {
+		return this._fields.rows
+	}
+
+	public set rows(value: rows) {
+		this._fields.rows = value
+	}
 
 	public _fields: {
 		rows: rows
@@ -200,10 +222,6 @@ export class columnRows {
 
 	public Columns(): any {
 		return $.pointerValue<rows>(this.rows).Columns()
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["rows"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -273,7 +291,13 @@ export async function main(): globalThis.Promise<void> {
 
 	type namedInt = number
 	class tagged {
-		public declare Value: number
+		public get Value(): number {
+			return this._fields.Value
+		}
+
+		public set Value(value: number) {
+			this._fields.Value = value
+		}
 
 		public _fields: {
 			Value: number
@@ -289,10 +313,6 @@ export async function main(): globalThis.Promise<void> {
 			return $.markAsStructValue(new tagged(this))
 		}
 
-		static {
-			$.bindStructFields(this.prototype, ["Value"])
-		}
-
 		static __typeInfo = $.registerStructType(
 			"main.tagged",
 			() => new tagged(),
@@ -302,7 +322,13 @@ export async function main(): globalThis.Promise<void> {
 		)
 	}
 	class retagged {
-		public declare Value: number
+		public get Value(): number {
+			return this._fields.Value
+		}
+
+		public set Value(value: number) {
+			this._fields.Value = value
+		}
 
 		public _fields: {
 			Value: number
@@ -316,10 +342,6 @@ export async function main(): globalThis.Promise<void> {
 
 		public clone(): retagged {
 			return $.markAsStructValue(new retagged(this))
-		}
-
-		static {
-			$.bindStructFields(this.prototype, ["Value"])
 		}
 
 		static __typeInfo = $.registerStructType(

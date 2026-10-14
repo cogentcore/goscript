@@ -7,9 +7,21 @@ import * as slices from "@goscript/slices/index.js"
 import "@goscript/slices/index.js"
 
 export class Person {
-	public declare Name: string
+	public get Name(): string {
+		return this._fields.Name
+	}
 
-	public declare Age: number
+	public set Name(value: string) {
+		this._fields.Name = value
+	}
+
+	public get Age(): number {
+		return this._fields.Age
+	}
+
+	public set Age(value: number) {
+		this._fields.Age = value
+	}
 
 	public _fields: {
 		Name: string
@@ -25,10 +37,6 @@ export class Person {
 
 	public clone(): Person {
 		return $.markAsStructValue(new Person(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["Name", "Age"])
 	}
 
 	static __typeInfo = $.registerStructType(

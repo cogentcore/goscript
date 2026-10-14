@@ -7,7 +7,13 @@ import * as __goscript_a from "./a.gs.ts"
 import "./a.gs.ts"
 
 export class bValue {
-	public declare inner: __goscript_a.aValue
+	public get inner(): __goscript_a.aValue {
+		return this._fields.inner
+	}
+
+	public set inner(value: __goscript_a.aValue) {
+		this._fields.inner = value
+	}
 
 	public _fields: {
 		inner: __goscript_a.aValue
@@ -21,10 +27,6 @@ export class bValue {
 
 	public clone(): bValue {
 		return $.markAsStructValue(new bValue(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["inner"])
 	}
 
 	static __typeInfo = $.registerStructType(

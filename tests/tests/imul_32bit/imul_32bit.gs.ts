@@ -4,13 +4,37 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class multiplyCase {
-	public declare x: number
+	public get x(): number {
+		return this._fields.x
+	}
 
-	public declare y: number
+	public set x(value: number) {
+		this._fields.x = value
+	}
 
-	public declare unsigned: number
+	public get y(): number {
+		return this._fields.y
+	}
 
-	public declare signed: number
+	public set y(value: number) {
+		this._fields.y = value
+	}
+
+	public get unsigned(): number {
+		return this._fields.unsigned
+	}
+
+	public set unsigned(value: number) {
+		this._fields.unsigned = value
+	}
+
+	public get signed(): number {
+		return this._fields.signed
+	}
+
+	public set signed(value: number) {
+		this._fields.signed = value
+	}
 
 	public _fields: {
 		x: number
@@ -30,10 +54,6 @@ export class multiplyCase {
 
 	public clone(): multiplyCase {
 		return $.markAsStructValue(new multiplyCase(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["x", "y", "unsigned", "signed"])
 	}
 
 	static __typeInfo = $.registerStructType(

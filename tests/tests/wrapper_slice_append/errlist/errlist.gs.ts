@@ -12,7 +12,13 @@ $.registerNamedValueType(
 );
 
 export class AStruct {
-	public declare Msg: string
+	public get Msg(): string {
+		return this._fields.Msg
+	}
+
+	public set Msg(value: string) {
+		this._fields.Msg = value
+	}
 
 	public _fields: {
 		Msg: string
@@ -31,10 +37,6 @@ export class AStruct {
 	public Set(msg: string): void {
 		let a: AStruct | $.VarRef<AStruct> | null = this;
 		$.pointerValue<AStruct>(a).Msg = msg
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["Msg"])
 	}
 
 	static __typeInfo = $.registerStructType(

@@ -7,7 +7,13 @@ import * as __goscript_b from "./b.gs.ts"
 import "./b.gs.ts"
 
 export class aValue {
-	public declare next: __goscript_b.bValue | $.VarRef<__goscript_b.bValue> | null
+	public get next(): __goscript_b.bValue | $.VarRef<__goscript_b.bValue> | null {
+		return this._fields.next
+	}
+
+	public set next(value: __goscript_b.bValue | $.VarRef<__goscript_b.bValue> | null) {
+		this._fields.next = value
+	}
 
 	public _fields: {
 		next: __goscript_b.bValue | $.VarRef<__goscript_b.bValue> | null
@@ -21,10 +27,6 @@ export class aValue {
 
 	public clone(): aValue {
 		return $.markAsStructValue(new aValue(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["next"])
 	}
 
 	static __typeInfo = $.registerStructType(

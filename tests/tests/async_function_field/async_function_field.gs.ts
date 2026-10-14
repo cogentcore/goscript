@@ -7,7 +7,13 @@ import * as sync from "@goscript/sync/index.js"
 import "@goscript/sync/index.js"
 
 export class loader {
-	public declare load: ((_p0: string) => [any, boolean] | globalThis.Promise<[any, boolean]>) | null
+	public get load(): ((_p0: string) => [any, boolean] | globalThis.Promise<[any, boolean]>) | null {
+		return this._fields.load
+	}
+
+	public set load(value: ((_p0: string) => [any, boolean] | globalThis.Promise<[any, boolean]>) | null) {
+		this._fields.load = value
+	}
 
 	public _fields: {
 		load: ((_p0: string) => [any, boolean] | globalThis.Promise<[any, boolean]>) | null
@@ -26,10 +32,6 @@ export class loader {
 	public getLoad(): ((_p0: string) => [any, boolean] | globalThis.Promise<[any, boolean]>) | null {
 		const l: loader | $.VarRef<loader> | null = this;
 		return $.pointerValue<loader>(l).load
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["load"])
 	}
 
 	static __typeInfo = $.registerStructType(

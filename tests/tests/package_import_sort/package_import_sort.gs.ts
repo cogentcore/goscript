@@ -41,7 +41,13 @@ $.registerNamedValueType(
 );
 
 export class descending {
-	public declare values: $.Slice<number>
+	public get values(): $.Slice<number> {
+		return this._fields.values
+	}
+
+	public set values(value: $.Slice<number>) {
+		this._fields.values = value
+	}
 
 	public _fields: {
 		values: $.Slice<number>
@@ -73,10 +79,6 @@ export class descending {
 		let __goscriptAssign0_1: number = $.arrayIndex(d.values!, i)
 		d.values![i] = __goscriptAssign0_0
 		d.values![j] = __goscriptAssign0_1
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["values"])
 	}
 
 	static __typeInfo = $.registerStructType(

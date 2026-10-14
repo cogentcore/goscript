@@ -35,11 +35,29 @@ export type ProcessFunc = ((data: string) => [string, $.GoError] | globalThis.Pr
 export type OptionalProcessFunc = ((data: string) => [string, $.GoError] | globalThis.Promise<[string, $.GoError]>) | null
 
 export class MockFileInfo {
-	public declare name: string
+	public get name(): string {
+		return this._fields.name
+	}
 
-	public declare size: bigint
+	public set name(value: string) {
+		this._fields.name = value
+	}
 
-	public declare isDir: boolean
+	public get size(): bigint {
+		return this._fields.size
+	}
+
+	public set size(value: bigint) {
+		this._fields.size = value
+	}
+
+	public get isDir(): boolean {
+		return this._fields.isDir
+	}
+
+	public set isDir(value: boolean) {
+		this._fields.isDir = value
+	}
 
 	public _fields: {
 		name: string
@@ -72,10 +90,6 @@ export class MockFileInfo {
 	public Size(): bigint {
 		const m: MockFileInfo | $.VarRef<MockFileInfo> | null = this;
 		return $.pointerValue<MockFileInfo>(m).size
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["name", "size", "isDir"])
 	}
 
 	static __typeInfo = $.registerStructType(

@@ -7,7 +7,13 @@ import * as slices from "@goscript/slices/index.js"
 import "@goscript/slices/index.js"
 
 export class item {
-	public declare Text: string
+	public get Text(): string {
+		return this._fields.Text
+	}
+
+	public set Text(value: string) {
+		this._fields.Text = value
+	}
 
 	public _fields: {
 		Text: string
@@ -23,10 +29,6 @@ export class item {
 		return $.markAsStructValue(new item(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Text"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.item",
 		() => new item(),
@@ -37,7 +39,13 @@ export class item {
 }
 
 export class arena {
-	public declare data: $.Slice<any>
+	public get data(): $.Slice<any> {
+		return this._fields.data
+	}
+
+	public set data(value: $.Slice<any>) {
+		this._fields.data = value
+	}
 
 	public _fields: {
 		data: $.Slice<any>
@@ -62,10 +70,6 @@ export class arena {
 		let index = $.len($.pointerValue<arena>(a).data)
 		$.pointerValue<arena>(a).data = $.goSlice($.pointerValue<arena>(a).data, undefined, index + 1)
 		return $.indexRef($.pointerValue<arena>(a).data!, index)
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["data"])
 	}
 
 	static __typeInfo = $.registerStructType(

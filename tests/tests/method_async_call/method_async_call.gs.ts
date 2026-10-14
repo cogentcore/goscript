@@ -7,9 +7,21 @@ import * as sync from "@goscript/sync/index.js"
 import "@goscript/sync/index.js"
 
 export class FileTracker {
-	public declare mutex: sync.Mutex
+	public get mutex(): sync.Mutex {
+		return this._fields.mutex
+	}
 
-	public declare lines: $.Slice<number>
+	public set mutex(value: sync.Mutex) {
+		this._fields.mutex = value
+	}
+
+	public get lines(): $.Slice<number> {
+		return this._fields.lines
+	}
+
+	public set lines(value: $.Slice<number>) {
+		this._fields.lines = value
+	}
 
 	public _fields: {
 		mutex: sync.Mutex
@@ -34,10 +46,6 @@ export class FileTracker {
 		$.pointerValue<FileTracker>(f).mutex.Unlock()
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["mutex", "lines"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.FileTracker",
 		() => new FileTracker(),
@@ -48,7 +56,13 @@ export class FileTracker {
 }
 
 export class Scanner {
-	public declare file: FileTracker | $.VarRef<FileTracker> | null
+	public get file(): FileTracker | $.VarRef<FileTracker> | null {
+		return this._fields.file
+	}
+
+	public set file(value: FileTracker | $.VarRef<FileTracker> | null) {
+		this._fields.file = value
+	}
 
 	public _fields: {
 		file: FileTracker | $.VarRef<FileTracker> | null
@@ -67,10 +81,6 @@ export class Scanner {
 	public async next(): globalThis.Promise<void> {
 		const s: Scanner | $.VarRef<Scanner> | null = this;
 		await FileTracker.prototype.AddLine.call($.pointerValue<Scanner>(s).file, 10)
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["file"])
 	}
 
 	static __typeInfo = $.registerStructType(

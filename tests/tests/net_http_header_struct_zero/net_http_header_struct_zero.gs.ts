@@ -7,7 +7,13 @@ import * as http from "@goscript/net/http/index.js"
 import "@goscript/net/http/index.js"
 
 export class responseWriter {
-	public declare header: http.Header
+	public get header(): http.Header {
+		return this._fields.header
+	}
+
+	public set header(value: http.Header) {
+		this._fields.header = value
+	}
 
 	public _fields: {
 		header: http.Header
@@ -26,10 +32,6 @@ export class responseWriter {
 	public Header(): http.Header {
 		const w: responseWriter | $.VarRef<responseWriter> | null = this;
 		return $.pointerValue<responseWriter>(w).header
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["header"])
 	}
 
 	static __typeInfo = $.registerStructType(

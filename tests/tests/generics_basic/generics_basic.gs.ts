@@ -26,7 +26,13 @@ $.registerInterfaceType(
 );
 
 export class Stack {
-	public declare items: $.Slice<any>
+	public get items(): $.Slice<any> {
+		return this._fields.items
+	}
+
+	public set items(value: $.Slice<any>) {
+		this._fields.items = value
+	}
 
 	public _fields: {
 		items: $.Slice<any>
@@ -63,10 +69,6 @@ export class Stack {
 		$.pointerValue<Stack>(s).items = $.append($.pointerValue<Stack>(s).items, value, $.appendZero(() => ($.genericZero(__typeArgs, "T", null) as any)))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["items"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.Stack",
 		() => new Stack(),
@@ -77,7 +79,13 @@ export class Stack {
 }
 
 export class Item {
-	public declare Name: string
+	public get Name(): string {
+		return this._fields.Name
+	}
+
+	public set Name(value: string) {
+		this._fields.Name = value
+	}
 
 	public _fields: {
 		Name: string
@@ -101,10 +109,6 @@ export class Item {
 		return new Item({Name: $.concatString($.pointerValue<Item>(i).Name, " copy")})
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Name"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.Item",
 		() => new Item(),
@@ -115,7 +119,13 @@ export class Item {
 }
 
 export class Mapper {
-	public declare values: globalThis.Map<any, any> | null
+	public get values(): globalThis.Map<any, any> | null {
+		return this._fields.values
+	}
+
+	public set values(value: globalThis.Map<any, any> | null) {
+		this._fields.values = value
+	}
 
 	public _fields: {
 		values: globalThis.Map<any, any> | null
@@ -142,10 +152,6 @@ export class Mapper {
 		$.mapSet($.pointerValue<Mapper>(m).values, key, value)
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["values"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.Mapper",
 		() => new Mapper(),
@@ -156,9 +162,21 @@ export class Mapper {
 }
 
 export class Pair {
-	public declare First: any
+	public get First(): any {
+		return this._fields.First
+	}
 
-	public declare Second: any
+	public set First(value: any) {
+		this._fields.First = value
+	}
+
+	public get Second(): any {
+		return this._fields.Second
+	}
+
+	public set Second(value: any) {
+		this._fields.Second = value
+	}
 
 	public _fields: {
 		First: any
@@ -179,10 +197,6 @@ export class Pair {
 	public Swap(__typeArgs: $.GenericTypeArgs | undefined): Pair {
 		const p = this;
 		return $.markAsStructValue(new Pair({First: p.Second, Second: p.First}))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["First", "Second"])
 	}
 
 	static __typeInfo = $.registerStructType(

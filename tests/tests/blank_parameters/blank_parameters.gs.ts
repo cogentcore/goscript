@@ -14,7 +14,13 @@ $.registerInterfaceType(
 );
 
 export class blankImpl {
-	public declare value: number
+	public get value(): number {
+		return this._fields.value
+	}
+
+	public set value(value: number) {
+		this._fields.value = value
+	}
 
 	public _fields: {
 		value: number
@@ -33,10 +39,6 @@ export class blankImpl {
 	public Value(): number {
 		const b: blankImpl | $.VarRef<blankImpl> | null = this;
 		return $.pointerValue<blankImpl>(b).value
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["value"])
 	}
 
 	static __typeInfo = $.registerStructType(

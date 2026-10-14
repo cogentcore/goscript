@@ -43,11 +43,29 @@ $.registerInterfaceType(
 export type Morphism = ((_p0: Shape | null) => Shape | null | globalThis.Promise<Shape | null>) | null
 
 export class MockFileInfo {
-	public declare name: string
+	public get name(): string {
+		return this._fields.name
+	}
 
-	public declare size: bigint
+	public set name(value: string) {
+		this._fields.name = value
+	}
 
-	public declare isDir: boolean
+	public get size(): bigint {
+		return this._fields.size
+	}
+
+	public set size(value: bigint) {
+		this._fields.size = value
+	}
+
+	public get isDir(): boolean {
+		return this._fields.isDir
+	}
+
+	public set isDir(value: boolean) {
+		this._fields.isDir = value
+	}
 
 	public _fields: {
 		name: string
@@ -80,10 +98,6 @@ export class MockFileInfo {
 	public Size(): bigint {
 		const m: MockFileInfo | $.VarRef<MockFileInfo> | null = this;
 		return $.pointerValue<MockFileInfo>(m).size
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["name", "size", "isDir"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -123,7 +137,13 @@ export class MockFilesystem {
 }
 
 export class shapeNode {
-	public declare value: number
+	public get value(): number {
+		return this._fields.value
+	}
+
+	public set value(value: number) {
+		this._fields.value = value
+	}
 
 	public _fields: {
 		value: number
@@ -144,10 +164,6 @@ export class shapeNode {
 		return $.pointerValue<shapeNode>(s).value
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["value"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.shapeNode",
 		() => new shapeNode(),
@@ -158,7 +174,13 @@ export class shapeNode {
 }
 
 export class MorphismHolder {
-	public declare morphism: ((_p0: Shape | null) => Shape | null | globalThis.Promise<Shape | null>) | null
+	public get morphism(): ((_p0: Shape | null) => Shape | null | globalThis.Promise<Shape | null>) | null {
+		return this._fields.morphism
+	}
+
+	public set morphism(value: ((_p0: Shape | null) => Shape | null | globalThis.Promise<Shape | null>) | null) {
+		this._fields.morphism = value
+	}
 
 	public _fields: {
 		morphism: ((_p0: Shape | null) => Shape | null | globalThis.Promise<Shape | null>) | null
@@ -184,10 +206,6 @@ export class MorphismHolder {
 		return $.pointerValue<Exclude<Shape, null>>((await $.pointerValue<MorphismHolder>(cloneMorphism($.pointerValue<MorphismHolder>(h).morphism)).morphism!(s))).Stats()
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["morphism"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.MorphismHolder",
 		() => new MorphismHolder(),
@@ -198,7 +216,13 @@ export class MorphismHolder {
 }
 
 export class morphismWorker {
-	public declare ready: $.Channel<boolean> | null
+	public get ready(): $.Channel<boolean> | null {
+		return this._fields.ready
+	}
+
+	public set ready(value: $.Channel<boolean> | null) {
+		this._fields.ready = value
+	}
 
 	public _fields: {
 		ready: $.Channel<boolean> | null
@@ -219,10 +243,6 @@ export class morphismWorker {
 		await $.chanSend($.pointerValue<morphismWorker>(w).ready, true)
 		await $.chanRecv($.pointerValue<morphismWorker>(w).ready)
 		return s
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["ready"])
 	}
 
 	static __typeInfo = $.registerStructType(

@@ -14,7 +14,13 @@ $.registerInterfaceType(
 );
 
 export class Dog {
-	public declare name: string
+	public get name(): string {
+		return this._fields.name
+	}
+
+	public set name(value: string) {
+		this._fields.name = value
+	}
 
 	public _fields: {
 		name: string
@@ -38,10 +44,6 @@ export class Dog {
 		return $.pointerValue<Dog>(d).name
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["name"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.Dog",
 		() => new Dog(),
@@ -52,7 +54,13 @@ export class Dog {
 }
 
 export class Cat {
-	public declare name: string
+	public get name(): string {
+		return this._fields.name
+	}
+
+	public set name(value: string) {
+		this._fields.name = value
+	}
 
 	public _fields: {
 		name: string
@@ -74,10 +82,6 @@ export class Cat {
 			return "unknown cat"
 		}
 		return $.pointerValue<Cat>(c).name
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["name"])
 	}
 
 	static __typeInfo = $.registerStructType(

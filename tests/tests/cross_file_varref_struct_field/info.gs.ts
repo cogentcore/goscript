@@ -4,9 +4,21 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class floatInfo {
-	public declare mantbits: number
+	public get mantbits(): number {
+		return this._fields.mantbits
+	}
 
-	public declare expbits: number
+	public set mantbits(value: number) {
+		this._fields.mantbits = value
+	}
+
+	public get expbits(): number {
+		return this._fields.expbits
+	}
+
+	public set expbits(value: number) {
+		this._fields.expbits = value
+	}
 
 	public _fields: {
 		mantbits: number
@@ -22,10 +34,6 @@ export class floatInfo {
 
 	public clone(): floatInfo {
 		return $.markAsStructValue(new floatInfo(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["mantbits", "expbits"])
 	}
 
 	static __typeInfo = $.registerStructType(

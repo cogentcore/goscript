@@ -4,9 +4,21 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class file {
-	public declare name: string
+	public get name(): string {
+		return this._fields.name
+	}
 
-	public declare data: $.Slice<number>
+	public set name(value: string) {
+		this._fields.name = value
+	}
+
+	public get data(): $.Slice<number> {
+		return this._fields.data
+	}
+
+	public set data(value: $.Slice<number>) {
+		this._fields.data = value
+	}
 
 	public _fields: {
 		name: string
@@ -24,10 +36,6 @@ export class file {
 		return $.markAsStructValue(new file(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["name", "data"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.file",
 		() => new file(),
@@ -38,9 +46,21 @@ export class file {
 }
 
 export class storage {
-	public declare files: globalThis.Map<string, file | $.VarRef<file> | null> | null
+	public get files(): globalThis.Map<string, file | $.VarRef<file> | null> | null {
+		return this._fields.files
+	}
 
-	public declare children: globalThis.Map<string, globalThis.Map<string, file | $.VarRef<file> | null> | null> | null
+	public set files(value: globalThis.Map<string, file | $.VarRef<file> | null> | null) {
+		this._fields.files = value
+	}
+
+	public get children(): globalThis.Map<string, globalThis.Map<string, file | $.VarRef<file> | null> | null> | null {
+		return this._fields.children
+	}
+
+	public set children(value: globalThis.Map<string, globalThis.Map<string, file | $.VarRef<file> | null> | null> | null) {
+		this._fields.children = value
+	}
 
 	public _fields: {
 		files: globalThis.Map<string, file | $.VarRef<file> | null> | null
@@ -56,10 +76,6 @@ export class storage {
 
 	public clone(): storage {
 		return $.markAsStructValue(new storage(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["files", "children"])
 	}
 
 	static __typeInfo = $.registerStructType(

@@ -7,7 +7,13 @@ import * as binary from "@goscript/encoding/binary/index.js"
 import "@goscript/encoding/binary/index.js"
 
 export class attrs {
-	public declare packedData: string
+	public get packedData(): string {
+		return this._fields.packedData
+	}
+
+	public set packedData(value: string) {
+		this._fields.packedData = value
+	}
 
 	public _fields: {
 		packedData: string
@@ -40,10 +46,6 @@ export class attrs {
 			result = $.append(result, $.concatString(($.concatString(k, "=")), v))
 		}
 		return result
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["packedData"])
 	}
 
 	static __typeInfo = $.registerStructType(

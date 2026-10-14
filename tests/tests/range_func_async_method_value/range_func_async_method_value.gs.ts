@@ -14,7 +14,13 @@ $.registerInterfaceType(
 );
 
 export class listProvider {
-	public declare items: $.Slice<Group | $.VarRef<Group> | null>
+	public get items(): $.Slice<Group | $.VarRef<Group> | null> {
+		return this._fields.items
+	}
+
+	public set items(value: $.Slice<Group | $.VarRef<Group> | null>) {
+		this._fields.items = value
+	}
 
 	public _fields: {
 		items: $.Slice<Group | $.VarRef<Group> | null>
@@ -35,10 +41,6 @@ export class listProvider {
 		return $.pointerValue<listProvider>(p).items
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["items"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.listProvider",
 		() => new listProvider(),
@@ -49,9 +51,21 @@ export class listProvider {
 }
 
 export class Group {
-	public declare provider: provider | null
+	public get provider(): provider | null {
+		return this._fields.provider
+	}
 
-	public declare seen: boolean
+	public set provider(value: provider | null) {
+		this._fields.provider = value
+	}
+
+	public get seen(): boolean {
+		return this._fields.seen
+	}
+
+	public set seen(value: boolean) {
+		this._fields.seen = value
+	}
 
 	public _fields: {
 		provider: provider | null
@@ -91,10 +105,6 @@ export class Group {
 				return
 			}
 		}
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["provider", "seen"])
 	}
 
 	static __typeInfo = $.registerStructType(

@@ -22,9 +22,21 @@ import "@goscript/io/index.js"
 import "@goscript/strings/index.js"
 
 export class chanReader {
-	public declare ch: $.Channel<string> | null
+	public get ch(): $.Channel<string> | null {
+		return this._fields.ch
+	}
 
-	public declare cur: string
+	public set ch(value: $.Channel<string> | null) {
+		this._fields.ch = value
+	}
+
+	public get cur(): string {
+		return this._fields.cur
+	}
+
+	public set cur(value: string) {
+		this._fields.cur = value
+	}
 
 	public _fields: {
 		ch: $.Channel<string> | null
@@ -58,10 +70,6 @@ export class chanReader {
 		return [n, null]
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["ch", "cur"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.chanReader",
 		() => new chanReader(),
@@ -72,9 +80,21 @@ export class chanReader {
 }
 
 export class item {
-	public declare A: string
+	public get A(): string {
+		return this._fields.A
+	}
 
-	public declare B: number
+	public set A(value: string) {
+		this._fields.A = value
+	}
+
+	public get B(): number {
+		return this._fields.B
+	}
+
+	public set B(value: number) {
+		this._fields.B = value
+	}
 
 	public _fields: {
 		A: string
@@ -90,10 +110,6 @@ export class item {
 
 	public clone(): item {
 		return $.markAsStructValue(new item(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["A", "B"])
 	}
 
 	static __typeInfo = $.registerStructType(

@@ -23,7 +23,13 @@ $.registerInterfaceType(
 );
 
 export class wrappedAEAD {
-	public declare inner: cipher.AEAD | null
+	public get inner(): cipher.AEAD | null {
+		return this._fields.inner
+	}
+
+	public set inner(value: cipher.AEAD | null) {
+		this._fields.inner = value
+	}
 
 	public _fields: {
 		inner: cipher.AEAD | null
@@ -59,10 +65,6 @@ export class wrappedAEAD {
 		return $.pointerValue<Exclude<cipher.AEAD, null>>($.pointerValue<wrappedAEAD>(w).inner).Seal(dst, nonce, plaintext, additionalData)
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["inner"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.wrappedAEAD",
 		() => new wrappedAEAD(),
@@ -73,11 +75,29 @@ export class wrappedAEAD {
 }
 
 export class nestedSealer {
-	public declare aead: cipher.AEAD | null
+	public get aead(): cipher.AEAD | null {
+		return this._fields.aead
+	}
 
-	public declare nonce: $.Slice<number>
+	public set aead(value: cipher.AEAD | null) {
+		this._fields.aead = value
+	}
 
-	public declare aad: $.Slice<number>
+	public get nonce(): $.Slice<number> {
+		return this._fields.nonce
+	}
+
+	public set nonce(value: $.Slice<number>) {
+		this._fields.nonce = value
+	}
+
+	public get aad(): $.Slice<number> {
+		return this._fields.aad
+	}
+
+	public set aad(value: $.Slice<number>) {
+		this._fields.aad = value
+	}
 
 	public _fields: {
 		aead: cipher.AEAD | null
@@ -100,10 +120,6 @@ export class nestedSealer {
 	public async Seal(dst: $.Slice<number>, plaintext: $.Slice<number>): globalThis.Promise<$.Slice<number>> {
 		const s: nestedSealer | $.VarRef<nestedSealer> | null = this;
 		return $.pointerValue<Exclude<cipher.AEAD, null>>($.pointerValue<nestedSealer>(s).aead).Seal(dst, $.pointerValue<nestedSealer>(s).nonce, plaintext, $.pointerValue<nestedSealer>(s).aad)
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["aead", "nonce", "aad"])
 	}
 
 	static __typeInfo = $.registerStructType(

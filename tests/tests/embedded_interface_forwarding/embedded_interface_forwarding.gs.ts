@@ -14,7 +14,13 @@ $.registerInterfaceType(
 );
 
 export class Box {
-	public declare Adder: Adder | null
+	public get Adder(): Adder | null {
+		return this._fields.Adder
+	}
+
+	public set Adder(value: Adder | null) {
+		this._fields.Adder = value
+	}
 
 	public _fields: {
 		Adder: Adder | null
@@ -34,10 +40,6 @@ export class Box {
 		return $.pointerValue<Exclude<Adder | null, null>>(this.Adder).Add(value)
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Adder"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.Box",
 		() => new Box(),
@@ -48,7 +50,13 @@ export class Box {
 }
 
 export class Counter {
-	public declare base: number
+	public get base(): number {
+		return this._fields.base
+	}
+
+	public set base(value: number) {
+		this._fields.base = value
+	}
 
 	public _fields: {
 		base: number
@@ -67,10 +75,6 @@ export class Counter {
 	public Add(value: number): number {
 		const c: Counter | $.VarRef<Counter> | null = this;
 		return $.pointerValue<Counter>(c).base + value
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["base"])
 	}
 
 	static __typeInfo = $.registerStructType(

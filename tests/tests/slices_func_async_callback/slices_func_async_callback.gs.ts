@@ -7,9 +7,21 @@ import * as slices from "@goscript/slices/index.js"
 import "@goscript/slices/index.js"
 
 export class Process {
-	public declare pid: number
+	public get pid(): number {
+		return this._fields.pid
+	}
 
-	public declare done: $.Channel<{}> | null
+	public set pid(value: number) {
+		this._fields.pid = value
+	}
+
+	public get done(): $.Channel<{}> | null {
+		return this._fields.done
+	}
+
+	public set done(value: $.Channel<{}> | null) {
+		this._fields.done = value
+	}
 
 	public _fields: {
 		pid: number
@@ -52,10 +64,6 @@ export class Process {
 		}
 		throw new globalThis.Error("unreachable select")
 		throw new globalThis.Error("goscript: unreachable return")
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["pid", "done"])
 	}
 
 	static __typeInfo = $.registerStructType(

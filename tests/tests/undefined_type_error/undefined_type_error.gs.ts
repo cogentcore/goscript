@@ -4,27 +4,93 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class formatter {
-	public declare wid: number
+	public get wid(): number {
+		return this._fields.wid
+	}
 
-	public declare prec: number
+	public set wid(value: number) {
+		this._fields.wid = value
+	}
 
-	public declare widPresent: boolean
+	public get prec(): number {
+		return this._fields.prec
+	}
 
-	public declare precPresent: boolean
+	public set prec(value: number) {
+		this._fields.prec = value
+	}
 
-	public declare minus: boolean
+	public get widPresent(): boolean {
+		return this._fields.widPresent
+	}
 
-	public declare plus: boolean
+	public set widPresent(value: boolean) {
+		this._fields.widPresent = value
+	}
 
-	public declare sharp: boolean
+	public get precPresent(): boolean {
+		return this._fields.precPresent
+	}
 
-	public declare space: boolean
+	public set precPresent(value: boolean) {
+		this._fields.precPresent = value
+	}
 
-	public declare zero: boolean
+	public get minus(): boolean {
+		return this._fields.minus
+	}
 
-	public declare plusV: boolean
+	public set minus(value: boolean) {
+		this._fields.minus = value
+	}
 
-	public declare sharpV: boolean
+	public get plus(): boolean {
+		return this._fields.plus
+	}
+
+	public set plus(value: boolean) {
+		this._fields.plus = value
+	}
+
+	public get sharp(): boolean {
+		return this._fields.sharp
+	}
+
+	public set sharp(value: boolean) {
+		this._fields.sharp = value
+	}
+
+	public get space(): boolean {
+		return this._fields.space
+	}
+
+	public set space(value: boolean) {
+		this._fields.space = value
+	}
+
+	public get zero(): boolean {
+		return this._fields.zero
+	}
+
+	public set zero(value: boolean) {
+		this._fields.zero = value
+	}
+
+	public get plusV(): boolean {
+		return this._fields.plusV
+	}
+
+	public set plusV(value: boolean) {
+		this._fields.plusV = value
+	}
+
+	public get sharpV(): boolean {
+		return this._fields.sharpV
+	}
+
+	public set sharpV(value: boolean) {
+		this._fields.sharpV = value
+	}
 
 	public _fields: {
 		wid: number
@@ -60,10 +126,6 @@ export class formatter {
 		return $.markAsStructValue(new formatter(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["wid", "prec", "widPresent", "precPresent", "minus", "plus", "sharp", "space", "zero", "plusV", "sharpV"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.formatter",
 		() => new formatter(),
@@ -74,13 +136,31 @@ export class formatter {
 }
 
 export class printer {
-	public declare buf: $.Slice<number>
+	public get buf(): $.Slice<number> {
+		return this._fields.buf
+	}
 
-	public declare arg: any
+	public set buf(value: $.Slice<number>) {
+		this._fields.buf = value
+	}
+
+	public get arg(): any {
+		return this._fields.arg
+	}
+
+	public set arg(value: any) {
+		this._fields.arg = value
+	}
 
 	// This line causes the issue: fmt: $.VarRef<fmt>; where fmt is undefined
 	// Should generate proper type reference
-	public declare fmt: formatter
+	public get fmt(): formatter {
+		return this._fields.fmt
+	}
+
+	public set fmt(value: formatter) {
+		this._fields.fmt = value
+	}
 
 	public _fields: {
 		buf: $.Slice<number>
@@ -114,10 +194,6 @@ export class printer {
 	public init(): void {
 		let p: printer | $.VarRef<printer> | null = this;
 		$.assignStruct($.pointerValue<printer>(p).fmt, $.markAsStructValue(new formatter()))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["buf", "arg", "fmt"])
 	}
 
 	static __typeInfo = $.registerStructType(

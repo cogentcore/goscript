@@ -18,9 +18,21 @@ $.registerNamedValueType(
 );
 
 export class FileStatus {
-	public declare mode: MyFileMode
+	public get mode(): MyFileMode {
+		return this._fields.mode
+	}
 
-	public declare size: bigint
+	public set mode(value: MyFileMode) {
+		this._fields.mode = value
+	}
+
+	public get size(): bigint {
+		return this._fields.size
+	}
+
+	public set size(value: bigint) {
+		this._fields.size = value
+	}
 
 	public _fields: {
 		mode: MyFileMode
@@ -36,10 +48,6 @@ export class FileStatus {
 
 	public clone(): FileStatus {
 		return $.markAsStructValue(new FileStatus(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["mode", "size"])
 	}
 
 	static __typeInfo = $.registerStructType(

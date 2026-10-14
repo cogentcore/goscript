@@ -27,9 +27,21 @@ $.registerInterfaceType(
 );
 
 export class T {
-	public declare A: string
+	public get A(): string {
+		return this._fields.A
+	}
 
-	public declare B: number
+	public set A(value: string) {
+		this._fields.A = value
+	}
+
+	public get B(): number {
+		return this._fields.B
+	}
+
+	public set B(value: number) {
+		this._fields.B = value
+	}
 
 	public _fields: {
 		A: string
@@ -47,10 +59,6 @@ export class T {
 		return $.markAsStructValue(new T(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["A", "B"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.T",
 		() => new T(),
@@ -61,7 +69,13 @@ export class T {
 }
 
 export class square {
-	public declare Side: number
+	public get Side(): number {
+		return this._fields.Side
+	}
+
+	public set Side(value: number) {
+		this._fields.Side = value
+	}
 
 	public _fields: {
 		Side: number
@@ -82,10 +96,6 @@ export class square {
 		return s.Side * s.Side
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Side"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.square",
 		() => new square(),
@@ -96,9 +106,21 @@ export class square {
 }
 
 export class holder {
-	public declare S: shape | null
+	public get S(): shape | null {
+		return this._fields.S
+	}
 
-	public declare A: any
+	public set S(value: shape | null) {
+		this._fields.S = value
+	}
+
+	public get A(): any {
+		return this._fields.A
+	}
+
+	public set A(value: any) {
+		this._fields.A = value
+	}
 
 	public _fields: {
 		S: shape | null
@@ -116,10 +138,6 @@ export class holder {
 		return $.markAsStructValue(new holder(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["S", "A"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.holder",
 		() => new holder(),
@@ -130,9 +148,21 @@ export class holder {
 }
 
 export class base {
-	public declare This: node | null
+	public get This(): node | null {
+		return this._fields.This
+	}
 
-	public declare Name: string
+	public set This(value: node | null) {
+		this._fields.This = value
+	}
+
+	public get Name(): string {
+		return this._fields.Name
+	}
+
+	public set Name(value: string) {
+		this._fields.Name = value
+	}
 
 	public _fields: {
 		This: node | null
@@ -160,10 +190,6 @@ export class base {
 		return $.mustTypeAssert<node | null>($.markAsStructValue($.cloneStructValue(reflect.New($.pointerValueOrNil(await $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf(($.pointerValue<base>(b).This as any))).Elem())!))).Interface(), "main.node")
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["This", "Name"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.base",
 		() => new base(),
@@ -174,9 +200,21 @@ export class base {
 }
 
 export class widget {
-	public declare base: base
+	public get base(): base {
+		return this._fields.base
+	}
 
-	public declare X: number
+	public set base(value: base) {
+		this._fields.base = value
+	}
+
+	public get X(): number {
+		return this._fields.X
+	}
+
+	public set X(value: number) {
+		this._fields.X = value
+	}
 
 	public _fields: {
 		base: base
@@ -202,10 +240,6 @@ export class widget {
 		return await $.pointerValue<base>(this.base).NewInstance()
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["base", "X"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.widget",
 		() => new widget(),
@@ -216,9 +250,21 @@ export class widget {
 }
 
 export class body {
-	public declare widget: widget
+	public get widget(): widget {
+		return this._fields.widget
+	}
 
-	public declare Title: string
+	public set widget(value: widget) {
+		this._fields.widget = value
+	}
+
+	public get Title(): string {
+		return this._fields.Title
+	}
+
+	public set Title(value: string) {
+		this._fields.Title = value
+	}
 
 	public _fields: {
 		widget: widget
@@ -242,10 +288,6 @@ export class body {
 
 	public async NewInstance(): globalThis.Promise<any> {
 		return await $.pointerValue<widget>(this.widget).base.NewInstance()
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["widget", "Title"])
 	}
 
 	static __typeInfo = $.registerStructType(

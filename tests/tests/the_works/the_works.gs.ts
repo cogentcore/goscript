@@ -28,9 +28,21 @@ $.registerInterfaceType(
 );
 
 export class Instr {
-	public declare Op: Op
+	public get Op(): Op {
+		return this._fields.Op
+	}
 
-	public declare Arg: bigint
+	public set Op(value: Op) {
+		this._fields.Op = value
+	}
+
+	public get Arg(): bigint {
+		return this._fields.Arg
+	}
+
+	public set Arg(value: bigint) {
+		this._fields.Arg = value
+	}
 
 	public _fields: {
 		Op: Op
@@ -48,10 +60,6 @@ export class Instr {
 		return $.markAsStructValue(new Instr(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Op", "Arg"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.Instr",
 		() => new Instr(),
@@ -62,9 +70,21 @@ export class Instr {
 }
 
 export class Program {
-	public declare Name: string
+	public get Name(): string {
+		return this._fields.Name
+	}
 
-	public declare Code: $.Slice<Instr>
+	public set Name(value: string) {
+		this._fields.Name = value
+	}
+
+	public get Code(): $.Slice<Instr> {
+		return this._fields.Code
+	}
+
+	public set Code(value: $.Slice<Instr>) {
+		this._fields.Code = value
+	}
 
 	public _fields: {
 		Name: string
@@ -94,10 +114,6 @@ export class Program {
 		}, ({ kind: $.TypeKind.Function, params: [({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int"), "main.Instr"], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo)], results: [] } as $.FunctionTypeInfo))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Name", "Code"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.Program",
 		() => new Program(),
@@ -108,7 +124,13 @@ export class Program {
 }
 
 export class Stack {
-	public declare items: $.Slice<any>
+	public get items(): $.Slice<any> {
+		return this._fields.items
+	}
+
+	public set items(value: $.Slice<any>) {
+		this._fields.items = value
+	}
 
 	public _fields: {
 		items: $.Slice<any>
@@ -139,10 +161,6 @@ export class Stack {
 		$.pointerValue<Stack>(s).items = $.append($.pointerValue<Stack>(s).items, v, $.appendZero(() => ($.genericZero(__typeArgs, "T", null) as any)))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["items"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.Stack",
 		() => new Stack(),
@@ -153,11 +171,29 @@ export class Stack {
 }
 
 export class VM {
-	public declare pc: number
+	public get pc(): number {
+		return this._fields.pc
+	}
 
-	public declare steps: number
+	public set pc(value: number) {
+		this._fields.pc = value
+	}
 
-	public declare stack: Stack
+	public get steps(): number {
+		return this._fields.steps
+	}
+
+	public set steps(value: number) {
+		this._fields.steps = value
+	}
+
+	public get stack(): Stack {
+		return this._fields.stack
+	}
+
+	public set stack(value: Stack) {
+		this._fields.stack = value
+	}
 
 	public _fields: {
 		pc: number
@@ -249,10 +285,6 @@ export class VM {
 		return false
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["pc", "steps", "stack"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.VM",
 		() => new VM(),
@@ -263,11 +295,29 @@ export class VM {
 }
 
 export class Answer {
-	public declare Name: string
+	public get Name(): string {
+		return this._fields.Name
+	}
 
-	public declare Value: bigint
+	public set Name(value: string) {
+		this._fields.Name = value
+	}
 
-	public declare Steps: number
+	public get Value(): bigint {
+		return this._fields.Value
+	}
+
+	public set Value(value: bigint) {
+		this._fields.Value = value
+	}
+
+	public get Steps(): number {
+		return this._fields.Steps
+	}
+
+	public set Steps(value: number) {
+		this._fields.Steps = value
+	}
 
 	public _fields: {
 		Name: string
@@ -292,10 +342,6 @@ export class Answer {
 		return a.Name
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Name", "Value", "Steps"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.Answer",
 		() => new Answer(),
@@ -306,9 +352,21 @@ export class Answer {
 }
 
 export class Fault {
-	public declare Name: string
+	public get Name(): string {
+		return this._fields.Name
+	}
 
-	public declare Reason: string
+	public set Name(value: string) {
+		this._fields.Name = value
+	}
+
+	public get Reason(): string {
+		return this._fields.Reason
+	}
+
+	public set Reason(value: string) {
+		this._fields.Reason = value
+	}
 
 	public _fields: {
 		Name: string
@@ -329,10 +387,6 @@ export class Fault {
 	public Program(): string {
 		const f: Fault | $.VarRef<Fault> | null = this;
 		return $.pointerValue<Fault>(f).Name
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["Name", "Reason"])
 	}
 
 	static __typeInfo = $.registerStructType(

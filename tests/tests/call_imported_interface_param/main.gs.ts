@@ -9,7 +9,13 @@ import * as __goscript_sink from "./sink.gs.ts"
 import "./sink.gs.ts"
 
 export class Buffer {
-	public declare data: $.Slice<number>
+	public get data(): $.Slice<number> {
+		return this._fields.data
+	}
+
+	public set data(value: $.Slice<number>) {
+		this._fields.data = value
+	}
 
 	public _fields: {
 		data: $.Slice<number>
@@ -29,10 +35,6 @@ export class Buffer {
 		let b: Buffer | $.VarRef<Buffer> | null = this;
 		$.pointerValue<Buffer>(b).data = $.appendSlice($.pointerValue<Buffer>(b).data, p, $.byteSliceHint)
 		return [$.len(p), null]
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["data"])
 	}
 
 	static __typeInfo = $.registerStructType(

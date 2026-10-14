@@ -7,9 +7,21 @@ import * as reflect from "@goscript/reflect/index.js"
 import "@goscript/reflect/index.js"
 
 export class P {
-	public declare X: number
+	public get X(): number {
+		return this._fields.X
+	}
 
-	public declare Y: string
+	public set X(value: number) {
+		this._fields.X = value
+	}
+
+	public get Y(): string {
+		return this._fields.Y
+	}
+
+	public set Y(value: string) {
+		this._fields.Y = value
+	}
 
 	public _fields: {
 		X: number
@@ -25,10 +37,6 @@ export class P {
 
 	public clone(): P {
 		return $.markAsStructValue(new P(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["X", "Y"])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -55,17 +63,53 @@ export async function main(): globalThis.Promise<void> {
 	await $.println($.markAsStructValue($.cloneStructValue(reflect.ValueOf(null))).Equal($.markAsStructValue($.cloneStructValue(reflect.ValueOf(null)))), $.markAsStructValue($.cloneStructValue(reflect.ValueOf(null))).Equal($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.basicInterfaceValue(1, "int"))))))
 
 	class Z {
-		public declare S: $.Slice<number>
+		public get S(): $.Slice<number> {
+			return this._fields.S
+		}
 
-		public declare M: globalThis.Map<string, number> | null
+		public set S(value: $.Slice<number>) {
+			this._fields.S = value
+		}
 
-		public declare P: $.VarRef<number> | null
+		public get M(): globalThis.Map<string, number> | null {
+			return this._fields.M
+		}
 
-		public declare F: number
+		public set M(value: globalThis.Map<string, number> | null) {
+			this._fields.M = value
+		}
 
-		public declare B: boolean
+		public get P(): $.VarRef<number> | null {
+			return this._fields.P
+		}
 
-		public declare T: string
+		public set P(value: $.VarRef<number> | null) {
+			this._fields.P = value
+		}
+
+		public get F(): number {
+			return this._fields.F
+		}
+
+		public set F(value: number) {
+			this._fields.F = value
+		}
+
+		public get B(): boolean {
+			return this._fields.B
+		}
+
+		public set B(value: boolean) {
+			this._fields.B = value
+		}
+
+		public get T(): string {
+			return this._fields.T
+		}
+
+		public set T(value: string) {
+			this._fields.T = value
+		}
 
 		public _fields: {
 			S: $.Slice<number>
@@ -89,10 +133,6 @@ export async function main(): globalThis.Promise<void> {
 
 		public clone(): Z {
 			return $.markAsStructValue(new Z(this))
-		}
-
-		static {
-			$.bindStructFields(this.prototype, ["S", "M", "P", "F", "B", "T"])
 		}
 
 		static __typeInfo = $.registerStructType(

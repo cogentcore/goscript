@@ -68,9 +68,21 @@ export class ConcreteB {
 }
 
 export class Container {
-	public declare hasA: boolean
+	public get hasA(): boolean {
+		return this._fields.hasA
+	}
 
-	public declare hasB: boolean
+	public set hasA(value: boolean) {
+		this._fields.hasA = value
+	}
+
+	public get hasB(): boolean {
+		return this._fields.hasB
+	}
+
+	public set hasB(value: boolean) {
+		this._fields.hasB = value
+	}
 
 	public _fields: {
 		hasA: boolean
@@ -86,10 +98,6 @@ export class Container {
 
 	public clone(): Container {
 		return $.markAsStructValue(new Container(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["hasA", "hasB"])
 	}
 
 	static __typeInfo = $.registerStructType(

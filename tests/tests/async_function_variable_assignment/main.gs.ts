@@ -5,7 +5,13 @@ import * as $ from "@goscript/builtin/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	class result {
-		public declare value: number
+		public get value(): number {
+			return this._fields.value
+		}
+
+		public set value(value: number) {
+			this._fields.value = value
+		}
 
 		public _fields: {
 			value: number
@@ -19,10 +25,6 @@ export async function main(): globalThis.Promise<void> {
 
 		public clone(): result {
 			return $.markAsStructValue(new result(this))
-		}
-
-		static {
-			$.bindStructFields(this.prototype, ["value"])
 		}
 
 		static __typeInfo = $.registerStructType(

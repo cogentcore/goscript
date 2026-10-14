@@ -14,7 +14,13 @@ $.registerInterfaceType(
 );
 
 export class box {
-	public declare value: number
+	public get value(): number {
+		return this._fields.value
+	}
+
+	public set value(value: number) {
+		this._fields.value = value
+	}
 
 	public _fields: {
 		value: number
@@ -33,10 +39,6 @@ export class box {
 	public Value(): number {
 		const b: box | $.VarRef<box> | null = this;
 		return $.pointerValue<box>(b).value
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["value"])
 	}
 
 	static __typeInfo = $.registerStructType(

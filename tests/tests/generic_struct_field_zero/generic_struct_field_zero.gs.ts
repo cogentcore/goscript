@@ -4,7 +4,13 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class box {
-	public declare Value: any
+	public get Value(): any {
+		return this._fields.Value
+	}
+
+	public set Value(value: any) {
+		this._fields.Value = value
+	}
 
 	public _fields: {
 		Value: any
@@ -20,10 +26,6 @@ export class box {
 		return $.markAsStructValue(new box(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Value"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.box",
 		() => new box(),
@@ -34,7 +36,13 @@ export class box {
 }
 
 export class point {
-	public declare X: number
+	public get X(): number {
+		return this._fields.X
+	}
+
+	public set X(value: number) {
+		this._fields.X = value
+	}
 
 	public _fields: {
 		X: number
@@ -48,10 +56,6 @@ export class point {
 
 	public clone(): point {
 		return $.markAsStructValue(new point(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["X"])
 	}
 
 	static __typeInfo = $.registerStructType(

@@ -7,9 +7,21 @@ import * as __goscript_methods from "./methods.gs.ts"
 import "./methods.gs.ts"
 
 export class storage {
-	public declare bytes: $.Slice<number>
+	public get bytes(): $.Slice<number> {
+		return this._fields.bytes
+	}
 
-	public declare name: string
+	public set bytes(value: $.Slice<number>) {
+		this._fields.bytes = value
+	}
+
+	public get name(): string {
+		return this._fields.name
+	}
+
+	public set name(value: string) {
+		this._fields.name = value
+	}
 
 	public _fields: {
 		bytes: $.Slice<number>
@@ -50,10 +62,6 @@ export class storage {
 	public Truncate(): void {
 		let s: storage | $.VarRef<storage> | null = this;
 		$.pointerValue<storage>(s).bytes = $.makeSlice<number>(0, undefined, "byte")
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["bytes", "name"])
 	}
 
 	static __typeInfo = $.registerStructType(

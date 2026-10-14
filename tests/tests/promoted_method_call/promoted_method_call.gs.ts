@@ -4,7 +4,13 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class base {
-	public declare value: number
+	public get value(): number {
+		return this._fields.value
+	}
+
+	public set value(value: number) {
+		this._fields.value = value
+	}
 
 	public _fields: {
 		value: number
@@ -25,10 +31,6 @@ export class base {
 		return $.pointerValue<base>(b).value + n
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["value"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.base",
 		() => new base(),
@@ -39,7 +41,13 @@ export class base {
 }
 
 export class wrapper {
-	public declare base: base
+	public get base(): base {
+		return this._fields.base
+	}
+
+	public set base(value: base) {
+		this._fields.base = value
+	}
 
 	public _fields: {
 		base: base
@@ -57,10 +65,6 @@ export class wrapper {
 
 	public Add(n: any): any {
 		return $.pointerValue<base>(this.base).Add(n)
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["base"])
 	}
 
 	static __typeInfo = $.registerStructType(

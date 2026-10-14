@@ -22,7 +22,13 @@ import "@goscript/strings/index.js"
 import "@goscript/time/index.js"
 
 export class Holder {
-	public declare Tags: globalThis.Map<string, number> | null
+	public get Tags(): globalThis.Map<string, number> | null {
+		return this._fields.Tags
+	}
+
+	public set Tags(value: globalThis.Map<string, number> | null) {
+		this._fields.Tags = value
+	}
 
 	public _fields: {
 		Tags: globalThis.Map<string, number> | null
@@ -38,10 +44,6 @@ export class Holder {
 		return $.markAsStructValue(new Holder(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Tags"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.Holder",
 		() => new Holder(),
@@ -52,15 +54,45 @@ export class Holder {
 }
 
 export class Enc {
-	public declare Width: number
+	public get Width(): number {
+		return this._fields.Width
+	}
 
-	public declare Image: $.Slice<number>
+	public set Width(value: number) {
+		this._fields.Width = value
+	}
 
-	public declare Frames: $.Slice<$.Slice<number>>
+	public get Image(): $.Slice<number> {
+		return this._fields.Image
+	}
 
-	public declare Named: globalThis.Map<string, $.Slice<number>> | null
+	public set Image(value: $.Slice<number>) {
+		this._fields.Image = value
+	}
 
-	public declare Nested: Enc | $.VarRef<Enc> | null
+	public get Frames(): $.Slice<$.Slice<number>> {
+		return this._fields.Frames
+	}
+
+	public set Frames(value: $.Slice<$.Slice<number>>) {
+		this._fields.Frames = value
+	}
+
+	public get Named(): globalThis.Map<string, $.Slice<number>> | null {
+		return this._fields.Named
+	}
+
+	public set Named(value: globalThis.Map<string, $.Slice<number>> | null) {
+		this._fields.Named = value
+	}
+
+	public get Nested(): Enc | $.VarRef<Enc> | null {
+		return this._fields.Nested
+	}
+
+	public set Nested(value: Enc | $.VarRef<Enc> | null) {
+		this._fields.Nested = value
+	}
 
 	public _fields: {
 		Width: number
@@ -84,10 +116,6 @@ export class Enc {
 		return $.markAsStructValue(new Enc(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Width", "Image", "Frames", "Named", "Nested"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.Enc",
 		() => new Enc(),
@@ -98,9 +126,21 @@ export class Enc {
 }
 
 export class Event {
-	public declare Name: string
+	public get Name(): string {
+		return this._fields.Name
+	}
 
-	public declare At: time.Time
+	public set Name(value: string) {
+		this._fields.Name = value
+	}
+
+	public get At(): time.Time {
+		return this._fields.At
+	}
+
+	public set At(value: time.Time) {
+		this._fields.At = value
+	}
 
 	public _fields: {
 		Name: string
@@ -118,10 +158,6 @@ export class Event {
 		return $.markAsStructValue(new Event(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Name", "At"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.Event",
 		() => new Event(),
@@ -132,11 +168,29 @@ export class Event {
 }
 
 export class Person {
-	public declare Name: string
+	public get Name(): string {
+		return this._fields.Name
+	}
 
-	public declare Age: number
+	public set Name(value: string) {
+		this._fields.Name = value
+	}
 
-	public declare Active: boolean
+	public get Age(): number {
+		return this._fields.Age
+	}
+
+	public set Age(value: number) {
+		this._fields.Age = value
+	}
+
+	public get Active(): boolean {
+		return this._fields.Active
+	}
+
+	public set Active(value: boolean) {
+		this._fields.Active = value
+	}
 
 	public _fields: {
 		Name: string
@@ -154,10 +208,6 @@ export class Person {
 
 	public clone(): Person {
 		return $.markAsStructValue(new Person(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["Name", "Age", "Active"])
 	}
 
 	static __typeInfo = $.registerStructType(

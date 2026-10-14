@@ -17,7 +17,13 @@ $.registerInterfaceType(
 );
 
 export class raw {
-	public declare Mutex: sync.Mutex
+	public get Mutex(): sync.Mutex {
+		return this._fields.Mutex
+	}
+
+	public set Mutex(value: sync.Mutex) {
+		this._fields.Mutex = value
+	}
 
 	public _fields: {
 		Mutex: sync.Mutex
@@ -45,10 +51,6 @@ export class raw {
 		return $.pointerValue<sync.Mutex>(this.Mutex).Unlock()
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Mutex"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.raw",
 		() => new raw(),
@@ -59,7 +61,13 @@ export class raw {
 }
 
 export class outer {
-	public declare raw: raw
+	public get raw(): raw {
+		return this._fields.raw
+	}
+
+	public set raw(value: raw) {
+		this._fields.raw = value
+	}
 
 	public _fields: {
 		raw: raw
@@ -87,10 +95,6 @@ export class outer {
 		return $.pointerValue<raw>(this.raw).Mutex.Unlock()
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["raw"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.outer",
 		() => new outer(),
@@ -101,7 +105,13 @@ export class outer {
 }
 
 export class rawRW {
-	public declare RWMutex: sync.RWMutex
+	public get RWMutex(): sync.RWMutex {
+		return this._fields.RWMutex
+	}
+
+	public set RWMutex(value: sync.RWMutex) {
+		this._fields.RWMutex = value
+	}
 
 	public _fields: {
 		RWMutex: sync.RWMutex
@@ -145,10 +155,6 @@ export class rawRW {
 		return $.pointerValue<sync.RWMutex>(this.RWMutex).Unlock()
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["RWMutex"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.rawRW",
 		() => new rawRW(),
@@ -159,7 +165,13 @@ export class rawRW {
 }
 
 export class outerRW {
-	public declare rawRW: rawRW
+	public get rawRW(): rawRW {
+		return this._fields.rawRW
+	}
+
+	public set rawRW(value: rawRW) {
+		this._fields.rawRW = value
+	}
 
 	public _fields: {
 		rawRW: rawRW
@@ -203,10 +215,6 @@ export class outerRW {
 		return $.pointerValue<rawRW>(this.rawRW).RWMutex.Unlock()
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["rawRW"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.outerRW",
 		() => new outerRW(),
@@ -217,7 +225,13 @@ export class outerRW {
 }
 
 export class rawRunner {
-	public declare runner: runner | null
+	public get runner(): runner | null {
+		return this._fields.runner
+	}
+
+	public set runner(value: runner | null) {
+		this._fields.runner = value
+	}
 
 	public _fields: {
 		runner: runner | null
@@ -237,10 +251,6 @@ export class rawRunner {
 		return $.pointerValue<Exclude<runner | null, null>>(this.runner).Run()
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["runner"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.rawRunner",
 		() => new rawRunner(),
@@ -251,7 +261,13 @@ export class rawRunner {
 }
 
 export class outerRunner {
-	public declare rawRunner: rawRunner
+	public get rawRunner(): rawRunner {
+		return this._fields.rawRunner
+	}
+
+	public set rawRunner(value: rawRunner) {
+		this._fields.rawRunner = value
+	}
 
 	public _fields: {
 		rawRunner: rawRunner
@@ -269,10 +285,6 @@ export class outerRunner {
 
 	public Run(): any {
 		return $.pointerValue<any>($.pointerValue<rawRunner>(this.rawRunner).runner).Run()
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["rawRunner"])
 	}
 
 	static __typeInfo = $.registerStructType(

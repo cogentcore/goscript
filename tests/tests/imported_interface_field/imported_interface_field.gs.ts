@@ -7,7 +7,13 @@ import * as io from "@goscript/io/index.js"
 import "@goscript/io/index.js"
 
 export class holder {
-	public declare w: io.Writer | null
+	public get w(): io.Writer | null {
+		return this._fields.w
+	}
+
+	public set w(value: io.Writer | null) {
+		this._fields.w = value
+	}
 
 	public _fields: {
 		w: io.Writer | null
@@ -21,10 +27,6 @@ export class holder {
 
 	public clone(): holder {
 		return $.markAsStructValue(new holder(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["w"])
 	}
 
 	static __typeInfo = $.registerStructType(

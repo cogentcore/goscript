@@ -24,9 +24,21 @@ $.registerInterfaceType(
 );
 
 export class VerboseStore {
-	public declare BaseStore: dep.BaseStore | $.VarRef<dep.BaseStore> | null
+	public get BaseStore(): dep.BaseStore | $.VarRef<dep.BaseStore> | null {
+		return this._fields.BaseStore
+	}
 
-	public declare name: string
+	public set BaseStore(value: dep.BaseStore | $.VarRef<dep.BaseStore> | null) {
+		this._fields.BaseStore = value
+	}
+
+	public get name(): string {
+		return this._fields.name
+	}
+
+	public set name(value: string) {
+		this._fields.name = value
+	}
 
 	public _fields: {
 		BaseStore: dep.BaseStore | $.VarRef<dep.BaseStore> | null
@@ -51,10 +63,6 @@ export class VerboseStore {
 
 	public NewTransaction(write: any): any {
 		return $.pointerValue<any>($.pointerValue<dep.BaseStore>(this.BaseStore).CoreStore).NewTransaction(write)
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["BaseStore", "name"])
 	}
 
 	static __typeInfo = $.registerStructType(

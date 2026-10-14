@@ -13,21 +13,69 @@ import "@goscript/fmt/index.js"
 import "@goscript/strings/index.js"
 
 export class Payload {
-	public declare Ptr: $.VarRef<number> | null
+	public get Ptr(): $.VarRef<number> | null {
+		return this._fields.Ptr
+	}
 
-	public declare IfaceZero: any
+	public set Ptr(value: $.VarRef<number> | null) {
+		this._fields.Ptr = value
+	}
 
-	public declare IfaceFalse: any
+	public get IfaceZero(): any {
+		return this._fields.IfaceZero
+	}
 
-	public declare IfaceEmptyString: any
+	public set IfaceZero(value: any) {
+		this._fields.IfaceZero = value
+	}
 
-	public declare IfaceEmptySlice: any
+	public get IfaceFalse(): any {
+		return this._fields.IfaceFalse
+	}
 
-	public declare IfaceEmptyMap: any
+	public set IfaceFalse(value: any) {
+		this._fields.IfaceFalse = value
+	}
 
-	public declare PtrNilIface: $.VarRef<any> | null
+	public get IfaceEmptyString(): any {
+		return this._fields.IfaceEmptyString
+	}
 
-	public declare PtrBool: $.VarRef<boolean> | null
+	public set IfaceEmptyString(value: any) {
+		this._fields.IfaceEmptyString = value
+	}
+
+	public get IfaceEmptySlice(): any {
+		return this._fields.IfaceEmptySlice
+	}
+
+	public set IfaceEmptySlice(value: any) {
+		this._fields.IfaceEmptySlice = value
+	}
+
+	public get IfaceEmptyMap(): any {
+		return this._fields.IfaceEmptyMap
+	}
+
+	public set IfaceEmptyMap(value: any) {
+		this._fields.IfaceEmptyMap = value
+	}
+
+	public get PtrNilIface(): $.VarRef<any> | null {
+		return this._fields.PtrNilIface
+	}
+
+	public set PtrNilIface(value: $.VarRef<any> | null) {
+		this._fields.PtrNilIface = value
+	}
+
+	public get PtrBool(): $.VarRef<boolean> | null {
+		return this._fields.PtrBool
+	}
+
+	public set PtrBool(value: $.VarRef<boolean> | null) {
+		this._fields.PtrBool = value
+	}
 
 	public _fields: {
 		Ptr: $.VarRef<number> | null
@@ -55,10 +103,6 @@ export class Payload {
 
 	public clone(): Payload {
 		return $.markAsStructValue(new Payload(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["Ptr", "IfaceZero", "IfaceFalse", "IfaceEmptyString", "IfaceEmptySlice", "IfaceEmptyMap", "PtrNilIface", "PtrBool"])
 	}
 
 	static __typeInfo = $.registerStructType(

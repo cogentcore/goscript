@@ -4,7 +4,13 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class Map {
-	public declare values: globalThis.Map<string, number> | null
+	public get values(): globalThis.Map<string, number> | null {
+		return this._fields.values
+	}
+
+	public set values(value: globalThis.Map<string, number> | null) {
+		this._fields.values = value
+	}
 
 	public _fields: {
 		values: globalThis.Map<string, number> | null
@@ -18,10 +24,6 @@ export class Map {
 
 	public clone(): Map {
 		return $.markAsStructValue(new Map(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["values"])
 	}
 
 	static __typeInfo = $.registerStructType(

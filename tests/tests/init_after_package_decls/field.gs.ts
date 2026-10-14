@@ -9,7 +9,13 @@ import * as __goscript_types from "./types.gs.ts"
 import "./types.gs.ts"
 
 export class Field {
-	public declare Name: string
+	public get Name(): string {
+		return this._fields.Name
+	}
+
+	public set Name(value: string) {
+		this._fields.Name = value
+	}
 
 	public _fields: {
 		Name: string
@@ -28,10 +34,6 @@ export class Field {
 	public Owner(): __goscript__type.Type | $.VarRef<__goscript__type.Type> | null {
 		const f = this;
 		return __goscript_types.TypeByName(f.Name)
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["Name"])
 	}
 
 	static __typeInfo = $.registerStructType(

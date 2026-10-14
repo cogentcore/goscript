@@ -4,7 +4,13 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class counter {
-	public declare value: number
+	public get value(): number {
+		return this._fields.value
+	}
+
+	public set value(value: number) {
+		this._fields.value = value
+	}
 
 	public _fields: {
 		value: number
@@ -25,10 +31,6 @@ export class counter {
 		return $.pointerValue<counter>(c).value
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["value"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.counter",
 		() => new counter(),
@@ -39,9 +41,21 @@ export class counter {
 }
 
 export class inner {
-	public declare name: string
+	public get name(): string {
+		return this._fields.name
+	}
 
-	public declare count: counter
+	public set name(value: string) {
+		this._fields.name = value
+	}
+
+	public get count(): counter {
+		return this._fields.count
+	}
+
+	public set count(value: counter) {
+		this._fields.count = value
+	}
 
 	public _fields: {
 		name: string
@@ -59,10 +73,6 @@ export class inner {
 		return $.markAsStructValue(new inner(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["name", "count"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.inner",
 		() => new inner(),
@@ -73,7 +83,13 @@ export class inner {
 }
 
 export class outer {
-	public declare inner: inner | $.VarRef<inner> | null
+	public get inner(): inner | $.VarRef<inner> | null {
+		return this._fields.inner
+	}
+
+	public set inner(value: inner | $.VarRef<inner> | null) {
+		this._fields.inner = value
+	}
 
 	public _fields: {
 		inner: inner | $.VarRef<inner> | null
@@ -87,10 +103,6 @@ export class outer {
 
 	public clone(): outer {
 		return $.markAsStructValue(new outer(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["inner"])
 	}
 
 	static __typeInfo = $.registerStructType(

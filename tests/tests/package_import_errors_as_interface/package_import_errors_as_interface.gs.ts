@@ -18,7 +18,13 @@ $.registerInterfaceType(
 );
 
 export class wrappedHealthError {
-	public declare err: $.GoError
+	public get err(): $.GoError {
+		return this._fields.err
+	}
+
+	public set err(value: $.GoError) {
+		this._fields.err = value
+	}
 
 	public _fields: {
 		err: $.GoError
@@ -47,10 +53,6 @@ export class wrappedHealthError {
 	public Unwrap(): $.GoError {
 		const e: wrappedHealthError | $.VarRef<wrappedHealthError> | null = this;
 		return $.pointerValue<wrappedHealthError>(e).err
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["err"])
 	}
 
 	static __typeInfo = $.registerStructType(

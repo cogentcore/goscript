@@ -4,7 +4,13 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class AsyncResource {
-	public declare name: string
+	public get name(): string {
+		return this._fields.name
+	}
+
+	public set name(value: string) {
+		this._fields.name = value
+	}
 
 	public _fields: {
 		name: string
@@ -28,10 +34,6 @@ export class AsyncResource {
 		})() })
 		await $.chanRecv(ch)
 		await $.println("Released", $.pointerValue<AsyncResource>(r).name)
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["name"])
 	}
 
 	static __typeInfo = $.registerStructType(

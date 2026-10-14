@@ -4,9 +4,21 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class State {
-	public declare value: number
+	public get value(): number {
+		return this._fields.value
+	}
 
-	public declare index: $.VarRef<number> | null
+	public set value(value: number) {
+		this._fields.value = value
+	}
+
+	public get index(): $.VarRef<number> | null {
+		return this._fields.index
+	}
+
+	public set index(value: $.VarRef<number> | null) {
+		this._fields.index = value
+	}
 
 	public _fields: {
 		value: number
@@ -37,10 +49,6 @@ export class State {
 		let s: State | $.VarRef<State> | null = this;
 		// The first body statement begins with a parenthesized pointer expression.
 		$.pointerValue<State>(s).index!.value = -1
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["value", "index"])
 	}
 
 	static __typeInfo = $.registerStructType(

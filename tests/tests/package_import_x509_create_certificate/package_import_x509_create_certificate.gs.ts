@@ -36,9 +36,21 @@ import "@goscript/time/index.js"
 import "@goscript/io/index.js"
 
 export class signedKey {
-	public declare PubKey: $.Slice<number>
+	public get PubKey(): $.Slice<number> {
+		return this._fields.PubKey
+	}
 
-	public declare Signature: $.Slice<number>
+	public set PubKey(value: $.Slice<number>) {
+		this._fields.PubKey = value
+	}
+
+	public get Signature(): $.Slice<number> {
+		return this._fields.Signature
+	}
+
+	public set Signature(value: $.Slice<number>) {
+		this._fields.Signature = value
+	}
 
 	public _fields: {
 		PubKey: $.Slice<number>
@@ -54,10 +66,6 @@ export class signedKey {
 
 	public clone(): signedKey {
 		return $.markAsStructValue(new signedKey(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["PubKey", "Signature"])
 	}
 
 	static __typeInfo = $.registerStructType(

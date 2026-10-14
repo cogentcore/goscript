@@ -45,9 +45,21 @@ $.registerInterfaceType(
 );
 
 export class Action {
-	public declare Result: number
+	public get Result(): number {
+		return this._fields.Result
+	}
 
-	public declare Filter: globalThis.Map<number, dep.Ref | null> | null
+	public set Result(value: number) {
+		this._fields.Result = value
+	}
+
+	public get Filter(): globalThis.Map<number, dep.Ref | null> | null {
+		return this._fields.Filter
+	}
+
+	public set Filter(value: globalThis.Map<number, dep.Ref | null> | null) {
+		this._fields.Filter = value
+	}
 
 	public _fields: {
 		Result: number
@@ -76,10 +88,6 @@ export class Action {
 			$.pointerValue<Action>(a).Filter = $.makeMap<number, dep.Ref | null>()
 		}
 		$.mapSet($.pointerValue<Action>(a).Filter, k, v)
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["Result", "Filter"])
 	}
 
 	static __typeInfo = $.registerStructType(

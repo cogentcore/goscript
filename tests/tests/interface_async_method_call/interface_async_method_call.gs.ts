@@ -25,7 +25,13 @@ $.registerInterfaceType(
 );
 
 export class ChannelProcessor {
-	public declare ch: $.Channel<number> | null
+	public get ch(): $.Channel<number> | null {
+		return this._fields.ch
+	}
+
+	public set ch(value: $.Channel<number> | null) {
+		this._fields.ch = value
+	}
 
 	public _fields: {
 		ch: $.Channel<number> | null
@@ -55,10 +61,6 @@ export class ChannelProcessor {
 		return result * 2
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["ch"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.ChannelProcessor",
 		() => new ChannelProcessor(),
@@ -69,7 +71,13 @@ export class ChannelProcessor {
 }
 
 export class SimpleProcessor {
-	public declare value: number
+	public get value(): number {
+		return this._fields.value
+	}
+
+	public set value(value: number) {
+		this._fields.value = value
+	}
 
 	public _fields: {
 		value: number
@@ -96,10 +104,6 @@ export class SimpleProcessor {
 		return data + 10
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["value"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.SimpleProcessor",
 		() => new SimpleProcessor(),
@@ -110,9 +114,21 @@ export class SimpleProcessor {
 }
 
 export class GenericChannelStore {
-	public declare ch: $.Channel<any> | null
+	public get ch(): $.Channel<any> | null {
+		return this._fields.ch
+	}
 
-	public declare value: any
+	public set ch(value: $.Channel<any> | null) {
+		this._fields.ch = value
+	}
+
+	public get value(): any {
+		return this._fields.value
+	}
+
+	public set value(value: any) {
+		this._fields.value = value
+	}
 
 	public _fields: {
 		ch: $.Channel<any> | null
@@ -134,10 +150,6 @@ export class GenericChannelStore {
 		const s: GenericChannelStore | $.VarRef<GenericChannelStore> | null = this;
 		await $.chanSend($.pointerValue<GenericChannelStore>(s).ch, $.pointerValue<GenericChannelStore>(s).value)
 		return await $.chanRecv($.pointerValue<GenericChannelStore>(s).ch)
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["ch", "value"])
 	}
 
 	static __typeInfo = $.registerStructType(

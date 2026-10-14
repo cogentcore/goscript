@@ -7,7 +7,13 @@ import * as drbg2 from "@goscript/github.com/s4wave/goscript/tests/tests/import_
 import "@goscript/github.com/s4wave/goscript/tests/tests/import_alias_shadowed_by_local/drbg/index.js"
 
 export class local {
-	public declare value: number
+	public get value(): number {
+		return this._fields.value
+	}
+
+	public set value(value: number) {
+		this._fields.value = value
+	}
 
 	public _fields: {
 		value: number
@@ -21,10 +27,6 @@ export class local {
 
 	public clone(): local {
 		return $.markAsStructValue(new local(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["value"])
 	}
 
 	static __typeInfo = $.registerStructType(

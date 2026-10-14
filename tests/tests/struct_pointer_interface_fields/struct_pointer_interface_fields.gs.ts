@@ -14,9 +14,21 @@ $.registerInterfaceType(
 );
 
 export class MyStruct {
-	public declare PointerField: $.VarRef<number> | null
+	public get PointerField(): $.VarRef<number> | null {
+		return this._fields.PointerField
+	}
 
-	public declare interfaceField: MyInterface | null
+	public set PointerField(value: $.VarRef<number> | null) {
+		this._fields.PointerField = value
+	}
+
+	public get interfaceField(): MyInterface | null {
+		return this._fields.interfaceField
+	}
+
+	public set interfaceField(value: MyInterface | null) {
+		this._fields.interfaceField = value
+	}
 
 	public _fields: {
 		PointerField: $.VarRef<number> | null
@@ -32,10 +44,6 @@ export class MyStruct {
 
 	public clone(): MyStruct {
 		return $.markAsStructValue(new MyStruct(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["PointerField", "interfaceField"])
 	}
 
 	static __typeInfo = $.registerStructType(

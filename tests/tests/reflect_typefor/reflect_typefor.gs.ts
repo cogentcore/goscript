@@ -53,9 +53,21 @@ $.registerInterfaceType(
 );
 
 export class MyStruct {
-	public declare Name: string
+	public get Name(): string {
+		return this._fields.Name
+	}
 
-	public declare Age: number
+	public set Name(value: string) {
+		this._fields.Name = value
+	}
+
+	public get Age(): number {
+		return this._fields.Age
+	}
+
+	public set Age(value: number) {
+		this._fields.Age = value
+	}
 
 	public _fields: {
 		Name: string
@@ -71,10 +83,6 @@ export class MyStruct {
 
 	public clone(): MyStruct {
 		return $.markAsStructValue(new MyStruct(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["Name", "Age"])
 	}
 
 	static __typeInfo = $.registerStructType(

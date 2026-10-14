@@ -40,7 +40,13 @@ export class impl {
 }
 
 export class Holder {
-	public declare Hidden: hidden | null
+	public get Hidden(): hidden | null {
+		return this._fields.Hidden
+	}
+
+	public set Hidden(value: hidden | null) {
+		this._fields.Hidden = value
+	}
 
 	public _fields: {
 		Hidden: hidden | null
@@ -54,10 +60,6 @@ export class Holder {
 
 	public clone(): Holder {
 		return $.markAsStructValue(new Holder(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["Hidden"])
 	}
 
 	static __typeInfo = $.registerStructType(

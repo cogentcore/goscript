@@ -26,9 +26,21 @@ $.registerNamedValueType(
 );
 
 export class Hooked {
-	public declare Calls: number
+	public get Calls(): number {
+		return this._fields.Calls
+	}
 
-	public declare Seen: string
+	public set Calls(value: number) {
+		this._fields.Calls = value
+	}
+
+	public get Seen(): string {
+		return this._fields.Seen
+	}
+
+	public set Seen(value: string) {
+		this._fields.Seen = value
+	}
 
 	public _fields: {
 		Calls: number
@@ -53,10 +65,6 @@ export class Hooked {
 		return null
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Calls", "Seen"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.Hooked",
 		() => new Hooked(),
@@ -67,7 +75,13 @@ export class Hooked {
 }
 
 export class Box {
-	public declare Value: Hooked | $.VarRef<Hooked> | null
+	public get Value(): Hooked | $.VarRef<Hooked> | null {
+		return this._fields.Value
+	}
+
+	public set Value(value: Hooked | $.VarRef<Hooked> | null) {
+		this._fields.Value = value
+	}
 
 	public _fields: {
 		Value: Hooked | $.VarRef<Hooked> | null
@@ -83,10 +97,6 @@ export class Box {
 		return $.markAsStructValue(new Box(this))
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Value"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.Box",
 		() => new Box(),
@@ -97,9 +107,21 @@ export class Box {
 }
 
 export class MapItem {
-	public declare Name: string
+	public get Name(): string {
+		return this._fields.Name
+	}
 
-	public declare Map: globalThis.Map<string, number> | null
+	public set Name(value: string) {
+		this._fields.Name = value
+	}
+
+	public get Map(): globalThis.Map<string, number> | null {
+		return this._fields.Map
+	}
+
+	public set Map(value: globalThis.Map<string, number> | null) {
+		this._fields.Map = value
+	}
 
 	public _fields: {
 		Name: string
@@ -115,10 +137,6 @@ export class MapItem {
 
 	public clone(): MapItem {
 		return $.markAsStructValue(new MapItem(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["Name", "Map"])
 	}
 
 	static __typeInfo = $.registerStructType(

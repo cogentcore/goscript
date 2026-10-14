@@ -10,7 +10,13 @@ export type Adder = ((a: number, b: number) => number | globalThis.Promise<numbe
 export type AddFunc = ((a: number, b: number) => number | globalThis.Promise<number>) | null
 
 export class FuncContainer {
-	public declare myFunc: any
+	public get myFunc(): any {
+		return this._fields.myFunc
+	}
+
+	public set myFunc(value: any) {
+		this._fields.myFunc = value
+	}
 
 	public _fields: {
 		myFunc: any
@@ -24,10 +30,6 @@ export class FuncContainer {
 
 	public clone(): FuncContainer {
 		return $.markAsStructValue(new FuncContainer(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["myFunc"])
 	}
 
 	static __typeInfo = $.registerStructType(

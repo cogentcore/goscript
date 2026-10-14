@@ -7,11 +7,29 @@ import * as atomic from "@goscript/sync/atomic/index.js"
 import "@goscript/sync/atomic/index.js"
 
 export class MyStruct {
-	public declare closed: atomic.Bool
+	public get closed(): atomic.Bool {
+		return this._fields.closed
+	}
 
-	public declare count: atomic.Int32
+	public set closed(value: atomic.Bool) {
+		this._fields.closed = value
+	}
 
-	public declare flag: atomic.Uint32
+	public get count(): atomic.Int32 {
+		return this._fields.count
+	}
+
+	public set count(value: atomic.Int32) {
+		this._fields.count = value
+	}
+
+	public get flag(): atomic.Uint32 {
+		return this._fields.flag
+	}
+
+	public set flag(value: atomic.Uint32) {
+		this._fields.flag = value
+	}
 
 	public _fields: {
 		closed: atomic.Bool
@@ -29,10 +47,6 @@ export class MyStruct {
 
 	public clone(): MyStruct {
 		return $.markAsStructValue(new MyStruct(this))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["closed", "count", "flag"])
 	}
 
 	static __typeInfo = $.registerStructType(

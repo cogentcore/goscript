@@ -28,9 +28,21 @@ $.registerInterfaceType(
 );
 
 export class Engineer {
-	public declare Level: Level
+	public get Level(): Level {
+		return this._fields.Level
+	}
 
-	public declare Name: string
+	public set Level(value: Level) {
+		this._fields.Level = value
+	}
+
+	public get Name(): string {
+		return this._fields.Name
+	}
+
+	public set Name(value: string) {
+		this._fields.Name = value
+	}
 
 	public _fields: {
 		Level: Level
@@ -52,10 +64,6 @@ export class Engineer {
 		return Level_Rank(this.Level, prefix)
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Level", "Name"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"main.Engineer",
 		() => new Engineer(),
@@ -66,7 +74,13 @@ export class Engineer {
 }
 
 export class Lead {
-	public declare Engineer: Engineer
+	public get Engineer(): Engineer {
+		return this._fields.Engineer
+	}
+
+	public set Engineer(value: Engineer) {
+		this._fields.Engineer = value
+	}
 
 	public _fields: {
 		Engineer: Engineer
@@ -84,10 +98,6 @@ export class Lead {
 
 	public Rank(prefix: any): any {
 		return Level_Rank($.pointerValue<Engineer>(this.Engineer).Level, prefix)
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["Engineer"])
 	}
 
 	static __typeInfo = $.registerStructType(
