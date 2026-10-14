@@ -92,6 +92,42 @@ function goStringFromBytes(bytes: Uint8Array): string {
   }
 }
 
+// The string view cache remembers, for a few recently used strings, whether
+// each is ASCII (so that its UTF-16 code units are its Go bytes), or else its
+// UTF-8 bytes. Go code commonly takes the length of, indexes, and slices the
+// same string many times in a loop, each of which would otherwise have to
+// scan or encode the whole string, making such loops quadratic.
+const stringViewCacheSize = 8 // must be a power of two
+const stringViewMinLength = 32 // shorter strings are cheap to scan directly
+const stringViewKeys: string[] = new Array<string>(stringViewCacheSize).fill('')
+const stringViewBytes: Array<Uint8Array | null> = new Array<Uint8Array | null>(
+  stringViewCacheSize,
+).fill(null)
+
+// goStringBytesView returns the Go bytes of the given string, or null if it
+// is ASCII, in which case its UTF-16 code units are its bytes. The returned
+// bytes may be shared, so they must not be modified.
+function goStringBytesView(str: GoStringValue): Uint8Array | null {
+  if (str instanceof GoBinaryString) {
+    return str.bytes
+  }
+  if (str.length < stringViewMinLength) {
+    return asciiString.test(str) ? null : goStringBytes(str)
+  }
+  const slot = str.length & (stringViewCacheSize - 1)
+  if (stringViewKeys[slot] === str) {
+    // An equal string may be a different string object, which takes a full
+    // comparison each time, so we keep this one, which is likely to be used
+    // again, so that later comparisons are by identity.
+    stringViewKeys[slot] = str
+    return stringViewBytes[slot]
+  }
+  const bytes = asciiString.test(str) ? null : goStringBytes(str)
+  stringViewKeys[slot] = str
+  stringViewBytes[slot] = bytes
+  return bytes
+}
+
 /**
  * GoSliceObject describes a slice window and its shared backing array.
  */
@@ -2210,47 +2246,41 @@ export const indexString = (
   str: GoStringValue | import('./builtin.js').Bytes,
   index: number,
 ): number => {
-  if (
-    typeof str === 'string' &&
-    Number.isInteger(index) &&
-    asciiString.test(str)
-  ) {
-    if (index < 0 || index >= str.length) {
-      outOfRangeIndex(index, str.length)
+  if (isGoStringValue(str)) {
+    const bytes = goStringBytesView(str)
+    const length = bytes === null ? str.length : bytes.length
+    if (index < 0 || index >= length) {
+      outOfRangeIndex(index, length)
     }
-    return str.charCodeAt(index)
+    if (bytes !== null) {
+      return bytes[index]
+    }
+    return Number.isInteger(index) ?
+        (str as string).charCodeAt(index)
+      : (undefined as unknown as number)
   }
 
-  if (!isGoStringValue(str)) {
-    if (str instanceof Uint8Array) {
-      if (index < 0 || index >= str.length) {
-        outOfRangeIndex(index, str.length)
-      }
-      return str[index]
-    }
-    if (str === null || str === undefined) {
-      outOfRangeIndex(index, 0)
-    }
+  if (str instanceof Uint8Array) {
     if (index < 0 || index >= str.length) {
       outOfRangeIndex(index, str.length)
     }
     return str[index]
   }
-  const bytes = goStringBytes(str)
-  if (index < 0 || index >= bytes.length) {
-    outOfRangeIndex(index, bytes.length)
+  if (str === null || str === undefined) {
+    outOfRangeIndex(index, 0)
   }
-  return bytes[index]
+  if (index < 0 || index >= str.length) {
+    outOfRangeIndex(index, str.length)
+  }
+  return str[index]
 }
 
 /**
  * stringLen returns the Go byte length; ASCII reads allocate no byte buffer.
  */
 export const stringLen = (str: GoStringValue): number => {
-  if (typeof str === 'string' && asciiString.test(str)) {
-    return str.length
-  }
-  return goStringBytes(str).length
+  const bytes = goStringBytesView(str)
+  return bytes === null ? str.length : bytes.length
 }
 
 /**
@@ -2261,23 +2291,23 @@ export const sliceString = (
   low?: number,
   high?: number,
 ): string => {
-  const bytes = goStringBytes(str)
+  const bytes = goStringBytesView(str)
+  const length = bytes === null ? str.length : bytes.length
   const actualLow = low === undefined ? 0 : low
-  const actualHigh = high === undefined ? bytes.length : high
+  const actualHigh = high === undefined ? length : high
 
-  if (actualLow < 0 || actualHigh < actualLow || actualHigh > bytes.length) {
-    if (
-      actualLow === actualHigh &&
-      actualLow >= 0 &&
-      actualLow <= bytes.length
-    ) {
+  if (actualLow < 0 || actualHigh < actualLow || actualHigh > length) {
+    if (actualLow === actualHigh && actualLow >= 0 && actualLow <= length) {
       return ''
     }
     runtimePanic(
-      `runtime error: slice bounds out of range [${actualLow}:${actualHigh}] with length ${bytes.length}`,
+      `runtime error: slice bounds out of range [${actualLow}:${actualHigh}] with length ${length}`,
     )
   }
 
+  if (bytes === null) {
+    return (str as string).slice(actualLow, actualHigh)
+  }
   return goStringFromBytes(bytes.subarray(actualLow, actualHigh))
 }
 

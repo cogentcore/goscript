@@ -15,6 +15,7 @@ import {
   GoBinaryString,
   goSlice,
   indexString,
+  sliceString,
   indexByteString,
   len,
   makeSlice,
@@ -293,6 +294,36 @@ describe('builtin string byte representation', () => {
     const ascii = 'abc'
     stringToBytes(ascii).fill(0)
     expect(indexString(ascii, 0)).toBe(97)
+  })
+
+  it('reads cached long strings correctly across cache slot reuse', () => {
+    // Long strings use a small cache of their ASCII-ness or UTF-8 bytes;
+    // strings whose lengths share a cache slot must not be confused.
+    const values = [
+      'a'.repeat(40),
+      'é'.repeat(20), // 40 UTF-16 units, 40 UTF-8 bytes: same slot as above
+      'x'.repeat(39) + 'é',
+      'b'.repeat(48),
+      bytesToString(new Uint8Array(48).fill(0xff)),
+    ]
+    for (let rep = 0; rep < 2; rep++) {
+      for (const value of values) {
+        const bytes =
+          value.startsWith('\uFDD0') ?
+            stringToBytes(value)
+          : new TextEncoder().encode(value)
+        expect(stringLen(value)).toBe(bytes.length)
+        for (let i = 0; i < bytes.length; i++) {
+          expect(indexString(value, i)).toBe(bytes[i])
+        }
+        expect(stringToBytes(sliceString(value, 2, 10))).toEqual(
+          bytes.subarray(2, 10),
+        )
+        expect(() => indexString(value, bytes.length)).toThrow(
+          `index out of range [${bytes.length}]`,
+        )
+      }
+    }
   })
 
   it('preserves byte-index bounds and non-integer access behavior', () => {
