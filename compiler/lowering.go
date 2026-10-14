@@ -9893,7 +9893,7 @@ func (o *LoweringOwner) lowerFixedCallArgs(
 		allowAsyncCallback := allowAsyncOverrideCallback || o.overrideAwaitsCallback(ctx, call.Fun, param.Name())
 		lowered, exprDiagnostics := o.lowerCallArgExpr(ctx, expr, param.Type(), allowAsyncCallback)
 		diagnostics = append(diagnostics, exprDiagnostics...)
-		if idx < len(paramsReadOnly) && types.Identical(ctx.semPkg.source.TypesInfo.TypeOf(expr), param.Type()) &&
+		if !ctx.copyValues && idx < len(paramsReadOnly) && types.Identical(ctx.semPkg.source.TypesInfo.TypeOf(expr), param.Type()) &&
 			valueReadOnlyArg(ctx, paramsReadOnly[idx], calleeAsync, expr) {
 			args = append(args, lowered)
 			continue
