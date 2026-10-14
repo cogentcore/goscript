@@ -13,16 +13,26 @@ describe('os user directories', () => {
     const originalProcess = (globalThis as { process?: unknown }).process
     try {
       // With no process, as in a browser, the environment is kept in memory.
+      // The empty XDG variables hide the host's, so the directories derive
+      // from HOME.
       ;(globalThis as { process?: unknown }).process = undefined
-      expect(Setenv('HOME', '/home/me')).toBeNull()
-      expect(Setenv('TMPDIR', '/home/me/tmp')).toBeNull()
+      const env = {
+        HOME: '/home/me',
+        TMPDIR: '/home/me/tmp',
+        XDG_CACHE_HOME: '',
+        XDG_CONFIG_HOME: '',
+      }
+      for (const [key, value] of Object.entries(env)) {
+        expect(Setenv(key, value)).toBeNull()
+      }
 
       expect(UserHomeDir()).toEqual(['/home/me', null])
       expect(UserCacheDir()).toEqual(['/home/me/.cache', null])
       expect(UserConfigDir()).toEqual(['/home/me/.config', null])
       expect(TempDir()).toBe('/home/me/tmp')
-      expect(Unsetenv('HOME')).toBeNull()
-      expect(Unsetenv('TMPDIR')).toBeNull()
+      for (const key of Object.keys(env)) {
+        expect(Unsetenv(key)).toBeNull()
+      }
     } finally {
       ;(globalThis as { process?: unknown }).process = originalProcess
     }
