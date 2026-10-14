@@ -480,12 +480,13 @@ function sliceProxyFromBacking<T>(
   offset: number,
   length: number,
   capacity: number,
-  target?: T[],
+  _target?: T[],
 ): SliceProxy<T> {
-  const proxyTargetArray = (target ?? new Array<T>(length)) as SliceProxy<T>
-  proxyTargetArray.length = length
-  // The proxy handler reads indexes from the backing array, so a fresh target
-  // stays sparse until writes create owned elements.
+  // The shared proxy handlers find a slice's window on its target, so each
+  // slice has a target of its own, even where it shares its backing array
+  // with an earlier slice. The handlers read elements and the length from
+  // the window, so the target stays empty.
+  const proxyTargetArray = [] as unknown as SliceProxy<T>
   proxyTargetArray.__meta__ = { backing, offset, length, capacity }
   return wrapSliceProxy(proxyTargetArray)
 }
