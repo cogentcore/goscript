@@ -12,7 +12,13 @@ import "@goscript/fmt/index.js"
 import "@goscript/runtime/trace/index.js"
 
 export class byteSink {
-	public declare data: $.Slice<number>
+	public get data(): $.Slice<number> {
+		return this._fields.data
+	}
+
+	public set data(value: $.Slice<number>) {
+		this._fields.data = value
+	}
 
 	public _fields: {
 		data: $.Slice<number>
@@ -28,20 +34,22 @@ export class byteSink {
 		return $.markAsStructValue(new byteSink(this))
 	}
 
+	public __goscriptAssign(source: byteSink): void {
+		const target = this._fields
+		const values = source._fields
+		target.data = values.data
+	}
+
 	public Write(p: $.Slice<number>): [number, $.GoError] {
 		let s: byteSink | $.VarRef<byteSink> | null = this;
 		$.pointerValue<byteSink>(s).data = $.appendSlice($.pointerValue<byteSink>(s).data, p, $.byteSliceHint)
-		return [$.len(p), null]
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["data"])
+		return [$.sliceLen(p), null]
 	}
 
 	static __typeInfo = $.registerStructType(
 		"main.byteSink",
 		() => new byteSink(),
-		() => [{ name: "Write", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("int") }, { type: "error" }] }],
+		() => [{ name: "Write", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("int") }, { type: "error" }], pointerReceiver: true }],
 		byteSink,
 		() => [{ name: "data", key: "data", type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }]
 	)
@@ -50,9 +58,9 @@ export class byteSink {
 export const hexDigits: string = "0123456789abcdef"
 
 export function toHex(b: $.Slice<number>): string {
-	let out: $.Slice<number> = $.makeSlice<number>($.len(b) * 2, undefined, "byte")
-	for (let __goscriptRangeTarget0 = b, i = 0; i < $.len(__goscriptRangeTarget0); i++) {
-		let c = $.uint(__goscriptRangeTarget0![i], 8)
+	let out: $.Slice<number> = $.makeSlice<number>($.sliceLen(b) * 2, undefined, "byte")
+	for (let __goscriptRangeTarget0 = b, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), i = 0; i < __goscriptRangeWindow0.length; i++) {
+		let c = $.uint((__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + i] as number), 8)
 		out![i * 2] = $.uint($.indexByteString("\x30\x31\x32\x33\x34\x35\x36\x37\x38\x39\x61\x62\x63\x64\x65\x66", $.uintShr(c, 4, 8)), 8)
 		out![(i * 2) + 1] = $.uint($.indexByteString("\x30\x31\x32\x33\x34\x35\x36\x37\x38\x39\x61\x62\x63\x64\x65\x66", c & 0x0f), 8)
 	}
@@ -64,7 +72,7 @@ export async function main(): globalThis.Promise<void> {
 	{
 		let err = trace.Start($.pointerValueOrNil($.interfaceValue<io.Writer | null>(sink, "*main.byteSink", /* @__PURE__ */ $.pointerType("main.byteSink")))!)
 		if (err != null) {
-			await fmt.Println($.concatString("ERROR:", await $.pointerValue<Exclude<$.GoError, null>>(err).Error()))
+			await fmt.Println($.concatString("ERROR:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)))
 			return
 		}
 	}
@@ -72,6 +80,8 @@ export async function main(): globalThis.Promise<void> {
 
 	await fmt.Println(toHex($.pointerValue<byteSink>(sink).data))
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()
