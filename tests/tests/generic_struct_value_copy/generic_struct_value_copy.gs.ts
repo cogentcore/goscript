@@ -209,7 +209,7 @@ export function store(__typeArgs: $.GenericTypeArgs | undefined, dst: any, v: an
 export function fill<T>(__typeArgs: $.GenericTypeArgs | undefined, n: number, v: any): $.Slice<T> {
 	let r: $.Slice<T> = $.makeSlice<T>(n, undefined, undefined, () => ($.genericZero(__typeArgs, "T", null) as T))
 	for (let __goscriptRangeTarget0 = r, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), i = 0; i < __goscriptRangeWindow0.length; i++) {
-		r![i] = $.copyElement(v)
+		(__goscriptRangeWindow0.backing as any[])[__goscriptRangeWindow0.offset + i] = $.copyElement(v)
 	}
 	return r
 }

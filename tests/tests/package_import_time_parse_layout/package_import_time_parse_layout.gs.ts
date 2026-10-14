@@ -18,11 +18,11 @@ export async function main(): globalThis.Promise<void> {
 	let local: time.Location | $.VarRef<time.Location> | null = time.FixedZone("local", 0)
 	let layouts: $.Slice<string> = $.arrayToSlice<string>([time.RFC3339Nano, "2006-01-02T15:04:05.999999999", "2006-01-02", "15:04:05.999999999", "2006-01-02T15:04Z07:00", "2006-01-02T15:04", "15:04"])
 	let values: $.Slice<string> = $.arrayToSlice<string>(["1979-05-27T07:32:00Z", "1979-05-27T00:32:00.999999-07:00", "1979-05-27T07:32:00", "1979-05-27T00:32:00.5", "1979-05-27", "07:32:00", "00:32:00.999999", "1979-05-27T07:32Z", "1979-05-27T07:32", "07:32", "1979-05-27 07:32:00"])
-	for (let __goscriptRangeTarget1 = values, __goscriptRangeWindow1 = $.sliceRange(__goscriptRangeTarget1), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow1.length; __rangeIndex++) {
-		let v = (__goscriptRangeWindow1.backing[__goscriptRangeWindow1.offset + __rangeIndex] as string)
+	for (let __goscriptRangeTarget1 = values, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget1), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
+		let v = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as string)
 		let matched = false
-		for (let __goscriptRangeTarget0 = layouts, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
-			let l = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as string)
+		for (let __goscriptRangeTarget0 = layouts, __goscriptRangeWindow1 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow1.length; __rangeIndex++) {
+			let l = (__goscriptRangeWindow1.backing[__goscriptRangeWindow1.offset + __rangeIndex] as string)
 			let [t, err] = time.ParseInLocation(l, v, local)
 			if (err != null) {
 				continue

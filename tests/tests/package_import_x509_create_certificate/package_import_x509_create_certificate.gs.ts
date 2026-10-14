@@ -121,12 +121,12 @@ export async function main(): globalThis.Promise<void> {
 		return
 	}
 	let keyExt: pkix.Extension = $.markAsStructValue(new pkix.Extension())
-	for (let __goscriptRangeTarget1 = $.pointerValue<x509.Certificate>(cert).Extensions, __goscriptRangeWindow1 = $.sliceRange(__goscriptRangeTarget1), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow1.length; __rangeIndex++) {
-		let ext = $.markAsStructValue($.cloneStructValue((__goscriptRangeWindow1.backing[__goscriptRangeWindow1.offset + __rangeIndex] as pkix.Extension)))
+	for (let __goscriptRangeTarget1 = $.pointerValue<x509.Certificate>(cert).Extensions, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget1), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
+		let ext = $.markAsStructValue($.cloneStructValue((__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as pkix.Extension)))
 		if (asn1.ObjectIdentifier_Equal(ext.Id, (extensionID as asn1.ObjectIdentifier))) {
 			$.assignStruct(keyExt, $.markAsStructValue($.cloneStructValue(ext)))
-			for (let __goscriptRangeTarget0 = $.pointerValue<x509.Certificate>(cert).UnhandledCriticalExtensions, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), idx = 0; idx < __goscriptRangeWindow0.length; idx++) {
-				let unhandled = ((__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + idx] as asn1.ObjectIdentifier) as asn1.ObjectIdentifier)
+			for (let __goscriptRangeTarget0 = $.pointerValue<x509.Certificate>(cert).UnhandledCriticalExtensions, __goscriptRangeWindow1 = $.sliceRange(__goscriptRangeTarget0), idx = 0; idx < __goscriptRangeWindow1.length; idx++) {
+				let unhandled = ((__goscriptRangeWindow1.backing[__goscriptRangeWindow1.offset + idx] as asn1.ObjectIdentifier) as asn1.ObjectIdentifier)
 				if (asn1.ObjectIdentifier_Equal(unhandled, (extensionID as asn1.ObjectIdentifier))) {
 					$.pointerValue<x509.Certificate>(cert).UnhandledCriticalExtensions = (slices.Delete($.pointerValue<x509.Certificate>(cert).UnhandledCriticalExtensions, idx, idx + 1) as $.Slice<asn1.ObjectIdentifier>)
 					break

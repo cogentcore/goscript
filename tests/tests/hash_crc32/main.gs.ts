@@ -31,15 +31,15 @@ export async function main(): globalThis.Promise<void> {
 
 	let payload: $.Slice<number> = $.makeSlice<number>(257, undefined, "byte")
 	for (let __goscriptRangeTarget0 = payload, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), i = 0; i < __goscriptRangeWindow0.length; i++) {
-		payload![i] = $.uint($.uint(((i * 31) + (globalThis.Math.trunc(i / 3))) + 7, 8), 8)
+		(__goscriptRangeWindow0.backing as any[])[__goscriptRangeWindow0.offset + i] = $.uint($.uint(((i * 31) + (globalThis.Math.trunc(i / 3))) + 7, 8), 8)
 	}
 
 	let tables: $.Slice<{"name": string, "table": $.VarRef<crc32.Table> | null}> = $.arrayToSlice<{"name": string, "table": $.VarRef<crc32.Table> | null}>([$.anonymousStructValue({name: "ieee", table: crc32.IEEETable}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("name", /* @__PURE__ */ $.basicType("string"), [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/hash_crc32" }), /* @__PURE__ */ $.structField("table", /* @__PURE__ */ $.pointerType("crc32.Table"), [1], 16, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/hash_crc32" })] }), $.anonymousStructValue({name: "castagnoli", table: crc32.MakeTable(2197175160)}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("name", /* @__PURE__ */ $.basicType("string"), [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/hash_crc32" }), /* @__PURE__ */ $.structField("table", /* @__PURE__ */ $.pointerType("crc32.Table"), [1], 16, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/hash_crc32" })] }), $.anonymousStructValue({name: "koopman", table: crc32.MakeTable(3945912366)}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("name", /* @__PURE__ */ $.basicType("string"), [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/hash_crc32" }), /* @__PURE__ */ $.structField("table", /* @__PURE__ */ $.pointerType("crc32.Table"), [1], 16, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/hash_crc32" })] }), $.anonymousStructValue({name: "custom", table: crc32.MakeTable(0xd5828281)}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("name", /* @__PURE__ */ $.basicType("string"), [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/hash_crc32" }), /* @__PURE__ */ $.structField("table", /* @__PURE__ */ $.pointerType("crc32.Table"), [1], 16, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/hash_crc32" })] })])
 	let lengths: $.Slice<number> = $.arrayToSlice<number>([0, 1, 7, 8, 9, 15, 16, 17, $.sliceLen(payload)])
-	for (let __goscriptRangeTarget2 = tables, __goscriptRangeWindow2 = $.sliceRange(__goscriptRangeTarget2), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow2.length; __rangeIndex++) {
-		let tc = $.markAsStructValue($.cloneStructValue((__goscriptRangeWindow2.backing[__goscriptRangeWindow2.offset + __rangeIndex] as {"name": string, "table": $.VarRef<crc32.Table> | null})))
-		for (let __goscriptRangeTarget1 = lengths, __goscriptRangeWindow1 = $.sliceRange(__goscriptRangeTarget1), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow1.length; __rangeIndex++) {
-			let length = (__goscriptRangeWindow1.backing[__goscriptRangeWindow1.offset + __rangeIndex] as number)
+	for (let __goscriptRangeTarget2 = tables, __goscriptRangeWindow1 = $.sliceRange(__goscriptRangeTarget2), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow1.length; __rangeIndex++) {
+		let tc = $.markAsStructValue($.cloneStructValue((__goscriptRangeWindow1.backing[__goscriptRangeWindow1.offset + __rangeIndex] as {"name": string, "table": $.VarRef<crc32.Table> | null})))
+		for (let __goscriptRangeTarget1 = lengths, __goscriptRangeWindow2 = $.sliceRange(__goscriptRangeTarget1), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow2.length; __rangeIndex++) {
+			let length = (__goscriptRangeWindow2.backing[__goscriptRangeWindow2.offset + __rangeIndex] as number)
 			let data: $.Slice<number> = $.goSlice(payload, undefined, length)
 			let oneShot = $.uint(crc32.Checksum(data, tc.table), 32)
 			let split = globalThis.Math.trunc(length / 2)
@@ -114,7 +114,7 @@ export async function main(): globalThis.Promise<void> {
 		$.panic("AppendBinary")
 	}
 	for (let __goscriptRangeTarget3 = state, __goscriptRangeWindow3 = $.sliceRange(__goscriptRangeTarget3), i = 0; i < __goscriptRangeWindow3.length; i++) {
-		if ($.uint($.arrayIndex(appended!, i + 2), 8) != $.uint($.arrayIndex(state!, i), 8)) {
+		if ($.uint($.arrayIndex(appended!, i + 2), 8) != $.uint(((__goscriptRangeWindow3.backing as any[])[__goscriptRangeWindow3.offset + i] as number), 8)) {
 			$.panic("AppendBinary state")
 		}
 	}

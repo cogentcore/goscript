@@ -1661,20 +1661,24 @@ type lowerFileContext struct {
 	protobufGeneratedSyncFunction bool
 	functionTypeDepth             int
 	deferState                    *loweredDeferState
-	rangeBranch                   *loweredRangeBranch
-	rangeBreak                    bool
-	rangeContinue                 bool
-	gotoLabels                    map[string]bool
-	forwardGotos                  map[string]bool
-	gotoStateLabels               map[string]bool
-	gotoStateVar                  string
-	gotoStateLoop                 string
-	functionScopedDecls           bool
-	loopLabel                     string
-	switchBreak                   bool
-	topLevel                      bool
-	protobufTSAdapter             bool
-	trimTypeInfo                  bool
+	// rangeElements are the slices that enclosing range loops index by their
+	// own index variable, whose elements s[i] read and write the loop's
+	// window directly (see rangeWindowElement).
+	rangeElements       []rangeElementAccess
+	rangeBranch         *loweredRangeBranch
+	rangeBreak          bool
+	rangeContinue       bool
+	gotoLabels          map[string]bool
+	forwardGotos        map[string]bool
+	gotoStateLabels     map[string]bool
+	gotoStateVar        string
+	gotoStateLoop       string
+	functionScopedDecls bool
+	loopLabel           string
+	switchBreak         bool
+	topLevel            bool
+	protobufTSAdapter   bool
+	trimTypeInfo        bool
 	// statics holds the static expressions of the file hoisted out of the
 	// code that would evaluate them each time (see hoistStatic).
 	statics *staticPool
@@ -7420,11 +7424,6 @@ func (o *LoweringOwner) lowerRangeStmt(ctx lowerFileContext, stmt *ast.RangeStmt
 		return lowered, diagnostics
 	}
 
-	body, bodyDiagnostics := o.lowerBlock(bodyCtx.withoutRangeLoopBranches(), stmt.Body)
-	diagnostics = append(diagnostics, bodyDiagnostics...)
-	rangeTarget := ctx.tempName("RangeTarget")
-	rangeTargetValue := o.lowerArrayPointerTarget(ctx, rangeValue, rangeType)
-
 	// The window of the slice or array is read once, as Go evaluates the
 	// length once, and its elements are read from its backing array
 	// directly, which is much faster than through a slice proxy.
@@ -7433,6 +7432,14 @@ func (o *LoweringOwner) lowerRangeStmt(ctx lowerFileContext, stmt *ast.RangeStmt
 	if indexName == "" {
 		indexName = "__rangeIndex"
 	}
+	loopCtx := bodyCtx.withoutRangeLoopBranches()
+	if access, ok := rangeElementAccessFor(ctx, stmt, rangeType, rangeWindow, indexName); ok {
+		loopCtx.rangeElements = append(append([]rangeElementAccess(nil), ctx.rangeElements...), access)
+	}
+	body, bodyDiagnostics := o.lowerBlock(loopCtx, stmt.Body)
+	diagnostics = append(diagnostics, bodyDiagnostics...)
+	rangeTarget := ctx.tempName("RangeTarget")
+	rangeTargetValue := o.lowerArrayPointerTarget(ctx, rangeValue, rangeType)
 	children := body
 	if valueName != "" {
 		// The value variable holds a copy of the element, so struct and array
@@ -7455,6 +7462,143 @@ func (o *LoweringOwner) lowerRangeStmt(ctx lowerFileContext, stmt *ast.RangeStmt
 			indexName + " = 0; " + indexName + " < " + rangeWindow + ".length; " + indexName + "++)",
 		children: children,
 	}, diagnostics
+}
+
+// rangeElementAccess is a slice variable that a range loop over it indexes
+// by the loop's index variable.
+type rangeElementAccess struct {
+	slice  types.Object
+	index  types.Object
+	window string
+	name   string
+}
+
+// rangeElementAccessFor returns the element access of a range loop over a
+// slice variable, by an index variable that the loop declares, when the body
+// never assigns either variable, so that s[i] is always in the window that
+// the loop read.
+func rangeElementAccessFor(ctx lowerFileContext, stmt *ast.RangeStmt, rangeType types.Type, window string, indexName string) (rangeElementAccess, bool) {
+	if _, ok := types.Unalias(rangeType).Underlying().(*types.Slice); !ok || stmt.Tok != token.DEFINE || stmt.Key == nil {
+		return rangeElementAccess{}, false
+	}
+	info := ctx.semPkg.source.TypesInfo
+	sliceIdent, ok := ast.Unparen(stmt.X).(*ast.Ident)
+	if !ok {
+		return rangeElementAccess{}, false
+	}
+	slice, ok := info.Uses[sliceIdent].(*types.Var)
+	keyIdent, keyOK := stmt.Key.(*ast.Ident)
+	if !ok || !keyOK || keyIdent.Name == "_" || ctx.model.needsVarRef[slice] {
+		return rangeElementAccess{}, false
+	}
+	index := info.Defs[keyIdent]
+	if index == nil || ctx.model.needsVarRef[index] || ctx.lazyPackageVars[slice] {
+		return rangeElementAccess{}, false
+	}
+	assigned := false
+	ast.Inspect(stmt.Body, func(node ast.Node) bool {
+		switch typed := node.(type) {
+		case *ast.AssignStmt:
+			for _, lhs := range typed.Lhs {
+				if ident, ok := ast.Unparen(lhs).(*ast.Ident); ok {
+					if obj := info.ObjectOf(ident); obj == slice || obj == index {
+						assigned = true
+					}
+				}
+			}
+		case *ast.IncDecStmt:
+			if ident, ok := ast.Unparen(typed.X).(*ast.Ident); ok {
+				if obj := info.ObjectOf(ident); obj == slice || obj == index {
+					assigned = true
+				}
+			}
+		case *ast.UnaryExpr:
+			if ident, ok := ast.Unparen(typed.X).(*ast.Ident); ok && typed.Op == token.AND {
+				if obj := info.ObjectOf(ident); obj == slice || obj == index {
+					assigned = true
+				}
+			}
+		case *ast.RangeStmt:
+			for _, expr := range []ast.Expr{typed.Key, typed.Value} {
+				if ident, ok := expr.(*ast.Ident); ok && typed.Tok == token.ASSIGN {
+					if obj := info.ObjectOf(ident); obj == slice || obj == index {
+						assigned = true
+					}
+				}
+			}
+		}
+		return !assigned
+	})
+	if assigned || sliceAssignedInFuncLit(ctx, stmt, slice) {
+		return rangeElementAccess{}, false
+	}
+	return rangeElementAccess{slice: slice, index: index, window: window, name: indexName}, true
+}
+
+// sliceAssignedInFuncLit reports whether a function literal in the function
+// that contains stmt assigns the variable slice, which the loop body could
+// call.
+func sliceAssignedInFuncLit(ctx lowerFileContext, stmt ast.Stmt, slice types.Object) bool {
+	if ctx.file == nil {
+		return true
+	}
+	path, _ := astutil.PathEnclosingInterval(ctx.file, stmt.Pos(), stmt.End())
+	var outer ast.Node
+	for _, node := range path {
+		switch node.(type) {
+		case *ast.FuncDecl, *ast.FuncLit:
+			outer = node
+		}
+	}
+	if outer == nil {
+		return true
+	}
+	info := ctx.semPkg.source.TypesInfo
+	assigned := false
+	ast.Inspect(outer, func(node ast.Node) bool {
+		lit, ok := node.(*ast.FuncLit)
+		if !ok || assigned {
+			return !assigned
+		}
+		ast.Inspect(lit.Body, func(node ast.Node) bool {
+			if assign, ok := node.(*ast.AssignStmt); ok {
+				for _, lhs := range assign.Lhs {
+					if ident, ok := ast.Unparen(lhs).(*ast.Ident); ok && info.ObjectOf(ident) == slice {
+						assigned = true
+					}
+				}
+			}
+			return !assigned
+		})
+		return false
+	})
+	return assigned
+}
+
+// rangeWindowElement returns the element s[i] of an enclosing range loop's
+// window, read or written in place, for a slice and index variable of the
+// loop (see rangeElementAccessFor).
+func rangeWindowElement(ctx lowerFileContext, expr *ast.IndexExpr) (string, bool) {
+	if len(ctx.rangeElements) == 0 {
+		return "", false
+	}
+	sliceIdent, ok := ast.Unparen(expr.X).(*ast.Ident)
+	if !ok {
+		return "", false
+	}
+	indexIdent, ok := ast.Unparen(expr.Index).(*ast.Ident)
+	if !ok {
+		return "", false
+	}
+	info := ctx.semPkg.source.TypesInfo
+	slice, index := info.Uses[sliceIdent], info.Uses[indexIdent]
+	for idx := len(ctx.rangeElements) - 1; idx >= 0; idx-- {
+		access := ctx.rangeElements[idx]
+		if access.slice == slice && access.index == index {
+			return "(" + access.window + ".backing as any[])[" + access.window + ".offset + " + access.name + "]", true
+		}
+	}
+	return "", false
 }
 
 func (o *LoweringOwner) lowerRangeDeclShadowAliases(
@@ -11184,6 +11328,9 @@ func (o *LoweringOwner) lowerAssignmentTarget(
 		if isStringType(targetType) || isMapType(targetType) {
 			return o.lowerExpr(ctx, expr)
 		}
+		if element, ok := rangeWindowElement(ctx, typed); ok {
+			return element, nil
+		}
 		target, targetDiagnostics := o.lowerExpr(ctx, typed.X)
 		index, indexDiagnostics := o.lowerExpr(ctx, typed.Index)
 		diagnostics := append(targetDiagnostics, indexDiagnostics...)
@@ -11987,6 +12134,10 @@ func exprContainsUnsafePointerConversion(ctx lowerFileContext, expr ast.Expr) bo
 func (o *LoweringOwner) lowerIndexExpr(ctx lowerFileContext, expr *ast.IndexExpr) (string, []Diagnostic) {
 	if signature := genericFunctionSignature(ctx, expr.X); signature != nil {
 		return o.lowerGenericFunctionValue(ctx, expr.X, []ast.Expr{expr.Index}, signature)
+	}
+	if element, ok := rangeWindowElement(ctx, expr); ok {
+		elemType := ctx.semPkg.source.TypesInfo.TypeOf(expr)
+		return "(" + element + " as " + o.tsTypeFor(ctx, elemType) + ")", nil
 	}
 	target, targetDiagnostics := o.lowerExpr(ctx, expr.X)
 	index, indexDiagnostics := o.lowerExpr(ctx, expr.Index)

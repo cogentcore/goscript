@@ -202,7 +202,7 @@ export async function main(): globalThis.Promise<void> {
 	let aead = $.interfaceValue<cipher.AEAD | null>(new wrappedAEAD({inner: inner}), "*main.wrappedAEAD", /* @__PURE__ */ $.pointerType("main.wrappedAEAD"))
 	let plaintext: $.Slice<number> = $.makeSlice<number>(695, undefined, "byte")
 	for (let __goscriptRangeTarget1 = plaintext, __goscriptRangeWindow1 = $.sliceRange(__goscriptRangeTarget1), i = 0; i < __goscriptRangeWindow1.length; i++) {
-		plaintext![i] = $.uint($.uint(i, 8), 8)
+		(__goscriptRangeWindow1.backing as any[])[__goscriptRangeWindow1.offset + i] = $.uint($.uint(i, 8), 8)
 	}
 	let packet: $.Slice<number> = (makeGeneric(__goscriptStatic0(), 15 + $.sliceLen(plaintext), 1452) as $.Slice<number>)
 	let nonce: $.Slice<number> = new Uint8Array([49, 50, 51, 52, 53, 54, 55, 56, 57, 48, 49, 50])
