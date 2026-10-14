@@ -1,3 +1,4 @@
+import { isArrayOrGoSlice } from './slice.js'
 import { isVarRef, varRef, type VarRef } from './varRef.js'
 import { runtimePanic } from './panic.js'
 
@@ -76,7 +77,7 @@ function methodParameters(
   prefix: string,
 ): MethodArg[] {
   return parameters.map((parameter, index) =>
-    Array.isArray(parameter) ?
+    isArrayOrGoSlice(parameter) ?
       { name: parameter[0], type: parameter[1] }
     : { name: prefix + index, type: parameter },
   )
@@ -1198,7 +1199,7 @@ function matchesMapType(value: any, info: TypeInfo): boolean {
   // A Go slice/array is never a map, even though Object.entries() of a
   // plain JS array yields string-indexed pairs that would otherwise pass
   // the key/elem sampling below.
-  if (Array.isArray(value) || value instanceof Uint8Array) return false
+  if (isArrayOrGoSlice(value) || value instanceof Uint8Array) return false
   if (!isMapTypeInfo(info)) return false
 
   if (info.keyType || info.elemType) {
@@ -1250,7 +1251,7 @@ function matchesArrayOrSliceType(value: any, info: TypeInfo): boolean {
     return isNumberElementType(info.elemType)
   }
 
-  if (!Array.isArray(value)) return false
+  if (!isArrayOrGoSlice(value)) return false
 
   if (info.elemType) {
     const arr = value as any[]
@@ -1556,7 +1557,7 @@ export function cloneArrayValue<T>(value: T, typeInfo?: string | TypeInfo): T {
   if (value instanceof Uint8Array) {
     return arrayValue(value.slice()) as T
   }
-  if (!Array.isArray(value)) {
+  if (!isArrayOrGoSlice(value)) {
     return value
   }
 
@@ -2060,7 +2061,7 @@ export function typeAssert<T>(
     typeof value === 'object' &&
     value !== null &&
     // A Go slice/array is never a map; see matchesMapType above.
-    !Array.isArray(value) &&
+    !isArrayOrGoSlice(value) &&
     !(value instanceof Uint8Array)
   ) {
     if (normalizedType.keyType || normalizedType.elemType) {

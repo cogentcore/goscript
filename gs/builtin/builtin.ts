@@ -1,3 +1,4 @@
+import { GoSlice, isArrayOrGoSlice } from './slice.js'
 import type { Slice, SliceProxy, StringHeaderData } from './slice.js'
 import {
   arrayValueTypeInfo,
@@ -39,9 +40,12 @@ export async function println(...args: any[]): Promise<void> {
  * clear zeroes slice elements or removes every map entry.
  */
 export function clear<T>(v: Slice<T> | Map<unknown, unknown> | null): void {
+  // A nil slice or map has nothing to clear.
   if (v === null || v === undefined) {
     return
   }
+
+  // A map loses its entries, and a byte slice is zeroed in place.
   if (v instanceof Map) {
     v.clear()
     return
@@ -50,13 +54,18 @@ export function clear<T>(v: Slice<T> | Map<unknown, unknown> | null): void {
     v.fill(0)
     return
   }
+
+  // A window zeroes its part of the backing array.
   if (isSliceProxy(v)) {
-    const zero = clearZeroValue(v)
-    for (let i = 0; i < v.length; i++) {
-      v[i] = zero
+    const meta = v.__meta__
+    const zero = clearZeroValue(meta.backing as T[])
+    for (let i = 0; i < meta.length; i++) {
+      meta.backing[meta.offset + i] = zero
     }
     return
   }
+
+  // An array is zeroed in place.
   if (Array.isArray(v)) {
     v.fill(clearZeroValue(v))
     return
@@ -415,7 +424,7 @@ export function structEqual(
 }
 
 function isArrayLike(value: unknown): value is ArrayLike<unknown> {
-  return Array.isArray(value) || value instanceof Uint8Array
+  return isArrayOrGoSlice(value) || value instanceof Uint8Array
 }
 
 function hasGoType(value: unknown): value is {
@@ -467,7 +476,9 @@ function isStructValue(value: unknown): value is {
     typeof value === 'object' && value !== null ?
       (value as { _fields?: unknown })._fields
     : undefined
-  return typeof fields === 'object' && fields !== null && !Array.isArray(fields)
+  return (
+    typeof fields === 'object' && fields !== null && !isArrayOrGoSlice(fields)
+  )
 }
 
 function fieldsEqual(
@@ -986,29 +997,41 @@ function uint64Result(value: bigint): bigint {
  * Null inputs produce an empty byte array; unsupported inputs throw.
  */
 export function normalizeBytes(
-  bytes: Uint8Array | number[] | null | undefined | { data: number[] },
+  bytes:
+    | Uint8Array
+    | number[]
+    | SliceProxy<number>
+    | null
+    | undefined
+    | { data: number[] },
 ): Uint8Array {
+  // Nil is empty, and a byte array is kept as it is.
   if (bytes === null || bytes === undefined) {
     return new Uint8Array(0)
   }
-
   if (bytes instanceof Uint8Array) {
     return bytes
   }
 
+  // An object with a data array copies the data.
   if (
     bytes &&
     typeof bytes === 'object' &&
     'data' in bytes &&
-    Array.isArray(bytes.data)
+    isArrayOrGoSlice(bytes.data)
   ) {
     return new Uint8Array(bytes.data)
   }
 
+  // An array or a window copies its elements.
   if (Array.isArray(bytes)) {
     return new Uint8Array(bytes)
   }
+  if (bytes instanceof GoSlice) {
+    return new Uint8Array(bytes.window())
+  }
 
+  // Nothing else holds bytes.
   throw new Error(`Cannot normalize bytes of type ${typeof bytes}: ${bytes}`)
 }
 
@@ -1036,7 +1059,7 @@ export function sortSlice<T extends string | number | bigint>(
     return
   }
 
-  if (Array.isArray(s)) {
+  if (isArrayOrGoSlice(s)) {
     s.sort(ascendingOrdered)
     return
   }
@@ -1141,7 +1164,7 @@ export function bytesToArray(bytes: Bytes | null): number[] {
     return meta.backing.slice(meta.offset, meta.offset + meta.length)
   }
 
-  if (Array.isArray(bytes)) {
+  if (isArrayOrGoSlice(bytes)) {
     return bytes
   }
 
@@ -1202,7 +1225,7 @@ function byteView(bytes: Bytes | null): ByteView {
     const meta = (bytes as SliceProxy<number>).__meta__
     return { data: meta.backing, off: meta.offset, len: meta.length }
   }
-  if (Array.isArray(bytes)) {
+  if (isArrayOrGoSlice(bytes)) {
     return { data: bytes, off: 0, len: bytes.length }
   }
   throw new Error(`Cannot convert bytes of type ${typeof bytes} to array`)
