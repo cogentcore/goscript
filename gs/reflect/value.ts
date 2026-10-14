@@ -251,18 +251,19 @@ function fieldPointerAtOffset(
   const structType = v.Type()
   for (let i = 0; i < structType.NumField(); i++) {
     const field = structType.Field(i)
+    const fieldType = field.Type!
     const start = field.Offset
-    if (offset < start || offset >= start + Math.max(field.Type.Size(), 1)) {
+    if (offset < start || offset >= start + Math.max(fieldType.Size(), 1)) {
       continue
     }
     const fieldValue = v.Field(i)
     if (
       offset === start &&
-      typeIdentityKey(field.Type) === typeIdentityKey(typ)
+      typeIdentityKey(fieldType) === typeIdentityKey(typ)
     ) {
       return fieldValue.Addr()
     }
-    if (field.Type.Kind() === Struct) {
+    if (fieldType.Kind() === Struct) {
       return fieldPointerAtOffset(fieldValue, typ, offset - start)
     }
   }
