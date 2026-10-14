@@ -24,14 +24,15 @@ export class byteSink {
 		data: $.Slice<number>
 	}
 
-	constructor(init?: Partial<{data?: $.Slice<number>}>) {
+	constructor(init?: Partial<{data?: $.Slice<number>}>, __goscriptValue?: boolean) {
 		this._fields = {
 			data: init?.data ?? (null! as $.Slice<number>)
 		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): byteSink {
-		return $.markAsStructValue(new byteSink(this))
+		return new byteSink(this, true)
 	}
 
 	public __goscriptAssign(source: byteSink): void {
@@ -42,7 +43,8 @@ export class byteSink {
 
 	public Write(p: $.Slice<number>): [number, $.GoError] {
 		let s: byteSink | $.VarRef<byteSink> | null = this;
-		$.pointerValue<byteSink>(s).data = $.appendSlice($.pointerValue<byteSink>(s).data, p, $.byteSliceHint)
+		const s$ = $.pointerTarget<byteSink>(s);
+		;(s$ as byteSink).data = $.appendSlice((s$ as byteSink).data, p, $.byteSliceHint)
 		return [$.sliceLen(p), null]
 	}
 
@@ -61,8 +63,8 @@ export function toHex(b: $.Slice<number>): string {
 	let out: $.Slice<number> = $.makeSlice<number>($.sliceLen(b) * 2, undefined, "byte")
 	for (let __goscriptRangeTarget0 = b, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), i = 0; i < __goscriptRangeWindow0.length; i++) {
 		let c = $.uint((__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + i] as number), 8)
-		out![i * 2] = $.uint($.indexByteString("\x30\x31\x32\x33\x34\x35\x36\x37\x38\x39\x61\x62\x63\x64\x65\x66", $.uintShr(c, 4, 8)), 8)
-		out![(i * 2) + 1] = $.uint($.indexByteString("\x30\x31\x32\x33\x34\x35\x36\x37\x38\x39\x61\x62\x63\x64\x65\x66", c & 0x0f), 8)
+		out![i * 2] = $.indexByteString("\x30\x31\x32\x33\x34\x35\x36\x37\x38\x39\x61\x62\x63\x64\x65\x66", $.uintShr(c, 4, 8))
+		out![(i * 2) + 1] = $.indexByteString("\x30\x31\x32\x33\x34\x35\x36\x37\x38\x39\x61\x62\x63\x64\x65\x66", c & 0x0f)
 	}
 	return $.bytesToString(out)
 }
