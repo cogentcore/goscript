@@ -7746,6 +7746,7 @@ func (o *LoweringOwner) lowerRangeStmt(ctx lowerFileContext, stmt *ast.RangeStmt
 		}, diagnostics
 	}
 	if isStringType(rangeType) {
+		// The body is lowered first, and the key and value get names.
 		body, bodyDiagnostics := o.lowerBlock(bodyCtx.withoutRangeLoopBranches(), stmt.Body)
 		diagnostics = append(diagnostics, bodyDiagnostics...)
 		key := keyName
@@ -7756,15 +7757,28 @@ func (o *LoweringOwner) lowerRangeStmt(ctx lowerFileContext, stmt *ast.RangeStmt
 		if value == "" {
 			value = "__rangeRune"
 		}
+
+		// The key and value are constants unless the body assigns them.
 		binding := "const"
 		if rangeBindingAssignedInBody(ctx, stmt.Key, stmt.Body) ||
 			rangeBindingAssignedInBody(ctx, stmt.Value, stmt.Body) {
 			binding = "let"
 		}
+
+		// The runes are read from an iterator that allocates nothing for
+		// each rune, and bound to the key and value at the start of the body.
+		runes := ctx.tempName("Runes")
+		var bindings []loweredStmt
+		if keyName != "" {
+			bindings = append(bindings, loweredStmt{text: binding + " " + key + " = " + runes + ".index"})
+		}
+		if valueName != "" {
+			bindings = append(bindings, loweredStmt{text: binding + " " + value + " = " + runes + ".rune"})
+		}
 		return loweredStmt{
 			hasBlock: true,
-			text:     loopPrefix + "for (" + binding + " [" + key + ", " + value + "] of " + o.runtimeOwner.QualifiedHelper(RuntimeHelperRangeString) + "(" + rangeValue + "))",
-			children: body,
+			text:     loopPrefix + "for (let " + runes + " = " + o.runtimeOwner.QualifiedHelper(RuntimeHelperStringRunes) + "(" + rangeValue + "); " + runes + ".next(); )",
+			children: append(bindings, body...),
 		}, diagnostics
 	}
 	if isFunctionType(rangeType) {
