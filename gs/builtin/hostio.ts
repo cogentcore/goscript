@@ -1,3 +1,5 @@
+import { stringToBytes } from './slice.js'
+
 export class HostUnsupportedError extends Error {
   constructor() {
     super('operation not implemented in JavaScript environment')
@@ -104,7 +106,6 @@ export type MainScriptMeta = {
   main?: boolean
 }
 
-const encoder = new TextEncoder()
 const decoder = new TextDecoder()
 
 function getDynamicRequire(): ((specifier: string) => unknown) | null {
@@ -135,11 +136,13 @@ function writeAllSync(
   return buffer.length
 }
 
+// writeAllText writes the Go bytes of data, so invalid UTF-8 reaches the
+// host unchanged.
 function writeAllText(
   writeChunk: (chunk: Uint8Array) => number,
   data: string,
 ): void {
-  const bytes = encoder.encode(data)
+  const bytes = stringToBytes(data)
   if (bytes.length === 0) {
     return
   }

@@ -1,9 +1,12 @@
 import { describe, expect, it } from 'vitest'
 
+import * as $ from '@goscript/builtin/index.js'
+
 import {
   CanBackquote,
   Quote,
   QuoteRune,
+  QuoteRuneToASCII,
   QuoteToASCII,
   Unquote,
   UnquoteChar,
@@ -51,8 +54,16 @@ describe('strconv.QuoteRune', () => {
     expect(QuoteRune(0x00)).toBe("'\\x00'")
   })
 
-  it('folds an invalid rune to the U+FFFD escape', () => {
-    expect(QuoteRune(0x110000)).toBe("'\\ufffd'")
+  it('folds an invalid rune to U+FFFD', () => {
+    expect(QuoteRune(0x110000)).toBe("'\uFFFD'")
+    expect(QuoteRune(0xd800)).toBe("'\uFFFD'")
+    expect(QuoteRuneToASCII(0x110000)).toBe("'\\ufffd'")
+  })
+
+  it('quotes each byte of invalid UTF-8 as \\xNN', () => {
+    expect(Quote($.bytesToString(new Uint8Array([0xed, 0xa0, 0x80])))).toBe(
+      '"\\xed\\xa0\\x80"',
+    )
   })
 })
 

@@ -70,6 +70,18 @@ func main() {
 	fmt.Printf("Bytes: %s %q %x %X %v\n", bs, bs, bs, bs, bs)
 	fmt.Printf("String hex: %x %X\n", "hi", "hi")
 	fmt.Printf("Hex flags: % x %#x %# x %#v\n", bs, bs, bs, bs)
+	sub := bs[1:3]
+	fmt.Printf("Sliced bytes: %s %q %x %X %v\n", sub, sub, sub, sub, sub)
+	grown := append(make([]byte, 0, 2), 0xde, 0xad, 0xbe, 0xef)
+	fmt.Printf("Grown bytes: %x %X % x %v\n", grown, grown, grown, grown)
+	arr := [4]byte{0xca, 0xfe, 0x22, 0x41}
+	view := arr[:]
+	fmt.Printf("Array bytes: %s %q %x %X %x %v\n", view, view, view, view, arr, arr)
+	var none []byte
+	fmt.Printf("Nil bytes: [%s] %q [%x] %v\n", none, none, none, none)
+	fmt.Printf("Quoted: %q %+q %#q %q %+q\n", "tab\there", "é", "raw", 'x', 'é')
+	var seq uint64 = 255
+	fmt.Printf("Uint64: %d %x %v\n", seq, seq, seq)
 	appended := fmt.Append([]byte("base-"), "tail")
 	fmt.Println("Append bytes:", string(appended))
 	var buf bytes.Buffer

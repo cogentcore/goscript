@@ -11,6 +11,13 @@ import {
   TypeOf,
   Value,
 } from '@goscript/reflect/type.js'
+import {
+  CanBackquote,
+  Quote,
+  QuoteRune,
+  QuoteRuneToASCII,
+  QuoteToASCII,
+} from '@goscript/strconv/index.js'
 
 // Stringer Basic interfaces.
 export interface Stringer {
@@ -57,6 +64,14 @@ $.registerInterfaceType('fmt.Formatter', null, [
   ]),
 ])
 
+// basicValue returns the primitive inside a boxed basic interface value, or
+// value itself when it is not boxed.
+function basicValue(value: unknown): unknown {
+  return value !== null && typeof value === 'object' && '__goValue' in value ?
+      value.__goValue
+    : value
+}
+
 // formatInt renders an integer value in the given radix, applying Go's # flag
 // (0x/0X/0 base prefix) and +/space sign flags. The sign precedes the prefix,
 // matching fmt's "%+#x" ordering.
@@ -66,10 +81,7 @@ function formatInt(
   flags: string,
   upper: boolean,
 ): string {
-  let primitive = value
-  if (value !== null && typeof value === 'object' && '__goValue' in value) {
-    primitive = value.__goValue
-  }
+  const primitive = basicValue(value)
   const neg =
     typeof primitive === 'bigint' ? primitive < 0n : Number(primitive) < 0
   let digits =
@@ -149,6 +161,25 @@ const elementwiseVerbs = new Set([
   'G',
 ])
 
+// formatQuoted applies %q with Go's quoting rules: an integer is a rune
+// literal, anything else a string literal. The + flag escapes non-ASCII and
+// the # flag prefers a raw string literal.
+function formatQuoted(value: any, flags: string): string {
+  const ascii = flags.includes('+')
+  const primitive = basicValue(value)
+  if (typeof primitive === 'number' && Number.isInteger(primitive)) {
+    return ascii ? QuoteRuneToASCII(primitive) : QuoteRune(primitive)
+  }
+  const str =
+    primitive instanceof Uint8Array ?
+      $.bytesToString(primitive)
+    : String(primitive)
+  if (flags.includes('#') && CanBackquote(str)) {
+    return '`' + str + '`'
+  }
+  return ascii ? QuoteToASCII(str) : Quote(str)
+}
+
 // Simple printf-style formatting implementation for verbs that cannot
 // produce async results (numbers, runes, booleans). Value formatting that can
 // consult Error/String/GoString goes through formatValueMaybe instead.
@@ -202,15 +233,7 @@ function formatValue(value: any, verb: string, flags = ''): string {
     case 'G':
       return formatFloatVerb(value, verb, '')
     case 'q': // quoted string / rune
-      if (typeof value === 'number' && Number.isInteger(value)) {
-        // emulate quoted rune; runeToString avoids fromCodePoint throwing on
-        // invalid code points and maps them to U+FFFD as Go's %q does.
-        return JSON.stringify($.runeToString(value))
-      }
-      if (value instanceof Uint8Array) {
-        return JSON.stringify($.bytesToString(value))
-      }
-      return JSON.stringify(String(value))
+      return formatQuoted(value, flags)
     case 'p': {
       return formatPointer(value)
     }
@@ -407,7 +430,7 @@ function defaultFormatMaybe(
   if ($.isTypedNilValue(value)) return '<nil>'
   if (typeof value === 'boolean') return value ? 'true' : 'false'
   if (typeof value === 'string')
-    return flags.includes('#') ? JSON.stringify(value) : value
+    return flags.includes('#') ? Quote(value) : value
   if (typeof value === 'number' || typeof value === 'bigint') {
     const bits = typeof value === 'number' ? floatBits(value, typeInfo) : 0
     return bits ?
@@ -662,10 +685,7 @@ function applyFormatOptions(
 // starOperand returns the int operand of a * width or precision, or null
 // when the operand is missing or not an integer.
 function starOperand(arg: unknown): number | null {
-  const value =
-    arg != null && typeof arg === 'object' && '__goValue' in arg ?
-      arg.__goValue
-    : arg
+  const value = basicValue(arg)
   if (typeof value === 'bigint') {
     return Number(value)
   }
@@ -673,6 +693,32 @@ function starOperand(arg: unknown): number | null {
     return value
   }
   return null
+}
+
+// nilSliceOperand returns the empty slice a typed nil slice formats as, or
+// undefined for any other operand. Go formats a nil slice as an empty one
+// under every verb except %#v, %T and %p, which report its type or address.
+function nilSliceOperand(
+  arg: unknown,
+  verb: string,
+  flags: string,
+): Uint8Array | never[] | undefined {
+  if (
+    !$.isTypedNilValue(arg) ||
+    'Tp'.includes(verb) ||
+    (verb === 'v' && flags.includes('#'))
+  ) {
+    return undefined
+  }
+  const info = $.resolveTypeInfo(arg.__goTypeInfo ?? arg.__goType)
+  if (info?.kind !== $.TypeKind.Slice) {
+    return undefined
+  }
+  const elem = $.resolveTypeInfo(info.elemType)
+  const bytes =
+    elem?.kind === $.TypeKind.Basic &&
+    (elem.name === 'uint8' || elem.name === 'byte')
+  return bytes ? new Uint8Array(0) : []
 }
 
 // formatOperandMaybe formats arg for one verb with its flags, width and
@@ -691,6 +737,10 @@ function formatOperandMaybe(
       formatOperandMaybe(elem, verb, flags, width, precision),
     )
     return joinMaybe(elems, ' ', '[', ']')
+  }
+  const empty = nilSliceOperand(arg, verb, flags)
+  if (empty !== undefined) {
+    return formatOperandMaybe(empty, verb, flags, width, precision)
   }
   const formatted =
     formatWithStateMaybe(arg, verb, flags, width, precision) ??
@@ -1260,9 +1310,7 @@ class stringScanner {
       const value = Number(tok.replace(/_/g, ''))
       if (tok === '' || Number.isNaN(value)) {
         return $.newError(
-          'strconv.ParseFloat: parsing ' +
-            JSON.stringify(tok) +
-            ': invalid syntax',
+          'strconv.ParseFloat: parsing ' + Quote(tok) + ': invalid syntax',
         )
       }
       dest.ref.value = kind === 'float32' ? Math.fround(value) : value

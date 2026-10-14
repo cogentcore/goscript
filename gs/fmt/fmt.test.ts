@@ -106,9 +106,9 @@ describe('fmt basic value formatting', () => {
   })
 
   it('%q quoted string and rune', async () => {
-    expect(await fmt.Sprintf('%q', 'hello')).toBe(JSON.stringify('hello'))
-    // rune-like number
-    expect(await fmt.Sprintf('%q', 97)).toBe(JSON.stringify('a'))
+    expect(await fmt.Sprintf('%q', 'hello')).toBe('"hello"')
+    // An integer quotes as a rune literal.
+    expect(await fmt.Sprintf('%q', 97)).toBe("'a'")
   })
 
   it('%c encodes runes including astral planes and invalid code points', async () => {
@@ -122,8 +122,8 @@ describe('fmt basic value formatting', () => {
   })
 
   it('%q on an astral rune does not throw and round-trips the code point', async () => {
-    expect(await fmt.Sprintf('%q', 0x1f600)).toBe(JSON.stringify('😀'))
-    expect(await fmt.Sprintf('%q', 0x110000)).toBe(JSON.stringify('�'))
+    expect(await fmt.Sprintf('%q', 0x1f600)).toBe("'😀'")
+    expect(await fmt.Sprintf('%q', 0x110000)).toBe("'�'")
   })
 
   it('uses the same address for %p and scalar pointers nested in structs', async () => {

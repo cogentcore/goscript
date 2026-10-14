@@ -72,7 +72,14 @@ function quoteWith(
 ): string {
 	let out = String.fromCharCode(quote);
 	for (const ch of s) {
-		out += appendEscapedRune(ch.codePointAt(0)!, quote, asciiOnly, graphicOnly);
+		// A lone surrogate U+DC80..U+DCFF holds one byte of invalid UTF-8,
+		// which Go quotes as \xNN.
+		const r = ch.codePointAt(0)!;
+		if (r >= 0xdc80 && r <= 0xdcff) {
+			out += hexEscape("\\x", r - 0xdc00, 2);
+			continue;
+		}
+		out += appendEscapedRune(r, quote, asciiOnly, graphicOnly);
 	}
 	return out + String.fromCharCode(quote);
 }
@@ -84,6 +91,10 @@ function quoteRuneWith(
 	asciiOnly: boolean,
 	graphicOnly: boolean,
 ): string {
+	// An invalid rune quotes as U+FFFD, which is printable.
+	if (r < 0 || r > 0x10ffff || (r >= 0xd800 && r <= 0xdfff)) {
+		r = 0xfffd;
+	}
 	return (
 		String.fromCharCode(quote) +
 		appendEscapedRune(r, quote, asciiOnly, graphicOnly) +
