@@ -1,3 +1,4 @@
+import { goString } from '@goscript/builtin/index.js'
 import { describe, it, expect } from 'vitest'
 import {
   Lines,
@@ -123,12 +124,12 @@ describe('strings/iter', () => {
 
     it('should handle unicode', () => {
       const parts: string[] = []
-      const seq = SplitSeq('世界,你好', ',')
+      const seq = SplitSeq(goString('世界,你好'), ',')
       seq((part: string) => {
         parts.push(part)
         return true
       })
-      expect(parts).toEqual(['世界', '你好'])
+      expect(parts).toEqual([goString('世界'), goString('你好')])
     })
   })
 
@@ -247,7 +248,7 @@ describe('strings/iter', () => {
 
     it('should handle unicode whitespace', () => {
       const fields: string[] = []
-      const seq = FieldsSeq('hello　world') // contains unicode space
+      const seq = FieldsSeq(goString('hello　world')) // contains unicode space
       seq((field: string) => {
         fields.push(field)
         return true
@@ -309,7 +310,10 @@ describe('strings/iter', () => {
 
     it('should handle mixed ascii and unicode', () => {
       const fields: string[] = []
-      const seq = FieldsFuncSeq('hello世world', (r: number) => r === 0x4e16) // '世'
+      const seq = FieldsFuncSeq(
+        goString('hello世world'),
+        (r: number) => r === 0x4e16,
+      ) // goString('世')
       seq((field: string) => {
         fields.push(field)
         return true

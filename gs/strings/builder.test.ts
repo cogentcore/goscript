@@ -1,3 +1,4 @@
+import { goString } from '@goscript/builtin/index.js'
 import { describe, it, expect } from 'vitest'
 import { Builder } from './builder.js'
 import { varRef } from '../builtin/varRef.js'
@@ -42,7 +43,7 @@ describe('strings/Builder', () => {
       const [n, err] = b.WriteRune(0x1f44d) // 👍
       expect(err).toBeNull()
       expect(n).toBeGreaterThan(0)
-      expect(b.String()).toBe('👍')
+      expect(b.String()).toBe(goString('👍'))
     })
 
     it('should grow capacity', () => {
@@ -107,19 +108,19 @@ describe('strings/Builder', () => {
 
     it('should handle unicode correctly', () => {
       const b = new Builder()
-      b.WriteString('Hello 世界')
-      expect(b.String()).toBe('Hello 世界')
+      b.WriteString(goString('Hello 世界'))
+      expect(b.String()).toBe(goString('Hello 世界'))
 
       // Write individual runes
       const b2 = new Builder()
       b2.WriteRune(0x4e16) // 世
       b2.WriteRune(0x754c) // 界
-      expect(b2.String()).toBe('世界')
+      expect(b2.String()).toBe(goString('世界'))
     })
 
     it('should maintain proper length with unicode', () => {
       const b = new Builder()
-      const text = 'Hello 🌟'
+      const text = goString('Hello 🌟')
       b.WriteString(text)
       expect(b.String()).toBe(text)
       // Len is the length in UTF-8 bytes, as in Go.
