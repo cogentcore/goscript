@@ -11128,8 +11128,37 @@ func (o *LoweringOwner) lowerPointerReceiverMethodCall(
 	}
 	callArgs := append([]string{receiverExpr}, args...)
 	call := namedValueExpr(ctx, receiver) + ".prototype." + selector.Sel.Name + ".call(" + strings.Join(callArgs, ", ") + ")"
-	return call, diagnostics, true
+	return directPointerMethodCall(receiverExpr, o.namedTypeExpr(ctx, receiver), selector.Sel.Name, args, call), diagnostics, true
 }
+
+// directPointerMethodCall returns a call of the pointer method name on the
+// local receiver, which calls the method on the receiver directly when it is
+// a plain struct, and otherwise makes call, which calls the method through
+// its prototype and so takes a nil receiver, a variable reference or a
+// boxed pointer. Calling through the prototype is much slower in V8 than a
+// direct method call, which it can inline. Only one of the two calls runs,
+// so the arguments are evaluated once; long arguments keep the prototype
+// call alone, so as not to double the code.
+func directPointerMethodCall(receiver, receiverType, name string, args []string, call string) string {
+	// Only a plain local receiver can be read more than once.
+	if !plainLocalName.MatchString(receiver) || len(strings.Join(args, ", ")) > maxDirectCallArgsLen {
+		return call
+	}
+
+	// The receiver is checked as interfaceMethodReceiver checks it.
+	value := "(" + receiver + " as any)"
+	member := methodMemberName(name)
+	if !strings.HasPrefix(member, "[") {
+		member = "." + member
+	}
+	direct := "(" + value + " as " + receiverType + ")" + member + "(" + strings.Join(args, ", ") + ")"
+	return "(" + receiver + " !== null && " + value + ".__isVarRef !== true && " +
+		value + ".__goValue === undefined ? " + direct + " : " + call + ")"
+}
+
+// maxDirectCallArgsLen is the longest argument list, in characters, that a
+// direct pointer method call repeats (see directPointerMethodCall).
+const maxDirectCallArgsLen = 120
 
 func (o *LoweringOwner) lowerNamedReceiverForMethod(
 	ctx lowerFileContext,
@@ -11668,11 +11697,33 @@ func (o *LoweringOwner) lowerMethodReceiverExpr(
 		return o.lowerStructClone(receiver), diagnostics
 	}
 	if isInterfaceType(receiverType) {
-		return o.runtimeOwner.QualifiedHelper(RuntimeHelperPointerValue) +
-			"<" + o.tsNonNilTypeFor(ctx, receiverType) + ">(" + receiver + ")", diagnostics
+		return o.interfaceMethodReceiver(ctx, receiver, receiverType), diagnostics
 	}
 	return receiver, diagnostics
 }
+
+// interfaceMethodReceiver returns the value that a method of the interface
+// value receiver is called on. A local holding a plain object, the common
+// case, is checked inline and called directly; nil, a variable reference and
+// a boxed pointer go through $.pointerValue, which panics for nil.
+func (o *LoweringOwner) interfaceMethodReceiver(ctx lowerFileContext, receiver string, receiverType types.Type) string {
+	// Only a plain local can be read more than once.
+	nonNil := o.tsNonNilTypeFor(ctx, receiverType)
+	slow := o.runtimeOwner.QualifiedHelper(RuntimeHelperPointerValue) + "<" + nonNil + ">(" + receiver + ")"
+	if !plainLocalName.MatchString(receiver) {
+		return slow
+	}
+
+	// The object is its own receiver unless it is nil, a variable reference
+	// or a boxed pointer.
+	value := "(" + receiver + " as any)"
+	return "(" + receiver + " !== null && " + value + ".__isVarRef !== true && " +
+		value + ".__goValue === undefined ? (" + receiver + " as " + nonNil + ") : " + slow + ")"
+}
+
+// plainLocalName matches a JavaScript identifier, the lowered form of a
+// local variable that can be read more than once without side effects.
+var plainLocalName = regexp.MustCompile(`^[A-Za-z_$][A-Za-z0-9_$]*$`)
 
 // isOverrideFieldValue reports whether expr selects a struct field declared by
 // an override package type.
@@ -12244,6 +12295,20 @@ func pointerTargetUses(ctx lowerFileContext, body *ast.BlockStmt, candidates map
 		}
 	}
 
+	// countUpdate counts a field that an assignment operator or an increment
+	// or decrement updates once more, since it is read and written.
+	countUpdate := func(expr ast.Expr) {
+		selector, ok := ast.Unparen(expr).(*ast.SelectorExpr)
+		if !ok {
+			return
+		}
+		if ident, ok := ast.Unparen(selector.X).(*ast.Ident); ok {
+			if selection := info.Selections[selector]; selection != nil && selection.Kind() == types.FieldVal {
+				uses[info.Uses[ident]]++
+			}
+		}
+	}
+
 	// Assignments, increments, range variables and address operations drop
 	// candidates, and field selections count dereferences.
 	ast.Inspect(body, func(node ast.Node) bool {
@@ -12251,9 +12316,13 @@ func pointerTargetUses(ctx lowerFileContext, body *ast.BlockStmt, candidates map
 		case *ast.AssignStmt:
 			for _, lhs := range typed.Lhs {
 				drop(lhs)
+				if typed.Tok != token.ASSIGN && typed.Tok != token.DEFINE {
+					countUpdate(lhs)
+				}
 			}
 		case *ast.IncDecStmt:
 			drop(typed.X)
+			countUpdate(typed.X)
 		case *ast.RangeStmt:
 			for _, expr := range []ast.Expr{typed.Key, typed.Value} {
 				if expr != nil {

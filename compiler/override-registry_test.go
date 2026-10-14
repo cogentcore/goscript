@@ -465,7 +465,7 @@ func TestCompilePackagesPropagatesOverrideAsyncInterfaceMethods(t *testing.T) {
 		"public async Do(req: http.Request | $.VarRef<http.Request> | null): globalThis.Promise<[http.Response | $.VarRef<http.Response> | null, $.GoError]>",
 		"return $.pointerValue<Exclude<http.RoundTripper, null>>($.pointerValue<client>(c).rt).RoundTrip(req)",
 		"export async function Use(c: client | $.VarRef<client> | null, req: http.Request | $.VarRef<http.Request> | null): globalThis.Promise<[http.Response | $.VarRef<http.Response> | null, $.GoError]>",
-		"return client.prototype.Do.call(c, req)",
+		"return (c !== null && (c as any).__isVarRef !== true && (c as any).__goValue === undefined ? ((c as any) as client).Do(req) : client.prototype.Do.call(c, req))",
 	} {
 		if !strings.Contains(text, want) {
 			t.Fatalf("missing %q in generated output:\n%s", want, text)
@@ -506,8 +506,8 @@ func TestCompilePackagesAwaitsOverrideAsyncInterfaceMethodCalls(t *testing.T) {
 	text := string(content)
 	for _, want := range []string{
 		"export async function Use(l: sync.Locker | null): globalThis.Promise<void>",
-		"await $.pointerValue<Exclude<sync.Locker, null>>(l).Lock()",
-		"$.pointerValue<Exclude<sync.Locker, null>>(l).Unlock()",
+		"await (l !== null && (l as any).__isVarRef !== true && (l as any).__goValue === undefined ? (l as Exclude<sync.Locker, null>) : $.pointerValue<Exclude<sync.Locker, null>>(l)).Lock()",
+		"(l !== null && (l as any).__isVarRef !== true && (l as any).__goValue === undefined ? (l as Exclude<sync.Locker, null>) : $.pointerValue<Exclude<sync.Locker, null>>(l)).Unlock()",
 	} {
 		if !strings.Contains(text, want) {
 			t.Fatalf("missing %q in generated output:\n%s", want, text)
@@ -549,7 +549,7 @@ func TestCompilePackagesAwaitsNetHTTPServeHTTPOverrideMethods(t *testing.T) {
 	text := string(content)
 	for _, want := range []string{
 		"export async function Use(",
-		"await $.pointerValue<Exclude<http.Handler, null>>(h).ServeHTTP($.pointerValueOrNil(w)!, r)",
+		"await (h !== null && (h as any).__isVarRef !== true && (h as any).__goValue === undefined ? (h as Exclude<http.Handler, null>) : $.pointerValue<Exclude<http.Handler, null>>(h)).ServeHTTP($.pointerValueOrNil(w)!, r)",
 		"await http.HandlerFunc_ServeHTTP(hf, $.pointerValueOrNil(w)!, r)",
 		"await http.ServeMux.prototype.ServeHTTP.call($.pointerValue<http.ServeMux>(mux), $.pointerValueOrNil(w)!, r)",
 	} {
