@@ -32,9 +32,7 @@ export class AStruct {
 		this._fields = {
 			Msg: init?.Msg ?? ("" as string)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): AStruct {

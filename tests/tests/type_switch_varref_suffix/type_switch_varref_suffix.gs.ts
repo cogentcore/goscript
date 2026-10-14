@@ -30,9 +30,7 @@ export class branch {
 		this._fields = {
 			n: init?.n ?? (0 as number)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): branch {

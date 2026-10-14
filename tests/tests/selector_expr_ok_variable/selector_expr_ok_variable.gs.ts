@@ -20,9 +20,7 @@ export class Result {
 		this._fields = {
 			ok: init?.ok ?? (false as boolean)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Result {

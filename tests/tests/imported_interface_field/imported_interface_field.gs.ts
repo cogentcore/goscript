@@ -23,9 +23,7 @@ export class holder {
 		this._fields = {
 			w: init?.w ?? (null! as io.Writer | null)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): holder {

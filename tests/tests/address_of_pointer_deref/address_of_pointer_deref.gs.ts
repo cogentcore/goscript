@@ -30,9 +30,7 @@ export class Col {
 			Name: init?.Name ?? ("" as string),
 			Default: init?.Default ?? (null! as $.VarRef<number> | null)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Col {

@@ -20,9 +20,7 @@ export class child {
 		this._fields = {
 			value: init?.value ?? ("" as string)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): child {
@@ -69,9 +67,7 @@ export class parent {
 		this._fields = {
 			child: init?.child ?? (null! as child | $.VarRef<child> | null)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): parent {

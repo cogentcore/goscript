@@ -52,9 +52,7 @@ export class segmentedReader {
 			offset: init?.offset ?? (0 as number),
 			step: init?.step ?? (0 as number)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): segmentedReader {
@@ -96,9 +94,7 @@ export class failingReader {
 	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
 		this._fields = {
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): failingReader {

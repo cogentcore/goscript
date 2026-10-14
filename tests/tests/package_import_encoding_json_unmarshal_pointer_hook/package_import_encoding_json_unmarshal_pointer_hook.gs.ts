@@ -56,9 +56,7 @@ export class Hooked {
 			Calls: init?.Calls ?? (0 as number),
 			Seen: init?.Seen ?? ("" as string)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Hooked {
@@ -105,9 +103,7 @@ export class Box {
 		this._fields = {
 			Value: init?.Value ?? (null! as Hooked | $.VarRef<Hooked> | null)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Box {
@@ -156,9 +152,7 @@ export class MapItem {
 			Name: init?.Name ?? ("" as string),
 			Map: init?.Map ?? (null! as globalThis.Map<string, number> | null)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): MapItem {

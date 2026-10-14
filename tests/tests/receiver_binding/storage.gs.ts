@@ -33,9 +33,7 @@ export class storage {
 			bytes: init?.bytes ?? (null! as $.Slice<number>),
 			name: init?.name ?? ("" as string)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): storage {

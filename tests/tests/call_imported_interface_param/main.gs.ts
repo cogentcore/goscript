@@ -25,9 +25,7 @@ export class Buffer {
 		this._fields = {
 			data: init?.data ?? (null! as $.Slice<number>)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Buffer {

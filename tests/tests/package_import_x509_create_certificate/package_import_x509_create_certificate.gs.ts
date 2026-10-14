@@ -62,9 +62,7 @@ export class signedKey {
 			PubKey: init?.PubKey ?? (null! as $.Slice<number>),
 			Signature: init?.Signature ?? (null! as $.Slice<number>)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): signedKey {

@@ -34,9 +34,7 @@ export class wrapper {
 		this._fields = {
 			Impl: init?.Impl ?? (null! as dep.Impl | $.VarRef<dep.Impl> | null)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): wrapper {

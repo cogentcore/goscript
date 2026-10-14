@@ -35,9 +35,7 @@ export class genericBox {
 	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
 		this._fields = {
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): genericBox {
@@ -83,9 +81,7 @@ export class intBox {
 		this._fields = {
 			id: init?.id ?? (0 as number)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): intBox {

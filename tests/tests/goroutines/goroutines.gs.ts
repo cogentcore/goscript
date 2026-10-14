@@ -30,9 +30,7 @@ export class Message {
 			priority: init?.priority ?? (0 as number),
 			text: init?.text ?? ("" as string)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Message {

@@ -22,9 +22,7 @@ export class impl {
 	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
 		this._fields = {
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): impl {
@@ -64,9 +62,7 @@ export class Holder {
 		this._fields = {
 			Hidden: init?.Hidden ?? (null! as hidden | null)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Holder {

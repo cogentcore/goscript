@@ -26,9 +26,7 @@ export class FuncContainer {
 		this._fields = {
 			myFunc: init?.myFunc ?? (null! as any)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): FuncContainer {

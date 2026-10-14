@@ -54,9 +54,7 @@ export class Engineer {
 			Level: init?.Level ?? (0 as Level),
 			Name: init?.Name ?? ("" as string)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Engineer {
@@ -100,9 +98,7 @@ export class Lead {
 		this._fields = {
 			Engineer: init?.Engineer ? init.Engineer.clone() : new Engineer(undefined, true)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Lead {

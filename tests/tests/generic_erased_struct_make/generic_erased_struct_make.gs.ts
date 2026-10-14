@@ -20,9 +20,7 @@ export class queue {
 		this._fields = {
 			buf: init?.buf ?? (null! as $.Slice<any>)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): queue {

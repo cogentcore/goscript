@@ -33,9 +33,7 @@ export class Wrapped {
 			Value: init?.Value ?? ("" as string),
 			Hidden: init?.Hidden ? init.Hidden.clone() : new dep.hidden(undefined, true)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Wrapped {

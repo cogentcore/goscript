@@ -56,9 +56,7 @@ export class transport {
 		this._fields = {
 			values: init?.values ?? (null! as globalThis.Map<number, number> | null)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): transport {
@@ -102,9 +100,7 @@ export class packetHandlerMap {
 		this._fields = {
 			values: init?.values ?? (null! as globalThis.Map<number, number> | null)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): packetHandlerMap {
@@ -148,9 +144,7 @@ export class connRunnerCallbacks {
 		this._fields = {
 			AddConnectionID: init?.AddConnectionID ?? (null! as ((_p0: number) => void) | null)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): connRunnerCallbacks {

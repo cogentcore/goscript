@@ -25,9 +25,7 @@ export class point {
 		this._fields = {
 			x: init?.x ?? (0 as number)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): point {

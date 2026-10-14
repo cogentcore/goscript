@@ -32,9 +32,7 @@ export class Box {
 		this._fields = {
 			Value: init?.Value !== undefined ? $.copyElement(init.Value) : (null! as any)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Box {
@@ -73,9 +71,7 @@ export class IntValue {
 		this._fields = {
 			N: init?.N ?? (0 as number)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): IntValue {

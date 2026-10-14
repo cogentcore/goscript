@@ -23,9 +23,7 @@ export class item {
 		this._fields = {
 			Text: init?.Text ?? ("" as string)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): item {
@@ -64,9 +62,7 @@ export class arena {
 		this._fields = {
 			data: init?.data ?? (null! as $.Slice<any>)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): arena {

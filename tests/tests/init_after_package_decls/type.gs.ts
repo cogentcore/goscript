@@ -33,9 +33,7 @@ export class Type {
 			Name: init?.Name ?? ("" as string),
 			Fields: init?.Fields ?? (null! as $.Slice<__goscript_field.Field>)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Type {

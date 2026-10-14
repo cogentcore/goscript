@@ -20,9 +20,7 @@ export class cache {
 		this._fields = {
 			stored: init?.stored ?? (null! as any)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): cache {
@@ -74,9 +72,7 @@ export class key {
 		this._fields = {
 			N: init?.N ?? (0 as number)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): key {
@@ -115,9 +111,7 @@ export class privateKey {
 		this._fields = {
 			D: init?.D ?? (0 as number)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): privateKey {

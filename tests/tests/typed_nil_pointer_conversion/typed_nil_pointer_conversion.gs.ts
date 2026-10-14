@@ -20,9 +20,7 @@ export class node {
 		this._fields = {
 			next: init?.next ?? (null! as node | $.VarRef<node> | null)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): node {

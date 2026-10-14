@@ -33,9 +33,7 @@ export class parser {
 			errors: init?.errors ?? (null! as errlist.ErrorList),
 			astruct: init?.astruct ? init.astruct.clone() : new errlist.AStruct(undefined, true)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): parser {

@@ -51,9 +51,7 @@ export class impl {
 			value: init?.value !== undefined ? $.copyElement(init.value) : (null! as any),
 			other: init?.other !== undefined ? $.copyElement(init.other) : (null! as any)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): impl {

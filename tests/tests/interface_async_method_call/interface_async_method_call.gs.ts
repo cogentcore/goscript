@@ -41,9 +41,7 @@ export class ChannelProcessor {
 		this._fields = {
 			ch: init?.ch ?? (null! as $.Channel<number> | null)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): ChannelProcessor {
@@ -96,9 +94,7 @@ export class SimpleProcessor {
 		this._fields = {
 			value: init?.value ?? (0 as number)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): SimpleProcessor {
@@ -158,9 +154,7 @@ export class GenericChannelStore {
 			ch: init?.ch ?? (null! as $.Channel<any> | null),
 			value: init?.value !== undefined ? $.copyElement(init.value) : (null! as any)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): GenericChannelStore {

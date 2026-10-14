@@ -30,9 +30,7 @@ export class listProvider {
 		this._fields = {
 			items: init?.items ?? (null! as $.Slice<Group | $.VarRef<Group> | null>)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): listProvider {
@@ -86,9 +84,7 @@ export class Group {
 			provider: init?.provider ?? (null! as provider | null),
 			seen: init?.seen ?? (false as boolean)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Group {

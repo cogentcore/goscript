@@ -32,9 +32,7 @@ export class Impl {
 		this._fields = {
 			Item: init?.Item !== undefined ? $.copyElement(init.Item) : (null! as any)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Impl {
@@ -68,9 +66,7 @@ export class Keyed {
 	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
 		this._fields = {
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Keyed {
@@ -112,9 +108,7 @@ export class Wrapper {
 		this._fields = {
 			Keyed: init?.Keyed ?? (null! as Keyed | $.VarRef<Keyed> | null)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Wrapper {

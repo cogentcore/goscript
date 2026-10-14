@@ -50,9 +50,7 @@ export class multiplyCase {
 			unsigned: init?.unsigned ?? (0 as number),
 			signed: init?.signed ?? (0 as number)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): multiplyCase {

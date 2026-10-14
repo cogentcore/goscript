@@ -30,9 +30,7 @@ export class stream {
 		this._fields = {
 			name: init?.name ?? ("" as string)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): stream {
@@ -76,9 +74,7 @@ export class stopStream {
 		this._fields = {
 			stream: init?.stream ? init.stream.clone() : new stream(undefined, true)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): stopStream {
@@ -121,9 +117,7 @@ export class pointerStopStream {
 		this._fields = {
 			stream: init?.stream ?? (null! as stream | $.VarRef<stream> | null)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): pointerStopStream {

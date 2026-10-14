@@ -32,9 +32,7 @@ export class Person {
 			Name: init?.Name ?? ("" as string),
 			Age: init?.Age ?? (0 as number)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Person {
@@ -85,9 +83,7 @@ export class Employee {
 			Person: init?.Person ? init.Person.clone() : new Person(undefined, true),
 			ID: init?.ID ?? (0 as number)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Employee {
@@ -139,9 +135,7 @@ export class Address {
 			Street: init?.Street ?? ("" as string),
 			City: init?.City ?? ("" as string)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Address {
@@ -213,9 +207,7 @@ export class Manager {
 			Phone: init?.Phone ?? ("" as string),
 			Level: init?.Level ?? (0 as number)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Manager {
@@ -268,9 +260,7 @@ export class Team {
 			Employee: init?.Employee ? init.Employee.clone() : new Employee(undefined, true),
 			Active: init?.Active ?? (false as boolean)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Team {
@@ -322,9 +312,7 @@ export class LiteralValue {
 			Value: init?.Value !== undefined ? $.copyElement(init.Value) : (null! as any),
 			Zero: init?.Zero !== undefined ? $.copyElement(init.Zero) : (null! as any)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): LiteralValue {
@@ -364,9 +352,7 @@ export class LiteralContainer {
 		this._fields = {
 			LiteralValue: init?.LiteralValue ? $.markAsStructValue($.cloneStructValue(init.LiteralValue)) : $.markAsStructValue(new LiteralValue({Value: null, Zero: null}))
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): LiteralContainer {

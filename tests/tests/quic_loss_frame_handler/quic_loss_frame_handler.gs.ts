@@ -31,9 +31,7 @@ export class pingFrame {
 	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
 		this._fields = {
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): pingFrame {
@@ -82,9 +80,7 @@ export class Frame {
 			Frame: init?.Frame ?? (null! as wireFrame | null),
 			Handler: init?.Handler ?? (null! as FrameHandler | null)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Frame {
@@ -124,9 +120,7 @@ export class packet {
 		this._fields = {
 			Frames: init?.Frames ?? (null! as $.Slice<Frame>)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): packet {
@@ -165,9 +159,7 @@ export class retransmissionQueue {
 		this._fields = {
 			lost: init?.lost ?? (0 as number)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): retransmissionQueue {
@@ -221,9 +213,7 @@ export class retransmissionQueueInitialAckHandler {
 		this._fields = {
 			lost: init?.lost ?? (0 as number)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): retransmissionQueueInitialAckHandler {
@@ -272,9 +262,7 @@ export class retransmissionQueueHandshakeAckHandler {
 		this._fields = {
 			lost: init?.lost ?? (0 as number)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): retransmissionQueueHandshakeAckHandler {
@@ -323,9 +311,7 @@ export class retransmissionQueueAppDataAckHandler {
 		this._fields = {
 			lost: init?.lost ?? (0 as number)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): retransmissionQueueAppDataAckHandler {

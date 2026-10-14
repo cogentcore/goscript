@@ -75,9 +75,7 @@ export class Action {
 			Result: init?.Result ?? (0 as number),
 			Filter: init?.Filter ?? (null! as globalThis.Map<number, dep.Ref | null> | null)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Action {

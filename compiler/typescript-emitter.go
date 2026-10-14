@@ -650,10 +650,12 @@ func renderStruct(b *strings.Builder, structType *loweredStruct, runtimeOwner *R
 		b.WriteString("\n")
 	}
 	// A struct value carries the marker as its own property, set here so
-	// that each class stores it at one site.
-	b.WriteString("\t\t}\n\t\tif (__goscriptValue) {\n\t\t\t(this as any)[")
+	// that each class stores it at one site. Every instance has the
+	// property, false for a pointer's struct, so that all instances of a
+	// class have one shape and marking one later changes no shape.
+	b.WriteString("\t\t}\n\t\t;(this as any)[")
 	b.WriteString(structValueMarker)
-	b.WriteString("] = true\n\t\t}\n\t}\n\n")
+	b.WriteString("] = __goscriptValue === true\n\t}\n\n")
 	b.WriteString("\tpublic ")
 	b.WriteString(structType.cloneMethod)
 	b.WriteString("(): ")

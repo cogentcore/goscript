@@ -54,9 +54,7 @@ export class Instr {
 			Op: init?.Op ?? (0 as Op),
 			Arg: init?.Arg ?? (0n as bigint)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Instr {
@@ -106,9 +104,7 @@ export class Program {
 			Name: init?.Name ?? ("" as string),
 			Code: init?.Code ?? (null! as $.Slice<Instr>)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Program {
@@ -160,9 +156,7 @@ export class Stack {
 		this._fields = {
 			items: init?.items ?? (null! as $.Slice<any>)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Stack {
@@ -236,9 +230,7 @@ export class VM {
 			steps: init?.steps ?? (0 as number),
 			stack: init?.stack ? $.markAsStructValue($.cloneStructValue(init.stack)) : $.markAsStructValue(new Stack())
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): VM {
@@ -371,9 +363,7 @@ export class Answer {
 			Value: init?.Value ?? (0n as bigint),
 			Steps: init?.Steps ?? (0 as number)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Answer {
@@ -429,9 +419,7 @@ export class Fault {
 			Name: init?.Name ?? ("" as string),
 			Reason: init?.Reason ?? ("" as string)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Fault {

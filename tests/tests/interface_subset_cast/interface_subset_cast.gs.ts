@@ -51,9 +51,7 @@ export class MyStruct {
 			Value1: init?.Value1 ?? ("" as string),
 			Value2: init?.Value2 ?? ("" as string)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): MyStruct {

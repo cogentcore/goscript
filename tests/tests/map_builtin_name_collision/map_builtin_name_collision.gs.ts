@@ -20,9 +20,7 @@ export class Map {
 		this._fields = {
 			values: init?.values ?? (null! as globalThis.Map<string, number> | null)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Map {

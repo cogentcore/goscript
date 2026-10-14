@@ -42,9 +42,7 @@ export class Stack {
 		this._fields = {
 			items: init?.items ?? (null! as $.Slice<any>)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Stack {
@@ -104,9 +102,7 @@ export class Item {
 		this._fields = {
 			Name: init?.Name ?? ("" as string)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Item {
@@ -153,9 +149,7 @@ export class Mapper {
 		this._fields = {
 			values: init?.values ?? (null! as globalThis.Map<any, any> | null)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Mapper {
@@ -215,9 +209,7 @@ export class Pair {
 			First: init?.First !== undefined ? $.copyElement(init.First) : (null! as any),
 			Second: init?.Second !== undefined ? $.copyElement(init.Second) : (null! as any)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Pair {

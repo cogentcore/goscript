@@ -24,9 +24,7 @@ export class MyStruct {
 		this._fields = {
 			MyInt: init?.MyInt ?? (0 as number)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): MyStruct {
@@ -88,9 +86,7 @@ export class Outer {
 			Items: init?.Items !== undefined ? $.cloneArrayValue(init.Items, /* @__PURE__ */ $.arrayType("main.MyStruct", 2)) : $.arrayValue(globalThis.Array.from({ length: 2 }, () => new MyStruct(undefined, true)), /* @__PURE__ */ $.arrayType("main.MyStruct", 2)),
 			Ptr: init?.Ptr ?? (null! as MyStruct | $.VarRef<MyStruct> | null)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Outer {

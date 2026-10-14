@@ -23,9 +23,7 @@ export class attrs {
 		this._fields = {
 			packedData: init?.packedData ?? ("" as string)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): attrs {

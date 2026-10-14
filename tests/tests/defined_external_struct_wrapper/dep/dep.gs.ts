@@ -22,9 +22,7 @@ export class hidden {
 		this._fields = {
 			label: init?.label ?? ("" as string)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): hidden {
@@ -73,9 +71,7 @@ export class Public {
 			Value: init?.Value ?? ("" as string),
 			Hidden: init?.Hidden ? init.Hidden.clone() : new hidden(undefined, true)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Public {

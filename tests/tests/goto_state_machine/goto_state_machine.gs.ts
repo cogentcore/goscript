@@ -40,9 +40,7 @@ export class scanner {
 			pos: init?.pos ?? (0 as number),
 			done: init?.done ?? (false as boolean)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): scanner {

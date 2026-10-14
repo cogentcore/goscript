@@ -34,9 +34,7 @@ export class handler {
 	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
 		this._fields = {
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): handler {
@@ -105,9 +103,7 @@ export class embeddedStream {
 		this._fields = {
 			Stream: init?.Stream ?? (null! as srpc.Stream | null)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): embeddedStream {
@@ -176,9 +172,7 @@ export class streamOpenResult {
 			stream: init?.stream ?? (null! as srpc.Stream | null),
 			err: init?.err ?? (null! as $.GoError)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): streamOpenResult {
@@ -228,9 +222,7 @@ export class streamProbeResult {
 			total: init?.total ?? (0 as number),
 			err: init?.err ?? ("" as string)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): streamProbeResult {
@@ -270,9 +262,7 @@ export class rpcStreamServerResult {
 		this._fields = {
 			err: init?.err ?? ("" as string)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): rpcStreamServerResult {
@@ -361,9 +351,7 @@ export class memoryRpcStream {
 			closeSend: init?.closeSend ? $.markAsStructValue($.cloneStructValue(init.closeSend)) : $.markAsStructValue(new sync.Once()),
 			cancelLocal: init?.cancelLocal ? $.markAsStructValue($.cloneStructValue(init.cancelLocal)) : $.markAsStructValue(new sync.Once())
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): memoryRpcStream {
@@ -528,9 +516,7 @@ export class memoryRpcContext {
 			done: init?.done ?? (null! as $.Channel<{}> | null),
 			once: init?.once ? $.markAsStructValue($.cloneStructValue(init.once)) : $.markAsStructValue(new sync.Once())
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): memoryRpcContext {

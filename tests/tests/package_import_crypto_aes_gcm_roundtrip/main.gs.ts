@@ -39,9 +39,7 @@ export class wrappedAEAD {
 		this._fields = {
 			inner: init?.inner ?? (null! as cipher.AEAD | null)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): wrappedAEAD {
@@ -120,9 +118,7 @@ export class nestedSealer {
 			nonce: init?.nonce ?? (null! as $.Slice<number>),
 			aad: init?.aad ?? (null! as $.Slice<number>)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): nestedSealer {

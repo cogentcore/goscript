@@ -48,9 +48,7 @@ export class connector {
 			direct: init?.direct ?? (false as boolean),
 			blob: init?.blob ?? (false as boolean)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): connector {
@@ -145,9 +143,7 @@ export class rows {
 			done: init?.done ?? (false as boolean),
 			blob: init?.blob ?? (false as boolean)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): rows {
@@ -209,9 +205,7 @@ export class columnRows {
 		this._fields = {
 			rows: init?.rows ? init.rows.clone() : new rows(undefined, true)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): columnRows {
@@ -336,9 +330,7 @@ export async function main(): globalThis.Promise<void> {
 			this._fields = {
 				Value: init?.Value ?? (0 as number)
 			}
-			if (__goscriptValue) {
-				(this as any)[$.structValueMarker] = true
-			}
+			;(this as any)[$.structValueMarker] = __goscriptValue === true
 		}
 
 		public clone(): tagged {
@@ -376,9 +368,7 @@ export async function main(): globalThis.Promise<void> {
 			this._fields = {
 				Value: init?.Value ?? (0 as number)
 			}
-			if (__goscriptValue) {
-				(this as any)[$.structValueMarker] = true
-			}
+			;(this as any)[$.structValueMarker] = __goscriptValue === true
 		}
 
 		public clone(): retagged {

@@ -53,9 +53,7 @@ export class T {
 			A: init?.A ?? ("" as string),
 			B: init?.B ?? (0 as number)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): T {
@@ -95,9 +93,7 @@ export class square {
 		this._fields = {
 			Side: init?.Side ?? (0 as number)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): square {
@@ -151,9 +147,7 @@ export class holder {
 			S: init?.S ?? (null! as shape | null),
 			A: init?.A ?? (null! as any)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): holder {
@@ -203,9 +197,7 @@ export class base {
 			This: init?.This ?? (null! as node | null),
 			Name: init?.Name ?? ("" as string)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): base {
@@ -265,9 +257,7 @@ export class widget {
 			base: init?.base ? init.base.clone() : new base(undefined, true),
 			X: init?.X ?? (0 as number)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): widget {
@@ -325,9 +315,7 @@ export class body {
 			widget: init?.widget ? init.widget.clone() : new widget(undefined, true),
 			Title: init?.Title ?? ("" as string)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): body {

@@ -2857,7 +2857,7 @@ export function genericNew<T>(
 ): T | VarRef<T> {
   const zero = genericZero(typeArgs, name, fallback)
   if (isMarkedAsStructValue(zero)) {
-    delete (zero as any)[STRUCT_VALUE_MARKER]
+    ;(zero as any)[STRUCT_VALUE_MARKER] = false
     return zero
   }
   return varRef(zero)

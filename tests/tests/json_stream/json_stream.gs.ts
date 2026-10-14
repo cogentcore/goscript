@@ -48,9 +48,7 @@ export class chanReader {
 			ch: init?.ch ?? (null! as $.Channel<string> | null),
 			cur: init?.cur ?? ("" as string)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): chanReader {
@@ -116,9 +114,7 @@ export class item {
 			A: init?.A ?? ("" as string),
 			B: init?.B ?? (0 as number)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): item {

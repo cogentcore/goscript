@@ -26,9 +26,7 @@ export class openOnlyFS {
 		this._fields = {
 			fsys: init?.fsys ?? (null! as fstest.MapFS)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): openOnlyFS {

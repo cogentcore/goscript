@@ -50,9 +50,7 @@ export class VerboseStore {
 			BaseStore: init?.BaseStore ?? (null! as dep.BaseStore | $.VarRef<dep.BaseStore> | null),
 			name: init?.name ?? ("" as string)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): VerboseStore {

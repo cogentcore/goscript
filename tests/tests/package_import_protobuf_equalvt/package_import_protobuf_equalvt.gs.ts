@@ -40,9 +40,7 @@ export class msg {
 		this._fields = {
 			v: init?.v ?? (0 as number)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): msg {

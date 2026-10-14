@@ -86,9 +86,7 @@ export async function main(): globalThis.Promise<void> {
 				group: init?.group ?? (0 as number),
 				label: init?.label ?? ("" as string)
 			}
-			if (__goscriptValue) {
-				(this as any)[$.structValueMarker] = true
-			}
+			;(this as any)[$.structValueMarker] = __goscriptValue === true
 		}
 
 		public clone(): item {
@@ -199,9 +197,7 @@ export async function main(): globalThis.Promise<void> {
 			this._fields = {
 				n: init?.n ?? (0 as number)
 			}
-			if (__goscriptValue) {
-				(this as any)[$.structValueMarker] = true
-			}
+			;(this as any)[$.structValueMarker] = __goscriptValue === true
 		}
 
 		public clone(): cell {

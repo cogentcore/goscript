@@ -30,9 +30,7 @@ export class holder {
 			values: init?.values ?? (null! as globalThis.Map<string, number> | null),
 			items: init?.items ?? (null! as $.Slice<item>)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): holder {
@@ -72,9 +70,7 @@ export class item {
 		this._fields = {
 			value: init?.value ?? (0 as number)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): item {

@@ -23,9 +23,7 @@ export class parser {
 		this._fields = {
 			errors: init?.errors ?? (null! as errlist.ErrorList)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): parser {

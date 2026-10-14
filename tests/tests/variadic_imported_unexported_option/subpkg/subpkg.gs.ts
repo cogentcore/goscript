@@ -34,9 +34,7 @@ export class Thing {
 			Value: init?.Value ?? (0 as number),
 			Label: init?.Label ?? ("" as string)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Thing {

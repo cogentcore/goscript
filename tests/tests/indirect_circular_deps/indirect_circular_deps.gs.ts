@@ -20,9 +20,7 @@ export class A {
 		this._fields = {
 			BB: init?.BB ?? (null! as $.Slice<B>)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): A {
@@ -61,9 +59,7 @@ export class B {
 		this._fields = {
 			AA: init?.AA ?? (null! as $.Slice<A>)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): B {

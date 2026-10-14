@@ -43,9 +43,7 @@ export class LocalTime {
 			ext: init?.ext ?? (0n as bigint),
 			loc: init?.loc ?? (null! as time.Location | $.VarRef<time.Location> | null)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): LocalTime {

@@ -20,9 +20,7 @@ export class bitset {
 		this._fields = {
 			bits: init?.bits !== undefined ? $.cloneArrayValue(init.bits, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 4)) : $.arrayValue(new Uint8Array(4))
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): bitset {

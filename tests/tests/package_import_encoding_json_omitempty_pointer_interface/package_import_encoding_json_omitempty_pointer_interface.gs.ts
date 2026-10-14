@@ -99,9 +99,7 @@ export class Payload {
 			PtrNilIface: init?.PtrNilIface ?? (null! as $.VarRef<any> | null),
 			PtrBool: init?.PtrBool ?? (null! as $.VarRef<boolean> | null)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Payload {

@@ -20,9 +20,7 @@ export class AsyncResource {
 		this._fields = {
 			name: init?.name ?? ("" as string)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): AsyncResource {

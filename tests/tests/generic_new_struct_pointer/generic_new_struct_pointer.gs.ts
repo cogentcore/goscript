@@ -41,9 +41,7 @@ export class Base {
 			name: init?.name ?? ("" as string),
 			inits: init?.inits ?? (0 as number)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Base {
@@ -103,9 +101,7 @@ export class Widget {
 			Base: init?.Base ? init.Base.clone() : new Base(undefined, true),
 			Text: init?.Text ?? ("" as string)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Widget {

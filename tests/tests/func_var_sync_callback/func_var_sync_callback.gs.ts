@@ -26,9 +26,7 @@ export class matcher {
 		this._fields = {
 			match: init?.match ?? (null! as ((r: number) => boolean | globalThis.Promise<boolean>) | null)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): matcher {

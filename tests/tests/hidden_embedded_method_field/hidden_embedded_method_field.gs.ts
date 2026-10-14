@@ -10,9 +10,7 @@ export class embedded {
 	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
 		this._fields = {
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): embedded {
@@ -62,9 +60,7 @@ export class holder {
 			Database: init?.Database ?? ("" as string),
 			embedded: init?.embedded ? init.embedded.clone() : new embedded(undefined, true)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): holder {

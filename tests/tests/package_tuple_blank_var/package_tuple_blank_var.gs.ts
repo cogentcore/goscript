@@ -20,9 +20,7 @@ export class item {
 		this._fields = {
 			value: init?.value ?? (0 as number)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): item {

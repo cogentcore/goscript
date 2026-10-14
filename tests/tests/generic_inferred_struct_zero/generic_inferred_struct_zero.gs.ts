@@ -30,9 +30,7 @@ export class entry {
 			key: init?.key ?? (null! as $.Slice<number>),
 			n: init?.n ?? (0 as number)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): entry {
@@ -92,9 +90,7 @@ export class tree {
 			empty: init?.empty !== undefined ? $.copyElement(init.empty) : (null! as any),
 			count: init?.count ?? (0 as number)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): tree {

@@ -40,9 +40,7 @@ export class MyStruct {
 			MyString: init?.MyString ?? ("" as string),
 			myBool: init?.myBool ?? (false as boolean)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): MyStruct {

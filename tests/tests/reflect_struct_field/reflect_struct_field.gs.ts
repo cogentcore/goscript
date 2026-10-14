@@ -33,9 +33,7 @@ export class inner {
 			A: init?.A ?? (0 as number),
 			B: init?.B ?? ("" as string)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): inner {
@@ -95,9 +93,7 @@ export class outer {
 			In: init?.In ? init.In.clone() : new inner(undefined, true),
 			P: init?.P ?? (null! as inner | $.VarRef<inner> | null)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): outer {

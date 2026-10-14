@@ -30,9 +30,7 @@ export class Pos {
 			Line: init?.Line ?? (0 as number),
 			Char: init?.Char ?? (0 as number)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Pos {
@@ -82,9 +80,7 @@ export class Region {
 			Start: init?.Start ? init.Start.clone() : new Pos(undefined, true),
 			End: init?.End ? init.End.clone() : new Pos(undefined, true)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Region {
@@ -134,9 +130,7 @@ export class Rule {
 			Name: init?.Name ?? ("" as string),
 			pos: init?.pos ? init.pos.clone() : new Pos(undefined, true)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Rule {
@@ -196,9 +190,7 @@ export class key {
 			a: init?.a ?? (0 as number),
 			b: init?.b ?? (0 as number)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): key {

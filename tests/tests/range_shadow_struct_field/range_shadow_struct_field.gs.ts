@@ -20,9 +20,7 @@ export class Match {
 		this._fields = {
 			Size: init?.Size ?? (0 as number)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Match {
@@ -61,9 +59,7 @@ export class Matcher {
 		this._fields = {
 			matches: init?.matches ?? (null! as $.Slice<Match>)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Matcher {

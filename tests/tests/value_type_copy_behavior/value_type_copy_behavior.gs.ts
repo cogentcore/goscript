@@ -30,9 +30,7 @@ export class MyStruct {
 			MyInt: init?.MyInt ?? (0 as number),
 			MyString: init?.MyString ?? ("" as string)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): MyStruct {
@@ -82,9 +80,7 @@ export class NestedStruct {
 			Value: init?.Value ?? (0 as number),
 			InnerStruct: init?.InnerStruct ? init.InnerStruct.clone() : new MyStruct(undefined, true)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): NestedStruct {

@@ -21,9 +21,7 @@ export class cell {
 		this._fields = {
 			width: init?.width ?? (0 as number)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): cell {

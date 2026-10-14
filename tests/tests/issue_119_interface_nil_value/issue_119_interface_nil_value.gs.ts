@@ -30,9 +30,7 @@ export class Dog {
 		this._fields = {
 			name: init?.name ?? ("" as string)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Dog {
@@ -79,9 +77,7 @@ export class Cat {
 		this._fields = {
 			name: init?.name ?? ("" as string)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Cat {

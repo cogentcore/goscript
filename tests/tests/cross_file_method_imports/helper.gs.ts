@@ -20,9 +20,7 @@ export class helperState {
 		this._fields = {
 			text: init?.text ?? ("" as string)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): helperState {

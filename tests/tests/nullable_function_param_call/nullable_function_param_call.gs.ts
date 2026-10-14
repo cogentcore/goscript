@@ -71,9 +71,7 @@ export class MockFileInfo {
 			size: init?.size ?? (0n as bigint),
 			isDir: init?.isDir ?? (false as boolean)
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): MockFileInfo {
@@ -119,9 +117,7 @@ export class MockFilesystem {
 	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
 		this._fields = {
 		}
-		if (__goscriptValue) {
-			(this as any)[$.structValueMarker] = true
-		}
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): MockFilesystem {
