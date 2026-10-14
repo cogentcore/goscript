@@ -1455,6 +1455,7 @@ export class Value {
         registered?.signatures,
       )
     }
+
     // Box an unnamed value with its type, as the compiler does when it
     // converts the value to an interface. A nil slice, map, func, chan or
     // pointer then keeps its type, so the interface is not nil, and a
@@ -3671,6 +3672,9 @@ function typeMethods(t: Type): $.MethodSignature[] {
   if (named !== undefined) {
     return named.signatures
   }
+
+  // Any other type is looked up by name: its own, its element's if it is a
+  // pointer, or the registered name of an interface.
   let typeInfo = builtinGetTypeByName(t.String())
   if (!typeInfo && t.Kind() === Ptr) {
     typeInfo = builtinGetTypeByName(t.Elem().String())
@@ -3681,6 +3685,8 @@ function typeMethods(t: Type): $.MethodSignature[] {
       typeInfo = builtinGetTypeByName(registeredName)
     }
   }
+
+  // A type that is not registered carries its own method signatures.
   if (!typeInfo && t instanceof InterfaceType) {
     return t.methodSignatures()
   }
@@ -3696,6 +3702,8 @@ function typeMethods(t: Type): $.MethodSignature[] {
   if (!typeInfo) {
     return []
   }
+
+  // A registered struct or interface lists its methods in its type info.
   if (isStructTypeInfo(typeInfo) || isInterfaceTypeInfo(typeInfo)) {
     return typeInfo.methods || []
   }
@@ -4712,13 +4720,29 @@ function getTypeOf(value: ReflectValue): Type {
           typeInfo.params &&
           typeInfo.results
         ) {
-          if (funcWithMeta.__goTypeName && !typeInfo.name) {
-            return functionTypeFromInfo({
-              ...typeInfo,
-              name: funcWithMeta.__goTypeName,
-            })
+          const named = funcWithMeta.__goTypeName && !typeInfo.name
+          const infoKey = typeInfoCacheKey(typeInfo)
+          const cacheKey =
+            infoKey === '' ? '' : (
+              infoKey + (named ? '#' + funcWithMeta.__goTypeName : '')
+            )
+          if (cacheKey !== '') {
+            const cached = functionValueTypes.get(cacheKey)
+            if (cached !== undefined) {
+              return cached
+            }
           }
-          return functionTypeFromInfo(typeInfo)
+          const typ =
+            named ?
+              functionTypeFromInfo({
+                ...typeInfo,
+                name: funcWithMeta.__goTypeName,
+              })
+            : functionTypeFromInfo(typeInfo)
+          if (cacheKey !== '') {
+            functionValueTypes.set(cacheKey, typ)
+          }
+          return typ
         }
       }
 
@@ -4906,17 +4930,14 @@ function getTypeOf(value: ReflectValue): Type {
           value.constructor as { __typeInfo?: $.StructTypeInfo }
         ).__typeInfo
         if (typeInfo && isStructTypeInfo(typeInfo)) {
-          const name = typeInfo.name ?? ''
-          if (name === '') {
-            return new StructType('', structFieldsFromTypeInfo(typeInfo))
+          const ctor = value.constructor as object
+          const cached = structConstructorTypes.get(ctor)
+          if (cached !== undefined) {
+            return cached
           }
-          const typeName = name.includes('.') ? name : `main.${name}`
-          const regTypeInfo = builtinGetTypeByName(typeName)
-          const fields =
-            regTypeInfo && isStructTypeInfo(regTypeInfo) ?
-              structFieldsFromTypeInfo(regTypeInfo)
-            : structFieldsFromTypeInfo(typeInfo)
-          return new StructType(typeName, fields)
+          const typ = structTypeOfConstructor(typeInfo)
+          structConstructorTypes.set(ctor, typ)
+          return typ
         }
       }
 
@@ -4932,6 +4953,29 @@ function getTypeOf(value: ReflectValue): Type {
     default:
       return new BasicType(Interface, 'interface{}', 16)
   }
+}
+
+// structConstructorTypes caches the reflect type of the struct values of
+// each generated struct class.
+const structConstructorTypes = new WeakMap<object, Type>()
+
+// structTypeOfConstructor returns the reflect type of the values of a
+// struct class with the given type info.
+function structTypeOfConstructor(typeInfo: $.StructTypeInfo): Type {
+  // An anonymous struct has no registered type to consult.
+  const name = typeInfo.name ?? ''
+  if (name === '') {
+    return new StructType('', structFieldsFromTypeInfo(typeInfo))
+  }
+
+  // A named struct takes its fields from the registered type, when there is one.
+  const typeName = name.includes('.') ? name : `main.${name}`
+  const regTypeInfo = builtinGetTypeByName(typeName)
+  const fields =
+    regTypeInfo && isStructTypeInfo(regTypeInfo) ?
+      structFieldsFromTypeInfo(regTypeInfo)
+    : structFieldsFromTypeInfo(typeInfo)
+  return new StructType(typeName, fields)
 }
 
 // boxedMethodSignatures returns the method signatures of the methods of a
@@ -5266,19 +5310,140 @@ const typeInfoTypes = new WeakMap<object, Type>()
 const namedTypeInfoTypes = new globalThis.Map<string, Type>()
 
 // typeInfoCacheKey returns the key of a type info that names a registered
-// type, or a pointer to one, or '' for any other type info.
-function typeInfoCacheKey(info: $.TypeInfo | string): string {
+// type, by its name or as the registered type info itself, or that is built
+// from such types and basic types, as pointer, slice, array, map and function
+// types are, or '' for any other type info. Generated code and the runtime
+// make new type info objects for the same type at each use, so they are
+// cached by this key.
+function typeInfoCacheKey(info: $.TypeInfo | string | undefined): string {
+  // A string is a key when it names a registered type.
+  if (info === undefined) {
+    return ''
+  }
   if (typeof info === 'string') {
     return builtinGetTypeByName(info) ? info : ''
   }
-  if (info.kind === $.TypeKind.Pointer && info.elemType !== undefined) {
-    const elem = typeInfoCacheKey(info.elemType)
-    return elem === '' ? '' : '*' + elem
+
+  // The registered type info is keyed by its name.
+  if (info.name !== undefined && builtinGetTypeByName(info.name) === info) {
+    return info.name
+  }
+
+  // Any other type info is keyed by the keys of the types it is built from.
+  switch (info.kind) {
+    case $.TypeKind.Basic: {
+      if (info.name === undefined) {
+        return ''
+      }
+      return 'b:' + info.name + '|' + (info.typeName ?? '')
+    }
+    case $.TypeKind.Pointer: {
+      const elem = typeInfoCacheKey((info as $.PointerTypeInfo).elemType)
+      return elem === '' ? '' : '*' + elem
+    }
+    case $.TypeKind.Slice: {
+      const elem = typeInfoCacheKey((info as $.SliceTypeInfo).elemType)
+      return elem === '' ? '' : '[]' + elem + '|' + (info.typeName ?? '')
+    }
+    case $.TypeKind.Array: {
+      const array = info as $.ArrayTypeInfo
+      const elem = typeInfoCacheKey(array.elemType)
+      return elem === '' ? '' : (
+          '[' + array.length + ']' + elem + '|' + (info.typeName ?? '')
+        )
+    }
+    case $.TypeKind.Map: {
+      const map = info as $.MapTypeInfo
+      const key = typeInfoCacheKey(map.keyType)
+      const elem = typeInfoCacheKey(map.elemType)
+      return key === '' || elem === '' ?
+          ''
+        : 'map[' + key + ']' + elem + '|' + (info.typeName ?? '')
+    }
+    case $.TypeKind.Function: {
+      const fn = info as $.FunctionTypeInfo
+      const params = (fn.params ?? []).map(typeInfoCacheKey)
+      const results = (fn.results ?? []).map(typeInfoCacheKey)
+      if (params.includes('') || results.includes('')) {
+        return ''
+      }
+      return (
+        'func(' +
+        params.join(',') +
+        ')(' +
+        results.join(',') +
+        ')' +
+        (fn.isVariadic ? '...' : '') +
+        '|' +
+        (fn.name ?? '') +
+        '|' +
+        (info.typeName ?? '')
+      )
+    }
+    case $.TypeKind.Interface: {
+      if (info.name !== undefined && info.name !== '') {
+        return ''
+      }
+      const methods = (info as $.InterfaceTypeInfo).methods ?? []
+      const keys = methods.map(methodSignatureCacheKey)
+      if (keys.includes('')) {
+        return ''
+      }
+      return 'interface{' + keys.join(';') + '}|' + (info.typeName ?? '')
+    }
+    case $.TypeKind.Struct: {
+      if (info.name !== undefined && info.name !== '') {
+        return ''
+      }
+      const fields = (info as $.StructTypeInfo).fields ?? []
+      const keys = fields.map(structFieldCacheKey)
+      if (keys.includes('')) {
+        return ''
+      }
+      return 'struct{' + keys.join(';') + '}|' + (info.typeName ?? '')
+    }
   }
   return ''
 }
 
+// methodSignatureCacheKey returns the cache key of a method signature, or ''
+// if one of its types has none.
+function methodSignatureCacheKey(method: $.MethodSignature): string {
+  const args = method.args.map((arg) => typeInfoCacheKey(arg.type))
+  const returns = method.returns.map((arg) => typeInfoCacheKey(arg.type))
+  if (args.includes('') || returns.includes('')) {
+    return ''
+  }
+  return method.name + '(' + args.join(',') + ')(' + returns.join(',') + ')'
+}
+
+// structFieldCacheKey returns the cache key of a struct field, or '' if its
+// type has none.
+function structFieldCacheKey(field: $.StructFieldInfo): string {
+  const typ = typeInfoCacheKey(field.type)
+  if (typ === '') {
+    return ''
+  }
+  return (
+    field.name +
+    ' ' +
+    (field.key ?? '') +
+    ' ' +
+    typ +
+    ' ' +
+    JSON.stringify(field.tag ?? '') +
+    ' ' +
+    (field.pkgPath ?? '') +
+    (field.anonymous ? ' embedded' : '')
+  )
+}
+
+// functionValueTypes caches the reflect types of function values by the key
+// of their type info and Go type name.
+const functionValueTypes = new globalThis.Map<string, Type>()
+
 function typeFromTypeInfo(info: $.TypeInfo | string): Type {
+  // Type info with a key shares one type, however many objects describe it.
   const key = typeInfoCacheKey(info)
   if (key !== '') {
     let typ = namedTypeInfoTypes.get(key)
@@ -5291,6 +5456,8 @@ function typeFromTypeInfo(info: $.TypeInfo | string): Type {
   if (typeof info === 'string') {
     return typeFromTypeInfoWithSeen(info, new Set())
   }
+
+  // Any other type info object has its own type.
   let typ = typeInfoTypes.get(info)
   if (typ === undefined) {
     typ = typeFromTypeInfoWithSeen(info, new Set())
@@ -5804,10 +5971,13 @@ const unnamedStructViews = new WeakMap<object, object>()
 // unnamedStructView returns a view of a struct object that shares its fields
 // but hides the methods of its named type, and has its own Go type tags.
 function unnamedStructView(target: object): object {
+  // A struct has one view.
   const existing = unnamedStructViews.get(target)
   if (existing !== undefined) {
     return existing
   }
+
+  // The view has its own Go type tags and hides the methods of the named type.
   const tags: Record<PropertyKey, unknown> = {}
   const isTag = (prop: PropertyKey) =>
     prop === '__goType' || prop === '__goTypeInfo'
