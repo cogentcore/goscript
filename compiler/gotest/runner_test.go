@@ -250,6 +250,21 @@ func TestRunnerReportsTesting(t *testing.T) {
 			"}",
 			"",
 		}, "\n"),
+		"bubble_test.go": strings.Join([]string{
+			"package testingmode",
+			"",
+			"import (",
+			"\t\"testing\"",
+			"\t\"testing/synctest\"",
+			")",
+			"",
+			"func TestBubble(t *testing.T) {",
+			"\tsynctest.Test(t, func(t *testing.T) {",
+			"\t\tsynctest.Wait()",
+			"\t})",
+			"}",
+			"",
+		}, "\n"),
 	})
 
 	result, err := NewRunner().Run(context.Background(), &Request{

@@ -344,6 +344,8 @@ import "embed"
 //go:embed gs/testing/index.ts
 //go:embed gs/testing/meta.json
 //go:embed gs/testing/runner.ts
+//go:embed gs/testing/synctest/index.ts
+//go:embed gs/testing/synctest/meta.json
 //go:embed gs/testing/testing.ts
 //go:embed gs/time/index.ts
 //go:embed gs/time/meta.json
