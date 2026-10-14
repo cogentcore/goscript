@@ -7644,7 +7644,7 @@ func (o *LoweringOwner) lowerTypeSwitchStmt(ctx lowerFileContext, stmt *ast.Type
 		tsTypes := make([]string, 0, len(clause.List))
 		for _, expr := range clause.List {
 			typ := ctx.semPkg.source.TypesInfo.TypeOf(expr)
-			types = append(types, o.runtimeTypeInfoExpr(typ))
+			types = append(types, o.runtimeTypeAssertInfoExpr(ctx, typ))
 			if typ == nil {
 				tsTypes = append(tsTypes, "any")
 			} else {
