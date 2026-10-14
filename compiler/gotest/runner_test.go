@@ -1327,6 +1327,15 @@ func TestBrowserVitestConfigHostFS(t *testing.T) {
 	}
 }
 
+func TestBrowserVitestConfigAPIHost(t *testing.T) {
+	// The browser API server listens on, and the page opens, 127.0.0.1.
+	config := renderBrowserVitestConfig(&normalizedRequest{}, "/out", "runner-0.ts", "/src/pkg")
+	want := `api: { host: "127.0.0.1" },`
+	if !strings.Contains(config, want) {
+		t.Fatalf("expected %q in config, got:\n%s", want, config)
+	}
+}
+
 func TestParseCombinedRuntimeRecordsLineProtocol(t *testing.T) {
 	records, ok := parseCombinedRuntimeRecords(strings.Join([]string{
 		"ordinary output",
