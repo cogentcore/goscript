@@ -1,3 +1,4 @@
+import * as $ from '@goscript/builtin/index.js'
 import { describe, expect, it } from 'vitest'
 
 import { cloneStructValue, markAsStructValue } from '@goscript/builtin/index.js'
@@ -32,7 +33,7 @@ describe('embed.FS', () => {
     const [data, readErr] = await ReadFile(fsys, 'config-set.bin')
     expect(readErr).toBeNull()
     expect(Array.from(data)).toEqual([1, 2, 3])
-    data[0] = 9
+    $.sliceElems(data)[$.sliceSlot(data, 0)] = 9
     const [dataAgain, readAgainErr] = await ReadFile(fsys, 'config-set.bin')
     expect(readAgainErr).toBeNull()
     expect(Array.from(dataAgain)).toEqual([1, 2, 3])

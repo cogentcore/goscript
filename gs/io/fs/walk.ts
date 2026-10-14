@@ -54,7 +54,7 @@ export async function walkDir(
   }
 
   for (let _i = 0; _i < $.len(dirs); _i++) {
-    const d1 = dirs![_i]
+    const d1 = $.arrayIndex(dirs!, _i)
     {
       let name1 = path.Join(name, d1!.Name())
       {

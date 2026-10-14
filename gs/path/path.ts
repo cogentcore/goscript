@@ -7,7 +7,7 @@ function normalizeJoinElements(elem: JoinElement[]): string[] {
     const slice = elem[0]
     const parts: string[] = []
     for (let i = 0; i < $.len(slice); i++) {
-      parts.push(slice![i])
+      parts.push($.arrayIndex(slice!, i))
     }
     return parts
   }

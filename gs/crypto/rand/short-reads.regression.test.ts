@@ -22,7 +22,7 @@ describe('crypto/rand.Int exact candidate reads', () => {
       const reader: io.Reader = { Read(p): io.Awaitable<io.IOResult> {
         calls++
         const result: io.IOResult = calls === 1 ? [0, null] : [1, null]
-        if (calls > 1) p![0] = calls === 3 ? 7 : 0
+        if (calls > 1) $.sliceElems(p!)[$.sliceSlot(p!, 0)] = calls === 3 ? 7 : 0
         return async ? Promise.resolve(result) : result
       } }
       const [value, err] = await Int(reader, new Integer(65536n))

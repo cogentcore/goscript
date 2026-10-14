@@ -124,7 +124,7 @@ export function readInt(b: $.Bytes, off: uintptr, size: uintptr): [number, boole
 export function readIntBE(b: $.Bytes, size: uintptr): number {
 	switch (size) {
 		case 1:
-			return (b![0] as number)
+			return ($.arrayIndex(b!, 0) as number)
 		case 2:
 			return (byteorder.BEUint16(b) as number)
 		case 4:
@@ -140,7 +140,7 @@ export function readIntBE(b: $.Bytes, size: uintptr): number {
 export function readIntLE(b: $.Bytes, size: uintptr): number {
 	switch (size) {
 		case 1:
-			return (b![0] as number)
+			return ($.arrayIndex(b!, 0) as number)
 		case 2:
 			return (byteorder.LEUint16(b) as number)
 		case 4:

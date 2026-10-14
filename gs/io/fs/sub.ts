@@ -205,7 +205,7 @@ class subFS {
     let full = f!.dir + '/' + pattern
     let [list, err] = await Glob(f!.fsys, full)
     for (let i = 0; i < $.len(list); i++) {
-      const name = list![i]
+      const name = $.arrayIndex(list!, i)
       {
         let [shortName, ok] = f!.shorten(name)
 
@@ -221,7 +221,7 @@ class subFS {
             ),
           ]
         }
-        list![i] = shortName
+        $.sliceElems(list!)[$.sliceSlot(list!, i)] = shortName
       }
     }
     return [list, f!.fixErr(err)]

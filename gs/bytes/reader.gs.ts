@@ -110,7 +110,7 @@ export class Reader {
 		if (r.i >= ($.len(r.s) as number)) {
 			return [0, io.EOF]
 		}
-		let b = r.s![r.i]
+		let b = $.arrayIndex(r.s!, r.i)
 		r.i++
 		return [b, null]
 	}
@@ -135,7 +135,7 @@ export class Reader {
 		}
 		r.prevRune = $.int(r.i)
 		{
-			let c = r.s![r.i]
+			let c = $.arrayIndex(r.s!, r.i)
 			if (c < utf8.RuneSelf) {
 				r.i++
 				return [(c as number), 1, null]

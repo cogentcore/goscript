@@ -105,7 +105,9 @@ export function EncodeRune(p: Uint8Array | $.Slice<number>, r: number): number {
     // Handle Slice<number>
     const len = $.len(p!)
     for (let i = 0; i < Math.min(encoded.length, len); i++) {
-      ;(p as $.Slice<number>)![i] = encoded[i]
+      $.sliceElems((p as $.Slice<number>)!)[
+        $.sliceSlot((p as $.Slice<number>)!, i)
+      ] = encoded[i]
     }
     return Math.min(encoded.length, len)
   }

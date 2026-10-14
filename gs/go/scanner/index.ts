@@ -137,8 +137,8 @@ export function ErrorList_Len(list: ErrorList): number {
 }
 
 export function ErrorList_Less(list: ErrorList, i: number, j: number): boolean {
-  const left = list![i]!
-  const right = list![j]!
+  const left = $.arrayIndex(list!, i)!
+  const right = $.arrayIndex(list!, j)!
   if (left.Pos.Filename !== right.Pos.Filename) {
     return left.Pos.Filename < right.Pos.Filename
   }
@@ -152,9 +152,9 @@ export function ErrorList_Less(list: ErrorList, i: number, j: number): boolean {
 }
 
 export function ErrorList_Swap(list: ErrorList, i: number, j: number): void {
-  const first = list![i]
-  list![i] = list![j]
-  list![j] = first
+  const first = $.arrayIndex(list!, i)
+  $.sliceElems(list!)[$.sliceSlot(list!, i)] = $.arrayIndex(list!, j)
+  $.sliceElems(list!)[$.sliceSlot(list!, j)] = first
 }
 
 export function ErrorList_Sort(list: ErrorList): void {
@@ -230,7 +230,7 @@ export async function PrintError(w: io.Writer, err: $.GoError): Promise<void> {
   if (err === null) {
     return
   }
-  if (Array.isArray(err)) {
+  if ($.isArrayOrGoSlice(err)) {
     for (const entry of Array.from((err as ErrorList) ?? [])) {
       if (entry == null) {
         continue

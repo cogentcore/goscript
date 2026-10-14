@@ -1151,8 +1151,8 @@ describe('generated method installation', () => {
 
       MarshalToSizedBufferVT(data: $.Slice<number>): [number, $.GoError] {
         expect($.len(data)).toBe(2)
-        data![0] = 7
-        data![1] = 8
+        $.sliceElems(data!)[$.sliceSlot(data!, 0)] = 7
+        $.sliceElems(data!)[$.sliceSlot(data!, 1)] = 8
         return [2, null]
       }
 

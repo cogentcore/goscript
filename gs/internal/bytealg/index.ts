@@ -10,10 +10,13 @@ function normalizeBytes(b: any): any[] {
   if (Array.isArray(b)) {
     return b
   }
+  if (b instanceof $.GoSlice) {
+    return b.window()
+  }
   if (b instanceof Uint8Array) {
     return Array.from(b)
   }
-  if (b && typeof b === 'object' && 'data' in b && Array.isArray(b.data)) {
+  if (b && typeof b === 'object' && 'data' in b && $.isArrayOrGoSlice(b.data)) {
     return b.data
   }
   return []

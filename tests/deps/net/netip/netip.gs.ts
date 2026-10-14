@@ -1478,7 +1478,7 @@ export function parseIPv4Fields(_in: string, off: number, end: number, fields: $
 				if (pos == 3) {
 					return $.interfaceValue<$.GoError>($.markAsStructValue(new parseAddrError({_in: _in, msg: "IPv4 address too long"})), "netip.parseAddrError", "netip.parseAddrError")
 				}
-				fields![pos] = $.uint($.uint(val, 8), 8)
+				$.sliceElems(fields!)[$.sliceSlot(fields!, pos)] = $.uint($.uint(val, 8), 8)
 				pos++
 				val = 0
 				digLen = 0
@@ -1490,7 +1490,7 @@ export function parseIPv4Fields(_in: string, off: number, end: number, fields: $
 	if (pos < 3) {
 		return $.interfaceValue<$.GoError>($.markAsStructValue(new parseAddrError({_in: _in, msg: "IPv4 address too short"})), "netip.parseAddrError", "netip.parseAddrError")
 	}
-	fields![3] = $.uint($.uint(val, 8), 8)
+	$.sliceElems(fields!)[$.sliceSlot(fields!, 3)] = $.uint($.uint(val, 8), 8)
 	return null
 }
 

@@ -414,7 +414,7 @@ function defaultFormatMaybe(
         $.formatFloat(value as number, 'g', -1, bits)
       : value.toString()
   }
-  if (Array.isArray(value)) {
+  if ($.isArrayOrGoSlice(value)) {
     // Elements are formatted with the element type, so that pointers print
     // as addresses.
     const elemType = elementTypeInfo(
@@ -522,7 +522,7 @@ function defaultFormatMaybe(
       info?.kind === $.TypeKind.Struct ||
       (value._fields &&
         typeof value._fields === 'object' &&
-        !Array.isArray(value._fields)) ||
+        !$.isArrayOrGoSlice(value._fields)) ||
       value.constructor === Object
     ) {
       const fields: $.StructFieldInfo[] =
@@ -686,7 +686,7 @@ function formatOperandMaybe(
   width: string,
   precision: string,
 ): MaybeString {
-  if (Array.isArray(arg) && elementwiseVerbs.has(verb)) {
+  if ($.isArrayOrGoSlice(arg) && elementwiseVerbs.has(verb)) {
     const elems = arg.map((elem) =>
       formatOperandMaybe(elem, verb, flags, width, precision),
     )

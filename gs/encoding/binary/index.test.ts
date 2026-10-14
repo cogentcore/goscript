@@ -215,7 +215,10 @@ describe('encoding/binary override', () => {
     let index = 0
     const promiseLikeReader: io.ByteReader = {
       ReadByte(): PromiseLike<io.IOResult> {
-        return Promise.resolve([buf[index++], null] as io.IOResult)
+        return Promise.resolve([
+          $.arrayIndex(buf, index++),
+          null,
+        ] as io.IOResult)
       },
     }
     expect(await ReadUvarint(promiseLikeReader)).toEqual([300n, null])
@@ -226,7 +229,7 @@ describe('encoding/binary override', () => {
 
     const overflow = $.makeSlice<number>(11, undefined, 'byte')
     for (let i = 0; i < $.len(overflow); i++) {
-      overflow[i] = 0x80
+      $.sliceElems(overflow)[$.sliceSlot(overflow, i)] = 0x80
     }
     expect(Uvarint(overflow)).toEqual([0n, -11])
 

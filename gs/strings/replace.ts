@@ -83,15 +83,18 @@ export class Replacer {
       }
     }
 
-    if ($.len(oldnew) == 2 && $.len(oldnew![0]) > 1) {
-      return makeSingleStringReplacer(oldnew![0], oldnew![1])
+    if ($.len(oldnew) == 2 && $.len($.arrayIndex(oldnew!, 0)) > 1) {
+      return makeSingleStringReplacer(
+        $.arrayIndex(oldnew!, 0),
+        $.arrayIndex(oldnew!, 1),
+      )
     }
     let allNewBytes = true
     for (let i = 0; i < $.len(oldnew); i += 2) {
-      if ($.len(oldnew![i]) != 1) {
+      if ($.len($.arrayIndex(oldnew!, i)) != 1) {
         return makeGenericReplacer(oldnew)
       }
-      if ($.len(oldnew![i + 1]) != 1) {
+      if ($.len($.arrayIndex(oldnew!, i + 1)) != 1) {
         allNewBytes = false
       }
     }
@@ -103,8 +106,8 @@ export class Replacer {
       // The first occurrence of old->new map takes precedence
       // over the others with the same old string.
       for (let i = $.len(oldnew) - 2; i >= 0; i -= 2) {
-        let o = $.indexString(oldnew![i], 0)
-        let n = $.indexString(oldnew![i + 1], 0)
+        let o = $.indexString($.arrayIndex(oldnew!, i), 0)
+        let n = $.indexString($.arrayIndex(oldnew!, i + 1), 0)
         r[o] = n
       }
       return {
@@ -131,8 +134,8 @@ export class Replacer {
       toReplace: $.makeSlice<string>(0, $.len(oldnew) / 2),
     })
     for (let i = $.len(oldnew) - 2; i >= 0; i -= 2) {
-      let o = $.indexString(oldnew![i], 0)
-      let n = oldnew![i + 1]
+      let o = $.indexString($.arrayIndex(oldnew!, i), 0)
+      let n = $.arrayIndex(oldnew!, i + 1)
       // To avoid counting repetitions multiple times.
 
       // We need to use string([]byte{o}) instead of string(o),
@@ -412,8 +415,12 @@ class trieNode {
             })
         let keyNode = new trieNode()
         t!.table = $.makeSlice<trieNode | null>(r!.tableSize)
-        t!.table![r!.mapping![$.indexString(t!.prefix, 0)]] = prefixNode
-        t!.table![r!.mapping![$.indexString(key, 0)]] = keyNode
+        $.sliceElems(t!.table!)[
+          $.sliceSlot(t!.table!, r!.mapping![$.indexString(t!.prefix, 0)])
+        ] = prefixNode
+        $.sliceElems(t!.table!)[
+          $.sliceSlot(t!.table!, r!.mapping![$.indexString(key, 0)])
+        ] = keyNode
         t!.prefix = ''
         t!.next = null
         keyNode!.add($.sliceString(key, 1, undefined), val, priority, r)
@@ -430,10 +437,15 @@ class trieNode {
     } else if (t!.table != null) {
       // Insert into existing table.
       let m = r!.mapping![$.indexString(key, 0)]
-      if (t!.table![m] == null) {
-        t!.table![m] = new trieNode()
+      if ($.arrayIndex(t!.table!, m) == null) {
+        $.sliceElems(t!.table!)[$.sliceSlot(t!.table!, m)] = new trieNode()
       }
-      t!.table![m]!.add($.sliceString(key, 1, undefined), val, priority, r)
+      $.arrayIndex(t!.table!, m)!.add(
+        $.sliceString(key, 1, undefined),
+        val,
+        priority,
+        r,
+      )
     } else {
       t!.prefix = key
       t!.next = new trieNode()
@@ -529,7 +541,7 @@ class genericReplacer {
         if ((index as number) == r!.tableSize) {
           break
         }
-        node = node!.table![index]!
+        node = $.arrayIndex(node!.table!, index)!
         s = $.sliceString(s, 1, undefined)
         n++
       } else if (node!.prefix != '' && HasPrefix(s, node!.prefix)) {
@@ -551,7 +563,10 @@ class genericReplacer {
       // Fast path: s[i] is not a prefix of any pattern.
       if (i != $.len(s) && r!.root.priority == 0) {
         let index = r!.mapping![$.indexString(s, i)] as number
-        if (index == r!.tableSize || r!.root.table![index] == null) {
+        if (
+          index == r!.tableSize ||
+          $.arrayIndex(r!.root.table!, index) == null
+        ) {
           i++
           continue
         }
@@ -579,52 +594,63 @@ class genericReplacer {
 
   public WriteString(w: io.Writer, s: string): io.Awaitable<io.IOResult> {
     const self = this
-    return io.runIO((function* (): Generator<io.Awaitable<io.IOResult>, io.IOResult, io.IOResult> {
-      const r = self
-      let sw = getStringWriter(w)
-      let last: number = 0
-      let n: number = 0
-      let prevMatchEmpty: boolean = false
-      for (let i = 0; i <= $.len(s); ) {
-        // Fast path: s[i] is not a prefix of any pattern.
-        if (i != $.len(s) && r!.root.priority == 0) {
-          let index = r!.mapping![$.indexString(s, i)] as number
-          if (index == r!.tableSize || r!.root.table![index] == null) {
-            i++
+    return io.runIO(
+      (function* (): Generator<
+        io.Awaitable<io.IOResult>,
+        io.IOResult,
+        io.IOResult
+      > {
+        const r = self
+        let sw = getStringWriter(w)
+        let last: number = 0
+        let n: number = 0
+        let prevMatchEmpty: boolean = false
+        for (let i = 0; i <= $.len(s); ) {
+          // Fast path: s[i] is not a prefix of any pattern.
+          if (i != $.len(s) && r!.root.priority == 0) {
+            let index = r!.mapping![$.indexString(s, i)] as number
+            if (
+              index == r!.tableSize ||
+              $.arrayIndex(r!.root.table!, index) == null
+            ) {
+              i++
+              continue
+            }
+          }
+
+          // Ignore the empty match iff the previous loop found the empty match.
+          let [val, keylen, match] = r!.lookup(
+            $.sliceString(s, i, undefined),
+            prevMatchEmpty,
+          )
+          prevMatchEmpty = match && keylen == 0
+          if (match) {
+            let [wn, err] = yield sw!.WriteString($.sliceString(s, last, i))
+            n += wn
+            if (err != null) {
+              return [n, err]
+            }
+            ;[wn, err] = yield sw!.WriteString(val)
+            n += wn
+            if (err != null) {
+              return [n, err]
+            }
+            i += keylen
+            last = i
             continue
           }
+          i++
         }
-
-        // Ignore the empty match iff the previous loop found the empty match.
-        let [val, keylen, match] = r!.lookup(
-          $.sliceString(s, i, undefined),
-          prevMatchEmpty,
-        )
-        prevMatchEmpty = match && keylen == 0
-        if (match) {
-          let [wn, err] = yield sw!.WriteString($.sliceString(s, last, i))
+        if (last != $.len(s)) {
+          const [wn, err] = yield sw!.WriteString(
+            $.sliceString(s, last, undefined),
+          )
           n += wn
-          if (err != null) {
-            return [n, err]
-          }
-          ;[wn, err] = yield sw!.WriteString(val)
-          n += wn
-          if (err != null) {
-            return [n, err]
-          }
-          i += keylen
-          last = i
-          continue
+          return [n, err]
         }
-        i++
-      }
-      if (last != $.len(s)) {
-        const [wn, err] = yield sw!.WriteString($.sliceString(s, last, undefined))
-        n += wn
-        return [n, err]
-      }
-      return [n, null]
-    })())
+        return [n, null]
+      })(),
+    )
   }
 }
 
@@ -632,7 +658,7 @@ function makeGenericReplacer(oldnew: $.Slice<string>): genericReplacer | null {
   let r = new genericReplacer()
   // Find each byte used, then assign them each an index.
   for (let i = 0; i < $.len(oldnew); i += 2) {
-    let key = oldnew![i]
+    let key = $.arrayIndex(oldnew!, i)
     for (let j = 0; j < $.len(key); j++) {
       r!.mapping![$.indexString(key, j)] = 1
     }
@@ -661,7 +687,12 @@ function makeGenericReplacer(oldnew: $.Slice<string>): genericReplacer | null {
   r!.root.table = $.makeSlice<trieNode | null>(r!.tableSize)
 
   for (let i = 0; i < $.len(oldnew); i += 2) {
-    r!.root.add(oldnew![i], oldnew![i + 1], $.len(oldnew) - i, r)
+    r!.root.add(
+      $.arrayIndex(oldnew!, i),
+      $.arrayIndex(oldnew!, i + 1),
+      $.len(oldnew) - i,
+      r,
+    )
   }
   return r
 }
@@ -764,32 +795,38 @@ class singleStringReplacer {
 
   public WriteString(w: io.Writer, s: string): io.Awaitable<io.IOResult> {
     const self = this
-    return io.runIO((function* (): Generator<io.Awaitable<io.IOResult>, io.IOResult, io.IOResult> {
-      const r = self
-      let sw = getStringWriter(w)
-      let i: number = 0
-      let n: number = 0
-      for (;;) {
-        let match = r!.finder!.next($.sliceString(s, i, undefined))
-        if (match == -1) {
-          break
+    return io.runIO(
+      (function* (): Generator<
+        io.Awaitable<io.IOResult>,
+        io.IOResult,
+        io.IOResult
+      > {
+        const r = self
+        let sw = getStringWriter(w)
+        let i: number = 0
+        let n: number = 0
+        for (;;) {
+          let match = r!.finder!.next($.sliceString(s, i, undefined))
+          if (match == -1) {
+            break
+          }
+          let [wn, err] = yield sw!.WriteString($.sliceString(s, i, i + match))
+          n += wn
+          if (err != null) {
+            return [n, err]
+          }
+          ;[wn, err] = yield sw!.WriteString(r!.value)
+          n += wn
+          if (err != null) {
+            return [n, err]
+          }
+          i += match + $.len(r!.finder!.pattern)
         }
-        let [wn, err] = yield sw!.WriteString($.sliceString(s, i, i + match))
+        const [wn, err] = yield sw!.WriteString($.sliceString(s, i, undefined))
         n += wn
-        if (err != null) {
-          return [n, err]
-        }
-        ;[wn, err] = yield sw!.WriteString(r!.value)
-        n += wn
-        if (err != null) {
-          return [n, err]
-        }
-        i += match + $.len(r!.finder!.pattern)
-      }
-      const [wn, err] = yield sw!.WriteString($.sliceString(s, i, undefined))
-      n += wn
-      return [n, err]
-    })())
+        return [n, err]
+      })(),
+    )
   }
 }
 
@@ -986,7 +1023,7 @@ class byteStringReplacer {
     if ($.len(r!.toReplace) * 8 <= $.len(s)) {
       // The -1 is because we are replacing 1 byte with len(replacements[b]) bytes.
       for (let _i = 0; _i < $.len(r!.toReplace); _i++) {
-        const x = r!.toReplace![_i]
+        const x = $.arrayIndex(r!.toReplace!, _i)
         {
           // The -1 is because we are replacing 1 byte with len(replacements[b]) bytes.
           {
@@ -1031,40 +1068,48 @@ class byteStringReplacer {
 
   public WriteString(w: io.Writer, s: string): io.Awaitable<io.IOResult> {
     const self = this
-    return io.runIO((function* (): Generator<io.Awaitable<io.IOResult>, io.IOResult, io.IOResult> {
-      const r = self
-      let sw = getStringWriter(w)
-      let last = 0
-      let n: number = 0
-      let err: $.GoError | null = null
-      for (let i = 0; i < $.len(s); i++) {
-        let b = $.indexString(s, i)
-        if (r!.replacements![b] == null) {
-          continue
-        }
-        if (last != i) {
-          let [nw, err] = yield sw!.WriteString($.sliceString(s, last, i))
+    return io.runIO(
+      (function* (): Generator<
+        io.Awaitable<io.IOResult>,
+        io.IOResult,
+        io.IOResult
+      > {
+        const r = self
+        let sw = getStringWriter(w)
+        let last = 0
+        let n: number = 0
+        let err: $.GoError | null = null
+        for (let i = 0; i < $.len(s); i++) {
+          let b = $.indexString(s, i)
+          if (r!.replacements![b] == null) {
+            continue
+          }
+          if (last != i) {
+            let [nw, err] = yield sw!.WriteString($.sliceString(s, last, i))
+            n += nw
+            if (err != null) {
+              return [n, err]
+            }
+          }
+          last = i + 1
+          let [nw, err] = yield w!.Write(r!.replacements![b])
           n += nw
           if (err != null) {
             return [n, err]
           }
         }
-        last = i + 1
-        let [nw, err] = yield w!.Write(r!.replacements![b])
-        n += nw
-        if (err != null) {
-          return [n, err]
+        if (last != $.len(s)) {
+          let [nw, err] = yield sw!.WriteString(
+            $.sliceString(s, last, undefined),
+          )
+          n += nw
+          if (err != null) {
+            return [n, err]
+          }
         }
-      }
-      if (last != $.len(s)) {
-        let [nw, err] = yield sw!.WriteString($.sliceString(s, last, undefined))
-        n += nw
-        if (err != null) {
-          return [n, err]
-        }
-      }
-      return [n, err]
-    })())
+        return [n, err]
+      })(),
+    )
   }
 }
 

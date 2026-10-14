@@ -126,7 +126,7 @@ describe('crypto/aes WebCrypto override', () => {
       $.stringToBytes('hello'),
       $.stringToBytes('aad'),
     )
-    sealed![0] ^= 1
+    $.sliceElems(sealed!)[$.sliceSlot(sealed!, 0)] ^= 1
 
     const [opened, openErr] = await aead!.Open(
       null,

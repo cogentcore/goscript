@@ -16,7 +16,7 @@ describe('binary append byte truncation', () => {
             if (kind === 'nil') return null
             if (kind === 'array') return [0xa5]
             const b = $.makeSlice<number>(1, 8, kind === 'byte-slice' ? 'byte' : undefined)
-            b![0] = 0xa5
+            $.sliceElems(b!)[$.sliceSlot(b!, 0)] = 0xa5
             return b
           }
           for (const value of [0, 0x1234, 0x89abcdef, 0xffffffff]) {

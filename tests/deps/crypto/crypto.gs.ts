@@ -293,7 +293,7 @@ export function RegisterHash(h: Hash, f: (() => hash.Hash | null | globalThis.Pr
 	if (h >= 20) {
 		$.panic("crypto: RegisterHash of unknown hash function")
 	}
-	hashes![h] = f
+	$.sliceElems(hashes!)[$.sliceSlot(hashes!, h)] = f
 }
 
 export async function SignMessage(signer: Signer | null, rand: io.Reader | null, msg: $.Slice<number>, opts: SignerOpts | null): globalThis.Promise<[$.Slice<number>, $.GoError]> {

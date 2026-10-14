@@ -121,7 +121,7 @@ export async function globWithLimit(
       return [null, dirErr]
     }
     for (let _i = 0; _i < $.len(dirs); _i++) {
-      const d = dirs![_i]
+      const d = $.arrayIndex(dirs!, _i)
       {
         const [nextMatches, globErr] = await glob(fsys, d, file, matches)
         matches = nextMatches
@@ -167,7 +167,7 @@ export async function glob(
     }
 
     for (let _i = 0; _i < $.len(infos); _i++) {
-      const info = infos![_i]
+      const info = $.arrayIndex(infos!, _i)
       {
         let n = info!.Name()
         let [matched, err] = path.Match(pattern, n)

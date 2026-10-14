@@ -422,7 +422,7 @@ export class File {
         lines.push(line)
       }
       line = -1
-      if (content![offset] === 10) {
+      if ($.arrayIndex(content!, offset) === 10) {
         line = offset + 1
       }
     }

@@ -35,7 +35,7 @@ class bufferWriterAt {
     const base = Number(off)
     const bytes = p ?? new Uint8Array(0)
     for (let i = 0; i < bytes.length; i++) {
-      this.buf[base + i] = bytes[i]
+      this.buf[base + i] = $.arrayIndex(bytes, i)
     }
     return [$.len(p), null]
   }

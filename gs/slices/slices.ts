@@ -30,8 +30,8 @@ export function Compare<T extends cmp.Ordered>(
   const minLen = len1 < len2 ? len1 : len2
 
   for (let i = 0; i < minLen; i++) {
-    const v1 = (s1 as any)[i] as T
-    const v2 = (s2 as any)[i] as T
+    const v1 = $.arrayIndex(s1 as any, i) as T
+    const v2 = $.arrayIndex(s2 as any, i) as T
     const result = cmp.Compare(v1, v2)
     if (result !== 0) {
       return result
@@ -63,8 +63,8 @@ export function CompareFunc<T, U, R extends $.MaybePromise<number>>(
       const minLen = len1 < len2 ? len1 : len2
       for (let i = 0; i < minLen; i++) {
         const result: number = yield compare(
-          (s1 as any)[i] as T,
-          (s2 as any)[i] as U,
+          $.arrayIndex(s1 as any, i) as T,
+          $.arrayIndex(s2 as any, i) as U,
         )
         if (result !== 0) {
           return result
@@ -171,7 +171,7 @@ export function All<T>(
     const length = $.len(s)
     const walk = (i: number): void | globalThis.Promise<void> => {
       for (; i < length; i++) {
-        const stored = (s as any)[i] as T // Use proper indexing to avoid type issues
+        const stored = $.arrayIndex(s as any, i) as T // Use proper indexing to avoid type issues
         const value = $.copyElement(stored)
         const keepGoing = _yield(i, value)
         if (keepGoing instanceof Promise) {
@@ -200,7 +200,7 @@ export function Backward<T>(
   ): void | globalThis.Promise<void> {
     const walk = (i: number): void | globalThis.Promise<void> => {
       for (; i >= 0; i--) {
-        const stored = (s as any)[i] as T
+        const stored = $.arrayIndex(s as any, i) as T
         const value = $.copyElement(stored)
         const keepGoing = _yield(i, value)
         if (keepGoing instanceof Promise) {
@@ -234,7 +234,7 @@ export function Values<T>(s: $.Slice<T>): iter.Seq<T> {
     const length = $.len(s)
     const walk = (i: number): void | globalThis.Promise<void> => {
       for (; i < length; i++) {
-        const stored = (s as any)[i] as T
+        const stored = $.arrayIndex(s as any, i) as T
         const keepGoing = _yield!($.copyElement(stored))
         if (keepGoing instanceof Promise) {
           return keepGoing.then((next) => {
@@ -299,7 +299,12 @@ export function Sort<T extends cmp.Ordered>(s: $.Slice<T>): void {
 
 export function IsSorted<T extends cmp.Ordered>(x: $.Slice<T>): boolean {
   for (let i = $.len(x) - 1; i > 0; i--) {
-    if (cmp.Compare((x as any)[i] as T, (x as any)[i - 1] as T) < 0) {
+    if (
+      cmp.Compare(
+        $.arrayIndex(x as any, i) as T,
+        $.arrayIndex(x as any, i - 1) as T,
+      ) < 0
+    ) {
       return false
     }
   }
@@ -310,9 +315,9 @@ export function Max<T extends cmp.Ordered>(x: $.Slice<T>): T {
   if ($.len(x) === 0) {
     throw new Error('slices.Max: empty list')
   }
-  let max = (x as any)[0] as T
+  let max = $.arrayIndex(x as any, 0) as T
   for (let i = 1; i < $.len(x); i++) {
-    const value = (x as any)[i] as T
+    const value = $.arrayIndex(x as any, i) as T
     if (cmp.Compare(max, value) < 0) {
       max = value
     }
@@ -324,9 +329,9 @@ export function Min<T extends cmp.Ordered>(x: $.Slice<T>): T {
   if ($.len(x) === 0) {
     throw new Error('slices.Min: empty list')
   }
-  let min = (x as any)[0] as T
+  let min = $.arrayIndex(x as any, 0) as T
   for (let i = 1; i < $.len(x); i++) {
-    const value = (x as any)[i] as T
+    const value = $.arrayIndex(x as any, i) as T
     if (cmp.Compare(value, min) < 0) {
       min = value
     }
@@ -346,9 +351,9 @@ export function MaxFunc<T, R extends $.MaybePromise<number>>(
   }
   return $.runCallbacks(
     (function* () {
-      let max = (x as any)[0] as T
+      let max = $.arrayIndex(x as any, 0) as T
       for (let i = 1; i < $.len(x); i++) {
-        const value = (x as any)[i] as T
+        const value = $.arrayIndex(x as any, i) as T
         if ((yield compare(max, value)) < 0) {
           max = value
         }
@@ -370,9 +375,9 @@ export function MinFunc<T, R extends $.MaybePromise<number>>(
   }
   return $.runCallbacks(
     (function* () {
-      let min = (x as any)[0] as T
+      let min = $.arrayIndex(x as any, 0) as T
       for (let i = 1; i < $.len(x); i++) {
-        const value = (x as any)[i] as T
+        const value = $.arrayIndex(x as any, i) as T
         if ((yield compare(value, min)) < 0) {
           min = value
         }
@@ -468,11 +473,11 @@ export function Delete<T>(s: $.Slice<T>, i: number, j: number): $.Slice<T> {
   // Shift elements after j to position i
   const deleteCount = j - i
   for (let k = j; k < length; k++) {
-    ;(s as any)[k - deleteCount] = (s as any)[k]
+    $.sliceElems(s)[$.sliceSlot(s, k - deleteCount)] = $.arrayIndex(s as any, k)
   }
   // Zero out the elements at the end
   for (let k = length - deleteCount; k < length; k++) {
-    ;(s as any)[k] = null
+    $.sliceElems(s)[$.sliceSlot(s, k)] = null
   }
   // Update the slice length
   return $.goSlice(s, 0, length - deleteCount) as $.Slice<T>
@@ -492,14 +497,14 @@ export function DeleteFunc<T, R extends $.MaybePromise<boolean>>(
       }
       let w = 0
       for (let i = 0; i < s.length; i++) {
-        const value = s[i] as T
+        const value = $.arrayIndex(s, i) as T
         if (!(yield del(value))) {
-          s[w] = value
+          $.sliceElems(s)[$.sliceSlot(s, w)] = value
           w++
         }
       }
       for (let i = w; i < s.length; i++) {
-        s[i] = clearValue(s) as T
+        $.sliceElems(s)[$.sliceSlot(s, i)] = clearValue(s) as T
       }
       return $.goSlice(s, 0, w) as $.Slice<T>
     })(),
@@ -531,13 +536,18 @@ export function Compact<T>(s: $.Slice<T>): $.Slice<T> {
   }
   let w = 1
   for (let i = 1; i < $.len(s); i++) {
-    if (!$.comparableEqual((s as any)[i], (s as any)[i - 1])) {
-      ;(s as any)[w] = (s as any)[i]
+    if (
+      !$.comparableEqual(
+        $.arrayIndex(s as any, i),
+        $.arrayIndex(s as any, i - 1),
+      )
+    ) {
+      $.sliceElems(s)[$.sliceSlot(s, w)] = $.arrayIndex(s as any, i)
       w++
     }
   }
   for (let i = w; i < $.len(s); i++) {
-    ;(s as any)[i] = clearValue(s)
+    $.sliceElems(s)[$.sliceSlot(s, i)] = clearValue(s)
   }
   return $.goSlice(s, 0, w) as $.Slice<T>
 }
@@ -556,13 +566,18 @@ export function CompactFunc<T, R extends $.MaybePromise<boolean>>(
       }
       let w = 1
       for (let i = 1; i < $.len(s); i++) {
-        if (!(yield eq((s as any)[i - 1] as T, (s as any)[i] as T))) {
-          ;(s as any)[w] = (s as any)[i]
+        if (
+          !(yield eq(
+            $.arrayIndex(s as any, i - 1) as T,
+            $.arrayIndex(s as any, i) as T,
+          ))
+        ) {
+          $.sliceElems(s)[$.sliceSlot(s, w)] = $.arrayIndex(s as any, i)
           w++
         }
       }
       for (let i = w; i < $.len(s); i++) {
-        ;(s as any)[i] = clearValue(s)
+        $.sliceElems(s)[$.sliceSlot(s, i)] = clearValue(s)
       }
       return $.goSlice(s, 0, w) as $.Slice<T>
     })(),
@@ -585,7 +600,9 @@ export function Equal<T>(s1: $.Slice<T>, s2: $.Slice<T>): boolean {
     return false
   }
   for (let i = 0; i < len1; i++) {
-    if (!$.comparableEqual((s1 as any)[i], (s2 as any)[i])) {
+    if (
+      !$.comparableEqual($.arrayIndex(s1 as any, i), $.arrayIndex(s2 as any, i))
+    ) {
       return false
     }
   }
@@ -607,7 +624,12 @@ export function EqualFunc<T, U, R extends $.MaybePromise<boolean>>(
         return false
       }
       for (let i = 0; i < len1; i++) {
-        if (!(yield eq((s1 as any)[i] as T, (s2 as any)[i] as U))) {
+        if (
+          !(yield eq(
+            $.arrayIndex(s1 as any, i) as T,
+            $.arrayIndex(s2 as any, i) as U,
+          ))
+        ) {
           return false
         }
       }
@@ -618,7 +640,7 @@ export function EqualFunc<T, U, R extends $.MaybePromise<boolean>>(
 
 export function Index<T>(s: $.Slice<T>, v: T): number {
   for (let i = 0; i < $.len(s); i++) {
-    if ($.comparableEqual((s as any)[i], v)) {
+    if ($.comparableEqual($.arrayIndex(s as any, i), v)) {
       return i
     }
   }
@@ -640,7 +662,7 @@ function* indexFunc<T>(
   f: (value: T) => $.MaybePromise<boolean>,
 ): $.CallbackRun<number> {
   for (let i = 0; i < $.len(s); i++) {
-    if (yield f((s as any)[i] as T)) {
+    if (yield f($.arrayIndex(s as any, i) as T)) {
       return i
     }
   }
@@ -684,9 +706,9 @@ export function Insert<T>(s: $.Slice<T>, i: number, ...v: T[]): $.Slice<T> {
 
 export function Reverse<T>(s: $.Slice<T>): void {
   for (let i = 0, j = $.len(s) - 1; i < j; i++, j--) {
-    const tmp = (s as any)[i]
-    ;(s as any)[i] = (s as any)[j]
-    ;(s as any)[j] = tmp
+    const tmp = $.arrayIndex(s as any, i)
+    $.sliceElems(s)[$.sliceSlot(s, i)] = $.arrayIndex(s as any, j)
+    $.sliceElems(s)[$.sliceSlot(s, j)] = tmp
   }
 }
 
@@ -751,7 +773,7 @@ export function SortFunc<T, R extends $.MaybePromise<number>>(
       }
       const sorted = yield* mergeSort(Array.from(s as any as T[]), cmp)
       for (let i = 0; i < sorted.length; i++) {
-        ;(s as any)[i] = sorted[i]
+        $.sliceElems(s)[$.sliceSlot(s, i)] = sorted[i]
       }
     })(),
   )
@@ -796,7 +818,12 @@ export function IsSortedFunc<T, R extends $.MaybePromise<number>>(
   return $.runCallbacks(
     (function* () {
       for (let i = $.len(x) - 1; i > 0; i--) {
-        if ((yield cmp((x as any)[i] as T, (x as any)[i - 1] as T)) < 0) {
+        if (
+          (yield cmp(
+            $.arrayIndex(x as any, i) as T,
+            $.arrayIndex(x as any, i - 1) as T,
+          )) < 0
+        ) {
           return false
         }
       }
@@ -871,13 +898,14 @@ function* binarySearchFunc<E, T>(
   let right = n
   while (left < right) {
     const mid = Math.floor((left + right) / 2)
-    if ((yield cmp((x as any)[mid] as E, target)) < 0) {
+    if ((yield cmp($.arrayIndex(x as any, mid) as E, target)) < 0) {
       left = mid + 1
     } else {
       right = mid
     }
   }
-  const found = left < n && (yield cmp((x as any)[left] as E, target)) === 0
+  const found =
+    left < n && (yield cmp($.arrayIndex(x as any, left) as E, target)) === 0
   return [left, found]
 }
 

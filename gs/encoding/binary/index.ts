@@ -577,7 +577,7 @@ function decodeFixedSlice(
   const width = fixedSize(elemKind, 0)
   const count = $.len(target as $.Slice<unknown>)
   for (let i = 0; i < count; i++) {
-    ;(target as any)[i] = decodeScalar(
+    $.sliceElems(target)[$.sliceSlot(target, i)] = decodeScalar(
       $.goSlice(buf, i * width, i * width + width),
       order,
       elemKind,
@@ -618,7 +618,7 @@ function encodeFixed(
         $.goSlice(buf, i * width, i * width + width),
         order,
         elemKind,
-        (value as any)[i],
+        $.arrayIndex(value as any, i),
       )
     }
     return
@@ -723,7 +723,7 @@ function decodeTarget(data: unknown): decodedTarget | null {
   if (value instanceof Uint8Array) {
     return { kind: '[]uint8', value, settable: null }
   }
-  if (Array.isArray(value)) {
+  if ($.isArrayOrGoSlice(value)) {
     if (value.every((item) => typeof item === 'boolean')) {
       return { kind: '[]bool', value, settable: null }
     }
@@ -990,7 +990,7 @@ function shapeEncode(
           $.goSlice(buf, i * width, i * width + width),
           order,
           shape.elem,
-          (value as $.Slice<unknown>)![i],
+          $.arrayIndex((value as $.Slice<unknown>)!, i),
         )
       }
       return
@@ -1085,7 +1085,7 @@ function unsupportedKind(data: unknown): string {
   if ($.isVarRef(data)) {
     return 'untyped pointer'
   }
-  if (Array.isArray(data)) {
+  if ($.isArrayOrGoSlice(data)) {
     return 'array'
   }
   if (data === null || data === undefined) {
@@ -1122,12 +1122,12 @@ function requireLen(b: $.Slice<number>, n: number): void {
 }
 
 function byteAt(b: $.Slice<number>, i: number): number {
-  return Number((b as any)[i]) & 0xff
+  return Number($.arrayIndex(b as any, i)) & 0xff
 }
 
 function setByte(b: $.Slice<number>, i: number, v: number): void {
   requireLen(b, i + 1)
-  ;(b as any)[i] = Number(v) & 0xff
+  $.sliceElems(b)[$.sliceSlot(b, i)] = Number(v) & 0xff
 }
 
 function encodeSignedVarint(x: number | bigint): bigint {

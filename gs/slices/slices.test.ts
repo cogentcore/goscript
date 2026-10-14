@@ -310,17 +310,17 @@ describe('struct element copies', () => {
   it('gives Insert, Replace, and Grow their own struct elements', () => {
     const inserted = $.arrayToSlice([cell(1)])
     const insertedOut = Insert(inserted, 0, cell(0))
-    ;(insertedOut as Cell[])[1].n = 7
+    $.arrayIndex(insertedOut, 1).n = 7
     expect(inserted[0].n).toBe(1)
 
     const replaced = $.arrayToSlice([cell(1)])
     const replacedOut = Replace(replaced, 0, 0, cell(0))
-    ;(replacedOut as Cell[])[1].n = 8
+    $.arrayIndex(replacedOut, 1).n = 8
     expect(replaced[0].n).toBe(1)
 
     const grown = $.arrayToSlice([cell(1)])
     const grownOut = Grow(grown, 1)
-    ;(grownOut as Cell[])[0].n = 9
+    $.arrayIndex(grownOut, 0).n = 9
     expect(grown[0].n).toBe(1)
   })
 
@@ -330,13 +330,13 @@ describe('struct element copies', () => {
       yieldValue!(stored)
       return true
     })
-    ;(appended as Cell[])[0].n = 9
+    $.arrayIndex(appended, 0).n = 9
     expect(stored.n).toBe(1)
 
     const values = $.makeMap<number, Cell>()
     $.mapSet(values, 0, cell(1))
     const collected = Collect(mapValues(values))
-    ;(collected as Cell[])[0].n = 9
+    $.arrayIndex(collected, 0).n = 9
     expect($.mapGet(values, 0, cell(0))[0].n).toBe(1)
   })
 })
@@ -446,7 +446,7 @@ describe('slices.Repeat', () => {
   it('repeats elements and returns a non-nil empty slice for a zero count', () => {
     const source = $.arrayToSlice([1, 2])
     const repeated = Repeat(source, 3)
-    ;(repeated as number[])[0] = 9
+    $.sliceElems(repeated)[$.sliceSlot(repeated, 0)] = 9
 
     expect(Array.from(repeated ?? [])).toEqual([9, 2, 1, 2, 1, 2])
     expect($.len(repeated)).toBe(6)

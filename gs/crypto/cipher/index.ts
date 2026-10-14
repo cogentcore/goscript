@@ -416,7 +416,7 @@ class ctrStream implements Stream {
       }
       const chunk = Math.min(this.keystream.length - this.keystreamUsed, n - done)
       for (let i = 0; i < chunk; i++) {
-        output[done + i] = input[done + i] ^ this.keystream[this.keystreamUsed + i]
+        $.sliceElems(output)[$.sliceSlot(output, done + i)] = $.arrayIndex(input, done + i) ^ this.keystream[this.keystreamUsed + i]
       }
       done += chunk
       this.keystreamUsed += chunk
@@ -488,7 +488,7 @@ function mapStreamIOResult<T extends StreamIOResult | PromiseLike<StreamIOResult
   transform: (result: StreamIOResult) => StreamIOResult,
 ): MappedIOResult<T> {
   return (
-    Array.isArray(result) ? transform(result) : Promise.resolve(result).then(transform)
+    $.isArrayOrGoSlice(result) ? transform(result) : Promise.resolve(result).then(transform)
   ) as MappedIOResult<T>
 }
 

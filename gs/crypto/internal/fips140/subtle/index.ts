@@ -7,7 +7,7 @@ export function ConstantTimeCompare(x: $.Bytes, y: $.Bytes): number {
 
   let v = 0
   for (let i = 0; i < $.len(x); i++) {
-    v |= x![i] ^ y![i]
+    v |= $.arrayIndex(x!, i) ^ $.arrayIndex(y!, i)
   }
   return v === 0 ? 1 : 0
 }
@@ -20,8 +20,8 @@ export function ConstantTimeLessOrEqBytes(x: $.Bytes, y: $.Bytes): number {
   let less = 0
   let greater = 0
   for (let i = 0; i < $.len(x); i++) {
-    const xLess = ((x![i] - y![i]) >>> 31) & 1
-    const xGreater = ((y![i] - x![i]) >>> 31) & 1
+    const xLess = (($.arrayIndex(x!, i) - $.arrayIndex(y!, i)) >>> 31) & 1
+    const xGreater = (($.arrayIndex(y!, i) - $.arrayIndex(x!, i)) >>> 31) & 1
     const undecided = 1 ^ (less | greater)
     less |= undecided & xLess
     greater |= undecided & xGreater
@@ -37,7 +37,8 @@ export function ConstantTimeCopy(v: number, x: $.Bytes, y: $.Bytes): void {
   const xmask = (v - 1) & 0xff
   const ymask = ~(v - 1) & 0xff
   for (let i = 0; i < $.len(x); i++) {
-    x![i] = (x![i] & xmask) | (y![i] & ymask)
+    $.sliceElems(x!)[$.sliceSlot(x!, i)] =
+      ($.arrayIndex(x!, i) & xmask) | ($.arrayIndex(y!, i) & ymask)
   }
 }
 
@@ -54,7 +55,8 @@ export function XORBytes(dst: $.Bytes, x: $.Bytes, y: $.Bytes): number {
   }
 
   for (let i = 0; i < n; i++) {
-    dst![i] = x![i] ^ y![i]
+    $.sliceElems(dst!)[$.sliceSlot(dst!, i)] =
+      $.arrayIndex(x!, i) ^ $.arrayIndex(y!, i)
   }
   return n
 }

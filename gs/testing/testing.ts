@@ -65,7 +65,7 @@ function goArgs(args: unknown[]): unknown[] {
   if (arg === null) {
     return []
   }
-  if (Array.isArray(arg) && !('__goType' in arg)) {
+  if ($.isArrayOrGoSlice(arg) && !('__goType' in arg)) {
     return $.asArray(arg)
   }
   return args
