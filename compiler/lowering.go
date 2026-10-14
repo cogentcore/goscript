@@ -850,6 +850,16 @@ func (o *LoweringOwner) analyzeLocalFileReferences(
 		if obj == nil || obj.Pkg() == nil {
 			return
 		}
+
+		// A method of an instantiated generic type is declared by its origin,
+		// so it shares the origin's alias.
+		if fn, ok := obj.(*types.Func); ok && fn.Origin() != fn {
+			addObject(fn.Origin(), runtime)
+			if alias := analysis.aliases[fn.Origin()]; alias != "" {
+				analysis.aliases[obj] = alias
+			}
+			return
+		}
 		if obj.Pkg().Path() != semPkg.pkgPath {
 			if runtime {
 				analysis.implicitImports[obj.Pkg().Path()] = true
