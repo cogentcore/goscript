@@ -113,8 +113,8 @@ export async function main(): globalThis.Promise<void> {
 	if ((((err != null) || ($.sliceLen(appended) != ($.sliceLen(state) + 2))) || ($.arrayIndex(appended!, 0) != 4)) || ($.arrayIndex(appended!, 1) != 5)) {
 		$.panic("AppendBinary")
 	}
-	for (let __goscriptRangeTarget3 = state, __goscriptRangeWindow3 = $.sliceRange(__goscriptRangeTarget3), i = 0; i < __goscriptRangeWindow3.length; i++) {
-		if ($.arrayIndex(appended!, i + 2) != ((__goscriptRangeWindow3.backing as any[])[__goscriptRangeWindow3.offset + i] as number)) {
+	for (let __goscriptRangeTarget3 = state, __goscriptRangeWindow3 = $.sliceRange(__goscriptRangeTarget3), __goscriptSliceWindow0 = $.sliceRange(appended), i = 0; i < __goscriptRangeWindow3.length; i++) {
+		if (((__goscriptSliceWindow0.backing as any[])[$.windowSlot(__goscriptSliceWindow0, i + 2)] as number) != ((__goscriptRangeWindow3.backing as any[])[__goscriptRangeWindow3.offset + i] as number)) {
 			$.panic("AppendBinary state")
 		}
 	}

@@ -7,9 +7,9 @@ export function search<E>(__typeArgs: $.GenericTypeArgs | undefined, dictionary:
 	let result: any = $.genericZero(__typeArgs, "E", null)
 	let _from = 0
 	let to = $.sliceLen(dictionary)
-	while (to > _from) {
+	for (let __goscriptSliceWindow0 = $.sliceRange(dictionary); to > _from; ) {
 		let middle: number = globalThis.Math.trunc((_from + to) / 2)
-		let cpRange = $.copyElement($.arrayIndex(dictionary!, middle))
+		let cpRange = $.copyElement(((__goscriptSliceWindow0.backing as any[])[$.windowSlot(__goscriptSliceWindow0, middle)] as any))
 		if ($.int(r) < $.arrayIndex((cpRange as number[]), 0)) {
 			to = middle
 			continue

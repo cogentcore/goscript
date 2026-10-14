@@ -80,8 +80,8 @@ export async function main(): globalThis.Promise<void> {
 	// Test 11: Slice operations on made slices
 	await $.println("--- Slice operations on made slices ---")
 	let s6: $.Slice<number> = $.makeSlice<number>(10, 20, "number")
-	for (let i = 0; i < 10; i++) {
-		$.sliceElems(s6!)[$.sliceSlot(s6!, i)] = i * 10
+	for (let __goscriptSliceWindow0 = $.sliceRange(s6), i = 0; i < 10; i++) {
+		;(__goscriptSliceWindow0.backing as any[])[$.windowSlot(__goscriptSliceWindow0, i)] = i * 10
 	}
 	let sub: $.Slice<number> = $.goSlice(s6, 2, 5)
 	await $.println("sub - len:", $.sliceLen(sub), "cap:", $.cap(sub))

@@ -87,8 +87,8 @@ export class repeatReader {
 			return [0, io.EOF]
 		}
 		let n = $.min($.sliceLen(p), (r$ as repeatReader).remaining)
-		for (let __goscriptRangeCount0 = n, i = 0; i < __goscriptRangeCount0; i++) {
-			$.sliceElems(p!)[$.sliceSlot(p!, i)] = $.uint(i, 8)
+		for (let __goscriptSliceWindow2 = $.sliceRange(p), __goscriptRangeCount0 = n, i = 0; i < __goscriptRangeCount0; i++) {
+			;(__goscriptSliceWindow2.backing as any[])[$.windowSlot(__goscriptSliceWindow2, i)] = $.uint(i, 8)
 		}
 		;(r$ as repeatReader).remaining = (r$ as repeatReader).remaining - (n)
 		return [n, null]
@@ -106,8 +106,8 @@ export class repeatReader {
 export function algorithm(data: $.Slice<number>, n: number, g: $.Slice<bigint>, maskC: bigint, maskJ: bigint, minSize: number, jumpLength: number): number {
 	let fp = 0n
 	let i = minSize
-	while (i < n) {
-		fp = $.uint64Add(($.uint64Shl(fp, 1n)), $.arrayIndex(g!, $.arrayIndex(data!, i) % uint64Len(g)))
+	for (let __goscriptSliceWindow0 = $.sliceRange(g), __goscriptSliceWindow1 = $.sliceRange(data); i < n; ) {
+		fp = $.uint64Add(($.uint64Shl(fp, 1n)), ((__goscriptSliceWindow0.backing as any[])[$.windowSlot(__goscriptSliceWindow0, ((__goscriptSliceWindow1.backing as any[])[$.windowSlot(__goscriptSliceWindow1, i)] as number) % uint64Len(g))] as bigint))
 		if (($.uint64And(fp, maskJ)) == 0n) {
 			if (($.uint64And(fp, maskC)) == 0n) {
 				return i

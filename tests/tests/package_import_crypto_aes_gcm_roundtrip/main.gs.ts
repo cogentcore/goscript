@@ -151,10 +151,10 @@ export class nestedSealer {
 export function encodeHex(data: $.Slice<number>): string {
 	const digits: string = "0123456789abcdef"
 	let encoded: $.Slice<number> = $.makeSlice<number>($.sliceLen(data) * 2, undefined, "byte")
-	for (let __goscriptRangeTarget0 = data, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), i = 0; i < __goscriptRangeWindow0.length; i++) {
-		let value = $.uint((__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + i] as number), 8)
-		$.sliceElems(encoded!)[$.sliceSlot(encoded!, i * 2)] = $.indexByteString("\x30\x31\x32\x33\x34\x35\x36\x37\x38\x39\x61\x62\x63\x64\x65\x66", $.uintShr(value, 4, 8))
-		$.sliceElems(encoded!)[$.sliceSlot(encoded!, (i * 2) + 1)] = $.indexByteString("\x30\x31\x32\x33\x34\x35\x36\x37\x38\x39\x61\x62\x63\x64\x65\x66", value & 0xf)
+	for (let __goscriptRangeTarget0 = data, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __goscriptSliceWindow0 = $.sliceRange(encoded), i = 0; i < __goscriptRangeWindow0.length; i++) {
+		let value = $.uint((__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + i] as number), 8);
+		;(__goscriptSliceWindow0.backing as any[])[$.windowSlot(__goscriptSliceWindow0, i * 2)] = $.indexByteString("\x30\x31\x32\x33\x34\x35\x36\x37\x38\x39\x61\x62\x63\x64\x65\x66", $.uintShr(value, 4, 8));
+		;(__goscriptSliceWindow0.backing as any[])[$.windowSlot(__goscriptSliceWindow0, (i * 2) + 1)] = $.indexByteString("\x30\x31\x32\x33\x34\x35\x36\x37\x38\x39\x61\x62\x63\x64\x65\x66", value & 0xf)
 	}
 	return $.bytesToString(encoded)
 }

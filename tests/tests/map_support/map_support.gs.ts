@@ -69,13 +69,13 @@ export async function main(): globalThis.Promise<void> {
 	// Inline bubble sort for string slice
 	// (avoid importing sort package yet)
 	let n = $.sliceLen(scoreResults)
-	for (let i = 0; i < (n - 1); i++) {
+	for (let __goscriptSliceWindow0 = $.sliceRange(scoreResults), i = 0; i < (n - 1); i++) {
 		for (let j = 0; j < ((n - i) - 1); j++) {
-			if ($.stringCompare($.arrayIndex(scoreResults!, j), $.arrayIndex(scoreResults!, j + 1)) > 0) {
-				let __goscriptAssign0_0: string = $.arrayIndex(scoreResults!, j + 1)
-				let __goscriptAssign0_1: string = $.arrayIndex(scoreResults!, j)
-				$.sliceElems(scoreResults!)[$.sliceSlot(scoreResults!, j)] = __goscriptAssign0_0
-				$.sliceElems(scoreResults!)[$.sliceSlot(scoreResults!, j + 1)] = __goscriptAssign0_1
+			if ($.stringCompare(((__goscriptSliceWindow0.backing as any[])[$.windowSlot(__goscriptSliceWindow0, j)] as string), ((__goscriptSliceWindow0.backing as any[])[$.windowSlot(__goscriptSliceWindow0, j + 1)] as string)) > 0) {
+				let __goscriptAssign0_0: string = ((__goscriptSliceWindow0.backing as any[])[$.windowSlot(__goscriptSliceWindow0, j + 1)] as string)
+				let __goscriptAssign0_1: string = ((__goscriptSliceWindow0.backing as any[])[$.windowSlot(__goscriptSliceWindow0, j)] as string);
+				;(__goscriptSliceWindow0.backing as any[])[$.windowSlot(__goscriptSliceWindow0, j)] = __goscriptAssign0_0;
+				;(__goscriptSliceWindow0.backing as any[])[$.windowSlot(__goscriptSliceWindow0, j + 1)] = __goscriptAssign0_1
 			}
 		}
 	}

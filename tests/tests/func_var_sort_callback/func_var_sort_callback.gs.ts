@@ -11,8 +11,8 @@ import "@goscript/slices/index.js"
 
 export async function order(prev: $.Slice<string>, hosts: $.Slice<string>): globalThis.Promise<$.Slice<string>> {
 	let ranks: globalThis.Map<string, number> | null = $.makeMap<string, number>([])
-	for (let i = $.sliceLen(prev) - 1; i >= 0; i--) {
-		$.mapSet(ranks, $.arrayIndex(prev!, i), i)
+	for (let __goscriptSliceWindow0 = $.sliceRange(prev), i = $.sliceLen(prev) - 1; i >= 0; i--) {
+		$.mapSet(ranks, ((__goscriptSliceWindow0.backing as any[])[$.windowSlot(__goscriptSliceWindow0, i)] as string), i)
 	}
 	let known = $.sliceLen(prev)
 
