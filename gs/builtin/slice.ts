@@ -2465,21 +2465,56 @@ export const stringToRunes = (str: string): number[] => {
  * rangeString returns UTF-8 byte offsets and rune values for string iteration.
  */
 export const rangeString = (str: string): Array<[number, number]> => {
-  // ASCII bytes are their runes, and other runes are decoded.
-  str = str.toString()
   const pairs: Array<[number, number]> = []
-  for (let i = 0; i < str.length; ) {
-    const c = str.charCodeAt(i)
-    if (c < 0x80) {
-      pairs.push([i, c])
-      i++
-      continue
-    }
-    const [r, size] = decodeRuneInString(str, i)
-    pairs.push([i, r])
-    i += size
+  for (const runes = new StringRunes(str.toString()); runes.next(); ) {
+    pairs.push([runes.index, runes.rune])
   }
   return pairs
+}
+
+/**
+ * StringRunes steps through the runes of a Go string as a range loop over the
+ * string does: each call of next moves to the next rune, setting index to its
+ * byte offset and rune to its value, and returns false at the end. An ASCII
+ * byte, the common case, is its own rune, so stepping over it allocates
+ * nothing; other runes are decoded from their bytes.
+ */
+export class StringRunes {
+  index = 0
+  rune = 0
+  // pos is the byte offset of the next rune.
+  private pos = 0
+
+  constructor(private readonly str: string) {}
+
+  next(): boolean {
+    // The string ends after its last byte.
+    const str = this.str
+    const pos = this.pos
+    if (pos >= str.length) {
+      return false
+    }
+    this.index = pos
+
+    // An ASCII byte is its own rune, and any other byte starts a sequence.
+    const c = str.charCodeAt(pos)
+    if (c < 0x80) {
+      this.rune = c
+      this.pos = pos + 1
+      return true
+    }
+    const [r, size] = decodeRuneInString(str, pos)
+    this.rune = r
+    this.pos = pos + size
+    return true
+  }
+}
+
+/**
+ * stringRunes returns a StringRunes for a range loop over str.
+ */
+export function stringRunes(str: string): StringRunes {
+  return new StringRunes(str)
 }
 
 /**
