@@ -21,14 +21,17 @@ export class CoreStore {
 		Prefix: string
 	}
 
-	constructor(init?: Partial<{Prefix?: string}>) {
+	constructor(init?: Partial<{Prefix?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Prefix: init?.Prefix ?? ("" as string)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): CoreStore {
-		return $.markAsStructValue(new CoreStore(this))
+		return new CoreStore(this, true)
 	}
 
 	public __goscriptAssign(source: CoreStore): void {

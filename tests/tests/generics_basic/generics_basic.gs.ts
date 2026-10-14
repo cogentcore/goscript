@@ -38,14 +38,17 @@ export class Stack {
 		items: $.Slice<any>
 	}
 
-	constructor(init?: Partial<{items?: $.Slice<any>}>) {
+	constructor(init?: Partial<{items?: $.Slice<any>}>, __goscriptValue?: boolean) {
 		this._fields = {
 			items: init?.items ?? (null! as $.Slice<any>)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): Stack {
-		return $.markAsStructValue(new Stack(this))
+		return new Stack(this, true)
 	}
 
 	public __goscriptAssign(source: Stack): void {
@@ -97,14 +100,17 @@ export class Item {
 		Name: string
 	}
 
-	constructor(init?: Partial<{Name?: string}>) {
+	constructor(init?: Partial<{Name?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Name: init?.Name ?? ("" as string)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): Item {
-		return $.markAsStructValue(new Item(this))
+		return new Item(this, true)
 	}
 
 	public __goscriptAssign(source: Item): void {
@@ -143,14 +149,17 @@ export class Mapper {
 		values: globalThis.Map<any, any> | null
 	}
 
-	constructor(init?: Partial<{values?: globalThis.Map<any, any> | null}>) {
+	constructor(init?: Partial<{values?: globalThis.Map<any, any> | null}>, __goscriptValue?: boolean) {
 		this._fields = {
 			values: init?.values ?? (null! as globalThis.Map<any, any> | null)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): Mapper {
-		return $.markAsStructValue(new Mapper(this))
+		return new Mapper(this, true)
 	}
 
 	public __goscriptAssign(source: Mapper): void {
@@ -201,15 +210,18 @@ export class Pair {
 		Second: any
 	}
 
-	constructor(init?: Partial<{First?: any, Second?: any}>) {
+	constructor(init?: Partial<{First?: any, Second?: any}>, __goscriptValue?: boolean) {
 		this._fields = {
 			First: init?.First !== undefined ? $.copyElement(init.First) : (null! as any),
 			Second: init?.Second !== undefined ? $.copyElement(init.Second) : (null! as any)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): Pair {
-		return $.markAsStructValue(new Pair(this))
+		return new Pair(this, true)
 	}
 
 	public __goscriptAssign(source: Pair): void {

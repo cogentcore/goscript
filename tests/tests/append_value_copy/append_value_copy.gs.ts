@@ -17,14 +17,17 @@ export class cell {
 		width: number
 	}
 
-	constructor(init?: Partial<{width?: number}>) {
+	constructor(init?: Partial<{width?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			width: init?.width ?? (0 as number)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): cell {
-		return $.markAsStructValue(new cell(this))
+		return new cell(this, true)
 	}
 
 	public __goscriptAssign(source: cell): void {
@@ -44,9 +47,9 @@ export class cell {
 
 export async function main(): globalThis.Promise<void> {
 	// Resetting a reusable cell must leave appended entries intact.
-	let current = $.varRef($.markAsStructValue(new cell({width: 7})))
-	let cells: $.Slice<cell> = $.append<cell>(null, $.markAsStructValue($.cloneStructValue(current.value)))
-	$.assignStruct(current.value, $.markAsStructValue(new cell()))
+	let current = $.varRef(new cell({width: 7}, true))
+	let cells: $.Slice<cell> = $.append<cell>(null, (current.value).clone())
+	$.assignStruct(current.value, new cell(undefined, true))
 	await $.println("cell:", $.arrayIndex(cells!, 0).width, current.value.width)
 
 	// Arrays also copy at the argument boundary.

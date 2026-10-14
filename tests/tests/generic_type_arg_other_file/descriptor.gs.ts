@@ -16,14 +16,17 @@ export class descriptor {
 		Label: string
 	}
 
-	constructor(init?: Partial<{Label?: string}>) {
+	constructor(init?: Partial<{Label?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Label: init?.Label ?? ("" as string)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): descriptor {
-		return $.markAsStructValue(new descriptor(this))
+		return new descriptor(this, true)
 	}
 
 	public __goscriptAssign(source: descriptor): void {

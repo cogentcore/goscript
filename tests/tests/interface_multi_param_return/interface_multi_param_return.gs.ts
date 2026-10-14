@@ -17,13 +17,16 @@ export class MyProcessor {
 	public _fields: {
 	}
 
-	constructor(init?: Partial<{}>) {
+	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
 		this._fields = {
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): MyProcessor {
-		return $.markAsStructValue(new MyProcessor(this))
+		return new MyProcessor(this, true)
 	}
 
 	public __goscriptAssign(source: MyProcessor): void {
@@ -50,7 +53,7 @@ export class MyProcessor {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let processor: MultiParamReturner | null = $.interfaceValue<MultiParamReturner | null>($.markAsStructValue(new MyProcessor()), "main.MyProcessor", "main.MyProcessor")
+	let processor: MultiParamReturner | null = $.interfaceValue<MultiParamReturner | null>(new MyProcessor(undefined, true), "main.MyProcessor", "main.MyProcessor")
 
 	let data: $.Slice<number> = new Uint8Array([1, 2, 3]) as $.Slice<number>
 	let [success, ] = await $.pointerValue<Exclude<MultiParamReturner, null>>(processor).Process(data, 5, "unused")

@@ -28,15 +28,18 @@ export class P {
 		Y: string
 	}
 
-	constructor(init?: Partial<{X?: number, Y?: string}>) {
+	constructor(init?: Partial<{X?: number, Y?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
 			X: init?.X ?? (0 as number),
 			Y: init?.Y ?? ("" as string)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): P {
-		return $.markAsStructValue(new P(this))
+		return new P(this, true)
 	}
 
 	public __goscriptAssign(source: P): void {
@@ -66,7 +69,7 @@ export async function main(): globalThis.Promise<void> {
 	let n1: $.VarRef<number> | null = null! as $.VarRef<number> | null
 	let n2: $.VarRef<number> | null = null! as $.VarRef<number> | null
 	await $.println($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(n1, "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int")))))).Equal($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(n2, "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int"))))))), $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(n1, "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int")))))).Equal($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(pv.value, "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int"))))))))
-	await $.println($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.markAsStructValue(new P({X: 1, Y: "a"})), "main.P", "main.P")))).Equal($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.markAsStructValue(new P({X: 1, Y: "a"})), "main.P", "main.P"))))), $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.markAsStructValue(new P({X: 1, Y: "a"})), "main.P", "main.P")))).Equal($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.markAsStructValue(new P({X: 1, Y: "b"})), "main.P", "main.P"))))))
+	await $.println($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(new P({X: 1, Y: "a"}, true), "main.P", "main.P")))).Equal($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(new P({X: 1, Y: "a"}, true), "main.P", "main.P"))))), $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(new P({X: 1, Y: "a"}, true), "main.P", "main.P")))).Equal($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(new P({X: 1, Y: "b"}, true), "main.P", "main.P"))))))
 	await $.println($.markAsStructValue($.cloneStructValue(reflect.ValueOf(null))).Equal($.markAsStructValue($.cloneStructValue(reflect.ValueOf(null)))), $.markAsStructValue($.cloneStructValue(reflect.ValueOf(null))).Equal($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.basicInterfaceValue(1, "int"))))))
 
 	class Z {
@@ -127,7 +130,7 @@ export async function main(): globalThis.Promise<void> {
 			T: string
 		}
 
-		constructor(init?: Partial<{S?: $.Slice<number>, M?: globalThis.Map<string, number> | null, P?: $.VarRef<number> | null, F?: number, B?: boolean, T?: string}>) {
+		constructor(init?: Partial<{S?: $.Slice<number>, M?: globalThis.Map<string, number> | null, P?: $.VarRef<number> | null, F?: number, B?: boolean, T?: string}>, __goscriptValue?: boolean) {
 			this._fields = {
 				S: init?.S ?? (null! as $.Slice<number>),
 				M: init?.M ?? (null! as globalThis.Map<string, number> | null),
@@ -136,10 +139,13 @@ export async function main(): globalThis.Promise<void> {
 				B: init?.B ?? (false as boolean),
 				T: init?.T ?? ("" as string)
 			}
+			if (__goscriptValue) {
+				(this as any)[$.structValueMarker] = true
+			}
 		}
 
 		public clone(): Z {
-			return $.markAsStructValue(new Z(this))
+			return new Z(this, true)
 		}
 
 		public __goscriptAssign(source: Z): void {

@@ -16,14 +16,17 @@ export class MyStruct {
 		MyInt: number
 	}
 
-	constructor(init?: Partial<{MyInt?: number}>) {
+	constructor(init?: Partial<{MyInt?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			MyInt: init?.MyInt ?? (0 as number)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): MyStruct {
-		return $.markAsStructValue(new MyStruct(this))
+		return new MyStruct(this, true)
 	}
 
 	public __goscriptAssign(source: MyStruct): void {
@@ -44,7 +47,7 @@ export class MyStruct {
 export async function main(): globalThis.Promise<void> {
 	// Scenario 1: Value type that NeedsVarRef
 	// 'val' is a value type, but its address is taken, so it should be varrefed in TS.
-	let val = $.varRef($.markAsStructValue(new MyStruct({MyInt: 10})))
+	let val = $.varRef(new MyStruct({MyInt: 10}, true))
 	let ptrToVal: MyStruct | $.VarRef<MyStruct> | null = val
 
 	// Accessing field on varrefed value type: Should generate val.value.MyInt

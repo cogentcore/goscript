@@ -25,15 +25,18 @@ export class node {
 		sub0: (node | $.VarRef<node> | null)[]
 	}
 
-	constructor(init?: Partial<{sub?: $.Slice<node | $.VarRef<node> | null>, sub0?: (node | $.VarRef<node> | null)[]}>) {
+	constructor(init?: Partial<{sub?: $.Slice<node | $.VarRef<node> | null>, sub0?: (node | $.VarRef<node> | null)[]}>, __goscriptValue?: boolean) {
 		this._fields = {
 			sub: init?.sub ?? (null! as $.Slice<node | $.VarRef<node> | null>),
 			sub0: init?.sub0 !== undefined ? $.cloneArrayValue(init.sub0, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.pointerType("main.node"), 1)) : $.arrayValue(globalThis.Array.from({ length: 1 }, () => null))
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): node {
-		return $.markAsStructValue(new node(this))
+		return new node(this, true)
 	}
 
 	public __goscriptAssign(source: node): void {

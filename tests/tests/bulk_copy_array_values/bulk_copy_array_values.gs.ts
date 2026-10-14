@@ -21,14 +21,17 @@ export class point {
 		x: number
 	}
 
-	constructor(init?: Partial<{x?: number}>) {
+	constructor(init?: Partial<{x?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			x: init?.x ?? (0 as number)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): point {
-		return $.markAsStructValue(new point(this))
+		return new point(this, true)
 	}
 
 	public __goscriptAssign(source: point): void {
@@ -78,7 +81,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 	await $.println("values:", $.arrayIndex($.arrayIndex(src!, 0), 0))
 
-	let points: $.Slice<point[]> = $.arrayToSlice<point[]>([$.arrayValue([$.markAsStructValue(new point({x: 1}))], /* @__PURE__ */ $.arrayType("main.point", 1))])
+	let points: $.Slice<point[]> = $.arrayToSlice<point[]>([$.arrayValue([new point({x: 1}, true)], /* @__PURE__ */ $.arrayType("main.point", 1))])
 	let pointCopies: $.Slice<point[]> = $.makeSlice<point[]>(1)
 	$.copy(pointCopies, points)
 	$.arrayIndex($.arrayIndex(pointCopies!, 0), 0).x = 9

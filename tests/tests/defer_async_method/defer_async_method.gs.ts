@@ -16,14 +16,17 @@ export class AsyncResource {
 		name: string
 	}
 
-	constructor(init?: Partial<{name?: string}>) {
+	constructor(init?: Partial<{name?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
 			name: init?.name ?? ("" as string)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): AsyncResource {
-		return $.markAsStructValue(new AsyncResource(this))
+		return new AsyncResource(this, true)
 	}
 
 	public __goscriptAssign(source: AsyncResource): void {

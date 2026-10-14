@@ -19,14 +19,17 @@ export class chunker {
 		pos: bigint
 	}
 
-	constructor(init?: Partial<{pos?: bigint}>) {
+	constructor(init?: Partial<{pos?: bigint}>, __goscriptValue?: boolean) {
 		this._fields = {
 			pos: init?.pos ?? (0n as bigint)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): chunker {
-		return $.markAsStructValue(new chunker(this))
+		return new chunker(this, true)
 	}
 
 	public __goscriptAssign(source: chunker): void {
@@ -62,14 +65,17 @@ export class repeatReader {
 		remaining: number
 	}
 
-	constructor(init?: Partial<{remaining?: number}>) {
+	constructor(init?: Partial<{remaining?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			remaining: init?.remaining ?? (0 as number)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): repeatReader {
-		return $.markAsStructValue(new repeatReader(this))
+		return new repeatReader(this, true)
 	}
 
 	public __goscriptAssign(source: repeatReader): void {

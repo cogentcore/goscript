@@ -7,13 +7,16 @@ export class embedded {
 	public _fields: {
 	}
 
-	constructor(init?: Partial<{}>) {
+	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
 		this._fields = {
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): embedded {
-		return $.markAsStructValue(new embedded(this))
+		return new embedded(this, true)
 	}
 
 	public __goscriptAssign(source: embedded): void {
@@ -54,15 +57,18 @@ export class holder {
 		embedded: embedded
 	}
 
-	constructor(init?: Partial<{Database?: string, embedded?: embedded}>) {
+	constructor(init?: Partial<{Database?: string, embedded?: embedded}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Database: init?.Database ?? ("" as string),
-			embedded: init?.embedded ? $.markAsStructValue($.cloneStructValue(init.embedded)) : $.markAsStructValue(new embedded())
+			embedded: init?.embedded ? init.embedded.clone() : new embedded(undefined, true)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): holder {
-		return $.markAsStructValue(new holder(this))
+		return new holder(this, true)
 	}
 
 	public __goscriptAssign(source: holder): void {
@@ -86,7 +92,7 @@ export function value(h: holder): string {
 }
 
 export async function main(): globalThis.Promise<void> {
-	await $.println(value($.markAsStructValue(new holder({Database: "field"}))))
+	await $.println(value(new holder({Database: "field"}, true)))
 }
 
 if ($.isMainScript(import.meta)) {

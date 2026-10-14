@@ -34,16 +34,19 @@ export class MyStruct {
 		myBool: boolean
 	}
 
-	constructor(init?: Partial<{MyInt?: number, MyString?: string, myBool?: boolean}>) {
+	constructor(init?: Partial<{MyInt?: number, MyString?: string, myBool?: boolean}>, __goscriptValue?: boolean) {
 		this._fields = {
 			MyInt: init?.MyInt ?? (0 as number),
 			MyString: init?.MyString ?? ("" as string),
 			myBool: init?.myBool ?? (false as boolean)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): MyStruct {
-		return $.markAsStructValue(new MyStruct(this))
+		return new MyStruct(this, true)
 	}
 
 	public __goscriptAssign(source: MyStruct): void {
@@ -64,14 +67,14 @@ export class MyStruct {
 }
 
 export function NewMyStruct(s: string): MyStruct {
-	return $.markAsStructValue(new MyStruct({MyString: s}))
+	return new MyStruct({MyString: s}, true)
 }
 
 export async function main(): globalThis.Promise<void> {
 	// === Function Call Result Assignment (Value Copy) ===
 	// Assigning the result of a function that returns a struct creates a copy.
 	let structFromFunc = NewMyStruct("function result")
-	let structFromFuncCopy = $.markAsStructValue($.cloneStructValue(structFromFunc))
+	let structFromFuncCopy = (structFromFunc).clone()
 	structFromFuncCopy.MyString = "modified function result copy"
 	// Expected: "function result"
 	await $.println($.concatString("Original struct from function: Expected: function result, Actual: ", structFromFunc.MyString))

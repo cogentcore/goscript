@@ -28,15 +28,18 @@ export class table {
 		byAddr: globalThis.Map<string, $.Slice<string>> | null
 	}
 
-	constructor(init?: Partial<{Mutex?: sync.Mutex, byAddr?: globalThis.Map<string, $.Slice<string>> | null}>) {
+	constructor(init?: Partial<{Mutex?: sync.Mutex, byAddr?: globalThis.Map<string, $.Slice<string>> | null}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Mutex: init?.Mutex ? $.markAsStructValue($.cloneStructValue(init.Mutex)) : $.markAsStructValue(new sync.Mutex()),
 			byAddr: init?.byAddr ?? (null! as globalThis.Map<string, $.Slice<string>> | null)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): table {
-		return $.markAsStructValue(new table(this))
+		return new table(this, true)
 	}
 
 	public __goscriptAssign(source: table): void {
@@ -73,7 +76,7 @@ export function __goscript_set_hosts(__goscriptValue: {"Mutex": sync.Mutex, "byA
 	$.assignStruct(hosts.value, __goscriptValue)
 }
 
-export let named: $.VarRef<table> = $.varRef($.markAsStructValue(new table()))
+export let named: $.VarRef<table> = $.varRef(new table(undefined, true))
 
 export function __goscript_set_named(__goscriptValue: table): void {
 	$.assignStruct(named.value, __goscriptValue)
@@ -117,7 +120,7 @@ export async function lookupNamed(addr: string): globalThis.Promise<$.Slice<stri
 
 export async function lookupLocal(addr: string): globalThis.Promise<$.Slice<string>> {
 	using __defer = new $.DisposableStack()
-	let local: $.VarRef<table> = $.varRef($.markAsStructValue(new table()))
+	let local: $.VarRef<table> = $.varRef(new table(undefined, true))
 	local.value.byAddr = $.makeMap<string, $.Slice<string>>([[addr, $.arrayToSlice<string>(["local"])]])
 	let ptr: table | $.VarRef<table> | null = local
 	await $.pointerValue<table>(ptr).Mutex.Lock()

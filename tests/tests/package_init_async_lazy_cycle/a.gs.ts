@@ -21,14 +21,17 @@ export class holder {
 		n: number
 	}
 
-	constructor(init?: Partial<{n?: number}>) {
+	constructor(init?: Partial<{n?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			n: init?.n ?? (0 as number)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): holder {
-		return $.markAsStructValue(new holder(this))
+		return new holder(this, true)
 	}
 
 	public __goscriptAssign(source: holder): void {

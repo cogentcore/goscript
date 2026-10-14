@@ -16,14 +16,17 @@ export class helperState {
 		text: string
 	}
 
-	constructor(init?: Partial<{text?: string}>) {
+	constructor(init?: Partial<{text?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
 			text: init?.text ?? ("" as string)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): helperState {
-		return $.markAsStructValue(new helperState(this))
+		return new helperState(this, true)
 	}
 
 	public __goscriptAssign(source: helperState): void {

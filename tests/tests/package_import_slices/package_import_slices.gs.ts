@@ -81,15 +81,18 @@ export async function main(): globalThis.Promise<void> {
 			label: string
 		}
 
-		constructor(init?: Partial<{group?: number, label?: string}>) {
+		constructor(init?: Partial<{group?: number, label?: string}>, __goscriptValue?: boolean) {
 			this._fields = {
 				group: init?.group ?? (0 as number),
 				label: init?.label ?? ("" as string)
 			}
+			if (__goscriptValue) {
+				(this as any)[$.structValueMarker] = true
+			}
 		}
 
 		public clone(): item {
-			return $.markAsStructValue(new item(this))
+			return new item(this, true)
 		}
 
 		public __goscriptAssign(source: item): void {
@@ -192,14 +195,17 @@ export async function main(): globalThis.Promise<void> {
 			n: number
 		}
 
-		constructor(init?: Partial<{n?: number}>) {
+		constructor(init?: Partial<{n?: number}>, __goscriptValue?: boolean) {
 			this._fields = {
 				n: init?.n ?? (0 as number)
+			}
+			if (__goscriptValue) {
+				(this as any)[$.structValueMarker] = true
 			}
 		}
 
 		public clone(): cell {
-			return $.markAsStructValue(new cell(this))
+			return new cell(this, true)
 		}
 
 		public __goscriptAssign(source: cell): void {

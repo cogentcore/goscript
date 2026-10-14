@@ -16,14 +16,17 @@ export class MyStruct {
 		myPrivate: $.VarRef<number> | null
 	}
 
-	constructor(init?: Partial<{myPrivate?: $.VarRef<number> | null}>) {
+	constructor(init?: Partial<{myPrivate?: $.VarRef<number> | null}>, __goscriptValue?: boolean) {
 		this._fields = {
 			myPrivate: init?.myPrivate ?? (null! as $.VarRef<number> | null)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): MyStruct {
-		return $.markAsStructValue(new MyStruct(this))
+		return new MyStruct(this, true)
 	}
 
 	public __goscriptAssign(source: MyStruct): void {

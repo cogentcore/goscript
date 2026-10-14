@@ -16,14 +16,17 @@ export class holder {
 		values: $.VarRef<$.Slice<number>> | null
 	}
 
-	constructor(init?: Partial<{values?: $.VarRef<$.Slice<number>> | null}>) {
+	constructor(init?: Partial<{values?: $.VarRef<$.Slice<number>> | null}>, __goscriptValue?: boolean) {
 		this._fields = {
 			values: init?.values ?? (null! as $.VarRef<$.Slice<number>> | null)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): holder {
-		return $.markAsStructValue(new holder(this))
+		return new holder(this, true)
 	}
 
 	public __goscriptAssign(source: holder): void {

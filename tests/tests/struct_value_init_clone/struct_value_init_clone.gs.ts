@@ -25,15 +25,18 @@ export class Point {
 		Y: number
 	}
 
-	constructor(init?: Partial<{X?: number, Y?: number}>) {
+	constructor(init?: Partial<{X?: number, Y?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			X: init?.X ?? (0 as number),
 			Y: init?.Y ?? (0 as number)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): Point {
-		return $.markAsStructValue(new Point(this))
+		return new Point(this, true)
 	}
 
 	public __goscriptAssign(source: Point): void {
@@ -54,11 +57,11 @@ export class Point {
 
 export async function main(): globalThis.Promise<void> {
 	// Initialize directly
-	let p1 = $.markAsStructValue(new Point({X: 1, Y: 2}))
+	let p1 = new Point({X: 1, Y: 2}, true)
 	await $.println("p1:", p1.X, p1.Y)
 
 	// Assign to another variable (should trigger clone)
-	let p2 = $.markAsStructValue($.cloneStructValue(p1))
+	let p2 = (p1).clone()
 	p2.X = 10
 
 	// Print both to show they are independent
@@ -66,8 +69,8 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("p2:", p2.X, p2.Y)
 
 	// Initialize via variable assignment
-	let v = $.markAsStructValue(new Point({X: 3, Y: 4}))
-	let p3 = $.markAsStructValue($.cloneStructValue(v))
+	let v = new Point({X: 3, Y: 4}, true)
+	let p3 = (v).clone()
 	p3.Y = 40
 
 	await $.println("v after p3 mod:", v.X, v.Y)

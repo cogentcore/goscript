@@ -18,14 +18,17 @@ export class Box {
 		N: number
 	}
 
-	constructor(init?: Partial<{N?: number}>) {
+	constructor(init?: Partial<{N?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			N: init?.N ?? (0 as number)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): Box {
-		return $.markAsStructValue(new Box(this))
+		return new Box(this, true)
 	}
 
 	public __goscriptAssign(source: Box): void {
@@ -54,5 +57,5 @@ export function Double(v: number): number {
 }
 
 export function NewBox(n: number): Box {
-	return $.markAsStructValue(new Box({N: n}))
+	return new Box({N: n}, true)
 }

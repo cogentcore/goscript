@@ -28,14 +28,17 @@ export class Image {
 		Name: string
 	}
 
-	constructor(init?: Partial<{Name?: string}>) {
+	constructor(init?: Partial<{Name?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Name: init?.Name ?? ("" as string)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): Image {
-		return $.markAsStructValue(new Image(this))
+		return new Image(this, true)
 	}
 
 	public __goscriptAssign(source: Image): void {
@@ -114,16 +117,19 @@ export class Doc {
 		Note: string
 	}
 
-	constructor(init?: Partial<{Title?: string, Image?: Image | $.VarRef<Image> | null, Note?: string}>) {
+	constructor(init?: Partial<{Title?: string, Image?: Image | $.VarRef<Image> | null, Note?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Title: init?.Title ?? ("" as string),
 			Image: init?.Image ?? (null! as Image | $.VarRef<Image> | null),
 			Note: init?.Note ?? ("" as string)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): Doc {
-		return $.markAsStructValue(new Doc(this))
+		return new Doc(this, true)
 	}
 
 	public __goscriptAssign(source: Doc): void {

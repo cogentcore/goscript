@@ -25,15 +25,18 @@ export class MyStruct {
 		MyString: string
 	}
 
-	constructor(init?: Partial<{MyInt?: number, MyString?: string}>) {
+	constructor(init?: Partial<{MyInt?: number, MyString?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
 			MyInt: init?.MyInt ?? (0 as number),
 			MyString: init?.MyString ?? ("" as string)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): MyStruct {
-		return $.markAsStructValue(new MyStruct(this))
+		return new MyStruct(this, true)
 	}
 
 	public __goscriptAssign(source: MyStruct): void {
@@ -54,11 +57,11 @@ export class MyStruct {
 
 export async function main(): globalThis.Promise<void> {
 	let structPointer: MyStruct | $.VarRef<MyStruct> | null = new MyStruct({MyInt: 4, MyString: "hello world"})
-	let dereferencedStructCopy = $.markAsStructValue($.cloneStructValue($.pointerValue<MyStruct>(structPointer)))
+	let dereferencedStructCopy = ($.pointerValue<MyStruct>(structPointer)).clone()
 	dereferencedStructCopy.MyString = "original dereferenced copy modified"
-	let valueCopy1 = $.markAsStructValue($.cloneStructValue(dereferencedStructCopy))
+	let valueCopy1 = (dereferencedStructCopy).clone()
 	valueCopy1.MyString = "value copy 1"
-	let valueCopy2 = $.markAsStructValue($.cloneStructValue(dereferencedStructCopy))
+	let valueCopy2 = (dereferencedStructCopy).clone()
 	valueCopy2.MyString = "value copy 2"
 	let pointerCopy: MyStruct | $.VarRef<MyStruct> | null = structPointer
 

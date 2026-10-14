@@ -28,14 +28,17 @@ export class Impl {
 		Item: any
 	}
 
-	constructor(init?: Partial<{Item?: any}>) {
+	constructor(init?: Partial<{Item?: any}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Item: init?.Item !== undefined ? $.copyElement(init.Item) : (null! as any)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): Impl {
-		return $.markAsStructValue(new Impl(this))
+		return new Impl(this, true)
 	}
 
 	public __goscriptAssign(source: Impl): void {
@@ -62,13 +65,16 @@ export class Keyed {
 	public _fields: {
 	}
 
-	constructor(init?: Partial<{}>) {
+	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
 		this._fields = {
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): Keyed {
-		return $.markAsStructValue(new Keyed(this))
+		return new Keyed(this, true)
 	}
 
 	public __goscriptAssign(source: Keyed): void {
@@ -102,14 +108,17 @@ export class Wrapper {
 		Keyed: Keyed | $.VarRef<Keyed> | null
 	}
 
-	constructor(init?: Partial<{Keyed?: Keyed | $.VarRef<Keyed> | null}>) {
+	constructor(init?: Partial<{Keyed?: Keyed | $.VarRef<Keyed> | null}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Keyed: init?.Keyed ?? (null! as Keyed | $.VarRef<Keyed> | null)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): Wrapper {
-		return $.markAsStructValue(new Wrapper(this))
+		return new Wrapper(this, true)
 	}
 
 	public __goscriptAssign(source: Wrapper): void {

@@ -25,15 +25,18 @@ export class Col {
 		Default: $.VarRef<number> | null
 	}
 
-	constructor(init?: Partial<{Name?: string, Default?: $.VarRef<number> | null}>) {
+	constructor(init?: Partial<{Name?: string, Default?: $.VarRef<number> | null}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Name: init?.Name ?? ("" as string),
 			Default: init?.Default ?? (null! as $.VarRef<number> | null)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): Col {
-		return $.markAsStructValue(new Col(this))
+		return new Col(this, true)
 	}
 
 	public __goscriptAssign(source: Col): void {
@@ -53,7 +56,7 @@ export class Col {
 }
 
 export function cloneColField(c: Col | $.VarRef<Col> | null): Col | $.VarRef<Col> | null {
-	let out = $.varRef($.markAsStructValue($.cloneStructValue($.pointerValue<Col>(c))))
+	let out = $.varRef(($.pointerValue<Col>(c)).clone())
 	if (out.value.Default != null) {
 		out.value.Default = out.value.Default
 	}

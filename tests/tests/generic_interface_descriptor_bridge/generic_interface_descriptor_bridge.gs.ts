@@ -32,13 +32,16 @@ export class genericBox {
 	public _fields: {
 	}
 
-	constructor(init?: Partial<{}>) {
+	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
 		this._fields = {
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): genericBox {
-		return $.markAsStructValue(new genericBox(this))
+		return new genericBox(this, true)
 	}
 
 	public __goscriptAssign(source: genericBox): void {
@@ -76,14 +79,17 @@ export class intBox {
 		id: number
 	}
 
-	constructor(init?: Partial<{id?: number}>) {
+	constructor(init?: Partial<{id?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			id: init?.id ?? (0 as number)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): intBox {
-		return $.markAsStructValue(new intBox(this))
+		return new intBox(this, true)
 	}
 
 	public __goscriptAssign(source: intBox): void {

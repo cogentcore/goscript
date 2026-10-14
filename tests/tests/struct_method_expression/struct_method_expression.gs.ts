@@ -16,14 +16,17 @@ export class worker {
 		base: number
 	}
 
-	constructor(init?: Partial<{base?: number}>) {
+	constructor(init?: Partial<{base?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			base: init?.base ?? (0 as number)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): worker {
-		return $.markAsStructValue(new worker(this))
+		return new worker(this, true)
 	}
 
 	public __goscriptAssign(source: worker): void {

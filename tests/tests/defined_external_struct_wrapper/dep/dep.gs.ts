@@ -18,14 +18,17 @@ export class hidden {
 		label: string
 	}
 
-	constructor(init?: Partial<{label?: string}>) {
+	constructor(init?: Partial<{label?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
 			label: init?.label ?? ("" as string)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): hidden {
-		return $.markAsStructValue(new hidden(this))
+		return new hidden(this, true)
 	}
 
 	public __goscriptAssign(source: hidden): void {
@@ -65,15 +68,18 @@ export class Public {
 		Hidden: hidden
 	}
 
-	constructor(init?: Partial<{Value?: string, Hidden?: hidden}>) {
+	constructor(init?: Partial<{Value?: string, Hidden?: hidden}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Value: init?.Value ?? ("" as string),
-			Hidden: init?.Hidden ? $.markAsStructValue($.cloneStructValue(init.Hidden)) : $.markAsStructValue(new hidden())
+			Hidden: init?.Hidden ? init.Hidden.clone() : new hidden(undefined, true)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): Public {
-		return $.markAsStructValue(new Public(this))
+		return new Public(this, true)
 	}
 
 	public __goscriptAssign(source: Public): void {

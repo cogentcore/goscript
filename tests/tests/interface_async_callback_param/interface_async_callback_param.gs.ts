@@ -23,13 +23,16 @@ export class listScanner {
 	public _fields: {
 	}
 
-	constructor(init?: Partial<{}>) {
+	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
 		this._fields = {
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): listScanner {
-		return $.markAsStructValue(new listScanner(this))
+		return new listScanner(this, true)
 	}
 
 	public __goscriptAssign(source: listScanner): void {
@@ -58,7 +61,7 @@ export async function run(s: scanner | null): globalThis.Promise<$.GoError> {
 }
 
 export async function main(): globalThis.Promise<void> {
-	await $.println(await run($.interfaceValue<scanner | null>($.markAsStructValue(new listScanner()), "main.listScanner", "main.listScanner")) == null)
+	await $.println(await run($.interfaceValue<scanner | null>(new listScanner(undefined, true), "main.listScanner", "main.listScanner")) == null)
 
 	let m: $.VarRef<sync.Map> = $.varRef($.markAsStructValue(new sync.Map()))
 	let callbacks = $.arrayValue([$.functionValue(async (v: number): globalThis.Promise<$.GoError> => {

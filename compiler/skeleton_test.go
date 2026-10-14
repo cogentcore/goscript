@@ -266,7 +266,7 @@ func TestCompilePackagesLazilyInitializesSameFileLaterPackageVars(t *testing.T) 
 	for _, want := range []string{
 		"export var table: $.Slice<detail>",
 		"export function __goscript_get_table(): $.Slice<detail>",
-		"export let later: detail = $.markAsStructValue(new detail({n: 7}))",
+		"export let later: detail = new detail({n: 7}, true)",
 	} {
 		if !strings.Contains(text, want) {
 			t.Fatalf("missing %q in generated output:\n%s", want, text)
@@ -1509,7 +1509,7 @@ func TestCompilePackagesEmitsPackageLocalImport(t *testing.T) {
 	if !strings.Contains(string(mainContent), "import * as subpkg from \"@goscript/example.test/imports/subpkg/index.js\"") {
 		t.Fatalf("missing package-local import:\n%s", string(mainContent))
 	}
-	if !strings.Contains(string(mainContent), "let b: $.VarRef<subpkg.Builder> = $.varRef($.markAsStructValue(new subpkg.Builder()))") {
+	if !strings.Contains(string(mainContent), "let b: $.VarRef<subpkg.Builder> = $.varRef(new subpkg.Builder(undefined, true))") {
 		t.Fatalf("missing imported struct zero value qualification:\n%s", string(mainContent))
 	}
 	if !strings.Contains(string(mainContent), "import * as __goscript_helper from \"./helper.gs.ts\"") ||
@@ -1953,9 +1953,9 @@ func TestCompilePackagesEmitsStructMethodsAndPointerAssertions(t *testing.T) {
 		"public clone(): Counter",
 		"public Read(): number",
 		"public Set(v: number): void",
-		"let original = $.varRef($.markAsStructValue(new Counter({Value: 1})))",
-		"let original = $.varRef($.markAsStructValue(new Counter({Value: 1})))\n\n\t// Copy should stay readable in generated output.\n\tlet copy",
-		"let copy = $.markAsStructValue($.cloneStructValue(original.value))",
+		"let original = $.varRef(new Counter({Value: 1}, true))",
+		"let original = $.varRef(new Counter({Value: 1}, true))\n\n\t// Copy should stay readable in generated output.\n\tlet copy",
+		"let copy = (original.value).clone()",
 		"let pointer: Counter | $.VarRef<Counter> | null = original",
 		"Counter.prototype.Set.call(pointer, 2)",
 		"Counter.prototype.Set.call(NewCounter(), 5)",
@@ -2362,7 +2362,7 @@ func TestCompilePackagesClonesNestedStructFieldsWithCloneMethodCollision(t *test
 	for _, want := range []string{
 		"public __goscriptClone(): Box",
 		"Box: init?.Box ? $.markAsStructValue($.cloneStructValue(init.Box)) : $.markAsStructValue(new Box())",
-		"return $.markAsStructValue(new Holder(this))",
+		"return new Holder(this, true)",
 	} {
 		if !strings.Contains(text, want) {
 			t.Fatalf("missing %q in generated output:\n%s", want, text)
@@ -2599,9 +2599,9 @@ func TestCompilePackagesWrapsAddressedMapRangeValue(t *testing.T) {
 	}
 	text := string(content)
 	for _, want := range []string{
-		"let item: $.VarRef<Item> = $.varRef($.markAsStructValue($.cloneStructValue(__goscriptRangeValue",
+		"let item: $.VarRef<Item> = $.varRef((__goscriptRangeValue",
 		"item.value.add(v)",
-		"$.mapSet(m, k, $.markAsStructValue($.cloneStructValue(item.value)))",
+		"$.mapSet(m, k, (item.value).clone())",
 	} {
 		if !strings.Contains(text, want) {
 			t.Fatalf("missing %q in generated output:\n%s", want, text)
@@ -5857,7 +5857,7 @@ func TestCompilePackagesQualifiesImportedTypesInSignaturesAndZeroValues(t *testi
 		"Fn: ((_p0: lib.Box) => [lib.Box, $.GoError] | globalThis.Promise<[lib.Box, $.GoError]>) | null",
 		"Ptr: atomic.Pointer<(() => void) | null>",
 		"Header: init?.Header ?? (null! as lib.Header)",
-		"$.markAsStructValue(new lib.Box())",
+		"new lib.Box(undefined, true)",
 		"$.markAsStructValue(new atomic.Pointer<(() => void) | null>())",
 		"export async function Use(fn: ((_p0: lib.Box) => [lib.Box, $.GoError] | globalThis.Promise<[lib.Box, $.GoError]>) | null, box: lib.Box): globalThis.Promise<[lib.Box, $.GoError]>",
 		"$.functionValue((box: lib.Box): [lib.Box, $.GoError] => {",

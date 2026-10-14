@@ -515,6 +515,7 @@ func renderStructAssign(b *strings.Builder, structType *loweredStruct, runtimeOw
 // renderStruct emits field storage, value-copy operations, methods, and metadata.
 func renderStruct(b *strings.Builder, structType *loweredStruct, runtimeOwner *RuntimeContractOwner, trimTypeInfo bool) {
 	markStructValue := runtimeOwner.QualifiedHelper(RuntimeHelperMarkAsStructValue)
+	structValueMarker := runtimeOwner.QualifiedHelper(RuntimeHelperStructValueMarker)
 	cloneStructValue := runtimeOwner.QualifiedHelper(RuntimeHelperCloneStructValue)
 	cloneArrayValue := runtimeOwner.QualifiedHelper(RuntimeHelperCloneArrayValue)
 	copyElement := runtimeOwner.QualifiedHelper(RuntimeHelperCopyElement)
@@ -577,12 +578,19 @@ func renderStruct(b *strings.Builder, structType *loweredStruct, runtimeOwner *R
 		b.WriteString("?: ")
 		b.WriteString(field.typ)
 	}
-	b.WriteString("}>) {\n\t\tthis._fields = {\n")
+	b.WriteString("}>, __goscriptValue?: boolean) {\n\t\tthis._fields = {\n")
 	for idx, field := range structType.fields {
 		b.WriteString("\t\t\t")
 		b.WriteString(field.name)
 		b.WriteString(": ")
-		if field.structValue {
+		if field.directClone {
+			b.WriteString("init?.")
+			b.WriteString(field.name)
+			b.WriteString(" ? init.")
+			b.WriteString(field.name)
+			b.WriteString(".clone() : ")
+			b.WriteString(field.zero)
+		} else if field.structValue {
 			b.WriteString("init?.")
 			b.WriteString(field.name)
 			b.WriteString(" ? ")
@@ -641,16 +649,18 @@ func renderStruct(b *strings.Builder, structType *loweredStruct, runtimeOwner *R
 		}
 		b.WriteString("\n")
 	}
-	b.WriteString("\t\t}\n\t}\n\n")
+	// A struct value carries the marker as its own property, set here so
+	// that each class stores it at one site.
+	b.WriteString("\t\t}\n\t\tif (__goscriptValue) {\n\t\t\t(this as any)[")
+	b.WriteString(structValueMarker)
+	b.WriteString("] = true\n\t\t}\n\t}\n\n")
 	b.WriteString("\tpublic ")
 	b.WriteString(structType.cloneMethod)
 	b.WriteString("(): ")
 	b.WriteString(structType.name)
-	b.WriteString(" {\n\t\treturn ")
-	b.WriteString(markStructValue)
-	b.WriteString("(new ")
+	b.WriteString(" {\n\t\treturn new ")
 	b.WriteString(structType.name)
-	b.WriteString("(this))\n\t}\n")
+	b.WriteString("(this, true)\n\t}\n")
 	renderStructAssign(b, structType, runtimeOwner)
 	for _, method := range structType.methods {
 		b.WriteString("\n")

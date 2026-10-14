@@ -17,13 +17,16 @@ export class nistCurve {
 	public _fields: {
 	}
 
-	constructor(init?: Partial<{}>) {
+	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
 		this._fields = {
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): nistCurve {
-		return $.markAsStructValue(new nistCurve(this))
+		return new nistCurve(this, true)
 	}
 
 	public __goscriptAssign(source: nistCurve): void {
@@ -62,14 +65,17 @@ export class point {
 		N: number
 	}
 
-	constructor(init?: Partial<{N?: number}>) {
+	constructor(init?: Partial<{N?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			N: init?.N ?? (0 as number)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): point {
-		return $.markAsStructValue(new point(this))
+		return new point(this, true)
 	}
 
 	public __goscriptAssign(source: point): void {

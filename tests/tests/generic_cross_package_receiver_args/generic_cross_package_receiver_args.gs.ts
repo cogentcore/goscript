@@ -30,14 +30,17 @@ export class wrapper {
 		Impl: dep.Impl | $.VarRef<dep.Impl> | null
 	}
 
-	constructor(init?: Partial<{Impl?: dep.Impl | $.VarRef<dep.Impl> | null}>) {
+	constructor(init?: Partial<{Impl?: dep.Impl | $.VarRef<dep.Impl> | null}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Impl: init?.Impl ?? (null! as dep.Impl | $.VarRef<dep.Impl> | null)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): wrapper {
-		return $.markAsStructValue(new wrapper(this))
+		return new wrapper(this, true)
 	}
 
 	public __goscriptAssign(source: wrapper): void {

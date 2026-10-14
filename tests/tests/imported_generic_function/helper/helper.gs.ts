@@ -28,14 +28,17 @@ export class Box {
 		Value: any
 	}
 
-	constructor(init?: Partial<{Value?: any}>) {
+	constructor(init?: Partial<{Value?: any}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Value: init?.Value !== undefined ? $.copyElement(init.Value) : (null! as any)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): Box {
-		return $.markAsStructValue(new Box(this))
+		return new Box(this, true)
 	}
 
 	public __goscriptAssign(source: Box): void {
@@ -66,14 +69,17 @@ export class IntValue {
 		N: number
 	}
 
-	constructor(init?: Partial<{N?: number}>) {
+	constructor(init?: Partial<{N?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			N: init?.N ?? (0 as number)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): IntValue {
-		return $.markAsStructValue(new IntValue(this))
+		return new IntValue(this, true)
 	}
 
 	public __goscriptAssign(source: IntValue): void {

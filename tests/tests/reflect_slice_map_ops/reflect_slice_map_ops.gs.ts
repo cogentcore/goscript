@@ -22,14 +22,17 @@ export class Item {
 		Name: string
 	}
 
-	constructor(init?: Partial<{Name?: string}>) {
+	constructor(init?: Partial<{Name?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Name: init?.Name ?? ("" as string)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): Item {
-		return $.markAsStructValue(new Item(this))
+		return new Item(this, true)
 	}
 
 	public __goscriptAssign(source: Item): void {
@@ -69,15 +72,18 @@ export class Holder {
 		T: $.Slice<number>
 	}
 
-	constructor(init?: Partial<{S?: $.Slice<number>, T?: $.Slice<number>}>) {
+	constructor(init?: Partial<{S?: $.Slice<number>, T?: $.Slice<number>}>, __goscriptValue?: boolean) {
 		this._fields = {
 			S: init?.S ?? (null! as $.Slice<number>),
 			T: init?.T ?? (null! as $.Slice<number>)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): Holder {
-		return $.markAsStructValue(new Holder(this))
+		return new Holder(this, true)
 	}
 
 	public __goscriptAssign(source: Holder): void {
@@ -109,14 +115,17 @@ export class Doc {
 		Items: $.Slice<Item>
 	}
 
-	constructor(init?: Partial<{Items?: $.Slice<Item>}>) {
+	constructor(init?: Partial<{Items?: $.Slice<Item>}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Items: init?.Items ?? (null! as $.Slice<Item>)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): Doc {
-		return $.markAsStructValue(new Doc(this))
+		return new Doc(this, true)
 	}
 
 	public __goscriptAssign(source: Doc): void {
@@ -200,7 +209,7 @@ export async function main(): globalThis.Promise<void> {
 	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(bs)).Index(1))).SetUint(7n)
 	await $.println("bytes:", $.sliceLen($.markAsStructValue($.cloneStructValue(bs)).Bytes()), $.uint($.arrayIndex($.markAsStructValue($.cloneStructValue(bs)).Bytes()!, 1), 8))
 
-	let d: $.VarRef<Doc> = $.varRef($.markAsStructValue(new Doc()))
+	let d: $.VarRef<Doc> = $.varRef(new Doc(undefined, true))
 	let err = await xml.Unmarshal(new Uint8Array([60, 100, 111, 99, 62, 60, 105, 116, 101, 109, 62, 60, 78, 97, 109, 101, 62, 120, 60, 47, 78, 97, 109, 101, 62, 60, 47, 105, 116, 101, 109, 62, 60, 105, 116, 101, 109, 62, 60, 78, 97, 109, 101, 62, 121, 60, 47, 78, 97, 109, 101, 62, 60, 47, 105, 116, 101, 109, 62, 60, 47, 100, 111, 99, 62]), $.interfaceValue(d, "*main.Doc", /* @__PURE__ */ $.pointerType("main.Doc")))
 	await $.println("xml:", err == null, $.sliceLen(d.value.Items))
 	if ($.sliceLen(d.value.Items) == 2) {

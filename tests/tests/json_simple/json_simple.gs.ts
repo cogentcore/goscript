@@ -19,14 +19,17 @@ export class Simple {
 		X: number
 	}
 
-	constructor(init?: Partial<{X?: number}>) {
+	constructor(init?: Partial<{X?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			X: init?.X ?? (0 as number)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): Simple {
-		return $.markAsStructValue(new Simple(this))
+		return new Simple(this, true)
 	}
 
 	public __goscriptAssign(source: Simple): void {
@@ -45,8 +48,8 @@ export class Simple {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let s = $.markAsStructValue(new Simple({X: 42}))
-	let __goscriptTuple0: any = json.Marshal($.interfaceValue($.markAsStructValue($.cloneStructValue(s)), "main.Simple", "main.Simple"))
+	let s = new Simple({X: 42}, true)
+	let __goscriptTuple0: any = json.Marshal($.interfaceValue((s).clone(), "main.Simple", "main.Simple"))
 	let b: $.Slice<number> = __goscriptTuple0[0]
 	let err = __goscriptTuple0[1]
 	if (err != null) {

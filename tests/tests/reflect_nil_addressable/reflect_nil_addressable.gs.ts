@@ -28,15 +28,18 @@ export class S {
 		B: string
 	}
 
-	constructor(init?: Partial<{A?: number, B?: string}>) {
+	constructor(init?: Partial<{A?: number, B?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
 			A: init?.A ?? (0 as number),
 			B: init?.B ?? ("" as string)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): S {
-		return $.markAsStructValue(new S(this))
+		return new S(this, true)
 	}
 
 	public __goscriptAssign(source: S): void {
@@ -68,8 +71,8 @@ export async function main(): globalThis.Promise<void> {
 	// Only values reached through a pointer or slice are addressable.
 	let v = $.varRef(1)
 	await $.println($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.basicInterfaceValue(v.value, "int")))).CanAddr(), $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(v, "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int")))))).CanAddr(), $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(v, "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int")))))).Elem())).CanAddr())
-	let s = $.varRef($.markAsStructValue(new S()))
-	await $.println($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.markAsStructValue($.cloneStructValue(s.value)), "main.S", "main.S")))).Field(0))).CanAddr(), $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(s, "*main.S", /* @__PURE__ */ $.pointerType("main.S"))))).Elem())).Field(0))).CanAddr())
+	let s = $.varRef(new S(undefined, true))
+	await $.println($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue((s.value).clone(), "main.S", "main.S")))).Field(0))).CanAddr(), $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(s, "*main.S", /* @__PURE__ */ $.pointerType("main.S"))))).Elem())).Field(0))).CanAddr())
 	await $.println($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.arrayToSlice<number>([1]), "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")))))).Index(0))).CanAddr())
 
 	// Addr of an addressable value points at it.

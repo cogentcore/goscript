@@ -16,14 +16,17 @@ export class MyStruct {
 		Value: number
 	}
 
-	constructor(init?: Partial<{Value?: number}>) {
+	constructor(init?: Partial<{Value?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Value: init?.Value ?? (0 as number)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): MyStruct {
-		return $.markAsStructValue(new MyStruct(this))
+		return new MyStruct(this, true)
 	}
 
 	public __goscriptAssign(source: MyStruct): void {
@@ -48,15 +51,15 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("Scenario 1 - Composite literal pointer assertion:", ok1)
 
 	// Scenario 2: Variable aliasing (fixed by our change)
-	let original = $.varRef($.markAsStructValue(new MyStruct({Value: 30})))
+	let original = $.varRef(new MyStruct({Value: 30}, true))
 	let pAlias: MyStruct | $.VarRef<MyStruct> | null = original
 	let i2: any = $.interfaceValue(pAlias, "*main.MyStruct", /* @__PURE__ */ $.pointerType("main.MyStruct"))
 	let [, ok2] = $.typeAssertTuple<MyStruct | $.VarRef<MyStruct> | null>(i2, /* @__PURE__ */ $.pointerType("main.MyStruct"))
 	await $.println("Scenario 2 - Variable pointer assertion:", ok2)
 
 	// Scenario 3: Multiple pointer variables
-	let s1 = $.varRef($.markAsStructValue(new MyStruct({Value: 40})))
-	let s2 = $.varRef($.markAsStructValue(new MyStruct({Value: 50})))
+	let s1 = $.varRef(new MyStruct({Value: 40}, true))
+	let s2 = $.varRef(new MyStruct({Value: 50}, true))
 	let p1: MyStruct | $.VarRef<MyStruct> | null = s1
 	let p2: MyStruct | $.VarRef<MyStruct> | null = s2
 	let i3a: any = $.interfaceValue(p1, "*main.MyStruct", /* @__PURE__ */ $.pointerType("main.MyStruct"))
@@ -67,7 +70,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("Scenario 3b - Multiple pointer 2 assertion:", ok3b)
 
 	// Scenario 4: Mixed patterns
-	let s4 = $.varRef($.markAsStructValue(new MyStruct({Value: 60})))
+	let s4 = $.varRef(new MyStruct({Value: 60}, true))
 	let p4: MyStruct | $.VarRef<MyStruct> | null = s4
 	let i4a: any = $.interfaceValue(new MyStruct({Value: 70}), "*main.MyStruct", /* @__PURE__ */ $.pointerType("main.MyStruct"))
 	let i4b: any = $.interfaceValue(p4, "*main.MyStruct", /* @__PURE__ */ $.pointerType("main.MyStruct"))
@@ -77,7 +80,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("Scenario 4b - Mixed variable pointer assertion:", ok4b)
 
 	// Scenario 5: Nested pointer assignment
-	let s5 = $.varRef($.markAsStructValue(new MyStruct({Value: 80})))
+	let s5 = $.varRef(new MyStruct({Value: 80}, true))
 	let p5a: MyStruct | $.VarRef<MyStruct> | null = s5
 	let p5b: MyStruct | $.VarRef<MyStruct> | null = p5a
 	let i5: any = $.interfaceValue(p5b, "*main.MyStruct", /* @__PURE__ */ $.pointerType("main.MyStruct"))
@@ -85,10 +88,10 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("Scenario 5 - Nested pointer assignment assertion:", ok5)
 
 	// Scenario 6: Struct value vs pointer distinction
-	let s6 = $.varRef($.markAsStructValue(new MyStruct({Value: 90})))
+	let s6 = $.varRef(new MyStruct({Value: 90}, true))
 	let p6: MyStruct | $.VarRef<MyStruct> | null = s6
-	let s6copy = $.markAsStructValue($.cloneStructValue(s6.value))
-	let i6a: any = $.interfaceValue($.markAsStructValue($.cloneStructValue(s6copy)), "main.MyStruct", "main.MyStruct")
+	let s6copy = (s6.value).clone()
+	let i6a: any = $.interfaceValue((s6copy).clone(), "main.MyStruct", "main.MyStruct")
 	let i6b: any = $.interfaceValue(p6, "*main.MyStruct", /* @__PURE__ */ $.pointerType("main.MyStruct"))
 	let [, ok6a] = $.typeAssertTuple<MyStruct | $.VarRef<MyStruct> | null>(i6a, /* @__PURE__ */ $.pointerType("main.MyStruct"))
 	let [, ok6b] = $.typeAssertTuple<MyStruct | $.VarRef<MyStruct> | null>(i6b, /* @__PURE__ */ $.pointerType("main.MyStruct"))

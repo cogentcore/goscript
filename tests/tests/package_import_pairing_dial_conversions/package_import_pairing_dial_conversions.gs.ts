@@ -31,14 +31,17 @@ export class recreateError {
 		next: bigint
 	}
 
-	constructor(init?: Partial<{next?: bigint}>) {
+	constructor(init?: Partial<{next?: bigint}>, __goscriptValue?: boolean) {
 		this._fields = {
 			next: init?.next ?? (0n as bigint)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): recreateError {
-		return $.markAsStructValue(new recreateError(this))
+		return new recreateError(this, true)
 	}
 
 	public __goscriptAssign(source: recreateError): void {
@@ -65,13 +68,16 @@ export class readWriteCloser {
 	public _fields: {
 	}
 
-	constructor(init?: Partial<{}>) {
+	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
 		this._fields = {
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): readWriteCloser {
-		return $.markAsStructValue(new readWriteCloser(this))
+		return new readWriteCloser(this, true)
 	}
 
 	public __goscriptAssign(source: readWriteCloser): void {

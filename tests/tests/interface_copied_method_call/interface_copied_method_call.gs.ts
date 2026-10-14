@@ -17,13 +17,16 @@ export class task {
 	public _fields: {
 	}
 
-	constructor(init?: Partial<{}>) {
+	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
 		this._fields = {
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): task {
-		return $.markAsStructValue(new task(this))
+		return new task(this, true)
 	}
 
 	public __goscriptAssign(source: task): void {
@@ -51,7 +54,7 @@ export async function callCopied(r: runner | null): globalThis.Promise<void> {
 }
 
 export async function main(): globalThis.Promise<void> {
-	await callCopied($.interfaceValue<runner | null>($.markAsStructValue(new task()), "main.task", "main.task"))
+	await callCopied($.interfaceValue<runner | null>(new task(undefined, true), "main.task", "main.task"))
 }
 
 var __goscriptAwait: any

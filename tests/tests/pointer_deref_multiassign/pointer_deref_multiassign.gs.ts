@@ -34,16 +34,19 @@ export class MyStruct {
 		myBool: boolean
 	}
 
-	constructor(init?: Partial<{MyInt?: number, MyString?: string, myBool?: boolean}>) {
+	constructor(init?: Partial<{MyInt?: number, MyString?: string, myBool?: boolean}>, __goscriptValue?: boolean) {
 		this._fields = {
 			MyInt: init?.MyInt ?? (0 as number),
 			MyString: init?.MyString ?? ("" as string),
 			myBool: init?.myBool ?? (false as boolean)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): MyStruct {
-		return $.markAsStructValue(new MyStruct(this))
+		return new MyStruct(this, true)
 	}
 
 	public __goscriptAssign(source: MyStruct): void {
@@ -68,7 +71,7 @@ export async function main(): globalThis.Promise<void> {
 	// === Pointer Dereference and Multi-Assignment ===
 	// Dereference structPointer to get a copy of the struct.
 	// Also demonstrates multi-variable assignment and the use of the blank identifier '_'.
-	let dereferencedStructCopy = $.markAsStructValue($.cloneStructValue($.pointerValue<MyStruct>(structPointer)))
+	let dereferencedStructCopy = ($.pointerValue<MyStruct>(structPointer)).clone()
 	let unusedString = "hello"
 	unusedString
 	dereferencedStructCopy

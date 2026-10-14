@@ -16,14 +16,17 @@ export class content {
 		bytes: $.Slice<number>
 	}
 
-	constructor(init?: Partial<{bytes?: $.Slice<number>}>) {
+	constructor(init?: Partial<{bytes?: $.Slice<number>}>, __goscriptValue?: boolean) {
 		this._fields = {
 			bytes: init?.bytes ?? (null! as $.Slice<number>)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): content {
-		return $.markAsStructValue(new content(this))
+		return new content(this, true)
 	}
 
 	public __goscriptAssign(source: content): void {

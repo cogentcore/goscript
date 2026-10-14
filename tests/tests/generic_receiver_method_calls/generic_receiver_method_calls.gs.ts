@@ -26,14 +26,17 @@ export class box {
 		value: any
 	}
 
-	constructor(init?: Partial<{value?: any}>) {
+	constructor(init?: Partial<{value?: any}>, __goscriptValue?: boolean) {
 		this._fields = {
 			value: init?.value !== undefined ? $.copyElement(init.value) : (null! as any)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): box {
-		return $.markAsStructValue(new box(this))
+		return new box(this, true)
 	}
 
 	public __goscriptAssign(source: box): void {
@@ -69,14 +72,17 @@ export class holder {
 		box: box
 	}
 
-	constructor(init?: Partial<{box?: box}>) {
+	constructor(init?: Partial<{box?: box}>, __goscriptValue?: boolean) {
 		this._fields = {
 			box: init?.box ? $.markAsStructValue($.cloneStructValue(init.box)) : $.markAsStructValue(new box({value: null}))
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): holder {
-		return $.markAsStructValue(new holder(this))
+		return new holder(this, true)
 	}
 
 	public __goscriptAssign(source: holder): void {

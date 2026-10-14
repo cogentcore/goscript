@@ -18,14 +18,17 @@ export class Thing {
 		Value: number
 	}
 
-	constructor(init?: Partial<{Value?: number}>) {
+	constructor(init?: Partial<{Value?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Value: init?.Value ?? (0 as number)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): Thing {
-		return $.markAsStructValue(new Thing(this))
+		return new Thing(this, true)
 	}
 
 	public __goscriptAssign(source: Thing): void {

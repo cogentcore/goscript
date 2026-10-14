@@ -16,14 +16,17 @@ export class MyStruct {
 		Value: number
 	}
 
-	constructor(init?: Partial<{Value?: number}>) {
+	constructor(init?: Partial<{Value?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Value: init?.Value ?? (0 as number)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): MyStruct {
-		return $.markAsStructValue(new MyStruct(this))
+		return new MyStruct(this, true)
 	}
 
 	public __goscriptAssign(source: MyStruct): void {
@@ -42,13 +45,13 @@ export class MyStruct {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let s1 = $.markAsStructValue(new MyStruct({Value: 10}))
+	let s1 = new MyStruct({Value: 10}, true)
 	let p: MyStruct | $.VarRef<MyStruct> | null = null! as MyStruct | $.VarRef<MyStruct> | null
 	p = new MyStruct({Value: 20})
 
 	// This assignment should trigger the .clone() on s1
 	// because s1 is a struct and *p is being assigned.
-	$.assignStruct($.pointerValue<MyStruct>(p), $.markAsStructValue($.cloneStructValue(s1)))
+	$.assignStruct($.pointerValue<MyStruct>(p), (s1).clone())
 
 	await $.println($.pointerValue<MyStruct>(p).Value)
 
@@ -59,7 +62,7 @@ export async function main(): globalThis.Promise<void> {
 	// Test assignment from a pointer to a struct (should not clone)
 	let s2: MyStruct | $.VarRef<MyStruct> | null = new MyStruct({Value: 40})
 	let p2: MyStruct | $.VarRef<MyStruct> | null = new MyStruct({Value: 50})
-	$.assignStruct($.pointerValue<MyStruct>(p2), $.markAsStructValue($.cloneStructValue($.pointerValue<MyStruct>(s2))))
+	$.assignStruct($.pointerValue<MyStruct>(p2), ($.pointerValue<MyStruct>(s2)).clone())
 	await $.println($.pointerValue<MyStruct>(p2).Value)
 
 	$.pointerValue<MyStruct>(s2).Value = 60
@@ -68,7 +71,7 @@ export async function main(): globalThis.Promise<void> {
 	// In *p2 = *s2, *s2 is a struct value.
 
 	// Test assignment of a struct from a function call
-	let s3 = $.markAsStructValue(new MyStruct({Value: 70}))
+	let s3 = new MyStruct({Value: 70}, true)
 	let p3: MyStruct | $.VarRef<MyStruct> | null = new MyStruct({Value: 80})
 	$.assignStruct($.pointerValue<MyStruct>(p3), getStruct())
 	await $.println($.pointerValue<MyStruct>(p3).Value)
@@ -76,12 +79,12 @@ export async function main(): globalThis.Promise<void> {
 
 	// Test assignment of a struct from a pointer returned by a function call
 	let p4: MyStruct | $.VarRef<MyStruct> | null = new MyStruct({Value: 90})
-	$.assignStruct($.pointerValue<MyStruct>(p4), $.markAsStructValue($.cloneStructValue($.pointerValue<MyStruct>(getStructPointer()))))
+	$.assignStruct($.pointerValue<MyStruct>(p4), ($.pointerValue<MyStruct>(getStructPointer())).clone())
 	await $.println($.pointerValue<MyStruct>(p4).Value)
 }
 
 export function getStruct(): MyStruct {
-	return $.markAsStructValue(new MyStruct({Value: 100}))
+	return new MyStruct({Value: 100}, true)
 }
 
 export function getStructPointer(): MyStruct | $.VarRef<MyStruct> | null {

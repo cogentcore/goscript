@@ -27,15 +27,18 @@ export class ObjectID {
 		format: number
 	}
 
-	constructor(init?: Partial<{hash?: Uint8Array, format?: number}>) {
+	constructor(init?: Partial<{hash?: Uint8Array, format?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			hash: init?.hash !== undefined ? $.cloneArrayValue(init.hash, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 4)) : $.arrayValue(new Uint8Array(4)),
 			format: init?.format ?? (0 as number)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): ObjectID {
-		return $.markAsStructValue(new ObjectID(this))
+		return new ObjectID(this, true)
 	}
 
 	public __goscriptAssign(source: ObjectID): void {
@@ -47,12 +50,12 @@ export class ObjectID {
 
 	public IsZero(): boolean {
 		const s = this;
-		return $.structEqual(s, $.markAsStructValue(new ObjectID()))
+		return $.structEqual(s, new ObjectID(undefined, true))
 	}
 
 	public Valid(): boolean {
 		const s = this;
-		return !$.structEqual(s, $.markAsStructValue(new ObjectID()))
+		return !$.structEqual(s, new ObjectID(undefined, true))
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -86,15 +89,18 @@ export class S {
 		B: number
 	}
 
-	constructor(init?: Partial<{A?: string, B?: number}>) {
+	constructor(init?: Partial<{A?: string, B?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			A: init?.A ?? ("" as string),
 			B: init?.B ?? (0 as number)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): S {
-		return $.markAsStructValue(new S(this))
+		return new S(this, true)
 	}
 
 	public __goscriptAssign(source: S): void {
@@ -135,15 +141,18 @@ export class Outer {
 		N: number
 	}
 
-	constructor(init?: Partial<{In?: S, N?: number}>) {
+	constructor(init?: Partial<{In?: S, N?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
-			In: init?.In ? $.markAsStructValue($.cloneStructValue(init.In)) : $.markAsStructValue(new S()),
+			In: init?.In ? init.In.clone() : new S(undefined, true),
 			N: init?.N ?? (0 as number)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): Outer {
-		return $.markAsStructValue(new Outer(this))
+		return new Outer(this, true)
 	}
 
 	public __goscriptAssign(source: Outer): void {
@@ -179,11 +188,11 @@ export function keep(x: any): any {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let zero: Hash = $.markAsStructValue(new ObjectID())
-	let otherZero = $.markAsStructValue(new ObjectID())
-	let one = $.markAsStructValue(new ObjectID({hash: $.arrayValue(new Uint8Array([0, 7, 0, 0]))}))
-	let otherOne = $.markAsStructValue(new ObjectID({hash: $.arrayValue(new Uint8Array([0, 7, 0, 0]))}))
-	let different = $.markAsStructValue(new ObjectID({hash: $.arrayValue(new Uint8Array([0, 0, 7, 0]))}))
+	let zero: Hash = new ObjectID(undefined, true)
+	let otherZero = new ObjectID(undefined, true)
+	let one = new ObjectID({hash: $.arrayValue(new Uint8Array([0, 7, 0, 0]))}, true)
+	let otherOne = new ObjectID({hash: $.arrayValue(new Uint8Array([0, 7, 0, 0]))}, true)
+	let different = new ObjectID({hash: $.arrayValue(new Uint8Array([0, 0, 7, 0]))}, true)
 
 	await $.println("zero is zero:", zero.IsZero())
 	await $.println("zero valid:", zero.Valid())
@@ -193,19 +202,19 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("one differs:", !$.structEqual(one, different))
 
 	// struct values compare by fields after passing a pointer as an interface
-	let s = $.markAsStructValue(new S({A: "x", B: 1.5}))
+	let s = new S({A: "x", B: 1.5}, true)
 	let n: S | $.VarRef<S> | null = new S({A: "x", B: 1.5})
 	take($.interfaceValue(n, "*main.S", /* @__PURE__ */ $.pointerType("main.S")))
 	await $.println($.structEqual($.pointerValue<S>(n), s))
 	let m: S | $.VarRef<S> | null = new S({A: "x", B: 1.5})
 	keep($.interfaceValue(m, "*main.S", /* @__PURE__ */ $.pointerType("main.S")))
 	await $.println($.structEqual($.pointerValue<S>(m), s), $.structEqual(s, $.pointerValue<S>(m)))
-	let v: any = $.interfaceValue($.markAsStructValue($.cloneStructValue(s)), "main.S", "main.S")
+	let v: any = $.interfaceValue((s).clone(), "main.S", "main.S")
 	await $.println($.structEqual($.mustTypeAssert<S>(v, "main.S"), s))
 
 	// nested struct field passed as a pointer
-	let o1 = $.markAsStructValue(new Outer({In: $.markAsStructValue(new S({A: "y"})), N: 2}))
-	let o2 = $.markAsStructValue(new Outer({In: $.markAsStructValue(new S({A: "y"})), N: 2}))
+	let o1 = new Outer({In: new S({A: "y"}, true), N: 2}, true)
+	let o2 = new Outer({In: new S({A: "y"}, true), N: 2}, true)
 	take($.interfaceValue($.fieldRef(o1._fields, "In"), "*main.S", /* @__PURE__ */ $.pointerType("main.S")))
 	await $.println($.structEqual(o1, o2), $.structEqual(o1.In, o2.In))
 	o2.In.B = 3
@@ -215,9 +224,9 @@ export async function main(): globalThis.Promise<void> {
 	let p1: any = $.interfaceValue(new S({A: "z"}), "*main.S", /* @__PURE__ */ $.pointerType("main.S"))
 	let p2: any = $.interfaceValue(new S({A: "z"}), "*main.S", /* @__PURE__ */ $.pointerType("main.S"))
 	await $.println($.comparableEqual(p1, p2), $.comparableEqual(p1, p1))
-	let i1: any = $.interfaceValue($.markAsStructValue(new S({A: "z"})), "main.S", "main.S")
+	let i1: any = $.interfaceValue(new S({A: "z"}, true), "main.S", "main.S")
 	let i2: any = $.interfaceValue(new S({A: "z"}), "*main.S", /* @__PURE__ */ $.pointerType("main.S"))
-	await $.println($.comparableEqual(i1, i2), $.comparableEqual(i1, $.interfaceValue($.markAsStructValue(new S({A: "z"})), "main.S", "main.S")))
+	await $.println($.comparableEqual(i1, i2), $.comparableEqual(i1, $.interfaceValue(new S({A: "z"}, true), "main.S", "main.S")))
 }
 
 if ($.isMainScript(import.meta)) {

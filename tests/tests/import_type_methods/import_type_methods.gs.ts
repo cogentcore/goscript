@@ -19,14 +19,17 @@ export class parser {
 		errors: errlist.ErrorList
 	}
 
-	constructor(init?: Partial<{errors?: errlist.ErrorList}>) {
+	constructor(init?: Partial<{errors?: errlist.ErrorList}>, __goscriptValue?: boolean) {
 		this._fields = {
 			errors: init?.errors ?? (null! as errlist.ErrorList)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): parser {
-		return $.markAsStructValue(new parser(this))
+		return new parser(this, true)
 	}
 
 	public __goscriptAssign(source: parser): void {
@@ -45,7 +48,7 @@ export class parser {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let p: parser = $.markAsStructValue(new parser())
+	let p: parser = new parser(undefined, true)
 	p.errors = (errlist.ErrorList_Add(p.errors, "error") as errlist.ErrorList)
 	await $.println($.arrayIndex(p.errors!, 0))
 }

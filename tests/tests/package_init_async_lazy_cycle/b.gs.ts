@@ -38,5 +38,5 @@ export async function makeFirst(): globalThis.Promise<__goscript_a.holder> {
 	using __defer = new $.DisposableStack()
 	await lock.value.Lock()
 	__defer.defer(() => { lock.value.Unlock() })
-	return $.markAsStructValue(new __goscript_a.holder({n: __goscript_a.__goscript_get_seed()}))
+	return new __goscript_a.holder({n: __goscript_a.__goscript_get_seed()}, true)
 }

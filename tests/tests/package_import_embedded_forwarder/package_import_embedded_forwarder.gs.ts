@@ -45,15 +45,18 @@ export class VerboseStore {
 		name: string
 	}
 
-	constructor(init?: Partial<{BaseStore?: dep.BaseStore | $.VarRef<dep.BaseStore> | null, name?: string}>) {
+	constructor(init?: Partial<{BaseStore?: dep.BaseStore | $.VarRef<dep.BaseStore> | null, name?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
 			BaseStore: init?.BaseStore ?? (null! as dep.BaseStore | $.VarRef<dep.BaseStore> | null),
 			name: init?.name ?? ("" as string)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): VerboseStore {
-		return $.markAsStructValue(new VerboseStore(this))
+		return new VerboseStore(this, true)
 	}
 
 	public __goscriptAssign(source: VerboseStore): void {

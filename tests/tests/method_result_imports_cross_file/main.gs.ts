@@ -16,13 +16,16 @@ export class Holder {
 	public _fields: {
 	}
 
-	constructor(init?: Partial<{}>) {
+	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
 		this._fields = {
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): Holder {
-		return $.markAsStructValue(new Holder(this))
+		return new Holder(this, true)
 	}
 
 	public __goscriptAssign(source: Holder): void {
@@ -43,7 +46,7 @@ export class Holder {
 }
 
 export async function main(): globalThis.Promise<void> {
-	await $.markAsStructValue($.cloneStructValue($.markAsStructValue(new Holder()))).Run()
+	await $.markAsStructValue($.cloneStructValue(new Holder(undefined, true))).Run()
 }
 
 var __goscriptAwait: any

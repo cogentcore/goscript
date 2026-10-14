@@ -34,16 +34,19 @@ export class scanner {
 		done: boolean
 	}
 
-	constructor(init?: Partial<{data?: string, pos?: number, done?: boolean}>) {
+	constructor(init?: Partial<{data?: string, pos?: number, done?: boolean}>, __goscriptValue?: boolean) {
 		this._fields = {
 			data: init?.data ?? ("" as string),
 			pos: init?.pos ?? (0 as number),
 			done: init?.done ?? (false as boolean)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): scanner {
-		return $.markAsStructValue(new scanner(this))
+		return new scanner(this, true)
 	}
 
 	public __goscriptAssign(source: scanner): void {

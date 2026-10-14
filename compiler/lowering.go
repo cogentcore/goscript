@@ -3530,6 +3530,7 @@ func (o *LoweringOwner) lowerStructType(ctx lowerFileContext, semType *semanticT
 			anonymous:      field.embedded,
 			exported:       field.exported,
 			structValue:    structValue,
+			directClone:    structValue && o.isGeneratedStructClass(namedStructType(field.typ)),
 			arrayValue:     isArrayType(field.typ),
 			typeParamValue: typeParamMayHoldValueType(field.typ),
 			plainValue:     isPlainAssignType(field.typ),
@@ -4293,7 +4294,7 @@ func (o *LoweringOwner) lowerMapRangeBinding(
 		rawName := ctx.tempName(tempPrefix)
 		value := rawName
 		if isStructValueType(obj.Type()) {
-			value = o.lowerStructClone(value)
+			value = o.lowerStructCloneOf(obj.Type(), value)
 		}
 		return rawName, []loweredStmt{{
 			text: "let " + name + ": " + o.tsVariableTypeFor(ctx, obj.Type(), true) + " = " +
@@ -12360,7 +12361,13 @@ func (o *LoweringOwner) lowerStructCompositeLit(
 		}
 		value, valueDiagnostics := o.lowerExpr(ctx, valueExpr)
 		diagnostics = append(diagnostics, valueDiagnostics...)
-		value = o.lowerValueForTarget(ctx, valueExpr, fieldType, value)
+		// The constructor of a generated struct class copies a struct field
+		// value of a generated struct class itself.
+		valueType := ctx.semPkg.source.TypesInfo.TypeOf(valueExpr)
+		if !o.isGeneratedStructClass(named) || !o.isGeneratedStructClass(namedStructType(fieldType)) ||
+			valueType == nil || !types.Identical(valueType, fieldType) {
+			value = o.lowerValueForTarget(ctx, valueExpr, fieldType, value)
+		}
 		if compositeLiteralFieldNeedsPreEval(ctx, valueExpr) {
 			temp := ctx.tempName("LiteralField")
 			prelude = append(prelude, "const "+temp+" = "+value)
@@ -12390,7 +12397,13 @@ func (o *LoweringOwner) lowerStructCompositeLit(
 	if len(fields) != 0 {
 		expr = "new " + o.namedTypeExpr(ctx, named) + "({" + strings.Join(fields, ", ") + "})"
 	}
-	if markStruct {
+	if markStruct && o.isGeneratedStructClass(named) {
+		init := ""
+		if len(fields) != 0 {
+			init = "{" + strings.Join(fields, ", ") + "}"
+		}
+		expr = o.lowerNewStructValue(ctx, named, init)
+	} else if markStruct {
 		expr = o.runtimeOwner.QualifiedHelper(RuntimeHelperMarkAsStructValue) + "(" + expr + ")"
 	}
 	if len(prelude) != 0 {
@@ -13114,7 +13127,7 @@ func (o *LoweringOwner) lowerValueForTargetTypes(
 	}
 	if isInterfaceType(targetType) && isStructValueType(sourceType) {
 		if cloneStructValue {
-			value = o.lowerStructClone(value)
+			value = o.lowerStructCloneOf(sourceType, value)
 		}
 		if wrapper := o.lowerNamedValueInterfaceWrapper(ctx, targetType, sourceType, value); wrapper != "" {
 			return wrapper
@@ -13135,7 +13148,7 @@ func (o *LoweringOwner) lowerValueForTargetTypes(
 		return "(" + value + " as " + o.tsTypeFor(ctx, targetType) + ")"
 	}
 	if isStructValueType(targetType) && cloneStructValue {
-		return o.lowerStructClone(value)
+		return o.lowerStructCloneOf(targetType, value)
 	}
 	// Arrays retain value semantics at assignment, argument, and return boundaries.
 	if isArrayType(targetType) && isArrayType(sourceType) && cloneStructValue {
@@ -13386,6 +13399,58 @@ func (o *LoweringOwner) lowerStructClone(value string) string {
 		o.runtimeOwner.QualifiedHelper(RuntimeHelperCloneStructValue) + "(" + value + "))"
 }
 
+// lowerStructCloneOf copies value, a struct value of type typ. A value of a
+// generated struct class is copied by its own clone method, which returns a
+// marked struct value, so that each copy site calls one known method.
+func (o *LoweringOwner) lowerStructCloneOf(typ types.Type, value string) string {
+	if o.isGeneratedStructClass(namedStructType(typ)) {
+		return "(" + value + ").clone()"
+	}
+	return o.lowerStructClone(value)
+}
+
+// isGeneratedStructClass reports whether named is a non-generic package-level
+// struct type that the compiler emits as a class whose constructor takes a
+// second argument that marks the new object as a struct value, and whose
+// copy method is named clone.
+func (o *LoweringOwner) isGeneratedStructClass(named *types.Named) bool {
+	if named == nil || named.Obj() == nil || named.Obj().Pkg() == nil {
+		return false
+	}
+	if named.TypeParams().Len() != 0 || named.TypeArgs().Len() != 0 {
+		return false
+	}
+	pkg := named.Obj().Pkg()
+	if named.Obj().Parent() != pkg.Scope() || o.overrideFacts().HasPackage(pkg.Path()) {
+		return false
+	}
+	structType, ok := named.Underlying().(*types.Struct)
+	if !ok {
+		return false
+	}
+	for idx := range structType.NumFields() {
+		if structType.Field(idx).Name() == "clone" || strings.Contains(structType.Tag(idx), "protobuf") {
+			return false
+		}
+	}
+	methods := types.NewMethodSet(types.NewPointer(named))
+	for selection := range methods.Methods() {
+		if selection.Obj().Name() == "clone" {
+			return false
+		}
+	}
+	return true
+}
+
+// lowerNewStructValue returns a new struct value of a generated struct class
+// from the constructor arguments init, which may be empty.
+func (o *LoweringOwner) lowerNewStructValue(ctx lowerFileContext, named *types.Named, init string) string {
+	if init == "" {
+		init = "undefined"
+	}
+	return "new " + o.namedTypeExpr(ctx, named) + "(" + init + ", true)"
+}
+
 func (o *LoweringOwner) lowerNamedStructZeroValueExpr(
 	ctx lowerFileContext,
 	named *types.Named,
@@ -13429,6 +13494,9 @@ func (o *LoweringOwner) lowerZeroValueExprFor(ctx lowerFileContext, typ types.Ty
 	if named := namedStructType(typ); named != nil && isStructValueType(typ) {
 		if !o.canSpellNamedType(ctx, named) {
 			return "undefined as any"
+		}
+		if o.isGeneratedStructClass(named) {
+			return o.lowerNewStructValue(ctx, named, "")
 		}
 		return o.runtimeOwner.QualifiedHelper(RuntimeHelperMarkAsStructValue) +
 			"(" + o.lowerNamedStructZeroValueExpr(ctx, named) + ")"

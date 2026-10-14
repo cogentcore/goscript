@@ -48,15 +48,18 @@ export class T {
 		B: number
 	}
 
-	constructor(init?: Partial<{A?: string, B?: number}>) {
+	constructor(init?: Partial<{A?: string, B?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			A: init?.A ?? ("" as string),
 			B: init?.B ?? (0 as number)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): T {
-		return $.markAsStructValue(new T(this))
+		return new T(this, true)
 	}
 
 	public __goscriptAssign(source: T): void {
@@ -88,14 +91,17 @@ export class square {
 		Side: number
 	}
 
-	constructor(init?: Partial<{Side?: number}>) {
+	constructor(init?: Partial<{Side?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Side: init?.Side ?? (0 as number)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): square {
-		return $.markAsStructValue(new square(this))
+		return new square(this, true)
 	}
 
 	public __goscriptAssign(source: square): void {
@@ -140,15 +146,18 @@ export class holder {
 		A: any
 	}
 
-	constructor(init?: Partial<{S?: shape | null, A?: any}>) {
+	constructor(init?: Partial<{S?: shape | null, A?: any}>, __goscriptValue?: boolean) {
 		this._fields = {
 			S: init?.S ?? (null! as shape | null),
 			A: init?.A ?? (null! as any)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): holder {
-		return $.markAsStructValue(new holder(this))
+		return new holder(this, true)
 	}
 
 	public __goscriptAssign(source: holder): void {
@@ -189,15 +198,18 @@ export class base {
 		Name: string
 	}
 
-	constructor(init?: Partial<{This?: node | null, Name?: string}>) {
+	constructor(init?: Partial<{This?: node | null, Name?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
 			This: init?.This ?? (null! as node | null),
 			Name: init?.Name ?? ("" as string)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): base {
-		return $.markAsStructValue(new base(this))
+		return new base(this, true)
 	}
 
 	public __goscriptAssign(source: base): void {
@@ -248,15 +260,18 @@ export class widget {
 		X: number
 	}
 
-	constructor(init?: Partial<{base?: base, X?: number}>) {
+	constructor(init?: Partial<{base?: base, X?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
-			base: init?.base ? $.markAsStructValue($.cloneStructValue(init.base)) : $.markAsStructValue(new base()),
+			base: init?.base ? init.base.clone() : new base(undefined, true),
 			X: init?.X ?? (0 as number)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): widget {
-		return $.markAsStructValue(new widget(this))
+		return new widget(this, true)
 	}
 
 	public __goscriptAssign(source: widget): void {
@@ -305,15 +320,18 @@ export class body {
 		Title: string
 	}
 
-	constructor(init?: Partial<{widget?: widget, Title?: string}>) {
+	constructor(init?: Partial<{widget?: widget, Title?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
-			widget: init?.widget ? $.markAsStructValue($.cloneStructValue(init.widget)) : $.markAsStructValue(new widget()),
+			widget: init?.widget ? init.widget.clone() : new widget(undefined, true),
 			Title: init?.Title ?? ("" as string)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): body {
-		return $.markAsStructValue(new body(this))
+		return new body(this, true)
 	}
 
 	public __goscriptAssign(source: body): void {
@@ -375,7 +393,7 @@ export async function structPointers(): globalThis.Promise<void> {
 	let nb: body | $.VarRef<body> | null = __goscriptTuple1[0]
 	ok = __goscriptTuple1[1]
 	await $.println("new:", ok, !$.pointerEqual(nb, b), $.stringEqual($.pointerValue<body>(nb).Title, ""), $.pointerValue<body>(nb).widget.base.AsBase() != null)
-	let nv = $.markAsStructValue($.cloneStructValue(reflect.New($.pointerValueOrNil(reflect.TypeOf($.interfaceValue($.markAsStructValue(new widget()), "main.widget", "main.widget")))!)))
+	let nv = $.markAsStructValue($.cloneStructValue(reflect.New($.pointerValueOrNil(reflect.TypeOf($.interfaceValue(new widget(undefined, true), "main.widget", "main.widget")))!)))
 	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(nv)).Elem())).FieldByName("X"))).SetInt(7n)
 	await $.println("new widget:", $.pointerValue<widget>($.mustTypeAssert<widget | $.VarRef<widget> | null>($.markAsStructValue($.cloneStructValue(nv)).Interface(), /* @__PURE__ */ $.pointerType("main.widget"))).X)
 
@@ -430,13 +448,13 @@ export async function main(): globalThis.Promise<void> {
 	await $.println($.markAsStructValue($.cloneStructValue(sl)).Len())
 
 	// The element of a nil interface is the zero Value.
-	let empty: $.VarRef<holder> = $.varRef($.markAsStructValue(new holder()))
+	let empty: $.VarRef<holder> = $.varRef(new holder(undefined, true))
 	let ev = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(empty, "*main.holder", /* @__PURE__ */ $.pointerType("main.holder"))))).Elem()))
 	let sf = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(ev)).Field(0)))
 	await $.println(reflect.Kind_String($.markAsStructValue($.cloneStructValue(sf)).Kind()), $.markAsStructValue($.cloneStructValue(sf)).IsNil(), $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(sf)).Elem())).IsValid())
 	await $.println(reflect.Kind_String($.markAsStructValue($.cloneStructValue(underlying($.markAsStructValue($.cloneStructValue(sf))))).Kind()), reflect.Kind_String($.markAsStructValue($.cloneStructValue(underlying($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(ev)).Field(1)))))).Kind()))
 
-	let full = $.varRef($.markAsStructValue(new holder({S: $.interfaceValue<shape | null>($.markAsStructValue(new square({Side: 3})), "main.square", "main.square"), A: $.interfaceValue(new square({Side: 2}), "*main.square", /* @__PURE__ */ $.pointerType("main.square"))})))
+	let full = $.varRef(new holder({S: $.interfaceValue<shape | null>(new square({Side: 3}, true), "main.square", "main.square"), A: $.interfaceValue(new square({Side: 2}), "*main.square", /* @__PURE__ */ $.pointerType("main.square"))}, true))
 	let fv = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(full, "*main.holder", /* @__PURE__ */ $.pointerType("main.holder"))))).Elem()))
 	let u = underlying($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(fv)).Field(0))))
 	await $.println(reflect.Kind_String($.markAsStructValue($.cloneStructValue(u)).Kind()), $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(u)).Field(0))).Int())

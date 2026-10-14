@@ -37,16 +37,19 @@ export class MyStruct {
 		flag: atomic.Uint32
 	}
 
-	constructor(init?: Partial<{closed?: atomic.Bool, count?: atomic.Int32, flag?: atomic.Uint32}>) {
+	constructor(init?: Partial<{closed?: atomic.Bool, count?: atomic.Int32, flag?: atomic.Uint32}>, __goscriptValue?: boolean) {
 		this._fields = {
 			closed: init?.closed ? $.markAsStructValue($.cloneStructValue(init.closed)) : $.markAsStructValue(new atomic.Bool()),
 			count: init?.count ? $.markAsStructValue($.cloneStructValue(init.count)) : $.markAsStructValue(new atomic.Int32()),
 			flag: init?.flag ? $.markAsStructValue($.cloneStructValue(init.flag)) : $.markAsStructValue(new atomic.Uint32())
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): MyStruct {
-		return $.markAsStructValue(new MyStruct(this))
+		return new MyStruct(this, true)
 	}
 
 	public __goscriptAssign(source: MyStruct): void {
@@ -68,7 +71,7 @@ export class MyStruct {
 
 export async function main(): globalThis.Promise<void> {
 	// Test struct initialization with atomic fields
-	let s = $.markAsStructValue(new MyStruct())
+	let s = new MyStruct(undefined, true)
 
 	// Test that the atomic fields work correctly
 	s.closed.Store(true)
@@ -80,7 +83,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("flag:", s.flag.Load())
 
 	// Test struct initialization with init values
-	let s2 = $.markAsStructValue(new MyStruct({closed: $.markAsStructValue(new atomic.Bool()), count: $.markAsStructValue(new atomic.Int32()), flag: $.markAsStructValue(new atomic.Uint32())}))
+	let s2 = new MyStruct({closed: $.markAsStructValue(new atomic.Bool()), count: $.markAsStructValue(new atomic.Int32()), flag: $.markAsStructValue(new atomic.Uint32())}, true)
 
 	s2.closed.Store(false)
 	s2.count.Store(24)

@@ -16,14 +16,17 @@ export class buffer {
 		buf: $.Slice<number>
 	}
 
-	constructor(init?: Partial<{buf?: $.Slice<number>}>) {
+	constructor(init?: Partial<{buf?: $.Slice<number>}>, __goscriptValue?: boolean) {
 		this._fields = {
 			buf: init?.buf ?? (null! as $.Slice<number>)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): buffer {
-		return $.markAsStructValue(new buffer(this))
+		return new buffer(this, true)
 	}
 
 	public __goscriptAssign(source: buffer): void {

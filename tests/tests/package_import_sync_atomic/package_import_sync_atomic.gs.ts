@@ -19,14 +19,17 @@ export class pointerNode {
 		value: string
 	}
 
-	constructor(init?: Partial<{value?: string}>) {
+	constructor(init?: Partial<{value?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
 			value: init?.value ?? ("" as string)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): pointerNode {
-		return $.markAsStructValue(new pointerNode(this))
+		return new pointerNode(this, true)
 	}
 
 	public __goscriptAssign(source: pointerNode): void {

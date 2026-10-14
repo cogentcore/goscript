@@ -28,15 +28,18 @@ export class FileTracker {
 		lines: $.Slice<number>
 	}
 
-	constructor(init?: Partial<{mutex?: sync.Mutex, lines?: $.Slice<number>}>) {
+	constructor(init?: Partial<{mutex?: sync.Mutex, lines?: $.Slice<number>}>, __goscriptValue?: boolean) {
 		this._fields = {
 			mutex: init?.mutex ? $.markAsStructValue($.cloneStructValue(init.mutex)) : $.markAsStructValue(new sync.Mutex()),
 			lines: init?.lines ?? (null! as $.Slice<number>)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): FileTracker {
-		return $.markAsStructValue(new FileTracker(this))
+		return new FileTracker(this, true)
 	}
 
 	public __goscriptAssign(source: FileTracker): void {
@@ -75,14 +78,17 @@ export class Scanner {
 		file: FileTracker | $.VarRef<FileTracker> | null
 	}
 
-	constructor(init?: Partial<{file?: FileTracker | $.VarRef<FileTracker> | null}>) {
+	constructor(init?: Partial<{file?: FileTracker | $.VarRef<FileTracker> | null}>, __goscriptValue?: boolean) {
 		this._fields = {
 			file: init?.file ?? (null! as FileTracker | $.VarRef<FileTracker> | null)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): Scanner {
-		return $.markAsStructValue(new Scanner(this))
+		return new Scanner(this, true)
 	}
 
 	public __goscriptAssign(source: Scanner): void {

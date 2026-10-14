@@ -36,14 +36,17 @@ export class BaseStore {
 		CoreStore: inner.CoreStore | $.VarRef<inner.CoreStore> | null
 	}
 
-	constructor(init?: Partial<{CoreStore?: inner.CoreStore | $.VarRef<inner.CoreStore> | null}>) {
+	constructor(init?: Partial<{CoreStore?: inner.CoreStore | $.VarRef<inner.CoreStore> | null}>, __goscriptValue?: boolean) {
 		this._fields = {
 			CoreStore: init?.CoreStore ?? (null! as inner.CoreStore | $.VarRef<inner.CoreStore> | null)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): BaseStore {
-		return $.markAsStructValue(new BaseStore(this))
+		return new BaseStore(this, true)
 	}
 
 	public __goscriptAssign(source: BaseStore): void {

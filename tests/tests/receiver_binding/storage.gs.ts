@@ -28,15 +28,18 @@ export class storage {
 		name: string
 	}
 
-	constructor(init?: Partial<{bytes?: $.Slice<number>, name?: string}>) {
+	constructor(init?: Partial<{bytes?: $.Slice<number>, name?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
 			bytes: init?.bytes ?? (null! as $.Slice<number>),
 			name: init?.name ?? ("" as string)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): storage {
-		return $.markAsStructValue(new storage(this))
+		return new storage(this, true)
 	}
 
 	public __goscriptAssign(source: storage): void {

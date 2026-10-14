@@ -37,14 +37,17 @@ export class ChannelProcessor {
 		ch: $.Channel<number> | null
 	}
 
-	constructor(init?: Partial<{ch?: $.Channel<number> | null}>) {
+	constructor(init?: Partial<{ch?: $.Channel<number> | null}>, __goscriptValue?: boolean) {
 		this._fields = {
 			ch: init?.ch ?? (null! as $.Channel<number> | null)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): ChannelProcessor {
-		return $.markAsStructValue(new ChannelProcessor(this))
+		return new ChannelProcessor(this, true)
 	}
 
 	public __goscriptAssign(source: ChannelProcessor): void {
@@ -89,14 +92,17 @@ export class SimpleProcessor {
 		value: number
 	}
 
-	constructor(init?: Partial<{value?: number}>) {
+	constructor(init?: Partial<{value?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			value: init?.value ?? (0 as number)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): SimpleProcessor {
-		return $.markAsStructValue(new SimpleProcessor(this))
+		return new SimpleProcessor(this, true)
 	}
 
 	public __goscriptAssign(source: SimpleProcessor): void {
@@ -147,15 +153,18 @@ export class GenericChannelStore {
 		value: any
 	}
 
-	constructor(init?: Partial<{ch?: $.Channel<any> | null, value?: any}>) {
+	constructor(init?: Partial<{ch?: $.Channel<any> | null, value?: any}>, __goscriptValue?: boolean) {
 		this._fields = {
 			ch: init?.ch ?? (null! as $.Channel<any> | null),
 			value: init?.value !== undefined ? $.copyElement(init.value) : (null! as any)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): GenericChannelStore {
-		return $.markAsStructValue(new GenericChannelStore(this))
+		return new GenericChannelStore(this, true)
 	}
 
 	public __goscriptAssign(source: GenericChannelStore): void {

@@ -17,13 +17,16 @@ export class ConcreteA {
 	public _fields: {
 	}
 
-	constructor(init?: Partial<{}>) {
+	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
 		this._fields = {
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): ConcreteA {
-		return $.markAsStructValue(new ConcreteA(this))
+		return new ConcreteA(this, true)
 	}
 
 	public __goscriptAssign(source: ConcreteA): void {
@@ -47,13 +50,16 @@ export class ConcreteB {
 	public _fields: {
 	}
 
-	constructor(init?: Partial<{}>) {
+	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
 		this._fields = {
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): ConcreteB {
-		return $.markAsStructValue(new ConcreteB(this))
+		return new ConcreteB(this, true)
 	}
 
 	public __goscriptAssign(source: ConcreteB): void {
@@ -95,15 +101,18 @@ export class Container {
 		hasB: boolean
 	}
 
-	constructor(init?: Partial<{hasA?: boolean, hasB?: boolean}>) {
+	constructor(init?: Partial<{hasA?: boolean, hasB?: boolean}>, __goscriptValue?: boolean) {
 		this._fields = {
 			hasA: init?.hasA ?? (false as boolean),
 			hasB: init?.hasB ?? (false as boolean)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): Container {
-		return $.markAsStructValue(new Container(this))
+		return new Container(this, true)
 	}
 
 	public __goscriptAssign(source: Container): void {
@@ -123,7 +132,7 @@ export class Container {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let iface: Interface | null = $.interfaceValue<Interface | null>($.markAsStructValue(new ConcreteA()), "main.ConcreteA", "main.ConcreteA")
+	let iface: Interface | null = $.interfaceValue<Interface | null>(new ConcreteA(undefined, true), "main.ConcreteA", "main.ConcreteA")
 
 	let c: Container | $.VarRef<Container> | null = new Container()
 

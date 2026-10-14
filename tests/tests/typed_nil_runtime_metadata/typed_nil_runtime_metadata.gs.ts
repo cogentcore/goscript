@@ -20,13 +20,16 @@ export class source {
 	public _fields: {
 	}
 
-	constructor(init?: Partial<{}>) {
+	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
 		this._fields = {
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): source {
-		return $.markAsStructValue(new source(this))
+		return new source(this, true)
 	}
 
 	public __goscriptAssign(source: source): void {

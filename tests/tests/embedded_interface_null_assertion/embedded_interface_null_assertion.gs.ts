@@ -35,15 +35,18 @@ export class MyReader {
 		name: string
 	}
 
-	constructor(init?: Partial<{Reader?: Reader | null, name?: string}>) {
+	constructor(init?: Partial<{Reader?: Reader | null, name?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
 			Reader: init?.Reader ?? (null! as Reader | null),
 			name: init?.name ?? ("" as string)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): MyReader {
-		return $.markAsStructValue(new MyReader(this))
+		return new MyReader(this, true)
 	}
 
 	public __goscriptAssign(source: MyReader): void {
@@ -88,15 +91,18 @@ export class StringReader {
 		pos: number
 	}
 
-	constructor(init?: Partial<{data?: string, pos?: number}>) {
+	constructor(init?: Partial<{data?: string, pos?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			data: init?.data ?? ("" as string),
 			pos: init?.pos ?? (0 as number)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): StringReader {
-		return $.markAsStructValue(new StringReader(this))
+		return new StringReader(this, true)
 	}
 
 	public __goscriptAssign(source: StringReader): void {

@@ -19,14 +19,17 @@ export class local {
 		value: number
 	}
 
-	constructor(init?: Partial<{value?: number}>) {
+	constructor(init?: Partial<{value?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			value: init?.value ?? (0 as number)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): local {
-		return $.markAsStructValue(new local(this))
+		return new local(this, true)
 	}
 
 	public __goscriptAssign(source: local): void {

@@ -25,15 +25,18 @@ export class file {
 		data: $.Slice<number>
 	}
 
-	constructor(init?: Partial<{name?: string, data?: $.Slice<number>}>) {
+	constructor(init?: Partial<{name?: string, data?: $.Slice<number>}>, __goscriptValue?: boolean) {
 		this._fields = {
 			name: init?.name ?? ("" as string),
 			data: init?.data ?? (null! as $.Slice<number>)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): file {
-		return $.markAsStructValue(new file(this))
+		return new file(this, true)
 	}
 
 	public __goscriptAssign(source: file): void {
@@ -74,15 +77,18 @@ export class storage {
 		children: globalThis.Map<string, globalThis.Map<string, file | $.VarRef<file> | null> | null> | null
 	}
 
-	constructor(init?: Partial<{files?: globalThis.Map<string, file | $.VarRef<file> | null> | null, children?: globalThis.Map<string, globalThis.Map<string, file | $.VarRef<file> | null> | null> | null}>) {
+	constructor(init?: Partial<{files?: globalThis.Map<string, file | $.VarRef<file> | null> | null, children?: globalThis.Map<string, globalThis.Map<string, file | $.VarRef<file> | null> | null> | null}>, __goscriptValue?: boolean) {
 		this._fields = {
 			files: init?.files ?? (null! as globalThis.Map<string, file | $.VarRef<file> | null> | null),
 			children: init?.children ?? (null! as globalThis.Map<string, globalThis.Map<string, file | $.VarRef<file> | null> | null> | null)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): storage {
-		return $.markAsStructValue(new storage(this))
+		return new storage(this, true)
 	}
 
 	public __goscriptAssign(source: storage): void {
@@ -102,7 +108,7 @@ export class storage {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let s = $.markAsStructValue(new storage({files: $.makeMap<string, file | $.VarRef<file> | null>(), children: $.makeMap<string, globalThis.Map<string, file | $.VarRef<file> | null> | null>()}))
+	let s = new storage({files: $.makeMap<string, file | $.VarRef<file> | null>(), children: $.makeMap<string, globalThis.Map<string, file | $.VarRef<file> | null> | null>()}, true)
 
 	let f: file | $.VarRef<file> | null = new file({name: "test.txt", data: new Uint8Array([104, 101, 108, 108, 111, 32, 119, 111, 114, 108, 100])})
 

@@ -34,16 +34,19 @@ export class requestKey {
 		peerID: string
 	}
 
-	constructor(init?: Partial<{soID?: string, inviteID?: string, peerID?: string}>) {
+	constructor(init?: Partial<{soID?: string, inviteID?: string, peerID?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
 			soID: init?.soID ?? ("" as string),
 			inviteID: init?.inviteID ?? ("" as string),
 			peerID: init?.peerID ?? ("" as string)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): requestKey {
-		return $.markAsStructValue(new requestKey(this))
+		return new requestKey(this, true)
 	}
 
 	public __goscriptAssign(source: requestKey): void {
@@ -85,15 +88,18 @@ export class node {
 		next: node | $.VarRef<node> | null
 	}
 
-	constructor(init?: Partial<{value?: string, next?: node | $.VarRef<node> | null}>) {
+	constructor(init?: Partial<{value?: string, next?: node | $.VarRef<node> | null}>, __goscriptValue?: boolean) {
 		this._fields = {
 			value: init?.value ?? ("" as string),
 			next: init?.next ?? (null! as node | $.VarRef<node> | null)
 		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
+		}
 	}
 
 	public clone(): node {
-		return $.markAsStructValue(new node(this))
+		return new node(this, true)
 	}
 
 	public __goscriptAssign(source: node): void {
@@ -118,17 +124,17 @@ export function newMap(__typeArgs: $.GenericTypeArgs | undefined): globalThis.Ma
 
 export async function main(): globalThis.Promise<void> {
 	let status: globalThis.Map<requestKey, string> | null = $.makeMap<requestKey, string>()
-	$.mapSet(status, $.markAsStructValue(new requestKey({soID: "so-1", inviteID: "inv-1", peerID: "peer-1"})), "pending")
-	$.mapSet(status, $.markAsStructValue(new requestKey({soID: "so-1", inviteID: "inv-1", peerID: "peer-1"})), "accepted")
+	$.mapSet(status, new requestKey({soID: "so-1", inviteID: "inv-1", peerID: "peer-1"}, true), "pending")
+	$.mapSet(status, new requestKey({soID: "so-1", inviteID: "inv-1", peerID: "peer-1"}, true), "accepted")
 
-	let [got, ok] = $.mapGet<requestKey, string, string>(status, $.markAsStructValue(new requestKey({soID: "so-1", inviteID: "inv-1", peerID: "peer-1"})), "")
+	let [got, ok] = $.mapGet<requestKey, string, string>(status, new requestKey({soID: "so-1", inviteID: "inv-1", peerID: "peer-1"}, true), "")
 	await $.println("same struct key:", got, ok, $.len(status))
 
-	let [, missing] = $.mapGet<requestKey, string, string>(status, $.markAsStructValue(new requestKey({soID: "so-2", inviteID: "inv-1", peerID: "peer-1"})), "")
+	let [, missing] = $.mapGet<requestKey, string, string>(status, new requestKey({soID: "so-2", inviteID: "inv-1", peerID: "peer-1"}, true), "")
 	await $.println("different struct key:", missing)
 
-	$.deleteMapEntry(status, $.markAsStructValue(new requestKey({soID: "so-1", inviteID: "inv-1", peerID: "peer-1"})))
-	let [, deleted] = $.mapGet<requestKey, string, string>(status, $.markAsStructValue(new requestKey({soID: "so-1", inviteID: "inv-1", peerID: "peer-1"})), "")
+	$.deleteMapEntry(status, new requestKey({soID: "so-1", inviteID: "inv-1", peerID: "peer-1"}, true))
+	let [, deleted] = $.mapGet<requestKey, string, string>(status, new requestKey({soID: "so-1", inviteID: "inv-1", peerID: "peer-1"}, true), "")
 	await $.println("deleted struct key:", deleted, $.len(status))
 
 	let first: requestKey | $.VarRef<requestKey> | null = new requestKey({soID: "same"})

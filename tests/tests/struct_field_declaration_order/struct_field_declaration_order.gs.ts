@@ -16,14 +16,17 @@ export class inner {
 		value: number
 	}
 
-	constructor(init?: Partial<{value?: number}>) {
+	constructor(init?: Partial<{value?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			value: init?.value ?? (0 as number)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): inner {
-		return $.markAsStructValue(new inner(this))
+		return new inner(this, true)
 	}
 
 	public __goscriptAssign(source: inner): void {
@@ -54,14 +57,17 @@ export class outer {
 		inner: inner
 	}
 
-	constructor(init?: Partial<{inner?: inner}>) {
+	constructor(init?: Partial<{inner?: inner}>, __goscriptValue?: boolean) {
 		this._fields = {
-			inner: init?.inner ? $.markAsStructValue($.cloneStructValue(init.inner)) : $.markAsStructValue(new inner())
+			inner: init?.inner ? init.inner.clone() : new inner(undefined, true)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): outer {
-		return $.markAsStructValue(new outer(this))
+		return new outer(this, true)
 	}
 
 	public __goscriptAssign(source: outer): void {
@@ -79,7 +85,7 @@ export class outer {
 	)
 }
 
-export let defaultOuter: outer = $.markAsStructValue(new outer())
+export let defaultOuter: outer = new outer(undefined, true)
 
 export function __goscript_set_defaultOuter(__goscriptValue: outer): void {
 	$.assignStruct(defaultOuter, __goscriptValue)

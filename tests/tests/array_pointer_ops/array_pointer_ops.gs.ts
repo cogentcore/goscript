@@ -16,14 +16,17 @@ export class item {
 		value: number
 	}
 
-	constructor(init?: Partial<{value?: number}>) {
+	constructor(init?: Partial<{value?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			value: init?.value ?? (0 as number)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): item {
-		return $.markAsStructValue(new item(this))
+		return new item(this, true)
 	}
 
 	public __goscriptAssign(source: item): void {
@@ -63,15 +66,18 @@ export class arrays {
 		items: item[]
 	}
 
-	constructor(init?: Partial<{slices?: $.Slice<number>[], items?: item[]}>) {
+	constructor(init?: Partial<{slices?: $.Slice<number>[], items?: item[]}>, __goscriptValue?: boolean) {
 		this._fields = {
 			slices: init?.slices !== undefined ? $.cloneArrayValue(init.slices, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")), 1)) : $.arrayValue(globalThis.Array.from({ length: 1 }, () => null)),
-			items: init?.items !== undefined ? $.cloneArrayValue(init.items, /* @__PURE__ */ $.arrayType("main.item", 1)) : $.arrayValue(globalThis.Array.from({ length: 1 }, () => $.markAsStructValue(new item())), /* @__PURE__ */ $.arrayType("main.item", 1))
+			items: init?.items !== undefined ? $.cloneArrayValue(init.items, /* @__PURE__ */ $.arrayType("main.item", 1)) : $.arrayValue(globalThis.Array.from({ length: 1 }, () => new item(undefined, true)), /* @__PURE__ */ $.arrayType("main.item", 1))
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): arrays {
-		return $.markAsStructValue(new arrays(this))
+		return new arrays(this, true)
 	}
 
 	public __goscriptAssign(source: arrays): void {
@@ -121,7 +127,7 @@ export async function main(): globalThis.Promise<void> {
 	$.arrayIndex(slicesCopy, 0)![0] = 7
 	await $.println("slice sharing:", $.arrayIndex($.arrayIndex(slices, 0)!, 0))
 
-	let structs = $.arrayValue([$.markAsStructValue(new item({value: 1}))], /* @__PURE__ */ $.arrayType("main.item", 1))
+	let structs = $.arrayValue([new item({value: 1}, true)], /* @__PURE__ */ $.arrayType("main.item", 1))
 	let structsCopy = $.cloneArrayValue(structs, /* @__PURE__ */ $.arrayType("main.item", 1))
 	$.arrayIndex(structsCopy, 0).value = 7
 	await $.println("struct copy:", $.arrayIndex(structs, 0).value, $.arrayIndex(structsCopy, 0).value)
@@ -131,8 +137,8 @@ export async function main(): globalThis.Promise<void> {
 	$.pointerValue<item>($.arrayIndex(pointersCopy, 0)).value = 7
 	await $.println("pointer sharing:", $.pointerValue<item>($.arrayIndex(pointers, 0)).value, $.pointerEqual($.arrayIndex(pointers, 0), $.arrayIndex(pointersCopy, 0)))
 
-	let original = $.markAsStructValue(new arrays({slices: $.cloneArrayValue(slices, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")), 1)), items: $.cloneArrayValue(structs, /* @__PURE__ */ $.arrayType("main.item", 1))}))
-	let copied = $.markAsStructValue($.cloneStructValue(original))
+	let original = new arrays({slices: $.cloneArrayValue(slices, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")), 1)), items: $.cloneArrayValue(structs, /* @__PURE__ */ $.arrayType("main.item", 1))}, true)
+	let copied = (original).clone()
 	$.arrayIndex(copied.slices, 0)![0] = 8
 	$.arrayIndex(copied.items, 0).value = 8
 	await $.println("array fields:", $.arrayIndex($.arrayIndex(original.slices, 0)!, 0), $.arrayIndex(original.items, 0).value, $.arrayIndex(copied.items, 0).value)

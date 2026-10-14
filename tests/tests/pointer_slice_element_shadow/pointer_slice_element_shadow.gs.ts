@@ -16,14 +16,17 @@ export class entry {
 		key: string
 	}
 
-	constructor(init?: Partial<{key?: string}>) {
+	constructor(init?: Partial<{key?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
 			key: init?.key ?? ("" as string)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): entry {
-		return $.markAsStructValue(new entry(this))
+		return new entry(this, true)
 	}
 
 	public __goscriptAssign(source: entry): void {
@@ -54,14 +57,17 @@ export class _object {
 		entries: $.Slice<entry>
 	}
 
-	constructor(init?: Partial<{entries?: $.Slice<entry>}>) {
+	constructor(init?: Partial<{entries?: $.Slice<entry>}>, __goscriptValue?: boolean) {
 		this._fields = {
 			entries: init?.entries ?? (null! as $.Slice<entry>)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): _object {
-		return $.markAsStructValue(new _object(this))
+		return new _object(this, true)
 	}
 
 	public __goscriptAssign(source: _object): void {
@@ -75,7 +81,7 @@ export class _object {
 		if ($.cap($.pointerValue<_object>(o).entries) > $.sliceLen($.pointerValue<_object>(o).entries)) {
 			$.pointerValue<_object>(o).entries = $.goSlice($.pointerValue<_object>(o).entries, undefined, $.sliceLen($.pointerValue<_object>(o).entries) + 1)
 		} else {
-			$.pointerValue<_object>(o).entries = $.append($.pointerValue<_object>(o).entries, $.markAsStructValue(new entry()))
+			$.pointerValue<_object>(o).entries = $.append($.pointerValue<_object>(o).entries, new entry(undefined, true))
 		}
 		return $.indexRef($.pointerValue<_object>(o).entries!, $.sliceLen($.pointerValue<_object>(o).entries) - 1)
 	}
@@ -95,14 +101,14 @@ export function parseKey(): [string, $.GoError] {
 
 export async function printInterfaceSpareZero(): globalThis.Promise<void> {
 	let values: $.Slice<any> = $.makeSlice<any>(0, 2)
-	values = $.append(values, $.interfaceValue($.markAsStructValue(new entry({key: "value"})), "main.entry", "main.entry"), $.appendZeros.nil)
+	values = $.append(values, $.interfaceValue(new entry({key: "value"}, true), "main.entry", "main.entry"), $.appendZeros.nil)
 	values = $.goSlice(values, undefined, 2)
 	await $.println($.arrayIndex(values!, 1) == null)
 }
 
 export async function printInterfaceAppendSliceSpareZero(): globalThis.Promise<void> {
 	let values: $.Slice<any> = $.makeSlice<any>(0, 2)
-	values = $.appendSlice(values, $.arrayToSlice<any>([$.interfaceValue($.markAsStructValue(new entry({key: "value"})), "main.entry", "main.entry")]), $.appendZeros.nil)
+	values = $.appendSlice(values, $.arrayToSlice<any>([$.interfaceValue(new entry({key: "value"}, true), "main.entry", "main.entry")]), $.appendZeros.nil)
 	values = $.goSlice(values, undefined, 2)
 	await $.println($.arrayIndex(values!, 1) == null)
 }

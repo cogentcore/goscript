@@ -17,7 +17,7 @@ import "@goscript/github.com/aperturerobotics/util/csync/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	await using __defer = new $.AsyncDisposableStack()
-	let mtx: $.VarRef<csync.Mutex> = $.varRef($.markAsStructValue(new csync.Mutex()))
+	let mtx: $.VarRef<csync.Mutex> = $.varRef(new csync.Mutex(undefined, true))
 	let counter: number = 0
 	let wg: $.VarRef<sync.WaitGroup> = $.varRef($.markAsStructValue(new sync.WaitGroup()))
 

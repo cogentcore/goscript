@@ -16,14 +16,17 @@ export class code {
 		len: number
 	}
 
-	constructor(init?: Partial<{len?: number}>) {
+	constructor(init?: Partial<{len?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
 			len: init?.len ?? (0 as number)
+		}
+		if (__goscriptValue) {
+			(this as any)[$.structValueMarker] = true
 		}
 	}
 
 	public clone(): code {
-		return $.markAsStructValue(new code(this))
+		return new code(this, true)
 	}
 
 	public __goscriptAssign(source: code): void {
@@ -42,7 +45,7 @@ export class code {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let codes: $.Slice<code> = $.makeSlice<code>(2, undefined, undefined, () => $.markAsStructValue(new code()))
+	let codes: $.Slice<code> = $.makeSlice<code>(2, undefined, undefined, () => new code(undefined, true))
 	$.arrayIndex(codes!, 0).len = 3
 	await $.println("first:", $.arrayIndex(codes!, 0).len)
 	await $.println("second:", $.arrayIndex(codes!, 1).len)
