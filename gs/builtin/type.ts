@@ -358,12 +358,15 @@ export function registerTypePackagePath(
  * the name has no package qualifier.
  */
 export function typePackagePath(typeName: string): string {
+  // A registered package path wins, whatever the type arguments are.
   const bracket = typeName.indexOf('[')
   const baseName = bracket >= 0 ? typeName.substring(0, bracket) : typeName
   const registered = typePackagePaths.get(baseName)
   if (registered !== undefined) {
     return registered
   }
+
+  // Otherwise the qualifier of the name is the path.
   const dotIndex = baseName.lastIndexOf('.')
   return dotIndex > 0 ? baseName.substring(0, dotIndex) : ''
 }
@@ -553,6 +556,7 @@ function goTypeMatchesTypeInfo(goType: string, info: TypeInfo): boolean {
   if (runtimeName !== undefined && goType === runtimeName) {
     return true
   }
+
   // The comparison parses the type string, so its result is cached on the
   // type info, until more types are registered.
   let cache = (info as any)[goTypeMatchCacheKey] as
@@ -678,12 +682,15 @@ function simpleTypeInfosIdentical(
   t1: string | TypeInfo,
   t2: string | TypeInfo,
 ): boolean | undefined {
+  // The same object, or a string that cannot be resolved here, is decided at once.
   if (t1 === t2) {
     return true
   }
   if (typeof t1 === 'string' || typeof t2 === 'string') {
     return undefined
   }
+
+  // A different kind or name is a different type.
   if (
     t1.kind !== t2.kind ||
     t1.name !== t2.name ||
@@ -691,6 +698,8 @@ function simpleTypeInfosIdentical(
   ) {
     return false
   }
+
+  // Only a basic type or an element named by a string is decided here.
   switch (t1.kind) {
     case TypeKind.Basic:
       return t1.name !== undefined ? true : undefined
@@ -1010,6 +1019,8 @@ function matchesInterfaceType(value: any, info: TypeInfo): boolean {
   if (ctor === undefined || ctor.__typeInfo === undefined) {
     return matchesInterfaceTypeUncached(value, info)
   }
+
+  // The cache of the interface type is keyed by the Go type of the value.
   const goType: string = value.__goType ?? ''
   let cache = (info as any)[interfaceMatchCacheKey] as
     | Map<string, { ctor: unknown; ok: boolean }>
@@ -1018,6 +1029,8 @@ function matchesInterfaceType(value: any, info: TypeInfo): boolean {
     cache = new globalThis.Map()
     ;(info as any)[interfaceMatchCacheKey] = cache
   }
+
+  // A result is reused only for the same class.
   const cached = cache.get(goType)
   if (cached !== undefined && cached.ctor === ctor) {
     return cached.ok
@@ -2466,6 +2479,18 @@ export function namedValueInterfaceValue<T>(
   typeInfo?: TypeInfo | string,
   methodSignatures?: MethodSignature[],
 ): T {
+  // A method table that is cached, as the compiler creates one per type,
+  // has a shared prototype holding its method wrappers, so that boxing a
+  // value only creates the box.
+  const proto =
+    methodSignatures !== undefined ? namedValueBoxPrototype(methods) : undefined
+  if (proto !== undefined) {
+    const box = Object.create(proto)
+    box.__goType = typeName
+    box.__goValue = value
+    box.__goTypeInfo = typeInfo
+    return box as T
+  }
   const boxed: any = {
     __goType: typeName,
     __goValue: value,
@@ -2490,6 +2515,55 @@ export function namedValueInterfaceValue<T>(
   return boxed as T
 }
 
+// namedValueBoxPrototypes holds the prototype of the boxes of each cached
+// method table, made the first time a value is boxed with it.
+const namedValueBoxPrototypes = new WeakMap<object, object>()
+
+// namedValueBoxMarker marks a prototype of named value boxes, whose methods
+// make up their Go method surface.
+export const namedValueBoxMarker = Symbol('namedValueBox')
+
+function namedValueBoxPrototype(
+  methods: Record<string, (receiver: any, ...args: any[]) => any>,
+): object | undefined {
+  // A method table has one prototype.
+  let proto = namedValueBoxPrototypes.get(methods)
+  if (proto !== undefined) {
+    return proto
+  }
+
+  // The methods are those cached by namedValueMethodEntries.
+  const entries = namedValueMethodCache.get(methods)
+  if (entries === undefined) {
+    return undefined
+  }
+  const p: any = {
+    valueOf(this: any) {
+      return this.__goValue
+    },
+    toString(this: any) {
+      return String(this.__goValue)
+    },
+    [Symbol.toPrimitive](this: any) {
+      return this.__goValue
+    },
+    [namedValueBoxMarker]: true,
+  }
+  for (const entry of entries) {
+    const method = entry.method
+    const wrapper: any = function (this: any, ...args: any[]) {
+      return method(this.__goValue, ...args)
+    }
+    wrapper.__goscriptMethodWrapper = true
+    if (entry.signature) {
+      wrapper.__goscriptMethodSignature = entry.signature
+    }
+    p[entry.name] = wrapper
+  }
+  namedValueBoxPrototypes.set(methods, p)
+  return p
+}
+
 interface NamedValueMethodEntry {
   name: string
   method: (receiver: any, ...args: any[]) => any
@@ -2505,10 +2579,13 @@ function namedValueMethodEntries(
   typeInfo?: TypeInfo | string,
   methodSignatures?: MethodSignature[],
 ): NamedValueMethodEntry[] {
+  // A method table with signatures has one list of entries.
   const cached = namedValueMethodCache.get(methods)
   if (cached !== undefined) {
     return cached
   }
+
+  // Each method takes its signature from the given list or from the type info.
   const entries = Object.entries(methods).map(([name, method]) => ({
     name,
     method,
@@ -2517,6 +2594,7 @@ function namedValueMethodEntries(
       wrapperMethodSignatureFromTypeInfo(name, typeInfo) ??
       undefined,
   }))
+
   // Only a method table that comes with its signatures is cached, since
   // its signatures do not depend on the type info given with it.
   if (methodSignatures !== undefined) {

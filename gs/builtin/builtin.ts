@@ -11,6 +11,7 @@ import {
   TypeKind,
   type GenericTypeArgs,
   type TypeInfo,
+  namedValueBoxMarker,
 } from './type.js'
 import { writeHostStdoutText } from './hostio.js'
 import { runtimePanic } from './panic.js'
@@ -169,6 +170,7 @@ export function assignFieldValue(
     }
     return target
   }
+
   // An array whose type is not resolved is still copied.
   if (isArrayValue(source)) {
     return cloneArrayValue(source, arrayValueTypeInfo(source))
@@ -406,6 +408,15 @@ function hasGoValue(value: unknown): value is {
 function hasGoMethodSurface(value: unknown): boolean {
   if (typeof value !== 'object' || value === null) {
     return false
+  }
+  const proto = Object.getPrototypeOf(value)
+  if (proto !== null && proto[namedValueBoxMarker] === true) {
+    return Object.keys(proto).some(
+      (key) =>
+        key !== 'valueOf' &&
+        key !== 'toString' &&
+        typeof proto[key] === 'function',
+    )
   }
   return Object.keys(value).some((key) => {
     return (
@@ -1136,6 +1147,7 @@ const emptyByteView: ByteView = { data: [], off: 0, len: 0 }
 
 // byteView returns the view of the given bytes, without copying them.
 function byteView(bytes: Bytes | null): ByteView {
+  // A slice of a named byte type is read as its bytes.
   bytes = bytesValue(bytes) as Bytes | null
   if (bytes === null) return emptyByteView
   if (bytes instanceof Uint8Array) {
@@ -1154,6 +1166,7 @@ function byteView(bytes: Bytes | null): ByteView {
 // byteViewMatches reports whether the needle occurs in the haystack at the
 // given position, which must leave room for the whole needle.
 function byteViewMatches(h: ByteView, pos: number, n: ByteView): boolean {
+  // The backing arrays are read directly.
   const hd = h.data
   const nd = n.data
   const ho = h.off + pos
@@ -1175,15 +1188,18 @@ export function bytesIndexOf(
 ): number {
   if (bytes === null || subslice === null) return -1
 
+  // The search reads both byte sequences in place.
   const haystack = byteView(bytes)
   const needle = byteView(subslice)
 
+  // An empty needle matches at the start, and a single byte has a fast path.
   if (needle.len === 0) return 0
   if (needle.len > haystack.len) return -1
   if (needle.len === 1) {
     return bytesIndexByteView(haystack, needle.data[needle.off])
   }
 
+  // A position is tried only when its first byte matches.
   const first = needle.data[needle.off]
   const hd = haystack.data
   for (let i = 0; i <= haystack.len - needle.len; i++) {
@@ -1208,12 +1224,15 @@ export function bytesLastIndexOf(
 ): number {
   if (bytes === null || subslice === null) return -1
 
+  // The search reads both byte sequences in place.
   const haystack = byteView(bytes)
   const needle = byteView(subslice)
 
+  // An empty needle matches at the end.
   if (needle.len === 0) return haystack.len
   if (needle.len > haystack.len) return -1
 
+  // The last match is the first one found scanning backwards.
   for (let i = haystack.len - needle.len; i >= 0; i--) {
     if (byteViewMatches(haystack, i, needle)) return i
   }
@@ -1223,10 +1242,13 @@ export function bytesLastIndexOf(
 
 // bytesIndexByteView returns the index of the first byte c in the view.
 function bytesIndexByteView(v: ByteView, c: number): number {
+  // A Uint8Array is searched natively.
   const d = v.data
   if (d instanceof Uint8Array) {
     return d.subarray(v.off, v.off + v.len).indexOf(c)
   }
+
+  // Any other backing array is scanned.
   const end = v.off + v.len
   for (let i = v.off; i < end; i++) {
     if (d[i] === c) return i - v.off
@@ -1250,6 +1272,7 @@ export function bytesIndexByte(bytes: Bytes | null, c: number): number {
 export function bytesLastIndexByte(bytes: Bytes | null, c: number): number {
   if (bytes === null) return -1
 
+  // The backing array is scanned from the end of the window.
   const v = byteView(bytes)
   const d = v.data
   for (let i = v.off + v.len - 1; i >= v.off; i--) {
@@ -1264,17 +1287,19 @@ export function bytesLastIndexByte(bytes: Bytes | null, c: number): number {
 export function bytesCount(bytes: Bytes | null, sep: Bytes | null): number {
   if (bytes === null || sep === null) return 0
 
+  // The search reads both byte sequences in place.
   const haystack = byteView(bytes)
   const needle = byteView(sep)
 
+  // An empty separator counts the positions between bytes.
   if (needle.len === 0) {
     // Empty separators count byte positions, including both ends.
     return haystack.len + 1
   }
 
+  // Matches do not overlap, so the scan skips past each one.
   let count = 0
   let pos = 0
-
   while (pos <= haystack.len - needle.len) {
     if (byteViewMatches(haystack, pos, needle)) {
       count++
