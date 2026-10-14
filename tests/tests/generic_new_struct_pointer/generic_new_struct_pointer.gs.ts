@@ -114,11 +114,11 @@ export async function initAs(__typeArgs: $.GenericTypeArgs | undefined, n: Node 
 }
 
 export function store(__typeArgs: $.GenericTypeArgs | undefined, p: any, v: any): void {
-	$.genericPointerRef(p).value = v
+	$.genericPointerRef(p).value = $.copyElement(v)
 }
 
 export function load(__typeArgs: $.GenericTypeArgs | undefined, p: any): any {
-	return $.pointerValue<any>(p)
+	return $.copyElement($.pointerValue<any>(p))
 }
 
 export async function main(): globalThis.Promise<void> {

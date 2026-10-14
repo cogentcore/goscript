@@ -144,7 +144,7 @@ export function twoCopies(__typeArgs: $.GenericTypeArgs | undefined, v: any): [a
 }
 
 export function store(__typeArgs: $.GenericTypeArgs | undefined, dst: any, v: any): void {
-	dst!.value = $.copyElement(v)
+	$.genericPointerRef(dst).value = $.copyElement(v)
 }
 
 export function fill<T>(__typeArgs: $.GenericTypeArgs | undefined, n: number, v: any): $.Slice<T> {

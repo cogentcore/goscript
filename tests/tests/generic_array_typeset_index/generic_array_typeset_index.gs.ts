@@ -8,7 +8,7 @@ export function search<E>(__typeArgs: $.GenericTypeArgs | undefined, dictionary:
 	let _from = 0
 	let to = $.len(dictionary)
 	while (to > _from) {
-		let middle: number = Math.trunc((_from + to) / 2)
+		let middle: number = globalThis.Math.trunc((_from + to) / 2)
 		let cpRange = $.copyElement($.arrayIndex(dictionary!, middle))
 		if ($.int(r) < $.arrayIndex((cpRange as number[]), 0)) {
 			to = middle
@@ -25,9 +25,9 @@ export function search<E>(__typeArgs: $.GenericTypeArgs | undefined, dictionary:
 
 export async function main(): globalThis.Promise<void> {
 	let three: $.Slice<number[]> = $.arrayToSlice<number[]>([$.arrayValue([0, 9, 1]), $.arrayValue([10, 19, 2]), $.arrayValue([20, 29, 3])])
-	await $.println($.arrayIndex(search({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, E: { type: /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 3), zero: () => $.arrayValue(Array.from({ length: 3 }, () => 0)) }}, three, 15), 2), $.arrayIndex(search({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, E: { type: /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 3), zero: () => $.arrayValue(Array.from({ length: 3 }, () => 0)) }}, three, 25), 2), $.arrayIndex(search({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, E: { type: /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 3), zero: () => $.arrayValue(Array.from({ length: 3 }, () => 0)) }}, three, 40), 2))
+	await $.println($.arrayIndex(search({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, E: { type: /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 3), zero: () => $.arrayValue(globalThis.Array.from({ length: 3 }, () => 0)) }}, three, 15), 2), $.arrayIndex(search({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, E: { type: /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 3), zero: () => $.arrayValue(globalThis.Array.from({ length: 3 }, () => 0)) }}, three, 25), 2), $.arrayIndex(search({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, E: { type: /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 3), zero: () => $.arrayValue(globalThis.Array.from({ length: 3 }, () => 0)) }}, three, 40), 2))
 	let four: $.Slice<number[]> = $.arrayToSlice<number[]>([$.arrayValue([0, 9, 1, 5]), $.arrayValue([10, 19, 2, 6])])
-	let r = ($.cloneArrayValue(search({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, E: { type: /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 4), zero: () => $.arrayValue(Array.from({ length: 4 }, () => 0)) }}, four, 3), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 4)) as number[])
+	let r = ($.cloneArrayValue(search({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, E: { type: /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 4), zero: () => $.arrayValue(globalThis.Array.from({ length: 4 }, () => 0)) }}, four, 3), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 4)) as number[])
 	await $.println($.arrayIndex(r, 2), $.arrayIndex(r, 3), 4)
 }
 
