@@ -9612,6 +9612,15 @@ func (o *LoweringOwner) lowerFixedCallArgs(
 		params = signature.Params()
 	}
 
+	// A struct parameter that the called function only reads takes the
+	// caller's value without a copy (see funcParamsReadOnly).
+	var paramsReadOnly []bool
+	if fn := calledFunction(ctx.semPkg.source, ast.Unparen(call.Fun)); fn != nil && !overrideCall {
+		if semFn := semanticFunctionFor(ctx.model, fn); semFn != nil && !o.functionAsync(ctx, fn) {
+			paramsReadOnly = semFn.paramsReadOnly
+		}
+	}
+
 	// Lower each argument against its parameter.
 	args := make([]string, 0, len(call.Args))
 	var diagnostics []Diagnostic
@@ -9627,6 +9636,10 @@ func (o *LoweringOwner) lowerFixedCallArgs(
 		allowAsyncCallback := allowAsyncOverrideCallback || o.overrideAwaitsCallback(ctx, call.Fun, param.Name())
 		lowered, exprDiagnostics := o.lowerCallArgExpr(ctx, expr, param.Type(), allowAsyncCallback)
 		diagnostics = append(diagnostics, exprDiagnostics...)
+		if idx < len(paramsReadOnly) && paramsReadOnly[idx] && types.Identical(ctx.semPkg.source.TypesInfo.TypeOf(expr), param.Type()) {
+			args = append(args, lowered)
+			continue
+		}
 		lowered = o.lowerCallArgForTarget(ctx, expr, param.Type(), lowered, overrideCall)
 		if !allowAsyncCallback {
 			lowered = o.lowerSyncCallbackArg(ctx, expr, param.Type(), lowered)
