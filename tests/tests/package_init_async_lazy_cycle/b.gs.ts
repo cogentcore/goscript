@@ -37,6 +37,7 @@ export function __goscript_set_first(__goscriptValue: __goscript_a.holder): void
 export async function makeFirst(): globalThis.Promise<__goscript_a.holder> {
 	using __defer = new $.DisposableStack()
 	await lock.value.Lock()
-	__defer.defer(() => { lock.value.Unlock() })
+	const __goscriptDeferCallee0 = $.functionValue(((__receiver) => () => __receiver.Unlock())(lock.value), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "sync.(*Mutex).Unlock-fm")
+	__defer.defer(() => { __goscriptDeferCallee0() })
 	return $.markAsStructValue(new __goscript_a.holder({n: __goscript_a.__goscript_get_seed()}))
 }

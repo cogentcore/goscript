@@ -22,7 +22,8 @@ export async function main(): globalThis.Promise<void> {
 	let wg: $.VarRef<sync.WaitGroup> = $.varRef($.markAsStructValue(new sync.WaitGroup()))
 
 	let [ctx, cancel] = context.WithTimeout($.pointerValueOrNil(context.Background())!, 5000000000n)
-	__defer.defer(async () => { (__goscriptAwait = cancel!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) })
+	const __goscriptDeferCallee0 = cancel
+	__defer.defer(async () => { (__goscriptAwait = __goscriptDeferCallee0!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) })
 
 	// Number of goroutines to spawn
 	let numWorkers = 5
@@ -39,7 +40,8 @@ export async function main(): globalThis.Promise<void> {
 			await $.println("worker", id, "failed to acquire lock:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 			return
 		}
-		__defer.defer(async () => { (__goscriptAwait = relLock!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) })
+		const __goscriptDeferCallee1 = relLock
+		__defer.defer(async () => { (__goscriptAwait = __goscriptDeferCallee1!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) })
 
 		// Critical section
 		// println("worker", id, "entered critical section") - non-deterministic, leave commented out
@@ -50,7 +52,9 @@ export async function main(): globalThis.Promise<void> {
 
 	// Start worker goroutines
 	for (let __goscriptRangeCount0 = numWorkers, i = 0; i < __goscriptRangeCount0; i++) {
-		queueMicrotask(async () => { (__goscriptAwait = worker!(i), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) })
+		const __goscriptDeferCallee2 = worker
+		const __goscriptDeferArg0 = i
+		queueMicrotask(async () => { (__goscriptAwait = __goscriptDeferCallee2!(__goscriptDeferArg0), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) })
 	}
 
 	// Wait for all workers to complete or context timeout

@@ -67,7 +67,8 @@ export async function main(): globalThis.Promise<void> {
 		await $.println("get error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		return
 	}
-	__defer.defer(async () => { await $.pointerValue<Exclude<io.ReadCloser, null>>($.pointerValue<http.Response>(resp).Body).Close() })
+	const __goscriptDeferCallee0 = $.functionValue(((__receiver) => () => __receiver.Close())($.pointerValue<Exclude<io.ReadCloser, null>>($.pointerValue<http.Response>(resp).Body)), ({ kind: $.TypeKind.Function, params: [], results: ["error"] } as $.FunctionTypeInfo), "io.Closer.Close-fm")
+	__defer.defer(async () => { await __goscriptDeferCallee0() })
 	await $.println("get status:", $.pointerValue<http.Response>(resp).StatusCode)
 
 	let req: http.Request | $.VarRef<http.Request> | null = httptest.NewRequest(http.MethodGet, "/?y=2", null!)

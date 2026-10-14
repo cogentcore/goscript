@@ -16,6 +16,7 @@ export async function main(): globalThis.Promise<void> {
 	let completed = 0
 
 	for (let w = 0; w < 16; w++) {
+		const __goscriptDeferArg0 = w
 		queueMicrotask(async () => { await (async (id: number): globalThis.Promise<void> => {
 			// Await-free CPU span: a tight loop with no I/O or channel op, the
 			// starvation shape from issue_118 scaled across 16 goroutines.
@@ -28,7 +29,7 @@ export async function main(): globalThis.Promise<void> {
 				completed++
 				void (__goscriptAwait = broadcastFn!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 			}, ({ kind: $.TypeKind.Function, params: [({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.channelType({ kind: $.TypeKind.Struct, methods: [], fields: [] }, "receive")] } as $.FunctionTypeInfo)], results: [] } as $.FunctionTypeInfo)))
-		})(w) })
+		})(__goscriptDeferArg0) })
 	}
 
 	// Coordinator mirrors ConcurrentQueue.WaitIdle: read state and the wait

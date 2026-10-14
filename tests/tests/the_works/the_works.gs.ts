@@ -522,7 +522,10 @@ export async function main(): globalThis.Promise<void> {
 	let faults: $.Channel<Fault | $.VarRef<Fault> | null> | null = $.makeChannel<Fault | $.VarRef<Fault> | null>(0, null! as Fault | $.VarRef<Fault> | null, "both")
 	for (let __goscriptRangeTarget1 = programs, __goscriptRangeWindow1 = $.sliceRange(__goscriptRangeTarget1), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow1.length; __rangeIndex++) {
 		let p = $.markAsStructValue($.cloneStructValue((__goscriptRangeWindow1.backing[__goscriptRangeWindow1.offset + __rangeIndex] as Program)))
-		queueMicrotask(async () => { await run($.markAsStructValue($.cloneStructValue(p)), answers, faults) })
+		const __goscriptDeferArg0 = $.markAsStructValue($.cloneStructValue(p))
+		const __goscriptDeferArg1 = answers
+		const __goscriptDeferArg2 = faults
+		queueMicrotask(async () => { await run(__goscriptDeferArg0, __goscriptDeferArg1, __goscriptDeferArg2) })
 	}
 
 	let reports: globalThis.Map<string, Report | null> | null = $.makeMap<string, Report | null>()

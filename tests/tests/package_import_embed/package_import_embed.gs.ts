@@ -25,7 +25,8 @@ export async function main(): globalThis.Promise<void> {
 		await $.println("open error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		return
 	}
-	__defer.defer(async () => { (__goscriptAwait = $.pointerValue<Exclude<fs.File, null>>(f).Close(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) })
+	const __goscriptDeferCallee0 = $.functionValue(((__receiver) => () => __receiver.Close())($.pointerValue<Exclude<fs.File, null>>(f)), ({ kind: $.TypeKind.Function, params: [], results: ["error"] } as $.FunctionTypeInfo), "io/fs.File.Close-fm")
+	__defer.defer(async () => { (__goscriptAwait = __goscriptDeferCallee0(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) })
 
 	// A regular embedded file implements io.ReaderAt and io.Seeker.
 	let [ra, isReaderAt] = $.typeAssertTuple<io.ReaderAt | null>(f, "io.ReaderAt")
