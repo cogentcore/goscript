@@ -371,7 +371,7 @@ export async function structPointers(): globalThis.Promise<void> {
 	let b: body | $.VarRef<body> | null = new body({Title: "body"})
 	$.pointerValue<body>(b).widget.base.This = $.interfaceValue<node | null>(b, "*main.body", /* @__PURE__ */ $.pointerType("main.body"))
 	let [n, ok] = $.typeAssertTuple<node | null>($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(b, "*main.body", /* @__PURE__ */ $.pointerType("main.body"))))).Interface(), "main.node")
-	await $.println("valueof:", ok, ok && ($.pointerEqual($.mustTypeAssert<body | $.VarRef<body> | null>(n, /* @__PURE__ */ $.pointerType("main.body")), b)))
+	await $.println("valueof:", ok, ok && ($.pointerEqual(((n as any)?.__goType === "*main.body" && (n as any).__goValue === undefined && (n as any).__isTypedNil !== true ? ((n as any) as body | $.VarRef<body> | null) : $.mustTypeAssert<body | $.VarRef<body> | null>(n, /* @__PURE__ */ $.pointerType("main.body"))), b)))
 	let __goscriptTuple0: any = $.typeAssertTuple<body | $.VarRef<body> | null>($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(b, "*main.body", /* @__PURE__ */ $.pointerType("main.body"))))).Elem())).Addr())).Interface(), /* @__PURE__ */ $.pointerType("main.body"))
 	let a: body | $.VarRef<body> | null = __goscriptTuple0[0]
 	ok = __goscriptTuple0[1]
@@ -387,7 +387,7 @@ export async function structPointers(): globalThis.Promise<void> {
 
 	let np: body | $.VarRef<body> | null = null! as body | $.VarRef<body> | null
 	let iv = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(np, "*main.body", /* @__PURE__ */ $.pointerType("main.body"))))).Interface()
-	await $.println("nil:", iv != null, $.mustTypeAssert<body | $.VarRef<body> | null>(iv, /* @__PURE__ */ $.pointerType("main.body")) == null)
+	await $.println("nil:", iv != null, ((iv as any)?.__goType === "*main.body" && (iv as any).__goValue === undefined && (iv as any).__isTypedNil !== true ? ((iv as any) as body | $.VarRef<body> | null) : $.mustTypeAssert<body | $.VarRef<body> | null>(iv, /* @__PURE__ */ $.pointerType("main.body"))) == null)
 }
 
 export async function main(): globalThis.Promise<void> {
