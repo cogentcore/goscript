@@ -399,3 +399,26 @@ describe('time monotonic fractional-nanosecond Sub', () => {
     }
   })
 })
+
+describe('time local zone abbreviation', () => {
+  const savedTZ = process.env.TZ
+  afterEach(() => {
+    process.env.TZ = savedTZ
+  })
+
+  it('names the local zone as Go does', () => {
+    // The instant is in the northern summer, so daylight time applies where it exists.
+    const at = Date(2026, 7 as Month, 1, 12, 0, 0, 0, UTC).Local()
+
+    // A zone with an abbreviation is named by it.
+    process.env.TZ = 'Europe/Amsterdam'
+    expect(at.Zone()).toEqual(['CEST', 7200])
+    expect(at.Format('MST')).toBe('CEST')
+    process.env.TZ = 'America/New_York'
+    expect(at.Zone()).toEqual(['EDT', -14400])
+
+    // A zone without one is named by its offset.
+    process.env.TZ = 'Asia/Kolkata'
+    expect(at.Zone()).toEqual(['+0530', 19800])
+  })
+})
