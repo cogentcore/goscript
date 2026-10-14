@@ -61,7 +61,7 @@ describe('jsontext.Value override', () => {
     ).toBe(true)
     expect(Value_IsValid($.stringToBytes('1 2'))).toBe(false)
     expect(Value_IsValid(new Uint8Array([0xef, 0xbb, 0xbf, 0x31]))).toBe(false)
-    expect(Value_IsValid($.stringToBytes('"\\ud800"'))).toBe(false)
+    expect(Value_IsValid($.stringToBytes($.goString('"\\ud800"')))).toBe(false)
     const invalidUTF8 = new Uint8Array([0x22, 0xff, 0x22])
     expect(Value_IsValid(invalidUTF8)).toBe(false)
     expect(Value_IsValid(invalidUTF8, AllowInvalidUTF8(true))).toBe(true)
@@ -69,26 +69,36 @@ describe('jsontext.Value override', () => {
 
   it('formats without changing invalid input or discarding duplicate names', () => {
     const raw = $.varRef<$.Bytes>(
-      $.stringToBytes(' { "a" : "\\u0062", "a": 1e+1 } '),
+      $.stringToBytes($.goString(' { "a" : "\\u0062", "a": 1e+1 } ')),
     )
     expect(Value_Format(raw)).not.toBeNull()
-    expect($.bytesToString(raw.value)).toBe(' { "a" : "\\u0062", "a": 1e+1 } ')
+    expect($.bytesToString(raw.value)).toBe(
+      $.goString(' { "a" : "\\u0062", "a": 1e+1 } '),
+    )
     expect(Value_Compact(raw)).toBeNull()
-    expect($.bytesToString(raw.value)).toBe('{"a":"\\u0062","a":1e+1}')
+    expect($.bytesToString(raw.value)).toBe(
+      $.goString('{"a":"\\u0062","a":1e+1}'),
+    )
     expect(Value_Indent(raw, WithIndent('  '))).toBeNull()
     expect(() => WithIndent('x')).toThrow()
     expect($.bytesToString(raw.value)).toBe(
-      '{\n  "a": "\\u0062",\n  "a": 1e+1\n}',
+      $.goString('{\n  "a": "\\u0062",\n  "a": 1e+1\n}'),
     )
   })
 
   it('normalizes strings and escapes HTML only when requested', () => {
-    const raw = $.varRef<$.Bytes>($.stringToBytes(' { "x": "<\\u0026>" } '))
+    const raw = $.varRef<$.Bytes>(
+      $.stringToBytes($.goString(' { "x": "<\\u0026>" } ')),
+    )
     expect(Value_Format(raw, EscapeForHTML(true))).toBeNull()
-    expect($.bytesToString(raw.value)).toBe('{"x":"\\u003c\\u0026\\u003e"}')
+    expect($.bytesToString(raw.value)).toBe(
+      $.goString('{"x":"\\u003c\\u0026\\u003e"}'),
+    )
     expect(Value_Format(raw, PreserveRawStrings(true))).toBeNull()
 
-    const escaped = $.varRef<$.Bytes>($.stringToBytes('{"x":"\\u0062"}'))
+    const escaped = $.varRef<$.Bytes>(
+      $.stringToBytes($.goString('{"x":"\\u0062"}')),
+    )
     expect(Value_Format(escaped)).toBeNull()
     expect($.bytesToString(escaped.value)).toBe('{"x":"b"}')
   })
@@ -119,18 +129,22 @@ describe('jsontext.Value override', () => {
 
     const formatted = $.varRef<$.Bytes>(input.slice())
     expect(Value_Format(formatted, AllowInvalidUTF8(true))).toBeNull()
-    expect($.bytesToString(formatted.value)).toBe('["�"]')
+    expect($.bytesToString(formatted.value)).toBe($.goString('["�"]'))
     expect(Value_Format($.varRef<$.Bytes>(input.slice()))).not.toBeNull()
   })
 
   it('replaces unpaired escapes unless preserving raw strings', () => {
-    const formatted = $.varRef<$.Bytes>($.stringToBytes('"\\ud800"'))
+    const formatted = $.varRef<$.Bytes>(
+      $.stringToBytes($.goString('"\\ud800"')),
+    )
     expect(Value_Format(formatted, AllowInvalidUTF8(true))).toBeNull()
-    expect($.bytesToString(formatted.value)).toBe('"�"')
+    expect($.bytesToString(formatted.value)).toBe($.goString('"�"'))
 
-    const preserved = $.varRef<$.Bytes>($.stringToBytes('"\\ud800"'))
+    const preserved = $.varRef<$.Bytes>(
+      $.stringToBytes($.goString('"\\ud800"')),
+    )
     expect(Value_Compact(preserved)).toBeNull()
-    expect($.bytesToString(preserved.value)).toBe('"\\ud800"')
+    expect($.bytesToString(preserved.value)).toBe($.goString('"\\ud800"'))
   })
 
   it('normalizes negative zero and orders duplicate members by content', () => {
@@ -145,17 +159,19 @@ describe('jsontext.Value override', () => {
     expect($.bytesToString(raw.value)).toBe('{"a":1,"a":2,"b":0}')
   })
   it('sorts equal names by UTF-16 member content', () => {
-    const raw = $.varRef<$.Bytes>($.stringToBytes('{"a":"","a":"😀"}'))
+    const raw = $.varRef<$.Bytes>(
+      $.stringToBytes($.goString('{"a":"","a":"😀"}')),
+    )
     expect(Value_Canonicalize(raw, AllowDuplicateNames(true))).toBeNull()
-    expect($.bytesToString(raw.value)).toBe('{"a":"😀","a":""}')
+    expect($.bytesToString(raw.value)).toBe($.goString('{"a":"😀","a":""}'))
   })
 
   it('escapes JavaScript separators in preserved byte strings', () => {
     const raw = $.varRef<$.Bytes>(
-      $.stringToBytes(`"${String.fromCodePoint(0x2028)}"`),
+      $.stringToBytes($.goString(`"${String.fromCodePoint(0x2028)}"`)),
     )
     expect(Value_Compact(raw, EscapeForJS(true))).toBeNull()
-    expect($.bytesToString(raw.value)).toBe('"\\u2028"')
+    expect($.bytesToString(raw.value)).toBe($.goString('"\\u2028"'))
   })
 
   it('string formats nil as null', () => {

@@ -3440,7 +3440,11 @@ function mergeMethodSignatureList(
       merged[existingIndex] = method
     }
   }
-  return merged.sort((left, right) => left.name.localeCompare(right.name))
+  return merged.sort((left, right) =>
+    left.name < right.name ? -1
+    : left.name > right.name ? 1
+    : 0,
+  )
 }
 
 function typeInfoIdentityKey(

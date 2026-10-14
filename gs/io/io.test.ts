@@ -338,7 +338,7 @@ describe('io override', () => {
   test('WriteString writes encoded bytes and returns the byte count', async () => {
     const writer = new captureWriter()
 
-    const [written, err] = await WriteString(writer, 'hé')
+    const [written, err] = await WriteString(writer, $.goString('hé'))
 
     expect(err).toBeNull()
     expect(written).toBe(3)

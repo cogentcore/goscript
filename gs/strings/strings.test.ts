@@ -59,7 +59,7 @@ describe('strings', () => {
     it('should return a copy of the string', () => {
       expect(Clone('hello')).toBe('hello')
       expect(Clone('')).toBe('')
-      expect(Clone('unicode: 🌟')).toBe('unicode: 🌟')
+      expect(Clone($.goString('unicode: 🌟'))).toBe($.goString('unicode: 🌟'))
     })
   })
 
@@ -208,7 +208,7 @@ describe('strings', () => {
       expect(Index('hello world', 'xyz')).toBe(-1)
       expect(Index('hello', 'hello')).toBe(0)
       expect(Index('', '')).toBe(0)
-      expect(Index('世界,你好', ',')).toBe(6)
+      expect(Index($.goString('世界,你好'), ',')).toBe(6)
     })
   })
 
@@ -225,7 +225,7 @@ describe('strings', () => {
       expect(IndexByte('hello', 101)).toBe(1) // 'e'
       expect(IndexByte('hello', 120)).toBe(-1) // 'x'
       expect(IndexByte('', 97)).toBe(-1) // 'a'
-      expect(IndexByte('世界,你好', 44)).toBe(6)
+      expect(IndexByte($.goString('世界,你好'), 44)).toBe(6)
     })
   })
 
@@ -264,7 +264,7 @@ describe('strings', () => {
       expect(LastIndex('hello world hello', 'hello')).toBe(12)
       expect(LastIndex('hello world', 'xyz')).toBe(-1)
       expect(LastIndex('hello', 'hello')).toBe(0)
-      expect(LastIndex('世界,你好', '你好')).toBe(7)
+      expect(LastIndex($.goString('世界,你好'), $.goString('你好'))).toBe(7)
     })
   })
 
@@ -281,7 +281,7 @@ describe('strings', () => {
       expect(LastIndexByte('hello', 108)).toBe(3) // 'l'
       expect(LastIndexByte('hello', 120)).toBe(-1) // 'x'
       expect(LastIndexByte('', 97)).toBe(-1) // 'a'
-      expect(LastIndexByte('世界,你好', 44)).toBe(6)
+      expect(LastIndexByte($.goString('世界,你好'), 44)).toBe(6)
     })
   })
 
@@ -427,13 +427,22 @@ describe('strings', () => {
       expect(ToTitleSpecial(new unicode.SpecialCase(), 'hello world')).toBe(
         'HELLO WORLD',
       )
-      expect(ToUpperSpecial(unicode.TurkishCase, 'iki')).toBe('İKİ')
-      expect(ToLowerSpecial(unicode.TurkishCase, 'Iİ')).toBe('ıi')
-      expect(ToTitleSpecial(unicode.TurkishCase, 'iki')).toBe('İKİ')
+      expect(ToUpperSpecial(unicode.TurkishCase, 'iki')).toBe($.goString('İKİ'))
+      expect(ToLowerSpecial(unicode.TurkishCase, $.goString('Iİ'))).toBe(
+        $.goString('ıi'),
+      )
+      expect(ToTitleSpecial(unicode.TurkishCase, 'iki')).toBe($.goString('İKİ'))
     })
 
     it('should preserve valid replacement runes', () => {
-      expect(ToValidUTF8('a\uFFFDb', '?')).toBe('a\uFFFDb')
+      expect(ToValidUTF8($.goString('a\uFFFDb'), '?')).toBe(
+        $.goString('a\uFFFDb'),
+      )
+    })
+
+    it('should replace each run of invalid bytes once', () => {
+      expect(ToValidUTF8('a\xff\xfeb\xc3', '?')).toBe('a?b?')
+      expect(ToValidUTF8('\xffa', '')).toBe('a')
     })
   })
 
