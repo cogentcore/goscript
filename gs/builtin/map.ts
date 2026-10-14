@@ -2,7 +2,9 @@ import { comparableEqual } from './builtin.js'
 import { GoBinaryString, stringEqual, stringMapKey } from './slice.js'
 import {
   canonicalPointerIdentity,
+  isStructTypeInfo,
   resolveTypeInfo,
+  structFieldRuntimeKey,
   TypeKind,
   type TypeInfo,
 } from './type.js'
@@ -215,23 +217,85 @@ function isGoStringKey(value: unknown): value is string | GoBinaryString {
 }
 
 // structMapKey returns the canonical index key for a struct whose fields are
-// all strings, or undefined for any other value. The
-// canonical form narrows candidates by field names and Go string bytes.
-// comparableEqual still decides identity, type, and field equality within a
-// bucket. Non-string fields remain on the comparison scan.
+// all strings, numbers, booleans, pointers or such structs, or undefined for
+// any other value. The canonical form narrows candidates by field names and
+// values, and pointers by their identity, since what they point to may
+// change. comparableEqual still decides identity, type, and field equality
+// within a bucket. Keys with other fields, such as interfaces, remain on the
+// comparison scan.
 function structMapKey(key: unknown): string | undefined {
   if (typeof key !== 'object' || key === null) return undefined
   const fields = (key as { _fields?: unknown })._fields
   if (typeof fields !== 'object' || fields === null || Array.isArray(fields)) {
     return undefined
   }
+  const kinds = structFieldKinds(key)
   const names = Object.keys(fields)
   const parts: string[] = []
   for (const name of names.sort()) {
-    const value = (fields as Record<string, unknown>)[name]
-    if (!isGoStringKey(value)) return undefined
-    const bytes = stringMapKey(value)
-    parts.push(`${name.length}:${name}${bytes.length}:${bytes}`)
+    const value = structMapKeyField(
+      (fields as Record<string, unknown>)[name],
+      kinds?.get(name),
+    )
+    if (value === undefined) return undefined
+    parts.push(`${name.length}:${name}${value.length}:${value}`)
   }
   return parts.join('')
+}
+
+// structFieldKinds returns the kind of each field of a struct value by its
+// runtime key, from the type info of its class, or undefined without one.
+function structFieldKinds(value: object): Map<string, TypeKind> | undefined {
+  const ctor = (value as { constructor?: { __typeInfo?: TypeInfo } })
+    .constructor
+  const info = resolveTypeInfo(ctor?.__typeInfo)
+  if (info === undefined || !isStructTypeInfo(info)) return undefined
+  let kinds = structFieldKindCache.get(info)
+  if (kinds === undefined) {
+    kinds = new Map()
+    for (const field of info.fields) {
+      const kind = resolveTypeInfo(field.type)?.kind
+      if (kind !== undefined) kinds.set(structFieldRuntimeKey(field), kind)
+    }
+    structFieldKindCache.set(info, kinds)
+  }
+  return kinds
+}
+
+const structFieldKindCache = new WeakMap<object, Map<string, TypeKind>>()
+
+// pointerKeyIDs numbers the pointers in struct map keys by identity.
+const pointerKeyIDs = new WeakMap<object, number>()
+let nextPointerKeyID = 1
+
+// structMapKeyField returns the index text of a struct key field of the
+// given kind: a string, number, boolean, pointer or nested struct, or
+// undefined for any other field, which leaves the key unindexed.
+function structMapKeyField(
+  value: unknown,
+  kind: TypeKind | undefined,
+): string | undefined {
+  if (isGoStringKey(value)) return 's' + stringMapKey(value)
+  switch (typeof value) {
+    case 'number':
+      return 'n' + String(value)
+    case 'bigint':
+      return 'n' + value.toString()
+    case 'boolean':
+      return value ? 't' : 'f'
+  }
+  if (kind === TypeKind.Pointer) {
+    if (value === null || value === undefined) return 'p0'
+    if (typeof value !== 'object') return undefined
+    const identity = canonicalPointerIdentity(value)
+    let id = pointerKeyIDs.get(identity)
+    if (id === undefined) {
+      id = nextPointerKeyID++
+      pointerKeyIDs.set(identity, id)
+    }
+    return 'p' + id
+  }
+  if (kind !== TypeKind.Struct) return undefined
+  const nested = structMapKey(value)
+  return nested === undefined ? undefined : 'r' + nested
 }
