@@ -8,6 +8,7 @@ import {
   TypeKind,
   type GenericTypeArgs,
   type TypeInfo,
+  namedValueBoxMarker,
 } from './type.js'
 import { writeHostStdoutText } from './hostio.js'
 import { runtimePanic } from './panic.js'
@@ -388,6 +389,15 @@ function hasGoValue(value: unknown): value is {
 function hasGoMethodSurface(value: unknown): boolean {
   if (typeof value !== 'object' || value === null) {
     return false
+  }
+  const proto = Object.getPrototypeOf(value)
+  if (proto !== null && proto[namedValueBoxMarker] === true) {
+    return Object.keys(proto).some(
+      (key) =>
+        key !== 'valueOf' &&
+        key !== 'toString' &&
+        typeof proto[key] === 'function',
+    )
   }
   return Object.keys(value).some((key) => {
     return (

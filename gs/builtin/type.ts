@@ -2297,6 +2297,18 @@ export function namedValueInterfaceValue<T>(
   typeInfo?: TypeInfo | string,
   methodSignatures?: MethodSignature[],
 ): T {
+  // A method table that is cached, as the compiler creates one per type,
+  // has a shared prototype holding its method wrappers, so that boxing a
+  // value only creates the box.
+  const proto =
+    methodSignatures !== undefined ? namedValueBoxPrototype(methods) : undefined
+  if (proto !== undefined) {
+    const box = Object.create(proto)
+    box.__goType = typeName
+    box.__goValue = value
+    box.__goTypeInfo = typeInfo
+    return box as T
+  }
   const boxed: any = {
     __goType: typeName,
     __goValue: value,
@@ -2319,6 +2331,52 @@ export function namedValueInterfaceValue<T>(
     boxed[entry.name] = wrapper
   }
   return boxed as T
+}
+
+// namedValueBoxPrototypes holds the prototype of the boxes of each cached
+// method table, made the first time a value is boxed with it.
+const namedValueBoxPrototypes = new WeakMap<object, object>()
+
+// namedValueBoxMarker marks a prototype of named value boxes, whose methods
+// make up their Go method surface.
+export const namedValueBoxMarker = Symbol('namedValueBox')
+
+function namedValueBoxPrototype(
+  methods: Record<string, (receiver: any, ...args: any[]) => any>,
+): object | undefined {
+  let proto = namedValueBoxPrototypes.get(methods)
+  if (proto !== undefined) {
+    return proto
+  }
+  const entries = namedValueMethodCache.get(methods)
+  if (entries === undefined) {
+    return undefined
+  }
+  const p: any = {
+    valueOf(this: any) {
+      return this.__goValue
+    },
+    toString(this: any) {
+      return String(this.__goValue)
+    },
+    [Symbol.toPrimitive](this: any) {
+      return this.__goValue
+    },
+    [namedValueBoxMarker]: true,
+  }
+  for (const entry of entries) {
+    const method = entry.method
+    const wrapper: any = function (this: any, ...args: any[]) {
+      return method(this.__goValue, ...args)
+    }
+    wrapper.__goscriptMethodWrapper = true
+    if (entry.signature) {
+      wrapper.__goscriptMethodSignature = entry.signature
+    }
+    p[entry.name] = wrapper
+  }
+  namedValueBoxPrototypes.set(methods, p)
+  return p
 }
 
 interface NamedValueMethodEntry {
