@@ -569,6 +569,7 @@ function callUnmarshalJSON(
   unmarshaler: Unmarshaler,
   data: $.Slice<number>,
 ): void {
+  // A call behind a pending one waits for it, so the unmarshalers run in order.
   const previous = pendingUnmarshals.at(-1)
   if (previous !== undefined) {
     pendingUnmarshals.push(
@@ -578,6 +579,8 @@ function callUnmarshalJSON(
     )
     return
   }
+
+  // A call that suspends is awaited by Unmarshal.
   const err: $.MaybePromise<$.GoError> = unmarshaler.UnmarshalJSON(data)
   if (err instanceof Promise) {
     pendingUnmarshals.push(err)
@@ -1257,21 +1260,28 @@ function integerKeyBits(kind: string): [number, boolean] | null {
 // pointer to the key type implements encoding.TextUnmarshaler, as is for
 // string kinds, and parsed as a decimal integer for integer kinds.
 function decodeMapKey(key: string, keyType: unknown, assign: Assign): void {
+  // A key that is not of a basic type stays a string.
   const info = resolveTypeInfo(keyType)
   if (info === null || info.kind !== $.TypeKind.Basic) {
     assign(key)
     return
   }
+
+  // A key type with UnmarshalText decodes itself.
   if (hasTextMethod(info, 'UnmarshalText')) {
     unmarshalText(key, info, assign)
     return
   }
+
+  // A string key stays a string, and an integer key is parsed.
   const kind = info.name ?? ''
   const bits = integerKeyBits(kind)
   if (bits === null) {
     assign(key)
     return
   }
+
+  // The text must be a decimal integer.
   const typeName = mapKeyTypeName(info)
   const [size, signed] = bits
   const typeError = () =>
@@ -1282,6 +1292,8 @@ function decodeMapKey(key: string, keyType: unknown, assign: Assign): void {
   if (!/^-?[0-9]+$/.test(key)) {
     throw typeError()
   }
+
+  // The integer must fit the key type.
   const n = BigInt(key)
   const min = signed ? -(BigInt(1) << BigInt(size - 1)) : BigInt(0)
   const max =
@@ -1291,6 +1303,8 @@ function decodeMapKey(key: string, keyType: unknown, assign: Assign): void {
   if (n < min || n > max) {
     throw typeError()
   }
+
+  // A 64-bit integer is a bigint, as elsewhere in the runtime.
   assign(
     kind === 'int64' || kind === 'uint64' || kind === 'uintptr' ? n : Number(n),
   )
@@ -1306,6 +1320,7 @@ type Assign = (value: unknown) => void
 // awaits its unmarshalers (see pendingUnmarshals), assign is called once it
 // completes.
 function unmarshalText(text: string, info: $.TypeInfo, assign: Assign): void {
+  // UnmarshalText is called on a pointer to a zero value of the type.
   const typeName = mapKeyTypeName(info)
   const method = $.namedValueMethods('*' + typeName)!.methods.UnmarshalText
   const kind = info.name ?? ''
@@ -1318,6 +1333,8 @@ function unmarshalText(text: string, info: $.TypeInfo, assign: Assign): void {
   const err = method(ref, $.stringToBytes(text)) as
     | $.GoError
     | PromiseLike<$.GoError>
+
+  // A method that suspends is awaited by Unmarshal, which then assigns the value.
   if (err instanceof Promise) {
     if (pendingUnmarshals === null) {
       throw $.newError('json: asynchronous UnmarshalText is unsupported')
@@ -1333,6 +1350,8 @@ function unmarshalText(text: string, info: $.TypeInfo, assign: Assign): void {
     )
     return
   }
+
+  // A method that returned is assigned at once.
   if (err !== null && err !== undefined) {
     throw err
   }
@@ -1343,6 +1362,7 @@ function unmarshalText(text: string, info: $.TypeInfo, assign: Assign): void {
 // as encoding/json does: through MarshalText when the key type implements
 // encoding.TextMarshaler, and as its decimal or string value otherwise.
 function encodeMapKey(key: unknown, keyType: unknown): string {
+  // A key type with MarshalText encodes itself.
   const info = resolveTypeInfo(keyType)
   const typeName = info !== null ? mapKeyTypeName(info) : ''
   const marshalText =
@@ -1362,7 +1382,54 @@ function encodeMapKey(key: unknown, keyType: unknown): string {
     }
     return $.bytesToString(data)
   }
+
+  // Any other key is its string value.
   return String(key)
+}
+
+// textUnmarshalerElemInfo returns the type information of the named basic
+// type that a pointer target points to, when it implements
+// encoding.TextUnmarshaler, or null.
+function textUnmarshalerElemInfo(target: unknown): $.TypeInfo | null {
+  // The target must be a pointer.
+  const pointer = $.resolveTypeInfo(
+    Reflect.get(target as object, '__goTypeInfo') as $.TypeInfo | string,
+  )
+  if (
+    pointer === undefined ||
+    pointer === null ||
+    !$.isPointerTypeInfo(pointer)
+  ) {
+    return null
+  }
+
+  // Its element must have UnmarshalText.
+  const elem = $.resolveTypeInfo(pointer.elemType)
+  if (elem === undefined || elem === null) {
+    return null
+  }
+  return hasTextMethod(elem, 'UnmarshalText') ? elem : null
+}
+
+// textUnmarshalerSliceInfo returns the type information of the slice that
+// a pointer target points to, when its elements are of a named basic type
+// that implements encoding.TextUnmarshaler, or null.
+function textUnmarshalerSliceInfo(target: unknown): $.TypeInfo | null {
+  // The target must be a pointer to a slice.
+  const pointer = $.resolveTypeInfo(
+    Reflect.get(target as object, '__goTypeInfo') as $.TypeInfo | string,
+  )
+  if (!pointer || !$.isPointerTypeInfo(pointer)) {
+    return null
+  }
+  const slice = $.resolveTypeInfo(pointer.elemType)
+  if (!slice || !$.isSliceTypeInfo(slice)) {
+    return null
+  }
+
+  // The elements must have UnmarshalText.
+  const elem = $.resolveTypeInfo(slice.elemType)
+  return elem && hasTextMethod(elem, 'UnmarshalText') ? slice : null
 }
 
 // hasTextMethod reports whether the named basic type described by info (or
@@ -1372,6 +1439,7 @@ function hasTextMethod(
   info: $.TypeInfo,
   method: 'MarshalText' | 'UnmarshalText',
 ): boolean {
+  // Only a named basic type has these methods.
   if (info.kind !== $.TypeKind.Basic) {
     return false
   }
@@ -1379,6 +1447,8 @@ function hasTextMethod(
   if (typeName === '') {
     return false
   }
+
+  // UnmarshalText has a pointer receiver.
   const name = method === 'UnmarshalText' ? '*' + typeName : typeName
   return $.namedValueMethods(name)?.methods[method] !== undefined
 }
@@ -1401,6 +1471,7 @@ function marshalValue(
   typeInfo?: unknown,
   addressable = false,
 ): unknown {
+  // A value with MarshalJSON encodes itself, awaiting it if it suspends.
   typeInfo ??= goTypeInfoOf(v) ?? undefined
   const marshaler = marshalJSONTarget(v, typeInfo, addressable)
   if (marshaler !== null) {
@@ -1413,9 +1484,12 @@ function marshalValue(
     const [data, err] = result
     return marshalerResult(data, err)
   }
+
+  // A pointer encodes the value it points to, which is addressable.
   if ($.isVarRef(v)) {
     return marshalValue(v.value, typeInfo, true)
   }
+
   // Unwrap a boxed interface{} value (a named/defined type's value, boxed by
   // the runtime as { __goType, __goValue, ... } so it can carry methods)
   // before serializing; otherwise the wrapper object itself leaks into the
@@ -1426,9 +1500,13 @@ function marshalValue(
       (v as { __goType: unknown }).__goType,
     )
   }
+
+  // A nil value is null.
   if (v === null || v === undefined) {
     return null
   }
+
+  // A primitive is encoded by MarshalText, if its type has one, or by its value.
   if (typeof v !== 'object' && typeof v !== 'function') {
     const textInfo = resolveTypeInfo(typeInfo)
     if (textInfo !== null && hasTextMethod(textInfo, 'MarshalText')) {
@@ -1444,9 +1522,13 @@ function marshalValue(
   if (typeof v !== 'object') {
     return v
   }
+
+  // A byte slice is base64 text.
   if (v instanceof Uint8Array) {
     return base64Encode(v)
   }
+
+  // A slice, array or map encodes its elements by their types.
   const info = resolveTypeInfo(typeInfo)
   if (Array.isArray(v)) {
     const elemType =
@@ -1476,6 +1558,7 @@ function marshalValue(
     }
     return out
   }
+
   // An anonymous struct value stores its fields on the object itself.
   const anonymousFields =
     isStructValue(v) ? null : anonymousStructValueFields(v)
@@ -1487,6 +1570,8 @@ function marshalValue(
 
   // Fields are addressable when the struct is or is reached via a pointer.
   const fieldsAddressable = !isStructValueType(typeInfo) || addressable
+
+  // The fields are listed with their JSON names, and the object is built in that order.
   const out: Record<string, unknown> = {}
   const fields =
     anonymousFields !== null ?
@@ -1784,6 +1869,18 @@ function assignDecodedValue(
       callUnmarshalJSON(unmarshaler, $.stringToBytes(decodedJSONText(decoded)))
       return
     }
+    // A pointer to a named basic type that implements
+    // encoding.TextUnmarshaler, such as an enum, decodes from a string
+    // through UnmarshalText.
+    if (typeof decoded === 'string') {
+      const info = textUnmarshalerElemInfo(target)
+      if (info !== null) {
+        unmarshalText(decoded, info, (value) => {
+          target.value = value
+        })
+        return
+      }
+    }
     if (isStructValue(target.value) && isPlainObject(decoded)) {
       assignStructFields(target.value, decoded, opts)
       return
@@ -1799,6 +1896,14 @@ function assignDecodedValue(
     // is what makes e.g. `var m map[string]json.RawMessage` or
     // `var m map[string]*Property` populate real typed elements instead of
     // plain JS objects/strings.
+    // A slice of a named basic type with a text method, such as []Enum,
+    // decodes by the structured type information of the target, which keeps
+    // the element type's methods that its spelling below cannot.
+    const elemSlice = textUnmarshalerSliceInfo(target)
+    if (elemSlice !== null && Array.isArray(decoded)) {
+      target.value = decodeValueForType(decoded, elemSlice, opts)
+      return
+    }
     const spelling = unmarshalTargetGoType(target)
     if (spelling !== null) {
       let desc: unknown = goTypeDescriptor(spelling)
@@ -1898,6 +2003,7 @@ function reuseInterfacePointerElements(
   info: $.SliceTypeInfo,
   opts: decodeOptions,
 ): void {
+  // Only a slice of interfaces that held elements before decoding reuses any.
   const existing = target.value
   const elemInfo = resolveTypeInfo(info.elemType)
   if (
@@ -1910,6 +2016,8 @@ function reuseInterfacePointerElements(
     target.value = value
     return
   }
+
+  // Each old struct element is decoded into in place, when it can be.
   const old = $.asArray(existing as $.Slice<unknown>)
   const out = $.asArray(value as $.Slice<unknown>).slice()
   let reused = 0
@@ -1932,6 +2040,8 @@ function reuseInterfacePointerElements(
     out[i] = elem
     reused++
   }
+
+  // A slice whose elements were all reused is left as UnmarshalJSON left it.
   if (reused === out.length && out.length === old.length) {
     return
   }
@@ -1957,6 +2067,7 @@ type jsonStructField = {
 function jsonStructFields(value: {
   _fields: Record<string, unknown>
 }): jsonStructField[] {
+  // The fields are collected from the struct and the structs embedded in it.
   const all: jsonStructField[] = []
   const visit = (
     target: { _fields: Record<string, unknown> },
@@ -2009,10 +2120,13 @@ function jsonStructFields(value: {
     }
   }
   return all.filter((field) => {
+    // A name used once is kept.
     const named = byName.get(field.jsonName)!
     if (named.length === 1) {
       return true
     }
+
+    // Among equal names, the shallowest wins, or the only tagged one at that depth.
     const depth = Math.min(...named.map((f) => f.depth))
     const shallow = named.filter((f) => f.depth === depth)
     const tagged = shallow.filter((f) => f.tagged)
@@ -2799,11 +2913,16 @@ function escapeHTMLString(text: string): string {
   })
 }
 
+// jsonFieldName returns the JSON name of a struct field: the name in its json
+// tag, or the field name without one, or "" when the tag omits the field.
 function jsonFieldName(fieldName: string, tag: string | undefined): string {
+  // Without a json tag the field keeps its name.
   const value = jsonTagValue(tag)
   if (value === undefined) {
     return fieldName
   }
+
+  // The name is the part of the tag before the options.
   const name = value.split(',')[0]
   if (name === '-') {
     return ''
