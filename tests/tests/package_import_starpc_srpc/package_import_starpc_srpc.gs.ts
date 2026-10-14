@@ -607,13 +607,14 @@ export function newMemoryRpcStreamPair(): [memoryRpcStream | $.VarRef<memoryRpcS
 export async function openHeldStreams(ctx: context.Context | null, client: srpc.Client | null, count: number): globalThis.Promise<[$.Slice<srpc.Stream | null>, boolean]> {
 	let resultCh: $.Channel<streamOpenResult> | null = $.makeChannel<streamOpenResult>(count, $.markAsStructValue(new streamOpenResult()), "both")
 	for (let __goscriptRangeCount0 = count, i = 0; i < __goscriptRangeCount0; i++) {
+		const __goscriptDeferArg0 = i
 		queueMicrotask(async () => { await (async (idx: number): globalThis.Promise<void> => {
 			let [strm, err] = await $.pointerValue<Exclude<srpc.Client, null>>(client).NewStream(ctx, "svc", "hold", null)
 			if (err == null) {
 				err = (__goscriptAwait = $.pointerValue<Exclude<srpc.Stream, null>>(strm).MsgSend($.interfaceValue<srpc.Message | null>(srpc.NewRawMessage(new Uint8Array([$.uint(idx, 8)]) as $.Slice<number>, false), "*srpc.RawMessage", /* @__PURE__ */ $.pointerType("srpc.RawMessage"))), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 			}
 			await $.chanSend(resultCh, $.markAsStructValue(new streamOpenResult({stream: strm, err: err})))
-		})(i) })
+		})(__goscriptDeferArg0) })
 	}
 
 	let streams: $.Slice<srpc.Stream | null> = $.makeSlice<srpc.Stream | null>(0, count)
@@ -679,6 +680,7 @@ export async function closeHeldStreams(streams: $.Slice<srpc.Stream | null>): gl
 export async function probeConcurrentStreams(ctx: context.Context | null, client: srpc.Client | null, count: number): globalThis.Promise<boolean> {
 	let resultCh: $.Channel<streamProbeResult> | null = $.makeChannel<streamProbeResult>(count, $.markAsStructValue(new streamProbeResult()), "both")
 	for (let __goscriptRangeCount2 = count, i = 0; i < __goscriptRangeCount2; i++) {
+		const __goscriptDeferArg1 = i
 		queueMicrotask(async () => { await (async (idx: number): globalThis.Promise<void> => {
 			let [total, err] = await probeStream(ctx, client, $.uint(idx + 1, 8), $.uint(idx + 2, 8))
 			if (err != null) {
@@ -686,7 +688,7 @@ export async function probeConcurrentStreams(ctx: context.Context | null, client
 				return
 			}
 			await $.chanSend(resultCh, $.markAsStructValue(new streamProbeResult({total: total})))
-		})(i) })
+		})(__goscriptDeferArg1) })
 	}
 
 	for (let __goscriptRangeCount3 = count, i = 0; i < __goscriptRangeCount3; i++) {
@@ -1014,12 +1016,14 @@ export async function exercisePushablePacketWriter(): globalThis.Promise<boolean
 		pushed = $.append(pushed, data, $.appendZeros.nil)
 		return null
 	}, ({ kind: $.TypeKind.Function, params: ["js.Value", /* @__PURE__ */ $.sliceType("js.Value")], results: [{ kind: $.TypeKind.Interface, methods: [] }] } as $.FunctionTypeInfo)))))
-	__defer.defer(() => { $.markAsStructValue($.cloneStructValue(pushFn)).Release() })
+	const __goscriptDeferCallee0 = $.functionValue(((__receiver) => () => __receiver.Release())($.markAsStructValue($.cloneStructValue(pushFn))), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "syscall/js.Func.Release-fm")
+	__defer.defer(() => { __goscriptDeferCallee0() })
 	let endFn = $.markAsStructValue($.cloneStructValue(js.FuncOf($.functionValue((_this: js.Value, args: $.Slice<js.Value>): any => {
 		ended = true
 		return null
 	}, ({ kind: $.TypeKind.Function, params: ["js.Value", /* @__PURE__ */ $.sliceType("js.Value")], results: [{ kind: $.TypeKind.Interface, methods: [] }] } as $.FunctionTypeInfo)))))
-	__defer.defer(() => { $.markAsStructValue($.cloneStructValue(endFn)).Release() })
+	const __goscriptDeferCallee1 = $.functionValue(((__receiver) => () => __receiver.Release())($.markAsStructValue($.cloneStructValue(endFn))), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "syscall/js.Func.Release-fm")
+	__defer.defer(() => { __goscriptDeferCallee1() })
 
 	let writer: srpc.PushablePacketWriter | $.VarRef<srpc.PushablePacketWriter> | null = srpc.NewPushablePacketWriter(js.ValueOf($.interfaceValue($.makeMap<string, any>([["push", $.interfaceValue($.markAsStructValue($.cloneStructValue(pushFn)), "js.Func", "js.Func")], ["end", $.interfaceValue($.markAsStructValue($.cloneStructValue(endFn)), "js.Func", "js.Func")]]), "map[string]interface{}", /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), { kind: $.TypeKind.Interface, methods: [] }))))
 	{
@@ -1096,7 +1100,8 @@ export async function exercisePushablePacketWriter(): globalThis.Promise<boolean
 export async function main(): globalThis.Promise<void> {
 	await using __defer = new $.AsyncDisposableStack()
 	let [ctx, cancel] = context.WithTimeout($.pointerValueOrNil(context.Background())!, 20000000000n)
-	__defer.defer(async () => { (__goscriptAwait = cancel!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) })
+	const __goscriptDeferCallee2 = cancel
+	__defer.defer(async () => { (__goscriptAwait = __goscriptDeferCallee2!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) })
 
 	let mux = srpc.NewMux(null);
 	(__goscriptAwait = $.pointerValue<Exclude<srpc.Mux, null>>(mux).Register($.interfaceValue<srpc.Handler | null>($.markAsStructValue(new handler()), "main.handler", "main.handler")), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)

@@ -85,7 +85,8 @@ export function __goscript_set_named(__goscriptValue: table): void {
 export async function lookup(addr: string): globalThis.Promise<$.Slice<string>> {
 	using __defer = new $.DisposableStack()
 	await hosts.value.Mutex.Lock()
-	__defer.defer(() => { hosts.value.Mutex.Unlock() })
+	const __goscriptDeferCallee0 = $.functionValue(((__receiver) => () => __receiver.Unlock())(hosts.value.Mutex), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "sync.(*Mutex).Unlock-fm")
+	__defer.defer(() => { __goscriptDeferCallee0() })
 	if ($.len(hosts.value.byAddr) != 0) {
 		let __goscriptShadow0 = hosts.value
 		{
@@ -103,7 +104,8 @@ export async function lookup(addr: string): globalThis.Promise<$.Slice<string>> 
 export async function lookupNamed(addr: string): globalThis.Promise<$.Slice<string>> {
 	using __defer = new $.DisposableStack()
 	await named.value.Mutex.Lock()
-	__defer.defer(() => { named.value.Mutex.Unlock() })
+	const __goscriptDeferCallee1 = $.functionValue(((__receiver) => () => __receiver.Unlock())(named.value.Mutex), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "sync.(*Mutex).Unlock-fm")
+	__defer.defer(() => { __goscriptDeferCallee1() })
 	if ($.len(named.value.byAddr) != 0) {
 		let __goscriptShadow2 = named.value
 		{
@@ -124,7 +126,8 @@ export async function lookupLocal(addr: string): globalThis.Promise<$.Slice<stri
 	local.value.byAddr = $.makeMap<string, $.Slice<string>>([[addr, $.arrayToSlice<string>(["local"])]])
 	let ptr: table | $.VarRef<table> | null = local
 	await $.pointerValue<table>(ptr).Mutex.Lock()
-	__defer.defer(() => { $.pointerValue<table>(ptr).Mutex.Unlock() })
+	const __goscriptDeferCallee2 = $.functionValue(((__receiver) => () => __receiver.Unlock())($.pointerValue<table>(ptr).Mutex), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "sync.(*Mutex).Unlock-fm")
+	__defer.defer(() => { __goscriptDeferCallee2() })
 	let __goscriptShadow4 = local.value
 	{
 		let __goscriptTuple2: any = $.mapGet<string, $.Slice<string>, $.Slice<string>>(__goscriptShadow4.byAddr, addr, null)

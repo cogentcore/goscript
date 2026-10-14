@@ -216,7 +216,8 @@ export class queue {
 		let q: queue | $.VarRef<queue> | null = this;
 		using __defer = new $.DisposableStack()
 		await queue.prototype.lockAndInit.call(q)
-		__defer.defer(() => { $.pointerValue<queue>(q).Mu.Unlock() })
+		const __goscriptDeferCallee0 = $.functionValue(((__receiver) => () => __receiver.Unlock())($.pointerValue<queue>(q).Mu), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "sync.(*Mutex).Unlock-fm")
+		__defer.defer(() => { __goscriptDeferCallee0() })
 		while ($.sliceLen($.pointerValue<queue>(q).items) == 0) {
 			await $.pointerValue<queue>(q).Cond.Wait()
 		}

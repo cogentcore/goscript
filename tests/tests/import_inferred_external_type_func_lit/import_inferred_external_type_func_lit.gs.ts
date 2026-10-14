@@ -19,7 +19,8 @@ export async function main(): globalThis.Promise<void> {
 			return
 		}
 	}
-	__defer.defer(async () => { await os.Remove(fileName) })
+	const __goscriptDeferArg0 = fileName
+	__defer.defer(async () => { await os.Remove(__goscriptDeferArg0) })
 
 	await (async (): globalThis.Promise<void> => {
 		let [info, err] = await os.Stat(fileName)
