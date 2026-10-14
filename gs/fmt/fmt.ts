@@ -270,6 +270,41 @@ function hasGoTypeName(value: unknown): value is { __goType: string } {
   )
 }
 
+// pointerReceiverOnly reports whether value is a struct value, rather than
+// a pointer to one, whose method name has a pointer receiver, so that the
+// value does not have the method in Go. A struct value is known by its
+// declared type, or else by the type it was boxed with in an interface.
+function pointerReceiverOnly(
+  value: any,
+  typeInfo: $.TypeInfo | string | undefined,
+  name: string,
+): boolean {
+  if (value === null || typeof value !== 'object') {
+    return false
+  }
+  const declared = $.resolveTypeInfo(typeInfo)
+  if (declared?.kind === $.TypeKind.Pointer) {
+    return false
+  }
+  if (declared?.kind !== $.TypeKind.Struct) {
+    const tag = value.__goType
+    if (
+      typeof tag !== 'string' ||
+      tag.startsWith('*') ||
+      !$.isMarkedAsStructValue(value)
+    ) {
+      return false
+    }
+  }
+  const info = $.resolveTypeInfo(value.constructor?.__typeInfo)
+  return (
+    info?.kind === $.TypeKind.Struct &&
+    info.methods.some(
+      (method) => method.name === name && method.pointerReceiver === true,
+    )
+  )
+}
+
 // hasGoString reports whether value implements the GoStringer interface. Go
 // invokes GoString only for the %#v verb, never for %v, %s, or Sprint.
 function hasGoString(value: unknown): value is { GoString: () => string } {
@@ -398,7 +433,8 @@ function defaultFormatMaybe(
     if (
       allowMethods &&
       !flags.includes('#') &&
-      typeof methodValue?.Error === 'function'
+      typeof methodValue?.Error === 'function' &&
+      !pointerReceiverOnly(methodValue, typeInfo, 'Error')
     ) {
       try {
         return toMaybeString(methodValue.Error())
@@ -409,7 +445,8 @@ function defaultFormatMaybe(
     if (
       allowMethods &&
       !flags.includes('#') &&
-      typeof methodValue?.String === 'function'
+      typeof methodValue?.String === 'function' &&
+      !pointerReceiverOnly(methodValue, typeInfo, 'String')
     ) {
       try {
         return toMaybeString(methodValue.String())
