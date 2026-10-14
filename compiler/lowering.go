@@ -5969,7 +5969,12 @@ func (o *LoweringOwner) lowerShortDeclShadowAliases(
 			if def == nil || objectDeclaredInAssignRHS(used, assign) {
 				return
 			}
-			if _, isPackage := used.(*types.PkgName); !isPackage && oldAliases[used] == "" {
+			// A package or builtin function is not a value, so its old value
+			// needs no alias: it is still lowered by name after the new
+			// binding, as in len := len(a).
+			_, isPackage := used.(*types.PkgName)
+			_, isBuiltin := used.(*types.Builtin)
+			if !isPackage && !isBuiltin && oldAliases[used] == "" {
 				if oldAliases == nil {
 					oldAliases = make(map[types.Object]string)
 				}
