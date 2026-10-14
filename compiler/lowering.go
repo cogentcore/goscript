@@ -1672,7 +1672,11 @@ type lowerFileContext struct {
 	// expression that lowers them, as by a method value or a defer or go
 	// statement, so that they are copied even for a method or function that
 	// only reads them.
-	copyValues          bool
+	copyValues bool
+	// rangeElements are the slices that enclosing range loops index by their
+	// own index variable, whose elements s[i] read and write the loop's
+	// window directly (see rangeWindowElement).
+	rangeElements       []rangeElementAccess
 	rangeBranch         *loweredRangeBranch
 	rangeBreak          bool
 	rangeContinue       bool
@@ -4351,25 +4355,15 @@ func isValueCopyType(typ types.Type) bool {
 // to it or into it, takes its address, calls a pointer method on it, or
 // refers to it from a function literal.
 func rangeValueBindingMayChange(ctx lowerFileContext, obj types.Object, body *ast.BlockStmt) bool {
+	// A range with no body changes nothing.
 	if body == nil {
 		return false
 	}
+
+	// The variable is reached from a chain of selectors and indexes.
 	info := ctx.semPkg.source.TypesInfo
 	rootIsObj := func(expr ast.Expr) bool {
-		for {
-			switch typed := ast.Unparen(expr).(type) {
-			case *ast.Ident:
-				return info.Uses[typed] == obj
-			case *ast.SelectorExpr:
-				expr = typed.X
-			case *ast.IndexExpr:
-				expr = typed.X
-			case *ast.SliceExpr:
-				expr = typed.X
-			default:
-				return false
-			}
-		}
+		return info.Uses[exprRootIdent(expr)] == obj
 	}
 	changes := false
 	ast.Inspect(body, func(node ast.Node) bool {
@@ -5659,23 +5653,30 @@ func (o *LoweringOwner) lowerGoStmt(ctx lowerFileContext, stmt *ast.GoStmt) (str
 // calls the function later. It returns the statements that evaluate them,
 // each ending in a newline, and the call that reads their results.
 func (o *LoweringOwner) lowerStatementCall(ctx lowerFileContext, call *ast.CallExpr) (string, string, []Diagnostic) {
+	// The arguments lower into temporaries that the statement evaluates.
 	var hoisted []string
 	argCtx := ctx
 	argCtx.hoistArgsCall = call
 	argCtx.hoistedArgs = &hoisted
 	argCtx.copyValues = true
+
+	// A method or function variable is evaluated into a temporary too.
 	if statementCallNeedsCalleeValue(ctx, call) {
 		calleeCtx := ctx
 		calleeCtx.copyValues = true
 		callee, diagnostics := o.lowerExpr(calleeCtx, call.Fun)
 		calleeTemp := ctx.tempName("DeferCallee")
 		hoisted = append(hoisted, "const "+calleeTemp+" = "+callee)
+
+		// The call reads the temporaries.
 		args, argDiagnostics := o.lowerCallArgs(argCtx, call, callTargetSignature(ctx, call.Fun))
 		diagnostics = append(diagnostics, argDiagnostics...)
 		text := o.lowerCallableExpr(ctx, call.Fun, calleeTemp) + "(" + strings.Join(args, ", ") + ")"
 		text = o.awaitCallIfNeeded(ctx, call, text)
 		return hoistedPrelude(hoisted), text, diagnostics
 	}
+
+	// A declared function, builtin or function literal is called directly.
 	text, diagnostics := o.lowerCallExpr(argCtx, call)
 	return hoistedPrelude(hoisted), text, diagnostics
 }
@@ -5683,6 +5684,7 @@ func (o *LoweringOwner) lowerStatementCall(ctx lowerFileContext, call *ast.CallE
 // fixedPointerReceiver reports whether the receiver x of the method selection
 // is a pointer whose value is the same wherever it is evaluated.
 func fixedPointerReceiver(ctx lowerFileContext, x ast.Expr, selection *types.Selection) bool {
+	// The method has a pointer receiver and is not promoted.
 	signature, _ := selection.Obj().Type().(*types.Signature)
 	if signature == nil || signature.Recv() == nil {
 		return false
@@ -5690,6 +5692,8 @@ func fixedPointerReceiver(ctx lowerFileContext, x ast.Expr, selection *types.Sel
 	if _, ptr := signature.Recv().Type().(*types.Pointer); !ptr || len(selection.Index()) != 1 {
 		return false
 	}
+
+	// The receiver is a local variable.
 	ident, ok := ast.Unparen(x).(*ast.Ident)
 	if !ok {
 		return false
@@ -5698,6 +5702,8 @@ func fixedPointerReceiver(ctx lowerFileContext, x ast.Expr, selection *types.Sel
 	if !ok || obj.Pkg() == nil || obj.Parent() == obj.Pkg().Scope() {
 		return false
 	}
+
+	// A local of struct type is addressed by the call, which cannot change.
 	if _, ptr := types.Unalias(obj.Type()).Underlying().(*types.Pointer); !ptr {
 		// The receiver is the variable's address.
 		return true
@@ -5705,6 +5711,8 @@ func fixedPointerReceiver(ctx lowerFileContext, x ast.Expr, selection *types.Sel
 	if ctx.model.needsVarRef[obj] {
 		return false
 	}
+
+	// A pointer local declared in a block is fixed unless it is reassigned.
 	path, _ := astutil.PathEnclosingInterval(ctx.file, obj.Pos(), obj.Pos())
 	for _, node := range path {
 		if _, ok := node.(*ast.BlockStmt); ok {
@@ -5717,6 +5725,8 @@ func fixedPointerReceiver(ctx lowerFileContext, x ast.Expr, selection *types.Sel
 	return false
 }
 
+// hoistedPrelude returns the statements that evaluate the hoisted temporaries,
+// each ending in a newline.
 func hoistedPrelude(hoisted []string) string {
 	if len(hoisted) == 0 {
 		return ""
@@ -5729,13 +5739,16 @@ func hoistedPrelude(hoisted []string) string {
 // receiver Go evaluates there, or a function variable. A declared function,
 // a builtin and a function literal are called directly.
 func statementCallNeedsCalleeValue(ctx lowerFileContext, call *ast.CallExpr) bool {
-	info := ctx.semPkg.source.TypesInfo
+	// An instantiated generic function is judged by the function itself.
 	fun := ast.Unparen(call.Fun)
 	if index, ok := fun.(*ast.IndexExpr); ok {
 		fun = ast.Unparen(index.X)
 	} else if index, ok := fun.(*ast.IndexListExpr); ok {
 		fun = ast.Unparen(index.X)
 	}
+
+	// Judge the function by what it names.
+	info := ctx.semPkg.source.TypesInfo
 	switch typed := fun.(type) {
 	case *ast.FuncLit:
 		return false
@@ -5766,7 +5779,10 @@ func statementCallNeedsCalleeValue(ctx lowerFileContext, call *ast.CallExpr) boo
 }
 
 func (o *LoweringOwner) lowerDeferStmt(ctx lowerFileContext, stmt *ast.DeferStmt) (string, []Diagnostic) {
+	// The call lowers with the arguments evaluated at the statement.
 	prelude, call, diagnostics := o.lowerStatementCall(ctx, stmt.Call)
+
+	// The enclosing function records what the deferred call needs.
 	async := strings.Contains(call, "await ")
 	if ctx.deferState != nil {
 		ctx.deferState.used = true
@@ -5777,6 +5793,8 @@ func (o *LoweringOwner) lowerDeferStmt(ctx lowerFileContext, stmt *ast.DeferStmt
 			ctx.deferState.recover = true
 		}
 	}
+
+	// The deferred call runs inside a function of its own.
 	if async {
 		return prelude + "__defer.defer(async () => { " + call + " })", diagnostics
 	}
@@ -6764,6 +6782,7 @@ func (o *LoweringOwner) lowerTupleAssignmentValueForTarget(
 	if targetType == nil {
 		return value
 	}
+
 	// Each return wraps an integer result to its width.
 	if !sameIntegerRepresentation(targetType, sourceResults.At(idx).Type()) {
 		value = o.lowerValueForTargetTypes(ctx, targetType, sourceResults.At(idx).Type(), value, false)
@@ -7339,10 +7358,13 @@ func (o *LoweringOwner) lowerNamedResultReturn(ctx lowerFileContext) (string, bo
 // address or a function literal, is copied, so that the caller gets a value
 // of its own.
 func (o *LoweringOwner) lowerNamedResultValue(ctx lowerFileContext, result *types.Var) string {
+	// A variable reference result is read through its value.
 	value := safeIdentifier(result.Name())
 	if ctx.model.needsVarRef[result] {
 		value += ".value"
 	}
+
+	// Only a struct or array result that another reference can reach is copied.
 	if !isStructValueType(result.Type()) && !isArrayType(result.Type()) {
 		return value
 	}
@@ -7355,9 +7377,12 @@ func (o *LoweringOwner) lowerNamedResultValue(ctx lowerFileContext, result *type
 // namedResultUsedInFuncLit reports whether a function literal in the function
 // that declares result refers to it.
 func namedResultUsedInFuncLit(ctx lowerFileContext, result *types.Var) bool {
+	// Without the syntax, assume that a function literal uses the result.
 	if ctx.file == nil || ctx.semPkg == nil || ctx.semPkg.source == nil {
 		return true
 	}
+
+	// Find the body of the function that declares the result.
 	var body *ast.BlockStmt
 	ast.Inspect(ctx.file, func(node ast.Node) bool {
 		if body != nil || node == nil || node.Pos() > result.Pos() || node.End() <= result.Pos() {
@@ -7378,16 +7403,22 @@ func namedResultUsedInFuncLit(ctx lowerFileContext, result *types.Var) bool {
 	if body == nil {
 		return true
 	}
+
+	// Look for a use of the result inside a function literal of the body.
 	info := ctx.semPkg.source.TypesInfo
 	used := false
 	ast.Inspect(body, func(node ast.Node) bool {
+		// Stop at the first use.
 		if used {
 			return false
 		}
+
 		lit, ok := node.(*ast.FuncLit)
 		if !ok {
 			return true
 		}
+
+		// A function literal that mentions the result uses it.
 		ast.Inspect(lit.Body, func(node ast.Node) bool {
 			if ident, ok := node.(*ast.Ident); ok && info.Uses[ident] == result {
 				used = true
@@ -7715,11 +7746,6 @@ func (o *LoweringOwner) lowerRangeStmt(ctx lowerFileContext, stmt *ast.RangeStmt
 		return lowered, diagnostics
 	}
 
-	body, bodyDiagnostics := o.lowerBlock(bodyCtx.withoutRangeLoopBranches(), stmt.Body)
-	diagnostics = append(diagnostics, bodyDiagnostics...)
-	rangeTarget := ctx.tempName("RangeTarget")
-	rangeTargetValue := o.lowerArrayPointerTarget(ctx, rangeValue, rangeType)
-
 	// The window of the slice or array is read once, as Go evaluates the
 	// length once, and its elements are read from its backing array
 	// directly, which is much faster than through a slice proxy.
@@ -7728,6 +7754,14 @@ func (o *LoweringOwner) lowerRangeStmt(ctx lowerFileContext, stmt *ast.RangeStmt
 	if indexName == "" {
 		indexName = "__rangeIndex"
 	}
+	loopCtx := bodyCtx.withoutRangeLoopBranches()
+	if access, ok := rangeElementAccessFor(ctx, stmt, rangeType, rangeWindow, indexName); ok {
+		loopCtx.rangeElements = append(append([]rangeElementAccess(nil), ctx.rangeElements...), access)
+	}
+	body, bodyDiagnostics := o.lowerBlock(loopCtx, stmt.Body)
+	diagnostics = append(diagnostics, bodyDiagnostics...)
+	rangeTarget := ctx.tempName("RangeTarget")
+	rangeTargetValue := o.lowerArrayPointerTarget(ctx, rangeValue, rangeType)
 	children := body
 	if valueName != "" {
 		// The value variable holds a copy of the element, so struct and array
@@ -7750,6 +7784,144 @@ func (o *LoweringOwner) lowerRangeStmt(ctx lowerFileContext, stmt *ast.RangeStmt
 			indexName + " = 0; " + indexName + " < " + rangeWindow + ".length; " + indexName + "++)",
 		children: children,
 	}, diagnostics
+}
+
+// rangeElementAccess is a slice variable that a range loop over it indexes
+// by the loop's index variable.
+type rangeElementAccess struct {
+	slice  types.Object
+	index  types.Object
+	window string
+	name   string
+}
+
+// rangeElementAccessFor returns the element access of a range loop over a
+// slice variable, by an index variable that the loop declares, when the body
+// never assigns either variable, so that s[i] is always in the window that
+// the loop read.
+func rangeElementAccessFor(ctx lowerFileContext, stmt *ast.RangeStmt, rangeType types.Type, window string, indexName string) (rangeElementAccess, bool) {
+	// The loop declares an index variable and ranges over a slice variable.
+	if _, ok := types.Unalias(rangeType).Underlying().(*types.Slice); !ok || stmt.Tok != token.DEFINE || stmt.Key == nil {
+		return rangeElementAccess{}, false
+	}
+	info := ctx.semPkg.source.TypesInfo
+	sliceIdent, ok := ast.Unparen(stmt.X).(*ast.Ident)
+	if !ok {
+		return rangeElementAccess{}, false
+	}
+
+	// Both variables are plain locals that need no variable reference.
+	slice, ok := info.Uses[sliceIdent].(*types.Var)
+	keyIdent, keyOK := stmt.Key.(*ast.Ident)
+	if !ok || !keyOK || keyIdent.Name == "_" || ctx.model.needsVarRef[slice] {
+		return rangeElementAccess{}, false
+	}
+	index := info.Defs[keyIdent]
+	if index == nil || ctx.model.needsVarRef[index] || ctx.lazyPackageVars[slice] {
+		return rangeElementAccess{}, false
+	}
+
+	// The body assigns neither variable and takes neither address.
+	tracked := func(expr ast.Expr) bool {
+		ident, ok := ast.Unparen(expr).(*ast.Ident)
+		if !ok {
+			return false
+		}
+		obj := info.ObjectOf(ident)
+		return obj == slice || obj == index
+	}
+	assigned := false
+	ast.Inspect(stmt.Body, func(node ast.Node) bool {
+		switch typed := node.(type) {
+		case *ast.AssignStmt:
+			assigned = assigned || slices.ContainsFunc(typed.Lhs, tracked)
+		case *ast.IncDecStmt:
+			assigned = assigned || tracked(typed.X)
+		case *ast.UnaryExpr:
+			assigned = assigned || typed.Op == token.AND && tracked(typed.X)
+		case *ast.RangeStmt:
+			assigned = assigned || typed.Tok == token.ASSIGN && (tracked(typed.Key) || tracked(typed.Value))
+		}
+		return !assigned
+	})
+	if assigned || sliceAssignedInFuncLit(ctx, stmt, slice) {
+		return rangeElementAccess{}, false
+	}
+	return rangeElementAccess{slice: slice, index: index, window: window, name: indexName}, true
+}
+
+// sliceAssignedInFuncLit reports whether a function literal in the function
+// that contains stmt assigns the variable slice, which the loop body could
+// call.
+func sliceAssignedInFuncLit(ctx lowerFileContext, stmt ast.Stmt, slice types.Object) bool {
+	// Without the syntax, assume that a function literal assigns the slice.
+	if ctx.file == nil {
+		return true
+	}
+
+	// Find the outermost function that contains the statement.
+	path, _ := astutil.PathEnclosingInterval(ctx.file, stmt.Pos(), stmt.End())
+	var outer ast.Node
+	for _, node := range path {
+		switch node.(type) {
+		case *ast.FuncDecl, *ast.FuncLit:
+			outer = node
+		}
+	}
+	if outer == nil {
+		return true
+	}
+
+	// Look for an assignment to the slice inside a function literal.
+	info := ctx.semPkg.source.TypesInfo
+	assigned := false
+	ast.Inspect(outer, func(node ast.Node) bool {
+		lit, ok := node.(*ast.FuncLit)
+		if !ok || assigned {
+			return !assigned
+		}
+		ast.Inspect(lit.Body, func(node ast.Node) bool {
+			if assign, ok := node.(*ast.AssignStmt); ok {
+				for _, lhs := range assign.Lhs {
+					if ident, ok := ast.Unparen(lhs).(*ast.Ident); ok && info.ObjectOf(ident) == slice {
+						assigned = true
+					}
+				}
+			}
+			return !assigned
+		})
+		return false
+	})
+	return assigned
+}
+
+// rangeWindowElement returns the element s[i] of an enclosing range loop's
+// window, read or written in place, for a slice and index variable of the
+// loop (see rangeElementAccessFor).
+func rangeWindowElement(ctx lowerFileContext, expr *ast.IndexExpr) (string, bool) {
+	// Only an index of a slice variable by an index variable can match.
+	if len(ctx.rangeElements) == 0 {
+		return "", false
+	}
+	sliceIdent, ok := ast.Unparen(expr.X).(*ast.Ident)
+	if !ok {
+		return "", false
+	}
+	indexIdent, ok := ast.Unparen(expr.Index).(*ast.Ident)
+	if !ok {
+		return "", false
+	}
+
+	// The innermost loop that indexes the slice by the index variable wins.
+	info := ctx.semPkg.source.TypesInfo
+	slice, index := info.Uses[sliceIdent], info.Uses[indexIdent]
+	for idx := len(ctx.rangeElements) - 1; idx >= 0; idx-- {
+		access := ctx.rangeElements[idx]
+		if access.slice == slice && access.index == index {
+			return "(" + access.window + ".backing as any[])[" + access.window + ".offset + " + access.name + "]", true
+		}
+	}
+	return "", false
 }
 
 func (o *LoweringOwner) lowerRangeDeclShadowAliases(
@@ -9583,14 +9755,19 @@ func (o *LoweringOwner) lowerCallArgs(
 	expr *ast.CallExpr,
 	signature *types.Signature,
 ) ([]string, []Diagnostic) {
+	// An ordinary call keeps its arguments in place.
 	if ctx.hoistArgsCall != expr || ctx.hoistedArgs == nil {
 		return o.lowerCallArgValues(ctx, expr, signature)
 	}
+
 	// The arguments of a deferred or go call are evaluated where the
 	// statement runs, so each is stored in a temporary that the call reads.
 	hoisted := ctx.hoistedArgs
 	ctx.hoistArgsCall, ctx.hoistedArgs = nil, nil
 	args, diagnostics := o.lowerCallArgValues(ctx, expr, signature)
+
+	// A literal needs no temporary; the others are stored, a spread keeping
+	// its marker on the temporary.
 	for idx, arg := range args {
 		if isHoistFreeArg(arg) {
 			continue
@@ -9931,7 +10108,8 @@ func (o *LoweringOwner) lowerFixedCallArgs(
 		allowAsyncCallback := allowAsyncOverrideCallback || o.overrideAwaitsCallback(ctx, call.Fun, param.Name())
 		lowered, exprDiagnostics := o.lowerCallArgExpr(ctx, expr, param.Type(), allowAsyncCallback)
 		diagnostics = append(diagnostics, exprDiagnostics...)
-		if idx < len(paramsReadOnly) && types.Identical(ctx.semPkg.source.TypesInfo.TypeOf(expr), param.Type()) &&
+		if idx < len(paramsReadOnly) && !ctx.copyValues &&
+			types.Identical(ctx.semPkg.source.TypesInfo.TypeOf(expr), param.Type()) &&
 			valueReadOnlyArg(ctx, paramsReadOnly[idx], calleeAsync, expr) {
 			args = append(args, lowered)
 			continue
@@ -11555,6 +11733,9 @@ func (o *LoweringOwner) lowerAssignmentTarget(
 		if isStringType(targetType) || isMapType(targetType) {
 			return o.lowerExpr(ctx, expr)
 		}
+		if element, ok := rangeWindowElement(ctx, typed); ok {
+			return element, nil
+		}
 		target, targetDiagnostics := o.lowerExpr(ctx, typed.X)
 		index, indexDiagnostics := o.lowerExpr(ctx, typed.Index)
 		diagnostics := append(targetDiagnostics, indexDiagnostics...)
@@ -11809,24 +11990,35 @@ func (o *LoweringOwner) lowerPointerValueExpr(ctx lowerFileContext, expr ast.Exp
 // than calling $.pointerValue each time. A nil pointer's local panics when a
 // field is read or written, as the dereference does.
 func (o *LoweringOwner) pointerTargetLocals(ctx lowerFileContext, decl *ast.FuncDecl, receiverAlias string) (map[types.Object]string, []loweredStmt) {
+	// A function without a body or syntax has nothing to analyze.
 	if decl.Body == nil || ctx.semPkg == nil || ctx.semPkg.source == nil {
 		return nil, nil
 	}
+
+	// The candidates are the receiver and parameters that are pointers to
+	// structs, held in no variable reference or alias.
 	info := ctx.semPkg.source.TypesInfo
 	candidates := make(map[types.Object]string)
 	addField := func(field *ast.Field, name string) {
+		// A field declares one named variable.
 		if len(field.Names) != 1 {
 			return
 		}
+
+		// The variable is a plain pointer to a struct.
 		obj := info.Defs[field.Names[0]]
 		if obj == nil || field.Names[0].Name == "_" || ctx.model.needsVarRef[obj] || !isPointerToStructType(obj.Type()) {
 			return
 		}
+
+		// A variable read through an alias is left alone.
 		if ctx.identAliases != nil && ctx.identAliases[obj] != "" {
 			return
 		}
 		candidates[obj] = name
 	}
+
+	// The receiver and the parameters are the candidates.
 	if decl.Recv != nil && len(decl.Recv.List) == 1 && receiverAlias != "" && receiverAlias != "_" {
 		addField(decl.Recv.List[0], receiverAlias)
 	}
@@ -12471,6 +12663,10 @@ func exprContainsUnsafePointerConversion(ctx lowerFileContext, expr ast.Expr) bo
 func (o *LoweringOwner) lowerIndexExpr(ctx lowerFileContext, expr *ast.IndexExpr) (string, []Diagnostic) {
 	if signature := genericFunctionSignature(ctx, expr.X); signature != nil {
 		return o.lowerGenericFunctionValue(ctx, expr.X, []ast.Expr{expr.Index}, signature)
+	}
+	if element, ok := rangeWindowElement(ctx, expr); ok {
+		elemType := ctx.semPkg.source.TypesInfo.TypeOf(expr)
+		return "(" + element + " as " + o.tsTypeFor(ctx, elemType) + ")", nil
 	}
 	target, targetDiagnostics := o.lowerExpr(ctx, expr.X)
 	index, indexDiagnostics := o.lowerExpr(ctx, expr.Index)
@@ -13821,6 +14017,7 @@ func (o *LoweringOwner) lowerStructCloneOf(typ types.Type, value string) string 
 // second argument that marks the new object as a struct value, and whose
 // copy method is named clone.
 func (o *LoweringOwner) isGeneratedStructClass(named *types.Named) bool {
+	// A named, non-generic type declared at package level in Go source.
 	if named == nil || named.Obj() == nil || named.Obj().Pkg() == nil {
 		return false
 	}
@@ -13831,6 +14028,8 @@ func (o *LoweringOwner) isGeneratedStructClass(named *types.Named) bool {
 	if named.Obj().Parent() != pkg.Scope() || o.overrideFacts().HasPackage(pkg.Path()) {
 		return false
 	}
+
+	// A struct that declares no clone or protobuf field.
 	structType, ok := named.Underlying().(*types.Struct)
 	if !ok {
 		return false
@@ -13840,6 +14039,8 @@ func (o *LoweringOwner) isGeneratedStructClass(named *types.Named) bool {
 			return false
 		}
 	}
+
+	// A struct with no clone method of its own.
 	methods := types.NewMethodSet(types.NewPointer(named))
 	for selection := range methods.Methods() {
 		if selection.Obj().Name() == "clone" {
@@ -14355,6 +14556,7 @@ func (o *LoweringOwner) shouldCloneStructValue(ctx lowerFileContext, expr ast.Ex
 // source. Conversions, function values, interface methods and hand-written
 // override packages may return stored values.
 func (o *LoweringOwner) isFreshStructCallResult(ctx lowerFileContext, call *ast.CallExpr) bool {
+	// The call is of a declared function or method, not a conversion or builtin.
 	if ctx.semPkg == nil || ctx.semPkg.source == nil {
 		return false
 	}
@@ -14366,6 +14568,8 @@ func (o *LoweringOwner) isFreshStructCallResult(ctx lowerFileContext, call *ast.
 	if fn == nil || fn.Pkg() == nil {
 		return false
 	}
+
+	// An interface method may return a stored value.
 	signature, _ := fn.Type().(*types.Signature)
 	if signature == nil {
 		return false
@@ -14373,6 +14577,7 @@ func (o *LoweringOwner) isFreshStructCallResult(ctx lowerFileContext, call *ast.
 	if recv := signature.Recv(); recv != nil && types.IsInterface(recv.Type()) {
 		return false
 	}
+
 	// A generic function returns a value of a type parameter as it is.
 	if origin, _ := fn.Origin().Type().(*types.Signature); origin != nil {
 		for result := range origin.Results().Variables() {
@@ -14381,11 +14586,15 @@ func (o *LoweringOwner) isFreshStructCallResult(ctx lowerFileContext, call *ast.
 			}
 		}
 	}
+
+	// A method expression passes its receiver along, so the result may be it.
 	if selector, ok := ast.Unparen(call.Fun).(*ast.SelectorExpr); ok {
 		if selection := info.Selections[selector]; selection != nil && selection.Kind() != types.MethodVal {
 			return false
 		}
 	}
+
+	// Hand-written override packages may return stored values.
 	return !o.overrideFacts().HasPackage(fn.Pkg().Path())
 }
 
@@ -15491,21 +15700,15 @@ func isFixedWideIntegerType(typ types.Type) bool {
 	}
 }
 
-// isBigIntBackedType reports whether typ lowers to a TypeScript bigint. Only the
-// fixed 64-bit Go integer types int64 and uint64 are represented as bigint to
-// preserve full-width precision and Go overflow semantics. The platform-width
-// uint and uintptr, plain int, and the narrower fixed-width integers stay number
-// so they remain usable as array indices; uint/uintptr arithmetic still routes
-// through the int64/uint64 runtime helpers and the result flows through
-// coerceWideHelperResult, which keeps values above 2^53 as a runtime bigint to
-// preserve full 64-bit width, matching design/SPEC_DIFFERENCES.md which maps
-// int64/uint64 to bigint and uint/uintptr to the number representation.
 // sameIntegerRepresentation reports whether target and source are integer
 // types of the same kind, whose values need no conversion between them.
 func sameIntegerRepresentation(target types.Type, source types.Type) bool {
+	// An unknown type has no representation to share.
 	if target == nil || source == nil {
 		return false
 	}
+
+	// Both types are integers of one kind.
 	targetBasic, ok := types.Unalias(target).Underlying().(*types.Basic)
 	if !ok || targetBasic.Info()&types.IsInteger == 0 || targetBasic.Info()&types.IsUntyped != 0 {
 		return false
@@ -15545,6 +15748,15 @@ func isNormalizedIntegerExpr(ctx lowerFileContext, expr ast.Expr) bool {
 	return false
 }
 
+// isBigIntBackedType reports whether typ lowers to a TypeScript bigint. Only the
+// fixed 64-bit Go integer types int64 and uint64 are represented as bigint to
+// preserve full-width precision and Go overflow semantics. The platform-width
+// uint and uintptr, plain int, and the narrower fixed-width integers stay number
+// so they remain usable as array indices; uint/uintptr arithmetic still routes
+// through the int64/uint64 runtime helpers and the result flows through
+// coerceWideHelperResult, which keeps values above 2^53 as a runtime bigint to
+// preserve full 64-bit width, matching design/SPEC_DIFFERENCES.md which maps
+// int64/uint64 to bigint and uint/uintptr to the number representation.
 func isBigIntBackedType(typ types.Type) bool {
 	basic, ok := types.Unalias(typ).Underlying().(*types.Basic)
 	if !ok {
@@ -16489,6 +16701,7 @@ func valueReadOnlyArg(ctx lowerFileContext, kind valueReadOnlyKind, async bool, 
 // fields, no function literal refers to it, and it is not a range variable,
 // which may share an element of the ranged value.
 func isUnaliasedLocalValue(ctx lowerFileContext, expr ast.Expr) bool {
+	// Find the variable that expr reads through plain field selections.
 	info := ctx.semPkg.source.TypesInfo
 	var ident *ast.Ident
 	for ident == nil {
@@ -16505,6 +16718,8 @@ func isUnaliasedLocalValue(ctx lowerFileContext, expr ast.Expr) bool {
 			return false
 		}
 	}
+
+	// The variable is a struct or array local of this file.
 	obj, ok := info.Uses[ident].(*types.Var)
 	if !ok || obj.Pkg() == nil || obj.Parent() == nil || obj.Parent() == obj.Pkg().Scope() ||
 		!isValueCopyType(obj.Type()) || ctx.model.needsVarRef[obj] || ctx.file == nil {
@@ -16513,6 +16728,9 @@ func isUnaliasedLocalValue(ctx lowerFileContext, expr ast.Expr) bool {
 	if obj.Pos() < ctx.file.Pos() || obj.Pos() >= ctx.file.End() {
 		return false
 	}
+
+	// Find the body of the function that declares it, which is not a range
+	// variable.
 	path, _ := astutil.PathEnclosingInterval(ctx.file, obj.Pos(), obj.Pos())
 	var body *ast.BlockStmt
 	for _, node := range path {
@@ -16533,21 +16751,10 @@ func isUnaliasedLocalValue(ctx lowerFileContext, expr ast.Expr) bool {
 	if body == nil {
 		return false
 	}
+
+	// Look for a reference to the variable that the body creates.
 	rootIsObj := func(expr ast.Expr) bool {
-		for {
-			switch typed := ast.Unparen(expr).(type) {
-			case *ast.Ident:
-				return info.Uses[typed] == obj
-			case *ast.SelectorExpr:
-				expr = typed.X
-			case *ast.IndexExpr:
-				expr = typed.X
-			case *ast.SliceExpr:
-				expr = typed.X
-			default:
-				return false
-			}
-		}
+		return info.Uses[exprRootIdent(expr)] == obj
 	}
 	aliased := false
 	ast.Inspect(body, func(node ast.Node) bool {

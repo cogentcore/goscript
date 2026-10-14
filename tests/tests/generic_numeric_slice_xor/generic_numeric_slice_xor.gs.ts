@@ -7,7 +7,7 @@ export function xorLoop<T>(__typeArgs: $.GenericTypeArgs | undefined, dst: $.Sli
 	x = $.goSlice(x, undefined, $.sliceLen(dst))
 	y = $.goSlice(y, undefined, $.sliceLen(dst))
 	for (let __goscriptRangeTarget0 = dst, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), i = 0; i < __goscriptRangeWindow0.length; i++) {
-		dst![i] = ($.arrayIndex(x!, i) as any) ^ ($.arrayIndex(y!, i) as any)
+		(__goscriptRangeWindow0.backing as any[])[__goscriptRangeWindow0.offset + i] = ($.arrayIndex(x!, i) as any) ^ ($.arrayIndex(y!, i) as any)
 	}
 }
 
