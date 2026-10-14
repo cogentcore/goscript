@@ -19,7 +19,7 @@
   },
   "type": "module",
   "bin": {
-    "goscript": "./cmd/goscript/main.js"
+    "goscript": "cmd/goscript/main.js"
   },
   "exports": {
     ".": {
