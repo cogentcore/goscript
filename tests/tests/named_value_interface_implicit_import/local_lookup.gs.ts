@@ -14,7 +14,7 @@ export function localLookup(): [$.GoError, boolean] {
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({Error: (receiver: any, ...args: any[]) => (__goscript_layers.layers_Error as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))})
+	return __goscriptStatic0$value ??= ({Error: (receiver: any) => (__goscript_layers.layers_Error as any)(($.isVarRef(receiver) ? receiver.value : receiver))})
 }
 
 var __goscriptStatic1$value: any

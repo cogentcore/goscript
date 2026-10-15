@@ -19,13 +19,13 @@ export type mode = number
 
 $.registerNamedValueType(
 	"main.mode",
-	{Run: (receiver: any, ...args: any[]) => (__goscript_method.mode_Run as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	{Run: (receiver: any) => (__goscript_method.mode_Run as any)(($.isVarRef(receiver) ? receiver.value : receiver))},
 	[$.methodSignature("Run", [], [/* @__PURE__ */ $.basicType("string")])]
 );
 
 $.registerNamedValueType(
 	"*main.mode",
-	{Run: (receiver: any, ...args: any[]) => (__goscript_method.mode_Run as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	{Run: (receiver: any) => (__goscript_method.mode_Run as any)($.pointerValue(receiver))},
 	[$.methodSignature("Run", [], [/* @__PURE__ */ $.basicType("string")])]
 );
 
@@ -39,7 +39,7 @@ export async function main(): globalThis.Promise<void> {
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({Run: (receiver: any, ...args: any[]) => (__goscript_method.mode_Run as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))})
+	return __goscriptStatic0$value ??= ({Run: (receiver: any) => (__goscript_method.mode_Run as any)(($.isVarRef(receiver) ? receiver.value : receiver))})
 }
 
 var __goscriptStatic1$value: any

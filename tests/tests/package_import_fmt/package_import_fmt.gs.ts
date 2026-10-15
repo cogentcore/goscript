@@ -11,13 +11,13 @@ export type num = number
 
 $.registerNamedValueType(
 	"main.num",
-	{String: (receiver: any, ...args: any[]) => (num_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	{String: (receiver: any) => (num_String as any)(($.isVarRef(receiver) ? receiver.value : receiver))},
 	[$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])]
 );
 
 $.registerNamedValueType(
 	"*main.num",
-	{String: (receiver: any, ...args: any[]) => (num_String as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	{String: (receiver: any) => (num_String as any)($.pointerValue(receiver))},
 	[$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])]
 );
 
@@ -218,7 +218,7 @@ export async function starWidthPrecision(): globalThis.Promise<void> {
 	await fmt.Println(await fmt.Sprintf("[%*.*f]", $.basicInterfaceValue(8, "int"), $.basicInterfaceValue(2, "int"), $.basicInterfaceValue(3.14159, "float64")))
 	await fmt.Println(await fmt.Sprintf("[%.*g]", $.basicInterfaceValue(7, "int"), $.basicInterfaceValue(13.333333015441895, "float32")))
 	await fmt.Println(await fmt.Sprintf("[%.*d] [%s]", $.basicInterfaceValue(-1, "int"), $.basicInterfaceValue(5, "int"), "after"))
-	await fmt.Println(await fmt.Sprintf("[%v]", $.namedValueInterfaceValue<any>(6.666666507720947, "main.num", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2())))
+	await fmt.Println(await fmt.Sprintf("[%v]", __goscriptStatic3()))
 	await fmt.Println(await fmt.Sprintf("[%.*d]", "x", $.basicInterfaceValue(5, "int")))
 	let err = fmt.Errorf("%*s: %w", $.basicInterfaceValue(6, "int"), "ctx", (errors.New("base") as any))
 	await fmt.Println((err as any), errors.Unwrap($.pointerValueOrNil(err)!) != null)
@@ -299,7 +299,7 @@ export async function scanVerbs(): globalThis.Promise<void> {
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({String: (receiver: any, ...args: any[]) => (num_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))})
+	return __goscriptStatic0$value ??= ({String: (receiver: any) => (num_String as any)(($.isVarRef(receiver) ? receiver.value : receiver))})
 }
 
 var __goscriptStatic1$value: any
@@ -310,6 +310,11 @@ function __goscriptStatic1(): any {
 var __goscriptStatic2$value: any
 function __goscriptStatic2(): any {
 	return __goscriptStatic2$value ??= ([$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])])
+}
+
+var __goscriptStatic3$value: any
+function __goscriptStatic3(): any {
+	return __goscriptStatic3$value ??= ($.namedValueInterfaceValue<any>(6.666666507720947, "main.num", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()))
 }
 
 if ($.isMainScript(import.meta)) {

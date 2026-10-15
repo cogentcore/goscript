@@ -7,13 +7,13 @@ export type MyInt = number
 
 $.registerNamedValueType(
 	"main.MyInt",
-	{Double: (receiver: any, ...args: any[]) => (MyInt_Double as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	{Double: (receiver: any) => (MyInt_Double as any)(($.isVarRef(receiver) ? receiver.value : receiver))},
 	[$.methodSignature("Double", [], [/* @__PURE__ */ $.basicType("int")])]
 );
 
 $.registerNamedValueType(
 	"*main.MyInt",
-	{Double: (receiver: any, ...args: any[]) => (MyInt_Double as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	{Double: (receiver: any) => (MyInt_Double as any)($.pointerValue(receiver))},
 	[$.methodSignature("Double", [], [/* @__PURE__ */ $.basicType("int")])]
 );
 
@@ -41,7 +41,7 @@ export type MyBool = boolean
 
 $.registerNamedValueType(
 	"*main.MyBool",
-	{String: (receiver: any, ...args: any[]) => (MyBool_String as any)(receiver, ...$.stripGenericTypeArgs(args))},
+	{String: (receiver: any) => (MyBool_String as any)(receiver)},
 	[$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])]
 );
 
@@ -88,7 +88,7 @@ export async function main(): globalThis.Promise<void> {
 	let fn: (() => number | globalThis.Promise<number>) | null = $.functionValue(((__receiver) => () => MyInt_Double(__receiver))(10), ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo), "main.MyInt.Double-fm")
 	await $.println("Method ref call:", (__goscriptAwait = fn!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
-	let d: Doubler | null = $.namedValueInterfaceValue<Doubler | null>(12, "main.MyInt", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2())
+	let d: Doubler | null = __goscriptStatic3()
 	await $.println("Interface method call:", (__goscriptAwait = (d !== null && (d as any).__isVarRef !== true && (d as any).__goValue === undefined ? (d as Exclude<Doubler, null>) : $.pointerValue<Exclude<Doubler, null>>(d)).Double(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
 	let ret = asDoubler(13)
@@ -98,19 +98,19 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("Interface assertion:", asserted, ok)
 
 	let vals: $.Slice<Doubler | null> = null! as $.Slice<Doubler | null>
-	vals = $.append(vals, $.namedValueInterfaceValue<Doubler | null>(14, "main.MyInt", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()), $.namedValueInterfaceValue<Doubler | null>(15, "main.MyInt", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()), $.appendZeros.nil)
+	vals = $.append(vals, __goscriptStatic4(), __goscriptStatic5(), $.appendZeros.nil)
 	await $.println("Interface slice append:", await sumDoublers(vals))
 
-	let __goscriptTuple0: any = assertDoubler(__goscriptStatic3(), ret)
+	let __goscriptTuple0: any = assertDoubler(__goscriptStatic6(), ret)
 	let genericAsserted = (__goscriptTuple0[0] as MyInt)
 	let genericOK = __goscriptTuple0[1]
 	await $.println("Generic interface assertion:", genericAsserted, genericOK)
 
 	let flag = $.varRef(false)
-	let stringer: Stringer | null = $.namedValueInterfaceValue<Stringer | null>(newMyBool(true, flag), "*main.MyBool", __goscriptStatic4(), __goscriptStatic5(), __goscriptStatic6())
+	let stringer: Stringer | null = $.namedValueInterfaceValue<Stringer | null>(newMyBool(true, flag), "*main.MyBool", __goscriptStatic7(), __goscriptStatic8(), __goscriptStatic9())
 	await $.println("Pointer primitive interface:", (__goscriptAwait = (stringer !== null && (stringer as any).__isVarRef !== true && (stringer as any).__goValue === undefined ? (stringer as Exclude<Stringer, null>) : $.pointerValue<Exclude<Stringer, null>>(stringer)).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), flag.value)
 
-	let __goscriptTuple1: any = assertStringer(__goscriptStatic7(), stringer)
+	let __goscriptTuple1: any = assertStringer(__goscriptStatic10(), stringer)
 	let genericPointer: $.VarRef<MyBool> | null = (__goscriptTuple1[0] as $.VarRef<MyBool> | null)
 	let genericPointerOK = __goscriptTuple1[1]
 	await $.println("Generic pointer interface assertion:", MyBool_String(genericPointer), genericPointerOK)
@@ -118,7 +118,7 @@ export async function main(): globalThis.Promise<void> {
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({Double: (receiver: any, ...args: any[]) => (MyInt_Double as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))})
+	return __goscriptStatic0$value ??= ({Double: (receiver: any) => (MyInt_Double as any)(($.isVarRef(receiver) ? receiver.value : receiver))})
 }
 
 var __goscriptStatic1$value: any
@@ -133,27 +133,42 @@ function __goscriptStatic2(): any {
 
 var __goscriptStatic3$value: any
 function __goscriptStatic3(): any {
-	return __goscriptStatic3$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int", "main.MyInt"), zero: () => 0, methods: {Double: (receiver: any, ...args: any[]) => (MyInt_Double as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, methodSignatures: [$.methodSignature("Double", [], [/* @__PURE__ */ $.basicType("int")])] }})
+	return __goscriptStatic3$value ??= ($.namedValueInterfaceValue<Doubler | null>(12, "main.MyInt", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()))
 }
 
 var __goscriptStatic4$value: any
 function __goscriptStatic4(): any {
-	return __goscriptStatic4$value ??= ({String: (receiver: any, ...args: any[]) => (MyBool_String as any)(receiver, ...$.stripGenericTypeArgs(args))})
+	return __goscriptStatic4$value ??= ($.namedValueInterfaceValue<Doubler | null>(14, "main.MyInt", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()))
 }
 
 var __goscriptStatic5$value: any
 function __goscriptStatic5(): any {
-	return __goscriptStatic5$value ??= (/* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("bool", "main.MyBool")))
+	return __goscriptStatic5$value ??= ($.namedValueInterfaceValue<Doubler | null>(15, "main.MyInt", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()))
 }
 
 var __goscriptStatic6$value: any
 function __goscriptStatic6(): any {
-	return __goscriptStatic6$value ??= ([$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])])
+	return __goscriptStatic6$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int", "main.MyInt"), zero: () => 0, methods: {Double: (receiver: any) => (MyInt_Double as any)(($.isVarRef(receiver) ? receiver.value : receiver))}, methodSignatures: [$.methodSignature("Double", [], [/* @__PURE__ */ $.basicType("int")])] }})
 }
 
 var __goscriptStatic7$value: any
 function __goscriptStatic7(): any {
-	return __goscriptStatic7$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("bool", "main.MyBool")), zero: () => null, methods: {String: (receiver: any, ...args: any[]) => (MyBool_String as any)(receiver, ...$.stripGenericTypeArgs(args))}, methodSignatures: [$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])] }})
+	return __goscriptStatic7$value ??= ({String: (receiver: any) => (MyBool_String as any)(receiver)})
+}
+
+var __goscriptStatic8$value: any
+function __goscriptStatic8(): any {
+	return __goscriptStatic8$value ??= (/* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("bool", "main.MyBool")))
+}
+
+var __goscriptStatic9$value: any
+function __goscriptStatic9(): any {
+	return __goscriptStatic9$value ??= ([$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])])
+}
+
+var __goscriptStatic10$value: any
+function __goscriptStatic10(): any {
+	return __goscriptStatic10$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("bool", "main.MyBool")), zero: () => null, methods: {String: (receiver: any) => (MyBool_String as any)(receiver)}, methodSignatures: [$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])] }})
 }
 
 var __goscriptAwait: any

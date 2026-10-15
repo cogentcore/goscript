@@ -19,13 +19,13 @@ $.registerNamedType("main.bytesEncoder", /* @__PURE__ */ $.sliceType(/* @__PURE_
 
 $.registerNamedValueType(
 	"main.bytesEncoder",
-	{Len: (receiver: any, ...args: any[]) => (bytesEncoder_Len as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	{Len: (receiver: any) => (bytesEncoder_Len as any)(($.isVarRef(receiver) ? receiver.value : receiver))},
 	[$.methodSignature("Len", [], [/* @__PURE__ */ $.basicType("int")])]
 );
 
 $.registerNamedValueType(
 	"*main.bytesEncoder",
-	{Len: (receiver: any, ...args: any[]) => (bytesEncoder_Len as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	{Len: (receiver: any) => (bytesEncoder_Len as any)($.pointerValue(receiver))},
 	[$.methodSignature("Len", [], [/* @__PURE__ */ $.basicType("int")])]
 );
 
@@ -41,7 +41,7 @@ export async function main(): globalThis.Promise<void> {
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({Len: (receiver: any, ...args: any[]) => (bytesEncoder_Len as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))})
+	return __goscriptStatic0$value ??= ({Len: (receiver: any) => (bytesEncoder_Len as any)(($.isVarRef(receiver) ? receiver.value : receiver))})
 }
 
 var __goscriptStatic1$value: any

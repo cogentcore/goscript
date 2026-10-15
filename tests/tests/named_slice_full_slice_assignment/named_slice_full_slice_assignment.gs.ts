@@ -9,13 +9,13 @@ $.registerNamedType("main.filters", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ 
 
 $.registerNamedValueType(
 	"main.filters",
-	{size: (receiver: any, ...args: any[]) => (filters_size as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	{size: (receiver: any) => (filters_size as any)(($.isVarRef(receiver) ? receiver.value : receiver))},
 	[$.methodSignature("size", [], [/* @__PURE__ */ $.basicType("int")])]
 );
 
 $.registerNamedValueType(
 	"*main.filters",
-	{size: (receiver: any, ...args: any[]) => (filters_size as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	{size: (receiver: any) => (filters_size as any)($.pointerValue(receiver))},
 	[$.methodSignature("size", [], [/* @__PURE__ */ $.basicType("int")])]
 );
 
@@ -43,7 +43,7 @@ export async function main(): globalThis.Promise<void> {
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({size: (receiver: any, ...args: any[]) => (filters_size as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))})
+	return __goscriptStatic0$value ??= ({size: (receiver: any) => (filters_size as any)(($.isVarRef(receiver) ? receiver.value : receiver))})
 }
 
 var __goscriptStatic1$value: any

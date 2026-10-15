@@ -1,0 +1,7 @@
+count 3
+equal true false
+methods 2 7 -1
+variable 1 2
+switch 2
+string go! true
+convert 9223372036854775813 true -7 -7 kind

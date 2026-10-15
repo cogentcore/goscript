@@ -170,15 +170,15 @@ export async function main(): globalThis.Promise<void> {
 	await check($.namedValueInterfaceValue<any>($.arrayToSlice<number>([1, 2]), "main.namedSlice", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()))
 	await check($.namedValueInterfaceValue<any>($.makeMap<string, number>([["one", 1], ["two", 2]]), "main.namedMap", __goscriptStatic3(), __goscriptStatic4(), __goscriptStatic2()))
 	await check($.namedValueInterfaceValue<any>($.arrayValue([1, 2]), "main.namedArray", __goscriptStatic5(), __goscriptStatic6(), __goscriptStatic2()))
-	await check($.namedValueInterfaceValue<any>(4, "main.namedInt", __goscriptStatic7(), __goscriptStatic8(), __goscriptStatic2()))
+	await check(__goscriptStatic9())
 	await check($.namedValueInterfaceValue<any>($.namedFunction($.functionValue((): number => {
 		return 2
-	}, ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo)), "main.namedFunc", ({ kind: $.TypeKind.Function, name: "main.namedFunc", params: [], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo)), "main.namedFunc", __goscriptStatic9(), __goscriptStatic10(), __goscriptStatic2()))
-	await check($.namedValueInterfaceValue<any>($.makeChannel<number>(2, 0, "both"), "main.namedChan", __goscriptStatic11(), __goscriptStatic12(), __goscriptStatic2()))
+	}, ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo)), "main.namedFunc", ({ kind: $.TypeKind.Function, name: "main.namedFunc", params: [], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo)), "main.namedFunc", __goscriptStatic10(), __goscriptStatic11(), __goscriptStatic2()))
+	await check($.namedValueInterfaceValue<any>($.makeChannel<number>(2, 0, "both"), "main.namedChan", __goscriptStatic12(), __goscriptStatic13(), __goscriptStatic2()))
 	let value: $.VarRef<pointerSlice> = $.varRef(($.arrayToSlice<number>([1, 2]) as pointerSlice))
-	await check($.namedValueInterfaceValue<any>(value, "*main.pointerSlice", __goscriptStatic13(), __goscriptStatic14(), __goscriptStatic2()))
+	await check($.namedValueInterfaceValue<any>(value, "*main.pointerSlice", __goscriptStatic14(), __goscriptStatic15(), __goscriptStatic2()))
 	let mapped: $.VarRef<pointerMap> = $.varRef($.makeMap<string, number>([["one", 1], ["two", 2]]))
-	await check($.namedValueInterfaceValue<any>(mapped, "*main.pointerMap", __goscriptStatic15(), __goscriptStatic16(), __goscriptStatic2()))
+	await check($.namedValueInterfaceValue<any>(mapped, "*main.pointerMap", __goscriptStatic16(), __goscriptStatic17(), __goscriptStatic2()))
 }
 
 var __goscriptStatic0$value: any
@@ -228,42 +228,47 @@ function __goscriptStatic8(): any {
 
 var __goscriptStatic9$value: any
 function __goscriptStatic9(): any {
-	return __goscriptStatic9$value ??= ({Add: (receiver: any, ...args: any[]) => (namedFunc_Add as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))})
+	return __goscriptStatic9$value ??= ($.namedValueInterfaceValue<any>(4, "main.namedInt", __goscriptStatic7(), __goscriptStatic8(), __goscriptStatic2()))
 }
 
 var __goscriptStatic10$value: any
 function __goscriptStatic10(): any {
-	return __goscriptStatic10$value ??= (({ kind: $.TypeKind.Function, name: "main.namedFunc", params: [], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))
+	return __goscriptStatic10$value ??= ({Add: (receiver: any, ...args: any[]) => (namedFunc_Add as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))})
 }
 
 var __goscriptStatic11$value: any
 function __goscriptStatic11(): any {
-	return __goscriptStatic11$value ??= ({Add: (receiver: any, ...args: any[]) => (namedChan_Add as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))})
+	return __goscriptStatic11$value ??= (({ kind: $.TypeKind.Function, name: "main.namedFunc", params: [], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))
 }
 
 var __goscriptStatic12$value: any
 function __goscriptStatic12(): any {
-	return __goscriptStatic12$value ??= ("main.namedChan")
+	return __goscriptStatic12$value ??= ({Add: (receiver: any, ...args: any[]) => (namedChan_Add as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))})
 }
 
 var __goscriptStatic13$value: any
 function __goscriptStatic13(): any {
-	return __goscriptStatic13$value ??= ({Add: (receiver: any, ...args: any[]) => (pointerSlice_Add as any)(receiver, ...$.stripGenericTypeArgs(args))})
+	return __goscriptStatic13$value ??= ("main.namedChan")
 }
 
 var __goscriptStatic14$value: any
 function __goscriptStatic14(): any {
-	return __goscriptStatic14$value ??= (/* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"), "main.pointerSlice")))
+	return __goscriptStatic14$value ??= ({Add: (receiver: any, ...args: any[]) => (pointerSlice_Add as any)(receiver, ...$.stripGenericTypeArgs(args))})
 }
 
 var __goscriptStatic15$value: any
 function __goscriptStatic15(): any {
-	return __goscriptStatic15$value ??= ({Add: (receiver: any, ...args: any[]) => (pointerMap_Add as any)(receiver, ...$.stripGenericTypeArgs(args))})
+	return __goscriptStatic15$value ??= (/* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"), "main.pointerSlice")))
 }
 
 var __goscriptStatic16$value: any
 function __goscriptStatic16(): any {
-	return __goscriptStatic16$value ??= (/* @__PURE__ */ $.pointerType("main.pointerMap"))
+	return __goscriptStatic16$value ??= ({Add: (receiver: any, ...args: any[]) => (pointerMap_Add as any)(receiver, ...$.stripGenericTypeArgs(args))})
+}
+
+var __goscriptStatic17$value: any
+function __goscriptStatic17(): any {
+	return __goscriptStatic17$value ??= (/* @__PURE__ */ $.pointerType("main.pointerMap"))
 }
 
 var __goscriptAwait: any

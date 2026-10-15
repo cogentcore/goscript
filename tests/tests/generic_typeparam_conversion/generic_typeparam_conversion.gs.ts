@@ -51,13 +51,13 @@ export type Base = number
 
 $.registerNamedValueType(
 	"main.Base",
-	{String: (receiver: any, ...args: any[]) => (Base_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	{String: (receiver: any) => (Base_String as any)(($.isVarRef(receiver) ? receiver.value : receiver))},
 	[$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])]
 );
 
 $.registerNamedValueType(
 	"*main.Base",
-	{String: (receiver: any, ...args: any[]) => (Base_String as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	{String: (receiver: any) => (Base_String as any)($.pointerValue(receiver))},
 	[$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])]
 );
 
@@ -65,13 +65,13 @@ export type Extended = number
 
 $.registerNamedValueType(
 	"main.Extended",
-	{String: (receiver: any, ...args: any[]) => (Extended_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	{String: (receiver: any) => (Extended_String as any)(($.isVarRef(receiver) ? receiver.value : receiver))},
 	[$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])]
 );
 
 $.registerNamedValueType(
 	"*main.Extended",
-	{String: (receiver: any, ...args: any[]) => (Extended_String as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	{String: (receiver: any) => (Extended_String as any)($.pointerValue(receiver))},
 	[$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])]
 );
 
@@ -79,13 +79,13 @@ export type Wide = bigint
 
 $.registerNamedValueType(
 	"main.Wide",
-	{String: (receiver: any, ...args: any[]) => (Wide_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	{String: (receiver: any) => (Wide_String as any)(($.isVarRef(receiver) ? receiver.value : receiver))},
 	[$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])]
 );
 
 $.registerNamedValueType(
 	"*main.Wide",
-	{String: (receiver: any, ...args: any[]) => (Wide_String as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	{String: (receiver: any) => (Wide_String as any)($.pointerValue(receiver))},
 	[$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])]
 );
 
@@ -126,11 +126,11 @@ export async function main(): globalThis.Promise<void> {
 		await $.println(v, Base_String(v))
 	}
 	let w = (toWide(__goscriptStatic1(), 5) as Wide)
-	await $.println($.int64Mul($.int64(w), 2n), Wide_String(w))
+	await $.println($.int64Mul(w, 2n), Wide_String(w))
 	let __goscriptTuple0: any = fromConst(__goscriptStatic2(), 9)
 	let a = (__goscriptTuple0[0] as Wide)
 	let b = (__goscriptTuple0[1] as Wide)
-	await $.println($.int64Add($.int64(a), $.int64(b)))
+	await $.println($.int64Add(a, b))
 	let __goscriptTuple1: any = fromConst(__goscriptStatic3(), 300)
 	let c = (__goscriptTuple1[0] as number)
 	let d = (__goscriptTuple1[1] as number)
@@ -139,17 +139,17 @@ export async function main(): globalThis.Promise<void> {
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int32", "main.Base"), zero: () => 0, methods: {String: (receiver: any, ...args: any[]) => (Base_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, methodSignatures: [$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])] }, E: { type: /* @__PURE__ */ $.basicType("int32", "main.Extended"), zero: () => 0, methods: {String: (receiver: any, ...args: any[]) => (Extended_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, methodSignatures: [$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])] }})
+	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int32", "main.Base"), zero: () => 0, methods: {String: (receiver: any) => (Base_String as any)(($.isVarRef(receiver) ? receiver.value : receiver))}, methodSignatures: [$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])] }, E: { type: /* @__PURE__ */ $.basicType("int32", "main.Extended"), zero: () => 0, methods: {String: (receiver: any) => (Extended_String as any)(($.isVarRef(receiver) ? receiver.value : receiver))}, methodSignatures: [$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])] }})
 }
 
 var __goscriptStatic1$value: any
 function __goscriptStatic1(): any {
-	return __goscriptStatic1$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int64", "main.Wide"), zero: () => 0n, methods: {String: (receiver: any, ...args: any[]) => (Wide_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, methodSignatures: [$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])] }, E: { type: /* @__PURE__ */ $.basicType("int32", "main.Extended"), zero: () => 0, methods: {String: (receiver: any, ...args: any[]) => (Extended_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, methodSignatures: [$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])] }})
+	return __goscriptStatic1$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int64", "main.Wide"), zero: () => 0n, methods: {String: (receiver: any) => (Wide_String as any)(($.isVarRef(receiver) ? receiver.value : receiver))}, methodSignatures: [$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])] }, E: { type: /* @__PURE__ */ $.basicType("int32", "main.Extended"), zero: () => 0, methods: {String: (receiver: any) => (Extended_String as any)(($.isVarRef(receiver) ? receiver.value : receiver))}, methodSignatures: [$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])] }})
 }
 
 var __goscriptStatic2$value: any
 function __goscriptStatic2(): any {
-	return __goscriptStatic2$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int64", "main.Wide"), zero: () => 0n, methods: {String: (receiver: any, ...args: any[]) => (Wide_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, methodSignatures: [$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])] }})
+	return __goscriptStatic2$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int64", "main.Wide"), zero: () => 0n, methods: {String: (receiver: any) => (Wide_String as any)(($.isVarRef(receiver) ? receiver.value : receiver))}, methodSignatures: [$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])] }})
 }
 
 var __goscriptStatic3$value: any

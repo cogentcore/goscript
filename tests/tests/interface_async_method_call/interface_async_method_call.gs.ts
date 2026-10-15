@@ -196,7 +196,7 @@ export async function processViaInterface(processor: AsyncProcessor | null, inpu
 }
 
 export function newGenericStore(__typeArgs: $.GenericTypeArgs | undefined, value: any): GenericStore | null {
-	return $.namedValueInterfaceValue<GenericStore | null>(new GenericChannelStore({ch: $.makeChannel<any>(1, $.genericZero(__typeArgs, "V", null), "both"), value: $.copyElement(value)}), "*main.GenericChannelStore", {Load: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Load({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, V: __typeArgs?.["V"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }}, ...$.stripGenericTypeArgs(args))}, /* @__PURE__ */ $.pointerType("main.GenericChannelStore"), [$.methodSignature("Load", [], [{ kind: $.TypeKind.Interface, methods: [] }])])
+	return $.namedValueInterfaceValue<GenericStore | null>(new GenericChannelStore({ch: $.makeChannel<any>(1, $.genericZero(__typeArgs, "V", null), "both"), value: $.copyElement(value)}), "*main.GenericChannelStore", {Load: (receiver: any) => $.pointerValue(receiver).Load({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, V: __typeArgs?.["V"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }})}, /* @__PURE__ */ $.pointerType("main.GenericChannelStore"), [$.methodSignature("Load", [], [{ kind: $.TypeKind.Interface, methods: [] }])])
 }
 
 export async function loadGenericStore(store: GenericStore | null): globalThis.Promise<number> {

@@ -24,13 +24,13 @@ export type Stringy = string
 
 $.registerNamedValueType(
 	"main.Stringy",
-	{String: (receiver: any, ...args: any[]) => (Stringy_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	{String: (receiver: any) => (Stringy_String as any)(($.isVarRef(receiver) ? receiver.value : receiver))},
 	[$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])]
 );
 
 $.registerNamedValueType(
 	"*main.Stringy",
-	{String: (receiver: any, ...args: any[]) => (Stringy_String as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	{String: (receiver: any) => (Stringy_String as any)($.pointerValue(receiver))},
 	[$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])]
 );
 
@@ -159,18 +159,18 @@ export async function main(): globalThis.Promise<void> {
 
 	let stringerType = reflect.TypeFor(__goscriptStatic6())
 	await $.println("Stringer:", (__goscriptAwait = (stringerType !== null && (stringerType as any).__isVarRef !== true && (stringerType as any).__goValue === undefined ? (stringerType as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(stringerType)).Kind(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) == 20, (__goscriptAwait = (stringerType !== null && (stringerType as any).__isVarRef !== true && (stringerType as any).__goValue === undefined ? (stringerType as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(stringerType)).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = (stringerType !== null && (stringerType as any).__isVarRef !== true && (stringerType as any).__goValue === undefined ? (stringerType as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(stringerType)).Name(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = (stringerType !== null && (stringerType as any).__isVarRef !== true && (stringerType as any).__goValue === undefined ? (stringerType as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(stringerType)).PkgPath(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
-	await $.println("Stringer implements:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.namedValueInterfaceValue<any>("s", "main.Stringy", __goscriptStatic7(), __goscriptStatic8(), __goscriptStatic9()))).Implements($.pointerValueOrNil(stringerType)!), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf("s")).Implements($.pointerValueOrNil(stringerType)!), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println("Stringer implements:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf(__goscriptStatic10())).Implements($.pointerValueOrNil(stringerType)!), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf("s")).Implements($.pointerValueOrNil(stringerType)!), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
-	let readerType = reflect.TypeFor(__goscriptStatic10())
+	let readerType = reflect.TypeFor(__goscriptStatic11())
 	await $.println("Reader:", (__goscriptAwait = (readerType !== null && (readerType as any).__isVarRef !== true && (readerType as any).__goValue === undefined ? (readerType as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(readerType)).Kind(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) == 20, (__goscriptAwait = (readerType !== null && (readerType as any).__isVarRef !== true && (readerType as any).__goValue === undefined ? (readerType as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(readerType)).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
-	let namerType = reflect.TypeFor(__goscriptStatic11())
+	let namerType = reflect.TypeFor(__goscriptStatic12())
 	await $.println("namer:", (__goscriptAwait = (namerType !== null && (namerType as any).__isVarRef !== true && (namerType as any).__goValue === undefined ? (namerType as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(namerType)).Kind(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) == 20, (__goscriptAwait = (namerType !== null && (namerType as any).__isVarRef !== true && (namerType as any).__goValue === undefined ? (namerType as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(namerType)).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = (namerType !== null && (namerType as any).__isVarRef !== true && (namerType as any).__goValue === undefined ? (namerType as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(namerType)).NumMethod(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
-	let anyType = reflect.TypeFor(__goscriptStatic12())
+	let anyType = reflect.TypeFor(__goscriptStatic13())
 	await $.println("any:", (__goscriptAwait = (anyType !== null && (anyType as any).__isVarRef !== true && (anyType as any).__goValue === undefined ? (anyType as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(anyType)).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), $.stringEqual((__goscriptAwait = (anyType !== null && (anyType as any).__isVarRef !== true && (anyType as any).__goValue === undefined ? (anyType as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(anyType)).Name(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), ""), (__goscriptAwait = (anyType !== null && (anyType as any).__isVarRef !== true && (anyType as any).__goValue === undefined ? (anyType as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(anyType)).Kind(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) == 20)
 
-	let s: any = $.namedValueInterfaceValue<any>("q", "main.Stringy", __goscriptStatic7(), __goscriptStatic8(), __goscriptStatic9())
+	let s: any = __goscriptStatic14()
 	let [, ok] = $.typeAssertTuple<fmt.Stringer | null>(s, "fmt.Stringer")
 	await $.println("assert fmt.Stringer:", ok)
 
@@ -196,16 +196,16 @@ export async function describePointer(__typeArgs: $.GenericTypeArgs | undefined,
 }
 
 export async function genericComposites(): globalThis.Promise<void> {
-	await describe(__goscriptStatic13(), $.arrayToSlice<MyStruct>([new MyStruct({Name: "a", Age: 1}, true)]))
-	await describe(__goscriptStatic14(), $.arrayToSlice<number>([1, 2, 3]))
-	await describe(__goscriptStatic15(), $.arrayToSlice<number>([]))
-	await describeMap(__goscriptStatic16(), $.makeMap<string, MyStruct>([]))
-	await describePointer(__goscriptStatic13(), new MyStruct())
+	await describe(__goscriptStatic15(), $.arrayToSlice<MyStruct>([new MyStruct({Name: "a", Age: 1}, true)]))
+	await describe(__goscriptStatic16(), $.arrayToSlice<number>([1, 2, 3]))
+	await describe(__goscriptStatic17(), $.arrayToSlice<number>([]))
+	await describeMap(__goscriptStatic18(), $.makeMap<string, MyStruct>([]))
+	await describePointer(__goscriptStatic15(), new MyStruct())
 }
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.MyInterface", zero: () => null, methods: {SomeMethod: (receiver: any, ...args: any[]) => receiver.SomeMethod(...$.stripGenericTypeArgs(args))} }})
+	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.MyInterface", zero: () => null, methods: {SomeMethod: (receiver: any) => receiver.SomeMethod()} }})
 }
 
 var __goscriptStatic1$value: any
@@ -220,7 +220,7 @@ function __goscriptStatic2(): any {
 
 var __goscriptStatic3$value: any
 function __goscriptStatic3(): any {
-	return __goscriptStatic3$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "time.Time", zero: () => $.markAsStructValue(new time.Time()), methods: {Add: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Add(...$.stripGenericTypeArgs(args)), AddDate: (receiver: any, ...args: any[]) => $.pointerValue(receiver).AddDate(...$.stripGenericTypeArgs(args)), After: (receiver: any, ...args: any[]) => $.pointerValue(receiver).After(...$.stripGenericTypeArgs(args)), AppendBinary: (receiver: any, ...args: any[]) => $.pointerValue(receiver).AppendBinary(...$.stripGenericTypeArgs(args)), AppendFormat: (receiver: any, ...args: any[]) => $.pointerValue(receiver).AppendFormat(...$.stripGenericTypeArgs(args)), AppendText: (receiver: any, ...args: any[]) => $.pointerValue(receiver).AppendText(...$.stripGenericTypeArgs(args)), Before: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Before(...$.stripGenericTypeArgs(args)), Clock: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Clock(...$.stripGenericTypeArgs(args)), Compare: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Compare(...$.stripGenericTypeArgs(args)), Date: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Date(...$.stripGenericTypeArgs(args)), Day: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Day(...$.stripGenericTypeArgs(args)), Equal: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Equal(...$.stripGenericTypeArgs(args)), Format: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Format(...$.stripGenericTypeArgs(args)), GoString: (receiver: any, ...args: any[]) => $.pointerValue(receiver).GoString(...$.stripGenericTypeArgs(args)), GobEncode: (receiver: any, ...args: any[]) => $.pointerValue(receiver).GobEncode(...$.stripGenericTypeArgs(args)), Hour: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Hour(...$.stripGenericTypeArgs(args)), ISOWeek: (receiver: any, ...args: any[]) => $.pointerValue(receiver).ISOWeek(...$.stripGenericTypeArgs(args)), In: (receiver: any, ...args: any[]) => $.pointerValue(receiver).In(...$.stripGenericTypeArgs(args)), IsDST: (receiver: any, ...args: any[]) => $.pointerValue(receiver).IsDST(...$.stripGenericTypeArgs(args)), IsZero: (receiver: any, ...args: any[]) => $.pointerValue(receiver).IsZero(...$.stripGenericTypeArgs(args)), Local: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Local(...$.stripGenericTypeArgs(args)), Location: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Location(...$.stripGenericTypeArgs(args)), MarshalBinary: (receiver: any, ...args: any[]) => $.pointerValue(receiver).MarshalBinary(...$.stripGenericTypeArgs(args)), MarshalJSON: (receiver: any, ...args: any[]) => $.pointerValue(receiver).MarshalJSON(...$.stripGenericTypeArgs(args)), MarshalText: (receiver: any, ...args: any[]) => $.pointerValue(receiver).MarshalText(...$.stripGenericTypeArgs(args)), Minute: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Minute(...$.stripGenericTypeArgs(args)), Month: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Month(...$.stripGenericTypeArgs(args)), Nanosecond: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Nanosecond(...$.stripGenericTypeArgs(args)), Round: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Round(...$.stripGenericTypeArgs(args)), Second: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Second(...$.stripGenericTypeArgs(args)), String: (receiver: any, ...args: any[]) => $.pointerValue(receiver).String(...$.stripGenericTypeArgs(args)), Sub: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Sub(...$.stripGenericTypeArgs(args)), Truncate: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Truncate(...$.stripGenericTypeArgs(args)), UTC: (receiver: any, ...args: any[]) => $.pointerValue(receiver).UTC(...$.stripGenericTypeArgs(args)), Unix: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Unix(...$.stripGenericTypeArgs(args)), UnixMicro: (receiver: any, ...args: any[]) => $.pointerValue(receiver).UnixMicro(...$.stripGenericTypeArgs(args)), UnixMilli: (receiver: any, ...args: any[]) => $.pointerValue(receiver).UnixMilli(...$.stripGenericTypeArgs(args)), UnixNano: (receiver: any, ...args: any[]) => $.pointerValue(receiver).UnixNano(...$.stripGenericTypeArgs(args)), Weekday: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Weekday(...$.stripGenericTypeArgs(args)), Year: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Year(...$.stripGenericTypeArgs(args)), YearDay: (receiver: any, ...args: any[]) => $.pointerValue(receiver).YearDay(...$.stripGenericTypeArgs(args)), Zone: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Zone(...$.stripGenericTypeArgs(args)), ZoneBounds: (receiver: any, ...args: any[]) => $.pointerValue(receiver).ZoneBounds(...$.stripGenericTypeArgs(args)), absSec: (receiver: any, ...args: any[]) => $.pointerValue(receiver).absSec(...$.stripGenericTypeArgs(args)), appendFormat: (receiver: any, ...args: any[]) => $.pointerValue(receiver).appendFormat(...$.stripGenericTypeArgs(args)), appendFormatRFC3339: (receiver: any, ...args: any[]) => $.pointerValue(receiver).appendFormatRFC3339(...$.stripGenericTypeArgs(args)), appendStrictRFC3339: (receiver: any, ...args: any[]) => $.pointerValue(receiver).appendStrictRFC3339(...$.stripGenericTypeArgs(args)), appendTo: (receiver: any, ...args: any[]) => $.pointerValue(receiver).appendTo(...$.stripGenericTypeArgs(args)), locabs: (receiver: any, ...args: any[]) => $.pointerValue(receiver).locabs(...$.stripGenericTypeArgs(args))} }})
+	return __goscriptStatic3$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "time.Time", zero: () => $.markAsStructValue(new time.Time()), methods: {Add: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Add(...$.stripGenericTypeArgs(args)), AddDate: (receiver: any, ...args: any[]) => $.pointerValue(receiver).AddDate(...$.stripGenericTypeArgs(args)), After: (receiver: any, ...args: any[]) => $.pointerValue(receiver).After(...$.stripGenericTypeArgs(args)), AppendBinary: (receiver: any, ...args: any[]) => $.pointerValue(receiver).AppendBinary(...$.stripGenericTypeArgs(args)), AppendFormat: (receiver: any, ...args: any[]) => $.pointerValue(receiver).AppendFormat(...$.stripGenericTypeArgs(args)), AppendText: (receiver: any, ...args: any[]) => $.pointerValue(receiver).AppendText(...$.stripGenericTypeArgs(args)), Before: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Before(...$.stripGenericTypeArgs(args)), Clock: (receiver: any) => $.pointerValue(receiver).Clock(), Compare: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Compare(...$.stripGenericTypeArgs(args)), Date: (receiver: any) => $.pointerValue(receiver).Date(), Day: (receiver: any) => $.pointerValue(receiver).Day(), Equal: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Equal(...$.stripGenericTypeArgs(args)), Format: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Format(...$.stripGenericTypeArgs(args)), GoString: (receiver: any) => $.pointerValue(receiver).GoString(), GobEncode: (receiver: any) => $.pointerValue(receiver).GobEncode(), Hour: (receiver: any) => $.pointerValue(receiver).Hour(), ISOWeek: (receiver: any) => $.pointerValue(receiver).ISOWeek(), In: (receiver: any, ...args: any[]) => $.pointerValue(receiver).In(...$.stripGenericTypeArgs(args)), IsDST: (receiver: any) => $.pointerValue(receiver).IsDST(), IsZero: (receiver: any) => $.pointerValue(receiver).IsZero(), Local: (receiver: any) => $.pointerValue(receiver).Local(), Location: (receiver: any) => $.pointerValue(receiver).Location(), MarshalBinary: (receiver: any) => $.pointerValue(receiver).MarshalBinary(), MarshalJSON: (receiver: any) => $.pointerValue(receiver).MarshalJSON(), MarshalText: (receiver: any) => $.pointerValue(receiver).MarshalText(), Minute: (receiver: any) => $.pointerValue(receiver).Minute(), Month: (receiver: any) => $.pointerValue(receiver).Month(), Nanosecond: (receiver: any) => $.pointerValue(receiver).Nanosecond(), Round: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Round(...$.stripGenericTypeArgs(args)), Second: (receiver: any) => $.pointerValue(receiver).Second(), String: (receiver: any) => $.pointerValue(receiver).String(), Sub: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Sub(...$.stripGenericTypeArgs(args)), Truncate: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Truncate(...$.stripGenericTypeArgs(args)), UTC: (receiver: any) => $.pointerValue(receiver).UTC(), Unix: (receiver: any) => $.pointerValue(receiver).Unix(), UnixMicro: (receiver: any) => $.pointerValue(receiver).UnixMicro(), UnixMilli: (receiver: any) => $.pointerValue(receiver).UnixMilli(), UnixNano: (receiver: any) => $.pointerValue(receiver).UnixNano(), Weekday: (receiver: any) => $.pointerValue(receiver).Weekday(), Year: (receiver: any) => $.pointerValue(receiver).Year(), YearDay: (receiver: any) => $.pointerValue(receiver).YearDay(), Zone: (receiver: any) => $.pointerValue(receiver).Zone(), ZoneBounds: (receiver: any) => $.pointerValue(receiver).ZoneBounds(), absSec: (receiver: any) => $.pointerValue(receiver).absSec(), appendFormat: (receiver: any, ...args: any[]) => $.pointerValue(receiver).appendFormat(...$.stripGenericTypeArgs(args)), appendFormatRFC3339: (receiver: any, ...args: any[]) => $.pointerValue(receiver).appendFormatRFC3339(...$.stripGenericTypeArgs(args)), appendStrictRFC3339: (receiver: any, ...args: any[]) => $.pointerValue(receiver).appendStrictRFC3339(...$.stripGenericTypeArgs(args)), appendTo: (receiver: any, ...args: any[]) => $.pointerValue(receiver).appendTo(...$.stripGenericTypeArgs(args)), locabs: (receiver: any) => $.pointerValue(receiver).locabs()} }})
 }
 
 var __goscriptStatic4$value: any
@@ -230,17 +230,17 @@ function __goscriptStatic4(): any {
 
 var __goscriptStatic5$value: any
 function __goscriptStatic5(): any {
-	return __goscriptStatic5$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "error", zero: () => null, methods: {Error: (receiver: any, ...args: any[]) => receiver.Error(...$.stripGenericTypeArgs(args))} }})
+	return __goscriptStatic5$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "error", zero: () => null, methods: {Error: (receiver: any) => receiver.Error()} }})
 }
 
 var __goscriptStatic6$value: any
 function __goscriptStatic6(): any {
-	return __goscriptStatic6$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "fmt.Stringer", zero: () => null, methods: {String: (receiver: any, ...args: any[]) => receiver.String(...$.stripGenericTypeArgs(args))} }})
+	return __goscriptStatic6$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "fmt.Stringer", zero: () => null, methods: {String: (receiver: any) => receiver.String()} }})
 }
 
 var __goscriptStatic7$value: any
 function __goscriptStatic7(): any {
-	return __goscriptStatic7$value ??= ({String: (receiver: any, ...args: any[]) => (Stringy_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))})
+	return __goscriptStatic7$value ??= ({String: (receiver: any) => (Stringy_String as any)(($.isVarRef(receiver) ? receiver.value : receiver))})
 }
 
 var __goscriptStatic8$value: any
@@ -255,37 +255,47 @@ function __goscriptStatic9(): any {
 
 var __goscriptStatic10$value: any
 function __goscriptStatic10(): any {
-	return __goscriptStatic10$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "io.Reader", zero: () => null, methods: {Read: (receiver: any, ...args: any[]) => receiver.Read(...$.stripGenericTypeArgs(args))} }})
+	return __goscriptStatic10$value ??= ($.namedValueInterfaceValue<any>("s", "main.Stringy", __goscriptStatic7(), __goscriptStatic8(), __goscriptStatic9()))
 }
 
 var __goscriptStatic11$value: any
 function __goscriptStatic11(): any {
-	return __goscriptStatic11$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.namer", zero: () => null, methods: {Name: (receiver: any, ...args: any[]) => receiver.Name(...$.stripGenericTypeArgs(args))} }})
+	return __goscriptStatic11$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "io.Reader", zero: () => null, methods: {Read: (receiver: any, ...args: any[]) => receiver.Read(...$.stripGenericTypeArgs(args))} }})
 }
 
 var __goscriptStatic12$value: any
 function __goscriptStatic12(): any {
-	return __goscriptStatic12$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }})
+	return __goscriptStatic12$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.namer", zero: () => null, methods: {Name: (receiver: any) => receiver.Name()} }})
 }
 
 var __goscriptStatic13$value: any
 function __goscriptStatic13(): any {
-	return __goscriptStatic13$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, E: { type: "main.MyStruct", zero: () => new MyStruct(undefined, true) }})
+	return __goscriptStatic13$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }})
 }
 
 var __goscriptStatic14$value: any
 function __goscriptStatic14(): any {
-	return __goscriptStatic14$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, E: { type: /* @__PURE__ */ $.basicType("float32"), zero: () => 0 }})
+	return __goscriptStatic14$value ??= ($.namedValueInterfaceValue<any>("q", "main.Stringy", __goscriptStatic7(), __goscriptStatic8(), __goscriptStatic9()))
 }
 
 var __goscriptStatic15$value: any
 function __goscriptStatic15(): any {
-	return __goscriptStatic15$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, E: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }})
+	return __goscriptStatic15$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, E: { type: "main.MyStruct", zero: () => new MyStruct(undefined, true) }})
 }
 
 var __goscriptStatic16$value: any
 function __goscriptStatic16(): any {
-	return __goscriptStatic16$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, K: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }, V: { type: "main.MyStruct", zero: () => new MyStruct(undefined, true) }})
+	return __goscriptStatic16$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, E: { type: /* @__PURE__ */ $.basicType("float32"), zero: () => 0 }})
+}
+
+var __goscriptStatic17$value: any
+function __goscriptStatic17(): any {
+	return __goscriptStatic17$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, E: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }})
+}
+
+var __goscriptStatic18$value: any
+function __goscriptStatic18(): any {
+	return __goscriptStatic18$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, K: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }, V: { type: "main.MyStruct", zero: () => new MyStruct(undefined, true) }})
 }
 
 var __goscriptAwait: any

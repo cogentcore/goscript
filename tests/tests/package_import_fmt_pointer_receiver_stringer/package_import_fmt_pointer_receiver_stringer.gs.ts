@@ -10,7 +10,7 @@ $.registerNamedType("main.Line", /* @__PURE__ */ $.sliceType("main.Lex"));
 
 $.registerNamedValueType(
 	"*main.Line",
-	{String: (receiver: any, ...args: any[]) => (Line_String as any)(receiver, ...$.stripGenericTypeArgs(args))},
+	{String: (receiver: any) => (Line_String as any)(receiver)},
 	[$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])]
 );
 
@@ -130,7 +130,7 @@ export async function main(): globalThis.Promise<void> {
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({String: (receiver: any, ...args: any[]) => (Line_String as any)(receiver, ...$.stripGenericTypeArgs(args))})
+	return __goscriptStatic0$value ??= ({String: (receiver: any) => (Line_String as any)(receiver)})
 }
 
 var __goscriptStatic1$value: any

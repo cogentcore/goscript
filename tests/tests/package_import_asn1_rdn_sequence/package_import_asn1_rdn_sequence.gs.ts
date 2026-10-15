@@ -27,7 +27,7 @@ export async function main(): globalThis.Promise<void> {
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({String: (receiver: any, ...args: any[]) => (pkix.RDNSequence_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))})
+	return __goscriptStatic0$value ??= ({String: (receiver: any) => (pkix.RDNSequence_String as any)(($.isVarRef(receiver) ? receiver.value : receiver))})
 }
 
 var __goscriptStatic1$value: any
@@ -42,7 +42,7 @@ function __goscriptStatic2(): any {
 
 var __goscriptStatic3$value: any
 function __goscriptStatic3(): any {
-	return __goscriptStatic3$value ??= ({String: (receiver: any, ...args: any[]) => (pkix.RDNSequence_String as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))})
+	return __goscriptStatic3$value ??= ({String: (receiver: any) => (pkix.RDNSequence_String as any)($.pointerValue(receiver))})
 }
 
 var __goscriptStatic4$value: any
