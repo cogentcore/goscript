@@ -12256,10 +12256,12 @@ func (o *LoweringOwner) interfaceMethodReceiver(ctx lowerFileContext, receiver s
 	}
 
 	// The object is its own receiver unless it is nil, a variable reference
-	// or a boxed pointer.
+	// or a boxed pointer, whose type name starts with "*" (code 42). A box
+	// of a named value, such as a bit flag constant, is its own receiver.
 	value := "(" + receiver + " as any)"
-	return "(" + receiver + " !== null && " + value + ".__isVarRef !== true && " +
-		value + ".__goValue === undefined ? (" + receiver + " as " + nonNil + ") : " + slow + ")"
+	return "(" + receiver + " !== null && " + value + ".__isVarRef !== true && (" +
+		value + ".__goValue === undefined || " + value + ".__goType?.charCodeAt(0) !== 42) ? (" +
+		receiver + " as " + nonNil + ") : " + slow + ")"
 }
 
 // plainLocalName matches a JavaScript identifier, the lowered form of a
