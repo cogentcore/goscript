@@ -467,7 +467,7 @@ func renderStructAssign(b *strings.Builder, structType *loweredStruct, runtimeOw
 	// The method copies each field of source into the receiver by its kind.
 	b.WriteString("\n\tpublic __goscriptAssign(source: ")
 	b.WriteString(structType.name)
-	b.WriteString("): void {\n")
+	b.WriteString("): this {\n")
 	for _, field := range structType.fields {
 		b.WriteString("\t\t")
 		switch {
@@ -476,6 +476,12 @@ func renderStructAssign(b *strings.Builder, structType *loweredStruct, runtimeOw
 			b.WriteString(field.name)
 			b.WriteString(" = source.")
 			b.WriteString(field.name)
+		case field.directClone:
+			b.WriteString("this.")
+			b.WriteString(field.name)
+			b.WriteString(".__goscriptAssign(source.")
+			b.WriteString(field.name)
+			b.WriteString(")")
 		case field.structValue:
 			b.WriteString(runtimeOwner.QualifiedHelper(RuntimeHelperAssignStruct))
 			b.WriteString("(this.")
@@ -498,7 +504,7 @@ func renderStructAssign(b *strings.Builder, structType *loweredStruct, runtimeOw
 		}
 		b.WriteString("\n")
 	}
-	b.WriteString("\t}\n")
+	b.WriteString("\t\treturn this\n\t}\n")
 }
 
 // renderStruct emits field storage, value-copy operations, methods, and metadata.
