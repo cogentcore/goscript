@@ -720,6 +720,18 @@ function decodeTarget(data: unknown): decodedTarget | null {
     }
     return null
   }
+
+  // A struct, or a pointer to one, is the struct object itself, described by
+  // the type of its class.
+  const structInfo = $.structValueTypeInfo(value)
+  if (structInfo !== undefined) {
+    const shape = shapeFromType(structInfo)
+    return shape !== null && shape.tag === 'struct' ?
+        { kind: null, shape, value, settable: null }
+      : null
+  }
+
+  // Byte and bool slices are encoded as their elements.
   if (value instanceof Uint8Array) {
     return { kind: '[]uint8', value, settable: null }
   }
@@ -901,8 +913,14 @@ function shapeFromType(info: $.TypeInfo | string | undefined): binShape | null {
       return { tag: 'complex', elem: 'float64' }
     }
     const kind = fixedKindFromType(info)
-    return kind !== null && !kind.startsWith('[]') ?
-        { tag: 'scalar', kind }
+    if (kind !== null) {
+      return !kind.startsWith('[]') ? { tag: 'scalar', kind } : null
+    }
+
+    // A named struct type is described by its registered type.
+    const named = $.resolveTypeInfo(info)
+    return named !== undefined && named.kind === $.TypeKind.Struct ?
+        shapeFromType(named)
       : null
   }
   switch (info.kind) {
@@ -1182,11 +1200,11 @@ function int64Result(value: bigint): bigint {
   return BigInt.asIntN(64, value)
 }
 
+// intN returns the low bits of value as a signed integer of that many bits,
+// up to 32. Shifting the sign bit to bit 31 and back extends it.
 function intN(value: number, bits: number): number {
-  const sign = 1 << (bits - 1)
-  const mask = bits === 32 ? 0xffffffff : (1 << bits) - 1
-  const normalized = value & mask
-  return (normalized & sign) !== 0 ? normalized - (1 << bits) : normalized
+  const shift = 32 - bits
+  return (value << shift) >> shift
 }
 
 function float32Bits(value: number): number {
