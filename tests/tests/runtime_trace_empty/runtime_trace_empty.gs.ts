@@ -2,14 +2,9 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as fmt from "@goscript/fmt/index.js"
-
 import * as trace from "@goscript/runtime/trace/index.js"
-
 import type * as io from "@goscript/io/index.js"
-import "@goscript/fmt/index.js"
-import "@goscript/runtime/trace/index.js"
 
 export class byteSink {
 	public get data(): $.Slice<number> {
