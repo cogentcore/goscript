@@ -8,50 +8,25 @@ import * as io from "@goscript/io/index.js"
 import * as utf8 from "@goscript/unicode/utf8/index.js"
 
 export class Reader {
-	public get s(): $.Bytes {
-		return this._fields.s
-	}
-	public set s(value: $.Bytes) {
-		this._fields.s = value
-	}
+	public declare s: $.Bytes
 
 	// current reading index
-	public get i(): number {
-		return this._fields.i
-	}
-	public set i(value: number) {
-		this._fields.i = value
-	}
+	public declare i: number
 
 	// index of previous rune; or < 0
-	public get prevRune(): number {
-		return this._fields.prevRune
-	}
-	public set prevRune(value: number) {
-		this._fields.prevRune = value
-	}
-
-	public _fields: {
-		s: $.Bytes;
-		i: number;
-		prevRune: number;
-	}
+	public declare prevRune: number
 
 	constructor(init?: Partial<{i?: number, prevRune?: number, s?: $.Bytes}>) {
-		this._fields = {
-			s: init?.s ?? new Uint8Array(0),
-			i: init?.i ?? 0,
-			prevRune: init?.prevRune ?? 0
-		}
+		this.s = init?.s ?? new Uint8Array(0)
+		this.i = init?.i ?? 0
+		this.prevRune = init?.prevRune ?? 0
 	}
 
 	public clone(): Reader {
 		const cloned = new Reader()
-		cloned._fields = {
-			s: this._fields.s,
-			i: this._fields.i,
-			prevRune: this._fields.prevRune
-		}
+		cloned.s = this.s
+		cloned.i = this.i
+		cloned.prevRune = this.prevRune
 		return cloned
 	}
 

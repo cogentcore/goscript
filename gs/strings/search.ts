@@ -8,12 +8,7 @@ function max(a: number, b: number): number {
 
 export class stringFinder {
   // pattern is the string that we are searching for in the text.
-  public get pattern(): string {
-    return this._fields.pattern
-  }
-  public set pattern(value: string) {
-    this._fields.pattern = value
-  }
+  declare public pattern: string
 
   // badCharSkip[b] contains the distance between the last byte of pattern
   // and the rightmost occurrence of b in pattern. If b is not in pattern,
@@ -22,12 +17,7 @@ export class stringFinder {
   // Whenever a mismatch is found with byte b in the text, we can safely
   // shift the matching frame at least badCharSkip[b] until the next time
   // the matching char could be in alignment.
-  public get badCharSkip(): number[] {
-    return this._fields.badCharSkip
-  }
-  public set badCharSkip(value: number[]) {
-    this._fields.badCharSkip = value
-  }
+  declare public badCharSkip: number[]
 
   // goodSuffixSkip[i] defines how far we can shift the matching frame given
   // that the suffix pattern[i+1:] matches, but the byte pattern[i] does
@@ -49,18 +39,7 @@ export class stringFinder {
   // suffix "xxabc" is not found elsewhere in the pattern. However, its
   // rightmost "abc" (at position 6) is a prefix of the whole pattern, so
   // goodSuffixSkip[3] == shift+len(suffix) == 6+5 == 11.
-  public get goodSuffixSkip(): $.Slice<number> {
-    return this._fields.goodSuffixSkip
-  }
-  public set goodSuffixSkip(value: $.Slice<number>) {
-    this._fields.goodSuffixSkip = value
-  }
-
-  public _fields: {
-    pattern: string
-    badCharSkip: number[]
-    goodSuffixSkip: $.Slice<number>
-  }
+  declare public goodSuffixSkip: $.Slice<number>
 
   constructor(
     init?: Partial<{
@@ -69,20 +48,16 @@ export class stringFinder {
       pattern?: string
     }>,
   ) {
-    this._fields = {
-      pattern: init?.pattern ?? '',
-      badCharSkip: init?.badCharSkip ?? new Array(256).fill(0),
-      goodSuffixSkip: init?.goodSuffixSkip ?? null,
-    }
+    this.pattern = init?.pattern ?? ''
+    this.badCharSkip = init?.badCharSkip ?? new Array(256).fill(0)
+    this.goodSuffixSkip = init?.goodSuffixSkip ?? null
   }
 
   public clone(): stringFinder {
     const cloned = new stringFinder()
-    cloned._fields = {
-      pattern: this._fields.pattern,
-      badCharSkip: this._fields.badCharSkip,
-      goodSuffixSkip: this._fields.goodSuffixSkip,
-    }
+    cloned.pattern = this.pattern
+    cloned.badCharSkip = this.badCharSkip
+    cloned.goodSuffixSkip = this.goodSuffixSkip
     return cloned
   }
 

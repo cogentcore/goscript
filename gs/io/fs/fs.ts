@@ -509,48 +509,23 @@ export function fileModeType(mode: FileMode): FileMode {
 }
 
 export class PathError {
-  public get Op(): string {
-    return this._fields.Op
-  }
-  public set Op(value: string) {
-    this._fields.Op = value
-  }
+  declare public Op: string
 
-  public get Path(): string {
-    return this._fields.Path
-  }
-  public set Path(value: string) {
-    this._fields.Path = value
-  }
+  declare public Path: string
 
-  public get Err(): $.GoError {
-    return this._fields.Err
-  }
-  public set Err(value: $.GoError) {
-    this._fields.Err = value
-  }
-
-  public _fields: {
-    Op: string
-    Path: string
-    Err: $.GoError
-  }
+  declare public Err: $.GoError
 
   constructor(init?: Partial<{ Err?: $.GoError; Op?: string; Path?: string }>) {
-    this._fields = {
-      Op: init?.Op ?? '',
-      Path: init?.Path ?? '',
-      Err: init?.Err ?? null,
-    }
+    this.Op = init?.Op ?? ''
+    this.Path = init?.Path ?? ''
+    this.Err = init?.Err ?? null
   }
 
   public clone(): PathError {
     const cloned = new PathError()
-    cloned._fields = {
-      Op: this._fields.Op,
-      Path: this._fields.Path,
-      Err: this._fields.Err,
-    }
+    cloned.Op = this.Op
+    cloned.Path = this.Path
+    cloned.Err = this.Err
     return cloned
   }
 
@@ -558,7 +533,7 @@ export class PathError {
   // interpolating a possible Promise into the text.
   public Error(): string | PromiseLike<string> {
     const e = this
-    const inner = e!._fields.Err!.Error()
+    const inner = e!.Err!.Error()
     if (typeof inner === 'string') {
       return e!.Op + ' ' + e!.Path + ': ' + inner
     }

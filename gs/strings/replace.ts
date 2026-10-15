@@ -6,32 +6,11 @@ import * as io from '@goscript/io/index.js'
 
 export class Replacer {
   // guards buildOnce method
-  public get built(): boolean {
-    return this._fields.built
-  }
-  public set built(value: boolean) {
-    this._fields.built = value
-  }
+  declare public built: boolean
 
-  public get r(): replacer {
-    return this._fields.r
-  }
-  public set r(value: replacer) {
-    this._fields.r = value
-  }
+  declare public r: replacer
 
-  public get oldnew(): $.Slice<string> {
-    return this._fields.oldnew
-  }
-  public set oldnew(value: $.Slice<string>) {
-    this._fields.oldnew = value
-  }
-
-  public _fields: {
-    built: boolean
-    r: replacer
-    oldnew: $.Slice<string>
-  }
+  declare public oldnew: $.Slice<string>
 
   constructor(
     init?: Partial<{
@@ -40,20 +19,16 @@ export class Replacer {
       r?: replacer
     }>,
   ) {
-    this._fields = {
-      built: init?.built ?? false,
-      r: init?.r ?? null,
-      oldnew: init?.oldnew ?? null,
-    }
+    this.built = init?.built ?? false
+    this.r = init?.r ?? null
+    this.oldnew = init?.oldnew ?? null
   }
 
   public clone(): Replacer {
     const cloned = new Replacer()
-    cloned._fields = {
-      built: this._fields.built,
-      r: this._fields.r,
-      oldnew: this._fields.oldnew,
-    }
+    cloned.built = this.built
+    cloned.r = this.r
+    cloned.oldnew = this.oldnew
     return cloned
   }
 
@@ -283,41 +258,21 @@ export function NewReplacer(...oldnew: string[]): Replacer | null {
 class trieNode {
   // value is the value of the trie node's key/value pair. It is empty if
   // this node is not a complete key.
-  public get value(): string {
-    return this._fields.value
-  }
-  public set value(value: string) {
-    this._fields.value = value
-  }
+  declare public value: string
 
   // priority is the priority (higher is more important) of the trie node's
   // key/value pair; keys are not necessarily matched shortest- or longest-
   // first. Priority is positive if this node is a complete key, and zero
   // otherwise. In the example above, positive/zero priorities are marked
   // with a trailing "+" or "-".
-  public get priority(): number {
-    return this._fields.priority
-  }
-  public set priority(value: number) {
-    this._fields.priority = value
-  }
+  declare public priority: number
 
   // prefix is the difference in keys between this trie node and the next.
   // In the example above, node n4 has prefix "cbc" and n4's next node is n5.
   // Node n5 has no children and so has zero prefix, next and table fields.
-  public get prefix(): string {
-    return this._fields.prefix
-  }
-  public set prefix(value: string) {
-    this._fields.prefix = value
-  }
+  declare public prefix: string
 
-  public get next(): trieNode | null {
-    return this._fields.next
-  }
-  public set next(value: trieNode | null) {
-    this._fields.next = value
-  }
+  declare public next: trieNode | null
 
   // table is a lookup table indexed by the next byte in the key, after
   // remapping that byte through genericReplacer.mapping to create a dense
@@ -326,20 +281,7 @@ class trieNode {
   // genericReplacer.tableSize will be 5. Node n0's table will be
   // []*trieNode{ 0:n1, 1:n4, 3:n6 }, where the 0, 1 and 3 are the remapped
   // 'a', 'b' and 'x'.
-  public get table(): $.Slice<trieNode | null> {
-    return this._fields.table
-  }
-  public set table(value: $.Slice<trieNode | null>) {
-    this._fields.table = value
-  }
-
-  public _fields: {
-    value: string
-    priority: number
-    prefix: string
-    next: trieNode | null
-    table: $.Slice<trieNode | null>
-  }
+  declare public table: $.Slice<trieNode | null>
 
   constructor(
     init?: Partial<{
@@ -350,24 +292,20 @@ class trieNode {
       value?: string
     }>,
   ) {
-    this._fields = {
-      value: init?.value ?? '',
-      priority: init?.priority ?? 0,
-      prefix: init?.prefix ?? '',
-      next: init?.next ?? null,
-      table: init?.table ?? null,
-    }
+    this.value = init?.value ?? ''
+    this.priority = init?.priority ?? 0
+    this.prefix = init?.prefix ?? ''
+    this.next = init?.next ?? null
+    this.table = init?.table ?? null
   }
 
   public clone(): trieNode {
     const cloned = new trieNode()
-    cloned._fields = {
-      value: this._fields.value,
-      priority: this._fields.priority,
-      prefix: this._fields.prefix,
-      next: this._fields.next,
-      table: this._fields.table,
-    }
+    cloned.value = this.value
+    cloned.priority = this.priority
+    cloned.prefix = this.prefix
+    cloned.next = this.next
+    cloned.table = this.table
     return cloned
   }
 
@@ -455,65 +393,40 @@ class trieNode {
 }
 
 class genericReplacer {
-  public get root(): trieNode {
-    return this._fields.root
-  }
-  public set root(value: trieNode) {
-    this._fields.root = value
-  }
+  declare public root: trieNode
 
   // tableSize is the size of a trie node's lookup table. It is the number
   // of unique key bytes.
-  public get tableSize(): number {
-    return this._fields.tableSize
-  }
-  public set tableSize(value: number) {
-    this._fields.tableSize = value
-  }
+  declare public tableSize: number
 
   // mapping maps from key bytes to a dense index for trieNode.table.
-  public get mapping(): number[] {
-    return this._fields.mapping
-  }
-  public set mapping(value: number[]) {
-    this._fields.mapping = value
-  }
-
-  public _fields: {
-    root: trieNode
-    tableSize: number
-    mapping: number[]
-  }
+  declare public mapping: number[]
 
   constructor(
     init?: Partial<{ mapping?: number[]; root?: trieNode; tableSize?: number }>,
   ) {
-    this._fields = {
-      root: init?.root?.clone() ?? new trieNode(),
-      tableSize: init?.tableSize ?? 0,
-      mapping: init?.mapping ?? [
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-      ],
-    }
+    this.root = init?.root?.clone() ?? new trieNode()
+    this.tableSize = init?.tableSize ?? 0
+    this.mapping = init?.mapping ?? [
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0,
+    ]
   }
 
   public clone(): genericReplacer {
     const cloned = new genericReplacer()
-    cloned._fields = {
-      root: this._fields.root?.clone() ?? null,
-      tableSize: this._fields.tableSize,
-      mapping: this._fields.mapping,
-    }
+    cloned.root = this.root?.clone() ?? null
+    cloned.tableSize = this.tableSize
+    cloned.mapping = this.mapping
     return cloned
   }
 
@@ -698,21 +611,10 @@ function makeGenericReplacer(oldnew: $.Slice<string>): genericReplacer | null {
 }
 
 class stringWriter {
-  public get w(): io.Writer {
-    return this._fields.w
-  }
-  public set w(value: io.Writer) {
-    this._fields.w = value
-  }
-
-  public _fields: {
-    w: io.Writer
-  }
+  declare public w: io.Writer
 
   constructor(w: io.Writer) {
-    this._fields = {
-      w: w,
-    }
+    this.w = w
   }
 
   public WriteString(s: string): io.Awaitable<io.IOResult> {
@@ -733,41 +635,22 @@ function getStringWriter(w: io.Writer): io.StringWriter {
 }
 
 class singleStringReplacer {
-  public get finder(): stringFinder | null {
-    return this._fields.finder
-  }
-  public set finder(value: stringFinder | null) {
-    this._fields.finder = value
-  }
+  declare public finder: stringFinder | null
 
   // value is the new string that replaces that pattern when it's found.
-  public get value(): string {
-    return this._fields.value
-  }
-  public set value(value: string) {
-    this._fields.value = value
-  }
-
-  public _fields: {
-    finder: stringFinder | null
-    value: string
-  }
+  declare public value: string
 
   constructor(
     init?: Partial<{ finder?: stringFinder | null; value?: string }>,
   ) {
-    this._fields = {
-      finder: init?.finder ?? null,
-      value: init?.value ?? '',
-    }
+    this.finder = init?.finder ?? null
+    this.value = init?.value ?? ''
   }
 
   public clone(): singleStringReplacer {
     const cloned = new singleStringReplacer()
-    cloned._fields = {
-      finder: this._fields.finder,
-      value: this._fields.value,
-    }
+    cloned.finder = this.finder
+    cloned.value = this.value
     return cloned
   }
 
@@ -843,27 +726,12 @@ function makeSingleStringReplacer(
 class byteStringReplacer {
   // replacements contains replacement byte slices indexed by old byte.
   // A nil []byte means that the old byte should not be replaced.
-  public get replacements(): Uint8Array[] {
-    return this._fields.replacements
-  }
-  public set replacements(value: Uint8Array[]) {
-    this._fields.replacements = value
-  }
+  declare public replacements: Uint8Array[]
 
   // toReplace keeps a list of bytes to replace. Depending on length of toReplace
   // and length of target string it may be faster to use Count, or a plain loop.
   // We store single byte as a string, because Count takes a string.
-  public get toReplace(): $.Slice<string> {
-    return this._fields.toReplace
-  }
-  public set toReplace(value: $.Slice<string>) {
-    this._fields.toReplace = value
-  }
-
-  public _fields: {
-    replacements: Uint8Array[]
-    toReplace: $.Slice<string>
-  }
+  declare public toReplace: $.Slice<string>
 
   constructor(
     init?: Partial<{
@@ -871,148 +739,144 @@ class byteStringReplacer {
       toReplace?: $.Slice<string>
     }>,
   ) {
-    this._fields = {
-      replacements: init?.replacements ?? [
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-        new Uint8Array(0),
-      ],
-      toReplace: init?.toReplace ?? null,
-    }
+    this.replacements = init?.replacements ?? [
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+      new Uint8Array(0),
+    ]
+    this.toReplace = init?.toReplace ?? null
   }
 
   public clone(): byteStringReplacer {
     const cloned = new byteStringReplacer()
-    cloned._fields = {
-      replacements: this._fields.replacements,
-      toReplace: this._fields.toReplace,
-    }
+    cloned.replacements = this.replacements
+    cloned.toReplace = this.toReplace
     return cloned
   }
 

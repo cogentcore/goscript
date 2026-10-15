@@ -3,6 +3,8 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
+$.registerTypePackagePath("net/url", ["url.encoding"])
+
 export type encoding = number
 
 export const encodePath: encoding = 1
