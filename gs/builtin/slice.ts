@@ -579,14 +579,12 @@ export function sliceToArrayPointer<T>(
  * isComplexSlice identifies slices with explicit backing-window metadata.
  */
 function isComplexSlice<T>(slice: unknown): slice is SliceProxy<T> {
-  // A window object is one, tested first without reading __meta__ (see
-  // sliceLen), and sliceMeta reads the window of a proxy without its has
-  // trap.
+  // sliceMeta reads the window of a proxy without its has trap. Testing
+  // instanceof GoSlice first would slow down every test of a plain array.
   return (
-    slice instanceof GoSlice ||
-    (slice !== null &&
-      typeof slice === 'object' &&
-      sliceMeta(slice) !== undefined)
+    slice !== null &&
+    typeof slice === 'object' &&
+    sliceMeta(slice) !== undefined
   )
 }
 
