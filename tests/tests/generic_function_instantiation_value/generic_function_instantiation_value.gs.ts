@@ -9,15 +9,13 @@ export function identity(__typeArgs: $.GenericTypeArgs | undefined, value: any):
 
 export async function main(): globalThis.Promise<void> {
 	let fn: ((value: number) => number | globalThis.Promise<number>) | null = $.functionValue((value: any): any => identity(__goscriptStatic0(), value), ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Interface, methods: [] }], results: [{ kind: $.TypeKind.Interface, methods: [] }] } as $.FunctionTypeInfo))
-	await $.println((__goscriptAwait = fn!(7), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println((fn!(7) as number))
 }
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
 	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }})
 }
-
-var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

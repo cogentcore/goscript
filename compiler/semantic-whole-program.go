@@ -1,8 +1,11 @@
 package compiler
 
 import (
+	"go/token"
 	"go/types"
+	"maps"
 	"slices"
+	"strings"
 )
 
 // Whole-program interface analysis.
@@ -346,4 +349,179 @@ func interfaceKnown(named *types.Named, closed map[*types.Named]bool) bool {
 	}
 	iface, _ := named.Underlying().(*types.Interface)
 	return interfaceIsPackageSealed(iface) && !namedTypeHasParams(named)
+}
+
+// Function values from override packages.
+//
+// An override is hand-written TypeScript, so the function values it hands to
+// compiled code have no compiled body: its function results, the func-typed
+// fields of its types and variables, and the callbacks it passes to Go
+// functions it takes. Such a value suspends only by calling the Go functions
+// it was given: its own function arguments, and those of the override
+// function or method that produced it. sync.OnceFunc's result calls its
+// argument, and an iterator from slices.Values calls its yield callback.
+// Each value is a node that calls through the classes of those parameters.
+
+// overrideValueWalker finds the function values override packages produce.
+type overrideValueWalker struct {
+	model    *SemanticModel
+	pkgPaths map[string]bool
+	values   []funcValue
+	// nodes holds the node of each value shape and dependency set.
+	nodes map[string]*semanticFunction
+	seen  map[overrideValueSeen]bool
+}
+
+// overrideValueSeen is a type walked with a polarity.
+type overrideValueSeen struct {
+	typ     types.Type
+	outward bool
+}
+
+// addOverrideFuncValues adds a node for each function value override
+// packages produce and returns the values.
+func addOverrideFuncValues(model *SemanticModel, overridePkgs []*types.Package) []funcValue {
+	// The override packages are boundary packages.
+	w := &overrideValueWalker{
+		model:    model,
+		pkgPaths: make(map[string]bool, len(overridePkgs)),
+		nodes:    make(map[string]*semanticFunction),
+		seen:     make(map[overrideValueSeen]bool),
+	}
+	for _, pkg := range overridePkgs {
+		w.pkgPaths[pkg.Path()] = true
+	}
+
+	// Walk the exported API of each package.
+	for _, pkg := range overridePkgs {
+		for _, name := range pkg.Scope().Names() {
+			if obj := pkg.Scope().Lookup(name); obj.Exported() {
+				w.walkObject(obj)
+			}
+		}
+	}
+	return w.values
+}
+
+// walkObject walks the values an exported object can produce.
+func (w *overrideValueWalker) walkObject(obj types.Object) {
+	switch typed := obj.(type) {
+	case *types.Func:
+		signature, _ := typed.Type().(*types.Signature)
+		w.walkSignatureParts(signature, signature, true)
+	case *types.Var:
+		w.walk(typed.Type(), true, nil)
+	case *types.TypeName:
+		w.walk(typed.Type(), true, nil)
+	}
+}
+
+// walkSignatureParts walks the parameters and results of a function called
+// in the given direction: compiled code calls an outward function, so its
+// parameters flow in and its results flow out, and the reverse for an inward
+// one. producer is the override function whose arguments a value may call.
+func (w *overrideValueWalker) walkSignatureParts(signature, producer *types.Signature, outward bool) {
+	if signature == nil {
+		return
+	}
+	for v := range signature.Params().Variables() {
+		w.walk(v.Type(), !outward, nil)
+	}
+	for v := range signature.Results().Variables() {
+		w.walk(v.Type(), outward, producer)
+	}
+}
+
+// walk walks typ, which flows to compiled code when outward.
+func (w *overrideValueWalker) walk(typ types.Type, outward bool, producer *types.Signature) {
+	// Each type is walked once per direction.
+	typ = types.Unalias(typ)
+	key := overrideValueSeen{typ: typ, outward: outward}
+	if typ == nil || w.seen[key] {
+		return
+	}
+	w.seen[key] = true
+
+	// A function flowing out is a value; its own parts flow by its direction.
+	switch typed := typ.(type) {
+	case *types.Signature:
+		if outward {
+			w.addValue(typed, producer)
+		}
+		w.walkSignatureParts(typed, producer, outward)
+	case *types.Named:
+		w.walkNamed(typed, outward, producer)
+	case *types.Interface:
+		for method := range typed.Methods() {
+			signature, _ := method.Type().(*types.Signature)
+			w.walkSignatureParts(signature, signature, outward)
+		}
+	case *types.Struct:
+		for field := range typed.Fields() {
+			if field.Exported() {
+				w.walk(field.Type(), outward, producer)
+			}
+		}
+	case *types.Map:
+		w.walk(typed.Key(), outward, producer)
+		w.walk(typed.Elem(), outward, producer)
+	case interface{ Elem() types.Type }:
+		w.walk(typed.Elem(), outward, producer)
+	}
+}
+
+// walkNamed walks a named type's underlying type and, for a type of an
+// override package, the methods compiled code calls on it.
+func (w *overrideValueWalker) walkNamed(named *types.Named, outward bool, producer *types.Signature) {
+	w.walk(named.Underlying(), outward, producer)
+	if named.Obj().Pkg() == nil || !w.pkgPaths[named.Obj().Pkg().Path()] {
+		return
+	}
+	for method := range named.Methods() {
+		if method.Exported() {
+			signature, _ := method.Type().(*types.Signature)
+			w.walkSignatureParts(signature, signature, true)
+		}
+	}
+}
+
+// addValue adds a value of signature produced by producer: a node calling
+// the classes of the function parameters of both.
+//
+// A producer parameter of the value's own type is left out. The function
+// passed for it is a value of that type, so the classes that may reach the
+// produced value already reach it: sync.OnceFunc's result is async exactly
+// where its argument makes calls of its type async. A value that calls
+// nothing else is never async by itself and is not added.
+func (w *overrideValueWalker) addValue(signature, producer *types.Signature) {
+	// The node calls through the classes of the function parameters.
+	shapes := make(map[string]bool)
+	for _, sig := range []*types.Signature{signature, producer} {
+		if sig == nil {
+			continue
+		}
+		for v := range sig.Params().Variables() {
+			shape := funcValueShape(v.Type())
+			if shape != "" && (sig == signature || !types.Identical(v.Type().Underlying(), signature)) {
+				shapes[shape] = true
+			}
+		}
+	}
+	if len(shapes) == 0 {
+		return
+	}
+
+	// Values with the same shape and dependencies share a node.
+	shape := funcValueShape(signature)
+	nodeKey := shape + "|" + strings.Join(slices.Sorted(maps.Keys(shapes)), "|")
+	if w.nodes[nodeKey] != nil {
+		return
+	}
+	node := newSyntheticNode(token.NoPos, nil, funcValueNodeName)
+	if len(shapes) != 0 {
+		node.valueCalls = shapes
+	}
+	w.nodes[nodeKey] = node
+	w.model.valueNodes[node.function] = node
+	w.values = append(w.values, funcValue{shape: shape, key: node.function})
 }

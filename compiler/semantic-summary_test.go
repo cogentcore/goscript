@@ -10,8 +10,19 @@ import (
 
 // TestBodySummaryRoundTrip checks that packages built from their body
 // summaries after a check without bodies give the same whole-program facts as
-// packages built from their bodies.
+// packages built from their bodies, in a library build and in a whole program,
+// where function values reach only the classes of calls they match.
 func TestBodySummaryRoundTrip(t *testing.T) {
+	for _, wholeProgram := range []bool{false, true} {
+		t.Run(map[bool]string{false: "library", true: "program"}[wholeProgram], func(t *testing.T) {
+			testBodySummaryRoundTrip(t, wholeProgram)
+		})
+	}
+}
+
+// testBodySummaryRoundTrip compares the facts of a build from bodies and a
+// build from summaries.
+func testBodySummaryRoundTrip(t *testing.T, wholeProgram bool) {
 	ctx := context.Background()
 	service := NewCompileService()
 	req := service.RequestOwner().NewRequest(Config{
@@ -28,7 +39,7 @@ func TestBodySummaryRoundTrip(t *testing.T) {
 			summarize[node.PkgPath] = true
 		}
 	}
-	full, diagnostics := service.semanticOwner.Build(ctx, graph, SemanticBuildOptions{Summarize: summarize})
+	full, diagnostics := service.semanticOwner.Build(ctx, graph, SemanticBuildOptions{Summarize: summarize, WholeProgram: wholeProgram})
 	if diagnosticsHaveErrors(diagnostics) {
 		t.Fatalf("full build: %v", diagnostics)
 	}
@@ -46,7 +57,7 @@ func TestBodySummaryRoundTrip(t *testing.T) {
 	if diagnostics := service.graphOwner.Check(ctx, graph, bodiless); diagnosticsHaveErrors(diagnostics) {
 		t.Fatalf("check without bodies: %v", diagnostics)
 	}
-	applied, diagnostics := service.semanticOwner.Build(ctx, graph, SemanticBuildOptions{Summaries: summaries})
+	applied, diagnostics := service.semanticOwner.Build(ctx, graph, SemanticBuildOptions{Summaries: summaries, WholeProgram: wholeProgram})
 	if diagnosticsHaveErrors(diagnostics) {
 		t.Fatalf("summary build: %v", diagnostics)
 	}
@@ -79,6 +90,9 @@ func bodySummaryFacts(model *SemanticModel) map[string]string {
 		}
 		for obj := range semPkg.lazyVars {
 			lines = append(lines, "lazy "+objectKey(fset, obj))
+		}
+		for _, value := range semPkg.funcValues {
+			lines = append(lines, "func-value "+value.shape+" "+objectKey(fset, value.key))
 		}
 		for _, semFn := range semPkg.functions {
 			for v := range semFn.packageVars {

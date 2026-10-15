@@ -4,7 +4,7 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export type adder = {
-	Add(_p0: number): number | globalThis.Promise<number>
+	Add(_p0: number): number
 }
 
 $.registerInterfaceType(
@@ -139,8 +139,8 @@ export function namedInt_Add(v: namedInt, n: number): number {
 	return $.int(v) + n
 }
 
-export async function namedFunc_Add(v: namedFunc | null, n: number): globalThis.Promise<number> {
-	return (__goscriptAwait = v!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) + n
+export function namedFunc_Add(v: namedFunc | null, n: number): number {
+	return (v!() as number) + n
 }
 
 export function namedChan_Add(v: namedChan, n: number): number {

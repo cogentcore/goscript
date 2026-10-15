@@ -44,13 +44,13 @@ export class State {
 		target.index = values.index
 	}
 
-	public async Process(): globalThis.Promise<void> {
+	public Process(): void {
 		const s: State | $.VarRef<State> | null = this;
 		// This should generate:
 		// const s = this
 		// ;(getProcessor())!(s)
 		// The semicolon is important to prevent: const s = this(getProcessor())!(s)
-		void (__goscriptAwait = getProcessor()!(s), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+		getProcessor()!(s)
 	}
 
 	public markIndex(): void {
@@ -77,15 +77,13 @@ export function getProcessor(): ((_p0: State | $.VarRef<State> | null) => void) 
 export async function main(): globalThis.Promise<void> {
 	let state = new State()
 	let state$: State = state == null ? $.pointerTarget<State>(state) : (state as any).__isVarRef === true ? (state as any).value : (state as any).__goValue === undefined ? (state as any) : $.pointerTarget<State>(state)
-	await (state !== null && (state as any).__isVarRef !== true && (state as any).__goValue === undefined ? ((state as any) as State).Process() : State.prototype.Process.call(state))
+	void (state !== null && (state as any).__isVarRef !== true && (state as any).__goValue === undefined ? ((state as any) as State).Process() : State.prototype.Process.call(state))
 	await $.println("value:", (state$ as State).value)
 	let index = $.varRef(7);
 	;(state$ as State).index = index
 	void (state !== null && (state as any).__isVarRef !== true && (state as any).__goValue === undefined ? ((state as any) as State).markIndex() : State.prototype.markIndex.call(state))
 	await $.println("index:", index.value)
 }
-
-var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

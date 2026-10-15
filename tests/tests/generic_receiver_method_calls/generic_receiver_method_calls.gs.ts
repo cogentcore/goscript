@@ -112,9 +112,9 @@ export function promoted(__typeArgs: $.GenericTypeArgs | undefined, h: holder | 
 	return ($.pointerValue<holder>(h).box.Value({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }}) as any)
 }
 
-export async function methodExpression(__typeArgs: $.GenericTypeArgs | undefined, b: box | $.VarRef<box> | null): globalThis.Promise<any> {
+export function methodExpression(__typeArgs: $.GenericTypeArgs | undefined, b: box | $.VarRef<box> | null): any {
 	let value: ((_p0: box | $.VarRef<box> | null) => any | globalThis.Promise<any>) | null = $.functionValue((b: box | $.VarRef<box> | null): any => $.pointerValue<box>(b).Value({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }}), ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.pointerType("main.box")], results: [{ kind: $.TypeKind.Interface, methods: [] }] } as $.FunctionTypeInfo))
-	return value!(b)
+	return (value!(b) as any)
 }
 
 export async function main(): globalThis.Promise<void> {
@@ -122,7 +122,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("direct:", direct(__goscriptStatic0(), b))
 	await $.println("interface:", await throughInterface(__goscriptStatic0(), $.namedValueInterfaceValue<reader | null>(b, "*main.box", __goscriptStatic1(), __goscriptStatic2(), __goscriptStatic3())))
 	await $.println("promoted:", promoted(__goscriptStatic0(), new holder({box: $.markAsStructValue($.cloneStructValue($.pointerValue<box>(b)))})))
-	await $.println("expression:", await methodExpression(__goscriptStatic0(), b))
+	await $.println("expression:", methodExpression(__goscriptStatic0(), b))
 }
 
 var __goscriptStatic0$value: any

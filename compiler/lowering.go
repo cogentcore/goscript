@@ -9553,8 +9553,9 @@ func (o *LoweringOwner) lowerFuncLitArrowWithAsyncCalls(
 	bodyCtx := ctx.withSignature(signature).withAsyncFunction(false).withDeferState(deferState).withoutRangeBranch()
 	var nested []string
 	bodyCtx.nestedFunctions = &nested
-	asyncCompatibleParams := funcLiteralNeedsAsyncFunctionParamCalls(signature)
-	if allowAsyncCalls && (asyncCompatibleParams || funcLiteralUsesAwaitableCall(ctx.semPkg.source, lit)) {
+	litAsync := allowAsyncCalls && (ctx.model == nil || ctx.model.funcLitAsync(lit.Pos()))
+	asyncCompatibleParams := litAsync && funcLiteralNeedsAsyncFunctionParamCalls(signature)
+	if litAsync {
 		bodyCtx = bodyCtx.withAsyncFunction(true)
 	}
 	var params []loweredParam
@@ -9577,8 +9578,11 @@ func (o *LoweringOwner) lowerFuncLitArrowWithAsyncCalls(
 	renderStmts(&rendered, paramBindings, 1)
 	renderNamedResults(&rendered, o.lowerNamedResults(ctx, signature), 1)
 	renderBodyWithDefer(&rendered, litFn, 1)
-	// The literal is async when its own body awaits.
-	async := bodyCtx.asyncFunction || stmtsContainAwait(body, nested) || deferState.async
+	// The analysis decides whether the literal is async. Its lowered text
+	// holds the awaits of its own body, apart from the literals nested in it,
+	// and only a literal lowered for a synchronous override callback consults
+	// it.
+	async := bodyCtx.asyncFunction || deferState.async || (!allowAsyncCalls && stmtsContainAwait(body, nested))
 	prefix := ""
 	if async {
 		prefix = "async "
@@ -16692,11 +16696,17 @@ func (o *LoweringOwner) callNeedsAwait(ctx lowerFileContext, fun ast.Expr) bool 
 	}
 	return o.functionAsync(ctx, called) ||
 		o.overrideCallNeedsAwait(ctx, fun) ||
-		(!ctx.protobufGeneratedSyncFunction && callUsesFunctionValue(pkg, fun)) ||
+		(!ctx.protobufGeneratedSyncFunction && callUsesFunctionValue(pkg, fun) && o.valueCallAsync(ctx, fun)) ||
 		(ctx.asyncFunction && callUsesInterfaceMethod(pkg, fun)) ||
 		// A package variable initializer can await, as package initialization
 		// is asynchronous, so it awaits a function variable that may suspend.
-		((ctx.asyncFunction || ctx.topLevel) && callUsesFunctionIdentifier(pkg, fun))
+		((ctx.asyncFunction || ctx.topLevel) && callUsesFunctionIdentifier(pkg, fun) && o.valueCallAsync(ctx, fun))
+}
+
+// valueCallAsync reports whether a call through the function value fun may
+// suspend: its class reaches an async function value.
+func (o *LoweringOwner) valueCallAsync(ctx lowerFileContext, fun ast.Expr) bool {
+	return ctx.model == nil || ctx.model.valueCallAsync(ctx.semPkg.source.TypesInfo.TypeOf(fun))
 }
 
 func callUsesInterfaceMethod(pkg *packages.Package, fun ast.Expr) bool {
@@ -16769,13 +16779,13 @@ func (o *LoweringOwner) callbackOverrideCallNeedsAwait(ctx lowerFileContext, cal
 	if ctx.semPkg == nil || ctx.semPkg.source == nil {
 		return false
 	}
-	ok, suspends, deps := callbackOverrideCallFacts(ctx.semPkg.source, o.overrideFacts(), call)
+	ok, deps, shapes := callbackOverrideCallFacts(ctx.semPkg.source, o.overrideFacts(), call, ctx.model.literalKey)
 	if !ok {
 		return false
 	}
-	return suspends || slices.ContainsFunc(deps, func(dep *types.Func) bool {
-		return o.functionAsync(ctx, dep)
-	})
+	return slices.ContainsFunc(deps, func(dep *types.Func) bool {
+		return dep == nil || o.functionAsync(ctx, dep)
+	}) || slices.ContainsFunc(shapes, ctx.model.shapeCallAsync)
 }
 
 // callExprNeedsAwait reports whether call may suspend, by its callee or by a
@@ -16805,10 +16815,21 @@ func (o *LoweringOwner) awaitCallIfNeeded(ctx lowerFileContext, call *ast.CallEx
 		return "await " + lowered
 	}
 
-	// A function variable in a synchronous literal must have returned a value.
+	// Only a call through a function value with results needs more.
 	pkg := ctx.semPkg.source
 	fun := call.Fun
-	if callUsesFunctionIdentifier(pkg, fun) && signatureForType(pkg.TypesInfo.TypeOf(fun)).Results().Len() > 0 {
+	signature := signatureForType(pkg.TypesInfo.TypeOf(fun))
+	if !callUsesFunctionValue(pkg, fun) && !callUsesFunctionIdentifier(pkg, fun) || signature.Results().Len() == 0 {
+		return lowered
+	}
+
+	// A function variable in a synchronous literal must have returned a
+	// value. A value whose class is sync returns one, but its TypeScript
+	// type admits a promise, so the result is asserted to its Go type.
+	if !o.valueCallAsync(ctx, fun) {
+		return "(" + lowered + " as " + o.tsSignatureResultFor(ctx, signature) + ")"
+	}
+	if callUsesFunctionIdentifier(pkg, fun) {
 		return o.runtimeOwner.QualifiedHelper(RuntimeHelperSyncResult) + "(" + lowered + ")"
 	}
 	return lowered

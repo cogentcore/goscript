@@ -8,11 +8,9 @@ export async function main(): globalThis.Promise<void> {
 	callbacks = $.appendOne(callbacks, $.functionValue((value: number): number => {
 		return value + 1
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo)), $.appendZeros.nil)
-	let value = (__goscriptAwait = $.arrayIndex(callbacks!, 0)!(2), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+	let value = ($.arrayIndex(callbacks!, 0)!(2) as number)
 	await $.println("value:", value)
 }
-
-var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

@@ -1,0 +1,413 @@
+package compiler
+
+import (
+	"go/ast"
+	"go/token"
+	"go/types"
+
+	"golang.org/x/tools/go/packages"
+)
+
+// Calls through function values.
+//
+// A call through a function value (a variable, field, parameter, element,
+// call result or type assertion of func type) may reach any function whose
+// value the program takes with an assignable type: a declared function or
+// method, a method value or expression, a function literal, or the yield
+// callback of a range-over-func loop. The analysis groups both sides by
+// shape (see funcValueShape). Each called shape is a class with a synthetic
+// key; a call through a value is a call of its class, and a class is async
+// when a matching value is.
+//
+// Function literals and the initializers of lazily initialized package
+// variables are nodes of the analysis too, with their own calls and async
+// causes. A literal is a value; an initializer makes the functions that read
+// its variable wait for it.
+
+// funcValue is a function value a package takes: shape is the shape of its
+// type, and key the function, interface method, literal node or loop node
+// whose async mark decides it.
+type funcValue struct {
+	shape string
+	key   *types.Func
+}
+
+// Names of the synthetic keys of the analysis nodes. They are not Go
+// identifiers, so they never collide with a declared function.
+const (
+	funcLitNodeName   = "func·lit"
+	lazyInitNodeName  = "init·"
+	funcValueNodeName = "func·value"
+)
+
+// newSyntheticNode returns a node of the analysis whose key is a new
+// synthetic function named name at pos.
+func newSyntheticNode(pos token.Pos, pkg *types.Package, name string) *semanticFunction {
+	signature := types.NewSignatureType(nil, nil, nil, nil, nil, false)
+	fn := types.NewFunc(pos, pkg, name, signature)
+	return &semanticFunction{
+		name:      name,
+		function:  fn,
+		signature: signature,
+		hasBody:   true,
+		calls:     make(map[*types.Func]bool),
+	}
+}
+
+// recordValueCall records that semFn calls through a value of shape.
+func recordValueCall(semFn *semanticFunction, shape string) {
+	if shape == "" {
+		return
+	}
+	if semFn.valueCalls == nil {
+		semFn.valueCalls = make(map[string]bool)
+	}
+	semFn.valueCalls[shape] = true
+}
+
+// funcFactsWalker collects the async facts of one package's code: the calls
+// and direct async causes of each declared function, function literal and
+// lazy initializer, and the function values the package takes.
+type funcFactsWalker struct {
+	model         *SemanticModel
+	semPkg        *semanticPackage
+	pkg           *packages.Package
+	overrideFacts *OverrideFacts
+	// callees holds the expressions in the callee position of a call, which
+	// call a function rather than take its value.
+	callees map[ast.Node]bool
+	// immediate holds the literals that are called where they are written.
+	immediate map[*ast.FuncLit]bool
+	// taken holds the values already recorded.
+	taken map[funcValue]bool
+}
+
+// collectFunctionFacts records the calls and direct async causes of the
+// package's declared functions, literals and lazy initializers, and the
+// function values it takes. Function bodies outside literals belong to the
+// enclosing node; an immediately called literal is also part of it.
+func collectFunctionFacts(
+	model *SemanticModel,
+	semPkg *semanticPackage,
+	pkg *packages.Package,
+	overrideFacts *OverrideFacts,
+) {
+	// The package's nodes and values start empty.
+	w := &funcFactsWalker{
+		model:         model,
+		semPkg:        semPkg,
+		pkg:           pkg,
+		overrideFacts: overrideFacts,
+		callees:       make(map[ast.Node]bool),
+		immediate:     make(map[*ast.FuncLit]bool),
+		taken:         make(map[funcValue]bool),
+	}
+	semPkg.funcLits = make(map[token.Pos]*semanticFunction)
+	semPkg.lazyInits = make(map[types.Object]*semanticFunction)
+	top := &semanticFunction{calls: make(map[*types.Func]bool)}
+
+	// Walk each declared body and each package variable initializer.
+	for _, file := range pkg.Syntax {
+		for _, decl := range file.Decls {
+			switch typed := decl.(type) {
+			case *ast.FuncDecl:
+				w.walkFuncDecl(typed)
+			case *ast.GenDecl:
+				w.walkVarDecl(top, typed)
+			}
+		}
+	}
+	semPkg.topValueCalls = top.valueCalls
+}
+
+// walkFuncDecl walks the body of a declared function.
+func (w *funcFactsWalker) walkFuncDecl(decl *ast.FuncDecl) {
+	fn, _ := w.pkg.TypesInfo.Defs[decl.Name].(*types.Func)
+	if semFn := w.model.functions[fn]; semFn != nil && decl.Body != nil {
+		w.walk(semFn, decl.Body)
+	}
+}
+
+// walkVarDecl walks the initializers of package variables. A lazily
+// initialized variable's initializer runs on its first read, so it walks
+// into the variable's node; any other runs at package initialization.
+func (w *funcFactsWalker) walkVarDecl(top *semanticFunction, decl *ast.GenDecl) {
+	if decl.Tok != token.VAR {
+		return
+	}
+	for _, spec := range decl.Specs {
+		valueSpec, _ := spec.(*ast.ValueSpec)
+		if valueSpec == nil {
+			continue
+		}
+		for idx, value := range valueSpec.Values {
+			// One value initializes its own name, or all names of a
+			// multi-value call.
+			names := valueSpec.Names
+			if len(valueSpec.Values) == len(names) {
+				names = names[idx : idx+1]
+			}
+			nodes := w.lazyInitNodes(names)
+			for _, node := range nodes {
+				w.walk(node, value)
+				if w.initializerCallsOtherPackage(value) {
+					markFunctionAsync(node)
+				}
+			}
+			if len(nodes) == 0 {
+				w.walk(top, value)
+			}
+		}
+	}
+}
+
+// lazyInitNodes returns the nodes of the lazily initialized variables among
+// names.
+func (w *funcFactsWalker) lazyInitNodes(names []*ast.Ident) []*semanticFunction {
+	var nodes []*semanticFunction
+	for _, name := range names {
+		obj := w.pkg.TypesInfo.Defs[name]
+		if obj == nil || !w.semPkg.lazyVars[obj] {
+			continue
+		}
+		node := w.semPkg.lazyInits[obj]
+		if node == nil {
+			node = newSyntheticNode(obj.Pos(), w.pkg.Types, lazyInitNodeName+obj.Name())
+			w.semPkg.lazyInits[obj] = node
+		}
+		nodes = append(nodes, node)
+	}
+	return nodes
+}
+
+// initializerCallsOtherPackage reports whether a package variable
+// initializer calls a function of another compiled package. Lowering awaits
+// such a call in a lazy initializer, as that package's initialization may
+// still be pending.
+func (w *funcFactsWalker) initializerCallsOtherPackage(expr ast.Expr) bool {
+	calls := false
+	ast.Inspect(expr, func(node ast.Node) bool {
+		// Literal bodies do not run during initialization.
+		if _, ok := node.(*ast.FuncLit); ok || calls {
+			return false
+		}
+
+		// A call of a function of another compiled package counts.
+		call, ok := node.(*ast.CallExpr)
+		if !ok {
+			return true
+		}
+		fn := calledFunction(w.pkg, call.Fun)
+		if fn != nil && fn.Pkg() != nil && fn.Pkg().Path() != w.semPkg.pkgPath {
+			calls = !w.overrideFacts.HasPackage(fn.Pkg().Path())
+		}
+		return !calls
+	})
+	return calls
+}
+
+// walk records the facts of root into node.
+func (w *funcFactsWalker) walk(node *semanticFunction, root ast.Node) {
+	ast.Inspect(root, func(n ast.Node) bool {
+		return w.visit(node, n)
+	})
+}
+
+// visit records the facts of one syntax node into node and reports whether
+// to walk its children.
+func (w *funcFactsWalker) visit(node *semanticFunction, n ast.Node) bool {
+	switch typed := n.(type) {
+	case *ast.FuncLit:
+		return w.visitFuncLit(typed)
+	case *ast.Ident:
+		w.visitIdent(node, typed)
+	case *ast.SelectorExpr:
+		w.visitSelector(node, typed)
+		return false
+	case *ast.SendStmt, *ast.SelectStmt:
+		markFunctionAsync(node)
+	case *ast.UnaryExpr:
+		if typed.Op == token.ARROW {
+			markFunctionAsync(node)
+		}
+	case *ast.RangeStmt:
+		w.visitRange(node, typed)
+	case *ast.CallExpr:
+		w.visitCall(node, typed)
+	case *ast.TypeAssertExpr:
+		w.visitAssertedType(typed.Type)
+	case *ast.CaseClause:
+		for _, expr := range typed.List {
+			if tv, ok := w.pkg.TypesInfo.Types[expr]; ok && tv.IsType() {
+				w.visitAssertedType(expr)
+			}
+		}
+	}
+	return true
+}
+
+// visitFuncLit records a literal's node. A literal called where it is
+// written is part of the enclosing node too, so its body is walked again
+// into it; any other literal is a function value.
+func (w *funcFactsWalker) visitFuncLit(lit *ast.FuncLit) bool {
+	node := w.literal(lit)
+	if w.immediate[lit] {
+		return true
+	}
+	w.takeValue(lit, node.function)
+	return false
+}
+
+// literal returns the node of lit, walking its body the first time.
+func (w *funcFactsWalker) literal(lit *ast.FuncLit) *semanticFunction {
+	if node := w.semPkg.funcLits[lit.Pos()]; node != nil {
+		return node
+	}
+	node := newSyntheticNode(lit.Pos(), w.pkg.Types, funcLitNodeName)
+	w.semPkg.funcLits[lit.Pos()] = node
+	w.walk(node, lit.Body)
+	return node
+}
+
+// visitIdent records a package variable read, and a declared function
+// named outside a callee position as a value.
+func (w *funcFactsWalker) visitIdent(node *semanticFunction, ident *ast.Ident) {
+	obj := w.pkg.TypesInfo.Uses[ident]
+	recordPackageVarUse(node, obj)
+	if fn, ok := obj.(*types.Func); ok && !w.callees[ident] {
+		w.takeValue(ident, fn)
+	}
+}
+
+// visitSelector walks the operand of a selector and records a qualified
+// package variable read, and a method value, method expression or qualified
+// function outside a callee position as a value.
+func (w *funcFactsWalker) visitSelector(node *semanticFunction, sel *ast.SelectorExpr) {
+	// The operand is walked as usual, and the selected object is read.
+	w.walk(node, sel.X)
+	obj := w.pkg.TypesInfo.Uses[sel.Sel]
+	recordPackageVarUse(node, obj)
+	if w.callees[sel] {
+		return
+	}
+
+	// A method value or method expression takes the method's value.
+	if selection := w.pkg.TypesInfo.Selections[sel]; selection != nil {
+		method, _ := selection.Obj().(*types.Func)
+		if method != nil && selection.Kind() != types.FieldVal {
+			w.takeValue(sel, method)
+		}
+		return
+	}
+
+	// A qualified identifier may name a function of another package.
+	if fn, ok := obj.(*types.Func); ok {
+		w.takeValue(sel, fn)
+	}
+}
+
+// visitRange records a range over a function. Calling a declared function
+// calls it; any other function is a value. The loop body is the yield
+// callback, a value as async as the enclosing node.
+func (w *funcFactsWalker) visitRange(node *semanticFunction, stmt *ast.RangeStmt) {
+	// Only a range over a function calls it.
+	signature := signatureForType(w.pkg.TypesInfo.TypeOf(stmt.X))
+	if signature == nil {
+		return
+	}
+
+	// The iterator is a declared function or a value.
+	if called := calledFunction(w.pkg, stmt.X); called != nil {
+		node.calls[functionOriginOrSelf(called)] = true
+	} else {
+		recordValueCall(node, funcValueShape(w.pkg.TypesInfo.TypeOf(stmt.X)))
+	}
+	if rangeFunctionExprNeedsAwait(w.model, w.pkg, w.overrideFacts, stmt.X) {
+		markFunctionAsync(node)
+	}
+
+	// The loop body is a function value of the yield type.
+	if signature.Params().Len() == 1 && node.function != nil {
+		w.addValue(funcValue{shape: funcValueShape(signature.Params().At(0).Type()), key: node.function})
+	}
+}
+
+// visitCall records a call: of a declared function, of a value of the
+// callee's shape, and of the direct async causes of the callee and the
+// function arguments of a callback async override.
+func (w *funcFactsWalker) visitCall(node *semanticFunction, call *ast.CallExpr) {
+	// The callee is called, not taken as a value.
+	fun := ast.Unparen(call.Fun)
+	w.callees[calleeExpr(fun)] = true
+	if lit, ok := fun.(*ast.FuncLit); ok {
+		w.immediate[lit] = true
+	}
+
+	// The callee is a declared function or a value.
+	if called := calledFunction(w.pkg, call.Fun); called != nil {
+		node.calls[functionOriginOrSelf(called)] = true
+	}
+	if callUsesFunctionValue(w.pkg, call.Fun) || callUsesFunctionIdentifier(w.pkg, call.Fun) {
+		recordValueCall(node, funcValueShape(w.pkg.TypesInfo.TypeOf(call.Fun)))
+	}
+
+	// Some callees suspend whatever the program, and callback async
+	// overrides wait on their function arguments.
+	if !node.async && callSuspends(w.pkg, w.overrideFacts, call.Fun) {
+		markFunctionAsync(node)
+	}
+	recordCallbackOverrideCall(w.pkg, w.overrideFacts, node, call, w.literalKey)
+}
+
+// literalKey returns the key of lit's node, walking its body the first time.
+func (w *funcFactsWalker) literalKey(lit *ast.FuncLit) *types.Func {
+	return w.literal(lit).function
+}
+
+// visitAssertedType records a func type asserted from an interface value. A
+// value that reflection made may have any func type, so calls of the type
+// stay open.
+func (w *funcFactsWalker) visitAssertedType(expr ast.Expr) {
+	if expr == nil {
+		return
+	}
+	shape := funcValueShape(w.pkg.TypesInfo.TypeOf(expr))
+	if shape == "" {
+		return
+	}
+	if w.semPkg.assertedFuncShapes == nil {
+		w.semPkg.assertedFuncShapes = make(map[string]bool)
+	}
+	w.semPkg.assertedFuncShapes[shape] = true
+}
+
+// takeValue records that the package takes the value of key at expr.
+func (w *funcFactsWalker) takeValue(expr ast.Expr, key *types.Func) {
+	w.addValue(funcValue{shape: funcValueShape(w.pkg.TypesInfo.TypeOf(expr)), key: functionOriginOrSelf(key)})
+}
+
+// addValue records a function value once.
+func (w *funcFactsWalker) addValue(value funcValue) {
+	if value.shape == "" || w.taken[value] {
+		return
+	}
+	w.taken[value] = true
+	w.semPkg.funcValues = append(w.semPkg.funcValues, value)
+}
+
+// calleeExpr returns the expression naming the function a call calls,
+// without parentheses and the type arguments of a generic instance.
+func calleeExpr(fun ast.Expr) ast.Expr {
+	for {
+		switch typed := fun.(type) {
+		case *ast.ParenExpr:
+			fun = typed.X
+		case *ast.IndexExpr:
+			fun = typed.X
+		case *ast.IndexListExpr:
+			fun = typed.X
+		default:
+			return fun
+		}
+	}
+}

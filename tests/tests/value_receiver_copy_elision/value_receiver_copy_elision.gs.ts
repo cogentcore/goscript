@@ -50,7 +50,7 @@ export class vec {
 		return v.X
 	}
 
-	public async BumpInClosure(): globalThis.Promise<number> {
+	public BumpInClosure(): number {
 		const v = this;
 		let f = $.functionValue(() => {
 			v.X = 100
@@ -134,7 +134,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("sum", a.value.Sum())
 	await $.println("bump", $.markAsStructValue($.cloneStructValue(a.value)).Bump(), a.value.X)
 	await $.println("ptr", $.markAsStructValue($.cloneStructValue(a.value)).BumpViaPointer(), a.value.Y)
-	await $.println("closure", await $.markAsStructValue($.cloneStructValue(a.value)).BumpInClosure(), a.value.X)
+	await $.println("closure", $.markAsStructValue($.cloneStructValue(a.value)).BumpInClosure(), a.value.X)
 	let k = a.value.Keep()
 	k.X = 50
 	await $.println("keep", a.value.X, k.X)

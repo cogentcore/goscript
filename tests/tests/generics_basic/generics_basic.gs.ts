@@ -277,8 +277,8 @@ export function NewMapper(__typeArgs: $.GenericTypeArgs | undefined): Mapper | $
 	return new Mapper({values: $.makeMap<any, any>(undefined, __typeArgs?.["K"]?.type ?? { kind: $.TypeKind.Interface, methods: [] })})
 }
 
-export async function Apply(__typeArgs: $.GenericTypeArgs | undefined, value: any, fn: ((_p0: any) => any | globalThis.Promise<any>) | null): globalThis.Promise<any> {
-	return fn!($.copyElement(value))
+export function Apply(__typeArgs: $.GenericTypeArgs | undefined, value: any, fn: ((_p0: any) => any | globalThis.Promise<any>) | null): any {
+	return (fn!($.copyElement(value)) as any)
 }
 
 export async function main(): globalThis.Promise<void> {
@@ -317,10 +317,10 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("mapper:", answer, found)
 
 	await $.println("=== Function instantiation ===")
-	let applyInt: ((value: number, fn: ((_p0: number) => number | globalThis.Promise<number>) | null) => number | globalThis.Promise<number>) | null = $.functionValue(async (value: any, fn: ((_p0: any) => any | globalThis.Promise<any>) | null): globalThis.Promise<any> => await Apply(__goscriptStatic0(), value, fn), ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Interface, methods: [] }, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Interface, methods: [] }], results: [{ kind: $.TypeKind.Interface, methods: [] }] } as $.FunctionTypeInfo)], results: [{ kind: $.TypeKind.Interface, methods: [] }] } as $.FunctionTypeInfo))
-	await $.println("apply:", (__goscriptAwait = applyInt!(21, $.functionValue((n: number): number => {
+	let applyInt: ((value: number, fn: ((_p0: number) => number | globalThis.Promise<number>) | null) => number | globalThis.Promise<number>) | null = $.functionValue((value: any, fn: ((_p0: any) => any | globalThis.Promise<any>) | null): any => Apply(__goscriptStatic0(), value, fn), ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Interface, methods: [] }, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Interface, methods: [] }], results: [{ kind: $.TypeKind.Interface, methods: [] }] } as $.FunctionTypeInfo)], results: [{ kind: $.TypeKind.Interface, methods: [] }] } as $.FunctionTypeInfo))
+	await $.println("apply:", (applyInt!(21, $.functionValue((n: number): number => {
 		return n * 2
-	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))) as number))
 
 	await $.println("=== Generic pair method ===")
 	let pair = $.markAsStructValue(new Pair({First: "left", Second: "right"}))

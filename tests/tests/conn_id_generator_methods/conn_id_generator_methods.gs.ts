@@ -166,15 +166,15 @@ export class connRunnerCallbacks {
 	)
 }
 
-export async function connRunners_AddConnectionID(cr: connRunners, id: number): globalThis.Promise<void> {
+export function connRunners_AddConnectionID(cr: connRunners, id: number): void {
 	for (const [__rangeKey, c] of cr?.entries() ?? []) {
-		void (__goscriptAwait = c.AddConnectionID!(id), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+		c.AddConnectionID!(id)
 	}
 }
 
 export function newConnRunnerCallbacks(runner: connRunner | null): connRunnerCallbacks {
-	return new connRunnerCallbacks({AddConnectionID: $.functionValue(async (id: number) => {
-		void (__goscriptAwait = (runner !== null && (runner as any).__isVarRef !== true && (runner as any).__goValue === undefined ? (runner as Exclude<connRunner, null>) : $.pointerValue<Exclude<connRunner, null>>(runner)).Add(id), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+	return new connRunnerCallbacks({AddConnectionID: $.functionValue((id: number) => {
+		void (runner !== null && (runner as any).__isVarRef !== true && (runner as any).__goValue === undefined ? (runner as Exclude<connRunner, null>) : $.pointerValue<Exclude<connRunner, null>>(runner)).Add(id)
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [] } as $.FunctionTypeInfo))}, true)
 }
 
@@ -197,7 +197,7 @@ export async function main(): globalThis.Promise<void> {
 	let runners = $.makeMap<connRunner | null, connRunnerCallbacks>([[$.interfaceValue<connRunner | null>(runner, "*main.packetHandlerMap", /* @__PURE__ */ $.pointerType("main.packetHandlerMap")), newConnRunnerCallbacks($.interfaceValue<connRunner | null>(runner, "*main.packetHandlerMap", /* @__PURE__ */ $.pointerType("main.packetHandlerMap")))]])
 	let sourceInterface: sourceRunner | null = $.interfaceValue<sourceRunner | null>(t, "*main.transport", /* @__PURE__ */ $.pointerType("main.transport"))
 	let destinationInterface: connRunner | null = $.interfaceValue<connRunner | null>(runner, "*main.packetHandlerMap", /* @__PURE__ */ $.pointerType("main.packetHandlerMap"))
-	await connRunners_AddConnectionID(runners, 7)
+	connRunners_AddConnectionID(runners, 7)
 	let runnerAgain = $.unsafePointerCast<transport | $.VarRef<transport> | null>(runner, transport)
 	await $.println("source:", $.mapGet<number, number, number>((t$ as transport).values, 3, 0)[0])
 	await $.println("same destination view:", $.pointerEqual(runner, runnerAgainDest))

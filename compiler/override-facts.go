@@ -121,6 +121,16 @@ func (f *OverrideFacts) AsyncWhenMethods(pkgPath, function string) []string {
 	return pkg.metadata.AsyncWhenMethods[function]
 }
 
+// IsFuncValueMaker returns true when override metadata names the function
+// or Type.Method key as one that makes function values of any type.
+func (f *OverrideFacts) IsFuncValueMaker(pkgPath, name string) bool {
+	if f == nil {
+		return false
+	}
+	pkg := f.packages[pkgPath]
+	return pkg.metadata.FuncValueMakers[name]
+}
+
 // IsFunctionAsync returns true when override metadata marks a package-level function async.
 func (f *OverrideFacts) IsFunctionAsync(pkgPath, function string) bool {
 	if f == nil {
@@ -355,6 +365,10 @@ func loadOverrideMetadata(root overridePackageRoot) (OverrideMetadata, error) {
 				for iter.ReadArray() {
 					metadata.AsyncCallbacks[callee] = append(metadata.AsyncCallbacks[callee], iter.ReadString())
 				}
+			}
+		case "funcValueMakers":
+			for name := iter.ReadObject(); name != ""; name = iter.ReadObject() {
+				metadata.FuncValueMakers[name] = iter.ReadBool()
 			}
 		case "asyncWhenMethods":
 			for function := iter.ReadObject(); function != ""; function = iter.ReadObject() {
@@ -755,6 +769,7 @@ func newOverrideMetadata() OverrideMetadata {
 		AsyncMethods:           make(map[string]bool),
 		AsyncCallbacks:         make(map[string][]string),
 		AsyncWhenMethods:       make(map[string][]string),
+		FuncValueMakers:        make(map[string]bool),
 	}
 }
 
@@ -767,6 +782,7 @@ func cloneOverrideMetadata(metadata OverrideMetadata) OverrideMetadata {
 		AsyncMethods:           cloneBoolMap(metadata.AsyncMethods),
 		AsyncCallbacks:         cloneStringSlicesMap(metadata.AsyncCallbacks),
 		AsyncWhenMethods:       cloneStringSlicesMap(metadata.AsyncWhenMethods),
+		FuncValueMakers:        cloneBoolMap(metadata.FuncValueMakers),
 	}
 }
 

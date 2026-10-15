@@ -19,11 +19,11 @@ export function makeLookup(): ((_p0: boolean) => [number, string] | globalThis.P
 export async function main(): globalThis.Promise<void> {
 	let lookup: ((_p0: boolean) => [number, string] | globalThis.Promise<[number, string]>) | null = makeLookup()
 
-	let [value, label] = await lookup!(false)
+	let [value, label] = (lookup!(false) as [number, string])
 	await $.println(value)
 	await $.println($.stringEqual(label, ""))
 
-	let __goscriptTuple0: any = await lookup!(true)
+	let __goscriptTuple0: any = (lookup!(true) as [number, string])
 	value = __goscriptTuple0[0]
 	label = __goscriptTuple0[1]
 	await $.println(value)

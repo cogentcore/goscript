@@ -98,11 +98,11 @@ export class Group {
 		target.seen = values.seen
 	}
 
-	public async Build(): globalThis.Promise<void> {
+	public Build(): void {
 		const g: Group | $.VarRef<Group> | null = this;
 		let __goscriptRangeReturn0 = false
-		;await (async () => {
-			await $.functionValue(((__receiver) => (_yield: ((_p0: Group | $.VarRef<Group> | null) => boolean | globalThis.Promise<boolean>) | null) => __receiver.Each(_yield))($.pointerValue<Group>(g)), ({ kind: $.TypeKind.Function, params: [({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.pointerType("main.Group")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo)], results: [] } as $.FunctionTypeInfo), "main.(*Group).Each-fm")!(async (child) => {
+		;(() => {
+			$.functionValue(((__receiver) => (_yield: ((_p0: Group | $.VarRef<Group> | null) => boolean | globalThis.Promise<boolean>) | null) => __receiver.Each(_yield))($.pointerValue<Group>(g)), ({ kind: $.TypeKind.Function, params: [({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.pointerType("main.Group")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo)], results: [] } as $.FunctionTypeInfo), "main.(*Group).Each-fm")!((child) => {
 				$.pointerValue<Group>(child).seen = true
 				return true
 			})
@@ -112,11 +112,11 @@ export class Group {
 		}
 	}
 
-	public async Each(_yield: ((_p0: Group | $.VarRef<Group> | null) => boolean | globalThis.Promise<boolean>) | null): globalThis.Promise<void> {
+	public Each(_yield: ((_p0: Group | $.VarRef<Group> | null) => boolean | globalThis.Promise<boolean>) | null): void {
 		const g: Group | $.VarRef<Group> | null = this;
-		for (let __goscriptRangeTarget0 = ((__goscriptAwait = $.pointerValue<Exclude<provider, null>>($.pointerValue<Group>(g).provider).Items(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as $.Slice<Group | $.VarRef<Group> | null>), __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
+		for (let __goscriptRangeTarget0 = $.pointerValue<Exclude<provider, null>>($.pointerValue<Group>(g).provider).Items(), __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
 			let child = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as Group | $.VarRef<Group> | null)
-			if (!(__goscriptAwait = _yield!(child), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)) {
+			if (!(_yield!(child) as boolean)) {
 				return
 			}
 		}
@@ -134,11 +134,9 @@ export class Group {
 export async function main(): globalThis.Promise<void> {
 	let child = new Group()
 	let root = new Group({provider: $.interfaceValue<provider | null>(new listProvider({items: $.arrayToSlice<Group | $.VarRef<Group> | null>([child])}), "*main.listProvider", /* @__PURE__ */ $.pointerType("main.listProvider"))})
-	await (root !== null && (root as any).__isVarRef !== true && (root as any).__goValue === undefined ? ((root as any) as Group).Build() : Group.prototype.Build.call(root))
+	void (root !== null && (root as any).__isVarRef !== true && (root as any).__goValue === undefined ? ((root as any) as Group).Build() : Group.prototype.Build.call(root))
 	await $.println($.pointerValue<Group>(child).seen)
 }
-
-var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

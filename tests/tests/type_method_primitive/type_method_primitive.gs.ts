@@ -86,7 +86,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// Test storing method reference (this is the failing case)
 	let fn: (() => number | globalThis.Promise<number>) | null = $.functionValue(((__receiver) => () => MyInt_Double(__receiver))(10), ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo), "main.MyInt.Double-fm")
-	await $.println("Method ref call:", (__goscriptAwait = fn!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println("Method ref call:", (fn!() as number))
 
 	let d: Doubler | null = $.namedValueInterfaceValue<Doubler | null>(12, "main.MyInt", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2())
 	await $.println("Interface method call:", (__goscriptAwait = (d !== null && (d as any).__isVarRef !== true && (d as any).__goValue === undefined ? (d as Exclude<Doubler, null>) : $.pointerValue<Exclude<Doubler, null>>(d)).Double(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))

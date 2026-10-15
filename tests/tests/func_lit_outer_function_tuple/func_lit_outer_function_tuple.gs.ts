@@ -10,8 +10,8 @@ export type wrapper = ((_p0: string) => [string, $.GoError] | globalThis.Promise
 export type updater = (() => $.GoError | globalThis.Promise<$.GoError>) | null
 
 export function wrap(open: opener | null): wrapper | null {
-	return $.functionValue(async (path: string): globalThis.Promise<[string, $.GoError]> => {
-		let [value, err] = await open!(path)
+	return $.functionValue((path: string): [string, $.GoError] => {
+		let [value, err] = (open!(path) as [string, $.GoError])
 		if (err != null) {
 			return ["", err]
 		}
@@ -23,9 +23,9 @@ export function open(path: string): [string, $.GoError] {
 	return [path, null]
 }
 
-export async function run(update: (() => $.GoError | globalThis.Promise<$.GoError>) | null): globalThis.Promise<$.GoError> {
-	let err = await (async (): globalThis.Promise<$.GoError> => {
-		return update!()
+export function run(update: updater | null): $.GoError {
+	let err = ((): $.GoError => {
+		return (update!() as $.GoError)
 	})()
 	if (err != null) {
 		return err
@@ -39,18 +39,16 @@ export function noop(): $.GoError {
 
 export async function main(): globalThis.Promise<void> {
 	let wrapped = wrap(open)
-	let [value, err] = await wrapped!("ok")
+	let [value, err] = (wrapped!("ok") as [string, $.GoError])
 	if (err != null) {
 		await $.println("err")
 		return
 	}
 	await $.println(value)
-	if (await run(noop) == null) {
+	if (run(noop) == null) {
 		await $.println("run ok")
 	}
 }
-
-var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

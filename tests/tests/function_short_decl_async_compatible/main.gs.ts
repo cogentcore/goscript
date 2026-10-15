@@ -3,7 +3,7 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
-export function wrap(fn: (() => number | globalThis.Promise<number>) | null, ch: $.Channel<number> | null): (() => number | globalThis.Promise<number>) | null {
+export async function wrap(fn: (() => number | globalThis.Promise<number>) | null, ch: $.Channel<number> | null): globalThis.Promise<(() => number | globalThis.Promise<number>) | null> {
 	return $.functionValue(async (): globalThis.Promise<number> => {
 		return await $.chanRecv(ch)
 	}, ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))
@@ -14,7 +14,7 @@ export async function main(): globalThis.Promise<void> {
 	let fn: (() => number | globalThis.Promise<number>) | null = $.functionValue((): number => {
 		return 1
 	}, ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))
-	fn = wrap(fn, ch)
+	fn = await wrap(fn, ch)
 	await $.chanSend(ch, 9)
 	await $.println((__goscriptAwait = fn!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 }

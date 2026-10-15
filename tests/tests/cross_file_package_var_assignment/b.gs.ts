@@ -12,7 +12,7 @@ function __goscriptInit0(): void {
 }
 
 export async function main(): globalThis.Promise<void> {
-	await $.println(await __goscript_a.read())
+	await $.println(__goscript_a.read())
 }
 
 export { __goscriptInit0 }

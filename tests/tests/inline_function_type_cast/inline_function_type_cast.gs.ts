@@ -15,7 +15,7 @@ export async function main(): globalThis.Promise<void> {
 	let castedGreeter = $.namedFunction(theInlineVar, "main.Greeter", ({ kind: $.TypeKind.Function, name: "main.Greeter", params: [/* @__PURE__ */ $.basicType("string")], results: [/* @__PURE__ */ $.basicType("string")] } as $.FunctionTypeInfo))
 
 	// 4. Call that
-	await $.println((__goscriptAwait = castedGreeter!("Inline World"), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println((castedGreeter!("Inline World") as string))
 
 	// Test with a different signature
 	type Adder = ((a: number, b: number) => number | globalThis.Promise<number>) | null
@@ -23,10 +23,8 @@ export async function main(): globalThis.Promise<void> {
 		return a + b
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))
 	let castedAdder = $.namedFunction(theInlineAdder, "main.Adder", ({ kind: $.TypeKind.Function, name: "main.Adder", params: [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))
-	await $.println((__goscriptAwait = castedAdder!(5, 7), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println((castedAdder!(5, 7) as number))
 }
-
-var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

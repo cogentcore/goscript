@@ -174,7 +174,11 @@ func (o *SemanticModelOwner) colorAsync(
 	overridePkgs []*types.Package,
 	wholeProgram bool,
 ) []Diagnostic {
-	// Index the callers and the calls that pass functions.
+	// Give each shape called through a value a class, after adding the
+	// values override packages produce, and index the callers and the calls
+	// that pass functions.
+	overrideValues := addOverrideFuncValues(model, overridePkgs)
+	internFuncValueClasses(model)
 	model.functionCallers = semanticFunctionCallers(model)
 	asyncArgumentSites := asyncArgumentCallSites(model)
 
@@ -199,7 +203,15 @@ func (o *SemanticModelOwner) colorAsync(
 	if wholeProgram {
 		closed = closedInterfaces(model, interfaceGraph, overridePkgs)
 	}
-	openMethods := openInterfaceMethods(model, interfaceGraph, anonymousInterfaceGraph, closed)
+	values := append(programFuncValues(model), overrideValues...)
+	openMethods := openInterfaceMethods(model, interfaceGraph, anonymousInterfaceGraph, closed, values)
+
+	// Function values reach the classes of calls that match them.
+	openMethodSet := make(map[*types.Func]bool, len(openMethods))
+	for _, method := range openMethods {
+		openMethodSet[method] = true
+	}
+	valueGraph := buildFuncValueGraph(model, overrideFacts, values, openMethodSet, wholeProgram)
 
 	// Propagate the async marks to their fixed point.
 	interfaceAsyncEdges, markDiagnostics := o.buildInterfaceAsyncEdges(ctx, model, overrideFacts, interfaceGraph)
@@ -211,6 +223,7 @@ func (o *SemanticModelOwner) colorAsync(
 	return append(diagnostics, colorAsyncFunctions(ctx, model, asyncRoots{
 		sites:       asyncArgumentSites,
 		openMethods: openMethods,
+		values:      valueGraph,
 	}, interfaceAsyncEdges, anonymousInterfaceGraph, asyncWhen)...)
 }
 
@@ -232,6 +245,10 @@ func newSemanticModel() *SemanticModel {
 		asyncInterfaceMethods:    make(map[string]bool),
 		asyncInterfaceMethodObjs: make(map[*types.Func]bool),
 		asyncOverrideFunctions:   make(map[*types.Func]bool),
+		funcValueClasses:         make(map[string]*types.Func),
+		asyncValueClasses:        make(map[*types.Func]bool),
+		valueNodes:               make(map[*types.Func]*semanticFunction),
+		funcLitNodes:             make(map[token.Pos]*semanticFunction),
 		summaries:                make(map[string][]byte),
 	}
 }
@@ -271,11 +288,9 @@ func (o *SemanticModelOwner) buildPackage(
 		o.collectFileDeclarations(shard, semPkg, pkg, tokenFile, file)
 		o.collectFacts(shard, semPkg, pkg, tokenFile, file, nil, nil)
 	}
-	for _, file := range pkg.Syntax {
-		collectFunctionFacts(shard, pkg, file, overrideFacts)
-	}
 	semPkg.lazyVars = lazyPackageVars(semPkg)
-	semPkg.asyncArgumentCalls = collectAsyncArgumentCalls(pkg)
+	collectFunctionFacts(shard, semPkg, pkg, overrideFacts)
+	semPkg.asyncArgumentCalls = collectAsyncArgumentCalls(pkg, semPkg.literalKey)
 	if !summarize {
 		return shard, nil, true
 	}
@@ -342,6 +357,17 @@ func (m *SemanticModel) mergePackage(shard *SemanticModel) {
 	for fn, semFn := range shard.functions {
 		if m.functions[fn] == nil {
 			m.functions[fn] = merged[semFn]
+		}
+	}
+
+	// The literal and initializer nodes are keyed by their synthetic keys.
+	for _, semPkg := range shard.packages {
+		for pos, node := range semPkg.funcLits {
+			m.funcLitNodes[pos] = node
+			m.valueNodes[node.function] = node
+		}
+		for _, node := range semPkg.lazyInits {
+			m.valueNodes[node.function] = node
 		}
 	}
 	maps.Copy(m.types, shard.types)
@@ -893,64 +919,6 @@ func objectForAddress(pkg *packages.Package, expr ast.Expr) types.Object {
 	return nil
 }
 
-// collectFunctionFacts records the calls and direct async causes of the
-// functions declared in file. A callee from another package is not in the
-// shard yet; its async mark reaches the caller through the recorded call when
-// Build propagates async across the merged model.
-func collectFunctionFacts(
-	model *SemanticModel,
-	pkg *packages.Package,
-	file *ast.File,
-	overrideFacts *OverrideFacts,
-) {
-	for _, decl := range file.Decls {
-		fnDecl, ok := decl.(*ast.FuncDecl)
-		if !ok || fnDecl.Body == nil {
-			continue
-		}
-		fnObj, _ := pkg.TypesInfo.Defs[fnDecl.Name].(*types.Func)
-		semFn := model.functions[fnObj]
-		if semFn == nil {
-			continue
-		}
-		ast.Inspect(fnDecl.Body, func(node ast.Node) bool {
-			switch typed := node.(type) {
-			case *ast.FuncLit:
-				return false
-			case *ast.Ident:
-				recordPackageVarUse(semFn, pkg.TypesInfo.Uses[typed])
-			case *ast.SendStmt, *ast.SelectStmt:
-				markFunctionAsync(semFn)
-			case *ast.UnaryExpr:
-				if typed.Op == token.ARROW {
-					markFunctionAsync(semFn)
-				}
-			case *ast.RangeStmt:
-				if signatureForType(pkg.TypesInfo.TypeOf(typed.X)) != nil {
-					if called := calledFunction(pkg, typed.X); called != nil {
-						semFn.calls[functionOriginOrSelf(called)] = true
-					}
-					if rangeFunctionExprNeedsAwait(model, pkg, overrideFacts, typed.X) {
-						markFunctionAsync(semFn)
-					}
-				}
-			case *ast.CallExpr:
-				if called := calledFunction(pkg, typed.Fun); called != nil {
-					semFn.calls[functionOriginOrSelf(called)] = true
-				}
-				if fun, ok := ast.Unparen(typed.Fun).(*ast.FuncLit); ok {
-					recordImmediateFuncLitAsyncFacts(model, pkg, overrideFacts, semFn, fun)
-				}
-				if !semFn.async && callSuspends(pkg, overrideFacts, typed.Fun) {
-					markFunctionAsync(semFn)
-				}
-				recordCallbackOverrideCall(pkg, overrideFacts, semFn, typed)
-			}
-			return true
-		})
-	}
-}
-
 // recordPackageVarUse adds obj to semFn's package variables when it is one.
 func recordPackageVarUse(semFn *semanticFunction, obj types.Object) {
 	v, ok := obj.(*types.Var)
@@ -980,19 +948,14 @@ func rangeFunctionExprNeedsAwait(
 			return true
 		}
 	}
-	if overrideFacts.IsMethodAsync(overrideCallPackage(pkg, expr), overrideCallMethod(pkg, expr)) {
-		return true
-	}
-	return callUsesFunctionValue(pkg, expr)
+	return overrideFacts.IsMethodAsync(overrideCallPackage(pkg, expr), overrideCallMethod(pkg, expr))
 }
 
-// callSuspends reports whether a call suspends its caller whatever the callee's
-// own coloring: printing, calling a function value, or calling an async
-// override.
+// callSuspends reports whether a call suspends its caller whatever the
+// program: printing, or calling an async override. A call through a function
+// value suspends when its class is async (see funcValueShape).
 func callSuspends(pkg *packages.Package, overrideFacts *OverrideFacts, fun ast.Expr) bool {
 	return isBuiltinPrintCall(pkg, fun) ||
-		callUsesFunctionValue(pkg, fun) ||
-		callUsesFunctionIdentifier(pkg, fun) ||
 		overrideFacts.IsMethodAsync(overrideCallPackage(pkg, fun), overrideCallMethod(pkg, fun)) ||
 		overrideFacts.IsFunctionAsync(overrideFunctionCallPackage(pkg, fun), overrideFunctionCallName(pkg, fun))
 }
@@ -1007,47 +970,6 @@ func isBuiltinPrintCall(pkg *packages.Package, fun ast.Expr) bool {
 	}
 	builtin, ok := pkg.TypesInfo.Uses[ident].(*types.Builtin)
 	return ok && (builtin.Name() == "print" || builtin.Name() == "println")
-}
-
-func recordImmediateFuncLitAsyncFacts(
-	model *SemanticModel,
-	pkg *packages.Package,
-	overrideFacts *OverrideFacts,
-	semFn *semanticFunction,
-	lit *ast.FuncLit,
-) {
-	if lit == nil || lit.Body == nil {
-		return
-	}
-	ast.Inspect(lit.Body, func(node ast.Node) bool {
-		switch typed := node.(type) {
-		case *ast.FuncLit:
-			return false
-		case *ast.Ident:
-			recordPackageVarUse(semFn, pkg.TypesInfo.Uses[typed])
-		case *ast.SendStmt, *ast.SelectStmt:
-			markFunctionAsync(semFn)
-		case *ast.UnaryExpr:
-			if typed.Op == token.ARROW {
-				markFunctionAsync(semFn)
-			}
-		case *ast.CallExpr:
-			called := calledFunction(pkg, typed.Fun)
-			if called != nil {
-				semFn.calls[functionOriginOrSelf(called)] = true
-			}
-			recordCallbackOverrideCall(pkg, overrideFacts, semFn, typed)
-			if semFn.async {
-				break
-			}
-			if calledFn := semanticFunctionFor(model, called); calledFn != nil && calledFn.async {
-				markFunctionAsync(semFn)
-			} else if callSuspends(pkg, overrideFacts, typed.Fun) {
-				markFunctionAsync(semFn)
-			}
-		}
-		return true
-	})
 }
 
 func overrideCallPackage(pkg *packages.Package, expr ast.Expr) string {
@@ -1151,6 +1073,9 @@ func semanticFunctionFor(model *SemanticModel, fn *types.Func) *semanticFunction
 		return nil
 	}
 	if semFn := model.functions[fn]; semFn != nil {
+		return semFn
+	}
+	if semFn := model.valueNodes[fn]; semFn != nil {
 		return semFn
 	}
 	// functions is fully populated while the model is built and stays read-only
@@ -1273,47 +1198,14 @@ func callUsesFunctionIdentifier(pkg *packages.Package, expr ast.Expr) bool {
 	return ok
 }
 
+// exprMayNeedAwait reports whether calling the function expr names may
+// suspend: a declared function or a function literal.
 func exprMayNeedAwait(model *SemanticModel, pkg *packages.Package, expr ast.Expr) bool {
 	if called := calledFunction(pkg, expr); called != nil {
 		return model.functionAsync(called)
 	}
 	lit, ok := expr.(*ast.FuncLit)
-	if !ok {
-		return false
-	}
-	needsAwait := false
-	ast.Inspect(lit.Body, func(node ast.Node) bool {
-		if needsAwait {
-			return false
-		}
-		switch typed := node.(type) {
-		case *ast.FuncLit:
-			return false
-		case *ast.SendStmt, *ast.SelectStmt:
-			needsAwait = true
-			return false
-		case *ast.UnaryExpr:
-			if typed.Op == token.ARROW {
-				needsAwait = true
-				return false
-			}
-		case *ast.CallExpr:
-			if callUsesFunctionValue(pkg, typed.Fun) {
-				needsAwait = true
-				return false
-			}
-			if callUsesFunctionIdentifier(pkg, typed.Fun) {
-				needsAwait = true
-				return false
-			}
-			if called := calledFunction(pkg, typed.Fun); called != nil && model.functionAsync(called) {
-				needsAwait = true
-				return false
-			}
-		}
-		return true
-	})
-	return needsAwait
+	return ok && model.funcLitAsync(lit.Pos())
 }
 
 func receiverNamedType(typ types.Type) *types.Named {
@@ -1328,16 +1220,42 @@ func receiverNamedType(typ types.Type) *types.Named {
 	return named
 }
 
+// semanticFunctionCallers indexes the nodes that call each function: a
+// declared function, literal or initializer node calls the functions it
+// names, the classes of the values it calls through, and the initializers of
+// the lazily initialized variables it reads.
 func semanticFunctionCallers(model *SemanticModel) map[*types.Func][]*semanticFunction {
-	callers := make(map[*types.Func][]*semanticFunction)
-	for _, semFn := range model.functions {
-		for called := range semFn.calls {
-			called = functionOriginOrSelf(called)
-			if called == nil {
-				continue
-			}
-			callers[called] = append(callers[called], semFn)
+	// Index the initializer of each lazily initialized variable.
+	initKeys := make(map[types.Object]*types.Func)
+	for _, semPkg := range model.packages {
+		for obj, node := range semPkg.lazyInits {
+			initKeys[obj] = node.function
 		}
+	}
+
+	// Every node records its calls.
+	callers := make(map[*types.Func][]*semanticFunction)
+	addCalls := func(semFn *semanticFunction) {
+		for called := range semFn.calls {
+			if called = functionOriginOrSelf(called); called != nil {
+				callers[called] = append(callers[called], semFn)
+			}
+		}
+		for shape := range semFn.valueCalls {
+			class := model.funcValueClasses[shape]
+			callers[class] = append(callers[class], semFn)
+		}
+		for v := range semFn.packageVars {
+			if key := initKeys[v]; key != nil {
+				callers[key] = append(callers[key], semFn)
+			}
+		}
+	}
+	for _, semFn := range model.functions {
+		addCalls(semFn)
+	}
+	for _, node := range model.valueNodes {
+		addCalls(node)
 	}
 	return callers
 }
@@ -1628,16 +1546,17 @@ func (c *interfaceCandidates) collectModel(model *SemanticModel) {
 	}
 }
 
-// openInterfaceMethods returns the called interface methods that the
-// implementation graph does not color: methods of an interface that is
-// neither package-sealed nor in closed, the interfaces a whole program closes
-// over its graph. An implementation outside the graph may suspend, so each is
-// an async root for its callers.
+// openInterfaceMethods returns the interface methods called or taken as
+// values that the implementation graph does not color: methods of an
+// interface that is neither package-sealed nor in closed, the interfaces a
+// whole program closes over its graph. An implementation outside the graph
+// may suspend, so each is an async root for its callers.
 func openInterfaceMethods(
 	model *SemanticModel,
 	interfaceGraph []semanticInterfaceImplementationGraphEntry,
 	anonymousInterfaceGraph []semanticAnonymousInterfaceImplementation,
 	closed map[*types.Named]bool,
+	values []funcValue,
 ) []*types.Func {
 	// The graph colors the methods a known interface declares.
 	known := make(map[*types.Func]bool)
@@ -1671,13 +1590,19 @@ func openInterfaceMethods(
 		}
 	}
 
-	// Any other called interface method is open.
+	// Any other interface method called or taken as a value is open.
+	candidates := slices.Collect(maps.Keys(model.functionCallers))
+	for _, value := range values {
+		candidates = append(candidates, value.key)
+	}
 	var open []*types.Func
-	for method := range model.functionCallers {
+	seen := make(map[*types.Func]bool)
+	for _, method := range candidates {
 		method = functionOriginOrSelf(method)
-		if method == nil || known[method] {
+		if method == nil || known[method] || seen[method] {
 			continue
 		}
+		seen[method] = true
 		signature, _ := method.Type().(*types.Signature)
 		if signature != nil && signature.Recv() != nil && isInterfaceType(signature.Recv().Type()) {
 			open = append(open, method)
@@ -1727,7 +1652,7 @@ func (m *SemanticModel) functionAsync(fn *types.Func) bool {
 	if semFn != nil && semFn.async {
 		return true
 	}
-	if m != nil && m.asyncOverrideFunctions[functionOriginOrSelf(fn)] {
+	if m != nil && (m.asyncOverrideFunctions[functionOriginOrSelf(fn)] || m.asyncValueClasses[fn]) {
 		return true
 	}
 	return m.interfaceMethodAsync(fn)

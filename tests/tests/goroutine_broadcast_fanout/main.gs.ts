@@ -35,10 +35,10 @@ export async function main(): globalThis.Promise<void> {
 	while (true) {
 		let done = false
 		let waitCh: $.Channel<{}> | null = null! as $.Channel<{}> | null
-		await bcast.value.HoldLock($.functionValue(async (_p0: (() => void) | null, getWaitCh: (() => $.Channel<{}> | null | globalThis.Promise<$.Channel<{}> | null>) | null) => {
+		await bcast.value.HoldLock($.functionValue((_p0: (() => void) | null, getWaitCh: (() => $.Channel<{}> | null | globalThis.Promise<$.Channel<{}> | null>) | null) => {
 			done = completed == 16
 			if (!done) {
-				waitCh = ((__goscriptAwait = getWaitCh!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as $.Channel<{}> | null)
+				waitCh = (getWaitCh!() as $.Channel<{}> | null)
 			}
 		}, ({ kind: $.TypeKind.Function, params: [({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.channelType({ kind: $.TypeKind.Struct, methods: [], fields: [] }, "receive")] } as $.FunctionTypeInfo)], results: [] } as $.FunctionTypeInfo)))
 		if (done) {

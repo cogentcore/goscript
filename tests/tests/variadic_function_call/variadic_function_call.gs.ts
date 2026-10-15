@@ -51,12 +51,12 @@ export function count(names: $.Slice<string>): number {
 	return $.sliceLen(names)
 }
 
-export async function countHandlers(name: string, handlers: $.Slice<Handler | null>): globalThis.Promise<number> {
+export function countHandlers(name: string, handlers: $.Slice<Handler | null>): number {
 	let n = 0
 	for (let __goscriptRangeTarget2 = handlers, __goscriptRangeWindow2 = $.sliceRange(__goscriptRangeTarget2), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow2.length; __rangeIndex++) {
 		let h = (__goscriptRangeWindow2.backing[__goscriptRangeWindow2.offset + __rangeIndex] as Handler | null)
 		{
-			let [ok, ] = await h!(name)
+			let [ok, ] = (h!(name) as [boolean, $.GoError])
 			if (ok) {
 				n++
 			}
@@ -86,7 +86,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("count:", count((names as $.Slice<string>)))
 
 	// A conversion to a multi-result function type is one variadic argument.
-	await $.println("handlers:", await countHandlers("x", $.arrayToSlice<Handler | null>([$.namedFunction($.functionValue((name: string): [boolean, $.GoError] => {
+	await $.println("handlers:", countHandlers("x", $.arrayToSlice<Handler | null>([$.namedFunction($.functionValue((name: string): [boolean, $.GoError] => {
 		return [$.stringEqual(name, "x"), null]
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string")], results: [/* @__PURE__ */ $.basicType("bool"), "error"] } as $.FunctionTypeInfo)), "main.Handler", ({ kind: $.TypeKind.Function, name: "main.Handler", params: [/* @__PURE__ */ $.basicType("string")], results: [/* @__PURE__ */ $.basicType("bool"), "error"] } as $.FunctionTypeInfo))])))
 }

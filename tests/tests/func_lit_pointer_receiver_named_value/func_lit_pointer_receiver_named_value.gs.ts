@@ -15,19 +15,17 @@ export function state__set(s: $.VarRef<state> | null, v: number): void {
 	s!.value = $.int(v)
 }
 
-export async function call(fn: (() => void) | null): globalThis.Promise<void> {
-	void (__goscriptAwait = fn!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+export function call(fn: (() => void) | null): void {
+	fn!()
 }
 
 export async function main(): globalThis.Promise<void> {
 	let s: $.VarRef<state> = $.varRef(0)
-	await call($.functionValue(() => {
+	call($.functionValue(() => {
 		state__set(s, 7)
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)))
 	await $.println($.int(s.value))
 }
-
-var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

@@ -225,7 +225,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println(readAfterCall(((s$ as State).reg).clone(), s), (s$ as State).reg.Start.Char)
 	let f: (() => number | globalThis.Promise<number>) | null = later(((s$ as State).reg).clone());
 	;(s$ as State).reg.Start.Char = 3
-	await $.println((__goscriptAwait = f!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (s$ as State).reg.Start.Char)
+	await $.println((f!() as number), (s$ as State).reg.Start.Char)
 	let p = address(((s$ as State).reg).clone())
 	$.pointerValue<Region>(p).Start.Char = 99
 	await $.println((s$ as State).reg.Start.Char)
@@ -238,10 +238,8 @@ export async function main(): globalThis.Promise<void> {
 	await $.println(readAfterPointer((addr.value).clone(), ap), addr.value.Start.Char)
 	let g: (() => number | globalThis.Promise<number>) | null = $.markAsStructValue($.cloneStructValue((s$ as State).reg)).Later();
 	;(s$ as State).reg.End.Char = 20
-	await $.println((__goscriptAwait = g!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (s$ as State).reg.Width())
+	await $.println((g!() as number), (s$ as State).reg.Width())
 }
-
-var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

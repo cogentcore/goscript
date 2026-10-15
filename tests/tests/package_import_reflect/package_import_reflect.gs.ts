@@ -139,7 +139,7 @@ export async function main(): globalThis.Promise<void> {
 	let testSlice = $.arrayToSlice<number>([1, 2, 3, 4, 5])
 	let swapper: ((i: number, j: number) => void) | null = reflect.Swapper($.interfaceValue(testSlice, "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"))))
 	await $.println("Before swap:", $.arrayIndex(testSlice!, 0), $.arrayIndex(testSlice!, 4))
-	void (__goscriptAwait = swapper!(0, 4), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+	swapper!(0, 4)
 	await $.println("After swap:", $.arrayIndex(testSlice!, 0), $.arrayIndex(testSlice!, 4))
 
 	// Test Copy function

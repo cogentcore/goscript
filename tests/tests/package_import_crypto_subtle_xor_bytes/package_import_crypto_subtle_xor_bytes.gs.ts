@@ -5,14 +5,14 @@ import * as $ from "@goscript/builtin/index.js"
 import * as bytes from "@goscript/bytes/index.js"
 import * as subtle from "@goscript/crypto/subtle/index.js"
 
-export async function panics(f: (() => void) | null): globalThis.Promise<boolean> {
+export function panics(f: (() => void) | null): boolean {
 	let panicked = false
 	const __defer = new $.DisposableStack()
 	try {
 		__defer.defer(() => { (() => {
 			panicked = $.recover() != null
 		})() })
-		void (__goscriptAwait = f!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+		f!()
 		const __goscriptReturn0: boolean = false
 		panicked = __goscriptReturn0
 		__defer.dispose()
@@ -39,7 +39,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("unequal value", bytes.Equal(unequal, new Uint8Array([5, 4, 99, 99]) as $.Slice<number>))
 
 	let short = new Uint8Array([7]) as $.Slice<number>
-	await $.println("short panics", await panics($.functionValue(() => {
+	await $.println("short panics", panics($.functionValue(() => {
 		subtle.XORBytes(short, new Uint8Array([1, 2]) as $.Slice<number>, new Uint8Array([3, 4]) as $.Slice<number>)
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo))))
 	await $.println("short unchanged", bytes.Equal(short, new Uint8Array([7]) as $.Slice<number>))
@@ -50,13 +50,11 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("exact value", bytes.Equal(exact, new Uint8Array([5, 1, 1, 5]) as $.Slice<number>))
 
 	let inexact = new Uint8Array([1, 2, 3, 4]) as $.Slice<number>
-	await $.println("inexact panics", await panics($.functionValue(() => {
+	await $.println("inexact panics", panics($.functionValue(() => {
 		subtle.XORBytes($.goSlice(inexact, 1, undefined), $.goSlice(inexact, undefined, 3), new Uint8Array([4, 5, 6]) as $.Slice<number>)
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo))))
 	await $.println("inexact unchanged", bytes.Equal(inexact, new Uint8Array([1, 2, 3, 4]) as $.Slice<number>))
 }
-
-var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

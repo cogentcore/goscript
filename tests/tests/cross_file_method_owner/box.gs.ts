@@ -49,12 +49,12 @@ export class pile {
 		target.step = values.step
 	}
 
-	public async drain(items: $.Slice<number>): globalThis.Promise<number> {
+	public drain(items: $.Slice<number>): number {
 		const p: pile | $.VarRef<pile> | null = this;
 		let sum = 0
-		await pile.prototype.each.call(p, $.functionValue(async () => {
+		pile.prototype.each.call(p, $.functionValue(() => {
 			let stack: $.Slice<number> = $.arrayToSlice<number>([])
-			await pile.prototype.each.call(p, $.functionValue(() => {
+			pile.prototype.each.call(p, $.functionValue(() => {
 				stack = $.appendSlice(stack, items)
 			}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)))
 			while ($.sliceLen(stack) != 0) {
@@ -69,9 +69,9 @@ export class pile {
 		return sum
 	}
 
-	public async each(fn: (() => void) | null): globalThis.Promise<void> {
+	public each(fn: (() => void) | null): void {
 		const p: pile | $.VarRef<pile> | null = this;
-		void (__goscriptAwait = fn!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+		fn!()
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -86,5 +86,3 @@ export class pile {
 export function box_base(b: box): number {
 	return $.int(b)
 }
-
-var __goscriptAwait: any
