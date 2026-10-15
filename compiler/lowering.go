@@ -2250,6 +2250,7 @@ func lazyPackageVars(semPkg *semanticPackage) map[types.Object]bool {
 					if obj == nil {
 						continue
 					}
+					// A large table of constant data is built on first read.
 					if valueIdx < len(valueSpec.Values) && len(valueSpec.Names) == len(valueSpec.Values) &&
 						packageVarInitIsDeferred(semPkg.source.TypesInfo, valueSpec.Values[valueIdx]) {
 						lazy[obj] = true
