@@ -1,6 +1,10 @@
 package main
 
-import "iter"
+import (
+	"iter"
+	"maps"
+	"slices"
+)
 
 // Nothing in this program but iter.Pull makes a yield call or a call of a
 // func() value suspend: the loops over sequences and the deferred calls do not
@@ -30,6 +34,15 @@ func points(n int) iter.Seq2[string, point] {
 			if !yield(names[i], point{i, i * 10}) {
 				return
 			}
+		}
+	}
+}
+
+// words yields strings, which no Pull call pulls.
+func words(yield func(string) bool) {
+	for _, w := range []string{"b", "a"} {
+		if !yield(w) {
+			return
 		}
 	}
 }
@@ -83,6 +96,17 @@ func main() {
 	for _, pair := range zip(numbers(3), numbers(5)) {
 		println("zip:", pair[0], pair[1])
 	}
+
+	// Collecting a sequence that suspends at yield waits for it.
+	println("collect:", len(slices.Collect(numbers(3))))
+	println("sorted:", slices.Sorted(numbers(3))[2])
+	println("append:", len(slices.AppendSeq([]int{9}, numbers(2))))
+	m := maps.Collect(points(3))
+	println("map:", len(m), m["c"].y)
+	maps.Insert(m, points(1))
+	println("insert:", len(m))
+	sortedWords := slices.Sorted(words)
+	println("words:", sortedWords[0], sortedWords[1])
 
 	// Pull2 returns zero values of its element types at the end.
 	next, stop := iter.Pull2(points(2))

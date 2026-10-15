@@ -4,7 +4,9 @@
     "SortedStableFunc": true
   },
   "callbackAsyncFunctions": {
+    "AppendSeq": true,
     "BinarySearchFunc": true,
+    "Collect": true,
     "CompactFunc": true,
     "CompareFunc": true,
     "ContainsFunc": true,
@@ -15,7 +17,8 @@
     "MaxFunc": true,
     "MinFunc": true,
     "SortFunc": true,
-    "SortStableFunc": true
+    "SortStableFunc": true,
+    "Sorted": true
   },
   "dependencies": ["cmp", "iter"]
 }
