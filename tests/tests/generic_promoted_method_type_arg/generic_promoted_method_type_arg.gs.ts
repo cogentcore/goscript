@@ -242,13 +242,13 @@ export function asFlagger(__typeArgs: $.GenericTypeArgs | undefined, w: any): Fl
 }
 
 export async function main(): globalThis.Promise<void> {
-	let w: Window | $.VarRef<Window> | null = new Window({Title: "main"})
+	let w = new Window({Title: "main"})
 	await $.println("check:", await check(__goscriptStatic1(), w))
 	let f = asFlagger(__goscriptStatic1(), new Window())
 	void (__goscriptAwait = (f !== null && (f as any).__isVarRef !== true && (f as any).__goValue === undefined ? (f as Exclude<Flagger, null>) : $.pointerValue<Exclude<Flagger, null>>(f)).Set(3n), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 	await $.println("interface:", (__goscriptAwait = (f !== null && (f as any).__isVarRef !== true && (f as any).__goValue === undefined ? (f as Exclude<Flagger, null>) : $.pointerValue<Exclude<Flagger, null>>(f)).Is(3n), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = (f !== null && (f as any).__isVarRef !== true && (f as any).__goValue === undefined ? (f as Exclude<Flagger, null>) : $.pointerValue<Exclude<Flagger, null>>(f)).Is(6n), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
-	let s: Single | $.VarRef<Single> | null = new Single()
+	let s = new Single()
 	await $.println("generic outer:", await check(__goscriptStatic2(), s))
 	await $.println("generic outer string:", await check(__goscriptStatic4(), new Single()))
 }

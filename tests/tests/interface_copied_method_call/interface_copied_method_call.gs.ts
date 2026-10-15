@@ -45,7 +45,7 @@ export class task {
 
 export async function callCopied(r: runner | null): globalThis.Promise<void> {
 	let curr: runner | null = null! as runner | null
-	void ((): void => {
+	void (() => {
 		curr = r
 	})()
 	void (__goscriptAwait = (curr !== null && (curr as any).__isVarRef !== true && (curr as any).__goValue === undefined ? (curr as Exclude<runner, null>) : $.pointerValue<Exclude<runner, null>>(curr)).Run(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)

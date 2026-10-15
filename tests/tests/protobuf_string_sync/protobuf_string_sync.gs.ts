@@ -14,7 +14,7 @@ import "@goscript/fmt/index.js"
 import "./protobuf_string_sync.pb.ts"
 
 export async function main(): globalThis.Promise<void> {
-	let msg: __goscript_protobuf_string_sync_pb_ts.ExampleMsg | $.VarRef<__goscript_protobuf_string_sync_pb_ts.ExampleMsg> | null = new __goscript_protobuf_string_sync_pb_ts.ExampleMsg({ExampleText: "world"})
+	let msg = new __goscript_protobuf_string_sync_pb_ts.ExampleMsg({ExampleText: "world"})
 
 	// String() must be synchronous and return a plain string, matching the Go
 	// contract: func (x *M) String() string. A GoScript regression that makes

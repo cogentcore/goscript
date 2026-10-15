@@ -14,7 +14,7 @@ export function __goscript_set_cache(__goscriptValue: sync.Map): void {
 
 export async function getCallback(): globalThis.Promise<((_p0: string) => void) | null> {
 	await cache.value.Load($.basicInterfaceValue(1, "int"))
-	return $.functionValue(async (msg: string): globalThis.Promise<void> => {
+	return $.functionValue(async (msg: string) => {
 		await $.println("Callback:", msg)
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string")], results: [] } as $.FunctionTypeInfo))
 }

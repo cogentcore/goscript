@@ -140,7 +140,7 @@ export class digest {
 	public Write(p: $.Slice<number>): void {
 		let d: digest | $.VarRef<digest> | null = this;
 		const d$: digest = d == null ? $.pointerTarget<digest>(d) : (d as any).__isVarRef === true ? (d as any).value : (d as any).__goValue === undefined ? (d as any) : $.pointerTarget<digest>(d);
-		;(d$ as digest).writes = (d$ as digest).writes + ($.sliceLen(p))
+		;(d$ as digest).writes += $.sliceLen(p)
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -153,20 +153,20 @@ export class digest {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let structPointer: MyStruct | $.VarRef<MyStruct> | null = new MyStruct({MyInt: 4, MyString: "hello world"})
+	let structPointer = new MyStruct({MyInt: 4, MyString: "hello world"})
 	// === Method Call on Pointer Receiver ===
 	// Calling a method with a pointer receiver (*MyStruct) using a pointer variable.
-	await $.println($.concatString("Method call on pointer (structPointer): Expected: hello world, Actual: ", (structPointer !== null && (structPointer as any).__isVarRef !== true && (structPointer as any).__goValue === undefined ? ((structPointer as any) as MyStruct).GetMyString() : MyStruct.prototype.GetMyString.call(structPointer))))
+	await $.println("Method call on pointer (structPointer): Expected: hello world, Actual: " + (structPointer !== null && (structPointer as any).__isVarRef !== true && (structPointer as any).__goValue === undefined ? ((structPointer as any) as MyStruct).GetMyString() : MyStruct.prototype.GetMyString.call(structPointer)))
 
-	let setter: setterStruct | $.VarRef<setterStruct> | null = new setterStruct()
+	let setter = new setterStruct()
 	void (setter !== null && (setter as any).__isVarRef !== true && (setter as any).__goValue === undefined ? ((setter as any) as setterStruct)["set"](9) : setterStruct.prototype.set.call(setter, 9))
 	await $.println("reserved pointer method:", (setter !== null && (setter as any).__isVarRef !== true && (setter as any).__goValue === undefined ? ((setter as any) as setterStruct)["get"]() : setterStruct.prototype.get.call(setter)))
 
-	let d: digest | $.VarRef<digest> | null = new digest()
-	let pad: $.Slice<number> = new Uint8Array([1, 2, 3]) as $.Slice<number>
+	let d = new digest()
+	let pad = new Uint8Array([1, 2, 3]) as $.Slice<number>
 	{
 		void (d !== null && (d as any).__isVarRef !== true && (d as any).__goValue === undefined ? ((d as any) as digest).Write(pad) : digest.prototype.Write.call(d, pad))
-		let __goscriptShadow0: $.Slice<number> = new Uint8Array([4]) as $.Slice<number>
+		let __goscriptShadow0 = new Uint8Array([4]) as $.Slice<number>
 		await $.println("shadowed type name after method call:", $.pointerValue<digest>(d).writes, $.sliceLen(__goscriptShadow0))
 	}
 }

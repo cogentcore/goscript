@@ -28,7 +28,7 @@ export async function main(): globalThis.Promise<void> {
 			return
 		}
 	}
-	let out: $.Slice<number> = buf.value.Bytes()
+	let out = buf.value.Bytes()
 	await $.println("len:", $.sliceLen(out))
 	for (let __goscriptRangeTarget0 = out, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
 		let b = $.uint((__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as number), 8)

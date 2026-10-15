@@ -120,10 +120,10 @@
                   <i></i><i></i><i></i><span>main.gs.ts</span>
                 </div>
                 <pre><span class="k">export async function</span> main(): globalThis.Promise&lt;void&gt; {
-	<span class="k">let</span> ch: $.Channel&lt;string&gt; | null = $.makeChannel&lt;string&gt;(0, <span class="s">""</span>, <span class="s">"both"</span>)
-	queueMicrotask(<span class="k">async</span> () =&gt; { <span class="k">await</span> (<span class="k">async</span> (): globalThis.Promise&lt;void&gt; =&gt; {
+	<span class="k">let</span> ch = $.makeChannel&lt;string&gt;(0, <span class="s">""</span>, <span class="s">"both"</span>)
+	queueMicrotask(<span class="k">async</span> () =&gt; {
 		<span class="k">await</span> $.chanSend(ch, <span class="s">"Hello from a goroutine"</span>)
-	})() })
+	})
 	<span class="k">await</span> fmt.Println(<span class="k">await</span> $.chanRecv(ch))
 }</pre>
               </div>

@@ -50,7 +50,7 @@ export async function main(): globalThis.Promise<void> {
 	let p2: $.VarRef<MyStruct | $.VarRef<MyStruct> | null> = $.varRef(s1)
 	let p3: $.VarRef<MyStruct | $.VarRef<MyStruct> | null> = $.varRef(s2)
 
-	let p4: MyStruct | $.VarRef<MyStruct> | null = s1
+	let p4 = s1
 	p4
 
 	let pp1 = $.varRef(p1)

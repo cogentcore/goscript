@@ -31,7 +31,7 @@ export async function run(frames: $.Channel<number> | null, done: $.Channel<stri
 					{
 						const __goscriptSelect0Result = __goscriptSelect0Value
 						let result = __goscriptSelect0Result.value
-						out = $.concatString(out, result)
+						out += result
 						command = false
 						continue
 						break
@@ -70,21 +70,21 @@ export async function run(frames: $.Channel<number> | null, done: $.Channel<stri
 						case 1:
 						{
 							if (command) {
-								out = $.concatString(out, "busy ")
+								out += "busy "
 								continue
 							}
-							out = $.concatString(out, "input ")
+							out += "input "
 							break
 						}
 						case 2:
 						{
-							out = $.concatString(out, "resize ")
+							out += "resize "
 							continue
 							break
 						}
 						case 3:
 						{
-							return $.concatString(out, "close")
+							return out + "close"
 							break
 						}
 					}
@@ -94,7 +94,7 @@ export async function run(frames: $.Channel<number> | null, done: $.Channel<stri
 				{
 					const __goscriptSelect1Result = __goscriptSelect1Value
 					let result = __goscriptSelect1Result.value
-					out = $.concatString(out, result)
+					out += result
 					command = false
 					break
 				}
@@ -104,8 +104,8 @@ export async function run(frames: $.Channel<number> | null, done: $.Channel<stri
 }
 
 export async function main(): globalThis.Promise<void> {
-	let frames: $.Channel<number> | null = $.makeChannel<number>(3, 0, "both")
-	let done: $.Channel<string> | null = $.makeChannel<string>(1, "", "both")
+	let frames = $.makeChannel<number>(3, 0, "both")
+	let done = $.makeChannel<string>(1, "", "both")
 	await $.chanSend(frames, 2)
 	await $.chanSend(frames, 1)
 	await $.chanSend(frames, 3)

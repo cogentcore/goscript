@@ -6,12 +6,12 @@ import * as $ from "@goscript/builtin/index.js"
 export async function scopedTotal(seed: number): globalThis.Promise<number> {
 	let total = seed
 	{
-		total = total + (1)
+		total += 1
 		let inner = total * 2
 		await $.println("inner:", inner)
 	}
 	{
-		total = total + (3)
+		total += 3
 	}
 	return total
 }

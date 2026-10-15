@@ -2434,13 +2434,6 @@ export function decodeRuneInString(
 }
 
 /**
- * concatString concatenates two Go strings.
- */
-export function concatString(a: string, b: string): string {
-  return a + b
-}
-
-/**
  * stringToRunes returns the runes of a Go string, as []rune(s) does.
  */
 export const stringToRunes = (str: string): number[] => {

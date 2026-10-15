@@ -1832,7 +1832,7 @@ func TestCompilePackagesLowersUnsafeBytePointerArithmetic(t *testing.T) {
 	if !strings.Contains(text, "$.indexByteAddress(bits!, globalThis.Number($.uint64Shr(idx, 6n)), 8)") {
 		t.Fatalf("missing byte-addressed unsafe pointer root:\n%s", text)
 	}
-	if !strings.Contains(text, "$.unsafePointerRef<number>(ptr).value =") {
+	if !strings.Contains(text, "$.unsafePointerRef<number>(ptr).value |=") {
 		t.Fatalf("missing unsafe pointer storage ref:\n%s", text)
 	}
 	if !strings.Contains(text, "return $.uint($.unsafePointerRef<number>(ptr).value, 8)") {
@@ -1956,7 +1956,7 @@ func TestCompilePackagesEmitsStructMethodsAndPointerAssertions(t *testing.T) {
 		"let original = $.varRef(new Counter({Value: 1}, true))",
 		"let original = $.varRef(new Counter({Value: 1}, true))\n\n\t// Copy should stay readable in generated output.\n\tlet copy",
 		"let copy = (original.value).clone()",
-		"let pointer: Counter | $.VarRef<Counter> | null = original",
+		"let pointer = original",
 		"Counter.prototype.Set.call(pointer, 2)",
 		"Counter.prototype.Set.call(NewCounter(), 5)",
 		"let [, ok] = $.typeAssertTuple<Counter | $.VarRef<Counter> | null>(iface, /* @__PURE__ */ $.pointerType(\"main.Counter\"))",
@@ -2545,11 +2545,11 @@ func TestCompilePackagesEmitsArraySliceMapStringAndNamedMethods(t *testing.T) {
 		"export function MySlice_Add(s: $.VarRef<MySlice> | null, v: number): void",
 		"let arr = $.arrayValue([0, 10, 0])",
 		"let slice: $.Slice<number> = $.makeSlice<number>(0, 2, \"number\")",
-		"let empty: $.Slice<number> = $.arrayToSlice<number>([])",
+		"let empty = $.arrayToSlice<number>([])",
 		"let literal: $.Slice<number> = $.arrayToSlice<number>([1, 2])",
 		"literal = $.appendOne(literal, 3)",
 		"$.sliceElems(slice!)[$.sliceSlot(slice!, 0)] = $.arrayIndex(arr, 1)",
-		"let m: globalThis.Map<string, number> | null = $.makeMap<string, number>()",
+		"let m = $.makeMap<string, number>()",
 		"$.mapSet(m, \"one\", 1)",
 		"let [value, ok] = $.mapGet<string, number, number>(m, \"missing\", 0)",
 		"$.sliceSlot(slice!, 0)",
@@ -3345,7 +3345,7 @@ func TestCompilePackagesEmitsGenericMethodsAliasesAndDictionaries(t *testing.T) 
 		"export function Sum<T>(__typeArgs: $.GenericTypeArgs | undefined, vals: $.Slice<T>): any",
 		"export function Copy<T>(__typeArgs: $.GenericTypeArgs | undefined, vals: $.Slice<T>): $.Slice<T>",
 		"return $.appendSlice($.arrayToSlice<T>([]), vals, $.appendZero(() => ($.genericZero(__typeArgs, \"T\", null) as T)))",
-		"let seen: Set = $.makeMap<number, {}>()",
+		"let seen = $.makeMap<number, {}>()",
 		"$.mapSet(seen, 1, {})",
 		"$.genericZero(__typeArgs, \"T\", null)",
 		"return $.callGenericMethod(__typeArgs, \"T\", \"String\", v)",
@@ -4095,11 +4095,11 @@ func TestCompilePackagesEmitsAsyncChannelsSelectAndDefer(t *testing.T) {
 	for _, want := range []string{
 		"Process(v: number): number | globalThis.Promise<number>",
 		"public async Process(v: number): globalThis.Promise<number>",
-		"let ch: $.Channel<number> | null = $.makeChannel<number>(1, 0, \"both\")",
+		"let ch = $.makeChannel<number>(1, 0, \"both\")",
 		"await $.chanSend((w$ as Worker).ch, v)",
 		"return await $.chanRecv((w$ as Worker).ch)",
 		"await using __defer = new $.AsyncDisposableStack()",
-		"queueMicrotask(async () => { await (async (): globalThis.Promise<void> => {",
+		"queueMicrotask(async () => {",
 		"$.selectStatement<any, void>([",
 		"let v = __goscriptSelect1Result.value",
 		"return $.selectVoidReturn()",
@@ -5467,7 +5467,7 @@ func TestCompilePackagesAwaitsAsyncMethodValuesInAssignmentsAndReceivers(t *test
 	text := string(content)
 	for _, want := range []string{
 		"public async WithField(key: string, value: any): globalThis.Promise<Entry | $.VarRef<Entry> | null>",
-		"let le: Entry | $.VarRef<Entry> | null = await Entry.prototype.WithField.call(entry, \"first\",",
+		"let le = await Entry.prototype.WithField.call(entry, \"first\",",
 		"const __goscriptLiteralField0 = await Entry.prototype.WithField.call(entry, \"holder\",",
 		"Entry.prototype.Warn.call(await Entry.prototype.WithField.call(le, \"second\",",
 	} {
@@ -5546,7 +5546,7 @@ func TestCompilePackagesWidensErrorInterfaceABI(t *testing.T) {
 		// Concrete implementations become async and await inner error
 		// dispatch whose text may resolve on the microtask queue.
 		"public async Error(): globalThis.Promise<string>",
-		", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>((w$ as wrappedError).cause).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))",
+		" + (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>((w$ as wrappedError).cause).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)",
 	} {
 		if !strings.Contains(text, want) {
 			t.Fatalf("missing %q in generated output:\n%s", want, text)
@@ -5681,7 +5681,7 @@ func TestCompilePackagesLowersSwitchesAndFunctionValueCalls(t *testing.T) {
 		"var window = value + 1",
 		"await $.println(window)",
 		"($.pointerValue<(() => void) | null>(rel))!()",
-		"$.functionValue(async (): globalThis.Promise<void> => {\n\t\tawait using __defer = new $.AsyncDisposableStack()",
+		"$.functionValue(async () => {\n\t\tawait using __defer = new $.AsyncDisposableStack()",
 		"__defer.defer(async () => { await $.println(\"wrapped deferred\") })",
 		"await $.println(\"wrapped body\")",
 	} {

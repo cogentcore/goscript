@@ -79,9 +79,9 @@ export function setConcrete(w: dep.Wrapper | $.VarRef<dep.Wrapper> | null): stri
 }
 
 export async function main(): globalThis.Promise<void> {
-	let impl: wrapper | $.VarRef<wrapper> | null = new wrapper({Impl: new dep.Impl({Item: 7})})
+	let impl = new wrapper({Impl: new dep.Impl({Item: 7})})
 	await $.println("interface:", await read(__goscriptStatic1(), $.namedValueInterfaceValue<Derived | null>(impl, "*main.wrapper", __goscriptStatic2(), __goscriptStatic3(), __goscriptStatic4())))
-	let keyed: dep.Wrapper | $.VarRef<dep.Wrapper> | null = new dep.Wrapper({Keyed: new dep.Keyed()})
+	let keyed = new dep.Wrapper({Keyed: new dep.Keyed()})
 	await $.println("generic empty:", $.stringEqual(setGeneric(__goscriptStatic0(), keyed, 7), ""))
 	await $.println("concrete empty:", $.stringEqual(setConcrete(keyed), ""))
 }

@@ -12,7 +12,7 @@ import "@goscript/github.com/aperturerobotics/protobuf-go-lite/index.js"
 import "./protobuf_lite_ts.pb.ts"
 
 export async function main(): globalThis.Promise<void> {
-	let msg: __goscript_protobuf_lite_ts_pb_ts.ExampleMsg | $.VarRef<__goscript_protobuf_lite_ts_pb_ts.ExampleMsg> | null = new __goscript_protobuf_lite_ts_pb_ts.ExampleMsg({ExampleField: new Uint8Array([104, 101, 108, 108, 111]), ExampleText: "world"})
+	let msg = new __goscript_protobuf_lite_ts_pb_ts.ExampleMsg({ExampleField: new Uint8Array([104, 101, 108, 108, 111]), ExampleText: "world"})
 
 	let __goscriptTuple0: any = (msg !== null && (msg as any).__isVarRef !== true && (msg as any).__goValue === undefined ? ((msg as any) as __goscript_protobuf_lite_ts_pb_ts.ExampleMsg).MarshalVT() : __goscript_protobuf_lite_ts_pb_ts.ExampleMsg.prototype.MarshalVT.call(msg))
 	let data: $.Slice<number> = __goscriptTuple0[0]
@@ -52,8 +52,8 @@ export async function main(): globalThis.Promise<void> {
 
 	await $.println("json unmarshaled:", (out !== null && (out as any).__isVarRef !== true && (out as any).__goValue === undefined ? ((out as any) as __goscript_protobuf_lite_ts_pb_ts.ExampleMsg).String() : __goscript_protobuf_lite_ts_pb_ts.ExampleMsg.prototype.String.call(out)))
 
-	let oneofMsg: __goscript_protobuf_lite_ts_pb_ts.ExampleMsg | $.VarRef<__goscript_protobuf_lite_ts_pb_ts.ExampleMsg> | null = new __goscript_protobuf_lite_ts_pb_ts.ExampleMsg({ExampleText: "oneof", Choice: $.interfaceValue<__goscript_protobuf_lite_ts_pb_ts.isExampleMsg_Choice | null>(new __goscript_protobuf_lite_ts_pb_ts.ExampleMsg_ChoiceData({ChoiceData: new Uint8Array([1, 2, 3]) as $.Slice<number>}), "*main.ExampleMsg_ChoiceData", /* @__PURE__ */ $.pointerType("main.ExampleMsg_ChoiceData"))})
-	let oneofClone: __goscript_protobuf_lite_ts_pb_ts.ExampleMsg | $.VarRef<__goscript_protobuf_lite_ts_pb_ts.ExampleMsg> | null = (oneofMsg !== null && (oneofMsg as any).__isVarRef !== true && (oneofMsg as any).__goValue === undefined ? ((oneofMsg as any) as __goscript_protobuf_lite_ts_pb_ts.ExampleMsg).CloneVT() : __goscript_protobuf_lite_ts_pb_ts.ExampleMsg.prototype.CloneVT.call(oneofMsg))
+	let oneofMsg = new __goscript_protobuf_lite_ts_pb_ts.ExampleMsg({ExampleText: "oneof", Choice: $.interfaceValue<__goscript_protobuf_lite_ts_pb_ts.isExampleMsg_Choice | null>(new __goscript_protobuf_lite_ts_pb_ts.ExampleMsg_ChoiceData({ChoiceData: new Uint8Array([1, 2, 3]) as $.Slice<number>}), "*main.ExampleMsg_ChoiceData", /* @__PURE__ */ $.pointerType("main.ExampleMsg_ChoiceData"))})
+	let oneofClone = (oneofMsg !== null && (oneofMsg as any).__isVarRef !== true && (oneofMsg as any).__goValue === undefined ? ((oneofMsg as any) as __goscript_protobuf_lite_ts_pb_ts.ExampleMsg).CloneVT() : __goscript_protobuf_lite_ts_pb_ts.ExampleMsg.prototype.CloneVT.call(oneofMsg))
 	await $.println("oneof clone equal:", (oneofMsg !== null && (oneofMsg as any).__isVarRef !== true && (oneofMsg as any).__goValue === undefined ? ((oneofMsg as any) as __goscript_protobuf_lite_ts_pb_ts.ExampleMsg).EqualVT(oneofClone) : __goscript_protobuf_lite_ts_pb_ts.ExampleMsg.prototype.EqualVT.call(oneofMsg, oneofClone)))
 	$.indexRef((oneofMsg !== null && (oneofMsg as any).__isVarRef !== true && (oneofMsg as any).__goValue === undefined ? ((oneofMsg as any) as __goscript_protobuf_lite_ts_pb_ts.ExampleMsg).GetChoiceData() : __goscript_protobuf_lite_ts_pb_ts.ExampleMsg.prototype.GetChoiceData.call(oneofMsg))!, 0).value = 9
 	await $.println("oneof clone independent:", $.uint($.arrayIndex((oneofClone !== null && (oneofClone as any).__isVarRef !== true && (oneofClone as any).__goValue === undefined ? ((oneofClone as any) as __goscript_protobuf_lite_ts_pb_ts.ExampleMsg).GetChoiceData() : __goscript_protobuf_lite_ts_pb_ts.ExampleMsg.prototype.GetChoiceData.call(oneofClone))!, 0), 8) == 1)
@@ -68,7 +68,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 	await $.println("oneof size matches:", oneofSize == $.sliceLen(oneofData))
 
-	let oneofOut: __goscript_protobuf_lite_ts_pb_ts.ExampleMsg | $.VarRef<__goscript_protobuf_lite_ts_pb_ts.ExampleMsg> | null = new __goscript_protobuf_lite_ts_pb_ts.ExampleMsg()
+	let oneofOut = new __goscript_protobuf_lite_ts_pb_ts.ExampleMsg()
 	{
 		let __goscriptShadow0 = (oneofOut !== null && (oneofOut as any).__isVarRef !== true && (oneofOut as any).__goValue === undefined ? ((oneofOut as any) as __goscript_protobuf_lite_ts_pb_ts.ExampleMsg).UnmarshalVT(oneofData) : __goscript_protobuf_lite_ts_pb_ts.ExampleMsg.prototype.UnmarshalVT.call(oneofOut, oneofData))
 		if (__goscriptShadow0 != null) {

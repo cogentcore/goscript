@@ -84,7 +84,7 @@ export async function receiverCopies(): globalThis.Promise<void> {
 	await $.println("r:", $.arrayIndex(r, 0), $.arrayIndex(r, 1), $.arrayIndex(r, 2), $.arrayIndex(r, 3))
 	await $.println("original equal:", $.arrayEqual(original, m.value))
 	await $.println("sum:", Matrix_Sum(m.value), $.arrayIndex(m.value, 0))
-	let p: $.VarRef<Matrix> | null = m
+	let p = m
 	await $.println("ptr sum:", Matrix_Sum($.pointerValue<Matrix>(p)), $.arrayIndex($.pointerValue<number[]>(p), 0))
 }
 

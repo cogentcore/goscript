@@ -34,7 +34,7 @@ export async function main(): globalThis.Promise<void> {
 			out = ($.goSlice(c, undefined, $.sliceLen((c as filters)), $.sliceLen((c as filters))) as filters)
 		}
 	}
-	let raw: $.Slice<number> = $.arrayToSlice<number>([4, 5])
+	let raw = $.arrayToSlice<number>([4, 5])
 	let size = filters_size((raw as filters))
 	await $.println("len:", $.sliceLen((out as filters)))
 	await $.println("cap:", $.cap((out as filters)))

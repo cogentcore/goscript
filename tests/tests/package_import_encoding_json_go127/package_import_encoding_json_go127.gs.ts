@@ -20,7 +20,7 @@ import "@goscript/strings/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	let raw: $.VarRef<json.RawMessage> = $.varRef(null! as json.RawMessage)
-	let dec: json.Decoder | $.VarRef<json.Decoder> | null = json.NewDecoder($.pointerValueOrNil($.interfaceValue<io.Reader | null>(strings.NewReader("{\"hello\": true}"), "*strings.Reader", /* @__PURE__ */ $.pointerType("strings.Reader")))!)
+	let dec = json.NewDecoder($.pointerValueOrNil($.interfaceValue<io.Reader | null>(strings.NewReader("{\"hello\": true}"), "*strings.Reader", /* @__PURE__ */ $.pointerType("strings.Reader")))!)
 	let err = await json.Decoder.prototype.Decode.call($.pointerValue<json.Decoder>(dec), $.namedValueInterfaceValue<any>(raw, "*jsontext.Value", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()))
 	await $.println("RawMessage:", $.bytesToString(raw.value), err == null)
 	await $.println("RawMessage EOF:", $.comparableEqual(await json.Decoder.prototype.Decode.call($.pointerValue<json.Decoder>(dec), $.namedValueInterfaceValue<any>(raw, "*jsontext.Value", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2())), io.EOF))
@@ -29,10 +29,10 @@ export async function main(): globalThis.Promise<void> {
 
 	let formatted: $.VarRef<json.RawMessage> = $.varRef((new Uint8Array([123, 34, 120, 34, 58, 32, 34, 60, 34, 125]) as json.RawMessage))
 	await $.println("RawMessage HTML:", jsontext.Value_Format(formatted, $.pointerValueOrNil(jsontext.EscapeForHTML(true))!) == null, $.bytesToString(formatted.value))
-	let duplicates: json.RawMessage = (new Uint8Array([123, 34, 97, 34, 58, 49, 44, 34, 97, 34, 58, 50, 125]) as json.RawMessage)
+	let duplicates = (new Uint8Array([123, 34, 97, 34, 58, 49, 44, 34, 97, 34, 58, 50, 125]) as json.RawMessage)
 	await $.println("RawMessage duplicates:", jsontext.Value_IsValid(duplicates), jsontext.Value_IsValid(duplicates, $.pointerValueOrNil(jsontext.AllowDuplicateNames(true))!))
 
-	let malformed: json.RawMessage = (new Uint8Array([91, 32, 34, 255, 34, 32, 93]) as $.Slice<number> as json.RawMessage)
+	let malformed = (new Uint8Array([91, 32, 34, 255, 34, 32, 93]) as $.Slice<number> as json.RawMessage)
 	let compact: $.VarRef<jsontext.Value> = $.varRef((jsontext.Value_Clone(malformed) as jsontext.Value))
 	await $.println("RawMessage compact bytes:", jsontext.Value_Compact(compact) == null, slices.Equal((compact.value as jsontext.Value), (new Uint8Array([91, 34, 255, 34, 93]) as $.Slice<number> as jsontext.Value)))
 	let indentedRaw: $.VarRef<jsontext.Value> = $.varRef((jsontext.Value_Clone(malformed) as jsontext.Value))

@@ -21,7 +21,7 @@ export function sqrt(x: number): number {
 	}
 	let z = x / 2
 	for (let __rangeIndex = 0; __rangeIndex < 20; __rangeIndex++) {
-		z = z - (((z * z) - x) / (2 * z))
+		z -= ((z * z) - x) / (2 * z)
 	}
 	return z
 }

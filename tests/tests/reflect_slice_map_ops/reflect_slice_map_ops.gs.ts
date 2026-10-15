@@ -139,14 +139,14 @@ export class Doc {
 
 export async function main(): globalThis.Promise<void> {
 	// MapRange starts before the first entry and uses the map's types.
-	let it: reflect.MapIter | $.VarRef<reflect.MapIter> | null = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.makeMap<string, number>([["x", 3]]), "map[string]float32", /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("float32")))))).MapRange()
+	let it = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.makeMap<string, number>([["x", 3]]), "map[string]float32", /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("float32")))))).MapRange()
 	let n = 0
 	while (reflect.MapIter.prototype.Next.call($.pointerValue<reflect.MapIter>(it))) {
 		n++
 		await $.println($.markAsStructValue($.cloneStructValue(reflect.MapIter.prototype.Key.call($.pointerValue<reflect.MapIter>(it)))).String(), reflect.Kind_String($.markAsStructValue($.cloneStructValue(reflect.MapIter.prototype.Value.call($.pointerValue<reflect.MapIter>(it)))).Kind()), $.markAsStructValue($.cloneStructValue(reflect.MapIter.prototype.Value.call($.pointerValue<reflect.MapIter>(it)))).Float())
 	}
 	await $.println(n)
-	let empty: reflect.MapIter | $.VarRef<reflect.MapIter> | null = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.makeMap<string, number>([]), "map[string]int", /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("int")))))).MapRange()
+	let empty = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.makeMap<string, number>([]), "map[string]int", /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("int")))))).MapRange()
 	await $.println(reflect.MapIter.prototype.Next.call($.pointerValue<reflect.MapIter>(empty)))
 
 	// Append appends after the slice's length, within its capacity.
@@ -160,7 +160,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println($.markAsStructValue($.cloneStructValue(b)).Len(), $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(b)).Index(3))).Int())
 
 	// Copy copies within the lengths of the slices.
-	let c: $.Slice<number> = $.arrayToSlice<number>([1, 2, 3, 4])
+	let c = $.arrayToSlice<number>([1, 2, 3, 4])
 	let copied = reflect.Copy($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.goSlice(c, 2, undefined), "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")))))), $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.arrayToSlice<number>([8, 9, 10]), "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")))))))
 	await $.println(copied, $.arrayIndex(c!, 0), $.arrayIndex(c!, 2), $.arrayIndex(c!, 3))
 
@@ -177,7 +177,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println($.arrayIndex(t.value!, 1), $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(tv)).Slice(1, 2))).Index(0))).Int())
 
 	// Grow then SetLen, as encoding/xml and encoding/json do.
-	let h: Holder | $.VarRef<Holder> | null = new Holder({T: $.makeSlice<number>(1, 10, "number")})
+	let h = new Holder({T: $.makeSlice<number>(1, 10, "number")})
 	let h$: Holder = h == null ? $.pointerTarget<Holder>(h) : (h as any).__isVarRef === true ? (h as any).value : (h as any).__goValue === undefined ? (h as any) : $.pointerTarget<Holder>(h)
 	let hs = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(h, "*main.Holder", /* @__PURE__ */ $.pointerType("main.Holder"))))).Elem())).Field(0)))
 	for (let i = 0; i < 5; i++) {

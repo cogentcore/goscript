@@ -5,27 +5,25 @@ import * as $ from "@goscript/builtin/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	await using __defer = new $.AsyncDisposableStack()
-	let messages: $.Channel<string> | null = $.makeChannel<string>(0, "", "both")
-	queueMicrotask(async () => { await (async (): globalThis.Promise<void> => {
+	let messages = $.makeChannel<string>(0, "", "both")
+	queueMicrotask(async () => {
 		await $.chanSend(messages, "go")
-	})() })
+	})
 	await $.println(await $.chanRecv(messages))
 
-	await (async (): globalThis.Promise<void> => {
+	await (async () => {
 		await $.println("plain")
 	})()
 
-	__defer.defer(async () => { await (async (): globalThis.Promise<void> => {
+	__defer.defer(async () => { await (async () => {
 		await $.println("defer")
 	})() })
 
-	let stored: (() => void) | null = $.functionValue(async (): globalThis.Promise<void> => {
+	let stored = $.functionValue(async () => {
 		await $.println("value")
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo))
-	void (__goscriptAwait = stored!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+	await stored()
 }
-
-var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

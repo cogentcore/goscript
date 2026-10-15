@@ -91,7 +91,7 @@ export class repeatReader {
 		for (let __goscriptSliceWindow2 = $.sliceRange(p), __goscriptRangeCount0 = n, i = 0; i < __goscriptRangeCount0; i++) {
 			;(__goscriptSliceWindow2.backing as any[])[$.windowSlot(__goscriptSliceWindow2, i)] = $.uint(i, 8)
 		}
-		;(r$ as repeatReader).remaining = (r$ as repeatReader).remaining - (n)
+		;(r$ as repeatReader).remaining -= n
 		return [n, null]
 	}
 
@@ -127,16 +127,16 @@ export function uint64Len(g: $.Slice<bigint>): number {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let g: $.Slice<bigint> = $.arrayToSlice<bigint>([7n, 11n, 22n, 33n])
-	let data: $.Slice<number> = new Uint8Array([1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0]) as $.Slice<number>
+	let g = $.arrayToSlice<bigint>([7n, 11n, 22n, 33n])
+	let data = new Uint8Array([1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0]) as $.Slice<number>
 	await $.println("algo", algorithm(data, $.sliceLen(data), g, 3n, 1n, 0, 3))
 
-	let c: chunker | $.VarRef<chunker> | null = new chunker()
+	let c = new chunker()
 	let totalSize: bigint = 0n
 	let chkStart: bigint = 0n
 
 	let src = io.LimitReader($.pointerValueOrNil($.interfaceValue<io.Reader | null>(newRepeatReader(40), "*main.repeatReader", /* @__PURE__ */ $.pointerType("main.repeatReader")))!, 25n)
-	let buf: $.Slice<number> = $.makeSlice<number>(8, undefined, "byte")
+	let buf = $.makeSlice<number>(8, undefined, "byte")
 	while (true) {
 		let [nr, err] = await (src !== null && (src as any).__isVarRef !== true && (src as any).__goValue === undefined ? (src as Exclude<io.Reader, null>) : $.pointerValue<Exclude<io.Reader, null>>(src)).Read(buf)
 		if (nr > 0) {

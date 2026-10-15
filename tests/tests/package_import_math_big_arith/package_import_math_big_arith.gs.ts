@@ -14,7 +14,7 @@ import "@goscript/math/big/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	let y = 13835058055282163712n
-	let b: big.Int | $.VarRef<big.Int> | null = big.Int.prototype.SetUint64.call(new big.Int(), y)
+	let b = big.Int.prototype.SetUint64.call(new big.Int(), y)
 	await $.println("rsh", await big.Int.prototype.String.call(big.Int.prototype.Rsh.call(new big.Int(), b, 11)))
 	await $.println("lsh", await big.Int.prototype.String.call(big.Int.prototype.Lsh.call(new big.Int(), b, 3)))
 	await $.println("mul", await big.Int.prototype.String.call(await big.Int.prototype.Mul.call(new big.Int(), b, b)))

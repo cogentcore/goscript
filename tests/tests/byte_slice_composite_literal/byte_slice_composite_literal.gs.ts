@@ -46,7 +46,7 @@ export async function main(): globalThis.Promise<void> {
 	// A non-empty []byte composite literal must keep the Uint8Array
 	// representation shared by the make, conversion, and array-literal
 	// paths, rather than degrading to a generic Array<number> backing.
-	let b: $.Slice<number> = new Uint8Array([1, 2, 3]) as $.Slice<number>
+	let b = new Uint8Array([1, 2, 3]) as $.Slice<number>
 	await $.println("non-empty:", b)
 	await $.println("index:", $.arrayIndex(b!, 0), $.arrayIndex(b!, 1), $.arrayIndex(b!, 2))
 	await $.println("len:", $.sliceLen(b))
@@ -58,12 +58,12 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("stored index:", $.arrayIndex(h.data!, 1))
 
 	// An empty non-nil []byte literal stays a Uint8Array.
-	let e: $.Slice<number> = new Uint8Array([]) as $.Slice<number>
+	let e = new Uint8Array([]) as $.Slice<number>
 	await $.println("empty:", e)
 	await $.println("empty len:", $.sliceLen(e))
 
 	// A keyed/sparse []byte literal is zero-filled and stays a Uint8Array.
-	let k: $.Slice<number> = new Uint8Array([0, 0, 0, 0, 0, 1]) as $.Slice<number>
+	let k = new Uint8Array([0, 0, 0, 0, 0, 1]) as $.Slice<number>
 	await $.println("keyed:", k)
 	await $.println("keyed len:", $.sliceLen(k))
 
@@ -71,7 +71,7 @@ export async function main(): globalThis.Promise<void> {
 	// uint8 on construction, so 300 folds to 44 without a runtime $.uint wrap,
 	// while the constant element folds to a plain literal.
 	let n = 300
-	let m: $.Slice<number> = new Uint8Array([$.uint(n, 8), 2]) as $.Slice<number>
+	let m = new Uint8Array([$.uint(n, 8), 2]) as $.Slice<number>
 	await $.println("mixed:", m)
 	await $.println("mixed index:", $.arrayIndex(m!, 0), $.arrayIndex(m!, 1))
 }

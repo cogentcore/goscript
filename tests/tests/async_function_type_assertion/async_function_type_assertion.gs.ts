@@ -70,7 +70,7 @@ export function chooseLookup(value: any, worker: Worker | $.VarRef<Worker> | nul
 }
 
 export async function main(): globalThis.Promise<void> {
-	let worker: Worker | $.VarRef<Worker> | null = new Worker({ch: $.makeChannel<number>(1, 0, "both")})
+	let worker = new Worker({ch: $.makeChannel<number>(1, 0, "both")})
 	let worker$: Worker = worker == null ? $.pointerTarget<Worker>(worker) : (worker as any).__isVarRef === true ? (worker as any).value : (worker as any).__goValue === undefined ? (worker as any) : $.pointerTarget<Worker>(worker)
 	await $.println("lookup:", chooseLookup(null, worker))
 
@@ -78,10 +78,10 @@ export async function main(): globalThis.Promise<void> {
 	await $.chanRecv((worker$ as Worker).ch)
 	await $.println("call:", await callLookup($.functionValue(((__receiver) => (network: string) => __receiver.lookup(network))((worker$ as Worker)), ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo), "main.(*Worker).lookup-fm"), "tcp"))
 
-	let hook: ((fn: ((_p0: string) => number | globalThis.Promise<number>) | null, network: string) => number | globalThis.Promise<number>) | null = $.functionValue(async (fn: ((_p0: string) => number | globalThis.Promise<number>) | null, network: string): globalThis.Promise<number> => {
+	let hook = $.functionValue(async (fn: ((_p0: string) => number | globalThis.Promise<number>) | null, network: string): globalThis.Promise<number> => {
 		return fn!(network)
 	}, ({ kind: $.TypeKind.Function, params: [({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo), /* @__PURE__ */ $.basicType("string")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))
-	await $.println("hook:", (__goscriptAwait = hook!(syncLookup, "ip"), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println("hook:", await hook(syncLookup, "ip"))
 	void (worker$ as Worker).ch!.close()
 }
 

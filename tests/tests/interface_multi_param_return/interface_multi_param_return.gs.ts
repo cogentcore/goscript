@@ -53,7 +53,7 @@ export class MyProcessor {
 export async function main(): globalThis.Promise<void> {
 	let processor: MultiParamReturner | null = $.interfaceValue<MultiParamReturner | null>(new MyProcessor(undefined, true), "main.MyProcessor", "main.MyProcessor")
 
-	let data: $.Slice<number> = new Uint8Array([1, 2, 3]) as $.Slice<number>
+	let data = new Uint8Array([1, 2, 3]) as $.Slice<number>
 	let [success, ] = await (processor !== null && (processor as any).__isVarRef !== true && (processor as any).__goValue === undefined ? (processor as Exclude<MultiParamReturner, null>) : $.pointerValue<Exclude<MultiParamReturner, null>>(processor)).Process(data, 5, "unused")
 
 	if (success) {

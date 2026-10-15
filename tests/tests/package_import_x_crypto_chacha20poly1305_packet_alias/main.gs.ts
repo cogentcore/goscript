@@ -13,19 +13,19 @@ import "@goscript/golang.org/x/crypto/chacha20poly1305/index.js"
 import "@goscript/crypto/cipher/index.js"
 
 export async function main(): globalThis.Promise<void> {
-	let key: $.Slice<number> = $.makeSlice<number>(chacha20poly1305.KeySize, undefined, "byte")
-	let nonce: $.Slice<number> = $.makeSlice<number>(chacha20poly1305.NonceSize, undefined, "byte")
-	let plaintext: $.Slice<number> = new Uint8Array([81, 85, 73, 67, 32, 112, 97, 121, 108, 111, 97, 100])
+	let key = $.makeSlice<number>(chacha20poly1305.KeySize, undefined, "byte")
+	let nonce = $.makeSlice<number>(chacha20poly1305.NonceSize, undefined, "byte")
+	let plaintext = new Uint8Array([81, 85, 73, 67, 32, 112, 97, 121, 108, 111, 97, 100])
 
 	let [aead, err] = chacha20poly1305.New(key)
 	if (err != null) {
 		$.panic((err as any))
 	}
 
-	let dst: $.Slice<number> = $.makeSlice<number>(2, 64, "byte")
+	let dst = $.makeSlice<number>(2, 64, "byte")
 	$.copy(dst, "hd")
-	let alias: $.Slice<number> = $.goSlice(dst, undefined, $.cap(dst))
-	let sealed: $.Slice<number> = await (aead !== null && (aead as any).__isVarRef !== true && (aead as any).__goValue === undefined ? (aead as Exclude<cipher.AEAD, null>) : $.pointerValue<Exclude<cipher.AEAD, null>>(aead)).Seal(dst, nonce, plaintext, null)
+	let alias = $.goSlice(dst, undefined, $.cap(dst))
+	let sealed = await (aead !== null && (aead as any).__isVarRef !== true && (aead as any).__goValue === undefined ? (aead as Exclude<cipher.AEAD, null>) : $.pointerValue<Exclude<cipher.AEAD, null>>(aead)).Seal(dst, nonce, plaintext, null)
 
 	await $.println("alias sees ciphertext:", bytes.Equal($.goSlice(alias, $.sliceLen(dst), $.sliceLen(sealed)), $.goSlice(sealed, $.sliceLen(dst), undefined)))
 }

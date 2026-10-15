@@ -48,7 +48,7 @@ export async function fill(fn: ((_p0: number) => void) | null): globalThis.Promi
 
 export async function main(): globalThis.Promise<void> {
 	let values: $.Slice<item> = null! as $.Slice<item>
-	await fill($.functionValue((value: number): void => {
+	await fill($.functionValue((value: number) => {
 		values = $.appendOne(values, new item({Value: value}, true))
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [] } as $.FunctionTypeInfo)))
 	if ($.sliceLen(values) != 0) {

@@ -30,7 +30,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("Valid UTF-8:", valid)
 
 	// Test with bytes
-	let b: $.Slice<number> = $.stringToBytes(s)
+	let b = $.stringToBytes(s)
 
 	// Test RuneCount
 	let byteCount = utf8.RuneCount(b)

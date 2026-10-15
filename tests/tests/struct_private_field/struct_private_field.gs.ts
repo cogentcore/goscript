@@ -43,7 +43,7 @@ export class MyStruct {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let myStruct: MyStruct | $.VarRef<MyStruct> | null = new MyStruct({myPrivate: 4})
+	let myStruct = new MyStruct({myPrivate: 4})
 	let myStruct$: MyStruct = myStruct == null ? $.pointerTarget<MyStruct>(myStruct) : (myStruct as any).__isVarRef === true ? (myStruct as any).value : (myStruct as any).__goValue === undefined ? (myStruct as any) : $.pointerTarget<MyStruct>(myStruct);
 	;(myStruct$ as MyStruct).myPrivate = 10
 	await $.println((myStruct$ as MyStruct).myPrivate)

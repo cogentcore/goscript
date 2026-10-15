@@ -130,7 +130,6 @@ const (
 	RuntimeHelperStringToBytes                RuntimeHelper = "slice.stringToBytes"
 	RuntimeHelperBytesToString                RuntimeHelper = "slice.bytesToString"
 	RuntimeHelperStringEqual                  RuntimeHelper = "slice.stringEqual"
-	RuntimeHelperStringConcat                 RuntimeHelper = "slice.concatString"
 	RuntimeHelperStringCompare                RuntimeHelper = "slice.stringCompare"
 	RuntimeHelperStringHeaderRef              RuntimeHelper = "slice.stringHeaderRef"
 	RuntimeHelperSliceHeaderRef               RuntimeHelper = "slice.sliceHeaderRef"
@@ -420,7 +419,6 @@ func runtimeHelperContracts() []RuntimeHelperContract {
 		runtimeHelper(RuntimeHelperStringToBytes, "stringToBytes", RuntimeHelperCategorySlice),
 		runtimeHelper(RuntimeHelperBytesToString, "bytesToString", RuntimeHelperCategorySlice),
 		runtimeHelper(RuntimeHelperStringEqual, "stringEqual", RuntimeHelperCategorySlice),
-		runtimeHelper(RuntimeHelperStringConcat, "concatString", RuntimeHelperCategorySlice),
 		runtimeHelper(RuntimeHelperStringCompare, "stringCompare", RuntimeHelperCategorySlice),
 		runtimeHelper(RuntimeHelperStringHeaderRef, "stringHeaderRef", RuntimeHelperCategorySlice),
 		runtimeHelper(RuntimeHelperSliceHeaderRef, "sliceHeaderRef", RuntimeHelperCategorySlice),

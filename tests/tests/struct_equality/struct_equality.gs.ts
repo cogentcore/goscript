@@ -197,10 +197,10 @@ export async function main(): globalThis.Promise<void> {
 
 	// struct values compare by fields after passing a pointer as an interface
 	let s = new S({A: "x", B: 1.5}, true)
-	let n: S | $.VarRef<S> | null = new S({A: "x", B: 1.5})
+	let n = new S({A: "x", B: 1.5})
 	take($.interfaceValue(n, "*main.S", /* @__PURE__ */ $.pointerType("main.S")))
 	await $.println($.structEqual($.pointerValue<S>(n), s))
-	let m: S | $.VarRef<S> | null = new S({A: "x", B: 1.5})
+	let m = new S({A: "x", B: 1.5})
 	keep($.interfaceValue(m, "*main.S", /* @__PURE__ */ $.pointerType("main.S")))
 	await $.println($.structEqual($.pointerValue<S>(m), s), $.structEqual(s, $.pointerValue<S>(m)))
 	let v: any = $.interfaceValue((s).clone(), "main.S", "main.S")

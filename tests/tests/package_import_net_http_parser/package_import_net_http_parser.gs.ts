@@ -22,7 +22,7 @@ import "@goscript/strings/index.js"
 import "@goscript/net/url/index.js"
 
 export async function main(): globalThis.Promise<void> {
-	let requestWire = $.concatString(($.concatString(($.concatString(($.concatString(($.concatString(($.concatString("POST /chunk HTTP/1.1\r\n", "Host: example.com\r\n")), "Transfer-Encoding: chunked\r\n")), "X-Test: one\r\n")), "X-Test: two\r\n")), "\r\n")), "5\r\nhello\r\n0\r\n\r\n")
+	let requestWire = "POST /chunk HTTP/1.1\r\n" + "Host: example.com\r\n" + "Transfer-Encoding: chunked\r\n" + "X-Test: one\r\n" + "X-Test: two\r\n" + "\r\n" + "5\r\nhello\r\n0\r\n\r\n"
 	let __goscriptTuple0: any = await http.ReadRequest(bufio.NewReader($.interfaceValue<io.Reader | null>(strings.NewReader(requestWire), "*strings.Reader", /* @__PURE__ */ $.pointerType("strings.Reader"))))
 	let req: http.Request | $.VarRef<http.Request> | null = __goscriptTuple0[0]
 	let err = __goscriptTuple0[1]
@@ -36,7 +36,7 @@ export async function main(): globalThis.Promise<void> {
 	let reqBodyErr = __goscriptTuple1[1]
 	await fmt.Printf("request %s %s %s %s %d %d %s %d %d %t %d %q %v\n", (req$ as http.Request).Method, (req$ as http.Request).Host, $.pointerValue<url.URL>((req$ as http.Request).URL).Path, $.pointerValue<url.URL>((req$ as http.Request).URL).RawQuery, $.basicInterfaceValue((req$ as http.Request).ProtoMajor, "int"), $.basicInterfaceValue((req$ as http.Request).ProtoMinor, "int"), http.Request.prototype.UserAgent.call($.pointerValue<http.Request>(req)), $.basicInterfaceValue($.sliceLen(http.Header_Values((req$ as http.Request).Header, "X-Test")), "int"), $.basicInterfaceValue((req$ as http.Request).ContentLength, "int64"), (req$ as http.Request).Close, $.basicInterfaceValue($.sliceLen((req$ as http.Request).TransferEncoding), "int"), $.bytesToString(reqBody), (reqBodyErr as any))
 
-	let responseWire = $.concatString(($.concatString(($.concatString(($.concatString("HTTP/1.1 201 Created\r\n", "Content-Type: text/plain\r\n")), "Content-Length: 5\r\n")), "\r\n")), "hello")
+	let responseWire = "HTTP/1.1 201 Created\r\n" + "Content-Type: text/plain\r\n" + "Content-Length: 5\r\n" + "\r\n" + "hello"
 	let __goscriptTuple2: any = await http.ReadResponse(bufio.NewReader($.interfaceValue<io.Reader | null>(strings.NewReader(responseWire), "*strings.Reader", /* @__PURE__ */ $.pointerType("strings.Reader"))), req)
 	let resp: http.Response | $.VarRef<http.Response> | null = __goscriptTuple2[0]
 	err = __goscriptTuple2[1]

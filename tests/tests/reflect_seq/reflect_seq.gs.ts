@@ -150,7 +150,7 @@ export async function main(): globalThis.Promise<void> {
 		return
 	}
 
-	let ch: $.Channel<number> | null = $.makeChannel<number>(2, 0, "both")
+	let ch = $.makeChannel<number>(2, 0, "both")
 	await $.chanSend(ch, 5)
 	await $.chanSend(ch, 6)
 	ch!.close()
@@ -164,7 +164,7 @@ export async function main(): globalThis.Promise<void> {
 	if (__goscriptRangeReturn5) {
 		return
 	}
-	let rc: $.Channel<number> | null = $.makeChannel<number>(1, 0, "both")
+	let rc = $.makeChannel<number>(1, 0, "both")
 	await $.chanSend(rc, 8)
 	let [v, ok] = await $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(rc, "chan int", /* @__PURE__ */ $.channelType(/* @__PURE__ */ $.basicType("int"), "both"))))).Recv()
 	await $.println("recv", $.markAsStructValue($.cloneStructValue(v)).Int(), ok)
@@ -177,7 +177,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.interfaceValue(ch, "chan int", /* @__PURE__ */ $.channelType(/* @__PURE__ */ $.basicType("int"), "both")))).ChanDir(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) == 3, reflect.ChanDir_String((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.interfaceValue(null, "<-chan int", /* @__PURE__ */ $.channelType(/* @__PURE__ */ $.basicType("int"), "receive")))).ChanDir(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)))
 	await $.println((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.basicInterfaceValue(1, "int"))).CanSeq(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.basicInterfaceValue(1, "int"))).CanSeq2(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf("")).CanSeq2(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.basicInterfaceValue(1.5, "float64"))).CanSeq(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
-	let seq: ((_yield: ((_p0: number) => boolean | globalThis.Promise<boolean>) | null) => void) | null = $.functionValue(async (_yield: ((_p0: number) => boolean | globalThis.Promise<boolean>) | null): globalThis.Promise<void> => {
+	let seq = $.functionValue(async (_yield: ((_p0: number) => boolean | globalThis.Promise<boolean>) | null) => {
 		;(__goscriptAwait = _yield!(7), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) && (__goscriptAwait = _yield!(9), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 	}, ({ kind: $.TypeKind.Function, params: [({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo)], results: [] } as $.FunctionTypeInfo))
 	await $.println((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.interfaceValue(seq, "func(yield func(int) bool)", ({ kind: $.TypeKind.Function, params: [({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo)], results: [] } as $.FunctionTypeInfo)))).CanSeq(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.interfaceValue(seq, "func(yield func(int) bool)", ({ kind: $.TypeKind.Function, params: [({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo)], results: [] } as $.FunctionTypeInfo)))).CanSeq2(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))

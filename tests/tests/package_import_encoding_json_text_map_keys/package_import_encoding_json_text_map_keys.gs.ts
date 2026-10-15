@@ -144,7 +144,7 @@ export async function Tokens_UnmarshalText(t: $.VarRef<Tokens> | null, text: $.S
 			return null
 		}
 	}
-	return errors.New($.concatString("unknown token ", $.bytesToString(text)))
+	return errors.New("unknown token " + $.bytesToString(text))
 }
 
 export async function main(): globalThis.Promise<void> {

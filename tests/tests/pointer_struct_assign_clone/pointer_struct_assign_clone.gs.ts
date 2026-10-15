@@ -58,8 +58,8 @@ export async function main(): globalThis.Promise<void> {
 	await $.println($.pointerValue<MyStruct>(p).Value)
 
 	// Test assignment from a pointer to a struct (should not clone)
-	let s2: MyStruct | $.VarRef<MyStruct> | null = new MyStruct({Value: 40})
-	let p2: MyStruct | $.VarRef<MyStruct> | null = new MyStruct({Value: 50})
+	let s2 = new MyStruct({Value: 40})
+	let p2 = new MyStruct({Value: 50})
 	let p2$: MyStruct = p2 == null ? $.pointerTarget<MyStruct>(p2) : (p2 as any).__isVarRef === true ? (p2 as any).value : (p2 as any).__goValue === undefined ? (p2 as any) : $.pointerTarget<MyStruct>(p2)
 	$.assignStruct((p2$ as MyStruct), $.pointerValue<MyStruct>(s2))
 	await $.println((p2$ as MyStruct).Value)
@@ -71,13 +71,13 @@ export async function main(): globalThis.Promise<void> {
 
 	// Test assignment of a struct from a function call
 	let s3 = new MyStruct({Value: 70}, true)
-	let p3: MyStruct | $.VarRef<MyStruct> | null = new MyStruct({Value: 80})
+	let p3 = new MyStruct({Value: 80})
 	$.assignStruct($.pointerValue<MyStruct>(p3), getStruct())
 	await $.println($.pointerValue<MyStruct>(p3).Value)
 	await $.println(s3.Value)
 
 	// Test assignment of a struct from a pointer returned by a function call
-	let p4: MyStruct | $.VarRef<MyStruct> | null = new MyStruct({Value: 90})
+	let p4 = new MyStruct({Value: 90})
 	$.assignStruct($.pointerValue<MyStruct>(p4), $.pointerValue<MyStruct>(getStructPointer()))
 	await $.println($.pointerValue<MyStruct>(p4).Value)
 }

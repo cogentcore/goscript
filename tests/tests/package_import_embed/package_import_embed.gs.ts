@@ -33,7 +33,7 @@ export async function main(): globalThis.Promise<void> {
 	let [sk, isSeeker] = $.typeAssertTuple<io.Seeker | null>(f, "io.Seeker")
 	await $.println("interfaces:", isReaderAt, isSeeker)
 
-	let b: $.Slice<number> = $.makeSlice<number>(8, undefined, "byte")
+	let b = $.makeSlice<number>(8, undefined, "byte")
 	let __goscriptTuple0: any = await (ra !== null && (ra as any).__isVarRef !== true && (ra as any).__goValue === undefined ? (ra as Exclude<io.ReaderAt, null>) : $.pointerValue<Exclude<io.ReaderAt, null>>(ra)).ReadAt(b, 7n)
 	let n = __goscriptTuple0[0]
 	err = __goscriptTuple0[1]

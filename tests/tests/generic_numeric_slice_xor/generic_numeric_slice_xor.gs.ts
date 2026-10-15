@@ -12,7 +12,7 @@ export function xorLoop<T>(__typeArgs: $.GenericTypeArgs | undefined, dst: $.Sli
 }
 
 export async function main(): globalThis.Promise<void> {
-	let dst: $.Slice<number> = new Uint8Array([0, 0]) as $.Slice<number>
+	let dst = new Uint8Array([0, 0]) as $.Slice<number>
 	xorLoop(__goscriptStatic0(), dst, new Uint8Array([1, 3]) as $.Slice<number>, new Uint8Array([2, 1]) as $.Slice<number>)
 	await $.println($.arrayIndex(dst!, 0), $.arrayIndex(dst!, 1))
 }

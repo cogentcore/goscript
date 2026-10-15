@@ -139,15 +139,15 @@ export class item {
 }
 
 export async function newChanReader(chunks: $.Slice<string>): globalThis.Promise<chanReader | $.VarRef<chanReader> | null> {
-	let r: chanReader | $.VarRef<chanReader> | null = new chanReader({ch: $.makeChannel<string>(0, "", "both")})
+	let r = new chanReader({ch: $.makeChannel<string>(0, "", "both")})
 	let r$: chanReader = r == null ? $.pointerTarget<chanReader>(r) : (r as any).__isVarRef === true ? (r as any).value : (r as any).__goValue === undefined ? (r as any) : $.pointerTarget<chanReader>(r)
-	queueMicrotask(async () => { await (async (): globalThis.Promise<void> => {
+	queueMicrotask(async () => {
 		for (let __goscriptRangeTarget0 = chunks, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
 			let c = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as string)
 			await $.chanSend((r$ as chanReader).ch, c)
 		}
 		void (r$ as chanReader).ch!.close()
-	})() })
+	})
 	return r
 }
 
@@ -209,14 +209,14 @@ export async function main(): globalThis.Promise<void> {
 	await fmt.Println(ind.value.String())
 
 	// Decoder reads one value per call and buffers the rest of the stream.
-	let dec: json.Decoder | $.VarRef<json.Decoder> | null = json.NewDecoder($.pointerValueOrNil($.interfaceValue<io.Reader | null>(strings.NewReader("1 2 3"), "*strings.Reader", /* @__PURE__ */ $.pointerType("strings.Reader")))!)
+	let dec = json.NewDecoder($.pointerValueOrNil($.interfaceValue<io.Reader | null>(strings.NewReader("1 2 3"), "*strings.Reader", /* @__PURE__ */ $.pointerType("strings.Reader")))!)
 	let n: $.VarRef<number> = $.varRef(0)
 	while (await json.Decoder.prototype.Decode.call($.pointerValue<json.Decoder>(dec), $.interfaceValue(n, "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int")))) == null) {
 		await fmt.Println("decoded", $.basicInterfaceValue(n.value, "int"))
 	}
 
 	// UseNumber keeps the exact source literal beyond float64 precision.
-	let und: json.Decoder | $.VarRef<json.Decoder> | null = json.NewDecoder($.pointerValueOrNil($.interfaceValue<io.Reader | null>(strings.NewReader("{\"big\":9007199254740993}"), "*strings.Reader", /* @__PURE__ */ $.pointerType("strings.Reader")))!)
+	let und = json.NewDecoder($.pointerValueOrNil($.interfaceValue<io.Reader | null>(strings.NewReader("{\"big\":9007199254740993}"), "*strings.Reader", /* @__PURE__ */ $.pointerType("strings.Reader")))!)
 	json.Decoder.prototype.UseNumber.call($.pointerValue<json.Decoder>(und))
 	let m: $.VarRef<globalThis.Map<string, any> | null> = $.varRef(null! as globalThis.Map<string, any> | null)
 	await json.Decoder.prototype.Decode.call($.pointerValue<json.Decoder>(und), $.interfaceValue(m, "*map[string]interface{}", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), { kind: $.TypeKind.Interface, methods: [] }))))
@@ -235,7 +235,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 
 	// Token advances the stream; More reports remaining container elements.
-	let mdec: json.Decoder | $.VarRef<json.Decoder> | null = json.NewDecoder($.pointerValueOrNil($.interfaceValue<io.Reader | null>(strings.NewReader("[10,20]"), "*strings.Reader", /* @__PURE__ */ $.pointerType("strings.Reader")))!)
+	let mdec = json.NewDecoder($.pointerValueOrNil($.interfaceValue<io.Reader | null>(strings.NewReader("[10,20]"), "*strings.Reader", /* @__PURE__ */ $.pointerType("strings.Reader")))!)
 	await json.Decoder.prototype.Token.call($.pointerValue<json.Decoder>(mdec))
 	await fmt.Println("more", await json.Decoder.prototype.More.call($.pointerValue<json.Decoder>(mdec)))
 	await json.Decoder.prototype.Token.call($.pointerValue<json.Decoder>(mdec))
@@ -244,7 +244,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// A blocking reader delivers values, a number, and a multibyte character
 	// split across its chunks.
-	let bdec: json.Decoder | $.VarRef<json.Decoder> | null = json.NewDecoder($.pointerValueOrNil($.interfaceValue<io.Reader | null>(bufio.NewReader($.interfaceValue<io.Reader | null>(await newChanReader($.arrayToSlice<string>(["{\"A\": \"h", "\xc3", "\xa9llo\", \"B\": 1", "2.5}", "\n{\"A\": \"x\", \"B\": 3}"])), "*main.chanReader", /* @__PURE__ */ $.pointerType("main.chanReader"))), "*bufio.Reader", /* @__PURE__ */ $.pointerType("bufio.Reader")))!)
+	let bdec = json.NewDecoder($.pointerValueOrNil($.interfaceValue<io.Reader | null>(bufio.NewReader($.interfaceValue<io.Reader | null>(await newChanReader($.arrayToSlice<string>(["{\"A\": \"h", "\xc3", "\xa9llo\", \"B\": 1", "2.5}", "\n{\"A\": \"x\", \"B\": 3}"])), "*main.chanReader", /* @__PURE__ */ $.pointerType("main.chanReader"))), "*bufio.Reader", /* @__PURE__ */ $.pointerType("bufio.Reader")))!)
 	while (true) {
 		let it: $.VarRef<item> = $.varRef(new item(undefined, true))
 		{
@@ -260,7 +260,7 @@ export async function main(): globalThis.Promise<void> {
 	// Token and More work on a blocking reader, and UseNumber tokens are
 	// json.Number values.
 	await printTokens(json.NewDecoder($.pointerValueOrNil($.interfaceValue<io.Reader | null>(await newChanReader($.arrayToSlice<string>(["[1, \"two\", ", "{\"k\": true}]"])), "*main.chanReader", /* @__PURE__ */ $.pointerType("main.chanReader")))!))
-	let ndec: json.Decoder | $.VarRef<json.Decoder> | null = json.NewDecoder($.pointerValueOrNil($.interfaceValue<io.Reader | null>(await newChanReader($.arrayToSlice<string>(["[1.5, \"s\"]"])), "*main.chanReader", /* @__PURE__ */ $.pointerType("main.chanReader")))!)
+	let ndec = json.NewDecoder($.pointerValueOrNil($.interfaceValue<io.Reader | null>(await newChanReader($.arrayToSlice<string>(["[1.5, \"s\"]"])), "*main.chanReader", /* @__PURE__ */ $.pointerType("main.chanReader")))!)
 	json.Decoder.prototype.UseNumber.call($.pointerValue<json.Decoder>(ndec))
 	await printTokens(ndec)
 

@@ -126,9 +126,9 @@ export class Lead {
 
 export function Level_Rank(l: Level, prefix: string): string {
 	if (l > 2) {
-		return $.concatString(prefix, "senior")
+		return prefix + "senior"
 	}
-	return $.concatString(prefix, "junior")
+	return prefix + "junior"
 }
 
 export async function main(): globalThis.Promise<void> {
@@ -141,7 +141,7 @@ export async function main(): globalThis.Promise<void> {
 	r = $.interfaceValue<Ranker | null>(new Engineer({Level: 1, Name: "Ada"}), "*main.Engineer", /* @__PURE__ */ $.pointerType("main.Engineer"))
 	await $.println("pointer:", (__goscriptAwait = (r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? (r as Exclude<Ranker, null>) : $.pointerValue<Exclude<Ranker, null>>(r)).Rank("pointer: "), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
-	let lead: Lead | $.VarRef<Lead> | null = new Lead({Engineer: new Engineer({Level: 4, Name: "Linus"}, true)})
+	let lead = new Lead({Engineer: new Engineer({Level: 4, Name: "Linus"}, true)})
 	await $.println("nested direct:", Level_Rank($.pointerValue<Lead>(lead).Engineer.Level, "lead: "))
 	r = $.interfaceValue<Ranker | null>(lead, "*main.Lead", /* @__PURE__ */ $.pointerType("main.Lead"))
 	await $.println("nested interface:", (__goscriptAwait = (r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? (r as Exclude<Ranker, null>) : $.pointerValue<Exclude<Ranker, null>>(r)).Rank("lead: "), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))

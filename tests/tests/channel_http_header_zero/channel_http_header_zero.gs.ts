@@ -7,7 +7,7 @@ import * as http from "@goscript/net/http/index.js"
 import "@goscript/net/http/index.js"
 
 export async function main(): globalThis.Promise<void> {
-	let channel: $.Channel<http.Header> | null = $.makeChannel<http.Header>(1, null! as http.Header, "both")
+	let channel = $.makeChannel<http.Header>(1, null! as http.Header, "both")
 	channel!.close()
 	let __goscriptRecv0 = await $.chanRecvWithOk(channel)
 	let header: http.Header = __goscriptRecv0.value

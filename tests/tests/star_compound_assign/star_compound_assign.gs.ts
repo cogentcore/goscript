@@ -56,20 +56,20 @@ export async function main(): globalThis.Promise<void> {
 	let x: $.VarRef<number> = $.varRef(2)
 	let p: $.VarRef<number> | null = x
 
-	p!.value = p!.value + (3)
+	p!.value += 3
 	await $.println(x.value)
 
 	p!.value = p!.value & ~((1))
 	// 5 (0101) &^ 1 (0001) = 4 (0100)
 	await $.println(x.value)
 
-	p!.value = p!.value << (2)
+	p!.value <<= 2
 	await $.println(x.value)
 
-	p!.value = p!.value >> (1)
+	p!.value >>= 1
 	await $.println(x.value)
 
-	p!.value = p!.value | (3)
+	p!.value |= 3
 	await $.println(x.value)
 
 	p!.value++
@@ -79,7 +79,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println(x.value)
 
 	let values: $.VarRef<$.Slice<number>> = $.varRef($.arrayToSlice<number>([1, 2, 3, 4]))
-	let h: holder | $.VarRef<holder> | null = new holder({values: values})
+	let h = new holder({values: values})
 	let h$: holder = h == null ? $.pointerTarget<holder>(h) : (h as any).__isVarRef === true ? (h as any).value : (h as any).__goValue === undefined ? (h as any) : $.pointerTarget<holder>(h)
 	trim(h)
 	await $.println("len after star:", $.sliceLen($.pointerValue<$.Slice<number>>((h$ as holder).values)))

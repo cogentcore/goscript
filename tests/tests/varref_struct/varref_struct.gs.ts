@@ -123,7 +123,7 @@ export function pair(): [MyStruct, MyStruct] {
 export async function main(): globalThis.Promise<void> {
 	// 'val' is a value type, but its address is taken, so it should be varrefed in TS.
 	let val = $.varRef(new MyStruct({MyInt: 10}, true))
-	let ptrToVal: MyStruct | $.VarRef<MyStruct> | null = val
+	let ptrToVal = val
 	let ptrToVal$: MyStruct = ptrToVal == null ? $.pointerTarget<MyStruct>(ptrToVal) : (ptrToVal as any).__isVarRef === true ? (ptrToVal as any).value : (ptrToVal as any).__goValue === undefined ? (ptrToVal as any) : $.pointerTarget<MyStruct>(ptrToVal)
 
 	// Accessing pointer value, should use .value
@@ -147,8 +147,8 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("keyword field:", keywords._catch, $.pointerEqual(keyword, $.fieldRef(keywords, "_catch")))
 
 	// Nested values keep their storage while pointer fields change referents.
-	let first: MyStruct | $.VarRef<MyStruct> | null = new MyStruct({MyInt: 1})
-	let second: MyStruct | $.VarRef<MyStruct> | null = new MyStruct({MyInt: 2})
+	let first = new MyStruct({MyInt: 1})
+	let second = new MyStruct({MyInt: 2})
 	let outer = new Outer({Ptr: first}, true)
 	let child = $.fieldRef(outer.Child._fields, "MyInt")
 	let item = $.fieldRef($.arrayIndex(outer.Items, 0)._fields, "MyInt")

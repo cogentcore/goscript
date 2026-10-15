@@ -45,7 +45,7 @@ export class stream {
 
 	public Close(): string {
 		const s = this;
-		return $.concatString("close:", s.name)
+		return "close:" + s.name
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -151,7 +151,7 @@ export async function main(): globalThis.Promise<void> {
 	let value = new stopStream({stream: new stream({name: "value"}, true)}, true)
 	await closeIt($.interfaceValue<closer | null>((value).clone(), "main.stopStream", "main.stopStream"))
 
-	let ptr: stopStream | $.VarRef<stopStream> | null = new stopStream({stream: new stream({name: "pointer"}, true)})
+	let ptr = new stopStream({stream: new stream({name: "pointer"}, true)})
 	await closeIt($.interfaceValue<closer | null>(ptr, "*main.stopStream", /* @__PURE__ */ $.pointerType("main.stopStream")))
 
 	let promotedPtr = new pointerStopStream({stream: new stream({name: "embedded pointer"})}, true)

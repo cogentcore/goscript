@@ -8,7 +8,7 @@ export function safeDivide(a: number, b: number): [number, boolean] {
 	let ok: boolean = false
 	const __defer = new $.DisposableStack()
 	try {
-		__defer.defer(() => { ((): void => {
+		__defer.defer(() => { (() => {
 			{
 				let r = $.recover()
 				if (r != null) {
@@ -38,7 +38,7 @@ export function safeDivide(a: number, b: number): [number, boolean] {
 export async function mustPanic(): globalThis.Promise<void> {
 	const __defer = new $.AsyncDisposableStack()
 	try {
-		__defer.defer(async () => { await (async (): globalThis.Promise<void> => {
+		__defer.defer(async () => { await (async () => {
 			{
 				let r = $.recover()
 				if (r != null) {
@@ -59,7 +59,7 @@ export async function mustPanic(): globalThis.Promise<void> {
 export async function noPanic(): globalThis.Promise<void> {
 	const __defer = new $.AsyncDisposableStack()
 	try {
-		__defer.defer(async () => { await (async (): globalThis.Promise<void> => {
+		__defer.defer(async () => { await (async () => {
 			{
 				let r = $.recover()
 				if (r != null) {

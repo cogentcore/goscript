@@ -126,7 +126,7 @@ export async function main(): globalThis.Promise<void> {
 	let line: $.VarRef<Line> = $.varRef(($.arrayToSlice<Lex>([new Lex({Name: "b", Start: 2}, true), new Lex({Name: "c", Start: 3}, true)]) as Line))
 	await fmt.Println($.interfaceValue(line.value, "main.Line", /* @__PURE__ */ $.sliceType("main.Lex", "main.Line")), $.namedValueInterfaceValue<any>(line, "*main.Line", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()))
 	await fmt.Println(await fmt.Sprint($.interfaceValue(line.value, "main.Line", /* @__PURE__ */ $.sliceType("main.Lex", "main.Line"))))
-	let ptrs: $.Slice<Lex | $.VarRef<Lex> | null> = $.arrayToSlice<Lex | $.VarRef<Lex> | null>([$.indexRef(line.value!, 0)])
+	let ptrs = $.arrayToSlice<Lex | $.VarRef<Lex> | null>([$.indexRef(line.value!, 0)])
 	await fmt.Println($.interfaceValue($.arrayIndex(ptrs!, 0), "*main.Lex", /* @__PURE__ */ $.pointerType("main.Lex")), $.interfaceValue(new Val({N: 4}, true), "main.Val", "main.Val"), $.interfaceValue(new Val({N: 5}), "*main.Val", /* @__PURE__ */ $.pointerType("main.Val")), $.interfaceValue($.arrayToSlice<Val>([new Val({N: 6}, true)]), "[]main.Val", /* @__PURE__ */ $.sliceType("main.Val")))
 }
 

@@ -5,10 +5,10 @@ import * as $ from "@goscript/builtin/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	// Start an anonymous function worker
-	let msgs: $.Channel<string> | null = $.makeChannel<string>(1, "", "both")
-	queueMicrotask(async () => { await (async (): globalThis.Promise<void> => {
+	let msgs = $.makeChannel<string>(1, "", "both")
+	queueMicrotask(async () => {
 		await $.chanSend(msgs, "anonymous function worker")
-	})() })
+	})
 	await $.println(await $.chanRecv(msgs))
 }
 

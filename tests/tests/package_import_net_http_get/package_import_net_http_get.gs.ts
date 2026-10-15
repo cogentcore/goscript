@@ -17,7 +17,7 @@ import "@goscript/strings/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	await using __defer = new $.AsyncDisposableStack()
-	let server: httptest.Server | $.VarRef<httptest.Server> | null = httptest.NewServer($.pointerValueOrNil($.namedValueInterfaceValue<http.Handler | null>($.namedFunction($.functionValue(async (w: http.ResponseWriter | null, r: http.Request | $.VarRef<http.Request> | null): globalThis.Promise<void> => {
+	let server = httptest.NewServer($.pointerValueOrNil($.namedValueInterfaceValue<http.Handler | null>($.namedFunction($.functionValue(async (w: http.ResponseWriter | null, r: http.Request | $.VarRef<http.Request> | null) => {
 		let data: $.Slice<number> = null! as $.Slice<number>
 		if ($.pointerValue<http.Request>(r).Body != null) {
 			let readErr: $.GoError = null! as $.GoError
@@ -27,7 +27,7 @@ export async function main(): globalThis.Promise<void> {
 			if (readErr != null) {
 				void (__goscriptAwait = (w !== null && (w as any).__isVarRef !== true && (w as any).__goValue === undefined ? (w as Exclude<http.ResponseWriter, null>) : $.pointerValue<Exclude<http.ResponseWriter, null>>(w)).WriteHeader(500), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 				{
-					let [, writeErr] = await (w !== null && (w as any).__isVarRef !== true && (w as any).__goValue === undefined ? (w as Exclude<http.ResponseWriter, null>) : $.pointerValue<Exclude<http.ResponseWriter, null>>(w)).Write($.stringToBytes($.concatString("read error: ", (__goscriptAwait = (readErr !== null && (readErr as any).__isVarRef !== true && (readErr as any).__goValue === undefined ? (readErr as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(readErr)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))))
+					let [, writeErr] = await (w !== null && (w as any).__isVarRef !== true && (w as any).__goValue === undefined ? (w as Exclude<http.ResponseWriter, null>) : $.pointerValue<Exclude<http.ResponseWriter, null>>(w)).Write($.stringToBytes("read error: " + (__goscriptAwait = (readErr !== null && (readErr as any).__isVarRef !== true && (readErr as any).__goValue === undefined ? (readErr as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(readErr)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)))
 					if (writeErr != null) {
 						return
 					}
@@ -37,7 +37,7 @@ export async function main(): globalThis.Promise<void> {
 		}
 		if ($.sliceLen(data) != 0) {
 			{
-				let [, writeErr] = await (w !== null && (w as any).__isVarRef !== true && (w as any).__goValue === undefined ? (w as Exclude<http.ResponseWriter, null>) : $.pointerValue<Exclude<http.ResponseWriter, null>>(w)).Write($.stringToBytes($.concatString(($.concatString($.pointerValue<http.Request>(r).Method, ":")), $.bytesToString(data))))
+				let [, writeErr] = await (w !== null && (w as any).__isVarRef !== true && (w as any).__goValue === undefined ? (w as Exclude<http.ResponseWriter, null>) : $.pointerValue<Exclude<http.ResponseWriter, null>>(w)).Write($.stringToBytes($.pointerValue<http.Request>(r).Method + ":" + $.bytesToString(data)))
 				if (writeErr != null) {
 					return
 				}

@@ -50,7 +50,7 @@ export function mapComparisonPanics(): boolean {
 	let panicked: boolean = false
 	const __defer = new $.DisposableStack()
 	try {
-		__defer.defer(() => { ((): void => {
+		__defer.defer(() => { (() => {
 			panicked = $.recover() != null
 		})() })
 		let mapped: globalThis.Map<string, number> | null = null! as globalThis.Map<string, number> | null

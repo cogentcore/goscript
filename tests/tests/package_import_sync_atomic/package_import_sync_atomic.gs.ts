@@ -46,7 +46,7 @@ export class pointerNode {
 }
 
 export function makeAtomicCallback(): [(() => void) | null, $.GoError] {
-	return [$.functionValue(async (): globalThis.Promise<void> => {
+	return [$.functionValue(async () => {
 		await $.println("Pointer function callback called")
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)), null]
 }
@@ -131,10 +131,10 @@ export async function main(): globalThis.Promise<void> {
 	}
 
 	let structPtr: $.VarRef<atomic.Pointer<pointerNode>> = $.varRef($.markAsStructValue(new atomic.Pointer<pointerNode>()))
-	let node: pointerNode | $.VarRef<pointerNode> | null = new pointerNode()
+	let node = new pointerNode()
 	$.pointerValue<pointerNode>(node).value = "node"
 	if (structPtr.value.CompareAndSwap(null, node)) {
-		let loadedNode: pointerNode | $.VarRef<pointerNode> | null = (structPtr.value.Load() as pointerNode | $.VarRef<pointerNode> | null)
+		let loadedNode = (structPtr.value.Load() as pointerNode | $.VarRef<pointerNode> | null)
 		if (loadedNode != null) {
 			await $.println("Pointer struct CAS:", $.pointerValue<pointerNode>(loadedNode).value)
 		}

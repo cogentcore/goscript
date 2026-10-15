@@ -54,12 +54,12 @@ export class MyStruct {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let original: MyStruct | $.VarRef<MyStruct> | null = new MyStruct({MyInt: 10, MyString: "original"})
+	let original = new MyStruct({MyInt: 10, MyString: "original"})
 	let original$: MyStruct = original == null ? $.pointerTarget<MyStruct>(original) : (original as any).__isVarRef === true ? (original as any).value : (original as any).__goValue === undefined ? (original as any) : $.pointerTarget<MyStruct>(original)
 
 	// === Pointer Assignment (No Copy) ===
 	// Assigning a pointer variable to another pointer variable.
-	let pointerCopy: MyStruct | $.VarRef<MyStruct> | null = original
+	let pointerCopy = original
 	let pointerCopy$: MyStruct = pointerCopy == null ? $.pointerTarget<MyStruct>(pointerCopy) : (pointerCopy as any).__isVarRef === true ? (pointerCopy as any).value : (pointerCopy as any).__goValue === undefined ? (pointerCopy as any) : $.pointerTarget<MyStruct>(pointerCopy);
 
 	// Modify the struct through the original pointer.
@@ -67,7 +67,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// The change should be reflected when accessing through the copied pointer.
 	// Expected: "modified original"
-	await $.println($.concatString("Pointer copy value: Expected: modified original, Actual: ", (pointerCopy$ as MyStruct).MyString));
+	await $.println("Pointer copy value: Expected: modified original, Actual: " + (pointerCopy$ as MyStruct).MyString);
 
 	// Modify the struct through the copied pointer.
 	;(pointerCopy$ as MyStruct).MyInt = 20

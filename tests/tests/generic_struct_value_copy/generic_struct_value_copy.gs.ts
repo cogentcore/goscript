@@ -212,7 +212,7 @@ export function store(__typeArgs: $.GenericTypeArgs | undefined, dst: any, v: an
 }
 
 export function fill<T>(__typeArgs: $.GenericTypeArgs | undefined, n: number, v: any): $.Slice<T> {
-	let r: $.Slice<T> = $.makeSlice<T>(n, undefined, undefined, () => ($.genericZero(__typeArgs, "T", null) as T))
+	let r = $.makeSlice<T>(n, undefined, undefined, () => ($.genericZero(__typeArgs, "T", null) as T))
 	for (let __goscriptRangeTarget0 = r, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), i = 0; i < __goscriptRangeWindow0.length; i++) {
 		;(__goscriptRangeWindow0.backing as any[])[__goscriptRangeWindow0.offset + i] = $.copyElement(v)
 	}
@@ -263,15 +263,15 @@ export async function main(): globalThis.Promise<void> {
 	d.value.Set(3)
 	await $.println("store:", v.V, d.value.V)
 
-	let xs: $.Slice<Value> = (fill(__goscriptStatic0(), 2, new Value({V: 5}, true)) as $.Slice<Value>)
+	let xs = (fill(__goscriptStatic0(), 2, new Value({V: 5}, true)) as $.Slice<Value>)
 	$.arrayIndex(xs!, 0).Set(6)
 	await $.println("fill:", $.arrayIndex(xs!, 0).V, $.arrayIndex(xs!, 1).V)
 
-	let ys: $.Slice<Value> = (appendTwice(__goscriptStatic0(), null, new Value({V: 7}, true)) as $.Slice<Value>)
+	let ys = (appendTwice(__goscriptStatic0(), null, new Value({V: 7}, true)) as $.Slice<Value>)
 	$.arrayIndex(ys!, 0).Set(8)
 	await $.println("append:", $.arrayIndex(ys!, 0).V, $.arrayIndex(ys!, 1).V)
 
-	let m: globalThis.Map<string, Value> | null = $.makeMap<string, Value>([])
+	let m = $.makeMap<string, Value>([])
 	setTwo(__goscriptStatic0(), m, new Value({V: 9}, true))
 	let a = $.varRef(($.mapGet<string, Value, Value>(m, "a", new Value(undefined, true))[0]).clone())
 	a.value.Set(10)

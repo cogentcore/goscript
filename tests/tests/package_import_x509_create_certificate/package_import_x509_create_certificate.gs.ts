@@ -102,7 +102,7 @@ export async function main(): globalThis.Promise<void> {
 	err = __goscriptTuple1[1]
 	await $.println("extension marshal err nil", err == null)
 
-	let template: x509.Certificate | $.VarRef<x509.Certificate> | null = (() => { const __goscriptLiteralField0 = big.NewInt(42n); const __goscriptLiteralField1 = $.markAsStructValue($.cloneStructValue(time.Unix(1700000000n, 0n))); const __goscriptLiteralField2 = $.markAsStructValue($.cloneStructValue(time.Unix(4900000000n, 0n))); return new x509.Certificate({SerialNumber: __goscriptLiteralField0, Subject: new pkix.Name({CommonName: "goscript.test", Organization: $.arrayToSlice<string>(["GoScript"])}, true), NotBefore: __goscriptLiteralField1, NotAfter: __goscriptLiteralField2, KeyUsage: 1, ExtKeyUsage: $.arrayToSlice<x509.ExtKeyUsage>([1]), BasicConstraintsValid: true, ExtraExtensions: $.arrayToSlice<pkix.Extension>([new pkix.Extension({Id: (extensionID as asn1.ObjectIdentifier), Critical: true, Value: extensionDER}, true)])}) })()
+	let template = (() => { const __goscriptLiteralField0 = big.NewInt(42n); const __goscriptLiteralField1 = $.markAsStructValue($.cloneStructValue(time.Unix(1700000000n, 0n))); const __goscriptLiteralField2 = $.markAsStructValue($.cloneStructValue(time.Unix(4900000000n, 0n))); return new x509.Certificate({SerialNumber: __goscriptLiteralField0, Subject: new pkix.Name({CommonName: "goscript.test", Organization: $.arrayToSlice<string>(["GoScript"])}, true), NotBefore: __goscriptLiteralField1, NotAfter: __goscriptLiteralField2, KeyUsage: 1, ExtKeyUsage: $.arrayToSlice<x509.ExtKeyUsage>([1]), BasicConstraintsValid: true, ExtraExtensions: $.arrayToSlice<pkix.Extension>([new pkix.Extension({Id: (extensionID as asn1.ObjectIdentifier), Critical: true, Value: extensionDER}, true)])}) })()
 	let __goscriptTuple2: any = await x509.CreateCertificate(rand.Reader, template, template, $.namedValueInterfaceValue<any>(pub, "ed25519.PublicKey", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()), $.namedValueInterfaceValue<any>(priv, "ed25519.PrivateKey", __goscriptStatic3(), __goscriptStatic4(), __goscriptStatic5()))
 	let der: $.Slice<number> = __goscriptTuple2[0]
 	err = __goscriptTuple2[1]
@@ -141,7 +141,7 @@ export async function main(): globalThis.Promise<void> {
 	let __goscriptTuple4: any = await asn1.Unmarshal(keyExt.Value, $.interfaceValue(decoded, "*main.signedKey", /* @__PURE__ */ $.pointerType("main.signedKey")))
 	err = __goscriptTuple4[1]
 	await $.println("extension unmarshal", err == null, $.sliceLen(decoded.value.PubKey), $.arrayIndex(decoded.value.PubKey!, 0), $.arrayIndex(decoded.value.PubKey!, 5), $.sliceLen(decoded.value.Signature))
-	let pool: x509.CertPool | $.VarRef<x509.CertPool> | null = x509.NewCertPool()
+	let pool = x509.NewCertPool()
 	await (pool !== null && (pool as any).__isVarRef !== true && (pool as any).__goValue === undefined ? ((pool as any) as x509.CertPool).AddCert(cert) : x509.CertPool.prototype.AddCert.call(pool, cert))
 	let __goscriptTuple5: any = await (cert !== null && (cert as any).__isVarRef !== true && (cert as any).__goValue === undefined ? ((cert as any) as x509.Certificate).Verify(new x509.VerifyOptions({Roots: pool}, true)) : x509.Certificate.prototype.Verify.call(cert, new x509.VerifyOptions({Roots: pool}, true)))
 	err = __goscriptTuple5[1]

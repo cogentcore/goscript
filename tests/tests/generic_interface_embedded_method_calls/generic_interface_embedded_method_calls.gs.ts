@@ -89,7 +89,7 @@ export async function read(__typeArgs: $.GenericTypeArgs | undefined, d: derived
 }
 
 export async function main(): globalThis.Promise<void> {
-	let i: impl | $.VarRef<impl> | null = new impl({value: 7, other: "ok"})
+	let i = new impl({value: 7, other: "ok"})
 	await $.println(await read(__goscriptStatic0(), $.namedValueInterfaceValue<derived | null>(i, "*main.impl", __goscriptStatic1(), __goscriptStatic2(), __goscriptStatic3())))
 }
 

@@ -27,7 +27,7 @@ export async function main(): globalThis.Promise<void> {
 		await $.println("open error:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		return
 	}
-	let data: $.Slice<number> = $.makeSlice<number>(3, undefined, "byte")
+	let data = $.makeSlice<number>(3, undefined, "byte")
 	let __goscriptTuple1: any = await (file !== null && (file as any).__isVarRef !== true && (file as any).__goValue === undefined ? (file as Exclude<fs.File, null>) : $.pointerValue<Exclude<fs.File, null>>(file)).Read(data)
 	let n = __goscriptTuple1[0]
 	err = __goscriptTuple1[1]

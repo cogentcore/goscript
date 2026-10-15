@@ -35,10 +35,10 @@ export class AsyncResource {
 
 	public async Release(): globalThis.Promise<void> {
 		const r: AsyncResource | $.VarRef<AsyncResource> | null = this;
-		let ch: $.Channel<boolean> | null = $.makeChannel<boolean>(1, false, "both")
-		queueMicrotask(async () => { await (async (): globalThis.Promise<void> => {
+		let ch = $.makeChannel<boolean>(1, false, "both")
+		queueMicrotask(async () => {
 			await $.chanSend(ch, true)
-		})() })
+		})
 		await $.chanRecv(ch)
 		await $.println("Released", $.pointerValue<AsyncResource>(r).name)
 	}
@@ -54,7 +54,7 @@ export class AsyncResource {
 
 export async function main(): globalThis.Promise<void> {
 	await using __defer = new $.AsyncDisposableStack()
-	let res: AsyncResource | $.VarRef<AsyncResource> | null = new AsyncResource({name: "test"})
+	let res = new AsyncResource({name: "test"})
 	__defer.defer(async () => { await (res !== null && (res as any).__isVarRef !== true && (res as any).__goValue === undefined ? ((res as any) as AsyncResource).Release() : AsyncResource.prototype.Release.call(res)) })
 	await $.println("main function")
 }

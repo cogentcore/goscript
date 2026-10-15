@@ -74,7 +74,7 @@ export class fixedReader {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let buf: $.Slice<number> = $.makeSlice<number>(2, undefined, "byte")
+	let buf = $.makeSlice<number>(2, undefined, "byte")
 	let [n, err] = await io.ReadFull($.pointerValueOrNil($.interfaceValue<io.Reader | null>(new fixedReader({data: new Uint8Array([97, 98, 99])}), "*main.fixedReader", /* @__PURE__ */ $.pointerType("main.fixedReader")))!, buf)
 	await $.println("read:", n, $.bytesToString(buf), err == null)
 	let __goscriptTuple0: any = await io.ReadFull($.pointerValueOrNil($.interfaceValue<io.Reader | null>(bytes.NewReader(null), "*bytes.Reader", /* @__PURE__ */ $.pointerType("bytes.Reader")))!, buf)

@@ -5,7 +5,7 @@ import * as $ from "@goscript/builtin/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	let _unique = true
-	void ((): void => {
+	void (() => {
 		if (_unique) {
 			_unique = false
 		}

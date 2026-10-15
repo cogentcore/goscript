@@ -120,7 +120,7 @@ export class tree {
 }
 
 export function newTree(__typeArgs: $.GenericTypeArgs | undefined, less: ((a: any, b: any) => boolean | globalThis.Promise<boolean>) | null): tree | $.VarRef<tree> | null {
-	let tr: tree | $.VarRef<tree> | null = new tree({empty: $.genericZero(__typeArgs, "T", null)})
+	let tr = new tree({empty: $.genericZero(__typeArgs, "T", null)})
 	$.pointerValue<tree>(tr).less = less
 	return tr
 }
@@ -145,7 +145,7 @@ export function lessEntry(a: entry, b: entry): boolean {
 
 export async function main(): globalThis.Promise<void> {
 	// Inferred from a function-typed argument.
-	let tr: tree | $.VarRef<tree> | null = (newTree(__goscriptStatic0(), lessEntry) as tree | $.VarRef<tree> | null)
+	let tr = (newTree(__goscriptStatic0(), lessEntry) as tree | $.VarRef<tree> | null)
 	let e = (((tr !== null && (tr as any).__isVarRef !== true && (tr as any).__goValue === undefined ? ((tr as any) as tree)["get"](__goscriptStatic0()) : tree.prototype.get.call(tr, __goscriptStatic0()))).clone() as entry)
 	await $.println("new", e.key == null, e.n)
 	await $.println("less", (__goscriptAwait = $.pointerValue<tree>(tr).less!(new entry({n: 1}, true), new entry({n: 2}, true)), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
@@ -157,7 +157,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("var", v.empty.key == null, v.empty.n)
 	let z = ((zero(__goscriptStatic0())).clone() as entry)
 	await $.println("zero", z.key == null, z.n)
-	let ints: tree | $.VarRef<tree> | null = (newTree(__goscriptStatic1(), $.functionValue((a: number, b: number): boolean => {
+	let ints = (newTree(__goscriptStatic1(), $.functionValue((a: number, b: number): boolean => {
 		return a < b
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo))) as tree | $.VarRef<tree> | null)
 	await $.println("int", (ints !== null && (ints as any).__isVarRef !== true && (ints as any).__goValue === undefined ? ((ints as any) as tree)["get"](__goscriptStatic1()) : tree.prototype.get.call(ints, __goscriptStatic1())))

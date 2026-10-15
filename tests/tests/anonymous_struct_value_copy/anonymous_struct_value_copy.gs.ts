@@ -19,17 +19,17 @@ export async function main(): globalThis.Promise<void> {
 	mutate($.markAsStructValue($.cloneStructValue(a)))
 	await $.println("param:", a.N)
 
-	let s: $.Slice<{"N": number}> = $.arrayToSlice<{"N": number}>([$.anonymousStructValue({N: 1}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("N", /* @__PURE__ */ $.basicType("int"), [0], 0, true)] })])
+	let s = $.arrayToSlice<{"N": number}>([$.anonymousStructValue({N: 1}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("N", /* @__PURE__ */ $.basicType("int"), [0], 0, true)] })])
 	let e = $.markAsStructValue($.cloneStructValue($.arrayIndex(s!, 0)))
 	e.N = 9
 	await $.println("index:", $.arrayIndex(s!, 0).N)
 
-	let t: $.Slice<{"N": number}> = $.makeSlice<{"N": number}>(1)
+	let t = $.makeSlice<{"N": number}>(1)
 	$.copy(t, s)
 	$.arrayIndex(t!, 0).N = 9
 	await $.println("copy:", $.arrayIndex(s!, 0).N)
 
-	let c: $.Slice<{"N": number}> = (slices.Clone(s) as $.Slice<{"N": number}>)
+	let c = (slices.Clone(s) as $.Slice<{"N": number}>)
 	$.arrayIndex(c!, 0).N = 9
 	await $.println("clone:", $.arrayIndex(s!, 0).N)
 

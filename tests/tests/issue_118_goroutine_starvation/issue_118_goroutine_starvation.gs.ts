@@ -11,18 +11,18 @@ import "@goscript/time/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	let wg: $.VarRef<sync.WaitGroup> = $.varRef($.markAsStructValue(new sync.WaitGroup()))
-	let done: $.Channel<boolean> | null = $.makeChannel<boolean>(0, false, "both")
-	let result: $.Channel<number> | null = $.makeChannel<number>(2, 0, "both")
+	let done = $.makeChannel<boolean>(0, false, "both")
+	let result = $.makeChannel<number>(2, 0, "both")
 
 	// Worker 1: Does a tight loop (CPU-bound work)
 	// In Go: Will be preempted, allowing other goroutines to run
 	// In GoScript: Would block forever, starving other goroutines
-	wg.value.Go($.functionValue(async (): globalThis.Promise<void> => {
+	wg.value.Go($.functionValue(async () => {
 		let sum = 0
 		// Simulate CPU-bound work with a tight loop
 		// In real code this might be a computation without I/O
 		for (let i = 0; i < 1000000; i++) {
-			sum = sum + (i)
+			sum += i
 		}
 		await $.chanSend(result, sum)
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)))
@@ -30,19 +30,19 @@ export async function main(): globalThis.Promise<void> {
 	// Worker 2: Quick task that should complete
 	// In Go: Will run concurrently with worker1
 	// In GoScript: Would never run if worker1 starves the event loop
-	wg.value.Go($.functionValue(async (): globalThis.Promise<void> => {
+	wg.value.Go($.functionValue(async () => {
 		await $.chanSend(result, 42)
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)))
 
 	// Wait for both workers with a timeout
-	queueMicrotask(async () => { await (async (): globalThis.Promise<void> => {
+	queueMicrotask(async () => {
 		await wg.value.Wait()
 		done!.close()
-	})() })
+	})
 
 	// Collect results
 	let results: $.Slice<number> = $.arrayToSlice<number>([])
-	let timeout: $.Channel<time.Time> | null = time.After(5000000000n)
+	let timeout = time.After(5000000000n)
 
 	for (let __rangeIndex = 0; __rangeIndex < 2; __rangeIndex++) {
 		const [__goscriptSelect0HasReturn, __goscriptSelect0Value] = await $.selectStatement<any, void>([

@@ -104,7 +104,7 @@ export async function deferred(): globalThis.Promise<void> {
 	await using __defer = new $.AsyncDisposableStack()
 	let r = new R({A: 1, B: 2}, true)
 	let n = 3
-	let f: ((tag: string) => void) | null = $.functionValue(async (tag: string): globalThis.Promise<void> => {
+	let f: ((tag: string) => void) | null = $.functionValue(async (tag: string) => {
 		await $.println(tag, "first function")
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string")], results: [] } as $.FunctionTypeInfo))
 	let p: R | $.VarRef<R> | null = new R({A: 10, B: 20})
@@ -119,7 +119,7 @@ export async function deferred(): globalThis.Promise<void> {
 	let mu: $.VarRef<sync.Mutex> = $.varRef($.markAsStructValue(new sync.Mutex()))
 	await mu.value.Lock()
 	__defer.defer(() => { mu.value.Unlock() })
-	let q: R | $.VarRef<R> | null = new R({A: 50, B: 60})
+	let q = new R({A: 50, B: 60})
 	__defer.defer(async () => { await (q !== null && (q as any).__isVarRef !== true && (q as any).__goValue === undefined ? ((q as any) as R).ShowPtr("fixed pointer") : R.prototype.ShowPtr.call(q, "fixed pointer")) })
 	const __goscriptDeferArg1 = n
 	const __goscriptDeferArg2 = await value(4)
@@ -127,7 +127,7 @@ export async function deferred(): globalThis.Promise<void> {
 	const __goscriptDeferArg3 = (pair() as [number, number])
 	__defer.defer(async () => { await two(...__goscriptDeferArg3) })
 	const __goscriptDeferArg4 = n
-	__defer.defer(async () => { await (async (m: number): globalThis.Promise<void> => {
+	__defer.defer(async () => { await (async (m: number) => {
 		await $.println("literal", m)
 	})(__goscriptDeferArg4) })
 	const __goscriptDeferCallee3 = $.functionValue(((__receiver) => () => __receiver.Store())($.markAsStructValue($.cloneStructValue(r))), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "main.R.Store-fm")
@@ -135,7 +135,7 @@ export async function deferred(): globalThis.Promise<void> {
 	let sum: (() => number | globalThis.Promise<number>) | null = $.functionValue(((__receiver) => () => __receiver.Sum())($.markAsStructValue($.cloneStructValue(r))), ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo), "main.R.Sum-fm")
 	r.A = 5
 	n = 6
-	f = $.functionValue(async (tag: string): globalThis.Promise<void> => {
+	f = $.functionValue(async (tag: string) => {
 		await $.println(tag, "second function")
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string")], results: [] } as $.FunctionTypeInfo))
 	p = new R({A: 30, B: 40})
@@ -150,7 +150,7 @@ export async function main(): globalThis.Promise<void> {
 	wg.value.Add(1)
 	let r = new R({A: 1, B: 2}, true)
 	const __goscriptDeferArg5 = (r).clone()
-	queueMicrotask(async () => { await (async (r: R): globalThis.Promise<void> => {
+	queueMicrotask(async () => { await (async (r: R) => {
 		await show("go", (r).clone())
 		wg.value.Done()
 	})(__goscriptDeferArg5) })

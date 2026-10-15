@@ -46,18 +46,18 @@ export class cell {
 export async function main(): globalThis.Promise<void> {
 	// Resetting a reusable cell must leave appended entries intact.
 	let current = $.varRef(new cell({width: 7}, true))
-	let cells: $.Slice<cell> = $.appendOne<cell>(null, (current.value).clone())
+	let cells = $.appendOne<cell>(null, (current.value).clone())
 	current.value = $.assignStruct(current.value, new cell(undefined, true))
 	await $.println("cell:", $.arrayIndex(cells!, 0).width, current.value.width)
 
 	// Arrays also copy at the argument boundary.
 	let row = $.arrayValue([3, 4])
-	let rows: $.Slice<number[]> = $.appendOne<number[]>(null, $.cloneArrayValue(row, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2)))
+	let rows = $.appendOne<number[]>(null, $.cloneArrayValue(row, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2)))
 	row[0] = 9
 	await $.println("array:", $.arrayIndex($.arrayIndex(rows!, 0), 0), $.arrayIndex(row, 0))
 
 	// Pointer elements retain their identity.
-	let pointers: $.Slice<cell | $.VarRef<cell> | null> = $.appendOne<cell | $.VarRef<cell> | null>(null, current, $.appendZeros.nil)
+	let pointers = $.appendOne<cell | $.VarRef<cell> | null>(null, current, $.appendZeros.nil)
 	current.value.width = 11
 	await $.println("pointer:", $.pointerValue<cell>($.arrayIndex(pointers!, 0)).width)
 }

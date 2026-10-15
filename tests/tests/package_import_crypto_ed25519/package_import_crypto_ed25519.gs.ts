@@ -29,13 +29,13 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("pub len", $.sliceLen((pub as ed25519.PublicKey)))
 	await $.println("priv len", $.sliceLen((priv as ed25519.PrivateKey)))
 
-	let msg: $.Slice<number> = new Uint8Array([103, 111, 115, 99, 114, 105, 112, 116])
-	let sig: $.Slice<number> = await ed25519.Sign((priv as ed25519.PrivateKey), msg)
+	let msg = new Uint8Array([103, 111, 115, 99, 114, 105, 112, 116])
+	let sig = await ed25519.Sign((priv as ed25519.PrivateKey), msg)
 	await $.println("sig len", $.sliceLen(sig))
 	await $.println("verify ok", await ed25519.Verify((pub as ed25519.PublicKey), msg, sig))
 	await $.println("verify wrong", await ed25519.Verify((pub as ed25519.PublicKey), new Uint8Array([119, 114, 111, 110, 103]), sig))
 
-	let pubFromPriv: ed25519.PublicKey = ($.mustTypeAssert<ed25519.PublicKey>(ed25519.PrivateKey_Public(priv), /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"), "ed25519.PublicKey")) as ed25519.PublicKey)
+	let pubFromPriv = ($.mustTypeAssert<ed25519.PublicKey>(ed25519.PrivateKey_Public(priv), /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"), "ed25519.PublicKey")) as ed25519.PublicKey)
 	await $.println("public equal", bytes.Equal(pub, pubFromPriv))
 	await $.println("private seed len", $.sliceLen(ed25519.PrivateKey_Seed(priv)))
 	await $.println("nil literal reader err nil", await generateWithReader(null) == null)

@@ -111,7 +111,7 @@ export async function main(): globalThis.Promise<void> {
 	// Conditions set only inside a callback are still runtime values.
 	let data: $.Slice<number> = null! as $.Slice<number>
 	let rejected = false
-	await hold($.functionValue((): void => {
+	await hold($.functionValue(() => {
 		data = new Uint8Array([120])
 		rejected = true
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)))

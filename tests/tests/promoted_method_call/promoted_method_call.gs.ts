@@ -91,7 +91,7 @@ export class wrapper {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let w: wrapper | $.VarRef<wrapper> | null = new wrapper({base: new base({value: 3}, true)})
+	let w = new wrapper({base: new base({value: 3}, true)})
 	await $.println($.pointerValue<wrapper>(w).base.Add(4))
 
 	let add: ((n: number) => number | globalThis.Promise<number>) | null = $.functionValue(((__receiver) => (n: number) => __receiver.Add(n))($.pointerValue<wrapper>(w).base), ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo), "main.(*base).Add-fm")

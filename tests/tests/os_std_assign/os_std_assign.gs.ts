@@ -7,9 +7,9 @@ import * as os from "@goscript/os/index.js"
 import "@goscript/os/index.js"
 
 export async function main(): globalThis.Promise<void> {
-	let stdin: os.File | $.VarRef<os.File> | null = os.Stdin
-	let stdout: os.File | $.VarRef<os.File> | null = os.Stdout
-	let stderr: os.File | $.VarRef<os.File> | null = os.Stderr
+	let stdin = os.Stdin
+	let stdout = os.Stdout
+	let stderr = os.Stderr
 
 	os.__goscript_set_Stdout(stderr)
 	os.__goscript_set_Stderr(stdout)

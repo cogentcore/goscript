@@ -6,7 +6,7 @@ import * as $ from "@goscript/builtin/index.js"
 export async function recoverMsg(label: string, fn: (() => void) | null): globalThis.Promise<void> {
 	const __defer = new $.AsyncDisposableStack()
 	try {
-		__defer.defer(async () => { await (async (): globalThis.Promise<void> => {
+		__defer.defer(async () => { await (async () => {
 			{
 				let r = $.recover()
 				if (r != null) {
@@ -32,33 +32,33 @@ export async function recoverMsg(label: string, fn: (() => void) | null): global
 }
 
 export async function main(): globalThis.Promise<void> {
-	await recoverMsg("slice:", $.functionValue(async (): globalThis.Promise<void> => {
-		let s: $.Slice<number> = $.arrayToSlice<number>([1, 2, 3])
+	await recoverMsg("slice:", $.functionValue(async () => {
+		let s = $.arrayToSlice<number>([1, 2, 3])
 		let i = 5
 		await $.println($.arrayIndex(s!, i))
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)))
-	await recoverMsg("array:", $.functionValue(async (): globalThis.Promise<void> => {
+	await recoverMsg("array:", $.functionValue(async () => {
 		let a: number[] = $.arrayValue(globalThis.Array.from({ length: 3 }, () => 0))
 		let i = 7
 		await $.println($.arrayIndex(a, i))
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)))
-	await recoverMsg("negative:", $.functionValue(async (): globalThis.Promise<void> => {
-		let s: $.Slice<number> = $.arrayToSlice<number>([1, 2, 3])
+	await recoverMsg("negative:", $.functionValue(async () => {
+		let s = $.arrayToSlice<number>([1, 2, 3])
 		let i = -1
 		await $.println($.arrayIndex(s!, i))
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)))
-	await recoverMsg("string:", $.functionValue(async (): globalThis.Promise<void> => {
+	await recoverMsg("string:", $.functionValue(async () => {
 		let s = "abc"
 		let i = 9
 		await $.println($.indexString(s, i))
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)))
-	await recoverMsg("string-negative:", $.functionValue(async (): globalThis.Promise<void> => {
+	await recoverMsg("string-negative:", $.functionValue(async () => {
 		let s = "abc"
 		let i = -1
 		await $.println($.indexString(s, i))
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)))
-	await recoverMsg("bytes-negative:", $.functionValue(async (): globalThis.Promise<void> => {
-		let b: $.Slice<number> = new Uint8Array([97, 98, 99])
+	await recoverMsg("bytes-negative:", $.functionValue(async () => {
+		let b = new Uint8Array([97, 98, 99])
 		let i = -1
 		await $.println($.arrayIndex(b!, i))
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)))

@@ -10,7 +10,7 @@ export function __goscript_set_userLevel(__goscriptValue: number): void {
 }
 
 export async function defaultLevel(): globalThis.Promise<number> {
-	let ch: $.Channel<number> | null = $.makeChannel<number>(1, 0, "both")
+	let ch = $.makeChannel<number>(1, 0, "both")
 	await $.chanSend(ch, 3)
 	return await $.chanRecv(ch)
 }

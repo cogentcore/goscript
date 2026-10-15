@@ -121,14 +121,14 @@ export function markThroughView(src: sourceStruct | $.VarRef<sourceStruct> | nul
 }
 
 export async function main(): globalThis.Promise<void> {
-	let values: $.Slice<number> = $.arrayToSlice<number>([1, 2])
+	let values = $.arrayToSlice<number>([1, 2])
 	let p = ($.indexRef(values!, 1) as any)
 	let q = noescape(p)
 
 	await $.println("same:", q == p)
 	await $.println("nil:", q == null)
 
-	let inline: $.Slice<number> = inlineSlice(values)
+	let inline = inlineSlice(values)
 	await $.println("inline:", $.arrayIndex(inline!, 0), $.arrayIndex(inline!, 1))
 	$.sliceElems(inline!)[$.sliceSlot(inline!, 0)] = 9
 	await $.println("updated:", $.arrayIndex(values!, 0))

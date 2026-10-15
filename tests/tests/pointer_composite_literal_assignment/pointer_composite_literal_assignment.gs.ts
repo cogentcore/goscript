@@ -56,14 +56,14 @@ export class MyStruct {
 export async function main(): globalThis.Promise<void> {
 	// === Pointer Composite Literal Assignment ===
 	// Creating a pointer to a struct directly using a composite literal with &
-	let structPointer: MyStruct | $.VarRef<MyStruct> | null = new MyStruct({MyInt: 42, MyString: "composite literal pointer"})
+	let structPointer = new MyStruct({MyInt: 42, MyString: "composite literal pointer"})
 	let structPointer$: MyStruct = structPointer == null ? $.pointerTarget<MyStruct>(structPointer) : (structPointer as any).__isVarRef === true ? (structPointer as any).value : (structPointer as any).__goValue === undefined ? (structPointer as any) : $.pointerTarget<MyStruct>(structPointer)
 
 	// Access fields through the pointer
 	// Expected: 42
 	await $.println("MyInt via pointer: Expected: 42, Actual:", (structPointer$ as MyStruct).MyInt)
 	// Expected: "composite literal pointer"
-	await $.println($.concatString("MyString via pointer: Expected: composite literal pointer, Actual: ", (structPointer$ as MyStruct).MyString));
+	await $.println("MyString via pointer: Expected: composite literal pointer, Actual: " + (structPointer$ as MyStruct).MyString);
 
 	// Modify through the pointer
 	;(structPointer$ as MyStruct).MyInt = 99

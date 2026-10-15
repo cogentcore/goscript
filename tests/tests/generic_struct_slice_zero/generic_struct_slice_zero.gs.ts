@@ -98,7 +98,7 @@ export class arena {
 
 export async function main(): globalThis.Promise<void> {
 	let a: $.VarRef<arena> = $.varRef($.markAsStructValue(new arena()))
-	let value: item | $.VarRef<item> | null = (a.value.New(__goscriptStatic0()) as item | $.VarRef<item> | null)
+	let value = (a.value.New(__goscriptStatic0()) as item | $.VarRef<item> | null)
 	let value$: item = value == null ? $.pointerTarget<item>(value) : (value as any).__isVarRef === true ? (value as any).value : (value as any).__goValue === undefined ? (value as any) : $.pointerTarget<item>(value);
 	;(value$ as item).Text = "ok"
 	await $.println((value$ as item).Text)

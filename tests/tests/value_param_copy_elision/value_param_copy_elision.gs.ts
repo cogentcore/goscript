@@ -217,7 +217,7 @@ export function readGlobal(r: Region): number {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let s: State | $.VarRef<State> | null = new State({reg: new Region({Start: new Pos({Line: 1, Char: 2}, true), End: new Pos({Line: 1, Char: 10}, true)}, true)})
+	let s = new State({reg: new Region({Start: new Pos({Line: 1, Char: 2}, true), End: new Pos({Line: 1, Char: 10}, true)}, true)})
 	let s$: State = s == null ? $.pointerTarget<State>(s) : (s as any).__isVarRef === true ? (s as any).value : (s as any).__goValue === undefined ? (s as any) : $.pointerTarget<State>(s)
 	await $.println(width((s$ as State).reg), (s$ as State).reg.Width())
 	await $.println(mutate(((s$ as State).reg).clone()), (s$ as State).reg.Start.Char)
@@ -226,7 +226,7 @@ export async function main(): globalThis.Promise<void> {
 	let f: (() => number | globalThis.Promise<number>) | null = later(((s$ as State).reg).clone());
 	;(s$ as State).reg.Start.Char = 3
 	await $.println((__goscriptAwait = f!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (s$ as State).reg.Start.Char)
-	let p: Region | $.VarRef<Region> | null = address(((s$ as State).reg).clone())
+	let p = address(((s$ as State).reg).clone())
 	$.pointerValue<Region>(p).Start.Char = 99
 	await $.println((s$ as State).reg.Start.Char)
 	global.reg.Start.Char = 4
@@ -234,7 +234,7 @@ export async function main(): globalThis.Promise<void> {
 	let loc = ((s$ as State).reg).clone()
 	await $.println(readAfterCall(loc, s), loc.Start.Char, (s$ as State).reg.Start.Char)
 	let addr = $.varRef(((s$ as State).reg).clone())
-	let ap: Region | $.VarRef<Region> | null = addr
+	let ap = addr
 	await $.println(readAfterPointer((addr.value).clone(), ap), addr.value.Start.Char)
 	let g: (() => number | globalThis.Promise<number>) | null = $.markAsStructValue($.cloneStructValue((s$ as State).reg)).Later();
 	;(s$ as State).reg.End.Char = 20

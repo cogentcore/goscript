@@ -128,7 +128,7 @@ export class Container {
 export async function main(): globalThis.Promise<void> {
 	let iface: Interface | null = $.interfaceValue<Interface | null>(new ConcreteA(undefined, true), "main.ConcreteA", "main.ConcreteA")
 
-	let c: Container | $.VarRef<Container> | null = new Container()
+	let c = new Container()
 	let c$: Container = c == null ? $.pointerTarget<Container>(c) : (c as any).__isVarRef === true ? (c as any).value : (c as any).__goValue === undefined ? (c as any) : $.pointerTarget<Container>(c)
 
 	// Multiple type assertions that should generate unique variable names

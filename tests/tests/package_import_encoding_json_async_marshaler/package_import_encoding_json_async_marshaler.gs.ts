@@ -160,11 +160,11 @@ export async function main(): globalThis.Promise<void> {
 	let err = __goscriptTuple0[1]
 	await $.println("top:", $.bytesToString(b), err == null)
 
-	let im: Image | $.VarRef<Image> | null = new Image()
+	let im = new Image()
 	err = await json.Unmarshal(b, $.interfaceValue(im, "*main.Image", /* @__PURE__ */ $.pointerType("main.Image")))
 	await $.println("top back:", $.pointerValue<Image>(im).Name, err == null)
 
-	let doc: Doc | $.VarRef<Doc> | null = new Doc({Title: "t", Image: new Image({Name: "nested"}), Note: "n"})
+	let doc = new Doc({Title: "t", Image: new Image({Name: "nested"}), Note: "n"})
 	let __goscriptTuple1: any = await json.Marshal($.interfaceValue(doc, "*main.Doc", /* @__PURE__ */ $.pointerType("main.Doc")))
 	b = __goscriptTuple1[0]
 	err = __goscriptTuple1[1]
@@ -175,7 +175,7 @@ export async function main(): globalThis.Promise<void> {
 	err = __goscriptTuple2[1]
 	await $.println("indent:", $.bytesToString(b2), err == null)
 
-	let back: Doc | $.VarRef<Doc> | null = new Doc()
+	let back = new Doc()
 	let back$: Doc = back == null ? $.pointerTarget<Doc>(back) : (back as any).__isVarRef === true ? (back as any).value : (back as any).__goValue === undefined ? (back as any) : $.pointerTarget<Doc>(back)
 	err = await json.Unmarshal(b, $.interfaceValue(back, "*main.Doc", /* @__PURE__ */ $.pointerType("main.Doc")))
 	await $.println("doc back:", (back$ as Doc).Title, $.pointerValue<Image>((back$ as Doc).Image).Name, (back$ as Doc).Note, err == null)

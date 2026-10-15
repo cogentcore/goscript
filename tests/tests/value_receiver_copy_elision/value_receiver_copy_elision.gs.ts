@@ -52,10 +52,10 @@ export class vec {
 
 	public async BumpInClosure(): globalThis.Promise<number> {
 		const v = this;
-		let f: (() => void) | null = $.functionValue((): void => {
+		let f = $.functionValue(() => {
 			v.X = 100
 		}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo))
-		void (__goscriptAwait = f!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+		f()
 		return v.X
 	}
 
@@ -140,11 +140,9 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("keep", a.value.X, k.X)
 	let h = new holder({v: a.value}, true)
 	await $.println("field", h.v.Sum(), $.markAsStructValue($.cloneStructValue(h.v)).Bump(), h.v.X)
-	let p: vec | $.VarRef<vec> | null = a
+	let p = a
 	await $.println("via pointer", $.pointerValue<vec>(p).Sum(), $.markAsStructValue($.cloneStructValue($.pointerValue<vec>(p))).Bump(), $.pointerValue<vec>(p).X)
 }
-
-var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

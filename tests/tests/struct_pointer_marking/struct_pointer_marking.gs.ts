@@ -48,7 +48,7 @@ export async function main(): globalThis.Promise<void> {
 	// Scenario 1: Address-of Composite Literal vs Value Variable
 	await $.println("\n--- Scenario 1: Composite Literal vs Value Variable ---")
 	let s = new MyStruct({Value: 10}, true)
-	let p: MyStruct | $.VarRef<MyStruct> | null = new MyStruct({Value: 20})
+	let p = new MyStruct({Value: 20})
 
 	// Type assertions - struct value
 	let i: any = $.interfaceValue((s).clone(), "main.MyStruct", "main.MyStruct")
@@ -67,7 +67,7 @@ export async function main(): globalThis.Promise<void> {
 	// Scenario 2: Variable Aliasing
 	await $.println("\n--- Scenario 2: Variable Aliasing ---")
 	let original = $.varRef(new MyStruct({Value: 30}, true))
-	let pAlias: MyStruct | $.VarRef<MyStruct> | null = original
+	let pAlias = original
 
 	let iOriginal: any = $.interfaceValue((original.value).clone(), "main.MyStruct", "main.MyStruct")
 	let jAlias: any = $.interfaceValue(pAlias, "*main.MyStruct", /* @__PURE__ */ $.pointerType("main.MyStruct"))
@@ -85,8 +85,8 @@ export async function main(): globalThis.Promise<void> {
 	// Scenario 3: Multiple Pointers to Same Variable
 	await $.println("\n--- Scenario 3: Multiple Pointers to Same Variable ---")
 	let shared = $.varRef(new MyStruct({Value: 40}, true))
-	let p1: MyStruct | $.VarRef<MyStruct> | null = shared
-	let p2: MyStruct | $.VarRef<MyStruct> | null = shared
+	let p1 = shared
+	let p2 = shared
 
 	let i1: any = $.interfaceValue(p1, "*main.MyStruct", /* @__PURE__ */ $.pointerType("main.MyStruct"))
 	let i2: any = $.interfaceValue(p2, "*main.MyStruct", /* @__PURE__ */ $.pointerType("main.MyStruct"))
@@ -117,8 +117,8 @@ export async function main(): globalThis.Promise<void> {
 	// Scenario 4: Mixed Assignment Patterns
 	await $.println("\n--- Scenario 4: Mixed Assignment Patterns ---")
 	let mixed = $.varRef(new MyStruct({Value: 50}, true))
-	let pVar: MyStruct | $.VarRef<MyStruct> | null = mixed
-	let pLit: MyStruct | $.VarRef<MyStruct> | null = new MyStruct({Value: 60})
+	let pVar = mixed
+	let pLit = new MyStruct({Value: 60})
 
 	let iVar: any = $.interfaceValue(pVar, "*main.MyStruct", /* @__PURE__ */ $.pointerType("main.MyStruct"))
 	let iLit: any = $.interfaceValue(pLit, "*main.MyStruct", /* @__PURE__ */ $.pointerType("main.MyStruct"))
@@ -130,11 +130,11 @@ export async function main(): globalThis.Promise<void> {
 
 	// Scenario 5: Nested Type Assertions
 	await $.println("\n--- Scenario 5: Nested Type Assertions ---")
-	let nested1: MyStruct | $.VarRef<MyStruct> | null = new MyStruct({Value: 70})
+	let nested1 = new MyStruct({Value: 70})
 	let nested2 = $.varRef(new MyStruct({Value: 80}, true))
 
 	// Array of interfaces containing both pointers and values
-	let arr: $.Slice<any> = $.arrayToSlice<any>([$.interfaceValue(nested1, "*main.MyStruct", /* @__PURE__ */ $.pointerType("main.MyStruct")), $.interfaceValue((nested2.value).clone(), "main.MyStruct", "main.MyStruct"), $.interfaceValue(nested2, "*main.MyStruct", /* @__PURE__ */ $.pointerType("main.MyStruct"))])
+	let arr = $.arrayToSlice<any>([$.interfaceValue(nested1, "*main.MyStruct", /* @__PURE__ */ $.pointerType("main.MyStruct")), $.interfaceValue((nested2.value).clone(), "main.MyStruct", "main.MyStruct"), $.interfaceValue(nested2, "*main.MyStruct", /* @__PURE__ */ $.pointerType("main.MyStruct"))])
 
 	for (let __goscriptRangeTarget0 = arr, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), i = 0; i < __goscriptRangeWindow0.length; i++) {
 		let item = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + i] as any)
@@ -159,7 +159,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// Scenario 6: Type Switch with Mixed Types
 	await $.println("\n--- Scenario 6: Type Switch ---")
-	let testItems: $.Slice<any> = $.arrayToSlice<any>([$.interfaceValue(new MyStruct({Value: 100}, true), "main.MyStruct", "main.MyStruct"), $.interfaceValue(new MyStruct({Value: 200}), "*main.MyStruct", /* @__PURE__ */ $.pointerType("main.MyStruct")), $.basicInterfaceValue(300, "int"), "string"])
+	let testItems = $.arrayToSlice<any>([$.interfaceValue(new MyStruct({Value: 100}, true), "main.MyStruct", "main.MyStruct"), $.interfaceValue(new MyStruct({Value: 200}), "*main.MyStruct", /* @__PURE__ */ $.pointerType("main.MyStruct")), $.basicInterfaceValue(300, "int"), "string"])
 
 	for (let __goscriptRangeTarget1 = testItems, __goscriptRangeWindow1 = $.sliceRange(__goscriptRangeTarget1), i = 0; i < __goscriptRangeWindow1.length; i++) {
 		let item = (__goscriptRangeWindow1.backing[__goscriptRangeWindow1.offset + i] as any)

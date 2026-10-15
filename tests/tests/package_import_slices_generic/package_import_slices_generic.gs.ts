@@ -17,10 +17,10 @@ export function siblings<T>(__typeArgs: $.GenericTypeArgs | undefined, value: an
 }
 
 export async function main(): globalThis.Promise<void> {
-	let grown: $.Slice<number> = (grow(__goscriptStatic0(), 3) as $.Slice<number>)
+	let grown = (grow(__goscriptStatic0(), 3) as $.Slice<number>)
 	await $.println("grow:", $.sliceLen(grown), $.cap(grown))
 
-	let values: $.Slice<number> = (siblings(__goscriptStatic0(), 7) as $.Slice<number>)
+	let values = (siblings(__goscriptStatic0(), 7) as $.Slice<number>)
 	await $.println("siblings:", $.sliceLen(values), $.arrayIndex(values!, 0))
 }
 

@@ -35,7 +35,7 @@ export class descriptor {
 
 	public toJS(): any {
 		const d: descriptor | $.VarRef<descriptor> | null = this;
-		return $.concatString("descriptor ", $.pointerValue<descriptor>(d).Label)
+		return "descriptor " + $.pointerValue<descriptor>(d).Label
 	}
 
 	static __typeInfo = $.registerStructType(

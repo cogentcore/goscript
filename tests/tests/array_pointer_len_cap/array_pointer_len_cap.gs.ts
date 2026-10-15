@@ -6,13 +6,13 @@ import * as $ from "@goscript/builtin/index.js"
 export function sum(values: $.VarRef<number[]> | null): number {
 	let out = 8
 	for (let i = 0; i < $.len($.pointerValue<number[]>(values)); i++) {
-		out = out + ($.arrayIndex($.pointerValue<number[]>(values), i))
+		out += $.arrayIndex($.pointerValue<number[]>(values), i)
 	}
 	return out
 }
 
 export async function main(): globalThis.Promise<void> {
-	let values: $.VarRef<number[]> | null = $.varRef($.arrayValue([1, 2, 3, 4]))
+	let values = $.varRef($.arrayValue([1, 2, 3, 4]))
 	await $.println(sum(values))
 }
 

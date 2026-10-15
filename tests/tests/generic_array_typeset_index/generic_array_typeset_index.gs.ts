@@ -24,9 +24,9 @@ export function search<E>(__typeArgs: $.GenericTypeArgs | undefined, dictionary:
 }
 
 export async function main(): globalThis.Promise<void> {
-	let three: $.Slice<number[]> = $.arrayToSlice<number[]>([$.arrayValue([0, 9, 1]), $.arrayValue([10, 19, 2]), $.arrayValue([20, 29, 3])])
+	let three = $.arrayToSlice<number[]>([$.arrayValue([0, 9, 1]), $.arrayValue([10, 19, 2]), $.arrayValue([20, 29, 3])])
 	await $.println($.arrayIndex(search(__goscriptStatic0(), three, 15), 2), $.arrayIndex(search(__goscriptStatic0(), three, 25), 2), $.arrayIndex(search(__goscriptStatic0(), three, 40), 2))
-	let four: $.Slice<number[]> = $.arrayToSlice<number[]>([$.arrayValue([0, 9, 1, 5]), $.arrayValue([10, 19, 2, 6])])
+	let four = $.arrayToSlice<number[]>([$.arrayValue([0, 9, 1, 5]), $.arrayValue([10, 19, 2, 6])])
 	let r = ($.cloneArrayValue(search(__goscriptStatic1(), four, 3), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 4)) as number[])
 	await $.println($.arrayIndex(r, 2), $.arrayIndex(r, 3), 4)
 }

@@ -56,10 +56,10 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("typed value:", $.pointerValue<number>(typedValue))
 
 	let namedValue = 9
-	let namedPointer: $.VarRef<Number> | null = $.varRef<Number>(namedValue)
+	let namedPointer = $.varRef<Number>(namedValue)
 	await $.println("named value:", $.pointerValue<Number>(namedPointer))
 
-	let pairPointer: Pair | $.VarRef<Pair> | null = $.varRef<Pair>(new Pair({Value: 11}, true))
+	let pairPointer = $.varRef<Pair>(new Pair({Value: 11}, true))
 	await $.println("struct value:", $.pointerValue<Pair>(pairPointer).Value)
 }
 

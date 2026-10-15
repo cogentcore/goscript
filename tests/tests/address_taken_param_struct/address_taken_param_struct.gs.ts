@@ -72,7 +72,7 @@ export function registerFormat(__goscriptParam0: Format): void {
 		let ext = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as string)
 		$.mapSet(byExt, ext, f)
 	}
-	f.value.Name = $.concatString(f.value.Name, "-updated")
+	f.value.Name = f.value.Name + "-updated"
 }
 
 export async function main(): globalThis.Promise<void> {

@@ -117,7 +117,7 @@ export async function main(): globalThis.Promise<void> {
 	// A struct type built from the fields of Node, whose embedded Base has
 	// methods: Go allows this when Base is the first field.
 	let nt = reflect.TypeOf($.interfaceValue(new Node(undefined, true), "main.Node", "main.Node"))
-	let fields: $.Slice<reflect.StructField> = $.makeSlice<reflect.StructField>((__goscriptAwait = (nt !== null && (nt as any).__isVarRef !== true && (nt as any).__goValue === undefined ? (nt as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(nt)).NumField(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), undefined, undefined, () => $.markAsStructValue(new reflect.StructField()))
+	let fields = $.makeSlice<reflect.StructField>((__goscriptAwait = (nt !== null && (nt as any).__isVarRef !== true && (nt as any).__goValue === undefined ? (nt as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(nt)).NumField(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), undefined, undefined, () => $.markAsStructValue(new reflect.StructField()))
 	for (let __goscriptRangeTarget0 = fields, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), i = 0; i < __goscriptRangeWindow0.length; i++) {
 		$.assignStruct((__goscriptRangeWindow0.backing as any[])[__goscriptRangeWindow0.offset + i], ((__goscriptAwait = (nt !== null && (nt as any).__isVarRef !== true && (nt as any).__goValue === undefined ? (nt as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(nt)).Field(i), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as reflect.StructField))
 	}

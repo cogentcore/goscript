@@ -69,13 +69,13 @@ export class State {
 }
 
 export function getProcessor(): ((_p0: State | $.VarRef<State> | null) => void) | null {
-	return $.functionValue((s: State | $.VarRef<State> | null): void => {
+	return $.functionValue((s: State | $.VarRef<State> | null) => {
 		$.pointerValue<State>(s).value = 42
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.pointerType("main.State")], results: [] } as $.FunctionTypeInfo))
 }
 
 export async function main(): globalThis.Promise<void> {
-	let state: State | $.VarRef<State> | null = new State()
+	let state = new State()
 	let state$: State = state == null ? $.pointerTarget<State>(state) : (state as any).__isVarRef === true ? (state as any).value : (state as any).__goValue === undefined ? (state as any) : $.pointerTarget<State>(state)
 	await (state !== null && (state as any).__isVarRef !== true && (state as any).__goValue === undefined ? ((state as any) as State).Process() : State.prototype.Process.call(state))
 	await $.println("value:", (state$ as State).value)

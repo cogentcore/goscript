@@ -191,10 +191,10 @@ export class Holder {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let v: Var | $.VarRef<Var> | null = new Var({_object: new _object({name: "x"}, true)})
+	let v = new Var({_object: new _object({name: "x"}, true)})
 	let v$: Var = v == null ? $.pointerTarget<Var>(v) : (v as any).__isVarRef === true ? (v as any).value : (v as any).__goValue === undefined ? (v as any) : $.pointerTarget<Var>(v)
 	await $.println((v$ as Var)._object.Name(), (v$ as Var)._object.name, (v$ as Var)._object.Name(), (v$ as Var)._object.name)
-	let o: _object | $.VarRef<_object> | null = $.fieldRef((v$ as Var)._fields, "_object")
+	let o = $.fieldRef((v$ as Var)._fields, "_object")
 	$.pointerValue<_object>(o).name = "y"
 	await $.println((v$ as Var)._object.name)
 	let h = new Holder({_number: new _number({n: 3}), _string: "s"}, true)

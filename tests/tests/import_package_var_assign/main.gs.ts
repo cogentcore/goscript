@@ -79,7 +79,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println(dep.Get(), dep.Verbosity.value > 3)
 	dep.__goscript_set_Verbosity(dep.Verbosity.value + 1)
 	await $.println($.pointerValue<dep.Level>(dep.Ptr))
-	let p: $.VarRef<dep.Level> | null = dep.Verbosity
+	let p = dep.Verbosity
 	p!.value = 9
 	await $.println(dep.Verbosity.value, dep.Get())
 	if (dep.__goscript_get_UserLevel().value <= 3) {

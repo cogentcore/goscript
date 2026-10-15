@@ -44,7 +44,7 @@ export class item {
 
 export async function main(): globalThis.Promise<void> {
 	let boxed: any = $.interfaceValue(null, "[]*main.item", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.pointerType("main.item")))
-	let asserted: $.Slice<item | $.VarRef<item> | null> = $.mustTypeAssert<$.Slice<item | $.VarRef<item> | null>>(boxed, /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.pointerType("main.item")))
+	let asserted = $.mustTypeAssert<$.Slice<item | $.VarRef<item> | null>>(boxed, /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.pointerType("main.item")))
 	await $.println(asserted == null)
 
 	let __goscriptTuple0: any = $.typeAssertTuple<$.Slice<item | $.VarRef<item> | null>>(boxed, /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.pointerType("main.item")))

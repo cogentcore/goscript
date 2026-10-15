@@ -6,14 +6,14 @@ import * as $ from "@goscript/builtin/index.js"
 export async function register(cb: (() => void) | null): globalThis.Promise<(() => void) | null> {
 	await $.println("register")
 	void (__goscriptAwait = cb!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
-	return $.functionValue(async (): globalThis.Promise<void> => {
+	return $.functionValue(async () => {
 		await $.println("release")
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo))
 }
 
 export async function main(): globalThis.Promise<void> {
 	await using __defer = new $.AsyncDisposableStack()
-	const __goscriptDeferCallee0 = await register($.functionValue(async (): globalThis.Promise<void> => {
+	const __goscriptDeferCallee0 = await register($.functionValue(async () => {
 		await $.println("callback")
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)))
 	__defer.defer(async () => { (__goscriptAwait = __goscriptDeferCallee0!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) })

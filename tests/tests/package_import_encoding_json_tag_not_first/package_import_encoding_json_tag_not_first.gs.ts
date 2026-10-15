@@ -90,7 +90,7 @@ export class Node {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let n: Node | $.VarRef<Node> | null = new Node({Name: "a", Label: "x", Kept: 3})
+	let n = new Node({Name: "a", Label: "x", Kept: 3})
 	$.pointerValue<Node>(n).Parent = n
 	let __goscriptTuple0: any = json.Marshal($.interfaceValue(n, "*main.Node", /* @__PURE__ */ $.pointerType("main.Node")))
 	let b: $.Slice<number> = __goscriptTuple0[0]

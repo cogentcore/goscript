@@ -198,7 +198,7 @@ export class scanner {
 export async function main(): globalThis.Promise<void> {
 	for (let __goscriptRangeTarget0 = $.arrayToSlice<string>(["a < b</script>", "x<!-- </script> -->y</script>", "<!x</script>", "no end"]), __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
 		let src = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as string)
-		let s: scanner | $.VarRef<scanner> | null = new scanner({data: src})
+		let s = new scanner({data: src})
 		let end = (s !== null && (s as any).__isVarRef !== true && (s as any).__goValue === undefined ? ((s as any) as scanner).readScript() : scanner.prototype.readScript.call(s))
 		await $.println($.sliceStringOrBytes(src, undefined, end))
 	}
@@ -210,7 +210,7 @@ export function encode(rs: $.Slice<number>): string {
 	__goscriptLoop0: for (let __goscriptRangeTarget1 = rs, __goscriptRangeWindow1 = $.sliceRange(__goscriptRangeTarget1), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow1.length; __rangeIndex++) {
 		let r = $.int((__goscriptRangeWindow1.backing[__goscriptRangeWindow1.offset + __rangeIndex] as number), 32)
 		if (r < 0x80) {
-			out = $.concatString(out, $.runeToString(r))
+			out += $.runeToString(r)
 			continue __goscriptLoop0
 		}
 		let __goscriptGotoState1 = "__entry"
@@ -228,7 +228,7 @@ export function encode(rs: $.Slice<number>): string {
 				}
 				case "terminate":
 				{
-					out = $.concatString(out, "?")
+					out += "?"
 					continue __goscriptLoop0
 					__goscriptGotoState1 = "writeGB"
 					continue __goscriptGotoLoop1
@@ -241,7 +241,7 @@ export function encode(rs: $.Slice<number>): string {
 						__goscriptGotoState1 = "terminate"
 						continue __goscriptGotoLoop1
 					}
-					out = $.concatString(out, $.concatString(($.concatString("[", $.runeToString($.int($.uint(((65 + (c0 % 26)) & 0xff), 8), 32)))), "]"))
+					out += "[" + $.runeToString($.int($.uint(((65 + (c0 % 26)) & 0xff), 8), 32)) + "]"
 					break __goscriptGotoLoop1
 					break
 				}

@@ -46,7 +46,7 @@ export async function printURL(label: string, u: url.URL | $.VarRef<url.URL> | n
 
 export async function main(): globalThis.Promise<void> {
 	await using __defer = new $.AsyncDisposableStack()
-	let server: httptest.Server | $.VarRef<httptest.Server> | null = httptest.NewServer($.pointerValueOrNil($.namedValueInterfaceValue<http.Handler | null>($.namedFunction($.functionValue(async (w: http.ResponseWriter | null, r: http.Request | $.VarRef<http.Request> | null): globalThis.Promise<void> => {
+	let server = httptest.NewServer($.pointerValueOrNil($.namedValueInterfaceValue<http.Handler | null>($.namedFunction($.functionValue(async (w: http.ResponseWriter | null, r: http.Request | $.VarRef<http.Request> | null) => {
 		let __goscriptTuple2: any = await io.ReadAll($.pointerValueOrNil(($.pointerValue<http.Request>(r).Body as io.Reader | null))!)
 		let data: $.Slice<number> = __goscriptTuple2[0]
 		let err = __goscriptTuple2[1]
@@ -61,7 +61,7 @@ export async function main(): globalThis.Promise<void> {
 	}, ({ kind: $.TypeKind.Function, params: ["http.ResponseWriter", /* @__PURE__ */ $.pointerType("http.Request")], results: [] } as $.FunctionTypeInfo)), "http.HandlerFunc", ({ kind: $.TypeKind.Function, name: "http.HandlerFunc", params: ["http.ResponseWriter", /* @__PURE__ */ $.pointerType("http.Request")], results: [] } as $.FunctionTypeInfo)), "http.HandlerFunc", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()))!)
 	__defer.defer(() => { httptest.Server.prototype.Close.call($.pointerValue<httptest.Server>(server)) })
 
-	let __goscriptTuple3: any = await http.Get($.concatString($.pointerValue<httptest.Server>(server).URL, "/?x=1"))
+	let __goscriptTuple3: any = await http.Get($.pointerValue<httptest.Server>(server).URL + "/?x=1")
 	let resp: http.Response | $.VarRef<http.Response> | null = __goscriptTuple3[0]
 	let err = __goscriptTuple3[1]
 	let resp$: http.Response = resp == null ? $.pointerTarget<http.Response>(resp) : (resp as any).__isVarRef === true ? (resp as any).value : (resp as any).__goValue === undefined ? (resp as any) : $.pointerTarget<http.Response>(resp)
@@ -73,7 +73,7 @@ export async function main(): globalThis.Promise<void> {
 	__defer.defer(async () => { await __goscriptDeferCallee0() })
 	await $.println("get status:", (resp$ as http.Response).StatusCode)
 
-	let req: http.Request | $.VarRef<http.Request> | null = httptest.NewRequest(http.MethodGet, "/?y=2", null!)
+	let req = httptest.NewRequest(http.MethodGet, "/?y=2", null!)
 	let req$: http.Request = req == null ? $.pointerTarget<http.Request>(req) : (req as any).__isVarRef === true ? (req as any).value : (req as any).__goValue === undefined ? (req as any) : $.pointerTarget<http.Request>(req)
 	await $.println("recorded:", (req$ as http.Request).Body != null, url.Values_Get((req$ as http.Request).URL.Query(), "y"), url.Values_Has((req$ as http.Request).URL.Query(), "z"))
 
@@ -89,12 +89,12 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("assigned:", url.Values_Get((req$ as http.Request).URL.Query(), "y"), (req$ as http.Request).URL.Hostname(), (req$ as http.Request).URL.Port(), (req$ as http.Request).URL.RequestURI())
 
 	// A composite literal takes a *url.URL field directly.
-	let literal: http.Request | $.VarRef<http.Request> | null = new http.Request({Method: http.MethodPost, URL: parsed})
+	let literal = new http.Request({Method: http.MethodPost, URL: parsed})
 	let literal$: http.Request = literal == null ? $.pointerTarget<http.Request>(literal) : (literal as any).__isVarRef === true ? (literal as any).value : (literal as any).__goValue === undefined ? (literal as any) : $.pointerTarget<http.Request>(literal)
 	await $.println("literal:", (literal$ as http.Request).Method, $.pointerValue<url.URL>((literal$ as http.Request).URL).Host, (literal$ as http.Request).URL.RequestURI())
 
 	// RequestURI keeps the escaped path and the query unchanged.
-	let targets: $.Slice<string> = $.arrayToSlice<string>(["/a%2Fb/c?q=a/../b&n=5", "/a/b", "http://example.com", "https://user:secret@example.com:8443/p/q%20r?a=1&b=2#frag%20x", "mailto:joe@example.com?subject=hi", "http://example.com/p?"])
+	let targets = $.arrayToSlice<string>(["/a%2Fb/c?q=a/../b&n=5", "/a/b", "http://example.com", "https://user:secret@example.com:8443/p/q%20r?a=1&b=2#frag%20x", "mailto:joe@example.com?subject=hi", "http://example.com/p?"])
 	for (let __goscriptRangeTarget0 = targets, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
 		let target = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as string)
 		let __goscriptTuple5: any = http.NewRequest(http.MethodGet, target, null!)

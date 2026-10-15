@@ -22,7 +22,7 @@ export async function main(): globalThis.Promise<void> {
 	const __goscriptDeferArg0 = fileName
 	__defer.defer(async () => { await os.Remove(__goscriptDeferArg0) })
 
-	await (async (): globalThis.Promise<void> => {
+	await (async () => {
 		let [info, err] = await os.Stat(fileName)
 		if (err != null) {
 			await $.println("stat error:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))

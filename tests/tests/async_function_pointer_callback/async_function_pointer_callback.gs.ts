@@ -98,7 +98,7 @@ export class Host {
 			return (null as ((n: number) => [number, $.GoError] | globalThis.Promise<[number, $.GoError]>) | null)
 		}
 		return $.functionValue(async (n: number): globalThis.Promise<[number, $.GoError]> => {
-			let snap: Snapshot | $.VarRef<Snapshot> | null = new Snapshot({base: 10})
+			let snap = new Snapshot({base: 10})
 			return await Snapshot.prototype.Apply.call(snap, n, $.functionValue(async (n: number): globalThis.Promise<[$.VarRef<number> | null, $.Slice<number>, $.GoError]> => {
 				return await ($.pointerValue<Process>(cb))!(snap, n)
 			}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int")), /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")), "error"] } as $.FunctionTypeInfo)))
@@ -115,14 +115,14 @@ export class Host {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let ch: $.Channel<number> | null = $.makeChannel<number>(1, 0, "both")
+	let ch = $.makeChannel<number>(1, 0, "both")
 	await $.chanSend(ch, 5)
 	let process: $.VarRef<((snap: Snapshot | $.VarRef<Snapshot> | null, n: number) => [$.VarRef<number> | null, $.Slice<number>, $.GoError] | globalThis.Promise<[$.VarRef<number> | null, $.Slice<number>, $.GoError]>) | null> = $.varRef($.functionValue(async (snap: Snapshot | $.VarRef<Snapshot> | null, n: number): globalThis.Promise<[$.VarRef<number> | null, $.Slice<number>, $.GoError]> => {
 		let next = $.varRef(n + await $.chanRecv(ch))
 		return [next, $.arrayToSlice<number>([$.pointerValue<Snapshot>(snap).base]), null]
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.pointerType("main.Snapshot"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int")), /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")), "error"] } as $.FunctionTypeInfo)))
 
-	let h: Host | $.VarRef<Host> | null = new Host()
+	let h = new Host()
 	$.pointerValue<Host>(h).process.Store(process)
 	let [got, err] = await (h !== null && (h as any).__isVarRef !== true && (h as any).__goValue === undefined ? ((h as any) as Host).processor() : Host.prototype.processor.call(h))!(1)
 	await $.println("pointer callback", got, err == null)

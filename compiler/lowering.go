@@ -551,6 +551,7 @@ func (o *LoweringOwner) lowerFile(req lowerFileRequest) (*loweredFile, []Diagnos
 		displayRoot:       displayRoot,
 		statics:           &staticPool{names: make(map[string]string)},
 		awaitTemp:         new(bool),
+		funcLitAsync:      make(map[*ast.FuncLit]bool),
 	}
 	appendDecls := func(decls []loweredDecl) {
 		for _, decl := range decls {
@@ -1708,6 +1709,13 @@ type lowerFileContext struct {
 	// awaitTemp is set when the file uses the temporary variable of
 	// conditional awaits (see conditionalAwait), which is then declared.
 	awaitTemp *bool
+	// funcLitAsync records whether each function literal of the file was
+	// lowered async, for the calls through the local that holds it (see
+	// fixedFuncLocal).
+	funcLitAsync map[*ast.FuncLit]bool
+	// nestedFunctions collects the lowered function literals of the current
+	// literal body, whose awaits do not make that body async.
+	nestedFunctions *[]string
 
 	// rangeLabels maps visible labels to their statements in the current yield.
 	rangeLabels map[string]ast.Stmt
@@ -5666,11 +5674,25 @@ func (o *LoweringOwner) lowerSendStmt(ctx lowerFileContext, stmt *ast.SendStmt) 
 	return "await " + o.runtimeOwner.QualifiedHelper(RuntimeHelperChanSend) + "(" + channel + ", " + value + ")", diagnostics
 }
 
+// lowerGoStmt lowers a go statement to a microtask. A function literal
+// called without arguments is the task itself; any other call is wrapped in
+// a task that makes the call.
 func (o *LoweringOwner) lowerGoStmt(ctx lowerFileContext, stmt *ast.GoStmt) (string, []Diagnostic) {
+	// The task runs outside the deferring function.
 	goCtx := ctx
 	goCtx.deferState = nil
+	if lit, ok := ast.Unparen(stmt.Call.Fun).(*ast.FuncLit); ok && len(stmt.Call.Args) == 0 {
+		task, _, diagnostics := o.lowerFuncLitCallCallee(goCtx, lit)
+		return "queueMicrotask(" + task + ")", diagnostics
+	}
+
+	// Any other call is made by a task, async only when the call awaits.
 	prelude, call, diagnostics := o.lowerStatementCall(goCtx, stmt.Call)
-	return prelude + "queueMicrotask(async () => { " + call + " })", diagnostics
+	prefix := ""
+	if strings.Contains(call, "await ") {
+		prefix = "async "
+	}
+	return prelude + "queueMicrotask(" + prefix + "() => { " + call + " })", diagnostics
 }
 
 // lowerStatementCall lowers the call of a defer or go statement, which
@@ -5939,7 +5961,7 @@ func (o *LoweringOwner) lowerAssignStmt(ctx lowerFileContext, stmt *ast.AssignSt
 				stmts = append(stmts, loweredStmt{text: value})
 				continue
 			}
-			stmts = append(stmts, loweredStmt{text: pointer + " = " + lowerCompoundAssignValue(o.runtimeOwner, targetType, pointer, right, stmt.Tok)})
+			stmts = append(stmts, loweredStmt{text: lowerCompoundAssignStmt(o.runtimeOwner, targetType, pointer, right, stmt.Tok)})
 			continue
 		}
 		if isShortDecl {
@@ -5963,7 +5985,7 @@ func (o *LoweringOwner) lowerAssignStmt(ctx lowerFileContext, stmt *ast.AssignSt
 			op = "="
 		}
 		if stmt.Tok != token.ASSIGN && stmt.Tok != token.DEFINE {
-			stmts = append(stmts, loweredStmt{text: left + " = " + lowerCompoundAssignValue(o.runtimeOwner, targetType, left, right, stmt.Tok)})
+			stmts = append(stmts, loweredStmt{text: lowerCompoundAssignStmt(o.runtimeOwner, targetType, left, right, stmt.Tok)})
 			continue
 		}
 		stmts = append(stmts, loweredStmt{text: left + " " + op + " " + right})
@@ -5998,6 +6020,24 @@ func (o *LoweringOwner) lowerMapIndexUpdateStmts(
 	}, diagnostics
 }
 
+// lowerCompoundAssignStmt lowers the compound assignment left op= right. An
+// operation that JavaScript computes as Go does keeps its compound operator.
+func lowerCompoundAssignStmt(
+	runtimeOwner *RuntimeContractOwner,
+	targetType types.Type,
+	left string,
+	right string,
+	tok token.Token,
+) string {
+	value := lowerCompoundAssignValue(runtimeOwner, targetType, left, right, tok)
+	if value == left+" "+strings.TrimSuffix(tok.String(), "=")+" ("+right+")" {
+		return left + " " + tok.String() + " " + right
+	}
+	return left + " = " + value
+}
+
+// lowerCompoundAssignValue returns the value that left op= right assigns to
+// left.
 func lowerCompoundAssignValue(
 	runtimeOwner *RuntimeContractOwner,
 	targetType types.Type,
@@ -6005,11 +6045,9 @@ func lowerCompoundAssignValue(
 	right string,
 	tok token.Token,
 ) string {
+	// Wide integers, 32-bit products and integer quotients have helpers.
 	if helper, ok := wideIntegerAssignHelper(targetType, tok); ok {
 		return coerceWideHelperResult(runtimeOwner, targetType, runtimeOwner.QualifiedHelper(helper)+"("+left+", "+right+")")
-	}
-	if tok == token.ADD_ASSIGN && isStringType(targetType) {
-		return runtimeOwner.QualifiedHelper(RuntimeHelperStringConcat) + "(" + left + ", " + right + ")"
 	}
 	if tok == token.MUL_ASSIGN {
 		if value, ok := lower32BitIntegerMultiplicationValue(targetType, left, right); ok {
@@ -6019,6 +6057,9 @@ func lowerCompoundAssignValue(
 	if value, ok := integerQuotientAssignValueExpr(targetType, left, right, tok); ok {
 		return value
 	}
+
+	// Other operators apply to the parenthesized operand, wrapped to the
+	// target's width.
 	right = "(" + right + ")"
 	wrapNarrow := func(value string) string {
 		if targetType == nil || isFloatType(targetType) {
@@ -6241,6 +6282,11 @@ func (o *LoweringOwner) shortDeclTypeAnnotation(ctx lowerFileContext, lhs ast.Ex
 	if obj == nil {
 		return ""
 	}
+
+	// A local that always holds its literal takes the literal's exact type.
+	if rhs != nil && fixedFuncLocal(ctx, obj) != nil {
+		return ""
+	}
 	if signature := unnamedSignatureForType(obj.Type()); signature != nil {
 		typ := o.tsAsyncCompatibleFunctionTypeFor(ctx, signature)
 		if ctx.model.needsVarRef[obj] {
@@ -6251,7 +6297,15 @@ func (o *LoweringOwner) shortDeclTypeAnnotation(ctx lowerFileContext, lhs ast.Ex
 	if rhs != nil && isInterfaceType(obj.Type()) && (isIdentLikeExpr(rhs) || (o.callsOverridePackage(ctx, rhs) && isReassignedLocal(ctx, obj))) {
 		return ": " + o.tsVariableTypeFor(ctx, obj.Type(), ctx.model.needsVarRef[obj])
 	}
-	if !shortDeclNeedsTypeAnnotation(obj.Type()) && !(rhs != nil && shortDeclFeedsOwnInit(ctx, obj, rhs)) {
+	if rhs != nil && shortDeclFeedsOwnInit(ctx, obj, rhs) {
+		return ": " + o.tsVariableTypeFor(ctx, obj.Type(), ctx.model.needsVarRef[obj])
+	}
+
+	// A nil-able local takes its Go type, so a later nil assignment
+	// typechecks. One that is never assigned again keeps the type inferred
+	// from its value; an untyped tuple element has none to infer.
+	if !shortDeclNeedsTypeAnnotation(obj.Type()) ||
+		(rhs != nil && !ctx.model.needsVarRef[obj] && !isReassignedLocal(ctx, obj)) {
 		return ""
 	}
 	return ": " + o.tsVariableTypeFor(ctx, obj.Type(), ctx.model.needsVarRef[obj])
@@ -6287,41 +6341,78 @@ func (o *LoweringOwner) callsOverridePackage(ctx lowerFileContext, expr ast.Expr
 }
 
 // isReassignedLocal reports whether the local variable obj is assigned
-// after its declaration, by an assignment or a redeclaring := in its block.
+// after its declaration, by an assignment, a redeclaring :=, an increment or
+// a range assignment.
 func isReassignedLocal(ctx lowerFileContext, obj types.Object) bool {
-	// The variable is scoped to the innermost block that declares it.
-	path, _ := astutil.PathEnclosingInterval(ctx.file, obj.Pos(), obj.Pos())
-	var scope ast.Node
-	for _, node := range path {
-		if _, ok := node.(*ast.BlockStmt); ok {
-			scope = node
-			break
-		}
-	}
-	if scope == nil {
-		return false
-	}
-	info := ctx.semPkg.source.TypesInfo
-	assigned := false
-	ast.Inspect(scope, func(node ast.Node) bool {
-		// Stop walking once an assignment is found.
-		if assigned {
-			return false
-		}
+	return localAssignmentsFor(ctx).reassigned[obj]
+}
 
-		// Only an assignment can change the variable.
-		assign, ok := node.(*ast.AssignStmt)
-		if !ok {
-			return true
-		}
-		for _, lhs := range assign.Lhs {
-			if ident, ok := ast.Unparen(lhs).(*ast.Ident); ok && ident.Pos() != obj.Pos() && info.ObjectOf(ident) == obj {
-				assigned = true
+// fixedFuncLocal returns the function literal that the local variable obj
+// always holds: obj is declared by := to the literal, never assigned again
+// and never referenced by pointer, so a call through obj calls the literal.
+func fixedFuncLocal(ctx lowerFileContext, obj types.Object) *ast.FuncLit {
+	assignments := localAssignmentsFor(ctx)
+	if assignments.reassigned[obj] || ctx.model.needsVarRef[obj] {
+		return nil
+	}
+	return assignments.funcLits[obj]
+}
+
+func localAssignmentsFor(ctx lowerFileContext) *localAssignments {
+	pkg := ctx.semPkg
+	pkg.assignmentsOnce.Do(func() {
+		pkg.assignments = collectLocalAssignments(pkg.source)
+	})
+	return pkg.assignments
+}
+
+// collectLocalAssignments finds how the variables of pkg are assigned. An
+// identifier on the left of an assignment that is not the variable's
+// declaring identifier assigns it again.
+func collectLocalAssignments(pkg *packages.Package) *localAssignments {
+	assignments := &localAssignments{
+		reassigned: make(map[types.Object]bool),
+		funcLits:   make(map[types.Object]*ast.FuncLit),
+	}
+	mark := func(targets ...ast.Expr) {
+		for _, target := range targets {
+			ident, ok := ast.Unparen(target).(*ast.Ident)
+			if !ok {
+				continue
+			}
+			if obj := pkg.TypesInfo.ObjectOf(ident); obj != nil && ident.Pos() != obj.Pos() {
+				assignments.reassigned[obj] = true
 			}
 		}
-		return true
-	})
-	return assigned
+	}
+	for _, file := range pkg.Syntax {
+		ast.Inspect(file, func(node ast.Node) bool {
+			switch typed := node.(type) {
+			case *ast.AssignStmt:
+				mark(typed.Lhs...)
+				if typed.Tok == token.DEFINE && len(typed.Lhs) == len(typed.Rhs) {
+					for idx, lhs := range typed.Lhs {
+						lit, isLit := typed.Rhs[idx].(*ast.FuncLit)
+						ident, isIdent := lhs.(*ast.Ident)
+						if !isLit || !isIdent {
+							continue
+						}
+						if obj := pkg.TypesInfo.Defs[ident]; obj != nil {
+							assignments.funcLits[obj] = lit
+						}
+					}
+				}
+			case *ast.IncDecStmt:
+				mark(typed.X)
+			case *ast.RangeStmt:
+				if typed.Tok == token.ASSIGN {
+					mark(typed.Key, typed.Value)
+				}
+			}
+			return true
+		})
+	}
+	return assignments
 }
 
 // shortDeclFeedsOwnInit reports whether obj, declared as obj := init, is read by
@@ -8149,7 +8240,7 @@ func (o *LoweringOwner) lowerRangeFuncStmt(
 	}
 
 	// Preserve await requirements and the enclosing callback's return state.
-	async := ctx.asyncFunction || stmtsContainAwait(body) || o.rangeFunctionValueNeedsAwait(ctx, stmt.X)
+	async := ctx.asyncFunction || stmtsContainAwait(body, nil) || o.rangeFunctionValueNeedsAwait(ctx, stmt.X)
 	return loweredStmt{rangeFunc: &loweredRangeFunc{
 		value:        rangeValue,
 		params:       paramNames,
@@ -8933,14 +9024,9 @@ func (o *LoweringOwner) lowerStringEqualityExpr(ctx lowerFileContext, expr *ast.
 	return value, true
 }
 
-// lowerStringConcatExpr lowers string concatenation through the runtime, since
-// a string holding invalid UTF-8 is a tagged byte string that a JavaScript +
-// would not concatenate by its bytes.
-func (o *LoweringOwner) lowerStringConcatExpr(ctx lowerFileContext, expr *ast.BinaryExpr, left string, right string) (string, bool) {
-	if expr.Op != token.ADD || !isStringType(ctx.semPkg.source.TypesInfo.TypeOf(expr)) {
-		return "", false
-	}
-	return o.runtimeOwner.QualifiedHelper(RuntimeHelperStringConcat) + "(" + left + ", " + right + ")", true
+// isStringConcat reports whether expr concatenates strings.
+func isStringConcat(ctx lowerFileContext, expr *ast.BinaryExpr) bool {
+	return expr.Op == token.ADD && isStringType(ctx.semPkg.source.TypesInfo.TypeOf(expr))
 }
 
 func (o *LoweringOwner) lowerInterfaceEqualityExpr(ctx lowerFileContext, expr *ast.BinaryExpr, left string, right string) (string, bool) {
@@ -9136,7 +9222,9 @@ func (o *LoweringOwner) lowerExpr(ctx lowerFileContext, expr ast.Expr) (string, 
 		}
 		left, leftDiagnostics := o.lowerExpr(ctx, typed.X)
 		right, rightDiagnostics := o.lowerExpr(ctx, typed.Y)
-		if _, ok := typed.X.(*ast.BinaryExpr); ok {
+		// A string concatenation lowers to a JavaScript +, so a chain of them
+		// needs no parentheses.
+		if x, ok := typed.X.(*ast.BinaryExpr); ok && (!isStringConcat(ctx, typed) || !isStringConcat(ctx, x)) {
 			left = "(" + left + ")"
 		}
 		if _, ok := typed.Y.(*ast.BinaryExpr); ok {
@@ -9208,9 +9296,6 @@ func (o *LoweringOwner) lowerExpr(ctx lowerFileContext, expr ast.Expr) (string, 
 		}
 		if value, diagnostics, ok := o.lowerStringOrderExpr(ctx, typed, left, right, leftDiagnostics, rightDiagnostics); ok {
 			return value, diagnostics
-		}
-		if value, ok := o.lowerStringConcatExpr(ctx, typed, left, right); ok {
-			return value, append(leftDiagnostics, rightDiagnostics...)
 		}
 		if binaryOperandUsesTypeParam(ctx, typed.X) {
 			left = "(" + left + " as any)"
@@ -9369,6 +9454,8 @@ func (o *LoweringOwner) lowerFuncLitArrowWithAsyncCalls(
 	signature, _ := ctx.semPkg.source.TypesInfo.TypeOf(lit).(*types.Signature)
 	deferState := &loweredDeferState{}
 	bodyCtx := ctx.withSignature(signature).withAsyncFunction(false).withDeferState(deferState).withoutRangeBranch()
+	var nested []string
+	bodyCtx.nestedFunctions = &nested
 	asyncCompatibleParams := funcLiteralNeedsAsyncFunctionParamCalls(signature)
 	if allowAsyncCalls && (asyncCompatibleParams || funcLiteralUsesAwaitableCall(ctx.semPkg.source, lit)) {
 		bodyCtx = bodyCtx.withAsyncFunction(true)
@@ -9393,14 +9480,30 @@ func (o *LoweringOwner) lowerFuncLitArrowWithAsyncCalls(
 	renderStmts(&rendered, paramBindings, 1)
 	renderNamedResults(&rendered, o.lowerNamedResults(ctx, signature), 1)
 	renderBodyWithDefer(&rendered, litFn, 1)
-	async := bodyCtx.asyncFunction || stmtsContainAwait(body) || deferState.async
+	// The literal is async when its own body awaits.
+	async := bodyCtx.asyncFunction || stmtsContainAwait(body, nested) || deferState.async
 	prefix := ""
 	if async {
 		prefix = "async "
 	}
-	function := prefix + "(" + renderLoweredParams(params) + "): " +
-		asyncResultType(o.tsSignatureResultFor(ctx, signature), async) + " => {\n" +
+
+	// A literal without results needs no result annotation: TypeScript
+	// infers void, or a Promise of void when the literal is async.
+	resultType := ""
+	if signature != nil && signature.Results().Len() != 0 {
+		resultType = ": " + asyncResultType(o.tsSignatureResultFor(ctx, signature), async)
+	}
+	function := prefix + "(" + renderLoweredParams(params) + ")" + resultType + " => {\n" +
 		rendered.String() + "}"
+
+	// The enclosing literal and the calls through a fixed local read the
+	// lowered literal.
+	if ctx.nestedFunctions != nil {
+		*ctx.nestedFunctions = append(*ctx.nestedFunctions, function)
+	}
+	if ctx.funcLitAsync != nil {
+		ctx.funcLitAsync[lit] = async
+	}
 	return function, async, signature, diagnostics
 }
 
@@ -9415,49 +9518,63 @@ func renderLoweredParams(params []loweredParam) string {
 	return strings.Join(rendered, ", ")
 }
 
-func stmtsContainAwait(stmts []loweredStmt) bool {
+// stmtsContainAwait reports whether the lowered statements await, outside
+// the nested function literals they contain.
+func stmtsContainAwait(stmts []loweredStmt, nested []string) bool {
 	for _, stmt := range stmts {
-		if strings.Contains(stmt.text, "await ") ||
-			stmtsContainAwait(stmt.children) ||
-			stmtsContainAwait(stmt.elseBody) {
+		if textAwaits(stmt.text, nested) ||
+			stmtsContainAwait(stmt.children, nested) ||
+			stmtsContainAwait(stmt.elseBody, nested) {
 			return true
 		}
-		if stmt.rangeFunc != nil && (stmt.rangeFunc.async || stmtsContainAwait(stmt.rangeFunc.body)) {
+		if stmt.rangeFunc != nil && (stmt.rangeFunc.async || stmtsContainAwait(stmt.rangeFunc.body, nested)) {
 			return true
 		}
 		if stmt.selectStmt != nil {
 			return true
 		}
 		if stmt.switchStmt != nil {
-			if strings.Contains(stmt.switchStmt.value, "await ") {
+			if textAwaits(stmt.switchStmt.value, nested) {
 				return true
 			}
 			for _, switchCase := range stmt.switchStmt.cases {
 				for _, value := range switchCase.values {
-					if strings.Contains(value, "await ") {
+					if textAwaits(value, nested) {
 						return true
 					}
 				}
-				if stmtsContainAwait(switchCase.body) {
+				if stmtsContainAwait(switchCase.body, nested) {
 					return true
 				}
 			}
-		}
-		if stmt.typeSwitch != nil && strings.Contains(stmt.typeSwitch.value, "await ") {
-			return true
 		}
 		if stmt.typeSwitch != nil {
+			if textAwaits(stmt.typeSwitch.value, nested) {
+				return true
+			}
 			for _, switchCase := range stmt.typeSwitch.cases {
-				if stmtsContainAwait(switchCase.body) {
+				if stmtsContainAwait(switchCase.body, nested) {
 					return true
 				}
 			}
-			if stmtsContainAwait(stmt.typeSwitch.defaultBody) {
+			if stmtsContainAwait(stmt.typeSwitch.defaultBody, nested) {
 				return true
 			}
 		}
 	}
 	return false
+}
+
+// textAwaits reports whether the lowered text awaits outside the nested
+// function literals it contains.
+func textAwaits(text string, nested []string) bool {
+	if !strings.Contains(text, "await ") {
+		return false
+	}
+	for _, function := range nested {
+		text = strings.ReplaceAll(text, function, "")
+	}
+	return strings.Contains(text, "await ")
 }
 
 func lowerIdent(ident *ast.Ident) string {
@@ -10383,9 +10500,11 @@ func callTargetNeedsNonNull(ctx lowerFileContext, expr ast.Expr) bool {
 	case *ast.FuncLit:
 		return false
 	case *ast.Ident:
-		switch objectForIdent(ctx, typed).(type) {
+		switch obj := objectForIdent(ctx, typed).(type) {
 		case *types.Func, *types.Builtin:
 			return false
+		case *types.Var:
+			return fixedFuncLocal(ctx, obj) == nil
 		default:
 			return true
 		}
@@ -16569,6 +16688,15 @@ func (o *LoweringOwner) callExprNeedsAwait(ctx lowerFileContext, call *ast.CallE
 // through a function variable in a synchronous literal cannot await, so it
 // unwraps the result of a function value that returned synchronously.
 func (o *LoweringOwner) awaitCallIfNeeded(ctx lowerFileContext, call *ast.CallExpr, lowered string) string {
+	// A call through a local that always holds a lowered literal awaits only
+	// an async literal.
+	if async, ok := o.fixedFuncLocalCallAsync(ctx, call); ok && (!async || ctx.asyncFunction) {
+		if async {
+			return "await " + lowered
+		}
+		return lowered
+	}
+
 	// Await a call that may suspend.
 	if o.callExprNeedsAwait(ctx, call) {
 		if awaited, ok := o.conditionalAwait(ctx, call, lowered); ok {
@@ -16584,6 +16712,30 @@ func (o *LoweringOwner) awaitCallIfNeeded(ctx lowerFileContext, call *ast.CallEx
 		return o.runtimeOwner.QualifiedHelper(RuntimeHelperSyncResult) + "(" + lowered + ")"
 	}
 	return lowered
+}
+
+// fixedFuncLocalCallAsync reports whether call calls the literal of a fixed
+// function local (see fixedFuncLocal) that was lowered async. It reports ok
+// false when the callee is not such a local or its literal is not lowered
+// yet.
+func (o *LoweringOwner) fixedFuncLocalCallAsync(ctx lowerFileContext, call *ast.CallExpr) (async, ok bool) {
+	// Only a local variable can hold a fixed literal.
+	ident, isIdent := ast.Unparen(call.Fun).(*ast.Ident)
+	if !isIdent || ctx.funcLitAsync == nil {
+		return false, false
+	}
+	obj, _ := objectForIdent(ctx, ident).(*types.Var)
+	if obj == nil {
+		return false, false
+	}
+
+	// The literal records its async mark once lowered.
+	lit := fixedFuncLocal(ctx, obj)
+	if lit == nil {
+		return false, false
+	}
+	async, ok = ctx.funcLitAsync[lit]
+	return async, ok
 }
 
 // conditionalAwaitTemp is the module variable that holds the result of a

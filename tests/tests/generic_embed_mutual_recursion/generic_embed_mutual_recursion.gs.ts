@@ -125,7 +125,7 @@ export class WindowBase {
 	public async AppWindowName(__typeArgs: $.GenericTypeArgs | undefined): globalThis.Promise<string> {
 		const w: WindowBase | $.VarRef<WindowBase> | null = this;
 		const w$: WindowBase = w == null ? $.pointerTarget<WindowBase>(w) : (w as any).__isVarRef === true ? (w as any).value : (w as any).__goValue === undefined ? (w as any) : $.pointerTarget<WindowBase>(w)
-		return $.concatString(($.concatString((__goscriptAwait = $.pointerValue<Exclude<Window, null>>((__goscriptAwait = $.callGenericMethod(__typeArgs, "A", "Window", (w$ as WindowBase).App), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)).Name(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), " via ")), (__goscriptAwait = $.callGenericMethod(__typeArgs, "A", "FirstName", (w$ as WindowBase).App), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+		return (__goscriptAwait = $.pointerValue<Exclude<Window, null>>((__goscriptAwait = $.callGenericMethod(__typeArgs, "A", "Window", (w$ as WindowBase).App), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)).Name(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) + " via " + (__goscriptAwait = $.callGenericMethod(__typeArgs, "A", "FirstName", (w$ as WindowBase).App), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 	}
 
 	public Name(__typeArgs: $.GenericTypeArgs | undefined): string {
@@ -237,9 +237,9 @@ export class MyWindow {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let a: MyApp | $.VarRef<MyApp> | null = new MyApp()
+	let a = new MyApp()
 	let a$: MyApp = a == null ? $.pointerTarget<MyApp>(a) : (a as any).__isVarRef === true ? (a as any).value : (a as any).__goValue === undefined ? (a as any) : $.pointerTarget<MyApp>(a)
-	let w: MyWindow | $.VarRef<MyWindow> | null = new MyWindow()
+	let w = new MyWindow()
 	let w$: MyWindow = w == null ? $.pointerTarget<MyWindow>(w) : (w as any).__isVarRef === true ? (w as any).value : (w as any).__goValue === undefined ? (w as any) : $.pointerTarget<MyWindow>(w);
 	;(w$ as MyWindow).WindowBase.name = "main";
 	;(w$ as MyWindow).WindowBase.App = a;

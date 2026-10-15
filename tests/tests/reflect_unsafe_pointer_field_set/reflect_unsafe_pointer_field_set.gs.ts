@@ -60,7 +60,7 @@ export class config {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let c: config | $.VarRef<config> | null = new config({Name: "x"})
+	let c = new config({Name: "x"})
 	let f = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(c, "*main.config", /* @__PURE__ */ $.pointerType("main.config"))))).Elem())).FieldByName("UsesCgo")))
 	$.unsafePointerRef<boolean>($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(f)).Addr())).UnsafePointer()).value = true
 	await $.println($.pointerValue<config>(c).UsesCgo)

@@ -118,7 +118,7 @@ export async function methodExpression(__typeArgs: $.GenericTypeArgs | undefined
 }
 
 export async function main(): globalThis.Promise<void> {
-	let b: box | $.VarRef<box> | null = new box({value: 7})
+	let b = new box({value: 7})
 	await $.println("direct:", direct(__goscriptStatic0(), b))
 	await $.println("interface:", await throughInterface(__goscriptStatic0(), $.namedValueInterfaceValue<reader | null>(b, "*main.box", __goscriptStatic1(), __goscriptStatic2(), __goscriptStatic3())))
 	await $.println("promoted:", promoted(__goscriptStatic0(), new holder({box: $.markAsStructValue($.cloneStructValue($.pointerValue<box>(b)))})))

@@ -49,7 +49,7 @@ export class matcher {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let isX: ((r: number) => boolean | globalThis.Promise<boolean>) | null = $.functionValue((r: number): boolean => {
+	let isX = $.functionValue((r: number): boolean => {
 		return r == 120
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int32")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo))
 	await $.println(strings.IndexFunc("abxc", $.syncFunction(isX)))
@@ -58,8 +58,8 @@ export async function main(): globalThis.Promise<void> {
 	let m = new matcher({match: isX}, true)
 	await $.println(strings.IndexFunc("xyz", $.syncFunction(m.match)), strings.LastIndexFunc("axbx", $.syncFunction(m.match)))
 
-	let env: globalThis.Map<string, string> | null = $.makeMap<string, string>([["A", "1"]])
-	let expand: ((s: string) => string | globalThis.Promise<string>) | null = $.functionValue((s: string): string => {
+	let env = $.makeMap<string, string>([["A", "1"]])
+	let expand = $.functionValue((s: string): string => {
 		return $.mapGet<string, string, string>(env, s, "")[0]
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string")], results: [/* @__PURE__ */ $.basicType("string")] } as $.FunctionTypeInfo))
 	await $.println(os.Expand("$A-$B", $.syncFunction(expand)))

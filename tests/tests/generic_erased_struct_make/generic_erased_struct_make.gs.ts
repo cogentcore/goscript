@@ -47,7 +47,7 @@ export function newQueue(__typeArgs: $.GenericTypeArgs | undefined, capacity: nu
 }
 
 export async function main(): globalThis.Promise<void> {
-	let q: queue | $.VarRef<queue> | null = (newQueue(__goscriptStatic0(), 2) as queue | $.VarRef<queue> | null)
+	let q = (newQueue(__goscriptStatic0(), 2) as queue | $.VarRef<queue> | null)
 	let q$: queue = q == null ? $.pointerTarget<queue>(q) : (q as any).__isVarRef === true ? (q as any).value : (q as any).__goValue === undefined ? (q as any) : $.pointerTarget<queue>(q)
 	$.sliceElems((q$ as queue).buf!)[$.sliceSlot((q$ as queue).buf!, 0)] = 7
 	await $.println($.sliceLen((q$ as queue).buf), $.arrayIndex((q$ as queue).buf!, 0))

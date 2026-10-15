@@ -29,7 +29,7 @@ export async function main(): globalThis.Promise<void> {
 export async function checkBounds(index: number): globalThis.Promise<void> {
 	const __defer = new $.AsyncDisposableStack()
 	try {
-		__defer.defer(async () => { await (async (): globalThis.Promise<void> => {
+		__defer.defer(async () => { await (async () => {
 			await $.println("out of bounds", $.recover() != null)
 		})() })
 		await $.println($.indexByteString("\x00\xff\x07\xe4\xbd\xa0", index))

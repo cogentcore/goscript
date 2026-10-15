@@ -63,14 +63,14 @@ export function __goscript_set_messages(__goscriptValue: $.Channel<Message> | nu
 
 export async function worker(id: number): globalThis.Promise<void> {
 	// Send worker starting message
-	await $.chanSend(messages, new Message({priority: 10 + id, text: $.concatString(($.concatString("Worker ", $.runeToString($.int(48 + id, 32)))), " starting")}, true))
+	await $.chanSend(messages, new Message({priority: 10 + id, text: "Worker " + $.runeToString($.int(48 + id, 32)) + " starting"}, true))
 
 	// Send worker done message
-	await $.chanSend(messages, new Message({priority: 20 + id, text: $.concatString(($.concatString("Worker ", $.runeToString($.int(48 + id, 32)))), " done")}, true))
+	await $.chanSend(messages, new Message({priority: 20 + id, text: "Worker " + $.runeToString($.int(48 + id, 32)) + " done"}, true))
 }
 
 export async function anotherWorker(name: string): globalThis.Promise<void> {
-	await $.chanSend(messages, new Message({priority: 40, text: $.concatString("Another worker: ", name)}, true))
+	await $.chanSend(messages, new Message({priority: 40, text: "Another worker: " + name}, true))
 }
 
 export async function main(): globalThis.Promise<void> {
@@ -90,9 +90,9 @@ export async function main(): globalThis.Promise<void> {
 	queueMicrotask(async () => { await anotherWorker("test") })
 
 	// Start an anonymous function worker
-	queueMicrotask(async () => { await (async (): globalThis.Promise<void> => {
+	queueMicrotask(async () => {
 		await $.chanSend(messages, new Message({priority: 50, text: "Anonymous function worker"}, true))
-	})() })
+	})
 
 	// Add status message
 	allMessages = $.appendOne(allMessages, new Message({priority: 1, text: "Main: Workers started"}, true))

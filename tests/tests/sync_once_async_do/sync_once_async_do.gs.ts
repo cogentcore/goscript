@@ -8,13 +8,13 @@ import "@goscript/sync/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	let once: $.VarRef<sync.Once> = $.varRef($.markAsStructValue(new sync.Once()))
-	let ch: $.Channel<number> | null = $.makeChannel<number>(1, 0, "both")
+	let ch = $.makeChannel<number>(1, 0, "both")
 	await $.chanSend(ch, 17)
 	let value = 0
-	await once.value.Do($.functionValue(async (): globalThis.Promise<void> => {
+	await once.value.Do($.functionValue(async () => {
 		value = await $.chanRecv(ch)
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)))
-	await once.value.Do($.functionValue((): void => {
+	await once.value.Do($.functionValue(() => {
 		value = 99
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)))
 	await $.println("once", value)

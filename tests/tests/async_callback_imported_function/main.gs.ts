@@ -7,7 +7,7 @@ import * as subpkg from "@goscript/github.com/s4wave/goscript/tests/tests/async_
 import "@goscript/github.com/s4wave/goscript/tests/tests/async_callback_imported_function/subpkg/index.js"
 
 export async function main(): globalThis.Promise<void> {
-	let ch: $.Channel<number> | null = $.makeChannel<number>(1, 0, "both")
+	let ch = $.makeChannel<number>(1, 0, "both")
 	await $.chanSend(ch, 7)
 
 	await subpkg.Run("async callback", $.functionValue(async (): globalThis.Promise<$.GoError> => {

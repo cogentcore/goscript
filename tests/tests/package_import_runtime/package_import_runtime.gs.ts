@@ -135,9 +135,9 @@ export async function main(): globalThis.Promise<void> {
 	runtime.GC()
 	await $.println("GC called successfully")
 
-	let pcs: $.Slice<number> = $.makeSlice<number>(0, undefined, "number")
+	let pcs = $.makeSlice<number>(0, undefined, "number")
 	await $.println("Callers empty:", runtime.Callers(0, pcs))
-	let frames: runtime.Frames | $.VarRef<runtime.Frames> | null = runtime.CallersFrames(pcs)
+	let frames = runtime.CallersFrames(pcs)
 	let [frame, more] = runtime.Frames.prototype.Next.call($.pointerValue<runtime.Frames>(frames))
 	await $.println("Frames empty:", frame.Line, more)
 	await $.println("FuncForPC nil:", runtime.FuncForPC(0) == null)
@@ -145,14 +145,14 @@ export async function main(): globalThis.Promise<void> {
 	await funcValueNames()
 
 	let __goscriptShadow0 = $.varRef($.anonymousStructValue({value: 1}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("value", /* @__PURE__ */ $.basicType("int"), [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/package_import_runtime" })] }))
-	let cleanup = $.markAsStructValue($.cloneStructValue(runtime.AddCleanup(__goscriptShadow0, $.functionValue(async (value: number): globalThis.Promise<void> => {
+	let cleanup = $.markAsStructValue($.cloneStructValue(runtime.AddCleanup(__goscriptShadow0, $.functionValue(async (value: number) => {
 		await $.println("cleanup should not run during test:", value)
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [] } as $.FunctionTypeInfo)), 1)))
 	$.markAsStructValue($.cloneStructValue(cleanup)).Stop()
 	runtime.KeepAlive($.interfaceValue(__goscriptShadow0, "*struct{value int}", /* @__PURE__ */ $.pointerType({ kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("value", /* @__PURE__ */ $.basicType("int"), [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/package_import_runtime" })] })))
 	await $.println("Cleanup stopped")
 
-	runtime.SetFinalizer($.interfaceValue(__goscriptShadow0, "*struct{value int}", /* @__PURE__ */ $.pointerType({ kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("value", /* @__PURE__ */ $.basicType("int"), [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/package_import_runtime" })] })), $.interfaceValue($.functionValue(async (_p0: $.VarRef<{"value": number}> | null): globalThis.Promise<void> => {
+	runtime.SetFinalizer($.interfaceValue(__goscriptShadow0, "*struct{value int}", /* @__PURE__ */ $.pointerType({ kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("value", /* @__PURE__ */ $.basicType("int"), [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/package_import_runtime" })] })), $.interfaceValue($.functionValue(async (_p0: $.VarRef<{"value": number}> | null) => {
 		await $.println("finalizer should not run during test")
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.pointerType({ kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("value", /* @__PURE__ */ $.basicType("int"), [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/package_import_runtime" })] })], results: [] } as $.FunctionTypeInfo)), "func(*struct{value int})", ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.pointerType({ kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("value", /* @__PURE__ */ $.basicType("int"), [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/package_import_runtime" })] })], results: [] } as $.FunctionTypeInfo)))
 	runtime.SetFinalizer($.interfaceValue(__goscriptShadow0, "*struct{value int}", /* @__PURE__ */ $.pointerType({ kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("value", /* @__PURE__ */ $.basicType("int"), [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/package_import_runtime" })] })), null)
@@ -164,11 +164,11 @@ export async function main(): globalThis.Promise<void> {
 export async function callers(): globalThis.Promise<void> {
 	let [pc, file, line, ok] = runtime.Caller(0)
 	await $.println("Caller:", ok, pc != 0, !$.stringEqual(file, ""), line > 0)
-	let f: runtime.Func | $.VarRef<runtime.Func> | null = runtime.FuncForPC(pc)
+	let f = runtime.FuncForPC(pc)
 	await $.println("FuncForPC caller:", f != null, strings.Contains(runtime.Func.prototype.Name.call($.pointerValueOrNil(f)), "callers"))
 	await $.println("Caller(1):", !$.stringEqual(callerInfo(), ""))
 
-	let pcs: $.Slice<number> = $.makeSlice<number>(8, undefined, "number")
+	let pcs = $.makeSlice<number>(8, undefined, "number")
 	let n = runtime.Callers(1, pcs)
 	let [frame, ] = runtime.Frames.prototype.Next.call($.pointerValue<runtime.Frames>(runtime.CallersFrames($.goSlice(pcs, undefined, n))))
 	await $.println("Callers:", n > 0, frame.Line > 0, strings.Contains(frame.Function, "callers"))
@@ -176,7 +176,7 @@ export async function callers(): globalThis.Promise<void> {
 
 export function callerInfo(): string {
 	let [pc, file, line, ] = runtime.Caller(1)
-	return $.concatString(($.concatString(($.concatString(($.concatString(runtime.Func.prototype.Name.call($.pointerValueOrNil(runtime.FuncForPC(pc))), " ")), file)), ":")), strconv.Itoa(line))
+	return runtime.Func.prototype.Name.call($.pointerValueOrNil(runtime.FuncForPC(pc))) + " " + file + ":" + strconv.Itoa(line)
 }
 
 export function funcName(f: any): string {
@@ -190,23 +190,23 @@ export async function funcValueNames(): globalThis.Promise<void> {
 	await $.println("FuncForPC func:", funcName($.interfaceValue($.goFunc(helperFunc, "main.helperFunc"), "func()", ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo))))
 	await $.println("FuncForPC imported:", funcName($.interfaceValue($.goFunc(strings.ToUpper, "strings.ToUpper"), "func(s string) string", ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string")], results: [/* @__PURE__ */ $.basicType("string")] } as $.FunctionTypeInfo))))
 
-	let c: counter | $.VarRef<counter> | null = new counter({n: 1})
+	let c = new counter({n: 1})
 	await $.println("FuncForPC pointer method:", funcName($.interfaceValue($.functionValue(((__receiver) => () => __receiver.PtrMethod())($.pointerValue<counter>(c)), ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo), "main.(*counter).PtrMethod-fm"), "func() int", ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))))
 	await $.println("FuncForPC value method:", funcName($.interfaceValue($.functionValue(((__receiver) => () => __receiver.ValMethod())($.markAsStructValue($.cloneStructValue($.pointerValue<counter>(c)))), ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo), "main.counter.ValMethod-fm"), "func() int", ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))))
 
-	let b: box | $.VarRef<box> | null = new box({v: 2})
+	let b = new box({v: 2})
 	await $.println("FuncForPC generic method:", funcName($.interfaceValue($.functionValue(((__receiver) => () => __receiver.Get(__goscriptStatic0()))($.pointerValue<box>(b)), ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo), "main.(*box[...]).Get-fm"), "func() int", ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))))
 }
 
 export async function lockOSThread(): globalThis.Promise<void> {
-	let done: $.Channel<boolean> | null = $.makeChannel<boolean>(0, false, "both")
-	queueMicrotask(async () => { await (async (): globalThis.Promise<void> => {
+	let done = $.makeChannel<boolean>(0, false, "both")
+	queueMicrotask(async () => {
 		await using __defer = new $.AsyncDisposableStack()
 		runtime.LockOSThread()
 		__defer.defer(() => { runtime.UnlockOSThread() })
 		await $.println("locked goroutine ran")
 		await $.chanSend(done, true)
-	})() })
+	})
 	await $.chanRecv(done)
 	runtime.UnlockOSThread()
 	await $.println("main unlocked")

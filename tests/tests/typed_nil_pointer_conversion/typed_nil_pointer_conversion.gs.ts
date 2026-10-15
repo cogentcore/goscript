@@ -51,7 +51,7 @@ export function clone(n: node | $.VarRef<node> | null): node | $.VarRef<node> | 
 
 export async function main(): globalThis.Promise<void> {
 	let n: node | $.VarRef<node> | null = null! as node | $.VarRef<node> | null
-	let cloned: node | $.VarRef<node> | null = clone(n)
+	let cloned = clone(n)
 	await $.println(cloned == null)
 
 	let boxed: any = $.interfaceValue(null, "*main.node", /* @__PURE__ */ $.pointerType("main.node"))

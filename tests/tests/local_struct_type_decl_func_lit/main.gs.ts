@@ -4,7 +4,7 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export async function main(): globalThis.Promise<void> {
-	let run: (() => void) | null = $.functionValue(async (): globalThis.Promise<void> => {
+	let run = $.functionValue(async () => {
 		class item {
 			public get name(): string {
 				return this._fields.name
@@ -55,17 +55,15 @@ export async function main(): globalThis.Promise<void> {
 			)
 		}
 
-		let items: $.Slice<item> = $.arrayToSlice<item>([$.markAsStructValue(new item({name: "alpha", count: 1})), $.markAsStructValue(new item({name: "beta", count: 2}))])
+		let items = $.arrayToSlice<item>([$.markAsStructValue(new item({name: "alpha", count: 1})), $.markAsStructValue(new item({name: "beta", count: 2}))])
 		for (let __goscriptRangeTarget0 = items, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
 			let item = $.markAsStructValue($.cloneStructValue((__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as item)))
 			await $.println(item.name, item.count)
 		}
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo))
 
-	void (__goscriptAwait = run!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+	await run()
 }
-
-var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

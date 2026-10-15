@@ -351,7 +351,7 @@ export function walk(v: reflect.Value): string {
 		if ($.markAsStructValue($.cloneStructValue(v)).IsNil()) {
 			return "nil"
 		}
-		return $.concatString("*", walk($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(v)).Elem()))))
+		return "*" + walk($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(v)).Elem())))
 	}
 	return reflect.Kind_String($.markAsStructValue($.cloneStructValue(v)).Kind())
 }
@@ -368,7 +368,7 @@ export function underlying(v: reflect.Value): reflect.Value {
 }
 
 export async function structPointers(): globalThis.Promise<void> {
-	let b: body | $.VarRef<body> | null = new body({Title: "body"})
+	let b = new body({Title: "body"})
 	$.pointerValue<body>(b).widget.base.This = $.interfaceValue<node | null>(b, "*main.body", /* @__PURE__ */ $.pointerType("main.body"))
 	let [n, ok] = $.typeAssertTuple<node | null>($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(b, "*main.body", /* @__PURE__ */ $.pointerType("main.body"))))).Interface(), "main.node")
 	await $.println("valueof:", ok, ok && ($.pointerEqual(((n as any)?.__goType === "*main.body" && (n as any).__goValue === undefined && (n as any).__isTypedNil !== true ? ((n as any) as body | $.VarRef<body> | null) : $.mustTypeAssert<body | $.VarRef<body> | null>(n, /* @__PURE__ */ $.pointerType("main.body"))), b)))
@@ -406,7 +406,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println($.pointerValue<T>(s.value).A, $.pointerValue<T>(s.value).B)
 
 	// Field Values copied into a slice read back what was set through them.
-	let fields: $.Slice<reflect.Value> = $.arrayToSlice<reflect.Value>([$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(e)).Field(0))), $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(e)).Field(1)))])
+	let fields = $.arrayToSlice<reflect.Value>([$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(e)).Field(0))), $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(e)).Field(1)))])
 	$.markAsStructValue($.cloneStructValue($.arrayIndex(fields!, 0))).SetString("ccc")
 	$.markAsStructValue($.cloneStructValue($.arrayIndex(fields!, 1))).SetFloat(1.5)
 	await $.println($.markAsStructValue($.cloneStructValue($.arrayIndex(fields!, 0))).String(), $.markAsStructValue($.cloneStructValue($.arrayIndex(fields!, 1))).Float(), $.pointerValue<T>(s.value).A, $.pointerValue<T>(s.value).B)

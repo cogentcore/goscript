@@ -38,9 +38,9 @@ export async function main(): globalThis.Promise<void> {
 	await $.println($.indexString(s, 7), $.indexString(s, 8), $.indexString(s, 9), $.stringLen($.sliceStringOrBytes(s, 7, undefined)), $.sliceStringOrBytes(s, undefined, 7))
 
 	// conversions
-	let runes: $.Slice<number> = $.stringToRunes(s)
+	let runes = $.stringToRunes(s)
 	await $.println($.sliceLen(runes), $.arrayIndex(runes!, 7), $.arrayIndex(runes!, 9))
-	let bs: $.Slice<number> = $.stringToBytes(s)
+	let bs = $.stringToBytes(s)
 	await $.println($.sliceLen(bs), $.arrayIndex(bs!, 7), $.stringEqual($.bytesToString(bs), s))
 	await $.println($.stringLen($.runesToString(runes)), $.stringEqual($.runesToString(runes), "BadUTF8\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd"))
 
@@ -57,13 +57,13 @@ export async function main(): globalThis.Promise<void> {
 	await $.println($.stringLen(out), $.stringEqual(out, "badutf8\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd"))
 
 	// concatenation keeps the bytes
-	let c = $.concatString(s, "x")
+	let c = s + "x"
 	await $.println($.stringLen(c), $.indexString(c, 9), $.indexString(c, 10), utf8.ValidString(c))
-	let d = $.concatString("x", s)
+	let d = "x" + s
 	await $.println($.stringLen(d), $.indexString(d, 0), $.indexString(d, 8), $.indexString(d, 10), $.stringEqual(d, "xBadUTF8\xe2\xe2\xa1"))
-	let e = $.concatString(s, "\xc3\xa9")
+	let e = s + "\xc3\xa9"
 	await $.println($.stringLen(e), $.indexString(e, 10), $.indexString(e, 11), $.stringEqual(e, "BadUTF8\xe2\xe2\xa1\xc3\xa9"))
-	let f = $.concatString($.sliceStringOrBytes(s, undefined, 8), $.sliceStringOrBytes(s, 8, undefined))
+	let f = $.sliceStringOrBytes(s, undefined, 8) + $.sliceStringOrBytes(s, 8, undefined)
 	await $.println($.stringEqual(f, s), $.stringLen(f))
 
 	// strings functions
@@ -82,15 +82,15 @@ export async function main(): globalThis.Promise<void> {
 	let key = "block:\x01\xff\x80"
 	let [rest, ok] = strings.CutPrefix(key, "block:")
 	await $.println(strings.HasPrefix(key, "block:"), ok, $.stringLen(rest), $.indexString(rest, 0), $.indexString(rest, 1))
-	let keys: $.Slice<string> = $.arrayToSlice<string>(["gcroot", key])
+	let keys = $.arrayToSlice<string>(["gcroot", key])
 	slices.Sort(keys)
 	await $.println($.stringEqual($.arrayIndex(keys!, 0), key), $.stringCompare(key, "gcroot") < 0, strings.Compare(key, "gcroot"))
-	let keyed: globalThis.Map<string, number> | null = $.makeMap<string, number>([[key, 1]])
+	let keyed = $.makeMap<string, number>([[key, 1]])
 	await $.println($.mapGet<string, number, number>(keyed, "block:\x01\xff\x80", 0)[0], $.mapGet<string, number, number>(keyed, $.bytesToString($.stringToBytes(key)), 0)[0])
 
 	// bytes split from a sequence join into it again
 	let euro = "\xe2\x82\xac"
-	await $.println($.stringLen($.sliceStringOrBytes(euro, undefined, 1)), $.stringEqual(($.concatString($.sliceStringOrBytes(euro, undefined, 1), $.sliceStringOrBytes(euro, 1, undefined))), euro), $.stringEqual(($.concatString($.sliceStringOrBytes(euro, undefined, 2), "\xac")), euro))
+	await $.println($.stringLen($.sliceStringOrBytes(euro, undefined, 1)), $.stringEqual(($.sliceStringOrBytes(euro, undefined, 1) + $.sliceStringOrBytes(euro, 1, undefined)), euro), $.stringEqual(($.sliceStringOrBytes(euro, undefined, 2) + "\xac"), euro))
 
 	// decoding at the edges
 	await $.println(utf8.FullRune(new Uint8Array([226, 130]) as $.Slice<number>), utf8.FullRune(new Uint8Array([226, 40]) as $.Slice<number>), utf8.FullRuneInString("\xe2"))

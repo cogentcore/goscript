@@ -76,11 +76,11 @@ $.registerNamedValueType(
 export const errConst: FormatError = "const"
 
 export function Stringy_String(s: Stringy): string {
-	return $.concatString("S:", s)
+	return "S:" + s
 }
 
 export function FormatError_Error(e: FormatError): string {
-	return $.concatString("format: ", e)
+	return "format: " + e
 }
 
 export function Code_Error(c: Code): string {
@@ -239,13 +239,13 @@ export async function main(): globalThis.Promise<void> {
 
 	await $.println("equal:", $.comparableEqual(a, $.namedValueInterfaceValue<any>(5, "main.MyInt", {}, /* @__PURE__ */ $.basicType("int32", "main.MyInt"))), $.comparableEqual(a, b), $.comparableEqual(a, $.namedValueInterfaceValue<any>(6, "main.MyInt", {}, /* @__PURE__ */ $.basicType("int32", "main.MyInt"))))
 
-	let m: globalThis.Map<string, Name> | null = $.makeMap<string, Name>([["k", "v"]])
+	let m = $.makeMap<string, Name>([["k", "v"]])
 	let am: any = $.interfaceValue(m, "map[string]main.Name", /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("string", "main.Name")))
 	let __goscriptTuple3: any = $.typeAssertTuple<globalThis.Map<string, Name> | null>(am, /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("string", "main.Name")))
 	ok = __goscriptTuple3[1]
 	await $.println("map:", ok)
 
-	let d: json.Decoder | $.VarRef<json.Decoder> | null = json.NewDecoder($.pointerValueOrNil($.interfaceValue<io.Reader | null>(strings.NewReader("{\"n\": 12}"), "*strings.Reader", /* @__PURE__ */ $.pointerType("strings.Reader")))!)
+	let d = json.NewDecoder($.pointerValueOrNil($.interfaceValue<io.Reader | null>(strings.NewReader("{\"n\": 12}"), "*strings.Reader", /* @__PURE__ */ $.pointerType("strings.Reader")))!)
 	json.Decoder.prototype.UseNumber.call($.pointerValue<json.Decoder>(d))
 	let obj: $.VarRef<globalThis.Map<string, any> | null> = $.varRef(null! as globalThis.Map<string, any> | null)
 	{

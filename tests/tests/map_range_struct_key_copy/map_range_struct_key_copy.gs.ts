@@ -104,7 +104,7 @@ export class Key {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let m: globalThis.Map<Pos, string> | null = $.makeMap<Pos, string>([[new Pos({Line: 1, Char: 2}, true), "a"]])
+	let m = $.makeMap<Pos, string>([[new Pos({Line: 1, Char: 2}, true), "a"]])
 	for (let [__goscriptRangeKey0, __rangeValue] of m?.entries() ?? []) {
 		let k = (__goscriptRangeKey0).clone()
 		k.Line = 77
@@ -119,7 +119,7 @@ export async function main(): globalThis.Promise<void> {
 		await $.println(k.Line, k.Char)
 	}
 
-	let n: globalThis.Map<Key, number> | null = $.makeMap<Key, number>([[new Key({P: new Pos({Line: 3, Char: 4}, true), Name: "x"}, true), 5]])
+	let n = $.makeMap<Key, number>([[new Key({P: new Pos({Line: 3, Char: 4}, true), Name: "x"}, true), 5]])
 	let saved: $.Slice<Key> = null! as $.Slice<Key>
 	for (let [__goscriptRangeKey2, __rangeValue] of n?.entries() ?? []) {
 		let k = (__goscriptRangeKey2).clone()
@@ -128,12 +128,12 @@ export async function main(): globalThis.Promise<void> {
 	}
 	await $.println($.mapGet<Key, number, number>(n, new Key({P: new Pos({Line: 3, Char: 4}, true), Name: "x"}, true), 0)[0], $.arrayIndex(saved!, 0).P.Line)
 
-	let vals: globalThis.Map<string, Pos> | null = $.makeMap<string, Pos>([["v", new Pos({Line: 5, Char: 6}, true)]])
+	let vals = $.makeMap<string, Pos>([["v", new Pos({Line: 5, Char: 6}, true)]])
 	for (let [__rangeKey, __goscriptRangeValue0] of vals?.entries() ?? []) {
 		let v = (__goscriptRangeValue0).clone()
 		v.Line = 66
 	}
-	let arrs: globalThis.Map<string, number[]> | null = $.makeMap<string, number[]>([["a", $.arrayValue([1, 2])]])
+	let arrs = $.makeMap<string, number[]>([["a", $.arrayValue([1, 2])]])
 	for (let [__rangeKey, __goscriptRangeValue1] of arrs?.entries() ?? []) {
 		let a = $.cloneArrayValue(__goscriptRangeValue1, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2))
 		a[0] = 9

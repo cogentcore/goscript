@@ -24,17 +24,17 @@ export async function main(): globalThis.Promise<void> {
 	// A narrower count keeps an int counter.
 	let n = 0
 	for (let i = 0; i < $.uint(3, 8); i++) {
-		n = n + ($.int(i))
+		n += $.int(i)
 	}
 	await $.println("uint8 range sum:", n)
 
 	// The count is evaluated once.
 	let calls = 0
-	let count: (() => bigint | globalThis.Promise<bigint>) | null = $.functionValue((): bigint => {
+	let count = $.functionValue((): bigint => {
 		calls++
 		return 3n
 	}, ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.basicType("uint64")] } as $.FunctionTypeInfo))
-	for (let __goscriptRangeCount0 = (__goscriptAwait = count!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), __rangeIndex = 0n; __rangeIndex < __goscriptRangeCount0; __rangeIndex++) {
+	for (let __goscriptRangeCount0 = count(), __rangeIndex = 0n; __rangeIndex < __goscriptRangeCount0; __rangeIndex++) {
 	}
 	await $.println("count calls:", calls)
 
@@ -44,8 +44,6 @@ export async function main(): globalThis.Promise<void> {
 		await $.println("iteration:", i, m)
 	}
 }
-
-var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

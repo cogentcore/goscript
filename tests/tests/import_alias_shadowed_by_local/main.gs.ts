@@ -58,7 +58,7 @@ export async function main(): globalThis.Promise<void> {
 		}
 	}
 
-	let __goscriptShadow0: local | $.VarRef<local> | null = newLocal(7)
+	let __goscriptShadow0 = newLocal(7)
 	await $.println($.pointerValue<local>(__goscriptShadow0).value)
 }
 

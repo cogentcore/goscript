@@ -113,7 +113,7 @@ export function NewBlockType(__typeArgs: $.GenericTypeArgs | undefined, typeID: 
 }
 
 export async function main(): globalThis.Promise<void> {
-	let bt: blockType | $.VarRef<blockType> | null = (NewBlockType(__goscriptStatic0(), "sample", $.functionValue((): sampleBlock | $.VarRef<sampleBlock> | null => {
+	let bt = (NewBlockType(__goscriptStatic0(), "sample", $.functionValue((): sampleBlock | $.VarRef<sampleBlock> | null => {
 		return new sampleBlock()
 	}, ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.pointerType("main.sampleBlock")] } as $.FunctionTypeInfo))) as blockType | $.VarRef<blockType> | null)
 	let blk = await (bt !== null && (bt as any).__isVarRef !== true && (bt as any).__goValue === undefined ? ((bt as any) as blockType).Constructor(__goscriptStatic0()) : blockType.prototype.Constructor.call(bt, __goscriptStatic0()))

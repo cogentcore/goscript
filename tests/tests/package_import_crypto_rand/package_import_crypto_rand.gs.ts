@@ -10,14 +10,14 @@ import "@goscript/crypto/rand/index.js"
 import "@goscript/io/index.js"
 
 export async function main(): globalThis.Promise<void> {
-	let buf: $.Slice<number> = $.makeSlice<number>(32, undefined, "byte")
+	let buf = $.makeSlice<number>(32, undefined, "byte")
 	let [n, err] = await rand.Read(buf)
 	await $.println("read len", n)
 	await $.println("read err nil", err == null)
 	await $.println("read has data", hasData(buf))
 
 	let r: io.Reader | null = rand.Reader
-	let small: $.Slice<number> = $.makeSlice<number>(4, undefined, "byte")
+	let small = $.makeSlice<number>(4, undefined, "byte")
 	let __goscriptTuple0: any = await (r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? (r as Exclude<io.Reader, null>) : $.pointerValue<Exclude<io.Reader, null>>(r)).Read(small)
 	n = __goscriptTuple0[0]
 	err = __goscriptTuple0[1]

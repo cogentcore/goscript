@@ -295,7 +295,8 @@ above are shortened.
 
 ### Goroutines
 
-A `go` statement queues the call as a microtask and does not wait for it:
+A `go` statement queues the call as a microtask and does not wait for it. A
+function literal called without arguments is the task itself:
 
 ```go
 go func() {
@@ -304,9 +305,9 @@ go func() {
 ```
 
 ```ts
-queueMicrotask(async () => { await (async (): globalThis.Promise<void> => {
+queueMicrotask(async () => {
 	await $.chanSend(ch, 1)
-})() })
+})
 ```
 
 ### Defer

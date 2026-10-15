@@ -223,7 +223,7 @@ export function shift(p: point | $.VarRef<point> | null): [point | $.VarRef<poin
 }
 
 export function newTab(name: string): [frame | $.VarRef<frame> | null, tab | $.VarRef<tab> | null] {
-	return [new frame({name: $.concatString(name, "-frame")}), new tab({name: $.concatString(name, "-tab")})]
+	return [new frame({name: name + "-frame"}), new tab({name: name + "-tab"})]
 }
 
 export async function names(nodes: $.Slice<Node | null>): globalThis.Promise<void> {
@@ -237,7 +237,7 @@ export async function names(nodes: $.Slice<Node | null>): globalThis.Promise<voi
 export function total(base: number, rest: $.Slice<number>): number {
 	for (let __goscriptRangeTarget1 = rest, __goscriptRangeWindow1 = $.sliceRange(__goscriptRangeTarget1), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow1.length; __rangeIndex++) {
 		let r = (__goscriptRangeWindow1.backing[__goscriptRangeWindow1.offset + __rangeIndex] as number)
-		base = base + (r)
+		base += r
 	}
 	return base
 }
@@ -252,7 +252,7 @@ export function span(a: number, b: number, rest: $.Slice<number>): number {
 
 export async function main(): globalThis.Promise<void> {
 	await $.println("sum:", sum(...(pair(2, 3) as [number, number])))
-	let p: point | $.VarRef<point> | null = makePoint(...(triple(4, 5, 6) as [number, number, number]))
+	let p = makePoint(...(triple(4, 5, 6) as [number, number, number]))
 	let p$: point = p == null ? $.pointerTarget<point>(p) : (p as any).__isVarRef === true ? (p as any).value : (p as any).__goValue === undefined ? (p as any) : $.pointerTarget<point>(p)
 	await $.println("point:", (p$ as point).x, (p$ as point).y)
 	let x: point | $.VarRef<point> | null = new point()
@@ -269,7 +269,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("total:", total(...(() => { const __goscriptTupleArg1 = pair(3, 4); return [__goscriptTupleArg1[0], $.arrayToSlice<number>([__goscriptTupleArg1[1]])] as [number, $.Slice<number>] })()))
 	await $.println("count:", count(...(() => { const __goscriptTupleArg2 = pair(3, 4); return [$.arrayToSlice<number>([__goscriptTupleArg2[0], __goscriptTupleArg2[1]])] as [$.Slice<number>] })()))
 	await $.println("span:", span(...(() => { const __goscriptTupleArg3 = pair(5, 9); return [__goscriptTupleArg3[0], __goscriptTupleArg3[1], null] as [number, number, $.Slice<number>] })()))
-	let ts: tabs | $.VarRef<tabs> | null = new tabs()
+	let ts = new tabs()
 	await names(...(await (async () => { const __goscriptTupleArg4 = await (ts !== null && (ts as any).__isVarRef !== true && (ts as any).__goValue === undefined ? ((ts as any) as tabs).NewTab("Text") : tabs.prototype.NewTab.call(ts, "Text")); return [$.arrayToSlice<Node | null>([$.interfaceValue<Node | null>(__goscriptTupleArg4[0], "*main.frame", /* @__PURE__ */ $.pointerType("main.frame")), $.interfaceValue<Node | null>(__goscriptTupleArg4[1], "*main.tab", /* @__PURE__ */ $.pointerType("main.tab"))])] as [$.Slice<Node | null>] })()))
 	await $.println("sprint:", await fmt.Sprint(...(() => { const __goscriptTupleArg5 = pair(3, 4); return [$.basicInterfaceValue(__goscriptTupleArg5[0], "int"), $.basicInterfaceValue(__goscriptTupleArg5[1], "int")] as [any, any] })()))
 	await $.println("tabs:", $.pointerValue<tabs>(ts).count)

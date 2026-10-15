@@ -25,7 +25,7 @@ import "@goscript/net/url/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	await using __defer = new $.AsyncDisposableStack()
-	let h: http.Header = $.makeMap<string, $.Slice<string>>([])
+	let h = $.makeMap<string, $.Slice<string>>([])
 	http.Header_Set(h, "content-type", "text/plain")
 	http.Header_Add(h, "content-type", "charset=utf-8")
 	await $.println("header:", http.CanonicalHeaderKey("x-test"), await http.Header_Get(h, "CONTENT-TYPE"), $.sliceLen(http.Header_Values(h, "content-type")))
@@ -64,7 +64,7 @@ export async function main(): globalThis.Promise<void> {
 	await http.ServeContent($.pointerValueOrNil($.interfaceValue<http.ResponseWriter | null>(rec, "*httptest.ResponseRecorder", /* @__PURE__ */ $.pointerType("httptest.ResponseRecorder")))!, headReq, "content.txt", $.markAsStructValue(new time.Time()), $.pointerValueOrNil($.interfaceValue<io.ReadSeeker | null>(strings.NewReader("hidden"), "*strings.Reader", /* @__PURE__ */ $.pointerType("strings.Reader")))!)
 	await $.println("servecontent head:", $.pointerValue<httptest.ResponseRecorder>(rec).Code, $.pointerValue<bytes.Buffer>($.pointerValue<httptest.ResponseRecorder>(rec).Body).Len())
 
-	let srv: httptest.Server | $.VarRef<httptest.Server> | null = httptest.NewTLSServer($.pointerValueOrNil(http.NotFoundHandler())!)
+	let srv = httptest.NewTLSServer($.pointerValueOrNil(http.NotFoundHandler())!)
 	__defer.defer(() => { httptest.Server.prototype.Close.call($.pointerValue<httptest.Server>(srv)) })
 	await $.println("server:", !$.stringEqual($.pointerValue<httptest.Server>(srv).URL, ""), httptest.Server.prototype.Client.call($.pointerValue<httptest.Server>(srv)) != null, httptest.DefaultRemoteAddr)
 }

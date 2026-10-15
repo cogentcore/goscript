@@ -82,7 +82,7 @@ export class Matcher {
 		let total = 0
 		for (let __goscriptRangeTarget0 = (m !== null && (m as any).__isVarRef !== true && (m as any).__goValue === undefined ? ((m as any) as Matcher).Blocks() : Matcher.prototype.Blocks.call(m)), __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
 			let __goscriptRangeShadow0 = ((__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as Match)).clone()
-			total = total + (__goscriptRangeShadow0.Size)
+			total += __goscriptRangeShadow0.Size
 		}
 		return total
 	}
@@ -97,7 +97,7 @@ export class Matcher {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let m: Matcher | $.VarRef<Matcher> | null = new Matcher({matches: $.arrayToSlice<Match>([new Match({Size: 3}, true), new Match({Size: 4}, true)])})
+	let m = new Matcher({matches: $.arrayToSlice<Match>([new Match({Size: 3}, true), new Match({Size: 4}, true)])})
 	await $.println((m !== null && (m as any).__isVarRef !== true && (m as any).__goValue === undefined ? ((m as any) as Matcher).Total() : Matcher.prototype.Total.call(m)))
 }
 

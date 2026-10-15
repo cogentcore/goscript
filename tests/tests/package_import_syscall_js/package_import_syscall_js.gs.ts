@@ -30,15 +30,15 @@ export async function main(): globalThis.Promise<void> {
 		$.markAsStructValue($.cloneStructValue(bytes)).SetIndex(0, $.basicInterfaceValue(65, "int"))
 		$.markAsStructValue($.cloneStructValue(bytes)).SetIndex(1, $.basicInterfaceValue(66, "int"))
 		$.markAsStructValue($.cloneStructValue(bytes)).SetIndex(2, $.basicInterfaceValue(67, "int"))
-		let dst: $.Slice<number> = $.makeSlice<number>(3, undefined, "byte")
+		let dst = $.makeSlice<number>(3, undefined, "byte")
 		js.CopyBytesToGo(dst, $.markAsStructValue($.cloneStructValue(bytes)))
 		await $.println("bytes:", $.bytesToString(dst))
 
 		// A JavaScript exception surfaces as a js.Error panic.
-		await (async (): globalThis.Promise<void> => {
+		await (async () => {
 			const __defer = new $.AsyncDisposableStack()
 			try {
-				__defer.defer(async () => { await (async (): globalThis.Promise<void> => {
+				__defer.defer(async () => { await (async () => {
 					{
 						let [err, ok] = $.typeAssertTuple<js.Error>($.recover(), "js.Error")
 						if (ok) {
@@ -69,7 +69,7 @@ export async function main(): globalThis.Promise<void> {
 }
 
 export async function wrap(fn: ((_this: js.Value, args: $.Slice<js.Value>) => any | globalThis.Promise<any>) | null): globalThis.Promise<js.Func> {
-	let jsFunc: ((_this: js.Value, args: $.Slice<js.Value>) => any | globalThis.Promise<any>) | null = $.functionValue(async (_this: js.Value, args: $.Slice<js.Value>): globalThis.Promise<any> => {
+	let jsFunc = $.functionValue(async (_this: js.Value, args: $.Slice<js.Value>): globalThis.Promise<any> => {
 		return fn!($.markAsStructValue($.cloneStructValue(_this)), args)
 	}, ({ kind: $.TypeKind.Function, params: ["js.Value", /* @__PURE__ */ $.sliceType("js.Value")], results: [{ kind: $.TypeKind.Interface, methods: [] }] } as $.FunctionTypeInfo))
 	return $.markAsStructValue($.cloneStructValue(js.FuncOf(jsFunc)))
@@ -97,12 +97,12 @@ export async function funcOfValues(): globalThis.Promise<void> {
 export async function funcOfSuspend(): globalThis.Promise<void> {
 	await using __defer = new $.AsyncDisposableStack()
 	let mu: $.VarRef<sync.Mutex> = $.varRef($.markAsStructValue(new sync.Mutex()))
-	let done: $.Channel<string> | null = $.makeChannel<string>(2, "", "both")
+	let done = $.makeChannel<string>(2, "", "both")
 	let handler = await wrap($.functionValue(async (_this: js.Value, args: $.Slice<js.Value>): globalThis.Promise<any> => {
 		using __defer = new $.DisposableStack()
 		await mu.value.Lock()
 		__defer.defer(() => { mu.value.Unlock() })
-		await $.chanSend(done, $.concatString("handled ", $.markAsStructValue($.cloneStructValue($.arrayIndex(args!, 0))).String()))
+		await $.chanSend(done, "handled " + $.markAsStructValue($.cloneStructValue($.arrayIndex(args!, 0))).String())
 		return null
 	}, ({ kind: $.TypeKind.Function, params: ["js.Value", /* @__PURE__ */ $.sliceType("js.Value")], results: [{ kind: $.TypeKind.Interface, methods: [] }] } as $.FunctionTypeInfo)))
 	const __goscriptDeferCallee3 = $.functionValue(((__receiver) => () => __receiver.Release())($.markAsStructValue($.cloneStructValue(handler))), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "syscall/js.Func.Release-fm")
@@ -123,7 +123,7 @@ export async function valueOfNil(): globalThis.Promise<void> {
 	await $.println("nil slice:", js.Type_String($.markAsStructValue($.cloneStructValue(js.ValueOf($.interfaceValue(null, "[]interface{}", /* @__PURE__ */ $.sliceType({ kind: $.TypeKind.Interface, methods: [] }))))).Type()), $.markAsStructValue($.cloneStructValue(js.ValueOf($.interfaceValue(null, "[]interface{}", /* @__PURE__ */ $.sliceType({ kind: $.TypeKind.Interface, methods: [] }))))).Length())
 	await $.println("nil map:", js.Type_String($.markAsStructValue($.cloneStructValue(js.ValueOf($.interfaceValue(null, "map[string]interface{}", /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), { kind: $.TypeKind.Interface, methods: [] }))))).Type()))
 
-	let desc: globalThis.Map<string, any> | null = $.makeMap<string, any>([["label", ""], ["requiredFeatures", $.interfaceValue(features(), "[]interface{}", /* @__PURE__ */ $.sliceType({ kind: $.TypeKind.Interface, methods: [] }))], ["limits", $.interfaceValue(null, "map[string]interface{}", /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), { kind: $.TypeKind.Interface, methods: [] }))]])
+	let desc = $.makeMap<string, any>([["label", ""], ["requiredFeatures", $.interfaceValue(features(), "[]interface{}", /* @__PURE__ */ $.sliceType({ kind: $.TypeKind.Interface, methods: [] }))], ["limits", $.interfaceValue(null, "map[string]interface{}", /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), { kind: $.TypeKind.Interface, methods: [] }))]])
 	let v = $.markAsStructValue($.cloneStructValue(js.ValueOf($.interfaceValue(desc, "map[string]interface{}", /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), { kind: $.TypeKind.Interface, methods: [] })))))
 	await $.println("nested slice:", js.Type_String($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(v)).Get("requiredFeatures"))).Type()), $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(js.Global())).Get("Array"))).Call("isArray", $.interfaceValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(v)).Get("requiredFeatures"))), "js.Value", "js.Value")))).Bool())
 	await $.println("nested map:", js.Type_String($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(v)).Get("limits"))).Type()))

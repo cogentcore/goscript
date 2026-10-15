@@ -46,7 +46,7 @@ export async function main(): globalThis.Promise<void> {
 	// Scenario 1: Value type that NeedsVarRef
 	// 'val' is a value type, but its address is taken, so it should be varrefed in TS.
 	let val = $.varRef(new MyStruct({MyInt: 10}, true))
-	let ptrToVal: MyStruct | $.VarRef<MyStruct> | null = val
+	let ptrToVal = val
 	let ptrToVal$: MyStruct = ptrToVal == null ? $.pointerTarget<MyStruct>(ptrToVal) : (ptrToVal as any).__isVarRef === true ? (ptrToVal as any).value : (ptrToVal as any).__goValue === undefined ? (ptrToVal as any) : $.pointerTarget<MyStruct>(ptrToVal)
 
 	// Accessing field on varrefed value type: Should generate val.value.MyInt
@@ -54,7 +54,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// Scenario 2: Pointer type
 	// We never take the address of ptr so it should not be varrefed.
-	let ptr: MyStruct | $.VarRef<MyStruct> | null = new MyStruct({MyInt: 30})
+	let ptr = new MyStruct({MyInt: 30})
 	let ptr$: MyStruct = ptr == null ? $.pointerTarget<MyStruct>(ptr) : (ptr as any).__isVarRef === true ? (ptr as any).value : (ptr as any).__goValue === undefined ? (ptr as any) : $.pointerTarget<MyStruct>(ptr);
 
 	// Accessing field on pointer type: Should generate ptr.MyInt

@@ -96,9 +96,9 @@ export async function anyExited(procs: $.Slice<Process | $.VarRef<Process> | nul
 }
 
 export async function main(): globalThis.Promise<void> {
-	let done: $.Channel<{}> | null = $.makeChannel<{}>(0, {}, "both")
+	let done = $.makeChannel<{}>(0, {}, "both")
 	done!.close()
-	let procs: $.Slice<Process | $.VarRef<Process> | null> = $.arrayToSlice<Process | $.VarRef<Process> | null>([new Process({pid: 1, done: $.makeChannel<{}>(0, {}, "both")}), new Process({pid: 2, done: done})])
+	let procs = $.arrayToSlice<Process | $.VarRef<Process> | null>([new Process({pid: 1, done: $.makeChannel<{}>(0, {}, "both")}), new Process({pid: 2, done: done})])
 
 	await $.println("first even:", firstEven($.arrayToSlice<number>([1, 3, 4, 6])))
 	await $.println("any exited:", await anyExited(procs))
@@ -107,14 +107,14 @@ export async function main(): globalThis.Promise<void> {
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.pointerType("main.Process")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo))))
 
 	// Each comparison receives a zero, which makes cmp async.
-	let ch: $.Channel<number> | null = $.makeChannel<number>(8, 0, "both")
+	let ch = $.makeChannel<number>(8, 0, "both")
 	for (let __goscriptRangeCount0 = $.cap(ch), __rangeIndex = 0; __rangeIndex < __goscriptRangeCount0; __rangeIndex++) {
 		await $.chanSend(ch, 0)
 	}
-	let cmp: ((a: number, b: number) => number | globalThis.Promise<number>) | null = $.functionValue(async (a: number, b: number): globalThis.Promise<number> => {
+	let cmp = $.functionValue(async (a: number, b: number): globalThis.Promise<number> => {
 		return (a - b) + (0 * await $.chanRecv(ch))
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))
-	let values: $.Slice<number> = $.arrayToSlice<number>([3, 1, 2])
+	let values = $.arrayToSlice<number>([3, 1, 2])
 	await slices.SortStableFunc(values, cmp)
 	await $.println("sorted:", $.arrayIndex(values!, 0), $.arrayIndex(values!, 1), $.arrayIndex(values!, 2))
 

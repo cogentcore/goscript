@@ -54,24 +54,24 @@ export class MyStruct {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let structPointer: MyStruct | $.VarRef<MyStruct> | null = new MyStruct({MyInt: 4, MyString: "hello world"})
+	let structPointer = new MyStruct({MyInt: 4, MyString: "hello world"})
 	let dereferencedStructCopy = ($.pointerValue<MyStruct>(structPointer)).clone()
 	dereferencedStructCopy.MyString = "original dereferenced copy modified"
 	let valueCopy1 = (dereferencedStructCopy).clone()
 	valueCopy1.MyString = "value copy 1"
 	let valueCopy2 = (dereferencedStructCopy).clone()
 	valueCopy2.MyString = "value copy 2"
-	let pointerCopy: MyStruct | $.VarRef<MyStruct> | null = structPointer
+	let pointerCopy = structPointer
 
 	// === Verifying Copy Independence ===
 	// Expected: "hello world"
-	await $.println($.concatString("pointerCopy (points to original structPointer): Expected: hello world, Actual: ", $.pointerValue<MyStruct>(pointerCopy).MyString))
+	await $.println("pointerCopy (points to original structPointer): Expected: hello world, Actual: " + $.pointerValue<MyStruct>(pointerCopy).MyString)
 	// Expected: "original dereferenced copy modified"
-	await $.println($.concatString("dereferencedStructCopy (modified after copies were made): Expected: original dereferenced copy modified, Actual: ", dereferencedStructCopy.MyString))
+	await $.println("dereferencedStructCopy (modified after copies were made): Expected: original dereferenced copy modified, Actual: " + dereferencedStructCopy.MyString)
 	// Expected: "value copy 1"
-	await $.println($.concatString("valueCopy1: Expected: value copy 1, Actual: ", valueCopy1.MyString))
+	await $.println("valueCopy1: Expected: value copy 1, Actual: " + valueCopy1.MyString)
 	// Expected: "value copy 2"
-	await $.println($.concatString("valueCopy2: Expected: value copy 2, Actual: ", valueCopy2.MyString))
+	await $.println("valueCopy2: Expected: value copy 2, Actual: " + valueCopy2.MyString)
 }
 
 if ($.isMainScript(import.meta)) {

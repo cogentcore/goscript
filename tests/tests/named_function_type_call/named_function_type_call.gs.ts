@@ -367,11 +367,11 @@ export function cloneMorphism(m: Morphism | null): MorphismHolder | $.VarRef<Mor
 }
 
 export async function main(): globalThis.Promise<void> {
-	let fs: MockFilesystem | $.VarRef<MockFilesystem> | null = new MockFilesystem()
-	let fileInfo: MockFileInfo | $.VarRef<MockFileInfo> | null = new MockFileInfo({name: "test.txt", size: 50n, isDir: false})
+	let fs = new MockFilesystem()
+	let fileInfo = new MockFileInfo({name: "test.txt", size: 50n, isDir: false})
 
 	// Test the walk function with custom WalkFunc
-	let walkFunc: ((path: string, info: FileInfo | null, err: $.GoError) => $.GoError | globalThis.Promise<$.GoError>) | null = $.functionValue(async (path: string, info: FileInfo | null, err: $.GoError): globalThis.Promise<$.GoError> => {
+	let walkFunc = $.functionValue(async (path: string, info: FileInfo | null, err: $.GoError): globalThis.Promise<$.GoError> => {
 		if (info != null) {
 			await $.println("Walking:", path, "size:", (__goscriptAwait = (info !== null && (info as any).__isVarRef !== true && (info as any).__goValue === undefined ? (info as Exclude<FileInfo, null>) : $.pointerValue<Exclude<FileInfo, null>>(info)).Size(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		}
@@ -387,7 +387,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 
 	// Test with processFiles
-	let processFunc: ((pattern: string) => $.GoError | globalThis.Promise<$.GoError>) | null = $.functionValue(async (pattern: string): globalThis.Promise<$.GoError> => {
+	let processFunc = $.functionValue(async (pattern: string): globalThis.Promise<$.GoError> => {
 		await $.println("Processing pattern:", pattern)
 		return null
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string")], results: ["error"] } as $.FunctionTypeInfo))
@@ -408,10 +408,10 @@ export async function main(): globalThis.Promise<void> {
 		return true
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo))]), "slice")
 
-	let worker: morphismWorker | $.VarRef<morphismWorker> | null = new morphismWorker({ready: $.makeChannel<boolean>(1, false, "both")})
-	let shape: shapeNode | $.VarRef<shapeNode> | null = new shapeNode({value: 7})
+	let worker = new morphismWorker({ready: $.makeChannel<boolean>(1, false, "both")})
+	let shape = new shapeNode({value: 7})
 	await $.println("Named morphism:", await useMorphism($.functionValue(((__receiver) => (s: Shape | null) => __receiver.lookup(s))($.pointerValue<morphismWorker>(worker)), ({ kind: $.TypeKind.Function, params: ["main.Shape"], results: ["main.Shape"] } as $.FunctionTypeInfo), "main.(*morphismWorker).lookup-fm"), $.interfaceValue<Shape | null>(shape, "*main.shapeNode", /* @__PURE__ */ $.pointerType("main.shapeNode"))))
-	let holder: MorphismHolder | $.VarRef<MorphismHolder> | null = await newMorphismHolder($.functionValue(((__receiver) => (s: Shape | null) => __receiver.lookup(s))($.pointerValue<morphismWorker>(worker)), ({ kind: $.TypeKind.Function, params: ["main.Shape"], results: ["main.Shape"] } as $.FunctionTypeInfo), "main.(*morphismWorker).lookup-fm"))
+	let holder = await newMorphismHolder($.functionValue(((__receiver) => (s: Shape | null) => __receiver.lookup(s))($.pointerValue<morphismWorker>(worker)), ({ kind: $.TypeKind.Function, params: ["main.Shape"], results: ["main.Shape"] } as $.FunctionTypeInfo), "main.(*morphismWorker).lookup-fm"))
 	await $.println("Field morphism:", await (holder !== null && (holder as any).__isVarRef !== true && (holder as any).__goValue === undefined ? ((holder as any) as MorphismHolder).apply($.interfaceValue<Shape | null>(shape, "*main.shapeNode", /* @__PURE__ */ $.pointerType("main.shapeNode"))) : MorphismHolder.prototype.apply.call(holder, $.interfaceValue<Shape | null>(shape, "*main.shapeNode", /* @__PURE__ */ $.pointerType("main.shapeNode")))))
 	await $.println("Cloned field morphism:", await (holder !== null && (holder as any).__isVarRef !== true && (holder as any).__goValue === undefined ? ((holder as any) as MorphismHolder).cloneApply($.interfaceValue<Shape | null>(shape, "*main.shapeNode", /* @__PURE__ */ $.pointerType("main.shapeNode"))) : MorphismHolder.prototype.cloneApply.call(holder, $.interfaceValue<Shape | null>(shape, "*main.shapeNode", /* @__PURE__ */ $.pointerType("main.shapeNode")))))
 	$.pointerValue<morphismWorker>(worker).ready!.close()

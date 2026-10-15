@@ -54,19 +54,19 @@ export class P {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let xs: $.Slice<number> = $.arrayToSlice<number>([1, 2, 3, 4])
+	let xs = $.arrayToSlice<number>([1, 2, 3, 4])
 	for (let __goscriptRangeTarget0 = xs, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), i = 0; i < __goscriptRangeWindow0.length; i++) {
 		;(__goscriptRangeWindow0.backing as any[])[__goscriptRangeWindow0.offset + i] = (((__goscriptRangeWindow0.backing as any[])[__goscriptRangeWindow0.offset + i] as number) * 2) + 1
 	}
 	await $.println($.arrayIndex(xs!, 0), $.arrayIndex(xs!, 3))
 
-	let sub: $.Slice<number> = $.goSlice(xs, 1, 3)
+	let sub = $.goSlice(xs, 1, 3)
 	for (let __goscriptRangeTarget1 = sub, __goscriptRangeWindow1 = $.sliceRange(__goscriptRangeTarget1), i = 0; i < __goscriptRangeWindow1.length; i++) {
-		;(__goscriptRangeWindow1.backing as any[])[__goscriptRangeWindow1.offset + i] = (__goscriptRangeWindow1.backing as any[])[__goscriptRangeWindow1.offset + i] + (100)
+		;(__goscriptRangeWindow1.backing as any[])[__goscriptRangeWindow1.offset + i] += 100
 	}
 	await $.println($.arrayIndex(xs!, 1), $.arrayIndex(xs!, 2), $.sliceLen(sub))
 
-	let ps: $.Slice<P> = $.arrayToSlice<P>([new P({X: 1, Y: 2}, true), new P({X: 3, Y: 4}, true)])
+	let ps = $.arrayToSlice<P>([new P({X: 1, Y: 2}, true), new P({X: 3, Y: 4}, true)])
 	for (let __goscriptRangeTarget2 = ps, __goscriptRangeWindow2 = $.sliceRange(__goscriptRangeTarget2), i = 0; i < __goscriptRangeWindow2.length; i++) {
 		let p = ((__goscriptRangeWindow2.backing[__goscriptRangeWindow2.offset + i] as P)).clone();
 		;((__goscriptRangeWindow2.backing as any[])[__goscriptRangeWindow2.offset + i] as P).X = globalThis.Math.fround(p.Y * 2)
@@ -75,27 +75,27 @@ export async function main(): globalThis.Promise<void> {
 	}
 	await $.println($.arrayIndex(ps!, 0).X, $.arrayIndex(ps!, 0).Y, $.arrayIndex(ps!, 1).X)
 
-	let m: $.Slice<$.Slice<number>> = $.arrayToSlice<$.Slice<number>>([$.arrayToSlice<number>([1, 2]), $.arrayToSlice<number>([3, 4])])
+	let m = $.arrayToSlice<$.Slice<number>>([$.arrayToSlice<number>([1, 2]), $.arrayToSlice<number>([3, 4])])
 	for (let __goscriptRangeTarget4 = m, __goscriptRangeWindow3 = $.sliceRange(__goscriptRangeTarget4), i = 0; i < __goscriptRangeWindow3.length; i++) {
 		for (let __goscriptRangeTarget3 = ((__goscriptRangeWindow3.backing as any[])[__goscriptRangeWindow3.offset + i] as $.Slice<number>), __goscriptRangeWindow4 = $.sliceRange(__goscriptRangeTarget3), j = 0; j < __goscriptRangeWindow4.length; j++) {
-			$.indexRef(((__goscriptRangeWindow3.backing as any[])[__goscriptRangeWindow3.offset + i] as $.Slice<number>)!, j).value = $.indexRef(((__goscriptRangeWindow3.backing as any[])[__goscriptRangeWindow3.offset + i] as $.Slice<number>)!, j).value * (10)
+			$.indexRef(((__goscriptRangeWindow3.backing as any[])[__goscriptRangeWindow3.offset + i] as $.Slice<number>)!, j).value *= 10
 		}
 	}
 	await $.println($.arrayIndex($.arrayIndex(m!, 0)!, 1), $.arrayIndex($.arrayIndex(m!, 1)!, 0))
 
 	let ys: $.Slice<number> = $.arrayToSlice<number>([1, 2, 3])
-	let grow: (() => void) | null = $.functionValue((): void => {
+	let grow = $.functionValue(() => {
 		ys = $.appendOne(ys, 9)
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo))
 	for (let __goscriptRangeTarget5 = ys, __goscriptRangeWindow5 = $.sliceRange(__goscriptRangeTarget5), i = 0; i < __goscriptRangeWindow5.length; i++) {
 		if (i == 0) {
-			void (__goscriptAwait = grow!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+			grow()
 		}
-		$.sliceElems(ys!)[$.sliceSlot(ys!, i)] = $.sliceElems(ys!)[$.sliceSlot(ys!, i)] + (1)
+		$.sliceElems(ys!)[$.sliceSlot(ys!, i)] += 1
 	}
 	await $.println($.sliceLen(ys), $.arrayIndex(ys!, 0), $.arrayIndex(ys!, 2), $.arrayIndex(ys!, 3))
 
-	let bs: $.Slice<number> = new Uint8Array([250, 251]) as $.Slice<number>
+	let bs = new Uint8Array([250, 251]) as $.Slice<number>
 	for (let __goscriptRangeTarget6 = bs, __goscriptRangeWindow6 = $.sliceRange(__goscriptRangeTarget6), i = 0; i < __goscriptRangeWindow6.length; i++) {
 		;(__goscriptRangeWindow6.backing as any[])[__goscriptRangeWindow6.offset + i] = $.uint((__goscriptRangeWindow6.backing as any[])[__goscriptRangeWindow6.offset + i] + (10), 8)
 	}
@@ -107,8 +107,6 @@ export async function main(): globalThis.Promise<void> {
 	}
 	await $.println($.int(globalThis.Math.fround(f32 * 1e+06)))
 }
-
-var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

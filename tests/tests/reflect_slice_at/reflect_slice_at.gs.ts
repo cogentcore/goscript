@@ -149,7 +149,7 @@ export async function newAtOffsets(): globalThis.Promise<void> {
 	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.NewAt($.pointerValueOrNil(yf.Type)!, ($.uint($.uint64Add(($.uint($.uint64Add($.markAsStructValue($.cloneStructValue(ov)).Pointer(), sf.Offset), 64)), yf.Offset), 64) as any)))).Elem())).SetString("sub")
 	await $.println("newat-offset:", pt.value.S.Y)
 
-	let local: T | $.VarRef<T> | null = new T()
+	let local = new T()
 	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(fieldValue($.interfaceValue(local, "*main.T", /* @__PURE__ */ $.pointerType("main.T")), fld))).Elem())).SetString("loc")
 	await $.println("newat-offset:", $.pointerValue<T>(local).Mbr1)
 
@@ -205,14 +205,14 @@ export async function main(): globalThis.Promise<void> {
 	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.NewAt($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic0()))!, ($.fieldRef(h._fields, "Count") as any)))).Elem())).SetInt(6n)
 	await $.println("newat-field:", h.Count)
 
-	let buf: $.Slice<number> = new Uint8Array([1, 2, 3, 4]) as $.Slice<number>
+	let buf = new Uint8Array([1, 2, 3, 4]) as $.Slice<number>
 	let bytes = $.markAsStructValue($.cloneStructValue(reflect.SliceAt($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic1()))!, ($.indexRef(buf!, 1) as any), 2)))
 	await $.println("bytes:", $.markAsStructValue($.cloneStructValue(bytes)).Len(), $.markAsStructValue($.cloneStructValue(bytes)).Cap(), $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(bytes)).Index(0))).Uint(), $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(bytes)).Index(1))).Uint())
 	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(bytes)).Index(0))).SetUint(9n)
 	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(bytes)).Index(1))).SetUint(8n)
 	await $.println("buf:", $.arrayIndex(buf!, 0), $.arrayIndex(buf!, 1), $.arrayIndex(buf!, 2), $.arrayIndex(buf!, 3))
 
-	let ints: $.Slice<number> = $.arrayToSlice<number>([10, 20, 30, 40])
+	let ints = $.arrayToSlice<number>([10, 20, 30, 40])
 	let intSlice = $.markAsStructValue($.cloneStructValue(reflect.SliceAt($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic0()))!, ($.indexRef(ints!, 1) as any), 2)))
 	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(intSlice)).Index(1))).SetInt(77n)
 	await $.println("ints:", $.arrayIndex(ints!, 0), $.arrayIndex(ints!, 1), $.arrayIndex(ints!, 2), $.arrayIndex(ints!, 3), $.markAsStructValue($.cloneStructValue(intSlice)).Len(), $.markAsStructValue($.cloneStructValue(intSlice)).Cap())

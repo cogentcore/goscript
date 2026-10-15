@@ -12,7 +12,7 @@ export async function outer(__typeArgs: $.GenericTypeArgs | undefined, ch: $.Cha
 }
 
 export async function main(): globalThis.Promise<void> {
-	let ch: $.Channel<number> | null = $.makeChannel<number>(1, 0, "both")
+	let ch = $.makeChannel<number>(1, 0, "both")
 	await $.chanSend(ch, 7)
 	await $.println("value:", await outer(__goscriptStatic0(), ch))
 }

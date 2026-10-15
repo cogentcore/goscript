@@ -30,7 +30,7 @@ export async function main(): globalThis.Promise<void> {
 	wg.value.Add(numWorkers)
 
 	// Function that will be run by each worker
-	let worker: ((id: number) => void) | null = $.functionValue(async (id: number): globalThis.Promise<void> => {
+	let worker = $.functionValue(async (id: number) => {
 		await using __defer = new $.AsyncDisposableStack()
 		__defer.defer(() => { wg.value.Done() })
 
@@ -54,15 +54,15 @@ export async function main(): globalThis.Promise<void> {
 	for (let __goscriptRangeCount0 = numWorkers, i = 0; i < __goscriptRangeCount0; i++) {
 		const __goscriptDeferCallee2 = worker
 		const __goscriptDeferArg0 = i
-		queueMicrotask(async () => { (__goscriptAwait = __goscriptDeferCallee2!(__goscriptDeferArg0), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) })
+		queueMicrotask(async () => { await __goscriptDeferCallee2(__goscriptDeferArg0) })
 	}
 
 	// Wait for all workers to complete or context timeout
-	let done: $.Channel<{}> | null = $.makeChannel<{}>(0, {}, "both")
-	queueMicrotask(async () => { await (async (): globalThis.Promise<void> => {
+	let done = $.makeChannel<{}>(0, {}, "both")
+	queueMicrotask(async () => {
 		await wg.value.Wait()
 		done!.close()
-	})() })
+	})
 
 	const [__goscriptSelect0HasReturn, __goscriptSelect0Value] = await $.selectStatement<any, void>([
 		{

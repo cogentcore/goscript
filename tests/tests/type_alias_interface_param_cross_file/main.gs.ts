@@ -58,7 +58,7 @@ export async function write(tx: __goscript_types.Tx | null, v: dep.Value): globa
 }
 
 export async function main(): globalThis.Promise<void> {
-	let s: sink | $.VarRef<sink> | null = new sink()
+	let s = new sink()
 	await write($.interfaceValue<__goscript_types.Tx | null>(s, "*main.sink", /* @__PURE__ */ $.pointerType("main.sink")), (new Uint8Array([1, 2, 3]) as $.Slice<number> as dep.Value))
 	await $.println("size:", $.pointerValue<sink>(s).size)
 }

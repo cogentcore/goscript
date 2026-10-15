@@ -108,9 +108,9 @@ export async function main(): globalThis.Promise<void> {
 	let [written, err] = await (stream !== null && (stream as any).__isVarRef !== true && (stream as any).__goValue === undefined ? (stream as Exclude<io.ReadWriteCloser, null>) : $.pointerValue<Exclude<io.ReadWriteCloser, null>>(stream)).Write(new Uint8Array([100, 105, 97, 108]))
 	await $.println("stream", written, err == null, await (stream !== null && (stream as any).__isVarRef !== true && (stream as any).__goValue === undefined ? (stream as Exclude<io.ReadWriteCloser, null>) : $.pointerValue<Exclude<io.ReadWriteCloser, null>>(stream)).Close() == null)
 
-	let keys: $.Channel<crypto.PublicKey | null> | null = $.makeChannel<crypto.PublicKey | null>(1, null! as crypto.PublicKey | null, "both")
+	let keys = $.makeChannel<crypto.PublicKey | null>(1, null! as crypto.PublicKey | null, "both")
 	await $.chanSend(keys, $.namedValueInterfaceValue<crypto.PublicKey | null>(new Uint8Array([1, 2, 3]) as $.Slice<number>, "ed25519.PublicKey", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()))
-	let key: ed25519.PublicKey = ($.mustTypeAssert<ed25519.PublicKey>((await $.chanRecv(keys)), /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"), "ed25519.PublicKey")) as ed25519.PublicKey)
+	let key = ($.mustTypeAssert<ed25519.PublicKey>((await $.chanRecv(keys)), /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"), "ed25519.PublicKey")) as ed25519.PublicKey)
 	await $.println("key", $.sliceLen((key as ed25519.PublicKey)), $.arrayIndex(key!, 0))
 
 	let target: $.VarRef<recreateError | $.VarRef<recreateError> | null> = $.varRef(null! as recreateError | $.VarRef<recreateError> | null)

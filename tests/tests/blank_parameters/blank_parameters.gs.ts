@@ -104,16 +104,14 @@ export async function main(): globalThis.Promise<void> {
 	await $.println(blanks(1, "x"))
 	await $.println($.sliceLen(p.pack(null, null, 0)))
 
-	let f: ((_p0: number, _p1: number) => number | globalThis.Promise<number>) | null = $.functionValue((_p0: number, _p1: number): number => {
+	let f = $.functionValue((_p0: number, _p1: number): number => {
 		return 9
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))
-	await $.println((__goscriptAwait = f!(1, 2), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println(f(1, 2))
 
 	let [left, right] = unicodeNames(3, 4)
 	await $.println(left, right)
 }
-
-var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

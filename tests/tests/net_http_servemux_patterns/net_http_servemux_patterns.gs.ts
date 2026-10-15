@@ -21,8 +21,8 @@ import "@goscript/context/index.js"
 import "@goscript/net/url/index.js"
 
 export function route(label: string): http.Handler | null {
-	return $.namedValueInterfaceValue<http.Handler | null>($.namedFunction($.functionValue(async (w: http.ResponseWriter | null, r: http.Request | $.VarRef<http.Request> | null): globalThis.Promise<void> => {
-		let body = $.concatString(($.concatString(($.concatString(($.concatString(($.concatString(($.concatString(label, " id=")), http.Request.prototype.PathValue.call($.pointerValue<http.Request>(r), "id"))), " path=")), http.Request.prototype.PathValue.call($.pointerValue<http.Request>(r), "path"))), " pattern=")), $.pointerValue<http.Request>(r).Pattern)
+	return $.namedValueInterfaceValue<http.Handler | null>($.namedFunction($.functionValue(async (w: http.ResponseWriter | null, r: http.Request | $.VarRef<http.Request> | null) => {
+		let body = label + " id=" + http.Request.prototype.PathValue.call($.pointerValue<http.Request>(r), "id") + " path=" + http.Request.prototype.PathValue.call($.pointerValue<http.Request>(r), "path") + " pattern=" + $.pointerValue<http.Request>(r).Pattern
 		{
 			let [, err] = await (w !== null && (w as any).__isVarRef !== true && (w as any).__goValue === undefined ? (w as Exclude<http.ResponseWriter, null>) : $.pointerValue<Exclude<http.ResponseWriter, null>>(w)).Write($.stringToBytes(body))
 			if (err != null) {
@@ -34,7 +34,7 @@ export function route(label: string): http.Handler | null {
 
 export async function serve(mux: http.ServeMux | $.VarRef<http.ServeMux> | null, req: http.Request | $.VarRef<http.Request> | null): globalThis.Promise<void> {
 	const req$: http.Request = req == null ? $.pointerTarget<http.Request>(req) : (req as any).__isVarRef === true ? (req as any).value : (req as any).__goValue === undefined ? (req as any) : $.pointerTarget<http.Request>(req)
-	let rec: httptest.ResponseRecorder | $.VarRef<httptest.ResponseRecorder> | null = httptest.NewRecorder()
+	let rec = httptest.NewRecorder()
 	let rec$: httptest.ResponseRecorder = rec == null ? $.pointerTarget<httptest.ResponseRecorder>(rec) : (rec as any).__isVarRef === true ? (rec as any).value : (rec as any).__goValue === undefined ? (rec as any) : $.pointerTarget<httptest.ResponseRecorder>(rec)
 	await http.ServeMux.prototype.ServeHTTP.call($.pointerValue<http.ServeMux>(mux), $.pointerValueOrNil($.interfaceValue<http.ResponseWriter | null>(rec, "*httptest.ResponseRecorder", /* @__PURE__ */ $.pointerType("httptest.ResponseRecorder")))!, req)
 	await $.println((req$ as http.Request).Method, (req$ as http.Request).Host, $.pointerValue<url.URL>((req$ as http.Request).URL).Path, "->", (rec$ as httptest.ResponseRecorder).Code, $.pointerValue<bytes.Buffer>((rec$ as httptest.ResponseRecorder).Body).String(), await http.Header_Get(httptest.ResponseRecorder.prototype.Header.call($.pointerValue<httptest.ResponseRecorder>(rec)), "Allow"), await http.Header_Get(httptest.ResponseRecorder.prototype.Header.call($.pointerValue<httptest.ResponseRecorder>(rec)), "Location"))
@@ -47,7 +47,7 @@ export async function _get(mux: http.ServeMux | $.VarRef<http.ServeMux> | null, 
 export async function register(mux: http.ServeMux | $.VarRef<http.ServeMux> | null, pattern: string, handler: http.Handler | null): globalThis.Promise<void> {
 	const __defer = new $.AsyncDisposableStack()
 	try {
-		__defer.defer(async () => { await (async (): globalThis.Promise<void> => {
+		__defer.defer(async () => { await (async () => {
 			await $.println("register", pattern, "panics:", $.recover() != null)
 		})() })
 		http.ServeMux.prototype.Handle.call($.pointerValue<http.ServeMux>(mux), pattern, $.pointerValueOrNil(handler)!)
@@ -61,7 +61,7 @@ export async function register(mux: http.ServeMux | $.VarRef<http.ServeMux> | nu
 }
 
 export async function main(): globalThis.Promise<void> {
-	let mux: http.ServeMux | $.VarRef<http.ServeMux> | null = http.NewServeMux()
+	let mux = http.NewServeMux()
 	http.ServeMux.prototype.Handle.call($.pointerValue<http.ServeMux>(mux), "/{$}", $.pointerValueOrNil(route("home"))!)
 	http.ServeMux.prototype.Handle.call($.pointerValue<http.ServeMux>(mux), "GET /items/{id}", $.pointerValueOrNil(route("get"))!)
 	http.ServeMux.prototype.Handle.call($.pointerValue<http.ServeMux>(mux), "DELETE /items/{id}", $.pointerValueOrNil(route("delete"))!)
@@ -106,7 +106,7 @@ export async function main(): globalThis.Promise<void> {
 	let [h, pattern] = http.ServeMux.prototype.Handler.call($.pointerValue<http.ServeMux>(mux), httptest.NewRequest("GET", "/items/9", null!))
 	await $.println("handler:", h != null, pattern)
 
-	let req: http.Request | $.VarRef<http.Request> | null = httptest.NewRequest("GET", "/", null!)
+	let req = httptest.NewRequest("GET", "/", null!)
 	await $.println("unset:", $.stringEqual(http.Request.prototype.PathValue.call($.pointerValue<http.Request>(req), "id"), ""))
 	http.Request.prototype.SetPathValue.call($.pointerValue<http.Request>(req), "id", "set")
 	await $.println("set:", http.Request.prototype.PathValue.call($.pointerValue<http.Request>(req), "id"), http.Request.prototype.PathValue.call($.pointerValue<http.Request>(http.Request.prototype.Clone.call($.pointerValue<http.Request>(req), $.pointerValueOrNil(http.Request.prototype.Context.call($.pointerValue<http.Request>(req)))!)), "id"))

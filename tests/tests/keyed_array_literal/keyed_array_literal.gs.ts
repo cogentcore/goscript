@@ -31,7 +31,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("arr3[7]:", $.arrayIndex(arr3, 7))
 
 	// Test slice with keyed elements
-	let slice1: $.Slice<string> = $.arrayToSlice<string>(["", "", "second", "", "fourth"])
+	let slice1 = $.arrayToSlice<string>(["", "", "second", "", "fourth"])
 	await $.println("slice1[0]:", $.arrayIndex(slice1!, 0))
 	await $.println("slice1[1]:", $.arrayIndex(slice1!, 1))
 	await $.println("slice1[2]:", $.arrayIndex(slice1!, 2))

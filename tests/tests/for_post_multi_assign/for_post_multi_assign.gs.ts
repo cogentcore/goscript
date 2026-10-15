@@ -106,7 +106,7 @@ export class iterator {
 }
 
 export function findFrame(): frame | $.VarRef<frame> | null {
-	let it: iterator | $.VarRef<iterator> | null = new iterator()
+	let it = new iterator()
 	for (let __goscriptTuple0 = (it !== null && (it as any).__isVarRef !== true && (it as any).__goValue === undefined ? ((it as any) as iterator).Next() : iterator.prototype.Next.call(it)), f = $.varRef(__goscriptTuple0[0]), again = __goscriptTuple0[1]; again; [f.value, again] = (it !== null && (it as any).__isVarRef !== true && (it as any).__goValue === undefined ? ((it as any) as iterator).Next() : iterator.prototype.Next.call(it))) {
 		if ($.stringEqual(f.value.name, "second")) {
 			return f
@@ -119,7 +119,7 @@ export async function main(): globalThis.Promise<void> {
 	for (let i = 0, j = 5; i < j; [i, j] = [i + 1, j - 1]) {
 		await $.println(i, j)
 	}
-	let found: frame | $.VarRef<frame> | null = findFrame()
+	let found = findFrame()
 	if (found != null) {
 		await $.println("frame:", $.pointerValue<frame>(found).name)
 	}

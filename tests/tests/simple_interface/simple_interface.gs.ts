@@ -44,7 +44,7 @@ export class MyStruct {
 
 export async function main(): globalThis.Promise<void> {
 	let original = $.varRef(new MyStruct({Value: 30}, true))
-	let pAlias: MyStruct | $.VarRef<MyStruct> | null = original
+	let pAlias = original
 
 	let jAlias: any = $.interfaceValue(pAlias, "*main.MyStruct", /* @__PURE__ */ $.pointerType("main.MyStruct"))
 

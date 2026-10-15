@@ -8,10 +8,10 @@ import "@goscript/bytes/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	let nilBytes: $.Slice<number> = null! as $.Slice<number>
-	let backing: $.Slice<number> = new Uint8Array([1]) as $.Slice<number>
-	let emptyView: $.Slice<number> = $.goSlice(backing, undefined, 0)
-	let otherBacking: $.Slice<number> = new Uint8Array([2]) as $.Slice<number>
-	let otherEmptyView: $.Slice<number> = $.goSlice(otherBacking, undefined, 0)
+	let backing = new Uint8Array([1]) as $.Slice<number>
+	let emptyView = $.goSlice(backing, undefined, 0)
+	let otherBacking = new Uint8Array([2]) as $.Slice<number>
+	let otherEmptyView = $.goSlice(otherBacking, undefined, 0)
 
 	await $.println("nil and view:", bytes.Equal(nilBytes, emptyView))
 	await $.println("views:", bytes.Equal(emptyView, otherEmptyView))

@@ -7,7 +7,7 @@ import * as __goscript_table from "./table.gs.ts"
 import "./table.gs.ts"
 
 export async function main(): globalThis.Promise<void> {
-	let p: $.VarRef<number[]> | null = __goscript_table.table
+	let p = __goscript_table.table
 	await $.println($.arrayIndex(($.pointerValue<number[]>(p)), 1))
 }
 

@@ -73,7 +73,7 @@ export class factory {
 }
 
 export async function NewFactory(b: Bus): globalThis.Promise<Factory | null> {
-	let ch: $.Channel<{}> | null = $.makeChannel<{}>(1, {}, "both")
+	let ch = $.makeChannel<{}>(1, {}, "both")
 	await $.chanSend(ch, {})
 	await $.chanRecv(ch)
 	return $.namedValueInterfaceValue<Factory | null>(new factory(), "*dep.factory", __goscriptStatic1(), __goscriptStatic2(), __goscriptStatic3())

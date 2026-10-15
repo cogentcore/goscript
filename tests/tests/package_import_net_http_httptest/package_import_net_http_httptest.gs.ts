@@ -17,7 +17,7 @@ export async function setAttachment(w: http.ResponseWriter | null, name: string)
 }
 
 export async function main(): globalThis.Promise<void> {
-	let w: httptest.ResponseRecorder | $.VarRef<httptest.ResponseRecorder> | null = httptest.NewRecorder()
+	let w = httptest.NewRecorder()
 	http.Header_Set(httptest.ResponseRecorder.prototype.Header.call($.pointerValue<httptest.ResponseRecorder>(w)), "X-Test", "ok")
 	await $.println(await http.Header_Get(httptest.ResponseRecorder.prototype.Header.call($.pointerValue<httptest.ResponseRecorder>(w)), "X-Test"))
 

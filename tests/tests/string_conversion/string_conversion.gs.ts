@@ -22,24 +22,24 @@ export async function main(): globalThis.Promise<void> {
 	await $.println(s3)
 
 	// === string([]rune) Conversion ===
-	let myRunes: $.Slice<number> = $.arrayToSlice<number>([71, 111, 83, 99, 114, 105, 112, 116])
+	let myRunes = $.arrayToSlice<number>([71, 111, 83, 99, 114, 105, 112, 116])
 	let myStringFromRunes = $.runesToString(myRunes)
 	await $.println(myStringFromRunes)
 
-	let emptyRunes: $.Slice<number> = $.arrayToSlice<number>([])
+	let emptyRunes = $.arrayToSlice<number>([])
 	let emptyStringFromRunes = $.runesToString(emptyRunes)
 	await $.println(emptyStringFromRunes)
 
 	// === []rune(string) and string([]rune) Round Trip ===
 	let originalString = "\xe4\xbd\xa0\xe5\xa5\xbd\xe4\xb8\x96\xe7\x95\x8c"
-	let runesFromString: $.Slice<number> = $.stringToRunes(originalString)
+	let runesFromString = $.stringToRunes(originalString)
 	let stringFromRunes = $.runesToString(runesFromString)
 	await $.println(originalString)
 	await $.println(stringFromRunes)
 	await $.println($.stringEqual(originalString, stringFromRunes))
 
 	// === Modify []rune and convert back to string ===
-	let mutableRunes: $.Slice<number> = $.stringToRunes("Mutable String")
+	let mutableRunes = $.stringToRunes("Mutable String")
 	$.sliceElems(mutableRunes!)[$.sliceSlot(mutableRunes!, 0)] = 109
 	$.sliceElems(mutableRunes!)[$.sliceSlot(mutableRunes!, 8)] = 115
 	let modifiedString = $.runesToString(mutableRunes)
@@ -48,20 +48,20 @@ export async function main(): globalThis.Promise<void> {
 	// === Test cases that might trigger "unhandled string conversion" ===
 
 	// string([]byte) conversion
-	let bytes: $.Slice<number> = new Uint8Array([72, 101, 108, 108, 111]) as $.Slice<number>
+	let bytes = new Uint8Array([72, 101, 108, 108, 111]) as $.Slice<number>
 	let bytesString = $.bytesToString(bytes)
 	await $.println(bytesString)
 	await $.println($.stringEqual($.bytesToString(new Uint8Array([234, 8, 0]) as $.Slice<number>), "\xea\x08\x00"))
 	await $.println($.stringEqual($.bytesToString(new Uint8Array([195, 169]) as $.Slice<number>), "\xc3\xa9"))
 	const magic: string = "\xff\x06\x00\x00S2sTwO"
 	await $.println((10 as number) == 10)
-	let magicBytes: $.Slice<number> = new Uint8Array([255, 6, 0, 0, 83, 50, 115, 84, 119, 79])
+	let magicBytes = new Uint8Array([255, 6, 0, 0, 83, 50, 115, 84, 119, 79])
 	await $.println($.sliceLen(magicBytes) == 10)
 	await $.println($.arrayIndex(magicBytes!, 0) == 255)
 	await $.println($.arrayIndex(magicBytes!, 1) == 6)
 	await $.println($.stringEqual($.bytesToString(magicBytes), "\xff\x06\x00\x00S2sTwO"))
 	await $.println((2 as number) == 2)
-	let utf8Bytes: $.Slice<number> = new Uint8Array([195, 169])
+	let utf8Bytes = new Uint8Array([195, 169])
 	await $.println($.sliceLen(utf8Bytes) == 2)
 	await $.println($.arrayIndex(utf8Bytes!, 0) == 195)
 	await $.println($.arrayIndex(utf8Bytes!, 1) == 169)

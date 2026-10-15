@@ -120,7 +120,7 @@ export class Program {
 
 	public Listing(): ((_yield: ((_p0: number, _p1: Instr) => boolean | globalThis.Promise<boolean>) | null) => void) | null {
 		const p = this;
-		return $.functionValue(async (_yield: ((_p0: number, _p1: Instr) => boolean | globalThis.Promise<boolean>) | null): globalThis.Promise<void> => {
+		return $.functionValue(async (_yield: ((_p0: number, _p1: Instr) => boolean | globalThis.Promise<boolean>) | null) => {
 			for (let __goscriptRangeTarget0 = p.Code, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), pc = 0; pc < __goscriptRangeWindow0.length; pc++) {
 				let _in = ((__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + pc] as Instr)).clone()
 				if (!(__goscriptAwait = _yield!(pc, (_in).clone()), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)) {
@@ -253,7 +253,7 @@ export class VM {
 		let _in = ($.arrayIndex(code!, (vm$ as VM).pc)).clone();
 		;(vm$ as VM).pc++;
 		;(vm$ as VM).steps++
-		let s: Stack | $.VarRef<Stack> | null = $.fieldRef((vm$ as VM)._fields, "stack")
+		let s = $.fieldRef((vm$ as VM)._fields, "stack")
 		switch (_in.Op) {
 			case 0:
 			{
@@ -483,7 +483,7 @@ export function Op_String(o: Op): string {
 export async function run(p: Program, answers: $.Channel<Answer> | null, faults: $.Channel<Fault | $.VarRef<Fault> | null> | null): globalThis.Promise<void> {
 	const __defer = new $.AsyncDisposableStack()
 	try {
-		__defer.defer(async () => { await (async (): globalThis.Promise<void> => {
+		__defer.defer(async () => { await (async () => {
 			{
 				let r = $.recover()
 				if (r != null) {
@@ -491,7 +491,7 @@ export async function run(p: Program, answers: $.Channel<Answer> | null, faults:
 				}
 			}
 		})() })
-		let vm: VM | $.VarRef<VM> | null = new VM()
+		let vm = new VM()
 		let vm$: VM = vm == null ? $.pointerTarget<VM>(vm) : (vm as any).__isVarRef === true ? (vm as any).value : (vm as any).__goValue === undefined ? (vm as any) : $.pointerTarget<VM>(vm)
 		while (!(vm !== null && (vm as any).__isVarRef !== true && (vm as any).__goValue === undefined ? ((vm as any) as VM).Step(p.Code) : VM.prototype.Step.call(vm, p.Code))) {
 		}
@@ -510,7 +510,7 @@ export function factorial(name: string, n: bigint): Program {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let programs: $.Slice<Program> = $.arrayToSlice<Program>([factorial("20!", 20n), factorial("21!", 21n), new Program({Name: "broken", Code: $.arrayToSlice<Instr>([new Instr({Op: 0, Arg: 1n}, true), new Instr({Op: 6, Arg: 0n}, true), new Instr({Op: 9, Arg: 0n}, true)])}, true)])
+	let programs = $.arrayToSlice<Program>([factorial("20!", 20n), factorial("21!", 21n), new Program({Name: "broken", Code: $.arrayToSlice<Instr>([new Instr({Op: 0, Arg: 1n}, true), new Instr({Op: 6, Arg: 0n}, true), new Instr({Op: 9, Arg: 0n}, true)])}, true)])
 
 	await $.println("listing of", $.arrayIndex(programs!, 0).Name)
 	let __goscriptRangeReturn0 = false
@@ -528,8 +528,8 @@ export async function main(): globalThis.Promise<void> {
 		return
 	}
 
-	let answers: $.Channel<Answer> | null = $.makeChannel<Answer>(0, new Answer(undefined, true), "both")
-	let faults: $.Channel<Fault | $.VarRef<Fault> | null> | null = $.makeChannel<Fault | $.VarRef<Fault> | null>(0, null! as Fault | $.VarRef<Fault> | null, "both")
+	let answers = $.makeChannel<Answer>(0, new Answer(undefined, true), "both")
+	let faults = $.makeChannel<Fault | $.VarRef<Fault> | null>(0, null! as Fault | $.VarRef<Fault> | null, "both")
 	for (let __goscriptRangeTarget1 = programs, __goscriptRangeWindow1 = $.sliceRange(__goscriptRangeTarget1), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow1.length; __rangeIndex++) {
 		let p = ((__goscriptRangeWindow1.backing[__goscriptRangeWindow1.offset + __rangeIndex] as Program)).clone()
 		const __goscriptDeferArg0 = (p).clone()
@@ -538,7 +538,7 @@ export async function main(): globalThis.Promise<void> {
 		queueMicrotask(async () => { await run(__goscriptDeferArg0, __goscriptDeferArg1, __goscriptDeferArg2) })
 	}
 
-	let reports: globalThis.Map<string, Report | null> | null = $.makeMap<string, Report | null>()
+	let reports = $.makeMap<string, Report | null>()
 	while ($.len(reports) < $.sliceLen(programs)) {
 		const [__goscriptSelect0HasReturn, __goscriptSelect0Value] = await $.selectStatement<any, void>([
 			{
@@ -574,7 +574,7 @@ export async function main(): globalThis.Promise<void> {
 				case $.typeAssert<Answer>(__goscriptTypeSwitchValue, "main.Answer").ok:
 					{
 						let r: Answer = $.markAsStructValue($.cloneStructValue($.typeAssert<Answer>(__goscriptTypeSwitchValue, "main.Answer").value))
-						totalSteps = totalSteps + (r.Steps)
+						totalSteps += r.Steps
 						await $.println(r.Program(), "=", r.Value, "in", r.Steps, "steps")
 					}
 					break

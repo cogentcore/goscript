@@ -73,7 +73,7 @@ export class cursor {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let __goscriptShadow0: cursor | $.VarRef<cursor> | null = new cursor()
+	let __goscriptShadow0 = new cursor()
 	let x: box | $.VarRef<box> | null = new box({value: 1})
 	let y: box | $.VarRef<box> | null = new box({value: 2})
 	let z: box | $.VarRef<box> | null = new box({value: 3})

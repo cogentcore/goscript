@@ -215,7 +215,7 @@ export class ScopeRule {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let m: globalThis.Map<Key, number> | null = $.makeMap<Key, number>([])
+	let m = $.makeMap<Key, number>([])
 	for (let i = 0; i < 2000; i++) {
 		$.mapSet(m, new Key({Name: "k", At: new Pos({Ln: i, Ch: i % 7}, true), On: (i % 2) == 0, F: i / 2}, true), i)
 	}
@@ -226,15 +226,15 @@ export async function main(): globalThis.Promise<void> {
 	let __goscriptTuple0: any = $.mapGet<Key, number, number>(m, new Key({Name: "k", At: new Pos({Ln: 10, Ch: 3}, true), On: true, F: 5}, true), 0)
 	ok = __goscriptTuple0[1]
 	await $.println($.len(m), ok)
-	let z: globalThis.Map<Pos, string> | null = $.makeMap<Pos, string>([[new Pos({Ln: 0, Ch: 0}, true), "zero"]])
+	let z = $.makeMap<Pos, string>([[new Pos({Ln: 0, Ch: 0}, true), "zero"]])
 	let negZero = 0.0
 	negZero = -negZero
-	let fz: globalThis.Map<number, number> | null = $.makeMap<number, number>([[0, 1]])
+	let fz = $.makeMap<number, number>([[0, 1]])
 	await $.println($.mapGet<Pos, string, string>(z, new Pos(undefined, true), "")[0], $.mapGet<number, number, number>(fz, negZero, 0)[0])
 
-	let r1: Rule | $.VarRef<Rule> | null = new Rule({Name: "a"})
-	let r2: Rule | $.VarRef<Rule> | null = new Rule({Name: "a"})
-	let _set: globalThis.Map<ScopeRule, boolean> | null = $.makeMap<ScopeRule, boolean>([])
+	let r1 = new Rule({Name: "a"})
+	let r2 = new Rule({Name: "a"})
+	let _set = $.makeMap<ScopeRule, boolean>([])
 	for (let i = 0; i < 1000; i++) {
 		$.mapSet(_set, new ScopeRule({Scope: new Pos({Ln: i, Ch: 0}, true), Rule: r1}, true), true)
 	}

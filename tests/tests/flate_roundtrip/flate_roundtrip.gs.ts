@@ -14,7 +14,7 @@ import "@goscript/io/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	// Mixed repeated and distinct bytes exercise dynamic Huffman blocks.
-	let input: $.Slice<number> = $.makeSlice<number>(4096, undefined, "byte")
+	let input = $.makeSlice<number>(4096, undefined, "byte")
 	for (let __goscriptRangeTarget0 = input, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), i = 0; i < __goscriptRangeWindow0.length; i++) {
 		;(__goscriptRangeWindow0.backing as any[])[__goscriptRangeWindow0.offset + i] = $.uint((i * 31) ^ (i >> 5), 8)
 	}

@@ -75,7 +75,7 @@ export class segmentedReader {
 		}
 		let n = (() => { const __goscriptMinMax0 = (r$ as segmentedReader).step; const __goscriptMinMax1 = $.sliceLen(p); const __goscriptMinMax2 = $.sliceLen((r$ as segmentedReader).data) - (r$ as segmentedReader).offset; let __goscriptMinMax3 = __goscriptMinMax0; __goscriptMinMax3 = $.min(__goscriptMinMax3, __goscriptMinMax1); __goscriptMinMax3 = $.min(__goscriptMinMax3, __goscriptMinMax2); return __goscriptMinMax3 })()
 		$.copy(p, $.goSlice((r$ as segmentedReader).data, (r$ as segmentedReader).offset, (r$ as segmentedReader).offset + n));
-		;(r$ as segmentedReader).offset = (r$ as segmentedReader).offset + (n)
+		;(r$ as segmentedReader).offset += n
 		return [n, null]
 	}
 
@@ -126,7 +126,7 @@ export function __goscript_set_errReaderFailed(__goscriptValue: $.GoError): void
 }
 
 export async function main(): globalThis.Promise<void> {
-	let deterministicBytes: $.Slice<number> = bytes.Repeat(new Uint8Array([42]) as $.Slice<number>, 64)
+	let deterministicBytes = bytes.Repeat(new Uint8Array([42]) as $.Slice<number>, 64)
 	let __goscriptTuple0: any = await $.pointerValue<Exclude<ecdh.Curve, null>>(ecdh.X25519()).GenerateKey($.pointerValueOrNil($.interfaceValue<io.Reader | null>(bytes.NewReader(deterministicBytes), "*bytes.Reader", /* @__PURE__ */ $.pointerType("bytes.Reader")))!)
 	let deterministic: ecdh.PrivateKey | $.VarRef<ecdh.PrivateKey> | null = __goscriptTuple0[0]
 	let err = __goscriptTuple0[1]
@@ -134,7 +134,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("deterministic private matches", bytes.Equal(ecdh.PrivateKey.prototype.Bytes.call($.pointerValue<ecdh.PrivateKey>(deterministic)), $.goSlice(deterministicBytes, undefined, 32)))
 	await $.println("deterministic public len", $.sliceLen(ecdh.PublicKey.prototype.Bytes.call($.pointerValue<ecdh.PublicKey>(ecdh.PrivateKey.prototype.PublicKey.call($.pointerValue<ecdh.PrivateKey>(deterministic))))))
 
-	let segmentedBytes: $.Slice<number> = bytes.Repeat(new Uint8Array([43]) as $.Slice<number>, 64)
+	let segmentedBytes = bytes.Repeat(new Uint8Array([43]) as $.Slice<number>, 64)
 	let __goscriptTuple1: any = await $.pointerValue<Exclude<ecdh.Curve, null>>(ecdh.X25519()).GenerateKey($.pointerValueOrNil($.interfaceValue<io.Reader | null>(new segmentedReader({data: segmentedBytes, step: 5}), "*main.segmentedReader", /* @__PURE__ */ $.pointerType("main.segmentedReader")))!)
 	let segmented: ecdh.PrivateKey | $.VarRef<ecdh.PrivateKey> | null = __goscriptTuple1[0]
 	err = __goscriptTuple1[1]

@@ -18,7 +18,7 @@ import "@goscript/image/color/index.js"
 import "@goscript/image/jpeg/index.js"
 
 export async function main(): globalThis.Promise<void> {
-	let im: image.RGBA | $.VarRef<image.RGBA> | null = image.NewRGBA(image.Rect(0, 0, 16, 16))
+	let im = image.NewRGBA(image.Rect(0, 0, 16, 16))
 	for (let y = 0; y < 16; y++) {
 		for (let x = 0; x < 16; x++) {
 			await image.RGBA.prototype.Set.call(im, x, y, $.interfaceValue<color.Color | null>(new color.RGBA({R: $.uint(x * 16, 8), G: $.uint(y * 16, 8), B: 128, A: 255}, true), "color.RGBA", "color.RGBA"))
@@ -32,7 +32,7 @@ export async function main(): globalThis.Promise<void> {
 			return
 		}
 	}
-	let b: $.Slice<number> = buf.value.Bytes()
+	let b = buf.value.Bytes()
 	await $.println("len:", $.sliceLen(b))
 	let sum = 0
 	for (let __goscriptRangeTarget0 = b, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), i = 0; i < __goscriptRangeWindow0.length; i++) {

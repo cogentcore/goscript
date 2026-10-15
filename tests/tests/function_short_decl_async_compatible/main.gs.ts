@@ -10,7 +10,7 @@ export function wrap(fn: (() => number | globalThis.Promise<number>) | null, ch:
 }
 
 export async function main(): globalThis.Promise<void> {
-	let ch: $.Channel<number> | null = $.makeChannel<number>(1, 0, "both")
+	let ch = $.makeChannel<number>(1, 0, "both")
 	let fn: (() => number | globalThis.Promise<number>) | null = $.functionValue((): number => {
 		return 1
 	}, ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))

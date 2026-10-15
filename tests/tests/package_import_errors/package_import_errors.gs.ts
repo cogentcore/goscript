@@ -96,7 +96,7 @@ export class wrappedErr {
 
 	public async Error(): globalThis.Promise<string> {
 		const e = this;
-		return $.concatString("wrapped: ", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(e.err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+		return "wrapped: " + (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(e.err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 	}
 
 	public Unwrap(): $.GoError {
@@ -133,7 +133,7 @@ export async function main(): globalThis.Promise<void> {
 	let nilErr: $.GoError = null! as $.GoError
 	await $.println("nilErr == nil:", nilErr == null)
 
-	let typedErr: customErr | $.VarRef<customErr> | null = new customErr({msg: "typed error"})
+	let typedErr = new customErr({msg: "typed error"})
 	let __goscriptTuple0: any = errors.AsType(__goscriptStatic0(), $.interfaceValue<$.GoError>(new wrappedErr({err: $.interfaceValue<$.GoError>(typedErr, "*main.customErr", /* @__PURE__ */ $.pointerType("main.customErr"))}, true), "main.wrappedErr", "main.wrappedErr")!)
 	let matched: customErr | $.VarRef<customErr> | null = (__goscriptTuple0[0] as customErr | $.VarRef<customErr> | null)
 	let ok = __goscriptTuple0[1]

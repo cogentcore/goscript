@@ -113,10 +113,10 @@ export class Holder {
 
 	public touch(i: number): void {
 		const h: Holder | $.VarRef<Holder> | null = this;
-		let p: Node | $.VarRef<Node> | null = $.indexRef($.pointerValue<Holder>(h).items!, i)
+		let p = $.indexRef($.pointerValue<Holder>(h).items!, i)
 		let p$: Node = p == null ? $.pointerTarget<Node>(p) : (p as any).__isVarRef === true ? (p as any).value : (p as any).__goValue === undefined ? (p as any) : $.pointerTarget<Node>(p);
-		;(p$ as Node).Count = (p$ as Node).Count + (10);
-		;(p$ as Node).Name = $.concatString((p$ as Node).Name, "!")
+		;(p$ as Node).Count += 10;
+		;(p$ as Node).Name = (p$ as Node).Name + "!"
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -131,20 +131,20 @@ export class Holder {
 export function Describe(n: Node | $.VarRef<Node> | null, prefix: string): string {
 	const n$: Node = n == null ? $.pointerTarget<Node>(n) : (n as any).__isVarRef === true ? (n as any).value : (n as any).__goValue === undefined ? (n as any) : $.pointerTarget<Node>(n)
 	if (n == null) {
-		return $.concatString(prefix, "nil")
+		return prefix + "nil"
 	}
-	return $.concatString(($.concatString(($.concatString(prefix, (n$ as Node).Name)), ":")), $.runeToString($.int(48 + (n$ as Node).Count, 32)))
+	return prefix + (n$ as Node).Name + ":" + $.runeToString($.int(48 + (n$ as Node).Count, 32))
 }
 
 export async function deref(n: Node | $.VarRef<Node> | null): globalThis.Promise<string> {
 	let msg: string = ""
 	const __defer = new $.AsyncDisposableStack()
 	try {
-		__defer.defer(async () => { await (async (): globalThis.Promise<void> => {
+		__defer.defer(async () => { await (async () => {
 			{
 				let r = $.recover()
 				if (r != null) {
-					msg = $.concatString("recovered: ", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>($.mustTypeAssert<$.GoError>(r, "error")).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+					msg = "recovered: " + (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>($.mustTypeAssert<$.GoError>(r, "error")).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 				}
 			}
 		})() })
@@ -164,11 +164,11 @@ export async function deref(n: Node | $.VarRef<Node> | null): globalThis.Promise
 }
 
 export async function main(): globalThis.Promise<void> {
-	let a: Node | $.VarRef<Node> | null = new Node({Name: "a", Next: new Node({Name: "b"})})
+	let a = new Node({Name: "a", Next: new Node({Name: "b"})})
 	let a$: Node = a == null ? $.pointerTarget<Node>(a) : (a as any).__isVarRef === true ? (a as any).value : (a as any).__goValue === undefined ? (a as any) : $.pointerTarget<Node>(a)
 	await $.println((a !== null && (a as any).__isVarRef !== true && (a as any).__goValue === undefined ? ((a as any) as Node).Len() : Node.prototype.Len.call(a)), (a$ as Node).Count, $.pointerValue<Node>((a$ as Node).Next).Count)
 	await $.println(Describe(a, "> "), Describe(null, "> "))
-	let b: Node | $.VarRef<Node> | null = new Node()
+	let b = new Node()
 	let b$: Node = b == null ? $.pointerTarget<Node>(b) : (b as any).__isVarRef === true ? (b as any).value : (b as any).__goValue === undefined ? (b as any) : $.pointerTarget<Node>(b)
 	void (b !== null && (b as any).__isVarRef !== true && (b as any).__goValue === undefined ? ((b as any) as Node).Fill("hello") : Node.prototype.Fill.call(b, "hello"))
 	await $.println((b$ as Node).Name, (b$ as Node).Count)
@@ -176,7 +176,7 @@ export async function main(): globalThis.Promise<void> {
 	let nn: Node | $.VarRef<Node> | null = null! as Node | $.VarRef<Node> | null
 	await $.println((nn !== null && (nn as any).__isVarRef !== true && (nn as any).__goValue === undefined ? ((nn as any) as Node).Len() : Node.prototype.Len.call(nn)))
 
-	let h: Holder | $.VarRef<Holder> | null = new Holder({items: $.arrayToSlice<Node>([new Node({Name: "p"}, true), new Node({Name: "q"}, true)])})
+	let h = new Holder({items: $.arrayToSlice<Node>([new Node({Name: "p"}, true), new Node({Name: "q"}, true)])})
 	let h$: Holder = h == null ? $.pointerTarget<Holder>(h) : (h as any).__isVarRef === true ? (h as any).value : (h as any).__goValue === undefined ? (h as any) : $.pointerTarget<Holder>(h)
 	void (h !== null && (h as any).__isVarRef !== true && (h as any).__goValue === undefined ? ((h as any) as Holder).touch(1) : Holder.prototype.touch.call(h, 1))
 	await $.println($.arrayIndex((h$ as Holder).items!, 1).Name, $.arrayIndex((h$ as Holder).items!, 1).Count)

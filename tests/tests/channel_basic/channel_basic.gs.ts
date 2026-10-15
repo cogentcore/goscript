@@ -4,22 +4,22 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export async function main(): globalThis.Promise<void> {
-	let messages: $.Channel<string> | null = $.makeChannel<string>(0, "", "both")
+	let messages = $.makeChannel<string>(0, "", "both")
 
-	queueMicrotask(async () => { await (async (): globalThis.Promise<void> => {
+	queueMicrotask(async () => {
 		await $.chanSend(messages, "ping")
-	})() })
+	})
 
 	let msg = await $.chanRecv(messages)
 	await $.println(msg)
 
 	// A compound assignment keeps its operator when the operand is a receive.
-	let numbers: $.Channel<number> | null = $.makeChannel<number>(2, 0, "both")
+	let numbers = $.makeChannel<number>(2, 0, "both")
 	await $.chanSend(numbers, 3)
 	await $.chanSend(numbers, 4)
 	let sum = 10
-	sum = sum + (await $.chanRecv(numbers))
-	sum = sum * (await $.chanRecv(numbers))
+	sum += await $.chanRecv(numbers)
+	sum *= await $.chanRecv(numbers)
 	await $.println("sum:", sum)
 }
 

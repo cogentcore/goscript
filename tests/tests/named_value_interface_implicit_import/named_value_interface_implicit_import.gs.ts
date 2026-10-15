@@ -33,16 +33,16 @@ export async function main(): globalThis.Promise<void> {
 	let declared: $.GoError = $.namedValueInterfaceValue<$.GoError>(dep.ErrNotDir, "errno.Errno", {"Error": errno.Errno_Error}, /* @__PURE__ */ $.basicType("uintptr", "errno.Errno"))
 	await $.println("declared:", (__goscriptAwait = (declared !== null && (declared as any).__isVarRef !== true && (declared as any).__goValue === undefined ? (declared as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(declared)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
-	let ch: $.Channel<$.GoError> | null = $.makeChannel<$.GoError>(1, null! as $.GoError, "both")
+	let ch = $.makeChannel<$.GoError>(1, null! as $.GoError, "both")
 	await $.chanSend(ch, $.namedValueInterfaceValue<$.GoError>(dep.ErrNotDir, "errno.Errno", {"Error": errno.Errno_Error}, /* @__PURE__ */ $.basicType("uintptr", "errno.Errno")))
 	await $.println("sent:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>((await $.chanRecv(ch))).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
 	await $.println("converted:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>($.namedValueInterfaceValue<$.GoError>(dep.ErrNotDir, "errno.Errno", {"Error": errno.Errno_Error}, /* @__PURE__ */ $.basicType("uintptr", "errno.Errno"))).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
-	let lit: (() => $.GoError | globalThis.Promise<$.GoError>) | null = $.functionValue((): $.GoError => {
+	let lit = $.functionValue((): $.GoError => {
 		return $.namedValueInterfaceValue<$.GoError>(dep.ErrNotDir, "errno.Errno", {"Error": errno.Errno_Error}, /* @__PURE__ */ $.basicType("uintptr", "errno.Errno"))
 	}, ({ kind: $.TypeKind.Function, params: [], results: ["error"] } as $.FunctionTypeInfo))
-	await $.println("func literal:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>((__goscriptAwait = lit!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println("func literal:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(lit()).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
 	let [looked, ok] = __goscript_multi_return.lookup()
 	await $.println("multi-value return:", (__goscriptAwait = (looked !== null && (looked as any).__isVarRef !== true && (looked as any).__goValue === undefined ? (looked as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(looked)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), ok)

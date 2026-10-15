@@ -14,7 +14,7 @@ export async function main(): globalThis.Promise<void> {
 	for (let __goscriptRangeTarget0 = seed, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), i = 0; i < __goscriptRangeWindow0.length; i++) {
 		seed[i] = $.uint(i + 1, 8)
 	}
-	let r: rand.ChaCha8 | $.VarRef<rand.ChaCha8> | null = rand.NewChaCha8($.cloneArrayValue(seed, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 32)))
+	let r = rand.NewChaCha8($.cloneArrayValue(seed, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 32)))
 	for (let i = 0; i < 8; i++) {
 		await $.println((r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? ((r as any) as rand.ChaCha8).Uint64() : rand.ChaCha8.prototype.Uint64.call(r)))
 	}
@@ -35,7 +35,7 @@ export async function main(): globalThis.Promise<void> {
 		let v = $.uint((__goscriptRangeWindow1.backing[__goscriptRangeWindow1.offset + __rangeIndex] as number), 8)
 		await $.println(v)
 	}
-	let r2: rand.ChaCha8 | $.VarRef<rand.ChaCha8> | null = rand.NewChaCha8($.cloneArrayValue(seed, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 32)))
+	let r2 = rand.NewChaCha8($.cloneArrayValue(seed, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 32)))
 	{
 		let __goscriptShadow0 = (r2 !== null && (r2 as any).__isVarRef !== true && (r2 as any).__goValue === undefined ? ((r2 as any) as rand.ChaCha8).UnmarshalBinary(b) : rand.ChaCha8.prototype.UnmarshalBinary.call(r2, b))
 		if (__goscriptShadow0 != null) {
@@ -54,7 +54,7 @@ export async function main(): globalThis.Promise<void> {
 }
 
 export async function globalSources(): globalThis.Promise<void> {
-	let seen: globalThis.Map<bigint, boolean> | null = $.makeMap<bigint, boolean>([])
+	let seen = $.makeMap<bigint, boolean>([])
 	let nonzero = 0
 	let inRange = true
 	for (let __rangeIndex = 0; __rangeIndex < 20; __rangeIndex++) {
@@ -71,7 +71,7 @@ export async function globalSources(): globalThis.Promise<void> {
 	}
 	await $.println("v1 distinct:", $.len(seen) > 15, "nonzero:", nonzero > 15, "in range:", inRange)
 
-	let seen2: globalThis.Map<bigint, boolean> | null = $.makeMap<bigint, boolean>([])
+	let seen2 = $.makeMap<bigint, boolean>([])
 	for (let __rangeIndex = 0; __rangeIndex < 20; __rangeIndex++) {
 		$.mapSet(seen2, await rand.Uint64(), true)
 	}

@@ -122,7 +122,7 @@ export class Item {
 		if (i == null) {
 			return null
 		}
-		return new Item({Name: $.concatString($.pointerValue<Item>(i).Name, " copy")})
+		return new Item({Name: $.pointerValue<Item>(i).Name + " copy"})
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -247,7 +247,7 @@ export function min(__typeArgs: $.GenericTypeArgs | undefined, a: any, b: any): 
 }
 
 export function NewSet<T>(__typeArgs: $.GenericTypeArgs | undefined, values: $.Slice<T>): Set {
-	let _set: Set = $.makeMap<any, {}>(undefined, __typeArgs?.["T"]?.type ?? { kind: $.TypeKind.Interface, methods: [] })
+	let _set = $.makeMap<any, {}>(undefined, __typeArgs?.["T"]?.type ?? { kind: $.TypeKind.Interface, methods: [] })
 	for (let __goscriptRangeTarget0 = values, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
 		let value = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as any)
 		$.mapSet(_set, value, {})
@@ -299,17 +299,17 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("pop:", value, ok, stack.value.Len(__goscriptStatic0()))
 
 	await $.println("=== Generic map alias ===")
-	let seen: Set = (NewSet(__goscriptStatic2(), $.arrayToSlice<string>(["go", "ts"])) as Set)
+	let seen = (NewSet(__goscriptStatic2(), $.arrayToSlice<string>(["go", "ts"])) as Set)
 	Set_Add(seen, __goscriptStatic2(), "wasm")
 	await $.println("set:", Set_Has(seen, __goscriptStatic2(), "go"), Set_Has(seen, __goscriptStatic2(), "rust"), $.len(seen))
 
 	await $.println("=== Interface constraint ===")
-	let items: $.Slice<Item | $.VarRef<Item> | null> = $.arrayToSlice<Item | $.VarRef<Item> | null>([new Item({Name: "alpha"}), new Item({Name: "beta"})])
-	let clones: $.Slice<Item | $.VarRef<Item> | null> = (await CloneAll(__goscriptStatic3(), items) as $.Slice<Item | $.VarRef<Item> | null>)
+	let items = $.arrayToSlice<Item | $.VarRef<Item> | null>([new Item({Name: "alpha"}), new Item({Name: "beta"})])
+	let clones = (await CloneAll(__goscriptStatic3(), items) as $.Slice<Item | $.VarRef<Item> | null>)
 	await $.println("clone:", $.pointerValue<Item>($.arrayIndex(clones!, 0)).Name, $.pointerValue<Item>($.arrayIndex(clones!, 1)).Name, $.pointerEqual($.arrayIndex(clones!, 0), $.arrayIndex(items!, 0)))
 
 	await $.println("=== Generic struct with map field ===")
-	let mapper: Mapper | $.VarRef<Mapper> | null = (NewMapper(__goscriptStatic4()) as Mapper | $.VarRef<Mapper> | null)
+	let mapper = (NewMapper(__goscriptStatic4()) as Mapper | $.VarRef<Mapper> | null)
 	void (mapper !== null && (mapper as any).__isVarRef !== true && (mapper as any).__goValue === undefined ? ((mapper as any) as Mapper).Put(__goscriptStatic4(), "answer", 42) : Mapper.prototype.Put.call(mapper, __goscriptStatic4(), "answer", 42))
 	let __goscriptTuple2: any = (mapper !== null && (mapper as any).__isVarRef !== true && (mapper as any).__goValue === undefined ? ((mapper as any) as Mapper).Get(__goscriptStatic4(), "answer") : Mapper.prototype.Get.call(mapper, __goscriptStatic4(), "answer"))
 	let answer = (__goscriptTuple2[0] as number)

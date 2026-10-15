@@ -5,9 +5,9 @@ import * as $ from "@goscript/builtin/index.js"
 
 export async function run(_set: ((_p0: (() => void) | null) => void) | null): globalThis.Promise<void> {
 	let cb: $.VarRef<(() => void) | null> = $.varRef(null! as (() => void) | null)
-	void (__goscriptAwait = _set!($.functionValue(async (): globalThis.Promise<void> => {
-		void (__goscriptAwait = _set!($.functionValue(async (): globalThis.Promise<void> => {
-			cb.value = $.functionValue(async (): globalThis.Promise<void> => {
+	void (__goscriptAwait = _set!($.functionValue(async () => {
+		void (__goscriptAwait = _set!($.functionValue(() => {
+			cb.value = $.functionValue(async () => {
 				await $.println("called")
 			}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo))
 		}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo))), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
@@ -18,7 +18,7 @@ export async function run(_set: ((_p0: (() => void) | null) => void) | null): gl
 }
 
 export async function main(): globalThis.Promise<void> {
-	await run($.functionValue(async (fn: (() => void) | null): globalThis.Promise<void> => {
+	await run($.functionValue(async (fn: (() => void) | null) => {
 		void (__goscriptAwait = fn!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 	}, ({ kind: $.TypeKind.Function, params: [({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)], results: [] } as $.FunctionTypeInfo)))
 }

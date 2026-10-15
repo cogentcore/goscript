@@ -29,18 +29,18 @@ export async function main(): globalThis.Promise<void> {
 		$.panic("custom tables unexpectedly reused")
 	}
 
-	let payload: $.Slice<number> = $.makeSlice<number>(257, undefined, "byte")
+	let payload = $.makeSlice<number>(257, undefined, "byte")
 	for (let __goscriptRangeTarget0 = payload, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), i = 0; i < __goscriptRangeWindow0.length; i++) {
 		;(__goscriptRangeWindow0.backing as any[])[__goscriptRangeWindow0.offset + i] = $.uint(((i * 31) + (globalThis.Math.trunc(i / 3))) + 7, 8)
 	}
 
-	let tables: $.Slice<{"name": string, "table": $.VarRef<crc32.Table> | null}> = $.arrayToSlice<{"name": string, "table": $.VarRef<crc32.Table> | null}>([$.anonymousStructValue({name: "ieee", table: crc32.IEEETable}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("name", /* @__PURE__ */ $.basicType("string"), [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/hash_crc32" }), /* @__PURE__ */ $.structField("table", /* @__PURE__ */ $.pointerType("crc32.Table"), [1], 16, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/hash_crc32" })] }), $.anonymousStructValue({name: "castagnoli", table: crc32.MakeTable(2197175160)}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("name", /* @__PURE__ */ $.basicType("string"), [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/hash_crc32" }), /* @__PURE__ */ $.structField("table", /* @__PURE__ */ $.pointerType("crc32.Table"), [1], 16, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/hash_crc32" })] }), $.anonymousStructValue({name: "koopman", table: crc32.MakeTable(3945912366)}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("name", /* @__PURE__ */ $.basicType("string"), [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/hash_crc32" }), /* @__PURE__ */ $.structField("table", /* @__PURE__ */ $.pointerType("crc32.Table"), [1], 16, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/hash_crc32" })] }), $.anonymousStructValue({name: "custom", table: crc32.MakeTable(0xd5828281)}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("name", /* @__PURE__ */ $.basicType("string"), [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/hash_crc32" }), /* @__PURE__ */ $.structField("table", /* @__PURE__ */ $.pointerType("crc32.Table"), [1], 16, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/hash_crc32" })] })])
-	let lengths: $.Slice<number> = $.arrayToSlice<number>([0, 1, 7, 8, 9, 15, 16, 17, $.sliceLen(payload)])
+	let tables = $.arrayToSlice<{"name": string, "table": $.VarRef<crc32.Table> | null}>([$.anonymousStructValue({name: "ieee", table: crc32.IEEETable}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("name", /* @__PURE__ */ $.basicType("string"), [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/hash_crc32" }), /* @__PURE__ */ $.structField("table", /* @__PURE__ */ $.pointerType("crc32.Table"), [1], 16, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/hash_crc32" })] }), $.anonymousStructValue({name: "castagnoli", table: crc32.MakeTable(2197175160)}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("name", /* @__PURE__ */ $.basicType("string"), [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/hash_crc32" }), /* @__PURE__ */ $.structField("table", /* @__PURE__ */ $.pointerType("crc32.Table"), [1], 16, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/hash_crc32" })] }), $.anonymousStructValue({name: "koopman", table: crc32.MakeTable(3945912366)}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("name", /* @__PURE__ */ $.basicType("string"), [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/hash_crc32" }), /* @__PURE__ */ $.structField("table", /* @__PURE__ */ $.pointerType("crc32.Table"), [1], 16, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/hash_crc32" })] }), $.anonymousStructValue({name: "custom", table: crc32.MakeTable(0xd5828281)}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("name", /* @__PURE__ */ $.basicType("string"), [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/hash_crc32" }), /* @__PURE__ */ $.structField("table", /* @__PURE__ */ $.pointerType("crc32.Table"), [1], 16, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/hash_crc32" })] })])
+	let lengths = $.arrayToSlice<number>([0, 1, 7, 8, 9, 15, 16, 17, $.sliceLen(payload)])
 	for (let __goscriptRangeTarget2 = tables, __goscriptRangeWindow1 = $.sliceRange(__goscriptRangeTarget2), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow1.length; __rangeIndex++) {
 		let tc = $.markAsStructValue($.cloneStructValue((__goscriptRangeWindow1.backing[__goscriptRangeWindow1.offset + __rangeIndex] as {"name": string, "table": $.VarRef<crc32.Table> | null})))
 		for (let __goscriptRangeTarget1 = lengths, __goscriptRangeWindow2 = $.sliceRange(__goscriptRangeTarget1), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow2.length; __rangeIndex++) {
 			let length = (__goscriptRangeWindow2.backing[__goscriptRangeWindow2.offset + __rangeIndex] as number)
-			let data: $.Slice<number> = $.goSlice(payload, undefined, length)
+			let data = $.goSlice(payload, undefined, length)
 			let oneShot = crc32.Checksum(data, tc.table)
 			let split = globalThis.Math.trunc(length / 2)
 			let updated = crc32.Update(crc32.Update(0, tc.table, $.goSlice(data, undefined, split)), tc.table, $.goSlice(data, split, undefined))
@@ -84,8 +84,8 @@ export async function main(): globalThis.Promise<void> {
 		$.panic("NewIEEE")
 	}
 
-	let prefix: $.Slice<number> = new Uint8Array([9, 8, 7]) as $.Slice<number>
-	let summed: $.Slice<number> = ((__goscriptAwait = (ieee !== null && (ieee as any).__isVarRef !== true && (ieee as any).__goValue === undefined ? (ieee as Exclude<hash.Hash32, null>) : $.pointerValue<Exclude<hash.Hash32, null>>(ieee)).Sum($.goSlice(prefix, undefined, $.sliceLen(prefix), $.sliceLen(prefix))), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as $.Slice<number>)
+	let prefix = new Uint8Array([9, 8, 7]) as $.Slice<number>
+	let summed = ((__goscriptAwait = (ieee !== null && (ieee as any).__isVarRef !== true && (ieee as any).__goValue === undefined ? (ieee as Exclude<hash.Hash32, null>) : $.pointerValue<Exclude<hash.Hash32, null>>(ieee)).Sum($.goSlice(prefix, undefined, $.sliceLen(prefix), $.sliceLen(prefix))), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as $.Slice<number>)
 	if (((($.sliceLen(summed) != ($.sliceLen(prefix) + crc32.Size)) || ($.arrayIndex(summed!, 0) != 9)) || ($.arrayIndex(summed!, 1) != 8)) || ($.arrayIndex(summed!, 2) != 7)) {
 		$.panic("prefix-preserving Sum")
 	}
@@ -147,7 +147,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 
 	let beforeInvalid = (__goscriptAwait = (restored !== null && (restored as any).__isVarRef !== true && (restored as any).__goValue === undefined ? (restored as Exclude<hash.Hash32, null>) : $.pointerValue<Exclude<hash.Hash32, null>>(restored)).Sum32(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
-	let invalidCases: $.Slice<$.Slice<number>> = $.arrayToSlice<$.Slice<number>>([new Uint8Array([1, 2, 3]) as $.Slice<number>, new Uint8Array([99, 114, 99, 1]) as $.Slice<number>])
+	let invalidCases = $.arrayToSlice<$.Slice<number>>([new Uint8Array([1, 2, 3]) as $.Slice<number>, new Uint8Array([99, 114, 99, 1]) as $.Slice<number>])
 	for (let __goscriptRangeTarget4 = invalidCases, __goscriptRangeWindow4 = $.sliceRange(__goscriptRangeTarget4), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow4.length; __rangeIndex++) {
 		let invalid = (__goscriptRangeWindow4.backing[__goscriptRangeWindow4.offset + __rangeIndex] as $.Slice<number>)
 		let __goscriptShadow2 = (__goscriptAwait = (unmarshaler !== null && (unmarshaler as any).__isVarRef !== true && (unmarshaler as any).__goValue === undefined ? (unmarshaler as Exclude<encoding.BinaryUnmarshaler, null>) : $.pointerValue<Exclude<encoding.BinaryUnmarshaler, null>>(unmarshaler)).UnmarshalBinary(invalid), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)

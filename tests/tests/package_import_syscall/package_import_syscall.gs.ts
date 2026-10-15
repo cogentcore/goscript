@@ -69,7 +69,7 @@ export async function main(): globalThis.Promise<void> {
 		syscall.F_DUPFD_CLOEXEC
 		$.pointerValue<sync.RWMutex>(syscall.ForkLock)
 		iovecs
-		let attr: syscall.SysProcAttr | $.VarRef<syscall.SysProcAttr> | null = new syscall.SysProcAttr()
+		let attr = new syscall.SysProcAttr()
 		attr
 	}
 	let sa4: syscall.SockaddrInet4 = $.markAsStructValue(new syscall.SockaddrInet4())

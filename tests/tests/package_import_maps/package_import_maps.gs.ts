@@ -16,7 +16,7 @@ export function getValue(): [string, number] {
 }
 
 export function simpleIterator(m: globalThis.Map<string, number> | null): ((_p0: ((_p0: string, _p1: number) => boolean | globalThis.Promise<boolean>) | null) => void) | null {
-	return $.functionValue(async (_yield: ((_p0: string, _p1: number) => boolean | globalThis.Promise<boolean>) | null): globalThis.Promise<void> => {
+	return $.functionValue(async (_yield: ((_p0: string, _p1: number) => boolean | globalThis.Promise<boolean>) | null) => {
 		for (const [k, v] of m?.entries() ?? []) {
 			if (!(__goscriptAwait = _yield!(k, v), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)) {
 				break
@@ -27,7 +27,7 @@ export function simpleIterator(m: globalThis.Map<string, number> | null): ((_p0:
 
 export async function main(): globalThis.Promise<void> {
 	// Create a map to test with
-	let m: globalThis.Map<string, number> | null = $.makeMap<string, number>([["a", 1], ["b", 2], ["c", 3]])
+	let m = $.makeMap<string, number>([["a", 1], ["b", 2], ["c", 3]])
 
 	// Collect results in a slice to ensure deterministic output
 	let results: $.Slice<string> = null! as $.Slice<string>
@@ -38,7 +38,7 @@ export async function main(): globalThis.Promise<void> {
 		await maps.All(m)!(async (k, v) => {
 			// Simple assignment that should trigger the error
 			let [x, y] = getValue()
-			let result = $.concatString(($.concatString(k, x)), $.runeToString($.int(v + y, 32)))
+			let result = k + x + $.runeToString($.int(v + y, 32))
 			results = $.appendOne(results, result)
 			return true
 		})
@@ -52,7 +52,7 @@ export async function main(): globalThis.Promise<void> {
 	;await (async () => {
 		await simpleIterator(m)!(async (k, v) => {
 			let [x, y] = getValue()
-			let result = $.concatString(($.concatString(($.concatString(k, x)), $.runeToString($.int(v + y, 32)))), "_local")
+			let result = k + x + $.runeToString($.int(v + y, 32)) + "_local"
 			results = $.appendOne(results, result)
 			return true
 		})
@@ -70,13 +70,13 @@ export async function main(): globalThis.Promise<void> {
 		await $.println("Result:", result)
 	}
 
-	let dst: globalThis.Map<string, number> | null = $.makeMap<string, number>([["base", 1]])
-	let src: globalThis.Map<string, number> | null = $.makeMap<string, number>([["copied", 2]])
+	let dst = $.makeMap<string, number>([["base", 1]])
+	let src = $.makeMap<string, number>([["copied", 2]])
 	maps.Copy(dst, src)
 	let nilSrc: globalThis.Map<string, number> | null = null! as globalThis.Map<string, number> | null
 	maps.Copy(dst, nilSrc)
 	await $.println("Copy result:", $.mapGet<string, number, number>(dst, "base", 0)[0], $.mapGet<string, number, number>(dst, "copied", 0)[0], $.len(dst))
-	let cloned: globalThis.Map<string, number> | null = (maps.Clone(dst) as globalThis.Map<string, number> | null)
+	let cloned = (maps.Clone(dst) as globalThis.Map<string, number> | null)
 	let nilMap: globalThis.Map<string, number> | null = null! as globalThis.Map<string, number> | null
 	await $.println("Clone result:", $.mapGet<string, number, number>(cloned, "base", 0)[0], $.mapGet<string, number, number>(cloned, "copied", 0)[0], maps.Clone(nilMap) == null)
 

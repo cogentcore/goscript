@@ -89,6 +89,21 @@ type semanticPackage struct {
 	// localFacts holds the fact digest lines of the marks on the package's
 	// body locals, applied from a body summary.
 	localFacts []string
+	// assignments holds how the package's variables are assigned. Lowering
+	// builds it once, on first use, from the package syntax.
+	assignments     *localAssignments
+	assignmentsOnce sync.Once
+}
+
+// localAssignments holds the facts lowering reads about how the variables of
+// a package are assigned.
+type localAssignments struct {
+	// reassigned holds the variables that an assignment, an increment or a
+	// range assignment changes after their declaration.
+	reassigned map[types.Object]bool
+	// funcLits maps each variable declared by := to a function literal to the
+	// literal.
+	funcLits map[types.Object]*ast.FuncLit
 }
 
 type semanticDeclaration struct {

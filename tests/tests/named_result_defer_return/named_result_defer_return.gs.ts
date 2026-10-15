@@ -7,7 +7,7 @@ export function syncReturn(): [number, string] {
 	let value: number = 0
 	let err: string = ""
 	using __defer = new $.DisposableStack()
-	__defer.defer(() => { ((): void => {
+	__defer.defer(() => { (() => {
 		err = "deferred"
 	})() })
 	const __goscriptReturn0: [number, string] = [7, ""]
@@ -22,7 +22,7 @@ export async function asyncReturn(ch: $.Channel<string> | null): globalThis.Prom
 	let value: number = 0
 	let err: string = ""
 	await using __defer = new $.AsyncDisposableStack()
-	__defer.defer(async () => { await (async (): globalThis.Promise<void> => {
+	__defer.defer(async () => { await (async () => {
 		err = await $.chanRecv(ch)
 	})() })
 	await $.chanSend(ch, "async deferred")
@@ -37,7 +37,7 @@ export async function asyncReturn(ch: $.Channel<string> | null): globalThis.Prom
 export function blankReturn(): [number, string] {
 	let err: string = ""
 	using __defer = new $.DisposableStack()
-	__defer.defer(() => { ((): void => {
+	__defer.defer(() => { (() => {
 		err = "blank deferred"
 	})() })
 	const __goscriptReturn2: [number, string] = [13, ""]
@@ -51,7 +51,7 @@ export async function main(): globalThis.Promise<void> {
 	let [v, err] = syncReturn()
 	await $.println("sync", v, err)
 
-	let ch: $.Channel<string> | null = $.makeChannel<string>(1, "", "both")
+	let ch = $.makeChannel<string>(1, "", "both")
 	let __goscriptTuple0: any = await asyncReturn(ch)
 	v = __goscriptTuple0[0]
 	err = __goscriptTuple0[1]

@@ -19,7 +19,7 @@ export async function main(): globalThis.Promise<void> {
 	await fmt.Printf("After delete: %v\n", $.interfaceValue(numbers, "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"))))
 
 	// Test slices.BinarySearchFunc which was also missing
-	let data: $.Slice<number> = $.arrayToSlice<number>([10, 20, 30, 40, 50])
+	let data = $.arrayToSlice<number>([10, 20, 30, 40, 50])
 	let [index, found] = slices.BinarySearchFunc(data, 30, $.functionValue((a: number, b: number): number => {
 		if (a < b) {
 			return -1

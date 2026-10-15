@@ -376,20 +376,20 @@ export class LiteralContainer {
 
 export async function main(): globalThis.Promise<void> {
 	// Calls interleaved across embeddings must keep their source order.
-	let name: ((value: string) => string | globalThis.Promise<string>) | null = $.functionValue(async (value: string): globalThis.Promise<string> => {
+	let name = $.functionValue(async (value: string): globalThis.Promise<string> => {
 		await $.println("evaluate", value)
 		return value
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string")], results: [/* @__PURE__ */ $.basicType("string")] } as $.FunctionTypeInfo))
-	let m = (await (async () => { const __goscriptStructLiteral0: Manager = new Manager(); __goscriptStructLiteral0.Person = new Person(undefined, true); __goscriptStructLiteral0.Person.Name = (__goscriptAwait = name!("promoted"), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait); __goscriptStructLiteral0.Address = new Address(undefined, true); __goscriptStructLiteral0.Address.City = (__goscriptAwait = name!("city"), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait); __goscriptStructLiteral0.Person.Age = 42; __goscriptStructLiteral0.Phone = (__goscriptAwait = name!("phone"), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait); __goscriptStructLiteral0.Address.Street = (__goscriptAwait = name!("street"), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait); return $.markAsStructValue(__goscriptStructLiteral0) })())
+	let m = (await (async () => { const __goscriptStructLiteral0: Manager = new Manager(); __goscriptStructLiteral0.Person = new Person(undefined, true); __goscriptStructLiteral0.Person.Name = await name("promoted"); __goscriptStructLiteral0.Address = new Address(undefined, true); __goscriptStructLiteral0.Address.City = await name("city"); __goscriptStructLiteral0.Person.Age = 42; __goscriptStructLiteral0.Phone = await name("phone"); __goscriptStructLiteral0.Address.Street = await name("street"); return $.markAsStructValue(__goscriptStructLiteral0) })())
 	await $.println(m.Person.Name, m.Person.Age, m.Address.Street, m.Address.City, m.Phone, m.Level)
 
 	// Nested embeddings retain independent value copies and zero fields.
-	let team: Team | $.VarRef<Team> | null = (() => { const __goscriptStructLiteral1: Team = new Team(); __goscriptStructLiteral1.Employee = new Employee(undefined, true); __goscriptStructLiteral1.Employee.Person = new Person(undefined, true); __goscriptStructLiteral1.Employee.Person.Name = "nested"; __goscriptStructLiteral1.Employee.ID = 7; __goscriptStructLiteral1.Active = true; return __goscriptStructLiteral1 })()
+	let team = (() => { const __goscriptStructLiteral1: Team = new Team(); __goscriptStructLiteral1.Employee = new Employee(undefined, true); __goscriptStructLiteral1.Employee.Person = new Person(undefined, true); __goscriptStructLiteral1.Employee.Person.Name = "nested"; __goscriptStructLiteral1.Employee.ID = 7; __goscriptStructLiteral1.Active = true; return __goscriptStructLiteral1 })()
 	let team$: Team = team == null ? $.pointerTarget<Team>(team) : (team as any).__isVarRef === true ? (team as any).value : (team as any).__goValue === undefined ? (team as any) : $.pointerTarget<Team>(team)
 	let copy = ((team$ as Team)).clone()
 	copy.Employee.Person.Name = "copy"
 	await $.println((team$ as Team).Employee.Person.Name, copy.Employee.Person.Name, (team$ as Team).Employee.Person.Age, (team$ as Team).Employee.ID, (team$ as Team).Active)
-	let items: $.Slice<Team | $.VarRef<Team> | null> = $.arrayToSlice<Team | $.VarRef<Team> | null>([(() => { const __goscriptStructLiteral2: Team = new Team(); __goscriptStructLiteral2.Employee = new Employee(undefined, true); __goscriptStructLiteral2.Employee.Person = new Person(undefined, true); __goscriptStructLiteral2.Employee.Person.Name = "inferred"; return __goscriptStructLiteral2 })()])
+	let items = $.arrayToSlice<Team | $.VarRef<Team> | null>([(() => { const __goscriptStructLiteral2: Team = new Team(); __goscriptStructLiteral2.Employee = new Employee(undefined, true); __goscriptStructLiteral2.Employee.Person = new Person(undefined, true); __goscriptStructLiteral2.Employee.Person.Name = "inferred"; return __goscriptStructLiteral2 })()])
 	await $.println($.pointerValue<Team>($.arrayIndex(items!, 0)).Employee.Person.Name, $.pointerValue<Team>($.arrayIndex(items!, 0)).Employee.ID)
 
 	// Anonymous and generic structs use the same promoted field paths.
@@ -399,8 +399,6 @@ export async function main(): globalThis.Promise<void> {
 	let wide = (() => { const __goscriptStructLiteral5: LiteralContainer = new LiteralContainer(); __goscriptStructLiteral5.LiteralValue = $.markAsStructValue(new LiteralValue({Value: 0n, Zero: 0n})); __goscriptStructLiteral5.LiteralValue.Value = 17n; return $.markAsStructValue(__goscriptStructLiteral5) })()
 	await $.println(text.LiteralValue.Value, text.LiteralValue.Zero, wide.LiteralValue.Value, wide.LiteralValue.Zero)
 }
-
-var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

@@ -182,11 +182,11 @@ export async function maybeProcess(input: string, processor: ((data: string) => 
 }
 
 export async function main(): globalThis.Promise<void> {
-	let fs: MockFilesystem | $.VarRef<MockFilesystem> | null = new MockFilesystem()
-	let fileInfo: MockFileInfo | $.VarRef<MockFileInfo> | null = new MockFileInfo({name: "test.txt", size: 50n, isDir: false})
+	let fs = new MockFilesystem()
+	let fileInfo = new MockFileInfo({name: "test.txt", size: 50n, isDir: false})
 
 	// Test the walk function with a callback
-	let walkFunc: ((path: string, info: FileInfo | null, err: $.GoError) => $.GoError | globalThis.Promise<$.GoError>) | null = $.functionValue(async (path: string, info: FileInfo | null, err: $.GoError): globalThis.Promise<$.GoError> => {
+	let walkFunc = $.functionValue(async (path: string, info: FileInfo | null, err: $.GoError): globalThis.Promise<$.GoError> => {
 		await $.println("Walking:", path, "size:", (__goscriptAwait = (info !== null && (info as any).__isVarRef !== true && (info as any).__goValue === undefined ? (info as Exclude<FileInfo, null>) : $.pointerValue<Exclude<FileInfo, null>>(info)).Size(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		if (err != null) {
 			await $.println("Error:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
@@ -200,8 +200,8 @@ export async function main(): globalThis.Promise<void> {
 	}
 
 	// Test the process function with a callback
-	let processFunc: ((data: string) => [string, $.GoError] | globalThis.Promise<[string, $.GoError]>) | null = $.functionValue((data: string): [string, $.GoError] => {
-		return [$.concatString("processed: ", data), null]
+	let processFunc = $.functionValue((data: string): [string, $.GoError] => {
+		return ["processed: " + data, null]
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string")], results: [/* @__PURE__ */ $.basicType("string"), "error"] } as $.FunctionTypeInfo))
 
 	let [result, err2] = await processWithCallback("hello", processFunc)

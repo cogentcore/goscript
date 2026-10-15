@@ -71,7 +71,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("Result3:", result3)
 
 	// Test with slice expansion
-	let parts: $.Slice<string> = $.arrayToSlice<string>(["another", "path", "here"])
+	let parts = $.arrayToSlice<string>(["another", "path", "here"])
 	let result4 = (__goscriptAwait = (b !== null && (b as any).__isVarRef !== true && (b as any).__goValue === undefined ? (b as Exclude<Basic, null>) : $.pointerValue<Exclude<Basic, null>>(b)).Join(parts), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 	await $.println("Result4:", result4)
 }

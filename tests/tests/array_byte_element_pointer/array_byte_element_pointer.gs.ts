@@ -44,7 +44,7 @@ export class bitset {
 		const b: bitset | $.VarRef<bitset> | null = this;
 		let entry = $.indexRef($.pointerValue<bitset>(b).bits, globalThis.Math.trunc(bit / 8))
 		let mask = $.uint((($.uint(1, 8) << (bit % 8)) & 0xff), 8)
-		entry!.value = entry!.value | (mask)
+		entry!.value |= mask
 	}
 
 	static __typeInfo = $.registerStructType(

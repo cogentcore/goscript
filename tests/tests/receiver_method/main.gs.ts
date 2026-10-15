@@ -53,7 +53,7 @@ export class MyStruct {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let s: MyStruct | $.VarRef<MyStruct> | null = new MyStruct({Value: 10})
+	let s = new MyStruct({Value: 10})
 	await $.println((s !== null && (s as any).__isVarRef !== true && (s as any).__goValue === undefined ? ((s as any) as MyStruct).UsesReceiver() : MyStruct.prototype.UsesReceiver.call(s)))
 	await $.println((s !== null && (s as any).__isVarRef !== true && (s as any).__goValue === undefined ? ((s as any) as MyStruct).DoesNotUseReceiver() : MyStruct.prototype.DoesNotUseReceiver.call(s)))
 }

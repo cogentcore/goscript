@@ -14,10 +14,10 @@ import "./child.pb.ts"
 import "./parent.pb.ts"
 
 export async function main(): globalThis.Promise<void> {
-	let parent: __goscript_parent_pb_ts.Parent | $.VarRef<__goscript_parent_pb_ts.Parent> | null = new __goscript_parent_pb_ts.Parent({Child: new __goscript_child_pb_ts.Child({Name: "hello"}), Children: $.arrayToSlice<__goscript_child_pb_ts.Child | $.VarRef<__goscript_child_pb_ts.Child> | null>([new __goscript_child_pb_ts.Child({Name: "one"}), new __goscript_child_pb_ts.Child({Name: "two"})])})
+	let parent = new __goscript_parent_pb_ts.Parent({Child: new __goscript_child_pb_ts.Child({Name: "hello"}), Children: $.arrayToSlice<__goscript_child_pb_ts.Child | $.VarRef<__goscript_child_pb_ts.Child> | null>([new __goscript_child_pb_ts.Child({Name: "one"}), new __goscript_child_pb_ts.Child({Name: "two"})])})
 	let parent$: __goscript_parent_pb_ts.Parent = parent == null ? $.pointerTarget<__goscript_parent_pb_ts.Parent>(parent) : (parent as any).__isVarRef === true ? (parent as any).value : (parent as any).__goValue === undefined ? (parent as any) : $.pointerTarget<__goscript_parent_pb_ts.Parent>(parent)
 
-	let clone: __goscript_parent_pb_ts.Parent | $.VarRef<__goscript_parent_pb_ts.Parent> | null = (parent !== null && (parent as any).__isVarRef !== true && (parent as any).__goValue === undefined ? ((parent as any) as __goscript_parent_pb_ts.Parent).CloneVT() : __goscript_parent_pb_ts.Parent.prototype.CloneVT.call(parent))
+	let clone = (parent !== null && (parent as any).__isVarRef !== true && (parent as any).__goValue === undefined ? ((parent as any) as __goscript_parent_pb_ts.Parent).CloneVT() : __goscript_parent_pb_ts.Parent.prototype.CloneVT.call(parent))
 	let clone$: __goscript_parent_pb_ts.Parent = clone == null ? $.pointerTarget<__goscript_parent_pb_ts.Parent>(clone) : (clone as any).__isVarRef === true ? (clone as any).value : (clone as any).__goValue === undefined ? (clone as any) : $.pointerTarget<__goscript_parent_pb_ts.Parent>(clone)
 	await $.println("clone nil:", clone == null)
 	await $.println("child name:", $.pointerValue<__goscript_child_pb_ts.Child>((clone$ as __goscript_parent_pb_ts.Parent).Child).Name)

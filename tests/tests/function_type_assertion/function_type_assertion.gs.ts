@@ -49,7 +49,7 @@ export class FuncContainer {
 }
 
 export function greet(name: string): string {
-	return $.concatString("Hello, ", name)
+	return "Hello, " + name
 }
 
 export function add(a: number, b: number): number {
@@ -127,7 +127,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 
 	// 4. Type assertion of a function in a map
-	let funcMap: globalThis.Map<string, any> | null = $.makeMap<string, any>()
+	let funcMap = $.makeMap<string, any>()
 	$.mapSet(funcMap, "greeter", $.interfaceValue($.namedFunction(greet, "main.Greeter", ({ kind: $.TypeKind.Function, name: "main.Greeter", params: [/* @__PURE__ */ $.basicType("string")], results: [/* @__PURE__ */ $.basicType("string")] } as $.FunctionTypeInfo)), "main.Greeter", ({ kind: $.TypeKind.Function, name: "main.Greeter", params: [/* @__PURE__ */ $.basicType("string")], results: [/* @__PURE__ */ $.basicType("string")] } as $.FunctionTypeInfo)))
 	$.mapSet(funcMap, "adder", $.interfaceValue($.namedFunction(add, "main.Adder", ({ kind: $.TypeKind.Function, name: "main.Adder", params: [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo)), "main.Adder", ({ kind: $.TypeKind.Function, name: "main.Adder", params: [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo)))
 
@@ -150,7 +150,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 
 	// 5. Type assertion of a function in a slice
-	let funcSlice: $.Slice<any> = $.makeSlice<any>(2)
+	let funcSlice = $.makeSlice<any>(2)
 	$.sliceElems(funcSlice!)[$.sliceSlot(funcSlice!, 0)] = $.interfaceValue($.namedFunction(greet, "main.Greeter", ({ kind: $.TypeKind.Function, name: "main.Greeter", params: [/* @__PURE__ */ $.basicType("string")], results: [/* @__PURE__ */ $.basicType("string")] } as $.FunctionTypeInfo)), "main.Greeter", ({ kind: $.TypeKind.Function, name: "main.Greeter", params: [/* @__PURE__ */ $.basicType("string")], results: [/* @__PURE__ */ $.basicType("string")] } as $.FunctionTypeInfo))
 	$.sliceElems(funcSlice!)[$.sliceSlot(funcSlice!, 1)] = $.interfaceValue($.namedFunction(add, "main.Adder", ({ kind: $.TypeKind.Function, name: "main.Adder", params: [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo)), "main.Adder", ({ kind: $.TypeKind.Function, name: "main.Adder", params: [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))
 

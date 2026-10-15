@@ -89,7 +89,7 @@ export async function main(): globalThis.Promise<void> {
 	// Test 3: Mix of nil and valid channels in select
 	await $.println("\nTest 3: Select with mix of nil and valid channels")
 	let nilCh3: $.Channel<boolean> | null = null! as $.Channel<boolean> | null
-	let validCh: $.Channel<boolean> | null = $.makeChannel<boolean>(1, false, "both")
+	let validCh = $.makeChannel<boolean>(1, false, "both")
 	await $.chanSend(validCh, true)
 
 	const [__goscriptSelect2HasReturn, __goscriptSelect2Value] = await $.selectStatement<any, void>([

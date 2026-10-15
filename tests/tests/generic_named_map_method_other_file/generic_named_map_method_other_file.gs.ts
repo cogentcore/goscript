@@ -7,7 +7,7 @@ import * as __goscript_trie from "./trie.gs.ts"
 import "./trie.gs.ts"
 
 export async function main(): globalThis.Promise<void> {
-	let tr: __goscript_trie.trie = $.makeMap<number, string>()
+	let tr = $.makeMap<number, string>()
 	let __goscriptTuple0: any = __goscript_trie.trie_insert(tr, __goscriptStatic0(), 1, "a")
 	let old = (__goscriptTuple0[0] as string)
 	let n = __goscriptTuple0[1]
@@ -16,7 +16,7 @@ export async function main(): globalThis.Promise<void> {
 	old = (__goscriptTuple1[0] as string)
 	n = __goscriptTuple1[1]
 	await $.println(old, n)
-	let nm: __goscript_trie.names = $.makeMap<string, number>()
+	let nm = $.makeMap<string, number>()
 	__goscript_trie.names_add(nm, "x")
 	await $.println(__goscript_trie.names_add(nm, "x"))
 }

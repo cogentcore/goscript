@@ -261,7 +261,7 @@ export class columnRows {
 export async function main(): globalThis.Promise<void> {
 	for (let __goscriptRangeTarget0 = $.arrayToSlice<boolean>([false, true]), __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
 		let direct = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as boolean)
-		let db: sql.DB | $.VarRef<sql.DB> | null = await sql.OpenDB($.interfaceValue<driver.Connector | null>(new connector({direct: direct}, true), "main.connector", "main.connector"))
+		let db = await sql.OpenDB($.interfaceValue<driver.Connector | null>(new connector({direct: direct}, true), "main.connector", "main.connector"))
 		{
 			let [, err] = await (db !== null && (db as any).__isVarRef !== true && (db as any).__goValue === undefined ? ((db as any) as sql.DB).ExecContext(context.Background(), "create", null) : sql.DB.prototype.ExecContext.call(db, context.Background(), "create", null))
 			if (err != null) {
@@ -291,7 +291,7 @@ export async function main(): globalThis.Promise<void> {
 		}
 	}
 	await $.println("zero context", value.value)
-	let db: sql.DB | $.VarRef<sql.DB> | null = await sql.OpenDB($.interfaceValue<driver.Connector | null>(new connector({blob: true}, true), "main.connector", "main.connector"))
+	let db = await sql.OpenDB($.interfaceValue<driver.Connector | null>(new connector({blob: true}, true), "main.connector", "main.connector"))
 	let data: $.VarRef<$.Slice<number>> = $.varRef(null! as $.Slice<number>)
 	{
 		let err = await sql.Row.prototype.Scan.call(await (db !== null && (db as any).__isVarRef !== true && (db as any).__goValue === undefined ? ((db as any) as sql.DB).QueryRow("blob", null) : sql.DB.prototype.QueryRow.call(db, "blob", null)), $.arrayToSlice<any>([$.interfaceValue(data, "*[]byte", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))))]))

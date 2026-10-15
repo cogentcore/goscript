@@ -132,8 +132,8 @@ export class Group {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let child: Group | $.VarRef<Group> | null = new Group()
-	let root: Group | $.VarRef<Group> | null = new Group({provider: $.interfaceValue<provider | null>(new listProvider({items: $.arrayToSlice<Group | $.VarRef<Group> | null>([child])}), "*main.listProvider", /* @__PURE__ */ $.pointerType("main.listProvider"))})
+	let child = new Group()
+	let root = new Group({provider: $.interfaceValue<provider | null>(new listProvider({items: $.arrayToSlice<Group | $.VarRef<Group> | null>([child])}), "*main.listProvider", /* @__PURE__ */ $.pointerType("main.listProvider"))})
 	await (root !== null && (root as any).__isVarRef !== true && (root as any).__goValue === undefined ? ((root as any) as Group).Build() : Group.prototype.Build.call(root))
 	await $.println($.pointerValue<Group>(child).seen)
 }

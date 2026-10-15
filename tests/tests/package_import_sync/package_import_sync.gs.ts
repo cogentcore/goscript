@@ -283,18 +283,18 @@ export async function main(): globalThis.Promise<void> {
 	// Test Once
 	let once: $.VarRef<sync.Once> = $.varRef($.markAsStructValue(new sync.Once()))
 	let counter = 0
-	await once.value.Do($.functionValue(async (): globalThis.Promise<void> => {
+	await once.value.Do($.functionValue(async () => {
 		counter++
 		await $.println("Once function executed, counter:", counter)
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)))
-	await once.value.Do($.functionValue(async (): globalThis.Promise<void> => {
+	await once.value.Do($.functionValue(async () => {
 		counter++
 		await $.println("This should not execute")
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)))
 	await $.println("Final counter:", counter)
 
 	// Test OnceFunc
-	let onceFunc: (() => void) | null = sync.OnceFunc($.functionValue(async (): globalThis.Promise<void> => {
+	let onceFunc: (() => void) | null = sync.OnceFunc($.functionValue(async () => {
 		await $.println("OnceFunc executed")
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)))
 	void (__goscriptAwait = onceFunc!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
@@ -367,7 +367,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 
 	// Test Pool
-	let pool: sync.Pool | $.VarRef<sync.Pool> | null = new sync.Pool({New: $.functionValue(async (): globalThis.Promise<any> => {
+	let pool = new sync.Pool({New: $.functionValue(async (): globalThis.Promise<any> => {
 		await $.println("Pool creating new object")
 		return "new object"
 	}, ({ kind: $.TypeKind.Function, params: [], results: [{ kind: $.TypeKind.Interface, methods: [] }] } as $.FunctionTypeInfo))})
@@ -389,22 +389,22 @@ export async function condZeroValue(): globalThis.Promise<void> {
 
 	// The consumer starts first and each push waits for its pop to print,
 	// so that the consumer waits on the Cond for every value.
-	let q: queue | $.VarRef<queue> | null = new queue()
-	let started: $.Channel<boolean> | null = $.makeChannel<boolean>(0, false, "both")
-	let results: $.Channel<number> | null = $.makeChannel<number>(0, 0, "both")
-	queueMicrotask(async () => { await (async (): globalThis.Promise<void> => {
+	let q = new queue()
+	let started = $.makeChannel<boolean>(0, false, "both")
+	let results = $.makeChannel<number>(0, 0, "both")
+	queueMicrotask(async () => {
 		await $.chanSend(started, true)
 		for (let __rangeIndex = 0; __rangeIndex < 3; __rangeIndex++) {
 			await $.chanSend(results, await (q !== null && (q as any).__isVarRef !== true && (q as any).__goValue === undefined ? ((q as any) as queue).pop() : queue.prototype.pop.call(q)))
 		}
-	})() })
+	})
 	await $.chanRecv(started)
 	for (let i = 1; i <= 3; i++) {
 		await (q !== null && (q as any).__isVarRef !== true && (q as any).__goValue === undefined ? ((q as any) as queue).push(i * 10) : queue.prototype.push.call(q, i * 10))
 		await $.println("got:", await $.chanRecv(results))
 	}
 
-	let c: sync.Cond | $.VarRef<sync.Cond> | null = sync.NewCond($.pointerValueOrNil($.interfaceValue<sync.Locker | null>(new sync.Mutex(), "*sync.Mutex", /* @__PURE__ */ $.pointerType("sync.Mutex")))!)
+	let c = sync.NewCond($.pointerValueOrNil($.interfaceValue<sync.Locker | null>(new sync.Mutex(), "*sync.Mutex", /* @__PURE__ */ $.pointerType("sync.Mutex")))!)
 	await $.println("NewCond L is nil:", $.pointerValue<sync.Cond>(c).L == null)
 }
 

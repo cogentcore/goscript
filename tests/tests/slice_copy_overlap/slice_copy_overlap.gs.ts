@@ -5,18 +5,18 @@ import * as $ from "@goscript/builtin/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	// Integer slices retain overlapping memmove behavior.
-	let right: $.Slice<number> = $.arrayToSlice<number>([1, 2, 3, 4, 5])
+	let right = $.arrayToSlice<number>([1, 2, 3, 4, 5])
 	let n = $.copy($.goSlice(right, 2, undefined), $.goSlice(right, 1, 4))
 	await $.println("right count:", n)
 	await $.println("right:", $.arrayIndex(right!, 0), $.arrayIndex(right!, 1), $.arrayIndex(right!, 2), $.arrayIndex(right!, 3), $.arrayIndex(right!, 4))
 
-	let left: $.Slice<number> = $.arrayToSlice<number>([1, 2, 3, 4, 5])
+	let left = $.arrayToSlice<number>([1, 2, 3, 4, 5])
 	n = $.copy($.goSlice(left, 1, undefined), $.goSlice(left, 2, undefined))
 	await $.println("left count:", n)
 	await $.println("left:", $.arrayIndex(left!, 0), $.arrayIndex(left!, 1), $.arrayIndex(left!, 2), $.arrayIndex(left!, 3), $.arrayIndex(left!, 4))
 
 	// Byte ranges copy in both directions without exposing temporary views.
-	let bytes: $.Slice<number> = new Uint8Array([1, 2, 3, 4, 5]) as $.Slice<number>
+	let bytes = new Uint8Array([1, 2, 3, 4, 5]) as $.Slice<number>
 	let start = 1
 	let stop = 4
 	n = $.copyByteRanges(bytes, start + 1, undefined, bytes, start, stop)
@@ -25,9 +25,9 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("byte left:", n, $.arrayIndex(bytes!, 0), $.arrayIndex(bytes!, 1), $.arrayIndex(bytes!, 2), $.arrayIndex(bytes!, 3), $.arrayIndex(bytes!, 4))
 
 	// Explicit high bounds may extend into spare capacity; omitted highs may not.
-	let backing: $.Slice<number> = new Uint8Array([10, 11, 12, 13, 14, 15]) as $.Slice<number>
-	let dst: $.Slice<number> = $.goSlice(backing, 1, 2, 5)
-	let src: $.Slice<number> = new Uint8Array([7, 8, 9]) as $.Slice<number>
+	let backing = new Uint8Array([10, 11, 12, 13, 14, 15]) as $.Slice<number>
+	let dst = $.goSlice(backing, 1, 2, 5)
+	let src = new Uint8Array([7, 8, 9]) as $.Slice<number>
 	n = $.copyByteRanges(dst, 1, 4, src, undefined, undefined)
 	await $.println("capacity:", n, $.arrayIndex(backing!, 0), $.arrayIndex(backing!, 1), $.arrayIndex(backing!, 2), $.arrayIndex(backing!, 3), $.arrayIndex(backing!, 4), $.arrayIndex(backing!, 5))
 	n = $.copyByteRanges(dst, undefined, undefined, src, undefined, undefined)
@@ -51,7 +51,7 @@ export async function bound(value: number): globalThis.Promise<number> {
 export async function checkInvalidSource(dst: $.Slice<number>, src: $.Slice<number>): globalThis.Promise<void> {
 	const __defer = new $.AsyncDisposableStack()
 	try {
-		__defer.defer(async () => { await (async (): globalThis.Promise<void> => {
+		__defer.defer(async () => { await (async () => {
 			await $.println("invalid source:", $.recover() != null)
 		})() })
 		let high = $.sliceLen(src) + 1

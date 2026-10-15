@@ -5,9 +5,9 @@ import * as $ from "@goscript/builtin/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	await using __defer = new $.AsyncDisposableStack()
-	let ch: $.Channel<boolean> | null = $.makeChannel<boolean>(1, false, "both")
+	let ch = $.makeChannel<boolean>(1, false, "both")
 
-	__defer.defer(async () => { await (async (): globalThis.Promise<void> => {
+	__defer.defer(async () => { await (async () => {
 		await $.println("deferred start")
 		await $.chanRecv(ch)
 		await $.println("deferred end")

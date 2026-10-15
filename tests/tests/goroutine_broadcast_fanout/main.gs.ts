@@ -17,15 +17,15 @@ export async function main(): globalThis.Promise<void> {
 
 	for (let w = 0; w < 16; w++) {
 		const __goscriptDeferArg0 = w
-		queueMicrotask(async () => { await (async (id: number): globalThis.Promise<void> => {
+		queueMicrotask(async () => { await (async (id: number) => {
 			// Await-free CPU span: a tight loop with no I/O or channel op, the
 			// starvation shape from issue_118 scaled across 16 goroutines.
 			let sum = 0
 			for (let i = 0; i < 200000; i++) {
-				sum = sum + (i * (id + 1))
+				sum += i * (id + 1)
 			}
 			sum
-			await bcast.value.HoldLock($.functionValue(async (broadcastFn: (() => void) | null, _p1: (() => $.Channel<{}> | null | globalThis.Promise<$.Channel<{}> | null>) | null): globalThis.Promise<void> => {
+			await bcast.value.HoldLock($.functionValue(async (broadcastFn: (() => void) | null, _p1: (() => $.Channel<{}> | null | globalThis.Promise<$.Channel<{}> | null>) | null) => {
 				completed++
 				void (__goscriptAwait = broadcastFn!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 			}, ({ kind: $.TypeKind.Function, params: [({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.channelType({ kind: $.TypeKind.Struct, methods: [], fields: [] }, "receive")] } as $.FunctionTypeInfo)], results: [] } as $.FunctionTypeInfo)))
@@ -39,7 +39,7 @@ export async function main(): globalThis.Promise<void> {
 	while (true) {
 		let done: boolean = false
 		let waitCh: $.Channel<{}> | null = null! as $.Channel<{}> | null
-		await bcast.value.HoldLock($.functionValue(async (_p0: (() => void) | null, getWaitCh: (() => $.Channel<{}> | null | globalThis.Promise<$.Channel<{}> | null>) | null): globalThis.Promise<void> => {
+		await bcast.value.HoldLock($.functionValue(async (_p0: (() => void) | null, getWaitCh: (() => $.Channel<{}> | null | globalThis.Promise<$.Channel<{}> | null>) | null) => {
 			done = completed == 16
 			if (!done) {
 				waitCh = ((__goscriptAwait = getWaitCh!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as $.Channel<{}> | null)

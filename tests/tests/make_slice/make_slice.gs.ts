@@ -8,37 +8,37 @@ export async function main(): globalThis.Promise<void> {
 
 	// Test 1: Basic make with length only
 	await $.println("--- Basic make with length only ---")
-	let s1: $.Slice<number> = $.makeSlice<number>(5, undefined, "number")
+	let s1 = $.makeSlice<number>(5, undefined, "number")
 	await $.println("len(s1):", $.sliceLen(s1))
 	await $.println("cap(s1):", $.cap(s1))
 
 	// Test 2: Make with length and capacity
 	await $.println("--- Make with length and capacity ---")
-	let s2: $.Slice<number> = $.makeSlice<number>(3, 10, "number")
+	let s2 = $.makeSlice<number>(3, 10, "number")
 	await $.println("len(s2):", $.sliceLen(s2))
 	await $.println("cap(s2):", $.cap(s2))
 
 	// Test 3: Make bytes with zero length, large capacity
 	await $.println("--- Make bytes with zero length, large capacity ---")
-	let b1: $.Slice<number> = $.makeSlice<number>(0, 100000, "byte")
+	let b1 = $.makeSlice<number>(0, 100000, "byte")
 	await $.println("len(b1):", $.sliceLen(b1))
 	await $.println("cap(b1):", $.cap(b1))
 
 	// Test 4: Make bytes with length and capacity
 	await $.println("--- Make bytes with length and capacity ---")
-	let b2: $.Slice<number> = $.makeSlice<number>(10, 50, "byte")
+	let b2 = $.makeSlice<number>(10, 50, "byte")
 	await $.println("len(b2):", $.sliceLen(b2))
 	await $.println("cap(b2):", $.cap(b2))
 
 	// Test 5: Make with zero capacity
 	await $.println("--- Make with zero capacity ---")
-	let s3: $.Slice<number> = $.makeSlice<number>(0, 0, "number")
+	let s3 = $.makeSlice<number>(0, 0, "number")
 	await $.println("len(s3):", $.sliceLen(s3))
 	await $.println("cap(s3):", $.cap(s3))
 
 	// Test 6: Make with equal length and capacity
 	await $.println("--- Make with equal length and capacity ---")
-	let s4: $.Slice<string> = $.makeSlice<string>(7, 7, "string")
+	let s4 = $.makeSlice<string>(7, 7, "string")
 	await $.println("len(s4):", $.sliceLen(s4))
 	await $.println("cap(s4):", $.cap(s4))
 
@@ -64,33 +64,33 @@ export async function main(): globalThis.Promise<void> {
 
 	// Test 9: Large capacity slice
 	await $.println("--- Large capacity slice ---")
-	let large: $.Slice<number> = $.makeSlice<number>(5, 1000000, "number")
+	let large = $.makeSlice<number>(5, 1000000, "number")
 	await $.println("len(large):", $.sliceLen(large))
 	await $.println("cap(large):", $.cap(large))
 
 	// Test 10: Zero length, various capacities
 	await $.println("--- Zero length, various capacities ---")
-	let z1: $.Slice<number> = $.makeSlice<number>(0, 1, "byte")
-	let z2: $.Slice<number> = $.makeSlice<number>(0, 100, "byte")
-	let z3: $.Slice<number> = $.makeSlice<number>(0, 10000, "byte")
+	let z1 = $.makeSlice<number>(0, 1, "byte")
+	let z2 = $.makeSlice<number>(0, 100, "byte")
+	let z3 = $.makeSlice<number>(0, 10000, "byte")
 	await $.println("z1 - len:", $.sliceLen(z1), "cap:", $.cap(z1))
 	await $.println("z2 - len:", $.sliceLen(z2), "cap:", $.cap(z2))
 	await $.println("z3 - len:", $.sliceLen(z3), "cap:", $.cap(z3))
 
 	// Test 11: Slice operations on made slices
 	await $.println("--- Slice operations on made slices ---")
-	let s6: $.Slice<number> = $.makeSlice<number>(10, 20, "number")
+	let s6 = $.makeSlice<number>(10, 20, "number")
 	for (let __goscriptSliceWindow0 = $.sliceRange(s6), i = 0; i < 10; i++) {
 		;(__goscriptSliceWindow0.backing as any[])[$.windowSlot(__goscriptSliceWindow0, i)] = i * 10
 	}
-	let sub: $.Slice<number> = $.goSlice(s6, 2, 5)
+	let sub = $.goSlice(s6, 2, 5)
 	await $.println("sub - len:", $.sliceLen(sub), "cap:", $.cap(sub))
 	await $.println("sub[0]:", $.arrayIndex(sub!, 0))
 	await $.println("sub[2]:", $.arrayIndex(sub!, 2))
 
 	// Test 12: String slices with capacity
 	await $.println("--- String slices with capacity ---")
-	let str: $.Slice<string> = $.makeSlice<string>(3, 8, "string")
+	let str = $.makeSlice<string>(3, 8, "string")
 	$.sliceElems(str!)[$.sliceSlot(str!, 0)] = "hello"
 	$.sliceElems(str!)[$.sliceSlot(str!, 1)] = "world"
 	$.sliceElems(str!)[$.sliceSlot(str!, 2)] = "test"

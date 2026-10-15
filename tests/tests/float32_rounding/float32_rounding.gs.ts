@@ -74,7 +74,7 @@ export async function main(): globalThis.Promise<void> {
 	let sum64: number = 0
 	for (let __rangeIndex = 0; __rangeIndex < 10; __rangeIndex++) {
 		sum32 = globalThis.Math.fround(sum32 + (0.10000000149011612))
-		sum64 = sum64 + (0.1)
+		sum64 += 0.1
 	}
 	await fmt.Println("sum32:", $.basicInterfaceValue(sum32, "float64"))
 	await fmt.Println("sum64:", $.basicInterfaceValue(sum64, "float64"))
@@ -125,7 +125,7 @@ export async function main(): globalThis.Promise<void> {
 	let err: $.GoError = json.Unmarshal(b, $.interfaceValue(j, "*main.T", /* @__PURE__ */ $.pointerType("main.T")))
 	await fmt.Println($.bytesToString(b), $.structEqual(j.value, s.value), $.interfaceValue((j.value).clone(), "main.T", "main.T"), (err as any))
 	let buf: $.VarRef<bytes.Buffer> = $.varRef($.markAsStructValue(new bytes.Buffer()))
-	let enc: json.Encoder | $.VarRef<json.Encoder> | null = json.NewEncoder($.pointerValueOrNil($.interfaceValue<io.Writer | null>(buf, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer")))!)
+	let enc = json.NewEncoder($.pointerValueOrNil($.interfaceValue<io.Writer | null>(buf, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer")))!)
 	json.Encoder.prototype.SetIndent.call($.pointerValue<json.Encoder>(enc), "", "\t")
 	err = await json.Encoder.prototype.Encode.call($.pointerValue<json.Encoder>(enc), $.interfaceValue(s, "*main.T", /* @__PURE__ */ $.pointerType("main.T")))
 	let k: $.VarRef<T> = $.varRef(new T(undefined, true))

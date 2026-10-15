@@ -66,7 +66,7 @@ export class MyStruct {
 
 export async function main(): globalThis.Promise<void> {
 	// Test new(MyStruct)
-	let ptr: MyStruct | $.VarRef<MyStruct> | null = new MyStruct()
+	let ptr = new MyStruct()
 	let ptr$: MyStruct = ptr == null ? $.pointerTarget<MyStruct>(ptr) : (ptr as any).__isVarRef === true ? (ptr as any).value : (ptr as any).__goValue === undefined ? (ptr as any) : $.pointerTarget<MyStruct>(ptr)
 	await $.println("ptr.MyInt (default):", (ptr$ as MyStruct).MyInt)
 	await $.println("ptr.MyString (default):", (ptr$ as MyStruct).MyString)

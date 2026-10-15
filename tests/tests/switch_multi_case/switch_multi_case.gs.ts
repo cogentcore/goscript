@@ -12,11 +12,11 @@ export async function main(): globalThis.Promise<void> {
 	let value = "someValue"
 	let err: $.GoError = null! as $.GoError
 
-	let getnum: ((v: string, flag: boolean) => [number, string, $.GoError] | globalThis.Promise<[number, string, $.GoError]>) | null = $.functionValue((v: string, flag: boolean): [number, string, $.GoError] => {
+	let getnum = $.functionValue((v: string, flag: boolean): [number, string, $.GoError] => {
 		if (flag) {
-			return [12, $.concatString(v, "_processed_flag_true"), null]
+			return [12, v + "_processed_flag_true", null]
 		}
-		return [1, $.concatString(v, "_processed_flag_false"), null]
+		return [1, v + "_processed_flag_false", null]
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("bool")], results: [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("string"), "error"] } as $.FunctionTypeInfo))
 
 	let std = 2
@@ -25,7 +25,7 @@ export async function main(): globalThis.Promise<void> {
 		case stdNumMonth:
 		case stdZeroMonth:
 		{
-			let __goscriptTuple0: any = await getnum!(value, std == stdZeroMonth)
+			let __goscriptTuple0: any = getnum(value, std == stdZeroMonth)
 			month = __goscriptTuple0[0]
 			value = __goscriptTuple0[1]
 			err = __goscriptTuple0[2]
@@ -52,7 +52,7 @@ export async function main(): globalThis.Promise<void> {
 		case stdNumMonth:
 		case stdZeroMonth:
 		{
-			let __goscriptTuple1: any = await getnum!(value, std == stdZeroMonth)
+			let __goscriptTuple1: any = getnum(value, std == stdZeroMonth)
 			month = __goscriptTuple1[0]
 			value = __goscriptTuple1[1]
 			err = __goscriptTuple1[2]

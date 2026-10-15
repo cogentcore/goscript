@@ -60,13 +60,13 @@ export async function main(): globalThis.Promise<void> {
 	for (let i = 0; i < 5; i++) {
 		ps = $.appendOne(ps, new pos({Line: i + 1, Char: i}, true))
 	}
-	let all: $.Slice<pos> = $.goSlice(ps, undefined, $.cap(ps))
+	let all = $.goSlice(ps, undefined, $.cap(ps))
 	await $.println($.sliceLen(ps), $.cap(ps), $.arrayIndex(all!, 4).Line, $.arrayIndex(all!, 5).Line, $.arrayIndex(all!, 7).Char)
 	$.arrayIndex(all!, 5).Line = 9
 	await $.println($.arrayIndex(all!, 5).Line, $.arrayIndex(all!, 6).Line)
 
 	// Appending after a reslice writes the slot the reslice zeroed.
-	let more: $.Slice<pos> = $.appendOne(ps, new pos({Line: 42}, true))
+	let more = $.appendOne(ps, new pos({Line: 42}, true))
 	await $.println($.arrayIndex(more!, 5).Line, $.arrayIndex(all!, 5).Line)
 
 	// Grown slices of other element types have their zero values too.
@@ -78,21 +78,21 @@ export async function main(): globalThis.Promise<void> {
 		ss = $.appendOne(ss, "x")
 		ptrs = $.appendOne(ptrs, new pos({Line: i}), $.appendZeros.nil)
 	}
-	let nall: $.Slice<number> = $.goSlice(ns, undefined, $.cap(ns))
-	let sall: $.Slice<string> = $.goSlice(ss, undefined, $.cap(ss))
-	let pall: $.Slice<pos | $.VarRef<pos> | null> = $.goSlice(ptrs, undefined, $.cap(ptrs))
+	let nall = $.goSlice(ns, undefined, $.cap(ns))
+	let sall = $.goSlice(ss, undefined, $.cap(ss))
+	let pall = $.goSlice(ptrs, undefined, $.cap(ptrs))
 	await $.println($.arrayIndex(nall!, 3), $.stringLen($.arrayIndex(sall!, 3)), $.arrayIndex(pall!, 3) == null, $.pointerValue<pos>($.arrayIndex(ptrs!, 2)).Line)
 
 	// A grown copy holds copies of the struct elements.
-	let small: $.Slice<pos> = $.makeSlice<pos>(1, 1, undefined, () => new pos(undefined, true))
+	let small = $.makeSlice<pos>(1, 1, undefined, () => new pos(undefined, true))
 	$.arrayIndex(small!, 0).Line = 7
-	let grown: $.Slice<pos> = $.appendOne(small, new pos({Line: 8}, true))
+	let grown = $.appendOne(small, new pos({Line: 8}, true))
 	$.arrayIndex(grown!, 0).Line = 70
 	await $.println($.arrayIndex(small!, 0).Line, $.arrayIndex(grown!, 0).Line, $.arrayIndex(grown!, 1).Line)
 
 	// Appending a slice grows the same way.
-	let ext: $.Slice<pos> = $.appendSlice($.arrayToSlice<pos>([new pos({Line: 1}, true)]), $.arrayToSlice<pos>([new pos({Line: 2}, true), new pos({Line: 3}, true)]))
-	let full: $.Slice<pos> = $.goSlice(ext, undefined, $.cap(ext))
+	let ext = $.appendSlice($.arrayToSlice<pos>([new pos({Line: 1}, true)]), $.arrayToSlice<pos>([new pos({Line: 2}, true), new pos({Line: 3}, true)]))
+	let full = $.goSlice(ext, undefined, $.cap(ext))
 	await $.println($.sliceLen(ext), $.cap(ext) >= 3, $.arrayIndex(full!, $.sliceLen(full) - 1).Line)
 }
 

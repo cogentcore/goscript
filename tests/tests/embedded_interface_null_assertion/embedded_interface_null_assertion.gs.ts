@@ -115,7 +115,7 @@ export class StringReader {
 			return [0, null]
 		}
 		let n = $.copy(p, $.stringToBytes($.sliceStringOrBytes((s$ as StringReader).data, (s$ as StringReader).pos, undefined)));
-		;(s$ as StringReader).pos = (s$ as StringReader).pos + (n)
+		;(s$ as StringReader).pos += n
 		return [n, null]
 	}
 
@@ -129,14 +129,14 @@ export class StringReader {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let mr1: MyReader | $.VarRef<MyReader> | null = new MyReader({name: "test1"})
+	let mr1 = new MyReader({name: "test1"})
 	await $.println($.pointerValue<MyReader>(mr1).Reader == null)
 
-	let sr: StringReader | $.VarRef<StringReader> | null = new StringReader({data: "hello", pos: 0})
-	let mr2: MyReader | $.VarRef<MyReader> | null = new MyReader({Reader: $.interfaceValue<Reader | null>(sr, "*main.StringReader", /* @__PURE__ */ $.pointerType("main.StringReader")), name: "test2"})
+	let sr = new StringReader({data: "hello", pos: 0})
+	let mr2 = new MyReader({Reader: $.interfaceValue<Reader | null>(sr, "*main.StringReader", /* @__PURE__ */ $.pointerType("main.StringReader")), name: "test2"})
 	await $.println($.pointerValue<MyReader>(mr2).Reader != null)
 
-	let buf: $.Slice<number> = $.makeSlice<number>(5, undefined, "byte")
+	let buf = $.makeSlice<number>(5, undefined, "byte")
 	let [n, ] = $.pointerValue<Exclude<Reader, null>>($.pointerValue<MyReader>(mr2).Reader).Read(buf)
 	await $.println(n == 5)
 

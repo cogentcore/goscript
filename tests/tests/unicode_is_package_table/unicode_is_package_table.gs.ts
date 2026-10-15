@@ -19,7 +19,7 @@ export function __goscript_set_digits(__goscriptValue: unicode.RangeTable | $.Va
 }
 
 export async function main(): globalThis.Promise<void> {
-	let local: unicode.RangeTable | $.VarRef<unicode.RangeTable> | null = new unicode.RangeTable({R16: $.arrayToSlice<unicode.Range16>([$.markAsStructValue(new unicode.Range16({Lo: 120, Hi: 122, Stride: 1}))])})
+	let local = new unicode.RangeTable({R16: $.arrayToSlice<unicode.Range16>([$.markAsStructValue(new unicode.Range16({Lo: 120, Hi: 122, Stride: 1}))])})
 	await $.println(unicode.Is(vowels, 101), unicode.Is(vowels, 122), unicode.Is(local, 121))
 	await $.println(unicode.In(55, vowels, digits), unicode.In(113, vowels, digits))
 	await $.println(unicode.IsOneOf($.arrayToSlice<unicode.RangeTable | $.VarRef<unicode.RangeTable> | null>([vowels, local]), 122))

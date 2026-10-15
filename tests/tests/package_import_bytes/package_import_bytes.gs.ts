@@ -11,8 +11,8 @@ import "@goscript/io/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	// Test basic byte slice operations
-	let b1: $.Slice<number> = new Uint8Array([104, 101, 108, 108, 111])
-	let b2: $.Slice<number> = new Uint8Array([119, 111, 114, 108, 100])
+	let b1 = new Uint8Array([104, 101, 108, 108, 111])
+	let b2 = new Uint8Array([119, 111, 114, 108, 100])
 
 	// Test Equal
 	if (bytes.Equal(b1, b1)) {
@@ -37,12 +37,12 @@ export async function main(): globalThis.Promise<void> {
 	}
 
 	// Test Join
-	let slices: $.Slice<$.Slice<number>> = $.arrayToSlice<$.Slice<number>>([b1, b2])
-	let joined: $.Slice<number> = bytes.Join(slices, new Uint8Array([32]))
+	let slices = $.arrayToSlice<$.Slice<number>>([b1, b2])
+	let joined = bytes.Join(slices, new Uint8Array([32]))
 	await $.println("Joined:", $.bytesToString(joined))
 
 	// Test Split
-	let split: $.Slice<$.Slice<number>> = bytes.Split(joined, new Uint8Array([32]))
+	let split = bytes.Split(joined, new Uint8Array([32]))
 	await $.println("Split result length:", $.sliceLen(split))
 	if ($.sliceLen(split) == 2) {
 		await $.println("Split works correctly")
@@ -58,18 +58,18 @@ export async function main(): globalThis.Promise<void> {
 	}
 
 	// Test Trim functions
-	let whitespace: $.Slice<number> = new Uint8Array([32, 32, 104, 101, 108, 108, 111, 32, 32])
-	let trimmed: $.Slice<number> = bytes.TrimSpace(whitespace)
+	let whitespace = new Uint8Array([32, 32, 104, 101, 108, 108, 111, 32, 32])
+	let trimmed = bytes.TrimSpace(whitespace)
 	await $.println("Trimmed:", $.bytesToString(trimmed))
 
 	// Test ToUpper and ToLower
-	let upper: $.Slice<number> = bytes.ToUpper(b1)
-	let lower: $.Slice<number> = bytes.ToLower(upper)
+	let upper = bytes.ToUpper(b1)
+	let lower = bytes.ToLower(upper)
 	await $.println("Upper:", $.bytesToString(upper))
 	await $.println("Lower:", $.bytesToString(lower))
 
 	// Test Repeat
-	let repeated: $.Slice<number> = bytes.Repeat(new Uint8Array([120]), 3)
+	let repeated = bytes.Repeat(new Uint8Array([120]), 3)
 	await $.println("Repeated:", $.bytesToString(repeated))
 
 	// Test Count
@@ -77,11 +77,11 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("Count of 'a' in 'banana':", count)
 
 	// Test Replace
-	let replaced: $.Slice<number> = bytes.Replace(new Uint8Array([104, 101, 108, 108, 111, 32, 104, 101, 108, 108, 111]), new Uint8Array([104, 101, 108, 108, 111]), new Uint8Array([104, 105]), 1)
+	let replaced = bytes.Replace(new Uint8Array([104, 101, 108, 108, 111, 32, 104, 101, 108, 108, 111]), new Uint8Array([104, 101, 108, 108, 111]), new Uint8Array([104, 105]), 1)
 	await $.println("Replace result:", $.bytesToString(replaced))
 
 	// Test ReplaceAll
-	let replacedAll: $.Slice<number> = bytes.ReplaceAll(new Uint8Array([104, 101, 108, 108, 111, 32, 104, 101, 108, 108, 111]), new Uint8Array([104, 101, 108, 108, 111]), new Uint8Array([104, 105]))
+	let replacedAll = bytes.ReplaceAll(new Uint8Array([104, 101, 108, 108, 111, 32, 104, 101, 108, 108, 111]), new Uint8Array([104, 101, 108, 108, 111]), new Uint8Array([104, 105]))
 	await $.println("ReplaceAll result:", $.bytesToString(replacedAll))
 
 	// Test Buffer
@@ -101,7 +101,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("Buffer after reset, length:", buf.value.Len())
 
 	// Test Buffer pointer receiver calls through an address-taken pointer.
-	let ptr: bytes.Buffer | $.VarRef<bytes.Buffer> | null = buf
+	let ptr = buf
 	bytes.Buffer.prototype.Write.call($.pointerValue<bytes.Buffer>(ptr), new Uint8Array([112, 116, 114]))
 	await $.println("Pointer buffer content:", bytes.Buffer.prototype.String.call($.pointerValue<bytes.Buffer>(ptr)))
 	bytes.Buffer.prototype.Reset.call($.pointerValue<bytes.Buffer>(ptr))
@@ -114,8 +114,8 @@ export async function main(): globalThis.Promise<void> {
 	n = __goscriptTuple0[0]
 	await $.println("MultiReader read", n, "bytes:", $.bytesToString($.goSlice(data, undefined, n)))
 
-	let reader: bytes.Reader | $.VarRef<bytes.Reader> | null = bytes.NewReader(new Uint8Array([114, 101, 97, 100, 101, 114]))
-	let at: $.Slice<number> = $.makeSlice<number>(3, undefined, "byte")
+	let reader = bytes.NewReader(new Uint8Array([114, 101, 97, 100, 101, 114]))
+	let at = $.makeSlice<number>(3, undefined, "byte")
 	let off: bigint = 2n
 	let __goscriptTuple1: any = bytes.Reader.prototype.ReadAt.call($.pointerValue<bytes.Reader>(reader), at, off)
 	n = __goscriptTuple1[0]

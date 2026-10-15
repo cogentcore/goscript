@@ -22,13 +22,13 @@ export async function main(): globalThis.Promise<void> {
 	await $.println(await $.markAsStructValue($.cloneStructValue(slog.Int("n", 3))).String(), await $.markAsStructValue($.cloneStructValue(slog.Any("x", $.interfaceValue($.arrayToSlice<number>([1, 2]), "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")))))).String())
 
 	let g = slog.Group("g", $.arrayToSlice<any>([$.interfaceValue(slog.String("a", "x"), "slog.Attr", "slog.Attr"), $.interfaceValue(slog.Int("b", 2), "slog.Attr", "slog.Attr")]))
-	let attrs: $.Slice<slog.Attr> = g.Value.Group()
+	let attrs = g.Value.Group()
 	await $.println(slog.Kind_String(g.Value.Kind()), $.sliceLen(attrs), $.arrayIndex(attrs!, 0).Key, await $.markAsStructValue($.cloneStructValue($.arrayIndex(attrs!, 1).Value)).Int64())
 	await $.println(await g.String())
 	await $.println(await $.markAsStructValue($.cloneStructValue(slog.StringValue("a"))).Equal(slog.StringValue("a")), await s.Equal(slog.StringValue("other")))
 
 	let buf: $.VarRef<bytes.Buffer> = $.varRef($.markAsStructValue(new bytes.Buffer()))
-	let logger: slog.Logger | $.VarRef<slog.Logger> | null = slog.New($.interfaceValue<slog.Handler | null>(slog.NewTextHandler($.interfaceValue<io.Writer | null>(buf, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer")), new slog.HandlerOptions({ReplaceAttr: $.functionValue((groups: $.Slice<string>, a: slog.Attr): slog.Attr => {
+	let logger = slog.New($.interfaceValue<slog.Handler | null>(slog.NewTextHandler($.interfaceValue<io.Writer | null>(buf, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer")), new slog.HandlerOptions({ReplaceAttr: $.functionValue((groups: $.Slice<string>, a: slog.Attr): slog.Attr => {
 		if (($.stringEqual(a.Key, slog.TimeKey)) && ($.sliceLen(groups) == 0)) {
 			return new slog.Attr(undefined, true)
 		}
@@ -38,7 +38,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.print(buf.value.String())
 
 	buf.value.Reset()
-	let jl: slog.Logger | $.VarRef<slog.Logger> | null = slog.New($.interfaceValue<slog.Handler | null>(slog.NewJSONHandler($.interfaceValue<io.Writer | null>(buf, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer")), new slog.HandlerOptions({Level: $.namedValueInterfaceValue<slog.Leveler | null>(slog.LevelDebug, "slog.Level", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()), ReplaceAttr: $.functionValue((groups: $.Slice<string>, a: slog.Attr): slog.Attr => {
+	let jl = slog.New($.interfaceValue<slog.Handler | null>(slog.NewJSONHandler($.interfaceValue<io.Writer | null>(buf, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer")), new slog.HandlerOptions({Level: $.namedValueInterfaceValue<slog.Leveler | null>(slog.LevelDebug, "slog.Level", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()), ReplaceAttr: $.functionValue((groups: $.Slice<string>, a: slog.Attr): slog.Attr => {
 		if (($.stringEqual(a.Key, slog.TimeKey)) && ($.sliceLen(groups) == 0)) {
 			return new slog.Attr(undefined, true)
 		}
@@ -48,7 +48,7 @@ export async function main(): globalThis.Promise<void> {
 	await slog.Logger.prototype.Warn.call(await slog.Logger.prototype.WithGroup.call(await (jl !== null && (jl as any).__isVarRef !== true && (jl as any).__goValue === undefined ? ((jl as any) as slog.Logger).With($.arrayToSlice<any>(["w", "x"])) : slog.Logger.prototype.With.call(jl, $.arrayToSlice<any>(["w", "x"]))), "sub"), "with", $.arrayToSlice<any>(["y", $.basicInterfaceValue(2.5, "float64")]))
 	await $.print(buf.value.String())
 
-	let old: slog.Logger | $.VarRef<slog.Logger> | null = slog.Default()
+	let old = slog.Default()
 	await slog.SetDefault(logger)
 	buf.value.Reset()
 	await slog.Error("default", $.arrayToSlice<any>(["err", "boom"]))

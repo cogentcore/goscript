@@ -291,12 +291,12 @@ export async function main(): globalThis.Promise<void> {
 	a.value = $.assignStruct(a.value, $.pointerValue<Outer>(p))
 	await $.println(a.value.In.X, a.value.N)
 
-	let s: $.Slice<Outer> = $.arrayToSlice<Outer>([make1(), make1()])
+	let s = $.arrayToSlice<Outer>([make1(), make1()])
 	$.assignStruct($.sliceElems(s!)[$.sliceSlot(s!, 0)], $.arrayIndex(s!, 1))
 	$.arrayIndex(s!, 1).In.Y = 20
 	await $.println($.arrayIndex(s!, 0).In.Y, $.arrayIndex(s!, 1).In.Y)
 
-	let sh: Inner | $.VarRef<Inner> | null = new Inner({X: 7, Y: 8})
+	let sh = new Inner({X: 7, Y: 8})
 	a.value.Ptr = sh
 	b = $.assignStruct(b, a.value)
 	$.pointerValue<Inner>(b.Ptr).X = 70
@@ -324,7 +324,7 @@ export async function main(): globalThis.Promise<void> {
 	h2 = $.assignStruct(h2, $.markAsStructValue($.cloneStructValue(h1)))
 	h1.P.Val.X = 33
 	await $.println(h2.P.Val.X, h1.P.Val.X)
-	let m: globalThis.Map<string, Outer> | null = $.makeMap<string, Outer>([["k", (a.value).clone()]])
+	let m = $.makeMap<string, Outer>([["k", (a.value).clone()]])
 	let c = new Outer(undefined, true)
 	c = $.assignStruct(c, $.mapGet<string, Outer, Outer>(m, "k", new Outer(undefined, true))[0])
 	c.N = 77

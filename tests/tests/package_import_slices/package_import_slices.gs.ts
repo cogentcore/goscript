@@ -12,7 +12,7 @@ import "@goscript/maps/index.js"
 import "@goscript/slices/index.js"
 
 export async function main(): globalThis.Promise<void> {
-	let s: $.Slice<number> = $.arrayToSlice<number>([1, 2, 3, 4, 5])
+	let s = $.arrayToSlice<number>([1, 2, 3, 4, 5])
 
 	// This should trigger the interface range issue
 	// slices.All returns an iterator interface that can be ranged over
@@ -40,7 +40,7 @@ export async function main(): globalThis.Promise<void> {
 		return
 	}
 
-	let cloned: $.Slice<number> = (slices.Clone(s) as $.Slice<number>)
+	let cloned = (slices.Clone(s) as $.Slice<number>)
 	$.sliceElems(cloned!)[$.sliceSlot(cloned!, 0)] = 99
 	await $.println("clone first:", $.arrayIndex(cloned!, 0), "original first:", $.arrayIndex(s!, 0), "same len:", $.sliceLen(cloned) == $.sliceLen(s))
 	let nilSlice: $.Slice<number> = null! as $.Slice<number>
@@ -53,7 +53,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("contains:", slices.Contains(s, 3), slices.ContainsFunc(s, $.functionValue((v: number): boolean => {
 		return v > 4
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo))))
-	let inserted: $.Slice<number> = (slices.Insert($.arrayToSlice<number>([1, 4]), 1, 2, 3) as $.Slice<number>)
+	let inserted = (slices.Insert($.arrayToSlice<number>([1, 4]), 1, 2, 3) as $.Slice<number>)
 	await $.println("insert:", $.arrayIndex(inserted!, 0), $.arrayIndex(inserted!, 1), $.arrayIndex(inserted!, 2), $.arrayIndex(inserted!, 3))
 	slices.Reverse(inserted)
 	await $.println("reverse:", $.arrayIndex(inserted!, 0), $.arrayIndex(inserted!, 1), $.arrayIndex(inserted!, 2), $.arrayIndex(inserted!, 3))
@@ -108,7 +108,7 @@ export async function main(): globalThis.Promise<void> {
 			() => [{ name: "group", key: "group", type: /* @__PURE__ */ $.basicType("int") }, { name: "label", key: "label", type: /* @__PURE__ */ $.basicType("string") }]
 		)
 	}
-	let stable: $.Slice<item> = $.arrayToSlice<item>([$.markAsStructValue(new item({group: 2, label: "a"})), $.markAsStructValue(new item({group: 1, label: "b"})), $.markAsStructValue(new item({group: 2, label: "c"})), $.markAsStructValue(new item({group: 1, label: "d"}))])
+	let stable = $.arrayToSlice<item>([$.markAsStructValue(new item({group: 2, label: "a"})), $.markAsStructValue(new item({group: 1, label: "b"})), $.markAsStructValue(new item({group: 2, label: "c"})), $.markAsStructValue(new item({group: 1, label: "d"}))])
 	slices.SortStableFunc(stable, $.functionValue((a: item, b: item): number => {
 		return a.group - b.group
 	}, ({ kind: $.TypeKind.Function, params: ["main.item", "main.item"], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo)))
@@ -117,12 +117,12 @@ export async function main(): globalThis.Promise<void> {
 		return a.group - b.group
 	}, ({ kind: $.TypeKind.Function, params: ["main.item", "main.item"], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))))
 
-	let filtered: $.Slice<number> = (slices.DeleteFunc($.arrayToSlice<number>([1, 2, 3, 4, 5]), $.functionValue((v: number): boolean => {
+	let filtered = (slices.DeleteFunc($.arrayToSlice<number>([1, 2, 3, 4, 5]), $.functionValue((v: number): boolean => {
 		return (v % 2) == 0
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo))) as $.Slice<number>)
 	await $.println("delete func:", $.arrayIndex(filtered!, 0), $.arrayIndex(filtered!, 1), $.arrayIndex(filtered!, 2), $.sliceLen(filtered))
 
-	let sortedKeys: $.Slice<string> = (slices.Sorted(maps.Keys($.makeMap<string, number>([["c", 3], ["a", 1], ["b", 2]]))) as $.Slice<string>)
+	let sortedKeys = (slices.Sorted(maps.Keys($.makeMap<string, number>([["c", 3], ["a", 1], ["b", 2]]))) as $.Slice<string>)
 	await $.println("sorted:", $.arrayIndex(sortedKeys!, 0), $.arrayIndex(sortedKeys!, 1), $.arrayIndex(sortedKeys!, 2))
 
 	let __goscriptRangeReturn2 = false
@@ -160,20 +160,20 @@ export async function main(): globalThis.Promise<void> {
 		return
 	}
 	await $.println("nil values:", valueCount)
-	let sortedValues: $.Slice<string> = (slices.Sorted(slices.Values($.arrayToSlice<string>(["c", "a", "b"]))) as $.Slice<string>)
+	let sortedValues = (slices.Sorted(slices.Values($.arrayToSlice<string>(["c", "a", "b"]))) as $.Slice<string>)
 	await $.println("sorted values:", $.arrayIndex(sortedValues!, 0), $.arrayIndex(sortedValues!, 1), $.arrayIndex(sortedValues!, 2))
 
-	let repeated: $.Slice<number> = (slices.Repeat($.arrayToSlice<number>([7, 8]), 3) as $.Slice<number>)
+	let repeated = (slices.Repeat($.arrayToSlice<number>([7, 8]), 3) as $.Slice<number>)
 	await $.println("repeat:", $.sliceLen(repeated), $.cap(repeated), $.arrayIndex(repeated!, 0), $.arrayIndex(repeated!, 5), slices.Repeat(null, 2) == null, $.sliceLen(slices.Repeat($.arrayToSlice<number>([1]), 0)))
 
-	let sortedFunc: $.Slice<number> = (await slices.SortedFunc(slices.Values($.arrayToSlice<number>([1, 3, 2])), $.functionValue((a: number, b: number): number => {
+	let sortedFunc = (await slices.SortedFunc(slices.Values($.arrayToSlice<number>([1, 3, 2])), $.functionValue((a: number, b: number): number => {
 		return b - a
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))) as $.Slice<number>)
 	await $.println("sorted func:", $.arrayIndex(sortedFunc!, 0), $.arrayIndex(sortedFunc!, 1), $.arrayIndex(sortedFunc!, 2), await slices.SortedFunc(slices.Values($.arrayToSlice<number>([])), $.functionValue((a: number, b: number): number => {
 		return a - b
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))) == null)
 
-	let stableSeq: $.Slice<item> = (await slices.SortedStableFunc(slices.Values($.arrayToSlice<item>([$.markAsStructValue(new item({group: 2, label: "a"})), $.markAsStructValue(new item({group: 1, label: "b"})), $.markAsStructValue(new item({group: 2, label: "c"})), $.markAsStructValue(new item({group: 1, label: "d"}))])), $.functionValue((a: item, b: item): number => {
+	let stableSeq = (await slices.SortedStableFunc(slices.Values($.arrayToSlice<item>([$.markAsStructValue(new item({group: 2, label: "a"})), $.markAsStructValue(new item({group: 1, label: "b"})), $.markAsStructValue(new item({group: 2, label: "c"})), $.markAsStructValue(new item({group: 1, label: "d"}))])), $.functionValue((a: item, b: item): number => {
 		return a.group - b.group
 	}, ({ kind: $.TypeKind.Function, params: ["main.item", "main.item"], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))) as $.Slice<item>)
 	await $.println("sorted stable func:", $.arrayIndex(stableSeq!, 0).label, $.arrayIndex(stableSeq!, 1).label, $.arrayIndex(stableSeq!, 2).label, $.arrayIndex(stableSeq!, 3).label)
@@ -218,30 +218,30 @@ export async function main(): globalThis.Promise<void> {
 			() => [{ name: "n", key: "n", type: /* @__PURE__ */ $.basicType("int") }]
 		)
 	}
-	let copySrc: $.Slice<cell> = $.arrayToSlice<cell>([$.markAsStructValue(new cell({n: 1})), $.markAsStructValue(new cell({n: 2}))])
-	let copyDst: $.Slice<cell> = $.arrayToSlice<cell>([$.markAsStructValue(new cell({n: 0})), $.markAsStructValue(new cell({n: 0}))])
+	let copySrc = $.arrayToSlice<cell>([$.markAsStructValue(new cell({n: 1})), $.markAsStructValue(new cell({n: 2}))])
+	let copyDst = $.arrayToSlice<cell>([$.markAsStructValue(new cell({n: 0})), $.markAsStructValue(new cell({n: 0}))])
 	$.copy(copyDst, copySrc)
 	$.arrayIndex(copyDst!, 0).n = 9
 	await $.println("copy struct:", $.arrayIndex(copySrc!, 0).n, $.arrayIndex(copySrc!, 1).n, $.arrayIndex(copyDst!, 0).n, $.arrayIndex(copyDst!, 1).n)
 
-	let cloneSrc: $.Slice<cell> = $.arrayToSlice<cell>([$.markAsStructValue(new cell({n: 1})), $.markAsStructValue(new cell({n: 2}))])
-	let clonedCells: $.Slice<cell> = (slices.Clone(cloneSrc) as $.Slice<cell>)
+	let cloneSrc = $.arrayToSlice<cell>([$.markAsStructValue(new cell({n: 1})), $.markAsStructValue(new cell({n: 2}))])
+	let clonedCells = (slices.Clone(cloneSrc) as $.Slice<cell>)
 	$.arrayIndex(clonedCells!, 0).n = 8
 	await $.println("clone struct:", $.arrayIndex(cloneSrc!, 0).n, $.arrayIndex(cloneSrc!, 1).n, $.arrayIndex(clonedCells!, 0).n, $.arrayIndex(clonedCells!, 1).n)
 
-	let repeatSrc: $.Slice<cell> = $.arrayToSlice<cell>([$.markAsStructValue(new cell({n: 1})), $.markAsStructValue(new cell({n: 2}))])
-	let repeatedCells: $.Slice<cell> = (slices.Repeat(repeatSrc, 2) as $.Slice<cell>)
+	let repeatSrc = $.arrayToSlice<cell>([$.markAsStructValue(new cell({n: 1})), $.markAsStructValue(new cell({n: 2}))])
+	let repeatedCells = (slices.Repeat(repeatSrc, 2) as $.Slice<cell>)
 	$.arrayIndex(repeatedCells!, 0).n = 7
 	$.arrayIndex(repeatedCells!, 2).n = 6
 	await $.println("repeat struct:", $.arrayIndex(repeatSrc!, 0).n, $.arrayIndex(repeatSrc!, 1).n, $.arrayIndex(repeatedCells!, 0).n, $.arrayIndex(repeatedCells!, 1).n, $.arrayIndex(repeatedCells!, 2).n, $.arrayIndex(repeatedCells!, 3).n)
 
-	let concatSrc: $.Slice<cell> = $.arrayToSlice<cell>([$.markAsStructValue(new cell({n: 1})), $.markAsStructValue(new cell({n: 2}))])
-	let concated: $.Slice<cell> = (slices.Concat(concatSrc, $.arrayToSlice<cell>([$.markAsStructValue(new cell({n: 3}))])) as $.Slice<cell>)
+	let concatSrc = $.arrayToSlice<cell>([$.markAsStructValue(new cell({n: 1})), $.markAsStructValue(new cell({n: 2}))])
+	let concated = (slices.Concat(concatSrc, $.arrayToSlice<cell>([$.markAsStructValue(new cell({n: 3}))])) as $.Slice<cell>)
 	$.arrayIndex(concated!, 0).n = 5
 	$.arrayIndex(concated!, 2).n = 4
 	await $.println("concat struct:", $.arrayIndex(concatSrc!, 0).n, $.arrayIndex(concatSrc!, 1).n, $.arrayIndex(concated!, 0).n, $.arrayIndex(concated!, 1).n, $.arrayIndex(concated!, 2).n)
 
-	let valuesSrc: $.Slice<cell> = $.arrayToSlice<cell>([$.markAsStructValue(new cell({n: 1})), $.markAsStructValue(new cell({n: 2}))])
+	let valuesSrc = $.arrayToSlice<cell>([$.markAsStructValue(new cell({n: 1})), $.markAsStructValue(new cell({n: 2}))])
 	let __goscriptRangeReturn5 = false
 	;await (async () => {
 		await slices.Values(valuesSrc)!(async (v) => {
@@ -254,7 +254,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 	await $.println("values struct:", $.arrayIndex(valuesSrc!, 0).n, $.arrayIndex(valuesSrc!, 1).n)
 
-	let allSrc: $.Slice<cell> = $.arrayToSlice<cell>([$.markAsStructValue(new cell({n: 1})), $.markAsStructValue(new cell({n: 2}))])
+	let allSrc = $.arrayToSlice<cell>([$.markAsStructValue(new cell({n: 1})), $.markAsStructValue(new cell({n: 2}))])
 	let __goscriptRangeReturn6 = false
 	;await (async () => {
 		await slices.All(allSrc)!(async (__goscriptRange6_0, v) => {
@@ -268,24 +268,24 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("all struct:", $.arrayIndex(allSrc!, 0).n, $.arrayIndex(allSrc!, 1).n)
 
 	// append copies struct elements into new backing, including variadic sources.
-	let appendSrc: $.Slice<cell> = $.arrayToSlice<cell>([$.markAsStructValue(new cell({n: 1}))])
-	let appended: $.Slice<cell> = $.appendOne(appendSrc, $.markAsStructValue(new cell({n: 2})))
+	let appendSrc = $.arrayToSlice<cell>([$.markAsStructValue(new cell({n: 1}))])
+	let appended = $.appendOne(appendSrc, $.markAsStructValue(new cell({n: 2})))
 	$.arrayIndex(appended!, 0).n = 9
 	await $.println("append realloc:", $.arrayIndex(appendSrc!, 0).n)
-	let appendSpread: $.Slice<cell> = $.appendSlice<cell>(null, appendSrc)
+	let appendSpread = $.appendSlice<cell>(null, appendSrc)
 	$.arrayIndex(appendSpread!, 0).n = 8
 	await $.println("append slice:", $.arrayIndex(appendSrc!, 0).n)
 
 	// Overlapping append reads a snapshot, so later source elements stay intact.
-	let overlap: $.Slice<number> = $.makeSlice<number>(2, 4, "number")
+	let overlap = $.makeSlice<number>(2, 4, "number")
 	let __goscriptAssign0_0: number = 1
 	let __goscriptAssign0_1: number = 2
 	$.sliceElems(overlap!)[$.sliceSlot(overlap!, 0)] = __goscriptAssign0_0
 	$.sliceElems(overlap!)[$.sliceSlot(overlap!, 1)] = __goscriptAssign0_1
-	let overlapped: $.Slice<number> = $.appendSlice($.goSlice(overlap, undefined, 1), overlap)
+	let overlapped = $.appendSlice($.goSlice(overlap, undefined, 1), overlap)
 	await $.println("append overlap:", $.arrayIndex(overlapped!, 0), $.arrayIndex(overlapped!, 1), $.arrayIndex(overlapped!, 2))
 
-	let backwardSrc: $.Slice<cell> = $.arrayToSlice<cell>([$.markAsStructValue(new cell({n: 1}))])
+	let backwardSrc = $.arrayToSlice<cell>([$.markAsStructValue(new cell({n: 1}))])
 	let __goscriptRangeReturn7 = false
 	;await (async () => {
 		await slices.Backward(backwardSrc)!(async (__goscriptRange7_0, v) => {
@@ -298,28 +298,28 @@ export async function main(): globalThis.Promise<void> {
 	}
 	await $.println("backward struct:", $.arrayIndex(backwardSrc!, 0).n)
 
-	let insertSrc: $.Slice<cell> = $.arrayToSlice<cell>([$.markAsStructValue(new cell({n: 1}))])
-	let insertedCells: $.Slice<cell> = (slices.Insert(insertSrc, 0, $.markAsStructValue(new cell())) as $.Slice<cell>)
+	let insertSrc = $.arrayToSlice<cell>([$.markAsStructValue(new cell({n: 1}))])
+	let insertedCells = (slices.Insert(insertSrc, 0, $.markAsStructValue(new cell())) as $.Slice<cell>)
 	$.arrayIndex(insertedCells!, 1).n = 7
 	await $.println("insert struct:", $.arrayIndex(insertSrc!, 0).n)
 
-	let replaceSrc: $.Slice<cell> = $.arrayToSlice<cell>([$.markAsStructValue(new cell({n: 1}))])
-	let replaced: $.Slice<cell> = (slices.Replace(replaceSrc, 0, 0, $.markAsStructValue(new cell())) as $.Slice<cell>)
+	let replaceSrc = $.arrayToSlice<cell>([$.markAsStructValue(new cell({n: 1}))])
+	let replaced = (slices.Replace(replaceSrc, 0, 0, $.markAsStructValue(new cell())) as $.Slice<cell>)
 	$.arrayIndex(replaced!, 1).n = 8
 	await $.println("replace struct:", $.arrayIndex(replaceSrc!, 0).n)
 
-	let growSrc: $.Slice<cell> = $.arrayToSlice<cell>([$.markAsStructValue(new cell({n: 1}))])
-	let grown: $.Slice<cell> = (slices.Grow(growSrc, 1) as $.Slice<cell>)
+	let growSrc = $.arrayToSlice<cell>([$.markAsStructValue(new cell({n: 1}))])
+	let grown = (slices.Grow(growSrc, 1) as $.Slice<cell>)
 	$.arrayIndex(grown!, 0).n = 9
 	await $.println("grow struct:", $.arrayIndex(growSrc!, 0).n)
 
-	let collectedMap: globalThis.Map<number, cell> | null = $.makeMap<number, cell>([[0, $.markAsStructValue(new cell({n: 1}))]])
-	let collected: $.Slice<cell> = (slices.Collect(maps.Values(collectedMap)) as $.Slice<cell>)
+	let collectedMap = $.makeMap<number, cell>([[0, $.markAsStructValue(new cell({n: 1}))]])
+	let collected = (slices.Collect(maps.Values(collectedMap)) as $.Slice<cell>)
 	$.arrayIndex(collected!, 0).n = 9
 	await $.println("collect struct:", $.mapGet<number, cell, cell>(collectedMap, 0, $.markAsStructValue(new cell()))[0].n)
 
 	// Interface slices can hold a struct after nil or a pointer.
-	let mutateSecond: ((values: $.Slice<any>) => void) | null = $.functionValue((values: $.Slice<any>): void => {
+	let mutateSecond = $.functionValue((values: $.Slice<any>) => {
 		{
 			const __goscriptTypeSwitchValue = $.arrayIndex(values!, 1)
 			switch (true) {
@@ -334,34 +334,34 @@ export async function main(): globalThis.Promise<void> {
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.sliceType({ kind: $.TypeKind.Interface, methods: [] })], results: [] } as $.FunctionTypeInfo))
 	for (let __goscriptRangeTarget0 = $.arrayToSlice<$.Slice<any>>([$.arrayToSlice<any>([null, $.interfaceValue($.markAsStructValue(new cell({n: 1})), "main.cell", "main.cell")]), $.arrayToSlice<any>([$.interfaceValue(new cell(), "*main.cell", /* @__PURE__ */ $.pointerType("main.cell")), $.interfaceValue($.markAsStructValue(new cell({n: 2})), "main.cell", "main.cell")])]), __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
 		let source = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as $.Slice<any>)
-		let __goscriptShadow0: $.Slice<any> = (slices.Clone(source) as $.Slice<any>)
-		void (__goscriptAwait = mutateSecond!(__goscriptShadow0), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
-		let copied: $.Slice<any> = $.makeSlice<any>($.sliceLen(source))
+		let __goscriptShadow0 = (slices.Clone(source) as $.Slice<any>)
+		mutateSecond(__goscriptShadow0)
+		let copied = $.makeSlice<any>($.sliceLen(source))
 		$.copy(copied, source)
-		void (__goscriptAwait = mutateSecond!(copied), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
-		let __goscriptShadow1: $.Slice<any> = $.appendSlice<any>(null, source, $.appendZeros.nil)
-		void (__goscriptAwait = mutateSecond!(__goscriptShadow1), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+		mutateSecond(copied)
+		let __goscriptShadow1 = $.appendSlice<any>(null, source, $.appendZeros.nil)
+		mutateSecond(__goscriptShadow1)
 		await $.println("interface struct:", $.mustTypeAssert<cell>($.arrayIndex(source!, 1), "main.cell").n, $.mustTypeAssert<cell>($.arrayIndex(__goscriptShadow0!, 1), "main.cell").n, $.mustTypeAssert<cell>($.arrayIndex(copied!, 1), "main.cell").n, $.mustTypeAssert<cell>($.arrayIndex(__goscriptShadow1!, 1), "main.cell").n)
 	}
 
-	let appendSeqSource: $.Slice<cell> = $.arrayToSlice<cell>([$.markAsStructValue(new cell({n: 1}))])
-	let appendSeq: ((_yield: ((_p0: cell) => boolean | globalThis.Promise<boolean>) | null) => void) | null = $.functionValue(async (_yield: ((_p0: cell) => boolean | globalThis.Promise<boolean>) | null): globalThis.Promise<void> => {
+	let appendSeqSource = $.arrayToSlice<cell>([$.markAsStructValue(new cell({n: 1}))])
+	let appendSeq = $.functionValue(async (_yield: ((_p0: cell) => boolean | globalThis.Promise<boolean>) | null) => {
 		void (__goscriptAwait = _yield!($.markAsStructValue($.cloneStructValue($.arrayIndex(appendSeqSource!, 0)))), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 	}, ({ kind: $.TypeKind.Function, params: [({ kind: $.TypeKind.Function, params: ["main.cell"], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo)], results: [] } as $.FunctionTypeInfo))
-	let appendSeqResult: $.Slice<cell> = (slices.AppendSeq(null, appendSeq) as $.Slice<cell>)
+	let appendSeqResult = (slices.AppendSeq(null, appendSeq) as $.Slice<cell>)
 	$.arrayIndex(appendSeqResult!, 0).n = 9
 	await $.println("append seq struct:", $.arrayIndex(appendSeqSource!, 0).n, $.arrayIndex(appendSeqResult!, 0).n)
 
-	let sortedFuncSource: $.Slice<cell> = $.arrayToSlice<cell>([$.markAsStructValue(new cell({n: 2})), $.markAsStructValue(new cell({n: 1}))])
-	let sortedFuncResult: $.Slice<cell> = (await slices.SortedFunc(slices.Values(sortedFuncSource), $.functionValue((a: cell, b: cell): number => {
+	let sortedFuncSource = $.arrayToSlice<cell>([$.markAsStructValue(new cell({n: 2})), $.markAsStructValue(new cell({n: 1}))])
+	let sortedFuncResult = (await slices.SortedFunc(slices.Values(sortedFuncSource), $.functionValue((a: cell, b: cell): number => {
 		return a.n - b.n
 	}, ({ kind: $.TypeKind.Function, params: ["main.cell", "main.cell"], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))) as $.Slice<cell>)
 	$.arrayIndex(sortedFuncResult!, 0).n = 9
 	await $.println("sorted func struct:", $.arrayIndex(sortedFuncSource!, 0).n, $.arrayIndex(sortedFuncSource!, 1).n, $.arrayIndex(sortedFuncResult!, 0).n, $.arrayIndex(sortedFuncResult!, 1).n)
 
 	// Byte slice results hold bytes and feed byte operations.
-	let src: $.Slice<number> = new Uint8Array([97, 98, 99])
-	let byteClone: $.Slice<number> = (slices.Clone(src) as $.Slice<number>)
+	let src = new Uint8Array([97, 98, 99])
+	let byteClone = (slices.Clone(src) as $.Slice<number>)
 	$.sliceElems(byteClone!)[$.sliceSlot(byteClone!, 0)] = 120
 	$.sliceElems(byteClone!)[$.sliceSlot(byteClone!, 1)] = $.uint($.sliceElems(byteClone!)[$.sliceSlot(byteClone!, 1)] + (255), 8)
 	await $.println("byte clone:", $.bytesToString(byteClone), $.bytesToString(src), $.arrayIndex(byteClone!, 1))

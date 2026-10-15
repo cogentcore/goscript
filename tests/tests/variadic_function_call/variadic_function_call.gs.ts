@@ -29,10 +29,10 @@ export async function testFS(fsys: string, expected: $.Slice<string>): globalThi
 
 	for (let __goscriptRangeTarget0 = expected, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), i = 0; i < __goscriptRangeWindow0.length; i++) {
 		let exp = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + i] as string)
-		await $.println($.concatString(($.concatString(($.concatString("Expected[", $.runeToString($.int(i + 48, 32)))), "]: ")), exp))
+		await $.println("Expected[" + $.runeToString($.int(i + 48, 32)) + "]: " + exp)
 	}
 
-	await $.println($.concatString("File system: ", fsys))
+	await $.println("File system: " + fsys)
 	return null
 }
 
@@ -44,7 +44,7 @@ export function join(txts: $.Slice<Text>): number {
 	let n = 0
 	for (let __goscriptRangeTarget1 = txts, __goscriptRangeWindow1 = $.sliceRange(__goscriptRangeTarget1), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow1.length; __rangeIndex++) {
 		let t = ((__goscriptRangeWindow1.backing[__goscriptRangeWindow1.offset + __rangeIndex] as Text) as Text)
-		n = n + ($.sliceLen((t as Text)))
+		n += $.sliceLen((t as Text))
 	}
 	return n
 }
@@ -68,13 +68,13 @@ export async function countHandlers(name: string, handlers: $.Slice<Handler | nu
 }
 
 export async function main(): globalThis.Promise<void> {
-	let expected: $.Slice<string> = $.arrayToSlice<string>(["file1.txt", "file2.txt", "file3.txt"])
+	let expected = $.arrayToSlice<string>(["file1.txt", "file2.txt", "file3.txt"])
 
 	// This is the problematic line - should generate spread syntax in TypeScript
 	let err = await TestFS("myfs", expected)
 
 	if (err != null) {
-		await $.println($.concatString("Error: ", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)))
+		await $.println("Error: " + (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	} else {
 		await $.println("Success!")
 	}
@@ -84,7 +84,7 @@ export async function main(): globalThis.Promise<void> {
 	Stack_Push(st, __goscriptStatic0(), $.arrayToSlice<Text>([($.arrayToSlice<string>(["a", "b"]) as Text), ($.arrayToSlice<string>(["c"]) as Text)]))
 	await $.println("join:", join((st.value as $.Slice<Text>)))
 
-	let names: Names = ($.arrayToSlice<string>(["x", "y", "z"]) as Names)
+	let names = ($.arrayToSlice<string>(["x", "y", "z"]) as Names)
 	await $.println("count:", count((names as $.Slice<string>)))
 
 	// A conversion to a multi-result function type is one variadic argument.

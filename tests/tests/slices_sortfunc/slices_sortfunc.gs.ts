@@ -57,7 +57,7 @@ export class Person {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let people: $.Slice<Person> = $.arrayToSlice<Person>([new Person({Name: "Charlie", Age: 30}, true), new Person({Name: "Alice", Age: 25}, true), new Person({Name: "Bob", Age: 35}, true)])
+	let people = $.arrayToSlice<Person>([new Person({Name: "Charlie", Age: 30}, true), new Person({Name: "Alice", Age: 25}, true), new Person({Name: "Bob", Age: 35}, true)])
 
 	slices.SortFunc(people, $.functionValue((a: Person, b: Person): number => {
 		if (a.Age < b.Age) {

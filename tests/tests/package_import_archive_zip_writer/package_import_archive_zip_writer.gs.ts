@@ -14,7 +14,7 @@ import "@goscript/io/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	let buf: $.VarRef<bytes.Buffer> = $.varRef($.markAsStructValue(new bytes.Buffer()))
-	let zw: zip.Writer | $.VarRef<zip.Writer> | null = zip.NewWriter($.interfaceValue<io.Writer | null>(buf, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer")))
+	let zw = zip.NewWriter($.interfaceValue<io.Writer | null>(buf, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer")))
 	let [w, err] = await (zw !== null && (zw as any).__isVarRef !== true && (zw as any).__goValue === undefined ? ((zw as any) as zip.Writer).Create("hello.txt") : zip.Writer.prototype.Create.call(zw, "hello.txt"))
 	await $.println("create", err == null)
 	let __goscriptTuple0: any = await (w !== null && (w as any).__isVarRef !== true && (w as any).__goValue === undefined ? (w as Exclude<io.Writer, null>) : $.pointerValue<Exclude<io.Writer, null>>(w)).Write(new Uint8Array([104, 101, 108, 108, 111]))

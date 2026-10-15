@@ -119,7 +119,7 @@ export async function main(): globalThis.Promise<void> {
 	let valueCopy1 = (original.value).clone()
 	let valueCopy2 = (original.value).clone()
 	// pointerCopy holds the memory address of 'original'.
-	let pointerCopy: MyStruct | $.VarRef<MyStruct> | null = original
+	let pointerCopy = original
 	let pointerCopy$: MyStruct = pointerCopy == null ? $.pointerTarget<MyStruct>(pointerCopy) : (pointerCopy as any).__isVarRef === true ? (pointerCopy as any).value : (pointerCopy as any).__goValue === undefined ? (pointerCopy as any) : $.pointerTarget<MyStruct>(pointerCopy)
 
 	// Modifications to value copies do not affect the original or other copies.
@@ -130,17 +130,17 @@ export async function main(): globalThis.Promise<void> {
 
 	await $.println("Value Copy Test:")
 	// valueCopy1 was modified independently.
-	await $.println($.concatString("  valueCopy1.MyString: ", valueCopy1.MyString))
+	await $.println("  valueCopy1.MyString: " + valueCopy1.MyString)
 	// original was modified after copies, showing its current state.
-	await $.println($.concatString("  original.MyString: ", original.value.MyString))
+	await $.println("  original.MyString: " + original.value.MyString)
 	// valueCopy2 was modified independently.
-	await $.println($.concatString("  valueCopy2.MyString: ", valueCopy2.MyString))
+	await $.println("  valueCopy2.MyString: " + valueCopy2.MyString)
 
 	// === Pointer Behavior ===
 	// Demonstrate how modifications via a pointer affect the original struct.
 	await $.println("\nPointer Behavior Test:")
 	// Show the state of 'original' before modification via the pointer.
-	await $.println($.concatString("  Before pointer modification - original.MyString: ", original.value.MyString));
+	await $.println("  Before pointer modification - original.MyString: " + original.value.MyString);
 
 	// Modify the struct 'original' *through* the pointerCopy.
 	;(pointerCopy$ as MyStruct).MyString = "modified through pointer";
@@ -167,8 +167,8 @@ export async function main(): globalThis.Promise<void> {
 	// Show that modifications to nestedCopy did not affect nestedOriginal.
 	await $.println("  nestedCopy.Value: ", nestedCopy.Value)
 	await $.println("  nestedOriginal.Value: ", nestedOriginal.Value)
-	await $.println($.concatString("  nestedCopy.InnerStruct.MyString: ", nestedCopy.InnerStruct.MyString))
-	await $.println($.concatString("  nestedOriginal.InnerStruct.MyString: ", nestedOriginal.InnerStruct.MyString))
+	await $.println("  nestedCopy.InnerStruct.MyString: " + nestedCopy.InnerStruct.MyString)
+	await $.println("  nestedOriginal.InnerStruct.MyString: " + nestedOriginal.InnerStruct.MyString)
 
 	await $.println("----------------------------------------------------------")
 }

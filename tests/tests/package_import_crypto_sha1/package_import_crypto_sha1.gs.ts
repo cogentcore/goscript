@@ -25,13 +25,13 @@ export async function main(): globalThis.Promise<void> {
 	n = __goscriptTuple0[0]
 	err = __goscriptTuple0[1]
 	await $.println("write bc", n, err == null)
-	let stream: $.Slice<number> = await (h !== null && (h as any).__isVarRef !== true && (h as any).__goValue === undefined ? (h as Exclude<hash.Hash, null>) : $.pointerValue<Exclude<hash.Hash, null>>(h)).Sum(new Uint8Array([1, 2]) as $.Slice<number>)
+	let stream = await (h !== null && (h as any).__isVarRef !== true && (h as any).__goValue === undefined ? (h as Exclude<hash.Hash, null>) : $.pointerValue<Exclude<hash.Hash, null>>(h)).Sum(new Uint8Array([1, 2]) as $.Slice<number>)
 	await $.println("stream len", $.sliceLen(stream))
 	await $.println("stream prefix", $.arrayIndex(stream!, 0), $.arrayIndex(stream!, 1))
 	await $.println("stream digest", $.arrayIndex(stream!, 2), $.arrayIndex(stream!, 21))
 
-	let backing: $.Slice<number> = $.makeSlice<number>(sha1.Size, undefined, "byte")
-	let backed: $.Slice<number> = await (h !== null && (h as any).__isVarRef !== true && (h as any).__goValue === undefined ? (h as Exclude<hash.Hash, null>) : $.pointerValue<Exclude<hash.Hash, null>>(h)).Sum($.goSlice(backing, undefined, 0))
+	let backing = $.makeSlice<number>(sha1.Size, undefined, "byte")
+	let backed = await (h !== null && (h as any).__isVarRef !== true && (h as any).__goValue === undefined ? (h as Exclude<hash.Hash, null>) : $.pointerValue<Exclude<hash.Hash, null>>(h)).Sum($.goSlice(backing, undefined, 0))
 	await $.println("backed len", $.sliceLen(backed), $.sliceLen(backing))
 	await $.println("backed digest", $.arrayIndex(backing!, 0), $.arrayIndex(backing!, 19), $.arrayIndex(backed!, 0), $.arrayIndex(backed!, 19))
 }

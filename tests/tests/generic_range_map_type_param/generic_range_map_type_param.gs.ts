@@ -30,21 +30,21 @@ export function Sum(__typeArgs: $.GenericTypeArgs | undefined, s: any): any {
 	let t: any = $.genericZero(__typeArgs, "E", null)
 	for (let __goscriptRangeTarget0 = s, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
 		let v = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as any)
-		t = t + (v)
+		t += v
 	}
 	return t
 }
 
 export async function main(): globalThis.Promise<void> {
-	let m: globalThis.Map<string, $.Slice<number>> | null = $.makeMap<string, $.Slice<number>>([["a", $.arrayToSlice<number>([1])], ["b", $.arrayToSlice<number>([2, 3])], ["c", null]])
-	let ks: $.Slice<string> = (Keys(__goscriptStatic0(), m) as $.Slice<string>)
+	let m = $.makeMap<string, $.Slice<number>>([["a", $.arrayToSlice<number>([1])], ["b", $.arrayToSlice<number>([2, 3])], ["c", null]])
+	let ks = (Keys(__goscriptStatic0(), m) as $.Slice<string>)
 	slices.Sort(ks)
 	await $.println($.sliceLen(ks), $.arrayIndex(ks!, 0), $.arrayIndex(ks!, 1), $.arrayIndex(ks!, 2))
-	let n: Named = $.makeMap<string, number>([["x", 1], ["y", 2]])
-	let vs: $.Slice<number> = (Values(__goscriptStatic1(), n) as $.Slice<number>)
+	let n = $.makeMap<string, number>([["x", 1], ["y", 2]])
+	let vs = (Values(__goscriptStatic1(), n) as $.Slice<number>)
 	slices.Sort(vs)
 	await $.println($.sliceLen(vs), $.arrayIndex(vs!, 0), $.arrayIndex(vs!, 1))
-	let nk: $.Slice<string> = (Keys(__goscriptStatic1(), n) as $.Slice<string>)
+	let nk = (Keys(__goscriptStatic1(), n) as $.Slice<string>)
 	slices.Sort(nk)
 	await $.println($.arrayIndex(nk!, 0), $.arrayIndex(nk!, 1))
 	await $.println(Sum(__goscriptStatic2(), $.arrayToSlice<number>([1, 2, 3])))

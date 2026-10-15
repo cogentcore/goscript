@@ -55,7 +55,7 @@ export async function main(): globalThis.Promise<void> {
 	let [, badDurationErr] = time.ParseDuration("not-a-duration")
 	await $.println("bad duration err", badDurationErr != null)
 
-	let timer: time.Timer | $.VarRef<time.Timer> | null = time.AfterFunc(9223372036854775807n, $.functionValue((): void => {
+	let timer = time.AfterFunc(9223372036854775807n, $.functionValue(() => {
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)))
 	await $.println("max duration timer stopped", time.Timer.prototype.Stop.call($.pointerValue<time.Timer>(timer)))
 	let maxDuration = 9223372036854775807n
@@ -116,7 +116,7 @@ export async function marshal(): globalThis.Promise<void> {
 export async function timers(): globalThis.Promise<void> {
 	let p: $.VarRef<atomic.Pointer<time.Timer>> = $.varRef($.markAsStructValue(new atomic.Pointer<time.Timer>()))
 	p.value.Store(time.NewTimer(3600000000000n))
-	let t: time.Timer | $.VarRef<time.Timer> | null = (p.value.Load() as time.Timer | $.VarRef<time.Timer> | null)
+	let t = (p.value.Load() as time.Timer | $.VarRef<time.Timer> | null)
 	await $.println("timer stop", time.Timer.prototype.Stop.call($.pointerValue<time.Timer>(t)), time.Timer.prototype.Stop.call($.pointerValue<time.Timer>(t)))
 	await $.println("timer reset", time.Timer.prototype.Reset.call($.pointerValue<time.Timer>(t), 3600000000000n), time.Timer.prototype.Reset.call($.pointerValue<time.Timer>(t), 3600000000000n))
 	time.Timer.prototype.Stop.call($.pointerValue<time.Timer>(t))

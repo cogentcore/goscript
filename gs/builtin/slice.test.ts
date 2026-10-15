@@ -11,7 +11,6 @@ import {
   byteSliceHint,
   bytesFromHex,
   bytesToString,
-  concatString,
   copy,
   copyByteRanges,
   goSlice,
@@ -246,11 +245,11 @@ describe('append spare capacity', () => {
     const source = [cell(1)]
 
     const appended = append(source, cell(2))
-    ;arrayIndex(appended, 0).n = 9
+    arrayIndex(appended, 0).n = 9
     expect(source[0].n).toBe(1)
 
     const spread = appendSlice(null, source)
-    ;arrayIndex(spread, 0).n = 8
+    arrayIndex(spread, 0).n = 8
     expect(source[0].n).toBe(1)
   })
 
@@ -335,8 +334,7 @@ describe('builtin string byte representation', () => {
     const euro = goString('€')
     const head = sliceString(euro, 0, 1)
     expect(stringLen(head)).toBe(1)
-    expect(concatString(head, sliceString(euro, 1))).toBe(euro)
-    expect(concatString(head, 'x')).toBe(head + 'x')
+    expect(head + sliceString(euro, 1)).toBe(euro)
   })
 
   it('represents Go strings by their UTF-8 bytes', () => {

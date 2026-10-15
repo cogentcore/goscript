@@ -103,7 +103,7 @@ export async function main(): globalThis.Promise<void> {
 	let k = new holder({values: $.makeMap<string, number>([["a", 1], ["b", 2]])}, true)
 	let sum = 0
 	for (const [__goscriptRangeShadow0, v] of k.values?.entries() ?? []) {
-		sum = sum + ($.stringLen(__goscriptRangeShadow0) + v)
+		sum += $.stringLen(__goscriptRangeShadow0) + v
 	}
 	await $.println(sum)
 	let items = new holder({items: $.arrayToSlice<item>([new item({value: 3}, true), new item({value: 7}, true)])}, true)

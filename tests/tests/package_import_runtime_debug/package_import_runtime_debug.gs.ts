@@ -7,7 +7,7 @@ import * as debug from "@goscript/runtime/debug/index.js"
 import "@goscript/runtime/debug/index.js"
 
 export async function main(): globalThis.Promise<void> {
-	let stack: $.Slice<number> = debug.Stack()
+	let stack = debug.Stack()
 	await $.println("Stack nonempty:", $.sliceLen(stack) > 0)
 }
 

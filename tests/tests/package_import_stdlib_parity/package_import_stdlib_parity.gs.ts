@@ -91,7 +91,7 @@ export class xof {
 export async function main(): globalThis.Promise<void> {
 	let compact: $.VarRef<bytes.Buffer> = $.varRef($.markAsStructValue(new bytes.Buffer()))
 	json.Compact(compact, new Uint8Array([123, 32, 34, 120, 34, 32, 58, 32, 49, 32, 125]))
-	let raw: json.RawMessage = ((compact.value.Bytes() as json.RawMessage) as json.RawMessage)
+	let raw = ((compact.value.Bytes() as json.RawMessage) as json.RawMessage)
 	let __goscriptTuple0: any = jsontext.Value_MarshalJSON(raw)
 	let rawBytes: $.Slice<number> = __goscriptTuple0[0]
 	let [num, ] = json.Number_Int64(globalThis.String("42"))

@@ -7,12 +7,12 @@ export async function main(): globalThis.Promise<void> {
 	// --- Original Tests ---
 	await $.println("--- Original Tests ---")
 	// Create a slice of integers with length 5 and capacity 10
-	let s: $.Slice<number> = $.makeSlice<number>(5, 10, "number")
+	let s = $.makeSlice<number>(5, 10, "number")
 	await $.println($.sliceLen(s))
 	await $.println($.cap(s))
 
 	// Create a slice of strings with length 3
-	let s2: $.Slice<string> = $.makeSlice<string>(3, undefined, "string")
+	let s2 = $.makeSlice<string>(3, undefined, "string")
 	await $.println($.sliceLen(s2))
 	await $.println($.cap(s2))
 
@@ -30,7 +30,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// Create slice from array literal
 	let arrLit = $.arrayValue([1, 2, 3, 4, 5])
-	let sliceFromLit: $.Slice<number> = $.goSlice(arrLit, undefined, undefined)
+	let sliceFromLit = $.goSlice(arrLit, undefined, undefined)
 	await $.println($.sliceLen(sliceFromLit))
 	await $.println($.cap(sliceFromLit))
 	await $.println($.arrayIndex(sliceFromLit!, 0))
@@ -38,14 +38,14 @@ export async function main(): globalThis.Promise<void> {
 
 	// Create slice from array variable
 	let arrVar = $.arrayValue(["a", "b", "c", "d"])
-	let sliceFromVar: $.Slice<string> = $.goSlice(arrVar, undefined, undefined)
+	let sliceFromVar = $.goSlice(arrVar, undefined, undefined)
 	await $.println($.sliceLen(sliceFromVar))
 	await $.println($.cap(sliceFromVar))
 	await $.println($.arrayIndex(sliceFromVar!, 0))
 	await $.println($.arrayIndex(sliceFromVar!, 3))
 
 	// Create slice with specific indices
-	let sliceIndices: $.Slice<string> = $.goSlice(arrVar, 1, 3)
+	let sliceIndices = $.goSlice(arrVar, 1, 3)
 	await $.println($.sliceLen(sliceIndices))
 	await $.println($.cap(sliceIndices))
 	await $.println($.arrayIndex(sliceIndices!, 0))
@@ -68,7 +68,7 @@ export async function main(): globalThis.Promise<void> {
 	// Modify slice, check original array
 	await $.println("--- Modify slice, check array ---")
 	let modArr = $.arrayValue([10, 20, 30])
-	let modSlice: $.Slice<number> = $.goSlice(modArr, undefined, undefined)
+	let modSlice = $.goSlice(modArr, undefined, undefined)
 	$.sliceElems(modSlice!)[$.sliceSlot(modSlice!, 1)] = 25
 	await $.println($.arrayIndex(modArr, 1))
 	await $.println($.arrayIndex(modSlice!, 1))
@@ -82,10 +82,10 @@ export async function main(): globalThis.Promise<void> {
 	// Append to sub-slice within capacity
 	await $.println("--- Append sub-slice w/in capacity ---")
 	let appendArr = $.arrayValue([1, 2, 3, 4, 5])
-	let appendSlice1: $.Slice<number> = $.goSlice(appendArr, 0, 2)
+	let appendSlice1 = $.goSlice(appendArr, 0, 2)
 	await $.println($.sliceLen(appendSlice1))
 	await $.println($.cap(appendSlice1))
-	let appendSlice2: $.Slice<number> = $.appendOne(appendSlice1, 99)
+	let appendSlice2 = $.appendOne(appendSlice1, 99)
 	await $.println($.sliceLen(appendSlice2))
 	await $.println($.cap(appendSlice2))
 	await $.println($.arrayIndex(appendSlice2!, 2))
@@ -93,10 +93,10 @@ export async function main(): globalThis.Promise<void> {
 
 	// Append to sub-slice exceeding capacity
 	await $.println("--- Append sub-slice exceed capacity ---")
-	let appendSlice3: $.Slice<number> = $.goSlice(appendArr, 3, 5)
+	let appendSlice3 = $.goSlice(appendArr, 3, 5)
 	await $.println($.sliceLen(appendSlice3))
 	await $.println($.cap(appendSlice3))
-	let appendSlice4: $.Slice<number> = $.appendOne(appendSlice3, 101)
+	let appendSlice4 = $.appendOne(appendSlice3, 101)
 	await $.println($.sliceLen(appendSlice4))
 	await $.println($.cap(appendSlice4))
 	await $.println($.arrayIndex(appendSlice4!, 0))
@@ -111,12 +111,12 @@ export async function main(): globalThis.Promise<void> {
 
 	// Slicing a slice
 	await $.println("--- Slicing a slice ---")
-	let baseSlice: $.Slice<number> = $.arrayToSlice<number>([0, 10, 20, 30, 40, 50])
-	let subSlice1: $.Slice<number> = $.goSlice(baseSlice, 1, 4)
+	let baseSlice = $.arrayToSlice<number>([0, 10, 20, 30, 40, 50])
+	let subSlice1 = $.goSlice(baseSlice, 1, 4)
 	await $.println($.sliceLen(subSlice1))
 	await $.println($.cap(subSlice1))
 	await $.println($.arrayIndex(subSlice1!, 0))
-	let subSlice2: $.Slice<number> = $.goSlice(subSlice1, 1, 3)
+	let subSlice2 = $.goSlice(subSlice1, 1, 3)
 	await $.println($.sliceLen(subSlice2))
 	await $.println($.cap(subSlice2))
 	await $.println($.arrayIndex(subSlice2!, 0))
@@ -150,7 +150,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("--- Additional Tests ---")
 
 	// Slice literal
-	let sliceLiteral: $.Slice<number> = $.arrayToSlice<number>([10, 20, 30])
+	let sliceLiteral = $.arrayToSlice<number>([10, 20, 30])
 	await $.println("Slice literal len:", $.sliceLen(sliceLiteral))
 	await $.println("Slice literal cap:", $.cap(sliceLiteral))
 	await $.println("Slice literal[1]:", $.arrayIndex(sliceLiteral!, 1))
@@ -163,7 +163,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("Append to nil slice len:", $.sliceLen(nilSlice))
 	await $.println("Append to nil slice cap:", $.cap(nilSlice))
 	await $.println("Append to nil slice[0]:", $.arrayIndex(nilSlice!, 0))
-	let spreadSource: $.Slice<number> = $.arrayToSlice<number>([7, 8])
+	let spreadSource = $.arrayToSlice<number>([7, 8])
 	nilSlice = $.appendSlice(nilSlice, spreadSource)
 	await $.println("Append spread slice len:", $.sliceLen(nilSlice))
 	await $.println("Append spread slice[1]:", $.arrayIndex(nilSlice!, 1))
@@ -214,7 +214,7 @@ export async function main(): globalThis.Promise<void> {
 	// Let's test appending within capacity first.
 
 	// Create a slice of slices where inner slice has capacity for append
-	let sliceOfSlicesWithCap: $.Slice<$.Slice<number>> = $.arrayToSlice<$.Slice<number>>([$.arrayToSlice<number>([1, 2, 3]), $.makeSlice<number>(2, 5, "number"), $.arrayToSlice<number>([6, 7, 8, 9])])
+	let sliceOfSlicesWithCap = $.arrayToSlice<$.Slice<number>>([$.arrayToSlice<number>([1, 2, 3]), $.makeSlice<number>(2, 5, "number"), $.arrayToSlice<number>([6, 7, 8, 9])])
 	$.sliceElems($.arrayIndex(sliceOfSlicesWithCap!, 1)!)[$.sliceSlot($.arrayIndex(sliceOfSlicesWithCap!, 1)!, 0)] = 40
 	$.sliceElems($.arrayIndex(sliceOfSlicesWithCap!, 1)!)[$.sliceSlot($.arrayIndex(sliceOfSlicesWithCap!, 1)!, 1)] = 50
 
@@ -249,7 +249,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// Slicing a slice of slices
 	await $.println("--- Slicing a slice of slices ---")
-	let subSliceOfSlices: $.Slice<$.Slice<number>> = $.goSlice(sliceOfSlices, 1, 3)
+	let subSliceOfSlices = $.goSlice(sliceOfSlices, 1, 3)
 	await $.println("Length of subSliceOfSlices:", $.sliceLen(subSliceOfSlices))
 	await $.println("Capacity of subSliceOfSlices:", $.cap(subSliceOfSlices))
 	await $.println("subSliceOfSlices[0][0]:", $.arrayIndex($.arrayIndex(subSliceOfSlices!, 0)!, 0))
@@ -269,7 +269,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// Append an existing slice to the slice of slices
 	await $.println("--- Append an existing slice to slice of slices ---")
-	let existingSlice: $.Slice<number> = $.arrayToSlice<number>([200, 210])
+	let existingSlice = $.arrayToSlice<number>([200, 210])
 	sliceOfSlices = $.appendOne(sliceOfSlices, existingSlice, $.appendZeros.nil)
 	await $.println("Length of sliceOfSlices after appending existing:", $.sliceLen(sliceOfSlices))
 	await $.println("Capacity of sliceOfSlices after appending existing:", $.cap(sliceOfSlices))

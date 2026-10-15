@@ -20,13 +20,13 @@ export async function main(): globalThis.Promise<void> {
 	let mu: $.VarRef<sync.Mutex> = $.varRef($.markAsStructValue(new sync.Mutex()))
 	let completed = 0
 
-	let q: conc.ConcurrentQueue | $.VarRef<conc.ConcurrentQueue> | null = await conc.NewConcurrentQueue(16, null)
+	let q = await conc.NewConcurrentQueue(16, null)
 
-	let leaf: (() => void) | null = $.functionValue(async (): globalThis.Promise<void> => {
+	let leaf = $.functionValue(async () => {
 		// Await-free CPU span: a tight loop with no I/O or channel op.
 		let sum = 0
 		for (let i = 0; i < 200000; i++) {
-			sum = sum + (i * 3)
+			sum += i * 3
 		}
 		sum
 		await mu.value.Lock()
@@ -34,7 +34,7 @@ export async function main(): globalThis.Promise<void> {
 		mu.value.Unlock()
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo))
 
-	let child: (() => void) | null = $.functionValue(async (): globalThis.Promise<void> => {
+	let child = $.functionValue(async () => {
 		let jobs: $.Slice<(() => void) | null> = $.makeSlice<(() => void) | null>(0, 8)
 		for (let __rangeIndex = 0; __rangeIndex < 8; __rangeIndex++) {
 			jobs = $.appendOne(jobs, leaf, $.appendZeros.nil)
@@ -42,7 +42,7 @@ export async function main(): globalThis.Promise<void> {
 		await (q !== null && (q as any).__isVarRef !== true && (q as any).__goValue === undefined ? ((q as any) as conc.ConcurrentQueue).Enqueue(jobs) : conc.ConcurrentQueue.prototype.Enqueue.call(q, jobs))
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo))
 
-	let root: (() => void) | null = $.functionValue(async (): globalThis.Promise<void> => {
+	let root = $.functionValue(async () => {
 		let jobs: $.Slice<(() => void) | null> = $.makeSlice<(() => void) | null>(0, 16)
 		for (let __rangeIndex = 0; __rangeIndex < 16; __rangeIndex++) {
 			jobs = $.appendOne(jobs, child, $.appendZeros.nil)

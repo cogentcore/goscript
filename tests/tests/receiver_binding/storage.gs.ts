@@ -82,7 +82,7 @@ export class storage {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let s: storage | $.VarRef<storage> | null = new storage({bytes: $.makeSlice<number>(5, undefined, "byte"), name: "test"})
+	let s = new storage({bytes: $.makeSlice<number>(5, undefined, "byte"), name: "test"})
 
 	await $.println("Name:", (s !== null && (s as any).__isVarRef !== true && (s as any).__goValue === undefined ? ((s as any) as storage).Name() : storage.prototype.Name.call(s)))
 	await $.println("Length:", (s !== null && (s as any).__isVarRef !== true && (s as any).__goValue === undefined ? ((s as any) as storage).Len() : storage.prototype.Len.call(s)))

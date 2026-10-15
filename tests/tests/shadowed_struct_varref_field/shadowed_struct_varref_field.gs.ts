@@ -122,7 +122,7 @@ export async function lookupLocal(addr: string): globalThis.Promise<$.Slice<stri
 	using __defer = new $.DisposableStack()
 	let local: $.VarRef<table> = $.varRef(new table(undefined, true))
 	local.value.byAddr = $.makeMap<string, $.Slice<string>>([[addr, $.arrayToSlice<string>(["local"])]])
-	let ptr: table | $.VarRef<table> | null = local
+	let ptr = local
 	await $.pointerValue<table>(ptr).Mutex.Lock()
 	const __goscriptDeferCallee2 = $.functionValue(((__receiver) => () => __receiver.Unlock())($.pointerValue<table>(ptr).Mutex), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "sync.(*Mutex).Unlock-fm")
 	__defer.defer(() => { __goscriptDeferCallee2() })

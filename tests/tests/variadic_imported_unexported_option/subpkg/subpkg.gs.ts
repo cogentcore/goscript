@@ -58,19 +58,19 @@ export class Thing {
 }
 
 export function WithValue(v: number): option | null {
-	return $.functionValue((t: Thing | $.VarRef<Thing> | null): void => {
+	return $.functionValue((t: Thing | $.VarRef<Thing> | null) => {
 		$.pointerValue<Thing>(t).Value = v
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.pointerType("subpkg.Thing")], results: [] } as $.FunctionTypeInfo))
 }
 
 export function WithLabel(l: string): option | null {
-	return $.functionValue((t: Thing | $.VarRef<Thing> | null): void => {
+	return $.functionValue((t: Thing | $.VarRef<Thing> | null) => {
 		$.pointerValue<Thing>(t).Label = l
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.pointerType("subpkg.Thing")], results: [] } as $.FunctionTypeInfo))
 }
 
 export async function New(opts: $.Slice<option | null>): globalThis.Promise<Thing | $.VarRef<Thing> | null> {
-	let t: Thing | $.VarRef<Thing> | null = new Thing()
+	let t = new Thing()
 	for (let __goscriptRangeTarget0 = opts, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
 		let opt = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as option | null)
 		void (__goscriptAwait = opt!(t), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)

@@ -43,12 +43,12 @@ export class buffer {
 }
 
 export function newBuffer(data: $.Slice<number>): buffer | $.VarRef<buffer> | null {
-	let buf: buffer | $.VarRef<buffer> | null = new buffer({buf: data})
+	let buf = new buffer({buf: data})
 	return buf
 }
 
 export async function main(): globalThis.Promise<void> {
-	let buf: buffer | $.VarRef<buffer> | null = newBuffer(new Uint8Array([7]) as $.Slice<number>)
+	let buf = newBuffer(new Uint8Array([7]) as $.Slice<number>)
 	await $.println($.arrayIndex($.pointerValue<buffer>(buf).buf!, 0))
 }
 

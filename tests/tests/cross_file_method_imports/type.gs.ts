@@ -44,8 +44,8 @@ export class label {
 
 	public Format(): string {
 		const l = this;
-		let state: __goscript_helper.helperState | $.VarRef<__goscript_helper.helperState> | null = __goscript_helper.newHelperState()
-		return $.concatString(strings.ToUpper(l.value), $.pointerValue<__goscript_helper.helperState>(state).text)
+		let state = __goscript_helper.newHelperState()
+		return strings.ToUpper(l.value) + $.pointerValue<__goscript_helper.helperState>(state).text
 	}
 
 	static __typeInfo = $.registerStructType(

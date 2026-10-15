@@ -205,15 +205,15 @@ export async function loadGenericStore(store: GenericStore | null): globalThis.P
 
 export async function main(): globalThis.Promise<void> {
 	// Create a buffered channel
-	let ch: $.Channel<number> | null = $.makeChannel<number>(1, 0, "both")
+	let ch = $.makeChannel<number>(1, 0, "both")
 
 	// Test with ChannelProcessor (naturally async)
-	let channelProc: ChannelProcessor | $.VarRef<ChannelProcessor> | null = new ChannelProcessor({ch: ch})
+	let channelProc = new ChannelProcessor({ch: ch})
 	let result1 = await processViaInterface($.interfaceValue<AsyncProcessor | null>(channelProc, "*main.ChannelProcessor", /* @__PURE__ */ $.pointerType("main.ChannelProcessor")), 5)
 	await $.println("ChannelProcessor result:", result1)
 
 	// Test with SimpleProcessor (forced async for compatibility)
-	let simpleProc: SimpleProcessor | $.VarRef<SimpleProcessor> | null = new SimpleProcessor({value: 100})
+	let simpleProc = new SimpleProcessor({value: 100})
 	let result2 = await processViaInterface($.interfaceValue<AsyncProcessor | null>(simpleProc, "*main.SimpleProcessor", /* @__PURE__ */ $.pointerType("main.SimpleProcessor")), 5)
 	await $.println("SimpleProcessor result:", result2)
 

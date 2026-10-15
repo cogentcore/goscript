@@ -239,7 +239,7 @@ export function named(): Pos {
 export function namedDefer(): Pos {
 	let p: Pos = new Pos(undefined, true)
 	using __defer = new $.DisposableStack()
-	__defer.defer(() => { ((): void => {
+	__defer.defer(() => { (() => {
 		p.Char = 9
 	})() })
 	p.Line = 4
@@ -263,7 +263,7 @@ export function identity(__typeArgs: $.GenericTypeArgs | undefined, v: any): any
 }
 
 export async function main(): globalThis.Promise<void> {
-	let r: Rule | $.VarRef<Rule> | null = new Rule({Name: "r", pos: new Pos({Line: 1, Char: 2}, true)})
+	let r = new Rule({Name: "r", pos: new Pos({Line: 1, Char: 2}, true)})
 	let r$: Rule = r == null ? $.pointerTarget<Rule>(r) : (r as any).__isVarRef === true ? (r as any).value : (r as any).__goValue === undefined ? (r as any) : $.pointerTarget<Rule>(r)
 	let p = (r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? ((r as any) as Rule).Pos() : Rule.prototype.Pos.call(r))
 	p.Line = 10
@@ -303,7 +303,7 @@ export async function main(): globalThis.Promise<void> {
 	$.arrayIndex(arr, 0).Line = 11
 	await $.println((r$ as Rule).pos.Line, $.arrayIndex(arr, 0).Line)
 
-	let m: globalThis.Map<key, number> | null = $.makeMap<key, number>([])
+	let m = $.makeMap<key, number>([])
 	let k = new key({a: 1, b: 2}, true)
 	$.mapSet(m, (k).clone(), 1)
 	k.a = 5
@@ -314,7 +314,7 @@ export async function main(): globalThis.Promise<void> {
 	$.deleteMapEntry(m, (k).clone())
 	await $.println($.len(m))
 
-	let m2: globalThis.Map<Pos, Region> | null = $.makeMap<Pos, Region>([])
+	let m2 = $.makeMap<Pos, Region>([])
 	$.mapSet(m2, (r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? ((r as any) as Rule).Pos() : Rule.prototype.Pos.call(r)), makeRegion(1))
 	let q = (r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? ((r as any) as Rule).Pos() : Rule.prototype.Pos.call(r))
 	let got = ($.mapGet<Pos, Region, Region>(m2, q, new Region(undefined, true))[0]).clone()

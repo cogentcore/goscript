@@ -155,7 +155,7 @@ export class Sides {
 				case $.typeAssert<string>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.basicType("string")).ok:
 					{
 						let val: string = $.typeAssert<string>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.basicType("string")).value
-						return $.concatString("string ", val)
+						return "string " + val
 					}
 					break
 				default:
