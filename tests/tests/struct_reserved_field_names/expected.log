@@ -1,0 +1,5 @@
+8 c n 8
+{8 c n} {__proto__:8 constructor:c Name:n}
+main.odd 8 c
+true
+{"name":"n"} true
