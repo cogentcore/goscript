@@ -1,6 +1,22 @@
 import { describe, expect, it } from 'vitest'
 
-import { uint, uint64, uint64Add, uint64Shr } from './builtin.js'
+import {
+  int64And,
+  int64AndNot,
+  int64Or,
+  int64Shl,
+  int64Shr,
+  int64Xor,
+  uint,
+  uint64,
+  uint64Add,
+  uint64And,
+  uint64AndNot,
+  uint64Or,
+  uint64Shl,
+  uint64Shr,
+  uint64Xor,
+} from './builtin.js'
 import type { StringHeaderData } from './slice.js'
 
 // Go represents uint/uintptr as a TypeScript number until full-width values no
@@ -79,5 +95,48 @@ describe('uint conversion widths', () => {
   it('preserves string-header identity', () => {
     const header: StringHeaderData = { kind: 'string', value: 'abc' }
     expect(uint(header, 32)).toBe(header)
+  })
+})
+
+describe('64-bit bitwise operations', () => {
+  const big = 2n ** 64n
+  const values = [0n, 1n, -1n, 5n, -0x8000000000000000n, 0x7fffffffffffffffn]
+
+  it('match the operations of the 64-bit values of their operands', () => {
+    // Out-of-range bigints and numbers act as their 64 bits.
+    for (const a of values) {
+      for (const b of values) {
+        expect(int64And(a + big, b - big)).toBe(BigInt.asIntN(64, a & b))
+        expect(int64Or(a, b)).toBe(BigInt.asIntN(64, a | b))
+        expect(int64Xor(a, b + big)).toBe(BigInt.asIntN(64, a ^ b))
+        expect(int64AndNot(a, b)).toBe(BigInt.asIntN(64, a & ~b))
+        expect(uint64And(a, b)).toBe(BigInt.asUintN(64, a & b))
+        expect(uint64Or(a - big, b)).toBe(BigInt.asUintN(64, a | b))
+        expect(uint64Xor(a, b)).toBe(BigInt.asUintN(64, a ^ b))
+        expect(uint64AndNot(a, b)).toBe(BigInt.asUintN(64, a & ~b))
+      }
+    }
+    expect(int64And(6, 3n)).toBe(2n)
+    expect(uint64Or(4, 1)).toBe(5n)
+  })
+
+  it('shift by every count', () => {
+    // Counts past 63 shift every bit out.
+    for (let count = 0; count < 70; count++) {
+      expect(int64Shl(1n, count)).toBe(BigInt.asIntN(64, 1n << BigInt(count)))
+      expect(uint64Shl(3n, count)).toBe(BigInt.asUintN(64, 3n << BigInt(count)))
+      expect(int64Shr(-0x8000000000000000n, count)).toBe(
+        -0x8000000000000000n >> BigInt(count),
+      )
+    }
+    expect(int64Shl(1n, 2n)).toBe(4n)
+    expect(int64Shl(1n, 2.0)).toBe(4n)
+  })
+
+  it('convert 32-bit bigints to numbers', () => {
+    expect(uint(5n, 32)).toBe(5)
+    expect(uint(0xffffffffn, 32)).toBe(0xffffffff)
+    expect(uint(-1n, 32)).toBe(0xffffffff)
+    expect(uint(0x100000001n, 32)).toBe(1)
   })
 })
