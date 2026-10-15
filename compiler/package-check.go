@@ -29,11 +29,13 @@ import (
 // come from its stored summary. Checking the graph again replaces every
 // package's types and reuses the parsed syntax.
 //
-// The identity load already ran go list, so the check reads sources directly
-// instead of loading the graph a second time. Each package parses as soon as
-// its goroutine starts, one goroutine per file, and type-checks once its imports
-// are complete. At most GOMAXPROCS files parse or packages check at once.
+// The identity load already listed every package and its files, so the check
+// reads sources directly instead of loading the graph a second time. Each
+// package parses as soon as its goroutine starts, one goroutine per file, and
+// type-checks once its imports are complete. At most GOMAXPROCS files parse or
+// packages check at once.
 func (o *PackageGraphOwner) Check(ctx context.Context, graph *PackageGraph, bodiless map[string]bool) []Diagnostic {
+	// Reuse the graph's checker, so a second check shares the parsed syntax.
 	pkgs := graph.reachablePackages()
 	if graph.checker == nil {
 		graph.checker = &packageChecker{
@@ -44,6 +46,8 @@ func (o *PackageGraphOwner) Check(ctx context.Context, graph *PackageGraph, bodi
 		}
 	}
 	checker := graph.checker
+
+	// Check each package in its own goroutine once its imports are done.
 	done := make(map[*packages.Package]chan struct{}, len(pkgs))
 	for _, pkg := range pkgs {
 		done[pkg] = make(chan struct{})
@@ -80,6 +84,7 @@ func (o *PackageGraphOwner) Check(ctx context.Context, graph *PackageGraph, bodi
 // reachablePackages returns every package the graph nodes import, directly or
 // transitively, in package path order.
 func (g *PackageGraph) reachablePackages() []*packages.Package {
+	// Visit each package once from every node.
 	seen := make(map[*packages.Package]bool)
 	var pkgs []*packages.Package
 	var visit func(pkg *packages.Package)
@@ -96,6 +101,8 @@ func (g *PackageGraph) reachablePackages() []*packages.Package {
 	for _, node := range g.Nodes {
 		visit(g.packagesByPath[node.PkgPath])
 	}
+
+	// Sort for a stable check order.
 	slices.SortFunc(pkgs, func(a, b *packages.Package) int {
 		return strings.Compare(a.ID, b.ID)
 	})
@@ -114,6 +121,7 @@ type packageChecker struct {
 	parsed map[string]*parsedFile
 }
 
+// parsedFile holds one file's syntax once ready is closed.
 type parsedFile struct {
 	ready chan struct{}
 	file  *ast.File
@@ -124,6 +132,7 @@ type parsedFile struct {
 // imports, with function bodies when bodies is set. Errors land in pkg.Errors
 // as go/packages reports them.
 func (c *packageChecker) check(ctx context.Context, pkg *packages.Package, bodies bool, waitImports func()) {
+	// Reset the package's results. unsafe has no source to check.
 	pkg.Errors, pkg.TypeErrors = nil, nil
 	pkg.Fset = c.fset
 	pkg.TypesSizes = c.sizes
@@ -144,6 +153,7 @@ func (c *packageChecker) check(ctx context.Context, pkg *packages.Package, bodie
 	}
 	pkg.Types = types.NewPackage(pkg.PkgPath, pkg.Name)
 
+	// Parse every file at once, keeping the files that parse.
 	files := make([]*ast.File, len(pkg.CompiledGoFiles))
 	errs := make([]error, len(pkg.CompiledGoFiles))
 	var wg sync.WaitGroup
@@ -160,11 +170,15 @@ func (c *packageChecker) check(ctx context.Context, pkg *packages.Package, bodie
 			pkg.Syntax = append(pkg.Syntax, file)
 		}
 	}
+
+	// Type-check once the imports are complete.
 	waitImports()
 	if ctx.Err() != nil {
 		return
 	}
 
+	// Check against the module's Go version, reporting a version that is too
+	// new when it is the only error.
 	conf := &types.Config{
 		Importer: packageImporter(pkg),
 		Error:    func(err error) { appendPackageError(pkg, err) },
@@ -187,6 +201,7 @@ func (c *packageChecker) check(ctx context.Context, pkg *packages.Package, bodie
 
 // parse returns the syntax of one file, parsing it on first use.
 func (c *packageChecker) parse(ctx context.Context, name string) (*ast.File, error) {
+	// Wait for a parse another package started, or claim the file.
 	c.mu.Lock()
 	parsed := c.parsed[name]
 	if parsed != nil {
@@ -198,6 +213,7 @@ func (c *packageChecker) parse(ctx context.Context, name string) (*ast.File, err
 	c.parsed[name] = parsed
 	c.mu.Unlock()
 
+	// Read and parse the file within the work bound.
 	defer close(parsed.ready)
 	c.work <- struct{}{}
 	defer func() { <-c.work }()
@@ -216,9 +232,12 @@ func (c *packageChecker) parse(ctx context.Context, name string) (*ast.File, err
 // packageImporter resolves pkg's imports to their checked packages.
 func packageImporter(pkg *packages.Package) types.ImporterFrom {
 	return packageImporterFunc(func(path string) (*types.Package, error) {
+		// unsafe has no package of its own in the graph.
 		if path == "unsafe" {
 			return types.Unsafe, nil
 		}
+
+		// Accept only an import whose check completed.
 		imp := pkg.Imports[path]
 		if imp == nil {
 			return nil, errors.New("no metadata for " + path)
@@ -230,12 +249,15 @@ func packageImporter(pkg *packages.Package) types.ImporterFrom {
 	})
 }
 
+// packageImporterFunc adapts a function to types.ImporterFrom.
 type packageImporterFunc func(path string) (*types.Package, error)
 
+// Import returns the package for path.
 func (f packageImporterFunc) Import(path string) (*types.Package, error) {
 	return f(path)
 }
 
+// ImportFrom returns the package for path, ignoring the importing directory.
 func (f packageImporterFunc) ImportFrom(path, _ string, _ types.ImportMode) (*types.Package, error) {
 	return f(path)
 }

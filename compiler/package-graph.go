@@ -4,6 +4,7 @@ import (
 	"context"
 	"go/ast"
 	"os"
+	"runtime"
 	"slices"
 	"strconv"
 	"strings"
@@ -87,6 +88,7 @@ func goScriptLoaderEnv() []string {
 // LoadIdentity builds the package identity graph: names, files and imports,
 // without syntax or types. Check completes it.
 func (o *PackageGraphOwner) LoadIdentity(ctx context.Context, req *CompileRequest) (*PackageGraph, []Diagnostic) {
+	// Stop before loading for a canceled request.
 	if err := ctx.Err(); err != nil {
 		return nil, []Diagnostic{{
 			Severity: DiagnosticSeverityError,
@@ -95,6 +97,7 @@ func (o *PackageGraphOwner) LoadIdentity(ctx context.Context, req *CompileReques
 		}}
 	}
 
+	// List the packages the request names and their imports.
 	cfg := &packages.Config{
 		Context:    ctx,
 		Dir:        req.Dir,
@@ -103,7 +106,14 @@ func (o *PackageGraphOwner) LoadIdentity(ctx context.Context, req *CompileReques
 		Tests:      req.Tests,
 		Mode:       packageGraphLoadMode,
 	}
-	pkgs, err := packages.Load(cfg, req.Patterns...)
+
+	// A host without a go command, such as a JavaScript runtime, loads the
+	// vendored module directly.
+	load := packages.Load
+	if runtime.GOOS == "js" {
+		load = loadVendorPackages
+	}
+	pkgs, err := load(cfg, req.Patterns...)
 	if err != nil {
 		return nil, []Diagnostic{{
 			Severity: DiagnosticSeverityError,
@@ -119,18 +129,20 @@ func (o *PackageGraphOwner) LoadIdentity(ctx context.Context, req *CompileReques
 			Message:  "package patterns did not match any packages",
 		}}
 	}
+
+	// Read the override facts the graph nodes apply.
 	overrideFacts, overrideDiagnostics := o.overrideOwner.Facts(ctx)
 	if diagnosticsHaveErrors(overrideDiagnostics) {
 		return nil, overrideDiagnostics
 	}
 
+	// Record the packages the patterns matched.
 	graph := &PackageGraph{
 		RequestedPatterns:     slices.Clone(req.Patterns),
 		NodesByPackagePath:    make(map[string]*PackageGraphNode),
 		packagesByPath:        make(map[string]*packages.Package),
 		RequestedPackagePaths: make([]string, 0, len(pkgs)),
 	}
-
 	requested := make(map[string]bool)
 	for _, pkg := range pkgs {
 		if isTestMainPackage(pkg) {
@@ -141,6 +153,8 @@ func (o *PackageGraphOwner) LoadIdentity(ctx context.Context, req *CompileReques
 		graph.RequestedPackagePaths = append(graph.RequestedPackagePaths, path)
 	}
 	slices.Sort(graph.RequestedPackagePaths)
+
+	// With tests, a package's same-package test variant replaces it.
 	samePackageTestVariants := make(map[string]bool)
 	if req.Tests {
 		for _, pkg := range pkgs {
@@ -151,6 +165,7 @@ func (o *PackageGraphOwner) LoadIdentity(ctx context.Context, req *CompileReques
 		}
 	}
 
+	// Collect the nodes in a stable order.
 	seen := make(map[string]bool)
 	for _, pkg := range pkgs {
 		if isTestMainPackage(pkg) {
@@ -207,6 +222,9 @@ func (o *PackageGraphOwner) collect(
 	overrideFacts *OverrideFacts,
 	seen map[string]bool,
 ) {
+	// Skip packages already collected and the variants a test variant
+	// replaces. A test variant of an unrequested package collects its
+	// production package instead.
 	if pkg == nil || seen[pkg.ID] {
 		return
 	}
@@ -226,18 +244,18 @@ func (o *PackageGraphOwner) collect(
 	if graph.NodesByPackagePath[path] != nil {
 		return
 	}
+
+	// Add the package's node.
 	seen[pkg.ID] = true
-
 	normalizePackageFileOrder(pkg)
-
 	node := newPackageGraphNode(pkg, requested[path], overrideFacts)
 	graph.Nodes = append(graph.Nodes, node)
 	graph.NodesByPackagePath[path] = node
 	graph.packagesByPath[path] = pkg
-
 	if mode != DependencyModeAll {
 		return
 	}
+
 	// An override ships hand-written TypeScript, so only the packages whose
 	// types it exposes join the graph.
 	var imports []string
@@ -256,12 +274,14 @@ func (o *PackageGraphOwner) collect(
 }
 
 func newPackageGraphNode(pkg *packages.Package, requested bool, overrideFacts *OverrideFacts) *PackageGraphNode {
+	// Sort the import paths.
 	imports := make([]string, 0, len(pkg.Imports))
 	for importPath := range pkg.Imports {
 		imports = append(imports, importPath)
 	}
 	slices.Sort(imports)
 
+	// Read the module, which the standard library lacks.
 	var modulePath string
 	var moduleDir string
 	if pkg.Module != nil {
@@ -285,6 +305,7 @@ func newPackageGraphNode(pkg *packages.Package, requested bool, overrideFacts *O
 }
 
 func packageBlocklistDiagnostics(graph *PackageGraph, blocklist []string) []Diagnostic {
+	// Report the first chain that reaches a blocked package.
 	chain := packageBlocklistChain(graph, blocklist)
 	if len(chain) == 0 {
 		return nil
@@ -299,13 +320,15 @@ func packageBlocklistDiagnostics(graph *PackageGraph, blocklist []string) []Diag
 }
 
 func packageBlocklistChain(graph *PackageGraph, blocklist []string) []string {
+	// A graph without requested packages has no chain.
 	if graph == nil || len(graph.RequestedPackagePaths) == 0 {
 		return nil
 	}
 
+	// Queue the requested packages in order, so the breadth-first walk finds
+	// a shortest chain.
 	roots := slices.Clone(graph.RequestedPackagePaths)
 	slices.Sort(roots)
-
 	type queueEntry struct {
 		path  string
 		chain []string
@@ -323,17 +346,18 @@ func packageBlocklistChain(graph *PackageGraph, blocklist []string) []string {
 		})
 	}
 
+	// Walk the imports until a package is blocked.
 	for len(queue) != 0 {
 		entry := queue[0]
 		queue = queue[1:]
 		if packagePathBlocklisted(entry.path, blocklist) {
 			return entry.chain
 		}
-
 		node := graph.NodesByPackagePath[entry.path]
 		if node == nil {
 			continue
 		}
+
 		// Override candidates are compiled from their GoScript override, whose
 		// TypeScript imports replace the native Go imports. collect prunes their
 		// native dependencies from the graph, so the blocklist walk must treat
@@ -343,6 +367,8 @@ func packageBlocklistChain(graph *PackageGraph, blocklist []string) []string {
 		if node.OverrideCandidate {
 			continue
 		}
+
+		// Queue each import not yet seen.
 		imports := slices.Clone(node.Imports)
 		slices.Sort(imports)
 		for _, importPath := range imports {
@@ -377,6 +403,7 @@ func packagePathBlocklisted(path string, blocklist []string) bool {
 }
 
 func normalizePackageFileOrder(pkg *packages.Package) {
+	// Sort the files, keeping parsed syntax beside its file name.
 	if pkg == nil {
 		return
 	}
