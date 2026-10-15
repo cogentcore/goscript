@@ -14544,18 +14544,19 @@ func (o *LoweringOwner) lowerInterfaceValueExpr(
 	sourceType types.Type,
 	value string,
 ) string {
-	// The helper names the target type when it is narrower than any.
-	helper := o.runtimeOwner.QualifiedHelper(RuntimeHelperInterfaceValue)
-	if target := o.tsTypeFor(ctx, targetType); target != "any" {
-		helper += "<" + target + ">"
-	}
-
 	// Type parameters in scope, such as E in []E, resolve from the runtime
 	// type arguments, so that reflection sees the instantiated type rather
-	// than an empty interface.
+	// than an empty interface, and the value's dynamic type is named by it.
+	helper := o.runtimeOwner.QualifiedHelper(RuntimeHelperInterfaceValue)
 	typeInfo := o.runtimeTypeInfoExpr(sourceType)
 	if typeContainsTypeParam(sourceType) {
+		helper = o.runtimeOwner.QualifiedHelper(RuntimeHelperGenericInterfaceValue)
 		typeInfo = o.runtimeTypeAssertInfoExpr(ctx, sourceType)
+	}
+
+	// The helper names the target type when it is narrower than any.
+	if target := o.tsTypeFor(ctx, targetType); target != "any" {
+		helper += "<" + target + ">"
 	}
 	return helper + "(" + value + ", " +
 		strconv.Quote(goRuntimeTypeString(sourceType)) + ", " +
