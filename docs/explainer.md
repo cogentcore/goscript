@@ -136,8 +136,8 @@ does not model 64-bit overflow.
 
 ## Structs and Value Copies
 
-A struct becomes a class. Field values live in `_fields`, and
-`$.bindStructFields` defines an accessor for each field on the prototype.
+A struct becomes a class whose fields are own properties of each instance, so
+a struct value is one object and a field is read and written directly.
 
 ```go
 type Point struct {
@@ -149,26 +149,23 @@ type Point struct {
 ```ts
 export class Point {
 	public declare X: number
+
 	public declare Y: number
 
-	public _fields: {
-		X: number
-		Y: number
-	}
-
-	constructor(init?: Partial<{X?: number, Y?: number}>) {
-		this._fields = {
-			X: init?.X ?? (0 as number),
-			Y: init?.Y ?? (0 as number)
-		}
+	constructor(init?: Partial<{X?: number, Y?: number}>, __goscriptValue?: boolean) {
+		this.X = init?.X ?? (0 as number)
+		this.Y = init?.Y ?? (0 as number)
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Point {
-		return $.markAsStructValue(new Point(this))
+		return new Point(this, true)
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["X", "Y"])
+	public __goscriptAssign(source: Point): Point {
+		this.X = source.X
+		this.Y = source.Y
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(/* name, constructor, methods, fields */)

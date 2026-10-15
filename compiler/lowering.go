@@ -11608,7 +11608,7 @@ func (o *LoweringOwner) lowerFieldSelectionExpr(
 	if len(index) == 0 {
 		fieldName := tsStructFieldName(expr.Sel.Name, 0)
 		if address {
-			return o.lowerFieldAddressExpr(ctx, receiver, ctx.semPkg.source.TypesInfo.TypeOf(expr.X), fieldName), diagnostics
+			return o.lowerFieldAddressExpr(receiver, fieldName), diagnostics
 		}
 		return receiver + "." + fieldName, diagnostics
 	}
@@ -11619,7 +11619,7 @@ func (o *LoweringOwner) lowerFieldSelectionExpr(
 		if structType == nil || fieldIndex < 0 || fieldIndex >= structType.NumFields() {
 			fieldName := tsStructFieldName(expr.Sel.Name, 0)
 			if address {
-				return o.runtimeOwner.QualifiedHelper(RuntimeHelperFieldRef) + "(" + receiver + "._fields, " + strconv.Quote(fieldName) + ")", diagnostics
+				return o.runtimeOwner.QualifiedHelper(RuntimeHelperFieldRef) + "(" + receiver + ", " + strconv.Quote(fieldName) + ")", diagnostics
 			}
 			return receiver + "." + fieldName, diagnostics
 		}
@@ -11627,7 +11627,7 @@ func (o *LoweringOwner) lowerFieldSelectionExpr(
 		name := tsStructFieldName(field.Name(), fieldIndex)
 		if idx == len(index)-1 {
 			if address {
-				return o.lowerFieldAddressExpr(ctx, receiver, typ, name), diagnostics
+				return o.lowerFieldAddressExpr(receiver, name), diagnostics
 			}
 			return receiver + "." + name, diagnostics
 		}
@@ -11642,15 +11642,14 @@ func (o *LoweringOwner) lowerFieldSelectionExpr(
 	}
 
 	if address {
-		return o.lowerFieldAddressExpr(ctx, receiver, typ, tsStructFieldName(expr.Sel.Name, 0)), diagnostics
+		return o.lowerFieldAddressExpr(receiver, tsStructFieldName(expr.Sel.Name, 0)), diagnostics
 	}
 	return receiver + "." + tsStructFieldName(expr.Sel.Name, 0), diagnostics
 }
 
-func (o *LoweringOwner) lowerFieldAddressExpr(ctx lowerFileContext, receiver string, typ types.Type, fieldName string) string {
-	if namedStructType(derefPointerType(typ)) != nil {
-		receiver += "._fields"
-	}
+// lowerFieldAddressExpr returns the reference to the field of the struct
+// that receiver evaluates to, whose fields are its own properties.
+func (o *LoweringOwner) lowerFieldAddressExpr(receiver string, fieldName string) string {
 	return o.runtimeOwner.QualifiedHelper(RuntimeHelperFieldRef) + "(" + receiver + ", " + strconv.Quote(fieldName) + ")"
 }
 
@@ -11704,7 +11703,7 @@ func (o *LoweringOwner) lowerUnsafeStructFieldSelectionExpr(
 	receiver, diagnostics := o.lowerFieldReceiverExpr(ctx, unsafeCall.Args[0])
 	fieldName := tsStructFieldName(sourceField.Name(), index[0])
 	if address {
-		return o.lowerFieldAddressExpr(ctx, receiver, sourcePointer.Elem(), fieldName), diagnostics, true
+		return o.lowerFieldAddressExpr(receiver, fieldName), diagnostics, true
 	}
 	return receiver + "." + fieldName, diagnostics, true
 }
@@ -12103,7 +12102,7 @@ func (o *LoweringOwner) lowerAddressExpr(ctx lowerFileContext, expr ast.Expr) (s
 			return o.lowerFieldSelectionExpr(ctx, typed, selection, true)
 		}
 		receiver, diagnostics := o.lowerFieldReceiverExpr(ctx, typed.X)
-		return o.runtimeOwner.QualifiedHelper(RuntimeHelperFieldRef) + "(" + receiver + "._fields, " + strconv.Quote(typed.Sel.Name) + ")", diagnostics
+		return o.runtimeOwner.QualifiedHelper(RuntimeHelperFieldRef) + "(" + receiver + ", " + strconv.Quote(typed.Sel.Name) + ")", diagnostics
 	case *ast.IndexExpr:
 		return o.lowerIndexAddressExpr(ctx, typed)
 	case *ast.StarExpr:
@@ -15086,8 +15085,15 @@ func (o *LoweringOwner) runtimeTypeAssertSignatureTypes(ctx lowerFileContext, tu
 }
 
 func tsStructFieldName(name string, idx int) string {
+	// A blank field gets a name of its own.
 	if name == "_" {
 		return "_blank" + strconv.Itoa(idx)
+	}
+
+	// A field is an own property of its struct object, and an own property
+	// named __proto__ would set the object's prototype instead.
+	if name == "__proto__" {
+		return "_" + name
 	}
 	return safeIdentifier(name)
 }
