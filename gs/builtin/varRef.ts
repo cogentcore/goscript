@@ -119,25 +119,6 @@ export function varRef<T>(v: T): VarRef<T> {
   return new VariableRef(v)
 }
 
-/** bindStructFields installs properties over a struct's mutable field record. */
-export function bindStructFields(
-  prototype: object,
-  names: readonly string[],
-): void {
-  for (const name of names) {
-    Object.defineProperty(prototype, name, {
-      get(this: { _fields: Record<string, unknown> }) {
-        return this._fields[name]
-      },
-      set(this: { _fields: Record<string, unknown> }, value: unknown) {
-        this._fields[name] = value
-      },
-      configurable: true,
-      enumerable: false,
-    })
-  }
-}
-
 /** fieldRef returns the stable reference to a mutable object field. */
 export function fieldRef<T extends object, K extends keyof T>(
   target: T,

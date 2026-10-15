@@ -542,13 +542,6 @@ func structZeroValueDeps(structType *loweredStruct, names map[string]bool) []str
 	return deps
 }
 
-// structFieldHasAccessors reports whether a struct field of the given name
-// can have accessors in its class body, which a field named constructor can
-// not, so such a field is bound to its _fields entry at run time instead.
-func structFieldHasAccessors(name string) bool {
-	return name != "constructor"
-}
-
 // renderStructAssign emits the __goscriptAssign method, which copies the
 // fields of another value of the struct type into this one by literal keys.
 // assignStruct uses it instead of copying the fields by their type info,
@@ -558,33 +551,29 @@ func renderStructAssign(b *strings.Builder, structType *loweredStruct, runtimeOw
 	b.WriteString("\n\tpublic __goscriptAssign(source: ")
 	b.WriteString(structType.name)
 	b.WriteString("): void {\n")
-	if len(structType.fields) != 0 {
-		b.WriteString("\t\tconst target = this._fields\n")
-		b.WriteString("\t\tconst values = source._fields\n")
-	}
 	for _, field := range structType.fields {
 		b.WriteString("\t\t")
 		switch {
 		case field.plainValue:
-			b.WriteString("target.")
+			b.WriteString("this.")
 			b.WriteString(field.name)
-			b.WriteString(" = values.")
+			b.WriteString(" = source.")
 			b.WriteString(field.name)
 		case field.structValue:
 			b.WriteString(runtimeOwner.QualifiedHelper(RuntimeHelperAssignStruct))
-			b.WriteString("(target.")
+			b.WriteString("(this.")
 			b.WriteString(field.name)
-			b.WriteString(", values.")
+			b.WriteString(", source.")
 			b.WriteString(field.name)
 			b.WriteString(")")
 		default:
-			b.WriteString("target.")
+			b.WriteString("this.")
 			b.WriteString(field.name)
 			b.WriteString(" = ")
 			b.WriteString(runtimeOwner.QualifiedHelper(RuntimeHelperAssignFieldValue))
-			b.WriteString("(target.")
+			b.WriteString("(this.")
 			b.WriteString(field.name)
-			b.WriteString(", values.")
+			b.WriteString(", source.")
 			b.WriteString(field.name)
 			b.WriteString(", ")
 			b.WriteString(field.runtimeType)
@@ -610,46 +599,16 @@ func renderStruct(b *strings.Builder, structType *loweredStruct, runtimeOwner *R
 	b.WriteString(structType.name)
 	b.WriteString(" {\n")
 
-	// Each field gets its own accessors, which read and write its _fields
-	// entry by a literal key, so that the JavaScript engine can optimize each
-	// one, unlike shared accessors that look up the key dynamically.
-	var boundFields []string
+	// Each field is an own property of the instance, as in a plain object,
+	// so that a struct value is one object and its fields are read directly.
 	for _, field := range structType.fields {
 		writeLineComment(b, "\t", field.doc)
-		if !structFieldHasAccessors(field.name) {
-			boundFields = append(boundFields, field.name)
-			b.WriteString("\tpublic declare ")
-			b.WriteString(field.name)
-			b.WriteString(": ")
-			b.WriteString(field.typ)
-			b.WriteString("\n\n")
-			continue
-		}
-		b.WriteString("\tpublic get ")
-		b.WriteString(field.name)
-		b.WriteString("(): ")
-		b.WriteString(field.typ)
-		b.WriteString(" {\n\t\treturn this._fields.")
-		b.WriteString(field.name)
-		b.WriteString("\n\t}\n\n\tpublic set ")
-		b.WriteString(field.name)
-		b.WriteString("(value: ")
-		b.WriteString(field.typ)
-		b.WriteString(") {\n\t\tthis._fields.")
-		b.WriteString(field.name)
-		b.WriteString(" = value\n\t}\n\n")
-	}
-
-	// The fields are stored in one object, which the accessors read and write.
-	b.WriteString("\tpublic _fields: {\n")
-	for _, field := range structType.fields {
-		b.WriteString("\t\t")
+		b.WriteString("\tpublic declare ")
 		b.WriteString(field.name)
 		b.WriteString(": ")
 		b.WriteString(field.typ)
-		b.WriteString("\n")
+		b.WriteString("\n\n")
 	}
-	b.WriteString("\t}\n\n")
 
 	// The constructor copies each initial value in by its kind.
 	b.WriteString("\tconstructor(init?: Partial<{")
@@ -661,11 +620,11 @@ func renderStruct(b *strings.Builder, structType *loweredStruct, runtimeOwner *R
 		b.WriteString("?: ")
 		b.WriteString(field.typ)
 	}
-	b.WriteString("}>, __goscriptValue?: boolean) {\n\t\tthis._fields = {\n")
-	for idx, field := range structType.fields {
-		b.WriteString("\t\t\t")
+	b.WriteString("}>, __goscriptValue?: boolean) {\n")
+	for _, field := range structType.fields {
+		b.WriteString("\t\tthis.")
 		b.WriteString(field.name)
-		b.WriteString(": ")
+		b.WriteString(" = ")
 		if field.directClone {
 			b.WriteString("init?.")
 			b.WriteString(field.name)
@@ -727,9 +686,6 @@ func renderStruct(b *strings.Builder, structType *loweredStruct, runtimeOwner *R
 			b.WriteString(field.typ)
 			b.WriteString(")")
 		}
-		if idx != len(structType.fields)-1 {
-			b.WriteString(",")
-		}
 		b.WriteString("\n")
 	}
 
@@ -737,7 +693,7 @@ func renderStruct(b *strings.Builder, structType *loweredStruct, runtimeOwner *R
 	// that each class stores it at one site. Every instance has the
 	// property, false for a pointer's struct, so that all instances of a
 	// class have one shape and marking one later changes no shape.
-	b.WriteString("\t\t}\n\t\t;(this as any)[")
+	b.WriteString("\t\t;(this as any)[")
 	b.WriteString(structValueMarker)
 	b.WriteString("] = __goscriptValue === true\n\t}\n\n")
 
@@ -757,27 +713,11 @@ func renderStruct(b *strings.Builder, structType *loweredStruct, runtimeOwner *R
 		renderMethod(b, &method)
 	}
 
-	// A static block binds the fields and sets up the prototype.
-	if len(boundFields) != 0 || structType.prototypeSetup != "" {
-		b.WriteString("\n\tstatic {\n")
-		if len(boundFields) != 0 {
-			b.WriteString("\t\t")
-			b.WriteString(runtimeOwner.QualifiedHelper(RuntimeHelperBindStructFields))
-			b.WriteString("(this.prototype, [")
-			for idx, name := range boundFields {
-				if idx != 0 {
-					b.WriteString(", ")
-				}
-				b.WriteString(strconv.Quote(name))
-			}
-			b.WriteString("])\n")
-		}
-		if structType.prototypeSetup != "" {
-			b.WriteString("\t\t")
-			b.WriteString(structType.prototypeSetup)
-			b.WriteString("\n")
-		}
-		b.WriteString("\t}\n")
+	// A static block sets up the prototype.
+	if structType.prototypeSetup != "" {
+		b.WriteString("\n\tstatic {\n\t\t")
+		b.WriteString(structType.prototypeSetup)
+		b.WriteString("\n\t}\n")
 	}
 
 	// The type info registers the struct with the runtime.
