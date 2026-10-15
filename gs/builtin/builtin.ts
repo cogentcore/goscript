@@ -4,6 +4,7 @@ import {
   arrayValueTypeInfo,
   cloneArrayValue,
   isArrayValue,
+  isMarkedAsStructValue,
   isTypeInfoComparable,
   pointerIdentityEqual,
   resolveTypeInfo,
@@ -402,24 +403,32 @@ export function structEqual(
   b: unknown,
   typeInfo?: TypeInfo | string,
 ): boolean {
+  // The same object is equal to itself.
   if (a === b) {
     return true
   }
-  if (!isStructObject(a) || !isStructObject(b)) {
+
+  // The operands may be a named and an unnamed struct of the same underlying
+  // type, held in different representations, so each is read by its fields.
+  const aFields = structFields(a)
+  const bFields = structFields(b)
+  if (aFields === undefined || bFields === undefined) {
     return comparableEqual(a, b)
   }
-  const info = structValueTypeInfo(a) ?? typeInfo
+
+  // The fields are compared in the order of the struct type of either side.
+  const info = structValueTypeInfo(a) ?? structValueTypeInfo(b) ?? typeInfo
   const resolved = resolveTypeInfo(info)
   if (resolved?.kind !== TypeKind.Struct) {
-    return fieldsEqual(a, b)
+    return fieldsEqual(aFields, bFields)
   }
   for (const field of resolved.fields) {
     const key = structFieldRuntimeKey(field)
     const fieldType = resolveTypeInfo(field.type)
     const equal =
       fieldType?.kind === TypeKind.Struct ?
-        structEqual(a[key], b[key], fieldType)
-      : comparableEqual(a[key], b[key])
+        structEqual(aFields[key], bFields[key], fieldType)
+      : comparableEqual(aFields[key], bFields[key])
     if (!equal) {
       return false
     }
@@ -475,6 +484,28 @@ function hasGoMethodSurface(value: unknown): boolean {
       typeof (value as Record<string, unknown>)[key] === 'function'
     )
   })
+}
+
+// structFields returns the object that holds the fields of a struct value:
+// a generated struct object or an unnamed struct value, whose fields are
+// both its own properties. It returns undefined for any other value.
+function structFields(value: unknown): Record<string, unknown> | undefined {
+  // A generated struct object holds its fields.
+  if (isStructObject(value)) {
+    return value
+  }
+
+  // An unnamed struct value is a plain object that is marked as a value or
+  // carries its struct type.
+  if (
+    typeof value === 'object' &&
+    value !== null &&
+    !isArrayOrGoSlice(value) &&
+    (isMarkedAsStructValue(value) || structValueTypeInfo(value) !== undefined)
+  ) {
+    return value as Record<string, unknown>
+  }
+  return undefined
 }
 
 function fieldsEqual(
@@ -651,6 +682,10 @@ function uintGeneral(
     value = BigInt(value)
   }
   if (typeof value === 'bigint') {
+    // A bigint that fits 32 bits is its number, as for uint32(x).
+    if (bits === 32 && value >= 0n && value <= 0xffffffffn) {
+      return Number(value)
+    }
     const normalized = BigInt.asUintN(Math.min(bits, 64), value)
     // Above 2^53 the value cannot round-trip through number, so keep the bigint
     // to preserve full 64-bit width; uint arithmetic routes through the
@@ -753,8 +788,22 @@ export function uint64(value: number | bigint | string): bigint {
 // Only counts below 64 can affect a 64-bit result, so Number preserves every
 // behaviorally relevant count exactly before the bigint shift.
 function wideShiftAmount(shift: number | bigint): bigint {
+  // The counts that matter for a 64-bit value are shared bigints, and
+  // other counts are converted.
+  if (
+    typeof shift === 'number' &&
+    shift >= 0 &&
+    shift <= 64 &&
+    shift % 1 === 0
+  ) {
+    return wideShiftAmounts[shift]
+  }
   return BigInt(Math.trunc(Number(shift)))
 }
+
+// wideShiftAmounts holds the shift counts 0 to 64 as bigints, so that a shift
+// of a 64-bit value allocates no bigint for its count.
+const wideShiftAmounts = Array.from({ length: 65 }, (_, idx) => BigInt(idx))
 
 export function uint64Shl(
   value: number | bigint,
@@ -890,6 +939,13 @@ export function uint64And(
   left: number | bigint,
   right: number | bigint,
 ): bigint {
+  // A bitwise operation of two bigints keeps 64 bits of the bigint result,
+  // which are those of the operation of their 64 bits.
+  if (typeof left === 'bigint' && typeof right === 'bigint') {
+    return uint64Result(left & right)
+  }
+
+  // Other operands are converted to their 64 bits first.
   return uint64Result(uint64Value(left) & uint64Value(right))
 }
 
@@ -897,6 +953,13 @@ export function int64And(
   left: number | bigint,
   right: number | bigint,
 ): bigint {
+  // A bitwise operation of two bigints keeps 64 bits of the bigint result,
+  // which are those of the operation of their 64 bits.
+  if (typeof left === 'bigint' && typeof right === 'bigint') {
+    return int64Result(left & right)
+  }
+
+  // Other operands are converted to their 64 bits first.
   return int64Result(int64Value(left) & int64Value(right))
 }
 
@@ -904,6 +967,13 @@ export function uint64AndNot(
   left: number | bigint,
   right: number | bigint,
 ): bigint {
+  // A bitwise operation of two bigints keeps 64 bits of the bigint result,
+  // which are those of the operation of their 64 bits.
+  if (typeof left === 'bigint' && typeof right === 'bigint') {
+    return uint64Result(left & ~right)
+  }
+
+  // Other operands are converted to their 64 bits first.
   return uint64Result(uint64Value(left) & ~uint64Value(right))
 }
 
@@ -911,6 +981,13 @@ export function int64AndNot(
   left: number | bigint,
   right: number | bigint,
 ): bigint {
+  // A bitwise operation of two bigints keeps 64 bits of the bigint result,
+  // which are those of the operation of their 64 bits.
+  if (typeof left === 'bigint' && typeof right === 'bigint') {
+    return int64Result(left & ~right)
+  }
+
+  // Other operands are converted to their 64 bits first.
   return int64Result(int64Value(left) & ~int64Value(right))
 }
 
@@ -918,10 +995,24 @@ export function uint64Or(
   left: number | bigint,
   right: number | bigint,
 ): bigint {
+  // A bitwise operation of two bigints keeps 64 bits of the bigint result,
+  // which are those of the operation of their 64 bits.
+  if (typeof left === 'bigint' && typeof right === 'bigint') {
+    return uint64Result(left | right)
+  }
+
+  // Other operands are converted to their 64 bits first.
   return uint64Result(uint64Value(left) | uint64Value(right))
 }
 
 export function int64Or(left: number | bigint, right: number | bigint): bigint {
+  // A bitwise operation of two bigints keeps 64 bits of the bigint result,
+  // which are those of the operation of their 64 bits.
+  if (typeof left === 'bigint' && typeof right === 'bigint') {
+    return int64Result(left | right)
+  }
+
+  // Other operands are converted to their 64 bits first.
   return int64Result(int64Value(left) | int64Value(right))
 }
 
@@ -929,6 +1020,13 @@ export function uint64Xor(
   left: number | bigint,
   right: number | bigint,
 ): bigint {
+  // A bitwise operation of two bigints keeps 64 bits of the bigint result,
+  // which are those of the operation of their 64 bits.
+  if (typeof left === 'bigint' && typeof right === 'bigint') {
+    return uint64Result(left ^ right)
+  }
+
+  // Other operands are converted to their 64 bits first.
   return uint64Result(uint64Value(left) ^ uint64Value(right))
 }
 
@@ -936,6 +1034,13 @@ export function int64Xor(
   left: number | bigint,
   right: number | bigint,
 ): bigint {
+  // A bitwise operation of two bigints keeps 64 bits of the bigint result,
+  // which are those of the operation of their 64 bits.
+  if (typeof left === 'bigint' && typeof right === 'bigint') {
+    return int64Result(left ^ right)
+  }
+
+  // Other operands are converted to their 64 bits first.
   return int64Result(int64Value(left) ^ int64Value(right))
 }
 
