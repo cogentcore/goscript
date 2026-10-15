@@ -81,6 +81,7 @@ import {
   EqualVTSliceImplicit,
   type EqualVT,
   IsEqualVTSlice,
+  MarshalBoundMessageJSON,
   MarshalBoundMessageVT,
   MarshalBoundMessageToSizedBufferVT,
   SizeBoolNonZero,
@@ -121,6 +122,7 @@ import {
   SizeZigzagSlice,
   SizeZigzagValue,
   Skip,
+  UnmarshalBoundMessageJSON,
   UnmarshalBoundMessageVT,
 } from './index.js'
 
@@ -223,6 +225,40 @@ class BytesBoundMessage {
     return new Uint8Array([9])
   },
 }
+
+class TextBoundMessage {
+  Name = ''
+  Labels: Map<string, string> | null = null
+
+  constructor(init?: Partial<TextBoundMessage>) {
+    Object.assign(this, init)
+  }
+}
+
+// textMessageType encodes like protobuf-es-lite: its strings are JavaScript
+// text, written to the wire as UTF-8.
+const textMessageType = {
+  typeName: 'test.TextBoundMessage',
+  fields: {
+    list: () => [
+      { localName: 'name', kind: 'scalar', T: 9 },
+      {
+        localName: 'labels',
+        kind: 'map',
+        V: { localName: 'value', kind: 'scalar', T: 9 },
+      },
+    ],
+  },
+  toBinary: (value: unknown) =>
+    new TextEncoder().encode(textMessageType.toJsonString(value)),
+  fromBinary: (bytes: Uint8Array | null | undefined) =>
+    textMessageType.fromJsonString(
+      new TextDecoder().decode(bytes ?? undefined),
+    ),
+  toJsonString: (value: unknown) => JSON.stringify(value),
+  fromJsonString: (text: string | null | undefined) => JSON.parse(text ?? '{}'),
+}
+;(TextBoundMessage as any).__protobufTypeScriptMessage = textMessageType
 
 class BinaryInputBoundMessage {
   static lastInput: Uint8Array | null | undefined
@@ -542,6 +578,44 @@ describe('protobuf-go-lite TypeScript binding helpers', () => {
     expect(err?.Error()).toBe(
       'marshal test.BrokenBoundMessage: invalid uint 32: undefined',
     )
+  })
+
+  it('converts Go strings and map keys to text across the binding', () => {
+    const name = $.goString('🌻')
+    const labels = new Map([[$.goString('🌳'), $.goString('💎')]])
+    const wire = new TextEncoder().encode(
+      JSON.stringify({ name: '🌻', labels: { '🌳': '💎' } }),
+    )
+
+    const [bytes, err] = MarshalBoundMessageVT(
+      TextBoundMessage as any,
+      new TextBoundMessage({ Name: name, Labels: labels }),
+    )
+    expect(err).toBeNull()
+    expect(Array.from(bytes ?? [])).toEqual(Array.from(wire))
+
+    const target = new TextBoundMessage()
+    expect(
+      UnmarshalBoundMessageVT(
+        TextBoundMessage as any,
+        target,
+        $.arrayToSlice(Array.from(wire)),
+      ),
+    ).toBeNull()
+    expect(target.Name).toBe(name)
+    expect(Array.from(target.Labels ?? [])).toEqual(Array.from(labels))
+
+    const [json, jsonErr] = MarshalBoundMessageJSON(
+      TextBoundMessage as any,
+      target,
+    )
+    expect(jsonErr).toBeNull()
+    expect(Array.from(json ?? [])).toEqual(Array.from(wire))
+    const fromJSON = new TextBoundMessage()
+    expect(
+      UnmarshalBoundMessageJSON(TextBoundMessage as any, fromJSON, json),
+    ).toBeNull()
+    expect(fromJSON.Name).toBe(name)
   })
 
   it('normalizes Go byte slices before binary marshal', () => {

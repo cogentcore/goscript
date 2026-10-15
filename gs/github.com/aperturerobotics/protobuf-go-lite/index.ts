@@ -468,8 +468,13 @@ function boundOneofGroupGoName(field: BoundFieldInfo): string {
   return boundFieldGoName({ ...field, localName: field.oneof?.localName ?? '' })
 }
 
+// toTypeScriptScalarValue converts a Go scalar to its protobuf-es-lite form: a
+// Go string, held as its UTF-8 bytes, becomes JavaScript text.
 function toTypeScriptScalarValue(value: any, field?: BoundFieldInfo): any {
   const unwrapped = $.pointerValueOrNil(value)
+  if (typeof unwrapped === 'string') {
+    return $.jsString(unwrapped)
+  }
   if (
     field?.kind === 'scalar' &&
     field.T === protobufScalarTypeBytes &&
@@ -477,9 +482,6 @@ function toTypeScriptScalarValue(value: any, field?: BoundFieldInfo): any {
     !(unwrapped instanceof Uint8Array)
   ) {
     return Uint8Array.from($.asArray(unwrapped))
-  }
-  if (unwrapped instanceof Uint8Array) {
-    return unwrapped
   }
   return unwrapped
 }
@@ -504,7 +506,7 @@ function toTypeScriptFieldValue(
     const entries =
       value instanceof Map ? Array.from(value.entries()) : Object.entries(value)
     for (const [key, item] of entries) {
-      out[String(key)] =
+      out[typeof key === 'string' ? $.jsString(key) : String(key)] =
         valueInfo != null ?
           toTypeScriptFieldValue(valueInfo, item, ctor)
         : toTypeScriptScalarValue(item)
@@ -571,7 +573,12 @@ function toTypeScriptMessage(
   return out
 }
 
+// fromTypeScriptScalarValue converts a protobuf-es-lite scalar to its Go form:
+// JavaScript text becomes a Go string of its UTF-8 bytes.
 function fromTypeScriptScalarValue(value: any): any {
+  if (typeof value === 'string') {
+    return $.goString(value)
+  }
   if (value instanceof Uint8Array) {
     // Own a copy of the viewed range. protobuf-go-lite copies bytes fields
     // while decoding (DecodeBytesAppend), so callers may scrub or reuse the
@@ -602,7 +609,7 @@ function fromTypeScriptFieldValue(
     const out = new Map<any, any>()
     for (const [key, item] of Object.entries(value)) {
       out.set(
-        key,
+        $.goString(key),
         valueInfo != null ?
           fromTypeScriptFieldValue(valueInfo, item, ctor)
         : fromTypeScriptScalarValue(item),
@@ -881,7 +888,7 @@ export function MarshalBoundMessageJSON<T>(
     const json =
       messageType.toJsonString?.(encoded) ??
       JSON.stringify(messageType.toJson?.(encoded) ?? encoded)
-    return [$.stringToBytes(json), null]
+    return [$.stringToBytes($.goString(json)), null]
   } catch (err) {
     return [null, $.toGoError(err as Error)]
   }
@@ -894,7 +901,7 @@ export function UnmarshalBoundMessageJSON<T>(
 ): $.GoError {
   try {
     const messageType = boundMessageType(ctor)
-    const text = $.bytesToString(data)
+    const text = $.jsString($.bytesToString(data))
     const decoded =
       messageType.fromJsonString?.(text) ??
       messageType.fromJson?.(JSON.parse(text))
@@ -935,12 +942,31 @@ export function UnmarshalBoundMessageProtoJSON<T>(
   }
   try {
     const messageType = boundMessageType(ctor)
-    const decoded = messageType.fromJson?.((state as any).value)
+    const decoded = messageType.fromJson?.(jsStringsDeep((state as any).value))
     const next = fromTypeScriptMessage(decoded, ctor, messageType)
     $.assignStruct($.pointerValue(target), $.markAsStructValue(next))
   } catch (err) {
     state.SetError($.toGoError(err as Error))
   }
+}
+
+// jsStringsDeep converts the Go strings of a parsed JSON value, including the
+// keys of objects, to JavaScript text.
+function jsStringsDeep(value: unknown): unknown {
+  if (typeof value === 'string') {
+    return $.jsString(value)
+  }
+  if (Array.isArray(value)) {
+    return value.map(jsStringsDeep)
+  }
+  if (value !== null && typeof value === 'object') {
+    const out: Record<string, unknown> = {}
+    for (const [key, item] of Object.entries(value)) {
+      out[$.jsString(key)] = jsStringsDeep(item)
+    }
+    return out
+  }
+  return value
 }
 
 export function MarshalBoundMessageProtoText<T>(
