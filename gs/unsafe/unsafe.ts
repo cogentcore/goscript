@@ -16,7 +16,7 @@ interface StringDataPointer {
 // whole slice so that Slice can return a view sharing its backing array.
 interface SliceDataPointer {
   [sliceDataPointer]: true
-  slice: $.Slice<unknown> | Uint8Array
+  slice: $.Slice<unknown> | $.TypedSlice
 }
 
 function isStringDataPointer(ptr: Pointer): ptr is StringDataPointer {
@@ -85,14 +85,25 @@ export function Add(_ptr: Pointer, _len: IntegerType): Pointer {
   )
 }
 
-// Slice returns a slice of len elements for a pointer produced by SliceData,
-// sharing its backing array, or the bytes of a pointer produced by StringData.
-export function Slice<T = number>(ptr: Pointer, len: IntegerType): $.Slice<T> {
-  // Only pointers into a slice or a string have memory to read.
+// Slice returns a slice of len elements for a pointer to an element of a
+// slice, from &s[i] or SliceData, sharing its backing array, or the bytes of a
+// pointer produced by StringData. The compiler passes the type hint of the
+// elements when a typed array holds them: a slice held in a typed array of
+// another kind of elements is then viewed as these elements, as
+// unsafe.Slice((*byte)(unsafe.Pointer(&s[0])), n) views the memory of s.
+export function Slice<T = number>(
+  ptr: Pointer,
+  len: IntegerType,
+  elementHint?: string,
+): $.Slice<T> {
+  // A pointer into a slice views its backing array from its element on.
   const n = lengthOf(len)
-  if (isSliceDataPointer(ptr)) {
-    return $.goSlice(ptr.slice as $.Slice<T>, 0, n)
+  const element = sliceElementOf(ptr)
+  if (element !== undefined) {
+    return sliceAt(element.slice, element.index, n, elementHint) as $.Slice<T>
   }
+
+  // A pointer into a string reads its bytes.
   if (isStringDataPointer(ptr)) {
     return $.goSlice($.stringToBytes(ptr.value), 0, n) as $.Slice<T>
   }
@@ -104,9 +115,45 @@ export function Slice<T = number>(ptr: Pointer, len: IntegerType): $.Slice<T> {
   )
 }
 
+// SliceElement is the slice and element index that a pointer points to.
+interface SliceElement {
+  slice: $.Slice<unknown> | $.TypedSlice
+  index: number
+}
+
+// sliceElementOf returns the slice element that ptr points to, for a pointer
+// from SliceData or from &s[i], or undefined for any other pointer.
+function sliceElementOf(ptr: Pointer): SliceElement | undefined {
+  if (isSliceDataPointer(ptr)) {
+    return { slice: ptr.slice, index: 0 }
+  }
+  if ($.isVarRef(ptr) && ptr.__goCollection !== undefined) {
+    const slice = ptr.__goCollection as $.Slice<unknown> | $.TypedSlice
+    return { slice, index: ptr.__goIndex ?? 0 }
+  }
+  return undefined
+}
+
+// sliceAt returns the n elements of slice from index on, with capacity n, as
+// elements of the kind elementHint names. A typed slice of another kind is
+// viewed as these elements; any other slice is assumed to hold them already.
+function sliceAt(
+  slice: $.Slice<unknown> | $.TypedSlice,
+  index: number,
+  n: number,
+  elementHint: string | undefined,
+): $.Slice<unknown> | $.TypedSlice {
+  const ctor = $.typedSliceConstructor(elementHint)
+  const typed = $.typedElements(slice)
+  if (ctor !== undefined && typed !== undefined && !(typed instanceof ctor)) {
+    return $.typedMemoryView(typed, index, n, ctor)
+  }
+  return $.goSlice(slice as $.Slice<unknown>, index, index + n, index + n)
+}
+
 // SliceData returns a pointer to the underlying array of the slice,
 // which Slice and String can read. It returns nil for a nil slice.
-export function SliceData(slice: $.Slice<unknown> | Uint8Array): Pointer {
+export function SliceData(slice: $.Slice<unknown> | $.TypedSlice): Pointer {
   if (slice === null) {
     return null
   }

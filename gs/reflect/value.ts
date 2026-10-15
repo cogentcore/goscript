@@ -26,6 +26,8 @@ import {
   Value,
   Chan,
   structFieldStorageKey,
+  sliceAppendHint,
+  sliceTypeHint,
   TypeOf,
   typeIdentityKey,
   typeInfoFromReflectType,
@@ -308,11 +310,8 @@ export function MakeSlice(typ: Type | null, len: number, cap: number): Value {
   if (!elemType) {
     throw new Error('slice type missing element type')
   }
-  const slice = $.makeSlice(
-    len,
-    cap,
-    elemType.Kind() === Uint8 ? 'byte' : undefined,
-    () => zeroReflectValue(elemType),
+  const slice = $.makeSlice(len, cap, sliceTypeHint(elemType), () =>
+    zeroReflectValue(elemType),
   )
   return new Value(slice, typ)
 }
@@ -336,8 +335,11 @@ export function Append(s: Value, x: Value): Value {
   if (s.Kind() !== Slice) {
     throw new Error('reflect.Append of non-slice')
   }
+  // The hint keeps a slice of typed array elements in its typed array.
+  const hint = sliceAppendHint(s.Type().Elem())
+  const elements = hint === undefined ? [x.value] : [x.value, hint]
   return new Value(
-    $.append(s.value as $.Slice<unknown>, x.value) as ReflectValue,
+    $.append(s.value as $.Slice<unknown>, ...elements) as ReflectValue,
     s.Type(),
   )
 }
@@ -346,9 +348,12 @@ export function AppendSlice(s: Value, t: Value): Value {
   if (s.Kind() !== Slice || t.Kind() !== Slice) {
     throw new Error('reflect.AppendSlice of non-slice')
   }
+  // The hint keeps a slice of typed array elements in its typed array.
   const right = $.asArray(t.value as $.Slice<unknown>)
+  const hint = sliceAppendHint(s.Type().Elem())
+  const elements = hint === undefined ? right : [...right, hint]
   return new Value(
-    $.append(s.value as $.Slice<unknown>, ...right) as ReflectValue,
+    $.append(s.value as $.Slice<unknown>, ...elements) as ReflectValue,
     s.Type(),
   )
 }

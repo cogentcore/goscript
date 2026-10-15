@@ -4,12 +4,16 @@ import { ReflectValue } from './types.js'
 // Swapper panics if the provided interface is not a slice.
 export function Swapper(slice: ReflectValue): (i: number, j: number) => void {
   // A slice is a JavaScript array, or a window on its backing array.
-  let backing: unknown[] | null = null
+  let backing: { [index: number]: unknown } | null = null
   let offset = 0
   let length = 0
   if (Array.isArray(slice)) {
     backing = slice
     length = slice.length
+  } else if (ArrayBuffer.isView(slice)) {
+    // A typed slice is a view of exactly its elements.
+    backing = slice as { [index: number]: unknown }
+    length = (slice as ArrayLike<unknown>).length
   } else if (slice && typeof slice === 'object' && '__meta__' in slice) {
     const meta = (
       slice as {

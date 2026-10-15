@@ -714,6 +714,9 @@ function encodeJSON(v: unknown): string {
   if ($.isArrayOrGoSlice(v)) {
     return '[' + v.map(encodeJSON).join(',') + ']'
   }
+  if ($.isTypedSlice(v)) {
+    return '[' + Array.from(v, encodeJSON).join(',') + ']'
+  }
   if (t === 'object') {
     const parts: string[] = []
     for (const [key, value] of Object.entries(v as Record<string, unknown>)) {
@@ -1523,17 +1526,19 @@ function marshalValue(
     return base64Encode(v)
   }
 
-  // A slice, array or map encodes its elements by their types.
+  // A slice, array or map encodes its elements by their types, which for a
+  // slice held in a typed array are at least those of its typed array.
   const info = resolveTypeInfo(typeInfo)
-  if ($.isArrayOrGoSlice(v)) {
+  if ($.isArrayOrGoSlice(v) || $.isTypedSlice(v)) {
     const elemType =
       info !== null && ($.isSliceTypeInfo(info) || $.isArrayTypeInfo(info)) ?
         info.elemType
-      : undefined
+      : $.typedSliceHintOf(v)
     // Slice elements are addressable; array elements are when the array is.
     const elemAddressable =
       info === null || !$.isArrayTypeInfo(info) || addressable
-    return v.map((el) => marshalValue(el, elemType, elemAddressable))
+    const items = $.isTypedSlice(v) ? Array.from(v) : v
+    return items.map((el) => marshalValue(el, elemType, elemAddressable))
   }
   if (v instanceof Map) {
     const mapInfo = info !== null && $.isMapTypeInfo(info) ? info : null
@@ -1677,7 +1682,7 @@ function isEmptyValue(v: unknown, fieldType?: unknown): boolean {
   if (typeof t === 'boolean') {
     return t === false
   }
-  if ($.isArrayOrGoSlice(t) || t instanceof Uint8Array) {
+  if ($.isArrayOrGoSlice(t) || $.isTypedSlice(t)) {
     return t.length === 0
   }
   if (t instanceof Map) {
@@ -2312,6 +2317,23 @@ function isFloat32Type(info: $.TypeInfo | null): boolean {
   return info?.kind === $.TypeKind.Basic && info.name === 'float32'
 }
 
+// typedSliceOf returns decoded slice elements of elemType in the typed array
+// that holds slices of such elements, as the compiled program makes them, or
+// the elements as they are for elements held in plain arrays.
+function typedSliceOf(out: unknown[], elemType: unknown): unknown {
+  // A basic element type is named by its spelling or by its type info.
+  const elem = resolveTypeInfo(elemType)
+  const name =
+    typeof elemType === 'string' ? elemType
+    : elem !== null && elem.kind === $.TypeKind.Basic ? elem.name
+    : ''
+  const ctor = $.typedSliceConstructor(name === 'uint8' ? 'byte' : name)
+  if (ctor === undefined || !out.every((el) => typeof el === 'number')) {
+    return out
+  }
+  return ctor.from(out as number[])
+}
+
 // decodeValueForType recursively decodes a raw JSON-parsed JS value into a
 // properly-typed Go value per `typeInfo`:
 //   - Struct: construct the registered ctor and populate its fields.
@@ -2426,7 +2448,7 @@ function decodeValueForType(
         out[i] = value
       })
     })
-    return out
+    return typedSliceOf(out, info.elemType)
   }
   if ($.isMapTypeInfo(info)) {
     if (!isPlainObject(decoded)) {
@@ -2788,7 +2810,7 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
     typeof value === 'object' &&
     !$.isNamedValueBox(value) &&
     !$.isArrayOrGoSlice(value) &&
-    !(value instanceof Uint8Array) &&
+    !$.isTypedSlice(value) &&
     !(value instanceof Map)
   )
 }

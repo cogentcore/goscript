@@ -611,12 +611,50 @@ function decodeShapeTarget(
   target.settable(shapeDecodeValue(buf, order, shape))
 }
 
+// typedSliceKind returns the fixed kind of a slice held in a typed array.
+function typedSliceKind(value: $.TypedSlice): fixedKind {
+  const hint = $.typedSliceHintOf(value)
+  return (hint === 'byte' ? '[]uint8' : '[]' + hint) as fixedKind
+}
+
+// nativeLittleEndian reports whether typed arrays store their elements in
+// little-endian order, as they do on every common platform.
+const nativeLittleEndian = new Uint8Array(new Uint16Array([1]).buffer)[0] === 1
+
+// typedSliceBytes returns the bytes of value in memory when value is a slice
+// of elements of kind held in a typed array, whose memory then holds the
+// little-endian encoding of its elements, or null otherwise.
+function typedSliceBytes(
+  value: unknown,
+  order: ByteOrder,
+  kind: fixedKind,
+): Uint8Array | null {
+  const typed = $.typedElements(value)
+  if (
+    !nativeLittleEndian ||
+    !(order instanceof littleEndian) ||
+    typed === undefined ||
+    typedSliceKind(typed) !== kind
+  ) {
+    return null
+  }
+  return new Uint8Array(typed.buffer, typed.byteOffset, typed.byteLength)
+}
+
 function decodeFixedSlice(
   buf: $.Slice<number>,
   order: ByteOrder,
   kind: fixedKind,
   target: unknown,
 ): void {
+  // A typed slice in little-endian order takes the bytes as they are.
+  const bytes = typedSliceBytes(target, order, kind)
+  if (bytes !== null && buf instanceof Uint8Array) {
+    bytes.set(buf.subarray(0, bytes.length))
+    return
+  }
+
+  // Any other slice decodes element by element.
   const elemKind = kind.slice(2) as fixedKind
   const width = fixedSize(elemKind, 0)
   const count = $.len(target as $.Slice<unknown>)
@@ -662,6 +700,14 @@ function encodeFixed(
   kind: fixedKind,
   value: unknown,
 ): void {
+  // A typed slice in little-endian order gives the bytes as they are.
+  const bytes = typedSliceBytes(value, order, kind)
+  if (bytes !== null && buf instanceof Uint8Array) {
+    buf.set(bytes)
+    return
+  }
+
+  // Any other slice encodes element by element.
   if (kind.startsWith('[]')) {
     const elemKind = kind.slice(2) as fixedKind
     const width = fixedSize(elemKind, 0)
@@ -794,9 +840,10 @@ function decodeTarget(data: unknown): decodedTarget | null {
       : null
   }
 
-  // Byte and bool slices are encoded as their elements.
-  if (value instanceof Uint8Array) {
-    return { kind: '[]uint8', value, settable: null }
+  // Typed and bool slices are encoded as their elements.
+  const typed = $.typedElements(value)
+  if (typed !== undefined) {
+    return { kind: typedSliceKind(typed), value, settable: null }
   }
   if ($.isArrayOrGoSlice(value)) {
     if (value.every((item) => typeof item === 'boolean')) {
