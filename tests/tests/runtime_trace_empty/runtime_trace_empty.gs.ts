@@ -60,7 +60,7 @@ export class byteSink {
 export const hexDigits: string = "0123456789abcdef"
 
 export function toHex(b: $.Slice<number>): string {
-	let out: $.Slice<number> = $.makeSlice<number>($.sliceLen(b) * 2, undefined, "byte")
+	let out = $.makeSlice<number>($.sliceLen(b) * 2, undefined, "byte")
 	for (let __goscriptRangeTarget0 = b, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __goscriptSliceWindow0 = $.sliceRange(out), i = 0; i < __goscriptRangeWindow0.length; i++) {
 		let c = $.uint((__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + i] as number), 8);
 		;(__goscriptSliceWindow0.backing as any[])[$.windowSlot(__goscriptSliceWindow0, i * 2)] = $.indexByteString("\x30\x31\x32\x33\x34\x35\x36\x37\x38\x39\x61\x62\x63\x64\x65\x66", $.uintShr(c, 4, 8));
@@ -70,11 +70,11 @@ export function toHex(b: $.Slice<number>): string {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let sink: byteSink | $.VarRef<byteSink> | null = new byteSink()
+	let sink = new byteSink()
 	{
 		let err = trace.Start($.pointerValueOrNil($.interfaceValue<io.Writer | null>(sink, "*main.byteSink", /* @__PURE__ */ $.pointerType("main.byteSink")))!)
 		if (err != null) {
-			await fmt.Println($.concatString("ERROR:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)))
+			await fmt.Println("ERROR:" + (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 			return
 		}
 	}
