@@ -3594,7 +3594,7 @@ func (o *LoweringOwner) lowerStructType(ctx lowerFileContext, semType *semanticT
 			anonymous:      field.embedded,
 			exported:       field.exported,
 			structValue:    structValue,
-			directClone:    structValue && o.isGeneratedStructClass(namedStructType(field.typ)),
+			directClone:    structValue && o.hasGeneratedClone(namedStructType(field.typ)),
 			arrayValue:     isArrayType(field.typ),
 			typeParamValue: typeParamMayHoldValueType(field.typ),
 			plainValue:     isPlainAssignType(field.typ),
@@ -14793,7 +14793,7 @@ func (o *LoweringOwner) lowerStructClone(value string) string {
 // generated struct class is copied by its own clone method, which returns a
 // marked struct value, so that each copy site calls one known method.
 func (o *LoweringOwner) lowerStructCloneOf(typ types.Type, value string) string {
-	if o.isGeneratedStructClass(namedStructType(typ)) {
+	if o.hasGeneratedClone(namedStructType(typ)) {
 		return "(" + value + ").clone()"
 	}
 	return o.lowerStructClone(value)
@@ -14804,11 +14804,31 @@ func (o *LoweringOwner) lowerStructCloneOf(typ types.Type, value string) string 
 // second argument that marks the new object as a struct value, and whose
 // copy method is named clone.
 func (o *LoweringOwner) isGeneratedStructClass(named *types.Named) bool {
-	// A named, non-generic type declared at package level in Go source.
-	if named == nil || named.Obj() == nil || named.Obj().Pkg() == nil {
+	// A named, non-generic type.
+	if named == nil || named.TypeParams().Len() != 0 || named.TypeArgs().Len() != 0 {
 		return false
 	}
-	if named.TypeParams().Len() != 0 || named.TypeArgs().Len() != 0 {
+	return o.hasGeneratedClassShape(named)
+}
+
+// hasGeneratedClone reports whether a struct value of type named is copied by
+// the clone method of its generated class: a generated struct class (see
+// isGeneratedStructClass), or an instance of a generic struct type whose
+// class has the same shape, and whose constructor copies the fields of type
+// parameter types by their values at run time.
+func (o *LoweringOwner) hasGeneratedClone(named *types.Named) bool {
+	if named == nil || named.TypeArgs().Len() == 0 {
+		return o.isGeneratedStructClass(named)
+	}
+	return o.hasGeneratedClassShape(named.Origin())
+}
+
+// hasGeneratedClassShape reports whether named, which may be generic, is a
+// struct type declared at package level in Go source whose class has the
+// clone method, which no field or method of its own takes the name of.
+func (o *LoweringOwner) hasGeneratedClassShape(named *types.Named) bool {
+	// A named type declared at package level in Go source.
+	if named == nil || named.Obj() == nil || named.Obj().Pkg() == nil {
 		return false
 	}
 	pkg := named.Obj().Pkg()
