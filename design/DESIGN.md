@@ -318,23 +318,11 @@ After reviewing the code and tests, some important implementation considerations
     *Note: Direct conversion between `string` and `[]byte` would involve different runtime helpers focusing on byte representations.*
 
 - **Structs:** Converted to TypeScript `class`es. Both exported and unexported Go fields become `public` members in the TypeScript class. A `clone()` method is added to support Go's value semantics on assignment/read. This `clone()` method performs a deep copy of the struct's fields, including recursively cloning any nested struct fields, to ensure true value semantics.
-    -   **Constructor Initialization:** The generated class constructor accepts an optional `init` object. Fields are initialized using this object. Crucially, for fields that are themselves struct *values* (not pointers):
-        - If the corresponding value in `init` is provided, it is **cloned** using its `.clone()` method before assignment to maintain Go's value semantics (e.g., `this._fields.InnerStruct = $.varRef(init?.InnerStruct?.clone() ?? new InnerStruct())`).
-        - If the corresponding value in `init` is nullish (`null` or `undefined`), the field is initialized with a *new instance* of the struct's zero value (`new FieldType()`) to maintain parity with Go's non-nullable struct semantics.
-        - Pointer fields are initialized to `null` if the `init` value is nullish (no cloning needed).
-        ```typescript
-        // Example generated constructor logic for a field 'Inner' of type 'InnerStruct'
-        public Inner: InnerStruct
-        // ... other fields ...
-        constructor(init?: { Inner?: InnerStruct /* ... other fields ... */ }) {
-            this.Inner = init?.Inner?.clone() ?? new InnerStruct() // Clones if init.Inner exists, else creates zero value
-            // ... other initializations ...
-        }
-        ```
+    -   **Constructor Initialization:** The generated class constructor takes the struct value marker and then one optional value per field, in field order (`new Point(true, 1, 2)`). It keeps the values it is given: callers pass values the struct owns, so a struct literal copies stored struct and array values at the call site and `clone()` passes a copy of each field. An omitted (undefined) value is the field's zero value, a new zero instance for a nested struct value. Classes of override packages, local struct types and structs with protobuf fields keep a constructor that takes an `init` object, whose struct values it clones.
 -   **Field Access:** Accessing struct fields uses standard TypeScript dot notation (`instance.FieldName`). Go's automatic dereferencing for pointer field access (`ptr.Field`) translates to accessing the value with appropriate null checks. Unexported fields become public class members.
 -   **Struct Composite Literals:**
         -   **Promoted Fields (Go 1.27):** Keys may name fields inside embedded struct values. The compiler resolves their field paths with `go/types`, initializes enclosing values with the appropriate zero values, and evaluates initializers in source order. This applies to named, anonymous, generic, and pointer literals. Go rejects ambiguous keys, overlapping enclosing and promoted initializers, and implicit pointer indirection through an embedding.
-        -   **Value Initialization (`T{...}`):** Translates to `new TypeName({...})`.
+        -   **Value Initialization (`T{...}`):** Translates to `new TypeName(true, ...)` with the field values in field order. When keys are out of field order, values with calls are evaluated into temporaries first, in source order.
             ```go
             type Point struct{ X, Y int }
             v := Point{X: 1, Y: 2}
@@ -342,7 +330,7 @@ After reviewing the code and tests, some important implementation considerations
             becomes:
             ```typescript
             class Point { /* ... constructor, fields, clone ... */ }
-            let v: Point = new Point({ X: 1, Y: 2 })
+            let v: Point = new Point(true, 1, 2)
             ```
         -   **Pointer Initialization (`&T{...}`):** The implementation of pointer initialization needs to be documented after changes.
 

@@ -86,10 +86,15 @@ type loweredNamedStructConversionExpr struct {
 	fields     []loweredConversionField
 	castOnly   bool
 	castTarget string
+	// positional reports that the target is a positional struct class,
+	// which takes the copies of the fields in order.
+	positional bool
 }
 
 type loweredConversionField struct {
 	name string
+	// copy is the copy of the field of the converted value.
+	copy string
 }
 
 type loweredDecl struct {
@@ -112,8 +117,11 @@ type loweredStruct struct {
 	name                 string
 	typeName             string
 	cloneMethod          string
-	fields               []loweredStructField
-	methods              []loweredFunction
+	// positional reports that the constructor takes the value marker and
+	// then each field value in field order (see isPositionalStructClass).
+	positional bool
+	fields     []loweredStructField
+	methods    []loweredFunction
 }
 
 type loweredStructField struct {

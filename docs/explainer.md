@@ -179,14 +179,14 @@ export class Point {
 
 	public declare Y: number
 
-	constructor(init?: Partial<{X?: number, Y?: number}>, __goscriptValue?: boolean) {
-		this.X = init?.X ?? (0 as number)
-		this.Y = init?.Y ?? (0 as number)
+	constructor(__goscriptValue?: boolean, X$?: number, Y$?: number) {
+		this.X = X$ ?? 0
+		this.Y = Y$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Point {
-		return new Point(this, true)
+		return new Point(true, this.X, this.Y)
 	}
 
 	public __goscriptAssign(source: Point): Point {
@@ -199,6 +199,15 @@ export class Point {
 }
 ```
 
+The constructor takes the struct value marker (true for a struct value, false
+or omitted for the struct a pointer points to) and then the value of each field
+in field order, as GopherJS does. It keeps the values it is given, so a caller
+passes values the new struct owns: a struct literal copies a stored struct
+value at the call site, and `clone` passes a copy of each field. An omitted
+value is the field's zero value. Struct classes declared in override packages,
+local struct types, and structs with protobuf fields keep a constructor that
+takes an init object instead.
+
 Go assignment copies a struct value, so the compiler emits a clone:
 
 ```go
@@ -209,8 +218,8 @@ return original.X // 10
 ```
 
 ```ts
-let original = $.markAsStructValue(new Point({X: 10, Y: 20}))
-let c = $.markAsStructValue($.cloneStructValue(original))
+let original = new Point(true, 10, 20)
+let c = original.clone()
 c.X = 100
 return original.X
 ```

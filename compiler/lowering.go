@@ -3671,6 +3671,7 @@ func (o *LoweringOwner) lowerStructType(ctx lowerFileContext, semType *semanticT
 	if explicitMethods["clone"] {
 		lowered.cloneMethod = "__goscriptClone"
 	}
+	lowered.positional = o.hasGeneratedClassShape(semType.named)
 	return lowered, diagnostics
 }
 
@@ -11586,9 +11587,11 @@ func (o *LoweringOwner) lowerNamedStructConversion(
 	fields := make([]loweredConversionField, 0, structType.NumFields())
 	for idx := range structType.NumFields() {
 		field := structType.Field(idx)
-		fields = append(fields, loweredConversionField{name: tsStructFieldName(field.Name(), idx)})
+		name := tsStructFieldName(field.Name(), idx)
+		fields = append(fields, loweredConversionField{name: name, copy: o.lowerFieldValueCopy(field.Type(), temp+"."+name)})
 	}
 	return &loweredNamedStructConversionExpr{
+		positional: o.hasGeneratedClone(target),
 		value: loweredExpr{
 			text:  value,
 			async: o.conversionValueNeedsAwait(ctx, sourceExpr),
@@ -13924,93 +13927,122 @@ func (o *LoweringOwner) lowerStructCompositeLit(
 	// literal await.
 	ctx, nested := ctx.withNestedFunctions()
 	structType, _ := named.Underlying().(*types.Struct)
-	fields := make([]string, 0, len(lit.Elts))
-	present := make([]bool, structType.NumFields())
+	values := make([]string, structType.NumFields())
 	var prelude []string
 	var diagnostics []Diagnostic
+
+	// Each value is copied for its field, and evaluated before the literal
+	// when it has calls, so that values are evaluated in source order.
 	for idx, elt := range lit.Elts {
-		fieldName := ""
-		fieldType := types.Type(nil)
-		fieldIndex := -1
-		valueExpr := elt
-		if keyed, ok := elt.(*ast.KeyValueExpr); ok {
-			valueExpr = keyed.Value
-			if ident, ok := keyed.Key.(*ast.Ident); ok {
-				for index := range structType.NumFields() {
-					field := structType.Field(index)
-					if field.Name() == ident.Name {
-						fieldIndex = index
-						fieldName = tsStructFieldName(field.Name(), index)
-						fieldType = field.Type()
-						break
-					}
-				}
-			}
-		} else if idx < structType.NumFields() {
-			field := structType.Field(idx)
-			fieldIndex = idx
-			fieldName = tsStructFieldName(field.Name(), idx)
-			fieldType = field.Type()
-		}
-		if fieldName == "" {
+		fieldIndex, valueExpr := structLiteralField(structType, idx, elt)
+		if fieldIndex < 0 {
 			diagnostics = append(diagnostics, loweringUnsupportedAt(ctx, elt, "expression", ctx.semPkg.pkgPath, "unsupported struct literal field"))
 			continue
 		}
 		value, valueDiagnostics := o.lowerExpr(ctx, valueExpr)
 		diagnostics = append(diagnostics, valueDiagnostics...)
-		// The constructor of a generated struct class copies a struct field
-		// value of a generated struct class itself.
-		valueType := ctx.semPkg.source.TypesInfo.TypeOf(valueExpr)
-		if !o.isGeneratedStructClass(named) || !o.isGeneratedStructClass(namedStructType(fieldType)) ||
-			valueType == nil || !types.Identical(valueType, fieldType) {
-			value = o.lowerValueForTarget(ctx, valueExpr, fieldType, value)
-		}
+		value = o.lowerValueForTarget(ctx, valueExpr, structType.Field(fieldIndex).Type(), value)
 		if compositeLiteralFieldNeedsPreEval(ctx, valueExpr) {
 			temp := ctx.tempName("LiteralField")
 			prelude = append(prelude, "const "+temp+" = "+value)
 			value = temp
 		}
-		present[fieldIndex] = true
-		fields = append(fields, fieldName+": "+value)
+		values[fieldIndex] = value
 	}
+
+	// An instance of a generic struct takes the zero values of the omitted
+	// fields of type parameter types.
 	if named.TypeArgs().Len() != 0 {
-		for idx := range structType.NumFields() {
-			if present[idx] {
-				continue
+		for idx, zero := range o.genericStructFieldZeros(ctx, named) {
+			if values[idx] == "" {
+				values[idx] = zero
 			}
-			if !genericStructFieldNeedsInstantiatedZero(named, idx) {
-				continue
-			}
-			field := structType.Field(idx)
-			fields = append(
-				fields,
-				tsStructFieldName(field.Name(), idx)+": "+
-					o.lowerDeclarationZeroValueExpr(ctx, field.Type()),
-			)
 		}
 	}
 
+	// A positional class takes the values in field order.
+	if o.hasGeneratedClone(named) {
+		return o.wrapCompositeLitPrelude(o.lowerPositionalStructExpr(ctx, named, markStruct, values), prelude, nested), diagnostics
+	}
+
+	// Another class takes an init object of the values.
+	fields := make([]string, 0, len(values))
+	for idx, value := range values {
+		if value != "" {
+			fields = append(fields, tsStructFieldName(structType.Field(idx).Name(), idx)+": "+value)
+		}
+	}
 	expr := "new " + o.namedTypeExpr(ctx, named) + "()"
 	if len(fields) != 0 {
 		expr = "new " + o.namedTypeExpr(ctx, named) + "({" + strings.Join(fields, ", ") + "})"
 	}
-	if markStruct && o.isGeneratedStructClass(named) {
-		init := ""
-		if len(fields) != 0 {
-			init = "{" + strings.Join(fields, ", ") + "}"
-		}
-		expr = o.lowerNewStructValue(ctx, named, init)
-	} else if markStruct {
+	if markStruct {
 		expr = o.runtimeOwner.QualifiedHelper(RuntimeHelperMarkAsStructValue) + "(" + expr + ")"
 	}
-	if len(prelude) != 0 {
-		body := strings.Join(prelude, "; ") + "; return " + expr
-		if textAwaits(body, nested()) {
-			return "(await (async () => { " + body + " })())", diagnostics
+	return o.wrapCompositeLitPrelude(expr, prelude, nested), diagnostics
+}
+
+// structLiteralField returns the index of the field of structType that elt,
+// the element at idx of a struct literal, sets, or -1, and its value.
+func structLiteralField(structType *types.Struct, idx int, elt ast.Expr) (int, ast.Expr) {
+	// A keyed element names its field.
+	if keyed, ok := elt.(*ast.KeyValueExpr); ok {
+		ident, ok := keyed.Key.(*ast.Ident)
+		if !ok {
+			return -1, keyed.Value
 		}
-		return "(() => { " + body + " })()", diagnostics
+		for index := range structType.NumFields() {
+			if structType.Field(index).Name() == ident.Name {
+				return index, keyed.Value
+			}
+		}
+		return -1, keyed.Value
 	}
-	return expr, diagnostics
+
+	// An unkeyed element sets the field at its position.
+	if idx < structType.NumFields() {
+		return idx, elt
+	}
+	return -1, elt
+}
+
+// wrapCompositeLitPrelude returns expr, evaluated after the statements of
+// prelude in a function literal when there are any, awaited when they await.
+func (o *LoweringOwner) wrapCompositeLitPrelude(expr string, prelude []string, nested func() []string) string {
+	// A literal without a prelude is the expression itself.
+	if len(prelude) == 0 {
+		return expr
+	}
+	body := strings.Join(prelude, "; ") + "; return " + expr
+	if textAwaits(body, nested()) {
+		return "(await (async () => { " + body + " })())"
+	}
+	return "(() => { " + body + " })()"
+}
+
+// lowerPositionalStructExpr returns a new struct of a positional struct class
+// (see hasGeneratedClone), a struct value if value, from the values of its
+// fields in field order, where an empty value is the field's zero value.
+func (o *LoweringOwner) lowerPositionalStructExpr(ctx lowerFileContext, named *types.Named, value bool, values []string) string {
+	// Trailing zero values are left out.
+	last := len(values)
+	for last > 0 && values[last-1] == "" {
+		last--
+	}
+
+	// The marker comes first, then the values.
+	args := make([]string, 0, last+1)
+	args = append(args, strconv.FormatBool(value))
+	for _, fieldValue := range values[:last] {
+		if fieldValue == "" {
+			fieldValue = "undefined"
+		}
+		args = append(args, fieldValue)
+	}
+	if !value && last == 0 {
+		args = args[:0]
+	}
+	return "new " + o.namedTypeExpr(ctx, named) + "(" + strings.Join(args, ", ") + ")"
 }
 
 func compositeLiteralFieldNeedsPreEval(ctx lowerFileContext, expr ast.Expr) bool {
@@ -15074,6 +15106,17 @@ func (o *LoweringOwner) lowerUnnamedToNamedStruct(
 		return "", false
 	}
 
+	// A positional class takes a copy of each field of the value.
+	if o.hasGeneratedClone(target) {
+		structType := target.Underlying().(*types.Struct)
+		values := make([]string, structType.NumFields())
+		for idx := range structType.NumFields() {
+			field := structType.Field(idx)
+			values[idx] = o.lowerFieldValueCopy(field.Type(), "__goscriptSource."+tsStructFieldName(field.Name(), idx))
+		}
+		return "((__goscriptSource) => " + o.lowerPositionalStructExpr(ctx, target, true, values) + ")(" + value + ")", true
+	}
+
 	// The class constructor copies the fields of its init value.
 	return "new " + o.namedTypeExpr(ctx, target) + "(" + value + ", true)", true
 }
@@ -15094,9 +15137,9 @@ func (o *LoweringOwner) lowerStructCloneOf(typ types.Type, value string) string 
 }
 
 // isGeneratedStructClass reports whether named is a non-generic package-level
-// struct type that the compiler emits as a class whose constructor takes a
-// second argument that marks the new object as a struct value, and whose
-// copy method is named clone.
+// struct type that the compiler emits as a positional class: its constructor
+// takes the struct value marker and then the field values in field order, and
+// its copy method is named clone.
 func (o *LoweringOwner) isGeneratedStructClass(named *types.Named) bool {
 	// A named, non-generic type.
 	if named == nil || named.TypeParams().Len() != 0 || named.TypeArgs().Len() != 0 {
@@ -15106,10 +15149,10 @@ func (o *LoweringOwner) isGeneratedStructClass(named *types.Named) bool {
 }
 
 // hasGeneratedClone reports whether a struct value of type named is copied by
-// the clone method of its generated class: a generated struct class (see
-// isGeneratedStructClass), or an instance of a generic struct type whose
-// class has the same shape, and whose constructor copies the fields of type
-// parameter types by their values at run time.
+// the clone method of its generated positional class: a generated struct
+// class (see isGeneratedStructClass), or an instance of a generic struct type
+// whose class has the same shape, whose clone method copies the fields of
+// type parameter types by their values at run time.
 func (o *LoweringOwner) hasGeneratedClone(named *types.Named) bool {
 	if named == nil || named.TypeArgs().Len() == 0 {
 		return o.isGeneratedStructClass(named)
@@ -15151,13 +15194,10 @@ func (o *LoweringOwner) hasGeneratedClassShape(named *types.Named) bool {
 	return true
 }
 
-// lowerNewStructValue returns a new struct value of a generated struct class
-// from the constructor arguments init, which may be empty.
-func (o *LoweringOwner) lowerNewStructValue(ctx lowerFileContext, named *types.Named, init string) string {
-	if init == "" {
-		init = "undefined"
-	}
-	return "new " + o.namedTypeExpr(ctx, named) + "(" + init + ", true)"
+// lowerNewStructValue returns the zero struct value of a generated struct
+// class.
+func (o *LoweringOwner) lowerNewStructValue(ctx lowerFileContext, named *types.Named) string {
+	return "new " + o.namedTypeExpr(ctx, named) + "(true)"
 }
 
 func (o *LoweringOwner) lowerNamedStructZeroValueExpr(
@@ -15168,6 +15208,12 @@ func (o *LoweringOwner) lowerNamedStructZeroValueExpr(
 	name := o.namedTypeExpr(ctx, named)
 	if named.TypeArgs().Len() == 0 {
 		return "new " + name + "()"
+	}
+
+	// A positional class takes the zero values of the type parameter fields
+	// of an instance in field order.
+	if o.hasGeneratedClone(named) {
+		return o.lowerPositionalStructExpr(ctx, named, false, o.genericStructFieldZeros(ctx, named))
 	}
 
 	// The zero values of the type parameter fields of an instance are
@@ -15199,6 +15245,35 @@ func (o *LoweringOwner) lowerNamedStructZeroValueExpr(
 	return "new " + name + "({" + strings.Join(fields, ", ") + "})"
 }
 
+// genericStructFieldZeros returns the zero value of each field of named, an
+// instance of a generic struct type, that is of a type parameter type, and
+// an empty value for each other field.
+func (o *LoweringOwner) genericStructFieldZeros(ctx lowerFileContext, named *types.Named) []string {
+	structType := named.Underlying().(*types.Struct)
+	values := make([]string, structType.NumFields())
+	for idx := range structType.NumFields() {
+		if genericStructFieldNeedsInstantiatedZero(named, idx) {
+			values[idx] = o.lowerDeclarationZeroValueExpr(ctx, structType.Field(idx).Type())
+		}
+	}
+	return values
+}
+
+// lowerFieldValueCopy returns a copy of value, a value of typ stored in a
+// field, for a positional constructor, which keeps the values it takes.
+func (o *LoweringOwner) lowerFieldValueCopy(typ types.Type, value string) string {
+	switch {
+	case isStructValueType(typ):
+		return o.lowerStructCloneOf(typ, value)
+	case isArrayType(typ):
+		return o.runtimeOwner.QualifiedHelper(RuntimeHelperCloneArrayValue) + "(" + value + ", " + o.runtimeTypeInfoExpr(typ) + ")"
+	case typeParamMayHoldValueType(typ):
+		return o.runtimeOwner.QualifiedHelper(RuntimeHelperCopyElement) + "(" + value + ")"
+	default:
+		return value
+	}
+}
+
 func genericStructFieldNeedsInstantiatedZero(named *types.Named, idx int) bool {
 	if named.TypeArgs().Len() == 0 {
 		return false
@@ -15217,7 +15292,10 @@ func (o *LoweringOwner) lowerZeroValueExprFor(ctx lowerFileContext, typ types.Ty
 			return "undefined as any"
 		}
 		if o.isGeneratedStructClass(named) {
-			return o.lowerNewStructValue(ctx, named, "")
+			return o.lowerNewStructValue(ctx, named)
+		}
+		if o.hasGeneratedClone(named) {
+			return o.lowerPositionalStructExpr(ctx, named, true, o.genericStructFieldZeros(ctx, named))
 		}
 		return o.runtimeOwner.QualifiedHelper(RuntimeHelperMarkAsStructValue) +
 			"(" + o.lowerNamedStructZeroValueExpr(ctx, named) + ")"
