@@ -266,7 +266,7 @@ func TestCompilePackagesLazilyInitializesSameFileLaterPackageVars(t *testing.T) 
 	for _, want := range []string{
 		"export var table: $.Slice<detail>",
 		"export function __goscript_get_table(): $.Slice<detail>",
-		"export let later: detail = new detail({n: 7}, true)",
+		"export let later: detail = new detail(true, 7)",
 	} {
 		if !strings.Contains(text, want) {
 			t.Fatalf("missing %q in generated output:\n%s", want, text)
@@ -1511,7 +1511,7 @@ func TestCompilePackagesEmitsPackageLocalImport(t *testing.T) {
 	if !strings.Contains(string(mainContent), "import * as subpkg from \"@goscript/example.test/imports/subpkg/index.js\"") {
 		t.Fatalf("missing package-local import:\n%s", string(mainContent))
 	}
-	if !strings.Contains(string(mainContent), "let b: $.VarRef<subpkg.Builder> = $.varRef(new subpkg.Builder(undefined, true))") {
+	if !strings.Contains(string(mainContent), "let b: $.VarRef<subpkg.Builder> = $.varRef(new subpkg.Builder(true))") {
 		t.Fatalf("missing imported struct zero value qualification:\n%s", string(mainContent))
 	}
 	if !strings.Contains(string(mainContent), "import * as __goscript_helper from \"./helper.gs.ts\"") ||
@@ -1793,7 +1793,7 @@ func TestCompilePackagesEmitsIndexAddressRefs(t *testing.T) {
 	if !strings.Contains(text, "set($.indexRef(values!, i), 9)") {
 		t.Fatalf("missing index address reference:\n%s", text)
 	}
-	if !strings.Contains(text, "new Item({N: 1})") {
+	if !strings.Contains(text, "new Item(false, 1)") {
 		t.Fatalf("missing elided pointer composite literal:\n%s", text)
 	}
 }
@@ -1955,8 +1955,8 @@ func TestCompilePackagesEmitsStructMethodsAndPointerAssertions(t *testing.T) {
 		"public clone(): Counter",
 		"public Read(): number",
 		"public Set(v: number): void",
-		"let original = $.varRef(new Counter({Value: 1}, true))",
-		"let original = $.varRef(new Counter({Value: 1}, true))\n\n\t// Copy should stay readable in generated output.\n\tlet copy",
+		"let original = $.varRef(new Counter(true, 1))",
+		"let original = $.varRef(new Counter(true, 1))\n\n\t// Copy should stay readable in generated output.\n\tlet copy",
 		"let copy = (original.value).clone()",
 		"let pointer = original",
 		"Counter.prototype.Set.call(pointer, 2)",
@@ -2103,7 +2103,7 @@ func TestCompilePackagesEscapesReservedTypeNames(t *testing.T) {
 	text := string(content)
 	for _, want := range []string{
 		"export class _static",
-		"new _static({Value: 7})",
+		"new _static(false, 7)",
 		"public Read(): number",
 		"_static.prototype.Read.call(newStatic())",
 		"\"main.static\"",
@@ -2363,8 +2363,8 @@ func TestCompilePackagesClonesNestedStructFieldsWithCloneMethodCollision(t *test
 	text := string(content)
 	for _, want := range []string{
 		"public __goscriptClone(): Box",
-		"this.Box = init?.Box ? $.markAsStructValue($.cloneStructValue(init.Box)) : $.markAsStructValue(new Box())",
-		"return new Holder(this, true)",
+		"this.Box = Box$ ?? $.markAsStructValue(new Box())",
+		"return new Holder(true, $.markAsStructValue($.cloneStructValue(this.Box)))",
 	} {
 		if !strings.Contains(text, want) {
 			t.Fatalf("missing %q in generated output:\n%s", want, text)
@@ -4120,7 +4120,7 @@ func TestCompilePackagesEmitsAsyncChannelsSelectAndDefer(t *testing.T) {
 		"$.selectStatement<any, void>([",
 		"let v = __goscriptSelect1Result.value",
 		"return $.selectVoidReturn()",
-		"await call($.interfaceValue<Processor | null>(new Worker({ch: $.makeChannel<number>(1, 0, \"both\")}), \"*main.Worker\",",
+		"await call($.interfaceValue<Processor | null>(new Worker(false, $.makeChannel<number>(1, 0, \"both\")), \"*main.Worker\",",
 	} {
 		if !strings.Contains(text, want) {
 			t.Fatalf("missing %q in generated output:\n%s", want, text)
@@ -5875,8 +5875,8 @@ func TestCompilePackagesQualifiesImportedTypesInSignaturesAndZeroValues(t *testi
 		"Header: lib.Header",
 		"Fn: ((_p0: lib.Box) => [lib.Box, $.GoError] | globalThis.Promise<[lib.Box, $.GoError]>) | null",
 		"Ptr: atomic.Pointer<(() => void) | null>",
-		"this.Header = init?.Header ?? (null! as lib.Header)",
-		"new lib.Box(undefined, true)",
+		"this.Header = Header$ ?? (null! as lib.Header)",
+		"new lib.Box(true)",
 		"$.markAsStructValue(new atomic.Pointer<(() => void) | null>())",
 		"export function Use(fn: ((_p0: lib.Box) => [lib.Box, $.GoError] | globalThis.Promise<[lib.Box, $.GoError]>) | null, box: lib.Box): [lib.Box, $.GoError]",
 		"$.functionValue((box: lib.Box): [lib.Box, $.GoError] => {",
@@ -6397,7 +6397,7 @@ func TestCompilePackagesLowersNamedStructConversionWithTypedAsyncFact(t *testing
 	if !strings.Contains(text, "await (async () => { const __goscriptConvert") {
 		t.Fatalf("missing async named struct conversion:\n%s", text)
 	}
-	if !strings.Contains(text, "$.markAsStructValue(new Target({Value: __goscriptConvert") {
+	if !strings.Contains(text, "new Target(true, __goscriptConvert") {
 		t.Fatalf("missing typed named struct conversion target:\n%s", text)
 	}
 	if !strings.Contains(text, "const __goscriptConvert1 = await (async ") {
