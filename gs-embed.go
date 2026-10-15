@@ -325,6 +325,7 @@ import "embed"
 //go:embed gs/sync/atomic/doc.gs.ts
 //go:embed gs/sync/atomic/doc_64.gs.ts
 //go:embed gs/sync/atomic/index.ts
+//go:embed gs/sync/atomic/meta.json
 //go:embed gs/sync/atomic/type.gs.ts
 //go:embed gs/sync/atomic/value.gs.ts
 //go:embed gs/sync/index.ts

@@ -1685,6 +1685,10 @@ type lowerFileContext struct {
 	// statement, so that they are copied even for a method or function that
 	// only reads them.
 	copyValues bool
+	// transientAddress is whether a field address being lowered is passed to
+	// a transient pointer parameter, so that it may be a new reference
+	// rather than the stable one (see markTransientPointers).
+	transientAddress bool
 	// exprTemps maps the operands of a compound assignment target that have
 	// side effects to the temporaries that hold their values, which the
 	// target reads instead of evaluating them again (see
@@ -10615,13 +10619,19 @@ func (o *LoweringOwner) lowerFixedCallArgs(
 	}
 
 	// A struct parameter that the called function only reads takes the
-	// caller's value without a copy (see funcParamsReadOnly).
+	// caller's value without a copy (see funcParamsReadOnly), and a
+	// transient pointer parameter a new reference to a field (see
+	// markTransientPointers).
 	var paramsReadOnly []valueReadOnlyKind
+	var paramsTransient []bool
 	calleeAsync := false
 	if fn := calledFunction(ctx.semPkg.source, ast.Unparen(call.Fun)); fn != nil && !overrideCall {
 		if semFn := semanticFunctionFor(ctx.model, fn); semFn != nil {
 			paramsReadOnly = semFn.paramsReadOnly
 			calleeAsync = o.functionAsync(ctx, fn)
+			if !isMethodExprCall(ctx.semPkg.source, call) {
+				paramsTransient = semFn.paramsTransient
+			}
 		}
 	}
 
@@ -10629,6 +10639,7 @@ func (o *LoweringOwner) lowerFixedCallArgs(
 	args := make([]string, 0, len(call.Args))
 	var diagnostics []Diagnostic
 	for idx, expr := range call.Args {
+		// An argument without a parameter lowers untyped.
 		if idx >= params.Len() {
 			lowered, exprDiagnostics := o.lowerCallArgExpr(ctx, expr, nil, allowAsyncOverrideCallback)
 			diagnostics = append(diagnostics, exprDiagnostics...)
@@ -10636,9 +10647,11 @@ func (o *LoweringOwner) lowerFixedCallArgs(
 			continue
 		}
 
+		// Other arguments lower against their parameters, and a read-only
+		// struct parameter shares the value.
 		param := params.At(idx)
 		allowAsyncCallback := allowAsyncOverrideCallback || o.overrideAwaitsCallback(ctx, call.Fun, param.Name())
-		lowered, exprDiagnostics := o.lowerCallArgExpr(ctx, expr, param.Type(), allowAsyncCallback)
+		lowered, exprDiagnostics := o.lowerFixedCallArg(ctx, expr, param.Type(), allowAsyncCallback, idx < len(paramsTransient) && paramsTransient[idx])
 		diagnostics = append(diagnostics, exprDiagnostics...)
 		if idx < len(paramsReadOnly) && !ctx.copyValues &&
 			types.Identical(ctx.semPkg.source.TypesInfo.TypeOf(expr), param.Type()) &&
@@ -10653,6 +10666,51 @@ func (o *LoweringOwner) lowerFixedCallArgs(
 		args = append(args, lowered)
 	}
 	return args, diagnostics
+}
+
+// lowerFixedCallArg lowers the argument expr of a parameter of type
+// targetType. The address of a field passed to a transient parameter is a
+// new reference to the field.
+func (o *LoweringOwner) lowerFixedCallArg(ctx lowerFileContext, expr ast.Expr, targetType types.Type, overrideCall bool, transient bool) (string, []Diagnostic) {
+	if transient {
+		if selector, selection := fieldAddressOperand(ctx, expr); selector != nil {
+			return o.lowerTransientFieldAddress(ctx, selector, selection)
+		}
+	}
+	return o.lowerCallArgExpr(ctx, expr, targetType, overrideCall)
+}
+
+// fieldAddressOperand returns the field selection x.f of expr when it is
+// the address &x.f of a field, which a transient parameter may take as a new
+// reference.
+func fieldAddressOperand(ctx lowerFileContext, expr ast.Expr) (*ast.SelectorExpr, *types.Selection) {
+	// Only the address of a selected field.
+	unary, ok := ast.Unparen(expr).(*ast.UnaryExpr)
+	if !ok || unary.Op != token.AND {
+		return nil, nil
+	}
+	return fieldSelectionOperand(ctx, unary.X)
+}
+
+// fieldSelectionOperand returns expr as a field selection x.f, if it is one.
+func fieldSelectionOperand(ctx lowerFileContext, expr ast.Expr) (*ast.SelectorExpr, *types.Selection) {
+	// Only a selector that selects a field.
+	selector, ok := ast.Unparen(expr).(*ast.SelectorExpr)
+	if !ok {
+		return nil, nil
+	}
+	selection := ctx.semPkg.source.TypesInfo.Selections[selector]
+	if selection == nil || selection.Kind() != types.FieldVal {
+		return nil, nil
+	}
+	return selector, selection
+}
+
+// lowerTransientFieldAddress lowers the address of the field of selector,
+// passed to a transient pointer parameter, as a new reference to the field.
+func (o *LoweringOwner) lowerTransientFieldAddress(ctx lowerFileContext, selector *ast.SelectorExpr, selection *types.Selection) (string, []Diagnostic) {
+	ctx.transientAddress = true
+	return o.lowerFieldSelectionExpr(ctx, selector, selection, true)
 }
 
 func (o *LoweringOwner) lowerCallArgExpr(
@@ -11613,8 +11671,15 @@ func (o *LoweringOwner) lowerNamedReceiverMethodCall(
 		receiver = selectedReceiverNamedType(ctx.semPkg.source, selector, selection)
 	}
 
-	// Call the method function with the receiver as its first argument.
-	receiverExpr, receiverDiagnostics := o.lowerNamedReceiverForMethod(ctx, selector.X, selection)
+	// Call the method function with the receiver as its first argument. A
+	// transient pointer receiver takes a new reference to a field.
+	var receiverExpr string
+	var receiverDiagnostics []Diagnostic
+	if field, fieldSelection := o.transientReceiverField(ctx, selector, selection); field != nil {
+		receiverExpr, receiverDiagnostics = o.lowerTransientFieldAddress(ctx, field, fieldSelection)
+	} else {
+		receiverExpr, receiverDiagnostics = o.lowerNamedReceiverForMethod(ctx, selector.X, selection)
+	}
 	diagnostics = append(diagnostics, receiverDiagnostics...)
 	allArgs := append([]string{receiverExpr}, args...)
 	call := o.methodFunctionExpr(ctx, receiver, selection.Obj(), selector.Sel.Name) + "(" + strings.Join(allArgs, ", ") + ")"
@@ -11721,6 +11786,27 @@ func directPointerMethodCall(receiver, receiverType, name string, args []string,
 // maxDirectCallArgsLen is the longest argument list, in characters, that a
 // direct pointer method call repeats (see directPointerMethodCall).
 const maxDirectCallArgsLen = 120
+
+// transientReceiverField returns the field selection x.f of a call x.f.M()
+// of a pointer method whose receiver is transient, which takes a new
+// reference to the field.
+func (o *LoweringOwner) transientReceiverField(ctx lowerFileContext, selector *ast.SelectorExpr, selection *types.Selection) (*ast.SelectorExpr, *types.Selection) {
+	// Only a method declared on the field's own type, not a promoted one.
+	method, _ := selection.Obj().(*types.Func)
+	if method == nil || len(selection.Index()) != 1 || !methodHasPointerReceiver(method) {
+		return nil, nil
+	}
+
+	// The receiver is the address of the field when the field is no pointer.
+	if isPointerType(ctx.semPkg.source.TypesInfo.TypeOf(selector.X)) {
+		return nil, nil
+	}
+	semFn := semanticFunctionFor(ctx.model, method)
+	if semFn == nil || !semFn.receiverTransient {
+		return nil, nil
+	}
+	return fieldSelectionOperand(ctx, selector.X)
+}
 
 func (o *LoweringOwner) lowerNamedReceiverForMethod(
 	ctx lowerFileContext,
@@ -11936,22 +12022,30 @@ func (o *LoweringOwner) lowerFieldSelectionExpr(
 	selection *types.Selection,
 	address bool,
 ) (string, []Diagnostic) {
+	// Only the address of this field may be transient, not those its
+	// receiver takes.
+	transient := ctx.transientAddress
+	ctx.transientAddress = false
 	if value, diagnostics, ok := o.lowerUnsafeStructFieldSelectionExpr(ctx, expr, selection, address); ok {
 		return value, diagnostics
 	}
+
+	// A direct field is selected on the lowered receiver.
 	receiver, diagnostics := o.lowerFieldReceiverExpr(ctx, expr.X)
 	receiver = parenthesizeAwaitedExpr(receiver)
 	index := selection.Index()
 	if len(index) == 0 {
 		fieldName := tsStructFieldName(expr.Sel.Name, 0)
 		if address {
-			return o.lowerFieldAddressExpr(receiver, fieldName), diagnostics
+			return o.lowerFieldAddressExpr(receiver, fieldName, transient), diagnostics
 		}
 		return receiver + "." + fieldName, diagnostics
 	}
 
+	// An embedded field path selects each field in turn.
 	typ := derefPointerType(ctx.semPkg.source.TypesInfo.TypeOf(expr.X))
 	for idx, fieldIndex := range index {
+		// A path through a type that is not a struct selects the name.
 		structType := structUnderlyingType(typ)
 		if structType == nil || fieldIndex < 0 || fieldIndex >= structType.NumFields() {
 			fieldName := tsStructFieldName(expr.Sel.Name, 0)
@@ -11960,15 +12054,18 @@ func (o *LoweringOwner) lowerFieldSelectionExpr(
 			}
 			return receiver + "." + fieldName, diagnostics
 		}
+
+		// The last field of the path is the selected one.
 		field := structType.Field(fieldIndex)
 		name := tsStructFieldName(field.Name(), fieldIndex)
 		if idx == len(index)-1 {
 			if address {
-				return o.lowerFieldAddressExpr(receiver, name), diagnostics
+				return o.lowerFieldAddressExpr(receiver, name, transient), diagnostics
 			}
 			return receiver + "." + name, diagnostics
 		}
 
+		// An embedded field is the receiver of the next, through a pointer.
 		receiver += "." + name
 		typ = field.Type()
 		if pointer, ok := types.Unalias(typ).Underlying().(*types.Pointer); ok {
@@ -11978,16 +12075,23 @@ func (o *LoweringOwner) lowerFieldSelectionExpr(
 		}
 	}
 
+	// A path that runs out of struct types selects the name.
 	if address {
-		return o.lowerFieldAddressExpr(receiver, tsStructFieldName(expr.Sel.Name, 0)), diagnostics
+		return o.lowerFieldAddressExpr(receiver, tsStructFieldName(expr.Sel.Name, 0), transient), diagnostics
 	}
 	return receiver + "." + tsStructFieldName(expr.Sel.Name, 0), diagnostics
 }
 
 // lowerFieldAddressExpr returns the reference to the field of the struct
-// that receiver evaluates to, whose fields are its own properties.
-func (o *LoweringOwner) lowerFieldAddressExpr(receiver string, fieldName string) string {
-	return o.runtimeOwner.QualifiedHelper(RuntimeHelperFieldRef) + "(" + receiver + ", " + strconv.Quote(fieldName) + ")"
+// that receiver evaluates to, whose fields are its own properties: the stable
+// one, or a new one when transient.
+func (o *LoweringOwner) lowerFieldAddressExpr(receiver string, fieldName string, transient bool) string {
+	// A transient parameter takes a new reference.
+	helper := RuntimeHelperFieldRef
+	if transient {
+		helper = RuntimeHelperTransientFieldRef
+	}
+	return o.runtimeOwner.QualifiedHelper(helper) + "(" + receiver + ", " + strconv.Quote(fieldName) + ")"
 }
 
 func (o *LoweringOwner) lowerUnsafeStructFieldSelectionExpr(
@@ -12040,7 +12144,7 @@ func (o *LoweringOwner) lowerUnsafeStructFieldSelectionExpr(
 	receiver, diagnostics := o.lowerFieldReceiverExpr(ctx, unsafeCall.Args[0])
 	fieldName := tsStructFieldName(sourceField.Name(), index[0])
 	if address {
-		return o.lowerFieldAddressExpr(receiver, fieldName), diagnostics, true
+		return o.lowerFieldAddressExpr(receiver, fieldName, false), diagnostics, true
 	}
 	return receiver + "." + fieldName, diagnostics, true
 }
