@@ -18,11 +18,11 @@ $.registerNamedValueType(
 );
 
 export function myInt_add(m: myInt, x: number): number {
-	return $.int(m) + x
+	return m + x
 }
 
 export function myInt_multiply(m: myInt, x: number, y: number): number {
-	return ($.int(m) * x) * y
+	return (m * x) * y
 }
 
 export async function main(): globalThis.Promise<void> {

@@ -21,5 +21,5 @@ $.registerNamedValueType(
 );
 
 export function box_base(b: box): number {
-	return $.int(b)
+	return b
 }

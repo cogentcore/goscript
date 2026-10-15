@@ -10,11 +10,11 @@ export function search<E>(__typeArgs: $.GenericTypeArgs | undefined, dictionary:
 	for (let __goscriptSliceWindow0 = $.sliceRange(dictionary); to > _from; ) {
 		let middle: number = globalThis.Math.trunc((_from + to) / 2)
 		let cpRange = $.copyElement(((__goscriptSliceWindow0.backing as any[])[$.windowSlot(__goscriptSliceWindow0, middle)] as any))
-		if ($.int(r) < $.arrayIndex((cpRange as number[]), 0)) {
+		if (r < $.arrayIndex((cpRange as number[]), 0)) {
 			to = middle
 			continue
 		}
-		if ($.int(r) > $.arrayIndex((cpRange as number[]), 1)) {
+		if (r > $.arrayIndex((cpRange as number[]), 1)) {
 			_from = middle + 1
 			continue
 		}
