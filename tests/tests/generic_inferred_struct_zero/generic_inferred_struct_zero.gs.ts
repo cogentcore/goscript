@@ -131,7 +131,7 @@ export function literalTree(__typeArgs: $.GenericTypeArgs | undefined): tree {
 
 export function varTree(__typeArgs: $.GenericTypeArgs | undefined): tree {
 	let tr: tree = $.markAsStructValue(new tree({empty: $.genericZero(__typeArgs, "T", null)}))
-	return $.markAsStructValue($.cloneStructValue(tr))
+	return tr
 }
 
 export function zero(__typeArgs: $.GenericTypeArgs | undefined): any {

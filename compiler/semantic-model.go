@@ -394,6 +394,7 @@ func (o *SemanticModelOwner) collectFileDeclarations(
 			semFn.hasBody = typed.Body != nil
 			semFn.receiverReadOnly = methodReceiverReadOnly(pkg, typed)
 			semFn.paramsReadOnly = funcParamsReadOnly(pkg, typed)
+			semFn.resultBorrows = funcResultBorrows(pkg, typed, fn, semFn.paramsReadOnly)
 			semPkg.functionDecls[fn] = typed
 			semPkg.declarations = append(semPkg.declarations, semanticDeclaration{
 				kind:     "func",
@@ -2478,6 +2479,80 @@ func funcParamsReadOnly(pkg *packages.Package, decl *ast.FuncDecl) []valueReadOn
 		return nil
 	}
 	return readOnly
+}
+
+// funcResultBorrows reports, for each result of decl, the index of the
+// struct parameter that a return statement returns as it is, where a caller
+// may pass that parameter without a copy (see funcParamsReadOnly), or -1.
+// Such a return copies the parameter, unless the call asks to borrow the
+// results, which a caller does when it only reads them while its argument
+// stays unchanged (see borrowedResultCalls). It is nil when no result
+// borrows a parameter, and for functions whose calls cannot add the request
+// as a last argument: generic and variadic ones, and ones with named results
+// or deferred calls, which may change or keep the results after a return.
+func funcResultBorrows(pkg *packages.Package, decl *ast.FuncDecl, fn *types.Func, paramsReadOnly []valueReadOnlyKind) []int {
+	// Only a plain function or method with shared parameters qualifies.
+	signature, _ := fn.Type().(*types.Signature)
+	if paramsReadOnly == nil || decl.Body == nil || signature == nil || signature.Variadic() ||
+		signature.TypeParams().Len() != 0 || signature.RecvTypeParams().Len() != 0 ||
+		signature.Results().Len() == 0 || signature.Results().At(0).Name() != "" || bodyHasDefer(decl.Body) {
+		return nil
+	}
+
+	// paramIndex returns the index of the shared parameter that expr names
+	// and that result idx can hold, or -1.
+	paramIndex := func(expr ast.Expr, idx int) int {
+		ident, ok := ast.Unparen(expr).(*ast.Ident)
+		if !ok {
+			return -1
+		}
+		resultType := signature.Results().At(idx).Type()
+		for p := range min(signature.Params().Len(), len(paramsReadOnly)) {
+			param := signature.Params().At(p)
+			if pkg.TypesInfo.Uses[ident] == param && paramsReadOnly[p] != valueNotReadOnly &&
+				isStructValueType(resultType) && types.Identical(param.Type(), resultType) {
+				return p
+			}
+		}
+		return -1
+	}
+
+	// Record the first shared parameter that each result returns, outside
+	// function literals.
+	borrows := slices.Repeat([]int{-1}, signature.Results().Len())
+	found := false
+	ast.Inspect(decl.Body, func(node ast.Node) bool {
+		switch typed := node.(type) {
+		case *ast.FuncLit:
+			return false
+		case *ast.ReturnStmt:
+			if len(typed.Results) != len(borrows) {
+				return true
+			}
+			for idx, result := range typed.Results {
+				if p := paramIndex(result, idx); p >= 0 && borrows[idx] < 0 {
+					borrows[idx], found = p, true
+				}
+			}
+		}
+		return true
+	})
+	if !found {
+		return nil
+	}
+	return borrows
+}
+
+// bodyHasDefer reports whether body has a defer statement, also in a
+// function literal.
+func bodyHasDefer(body *ast.BlockStmt) bool {
+	found := false
+	ast.Inspect(body, func(node ast.Node) bool {
+		_, isDefer := node.(*ast.DeferStmt)
+		found = found || isDefer
+		return !found
+	})
+	return found
 }
 
 // callPassesOnlyValues reports whether call is a conversion, a builtin call
