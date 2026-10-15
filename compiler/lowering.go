@@ -10217,7 +10217,8 @@ func (o *LoweringOwner) lowerCallExpr(ctx lowerFileContext, expr *ast.CallExpr) 
 			return o.awaitCallIfNeeded(ctx, expr, call), diagnostics
 		}
 		selector, selectorDiagnostics := o.lowerSelectorExpr(ctx, fun)
-		if genericFunctionSignature(ctx, fun) != nil && !o.callUsesOverridePackage(ctx, fun) {
+		if genericFunctionSignature(ctx, fun) != nil &&
+			(!o.callUsesOverridePackage(ctx, fun) || o.overrideFacts().TakesTypeArgs(calledFunction(ctx.semPkg.source, fun))) {
 			args = append([]string{o.genericTypeArgsExpr(ctx, fun, nil)}, args...)
 		}
 		args = o.appendSlicesGrowZeroFactory(ctx, fun, expr, args)

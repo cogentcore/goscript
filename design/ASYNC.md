@@ -114,6 +114,10 @@ program takes (`compiler/semantic-func-values.go`,
   fields and variables, and the callbacks an override passes to Go
   functions) suspend only by calling the Go functions they were given: their
   own function parameters and those of the function that produced them.
+  Override metadata can instead say that the values a function hands out
+  suspend (`suspendingValues`): `iter.Pull`'s `next` and `stop` and the yield
+  callback it passes to the sequence are async values of their instantiated
+  func types, recorded at each call of `Pull`.
 - A func type asserted from an interface value keeps its classes async when
   the program uses a function that override metadata lists in
   `funcValueMakers` (`reflect.MakeFunc`, `reflect.Value.MethodByName`),

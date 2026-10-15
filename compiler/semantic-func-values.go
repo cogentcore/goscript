@@ -386,13 +386,15 @@ func (w *funcFactsWalker) visitCall(node *semanticFunction, call *ast.CallExpr) 
 	}
 
 	// The callee is a declared function or a value. A format function's
-	// operands decide it.
+	// operands decide it, and a suspendingValues override hands out async
+	// values.
 	if called := calledFunction(w.pkg, call.Fun); called != nil && !w.visitFormatCall(node, call, called) {
 		node.calls[functionOriginOrSelf(called)] = true
 	}
 	if callUsesFunctionValue(w.pkg, call.Fun) || callUsesFunctionIdentifier(w.pkg, call.Fun) {
 		w.visitValueCall(node, call)
 	}
+	w.recordSuspendingValues(calledFunction(w.pkg, call.Fun), signatureForType(w.pkg.TypesInfo.TypeOf(call.Fun)))
 
 	// A Lock of a known mutex waits on its critical sections. Some callees
 	// suspend whatever the program, and callback async overrides wait on
@@ -411,6 +413,44 @@ func (w *funcFactsWalker) visitCall(node *semanticFunction, call *ast.CallExpr) 
 		markOwnAsync(node, call.Pos(), kind, detail)
 	}
 	recordCallbackOverrideCall(w.pkg, w.overrideFacts, node, call, w.literalKey)
+}
+
+// recordSuspendingValues records the shapes of the function values that an
+// override function, which metadata lists in suspendingValues, hands to
+// compiled code when called with signature, the function's type at a call or
+// where its value is taken: its function results and the callbacks it passes
+// to its function arguments. iter.Pull's next, stop and yield are such values.
+func (w *funcFactsWalker) recordSuspendingValues(fn *types.Func, signature *types.Signature) {
+	// Only such an override function qualifies.
+	if signature == nil || !w.overrideFacts.MakesSuspendingValues(fn) {
+		return
+	}
+
+	// The function results flow out to the caller.
+	var shapes []string
+	for result := range signature.Results().Variables() {
+		shapes = append(shapes, funcValueShape(result.Type()))
+	}
+
+	// The callbacks flow into the function arguments.
+	for param := range signature.Params().Variables() {
+		if callee := signatureForType(param.Type()); callee != nil {
+			for callback := range callee.Params().Variables() {
+				shapes = append(shapes, funcValueShape(callback.Type()))
+			}
+		}
+	}
+
+	// Each function shape is recorded once.
+	for _, shape := range shapes {
+		if shape == "" {
+			continue
+		}
+		if w.semPkg.suspendingValueShapes == nil {
+			w.semPkg.suspendingValueShapes = make(map[string]bool)
+		}
+		w.semPkg.suspendingValueShapes[shape] = true
+	}
 }
 
 // visitLock records a Lock or RLock call of a known mutex with a critical
@@ -511,8 +551,11 @@ func (w *funcFactsWalker) visitAssertedType(expr ast.Expr) {
 	w.semPkg.assertedFuncShapes[shape] = true
 }
 
-// takeValue records that the package takes the value of key at expr.
+// takeValue records that the package takes the value of key at expr. The
+// value of a suspendingValues override function hands out suspending values
+// when called.
 func (w *funcFactsWalker) takeValue(expr ast.Expr, key *types.Func) {
+	w.recordSuspendingValues(key, signatureForType(w.pkg.TypesInfo.TypeOf(expr)))
 	w.addValue(funcValue{shape: funcValueShape(w.pkg.TypesInfo.TypeOf(expr)), key: functionOriginOrSelf(key)})
 }
 

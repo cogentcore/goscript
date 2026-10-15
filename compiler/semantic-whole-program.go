@@ -531,6 +531,33 @@ func addOverrideFuncValues(model *SemanticModel, overridePkgs []*types.Package) 
 	return w.values
 }
 
+// addSuspendingFuncValues adds a value of each shape that the program's
+// calls of suspendingValues override functions receive, and returns the
+// values. They share one node that suspends by itself: iter.Pull's next and
+// stop wait for the sequence, and its yield waits for the next call.
+func addSuspendingFuncValues(model *SemanticModel) []funcValue {
+	// Collect the shapes of every package.
+	shapes := make(map[string]bool)
+	for _, semPkg := range model.packages {
+		maps.Copy(shapes, semPkg.suspendingValueShapes)
+	}
+	if len(shapes) == 0 {
+		return nil
+	}
+
+	// The node is async by its own code.
+	node := newSyntheticNode(token.NoPos, nil, funcValueNodeName)
+	markOwnAsync(node, token.NoPos, asyncCauseOverrideValue, "override metadata says the function values of a call suspend (suspendingValues)")
+	model.valueNodes[node.function] = node
+
+	// Each shape is a value of the node.
+	values := make([]funcValue, 0, len(shapes))
+	for _, shape := range slices.Sorted(maps.Keys(shapes)) {
+		values = append(values, funcValue{shape: shape, key: node.function})
+	}
+	return values
+}
+
 // walkObject walks the values an exported object can produce.
 func (w *overrideValueWalker) walkObject(obj types.Object) {
 	switch typed := obj.(type) {

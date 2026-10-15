@@ -51,7 +51,8 @@ const (
 	// interface value in a program that makes functions by reflection.
 	asyncCauseReflectFunc = "reflect-func"
 	// asyncCauseOverrideValue is an async override function or method taken
-	// as a value.
+	// as a value, or a function value an override hands out that metadata
+	// says suspends.
 	asyncCauseOverrideValue = "override-value"
 	// asyncCauseOverrideMethod is an async override method that implements an
 	// interface of the program.

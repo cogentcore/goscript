@@ -1,0 +1,37 @@
+next: 0 true
+next: 1 true
+next: 2 true
+next: 0 false
+after end: 0 false
+after stop: 0 false
+log: count done
+first: 0 true
+log before stop: 0
+log: yield false
+log: count done
+after stop: 0 false
+unstarted log: 0
+infinite sum: 10
+pair: 0 0 true
+pair: 1 1 true
+pair: 2 4 true
+pair: 0 0 false
+nil seq recovered: true
+before panic: 1 true
+recovered: seq failed
+after panic: 0 false
+doubled: 0
+doubled: 2
+doubled: 4
+doubled: 6
+interleaved: 0 true 0 true
+interleaved: 1 true 1 true
+interleaved: 2 true 2 true
+interleaved: 0 false 3 true
+token: 1
+token: 10
+token: 0
+token: 1
+token: 2
+stack after break: 0
+done

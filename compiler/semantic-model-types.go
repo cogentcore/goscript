@@ -145,6 +145,10 @@ type semanticPackage struct {
 	// topValueCalls holds the shapes of the function values called outside
 	// function bodies, by package initialization.
 	topValueCalls map[string]bool
+	// suspendingValueShapes holds the shapes of the function values that
+	// override functions, which metadata lists in suspendingValues, hand to
+	// the package's code at its calls of them.
+	suspendingValueShapes map[string]bool
 	// lockSections holds the node of the critical section of each Lock or
 	// RLock call of a known mutex, by the call's position.
 	lockSections map[token.Pos]*semanticFunction
