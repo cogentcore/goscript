@@ -1,0 +1,12 @@
+text: 18 14 héllo ✓ wörld
+bytes: 18 true 195 169
+rune: 0 104
+rune: 1 233
+rune: 3 108
+rune: 4 108
+rune: 5 111
+rune: 6 32
+rune: 7 65533
+invalid: 11 false 255 254
+file: true true
+entry: dé.txt 7
