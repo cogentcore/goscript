@@ -1,4 +1,10 @@
-import { isArrayOrGoSlice } from './slice.js'
+import {
+  isArrayOrGoSlice,
+  isTypedSlice,
+  typedSliceHintOf,
+  typedSliceHintOfBasic,
+  type TypedSlice,
+} from './slice.js'
 import { isVarRef, varRef, type VarRef } from './varRef.js'
 import { runtimePanic } from './panic.js'
 
@@ -1258,9 +1264,9 @@ function matchesArrayOrSliceType(value: any, info: TypeInfo): boolean {
   // For slices and arrays, check if the value is an array and sample element types
   if (!isArrayTypeInfo(info) && !isSliceTypeInfo(info)) return false
 
-  if (value instanceof Uint8Array) {
+  if (isTypedSlice(value)) {
     if (isArrayTypeInfo(info) && value.length !== info.length) return false
-    return isNumberElementType(info.elemType)
+    return typedElementMatches(value, info.elemType)
   }
 
   if (!isArrayOrGoSlice(value)) return false
@@ -1285,18 +1291,50 @@ function matchesArrayOrSliceType(value: any, info: TypeInfo): boolean {
   return true
 }
 
-function isNumberElementType(typeInfo: string | TypeInfo | undefined): boolean {
+// predeclaredBasicNames holds the names of Go's predeclared basic types,
+// with byte and rune as uint8 and int32.
+const predeclaredBasicNames = new Set([
+  'bool',
+  'string',
+  'int',
+  'int8',
+  'int16',
+  'int32',
+  'int64',
+  'uint',
+  'uint8',
+  'uint16',
+  'uint32',
+  'uint64',
+  'uintptr',
+  'float32',
+  'float64',
+  'complex64',
+  'complex128',
+])
+
+// typedElementMatches reports whether a typed slice holds elements of the
+// given type: those of the kind of its typed array, or of a named type, whose
+// underlying kind its type information does not give.
+function typedElementMatches(
+  value: TypedSlice,
+  typeInfo: string | TypeInfo | undefined,
+): boolean {
+  // Elements of an unknown type, or of any number type, match.
   if (typeInfo === undefined) return true
   const info = normalizeTypeInfo(typeInfo)
+  if (info.kind !== TypeKind.Basic) return false
+  if (info.name === undefined || info.name === 'number') return true
+
+  // A predeclared type must be that of the typed array.
+  const name =
+    info.name === 'byte' ? 'uint8'
+    : info.name === 'rune' ? 'int32'
+    : info.name
+  const hint = typedSliceHintOf(value)
   return (
-    info.kind === TypeKind.Basic &&
-    (info.name === undefined ||
-      info.name === 'number' ||
-      info.name === 'int' ||
-      info.name === 'uint' ||
-      info.name === 'uint8' ||
-      info.name === 'byte' ||
-      info.name === 'float64')
+    !predeclaredBasicNames.has(name) ||
+    name === (hint === 'byte' ? 'uint8' : hint)
   )
 }
 
@@ -1604,7 +1642,7 @@ export function arrayValueTypeInfo(
  * the value carries it. The copy is marked as an array value.
  */
 export function cloneArrayValue<T>(value: T, typeInfo?: string | TypeInfo): T {
-  if (value instanceof Uint8Array) {
+  if (isTypedSlice(value)) {
     return arrayValue(value.slice()) as T
   }
   if (!isArrayOrGoSlice(value)) {
@@ -3217,6 +3255,23 @@ export function genericZero<T>(
     return zero() as T
   }
   return fallback
+}
+
+// genericSliceTypeHint returns the makeSlice type hint of the typed array
+// that holds slices of the type argument of the type parameter name, so that
+// make([]T, n) in generic code makes the slice that make of its type argument
+// makes, or undefined for elements held in plain arrays.
+export function genericSliceTypeHint(
+  typeArgs: GenericTypeArgs | undefined,
+  name: string,
+): string | undefined {
+  // A basic type argument, named or not, is described by its basic name.
+  const info = typeArgs?.[name]?.type
+  const basic =
+    typeof info === 'string' ? info
+    : info?.kind === TypeKind.Basic ? info.name
+    : undefined
+  return typedSliceHintOfBasic(basic)
 }
 
 // genericNew returns new(T) for the type parameter name. A pointer to a
