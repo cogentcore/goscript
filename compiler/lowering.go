@@ -10084,6 +10084,11 @@ func (o *LoweringOwner) lowerCallExpr(ctx lowerFileContext, expr *ast.CallExpr) 
 				}
 				return o.runtimeOwner.QualifiedHelper(RuntimeHelperCap) + "(" + strings.Join(args, ", ") + ")", diagnostics
 			case "clear":
+				// Struct and array elements are cleared to zero values of
+				// their own, made by a factory.
+				if sliceType, ok := types.Unalias(ctx.semPkg.source.TypesInfo.TypeOf(expr.Args[0])).Underlying().(*types.Slice); ok && makeSliceElemNeedsZeroFactory(sliceType.Elem()) {
+					args = append(args, "() => "+o.lowerZeroValueExprFor(ctx, sliceType.Elem()))
+				}
 				return o.runtimeOwner.QualifiedHelper(RuntimeHelperClear) + "(" + strings.Join(args, ", ") + ")", diagnostics
 			case "copy":
 				return o.runtimeOwner.QualifiedHelper(RuntimeHelperCopy) + "(" + strings.Join(args, ", ") + ")", diagnostics
@@ -11010,7 +11015,9 @@ func (o *LoweringOwner) lowerMakeExpr(ctx lowerFileContext, expr *ast.CallExpr) 
 			}
 			args = append(args, "() => ("+o.lowerDeclarationZeroValueExpr(ctx, typed.Elem())+" as "+o.tsSliceElemTypeFor(ctx, typed.Elem())+")")
 		}
-		if namedStructType(typed.Elem()) != nil && isStructValueType(typed.Elem()) {
+		// Struct and array elements get their zero values from a factory,
+		// as each element is a value of its own.
+		if makeSliceElemNeedsZeroFactory(typed.Elem()) {
 			if capacity == "" {
 				args = append(args, "undefined")
 			}
@@ -16474,6 +16481,23 @@ func typeSetMayHoldValueType(iface *types.Interface) bool {
 		}
 	}
 	return false
+}
+
+// makeSliceElemNeedsZeroFactory reports whether make([]T, n) must build each
+// element with a zero-value factory: T is a struct with fields, named or not,
+// or an array type, whose zero value is an object rather than null.
+func makeSliceElemNeedsZeroFactory(elem types.Type) bool {
+	// A type parameter has its own factory.
+	if _, ok := types.Unalias(elem).(*types.TypeParam); ok {
+		return false
+	}
+
+	// Struct values and arrays are objects.
+	if isStructValueType(elem) {
+		return true
+	}
+	_, isArray := types.Unalias(elem).Underlying().(*types.Array)
+	return isArray
 }
 
 func isStructValueType(typ types.Type) bool {

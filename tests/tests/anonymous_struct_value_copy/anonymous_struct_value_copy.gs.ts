@@ -22,7 +22,7 @@ export async function main(): globalThis.Promise<void> {
 	e.N = 9
 	await $.println("index:", $.arrayIndex(s!, 0).N)
 
-	let t = $.makeSlice<{"N": number}>(1)
+	let t = $.makeSlice<{"N": number}>(1, undefined, undefined, () => $.anonymousStructValue({"N": 0}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("N", /* @__PURE__ */ $.basicType("int"), [0], 0, true)] }))
 	$.copy(t, s)
 	$.arrayIndex(t!, 0).N = 9
 	await $.println("copy:", $.arrayIndex(s!, 0).N)
