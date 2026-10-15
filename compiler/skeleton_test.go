@@ -826,7 +826,7 @@ func TestCompilePackagesRoutesUint64BinaryOpsThroughHelpers(t *testing.T) {
 	for _, want := range []string{
 		`return $.uint64Add(s.heap, s.stack)`,
 		`ret = $.uint64Or(ret, $.uint64Shr(ret, 32n))`,
-		`return $.int($.uint64And(ret, 1n), 32)`,
+		`return $.intFromWide($.uint64And(ret, 1n), 32)`,
 		`return $.uint64Sub(yVal, xVal)`,
 	} {
 		if !strings.Contains(text, want) {

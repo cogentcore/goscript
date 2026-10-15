@@ -11,16 +11,20 @@ export function lookup(c: number, delta: number): GID {
 
 export async function main(): globalThis.Promise<void> {
 	let big = 1099511627781n
-	await $.println("int32:", $.int(big, 32))
-	await $.println("uint8:", $.uint(big, 8))
-	await $.println("int16:", $.int(big, 16))
+	await $.println("int32:", $.intFromWide(big, 32))
+	await $.println("uint8:", $.uintFromWide(big, 8))
+	await $.println("int16:", $.intFromWide(big, 16))
 
 	let neg = -1n
-	await $.println("uint32 of -1:", $.uint(neg, 32))
+	await $.println("uint32 of -1:", $.uintFromWide(neg, 32))
 	await $.println("uint64 of -1:", $.uint64(neg))
 
 	let u = 18446744073709551615n
 	await $.println("int64 of max uint64:", $.int64(u))
+
+	// A uint64 narrows to the low bits of each width.
+	let w = 9223372043297259649n
+	await $.println("narrow uint64:", $.intFromWide(w, 8), $.uintFromWide(w, 16), $.intFromWide(w, 32), $.uintFromWide(w, 32))
 
 	// Arithmetic narrower than 64 bits wraps to its own width before a
 	// widening conversion.
