@@ -96,6 +96,7 @@ const (
 	RuntimeHelperComparableEqual       RuntimeHelper = "value.comparableEqual"
 	RuntimeHelperStructEqual           RuntimeHelper = "value.structEqual"
 	RuntimeHelperPointerEqual          RuntimeHelper = "value.pointerEqual"
+	RuntimeHelperPointerAliasesMade    RuntimeHelper = "value.pointerAliasesMade"
 
 	RuntimeHelperVarRef                RuntimeHelper = "varref.varRef"
 	RuntimeHelperBindStructFields      RuntimeHelper = "varref.bindStructFields"
@@ -387,6 +388,7 @@ func runtimeHelperContracts() []RuntimeHelperContract {
 		runtimeHelper(RuntimeHelperComparableEqual, "comparableEqual", RuntimeHelperCategoryValue),
 		runtimeHelper(RuntimeHelperStructEqual, "structEqual", RuntimeHelperCategoryValue),
 		runtimeHelper(RuntimeHelperPointerEqual, "pointerEqual", RuntimeHelperCategoryValue),
+		runtimeHelper(RuntimeHelperPointerAliasesMade, "pointerAliasesMade", RuntimeHelperCategoryValue),
 		runtimeHelper(RuntimeHelperVarRef, "varRef", RuntimeHelperCategoryVarRef),
 		runtimeHelper(RuntimeHelperBindStructFields, "bindStructFields", RuntimeHelperCategoryVarRef),
 		runtimeHelper(RuntimeHelperFieldRef, "fieldRef", RuntimeHelperCategoryVarRef),
@@ -566,6 +568,7 @@ func sourceExportNames(data string) []string {
 			"export async function ",
 			"export function ",
 			"export const ",
+			"export let ",
 			"export class ",
 			"export enum ",
 			"export type ",

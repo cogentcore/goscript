@@ -154,7 +154,7 @@ export async function main(): globalThis.Promise<void> {
 	let item = $.fieldRef($.arrayIndex(outer.Items, 0)._fields, "MyInt")
 	let ptrField = $.fieldRef(outer._fields, "Ptr")
 	outer = $.assignStruct(outer, new Outer({Child: new MyStruct({MyInt: 50}, true), Items: $.arrayValue([new MyStruct({MyInt: 60}, true), new MyStruct(undefined, true)], /* @__PURE__ */ $.arrayType("main.MyStruct", 2)), Ptr: second}, true))
-	await $.println("nested:", $.pointerValue<number>(child), $.pointerValue<number>(item), $.pointerEqual($.pointerValue<MyStruct | $.VarRef<MyStruct> | null>(ptrField), second), $.pointerValue<MyStruct>(first).MyInt)
+	await $.println("nested:", $.pointerValue<number>(child), $.pointerValue<number>(item), ($.pointerValue<MyStruct | $.VarRef<MyStruct> | null>(ptrField) === second || $.pointerAliasesMade && $.pointerEqual($.pointerValue<MyStruct | $.VarRef<MyStruct> | null>(ptrField), second)), $.pointerValue<MyStruct>(first).MyInt)
 	await $.println("nested identity:", $.pointerEqual(child, $.fieldRef(outer.Child._fields, "MyInt")), $.pointerEqual(item, $.fieldRef($.arrayIndex(outer.Items, 0)._fields, "MyInt")), $.pointerEqual(ptrField, $.fieldRef(outer._fields, "Ptr")))
 
 	// Both tuple and parallel assignments update existing variable storage.
@@ -175,7 +175,7 @@ export async function main(): globalThis.Promise<void> {
 	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(val, "*main.MyStruct", /* @__PURE__ */ $.pointerType("main.MyStruct"))))).Elem())).Set($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(new MyStruct({MyInt: 100}, true), "main.MyStruct", "main.MyStruct")))))
 	await $.println("reflect:", $.pointerValue<number>(field), $.pointerEqual(field, $.fieldRef(val.value._fields, "MyInt")))
 	let reflected = $.mustTypeAssert<$.VarRef<number> | null>($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(val, "*main.MyStruct", /* @__PURE__ */ $.pointerType("main.MyStruct"))))).Elem())).FieldByName("MyInt"))).Addr())).Interface(), /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int")))
-	await $.println("reflect address:", $.pointerEqual(reflected, field))
+	await $.println("reflect address:", (reflected === field || $.pointerAliasesMade && $.pointerEqual(reflected, field)))
 }
 
 if ($.isMainScript(import.meta)) {
