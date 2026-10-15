@@ -1,109 +1,118 @@
 // Generated file based on package_import_go_parser.go
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
-import * as $ from "@goscript/builtin/index.js";
-
+import * as $ from "@goscript/builtin/index.js"
 import * as ast from "@goscript/go/ast/index.js"
-
 import * as parser from "@goscript/go/parser/index.js"
-
 import * as token from "@goscript/go/token/index.js"
-
 import * as slices from "@goscript/slices/index.js"
+import "@goscript/go/ast/index.js"
 
-export async function main(): Promise<void> {
+export async function main(): globalThis.Promise<void> {
 	// Create a new token file set
 	let fset = token.NewFileSet()
 
 	// Test parsing expressions
-	let results: $.Slice<string> = null
+	let results: $.Slice<string> = null! as $.Slice<string>
 
 	// Parse some simple expressions
 	let expressions = $.arrayToSlice<string>(["42", "x + y", "len(slice)", "map[string]int{}"])
 
-	// Extract type information from the parsed expression
-	for (let _i = 0; _i < $.len(expressions); _i++) {
-		const expr = expressions![_i]
-		{
-			let [node, err] = parser.ParseExpr(expr)
-			if (err != null) {
-				results = $.append(results, "Error parsing " + expr + ": " + err!.Error())
-				continue
-			}
+	for (let __goscriptRangeTarget0 = expressions, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
+		let expr = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as string)
+		let [node, err] = await parser.ParseExpr(expr)
+		if (err != null) {
+			results = $.appendOne(results, "Error parsing " + expr + ": " + (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+			continue
+		}
 
-			// Extract type information from the parsed expression
-			$.typeSwitch(node, [{ types: [{kind: $.TypeKind.Pointer, elemType: 'ast.BasicLit'}], body: (n) => {
-				results = $.append(results, "BasicLit: " + n.Value)
-			}},
-			{ types: [{kind: $.TypeKind.Pointer, elemType: 'ast.BinaryExpr'}], body: (n) => {
-				results = $.append(results, "BinaryExpr with operator: " + token.Token_String(n.Op))
-			}},
-			{ types: [{kind: $.TypeKind.Pointer, elemType: 'ast.CallExpr'}], body: (n) => {
-				{
-					let { value: ident, ok: ok } = $.typeAssert<ast.Ident | null>(n.Fun, {kind: $.TypeKind.Pointer, elemType: 'ast.Ident'})
-					if (ok) {
-						results = $.append(results, "CallExpr: " + ident!.Name)
+		// Extract type information from the parsed expression
+		{
+			const __goscriptTypeSwitchValue = node
+			switch (true) {
+				case $.typeAssert<ast.BasicLit | $.VarRef<ast.BasicLit> | null>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.pointerType("ast.BasicLit")).ok:
+					{
+						let n: ast.BasicLit | $.VarRef<ast.BasicLit> | null = $.typeAssert<ast.BasicLit | $.VarRef<ast.BasicLit> | null>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.pointerType("ast.BasicLit")).value
+						results = $.appendOne(results, "BasicLit: " + $.pointerValue<ast.BasicLit>(n).Value)
 					}
-				}
-			}},
-			{ types: [{kind: $.TypeKind.Pointer, elemType: 'ast.CompositeLit'}], body: (n) => {
-				results = $.append(results, "CompositeLit (composite literal)")
-			}}], () => {
-				results = $.append(results, "Unknown expression type")
-			})
+					break
+				case $.typeAssert<ast.BinaryExpr | $.VarRef<ast.BinaryExpr> | null>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.pointerType("ast.BinaryExpr")).ok:
+					{
+						let n: ast.BinaryExpr | $.VarRef<ast.BinaryExpr> | null = $.typeAssert<ast.BinaryExpr | $.VarRef<ast.BinaryExpr> | null>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.pointerType("ast.BinaryExpr")).value
+						results = $.appendOne(results, "BinaryExpr with operator: " + token.Token_String($.pointerValue<ast.BinaryExpr>(n).Op))
+					}
+					break
+				case $.typeAssert<ast.CallExpr | $.VarRef<ast.CallExpr> | null>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.pointerType("ast.CallExpr")).ok:
+					{
+						let n: ast.CallExpr | $.VarRef<ast.CallExpr> | null = $.typeAssert<ast.CallExpr | $.VarRef<ast.CallExpr> | null>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.pointerType("ast.CallExpr")).value
+						{
+							let __goscriptTuple0: any = $.typeAssertTuple<ast.Ident | $.VarRef<ast.Ident> | null>($.pointerValue<ast.CallExpr>(n).Fun, /* @__PURE__ */ $.pointerType("ast.Ident"))
+							let ident: ast.Ident | $.VarRef<ast.Ident> | null = __goscriptTuple0[0]
+							let ok = __goscriptTuple0[1]
+							if (ok) {
+								results = $.appendOne(results, "CallExpr: " + $.pointerValue<ast.Ident>(ident).Name)
+							}
+						}
+					}
+					break
+				case $.typeAssert<ast.CompositeLit | $.VarRef<ast.CompositeLit> | null>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.pointerType("ast.CompositeLit")).ok:
+					{
+						let n: ast.CompositeLit | $.VarRef<ast.CompositeLit> | null = $.typeAssert<ast.CompositeLit | $.VarRef<ast.CompositeLit> | null>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.pointerType("ast.CompositeLit")).value
+						results = $.appendOne(results, "CompositeLit (composite literal)")
+					}
+					break
+				default:
+					{
+						let n: any = __goscriptTypeSwitchValue
+						results = $.appendOne(results, "Unknown expression type")
+					}
+					break
+			}
 		}
 	}
 
 	// Test parsing a simple Go source file
-	let src = `package main
-	
-func add(a, b int) int {
-	return a + b
-}
-
-func main() {
-	result := add(1, 2)
-	println(result)
-}`
+	let src = "package main\n\t\nfunc add(a, b int) int {\n\treturn a + b\n}\n\nfunc main() {\n\tresult := add(1, 2)\n\tprintln(result)\n}"
 
 	// Parse the source code
-	let [file, err] = parser.ParseFile(fset, "test.go", src, parser.ParseComments)
-
-	// Extract function names
-
-	// Check package name
+	let __goscriptTuple1: any = await parser.ParseFile(fset, "test.go", src, 4)
+	let file: ast.File | $.VarRef<ast.File> | null = __goscriptTuple1[0]
+	let err = __goscriptTuple1[1]
+	let file$: ast.File = file == null ? $.pointerTarget<ast.File>(file) : (file as any).__isVarRef === true ? (file as any).value : (file as any).__goValue === undefined ? (file as any) : $.pointerTarget<ast.File>(file)
 	if (err != null) {
-		results = $.append(results, "Error parsing file: " + err!.Error())
-	}
-	 else {
+		results = $.appendOne(results, "Error parsing file: " + (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	} else {
 		// Extract function names
-		for (let _i = 0; _i < $.len(file!.Decls); _i++) {
-			const decl = file!.Decls![_i]
+		for (let __goscriptRangeTarget1 = (file$ as ast.File).Decls, __goscriptRangeWindow1 = $.sliceRange(__goscriptRangeTarget1), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow1.length; __rangeIndex++) {
+			let decl = (__goscriptRangeWindow1.backing[__goscriptRangeWindow1.offset + __rangeIndex] as ast.Decl | null)
 			{
-				{
-					let { value: fn, ok: ok } = $.typeAssert<ast.FuncDecl | null>(decl, {kind: $.TypeKind.Pointer, elemType: 'ast.FuncDecl'})
-					if (ok) {
-						results = $.append(results, "Function: " + fn!.Name!.Name)
-					}
+				let __goscriptTuple2: any = $.typeAssertTuple<ast.FuncDecl | $.VarRef<ast.FuncDecl> | null>(decl, /* @__PURE__ */ $.pointerType("ast.FuncDecl"))
+				let fn: ast.FuncDecl | $.VarRef<ast.FuncDecl> | null = __goscriptTuple2[0]
+				let ok = __goscriptTuple2[1]
+				if (ok) {
+					results = $.appendOne(results, "Function: " + $.pointerValue<ast.Ident>($.pointerValue<ast.FuncDecl>(fn).Name).Name)
 				}
 			}
 		}
 
 		// Check package name
-		results = $.append(results, "Package: " + file!.Name!.Name)
+		results = $.appendOne(results, "Package: " + $.pointerValue<ast.Ident>((file$ as ast.File).Name).Name)
 	}
 
 	// Sort results for deterministic output
 	slices.Sort(results)
 
 	// Print results
-	for (let _i = 0; _i < $.len(results); _i++) {
-		const result = results![_i]
-		{
-			console.log("Parse result:", result)
-		}
+	for (let __goscriptRangeTarget2 = results, __goscriptRangeWindow2 = $.sliceRange(__goscriptRangeTarget2), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow2.length; __rangeIndex++) {
+		let result = (__goscriptRangeWindow2.backing[__goscriptRangeWindow2.offset + __rangeIndex] as string)
+		await $.println("Parse result:", result)
 	}
 
-	console.log("go/parser test finished")
+	await $.println("go/parser test finished")
 }
 
+var __goscriptAwait: any
+
+if ($.isMainScript(import.meta)) {
+	await main()
+}

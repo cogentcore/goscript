@@ -24,4 +24,16 @@ func main() {
 	fmt.Println("End before Scan:", s.End() == token.NoPos)
 	_, tok, _ := s.Scan()
 	fmt.Println("Scan:", tok.String(), s.End() == file.Pos(0))
+
+	// Scan reads each token of a statement.
+	src := []byte("x := 42 // answer")
+	file = fset.AddFile("stmt.go", -1, len(src))
+	s.Init(file, src, nil, scanner.ScanComments)
+	for {
+		pos, tok, lit := s.Scan()
+		if tok == token.EOF {
+			break
+		}
+		fmt.Printf("%s %s %q\n", fset.Position(pos), tok, lit)
+	}
 }

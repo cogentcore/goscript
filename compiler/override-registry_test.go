@@ -1034,7 +1034,6 @@ func TestOverrideParityVerifierReportsDeferredAtPhaseClose(t *testing.T) {
 		"strconv",
 		"compress/zlib",
 		"io",
-		"go/scanner",
 		"hash",
 		"internal/goarch",
 		"os",

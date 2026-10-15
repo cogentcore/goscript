@@ -103,9 +103,6 @@ import "embed"
 //go:embed gs/github.com/pkg/errors/stack.ts
 //go:embed gs/github.com/zeebo/blake3/internal/consts/index.ts
 //go:embed gs/go/internal/scannerhooks/index.ts
-//go:embed gs/go/scanner/index.ts
-//go:embed gs/go/scanner/meta.json
-//go:embed gs/go/scanner/parity.json
 //go:embed gs/go/token/index.ts
 //go:embed gs/golang.org/x/crypto/chacha20poly1305/index.ts
 //go:embed gs/golang.org/x/crypto/cryptobyte/asn1/index.ts
