@@ -99,7 +99,6 @@ const (
 	RuntimeHelperPointerAliasesMade    RuntimeHelper = "value.pointerAliasesMade"
 
 	RuntimeHelperVarRef                RuntimeHelper = "varref.varRef"
-	RuntimeHelperBindStructFields      RuntimeHelper = "varref.bindStructFields"
 	RuntimeHelperFieldRef              RuntimeHelper = "varref.fieldRef"
 	RuntimeHelperUnref                 RuntimeHelper = "varref.unref"
 	RuntimeHelperIsVarRef              RuntimeHelper = "varref.isVarRef"
@@ -392,7 +391,6 @@ func runtimeHelperContracts() []RuntimeHelperContract {
 		runtimeHelper(RuntimeHelperPointerEqual, "pointerEqual", RuntimeHelperCategoryValue),
 		runtimeHelper(RuntimeHelperPointerAliasesMade, "pointerAliasesMade", RuntimeHelperCategoryValue),
 		runtimeHelper(RuntimeHelperVarRef, "varRef", RuntimeHelperCategoryVarRef),
-		runtimeHelper(RuntimeHelperBindStructFields, "bindStructFields", RuntimeHelperCategoryVarRef),
 		runtimeHelper(RuntimeHelperFieldRef, "fieldRef", RuntimeHelperCategoryVarRef),
 		runtimeHelper(RuntimeHelperUnref, "unref", RuntimeHelperCategoryVarRef),
 		runtimeHelper(RuntimeHelperIsVarRef, "isVarRef", RuntimeHelperCategoryVarRef),
