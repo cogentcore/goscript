@@ -221,7 +221,11 @@ type semanticFunction struct {
 	// copy its struct value (see funcParamsReadOnly). It is nil when no
 	// parameter is.
 	paramsReadOnly []valueReadOnlyKind
-	async          bool
+	// resultBorrows holds, for each result, the index of the parameter that
+	// a call that asks to borrow its results may get back without a copy,
+	// or -1 (see funcResultBorrows). It is nil when no result does.
+	resultBorrows []int
+	async         bool
 	// asyncCause records why the node's own code suspends, when the fact
 	// walk found it.
 	asyncCause *asyncCause
