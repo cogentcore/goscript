@@ -739,6 +739,7 @@ func (r *Runner) compilePackageBatch(ctx context.Context, req *normalizedRequest
 		DependencyMode:            compiler.DependencyModeAll,
 		RuntimeEmissionMode:       compiler.RuntimeEmissionModeEmit,
 		Tests:                     true,
+		ReportAsync:               req.ReportAsync,
 	}
 	testCompileResult, testCompileErr := r.service.Compile(ctx, testCompileReq)
 	if testCompileErr != nil {
@@ -746,6 +747,7 @@ func (r *Runner) compilePackageBatch(ctx context.Context, req *normalizedRequest
 	}
 	if testCompileResult != nil {
 		result.Diagnostics = append(result.Diagnostics, testCompileResult.Diagnostics...)
+		appendAsyncReport(result, testCompileResult)
 	}
 	for idx := range result.Packages {
 		if !shouldCompilePackage(result.Packages[idx]) {
@@ -802,6 +804,7 @@ func (r *Runner) compilePackageOutputsIndividually(ctx context.Context, req *nor
 			DependencyMode:            compiler.DependencyModeAll,
 			RuntimeEmissionMode:       compiler.RuntimeEmissionModeEmit,
 			Tests:                     true,
+			ReportAsync:               req.ReportAsync,
 		}
 		if compileResult, compileErr := r.service.Compile(ctx, testCompileReq); compileErr != nil {
 			result.Packages[idx].Action = ActionFail
@@ -814,10 +817,19 @@ func (r *Runner) compilePackageOutputsIndividually(ctx context.Context, req *nor
 			continue
 		} else if compileResult != nil {
 			result.Diagnostics = append(result.Diagnostics, compileResult.Diagnostics...)
+			appendAsyncReport(result, compileResult)
 			markCompilePhase(&result.Packages[idx], compileResult, true)
 		}
 	}
 	return outputRoots
+}
+
+// appendAsyncReport adds the async report of a test binary compile to
+// result, when it has one.
+func appendAsyncReport(result *Result, compileResult *compiler.CompilationResult) {
+	if compileResult.AsyncReport != nil {
+		result.AsyncReports = append(result.AsyncReports, compileResult.AsyncReport)
+	}
 }
 
 func compileRunPattern(pattern string) (*regexp.Regexp, error) {

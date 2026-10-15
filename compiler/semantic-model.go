@@ -44,6 +44,8 @@ type SemanticBuildOptions struct {
 	// over the graph. Otherwise a call of an exported interface method makes
 	// its caller async.
 	WholeProgram bool
+	// ReportAsync asks for an async report (see AsyncReport).
+	ReportAsync bool
 }
 
 // Build constructs semantic facts for a package graph.
@@ -159,7 +161,11 @@ func (o *SemanticModelOwner) Build(ctx context.Context, graph *PackageGraph, opt
 	}
 
 	// Color the functions that may suspend.
-	diagnostics = append(diagnostics, o.colorAsync(ctx, model, overrideFacts, overridePkgs, opts.WholeProgram)...)
+	var report *asyncReporter
+	if opts.ReportAsync {
+		report = newAsyncReporter(model, overridePkgs, opts.WholeProgram)
+	}
+	diagnostics = append(diagnostics, o.colorAsync(ctx, model, overrideFacts, overridePkgs, opts.WholeProgram, report)...)
 	model.freeze()
 	return model, diagnostics
 }
@@ -173,6 +179,7 @@ func (o *SemanticModelOwner) colorAsync(
 	overrideFacts *OverrideFacts,
 	overridePkgs []*types.Package,
 	wholeProgram bool,
+	report *asyncReporter,
 ) []Diagnostic {
 	// Give each shape called through a value a class, after adding the
 	// values override packages produce, and index the callers and the calls
@@ -236,6 +243,7 @@ func (o *SemanticModelOwner) colorAsync(
 		openMethods:    openMethods,
 		values:         valueGraph,
 		asyncWhenSeeds: asyncWhenSeeds(asyncWhen, overrideFacts, overridePkgs),
+		report:         report,
 	}, interfaceAsyncEdges, anonymousInterfaceGraph, asyncWhen)...)
 }
 
@@ -1633,8 +1641,7 @@ func openInterfaceMethods(
 // buildInterfaceAsyncEdges records the implementation graph on the model and
 // returns the distinct edges from each implementation to the interface methods
 // whose async coloring is still undecided. An async override method has no
-// semantic function; its edges leave asyncOverrideMethod, which is always
-// async.
+// semantic function; its edges leave a node of its own that is always async.
 func (o *SemanticModelOwner) buildInterfaceAsyncEdges(
 	ctx context.Context,
 	model *SemanticModel,
@@ -1643,6 +1650,7 @@ func (o *SemanticModelOwner) buildInterfaceAsyncEdges(
 ) (interfaceAsyncEdges, []Diagnostic) {
 	model.interfaceImplementations = make([]semanticInterfaceImplementation, 0, len(interfaceGraph))
 	edges := make(interfaceAsyncEdges)
+	overrideNodes := make(map[*types.Func]*semanticFunction)
 	for _, graphEntry := range interfaceGraph {
 		if err := ctx.Err(); err != nil {
 			return nil, []Diagnostic{contextCanceledDiagnostic(err)}
@@ -1654,7 +1662,7 @@ func (o *SemanticModelOwner) buildInterfaceAsyncEdges(
 			if implFn := semanticFunctionFor(model, implMethod); implFn != nil {
 				edges.add(implFn, ifaceMethod)
 			} else if overrideMethodAsync(overrideFacts, implMethod) {
-				edges.add(asyncOverrideMethod, ifaceMethod)
+				edges.add(asyncOverrideMethodNode(overrideNodes, implMethod), ifaceMethod)
 			}
 		}
 		model.interfaceImplementations = append(model.interfaceImplementations, semanticInterfaceImplementation{
@@ -1664,6 +1672,17 @@ func (o *SemanticModelOwner) buildInterfaceAsyncEdges(
 		})
 	}
 	return edges, nil
+}
+
+// asyncOverrideMethodNode returns the node of an override method that
+// metadata marks async, which is always async, adding it to nodes when new.
+func asyncOverrideMethodNode(nodes map[*types.Func]*semanticFunction, method *types.Func) *semanticFunction {
+	if node := nodes[method]; node != nil {
+		return node
+	}
+	node := &semanticFunction{name: method.Name(), function: method, async: true}
+	nodes[method] = node
+	return node
 }
 
 func (m *SemanticModel) functionAsync(fn *types.Func) bool {

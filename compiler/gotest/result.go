@@ -12,6 +12,9 @@ type Result struct {
 	Packages []PackageResult
 	// Diagnostics are compiler diagnostics surfaced during the run.
 	Diagnostics []compiler.Diagnostic
+	// AsyncReports holds the async report of each compiled test binary,
+	// when the request asked for them.
+	AsyncReports []*compiler.AsyncReport
 }
 
 // Passed returns true when every package result passed or had no tests.

@@ -34,6 +34,9 @@ type Config struct {
 	ProtobufTypeScriptBinding bool
 	// AdditionalBindingRoots extends the roots searched for protobuf TypeScript bindings.
 	AdditionalBindingRoots []string
+	// ReportAsync asks for an async report in the compilation result (see
+	// AsyncReport). It does not change the output.
+	ReportAsync bool
 }
 
 // Validate checks the config and initializes owned defaults.

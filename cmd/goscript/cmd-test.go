@@ -41,6 +41,7 @@ func newTestCommand() *cli.Command {
 	var memProfile string
 	var incrementalTypeCheck bool
 	var protobufTypeScriptBinding bool
+	var reportAsync reportAsyncFlag
 
 	return &cli.Command{
 		Name:     "test",
@@ -68,6 +69,7 @@ func newTestCommand() *cli.Command {
 				RuntimeGroups:             runtimeGroups,
 				IncrementalTypeCheck:      incrementalTypeCheck,
 				ProtobufTypeScriptBinding: protobufTypeScriptBinding,
+				ReportAsync:               reportAsync.format != "",
 			}
 			stopProfile, err := startCPUProfile(cpuProfile)
 			if err != nil {
@@ -86,6 +88,9 @@ func newTestCommand() *cli.Command {
 				return err
 			}
 			if err := printTestResult(c.Context, c.App.Writer, result); err != nil {
+				return err
+			}
+			if err := writeAsyncReports(c.App.ErrWriter, &reportAsync, result.AsyncReports...); err != nil {
 				return err
 			}
 			if !result.Passed() {
@@ -205,6 +210,7 @@ func newTestCommand() *cli.Command {
 				Usage:       "write a Go heap profile for the goscript test process",
 				Destination: &memProfile,
 			},
+			newReportAsyncFlag(&reportAsync),
 		},
 	}
 }
