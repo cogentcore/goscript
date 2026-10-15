@@ -69,7 +69,8 @@ export function clear<T>(v: Slice<T> | Map<unknown, unknown> | null): void {
 
   // An array is zeroed in place.
   if (Array.isArray(v)) {
-    v.fill(clearZeroValue(v))
+    const array = v as unknown as T[]
+    array.fill(clearZeroValue(array))
     return
   }
 }
@@ -1234,7 +1235,7 @@ function bytesLen(bytes: ByteData): number {
   if (bytes instanceof Uint8Array) {
     return bytes.length
   }
-  if (isSliceProxy(bytes)) {
+  if (isSliceProxy(bytes as SliceProxy<number>)) {
     return (bytes as SliceProxy<number>).__meta__.length
   }
   return bytes.length
@@ -1327,7 +1328,8 @@ function byteView(bytes: Bytes | null): ByteView {
     return { data: meta.backing, off: meta.offset, len: meta.length }
   }
   if (Array.isArray(bytes)) {
-    return { data: bytes, off: 0, len: bytes.length }
+    const array = bytes as unknown as number[]
+    return { data: array, off: 0, len: array.length }
   }
   throw new Error(`Cannot convert bytes of type ${typeof bytes} to array`)
 }

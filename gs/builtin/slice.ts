@@ -118,7 +118,7 @@ export function sliceRange(
   slice: Uint8Array | null | undefined,
 ): SliceRange<number>
 export function sliceRange<T>(
-  slice: Slice<T> | Uint8Array | null | undefined,
+  slice: Slice<T> | T[] | Uint8Array | null | undefined,
 ): SliceRange<T> | SliceRange<number> {
   // A nil slice has no elements.
   if (slice === null || slice === undefined) {
@@ -142,7 +142,8 @@ export function sliceRange<T>(
   if (slice instanceof Uint8Array) {
     return { backing: slice, offset: 0, length: slice.length }
   }
-  return { backing: slice, offset: 0, length: slice.length }
+  const array = slice as T[]
+  return { backing: array, offset: 0, length: array.length }
 }
 
 /**
@@ -317,7 +318,6 @@ function sliceIndexProperty(prop: string | symbol): number {
  * Slice represents an array-backed or byte-backed Go slice; null is nil.
  */
 export type Slice<T> =
-  | T[]
   | SliceProxy<T>
   | null
   | (T extends number ? Uint8Array : never)
@@ -702,11 +702,7 @@ export const makeSlice = <T>(
     backingArr[i] = zeroValue()
   }
 
-  // A slice that covers its whole backing array is the array; any other is a
-  // window on it.
-  if (length === actualCapacity) {
-    return backingArr as Slice<T>
-  }
+  // Every slice is a window on its backing array.
   return new GoSlice(backingArr, 0, length, actualCapacity)
 }
 
@@ -720,18 +716,18 @@ export function goSlice(
   max?: number,
 ): Slice<number>
 export function goSlice<T>(
-  s: Slice<T>,
+  s: Slice<T> | T[],
   low?: number,
   high?: number,
   max?: number,
 ): Slice<T>
 export function goSlice<T>(
-  s: Slice<T> | Uint8Array,
+  s: Slice<T> | T[] | Uint8Array,
   low?: number,
   high?: number,
   max?: number,
 ): Slice<T> {
-  s = collectionValue(s) as Slice<T> | Uint8Array
+  s = collectionValue(s) as Slice<T> | T[] | Uint8Array
   low = normalizeSliceIndex(low)
   high = normalizeSliceIndex(high)
   max = normalizeSliceIndex(max)
@@ -797,63 +793,35 @@ export function goSlice<T>(
     return null as Slice<T>
   }
 
-  const slen = len(s)
+  // A window or an array view has its window; a Go array (a JavaScript
+  // array) is its own backing array.
+  const meta = isComplexSlice<T>(s) ? s.__meta__ : undefined
+  const array = s as T[]
+  const backing: T[] = meta !== undefined ? meta.backing : array
+  const oldOffset = meta !== undefined ? meta.offset : 0
+  const slen = meta !== undefined ? meta.length : array.length
+  const scap = meta !== undefined ? meta.capacity : array.length
   low = low ?? 0
   high = high ?? slen
 
+  // The bounds must be ordered and within the capacity.
   if (low < 0 || high < low) {
     runtimePanic(`runtime error: slice bounds out of range [${low}:${high}]`)
   }
-
-  // In Go, high can be up to capacity, not just length
-  const scap = cap(s)
   if (high > scap) {
     runtimePanic(`Slice index out of range: ${high} > ${scap}`)
   }
 
-  // A slice of a whole array shares its storage, but an array value's marker
-  // must not make the slice itself copy like an array, so it gets a view.
-  if (
-    isArrayOrGoSlice(s) &&
-    !isComplexSlice(s) &&
-    !isArrayValue(s) &&
-    low === 0 &&
-    high === s.length &&
-    max === undefined
-  ) {
-    return s
-  }
-
-  let backing: T[]
-  let oldOffset = 0
-  let oldCap = scap
-
-  if (isComplexSlice(s)) {
-    backing = s.__meta__.backing
-    oldOffset = s.__meta__.offset
-    oldCap = s.__meta__.capacity
-  } else {
-    backing = s as T[]
-  }
-
-  let newCap
+  // A full slice expression limits the capacity.
+  let newCap = scap - low
   if (max !== undefined) {
     if (max < high) {
       runtimePanic(`runtime error: slice bounds out of range [:${high}:${max}]`)
     }
-    if (isComplexSlice(s) && max > oldOffset + oldCap) {
-      runtimePanic(`Slice index out of range: ${max} > ${oldOffset + oldCap}`)
-    }
-    if (!isComplexSlice(s) && max > s.length) {
-      runtimePanic(`Slice index out of range: ${max} > ${s.length}`)
+    if (max > scap) {
+      runtimePanic(`Slice index out of range: ${max} > ${scap}`)
     }
     newCap = max - low
-  } else {
-    if (isComplexSlice(s)) {
-      newCap = oldCap - low
-    } else {
-      newCap = s.length - low
-    }
   }
 
   // A slice that extends past the length of s reads spare capacity, whose
@@ -861,26 +829,14 @@ export function goSlice<T>(
   if (high > slen) {
     fillSpareCapacity(backing, oldOffset + slen, oldOffset + high)
   }
-
-  const newLength = high - low
-  const newOffset = oldOffset + low
-
-  if (
-    !isArrayValue(backing) &&
-    newOffset === 0 &&
-    newLength === newCap &&
-    backing.length === newLength
-  ) {
-    return backing as Slice<T>
-  }
-
-  return new GoSlice(backing as T[], newOffset, newLength, newCap)
+  return new GoSlice(backing, oldOffset + low, high - low, newCap)
 }
 
 /**
- * arrayToSlice converts nested arrays to shared slice views up to depth; depth one preserves the array.
+ * arrayToSlice makes a slice of the elements of arr, which it shares, and of
+ * nested arrays up to depth.
  */
-export function arrayToSlice<T>(arr: T[] | null | undefined): T[]
+export function arrayToSlice<T>(arr: T[] | null | undefined): Slice<T>
 export function arrayToSlice<T>(
   arr: T[] | null | undefined,
   depth: number,
@@ -889,99 +845,20 @@ export function arrayToSlice<T>(
   arr: T[] | null | undefined,
   depth: number = 1,
 ): Slice<T> {
-  if (arr == null) return [] as T[]
-
-  if (arr.length === 0) return arr
-
-  if (depth === 1) {
-    return arr
+  // A slice of one level is a window on the array.
+  if (arr == null) arr = []
+  if (arr.length === 0 || depth === 1) {
+    return new GoSlice(arr, 0, arr.length, arr.length)
   }
 
-  const target = {
-    __meta__: {
-      backing: arr,
-      offset: 0,
-      length: arr.length,
-      capacity: arr.length,
-    },
-  }
-
-  const handler = {
-    get(target: any, prop: string | symbol): any {
-      const index = sliceIndexProperty(prop)
-      if (index >= 0) {
-        if (index < target.__meta__.length) {
-          return target.__meta__.backing[target.__meta__.offset + index]
-        }
-        runtimePanic(
-          `Slice index out of range: ${index} >= ${target.__meta__.length}`,
-        )
-      }
-
-      if (prop === 'length') {
-        return target.__meta__.length
-      }
-
-      if (prop === '__meta__') {
-        return target.__meta__
-      }
-
-      if (
-        prop === 'slice' ||
-        prop === 'map' ||
-        prop === 'filter' ||
-        prop === 'reduce' ||
-        prop === 'forEach' ||
-        prop === Symbol.iterator
-      ) {
-        const backingSlice = target.__meta__.backing.slice(
-          target.__meta__.offset,
-          target.__meta__.offset + target.__meta__.length,
-        )
-        return backingSlice[prop].bind(backingSlice)
-      }
-
-      return Reflect.get(target, prop)
-    },
-
-    set(target: any, prop: string | symbol, value: any): boolean {
-      const index = sliceIndexProperty(prop)
-      if (index >= 0) {
-        if (index < target.__meta__.length) {
-          target.__meta__.backing[target.__meta__.offset + index] = value
-          return true
-        }
-        if (
-          index === target.__meta__.length &&
-          target.__meta__.length < target.__meta__.capacity
-        ) {
-          target.__meta__.backing[target.__meta__.offset + index] = value
-          target.__meta__.length++
-          return true
-        }
-        runtimePanic(
-          `Slice index out of range: ${index} >= ${target.__meta__.length}`,
-        )
-      }
-
-      if (prop === 'length' || prop === '__meta__') {
-        return false
-      }
-
-      return Reflect.set(target, prop, value)
-    },
-  }
-
-  if (depth > 1 && arr.length > 0) {
-    for (let i = 0; i < arr.length; i++) {
-      const item = arr[i]
-      if (!isComplexSlice(item as any) && isArrayOrGoSlice(item)) {
-        arr[i] = arrayToSlice(item as any[], depth - 1) as any
-      }
+  // Nested arrays become slices of their own, up to depth.
+  for (let i = 0; i < arr.length; i++) {
+    const item = arr[i]
+    if (Array.isArray(item)) {
+      arr[i] = arrayToSlice(item as any[], depth - 1) as any
     }
   }
-
-  return new Proxy(target, handler) as SliceProxy<T>
+  return new GoSlice(arr, 0, arr.length, arr.length)
 }
 
 /**
@@ -1678,10 +1555,6 @@ function copyFromString<T>(dst: Slice<T> | Uint8Array, src: string): number {
     for (let i = 0; i < count; i++) {
       dstMeta.backing[dstMeta.offset + i] = bytes[i] as T
     }
-  } else if (Array.isArray(dst)) {
-    for (let i = 0; i < count; i++) {
-      dst[i] = bytes[i] as T
-    }
   }
 
   return count
@@ -1689,9 +1562,9 @@ function copyFromString<T>(dst: Slice<T> | Uint8Array, src: string): number {
 
 /** copySliceElements copies each value and traverses overlapping backing in the safe direction. */
 export function copySliceElements<T>(
-  dst: Slice<T> | Uint8Array | null,
+  dst: Slice<T> | T[] | Uint8Array | null,
   dstIndex: number,
-  src: Slice<T> | Uint8Array | null | undefined,
+  src: Slice<T> | T[] | Uint8Array | null | undefined,
   srcIndex: number,
   count: number,
 ): void {
@@ -2820,9 +2693,9 @@ function byteStringView(value: GoStringBytes): ByteStringView {
       }
     }
     return {
-      backing: value as number[],
+      backing: value as unknown as number[],
       offset: 0,
-      length: (value as number[]).length,
+      length: (value as unknown as number[]).length,
     }
   }
   if (typeof value === 'string') {
