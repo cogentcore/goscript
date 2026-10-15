@@ -30,7 +30,7 @@
 
 import { describe, expect, it } from 'vitest'
 
-import { block } from './block.js'
+import { State } from './index.js'
 
 // seed1to32 is the ChaCha8 seed whose bytes are 1, 2, ..., 32, read as
 // four little-endian uint64 words. goldenCounter0 is the corresponding
@@ -78,12 +78,24 @@ const goldenCounter0: readonly bigint[] = [
   7435345417750366512n,
 ]
 
-describe('block', () => {
+describe('State', () => {
   it('matches the native Go ChaCha8 stream for the first block', () => {
-    const out = block(seed1to32, 0)
-    expect(out).toHaveLength(32)
+    const state = new State()
+    state.Init64(seed1to32)
     for (let i = 0; i < 32; i++) {
-      expect(out[i], `word ${i}`).toBe(goldenCounter0[i])
+      const [x, ok] = state.Next()
+      expect(ok).toBe(true)
+      expect(x, `word ${i}`).toBe(goldenCounter0[i])
     }
+    expect(state.Next()[1]).toBe(false)
+  })
+
+  it('copies its state with clone', () => {
+    const state = new State()
+    state.Init64(seed1to32)
+    state.Next()
+    const copy = state.clone()
+    state.Next()
+    expect(copy.Next()[0]).toBe(goldenCounter0[1])
   })
 })
