@@ -9812,6 +9812,17 @@ func stmtsContainAwait(stmts []loweredStmt, nested []string) bool {
 	return false
 }
 
+// withNestedFunctions returns ctx collecting the function literals lowered
+// in it, and a function that returns those lowered since this call, for
+// textAwaits.
+func (ctx lowerFileContext) withNestedFunctions() (lowerFileContext, func() []string) {
+	if ctx.nestedFunctions == nil {
+		ctx.nestedFunctions = new([]string)
+	}
+	collected, start := ctx.nestedFunctions, len(*ctx.nestedFunctions)
+	return ctx, func() []string { return (*collected)[start:] }
+}
+
 // textAwaits reports whether the lowered text awaits outside the nested
 // function literals it contains.
 func textAwaits(text string, nested []string) bool {
@@ -13722,6 +13733,9 @@ func (o *LoweringOwner) lowerStructCompositeLit(
 	named *types.Named,
 	markStruct bool,
 ) (string, []Diagnostic) {
+	// The awaits of the function literals in the fields do not make the
+	// literal await.
+	ctx, nested := ctx.withNestedFunctions()
 	structType, _ := named.Underlying().(*types.Struct)
 	fields := make([]string, 0, len(lit.Elts))
 	present := make([]bool, structType.NumFields())
@@ -13804,7 +13818,7 @@ func (o *LoweringOwner) lowerStructCompositeLit(
 	}
 	if len(prelude) != 0 {
 		body := strings.Join(prelude, "; ") + "; return " + expr
-		if strings.Contains(body, "await ") {
+		if textAwaits(body, nested()) {
 			return "(await (async () => { " + body + " })())", diagnostics
 		}
 		return "(() => { " + body + " })()", diagnostics

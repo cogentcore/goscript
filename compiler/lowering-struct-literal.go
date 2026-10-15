@@ -44,6 +44,9 @@ func (o *LoweringOwner) lowerPromotedStructCompositeLit(
 	}
 
 	// Start with the complete zero value, preserving omitted direct fields.
+	// The awaits of the function literals in the fields do not make the
+	// literal await.
+	ctx, nested := ctx.withNestedFunctions()
 	zero := o.lowerDeclarationZeroValueExpr(ctx, typ)
 	if named := namedStructType(typ); named != nil {
 		zero = o.lowerNamedStructZeroValueExpr(ctx, named)
@@ -82,7 +85,7 @@ func (o *LoweringOwner) lowerPromotedStructCompositeLit(
 	}
 	statements = append(statements, "return "+value)
 	body := strings.Join(statements, "; ")
-	if strings.Contains(body, "await ") {
+	if textAwaits(body, nested()) {
 		return "(await (async () => { " + body + " })())", diagnostics, true
 	}
 	return "(() => { " + body + " })()", diagnostics, true
