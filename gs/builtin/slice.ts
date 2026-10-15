@@ -2645,6 +2645,27 @@ export function bytesFromHex(hex: string): Uint8Array {
   return bytes
 }
 
+// bytesFromBase64 decodes the base64 text of byte data compiled into the
+// program, such as embedded files, which loads much faster than an array
+// literal of the bytes and is about a third of its size.
+export function bytesFromBase64(data: string): Uint8Array {
+  // The native decoder is used where there is one.
+  if (
+    'fromBase64' in Uint8Array &&
+    typeof Uint8Array.fromBase64 === 'function'
+  ) {
+    return Uint8Array.fromBase64(data) as Uint8Array
+  }
+
+  // Otherwise the data is decoded to a string with a character per byte.
+  const binary = atob(data)
+  const bytes = new Uint8Array(binary.length)
+  for (let i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i)
+  }
+  return bytes
+}
+
 /**
  * bytesToString encodes byte values as a Go string without losing invalid UTF-8.
  */

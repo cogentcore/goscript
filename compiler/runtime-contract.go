@@ -114,6 +114,7 @@ const (
 	RuntimeHelperSliceElems                   RuntimeHelper = "slice.sliceElems"
 	RuntimeHelperSliceSlot                    RuntimeHelper = "slice.sliceSlot"
 	RuntimeHelperWindowSlot                   RuntimeHelper = "slice.windowSlot"
+	RuntimeHelperBytesFromBase64              RuntimeHelper = "slice.bytesFromBase64"
 	RuntimeHelperAppendOne                    RuntimeHelper = "slice.appendOne"
 	RuntimeHelperAppendSlice                  RuntimeHelper = "slice.appendSlice"
 	RuntimeHelperByteSliceHint                RuntimeHelper = "slice.byteSliceHint"
@@ -403,6 +404,7 @@ func runtimeHelperContracts() []RuntimeHelperContract {
 		runtimeHelper(RuntimeHelperSliceElems, "sliceElems", RuntimeHelperCategorySlice),
 		runtimeHelper(RuntimeHelperSliceSlot, "sliceSlot", RuntimeHelperCategorySlice),
 		runtimeHelper(RuntimeHelperWindowSlot, "windowSlot", RuntimeHelperCategorySlice),
+		runtimeHelper(RuntimeHelperBytesFromBase64, "bytesFromBase64", RuntimeHelperCategorySlice),
 		runtimeHelper(RuntimeHelperAppendOne, "appendOne", RuntimeHelperCategorySlice),
 		runtimeHelper(RuntimeHelperAppendSlice, "appendSlice", RuntimeHelperCategorySlice),
 		runtimeHelper(RuntimeHelperByteSliceHint, "byteSliceHint", RuntimeHelperCategorySlice),
