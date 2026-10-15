@@ -1,0 +1,11 @@
+{
+  "dependencies": ["internal/godebug"],
+  "callbackAsyncFunctions": {
+    "Shuffle": true,
+    "Rand.Shuffle": true
+  },
+  "syncInterfaces": {
+    "Source": true,
+    "Source64": true
+  }
+}
