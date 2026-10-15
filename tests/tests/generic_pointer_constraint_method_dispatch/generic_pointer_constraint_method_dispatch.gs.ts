@@ -109,17 +109,17 @@ export function flag_Set(f: $.VarRef<flag> | null, v: bigint): void {
 	f!.value = $.int64($.int64Or($.int64($.pointerValue<flag>(f)), v))
 }
 
-export async function countFlags(__typeArgs: $.GenericTypeArgs | undefined, __goscriptParam0: any, values: $.Slice<bigint>): globalThis.Promise<bigint> {
+export function countFlags(__typeArgs: $.GenericTypeArgs | undefined, __goscriptParam0: any, values: $.Slice<bigint>): bigint {
 	let i: $.VarRef<any> = $.varRef(__goscriptParam0)
 	let p = $.mustTypeAssert<setter | null>($.typeParamPointerInterfaceValue(i, __typeArgs?.["T"], "*T", /* @__PURE__ */ $.pointerType(__typeArgs?.["T"]?.type ?? { kind: $.TypeKind.Interface, methods: [] })), "main.setter")
 	let n = 0n
 	for (let __goscriptRangeTarget0 = values, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
 		let v = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as bigint)
-		if ((__goscriptAwait = (p !== null && (p as any).__isVarRef !== true && (p as any).__goValue === undefined ? (p as Exclude<setter, null>) : $.pointerValue<Exclude<setter, null>>(p)).Has(v), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)) {
+		if ((p !== null && (p as any).__isVarRef !== true && (p as any).__goValue === undefined ? (p as Exclude<setter, null>) : $.pointerValue<Exclude<setter, null>>(p)).Has(v)) {
 			n++
 		}
 	}
-	void (__goscriptAwait = (p !== null && (p as any).__isVarRef !== true && (p as any).__goValue === undefined ? (p as Exclude<setter, null>) : $.pointerValue<Exclude<setter, null>>(p)).Set(8n), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+	void (p !== null && (p as any).__isVarRef !== true && (p as any).__goValue === undefined ? (p as Exclude<setter, null>) : $.pointerValue<Exclude<setter, null>>(p)).Set(8n)
 	return $.int64Add(n, $.int64(i.value))
 }
 
@@ -142,7 +142,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 	await $.println("encoded:", $.bytesToString(encoded))
 
-	await $.println("count:", await countFlags(__goscriptStatic1(), 3n, $.arrayToSlice<bigint>([1n, 2n, 4n])))
+	await $.println("count:", countFlags(__goscriptStatic1(), 3n, $.arrayToSlice<bigint>([1n, 2n, 4n])))
 	let fl: $.VarRef<flag> = $.varRef(1n)
 	{
 		let [s, ok] = $.typeAssertTuple<setter | null>($.namedValueInterfaceValue<any>(fl, "*main.flag", __goscriptStatic2(), __goscriptStatic3(), __goscriptStatic4()), "main.setter")

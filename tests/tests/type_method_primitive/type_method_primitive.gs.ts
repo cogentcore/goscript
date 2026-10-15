@@ -60,8 +60,8 @@ export function asDoubler(v: MyInt): Doubler | null {
 	return $.namedValueInterfaceValue<Doubler | null>(v, "main.MyInt", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2())
 }
 
-export async function sumDoublers(vals: $.Slice<Doubler | null>): globalThis.Promise<number> {
-	return (__goscriptAwait = $.pointerValue<Exclude<Doubler, null>>($.arrayIndex(vals!, 0)).Double(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) + (__goscriptAwait = $.pointerValue<Exclude<Doubler, null>>($.arrayIndex(vals!, 1)).Double(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+export function sumDoublers(vals: $.Slice<Doubler | null>): number {
+	return $.pointerValue<Exclude<Doubler, null>>($.arrayIndex(vals!, 0)).Double() + $.pointerValue<Exclude<Doubler, null>>($.arrayIndex(vals!, 1)).Double()
 }
 
 export function assertDoubler(__typeArgs: $.GenericTypeArgs | undefined, v: Doubler | null): [any, boolean] {
@@ -99,7 +99,7 @@ export async function main(): globalThis.Promise<void> {
 
 	let vals: $.Slice<Doubler | null> = null! as $.Slice<Doubler | null>
 	vals = $.append(vals, $.namedValueInterfaceValue<Doubler | null>(14, "main.MyInt", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()), $.namedValueInterfaceValue<Doubler | null>(15, "main.MyInt", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()), $.appendZeros.nil)
-	await $.println("Interface slice append:", await sumDoublers(vals))
+	await $.println("Interface slice append:", sumDoublers(vals))
 
 	let __goscriptTuple0: any = assertDoubler(__goscriptStatic3(), ret)
 	let genericAsserted = (__goscriptTuple0[0] as MyInt)

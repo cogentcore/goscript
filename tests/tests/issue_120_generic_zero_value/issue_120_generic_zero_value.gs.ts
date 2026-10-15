@@ -63,7 +63,7 @@ export function ZeroArrayLiteral(__typeArgs: $.GenericTypeArgs | undefined): any
 	return $.genericZero(__typeArgs, "T", null)
 }
 
-export async function CallString(__typeArgs: $.GenericTypeArgs | undefined, v: any): globalThis.Promise<string> {
+export function CallString(__typeArgs: $.GenericTypeArgs | undefined, v: any): string {
 	return $.callGenericMethod(__typeArgs, "T", "String", v)
 }
 
@@ -84,8 +84,8 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("ZeroValue[StringVal] len:", $.stringLen(StringVal_String(zeroStr)))
 
 	// Test 3: CallString on zero value
-	await $.println("CallString on zero IntVal:", await CallString(__goscriptStatic0(), zeroInt))
-	await $.println("CallString on zero StringVal len:", $.stringLen(await CallString(__goscriptStatic1(), zeroStr)))
+	await $.println("CallString on zero IntVal:", CallString(__goscriptStatic0(), zeroInt))
+	await $.println("CallString on zero StringVal len:", $.stringLen(CallString(__goscriptStatic1(), zeroStr)))
 
 	// Test 4: Sum returns zero value
 	let sumInt = (Sum(__goscriptStatic0(), null) as IntVal)
@@ -118,8 +118,6 @@ var __goscriptStatic2$value: any
 function __goscriptStatic2(): any {
 	return __goscriptStatic2$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.Pair", zero: () => $.arrayValue(globalThis.Array.from({ length: 2 }, () => 0)) }})
 }
-
-var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()
