@@ -50,7 +50,7 @@ export class listScanner {
 }
 
 export async function run(s: scanner | null): globalThis.Promise<$.GoError> {
-	return $.pointerValue<Exclude<scanner, null>>(s).Scan($.functionValue((v: number): $.GoError => {
+	return (s !== null && (s as any).__isVarRef !== true && (s as any).__goValue === undefined ? (s as Exclude<scanner, null>) : $.pointerValue<Exclude<scanner, null>>(s)).Scan($.functionValue((v: number): $.GoError => {
 		if (v != 7) {
 			return errors.New("wrong value")
 		}

@@ -67,7 +67,7 @@ export class wrapper {
 }
 
 export async function read(__typeArgs: $.GenericTypeArgs | undefined, d: Derived | null): globalThis.Promise<any> {
-	return $.callInterfaceMethod($.pointerValue<Exclude<Derived, null>>(d), "Value", {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }})
+	return $.callInterfaceMethod((d !== null && (d as any).__isVarRef !== true && (d as any).__goValue === undefined ? (d as Exclude<Derived, null>) : $.pointerValue<Exclude<Derived, null>>(d)), "Value", {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }})
 }
 
 export function setGeneric(__typeArgs: $.GenericTypeArgs | undefined, w: dep.Wrapper | $.VarRef<dep.Wrapper> | null, value: any): any {

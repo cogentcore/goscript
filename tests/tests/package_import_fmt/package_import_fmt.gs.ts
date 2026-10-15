@@ -62,7 +62,7 @@ export class byteFormatter {
 		const b = this;
 		let buf: $.Slice<number> = $.appendSlice(new Uint8Array([]) as $.Slice<number>, b.prefix, $.byteSliceHint)
 		buf = $.append(buf, $.uint($.uint(verb, 8), 8), $.byteSliceHint)
-		await $.pointerValue<Exclude<fmt.State, null>>(state).Write(buf)
+		await (state !== null && (state as any).__isVarRef !== true && (state as any).__goValue === undefined ? (state as Exclude<fmt.State, null>) : $.pointerValue<Exclude<fmt.State, null>>(state)).Write(buf)
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -187,7 +187,7 @@ export async function main(): globalThis.Promise<void> {
 	await fmt.Printf("Array bytes: %s %q %x %X %x %v\n", $.interfaceValue(view, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(view, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(view, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(view, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))), arr, arr)
 	let none: $.Slice<number> = null! as $.Slice<number>
 	await fmt.Printf("Nil bytes: [%s] %q [%x] %v\n", $.interfaceValue(none, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(none, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(none, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(none, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))))
-	await fmt.Printf("Quoted: %q %+q %#q %q %+q\n", "tab\there", "é", "raw", $.basicInterfaceValue(120, "rune", "int32"), $.basicInterfaceValue(233, "rune", "int32"))
+	await fmt.Printf("Quoted: %q %+q %#q %q %+q\n", "tab\there", "\xc3\xa9", "raw", $.basicInterfaceValue(120, "rune", "int32"), $.basicInterfaceValue(233, "rune", "int32"))
 	let seq: bigint = 255n
 	await fmt.Printf("Uint64: %d %x %v\n", $.basicInterfaceValue(seq, "uint64"), $.basicInterfaceValue(seq, "uint64"), $.basicInterfaceValue(seq, "uint64"))
 	let appended: $.Slice<number> = await fmt.Append(new Uint8Array([98, 97, 115, 101, 45]), "tail")

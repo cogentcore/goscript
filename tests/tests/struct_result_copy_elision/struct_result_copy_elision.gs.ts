@@ -265,7 +265,7 @@ export function identity(__typeArgs: $.GenericTypeArgs | undefined, v: any): any
 export async function main(): globalThis.Promise<void> {
 	let r: Rule | $.VarRef<Rule> | null = new Rule({Name: "r", pos: new Pos({Line: 1, Char: 2}, true)})
 	let r$: Rule = r == null ? $.pointerTarget<Rule>(r) : (r as any).__isVarRef === true ? (r as any).value : (r as any).__goValue === undefined ? (r as any) : $.pointerTarget<Rule>(r)
-	let p = Rule.prototype.Pos.call(r)
+	let p = (r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? ((r as any) as Rule).Pos() : Rule.prototype.Pos.call(r))
 	p.Line = 10
 	await $.println((r$ as Rule).pos.Line, p.Line)
 
@@ -299,7 +299,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println(src.value.End.Char, id.End.Char)
 
 	let arr: Pos[] = $.arrayValue(globalThis.Array.from({ length: 2 }, () => new Pos(undefined, true)), /* @__PURE__ */ $.arrayType("main.Pos", 2))
-	$.assignStruct(arr[0], Rule.prototype.Pos.call(r))
+	$.assignStruct(arr[0], (r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? ((r as any) as Rule).Pos() : Rule.prototype.Pos.call(r)))
 	$.arrayIndex(arr, 0).Line = 11
 	await $.println((r$ as Rule).pos.Line, $.arrayIndex(arr, 0).Line)
 
@@ -315,8 +315,8 @@ export async function main(): globalThis.Promise<void> {
 	await $.println($.len(m))
 
 	let m2: globalThis.Map<Pos, Region> | null = $.makeMap<Pos, Region>([])
-	$.mapSet(m2, Rule.prototype.Pos.call(r), makeRegion(1))
-	let q = Rule.prototype.Pos.call(r)
+	$.mapSet(m2, (r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? ((r as any) as Rule).Pos() : Rule.prototype.Pos.call(r)), makeRegion(1))
+	let q = (r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? ((r as any) as Rule).Pos() : Rule.prototype.Pos.call(r))
 	let got = ($.mapGet<Pos, Region, Region>(m2, q, new Region(undefined, true))[0]).clone()
 	got.Start.Line = 100
 	await $.println($.mapGet<Pos, Region, Region>(m2, q, new Region(undefined, true))[0].Start.Line, got.Start.Line)

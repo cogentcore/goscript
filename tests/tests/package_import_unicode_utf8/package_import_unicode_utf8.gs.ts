@@ -15,7 +15,7 @@ export async function checkBytes(label: string, b: $.Slice<number>): globalThis.
 
 export async function main(): globalThis.Promise<void> {
 	// Test basic UTF-8 functions
-	let s = "Hello, 世界"
+	let s = "Hello, \xe4\xb8\x96\xe7\x95\x8c"
 
 	// Test RuneCountInString
 	let count = utf8.RuneCountInString(s)

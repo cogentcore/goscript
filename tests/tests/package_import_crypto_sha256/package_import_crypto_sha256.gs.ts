@@ -19,19 +19,19 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("sum last", $.arrayIndex(sum, 31))
 
 	let h: hash.Hash | null = sha256.New()
-	let [n, err] = await $.pointerValue<Exclude<hash.Hash, null>>(h).Write(new Uint8Array([97]))
+	let [n, err] = await (h !== null && (h as any).__isVarRef !== true && (h as any).__goValue === undefined ? (h as Exclude<hash.Hash, null>) : $.pointerValue<Exclude<hash.Hash, null>>(h)).Write(new Uint8Array([97]))
 	await $.println("write a", n, err == null)
-	let __goscriptTuple0: any = await $.pointerValue<Exclude<hash.Hash, null>>(h).Write(new Uint8Array([98, 99]))
+	let __goscriptTuple0: any = await (h !== null && (h as any).__isVarRef !== true && (h as any).__goValue === undefined ? (h as Exclude<hash.Hash, null>) : $.pointerValue<Exclude<hash.Hash, null>>(h)).Write(new Uint8Array([98, 99]))
 	n = __goscriptTuple0[0]
 	err = __goscriptTuple0[1]
 	await $.println("write bc", n, err == null)
-	let stream: $.Slice<number> = await $.pointerValue<Exclude<hash.Hash, null>>(h).Sum(new Uint8Array([1, 2]) as $.Slice<number>)
+	let stream: $.Slice<number> = await (h !== null && (h as any).__isVarRef !== true && (h as any).__goValue === undefined ? (h as Exclude<hash.Hash, null>) : $.pointerValue<Exclude<hash.Hash, null>>(h)).Sum(new Uint8Array([1, 2]) as $.Slice<number>)
 	await $.println("stream len", $.sliceLen(stream))
 	await $.println("stream prefix", $.arrayIndex(stream!, 0), $.arrayIndex(stream!, 1))
 	await $.println("stream digest", $.arrayIndex(stream!, 2), $.arrayIndex(stream!, 33))
 
 	let backing: $.Slice<number> = $.makeSlice<number>(sha256.Size, undefined, "byte")
-	let backed: $.Slice<number> = await $.pointerValue<Exclude<hash.Hash, null>>(h).Sum($.goSlice(backing, undefined, 0))
+	let backed: $.Slice<number> = await (h !== null && (h as any).__isVarRef !== true && (h as any).__goValue === undefined ? (h as Exclude<hash.Hash, null>) : $.pointerValue<Exclude<hash.Hash, null>>(h)).Sum($.goSlice(backing, undefined, 0))
 	await $.println("backed len", $.sliceLen(backed), $.sliceLen(backing))
 	await $.println("backed digest", $.arrayIndex(backing!, 0), $.arrayIndex(backing!, 31), $.arrayIndex(backed!, 0), $.arrayIndex(backed!, 31))
 }

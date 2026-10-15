@@ -53,7 +53,7 @@ export class pooledElement {
 
 export async function printList(name: string, values: list.List | $.VarRef<list.List> | null): globalThis.Promise<void> {
 	await fmt.Print(name)
-	for (let element: list.Element | $.VarRef<list.Element> | null = list.List.prototype.Front.call(values); element != null; element = list.Element.prototype.Next.call(element)) {
+	for (let element: list.Element | $.VarRef<list.Element> | null = (values !== null && (values as any).__isVarRef !== true && (values as any).__goValue === undefined ? ((values as any) as list.List).Front() : list.List.prototype.Front.call(values)); element != null; element = (element !== null && (element as any).__isVarRef !== true && (element as any).__goValue === undefined ? ((element as any) as list.Element).Next() : list.Element.prototype.Next.call(element))) {
 		await fmt.Print(" ", $.pointerValue<list.Element>(element).Value)
 	}
 	await fmt.Println()
@@ -73,16 +73,16 @@ export async function pushPooled(__typeArgs: $.GenericTypeArgs | undefined, pool
 
 export async function main(): globalThis.Promise<void> {
 	let values: list.List | $.VarRef<list.List> | null = list.New()
-	let middle: list.Element | $.VarRef<list.Element> | null = list.List.prototype.PushFront.call(values, "middle")
-	let back: list.Element | $.VarRef<list.Element> | null = list.List.prototype.PushBack.call(values, "back")
-	list.List.prototype.PushFront.call(values, "front")
+	let middle: list.Element | $.VarRef<list.Element> | null = (values !== null && (values as any).__isVarRef !== true && (values as any).__goValue === undefined ? ((values as any) as list.List).PushFront("middle") : list.List.prototype.PushFront.call(values, "middle"))
+	let back: list.Element | $.VarRef<list.Element> | null = (values !== null && (values as any).__isVarRef !== true && (values as any).__goValue === undefined ? ((values as any) as list.List).PushBack("back") : list.List.prototype.PushBack.call(values, "back"))
+	void (values !== null && (values as any).__isVarRef !== true && (values as any).__goValue === undefined ? ((values as any) as list.List).PushFront("front") : list.List.prototype.PushFront.call(values, "front"))
 	await printList("seed", values)
 
 	let boxed: any = $.interfaceValue(back, "*list.Element", /* @__PURE__ */ $.pointerType("list.Element"))
-	list.List.prototype.MoveToFront.call(values, $.mustTypeAssert<list.Element | $.VarRef<list.Element> | null>(boxed, /* @__PURE__ */ $.pointerType("list.Element")))
+	list.List.prototype.MoveToFront.call(values, ((boxed as any)?.__goType === "*list.Element" && (boxed as any).__goValue === undefined && (boxed as any).__isTypedNil !== true ? ((boxed as any) as list.Element | $.VarRef<list.Element> | null) : $.mustTypeAssert<list.Element | $.VarRef<list.Element> | null>(boxed, /* @__PURE__ */ $.pointerType("list.Element"))))
 	await printList("moved", values)
 
-	await fmt.Println("removed", list.List.prototype.Remove.call(values, middle))
+	await fmt.Println("removed", (values !== null && (values as any).__isVarRef !== true && (values as any).__goValue === undefined ? ((values as any) as list.List).Remove(middle) : list.List.prototype.Remove.call(values, middle)))
 	await printList("final", values)
 	let pool: sync.Pool | $.VarRef<sync.Pool> | null = newElementPool(__goscriptStatic0())
 	let pooled: pooledElement | $.VarRef<pooledElement> | null = (await pushPooled(__goscriptStatic0(), pool, "pooled") as pooledElement | $.VarRef<pooledElement> | null)

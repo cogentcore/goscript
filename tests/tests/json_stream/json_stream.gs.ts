@@ -244,7 +244,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// A blocking reader delivers values, a number, and a multibyte character
 	// split across its chunks.
-	let bdec: json.Decoder | $.VarRef<json.Decoder> | null = json.NewDecoder($.pointerValueOrNil($.interfaceValue<io.Reader | null>(bufio.NewReader($.interfaceValue<io.Reader | null>(await newChanReader($.arrayToSlice<string>(["{\"A\": \"h", $.bytesToString(new Uint8Array([195])), $.bytesToString(new Uint8Array([169, 108, 108, 111, 34, 44, 32, 34, 66, 34, 58, 32, 49])), "2.5}", "\n{\"A\": \"x\", \"B\": 3}"])), "*main.chanReader", /* @__PURE__ */ $.pointerType("main.chanReader"))), "*bufio.Reader", /* @__PURE__ */ $.pointerType("bufio.Reader")))!)
+	let bdec: json.Decoder | $.VarRef<json.Decoder> | null = json.NewDecoder($.pointerValueOrNil($.interfaceValue<io.Reader | null>(bufio.NewReader($.interfaceValue<io.Reader | null>(await newChanReader($.arrayToSlice<string>(["{\"A\": \"h", "\xc3", "\xa9llo\", \"B\": 1", "2.5}", "\n{\"A\": \"x\", \"B\": 3}"])), "*main.chanReader", /* @__PURE__ */ $.pointerType("main.chanReader"))), "*bufio.Reader", /* @__PURE__ */ $.pointerType("bufio.Reader")))!)
 	while (true) {
 		let it: $.VarRef<item> = $.varRef(new item(undefined, true))
 		{

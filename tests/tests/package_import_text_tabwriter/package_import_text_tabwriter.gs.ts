@@ -18,14 +18,14 @@ export async function main(): globalThis.Promise<void> {
 	{
 		let [, err] = await tabwriter.Writer.prototype.Write.call(writer, new Uint8Array([73, 68, 9, 78, 65, 77, 69, 10, 49, 9, 67, 97, 110, 118, 97, 115, 10, 50, 50, 9, 83, 116, 111, 114, 101, 10]))
 		if (err != null) {
-			await $.println((__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+			await $.println((__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 			return
 		}
 	}
 	{
-		let err = await tabwriter.Writer.prototype.Flush.call(writer)
+		let err = await (writer !== null && (writer as any).__isVarRef !== true && (writer as any).__goValue === undefined ? ((writer as any) as tabwriter.Writer).Flush() : tabwriter.Writer.prototype.Flush.call(writer))
 		if (err != null) {
-			await $.println((__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+			await $.println((__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 			return
 		}
 	}

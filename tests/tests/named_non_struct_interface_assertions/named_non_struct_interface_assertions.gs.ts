@@ -163,7 +163,7 @@ export async function check(value: any): globalThis.Promise<void> {
 		await $.println(false)
 		return
 	}
-	await $.println(ok, (__goscriptAwait = $.pointerValue<Exclude<adder, null>>(__goscriptShadow0).Add(3), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println(ok, (__goscriptAwait = (__goscriptShadow0 !== null && (__goscriptShadow0 as any).__isVarRef !== true && (__goscriptShadow0 as any).__goValue === undefined ? (__goscriptShadow0 as Exclude<adder, null>) : $.pointerValue<Exclude<adder, null>>(__goscriptShadow0)).Add(3), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 }
 
 export async function main(): globalThis.Promise<void> {

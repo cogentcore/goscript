@@ -103,7 +103,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("first even:", firstEven($.arrayToSlice<number>([1, 3, 4, 6])))
 	await $.println("any exited:", await anyExited(procs))
 	await $.println("exited index:", await slices.IndexFunc(procs, $.functionValue(async (p: Process | $.VarRef<Process> | null): globalThis.Promise<boolean> => {
-		return await Process.prototype.exited.call(p)
+		return await (p !== null && (p as any).__isVarRef !== true && (p as any).__goValue === undefined ? ((p as any) as Process).exited() : Process.prototype.exited.call(p))
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.pointerType("main.Process")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo))))
 
 	// Each comparison receives a zero, which makes cmp async.

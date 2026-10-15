@@ -38,7 +38,8 @@ export class chunker {
 
 	public advance(chunkSize: number): void {
 		let c: chunker | $.VarRef<chunker> | null = this;
-		$.pointerValue<chunker>(c).pos = $.uint64Add($.pointerValue<chunker>(c).pos, $.uint64(chunkSize))
+		const c$: chunker = c == null ? $.pointerTarget<chunker>(c) : (c as any).__isVarRef === true ? (c as any).value : (c as any).__goValue === undefined ? (c as any) : $.pointerTarget<chunker>(c);
+		;(c$ as chunker).pos = $.uint64Add((c$ as chunker).pos, $.uint64(chunkSize))
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -87,8 +88,8 @@ export class repeatReader {
 			return [0, io.EOF]
 		}
 		let n = $.min($.sliceLen(p), (r$ as repeatReader).remaining)
-		for (let __goscriptRangeCount0 = n, i = 0; i < __goscriptRangeCount0; i++) {
-			$.sliceElems(p!)[$.sliceSlot(p!, i)] = $.uint(i, 8)
+		for (let __goscriptSliceWindow2 = $.sliceRange(p), __goscriptRangeCount0 = n, i = 0; i < __goscriptRangeCount0; i++) {
+			;(__goscriptSliceWindow2.backing as any[])[$.windowSlot(__goscriptSliceWindow2, i)] = $.uint(i, 8)
 		}
 		;(r$ as repeatReader).remaining = (r$ as repeatReader).remaining - (n)
 		return [n, null]
@@ -106,8 +107,8 @@ export class repeatReader {
 export function algorithm(data: $.Slice<number>, n: number, g: $.Slice<bigint>, maskC: bigint, maskJ: bigint, minSize: number, jumpLength: number): number {
 	let fp = 0n
 	let i = minSize
-	while (i < n) {
-		fp = $.uint64Add(($.uint64Shl(fp, 1n)), $.arrayIndex(g!, $.arrayIndex(data!, i) % uint64Len(g)))
+	for (let __goscriptSliceWindow0 = $.sliceRange(g), __goscriptSliceWindow1 = $.sliceRange(data); i < n; ) {
+		fp = $.uint64Add(($.uint64Shl(fp, 1n)), ((__goscriptSliceWindow0.backing as any[])[$.windowSlot(__goscriptSliceWindow0, ((__goscriptSliceWindow1.backing as any[])[$.windowSlot(__goscriptSliceWindow1, i)] as number) % uint64Len(g))] as bigint))
 		if (($.uint64And(fp, maskJ)) == 0n) {
 			if (($.uint64And(fp, maskC)) == 0n) {
 				return i
@@ -137,9 +138,9 @@ export async function main(): globalThis.Promise<void> {
 	let src = io.LimitReader($.pointerValueOrNil($.interfaceValue<io.Reader | null>(newRepeatReader(40), "*main.repeatReader", /* @__PURE__ */ $.pointerType("main.repeatReader")))!, 25n)
 	let buf: $.Slice<number> = $.makeSlice<number>(8, undefined, "byte")
 	while (true) {
-		let [nr, err] = await $.pointerValue<Exclude<io.Reader, null>>(src).Read(buf)
+		let [nr, err] = await (src !== null && (src as any).__isVarRef !== true && (src as any).__goValue === undefined ? (src as Exclude<io.Reader, null>) : $.pointerValue<Exclude<io.Reader, null>>(src)).Read(buf)
 		if (nr > 0) {
-			chunker.prototype.advance.call(c, nr)
+			void (c !== null && (c as any).__isVarRef !== true && (c as any).__goValue === undefined ? ((c as any) as chunker).advance(nr) : chunker.prototype.advance.call(c, nr))
 			totalSize = $.uint64Add(totalSize, $.uint64(nr))
 			chkStart = $.uint64Add(chkStart, $.uint64(nr))
 		}
@@ -147,7 +148,7 @@ export async function main(): globalThis.Promise<void> {
 			break
 		}
 		if (err != null) {
-			await $.println("err", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+			await $.println("err", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 			return
 		}
 	}

@@ -152,7 +152,7 @@ export async function main(): globalThis.Promise<void> {
 	{
 		let err = await json.Unmarshal(new Uint8Array([123, 34, 75, 101, 121, 119, 111, 114, 100, 34, 58, 34, 98, 111, 108, 100, 34, 44, 34, 66, 97, 99, 107, 103, 114, 111, 117, 110, 100, 34, 58, 34, 119, 104, 105, 116, 101, 34, 125]), $.interfaceValue(s, "*main.Style", /* @__PURE__ */ $.pointerType("main.Style")))
 		if (err != null) {
-			await $.println("error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+			await $.println("error:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		}
 	}
 	await $.println("len:", $.len(s.value))
@@ -164,7 +164,7 @@ export async function main(): globalThis.Promise<void> {
 	let d: $.VarRef<Doc> = $.varRef(new Doc(undefined, true))
 	let err: $.GoError = await json.Unmarshal(new Uint8Array([123, 34, 75, 105, 110, 100, 34, 58, 34, 67, 111, 109, 109, 101, 110, 116, 34, 44, 34, 75, 105, 110, 100, 115, 34, 58, 91, 34, 75, 101, 121, 119, 111, 114, 100, 34, 44, 34, 66, 97, 99, 107, 103, 114, 111, 117, 110, 100, 34, 93, 44, 34, 83, 116, 121, 108, 101, 115, 34, 58, 123, 34, 120, 34, 58, 123, 34, 67, 111, 109, 109, 101, 110, 116, 34, 58, 34, 103, 114, 97, 121, 34, 125, 125, 44, 34, 67, 111, 117, 110, 116, 115, 34, 58, 123, 34, 49, 34, 58, 50, 44, 34, 45, 51, 34, 58, 52, 125, 44, 34, 66, 105, 103, 34, 58, 123, 34, 57, 48, 48, 55, 49, 57, 57, 50, 53, 52, 55, 52, 48, 57, 57, 51, 34, 58, 34, 98, 105, 103, 34, 125, 125]), $.interfaceValue(d, "*main.Doc", /* @__PURE__ */ $.pointerType("main.Doc")))
 	if (err != null) {
-		await $.println("error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+		await $.println("error:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	}
 	await $.println("comment:", $.mapGet<Tokens, string, string>($.mapGet<string, Style, Style>(d.value.Styles, "x", null)[0], 2, "")[0])
 	await $.println("kind:", Tokens_String(d.value.Kind), "kinds:", $.sliceLen(d.value.Kinds), Tokens_String($.arrayIndex(d.value.Kinds!, 0)), Tokens_String($.arrayIndex(d.value.Kinds!, 1)))
@@ -178,7 +178,7 @@ export async function main(): globalThis.Promise<void> {
 	b = __goscriptTuple1[0]
 	err = __goscriptTuple1[1]
 	if (err != null) {
-		await $.println("error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+		await $.println("error:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	}
 	await $.println("marshal:", $.bytesToString(b))
 	let __goscriptTuple2: any = json.Marshal($.interfaceValue($.makeMap<number, boolean>([[3, true], [1, false]]), "map[int]bool", /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("bool"))))

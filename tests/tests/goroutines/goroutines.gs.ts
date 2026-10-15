@@ -107,12 +107,12 @@ export async function main(): globalThis.Promise<void> {
 
 	// Sort messages by priority for deterministic order
 	for (let __goscriptRangeTarget0 = allMessages, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), i = 0; i < __goscriptRangeWindow0.length; i++) {
-		for (let j = i + 1; j < $.sliceLen(allMessages); j++) {
-			if (((__goscriptRangeWindow0.backing as any[])[__goscriptRangeWindow0.offset + i] as Message).priority > $.arrayIndex(allMessages!, j).priority) {
-				let __goscriptAssign0_0: Message = ($.arrayIndex(allMessages!, j)).clone()
+		for (let j = i + 1; j < __goscriptRangeWindow0.length; j++) {
+			if (((__goscriptRangeWindow0.backing as any[])[__goscriptRangeWindow0.offset + i] as Message).priority > ((__goscriptRangeWindow0.backing as any[])[$.windowSlot(__goscriptRangeWindow0, j)] as Message).priority) {
+				let __goscriptAssign0_0: Message = (((__goscriptRangeWindow0.backing as any[])[$.windowSlot(__goscriptRangeWindow0, j)] as Message)).clone()
 				let __goscriptAssign0_1: Message = (((__goscriptRangeWindow0.backing as any[])[__goscriptRangeWindow0.offset + i] as Message)).clone()
 				$.assignStruct((__goscriptRangeWindow0.backing as any[])[__goscriptRangeWindow0.offset + i], __goscriptAssign0_0)
-				$.assignStruct($.sliceElems(allMessages!)[$.sliceSlot(allMessages!, j)], __goscriptAssign0_1)
+				$.assignStruct((__goscriptRangeWindow0.backing as any[])[$.windowSlot(__goscriptRangeWindow0, j)], __goscriptAssign0_1)
 			}
 		}
 	}

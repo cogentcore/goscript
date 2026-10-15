@@ -13,7 +13,7 @@ export async function recoverMsg(label: string, fn: (() => void) | null): global
 					{
 						let [err, ok] = $.typeAssertTuple<$.GoError>(r, "error")
 						if (ok) {
-							await $.println(label, (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+							await $.println(label, (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 						} else {
 							await $.println(label, "non-error panic")
 						}

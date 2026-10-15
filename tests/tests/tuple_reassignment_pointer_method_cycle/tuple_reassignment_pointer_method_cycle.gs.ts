@@ -79,7 +79,7 @@ export async function main(): globalThis.Promise<void> {
 	let z: box | $.VarRef<box> | null = new box({value: 3})
 
 	for (let __rangeIndex = 0; __rangeIndex < 1; __rangeIndex++) {
-		let __goscriptTuple0: any = cursor.prototype.rotate.call(__goscriptShadow0, x, y, z)
+		let __goscriptTuple0: any = (__goscriptShadow0 !== null && (__goscriptShadow0 as any).__isVarRef !== true && (__goscriptShadow0 as any).__goValue === undefined ? ((__goscriptShadow0 as any) as cursor).rotate(x, y, z) : cursor.prototype.rotate.call(__goscriptShadow0, x, y, z))
 		x = __goscriptTuple0[0]
 		y = __goscriptTuple0[1]
 		z = __goscriptTuple0[2]

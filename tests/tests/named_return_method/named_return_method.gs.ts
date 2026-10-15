@@ -88,7 +88,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// Test ReadAt method
 	let buf: $.Slice<number> = $.makeSlice<number>(5, undefined, "byte")
-	let [n1, err1] = content.prototype.ReadAt.call(c, buf, 0n)
+	let [n1, err1] = (c !== null && (c as any).__isVarRef !== true && (c as any).__goValue === undefined ? ((c as any) as content).ReadAt(buf, 0n) : content.prototype.ReadAt.call(c, buf, 0n))
 	await $.println(n1)
 	if (err1 == null) {
 		await $.println("nil")
@@ -99,7 +99,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// Test ReadAt with different offset
 	let buf2: $.Slice<number> = $.makeSlice<number>(6, undefined, "byte")
-	let [n2, err2] = content.prototype.ReadAt.call(c, buf2, 7n)
+	let [n2, err2] = (c !== null && (c as any).__isVarRef !== true && (c as any).__goValue === undefined ? ((c as any) as content).ReadAt(buf2, 7n) : content.prototype.ReadAt.call(c, buf2, 7n))
 	await $.println(n2)
 	if (err2 == null) {
 		await $.println("nil")
@@ -109,17 +109,17 @@ export async function main(): globalThis.Promise<void> {
 	await $.println($.bytesToString(buf2))
 
 	// Test ProcessData method
-	let [r1, s1, v1] = content.prototype.ProcessData.call(c, 15)
+	let [r1, s1, v1] = (c !== null && (c as any).__isVarRef !== true && (c as any).__goValue === undefined ? ((c as any) as content).ProcessData(15) : content.prototype.ProcessData.call(c, 15))
 	await $.println(r1)
 	await $.println(s1)
 	await $.println(v1)
 
-	let [r2, s2, v2] = content.prototype.ProcessData.call(c, 5)
+	let [r2, s2, v2] = (c !== null && (c as any).__isVarRef !== true && (c as any).__goValue === undefined ? ((c as any) as content).ProcessData(5) : content.prototype.ProcessData.call(c, 5))
 	await $.println(r2)
 	await $.println(s2)
 	await $.println(v2)
 
-	let [r3, s3, v3] = content.prototype.ProcessData.call(c, -1)
+	let [r3, s3, v3] = (c !== null && (c as any).__isVarRef !== true && (c as any).__goValue === undefined ? ((c as any) as content).ProcessData(-1) : content.prototype.ProcessData.call(c, -1))
 	await $.println(r3)
 	await $.println(s3)
 	await $.println(v3)

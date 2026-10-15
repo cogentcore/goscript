@@ -310,8 +310,8 @@ export async function main(): globalThis.Promise<void> {
 
 	await $.println("=== Generic struct with map field ===")
 	let mapper: Mapper | $.VarRef<Mapper> | null = (NewMapper(__goscriptStatic4()) as Mapper | $.VarRef<Mapper> | null)
-	Mapper.prototype.Put.call(mapper, __goscriptStatic4(), "answer", 42)
-	let __goscriptTuple2: any = Mapper.prototype.Get.call(mapper, __goscriptStatic4(), "answer")
+	void (mapper !== null && (mapper as any).__isVarRef !== true && (mapper as any).__goValue === undefined ? ((mapper as any) as Mapper).Put(__goscriptStatic4(), "answer", 42) : Mapper.prototype.Put.call(mapper, __goscriptStatic4(), "answer", 42))
+	let __goscriptTuple2: any = (mapper !== null && (mapper as any).__isVarRef !== true && (mapper as any).__goValue === undefined ? ((mapper as any) as Mapper).Get(__goscriptStatic4(), "answer") : Mapper.prototype.Get.call(mapper, __goscriptStatic4(), "answer"))
 	let answer = (__goscriptTuple2[0] as number)
 	let found = __goscriptTuple2[1]
 	await $.println("mapper:", answer, found)

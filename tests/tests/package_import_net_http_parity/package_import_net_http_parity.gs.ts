@@ -39,7 +39,7 @@ export async function main(): globalThis.Promise<void> {
 	let err = __goscriptTuple0[1]
 	let req$: http.Request = req == null ? $.pointerTarget<http.Request>(req) : (req as any).__isVarRef === true ? (req as any).value : (req as any).__goValue === undefined ? (req as any) : $.pointerTarget<http.Request>(req)
 	if (err != null) {
-		await $.println("request error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+		await $.println("request error:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		return
 	}
 	http.Header_Set((req$ as http.Request).Header, "Cookie", "space=wave")
@@ -57,7 +57,7 @@ export async function main(): globalThis.Promise<void> {
 	let headReq: http.Request | $.VarRef<http.Request> | null = __goscriptTuple1[0]
 	err = __goscriptTuple1[1]
 	if (err != null) {
-		await $.println("head request error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+		await $.println("head request error:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		return
 	}
 	rec = httptest.NewRecorder()

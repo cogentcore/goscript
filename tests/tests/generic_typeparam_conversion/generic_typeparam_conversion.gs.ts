@@ -99,9 +99,9 @@ export function Extended_String(e: Extended): string {
 
 export function valuesExtended<T, E>(__typeArgs: $.GenericTypeArgs | undefined, values: $.Slice<T>, extended: $.Slice<E>): $.Slice<T> {
 	let res: $.Slice<T> = $.makeSlice<T>($.sliceLen(extended), undefined, undefined, () => ($.genericZero(__typeArgs, "T", null) as T))
-	for (let __goscriptRangeTarget0 = extended, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), i = 0; i < __goscriptRangeWindow0.length; i++) {
-		let e = $.copyElement((__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + i] as any))
-		$.sliceElems(res!)[$.sliceSlot(res!, i)] = $.genericConvert<T>(__typeArgs, "T", e)
+	for (let __goscriptRangeTarget0 = extended, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __goscriptSliceWindow0 = $.sliceRange(res), i = 0; i < __goscriptRangeWindow0.length; i++) {
+		let e = $.copyElement((__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + i] as any));
+		;(__goscriptSliceWindow0.backing as any[])[$.windowSlot(__goscriptSliceWindow0, i)] = $.genericConvert<T>(__typeArgs, "T", e)
 	}
 	res = $.appendSlice(res, values, $.appendZero(() => ($.genericZero(__typeArgs, "T", null) as T)))
 	return res

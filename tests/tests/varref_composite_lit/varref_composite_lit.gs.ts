@@ -55,7 +55,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// Use the pointer
 	await $.println("childInode.Value:", $.pointerValue<MockInode>(childInode).Value)
-	await $.println("childInode.getValue():", MockInode.prototype.getValue.call(childInode))
+	await $.println("childInode.getValue():", (childInode !== null && (childInode as any).__isVarRef !== true && (childInode as any).__goValue === undefined ? ((childInode as any) as MockInode).getValue() : MockInode.prototype.getValue.call(childInode)))
 }
 
 if ($.isMainScript(import.meta)) {

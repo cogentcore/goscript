@@ -77,7 +77,7 @@ export class scanner {
 			switch (__goscriptGotoState0) {
 				case "scriptData":
 				{
-					c = scanner.prototype.readByte.call(s)
+					c = (s !== null && (s as any).__isVarRef !== true && (s as any).__goValue === undefined ? ((s as any) as scanner).readByte() : scanner.prototype.readByte.call(s))
 					if ((s$ as scanner).done) {
 						return (s$ as scanner).pos
 					}
@@ -93,7 +93,7 @@ export class scanner {
 				}
 				case "scriptDataLessThanSign":
 				{
-					c = scanner.prototype.readByte.call(s)
+					c = (s !== null && (s as any).__isVarRef !== true && (s as any).__goValue === undefined ? ((s as any) as scanner).readByte() : scanner.prototype.readByte.call(s))
 					if ((s$ as scanner).done) {
 						return (s$ as scanner).pos
 					}
@@ -127,7 +127,7 @@ export class scanner {
 				case "scriptDataEscapeStart":
 				{
 					for (var i = 0; i < 2; i++) {
-						c = scanner.prototype.readByte.call(s)
+						c = (s !== null && (s as any).__isVarRef !== true && (s as any).__goValue === undefined ? ((s as any) as scanner).readByte() : scanner.prototype.readByte.call(s))
 						if ((s$ as scanner).done) {
 							return (s$ as scanner).pos
 						}
@@ -144,7 +144,7 @@ export class scanner {
 				}
 				case "scriptDataEscaped":
 				{
-					c = scanner.prototype.readByte.call(s)
+					c = (s !== null && (s as any).__isVarRef !== true && (s as any).__goValue === undefined ? ((s as any) as scanner).readByte() : scanner.prototype.readByte.call(s))
 					if ((s$ as scanner).done) {
 						return (s$ as scanner).pos
 					}
@@ -164,12 +164,12 @@ export class scanner {
 				}
 				case "scriptDataEscapedDash":
 				{
-					c = scanner.prototype.readByte.call(s)
+					c = (s !== null && (s as any).__isVarRef !== true && (s as any).__goValue === undefined ? ((s as any) as scanner).readByte() : scanner.prototype.readByte.call(s))
 					if ((s$ as scanner).done) {
 						return (s$ as scanner).pos
 					}
 					if (c == 45) {
-						c = scanner.prototype.readByte.call(s)
+						c = (s !== null && (s as any).__isVarRef !== true && (s as any).__goValue === undefined ? ((s as any) as scanner).readByte() : scanner.prototype.readByte.call(s))
 						if (c == 62) {
 							__goscriptGotoState0 = "scriptData"
 							continue __goscriptGotoLoop0
@@ -199,7 +199,7 @@ export async function main(): globalThis.Promise<void> {
 	for (let __goscriptRangeTarget0 = $.arrayToSlice<string>(["a < b</script>", "x<!-- </script> -->y</script>", "<!x</script>", "no end"]), __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
 		let src = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as string)
 		let s: scanner | $.VarRef<scanner> | null = new scanner({data: src})
-		let end = scanner.prototype.readScript.call(s)
+		let end = (s !== null && (s as any).__isVarRef !== true && (s as any).__goValue === undefined ? ((s as any) as scanner).readScript() : scanner.prototype.readScript.call(s))
 		await $.println($.sliceStringOrBytes(src, undefined, end))
 	}
 	await $.println(encode($.arrayToSlice<number>([97, 0xa5, 0x85, 0x300, 98])))

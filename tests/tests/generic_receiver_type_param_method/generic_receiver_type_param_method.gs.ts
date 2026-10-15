@@ -101,9 +101,9 @@ export function __goscript_set_curve(__goscriptValue: nistCurve | $.VarRef<nistC
 }
 
 export async function main(): globalThis.Promise<void> {
-	let p: point | $.VarRef<point> | null = (await nistCurve.prototype.Add.call(curve, __goscriptStatic0(), new point({N: 2}), new point({N: 3})) as point | $.VarRef<point> | null)
+	let p: point | $.VarRef<point> | null = (await (curve !== null && (curve as any).__isVarRef !== true && (curve as any).__goValue === undefined ? ((curve as any) as nistCurve).Add(__goscriptStatic0(), new point({N: 2}), new point({N: 3})) : nistCurve.prototype.Add.call(curve, __goscriptStatic0(), new point({N: 2}), new point({N: 3}))) as point | $.VarRef<point> | null)
 	await $.println("sum:", $.pointerValue<point>(p).N)
-	if (nistCurve.prototype.Zero.call(curve, __goscriptStatic0()) == null) {
+	if ((curve !== null && (curve as any).__isVarRef !== true && (curve as any).__goValue === undefined ? ((curve as any) as nistCurve).Zero(__goscriptStatic0()) : nistCurve.prototype.Zero.call(curve, __goscriptStatic0())) == null) {
 		await $.println("zero")
 	}
 }

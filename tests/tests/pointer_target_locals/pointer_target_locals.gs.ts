@@ -148,7 +148,7 @@ export async function deref(n: Node | $.VarRef<Node> | null): globalThis.Promise
 				}
 			}
 		})() })
-		Node.prototype.Fill.call(n, "x")
+		void (n !== null && (n as any).__isVarRef !== true && (n as any).__goValue === undefined ? ((n as any) as Node).Fill("x") : Node.prototype.Fill.call(n, "x"))
 		const __goscriptReturn0: string = $.pointerValue<Node>(n).Name
 		msg = __goscriptReturn0
 		await __defer.dispose()
@@ -166,19 +166,19 @@ export async function deref(n: Node | $.VarRef<Node> | null): globalThis.Promise
 export async function main(): globalThis.Promise<void> {
 	let a: Node | $.VarRef<Node> | null = new Node({Name: "a", Next: new Node({Name: "b"})})
 	let a$: Node = a == null ? $.pointerTarget<Node>(a) : (a as any).__isVarRef === true ? (a as any).value : (a as any).__goValue === undefined ? (a as any) : $.pointerTarget<Node>(a)
-	await $.println(Node.prototype.Len.call(a), (a$ as Node).Count, $.pointerValue<Node>((a$ as Node).Next).Count)
+	await $.println((a !== null && (a as any).__isVarRef !== true && (a as any).__goValue === undefined ? ((a as any) as Node).Len() : Node.prototype.Len.call(a)), (a$ as Node).Count, $.pointerValue<Node>((a$ as Node).Next).Count)
 	await $.println(Describe(a, "> "), Describe(null, "> "))
 	let b: Node | $.VarRef<Node> | null = new Node()
 	let b$: Node = b == null ? $.pointerTarget<Node>(b) : (b as any).__isVarRef === true ? (b as any).value : (b as any).__goValue === undefined ? (b as any) : $.pointerTarget<Node>(b)
-	Node.prototype.Fill.call(b, "hello")
+	void (b !== null && (b as any).__isVarRef !== true && (b as any).__goValue === undefined ? ((b as any) as Node).Fill("hello") : Node.prototype.Fill.call(b, "hello"))
 	await $.println((b$ as Node).Name, (b$ as Node).Count)
 	await $.println(await deref(null))
 	let nn: Node | $.VarRef<Node> | null = null! as Node | $.VarRef<Node> | null
-	await $.println(Node.prototype.Len.call(nn))
+	await $.println((nn !== null && (nn as any).__isVarRef !== true && (nn as any).__goValue === undefined ? ((nn as any) as Node).Len() : Node.prototype.Len.call(nn)))
 
 	let h: Holder | $.VarRef<Holder> | null = new Holder({items: $.arrayToSlice<Node>([new Node({Name: "p"}, true), new Node({Name: "q"}, true)])})
 	let h$: Holder = h == null ? $.pointerTarget<Holder>(h) : (h as any).__isVarRef === true ? (h as any).value : (h as any).__goValue === undefined ? (h as any) : $.pointerTarget<Holder>(h)
-	Holder.prototype.touch.call(h, 1)
+	void (h !== null && (h as any).__isVarRef !== true && (h as any).__goValue === undefined ? ((h as any) as Holder).touch(1) : Holder.prototype.touch.call(h, 1))
 	await $.println($.arrayIndex((h$ as Holder).items!, 1).Name, $.arrayIndex((h$ as Holder).items!, 1).Count)
 }
 

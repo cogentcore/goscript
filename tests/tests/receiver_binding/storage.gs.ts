@@ -84,15 +84,15 @@ export class storage {
 export async function main(): globalThis.Promise<void> {
 	let s: storage | $.VarRef<storage> | null = new storage({bytes: $.makeSlice<number>(5, undefined, "byte"), name: "test"})
 
-	await $.println("Name:", storage.prototype.Name.call(s))
-	await $.println("Length:", storage.prototype.Len.call(s))
-	await $.println("Empty:", storage.prototype.IsEmpty.call(s))
+	await $.println("Name:", (s !== null && (s as any).__isVarRef !== true && (s as any).__goValue === undefined ? ((s as any) as storage).Name() : storage.prototype.Name.call(s)))
+	await $.println("Length:", (s !== null && (s as any).__isVarRef !== true && (s as any).__goValue === undefined ? ((s as any) as storage).Len() : storage.prototype.Len.call(s)))
+	await $.println("Empty:", (s !== null && (s as any).__isVarRef !== true && (s as any).__goValue === undefined ? ((s as any) as storage).IsEmpty() : storage.prototype.IsEmpty.call(s)))
 
-	storage.prototype.Truncate.call(s)
-	await $.println("Length after truncate:", storage.prototype.Len.call(s))
+	void (s !== null && (s as any).__isVarRef !== true && (s as any).__goValue === undefined ? ((s as any) as storage).Truncate() : storage.prototype.Truncate.call(s))
+	await $.println("Length after truncate:", (s !== null && (s as any).__isVarRef !== true && (s as any).__goValue === undefined ? ((s as any) as storage).Len() : storage.prototype.Len.call(s)))
 
-	storage.prototype.SetName.call(s, "new_name")
-	await $.println("New name:", storage.prototype.Name.call(s))
+	void (s !== null && (s as any).__isVarRef !== true && (s as any).__goValue === undefined ? ((s as any) as storage).SetName("new_name") : storage.prototype.SetName.call(s, "new_name"))
+	await $.println("New name:", (s !== null && (s as any).__isVarRef !== true && (s as any).__goValue === undefined ? ((s as any) as storage).Name() : storage.prototype.Name.call(s)))
 }
 
 if ($.isMainScript(import.meta)) {

@@ -320,8 +320,8 @@ export async function main(): globalThis.Promise<void> {
 	// A for loop post statement and an if statement init.
 	let sum: $.Slice<number> = $.arrayToSlice<number>([0, 0, 0])
 	calls = 0
-	for (let n = 0; n < 3; (() => { const __goscriptOperand16 = idx()
-	$.sliceElems(sum!)[$.sliceSlot(sum!, __goscriptOperand16)] = $.sliceElems(sum!)[$.sliceSlot(sum!, __goscriptOperand16)] + (n) })()) {
+	for (let __goscriptSliceWindow0 = $.sliceRange(sum), n = 0; n < 3; (() => { const __goscriptOperand16 = idx();
+	;(__goscriptSliceWindow0.backing as any[])[$.windowSlot(__goscriptSliceWindow0, __goscriptOperand16)] = (__goscriptSliceWindow0.backing as any[])[$.windowSlot(__goscriptSliceWindow0, __goscriptOperand16)] + (n) })()) {
 		n++
 	}
 	await $.println("for post", $.arrayIndex(sum!, 0), $.arrayIndex(sum!, 1), $.arrayIndex(sum!, 2), calls)
@@ -360,9 +360,9 @@ export async function main(): globalThis.Promise<void> {
 	let c: counter | null = $.interfaceValue<counter | null>(new chanCounter({ch: ch}), "*main.chanCounter", /* @__PURE__ */ $.pointerType("main.chanCounter"))
 	let vals: $.Slice<number> = $.arrayToSlice<number>([0, 0, 0])
 	calls = 0
-	const __goscriptOperand19 = (__goscriptAwait = $.pointerValue<Exclude<counter, null>>(c).Next(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+	const __goscriptOperand19 = (__goscriptAwait = (c !== null && (c as any).__isVarRef !== true && (c as any).__goValue === undefined ? (c as Exclude<counter, null>) : $.pointerValue<Exclude<counter, null>>(c)).Next(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 	$.sliceElems(vals!)[$.sliceSlot(vals!, __goscriptOperand19)] = $.sliceElems(vals!)[$.sliceSlot(vals!, __goscriptOperand19)] + (5)
-	const __goscriptOperand20 = (__goscriptAwait = $.pointerValue<Exclude<counter, null>>(c).Next(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+	const __goscriptOperand20 = (__goscriptAwait = (c !== null && (c as any).__isVarRef !== true && (c as any).__goValue === undefined ? (c as Exclude<counter, null>) : $.pointerValue<Exclude<counter, null>>(c)).Next(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 	$.sliceElems(vals!)[$.sliceSlot(vals!, __goscriptOperand20)] = $.sliceElems(vals!)[$.sliceSlot(vals!, __goscriptOperand20)] + (6)
 	await $.println("async index +=", $.arrayIndex(vals!, 0), $.arrayIndex(vals!, 1), $.arrayIndex(vals!, 2), calls)
 }

@@ -16,7 +16,7 @@ $.registerInterfaceType(
 );
 
 export async function Use(d: Directive | null): globalThis.Promise<boolean> {
-	return (__goscriptAwait = $.pointerValue<Exclude<Directive, null>>(d).Validate(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) == null
+	return (__goscriptAwait = (d !== null && (d as any).__isVarRef !== true && (d as any).__goValue === undefined ? (d as Exclude<Directive, null>) : $.pointerValue<Exclude<Directive, null>>(d)).Validate(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) == null
 }
 
 export function Accept(d: Directive | null): boolean {

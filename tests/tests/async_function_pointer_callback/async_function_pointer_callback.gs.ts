@@ -124,7 +124,7 @@ export async function main(): globalThis.Promise<void> {
 
 	let h: Host | $.VarRef<Host> | null = new Host()
 	$.pointerValue<Host>(h).process.Store(process)
-	let [got, err] = await Host.prototype.processor.call(h)!(1)
+	let [got, err] = await (h !== null && (h as any).__isVarRef !== true && (h as any).__goValue === undefined ? ((h as any) as Host).processor() : Host.prototype.processor.call(h))!(1)
 	await $.println("pointer callback", got, err == null)
 }
 

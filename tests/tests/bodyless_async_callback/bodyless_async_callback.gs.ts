@@ -59,7 +59,7 @@ export function setCallback(callback: ((_p0: string) => (() => void) | null | gl
 
 export async function newCallback(name: string): globalThis.Promise<(() => void) | null> {
 	let s: Setting | $.VarRef<Setting> | null = new Setting()
-	await Setting.prototype.Value.call(s)
+	await (s !== null && (s as any).__isVarRef !== true && (s as any).__goValue === undefined ? ((s as any) as Setting).Value() : Setting.prototype.Value.call(s))
 	return $.functionValue(async (): globalThis.Promise<void> => {
 		await $.println("callback:", name)
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo))

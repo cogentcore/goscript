@@ -18,7 +18,7 @@ export async function run(ctx: context.Context | null): globalThis.Promise<void>
 	let myCh: $.Channel<{}> | null = $.makeChannel<{}>(0, {}, "both")
 
 	queueMicrotask(async () => { await (async (): globalThis.Promise<void> => {
-		await $.chanRecv(((__goscriptAwait = $.pointerValue<Exclude<context.Context, null>>(sctx).Done(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as $.Channel<{}> | null))
+		await $.chanRecv(((__goscriptAwait = (sctx !== null && (sctx as any).__isVarRef !== true && (sctx as any).__goValue === undefined ? (sctx as Exclude<context.Context, null>) : $.pointerValue<Exclude<context.Context, null>>(sctx)).Done(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as $.Channel<{}> | null))
 		await $.chanSend(myCh, {})
 	})() })
 
@@ -62,7 +62,7 @@ export async function main(): globalThis.Promise<void> {
 	let [deadlineCtx, cancel] = context.WithDeadline($.pointerValueOrNil(ctx)!, $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(time.Now())).Add(3600000000000n))))
 	const __goscriptDeferCallee1 = cancel
 	__defer.defer(async () => { (__goscriptAwait = __goscriptDeferCallee1!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) })
-	let [deadline, ok] = await $.pointerValue<Exclude<context.Context, null>>(deadlineCtx).Deadline()
+	let [deadline, ok] = await (deadlineCtx !== null && (deadlineCtx as any).__isVarRef !== true && (deadlineCtx as any).__goValue === undefined ? (deadlineCtx as Exclude<context.Context, null>) : $.pointerValue<Exclude<context.Context, null>>(deadlineCtx)).Deadline()
 	await $.println("deadline ok:", ok)
 	await $.println("deadline zero:", $.markAsStructValue($.cloneStructValue(deadline)).IsZero())
 

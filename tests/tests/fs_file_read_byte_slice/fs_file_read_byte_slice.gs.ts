@@ -22,13 +22,13 @@ export async function show(v: any): globalThis.Promise<void> {
 
 export async function main(): globalThis.Promise<void> {
 	let fsys: fs.FS | null = $.namedValueInterfaceValue<fs.FS | null>($.makeMap<string, fstest.MapFile | $.VarRef<fstest.MapFile> | null>([["a.txt", new fstest.MapFile({Data: new Uint8Array([98, 97, 114])})]]), "fstest.MapFS", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2())
-	let [file, err] = await $.pointerValue<Exclude<fs.FS, null>>(fsys).Open("a.txt")
+	let [file, err] = await (fsys !== null && (fsys as any).__isVarRef !== true && (fsys as any).__goValue === undefined ? (fsys as Exclude<fs.FS, null>) : $.pointerValue<Exclude<fs.FS, null>>(fsys)).Open("a.txt")
 	if (err != null) {
-		await $.println("open error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+		await $.println("open error:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		return
 	}
 	let data: $.Slice<number> = $.makeSlice<number>(3, undefined, "byte")
-	let __goscriptTuple1: any = await $.pointerValue<Exclude<fs.File, null>>(file).Read(data)
+	let __goscriptTuple1: any = await (file !== null && (file as any).__isVarRef !== true && (file as any).__goValue === undefined ? (file as Exclude<fs.File, null>) : $.pointerValue<Exclude<fs.File, null>>(file)).Read(data)
 	let n = __goscriptTuple1[0]
 	err = __goscriptTuple1[1]
 	await $.println(n, err == null, $.bytesToString(data))

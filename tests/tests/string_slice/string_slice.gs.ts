@@ -23,7 +23,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("myStr1[:]:", $.sliceStringOrBytes(myStr1, undefined, undefined))
 
 	// Slicing with Unicode characters
-	let myStr2 = "你好世界"
+	let myStr2 = "\xe4\xbd\xa0\xe5\xa5\xbd\xe4\xb8\x96\xe7\x95\x8c"
 	// UTF-8 bytes:
 	// 你: E4 BD A0
 	// 好: E5 A5 BD

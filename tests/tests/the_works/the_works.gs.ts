@@ -257,56 +257,56 @@ export class VM {
 		switch (_in.Op) {
 			case 0:
 			{
-				Stack.prototype.Push.call(s, __goscriptStatic0(), _in.Arg)
+				void (s !== null && (s as any).__isVarRef !== true && (s as any).__goValue === undefined ? ((s as any) as Stack).Push(__goscriptStatic0(), _in.Arg) : Stack.prototype.Push.call(s, __goscriptStatic0(), _in.Arg))
 				break
 			}
 			case 1:
 			{
-				let v = (Stack.prototype.Pop.call(s, __goscriptStatic0()) as bigint)
-				Stack.prototype.Push.call(s, __goscriptStatic0(), v)
-				Stack.prototype.Push.call(s, __goscriptStatic0(), v)
+				let v = ((s !== null && (s as any).__isVarRef !== true && (s as any).__goValue === undefined ? ((s as any) as Stack).Pop(__goscriptStatic0()) : Stack.prototype.Pop.call(s, __goscriptStatic0())) as bigint)
+				void (s !== null && (s as any).__isVarRef !== true && (s as any).__goValue === undefined ? ((s as any) as Stack).Push(__goscriptStatic0(), v) : Stack.prototype.Push.call(s, __goscriptStatic0(), v))
+				void (s !== null && (s as any).__isVarRef !== true && (s as any).__goValue === undefined ? ((s as any) as Stack).Push(__goscriptStatic0(), v) : Stack.prototype.Push.call(s, __goscriptStatic0(), v))
 				break
 			}
 			case 2:
 			{
-				let b = (Stack.prototype.Pop.call(s, __goscriptStatic0()) as bigint)
-				let a = (Stack.prototype.Pop.call(s, __goscriptStatic0()) as bigint)
-				Stack.prototype.Push.call(s, __goscriptStatic0(), a)
-				Stack.prototype.Push.call(s, __goscriptStatic0(), b)
-				Stack.prototype.Push.call(s, __goscriptStatic0(), a)
+				let b = ((s !== null && (s as any).__isVarRef !== true && (s as any).__goValue === undefined ? ((s as any) as Stack).Pop(__goscriptStatic0()) : Stack.prototype.Pop.call(s, __goscriptStatic0())) as bigint)
+				let a = ((s !== null && (s as any).__isVarRef !== true && (s as any).__goValue === undefined ? ((s as any) as Stack).Pop(__goscriptStatic0()) : Stack.prototype.Pop.call(s, __goscriptStatic0())) as bigint)
+				void (s !== null && (s as any).__isVarRef !== true && (s as any).__goValue === undefined ? ((s as any) as Stack).Push(__goscriptStatic0(), a) : Stack.prototype.Push.call(s, __goscriptStatic0(), a))
+				void (s !== null && (s as any).__isVarRef !== true && (s as any).__goValue === undefined ? ((s as any) as Stack).Push(__goscriptStatic0(), b) : Stack.prototype.Push.call(s, __goscriptStatic0(), b))
+				void (s !== null && (s as any).__isVarRef !== true && (s as any).__goValue === undefined ? ((s as any) as Stack).Push(__goscriptStatic0(), a) : Stack.prototype.Push.call(s, __goscriptStatic0(), a))
 				break
 			}
 			case 3:
 			{
-				let b = (Stack.prototype.Pop.call(s, __goscriptStatic0()) as bigint)
-				let a = (Stack.prototype.Pop.call(s, __goscriptStatic0()) as bigint)
-				Stack.prototype.Push.call(s, __goscriptStatic0(), b)
-				Stack.prototype.Push.call(s, __goscriptStatic0(), a)
+				let b = ((s !== null && (s as any).__isVarRef !== true && (s as any).__goValue === undefined ? ((s as any) as Stack).Pop(__goscriptStatic0()) : Stack.prototype.Pop.call(s, __goscriptStatic0())) as bigint)
+				let a = ((s !== null && (s as any).__isVarRef !== true && (s as any).__goValue === undefined ? ((s as any) as Stack).Pop(__goscriptStatic0()) : Stack.prototype.Pop.call(s, __goscriptStatic0())) as bigint)
+				void (s !== null && (s as any).__isVarRef !== true && (s as any).__goValue === undefined ? ((s as any) as Stack).Push(__goscriptStatic0(), b) : Stack.prototype.Push.call(s, __goscriptStatic0(), b))
+				void (s !== null && (s as any).__isVarRef !== true && (s as any).__goValue === undefined ? ((s as any) as Stack).Push(__goscriptStatic0(), a) : Stack.prototype.Push.call(s, __goscriptStatic0(), a))
 				break
 			}
 			case 4:
 			{
-				Stack.prototype.Pop.call(s, __goscriptStatic0())
+				void (s !== null && (s as any).__isVarRef !== true && (s as any).__goValue === undefined ? ((s as any) as Stack).Pop(__goscriptStatic0()) : Stack.prototype.Pop.call(s, __goscriptStatic0()))
 				break
 			}
 			case 5:
 			{
-				Stack.prototype.Push.call(s, __goscriptStatic0(), $.int64Sub(Stack.prototype.Pop.call(s, __goscriptStatic0()), 1n))
+				Stack.prototype.Push.call(s, __goscriptStatic0(), $.int64Sub((s !== null && (s as any).__isVarRef !== true && (s as any).__goValue === undefined ? ((s as any) as Stack).Pop(__goscriptStatic0()) : Stack.prototype.Pop.call(s, __goscriptStatic0())), 1n))
 				break
 			}
 			case 6:
 			{
-				Stack.prototype.Push.call(s, __goscriptStatic0(), $.int64Add(Stack.prototype.Pop.call(s, __goscriptStatic0()), Stack.prototype.Pop.call(s, __goscriptStatic0())))
+				Stack.prototype.Push.call(s, __goscriptStatic0(), $.int64Add((s !== null && (s as any).__isVarRef !== true && (s as any).__goValue === undefined ? ((s as any) as Stack).Pop(__goscriptStatic0()) : Stack.prototype.Pop.call(s, __goscriptStatic0())), (s !== null && (s as any).__isVarRef !== true && (s as any).__goValue === undefined ? ((s as any) as Stack).Pop(__goscriptStatic0()) : Stack.prototype.Pop.call(s, __goscriptStatic0()))))
 				break
 			}
 			case 7:
 			{
-				Stack.prototype.Push.call(s, __goscriptStatic0(), $.int64Mul(Stack.prototype.Pop.call(s, __goscriptStatic0()), Stack.prototype.Pop.call(s, __goscriptStatic0())))
+				Stack.prototype.Push.call(s, __goscriptStatic0(), $.int64Mul((s !== null && (s as any).__isVarRef !== true && (s as any).__goValue === undefined ? ((s as any) as Stack).Pop(__goscriptStatic0()) : Stack.prototype.Pop.call(s, __goscriptStatic0())), (s !== null && (s as any).__isVarRef !== true && (s as any).__goValue === undefined ? ((s as any) as Stack).Pop(__goscriptStatic0()) : Stack.prototype.Pop.call(s, __goscriptStatic0()))))
 				break
 			}
 			case 8:
 			{
-				if (Stack.prototype.Pop.call(s, __goscriptStatic0()) != 0n) {
+				if ((s !== null && (s as any).__isVarRef !== true && (s as any).__goValue === undefined ? ((s as any) as Stack).Pop(__goscriptStatic0()) : Stack.prototype.Pop.call(s, __goscriptStatic0())) != 0n) {
 					;(vm$ as VM).pc = $.int(_in.Arg)
 				}
 				break
@@ -493,7 +493,7 @@ export async function run(p: Program, answers: $.Channel<Answer> | null, faults:
 		})() })
 		let vm: VM | $.VarRef<VM> | null = new VM()
 		let vm$: VM = vm == null ? $.pointerTarget<VM>(vm) : (vm as any).__isVarRef === true ? (vm as any).value : (vm as any).__goValue === undefined ? (vm as any) : $.pointerTarget<VM>(vm)
-		while (!VM.prototype.Step.call(vm, p.Code)) {
+		while (!(vm !== null && (vm as any).__isVarRef !== true && (vm as any).__goValue === undefined ? ((vm as any) as VM).Step(p.Code) : VM.prototype.Step.call(vm, p.Code))) {
 		}
 		await $.chanSend(answers, (() => { const __goscriptLiteralField0 = (vm$ as VM).stack.Pop(__goscriptStatic0()); return new Answer({Name: p.Name, Value: __goscriptLiteralField0, Steps: (vm$ as VM).steps}, true) })())
 		await __defer.dispose()
@@ -581,7 +581,7 @@ export async function main(): globalThis.Promise<void> {
 				case $.typeAssert<Fault | $.VarRef<Fault> | null>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.pointerType("main.Fault")).ok:
 					{
 						let r: Fault | $.VarRef<Fault> | null = $.typeAssert<Fault | $.VarRef<Fault> | null>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.pointerType("main.Fault")).value
-						await $.println(Fault.prototype.Program.call(r), "crashed:", $.pointerValue<Fault>(r).Reason)
+						await $.println((r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? ((r as any) as Fault).Program() : Fault.prototype.Program.call(r)), "crashed:", $.pointerValue<Fault>(r).Reason)
 					}
 					break
 			}

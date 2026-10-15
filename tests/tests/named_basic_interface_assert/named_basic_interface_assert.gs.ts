@@ -251,7 +251,7 @@ export async function main(): globalThis.Promise<void> {
 	{
 		let err = await json.Decoder.prototype.Decode.call($.pointerValue<json.Decoder>(d), $.interfaceValue(obj, "*map[string]interface{}", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), { kind: $.TypeKind.Interface, methods: [] }))))
 		if (err != null) {
-			await $.println((__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+			await $.println((__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		}
 	}
 	await $.println("json UseNumber:", kind($.mapGet<string, any, any>(obj.value, "n", null)[0]))

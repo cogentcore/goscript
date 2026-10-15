@@ -5,8 +5,8 @@ import * as $ from "@goscript/builtin/index.js"
 
 export function last(a: $.Slice<number>): number {
 	let __goscriptShadow0 = $.sliceLen(a) - 1
-	for (let i = 0; i < __goscriptShadow0; i++) {
-		$.sliceElems(a!)[$.sliceSlot(a!, i + 1)] = $.sliceElems(a!)[$.sliceSlot(a!, i + 1)] + ($.arrayIndex(a!, i))
+	for (let __goscriptSliceWindow0 = $.sliceRange(a), i = 0; i < __goscriptShadow0; i++) {
+		;(__goscriptSliceWindow0.backing as any[])[$.windowSlot(__goscriptSliceWindow0, i + 1)] = (__goscriptSliceWindow0.backing as any[])[$.windowSlot(__goscriptSliceWindow0, i + 1)] + (((__goscriptSliceWindow0.backing as any[])[$.windowSlot(__goscriptSliceWindow0, i)] as number))
 	}
 	return $.arrayIndex(a!, __goscriptShadow0)
 }

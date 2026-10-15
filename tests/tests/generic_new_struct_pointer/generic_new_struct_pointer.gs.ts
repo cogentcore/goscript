@@ -155,12 +155,12 @@ export function load(__typeArgs: $.GenericTypeArgs | undefined, p: any): any {
 
 export async function main(): globalThis.Promise<void> {
 	let n = asNode(__goscriptStatic0())
-	void (__goscriptAwait = $.pointerValue<Exclude<Node, null>>(n).SetName("text"), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+	void (__goscriptAwait = (n !== null && (n as any).__isVarRef !== true && (n as any).__goValue === undefined ? (n as Exclude<Node, null>) : $.pointerValue<Exclude<Node, null>>(n)).SetName("text"), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 	await initAs(__goscriptStatic0(), n, $.functionValue((w: Widget | $.VarRef<Widget> | null): void => {
 		$.pointerValue<Widget>(w).Text = "hello"
 		$.pointerValue<Widget>(w).Base.inits++
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.pointerType("main.Widget")], results: [] } as $.FunctionTypeInfo)))
-	let w: Widget | $.VarRef<Widget> | null = $.mustTypeAssert<Widget | $.VarRef<Widget> | null>(n, /* @__PURE__ */ $.pointerType("main.Widget"))
+	let w: Widget | $.VarRef<Widget> | null = ((n as any)?.__goType === "*main.Widget" && (n as any).__goValue === undefined && (n as any).__isTypedNil !== true ? ((n as any) as Widget | $.VarRef<Widget> | null) : $.mustTypeAssert<Widget | $.VarRef<Widget> | null>(n, /* @__PURE__ */ $.pointerType("main.Widget")))
 	let w$: Widget = w == null ? $.pointerTarget<Widget>(w) : (w as any).__isVarRef === true ? (w as any).value : (w as any).__goValue === undefined ? (w as any) : $.pointerTarget<Widget>(w)
 	await $.println("name:", (w$ as Widget).Base.Name(), "text:", (w$ as Widget).Text, "inits:", (w$ as Widget).Base.inits)
 	await $.println("same:", $.comparableEqual($.interfaceValue(w, "*main.Widget", /* @__PURE__ */ $.pointerType("main.Widget")), (n as any)))

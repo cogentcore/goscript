@@ -263,7 +263,7 @@ export async function main(): globalThis.Promise<void> {
 		let direct = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as boolean)
 		let db: sql.DB | $.VarRef<sql.DB> | null = await sql.OpenDB($.interfaceValue<driver.Connector | null>(new connector({direct: direct}, true), "main.connector", "main.connector"))
 		{
-			let [, err] = await sql.DB.prototype.ExecContext.call(db, context.Background(), "create", null)
+			let [, err] = await (db !== null && (db as any).__isVarRef !== true && (db as any).__goValue === undefined ? ((db as any) as sql.DB).ExecContext(context.Background(), "create", null) : sql.DB.prototype.ExecContext.call(db, context.Background(), "create", null))
 			if (err != null) {
 				$.panic((err as any))
 			}
@@ -277,7 +277,7 @@ export async function main(): globalThis.Promise<void> {
 		}
 		await $.println(direct, value.value)
 		{
-			let err = await sql.DB.prototype.Close.call(db)
+			let err = await (db !== null && (db as any).__isVarRef !== true && (db as any).__goValue === undefined ? ((db as any) as sql.DB).Close() : sql.DB.prototype.Close.call(db))
 			if (err != null) {
 				$.panic((err as any))
 			}
@@ -294,16 +294,16 @@ export async function main(): globalThis.Promise<void> {
 	let db: sql.DB | $.VarRef<sql.DB> | null = await sql.OpenDB($.interfaceValue<driver.Connector | null>(new connector({blob: true}, true), "main.connector", "main.connector"))
 	let data: $.VarRef<$.Slice<number>> = $.varRef(null! as $.Slice<number>)
 	{
-		let err = await sql.Row.prototype.Scan.call(await sql.DB.prototype.QueryRow.call(db, "blob", null), $.arrayToSlice<any>([$.interfaceValue(data, "*[]byte", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))))]))
+		let err = await sql.Row.prototype.Scan.call(await (db !== null && (db as any).__isVarRef !== true && (db as any).__goValue === undefined ? ((db as any) as sql.DB).QueryRow("blob", null) : sql.DB.prototype.QueryRow.call(db, "blob", null)), $.arrayToSlice<any>([$.interfaceValue(data, "*[]byte", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))))]))
 		if (err != null) {
 			$.panic((err as any))
 		}
 	}
 	await $.println("blob", $.bytesToString(data.value))
 	let raw: $.VarRef<sql.RawBytes> = $.varRef(null! as sql.RawBytes)
-	await $.println("raw rejected", await sql.Row.prototype.Scan.call(await sql.DB.prototype.QueryRow.call(db, "blob", null), $.arrayToSlice<any>([$.interfaceValue(raw, "*sql.RawBytes", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"), "sql.RawBytes")))])) != null)
+	await $.println("raw rejected", await sql.Row.prototype.Scan.call(await (db !== null && (db as any).__isVarRef !== true && (db as any).__goValue === undefined ? ((db as any) as sql.DB).QueryRow("blob", null) : sql.DB.prototype.QueryRow.call(db, "blob", null)), $.arrayToSlice<any>([$.interfaceValue(raw, "*sql.RawBytes", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"), "sql.RawBytes")))])) != null)
 	{
-		let err = await sql.DB.prototype.Close.call(db)
+		let err = await (db !== null && (db as any).__isVarRef !== true && (db as any).__goValue === undefined ? ((db as any) as sql.DB).Close() : sql.DB.prototype.Close.call(db))
 		if (err != null) {
 			$.panic((err as any))
 		}

@@ -80,13 +80,13 @@ export async function main(): globalThis.Promise<void> {
 		// A pointer method is called directly on a plain struct pointer.
 		let c: counter | $.VarRef<counter> | null = new counter()
 		for (let i = 0; i < 4; i++) {
-			void (c !== null && (c as any).__isVarRef !== true && (c as any).__goValue === undefined ? (c as unknown as counter).add(i) : counter.prototype.add.call(c, i))
+			void (c !== null && (c as any).__isVarRef !== true && (c as any).__goValue === undefined ? ((c as any) as counter).add(i) : counter.prototype.add.call(c, i))
 		}
-		await $.println((c !== null && (c as any).__isVarRef !== true && (c as any).__goValue === undefined ? (c as unknown as counter)["get"]() : counter.prototype.get.call(c)))
+		await $.println((c !== null && (c as any).__isVarRef !== true && (c as any).__goValue === undefined ? ((c as any) as counter)["get"]() : counter.prototype.get.call(c)))
 
 		// A nil receiver still reaches the method.
 		let nilc: counter | $.VarRef<counter> | null = null! as counter | $.VarRef<counter> | null
-		await $.println((nilc !== null && (nilc as any).__isVarRef !== true && (nilc as any).__goValue === undefined ? (nilc as unknown as counter).add(5) : counter.prototype.add.call(nilc, 5)))
+		await $.println((nilc !== null && (nilc as any).__isVarRef !== true && (nilc as any).__goValue === undefined ? ((nilc as any) as counter).add(5) : counter.prototype.add.call(nilc, 5)))
 
 		// The arguments are evaluated once, whichever way the method is called.
 		let calls = 0
@@ -94,7 +94,7 @@ export async function main(): globalThis.Promise<void> {
 			calls++
 			return 2
 		}, ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))
-		await $.println((c !== null && (c as any).__isVarRef !== true && (c as any).__goValue === undefined ? (c as unknown as counter).add((__goscriptAwait = arg!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)) : counter.prototype.add.call(c, (__goscriptAwait = arg!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))), (nilc !== null && (nilc as any).__isVarRef !== true && (nilc as any).__goValue === undefined ? (nilc as unknown as counter).add((__goscriptAwait = arg!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)) : counter.prototype.add.call(nilc, (__goscriptAwait = arg!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))), calls)
+		await $.println((c !== null && (c as any).__isVarRef !== true && (c as any).__goValue === undefined ? ((c as any) as counter).add((__goscriptAwait = arg!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)) : counter.prototype.add.call(c, (__goscriptAwait = arg!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))), (nilc !== null && (nilc as any).__isVarRef !== true && (nilc as any).__goValue === undefined ? ((nilc as any) as counter).add((__goscriptAwait = arg!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)) : counter.prototype.add.call(nilc, (__goscriptAwait = arg!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))), calls)
 
 		// A pointer to a struct variable that a closure reassigns.
 		let v: $.VarRef<counter> = $.varRef(new counter(undefined, true))
@@ -102,9 +102,9 @@ export async function main(): globalThis.Promise<void> {
 		let reset: (() => void) | null = $.functionValue((): void => {
 			v.value = $.assignStruct(v.value, new counter({n: 100}, true))
 		}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo))
-		void (pv !== null && (pv as any).__isVarRef !== true && (pv as any).__goValue === undefined ? (pv as unknown as counter).add(1) : counter.prototype.add.call(pv, 1))
+		void (pv !== null && (pv as any).__isVarRef !== true && (pv as any).__goValue === undefined ? ((pv as any) as counter).add(1) : counter.prototype.add.call(pv, 1))
 		void (__goscriptAwait = reset!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
-		await $.println((pv !== null && (pv as any).__isVarRef !== true && (pv as any).__goValue === undefined ? (pv as unknown as counter).add(1) : counter.prototype.add.call(pv, 1)), v.value.n)
+		await $.println((pv !== null && (pv as any).__isVarRef !== true && (pv as any).__goValue === undefined ? ((pv as any) as counter).add(1) : counter.prototype.add.call(pv, 1)), v.value.n)
 
 		// Interface calls on a struct pointer, and on a nil interface, which panics.
 		let a: adder | null = $.interfaceValue<adder | null>(c, "*main.counter", /* @__PURE__ */ $.pointerType("main.counter"))

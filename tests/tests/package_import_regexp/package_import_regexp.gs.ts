@@ -11,9 +11,9 @@ export async function main(): globalThis.Promise<void> {
 	let anchored: regexp.Regexp | $.VarRef<regexp.Regexp> | null = await regexp.MustCompile("^a$")
 	let suffix: regexp.Regexp | $.VarRef<regexp.Regexp> | null = await regexp.MustCompile("a$")
 
-	await $.println("label spacewave-web:", await regexp.Regexp.prototype.MatchString.call(label, "spacewave-web"))
-	await $.println("anchored a:", await regexp.Regexp.prototype.MatchString.call(anchored, "a"))
-	await $.println("suffix ba:", await regexp.Regexp.prototype.MatchString.call(suffix, "ba"))
+	await $.println("label spacewave-web:", await (label !== null && (label as any).__isVarRef !== true && (label as any).__goValue === undefined ? ((label as any) as regexp.Regexp).MatchString("spacewave-web") : regexp.Regexp.prototype.MatchString.call(label, "spacewave-web")))
+	await $.println("anchored a:", await (anchored !== null && (anchored as any).__isVarRef !== true && (anchored as any).__goValue === undefined ? ((anchored as any) as regexp.Regexp).MatchString("a") : regexp.Regexp.prototype.MatchString.call(anchored, "a")))
+	await $.println("suffix ba:", await (suffix !== null && (suffix as any).__isVarRef !== true && (suffix as any).__goValue === undefined ? ((suffix as any) as regexp.Regexp).MatchString("ba") : regexp.Regexp.prototype.MatchString.call(suffix, "ba")))
 }
 
 if ($.isMainScript(import.meta)) {

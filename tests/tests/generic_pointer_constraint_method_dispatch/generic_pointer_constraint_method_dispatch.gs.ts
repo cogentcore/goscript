@@ -115,11 +115,11 @@ export async function countFlags(__typeArgs: $.GenericTypeArgs | undefined, __go
 	let n: bigint = 0n
 	for (let __goscriptRangeTarget0 = values, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
 		let v = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as bigint)
-		if ((__goscriptAwait = $.pointerValue<Exclude<setter, null>>(p).Has(v), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)) {
+		if ((__goscriptAwait = (p !== null && (p as any).__isVarRef !== true && (p as any).__goValue === undefined ? (p as Exclude<setter, null>) : $.pointerValue<Exclude<setter, null>>(p)).Has(v), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)) {
 			n++
 		}
 	}
-	void (__goscriptAwait = $.pointerValue<Exclude<setter, null>>(p).Set(8n), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+	void (__goscriptAwait = (p !== null && (p as any).__isVarRef !== true && (p as any).__goValue === undefined ? (p as Exclude<setter, null>) : $.pointerValue<Exclude<setter, null>>(p)).Set(8n), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 	return $.int64Add(n, $.int64(i.value))
 }
 
@@ -147,7 +147,7 @@ export async function main(): globalThis.Promise<void> {
 	{
 		let [s, ok] = $.typeAssertTuple<setter | null>($.namedValueInterfaceValue<any>(fl, "*main.flag", __goscriptStatic2(), __goscriptStatic3(), __goscriptStatic4()), "main.setter")
 		if (ok) {
-			void (__goscriptAwait = $.pointerValue<Exclude<setter, null>>(s).Set(2n), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+			void (__goscriptAwait = (s !== null && (s as any).__isVarRef !== true && (s as any).__goValue === undefined ? (s as Exclude<setter, null>) : $.pointerValue<Exclude<setter, null>>(s)).Set(2n), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 		}
 	}
 	await $.println("flag:", $.int64(fl.value))

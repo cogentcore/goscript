@@ -74,7 +74,7 @@ export async function main(): globalThis.Promise<void> {
 	let err = await TestFS("myfs", expected)
 
 	if (err != null) {
-		await $.println($.concatString("Error: ", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)))
+		await $.println($.concatString("Error: ", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)))
 	} else {
 		await $.println("Success!")
 	}

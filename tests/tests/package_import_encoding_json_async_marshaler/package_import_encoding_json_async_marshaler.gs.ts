@@ -182,10 +182,10 @@ export async function main(): globalThis.Promise<void> {
 
 	let __goscriptTuple3: any = await json.Marshal($.interfaceValue(new Doc({Image: new Image({Name: "bad"})}), "*main.Doc", /* @__PURE__ */ $.pointerType("main.Doc")))
 	err = __goscriptTuple3[1]
-	await $.println("marshal error:", strings.HasSuffix((__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), ": cannot marshal bad image"))
+	await $.println("marshal error:", strings.HasSuffix((__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), ": cannot marshal bad image"))
 
 	err = await json.Unmarshal(new Uint8Array([123, 34, 73, 109, 97, 103, 101, 34, 58, 123, 34, 111, 116, 104, 101, 114, 34, 58, 34, 120, 34, 125, 125]), $.interfaceValue(new Doc(), "*main.Doc", /* @__PURE__ */ $.pointerType("main.Doc")))
-	await $.println("unmarshal error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println("unmarshal error:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 }
 
 var __goscriptAwait: any

@@ -50,7 +50,7 @@ export async function use(v: any): globalThis.Promise<string> {
 	if (!ok) {
 		return "bad"
 	}
-	return $.pointerValue<Exclude<dumper, null>>(__goscriptShadow0).Dump()
+	return (__goscriptShadow0 !== null && (__goscriptShadow0 as any).__isVarRef !== true && (__goscriptShadow0 as any).__goValue === undefined ? (__goscriptShadow0 as Exclude<dumper, null>) : $.pointerValue<Exclude<dumper, null>>(__goscriptShadow0)).Dump()
 }
 
 export async function main(): globalThis.Promise<void> {

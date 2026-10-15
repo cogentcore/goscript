@@ -22,10 +22,10 @@ export async function main(): globalThis.Promise<void> {
 	await using __defer = new $.AsyncDisposableStack()
 	let [f, err] = $.markAsStructValue($.cloneStructValue(files)).Open("data.txt")
 	if (err != null) {
-		await $.println("open error:", (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+		await $.println("open error:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		return
 	}
-	const __goscriptDeferCallee0 = $.functionValue(((__receiver) => () => __receiver.Close())($.pointerValue<Exclude<fs.File, null>>(f)), ({ kind: $.TypeKind.Function, params: [], results: ["error"] } as $.FunctionTypeInfo), "io/fs.File.Close-fm")
+	const __goscriptDeferCallee0 = $.functionValue(((__receiver) => () => __receiver.Close())((f !== null && (f as any).__isVarRef !== true && (f as any).__goValue === undefined ? (f as Exclude<fs.File, null>) : $.pointerValue<Exclude<fs.File, null>>(f))), ({ kind: $.TypeKind.Function, params: [], results: ["error"] } as $.FunctionTypeInfo), "io/fs.File.Close-fm")
 	__defer.defer(async () => { (__goscriptAwait = __goscriptDeferCallee0(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) })
 
 	// A regular embedded file implements io.ReaderAt and io.Seeker.
@@ -34,28 +34,28 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("interfaces:", isReaderAt, isSeeker)
 
 	let b: $.Slice<number> = $.makeSlice<number>(8, undefined, "byte")
-	let __goscriptTuple0: any = await $.pointerValue<Exclude<io.ReaderAt, null>>(ra).ReadAt(b, 7n)
+	let __goscriptTuple0: any = await (ra !== null && (ra as any).__isVarRef !== true && (ra as any).__goValue === undefined ? (ra as Exclude<io.ReaderAt, null>) : $.pointerValue<Exclude<io.ReaderAt, null>>(ra)).ReadAt(b, 7n)
 	let n = __goscriptTuple0[0]
 	err = __goscriptTuple0[1]
 	await $.println("readat:", n, err == null, $.bytesToString($.goSlice(b, undefined, n)))
-	let __goscriptTuple1: any = await $.pointerValue<Exclude<io.ReaderAt, null>>(ra).ReadAt(b, 16n)
+	let __goscriptTuple1: any = await (ra !== null && (ra as any).__isVarRef !== true && (ra as any).__goValue === undefined ? (ra as Exclude<io.ReaderAt, null>) : $.pointerValue<Exclude<io.ReaderAt, null>>(ra)).ReadAt(b, 16n)
 	n = __goscriptTuple1[0]
 	err = __goscriptTuple1[1]
 	await $.println("readat end:", n, $.comparableEqual(err, io.EOF), $.bytesToString($.goSlice(b, undefined, n)))
 
-	let __goscriptTuple2: any = await $.pointerValue<Exclude<io.Seeker, null>>(sk).Seek(-5n, 2)
+	let __goscriptTuple2: any = await (sk !== null && (sk as any).__isVarRef !== true && (sk as any).__goValue === undefined ? (sk as Exclude<io.Seeker, null>) : $.pointerValue<Exclude<io.Seeker, null>>(sk)).Seek(-5n, 2)
 	let pos = __goscriptTuple2[0]
 	err = __goscriptTuple2[1]
 	await $.println("seek end:", pos, err == null)
-	let __goscriptTuple3: any = await $.pointerValue<Exclude<fs.File, null>>(f).Read(b)
+	let __goscriptTuple3: any = await (f !== null && (f as any).__isVarRef !== true && (f as any).__goValue === undefined ? (f as Exclude<fs.File, null>) : $.pointerValue<Exclude<fs.File, null>>(f)).Read(b)
 	n = __goscriptTuple3[0]
 	await $.println("read after seek:", $.bytesToString($.goSlice(b, undefined, n)))
-	let __goscriptTuple4: any = await $.pointerValue<Exclude<io.Seeker, null>>(sk).Seek(0n, 0)
+	let __goscriptTuple4: any = await (sk !== null && (sk as any).__isVarRef !== true && (sk as any).__goValue === undefined ? (sk as Exclude<io.Seeker, null>) : $.pointerValue<Exclude<io.Seeker, null>>(sk)).Seek(0n, 0)
 	pos = __goscriptTuple4[0]
-	let __goscriptTuple5: any = await $.pointerValue<Exclude<io.Seeker, null>>(sk).Seek(6n, 1)
+	let __goscriptTuple5: any = await (sk !== null && (sk as any).__isVarRef !== true && (sk as any).__goValue === undefined ? (sk as Exclude<io.Seeker, null>) : $.pointerValue<Exclude<io.Seeker, null>>(sk)).Seek(6n, 1)
 	pos = __goscriptTuple5[0]
 	await $.println("seek current:", pos)
-	let __goscriptTuple6: any = await $.pointerValue<Exclude<io.Seeker, null>>(sk).Seek(-1n, 0)
+	let __goscriptTuple6: any = await (sk !== null && (sk as any).__isVarRef !== true && (sk as any).__goValue === undefined ? (sk as Exclude<io.Seeker, null>) : $.pointerValue<Exclude<io.Seeker, null>>(sk)).Seek(-1n, 0)
 	err = __goscriptTuple6[1]
 	await $.println("seek invalid:", err != null)
 

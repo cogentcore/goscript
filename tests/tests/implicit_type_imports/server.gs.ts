@@ -24,7 +24,7 @@ export class Server {
 	}
 
 	public async Handle(rwc: io.ReadWriteCloser | null): globalThis.Promise<void> {
-		await $.pointerValue<Exclude<io.ReadWriteCloser, null>>(rwc).Close()
+		await (rwc !== null && (rwc as any).__isVarRef !== true && (rwc as any).__goValue === undefined ? (rwc as Exclude<io.ReadWriteCloser, null>) : $.pointerValue<Exclude<io.ReadWriteCloser, null>>(rwc)).Close()
 	}
 
 	static __typeInfo = $.registerStructType(
