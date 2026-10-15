@@ -1,0 +1,21 @@
+named == unnamed: true
+unnamed == named: true
+named != unnamed: true
+unnamed var == named: true
+changed unnamed var == named: false
+nested == unnamed: true
+nested != unnamed: false
+unnamed field == named: true
+named field == unnamed field: true
+changed field: false
+converted: true
+converted method: 11
+assigned method: 11
+var method: 11
+assign method: 5
+return method: 9
+field method: 11
+element method: 15
+map method: 2
+interfaces differ: false
+map key: one-two
