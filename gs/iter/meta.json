@@ -1,0 +1,14 @@
+{
+  "asyncCallbacks": {
+    "Pull": ["seq"],
+    "Pull2": ["seq"]
+  },
+  "suspendingValues": {
+    "Pull": true,
+    "Pull2": true
+  },
+  "typeArgFunctions": {
+    "Pull": true,
+    "Pull2": true
+  }
+}

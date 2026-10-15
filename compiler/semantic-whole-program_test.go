@@ -216,3 +216,51 @@ func TestOverrideBoundarySkipsUnexportedFields(t *testing.T) {
 		t.Fatalf("next async = %v, want false", semFn != nil && semFn.async)
 	}
 }
+
+func TestSemanticModelPullValuesSuspend(t *testing.T) {
+	// gen is pulled and strs only ranged over; neither suspends by itself.
+	moduleDir := writePackageGraphFixture(t, map[string]string{
+		"go.mod": "module example.test/pull\n\ngo 1.25.3\n",
+		"main.go": strings.Join([]string{
+			"package main",
+			"import \"iter\"",
+			"func gen(yield func(int) bool) { yield(1) }",
+			"func strs(yield func(string) bool) { yield(\"a\") }",
+			"func first() int {",
+			"  next, stop := iter.Pull(gen)",
+			"  defer stop()",
+			"  v, _ := next()",
+			"  return v",
+			"}",
+			"func count() int {",
+			"  n := 0",
+			"  for range strs { n++ }",
+			"  return n",
+			"}",
+			"func main() { _ = first(); _ = count() }",
+			"",
+		}, "\n"),
+	})
+	req := &CompileRequest{
+		Patterns:            []string{"."},
+		Dir:                 moduleDir,
+		OutputPath:          filepath.Join(t.TempDir(), "out"),
+		DependencyMode:      DependencyModeAll,
+		RuntimeEmissionMode: RuntimeEmissionModeEmit,
+	}
+	graph := loadPackageGraph(t, req)
+	model, diagnostics := NewSemanticModelOwner(NewOverrideRegistryOwner()).Build(
+		context.Background(), graph, SemanticBuildOptions{WholeProgram: true})
+	if diagnosticsHaveErrors(diagnostics) {
+		t.Fatalf("semantic model build failed: %#v", diagnostics)
+	}
+
+	// Pull's yield suspends gen, and next and stop suspend first; the yield
+	// of a range loop over strings stays sync.
+	for name, want := range map[string]bool{"gen": true, "first": true, "strs": false, "count": false} {
+		semFn := model.functions[requireDefinedFunc(t, graph, "example.test/pull", name)]
+		if semFn == nil || semFn.async != want {
+			t.Fatalf("%s async = %v, want %v", name, semFn != nil && semFn.async, want)
+		}
+	}
+}

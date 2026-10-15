@@ -65,6 +65,9 @@ type bodySummary struct {
 	// the package asserts and calls through outside function bodies.
 	assertedFuncShapes []string
 	topValueCalls      []string
+	// suspendingValueShapes holds the shapes of the suspending function
+	// values that the package's calls of override functions receive.
+	suspendingValueShapes []string
 	// mutexEscapes holds the mutexes the package lets escape the analysis.
 	mutexEscapes []string
 }
@@ -591,6 +594,7 @@ func summarizeValueNodes(summary *bodySummary, k *summaryKeys, semPkg *semanticP
 	}
 	summary.assertedFuncShapes = slices.Sorted(maps.Keys(semPkg.assertedFuncShapes))
 	summary.topValueCalls = slices.Sorted(maps.Keys(semPkg.topValueCalls))
+	summary.suspendingValueShapes = slices.Sorted(maps.Keys(semPkg.suspendingValueShapes))
 	return true
 }
 
@@ -1061,6 +1065,12 @@ func (a *bodyApplier) applyValues(semPkg *semanticPackage) bool {
 		}
 		semPkg.topValueCalls[shape] = true
 	}
+	for _, shape := range a.summary.suspendingValueShapes {
+		if semPkg.suspendingValueShapes == nil {
+			semPkg.suspendingValueShapes = make(map[string]bool)
+		}
+		semPkg.suspendingValueShapes[shape] = true
+	}
 	return true
 }
 
@@ -1097,6 +1107,7 @@ const (
 	summaryRecordFuncValue    = "value"
 	summaryRecordAssertedFunc = "asserted-func"
 	summaryRecordTopCall      = "top-value-call"
+	summaryRecordSuspending   = "suspending-value"
 	summaryRecordAsyncDep     = "async-dep"
 	summaryRecordAsyncShape   = "async-shape"
 	summaryRecordLiteral      = "literal"
@@ -1179,6 +1190,7 @@ func (s *bodySummary) encode() ([]byte, bool) {
 		{summaryRecordLazyVar, s.lazyVars},
 		{summaryRecordAssertedFunc, s.assertedFuncShapes},
 		{summaryRecordTopCall, s.topValueCalls},
+		{summaryRecordSuspending, s.suspendingValueShapes},
 		{summaryRecordMutexEscape, s.mutexEscapes},
 		{summaryRecordChangedVar, s.changedVars},
 		{summaryRecordEffectFree, s.effectFreeFuncs},
@@ -1294,7 +1306,7 @@ func decodeBodySummary(data []byte) (*bodySummary, bool) {
 			s.literals = append(s.literals, summaryLiteral{file: fields[1], offset: offset})
 		case summaryRecordAddressTaken, summaryRecordNeedsVarRef, summaryRecordLocalFact,
 			summaryRecordVarRefName, summaryRecordInterface, summaryRecordLazyVar,
-			summaryRecordAssertedFunc, summaryRecordTopCall, summaryRecordMutexEscape,
+			summaryRecordAssertedFunc, summaryRecordTopCall, summaryRecordSuspending, summaryRecordMutexEscape,
 			summaryRecordChangedVar, summaryRecordEffectFree:
 			v, ok := value(1)
 			if !ok {
@@ -1309,6 +1321,7 @@ func decodeBodySummary(data []byte) (*bodySummary, bool) {
 				summaryRecordLazyVar:      &s.lazyVars,
 				summaryRecordAssertedFunc: &s.assertedFuncShapes,
 				summaryRecordTopCall:      &s.topValueCalls,
+				summaryRecordSuspending:   &s.suspendingValueShapes,
 				summaryRecordMutexEscape:  &s.mutexEscapes,
 				summaryRecordChangedVar:   &s.changedVars,
 				summaryRecordEffectFree:   &s.effectFreeFuncs,

@@ -192,6 +192,24 @@ func (f *OverrideFacts) IsAsyncWhenOperands(fn *types.Func) bool {
 	return pkg.metadata.AsyncWhenOperands[fn.Name()]
 }
 
+// MakesSuspendingValues returns true when override metadata names fn, a
+// package-level function, as one whose function values suspend.
+func (f *OverrideFacts) MakesSuspendingValues(fn *types.Func) bool {
+	if f == nil || fn == nil || fn.Pkg() == nil || fn.Signature().Recv() != nil {
+		return false
+	}
+	return f.packages[fn.Pkg().Path()].metadata.SuspendingValues[fn.Name()]
+}
+
+// TakesTypeArgs returns true when override metadata names fn, a
+// package-level generic function, as one that takes its type arguments.
+func (f *OverrideFacts) TakesTypeArgs(fn *types.Func) bool {
+	if f == nil || fn == nil || fn.Pkg() == nil || fn.Signature().Recv() != nil {
+		return false
+	}
+	return f.packages[fn.Pkg().Path()].metadata.TypeArgFunctions[fn.Name()]
+}
+
 // IsFunctionAsync returns true when override metadata marks a package-level function async.
 func (f *OverrideFacts) IsFunctionAsync(pkgPath, function string) bool {
 	if f == nil {
@@ -448,6 +466,14 @@ func loadOverrideMetadata(root overridePackageRoot) (OverrideMetadata, error) {
 		case "transientPointerFunctions":
 			for iter.ReadArray() {
 				metadata.TransientPointerFunctions[iter.ReadString()] = true
+			}
+		case "suspendingValues":
+			for function := iter.ReadObject(); function != ""; function = iter.ReadObject() {
+				metadata.SuspendingValues[function] = iter.ReadBool()
+			}
+		case "typeArgFunctions":
+			for function := iter.ReadObject(); function != ""; function = iter.ReadObject() {
+				metadata.TypeArgFunctions[function] = iter.ReadBool()
 			}
 		case "asyncWhenMethods":
 			for function := iter.ReadObject(); function != ""; function = iter.ReadObject() {
@@ -853,6 +879,8 @@ func newOverrideMetadata() OverrideMetadata {
 		AsyncWhenOperands:         make(map[string]bool),
 		AsyncWhenFields:           make(map[string][]string),
 		TransientPointerFunctions: make(map[string]bool),
+		SuspendingValues:          make(map[string]bool),
+		TypeArgFunctions:          make(map[string]bool),
 	}
 }
 
@@ -870,6 +898,8 @@ func cloneOverrideMetadata(metadata OverrideMetadata) OverrideMetadata {
 		AsyncWhenOperands:         cloneBoolMap(metadata.AsyncWhenOperands),
 		AsyncWhenFields:           cloneStringSlicesMap(metadata.AsyncWhenFields),
 		TransientPointerFunctions: cloneBoolMap(metadata.TransientPointerFunctions),
+		SuspendingValues:          cloneBoolMap(metadata.SuspendingValues),
+		TypeArgFunctions:          cloneBoolMap(metadata.TypeArgFunctions),
 	}
 }
 

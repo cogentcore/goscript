@@ -153,6 +153,7 @@ import "embed"
 //go:embed gs/io/parity.json
 //go:embed gs/iter/index.ts
 //go:embed gs/iter/iter.ts
+//go:embed gs/iter/meta.json
 //go:embed gs/maps/index.ts
 //go:embed gs/maps/iter.ts
 //go:embed gs/maps/maps.ts

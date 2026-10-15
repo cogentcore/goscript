@@ -1,0 +1,14 @@
+pulled: 0
+pulled: 1
+pulled: 2
+pulled: 3
+sum: 6
+zip: 0 0
+zip: 1 1
+zip: 2 2
+point: a 0 0 true
+point: b 1 10 true
+point:  0 0 false
+explicit: 0 true
+value: 0 true
+value after stop: false

@@ -62,6 +62,16 @@ type OverrideMetadata struct {
 	// sync/atomic.LoadInt64 does, so that a caller can pass them a new
 	// reference to a field (see markTransientPointers).
 	TransientPointerFunctions map[string]bool
+	// SuspendingValues names the package-level functions whose
+	// function values suspend: the function results they return and the
+	// callbacks they pass to their function arguments, as iter.Pull's next
+	// and stop and the yield it passes to its sequence do. Calls through
+	// values of those types, instantiated at each call, are async.
+	SuspendingValues map[string]bool
+	// TypeArgFunctions names the package-level generic functions whose
+	// TypeScript takes the descriptor of their type arguments as the first
+	// argument, as iter.Pull does to return the zero value of V.
+	TypeArgFunctions map[string]bool
 }
 
 // OverrideRegistryOwner owns GoScript override package metadata and copy plans.
