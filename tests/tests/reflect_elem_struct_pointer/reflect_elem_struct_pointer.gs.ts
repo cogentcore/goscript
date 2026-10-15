@@ -101,8 +101,8 @@ export class holder {
 	}
 
 	public __goscriptAssign(source: holder): this {
-		this.S = $.assignFieldValue(this.S, source.S, "main.shape")
-		this.A = $.assignFieldValue(this.A, source.A, { kind: $.TypeKind.Interface, methods: [] })
+		this.S = $.assignFieldValue(this.S, source.S)
+		this.A = $.assignFieldValue(this.A, source.A)
 		return this
 	}
 
@@ -131,7 +131,7 @@ export class base {
 	}
 
 	public __goscriptAssign(source: base): this {
-		this.This = $.assignFieldValue(this.This, source.This, "main.node")
+		this.This = $.assignFieldValue(this.This, source.This)
 		this.Name = source.Name
 		return this
 	}

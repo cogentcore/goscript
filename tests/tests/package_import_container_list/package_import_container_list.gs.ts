@@ -19,7 +19,7 @@ export class pooledElement {
 	}
 
 	public __goscriptAssign(source: pooledElement): this {
-		this.Value = $.assignFieldValue(this.Value, source.Value, { kind: $.TypeKind.Interface, methods: [] })
+		this.Value = $.assignFieldValue(this.Value, source.Value)
 		return this
 	}
 

@@ -161,8 +161,8 @@ export class Pair {
 	}
 
 	public __goscriptAssign(source: Pair): this {
-		this.First = $.assignFieldValue(this.First, source.First, { kind: $.TypeKind.Interface, methods: [] })
-		this.Second = $.assignFieldValue(this.Second, source.Second, { kind: $.TypeKind.Interface, methods: [] })
+		this.First = $.assignFieldValue(this.First, source.First)
+		this.Second = $.assignFieldValue(this.Second, source.Second)
 		return this
 	}
 

@@ -577,16 +577,14 @@ func renderStructAssign(b *strings.Builder, structType *loweredStruct, runtimeOw
 			b.WriteString(field.name)
 			b.WriteString(")")
 		default:
-			b.WriteString("this.")
-			b.WriteString(field.name)
-			b.WriteString(" = ")
-			b.WriteString(runtimeOwner.QualifiedHelper(RuntimeHelperAssignFieldValue))
-			b.WriteString("(this.")
-			b.WriteString(field.name)
-			b.WriteString(", source.")
-			b.WriteString(field.name)
-			b.WriteString(", ")
-			b.WriteString(field.runtimeType)
+			// Other fields are copied by their type info, except that an
+			// interface or type parameter field needs none, so it allocates
+			// no type literal per assignment.
+			b.WriteString("this." + field.name + " = " + runtimeOwner.QualifiedHelper(RuntimeHelperAssignFieldValue))
+			b.WriteString("(this." + field.name + ", source." + field.name)
+			if !field.interfaceValue {
+				b.WriteString(", " + field.runtimeType)
+			}
 			b.WriteString(")")
 		}
 		b.WriteString("\n")

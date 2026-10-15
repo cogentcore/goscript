@@ -58,7 +58,7 @@ export class lineError {
 
 	public __goscriptAssign(source: lineError): this {
 		this.line = source.line
-		this.err = $.assignFieldValue(this.err, source.err, "error")
+		this.err = $.assignFieldValue(this.err, source.err)
 		return this
 	}
 

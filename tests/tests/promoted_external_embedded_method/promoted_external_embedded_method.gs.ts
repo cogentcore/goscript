@@ -211,7 +211,7 @@ export class rawRunner {
 	}
 
 	public __goscriptAssign(source: rawRunner): this {
-		this.runner = $.assignFieldValue(this.runner, source.runner, "main.runner")
+		this.runner = $.assignFieldValue(this.runner, source.runner)
 		return this
 	}
 

@@ -84,7 +84,7 @@ export class WindowBase {
 	}
 
 	public __goscriptAssign(source: WindowBase): this {
-		this.App = $.assignFieldValue(this.App, source.App, { kind: $.TypeKind.Interface, methods: [$.methodSignature("FirstName", [], [/* @__PURE__ */ $.basicType("string")]), $.methodSignature("Window", [], ["main.Window"])] })
+		this.App = $.assignFieldValue(this.App, source.App)
 		this.name = source.name
 		return this
 	}

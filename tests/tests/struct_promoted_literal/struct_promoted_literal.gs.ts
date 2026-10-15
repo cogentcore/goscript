@@ -187,8 +187,8 @@ export class LiteralValue {
 	}
 
 	public __goscriptAssign(source: LiteralValue): this {
-		this.Value = $.assignFieldValue(this.Value, source.Value, { kind: $.TypeKind.Interface, methods: [] })
-		this.Zero = $.assignFieldValue(this.Zero, source.Zero, { kind: $.TypeKind.Interface, methods: [] })
+		this.Value = $.assignFieldValue(this.Value, source.Value)
+		this.Zero = $.assignFieldValue(this.Zero, source.Zero)
 		return this
 	}
 

@@ -19,7 +19,7 @@ export class writerHolder {
 	}
 
 	public __goscriptAssign(source: writerHolder): this {
-		this.w = $.assignFieldValue(this.w, source.w, "io.Writer")
+		this.w = $.assignFieldValue(this.w, source.w)
 		return this
 	}
 

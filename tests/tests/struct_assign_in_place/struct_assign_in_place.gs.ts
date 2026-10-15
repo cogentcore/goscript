@@ -90,7 +90,7 @@ export class Pair {
 
 	public __goscriptAssign(source: Pair): this {
 		this.Key = source.Key
-		this.Val = $.assignFieldValue(this.Val, source.Val, { kind: $.TypeKind.Interface, methods: [] })
+		this.Val = $.assignFieldValue(this.Val, source.Val)
 		return this
 	}
 

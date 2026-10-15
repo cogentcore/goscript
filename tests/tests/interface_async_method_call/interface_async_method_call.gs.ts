@@ -119,7 +119,7 @@ export class GenericChannelStore {
 
 	public __goscriptAssign(source: GenericChannelStore): this {
 		this.ch = source.ch
-		this.value = $.assignFieldValue(this.value, source.value, { kind: $.TypeKind.Interface, methods: [] })
+		this.value = $.assignFieldValue(this.value, source.value)
 		return this
 	}
 

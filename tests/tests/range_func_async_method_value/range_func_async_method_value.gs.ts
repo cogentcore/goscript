@@ -60,7 +60,7 @@ export class Group {
 	}
 
 	public __goscriptAssign(source: Group): this {
-		this.provider = $.assignFieldValue(this.provider, source.provider, "main.provider")
+		this.provider = $.assignFieldValue(this.provider, source.provider)
 		this.seen = source.seen
 		return this
 	}

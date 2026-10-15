@@ -255,7 +255,7 @@ export class plusOne {
 	}
 
 	public __goscriptAssign(source: plusOne): this {
-		this._in = $.assignFieldValue(this._in, source._in, "main.Valuer")
+		this._in = $.assignFieldValue(this._in, source._in)
 		return this
 	}
 
@@ -286,7 +286,7 @@ export class prefixNamer {
 	}
 
 	public __goscriptAssign(source: prefixNamer): this {
-		this.labeler = $.assignFieldValue(this.labeler, source.labeler, "main.Labeler")
+		this.labeler = $.assignFieldValue(this.labeler, source.labeler)
 		return this
 	}
 

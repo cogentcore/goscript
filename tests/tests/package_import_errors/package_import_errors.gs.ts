@@ -62,7 +62,7 @@ export class wrappedErr {
 	}
 
 	public __goscriptAssign(source: wrappedErr): this {
-		this.err = $.assignFieldValue(this.err, source.err, "error")
+		this.err = $.assignFieldValue(this.err, source.err)
 		return this
 	}
 

@@ -29,7 +29,7 @@ export class wrappedAEAD {
 	}
 
 	public __goscriptAssign(source: wrappedAEAD): this {
-		this.inner = $.assignFieldValue(this.inner, source.inner, "cipher.AEAD")
+		this.inner = $.assignFieldValue(this.inner, source.inner)
 		return this
 	}
 
@@ -81,7 +81,7 @@ export class nestedSealer {
 	}
 
 	public __goscriptAssign(source: nestedSealer): this {
-		this.aead = $.assignFieldValue(this.aead, source.aead, "cipher.AEAD")
+		this.aead = $.assignFieldValue(this.aead, source.aead)
 		this.nonce = source.nonce
 		this.aad = source.aad
 		return this

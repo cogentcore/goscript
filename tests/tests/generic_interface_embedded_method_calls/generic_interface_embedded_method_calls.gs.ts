@@ -40,8 +40,8 @@ export class impl {
 	}
 
 	public __goscriptAssign(source: impl): this {
-		this.value = $.assignFieldValue(this.value, source.value, { kind: $.TypeKind.Interface, methods: [] })
-		this.other = $.assignFieldValue(this.other, source.other, { kind: $.TypeKind.Interface, methods: [] })
+		this.value = $.assignFieldValue(this.value, source.value)
+		this.other = $.assignFieldValue(this.other, source.other)
 		return this
 	}
 

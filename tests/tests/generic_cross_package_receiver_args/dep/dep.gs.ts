@@ -28,7 +28,7 @@ export class Impl {
 	}
 
 	public __goscriptAssign(source: Impl): this {
-		this.Item = $.assignFieldValue(this.Item, source.Item, { kind: $.TypeKind.Interface, methods: [] })
+		this.Item = $.assignFieldValue(this.Item, source.Item)
 		return this
 	}
 

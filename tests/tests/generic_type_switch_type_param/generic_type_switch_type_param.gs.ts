@@ -55,8 +55,8 @@ export class Sides {
 	}
 
 	public __goscriptAssign(source: Sides): this {
-		this.Top = $.assignFieldValue(this.Top, source.Top, { kind: $.TypeKind.Interface, methods: [] })
-		this.Right = $.assignFieldValue(this.Right, source.Right, { kind: $.TypeKind.Interface, methods: [] })
+		this.Top = $.assignFieldValue(this.Top, source.Top)
+		this.Right = $.assignFieldValue(this.Right, source.Right)
 		return this
 	}
 
