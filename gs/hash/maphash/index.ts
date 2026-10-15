@@ -264,7 +264,7 @@ function writeValue(h: Hash, v: unknown): void {
     }
     return
   }
-  const fields = (v as { _fields?: Record<string, unknown> })._fields
+  const fields = $.isStructObject(v) ? v : undefined
   if ($.isMarkedAsStructValue(v) && fields) {
     h.WriteByte(7)
     for (const key of Object.keys(fields)) {

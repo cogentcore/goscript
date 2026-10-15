@@ -35,11 +35,9 @@ import {
 } from './index.js'
 
 class Person {
-  public _fields = {
-    Name: '',
-    Age: 0,
-    Active: false,
-  }
+  public Name = ''
+  public Age = 0
+  public Active = false
 
   static __typeInfo = $.registerStructType(
     'test.Person',
@@ -70,9 +68,7 @@ class Person {
 }
 
 class FieldAlias {
-  public _fields = {
-    Name: '',
-  }
+  public Name = ''
 
   static __typeInfo = $.registerStructType(
     'test.FieldAlias',
@@ -90,12 +86,10 @@ class FieldAlias {
 }
 
 class OmitEmptyStruct {
-  public _fields = {
-    Name: '',
-    Age: 0,
-    Tags: [],
-    Data: new Uint8Array(0),
-  }
+  public Name = ''
+  public Age = 0
+  public Tags = []
+  public Data = new Uint8Array(0)
 
   static __typeInfo = $.registerStructType(
     'test.OmitEmptyStruct',
@@ -137,9 +131,7 @@ class OmitEmptyStruct {
   )
 }
 class Ref {
-  public _fields = {
-    Name: '',
-  }
+  public Name = ''
 
   static __typeInfo: $.StructTypeInfo
 }
@@ -154,9 +146,7 @@ Ref.__typeInfo = $.registerStructType('test.Ref', new Ref(), [], Ref, [
 ])
 
 class Container {
-  public _fields = {
-    Contexts: null,
-  }
+  public Contexts = null
 
   static __typeInfo = $.registerStructType(
     'test.Container',
@@ -178,9 +168,7 @@ class Container {
 }
 
 class Property {
-  public _fields = {
-    Type: '',
-  }
+  public Type = ''
 
   static __typeInfo = $.registerStructType(
     'test.Property',
@@ -199,10 +187,8 @@ class Property {
 }
 
 class Schema {
-  public _fields = {
-    Properties: null,
-    Items: null,
-  }
+  public Properties = null
+  public Items = null
 
   static __typeInfo = $.registerStructType(
     'test.Schema',
@@ -230,12 +216,10 @@ class Schema {
 }
 
 class OmitEmptyRefStruct {
-  public _fields = {
-    Ptr: null,
-    PtrNilIface: null,
-    Any: null,
-    Count: 0n,
-  }
+  public Ptr = null
+  public PtrNilIface = null
+  public Any = null
+  public Count = 0n
 
   static __typeInfo = $.registerStructType(
     'test.OmitEmptyRefStruct',
@@ -278,7 +262,6 @@ class OmitEmptyRefStruct {
 }
 
 class HookPointee {
-  public _fields = {}
   public Text = ''
   public Marker = ''
 
@@ -297,9 +280,7 @@ class HookPointee {
 }
 
 class HookHolder {
-  public _fields = {
-    Hook: null,
-  }
+  public Hook = null
 
   static __typeInfo = $.registerStructType(
     'test.HookHolder',
@@ -318,9 +299,7 @@ class HookHolder {
 }
 
 class Holder {
-  public _fields = {
-    Value: null,
-  }
+  public Value = null
 
   static __typeInfo = $.registerStructType(
     'test.Holder',
@@ -383,9 +362,9 @@ describe('encoding/json override', () => {
 
   it('marshals struct fields through json tags', () => {
     const person = new Person()
-    person._fields.Name = 'Alice'
-    person._fields.Age = 30
-    person._fields.Active = true
+    person.Name = 'Alice'
+    person.Age = 30
+    person.Active = true
 
     const [data, err] = Marshal(person)
 
@@ -397,7 +376,7 @@ describe('encoding/json override', () => {
 
   it('uses descriptor names separately from storage keys', () => {
     const alias = new FieldAlias()
-    alias._fields.Name = 'Ada'
+    alias.Name = 'Ada'
 
     const [data, err] = Marshal(alias)
     expect(err).toBeNull()
@@ -407,7 +386,7 @@ describe('encoding/json override', () => {
     expect(
       Unmarshal($.stringToBytes('{"FullName":"Grace"}'), target),
     ).toBeNull()
-    expect(target.value._fields.Name).toBe('Grace')
+    expect(target.value.Name).toBe('Grace')
   })
 
   it('omits zero-valued fields tagged omitempty on marshal', () => {
@@ -417,10 +396,10 @@ describe('encoding/json override', () => {
     expect($.bytesToString(zeroData)).toBe('{}')
 
     const filled = new OmitEmptyStruct()
-    filled._fields.Name = 'Ada'
-    filled._fields.Age = 30
-    filled._fields.Tags = ['x']
-    filled._fields.Data = $.stringToBytes('x')
+    filled.Name = 'Ada'
+    filled.Age = 30
+    filled.Tags = ['x']
+    filled.Data = $.stringToBytes('x')
     const [data, err] = Marshal(filled)
     expect(err).toBeNull()
     expect($.bytesToString(data)).toBe(
@@ -437,9 +416,9 @@ describe('encoding/json override', () => {
     // Non-nil wrappers are not empty: omit only when the pointer/interface
     // itself is nil, not when the pointed or dynamic value is zero or nil.
     const filled = new OmitEmptyRefStruct()
-    filled._fields.Ptr = $.varRef(0)
-    filled._fields.PtrNilIface = $.varRef(null)
-    filled._fields.Any = 0
+    filled.Ptr = $.varRef(0)
+    filled.PtrNilIface = $.varRef(null)
+    filled.Any = 0
     const [data, err] = Marshal(filled)
     expect(err).toBeNull()
     expect($.bytesToString(data)).toBe('{"ptr":0,"ptrNilIface":null,"any":0}')
@@ -452,14 +431,14 @@ describe('encoding/json override', () => {
     expect($.bytesToString(zeroData)).toBe('{}')
 
     const nonZero = new OmitEmptyRefStruct()
-    nonZero._fields.Count = 5n
+    nonZero.Count = 5n
     const [data, err] = Marshal(nonZero)
     expect(err).toBeNull()
     expect($.bytesToString(data)).toBe('{"count":5}')
 
     // A non-nil interface holding a zero bigint is still non-empty.
     const boxedZero = new OmitEmptyRefStruct()
-    boxedZero._fields.Any = 0n
+    boxedZero.Any = 0n
     const [boxedData, boxedErr] = Marshal(boxedZero)
     expect(boxedErr).toBeNull()
     expect($.bytesToString(boxedData)).toBe('{"any":0}')
@@ -480,7 +459,7 @@ describe('encoding/json override', () => {
       {},
     )
     const holder = new FieldAlias()
-    Reflect.set(holder._fields, 'Name', namedString)
+    Reflect.set(holder, 'Name', namedString)
     const [holderData, holderErr] = Marshal(holder)
     expect(holderErr).toBeNull()
     expect($.bytesToString(holderData)).toBe('{"FullName":"active"}')
@@ -530,9 +509,7 @@ describe('encoding/json override', () => {
     }
 
     class RawEnvelope {
-      public _fields = {
-        Raw: $.stringToBytes('{"embedded":true}'),
-      }
+      public Raw = $.stringToBytes('{"embedded":true}')
 
       static __typeInfo = $.registerStructType(
         'test.RawEnvelope',
@@ -551,12 +528,10 @@ describe('encoding/json override', () => {
     }
 
     class Envelope {
-      public _fields = {
-        Person: new Person(),
-        Data: new Uint8Array(0),
-        Raw: new Uint8Array(0),
-        Hook: new CustomJSON(),
-      }
+      public Person = new Person()
+      public Data = new Uint8Array(0)
+      public Raw = new Uint8Array(0)
+      public Hook = new CustomJSON()
 
       static __typeInfo = $.registerStructType(
         'test.Envelope',
@@ -632,9 +607,7 @@ describe('encoding/json override', () => {
     expect(
       Unmarshal($.stringToBytes('{"raw":{"next":1}}'), rawEnvelopeTarget),
     ).toBeNull()
-    expect($.bytesToString(rawEnvelopeTarget.value._fields.Raw)).toBe(
-      '{"next":1}',
-    )
+    expect($.bytesToString(rawEnvelopeTarget.value.Raw)).toBe('{"next":1}')
 
     const byteTarget = $.varRef(new Uint8Array(0))
     expect(Unmarshal($.stringToBytes('"eA=="'), byteTarget)).toBeNull()
@@ -649,11 +622,11 @@ describe('encoding/json override', () => {
         envelope,
       ),
     ).toBeNull()
-    expect(envelope.value._fields.Person._fields.Name).toBe('Eve')
-    expect(envelope.value._fields.Person._fields.Age).toBe(31)
-    expect($.bytesToString(envelope.value._fields.Data)).toBe('x')
-    expect($.bytesToString(envelope.value._fields.Raw)).toBe('{"keep":true}')
-    expect(envelope.value._fields.Hook.Text).toBe('{"nested":true}')
+    expect(envelope.value.Person.Name).toBe('Eve')
+    expect(envelope.value.Person.Age).toBe(31)
+    expect($.bytesToString(envelope.value.Data)).toBe('x')
+    expect($.bytesToString(envelope.value.Raw)).toBe('{"keep":true}')
+    expect(envelope.value.Hook.Text).toBe('{"nested":true}')
 
     const [envelopeData, envelopeErr] = Marshal(envelope.value)
     expect(envelopeErr).toBeNull()
@@ -662,9 +635,9 @@ describe('encoding/json override', () => {
 
   it('marshals indented JSON with a line prefix', () => {
     const person = new Person()
-    person._fields.Name = 'Alice'
-    person._fields.Age = 30
-    person._fields.Active = true
+    person.Name = 'Alice'
+    person.Age = 30
+    person.Active = true
 
     const [data, err] = MarshalIndent(person, '> ', '  ')
 
@@ -682,9 +655,9 @@ describe('encoding/json override', () => {
     )
 
     expect(personErr).toBeNull()
-    expect(person.value._fields.Name).toBe('Bob')
-    expect(person.value._fields.Age).toBe(25)
-    expect(person.value._fields.Active).toBe(false)
+    expect(person.value.Name).toBe('Bob')
+    expect(person.value.Age).toBe(25)
+    expect(person.value.Active).toBe(false)
 
     const mapRef: $.VarRef<Map<string, unknown> | null> = $.varRef(null)
     const mapErr = Unmarshal(
@@ -706,12 +679,12 @@ describe('encoding/json override', () => {
     )
 
     expect(err).toBeNull()
-    const contexts = target.value._fields.Contexts
+    const contexts = target.value.Contexts
     expect(contexts).toBeInstanceOf(Map)
     const refs = contexts?.get('a')
     expect(refs).toHaveLength(2)
-    expect(refs?.[0]._fields.Name).toBe('x')
-    expect(refs?.[1]._fields.Name).toBe('y')
+    expect(refs?.[0].Name).toBe('x')
+    expect(refs?.[1].Name).toBe('y')
   })
 
   it('decodes array elements inside an interface{}-typed field into Maps, not plain objects', () => {
@@ -722,7 +695,7 @@ describe('encoding/json override', () => {
     )
 
     expect(err).toBeNull()
-    const value = target.value._fields.Value as unknown[]
+    const value = target.value.Value as unknown[]
     expect(Array.isArray(value)).toBe(true)
     expect(value[0]).toBeInstanceOf(Map)
     expect((value[0] as Map<string, unknown>).get('x')).toBe(1)
@@ -739,9 +712,9 @@ describe('encoding/json override', () => {
     )
 
     expect(err).toBeNull()
-    const properties = target.value._fields.Properties
-    expect(properties?.get('width')?._fields.Type).toBe('number')
-    expect(target.value._fields.Items?._fields.Type).toBe('string')
+    const properties = target.value.Properties
+    expect(properties?.get('width')?.Type).toBe('number')
+    expect(target.value.Items?.Type).toBe('string')
   })
 
   it('allocates a nil pointer-to-struct field and invokes UnmarshalJSON on it, instead of decoding it field-by-field', () => {
@@ -749,15 +722,15 @@ describe('encoding/json override', () => {
     const err = Unmarshal($.stringToBytes('{"hook":{"nested":true}}'), target)
 
     expect(err).toBeNull()
-    expect(target.value._fields.Hook).toBeInstanceOf(HookPointee)
-    expect(target.value._fields.Hook?.Text).toBe('{"nested":true}')
+    expect(target.value.Hook).toBeInstanceOf(HookPointee)
+    expect(target.value.Hook?.Text).toBe('{"nested":true}')
   })
 
   it('invokes UnmarshalJSON on a non-nil pointer-to-struct field in place, instead of replacing it with a freshly decoded instance', () => {
     const holder = new HookHolder()
     const existing = new HookPointee()
     existing.Marker = 'orig'
-    holder._fields.Hook = existing
+    holder.Hook = existing
 
     const target = $.varRef(holder)
     const err = Unmarshal($.stringToBytes('{"hook":{"nested":true}}'), target)
@@ -765,9 +738,9 @@ describe('encoding/json override', () => {
     expect(err).toBeNull()
     // Go's encoding/json decodes into the existing pointee via its
     // UnmarshalJSON hook, it never discards it for a fresh replacement.
-    expect(target.value._fields.Hook).toBe(existing)
-    expect(target.value._fields.Hook?.Marker).toBe('orig')
-    expect(target.value._fields.Hook?.Text).toBe('{"nested":true}')
+    expect(target.value.Hook).toBe(existing)
+    expect(target.value.Hook?.Marker).toBe('orig')
+    expect(target.value.Hook?.Text).toBe('{"nested":true}')
   })
 
   it('decodes pointer-to-struct values as unmarked pointees, matching *Struct not Struct by value', () => {
@@ -791,11 +764,11 @@ describe('encoding/json override', () => {
     // with a marker, and getting this wrong breaks Go type
     // assertions/switches and pointer-receiver method-set checks on
     // JSON-decoded values.
-    const items = target.value._fields.Items
+    const items = target.value.Items
     expect($.is(items, propertyPointerType)).toBe(true)
     expect($.is(items, propertyType)).toBe(false)
 
-    const width = target.value._fields.Properties?.get('width')
+    const width = target.value.Properties?.get('width')
     expect($.is(width, propertyPointerType)).toBe(true)
     expect($.is(width, propertyType)).toBe(false)
   })
@@ -817,7 +790,7 @@ describe('encoding/json override', () => {
       elemType: propertyType,
     }
     const width = target.value?.get('width')
-    expect(width?._fields.Type).toBe('number')
+    expect(width?.Type).toBe('number')
     expect($.is(width, propertyPointerType)).toBe(true)
     expect($.is(width, propertyType)).toBe(false)
   })
@@ -901,7 +874,7 @@ describe('encoding/json override', () => {
 
     const err = Unmarshal($.stringToBytes('{"type":"string"}'), target)
     expect(err).toBeNull()
-    expect(target.value?._fields.Type).toBe('string')
+    expect(target.value?.Type).toBe('string')
 
     const propertyType = $.getTypeByName('test.Property') as $.TypeInfo
     const propertyPointerType: $.TypeInfo = {
@@ -943,7 +916,7 @@ describe('encoding/json override', () => {
     )
     expect(err).toBeNull()
     expect(target.value.Inner).toBeInstanceOf(Property)
-    expect(target.value.Inner?._fields.Type).toBe('string')
+    expect(target.value.Inner?.Type).toBe('string')
 
     const propertyType = $.getTypeByName('test.Property') as $.TypeInfo
     // A by-value struct field must match Property (value), not *Property.
@@ -1283,8 +1256,8 @@ describe('encoding/json override', () => {
     const decoder = NewDecoder(reader)
     const target = $.varRef(new Person())
     expect(await decoder.Decode(target)).toBeNull()
-    expect(target.value._fields.Name).toBe('Dana')
-    expect(target.value._fields.Age).toBe(28)
+    expect(target.value.Name).toBe('Dana')
+    expect(target.value.Age).toBe(28)
     expect(await decoder.Decode(target)).toBe(io.EOF)
     expect(reads).toBe(4)
   })
@@ -1303,14 +1276,12 @@ describe('encoding/json override', () => {
     }
     const target = $.varRef(new Person())
     expect(await NewDecoder(reader).Decode(target)).toBeNull()
-    expect(target.value._fields.Age).toBe(3)
+    expect(target.value.Age).toBe(3)
   })
 
   it('marshals a RawMessage field without normalizing its token spelling', () => {
     class RawHolder {
-      public _fields = {
-        R: $.stringToBytes('1e+00'),
-      }
+      public R = $.stringToBytes('1e+00')
 
       static __typeInfo = $.registerStructType(
         'test.RawHolder',
@@ -1332,8 +1303,8 @@ describe('encoding/json override', () => {
     const target = $.varRef(new Person())
 
     expect(decoder.Decode(target)).toBeNull()
-    expect(target.value._fields.Name).toBe('Dana')
-    expect(target.value._fields.Age).toBe(28)
+    expect(target.value.Name).toBe('Dana')
+    expect(target.value.Age).toBe(28)
     expect(decoder.InputOffset()).toBeGreaterThan(0n)
 
     const raw = $.stringToBytes('{"raw":true}')

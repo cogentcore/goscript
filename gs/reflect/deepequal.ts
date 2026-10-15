@@ -49,22 +49,8 @@
 // values that have been compared before, it treats the values as
 // equal rather than examining the values to which they point.
 // This ensures that DeepEqual terminates.
-import { isNamedValueBox } from '../builtin/index.js'
+import { isNamedValueBox, isStructObject } from '../builtin/index.js'
 import { ReflectValue } from './types.js'
-
-function hasGeneratedStructFields(
-  value: object,
-): value is { _fields: Record<string, ReflectValue> } {
-  if (!('_fields' in value)) {
-    return false
-  }
-  const fields = value._fields
-  return (
-    typeof fields === 'object' &&
-    fields !== null &&
-    !globalThis.Array.isArray(fields)
-  )
-}
 
 export function DeepEqual(
   x: ReflectValue | null | undefined,
@@ -153,19 +139,9 @@ export function DeepEqual(
 
   // Handle objects (structs)
   if (typeof x === 'object' && typeof y === 'object') {
-    if (hasGeneratedStructFields(x) || hasGeneratedStructFields(y)) {
-      if (!hasGeneratedStructFields(x) || !hasGeneratedStructFields(y)) {
-        return false
-      }
-      const keysX = Object.keys(x._fields)
-      const keysY = Object.keys(y._fields)
-      return (
-        keysX.length === keysY.length &&
-        keysX.every(
-          (key) =>
-            key in y._fields && DeepEqual(x._fields[key], y._fields[key]),
-        )
-      )
+    // A struct object only equals a struct object.
+    if (isStructObject(x) !== isStructObject(y)) {
+      return false
     }
 
     const keysX = Object.keys(x)

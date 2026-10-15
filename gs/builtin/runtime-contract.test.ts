@@ -490,17 +490,18 @@ describe('builtin runtime contract helpers', () => {
 
   it('matches struct map keys by Go comparable value', () => {
     class Key {
-      public _fields: {
-        name: string
-        id: number
-      }
+      declare public name: string
+      declare public id: number
 
       constructor(name: string, id: number) {
-        this._fields = {
-          name: name,
-          id: id,
-        }
+        this.name = name
+        this.id = id
       }
+
+      static __typeInfo = registerStructType('example.Key', null, [], Key, [
+        { name: 'name', type: { kind: TypeKind.Basic, name: 'string' } },
+        { name: 'id', type: { kind: TypeKind.Basic, name: 'int' } },
+      ])
     }
 
     const m = makeMap<Key, string>()
@@ -1047,12 +1048,12 @@ describe('builtin runtime contract helpers', () => {
 
   it('allocates and stores through pointers to type parameters', () => {
     class Point {
-      public _fields: { X: { value: number } }
+      declare public X: { value: number }
       constructor(init?: { X?: number }) {
-        this._fields = { X: { value: init?.X ?? 0 } }
+        this.X = { value: init?.X ?? 0 }
       }
       clone(): Point {
-        return markAsStructValue(new Point({ X: this._fields.X.value }))
+        return markAsStructValue(new Point({ X: this.X.value }))
       }
       static __typeInfo = {
         kind: TypeKind.Struct,
@@ -1070,7 +1071,7 @@ describe('builtin runtime contract helpers', () => {
     expect(isVarRef(p)).toBe(false)
     expect(isMarkedAsStructValue(p)).toBe(false)
     genericPointerRef(p).value = markAsStructValue(new Point({ X: 3 }))
-    expect(p._fields.X.value).toBe(3)
+    expect(p.X.value).toBe(3)
 
     const intArgs = { T: { zero: () => 0 } }
     const ip = genericNew(intArgs, 'T', null)
