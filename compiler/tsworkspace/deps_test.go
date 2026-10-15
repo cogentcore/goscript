@@ -10,6 +10,7 @@ import (
 )
 
 func TestImportedPackages(t *testing.T) {
+	// Write scripts that import packages in each import form.
 	root := t.TempDir()
 	files := map[string]string{
 		"a/index.ts":       "import { ecb } from '@noble/ciphers/aes.js'\nimport * as $ from '@goscript/builtin/index.js'\n",
@@ -28,6 +29,8 @@ func TestImportedPackages(t *testing.T) {
 			t.Fatal(err)
 		}
 	}
+
+	// Only declared packages imported by a script are reported.
 	declared := map[string]string{
 		"@noble/ciphers": "2.2.0",
 		"pako":           "3.0.2",
@@ -36,7 +39,7 @@ func TestImportedPackages(t *testing.T) {
 		"declared-only":  "1.0.0",
 		"globals":        "^17.4.0",
 	}
-	got, err := ImportedPackages([]string{root, root, filepath.Join(root, "missing")}, declared)
+	got, err := ImportedPackages(root, declared)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -49,9 +52,17 @@ func TestImportedPackages(t *testing.T) {
 	if !maps.Equal(got, want) {
 		t.Fatalf("imported packages = %v, want %v", got, want)
 	}
+
+	// A missing root imports nothing.
+	missing, err := ImportedPackages(filepath.Join(root, "missing"), declared)
+	if err != nil || len(missing) != 0 {
+		t.Fatalf("missing root imported %v, %v", missing, err)
+	}
 }
 
 func TestNPMPackageName(t *testing.T) {
+	// Each specifier names its npm package, or none for a local or builtin
+	// module.
 	for specifier, want := range map[string]string{
 		"pako":                     "pako",
 		"pako/lib/inflate.js":      "pako",
@@ -69,6 +80,7 @@ func TestNPMPackageName(t *testing.T) {
 }
 
 func TestEnsurePackageJSONDependencies(t *testing.T) {
+	// The package.json declares the module type and each dependency.
 	dir := t.TempDir()
 	owner := NewOwner(dir, dir)
 	if result := owner.EnsurePackageJSON(map[string]string{"pako": "3.0.2"}); result.Failed() {
@@ -86,6 +98,7 @@ func TestEnsurePackageJSONDependencies(t *testing.T) {
 }
 
 func TestInstallDependenciesUsesResolvablePackages(t *testing.T) {
+	// Make @noble/hashes resolvable from a parent project.
 	project := t.TempDir()
 	pkgDir := filepath.Join(project, "node_modules", "@noble", "hashes")
 	if err := os.MkdirAll(pkgDir, 0o755); err != nil {
@@ -94,6 +107,8 @@ func TestInstallDependenciesUsesResolvablePackages(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(pkgDir, "package.json"), []byte("{}"), 0o644); err != nil {
 		t.Fatal(err)
 	}
+
+	// A package that already resolves needs no install command.
 	workDir := filepath.Join(project, "work", "nested")
 	owner := NewOwner(workDir, workDir)
 	result := owner.InstallDependencies(context.Background(), map[string]string{"@noble/hashes": "2.2.0"})

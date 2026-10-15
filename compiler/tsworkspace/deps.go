@@ -19,24 +19,15 @@ var importSpecifierPattern = regexp.MustCompile(`(?m)(?:\bfrom\s*|^\s*import\s*|
 
 // ImportedPackages returns the npm packages from packages, which maps package
 // names to versions, that are imported by the TypeScript and JavaScript files
-// under roots. A missing root imports nothing.
-func ImportedPackages(roots []string, packages map[string]string) (map[string]string, error) {
+// under root. A missing root imports nothing.
+func ImportedPackages(root string, packages map[string]string) (map[string]string, error) {
 	// With no candidate packages, nothing can be imported.
 	imported := make(map[string]string)
 	if len(packages) == 0 {
 		return imported, nil
 	}
-
-	// Scan each distinct root once.
-	seen := make(map[string]bool)
-	for _, root := range roots {
-		if root == "" || seen[root] {
-			continue
-		}
-		seen[root] = true
-		if err := scanImportedPackages(root, packages, imported); err != nil {
-			return nil, errors.Wrap(err, "scan imported npm packages")
-		}
+	if err := scanImportedPackages(root, packages, imported); err != nil {
+		return nil, errors.Wrap(err, "scan imported npm packages")
 	}
 	return imported, nil
 }

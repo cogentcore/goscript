@@ -128,10 +128,10 @@ func (r *Runner) Run(ctx context.Context, req *Request) (*Result, error) {
 	}
 
 	// Compile the packages under test.
-	outputRoots := r.compilePackageOutputs(ctx, norm, result)
+	r.compilePackageOutputs(ctx, norm, result)
 
 	// Find the runtime npm packages the output imports.
-	dependencies, err := runtimeDependencies(outputRoots)
+	dependencies, err := runtimeDependencies(norm.OutputRoot)
 	if err != nil {
 		markAllFailures(result, OwnerTestRunner, err.Error())
 		return result, nil
@@ -178,11 +178,11 @@ func (r *Runner) Run(ctx context.Context, req *Request) (*Result, error) {
 		markAllFailures(result, OwnerTestRunner, phase.Error)
 		return result, nil
 	}
-	if phase := workspace.WriteFile(tsworkspace.PhaseWorkspace, "tsconfig.json", renderRuntimeTypeScriptProject(norm, outputRoots, nodeTypesAvailable)); phase.Failed() {
+	if phase := workspace.WriteFile(tsworkspace.PhaseWorkspace, "tsconfig.json", renderRuntimeTypeScriptProject(norm, nodeTypesAvailable)); phase.Failed() {
 		markAllFailures(result, OwnerTestRunner, phase.Error)
 		return result, nil
 	}
-	r.runPackageTools(ctx, norm, workspace, result, outputRoots, nodeTypesAvailable)
+	r.runPackageTools(ctx, norm, workspace, result, nodeTypesAvailable)
 	return result, nil
 }
 
@@ -191,19 +191,18 @@ func (r *Runner) runPackageTools(
 	req *normalizedRequest,
 	workspace *tsworkspace.Owner,
 	result *Result,
-	outputRoots []string,
 	nodeTypesAvailable bool,
 ) {
-	indexes := r.preparePackageWorkspaces(req, workspace, result, outputRoots, nodeTypesAvailable)
+	indexes := r.preparePackageWorkspaces(req, workspace, result, nodeTypesAvailable)
 	if len(indexes) == 0 {
 		return
 	}
-	if phase := materializeRuntimeModuleShims(req, outputRoots); phase.Failed() {
+	if phase := materializeRuntimeModuleShims(req); phase.Failed() {
 		markRuntimeFailures(result, indexes, OwnerTestRunner, phase.Error)
 		return
 	}
 	if len(indexes) == 1 {
-		r.runPackageTypeCheckAndRuntime(ctx, req, workspace, result, outputRoots, indexes[0])
+		r.runPackageTypeCheckAndRuntime(ctx, req, workspace, result, indexes[0])
 		return
 	}
 	typecheck := workspace.RunTool(ctx, tsworkspace.PhaseTypeCheck, req.WorkDir, "tsgo", "--project", "tsconfig.json")
@@ -212,20 +211,19 @@ func (r *Runner) runPackageTools(
 			markTypeCheckFailures(result, owner, processErrorText(typecheck))
 			return
 		}
-		r.runPackageTypeChecksAndRuntimes(ctx, req, workspace, result, outputRoots, indexes)
+		r.runPackageTypeChecksAndRuntimes(ctx, req, workspace, result, indexes)
 		return
 	}
 	for _, idx := range indexes {
 		result.Packages[idx].Phases.TypeCheck = PhaseStatusPass
 	}
-	r.runPackageRuntimes(ctx, req, workspace, result, outputRoots, indexes)
+	r.runPackageRuntimes(ctx, req, workspace, result, indexes)
 }
 
 func (r *Runner) preparePackageWorkspaces(
 	req *normalizedRequest,
 	workspace *tsworkspace.Owner,
 	result *Result,
-	outputRoots []string,
 	nodeTypesAvailable bool,
 ) []int {
 	var indexes []int
@@ -233,7 +231,7 @@ func (r *Runner) preparePackageWorkspaces(
 		if !shouldCompilePackage(result.Packages[idx]) {
 			continue
 		}
-		if r.preparePackageWorkspace(req, workspace, result, outputRoots, nodeTypesAvailable, idx) {
+		if r.preparePackageWorkspace(req, workspace, result, nodeTypesAvailable, idx) {
 			indexes = append(indexes, idx)
 		}
 	}
@@ -244,12 +242,10 @@ func (r *Runner) preparePackageWorkspace(
 	req *normalizedRequest,
 	workspace *tsworkspace.Owner,
 	result *Result,
-	outputRoots []string,
 	nodeTypesAvailable bool,
 	idx int,
 ) bool {
 	result.Packages[idx].Phases.Workspace = PhaseStatusPass
-	outputRoot := outputRoots[idx]
 	runnerFile := packageRunnerFile(idx)
 	if phase := workspace.WriteFile(tsworkspace.PhaseWorkspace, runnerFile, renderPackageRunner(result.Packages[idx], req)); phase.Failed() {
 		result.Packages[idx].Owner = OwnerTestRunner
@@ -258,7 +254,7 @@ func (r *Runner) preparePackageWorkspace(
 		return false
 	}
 	tsconfigFile := packageTSConfigFile(idx)
-	if phase := workspace.WriteFile(tsworkspace.PhaseWorkspace, tsconfigFile, renderTypeScriptProject(req, outputRoot, runnerFile, tsconfigFile, nodeTypesAvailable)); phase.Failed() {
+	if phase := workspace.WriteFile(tsworkspace.PhaseWorkspace, tsconfigFile, renderTypeScriptProject(req, runnerFile, tsconfigFile, nodeTypesAvailable)); phase.Failed() {
 		result.Packages[idx].Owner = OwnerTestRunner
 		result.Packages[idx].Phases.Workspace = PhaseStatusFail
 		result.Packages[idx].Error = phase.Error
@@ -272,7 +268,6 @@ func (r *Runner) runPackageTypeChecksAndRuntimes(
 	req *normalizedRequest,
 	workspace *tsworkspace.Owner,
 	result *Result,
-	outputRoots []string,
 	indexes []int,
 ) {
 	packageExecutionFanout(ctx, max(req.Parallelism, 1), packageExecutionIndexes(result, indexes), func(idx int) {
@@ -280,7 +275,7 @@ func (r *Runner) runPackageTypeChecksAndRuntimes(
 		result.Packages[idx].Phases.TypeCheck = PhaseStatusFail
 		result.Packages[idx].Error = ctx.Err().Error()
 	}, func(idx int) {
-		r.runPackageTypeCheckAndRuntime(ctx, req, workspace, result, outputRoots, idx)
+		r.runPackageTypeCheckAndRuntime(ctx, req, workspace, result, idx)
 	})
 }
 
@@ -313,13 +308,12 @@ func (r *Runner) runPackageTypeCheckAndRuntime(
 	req *normalizedRequest,
 	workspace *tsworkspace.Owner,
 	result *Result,
-	outputRoots []string,
 	idx int,
 ) {
 	if !r.runPackageTypeCheck(ctx, req, workspace, result, idx) {
 		return
 	}
-	r.runPackageRuntime(ctx, req, workspace, result, outputRootAt(outputRoots, idx), idx)
+	r.runPackageRuntime(ctx, req, workspace, result, idx)
 }
 
 func (r *Runner) runPackageTypeCheck(
@@ -345,11 +339,10 @@ func (r *Runner) runPackageRuntimes(
 	req *normalizedRequest,
 	workspace *tsworkspace.Owner,
 	result *Result,
-	outputRoots []string,
 	indexes []int,
 ) {
 	if req.RuntimeBackend == RuntimeBackendBrowser {
-		r.runPackageRuntimesIndividually(ctx, req, workspace, result, outputRoots, indexes)
+		r.runPackageRuntimesIndividually(ctx, req, workspace, result, indexes)
 		return
 	}
 	if len(indexes) > 1 &&
@@ -357,82 +350,64 @@ func (r *Runner) runPackageRuntimes(
 		r.runCombinedPackageRuntimes(ctx, req, workspace, result, indexes) {
 		return
 	}
-	r.runPackageRuntimesIndividually(ctx, req, workspace, result, outputRoots, indexes)
+	r.runPackageRuntimesIndividually(ctx, req, workspace, result, indexes)
 }
 
-func materializeRuntimeModuleShims(req *normalizedRequest, outputRoots []string) tsworkspace.Result {
+// materializeRuntimeModuleShims writes a node_modules/@goscript module beside
+// the workspace and the output root for each emitted TypeScript module, so
+// Bun resolves @goscript imports to the emitted program.
+func materializeRuntimeModuleShims(req *normalizedRequest) tsworkspace.Result {
+	// Only Bun resolves @goscript through node_modules, and an empty output
+	// needs no shims.
 	if req.RuntimeBackend != RuntimeBackendBun {
 		return tsworkspace.Result{Phase: tsworkspace.PhaseWorkspace}
 	}
-	seen := make(map[string]bool)
-	shimRoots := runtimeModuleShimRoots(req, outputRoots)
-	for _, outputRoot := range outputRoots {
-		if outputRoot == "" {
-			continue
+	root := filepath.Join(req.OutputRoot, "@goscript")
+	if _, err := os.Stat(root); err != nil {
+		if os.IsNotExist(err) {
+			return tsworkspace.Result{Phase: tsworkspace.PhaseWorkspace}
 		}
-		root := filepath.Join(outputRoot, "@goscript")
-		if _, err := os.Stat(root); err != nil {
-			if os.IsNotExist(err) {
-				continue
-			}
-			return tsworkspace.Result{Phase: tsworkspace.PhaseWorkspace, Error: errors.Wrap(err, "stat GoScript runtime output root").Error()}
-		}
-		err := filepath.WalkDir(root, func(path string, entry os.DirEntry, err error) error {
-			if err != nil {
-				return err
-			}
-			if entry.IsDir() || filepath.Ext(path) != ".ts" {
-				return nil
-			}
-			rel, err := filepath.Rel(root, path)
-			if err != nil {
-				return err
-			}
-			shimRel := filepath.Join("node_modules", "@goscript", strings.TrimSuffix(rel, ".ts")+".js")
-			for _, shimRoot := range shimRoots {
-				shimPath := filepath.Join(shimRoot, shimRel)
-				seenKey := shimPath
-				if seen[seenKey] {
-					continue
-				}
-				seen[seenKey] = true
-				shimDir := filepath.Dir(shimPath)
-				importPath, err := filepath.Rel(shimDir, path)
-				if err != nil {
-					return err
-				}
-				importPath = filepath.ToSlash(importPath)
-				if !strings.HasPrefix(importPath, ".") {
-					importPath = "./" + importPath
-				}
-				if err := writeRuntimeModuleShim(shimPath, "export * from "+strconv.Quote(importPath)+"\n"); err != nil {
-					return err
-				}
-			}
-			return nil
-		})
+		return tsworkspace.Result{Phase: tsworkspace.PhaseWorkspace, Error: errors.Wrap(err, "stat GoScript runtime output root").Error()}
+	}
+
+	// Write a shim for each module under every root that runs code.
+	shimRoots := []string{filepath.Clean(req.WorkDir)}
+	if outputRoot := filepath.Clean(req.OutputRoot); outputRoot != shimRoots[0] {
+		shimRoots = append(shimRoots, outputRoot)
+	}
+	err := filepath.WalkDir(root, func(path string, entry os.DirEntry, err error) error {
+		// Shim only the emitted TypeScript modules.
 		if err != nil {
-			return tsworkspace.Result{Phase: tsworkspace.PhaseWorkspace, Error: errors.Wrap(err, "materialize GoScript runtime module shims").Error()}
+			return err
 		}
+		if entry.IsDir() || filepath.Ext(path) != ".ts" {
+			return nil
+		}
+		rel, err := filepath.Rel(root, path)
+		if err != nil {
+			return err
+		}
+		shimRel := filepath.Join("node_modules", "@goscript", strings.TrimSuffix(rel, ".ts")+".js")
+		for _, shimRoot := range shimRoots {
+			shimPath := filepath.Join(shimRoot, shimRel)
+			importPath, err := filepath.Rel(filepath.Dir(shimPath), path)
+			if err != nil {
+				return err
+			}
+			importPath = filepath.ToSlash(importPath)
+			if !strings.HasPrefix(importPath, ".") {
+				importPath = "./" + importPath
+			}
+			if err := writeRuntimeModuleShim(shimPath, "export * from "+strconv.Quote(importPath)+"\n"); err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+	if err != nil {
+		return tsworkspace.Result{Phase: tsworkspace.PhaseWorkspace, Error: errors.Wrap(err, "materialize GoScript runtime module shims").Error()}
 	}
 	return tsworkspace.Result{Phase: tsworkspace.PhaseWorkspace}
-}
-
-func runtimeModuleShimRoots(req *normalizedRequest, outputRoots []string) []string {
-	seen := make(map[string]bool)
-	var roots []string
-	for _, root := range append([]string{req.WorkDir}, outputRoots...) {
-		if root == "" {
-			continue
-		}
-		clean := filepath.Clean(root)
-		if seen[clean] {
-			continue
-		}
-		seen[clean] = true
-		roots = append(roots, clean)
-	}
-	return roots
 }
 
 func writeRuntimeModuleShim(path string, data string) error {
@@ -459,7 +434,6 @@ func (r *Runner) runPackageRuntimesIndividually(
 	req *normalizedRequest,
 	workspace *tsworkspace.Owner,
 	result *Result,
-	outputRoots []string,
 	indexes []int,
 ) {
 	packageExecutionFanout(ctx, max(req.Parallelism, 1), packageExecutionIndexes(result, indexes), func(idx int) {
@@ -467,7 +441,7 @@ func (r *Runner) runPackageRuntimesIndividually(
 		result.Packages[idx].Phases.Runtime = PhaseStatusFail
 		result.Packages[idx].Error = ctx.Err().Error()
 	}, func(idx int) {
-		r.runPackageRuntime(ctx, req, workspace, result, outputRootAt(outputRoots, idx), idx)
+		r.runPackageRuntime(ctx, req, workspace, result, idx)
 	})
 }
 
@@ -575,11 +549,10 @@ func (r *Runner) runPackageRuntime(
 	req *normalizedRequest,
 	workspace *tsworkspace.Owner,
 	result *Result,
-	outputRoot string,
 	idx int,
 ) {
 	if req.RuntimeBackend == RuntimeBackendBrowser {
-		r.runPackageBrowserRuntime(ctx, req, workspace, result, outputRoot, idx)
+		r.runPackageBrowserRuntime(ctx, req, workspace, result, idx)
 		return
 	}
 	runtime := workspace.RunTool(ctx, tsworkspace.PhaseRuntime, req.WorkDir, "bun", packageRunnerFile(idx))
@@ -596,33 +569,18 @@ func (r *Runner) runPackageRuntime(
 	result.Packages[idx].Action = ActionPass
 }
 
-func outputRootAt(outputRoots []string, idx int) string {
-	if idx < 0 || idx >= len(outputRoots) {
-		return ""
-	}
-	return outputRoots[idx]
-}
-
 func (r *Runner) runPackageBrowserRuntime(
 	ctx context.Context,
 	req *normalizedRequest,
 	workspace *tsworkspace.Owner,
 	result *Result,
-	outputRoot string,
 	idx int,
 ) {
-	if outputRoot == "" {
-		result.Packages[idx].Action = ActionFail
-		result.Packages[idx].Owner = OwnerTestRunner
-		result.Packages[idx].Phases.Runtime = PhaseStatusFail
-		result.Packages[idx].Error = "browser runtime output root is empty"
-		return
-	}
 	configFile := browserVitestConfigFile(idx)
 	if phase := workspace.WriteFile(
 		tsworkspace.PhaseWorkspace,
 		configFile,
-		renderBrowserVitestConfig(req, outputRoot, packageRunnerFile(idx), result.Packages[idx].SourceDir),
+		renderBrowserVitestConfig(req, packageRunnerFile(idx), result.Packages[idx].SourceDir),
 	); phase.Failed() {
 		result.Packages[idx].Action = ActionFail
 		result.Packages[idx].Owner = OwnerTestRunner
@@ -673,66 +631,100 @@ func (r *Runner) runPackageBrowserRuntime(
 	result.Packages[idx].Error = "browser test did not report package " + result.Packages[idx].PackagePath
 }
 
-func (r *Runner) compileTestImports(
-	ctx context.Context,
-	req *normalizedRequest,
-	outputRoot string,
-	pkg *PackageResult,
-	result *Result,
-) bool {
-	imports := slices.Clone(pkg.TestImports)
-	slices.Sort(imports)
-	imports = slices.Compact(imports)
-	for _, importPath := range imports {
-		if importPath == "" || importPath == pkg.PackagePath {
+// compilePackageOutputs compiles the runnable packages and their tests as one
+// program under req.OutputRoot. Whole-program analysis colors a shared
+// dependency by every caller in the program, so packages compiled apart could
+// emit conflicting copies of it. A failed batch does not name its package, so
+// each package then compiles alone into a scratch root to find the failures,
+// and the rest compile again as one batch.
+func (r *Runner) compilePackageOutputs(ctx context.Context, req *normalizedRequest, result *Result) {
+	// Compile the batch, or drop the failing packages and compile it again.
+	if _, err := r.compilePackageBatch(ctx, req, result); err == nil {
+		return
+	}
+	r.markPackageCompileFailures(ctx, req, result)
+	compileResult, err := r.compilePackageBatch(ctx, req, result)
+	if err == nil {
+		return
+	}
+
+	// The packages that compile alone still fail together.
+	result.Diagnostics = append(result.Diagnostics, resultDiagnostics(compileResult)...)
+	for idx := range result.Packages {
+		pkg := &result.Packages[idx]
+		if !shouldCompilePackage(*pkg) {
 			continue
 		}
-		compileReq := &compiler.CompileRequest{
-			Patterns:                  []string{importPath},
-			Dir:                       req.Dir,
-			OutputPath:                outputRoot,
-			BuildFlags:                slices.Clone(req.BuildFlags),
-			OverrideDirs:              slices.Clone(req.OverrideDirs),
-			ProtobufTypeScriptBinding: req.ProtobufTypeScriptBinding,
-			DependencyMode:            compiler.DependencyModeAll,
-			RuntimeEmissionMode:       compiler.RuntimeEmissionModeEmit,
-			Tests:                     false,
+		pkg.Action = ActionFail
+		pkg.Owner = classifyDiagnostics(resultDiagnostics(compileResult))
+		markCompilePhase(pkg, compileResult, false)
+		pkg.Error = err.Error()
+	}
+}
+
+// compilePackageBatch compiles every runnable package with its tests into
+// req.OutputRoot and marks them compiled when the program compiles.
+func (r *Runner) compilePackageBatch(ctx context.Context, req *normalizedRequest, result *Result) (*compiler.CompilationResult, error) {
+	// Compile the runnable packages as one program.
+	packagePaths := runnablePackagePaths(result.Packages)
+	if len(packagePaths) == 0 {
+		return nil, nil
+	}
+	compileResult, err := r.service.Compile(ctx, packageTestCompileRequest(req, packagePaths, req.OutputRoot))
+	if err != nil {
+		return compileResult, err
+	}
+
+	// Record its diagnostics and mark each package compiled.
+	if compileResult != nil {
+		result.Diagnostics = append(result.Diagnostics, compileResult.Diagnostics...)
+		appendAsyncReport(result, compileResult)
+	}
+	for idx := range result.Packages {
+		if shouldCompilePackage(result.Packages[idx]) {
+			markCompilePhase(&result.Packages[idx], compileResult, true)
 		}
-		compileResult, compileErr := r.service.Compile(ctx, compileReq)
+	}
+	return compileResult, nil
+}
+
+// markPackageCompileFailures compiles each runnable package alone into a
+// scratch root and marks the packages that fail.
+func (r *Runner) markPackageCompileFailures(ctx context.Context, req *normalizedRequest, result *Result) {
+	for idx := range result.Packages {
+		pkg := &result.Packages[idx]
+		if !shouldCompilePackage(*pkg) {
+			continue
+		}
+		scratch, err := os.MkdirTemp(req.WorkDir, "compile-")
+		if err != nil {
+			pkg.Action = ActionFail
+			pkg.Owner = OwnerTestRunner
+			pkg.Error = errors.Wrap(err, "create scratch compile root").Error()
+			continue
+		}
+		compileResult, err := r.service.Compile(ctx, packageTestCompileRequest(req, []string{pkg.PackagePath}, scratch))
+		_ = os.RemoveAll(scratch)
+		if err == nil {
+			continue
+		}
 		if compileResult != nil {
 			result.Diagnostics = append(result.Diagnostics, compileResult.Diagnostics...)
 		}
-		if compileErr != nil {
-			pkg.Action = ActionFail
-			if compileResult != nil {
-				pkg.Owner = classifyDiagnostics(compileResult.Diagnostics)
-			}
-			markCompilePhase(pkg, compileResult, false)
-			pkg.Error = compileErr.Error()
-			return false
-		}
-		markCompilePhase(pkg, compileResult, true)
+		pkg.Action = ActionFail
+		pkg.Owner = classifyDiagnostics(resultDiagnostics(compileResult))
+		markCompilePhase(pkg, compileResult, false)
+		pkg.Error = err.Error()
 	}
-	return true
 }
 
-func (r *Runner) compilePackageOutputs(ctx context.Context, req *normalizedRequest, result *Result) []string {
-	outputRoots := make([]string, len(result.Packages))
-	if r.compilePackageBatch(ctx, req, result, outputRoots) {
-		return outputRoots
-	}
-	return r.compilePackageOutputsIndividually(ctx, req, result)
-}
-
-func (r *Runner) compilePackageBatch(ctx context.Context, req *normalizedRequest, result *Result, outputRoots []string) bool {
-	packagePaths := runnablePackagePaths(result.Packages)
-	if len(packagePaths) == 0 {
-		return true
-	}
-	testCompileReq := &compiler.CompileRequest{
+// packageTestCompileRequest builds the request that compiles packagePaths
+// with their tests and every dependency into outputPath.
+func packageTestCompileRequest(req *normalizedRequest, packagePaths []string, outputPath string) *compiler.CompileRequest {
+	return &compiler.CompileRequest{
 		Patterns:                  packagePaths,
 		Dir:                       req.Dir,
-		OutputPath:                req.OutputRoot,
+		OutputPath:                outputPath,
 		BuildFlags:                slices.Clone(req.BuildFlags),
 		OverrideDirs:              slices.Clone(req.OverrideDirs),
 		ProtobufTypeScriptBinding: req.ProtobufTypeScriptBinding,
@@ -741,87 +733,6 @@ func (r *Runner) compilePackageBatch(ctx context.Context, req *normalizedRequest
 		Tests:                     true,
 		ReportAsync:               req.ReportAsync,
 	}
-	testCompileResult, testCompileErr := r.service.Compile(ctx, testCompileReq)
-	if testCompileErr != nil {
-		return false
-	}
-	if testCompileResult != nil {
-		result.Diagnostics = append(result.Diagnostics, testCompileResult.Diagnostics...)
-		appendAsyncReport(result, testCompileResult)
-	}
-	for idx := range result.Packages {
-		if !shouldCompilePackage(result.Packages[idx]) {
-			continue
-		}
-		outputRoots[idx] = req.OutputRoot
-		markCompilePhase(&result.Packages[idx], testCompileResult, true)
-	}
-	return true
-}
-
-func (r *Runner) compilePackageOutputsIndividually(ctx context.Context, req *normalizedRequest, result *Result) []string {
-	outputRoots := make([]string, len(result.Packages))
-	for idx := range result.Packages {
-		if !shouldCompilePackage(result.Packages[idx]) {
-			continue
-		}
-		outputRoot := packageOutputRoot(req, idx)
-		outputRoots[idx] = outputRoot
-		compileReq := &compiler.CompileRequest{
-			Patterns:                  []string{result.Packages[idx].PackagePath},
-			Dir:                       req.Dir,
-			OutputPath:                outputRoot,
-			BuildFlags:                slices.Clone(req.BuildFlags),
-			OverrideDirs:              slices.Clone(req.OverrideDirs),
-			ProtobufTypeScriptBinding: req.ProtobufTypeScriptBinding,
-			DependencyMode:            compiler.DependencyModeAll,
-			RuntimeEmissionMode:       compiler.RuntimeEmissionModeEmit,
-			Tests:                     false,
-		}
-		if compileResult, compileErr := r.service.Compile(ctx, compileReq); compileErr != nil {
-			result.Packages[idx].Action = ActionFail
-			if compileResult != nil {
-				result.Diagnostics = append(result.Diagnostics, compileResult.Diagnostics...)
-				result.Packages[idx].Owner = classifyDiagnostics(compileResult.Diagnostics)
-			}
-			markCompilePhase(&result.Packages[idx], compileResult, false)
-			result.Packages[idx].Error = compileErr.Error()
-			continue
-		} else if compileResult != nil {
-			result.Diagnostics = append(result.Diagnostics, compileResult.Diagnostics...)
-			markCompilePhase(&result.Packages[idx], compileResult, true)
-		}
-		if !r.compileTestImports(ctx, req, outputRoot, &result.Packages[idx], result) {
-			continue
-		}
-		testCompileReq := &compiler.CompileRequest{
-			Patterns:                  []string{result.Packages[idx].PackagePath},
-			Dir:                       req.Dir,
-			OutputPath:                outputRoot,
-			BuildFlags:                slices.Clone(req.BuildFlags),
-			OverrideDirs:              slices.Clone(req.OverrideDirs),
-			ProtobufTypeScriptBinding: req.ProtobufTypeScriptBinding,
-			DependencyMode:            compiler.DependencyModeAll,
-			RuntimeEmissionMode:       compiler.RuntimeEmissionModeEmit,
-			Tests:                     true,
-			ReportAsync:               req.ReportAsync,
-		}
-		if compileResult, compileErr := r.service.Compile(ctx, testCompileReq); compileErr != nil {
-			result.Packages[idx].Action = ActionFail
-			if compileResult != nil {
-				result.Diagnostics = append(result.Diagnostics, compileResult.Diagnostics...)
-				result.Packages[idx].Owner = classifyDiagnostics(compileResult.Diagnostics)
-			}
-			markCompilePhase(&result.Packages[idx], compileResult, false)
-			result.Packages[idx].Error = compileErr.Error()
-			continue
-		} else if compileResult != nil {
-			result.Diagnostics = append(result.Diagnostics, compileResult.Diagnostics...)
-			appendAsyncReport(result, compileResult)
-			markCompilePhase(&result.Packages[idx], compileResult, true)
-		}
-	}
-	return outputRoots
 }
 
 // appendAsyncReport adds the async report of a test binary compile to
@@ -1075,10 +986,6 @@ func failurePhases(owner Owner) PackagePhases {
 		TypeCheck: PhaseStatusSkip,
 		Runtime:   PhaseStatusSkip,
 	}
-}
-
-func packageOutputRoot(req *normalizedRequest, idx int) string {
-	return filepath.Join(req.OutputRoot, "package-"+strconv.Itoa(idx))
 }
 
 func packageRunnerFile(idx int) string {
@@ -1500,9 +1407,9 @@ func browserLaunchOptions(req *normalizedRequest) string {
 	return "{ launchOptions: { " + strings.Join(options, ", ") + " } }"
 }
 
-func renderBrowserVitestConfig(req *normalizedRequest, outputRoot string, runnerFile string, sourceDir string) string {
+func renderBrowserVitestConfig(req *normalizedRequest, runnerFile string, sourceDir string) string {
 	// Paths are written with forward slashes, and the timeouts default to 30 s.
-	outputRoot = filepath.ToSlash(outputRoot)
+	outputRoot := filepath.ToSlash(req.OutputRoot)
 	runnerFile = filepath.ToSlash(runnerFile)
 	timeoutMS := int64(30000)
 	if req.Timeout > 0 {
@@ -1567,7 +1474,7 @@ func renderBrowserVitestConfig(req *normalizedRequest, outputRoot string, runner
 	return b.String()
 }
 
-func renderTypeScriptProject(req *normalizedRequest, outputRoot string, runnerFile string, projectFile string, nodeTypesAvailable bool) string {
+func renderTypeScriptProject(req *normalizedRequest, runnerFile string, projectFile string, nodeTypesAvailable bool) string {
 	var b strings.Builder
 	b.WriteString("{\n")
 	b.WriteString("  \"compilerOptions\": {\n")
@@ -1596,7 +1503,7 @@ func renderTypeScriptProject(req *normalizedRequest, outputRoot string, runnerFi
 	}
 	b.WriteString("      \"*\": [\"./*\"],\n")
 	b.WriteString("      \"@goscript/*\": [")
-	b.WriteString(strconv.Quote("./" + typeScriptOutputAlias(req, outputRoot)))
+	b.WriteString(strconv.Quote(typeScriptOutputAlias(req)))
 	b.WriteString("]\n")
 	b.WriteString("    }\n")
 	b.WriteString("  },\n")
@@ -1616,22 +1523,7 @@ func renderTypeScriptProject(req *normalizedRequest, outputRoot string, runnerFi
 	return b.String()
 }
 
-func renderRuntimeTypeScriptProject(req *normalizedRequest, outputRoots []string, nodeTypesAvailable bool) string {
-	var aliases []string
-	seen := make(map[string]bool)
-	for _, outputRoot := range outputRoots {
-		if outputRoot == "" {
-			continue
-		}
-		alias := "./" + typeScriptOutputAlias(req, outputRoot)
-		if !seen[alias] {
-			seen[alias] = true
-			aliases = append(aliases, alias)
-		}
-	}
-	if len(aliases) == 0 && req.OutputRoot != "" {
-		aliases = append(aliases, "./"+typeScriptOutputAlias(req, req.OutputRoot))
-	}
+func renderRuntimeTypeScriptProject(req *normalizedRequest, nodeTypesAvailable bool) string {
 	var b strings.Builder
 	b.WriteString("{\n")
 	b.WriteString("  \"compilerOptions\": {\n")
@@ -1660,12 +1552,7 @@ func renderRuntimeTypeScriptProject(req *normalizedRequest, outputRoots []string
 	}
 	b.WriteString("      \"*\": [\"./*\"],\n")
 	b.WriteString("      \"@goscript/*\": [")
-	for idx, alias := range aliases {
-		if idx != 0 {
-			b.WriteString(", ")
-		}
-		b.WriteString(strconv.Quote(alias))
-	}
+	b.WriteString(strconv.Quote(typeScriptOutputAlias(req)))
 	b.WriteString("]\n")
 	b.WriteString("    }\n")
 	b.WriteString("  },\n")
@@ -1689,15 +1576,14 @@ func typeScriptBuildInfoFile(projectFile string) string {
 	return ".goscript/" + name + ".tsbuildinfo"
 }
 
-func typeScriptOutputPattern(req *normalizedRequest, outputRoot string) string {
+// typeScriptOutputAlias returns the workspace-relative path pattern that
+// @goscript imports resolve to under the output root.
+func typeScriptOutputAlias(req *normalizedRequest) string {
+	outputRoot := req.OutputRoot
 	if rel, err := filepath.Rel(req.WorkDir, outputRoot); err == nil {
-		return filepath.ToSlash(rel)
+		outputRoot = rel
 	}
-	return filepath.ToSlash(outputRoot)
-}
-
-func typeScriptOutputAlias(req *normalizedRequest, outputRoot string) string {
-	return filepath.ToSlash(filepath.Join(typeScriptOutputPattern(req, outputRoot), "@goscript", "*"))
+	return "./" + filepath.ToSlash(filepath.Join(outputRoot, "@goscript", "*"))
 }
 
 func markCompilePhase(pkg *PackageResult, result *compiler.CompilationResult, passed bool) {
@@ -1772,12 +1658,12 @@ func diagnosticsSummary(diagnostics []compiler.Diagnostic) string {
 }
 
 // runtimeDependencies returns the npm packages that the GoScript runtime
-// declares and that the emitted output roots import, mapping each package
+// declares and that the output under outputRoot imports, mapping each package
 // name to its version.
-func runtimeDependencies(outputRoots []string) (map[string]string, error) {
+func runtimeDependencies(outputRoot string) (map[string]string, error) {
 	declared, err := goscript.RuntimeDependencies()
 	if err != nil {
 		return nil, errors.Wrap(err, "read GoScript runtime npm dependencies")
 	}
-	return tsworkspace.ImportedPackages(outputRoots, declared)
+	return tsworkspace.ImportedPackages(outputRoot, declared)
 }

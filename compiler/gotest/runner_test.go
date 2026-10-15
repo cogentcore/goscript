@@ -787,6 +787,102 @@ func TestRunnerCompilesAddressOfDereferencePackage(t *testing.T) {
 	}
 }
 
+func TestRunnerSharesOneProgramAfterCompileFailure(t *testing.T) {
+	moduleDir := writeFixture(t, map[string]string{
+		"go.mod": "module example.test/sharedprogram\n\ngo 1.25.3\n",
+		"dep/dep.go": strings.Join([]string{
+			"package dep",
+			"",
+			"type Getter interface{ Get() int }",
+			"",
+			"func Read(g Getter) int { return g.Get() }",
+			"",
+		}, "\n"),
+		"async/value.go": "package async\n",
+		"async/value_test.go": strings.Join([]string{
+			"package async",
+			"",
+			"import (",
+			"\t\"testing\"",
+			"",
+			"\t\"example.test/sharedprogram/dep\"",
+			")",
+			"",
+			"type chanGetter struct{ ch chan int }",
+			"",
+			"func (g chanGetter) Get() int { return <-g.ch }",
+			"",
+			"func TestRead(t *testing.T) {",
+			"\tch := make(chan int, 1)",
+			"\tch <- 3",
+			"\tif dep.Read(chanGetter{ch: ch}) != 3 {",
+			"\t\tt.Fatal(\"bad value\")",
+			"\t}",
+			"}",
+			"",
+		}, "\n"),
+		"broken/value.go": "package broken\n",
+		"broken/value_test.go": strings.Join([]string{
+			"package broken",
+			"",
+			"import \"testing\"",
+			"",
+			"func TestBroken(t *testing.T) {",
+			"\tvalues := []*struct{ n int }{{n: 1}}",
+			"\tif values[0].n != 1 {",
+			"\t\tt.Fatal(\"bad value\")",
+			"\t}",
+			"}",
+			"",
+		}, "\n"),
+		"sync/value.go": "package sync\n",
+		"sync/value_test.go": strings.Join([]string{
+			"package sync",
+			"",
+			"import (",
+			"\t\"testing\"",
+			"",
+			"\t\"example.test/sharedprogram/dep\"",
+			")",
+			"",
+			"type fixedGetter struct{}",
+			"",
+			"func (fixedGetter) Get() int { return 4 }",
+			"",
+			"func TestRead(t *testing.T) {",
+			"\tif dep.Read(fixedGetter{}) != 4 {",
+			"\t\tt.Fatal(\"bad value\")",
+			"\t}",
+			"}",
+			"",
+		}, "\n"),
+	})
+
+	// Run all three packages, so the broken one fails the first batch.
+	result, err := NewRunner().Run(context.Background(), &Request{
+		Dir:      moduleDir,
+		Patterns: []string{"./..."},
+		Timeout:  30 * time.Second,
+	})
+	if err != nil {
+		t.Fatalf("run shared program test: %v", err)
+	}
+
+	// The async package colors dep.Read async, so the sync package must
+	// await it too: both packages run against the same program.
+	for _, path := range []string{"example.test/sharedprogram/async", "example.test/sharedprogram/sync"} {
+		if pkg := requirePackageResult(t, result, path); pkg.Action != ActionPass {
+			t.Fatalf("%s should pass in the shared program: %#v", path, pkg)
+		}
+	}
+
+	// The broken package keeps its own compile failure.
+	broken := requirePackageResult(t, result, "example.test/sharedprogram/broken")
+	if broken.Action != ActionFail || broken.Phases.Compile != PhaseStatusFail {
+		t.Fatalf("broken package should carry its compile failure: %#v", broken)
+	}
+}
+
 func TestRunnerDoesNotCompileDependencyTests(t *testing.T) {
 	moduleDir := writeFixture(t, map[string]string{
 		"go.mod": "module example.test/deptest\n\ngo 1.25.3\n",
@@ -1298,7 +1394,7 @@ func TestRunnerReportsBrowserRuntimeFailureRecord(t *testing.T) {
 
 func TestBrowserVitestConfigLaunchOptions(t *testing.T) {
 	// Without launch options the provider keeps its defaults.
-	config := renderBrowserVitestConfig(&normalizedRequest{}, "/out", "runner-0.ts", "/src/pkg")
+	config := renderBrowserVitestConfig(&normalizedRequest{OutputRoot: "/out"}, "runner-0.ts", "/src/pkg")
 	if !strings.Contains(config, "provider: playwright(),") {
 		t.Fatalf("expected default playwright provider, got:\n%s", config)
 	}
@@ -1307,7 +1403,8 @@ func TestBrowserVitestConfigLaunchOptions(t *testing.T) {
 	config = renderBrowserVitestConfig(&normalizedRequest{
 		BrowserChannel: "chrome",
 		BrowserArgs:    []string{"--enable-unsafe-webgpu", "--use-angle=metal"},
-	}, "/out", "runner-0.ts", "/src/pkg")
+		OutputRoot:     "/out",
+	}, "runner-0.ts", "/src/pkg")
 	want := `provider: playwright({ launchOptions: { channel: "chrome", args: ["--enable-unsafe-webgpu", "--use-angle=metal"] } }),`
 	if !strings.Contains(config, want) {
 		t.Fatalf("expected %q in config, got:\n%s", want, config)
@@ -1316,7 +1413,7 @@ func TestBrowserVitestConfigLaunchOptions(t *testing.T) {
 
 func TestBrowserVitestConfigHostFS(t *testing.T) {
 	// The host filesystem command resolves paths in the package directory.
-	config := renderBrowserVitestConfig(&normalizedRequest{}, "/out", "runner-0.ts", "/src/pkg")
+	config := renderBrowserVitestConfig(&normalizedRequest{OutputRoot: "/out"}, "runner-0.ts", "/src/pkg")
 	for _, want := range []string{
 		`import { hostFS } from "./goscript-browser-hostfs.mts"`,
 		`commands: { goscriptHostFS: hostFS("/src/pkg") },`,
@@ -1329,7 +1426,7 @@ func TestBrowserVitestConfigHostFS(t *testing.T) {
 
 func TestBrowserVitestConfigAPIHost(t *testing.T) {
 	// The browser API server listens on, and the page opens, 127.0.0.1.
-	config := renderBrowserVitestConfig(&normalizedRequest{}, "/out", "runner-0.ts", "/src/pkg")
+	config := renderBrowserVitestConfig(&normalizedRequest{OutputRoot: "/out"}, "runner-0.ts", "/src/pkg")
 	want := `api: { host: "127.0.0.1" },`
 	if !strings.Contains(config, want) {
 		t.Fatalf("expected %q in config, got:\n%s", want, config)
@@ -1716,10 +1813,11 @@ func TestRenderCombinedRunnerChangesToEachPackageSourceDir(t *testing.T) {
 
 func TestRenderTypeScriptProjectDisablesAmbientTypePackages(t *testing.T) {
 	req := &normalizedRequest{
-		WorkDir: "/work",
+		WorkDir:    "/work",
+		OutputRoot: "/work/output",
 	}
 
-	tsconfig := renderTypeScriptProject(req, "/work/output/package-0", "runner-0.ts", "tsconfig-0.json", false)
+	tsconfig := renderTypeScriptProject(req, "runner-0.ts", "tsconfig-0.json", false)
 	if !strings.Contains(tsconfig, "\"types\": []") {
 		t.Fatalf("expected generated tsconfig to disable ambient @types packages: %s", tsconfig)
 	}
@@ -1729,7 +1827,7 @@ func TestRenderTypeScriptProjectDisablesAmbientTypePackages(t *testing.T) {
 	if strings.Contains(tsconfig, "\"incremental\": true") || strings.Contains(tsconfig, "\"tsBuildInfoFile\"") {
 		t.Fatalf("expected generated tsconfig to keep one-shot typecheck by default: %s", tsconfig)
 	}
-	if strings.Contains(tsconfig, "output/package-0/**/*.ts") {
+	if strings.Contains(tsconfig, "output/**/*.ts") {
 		t.Fatalf("expected generated tsconfig to typecheck from runner roots, not output globs: %s", tsconfig)
 	}
 }
@@ -1737,10 +1835,11 @@ func TestRenderTypeScriptProjectDisablesAmbientTypePackages(t *testing.T) {
 func TestRenderBrowserTypeScriptProjectsExcludeNodeAmbientDeclarations(t *testing.T) {
 	req := &normalizedRequest{
 		WorkDir:        "/work",
+		OutputRoot:     "/work/output",
 		RuntimeBackend: RuntimeBackendBrowser,
 	}
 
-	packageTSConfig := renderTypeScriptProject(req, "/work/output/package-0", "runner-0.ts", "tsconfig-0.json", false)
+	packageTSConfig := renderTypeScriptProject(req, "runner-0.ts", "tsconfig-0.json", false)
 	if strings.Contains(packageTSConfig, "goscript-node.d.ts") {
 		t.Fatalf("browser package tsconfig should not include node ambient declarations: %s", packageTSConfig)
 	}
@@ -1748,7 +1847,7 @@ func TestRenderBrowserTypeScriptProjectsExcludeNodeAmbientDeclarations(t *testin
 		t.Fatalf("browser package tsconfig should include browser ambient declarations: %s", packageTSConfig)
 	}
 
-	aggregateTSConfig := renderRuntimeTypeScriptProject(req, []string{"/work/output"}, false)
+	aggregateTSConfig := renderRuntimeTypeScriptProject(req, false)
 	if strings.Contains(aggregateTSConfig, "goscript-node.d.ts") {
 		t.Fatalf("browser aggregate tsconfig should not include node ambient declarations: %s", aggregateTSConfig)
 	}
@@ -1764,10 +1863,11 @@ func TestRenderBrowserTypeScriptProjectsExcludeNodeAmbientDeclarations(t *testin
 
 func TestRenderTypeScriptProjectUsesNodeTypesWhenAvailable(t *testing.T) {
 	req := &normalizedRequest{
-		WorkDir: "/work",
+		WorkDir:    "/work",
+		OutputRoot: "/work/output",
 	}
 
-	tsconfig := renderTypeScriptProject(req, "/work/output/package-0", "runner-0.ts", "tsconfig-0.json", true)
+	tsconfig := renderTypeScriptProject(req, "runner-0.ts", "tsconfig-0.json", true)
 	if !strings.Contains(tsconfig, "\"types\": [\"node\"]") {
 		t.Fatalf("expected generated tsconfig to opt into node types: %s", tsconfig)
 	}
@@ -1775,10 +1875,11 @@ func TestRenderTypeScriptProjectUsesNodeTypesWhenAvailable(t *testing.T) {
 
 func TestRenderRuntimeTypeScriptProjectDisablesEmit(t *testing.T) {
 	req := &normalizedRequest{
-		WorkDir: "/work",
+		WorkDir:    "/work",
+		OutputRoot: "/work/output",
 	}
 
-	tsconfig := renderRuntimeTypeScriptProject(req, []string{"/work/output"}, false)
+	tsconfig := renderRuntimeTypeScriptProject(req, false)
 	if !strings.Contains(tsconfig, "\"noEmit\": true") {
 		t.Fatalf("expected aggregate tsconfig to disable emit: %s", tsconfig)
 	}
@@ -1814,9 +1915,10 @@ func TestMaterializeRuntimeModuleShimsReexportsGeneratedTypeScript(t *testing.T)
 
 	req := &normalizedRequest{
 		WorkDir:        workDir,
+		OutputRoot:     outputRoot,
 		RuntimeBackend: RuntimeBackendBun,
 	}
-	phase := materializeRuntimeModuleShims(req, []string{outputRoot})
+	phase := materializeRuntimeModuleShims(req)
 	if phase.Failed() {
 		t.Fatalf("materialize shims: %s", phase.Error)
 	}
@@ -1844,16 +1946,17 @@ func TestMaterializeRuntimeModuleShimsReexportsGeneratedTypeScript(t *testing.T)
 func TestRenderTypeScriptProjectsCanUseIncrementalBuildInfo(t *testing.T) {
 	req := &normalizedRequest{
 		WorkDir:              "/work",
+		OutputRoot:           "/work/output",
 		IncrementalTypeCheck: true,
 	}
 
-	packageTSConfig := renderTypeScriptProject(req, "/work/output/package-0", "runner-0.ts", "tsconfig-0.json", false)
+	packageTSConfig := renderTypeScriptProject(req, "runner-0.ts", "tsconfig-0.json", false)
 	if !strings.Contains(packageTSConfig, "\"incremental\": true") ||
 		!strings.Contains(packageTSConfig, "\"tsBuildInfoFile\": \".goscript/tsconfig-0.tsbuildinfo\"") {
 		t.Fatalf("expected package tsconfig to cache package typecheck state: %s", packageTSConfig)
 	}
 
-	aggregateTSConfig := renderRuntimeTypeScriptProject(req, []string{"/work/output"}, false)
+	aggregateTSConfig := renderRuntimeTypeScriptProject(req, false)
 	if !strings.Contains(aggregateTSConfig, "\"incremental\": true") ||
 		!strings.Contains(aggregateTSConfig, "\"tsBuildInfoFile\": \".goscript/tsconfig.tsbuildinfo\"") {
 		t.Fatalf("expected aggregate tsconfig to cache typecheck state: %s", aggregateTSConfig)
