@@ -27,7 +27,7 @@ class GoMap<K, V> extends Map<K, V> {
   }
 
   override set(key: K, value: V): this {
-    if (this.pointerKeys) {
+    if (this.pointerKeys || isInterfacePointerKey(key)) {
       key = this.storedKey(key)
       if (typeof key === 'object' && key !== null) {
         this.pointerIndex ??= new Map<object, K>()
@@ -54,7 +54,7 @@ class GoMap<K, V> extends Map<K, V> {
 
   override delete(key: K): boolean {
     const stored = this.storedKey(key)
-    if (this.pointerKeys) {
+    if (this.pointerKeys || isInterfacePointerKey(key)) {
       if (typeof key === 'object' && key !== null)
         this.pointerIndex?.delete(canonicalPointerIdentity(key))
     } else if (typeof key !== 'string') this.removeStructKey(stored)
@@ -92,6 +92,19 @@ class GoMap<K, V> extends Map<K, V> {
     if (this.pointerKeys) {
       return typeof key === 'object' && key !== null ?
           (this.pointerIndex?.get(canonicalPointerIdentity(key)) ?? key)
+        : key
+    }
+
+    // A pointer in an interface key is found by the storage it points to,
+    // and is the stored key only if Go also compares them equal, which
+    // takes the same dynamic type.
+    if (isInterfacePointerKey(key)) {
+      const stored = this.pointerIndex?.get(canonicalPointerIdentity(key))
+      return (
+          stored !== undefined &&
+            (stored === key || comparableEqual(stored, key))
+        ) ?
+          stored
         : key
     }
     if (typeof key === 'string') {
@@ -140,6 +153,23 @@ class GoMap<K, V> extends Map<K, V> {
       this.structKeys!.set(canonical, remaining)
     }
   }
+}
+
+// isInterfacePointerKey reports whether key is a pointer held in an
+// interface, which comparableEqual finds equal only to the same pointer, or
+// to a view of the same storage of the same type. GoMap indexes such keys by
+// their storage, as it does the keys of pointer-key maps, instead of
+// comparing them with every key of the map, and never by the fields they
+// point to, which may change. A typed nil pointer equals any other of its
+// type, so it is not one.
+function isInterfacePointerKey(key: unknown): key is object {
+  if (typeof key !== 'object' || key === null) return false
+  const boxed = key as { __goType?: unknown; __isTypedNil?: unknown }
+  return (
+    typeof boxed.__goType === 'string' &&
+    boxed.__goType.startsWith('*') &&
+    boxed.__isTypedNil !== true
+  )
 }
 
 // makeMap receives pointer or generic key metadata from the compiler; other
@@ -228,7 +258,9 @@ function findMapEntry<K, V>(
   if (map.has(key)) {
     return { found: true, key, value: map.get(key)! }
   }
-  if (map instanceof GoMap && map.pointerKeys) return { found: false }
+  if (map instanceof GoMap && (map.pointerKeys || isInterfacePointerKey(key))) {
+    return { found: false }
+  }
   if (typeof key === 'string') return { found: false }
   if (key === null || (typeof key !== 'object' && typeof key !== 'function')) {
     return { found: false }
@@ -252,8 +284,9 @@ function findMapEntry<K, V>(
 // within a bucket. Keys with other fields, such as interfaces, remain on the
 // comparison scan.
 function structMapKey(key: unknown): string | undefined {
-  // Only a struct object has a canonical key, built from its own fields.
-  if (!isStructObject(key)) return undefined
+  // Only a struct object has a canonical key, built from its own fields; a
+  // pointer in an interface is found by its storage instead.
+  if (!isStructObject(key) || isInterfacePointerKey(key)) return undefined
   const plan = structKeyPlan(key)
   let text = ''
   for (let i = 0; i < plan.length; i++) {
