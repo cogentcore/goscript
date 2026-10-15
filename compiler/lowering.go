@@ -1965,8 +1965,8 @@ func (o *LoweringOwner) lowerGenDecl(ctx lowerFileContext, decl *ast.GenDecl) ([
 							declName + " = " + value + "\n\t}\n}"
 						decls = append(decls, loweredDecl{code: initCode, indexExport: initIndexExport})
 						// A table of constant data is built when it is first read.
-						if idx >= len(typed.Values) || len(typed.Names) != len(typed.Values) ||
-							!packageVarInitIsDeferred(ctx.semPkg.source.TypesInfo, typed.Values[idx]) {
+						if !ctx.semPkg.deferredVars[obj] && (idx >= len(typed.Values) || len(typed.Names) != len(typed.Values) ||
+							!packageVarInitIsDeferred(ctx.semPkg.source.TypesInfo, typed.Values[idx])) {
 							decls = append(decls, loweredDecl{packageInit: &packageInitCall{obj: obj, name: initName}})
 						}
 						getterCode += "if (((" + declName + ") as any) === undefined) {\n\t\t" +
@@ -2043,8 +2043,10 @@ func (o *LoweringOwner) topLevelInitializerNeedsAwait(ctx lowerFileContext, expr
 		if o.callUsesOverridePackage(ctx, call.Fun) {
 			return true
 		}
+		// A function of another package is awaited, unless it is effect free
+		// and so makes no calls.
 		fn := calledFunction(ctx.semPkg.source, call.Fun)
-		if fn != nil && fn.Pkg() != nil && fn.Pkg().Path() != ctx.semPkg.pkgPath {
+		if fn != nil && fn.Pkg() != nil && fn.Pkg().Path() != ctx.semPkg.pkgPath && !ctx.model.effectFreeFuncs[fn] {
 			needsAwait = true
 			return false
 		}
