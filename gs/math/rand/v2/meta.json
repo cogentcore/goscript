@@ -1,0 +1,10 @@
+{
+  "dependencies": ["errors", "internal/chacha8rand", "math/rand"],
+  "callbackAsyncFunctions": {
+    "Shuffle": true,
+    "Rand.Shuffle": true
+  },
+  "syncInterfaces": {
+    "Source": true
+  }
+}
