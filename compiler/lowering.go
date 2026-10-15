@@ -3,6 +3,7 @@ package compiler
 import (
 	"cmp"
 	"context"
+	"encoding/base64"
 	"encoding/hex"
 	"go/ast"
 	"go/constant"
@@ -2930,7 +2931,7 @@ func (o *LoweringOwner) lowerGoEmbedValue(
 		return lowerGoStringLiteral(string(data)), nil
 	}
 	if slice, ok := types.Unalias(typ).Underlying().(*types.Slice); ok && isByteType(slice.Elem()) {
-		return byteSliceLiteral(data), nil
+		return o.embeddedBytesLiteral(data), nil
 	}
 	diag := loweringUnsupportedPos(ctx, diagPos, "declaration", ctx.semPkg.pkgPath, "unsupported go:embed target type")
 	diag.Detail = "target type: " + types.TypeString(typ, func(pkg *types.Package) string {
@@ -2968,7 +2969,7 @@ func (o *LoweringOwner) lowerGoEmbedFSValue(ctx lowerFileContext, diagPos token.
 	slices.Sort(paths)
 	entries := make([]string, 0, len(paths))
 	for _, path := range paths {
-		entries = append(entries, "["+lowerGoStringLiteral(path)+", "+byteSliceLiteral(filesByPath[path])+"]")
+		entries = append(entries, "["+lowerGoStringLiteral(path)+", "+o.embeddedBytesLiteral(filesByPath[path])+"]")
 	}
 	builtinAlias := o.runtimeOwner.BuiltinImport().Alias
 	return builtinAlias + ".markAsStructValue(new " + embedAlias + ".FS(new globalThis.Map<string, Uint8Array>([" + strings.Join(entries, ", ") + "])))", nil
@@ -3131,6 +3132,20 @@ func isEmbedFSType(typ types.Type) bool {
 		return false
 	}
 	return named.Obj().Pkg().Path() == "embed" && named.Obj().Name() == "FS"
+}
+
+// embeddedBytesLiteralMin is the length from which embedded data is written
+// as base64 text instead of an array literal of its bytes.
+const embeddedBytesLiteralMin = 128
+
+// embeddedBytesLiteral returns a new Uint8Array of the bytes of an embedded
+// file. Large files are decoded from base64 text, which is about a third of
+// the size of an array literal and much faster for the engine to parse.
+func (o *LoweringOwner) embeddedBytesLiteral(data []byte) string {
+	if len(data) < embeddedBytesLiteralMin {
+		return byteSliceLiteral(data)
+	}
+	return o.runtimeOwner.QualifiedHelper(RuntimeHelperBytesFromBase64) + "(\"" + base64.StdEncoding.EncodeToString(data) + "\")"
 }
 
 func byteSliceLiteral(data []byte) string {
