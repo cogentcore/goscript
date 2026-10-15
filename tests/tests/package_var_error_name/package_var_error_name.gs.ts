@@ -2,11 +2,8 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as __goscript_load from "./load.gs.ts"
-
 import * as __goscript_package_init from "./__goscript_package_init.gs.ts"
-import "./load.gs.ts"
 
 export let Error: $.GoError = null! as $.GoError
 

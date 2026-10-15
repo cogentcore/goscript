@@ -2,9 +2,7 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as regexp from "@goscript/regexp/index.js"
-import "@goscript/regexp/index.js"
 
 export const nonASCII: string = "[\xc2\x80-\xed\x9f\xbf\xee\x80\x80-\xef\xbf\xbd\xf0\x90\x80\x80-\xf4\x8f\xbf\xbf]"
 

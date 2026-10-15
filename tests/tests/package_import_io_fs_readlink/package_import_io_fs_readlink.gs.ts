@@ -2,9 +2,7 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as fs from "@goscript/io/fs/index.js"
-import "@goscript/io/fs/index.js"
 
 export class emptyFS {
 	public _fields: {

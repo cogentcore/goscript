@@ -2,13 +2,9 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as embed from "@goscript/embed/index.js"
-
 import * as io from "@goscript/io/index.js"
-
 import * as fs from "@goscript/io/fs/index.js"
-import "@goscript/embed/index.js"
 import "@goscript/io/index.js"
 import "@goscript/io/fs/index.js"
 

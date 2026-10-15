@@ -2,12 +2,8 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as randv1 from "@goscript/math/rand/index.js"
-
 import * as rand from "@goscript/math/rand/v2/index.js"
-import "@goscript/math/rand/index.js"
-import "@goscript/math/rand/v2/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	let seed: Uint8Array = $.arrayValue(new Uint8Array(32))

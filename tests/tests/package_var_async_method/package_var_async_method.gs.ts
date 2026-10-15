@@ -2,11 +2,9 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as sync from "@goscript/sync/index.js"
-import "@goscript/sync/index.js"
 
-export let cache: $.VarRef<sync.Map> = $.varRef($.markAsStructValue(new sync.Map()))
+export let cache = $.varRef($.markAsStructValue(new sync.Map()))
 
 export function __goscript_set_cache(__goscriptValue: sync.Map): void {
 	$.assignStruct(cache.value, __goscriptValue)

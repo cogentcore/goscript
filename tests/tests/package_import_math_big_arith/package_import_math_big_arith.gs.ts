@@ -2,15 +2,10 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as constant from "@goscript/go/constant/index.js"
-
 import * as token from "@goscript/go/token/index.js"
-
 import * as big from "@goscript/math/big/index.js"
-import "@goscript/go/constant/index.js"
 import "@goscript/go/token/index.js"
-import "@goscript/math/big/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	let y = 13835058055282163712n

@@ -106,7 +106,7 @@ export async function main(): globalThis.Promise<void> {
 	let genericOK = __goscriptTuple0[1]
 	await $.println("Generic interface assertion:", $.int(genericAsserted), genericOK)
 
-	let flag: $.VarRef<boolean> = $.varRef(false)
+	let flag = $.varRef(false)
 	let stringer: Stringer | null = $.namedValueInterfaceValue<Stringer | null>(newMyBool(true, flag), "*main.MyBool", __goscriptStatic4(), __goscriptStatic5(), __goscriptStatic6())
 	await $.println("Pointer primitive interface:", (__goscriptAwait = (stringer !== null && (stringer as any).__isVarRef !== true && (stringer as any).__goValue === undefined ? (stringer as Exclude<Stringer, null>) : $.pointerValue<Exclude<Stringer, null>>(stringer)).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), flag.value)
 

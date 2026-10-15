@@ -2,9 +2,7 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as fmt from "@goscript/fmt/index.js"
-import "@goscript/fmt/index.js"
 
 export function multiReturn(): [number, number] {
 	return [10, 20]
@@ -24,8 +22,8 @@ export async function main(): globalThis.Promise<void> {
 	await fmt.Printf("name=%s, line=%d, col=%d\n", name, $.basicInterfaceValue(line, "int"), $.basicInterfaceValue(col, "int"))
 
 	// Test reassignment to existing variables
-	let a: number = 0
-	let b: number = 0
+	let a = 0
+	let b = 0
 	let __goscriptTuple0: any = multiReturn()
 	a = __goscriptTuple0[0]
 	b = __goscriptTuple0[1]

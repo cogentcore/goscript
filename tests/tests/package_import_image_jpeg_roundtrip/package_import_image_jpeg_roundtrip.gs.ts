@@ -2,20 +2,11 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as bytes from "@goscript/bytes/index.js"
-
 import * as image from "@goscript/image/index.js"
-
 import * as color from "@goscript/image/color/index.js"
-
 import * as jpeg from "@goscript/image/jpeg/index.js"
-
 import type * as io from "@goscript/io/index.js"
-import "@goscript/bytes/index.js"
-import "@goscript/image/index.js"
-import "@goscript/image/color/index.js"
-import "@goscript/image/jpeg/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	let im = image.NewRGBA(image.Rect(0, 0, 16, 16))
@@ -24,7 +15,7 @@ export async function main(): globalThis.Promise<void> {
 			await image.RGBA.prototype.Set.call(im, x, y, $.interfaceValue<color.Color | null>(new color.RGBA({R: $.uint(x * 16, 8), G: $.uint(y * 16, 8), B: 128, A: 255}, true), "color.RGBA", "color.RGBA"))
 		}
 	}
-	let buf: $.VarRef<bytes.Buffer> = $.varRef($.markAsStructValue(new bytes.Buffer()))
+	let buf = $.varRef($.markAsStructValue(new bytes.Buffer()))
 	{
 		let err = await jpeg.Encode($.interfaceValue<io.Writer | null>(buf, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer")), $.interfaceValue<image.Image | null>(im, "*image.RGBA", /* @__PURE__ */ $.pointerType("image.RGBA")), new jpeg.Options({Quality: 90}))
 		if (err != null) {

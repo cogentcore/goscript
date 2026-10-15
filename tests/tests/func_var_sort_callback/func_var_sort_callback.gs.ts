@@ -2,12 +2,8 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as cmp from "@goscript/cmp/index.js"
-
 import * as slices from "@goscript/slices/index.js"
-import "@goscript/cmp/index.js"
-import "@goscript/slices/index.js"
 
 export async function order(prev: $.Slice<string>, hosts: $.Slice<string>): globalThis.Promise<$.Slice<string>> {
 	let ranks = $.makeMap<string, number>([])

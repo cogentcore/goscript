@@ -2,9 +2,7 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as __goscript_b from "./b.gs.ts"
-import "./b.gs.ts"
 
 export var marker: number
 

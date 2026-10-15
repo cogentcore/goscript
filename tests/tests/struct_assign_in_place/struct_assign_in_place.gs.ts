@@ -320,7 +320,7 @@ export async function main(): globalThis.Promise<void> {
 	g1.Val.Y = 22
 	await $.println(g3.value.Val.Y, g1.Val.Y)
 	let h1 = $.markAsStructValue(new Holder({P: $.markAsStructValue($.cloneStructValue(g1))}))
-	let h2: Holder = $.markAsStructValue(new Holder())
+	let h2 = $.markAsStructValue(new Holder())
 	h2 = $.assignStruct(h2, $.markAsStructValue($.cloneStructValue(h1)))
 	h1.P.Val.X = 33
 	await $.println(h2.P.Val.X, h1.P.Val.X)

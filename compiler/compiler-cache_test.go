@@ -312,7 +312,7 @@ func TestCompilePackagesCacheInvalidatesEmbedFileChange(t *testing.T) {
 	secondOut := filepath.Join(t.TempDir(), "second")
 	compileCacheFixtureConfig(t, Config{}, moduleDir, secondOut, cacheRoot)
 	text := readOutputFile(t, secondOut, "example.test/cacheembed", "main.gs.ts")
-	if !strings.Contains(text, `Version: string = "2.0.0\n"`) {
+	if !strings.Contains(text, `Version = "2.0.0\n"`) {
 		t.Fatalf("embed file change was not reflected in output:\n%s", text)
 	}
 	if countCacheManifests(t, cacheRoot) < 2 {

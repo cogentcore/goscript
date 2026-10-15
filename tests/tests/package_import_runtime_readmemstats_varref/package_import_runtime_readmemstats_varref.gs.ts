@@ -2,12 +2,10 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as runtime from "@goscript/runtime/index.js"
-import "@goscript/runtime/index.js"
 
 export async function main(): globalThis.Promise<void> {
-	let stats: $.VarRef<runtime.MemStats> = $.varRef($.markAsStructValue(new runtime.MemStats()))
+	let stats = $.varRef($.markAsStructValue(new runtime.MemStats()))
 	runtime.ReadMemStats(stats)
 	await $.println(stats.value.Alloc >= 0n)
 }

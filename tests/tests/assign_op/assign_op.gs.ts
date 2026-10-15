@@ -4,43 +4,43 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export async function main(): globalThis.Promise<void> {
-	let a: number = 5
+	let a = 5
 	a += 3
 	await $.println(a)
 
-	let b: number = 10
+	let b = 10
 	b -= 2
 	await $.println(b)
 
-	let c: number = 16
+	let c = 16
 	c = globalThis.Math.trunc(c / 4)
 	await $.println(c)
 
-	let quotient: number = 5
+	let quotient = 5
 	quotient = globalThis.Math.trunc(quotient / 2)
 	await $.println(quotient)
 
-	let unsignedQuotient: number = 5
+	let unsignedQuotient = 5
 	unsignedQuotient = (unsignedQuotient / 2) >>> 0
 	await $.println(unsignedQuotient)
 
-	let d: number = 3
+	let d = 3
 	d *= 5
 	await $.println(d)
 
-	let e: number = 10
+	let e = 10
 	e %= 3
 	await $.println(e)
 
-	let f: number = 5
+	let f = 5
 	f &= 3
 	await $.println(f)
 
-	let g: number = 5
+	let g = 5
 	g |= 3
 	await $.println(g)
 
-	let h: number = 5
+	let h = 5
 	h ^= 3
 	await $.println(h)
 
@@ -49,15 +49,15 @@ export async function main(): globalThis.Promise<void> {
 	// i &^= 3    // 101 &^ 011 = 101 & (~011) = 101 & 100 = 100
 	// println(i) // Expected output: 4
 
-	let j: number = 5
+	let j = 5
 	j <<= 1
 	await $.println(j)
 
-	let k: number = 5
+	let k = 5
 	k >>= 1
 	await $.println(k)
 
-	let m: number = 10
+	let m = 10
 	m -= 3
 	await $.println(m)
 }

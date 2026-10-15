@@ -134,7 +134,7 @@ export class privateKey {
 	)
 }
 
-export let privateKeyCache: $.VarRef<cache> = $.varRef($.markAsStructValue(new cache()))
+export let privateKeyCache = $.varRef($.markAsStructValue(new cache()))
 
 export function __goscript_set_privateKeyCache(__goscriptValue: cache): void {
 	$.assignStruct(privateKeyCache.value, __goscriptValue)

@@ -23,7 +23,7 @@ export async function main(): globalThis.Promise<void> {
 	let finalResult = await caller(myChan)
 	await $.println(finalResult)
 
-	myChan!.close()
+	myChan.close()
 }
 
 if ($.isMainScript(import.meta)) {

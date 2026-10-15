@@ -2,9 +2,7 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as unicode from "@goscript/unicode/index.js"
-import "@goscript/unicode/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	// Test character classification functions

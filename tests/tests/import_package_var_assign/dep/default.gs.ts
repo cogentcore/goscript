@@ -2,7 +2,6 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import type * as __goscript_dep from "./dep.gs.ts"
 
 export var defaultLevel: __goscript_dep.Level

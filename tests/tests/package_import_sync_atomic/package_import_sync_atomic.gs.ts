@@ -2,9 +2,7 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as atomic from "@goscript/sync/atomic/index.js"
-import "@goscript/sync/atomic/index.js"
 
 export class pointerNode {
 	public get value(): string {
@@ -53,7 +51,7 @@ export function makeAtomicCallback(): [(() => void) | null, $.GoError] {
 
 export async function main(): globalThis.Promise<void> {
 	// Test atomic.Int32
-	let i32: $.VarRef<atomic.Int32> = $.varRef($.markAsStructValue(new atomic.Int32()))
+	let i32 = $.varRef($.markAsStructValue(new atomic.Int32()))
 	i32.value.Store(42)
 	await $.println("Int32 stored 42, value:", i32.value.Load())
 
@@ -68,7 +66,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 
 	// Test atomic.Int64
-	let i64: $.VarRef<atomic.Int64> = $.varRef($.markAsStructValue(new atomic.Int64()))
+	let i64 = $.varRef($.markAsStructValue(new atomic.Int64()))
 	i64.value.Store(1000n)
 	await $.println("Int64 stored 1000, value:", i64.value.Load())
 
@@ -76,7 +74,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("Int64 after subtracting 100:", i64.value.Load())
 
 	// Test atomic.Uint32
-	let u32: $.VarRef<atomic.Uint32> = $.varRef($.markAsStructValue(new atomic.Uint32()))
+	let u32 = $.varRef($.markAsStructValue(new atomic.Uint32()))
 	u32.value.Store(50)
 	await $.println("Uint32 stored 50, value:", u32.value.Load())
 
@@ -84,12 +82,12 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("Uint32 after adding 25:", u32.value.Load())
 
 	// Test atomic.Uint64
-	let u64: $.VarRef<atomic.Uint64> = $.varRef($.markAsStructValue(new atomic.Uint64()))
+	let u64 = $.varRef($.markAsStructValue(new atomic.Uint64()))
 	u64.value.Store(2000n)
 	await $.println("Uint64 stored 2000, value:", u64.value.Load())
 
 	// Test atomic.Bool
-	let b: $.VarRef<atomic.Bool> = $.varRef($.markAsStructValue(new atomic.Bool()))
+	let b = $.varRef($.markAsStructValue(new atomic.Bool()))
 	b.value.Store(true)
 	await $.println("Bool stored true, value:", b.value.Load())
 
@@ -141,7 +139,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 
 	// Test atomic.Value
-	let val: $.VarRef<atomic.Value> = $.varRef($.markAsStructValue(new atomic.Value()))
+	let val = $.varRef($.markAsStructValue(new atomic.Value()))
 	val.value.Store("atomic value")
 	{
 		let loaded_val = val.value.Load()

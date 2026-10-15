@@ -2,12 +2,8 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as os from "@goscript/os/index.js"
-
 import * as strings from "@goscript/strings/index.js"
-import "@goscript/os/index.js"
-import "@goscript/strings/index.js"
 
 export class matcher {
 	public get match(): ((r: number) => boolean | globalThis.Promise<boolean>) | null {

@@ -70,7 +70,7 @@ export class scanner {
 	public readScript(): number {
 		const s: scanner | $.VarRef<scanner> | null = this;
 		const s$: scanner = s == null ? $.pointerTarget<scanner>(s) : (s as any).__isVarRef === true ? (s as any).value : (s as any).__goValue === undefined ? (s as any) : $.pointerTarget<scanner>(s)
-		let c: number = 0
+		let c = 0
 
 		let __goscriptGotoState0 = "scriptData"
 		__goscriptGotoLoop0: while (true) {

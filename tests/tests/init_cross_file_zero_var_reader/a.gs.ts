@@ -2,11 +2,8 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as reflect from "@goscript/reflect/index.js"
-
 import * as __goscript_c from "./c.gs.ts"
-import "@goscript/reflect/index.js"
 import "./c.gs.ts"
 
 export var table: $.Slice<number>

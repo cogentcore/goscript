@@ -2,14 +2,10 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as os from "@goscript/os/index.js"
-
 import * as template from "@goscript/text/template/index.js"
-
 import type * as io from "@goscript/io/index.js"
 import "@goscript/os/index.js"
-import "@goscript/text/template/index.js"
 
 export class item {
 	public get Name(): string {

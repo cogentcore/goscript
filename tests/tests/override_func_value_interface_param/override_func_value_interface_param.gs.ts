@@ -2,18 +2,12 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as bytes from "@goscript/bytes/index.js"
-
 import * as json from "@goscript/encoding/json/index.js"
-
 import * as io from "@goscript/io/index.js"
-
 import * as strings from "@goscript/strings/index.js"
-import "@goscript/bytes/index.js"
 import "@goscript/encoding/json/index.js"
 import "@goscript/io/index.js"
-import "@goscript/strings/index.js"
 
 export type Decoder = {
 	Decode(v: any): $.GoError | globalThis.Promise<$.GoError>
@@ -64,7 +58,7 @@ export async function decode(f: ((r: io.Reader | null) => Decoder | null | globa
 }
 
 export async function writeBytes(v: any, f: ((w: io.Writer | null) => Encoder | null | globalThis.Promise<Encoder | null>) | null): globalThis.Promise<string> {
-	let b: $.VarRef<bytes.Buffer> = $.varRef($.markAsStructValue(new bytes.Buffer()))
+	let b = $.varRef($.markAsStructValue(new bytes.Buffer()))
 	{
 		let err = (__goscriptAwait = $.pointerValue<Exclude<Encoder, null>>((__goscriptAwait = f!($.interfaceValue<io.Writer | null>(b, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer"))), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)).Encode(v), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 		if (err != null) {
@@ -85,7 +79,7 @@ export async function main(): globalThis.Promise<void> {
 	// The writer is a pointer to a local variable.
 	await $.print(await writeBytes($.interfaceValue($.makeMap<string, number>([["b", 3]]), "map[string]int", /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("int"))), NewEncoderFunc(__goscriptStatic1(), ((__goscriptFn: typeof json.NewEncoder) => (__goscriptArg0: io.Writer | null) => __goscriptFn($.pointerValueOrNil(__goscriptArg0)!))(json.NewEncoder))))
 	let newEncoder: ((w: io.Writer | null) => json.Encoder | $.VarRef<json.Encoder> | null | globalThis.Promise<json.Encoder | $.VarRef<json.Encoder> | null>) | null = ((__goscriptFn: typeof json.NewEncoder) => (__goscriptArg0: io.Writer | null) => __goscriptFn($.pointerValueOrNil(__goscriptArg0)!))(json.NewEncoder)
-	let buf: $.VarRef<bytes.Buffer> = $.varRef($.markAsStructValue(new bytes.Buffer()))
+	let buf = $.varRef($.markAsStructValue(new bytes.Buffer()))
 	await json.Encoder.prototype.Encode.call($.pointerValue<json.Encoder>(((__goscriptAwait = newEncoder!($.interfaceValue<io.Writer | null>(buf, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer"))), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as json.Encoder | $.VarRef<json.Encoder> | null)), $.interfaceValue($.arrayToSlice<number>([4, 5]), "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"))))
 	await $.print(buf.value.String())
 }

@@ -2,14 +2,9 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as bytes from "@goscript/bytes/index.js"
-
 import * as chacha20poly1305 from "@goscript/golang.org/x/crypto/chacha20poly1305/index.js"
-
 import * as cipher from "@goscript/crypto/cipher/index.js"
-import "@goscript/bytes/index.js"
-import "@goscript/golang.org/x/crypto/chacha20poly1305/index.js"
 import "@goscript/crypto/cipher/index.js"
 
 export async function main(): globalThis.Promise<void> {

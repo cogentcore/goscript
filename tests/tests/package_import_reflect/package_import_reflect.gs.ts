@@ -2,9 +2,7 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as reflect from "@goscript/reflect/index.js"
-import "@goscript/reflect/index.js"
 
 export type Stringer = {
 	String(): string
@@ -163,11 +161,11 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("Struct value type:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(personVal)).Type()).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
 	// Test with different kinds
-	let f: number = 3.14
+	let f = 3.14
 	let fVal = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.basicInterfaceValue(f, "float64"))))
 	await $.println("Float kind:", reflect.Kind_String($.markAsStructValue($.cloneStructValue(fVal)).Kind()))
 
-	let boolVal: boolean = true
+	let boolVal = true
 	let bVal = $.markAsStructValue($.cloneStructValue(reflect.ValueOf(boolVal)))
 	await $.println("Bool kind:", reflect.Kind_String($.markAsStructValue($.cloneStructValue(bVal)).Kind()))
 

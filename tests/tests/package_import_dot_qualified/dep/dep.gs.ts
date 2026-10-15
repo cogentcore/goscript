@@ -44,7 +44,7 @@ export class Box {
 	)
 }
 
-export let Value: number = 5
+export let Value = 5
 
 export function __goscript_set_Value(__goscriptValue: number): void {
 	Value = __goscriptValue

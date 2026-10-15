@@ -2,14 +2,10 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as sync from "@goscript/sync/index.js"
-
 import * as __goscript_a from "./a.gs.ts"
-import "@goscript/sync/index.js"
-import "./a.gs.ts"
 
-export let lock: $.VarRef<sync.Mutex> = $.varRef($.markAsStructValue(new sync.Mutex()))
+export let lock = $.varRef($.markAsStructValue(new sync.Mutex()))
 
 export function __goscript_set_lock(__goscriptValue: sync.Mutex): void {
 	$.assignStruct(lock.value, __goscriptValue)

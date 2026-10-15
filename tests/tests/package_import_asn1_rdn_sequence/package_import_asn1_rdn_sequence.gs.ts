@@ -2,12 +2,8 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as pkix from "@goscript/crypto/x509/pkix/index.js"
-
 import * as asn1 from "@goscript/encoding/asn1/index.js"
-import "@goscript/crypto/x509/pkix/index.js"
-import "@goscript/encoding/asn1/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	let input = ($.arrayToSlice<pkix.RelativeDistinguishedNameSET>([($.arrayToSlice<pkix.AttributeTypeAndValue>([new pkix.AttributeTypeAndValue({Type: ($.arrayToSlice<number>([2, 5, 4, 3]) as asn1.ObjectIdentifier), Value: "goscript"}, true)]) as pkix.RelativeDistinguishedNameSET)]) as pkix.RDNSequence)

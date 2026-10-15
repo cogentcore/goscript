@@ -4,7 +4,7 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export function choose(_arguments: number): number {
-	let _eval: number = 0
+	let _eval = 0
 	_eval = _arguments + 1
 	_arguments = _eval + _arguments
 	return _eval

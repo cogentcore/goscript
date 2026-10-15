@@ -2,12 +2,8 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as protobuf_go_lite from "@goscript/github.com/aperturerobotics/protobuf-go-lite/index.js"
-
 import * as strings from "@goscript/strings/index.js"
-import "@goscript/github.com/aperturerobotics/protobuf-go-lite/index.js"
-import "@goscript/strings/index.js"
 
 export type state = number
 

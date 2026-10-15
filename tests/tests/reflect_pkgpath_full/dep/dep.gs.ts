@@ -2,9 +2,7 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as reflect from "@goscript/reflect/index.js"
-import "@goscript/reflect/index.js"
 
 $.registerTypePackagePath("github.com/s4wave/goscript/tests/tests/reflect_pkgpath_full/dep", ["dep.Node", "dep.Level", "dep.Namer", "dep.Box", "dep.local"])
 

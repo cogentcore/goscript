@@ -2,12 +2,8 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as bytes from "@goscript/bytes/index.js"
-
 import * as io from "@goscript/io/index.js"
-import "@goscript/bytes/index.js"
-import "@goscript/io/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	// Test basic byte slice operations
@@ -85,7 +81,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("ReplaceAll result:", $.bytesToString(replacedAll))
 
 	// Test Buffer
-	let buf: $.VarRef<bytes.Buffer> = $.varRef($.markAsStructValue(new bytes.Buffer()))
+	let buf = $.varRef($.markAsStructValue(new bytes.Buffer()))
 	buf.value.WriteString("Hello ")
 	buf.value.WriteString("World")
 	await $.println("Buffer content:", buf.value.String())
@@ -116,7 +112,7 @@ export async function main(): globalThis.Promise<void> {
 
 	let reader = bytes.NewReader(new Uint8Array([114, 101, 97, 100, 101, 114]))
 	let at = $.makeSlice<number>(3, undefined, "byte")
-	let off: bigint = 2n
+	let off = 2n
 	let __goscriptTuple1: any = bytes.Reader.prototype.ReadAt.call($.pointerValue<bytes.Reader>(reader), at, off)
 	n = __goscriptTuple1[0]
 	let err = __goscriptTuple1[1]
@@ -126,7 +122,7 @@ export async function main(): globalThis.Promise<void> {
 	err = __goscriptTuple2[1]
 	await $.println("Reader Seek", pos, "err:", err == null)
 	await $.println("Reader Size", bytes.Reader.prototype.Size.call($.pointerValue<bytes.Reader>(reader)))
-	let writeDst: $.VarRef<bytes.Buffer> = $.varRef($.markAsStructValue(new bytes.Buffer()))
+	let writeDst = $.varRef($.markAsStructValue(new bytes.Buffer()))
 	let __goscriptTuple3: any = await bytes.Reader.prototype.WriteTo.call($.pointerValue<bytes.Reader>(reader), $.pointerValueOrNil($.interfaceValue<io.Writer | null>(writeDst, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer")))!)
 	let n64 = __goscriptTuple3[0]
 	err = __goscriptTuple3[1]

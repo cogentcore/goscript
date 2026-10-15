@@ -2,15 +2,9 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as bytes from "@goscript/bytes/index.js"
-
 import * as flate from "@goscript/compress/flate/index.js"
-
 import * as io from "@goscript/io/index.js"
-import "@goscript/bytes/index.js"
-import "@goscript/compress/flate/index.js"
-import "@goscript/io/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	// Mixed repeated and distinct bytes exercise dynamic Huffman blocks.
@@ -20,7 +14,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 	for (let __goscriptRangeTarget1 = $.arrayToSlice<number>([1, -1, 9]), __goscriptRangeWindow1 = $.sliceRange(__goscriptRangeTarget1), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow1.length; __rangeIndex++) {
 		let level = (__goscriptRangeWindow1.backing[__goscriptRangeWindow1.offset + __rangeIndex] as number)
-		let compressed: $.VarRef<bytes.Buffer> = $.varRef($.markAsStructValue(new bytes.Buffer()))
+		let compressed = $.varRef($.markAsStructValue(new bytes.Buffer()))
 		let __goscriptTuple0: any = flate.NewWriter($.interfaceValue<io.Writer | null>(compressed, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer")), level)
 		let writer: flate.Writer | $.VarRef<flate.Writer> | null = __goscriptTuple0[0]
 		let err = __goscriptTuple0[1]

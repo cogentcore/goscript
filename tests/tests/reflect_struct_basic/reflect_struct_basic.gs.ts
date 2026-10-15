@@ -2,12 +2,8 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as fmt from "@goscript/fmt/index.js"
-
 import * as reflect from "@goscript/reflect/index.js"
-import "@goscript/fmt/index.js"
-import "@goscript/reflect/index.js"
 
 export class Person {
 	public get Name(): string {

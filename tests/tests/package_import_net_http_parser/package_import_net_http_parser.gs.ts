@@ -2,23 +2,12 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as bufio from "@goscript/bufio/index.js"
-
 import * as fmt from "@goscript/fmt/index.js"
-
 import * as io from "@goscript/io/index.js"
-
 import * as http from "@goscript/net/http/index.js"
-
 import * as strings from "@goscript/strings/index.js"
-
 import * as url from "@goscript/net/url/index.js"
-import "@goscript/bufio/index.js"
-import "@goscript/fmt/index.js"
-import "@goscript/io/index.js"
-import "@goscript/net/http/index.js"
-import "@goscript/strings/index.js"
 import "@goscript/net/url/index.js"
 
 export async function main(): globalThis.Promise<void> {

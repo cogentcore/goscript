@@ -2,12 +2,8 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as fmt from "@goscript/fmt/index.js"
-
 import * as http from "@goscript/net/http/index.js"
-import "@goscript/fmt/index.js"
-import "@goscript/net/http/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	let header = $.makeMap<string, $.Slice<string>>([["X-Test", $.arrayToSlice<string>(["ok"])]])

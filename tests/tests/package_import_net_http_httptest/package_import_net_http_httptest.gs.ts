@@ -2,15 +2,9 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as mime from "@goscript/mime/index.js"
-
 import * as http from "@goscript/net/http/index.js"
-
 import * as httptest from "@goscript/net/http/httptest/index.js"
-import "@goscript/mime/index.js"
-import "@goscript/net/http/index.js"
-import "@goscript/net/http/httptest/index.js"
 
 export async function setAttachment(w: http.ResponseWriter | null, name: string): globalThis.Promise<void> {
 	http.Header_Set(((__goscriptAwait = (w !== null && (w as any).__isVarRef !== true && (w as any).__goValue === undefined ? (w as Exclude<http.ResponseWriter, null>) : $.pointerValue<Exclude<http.ResponseWriter, null>>(w)).Header(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as http.Header), "Content-Disposition", mime.FormatMediaType("attachment", $.makeMap<string, string>([["filename", name]])))

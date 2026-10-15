@@ -2,21 +2,13 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as fmt from "@goscript/fmt/index.js"
-
 import * as io from "@goscript/io/index.js"
-
 import * as reflect from "@goscript/reflect/index.js"
-
 import * as time from "@goscript/time/index.js"
-
 import * as __goscript_other from "./other.gs.ts"
 import "@goscript/fmt/index.js"
 import "@goscript/io/index.js"
-import "@goscript/reflect/index.js"
-import "@goscript/time/index.js"
-import "./other.gs.ts"
 
 export type MyInterface = {
 	SomeMethod(): void

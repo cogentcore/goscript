@@ -255,7 +255,7 @@ export async function Recv(ch: $.Channel<number> | null): globalThis.Promise<num
 | `ch <- 42` | `await $.chanSend(ch, 42)` |
 | `v := <-ch` | `let v = await $.chanRecv(ch)` |
 | `v, ok := <-ch` | `let r = await $.chanRecvWithOk(ch)`, then `r.value` and `r.ok` |
-| `close(ch)` | `ch!.close()` |
+| `close(ch)` | `ch.close()`, or `ch!.close()` when `ch` may be nil |
 
 ### Select
 

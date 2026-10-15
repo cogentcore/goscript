@@ -4,9 +4,9 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export function processValues(input: number): [number, string, boolean] {
-	let num: number = 0
-	let text: string = ""
-	let ok: boolean = false
+	let num = 0
+	let text = ""
+	let ok = false
 	num = input * 2
 	if (input > 5) {
 		text = "greater than five"
@@ -30,9 +30,9 @@ export async function main(): globalThis.Promise<void> {
 
 	// Test with an anonymous function and potentially unassigned named returns
 	let [n3, t3, o3] = ((val: number): [number, string, boolean] => {
-		let resInt: number = 0
-		let resStr: string = ""
-		let resBool: boolean = false
+		let resInt = 0
+		let resStr = ""
+		let resBool = false
 		if (val == 1) {
 			resInt = 100
 		} else {
@@ -49,9 +49,9 @@ export async function main(): globalThis.Promise<void> {
 	await $.println(o3)
 
 	let [n4, t4, o4] = ((val: number): [number, string, boolean] => {
-		let resInt: number = 0
-		let resStr: string = ""
-		let resBool: boolean = false
+		let resInt = 0
+		let resStr = ""
+		let resBool = false
 		if (val == 1) {
 			resInt = 100
 		} else {
@@ -68,9 +68,9 @@ export async function main(): globalThis.Promise<void> {
 	await $.println(o4)
 
 	let [n5, t5, o5] = ((val: number): [number, string, boolean] => {
-		let resInt: number = 0
-		let resStr: string = ""
-		let resBool: boolean = false
+		let resInt = 0
+		let resStr = ""
+		let resBool = false
 		if (val == 1) {
 			resInt = 100
 		} else {

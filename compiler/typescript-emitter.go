@@ -190,17 +190,16 @@ func (o *TypeScriptEmitOwner) EmitToMemory(
 
 // renderLoweredFile orders imports, declarations, and the optional main invocation.
 func (o *TypeScriptEmitOwner) renderLoweredFile(pkg *loweredPackage, file *loweredFile, trimTypeInfo bool) string {
+	body := o.renderLoweredFileBody(pkg, file, trimTypeInfo)
+
 	var b strings.Builder
-	b.Grow(estimateLoweredFileSize(file))
+	b.Grow(len(body) + 128 + len(file.imports)*96)
 	if file.sourcePath != "" {
 		b.WriteString("// Generated file based on ")
 		b.WriteString(filepath.Base(file.sourcePath))
 		b.WriteString("\n// Updated when compliance tests are re-run, DO NOT EDIT!\n\n")
 	}
-	for idx, imp := range file.imports {
-		if idx != 0 {
-			b.WriteString("\n")
-		}
+	for _, imp := range file.imports {
 		if imp.bare {
 			b.WriteString("import \"")
 			b.WriteString(imp.source)
@@ -217,9 +216,14 @@ func (o *TypeScriptEmitOwner) renderLoweredFile(pkg *loweredPackage, file *lower
 		b.WriteString(imp.source)
 		b.WriteString("\"\n")
 	}
+
+	// TypeScript drops a namespace import that the file reads only as types,
+	// which would skip the package's initialization. A bare import keeps the
+	// module edge unless the file calls through the namespace.
+	called := calledNamespaces(body, file.imports)
 	sideEffectImports := make(map[string]bool)
 	for _, imp := range file.imports {
-		if imp.bare || imp.typeOnly || !imp.sideEffect || sideEffectImports[imp.source] {
+		if imp.bare || imp.typeOnly || !imp.sideEffect || called[imp.alias] || sideEffectImports[imp.source] {
 			continue
 		}
 		sideEffectImports[imp.source] = true
@@ -230,6 +234,14 @@ func (o *TypeScriptEmitOwner) renderLoweredFile(pkg *loweredPackage, file *lower
 	if len(file.imports) != 0 {
 		b.WriteString("\n")
 	}
+	b.WriteString(body)
+	return strings.TrimRight(b.String(), "\n") + "\n"
+}
+
+// renderLoweredFileBody renders the declarations of file after its imports.
+func (o *TypeScriptEmitOwner) renderLoweredFileBody(pkg *loweredPackage, file *loweredFile, trimTypeInfo bool) string {
+	var b strings.Builder
+	b.Grow(estimateLoweredFileSize(file))
 	if len(file.typePackageNames) != 0 {
 		quoted := make([]string, len(file.typePackageNames))
 		for idx, name := range file.typePackageNames {
@@ -292,7 +304,78 @@ func (o *TypeScriptEmitOwner) renderLoweredFile(pkg *loweredPackage, file *lower
 		b.WriteString("\tawait main()\n")
 		b.WriteString("}\n")
 	}
-	return strings.TrimRight(b.String(), "\n") + "\n"
+	return b.String()
+}
+
+// calledNamespaces returns the aliases of the namespace imports that code
+// calls through, as alias.name( outside strings and comments. TypeScript keeps
+// a namespace import that the file calls through.
+func calledNamespaces(code string, imports []loweredImport) map[string]bool {
+	aliases := make(map[string]bool, len(imports))
+	for _, imp := range imports {
+		if imp.alias != "" {
+			aliases[imp.alias] = true
+		}
+	}
+	called := make(map[string]bool)
+	identEnd := func(start int) int {
+		end := start
+		for end < len(code) && isTSIdentByte(code[end]) {
+			end++
+		}
+		return end
+	}
+	for idx := 0; idx < len(code); {
+		switch char := code[idx]; {
+		case char == '"' || char == '\'' || char == '`':
+			idx = skipTSString(code, idx)
+		case strings.HasPrefix(code[idx:], "//"):
+			idx += strings.IndexByte(code[idx:]+"\n", '\n')
+		case strings.HasPrefix(code[idx:], "/*"):
+			end := strings.Index(code[idx+2:], "*/")
+			if end < 0 {
+				return called
+			}
+			idx += end + 4
+		case isTSIdentByte(char):
+			end := identEnd(idx)
+			afterMember := idx > 0 && code[idx-1] == '.'
+			alias := code[idx:end]
+			idx = end
+			if afterMember || !aliases[alias] || end >= len(code) || code[end] != '.' {
+				continue
+			}
+			memberEnd := identEnd(end + 1)
+			if memberEnd > end+1 && memberEnd < len(code) && code[memberEnd] == '(' {
+				called[alias] = true
+			}
+		default:
+			idx++
+		}
+	}
+	return called
+}
+
+// skipTSString returns the index after the string or template literal that
+// starts at start. A template's substitutions are skipped with it.
+func skipTSString(code string, start int) int {
+	quote := code[start]
+	for idx := start + 1; idx < len(code); idx++ {
+		switch code[idx] {
+		case '\\':
+			idx++
+		case quote:
+			return idx + 1
+		}
+	}
+	return len(code)
+}
+
+// isTSIdentByte reports whether char can appear in an ASCII TypeScript
+// identifier.
+func isTSIdentByte(char byte) bool {
+	return char == '_' || char == '$' || char >= '0' && char <= '9' ||
+		char >= 'a' && char <= 'z' || char >= 'A' && char <= 'Z'
 }
 
 // estimateLoweredFileSize reserves approximate builder capacity without rendering.
@@ -960,8 +1043,10 @@ func renderNamedResults(b *strings.Builder, results []loweredNamedResult, indent
 		writeIndent(b, indent)
 		b.WriteString("let ")
 		b.WriteString(result.name)
-		b.WriteString(": ")
-		b.WriteString(result.typ)
+		if result.typ != "" {
+			b.WriteString(": ")
+			b.WriteString(result.typ)
+		}
 		b.WriteString(" = ")
 		b.WriteString(result.zero)
 		b.WriteString("\n")

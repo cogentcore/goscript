@@ -1920,6 +1920,9 @@ func (o *LoweringOwner) lowerGenDecl(ctx lowerFileContext, decl *ast.GenDecl) ([
 				}
 				lazy := ctx.topLevel && ctx.lazyPackageVars[obj]
 				code := keyword + " " + declName + ": " + variableType + " = " + value
+				if keyword != "const" && o.inferredValueType(value) == variableType {
+					code = keyword + " " + declName + " = " + value
+				}
 				if lazy {
 					keyword = "var"
 					code = "var " + declName + ": " + variableType
@@ -6340,6 +6343,53 @@ func (o *LoweringOwner) callsOverridePackage(ctx lowerFileContext, expr ast.Expr
 	return fn != nil && fn.Pkg() != nil && o.overrideFacts().HasPackage(fn.Pkg().Path())
 }
 
+// inferredValueType returns the type TypeScript infers for a let binding
+// initialized to the lowered value, or "" when the value is not one whose type
+// is evident: a literal, a struct value or a VarRef holding one of those.
+func (o *LoweringOwner) inferredValueType(value string) string {
+	if inner, ok := strings.CutPrefix(value, o.runtimeOwner.QualifiedHelper(RuntimeHelperVarRef)+"("); ok {
+		if inner, ok := strings.CutSuffix(inner, ")"); ok {
+			if typ := o.inferredValueType(inner); typ != "" {
+				return "$.VarRef<" + typ + ">"
+			}
+		}
+		return ""
+	}
+	if inner, ok := strings.CutPrefix(value, o.runtimeOwner.QualifiedHelper(RuntimeHelperMarkAsStructValue)+"(new "); ok {
+		if typ, ok := strings.CutSuffix(inner, "())"); ok && isQualifiedTSName(typ) {
+			return typ
+		}
+		return ""
+	}
+	switch {
+	case value == "true" || value == "false":
+		return "boolean"
+	case numericLiteralPattern.MatchString(value):
+		if strings.HasSuffix(value, "n") {
+			return "bigint"
+		}
+		return "number"
+	}
+	if _, err := strconv.Unquote(value); err == nil && strings.HasPrefix(value, `"`) {
+		return "string"
+	}
+	return ""
+}
+
+// numericLiteralPattern matches a lowered integer, float or bigint literal.
+var numericLiteralPattern = regexp.MustCompile(`^-?[0-9]+(\.[0-9]+)?([eE][+-]?[0-9]+)?n?$`)
+
+// isQualifiedTSName reports whether name is a type name with an optional
+// package qualifier and no type arguments.
+func isQualifiedTSName(name string) bool {
+	for _, part := range strings.Split(name, ".") {
+		if !token.IsIdentifier(part) {
+			return false
+		}
+	}
+	return true
+}
+
 // isReassignedLocal reports whether the local variable obj is assigned
 // after its declaration, by an assignment, a redeclaring :=, an increment or
 // a range assignment.
@@ -6347,15 +6397,45 @@ func isReassignedLocal(ctx lowerFileContext, obj types.Object) bool {
 	return localAssignmentsFor(ctx).reassigned[obj]
 }
 
-// fixedFuncLocal returns the function literal that the local variable obj
-// always holds: obj is declared by := to the literal, never assigned again
-// and never referenced by pointer, so a call through obj calls the literal.
-func fixedFuncLocal(ctx lowerFileContext, obj types.Object) *ast.FuncLit {
+// fixedLocalValue returns the expression that the local variable obj always
+// holds: obj is declared by := to the expression, never assigned again and
+// never referenced by pointer.
+func fixedLocalValue(ctx lowerFileContext, obj types.Object) ast.Expr {
 	assignments := localAssignmentsFor(ctx)
 	if assignments.reassigned[obj] || ctx.model.needsVarRef[obj] {
 		return nil
 	}
-	return assignments.funcLits[obj]
+	return assignments.values[obj]
+}
+
+// fixedFuncLocal returns the function literal that the local variable obj
+// always holds, so a call through obj calls the literal.
+func fixedFuncLocal(ctx lowerFileContext, obj types.Object) *ast.FuncLit {
+	lit, _ := fixedLocalValue(ctx, obj).(*ast.FuncLit)
+	return lit
+}
+
+// isMadeLocal reports whether expr names a local variable that always holds
+// the result of the make builtin, which is never nil.
+func isMadeLocal(ctx lowerFileContext, expr ast.Expr) bool {
+	ident, ok := ast.Unparen(expr).(*ast.Ident)
+	if !ok {
+		return false
+	}
+	obj, ok := ctx.semPkg.source.TypesInfo.Uses[ident].(*types.Var)
+	if !ok {
+		return false
+	}
+	call, ok := fixedLocalValue(ctx, obj).(*ast.CallExpr)
+	if !ok {
+		return false
+	}
+	fun, ok := ast.Unparen(call.Fun).(*ast.Ident)
+	if !ok {
+		return false
+	}
+	builtin, ok := ctx.semPkg.source.TypesInfo.Uses[fun].(*types.Builtin)
+	return ok && builtin.Name() == "make"
 }
 
 func localAssignmentsFor(ctx lowerFileContext) *localAssignments {
@@ -6372,7 +6452,7 @@ func localAssignmentsFor(ctx lowerFileContext) *localAssignments {
 func collectLocalAssignments(pkg *packages.Package) *localAssignments {
 	assignments := &localAssignments{
 		reassigned: make(map[types.Object]bool),
-		funcLits:   make(map[types.Object]*ast.FuncLit),
+		values:     make(map[types.Object]ast.Expr),
 	}
 	mark := func(targets ...ast.Expr) {
 		for _, target := range targets {
@@ -6392,13 +6472,12 @@ func collectLocalAssignments(pkg *packages.Package) *localAssignments {
 				mark(typed.Lhs...)
 				if typed.Tok == token.DEFINE && len(typed.Lhs) == len(typed.Rhs) {
 					for idx, lhs := range typed.Lhs {
-						lit, isLit := typed.Rhs[idx].(*ast.FuncLit)
-						ident, isIdent := lhs.(*ast.Ident)
-						if !isLit || !isIdent {
+						ident, ok := lhs.(*ast.Ident)
+						if !ok {
 							continue
 						}
 						if obj := pkg.TypesInfo.Defs[ident]; obj != nil {
-							assignments.funcLits[obj] = lit
+							assignments.values[obj] = ast.Unparen(typed.Rhs[idx])
 						}
 					}
 				}
@@ -7468,9 +7547,13 @@ func (o *LoweringOwner) lowerNamedResults(ctx lowerFileContext, signature *types
 			zero = o.runtimeOwner.QualifiedHelper(RuntimeHelperVarRef) + "(" + zero + ")"
 			returnExpr += ".value"
 		}
+		typ := o.tsVariableTypeFor(ctx, result.Type(), needsVarRef)
+		if o.inferredValueType(zero) == typ {
+			typ = ""
+		}
 		results = append(results, loweredNamedResult{
 			name:       safeIdentifier(name),
-			typ:        o.tsVariableTypeFor(ctx, result.Type(), needsVarRef),
+			typ:        typ,
 			zero:       zero,
 			returnExpr: returnExpr,
 		})
@@ -9882,6 +9965,9 @@ func (o *LoweringOwner) lowerCallExpr(ctx lowerFileContext, expr *ast.CallExpr) 
 			case "close":
 				if len(args) != 1 {
 					return "undefined", append(diagnostics, loweringUnsupportedAt(ctx, expr, "call", ctx.semPkg.pkgPath, "close requires one argument"))
+				}
+				if isMadeLocal(ctx, expr.Args[0]) {
+					return args[0] + ".close()", diagnostics
 				}
 				return args[0] + "!.close()", diagnostics
 			}

@@ -2,7 +2,6 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as __goscript_field from "./field.gs.ts"
 import "./field.gs.ts"
 

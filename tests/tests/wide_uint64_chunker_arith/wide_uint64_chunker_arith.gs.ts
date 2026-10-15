@@ -2,9 +2,7 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as io from "@goscript/io/index.js"
-import "@goscript/io/index.js"
 
 export class chunker {
 	public get pos(): bigint {
@@ -132,8 +130,8 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("algo", algorithm(data, $.sliceLen(data), g, 3n, 1n, 0, 3))
 
 	let c = new chunker()
-	let totalSize: bigint = 0n
-	let chkStart: bigint = 0n
+	let totalSize = 0n
+	let chkStart = 0n
 
 	let src = io.LimitReader($.pointerValueOrNil($.interfaceValue<io.Reader | null>(newRepeatReader(40), "*main.repeatReader", /* @__PURE__ */ $.pointerType("main.repeatReader")))!, 25n)
 	let buf = $.makeSlice<number>(8, undefined, "byte")

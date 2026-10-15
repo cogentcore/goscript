@@ -2,12 +2,8 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as __goscript_a from "./a.gs.ts"
-
 import * as __goscript_b from "./b.gs.ts"
-import "./a.gs.ts"
-import "./b.gs.ts"
 
 export async function main(): globalThis.Promise<void> {
 	let a = __goscript_a.makeA()

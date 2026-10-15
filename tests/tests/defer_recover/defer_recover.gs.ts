@@ -4,8 +4,8 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export function safeDivide(a: number, b: number): [number, boolean] {
-	let result: number = 0
-	let ok: boolean = false
+	let result = 0
+	let ok = false
 	const __defer = new $.DisposableStack()
 	try {
 		__defer.defer(() => { (() => {

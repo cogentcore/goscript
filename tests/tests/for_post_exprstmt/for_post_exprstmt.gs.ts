@@ -3,7 +3,7 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
-export let counter: number = 0
+export let counter = 0
 
 export function __goscript_set_counter(__goscriptValue: number): void {
 	counter = __goscriptValue

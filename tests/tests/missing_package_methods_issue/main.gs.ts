@@ -2,12 +2,8 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as fmt from "@goscript/fmt/index.js"
-
 import * as slices from "@goscript/slices/index.js"
-import "@goscript/fmt/index.js"
-import "@goscript/slices/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	// Test slices.Delete which was missing in the error output

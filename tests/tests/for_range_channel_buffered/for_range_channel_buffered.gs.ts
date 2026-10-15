@@ -9,7 +9,7 @@ export async function main(): globalThis.Promise<void> {
 		await $.println("Hello", i)
 		await $.chanSend(ch, "testing")
 	}
-	ch!.close()
+	ch.close()
 	while (true) {
 		let __goscriptRange0 = await $.chanRecvWithOk(ch)
 		if (!__goscriptRange0.ok) {

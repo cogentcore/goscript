@@ -2,15 +2,9 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as list from "@goscript/container/list/index.js"
-
 import * as fmt from "@goscript/fmt/index.js"
-
 import * as sync from "@goscript/sync/index.js"
-import "@goscript/container/list/index.js"
-import "@goscript/fmt/index.js"
-import "@goscript/sync/index.js"
 
 export class pooledElement {
 	public get Value(): any {

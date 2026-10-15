@@ -4,8 +4,8 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export function pair(ok: boolean): [number, string] {
-	let n: number = 0
-	let label: string = ""
+	let n = 0
+	let label = ""
 	n = 3
 	if (ok) {
 		label = "ok"
@@ -16,7 +16,7 @@ export function pair(ok: boolean): [number, string] {
 }
 
 export function single(): number {
-	let value: number = 0
+	let value = 0
 	value = 9
 	return value
 }

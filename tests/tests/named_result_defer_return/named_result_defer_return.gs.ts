@@ -4,8 +4,8 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export function syncReturn(): [number, string] {
-	let value: number = 0
-	let err: string = ""
+	let value = 0
+	let err = ""
 	using __defer = new $.DisposableStack()
 	__defer.defer(() => { (() => {
 		err = "deferred"
@@ -19,8 +19,8 @@ export function syncReturn(): [number, string] {
 }
 
 export async function asyncReturn(ch: $.Channel<string> | null): globalThis.Promise<[number, string]> {
-	let value: number = 0
-	let err: string = ""
+	let value = 0
+	let err = ""
 	await using __defer = new $.AsyncDisposableStack()
 	__defer.defer(async () => { await (async () => {
 		err = await $.chanRecv(ch)
@@ -35,7 +35,7 @@ export async function asyncReturn(ch: $.Channel<string> | null): globalThis.Prom
 }
 
 export function blankReturn(): [number, string] {
-	let err: string = ""
+	let err = ""
 	using __defer = new $.DisposableStack()
 	__defer.defer(() => { (() => {
 		err = "blank deferred"

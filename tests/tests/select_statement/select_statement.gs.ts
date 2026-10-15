@@ -62,7 +62,7 @@ export async function main(): globalThis.Promise<void> {
 	// Test 3: Select with channel closing and ok value
 	let ch2 = $.makeChannel<number>(1, 0, "both")
 	await $.chanSend(ch2, 42)
-	ch2!.close()
+	ch2.close()
 
 	// First receive gets the buffered value
 	const [__goscriptSelect2HasReturn, __goscriptSelect2Value] = await $.selectStatement<any, void>([
@@ -234,7 +234,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// Test 9: Channel closing test case for a separate test
 	let chClose = $.makeChannel<boolean>(0, false, "both")
-	chClose!.close()
+	chClose.close()
 	let __goscriptRecv0 = await $.chanRecvWithOk(chClose)
 	let val = __goscriptRecv0.value
 	let ok = __goscriptRecv0.ok
@@ -318,7 +318,7 @@ export async function main(): globalThis.Promise<void> {
 	if (__goscriptSelect11HasReturn) {
 		return __goscriptSelect11Value
 	}
-	empty!.close()
+	empty.close()
 	const [__goscriptSelect12HasReturn, __goscriptSelect12Value] = await $.selectStatement<any, void>([
 		{
 			id: 0,

@@ -53,7 +53,7 @@ export class pos {
 	)
 }
 
-export let calls: number = 0
+export let calls = 0
 
 export function __goscript_set_calls(__goscriptValue: number): void {
 	calls = __goscriptValue

@@ -2,11 +2,8 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as slices from "@goscript/slices/index.js"
-
 import type * as iter from "@goscript/iter/index.js"
-import "@goscript/slices/index.js"
 
 export async function simpleIterator(_yield: ((_p0: number) => boolean | globalThis.Promise<boolean>) | null): globalThis.Promise<void> {
 	for (let i = 0; i < 3; i++) {

@@ -2,12 +2,8 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as reflect from "@goscript/reflect/index.js"
-
 import * as strings from "@goscript/strings/index.js"
-import "@goscript/reflect/index.js"
-import "@goscript/strings/index.js"
 
 export class item {
 	public get Name(): string {

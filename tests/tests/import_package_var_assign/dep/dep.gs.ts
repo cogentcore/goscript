@@ -2,15 +2,13 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as __goscript__default from "./default.gs.ts"
-import "./default.gs.ts"
 
 $.registerTypePackagePath("github.com/s4wave/goscript/tests/tests/import_package_var_assign/dep", ["dep.Level"])
 
 export type Level = number
 
-export let Count: number = 1
+export let Count = 1
 
 export function __goscript_set_Count(__goscriptValue: number): void {
 	Count = __goscriptValue

@@ -2,9 +2,7 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as errors from "@goscript/github.com/pkg/errors/index.js"
-import "@goscript/github.com/pkg/errors/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	// Test New

@@ -4,7 +4,7 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export async function main(): globalThis.Promise<void> {
-	let value: bigint = 3n
+	let value = 3n
 	let delta = -5
 	value = $.int64Add(value, $.int64(delta))
 	await $.println("int64-add", value)

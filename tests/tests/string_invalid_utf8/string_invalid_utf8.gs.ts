@@ -2,18 +2,10 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as slices from "@goscript/slices/index.js"
-
 import * as strings from "@goscript/strings/index.js"
-
 import * as unicode from "@goscript/unicode/index.js"
-
 import * as utf8 from "@goscript/unicode/utf8/index.js"
-import "@goscript/slices/index.js"
-import "@goscript/strings/index.js"
-import "@goscript/unicode/index.js"
-import "@goscript/unicode/utf8/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	let s = "BadUTF8\xe2\xe2\xa1"
@@ -45,7 +37,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println($.stringLen($.runesToString(runes)), $.stringEqual($.runesToString(runes), "BadUTF8\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd"))
 
 	// building from runes
-	let b: $.VarRef<strings.Builder> = $.varRef($.markAsStructValue(new strings.Builder()))
+	let b = $.varRef($.markAsStructValue(new strings.Builder()))
 	for (let __goscriptRunes1 = $.stringRunes(s); __goscriptRunes1.next(); ) {
 		let r = __goscriptRunes1.rune
 		if (unicode.IsUpper(r)) {

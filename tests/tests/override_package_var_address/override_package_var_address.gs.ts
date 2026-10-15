@@ -2,18 +2,10 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as errors from "@goscript/errors/index.js"
-
 import * as reflect from "@goscript/reflect/index.js"
-
 import * as strconv from "@goscript/strconv/index.js"
-
 import * as time from "@goscript/time/index.js"
-import "@goscript/errors/index.js"
-import "@goscript/reflect/index.js"
-import "@goscript/strconv/index.js"
-import "@goscript/time/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	// Taking the address of a variable of a hand-written package does not

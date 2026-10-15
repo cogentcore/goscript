@@ -9,7 +9,7 @@ export function double(_in: number): number {
 
 export async function main(): globalThis.Promise<void> {
 	// Test simple variable named 'in'
-	let _in: number = 3
+	let _in = 3
 	_in = _in + 1
 
 	// Test function parameter named 'in'

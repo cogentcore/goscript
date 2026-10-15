@@ -2,9 +2,7 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as slices from "@goscript/slices/index.js"
-import "@goscript/slices/index.js"
 
 export class Process {
 	public get pid(): number {
@@ -97,7 +95,7 @@ export async function anyExited(procs: $.Slice<Process | $.VarRef<Process> | nul
 
 export async function main(): globalThis.Promise<void> {
 	let done = $.makeChannel<{}>(0, {}, "both")
-	done!.close()
+	done.close()
 	let procs = $.arrayToSlice<Process | $.VarRef<Process> | null>([new Process({pid: 1, done: $.makeChannel<{}>(0, {}, "both")}), new Process({pid: 2, done: done})])
 
 	await $.println("first even:", firstEven($.arrayToSlice<number>([1, 3, 4, 6])))

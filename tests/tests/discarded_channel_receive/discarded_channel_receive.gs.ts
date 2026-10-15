@@ -7,7 +7,7 @@ export async function main(): globalThis.Promise<void> {
 	let ch = $.makeChannel<number>(0, 0, "both")
 	queueMicrotask(async () => {
 		await $.chanSend(ch, 1)
-		ch!.close()
+		ch.close()
 	})
 	await $.chanRecv(ch)
 	await $.println("done")

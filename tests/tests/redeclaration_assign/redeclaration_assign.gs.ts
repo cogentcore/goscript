@@ -55,7 +55,7 @@ export async function typeSwitchCaseRedeclare(value: any): globalThis.Promise<vo
 }
 
 export async function main(): globalThis.Promise<void> {
-	let i: number = 0
+	let i = 0
 	await $.println("initial i:", i)
 
 	// i already exists from the var declaration above.

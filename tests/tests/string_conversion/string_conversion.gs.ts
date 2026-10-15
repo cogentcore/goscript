@@ -13,7 +13,7 @@ export async function main(): globalThis.Promise<void> {
 	let s = $.runeToString(r)
 	await $.println(s)
 
-	let r2: number = 97
+	let r2 = 97
 	let s2 = $.runeToString(r2)
 	await $.println(s2)
 
@@ -77,22 +77,22 @@ export async function main(): globalThis.Promise<void> {
 	await $.println(interfaceString)
 
 	// Test with type conversion through variable
-	let myString: string = "variable test"
+	let myString = "variable test"
 	let convertedString = myString
 	await $.println(convertedString)
 
 	// === Test string(byte) conversion ===
-	let b: number = 65
+	let b = 65
 	let byteString = $.runeToString(b)
 	await $.println(byteString)
 
 	// === Invalid runes convert to U+FFFD ===
 	let surrogate: number = 0xd800
-	let negative: number = -1
+	let negative = -1
 	let tooBig: number = 0x110000
 	await $.println($.stringEqual($.runeToString(surrogate), "\xef\xbf\xbd"), $.stringEqual($.runeToString(negative), "\xef\xbf\xbd"), $.stringEqual($.runeToString(tooBig), "\xef\xbf\xbd"))
-	let wide: bigint = 128512n
-	let wideBad: bigint = 1099511627776n
+	let wide = 128512n
+	let wideBad = 1099511627776n
 	await $.println($.stringEqual($.runeToString($.int(wide, 32)), "\xf0\x9f\x98\x80"), $.stringEqual($.runeToString(wide), "\xf0\x9f\x98\x80"), $.stringEqual($.runeToString(wideBad), "\xef\xbf\xbd"))
 }
 

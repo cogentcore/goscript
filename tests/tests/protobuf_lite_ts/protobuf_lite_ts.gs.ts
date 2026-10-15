@@ -2,14 +2,9 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as protobuf_go_lite from "@goscript/github.com/aperturerobotics/protobuf-go-lite/index.js"
-
 import type * as json from "@goscript/github.com/aperturerobotics/protobuf-go-lite/json/index.js"
-
 import * as __goscript_protobuf_lite_ts_pb_ts from "./protobuf_lite_ts.pb.ts"
-import "@goscript/github.com/aperturerobotics/protobuf-go-lite/index.js"
-import "./protobuf_lite_ts.pb.ts"
 
 export async function main(): globalThis.Promise<void> {
 	let msg = new __goscript_protobuf_lite_ts_pb_ts.ExampleMsg({ExampleField: new Uint8Array([104, 101, 108, 108, 111]), ExampleText: "world"})

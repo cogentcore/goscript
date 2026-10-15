@@ -2,7 +2,6 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as atomic from "@goscript/sync/atomic/index.js"
 import "@goscript/sync/atomic/index.js"
 

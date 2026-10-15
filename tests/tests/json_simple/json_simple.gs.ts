@@ -2,9 +2,7 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as json from "@goscript/encoding/json/index.js"
-import "@goscript/encoding/json/index.js"
 
 export class Simple {
 	public get X(): number {

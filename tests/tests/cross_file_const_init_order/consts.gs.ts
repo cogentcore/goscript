@@ -2,9 +2,7 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as __goscript_register from "./register.gs.ts"
-import "./register.gs.ts"
 
 export const Store: number = 0
 

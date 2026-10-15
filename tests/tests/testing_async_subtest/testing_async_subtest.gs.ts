@@ -2,7 +2,6 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as testing from "@goscript/testing/index.js"
 import "@goscript/testing/index.js"
 

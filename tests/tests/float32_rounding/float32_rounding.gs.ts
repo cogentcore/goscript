@@ -2,20 +2,11 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as bytes from "@goscript/bytes/index.js"
-
 import * as json from "@goscript/encoding/json/index.js"
-
 import * as fmt from "@goscript/fmt/index.js"
-
 import * as strconv from "@goscript/strconv/index.js"
-
 import type * as io from "@goscript/io/index.js"
-import "@goscript/bytes/index.js"
-import "@goscript/encoding/json/index.js"
-import "@goscript/fmt/index.js"
-import "@goscript/strconv/index.js"
 
 export class T {
 	public get A(): string {
@@ -70,8 +61,8 @@ export class T {
 export const c32: number = 0.10000000149011612
 
 export async function main(): globalThis.Promise<void> {
-	let sum32: number = 0
-	let sum64: number = 0
+	let sum32 = 0
+	let sum64 = 0
 	for (let __rangeIndex = 0; __rangeIndex < 10; __rangeIndex++) {
 		sum32 = globalThis.Math.fround(sum32 + (0.10000000149011612))
 		sum64 += 0.1
@@ -82,14 +73,14 @@ export async function main(): globalThis.Promise<void> {
 	let onePointOne32 = 1.100000023841858
 	await fmt.Println("widened32:", $.basicInterfaceValue(onePointOne32, "float64"))
 
-	let max32: number = 3.4028234663852886e+38
+	let max32 = 3.4028234663852886e+38
 	let overflow32 = globalThis.Math.fround(max32 * 2)
 	let finite64 = max32 * 2
 	await fmt.Println("overflow32:", $.basicInterfaceValue(overflow32, "float64"))
 	await fmt.Println("finite64:", $.basicInterfaceValue(finite64, "float64"))
 
 	// constants are rounded to float32 like computed values
-	let f: number = 3.140000104904175
+	let f = 3.140000104904175
 	let [g, ] = strconv.ParseFloat("3.14", 32)
 	let h = globalThis.Math.fround(g)
 	await fmt.Println(f == h, 0.10000000149011612 == globalThis.Math.fround((g / 31.4)), $.basicInterfaceValue(0.10000000149011612, "float32"))
@@ -106,7 +97,7 @@ export async function main(): globalThis.Promise<void> {
 	let y = 0.20000000298023224
 	let z = globalThis.Math.fround(x + y)
 	await fmt.Println($.basicInterfaceValue(z, "float32"), z == 0.30000001192092896, $.basicInterfaceValue(z, "float64"))
-	let d: number = 0.1
+	let d = 0.1
 	let e = globalThis.Math.fround(d)
 	await fmt.Println($.basicInterfaceValue(e, "float32"), $.basicInterfaceValue(e, "float64"))
 	let m = globalThis.Math.fround(f * 3)
@@ -124,7 +115,7 @@ export async function main(): globalThis.Promise<void> {
 	let j: $.VarRef<T> = $.varRef(new T(undefined, true))
 	let err: $.GoError = json.Unmarshal(b, $.interfaceValue(j, "*main.T", /* @__PURE__ */ $.pointerType("main.T")))
 	await fmt.Println($.bytesToString(b), $.structEqual(j.value, s.value), $.interfaceValue((j.value).clone(), "main.T", "main.T"), (err as any))
-	let buf: $.VarRef<bytes.Buffer> = $.varRef($.markAsStructValue(new bytes.Buffer()))
+	let buf = $.varRef($.markAsStructValue(new bytes.Buffer()))
 	let enc = json.NewEncoder($.pointerValueOrNil($.interfaceValue<io.Writer | null>(buf, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer")))!)
 	json.Encoder.prototype.SetIndent.call($.pointerValue<json.Encoder>(enc), "", "\t")
 	err = await json.Encoder.prototype.Encode.call($.pointerValue<json.Encoder>(enc), $.interfaceValue(s, "*main.T", /* @__PURE__ */ $.pointerType("main.T")))

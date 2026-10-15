@@ -2,9 +2,7 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as slices from "@goscript/slices/index.js"
-import "@goscript/slices/index.js"
 
 export class item {
 	public get Text(): string {
@@ -97,7 +95,7 @@ export class arena {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let a: $.VarRef<arena> = $.varRef($.markAsStructValue(new arena()))
+	let a = $.varRef($.markAsStructValue(new arena()))
 	let value = (a.value.New(__goscriptStatic0()) as item | $.VarRef<item> | null)
 	let value$: item = value == null ? $.pointerTarget<item>(value) : (value as any).__isVarRef === true ? (value as any).value : (value as any).__goValue === undefined ? (value as any) : $.pointerTarget<item>(value);
 	;(value$ as item).Text = "ok"

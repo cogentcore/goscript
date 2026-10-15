@@ -4,7 +4,7 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export async function main(): globalThis.Promise<void> {
-	let x: $.VarRef<number> = $.varRef(10)
+	let x = $.varRef(10)
 	let p1: $.VarRef<$.VarRef<number> | null> = $.varRef(x)
 	let p2: $.VarRef<$.VarRef<$.VarRef<number> | null> | null> = $.varRef(p1)
 	let p3: $.VarRef<$.VarRef<$.VarRef<number> | null> | null> | null = p2

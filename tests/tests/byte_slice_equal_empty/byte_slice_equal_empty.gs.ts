@@ -2,9 +2,7 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as bytes from "@goscript/bytes/index.js"
-import "@goscript/bytes/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	let nilBytes: $.Slice<number> = null! as $.Slice<number>

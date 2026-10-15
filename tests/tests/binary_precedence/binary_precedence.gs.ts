@@ -2,9 +2,7 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as math from "@goscript/math/index.js"
-import "@goscript/math/index.js"
 
 export type celsius = number
 
@@ -31,7 +29,7 @@ export async function conversionOperands(): globalThis.Promise<void> {
 	await $.println("multiply:", (2 * (ny + threads)) == 132)
 	await $.println("int:", globalThis.Math.trunc(100 / $.int(globalThis.Math.trunc((ny * threads) / ny))))
 	await $.println("named:", (n / (ny + threads)) > 63550)
-	let f: number = 10
+	let f = 10
 	await $.println("float:", $.int(f / (ny + 3)) == 2)
 	await $.println("unary:", -(ny + threads) == -66)
 }

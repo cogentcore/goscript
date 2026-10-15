@@ -2,22 +2,16 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as context from "@goscript/context/index.js"
-
 import * as sync from "@goscript/sync/index.js"
-
 import * as conc from "@goscript/github.com/aperturerobotics/util/conc/index.js"
-import "@goscript/context/index.js"
-import "@goscript/sync/index.js"
-import "@goscript/github.com/aperturerobotics/util/conc/index.js"
 
 export const children: number = 16
 
 export const leaves: number = 8
 
 export async function main(): globalThis.Promise<void> {
-	let mu: $.VarRef<sync.Mutex> = $.varRef($.markAsStructValue(new sync.Mutex()))
+	let mu = $.varRef($.markAsStructValue(new sync.Mutex()))
 	let completed = 0
 
 	let q = await conc.NewConcurrentQueue(16, null)

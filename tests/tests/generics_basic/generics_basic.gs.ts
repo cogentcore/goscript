@@ -286,7 +286,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("min:", min(__goscriptStatic0(), 8, 3), min(__goscriptStatic1(), 9, 4), min(__goscriptStatic2(), "go", "ts"))
 
 	await $.println("=== Generic stack ===")
-	let stack: $.VarRef<Stack> = $.varRef($.markAsStructValue(new Stack()))
+	let stack = $.varRef($.markAsStructValue(new Stack()))
 	stack.value.Push(__goscriptStatic0(), 10)
 	stack.value.Push(__goscriptStatic0(), 20)
 	let __goscriptTuple0: any = stack.value.Pop(__goscriptStatic0())

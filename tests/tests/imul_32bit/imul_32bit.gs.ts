@@ -118,7 +118,7 @@ export async function checkInt32(x: number, y: number, want: number): globalThis
 }
 
 export async function checkPlatformIntWidths(): globalThis.Promise<void> {
-	let neg: bigint = -1n
+	let neg = -1n
 	if ($.uint(neg, 64) == 4294967295) {
 		await $.println("uint is 32-bit")
 	}

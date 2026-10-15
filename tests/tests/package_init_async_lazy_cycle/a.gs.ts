@@ -2,11 +2,8 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as __goscript_b from "./b.gs.ts"
-
 import * as __goscript_package_init from "./__goscript_package_init.gs.ts"
-import "./b.gs.ts"
 
 export class holder {
 	public get n(): number {

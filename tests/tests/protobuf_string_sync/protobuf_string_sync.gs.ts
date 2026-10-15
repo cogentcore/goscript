@@ -2,16 +2,10 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as fmt from "@goscript/fmt/index.js"
-
 import type * as protobuf_go_lite from "@goscript/github.com/aperturerobotics/protobuf-go-lite/index.js"
-
 import type * as json from "@goscript/github.com/aperturerobotics/protobuf-go-lite/json/index.js"
-
 import * as __goscript_protobuf_string_sync_pb_ts from "./protobuf_string_sync.pb.ts"
-import "@goscript/fmt/index.js"
-import "./protobuf_string_sync.pb.ts"
 
 export async function main(): globalThis.Promise<void> {
 	let msg = new __goscript_protobuf_string_sync_pb_ts.ExampleMsg({ExampleText: "world"})

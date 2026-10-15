@@ -2,9 +2,7 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as strings from "@goscript/strings/index.js"
-import "@goscript/strings/index.js"
 
 export type Basic = {
 	Join(elem: $.Slice<string>): string
@@ -35,7 +33,7 @@ export class PathJoiner {
 
 	public Join(elem: $.Slice<string>): string {
 		const p = this;
-		let result: $.VarRef<strings.Builder> = $.varRef($.markAsStructValue(new strings.Builder()))
+		let result = $.varRef($.markAsStructValue(new strings.Builder()))
 		for (let __goscriptRangeTarget0 = elem, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), i = 0; i < __goscriptRangeWindow0.length; i++) {
 			let e = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + i] as string)
 			if (i > 0) {

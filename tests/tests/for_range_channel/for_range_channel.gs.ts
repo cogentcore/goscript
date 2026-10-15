@@ -22,7 +22,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.chanSend(c, 1)
 	c!.close()
 
-	let y: number = 0
+	let y = 0
 	while (true) {
 		let __goscriptRange1 = await $.chanRecvWithOk(c)
 		if (!__goscriptRange1.ok) {

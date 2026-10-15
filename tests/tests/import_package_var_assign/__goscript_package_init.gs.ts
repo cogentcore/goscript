@@ -2,7 +2,6 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as __goscript_file0 from "./main.gs.ts"
-
 import * as __goscript_file1 from "./vars.gs.ts"
 
 let initialized = false

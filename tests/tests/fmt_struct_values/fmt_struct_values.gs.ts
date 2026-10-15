@@ -2,20 +2,11 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as bytes from "@goscript/bytes/index.js"
-
 import * as fmt from "@goscript/fmt/index.js"
-
 import * as strings from "@goscript/strings/index.js"
-
 import * as logrus from "@goscript/github.com/sirupsen/logrus/index.js"
-
 import type * as io from "@goscript/io/index.js"
-import "@goscript/bytes/index.js"
-import "@goscript/fmt/index.js"
-import "@goscript/strings/index.js"
-import "@goscript/github.com/sirupsen/logrus/index.js"
 
 export class Inner {
 	// Ready is included even when it is false.
@@ -439,7 +430,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println(strings.Replacer.prototype.Replace.call($.pointerValue<strings.Replacer>(names), await fmt.Sprint($.interfaceValue(app, "*main.App", /* @__PURE__ */ $.pointerType("main.App")))))
 
 	// Exercise the same log field formatting used by controller shutdown warnings.
-	let output: $.VarRef<bytes.Buffer> = $.varRef($.markAsStructValue(new bytes.Buffer()))
+	let output = $.varRef($.markAsStructValue(new bytes.Buffer()))
 	let logger = logrus.New()
 	await (logger !== null && (logger as any).__isVarRef !== true && (logger as any).__goValue === undefined ? ((logger as any) as logrus.Logger).SetOutput($.interfaceValue<io.Writer | null>(output, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer"))) : logrus.Logger.prototype.SetOutput.call(logger, $.interfaceValue<io.Writer | null>(output, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer"))))
 	await logrus.Logger.prototype.SetFormatter.call(logger, $.interfaceValue<logrus.Formatter | null>(new logrus.TextFormatter({DisableColors: true, DisableTimestamp: true}), "*logrus.TextFormatter", /* @__PURE__ */ $.pointerType("logrus.TextFormatter")))

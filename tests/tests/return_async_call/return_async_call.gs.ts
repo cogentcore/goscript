@@ -2,12 +2,8 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as context from "@goscript/context/index.js"
-
 import * as time from "@goscript/time/index.js"
-import "@goscript/context/index.js"
-import "@goscript/time/index.js"
 
 export async function AsyncFunction(): globalThis.Promise<string> {
 	await time.Sleep(10000000n)

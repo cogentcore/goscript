@@ -2,23 +2,15 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as context from "@goscript/context/index.js"
-
 import * as strconv from "@goscript/strconv/index.js"
-
 import * as sync from "@goscript/sync/index.js"
-
 import * as conc from "@goscript/github.com/aperturerobotics/util/conc/index.js"
-import "@goscript/context/index.js"
-import "@goscript/strconv/index.js"
-import "@goscript/sync/index.js"
-import "@goscript/github.com/aperturerobotics/util/conc/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	let release = $.makeChannel<{}>(0, {}, "both")
 
-	let mu: $.VarRef<sync.Mutex> = $.varRef($.markAsStructValue(new sync.Mutex()))
+	let mu = $.varRef($.markAsStructValue(new sync.Mutex()))
 	let count = 0
 	let sum = 0
 
@@ -36,7 +28,7 @@ export async function main(): globalThis.Promise<void> {
 	let [queued, running] = await (q !== null && (q as any).__isVarRef !== true && (q as any).__goValue === undefined ? ((q as any) as conc.ConcurrentQueue).Enqueue($.arrayToSlice<(() => void) | null>([makeJob(2), makeJob(3), makeJob(4)])) : conc.ConcurrentQueue.prototype.Enqueue.call(q, $.arrayToSlice<(() => void) | null>([makeJob(2), makeJob(3), makeJob(4)])))
 	await $.println("queued=" + strconv.Itoa(queued) + " running=" + strconv.Itoa(running))
 
-	release!.close()
+	release.close()
 
 	{
 		let err = await (q !== null && (q as any).__isVarRef !== true && (q as any).__goValue === undefined ? ((q as any) as conc.ConcurrentQueue).WaitIdle(context.Background(), null) : conc.ConcurrentQueue.prototype.WaitIdle.call(q, context.Background(), null))

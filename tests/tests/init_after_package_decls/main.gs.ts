@@ -2,17 +2,11 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as __goscript__type from "./type.gs.ts"
-
 import * as __goscript_field from "./field.gs.ts"
-
 import * as __goscript_types from "./types.gs.ts"
-
 import * as __goscript_package_init from "./__goscript_package_init.gs.ts"
 import "./type.gs.ts"
-import "./field.gs.ts"
-import "./types.gs.ts"
 
 export var Later: string
 

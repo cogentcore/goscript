@@ -2,13 +2,9 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as sha1 from "@goscript/crypto/sha1/index.js"
-
 import * as hash from "@goscript/hash/index.js"
-
 import * as io from "@goscript/io/index.js"
-import "@goscript/crypto/sha1/index.js"
 import "@goscript/hash/index.js"
 import "@goscript/io/index.js"
 

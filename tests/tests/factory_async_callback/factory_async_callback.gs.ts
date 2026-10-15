@@ -2,9 +2,7 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as dep from "@goscript/github.com/s4wave/goscript/tests/tests/factory_async_callback/dep/index.js"
-import "@goscript/github.com/s4wave/goscript/tests/tests/factory_async_callback/dep/index.js"
 
 export type AddFactoryFunc = ((b: dep.Bus) => $.Slice<dep.Factory | null> | globalThis.Promise<$.Slice<dep.Factory | null>>) | null
 

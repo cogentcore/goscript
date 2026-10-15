@@ -2,24 +2,16 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as context from "@goscript/context/index.js"
-
 import * as sync from "@goscript/sync/index.js"
-
 import * as time from "@goscript/time/index.js"
-
 import * as csync from "@goscript/github.com/aperturerobotics/util/csync/index.js"
-import "@goscript/context/index.js"
-import "@goscript/sync/index.js"
-import "@goscript/time/index.js"
-import "@goscript/github.com/aperturerobotics/util/csync/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	await using __defer = new $.AsyncDisposableStack()
 	let mtx: $.VarRef<csync.Mutex> = $.varRef(new csync.Mutex(undefined, true))
-	let counter: number = 0
-	let wg: $.VarRef<sync.WaitGroup> = $.varRef($.markAsStructValue(new sync.WaitGroup()))
+	let counter = 0
+	let wg = $.varRef($.markAsStructValue(new sync.WaitGroup()))
 
 	let [ctx, cancel] = context.WithTimeout($.pointerValueOrNil(context.Background())!, 5000000000n)
 	const __goscriptDeferCallee0 = cancel
@@ -61,7 +53,7 @@ export async function main(): globalThis.Promise<void> {
 	let done = $.makeChannel<{}>(0, {}, "both")
 	queueMicrotask(async () => {
 		await wg.value.Wait()
-		done!.close()
+		done.close()
 	})
 
 	const [__goscriptSelect0HasReturn, __goscriptSelect0Value] = await $.selectStatement<any, void>([

@@ -2,15 +2,9 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as bytes from "@goscript/bytes/index.js"
-
 import * as aes from "@goscript/crypto/aes/index.js"
-
 import * as cipher from "@goscript/crypto/cipher/index.js"
-import "@goscript/bytes/index.js"
-import "@goscript/crypto/aes/index.js"
-import "@goscript/crypto/cipher/index.js"
 
 export type packetSealer = {
 	Seal(dst: $.Slice<number>, plaintext: $.Slice<number>): $.Slice<number> | globalThis.Promise<$.Slice<number>>

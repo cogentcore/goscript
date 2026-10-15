@@ -3,7 +3,7 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
-export let a: number = 10
+export let a = 10
 
 export function __goscript_set_a(__goscriptValue: number): void {
 	a = __goscriptValue

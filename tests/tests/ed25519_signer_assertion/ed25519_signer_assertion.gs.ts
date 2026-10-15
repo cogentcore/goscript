@@ -2,9 +2,7 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as crypto from "@goscript/crypto/index.js"
-
 import * as ed25519 from "@goscript/crypto/ed25519/index.js"
 import "@goscript/crypto/index.js"
 import "@goscript/crypto/ed25519/index.js"

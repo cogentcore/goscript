@@ -5,8 +5,8 @@ import * as $ from "@goscript/builtin/index.js"
 
 export function makeLookup(): ((_p0: boolean) => [number, string] | globalThis.Promise<[number, string]>) | null {
 	return $.functionValue((ok: boolean): [number, string] => {
-		let value: number = 0
-		let label: string = ""
+		let value = 0
+		let label = ""
 		if (!ok) {
 			return [value, label]
 		}

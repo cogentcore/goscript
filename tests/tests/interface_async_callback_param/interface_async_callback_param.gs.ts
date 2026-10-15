@@ -2,12 +2,8 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as errors from "@goscript/errors/index.js"
-
 import * as sync from "@goscript/sync/index.js"
-import "@goscript/errors/index.js"
-import "@goscript/sync/index.js"
 
 export type scanner = {
 	Scan(_p0: ((_p0: number) => $.GoError | globalThis.Promise<$.GoError>) | null): $.GoError | globalThis.Promise<$.GoError>
@@ -61,7 +57,7 @@ export async function run(s: scanner | null): globalThis.Promise<$.GoError> {
 export async function main(): globalThis.Promise<void> {
 	await $.println(await run($.interfaceValue<scanner | null>(new listScanner(undefined, true), "main.listScanner", "main.listScanner")) == null)
 
-	let m: $.VarRef<sync.Map> = $.varRef($.markAsStructValue(new sync.Map()))
+	let m = $.varRef($.markAsStructValue(new sync.Map()))
 	let callbacks = $.arrayValue([$.functionValue(async (v: number): globalThis.Promise<$.GoError> => {
 		await m.value.Load($.basicInterfaceValue(v, "int"))
 		return null

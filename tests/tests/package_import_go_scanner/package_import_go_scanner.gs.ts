@@ -2,15 +2,9 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as fmt from "@goscript/fmt/index.js"
-
 import * as scanner from "@goscript/go/scanner/index.js"
-
 import * as token from "@goscript/go/token/index.js"
-import "@goscript/fmt/index.js"
-import "@goscript/go/scanner/index.js"
-import "@goscript/go/token/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	// Use scanner package functionality that should generate imports
@@ -25,7 +19,7 @@ export async function main(): globalThis.Promise<void> {
 	// End reports the position after the last scanned token.
 	let fset = token.NewFileSet()
 	let file = token.FileSet.prototype.AddFile.call($.pointerValue<token.FileSet>(fset), "empty.go", -1, 0)
-	let s: $.VarRef<scanner.Scanner> = $.varRef($.markAsStructValue(new scanner.Scanner()))
+	let s = $.varRef($.markAsStructValue(new scanner.Scanner()))
 	s.value.Init(file, null, (null as scanner.ErrorHandler | null), 0)
 	await fmt.Println("End before Scan:", s.value.End() == 0)
 	let [, tok, ] = s.value.Scan()

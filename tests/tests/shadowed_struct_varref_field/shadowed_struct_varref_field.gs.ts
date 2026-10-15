@@ -2,9 +2,7 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as sync from "@goscript/sync/index.js"
-import "@goscript/sync/index.js"
 
 export class table {
 	public get Mutex(): sync.Mutex {

@@ -2,50 +2,25 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as bytes from "@goscript/bytes/index.js"
-
 import * as zlib from "@goscript/compress/zlib/index.js"
-
 import * as json from "@goscript/encoding/json/index.js"
-
 import * as errors from "@goscript/errors/index.js"
-
 import * as scanner from "@goscript/go/scanner/index.js"
-
 import * as hash from "@goscript/hash/index.js"
-
 import * as bits from "@goscript/math/bits/index.js"
-
 import * as mime from "@goscript/mime/index.js"
-
 import * as os from "@goscript/os/index.js"
-
 import * as strconv from "@goscript/strconv/index.js"
-
 import * as strings from "@goscript/strings/index.js"
-
 import * as time from "@goscript/time/index.js"
-
 import * as unicode from "@goscript/unicode/index.js"
-
 import * as jsontext from "@goscript/encoding/json/jsontext/index.js"
-
 import type * as io from "@goscript/io/index.js"
-import "@goscript/bytes/index.js"
 import "@goscript/compress/zlib/index.js"
-import "@goscript/encoding/json/index.js"
-import "@goscript/errors/index.js"
-import "@goscript/go/scanner/index.js"
 import "@goscript/hash/index.js"
-import "@goscript/math/bits/index.js"
-import "@goscript/mime/index.js"
 import "@goscript/os/index.js"
-import "@goscript/strconv/index.js"
-import "@goscript/strings/index.js"
-import "@goscript/time/index.js"
 import "@goscript/unicode/index.js"
-import "@goscript/encoding/json/jsontext/index.js"
 
 export class xof {
 	public _fields: {
@@ -89,7 +64,7 @@ export class xof {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let compact: $.VarRef<bytes.Buffer> = $.varRef($.markAsStructValue(new bytes.Buffer()))
+	let compact = $.varRef($.markAsStructValue(new bytes.Buffer()))
 	json.Compact(compact, new Uint8Array([123, 32, 34, 120, 34, 32, 58, 32, 49, 32, 125]))
 	let raw = ((compact.value.Bytes() as json.RawMessage) as json.RawMessage)
 	let __goscriptTuple0: any = jsontext.Value_MarshalJSON(raw)
@@ -106,7 +81,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("time:", time.RFC1123, time.Month_String(time.May))
 	await $.println("leaf:", bits.Rem32(1, 0, 3), strings.ToValidUTF8("abc", "?"), strconv.FormatComplex(parsed, 102, -1, 128), $.int($.real(parsed)), $.int($.imag(parsed)), 0, (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(os.ErrNoHandle).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), strings.ToUpperSpecial((unicode.TurkishCase as unicode.SpecialCase), "go"), $.stringEqual(strings.ToUpperSpecial((unicode.TurkishCase as unicode.SpecialCase), "iki"), "\xc4\xb0K\xc4\xb0"))
 
-	let scan: $.VarRef<bytes.Buffer> = $.varRef($.markAsStructValue(new bytes.Buffer()))
+	let scan = $.varRef($.markAsStructValue(new bytes.Buffer()))
 	await scanner.PrintError($.pointerValueOrNil($.interfaceValue<io.Writer | null>(scan, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer")))!, $.pointerValueOrNil(errors.New("scan failed"))!)
 	await $.println("scanner:", strings.TrimSpace(scan.value.String()))
 

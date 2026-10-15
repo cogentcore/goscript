@@ -2,17 +2,10 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as bytes from "@goscript/bytes/index.js"
-
 import * as errors from "@goscript/errors/index.js"
-
 import * as fmt from "@goscript/fmt/index.js"
-
 import type * as io from "@goscript/io/index.js"
-import "@goscript/bytes/index.js"
-import "@goscript/errors/index.js"
-import "@goscript/fmt/index.js"
 
 export type num = number
 
@@ -188,11 +181,11 @@ export async function main(): globalThis.Promise<void> {
 	let none: $.Slice<number> = null! as $.Slice<number>
 	await fmt.Printf("Nil bytes: [%s] %q [%x] %v\n", $.interfaceValue(none, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(none, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(none, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(none, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))))
 	await fmt.Printf("Quoted: %q %+q %#q %q %+q\n", "tab\there", "\xc3\xa9", "raw", $.basicInterfaceValue(120, "rune", "int32"), $.basicInterfaceValue(233, "rune", "int32"))
-	let seq: bigint = 255n
+	let seq = 255n
 	await fmt.Printf("Uint64: %d %x %v\n", $.basicInterfaceValue(seq, "uint64"), $.basicInterfaceValue(seq, "uint64"), $.basicInterfaceValue(seq, "uint64"))
 	let appended = await fmt.Append(new Uint8Array([98, 97, 115, 101, 45]), "tail")
 	await fmt.Println("Append bytes:", $.bytesToString(appended))
-	let buf: $.VarRef<bytes.Buffer> = $.varRef($.markAsStructValue(new bytes.Buffer()))
+	let buf = $.varRef($.markAsStructValue(new bytes.Buffer()))
 	await fmt.Fprintln($.pointerValueOrNil($.interfaceValue<io.Writer | null>(buf, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer")))!, "Buffered writer")
 	await fmt.Print(buf.value.String())
 
@@ -232,26 +225,26 @@ export async function starWidthPrecision(): globalThis.Promise<void> {
 }
 
 export async function scanVerbs(): globalThis.Promise<void> {
-	let f32: $.VarRef<number> = $.varRef(0)
+	let f32 = $.varRef(0)
 	let [n, err] = fmt.Sscanf("1.0", "%g", $.interfaceValue(f32, "*float32", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("float32"))))
 	await fmt.Println("g float32:", $.basicInterfaceValue(n, "int"), err == null, $.basicInterfaceValue(f32.value, "float32"))
 
-	let f64: $.VarRef<number> = $.varRef(0)
+	let f64 = $.varRef(0)
 	let __goscriptTuple0: any = fmt.Sscanf(" 2.5e1 rest", "%f", $.interfaceValue(f64, "*float64", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("float64"))))
 	n = __goscriptTuple0[0]
 	err = __goscriptTuple0[1]
 	await fmt.Println("f float64:", $.basicInterfaceValue(n, "int"), err == null, $.basicInterfaceValue(f64.value, "float64"))
 
-	let i64: $.VarRef<bigint> = $.varRef(0n)
-	let u8: $.VarRef<number> = $.varRef(0)
+	let i64 = $.varRef(0n)
+	let u8 = $.varRef(0)
 	let __goscriptTuple1: any = fmt.Sscanf("-42,200", "%d,%d", $.interfaceValue(i64, "*int64", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int64"))), $.interfaceValue(u8, "*uint8", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("uint8"))))
 	n = __goscriptTuple1[0]
 	err = __goscriptTuple1[1]
 	await fmt.Println("d int64 uint8:", $.basicInterfaceValue(n, "int"), err == null, $.basicInterfaceValue(i64.value, "int64"), $.basicInterfaceValue(u8.value, "uint8"))
 
-	let r: $.VarRef<number> = $.varRef(0)
-	let g: $.VarRef<number> = $.varRef(0)
-	let b: $.VarRef<number> = $.varRef(0)
+	let r = $.varRef(0)
+	let g = $.varRef(0)
+	let b = $.varRef(0)
 	let __goscriptTuple2: any = fmt.Sscanf("ff8000", "%02x%02x%02x", $.interfaceValue(r, "*uint8", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(g, "*uint8", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(b, "*uint8", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("uint8"))))
 	n = __goscriptTuple2[0]
 	err = __goscriptTuple2[1]
@@ -267,14 +260,14 @@ export async function scanVerbs(): globalThis.Promise<void> {
 	err = __goscriptTuple4[1]
 	await fmt.Println("struct fields:", $.basicInterfaceValue(n, "int"), err == null, $.basicInterfaceValue(p.Line, "int"), $.basicInterfaceValue(p.Char, "int"))
 
-	let s: $.VarRef<string> = $.varRef("")
-	let v: $.VarRef<number> = $.varRef(0)
+	let s = $.varRef("")
+	let v = $.varRef(0)
 	let __goscriptTuple5: any = fmt.Sscanf("name 7", "%s %v", $.interfaceValue(s, "*string", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("string"))), $.interfaceValue(v, "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int"))))
 	n = __goscriptTuple5[0]
 	err = __goscriptTuple5[1]
 	await fmt.Println("s v:", $.basicInterfaceValue(n, "int"), err == null, s.value, $.basicInterfaceValue(v.value, "int"))
 
-	let bl: $.VarRef<boolean> = $.varRef(false)
+	let bl = $.varRef(false)
 	let __goscriptTuple6: any = fmt.Sscanf("true", "%t", $.interfaceValue(bl, "*bool", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("bool"))))
 	n = __goscriptTuple6[0]
 	err = __goscriptTuple6[1]
@@ -290,14 +283,14 @@ export async function scanVerbs(): globalThis.Promise<void> {
 	err = __goscriptTuple8[1]
 	await fmt.Println("short:", $.basicInterfaceValue(n, "int"), err != null, $.basicInterfaceValue(v.value, "int"))
 
-	let a: $.VarRef<number> = $.varRef(0)
-	let c: $.VarRef<number> = $.varRef(0)
-	let word: $.VarRef<string> = $.varRef("")
+	let a = $.varRef(0)
+	let c = $.varRef(0)
+	let word = $.varRef("")
 	let __goscriptTuple9: any = fmt.Sscan("3  4\n hello", $.interfaceValue(a, "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int"))), $.interfaceValue(c, "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int"))), $.interfaceValue(word, "*string", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("string"))))
 	n = __goscriptTuple9[0]
 	err = __goscriptTuple9[1]
 	await fmt.Println("Sscan:", $.basicInterfaceValue(n, "int"), err == null, $.basicInterfaceValue(a.value, "int"), $.basicInterfaceValue(c.value, "int"), word.value)
-	let fl: $.VarRef<number> = $.varRef(0)
+	let fl = $.varRef(0)
 	let __goscriptTuple10: any = fmt.Sscan("1.25", $.interfaceValue(fl, "*float64", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("float64"))))
 	n = __goscriptTuple10[0]
 	err = __goscriptTuple10[1]

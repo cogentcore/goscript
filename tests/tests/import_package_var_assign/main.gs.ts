@@ -2,14 +2,9 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as dep from "@goscript/github.com/s4wave/goscript/tests/tests/import_package_var_assign/dep/index.js"
-
 import * as __goscript_vars from "./vars.gs.ts"
-
 import * as __goscript_package_init from "./__goscript_package_init.gs.ts"
-import "@goscript/github.com/s4wave/goscript/tests/tests/import_package_var_assign/dep/index.js"
-import "./vars.gs.ts"
 
 export var userPtr: $.VarRef<number> | null
 

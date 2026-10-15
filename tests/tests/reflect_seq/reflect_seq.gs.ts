@@ -2,11 +2,8 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as reflect from "@goscript/reflect/index.js"
-
 import type * as iter from "@goscript/iter/index.js"
-import "@goscript/reflect/index.js"
 
 export class Inner {
 	public get B(): number {
@@ -153,7 +150,7 @@ export async function main(): globalThis.Promise<void> {
 	let ch = $.makeChannel<number>(2, 0, "both")
 	await $.chanSend(ch, 5)
 	await $.chanSend(ch, 6)
-	ch!.close()
+	ch.close()
 	let __goscriptRangeReturn5 = false
 	;await (async () => {
 		await $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(ch, "chan int", /* @__PURE__ */ $.channelType(/* @__PURE__ */ $.basicType("int"), "both"))))).Seq()!(async (e) => {
@@ -168,7 +165,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.chanSend(rc, 8)
 	let [v, ok] = await $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(rc, "chan int", /* @__PURE__ */ $.channelType(/* @__PURE__ */ $.basicType("int"), "both"))))).Recv()
 	await $.println("recv", $.markAsStructValue($.cloneStructValue(v)).Int(), ok)
-	rc!.close()
+	rc.close()
 	let __goscriptTuple0: any = await $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(rc, "chan int", /* @__PURE__ */ $.channelType(/* @__PURE__ */ $.basicType("int"), "both"))))).Recv()
 	v = $.assignStruct(v, __goscriptTuple0[0])
 	ok = __goscriptTuple0[1]

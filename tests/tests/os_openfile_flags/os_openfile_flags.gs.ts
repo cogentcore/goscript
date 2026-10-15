@@ -2,14 +2,9 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as os from "@goscript/os/index.js"
-
 import * as filepath from "@goscript/path/filepath/index.js"
-
 import type * as fs from "@goscript/io/fs/index.js"
-import "@goscript/os/index.js"
-import "@goscript/path/filepath/index.js"
 
 export async function write(name: string, flag: number, data: string): globalThis.Promise<void> {
 	let __goscriptTuple0: any = await os.OpenFile(name, flag, 0o644)

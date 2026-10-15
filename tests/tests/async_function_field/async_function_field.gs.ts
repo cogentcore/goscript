@@ -2,9 +2,7 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as sync from "@goscript/sync/index.js"
-import "@goscript/sync/index.js"
 
 export class loader {
 	public get load(): ((_p0: string) => [any, boolean] | globalThis.Promise<[any, boolean]>) | null {
@@ -50,7 +48,7 @@ export class loader {
 	)
 }
 
-export let cache: $.VarRef<sync.Map> = $.varRef($.markAsStructValue(new sync.Map()))
+export let cache = $.varRef($.markAsStructValue(new sync.Map()))
 
 export function __goscript_set_cache(__goscriptValue: sync.Map): void {
 	$.assignStruct(cache.value, __goscriptValue)

@@ -2,13 +2,9 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as __goscript_consts from "./consts.gs.ts"
-
 import * as __goscript_register from "./register.gs.ts"
-
 import * as __goscript_package_init from "./__goscript_package_init.gs.ts"
-import "./consts.gs.ts"
 import "./register.gs.ts"
 
 export async function main(): globalThis.Promise<void> {

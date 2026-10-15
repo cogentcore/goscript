@@ -2,15 +2,9 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as x509 from "@goscript/crypto/x509/index.js"
-
 import * as big from "@goscript/math/big/index.js"
-
 import * as time from "@goscript/time/index.js"
-import "@goscript/crypto/x509/index.js"
-import "@goscript/math/big/index.js"
-import "@goscript/time/index.js"
 
 export async function verifyCertificate(cert: x509.Certificate | $.VarRef<x509.Certificate> | null, now: time.Time): globalThis.Promise<$.GoError> {
 	let pool = x509.NewCertPool()

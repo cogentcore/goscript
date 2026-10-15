@@ -101,9 +101,8 @@ type localAssignments struct {
 	// reassigned holds the variables that an assignment, an increment or a
 	// range assignment changes after their declaration.
 	reassigned map[types.Object]bool
-	// funcLits maps each variable declared by := to a function literal to the
-	// literal.
-	funcLits map[types.Object]*ast.FuncLit
+	// values maps each variable declared by := to its initial value.
+	values map[types.Object]ast.Expr
 }
 
 type semanticDeclaration struct {

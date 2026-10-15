@@ -2,12 +2,10 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as sync from "@goscript/sync/index.js"
-import "@goscript/sync/index.js"
 
 export async function main(): globalThis.Promise<void> {
-	let once: $.VarRef<sync.Once> = $.varRef($.markAsStructValue(new sync.Once()))
+	let once = $.varRef($.markAsStructValue(new sync.Once()))
 	let ch = $.makeChannel<number>(1, 0, "both")
 	await $.chanSend(ch, 17)
 	let value = 0

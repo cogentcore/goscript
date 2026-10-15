@@ -34,7 +34,7 @@ export function __goscript_set_level(__goscriptValue: number): void {
 	__goscript_get_level().value = __goscriptValue
 }
 
-export let base: number = 10
+export let base = 10
 
 export function __goscript_set_base(__goscriptValue: number): void {
 	base = __goscriptValue

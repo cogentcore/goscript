@@ -2,11 +2,8 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as maps from "@goscript/maps/index.js"
-
 import type * as iter from "@goscript/iter/index.js"
-import "@goscript/maps/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	let m: globalThis.Map<string, number> | null = null! as globalThis.Map<string, number> | null

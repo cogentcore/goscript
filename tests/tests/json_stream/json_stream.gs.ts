@@ -2,24 +2,13 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as bufio from "@goscript/bufio/index.js"
-
 import * as bytes from "@goscript/bytes/index.js"
-
 import * as json from "@goscript/encoding/json/index.js"
-
 import * as fmt from "@goscript/fmt/index.js"
-
 import * as io from "@goscript/io/index.js"
-
 import * as strings from "@goscript/strings/index.js"
-import "@goscript/bufio/index.js"
-import "@goscript/bytes/index.js"
-import "@goscript/encoding/json/index.js"
-import "@goscript/fmt/index.js"
 import "@goscript/io/index.js"
-import "@goscript/strings/index.js"
 
 export class chanReader {
 	public get ch(): $.Channel<string> | null {
@@ -199,18 +188,18 @@ export async function printTokens(dec: json.Decoder | $.VarRef<json.Decoder> | n
 
 export async function main(): globalThis.Promise<void> {
 	// Compact preserves number literal spelling.
-	let c: $.VarRef<bytes.Buffer> = $.varRef($.markAsStructValue(new bytes.Buffer()))
+	let c = $.varRef($.markAsStructValue(new bytes.Buffer()))
 	json.Compact(c, new Uint8Array([123, 34, 110, 34, 58, 32, 49, 101, 43, 48, 48, 44, 32, 34, 98, 105, 103, 34, 58, 32, 57, 48, 48, 55, 49, 57, 57, 50, 53, 52, 55, 52, 48, 57, 57, 51, 125]))
 	await fmt.Println(c.value.String())
 
 	// Indent lays out the compact form with Go spacing.
-	let ind: $.VarRef<bytes.Buffer> = $.varRef($.markAsStructValue(new bytes.Buffer()))
+	let ind = $.varRef($.markAsStructValue(new bytes.Buffer()))
 	json.Indent(ind, new Uint8Array([123, 34, 97, 34, 58, 49, 44, 34, 98, 34, 58, 91, 50, 44, 51, 93, 125]), "", "  ")
 	await fmt.Println(ind.value.String())
 
 	// Decoder reads one value per call and buffers the rest of the stream.
 	let dec = json.NewDecoder($.pointerValueOrNil($.interfaceValue<io.Reader | null>(strings.NewReader("1 2 3"), "*strings.Reader", /* @__PURE__ */ $.pointerType("strings.Reader")))!)
-	let n: $.VarRef<number> = $.varRef(0)
+	let n = $.varRef(0)
 	while (await json.Decoder.prototype.Decode.call($.pointerValue<json.Decoder>(dec), $.interfaceValue(n, "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int")))) == null) {
 		await fmt.Println("decoded", $.basicInterfaceValue(n.value, "int"))
 	}

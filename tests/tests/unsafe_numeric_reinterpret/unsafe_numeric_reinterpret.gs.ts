@@ -2,11 +2,8 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as math from "@goscript/math/index.js"
-
 import * as unsafe from "@goscript/unsafe/index.js"
-import "@goscript/math/index.js"
 import "@goscript/unsafe/index.js"
 
 export function float32bits(__goscriptParam0: number): number {
@@ -34,13 +31,13 @@ export async function main(): globalThis.Promise<void> {
 	await $.println(float32frombits(0x40490fdb) == math.Float32frombits(0x40490fdb))
 	await $.println(float64bits(-2.5), float64bits(-2.5) == math.Float64bits(-2.5))
 	await $.println(float64frombits(4614256656552045848n) == math.Pi)
-	let i: $.VarRef<number> = $.varRef(-1)
+	let i = $.varRef(-1)
 	await $.println($.uint($.unsafeNumericRef<number>(i, "int32", "uint32").value, 32))
-	let u: $.VarRef<bigint> = $.varRef(9223372036854775808n)
+	let u = $.varRef(9223372036854775808n)
 	await $.println($.unsafeNumericRef<bigint>(u, "uint64", "int64").value)
 
 	// writing through the reinterpreted pointer updates the variable
-	let g: $.VarRef<number> = $.varRef(1)
+	let g = $.varRef(1)
 	$.unsafeNumericRef<number>(g, "float32", "uint32").value = 0x40000000
 	await $.println(g.value == 2)
 	class pair {

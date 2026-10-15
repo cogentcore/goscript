@@ -2,16 +2,10 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import type * as protobuf_go_lite from "@goscript/github.com/aperturerobotics/protobuf-go-lite/index.js"
-
 import type * as json from "@goscript/github.com/aperturerobotics/protobuf-go-lite/json/index.js"
-
 import * as __goscript_child_pb_ts from "./child.pb.ts"
-
 import * as __goscript_parent_pb_ts from "./parent.pb.ts"
-import "./child.pb.ts"
-import "./parent.pb.ts"
 
 export async function main(): globalThis.Promise<void> {
 	let parent = new __goscript_parent_pb_ts.Parent({Child: new __goscript_child_pb_ts.Child({Name: "hello"}), Children: $.arrayToSlice<__goscript_child_pb_ts.Child | $.VarRef<__goscript_child_pb_ts.Child> | null>([new __goscript_child_pb_ts.Child({Name: "one"}), new __goscript_child_pb_ts.Child({Name: "two"})])})

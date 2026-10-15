@@ -2,11 +2,8 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import type * as __goscript__type from "./type.gs.ts"
-
 import * as __goscript_types from "./types.gs.ts"
-import "./types.gs.ts"
 
 export class Field {
 	public get Name(): string {

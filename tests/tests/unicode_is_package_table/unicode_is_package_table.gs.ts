@@ -2,9 +2,7 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as unicode from "@goscript/unicode/index.js"
-import "@goscript/unicode/index.js"
 
 export let vowels: unicode.RangeTable | $.VarRef<unicode.RangeTable> | null = new unicode.RangeTable({R16: $.arrayToSlice<unicode.Range16>([$.markAsStructValue(new unicode.Range16({Lo: 97, Hi: 97, Stride: 1})), $.markAsStructValue(new unicode.Range16({Lo: 101, Hi: 101, Stride: 1})), $.markAsStructValue(new unicode.Range16({Lo: 105, Hi: 105, Stride: 1}))])})
 

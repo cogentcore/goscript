@@ -2,14 +2,9 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as bytes from "@goscript/bytes/index.js"
-
 import * as slog from "@goscript/log/slog/index.js"
-
 import type * as io from "@goscript/io/index.js"
-import "@goscript/bytes/index.js"
-import "@goscript/log/slog/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	let s = slog.StringValue("hello")
@@ -27,7 +22,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println(await g.String())
 	await $.println(await $.markAsStructValue($.cloneStructValue(slog.StringValue("a"))).Equal(slog.StringValue("a")), await s.Equal(slog.StringValue("other")))
 
-	let buf: $.VarRef<bytes.Buffer> = $.varRef($.markAsStructValue(new bytes.Buffer()))
+	let buf = $.varRef($.markAsStructValue(new bytes.Buffer()))
 	let logger = slog.New($.interfaceValue<slog.Handler | null>(slog.NewTextHandler($.interfaceValue<io.Writer | null>(buf, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer")), new slog.HandlerOptions({ReplaceAttr: $.functionValue((groups: $.Slice<string>, a: slog.Attr): slog.Attr => {
 		if (($.stringEqual(a.Key, slog.TimeKey)) && ($.sliceLen(groups) == 0)) {
 			return new slog.Attr(undefined, true)

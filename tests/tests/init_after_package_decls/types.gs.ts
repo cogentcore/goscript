@@ -2,12 +2,8 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as __goscript__type from "./type.gs.ts"
-
 import * as __goscript_field from "./field.gs.ts"
-import "./type.gs.ts"
-import "./field.gs.ts"
 
 export var Types: globalThis.Map<string, __goscript__type.Type | $.VarRef<__goscript__type.Type> | null> | null
 

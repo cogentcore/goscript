@@ -118,7 +118,7 @@ export async function main(): globalThis.Promise<void> {
 	let b = 2
 	let w = $.int(a, 32)
 	await $.println("multiply:", a * b, $.int(globalThis.Math.imul(w, $.int(b, 32)), 32))
-	let u: number = 4000000000
+	let u = 4000000000
 	await $.println("unsigned multiply:", $.uint(globalThis.Math.imul(u, 3) >>> 0, 32))
 	await $.println("divide:", globalThis.Math.trunc(a / b), globalThis.Math.trunc(-a / b))
 
@@ -129,7 +129,7 @@ export async function main(): globalThis.Promise<void> {
 	$.arrayIndex(points, 1).x = 3
 	await $.println("array:", $.arrayIndex(points, 1).x, $.arrayIndex(points, 0).y)
 
-	let big: bigint = 1099511627776n
+	let big = 1099511627776n
 	let f: number = globalThis.Number(big)
 	await $.println("int64 to float:", f == 1099511627776)
 	let n: number = $.int($.int64Shr(big, 20n))

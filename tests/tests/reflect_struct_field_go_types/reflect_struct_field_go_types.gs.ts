@@ -2,12 +2,8 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as reflect from "@goscript/reflect/index.js"
-
 import * as strings from "@goscript/strings/index.js"
-import "@goscript/reflect/index.js"
-import "@goscript/strings/index.js"
 
 export class Inner {
 	public get X(): number {
@@ -189,7 +185,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println($.markAsStructValue($.cloneStructValue(missing)).IsValid())
 
 	// The zero StructField has a nil Type and an empty Index.
-	let zero: reflect.StructField = $.markAsStructValue(new reflect.StructField())
+	let zero = $.markAsStructValue(new reflect.StructField())
 	await $.println(zero.Type == null, $.sliceLen(zero.Index))
 }
 

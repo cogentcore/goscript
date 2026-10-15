@@ -180,7 +180,9 @@ type loweredParam struct {
 }
 
 type loweredNamedResult struct {
-	name       string
+	name string
+	// typ annotates the result variable, or is empty when TypeScript infers
+	// it from zero.
 	typ        string
 	zero       string
 	returnExpr string

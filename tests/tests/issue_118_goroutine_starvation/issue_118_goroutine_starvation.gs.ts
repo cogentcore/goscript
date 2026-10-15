@@ -2,15 +2,11 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as sync from "@goscript/sync/index.js"
-
 import * as time from "@goscript/time/index.js"
-import "@goscript/sync/index.js"
-import "@goscript/time/index.js"
 
 export async function main(): globalThis.Promise<void> {
-	let wg: $.VarRef<sync.WaitGroup> = $.varRef($.markAsStructValue(new sync.WaitGroup()))
+	let wg = $.varRef($.markAsStructValue(new sync.WaitGroup()))
 	let done = $.makeChannel<boolean>(0, false, "both")
 	let result = $.makeChannel<number>(2, 0, "both")
 
@@ -37,7 +33,7 @@ export async function main(): globalThis.Promise<void> {
 	// Wait for both workers with a timeout
 	queueMicrotask(async () => {
 		await wg.value.Wait()
-		done!.close()
+		done.close()
 	})
 
 	// Collect results

@@ -2,15 +2,9 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as reflect from "@goscript/reflect/index.js"
-
 import * as slices from "@goscript/slices/index.js"
-
 import * as sort2 from "@goscript/sort/index.js"
-import "@goscript/reflect/index.js"
-import "@goscript/slices/index.js"
-import "@goscript/sort/index.js"
 
 export type byFreq = $.Slice<number>
 

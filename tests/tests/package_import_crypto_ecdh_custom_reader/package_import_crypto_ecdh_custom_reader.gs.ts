@@ -2,17 +2,10 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as bytes from "@goscript/bytes/index.js"
-
 import * as ecdh from "@goscript/crypto/ecdh/index.js"
-
 import * as errors from "@goscript/errors/index.js"
-
 import * as io from "@goscript/io/index.js"
-import "@goscript/bytes/index.js"
-import "@goscript/crypto/ecdh/index.js"
-import "@goscript/errors/index.js"
 import "@goscript/io/index.js"
 
 export class segmentedReader {

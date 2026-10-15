@@ -9,13 +9,13 @@ export function high(v: bigint): bigint {
 
 export async function main(): globalThis.Promise<void> {
 	// A 64-bit count gives a 64-bit counter.
-	let wide: bigint = 0n
+	let wide = 0n
 	for (let i = 0n; i < 4n; i++) {
 		wide = $.uint64Add(wide, high(i))
 	}
 	await $.println("uint64 range sum:", wide)
 
-	let signed: bigint = 0n
+	let signed = 0n
 	for (let i = 0n; i < 3n; i++) {
 		signed = $.int64Sub(signed, $.int64(high($.uint64(i))))
 	}

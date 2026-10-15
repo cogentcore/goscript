@@ -2,13 +2,9 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import type * as reflect from "@goscript/reflect/index.js"
-
 import * as __goscript_a from "./a.gs.ts"
-
 import * as __goscript_package_init from "./__goscript_package_init.gs.ts"
-import "./a.gs.ts"
 
 export var registry: globalThis.Map<number, number> | null
 

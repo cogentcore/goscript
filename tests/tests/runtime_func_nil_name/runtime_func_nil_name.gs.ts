@@ -2,12 +2,8 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as reflect from "@goscript/reflect/index.js"
-
 import * as runtime from "@goscript/runtime/index.js"
-import "@goscript/reflect/index.js"
-import "@goscript/runtime/index.js"
 
 export function hello(): void {
 }
@@ -23,7 +19,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("pc 0:", $.stringEqual(runtime.Func.prototype.Name.call($.pointerValueOrNil(runtime.FuncForPC(0))), ""))
 
 	// Name of a nil Func field of a runtime.Frame, which is an override type.
-	let frame: runtime.Frame = $.markAsStructValue(new runtime.Frame())
+	let frame = $.markAsStructValue(new runtime.Frame())
 	await $.println("nil frame func:", $.stringEqual(runtime.Func.prototype.Name.call($.pointerValueOrNil(frame.Func)), ""))
 	let callers = $.makeSlice<number>(1, undefined, "number")
 	runtime.Callers(1, callers)

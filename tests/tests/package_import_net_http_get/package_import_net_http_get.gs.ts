@@ -2,18 +2,10 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as io from "@goscript/io/index.js"
-
 import * as http from "@goscript/net/http/index.js"
-
 import * as httptest from "@goscript/net/http/httptest/index.js"
-
 import * as strings from "@goscript/strings/index.js"
-import "@goscript/io/index.js"
-import "@goscript/net/http/index.js"
-import "@goscript/net/http/httptest/index.js"
-import "@goscript/strings/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	await using __defer = new $.AsyncDisposableStack()

@@ -2,17 +2,10 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as fmt from "@goscript/fmt/index.js"
-
 import * as netip from "@goscript/net/netip/index.js"
-
 import * as syscall from "@goscript/syscall/index.js"
-
 import type * as sync from "@goscript/sync/index.js"
-import "@goscript/fmt/index.js"
-import "@goscript/net/netip/index.js"
-import "@goscript/syscall/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	syscall.CloseOnExec(1)
@@ -43,7 +36,7 @@ export async function main(): globalThis.Promise<void> {
 		}
 	}
 	if (false) {
-		let st: $.VarRef<syscall.Stat_t> = $.varRef($.markAsStructValue(new syscall.Stat_t()))
+		let st = $.varRef($.markAsStructValue(new syscall.Stat_t()))
 		let buf: $.Slice<number> = null! as $.Slice<number>
 		let iovecs: $.Slice<syscall.Iovec> = null! as $.Slice<syscall.Iovec>
 		syscall.Accept(-1)
@@ -72,11 +65,11 @@ export async function main(): globalThis.Promise<void> {
 		let attr = new syscall.SysProcAttr()
 		attr
 	}
-	let sa4: syscall.SockaddrInet4 = $.markAsStructValue(new syscall.SockaddrInet4())
+	let sa4 = $.markAsStructValue(new syscall.SockaddrInet4())
 	let addr4 = netip.AddrFrom4($.cloneArrayValue(sa4.Addr, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 4)))
 	sa4.Addr = addr4.As4()
 
-	let sa6: syscall.SockaddrInet6 = $.markAsStructValue(new syscall.SockaddrInet6())
+	let sa6 = $.markAsStructValue(new syscall.SockaddrInet6())
 	let addr6 = netip.AddrFrom16($.cloneArrayValue(sa6.Addr, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 16)))
 	sa6.Addr = addr6.As16()
 

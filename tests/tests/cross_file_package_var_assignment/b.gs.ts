@@ -2,11 +2,8 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as __goscript_a from "./a.gs.ts"
-
 import * as __goscript_package_init from "./__goscript_package_init.gs.ts"
-import "./a.gs.ts"
 
 function __goscriptInit0(): void {
 	__goscript_a.__goscript_set_hook($.functionValue((): number => {

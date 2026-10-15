@@ -2,24 +2,13 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as json from "@goscript/encoding/json/index.js"
-
 import * as fmt from "@goscript/fmt/index.js"
-
 import * as slices from "@goscript/slices/index.js"
-
 import * as strconv from "@goscript/strconv/index.js"
-
 import * as strings from "@goscript/strings/index.js"
-
 import * as time from "@goscript/time/index.js"
-import "@goscript/encoding/json/index.js"
 import "@goscript/fmt/index.js"
-import "@goscript/slices/index.js"
-import "@goscript/strconv/index.js"
-import "@goscript/strings/index.js"
-import "@goscript/time/index.js"
 
 export class Holder {
 	public get Tags(): globalThis.Map<string, number> | null {

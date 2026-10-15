@@ -2,12 +2,9 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as hash from "@goscript/hash/index.js"
-
 import * as maphash from "@goscript/hash/maphash/index.js"
 import "@goscript/hash/index.js"
-import "@goscript/hash/maphash/index.js"
 
 export let stripeSeed: maphash.Seed = $.markAsStructValue($.cloneStructValue(maphash.MakeSeed()))
 
@@ -24,7 +21,7 @@ export async function main(): globalThis.Promise<void> {
 	let whole = maphash.String($.markAsStructValue($.cloneStructValue(seed)), "hello world")
 	await $.println(maphash.Bytes($.markAsStructValue($.cloneStructValue(seed)), new Uint8Array([104, 101, 108, 108, 111, 32, 119, 111, 114, 108, 100])) == whole)
 
-	let h: $.VarRef<maphash.Hash> = $.varRef($.markAsStructValue(new maphash.Hash()))
+	let h = $.varRef($.markAsStructValue(new maphash.Hash()))
 	h.value.SetSeed($.markAsStructValue($.cloneStructValue(seed)))
 	h.value.WriteString("hello")
 	h.value.WriteByte(32)
@@ -39,7 +36,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println(maphash.String($.markAsStructValue($.cloneStructValue(seed)), "a") != maphash.String($.markAsStructValue($.cloneStructValue(seed)), "b"))
 	await $.println(maphash.Comparable($.markAsStructValue($.cloneStructValue(seed)), 42) == maphash.Comparable($.markAsStructValue($.cloneStructValue(seed)), 42))
 
-	let zero: $.VarRef<maphash.Hash> = $.varRef($.markAsStructValue(new maphash.Hash()))
+	let zero = $.varRef($.markAsStructValue(new maphash.Hash()))
 	zero.value.WriteString("abc")
 	await $.println(zero.value.Sum64() == maphash.String($.markAsStructValue($.cloneStructValue(zero.value.Seed())), "abc"))
 

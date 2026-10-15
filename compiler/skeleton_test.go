@@ -309,7 +309,7 @@ func TestCompilePackagesLazilyInitializesFunctionBodyPackageVarDependencies(t *t
 		"export var first: Point | $.VarRef<Point> | null",
 		"export function __goscript_get_first(): Point | $.VarRef<Point> | null",
 		"function __goscript_get___goscriptTuple",
-		"export let later: number = 7",
+		"export let later = 7",
 	} {
 		if !strings.Contains(text, want) {
 			t.Fatalf("missing %q in generated output:\n%s", want, text)
@@ -1397,10 +1397,10 @@ func TestCompilePackagesUsesEmbedOverride(t *testing.T) {
 	if err != nil {
 		t.Fatal(err.Error())
 	}
-	if !strings.Contains(string(content), "export let Version: string = \"1.2.3\\n\"") {
+	if !strings.Contains(string(content), "export let Version = \"1.2.3\\n\"") {
 		t.Fatalf("embedded string content was not emitted:\n%s", string(content))
 	}
-	if !strings.Contains(string(content), "export let Dotted: string = \"4.5.6\\n\"") {
+	if !strings.Contains(string(content), "export let Dotted = \"4.5.6\\n\"") {
 		t.Fatalf("embedded dotted filename content was not emitted:\n%s", string(content))
 	}
 	if !strings.Contains(string(content), "export let Binary: $.Slice<number> = new Uint8Array([0, 255, 128, 65])") {
@@ -2150,7 +2150,7 @@ func TestCompilePackagesEscapesStrictModeRestrictedIdentifiers(t *testing.T) {
 	text := string(content)
 	for _, want := range []string{
 		"function choose(_arguments: number): number",
-		"let _eval: number = 0",
+		"let _eval = 0",
 		"_eval = _arguments + 1",
 		"_arguments = _eval + _arguments",
 		"let _eval = choose(1)",
@@ -2483,7 +2483,7 @@ func TestCompilePackagesEmitsNestedPointerStorageAssertions(t *testing.T) {
 	}
 	text := string(content)
 	for _, want := range []string{
-		"let x: $.VarRef<number> = $.varRef(10)",
+		"let x = $.varRef(10)",
 		"let p1 = $.varRef(x)",
 		"let p2 = $.varRef(p1)",
 		"let p3 = p2",

@@ -2,9 +2,7 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import type * as __goscript_invoker from "./invoker.gs.ts"
-
 import type * as __goscript_stream from "./stream.gs.ts"
 
 export type Handler = {

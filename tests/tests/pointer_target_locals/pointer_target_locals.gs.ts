@@ -137,7 +137,7 @@ export function Describe(n: Node | $.VarRef<Node> | null, prefix: string): strin
 }
 
 export async function deref(n: Node | $.VarRef<Node> | null): globalThis.Promise<string> {
-	let msg: string = ""
+	let msg = ""
 	const __defer = new $.AsyncDisposableStack()
 	try {
 		__defer.defer(async () => { await (async () => {

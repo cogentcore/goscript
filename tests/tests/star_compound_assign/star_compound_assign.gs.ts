@@ -53,7 +53,7 @@ export function trimParen(h: holder | $.VarRef<holder> | null): void {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let x: $.VarRef<number> = $.varRef(2)
+	let x = $.varRef(2)
 	let p: $.VarRef<number> | null = x
 
 	p!.value += 3

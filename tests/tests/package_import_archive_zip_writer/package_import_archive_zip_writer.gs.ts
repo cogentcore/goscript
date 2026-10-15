@@ -2,18 +2,12 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as zip from "@goscript/archive/zip/index.js"
-
 import * as bytes from "@goscript/bytes/index.js"
-
 import * as io from "@goscript/io/index.js"
-import "@goscript/archive/zip/index.js"
-import "@goscript/bytes/index.js"
-import "@goscript/io/index.js"
 
 export async function main(): globalThis.Promise<void> {
-	let buf: $.VarRef<bytes.Buffer> = $.varRef($.markAsStructValue(new bytes.Buffer()))
+	let buf = $.varRef($.markAsStructValue(new bytes.Buffer()))
 	let zw = zip.NewWriter($.interfaceValue<io.Writer | null>(buf, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer")))
 	let [w, err] = await (zw !== null && (zw as any).__isVarRef !== true && (zw as any).__goValue === undefined ? ((zw as any) as zip.Writer).Create("hello.txt") : zip.Writer.prototype.Create.call(zw, "hello.txt"))
 	await $.println("create", err == null)

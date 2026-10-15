@@ -2,9 +2,7 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as slices from "@goscript/slices/index.js"
-import "@goscript/slices/index.js"
 
 export function grow<T>(__typeArgs: $.GenericTypeArgs | undefined, n: number): $.Slice<T> {
 	return (slices.Grow(null, n, () => ($.genericZero(__typeArgs, "T", null) as T)) as $.Slice<T>)

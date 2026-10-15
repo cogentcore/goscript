@@ -2,18 +2,10 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as __goscript_build_tags_generic from "./build_tags_generic.gs.ts"
-
 import * as __goscript_build_tags_js from "./build_tags_js.gs.ts"
-
 import * as __goscript_build_tags_noasm from "./build_tags_noasm.gs.ts"
-
 import * as __goscript_build_tags_purego from "./build_tags_purego.gs.ts"
-import "./build_tags_generic.gs.ts"
-import "./build_tags_js.gs.ts"
-import "./build_tags_noasm.gs.ts"
-import "./build_tags_purego.gs.ts"
 
 export async function main(): globalThis.Promise<void> {
 	await $.println("=== Build Tags Test ===")

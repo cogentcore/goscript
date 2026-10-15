@@ -2,11 +2,8 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import type * as io from "@goscript/io/index.js"
-
 import * as __goscript_server from "./server.gs.ts"
-import "./server.gs.ts"
 
 export class localReadWriteCloser {
 	public _fields: {

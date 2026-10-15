@@ -2,9 +2,7 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as helper from "@goscript/github.com/s4wave/goscript/tests/tests/imported_generic_function/helper/index.js"
-import "@goscript/github.com/s4wave/goscript/tests/tests/imported_generic_function/helper/index.js"
 
 export function collectValues(value: helper.Value | null): [$.Slice<helper.Value | null>, $.GoError] {
 	const __goscriptReturn0 = helper.Collect(__goscriptStatic0(), value)

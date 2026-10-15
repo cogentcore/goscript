@@ -2,12 +2,8 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as sync from "@goscript/sync/index.js"
-
 import * as js from "@goscript/syscall/js/index.js"
-import "@goscript/sync/index.js"
-import "@goscript/syscall/js/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	const __defer = new $.AsyncDisposableStack()
@@ -96,7 +92,7 @@ export async function funcOfValues(): globalThis.Promise<void> {
 
 export async function funcOfSuspend(): globalThis.Promise<void> {
 	await using __defer = new $.AsyncDisposableStack()
-	let mu: $.VarRef<sync.Mutex> = $.varRef($.markAsStructValue(new sync.Mutex()))
+	let mu = $.varRef($.markAsStructValue(new sync.Mutex()))
 	let done = $.makeChannel<string>(2, "", "both")
 	let handler = await wrap($.functionValue(async (_this: js.Value, args: $.Slice<js.Value>): globalThis.Promise<any> => {
 		using __defer = new $.DisposableStack()

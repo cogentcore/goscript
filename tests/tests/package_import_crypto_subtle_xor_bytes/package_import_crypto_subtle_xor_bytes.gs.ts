@@ -2,15 +2,11 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as bytes from "@goscript/bytes/index.js"
-
 import * as subtle from "@goscript/crypto/subtle/index.js"
-import "@goscript/bytes/index.js"
-import "@goscript/crypto/subtle/index.js"
 
 export async function panics(f: (() => void) | null): globalThis.Promise<boolean> {
-	let panicked: boolean = false
+	let panicked = false
 	const __defer = new $.DisposableStack()
 	try {
 		__defer.defer(() => { (() => {

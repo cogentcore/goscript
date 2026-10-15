@@ -220,7 +220,7 @@ export async function main(): globalThis.Promise<void> {
 	let genericStore = (newGenericStore(__goscriptStatic0(), 7) as GenericStore | null)
 	await $.println("GenericStore result:", await loadGenericStore(genericStore))
 
-	ch!.close()
+	ch.close()
 }
 
 var __goscriptStatic0$value: any

@@ -2,9 +2,7 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as sync from "@goscript/sync/index.js"
-import "@goscript/sync/index.js"
 
 export class R {
 	public get A(): number {
@@ -81,7 +79,7 @@ export async function show(tag: string, r: R): globalThis.Promise<void> {
 	await $.println(tag, r.A, r.B)
 }
 
-export let stored: number = 0
+export let stored = 0
 
 export function __goscript_set_stored(__goscriptValue: number): void {
 	stored = __goscriptValue
@@ -116,7 +114,7 @@ export async function deferred(): globalThis.Promise<void> {
 	__defer.defer(async () => { await __goscriptDeferCallee1("pointer") })
 	const __goscriptDeferCallee2 = f
 	__defer.defer(async () => { (__goscriptAwait = __goscriptDeferCallee2!("function"), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) })
-	let mu: $.VarRef<sync.Mutex> = $.varRef($.markAsStructValue(new sync.Mutex()))
+	let mu = $.varRef($.markAsStructValue(new sync.Mutex()))
 	await mu.value.Lock()
 	__defer.defer(() => { mu.value.Unlock() })
 	let q = new R({A: 50, B: 60})
@@ -146,7 +144,7 @@ export async function deferred(): globalThis.Promise<void> {
 export async function main(): globalThis.Promise<void> {
 	await deferred()
 	await $.println("stored", stored)
-	let wg: $.VarRef<sync.WaitGroup> = $.varRef($.markAsStructValue(new sync.WaitGroup()))
+	let wg = $.varRef($.markAsStructValue(new sync.WaitGroup()))
 	wg.value.Add(1)
 	let r = new R({A: 1, B: 2}, true)
 	const __goscriptDeferArg5 = (r).clone()

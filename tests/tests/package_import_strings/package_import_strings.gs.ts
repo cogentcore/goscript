@@ -2,14 +2,12 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as strings from "@goscript/strings/index.js"
-import "@goscript/strings/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	// This should trigger the unhandled make call error
 	// strings.Builder uses make internally for its buffer
-	let builder: $.VarRef<strings.Builder> = $.varRef($.markAsStructValue(new strings.Builder()))
+	let builder = $.varRef($.markAsStructValue(new strings.Builder()))
 	builder.value.WriteString("Hello")
 	builder.value.WriteString(" ")
 	builder.value.WriteString("World")

@@ -2,12 +2,8 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as json from "@goscript/encoding/json/index.js"
-
 import * as reflect from "@goscript/reflect/index.js"
-import "@goscript/encoding/json/index.js"
-import "@goscript/reflect/index.js"
 
 export class Node {
 	public get Name(): string {
@@ -74,7 +70,7 @@ export class Node {
 	)
 }
 
-export let calls: number = 0
+export let calls = 0
 
 export function __goscript_set_calls(__goscriptValue: number): void {
 	calls = __goscriptValue

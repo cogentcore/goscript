@@ -60,7 +60,7 @@ export function Matrix_Scale(m: $.VarRef<Matrix> | null, s: number): void {
 
 export function Matrix_Sum(__goscriptReceiver2: Matrix): number {
 	let m: Matrix = $.cloneArrayValue(__goscriptReceiver2, "main.Matrix")
-	let t: number = 0
+	let t = 0
 	for (let __goscriptRangeTarget1 = m, __goscriptRangeWindow1 = $.sliceRange(__goscriptRangeTarget1), i = 0; i < __goscriptRangeWindow1.length; i++) {
 		t = globalThis.Math.fround(t + ($.arrayIndex(m, i)))
 		m[i] = 0

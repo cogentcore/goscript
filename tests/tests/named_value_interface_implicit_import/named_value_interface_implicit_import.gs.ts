@@ -2,21 +2,13 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as dep from "@goscript/github.com/s4wave/goscript/tests/tests/named_value_interface_implicit_import/dep/index.js"
-
 import * as errno from "@goscript/github.com/s4wave/goscript/tests/tests/named_value_interface_implicit_import/errno/index.js"
-
 import * as __goscript_local_lookup from "./local_lookup.gs.ts"
-
 import * as __goscript_multi_assign from "./multi_assign.gs.ts"
-
 import * as __goscript_multi_return from "./multi_return.gs.ts"
 import "@goscript/github.com/s4wave/goscript/tests/tests/named_value_interface_implicit_import/dep/index.js"
 import "@goscript/github.com/s4wave/goscript/tests/tests/named_value_interface_implicit_import/errno/index.js"
-import "./local_lookup.gs.ts"
-import "./multi_assign.gs.ts"
-import "./multi_return.gs.ts"
 
 export function notDir(): $.GoError {
 	return $.namedValueInterfaceValue<$.GoError>(dep.ErrNotDir, "errno.Errno", {"Error": errno.Errno_Error}, /* @__PURE__ */ $.basicType("uintptr", "errno.Errno"))

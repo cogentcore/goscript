@@ -2,9 +2,7 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as sync from "@goscript/sync/index.js"
-import "@goscript/sync/index.js"
 
 export class embeddedMutex {
 	public get Mutex(): sync.Mutex {
@@ -242,7 +240,7 @@ export class queue {
 
 export async function main(): globalThis.Promise<void> {
 	// Test Mutex
-	let mu: $.VarRef<sync.Mutex> = $.varRef($.markAsStructValue(new sync.Mutex()))
+	let mu = $.varRef($.markAsStructValue(new sync.Mutex()))
 	await mu.value.Lock()
 	await $.println("Mutex locked")
 	mu.value.Unlock()
@@ -272,7 +270,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 
 	// Test WaitGroup
-	let wg: $.VarRef<sync.WaitGroup> = $.varRef($.markAsStructValue(new sync.WaitGroup()))
+	let wg = $.varRef($.markAsStructValue(new sync.WaitGroup()))
 	wg.value.Add(1)
 	await $.println("WaitGroup counter set to 1")
 	wg.value.Done()
@@ -281,7 +279,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("WaitGroup wait completed")
 
 	// Test Once
-	let once: $.VarRef<sync.Once> = $.varRef($.markAsStructValue(new sync.Once()))
+	let once = $.varRef($.markAsStructValue(new sync.Once()))
 	let counter = 0
 	await once.value.Do($.functionValue(async () => {
 		counter++
@@ -310,7 +308,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("OnceValue results:", val1, val2)
 
 	// Test sync.Map
-	let m: $.VarRef<sync.Map> = $.varRef($.markAsStructValue(new sync.Map()))
+	let m = $.varRef($.markAsStructValue(new sync.Map()))
 	await m.value.Store("key1", "value1")
 	await $.println("Stored key1")
 
@@ -384,7 +382,7 @@ export async function main(): globalThis.Promise<void> {
 }
 
 export async function condZeroValue(): globalThis.Promise<void> {
-	let zero: sync.Cond = $.markAsStructValue(new sync.Cond())
+	let zero = $.markAsStructValue(new sync.Cond())
 	await $.println("zero L is nil:", zero.L == null)
 
 	// The consumer starts first and each push waits for its pop to print,

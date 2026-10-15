@@ -2,31 +2,16 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as ed25519 from "@goscript/crypto/ed25519/index.js"
-
 import * as rand from "@goscript/crypto/rand/index.js"
-
 import * as tls from "@goscript/crypto/tls/index.js"
-
 import * as x509 from "@goscript/crypto/x509/index.js"
-
 import * as pkix from "@goscript/crypto/x509/pkix/index.js"
-
 import * as big from "@goscript/math/big/index.js"
-
 import * as time from "@goscript/time/index.js"
-
 import type * as crypto from "@goscript/crypto/index.js"
-
 import * as io from "@goscript/io/index.js"
-import "@goscript/crypto/ed25519/index.js"
 import "@goscript/crypto/rand/index.js"
-import "@goscript/crypto/tls/index.js"
-import "@goscript/crypto/x509/index.js"
-import "@goscript/crypto/x509/pkix/index.js"
-import "@goscript/math/big/index.js"
-import "@goscript/time/index.js"
 import "@goscript/io/index.js"
 
 export async function main(): globalThis.Promise<void> {

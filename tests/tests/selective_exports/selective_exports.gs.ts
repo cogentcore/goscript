@@ -2,9 +2,7 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as __goscript_utils from "./utils.gs.ts"
-import "./utils.gs.ts"
 
 export async function main(): globalThis.Promise<void> {
 	await $.println("=== Selective Exports Test ===")

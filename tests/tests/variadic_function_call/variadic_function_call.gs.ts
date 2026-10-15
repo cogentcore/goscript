@@ -2,9 +2,7 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as errors from "@goscript/errors/index.js"
-import "@goscript/errors/index.js"
 
 export type Stack = $.Slice<any>
 

@@ -2,14 +2,9 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as maps from "@goscript/maps/index.js"
-
 import * as slices from "@goscript/slices/index.js"
-
 import type * as iter from "@goscript/iter/index.js"
-import "@goscript/maps/index.js"
-import "@goscript/slices/index.js"
 
 export function getValue(): [string, number] {
 	return ["test", 42]

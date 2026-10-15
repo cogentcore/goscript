@@ -2,29 +2,15 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as context from "@goscript/context/index.js"
-
 import * as io from "@goscript/io/index.js"
-
 import * as sync from "@goscript/sync/index.js"
-
 import * as js from "@goscript/syscall/js/index.js"
-
 import * as time from "@goscript/time/index.js"
-
 import * as rpcstream from "@goscript/github.com/aperturerobotics/starpc/rpcstream/index.js"
-
 import * as srpc from "@goscript/github.com/aperturerobotics/starpc/srpc/index.js"
-
 import * as protobuf_go_lite from "@goscript/github.com/aperturerobotics/protobuf-go-lite/index.js"
-import "@goscript/context/index.js"
 import "@goscript/io/index.js"
-import "@goscript/sync/index.js"
-import "@goscript/syscall/js/index.js"
-import "@goscript/time/index.js"
-import "@goscript/github.com/aperturerobotics/starpc/rpcstream/index.js"
-import "@goscript/github.com/aperturerobotics/starpc/srpc/index.js"
 import "@goscript/github.com/aperturerobotics/protobuf-go-lite/index.js"
 
 export class handler {

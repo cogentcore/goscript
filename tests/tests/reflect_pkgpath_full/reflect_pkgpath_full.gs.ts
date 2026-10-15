@@ -2,12 +2,8 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as reflect from "@goscript/reflect/index.js"
-
 import * as dep from "@goscript/github.com/s4wave/goscript/tests/tests/reflect_pkgpath_full/dep/index.js"
-import "@goscript/reflect/index.js"
-import "@goscript/github.com/s4wave/goscript/tests/tests/reflect_pkgpath_full/dep/index.js"
 
 export class mainType {
 	public _fields: {

@@ -2,9 +2,7 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as reflect from "@goscript/reflect/index.js"
-import "@goscript/reflect/index.js"
 
 export type reader = {
 	Read(_p0: $.Slice<number>): [number, $.GoError]
@@ -47,7 +45,7 @@ export class source {
 }
 
 export function mapComparisonPanics(): boolean {
-	let panicked: boolean = false
+	let panicked = false
 	const __defer = new $.DisposableStack()
 	try {
 		__defer.defer(() => { (() => {

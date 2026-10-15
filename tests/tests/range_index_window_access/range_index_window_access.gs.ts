@@ -101,7 +101,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 	await $.println($.arrayIndex(bs!, 0), $.arrayIndex(bs!, 1))
 
-	let f32: number = 1
+	let f32 = 1
 	for (let i = 0; i < 3; i++) {
 		f32 = globalThis.Math.fround((globalThis.Math.fround(f32 * 1.100000023841858)) + (globalThis.Math.fround(globalThis.Math.fround(i) / 3)))
 	}

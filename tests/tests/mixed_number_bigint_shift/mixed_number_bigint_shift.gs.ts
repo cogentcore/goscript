@@ -2,7 +2,6 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as binary from "@goscript/encoding/binary/index.js"
 import "@goscript/encoding/binary/index.js"
 

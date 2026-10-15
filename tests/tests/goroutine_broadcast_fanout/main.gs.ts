@@ -2,12 +2,8 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as context from "@goscript/context/index.js"
-
 import * as broadcast from "@goscript/github.com/aperturerobotics/util/broadcast/index.js"
-import "@goscript/context/index.js"
-import "@goscript/github.com/aperturerobotics/util/broadcast/index.js"
 
 export const workers: number = 16
 
@@ -37,7 +33,7 @@ export async function main(): globalThis.Promise<void> {
 	// worker has signaled. A lost wakeup or starvation hangs here.
 	let ctx = context.Background()
 	while (true) {
-		let done: boolean = false
+		let done = false
 		let waitCh: $.Channel<{}> | null = null! as $.Channel<{}> | null
 		await bcast.value.HoldLock($.functionValue(async (_p0: (() => void) | null, getWaitCh: (() => $.Channel<{}> | null | globalThis.Promise<$.Channel<{}> | null>) | null) => {
 			done = completed == 16

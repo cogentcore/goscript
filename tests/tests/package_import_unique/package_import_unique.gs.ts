@@ -2,9 +2,7 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as _unique from "@goscript/unique/index.js"
-import "@goscript/unique/index.js"
 
 export class zone {
 	public get name(): string {

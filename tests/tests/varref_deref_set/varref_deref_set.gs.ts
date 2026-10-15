@@ -5,7 +5,7 @@ import * as $ from "@goscript/builtin/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	// y is varrefed because p1 takes its address
-	let y: $.VarRef<number> = $.varRef(15)
+	let y = $.varRef(15)
 
 	// p1 is varrefed because p1_varRefer takes its address
 	let p1: $.VarRef<$.VarRef<number> | null> = $.varRef(null)

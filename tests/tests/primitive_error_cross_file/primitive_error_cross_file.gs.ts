@@ -2,7 +2,6 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as __goscript_error_type from "./error_type.gs.ts"
 import "./error_type.gs.ts"
 

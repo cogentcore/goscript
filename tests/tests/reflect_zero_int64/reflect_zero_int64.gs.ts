@@ -2,12 +2,8 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as reflect from "@goscript/reflect/index.js"
-
 import * as time from "@goscript/time/index.js"
-import "@goscript/reflect/index.js"
-import "@goscript/time/index.js"
 
 export class timer {
 	public get start(): time.Time {
@@ -69,11 +65,11 @@ export function isZero(x: any): boolean {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let i64: bigint = 0n
+	let i64 = 0n
 	await $.println(isZero($.basicInterfaceValue(i64, "int64")))
 	let d: time.Duration = 0n
 	await $.println(isZero($.namedValueInterfaceValue<any>(d, "time.Duration", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2())))
-	let tm: time.Time = $.markAsStructValue(new time.Time())
+	let tm = $.markAsStructValue(new time.Time())
 	await $.println(isZero($.interfaceValue($.markAsStructValue($.cloneStructValue(tm)), "time.Time", "time.Time")))
 	await $.println(isZero($.interfaceValue($.markAsStructValue(new time.Time()), "time.Time", "time.Time")))
 	await $.println($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.namedValueInterfaceValue<any>(d, "time.Duration", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2())))).IsZero(), $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.markAsStructValue($.cloneStructValue(tm)), "time.Time", "time.Time")))).IsZero())

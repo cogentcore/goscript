@@ -112,7 +112,7 @@ export function flag_Set(f: $.VarRef<flag> | null, v: bigint): void {
 export async function countFlags(__typeArgs: $.GenericTypeArgs | undefined, __goscriptParam0: any, values: $.Slice<bigint>): globalThis.Promise<bigint> {
 	let i: $.VarRef<any> = $.varRef(__goscriptParam0)
 	let p = $.mustTypeAssert<setter | null>($.typeParamPointerInterfaceValue(i, __typeArgs?.["T"], "*T", /* @__PURE__ */ $.pointerType(__typeArgs?.["T"]?.type ?? { kind: $.TypeKind.Interface, methods: [] })), "main.setter")
-	let n: bigint = 0n
+	let n = 0n
 	for (let __goscriptRangeTarget0 = values, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
 		let v = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as bigint)
 		if ((__goscriptAwait = (p !== null && (p as any).__isVarRef !== true && (p as any).__goValue === undefined ? (p as Exclude<setter, null>) : $.pointerValue<Exclude<setter, null>>(p)).Has(v), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)) {

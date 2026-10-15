@@ -26,8 +26,8 @@ export async function main(): globalThis.Promise<void> {
 
 	// Test with more complex index expressions
 	let matrix: number[][] = $.arrayValue(globalThis.Array.from({ length: 2 }, () => $.arrayValue(globalThis.Array.from({ length: 2 }, () => 0))), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2), 2))
-	let i: number = 0
-	let j: number = 1
+	let i = 0
+	let j = 1
 
 	let __goscriptTuple1: any = returnTwoInts()
 	$.arrayIndex(matrix, i)[j] = __goscriptTuple1[0]

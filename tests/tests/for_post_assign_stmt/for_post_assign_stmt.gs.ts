@@ -4,7 +4,7 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export async function main(): globalThis.Promise<void> {
-	let x: number = 0
+	let x = 0
 	// The post statement 'x = i' is an AssignStmt
 	for (let i = 0; i < 3; x = i) {
 		await $.println("looping, i:", i, "x_before_post:", x)

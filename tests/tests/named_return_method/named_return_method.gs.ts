@@ -35,9 +35,9 @@ export class content {
 
 	public ProcessData(input: number): [number, string, boolean] {
 		const c: content | $.VarRef<content> | null = this;
-		let result: number = 0
-		let status: string = ""
-		let valid: boolean = false
+		let result = 0
+		let status = ""
+		let valid = false
 		result = input * 2
 		if (input > 10) {
 			status = "high"
@@ -56,7 +56,7 @@ export class content {
 
 	public ReadAt(b: $.Slice<number>, off: bigint): [number, $.GoError] {
 		const c: content | $.VarRef<content> | null = this;
-		let n: number = 0
+		let n = 0
 		let err: $.GoError = null! as $.GoError
 		const c$: content = c == null ? $.pointerTarget<content>(c) : (c as any).__isVarRef === true ? (c as any).value : (c as any).__goValue === undefined ? (c as any) : $.pointerTarget<content>(c)
 		if ((off < 0n) || (off >= $.int64($.sliceLen((c$ as content).bytes)))) {

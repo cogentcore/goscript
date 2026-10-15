@@ -2,24 +2,13 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as context from "@goscript/context/index.js"
-
 import * as sql from "@goscript/database/sql/index.js"
-
 import * as driver from "@goscript/database/sql/driver/index.js"
-
 import * as io from "@goscript/io/index.js"
-
 import * as reflect from "@goscript/reflect/index.js"
-
 import * as time from "@goscript/time/index.js"
-import "@goscript/context/index.js"
-import "@goscript/database/sql/index.js"
-import "@goscript/database/sql/driver/index.js"
 import "@goscript/io/index.js"
-import "@goscript/reflect/index.js"
-import "@goscript/time/index.js"
 
 export class connector {
 	public get direct(): boolean {
@@ -268,7 +257,7 @@ export async function main(): globalThis.Promise<void> {
 				$.panic((err as any))
 			}
 		}
-		let value: $.VarRef<number> = $.varRef(0)
+		let value = $.varRef(0)
 		{
 			let err = await sql.Row.prototype.Scan.call(await sql.DB.prototype.QueryRowContext.call(db, context.Background(), "query", $.arrayToSlice<any>([$.interfaceValue(new Uint8Array([107, 101, 121]), "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")))])), $.arrayToSlice<any>([$.interfaceValue(value, "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int")))]))
 			if (err != null) {
@@ -283,7 +272,7 @@ export async function main(): globalThis.Promise<void> {
 			}
 		}
 	}
-	let value: $.VarRef<number> = $.varRef(0)
+	let value = $.varRef(0)
 	{
 		let err = await sql.ConvertAssign($.markAsStructValue(new driver.ScanContext()), $.interfaceValue(value, "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int"))), $.basicInterfaceValue(7n, "int64"))
 		if (err != null) {

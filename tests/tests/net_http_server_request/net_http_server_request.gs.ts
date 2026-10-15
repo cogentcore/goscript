@@ -2,21 +2,11 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as errors from "@goscript/errors/index.js"
-
 import * as io from "@goscript/io/index.js"
-
 import * as http from "@goscript/net/http/index.js"
-
 import * as httptest from "@goscript/net/http/httptest/index.js"
-
 import * as url from "@goscript/net/url/index.js"
-import "@goscript/errors/index.js"
-import "@goscript/io/index.js"
-import "@goscript/net/http/index.js"
-import "@goscript/net/http/httptest/index.js"
-import "@goscript/net/url/index.js"
 
 export async function printURL(label: string, u: url.URL | $.VarRef<url.URL> | null): globalThis.Promise<void> {
 	const u$: url.URL = u == null ? $.pointerTarget<url.URL>(u) : (u as any).__isVarRef === true ? (u as any).value : (u as any).__goValue === undefined ? (u as any) : $.pointerTarget<url.URL>(u)

@@ -2,7 +2,6 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as __goscript_consts from "./consts.gs.ts"
 import "./consts.gs.ts"
 
@@ -32,7 +31,7 @@ export class thing {
 	)
 }
 
-export let Seen: number = 0
+export let Seen = 0
 
 export function __goscript_set_Seen(__goscriptValue: number): void {
 	Seen = __goscriptValue

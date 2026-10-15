@@ -2,11 +2,8 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as json from "@goscript/encoding/json/index.js"
-
 import * as jsontext from "@goscript/encoding/json/jsontext/index.js"
-import "@goscript/encoding/json/index.js"
 import "@goscript/encoding/json/jsontext/index.js"
 
 export async function main(): globalThis.Promise<void> {
@@ -18,7 +15,7 @@ export async function main(): globalThis.Promise<void> {
 	err = json.Unmarshal($.mapGet<string, json.RawMessage, json.RawMessage>(fields.value, "kids", null)[0], $.interfaceValue(kids, "*[]jsontext.Value", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"), "jsontext.Value")))))
 	await $.println("slice:", err == null, $.sliceLen(kids.value), $.bytesToString($.arrayIndex(kids.value!, 0)), $.bytesToString($.arrayIndex(kids.value!, 1)))
 
-	let name: $.VarRef<string> = $.varRef("")
+	let name = $.varRef("")
 	err = json.Unmarshal($.mapGet<string, json.RawMessage, json.RawMessage>(fields.value, "name", null)[0], $.interfaceValue(name, "*string", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("string"))))
 	await $.println("name:", err == null, name.value)
 }

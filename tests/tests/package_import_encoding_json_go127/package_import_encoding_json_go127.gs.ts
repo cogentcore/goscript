@@ -2,21 +2,12 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as json from "@goscript/encoding/json/index.js"
-
 import * as jsontext from "@goscript/encoding/json/jsontext/index.js"
-
 import * as io from "@goscript/io/index.js"
-
 import * as slices from "@goscript/slices/index.js"
-
 import * as strings from "@goscript/strings/index.js"
-import "@goscript/encoding/json/index.js"
-import "@goscript/encoding/json/jsontext/index.js"
 import "@goscript/io/index.js"
-import "@goscript/slices/index.js"
-import "@goscript/strings/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	let raw: $.VarRef<json.RawMessage> = $.varRef(null! as json.RawMessage)

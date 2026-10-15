@@ -2,21 +2,14 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as crypto from "@goscript/crypto/index.js"
-
 import * as ed25519 from "@goscript/crypto/ed25519/index.js"
-
 import * as errors from "@goscript/errors/index.js"
-
 import * as io from "@goscript/io/index.js"
-
 import * as net from "@goscript/net/index.js"
 import "@goscript/crypto/index.js"
 import "@goscript/crypto/ed25519/index.js"
-import "@goscript/errors/index.js"
 import "@goscript/io/index.js"
-import "@goscript/net/index.js"
 
 export class recreateError {
 	public get next(): bigint {

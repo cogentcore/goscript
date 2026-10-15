@@ -2,15 +2,11 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as math from "@goscript/math/index.js"
-
 import * as atomic from "@goscript/sync/atomic/index.js"
-
 import * as time from "@goscript/time/index.js"
 import "@goscript/math/index.js"
 import "@goscript/sync/atomic/index.js"
-import "@goscript/time/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	let now = $.markAsStructValue($.cloneStructValue(time.Now()))
@@ -94,7 +90,7 @@ export async function marshal(): globalThis.Promise<void> {
 	let b: $.Slice<number> = __goscriptTuple0[0]
 	let err = __goscriptTuple0[1]
 	await $.println("marshal json", $.bytesToString(b), err == null)
-	let u: $.VarRef<time.Time> = $.varRef($.markAsStructValue(new time.Time()))
+	let u = $.varRef($.markAsStructValue(new time.Time()))
 	err = u.value.UnmarshalJSON(b)
 	await $.println("unmarshal json", err == null, $.markAsStructValue($.cloneStructValue(u.value)).Equal($.markAsStructValue($.cloneStructValue(t))))
 	await $.println("unmarshal json null", u.value.UnmarshalJSON(new Uint8Array([110, 117, 108, 108])) == null, $.markAsStructValue($.cloneStructValue(u.value)).Equal($.markAsStructValue($.cloneStructValue(t))))
@@ -104,7 +100,7 @@ export async function marshal(): globalThis.Promise<void> {
 	let text: $.Slice<number> = __goscriptTuple1[0]
 	err = __goscriptTuple1[1]
 	await $.println("marshal text", $.bytesToString(text), err == null)
-	let v: $.VarRef<time.Time> = $.varRef($.markAsStructValue(new time.Time()))
+	let v = $.varRef($.markAsStructValue(new time.Time()))
 	await $.println("unmarshal text", v.value.UnmarshalText(text) == null, $.markAsStructValue($.cloneStructValue(v.value)).Equal($.markAsStructValue($.cloneStructValue(t))))
 	await $.println("unmarshal bad text", v.value.UnmarshalText(new Uint8Array([98, 97, 100])) != null, $.markAsStructValue($.cloneStructValue(v.value)).IsZero())
 

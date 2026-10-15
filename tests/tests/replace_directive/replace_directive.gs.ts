@@ -2,9 +2,7 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as replaced from "@goscript/github.com/example/replaced/index.js"
-import "@goscript/github.com/example/replaced/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	await $.println(replaced.Hello())

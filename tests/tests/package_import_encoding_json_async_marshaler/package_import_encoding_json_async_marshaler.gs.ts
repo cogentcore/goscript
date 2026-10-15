@@ -2,18 +2,10 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as json from "@goscript/encoding/json/index.js"
-
 import * as errors from "@goscript/errors/index.js"
-
 import * as strings from "@goscript/strings/index.js"
-
 import * as sync from "@goscript/sync/index.js"
-import "@goscript/encoding/json/index.js"
-import "@goscript/errors/index.js"
-import "@goscript/strings/index.js"
-import "@goscript/sync/index.js"
 
 export class Image {
 	public get Name(): string {
@@ -148,7 +140,7 @@ export class Doc {
 	)
 }
 
-export let mu: $.VarRef<sync.Mutex> = $.varRef($.markAsStructValue(new sync.Mutex()))
+export let mu = $.varRef($.markAsStructValue(new sync.Mutex()))
 
 export function __goscript_set_mu(__goscriptValue: sync.Mutex): void {
 	$.assignStruct(mu.value, __goscriptValue)

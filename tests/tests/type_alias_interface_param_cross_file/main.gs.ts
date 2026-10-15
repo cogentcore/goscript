@@ -2,9 +2,7 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as dep from "@goscript/github.com/s4wave/goscript/tests/tests/type_alias_interface_param_cross_file/dep/index.js"
-
 import * as __goscript_types from "./types.gs.ts"
 import "@goscript/github.com/s4wave/goscript/tests/tests/type_alias_interface_param_cross_file/dep/index.js"
 import "./types.gs.ts"

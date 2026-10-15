@@ -2,9 +2,7 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as regexp from "@goscript/regexp/index.js"
-import "@goscript/regexp/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	let label = await regexp.MustCompile("^[a-z0-9]([-a-z0-9]*[a-z0-9])?$")

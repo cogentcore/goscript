@@ -2,15 +2,9 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as bytes from "@goscript/bytes/index.js"
-
 import * as io from "@goscript/io/index.js"
-
 import * as sync from "@goscript/sync/index.js"
-import "@goscript/bytes/index.js"
-import "@goscript/io/index.js"
-import "@goscript/sync/index.js"
 
 export class writerHolder {
 	public get w(): io.Writer | null {
@@ -318,7 +312,7 @@ export class pipeReadResult {
 	)
 }
 
-export let asyncWrites: $.VarRef<sync.Map> = $.varRef($.markAsStructValue(new sync.Map()))
+export let asyncWrites = $.varRef($.markAsStructValue(new sync.Map()))
 
 export function __goscript_set_asyncWrites(__goscriptValue: sync.Map): void {
 	$.assignStruct(asyncWrites.value, __goscriptValue)
@@ -382,7 +376,7 @@ export async function main(): globalThis.Promise<void> {
 	n = __goscriptTuple7[0]
 	err = __goscriptTuple7[1]
 	await $.println("Read into byte slice view - bytes:", n, "data:", $.bytesToString(viewBacking), "err:", err == null)
-	let dst: $.VarRef<bytes.Buffer> = $.varRef($.markAsStructValue(new bytes.Buffer()))
+	let dst = $.varRef($.markAsStructValue(new bytes.Buffer()))
 	let __goscriptTuple8: any = await io.Copy($.pointerValueOrNil($.interfaceValue<io.Writer | null>(dst, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer")))!, $.pointerValueOrNil($.interfaceValue<io.Reader | null>(new asyncReader(), "*main.asyncReader", /* @__PURE__ */ $.pointerType("main.asyncReader")))!)
 	n64 = __goscriptTuple8[0]
 	err = __goscriptTuple8[1]
