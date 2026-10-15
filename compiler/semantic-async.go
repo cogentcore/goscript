@@ -257,12 +257,27 @@ type asyncColoring struct {
 	queue                 []*types.Func
 }
 
+// asyncRoots are the causes of async marks that the coloring seeds, besides
+// the functions whose own bodies suspend, which their packages marked.
+type asyncRoots struct {
+	// sites are the calls that pass function arguments; a site that always
+	// suspends is a root, and the others are edges from their dependencies.
+	sites []asyncArgumentCallSite
+	// openMethods are the called interface methods that the implementation
+	// graph does not color; each makes its callers async.
+	openMethods []*types.Func
+}
+
 // colorAsyncFunctions marks every function and interface method that can
-// suspend, starting from the facts collected per package.
+// suspend, starting from the facts collected per package and roots.
+//
+// Every mark goes through asyncColoring.markFunction or markInterfaceMethod,
+// from a root in the seeding below or along one edge kind in the worklist
+// loop, so the cause of each mark is known at the point it is made.
 func colorAsyncFunctions(
 	ctx context.Context,
 	model *SemanticModel,
-	sites []asyncArgumentCallSite,
+	roots asyncRoots,
 	ifaceEdges interfaceAsyncEdges,
 	anonymousInterfaceGraph []semanticAnonymousInterfaceImplementation,
 	asyncWhen map[string][]*types.Func,
@@ -304,13 +319,15 @@ func colorAsyncFunctions(
 			c.anonMethodsByImpl[implMethod] = append(c.anonMethodsByImpl[implMethod], ifaceMethod)
 		}
 	}
-	for _, site := range sites {
+	for _, site := range roots.sites {
 		for _, dep := range site.deps {
 			c.register(dep)
 			c.sitesByDep[dep] = append(c.sitesByDep[dep], site.semFn)
 		}
 	}
 
+	// Seed the functions that their packages marked async, and the interface
+	// methods they implement.
 	for key := range c.registered {
 		if model.functionAsync(key) {
 			c.visit(key)
@@ -324,12 +341,25 @@ func colorAsyncFunctions(
 			c.markInterfaceMethod(ifaceMethod)
 		}
 	}
-	for _, site := range sites {
+
+	// Seed the argument sites that always suspend.
+	for _, site := range roots.sites {
 		if site.suspends {
 			c.markFunction(site.semFn)
 		}
 	}
 
+	// Seed the callers of open interface methods. The method itself stays
+	// sync until a compiled implementation proves it can suspend.
+	for _, method := range roots.openMethods {
+		for _, caller := range model.functionCallers[method] {
+			c.markFunction(caller)
+		}
+	}
+
+	// Propagate each new mark along its edges: to callers, to the anonymous
+	// interface methods a key implements, to the callees of argument sites
+	// that pass it, and to the override functions asyncWhenMethods names.
 	for len(c.queue) != 0 {
 		if err := ctx.Err(); err != nil {
 			return []Diagnostic{contextCanceledDiagnostic(err)}

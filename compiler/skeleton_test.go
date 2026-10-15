@@ -3341,7 +3341,8 @@ func TestCompilePackagesEmitsGenericMethodsAliasesAndDictionaries(t *testing.T) 
 		"public Get(__typeArgs: $.GenericTypeArgs | undefined): any",
 		"export function NewBox(__typeArgs: $.GenericTypeArgs | undefined, value: any): Box",
 		"export function ZeroValue(__typeArgs: $.GenericTypeArgs | undefined): any",
-		"export async function CallString(__typeArgs: $.GenericTypeArgs | undefined, v: any): globalThis.Promise<string>",
+		// The program's only Stringer implementation is sync.
+		"export function CallString(__typeArgs: $.GenericTypeArgs | undefined, v: any): string",
 		"export function Sum<T>(__typeArgs: $.GenericTypeArgs | undefined, vals: $.Slice<T>): any",
 		"export function Copy<T>(__typeArgs: $.GenericTypeArgs | undefined, vals: $.Slice<T>): $.Slice<T>",
 		"return $.appendSlice($.arrayToSlice<T>([]), vals, $.appendZero(() => ($.genericZero(__typeArgs, \"T\", null) as T)))",
@@ -3351,7 +3352,7 @@ func TestCompilePackagesEmitsGenericMethodsAliasesAndDictionaries(t *testing.T) 
 		"return $.callGenericMethod(__typeArgs, \"T\", \"String\", v)",
 		"ZeroValue(__goscriptStatic",
 		"??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType(\"int\", \"main.MyInt\"), zero: () => 0, methods: {String: (receiver: any, ...args: any[]) => (MyInt_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, methodSignatures: [$.methodSignature(\"String\", [], [/* @__PURE__ */ $.basicType(\"string\")])] }})",
-		"await CallString(__goscriptStatic",
+		"$.println(CallString(__goscriptStatic",
 		"??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType(\"int\", \"main.MyInt\"), zero: () => 0, methods: {String: (receiver: any, ...args: any[]) => (MyInt_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, methodSignatures: [$.methodSignature(\"String\", [], [/* @__PURE__ */ $.basicType(\"string\")])] }})",
 		"Sum(__goscriptStatic",
 		"??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType(\"int\", \"main.MyInt\"), zero: () => 0, methods: {String: (receiver: any, ...args: any[]) => (MyInt_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, methodSignatures: [$.methodSignature(\"String\", [], [/* @__PURE__ */ $.basicType(\"string\")])] }})",

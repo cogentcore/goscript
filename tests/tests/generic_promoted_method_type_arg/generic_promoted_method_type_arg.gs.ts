@@ -159,9 +159,9 @@ export class Single {
 	)
 }
 
-export async function check(__typeArgs: $.GenericTypeArgs | undefined, w: any): globalThis.Promise<boolean> {
-	void (__goscriptAwait = $.callGenericMethod(__typeArgs, "W", "Set", w, 6n), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
-	return (__goscriptAwait = $.callGenericMethod(__typeArgs, "W", "Is", w, 6n), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) && !(__goscriptAwait = $.callGenericMethod(__typeArgs, "W", "Is", w, 2n), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+export function check(__typeArgs: $.GenericTypeArgs | undefined, w: any): boolean {
+	$.callGenericMethod(__typeArgs, "W", "Set", w, 6n)
+	return $.callGenericMethod(__typeArgs, "W", "Is", w, 6n) && !$.callGenericMethod(__typeArgs, "W", "Is", w, 2n)
 }
 
 export function asFlagger(__typeArgs: $.GenericTypeArgs | undefined, w: any): Flagger | null {
@@ -170,14 +170,14 @@ export function asFlagger(__typeArgs: $.GenericTypeArgs | undefined, w: any): Fl
 
 export async function main(): globalThis.Promise<void> {
 	let w = new Window({Title: "main"})
-	await $.println("check:", await check(__goscriptStatic1(), w))
+	await $.println("check:", check(__goscriptStatic1(), w))
 	let f = asFlagger(__goscriptStatic1(), new Window())
 	void (__goscriptAwait = (f !== null && (f as any).__isVarRef !== true && (f as any).__goValue === undefined ? (f as Exclude<Flagger, null>) : $.pointerValue<Exclude<Flagger, null>>(f)).Set(3n), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 	await $.println("interface:", (__goscriptAwait = (f !== null && (f as any).__isVarRef !== true && (f as any).__goValue === undefined ? (f as Exclude<Flagger, null>) : $.pointerValue<Exclude<Flagger, null>>(f)).Is(3n), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = (f !== null && (f as any).__isVarRef !== true && (f as any).__goValue === undefined ? (f as Exclude<Flagger, null>) : $.pointerValue<Exclude<Flagger, null>>(f)).Is(6n), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
 	let s = new Single()
-	await $.println("generic outer:", await check(__goscriptStatic2(), s))
-	await $.println("generic outer string:", await check(__goscriptStatic4(), new Single()))
+	await $.println("generic outer:", check(__goscriptStatic2(), s))
+	await $.println("generic outer string:", check(__goscriptStatic4(), new Single()))
 }
 
 var __goscriptStatic0$value: any

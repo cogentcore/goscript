@@ -606,7 +606,7 @@ func TestSemanticModelAsyncPropagationObservesContext(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
 
-	diagnostics := colorAsyncFunctions(ctx, newSemanticModel(), nil, nil, nil, nil)
+	diagnostics := colorAsyncFunctions(ctx, newSemanticModel(), asyncRoots{}, nil, nil, nil)
 	if !diagnosticsHaveErrors(diagnostics) {
 		t.Fatalf("expected canceled context diagnostic")
 	}
