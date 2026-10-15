@@ -1673,6 +1673,9 @@ type lowerFileContext struct {
 	// are evaluated into the temporaries of hoistedArgs (see lowerCallArgs).
 	hoistArgsCall *ast.CallExpr
 	hoistedArgs   *[]string
+	// borrow holds the borrowed results of the function being lowered and
+	// the calls in it that borrow results (see lowering-borrowed-results.go).
+	borrow *borrowState
 	// copyValues is whether the struct values lowered are read after the
 	// expression that lowers them, as by a method value or a defer or go
 	// statement, so that they are copied even for a method or function that
@@ -4062,8 +4065,12 @@ func (o *LoweringOwner) lowerNamedReceiverMethodDecl(
 		param := signature.Params().At(idx)
 		lowered.params, lowered.paramBindings = o.appendLoweredParam(functionCtx, lowered.params, lowered.paramBindings, param, idx, decl.Body == nil || async)
 	}
+	if flag, ok := o.borrowFlagParam(ctx, fnObj); ok {
+		lowered.params = append(lowered.params, flag)
+	}
 	if decl.Body != nil {
 		bodyCtx := functionCtx.withAsyncFunction(async).withProtobufGeneratedSyncFunction(protobufSync).withDeferState(deferState)
+		bodyCtx = o.withBorrowedResults(bodyCtx, decl, fnObj)
 		targets, targetDecls, prelude := o.pointerTargetLocals(bodyCtx, decl, lowered.receiverAlias)
 		if len(targets) != 0 {
 			bodyCtx.pointerTargets = targets
@@ -4225,8 +4232,12 @@ func (o *LoweringOwner) lowerFuncDecl(ctx lowerFileContext, decl *ast.FuncDecl) 
 		param := signature.Params().At(idx)
 		lowered.params, lowered.paramBindings = o.appendLoweredParam(functionCtx, lowered.params, lowered.paramBindings, param, idx, decl.Body == nil || async)
 	}
+	if flag, ok := o.borrowFlagParam(ctx, fnObj); ok {
+		lowered.params = append(lowered.params, flag)
+	}
 	if decl.Body != nil {
 		bodyCtx := functionCtx.withAsyncFunction(async).withProtobufGeneratedSyncFunction(protobufSync).withDeferState(deferState)
+		bodyCtx = o.withBorrowedResults(bodyCtx, decl, fnObj)
 		targets, targetDecls, prelude := o.pointerTargetLocals(bodyCtx, decl, lowered.receiverAlias)
 		if len(targets) != 0 {
 			bodyCtx.pointerTargets = targets
@@ -4507,6 +4518,7 @@ func (o *LoweringOwner) appendLoweredParam(
 
 func (ctx lowerFileContext) withSignature(signature *types.Signature) lowerFileContext {
 	ctx.signature = signature
+	ctx.borrow = nil
 	if signature != nil && signature.TypeParams() != nil && signature.TypeParams().Len() != 0 {
 		next := make(map[string]bool, len(ctx.typeParams)+signature.TypeParams().Len())
 		maps.Copy(next, ctx.typeParams)
@@ -7126,7 +7138,7 @@ func (o *LoweringOwner) lowerReturnStmt(ctx lowerFileContext, stmt *ast.ReturnSt
 			return result, diagnostics
 		}
 		if returnType := singleReturnType(ctx); returnType != nil {
-			expr = o.lowerValueForTarget(ctx, stmt.Results[0], returnType, expr)
+			expr = borrowedReturn(ctx, stmt.Results, 0, expr, o.lowerValueForTarget(ctx, stmt.Results[0], returnType, expr))
 			if genericCallResultUsesTypeParam(ctx, stmt.Results[0]) {
 				expr = "(" + expr + " as " + o.tsTypeFor(ctx, returnType) + ")"
 			}
@@ -7140,7 +7152,7 @@ func (o *LoweringOwner) lowerReturnStmt(ctx lowerFileContext, stmt *ast.ReturnSt
 		expr, exprDiagnostics := o.lowerExpr(ctx, result)
 		diagnostics = append(diagnostics, exprDiagnostics...)
 		if ctx.signature != nil && ctx.signature.Results() != nil && idx < ctx.signature.Results().Len() {
-			expr = o.lowerValueForTarget(ctx, result, ctx.signature.Results().At(idx).Type(), expr)
+			expr = borrowedReturn(ctx, stmt.Results, idx, expr, o.lowerValueForTarget(ctx, result, ctx.signature.Results().At(idx).Type(), expr))
 		}
 		parts = append(parts, expr)
 	}
@@ -10167,9 +10179,14 @@ func (o *LoweringOwner) lowerCallArgs(
 	expr *ast.CallExpr,
 	signature *types.Signature,
 ) ([]string, []Diagnostic) {
-	// An ordinary call keeps its arguments in place.
+	// An ordinary call keeps its arguments in place, and one that may
+	// borrow its results asks for them (see collectBorrowCalls).
 	if ctx.hoistArgsCall != expr || ctx.hoistedArgs == nil {
-		return o.lowerCallArgValues(ctx, expr, signature)
+		args, diagnostics := o.lowerCallArgValues(ctx, expr, signature)
+		if flag, ok := borrowCallArg(ctx, expr); ok {
+			args = append(args, flag)
+		}
+		return args, diagnostics
 	}
 
 	// The arguments of a deferred or go call are evaluated where the
@@ -17581,6 +17598,12 @@ func isUnaliasedLocalValue(ctx lowerFileContext, expr ast.Expr) bool {
 	}
 	if obj.Pos() < ctx.file.Pos() || obj.Pos() >= ctx.file.End() {
 		return false
+	}
+
+	// A local that holds a borrowed result shares the value of the argument
+	// that the call borrowed it from.
+	if arg, ok := borrowedLocalArg(ctx, obj); ok {
+		return isUnaliasedLocalValue(ctx, arg)
 	}
 
 	// Find the body of the function that declares it, which is not a range
