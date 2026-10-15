@@ -7,22 +7,10 @@ import * as trace from "@goscript/runtime/trace/index.js"
 import type * as io from "@goscript/io/index.js"
 
 export class byteSink {
-	public get data(): $.Slice<number> {
-		return this._fields.data
-	}
-
-	public set data(value: $.Slice<number>) {
-		this._fields.data = value
-	}
-
-	public _fields: {
-		data: $.Slice<number>
-	}
+	public declare data: $.Slice<number>
 
 	constructor(init?: Partial<{data?: $.Slice<number>}>, __goscriptValue?: boolean) {
-		this._fields = {
-			data: init?.data ?? (null! as $.Slice<number>)
-		}
+		this.data = init?.data ?? (null! as $.Slice<number>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -30,10 +18,9 @@ export class byteSink {
 		return new byteSink(this, true)
 	}
 
-	public __goscriptAssign(source: byteSink): void {
-		const target = this._fields
-		const values = source._fields
-		target.data = values.data
+	public __goscriptAssign(source: byteSink): this {
+		this.data = source.data
+		return this
 	}
 
 	public Write(p: $.Slice<number>): [number, $.GoError] {
