@@ -10,22 +10,10 @@ import type * as io from "@goscript/io/index.js"
 
 export class Inner {
 	// Ready is included even when it is false.
-	public get Ready(): boolean {
-		return this._fields.Ready
-	}
-
-	public set Ready(value: boolean) {
-		this._fields.Ready = value
-	}
-
-	public _fields: {
-		Ready: boolean
-	}
+	public declare Ready: boolean
 
 	constructor(init?: Partial<{Ready?: boolean}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Ready: init?.Ready ?? (false as boolean)
-		}
+		this.Ready = init?.Ready ?? (false as boolean)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -33,10 +21,9 @@ export class Inner {
 		return new Inner(this, true)
 	}
 
-	public __goscriptAssign(source: Inner): void {
-		const target = this._fields
-		const values = source._fields
-		target.Ready = values.Ready
+	public __goscriptAssign(source: Inner): this {
+		this.Ready = source.Ready
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -50,44 +37,18 @@ export class Inner {
 
 export class Record {
 	// Count is the numeric field.
-	public get Count(): number {
-		return this._fields.Count
-	}
-
-	public set Count(value: number) {
-		this._fields.Count = value
-	}
+	public declare Count: number
 
 	// name is visible to formatting despite being unexported.
-	public get name(): string {
-		return this._fields.name
-	}
-
-	public set name(value: string) {
-		this._fields.name = value
-	}
+	public declare name: string
 
 	// Inner is a nested value.
-	public get Inner(): Inner {
-		return this._fields.Inner
-	}
-
-	public set Inner(value: Inner) {
-		this._fields.Inner = value
-	}
-
-	public _fields: {
-		Count: number
-		name: string
-		Inner: Inner
-	}
+	public declare Inner: Inner
 
 	constructor(init?: Partial<{Count?: number, name?: string, Inner?: Inner}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Count: init?.Count ?? (0 as number),
-			name: init?.name ?? ("" as string),
-			Inner: init?.Inner ? init.Inner.clone() : new Inner(undefined, true)
-		}
+		this.Count = init?.Count ?? (0 as number)
+		this.name = init?.name ?? ("" as string)
+		this.Inner = init?.Inner ? init.Inner.clone() : new Inner(undefined, true)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -95,12 +56,11 @@ export class Record {
 		return new Record(this, true)
 	}
 
-	public __goscriptAssign(source: Record): void {
-		const target = this._fields
-		const values = source._fields
-		target.Count = values.Count
-		target.name = values.name
-		$.assignStruct(target.Inner, values.Inner)
+	public __goscriptAssign(source: Record): this {
+		this.Count = source.Count
+		this.name = source.name
+		this.Inner.__goscriptAssign(source.Inner)
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -114,44 +74,18 @@ export class Record {
 
 export class Pointers {
 	// Value points to a scalar, which formats as an address.
-	public get Value(): $.VarRef<number> | null {
-		return this._fields.Value
-	}
-
-	public set Value(value: $.VarRef<number> | null) {
-		this._fields.Value = value
-	}
+	public declare Value: $.VarRef<number> | null
 
 	// Next can point back to this record.
-	public get Next(): Pointers | $.VarRef<Pointers> | null {
-		return this._fields.Next
-	}
-
-	public set Next(value: Pointers | $.VarRef<Pointers> | null) {
-		this._fields.Next = value
-	}
+	public declare Next: Pointers | $.VarRef<Pointers> | null
 
 	// Dynamic holds a pointer behind an interface.
-	public get Dynamic(): any {
-		return this._fields.Dynamic
-	}
-
-	public set Dynamic(value: any) {
-		this._fields.Dynamic = value
-	}
-
-	public _fields: {
-		Value: $.VarRef<number> | null
-		Next: Pointers | $.VarRef<Pointers> | null
-		Dynamic: any
-	}
+	public declare Dynamic: any
 
 	constructor(init?: Partial<{Value?: $.VarRef<number> | null, Next?: Pointers | $.VarRef<Pointers> | null, Dynamic?: any}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Value: init?.Value ?? (null! as $.VarRef<number> | null),
-			Next: init?.Next ?? (null! as Pointers | $.VarRef<Pointers> | null),
-			Dynamic: init?.Dynamic ?? (null! as any)
-		}
+		this.Value = init?.Value ?? (null! as $.VarRef<number> | null)
+		this.Next = init?.Next ?? (null! as Pointers | $.VarRef<Pointers> | null)
+		this.Dynamic = init?.Dynamic ?? (null! as any)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -159,12 +93,11 @@ export class Pointers {
 		return new Pointers(this, true)
 	}
 
-	public __goscriptAssign(source: Pointers): void {
-		const target = this._fields
-		const values = source._fields
-		target.Value = values.Value
-		target.Next = values.Next
-		target.Dynamic = $.assignFieldValue(target.Dynamic, values.Dynamic, { kind: $.TypeKind.Interface, methods: [] })
+	public __goscriptAssign(source: Pointers): this {
+		this.Value = source.Value
+		this.Next = source.Next
+		this.Dynamic = $.assignFieldValue(this.Dynamic, source.Dynamic, { kind: $.TypeKind.Interface, methods: [] })
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -177,42 +110,16 @@ export class Pointers {
 }
 
 export class Node {
-	public get Name(): string {
-		return this._fields.Name
-	}
+	public declare Name: string
 
-	public set Name(value: string) {
-		this._fields.Name = value
-	}
+	public declare Parent: Node | $.VarRef<Node> | null
 
-	public get Parent(): Node | $.VarRef<Node> | null {
-		return this._fields.Parent
-	}
-
-	public set Parent(value: Node | $.VarRef<Node> | null) {
-		this._fields.Parent = value
-	}
-
-	public get Kids(): $.Slice<Node | $.VarRef<Node> | null> {
-		return this._fields.Kids
-	}
-
-	public set Kids(value: $.Slice<Node | $.VarRef<Node> | null>) {
-		this._fields.Kids = value
-	}
-
-	public _fields: {
-		Name: string
-		Parent: Node | $.VarRef<Node> | null
-		Kids: $.Slice<Node | $.VarRef<Node> | null>
-	}
+	public declare Kids: $.Slice<Node | $.VarRef<Node> | null>
 
 	constructor(init?: Partial<{Name?: string, Parent?: Node | $.VarRef<Node> | null, Kids?: $.Slice<Node | $.VarRef<Node> | null>}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Name: init?.Name ?? ("" as string),
-			Parent: init?.Parent ?? (null! as Node | $.VarRef<Node> | null),
-			Kids: init?.Kids ?? (null! as $.Slice<Node | $.VarRef<Node> | null>)
-		}
+		this.Name = init?.Name ?? ("" as string)
+		this.Parent = init?.Parent ?? (null! as Node | $.VarRef<Node> | null)
+		this.Kids = init?.Kids ?? (null! as $.Slice<Node | $.VarRef<Node> | null>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -220,12 +127,11 @@ export class Node {
 		return new Node(this, true)
 	}
 
-	public __goscriptAssign(source: Node): void {
-		const target = this._fields
-		const values = source._fields
-		target.Name = values.Name
-		target.Parent = values.Parent
-		target.Kids = values.Kids
+	public __goscriptAssign(source: Node): this {
+		this.Name = source.Name
+		this.Parent = source.Parent
+		this.Kids = source.Kids
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -238,32 +144,13 @@ export class Node {
 }
 
 export class Base {
-	public get Windows(): $.Slice<any> {
-		return this._fields.Windows
-	}
+	public declare Windows: $.Slice<any>
 
-	public set Windows(value: $.Slice<any>) {
-		this._fields.Windows = value
-	}
+	public declare Active: any
 
-	public get Active(): any {
-		return this._fields.Active
-	}
-
-	public set Active(value: any) {
-		this._fields.Active = value
-	}
-
-	public _fields: {
-		Windows: $.Slice<any>
-		Active: any
-	}
-
-	constructor(init?: Partial<{Windows?: $.Slice<any>, Active?: any}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Windows: init?.Windows ?? (null! as $.Slice<any>),
-			Active: init?.Active !== undefined ? $.copyElement(init.Active) : (null! as any)
-		}
+	constructor(init?: Partial<{Windows?: $.Slice<any>, Active?: any}>, __goscriptValue?: boolean, __goscriptFresh?: boolean) {
+		this.Windows = init?.Windows ?? (null! as $.Slice<any>)
+		this.Active = init?.Active !== undefined ? (__goscriptFresh === true ? init.Active : $.copyElement(init.Active)) : (null! as any)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -271,11 +158,10 @@ export class Base {
 		return new Base(this, true)
 	}
 
-	public __goscriptAssign(source: Base): void {
-		const target = this._fields
-		const values = source._fields
-		target.Windows = values.Windows
-		target.Active = $.assignFieldValue(target.Active, values.Active, { kind: $.TypeKind.Interface, methods: [] })
+	public __goscriptAssign(source: Base): this {
+		this.Windows = source.Windows
+		this.Active = $.assignFieldValue(this.Active, source.Active, { kind: $.TypeKind.Interface, methods: [] })
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -288,32 +174,13 @@ export class Base {
 }
 
 export class App {
-	public get Base(): Base {
-		return this._fields.Base
-	}
+	public declare Base: Base
 
-	public set Base(value: Base) {
-		this._fields.Base = value
-	}
-
-	public get Name(): string {
-		return this._fields.Name
-	}
-
-	public set Name(value: string) {
-		this._fields.Name = value
-	}
-
-	public _fields: {
-		Base: Base
-		Name: string
-	}
+	public declare Name: string
 
 	constructor(init?: Partial<{Base?: Base, Name?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Base: init?.Base ? $.markAsStructValue($.cloneStructValue(init.Base)) : $.markAsStructValue(new Base({Active: null! as Win | $.VarRef<Win> | null})),
-			Name: init?.Name ?? ("" as string)
-		}
+		this.Base = init?.Base ? init.Base.clone() : $.markAsStructValue(new Base({Active: null! as Win | $.VarRef<Win> | null}, undefined, true))
+		this.Name = init?.Name ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -321,11 +188,10 @@ export class App {
 		return new App(this, true)
 	}
 
-	public __goscriptAssign(source: App): void {
-		const target = this._fields
-		const values = source._fields
-		$.assignStruct(target.Base, values.Base)
-		target.Name = values.Name
+	public __goscriptAssign(source: App): this {
+		this.Base.__goscriptAssign(source.Base)
+		this.Name = source.Name
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -338,32 +204,13 @@ export class App {
 }
 
 export class Win {
-	public get App(): App | $.VarRef<App> | null {
-		return this._fields.App
-	}
+	public declare App: App | $.VarRef<App> | null
 
-	public set App(value: App | $.VarRef<App> | null) {
-		this._fields.App = value
-	}
-
-	public get Title(): string {
-		return this._fields.Title
-	}
-
-	public set Title(value: string) {
-		this._fields.Title = value
-	}
-
-	public _fields: {
-		App: App | $.VarRef<App> | null
-		Title: string
-	}
+	public declare Title: string
 
 	constructor(init?: Partial<{App?: App | $.VarRef<App> | null, Title?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			App: init?.App ?? (null! as App | $.VarRef<App> | null),
-			Title: init?.Title ?? ("" as string)
-		}
+		this.App = init?.App ?? (null! as App | $.VarRef<App> | null)
+		this.Title = init?.Title ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -371,11 +218,10 @@ export class Win {
 		return new Win(this, true)
 	}
 
-	public __goscriptAssign(source: Win): void {
-		const target = this._fields
-		const values = source._fields
-		target.App = values.App
-		target.Title = values.Title
+	public __goscriptAssign(source: Win): this {
+		this.App = source.App
+		this.Title = source.Title
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

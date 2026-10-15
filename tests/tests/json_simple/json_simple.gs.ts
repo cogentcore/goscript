@@ -5,22 +5,10 @@ import * as $ from "@goscript/builtin/index.js"
 import * as json from "@goscript/encoding/json/index.js"
 
 export class Simple {
-	public get X(): number {
-		return this._fields.X
-	}
-
-	public set X(value: number) {
-		this._fields.X = value
-	}
-
-	public _fields: {
-		X: number
-	}
+	public declare X: number
 
 	constructor(init?: Partial<{X?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			X: init?.X ?? (0 as number)
-		}
+		this.X = init?.X ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -28,10 +16,9 @@ export class Simple {
 		return new Simple(this, true)
 	}
 
-	public __goscriptAssign(source: Simple): void {
-		const target = this._fields
-		const values = source._fields
-		target.X = values.X
+	public __goscriptAssign(source: Simple): this {
+		this.X = source.X
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

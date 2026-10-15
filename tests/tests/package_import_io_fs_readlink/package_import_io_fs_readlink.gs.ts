@@ -5,12 +5,7 @@ import * as $ from "@goscript/builtin/index.js"
 import * as fs from "@goscript/io/fs/index.js"
 
 export class emptyFS {
-	public _fields: {
-	}
-
 	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
-		this._fields = {
-		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -18,7 +13,8 @@ export class emptyFS {
 		return new emptyFS(this, true)
 	}
 
-	public __goscriptAssign(source: emptyFS): void {
+	public __goscriptAssign(source: emptyFS): this {
+		return this
 	}
 
 	public Open(name: string): [fs.File | null, $.GoError] {
@@ -35,12 +31,7 @@ export class emptyFS {
 }
 
 export class linkFS {
-	public _fields: {
-	}
-
 	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
-		this._fields = {
-		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -48,7 +39,8 @@ export class linkFS {
 		return new linkFS(this, true)
 	}
 
-	public __goscriptAssign(source: linkFS): void {
+	public __goscriptAssign(source: linkFS): this {
+		return this
 	}
 
 	public Lstat(name: string): [fs.FileInfo | null, $.GoError] {

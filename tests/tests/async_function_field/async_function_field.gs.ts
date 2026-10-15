@@ -5,22 +5,10 @@ import * as $ from "@goscript/builtin/index.js"
 import * as sync from "@goscript/sync/index.js"
 
 export class loader {
-	public get load(): ((_p0: string) => [any, boolean] | globalThis.Promise<[any, boolean]>) | null {
-		return this._fields.load
-	}
-
-	public set load(value: ((_p0: string) => [any, boolean] | globalThis.Promise<[any, boolean]>) | null) {
-		this._fields.load = value
-	}
-
-	public _fields: {
-		load: ((_p0: string) => [any, boolean] | globalThis.Promise<[any, boolean]>) | null
-	}
+	public declare load: ((_p0: string) => [any, boolean] | globalThis.Promise<[any, boolean]>) | null
 
 	constructor(init?: Partial<{load?: ((_p0: string) => [any, boolean] | globalThis.Promise<[any, boolean]>) | null}>, __goscriptValue?: boolean) {
-		this._fields = {
-			load: init?.load ?? (null! as ((_p0: string) => [any, boolean] | globalThis.Promise<[any, boolean]>) | null)
-		}
+		this.load = init?.load ?? (null! as ((_p0: string) => [any, boolean] | globalThis.Promise<[any, boolean]>) | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -28,10 +16,9 @@ export class loader {
 		return new loader(this, true)
 	}
 
-	public __goscriptAssign(source: loader): void {
-		const target = this._fields
-		const values = source._fields
-		target.load = values.load
+	public __goscriptAssign(source: loader): this {
+		this.load = source.load
+		return this
 	}
 
 	public getLoad(): ((_p0: string) => [any, boolean] | globalThis.Promise<[any, boolean]>) | null {

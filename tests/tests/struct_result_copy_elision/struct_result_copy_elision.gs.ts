@@ -4,32 +4,13 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class Pos {
-	public get Line(): number {
-		return this._fields.Line
-	}
+	public declare Line: number
 
-	public set Line(value: number) {
-		this._fields.Line = value
-	}
-
-	public get Char(): number {
-		return this._fields.Char
-	}
-
-	public set Char(value: number) {
-		this._fields.Char = value
-	}
-
-	public _fields: {
-		Line: number
-		Char: number
-	}
+	public declare Char: number
 
 	constructor(init?: Partial<{Line?: number, Char?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Line: init?.Line ?? (0 as number),
-			Char: init?.Char ?? (0 as number)
-		}
+		this.Line = init?.Line ?? (0 as number)
+		this.Char = init?.Char ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -37,11 +18,10 @@ export class Pos {
 		return new Pos(this, true)
 	}
 
-	public __goscriptAssign(source: Pos): void {
-		const target = this._fields
-		const values = source._fields
-		target.Line = values.Line
-		target.Char = values.Char
+	public __goscriptAssign(source: Pos): this {
+		this.Line = source.Line
+		this.Char = source.Char
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -54,32 +34,13 @@ export class Pos {
 }
 
 export class Region {
-	public get Start(): Pos {
-		return this._fields.Start
-	}
+	public declare Start: Pos
 
-	public set Start(value: Pos) {
-		this._fields.Start = value
-	}
-
-	public get End(): Pos {
-		return this._fields.End
-	}
-
-	public set End(value: Pos) {
-		this._fields.End = value
-	}
-
-	public _fields: {
-		Start: Pos
-		End: Pos
-	}
+	public declare End: Pos
 
 	constructor(init?: Partial<{Start?: Pos, End?: Pos}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Start: init?.Start ? init.Start.clone() : new Pos(undefined, true),
-			End: init?.End ? init.End.clone() : new Pos(undefined, true)
-		}
+		this.Start = init?.Start ? init.Start.clone() : new Pos(undefined, true)
+		this.End = init?.End ? init.End.clone() : new Pos(undefined, true)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -87,11 +48,10 @@ export class Region {
 		return new Region(this, true)
 	}
 
-	public __goscriptAssign(source: Region): void {
-		const target = this._fields
-		const values = source._fields
-		$.assignStruct(target.Start, values.Start)
-		$.assignStruct(target.End, values.End)
+	public __goscriptAssign(source: Region): this {
+		this.Start.__goscriptAssign(source.Start)
+		this.End.__goscriptAssign(source.End)
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -104,32 +64,13 @@ export class Region {
 }
 
 export class Rule {
-	public get Name(): string {
-		return this._fields.Name
-	}
+	public declare Name: string
 
-	public set Name(value: string) {
-		this._fields.Name = value
-	}
-
-	public get pos(): Pos {
-		return this._fields.pos
-	}
-
-	public set pos(value: Pos) {
-		this._fields.pos = value
-	}
-
-	public _fields: {
-		Name: string
-		pos: Pos
-	}
+	public declare pos: Pos
 
 	constructor(init?: Partial<{Name?: string, pos?: Pos}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Name: init?.Name ?? ("" as string),
-			pos: init?.pos ? init.pos.clone() : new Pos(undefined, true)
-		}
+		this.Name = init?.Name ?? ("" as string)
+		this.pos = init?.pos ? init.pos.clone() : new Pos(undefined, true)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -137,11 +78,10 @@ export class Rule {
 		return new Rule(this, true)
 	}
 
-	public __goscriptAssign(source: Rule): void {
-		const target = this._fields
-		const values = source._fields
-		target.Name = values.Name
-		$.assignStruct(target.pos, values.pos)
+	public __goscriptAssign(source: Rule): this {
+		this.Name = source.Name
+		this.pos.__goscriptAssign(source.pos)
+		return this
 	}
 
 	public Pos(): Pos {
@@ -164,32 +104,13 @@ export class Rule {
 }
 
 export class key {
-	public get a(): number {
-		return this._fields.a
-	}
+	public declare a: number
 
-	public set a(value: number) {
-		this._fields.a = value
-	}
-
-	public get b(): number {
-		return this._fields.b
-	}
-
-	public set b(value: number) {
-		this._fields.b = value
-	}
-
-	public _fields: {
-		a: number
-		b: number
-	}
+	public declare b: number
 
 	constructor(init?: Partial<{a?: number, b?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			a: init?.a ?? (0 as number),
-			b: init?.b ?? (0 as number)
-		}
+		this.a = init?.a ?? (0 as number)
+		this.b = init?.b ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -197,11 +118,10 @@ export class key {
 		return new key(this, true)
 	}
 
-	public __goscriptAssign(source: key): void {
-		const target = this._fields
-		const values = source._fields
-		target.a = values.a
-		target.b = values.b
+	public __goscriptAssign(source: key): this {
+		this.a = source.a
+		this.b = source.b
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -273,7 +193,7 @@ export async function main(): globalThis.Promise<void> {
 	v.Char = 20
 	await $.println((r$ as Rule).pos.Char, v.Char)
 
-	$.assignStruct(global, new Pos({Line: 5, Char: 6}, true))
+	global.__goscriptAssign(new Pos({Line: 5, Char: 6}, true))
 	let g = globalPos()
 	g.Line = 50
 	await $.println(global.Line, g.Line)
@@ -299,7 +219,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println(src.value.End.Char, id.End.Char)
 
 	let arr: Pos[] = $.arrayValue(globalThis.Array.from({ length: 2 }, () => new Pos(undefined, true)), /* @__PURE__ */ $.arrayType("main.Pos", 2))
-	$.assignStruct(arr[0], (r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? ((r as any) as Rule).Pos() : Rule.prototype.Pos.call(r)))
+	arr[0].__goscriptAssign((r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? ((r as any) as Rule).Pos() : Rule.prototype.Pos.call(r)))
 	$.arrayIndex(arr, 0).Line = 11
 	await $.println((r$ as Rule).pos.Line, $.arrayIndex(arr, 0).Line)
 

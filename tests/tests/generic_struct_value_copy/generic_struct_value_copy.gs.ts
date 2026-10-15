@@ -4,32 +4,13 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class Value {
-	public get V(): number {
-		return this._fields.V
-	}
+	public declare V: number
 
-	public set V(value: number) {
-		this._fields.V = value
-	}
-
-	public get U(): number {
-		return this._fields.U
-	}
-
-	public set U(value: number) {
-		this._fields.U = value
-	}
-
-	public _fields: {
-		V: number
-		U: number
-	}
+	public declare U: number
 
 	constructor(init?: Partial<{V?: number, U?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			V: init?.V ?? (0 as number),
-			U: init?.U ?? (0 as number)
-		}
+		this.V = init?.V ?? (0 as number)
+		this.U = init?.U ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -37,11 +18,10 @@ export class Value {
 		return new Value(this, true)
 	}
 
-	public __goscriptAssign(source: Value): void {
-		const target = this._fields
-		const values = source._fields
-		target.V = values.V
-		target.U = values.U
+	public __goscriptAssign(source: Value): this {
+		this.V = source.V
+		this.U = source.U
+		return this
 	}
 
 	public Set(x: number): void {
@@ -59,52 +39,19 @@ export class Value {
 }
 
 export class Sides {
-	public get Top(): any {
-		return this._fields.Top
-	}
+	public declare Top: any
 
-	public set Top(value: any) {
-		this._fields.Top = value
-	}
+	public declare Right: any
 
-	public get Right(): any {
-		return this._fields.Right
-	}
+	public declare Bottom: any
 
-	public set Right(value: any) {
-		this._fields.Right = value
-	}
+	public declare Left: any
 
-	public get Bottom(): any {
-		return this._fields.Bottom
-	}
-
-	public set Bottom(value: any) {
-		this._fields.Bottom = value
-	}
-
-	public get Left(): any {
-		return this._fields.Left
-	}
-
-	public set Left(value: any) {
-		this._fields.Left = value
-	}
-
-	public _fields: {
-		Top: any
-		Right: any
-		Bottom: any
-		Left: any
-	}
-
-	constructor(init?: Partial<{Top?: any, Right?: any, Bottom?: any, Left?: any}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Top: init?.Top !== undefined ? $.copyElement(init.Top) : (null! as any),
-			Right: init?.Right !== undefined ? $.copyElement(init.Right) : (null! as any),
-			Bottom: init?.Bottom !== undefined ? $.copyElement(init.Bottom) : (null! as any),
-			Left: init?.Left !== undefined ? $.copyElement(init.Left) : (null! as any)
-		}
+	constructor(init?: Partial<{Top?: any, Right?: any, Bottom?: any, Left?: any}>, __goscriptValue?: boolean, __goscriptFresh?: boolean) {
+		this.Top = init?.Top !== undefined ? (__goscriptFresh === true ? init.Top : $.copyElement(init.Top)) : (null! as any)
+		this.Right = init?.Right !== undefined ? (__goscriptFresh === true ? init.Right : $.copyElement(init.Right)) : (null! as any)
+		this.Bottom = init?.Bottom !== undefined ? (__goscriptFresh === true ? init.Bottom : $.copyElement(init.Bottom)) : (null! as any)
+		this.Left = init?.Left !== undefined ? (__goscriptFresh === true ? init.Left : $.copyElement(init.Left)) : (null! as any)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -112,13 +59,12 @@ export class Sides {
 		return new Sides(this, true)
 	}
 
-	public __goscriptAssign(source: Sides): void {
-		const target = this._fields
-		const values = source._fields
-		target.Top = $.assignFieldValue(target.Top, values.Top, { kind: $.TypeKind.Interface, methods: [] })
-		target.Right = $.assignFieldValue(target.Right, values.Right, { kind: $.TypeKind.Interface, methods: [] })
-		target.Bottom = $.assignFieldValue(target.Bottom, values.Bottom, { kind: $.TypeKind.Interface, methods: [] })
-		target.Left = $.assignFieldValue(target.Left, values.Left, { kind: $.TypeKind.Interface, methods: [] })
+	public __goscriptAssign(source: Sides): this {
+		this.Top = $.assignFieldValue(this.Top, source.Top, { kind: $.TypeKind.Interface, methods: [] })
+		this.Right = $.assignFieldValue(this.Right, source.Right, { kind: $.TypeKind.Interface, methods: [] })
+		this.Bottom = $.assignFieldValue(this.Bottom, source.Bottom, { kind: $.TypeKind.Interface, methods: [] })
+		this.Left = $.assignFieldValue(this.Left, source.Left, { kind: $.TypeKind.Interface, methods: [] })
+		return this
 	}
 
 	public SetAll(__typeArgs: $.GenericTypeArgs | undefined, val: any): void {
@@ -147,32 +93,13 @@ export class Sides {
 }
 
 export class box {
-	public get A(): any {
-		return this._fields.A
-	}
+	public declare A: any
 
-	public set A(value: any) {
-		this._fields.A = value
-	}
+	public declare B: any
 
-	public get B(): any {
-		return this._fields.B
-	}
-
-	public set B(value: any) {
-		this._fields.B = value
-	}
-
-	public _fields: {
-		A: any
-		B: any
-	}
-
-	constructor(init?: Partial<{A?: any, B?: any}>, __goscriptValue?: boolean) {
-		this._fields = {
-			A: init?.A !== undefined ? $.copyElement(init.A) : (null! as any),
-			B: init?.B !== undefined ? $.copyElement(init.B) : (null! as any)
-		}
+	constructor(init?: Partial<{A?: any, B?: any}>, __goscriptValue?: boolean, __goscriptFresh?: boolean) {
+		this.A = init?.A !== undefined ? (__goscriptFresh === true ? init.A : $.copyElement(init.A)) : (null! as any)
+		this.B = init?.B !== undefined ? (__goscriptFresh === true ? init.B : $.copyElement(init.B)) : (null! as any)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -180,11 +107,10 @@ export class box {
 		return new box(this, true)
 	}
 
-	public __goscriptAssign(source: box): void {
-		const target = this._fields
-		const values = source._fields
-		target.A = $.assignFieldValue(target.A, values.A, { kind: $.TypeKind.Interface, methods: [] })
-		target.B = $.assignFieldValue(target.B, values.B, { kind: $.TypeKind.Interface, methods: [] })
+	public __goscriptAssign(source: box): this {
+		this.A = $.assignFieldValue(this.A, source.A, { kind: $.TypeKind.Interface, methods: [] })
+		this.B = $.assignFieldValue(this.B, source.B, { kind: $.TypeKind.Interface, methods: [] })
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -237,7 +163,7 @@ export function makeBox(__typeArgs: $.GenericTypeArgs | undefined, v: any): box 
 }
 
 export async function main(): globalThis.Promise<void> {
-	let s: $.VarRef<Sides> = $.varRef($.markAsStructValue(new Sides({Top: new Value(undefined, true), Right: new Value(undefined, true), Bottom: new Value(undefined, true), Left: new Value(undefined, true)})))
+	let s: $.VarRef<Sides> = $.varRef($.markAsStructValue(new Sides({Top: new Value(undefined, true), Right: new Value(undefined, true), Bottom: new Value(undefined, true), Left: new Value(undefined, true)}, undefined, true)))
 	s.value.SetHorizontal(__goscriptStatic0(), new Value({V: 24}, true))
 	s.value.Left.Set(16)
 	await $.println("horizontal:", s.value.Left.V, s.value.Right.V)
@@ -289,16 +215,16 @@ export async function main(): globalThis.Promise<void> {
 	// Copying a generic struct copies its struct-typed fields, so assigning
 	// to a field of the original leaves the copy unchanged.
 	let orig = $.markAsStructValue(new Sides({Bottom: new Value({V: 1}, true), Top: new Value(undefined, true), Right: new Value(undefined, true), Left: new Value(undefined, true)}))
-	let cp = $.markAsStructValue($.cloneStructValue(orig))
-	$.assignStruct(cp.Bottom, new Value({V: 2}, true))
-	$.assignStruct(orig.Bottom, new Value({V: 3}, true))
+	let cp = (orig).clone()
+	cp.Bottom.__goscriptAssign(new Value({V: 2}, true))
+	orig.Bottom.__goscriptAssign(new Value({V: 3}, true))
 	await $.println("struct copy:", orig.Bottom.V, cp.Bottom.V)
 	let orig2 = $.markAsStructValue(new Sides({Top: new Value({V: 4}, true), Right: new Value(undefined, true), Bottom: new Value(undefined, true), Left: new Value(undefined, true)}))
-	let cp2 = $.markAsStructValue($.cloneStructValue(orig2))
+	let cp2 = (orig2).clone()
 	orig2.Top.Set(5)
 	await $.println("struct copy method:", orig2.Top.V, cp2.Top.V)
 
-	let si: $.VarRef<Sides> = $.varRef($.markAsStructValue(new Sides({Top: 0, Right: 0, Bottom: 0, Left: 0})))
+	let si: $.VarRef<Sides> = $.varRef($.markAsStructValue(new Sides({Top: 0, Right: 0, Bottom: 0, Left: 0}, undefined, true)))
 	si.value.SetAll(__goscriptStatic1(), 4)
 	si.value.Left = 5
 	await $.println("ints:", si.value.Top, si.value.Left)

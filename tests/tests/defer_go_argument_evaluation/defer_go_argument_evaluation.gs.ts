@@ -5,32 +5,13 @@ import * as $ from "@goscript/builtin/index.js"
 import * as sync from "@goscript/sync/index.js"
 
 export class R {
-	public get A(): number {
-		return this._fields.A
-	}
+	public declare A: number
 
-	public set A(value: number) {
-		this._fields.A = value
-	}
-
-	public get B(): number {
-		return this._fields.B
-	}
-
-	public set B(value: number) {
-		this._fields.B = value
-	}
-
-	public _fields: {
-		A: number
-		B: number
-	}
+	public declare B: number
 
 	constructor(init?: Partial<{A?: number, B?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			A: init?.A ?? (0 as number),
-			B: init?.B ?? (0 as number)
-		}
+		this.A = init?.A ?? (0 as number)
+		this.B = init?.B ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -38,11 +19,10 @@ export class R {
 		return new R(this, true)
 	}
 
-	public __goscriptAssign(source: R): void {
-		const target = this._fields
-		const values = source._fields
-		target.A = values.A
-		target.B = values.B
+	public __goscriptAssign(source: R): this {
+		this.A = source.A
+		this.B = source.B
+		return this
 	}
 
 	public async Show(tag: string): globalThis.Promise<void> {

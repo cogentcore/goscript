@@ -6,22 +6,10 @@ import * as __goscript_b from "./b.gs.ts"
 import "./b.gs.ts"
 
 export class aValue {
-	public get next(): __goscript_b.bValue | $.VarRef<__goscript_b.bValue> | null {
-		return this._fields.next
-	}
-
-	public set next(value: __goscript_b.bValue | $.VarRef<__goscript_b.bValue> | null) {
-		this._fields.next = value
-	}
-
-	public _fields: {
-		next: __goscript_b.bValue | $.VarRef<__goscript_b.bValue> | null
-	}
+	public declare next: __goscript_b.bValue | $.VarRef<__goscript_b.bValue> | null
 
 	constructor(init?: Partial<{next?: __goscript_b.bValue | $.VarRef<__goscript_b.bValue> | null}>, __goscriptValue?: boolean) {
-		this._fields = {
-			next: init?.next ?? (null! as __goscript_b.bValue | $.VarRef<__goscript_b.bValue> | null)
-		}
+		this.next = init?.next ?? (null! as __goscript_b.bValue | $.VarRef<__goscript_b.bValue> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -29,10 +17,9 @@ export class aValue {
 		return new aValue(this, true)
 	}
 
-	public __goscriptAssign(source: aValue): void {
-		const target = this._fields
-		const values = source._fields
-		target.next = values.next
+	public __goscriptAssign(source: aValue): this {
+		this.next = source.next
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

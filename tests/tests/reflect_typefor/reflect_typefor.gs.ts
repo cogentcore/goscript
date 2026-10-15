@@ -45,32 +45,13 @@ $.registerInterfaceType(
 );
 
 export class MyStruct {
-	public get Name(): string {
-		return this._fields.Name
-	}
+	public declare Name: string
 
-	public set Name(value: string) {
-		this._fields.Name = value
-	}
-
-	public get Age(): number {
-		return this._fields.Age
-	}
-
-	public set Age(value: number) {
-		this._fields.Age = value
-	}
-
-	public _fields: {
-		Name: string
-		Age: number
-	}
+	public declare Age: number
 
 	constructor(init?: Partial<{Name?: string, Age?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Name: init?.Name ?? ("" as string),
-			Age: init?.Age ?? (0 as number)
-		}
+		this.Name = init?.Name ?? ("" as string)
+		this.Age = init?.Age ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -78,11 +59,10 @@ export class MyStruct {
 		return new MyStruct(this, true)
 	}
 
-	public __goscriptAssign(source: MyStruct): void {
-		const target = this._fields
-		const values = source._fields
-		target.Name = values.Name
-		target.Age = values.Age
+	public __goscriptAssign(source: MyStruct): this {
+		this.Name = source.Name
+		this.Age = source.Age
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -95,12 +75,7 @@ export class MyStruct {
 }
 
 export class myErr {
-	public _fields: {
-	}
-
 	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
-		this._fields = {
-		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -108,7 +83,8 @@ export class myErr {
 		return new myErr(this, true)
 	}
 
-	public __goscriptAssign(source: myErr): void {
+	public __goscriptAssign(source: myErr): this {
+		return this
 	}
 
 	public Error(): string {
@@ -180,7 +156,7 @@ export async function main(): globalThis.Promise<void> {
 }
 
 export async function describe<E>(__typeArgs: $.GenericTypeArgs | undefined, s: $.Slice<E>): globalThis.Promise<void> {
-	let v = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(s, "[]E", /* @__PURE__ */ $.sliceType(__typeArgs?.["E"]?.type ?? { kind: $.TypeKind.Interface, methods: [] })))))
+	let v = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.genericInterfaceValue(s, "[]E", /* @__PURE__ */ $.sliceType(__typeArgs?.["E"]?.type ?? { kind: $.TypeKind.Interface, methods: [] })))))
 	await $.println("type:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(v)).Type()).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), "elem kind:", reflect.Kind_String((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(v)).Type()).Elem(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)).Kind(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)), "len:", $.markAsStructValue($.cloneStructValue(v)).Len())
 	if ($.markAsStructValue($.cloneStructValue(v)).Len() > 0) {
 		await $.println("index kind:", reflect.Kind_String($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(v)).Index(0))).Kind()))
@@ -188,7 +164,7 @@ export async function describe<E>(__typeArgs: $.GenericTypeArgs | undefined, s: 
 }
 
 export async function describeMap(__typeArgs: $.GenericTypeArgs | undefined, m: globalThis.Map<any, any> | null): globalThis.Promise<void> {
-	await $.println("map type:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.interfaceValue(m, "map[K]V", /* @__PURE__ */ $.mapType(__typeArgs?.["K"]?.type ?? { kind: $.TypeKind.Interface, methods: [] }, __typeArgs?.["V"]?.type ?? { kind: $.TypeKind.Interface, methods: [] })))).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println("map type:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.genericInterfaceValue(m, "map[K]V", /* @__PURE__ */ $.mapType(__typeArgs?.["K"]?.type ?? { kind: $.TypeKind.Interface, methods: [] }, __typeArgs?.["V"]?.type ?? { kind: $.TypeKind.Interface, methods: [] })))).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 }
 
 export async function describePointer(__typeArgs: $.GenericTypeArgs | undefined, p: any): globalThis.Promise<void> {

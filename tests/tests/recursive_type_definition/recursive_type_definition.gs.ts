@@ -34,12 +34,7 @@ $.registerInterfaceType(
 );
 
 export class B {
-	public _fields: {
-	}
-
 	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
-		this._fields = {
-		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -47,7 +42,8 @@ export class B {
 		return new B(this, true)
 	}
 
-	public __goscriptAssign(source: B): void {
+	public __goscriptAssign(source: B): this {
+		return this
 	}
 
 	public MethodB(valB: B | $.VarRef<B> | null): void {

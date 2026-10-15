@@ -6,12 +6,7 @@ import type * as io from "@goscript/io/index.js"
 import * as __goscript_server from "./server.gs.ts"
 
 export class localReadWriteCloser {
-	public _fields: {
-	}
-
 	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
-		this._fields = {
-		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -19,7 +14,8 @@ export class localReadWriteCloser {
 		return new localReadWriteCloser(this, true)
 	}
 
-	public __goscriptAssign(source: localReadWriteCloser): void {
+	public __goscriptAssign(source: localReadWriteCloser): this {
+		return this
 	}
 
 	public Close(): $.GoError {

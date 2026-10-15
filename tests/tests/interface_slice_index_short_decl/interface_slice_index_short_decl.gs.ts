@@ -47,32 +47,13 @@ $.registerInterfaceType(
 );
 
 export class Action {
-	public get Result(): number {
-		return this._fields.Result
-	}
+	public declare Result: number
 
-	public set Result(value: number) {
-		this._fields.Result = value
-	}
-
-	public get Filter(): globalThis.Map<number, dep.Ref | null> | null {
-		return this._fields.Filter
-	}
-
-	public set Filter(value: globalThis.Map<number, dep.Ref | null> | null) {
-		this._fields.Filter = value
-	}
-
-	public _fields: {
-		Result: number
-		Filter: globalThis.Map<number, dep.Ref | null> | null
-	}
+	public declare Filter: globalThis.Map<number, dep.Ref | null> | null
 
 	constructor(init?: Partial<{Result?: number, Filter?: globalThis.Map<number, dep.Ref | null> | null}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Result: init?.Result ?? (0 as number),
-			Filter: init?.Filter ?? (null! as globalThis.Map<number, dep.Ref | null> | null)
-		}
+		this.Result = init?.Result ?? (0 as number)
+		this.Filter = init?.Filter ?? (null! as globalThis.Map<number, dep.Ref | null> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -80,11 +61,10 @@ export class Action {
 		return new Action(this, true)
 	}
 
-	public __goscriptAssign(source: Action): void {
-		const target = this._fields
-		const values = source._fields
-		target.Result = values.Result
-		target.Filter = values.Filter
+	public __goscriptAssign(source: Action): this {
+		this.Result = source.Result
+		this.Filter = source.Filter
+		return this
 	}
 
 	public Mark(): boolean {

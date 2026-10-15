@@ -14,12 +14,7 @@ $.registerInterfaceType(
 );
 
 export class nistCurve {
-	public _fields: {
-	}
-
 	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
-		this._fields = {
-		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -27,7 +22,8 @@ export class nistCurve {
 		return new nistCurve(this, true)
 	}
 
-	public __goscriptAssign(source: nistCurve): void {
+	public __goscriptAssign(source: nistCurve): this {
+		return this
 	}
 
 	public async Add(__typeArgs: $.GenericTypeArgs | undefined, p1: any, p2: any): globalThis.Promise<any> {
@@ -51,22 +47,10 @@ export class nistCurve {
 }
 
 export class point {
-	public get N(): number {
-		return this._fields.N
-	}
-
-	public set N(value: number) {
-		this._fields.N = value
-	}
-
-	public _fields: {
-		N: number
-	}
+	public declare N: number
 
 	constructor(init?: Partial<{N?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			N: init?.N ?? (0 as number)
-		}
+		this.N = init?.N ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -74,10 +58,9 @@ export class point {
 		return new point(this, true)
 	}
 
-	public __goscriptAssign(source: point): void {
-		const target = this._fields
-		const values = source._fields
-		target.N = values.N
+	public __goscriptAssign(source: point): this {
+		this.N = source.N
+		return this
 	}
 
 	public Add(a: point | $.VarRef<point> | null, b: point | $.VarRef<point> | null): point | $.VarRef<point> | null {

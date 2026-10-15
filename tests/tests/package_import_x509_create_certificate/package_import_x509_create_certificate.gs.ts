@@ -17,32 +17,13 @@ import "@goscript/crypto/rand/index.js"
 import "@goscript/io/index.js"
 
 export class signedKey {
-	public get PubKey(): $.Slice<number> {
-		return this._fields.PubKey
-	}
+	public declare PubKey: $.Slice<number>
 
-	public set PubKey(value: $.Slice<number>) {
-		this._fields.PubKey = value
-	}
-
-	public get Signature(): $.Slice<number> {
-		return this._fields.Signature
-	}
-
-	public set Signature(value: $.Slice<number>) {
-		this._fields.Signature = value
-	}
-
-	public _fields: {
-		PubKey: $.Slice<number>
-		Signature: $.Slice<number>
-	}
+	public declare Signature: $.Slice<number>
 
 	constructor(init?: Partial<{PubKey?: $.Slice<number>, Signature?: $.Slice<number>}>, __goscriptValue?: boolean) {
-		this._fields = {
-			PubKey: init?.PubKey ?? (null! as $.Slice<number>),
-			Signature: init?.Signature ?? (null! as $.Slice<number>)
-		}
+		this.PubKey = init?.PubKey ?? (null! as $.Slice<number>)
+		this.Signature = init?.Signature ?? (null! as $.Slice<number>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -50,11 +31,10 @@ export class signedKey {
 		return new signedKey(this, true)
 	}
 
-	public __goscriptAssign(source: signedKey): void {
-		const target = this._fields
-		const values = source._fields
-		target.PubKey = values.PubKey
-		target.Signature = values.Signature
+	public __goscriptAssign(source: signedKey): this {
+		this.PubKey = source.PubKey
+		this.Signature = source.Signature
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -107,7 +87,7 @@ export async function main(): globalThis.Promise<void> {
 	for (let __goscriptRangeTarget1 = (cert$ as x509.Certificate).Extensions, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget1), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
 		let ext = ((__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as pkix.Extension)).clone()
 		if (asn1.ObjectIdentifier_Equal(ext.Id, (extensionID as asn1.ObjectIdentifier))) {
-			keyExt = $.assignStruct(keyExt, ext)
+			keyExt = keyExt.__goscriptAssign(ext)
 			for (let __goscriptRangeTarget0 = (cert$ as x509.Certificate).UnhandledCriticalExtensions, __goscriptRangeWindow1 = $.sliceRange(__goscriptRangeTarget0), idx = 0; idx < __goscriptRangeWindow1.length; idx++) {
 				let unhandled = ((__goscriptRangeWindow1.backing[__goscriptRangeWindow1.offset + idx] as asn1.ObjectIdentifier) as asn1.ObjectIdentifier)
 				if (asn1.ObjectIdentifier_Equal(unhandled, (extensionID as asn1.ObjectIdentifier))) {

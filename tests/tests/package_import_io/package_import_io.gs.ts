@@ -7,22 +7,10 @@ import * as io from "@goscript/io/index.js"
 import * as sync from "@goscript/sync/index.js"
 
 export class writerHolder {
-	public get w(): io.Writer | null {
-		return this._fields.w
-	}
-
-	public set w(value: io.Writer | null) {
-		this._fields.w = value
-	}
-
-	public _fields: {
-		w: io.Writer | null
-	}
+	public declare w: io.Writer | null
 
 	constructor(init?: Partial<{w?: io.Writer | null}>, __goscriptValue?: boolean) {
-		this._fields = {
-			w: init?.w ?? (null! as io.Writer | null)
-		}
+		this.w = init?.w ?? (null! as io.Writer | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -30,10 +18,9 @@ export class writerHolder {
 		return new writerHolder(this, true)
 	}
 
-	public __goscriptAssign(source: writerHolder): void {
-		const target = this._fields
-		const values = source._fields
-		target.w = $.assignFieldValue(target.w, values.w, "io.Writer")
+	public __goscriptAssign(source: writerHolder): this {
+		this.w = $.assignFieldValue(this.w, source.w, "io.Writer")
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -46,12 +33,7 @@ export class writerHolder {
 }
 
 export class asyncBuffer {
-	public _fields: {
-	}
-
 	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
-		this._fields = {
-		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -59,7 +41,8 @@ export class asyncBuffer {
 		return new asyncBuffer(this, true)
 	}
 
-	public __goscriptAssign(source: asyncBuffer): void {
+	public __goscriptAssign(source: asyncBuffer): this {
+		return this
 	}
 
 	public async Reset(w: io.Writer | null): globalThis.Promise<void> {
@@ -87,22 +70,10 @@ export class asyncBuffer {
 }
 
 export class staticReader {
-	public get done(): boolean {
-		return this._fields.done
-	}
-
-	public set done(value: boolean) {
-		this._fields.done = value
-	}
-
-	public _fields: {
-		done: boolean
-	}
+	public declare done: boolean
 
 	constructor(init?: Partial<{done?: boolean}>, __goscriptValue?: boolean) {
-		this._fields = {
-			done: init?.done ?? (false as boolean)
-		}
+		this.done = init?.done ?? (false as boolean)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -110,10 +81,9 @@ export class staticReader {
 		return new staticReader(this, true)
 	}
 
-	public __goscriptAssign(source: staticReader): void {
-		const target = this._fields
-		const values = source._fields
-		target.done = values.done
+	public __goscriptAssign(source: staticReader): this {
+		this.done = source.done
+		return this
 	}
 
 	public Read(p: $.Slice<number>): [number, $.GoError] {
@@ -137,22 +107,10 @@ export class staticReader {
 }
 
 export class asyncReader {
-	public get done(): boolean {
-		return this._fields.done
-	}
-
-	public set done(value: boolean) {
-		this._fields.done = value
-	}
-
-	public _fields: {
-		done: boolean
-	}
+	public declare done: boolean
 
 	constructor(init?: Partial<{done?: boolean}>, __goscriptValue?: boolean) {
-		this._fields = {
-			done: init?.done ?? (false as boolean)
-		}
+		this.done = init?.done ?? (false as boolean)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -160,10 +118,9 @@ export class asyncReader {
 		return new asyncReader(this, true)
 	}
 
-	public __goscriptAssign(source: asyncReader): void {
-		const target = this._fields
-		const values = source._fields
-		target.done = values.done
+	public __goscriptAssign(source: asyncReader): this {
+		this.done = source.done
+		return this
 	}
 
 	public async Read(p: $.Slice<number>): globalThis.Promise<[number, $.GoError]> {
@@ -188,22 +145,10 @@ export class asyncReader {
 }
 
 export class asyncReaderAt {
-	public get data(): $.Slice<number> {
-		return this._fields.data
-	}
-
-	public set data(value: $.Slice<number>) {
-		this._fields.data = value
-	}
-
-	public _fields: {
-		data: $.Slice<number>
-	}
+	public declare data: $.Slice<number>
 
 	constructor(init?: Partial<{data?: $.Slice<number>}>, __goscriptValue?: boolean) {
-		this._fields = {
-			data: init?.data ?? (null! as $.Slice<number>)
-		}
+		this.data = init?.data ?? (null! as $.Slice<number>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -211,10 +156,9 @@ export class asyncReaderAt {
 		return new asyncReaderAt(this, true)
 	}
 
-	public __goscriptAssign(source: asyncReaderAt): void {
-		const target = this._fields
-		const values = source._fields
-		target.data = values.data
+	public __goscriptAssign(source: asyncReaderAt): this {
+		this.data = source.data
+		return this
 	}
 
 	public async ReadAt(p: $.Slice<number>, off: bigint): globalThis.Promise<[number, $.GoError]> {
@@ -241,52 +185,19 @@ export class asyncReaderAt {
 }
 
 export class pipeReadResult {
-	public get n(): number {
-		return this._fields.n
-	}
+	public declare n: number
 
-	public set n(value: number) {
-		this._fields.n = value
-	}
+	public declare data: string
 
-	public get data(): string {
-		return this._fields.data
-	}
+	public declare errNil: boolean
 
-	public set data(value: string) {
-		this._fields.data = value
-	}
-
-	public get errNil(): boolean {
-		return this._fields.errNil
-	}
-
-	public set errNil(value: boolean) {
-		this._fields.errNil = value
-	}
-
-	public get errEOF(): boolean {
-		return this._fields.errEOF
-	}
-
-	public set errEOF(value: boolean) {
-		this._fields.errEOF = value
-	}
-
-	public _fields: {
-		n: number
-		data: string
-		errNil: boolean
-		errEOF: boolean
-	}
+	public declare errEOF: boolean
 
 	constructor(init?: Partial<{n?: number, data?: string, errNil?: boolean, errEOF?: boolean}>, __goscriptValue?: boolean) {
-		this._fields = {
-			n: init?.n ?? (0 as number),
-			data: init?.data ?? ("" as string),
-			errNil: init?.errNil ?? (false as boolean),
-			errEOF: init?.errEOF ?? (false as boolean)
-		}
+		this.n = init?.n ?? (0 as number)
+		this.data = init?.data ?? ("" as string)
+		this.errNil = init?.errNil ?? (false as boolean)
+		this.errEOF = init?.errEOF ?? (false as boolean)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -294,13 +205,12 @@ export class pipeReadResult {
 		return new pipeReadResult(this, true)
 	}
 
-	public __goscriptAssign(source: pipeReadResult): void {
-		const target = this._fields
-		const values = source._fields
-		target.n = values.n
-		target.data = values.data
-		target.errNil = values.errNil
-		target.errEOF = values.errEOF
+	public __goscriptAssign(source: pipeReadResult): this {
+		this.n = source.n
+		this.data = source.data
+		this.errNil = source.errNil
+		this.errEOF = source.errEOF
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

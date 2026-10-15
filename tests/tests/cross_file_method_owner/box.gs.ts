@@ -20,22 +20,10 @@ $.registerNamedValueType(
 );
 
 export class pile {
-	public get step(): number {
-		return this._fields.step
-	}
-
-	public set step(value: number) {
-		this._fields.step = value
-	}
-
-	public _fields: {
-		step: number
-	}
+	public declare step: number
 
 	constructor(init?: Partial<{step?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			step: init?.step ?? (0 as number)
-		}
+		this.step = init?.step ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -43,10 +31,9 @@ export class pile {
 		return new pile(this, true)
 	}
 
-	public __goscriptAssign(source: pile): void {
-		const target = this._fields
-		const values = source._fields
-		target.step = values.step
+	public __goscriptAssign(source: pile): this {
+		this.step = source.step
+		return this
 	}
 
 	public async drain(items: $.Slice<number>): globalThis.Promise<number> {

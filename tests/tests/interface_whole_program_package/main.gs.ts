@@ -2,17 +2,10 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as visit from "@goscript/github.com/s4wave/goscript/tests/tests/interface_whole_program_package/visit/index.js"
-import "@goscript/github.com/s4wave/goscript/tests/tests/interface_whole_program_package/visit/index.js"
 
 export class doubler {
-	public _fields: {
-	}
-
 	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
-		this._fields = {
-		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -20,7 +13,8 @@ export class doubler {
 		return new doubler(this, true)
 	}
 
-	public __goscriptAssign(source: doubler): void {
+	public __goscriptAssign(source: doubler): this {
+		return this
 	}
 
 	public Visit(n: number): number {
@@ -37,22 +31,10 @@ export class doubler {
 }
 
 export class chanFetcher {
-	public get ch(): $.Channel<number> | null {
-		return this._fields.ch
-	}
-
-	public set ch(value: $.Channel<number> | null) {
-		this._fields.ch = value
-	}
-
-	public _fields: {
-		ch: $.Channel<number> | null
-	}
+	public declare ch: $.Channel<number> | null
 
 	constructor(init?: Partial<{ch?: $.Channel<number> | null}>, __goscriptValue?: boolean) {
-		this._fields = {
-			ch: init?.ch ?? (null! as $.Channel<number> | null)
-		}
+		this.ch = init?.ch ?? (null! as $.Channel<number> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -60,10 +42,9 @@ export class chanFetcher {
 		return new chanFetcher(this, true)
 	}
 
-	public __goscriptAssign(source: chanFetcher): void {
-		const target = this._fields
-		const values = source._fields
-		target.ch = values.ch
+	public __goscriptAssign(source: chanFetcher): this {
+		this.ch = source.ch
+		return this
 	}
 
 	public async Fetch(): globalThis.Promise<number> {

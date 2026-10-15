@@ -5,22 +5,10 @@ import * as $ from "@goscript/builtin/index.js"
 import * as atomic from "@goscript/sync/atomic/index.js"
 
 export class pointerNode {
-	public get value(): string {
-		return this._fields.value
-	}
-
-	public set value(value: string) {
-		this._fields.value = value
-	}
-
-	public _fields: {
-		value: string
-	}
+	public declare value: string
 
 	constructor(init?: Partial<{value?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			value: init?.value ?? ("" as string)
-		}
+		this.value = init?.value ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -28,10 +16,9 @@ export class pointerNode {
 		return new pointerNode(this, true)
 	}
 
-	public __goscriptAssign(source: pointerNode): void {
-		const target = this._fields
-		const values = source._fields
-		target.value = values.value
+	public __goscriptAssign(source: pointerNode): this {
+		this.value = source.value
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

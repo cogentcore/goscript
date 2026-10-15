@@ -6,22 +6,10 @@ import * as fs from "@goscript/io/fs/index.js"
 import * as fstest from "@goscript/testing/fstest/index.js"
 
 export class openOnlyFS {
-	public get fsys(): fstest.MapFS {
-		return this._fields.fsys
-	}
-
-	public set fsys(value: fstest.MapFS) {
-		this._fields.fsys = value
-	}
-
-	public _fields: {
-		fsys: fstest.MapFS
-	}
+	public declare fsys: fstest.MapFS
 
 	constructor(init?: Partial<{fsys?: fstest.MapFS}>, __goscriptValue?: boolean) {
-		this._fields = {
-			fsys: init?.fsys ?? (null! as fstest.MapFS)
-		}
+		this.fsys = init?.fsys ?? (null! as fstest.MapFS)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -29,10 +17,9 @@ export class openOnlyFS {
 		return new openOnlyFS(this, true)
 	}
 
-	public __goscriptAssign(source: openOnlyFS): void {
-		const target = this._fields
-		const values = source._fields
-		target.fsys = values.fsys
+	public __goscriptAssign(source: openOnlyFS): this {
+		this.fsys = source.fsys
+		return this
 	}
 
 	public Open(name: string): [fs.File | null, $.GoError] {

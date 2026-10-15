@@ -5,32 +5,13 @@ import * as $ from "@goscript/builtin/index.js"
 import * as fmt from "@goscript/fmt/index.js"
 
 export class Value {
-	public get Val(): number {
-		return this._fields.Val
-	}
+	public declare Val: number
 
-	public set Val(value: number) {
-		this._fields.Val = value
-	}
-
-	public get Unit(): string {
-		return this._fields.Unit
-	}
-
-	public set Unit(value: string) {
-		this._fields.Unit = value
-	}
-
-	public _fields: {
-		Val: number
-		Unit: string
-	}
+	public declare Unit: string
 
 	constructor(init?: Partial<{Val?: number, Unit?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Val: init?.Val ?? (0 as number),
-			Unit: init?.Unit ?? ("" as string)
-		}
+		this.Val = init?.Val ?? (0 as number)
+		this.Unit = init?.Unit ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -38,11 +19,10 @@ export class Value {
 		return new Value(this, true)
 	}
 
-	public __goscriptAssign(source: Value): void {
-		const target = this._fields
-		const values = source._fields
-		target.Val = values.Val
-		target.Unit = values.Unit
+	public __goscriptAssign(source: Value): this {
+		this.Val = source.Val
+		this.Unit = source.Unit
+		return this
 	}
 
 	public async String(): globalThis.Promise<string> {
@@ -60,32 +40,13 @@ export class Value {
 }
 
 export class Sides {
-	public get Top(): any {
-		return this._fields.Top
-	}
+	public declare Top: any
 
-	public set Top(value: any) {
-		this._fields.Top = value
-	}
+	public declare Right: any
 
-	public get Right(): any {
-		return this._fields.Right
-	}
-
-	public set Right(value: any) {
-		this._fields.Right = value
-	}
-
-	public _fields: {
-		Top: any
-		Right: any
-	}
-
-	constructor(init?: Partial<{Top?: any, Right?: any}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Top: init?.Top !== undefined ? $.copyElement(init.Top) : (null! as any),
-			Right: init?.Right !== undefined ? $.copyElement(init.Right) : (null! as any)
-		}
+	constructor(init?: Partial<{Top?: any, Right?: any}>, __goscriptValue?: boolean, __goscriptFresh?: boolean) {
+		this.Top = init?.Top !== undefined ? (__goscriptFresh === true ? init.Top : $.copyElement(init.Top)) : (null! as any)
+		this.Right = init?.Right !== undefined ? (__goscriptFresh === true ? init.Right : $.copyElement(init.Right)) : (null! as any)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -93,11 +54,10 @@ export class Sides {
 		return new Sides(this, true)
 	}
 
-	public __goscriptAssign(source: Sides): void {
-		const target = this._fields
-		const values = source._fields
-		target.Top = $.assignFieldValue(target.Top, values.Top, { kind: $.TypeKind.Interface, methods: [] })
-		target.Right = $.assignFieldValue(target.Right, values.Right, { kind: $.TypeKind.Interface, methods: [] })
+	public __goscriptAssign(source: Sides): this {
+		this.Top = $.assignFieldValue(this.Top, source.Top, { kind: $.TypeKind.Interface, methods: [] })
+		this.Right = $.assignFieldValue(this.Right, source.Right, { kind: $.TypeKind.Interface, methods: [] })
+		return this
 	}
 
 	public async SetAny(__typeArgs: $.GenericTypeArgs | undefined, a: any): globalThis.Promise<string> {
@@ -109,14 +69,14 @@ export class Sides {
 				case $.typeAssert<Sides>(__goscriptTypeSwitchValue, "main.Sides").ok:
 					{
 						let val: Sides = $.markAsStructValue($.cloneStructValue($.typeAssert<Sides>(__goscriptTypeSwitchValue, "main.Sides").value))
-						$.assignStruct((s$ as Sides), $.markAsStructValue($.cloneStructValue(val)))
+						$.assignStruct((s$ as Sides), (val).clone())
 						return "Sides[T]"
 					}
 					break
 				case $.typeAssert<Sides | $.VarRef<Sides> | null>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.pointerType("main.Sides")).ok:
 					{
 						let val: Sides | $.VarRef<Sides> | null = $.typeAssert<Sides | $.VarRef<Sides> | null>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.pointerType("main.Sides")).value
-						$.assignStruct((s$ as Sides), $.markAsStructValue($.cloneStructValue($.pointerValue<Sides>(val))))
+						$.assignStruct((s$ as Sides), ($.pointerValue<Sides>(val)).clone())
 						return "*Sides[T]"
 					}
 					break
@@ -177,7 +137,7 @@ export class Sides {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let s: $.VarRef<Sides> = $.varRef($.markAsStructValue(new Sides({Top: new Value(undefined, true), Right: new Value(undefined, true)})))
+	let s: $.VarRef<Sides> = $.varRef($.markAsStructValue(new Sides({Top: new Value(undefined, true), Right: new Value(undefined, true)}, undefined, true)))
 	await $.println(await s.value.SetAny(__goscriptStatic0(), "3px"))
 	await $.println(await s.value.SetAny(__goscriptStatic0(), $.interfaceValue(new Value({Val: 1, Unit: "px"}, true), "main.Value", "main.Value")), await $.markAsStructValue($.cloneStructValue(s.value.Top)).String())
 	await $.println(await s.value.SetAny(__goscriptStatic0(), $.interfaceValue(new Value({Val: 2, Unit: "em"}), "*main.Value", /* @__PURE__ */ $.pointerType("main.Value"))), await $.markAsStructValue($.cloneStructValue(s.value.Right)).String())
@@ -186,12 +146,12 @@ export async function main(): globalThis.Promise<void> {
 	await $.println(await s.value.SetAny(__goscriptStatic0(), $.namedValueInterfaceValue<any>(new Sides({Right: new Value({Val: 6, Unit: "d"}, true), Top: new Value(undefined, true)}), "*main.Sides", __goscriptStatic1(), __goscriptStatic2(), __goscriptStatic3())), await $.markAsStructValue($.cloneStructValue(s.value.Right)).String())
 	await $.println(await s.value.SetAny(__goscriptStatic0(), $.basicInterfaceValue(7, "int")))
 
-	let f: $.VarRef<Sides> = $.varRef($.markAsStructValue(new Sides({Top: 0, Right: 0})))
+	let f: $.VarRef<Sides> = $.varRef($.markAsStructValue(new Sides({Top: 0, Right: 0}, undefined, true)))
 	await $.println(await f.value.SetAny(__goscriptStatic4(), $.basicInterfaceValue(1.5, "float32")), f.value.Top)
 	await $.println(await f.value.SetAny(__goscriptStatic4(), $.basicInterfaceValue(1.5, "float64")))
 	await $.println(await f.value.SetAny(__goscriptStatic4(), "x"))
 
-	let i: $.VarRef<Sides> = $.varRef($.markAsStructValue(new Sides({Top: 0, Right: 0})))
+	let i: $.VarRef<Sides> = $.varRef($.markAsStructValue(new Sides({Top: 0, Right: 0}, undefined, true)))
 	await $.println(await i.value.SetAny(__goscriptStatic5(), $.basicInterfaceValue(3, "int")), i.value.Top)
 	await $.println(await i.value.SetAny(__goscriptStatic5(), $.basicInterfaceValue(3n, "int64")))
 	await $.println(await i.value.SetAny(__goscriptStatic5(), $.basicInterfaceValue(3.5, "float64")))

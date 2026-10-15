@@ -24,10 +24,10 @@ export async function main(): globalThis.Promise<void> {
 		await $.println("byte", b, b, b, b, $.int(b, 8))
 	}
 
-	let i8: number = -128
-	let u16: number = 65535
-	let u32: number = 4294967295
-	let i16: number = -32768
+	let i8 = -128
+	let u16 = 65535
+	let u32 = 4294967295
+	let i16 = -32768
 	await $.println("i8", i8, i8, i8, $.int64(i8), $.uint(i8, 8), $.uint(i8, 64))
 	await $.println("u16", u16, u16, u16, $.int(u16, 16), $.uint(u16, 8))
 	await $.println("u32", u32, $.uint64(u32), $.int64(u32), $.int(u32, 32), $.uint(u32, 16))

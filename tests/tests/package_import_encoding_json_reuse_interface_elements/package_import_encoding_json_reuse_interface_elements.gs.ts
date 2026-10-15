@@ -16,22 +16,10 @@ $.registerInterfaceType(
 );
 
 export class Node {
-	public get Name(): string {
-		return this._fields.Name
-	}
-
-	public set Name(value: string) {
-		this._fields.Name = value
-	}
-
-	public _fields: {
-		Name: string
-	}
+	public declare Name: string
 
 	constructor(init?: Partial<{Name?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Name: init?.Name ?? ("" as string)
-		}
+		this.Name = init?.Name ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -39,10 +27,9 @@ export class Node {
 		return new Node(this, true)
 	}
 
-	public __goscriptAssign(source: Node): void {
-		const target = this._fields
-		const values = source._fields
-		target.Name = values.Name
+	public __goscriptAssign(source: Node): this {
+		this.Name = source.Name
+		return this
 	}
 
 	public GetName(): string {
@@ -60,22 +47,10 @@ export class Node {
 }
 
 export class Custom {
-	public get Text(): string {
-		return this._fields.Text
-	}
-
-	public set Text(value: string) {
-		this._fields.Text = value
-	}
-
-	public _fields: {
-		Text: string
-	}
+	public declare Text: string
 
 	constructor(init?: Partial<{Text?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Text: init?.Text ?? ("" as string)
-		}
+		this.Text = init?.Text ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -83,10 +58,9 @@ export class Custom {
 		return new Custom(this, true)
 	}
 
-	public __goscriptAssign(source: Custom): void {
-		const target = this._fields
-		const values = source._fields
-		target.Text = values.Text
+	public __goscriptAssign(source: Custom): this {
+		this.Text = source.Text
+		return this
 	}
 
 	public GetName(): string {
@@ -110,22 +84,10 @@ export class Custom {
 }
 
 export class Holder {
-	public get Items(): $.Slice<Named | null> {
-		return this._fields.Items
-	}
-
-	public set Items(value: $.Slice<Named | null>) {
-		this._fields.Items = value
-	}
-
-	public _fields: {
-		Items: $.Slice<Named | null>
-	}
+	public declare Items: $.Slice<Named | null>
 
 	constructor(init?: Partial<{Items?: $.Slice<Named | null>}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Items: init?.Items ?? (null! as $.Slice<Named | null>)
-		}
+		this.Items = init?.Items ?? (null! as $.Slice<Named | null>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -133,10 +95,9 @@ export class Holder {
 		return new Holder(this, true)
 	}
 
-	public __goscriptAssign(source: Holder): void {
-		const target = this._fields
-		const values = source._fields
-		target.Items = values.Items
+	public __goscriptAssign(source: Holder): this {
+		this.Items = source.Items
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

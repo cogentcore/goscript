@@ -4,32 +4,13 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class floatInfo {
-	public get mantbits(): number {
-		return this._fields.mantbits
-	}
+	public declare mantbits: number
 
-	public set mantbits(value: number) {
-		this._fields.mantbits = value
-	}
-
-	public get expbits(): number {
-		return this._fields.expbits
-	}
-
-	public set expbits(value: number) {
-		this._fields.expbits = value
-	}
-
-	public _fields: {
-		mantbits: number
-		expbits: number
-	}
+	public declare expbits: number
 
 	constructor(init?: Partial<{mantbits?: number, expbits?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			mantbits: init?.mantbits ?? (0 as number),
-			expbits: init?.expbits ?? (0 as number)
-		}
+		this.mantbits = init?.mantbits ?? (0 as number)
+		this.expbits = init?.expbits ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -37,11 +18,10 @@ export class floatInfo {
 		return new floatInfo(this, true)
 	}
 
-	public __goscriptAssign(source: floatInfo): void {
-		const target = this._fields
-		const values = source._fields
-		target.mantbits = values.mantbits
-		target.expbits = values.expbits
+	public __goscriptAssign(source: floatInfo): this {
+		this.mantbits = source.mantbits
+		this.expbits = source.expbits
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

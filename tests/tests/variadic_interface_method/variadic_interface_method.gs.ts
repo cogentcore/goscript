@@ -15,12 +15,7 @@ $.registerInterfaceType(
 );
 
 export class PathJoiner {
-	public _fields: {
-	}
-
 	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
-		this._fields = {
-		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -28,7 +23,8 @@ export class PathJoiner {
 		return new PathJoiner(this, true)
 	}
 
-	public __goscriptAssign(source: PathJoiner): void {
+	public __goscriptAssign(source: PathJoiner): this {
+		return this
 	}
 
 	public Join(elem: $.Slice<string>): string {

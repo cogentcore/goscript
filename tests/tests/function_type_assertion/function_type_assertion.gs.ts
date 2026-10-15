@@ -10,22 +10,10 @@ export type Adder = ((a: number, b: number) => number | globalThis.Promise<numbe
 export type AddFunc = ((a: number, b: number) => number | globalThis.Promise<number>) | null
 
 export class FuncContainer {
-	public get myFunc(): any {
-		return this._fields.myFunc
-	}
-
-	public set myFunc(value: any) {
-		this._fields.myFunc = value
-	}
-
-	public _fields: {
-		myFunc: any
-	}
+	public declare myFunc: any
 
 	constructor(init?: Partial<{myFunc?: any}>, __goscriptValue?: boolean) {
-		this._fields = {
-			myFunc: init?.myFunc ?? (null! as any)
-		}
+		this.myFunc = init?.myFunc ?? (null! as any)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -33,10 +21,9 @@ export class FuncContainer {
 		return new FuncContainer(this, true)
 	}
 
-	public __goscriptAssign(source: FuncContainer): void {
-		const target = this._fields
-		const values = source._fields
-		target.myFunc = $.assignFieldValue(target.myFunc, values.myFunc, { kind: $.TypeKind.Interface, methods: [] })
+	public __goscriptAssign(source: FuncContainer): this {
+		this.myFunc = $.assignFieldValue(this.myFunc, source.myFunc, { kind: $.TypeKind.Interface, methods: [] })
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

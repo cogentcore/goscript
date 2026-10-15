@@ -7,32 +7,13 @@ import * as unsafe from "@goscript/unsafe/index.js"
 import "@goscript/unsafe/index.js"
 
 export class Sub {
-	public get X(): number {
-		return this._fields.X
-	}
+	public declare X: number
 
-	public set X(value: number) {
-		this._fields.X = value
-	}
-
-	public get Y(): string {
-		return this._fields.Y
-	}
-
-	public set Y(value: string) {
-		this._fields.Y = value
-	}
-
-	public _fields: {
-		X: number
-		Y: string
-	}
+	public declare Y: string
 
 	constructor(init?: Partial<{X?: number, Y?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			X: init?.X ?? (0 as number),
-			Y: init?.Y ?? ("" as string)
-		}
+		this.X = init?.X ?? (0 as number)
+		this.Y = init?.Y ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -40,11 +21,10 @@ export class Sub {
 		return new Sub(this, true)
 	}
 
-	public __goscriptAssign(source: Sub): void {
-		const target = this._fields
-		const values = source._fields
-		target.X = values.X
-		target.Y = values.Y
+	public __goscriptAssign(source: Sub): this {
+		this.X = source.X
+		this.Y = source.Y
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -57,42 +37,16 @@ export class Sub {
 }
 
 export class T {
-	public get Mbr1(): string {
-		return this._fields.Mbr1
-	}
+	public declare Mbr1: string
 
-	public set Mbr1(value: string) {
-		this._fields.Mbr1 = value
-	}
+	public declare Mbr2: number
 
-	public get Mbr2(): number {
-		return this._fields.Mbr2
-	}
-
-	public set Mbr2(value: number) {
-		this._fields.Mbr2 = value
-	}
-
-	public get S(): Sub {
-		return this._fields.S
-	}
-
-	public set S(value: Sub) {
-		this._fields.S = value
-	}
-
-	public _fields: {
-		Mbr1: string
-		Mbr2: number
-		S: Sub
-	}
+	public declare S: Sub
 
 	constructor(init?: Partial<{Mbr1?: string, Mbr2?: number, S?: Sub}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Mbr1: init?.Mbr1 ?? ("" as string),
-			Mbr2: init?.Mbr2 ?? (0 as number),
-			S: init?.S ? init.S.clone() : new Sub(undefined, true)
-		}
+		this.Mbr1 = init?.Mbr1 ?? ("" as string)
+		this.Mbr2 = init?.Mbr2 ?? (0 as number)
+		this.S = init?.S ? init.S.clone() : new Sub(undefined, true)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -100,12 +54,11 @@ export class T {
 		return new T(this, true)
 	}
 
-	public __goscriptAssign(source: T): void {
-		const target = this._fields
-		const values = source._fields
-		target.Mbr1 = values.Mbr1
-		target.Mbr2 = values.Mbr2
-		$.assignStruct(target.S, values.S)
+	public __goscriptAssign(source: T): this {
+		this.Mbr1 = source.Mbr1
+		this.Mbr2 = source.Mbr2
+		this.S.__goscriptAssign(source.S)
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -161,22 +114,10 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("newat-local:", local.value)
 
 	class holder {
-		public get Count(): number {
-			return this._fields.Count
-		}
-
-		public set Count(value: number) {
-			this._fields.Count = value
-		}
-
-		public _fields: {
-			Count: number
-		}
+		public declare Count: number
 
 		constructor(init?: Partial<{Count?: number}>, __goscriptValue?: boolean) {
-			this._fields = {
-				Count: init?.Count ?? (0 as number)
-			}
+			this.Count = init?.Count ?? (0 as number)
 			;(this as any)[$.structValueMarker] = __goscriptValue === true
 		}
 
@@ -184,10 +125,9 @@ export async function main(): globalThis.Promise<void> {
 			return new holder(this, true)
 		}
 
-		public __goscriptAssign(source: holder): void {
-			const target = this._fields
-			const values = source._fields
-			target.Count = values.Count
+		public __goscriptAssign(source: holder): this {
+			this.Count = source.Count
+			return this
 		}
 
 		static __typeInfo = $.registerStructType(
@@ -199,7 +139,7 @@ export async function main(): globalThis.Promise<void> {
 		)
 	}
 	let h = $.markAsStructValue(new holder({Count: 5}))
-	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.NewAt($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic0()))!, ($.fieldRef(h._fields, "Count") as any)))).Elem())).SetInt(6n)
+	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.NewAt($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic0()))!, ($.fieldRef(h, "Count") as any)))).Elem())).SetInt(6n)
 	await $.println("newat-field:", h.Count)
 
 	let buf = new Uint8Array([1, 2, 3, 4]) as $.Slice<number>

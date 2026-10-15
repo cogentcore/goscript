@@ -4,32 +4,13 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class Point {
-	public get X(): number {
-		return this._fields.X
-	}
+	public declare X: number
 
-	public set X(value: number) {
-		this._fields.X = value
-	}
-
-	public get Y(): number {
-		return this._fields.Y
-	}
-
-	public set Y(value: number) {
-		this._fields.Y = value
-	}
-
-	public _fields: {
-		X: number
-		Y: number
-	}
+	public declare Y: number
 
 	constructor(init?: Partial<{X?: number, Y?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			X: init?.X ?? (0 as number),
-			Y: init?.Y ?? (0 as number)
-		}
+		this.X = init?.X ?? (0 as number)
+		this.Y = init?.Y ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -37,11 +18,10 @@ export class Point {
 		return new Point(this, true)
 	}
 
-	public __goscriptAssign(source: Point): void {
-		const target = this._fields
-		const values = source._fields
-		target.X = values.X
-		target.Y = values.Y
+	public __goscriptAssign(source: Point): this {
+		this.X = source.X
+		this.Y = source.Y
+		return this
 	}
 
 	public Sum(): number {
@@ -59,42 +39,16 @@ export class Point {
 }
 
 export class Box {
-	public get Min(): Point {
-		return this._fields.Min
-	}
+	public declare Min: Point
 
-	public set Min(value: Point) {
-		this._fields.Min = value
-	}
+	public declare Max: Point
 
-	public get Max(): Point {
-		return this._fields.Max
-	}
-
-	public set Max(value: Point) {
-		this._fields.Max = value
-	}
-
-	public get Name(): string {
-		return this._fields.Name
-	}
-
-	public set Name(value: string) {
-		this._fields.Name = value
-	}
-
-	public _fields: {
-		Min: Point
-		Max: Point
-		Name: string
-	}
+	public declare Name: string
 
 	constructor(init?: Partial<{Min?: Point, Max?: Point, Name?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Min: init?.Min ? init.Min.clone() : new Point(undefined, true),
-			Max: init?.Max ? init.Max.clone() : new Point(undefined, true),
-			Name: init?.Name ?? ("" as string)
-		}
+		this.Min = init?.Min ? init.Min.clone() : new Point(undefined, true)
+		this.Max = init?.Max ? init.Max.clone() : new Point(undefined, true)
+		this.Name = init?.Name ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -102,12 +56,11 @@ export class Box {
 		return new Box(this, true)
 	}
 
-	public __goscriptAssign(source: Box): void {
-		const target = this._fields
-		const values = source._fields
-		$.assignStruct(target.Min, values.Min)
-		$.assignStruct(target.Max, values.Max)
-		target.Name = values.Name
+	public __goscriptAssign(source: Box): this {
+		this.Min.__goscriptAssign(source.Min)
+		this.Max.__goscriptAssign(source.Max)
+		this.Name = source.Name
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -120,32 +73,13 @@ export class Box {
 }
 
 export class Pair {
-	public get A(): Point {
-		return this._fields.A
-	}
+	public declare A: Point
 
-	public set A(value: Point) {
-		this._fields.A = value
-	}
-
-	public get B(): {"X": number, "Y": number} {
-		return this._fields.B
-	}
-
-	public set B(value: {"X": number, "Y": number}) {
-		this._fields.B = value
-	}
-
-	public _fields: {
-		A: Point
-		B: {"X": number, "Y": number}
-	}
+	public declare B: {"X": number, "Y": number}
 
 	constructor(init?: Partial<{A?: Point, B?: {"X": number, "Y": number}}>, __goscriptValue?: boolean) {
-		this._fields = {
-			A: init?.A ? init.A.clone() : new Point(undefined, true),
-			B: init?.B ? $.markAsStructValue($.cloneStructValue(init.B)) : $.anonymousStructValue({"X": 0, "Y": 0}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("X", /* @__PURE__ */ $.basicType("int"), [0], 0, true), /* @__PURE__ */ $.structField("Y", /* @__PURE__ */ $.basicType("int"), [1], 8, true)] })
-		}
+		this.A = init?.A ? init.A.clone() : new Point(undefined, true)
+		this.B = init?.B ? $.markAsStructValue($.cloneStructValue(init.B)) : $.anonymousStructValue({"X": 0, "Y": 0}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("X", /* @__PURE__ */ $.basicType("int"), [0], 0, true), /* @__PURE__ */ $.structField("Y", /* @__PURE__ */ $.basicType("int"), [1], 8, true)] })
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -153,11 +87,10 @@ export class Pair {
 		return new Pair(this, true)
 	}
 
-	public __goscriptAssign(source: Pair): void {
-		const target = this._fields
-		const values = source._fields
-		$.assignStruct(target.A, values.A)
-		$.assignStruct(target.B, values.B)
+	public __goscriptAssign(source: Pair): this {
+		this.A.__goscriptAssign(source.A)
+		$.assignStruct(this.B, source.B)
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -214,7 +147,7 @@ export async function main(): globalThis.Promise<void> {
 	// elements and results get the methods of the named type
 	let q: Point = new Point(pr.B, true)
 	await $.println("var method:", q.Sum())
-	q = $.assignStruct(q, new Point($.anonymousStructValue({X: 2, Y: 3}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("X", /* @__PURE__ */ $.basicType("int"), [0], 0, true), /* @__PURE__ */ $.structField("Y", /* @__PURE__ */ $.basicType("int"), [1], 8, true)] }), true))
+	q = q.__goscriptAssign(new Point($.anonymousStructValue({X: 2, Y: 3}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("X", /* @__PURE__ */ $.basicType("int"), [0], 0, true), /* @__PURE__ */ $.structField("Y", /* @__PURE__ */ $.basicType("int"), [1], 8, true)] }), true))
 	await $.println("assign method:", q.Sum())
 	await $.println("return method:", unnamedPoint().Sum())
 	let pr2 = new Pair({A: new Point($.anonymousStructValue({X: 5, Y: 6}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("X", /* @__PURE__ */ $.basicType("int"), [0], 0, true), /* @__PURE__ */ $.structField("Y", /* @__PURE__ */ $.basicType("int"), [1], 8, true)] }), true)}, true)

@@ -5,32 +5,13 @@ import * as $ from "@goscript/builtin/index.js"
 import * as slices from "@goscript/slices/index.js"
 
 export class Person {
-	public get Name(): string {
-		return this._fields.Name
-	}
+	public declare Name: string
 
-	public set Name(value: string) {
-		this._fields.Name = value
-	}
-
-	public get Age(): number {
-		return this._fields.Age
-	}
-
-	public set Age(value: number) {
-		this._fields.Age = value
-	}
-
-	public _fields: {
-		Name: string
-		Age: number
-	}
+	public declare Age: number
 
 	constructor(init?: Partial<{Name?: string, Age?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Name: init?.Name ?? ("" as string),
-			Age: init?.Age ?? (0 as number)
-		}
+		this.Name = init?.Name ?? ("" as string)
+		this.Age = init?.Age ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -38,11 +19,10 @@ export class Person {
 		return new Person(this, true)
 	}
 
-	public __goscriptAssign(source: Person): void {
-		const target = this._fields
-		const values = source._fields
-		target.Name = values.Name
-		target.Age = values.Age
+	public __goscriptAssign(source: Person): this {
+		this.Name = source.Name
+		this.Age = source.Age
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

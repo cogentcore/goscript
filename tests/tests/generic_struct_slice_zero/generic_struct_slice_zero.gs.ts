@@ -5,22 +5,10 @@ import * as $ from "@goscript/builtin/index.js"
 import * as slices from "@goscript/slices/index.js"
 
 export class item {
-	public get Text(): string {
-		return this._fields.Text
-	}
-
-	public set Text(value: string) {
-		this._fields.Text = value
-	}
-
-	public _fields: {
-		Text: string
-	}
+	public declare Text: string
 
 	constructor(init?: Partial<{Text?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Text: init?.Text ?? ("" as string)
-		}
+		this.Text = init?.Text ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -28,10 +16,9 @@ export class item {
 		return new item(this, true)
 	}
 
-	public __goscriptAssign(source: item): void {
-		const target = this._fields
-		const values = source._fields
-		target.Text = values.Text
+	public __goscriptAssign(source: item): this {
+		this.Text = source.Text
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -44,22 +31,10 @@ export class item {
 }
 
 export class arena {
-	public get data(): $.Slice<any> {
-		return this._fields.data
-	}
-
-	public set data(value: $.Slice<any>) {
-		this._fields.data = value
-	}
-
-	public _fields: {
-		data: $.Slice<any>
-	}
+	public declare data: $.Slice<any>
 
 	constructor(init?: Partial<{data?: $.Slice<any>}>, __goscriptValue?: boolean) {
-		this._fields = {
-			data: init?.data ?? (null! as $.Slice<any>)
-		}
+		this.data = init?.data ?? (null! as $.Slice<any>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -67,10 +42,9 @@ export class arena {
 		return new arena(this, true)
 	}
 
-	public __goscriptAssign(source: arena): void {
-		const target = this._fields
-		const values = source._fields
-		target.data = values.data
+	public __goscriptAssign(source: arena): this {
+		this.data = source.data
+		return this
 	}
 
 	public New(__typeArgs: $.GenericTypeArgs | undefined): any {
