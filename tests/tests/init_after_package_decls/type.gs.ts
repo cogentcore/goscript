@@ -10,14 +10,14 @@ export class Type {
 
 	public declare Fields: $.Slice<__goscript_field.Field>
 
-	constructor(init?: Partial<{Name?: string, Fields?: $.Slice<__goscript_field.Field>}>, __goscriptValue?: boolean) {
-		this.Name = init?.Name ?? ("" as string)
-		this.Fields = init?.Fields ?? (null! as $.Slice<__goscript_field.Field>)
+	constructor(__goscriptValue?: boolean, Name$?: string, Fields$?: $.Slice<__goscript_field.Field>) {
+		this.Name = Name$ ?? ""
+		this.Fields = Fields$ ?? (null! as $.Slice<__goscript_field.Field>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Type {
-		return new Type(this, true)
+		return new Type(true, this.Name, this.Fields)
 	}
 
 	public __goscriptAssign(source: Type): this {

@@ -6,13 +6,13 @@ import * as $ from "@goscript/builtin/index.js"
 export class frame {
 	public declare name: string
 
-	constructor(init?: Partial<{name?: string}>, __goscriptValue?: boolean) {
-		this.name = init?.name ?? ("" as string)
+	constructor(__goscriptValue?: boolean, name$?: string) {
+		this.name = name$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): frame {
-		return new frame(this, true)
+		return new frame(true, this.name)
 	}
 
 	public __goscriptAssign(source: frame): this {
@@ -32,13 +32,13 @@ export class frame {
 export class iterator {
 	public declare idx: number
 
-	constructor(init?: Partial<{idx?: number}>, __goscriptValue?: boolean) {
-		this.idx = init?.idx ?? (0 as number)
+	constructor(__goscriptValue?: boolean, idx$?: number) {
+		this.idx = idx$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): iterator {
-		return new iterator(this, true)
+		return new iterator(true, this.idx)
 	}
 
 	public __goscriptAssign(source: iterator): this {
@@ -53,17 +53,17 @@ export class iterator {
 		switch ((it$ as iterator).idx) {
 			case 1:
 			{
-				return [new frame({name: "first"}, true), true]
+				return [new frame(true, "first"), true]
 				break
 			}
 			case 2:
 			{
-				return [new frame({name: "second"}, true), true]
+				return [new frame(true, "second"), true]
 				break
 			}
 			default:
 			{
-				return [new frame(undefined, true), false]
+				return [new frame(true), false]
 				break
 			}
 		}

@@ -8,14 +8,14 @@ export class MyStruct {
 
 	public declare MyString: string
 
-	constructor(init?: Partial<{MyInt?: number, MyString?: string}>, __goscriptValue?: boolean) {
-		this.MyInt = init?.MyInt ?? (0 as number)
-		this.MyString = init?.MyString ?? ("" as string)
+	constructor(__goscriptValue?: boolean, MyInt$?: number, MyString$?: string) {
+		this.MyInt = MyInt$ ?? 0
+		this.MyString = MyString$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): MyStruct {
-		return new MyStruct(this, true)
+		return new MyStruct(true, this.MyInt, this.MyString)
 	}
 
 	public __goscriptAssign(source: MyStruct): this {
@@ -34,7 +34,7 @@ export class MyStruct {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let original = new MyStruct({MyInt: 10, MyString: "original"})
+	let original = new MyStruct(false, 10, "original")
 	let original$: MyStruct = original == null ? $.pointerTarget<MyStruct>(original) : (original as any).__isVarRef === true ? (original as any).value : (original as any).__goValue === undefined ? (original as any) : $.pointerTarget<MyStruct>(original)
 
 	// === Pointer Assignment (No Copy) ===

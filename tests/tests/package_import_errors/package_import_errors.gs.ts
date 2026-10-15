@@ -21,13 +21,13 @@ $.registerNamedValueType(
 export class customErr {
 	public declare msg: string
 
-	constructor(init?: Partial<{msg?: string}>, __goscriptValue?: boolean) {
-		this.msg = init?.msg ?? ("" as string)
+	constructor(__goscriptValue?: boolean, msg$?: string) {
+		this.msg = msg$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): customErr {
-		return new customErr(this, true)
+		return new customErr(true, this.msg)
 	}
 
 	public __goscriptAssign(source: customErr): this {
@@ -52,13 +52,13 @@ export class customErr {
 export class wrappedErr {
 	public declare err: $.GoError
 
-	constructor(init?: Partial<{err?: $.GoError}>, __goscriptValue?: boolean) {
-		this.err = init?.err ?? (null! as $.GoError)
+	constructor(__goscriptValue?: boolean, err$?: $.GoError) {
+		this.err = err$ ?? (null! as $.GoError)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): wrappedErr {
-		return new wrappedErr(this, true)
+		return new wrappedErr(true, this.err)
 	}
 
 	public __goscriptAssign(source: wrappedErr): this {
@@ -105,8 +105,8 @@ export async function main(): globalThis.Promise<void> {
 	let nilErr: $.GoError = null! as $.GoError
 	await $.println("nilErr == nil:", nilErr == null)
 
-	let typedErr = new customErr({msg: "typed error"})
-	let __goscriptTuple0: any = errors.AsType(__goscriptStatic0(), $.interfaceValue<$.GoError>(new wrappedErr({err: $.interfaceValue<$.GoError>(typedErr, "*main.customErr", /* @__PURE__ */ $.pointerType("main.customErr"))}, true), "main.wrappedErr", "main.wrappedErr")!)
+	let typedErr = new customErr(false, "typed error")
+	let __goscriptTuple0: any = errors.AsType(__goscriptStatic0(), $.interfaceValue<$.GoError>(new wrappedErr(true, $.interfaceValue<$.GoError>(typedErr, "*main.customErr", /* @__PURE__ */ $.pointerType("main.customErr"))), "main.wrappedErr", "main.wrappedErr")!)
 	let matched: customErr | $.VarRef<customErr> | null = (__goscriptTuple0[0] as customErr | $.VarRef<customErr> | null)
 	let ok = __goscriptTuple0[1]
 	await $.println("AsType matched:", ok)

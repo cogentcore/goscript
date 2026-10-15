@@ -16,13 +16,13 @@ $.registerInterfaceType(
 export class Dog {
 	public declare name: string
 
-	constructor(init?: Partial<{name?: string}>, __goscriptValue?: boolean) {
-		this.name = init?.name ?? ("" as string)
+	constructor(__goscriptValue?: boolean, name$?: string) {
+		this.name = name$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Dog {
-		return new Dog(this, true)
+		return new Dog(true, this.name)
 	}
 
 	public __goscriptAssign(source: Dog): this {
@@ -50,13 +50,13 @@ export class Dog {
 export class Cat {
 	public declare name: string
 
-	constructor(init?: Partial<{name?: string}>, __goscriptValue?: boolean) {
-		this.name = init?.name ?? ("" as string)
+	constructor(__goscriptValue?: boolean, name$?: string) {
+		this.name = name$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Cat {
-		return new Cat(this, true)
+		return new Cat(true, this.name)
 	}
 
 	public __goscriptAssign(source: Cat): this {
@@ -86,7 +86,7 @@ export function FindDog(): Dog | $.VarRef<Dog> | null {
 }
 
 export function FindCat(): Cat | $.VarRef<Cat> | null {
-	return new Cat({name: "Whiskers"})
+	return new Cat(false, "Whiskers")
 }
 
 export function FindAnimal(): Animal | null {

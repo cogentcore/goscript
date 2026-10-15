@@ -8,14 +8,14 @@ export class pos {
 
 	public declare Char: number
 
-	constructor(init?: Partial<{Line?: number, Char?: number}>, __goscriptValue?: boolean) {
-		this.Line = init?.Line ?? (0 as number)
-		this.Char = init?.Char ?? (0 as number)
+	constructor(__goscriptValue?: boolean, Line$?: number, Char$?: number) {
+		this.Line = Line$ ?? 0
+		this.Char = Char$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): pos {
-		return new pos(this, true)
+		return new pos(true, this.Line, this.Char)
 	}
 
 	public __goscriptAssign(source: pos): this {
@@ -56,7 +56,7 @@ export async function main(): globalThis.Promise<void> {
 	const __defer = new $.AsyncDisposableStack()
 	try {
 		// A slice of structs indexed in a range loop over an integer.
-		let ps = $.makeSlice<pos>(4, undefined, undefined, () => new pos(undefined, true))
+		let ps = $.makeSlice<pos>(4, undefined, undefined, () => new pos(true))
 		for (let __goscriptSliceWindow1 = $.sliceRange(ps), i = 0; i < 10; i++) {
 			let j = i % __goscriptSliceWindow1.length;
 			;((__goscriptSliceWindow1.backing as any[])[$.windowSlot(__goscriptSliceWindow1, j)] as pos).Line += i;

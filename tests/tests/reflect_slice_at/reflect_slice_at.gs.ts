@@ -11,14 +11,14 @@ export class Sub {
 
 	public declare Y: string
 
-	constructor(init?: Partial<{X?: number, Y?: string}>, __goscriptValue?: boolean) {
-		this.X = init?.X ?? (0 as number)
-		this.Y = init?.Y ?? ("" as string)
+	constructor(__goscriptValue?: boolean, X$?: number, Y$?: string) {
+		this.X = X$ ?? 0
+		this.Y = Y$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Sub {
-		return new Sub(this, true)
+		return new Sub(true, this.X, this.Y)
 	}
 
 	public __goscriptAssign(source: Sub): this {
@@ -43,15 +43,15 @@ export class T {
 
 	public declare S: Sub
 
-	constructor(init?: Partial<{Mbr1?: string, Mbr2?: number, S?: Sub}>, __goscriptValue?: boolean) {
-		this.Mbr1 = init?.Mbr1 ?? ("" as string)
-		this.Mbr2 = init?.Mbr2 ?? (0 as number)
-		this.S = init?.S ? init.S.clone() : new Sub(undefined, true)
+	constructor(__goscriptValue?: boolean, Mbr1$?: string, Mbr2$?: number, S$?: Sub) {
+		this.Mbr1 = Mbr1$ ?? ""
+		this.Mbr2 = Mbr2$ ?? 0
+		this.S = S$ ?? new Sub(true)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): T {
-		return new T(this, true)
+		return new T(true, this.Mbr1, this.Mbr2, this.S.clone())
 	}
 
 	public __goscriptAssign(source: T): this {
@@ -70,7 +70,7 @@ export class T {
 	)
 }
 
-export let pt: $.VarRef<T> = $.varRef(new T(undefined, true))
+export let pt: $.VarRef<T> = $.varRef(new T(true))
 
 export function __goscript_set_pt(__goscriptValue: T): void {
 	$.assignStruct(pt.value, __goscriptValue)

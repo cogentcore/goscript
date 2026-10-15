@@ -6,13 +6,13 @@ import * as $ from "@goscript/builtin/index.js"
 export class item {
 	public declare value: number
 
-	constructor(init?: Partial<{value?: number}>, __goscriptValue?: boolean) {
-		this.value = init?.value ?? (0 as number)
+	constructor(__goscriptValue?: boolean, value$?: number) {
+		this.value = value$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): item {
-		return new item(this, true)
+		return new item(true, this.value)
 	}
 
 	public __goscriptAssign(source: item): this {
@@ -34,14 +34,14 @@ export class arrays {
 
 	public declare items: item[]
 
-	constructor(init?: Partial<{slices?: $.Slice<number>[], items?: item[]}>, __goscriptValue?: boolean) {
-		this.slices = init?.slices !== undefined ? $.cloneArrayValue(init.slices, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")), 1)) : $.arrayValue(globalThis.Array.from({ length: 1 }, () => null))
-		this.items = init?.items !== undefined ? $.cloneArrayValue(init.items, /* @__PURE__ */ $.arrayType("main.item", 1)) : $.arrayValue(globalThis.Array.from({ length: 1 }, () => new item(undefined, true)), /* @__PURE__ */ $.arrayType("main.item", 1))
+	constructor(__goscriptValue?: boolean, slices$?: $.Slice<number>[], items$?: item[]) {
+		this.slices = slices$ ?? $.arrayValue(globalThis.Array.from({ length: 1 }, () => null))
+		this.items = items$ ?? $.arrayValue(globalThis.Array.from({ length: 1 }, () => new item(true)), /* @__PURE__ */ $.arrayType("main.item", 1))
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): arrays {
-		return new arrays(this, true)
+		return new arrays(true, $.cloneArrayValue(this.slices, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")), 1)), $.cloneArrayValue(this.items, /* @__PURE__ */ $.arrayType("main.item", 1)))
 	}
 
 	public __goscriptAssign(source: arrays): this {
@@ -90,17 +90,17 @@ export async function main(): globalThis.Promise<void> {
 	$.sliceElems($.arrayIndex(slicesCopy, 0)!)[$.sliceSlot($.arrayIndex(slicesCopy, 0)!, 0)] = 7
 	await $.println("slice sharing:", $.arrayIndex($.arrayIndex(slices, 0)!, 0))
 
-	let structs = $.arrayValue([new item({value: 1}, true)], /* @__PURE__ */ $.arrayType("main.item", 1))
+	let structs = $.arrayValue([new item(true, 1)], /* @__PURE__ */ $.arrayType("main.item", 1))
 	let structsCopy = $.cloneArrayValue(structs, /* @__PURE__ */ $.arrayType("main.item", 1))
 	$.arrayIndex(structsCopy, 0).value = 7
 	await $.println("struct copy:", $.arrayIndex(structs, 0).value, $.arrayIndex(structsCopy, 0).value)
 
-	let pointers = $.arrayValue([new item({value: 1})])
+	let pointers = $.arrayValue([new item(false, 1)])
 	let pointersCopy = $.cloneArrayValue(pointers, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.pointerType("main.item"), 1))
 	$.pointerValue<item>($.arrayIndex(pointersCopy, 0)).value = 7
 	await $.println("pointer sharing:", $.pointerValue<item>($.arrayIndex(pointers, 0)).value, ($.arrayIndex(pointers, 0) === $.arrayIndex(pointersCopy, 0) || $.pointerAliasesMade && $.pointerEqual($.arrayIndex(pointers, 0), $.arrayIndex(pointersCopy, 0))))
 
-	let original = new arrays({slices: $.cloneArrayValue(slices, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")), 1)), items: $.cloneArrayValue(structs, /* @__PURE__ */ $.arrayType("main.item", 1))}, true)
+	let original = new arrays(true, $.cloneArrayValue(slices, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")), 1)), $.cloneArrayValue(structs, /* @__PURE__ */ $.arrayType("main.item", 1)))
 	let copied = (original).clone()
 	$.sliceElems($.arrayIndex(copied.slices, 0)!)[$.sliceSlot($.arrayIndex(copied.slices, 0)!, 0)] = 8
 	$.arrayIndex(copied.items, 0).value = 8

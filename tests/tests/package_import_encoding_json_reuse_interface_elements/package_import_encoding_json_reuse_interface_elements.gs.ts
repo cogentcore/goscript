@@ -18,13 +18,13 @@ $.registerInterfaceType(
 export class Node {
 	public declare Name: string
 
-	constructor(init?: Partial<{Name?: string}>, __goscriptValue?: boolean) {
-		this.Name = init?.Name ?? ("" as string)
+	constructor(__goscriptValue?: boolean, Name$?: string) {
+		this.Name = Name$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Node {
-		return new Node(this, true)
+		return new Node(true, this.Name)
 	}
 
 	public __goscriptAssign(source: Node): this {
@@ -49,13 +49,13 @@ export class Node {
 export class Custom {
 	public declare Text: string
 
-	constructor(init?: Partial<{Text?: string}>, __goscriptValue?: boolean) {
-		this.Text = init?.Text ?? ("" as string)
+	constructor(__goscriptValue?: boolean, Text$?: string) {
+		this.Text = Text$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Custom {
-		return new Custom(this, true)
+		return new Custom(true, this.Text)
 	}
 
 	public __goscriptAssign(source: Custom): this {
@@ -86,13 +86,13 @@ export class Custom {
 export class Holder {
 	public declare Items: $.Slice<Named | null>
 
-	constructor(init?: Partial<{Items?: $.Slice<Named | null>}>, __goscriptValue?: boolean) {
-		this.Items = init?.Items ?? (null! as $.Slice<Named | null>)
+	constructor(__goscriptValue?: boolean, Items$?: $.Slice<Named | null>) {
+		this.Items = Items$ ?? (null! as $.Slice<Named | null>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Holder {
-		return new Holder(this, true)
+		return new Holder(true, this.Items)
 	}
 
 	public __goscriptAssign(source: Holder): this {
@@ -112,7 +112,7 @@ export class Holder {
 export async function main(): globalThis.Promise<void> {
 	let a = new Node()
 	let b = new Custom()
-	let h = $.varRef(new Holder({Items: $.arrayToSlice<Named | null>([$.interfaceValue<Named | null>(a, "*main.Node", /* @__PURE__ */ $.pointerType("main.Node")), $.interfaceValue<Named | null>(b, "*main.Custom", /* @__PURE__ */ $.pointerType("main.Custom"))])}, true))
+	let h = $.varRef(new Holder(true, $.arrayToSlice<Named | null>([$.interfaceValue<Named | null>(a, "*main.Node", /* @__PURE__ */ $.pointerType("main.Node")), $.interfaceValue<Named | null>(b, "*main.Custom", /* @__PURE__ */ $.pointerType("main.Custom"))])))
 	let err = (json.Unmarshal(new Uint8Array([123, 34, 73, 116, 101, 109, 115, 34, 58, 91, 123, 34, 78, 97, 109, 101, 34, 58, 34, 120, 34, 125, 44, 34, 121, 34, 93, 125]), $.interfaceValue(h, "*main.Holder", /* @__PURE__ */ $.pointerType("main.Holder"))) as $.GoError)
 	fmt.Println((err as any), $.basicInterfaceValue($.sliceLen(h.value.Items), "int"), $.comparableEqual($.arrayIndex(h.value.Items!, 0), $.interfaceValue<Named | null>(a, "*main.Node", /* @__PURE__ */ $.pointerType("main.Node"))), $.pointerValue<Node>(a).Name, $.comparableEqual($.arrayIndex(h.value.Items!, 1), $.interfaceValue<Named | null>(b, "*main.Custom", /* @__PURE__ */ $.pointerType("main.Custom"))), $.pointerValue<Custom>(b).Text)
 }

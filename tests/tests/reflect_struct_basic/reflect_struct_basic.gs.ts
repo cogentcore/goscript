@@ -10,14 +10,14 @@ export class Person {
 
 	public declare Age: number
 
-	constructor(init?: Partial<{Name?: string, Age?: number}>, __goscriptValue?: boolean) {
-		this.Name = init?.Name ?? ("" as string)
-		this.Age = init?.Age ?? (0 as number)
+	constructor(__goscriptValue?: boolean, Name$?: string, Age$?: number) {
+		this.Name = Name$ ?? ""
+		this.Age = Age$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Person {
-		return new Person(this, true)
+		return new Person(true, this.Name, this.Age)
 	}
 
 	public __goscriptAssign(source: Person): this {
@@ -36,7 +36,7 @@ export class Person {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let p = new Person({Name: "Alice", Age: 30}, true)
+	let p = new Person(true, "Alice", 30)
 	let v = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue((p).clone(), "main.Person", "main.Person"))))
 	if ($.markAsStructValue($.cloneStructValue(v)).Kind() == 25) {
 		let f = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(v)).Field(0)))

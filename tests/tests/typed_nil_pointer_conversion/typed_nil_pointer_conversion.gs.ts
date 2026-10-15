@@ -6,13 +6,13 @@ import * as $ from "@goscript/builtin/index.js"
 export class node {
 	public declare next: node | $.VarRef<node> | null
 
-	constructor(init?: Partial<{next?: node | $.VarRef<node> | null}>, __goscriptValue?: boolean) {
-		this.next = init?.next ?? (null! as node | $.VarRef<node> | null)
+	constructor(__goscriptValue?: boolean, next$?: node | $.VarRef<node> | null) {
+		this.next = next$ ?? (null! as node | $.VarRef<node> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): node {
-		return new node(this, true)
+		return new node(true, this.next)
 	}
 
 	public __goscriptAssign(source: node): this {
@@ -33,7 +33,7 @@ export function clone(n: node | $.VarRef<node> | null): node | $.VarRef<node> | 
 	if (n == null) {
 		return null
 	}
-	return new node({next: $.pointerValue<node>(n).next})
+	return new node(false, $.pointerValue<node>(n).next)
 }
 
 export async function main(): globalThis.Promise<void> {

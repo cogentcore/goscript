@@ -7,13 +7,13 @@ import * as sync from "@goscript/sync/index.js"
 export class loader {
 	public declare load: ((_p0: string) => [any, boolean] | globalThis.Promise<[any, boolean]>) | null
 
-	constructor(init?: Partial<{load?: ((_p0: string) => [any, boolean] | globalThis.Promise<[any, boolean]>) | null}>, __goscriptValue?: boolean) {
-		this.load = init?.load ?? (null! as ((_p0: string) => [any, boolean] | globalThis.Promise<[any, boolean]>) | null)
+	constructor(__goscriptValue?: boolean, load$?: ((_p0: string) => [any, boolean] | globalThis.Promise<[any, boolean]>) | null) {
+		this.load = load$ ?? (null! as ((_p0: string) => [any, boolean] | globalThis.Promise<[any, boolean]>) | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): loader {
-		return new loader(this, true)
+		return new loader(true, this.load)
 	}
 
 	public __goscriptAssign(source: loader): this {
@@ -41,9 +41,9 @@ export function __goscript_set_cache(__goscriptValue: sync.Map): void {
 	$.assignStruct(cache.value, __goscriptValue)
 }
 
-export let defaultLoader: loader | $.VarRef<loader> | null = new loader({load: $.functionValue((key: string): [any, boolean] => {
+export let defaultLoader: loader | $.VarRef<loader> | null = new loader(false, $.functionValue((key: string): [any, boolean] => {
 	return cache.value.Load(key)
-}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string")], results: [{ kind: $.TypeKind.Interface, methods: [] }, /* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo))})
+}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string")], results: [{ kind: $.TypeKind.Interface, methods: [] }, /* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo)))
 
 export function __goscript_set_defaultLoader(__goscriptValue: loader | $.VarRef<loader> | null): void {
 	defaultLoader = __goscriptValue

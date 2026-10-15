@@ -16,13 +16,13 @@ $.registerInterfaceType(
 export class box {
 	public declare value: any
 
-	constructor(init?: Partial<{value?: any}>, __goscriptValue?: boolean, __goscriptFresh?: boolean) {
-		this.value = init?.value !== undefined ? (__goscriptFresh === true ? init.value : $.copyElement(init.value)) : (null! as any)
+	constructor(__goscriptValue?: boolean, value$?: any) {
+		this.value = value$ ?? (null! as any)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): box {
-		return new box(this, true)
+		return new box(true, $.copyElement(this.value))
 	}
 
 	public __goscriptAssign(source: box): this {
@@ -47,13 +47,13 @@ export class box {
 export class holder {
 	public declare box: box
 
-	constructor(init?: Partial<{box?: box}>, __goscriptValue?: boolean) {
-		this.box = init?.box ? init.box.clone() : $.markAsStructValue(new box({value: null}, undefined, true))
+	constructor(__goscriptValue?: boolean, box$?: box) {
+		this.box = box$ ?? new box(true, null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): holder {
-		return new holder(this, true)
+		return new holder(true, this.box.clone())
 	}
 
 	public __goscriptAssign(source: holder): this {
@@ -92,10 +92,10 @@ export function methodExpression(__typeArgs: $.GenericTypeArgs | undefined, b: b
 }
 
 export async function main(): globalThis.Promise<void> {
-	let b = new box({value: 7})
+	let b = new box(false, 7)
 	await $.println("direct:", direct(__goscriptStatic0(), b))
 	await $.println("interface:", await throughInterface(__goscriptStatic0(), $.namedValueInterfaceValue<reader | null>(b, "*main.box", __goscriptStatic1(), __goscriptStatic2(), __goscriptStatic3())))
-	await $.println("promoted:", promoted(__goscriptStatic0(), new holder({box: ($.pointerValue<box>(b)).clone()})))
+	await $.println("promoted:", promoted(__goscriptStatic0(), new holder(false, ($.pointerValue<box>(b)).clone())))
 	await $.println("expression:", methodExpression(__goscriptStatic0(), b))
 }
 

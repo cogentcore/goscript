@@ -35,5 +35,5 @@ export function makeFirst(): __goscript_a.holder {
 	lock.value.Lock()
 	const __goscriptDeferCallee0 = $.functionValue(((__receiver) => () => __receiver.Unlock())(lock.value), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "sync.(*Mutex).Unlock-fm")
 	__defer.defer(() => { __goscriptDeferCallee0() })
-	return new __goscript_a.holder({n: __goscript_a.__goscript_get_seed()}, true)
+	return new __goscript_a.holder(true, __goscript_a.__goscript_get_seed())
 }

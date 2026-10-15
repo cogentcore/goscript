@@ -6,13 +6,13 @@ import * as $ from "@goscript/builtin/index.js"
 export class child {
 	public declare value: string
 
-	constructor(init?: Partial<{value?: string}>, __goscriptValue?: boolean) {
-		this.value = init?.value ?? ("" as string)
+	constructor(__goscriptValue?: boolean, value$?: string) {
+		this.value = value$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): child {
-		return new child(this, true)
+		return new child(true, this.value)
 	}
 
 	public __goscriptAssign(source: child): this {
@@ -25,7 +25,7 @@ export class child {
 		if (c == null) {
 			return null
 		}
-		return new child({value: $.pointerValue<child>(c).value})
+		return new child(false, $.pointerValue<child>(c).value)
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -40,13 +40,13 @@ export class child {
 export class parent {
 	public declare child: child | $.VarRef<child> | null
 
-	constructor(init?: Partial<{child?: child | $.VarRef<child> | null}>, __goscriptValue?: boolean) {
-		this.child = init?.child ?? (null! as child | $.VarRef<child> | null)
+	constructor(__goscriptValue?: boolean, child$?: child | $.VarRef<child> | null) {
+		this.child = child$ ?? (null! as child | $.VarRef<child> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): parent {
-		return new parent(this, true)
+		return new parent(true, this.child)
 	}
 
 	public __goscriptAssign(source: parent): this {
@@ -64,11 +64,11 @@ export class parent {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let p: parent = new parent(undefined, true)
+	let p: parent = new parent(true)
 	if (child.prototype.Clone.call(p.child) == null) {
 		await $.println("nil clone")
 	}
-	p.child = new child({value: "ok"})
+	p.child = new child(false, "ok")
 	await $.println($.pointerValue<child>(child.prototype.Clone.call(p.child)).value)
 }
 

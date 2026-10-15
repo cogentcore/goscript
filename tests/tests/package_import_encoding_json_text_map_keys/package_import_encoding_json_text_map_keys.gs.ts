@@ -35,17 +35,17 @@ export class Doc {
 
 	public declare Big: globalThis.Map<bigint, string> | null
 
-	constructor(init?: Partial<{Kind?: Tokens, Kinds?: $.Slice<Tokens>, Styles?: globalThis.Map<string, Style> | null, Counts?: globalThis.Map<number, number> | null, Big?: globalThis.Map<bigint, string> | null}>, __goscriptValue?: boolean) {
-		this.Kind = init?.Kind ?? (0 as Tokens)
-		this.Kinds = init?.Kinds ?? (null! as $.Slice<Tokens>)
-		this.Styles = init?.Styles ?? (null! as globalThis.Map<string, Style> | null)
-		this.Counts = init?.Counts ?? (null! as globalThis.Map<number, number> | null)
-		this.Big = init?.Big ?? (null! as globalThis.Map<bigint, string> | null)
+	constructor(__goscriptValue?: boolean, Kind$?: Tokens, Kinds$?: $.Slice<Tokens>, Styles$?: globalThis.Map<string, Style> | null, Counts$?: globalThis.Map<number, number> | null, Big$?: globalThis.Map<bigint, string> | null) {
+		this.Kind = Kind$ ?? 0
+		this.Kinds = Kinds$ ?? (null! as $.Slice<Tokens>)
+		this.Styles = Styles$ ?? (null! as globalThis.Map<string, Style> | null)
+		this.Counts = Counts$ ?? (null! as globalThis.Map<number, number> | null)
+		this.Big = Big$ ?? (null! as globalThis.Map<bigint, string> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Doc {
-		return new Doc(this, true)
+		return new Doc(true, this.Kind, this.Kinds, this.Styles, this.Counts, this.Big)
 	}
 
 	public __goscriptAssign(source: Doc): this {
@@ -114,14 +114,14 @@ export async function main(): globalThis.Promise<void> {
 		await $.println("key is token:", (k == 1) || (k == 0))
 	}
 
-	let d: $.VarRef<Doc> = $.varRef(new Doc(undefined, true))
+	let d: $.VarRef<Doc> = $.varRef(new Doc(true))
 	let err: $.GoError = await json.Unmarshal(new Uint8Array([123, 34, 75, 105, 110, 100, 34, 58, 34, 67, 111, 109, 109, 101, 110, 116, 34, 44, 34, 75, 105, 110, 100, 115, 34, 58, 91, 34, 75, 101, 121, 119, 111, 114, 100, 34, 44, 34, 66, 97, 99, 107, 103, 114, 111, 117, 110, 100, 34, 93, 44, 34, 83, 116, 121, 108, 101, 115, 34, 58, 123, 34, 120, 34, 58, 123, 34, 67, 111, 109, 109, 101, 110, 116, 34, 58, 34, 103, 114, 97, 121, 34, 125, 125, 44, 34, 67, 111, 117, 110, 116, 115, 34, 58, 123, 34, 49, 34, 58, 50, 44, 34, 45, 51, 34, 58, 52, 125, 44, 34, 66, 105, 103, 34, 58, 123, 34, 57, 48, 48, 55, 49, 57, 57, 50, 53, 52, 55, 52, 48, 57, 57, 51, 34, 58, 34, 98, 105, 103, 34, 125, 125]), $.interfaceValue(d, "*main.Doc", /* @__PURE__ */ $.pointerType("main.Doc")))
 	if (err != null) {
 		await $.println("error:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	}
 	await $.println("comment:", $.mapGet<Tokens, string, string>($.mapGet<string, Style, Style>(d.value.Styles, "x", null)[0], 2, "")[0])
 	await $.println("kind:", Tokens_String(d.value.Kind), "kinds:", $.sliceLen(d.value.Kinds), Tokens_String($.arrayIndex(d.value.Kinds!, 0)), Tokens_String($.arrayIndex(d.value.Kinds!, 1)))
-	let __goscriptTuple0: any = (json.Marshal($.interfaceValue(new Doc({Kind: 1, Kinds: $.arrayToSlice<Tokens>([2])}, true), "main.Doc", "main.Doc")) as [$.Slice<number>, $.GoError])
+	let __goscriptTuple0: any = (json.Marshal($.interfaceValue(new Doc(true, 1, $.arrayToSlice<Tokens>([2])), "main.Doc", "main.Doc")) as [$.Slice<number>, $.GoError])
 	let b: $.Slice<number> = __goscriptTuple0[0]
 	await $.println("marshal doc:", $.bytesToString(b))
 	await $.println("counts:", $.mapGet<number, number, number>(d.value.Counts, 1, 0)[0], $.mapGet<number, number, number>(d.value.Counts, -3, 0)[0])

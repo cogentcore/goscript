@@ -8,14 +8,14 @@ export class unit {
 
 	public declare U: string
 
-	constructor(init?: Partial<{V?: number, U?: string}>, __goscriptValue?: boolean) {
-		this.V = init?.V ?? (0 as number)
-		this.U = init?.U ?? ("" as string)
+	constructor(__goscriptValue?: boolean, V$?: number, U$?: string) {
+		this.V = V$ ?? 0
+		this.U = U$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): unit {
-		return new unit(this, true)
+		return new unit(true, this.V, this.U)
 	}
 
 	public __goscriptAssign(source: unit): this {
@@ -42,16 +42,16 @@ export class sides {
 
 	public declare Left: any
 
-	constructor(init?: Partial<{Top?: any, Right?: any, Bottom?: any, Left?: any}>, __goscriptValue?: boolean, __goscriptFresh?: boolean) {
-		this.Top = init?.Top !== undefined ? (__goscriptFresh === true ? init.Top : $.copyElement(init.Top)) : (null! as any)
-		this.Right = init?.Right !== undefined ? (__goscriptFresh === true ? init.Right : $.copyElement(init.Right)) : (null! as any)
-		this.Bottom = init?.Bottom !== undefined ? (__goscriptFresh === true ? init.Bottom : $.copyElement(init.Bottom)) : (null! as any)
-		this.Left = init?.Left !== undefined ? (__goscriptFresh === true ? init.Left : $.copyElement(init.Left)) : (null! as any)
+	constructor(__goscriptValue?: boolean, Top$?: any, Right$?: any, Bottom$?: any, Left$?: any) {
+		this.Top = Top$ ?? (null! as any)
+		this.Right = Right$ ?? (null! as any)
+		this.Bottom = Bottom$ ?? (null! as any)
+		this.Left = Left$ ?? (null! as any)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): sides {
-		return new sides(this, true)
+		return new sides(true, $.copyElement(this.Top), $.copyElement(this.Right), $.copyElement(this.Bottom), $.copyElement(this.Left))
 	}
 
 	public __goscriptAssign(source: sides): this {
@@ -89,14 +89,14 @@ export class values {
 
 	public declare Name: string
 
-	constructor(init?: Partial<{sides?: sides, Name?: string}>, __goscriptValue?: boolean) {
-		this.sides = init?.sides ? init.sides.clone() : $.markAsStructValue(new sides({Top: new unit(undefined, true), Right: new unit(undefined, true), Bottom: new unit(undefined, true), Left: new unit(undefined, true)}, undefined, true))
-		this.Name = init?.Name ?? ("" as string)
+	constructor(__goscriptValue?: boolean, sides$?: sides, Name$?: string) {
+		this.sides = sides$ ?? new sides(true, new unit(true), new unit(true), new unit(true), new unit(true))
+		this.Name = Name$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): values {
-		return new values(this, true)
+		return new values(true, this.sides.clone(), this.Name)
 	}
 
 	public __goscriptAssign(source: values): this {
@@ -123,14 +123,14 @@ export class pair {
 
 	public declare Val: any
 
-	constructor(init?: Partial<{Key?: any, Val?: any}>, __goscriptValue?: boolean, __goscriptFresh?: boolean) {
-		this.Key = init?.Key ?? (null! as any)
-		this.Val = init?.Val !== undefined ? (__goscriptFresh === true ? init.Val : $.copyElement(init.Val)) : (null! as any)
+	constructor(__goscriptValue?: boolean, Key$?: any, Val$?: any) {
+		this.Key = Key$ ?? (null! as any)
+		this.Val = Val$ ?? (null! as any)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): pair {
-		return new pair(this, true)
+		return new pair(true, this.Key, $.copyElement(this.Val))
 	}
 
 	public __goscriptAssign(source: pair): this {
@@ -155,23 +155,23 @@ export function copySides(__typeArgs: $.GenericTypeArgs | undefined, s: sides): 
 
 export async function main(): globalThis.Promise<void> {
 	// A struct that embeds an instance of a generic struct copies it.
-	let a = $.varRef(new values({Name: "a"}, true))
-	a.value.sides.setAll(__goscriptStatic0(), new unit({V: 1, U: "px"}, true))
+	let a = $.varRef(new values(true, undefined, "a"))
+	a.value.sides.setAll(__goscriptStatic0(), new unit(true, 1, "px"))
 	let b = (a.value).clone()
 	b.sides.Top.V = 5
 	b.sides.Left.U = "em"
 	await $.println("copy:", a.value.sides.Top.V, a.value.sides.Left.U, b.sides.Top.V, b.sides.Left.U)
 
 	// Instances are copied when assigned, passed and returned.
-	let s = $.markAsStructValue(new sides({Top: new unit({V: 2, U: "dp"}, true), Right: new unit(undefined, true), Bottom: new unit(undefined, true), Left: new unit(undefined, true)}))
+	let s = new sides(true, new unit(true, 2, "dp"), new unit(true), new unit(true), new unit(true))
 	let t = (copySides(__goscriptStatic0(), s) as sides)
 	t.Top.V = 9
 	let u = (s).clone()
-	u.Right.__goscriptAssign(new unit({V: 3, U: "x"}, true))
+	u.Right.__goscriptAssign(new unit(true, 3, "x"))
 	await $.println("instance:", s.Top.V, t.Top.V, $.stringEqual(s.Right.U, ""), u.Right.U)
 
 	// Instances with type arguments of other kinds.
-	let p = $.markAsStructValue(new pair({Key: "k", Val: $.markAsStructValue(new sides({Top: 1, Right: 2, Bottom: 3, Left: 4}))}))
+	let p = new pair(true, "k", new sides(true, 1, 2, 3, 4))
 	let q = (p).clone()
 	q.Val.Left = 40
 	let ps = $.arrayToSlice<pair>([(p).clone(), (q).clone()])
@@ -181,7 +181,7 @@ export async function main(): globalThis.Promise<void> {
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.unit", zero: () => new unit(undefined, true) }})
+	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.unit", zero: () => new unit(true) }})
 }
 
 if ($.isMainScript(import.meta)) {

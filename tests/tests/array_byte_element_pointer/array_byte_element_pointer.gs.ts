@@ -6,13 +6,13 @@ import * as $ from "@goscript/builtin/index.js"
 export class bitset {
 	public declare bits: Uint8Array
 
-	constructor(init?: Partial<{bits?: Uint8Array}>, __goscriptValue?: boolean) {
-		this.bits = init?.bits !== undefined ? $.cloneArrayValue(init.bits, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 4)) : $.arrayValue(new Uint8Array(4))
+	constructor(__goscriptValue?: boolean, bits$?: Uint8Array) {
+		this.bits = bits$ ?? $.arrayValue(new Uint8Array(4))
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): bitset {
-		return new bitset(this, true)
+		return new bitset(true, $.cloneArrayValue(this.bits, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 4)))
 	}
 
 	public __goscriptAssign(source: bitset): this {
@@ -44,7 +44,7 @@ export class bitset {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let b: $.VarRef<bitset> = $.varRef(new bitset(undefined, true))
+	let b: $.VarRef<bitset> = $.varRef(new bitset(true))
 	b.value.set(3)
 	b.value.set(30)
 	await $.println(b.value.has(3), b.value.has(4), b.value.has(30), $.arrayIndex(b.value.bits, 0), $.arrayIndex(b.value.bits, 3))

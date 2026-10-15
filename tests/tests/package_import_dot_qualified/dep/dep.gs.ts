@@ -8,13 +8,13 @@ $.registerTypePackagePath("github.com/s4wave/goscript/tests/tests/package_import
 export class Box {
 	public declare N: number
 
-	constructor(init?: Partial<{N?: number}>, __goscriptValue?: boolean) {
-		this.N = init?.N ?? (0 as number)
+	constructor(__goscriptValue?: boolean, N$?: number) {
+		this.N = N$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Box {
-		return new Box(this, true)
+		return new Box(true, this.N)
 	}
 
 	public __goscriptAssign(source: Box): this {
@@ -42,5 +42,5 @@ export function Double(v: number): number {
 }
 
 export function NewBox(n: number): Box {
-	return new Box({N: n}, true)
+	return new Box(true, n)
 }

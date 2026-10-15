@@ -8,14 +8,14 @@ export class MyStruct {
 
 	public declare privateField: number
 
-	constructor(init?: Partial<{publicField?: string, privateField?: number}>, __goscriptValue?: boolean) {
-		this.publicField = init?.publicField ?? ("" as string)
-		this.privateField = init?.privateField ?? (0 as number)
+	constructor(__goscriptValue?: boolean, publicField$?: string, privateField$?: number) {
+		this.publicField = publicField$ ?? ""
+		this.privateField = privateField$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): MyStruct {
-		return new MyStruct(this, true)
+		return new MyStruct(true, this.publicField, this.privateField)
 	}
 
 	public __goscriptAssign(source: MyStruct): this {
@@ -34,7 +34,7 @@ export class MyStruct {
 }
 
 export function NewMyStruct(pub: string, priv: number): MyStruct {
-	return new MyStruct({publicField: pub, privateField: priv}, true)
+	return new MyStruct(true, pub, priv)
 }
 
 export async function accessPrivateField(s: MyStruct): globalThis.Promise<void> {

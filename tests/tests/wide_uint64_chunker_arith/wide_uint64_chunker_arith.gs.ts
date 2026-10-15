@@ -7,13 +7,13 @@ import * as io from "@goscript/io/index.js"
 export class chunker {
 	public declare pos: bigint
 
-	constructor(init?: Partial<{pos?: bigint}>, __goscriptValue?: boolean) {
-		this.pos = init?.pos ?? (0n as bigint)
+	constructor(__goscriptValue?: boolean, pos$?: bigint) {
+		this.pos = pos$ ?? 0n
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): chunker {
-		return new chunker(this, true)
+		return new chunker(true, this.pos)
 	}
 
 	public __goscriptAssign(source: chunker): this {
@@ -39,13 +39,13 @@ export class chunker {
 export class repeatReader {
 	public declare remaining: number
 
-	constructor(init?: Partial<{remaining?: number}>, __goscriptValue?: boolean) {
-		this.remaining = init?.remaining ?? (0 as number)
+	constructor(__goscriptValue?: boolean, remaining$?: number) {
+		this.remaining = remaining$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): repeatReader {
-		return new repeatReader(this, true)
+		return new repeatReader(true, this.remaining)
 	}
 
 	public __goscriptAssign(source: repeatReader): this {
@@ -130,7 +130,7 @@ export async function main(): globalThis.Promise<void> {
 }
 
 export function newRepeatReader(n: number): repeatReader | $.VarRef<repeatReader> | null {
-	return new repeatReader({remaining: n})
+	return new repeatReader(false, n)
 }
 
 var __goscriptAwait: any

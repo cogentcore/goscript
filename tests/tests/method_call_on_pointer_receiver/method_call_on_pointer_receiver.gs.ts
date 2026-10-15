@@ -8,14 +8,14 @@ export class MyStruct {
 
 	public declare MyString: string
 
-	constructor(init?: Partial<{MyInt?: number, MyString?: string}>, __goscriptValue?: boolean) {
-		this.MyInt = init?.MyInt ?? (0 as number)
-		this.MyString = init?.MyString ?? ("" as string)
+	constructor(__goscriptValue?: boolean, MyInt$?: number, MyString$?: string) {
+		this.MyInt = MyInt$ ?? 0
+		this.MyString = MyString$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): MyStruct {
-		return new MyStruct(this, true)
+		return new MyStruct(true, this.MyInt, this.MyString)
 	}
 
 	public __goscriptAssign(source: MyStruct): this {
@@ -41,13 +41,13 @@ export class MyStruct {
 export class setterStruct {
 	public declare value: number
 
-	constructor(init?: Partial<{value?: number}>, __goscriptValue?: boolean) {
-		this.value = init?.value ?? (0 as number)
+	constructor(__goscriptValue?: boolean, value$?: number) {
+		this.value = value$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): setterStruct {
-		return new setterStruct(this, true)
+		return new setterStruct(true, this.value)
 	}
 
 	public __goscriptAssign(source: setterStruct): this {
@@ -77,13 +77,13 @@ export class setterStruct {
 export class digest {
 	public declare writes: number
 
-	constructor(init?: Partial<{writes?: number}>, __goscriptValue?: boolean) {
-		this.writes = init?.writes ?? (0 as number)
+	constructor(__goscriptValue?: boolean, writes$?: number) {
+		this.writes = writes$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): digest {
-		return new digest(this, true)
+		return new digest(true, this.writes)
 	}
 
 	public __goscriptAssign(source: digest): this {
@@ -107,7 +107,7 @@ export class digest {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let structPointer = new MyStruct({MyInt: 4, MyString: "hello world"})
+	let structPointer = new MyStruct(false, 4, "hello world")
 	// === Method Call on Pointer Receiver ===
 	// Calling a method with a pointer receiver (*MyStruct) using a pointer variable.
 	await $.println("Method call on pointer (structPointer): Expected: hello world, Actual: " + (structPointer !== null && (structPointer as any).__isVarRef !== true && (structPointer as any).__goValue === undefined ? ((structPointer as any) as MyStruct).GetMyString() : MyStruct.prototype.GetMyString.call(structPointer)))

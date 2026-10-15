@@ -8,13 +8,13 @@ $.registerTypePackagePath("github.com/s4wave/goscript/tests/tests/package_import
 export class Tx {
 	public declare Name: string
 
-	constructor(init?: Partial<{Name?: string}>, __goscriptValue?: boolean) {
-		this.Name = init?.Name ?? ("" as string)
+	constructor(__goscriptValue?: boolean, Name$?: string) {
+		this.Name = Name$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Tx {
-		return new Tx(this, true)
+		return new Tx(true, this.Name)
 	}
 
 	public __goscriptAssign(source: Tx): this {

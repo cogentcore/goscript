@@ -9,14 +9,14 @@ export class Process {
 
 	public declare done: $.Channel<{}> | null
 
-	constructor(init?: Partial<{pid?: number, done?: $.Channel<{}> | null}>, __goscriptValue?: boolean) {
-		this.pid = init?.pid ?? (0 as number)
-		this.done = init?.done ?? (null! as $.Channel<{}> | null)
+	constructor(__goscriptValue?: boolean, pid$?: number, done$?: $.Channel<{}> | null) {
+		this.pid = pid$ ?? 0
+		this.done = done$ ?? (null! as $.Channel<{}> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Process {
-		return new Process(this, true)
+		return new Process(true, this.pid, this.done)
 	}
 
 	public __goscriptAssign(source: Process): this {
@@ -76,7 +76,7 @@ export async function anyExited(procs: $.Slice<Process | $.VarRef<Process> | nul
 export async function main(): globalThis.Promise<void> {
 	let done = $.makeChannel<{}>(0, {}, "both")
 	done.close()
-	let procs = $.arrayToSlice<Process | $.VarRef<Process> | null>([new Process({pid: 1, done: $.makeChannel<{}>(0, {}, "both")}), new Process({pid: 2, done: done})])
+	let procs = $.arrayToSlice<Process | $.VarRef<Process> | null>([new Process(false, 1, $.makeChannel<{}>(0, {}, "both")), new Process(false, 2, done)])
 
 	await $.println("first even:", firstEven($.arrayToSlice<number>([1, 3, 4, 6])))
 	await $.println("any exited:", await anyExited(procs))

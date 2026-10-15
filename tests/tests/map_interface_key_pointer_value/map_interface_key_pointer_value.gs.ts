@@ -16,13 +16,13 @@ $.registerInterfaceType(
 export class Table {
 	public declare name: string
 
-	constructor(init?: Partial<{name?: string}>, __goscriptValue?: boolean) {
-		this.name = init?.name ?? ("" as string)
+	constructor(__goscriptValue?: boolean, name$?: string) {
+		this.name = name$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Table {
-		return new Table(this, true)
+		return new Table(true, this.name)
 	}
 
 	public __goscriptAssign(source: Table): this {
@@ -45,7 +45,7 @@ export class Table {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let node: Node | null = $.interfaceValue<Node | null>(new Table({name: "users"}), "*main.Table", /* @__PURE__ */ $.pointerType("main.Table"))
+	let node: Node | null = $.interfaceValue<Node | null>(new Table(false, "users"), "*main.Table", /* @__PURE__ */ $.pointerType("main.Table"))
 	let seen = $.makeMap<Node | null, boolean>([[node, true]])
 	{
 		let __goscriptTuple0: any = $.typeAssertTuple<Table | $.VarRef<Table> | null>(node, /* @__PURE__ */ $.pointerType("main.Table"))

@@ -6,13 +6,13 @@ import * as $ from "@goscript/builtin/index.js"
 export class Foo {
 	public declare done: $.Channel<boolean> | null
 
-	constructor(init?: Partial<{done?: $.Channel<boolean> | null}>, __goscriptValue?: boolean) {
-		this.done = init?.done ?? (null! as $.Channel<boolean> | null)
+	constructor(__goscriptValue?: boolean, done$?: $.Channel<boolean> | null) {
+		this.done = done$ ?? (null! as $.Channel<boolean> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Foo {
-		return new Foo(this, true)
+		return new Foo(true, this.done)
 	}
 
 	public __goscriptAssign(source: Foo): this {
@@ -36,7 +36,7 @@ export class Foo {
 }
 
 export function NewFoo(): Foo | $.VarRef<Foo> | null {
-	return new Foo({done: $.makeChannel<boolean>(0, false, "both")})
+	return new Foo(false, $.makeChannel<boolean>(0, false, "both"))
 }
 
 export async function main(): globalThis.Promise<void> {

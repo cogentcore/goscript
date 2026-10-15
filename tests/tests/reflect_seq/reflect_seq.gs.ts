@@ -8,13 +8,13 @@ import type * as iter from "@goscript/iter/index.js"
 export class Inner {
 	public declare B: number
 
-	constructor(init?: Partial<{B?: number}>, __goscriptValue?: boolean) {
-		this.B = init?.B ?? (0 as number)
+	constructor(__goscriptValue?: boolean, B$?: number) {
+		this.B = B$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Inner {
-		return new Inner(this, true)
+		return new Inner(true, this.B)
 	}
 
 	public __goscriptAssign(source: Inner): this {
@@ -36,14 +36,14 @@ export class Outer {
 
 	public declare C: number
 
-	constructor(init?: Partial<{Inner?: Inner | $.VarRef<Inner> | null, C?: number}>, __goscriptValue?: boolean) {
-		this.Inner = init?.Inner ?? (null! as Inner | $.VarRef<Inner> | null)
-		this.C = init?.C ?? (0 as number)
+	constructor(__goscriptValue?: boolean, Inner$?: Inner | $.VarRef<Inner> | null, C$?: number) {
+		this.Inner = Inner$ ?? (null! as Inner | $.VarRef<Inner> | null)
+		this.C = C$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Outer {
-		return new Outer(this, true)
+		return new Outer(true, this.Inner, this.C)
 	}
 
 	public __goscriptAssign(source: Outer): this {
@@ -159,10 +159,10 @@ export async function main(): globalThis.Promise<void> {
 	let s3 = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.arrayToSlice<number>([1, 2, 3, 4]), "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")))))).Slice3(1, 2, 3)))
 	await $.println("slice3", $.markAsStructValue($.cloneStructValue(s3)).Len(), $.markAsStructValue($.cloneStructValue(s3)).Cap(), $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(s3)).Index(0))).Int())
 
-	let o: Outer = new Outer(undefined, true)
+	let o: Outer = new Outer(true)
 	let [, err] = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue((o).clone(), "main.Outer", "main.Outer")))).FieldByIndexErr($.arrayToSlice<number>([0, 0]))
 	await $.println("nil embedded", err != null)
-	o.Inner = new Inner({B: 9})
+	o.Inner = new Inner(false, 9)
 	let __goscriptTuple1: any = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue((o).clone(), "main.Outer", "main.Outer")))).FieldByIndexErr($.arrayToSlice<number>([0, 0]))
 	let f = __goscriptTuple1[0]
 	err = __goscriptTuple1[1]

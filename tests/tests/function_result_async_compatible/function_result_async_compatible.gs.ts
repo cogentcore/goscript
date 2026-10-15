@@ -16,13 +16,13 @@ $.registerInterfaceType(
 export class box {
 	public declare value: number
 
-	constructor(init?: Partial<{value?: number}>, __goscriptValue?: boolean) {
-		this.value = init?.value ?? (0 as number)
+	constructor(__goscriptValue?: boolean, value$?: number) {
+		this.value = value$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): box {
-		return new box(this, true)
+		return new box(true, this.value)
 	}
 
 	public __goscriptAssign(source: box): this {
@@ -47,7 +47,7 @@ export class box {
 export async function asyncBox(): globalThis.Promise<box | $.VarRef<box> | null> {
 	let ch = $.makeChannel<number>(1, 0, "both")
 	await $.chanSend(ch, 7)
-	return (await (async () => { const __goscriptLiteralField0 = await $.chanRecv(ch); return new box({value: __goscriptLiteralField0}) })())
+	return (await (async () => { const __goscriptLiteralField0 = await $.chanRecv(ch); return new box(false, __goscriptLiteralField0) })())
 }
 
 export function unwrap(v: Value | null): Value | null {

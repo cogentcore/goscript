@@ -9,14 +9,14 @@ export class parser {
 
 	public declare astruct: errlist.AStruct
 
-	constructor(init?: Partial<{errors?: errlist.ErrorList, astruct?: errlist.AStruct}>, __goscriptValue?: boolean) {
-		this.errors = init?.errors ?? (null! as errlist.ErrorList)
-		this.astruct = init?.astruct ? init.astruct.clone() : new errlist.AStruct(undefined, true)
+	constructor(__goscriptValue?: boolean, errors$?: errlist.ErrorList, astruct$?: errlist.AStruct) {
+		this.errors = errors$ ?? (null! as errlist.ErrorList)
+		this.astruct = astruct$ ?? new errlist.AStruct(true)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): parser {
-		return new parser(this, true)
+		return new parser(true, this.errors, this.astruct.clone())
 	}
 
 	public __goscriptAssign(source: parser): this {
@@ -35,7 +35,7 @@ export class parser {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let p: parser = new parser(undefined, true)
+	let p: parser = new parser(true)
 	// this Add method does not work:
 	errlist.ErrorList_Add($.fieldRef(p, "errors"), "error")
 	await $.println($.arrayIndex(p.errors!, 0))

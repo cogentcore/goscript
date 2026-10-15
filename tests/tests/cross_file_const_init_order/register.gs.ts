@@ -6,12 +6,12 @@ import * as __goscript_consts from "./consts.gs.ts"
 import "./consts.gs.ts"
 
 export class thing {
-	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
+	constructor(__goscriptValue?: boolean) {
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): thing {
-		return new thing(this, true)
+		return new thing(true)
 	}
 
 	public __goscriptAssign(source: thing): this {
@@ -34,7 +34,7 @@ export function __goscript_set_Seen(__goscriptValue: number): void {
 }
 
 export function newThing(): thing {
-	return new thing(undefined, true)
+	return new thing(true)
 }
 
 function __goscriptInit0(): void {

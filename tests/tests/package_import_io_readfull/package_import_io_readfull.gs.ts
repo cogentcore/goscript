@@ -10,14 +10,14 @@ export class fixedReader {
 
 	public declare size: number
 
-	constructor(init?: Partial<{data?: $.Slice<number>, size?: number}>, __goscriptValue?: boolean) {
-		this.data = init?.data ?? (null! as $.Slice<number>)
-		this.size = init?.size ?? (0 as number)
+	constructor(__goscriptValue?: boolean, data$?: $.Slice<number>, size$?: number) {
+		this.data = data$ ?? (null! as $.Slice<number>)
+		this.size = size$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): fixedReader {
-		return new fixedReader(this, true)
+		return new fixedReader(true, this.data, this.size)
 	}
 
 	public __goscriptAssign(source: fixedReader): this {
@@ -51,7 +51,7 @@ export class fixedReader {
 
 export async function main(): globalThis.Promise<void> {
 	let buf = $.makeSlice<number>(2, undefined, "byte")
-	let [n, err] = await io.ReadFull($.pointerValueOrNil($.interfaceValue<io.Reader | null>(new fixedReader({data: new Uint8Array([97, 98, 99])}), "*main.fixedReader", /* @__PURE__ */ $.pointerType("main.fixedReader")))!, buf)
+	let [n, err] = await io.ReadFull($.pointerValueOrNil($.interfaceValue<io.Reader | null>(new fixedReader(false, new Uint8Array([97, 98, 99])), "*main.fixedReader", /* @__PURE__ */ $.pointerType("main.fixedReader")))!, buf)
 	await $.println("read:", n, $.bytesToString(buf), err == null)
 	let __goscriptTuple0: any = await io.ReadFull($.pointerValueOrNil($.interfaceValue<io.Reader | null>(bytes.NewReader(null), "*bytes.Reader", /* @__PURE__ */ $.pointerType("bytes.Reader")))!, buf)
 	n = __goscriptTuple0[0]
@@ -61,7 +61,7 @@ export async function main(): globalThis.Promise<void> {
 	n = __goscriptTuple1[0]
 	err = __goscriptTuple1[1]
 	await $.println("short:", n, $.bytesToString($.goSlice(buf, undefined, 1)), $.comparableEqual(err, io.ErrUnexpectedEOF))
-	let __goscriptTuple2: any = await io.ReadAll($.pointerValueOrNil($.interfaceValue<io.Reader | null>(new fixedReader({data: new Uint8Array([97, 98, 99, 68, 69, 70, 103, 104, 105]), size: 3}), "*main.fixedReader", /* @__PURE__ */ $.pointerType("main.fixedReader")))!)
+	let __goscriptTuple2: any = await io.ReadAll($.pointerValueOrNil($.interfaceValue<io.Reader | null>(new fixedReader(false, new Uint8Array([97, 98, 99, 68, 69, 70, 103, 104, 105]), 3), "*main.fixedReader", /* @__PURE__ */ $.pointerType("main.fixedReader")))!)
 	let all: $.Slice<number> = __goscriptTuple2[0]
 	err = __goscriptTuple2[1]
 	await $.println("readall:", $.bytesToString(all), err == null)

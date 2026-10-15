@@ -22,14 +22,14 @@ export class Rule {
 
 	public declare act: ((r: Rule | $.VarRef<Rule> | null, n: number) => number | globalThis.Promise<number>) | null
 
-	constructor(init?: Partial<{name?: string, act?: ((r: Rule | $.VarRef<Rule> | null, n: number) => number | globalThis.Promise<number>) | null}>, __goscriptValue?: boolean) {
-		this.name = init?.name ?? ("" as string)
-		this.act = init?.act ?? (null! as ((r: Rule | $.VarRef<Rule> | null, n: number) => number | globalThis.Promise<number>) | null)
+	constructor(__goscriptValue?: boolean, name$?: string, act$?: ((r: Rule | $.VarRef<Rule> | null, n: number) => number | globalThis.Promise<number>) | null) {
+		this.name = name$ ?? ""
+		this.act = act$ ?? (null! as ((r: Rule | $.VarRef<Rule> | null, n: number) => number | globalThis.Promise<number>) | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Rule {
-		return new Rule(this, true)
+		return new Rule(true, this.name, this.act)
 	}
 
 	public __goscriptAssign(source: Rule): this {
@@ -50,13 +50,13 @@ export class Rule {
 export class counter {
 	public declare total: number
 
-	constructor(init?: Partial<{total?: number}>, __goscriptValue?: boolean) {
-		this.total = init?.total ?? (0 as number)
+	constructor(__goscriptValue?: boolean, total$?: number) {
+		this.total = total$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): counter {
-		return new counter(this, true)
+		return new counter(true, this.total)
 	}
 
 	public __goscriptAssign(source: counter): this {
@@ -82,13 +82,13 @@ export class counter {
 export class chanSource {
 	public declare ch: $.Channel<number> | null
 
-	constructor(init?: Partial<{ch?: $.Channel<number> | null}>, __goscriptValue?: boolean) {
-		this.ch = init?.ch ?? (null! as $.Channel<number> | null)
+	constructor(__goscriptValue?: boolean, ch$?: $.Channel<number> | null) {
+		this.ch = ch$ ?? (null! as $.Channel<number> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): chanSource {
-		return new chanSource(this, true)
+		return new chanSource(true, this.ch)
 	}
 
 	public __goscriptAssign(source: chanSource): this {
@@ -115,13 +115,13 @@ export class chanSource {
 export class fnSource {
 	public declare f: (() => number | globalThis.Promise<number>) | null
 
-	constructor(init?: Partial<{f?: (() => number | globalThis.Promise<number>) | null}>, __goscriptValue?: boolean) {
-		this.f = init?.f ?? (null! as (() => number | globalThis.Promise<number>) | null)
+	constructor(__goscriptValue?: boolean, f$?: (() => number | globalThis.Promise<number>) | null) {
+		this.f = f$ ?? (null! as (() => number | globalThis.Promise<number>) | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): fnSource {
-		return new fnSource(this, true)
+		return new fnSource(true, this.f)
 	}
 
 	public __goscriptAssign(source: fnSource): this {
@@ -199,9 +199,9 @@ export function labelAll(n: number, l: labeler | null): number {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let rules = $.arrayToSlice<Rule | $.VarRef<Rule> | null>([new Rule({name: "double", act: double}), new Rule({name: "inc", act: $.functionValue((r: Rule | $.VarRef<Rule> | null, n: number): number => {
+	let rules = $.arrayToSlice<Rule | $.VarRef<Rule> | null>([new Rule(false, "double", double), new Rule(false, "inc", $.functionValue((r: Rule | $.VarRef<Rule> | null, n: number): number => {
 		return n + $.stringLen($.pointerValue<Rule>(r).name)
-	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.pointerType("main.Rule"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))})])
+	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.pointerType("main.Rule"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo)))])
 	await $.println("rules:", applyRules(rules, 1))
 
 	let c = new counter()
@@ -214,11 +214,11 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("receive:", await callWith(receive, ch))
 	await $.println("plain:", await callWith(plain, ch))
 
-	let inner = new chanSource({ch: $.makeChannel<number>(1, 0, "both")})
+	let inner = new chanSource(false, $.makeChannel<number>(1, 0, "both"))
 	let src: Source | null = $.interfaceValue<Source | null>(inner, "*main.chanSource", /* @__PURE__ */ $.pointerType("main.chanSource"))
-	let outer = new fnSource({f: $.functionValue(async (): globalThis.Promise<number> => {
+	let outer = new fnSource(false, $.functionValue(async (): globalThis.Promise<number> => {
 		return (__goscriptAwait = (src !== null && (src as any).__isVarRef !== true && ((src as any).__goValue === undefined || (src as any).__goType?.charCodeAt(0) !== 42) ? (src as Exclude<Source, null>) : $.pointerValue<Exclude<Source, null>>(src)).Next(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) * 10
-	}, ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))})
+	}, ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo)))
 	await $.println("sum:", await sum($.interfaceValue<Source | null>(outer, "*main.fnSource", /* @__PURE__ */ $.pointerType("main.fnSource")), 2), await sum($.interfaceValue<Source | null>(inner, "*main.chanSource", /* @__PURE__ */ $.pointerType("main.chanSource")), 1))
 
 	await $.println("labels:", labelAll(3, label), labelAll(2, $.functionValue((_p0: number): string => {

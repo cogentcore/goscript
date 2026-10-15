@@ -8,14 +8,14 @@ export class floatInfo {
 
 	public declare expbits: number
 
-	constructor(init?: Partial<{mantbits?: number, expbits?: number}>, __goscriptValue?: boolean) {
-		this.mantbits = init?.mantbits ?? (0 as number)
-		this.expbits = init?.expbits ?? (0 as number)
+	constructor(__goscriptValue?: boolean, mantbits$?: number, expbits$?: number) {
+		this.mantbits = mantbits$ ?? 0
+		this.expbits = expbits$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): floatInfo {
-		return new floatInfo(this, true)
+		return new floatInfo(true, this.mantbits, this.expbits)
 	}
 
 	public __goscriptAssign(source: floatInfo): this {
@@ -33,7 +33,7 @@ export class floatInfo {
 	)
 }
 
-export let info: $.VarRef<floatInfo> = $.varRef(new floatInfo({mantbits: 52, expbits: 11}, true))
+export let info: $.VarRef<floatInfo> = $.varRef(new floatInfo(true, 52, 11))
 
 export function __goscript_set_info(__goscriptValue: floatInfo): void {
 	$.assignStruct(info.value, __goscriptValue)

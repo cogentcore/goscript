@@ -4,12 +4,12 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class Parser {
-	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
+	constructor(__goscriptValue?: boolean) {
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Parser {
-		return new Parser(this, true)
+		return new Parser(true)
 	}
 
 	public __goscriptAssign(source: Parser): this {
@@ -34,7 +34,7 @@ export function collect(_arguments: string): string {
 }
 
 export async function main(): globalThis.Promise<void> {
-	await $.println(new Parser(undefined, true).Parse($.arrayToSlice<string>(["a", "b"])))
+	await $.println(new Parser(true).Parse($.arrayToSlice<string>(["a", "b"])))
 	await $.println(collect("ok"))
 }
 

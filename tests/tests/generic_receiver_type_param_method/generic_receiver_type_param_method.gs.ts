@@ -14,12 +14,12 @@ $.registerInterfaceType(
 );
 
 export class nistCurve {
-	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
+	constructor(__goscriptValue?: boolean) {
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): nistCurve {
-		return new nistCurve(this, true)
+		return new nistCurve(true)
 	}
 
 	public __goscriptAssign(source: nistCurve): this {
@@ -49,13 +49,13 @@ export class nistCurve {
 export class point {
 	public declare N: number
 
-	constructor(init?: Partial<{N?: number}>, __goscriptValue?: boolean) {
-		this.N = init?.N ?? (0 as number)
+	constructor(__goscriptValue?: boolean, N$?: number) {
+		this.N = N$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): point {
-		return new point(this, true)
+		return new point(true, this.N)
 	}
 
 	public __goscriptAssign(source: point): this {
@@ -65,7 +65,7 @@ export class point {
 
 	public Add(a: point | $.VarRef<point> | null, b: point | $.VarRef<point> | null): point | $.VarRef<point> | null {
 		const p: point | $.VarRef<point> | null = this;
-		return new point({N: $.pointerValue<point>(a).N + $.pointerValue<point>(b).N})
+		return new point(false, $.pointerValue<point>(a).N + $.pointerValue<point>(b).N)
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -84,7 +84,7 @@ export function __goscript_set_curve(__goscriptValue: nistCurve | $.VarRef<nistC
 }
 
 export async function main(): globalThis.Promise<void> {
-	let p = (await (curve !== null && (curve as any).__isVarRef !== true && (curve as any).__goValue === undefined ? ((curve as any) as nistCurve).Add(__goscriptStatic0(), new point({N: 2}), new point({N: 3})) : nistCurve.prototype.Add.call(curve, __goscriptStatic0(), new point({N: 2}), new point({N: 3}))) as point | $.VarRef<point> | null)
+	let p = (await (curve !== null && (curve as any).__isVarRef !== true && (curve as any).__goValue === undefined ? ((curve as any) as nistCurve).Add(__goscriptStatic0(), new point(false, 2), new point(false, 3)) : nistCurve.prototype.Add.call(curve, __goscriptStatic0(), new point(false, 2), new point(false, 3))) as point | $.VarRef<point> | null)
 	await $.println("sum:", $.pointerValue<point>(p).N)
 	if ((curve !== null && (curve as any).__isVarRef !== true && (curve as any).__goValue === undefined ? ((curve as any) as nistCurve).Zero(__goscriptStatic0()) : nistCurve.prototype.Zero.call(curve, __goscriptStatic0())) == null) {
 		await $.println("zero")

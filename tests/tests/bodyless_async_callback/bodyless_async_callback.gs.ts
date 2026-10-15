@@ -8,13 +8,13 @@ import "@goscript/unsafe/index.js"
 export class Setting {
 	public declare once: sync.Once
 
-	constructor(init?: Partial<{once?: sync.Once}>, __goscriptValue?: boolean) {
-		this.once = init?.once ? $.markAsStructValue($.cloneStructValue(init.once)) : $.markAsStructValue(new sync.Once())
+	constructor(__goscriptValue?: boolean, once$?: sync.Once) {
+		this.once = once$ ?? $.markAsStructValue(new sync.Once())
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Setting {
-		return new Setting(this, true)
+		return new Setting(true, $.markAsStructValue($.cloneStructValue(this.once)))
 	}
 
 	public __goscriptAssign(source: Setting): this {

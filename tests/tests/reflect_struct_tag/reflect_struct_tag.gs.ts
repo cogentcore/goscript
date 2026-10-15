@@ -12,15 +12,15 @@ export class item {
 
 	public declare Plain: number
 
-	constructor(init?: Partial<{Name?: string, Count?: number, Plain?: number}>, __goscriptValue?: boolean) {
-		this.Name = init?.Name ?? ("" as string)
-		this.Count = init?.Count ?? (0 as number)
-		this.Plain = init?.Plain ?? (0 as number)
+	constructor(__goscriptValue?: boolean, Name$?: string, Count$?: number, Plain$?: number) {
+		this.Name = Name$ ?? ""
+		this.Count = Count$ ?? 0
+		this.Plain = Plain$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): item {
-		return new item(this, true)
+		return new item(true, this.Name, this.Count, this.Plain)
 	}
 
 	public __goscriptAssign(source: item): this {
@@ -44,7 +44,7 @@ export function tagLen(tag: reflect.StructTag): number {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let typ = reflect.TypeOf($.interfaceValue(new item(undefined, true), "main.item", "main.item"))
+	let typ = reflect.TypeOf($.interfaceValue(new item(true), "main.item", "main.item"))
 	for (let i = 0; i < (__goscriptAwait = (typ !== null && (typ as any).__isVarRef !== true && ((typ as any).__goValue === undefined || (typ as any).__goType?.charCodeAt(0) !== 42) ? (typ as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(typ)).NumField(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait); i++) {
 		let f = $.markAsStructValue($.cloneStructValue(((__goscriptAwait = (typ !== null && (typ as any).__isVarRef !== true && ((typ as any).__goValue === undefined || (typ as any).__goType?.charCodeAt(0) !== 42) ? (typ as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(typ)).Field(i), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as reflect.StructField)))
 		await $.println(f.Name, tagLen(f.Tag), $.stringEqual(globalThis.String(f.Tag), ""))

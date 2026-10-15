@@ -8,14 +8,14 @@ export class P {
 
 	public declare Y: number
 
-	constructor(init?: Partial<{X?: number, Y?: number}>, __goscriptValue?: boolean) {
-		this.X = init?.X ?? (0 as number)
-		this.Y = init?.Y ?? (0 as number)
+	constructor(__goscriptValue?: boolean, X$?: number, Y$?: number) {
+		this.X = X$ ?? 0
+		this.Y = Y$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): P {
-		return new P(this, true)
+		return new P(true, this.X, this.Y)
 	}
 
 	public __goscriptAssign(source: P): this {
@@ -46,7 +46,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 	await $.println($.arrayIndex(xs!, 1), $.arrayIndex(xs!, 2), $.sliceLen(sub))
 
-	let ps = $.arrayToSlice<P>([new P({X: 1, Y: 2}, true), new P({X: 3, Y: 4}, true)])
+	let ps = $.arrayToSlice<P>([new P(true, 1, 2), new P(true, 3, 4)])
 	for (let __goscriptRangeTarget2 = ps, __goscriptRangeWindow2 = $.sliceRange(__goscriptRangeTarget2), i = 0; i < __goscriptRangeWindow2.length; i++) {
 		let p = ((__goscriptRangeWindow2.backing[__goscriptRangeWindow2.offset + i] as P)).clone();
 		;((__goscriptRangeWindow2.backing as any[])[__goscriptRangeWindow2.offset + i] as P).X = globalThis.Math.fround(p.Y * 2)

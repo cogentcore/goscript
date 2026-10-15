@@ -15,15 +15,15 @@ export class segmentedReader {
 
 	public declare step: number
 
-	constructor(init?: Partial<{data?: $.Slice<number>, offset?: number, step?: number}>, __goscriptValue?: boolean) {
-		this.data = init?.data ?? (null! as $.Slice<number>)
-		this.offset = init?.offset ?? (0 as number)
-		this.step = init?.step ?? (0 as number)
+	constructor(__goscriptValue?: boolean, data$?: $.Slice<number>, offset$?: number, step$?: number) {
+		this.data = data$ ?? (null! as $.Slice<number>)
+		this.offset = offset$ ?? 0
+		this.step = step$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): segmentedReader {
-		return new segmentedReader(this, true)
+		return new segmentedReader(true, this.data, this.offset, this.step)
 	}
 
 	public __goscriptAssign(source: segmentedReader): this {
@@ -55,12 +55,12 @@ export class segmentedReader {
 }
 
 export class failingReader {
-	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
+	constructor(__goscriptValue?: boolean) {
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): failingReader {
-		return new failingReader(this, true)
+		return new failingReader(true)
 	}
 
 	public __goscriptAssign(source: failingReader): this {
@@ -97,7 +97,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("deterministic public len", $.sliceLen(ecdh.PublicKey.prototype.Bytes.call($.pointerValue<ecdh.PublicKey>(ecdh.PrivateKey.prototype.PublicKey.call($.pointerValue<ecdh.PrivateKey>(deterministic))))))
 
 	let segmentedBytes = bytes.Repeat(new Uint8Array([43]) as $.Slice<number>, 64)
-	let __goscriptTuple1: any = await $.pointerValue<Exclude<ecdh.Curve, null>>(ecdh.X25519()).GenerateKey($.pointerValueOrNil($.interfaceValue<io.Reader | null>(new segmentedReader({data: segmentedBytes, step: 5}), "*main.segmentedReader", /* @__PURE__ */ $.pointerType("main.segmentedReader")))!)
+	let __goscriptTuple1: any = await $.pointerValue<Exclude<ecdh.Curve, null>>(ecdh.X25519()).GenerateKey($.pointerValueOrNil($.interfaceValue<io.Reader | null>(new segmentedReader(false, segmentedBytes, undefined, 5), "*main.segmentedReader", /* @__PURE__ */ $.pointerType("main.segmentedReader")))!)
 	let segmented: ecdh.PrivateKey | $.VarRef<ecdh.PrivateKey> | null = __goscriptTuple1[0]
 	err = __goscriptTuple1[1]
 	await $.println("segmented err nil", err == null)

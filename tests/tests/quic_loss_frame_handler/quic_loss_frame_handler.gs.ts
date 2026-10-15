@@ -25,12 +25,12 @@ $.registerInterfaceType(
 );
 
 export class pingFrame {
-	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
+	constructor(__goscriptValue?: boolean) {
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): pingFrame {
-		return new pingFrame(this, true)
+		return new pingFrame(true)
 	}
 
 	public __goscriptAssign(source: pingFrame): this {
@@ -54,14 +54,14 @@ export class Frame {
 
 	public declare Handler: FrameHandler | null
 
-	constructor(init?: Partial<{Frame?: wireFrame | null, Handler?: FrameHandler | null}>, __goscriptValue?: boolean) {
-		this.Frame = init?.Frame ?? (null! as wireFrame | null)
-		this.Handler = init?.Handler ?? (null! as FrameHandler | null)
+	constructor(__goscriptValue?: boolean, Frame$?: wireFrame | null, Handler$?: FrameHandler | null) {
+		this.Frame = Frame$ ?? (null! as wireFrame | null)
+		this.Handler = Handler$ ?? (null! as FrameHandler | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Frame {
-		return new Frame(this, true)
+		return new Frame(true, this.Frame, this.Handler)
 	}
 
 	public __goscriptAssign(source: Frame): this {
@@ -82,13 +82,13 @@ export class Frame {
 export class packet {
 	public declare Frames: $.Slice<Frame>
 
-	constructor(init?: Partial<{Frames?: $.Slice<Frame>}>, __goscriptValue?: boolean) {
-		this.Frames = init?.Frames ?? (null! as $.Slice<Frame>)
+	constructor(__goscriptValue?: boolean, Frames$?: $.Slice<Frame>) {
+		this.Frames = Frames$ ?? (null! as $.Slice<Frame>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): packet {
-		return new packet(this, true)
+		return new packet(true, this.Frames)
 	}
 
 	public __goscriptAssign(source: packet): this {
@@ -108,13 +108,13 @@ export class packet {
 export class retransmissionQueue {
 	public declare lost: number
 
-	constructor(init?: Partial<{lost?: number}>, __goscriptValue?: boolean) {
-		this.lost = init?.lost ?? (0 as number)
+	constructor(__goscriptValue?: boolean, lost$?: number) {
+		this.lost = lost$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): retransmissionQueue {
-		return new retransmissionQueue(this, true)
+		return new retransmissionQueue(true, this.lost)
 	}
 
 	public __goscriptAssign(source: retransmissionQueue): this {
@@ -149,13 +149,13 @@ export class retransmissionQueue {
 export class retransmissionQueueInitialAckHandler {
 	public declare lost: number
 
-	constructor(init?: Partial<{lost?: number}>, __goscriptValue?: boolean) {
-		this.lost = init?.lost ?? (0 as number)
+	constructor(__goscriptValue?: boolean, lost$?: number) {
+		this.lost = lost$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): retransmissionQueueInitialAckHandler {
-		return new retransmissionQueueInitialAckHandler(this, true)
+		return new retransmissionQueueInitialAckHandler(true, this.lost)
 	}
 
 	public __goscriptAssign(source: retransmissionQueueInitialAckHandler): this {
@@ -186,13 +186,13 @@ export class retransmissionQueueInitialAckHandler {
 export class retransmissionQueueHandshakeAckHandler {
 	public declare lost: number
 
-	constructor(init?: Partial<{lost?: number}>, __goscriptValue?: boolean) {
-		this.lost = init?.lost ?? (0 as number)
+	constructor(__goscriptValue?: boolean, lost$?: number) {
+		this.lost = lost$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): retransmissionQueueHandshakeAckHandler {
-		return new retransmissionQueueHandshakeAckHandler(this, true)
+		return new retransmissionQueueHandshakeAckHandler(true, this.lost)
 	}
 
 	public __goscriptAssign(source: retransmissionQueueHandshakeAckHandler): this {
@@ -223,13 +223,13 @@ export class retransmissionQueueHandshakeAckHandler {
 export class retransmissionQueueAppDataAckHandler {
 	public declare lost: number
 
-	constructor(init?: Partial<{lost?: number}>, __goscriptValue?: boolean) {
-		this.lost = init?.lost ?? (0 as number)
+	constructor(__goscriptValue?: boolean, lost$?: number) {
+		this.lost = lost$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): retransmissionQueueAppDataAckHandler {
-		return new retransmissionQueueAppDataAckHandler(this, true)
+		return new retransmissionQueueAppDataAckHandler(true, this.lost)
 	}
 
 	public __goscriptAssign(source: retransmissionQueueAppDataAckHandler): this {
@@ -268,7 +268,7 @@ export async function queueFramesForRetransmission(p: packet | $.VarRef<packet> 
 
 export async function main(): globalThis.Promise<void> {
 	let q = new retransmissionQueue()
-	let p = new packet({Frames: $.arrayToSlice<Frame>([(() => { const __goscriptLiteralField0 = (q !== null && (q as any).__isVarRef !== true && (q as any).__goValue === undefined ? ((q as any) as retransmissionQueue).InitialAckHandler() : retransmissionQueue.prototype.InitialAckHandler.call(q)); return new Frame({Frame: $.interfaceValue<wireFrame | null>(new pingFrame(undefined, true), "main.pingFrame", "main.pingFrame"), Handler: __goscriptLiteralField0}, true) })(), (() => { const __goscriptLiteralField1 = (q !== null && (q as any).__isVarRef !== true && (q as any).__goValue === undefined ? ((q as any) as retransmissionQueue).HandshakeAckHandler() : retransmissionQueue.prototype.HandshakeAckHandler.call(q)); return new Frame({Frame: $.interfaceValue<wireFrame | null>(new pingFrame(undefined, true), "main.pingFrame", "main.pingFrame"), Handler: __goscriptLiteralField1}, true) })(), (() => { const __goscriptLiteralField2 = (q !== null && (q as any).__isVarRef !== true && (q as any).__goValue === undefined ? ((q as any) as retransmissionQueue).AppDataAckHandler() : retransmissionQueue.prototype.AppDataAckHandler.call(q)); return new Frame({Frame: $.interfaceValue<wireFrame | null>(new pingFrame(undefined, true), "main.pingFrame", "main.pingFrame"), Handler: __goscriptLiteralField2}, true) })()])})
+	let p = new packet(false, $.arrayToSlice<Frame>([(() => { const __goscriptLiteralField0 = (q !== null && (q as any).__isVarRef !== true && (q as any).__goValue === undefined ? ((q as any) as retransmissionQueue).InitialAckHandler() : retransmissionQueue.prototype.InitialAckHandler.call(q)); return new Frame(true, $.interfaceValue<wireFrame | null>(new pingFrame(true), "main.pingFrame", "main.pingFrame"), __goscriptLiteralField0) })(), (() => { const __goscriptLiteralField1 = (q !== null && (q as any).__isVarRef !== true && (q as any).__goValue === undefined ? ((q as any) as retransmissionQueue).HandshakeAckHandler() : retransmissionQueue.prototype.HandshakeAckHandler.call(q)); return new Frame(true, $.interfaceValue<wireFrame | null>(new pingFrame(true), "main.pingFrame", "main.pingFrame"), __goscriptLiteralField1) })(), (() => { const __goscriptLiteralField2 = (q !== null && (q as any).__isVarRef !== true && (q as any).__goValue === undefined ? ((q as any) as retransmissionQueue).AppDataAckHandler() : retransmissionQueue.prototype.AppDataAckHandler.call(q)); return new Frame(true, $.interfaceValue<wireFrame | null>(new pingFrame(true), "main.pingFrame", "main.pingFrame"), __goscriptLiteralField2) })()]))
 	await queueFramesForRetransmission(p)
 	await $.println("lost:", $.pointerValue<retransmissionQueue>(q).lost)
 	await $.println("done")

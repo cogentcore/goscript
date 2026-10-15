@@ -8,14 +8,14 @@ export class Point {
 
 	public declare Y: number
 
-	constructor(init?: Partial<{X?: number, Y?: number}>, __goscriptValue?: boolean) {
-		this.X = init?.X ?? (0 as number)
-		this.Y = init?.Y ?? (0 as number)
+	constructor(__goscriptValue?: boolean, X$?: number, Y$?: number) {
+		this.X = X$ ?? 0
+		this.Y = Y$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Point {
-		return new Point(this, true)
+		return new Point(true, this.X, this.Y)
 	}
 
 	public __goscriptAssign(source: Point): this {
@@ -45,15 +45,15 @@ export class Box {
 
 	public declare Name: string
 
-	constructor(init?: Partial<{Min?: Point, Max?: Point, Name?: string}>, __goscriptValue?: boolean) {
-		this.Min = init?.Min ? init.Min.clone() : new Point(undefined, true)
-		this.Max = init?.Max ? init.Max.clone() : new Point(undefined, true)
-		this.Name = init?.Name ?? ("" as string)
+	constructor(__goscriptValue?: boolean, Min$?: Point, Max$?: Point, Name$?: string) {
+		this.Min = Min$ ?? new Point(true)
+		this.Max = Max$ ?? new Point(true)
+		this.Name = Name$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Box {
-		return new Box(this, true)
+		return new Box(true, this.Min.clone(), this.Max.clone(), this.Name)
 	}
 
 	public __goscriptAssign(source: Box): this {
@@ -77,14 +77,14 @@ export class Pair {
 
 	public declare B: {"X": number, "Y": number}
 
-	constructor(init?: Partial<{A?: Point, B?: {"X": number, "Y": number}}>, __goscriptValue?: boolean) {
-		this.A = init?.A ? init.A.clone() : new Point(undefined, true)
-		this.B = init?.B ? $.markAsStructValue($.cloneStructValue(init.B)) : $.anonymousStructValue({"X": 0, "Y": 0}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("X", /* @__PURE__ */ $.basicType("int"), [0], 0, true), /* @__PURE__ */ $.structField("Y", /* @__PURE__ */ $.basicType("int"), [1], 8, true)] })
+	constructor(__goscriptValue?: boolean, A$?: Point, B$?: {"X": number, "Y": number}) {
+		this.A = A$ ?? new Point(true)
+		this.B = B$ ?? $.anonymousStructValue({"X": 0, "Y": 0}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("X", /* @__PURE__ */ $.basicType("int"), [0], 0, true), /* @__PURE__ */ $.structField("Y", /* @__PURE__ */ $.basicType("int"), [1], 8, true)] })
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Pair {
-		return new Pair(this, true)
+		return new Pair(true, this.A.clone(), $.markAsStructValue($.cloneStructValue(this.B)))
 	}
 
 	public __goscriptAssign(source: Pair): this {
@@ -107,11 +107,11 @@ export function sum(p: Point): number {
 }
 
 export function unnamedPoint(): Point {
-	return new Point($.anonymousStructValue({X: 4, Y: 5}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("X", /* @__PURE__ */ $.basicType("int"), [0], 0, true), /* @__PURE__ */ $.structField("Y", /* @__PURE__ */ $.basicType("int"), [1], 8, true)] }), true)
+	return ((__goscriptSource) => new Point(true, __goscriptSource.X, __goscriptSource.Y))($.anonymousStructValue({X: 4, Y: 5}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("X", /* @__PURE__ */ $.basicType("int"), [0], 0, true), /* @__PURE__ */ $.structField("Y", /* @__PURE__ */ $.basicType("int"), [1], 8, true)] }))
 }
 
 export async function main(): globalThis.Promise<void> {
-	let p = new Point({X: 1, Y: 2}, true)
+	let p = new Point(true, 1, 2)
 
 	// a named struct value equals an unnamed struct literal of the same
 	// underlying type, in both operand orders
@@ -126,36 +126,36 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("changed unnamed var == named:", $.structEqual(u, p))
 
 	// nested struct fields compare by fields, also when one side is unnamed
-	let b = new Box({Min: new Point({X: 1, Y: 2}, true), Max: new Point({X: 3, Y: 4}, true), Name: "b"}, true)
-	await $.println("nested == unnamed:", $.structEqual(b, $.anonymousStructValue({Min: new Point({X: 1, Y: 2}, true), Max: new Point({X: 3, Y: 4}, true), Name: "b"}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("Min", "main.Point", [0], 0, true), /* @__PURE__ */ $.structField("Max", "main.Point", [1], 16, true), /* @__PURE__ */ $.structField("Name", /* @__PURE__ */ $.basicType("string"), [2], 32, true)] })))
-	await $.println("nested != unnamed:", $.structEqual(b, $.anonymousStructValue({Min: new Point({X: 1, Y: 2}, true), Max: new Point({X: 3, Y: 5}, true), Name: "b"}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("Min", "main.Point", [0], 0, true), /* @__PURE__ */ $.structField("Max", "main.Point", [1], 16, true), /* @__PURE__ */ $.structField("Name", /* @__PURE__ */ $.basicType("string"), [2], 32, true)] })))
+	let b = new Box(true, new Point(true, 1, 2), new Point(true, 3, 4), "b")
+	await $.println("nested == unnamed:", $.structEqual(b, $.anonymousStructValue({Min: new Point(true, 1, 2), Max: new Point(true, 3, 4), Name: "b"}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("Min", "main.Point", [0], 0, true), /* @__PURE__ */ $.structField("Max", "main.Point", [1], 16, true), /* @__PURE__ */ $.structField("Name", /* @__PURE__ */ $.basicType("string"), [2], 32, true)] })))
+	await $.println("nested != unnamed:", $.structEqual(b, $.anonymousStructValue({Min: new Point(true, 1, 2), Max: new Point(true, 3, 5), Name: "b"}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("Min", "main.Point", [0], 0, true), /* @__PURE__ */ $.structField("Max", "main.Point", [1], 16, true), /* @__PURE__ */ $.structField("Name", /* @__PURE__ */ $.basicType("string"), [2], 32, true)] })))
 
 	// a field of unnamed struct type equals a named value of the same
 	// underlying type
-	let pr = new Pair({A: p, B: $.anonymousStructValue({X: 1, Y: 2}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("X", /* @__PURE__ */ $.basicType("int"), [0], 0, true), /* @__PURE__ */ $.structField("Y", /* @__PURE__ */ $.basicType("int"), [1], 8, true)] })}, true)
+	let pr = new Pair(true, (p).clone(), $.anonymousStructValue({X: 1, Y: 2}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("X", /* @__PURE__ */ $.basicType("int"), [0], 0, true), /* @__PURE__ */ $.structField("Y", /* @__PURE__ */ $.basicType("int"), [1], 8, true)] }))
 	await $.println("unnamed field == named:", $.structEqual(pr.B, p))
 	await $.println("named field == unnamed field:", $.structEqual(pr.A, pr.B))
 	pr.B.X = 9
 	await $.println("changed field:", $.structEqual(pr.A, pr.B))
 
 	// conversions between the named and unnamed type keep the fields
-	await $.println("converted:", $.structEqual((() => { const __goscriptConvert0 = pr.B; return $.markAsStructValue(new Point({X: __goscriptConvert0.X, Y: __goscriptConvert0.Y})) })(), new Point({X: 9, Y: 2}, true)))
-	await $.println("converted method:", (() => { const __goscriptConvert1 = pr.B; return $.markAsStructValue(new Point({X: __goscriptConvert1.X, Y: __goscriptConvert1.Y})) })().Sum())
-	await $.println("assigned method:", sum(new Point(pr.B, true)))
+	await $.println("converted:", $.structEqual((() => { const __goscriptConvert0 = pr.B; return new Point(true, __goscriptConvert0.X, __goscriptConvert0.Y) })(), new Point(true, 9, 2)))
+	await $.println("converted method:", (() => { const __goscriptConvert1 = pr.B; return new Point(true, __goscriptConvert1.X, __goscriptConvert1.Y) })().Sum())
+	await $.println("assigned method:", sum(((__goscriptSource) => new Point(true, __goscriptSource.X, __goscriptSource.Y))(pr.B)))
 
 	// unnamed struct values assigned to named struct variables, fields,
 	// elements and results get the methods of the named type
-	let q: Point = new Point(pr.B, true)
+	let q: Point = ((__goscriptSource) => new Point(true, __goscriptSource.X, __goscriptSource.Y))(pr.B)
 	await $.println("var method:", q.Sum())
-	q = q.__goscriptAssign(new Point($.anonymousStructValue({X: 2, Y: 3}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("X", /* @__PURE__ */ $.basicType("int"), [0], 0, true), /* @__PURE__ */ $.structField("Y", /* @__PURE__ */ $.basicType("int"), [1], 8, true)] }), true))
+	q = q.__goscriptAssign(((__goscriptSource) => new Point(true, __goscriptSource.X, __goscriptSource.Y))($.anonymousStructValue({X: 2, Y: 3}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("X", /* @__PURE__ */ $.basicType("int"), [0], 0, true), /* @__PURE__ */ $.structField("Y", /* @__PURE__ */ $.basicType("int"), [1], 8, true)] })))
 	await $.println("assign method:", q.Sum())
 	await $.println("return method:", unnamedPoint().Sum())
-	let pr2 = new Pair({A: new Point($.anonymousStructValue({X: 5, Y: 6}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("X", /* @__PURE__ */ $.basicType("int"), [0], 0, true), /* @__PURE__ */ $.structField("Y", /* @__PURE__ */ $.basicType("int"), [1], 8, true)] }), true)}, true)
+	let pr2 = new Pair(true, ((__goscriptSource) => new Point(true, __goscriptSource.X, __goscriptSource.Y))($.anonymousStructValue({X: 5, Y: 6}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("X", /* @__PURE__ */ $.basicType("int"), [0], 0, true), /* @__PURE__ */ $.structField("Y", /* @__PURE__ */ $.basicType("int"), [1], 8, true)] })))
 	await $.println("field method:", pr2.A.Sum())
-	let ps = $.arrayToSlice<Point>([new Point($.anonymousStructValue({X: 7, Y: 8}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("X", /* @__PURE__ */ $.basicType("int"), [0], 0, true), /* @__PURE__ */ $.structField("Y", /* @__PURE__ */ $.basicType("int"), [1], 8, true)] }), true)])
+	let ps = $.arrayToSlice<Point>([((__goscriptSource) => new Point(true, __goscriptSource.X, __goscriptSource.Y))($.anonymousStructValue({X: 7, Y: 8}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("X", /* @__PURE__ */ $.basicType("int"), [0], 0, true), /* @__PURE__ */ $.structField("Y", /* @__PURE__ */ $.basicType("int"), [1], 8, true)] }))])
 	await $.println("element method:", $.arrayIndex(ps!, 0).Sum())
-	let m = $.makeMap<string, Point>([["a", new Point($.anonymousStructValue({X: 1, Y: 1}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("X", /* @__PURE__ */ $.basicType("int"), [0], 0, true), /* @__PURE__ */ $.structField("Y", /* @__PURE__ */ $.basicType("int"), [1], 8, true)] }), true)]])
-	await $.println("map method:", $.mapGet<string, Point, Point>(m, "a", new Point(undefined, true))[0].Sum())
+	let m = $.makeMap<string, Point>([["a", ((__goscriptSource) => new Point(true, __goscriptSource.X, __goscriptSource.Y))($.anonymousStructValue({X: 1, Y: 1}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("X", /* @__PURE__ */ $.basicType("int"), [0], 0, true), /* @__PURE__ */ $.structField("Y", /* @__PURE__ */ $.basicType("int"), [1], 8, true)] }))]])
+	await $.println("map method:", $.mapGet<string, Point, Point>(m, "a", new Point(true))[0].Sum())
 
 	// as interface values, the named and unnamed types differ
 	let ia: any = $.interfaceValue((p).clone(), "main.Point", "main.Point")
@@ -163,8 +163,8 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("interfaces differ:", $.comparableEqual(ia, ib))
 
 	// an unnamed struct key finds the entry of a named key
-	let keys = $.makeMap<Point, string>([[new Point({X: 1, Y: 2}, true), "one-two"]])
-	await $.println("map key:", $.mapGet<Point, string, string>(keys, new Point($.anonymousStructValue({X: 1, Y: 2}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("X", /* @__PURE__ */ $.basicType("int"), [0], 0, true), /* @__PURE__ */ $.structField("Y", /* @__PURE__ */ $.basicType("int"), [1], 8, true)] }), true), "")[0])
+	let keys = $.makeMap<Point, string>([[new Point(true, 1, 2), "one-two"]])
+	await $.println("map key:", $.mapGet<Point, string, string>(keys, ((__goscriptSource) => new Point(true, __goscriptSource.X, __goscriptSource.Y))($.anonymousStructValue({X: 1, Y: 2}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("X", /* @__PURE__ */ $.basicType("int"), [0], 0, true), /* @__PURE__ */ $.structField("Y", /* @__PURE__ */ $.basicType("int"), [1], 8, true)] })), "")[0])
 }
 
 if ($.isMainScript(import.meta)) {

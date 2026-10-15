@@ -10,7 +10,7 @@ export function box_total(b: __goscript_box.box): number {
 
 export async function main(): globalThis.Promise<void> {
 	await $.println(box_total(3))
-	await $.println(__goscript_box.pile.prototype.drain.call((new __goscript_box.pile({step: 2})), $.arrayToSlice<number>([1, 2, 3, 4, 5])))
+	await $.println(__goscript_box.pile.prototype.drain.call((new __goscript_box.pile(false, 2)), $.arrayToSlice<number>([1, 2, 3, 4, 5])))
 }
 
 if ($.isMainScript(import.meta)) {

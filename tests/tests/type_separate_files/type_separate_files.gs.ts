@@ -6,9 +6,9 @@ import * as __goscript_memory from "./memory.gs.ts"
 import * as __goscript_storage from "./storage.gs.ts"
 
 export async function main(): globalThis.Promise<void> {
-	let s = new __goscript_storage.storage({files: $.makeMap<string, __goscript_memory.file | $.VarRef<__goscript_memory.file> | null>(), children: $.makeMap<string, globalThis.Map<string, __goscript_memory.file | $.VarRef<__goscript_memory.file> | null> | null>()}, true)
+	let s = new __goscript_storage.storage(true, $.makeMap<string, __goscript_memory.file | $.VarRef<__goscript_memory.file> | null>(), $.makeMap<string, globalThis.Map<string, __goscript_memory.file | $.VarRef<__goscript_memory.file> | null> | null>())
 
-	let f = new __goscript_memory.file({name: "test.txt", data: new Uint8Array([104, 101, 108, 108, 111, 32, 119, 111, 114, 108, 100])})
+	let f = new __goscript_memory.file(false, "test.txt", new Uint8Array([104, 101, 108, 108, 111, 32, 119, 111, 114, 108, 100]))
 
 	$.mapSet(s.files, "test", f)
 

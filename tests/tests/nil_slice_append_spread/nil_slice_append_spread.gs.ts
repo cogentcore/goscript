@@ -6,13 +6,13 @@ import * as $ from "@goscript/builtin/index.js"
 export class item {
 	public declare value: string
 
-	constructor(init?: Partial<{value?: string}>, __goscriptValue?: boolean) {
-		this.value = init?.value ?? ("" as string)
+	constructor(__goscriptValue?: boolean, value$?: string) {
+		this.value = value$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): item {
-		return new item(this, true)
+		return new item(true, this.value)
 	}
 
 	public __goscriptAssign(source: item): this {
@@ -34,8 +34,8 @@ export function clone(items: $.Slice<item | $.VarRef<item> | null>): $.Slice<ite
 }
 
 export async function main(): globalThis.Promise<void> {
-	let first = new item({value: "first"})
-	let second = new item({value: "second"})
+	let first = new item(false, "first")
+	let second = new item(false, "second")
 	let items = $.arrayToSlice<item | $.VarRef<item> | null>([first, second])
 	let cloned = clone(items)
 	await $.println($.sliceLen(cloned), $.pointerValue<item>($.arrayIndex(cloned!, 0)).value, $.pointerValue<item>($.arrayIndex(cloned!, 1)).value)

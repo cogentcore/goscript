@@ -18,13 +18,13 @@ $.registerNamedValueType(
 export class AStruct {
 	public declare Msg: string
 
-	constructor(init?: Partial<{Msg?: string}>, __goscriptValue?: boolean) {
-		this.Msg = init?.Msg ?? ("" as string)
+	constructor(__goscriptValue?: boolean, Msg$?: string) {
+		this.Msg = Msg$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): AStruct {
-		return new AStruct(this, true)
+		return new AStruct(true, this.Msg)
 	}
 
 	public __goscriptAssign(source: AStruct): this {

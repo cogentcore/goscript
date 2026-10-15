@@ -21,16 +21,16 @@ export class state {
 
 	public declare c: bigint
 
-	constructor(init?: Partial<{fl?: flags, n?: number, m?: number, c?: bigint}>, __goscriptValue?: boolean) {
-		this.fl = init?.fl ?? (0n as flags)
-		this.n = init?.n ?? (0 as number)
-		this.m = init?.m ?? (0 as number)
-		this.c = init?.c ?? (0n as bigint)
+	constructor(__goscriptValue?: boolean, fl$?: flags, n$?: number, m$?: number, c$?: bigint) {
+		this.fl = fl$ ?? 0n
+		this.n = n$ ?? 0
+		this.m = m$ ?? 0
+		this.c = c$ ?? 0n
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): state {
-		return new state(this, true)
+		return new state(true, this.fl, this.n, this.m, this.c)
 	}
 
 	public __goscriptAssign(source: state): this {
@@ -132,7 +132,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println($.pointerEqual(keptFlags, $.fieldRef((s$ as state), "fl")), (s$ as state).n)
 
 	// A struct value's fields work the same.
-	let v: state = new state(undefined, true)
+	let v: state = new state(true)
 	flags__set($.transientFieldRef(v, "fl"), 1)
 	incTwice($.transientFieldRef(v, "m"))
 	await $.println(flags_has($.transientFieldRef(v, "fl"), 1), flags_has($.transientFieldRef(v, "fl"), 3), v.m)

@@ -6,13 +6,13 @@ import * as $ from "@goscript/builtin/index.js"
 export class item {
 	public declare name: string
 
-	constructor(init?: Partial<{name?: string}>, __goscriptValue?: boolean) {
-		this.name = init?.name ?? ("" as string)
+	constructor(__goscriptValue?: boolean, name$?: string) {
+		this.name = name$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): item {
-		return new item(this, true)
+		return new item(true, this.name)
 	}
 
 	public __goscriptAssign(source: item): this {
@@ -38,7 +38,7 @@ export class item {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let items = $.arrayToSlice<item>([new item({name: "alpha"}, true), new item({name: "beta"}, true)])
+	let items = $.arrayToSlice<item>([new item(true, "alpha"), new item(true, "beta")])
 	for (let __goscriptRangeTarget0 = items, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
 		let item = $.varRef(((__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as item)).clone())
 		await $.println(item.value.Name())

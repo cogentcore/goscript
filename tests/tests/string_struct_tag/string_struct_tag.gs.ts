@@ -10,14 +10,14 @@ export class Item {
 
 	public declare Plain: string
 
-	constructor(init?: Partial<{Size?: number, Plain?: string}>, __goscriptValue?: boolean) {
-		this.Size = init?.Size ?? (0 as number)
-		this.Plain = init?.Plain ?? ("" as string)
+	constructor(__goscriptValue?: boolean, Size$?: number, Plain$?: string) {
+		this.Size = Size$ ?? 0
+		this.Plain = Plain$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Item {
-		return new Item(this, true)
+		return new Item(true, this.Size, this.Plain)
 	}
 
 	public __goscriptAssign(source: Item): this {
@@ -37,15 +37,15 @@ export class Item {
 
 export async function main(): globalThis.Promise<void> {
 	// A non-ASCII struct tag is a Go string of its UTF-8 bytes.
-	let [field, ] = await $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.interfaceValue(new Item(undefined, true), "main.Item", "main.Item"))).FieldByName("Size")
+	let [field, ] = await $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.interfaceValue(new Item(true), "main.Item", "main.Item"))).FieldByName("Size")
 	let label = reflect.StructTag_Get(field.Tag, "label")
 	await $.println("label:", label, $.stringLen(label), $.stringEqual(label, "Gr\xc3\xb6\xc3\x9fe"))
 
 	// Its JSON name round-trips through encoding/json.
-	let __goscriptTuple0: any = (json.Marshal($.interfaceValue(new Item({Size: 3, Plain: "x"}, true), "main.Item", "main.Item")) as [$.Slice<number>, $.GoError])
+	let __goscriptTuple0: any = (json.Marshal($.interfaceValue(new Item(true, 3, "x"), "main.Item", "main.Item")) as [$.Slice<number>, $.GoError])
 	let data: $.Slice<number> = __goscriptTuple0[0]
 	await $.println("json:", $.bytesToString(data), $.stringEqual($.bytesToString(data), "{\"gr\xc3\xb6\xc3\x9fe\":3,\"plain\":\"x\"}"))
-	let back: $.VarRef<Item> = $.varRef(new Item(undefined, true))
+	let back: $.VarRef<Item> = $.varRef(new Item(true))
 	let err = (json.Unmarshal(data, $.interfaceValue(back, "*main.Item", /* @__PURE__ */ $.pointerType("main.Item"))) as $.GoError)
 	await $.println("back:", err == null, back.value.Size, back.value.Plain)
 }

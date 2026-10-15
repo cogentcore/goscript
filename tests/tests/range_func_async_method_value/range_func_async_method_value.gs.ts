@@ -16,13 +16,13 @@ $.registerInterfaceType(
 export class listProvider {
 	public declare items: $.Slice<Group | $.VarRef<Group> | null>
 
-	constructor(init?: Partial<{items?: $.Slice<Group | $.VarRef<Group> | null>}>, __goscriptValue?: boolean) {
-		this.items = init?.items ?? (null! as $.Slice<Group | $.VarRef<Group> | null>)
+	constructor(__goscriptValue?: boolean, items$?: $.Slice<Group | $.VarRef<Group> | null>) {
+		this.items = items$ ?? (null! as $.Slice<Group | $.VarRef<Group> | null>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): listProvider {
-		return new listProvider(this, true)
+		return new listProvider(true, this.items)
 	}
 
 	public __goscriptAssign(source: listProvider): this {
@@ -49,14 +49,14 @@ export class Group {
 
 	public declare seen: boolean
 
-	constructor(init?: Partial<{provider?: provider | null, seen?: boolean}>, __goscriptValue?: boolean) {
-		this.provider = init?.provider ?? (null! as provider | null)
-		this.seen = init?.seen ?? (false as boolean)
+	constructor(__goscriptValue?: boolean, provider$?: provider | null, seen$?: boolean) {
+		this.provider = provider$ ?? (null! as provider | null)
+		this.seen = seen$ ?? false
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Group {
-		return new Group(this, true)
+		return new Group(true, this.provider, this.seen)
 	}
 
 	public __goscriptAssign(source: Group): this {
@@ -100,7 +100,7 @@ export class Group {
 
 export async function main(): globalThis.Promise<void> {
 	let child = new Group()
-	let root = new Group({provider: $.interfaceValue<provider | null>(new listProvider({items: $.arrayToSlice<Group | $.VarRef<Group> | null>([child])}), "*main.listProvider", /* @__PURE__ */ $.pointerType("main.listProvider"))})
+	let root = new Group(false, $.interfaceValue<provider | null>(new listProvider(false, $.arrayToSlice<Group | $.VarRef<Group> | null>([child])), "*main.listProvider", /* @__PURE__ */ $.pointerType("main.listProvider")))
 	void (root !== null && (root as any).__isVarRef !== true && (root as any).__goValue === undefined ? ((root as any) as Group).Build() : Group.prototype.Build.call(root))
 	await $.println($.pointerValue<Group>(child).seen)
 }

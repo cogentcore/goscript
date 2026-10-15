@@ -6,13 +6,13 @@ import * as $ from "@goscript/builtin/index.js"
 export class item {
 	public declare values: $.Slice<number>
 
-	constructor(init?: Partial<{values?: $.Slice<number>}>, __goscriptValue?: boolean) {
-		this.values = init?.values ?? (null! as $.Slice<number>)
+	constructor(__goscriptValue?: boolean, values$?: $.Slice<number>) {
+		this.values = values$ ?? (null! as $.Slice<number>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): item {
-		return new item(this, true)
+		return new item(true, this.values)
 	}
 
 	public __goscriptAssign(source: item): this {
@@ -30,9 +30,9 @@ export class item {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let items = $.makeMap<string, item>([["one", new item({values: $.arrayToSlice<number>([1, 2, 3])}, true)]])
+	let items = $.makeMap<string, item>([["one", new item(true, $.arrayToSlice<number>([1, 2, 3]))]])
 	{
-		let [__goscriptShadow0, ok] = $.mapGet<string, item, item>(items, "one", new item(undefined, true))
+		let [__goscriptShadow0, ok] = $.mapGet<string, item, item>(items, "one", new item(true))
 		if (ok) {
 			await $.println("values:", $.sliceLen(__goscriptShadow0.values))
 		}

@@ -23,20 +23,20 @@ export class Payload {
 
 	public declare PtrBool: $.VarRef<boolean> | null
 
-	constructor(init?: Partial<{Ptr?: $.VarRef<number> | null, IfaceZero?: any, IfaceFalse?: any, IfaceEmptyString?: any, IfaceEmptySlice?: any, IfaceEmptyMap?: any, PtrNilIface?: $.VarRef<any> | null, PtrBool?: $.VarRef<boolean> | null}>, __goscriptValue?: boolean) {
-		this.Ptr = init?.Ptr ?? (null! as $.VarRef<number> | null)
-		this.IfaceZero = init?.IfaceZero ?? (null! as any)
-		this.IfaceFalse = init?.IfaceFalse ?? (null! as any)
-		this.IfaceEmptyString = init?.IfaceEmptyString ?? (null! as any)
-		this.IfaceEmptySlice = init?.IfaceEmptySlice ?? (null! as any)
-		this.IfaceEmptyMap = init?.IfaceEmptyMap ?? (null! as any)
-		this.PtrNilIface = init?.PtrNilIface ?? (null! as $.VarRef<any> | null)
-		this.PtrBool = init?.PtrBool ?? (null! as $.VarRef<boolean> | null)
+	constructor(__goscriptValue?: boolean, Ptr$?: $.VarRef<number> | null, IfaceZero$?: any, IfaceFalse$?: any, IfaceEmptyString$?: any, IfaceEmptySlice$?: any, IfaceEmptyMap$?: any, PtrNilIface$?: $.VarRef<any> | null, PtrBool$?: $.VarRef<boolean> | null) {
+		this.Ptr = Ptr$ ?? (null! as $.VarRef<number> | null)
+		this.IfaceZero = IfaceZero$ ?? (null! as any)
+		this.IfaceFalse = IfaceFalse$ ?? (null! as any)
+		this.IfaceEmptyString = IfaceEmptyString$ ?? (null! as any)
+		this.IfaceEmptySlice = IfaceEmptySlice$ ?? (null! as any)
+		this.IfaceEmptyMap = IfaceEmptyMap$ ?? (null! as any)
+		this.PtrNilIface = PtrNilIface$ ?? (null! as $.VarRef<any> | null)
+		this.PtrBool = PtrBool$ ?? (null! as $.VarRef<boolean> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Payload {
-		return new Payload(this, true)
+		return new Payload(true, this.Ptr, this.IfaceZero, this.IfaceFalse, this.IfaceEmptyString, this.IfaceEmptySlice, this.IfaceEmptyMap, this.PtrNilIface, this.PtrBool)
 	}
 
 	public __goscriptAssign(source: Payload): this {
@@ -64,7 +64,7 @@ export async function main(): globalThis.Promise<void> {
 	let zero = $.varRef(0)
 	let falseValue = $.varRef(false)
 	let nilIface: $.VarRef<any> = $.varRef(null! as any)
-	let __goscriptTuple0: any = (json.Marshal($.interfaceValue(new Payload({Ptr: zero, IfaceZero: $.basicInterfaceValue(0, "int"), IfaceFalse: false, IfaceEmptyString: "", IfaceEmptySlice: $.interfaceValue($.arrayToSlice<number>([]), "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"))), IfaceEmptyMap: $.interfaceValue($.makeMap<string, number>([]), "map[string]int", /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("int"))), PtrNilIface: nilIface, PtrBool: falseValue}, true), "main.Payload", "main.Payload")) as [$.Slice<number>, $.GoError])
+	let __goscriptTuple0: any = (json.Marshal($.interfaceValue(new Payload(true, zero, $.basicInterfaceValue(0, "int"), false, "", $.interfaceValue($.arrayToSlice<number>([]), "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"))), $.interfaceValue($.makeMap<string, number>([]), "map[string]int", /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("int"))), nilIface, falseValue), "main.Payload", "main.Payload")) as [$.Slice<number>, $.GoError])
 	let out: $.Slice<number> = __goscriptTuple0[0]
 	let err = __goscriptTuple0[1]
 	if (err != null) {

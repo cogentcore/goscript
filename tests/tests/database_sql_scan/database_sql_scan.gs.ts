@@ -15,14 +15,14 @@ export class connector {
 
 	public declare blob: boolean
 
-	constructor(init?: Partial<{direct?: boolean, blob?: boolean}>, __goscriptValue?: boolean) {
-		this.direct = init?.direct ?? (false as boolean)
-		this.blob = init?.blob ?? (false as boolean)
+	constructor(__goscriptValue?: boolean, direct$?: boolean, blob$?: boolean) {
+		this.direct = direct$ ?? false
+		this.blob = blob$ ?? false
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): connector {
-		return new connector(this, true)
+		return new connector(true, this.direct, this.blob)
 	}
 
 	public __goscriptAssign(source: connector): this {
@@ -73,7 +73,7 @@ export class connector {
 		if (c.direct) {
 			return [$.interfaceValue<driver.Rows | null>(new columnRows(), "*main.columnRows", /* @__PURE__ */ $.pointerType("main.columnRows")), null]
 		}
-		return [$.interfaceValue<driver.Rows | null>(new rows({blob: c.blob}), "*main.rows", /* @__PURE__ */ $.pointerType("main.rows")), null]
+		return [$.interfaceValue<driver.Rows | null>(new rows(false, undefined, c.blob), "*main.rows", /* @__PURE__ */ $.pointerType("main.rows")), null]
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -90,14 +90,14 @@ export class rows {
 
 	public declare blob: boolean
 
-	constructor(init?: Partial<{done?: boolean, blob?: boolean}>, __goscriptValue?: boolean) {
-		this.done = init?.done ?? (false as boolean)
-		this.blob = init?.blob ?? (false as boolean)
+	constructor(__goscriptValue?: boolean, done$?: boolean, blob$?: boolean) {
+		this.done = done$ ?? false
+		this.blob = blob$ ?? false
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): rows {
-		return new rows(this, true)
+		return new rows(true, this.done, this.blob)
 	}
 
 	public __goscriptAssign(source: rows): this {
@@ -141,13 +141,13 @@ export class rows {
 export class columnRows {
 	public declare rows: rows
 
-	constructor(init?: Partial<{rows?: rows}>, __goscriptValue?: boolean) {
-		this.rows = init?.rows ? init.rows.clone() : new rows(undefined, true)
+	constructor(__goscriptValue?: boolean, rows$?: rows) {
+		this.rows = rows$ ?? new rows(true)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): columnRows {
-		return new columnRows(this, true)
+		return new columnRows(true, this.rows.clone())
 	}
 
 	public __goscriptAssign(source: columnRows): this {
@@ -197,7 +197,7 @@ export class columnRows {
 export async function main(): globalThis.Promise<void> {
 	for (let __goscriptRangeTarget0 = $.arrayToSlice<boolean>([false, true]), __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
 		let direct = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as boolean)
-		let db = await sql.OpenDB($.interfaceValue<driver.Connector | null>(new connector({direct: direct}, true), "main.connector", "main.connector"))
+		let db = await sql.OpenDB($.interfaceValue<driver.Connector | null>(new connector(true, direct), "main.connector", "main.connector"))
 		{
 			let [, err] = await (db !== null && (db as any).__isVarRef !== true && (db as any).__goValue === undefined ? ((db as any) as sql.DB).ExecContext(context.Background(), "create", null) : sql.DB.prototype.ExecContext.call(db, context.Background(), "create", null))
 			if (err != null) {
@@ -227,7 +227,7 @@ export async function main(): globalThis.Promise<void> {
 		}
 	}
 	await $.println("zero context", value.value)
-	let db = await sql.OpenDB($.interfaceValue<driver.Connector | null>(new connector({blob: true}, true), "main.connector", "main.connector"))
+	let db = await sql.OpenDB($.interfaceValue<driver.Connector | null>(new connector(true, undefined, true), "main.connector", "main.connector"))
 	let data: $.VarRef<$.Slice<number>> = $.varRef(null! as $.Slice<number>)
 	{
 		let err = await sql.Row.prototype.Scan.call(await (db !== null && (db as any).__isVarRef !== true && (db as any).__goValue === undefined ? ((db as any) as sql.DB).QueryRow("blob", null) : sql.DB.prototype.QueryRow.call(db, "blob", null)), $.arrayToSlice<any>([$.interfaceValue(data, "*[]byte", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))))]))

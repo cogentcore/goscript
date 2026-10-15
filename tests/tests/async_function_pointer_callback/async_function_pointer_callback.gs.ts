@@ -12,13 +12,13 @@ export type SnapFunc = ((n: number) => [$.VarRef<number> | null, $.Slice<number>
 export class Snapshot {
 	public declare base: number
 
-	constructor(init?: Partial<{base?: number}>, __goscriptValue?: boolean) {
-		this.base = init?.base ?? (0 as number)
+	constructor(__goscriptValue?: boolean, base$?: number) {
+		this.base = base$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Snapshot {
-		return new Snapshot(this, true)
+		return new Snapshot(true, this.base)
 	}
 
 	public __goscriptAssign(source: Snapshot): this {
@@ -50,13 +50,13 @@ export class Snapshot {
 export class Host {
 	public declare process: atomic.Pointer<Process>
 
-	constructor(init?: Partial<{process?: atomic.Pointer<Process>}>, __goscriptValue?: boolean) {
-		this.process = init?.process ? $.markAsStructValue($.cloneStructValue(init.process)) : $.markAsStructValue(new atomic.Pointer<Process>())
+	constructor(__goscriptValue?: boolean, process$?: atomic.Pointer<Process>) {
+		this.process = process$ ?? $.markAsStructValue(new atomic.Pointer<Process>())
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Host {
-		return new Host(this, true)
+		return new Host(true, $.markAsStructValue($.cloneStructValue(this.process)))
 	}
 
 	public __goscriptAssign(source: Host): this {
@@ -71,7 +71,7 @@ export class Host {
 			return (null as ((n: number) => [number, $.GoError] | globalThis.Promise<[number, $.GoError]>) | null)
 		}
 		return $.functionValue(async (n: number): globalThis.Promise<[number, $.GoError]> => {
-			let snap = new Snapshot({base: 10})
+			let snap = new Snapshot(false, 10)
 			return Snapshot.prototype.Apply.call(snap, n, $.functionValue(async (n: number): globalThis.Promise<[$.VarRef<number> | null, $.Slice<number>, $.GoError]> => {
 				return ($.pointerValue<Process>(cb))!(snap, n)
 			}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int")), /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")), "error"] } as $.FunctionTypeInfo)))

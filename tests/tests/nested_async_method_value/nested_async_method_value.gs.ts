@@ -16,13 +16,13 @@ $.registerInterfaceType(
 export class Worker {
 	public declare ch: $.Channel<number> | null
 
-	constructor(init?: Partial<{ch?: $.Channel<number> | null}>, __goscriptValue?: boolean) {
-		this.ch = init?.ch ?? (null! as $.Channel<number> | null)
+	constructor(__goscriptValue?: boolean, ch$?: $.Channel<number> | null) {
+		this.ch = ch$ ?? (null! as $.Channel<number> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Worker {
-		return new Worker(this, true)
+		return new Worker(true, this.ch)
 	}
 
 	public __goscriptAssign(source: Worker): this {
@@ -57,7 +57,7 @@ export async function run(fn: (() => $.GoError | globalThis.Promise<$.GoError>) 
 }
 
 export async function main(): globalThis.Promise<void> {
-	let w = new Worker({ch: $.makeChannel<number>(1, 0, "both")})
+	let w = new Worker(false, $.makeChannel<number>(1, 0, "both"))
 	await run($.functionValue(((__receiver) => () => __receiver.Spawn())($.pointerValue<Worker>(w)), ({ kind: $.TypeKind.Function, params: [], results: ["error"] } as $.FunctionTypeInfo), "main.(*Worker).Spawn-fm"))
 
 	let s: Spawner | null = $.interfaceValue<Spawner | null>(w, "*main.Worker", /* @__PURE__ */ $.pointerType("main.Worker"))

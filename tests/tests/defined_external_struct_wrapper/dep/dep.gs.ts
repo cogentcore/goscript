@@ -8,13 +8,13 @@ $.registerTypePackagePath("github.com/s4wave/goscript/tests/tests/defined_extern
 export class hidden {
 	public declare label: string
 
-	constructor(init?: Partial<{label?: string}>, __goscriptValue?: boolean) {
-		this.label = init?.label ?? ("" as string)
+	constructor(__goscriptValue?: boolean, label$?: string) {
+		this.label = label$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): hidden {
-		return new hidden(this, true)
+		return new hidden(true, this.label)
 	}
 
 	public __goscriptAssign(source: hidden): this {
@@ -36,14 +36,14 @@ export class Public {
 
 	public declare Hidden: hidden
 
-	constructor(init?: Partial<{Value?: string, Hidden?: hidden}>, __goscriptValue?: boolean) {
-		this.Value = init?.Value ?? ("" as string)
-		this.Hidden = init?.Hidden ? init.Hidden.clone() : new hidden(undefined, true)
+	constructor(__goscriptValue?: boolean, Value$?: string, Hidden$?: hidden) {
+		this.Value = Value$ ?? ""
+		this.Hidden = Hidden$ ?? new hidden(true)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Public {
-		return new Public(this, true)
+		return new Public(true, this.Value, this.Hidden.clone())
 	}
 
 	public __goscriptAssign(source: Public): this {

@@ -8,13 +8,13 @@ import "@goscript/unsafe/index.js"
 export class first {
 	public declare X: number
 
-	constructor(init?: Partial<{X?: number}>, __goscriptValue?: boolean) {
-		this.X = init?.X ?? (0 as number)
+	constructor(__goscriptValue?: boolean, X$?: number) {
+		this.X = X$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): first {
-		return new first(this, true)
+		return new first(true, this.X)
 	}
 
 	public __goscriptAssign(source: first): this {
@@ -34,13 +34,13 @@ export class first {
 export class second {
 	public declare X: number
 
-	constructor(init?: Partial<{X?: number}>, __goscriptValue?: boolean) {
-		this.X = init?.X ?? (0 as number)
+	constructor(__goscriptValue?: boolean, X$?: number) {
+		this.X = X$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): second {
-		return new second(this, true)
+		return new second(true, this.X)
 	}
 
 	public __goscriptAssign(source: second): this {
@@ -59,8 +59,8 @@ export class second {
 
 export async function main(): globalThis.Promise<void> {
 	// Distinct pointers before and after an unsafe view is made.
-	let a = new first({X: 1})
-	let other = new first({X: 1})
+	let a = new first(false, 1)
+	let other = new first(false, 1)
 	await $.println("same:", (a === a || $.pointerAliasesMade && $.pointerEqual(a, a)), (a !== a && !($.pointerAliasesMade && $.pointerEqual(a, a))))
 	await $.println("distinct:", (a === other || $.pointerAliasesMade && $.pointerEqual(a, other)), (a !== other && !($.pointerAliasesMade && $.pointerEqual(a, other))))
 

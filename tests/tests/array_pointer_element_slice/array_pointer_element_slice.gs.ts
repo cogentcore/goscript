@@ -8,14 +8,14 @@ export class node {
 
 	public declare sub0: (node | $.VarRef<node> | null)[]
 
-	constructor(init?: Partial<{sub?: $.Slice<node | $.VarRef<node> | null>, sub0?: (node | $.VarRef<node> | null)[]}>, __goscriptValue?: boolean) {
-		this.sub = init?.sub ?? (null! as $.Slice<node | $.VarRef<node> | null>)
-		this.sub0 = init?.sub0 !== undefined ? $.cloneArrayValue(init.sub0, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.pointerType("main.node"), 1)) : $.arrayValue(globalThis.Array.from({ length: 1 }, () => null))
+	constructor(__goscriptValue?: boolean, sub$?: $.Slice<node | $.VarRef<node> | null>, sub0$?: (node | $.VarRef<node> | null)[]) {
+		this.sub = sub$ ?? (null! as $.Slice<node | $.VarRef<node> | null>)
+		this.sub0 = sub0$ ?? $.arrayValue(globalThis.Array.from({ length: 1 }, () => null))
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): node {
-		return new node(this, true)
+		return new node(true, this.sub, $.cloneArrayValue(this.sub0, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.pointerType("main.node"), 1)))
 	}
 
 	public __goscriptAssign(source: node): this {

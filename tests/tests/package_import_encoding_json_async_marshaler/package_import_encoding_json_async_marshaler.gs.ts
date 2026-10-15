@@ -10,13 +10,13 @@ import * as sync from "@goscript/sync/index.js"
 export class Image {
 	public declare Name: string
 
-	constructor(init?: Partial<{Name?: string}>, __goscriptValue?: boolean) {
-		this.Name = init?.Name ?? ("" as string)
+	constructor(__goscriptValue?: boolean, Name$?: string) {
+		this.Name = Name$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Image {
-		return new Image(this, true)
+		return new Image(true, this.Name)
 	}
 
 	public __goscriptAssign(source: Image): this {
@@ -73,15 +73,15 @@ export class Doc {
 
 	public declare Note: string
 
-	constructor(init?: Partial<{Title?: string, Image?: Image | $.VarRef<Image> | null, Note?: string}>, __goscriptValue?: boolean) {
-		this.Title = init?.Title ?? ("" as string)
-		this.Image = init?.Image ?? (null! as Image | $.VarRef<Image> | null)
-		this.Note = init?.Note ?? ("" as string)
+	constructor(__goscriptValue?: boolean, Title$?: string, Image$?: Image | $.VarRef<Image> | null, Note$?: string) {
+		this.Title = Title$ ?? ""
+		this.Image = Image$ ?? (null! as Image | $.VarRef<Image> | null)
+		this.Note = Note$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Doc {
-		return new Doc(this, true)
+		return new Doc(true, this.Title, this.Image, this.Note)
 	}
 
 	public __goscriptAssign(source: Doc): this {
@@ -107,7 +107,7 @@ export function __goscript_set_mu(__goscriptValue: sync.Mutex): void {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let __goscriptTuple0: any = (json.Marshal($.interfaceValue(new Image({Name: "top"}), "*main.Image", /* @__PURE__ */ $.pointerType("main.Image"))) as [$.Slice<number>, $.GoError])
+	let __goscriptTuple0: any = (json.Marshal($.interfaceValue(new Image(false, "top"), "*main.Image", /* @__PURE__ */ $.pointerType("main.Image"))) as [$.Slice<number>, $.GoError])
 	let b: $.Slice<number> = __goscriptTuple0[0]
 	let err = __goscriptTuple0[1]
 	await $.println("top:", $.bytesToString(b), err == null)
@@ -116,7 +116,7 @@ export async function main(): globalThis.Promise<void> {
 	err = (json.Unmarshal(b, $.interfaceValue(im, "*main.Image", /* @__PURE__ */ $.pointerType("main.Image"))) as $.GoError)
 	await $.println("top back:", $.pointerValue<Image>(im).Name, err == null)
 
-	let doc = new Doc({Title: "t", Image: new Image({Name: "nested"}), Note: "n"})
+	let doc = new Doc(false, "t", new Image(false, "nested"), "n")
 	let __goscriptTuple1: any = (json.Marshal($.interfaceValue(doc, "*main.Doc", /* @__PURE__ */ $.pointerType("main.Doc"))) as [$.Slice<number>, $.GoError])
 	b = __goscriptTuple1[0]
 	err = __goscriptTuple1[1]
@@ -132,7 +132,7 @@ export async function main(): globalThis.Promise<void> {
 	err = (json.Unmarshal(b, $.interfaceValue(back, "*main.Doc", /* @__PURE__ */ $.pointerType("main.Doc"))) as $.GoError)
 	await $.println("doc back:", (back$ as Doc).Title, $.pointerValue<Image>((back$ as Doc).Image).Name, (back$ as Doc).Note, err == null)
 
-	let __goscriptTuple3: any = (json.Marshal($.interfaceValue(new Doc({Image: new Image({Name: "bad"})}), "*main.Doc", /* @__PURE__ */ $.pointerType("main.Doc"))) as [$.Slice<number>, $.GoError])
+	let __goscriptTuple3: any = (json.Marshal($.interfaceValue(new Doc(false, undefined, new Image(false, "bad")), "*main.Doc", /* @__PURE__ */ $.pointerType("main.Doc"))) as [$.Slice<number>, $.GoError])
 	err = __goscriptTuple3[1]
 	await $.println("marshal error:", strings.HasSuffix((__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), ": cannot marshal bad image"))
 

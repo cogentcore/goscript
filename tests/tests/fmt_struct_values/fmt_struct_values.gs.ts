@@ -12,13 +12,13 @@ export class Inner {
 	// Ready is included even when it is false.
 	public declare Ready: boolean
 
-	constructor(init?: Partial<{Ready?: boolean}>, __goscriptValue?: boolean) {
-		this.Ready = init?.Ready ?? (false as boolean)
+	constructor(__goscriptValue?: boolean, Ready$?: boolean) {
+		this.Ready = Ready$ ?? false
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Inner {
-		return new Inner(this, true)
+		return new Inner(true, this.Ready)
 	}
 
 	public __goscriptAssign(source: Inner): this {
@@ -45,15 +45,15 @@ export class Record {
 	// Inner is a nested value.
 	public declare Inner: Inner
 
-	constructor(init?: Partial<{Count?: number, name?: string, Inner?: Inner}>, __goscriptValue?: boolean) {
-		this.Count = init?.Count ?? (0 as number)
-		this.name = init?.name ?? ("" as string)
-		this.Inner = init?.Inner ? init.Inner.clone() : new Inner(undefined, true)
+	constructor(__goscriptValue?: boolean, Count$?: number, name$?: string, Inner$?: Inner) {
+		this.Count = Count$ ?? 0
+		this.name = name$ ?? ""
+		this.Inner = Inner$ ?? new Inner(true)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Record {
-		return new Record(this, true)
+		return new Record(true, this.Count, this.name, this.Inner.clone())
 	}
 
 	public __goscriptAssign(source: Record): this {
@@ -82,15 +82,15 @@ export class Pointers {
 	// Dynamic holds a pointer behind an interface.
 	public declare Dynamic: any
 
-	constructor(init?: Partial<{Value?: $.VarRef<number> | null, Next?: Pointers | $.VarRef<Pointers> | null, Dynamic?: any}>, __goscriptValue?: boolean) {
-		this.Value = init?.Value ?? (null! as $.VarRef<number> | null)
-		this.Next = init?.Next ?? (null! as Pointers | $.VarRef<Pointers> | null)
-		this.Dynamic = init?.Dynamic ?? (null! as any)
+	constructor(__goscriptValue?: boolean, Value$?: $.VarRef<number> | null, Next$?: Pointers | $.VarRef<Pointers> | null, Dynamic$?: any) {
+		this.Value = Value$ ?? (null! as $.VarRef<number> | null)
+		this.Next = Next$ ?? (null! as Pointers | $.VarRef<Pointers> | null)
+		this.Dynamic = Dynamic$ ?? (null! as any)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Pointers {
-		return new Pointers(this, true)
+		return new Pointers(true, this.Value, this.Next, this.Dynamic)
 	}
 
 	public __goscriptAssign(source: Pointers): this {
@@ -116,15 +116,15 @@ export class Node {
 
 	public declare Kids: $.Slice<Node | $.VarRef<Node> | null>
 
-	constructor(init?: Partial<{Name?: string, Parent?: Node | $.VarRef<Node> | null, Kids?: $.Slice<Node | $.VarRef<Node> | null>}>, __goscriptValue?: boolean) {
-		this.Name = init?.Name ?? ("" as string)
-		this.Parent = init?.Parent ?? (null! as Node | $.VarRef<Node> | null)
-		this.Kids = init?.Kids ?? (null! as $.Slice<Node | $.VarRef<Node> | null>)
+	constructor(__goscriptValue?: boolean, Name$?: string, Parent$?: Node | $.VarRef<Node> | null, Kids$?: $.Slice<Node | $.VarRef<Node> | null>) {
+		this.Name = Name$ ?? ""
+		this.Parent = Parent$ ?? (null! as Node | $.VarRef<Node> | null)
+		this.Kids = Kids$ ?? (null! as $.Slice<Node | $.VarRef<Node> | null>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Node {
-		return new Node(this, true)
+		return new Node(true, this.Name, this.Parent, this.Kids)
 	}
 
 	public __goscriptAssign(source: Node): this {
@@ -148,14 +148,14 @@ export class Base {
 
 	public declare Active: any
 
-	constructor(init?: Partial<{Windows?: $.Slice<any>, Active?: any}>, __goscriptValue?: boolean, __goscriptFresh?: boolean) {
-		this.Windows = init?.Windows ?? (null! as $.Slice<any>)
-		this.Active = init?.Active !== undefined ? (__goscriptFresh === true ? init.Active : $.copyElement(init.Active)) : (null! as any)
+	constructor(__goscriptValue?: boolean, Windows$?: $.Slice<any>, Active$?: any) {
+		this.Windows = Windows$ ?? (null! as $.Slice<any>)
+		this.Active = Active$ ?? (null! as any)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Base {
-		return new Base(this, true)
+		return new Base(true, this.Windows, $.copyElement(this.Active))
 	}
 
 	public __goscriptAssign(source: Base): this {
@@ -178,14 +178,14 @@ export class App {
 
 	public declare Name: string
 
-	constructor(init?: Partial<{Base?: Base, Name?: string}>, __goscriptValue?: boolean) {
-		this.Base = init?.Base ? init.Base.clone() : $.markAsStructValue(new Base({Active: null! as Win | $.VarRef<Win> | null}, undefined, true))
-		this.Name = init?.Name ?? ("" as string)
+	constructor(__goscriptValue?: boolean, Base$?: Base, Name$?: string) {
+		this.Base = Base$ ?? new Base(true, undefined, null! as Win | $.VarRef<Win> | null)
+		this.Name = Name$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): App {
-		return new App(this, true)
+		return new App(true, this.Base.clone(), this.Name)
 	}
 
 	public __goscriptAssign(source: App): this {
@@ -208,14 +208,14 @@ export class Win {
 
 	public declare Title: string
 
-	constructor(init?: Partial<{App?: App | $.VarRef<App> | null, Title?: string}>, __goscriptValue?: boolean) {
-		this.App = init?.App ?? (null! as App | $.VarRef<App> | null)
-		this.Title = init?.Title ?? ("" as string)
+	constructor(__goscriptValue?: boolean, App$?: App | $.VarRef<App> | null, Title$?: string) {
+		this.App = App$ ?? (null! as App | $.VarRef<App> | null)
+		this.Title = Title$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Win {
-		return new Win(this, true)
+		return new Win(true, this.App, this.Title)
 	}
 
 	public __goscriptAssign(source: Win): this {
@@ -234,7 +234,7 @@ export class Win {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let value = $.varRef(new Record({Count: 3, name: "hello", Inner: new Inner({Ready: true}, true)}, true))
+	let value = $.varRef(new Record(true, 3, "hello", new Inner(true, true)))
 	await $.println((fmt.Sprintf("%v", $.interfaceValue((value.value).clone(), "main.Record", "main.Record")) as string))
 	await $.println((fmt.Sprintf("%+v", $.interfaceValue((value.value).clone(), "main.Record", "main.Record")) as string))
 	await $.println((fmt.Sprintf("%v", $.interfaceValue(value, "*main.Record", /* @__PURE__ */ $.pointerType("main.Record"))) as string))
@@ -251,7 +251,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// Addresses differ across runtimes; their identity and surrounding text agree.
 	let count = $.varRef(7)
-	let pointers = $.varRef(new Pointers({Value: count}, true))
+	let pointers = $.varRef(new Pointers(true, count))
 	pointers.value.Next = pointers
 	pointers.value.Dynamic = $.interfaceValue(pointers, "*main.Pointers", /* @__PURE__ */ $.pointerType("main.Pointers"))
 	let text = await fmt.Sprintf("%+v", $.interfaceValue(pointers, "*main.Pointers", /* @__PURE__ */ $.pointerType("main.Pointers")))
@@ -260,13 +260,13 @@ export async function main(): globalThis.Promise<void> {
 	await $.println(text)
 
 	// Pointers nested in slices and struct cycles print as addresses.
-	let root = new Node({Name: "root"})
+	let root = new Node(false, "root")
 	let root$: Node = root == null ? $.pointerTarget<Node>(root) : (root as any).__isVarRef === true ? (root as any).value : (root as any).__goValue === undefined ? (root as any) : $.pointerTarget<Node>(root)
-	let kid = new Node({Name: "kid", Parent: root});
+	let kid = new Node(false, "kid", root);
 	;(root$ as Node).Kids = $.appendOne((root$ as Node).Kids, kid, $.appendZeros.nil)
-	let app = new App({Name: "app"})
+	let app = new App(false, undefined, "app")
 	let app$: App = app == null ? $.pointerTarget<App>(app) : (app as any).__isVarRef === true ? (app as any).value : (app as any).__goValue === undefined ? (app as any) : $.pointerTarget<App>(app)
-	let win = new Win({App: app, Title: "main"});
+	let win = new Win(false, app, "main");
 	;(app$ as App).Base.Windows = $.appendOne((app$ as App).Base.Windows, win, $.appendZeros.nil);
 	;(app$ as App).Base.Active = win
 	let names = strings.NewReplacer((fmt.Sprintf("%p", $.interfaceValue(root, "*main.Node", /* @__PURE__ */ $.pointerType("main.Node"))) as string), "<root>", (fmt.Sprintf("%p", $.interfaceValue(kid, "*main.Node", /* @__PURE__ */ $.pointerType("main.Node"))) as string), "<kid>", (fmt.Sprintf("%p", $.interfaceValue(app, "*main.App", /* @__PURE__ */ $.pointerType("main.App"))) as string), "<app>", (fmt.Sprintf("%p", $.interfaceValue(win, "*main.Win", /* @__PURE__ */ $.pointerType("main.Win"))) as string), "<win>")
@@ -279,7 +279,7 @@ export async function main(): globalThis.Promise<void> {
 	let output = $.varRef($.markAsStructValue(new bytes.Buffer()))
 	let logger = logrus.New()
 	await (logger !== null && (logger as any).__isVarRef !== true && (logger as any).__goValue === undefined ? ((logger as any) as logrus.Logger).SetOutput($.interfaceValue<io.Writer | null>(output, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer"))) : logrus.Logger.prototype.SetOutput.call(logger, $.interfaceValue<io.Writer | null>(output, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer"))))
-	await logrus.Logger.prototype.SetFormatter.call(logger, $.interfaceValue<logrus.Formatter | null>(new logrus.TextFormatter({DisableColors: true, DisableTimestamp: true}), "*logrus.TextFormatter", /* @__PURE__ */ $.pointerType("logrus.TextFormatter")))
+	await logrus.Logger.prototype.SetFormatter.call(logger, $.interfaceValue<logrus.Formatter | null>(new logrus.TextFormatter(false, undefined, true, undefined, undefined, undefined, true), "*logrus.TextFormatter", /* @__PURE__ */ $.pointerType("logrus.TextFormatter")))
 	await logrus.Entry.prototype.Warn.call((logger !== null && (logger as any).__isVarRef !== true && (logger as any).__goValue === undefined ? ((logger as any) as logrus.Logger).WithField("controller", $.interfaceValue(value, "*main.Record", /* @__PURE__ */ $.pointerType("main.Record"))) : logrus.Logger.prototype.WithField.call(logger, "controller", $.interfaceValue(value, "*main.Record", /* @__PURE__ */ $.pointerType("main.Record")))), $.arrayToSlice<any>(["waiting for controller Execute to return"]))
 	await $.println(strings.TrimSpace(output.value.String()))
 }

@@ -7,13 +7,13 @@ import * as slices from "@goscript/slices/index.js"
 export class item {
 	public declare Text: string
 
-	constructor(init?: Partial<{Text?: string}>, __goscriptValue?: boolean) {
-		this.Text = init?.Text ?? ("" as string)
+	constructor(__goscriptValue?: boolean, Text$?: string) {
+		this.Text = Text$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): item {
-		return new item(this, true)
+		return new item(true, this.Text)
 	}
 
 	public __goscriptAssign(source: item): this {
@@ -33,13 +33,13 @@ export class item {
 export class arena {
 	public declare data: $.Slice<any>
 
-	constructor(init?: Partial<{data?: $.Slice<any>}>, __goscriptValue?: boolean) {
-		this.data = init?.data ?? (null! as $.Slice<any>)
+	constructor(__goscriptValue?: boolean, data$?: $.Slice<any>) {
+		this.data = data$ ?? (null! as $.Slice<any>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): arena {
-		return new arena(this, true)
+		return new arena(true, this.data)
 	}
 
 	public __goscriptAssign(source: arena): this {
@@ -69,7 +69,7 @@ export class arena {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let a = $.varRef($.markAsStructValue(new arena()))
+	let a: $.VarRef<arena> = $.varRef(new arena(true))
 	let value = (a.value.New(__goscriptStatic0()) as item | $.VarRef<item> | null)
 	let value$: item = value == null ? $.pointerTarget<item>(value) : (value as any).__isVarRef === true ? (value as any).value : (value as any).__goValue === undefined ? (value as any) : $.pointerTarget<item>(value);
 	;(value$ as item).Text = "ok"
@@ -78,7 +78,7 @@ export async function main(): globalThis.Promise<void> {
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.item", zero: () => new item(undefined, true) }})
+	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.item", zero: () => new item(true) }})
 }
 
 if ($.isMainScript(import.meta)) {

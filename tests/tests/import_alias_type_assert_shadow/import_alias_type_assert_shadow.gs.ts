@@ -17,7 +17,7 @@ export function unwrap(v: any): number {
 }
 
 export async function main(): globalThis.Promise<void> {
-	await $.println(unwrap($.interfaceValue(new dep2.Thing({Value: 7}), "*dep.Thing", /* @__PURE__ */ $.pointerType("dep.Thing"))))
+	await $.println(unwrap($.interfaceValue(new dep2.Thing(false, 7), "*dep.Thing", /* @__PURE__ */ $.pointerType("dep.Thing"))))
 }
 
 if ($.isMainScript(import.meta)) {

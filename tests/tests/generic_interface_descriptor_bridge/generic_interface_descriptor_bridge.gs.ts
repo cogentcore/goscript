@@ -27,12 +27,12 @@ $.registerInterfaceType(
 );
 
 export class genericBox {
-	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
+	constructor(__goscriptValue?: boolean) {
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): genericBox {
-		return new genericBox(this, true)
+		return new genericBox(true)
 	}
 
 	public __goscriptAssign(source: genericBox): this {
@@ -61,13 +61,13 @@ export class genericBox {
 export class intBox {
 	public declare id: number
 
-	constructor(init?: Partial<{id?: number}>, __goscriptValue?: boolean) {
-		this.id = init?.id ?? (0 as number)
+	constructor(__goscriptValue?: boolean, id$?: number) {
+		this.id = id$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): intBox {
-		return new intBox(this, true)
+		return new intBox(true, this.id)
 	}
 
 	public __goscriptAssign(source: intBox): this {

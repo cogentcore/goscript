@@ -8,13 +8,13 @@ import * as reflect from "@goscript/reflect/index.js"
 export class Item {
 	public declare Name: string
 
-	constructor(init?: Partial<{Name?: string}>, __goscriptValue?: boolean) {
-		this.Name = init?.Name ?? ("" as string)
+	constructor(__goscriptValue?: boolean, Name$?: string) {
+		this.Name = Name$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Item {
-		return new Item(this, true)
+		return new Item(true, this.Name)
 	}
 
 	public __goscriptAssign(source: Item): this {
@@ -36,14 +36,14 @@ export class Holder {
 
 	public declare T: $.Slice<number>
 
-	constructor(init?: Partial<{S?: $.Slice<number>, T?: $.Slice<number>}>, __goscriptValue?: boolean) {
-		this.S = init?.S ?? (null! as $.Slice<number>)
-		this.T = init?.T ?? (null! as $.Slice<number>)
+	constructor(__goscriptValue?: boolean, S$?: $.Slice<number>, T$?: $.Slice<number>) {
+		this.S = S$ ?? (null! as $.Slice<number>)
+		this.T = T$ ?? (null! as $.Slice<number>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Holder {
-		return new Holder(this, true)
+		return new Holder(true, this.S, this.T)
 	}
 
 	public __goscriptAssign(source: Holder): this {
@@ -64,13 +64,13 @@ export class Holder {
 export class Doc {
 	public declare Items: $.Slice<Item>
 
-	constructor(init?: Partial<{Items?: $.Slice<Item>}>, __goscriptValue?: boolean) {
-		this.Items = init?.Items ?? (null! as $.Slice<Item>)
+	constructor(__goscriptValue?: boolean, Items$?: $.Slice<Item>) {
+		this.Items = Items$ ?? (null! as $.Slice<Item>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Doc {
-		return new Doc(this, true)
+		return new Doc(true, this.Items)
 	}
 
 	public __goscriptAssign(source: Doc): this {
@@ -127,7 +127,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println($.arrayIndex(t.value!, 1), $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(tv)).Slice(1, 2))).Index(0))).Int())
 
 	// Grow then SetLen, as encoding/xml and encoding/json do.
-	let h = new Holder({T: $.makeSlice<number>(1, 10, "number")})
+	let h = new Holder(false, undefined, $.makeSlice<number>(1, 10, "number"))
 	let h$: Holder = h == null ? $.pointerTarget<Holder>(h) : (h as any).__isVarRef === true ? (h as any).value : (h as any).__goValue === undefined ? (h as any) : $.pointerTarget<Holder>(h)
 	let hs = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(h, "*main.Holder", /* @__PURE__ */ $.pointerType("main.Holder"))))).Elem())).Field(0)))
 	for (let i = 0; i < 5; i++) {
@@ -154,7 +154,7 @@ export async function main(): globalThis.Promise<void> {
 	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(bs)).Index(1))).SetUint(7n)
 	await $.println("bytes:", $.sliceLen($.markAsStructValue($.cloneStructValue(bs)).Bytes()), $.uint($.arrayIndex($.markAsStructValue($.cloneStructValue(bs)).Bytes()!, 1), 8))
 
-	let d: $.VarRef<Doc> = $.varRef(new Doc(undefined, true))
+	let d: $.VarRef<Doc> = $.varRef(new Doc(true))
 	let err = await xml.Unmarshal(new Uint8Array([60, 100, 111, 99, 62, 60, 105, 116, 101, 109, 62, 60, 78, 97, 109, 101, 62, 120, 60, 47, 78, 97, 109, 101, 62, 60, 47, 105, 116, 101, 109, 62, 60, 105, 116, 101, 109, 62, 60, 78, 97, 109, 101, 62, 121, 60, 47, 78, 97, 109, 101, 62, 60, 47, 105, 116, 101, 109, 62, 60, 47, 100, 111, 99, 62]), $.interfaceValue(d, "*main.Doc", /* @__PURE__ */ $.pointerType("main.Doc")))
 	await $.println("xml:", err == null, $.sliceLen(d.value.Items))
 	if ($.sliceLen(d.value.Items) == 2) {

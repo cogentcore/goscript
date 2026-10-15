@@ -14,12 +14,12 @@ $.registerInterfaceType(
 );
 
 export class item {
-	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
+	constructor(__goscriptValue?: boolean) {
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): item {
-		return new item(this, true)
+		return new item(true)
 	}
 
 	public __goscriptAssign(source: item): this {
@@ -77,7 +77,7 @@ export async function main(): globalThis.Promise<void> {
 		}
 	}
 	await $.println("Completed successfully")
-	await describe($.interfaceValue(new item(undefined, true), "main.item", "main.item"))
+	await describe($.interfaceValue(new item(true), "main.item", "main.item"))
 	await describe("nope")
 }
 

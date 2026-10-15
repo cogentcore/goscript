@@ -18,13 +18,13 @@ $.registerInterfaceType(
 export class wrapper {
 	public declare Impl: dep.Impl | $.VarRef<dep.Impl> | null
 
-	constructor(init?: Partial<{Impl?: dep.Impl | $.VarRef<dep.Impl> | null}>, __goscriptValue?: boolean) {
-		this.Impl = init?.Impl ?? (null! as dep.Impl | $.VarRef<dep.Impl> | null)
+	constructor(__goscriptValue?: boolean, Impl$?: dep.Impl | $.VarRef<dep.Impl> | null) {
+		this.Impl = Impl$ ?? (null! as dep.Impl | $.VarRef<dep.Impl> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): wrapper {
-		return new wrapper(this, true)
+		return new wrapper(true, this.Impl)
 	}
 
 	public __goscriptAssign(source: wrapper): this {
@@ -64,9 +64,9 @@ export function setConcrete(w: dep.Wrapper | $.VarRef<dep.Wrapper> | null): stri
 }
 
 export async function main(): globalThis.Promise<void> {
-	let impl = new wrapper({Impl: new dep.Impl({Item: 7})})
+	let impl = new wrapper(false, new dep.Impl(false, 7))
 	await $.println("interface:", await read(__goscriptStatic1(), $.namedValueInterfaceValue<Derived | null>(impl, "*main.wrapper", __goscriptStatic2(), __goscriptStatic3(), __goscriptStatic4())))
-	let keyed = new dep.Wrapper({Keyed: new dep.Keyed()})
+	let keyed = new dep.Wrapper(false, new dep.Keyed())
 	await $.println("generic empty:", $.stringEqual(setGeneric(__goscriptStatic0(), keyed, 7), ""))
 	await $.println("concrete empty:", $.stringEqual(setConcrete(keyed), ""))
 }
