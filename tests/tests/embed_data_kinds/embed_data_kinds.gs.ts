@@ -2,11 +2,9 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as embed from "@goscript/embed/index.js"
-import "@goscript/embed/index.js"
 
-export let text: string = "plain ascii text\n"
+export let text = "plain ascii text\n"
 
 export function __goscript_set_text(__goscriptValue: string): void {
 	text = __goscriptValue
@@ -40,7 +38,7 @@ export function sum(data: $.Slice<number>): number {
 	let total = 0
 	for (let __goscriptRangeTarget0 = data, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), i = 0; i < __goscriptRangeWindow0.length; i++) {
 		let b = $.uint((__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + i] as number), 8)
-		total += ((i % 7) + 1) * $.int(b)
+		total += ((i % 7) + 1) * b
 	}
 	return total
 }

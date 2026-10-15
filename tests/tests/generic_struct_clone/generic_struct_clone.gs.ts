@@ -93,12 +93,12 @@ export class sides {
 		Left: any
 	}
 
-	constructor(init?: Partial<{Top?: any, Right?: any, Bottom?: any, Left?: any}>, __goscriptValue?: boolean) {
+	constructor(init?: Partial<{Top?: any, Right?: any, Bottom?: any, Left?: any}>, __goscriptValue?: boolean, __goscriptFresh?: boolean) {
 		this._fields = {
-			Top: init?.Top !== undefined ? $.copyElement(init.Top) : (null! as any),
-			Right: init?.Right !== undefined ? $.copyElement(init.Right) : (null! as any),
-			Bottom: init?.Bottom !== undefined ? $.copyElement(init.Bottom) : (null! as any),
-			Left: init?.Left !== undefined ? $.copyElement(init.Left) : (null! as any)
+			Top: init?.Top !== undefined ? (__goscriptFresh === true ? init.Top : $.copyElement(init.Top)) : (null! as any),
+			Right: init?.Right !== undefined ? (__goscriptFresh === true ? init.Right : $.copyElement(init.Right)) : (null! as any),
+			Bottom: init?.Bottom !== undefined ? (__goscriptFresh === true ? init.Bottom : $.copyElement(init.Bottom)) : (null! as any),
+			Left: init?.Left !== undefined ? (__goscriptFresh === true ? init.Left : $.copyElement(init.Left)) : (null! as any)
 		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
@@ -162,7 +162,7 @@ export class values {
 
 	constructor(init?: Partial<{sides?: sides, Name?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
-			sides: init?.sides ? init.sides.clone() : $.markAsStructValue(new sides({Top: new unit(undefined, true), Right: new unit(undefined, true), Bottom: new unit(undefined, true), Left: new unit(undefined, true)})),
+			sides: init?.sides ? init.sides.clone() : $.markAsStructValue(new sides({Top: new unit(undefined, true), Right: new unit(undefined, true), Bottom: new unit(undefined, true), Left: new unit(undefined, true)}, undefined, true)),
 			Name: init?.Name ?? ("" as string)
 		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
@@ -214,10 +214,10 @@ export class pair {
 		Val: any
 	}
 
-	constructor(init?: Partial<{Key?: any, Val?: any}>, __goscriptValue?: boolean) {
+	constructor(init?: Partial<{Key?: any, Val?: any}>, __goscriptValue?: boolean, __goscriptFresh?: boolean) {
 		this._fields = {
 			Key: init?.Key ?? (null! as any),
-			Val: init?.Val !== undefined ? $.copyElement(init.Val) : (null! as any)
+			Val: init?.Val !== undefined ? (__goscriptFresh === true ? init.Val : $.copyElement(init.Val)) : (null! as any)
 		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
@@ -244,7 +244,7 @@ export class pair {
 
 export function copySides(__typeArgs: $.GenericTypeArgs | undefined, s: sides): sides {
 	let c = (s).clone()
-	return (c).clone()
+	return c
 }
 
 export async function main(): globalThis.Promise<void> {

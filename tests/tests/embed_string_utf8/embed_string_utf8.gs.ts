@@ -2,17 +2,12 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as embed from "@goscript/embed/index.js"
-
 import * as utf8 from "@goscript/unicode/utf8/index.js"
-
 import * as fs from "@goscript/io/fs/index.js"
-import "@goscript/embed/index.js"
-import "@goscript/unicode/utf8/index.js"
 import "@goscript/io/fs/index.js"
 
-export let text: string = "h\xc3\xa9llo \xe2\x9c\x93 w\xc3\xb6rld\n"
+export let text = "h\xc3\xa9llo \xe2\x9c\x93 w\xc3\xb6rld\n"
 
 export function __goscript_set_text(__goscriptValue: string): void {
 	text = __goscriptValue
@@ -24,7 +19,7 @@ export function __goscript_set_textBytes(__goscriptValue: $.Slice<number>): void
 	textBytes = __goscriptValue
 }
 
-export let invalid: string = "bad \xff\xfe end\n"
+export let invalid = "bad \xff\xfe end\n"
 
 export function __goscript_set_invalid(__goscriptValue: string): void {
 	invalid = __goscriptValue

@@ -16,13 +16,13 @@ export type Stringy = string
 
 $.registerNamedValueType(
 	"main.Stringy",
-	{String: (receiver: any, ...args: any[]) => (Stringy_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	{String: (receiver: any) => (Stringy_String as any)(($.isVarRef(receiver) ? receiver.value : receiver))},
 	[$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])]
 );
 
 $.registerNamedValueType(
 	"*main.Stringy",
-	{String: (receiver: any, ...args: any[]) => (Stringy_String as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	{String: (receiver: any) => (Stringy_String as any)($.pointerValue(receiver))},
 	[$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])]
 );
 
@@ -40,13 +40,13 @@ export type FormatError = string
 
 $.registerNamedValueType(
 	"main.FormatError",
-	{Error: (receiver: any, ...args: any[]) => (FormatError_Error as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	{Error: (receiver: any) => (FormatError_Error as any)(($.isVarRef(receiver) ? receiver.value : receiver))},
 	[$.methodSignature("Error", [], [/* @__PURE__ */ $.basicType("string")])]
 );
 
 $.registerNamedValueType(
 	"*main.FormatError",
-	{Error: (receiver: any, ...args: any[]) => (FormatError_Error as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	{Error: (receiver: any) => (FormatError_Error as any)($.pointerValue(receiver))},
 	[$.methodSignature("Error", [], [/* @__PURE__ */ $.basicType("string")])]
 );
 
@@ -54,13 +54,13 @@ export type Code = number
 
 $.registerNamedValueType(
 	"main.Code",
-	{Error: (receiver: any, ...args: any[]) => (Code_Error as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	{Error: (receiver: any) => (Code_Error as any)(($.isVarRef(receiver) ? receiver.value : receiver))},
 	[$.methodSignature("Error", [], [/* @__PURE__ */ $.basicType("string")])]
 );
 
 $.registerNamedValueType(
 	"*main.Code",
-	{Error: (receiver: any, ...args: any[]) => (Code_Error as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	{Error: (receiver: any) => (Code_Error as any)($.pointerValue(receiver))},
 	[$.methodSignature("Error", [], [/* @__PURE__ */ $.basicType("string")])]
 );
 
@@ -159,12 +159,12 @@ export async function main(): globalThis.Promise<void> {
 	let __goscriptTuple0: any = $.typeAssertTuple<number>(a, /* @__PURE__ */ $.basicType("int32"))
 	ok = __goscriptTuple0[1]
 	await $.println("MyInt as int32:", ok)
-	let b: any = $.basicInterfaceValue($.int(5, 32), "int32")
+	let b: any = $.basicInterfaceValue(5, "int32")
 	let __goscriptTuple1: any = $.typeAssertTuple<MyInt>(b, /* @__PURE__ */ $.basicType("int32", "main.MyInt"))
 	ok = __goscriptTuple1[1]
 	await $.println("int32 as MyInt:", ok)
 
-	for (let __goscriptRangeTarget0 = $.arrayToSlice<any>(["s", $.namedValueInterfaceValue<any>("n", "main.Name", {}, /* @__PURE__ */ $.basicType("string", "main.Name")), $.namedValueInterfaceValue<any>(globalThis.String("1"), "json.Number", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()), $.namedValueInterfaceValue<any>(1, "main.MyInt", {}, /* @__PURE__ */ $.basicType("int32", "main.MyInt")), $.basicInterfaceValue($.int(2, 32), "int32"), $.basicInterfaceValue(3, "int")]), __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
+	for (let __goscriptRangeTarget0 = $.arrayToSlice<any>(["s", $.namedValueInterfaceValue<any>("n", "main.Name", {}, /* @__PURE__ */ $.basicType("string", "main.Name")), $.namedValueInterfaceValue<any>(globalThis.String("1"), "json.Number", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()), $.namedValueInterfaceValue<any>(1, "main.MyInt", {}, /* @__PURE__ */ $.basicType("int32", "main.MyInt")), $.basicInterfaceValue(2, "int32"), $.basicInterfaceValue(3, "int")]), __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
 		let v = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as any)
 		await $.println("switch:", kind(v))
 	}
@@ -262,7 +262,7 @@ export async function main(): globalThis.Promise<void> {
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({Float64: (receiver: any, ...args: any[]) => (json.Number_Float64 as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Int64: (receiver: any, ...args: any[]) => (json.Number_Int64 as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), MarshalJSONTo: (receiver: any, ...args: any[]) => (json.Number_MarshalJSONTo as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), String: (receiver: any, ...args: any[]) => (json.Number_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))})
+	return __goscriptStatic0$value ??= ({Float64: (receiver: any) => (json.Number_Float64 as any)(($.isVarRef(receiver) ? receiver.value : receiver)), Int64: (receiver: any) => (json.Number_Int64 as any)(($.isVarRef(receiver) ? receiver.value : receiver)), MarshalJSONTo: (receiver: any, ...args: any[]) => (json.Number_MarshalJSONTo as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), String: (receiver: any) => (json.Number_String as any)(($.isVarRef(receiver) ? receiver.value : receiver))})
 }
 
 var __goscriptStatic1$value: any
@@ -292,12 +292,12 @@ function __goscriptStatic5(): any {
 
 var __goscriptStatic6$value: any
 function __goscriptStatic6(): any {
-	return __goscriptStatic6$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("string", "main.Stringy"), zero: () => "", methods: {String: (receiver: any, ...args: any[]) => (Stringy_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, methodSignatures: [$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])] }})
+	return __goscriptStatic6$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("string", "main.Stringy"), zero: () => "", methods: {String: (receiver: any) => (Stringy_String as any)(($.isVarRef(receiver) ? receiver.value : receiver))}, methodSignatures: [$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])] }})
 }
 
 var __goscriptStatic7$value: any
 function __goscriptStatic7(): any {
-	return __goscriptStatic7$value ??= ({Error: (receiver: any, ...args: any[]) => (FormatError_Error as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))})
+	return __goscriptStatic7$value ??= ({Error: (receiver: any) => (FormatError_Error as any)(($.isVarRef(receiver) ? receiver.value : receiver))})
 }
 
 var __goscriptStatic8$value: any

@@ -140,7 +140,7 @@ export class Values {
 
 	constructor(init?: Partial<{Sides?: Sides}>, __goscriptValue?: boolean) {
 		this._fields = {
-			Sides: init?.Sides ? $.markAsStructValue($.cloneStructValue(init.Sides)) : $.markAsStructValue(new Sides({Top: new Value(undefined, true), Right: new Value(undefined, true), Bottom: new Value(undefined, true), Left: new Value(undefined, true)}, undefined, true))
+			Sides: init?.Sides ? init.Sides.clone() : $.markAsStructValue(new Sides({Top: new Value(undefined, true), Right: new Value(undefined, true), Bottom: new Value(undefined, true), Left: new Value(undefined, true)}, undefined, true))
 		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
@@ -281,16 +281,16 @@ export async function main(): globalThis.Promise<void> {
 	// copies of type argument fields of struct, array, pointer and unnamed
 	// struct types
 	let arr = $.markAsStructValue(new Sides({Top: $.arrayValue([1, 2]), Right: $.arrayValue(globalThis.Array.from({ length: 2 }, () => 0)), Bottom: $.arrayValue(globalThis.Array.from({ length: 2 }, () => 0)), Left: $.arrayValue(globalThis.Array.from({ length: 2 }, () => 0))}))
-	let arr2 = $.markAsStructValue($.cloneStructValue(arr))
+	let arr2 = (arr).clone()
 	arr2.Top[0] = 9
 	await $.println("array:", $.arrayIndex(arr.Top, 0), $.arrayIndex(arr2.Top, 0))
 	let p = new Value({V: 5})
 	let ptr = $.markAsStructValue(new Sides({Top: p, Right: null! as Value | $.VarRef<Value> | null, Bottom: null! as Value | $.VarRef<Value> | null, Left: null! as Value | $.VarRef<Value> | null}))
-	let ptr2 = $.markAsStructValue($.cloneStructValue(ptr))
+	let ptr2 = (ptr).clone()
 	$.pointerValue<Value>(ptr2.Top).V = 6
-	await $.println("pointer:", $.pointerValue<Value>(p).V, $.pointerEqual(ptr.Top, ptr2.Top))
+	await $.println("pointer:", $.pointerValue<Value>(p).V, (ptr.Top === ptr2.Top || $.pointerAliasesMade && $.pointerEqual(ptr.Top, ptr2.Top)))
 	let anon = $.markAsStructValue(new Sides({Top: $.anonymousStructValue({A: 1, B: 2}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("A", /* @__PURE__ */ $.basicType("int"), [0], 0, true), /* @__PURE__ */ $.structField("B", /* @__PURE__ */ $.basicType("int"), [1], 8, true)] }), Right: $.anonymousStructValue({"A": 0, "B": 0}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("A", /* @__PURE__ */ $.basicType("int"), [0], 0, true), /* @__PURE__ */ $.structField("B", /* @__PURE__ */ $.basicType("int"), [1], 8, true)] }), Bottom: $.anonymousStructValue({"A": 0, "B": 0}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("A", /* @__PURE__ */ $.basicType("int"), [0], 0, true), /* @__PURE__ */ $.structField("B", /* @__PURE__ */ $.basicType("int"), [1], 8, true)] }), Left: $.anonymousStructValue({"A": 0, "B": 0}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("A", /* @__PURE__ */ $.basicType("int"), [0], 0, true), /* @__PURE__ */ $.structField("B", /* @__PURE__ */ $.basicType("int"), [1], 8, true)] })}))
-	let anon2 = $.markAsStructValue($.cloneStructValue(anon))
+	let anon2 = (anon).clone()
 	anon2.Top.A = 7
 	await $.println("unnamed:", anon.Top.A, anon2.Top.A)
 
@@ -298,14 +298,14 @@ export async function main(): globalThis.Promise<void> {
 	let wc = $.markAsStructValue(new Sides({Top: $.markAsStructValue(new withClone({clone: $.functionValue((): number => {
 		return 8
 	}, ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo)), n: 1})), Right: $.markAsStructValue(new withClone()), Bottom: $.markAsStructValue(new withClone()), Left: $.markAsStructValue(new withClone())}))
-	let wc2 = $.markAsStructValue($.cloneStructValue(wc))
+	let wc2 = (wc).clone()
 	wc2.Top.n = 2
 	await $.println("field named clone:", wc.Top.n, wc2.Top.n, (__goscriptAwait = wc2.Top.clone!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
 	// nested generic instances
 	let pr: Pair = $.markAsStructValue(new Pair({Key: "", Val: $.markAsStructValue(new Sides({Top: new Value(undefined, true), Right: new Value(undefined, true), Bottom: new Value(undefined, true), Left: new Value(undefined, true)}, undefined, true))}, undefined, true))
 	pr.Val.Left.V = 10
-	let pr2 = $.markAsStructValue($.cloneStructValue(pr))
+	let pr2 = (pr).clone()
 	pr2.Val.Left.V = 11
 	await $.println("nested:", pr.Val.Left.V, pr2.Val.Left.V, pr2.Val.Top.Unit)
 

@@ -2,9 +2,7 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as fmt from "@goscript/fmt/index.js"
-import "@goscript/fmt/index.js"
 
 export type node = {
 	Name(): string | globalThis.Promise<string>
@@ -167,12 +165,12 @@ export async function main(): globalThis.Promise<void> {
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.label", zero: () => new label(undefined, true) }, PT: { type: /* @__PURE__ */ $.pointerType("main.label"), zero: () => null, methods: {Name: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Name(...$.stripGenericTypeArgs(args))} }})
+	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.label", zero: () => new label(undefined, true) }, PT: { type: /* @__PURE__ */ $.pointerType("main.label"), zero: () => null, methods: {Name: (receiver: any) => $.pointerValue(receiver).Name()} }})
 }
 
 var __goscriptStatic1$value: any
 function __goscriptStatic1(): any {
-	return __goscriptStatic1$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.icon", zero: () => new icon(undefined, true) }, PT: { type: /* @__PURE__ */ $.pointerType("main.icon"), zero: () => null, methods: {Name: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Name(...$.stripGenericTypeArgs(args)), Size: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Size(...$.stripGenericTypeArgs(args))} }})
+	return __goscriptStatic1$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.icon", zero: () => new icon(undefined, true) }, PT: { type: /* @__PURE__ */ $.pointerType("main.icon"), zero: () => null, methods: {Name: (receiver: any) => $.pointerValue(receiver).Name(), Size: (receiver: any) => $.pointerValue(receiver).Size()} }})
 }
 
 var __goscriptStatic2$value: any
@@ -182,7 +180,7 @@ function __goscriptStatic2(): any {
 
 var __goscriptStatic3$value: any
 function __goscriptStatic3(): any {
-	return __goscriptStatic3$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.node", zero: () => null, methods: {Name: (receiver: any, ...args: any[]) => receiver.Name(...$.stripGenericTypeArgs(args))} }})
+	return __goscriptStatic3$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.node", zero: () => null, methods: {Name: (receiver: any) => receiver.Name()} }})
 }
 
 var __goscriptStatic4$value: any

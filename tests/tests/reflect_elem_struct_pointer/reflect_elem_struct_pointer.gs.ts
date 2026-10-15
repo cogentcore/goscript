@@ -358,11 +358,11 @@ export function underlying(v: reflect.Value): reflect.Value {
 	while (($.markAsStructValue($.cloneStructValue(v)).Kind() == 20) || ($.markAsStructValue($.cloneStructValue(v)).Kind() == 22)) {
 		let e: reflect.Value = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(v)).Elem()))
 		if (!$.markAsStructValue($.cloneStructValue(e)).IsValid()) {
-			return $.markAsStructValue($.cloneStructValue(v))
+			return v
 		}
 		v = $.assignStruct(v, e)
 	}
-	return $.markAsStructValue($.cloneStructValue(v))
+	return v
 }
 
 export async function structPointers(): globalThis.Promise<void> {
