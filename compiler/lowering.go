@@ -8098,10 +8098,11 @@ func (o *LoweringOwner) lowerRangeStmt(ctx lowerFileContext, stmt *ast.RangeStmt
 	children := body
 	if valueName != "" {
 		// The value variable holds a copy of the element, so struct and array
-		// elements are cloned.
+		// elements are cloned, unless the variable can share the element
+		// (see rangeValueSharesElement).
 		valueType := ctx.semPkg.source.TypesInfo.TypeOf(stmt.Value)
 		element := "(" + rangeWindow + ".backing[" + rangeWindow + ".offset + " + indexName + "] as " + o.tsTypeFor(ctx, valueType) + ")"
-		value := o.lowerValueForTargetTypes(ctx, valueType, valueType, element, true)
+		value := o.lowerValueForTargetTypes(ctx, valueType, valueType, element, !rangeValueSharesElement(ctx, stmt, rangeType))
 		if typeParamMayHoldValueType(valueType) {
 			value = o.runtimeOwner.QualifiedHelper(RuntimeHelperCopyElement) + "(" + value + ")"
 		}
