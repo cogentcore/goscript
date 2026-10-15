@@ -1,0 +1,26 @@
+read: true 1 4 0
+changed result, scope: 1 99
+changed argument, result: 4 77
+loop: 2 12
+loop: 12 22
+loop: 22 32
+loop last: 2
+group: true 1 3
+group changed, scope: 3 55
+keep: 2 66
+indirect: 1 11 12
+first: 1
+first changed: 1 13
+at: 4 14
+off: true
+off after change: 1 21
+grow: 3 4 7
+twice: 3 3 50 4
+withStart: 60 1
+captured: 1
+deferred: 43 4
+changedParam: 1 101 201
+aliasArg: 1 methodArg: 1 aliasField: 1
+promoted: 4
+reads: 112
+calls: 20

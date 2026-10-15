@@ -34,8 +34,8 @@ export class Box {
 	)
 }
 
-export function copyBox(b: Box): Box {
-	return $.markAsStructValue($.cloneStructValue(b))
+export function copyBox(b: Box, __goscriptBorrow?: boolean): Box {
+	return (__goscriptBorrow === true ? b : $.markAsStructValue($.cloneStructValue(b)))
 }
 
 export async function main(): globalThis.Promise<void> {
