@@ -1,4 +1,5 @@
 import {
+  asArray,
   pointerValue,
   type Slice,
   type VarRef,
@@ -151,10 +152,7 @@ function isRangeTableInit(
 }
 
 function sliceToArray<T>(value: Slice<T> | undefined): T[] {
-  if (value == null) {
-    return []
-  }
-  return Array.from(value as ArrayLike<T>)
+  return asArray(value ?? null)
 }
 
 // CaseRange represents a range of Unicode code points for case mapping.

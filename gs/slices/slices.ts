@@ -771,7 +771,7 @@ export function SortFunc<T, R extends $.MaybePromise<number>>(
       if (s === null || s === undefined || $.len(s) < 2) {
         return
       }
-      const sorted = yield* mergeSort(Array.from(s as any as T[]), cmp)
+      const sorted = yield* mergeSort($.asArray(s), cmp)
       for (let i = 0; i < sorted.length; i++) {
         $.sliceElems(s)[$.sliceSlot(s, i)] = sorted[i]
       }

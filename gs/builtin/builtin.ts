@@ -1244,7 +1244,7 @@ function byteView(bytes: Bytes | null): ByteView {
     const meta = (bytes as SliceProxy<number>).__meta__
     return { data: meta.backing, off: meta.offset, len: meta.length }
   }
-  if (isArrayOrGoSlice(bytes)) {
+  if (Array.isArray(bytes)) {
     return { data: bytes, off: 0, len: bytes.length }
   }
   throw new Error(`Cannot convert bytes of type ${typeof bytes} to array`)

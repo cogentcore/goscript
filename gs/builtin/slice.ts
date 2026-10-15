@@ -118,8 +118,8 @@ export function sliceRange(
   slice: Uint8Array | null | undefined,
 ): SliceRange<number>
 export function sliceRange<T>(
-  slice: Slice<T> | T[] | Uint8Array | null | undefined,
-): SliceRange<T> {
+  slice: Slice<T> | Uint8Array | null | undefined,
+): SliceRange<T> | SliceRange<number> {
   // A nil slice has no elements.
   if (slice === null || slice === undefined) {
     return emptySliceRange
@@ -137,11 +137,12 @@ export function sliceRange<T>(
     return meta
   }
 
-  // A plain array is a window over itself.
-  if (isArrayOrGoSlice(slice) || slice instanceof Uint8Array) {
-    return { backing: slice as ArrayLike<T>, offset: 0, length: slice.length }
+  // A byte array or a plain array is a window over itself, typed by its
+  // element.
+  if (slice instanceof Uint8Array) {
+    return { backing: slice, offset: 0, length: slice.length }
   }
-  return { backing: [], offset: 0, length: len(slice as any) }
+  return { backing: slice, offset: 0, length: slice.length }
 }
 
 /**
@@ -489,12 +490,7 @@ function sliceProxyFromBacking<T>(
 ): SliceProxy<T> {
   // Each slice is a window object of its own, even where it shares its
   // backing array with an earlier slice.
-  return new GoSlice(
-    backing,
-    offset,
-    length,
-    capacity,
-  ) as unknown as SliceProxy<T>
+  return new GoSlice(backing, offset, length, capacity)
 }
 
 // asArray converts a slice to a JavaScript array.
@@ -515,11 +511,7 @@ export function asArray<T>(slice: Slice<T>): T[] {
     return result
   }
 
-  if (isArrayOrGoSlice(slice)) {
-    return slice
-  }
-
-  return []
+  return slice
 }
 
 export function sliceToArray<T>(
@@ -712,12 +704,7 @@ export const makeSlice = <T>(
   if (length === actualCapacity) {
     return backingArr as Slice<T>
   }
-  return new GoSlice(
-    backingArr,
-    0,
-    length,
-    actualCapacity,
-  ) as unknown as SliceProxy<T>
+  return new GoSlice(backingArr, 0, length, actualCapacity)
 }
 
 /**
@@ -884,12 +871,7 @@ export function goSlice<T>(
     return backing as Slice<T>
   }
 
-  return new GoSlice(
-    backing as T[],
-    newOffset,
-    newLength,
-    newCap,
-  ) as unknown as SliceProxy<T>
+  return new GoSlice(backing as T[], newOffset, newLength, newCap)
 }
 
 /**

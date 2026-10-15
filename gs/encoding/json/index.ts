@@ -2670,7 +2670,7 @@ function anonymousStructFields(desc: unknown): fieldMetadata[] | null {
   }
   const fields = (desc as { anonymousStructFields?: unknown })
     .anonymousStructFields
-  return $.isArrayOrGoSlice(fields) ? (fields as fieldMetadata[]) : null
+  return Array.isArray(fields) ? (fields as fieldMetadata[]) : null
 }
 
 // assignAnonymousStructFields populates an anonymous-struct value (a plain
