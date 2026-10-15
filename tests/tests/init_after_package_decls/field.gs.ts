@@ -8,13 +8,13 @@ import * as __goscript_types from "./types.gs.ts"
 export class Field {
 	public declare Name: string
 
-	constructor(init?: Partial<{Name?: string}>, __goscriptValue?: boolean) {
-		this.Name = init?.Name ?? ("" as string)
+	constructor(__goscriptValue?: boolean, Name$?: string) {
+		this.Name = Name$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Field {
-		return new Field(this, true)
+		return new Field(true, this.Name)
 	}
 
 	public __goscriptAssign(source: Field): this {

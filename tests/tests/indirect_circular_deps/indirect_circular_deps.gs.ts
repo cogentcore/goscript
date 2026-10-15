@@ -6,13 +6,13 @@ import * as $ from "@goscript/builtin/index.js"
 export class A {
 	public declare BB: $.Slice<B>
 
-	constructor(init?: Partial<{BB?: $.Slice<B>}>, __goscriptValue?: boolean) {
-		this.BB = init?.BB ?? (null! as $.Slice<B>)
+	constructor(__goscriptValue?: boolean, BB$?: $.Slice<B>) {
+		this.BB = BB$ ?? (null! as $.Slice<B>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): A {
-		return new A(this, true)
+		return new A(true, this.BB)
 	}
 
 	public __goscriptAssign(source: A): this {
@@ -32,13 +32,13 @@ export class A {
 export class B {
 	public declare AA: $.Slice<A>
 
-	constructor(init?: Partial<{AA?: $.Slice<A>}>, __goscriptValue?: boolean) {
-		this.AA = init?.AA ?? (null! as $.Slice<A>)
+	constructor(__goscriptValue?: boolean, AA$?: $.Slice<A>) {
+		this.AA = AA$ ?? (null! as $.Slice<A>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): B {
-		return new B(this, true)
+		return new B(true, this.AA)
 	}
 
 	public __goscriptAssign(source: B): this {
@@ -56,11 +56,11 @@ export class B {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let a1 = new A(undefined, true)
-	let b1 = new B(undefined, true)
+	let a1 = new A(true)
+	let b1 = new B(true)
 
-	let a2 = new A({BB: $.arrayToSlice<B>([(b1).clone()])}, true)
-	let b2 = new B({AA: $.arrayToSlice<A>([(a1).clone()])}, true)
+	let a2 = new A(true, $.arrayToSlice<B>([(b1).clone()]))
+	let b2 = new B(true, $.arrayToSlice<A>([(a1).clone()]))
 
 	await $.println("a1:", a1.BB == null)
 	await $.println("b1:", b1.AA == null)

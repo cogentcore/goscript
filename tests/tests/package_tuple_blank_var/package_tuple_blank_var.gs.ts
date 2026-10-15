@@ -6,13 +6,13 @@ import * as $ from "@goscript/builtin/index.js"
 export class item {
 	public declare value: number
 
-	constructor(init?: Partial<{value?: number}>, __goscriptValue?: boolean) {
-		this.value = init?.value ?? (0 as number)
+	constructor(__goscriptValue?: boolean, value$?: number) {
+		this.value = value$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): item {
-		return new item(this, true)
+		return new item(true, this.value)
 	}
 
 	public __goscriptAssign(source: item): this {
@@ -30,7 +30,7 @@ export class item {
 }
 
 export function newItem(value: number): [item | $.VarRef<item> | null, $.GoError] {
-	return [new item({value: value}), null]
+	return [new item(false, value), null]
 }
 
 const __goscriptTuple0 = newItem(11)

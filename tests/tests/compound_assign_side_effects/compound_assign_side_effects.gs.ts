@@ -26,18 +26,18 @@ export class point {
 
 	public declare F32: number
 
-	constructor(init?: Partial<{X?: number, S?: string, U8?: number, I64?: bigint, U32?: number, F32?: number}>, __goscriptValue?: boolean) {
-		this.X = init?.X ?? (0 as number)
-		this.S = init?.S ?? ("" as string)
-		this.U8 = init?.U8 ?? (0 as number)
-		this.I64 = init?.I64 ?? (0n as bigint)
-		this.U32 = init?.U32 ?? (0 as number)
-		this.F32 = init?.F32 ?? (0 as number)
+	constructor(__goscriptValue?: boolean, X$?: number, S$?: string, U8$?: number, I64$?: bigint, U32$?: number, F32$?: number) {
+		this.X = X$ ?? 0
+		this.S = S$ ?? ""
+		this.U8 = U8$ ?? 0
+		this.I64 = I64$ ?? 0n
+		this.U32 = U32$ ?? 0
+		this.F32 = F32$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): point {
-		return new point(this, true)
+		return new point(true, this.X, this.S, this.U8, this.I64, this.U32, this.F32)
 	}
 
 	public __goscriptAssign(source: point): this {
@@ -62,13 +62,13 @@ export class point {
 export class chanCounter {
 	public declare ch: $.Channel<number> | null
 
-	constructor(init?: Partial<{ch?: $.Channel<number> | null}>, __goscriptValue?: boolean) {
-		this.ch = init?.ch ?? (null! as $.Channel<number> | null)
+	constructor(__goscriptValue?: boolean, ch$?: $.Channel<number> | null) {
+		this.ch = ch$ ?? (null! as $.Channel<number> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): chanCounter {
-		return new chanCounter(this, true)
+		return new chanCounter(true, this.ch)
 	}
 
 	public __goscriptAssign(source: chanCounter): this {
@@ -296,7 +296,7 @@ export async function main(): globalThis.Promise<void> {
 	let ch = $.makeChannel<number>(3, 0, "both")
 	const __goscriptDeferArg0 = ch
 	queueMicrotask(async () => { await fill(__goscriptDeferArg0) })
-	let c: counter | null = $.interfaceValue<counter | null>(new chanCounter({ch: ch}), "*main.chanCounter", /* @__PURE__ */ $.pointerType("main.chanCounter"))
+	let c: counter | null = $.interfaceValue<counter | null>(new chanCounter(false, ch), "*main.chanCounter", /* @__PURE__ */ $.pointerType("main.chanCounter"))
 	let vals = $.arrayToSlice<number>([0, 0, 0])
 	calls = 0
 	const __goscriptOperand19 = (__goscriptAwait = (c !== null && (c as any).__isVarRef !== true && ((c as any).__goValue === undefined || (c as any).__goType?.charCodeAt(0) !== 42) ? (c as Exclude<counter, null>) : $.pointerValue<Exclude<counter, null>>(c)).Next(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)

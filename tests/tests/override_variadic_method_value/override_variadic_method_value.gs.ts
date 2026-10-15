@@ -7,13 +7,13 @@ import * as js from "@goscript/syscall/js/index.js"
 export class recorder {
 	public declare obj: js.Value
 
-	constructor(init?: Partial<{obj?: js.Value}>, __goscriptValue?: boolean) {
-		this.obj = init?.obj ? $.markAsStructValue($.cloneStructValue(init.obj)) : $.markAsStructValue(new js.Value())
+	constructor(__goscriptValue?: boolean, obj$?: js.Value) {
+		this.obj = obj$ ?? $.markAsStructValue(new js.Value())
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): recorder {
-		return new recorder(this, true)
+		return new recorder(true, $.markAsStructValue($.cloneStructValue(this.obj)))
 	}
 
 	public __goscriptAssign(source: recorder): this {
@@ -63,7 +63,7 @@ export async function main(): globalThis.Promise<void> {
 	call!("hit", $.arrayToSlice<any>([$.basicInterfaceValue(1, "int")]))
 	call!("hit", $.arrayToSlice<any>([$.basicInterfaceValue(1, "int"), $.basicInterfaceValue(2, "int")]))
 
-	let r = new recorder({obj: $.markAsStructValue($.cloneStructValue(obj))})
+	let r = new recorder(false, $.markAsStructValue($.cloneStructValue(obj)))
 	void (r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? ((r as any) as recorder).flush() : recorder.prototype.flush.call(r))
 }
 

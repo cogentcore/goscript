@@ -32,14 +32,14 @@ export class Engineer {
 
 	public declare Name: string
 
-	constructor(init?: Partial<{Level?: Level, Name?: string}>, __goscriptValue?: boolean) {
-		this.Level = init?.Level ?? (0 as Level)
-		this.Name = init?.Name ?? ("" as string)
+	constructor(__goscriptValue?: boolean, Level$?: Level, Name$?: string) {
+		this.Level = Level$ ?? 0
+		this.Name = Name$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Engineer {
-		return new Engineer(this, true)
+		return new Engineer(true, this.Level, this.Name)
 	}
 
 	public __goscriptAssign(source: Engineer): this {
@@ -64,13 +64,13 @@ export class Engineer {
 export class Lead {
 	public declare Engineer: Engineer
 
-	constructor(init?: Partial<{Engineer?: Engineer}>, __goscriptValue?: boolean) {
-		this.Engineer = init?.Engineer ? init.Engineer.clone() : new Engineer(undefined, true)
+	constructor(__goscriptValue?: boolean, Engineer$?: Engineer) {
+		this.Engineer = Engineer$ ?? new Engineer(true)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Lead {
-		return new Lead(this, true)
+		return new Lead(true, this.Engineer.clone())
 	}
 
 	public __goscriptAssign(source: Lead): this {
@@ -99,16 +99,16 @@ export function Level_Rank(l: Level, prefix: string): string {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let eng = new Engineer({Level: 3, Name: "Grace"}, true)
+	let eng = new Engineer(true, 3, "Grace")
 	await $.println("direct:", Level_Rank(eng.Level, "rank: "))
 
 	let r: Ranker | null = $.interfaceValue<Ranker | null>((eng).clone(), "main.Engineer", "main.Engineer")
 	await $.println("interface:", (__goscriptAwait = (r !== null && (r as any).__isVarRef !== true && ((r as any).__goValue === undefined || (r as any).__goType?.charCodeAt(0) !== 42) ? (r as Exclude<Ranker, null>) : $.pointerValue<Exclude<Ranker, null>>(r)).Rank("value: "), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
-	r = $.interfaceValue<Ranker | null>(new Engineer({Level: 1, Name: "Ada"}), "*main.Engineer", /* @__PURE__ */ $.pointerType("main.Engineer"))
+	r = $.interfaceValue<Ranker | null>(new Engineer(false, 1, "Ada"), "*main.Engineer", /* @__PURE__ */ $.pointerType("main.Engineer"))
 	await $.println("pointer:", (__goscriptAwait = (r !== null && (r as any).__isVarRef !== true && ((r as any).__goValue === undefined || (r as any).__goType?.charCodeAt(0) !== 42) ? (r as Exclude<Ranker, null>) : $.pointerValue<Exclude<Ranker, null>>(r)).Rank("pointer: "), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
-	let lead = new Lead({Engineer: new Engineer({Level: 4, Name: "Linus"}, true)})
+	let lead = new Lead(false, new Engineer(true, 4, "Linus"))
 	await $.println("nested direct:", Level_Rank($.pointerValue<Lead>(lead).Engineer.Level, "lead: "))
 	r = $.interfaceValue<Ranker | null>(lead, "*main.Lead", /* @__PURE__ */ $.pointerType("main.Lead"))
 	await $.println("nested interface:", (__goscriptAwait = (r !== null && (r as any).__isVarRef !== true && ((r as any).__goValue === undefined || (r as any).__goType?.charCodeAt(0) !== 42) ? (r as Exclude<Ranker, null>) : $.pointerValue<Exclude<Ranker, null>>(r)).Rank("lead: "), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))

@@ -9,14 +9,14 @@ export class T {
 
 	public declare B: number
 
-	constructor(init?: Partial<{A?: string, B?: number}>, __goscriptValue?: boolean) {
-		this.A = init?.A ?? ("" as string)
-		this.B = init?.B ?? (0 as number)
+	constructor(__goscriptValue?: boolean, A$?: string, B$?: number) {
+		this.A = A$ ?? ""
+		this.B = B$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): T {
-		return new T(this, true)
+		return new T(true, this.A, this.B)
 	}
 
 	public __goscriptAssign(source: T): this {
@@ -52,7 +52,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// Setting a float32 rounds to float32 precision, as a Go assignment does.
 	let x = 3.14
-	let s = new T({A: "aaa", B: globalThis.Math.fround(x)})
+	let s = new T(false, "aaa", globalThis.Math.fround(x))
 	let s$: T = s == null ? $.pointerTarget<T>(s) : (s as any).__isVarRef === true ? (s as any).value : (s as any).__goValue === undefined ? (s as any) : $.pointerTarget<T>(s)
 	let d = new T()
 	let d$: T = d == null ? $.pointerTarget<T>(d) : (d as any).__isVarRef === true ? (d as any).value : (d as any).__goValue === undefined ? (d as any) : $.pointerTarget<T>(d)

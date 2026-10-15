@@ -11,15 +11,15 @@ export class LocalTime {
 
 	public declare loc: time.Location | $.VarRef<time.Location> | null
 
-	constructor(init?: Partial<{wall?: bigint, ext?: bigint, loc?: time.Location | $.VarRef<time.Location> | null}>, __goscriptValue?: boolean) {
-		this.wall = init?.wall ?? (0n as bigint)
-		this.ext = init?.ext ?? (0n as bigint)
-		this.loc = init?.loc ?? (null! as time.Location | $.VarRef<time.Location> | null)
+	constructor(__goscriptValue?: boolean, wall$?: bigint, ext$?: bigint, loc$?: time.Location | $.VarRef<time.Location> | null) {
+		this.wall = wall$ ?? 0n
+		this.ext = ext$ ?? 0n
+		this.loc = loc$ ?? (null! as time.Location | $.VarRef<time.Location> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): LocalTime {
-		return new LocalTime(this, true)
+		return new LocalTime(true, this.wall, this.ext, this.loc)
 	}
 
 	public __goscriptAssign(source: LocalTime): this {

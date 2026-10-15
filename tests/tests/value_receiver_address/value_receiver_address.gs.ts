@@ -6,13 +6,13 @@ import * as $ from "@goscript/builtin/index.js"
 export class Counter {
 	public declare value: number
 
-	constructor(init?: Partial<{value?: number}>, __goscriptValue?: boolean) {
-		this.value = init?.value ?? (0 as number)
+	constructor(__goscriptValue?: boolean, value$?: number) {
+		this.value = value$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Counter {
-		return new Counter(this, true)
+		return new Counter(true, this.value)
 	}
 
 	public __goscriptAssign(source: Counter): this {
@@ -41,7 +41,7 @@ export class Counter {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let original = $.varRef(new Counter({value: 10}, true))
+	let original = $.varRef(new Counter(true, 10))
 	let pointerFromValue = $.markAsStructValue($.cloneStructValue(original.value)).PointerAfterIncrement()
 
 	await $.println("Value receiver pointer value:", (pointerFromValue !== null && (pointerFromValue as any).__isVarRef !== true && (pointerFromValue as any).__goValue === undefined ? ((pointerFromValue as any) as Counter).Value() : Counter.prototype.Value.call(pointerFromValue)))

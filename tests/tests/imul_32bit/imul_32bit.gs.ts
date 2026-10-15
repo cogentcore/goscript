@@ -12,16 +12,16 @@ export class multiplyCase {
 
 	public declare signed: number
 
-	constructor(init?: Partial<{x?: number, y?: number, unsigned?: number, signed?: number}>, __goscriptValue?: boolean) {
-		this.x = init?.x ?? (0 as number)
-		this.y = init?.y ?? (0 as number)
-		this.unsigned = init?.unsigned ?? (0 as number)
-		this.signed = init?.signed ?? (0 as number)
+	constructor(__goscriptValue?: boolean, x$?: number, y$?: number, unsigned$?: number, signed$?: number) {
+		this.x = x$ ?? 0
+		this.y = y$ ?? 0
+		this.unsigned = unsigned$ ?? 0
+		this.signed = signed$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): multiplyCase {
-		return new multiplyCase(this, true)
+		return new multiplyCase(true, this.x, this.y, this.unsigned, this.signed)
 	}
 
 	public __goscriptAssign(source: multiplyCase): this {
@@ -42,7 +42,7 @@ export class multiplyCase {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let cases = $.arrayToSlice<multiplyCase>([new multiplyCase({x: 65535, y: 65535, unsigned: 4294836225, signed: -131071}, true), new multiplyCase({x: 134217729, y: 134217729, unsigned: 268435457, signed: 268435457}, true), new multiplyCase({x: 4294967295, y: 4294967295, unsigned: 1, signed: 1}, true), new multiplyCase({x: 4294967295, y: 3221225473, unsigned: 1073741823, signed: 1073741823}, true), new multiplyCase({x: 4294967295, y: 134217729, unsigned: 4160749567, signed: -134217729}, true)])
+	let cases = $.arrayToSlice<multiplyCase>([new multiplyCase(true, 65535, 65535, 4294836225, -131071), new multiplyCase(true, 134217729, 134217729, 268435457, 268435457), new multiplyCase(true, 4294967295, 4294967295, 1, 1), new multiplyCase(true, 4294967295, 3221225473, 1073741823, 1073741823), new multiplyCase(true, 4294967295, 134217729, 4160749567, -134217729)])
 
 	for (let __goscriptRangeTarget0 = cases, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
 		let tc = ((__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as multiplyCase)).clone()

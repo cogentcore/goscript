@@ -9,14 +9,14 @@ export class Person {
 
 	public declare Age: number
 
-	constructor(init?: Partial<{Name?: string, Age?: number}>, __goscriptValue?: boolean) {
-		this.Name = init?.Name ?? ("" as string)
-		this.Age = init?.Age ?? (0 as number)
+	constructor(__goscriptValue?: boolean, Name$?: string, Age$?: number) {
+		this.Name = Name$ ?? ""
+		this.Age = Age$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Person {
-		return new Person(this, true)
+		return new Person(true, this.Name, this.Age)
 	}
 
 	public __goscriptAssign(source: Person): this {
@@ -35,7 +35,7 @@ export class Person {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let people = $.arrayToSlice<Person>([new Person({Name: "Charlie", Age: 30}, true), new Person({Name: "Alice", Age: 25}, true), new Person({Name: "Bob", Age: 35}, true)])
+	let people = $.arrayToSlice<Person>([new Person(true, "Charlie", 30), new Person(true, "Alice", 25), new Person(true, "Bob", 35)])
 
 	slices.SortFunc(people, $.functionValue((a: Person, b: Person): number => {
 		if (a.Age < b.Age) {

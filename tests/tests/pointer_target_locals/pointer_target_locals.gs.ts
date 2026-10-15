@@ -10,15 +10,15 @@ export class Node {
 
 	public declare Next: Node | $.VarRef<Node> | null
 
-	constructor(init?: Partial<{Name?: string, Count?: number, Next?: Node | $.VarRef<Node> | null}>, __goscriptValue?: boolean) {
-		this.Name = init?.Name ?? ("" as string)
-		this.Count = init?.Count ?? (0 as number)
-		this.Next = init?.Next ?? (null! as Node | $.VarRef<Node> | null)
+	constructor(__goscriptValue?: boolean, Name$?: string, Count$?: number, Next$?: Node | $.VarRef<Node> | null) {
+		this.Name = Name$ ?? ""
+		this.Count = Count$ ?? 0
+		this.Next = Next$ ?? (null! as Node | $.VarRef<Node> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Node {
-		return new Node(this, true)
+		return new Node(true, this.Name, this.Count, this.Next)
 	}
 
 	public __goscriptAssign(source: Node): this {
@@ -57,13 +57,13 @@ export class Node {
 export class Holder {
 	public declare items: $.Slice<Node>
 
-	constructor(init?: Partial<{items?: $.Slice<Node>}>, __goscriptValue?: boolean) {
-		this.items = init?.items ?? (null! as $.Slice<Node>)
+	constructor(__goscriptValue?: boolean, items$?: $.Slice<Node>) {
+		this.items = items$ ?? (null! as $.Slice<Node>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Holder {
-		return new Holder(this, true)
+		return new Holder(true, this.items)
 	}
 
 	public __goscriptAssign(source: Holder): this {
@@ -124,7 +124,7 @@ export function deref(n: Node | $.VarRef<Node> | null): string {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let a = new Node({Name: "a", Next: new Node({Name: "b"})})
+	let a = new Node(false, "a", undefined, new Node(false, "b"))
 	let a$: Node = a == null ? $.pointerTarget<Node>(a) : (a as any).__isVarRef === true ? (a as any).value : (a as any).__goValue === undefined ? (a as any) : $.pointerTarget<Node>(a)
 	await $.println((a !== null && (a as any).__isVarRef !== true && (a as any).__goValue === undefined ? ((a as any) as Node).Len() : Node.prototype.Len.call(a)), (a$ as Node).Count, $.pointerValue<Node>((a$ as Node).Next).Count)
 	await $.println(Describe(a, "> "), Describe(null, "> "))
@@ -136,7 +136,7 @@ export async function main(): globalThis.Promise<void> {
 	let nn: Node | $.VarRef<Node> | null = null! as Node | $.VarRef<Node> | null
 	await $.println((nn !== null && (nn as any).__isVarRef !== true && (nn as any).__goValue === undefined ? ((nn as any) as Node).Len() : Node.prototype.Len.call(nn)))
 
-	let h = new Holder({items: $.arrayToSlice<Node>([new Node({Name: "p"}, true), new Node({Name: "q"}, true)])})
+	let h = new Holder(false, $.arrayToSlice<Node>([new Node(true, "p"), new Node(true, "q")]))
 	let h$: Holder = h == null ? $.pointerTarget<Holder>(h) : (h as any).__isVarRef === true ? (h as any).value : (h as any).__goValue === undefined ? (h as any) : $.pointerTarget<Holder>(h)
 	void (h !== null && (h as any).__isVarRef !== true && (h as any).__goValue === undefined ? ((h as any) as Holder).touch(1) : Holder.prototype.touch.call(h, 1))
 	await $.println($.arrayIndex((h$ as Holder).items!, 1).Name, $.arrayIndex((h$ as Holder).items!, 1).Count)

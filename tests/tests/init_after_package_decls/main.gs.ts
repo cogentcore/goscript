@@ -39,7 +39,7 @@ function __goscriptInit0(): void {
 export async function main(): globalThis.Promise<void> {
 	await $.println($.len(__goscript_types.__goscript_get_Types()), $.pointerValue<__goscript__type.Type>($.mapGet<string, __goscript__type.Type | $.VarRef<__goscript__type.Type> | null, __goscript__type.Type | $.VarRef<__goscript__type.Type> | null>(__goscript_types.__goscript_get_Types(), "int", null)[0]).Name, $.pointerValue<__goscript__type.Type>($.mapGet<string, __goscript__type.Type | $.VarRef<__goscript__type.Type> | null, __goscript__type.Type | $.VarRef<__goscript__type.Type> | null>(__goscript_types.__goscript_get_Types(), "string", null)[0]).Name)
 	await $.println($.pointerValue<__goscript__type.Type>(__goscript_types.__goscript_get_Default()).Name, $.sliceLen(__goscript__type.Type.prototype.FieldNames.call(__goscript_types.__goscript_get_Default())), __goscript_get_Later())
-	await $.println($.pointerValue<__goscript__type.Type>(new __goscript_field.Field({Name: "int"}, true).Owner()).Name)
+	await $.println($.pointerValue<__goscript__type.Type>(new __goscript_field.Field(true, "int").Owner()).Name)
 	for (let __goscriptRangeTarget0 = __goscript_types.__goscript_get_order(), __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
 		let o = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as string)
 		await $.println(o)

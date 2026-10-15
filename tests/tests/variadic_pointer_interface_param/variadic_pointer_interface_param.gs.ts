@@ -16,13 +16,13 @@ $.registerInterfaceType(
 export class lit {
 	public declare n: number
 
-	constructor(init?: Partial<{n?: number}>, __goscriptValue?: boolean) {
-		this.n = init?.n ?? (0 as number)
+	constructor(__goscriptValue?: boolean, n$?: number) {
+		this.n = n$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): lit {
-		return new lit(this, true)
+		return new lit(true, this.n)
 	}
 
 	public __goscriptAssign(source: lit): this {
@@ -57,8 +57,8 @@ export function replace(to: Expr | null, exprs: $.Slice<$.VarRef<Expr | null> | 
 }
 
 export async function main(): globalThis.Promise<void> {
-	let expr: $.VarRef<Expr | null> = $.varRef($.interfaceValue<Expr | null>(new lit({n: 1}), "*main.lit", /* @__PURE__ */ $.pointerType("main.lit")))
-	let next: Expr | null = $.interfaceValue<Expr | null>(new lit({n: 7}), "*main.lit", /* @__PURE__ */ $.pointerType("main.lit"))
+	let expr: $.VarRef<Expr | null> = $.varRef($.interfaceValue<Expr | null>(new lit(false, 1), "*main.lit", /* @__PURE__ */ $.pointerType("main.lit")))
+	let next: Expr | null = $.interfaceValue<Expr | null>(new lit(false, 7), "*main.lit", /* @__PURE__ */ $.pointerType("main.lit"))
 	await $.println(replace(next, $.arrayToSlice<$.VarRef<Expr | null> | null>([expr])), (__goscriptAwait = $.pointerValue<Exclude<Expr, null>>(expr.value).Value(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 }
 

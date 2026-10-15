@@ -8,13 +8,13 @@ export type Jobs = $.Channel<Job> | null
 export class Job {
 	public declare Value: string
 
-	constructor(init?: Partial<{Value?: string}>, __goscriptValue?: boolean) {
-		this.Value = init?.Value ?? ("" as string)
+	constructor(__goscriptValue?: boolean, Value$?: string) {
+		this.Value = Value$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Job {
-		return new Job(this, true)
+		return new Job(true, this.Value)
 	}
 
 	public __goscriptAssign(source: Job): this {

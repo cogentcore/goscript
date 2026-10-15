@@ -11,15 +11,15 @@ export class MyStruct {
 
 	public declare flag: atomic.Uint32
 
-	constructor(init?: Partial<{closed?: atomic.Bool, count?: atomic.Int32, flag?: atomic.Uint32}>, __goscriptValue?: boolean) {
-		this.closed = init?.closed ? $.markAsStructValue($.cloneStructValue(init.closed)) : $.markAsStructValue(new atomic.Bool())
-		this.count = init?.count ? $.markAsStructValue($.cloneStructValue(init.count)) : $.markAsStructValue(new atomic.Int32())
-		this.flag = init?.flag ? $.markAsStructValue($.cloneStructValue(init.flag)) : $.markAsStructValue(new atomic.Uint32())
+	constructor(__goscriptValue?: boolean, closed$?: atomic.Bool, count$?: atomic.Int32, flag$?: atomic.Uint32) {
+		this.closed = closed$ ?? $.markAsStructValue(new atomic.Bool())
+		this.count = count$ ?? $.markAsStructValue(new atomic.Int32())
+		this.flag = flag$ ?? $.markAsStructValue(new atomic.Uint32())
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): MyStruct {
-		return new MyStruct(this, true)
+		return new MyStruct(true, $.markAsStructValue($.cloneStructValue(this.closed)), $.markAsStructValue($.cloneStructValue(this.count)), $.markAsStructValue($.cloneStructValue(this.flag)))
 	}
 
 	public __goscriptAssign(source: MyStruct): this {
@@ -40,7 +40,7 @@ export class MyStruct {
 
 export async function main(): globalThis.Promise<void> {
 	// Test struct initialization with atomic fields
-	let s = new MyStruct(undefined, true)
+	let s = new MyStruct(true)
 
 	// Test that the atomic fields work correctly
 	s.closed.Store(true)
@@ -52,7 +52,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("flag:", s.flag.Load())
 
 	// Test struct initialization with init values
-	let s2 = new MyStruct({closed: $.markAsStructValue(new atomic.Bool()), count: $.markAsStructValue(new atomic.Int32()), flag: $.markAsStructValue(new atomic.Uint32())}, true)
+	let s2 = new MyStruct(true, $.markAsStructValue(new atomic.Bool()), $.markAsStructValue(new atomic.Int32()), $.markAsStructValue(new atomic.Uint32()))
 
 	s2.closed.Store(false)
 	s2.count.Store(24)

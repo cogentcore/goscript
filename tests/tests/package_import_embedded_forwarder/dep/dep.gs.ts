@@ -23,13 +23,13 @@ $.registerInterfaceType(
 export class BaseStore {
 	public declare CoreStore: inner.CoreStore | $.VarRef<inner.CoreStore> | null
 
-	constructor(init?: Partial<{CoreStore?: inner.CoreStore | $.VarRef<inner.CoreStore> | null}>, __goscriptValue?: boolean) {
-		this.CoreStore = init?.CoreStore ?? (null! as inner.CoreStore | $.VarRef<inner.CoreStore> | null)
+	constructor(__goscriptValue?: boolean, CoreStore$?: inner.CoreStore | $.VarRef<inner.CoreStore> | null) {
+		this.CoreStore = CoreStore$ ?? (null! as inner.CoreStore | $.VarRef<inner.CoreStore> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): BaseStore {
-		return new BaseStore(this, true)
+		return new BaseStore(true, this.CoreStore)
 	}
 
 	public __goscriptAssign(source: BaseStore): this {
@@ -51,5 +51,5 @@ export class BaseStore {
 }
 
 export function NewBaseStore(prefix: string): BaseStore | $.VarRef<BaseStore> | null {
-	return (() => { const __goscriptLiteralField0 = inner.NewCoreStore(prefix); return new BaseStore({CoreStore: __goscriptLiteralField0}) })()
+	return (() => { const __goscriptLiteralField0 = inner.NewCoreStore(prefix); return new BaseStore(false, __goscriptLiteralField0) })()
 }

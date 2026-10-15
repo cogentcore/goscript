@@ -9,12 +9,12 @@ import "@goscript/github.com/s4wave/goscript/tests/tests/method_result_imports_c
 import "./method.gs.ts"
 
 export class Holder {
-	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
+	constructor(__goscriptValue?: boolean) {
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Holder {
-		return new Holder(this, true)
+		return new Holder(true)
 	}
 
 	public __goscriptAssign(source: Holder): this {
@@ -36,7 +36,7 @@ export class Holder {
 }
 
 export async function main(): globalThis.Promise<void> {
-	await new Holder(undefined, true).Run()
+	await new Holder(true).Run()
 }
 
 var __goscriptAwait: any

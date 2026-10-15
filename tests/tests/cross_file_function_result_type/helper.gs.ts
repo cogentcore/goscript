@@ -6,13 +6,13 @@ import * as $ from "@goscript/builtin/index.js"
 export class token {
 	public declare value: number
 
-	constructor(init?: Partial<{value?: number}>, __goscriptValue?: boolean) {
-		this.value = init?.value ?? (0 as number)
+	constructor(__goscriptValue?: boolean, value$?: number) {
+		this.value = value$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): token {
-		return new token(this, true)
+		return new token(true, this.value)
 	}
 
 	public __goscriptAssign(source: token): this {
@@ -30,7 +30,7 @@ export class token {
 }
 
 export function newToken(value: number): token | $.VarRef<token> | null {
-	return new token({value: value})
+	return new token(false, value)
 }
 
 export function consumeToken(tok: token | $.VarRef<token> | null): number {

@@ -8,14 +8,14 @@ export class Pos {
 
 	public declare Ch: number
 
-	constructor(init?: Partial<{Ln?: number, Ch?: number}>, __goscriptValue?: boolean) {
-		this.Ln = init?.Ln ?? (0 as number)
-		this.Ch = init?.Ch ?? (0 as number)
+	constructor(__goscriptValue?: boolean, Ln$?: number, Ch$?: number) {
+		this.Ln = Ln$ ?? 0
+		this.Ch = Ch$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Pos {
-		return new Pos(this, true)
+		return new Pos(true, this.Ln, this.Ch)
 	}
 
 	public __goscriptAssign(source: Pos): this {
@@ -42,16 +42,16 @@ export class Key {
 
 	public declare F: number
 
-	constructor(init?: Partial<{Name?: string, At?: Pos, On?: boolean, F?: number}>, __goscriptValue?: boolean) {
-		this.Name = init?.Name ?? ("" as string)
-		this.At = init?.At ? init.At.clone() : new Pos(undefined, true)
-		this.On = init?.On ?? (false as boolean)
-		this.F = init?.F ?? (0 as number)
+	constructor(__goscriptValue?: boolean, Name$?: string, At$?: Pos, On$?: boolean, F$?: number) {
+		this.Name = Name$ ?? ""
+		this.At = At$ ?? new Pos(true)
+		this.On = On$ ?? false
+		this.F = F$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Key {
-		return new Key(this, true)
+		return new Key(true, this.Name, this.At.clone(), this.On, this.F)
 	}
 
 	public __goscriptAssign(source: Key): this {
@@ -74,13 +74,13 @@ export class Key {
 export class Rule {
 	public declare Name: string
 
-	constructor(init?: Partial<{Name?: string}>, __goscriptValue?: boolean) {
-		this.Name = init?.Name ?? ("" as string)
+	constructor(__goscriptValue?: boolean, Name$?: string) {
+		this.Name = Name$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Rule {
-		return new Rule(this, true)
+		return new Rule(true, this.Name)
 	}
 
 	public __goscriptAssign(source: Rule): this {
@@ -102,14 +102,14 @@ export class ScopeRule {
 
 	public declare Rule: Rule | $.VarRef<Rule> | null
 
-	constructor(init?: Partial<{Scope?: Pos, Rule?: Rule | $.VarRef<Rule> | null}>, __goscriptValue?: boolean) {
-		this.Scope = init?.Scope ? init.Scope.clone() : new Pos(undefined, true)
-		this.Rule = init?.Rule ?? (null! as Rule | $.VarRef<Rule> | null)
+	constructor(__goscriptValue?: boolean, Scope$?: Pos, Rule$?: Rule | $.VarRef<Rule> | null) {
+		this.Scope = Scope$ ?? new Pos(true)
+		this.Rule = Rule$ ?? (null! as Rule | $.VarRef<Rule> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): ScopeRule {
-		return new ScopeRule(this, true)
+		return new ScopeRule(true, this.Scope.clone(), this.Rule)
 	}
 
 	public __goscriptAssign(source: ScopeRule): this {
@@ -130,29 +130,29 @@ export class ScopeRule {
 export async function main(): globalThis.Promise<void> {
 	let m = $.makeMap<Key, number>([])
 	for (let i = 0; i < 2000; i++) {
-		$.mapSet(m, new Key({Name: "k", At: new Pos({Ln: i, Ch: i % 7}, true), On: (i % 2) == 0, F: i / 2}, true), i)
+		$.mapSet(m, new Key(true, "k", new Pos(true, i, i % 7), (i % 2) == 0, i / 2), i)
 	}
-	await $.println($.len(m), $.mapGet<Key, number, number>(m, new Key({Name: "k", At: new Pos({Ln: 10, Ch: 3}, true), On: true, F: 5}, true), 0)[0], $.mapGet<Key, number, number>(m, new Key({Name: "k", At: new Pos({Ln: 11, Ch: 4}, true), On: false, F: 5.5}, true), 0)[0])
-	let [, ok] = $.mapGet<Key, number, number>(m, new Key({Name: "k", At: new Pos({Ln: 10, Ch: 3}, true), On: false, F: 5}, true), 0)
+	await $.println($.len(m), $.mapGet<Key, number, number>(m, new Key(true, "k", new Pos(true, 10, 3), true, 5), 0)[0], $.mapGet<Key, number, number>(m, new Key(true, "k", new Pos(true, 11, 4), false, 5.5), 0)[0])
+	let [, ok] = $.mapGet<Key, number, number>(m, new Key(true, "k", new Pos(true, 10, 3), false, 5), 0)
 	await $.println(ok)
-	$.deleteMapEntry(m, new Key({Name: "k", At: new Pos({Ln: 10, Ch: 3}, true), On: true, F: 5}, true))
-	let __goscriptTuple0: any = $.mapGet<Key, number, number>(m, new Key({Name: "k", At: new Pos({Ln: 10, Ch: 3}, true), On: true, F: 5}, true), 0)
+	$.deleteMapEntry(m, new Key(true, "k", new Pos(true, 10, 3), true, 5))
+	let __goscriptTuple0: any = $.mapGet<Key, number, number>(m, new Key(true, "k", new Pos(true, 10, 3), true, 5), 0)
 	ok = __goscriptTuple0[1]
 	await $.println($.len(m), ok)
-	let z = $.makeMap<Pos, string>([[new Pos({Ln: 0, Ch: 0}, true), "zero"]])
+	let z = $.makeMap<Pos, string>([[new Pos(true, 0, 0), "zero"]])
 	let negZero = 0.0
 	negZero = -negZero
 	let fz = $.makeMap<number, number>([[0, 1]])
-	await $.println($.mapGet<Pos, string, string>(z, new Pos(undefined, true), "")[0], $.mapGet<number, number, number>(fz, negZero, 0)[0])
+	await $.println($.mapGet<Pos, string, string>(z, new Pos(true), "")[0], $.mapGet<number, number, number>(fz, negZero, 0)[0])
 
-	let r1 = new Rule({Name: "a"})
-	let r2 = new Rule({Name: "a"})
+	let r1 = new Rule(false, "a")
+	let r2 = new Rule(false, "a")
 	let _set = $.makeMap<ScopeRule, boolean>([])
 	for (let i = 0; i < 1000; i++) {
-		$.mapSet(_set, new ScopeRule({Scope: new Pos({Ln: i, Ch: 0}, true), Rule: r1}, true), true)
+		$.mapSet(_set, new ScopeRule(true, new Pos(true, i, 0), r1), true)
 	}
 	$.pointerValue<Rule>(r1).Name = "changed"
-	await $.println($.len(_set), $.mapGet<ScopeRule, boolean, boolean>(_set, new ScopeRule({Scope: new Pos({Ln: 5, Ch: 0}, true), Rule: r1}, true), false)[0], $.mapGet<ScopeRule, boolean, boolean>(_set, new ScopeRule({Scope: new Pos({Ln: 5, Ch: 0}, true), Rule: r2}, true), false)[0], $.mapGet<ScopeRule, boolean, boolean>(_set, new ScopeRule({Scope: new Pos({Ln: 5, Ch: 0}, true), Rule: null}, true), false)[0])
+	await $.println($.len(_set), $.mapGet<ScopeRule, boolean, boolean>(_set, new ScopeRule(true, new Pos(true, 5, 0), r1), false)[0], $.mapGet<ScopeRule, boolean, boolean>(_set, new ScopeRule(true, new Pos(true, 5, 0), r2), false)[0], $.mapGet<ScopeRule, boolean, boolean>(_set, new ScopeRule(true, new Pos(true, 5, 0), null), false)[0])
 }
 
 if ($.isMainScript(import.meta)) {

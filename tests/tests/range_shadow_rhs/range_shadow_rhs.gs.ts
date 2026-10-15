@@ -8,14 +8,14 @@ export class holder {
 
 	public declare items: $.Slice<item>
 
-	constructor(init?: Partial<{values?: globalThis.Map<string, number> | null, items?: $.Slice<item>}>, __goscriptValue?: boolean) {
-		this.values = init?.values ?? (null! as globalThis.Map<string, number> | null)
-		this.items = init?.items ?? (null! as $.Slice<item>)
+	constructor(__goscriptValue?: boolean, values$?: globalThis.Map<string, number> | null, items$?: $.Slice<item>) {
+		this.values = values$ ?? (null! as globalThis.Map<string, number> | null)
+		this.items = items$ ?? (null! as $.Slice<item>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): holder {
-		return new holder(this, true)
+		return new holder(true, this.values, this.items)
 	}
 
 	public __goscriptAssign(source: holder): this {
@@ -36,13 +36,13 @@ export class holder {
 export class item {
 	public declare value: number
 
-	constructor(init?: Partial<{value?: number}>, __goscriptValue?: boolean) {
-		this.value = init?.value ?? (0 as number)
+	constructor(__goscriptValue?: boolean, value$?: number) {
+		this.value = value$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): item {
-		return new item(this, true)
+		return new item(true, this.value)
 	}
 
 	public __goscriptAssign(source: item): this {
@@ -67,13 +67,13 @@ export class item {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let k = new holder({values: $.makeMap<string, number>([["a", 1], ["b", 2]])}, true)
+	let k = new holder(true, $.makeMap<string, number>([["a", 1], ["b", 2]]))
 	let sum = 0
 	for (const [__goscriptRangeShadow0, v] of k.values?.entries() ?? []) {
 		sum += $.stringLen(__goscriptRangeShadow0) + v
 	}
 	await $.println(sum)
-	let items = new holder({items: $.arrayToSlice<item>([new item({value: 3}, true), new item({value: 7}, true)])}, true)
+	let items = new holder(true, undefined, $.arrayToSlice<item>([new item(true, 3), new item(true, 7)]))
 	for (let __goscriptRangeTarget0 = items.items, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
 		let __goscriptRangeShadow1 = $.varRef(((__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as item)).clone())
 		await $.println(__goscriptRangeShadow1.value.increment())

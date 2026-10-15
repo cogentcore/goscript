@@ -4,12 +4,12 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class BigInt {
-	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
+	constructor(__goscriptValue?: boolean) {
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): BigInt {
-		return new BigInt(this, true)
+		return new BigInt(true)
 	}
 
 	public __goscriptAssign(source: BigInt): this {

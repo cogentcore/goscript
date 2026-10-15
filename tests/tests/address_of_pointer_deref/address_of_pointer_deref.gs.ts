@@ -8,14 +8,14 @@ export class Col {
 
 	public declare Default: $.VarRef<number> | null
 
-	constructor(init?: Partial<{Name?: string, Default?: $.VarRef<number> | null}>, __goscriptValue?: boolean) {
-		this.Name = init?.Name ?? ("" as string)
-		this.Default = init?.Default ?? (null! as $.VarRef<number> | null)
+	constructor(__goscriptValue?: boolean, Name$?: string, Default$?: $.VarRef<number> | null) {
+		this.Name = Name$ ?? ""
+		this.Default = Default$ ?? (null! as $.VarRef<number> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Col {
-		return new Col(this, true)
+		return new Col(true, this.Name, this.Default)
 	}
 
 	public __goscriptAssign(source: Col): this {
@@ -51,7 +51,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("alias write through &*p:", v.value)
 
 	// Field selector: out.Default = &(*out.Default) keeps the same pointee.
-	let c = new Col({Name: "c", Default: v})
+	let c = new Col(false, "c", v)
 	let out = cloneColField(c)
 	let out$: Col = out == null ? $.pointerTarget<Col>(out) : (out as any).__isVarRef === true ? (out as any).value : (out as any).__goValue === undefined ? (out as any) : $.pointerTarget<Col>(out)
 	await $.println("field alias same pointee:", ((out$ as Col).Default === $.pointerValue<Col>(c).Default || $.pointerAliasesMade && $.pointerEqual((out$ as Col).Default, $.pointerValue<Col>(c).Default)));

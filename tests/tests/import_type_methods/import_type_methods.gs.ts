@@ -7,13 +7,13 @@ import * as errlist from "@goscript/github.com/s4wave/goscript/tests/tests/impor
 export class parser {
 	public declare errors: errlist.ErrorList
 
-	constructor(init?: Partial<{errors?: errlist.ErrorList}>, __goscriptValue?: boolean) {
-		this.errors = init?.errors ?? (null! as errlist.ErrorList)
+	constructor(__goscriptValue?: boolean, errors$?: errlist.ErrorList) {
+		this.errors = errors$ ?? (null! as errlist.ErrorList)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): parser {
-		return new parser(this, true)
+		return new parser(true, this.errors)
 	}
 
 	public __goscriptAssign(source: parser): this {
@@ -31,7 +31,7 @@ export class parser {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let p: parser = new parser(undefined, true)
+	let p: parser = new parser(true)
 	p.errors = (errlist.ErrorList_Add(p.errors, "error") as errlist.ErrorList)
 	await $.println($.arrayIndex(p.errors!, 0))
 }

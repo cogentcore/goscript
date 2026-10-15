@@ -11,14 +11,14 @@ export class inner {
 
 	public declare B: Uint8Array
 
-	constructor(init?: Partial<{A?: number, B?: Uint8Array}>, __goscriptValue?: boolean) {
-		this.A = init?.A ?? (0 as number)
-		this.B = init?.B !== undefined ? $.cloneArrayValue(init.B, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 2)) : $.arrayValue(new Uint8Array(2))
+	constructor(__goscriptValue?: boolean, A$?: number, B$?: Uint8Array) {
+		this.A = A$ ?? 0
+		this.B = B$ ?? $.arrayValue(new Uint8Array(2))
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): inner {
-		return new inner(this, true)
+		return new inner(true, this.A, $.cloneArrayValue(this.B, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 2)))
 	}
 
 	public __goscriptAssign(source: inner): this {
@@ -127,17 +127,17 @@ export class header {
 
 	public declare Width: number
 
-	constructor(init?: Partial<{Sig?: Uint8Array, Size?: number, Res?: number[], In?: inner, Width?: number}>, __goscriptValue?: boolean) {
-		this.Sig = init?.Sig !== undefined ? $.cloneArrayValue(init.Sig, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 2)) : $.arrayValue(new Uint8Array(2))
-		this.Size = init?.Size ?? (0 as number)
-		this.Res = init?.Res !== undefined ? $.cloneArrayValue(init.Res, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint16"), 2)) : $.arrayValue(globalThis.Array.from({ length: 2 }, () => 0))
-		this.In = init?.In ? init.In.clone() : new inner(undefined, true)
-		this.Width = init?.Width ?? (0 as number)
+	constructor(__goscriptValue?: boolean, Sig$?: Uint8Array, Size$?: number, Res$?: number[], In$?: inner, Width$?: number) {
+		this.Sig = Sig$ ?? $.arrayValue(new Uint8Array(2))
+		this.Size = Size$ ?? 0
+		this.Res = Res$ ?? $.arrayValue(globalThis.Array.from({ length: 2 }, () => 0))
+		this.In = In$ ?? new inner(true)
+		this.Width = Width$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): header {
-		return new header(this, true)
+		return new header(true, $.cloneArrayValue(this.Sig, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 2)), this.Size, $.cloneArrayValue(this.Res, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint16"), 2)), this.In.clone(), this.Width)
 	}
 
 	public __goscriptAssign(source: header): this {
@@ -160,7 +160,7 @@ export class header {
 
 export async function main(): globalThis.Promise<void> {
 	// A pointer to a struct is written field by field, as image/bmp does.
-	let h = new header({Sig: $.arrayValue(new Uint8Array([66, 77])), Size: 70, Res: $.arrayValue([1, 2]), In: new inner({A: 0x0102, B: $.arrayValue(new Uint8Array([3, 4]))}, true), Width: -5})
+	let h = new header(false, $.arrayValue(new Uint8Array([66, 77])), 70, $.arrayValue([1, 2]), new inner(true, 0x0102, $.arrayValue(new Uint8Array([3, 4]))), -5)
 	let buf = $.varRef($.markAsStructValue(new bytes.Buffer()))
 	{
 		let err = await binary.Write($.pointerValueOrNil($.interfaceValue<io.Writer | null>(buf, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer")))!, $.interfaceValue<binary.ByteOrder | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.LittleEndian))), "binary.littleEndian", "binary.littleEndian")!, $.interfaceValue(h, "*main.header", /* @__PURE__ */ $.pointerType("main.header")))
@@ -173,7 +173,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("bytes:", $.uint($.arrayIndex(buf.value.Bytes()!, 0), 8), $.uint($.arrayIndex(buf.value.Bytes()!, 1), 8), $.uint($.arrayIndex(buf.value.Bytes()!, 2), 8), $.uint($.arrayIndex(buf.value.Bytes()!, 10), 8), $.uint($.arrayIndex(buf.value.Bytes()!, 12), 8))
 
 	// Reading into a pointer to a struct fills its fields.
-	let r: $.VarRef<header> = $.varRef(new header(undefined, true))
+	let r: $.VarRef<header> = $.varRef(new header(true))
 	{
 		let err = await binary.Read($.pointerValueOrNil($.interfaceValue<io.Reader | null>(bytes.NewReader(buf.value.Bytes()), "*bytes.Reader", /* @__PURE__ */ $.pointerType("bytes.Reader")))!, $.interfaceValue<binary.ByteOrder | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.LittleEndian))), "binary.littleEndian", "binary.littleEndian")!, $.interfaceValue(r, "*main.header", /* @__PURE__ */ $.pointerType("main.header")))
 		if (err != null) {

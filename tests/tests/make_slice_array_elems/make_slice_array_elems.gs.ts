@@ -12,14 +12,14 @@ export class point {
 
 	public declare Y: number
 
-	constructor(init?: Partial<{X?: number, Y?: number}>, __goscriptValue?: boolean) {
-		this.X = init?.X ?? (0 as number)
-		this.Y = init?.Y ?? (0 as number)
+	constructor(__goscriptValue?: boolean, X$?: number, Y$?: number) {
+		this.X = X$ ?? 0
+		this.Y = Y$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): point {
-		return new point(this, true)
+		return new point(true, this.X, this.Y)
 	}
 
 	public __goscriptAssign(source: point): this {
@@ -44,7 +44,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("arrays:", $.arrayIndex($.arrayIndex(a!, 0), 0), $.arrayIndex($.arrayIndex(a!, 1), 2), 4)
 
 	// Arrays of structs and named array types too.
-	let b = $.makeSlice<point[]>(2, undefined, undefined, () => $.arrayValue(globalThis.Array.from({ length: 2 }, () => new point(undefined, true)), /* @__PURE__ */ $.arrayType("main.point", 2)))
+	let b = $.makeSlice<point[]>(2, undefined, undefined, () => $.arrayValue(globalThis.Array.from({ length: 2 }, () => new point(true)), /* @__PURE__ */ $.arrayType("main.point", 2)))
 	$.arrayIndex($.arrayIndex(b!, 1), 1).X = 3
 	let q = $.makeSlice<quad>(1, undefined, undefined, () => $.arrayValue(globalThis.Array.from({ length: 4 }, () => 0)))
 	$.arrayIndex(q!, 0)[3] = 9

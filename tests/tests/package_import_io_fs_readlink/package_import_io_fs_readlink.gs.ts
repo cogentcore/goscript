@@ -5,12 +5,12 @@ import * as $ from "@goscript/builtin/index.js"
 import * as fs from "@goscript/io/fs/index.js"
 
 export class emptyFS {
-	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
+	constructor(__goscriptValue?: boolean) {
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): emptyFS {
-		return new emptyFS(this, true)
+		return new emptyFS(true)
 	}
 
 	public __goscriptAssign(source: emptyFS): this {
@@ -31,12 +31,12 @@ export class emptyFS {
 }
 
 export class linkFS {
-	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
+	constructor(__goscriptValue?: boolean) {
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): linkFS {
-		return new linkFS(this, true)
+		return new linkFS(true)
 	}
 
 	public __goscriptAssign(source: linkFS): this {
@@ -65,10 +65,10 @@ export class linkFS {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let [target, err] = fs.ReadLink($.interfaceValue<fs.FS | null>(new linkFS(undefined, true), "main.linkFS", "main.linkFS")!, "link")
+	let [target, err] = fs.ReadLink($.interfaceValue<fs.FS | null>(new linkFS(true), "main.linkFS", "main.linkFS")!, "link")
 	await $.println("target:", target, err == null)
 
-	let __goscriptTuple0: any = fs.ReadLink($.interfaceValue<fs.FS | null>(new emptyFS(undefined, true), "main.emptyFS", "main.emptyFS")!, "link")
+	let __goscriptTuple0: any = fs.ReadLink($.interfaceValue<fs.FS | null>(new emptyFS(true), "main.emptyFS", "main.emptyFS")!, "link")
 	err = __goscriptTuple0[1]
 	await $.println("unsupported:", err != null)
 }

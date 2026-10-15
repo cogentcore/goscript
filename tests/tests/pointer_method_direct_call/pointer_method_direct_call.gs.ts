@@ -16,13 +16,13 @@ $.registerInterfaceType(
 export class counter {
 	public declare n: number
 
-	constructor(init?: Partial<{n?: number}>, __goscriptValue?: boolean) {
-		this.n = init?.n ?? (0 as number)
+	constructor(__goscriptValue?: boolean, n$?: number) {
+		this.n = n$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): counter {
-		return new counter(this, true)
+		return new counter(true, this.n)
 	}
 
 	public __goscriptAssign(source: counter): this {
@@ -84,10 +84,10 @@ export async function main(): globalThis.Promise<void> {
 		await $.println((c !== null && (c as any).__isVarRef !== true && (c as any).__goValue === undefined ? ((c as any) as counter).add(arg()) : counter.prototype.add.call(c, arg())), (nilc !== null && (nilc as any).__isVarRef !== true && (nilc as any).__goValue === undefined ? ((nilc as any) as counter).add(arg()) : counter.prototype.add.call(nilc, arg())), calls)
 
 		// A pointer to a struct variable that a closure reassigns.
-		let v: $.VarRef<counter> = $.varRef(new counter(undefined, true))
+		let v: $.VarRef<counter> = $.varRef(new counter(true))
 		let pv = v
 		let reset = $.functionValue(() => {
-			v.value = v.value.__goscriptAssign(new counter({n: 100}, true))
+			v.value = v.value.__goscriptAssign(new counter(true, 100))
 		}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo))
 		void (pv !== null && (pv as any).__isVarRef !== true && (pv as any).__goValue === undefined ? ((pv as any) as counter).add(1) : counter.prototype.add.call(pv, 1))
 		reset()

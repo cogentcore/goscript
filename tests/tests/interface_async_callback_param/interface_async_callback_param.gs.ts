@@ -16,12 +16,12 @@ $.registerInterfaceType(
 );
 
 export class listScanner {
-	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
+	constructor(__goscriptValue?: boolean) {
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): listScanner {
-		return new listScanner(this, true)
+		return new listScanner(true)
 	}
 
 	public __goscriptAssign(source: listScanner): this {
@@ -51,7 +51,7 @@ export function run(s: scanner | null): $.GoError {
 }
 
 export async function main(): globalThis.Promise<void> {
-	await $.println(run($.interfaceValue<scanner | null>(new listScanner(undefined, true), "main.listScanner", "main.listScanner")) == null)
+	await $.println(run($.interfaceValue<scanner | null>(new listScanner(true), "main.listScanner", "main.listScanner")) == null)
 
 	let m = $.varRef($.markAsStructValue(new sync.Map()))
 	let callbacks = $.arrayValue([$.functionValue((v: number): $.GoError => {

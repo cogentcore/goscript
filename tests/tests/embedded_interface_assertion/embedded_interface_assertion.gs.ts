@@ -35,12 +35,12 @@ $.registerInterfaceType(
 );
 
 export class MyStruct {
-	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
+	constructor(__goscriptValue?: boolean) {
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): MyStruct {
-		return new MyStruct(this, true)
+		return new MyStruct(true)
 	}
 
 	public __goscriptAssign(source: MyStruct): this {
@@ -70,7 +70,7 @@ export class MyStruct {
 
 export async function main(): globalThis.Promise<void> {
 	let rwc: ReadCloser | null = null! as ReadCloser | null
-	let s = new MyStruct(undefined, true)
+	let s = new MyStruct(true)
 	rwc = $.interfaceValue<ReadCloser | null>((s).clone(), "main.MyStruct", "main.MyStruct")
 
 	let [, ok] = $.typeAssertTuple<ReadCloser | null>(rwc, "main.ReadCloser")

@@ -6,13 +6,13 @@ import * as $ from "@goscript/builtin/index.js"
 export class descriptor {
 	public declare Label: string
 
-	constructor(init?: Partial<{Label?: string}>, __goscriptValue?: boolean) {
-		this.Label = init?.Label ?? ("" as string)
+	constructor(__goscriptValue?: boolean, Label$?: string) {
+		this.Label = Label$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): descriptor {
-		return new descriptor(this, true)
+		return new descriptor(true, this.Label)
 	}
 
 	public __goscriptAssign(source: descriptor): this {

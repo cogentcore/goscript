@@ -16,13 +16,13 @@ $.registerInterfaceType(
 export class branch {
 	public declare n: number
 
-	constructor(init?: Partial<{n?: number}>, __goscriptValue?: boolean) {
-		this.n = init?.n ?? (0 as number)
+	constructor(__goscriptValue?: boolean, n$?: number) {
+		this.n = n$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): branch {
-		return new branch(this, true)
+		return new branch(true, this.n)
 	}
 
 	public __goscriptAssign(source: branch): this {
@@ -49,7 +49,7 @@ export function accept(b: branch | $.VarRef<branch> | null): number {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let v: node | null = $.interfaceValue<node | null>(new branch({n: 3}), "*main.branch", /* @__PURE__ */ $.pointerType("main.branch"))
+	let v: node | null = $.interfaceValue<node | null>(new branch(false, 3), "*main.branch", /* @__PURE__ */ $.pointerType("main.branch"))
 	{
 		const __goscriptTypeSwitchValue = v
 		switch (true) {

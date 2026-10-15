@@ -7,13 +7,13 @@ import * as _unique from "@goscript/unique/index.js"
 export class zone {
 	public declare name: string
 
-	constructor(init?: Partial<{name?: string}>, __goscriptValue?: boolean) {
-		this.name = init?.name ?? ("" as string)
+	constructor(__goscriptValue?: boolean, name$?: string) {
+		this.name = name$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): zone {
-		return new zone(this, true)
+		return new zone(true, this.name)
 	}
 
 	public __goscriptAssign(source: zone): this {
@@ -31,9 +31,9 @@ export class zone {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let a = ($.markAsStructValue($.cloneStructValue(_unique.Make(new zone({name: "eth0"}, true)))) as _unique.Handle<zone>)
-	let b = ($.markAsStructValue($.cloneStructValue(_unique.Make(new zone({name: "eth0"}, true)))) as _unique.Handle<zone>)
-	let c = ($.markAsStructValue($.cloneStructValue(_unique.Make(new zone({name: "eth1"}, true)))) as _unique.Handle<zone>)
+	let a = ($.markAsStructValue($.cloneStructValue(_unique.Make(new zone(true, "eth0")))) as _unique.Handle<zone>)
+	let b = ($.markAsStructValue($.cloneStructValue(_unique.Make(new zone(true, "eth0")))) as _unique.Handle<zone>)
+	let c = ($.markAsStructValue($.cloneStructValue(_unique.Make(new zone(true, "eth1")))) as _unique.Handle<zone>)
 
 	await $.println($.structEqual(a, b))
 	await $.println($.structEqual(a, c))
@@ -42,7 +42,7 @@ export async function main(): globalThis.Promise<void> {
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.zone", zero: () => new zone(undefined, true) }})
+	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.zone", zero: () => new zone(true) }})
 }
 
 if ($.isMainScript(import.meta)) {

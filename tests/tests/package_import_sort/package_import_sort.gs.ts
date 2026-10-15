@@ -41,13 +41,13 @@ $.registerNamedValueType(
 export class descending {
 	public declare values: $.Slice<number>
 
-	constructor(init?: Partial<{values?: $.Slice<number>}>, __goscriptValue?: boolean) {
-		this.values = init?.values ?? (null! as $.Slice<number>)
+	constructor(__goscriptValue?: boolean, values$?: $.Slice<number>) {
+		this.values = values$ ?? (null! as $.Slice<number>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): descending {
-		return new descending(this, true)
+		return new descending(true, this.values)
 	}
 
 	public __goscriptAssign(source: descending): this {
@@ -185,7 +185,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("Custom slice is sorted:", isSliceSorted)
 
 	// Test custom sort.Interface values.
-	let custom = new descending({values: $.arrayToSlice<number>([1, 3, 2])}, true)
+	let custom = new descending(true, $.arrayToSlice<number>([1, 3, 2]))
 	sort2.Sort($.interfaceValue<sort2.Interface | null>((custom).clone(), "main.descending", "main.descending")!)
 	await $.println("Custom interface sort:", $.arrayIndex(custom.values!, 0), $.arrayIndex(custom.values!, 1), $.arrayIndex(custom.values!, 2))
 

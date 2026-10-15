@@ -9,14 +9,14 @@ export class counter {
 
 	public declare n: number
 
-	constructor(init?: Partial<{mu?: sync.Mutex, n?: number}>, __goscriptValue?: boolean) {
-		this.mu = init?.mu ? $.markAsStructValue($.cloneStructValue(init.mu)) : $.markAsStructValue(new sync.Mutex())
-		this.n = init?.n ?? (0 as number)
+	constructor(__goscriptValue?: boolean, mu$?: sync.Mutex, n$?: number) {
+		this.mu = mu$ ?? $.markAsStructValue(new sync.Mutex())
+		this.n = n$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): counter {
-		return new counter(this, true)
+		return new counter(true, $.markAsStructValue($.cloneStructValue(this.mu)), this.n)
 	}
 
 	public __goscriptAssign(source: counter): this {
@@ -59,15 +59,15 @@ export class queue {
 
 	public declare ready: $.Channel<number> | null
 
-	constructor(init?: Partial<{mu?: sync.Mutex, items?: $.Slice<number>, ready?: $.Channel<number> | null}>, __goscriptValue?: boolean) {
-		this.mu = init?.mu ? $.markAsStructValue($.cloneStructValue(init.mu)) : $.markAsStructValue(new sync.Mutex())
-		this.items = init?.items ?? (null! as $.Slice<number>)
-		this.ready = init?.ready ?? (null! as $.Channel<number> | null)
+	constructor(__goscriptValue?: boolean, mu$?: sync.Mutex, items$?: $.Slice<number>, ready$?: $.Channel<number> | null) {
+		this.mu = mu$ ?? $.markAsStructValue(new sync.Mutex())
+		this.items = items$ ?? (null! as $.Slice<number>)
+		this.ready = ready$ ?? (null! as $.Channel<number> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): queue {
-		return new queue(this, true)
+		return new queue(true, $.markAsStructValue($.cloneStructValue(this.mu)), this.items, this.ready)
 	}
 
 	public __goscriptAssign(source: queue): this {
@@ -110,14 +110,14 @@ export class shared {
 
 	public declare n: number
 
-	constructor(init?: Partial<{mu?: sync.Mutex, n?: number}>, __goscriptValue?: boolean) {
-		this.mu = init?.mu ? $.markAsStructValue($.cloneStructValue(init.mu)) : $.markAsStructValue(new sync.Mutex())
-		this.n = init?.n ?? (0 as number)
+	constructor(__goscriptValue?: boolean, mu$?: sync.Mutex, n$?: number) {
+		this.mu = mu$ ?? $.markAsStructValue(new sync.Mutex())
+		this.n = n$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): shared {
-		return new shared(this, true)
+		return new shared(true, $.markAsStructValue($.cloneStructValue(this.mu)), this.n)
 	}
 
 	public __goscriptAssign(source: shared): this {
@@ -152,16 +152,16 @@ export class gate {
 
 	public declare log: $.Slice<string>
 
-	constructor(init?: Partial<{mu?: sync.Mutex, started?: $.Channel<number> | null, wake?: $.Channel<number> | null, log?: $.Slice<string>}>, __goscriptValue?: boolean) {
-		this.mu = init?.mu ? $.markAsStructValue($.cloneStructValue(init.mu)) : $.markAsStructValue(new sync.Mutex())
-		this.started = init?.started ?? (null! as $.Channel<number> | null)
-		this.wake = init?.wake ?? (null! as $.Channel<number> | null)
-		this.log = init?.log ?? (null! as $.Slice<string>)
+	constructor(__goscriptValue?: boolean, mu$?: sync.Mutex, started$?: $.Channel<number> | null, wake$?: $.Channel<number> | null, log$?: $.Slice<string>) {
+		this.mu = mu$ ?? $.markAsStructValue(new sync.Mutex())
+		this.started = started$ ?? (null! as $.Channel<number> | null)
+		this.wake = wake$ ?? (null! as $.Channel<number> | null)
+		this.log = log$ ?? (null! as $.Slice<string>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): gate {
-		return new gate(this, true)
+		return new gate(true, $.markAsStructValue($.cloneStructValue(this.mu)), this.started, this.wake, this.log)
 	}
 
 	public __goscriptAssign(source: gate): this {
@@ -210,16 +210,16 @@ export class relay {
 
 	public declare log: $.Slice<string>
 
-	constructor(init?: Partial<{mu?: sync.Mutex, started?: $.Channel<number> | null, wake?: $.Channel<number> | null, log?: $.Slice<string>}>, __goscriptValue?: boolean) {
-		this.mu = init?.mu ? $.markAsStructValue($.cloneStructValue(init.mu)) : $.markAsStructValue(new sync.Mutex())
-		this.started = init?.started ?? (null! as $.Channel<number> | null)
-		this.wake = init?.wake ?? (null! as $.Channel<number> | null)
-		this.log = init?.log ?? (null! as $.Slice<string>)
+	constructor(__goscriptValue?: boolean, mu$?: sync.Mutex, started$?: $.Channel<number> | null, wake$?: $.Channel<number> | null, log$?: $.Slice<string>) {
+		this.mu = mu$ ?? $.markAsStructValue(new sync.Mutex())
+		this.started = started$ ?? (null! as $.Channel<number> | null)
+		this.wake = wake$ ?? (null! as $.Channel<number> | null)
+		this.log = log$ ?? (null! as $.Slice<string>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): relay {
-		return new relay(this, true)
+		return new relay(true, $.markAsStructValue($.cloneStructValue(this.mu)), this.started, this.wake, this.log)
 	}
 
 	public __goscriptAssign(source: relay): this {
@@ -384,7 +384,7 @@ export async function main(): globalThis.Promise<void> {
 	void (c !== null && (c as any).__isVarRef !== true && (c as any).__goValue === undefined ? ((c as any) as counter).add(3) : counter.prototype.add.call(c, 3))
 	await $.println("counter:", (c !== null && (c as any).__isVarRef !== true && (c as any).__goValue === undefined ? ((c as any) as counter)["get"]() : counter.prototype.get.call(c)))
 
-	let q = new queue({ready: $.makeChannel<number>(1, 0, "both")})
+	let q = new queue(false, undefined, undefined, $.makeChannel<number>(1, 0, "both"))
 	let wg = $.varRef($.markAsStructValue(new sync.WaitGroup()))
 	wg.value.Add(1)
 	queueMicrotask(async () => {
@@ -408,7 +408,7 @@ export async function main(): globalThis.Promise<void> {
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)))
 	await $.println("shared:", (s$ as shared).n)
 
-	let g = new gate({started: $.makeChannel<number>(0, 0, "both"), wake: $.makeChannel<number>(0, 0, "both")})
+	let g = new gate(false, undefined, $.makeChannel<number>(0, 0, "both"), $.makeChannel<number>(0, 0, "both"))
 	let g$: gate = g == null ? $.pointerTarget<gate>(g) : (g as any).__isVarRef === true ? (g as any).value : (g as any).__goValue === undefined ? (g as any) : $.pointerTarget<gate>(g)
 	queueMicrotask(async () => { await (g !== null && (g as any).__isVarRef !== true && (g as any).__goValue === undefined ? ((g as any) as gate).poll() : gate.prototype.poll.call(g)) })
 	await $.chanRecv((g$ as gate).started)
@@ -421,7 +421,7 @@ export async function main(): globalThis.Promise<void> {
 		await $.println("gate:", entry)
 	}
 
-	let r = new relay({started: $.makeChannel<number>(0, 0, "both"), wake: $.makeChannel<number>(0, 0, "both")})
+	let r = new relay(false, undefined, $.makeChannel<number>(0, 0, "both"), $.makeChannel<number>(0, 0, "both"))
 	let r$: relay = r == null ? $.pointerTarget<relay>(r) : (r as any).__isVarRef === true ? (r as any).value : (r as any).__goValue === undefined ? (r as any) : $.pointerTarget<relay>(r)
 	queueMicrotask(async () => { await (r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? ((r as any) as relay).run() : relay.prototype.run.call(r)) })
 	await $.chanRecv((r$ as relay).started)

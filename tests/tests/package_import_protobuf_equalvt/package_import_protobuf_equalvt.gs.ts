@@ -22,13 +22,13 @@ $.registerNamedValueType(
 export class msg {
 	public declare v: number
 
-	constructor(init?: Partial<{v?: number}>, __goscriptValue?: boolean) {
-		this.v = init?.v ?? (0 as number)
+	constructor(__goscriptValue?: boolean, v$?: number) {
+		this.v = v$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): msg {
-		return new msg(this, true)
+		return new msg(true, this.v)
 	}
 
 	public __goscriptAssign(source: msg): this {
@@ -46,7 +46,7 @@ export class msg {
 		if (m == null) {
 			return null
 		}
-		return new msg({v: $.pointerValue<msg>(m).v})
+		return new msg(false, $.pointerValue<msg>(m).v)
 	}
 
 	public EqualVT(other: msg | $.VarRef<msg> | null): boolean {
@@ -104,15 +104,15 @@ export function state_String(s: state): string {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let original = new msg({v: 7})
+	let original = new msg(false, 7)
 	let cloned = (protobuf_go_lite.CloneVTValue(__goscriptStatic0(), original) as msg | $.VarRef<msg> | null)
 	await $.println("clone:", (cloned !== original && !($.pointerAliasesMade && $.pointerEqual(cloned, original))), (cloned !== null && (cloned as any).__isVarRef !== true && (cloned as any).__goValue === undefined ? ((cloned as any) as msg).EqualVT(original) : msg.prototype.EqualVT.call(cloned, original)))
 	await $.println("clone-slice:", !$.pointerEqual($.arrayIndex(protobuf_go_lite.CloneVTSlice($.arrayToSlice<msg | $.VarRef<msg> | null>([original]))!, 0), original))
 	let enumSlice = $.arrayToSlice<state>([1, 0])
 	let clonedEnumSlice = (protobuf_go_lite.CloneSlice(enumSlice) as $.Slice<state>)
 	await $.println("clone-enum-slice:", $.arrayIndex(clonedEnumSlice!, 0), $.arrayIndex(clonedEnumSlice!, 1))
-	await $.println("equal:", protobuf_go_lite.IsEqualVT(__goscriptStatic0(), original, new msg({v: 7})))
-	await $.println("equal-slice-implicit:", protobuf_go_lite.EqualVTSliceImplicit($.arrayToSlice<msg | $.VarRef<msg> | null>([null, original]), $.arrayToSlice<msg | $.VarRef<msg> | null>([new msg(), new msg({v: 7})]), $.functionValue((): msg | $.VarRef<msg> | null => {
+	await $.println("equal:", protobuf_go_lite.IsEqualVT(__goscriptStatic0(), original, new msg(false, 7)))
+	await $.println("equal-slice-implicit:", protobuf_go_lite.EqualVTSliceImplicit($.arrayToSlice<msg | $.VarRef<msg> | null>([null, original]), $.arrayToSlice<msg | $.VarRef<msg> | null>([new msg(), new msg(false, 7)]), $.functionValue((): msg | $.VarRef<msg> | null => {
 		return new msg()
 	}, ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.pointerType("main.msg")] } as $.FunctionTypeInfo))))
 	let sb: $.VarRef<protobuf_go_lite.TextBuilder> = $.varRef($.markAsStructValue(new strings.Builder()))

@@ -8,12 +8,12 @@ import * as __goscript_iterator from "./iterator.gs.ts"
 import "./alias.gs.ts"
 
 export class source {
-	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
+	constructor(__goscriptValue?: boolean) {
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): source {
-		return new source(this, true)
+		return new source(true)
 	}
 
 	public __goscriptAssign(source: source): this {
@@ -34,8 +34,8 @@ export class source {
 }
 
 export async function main(): globalThis.Promise<void> {
-	await $.println($.bytesToString(__goscript_iterator.Read($.interfaceValue<__goscript_iterator.Reader | null>(new source(undefined, true), "main.source", "main.source"))))
-	await $.println($.bytesToString(subpkg.Value_Clone(__goscript_iterator.Read($.interfaceValue<__goscript_iterator.Reader | null>(new source(undefined, true), "main.source", "main.source")))))
+	await $.println($.bytesToString(__goscript_iterator.Read($.interfaceValue<__goscript_iterator.Reader | null>(new source(true), "main.source", "main.source"))))
+	await $.println($.bytesToString(subpkg.Value_Clone(__goscript_iterator.Read($.interfaceValue<__goscript_iterator.Reader | null>(new source(true), "main.source", "main.source")))))
 }
 
 if ($.isMainScript(import.meta)) {

@@ -22,13 +22,13 @@ $.registerNamedValueType(
 export class pile {
 	public declare step: number
 
-	constructor(init?: Partial<{step?: number}>, __goscriptValue?: boolean) {
-		this.step = init?.step ?? (0 as number)
+	constructor(__goscriptValue?: boolean, step$?: number) {
+		this.step = step$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): pile {
-		return new pile(this, true)
+		return new pile(true, this.step)
 	}
 
 	public __goscriptAssign(source: pile): this {

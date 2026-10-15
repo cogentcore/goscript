@@ -8,14 +8,14 @@ export class namedItem {
 
 	public declare data: $.Slice<number>
 
-	constructor(init?: Partial<{key?: string, data?: $.Slice<number>}>, __goscriptValue?: boolean) {
-		this.key = init?.key ?? ("" as string)
-		this.data = init?.data ?? (null! as $.Slice<number>)
+	constructor(__goscriptValue?: boolean, key$?: string, data$?: $.Slice<number>) {
+		this.key = key$ ?? ""
+		this.data = data$ ?? (null! as $.Slice<number>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): namedItem {
-		return new namedItem(this, true)
+		return new namedItem(true, this.key, this.data)
 	}
 
 	public __goscriptAssign(source: namedItem): this {
@@ -52,7 +52,7 @@ export async function main(): globalThis.Promise<void> {
 }
 
 export function buildNamedItems(): [$.Slice<namedItem>, boolean] {
-	return [$.arrayToSlice<namedItem>([new namedItem({key: "skip", data: new Uint8Array([0]) as $.Slice<number>}, true), new namedItem({key: "keep", data: new Uint8Array([1, 2, 3]) as $.Slice<number>}, true)]), true]
+	return [$.arrayToSlice<namedItem>([new namedItem(true, "skip", new Uint8Array([0]) as $.Slice<number>), new namedItem(true, "keep", new Uint8Array([1, 2, 3]) as $.Slice<number>)]), true]
 }
 
 if ($.isMainScript(import.meta)) {

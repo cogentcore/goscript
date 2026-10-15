@@ -10,13 +10,13 @@ import "./method.gs.ts"
 export class label {
 	public declare value: string
 
-	constructor(init?: Partial<{value?: string}>, __goscriptValue?: boolean) {
-		this.value = init?.value ?? ("" as string)
+	constructor(__goscriptValue?: boolean, value$?: string) {
+		this.value = value$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): label {
-		return new label(this, true)
+		return new label(true, this.value)
 	}
 
 	public __goscriptAssign(source: label): this {
@@ -40,7 +40,7 @@ export class label {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let item = new label({value: "go"}, true)
+	let item = new label(true, "go")
 	await $.println(item.Format())
 }
 

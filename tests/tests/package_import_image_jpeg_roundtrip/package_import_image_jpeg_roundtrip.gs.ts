@@ -12,12 +12,12 @@ export async function main(): globalThis.Promise<void> {
 	let im = image.NewRGBA(image.Rect(0, 0, 16, 16))
 	for (let y = 0; y < 16; y++) {
 		for (let x = 0; x < 16; x++) {
-			image.RGBA.prototype.Set.call(im, x, y, $.interfaceValue<color.Color | null>(new color.RGBA({R: $.uint(x * 16, 8), G: $.uint(y * 16, 8), B: 128, A: 255}, true), "color.RGBA", "color.RGBA"))
+			image.RGBA.prototype.Set.call(im, x, y, $.interfaceValue<color.Color | null>(new color.RGBA(true, $.uint(x * 16, 8), $.uint(y * 16, 8), 128, 255), "color.RGBA", "color.RGBA"))
 		}
 	}
 	let buf = $.varRef($.markAsStructValue(new bytes.Buffer()))
 	{
-		let err = await jpeg.Encode($.interfaceValue<io.Writer | null>(buf, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer")), $.interfaceValue<image.Image | null>(im, "*image.RGBA", /* @__PURE__ */ $.pointerType("image.RGBA")), new jpeg.Options({Quality: 90}))
+		let err = await jpeg.Encode($.interfaceValue<io.Writer | null>(buf, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer")), $.interfaceValue<image.Image | null>(im, "*image.RGBA", /* @__PURE__ */ $.pointerType("image.RGBA")), new jpeg.Options(false, 90))
 		if (err != null) {
 			await $.println("encode error:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 			return

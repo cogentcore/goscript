@@ -24,13 +24,13 @@ $.registerNamedValueType(
 export class slowName {
 	public declare ch: $.Channel<string> | null
 
-	constructor(init?: Partial<{ch?: $.Channel<string> | null}>, __goscriptValue?: boolean) {
-		this.ch = init?.ch ?? (null! as $.Channel<string> | null)
+	constructor(__goscriptValue?: boolean, ch$?: $.Channel<string> | null) {
+		this.ch = ch$ ?? (null! as $.Channel<string> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): slowName {
-		return new slowName(this, true)
+		return new slowName(true, this.ch)
 	}
 
 	public __goscriptAssign(source: slowName): this {
@@ -58,14 +58,14 @@ export class reading {
 
 	public declare Value: number
 
-	constructor(init?: Partial<{Name?: slowName, Value?: number}>, __goscriptValue?: boolean) {
-		this.Name = init?.Name ? init.Name.clone() : new slowName(undefined, true)
-		this.Value = init?.Value ?? (0 as number)
+	constructor(__goscriptValue?: boolean, Name$?: slowName, Value$?: number) {
+		this.Name = Name$ ?? new slowName(true)
+		this.Value = Value$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): reading {
-		return new reading(this, true)
+		return new reading(true, this.Name.clone(), this.Value)
 	}
 
 	public __goscriptAssign(source: reading): this {
@@ -86,13 +86,13 @@ export class reading {
 export class tag {
 	public declare name: string
 
-	constructor(init?: Partial<{name?: string}>, __goscriptValue?: boolean) {
-		this.name = init?.name ?? ("" as string)
+	constructor(__goscriptValue?: boolean, name$?: string) {
+		this.name = name$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): tag {
-		return new tag(this, true)
+		return new tag(true, this.name)
 	}
 
 	public __goscriptAssign(source: tag): this {
@@ -121,15 +121,15 @@ export class plain {
 
 	public declare Tags: $.Slice<string>
 
-	constructor(init?: Partial<{Tag?: tag, Count?: number, Tags?: $.Slice<string>}>, __goscriptValue?: boolean) {
-		this.Tag = init?.Tag ? init.Tag.clone() : new tag(undefined, true)
-		this.Count = init?.Count ?? (0 as number)
-		this.Tags = init?.Tags ?? (null! as $.Slice<string>)
+	constructor(__goscriptValue?: boolean, Tag$?: tag, Count$?: number, Tags$?: $.Slice<string>) {
+		this.Tag = Tag$ ?? new tag(true)
+		this.Count = Count$ ?? 0
+		this.Tags = Tags$ ?? (null! as $.Slice<string>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): plain {
-		return new plain(this, true)
+		return new plain(true, this.Tag.clone(), this.Count, this.Tags)
 	}
 
 	public __goscriptAssign(source: plain): this {
@@ -151,13 +151,13 @@ export class plain {
 export class codeError {
 	public declare code: number
 
-	constructor(init?: Partial<{code?: number}>, __goscriptValue?: boolean) {
-		this.code = init?.code ?? (0 as number)
+	constructor(__goscriptValue?: boolean, code$?: number) {
+		this.code = code$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): codeError {
-		return new codeError(this, true)
+		return new codeError(true, this.code)
 	}
 
 	public __goscriptAssign(source: codeError): this {
@@ -220,12 +220,12 @@ export async function write(w: io.Writer | null, c: celsius): globalThis.Promise
 
 export async function main(): globalThis.Promise<void> {
 	await $.println(basics(1, "a", 2.5))
-	await $.println(temps(21.5, new plain({Tag: new tag({name: "t"}, true), Count: 2, Tags: $.arrayToSlice<string>(["x"])}, true)))
-	await $.println(await slow(new slowName({ch: $.makeChannel<string>(1, "", "both")}, true)))
-	await $.println(await nested(new reading({Name: new slowName({ch: $.makeChannel<string>(1, "", "both")}, true), Value: 4}, true)))
+	await $.println(temps(21.5, new plain(true, new tag(true, "t"), 2, $.arrayToSlice<string>(["x"]))))
+	await $.println(await slow(new slowName(true, $.makeChannel<string>(1, "", "both"))))
+	await $.println(await nested(new reading(true, new slowName(true, $.makeChannel<string>(1, "", "both")), 4)))
 	await $.println(await anything(__goscriptStatic3()))
-	await $.println(await anything($.interfaceValue(new slowName({ch: $.makeChannel<string>(1, "", "both")}, true), "main.slowName", "main.slowName")))
-	await $.println(await wrap($.interfaceValue<$.GoError>(new codeError({code: 7}), "*main.codeError", /* @__PURE__ */ $.pointerType("main.codeError"))))
+	await $.println(await anything($.interfaceValue(new slowName(true, $.makeChannel<string>(1, "", "both")), "main.slowName", "main.slowName")))
+	await $.println(await wrap($.interfaceValue<$.GoError>(new codeError(false, 7), "*main.codeError", /* @__PURE__ */ $.pointerType("main.codeError"))))
 	await $.print(build(5))
 	let b = $.varRef($.markAsStructValue(new strings.Builder()))
 	await write($.interfaceValue<io.Writer | null>(b, "*strings.Builder", /* @__PURE__ */ $.pointerType("strings.Builder")), 6)

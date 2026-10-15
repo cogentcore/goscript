@@ -8,14 +8,14 @@ export class MyStruct {
 
 	public declare MyString: string
 
-	constructor(init?: Partial<{MyInt?: number, MyString?: string}>, __goscriptValue?: boolean) {
-		this.MyInt = init?.MyInt ?? (0 as number)
-		this.MyString = init?.MyString ?? ("" as string)
+	constructor(__goscriptValue?: boolean, MyInt$?: number, MyString$?: string) {
+		this.MyInt = MyInt$ ?? 0
+		this.MyString = MyString$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): MyStruct {
-		return new MyStruct(this, true)
+		return new MyStruct(true, this.MyInt, this.MyString)
 	}
 
 	public __goscriptAssign(source: MyStruct): this {
@@ -36,7 +36,7 @@ export class MyStruct {
 export async function main(): globalThis.Promise<void> {
 	// === Pointer Initialization ===
 	// Create a pointer to a MyStruct instance using a composite literal.
-	let structPointer = new MyStruct({MyInt: 4, MyString: "hello world"})
+	let structPointer = new MyStruct(false, 4, "hello world")
 	// Expected: "hello world"
 	await $.println("Initial MyString (via pointer): Expected: hello world, Actual: " + $.pointerValue<MyStruct>(structPointer).MyString)
 }

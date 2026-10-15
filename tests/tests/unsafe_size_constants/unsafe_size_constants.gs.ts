@@ -14,16 +14,16 @@ export class Data {
 
 	public declare D: number
 
-	constructor(init?: Partial<{A?: number, B?: number, C?: number, D?: number}>, __goscriptValue?: boolean) {
-		this.A = init?.A ?? (0 as number)
-		this.B = init?.B ?? (0 as number)
-		this.C = init?.C ?? (0 as number)
-		this.D = init?.D ?? (0 as number)
+	constructor(__goscriptValue?: boolean, A$?: number, B$?: number, C$?: number, D$?: number) {
+		this.A = A$ ?? 0
+		this.B = B$ ?? 0
+		this.C = C$ ?? 0
+		this.D = D$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Data {
-		return new Data(this, true)
+		return new Data(true, this.A, this.B, this.C, this.D)
 	}
 
 	public __goscriptAssign(source: Data): this {
@@ -50,15 +50,15 @@ export class Mixed {
 
 	public declare V: number[]
 
-	constructor(init?: Partial<{Flag?: boolean, N?: number, V?: number[]}>, __goscriptValue?: boolean) {
-		this.Flag = init?.Flag ?? (false as boolean)
-		this.N = init?.N ?? (0 as number)
-		this.V = init?.V !== undefined ? $.cloneArrayValue(init.V, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 3)) : $.arrayValue(globalThis.Array.from({ length: 3 }, () => 0), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 3))
+	constructor(__goscriptValue?: boolean, Flag$?: boolean, N$?: number, V$?: number[]) {
+		this.Flag = Flag$ ?? false
+		this.N = N$ ?? 0
+		this.V = V$ ?? $.arrayValue(globalThis.Array.from({ length: 3 }, () => 0), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 3))
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Mixed {
-		return new Mixed(this, true)
+		return new Mixed(true, this.Flag, this.N, $.cloneArrayValue(this.V, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 3)))
 	}
 
 	public __goscriptAssign(source: Mixed): this {
@@ -80,7 +80,7 @@ export class Mixed {
 export const dataSize: number = 16
 
 export async function main(): globalThis.Promise<void> {
-	let m: Mixed = new Mixed(undefined, true)
+	let m: Mixed = new Mixed(true)
 	let n = 10
 	await $.println("data size:", 16, 16)
 	await $.println("bytes for 10:", 160)

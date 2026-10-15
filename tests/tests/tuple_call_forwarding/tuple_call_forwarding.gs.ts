@@ -19,14 +19,14 @@ export class point {
 
 	public declare y: number
 
-	constructor(init?: Partial<{x?: number, y?: number}>, __goscriptValue?: boolean) {
-		this.x = init?.x ?? (0 as number)
-		this.y = init?.y ?? (0 as number)
+	constructor(__goscriptValue?: boolean, x$?: number, y$?: number) {
+		this.x = x$ ?? 0
+		this.y = y$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): point {
-		return new point(this, true)
+		return new point(true, this.x, this.y)
 	}
 
 	public __goscriptAssign(source: point): this {
@@ -47,13 +47,13 @@ export class point {
 export class frame {
 	public declare name: string
 
-	constructor(init?: Partial<{name?: string}>, __goscriptValue?: boolean) {
-		this.name = init?.name ?? ("" as string)
+	constructor(__goscriptValue?: boolean, name$?: string) {
+		this.name = name$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): frame {
-		return new frame(this, true)
+		return new frame(true, this.name)
 	}
 
 	public __goscriptAssign(source: frame): this {
@@ -78,13 +78,13 @@ export class frame {
 export class tab {
 	public declare name: string
 
-	constructor(init?: Partial<{name?: string}>, __goscriptValue?: boolean) {
-		this.name = init?.name ?? ("" as string)
+	constructor(__goscriptValue?: boolean, name$?: string) {
+		this.name = name$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): tab {
-		return new tab(this, true)
+		return new tab(true, this.name)
 	}
 
 	public __goscriptAssign(source: tab): this {
@@ -109,13 +109,13 @@ export class tab {
 export class tabs {
 	public declare count: number
 
-	constructor(init?: Partial<{count?: number}>, __goscriptValue?: boolean) {
-		this.count = init?.count ?? (0 as number)
+	constructor(__goscriptValue?: boolean, count$?: number) {
+		this.count = count$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): tabs {
-		return new tabs(this, true)
+		return new tabs(true, this.count)
 	}
 
 	public __goscriptAssign(source: tabs): this {
@@ -153,16 +153,16 @@ export function triple(a: number, b: number, c: number): [number, number, number
 }
 
 export function makePoint(x: number, y: number, z: number): point | $.VarRef<point> | null {
-	return new point({x: x + z, y: y})
+	return new point(false, x + z, y)
 }
 
 export function shift(p: point | $.VarRef<point> | null): [point | $.VarRef<point> | null, point | $.VarRef<point> | null, point | $.VarRef<point> | null] {
 	const p$: point = p == null ? $.pointerTarget<point>(p) : (p as any).__isVarRef === true ? (p as any).value : (p as any).__goValue === undefined ? (p as any) : $.pointerTarget<point>(p)
-	return [new point({x: (p$ as point).x + 1, y: (p$ as point).y}), new point({x: (p$ as point).x + 2, y: (p$ as point).y}), new point({x: (p$ as point).x + 3, y: (p$ as point).y})]
+	return [new point(false, (p$ as point).x + 1, (p$ as point).y), new point(false, (p$ as point).x + 2, (p$ as point).y), new point(false, (p$ as point).x + 3, (p$ as point).y)]
 }
 
 export function newTab(name: string): [frame | $.VarRef<frame> | null, tab | $.VarRef<tab> | null] {
-	return [new frame({name: name + "-frame"}), new tab({name: name + "-tab"})]
+	return [new frame(false, name + "-frame"), new tab(false, name + "-tab")]
 }
 
 export async function names(nodes: $.Slice<Node | null>): globalThis.Promise<void> {

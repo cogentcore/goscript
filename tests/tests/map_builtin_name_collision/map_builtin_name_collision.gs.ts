@@ -6,13 +6,13 @@ import * as $ from "@goscript/builtin/index.js"
 export class Map {
 	public declare values: globalThis.Map<string, number> | null
 
-	constructor(init?: Partial<{values?: globalThis.Map<string, number> | null}>, __goscriptValue?: boolean) {
-		this.values = init?.values ?? (null! as globalThis.Map<string, number> | null)
+	constructor(__goscriptValue?: boolean, values$?: globalThis.Map<string, number> | null) {
+		this.values = values$ ?? (null! as globalThis.Map<string, number> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Map {
-		return new Map(this, true)
+		return new Map(true, this.values)
 	}
 
 	public __goscriptAssign(source: Map): this {
@@ -30,7 +30,7 @@ export class Map {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let m = new Map({values: $.makeMap<string, number>([["one", 1]])}, true)
+	let m = new Map(true, $.makeMap<string, number>([["one", 1]]))
 	let [got, ok] = $.mapGet<string, number, number>(m.values, "one", 0)
 	await $.println(got, ok)
 }

@@ -11,14 +11,14 @@ export class config {
 
 	public declare UsesCgo: boolean
 
-	constructor(init?: Partial<{Name?: string, UsesCgo?: boolean}>, __goscriptValue?: boolean) {
-		this.Name = init?.Name ?? ("" as string)
-		this.UsesCgo = init?.UsesCgo ?? (false as boolean)
+	constructor(__goscriptValue?: boolean, Name$?: string, UsesCgo$?: boolean) {
+		this.Name = Name$ ?? ""
+		this.UsesCgo = UsesCgo$ ?? false
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): config {
-		return new config(this, true)
+		return new config(true, this.Name, this.UsesCgo)
 	}
 
 	public __goscriptAssign(source: config): this {
@@ -37,7 +37,7 @@ export class config {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let c = new config({Name: "x"})
+	let c = new config(false, "x")
 	let f = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(c, "*main.config", /* @__PURE__ */ $.pointerType("main.config"))))).Elem())).FieldByName("UsesCgo")))
 	$.unsafePointerRef<boolean>($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(f)).Addr())).UnsafePointer()).value = true
 	await $.println($.pointerValue<config>(c).UsesCgo)

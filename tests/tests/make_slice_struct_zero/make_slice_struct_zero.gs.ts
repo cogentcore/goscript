@@ -6,13 +6,13 @@ import * as $ from "@goscript/builtin/index.js"
 export class code {
 	public declare len: number
 
-	constructor(init?: Partial<{len?: number}>, __goscriptValue?: boolean) {
-		this.len = init?.len ?? (0 as number)
+	constructor(__goscriptValue?: boolean, len$?: number) {
+		this.len = len$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): code {
-		return new code(this, true)
+		return new code(true, this.len)
 	}
 
 	public __goscriptAssign(source: code): this {
@@ -30,7 +30,7 @@ export class code {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let codes = $.makeSlice<code>(2, undefined, undefined, () => new code(undefined, true))
+	let codes = $.makeSlice<code>(2, undefined, undefined, () => new code(true))
 	$.arrayIndex(codes!, 0).len = 3
 	await $.println("first:", $.arrayIndex(codes!, 0).len)
 	await $.println("second:", $.arrayIndex(codes!, 1).len)

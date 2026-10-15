@@ -9,13 +9,13 @@ $.registerTypePackagePath("github.com/s4wave/goscript/tests/tests/package_import
 export class CoreStore {
 	public declare Prefix: string
 
-	constructor(init?: Partial<{Prefix?: string}>, __goscriptValue?: boolean) {
-		this.Prefix = init?.Prefix ?? ("" as string)
+	constructor(__goscriptValue?: boolean, Prefix$?: string) {
+		this.Prefix = Prefix$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): CoreStore {
-		return new CoreStore(this, true)
+		return new CoreStore(true, this.Prefix)
 	}
 
 	public __goscriptAssign(source: CoreStore): this {
@@ -27,9 +27,9 @@ export class CoreStore {
 		const s: CoreStore | $.VarRef<CoreStore> | null = this;
 		const s$: CoreStore = s == null ? $.pointerTarget<CoreStore>(s) : (s as any).__isVarRef === true ? (s as any).value : (s as any).__goValue === undefined ? (s as any) : $.pointerTarget<CoreStore>(s)
 		if (write) {
-			return new tx.Tx({Name: (s$ as CoreStore).Prefix + ":write"})
+			return new tx.Tx(false, (s$ as CoreStore).Prefix + ":write")
 		}
-		return new tx.Tx({Name: (s$ as CoreStore).Prefix + ":read"})
+		return new tx.Tx(false, (s$ as CoreStore).Prefix + ":read")
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -42,5 +42,5 @@ export class CoreStore {
 }
 
 export function NewCoreStore(prefix: string): CoreStore | $.VarRef<CoreStore> | null {
-	return new CoreStore({Prefix: prefix})
+	return new CoreStore(false, prefix)
 }

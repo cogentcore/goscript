@@ -18,13 +18,13 @@ $.registerInterfaceType(
 export class Impl {
 	public declare Item: any
 
-	constructor(init?: Partial<{Item?: any}>, __goscriptValue?: boolean, __goscriptFresh?: boolean) {
-		this.Item = init?.Item !== undefined ? (__goscriptFresh === true ? init.Item : $.copyElement(init.Item)) : (null! as any)
+	constructor(__goscriptValue?: boolean, Item$?: any) {
+		this.Item = Item$ ?? (null! as any)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Impl {
-		return new Impl(this, true)
+		return new Impl(true, $.copyElement(this.Item))
 	}
 
 	public __goscriptAssign(source: Impl): this {
@@ -47,12 +47,12 @@ export class Impl {
 }
 
 export class Keyed {
-	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
+	constructor(__goscriptValue?: boolean) {
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Keyed {
-		return new Keyed(this, true)
+		return new Keyed(true)
 	}
 
 	public __goscriptAssign(source: Keyed): this {
@@ -77,13 +77,13 @@ export class Keyed {
 export class Wrapper {
 	public declare Keyed: Keyed | $.VarRef<Keyed> | null
 
-	constructor(init?: Partial<{Keyed?: Keyed | $.VarRef<Keyed> | null}>, __goscriptValue?: boolean) {
-		this.Keyed = init?.Keyed ?? (null! as Keyed | $.VarRef<Keyed> | null)
+	constructor(__goscriptValue?: boolean, Keyed$?: Keyed | $.VarRef<Keyed> | null) {
+		this.Keyed = Keyed$ ?? (null! as Keyed | $.VarRef<Keyed> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Wrapper {
-		return new Wrapper(this, true)
+		return new Wrapper(true, this.Keyed)
 	}
 
 	public __goscriptAssign(source: Wrapper): this {

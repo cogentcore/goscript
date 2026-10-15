@@ -6,13 +6,13 @@ import * as $ from "@goscript/builtin/index.js"
 export class locked {
 	public declare value: number
 
-	constructor(init?: Partial<{value?: number}>, __goscriptValue?: boolean) {
-		this.value = init?.value ?? (0 as number)
+	constructor(__goscriptValue?: boolean, value$?: number) {
+		this.value = value$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): locked {
-		return new locked(this, true)
+		return new locked(true, this.value)
 	}
 
 	public __goscriptAssign(source: locked): this {
@@ -41,7 +41,7 @@ export class locked {
 }
 
 export function newLocked(value: number): locked {
-	return new locked({value: value}, true)
+	return new locked(true, value)
 }
 
 export async function main(): globalThis.Promise<void> {

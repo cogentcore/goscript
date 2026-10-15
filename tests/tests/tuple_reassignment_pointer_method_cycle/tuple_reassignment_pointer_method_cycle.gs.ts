@@ -6,13 +6,13 @@ import * as $ from "@goscript/builtin/index.js"
 export class box {
 	public declare value: number
 
-	constructor(init?: Partial<{value?: number}>, __goscriptValue?: boolean) {
-		this.value = init?.value ?? (0 as number)
+	constructor(__goscriptValue?: boolean, value$?: number) {
+		this.value = value$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): box {
-		return new box(this, true)
+		return new box(true, this.value)
 	}
 
 	public __goscriptAssign(source: box): this {
@@ -30,12 +30,12 @@ export class box {
 }
 
 export class cursor {
-	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
+	constructor(__goscriptValue?: boolean) {
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): cursor {
-		return new cursor(this, true)
+		return new cursor(true)
 	}
 
 	public __goscriptAssign(source: cursor): this {
@@ -57,9 +57,9 @@ export class cursor {
 
 export async function main(): globalThis.Promise<void> {
 	let __goscriptShadow0 = new cursor()
-	let x: box | $.VarRef<box> | null = new box({value: 1})
-	let y: box | $.VarRef<box> | null = new box({value: 2})
-	let z: box | $.VarRef<box> | null = new box({value: 3})
+	let x: box | $.VarRef<box> | null = new box(false, 1)
+	let y: box | $.VarRef<box> | null = new box(false, 2)
+	let z: box | $.VarRef<box> | null = new box(false, 3)
 
 	for (let __rangeIndex = 0; __rangeIndex < 1; __rangeIndex++) {
 		let __goscriptTuple0: any = (__goscriptShadow0 !== null && (__goscriptShadow0 as any).__isVarRef !== true && (__goscriptShadow0 as any).__goValue === undefined ? ((__goscriptShadow0 as any) as cursor).rotate(x, y, z) : cursor.prototype.rotate.call(__goscriptShadow0, x, y, z))

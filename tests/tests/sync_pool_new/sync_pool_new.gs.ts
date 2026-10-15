@@ -7,13 +7,13 @@ import * as sync from "@goscript/sync/index.js"
 export class buffer {
 	public declare data: $.Slice<number>
 
-	constructor(init?: Partial<{data?: $.Slice<number>}>, __goscriptValue?: boolean) {
-		this.data = init?.data ?? (null! as $.Slice<number>)
+	constructor(__goscriptValue?: boolean, data$?: $.Slice<number>) {
+		this.data = data$ ?? (null! as $.Slice<number>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): buffer {
-		return new buffer(this, true)
+		return new buffer(true, this.data)
 	}
 
 	public __goscriptAssign(source: buffer): this {
@@ -31,7 +31,7 @@ export class buffer {
 }
 
 export let buffers: $.VarRef<sync.Pool> = $.varRef($.markAsStructValue(new sync.Pool({New: $.functionValue((): any => {
-	return $.interfaceValue(new buffer({data: $.makeSlice<number>(0, 8, "byte")}), "*main.buffer", /* @__PURE__ */ $.pointerType("main.buffer"))
+	return $.interfaceValue(new buffer(false, $.makeSlice<number>(0, 8, "byte")), "*main.buffer", /* @__PURE__ */ $.pointerType("main.buffer"))
 }, ({ kind: $.TypeKind.Function, params: [], results: [{ kind: $.TypeKind.Interface, methods: [] }] } as $.FunctionTypeInfo))})))
 
 export function __goscript_set_buffers(__goscriptValue: sync.Pool): void {

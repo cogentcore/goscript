@@ -8,13 +8,13 @@ $.registerTypePackagePath("github.com/s4wave/goscript/tests/tests/package_import
 export class Box {
 	public declare Value: number
 
-	constructor(init?: Partial<{Value?: number}>, __goscriptValue?: boolean) {
-		this.Value = init?.Value ?? (0 as number)
+	constructor(__goscriptValue?: boolean, Value$?: number) {
+		this.Value = Value$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Box {
-		return new Box(this, true)
+		return new Box(true, this.Value)
 	}
 
 	public __goscriptAssign(source: Box): this {
@@ -32,5 +32,5 @@ export class Box {
 }
 
 export function NewBox(value: number): Box | $.VarRef<Box> | null {
-	return new Box({Value: value})
+	return new Box(false, value)
 }

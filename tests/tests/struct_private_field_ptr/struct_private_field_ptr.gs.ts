@@ -6,13 +6,13 @@ import * as $ from "@goscript/builtin/index.js"
 export class MyStruct {
 	public declare myPrivate: $.VarRef<number> | null
 
-	constructor(init?: Partial<{myPrivate?: $.VarRef<number> | null}>, __goscriptValue?: boolean) {
-		this.myPrivate = init?.myPrivate ?? (null! as $.VarRef<number> | null)
+	constructor(__goscriptValue?: boolean, myPrivate$?: $.VarRef<number> | null) {
+		this.myPrivate = myPrivate$ ?? (null! as $.VarRef<number> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): MyStruct {
-		return new MyStruct(this, true)
+		return new MyStruct(true, this.myPrivate)
 	}
 
 	public __goscriptAssign(source: MyStruct): this {
@@ -30,7 +30,7 @@ export class MyStruct {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let myStruct = new MyStruct({myPrivate: null})
+	let myStruct = new MyStruct(false, null)
 	let myStruct$: MyStruct = myStruct == null ? $.pointerTarget<MyStruct>(myStruct) : (myStruct as any).__isVarRef === true ? (myStruct as any).value : (myStruct as any).__goValue === undefined ? (myStruct as any) : $.pointerTarget<MyStruct>(myStruct)
 	let intVar = $.varRef(10);
 	;(myStruct$ as MyStruct).myPrivate = intVar

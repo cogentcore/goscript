@@ -8,13 +8,13 @@ export type Number = number
 export class Pair {
 	public declare Value: number
 
-	constructor(init?: Partial<{Value?: number}>, __goscriptValue?: boolean) {
-		this.Value = init?.Value ?? (0 as number)
+	constructor(__goscriptValue?: boolean, Value$?: number) {
+		this.Value = Value$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Pair {
-		return new Pair(this, true)
+		return new Pair(true, this.Value)
 	}
 
 	public __goscriptAssign(source: Pair): this {
@@ -46,7 +46,7 @@ export async function main(): globalThis.Promise<void> {
 	let namedPointer = $.varRef<Number>(namedValue)
 	await $.println("named value:", $.pointerValue<Number>(namedPointer))
 
-	let pairPointer = $.varRef<Pair>(new Pair({Value: 11}, true))
+	let pairPointer = $.varRef<Pair>(new Pair(true, 11))
 	await $.println("struct value:", $.pointerValue<Pair>(pairPointer).Value)
 }
 

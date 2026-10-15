@@ -19,7 +19,7 @@ export async function main(): globalThis.Promise<void> {
 	// End reports the position after the last scanned token.
 	let fset = token.NewFileSet()
 	let file: token.File | $.VarRef<token.File> | null = token.FileSet.prototype.AddFile.call($.pointerValue<token.FileSet>(fset), "empty.go", -1, 0)
-	let s: $.VarRef<scanner.Scanner> = $.varRef(new scanner.Scanner(undefined, true))
+	let s: $.VarRef<scanner.Scanner> = $.varRef(new scanner.Scanner(true))
 	s.value.Init(file, null, (null as scanner.ErrorHandler | null), 0)
 	fmt.Println("End before Scan:", s.value.End() == 0)
 	let [, tok, ] = s.value.Scan()

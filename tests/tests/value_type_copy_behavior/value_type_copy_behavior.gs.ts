@@ -8,14 +8,14 @@ export class MyStruct {
 
 	public declare MyString: string
 
-	constructor(init?: Partial<{MyInt?: number, MyString?: string}>, __goscriptValue?: boolean) {
-		this.MyInt = init?.MyInt ?? (0 as number)
-		this.MyString = init?.MyString ?? ("" as string)
+	constructor(__goscriptValue?: boolean, MyInt$?: number, MyString$?: string) {
+		this.MyInt = MyInt$ ?? 0
+		this.MyString = MyString$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): MyStruct {
-		return new MyStruct(this, true)
+		return new MyStruct(true, this.MyInt, this.MyString)
 	}
 
 	public __goscriptAssign(source: MyStruct): this {
@@ -38,14 +38,14 @@ export class NestedStruct {
 
 	public declare InnerStruct: MyStruct
 
-	constructor(init?: Partial<{Value?: number, InnerStruct?: MyStruct}>, __goscriptValue?: boolean) {
-		this.Value = init?.Value ?? (0 as number)
-		this.InnerStruct = init?.InnerStruct ? init.InnerStruct.clone() : new MyStruct(undefined, true)
+	constructor(__goscriptValue?: boolean, Value$?: number, InnerStruct$?: MyStruct) {
+		this.Value = Value$ ?? 0
+		this.InnerStruct = InnerStruct$ ?? new MyStruct(true)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): NestedStruct {
-		return new NestedStruct(this, true)
+		return new NestedStruct(true, this.Value, this.InnerStruct.clone())
 	}
 
 	public __goscriptAssign(source: NestedStruct): this {
@@ -71,7 +71,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// original is the starting struct instance.
 	// We take its address later for pointerCopy, so it might be allocated on the heap (varrefed).
-	let original = $.varRef(new MyStruct({MyInt: 42, MyString: "original"}, true))
+	let original = $.varRef(new MyStruct(true, 42, "original"))
 
 	// === Value-Type Copy Behavior ===
 	// Assigning a struct (value type) creates independent copies.
@@ -114,7 +114,7 @@ export async function main(): globalThis.Promise<void> {
 	// === Nested Struct Behavior ===
 	// Demonstrate copy behavior with structs containing other structs.
 	await $.println("\nNested Struct Test:")
-	let nestedOriginal = new NestedStruct({Value: 10, InnerStruct: new MyStruct({MyInt: 20, MyString: "inner original"}, true)}, true)
+	let nestedOriginal = new NestedStruct(true, 10, new MyStruct(true, 20, "inner original"))
 
 	// Create a value copy of the nested struct. This copies both the outer
 	// struct's fields (Value) and the inner struct (InnerStruct) by value.

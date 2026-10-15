@@ -6,13 +6,13 @@ import * as $ from "@goscript/builtin/index.js"
 export class buffer {
 	public declare buf: $.Slice<number>
 
-	constructor(init?: Partial<{buf?: $.Slice<number>}>, __goscriptValue?: boolean) {
-		this.buf = init?.buf ?? (null! as $.Slice<number>)
+	constructor(__goscriptValue?: boolean, buf$?: $.Slice<number>) {
+		this.buf = buf$ ?? (null! as $.Slice<number>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): buffer {
-		return new buffer(this, true)
+		return new buffer(true, this.buf)
 	}
 
 	public __goscriptAssign(source: buffer): this {
@@ -30,7 +30,7 @@ export class buffer {
 }
 
 export function newBuffer(data: $.Slice<number>): buffer | $.VarRef<buffer> | null {
-	let buf = new buffer({buf: data})
+	let buf = new buffer(false, data)
 	return buf
 }
 

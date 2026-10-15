@@ -9,14 +9,14 @@ export class S {
 
 	public declare B: string
 
-	constructor(init?: Partial<{A?: number, B?: string}>, __goscriptValue?: boolean) {
-		this.A = init?.A ?? (0 as number)
-		this.B = init?.B ?? ("" as string)
+	constructor(__goscriptValue?: boolean, A$?: number, B$?: string) {
+		this.A = A$ ?? 0
+		this.B = B$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): S {
-		return new S(this, true)
+		return new S(true, this.A, this.B)
 	}
 
 	public __goscriptAssign(source: S): this {
@@ -47,7 +47,7 @@ export async function main(): globalThis.Promise<void> {
 	// Only values reached through a pointer or slice are addressable.
 	let v = $.varRef(1)
 	await $.println($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.basicInterfaceValue(v.value, "int")))).CanAddr(), $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(v, "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int")))))).CanAddr(), $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(v, "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int")))))).Elem())).CanAddr())
-	let s = $.varRef(new S(undefined, true))
+	let s = $.varRef(new S(true))
 	await $.println($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue((s.value).clone(), "main.S", "main.S")))).Field(0))).CanAddr(), $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(s, "*main.S", /* @__PURE__ */ $.pointerType("main.S"))))).Elem())).Field(0))).CanAddr())
 	await $.println($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.arrayToSlice<number>([1]), "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")))))).Index(0))).CanAddr())
 

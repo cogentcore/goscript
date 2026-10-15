@@ -8,14 +8,14 @@ export class pos {
 
 	public declare Char: number
 
-	constructor(init?: Partial<{Line?: number, Char?: number}>, __goscriptValue?: boolean) {
-		this.Line = init?.Line ?? (0 as number)
-		this.Char = init?.Char ?? (0 as number)
+	constructor(__goscriptValue?: boolean, Line$?: number, Char$?: number) {
+		this.Line = Line$ ?? 0
+		this.Char = Char$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): pos {
-		return new pos(this, true)
+		return new pos(true, this.Line, this.Char)
 	}
 
 	public __goscriptAssign(source: pos): this {
@@ -38,7 +38,7 @@ export async function main(): globalThis.Promise<void> {
 	// each its own, when a slice extends into it.
 	let ps: $.Slice<pos> = null! as $.Slice<pos>
 	for (let i = 0; i < 5; i++) {
-		ps = $.appendOne(ps, new pos({Line: i + 1, Char: i}, true))
+		ps = $.appendOne(ps, new pos(true, i + 1, i))
 	}
 	let all = $.goSlice(ps, undefined, $.cap(ps))
 	await $.println($.sliceLen(ps), $.cap(ps), $.arrayIndex(all!, 4).Line, $.arrayIndex(all!, 5).Line, $.arrayIndex(all!, 7).Char)
@@ -46,7 +46,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println($.arrayIndex(all!, 5).Line, $.arrayIndex(all!, 6).Line)
 
 	// Appending after a reslice writes the slot the reslice zeroed.
-	let more = $.appendOne(ps, new pos({Line: 42}, true))
+	let more = $.appendOne(ps, new pos(true, 42))
 	await $.println($.arrayIndex(more!, 5).Line, $.arrayIndex(all!, 5).Line)
 
 	// Grown slices of other element types have their zero values too.
@@ -56,7 +56,7 @@ export async function main(): globalThis.Promise<void> {
 	for (let i = 0; i < 3; i++) {
 		ns = $.appendOne(ns, i + 1)
 		ss = $.appendOne(ss, "x")
-		ptrs = $.appendOne(ptrs, new pos({Line: i}), $.appendZeros.nil)
+		ptrs = $.appendOne(ptrs, new pos(false, i), $.appendZeros.nil)
 	}
 	let nall = $.goSlice(ns, undefined, $.cap(ns))
 	let sall = $.goSlice(ss, undefined, $.cap(ss))
@@ -64,14 +64,14 @@ export async function main(): globalThis.Promise<void> {
 	await $.println($.arrayIndex(nall!, 3), $.stringLen($.arrayIndex(sall!, 3)), $.arrayIndex(pall!, 3) == null, $.pointerValue<pos>($.arrayIndex(ptrs!, 2)).Line)
 
 	// A grown copy holds copies of the struct elements.
-	let small = $.makeSlice<pos>(1, 1, undefined, () => new pos(undefined, true))
+	let small = $.makeSlice<pos>(1, 1, undefined, () => new pos(true))
 	$.arrayIndex(small!, 0).Line = 7
-	let grown = $.appendOne(small, new pos({Line: 8}, true))
+	let grown = $.appendOne(small, new pos(true, 8))
 	$.arrayIndex(grown!, 0).Line = 70
 	await $.println($.arrayIndex(small!, 0).Line, $.arrayIndex(grown!, 0).Line, $.arrayIndex(grown!, 1).Line)
 
 	// Appending a slice grows the same way.
-	let ext = $.appendSlice($.arrayToSlice<pos>([new pos({Line: 1}, true)]), $.arrayToSlice<pos>([new pos({Line: 2}, true), new pos({Line: 3}, true)]))
+	let ext = $.appendSlice($.arrayToSlice<pos>([new pos(true, 1)]), $.arrayToSlice<pos>([new pos(true, 2), new pos(true, 3)]))
 	let full = $.goSlice(ext, undefined, $.cap(ext))
 	await $.println($.sliceLen(ext), $.cap(ext) >= 3, $.arrayIndex(full!, $.sliceLen(full) - 1).Line)
 }

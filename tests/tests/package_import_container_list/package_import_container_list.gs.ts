@@ -9,13 +9,13 @@ import * as sync from "@goscript/sync/index.js"
 export class pooledElement {
 	public declare Value: any
 
-	constructor(init?: Partial<{Value?: any}>, __goscriptValue?: boolean, __goscriptFresh?: boolean) {
-		this.Value = init?.Value !== undefined ? (__goscriptFresh === true ? init.Value : $.copyElement(init.Value)) : (null! as any)
+	constructor(__goscriptValue?: boolean, Value$?: any) {
+		this.Value = Value$ ?? (null! as any)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): pooledElement {
-		return new pooledElement(this, true)
+		return new pooledElement(true, $.copyElement(this.Value))
 	}
 
 	public __goscriptAssign(source: pooledElement): this {
@@ -42,7 +42,7 @@ export function printList(name: string, values: list.List | $.VarRef<list.List> 
 
 export function newElementPool(__typeArgs: $.GenericTypeArgs | undefined): sync.Pool | $.VarRef<sync.Pool> | null {
 	return new sync.Pool({New: $.functionValue((): any => {
-		return $.genericInterfaceValue(new pooledElement({Value: $.genericZero(__typeArgs, "T", null)}), "*main.pooledElement", /* @__PURE__ */ $.pointerType("main.pooledElement"))
+		return $.genericInterfaceValue(new pooledElement(false, $.genericZero(__typeArgs, "T", null)), "*main.pooledElement", /* @__PURE__ */ $.pointerType("main.pooledElement"))
 	}, ({ kind: $.TypeKind.Function, params: [], results: [{ kind: $.TypeKind.Interface, methods: [] }] } as $.FunctionTypeInfo))})
 }
 

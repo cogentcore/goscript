@@ -9,14 +9,14 @@ export class inner {
 
 	public declare B: string
 
-	constructor(init?: Partial<{A?: number, B?: string}>, __goscriptValue?: boolean) {
-		this.A = init?.A ?? (0 as number)
-		this.B = init?.B ?? ("" as string)
+	constructor(__goscriptValue?: boolean, A$?: number, B$?: string) {
+		this.A = A$ ?? 0
+		this.B = B$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): inner {
-		return new inner(this, true)
+		return new inner(true, this.A, this.B)
 	}
 
 	public __goscriptAssign(source: inner): this {
@@ -41,15 +41,15 @@ export class outer {
 
 	public declare P: inner | $.VarRef<inner> | null
 
-	constructor(init?: Partial<{X?: number, In?: inner, P?: inner | $.VarRef<inner> | null}>, __goscriptValue?: boolean) {
-		this.X = init?.X ?? (0 as number)
-		this.In = init?.In ? init.In.clone() : new inner(undefined, true)
-		this.P = init?.P ?? (null! as inner | $.VarRef<inner> | null)
+	constructor(__goscriptValue?: boolean, X$?: number, In$?: inner, P$?: inner | $.VarRef<inner> | null) {
+		this.X = X$ ?? 0
+		this.In = In$ ?? new inner(true)
+		this.P = P$ ?? (null! as inner | $.VarRef<inner> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): outer {
-		return new outer(this, true)
+		return new outer(true, this.X, this.In.clone(), this.P)
 	}
 
 	public __goscriptAssign(source: outer): this {
@@ -75,7 +75,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("StructField Type:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(field.Type).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
 	// Type.FieldByIndex selects nested fields, following pointers to structs
-	let typ = reflect.TypeOf($.interfaceValue(new outer(undefined, true), "main.outer", "main.outer"))
+	let typ = reflect.TypeOf($.interfaceValue(new outer(true), "main.outer", "main.outer"))
 	let f = $.markAsStructValue($.cloneStructValue(((__goscriptAwait = (typ !== null && (typ as any).__isVarRef !== true && ((typ as any).__goValue === undefined || (typ as any).__goType?.charCodeAt(0) !== 42) ? (typ as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(typ)).FieldByIndex($.arrayToSlice<number>([0])), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as reflect.StructField)))
 	await $.println("FieldByIndex 0:", f.Name, (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(f.Type).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	f = $.assignStruct(f, ((__goscriptAwait = (typ !== null && (typ as any).__isVarRef !== true && ((typ as any).__goValue === undefined || (typ as any).__goType?.charCodeAt(0) !== 42) ? (typ as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(typ)).FieldByIndex($.arrayToSlice<number>([1, 1])), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as reflect.StructField))

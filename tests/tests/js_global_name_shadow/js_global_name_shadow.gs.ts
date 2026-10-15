@@ -10,13 +10,13 @@ export type Number = number
 export class Promise {
 	public declare value: string
 
-	constructor(init?: Partial<{value?: string}>, __goscriptValue?: boolean) {
-		this.value = init?.value ?? ("" as string)
+	constructor(__goscriptValue?: boolean, value$?: string) {
+		this.value = value$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Promise {
-		return new Promise(this, true)
+		return new Promise(true, this.value)
 	}
 
 	public __goscriptAssign(source: Promise): this {
@@ -38,14 +38,14 @@ export class point {
 
 	public declare y: number
 
-	constructor(init?: Partial<{x?: number, y?: number}>, __goscriptValue?: boolean) {
-		this.x = init?.x ?? (0 as number)
-		this.y = init?.y ?? (0 as number)
+	constructor(__goscriptValue?: boolean, x$?: number, y$?: number) {
+		this.x = x$ ?? 0
+		this.y = y$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): point {
-		return new point(this, true)
+		return new point(true, this.x, this.y)
 	}
 
 	public __goscriptAssign(source: point): this {
@@ -78,7 +78,7 @@ export function __goscript_set_Array(__goscriptValue: $.Slice<string>): void {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let p = new Promise({value: "Promise"}, true)
+	let p = new Promise(true, "Promise")
 	await $.println("names:", 1, 1.5, String(1), $.arrayIndex(Array!, 0), p.value)
 
 	let a = 7
@@ -92,7 +92,7 @@ export async function main(): globalThis.Promise<void> {
 	let r = 128512
 	await $.println("rune string:", $.stringEqual($.runeToString(r), "\xf0\x9f\x98\x80"))
 
-	let points: point[] = $.arrayValue(globalThis.Array.from({ length: 2 }, () => new point(undefined, true)), /* @__PURE__ */ $.arrayType("main.point", 2))
+	let points: point[] = $.arrayValue(globalThis.Array.from({ length: 2 }, () => new point(true)), /* @__PURE__ */ $.arrayType("main.point", 2))
 	$.arrayIndex(points, 1).x = 3
 	await $.println("array:", $.arrayIndex(points, 1).x, $.arrayIndex(points, 0).y)
 
