@@ -1,0 +1,7 @@
+[] [] [] [] map[]
+[] [] [] map[] <nil>
+[] [] [] []|[]|
+main.Line(nil) main.Ints(nil) []main.T(nil) main.M(nil) (*main.T)(nil)
+main.Bytes(nil) map[string]int(nil)
+[] [] main.Line(nil)
+{[]} {L:[]}

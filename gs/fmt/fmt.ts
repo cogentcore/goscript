@@ -451,6 +451,37 @@ function formatStructFields(
   return joinMaybe(parts, flags.includes('#') ? ', ' : ' ', name + '{', '}')
 }
 
+// nilString formats a nil value of the type info describes. A nil slice or
+// map prints as an empty one, and %#v spells the type of a nil slice, map,
+// pointer, func or channel, as in Go.
+function nilString(
+  info: $.TypeInfo | string | undefined,
+  flags: string,
+): string {
+  // %#v writes the type and nil, in parentheses when the type is not a name
+  // or a composite type literal.
+  const resolved = $.resolveTypeInfo(info)
+  if (flags.includes('#')) {
+    const name = $.typeInfoGoString(info)
+    if (name === undefined) return '<nil>'
+    switch (resolved?.kind) {
+      case $.TypeKind.Slice:
+      case $.TypeKind.Map:
+        return name + '(nil)'
+      case $.TypeKind.Pointer:
+      case $.TypeKind.Function:
+      case $.TypeKind.Channel:
+        return '(' + name + ')(nil)'
+    }
+    return '<nil>'
+  }
+
+  // Other verbs print a nil slice or map as an empty one.
+  if (resolved?.kind === $.TypeKind.Slice) return '[]'
+  if (resolved?.kind === $.TypeKind.Map) return 'map[]'
+  return '<nil>'
+}
+
 /** defaultFormatMaybe renders Go values without exposing their runtime storage. */
 function defaultFormatMaybe(
   value: any,
@@ -460,13 +491,11 @@ function defaultFormatMaybe(
   allowMethods = true,
 ): MaybeString {
   if (value === null || value === undefined) {
-    // A nil slice or map prints as an empty one, as in Go.
-    const nilInfo = $.resolveTypeInfo(typeInfo)
-    if (nilInfo?.kind === $.TypeKind.Slice) return '[]'
-    if (nilInfo?.kind === $.TypeKind.Map) return 'map[]'
-    return '<nil>'
+    return nilString(typeInfo, flags)
   }
-  if ($.isTypedNilValue(value)) return '<nil>'
+  if ($.isTypedNilValue(value)) {
+    return nilString(value.__goTypeInfo ?? value.__goType, flags)
+  }
   if (typeof value === 'boolean') return value ? 'true' : 'false'
   if (typeof value === 'string')
     return flags.includes('#') ? Quote(value) : value

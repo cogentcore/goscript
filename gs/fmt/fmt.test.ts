@@ -415,3 +415,28 @@ describe('fmt scanning', () => {
     expect(r.value).toBe(0xe9)
   })
 })
+
+describe('fmt nil values', () => {
+  it('prints a nil slice or map in an interface as an empty one', () => {
+    // Go: var l Line; fmt.Sprint(l) is "[]", %#v spells the type.
+    const line = $.interfaceValue(
+      null,
+      'main.Line',
+      $.sliceType('main.T', 'main.Line'),
+    )
+    const ints = $.interfaceValue(
+      null,
+      '[]int',
+      $.sliceType($.basicType('int')),
+    )
+    expect(fmt.Sprint(line)).toBe('[]')
+    expect(fmt.Sprintln(line, ints)).toBe('[] []\n')
+    expect(fmt.Sprintf('%#v %#v', line, ints)).toBe('main.Line(nil) []int(nil)')
+  })
+
+  it('spells the type of a nil pointer under %#v', () => {
+    const p = $.interfaceValue(null, '*main.T', $.pointerType('main.T'))
+    expect(fmt.Sprint(p)).toBe('<nil>')
+    expect(fmt.Sprintf('%#v', p)).toBe('(*main.T)(nil)')
+  })
+})
