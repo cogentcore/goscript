@@ -20,12 +20,8 @@ export class ProcessExitError extends Error {
 	}
 }
 
-export let Args: $.Slice<string> = null
-
-export function init(): void {
-	// In JavaScript environment, just initialize with empty args
-	Args = runtime_args()
-}
+// Args hold the command-line arguments, starting with the program name.
+export let Args: $.Slice<string> = runtime_args()
 
 export function runtime_args(): $.Slice<string> {
 	return hostRuntimeArgs()
