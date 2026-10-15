@@ -78,14 +78,14 @@ func TestOverrideRegistryFactsAreImmutable(t *testing.T) {
 	}
 
 	metadata := facts.Metadata("sync")
-	if !metadata.AsyncMethods["Map.Load"] {
-		t.Fatalf("expected sync Map.Load async metadata")
+	if !metadata.AsyncMethods["WaitGroup.Wait"] {
+		t.Fatalf("expected sync WaitGroup.Wait async metadata")
 	}
-	metadata.AsyncMethods["Map.Load"] = false
+	metadata.AsyncMethods["WaitGroup.Wait"] = false
 	metadata.Dependencies = append(metadata.Dependencies, "mutated")
 
 	metadata = facts.Metadata("sync")
-	if !metadata.AsyncMethods["Map.Load"] {
+	if !metadata.AsyncMethods["WaitGroup.Wait"] {
 		t.Fatalf("override metadata mutation leaked back into facts")
 	}
 	if slices.Contains(metadata.Dependencies, "mutated") {
@@ -347,10 +347,8 @@ func TestCompilePackagesAwaitsOverrideAsyncMethods(t *testing.T) {
 			"package main",
 			"import \"sync\"",
 			"func main() {",
-			"  var m sync.Map",
-			"  if value, ok := m.Load(\"key\"); ok {",
-			"    println(value)",
-			"  }",
+			"  var wg sync.WaitGroup",
+			"  wg.Wait()",
 			"}",
 			"",
 		}, "\n"),
@@ -371,7 +369,7 @@ func TestCompilePackagesAwaitsOverrideAsyncMethods(t *testing.T) {
 	if err != nil {
 		t.Fatal(err.Error())
 	}
-	if !strings.Contains(string(content), "let [value, ok] = await m.value.Load(\"key\")") {
+	if !strings.Contains(string(content), "await wg.value.Wait()") {
 		t.Fatalf("override async method call was not awaited:\n%s", string(content))
 	}
 }
@@ -570,11 +568,9 @@ func TestCompilePackagesAwaitsOverrideAsyncFunctions(t *testing.T) {
 			"  \"sync\"",
 			")",
 			"func main() {",
-			"  var m sync.Map",
+			"  var wg sync.WaitGroup",
 			"  _ = filepath.WalkDir(\".\", func(path string, d fs.DirEntry, err error) error {",
-			"    if _, ok := m.Load(path); ok {",
-			"      return nil",
-			"    }",
+			"    wg.Wait()",
 			"    return nil",
 			"  })",
 			"}",

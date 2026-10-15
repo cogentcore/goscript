@@ -125,9 +125,9 @@ func TestAsyncDirectiveErrors(t *testing.T) {
 		},
 		{
 			name: "mutex lock in a sync function",
-			source: "import \"sync\"\nvar mu sync.Mutex\n//goscript:sync\nfunc lock() { mu.Lock(); mu.Unlock() }\n" +
+			source: "import \"sync\"\nvar mu sync.Mutex\nvar locker sync.Locker = &mu\n//goscript:sync\nfunc lock() { mu.Lock(); mu.Unlock() }\n" +
 				"func main() { lock() }\n",
-			want: "sync.Mutex.Lock",
+			want: "it locks mu",
 		},
 		{
 			name: "call of an async function from a sync function",

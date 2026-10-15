@@ -63,12 +63,12 @@ export function __goscript_set_seed(__goscriptValue: number): void {
 	seed = __goscriptValue
 }
 
-export async function useFirst(): globalThis.Promise<number> {
-	return (await __goscript_b.__goscript_init_first(), __goscript_b.__goscript_get_first()).n
+export function useFirst(): number {
+	return __goscript_b.__goscript_get_first().n
 }
 
 export async function main(): globalThis.Promise<void> {
-	await $.println("main:", await useFirst())
+	await $.println("main:", useFirst())
 }
 
 await __goscript_package_init.__goscript_package_init()

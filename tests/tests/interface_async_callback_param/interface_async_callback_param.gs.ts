@@ -6,7 +6,7 @@ import * as errors from "@goscript/errors/index.js"
 import * as sync from "@goscript/sync/index.js"
 
 export type scanner = {
-	Scan(_p0: ((_p0: number) => $.GoError | globalThis.Promise<$.GoError>) | null): $.GoError | globalThis.Promise<$.GoError>
+	Scan(_p0: ((_p0: number) => $.GoError | globalThis.Promise<$.GoError>) | null): $.GoError
 }
 
 $.registerInterfaceType(
@@ -32,8 +32,8 @@ export class listScanner {
 	public __goscriptAssign(source: listScanner): void {
 	}
 
-	public async Scan(fn: ((_p0: number) => $.GoError | globalThis.Promise<$.GoError>) | null): globalThis.Promise<$.GoError> {
-		return fn!(7)
+	public Scan(fn: ((_p0: number) => $.GoError | globalThis.Promise<$.GoError>) | null): $.GoError {
+		return (fn!(7) as $.GoError)
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -45,7 +45,7 @@ export class listScanner {
 	)
 }
 
-export async function run(s: scanner | null): globalThis.Promise<$.GoError> {
+export function run(s: scanner | null): $.GoError {
 	return (s !== null && (s as any).__isVarRef !== true && (s as any).__goValue === undefined ? (s as Exclude<scanner, null>) : $.pointerValue<Exclude<scanner, null>>(s)).Scan($.functionValue((v: number): $.GoError => {
 		if (v != 7) {
 			return errors.New("wrong value")
@@ -55,17 +55,15 @@ export async function run(s: scanner | null): globalThis.Promise<$.GoError> {
 }
 
 export async function main(): globalThis.Promise<void> {
-	await $.println(await run($.interfaceValue<scanner | null>(new listScanner(undefined, true), "main.listScanner", "main.listScanner")) == null)
+	await $.println(run($.interfaceValue<scanner | null>(new listScanner(undefined, true), "main.listScanner", "main.listScanner")) == null)
 
 	let m = $.varRef($.markAsStructValue(new sync.Map()))
-	let callbacks = $.arrayValue([$.functionValue(async (v: number): globalThis.Promise<$.GoError> => {
-		await m.value.Load($.basicInterfaceValue(v, "int"))
+	let callbacks = $.arrayValue([$.functionValue((v: number): $.GoError => {
+		m.value.Load($.basicInterfaceValue(v, "int"))
 		return null
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: ["error"] } as $.FunctionTypeInfo))])
-	await $.println((__goscriptAwait = $.arrayIndex(callbacks, 0)!(1), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) == null)
+	await $.println(($.arrayIndex(callbacks, 0)!(1) as $.GoError) == null)
 }
-
-var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

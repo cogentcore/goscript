@@ -21,9 +21,9 @@ export async function main(): globalThis.Promise<void> {
 				sum += i * (id + 1)
 			}
 			sum
-			await bcast.value.HoldLock($.functionValue(async (broadcastFn: (() => void) | null, _p1: (() => $.Channel<{}> | null | globalThis.Promise<$.Channel<{}> | null>) | null) => {
+			await bcast.value.HoldLock($.functionValue((broadcastFn: (() => void) | null, _p1: (() => $.Channel<{}> | null | globalThis.Promise<$.Channel<{}> | null>) | null) => {
 				completed++
-				void (__goscriptAwait = broadcastFn!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+				broadcastFn!()
 			}, ({ kind: $.TypeKind.Function, params: [({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.channelType({ kind: $.TypeKind.Struct, methods: [], fields: [] }, "receive")] } as $.FunctionTypeInfo)], results: [] } as $.FunctionTypeInfo)))
 		})(__goscriptDeferArg0) })
 	}

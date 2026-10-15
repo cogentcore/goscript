@@ -8,16 +8,11 @@
     "RWMutex.Lock": true,
     "RWMutex.RLock": true,
     "WaitGroup.Wait": true,
-    "Once.Do": true,
     "Cond.Wait": true,
-    "Pool.Get": true,
-    "Map.CompareAndDelete": true,
-    "Map.Delete": true,
-    "Map.Load": true,
-    "Map.LoadAndDelete": true,
-    "Map.LoadOrStore": true,
-    "Map.Range": true,
-    "Map.Store": true,
-    "Map.Swap": true
+    "Pool.Get": true
+  },
+  "callbackAsyncFunctions": {
+    "Once.Do": true,
+    "Map.Range": true
   }
 }

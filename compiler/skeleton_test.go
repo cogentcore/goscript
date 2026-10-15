@@ -385,6 +385,8 @@ func TestCompilePackagesInitializesLazyAsyncPackageVarsBeforeInit(t *testing.T) 
 			"package main",
 			"import \"sync\"",
 			"var lock sync.Mutex",
+			// The mutex's address escapes, so its Lock stays async.
+			"var locker sync.Locker = &lock",
 			"var first = makeFirst()",
 			"func makeFirst() int {",
 			"  lock.Lock()",
@@ -5341,6 +5343,8 @@ func TestCompilePackagesPropagatesImmediateFuncLitAsync(t *testing.T) {
 			"  parent *resolver",
 			"  mutex sync.Mutex",
 			"}",
+			// The mutex's address escapes, so its Lock stays async.
+			"func (r *resolver) locker() sync.Locker { return &r.mutex }",
 			"func (r *resolver) lookup() (int, error) {",
 			"  value := func() int {",
 			"    r.mutex.Lock()",

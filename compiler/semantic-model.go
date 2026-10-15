@@ -197,6 +197,7 @@ func (o *SemanticModelOwner) colorAsync(
 	// that pass functions.
 	overrideValues := addOverrideFuncValues(model, overridePkgs)
 	internFuncValueClasses(model)
+	addMutexNodes(model)
 	model.functionCallers = semanticFunctionCallers(model)
 	asyncArgumentSites := asyncArgumentCallSites(model)
 
@@ -250,6 +251,10 @@ func (o *SemanticModelOwner) colorAsync(
 	}
 	model.openMethods = openMethodSet
 	valueGraph := buildFuncValueGraph(model, overrideFacts, values, openMethodSet, wholeProgram)
+
+	// A mutex that escapes the analysis is locked async.
+	markMutexEscapes(model, embeddedMutexesExposed(interfaceGraph, anonymousInterfaceGraph,
+		programMakesFuncValues(model, overrideFacts, values)))
 
 	// Propagate the async marks to their fixed point.
 	interfaceAsyncEdges, markDiagnostics := o.buildInterfaceAsyncEdges(ctx, model, overrideFacts, interfaceGraph)
@@ -408,6 +413,9 @@ func (m *SemanticModel) mergePackage(shard *SemanticModel) {
 			m.valueNodes[node.function] = node
 		}
 		for _, node := range semPkg.lazyInits {
+			m.valueNodes[node.function] = node
+		}
+		for _, node := range semPkg.lockSections {
 			m.valueNodes[node.function] = node
 		}
 	}
@@ -1289,6 +1297,11 @@ func semanticFunctionCallers(model *SemanticModel) map[*types.Func][]*semanticFu
 		for v := range semFn.packageVars {
 			if key := initKeys[v]; key != nil {
 				callers[key] = append(callers[key], semFn)
+			}
+		}
+		for mutex := range semFn.locks {
+			if node := model.mutexNodes[mutex]; node != nil {
+				callers[node.function] = append(callers[node.function], semFn)
 			}
 		}
 	}

@@ -12,7 +12,7 @@ export async function main(): globalThis.Promise<void> {
 	await once.value.Do($.functionValue(async () => {
 		value = await $.chanRecv(ch)
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)))
-	await once.value.Do($.functionValue(() => {
+	once.value.Do($.functionValue(() => {
 		value = 99
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)))
 	await $.println("once", value)

@@ -19,10 +19,10 @@ type OverrideMetadata struct {
 	NativeDependencies []string
 	// AsyncFunctions maps package-level function names to async status.
 	AsyncFunctions map[string]bool
-	// CallbackAsyncFunctions maps package-level function names that call their
-	// function arguments before returning. Such a function returns a promise
-	// only when an argument does, so a call suspends exactly when one of its
-	// function arguments can.
+	// CallbackAsyncFunctions maps package-level function names, or
+	// Type.Method keys, that call their function arguments before returning.
+	// Such a function returns a promise only when an argument does, so a call
+	// suspends exactly when one of its function arguments can.
 	CallbackAsyncFunctions map[string]bool
 	// AsyncMethods maps Type.Method keys to async status.
 	AsyncMethods map[string]bool

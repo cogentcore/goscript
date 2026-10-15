@@ -81,6 +81,8 @@ type funcFactsWalker struct {
 	immediate map[*ast.FuncLit]bool
 	// taken holds the values already recorded.
 	taken map[funcValue]bool
+	// lockSites holds the Lock and RLock statements of known mutexes.
+	lockSites map[*ast.CallExpr]lockSite
 }
 
 // collectFunctionFacts records the calls and direct async causes of the
@@ -104,8 +106,25 @@ func collectFunctionFacts(
 		callees:       make(map[ast.Node]bool),
 		immediate:     make(map[*ast.FuncLit]bool),
 		taken:         make(map[funcValue]bool),
+		lockSites:     make(map[*ast.CallExpr]lockSite),
 	}
 	semPkg.funcLits = make(map[token.Pos]*semanticFunction)
+	semPkg.lockSections = make(map[token.Pos]*semanticFunction)
+
+	// Find the critical sections of every function and literal body.
+	for _, file := range pkg.Syntax {
+		ast.Inspect(file, func(node ast.Node) bool {
+			switch typed := node.(type) {
+			case *ast.FuncDecl:
+				if typed.Body != nil {
+					collectLockSites(pkg, typed.Body, w.lockSites)
+				}
+			case *ast.FuncLit:
+				collectLockSites(pkg, typed.Body, w.lockSites)
+			}
+			return true
+		})
+	}
 	semPkg.lazyInits = make(map[types.Object]*semanticFunction)
 	top := &semanticFunction{calls: make(map[*types.Func]bool)}
 
@@ -235,6 +254,9 @@ func (w *funcFactsWalker) visit(node *semanticFunction, n ast.Node) bool {
 		if typed.Op == token.ARROW {
 			markOwnAsync(node, typed.Pos(), asyncCauseChannel, "channel receive")
 		}
+		if mutex := mutexOperand(w.pkg, typed.X); typed.Op == token.AND && mutex != nil {
+			w.semPkg.recordMutexEscape(mutex, typed.Pos())
+		}
 	case *ast.RangeStmt:
 		w.visitRange(node, typed)
 	case *ast.CallExpr:
@@ -296,6 +318,11 @@ func (w *funcFactsWalker) visitSelector(node *semanticFunction, sel *ast.Selecto
 		return
 	}
 
+	// A mutex method taken as a value may lock it anywhere.
+	if _, mutex := mutexMethodCall(w.pkg, sel); mutex != nil {
+		w.semPkg.recordMutexEscape(mutex, sel.Pos())
+	}
+
 	// A method value or method expression takes the method's value.
 	if selection := w.pkg.TypesInfo.Selections[sel]; selection != nil {
 		method, _ := selection.Obj().(*types.Func)
@@ -311,10 +338,19 @@ func (w *funcFactsWalker) visitSelector(node *semanticFunction, sel *ast.Selecto
 	}
 }
 
-// visitRange records a range over a function. Calling a declared function
+// visitRange records a range over a channel, which suspends, or over a
+// function. Calling a declared function
 // calls it; any other function is a value. The loop body is the yield
 // callback, a value as async as the enclosing node.
 func (w *funcFactsWalker) visitRange(node *semanticFunction, stmt *ast.RangeStmt) {
+	// A range over a channel receives from it.
+	if typ := w.pkg.TypesInfo.TypeOf(stmt.X); typ != nil {
+		if _, ok := typ.Underlying().(*types.Chan); ok {
+			markOwnAsync(node, stmt.Pos(), asyncCauseChannel, "range over channel")
+			return
+		}
+	}
+
 	// Only a range over a function calls it.
 	signature := signatureForType(w.pkg.TypesInfo.TypeOf(stmt.X))
 	if signature == nil {
@@ -357,13 +393,46 @@ func (w *funcFactsWalker) visitCall(node *semanticFunction, call *ast.CallExpr) 
 		w.visitValueCall(node, call)
 	}
 
-	// Some callees suspend whatever the program, and callback async
-	// overrides wait on their function arguments.
+	// A Lock of a known mutex waits on its critical sections. Some callees
+	// suspend whatever the program, and callback async overrides wait on
+	// their function arguments.
+	if w.visitLock(node, call) {
+		return
+	}
 	if !node.async && callSuspends(w.pkg, w.overrideFacts, call.Fun) {
 		kind, detail := suspendingCallCause(w.pkg, w.overrideFacts, call.Fun)
 		markOwnAsync(node, call.Pos(), kind, detail)
 	}
 	recordCallbackOverrideCall(w.pkg, w.overrideFacts, node, call, w.literalKey)
+}
+
+// visitLock records a Lock or RLock call of a known mutex with a critical
+// section as a lock of the mutex, and walks the section into its node the
+// first time. It reports whether the call was one; a Lock of a known mutex
+// without a section lets the mutex escape.
+func (w *funcFactsWalker) visitLock(node *semanticFunction, call *ast.CallExpr) bool {
+	// Only a Lock of a known mutex qualifies.
+	name, mutex := mutexMethodCall(w.pkg, call.Fun)
+	if mutex == nil || name != mutexLock && name != mutexRLock {
+		return false
+	}
+	site, ok := w.lockSites[call]
+	if !ok || !site.ok {
+		w.semPkg.recordMutexEscape(mutex, call.Pos())
+		return false
+	}
+
+	// The section is a node of its own.
+	recordLock(node, mutex)
+	if w.semPkg.lockSections[call.Pos()] == nil {
+		section := newSyntheticNode(call.Pos(), w.pkg.Types, lockSectionNodeName)
+		section.mutex = mutex
+		w.semPkg.lockSections[call.Pos()] = section
+		for _, stmt := range site.region {
+			w.walk(section, stmt)
+		}
+	}
+	return true
 }
 
 // visitFormatCall records a call of a format function that override

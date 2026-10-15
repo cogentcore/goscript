@@ -158,6 +158,38 @@ A call of such a target that the program leaves sync is not awaited, and its
 result is asserted to its Go type, since its TypeScript type admits a
 promise.
 
+### Mutex Locks
+
+`sync.Mutex` and `sync.RWMutex` `Lock` and `RLock` are async in metadata,
+since they wait for another goroutine to unlock. The runtime runs one
+goroutine at a time and switches only where one suspends, so another
+goroutine can hold a lock only across a suspension inside a critical section.
+The analysis (`compiler/semantic-mutex.go`) therefore decides each `Lock` by
+the critical sections of its mutex:
+
+- A mutex is known by the struct field or package variable that holds it (all
+  values of a struct share the field). A `Lock` of a mutex reached any other
+  way, such as through a pointer or a local variable, stays async.
+- The critical section of a `Lock` statement is the statements up to the
+  first `Unlock` of the same mutex after it in the same statement list, or,
+  when the `Unlock` is deferred or elsewhere in the function body, the whole
+  body. Each section is an analysis node, like a literal; each mutex has a node
+  that calls its sections, and a function that locks it calls that node. So
+  a `Lock` is async exactly when a section of its mutex may suspend, at the
+  same fixed point as everything else, nested locks included.
+- A mutex escapes, and every `Lock` of it stays async, when its address is
+  taken, a method of it is taken as a value, a `Lock` of it has no `Unlock`
+  in the same function body, or, for an embedded mutex, when the program has a
+  type whose promoted `Lock` or `RLock` implements an interface method, or
+  makes functions by reflection.
+
+The runtime acquires a free lock synchronously and returns nothing, so a
+`Lock` the analysis leaves sync is not awaited. `sync.Map`'s methods never
+suspend, since none but `Range` calls back into Go code; `Range` and
+`Once.Do` are callback async (`callbackAsyncFunctions`, which takes
+`Type.Method` keys): they return a promise only when their function argument
+does.
+
 ### Directives
 
 Two directives in the doc comment of a declaration override the analysis

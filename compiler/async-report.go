@@ -317,6 +317,10 @@ func (r *asyncReporter) nodeName(id int) string {
 		return "func literal" + r.enclosingName(semFn.function) + " at " + r.position(semFn.function.Pos())
 	case strings.HasPrefix(semFn.name, lazyInitNodeName):
 		return "initializer of " + semFn.function.Pkg().Path() + "." + strings.TrimPrefix(semFn.name, lazyInitNodeName)
+	case semFn.name == lockSectionNodeName:
+		return "critical section of " + semFn.mutex.Name() + " at " + r.position(semFn.function.Pos())
+	case strings.HasPrefix(semFn.name, mutexNodeName):
+		return "Lock of mutex " + strings.TrimPrefix(semFn.name, mutexNodeName) + " declared at " + r.position(semFn.function.Pos())
 	case semFn.name == funcValueNodeName:
 		return "function value from an override package, calling " + r.shapeList(semFn.valueCalls)
 	}
