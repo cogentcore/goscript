@@ -69,7 +69,7 @@ export async function main(): globalThis.Promise<void> {
 	if (dep.Verbosity.value <= 2) {
 		await $.println("at most 2")
 	}
-	await $.println(dep.Verbosity.value + 1, $.int(dep.Verbosity.value))
+	await $.println(dep.Verbosity.value + 1, dep.Verbosity.value)
 	dep.__goscript_set_Verbosity(5)
 	await $.println(dep.Get(), dep.Verbosity.value > 3)
 	dep.__goscript_set_Verbosity(dep.Verbosity.value + 1)
@@ -78,7 +78,7 @@ export async function main(): globalThis.Promise<void> {
 	p!.value = 9
 	await $.println(dep.Verbosity.value, dep.Get())
 	if (dep.__goscript_get_UserLevel().value <= 3) {
-		await $.println("user level", $.int(dep.__goscript_get_UserLevel().value), $.pointerValue<dep.Level>(dep.UserPtr()))
+		await $.println("user level", dep.__goscript_get_UserLevel().value, $.pointerValue<dep.Level>(dep.UserPtr()))
 	}
 
 	// Read and write lazy variables through package-level pointers.
@@ -89,7 +89,7 @@ export async function main(): globalThis.Promise<void> {
 	__goscript_vars.__goscript_set_level(7)
 	await $.println($.pointerValue<number>(__goscript_get_levelPtr()))
 	importedPtr!.value = 8
-	await $.println($.int(dep.__goscript_get_UserLevel().value), $.pointerValue<dep.Level>(dep.UserPtr()))
+	await $.println(dep.__goscript_get_UserLevel().value, $.pointerValue<dep.Level>(dep.UserPtr()))
 }
 
 await __goscript_package_init.__goscript_package_init()

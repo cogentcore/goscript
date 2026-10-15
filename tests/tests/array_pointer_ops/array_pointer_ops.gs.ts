@@ -102,7 +102,7 @@ export function sumArray(src: $.VarRef<Uint8Array> | null): number {
 	let sum = 0
 	for (let __goscriptRangeTarget1 = $.pointerValue<Uint8Array>(src), __goscriptRangeWindow1 = $.sliceRange(__goscriptRangeTarget1), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow1.length; __rangeIndex++) {
 		let v = $.uint((__goscriptRangeWindow1.backing[__goscriptRangeWindow1.offset + __rangeIndex] as number), 8)
-		sum += $.int(v)
+		sum += v
 	}
 	return sum
 }
@@ -112,7 +112,7 @@ export function closureArrayAddress(): number {
 	void (() => {
 		let table = $.varRef($.arrayValue(new Uint8Array([6, 7, 8, 9])))
 		let ptr = table
-		result = $.int($.arrayIndex($.pointerValue<Uint8Array>(ptr), 2))
+		result = $.arrayIndex($.pointerValue<Uint8Array>(ptr), 2)
 	})()
 	return result
 }

@@ -46,8 +46,8 @@ export async function main(): globalThis.Promise<void> {
 	let mode = 2147484141
 	await $.println("FileMode.IsDir():", fs.FileMode_IsDir(mode))
 	await $.println("FileMode.IsRegular():", fs.FileMode_IsRegular(mode))
-	await $.println("FileMode.Perm():", $.int(fs.FileMode_Perm(mode)))
-	await $.println("FileMode.Type():", $.int(fs.FileMode_Type(mode)))
+	await $.println("FileMode.Perm():", fs.FileMode_Perm(mode))
+	await $.println("FileMode.Type():", fs.FileMode_Type(mode))
 	await $.println("FileMode.String():", fs.FileMode_String(mode))
 
 	let regularMode = 420

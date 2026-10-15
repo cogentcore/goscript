@@ -19,7 +19,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println($.int((((globalThis.Math.trunc((globalThis.Math.imul(a, a)) / 64)) + (globalThis.Math.trunc((globalThis.Math.imul(b, b)) / 64))) | 0), 32), $.int((((((a + b) | 0)) + 2147483647) | 0), 32))
 	let i8 = 127
 	i8 = ((i8 + 1) << 24 >> 24)
-	await $.println(i8, $.int((($.int(-128, 8) - i8) << 24 >> 24), 8))
+	await $.println(i8, $.int(((-128 - i8) << 24 >> 24), 8))
 	let u16 = 65535
 	u16 = ((u16 + 1) & 0xffff)
 	let one = 1

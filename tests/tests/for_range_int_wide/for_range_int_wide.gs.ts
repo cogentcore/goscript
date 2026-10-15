@@ -23,8 +23,8 @@ export async function main(): globalThis.Promise<void> {
 
 	// A narrower count keeps an int counter.
 	let n = 0
-	for (let i = 0; i < $.uint(3, 8); i++) {
-		n += $.int(i)
+	for (let i = 0; i < 3; i++) {
+		n += i
 	}
 	await $.println("uint8 range sum:", n)
 
