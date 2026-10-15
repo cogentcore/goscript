@@ -15685,7 +15685,9 @@ func tsStructFieldName(name string, idx int) string {
 // shouldCloneStructValue reports whether a struct value expr must be copied
 // where Go copies it. A composite literal is a new value, and so is the
 // result of a call of a function or concrete method compiled from Go, since
-// each return copies a stored struct value (see lowerNamedResultValue).
+// each return copies a stored struct value (see lowerNamedResultValue). The
+// last read of a local that nothing reads afterwards moves its value (see
+// collectMoves).
 func (o *LoweringOwner) shouldCloneStructValue(ctx lowerFileContext, expr ast.Expr) bool {
 	switch typed := ast.Unparen(expr).(type) {
 	case *ast.CompositeLit:
@@ -15693,7 +15695,7 @@ func (o *LoweringOwner) shouldCloneStructValue(ctx lowerFileContext, expr ast.Ex
 	case *ast.CallExpr:
 		return !o.isFreshStructCallResult(ctx, typed)
 	default:
-		return true
+		return !movedLocalValue(ctx, expr)
 	}
 }
 
