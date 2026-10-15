@@ -57,6 +57,11 @@ type OverrideMetadata struct {
 	// receiver that the method calls, such as sync.Pool.Get's New. The method
 	// suspends exactly when a call through one of them may.
 	AsyncWhenFields map[string][]string
+	// TransientPointerFunctions names the package-level functions that only
+	// read and write through their pointer parameters during the call, as
+	// sync/atomic.LoadInt64 does, so that a caller can pass them a new
+	// reference to a field (see markTransientPointers).
+	TransientPointerFunctions map[string]bool
 }
 
 // OverrideRegistryOwner owns GoScript override package metadata and copy plans.

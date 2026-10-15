@@ -159,6 +159,7 @@ func (o *SemanticModelOwner) Build(ctx context.Context, graph *PackageGraph, opt
 		}
 	}
 	model.collectVarRefNames()
+	markTransientPointers(model, overrideFacts)
 
 	// Package variables that read only unchanging data initialize on first
 	// read, which the marks of every package decide.

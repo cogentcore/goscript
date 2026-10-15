@@ -239,6 +239,12 @@ type semanticFunction struct {
 	// walk found it.
 	asyncCause *asyncCause
 	deferred   bool
+	// receiverTransient and paramsTransient report whether the pointer
+	// receiver and each pointer parameter are transient, so that a call can
+	// pass a new reference to a field (see markTransientPointers).
+	// paramsTransient is nil when no parameter is.
+	receiverTransient bool
+	paramsTransient   []bool
 	// calls holds the origins of the functions the body calls outside
 	// function literals other than immediately invoked ones.
 	calls map[*types.Func]bool

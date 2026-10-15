@@ -112,6 +112,17 @@ func (f *OverrideFacts) IsFunctionCallbackAsync(pkgPath, function string) bool {
 	return pkg.metadata.CallbackAsyncFunctions[function]
 }
 
+// IsTransientPointerFunction returns true when override metadata marks a
+// package-level function as only reading and writing through its pointer
+// parameters during the call.
+func (f *OverrideFacts) IsTransientPointerFunction(pkgPath, function string) bool {
+	if f == nil {
+		return false
+	}
+	pkg := f.packages[pkgPath]
+	return pkg.metadata.TransientPointerFunctions[function]
+}
+
 // AsyncWhenMethods returns the method names whose async implementations make
 // the package-level function or Type.Method async, per override metadata.
 func (f *OverrideFacts) AsyncWhenMethods(pkgPath, function string) []string {
@@ -433,6 +444,10 @@ func loadOverrideMetadata(root overridePackageRoot) (OverrideMetadata, error) {
 				for iter.ReadArray() {
 					metadata.AsyncWhenFields[method] = append(metadata.AsyncWhenFields[method], iter.ReadString())
 				}
+			}
+		case "transientPointerFunctions":
+			for iter.ReadArray() {
+				metadata.TransientPointerFunctions[iter.ReadString()] = true
 			}
 		case "asyncWhenMethods":
 			for function := iter.ReadObject(); function != ""; function = iter.ReadObject() {
@@ -828,31 +843,33 @@ func addBehaviorTestSymbol(index map[string]map[string]bool, pkgPath, symbol str
 
 func newOverrideMetadata() OverrideMetadata {
 	return OverrideMetadata{
-		AsyncFunctions:         make(map[string]bool),
-		CallbackAsyncFunctions: make(map[string]bool),
-		AsyncMethods:           make(map[string]bool),
-		AsyncCallbacks:         make(map[string][]string),
-		AsyncWhenMethods:       make(map[string][]string),
-		FuncValueMakers:        make(map[string]bool),
-		SyncInterfaces:         make(map[string]bool),
-		AsyncWhenOperands:      make(map[string]bool),
-		AsyncWhenFields:        make(map[string][]string),
+		AsyncFunctions:            make(map[string]bool),
+		CallbackAsyncFunctions:    make(map[string]bool),
+		AsyncMethods:              make(map[string]bool),
+		AsyncCallbacks:            make(map[string][]string),
+		AsyncWhenMethods:          make(map[string][]string),
+		FuncValueMakers:           make(map[string]bool),
+		SyncInterfaces:            make(map[string]bool),
+		AsyncWhenOperands:         make(map[string]bool),
+		AsyncWhenFields:           make(map[string][]string),
+		TransientPointerFunctions: make(map[string]bool),
 	}
 }
 
 func cloneOverrideMetadata(metadata OverrideMetadata) OverrideMetadata {
 	return OverrideMetadata{
-		Dependencies:           slices.Clone(metadata.Dependencies),
-		NativeDependencies:     slices.Clone(metadata.NativeDependencies),
-		AsyncFunctions:         cloneBoolMap(metadata.AsyncFunctions),
-		CallbackAsyncFunctions: cloneBoolMap(metadata.CallbackAsyncFunctions),
-		AsyncMethods:           cloneBoolMap(metadata.AsyncMethods),
-		AsyncCallbacks:         cloneStringSlicesMap(metadata.AsyncCallbacks),
-		AsyncWhenMethods:       cloneStringSlicesMap(metadata.AsyncWhenMethods),
-		FuncValueMakers:        cloneBoolMap(metadata.FuncValueMakers),
-		SyncInterfaces:         cloneBoolMap(metadata.SyncInterfaces),
-		AsyncWhenOperands:      cloneBoolMap(metadata.AsyncWhenOperands),
-		AsyncWhenFields:        cloneStringSlicesMap(metadata.AsyncWhenFields),
+		Dependencies:              slices.Clone(metadata.Dependencies),
+		NativeDependencies:        slices.Clone(metadata.NativeDependencies),
+		AsyncFunctions:            cloneBoolMap(metadata.AsyncFunctions),
+		CallbackAsyncFunctions:    cloneBoolMap(metadata.CallbackAsyncFunctions),
+		AsyncMethods:              cloneBoolMap(metadata.AsyncMethods),
+		AsyncCallbacks:            cloneStringSlicesMap(metadata.AsyncCallbacks),
+		AsyncWhenMethods:          cloneStringSlicesMap(metadata.AsyncWhenMethods),
+		FuncValueMakers:           cloneBoolMap(metadata.FuncValueMakers),
+		SyncInterfaces:            cloneBoolMap(metadata.SyncInterfaces),
+		AsyncWhenOperands:         cloneBoolMap(metadata.AsyncWhenOperands),
+		AsyncWhenFields:           cloneStringSlicesMap(metadata.AsyncWhenFields),
+		TransientPointerFunctions: cloneBoolMap(metadata.TransientPointerFunctions),
 	}
 }
 

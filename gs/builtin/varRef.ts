@@ -136,6 +136,19 @@ export function fieldRef<T extends object, K extends keyof T>(
   return ref
 }
 
+/**
+ * transientFieldRef returns a new reference to a mutable object field, for a
+ * call whose pointer parameter only reads and writes through it, so that it
+ * need not find the stable reference of fieldRef. It must never be compared,
+ * kept or given an address.
+ */
+export function transientFieldRef<T extends object, K extends keyof T>(
+  target: T,
+  key: K,
+): VarRef<T[K]> {
+  return new FieldReference(target, key)
+}
+
 /** isVarRef reports whether a value carries the variable-reference marker. */
 export function isVarRef(v: unknown): v is VarRef<unknown> {
   return v !== null && typeof v === 'object' && (v as any).__isVarRef === true
