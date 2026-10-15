@@ -3603,7 +3603,7 @@ func (o *LoweringOwner) lowerStructType(ctx lowerFileContext, semType *semanticT
 			bodyless.Body = nil
 			lowerDecl = &bodyless
 		}
-		method, methodDiagnostics := o.lowerFuncDecl(ctx, lowerDecl)
+		method, methodDiagnostics := o.lowerFuncDecl(ctx.withDeclFile(methodDecl), lowerDecl)
 		diagnostics = append(diagnostics, methodDiagnostics...)
 		if method != nil {
 			lowered.methods = append(lowered.methods, *method)
@@ -4521,6 +4521,20 @@ func (ctx lowerFileContext) withReceiverTypeParams(params []*types.TypeParam) lo
 		}
 	}
 	ctx.typeParams = next
+	return ctx
+}
+
+// withDeclFile returns ctx reading the syntax of the file that declares decl.
+// A type's methods may be declared in other files of its package, and the
+// syntax walks that resolve a local's declaration search the current file.
+func (ctx lowerFileContext) withDeclFile(decl ast.Node) lowerFileContext {
+	for _, file := range ctx.semPkg.source.Syntax {
+		if file.FileStart <= decl.Pos() && decl.Pos() < file.FileEnd {
+			ctx.file = file
+			ctx.tokenFile = ctx.semPkg.source.Fset.File(file.Pos())
+			return ctx
+		}
+	}
 	return ctx
 }
 
