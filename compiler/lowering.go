@@ -6713,7 +6713,15 @@ func (o *LoweringOwner) lowerStructAssignment(target, value string) string {
 // names. A local variable is also assigned the result, which is the same
 // struct, so that TypeScript forgets what it narrowed about its fields.
 func (o *LoweringOwner) lowerStructAssignmentTo(ctx lowerFileContext, lhs ast.Expr, left, value string) string {
+	// A struct of a generated class copies the value by the class's own
+	// assign method, which returns the struct; any other struct by the
+	// runtime helper.
 	assignment := o.lowerStructAssignment(left, value)
+	if o.isGeneratedStructClass(namedStructType(assignmentTargetType(ctx, lhs))) {
+		assignment = parenthesizeAwaitedExpr(left) + ".__goscriptAssign(" + value + ")"
+	}
+
+	// A local variable is assigned the result.
 	ident, ok := unwrapParenExpr(lhs).(*ast.Ident)
 	if !ok {
 		return assignment
