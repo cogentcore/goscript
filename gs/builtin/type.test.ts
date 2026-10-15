@@ -151,3 +151,45 @@ describe('deferred struct metadata', () => {
     expect(fieldReads).toBe(1)
   })
 })
+
+describe('interface assertions of classes that share a Go type name', () => {
+  it('checks each class against the interface', () => {
+    // Values boxed in generic code can carry the name of a type parameter.
+    class Named {
+      Name(): string {
+        return 'named'
+      }
+    }
+    class Plain {}
+    registerStructType(
+      'test.SharedNameNamed',
+      () => new Named(),
+      () => [methodSignature('Name', [], [basicType('string')])],
+      Named,
+      () => [],
+    )
+    registerStructType(
+      'test.SharedNamePlain',
+      () => new Plain(),
+      () => [],
+      Plain,
+      () => [],
+    )
+    const namer = {
+      kind: TypeKind.Interface,
+      methods: [methodSignature('Name', [], [basicType('string')])],
+    } as const
+    const named = Object.defineProperty(new Named(), '__goType', {
+      value: '*T',
+    })
+    const plain = Object.defineProperty(new Plain(), '__goType', {
+      value: '*T',
+    })
+
+    // The answers stay right as the classes alternate.
+    for (let i = 0; i < 3; i++) {
+      expect(is(named, namer)).toBe(true)
+      expect(is(plain, namer)).toBe(false)
+    }
+  })
+})
