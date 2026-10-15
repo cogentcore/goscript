@@ -1,0 +1,122 @@
+package compiler
+
+import (
+	"context"
+	"path/filepath"
+	"strings"
+	"testing"
+)
+
+func TestWholeProgramBuild(t *testing.T) {
+	moduleDir := writePackageGraphFixture(t, map[string]string{
+		"go.mod": "module example.test/wholeprogram\n\ngo 1.25.3\n",
+		"main.go": strings.Join([]string{
+			"package main",
+			"import \"example.test/wholeprogram/used\"",
+			"func main() { used.Use() }",
+			"",
+		}, "\n"),
+		"used/used.go":     "package used\n\nfunc Use() {}\n",
+		"unused/unused.go": "package unused\n\nfunc Unused() {}\n",
+	})
+	for _, tc := range []struct {
+		name     string
+		patterns []string
+		mode     DependencyMode
+		tests    bool
+		want     bool
+	}{
+		{name: "main", patterns: []string{"."}, mode: DependencyModeAll, want: true},
+		{name: "main and its dependency", patterns: []string{".", "./used"}, mode: DependencyModeAll, want: true},
+		{name: "library", patterns: []string{"./used"}, mode: DependencyModeAll},
+		{name: "main and an unused library", patterns: []string{".", "./unused"}, mode: DependencyModeAll},
+		{name: "main without dependencies", patterns: []string{"."}, mode: DependencyModeRequested},
+		{name: "test binary", patterns: []string{"./used"}, mode: DependencyModeAll, tests: true, want: true},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			req := &CompileRequest{
+				Patterns:            tc.patterns,
+				Dir:                 moduleDir,
+				OutputPath:          filepath.Join(t.TempDir(), "out"),
+				DependencyMode:      tc.mode,
+				RuntimeEmissionMode: RuntimeEmissionModeEmit,
+				Tests:               tc.tests,
+			}
+			graph := loadPackageGraph(t, req)
+			if got := wholeProgramBuild(req, graph); got != tc.want {
+				t.Fatalf("wholeProgramBuild = %v, want %v", got, tc.want)
+			}
+		})
+	}
+}
+
+func TestSemanticModelClosesExportedInterfacesInWholeProgram(t *testing.T) {
+	// One interface has only compiled implementations, and an override type
+	// implements the other.
+	moduleDir := writePackageGraphFixture(t, map[string]string{
+		"go.mod": "module example.test/closed\n\ngo 1.25.3\n",
+		"main.go": strings.Join([]string{
+			"package main",
+			"import \"errors\"",
+			// Shape's implementations are all sync compiled methods.
+			"type Shape interface { Area() int }",
+			"type Rect struct{ w, h int }",
+			"func (r Rect) Area() int { return r.w * r.h }",
+			"func area(s Shape) int { return s.Area() }",
+			// Override types such as the errors package's implement Errorer.
+			"type Errorer interface { Error() string }",
+			"type myErr struct{}",
+			"func (myErr) Error() string { return \"x\" }",
+			"func message(e Errorer) string { return e.Error() }",
+			// Wrapped forwards to Errorer, which stays open.
+			"type Wrapped interface { Error() string; Unwrap() error }",
+			"type wrapper struct{ Errorer }",
+			"func (wrapper) Unwrap() error { return nil }",
+			"func unwrapMessage(w Wrapped) string { return w.Error() }",
+			"func main() {",
+			"  _ = area(Rect{})",
+			"  _ = message(myErr{})",
+			"  _ = message(errors.New(\"y\"))",
+			"  _ = unwrapMessage(wrapper{myErr{}})",
+			"}",
+			"",
+		}, "\n"),
+	})
+	req := &CompileRequest{
+		Patterns:            []string{"."},
+		Dir:                 moduleDir,
+		OutputPath:          filepath.Join(t.TempDir(), "out"),
+		DependencyMode:      DependencyModeAll,
+		RuntimeEmissionMode: RuntimeEmissionModeEmit,
+	}
+	graph := loadPackageGraph(t, req)
+	if !wholeProgramBuild(req, graph) {
+		t.Fatal("expected a whole program build")
+	}
+
+	// Only a whole program build closes the interface of compiled code.
+	for _, tc := range []struct {
+		fn               string
+		library, program bool
+	}{
+		{fn: "area", library: true, program: false},
+		{fn: "message", library: true, program: true},
+		{fn: "unwrapMessage", library: true, program: true},
+	} {
+		for _, wholeProgram := range []bool{false, true} {
+			model, diagnostics := NewSemanticModelOwner(NewOverrideRegistryOwner()).Build(
+				context.Background(), graph, SemanticBuildOptions{WholeProgram: wholeProgram})
+			if diagnosticsHaveErrors(diagnostics) {
+				t.Fatalf("semantic model build failed: %#v", diagnostics)
+			}
+			want := tc.library
+			if wholeProgram {
+				want = tc.program
+			}
+			semFn := model.functions[requireDefinedFunc(t, graph, "example.test/closed", tc.fn)]
+			if semFn == nil || semFn.async != want {
+				t.Fatalf("whole program %v: %s async = %v, want %v", wholeProgram, tc.fn, semFn != nil && semFn.async, want)
+			}
+		}
+	}
+}

@@ -39,7 +39,7 @@ export class item {
 	)
 }
 
-export async function use(v: any): globalThis.Promise<string> {
+export function use(v: any): string {
 	let __goscriptTuple0: any = $.typeAssertTuple<dumper | null>(v, "main.dumper")
 	let __goscriptShadow0 = __goscriptTuple0[0]
 	let ok = __goscriptTuple0[1]
@@ -50,10 +50,8 @@ export async function use(v: any): globalThis.Promise<string> {
 }
 
 export async function main(): globalThis.Promise<void> {
-	await $.println(await use($.interfaceValue(new item(undefined, true), "main.item", "main.item")))
+	await $.println(use($.interfaceValue(new item(undefined, true), "main.item", "main.item")))
 }
-
-var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

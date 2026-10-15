@@ -55,6 +55,30 @@ If ANY implementation of an interface method requires async behavior (due to cha
 1. The interface method becomes async (returns Promise)
 2. All implementations are forced to be async-compatible
 
+### Open and Closed Interfaces
+
+The rule above applies only where every implementation is known. The current
+compiler (`compiler/semantic-model.go`, `compiler/semantic-whole-program.go`)
+distinguishes:
+
+- **Package-sealed interfaces** (with an unexported method): every
+  implementation is in the compiled graph, so the implementations color the
+  methods.
+- **Closed exported interfaces**, in a whole-program build (the requested
+  packages are main packages and their dependencies, or a test binary): an
+  exported, non-generic interface whose implementations are all compiled Go
+  methods with bodies, or methods of other closed interfaces (embedded
+  interface fields). No type of a hand-written override package may
+  implement it, and no interface that an override package declares or
+  exposes in its API may have all of its methods, since override values are
+  TypeScript objects whose methods may suspend without metadata saying so.
+- **Open interfaces**: every other interface. A call of an open interface
+  method makes its caller async, but the method itself stays sync unless a
+  compiled implementation is async.
+
+A library build keeps every exported interface open
+(`SemanticBuildOptions.WholeProgram` false).
+
 ### Implementation Analysis Flow
 
 ```

@@ -384,7 +384,7 @@ export async function main(): globalThis.Promise<void> {
 	let [, viaIface, ] = await (m !== null && (m as any).__isVarRef !== true && (m as any).__goValue === undefined ? (m as Exclude<matcher, null>) : $.pointerValue<Exclude<matcher, null>>(m)).match((scope).clone(), 0)
 	viaIface.Start.Line = 11
 	let fn: ((scope: Region, depth: number) => [boolean, Region, number] | globalThis.Promise<[boolean, Region, number]>) | null = $.functionValue(((__receiver) => (scope: Region, depth: number) => __receiver.match(scope, depth))($.pointerValue<rule>(r)), ({ kind: $.TypeKind.Function, params: ["main.Region", /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("bool"), "main.Region", /* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo), "main.(*rule).match-fm")
-	let [, viaValue, ] = await fn!((scope).clone(), 0)
+	let [, viaValue, ] = (fn!((scope).clone(), 0) as [boolean, Region, number])
 	viaValue.Start.Line = 12
 	await $.println("indirect:", scope.Start.Line, viaIface.Start.Line, viaValue.Start.Line)
 
@@ -416,7 +416,7 @@ export async function main(): globalThis.Promise<void> {
 	ws.Start.Line = 60
 	await $.println("withStart:", ws.Start.Line, st.Line)
 	let [cr, _set] = captured(base)
-	void (__goscriptAwait = _set!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+	_set!()
 	await $.println("captured:", cr.Start.Line)
 	await $.println("deferred:", deferred(base).End.Char, base.End.Char)
 	let cp1 = changedParam((base).clone())
@@ -427,8 +427,6 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("reads:", reads(r, new Region({Start: new Pos({Line: 1, Char: 2}, true), End: new Pos({Line: 3, Char: 4}, true)}, true)))
 	await $.println("calls:", calls)
 }
-
-var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

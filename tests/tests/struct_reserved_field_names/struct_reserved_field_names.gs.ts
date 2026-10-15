@@ -47,16 +47,16 @@ export async function main(): globalThis.Promise<void> {
 	w.___proto__ = 8
 	let p = $.fieldRef(v, "___proto__")
 	p!.value += 1
-	await fmt.Println($.basicInterfaceValue(v.___proto__, "int"), v._constructor, v.Name, $.basicInterfaceValue(w.___proto__, "int"))
+	fmt.Println($.basicInterfaceValue(v.___proto__, "int"), v._constructor, v.Name, $.basicInterfaceValue(w.___proto__, "int"))
 
 	// The struct keeps its type and methods.
-	await fmt.Printf("%v %+v\n", $.interfaceValue((v).clone(), "main.odd", "main.odd"), $.interfaceValue((w).clone(), "main.odd", "main.odd"))
-	await fmt.Println((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.interfaceValue((v).clone(), "main.odd", "main.odd"))).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), $.basicInterfaceValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue((v).clone(), "main.odd", "main.odd")))).Field(0))).Int(), "int64"), $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue((v).clone(), "main.odd", "main.odd")))).Field(1))).String())
-	await fmt.Println($.structEqual(v, new odd({___proto__: 8, _constructor: "c", Name: "n"}, true)))
-	let __goscriptTuple0: any = json.Marshal($.interfaceValue((v).clone(), "main.odd", "main.odd"))
+	fmt.Printf("%v %+v\n", $.interfaceValue((v).clone(), "main.odd", "main.odd"), $.interfaceValue((w).clone(), "main.odd", "main.odd"))
+	fmt.Println((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.interfaceValue((v).clone(), "main.odd", "main.odd"))).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), $.basicInterfaceValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue((v).clone(), "main.odd", "main.odd")))).Field(0))).Int(), "int64"), $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue((v).clone(), "main.odd", "main.odd")))).Field(1))).String())
+	fmt.Println($.structEqual(v, new odd({___proto__: 8, _constructor: "c", Name: "n"}, true)))
+	let __goscriptTuple0: any = (json.Marshal($.interfaceValue((v).clone(), "main.odd", "main.odd")) as [$.Slice<number>, $.GoError])
 	let data: $.Slice<number> = __goscriptTuple0[0]
 	let err = __goscriptTuple0[1]
-	await fmt.Println($.bytesToString(data), err == null)
+	fmt.Println($.bytesToString(data), err == null)
 }
 
 var __goscriptAwait: any

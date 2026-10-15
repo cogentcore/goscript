@@ -193,7 +193,7 @@ export async function main(): globalThis.Promise<void> {
 	}, ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo)), n: 1})), Right: $.markAsStructValue(new withClone()), Bottom: $.markAsStructValue(new withClone()), Left: $.markAsStructValue(new withClone())}))
 	let wc2 = (wc).clone()
 	wc2.Top.n = 2
-	await $.println("field named clone:", wc.Top.n, wc2.Top.n, (__goscriptAwait = wc2.Top.clone!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println("field named clone:", wc.Top.n, wc2.Top.n, (wc2.Top.clone!() as number))
 
 	// nested generic instances
 	let pr: Pair = $.markAsStructValue(new Pair({Key: "", Val: $.markAsStructValue(new Sides({Top: new Value(undefined, true), Right: new Value(undefined, true), Bottom: new Value(undefined, true), Left: new Value(undefined, true)}, undefined, true))}, undefined, true))
@@ -208,8 +208,6 @@ export async function main(): globalThis.Promise<void> {
 	$.arrayIndex(vals!, 0).Sides.Top.V = 12
 	await $.println("slice:", $.arrayIndex(vals!, 0).Sides.Top.V, $.arrayIndex(vals!, 1).Sides.Top.V, $.arrayIndex(vals!, 2).Sides.Top.V)
 }
-
-var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

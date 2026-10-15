@@ -33,12 +33,12 @@ export function valueHash_Key(h: valueHash): any {
 	return $.namedValueInterfaceValue<any>(h, "main.valueHash", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2())
 }
 
-export async function sameKey(a: ref | null, b: ref | null): globalThis.Promise<boolean> {
-	return $.comparableEqual((__goscriptAwait = (a !== null && (a as any).__isVarRef !== true && (a as any).__goValue === undefined ? (a as Exclude<ref, null>) : $.pointerValue<Exclude<ref, null>>(a)).Key(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = (b !== null && (b as any).__isVarRef !== true && (b as any).__goValue === undefined ? (b as Exclude<ref, null>) : $.pointerValue<Exclude<ref, null>>(b)).Key(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+export function sameKey(a: ref | null, b: ref | null): boolean {
+	return $.comparableEqual((a !== null && (a as any).__isVarRef !== true && (a as any).__goValue === undefined ? (a as Exclude<ref, null>) : $.pointerValue<Exclude<ref, null>>(a)).Key(), (b !== null && (b as any).__isVarRef !== true && (b as any).__goValue === undefined ? (b as Exclude<ref, null>) : $.pointerValue<Exclude<ref, null>>(b)).Key())
 }
 
-export async function differentKey(a: ref | null, b: ref | null): globalThis.Promise<boolean> {
-	return !$.comparableEqual((__goscriptAwait = (a !== null && (a as any).__isVarRef !== true && (a as any).__goValue === undefined ? (a as Exclude<ref, null>) : $.pointerValue<Exclude<ref, null>>(a)).Key(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = (b !== null && (b as any).__isVarRef !== true && (b as any).__goValue === undefined ? (b as Exclude<ref, null>) : $.pointerValue<Exclude<ref, null>>(b)).Key(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+export function differentKey(a: ref | null, b: ref | null): boolean {
+	return !$.comparableEqual((a !== null && (a as any).__isVarRef !== true && (a as any).__goValue === undefined ? (a as Exclude<ref, null>) : $.pointerValue<Exclude<ref, null>>(a)).Key(), (b !== null && (b as any).__isVarRef !== true && (b as any).__goValue === undefined ? (b as Exclude<ref, null>) : $.pointerValue<Exclude<ref, null>>(b)).Key())
 }
 
 export async function main(): globalThis.Promise<void> {
@@ -46,8 +46,8 @@ export async function main(): globalThis.Promise<void> {
 	let b = $.arrayValue(new Uint8Array([0, 7, 0, 0]))
 	let c = $.arrayValue(new Uint8Array([0, 0, 7, 0]))
 
-	await $.println("same:", await sameKey($.namedValueInterfaceValue<ref | null>(a, "main.valueHash", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()), $.namedValueInterfaceValue<ref | null>(b, "main.valueHash", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2())))
-	await $.println("different:", await differentKey($.namedValueInterfaceValue<ref | null>(a, "main.valueHash", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()), $.namedValueInterfaceValue<ref | null>(c, "main.valueHash", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2())))
+	await $.println("same:", sameKey($.namedValueInterfaceValue<ref | null>(a, "main.valueHash", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()), $.namedValueInterfaceValue<ref | null>(b, "main.valueHash", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2())))
+	await $.println("different:", differentKey($.namedValueInterfaceValue<ref | null>(a, "main.valueHash", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()), $.namedValueInterfaceValue<ref | null>(c, "main.valueHash", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2())))
 }
 
 var __goscriptStatic0$value: any
@@ -64,8 +64,6 @@ var __goscriptStatic2$value: any
 function __goscriptStatic2(): any {
 	return __goscriptStatic2$value ??= ([$.methodSignature("Key", [], [{ kind: $.TypeKind.Interface, methods: [] }])])
 }
-
-var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

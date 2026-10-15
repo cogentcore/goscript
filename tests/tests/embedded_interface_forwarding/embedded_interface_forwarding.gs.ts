@@ -74,17 +74,15 @@ export class Counter {
 	)
 }
 
-export async function call(adder: Adder | null): globalThis.Promise<number> {
+export function call(adder: Adder | null): number {
 	return (adder !== null && (adder as any).__isVarRef !== true && (adder as any).__goValue === undefined ? (adder as Exclude<Adder, null>) : $.pointerValue<Exclude<Adder, null>>(adder)).Add(4)
 }
 
 export async function main(): globalThis.Promise<void> {
 	let box = new Box({Adder: $.interfaceValue<Adder | null>(new Counter({base: 3}), "*main.Counter", /* @__PURE__ */ $.pointerType("main.Counter"))})
 	await $.println($.pointerValue<Exclude<Adder, null>>($.pointerValue<Box>(box).Adder).Add(5))
-	await $.println(await call($.interfaceValue<Adder | null>(box, "*main.Box", /* @__PURE__ */ $.pointerType("main.Box"))))
+	await $.println(call($.interfaceValue<Adder | null>(box, "*main.Box", /* @__PURE__ */ $.pointerType("main.Box"))))
 }
-
-var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

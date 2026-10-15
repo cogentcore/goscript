@@ -39,6 +39,11 @@ type SemanticBuildOptions struct {
 	Summaries map[string][]byte
 	// Summarize names the packages whose body summaries the build extracts.
 	Summarize map[string]bool
+	// WholeProgram reports that the graph is a whole program, so exported
+	// interfaces whose implementations are all compiled Go code are closed
+	// over the graph. Otherwise a call of an exported interface method makes
+	// its caller async.
+	WholeProgram bool
 }
 
 // Build constructs semantic facts for a package graph.
@@ -146,42 +151,67 @@ func (o *SemanticModelOwner) Build(ctx context.Context, graph *PackageGraph, opt
 		return model, diagnostics
 	}
 
+	// Deferred functions load on first call.
 	diagnostics = append(diagnostics, model.deferFunctions(opts.DeferredFunctions)...)
 	if diagnosticsHaveErrors(diagnostics) {
 		model.freeze()
 		return model, diagnostics
 	}
+
+	// Color the functions that may suspend.
+	diagnostics = append(diagnostics, o.colorAsync(ctx, model, overrideFacts, overridePkgs, opts.WholeProgram)...)
+	model.freeze()
+	return model, diagnostics
+}
+
+// colorAsync resolves the interface implementation graph and colors every
+// function that may suspend. In a whole program, exported interfaces whose
+// implementations are all compiled Go code are closed over the graph.
+func (o *SemanticModelOwner) colorAsync(
+	ctx context.Context,
+	model *SemanticModel,
+	overrideFacts *OverrideFacts,
+	overridePkgs []*types.Package,
+	wholeProgram bool,
+) []Diagnostic {
+	// Index the callers and the calls that pass functions.
 	model.functionCallers = semanticFunctionCallers(model)
 	asyncArgumentSites := asyncArgumentCallSites(model)
-	methodSets, methodSetDiagnostics := o.resolveImplementationMethodSets(ctx, model, overrideFacts, overridePkgs)
-	diagnostics = append(diagnostics, methodSetDiagnostics...)
+
+	// Pair the interfaces with the method sets that implement them.
+	methodSets, diagnostics := o.resolveImplementationMethodSets(ctx, model, overrideFacts, overridePkgs)
 	if diagnosticsHaveErrors(diagnostics) {
-		model.freeze()
-		return model, diagnostics
+		return diagnostics
 	}
 	interfaceGraph, interfaceDiagnostics := o.resolveInterfaceImplementationGraph(ctx, model, methodSets)
 	diagnostics = append(diagnostics, interfaceDiagnostics...)
 	if diagnosticsHaveErrors(diagnostics) {
-		model.freeze()
-		return model, diagnostics
+		return diagnostics
 	}
 	anonymousInterfaceGraph, anonymousInterfaceDiagnostics := o.resolveAnonymousInterfaceImplementationGraph(ctx, model, methodSets)
 	diagnostics = append(diagnostics, anonymousInterfaceDiagnostics...)
 	if diagnosticsHaveErrors(diagnostics) {
-		model.freeze()
-		return model, diagnostics
+		return diagnostics
 	}
-	o.applyUnknownInterfaceAsyncMethods(model, interfaceGraph, anonymousInterfaceGraph)
+
+	// The graph does not color the methods of open interfaces.
+	var closed map[*types.Named]bool
+	if wholeProgram {
+		closed = closedInterfaces(model, interfaceGraph, overridePkgs)
+	}
+	openMethods := openInterfaceMethods(model, interfaceGraph, anonymousInterfaceGraph, closed)
+
+	// Propagate the async marks to their fixed point.
 	interfaceAsyncEdges, markDiagnostics := o.buildInterfaceAsyncEdges(ctx, model, overrideFacts, interfaceGraph)
 	diagnostics = append(diagnostics, markDiagnostics...)
 	if diagnosticsHaveErrors(diagnostics) {
-		model.freeze()
-		return model, diagnostics
+		return diagnostics
 	}
 	asyncWhen := asyncWhenMethodFunctions(model, overrideFacts)
-	diagnostics = append(diagnostics, colorAsyncFunctions(ctx, model, asyncArgumentSites, interfaceAsyncEdges, anonymousInterfaceGraph, asyncWhen)...)
-	model.freeze()
-	return model, diagnostics
+	return append(diagnostics, colorAsyncFunctions(ctx, model, asyncRoots{
+		sites:       asyncArgumentSites,
+		openMethods: openMethods,
+	}, interfaceAsyncEdges, anonymousInterfaceGraph, asyncWhen)...)
 }
 
 func newSemanticModel() *SemanticModel {
@@ -1599,18 +1629,24 @@ func (c *interfaceCandidates) collectModel(model *SemanticModel) {
 	}
 }
 
-func (o *SemanticModelOwner) applyUnknownInterfaceAsyncMethods(
+// openInterfaceMethods returns the called interface methods that the
+// implementation graph does not color: methods of an interface that is
+// neither package-sealed nor in closed, the interfaces a whole program closes
+// over its graph. An implementation outside the graph may suspend, so each is
+// an async root for its callers.
+func openInterfaceMethods(
 	model *SemanticModel,
 	interfaceGraph []semanticInterfaceImplementationGraphEntry,
 	anonymousInterfaceGraph []semanticAnonymousInterfaceImplementation,
-) {
+	closed map[*types.Named]bool,
+) []*types.Func {
+	// The graph colors the methods a known interface declares.
 	known := make(map[*types.Func]bool)
 	for _, graphEntry := range interfaceGraph {
-		iface, _ := graphEntry.iface.Underlying().(*types.Interface)
-		if !interfaceIsPackageSealed(iface) || namedTypeHasParams(graphEntry.iface) {
+		ifaceOrigin := namedOriginOrSelf(graphEntry.iface)
+		if !interfaceKnown(ifaceOrigin, closed) {
 			continue
 		}
-		ifaceOrigin := namedOriginOrSelf(graphEntry.iface)
 		for _, method := range graphEntry.ifaceMethods {
 			signature, _ := method.Type().(*types.Signature)
 			if signature == nil || signature.Recv() == nil {
@@ -1623,6 +1659,8 @@ func (o *SemanticModelOwner) applyUnknownInterfaceAsyncMethods(
 			known[functionOriginOrSelf(method)] = true
 		}
 	}
+
+	// It colors the methods of anonymous assertion targets.
 	for _, graphEntry := range anonymousInterfaceGraph {
 		for _, method := range graphEntry.ifaceMethods {
 			signature, _ := method.Type().(*types.Signature)
@@ -1633,22 +1671,20 @@ func (o *SemanticModelOwner) applyUnknownInterfaceAsyncMethods(
 			known[functionOriginOrSelf(method)] = true
 		}
 	}
+
+	// Any other called interface method is open.
+	var open []*types.Func
 	for method := range model.functionCallers {
 		method = functionOriginOrSelf(method)
 		if method == nil || known[method] {
 			continue
 		}
 		signature, _ := method.Type().(*types.Signature)
-		if signature == nil || signature.Recv() == nil || !isInterfaceType(signature.Recv().Type()) {
-			continue
-		}
-		// An implementation outside the compiled graph may suspend. Mark only
-		// the callers that invoke this method. The interface method itself stays
-		// synchronous until a compiled implementation proves it can suspend.
-		for _, caller := range model.functionCallers[method] {
-			markFunctionAsync(caller)
+		if signature != nil && signature.Recv() != nil && isInterfaceType(signature.Recv().Type()) {
+			open = append(open, method)
 		}
 	}
+	return open
 }
 
 // buildInterfaceAsyncEdges records the implementation graph on the model and

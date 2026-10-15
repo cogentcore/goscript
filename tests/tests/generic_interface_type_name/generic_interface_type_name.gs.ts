@@ -5,7 +5,7 @@ import * as $ from "@goscript/builtin/index.js"
 import * as fmt from "@goscript/fmt/index.js"
 
 export type node = {
-	Name(): string | globalThis.Promise<string>
+	Name(): string
 }
 
 $.registerInterfaceType(
@@ -72,9 +72,9 @@ export class icon {
 		return this
 	}
 
-	public async Name(): globalThis.Promise<string> {
+	public Name(): string {
 		const i: icon | $.VarRef<icon> | null = this;
-		return fmt.Sprint("icon:", $.basicInterfaceValue($.pointerValue<icon>(i).size, "int"))
+		return (fmt.Sprint("icon:", $.basicInterfaceValue($.pointerValue<icon>(i).size, "int")) as string)
 	}
 
 	public Size(): number {
@@ -106,31 +106,31 @@ export async function main(): globalThis.Promise<void> {
 	for (let __goscriptRangeTarget0 = nodes, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
 		let n = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as node | null)
 		let [, isSizer] = $.typeAssertTuple<sizer | null>(n, "main.sizer")
-		await fmt.Printf("%T %v %v\n", (n as any), isSizer, (__goscriptAwait = (n !== null && (n as any).__isVarRef !== true && (n as any).__goValue === undefined ? (n as Exclude<node, null>) : $.pointerValue<Exclude<node, null>>(n)).Name(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+		fmt.Printf("%T %v %v\n", (n as any), isSizer, (__goscriptAwait = (n !== null && (n as any).__isVarRef !== true && (n as any).__goValue === undefined ? (n as Exclude<node, null>) : $.pointerValue<Exclude<node, null>>(n)).Name(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	}
 	for (let __goscriptRangeTarget1 = box(__goscriptStatic2(), new label({text: "x"}, true)), __goscriptRangeWindow1 = $.sliceRange(__goscriptRangeTarget1), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow1.length; __rangeIndex++) {
 		let v = (__goscriptRangeWindow1.backing[__goscriptRangeWindow1.offset + __rangeIndex] as any)
-		await fmt.Printf("%T\n", v)
+		fmt.Printf("%T\n", v)
 	}
 	for (let __goscriptRangeTarget2 = box(__goscriptStatic3(), $.arrayIndex(nodes!, 0)), __goscriptRangeWindow2 = $.sliceRange(__goscriptRangeTarget2), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow2.length; __rangeIndex++) {
 		let v = (__goscriptRangeWindow2.backing[__goscriptRangeWindow2.offset + __rangeIndex] as any)
-		await fmt.Printf("%T\n", v)
+		fmt.Printf("%T\n", v)
 	}
 	for (let __goscriptRangeTarget3 = box(__goscriptStatic4(), 3), __goscriptRangeWindow3 = $.sliceRange(__goscriptRangeTarget3), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow3.length; __rangeIndex++) {
 		let v = (__goscriptRangeWindow3.backing[__goscriptRangeWindow3.offset + __rangeIndex] as any)
-		await fmt.Printf("%T\n", v)
+		fmt.Printf("%T\n", v)
 	}
 	{
 		const __goscriptTypeSwitchValue = $.arrayIndex(nodes!, 1)
 		switch (true) {
 			case $.typeAssert<label | $.VarRef<label> | null>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.pointerType("main.label")).ok:
 				{
-					await fmt.Println("switch: label")
+					fmt.Println("switch: label")
 				}
 				break
 			case $.typeAssert<icon | $.VarRef<icon> | null>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.pointerType("main.icon")).ok:
 				{
-					await fmt.Println("switch: icon")
+					fmt.Println("switch: icon")
 				}
 				break
 		}

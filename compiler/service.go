@@ -179,6 +179,7 @@ func (s *CompileService) Compile(ctx context.Context, req *CompileRequest) (*Com
 			DeferredFunctions: req.DeferredFunctions,
 			Summaries:         summaries,
 			Summarize:         summarize,
+			WholeProgram:      wholeProgramBuild(req, graph),
 		})
 		diagnostics = append(diagnostics, semanticDiagnostics...)
 		if diagnosticsHaveErrors(diagnostics) {

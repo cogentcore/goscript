@@ -78,16 +78,16 @@ export class outer {
 export async function main(): globalThis.Promise<void> {
 	let a = $.varRef(new tag({lang: 5, region: "a"}, true))
 	let b = $.markAsStructValue($.cloneStructValue(a.value)).reset()
-	await fmt.Println($.interfaceValue((a.value).clone(), "main.tag", "main.tag"), $.interfaceValue((b).clone(), "main.tag", "main.tag"))
+	fmt.Println($.interfaceValue((a.value).clone(), "main.tag", "main.tag"), $.interfaceValue((b).clone(), "main.tag", "main.tag"))
 
 	a.value.set(9)
-	await fmt.Println($.interfaceValue((a.value).clone(), "main.tag", "main.tag"))
+	fmt.Println($.interfaceValue((a.value).clone(), "main.tag", "main.tag"))
 
 	// Nested struct fields are assigned in place.
 	let o = new outer({t: new tag({lang: 2}, true), n: 1}, true)
 	let held = $.fieldRef(o, "t")
 	o = o.__goscriptAssign(new outer({t: new tag({lang: 3, region: "o"}, true), n: 4}, true))
-	await fmt.Println($.interfaceValue((o).clone(), "main.outer", "main.outer"), $.interfaceValue(($.pointerValue<tag>(held)).clone(), "main.tag", "main.tag"), $.pointerEqual(held, $.fieldRef(o, "t")))
+	fmt.Println($.interfaceValue((o).clone(), "main.outer", "main.outer"), $.interfaceValue(($.pointerValue<tag>(held)).clone(), "main.tag", "main.tag"), $.pointerEqual(held, $.fieldRef(o, "t")))
 }
 
 if ($.isMainScript(import.meta)) {

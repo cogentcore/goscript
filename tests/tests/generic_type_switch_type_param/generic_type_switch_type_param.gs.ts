@@ -25,9 +25,9 @@ export class Value {
 		return this
 	}
 
-	public async String(): globalThis.Promise<string> {
+	public String(): string {
 		const v = this;
-		return fmt.Sprintf("%g%s", $.basicInterfaceValue(v.Val, "float32"), v.Unit)
+		return (fmt.Sprintf("%g%s", $.basicInterfaceValue(v.Val, "float32"), v.Unit) as string)
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -60,7 +60,7 @@ export class Sides {
 		return this
 	}
 
-	public async SetAny(__typeArgs: $.GenericTypeArgs | undefined, a: any): globalThis.Promise<string> {
+	public SetAny(__typeArgs: $.GenericTypeArgs | undefined, a: any): string {
 		let s: Sides | $.VarRef<Sides> | null = this;
 		const s$: Sides = s == null ? $.pointerTarget<Sides>(s) : (s as any).__isVarRef === true ? (s as any).value : (s as any).__goValue === undefined ? (s as any) : $.pointerTarget<Sides>(s)
 		{
@@ -119,7 +119,7 @@ export class Sides {
 				default:
 					{
 						let val: any = __goscriptTypeSwitchValue
-						return fmt.Sprintf("default %v", val)
+						return (fmt.Sprintf("default %v", val) as string)
 					}
 					break
 			}
@@ -138,23 +138,23 @@ export class Sides {
 
 export async function main(): globalThis.Promise<void> {
 	let s: $.VarRef<Sides> = $.varRef($.markAsStructValue(new Sides({Top: new Value(undefined, true), Right: new Value(undefined, true)}, undefined, true)))
-	await $.println(await s.value.SetAny(__goscriptStatic0(), "3px"))
-	await $.println(await s.value.SetAny(__goscriptStatic0(), $.interfaceValue(new Value({Val: 1, Unit: "px"}, true), "main.Value", "main.Value")), await $.markAsStructValue($.cloneStructValue(s.value.Top)).String())
-	await $.println(await s.value.SetAny(__goscriptStatic0(), $.interfaceValue(new Value({Val: 2, Unit: "em"}), "*main.Value", /* @__PURE__ */ $.pointerType("main.Value"))), await $.markAsStructValue($.cloneStructValue(s.value.Right)).String())
-	await $.println(await s.value.SetAny(__goscriptStatic0(), $.interfaceValue($.arrayToSlice<Value>([new Value({Val: 3, Unit: "a"}, true), new Value({Val: 4, Unit: "b"}, true)]), "[]main.Value", /* @__PURE__ */ $.sliceType("main.Value"))), await $.markAsStructValue($.cloneStructValue(s.value.Top)).String(), await $.markAsStructValue($.cloneStructValue(s.value.Right)).String())
-	await $.println(await s.value.SetAny(__goscriptStatic0(), $.interfaceValue($.markAsStructValue(new Sides({Top: new Value({Val: 5, Unit: "c"}, true), Right: new Value(undefined, true)})), "main.Sides", "main.Sides")), await $.markAsStructValue($.cloneStructValue(s.value.Top)).String())
-	await $.println(await s.value.SetAny(__goscriptStatic0(), $.namedValueInterfaceValue<any>(new Sides({Right: new Value({Val: 6, Unit: "d"}, true), Top: new Value(undefined, true)}), "*main.Sides", __goscriptStatic1(), __goscriptStatic2(), __goscriptStatic3())), await $.markAsStructValue($.cloneStructValue(s.value.Right)).String())
-	await $.println(await s.value.SetAny(__goscriptStatic0(), $.basicInterfaceValue(7, "int")))
+	await $.println(s.value.SetAny(__goscriptStatic0(), "3px"))
+	await $.println(s.value.SetAny(__goscriptStatic0(), $.interfaceValue(new Value({Val: 1, Unit: "px"}, true), "main.Value", "main.Value")), $.markAsStructValue($.cloneStructValue(s.value.Top)).String())
+	await $.println(s.value.SetAny(__goscriptStatic0(), $.interfaceValue(new Value({Val: 2, Unit: "em"}), "*main.Value", /* @__PURE__ */ $.pointerType("main.Value"))), $.markAsStructValue($.cloneStructValue(s.value.Right)).String())
+	await $.println(s.value.SetAny(__goscriptStatic0(), $.interfaceValue($.arrayToSlice<Value>([new Value({Val: 3, Unit: "a"}, true), new Value({Val: 4, Unit: "b"}, true)]), "[]main.Value", /* @__PURE__ */ $.sliceType("main.Value"))), $.markAsStructValue($.cloneStructValue(s.value.Top)).String(), $.markAsStructValue($.cloneStructValue(s.value.Right)).String())
+	await $.println(s.value.SetAny(__goscriptStatic0(), $.interfaceValue($.markAsStructValue(new Sides({Top: new Value({Val: 5, Unit: "c"}, true), Right: new Value(undefined, true)})), "main.Sides", "main.Sides")), $.markAsStructValue($.cloneStructValue(s.value.Top)).String())
+	await $.println(s.value.SetAny(__goscriptStatic0(), $.namedValueInterfaceValue<any>(new Sides({Right: new Value({Val: 6, Unit: "d"}, true), Top: new Value(undefined, true)}), "*main.Sides", __goscriptStatic1(), __goscriptStatic2(), __goscriptStatic3())), $.markAsStructValue($.cloneStructValue(s.value.Right)).String())
+	await $.println(s.value.SetAny(__goscriptStatic0(), $.basicInterfaceValue(7, "int")))
 
 	let f: $.VarRef<Sides> = $.varRef($.markAsStructValue(new Sides({Top: 0, Right: 0}, undefined, true)))
-	await $.println(await f.value.SetAny(__goscriptStatic4(), $.basicInterfaceValue(1.5, "float32")), f.value.Top)
-	await $.println(await f.value.SetAny(__goscriptStatic4(), $.basicInterfaceValue(1.5, "float64")))
-	await $.println(await f.value.SetAny(__goscriptStatic4(), "x"))
+	await $.println(f.value.SetAny(__goscriptStatic4(), $.basicInterfaceValue(1.5, "float32")), f.value.Top)
+	await $.println(f.value.SetAny(__goscriptStatic4(), $.basicInterfaceValue(1.5, "float64")))
+	await $.println(f.value.SetAny(__goscriptStatic4(), "x"))
 
 	let i: $.VarRef<Sides> = $.varRef($.markAsStructValue(new Sides({Top: 0, Right: 0}, undefined, true)))
-	await $.println(await i.value.SetAny(__goscriptStatic5(), $.basicInterfaceValue(3, "int")), i.value.Top)
-	await $.println(await i.value.SetAny(__goscriptStatic5(), $.basicInterfaceValue(3n, "int64")))
-	await $.println(await i.value.SetAny(__goscriptStatic5(), $.basicInterfaceValue(3.5, "float64")))
+	await $.println(i.value.SetAny(__goscriptStatic5(), $.basicInterfaceValue(3, "int")), i.value.Top)
+	await $.println(i.value.SetAny(__goscriptStatic5(), $.basicInterfaceValue(3n, "int64")))
+	await $.println(i.value.SetAny(__goscriptStatic5(), $.basicInterfaceValue(3.5, "float64")))
 }
 
 var __goscriptStatic0$value: any

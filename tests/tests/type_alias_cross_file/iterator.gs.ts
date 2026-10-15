@@ -15,8 +15,6 @@ $.registerInterfaceType(
 	[{ name: "Val", args: [], returns: [{ type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"), "subpkg.Value") }] }]
 );
 
-export async function Read(r: Reader | null): globalThis.Promise<__goscript_alias.Value> {
-	return (((__goscriptAwait = (r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? (r as Exclude<Reader, null>) : $.pointerValue<Exclude<Reader, null>>(r)).Val(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as __goscript_alias.Value) as __goscript_alias.Value)
+export function Read(r: Reader | null): __goscript_alias.Value {
+	return ((r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? (r as Exclude<Reader, null>) : $.pointerValue<Exclude<Reader, null>>(r)).Val() as __goscript_alias.Value)
 }
-
-var __goscriptAwait: any
