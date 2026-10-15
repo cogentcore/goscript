@@ -69,14 +69,14 @@ export async function main(): globalThis.Promise<void> {
 
 	let v: {"N": Node} = $.anonymousStructValue({"N": new Node(true)}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("N", "main.Node", [0], 0, true)] })
 	v.N.A = 5
-	let __goscriptTuple5: any = (json.Marshal($.interfaceValue($.markAsStructValue($.cloneStructValue(v)), "struct{N main.Node}", { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("N", "main.Node", [0], 0, true)] })) as [$.Slice<number>, $.GoError])
+	let __goscriptTuple5: any = (json.Marshal($.interfaceValue(v, "struct{N main.Node}", { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("N", "main.Node", [0], 0, true)] })) as [$.Slice<number>, $.GoError])
 	b = __goscriptTuple5[0]
 	err = __goscriptTuple5[1]
 	await $.println($.bytesToString(b), err == null)
 
 	let p: {"N": Node | $.VarRef<Node> | null} = $.anonymousStructValue({"N": null}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("N", /* @__PURE__ */ $.pointerType("main.Node"), [0], 0, true)] })
 	p.N = new Node(false, 6)
-	let __goscriptTuple6: any = (json.Marshal($.interfaceValue($.markAsStructValue($.cloneStructValue(p)), "struct{N *main.Node}", { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("N", /* @__PURE__ */ $.pointerType("main.Node"), [0], 0, true)] })) as [$.Slice<number>, $.GoError])
+	let __goscriptTuple6: any = (json.Marshal($.interfaceValue(p, "struct{N *main.Node}", { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("N", /* @__PURE__ */ $.pointerType("main.Node"), [0], 0, true)] })) as [$.Slice<number>, $.GoError])
 	b = __goscriptTuple6[0]
 	err = __goscriptTuple6[1]
 	await $.println($.bytesToString(b), err == null)
