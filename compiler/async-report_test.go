@@ -26,7 +26,9 @@ var asyncReportFixture = map[string]string{
 		"type chanSource struct{ ch chan int }",
 		"func (s *chanSource) Next() int { return <-s.ch }",
 		"type cached struct { mu sync.Mutex; v int }",
-		"func (c *cached) get() int { c.mu.Lock(); defer c.mu.Unlock(); return c.v }",
+		// The lock goes through a pointer, so the analysis does not know the
+		// mutex and the Lock stays async.
+		"func (c *cached) get() int { mu := &c.mu; mu.Lock(); defer mu.Unlock(); return c.v }",
 		"func sum(s Source) int { return s.Next() }",
 		"func apply(f func() int) int { return f() }",
 		"func readOne(r io.Reader) int { var b [1]byte; n, _ := r.Read(b[:]); return n }",

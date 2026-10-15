@@ -10,8 +10,8 @@ export function __goscript_set_cache(__goscriptValue: sync.Map): void {
 	$.assignStruct(cache.value, __goscriptValue)
 }
 
-export async function store(key: string, value: string): globalThis.Promise<string> {
-	await cache.value.Store(key, value)
+export function store(key: string, value: string): string {
+	cache.value.Store(key, value)
 	return value
 }
 
@@ -21,25 +21,25 @@ export function __goscript_set_storeFunc(__goscriptValue: ((key: string, value: 
 	storeFunc = __goscriptValue
 }
 
-export let stored: string = await storeFunc!("init", "from func value")
+export let stored: string = (storeFunc!("init", "from func value") as string)
 
 export function __goscript_set_stored(__goscriptValue: string): void {
 	stored = __goscriptValue
 }
 
-export async function getValueFromCache(key: string): globalThis.Promise<[any, boolean]> {
+export function getValueFromCache(key: string): [any, boolean] {
 	return cache.value.Load(key)
 }
 
 export async function main(): globalThis.Promise<void> {
-	await cache.value.Store("hello", "world")
+	cache.value.Store("hello", "world")
 
-	let [val, ok] = await getValueFromCache("hello")
+	let [val, ok] = getValueFromCache("hello")
 	if (ok) {
 		await $.println("Found:", $.mustTypeAssert<string>(val, /* @__PURE__ */ $.basicType("string")))
 	}
 
-	let __goscriptTuple0: any = await getValueFromCache("init")
+	let __goscriptTuple0: any = getValueFromCache("init")
 	val = __goscriptTuple0[0]
 	ok = __goscriptTuple0[1]
 	await $.println("Stored:", stored, ok, $.mustTypeAssert<string>(val, /* @__PURE__ */ $.basicType("string")))

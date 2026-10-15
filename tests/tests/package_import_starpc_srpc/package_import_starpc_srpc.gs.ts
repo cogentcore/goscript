@@ -239,18 +239,18 @@ export class memoryRpcStream {
 
 	public async Close(): globalThis.Promise<$.GoError> {
 		const m: memoryRpcStream | $.VarRef<memoryRpcStream> | null = this;
-		const m$: memoryRpcStream = m == null ? $.pointerTarget<memoryRpcStream>(m) : (m as any).__isVarRef === true ? (m as any).value : (m as any).__goValue === undefined ? (m as any) : $.pointerTarget<memoryRpcStream>(m)
-		await (m !== null && (m as any).__isVarRef !== true && (m as any).__goValue === undefined ? ((m as any) as memoryRpcStream).CloseSend() : memoryRpcStream.prototype.CloseSend.call(m))
+		const m$: memoryRpcStream = m == null ? $.pointerTarget<memoryRpcStream>(m) : (m as any).__isVarRef === true ? (m as any).value : (m as any).__goValue === undefined ? (m as any) : $.pointerTarget<memoryRpcStream>(m);
+		;(m !== null && (m as any).__isVarRef !== true && (m as any).__goValue === undefined ? ((m as any) as memoryRpcStream).CloseSend() : memoryRpcStream.prototype.CloseSend.call(m))
 		await (m$ as memoryRpcStream).cancelLocal.Do($.functionValue(async () => {
 			void (__goscriptAwait = (m$ as memoryRpcStream).cancel!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 		}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)))
 		return null
 	}
 
-	public async CloseSend(): globalThis.Promise<$.GoError> {
+	public CloseSend(): $.GoError {
 		const m: memoryRpcStream | $.VarRef<memoryRpcStream> | null = this;
 		const m$: memoryRpcStream = m == null ? $.pointerTarget<memoryRpcStream>(m) : (m as any).__isVarRef === true ? (m as any).value : (m as any).__goValue === undefined ? (m as any) : $.pointerTarget<memoryRpcStream>(m)
-		await (m$ as memoryRpcStream).closeSend.Do($.functionValue(() => {
+		void (m$ as memoryRpcStream).closeSend.Do($.functionValue(() => {
 			void (m$ as memoryRpcStream).send!.close()
 		}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)))
 		return null
@@ -445,8 +445,8 @@ export async function recvOne(__typeArgs: $.GenericTypeArgs | undefined, strm: s
 export function newMemoryRpcContext(): [memoryRpcContext | $.VarRef<memoryRpcContext> | null, (() => void) | null] {
 	let ctx = new memoryRpcContext({done: $.makeChannel<{}>(0, {}, "both")})
 	let ctx$: memoryRpcContext = ctx == null ? $.pointerTarget<memoryRpcContext>(ctx) : (ctx as any).__isVarRef === true ? (ctx as any).value : (ctx as any).__goValue === undefined ? (ctx as any) : $.pointerTarget<memoryRpcContext>(ctx)
-	return [ctx, $.functionValue(async () => {
-		await (ctx$ as memoryRpcContext).once.Do($.functionValue(() => {
+	return [ctx, $.functionValue(() => {
+		void (ctx$ as memoryRpcContext).once.Do($.functionValue(() => {
 			void (ctx$ as memoryRpcContext).done!.close()
 		}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)))
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo))]

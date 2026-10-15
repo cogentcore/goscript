@@ -405,6 +405,8 @@ func TestSemanticModelPropagatesAsyncToOverrideInterfaceMethods(t *testing.T) {
 			"  \"sync\"",
 			")",
 			"type asyncWriter struct { mu sync.Mutex }",
+			// The mutex's address escapes, so its Lock stays async.
+			"func (w *asyncWriter) locker() sync.Locker { return &w.mu }",
 			"func (w *asyncWriter) Write(p []byte) (int, error) {",
 			"  w.mu.Lock()",
 			"  defer w.mu.Unlock()",

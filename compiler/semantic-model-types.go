@@ -61,6 +61,9 @@ type SemanticModel struct {
 	// staleSummaries lists the packages whose stored body summaries did not
 	// apply. A model with stale summaries is incomplete.
 	staleSummaries []string
+	// mutexNodes holds the node of each mutex with a known critical section,
+	// which calls its critical sections.
+	mutexNodes map[types.Object]*semanticFunction
 	// openMethods holds the interface methods the coloring leaves open: a
 	// call of one makes its caller async, but the method stays sync.
 	openMethods map[*types.Func]bool
@@ -133,6 +136,12 @@ type semanticPackage struct {
 	// topValueCalls holds the shapes of the function values called outside
 	// function bodies, by package initialization.
 	topValueCalls map[string]bool
+	// lockSections holds the node of the critical section of each Lock or
+	// RLock call of a known mutex, by the call's position.
+	lockSections map[token.Pos]*semanticFunction
+	// mutexEscapes holds the mutexes the package lets escape the analysis,
+	// with where.
+	mutexEscapes map[types.Object]token.Pos
 }
 
 // localAssignments holds the facts lowering reads about how the variables of
@@ -230,6 +239,11 @@ type semanticFunction struct {
 	// valueCalls holds the shapes of the function values the body calls in
 	// the same region as calls.
 	valueCalls map[string]bool
+	// locks holds the mutexes the body locks with a critical section the
+	// analysis knows (see semantic-mutex.go).
+	locks map[types.Object]bool
+	// mutex is the mutex a critical section node locks.
+	mutex types.Object
 }
 
 type semanticInterfaceImplementation struct {

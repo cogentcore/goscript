@@ -35,7 +35,7 @@ export async function main(): globalThis.Promise<void> {
 		}
 
 		// The decoded bytes must retain the complete original payload.
-		let reader = await flate.NewReader($.interfaceValue<io.Reader | null>(compressed, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer")))
+		let reader = flate.NewReader($.interfaceValue<io.Reader | null>(compressed, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer")))
 		let __goscriptTuple1: any = await io.ReadAll($.pointerValueOrNil((reader as io.Reader | null))!)
 		let output: $.Slice<number> = __goscriptTuple1[0]
 		err = __goscriptTuple1[1]

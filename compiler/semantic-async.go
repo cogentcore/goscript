@@ -172,10 +172,13 @@ func callbackOverrideCallFacts(
 	call *ast.CallExpr,
 	literalKey func(*ast.FuncLit) *types.Func,
 ) (ok bool, deps []*types.Func, shapes []string) {
-	// Only a callback async override function qualifies.
+	// Only a callback async override function or method qualifies.
 	called := calledFunction(pkg, call.Fun)
-	if called == nil || called.Pkg() == nil ||
-		!overrideFacts.IsFunctionCallbackAsync(called.Pkg().Path(), called.Name()) {
+	if called == nil || called.Pkg() == nil {
+		return false, nil, nil
+	}
+	pkgPath, name, ok := overrideMetadataName(called)
+	if !ok || !overrideFacts.IsFunctionCallbackAsync(pkgPath, name) {
 		return false, nil, nil
 	}
 
@@ -697,6 +700,12 @@ func (c *asyncColoring) checkSyncFunctionCalls() []Diagnostic {
 			if callee != nil && callee.async && callee.hasBody && !isInterfaceMethod(called) {
 				diagnostics = append(diagnostics, c.syncFunctionError(semFn, semFn.function.Pos(),
 					"it calls "+c.model.functionFullName(called)+", which may suspend"))
+			}
+		}
+		for mutex := range semFn.locks {
+			if node := c.model.mutexNodes[mutex]; node != nil && node.async {
+				diagnostics = append(diagnostics, c.syncFunctionError(semFn, semFn.function.Pos(),
+					"it locks "+mutex.Name()+", which another goroutine may hold across a suspension"))
 			}
 		}
 		for v := range semFn.packageVars {

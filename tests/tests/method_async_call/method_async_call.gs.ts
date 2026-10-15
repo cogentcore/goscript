@@ -25,10 +25,10 @@ export class FileTracker {
 		return this
 	}
 
-	public async AddLine(offset: number): globalThis.Promise<void> {
+	public AddLine(offset: number): void {
 		let f: FileTracker | $.VarRef<FileTracker> | null = this;
 		const f$: FileTracker = f == null ? $.pointerTarget<FileTracker>(f) : (f as any).__isVarRef === true ? (f as any).value : (f as any).__goValue === undefined ? (f as any) : $.pointerTarget<FileTracker>(f)
-		await (f$ as FileTracker).mutex.Lock();
+		void (f$ as FileTracker).mutex.Lock();
 		;(f$ as FileTracker).lines = $.appendOne((f$ as FileTracker).lines, offset)
 		void (f$ as FileTracker).mutex.Unlock()
 	}
@@ -59,9 +59,9 @@ export class Scanner {
 		return this
 	}
 
-	public async next(): globalThis.Promise<void> {
+	public next(): void {
 		const s: Scanner | $.VarRef<Scanner> | null = this;
-		await FileTracker.prototype.AddLine.call($.pointerValue<Scanner>(s).file, 10)
+		FileTracker.prototype.AddLine.call($.pointerValue<Scanner>(s).file, 10)
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -76,7 +76,7 @@ export class Scanner {
 export async function main(): globalThis.Promise<void> {
 	let tracker = new FileTracker({lines: $.arrayToSlice<number>([])})
 	let scanner = new Scanner({file: tracker})
-	await (scanner !== null && (scanner as any).__isVarRef !== true && (scanner as any).__goValue === undefined ? ((scanner as any) as Scanner).next() : Scanner.prototype.next.call(scanner))
+	void (scanner !== null && (scanner as any).__isVarRef !== true && (scanner as any).__goValue === undefined ? ((scanner as any) as Scanner).next() : Scanner.prototype.next.call(scanner))
 	await $.println($.sliceLen($.pointerValue<FileTracker>(tracker).lines))
 }
 

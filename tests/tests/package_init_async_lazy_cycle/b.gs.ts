@@ -13,15 +13,15 @@ export function __goscript_set_lock(__goscriptValue: sync.Mutex): void {
 
 export var first: __goscript_a.holder
 
-export async function __goscript_init_first(): globalThis.Promise<void> {
+export function __goscript_init_first(): void {
 	if (((first) as any) === undefined) {
-		first = await makeFirst()
+		first = makeFirst()
 	}
 }
 
 export function __goscript_get_first(): __goscript_a.holder {
 	if (((first) as any) === undefined) {
-		throw new globalThis.Error("goscript package variable first read before initialization")
+		__goscript_init_first()
 	}
 	return first
 }
@@ -30,9 +30,9 @@ export function __goscript_set_first(__goscriptValue: __goscript_a.holder): void
 	$.assignStruct(first, __goscriptValue)
 }
 
-export async function makeFirst(): globalThis.Promise<__goscript_a.holder> {
+export function makeFirst(): __goscript_a.holder {
 	using __defer = new $.DisposableStack()
-	await lock.value.Lock()
+	lock.value.Lock()
 	const __goscriptDeferCallee0 = $.functionValue(((__receiver) => () => __receiver.Unlock())(lock.value), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "sync.(*Mutex).Unlock-fm")
 	__defer.defer(() => { __goscriptDeferCallee0() })
 	return new __goscript_a.holder({n: __goscript_a.__goscript_get_seed()}, true)

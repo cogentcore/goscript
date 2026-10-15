@@ -61,6 +61,8 @@ type bodySummary struct {
 	// the package asserts and calls through outside function bodies.
 	assertedFuncShapes []string
 	topValueCalls      []string
+	// mutexEscapes holds the mutexes the package lets escape the analysis.
+	mutexEscapes []string
 }
 
 // summaryFunction holds the facts of one node: a declared function (kind
@@ -74,6 +76,10 @@ type summaryFunction struct {
 	calls       []string
 	packageVars []string
 	valueCalls  []string
+	// locks holds the mutexes the node locks, and mutex the one a critical
+	// section node (kind section) locks.
+	locks []string
+	mutex string
 }
 
 // summaryFuncValue is a function value by shape and node reference.
@@ -459,6 +465,16 @@ func (s *bodySummary) addNode(k *summaryKeys, kind, key string, semFn *semanticF
 	if !ok {
 		return false
 	}
+	locks, ok := keys(k, semFn.locks)
+	if !ok {
+		return false
+	}
+	mutex := ""
+	if semFn.mutex != nil {
+		if mutex, ok = k.key(semFn.mutex); !ok {
+			return false
+		}
+	}
 
 	// Record the node in a stable order.
 	slices.Sort(calls)
@@ -469,6 +485,8 @@ func (s *bodySummary) addNode(k *summaryKeys, kind, key string, semFn *semanticF
 		calls:       calls,
 		packageVars: packageVars,
 		valueCalls:  slices.Sorted(maps.Keys(semFn.valueCalls)),
+		locks:       locks,
+		mutex:       mutex,
 	})
 	return true
 }
@@ -490,6 +508,21 @@ func summarizeValueNodes(summary *bodySummary, k *summaryKeys, semPkg *semanticP
 			return false
 		}
 	}
+	for _, pos := range slices.Sorted(maps.Keys(semPkg.lockSections)) {
+		if !summary.addNode(k, summaryRecordLockSection, summaryPosKey(k.objects.fset, pos), semPkg.lockSections[pos]) {
+			return false
+		}
+	}
+
+	// Record the escaping mutexes.
+	escaping := make(map[types.Object]bool, len(semPkg.mutexEscapes))
+	for mutex := range semPkg.mutexEscapes {
+		escaping[mutex] = true
+	}
+	var ok bool
+	if summary.mutexEscapes, ok = keys(k, escaping); !ok {
+		return false
+	}
 
 	// Record the values by reference.
 	for _, value := range semPkg.funcValues {
@@ -507,6 +540,12 @@ func summarizeValueNodes(summary *bodySummary, k *summaryKeys, semPkg *semanticP
 // compareObjectPos orders objects by position.
 func compareObjectPos(a, b types.Object) int {
 	return int(a.Pos()) - int(b.Pos())
+}
+
+// summaryPosKey names a position by its file and offset.
+func summaryPosKey(fset *token.FileSet, pos token.Pos) string {
+	position := fset.Position(pos)
+	return baseName(position.Filename) + ":" + strconv.Itoa(position.Offset)
 }
 
 // ref returns the summary reference of a node key: a literal node by its
@@ -765,6 +804,13 @@ func (a *bodyApplier) apply(shard *SemanticModel, semPkg *semanticPackage) bool 
 		}
 		semPkg.lazyVars[obj] = true
 	}
+	for _, key := range a.summary.mutexEscapes {
+		mutex := a.keys.resolve(key)
+		if mutex == nil {
+			return false
+		}
+		semPkg.recordMutexEscape(mutex, mutex.Pos())
+	}
 	return a.applyValues(semPkg)
 }
 
@@ -823,6 +869,7 @@ func (a *bodyApplier) applyNodes(shard *SemanticModel, semPkg *semanticPackage) 
 	// Resolve or create each node.
 	semPkg.funcLits = make(map[token.Pos]*semanticFunction)
 	semPkg.lazyInits = make(map[types.Object]*semanticFunction)
+	semPkg.lockSections = make(map[token.Pos]*semanticFunction)
 	nodes := make([]*semanticFunction, len(a.summary.functions))
 	for idx, summaryFn := range a.summary.functions {
 		nodes[idx] = a.node(shard, semPkg, summaryFn)
@@ -860,6 +907,14 @@ func (a *bodyApplier) node(shard *SemanticModel, semPkg *semanticPackage, summar
 		node := newSyntheticNode(obj.Pos(), obj.Pkg(), lazyInitNodeName+obj.Name())
 		semPkg.lazyInits[obj] = node
 		return node
+	case summaryRecordLockSection:
+		pos := a.literalPos(summaryFn.key)
+		if !pos.IsValid() {
+			return nil
+		}
+		node := newSyntheticNode(pos, a.pkg.Types, lockSectionNodeName)
+		semPkg.lockSections[pos] = node
+		return node
 	}
 	return shard.functions[a.resolveFunc(summaryFn.key)]
 }
@@ -887,9 +942,21 @@ func (a *bodyApplier) applyNode(semPkg *semanticPackage, semFn *semanticFunction
 		recordPackageVarUse(semFn, v)
 	}
 
-	// Its value calls are shapes.
+	// Its value calls are shapes, and its locks and mutex objects.
 	for _, shape := range summaryFn.valueCalls {
 		recordValueCall(semFn, shape)
+	}
+	for _, key := range summaryFn.locks {
+		mutex := a.keys.resolve(key)
+		if mutex == nil {
+			return false
+		}
+		recordLock(semFn, mutex)
+	}
+	if summaryFn.mutex != "" {
+		if semFn.mutex = a.keys.resolve(summaryFn.mutex); semFn.mutex == nil {
+			return false
+		}
 	}
 	return true
 }
@@ -966,6 +1033,10 @@ const (
 	summaryRecordAssertion    = "assert"
 	summaryRecordAsyncCall    = "async-call"
 	summaryRecordLazyVar      = "lazy"
+	summaryRecordLockSection  = "section"
+	summaryRecordLock         = "lock"
+	summaryRecordMutex        = "section-mutex"
+	summaryRecordMutexEscape  = "mutex-escape"
 )
 
 // encode returns the summary's lines, or false when a field holds a tab or a
@@ -996,6 +1067,12 @@ func (s *bodySummary) encode() ([]byte, bool) {
 		for _, shape := range fn.valueCalls {
 			line(summaryRecordValueCall, shape)
 		}
+		for _, key := range fn.locks {
+			line(summaryRecordLock, key)
+		}
+		if fn.mutex != "" {
+			line(summaryRecordMutex, fn.mutex)
+		}
 	}
 	for _, literal := range s.literals {
 		line(summaryRecordLiteral, literal.file, strconv.Itoa(literal.offset))
@@ -1012,6 +1089,7 @@ func (s *bodySummary) encode() ([]byte, bool) {
 		{summaryRecordLazyVar, s.lazyVars},
 		{summaryRecordAssertedFunc, s.assertedFuncShapes},
 		{summaryRecordTopCall, s.topValueCalls},
+		{summaryRecordMutexEscape, s.mutexEscapes},
 	} {
 		for _, value := range records.values {
 			line(records.record, value)
@@ -1050,7 +1128,7 @@ func decodeBodySummary(data []byte) (*bodySummary, bool) {
 			return fields[n], true
 		}
 		switch fields[0] {
-		case summaryRecordFunction, summaryRecordFuncLit, summaryRecordLazyInit:
+		case summaryRecordFunction, summaryRecordFuncLit, summaryRecordLazyInit, summaryRecordLockSection:
 			if len(fields) != 3 {
 				return nil, false
 			}
@@ -1059,7 +1137,7 @@ func decodeBodySummary(data []byte) (*bodySummary, bool) {
 				return nil, false
 			}
 			s.functions = append(s.functions, summaryFunction{kind: fields[0], key: fields[1], async: async})
-		case summaryRecordCall, summaryRecordPackageVar, summaryRecordValueCall:
+		case summaryRecordCall, summaryRecordPackageVar, summaryRecordValueCall, summaryRecordLock:
 			key, ok := value(1)
 			if !ok || len(s.functions) == 0 {
 				return nil, false
@@ -1069,8 +1147,15 @@ func decodeBodySummary(data []byte) (*bodySummary, bool) {
 				summaryRecordCall:       &fn.calls,
 				summaryRecordPackageVar: &fn.packageVars,
 				summaryRecordValueCall:  &fn.valueCalls,
+				summaryRecordLock:       &fn.locks,
 			}[fields[0]]
 			*target = append(*target, key)
+		case summaryRecordMutex:
+			key, ok := value(1)
+			if !ok || len(s.functions) == 0 {
+				return nil, false
+			}
+			s.functions[len(s.functions)-1].mutex = key
 		case summaryRecordFuncValue:
 			if len(fields) != 3 {
 				return nil, false
@@ -1087,7 +1172,7 @@ func decodeBodySummary(data []byte) (*bodySummary, bool) {
 			s.literals = append(s.literals, summaryLiteral{file: fields[1], offset: offset})
 		case summaryRecordAddressTaken, summaryRecordNeedsVarRef, summaryRecordLocalFact,
 			summaryRecordVarRefName, summaryRecordInterface, summaryRecordLazyVar,
-			summaryRecordAssertedFunc, summaryRecordTopCall:
+			summaryRecordAssertedFunc, summaryRecordTopCall, summaryRecordMutexEscape:
 			v, ok := value(1)
 			if !ok {
 				return nil, false
@@ -1101,6 +1186,7 @@ func decodeBodySummary(data []byte) (*bodySummary, bool) {
 				summaryRecordLazyVar:      &s.lazyVars,
 				summaryRecordAssertedFunc: &s.assertedFuncShapes,
 				summaryRecordTopCall:      &s.topValueCalls,
+				summaryRecordMutexEscape:  &s.mutexEscapes,
 			}[fields[0]]
 			*target = append(*target, v)
 		case summaryRecordAssertion:

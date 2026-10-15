@@ -54,13 +54,13 @@ export async function globalSources(): globalThis.Promise<void> {
 	let nonzero = 0
 	let inRange = true
 	for (let __rangeIndex = 0; __rangeIndex < 20; __rangeIndex++) {
-		let n = await randv1.Int63()
+		let n = randv1.Int63()
 		$.mapSet(seen, n, true)
 		if (n != 0n) {
 			nonzero++
 		}
-		let f = await randv1.Float64()
-		let f32 = await randv1.Float32()
+		let f = randv1.Float64()
+		let f32 = randv1.Float32()
 		if ((((f < 0) || (f >= 1)) || (f32 < 0)) || (f32 >= 1)) {
 			inRange = false
 		}
@@ -69,9 +69,9 @@ export async function globalSources(): globalThis.Promise<void> {
 
 	let seen2 = $.makeMap<bigint, boolean>([])
 	for (let __rangeIndex = 0; __rangeIndex < 20; __rangeIndex++) {
-		$.mapSet(seen2, await rand.Uint64(), true)
+		$.mapSet(seen2, rand.Uint64(), true)
 	}
-	let n = await rand.IntN(10)
+	let n = rand.IntN(10)
 	await $.println("v2 distinct:", $.len(seen2) > 15, "intn in range:", (n >= 0) && (n < 10))
 }
 

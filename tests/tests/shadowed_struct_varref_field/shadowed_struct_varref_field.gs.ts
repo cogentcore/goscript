@@ -58,9 +58,9 @@ export function __goscript_set_named(__goscriptValue: table): void {
 	$.assignStruct(named.value, __goscriptValue)
 }
 
-export async function lookup(addr: string): globalThis.Promise<$.Slice<string>> {
+export function lookup(addr: string): $.Slice<string> {
 	using __defer = new $.DisposableStack()
-	await hosts.value.Mutex.Lock()
+	hosts.value.Mutex.Lock()
 	const __goscriptDeferCallee0 = $.functionValue(((__receiver) => () => __receiver.Unlock())(hosts.value.Mutex), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "sync.(*Mutex).Unlock-fm")
 	__defer.defer(() => { __goscriptDeferCallee0() })
 	if ($.len(hosts.value.byAddr) != 0) {
@@ -77,9 +77,9 @@ export async function lookup(addr: string): globalThis.Promise<$.Slice<string>> 
 	return null
 }
 
-export async function lookupNamed(addr: string): globalThis.Promise<$.Slice<string>> {
+export function lookupNamed(addr: string): $.Slice<string> {
 	using __defer = new $.DisposableStack()
-	await named.value.Mutex.Lock()
+	named.value.Mutex.Lock()
 	const __goscriptDeferCallee1 = $.functionValue(((__receiver) => () => __receiver.Unlock())(named.value.Mutex), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "sync.(*Mutex).Unlock-fm")
 	__defer.defer(() => { __goscriptDeferCallee1() })
 	if ($.len(named.value.byAddr) != 0) {
@@ -96,12 +96,12 @@ export async function lookupNamed(addr: string): globalThis.Promise<$.Slice<stri
 	return null
 }
 
-export async function lookupLocal(addr: string): globalThis.Promise<$.Slice<string>> {
+export function lookupLocal(addr: string): $.Slice<string> {
 	using __defer = new $.DisposableStack()
 	let local: $.VarRef<table> = $.varRef(new table(undefined, true))
 	local.value.byAddr = $.makeMap<string, $.Slice<string>>([[addr, $.arrayToSlice<string>(["local"])]])
 	let ptr = local
-	await $.pointerValue<table>(ptr).Mutex.Lock()
+	$.pointerValue<table>(ptr).Mutex.Lock()
 	const __goscriptDeferCallee2 = $.functionValue(((__receiver) => () => __receiver.Unlock())($.pointerValue<table>(ptr).Mutex), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "sync.(*Mutex).Unlock-fm")
 	__defer.defer(() => { __goscriptDeferCallee2() })
 	let __goscriptShadow4 = local.value
@@ -117,12 +117,12 @@ export async function lookupLocal(addr: string): globalThis.Promise<$.Slice<stri
 }
 
 export async function main(): globalThis.Promise<void> {
-	await $.println($.arrayIndex((await lookupLocal("127.0.0.1"))!, 0))
+	await $.println($.arrayIndex(lookupLocal("127.0.0.1")!, 0))
 	hosts.value.byAddr = $.makeMap<string, $.Slice<string>>([["127.0.0.1", $.arrayToSlice<string>(["localhost"])]])
 	named.value.byAddr = hosts.value.byAddr
-	await $.println($.arrayIndex((await lookup("127.0.0.1"))!, 0))
-	await $.println($.arrayIndex((await lookupNamed("127.0.0.1"))!, 0))
-	await $.println($.sliceLen(await lookup("::1")))
+	await $.println($.arrayIndex(lookup("127.0.0.1")!, 0))
+	await $.println($.arrayIndex(lookupNamed("127.0.0.1")!, 0))
+	await $.println($.sliceLen(lookup("::1")))
 }
 
 if ($.isMainScript(import.meta)) {

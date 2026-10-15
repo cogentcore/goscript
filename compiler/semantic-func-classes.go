@@ -230,8 +230,9 @@ func funcValueAsyncByItself(
 
 	// An override function or method follows its metadata.
 	pkgPath := key.Pkg().Path()
+	_, metadataName, _ := overrideMetadataName(key)
 	return overrideFacts.IsFunctionAsync(pkgPath, key.Name()) ||
-		overrideFacts.IsFunctionCallbackAsync(pkgPath, key.Name()) ||
+		overrideFacts.IsFunctionCallbackAsync(pkgPath, metadataName) ||
 		overrideMethodAsync(overrideFacts, key)
 }
 

@@ -17099,6 +17099,9 @@ func (o *LoweringOwner) callExprNeedsAwait(ctx lowerFileContext, call *ast.CallE
 	if async, ok := o.formatCallAsync(ctx, call); ok {
 		return async
 	}
+	if async, ok := ctx.model.mutexCallAsync(ctx.semPkg, call); ok {
+		return async
+	}
 	return o.callNeedsAwait(ctx, call.Fun) || o.callbackOverrideCallNeedsAwait(ctx, call)
 }
 

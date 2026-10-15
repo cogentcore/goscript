@@ -242,43 +242,43 @@ export async function main(): globalThis.Promise<void> {
 
 	// Test sync.Map
 	let m = $.varRef($.markAsStructValue(new sync.Map()))
-	await m.value.Store("key1", "value1")
+	m.value.Store("key1", "value1")
 	await $.println("Stored key1")
 
 	{
-		let [val, ok] = await m.value.Load("key1")
+		let [val, ok] = m.value.Load("key1")
 		if (ok) {
 			await $.println("Loaded key1:", val)
 		}
 	}
 
 	{
-		let [val, loaded] = await m.value.LoadOrStore("key2", "value2")
+		let [val, loaded] = m.value.LoadOrStore("key2", "value2")
 		if (!loaded) {
 			await $.println("Stored key2:", val)
 		}
 	}
 
 	{
-		let [val, loaded] = await m.value.Swap("key2", "value3")
+		let [val, loaded] = m.value.Swap("key2", "value3")
 		if (loaded) {
 			await $.println("Swapped key2 previous:", val)
 		}
 	}
 	{
-		let [val, ok] = await m.value.Load("key2")
+		let [val, ok] = m.value.Load("key2")
 		if (ok) {
 			await $.println("Loaded key2 after swap:", val)
 		}
 	}
-	if (!await m.value.CompareAndDelete("key2", "other")) {
+	if (!m.value.CompareAndDelete("key2", "other")) {
 		await $.println("CompareAndDelete mismatch preserved key2")
 	}
-	if (await m.value.CompareAndDelete("key2", "value3")) {
+	if (m.value.CompareAndDelete("key2", "value3")) {
 		await $.println("CompareAndDelete removed key2")
 	}
 	{
-		let [, ok] = await m.value.Load("key2")
+		let [, ok] = m.value.Load("key2")
 		if (!ok) {
 			await $.println("key2 compare deleted successfully")
 		}
@@ -289,9 +289,9 @@ export async function main(): globalThis.Promise<void> {
 		return true
 	}, ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Interface, methods: [] }, { kind: $.TypeKind.Interface, methods: [] }], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo)))
 
-	await m.value.Delete("key1")
+	m.value.Delete("key1")
 	{
-		let [, ok] = await m.value.Load("key1")
+		let [, ok] = m.value.Load("key1")
 		if (!ok) {
 			await $.println("key1 deleted successfully")
 		}

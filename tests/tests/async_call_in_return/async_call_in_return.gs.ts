@@ -10,29 +10,29 @@ export function __goscript_set_cache(__goscriptValue: sync.Map): void {
 	$.assignStruct(cache.value, __goscriptValue)
 }
 
-export async function getFromCache(key: string): globalThis.Promise<[any, boolean]> {
-	let [val, ok] = await cache.value.Load(key)
+export function getFromCache(key: string): [any, boolean] {
+	let [val, ok] = cache.value.Load(key)
 	return [val, ok]
 }
 
-export async function getFromCacheInline(key: string): globalThis.Promise<[any, boolean]> {
+export function getFromCacheInline(key: string): [any, boolean] {
 	return cache.value.Load(key)
 }
 
 export async function main(): globalThis.Promise<void> {
-	await cache.value.Store("test", $.basicInterfaceValue(42, "int"))
+	cache.value.Store("test", $.basicInterfaceValue(42, "int"))
 
-	let [val1, ok1] = await getFromCache("test")
+	let [val1, ok1] = getFromCache("test")
 	if (ok1) {
 		await $.println("getFromCache found:", $.mustTypeAssert<number>(val1, /* @__PURE__ */ $.basicType("int")))
 	}
 
-	let [val2, ok2] = await getFromCacheInline("test")
+	let [val2, ok2] = getFromCacheInline("test")
 	if (ok2) {
 		await $.println("getFromCacheInline found:", $.mustTypeAssert<number>(val2, /* @__PURE__ */ $.basicType("int")))
 	}
 
-	let [, ok3] = await getFromCache("missing")
+	let [, ok3] = getFromCache("missing")
 	if (!ok3) {
 		await $.println("Not found as expected")
 	}

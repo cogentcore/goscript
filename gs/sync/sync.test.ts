@@ -92,12 +92,13 @@ describe('sync.Once', () => {
     const once = new Once()
     let calls = 0
 
-    await expect(
+    // A sync f's panic propagates from Do directly.
+    expect(() =>
       once.Do(() => {
         calls++
         throw new Error('boom')
       }),
-    ).rejects.toThrow('boom')
+    ).toThrow('boom')
     await once.Do(() => {
       calls++
     })

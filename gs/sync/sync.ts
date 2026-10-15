@@ -7,7 +7,7 @@ import { comparableEqual, pointerValue } from '@goscript/builtin/index.js'
 
 // Locker represents an object that can be locked and unlocked.
 export interface Locker {
-  Lock(): Promise<void>
+  Lock(): void | Promise<void>
   Unlock(): void
 }
 
@@ -21,8 +21,10 @@ export class Mutex implements Locker {
   }
 
   // Lock locks m
-  // If the lock is already in use, the calling goroutine blocks until the mutex is available
-  public async Lock(): Promise<void> {
+  // If the lock is already in use, the calling goroutine blocks until the mutex is available.
+  // A free lock is acquired synchronously and nothing is returned, so a caller
+  // that the compiler proves never finds it held need not await.
+  public Lock(): void | Promise<void> {
     if (!this._locked) {
       this._locked = true
       return
@@ -76,8 +78,8 @@ export class RWMutex {
     // RWMutex has no public fields to initialize
   }
 
-  // Lock locks rw for writing
-  public async Lock(): Promise<void> {
+  // Lock locks rw for writing. A free lock is acquired synchronously.
+  public Lock(): void | Promise<void> {
     if (!this._writer && this._readers === 0) {
       this._writer = true
       return
@@ -107,8 +109,8 @@ export class RWMutex {
     this._wakeUpWaiters()
   }
 
-  // RLock locks rw for reading
-  public async RLock(): Promise<void> {
+  // RLock locks rw for reading. A free lock is acquired synchronously.
+  public RLock(): void | Promise<void> {
     if (!this._writer && this._writerWaitQueue.length === 0) {
       this._readers++
       return
@@ -234,30 +236,31 @@ export class WaitGroup {
 // Once is an object that will perform exactly one action.
 export class Once {
   private _done: boolean = false
-  private _m: Mutex = new Mutex()
+  private _pending: Promise<void> | null = null
 
   constructor(_init?: Partial<{}>) {
     // Once has no public fields to initialize
   }
 
-  // Do calls the function f if and only if Do is being called for the first time for this instance of Once
-  public async Do(f: (() => void | Promise<void>) | null): Promise<void> {
+  // Do calls the function f if and only if Do is being called for the first
+  // time for this instance of Once. It returns a promise only when f does, and
+  // a call made while that promise is pending waits for it.
+  public Do(f: (() => void | Promise<void>) | null): void | Promise<void> {
     if (f == null) {
       throw new Error('sync: nil function in Once.Do')
     }
     if (this._done) {
-      return
+      return this._pending ?? undefined
     }
-
-    await this._m.Lock()
-    try {
-      if (!this._done) {
-        this._done = true
-        await f()
-      }
-    } finally {
-      this._m.Unlock()
+    this._done = true
+    const result = f()
+    if (result instanceof Promise) {
+      this._pending = result.finally(() => {
+        this._pending = null
+      })
+      return this._pending
     }
+    return undefined
   }
 
   // clone returns a copy of this Once instance
@@ -324,8 +327,9 @@ export function NewCond(l: Locker | null): Cond {
 }
 
 // Map is like a Go map[interface{}]interface{} but is safe for concurrent use by multiple goroutines.
+// The runtime runs one goroutine at a time, and no method but Range calls
+// back into Go code, so each runs without interruption and needs no lock.
 export class Map {
-  private _m: RWMutex = new RWMutex()
   private _data: globalThis.Map<any, any> = new globalThis.Map()
 
   constructor(_init?: Partial<{}>) {
@@ -333,41 +337,26 @@ export class Map {
   }
 
   // Clear deletes all entries.
-  public async Clear(): Promise<void> {
-    await this._m.Lock()
-    try {
-      this._data.clear()
-    } finally {
-      this._m.Unlock()
-    }
+  public Clear(): void {
+    this._data.clear()
   }
 
   // Delete deletes the value for a key
-  public async Delete(key: any): Promise<void> {
-    await this._m.Lock()
-    try {
-      const entry = this.findEntry(key)
-      if (entry.found) {
-        this._data.delete(entry.key)
-      }
-    } finally {
-      this._m.Unlock()
+  public Delete(key: any): void {
+    const entry = this.findEntry(key)
+    if (entry.found) {
+      this._data.delete(entry.key)
     }
   }
 
   // CompareAndDelete deletes the entry for key if its value is equal to old.
-  public async CompareAndDelete(key: any, old: any): Promise<boolean> {
-    await this._m.Lock()
-    try {
-      const entry = this.findEntry(key)
-      if (!entry.found || !comparableEqual(entry.value, old)) {
-        return false
-      }
-      this._data.delete(entry.key)
-      return true
-    } finally {
-      this._m.Unlock()
+  public CompareAndDelete(key: any, old: any): boolean {
+    const entry = this.findEntry(key)
+    if (!entry.found || !comparableEqual(entry.value, old)) {
+      return false
     }
+    this._data.delete(entry.key)
+    return true
   }
 
   // CompareAndSwap swaps the old and new values for key if the stored value is old.
@@ -382,73 +371,69 @@ export class Map {
   }
 
   // Load returns the value stored in the map for a key, or nil if no value is present
-  public async Load(key: any): Promise<[any, boolean]> {
-    await this._m.RLock()
-    try {
-      const entry = this.findEntry(key)
-      return entry.found ? [entry.value, true] : [undefined, false]
-    } finally {
-      this._m.RUnlock()
-    }
+  public Load(key: any): [any, boolean] {
+    const entry = this.findEntry(key)
+    return entry.found ? [entry.value, true] : [undefined, false]
   }
 
   // LoadAndDelete deletes the value for a key, returning the previous value if any
-  public async LoadAndDelete(key: any): Promise<[any, boolean]> {
-    await this._m.Lock()
-    try {
-      const entry = this.findEntry(key)
-      if (!entry.found) {
-        return [undefined, false]
-      }
-      this._data.delete(entry.key)
-      return [entry.value, true]
-    } finally {
-      this._m.Unlock()
+  public LoadAndDelete(key: any): [any, boolean] {
+    const entry = this.findEntry(key)
+    if (!entry.found) {
+      return [undefined, false]
     }
+    this._data.delete(entry.key)
+    return [entry.value, true]
   }
 
   // LoadOrStore returns the existing value for the key if present
-  public async LoadOrStore(key: any, value: any): Promise<[any, boolean]> {
-    await this._m.Lock()
-    try {
-      const entry = this.findEntry(key)
-      if (entry.found) {
-        return [entry.value, true]
+  public LoadOrStore(key: any, value: any): [any, boolean] {
+    const entry = this.findEntry(key)
+    if (entry.found) {
+      return [entry.value, true]
+    }
+    this._data.set(key, value)
+    return [value, false]
+  }
+
+  // Range calls f sequentially for each key and value present in the map.
+  // It returns a promise only when f does.
+  public Range(
+    f: (key: any, value: any) => boolean | globalThis.Promise<boolean>,
+  ): void | Promise<void> {
+    const entries: [any, any][] = Array.from(this._data)
+    for (let i = 0; i < entries.length; i++) {
+      const more = f(entries[i][0], entries[i][1])
+      if (more instanceof Promise) {
+        return this.rangeAsync(f, entries, i, more)
       }
-      this._data.set(key, value)
-      return [value, false]
-    } finally {
-      this._m.Unlock()
+      if (!more) {
+        return
+      }
     }
   }
 
-  // Range calls f sequentially for each key and value present in the map
-  public async Range(
+  // rangeAsync continues Range after f returned a promise for entry i.
+  private async rangeAsync(
     f: (key: any, value: any) => boolean | globalThis.Promise<boolean>,
+    entries: [any, any][],
+    i: number,
+    more: Promise<boolean>,
   ): Promise<void> {
-    await this._m.RLock()
-    let entries: [any, any][]
-    try {
-      entries = Array.from(this._data)
-    } finally {
-      this._m.RUnlock()
+    if (!(await more)) {
+      return
     }
-    for (const [key, value] of entries) {
-      if (!(await f(key, value))) {
-        break
+    for (let j = i + 1; j < entries.length; j++) {
+      if (!(await f(entries[j][0], entries[j][1]))) {
+        return
       }
     }
   }
 
   // Store sets the value for a key
-  public async Store(key: any, value: any): Promise<void> {
-    await this._m.Lock()
-    try {
-      const entry = this.findEntry(key)
-      this._data.set(entry.found ? entry.key : key, value)
-    } finally {
-      this._m.Unlock()
-    }
+  public Store(key: any, value: any): void {
+    const entry = this.findEntry(key)
+    this._data.set(entry.found ? entry.key : key, value)
   }
 
   private findEntry(
@@ -469,15 +454,10 @@ export class Map {
   }
 
   // Swap swaps the value for a key and returns the previous value if any
-  public async Swap(key: any, value: any): Promise<[any, boolean]> {
-    await this._m.Lock()
-    try {
-      const entry = this.findEntry(key)
-      this._data.set(entry.found ? entry.key : key, value)
-      return [entry.found ? entry.value : undefined, entry.found]
-    } finally {
-      this._m.Unlock()
-    }
+  public Swap(key: any, value: any): [any, boolean] {
+    const entry = this.findEntry(key)
+    this._data.set(entry.found ? entry.key : key, value)
+    return [entry.found ? entry.value : undefined, entry.found]
   }
 
   // clone returns a copy of this Map instance

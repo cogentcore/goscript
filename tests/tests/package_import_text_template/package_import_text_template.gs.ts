@@ -38,7 +38,7 @@ export class item {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let t = template.Must(...((await template.Template.prototype.Parse.call(template.New("x"), "{{range $i, $e := .}}{{$i}}:{{$e.Name}}={{$e.Count}}{{if gt $e.Count 1}} many{{end}}\n{{end}}")) as [template.Template | $.VarRef<template.Template> | null, $.GoError]))
+	let t = template.Must(...(template.Template.prototype.Parse.call(template.New("x"), "{{range $i, $e := .}}{{$i}}:{{$e.Name}}={{$e.Count}}{{if gt $e.Count 1}} many{{end}}\n{{end}}") as [template.Template | $.VarRef<template.Template> | null, $.GoError]))
 	{
 		let err = await template.Template.prototype.Execute.call(t, $.interfaceValue<io.Writer | null>(os.Stdout, "*os.File", /* @__PURE__ */ $.pointerType("os.File")), $.interfaceValue($.arrayToSlice<item>([new item({Name: "a", Count: 1}, true), new item({Name: "b", Count: 2}, true)]), "[]main.item", /* @__PURE__ */ $.sliceType("main.item")))
 		if (err != null) {
