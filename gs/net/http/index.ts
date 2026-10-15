@@ -437,11 +437,11 @@ function canonicalMIMEHeaderKey(key: string): string {
 // urlFromEscaped returns the URL for an escaped path and raw query, keeping
 // the escaped form in RawPath so that encoded slashes survive.
 function urlFromEscaped(escaped: string, rawQuery: string): url.URL {
-  return new url.URL({
-    Path: pathUnescape(escaped),
-    RawPath: escaped,
-    RawQuery: rawQuery,
-  })
+  const u = new url.URL()
+  u.Path = pathUnescape(escaped)
+  u.RawPath = escaped
+  u.RawQuery = rawQuery
+  return u
 }
 
 class responseBody implements io.ReadCloser {

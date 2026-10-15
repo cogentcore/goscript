@@ -594,6 +594,65 @@ func renderStructAssign(b *strings.Builder, structType *loweredStruct, runtimeOw
 	b.WriteString("\t\treturn this\n\t}\n")
 }
 
+// renderPositionalStructConstructor emits the constructor of a positional
+// struct class, which takes the value marker and then the value of each field
+// in field order. It stores each value as it is: the caller passes values that
+// the new struct owns, such as copies. An omitted value is the field's zero
+// value.
+func renderPositionalStructConstructor(b *strings.Builder, structType *loweredStruct, runtimeOwner *RuntimeContractOwner) {
+	// The parameters are the marker and the fields, whose names end in $,
+	// which no Go identifier does, so that they hide no type of a zero value.
+	b.WriteString("\tconstructor(__goscriptValue?: boolean")
+	for _, field := range structType.fields {
+		b.WriteString(", " + field.name + "$?: " + field.typ)
+	}
+	b.WriteString(") {\n")
+
+	// Each field takes its value or its zero value.
+	for _, field := range structType.fields {
+		zero := field.zero
+		if zero == "null" || field.typeParamValue {
+			zero = "(" + zero + " as " + field.typ + ")"
+			zero = strings.Replace(zero, "(null as", "(null! as", 1)
+		}
+		b.WriteString("\t\tthis." + field.name + " = " + field.name + "$ ?? " + zero + "\n")
+	}
+
+	// Every instance carries the marker, false for a pointer's struct, so
+	// that all instances of a class have one shape.
+	b.WriteString("\t\t;(this as any)[" + runtimeOwner.QualifiedHelper(RuntimeHelperStructValueMarker))
+	b.WriteString("] = __goscriptValue === true\n\t}\n\n")
+}
+
+// renderPositionalStructClone emits the clone method of a positional struct
+// class, which passes a copy of each field to the constructor.
+func renderPositionalStructClone(b *strings.Builder, structType *loweredStruct, runtimeOwner *RuntimeContractOwner) {
+	b.WriteString("\tpublic " + structType.cloneMethod + "(): " + structType.name + " {\n")
+	b.WriteString("\t\treturn new " + structType.name + "(true")
+	for _, field := range structType.fields {
+		b.WriteString(", " + positionalFieldCopy(field, "this."+field.name, runtimeOwner))
+	}
+	b.WriteString(")\n\t}\n")
+}
+
+// positionalFieldCopy returns the expression that copies value, the value of
+// field, by the field's kind.
+func positionalFieldCopy(field loweredStructField, value string, runtimeOwner *RuntimeContractOwner) string {
+	switch {
+	case field.directClone:
+		return value + ".clone()"
+	case field.structValue:
+		return runtimeOwner.QualifiedHelper(RuntimeHelperMarkAsStructValue) + "(" +
+			runtimeOwner.QualifiedHelper(RuntimeHelperCloneStructValue) + "(" + value + "))"
+	case field.arrayValue:
+		return runtimeOwner.QualifiedHelper(RuntimeHelperCloneArrayValue) + "(" + value + ", " + field.runtimeType + ")"
+	case field.typeParamValue:
+		return runtimeOwner.QualifiedHelper(RuntimeHelperCopyElement) + "(" + value + ")"
+	default:
+		return value
+	}
+}
+
 // structFreshInitParam names the constructor parameter of a generic struct
 // class that says that the values of its type parameter fields in init are
 // fresh, so that it takes them without copies.
@@ -606,7 +665,6 @@ func renderStruct(b *strings.Builder, structType *loweredStruct, runtimeOwner *R
 	cloneStructValue := runtimeOwner.QualifiedHelper(RuntimeHelperCloneStructValue)
 	cloneArrayValue := runtimeOwner.QualifiedHelper(RuntimeHelperCloneArrayValue)
 	copyElement := runtimeOwner.QualifiedHelper(RuntimeHelperCopyElement)
-	registerStructType := runtimeOwner.QualifiedHelper(RuntimeHelperRegisterStructType)
 	if structType.exported {
 		b.WriteString("export ")
 	}
@@ -623,6 +681,15 @@ func renderStruct(b *strings.Builder, structType *loweredStruct, runtimeOwner *R
 		b.WriteString(": ")
 		b.WriteString(field.typ)
 		b.WriteString("\n\n")
+	}
+
+	// A positional class takes its field values in order and copies itself
+	// field by field.
+	if structType.positional {
+		renderPositionalStructConstructor(b, structType, runtimeOwner)
+		renderPositionalStructClone(b, structType, runtimeOwner)
+		renderStructBody(b, structType, runtimeOwner, trimTypeInfo)
+		return
 	}
 
 	// The constructor copies each initial value in by its kind. A generic
@@ -730,6 +797,14 @@ func renderStruct(b *strings.Builder, structType *loweredStruct, runtimeOwner *R
 	b.WriteString(" {\n\t\treturn new ")
 	b.WriteString(structType.name)
 	b.WriteString("(this, true)\n\t}\n")
+	renderStructBody(b, structType, runtimeOwner, trimTypeInfo)
+}
+
+// renderStructBody emits the members of a struct class that follow its clone
+// method: the assign method, the methods, the prototype setup and the type
+// info, and closes the class.
+func renderStructBody(b *strings.Builder, structType *loweredStruct, runtimeOwner *RuntimeContractOwner, trimTypeInfo bool) {
+	registerStructType := runtimeOwner.QualifiedHelper(RuntimeHelperRegisterStructType)
 
 	// The assign method and the methods follow the clone method.
 	renderStructAssign(b, structType, runtimeOwner)
@@ -1348,6 +1423,16 @@ func renderNamedStructConversion(expr *loweredNamedStructConversionExpr) string 
 	}
 	body := "const " + expr.temp + " = " + expr.value.text + "; return " +
 		expr.helper + "(new " + expr.target + "({" + strings.Join(fields, ", ") + "}))"
+
+	// A positional class takes the copies of the fields in order.
+	if expr.positional {
+		copies := make([]string, 0, len(expr.fields)+1)
+		copies = append(copies, "true")
+		for _, field := range expr.fields {
+			copies = append(copies, field.copy)
+		}
+		body = "const " + expr.temp + " = " + expr.value.text + "; return new " + expr.target + "(" + strings.Join(copies, ", ") + ")"
+	}
 	if expr.value.async {
 		return "(await (async () => { " + body + " })())"
 	}
