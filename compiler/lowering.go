@@ -2923,7 +2923,7 @@ func (o *LoweringOwner) lowerGoEmbedValue(
 		return "", diagnostics
 	}
 	if isStringType(typ) {
-		return strconv.Quote(string(data)), nil
+		return lowerGoStringLiteral(string(data)), nil
 	}
 	if slice, ok := types.Unalias(typ).Underlying().(*types.Slice); ok && isByteType(slice.Elem()) {
 		return byteSliceLiteral(data), nil
@@ -2964,7 +2964,7 @@ func (o *LoweringOwner) lowerGoEmbedFSValue(ctx lowerFileContext, diagPos token.
 	slices.Sort(paths)
 	entries := make([]string, 0, len(paths))
 	for _, path := range paths {
-		entries = append(entries, "["+strconv.Quote(path)+", "+byteSliceLiteral(filesByPath[path])+"]")
+		entries = append(entries, "["+lowerGoStringLiteral(path)+", "+byteSliceLiteral(filesByPath[path])+"]")
 	}
 	builtinAlias := o.runtimeOwner.BuiltinImport().Alias
 	return builtinAlias + ".markAsStructValue(new " + embedAlias + ".FS(new globalThis.Map<string, Uint8Array>([" + strings.Join(entries, ", ") + "])))", nil
