@@ -6,6 +6,7 @@ import * as fmt from "@goscript/fmt/index.js"
 import * as netip from "@goscript/net/netip/index.js"
 import * as syscall from "@goscript/syscall/index.js"
 import type * as sync from "@goscript/sync/index.js"
+import * as __goscript_stat_js from "./stat_js.gs.ts"
 
 export async function main(): globalThis.Promise<void> {
 	syscall.CloseOnExec(1)
@@ -65,6 +66,8 @@ export async function main(): globalThis.Promise<void> {
 		let attr = new syscall.SysProcAttr()
 		attr
 	}
+	fmt.Println("stat:", __goscript_stat_js.statCtime())
+
 	let sa4 = $.markAsStructValue(new syscall.SockaddrInet4())
 	let addr4 = netip.AddrFrom4($.cloneArrayValue(sa4.Addr, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 4)))
 	sa4.Addr = addr4.As4()

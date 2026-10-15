@@ -55,6 +55,8 @@ func main() {
 		attr := &syscall.SysProcAttr{}
 		_ = attr
 	}
+	fmt.Println("stat:", statCtime())
+
 	var sa4 syscall.SockaddrInet4
 	addr4 := netip.AddrFrom4(sa4.Addr)
 	sa4.Addr = addr4.As4()

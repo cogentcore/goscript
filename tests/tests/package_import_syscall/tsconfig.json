@@ -17,6 +17,7 @@
   "extends": "../../../tests/tsconfig.base.json",
   "include": [
     "index.ts",
-    "package_import_syscall.gs.ts"
+    "package_import_syscall.gs.ts",
+    "stat_js.gs.ts"
   ]
 }

@@ -13,24 +13,24 @@ export class Dirent {
   }
 }
 
-// Stat_t structure stub.
+// Stat_t mirrors the js/wasm Stat_t, so its int64 and uint64 fields are bigint.
 export class Stat_t {
-  public Dev: number = 0
-  public Ino: number = 0
+  public Dev: bigint = 0n
+  public Ino: bigint = 0n
   public Mode: number = 0
   public Nlink: number = 0
   public Uid: number = 0
   public Gid: number = 0
-  public Rdev: number = 0
-  public Size: number = 0
+  public Rdev: bigint = 0n
+  public Size: bigint = 0n
   public Blksize: number = 0
   public Blocks: number = 0
-  public Atime: number = 0
-  public Mtime: number = 0
-  public Ctime: number = 0
-  public AtimeNsec: number = 0
-  public MtimeNsec: number = 0
-  public CtimeNsec: number = 0
+  public Atime: bigint = 0n
+  public Mtime: bigint = 0n
+  public Ctime: bigint = 0n
+  public AtimeNsec: bigint = 0n
+  public MtimeNsec: bigint = 0n
+  public CtimeNsec: bigint = 0n
 
   constructor(init?: any) {
     if (init) {
