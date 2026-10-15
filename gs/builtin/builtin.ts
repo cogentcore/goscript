@@ -10,6 +10,7 @@ import {
   resolveTypeInfo,
   structFieldRuntimeKey,
   structValueTypeInfo,
+  isStructObject,
   TypeKind,
   type GenericTypeArgs,
   type TypeInfo,
@@ -115,28 +116,22 @@ export function assignStruct<T>(
   // directly, which is much faster than copying them by their type info.
   if (
     (target as any).constructor === (source as any).constructor &&
-    typeof (target as any).__goscriptAssign === 'function' &&
-    (source as any)._fields !== undefined
+    typeof (target as any).__goscriptAssign === 'function'
   ) {
     ;(target as any).__goscriptAssign(source)
     return target
   }
 
   // The value identifies its layout even when package names collide.
-  const targetFields = (target as any)._fields
-  const sourceFields = (source as any)._fields
   const info = structValueTypeInfo(source) ?? typeInfo
   const resolved = resolveTypeInfo(info)
 
-  // A registered struct without field descriptors or a _fields map (such as
-  // time.Time) keeps its state in private properties, copied by clone below.
-  const opaque =
-    resolved?.kind === TypeKind.Struct &&
-    resolved.fields.length === 0 &&
-    !sourceFields
-  if (resolved?.kind === TypeKind.Struct && !opaque) {
-    const destination = targetFields ?? target
-    const values = sourceFields ?? source
+  // A struct with field descriptors is copied field by field; a registered
+  // struct without them (such as time.Time) keeps its state in private
+  // properties, copied by clone below.
+  if (resolved?.kind === TypeKind.Struct && resolved.fields.length !== 0) {
+    const destination = target as Record<string, unknown>
+    const values = source as Record<string, unknown>
     for (const field of resolved.fields) {
       const key = structFieldRuntimeKey(field)
       destination[key] = assignFieldValue(
@@ -147,22 +142,16 @@ export function assignStruct<T>(
     }
     return target
   }
-  if (!targetFields || !sourceFields) {
-    // Structs without a _fields map (e.g. bound protobuf messages) carry their
-    // data as plain enumerable properties. Copy a clone when the value defines
-    // one, otherwise copy the value's own properties directly.
-    const cloneable = source as {
-      __goscriptClone?: () => T
-      clone?: () => T
-    }
-    const copied =
-      cloneable.__goscriptClone?.() ?? cloneable.clone?.() ?? source
-    Object.assign(target as object, copied as object)
-    return target
+
+  // Other structs (e.g. bound protobuf messages) carry their data as plain
+  // enumerable properties. Copy a clone when the value defines one,
+  // otherwise copy the value's own properties directly.
+  const cloneable = source as {
+    __goscriptClone?: () => T
+    clone?: () => T
   }
-  for (const key of Object.keys(sourceFields)) {
-    targetFields[key] = sourceFields[key]
-  }
+  const copied = cloneable.__goscriptClone?.() ?? cloneable.clone?.() ?? source
+  Object.assign(target as object, copied as object)
   return target
 }
 
@@ -396,8 +385,8 @@ export function comparableEqual(a: unknown, b: unknown): boolean {
       )
     }
   }
-  if (isStructValue(a) && isStructValue(b)) {
-    return fieldsEqual(a._fields, b._fields)
+  if (isStructObject(a) && isStructObject(b)) {
+    return fieldsEqual(a, b)
   }
   return false
 }
@@ -420,10 +409,8 @@ export function structEqual(
   }
 
   // The operands may be a named and an unnamed struct of the same underlying
-  // type, held in different representations, so each is read by its fields.
-  const aFields = structFields(a)
-  const bFields = structFields(b)
-  if (aFields === undefined || bFields === undefined) {
+  // type, and both hold their fields as own properties.
+  if (!isStructOperand(a) || !isStructOperand(b)) {
     return comparableEqual(a, b)
   }
 
@@ -431,15 +418,15 @@ export function structEqual(
   const info = structValueTypeInfo(a) ?? structValueTypeInfo(b) ?? typeInfo
   const resolved = resolveTypeInfo(info)
   if (resolved?.kind !== TypeKind.Struct) {
-    return fieldsEqual(aFields, bFields)
+    return fieldsEqual(a, b)
   }
   for (const field of resolved.fields) {
     const key = structFieldRuntimeKey(field)
     const fieldType = resolveTypeInfo(field.type)
     const equal =
       fieldType?.kind === TypeKind.Struct ?
-        structEqual(aFields[key], bFields[key], fieldType)
-      : comparableEqual(aFields[key], bFields[key])
+        structEqual(a[key], b[key], fieldType)
+      : comparableEqual(a[key], b[key])
     if (!equal) {
       return false
     }
@@ -497,39 +484,19 @@ function hasGoMethodSurface(value: unknown): boolean {
   })
 }
 
-function isStructValue(value: unknown): value is {
-  _fields: Record<string, unknown>
-} {
-  const fields =
-    typeof value === 'object' && value !== null ?
-      (value as { _fields?: unknown })._fields
-    : undefined
+// isStructOperand reports whether value is a struct value whose fields are
+// its own properties: an object of a struct class, or an unnamed struct
+// value, which is a plain object marked as a value or carrying its struct
+// type.
+function isStructOperand(value: unknown): value is Record<string, unknown> {
   return (
-    typeof fields === 'object' && fields !== null && !isArrayOrGoSlice(fields)
+    isStructObject(value) ||
+    (typeof value === 'object' &&
+      value !== null &&
+      !isArrayOrGoSlice(value) &&
+      (isMarkedAsStructValue(value) ||
+        structValueTypeInfo(value) !== undefined))
   )
-}
-
-// structFields returns the object that holds the fields of a struct value:
-// the field record of a generated struct class, or an unnamed struct value
-// itself, whose fields are its own properties. It returns undefined for any
-// other value.
-function structFields(value: unknown): Record<string, unknown> | undefined {
-  // A generated struct class keeps its fields in a record.
-  if (isStructValue(value)) {
-    return value._fields
-  }
-
-  // An unnamed struct value is a plain object that is marked as a value or
-  // carries its struct type.
-  if (
-    typeof value === 'object' &&
-    value !== null &&
-    !isArrayOrGoSlice(value) &&
-    (isMarkedAsStructValue(value) || structValueTypeInfo(value) !== undefined)
-  ) {
-    return value as Record<string, unknown>
-  }
-  return undefined
 }
 
 function fieldsEqual(

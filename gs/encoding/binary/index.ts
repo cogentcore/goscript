@@ -129,7 +129,13 @@ class littleEndian implements ByteOrder, AppendByteOrder {
 
   public AppendUint32(b: $.Slice<number>, v: number): $.Slice<number> {
     const value = Number($.uint(v, 32))
-    return $.append(b, value & 0xff, (value >>> 8) & 0xff, (value >>> 16) & 0xff, value >>> 24)
+    return $.append(
+      b,
+      value & 0xff,
+      (value >>> 8) & 0xff,
+      (value >>> 16) & 0xff,
+      value >>> 24,
+    )
   }
 
   public AppendUint64(b: $.Slice<number>, v: number | bigint): $.Slice<number> {
@@ -213,7 +219,13 @@ class bigEndian implements ByteOrder, AppendByteOrder {
 
   public AppendUint32(b: $.Slice<number>, v: number): $.Slice<number> {
     const value = Number($.uint(v, 32))
-    return $.append(b, value >>> 24, (value >>> 16) & 0xff, (value >>> 8) & 0xff, value & 0xff)
+    return $.append(
+      b,
+      value >>> 24,
+      (value >>> 16) & 0xff,
+      (value >>> 8) & 0xff,
+      value & 0xff,
+    )
   }
 
   public AppendUint64(b: $.Slice<number>, v: number | bigint): $.Slice<number> {
@@ -959,7 +971,7 @@ function shapeSize(shape: binShape): number {
 }
 
 function structFieldValue(instance: unknown, key: string): unknown {
-  return (instance as { _fields: Record<string, unknown> })._fields[key]
+  return (instance as Record<string, unknown>)[key]
 }
 
 function shapeEncode(
@@ -1057,7 +1069,7 @@ function shapeDecodeInto(
   shape: { tag: 'struct'; fields: { key: string; shape: binShape }[] },
   instance: unknown,
 ): void {
-  const fields = (instance as { _fields: Record<string, unknown> })._fields
+  const fields = instance as Record<string, unknown>
   let offset = 0
   for (const field of shape.fields) {
     const width = shapeSize(field.shape)

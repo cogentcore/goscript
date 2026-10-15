@@ -1,7 +1,7 @@
 import { comparableEqual } from './builtin.js'
-import { isArrayOrGoSlice } from './slice.js'
 import {
   canonicalPointerIdentity,
+  isStructObject,
   isStructTypeInfo,
   resolveTypeInfo,
   structFieldRuntimeKey,
@@ -284,25 +284,14 @@ function findMapEntry<K, V>(
 // within a bucket. Keys with other fields, such as interfaces, remain on the
 // comparison scan.
 function structMapKey(key: unknown): string | undefined {
-  if (typeof key !== 'object' || key === null || isInterfacePointerKey(key)) {
-    return undefined
-  }
-  const fields = (key as { _fields?: unknown })._fields
-  if (
-    typeof fields !== 'object' ||
-    fields === null ||
-    isArrayOrGoSlice(fields)
-  ) {
-    return undefined
-  }
-  const plan = structKeyPlan(key, fields)
+  // Only a struct object has a canonical key, built from its own fields; a
+  // pointer in an interface is found by its storage instead.
+  if (!isStructObject(key) || isInterfacePointerKey(key)) return undefined
+  const plan = structKeyPlan(key)
   let text = ''
   for (let i = 0; i < plan.length; i++) {
     const field = plan[i]
-    const value = structMapKeyField(
-      (fields as Record<string, unknown>)[field.name],
-      field.kind,
-    )
+    const value = structMapKeyField(key[field.name], field.kind)
     if (value === undefined) return undefined
     text += field.prefix + value.length + ':' + value
   }
@@ -324,7 +313,7 @@ const structKeyPlans = new WeakMap<object, StructKeyField[]>()
 
 // structKeyPlan returns the fields of a struct key in name order, with their
 // kinds, cached for a struct of a registered class.
-function structKeyPlan(key: object, fields: object): StructKeyField[] {
+function structKeyPlan(key: object): StructKeyField[] {
   // A struct of a registered class shares one plan.
   const ctor = (key as { constructor?: { __typeInfo?: TypeInfo } }).constructor
   const cacheable = ctor !== undefined && ctor.__typeInfo !== undefined
@@ -335,7 +324,7 @@ function structKeyPlan(key: object, fields: object): StructKeyField[] {
 
   // The fields are sorted by name so equal keys give equal text.
   const kinds = structFieldKinds(key)
-  const plan = Object.keys(fields)
+  const plan = Object.keys(key)
     .sort()
     .map((name) => ({
       name,
