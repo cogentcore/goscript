@@ -98,7 +98,7 @@ export function Extended_String(e: Extended): string {
 }
 
 export function valuesExtended<T, E>(__typeArgs: $.GenericTypeArgs | undefined, values: $.Slice<T>, extended: $.Slice<E>): $.Slice<T> {
-	let res: $.Slice<T> = $.makeSlice<T>($.sliceLen(extended), undefined, undefined, () => ($.genericZero(__typeArgs, "T", null) as T))
+	let res: $.Slice<T> = $.makeSlice<T>($.sliceLen(extended), undefined, $.genericSliceTypeHint(__typeArgs, "T"), () => ($.genericZero(__typeArgs, "T", null) as T))
 	for (let __goscriptRangeTarget0 = extended, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __goscriptSliceWindow0 = $.sliceRange(res), i = 0; i < __goscriptRangeWindow0.length; i++) {
 		let e = $.copyElement((__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + i] as any));
 		;(__goscriptSliceWindow0.backing as any[])[$.windowSlot(__goscriptSliceWindow0, i)] = $.genericConvert<T>(__typeArgs, "T", e)
@@ -120,7 +120,7 @@ export function fromConst(__typeArgs: $.GenericTypeArgs | undefined, i: number):
 }
 
 export async function main(): globalThis.Promise<void> {
-	let res = (valuesExtended(__goscriptStatic0(), $.arrayToSlice<Base>([0, 1]), $.arrayToSlice<Extended>([2, 3, 4])) as $.Slice<Base>)
+	let res = (valuesExtended(__goscriptStatic0(), $.typedSliceOf(Int32Array, [0, 1]) as $.Slice<Base>, $.typedSliceOf(Int32Array, [2, 3, 4]) as $.Slice<Extended>) as $.Slice<Base>)
 	for (let __goscriptRangeTarget1 = res, __goscriptRangeWindow1 = $.sliceRange(__goscriptRangeTarget1), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow1.length; __rangeIndex++) {
 		let v = $.int((__goscriptRangeWindow1.backing[__goscriptRangeWindow1.offset + __rangeIndex] as Base), 32)
 		await $.println(v, Base_String(v))

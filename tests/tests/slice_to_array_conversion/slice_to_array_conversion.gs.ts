@@ -18,7 +18,7 @@ export async function main(): globalThis.Promise<void> {
 	$.pointerValue<Uint8Array>(bytePointer)[0] = 6
 	await $.println("byte alias:", $.arrayIndex(values!, 1))
 
-	let words = $.arrayToSlice<number>([1, 2, 3, 4])
+	let words = $.typedSliceOf(Uint16Array, [1, 2, 3, 4]) as $.Slice<number>
 	let wordPointer = $.sliceToArrayPointer<number>($.goSlice(words, 1, undefined), 2)
 	let replacement = $.arrayValue([20, 30])
 	wordPointer!.value = $.cloneArrayValue(replacement, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint16"), 2))

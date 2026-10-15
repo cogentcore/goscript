@@ -9,7 +9,7 @@ export type Named = globalThis.Map<string, number> | null
 $.registerNamedType("main.Named", /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("int")));
 
 export function Keys<K>(__typeArgs: $.GenericTypeArgs | undefined, m: any): $.Slice<K> {
-	let r: $.Slice<K> = $.makeSlice<K>(0, $.len(m), undefined, () => ($.genericZero(__typeArgs, "K", null) as K))
+	let r: $.Slice<K> = $.makeSlice<K>(0, $.len(m), $.genericSliceTypeHint(__typeArgs, "K"), () => ($.genericZero(__typeArgs, "K", null) as K))
 	for (const [k, __rangeValue] of m?.entries() ?? []) {
 		r = $.append(r, k, $.appendZero(() => ($.genericZero(__typeArgs, "K", null) as K)))
 	}
@@ -17,7 +17,7 @@ export function Keys<K>(__typeArgs: $.GenericTypeArgs | undefined, m: any): $.Sl
 }
 
 export function Values<V>(__typeArgs: $.GenericTypeArgs | undefined, m: any): $.Slice<V> {
-	let r: $.Slice<V> = $.makeSlice<V>(0, $.len(m), undefined, () => ($.genericZero(__typeArgs, "V", null) as V))
+	let r: $.Slice<V> = $.makeSlice<V>(0, $.len(m), $.genericSliceTypeHint(__typeArgs, "V"), () => ($.genericZero(__typeArgs, "V", null) as V))
 	for (const [__rangeKey, v] of m?.entries() ?? []) {
 		r = $.append(r, v, $.appendZero(() => ($.genericZero(__typeArgs, "V", null) as V)))
 	}

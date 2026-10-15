@@ -1,0 +1,26 @@
+reflect len: 3 2.5 []float32
+reflect set: true
+reflect slice: 9 2
+reflect make: 5 -2147483648 -7 9
+reflect copy: 5
+deep equal: true false
+swapper: 9 5
+binary bytes: 16 00 00 20 c0 12 34 ff ff
+binary read: 1 -2.5 true 4660 65535
+binary window: 0 -1 2 0 8
+sort float64s: true -1 2 3
+slices sort window: 5 1 2 4 3
+sort slice: -1 2 3
+clone: 5 50 5 3 true 50
+insert delete: 6 7 8 1
+reverse: 3 false
+fmt: [0.1 9 3.5] [-1 2] [7] [0.5 2]
+fmt verbs: [0.1 1.25] [1.00 2.50] [-3 4] [ff 10]
+json: {"Pos":[0.5,1,-2.5],"Index":[0,1,4294967295]} true
+json back: true 3 0.5 4294967295
+json float32: true true 3
+json append: 4 4 true
+grown: 5 true [0.5 1.5 2.5 3.5 4.5] [0.5,1.5,2.5,3.5,4.5] 20
+grown reflect: true 4.5
+grown sort: 4.5 0.5 4.5 5
+grown assert: true false

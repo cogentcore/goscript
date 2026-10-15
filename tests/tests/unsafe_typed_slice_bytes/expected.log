@@ -1,0 +1,7 @@
+float bytes: 12 128 63 192 63
+shared: 4 64
+window: 8 8 12
+window write: true
+same kind: 7 2 2
+int16 bytes: 255 255 0 1
+nil: true
