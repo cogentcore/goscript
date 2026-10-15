@@ -163,7 +163,7 @@ export async function main(): globalThis.Promise<void> {
 	let [, err] = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue((o).clone(), "main.Outer", "main.Outer")))).FieldByIndexErr($.arrayToSlice<number>([0, 0]))
 	await $.println("nil embedded", err != null)
 	o.Inner = new Inner({B: 9})
-	let __goscriptTuple1: any = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue((o).clone(), "main.Outer", "main.Outer")))).FieldByIndexErr($.arrayToSlice<number>([0, 0]))
+	let __goscriptTuple1: any = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(o, "main.Outer", "main.Outer")))).FieldByIndexErr($.arrayToSlice<number>([0, 0]))
 	let f = __goscriptTuple1[0]
 	err = __goscriptTuple1[1]
 	await $.println("embedded", $.markAsStructValue($.cloneStructValue(f)).Int(), err == null)

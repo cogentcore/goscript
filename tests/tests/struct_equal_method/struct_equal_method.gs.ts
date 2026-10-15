@@ -235,7 +235,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("zeros:", (m2.Name === m3.Name && m2.F === m3.F && m2.OK === m3.OK && $.pointerEqual(m2.Ptr, m3.Ptr) && $.comparableEqual(m2.Any, m3.Any) && m2.Inner.Line === m3.Inner.Line && m2.Inner.Char === m3.Inner.Char))
 
 	// Comparisons of values in slices and maps.
-	let regions = $.arrayToSlice<region>([(a).clone(), (b).clone()])
+	let regions = $.arrayToSlice<region>([(a).clone(), b])
 	await $.println("slice:", $.structEqual($.arrayIndex(regions!, 0), a), $.structEqual($.arrayIndex(regions!, 1), a))
 	let seen = $.makeMap<pos, boolean>([[new pos({Line: 1, Char: 2}, true), true]])
 	await $.println("map:", $.mapGet<pos, boolean, boolean>(seen, a.Start, false)[0], $.mapGet<pos, boolean, boolean>(seen, a.End, false)[0])

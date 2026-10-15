@@ -66,7 +66,7 @@ export class MyStruct {
 
 export async function main(): globalThis.Promise<void> {
 	let s = new MyStruct({Value1: "hello", Value2: "world"}, true)
-	let i1: MyInterface1 | null = $.interfaceValue<MyInterface1 | null>((s).clone(), "main.MyStruct", "main.MyStruct")
+	let i1: MyInterface1 | null = $.interfaceValue<MyInterface1 | null>(s, "main.MyStruct", "main.MyStruct")
 
 	// Cast from larger interface to smaller interface (subset)
 	let i2: MyInterface2 | null = (i1 as MyInterface2 | null)

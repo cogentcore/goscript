@@ -105,7 +105,7 @@ export async function main(): globalThis.Promise<void> {
 	// Test New and Indirect
 	let newVal = $.markAsStructValue($.cloneStructValue(reflect.New($.pointerValueOrNil(intType)!)))
 	await $.println("New int type:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(newVal)).Type()).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
-	let indirectVal = $.markAsStructValue($.cloneStructValue(reflect.Indirect($.markAsStructValue($.cloneStructValue(newVal)))))
+	let indirectVal = $.markAsStructValue($.cloneStructValue(reflect.Indirect(newVal)))
 	await $.println("Indirect type:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(indirectVal)).Type()).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
 	// Test Zero values for different types
@@ -127,7 +127,7 @@ export async function main(): globalThis.Promise<void> {
 	let dst = $.makeSlice<number>(2, undefined, "number")
 	let srcVal = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(src, "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"))))))
 	let dstVal = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(dst, "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"))))))
-	let copied = reflect.Copy($.markAsStructValue($.cloneStructValue(dstVal)), $.markAsStructValue($.cloneStructValue(srcVal)))
+	let copied = reflect.Copy(dstVal, srcVal)
 	await $.println("Copied elements:", copied)
 	await $.println("Dst after copy:", $.arrayIndex(dst!, 0), $.arrayIndex(dst!, 1))
 
@@ -137,7 +137,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("Struct type:", (__goscriptAwait = (personType !== null && (personType as any).__isVarRef !== true && ((personType as any).__goValue === undefined || (personType as any).__goType?.charCodeAt(0) !== 42) ? (personType as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(personType)).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	await $.println("Struct kind:", reflect.Kind_String((__goscriptAwait = (personType !== null && (personType as any).__isVarRef !== true && ((personType as any).__goValue === undefined || (personType as any).__goType?.charCodeAt(0) !== 42) ? (personType as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(personType)).Kind(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)))
 
-	let personVal = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue((person).clone(), "main.Person", "main.Person"))))
+	let personVal = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(person, "main.Person", "main.Person"))))
 	await $.println("Struct value type:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(personVal)).Type()).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
 	// Test with different kinds
@@ -232,7 +232,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// Test Append
 	let originalSlice = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.arrayToSlice<number>([1, 2]), "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"))))))
-	let appendedSlice = $.markAsStructValue($.cloneStructValue(reflect.Append($.markAsStructValue($.cloneStructValue(originalSlice)), $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.basicInterfaceValue(3, "int")))))))
+	let appendedSlice = $.markAsStructValue($.cloneStructValue(reflect.Append(originalSlice, $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.basicInterfaceValue(3, "int")))))))
 	await $.println("Append result len:", $.markAsStructValue($.cloneStructValue(appendedSlice)).Len())
 
 	// Test channel types
@@ -285,7 +285,7 @@ export async function main(): globalThis.Promise<void> {
 	// Send values to only the string channel to make select deterministic
 	await $.markAsStructValue($.cloneStructValue(strChan)).Send($.markAsStructValue($.cloneStructValue(reflect.ValueOf("hello"))))
 
-	let cases = $.arrayToSlice<reflect.SelectCase>([$.markAsStructValue(new reflect.SelectCase({Dir: 2, Chan: $.markAsStructValue($.cloneStructValue(intChan))})), $.markAsStructValue(new reflect.SelectCase({Dir: 2, Chan: $.markAsStructValue($.cloneStructValue(strChan))})), $.markAsStructValue(new reflect.SelectCase({Dir: 3}))])
+	let cases = $.arrayToSlice<reflect.SelectCase>([$.markAsStructValue(new reflect.SelectCase({Dir: 2, Chan: intChan})), $.markAsStructValue(new reflect.SelectCase({Dir: 2, Chan: strChan})), $.markAsStructValue(new reflect.SelectCase({Dir: 3}))])
 	let [chosen, recv, recvOK] = await reflect.Select(cases)
 	await $.println("Select chosen:", chosen, "recvOK:", recvOK)
 	if ($.markAsStructValue($.cloneStructValue(recv)).IsValid()) {

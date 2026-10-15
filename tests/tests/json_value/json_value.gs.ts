@@ -40,7 +40,7 @@ export class Person {
 
 export async function main(): globalThis.Promise<void> {
 	let p = new Person({Name: "Alice", Age: 30, Active: true}, true)
-	let v = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue((p).clone(), "main.Person", "main.Person"))))
+	let v = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(p, "main.Person", "main.Person"))))
 	let t = $.markAsStructValue($.cloneStructValue(v)).Type()
 
 	await $.println("Type:", (__goscriptAwait = (t !== null && (t as any).__isVarRef !== true && ((t as any).__goValue === undefined || (t as any).__goType?.charCodeAt(0) !== 42) ? (t as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(t)).Name(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))

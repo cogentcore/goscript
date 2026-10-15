@@ -219,7 +219,7 @@ export async function main(): globalThis.Promise<void> {
 	assignGeneric(__goscriptStatic0(), g3, g1)
 	g1.Val.Y = 22
 	await $.println(g3.value.Val.Y, g1.Val.Y)
-	let h1 = $.markAsStructValue(new Holder({P: (g1).clone()}))
+	let h1 = $.markAsStructValue(new Holder({P: g1}))
 	let h2 = $.markAsStructValue(new Holder())
 	h2 = $.assignStruct(h2, (h1).clone())
 	h1.P.Val.X = 33
