@@ -99,6 +99,16 @@ func (o *SemanticModelOwner) Build(ctx context.Context, graph *PackageGraph, opt
 
 	// A package's facts depend only on that package, so each package is built
 	// into its own shard concurrently. The shards then merge in graph order.
+	// The async directives of every package are known before any package's
+	// facts, which they decide.
+	sources := make([]*packages.Package, len(nodes))
+	for idx, node := range nodes {
+		sources[idx] = graph.packagesByPath[node.PkgPath]
+	}
+	directives, directiveDiagnostics := collectAsyncDirectives(sources)
+	diagnostics = append(diagnostics, directiveDiagnostics...)
+	model.asyncDirectives = directives
+
 	var objects *summaryObjects
 	if len(opts.Summaries) != 0 || len(opts.Summarize) != 0 {
 		objects = newSummaryObjects(graph)
@@ -113,6 +123,7 @@ func (o *SemanticModelOwner) Build(ctx context.Context, graph *PackageGraph, opt
 				nodes[idx],
 				graph.packagesByPath[pkgPath],
 				overrideFacts,
+				directives,
 				objects,
 				opts.Summaries[pkgPath],
 				opts.Summarize[pkgPath],
@@ -246,11 +257,12 @@ func (o *SemanticModelOwner) colorAsync(
 		return diagnostics
 	}
 	return append(diagnostics, colorAsyncFunctions(ctx, model, asyncRoots{
-		sites:          asyncArgumentSites,
-		openMethods:    openMethods,
-		values:         valueGraph,
-		asyncWhenSeeds: asyncWhenSeeds(asyncWhen, overrideFacts, overridePkgs),
-		report:         report,
+		sites:            asyncArgumentSites,
+		openMethods:      openMethods,
+		values:           valueGraph,
+		asyncWhenSeeds:   asyncWhenSeeds(asyncWhen, overrideFacts, overridePkgs),
+		directiveMethods: model.asyncDirectives.asyncInterfaceMethods(),
+		report:           report,
 	}, interfaceAsyncEdges, anonymousInterfaceGraph, asyncWhen)...)
 }
 
@@ -293,6 +305,7 @@ func (o *SemanticModelOwner) buildPackage(
 	node *PackageGraphNode,
 	pkg *packages.Package,
 	overrideFacts *OverrideFacts,
+	directives asyncDirectives,
 	objects *summaryObjects,
 	stored []byte,
 	summarize bool,
@@ -316,8 +329,8 @@ func (o *SemanticModelOwner) buildPackage(
 		o.collectFacts(shard, semPkg, pkg, tokenFile, file, nil, nil)
 	}
 	semPkg.lazyVars = lazyPackageVars(semPkg)
-	collectFunctionFacts(shard, semPkg, pkg, overrideFacts)
-	semPkg.asyncArgumentCalls = collectAsyncArgumentCalls(pkg, semPkg.literalKey)
+	collectFunctionFacts(shard, semPkg, pkg, overrideFacts, directives)
+	semPkg.asyncArgumentCalls = collectAsyncArgumentCalls(pkg, semPkg.literalKey, directives)
 	if !summarize {
 		return shard, nil, true
 	}
@@ -1708,6 +1721,35 @@ func (m *SemanticModel) syncOverrideInterfaceMethod(fn *types.Func) bool {
 	}
 	receiver := receiverNamedType(fn.Type().(*types.Signature).Recv().Type())
 	return receiver != nil && m.syncOverrideInterfaces[namedOriginOrSelf(receiver)]
+}
+
+// syncDirective reports whether //goscript:sync marks fn: a declared
+// function or method, or an interface method or its interface type.
+func (m *SemanticModel) syncDirective(fn *types.Func) bool {
+	if m == nil || fn == nil || len(m.asyncDirectives) == 0 {
+		return false
+	}
+	if isInterfaceMethod(fn) {
+		return m.asyncDirectives.interfaceMethod(fn) == asyncDirectiveSync
+	}
+	return m.asyncDirectives.function(fn) == asyncDirectiveSync
+}
+
+// syncFunctions returns the functions and methods with a body that
+// //goscript:sync marks, in source order.
+func (m *SemanticModel) syncFunctions() []*semanticFunction {
+	var list []*semanticFunction
+	for obj, directive := range m.asyncDirectives {
+		fn, ok := obj.(*types.Func)
+		if !ok || directive != asyncDirectiveSync || isInterfaceMethod(fn) {
+			continue
+		}
+		if semFn := m.functions[fn]; semFn != nil && semFn.hasBody {
+			list = append(list, semFn)
+		}
+	}
+	slices.SortFunc(list, func(a, b *semanticFunction) int { return compareFuncPos(a.function, b.function) })
+	return list
 }
 
 func (m *SemanticModel) functionAsync(fn *types.Func) bool {

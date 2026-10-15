@@ -65,6 +65,9 @@ const (
 	// asyncCauseInterface is an interface method that an implementation made
 	// async.
 	asyncCauseInterface = "interface"
+	// asyncCauseDirective is an interface method, or a call through a func
+	// type, field or variable, that //goscript:async marks.
+	asyncCauseDirective = "directive"
 )
 
 // Packages whose async overrides the report names by kind.
@@ -161,6 +164,9 @@ type asyncReporter struct {
 	firstFrom []int
 	roots     []asyncReportRoot
 	rootNodes map[int]bool
+	// cuts holds, for each function or interface method that
+	// //goscript:sync keeps sync, the node whose mark first reached it.
+	cuts map[*types.Func]int
 	// cur is the node whose mark is being propagated.
 	cur int
 }
@@ -177,6 +183,7 @@ func newAsyncReporter(model *SemanticModel, boundary *overrideBoundary, wholePro
 		ids:          make(map[any]int),
 		edgeSet:      make(map[[2]int]bool),
 		rootNodes:    make(map[int]bool),
+		cuts:         make(map[*types.Func]int),
 		cur:          noReportNode,
 	}
 }
@@ -318,6 +325,12 @@ func (r *asyncReporter) addAsyncWhenRoot(target *types.Func) {
 		"override metadata makes it async with an async method of a name it lists, and an override method of that name is async")
 }
 
+// addDirectiveRoot records an interface method that //goscript:async marks
+// as a root.
+func (r *asyncReporter) addDirectiveRoot(method *types.Func) {
+	r.root(r.keyNode(method), asyncCauseDirective, method.Pos(), "", asyncDirectiveLine+" marks the method or its interface")
+}
+
 // addOpenMethodRoot records a called open interface method as a root.
 func (r *asyncReporter) addOpenMethodRoot(method *types.Func) {
 	kind, detail := r.openMethodCause(method)
@@ -376,6 +389,17 @@ func (r *asyncReporter) edgeToKey(key *types.Func) {
 func (r *asyncReporter) edgeToInterface(method *types.Func) {
 	if r != nil {
 		r.edge(r.interfaceNode(method))
+	}
+}
+
+// cut records that //goscript:sync kept fn sync against the mark being
+// propagated.
+func (r *asyncReporter) cut(fn *types.Func) {
+	if r == nil {
+		return
+	}
+	if _, ok := r.cuts[fn]; !ok || r.cuts[fn] == noReportNode {
+		r.cuts[fn] = r.cur
 	}
 }
 

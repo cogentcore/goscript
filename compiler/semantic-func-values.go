@@ -73,6 +73,7 @@ type funcFactsWalker struct {
 	semPkg        *semanticPackage
 	pkg           *packages.Package
 	overrideFacts *OverrideFacts
+	directives    asyncDirectives
 	// callees holds the expressions in the callee position of a call, which
 	// call a function rather than take its value.
 	callees map[ast.Node]bool
@@ -91,6 +92,7 @@ func collectFunctionFacts(
 	semPkg *semanticPackage,
 	pkg *packages.Package,
 	overrideFacts *OverrideFacts,
+	directives asyncDirectives,
 ) {
 	// The package's nodes and values start empty.
 	w := &funcFactsWalker{
@@ -98,6 +100,7 @@ func collectFunctionFacts(
 		semPkg:        semPkg,
 		pkg:           pkg,
 		overrideFacts: overrideFacts,
+		directives:    directives,
 		callees:       make(map[ast.Node]bool),
 		immediate:     make(map[*ast.FuncLit]bool),
 		taken:         make(map[funcValue]bool),
@@ -350,7 +353,7 @@ func (w *funcFactsWalker) visitCall(node *semanticFunction, call *ast.CallExpr) 
 		node.calls[functionOriginOrSelf(called)] = true
 	}
 	if callUsesFunctionValue(w.pkg, call.Fun) || callUsesFunctionIdentifier(w.pkg, call.Fun) {
-		recordValueCall(node, funcValueShape(w.pkg.TypesInfo.TypeOf(call.Fun)))
+		w.visitValueCall(node, call)
 	}
 
 	// Some callees suspend whatever the program, and callback async
@@ -360,6 +363,20 @@ func (w *funcFactsWalker) visitCall(node *semanticFunction, call *ast.CallExpr) 
 		markOwnAsync(node, call.Pos(), kind, detail)
 	}
 	recordCallbackOverrideCall(w.pkg, w.overrideFacts, node, call, w.literalKey)
+}
+
+// visitValueCall records a call through a function value as a call of its
+// class, unless a directive on the field, variable or func type it calls
+// through decides it: //goscript:async suspends, and //goscript:sync cuts the
+// call from the class.
+func (w *funcFactsWalker) visitValueCall(node *semanticFunction, call *ast.CallExpr) {
+	directive, obj := w.directives.valueCall(w.pkg, call.Fun)
+	switch directive {
+	case asyncDirectiveAsync:
+		markOwnAsync(node, call.Pos(), asyncCauseDirective, "call through "+obj.Name()+", which "+asyncDirectiveLine+" marks")
+	case asyncDirectiveNone:
+		recordValueCall(node, funcValueShape(w.pkg.TypesInfo.TypeOf(call.Fun)))
+	}
 }
 
 // literalKey returns the key of lit's node, walking its body the first time.

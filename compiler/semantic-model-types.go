@@ -61,6 +61,9 @@ type SemanticModel struct {
 	// staleSummaries lists the packages whose stored body summaries did not
 	// apply. A model with stale summaries is incomplete.
 	staleSummaries []string
+	// asyncDirectives holds the //goscript:async and //goscript:sync
+	// directives of the compiled packages.
+	asyncDirectives asyncDirectives
 	// asyncReport holds the async report the build was asked for, or nil.
 	asyncReport *AsyncReport
 }

@@ -1,0 +1,8 @@
+log: > a> b
+fill: 6
+chan put: 30
+recv: 5
+apply: 12
+click: 5
+count: 9
+sum: 8

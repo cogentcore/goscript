@@ -1,8 +1,10 @@
 package compiler
 
 import (
+	"cmp"
 	"context"
 	"go/ast"
+	"go/token"
 	"go/types"
 	"maps"
 	"slices"
@@ -42,7 +44,13 @@ type asyncArgumentCall struct {
 
 // collectAsyncArgumentCalls finds the calls in pkg whose function arguments
 // can make the callee async. literalKey returns the key of a literal's node.
-func collectAsyncArgumentCalls(pkg *packages.Package, literalKey func(*ast.FuncLit) *types.Func) []asyncArgumentCall {
+// An argument passed to a parameter of a func type that //goscript:sync
+// marks cannot.
+func collectAsyncArgumentCalls(
+	pkg *packages.Package,
+	literalKey func(*ast.FuncLit) *types.Func,
+	directives asyncDirectives,
+) []asyncArgumentCall {
 	var calls []asyncArgumentCall
 	for _, file := range pkg.Syntax {
 		ast.Inspect(file, func(node ast.Node) bool {
@@ -58,7 +66,7 @@ func collectAsyncArgumentCalls(pkg *packages.Package, literalKey func(*ast.FuncL
 
 			// Record the call when a function argument can decide it.
 			signature, _ := called.Type().(*types.Signature)
-			deps, shapes := asyncArgumentFacts(pkg, signature, expr.Args, literalKey)
+			deps, shapes := asyncArgumentFacts(pkg, signature, expr.Args, literalKey, directives)
 			if len(deps) != 0 || len(shapes) != 0 {
 				calls = append(calls, asyncArgumentCall{called: called, deps: deps, shapes: shapes})
 			}
@@ -101,6 +109,7 @@ func asyncArgumentFacts(
 	signature *types.Signature,
 	args []ast.Expr,
 	literalKey func(*ast.FuncLit) *types.Func,
+	directives asyncDirectives,
 ) ([]*types.Func, []string) {
 	// Only arguments of function-typed parameters count.
 	if signature == nil || signature.Params() == nil {
@@ -114,7 +123,8 @@ func asyncArgumentFacts(
 		if signature.Variadic() && idx >= params.Len()-1 {
 			paramIdx = params.Len() - 1
 		}
-		if paramIdx < 0 || paramIdx >= params.Len() || signatureForType(params.At(paramIdx).Type()) == nil {
+		if paramIdx < 0 || paramIdx >= params.Len() || signatureForType(params.At(paramIdx).Type()) == nil ||
+			directives.namedType(params.At(paramIdx).Type()) == asyncDirectiveSync {
 			continue
 		}
 
@@ -171,7 +181,7 @@ func callbackOverrideCallFacts(
 
 	// Its function arguments decide it.
 	signature, _ := called.Type().(*types.Signature)
-	deps, shapes = asyncArgumentFacts(pkg, signature, call.Args, literalKey)
+	deps, shapes = asyncArgumentFacts(pkg, signature, call.Args, literalKey, nil)
 	return true, deps, shapes
 }
 
@@ -335,6 +345,8 @@ type asyncRoots struct {
 	// asyncWhenSeeds are the asyncWhenMethods targets that an async override
 	// method makes async.
 	asyncWhenSeeds []*types.Func
+	// directiveMethods are the interface methods that //goscript:async marks.
+	directiveMethods []*types.Func
 	// report records the roots and edges for -report-async, or is nil.
 	report *asyncReporter
 }
@@ -410,6 +422,10 @@ func colorAsyncFunctions(
 		c.register(class)
 	}
 
+	// A function that //goscript:sync marks does not suspend by itself; a
+	// suspending operation in its body is an error.
+	diagnostics := c.checkSyncFunctionBodies()
+
 	// Seed the functions that their packages marked async, and the interface
 	// methods they implement.
 	if c.report != nil {
@@ -429,6 +445,9 @@ func colorAsyncFunctions(
 		c.markClass(class)
 	}
 	for _, key := range roots.values.asyncMembers {
+		if c.cutBySync(key) {
+			continue
+		}
 		c.reportRoot(func(r *asyncReporter) { r.addValueRoot(key) })
 		c.visit(key)
 	}
@@ -436,10 +455,17 @@ func colorAsyncFunctions(
 		c.reportRoot(func(r *asyncReporter) { r.addAsyncWhenRoot(target) })
 		c.markAsyncWhenTarget(target)
 	}
+	for _, method := range roots.directiveMethods {
+		c.reportRoot(func(r *asyncReporter) { r.addDirectiveRoot(method) })
+		c.markInterfaceMethod(method)
+	}
 
 	// Seed the callers of open interface methods. The method itself stays
 	// sync until a compiled implementation proves it can suspend.
 	for _, method := range roots.openMethods {
+		if c.cutBySync(method) {
+			continue
+		}
 		c.reportRoot(func(r *asyncReporter) { r.addOpenMethodRoot(method) })
 		for _, caller := range model.functionCallers[method] {
 			c.markFunction(caller)
@@ -461,6 +487,9 @@ func colorAsyncFunctions(
 			c.markFunction(caller)
 		}
 		for _, ifaceMethod := range c.anonMethodsByImpl[key] {
+			if c.cutBySync(ifaceMethod) {
+				continue
+			}
 			c.report.edgeToInterface(ifaceMethod)
 			if model.markInterfaceMethodAsync(ifaceMethod) {
 				c.visitInterfaceMethod(ifaceMethod)
@@ -476,10 +505,13 @@ func colorAsyncFunctions(
 			c.markClass(class)
 		}
 	}
+	// A function that //goscript:sync marks must not call one that the
+	// coloring made async.
+	diagnostics = append(diagnostics, c.checkSyncFunctionCalls()...)
 	if c.report != nil {
 		model.asyncReport = c.report.build()
 	}
-	return nil
+	return diagnostics
 }
 
 // seedImplementations marks the interface methods that the implementations
@@ -537,6 +569,9 @@ func (c *asyncColoring) visit(key *types.Func) {
 // markFunction marks semFn async and visits the keys and interface methods the
 // new mark decides.
 func (c *asyncColoring) markFunction(semFn *semanticFunction) {
+	if semFn != nil && c.cutBySync(semFn.function) {
+		return
+	}
 	c.report.edgeToSemFn(semFn)
 	if !markFunctionAsync(semFn) {
 		return
@@ -580,6 +615,9 @@ func (c *asyncColoring) markClass(class *types.Func) {
 
 // markInterfaceMethod colors an interface method whose implementation is async.
 func (c *asyncColoring) markInterfaceMethod(ifaceMethod *types.Func) {
+	if c.cutBySync(ifaceMethod) {
+		return
+	}
 	c.report.edgeToInterface(ifaceMethod)
 	if c.model.markInterfaceMethodAsync(ifaceMethod) {
 		c.visitInterfaceMethod(ifaceMethod)
@@ -597,4 +635,85 @@ func (c *asyncColoring) visitInterfaceMethod(ifaceMethod *types.Func) {
 			c.visit(key)
 		}
 	}
+}
+
+// cutBySync reports whether a //goscript:sync directive keeps fn sync, a
+// declared function or an interface method, and records the cut with the
+// report.
+func (c *asyncColoring) cutBySync(fn *types.Func) bool {
+	if !c.model.syncDirective(fn) {
+		return false
+	}
+	c.report.cut(fn)
+	return true
+}
+
+// checkSyncFunctionBodies returns an error for each function that
+// //goscript:sync marks and whose own body suspends, and keeps it sync.
+func (c *asyncColoring) checkSyncFunctionBodies() []Diagnostic {
+	var diagnostics []Diagnostic
+	for _, semFn := range c.model.syncFunctions() {
+		if !semFn.async {
+			continue
+		}
+		pos, detail := semFn.function.Pos(), "its body suspends"
+		if cause := semFn.asyncCause; cause != nil {
+			pos, detail = cause.pos, cause.detail
+		}
+		semFn.async = false
+		diagnostics = append(diagnostics, c.syncFunctionError(semFn, pos, detail))
+	}
+	return diagnostics
+}
+
+// checkSyncFunctionCalls returns an error for each call that a function
+// //goscript:sync marks makes of a compiled function the coloring made
+// async, and for each read of a lazily initialized variable whose
+// initializer may suspend. Such a call returns a promise, which a sync
+// function cannot wait for. Calls through interface methods and function
+// values are checked when they run instead.
+func (c *asyncColoring) checkSyncFunctionCalls() []Diagnostic {
+	// Index the initializer of each lazily initialized variable.
+	lazyInits := make(map[types.Object]*semanticFunction)
+	for _, semPkg := range c.model.packages {
+		maps.Copy(lazyInits, semPkg.lazyInits)
+	}
+
+	// Each sync function's calls and variable reads are checked.
+	var diagnostics []Diagnostic
+	for _, semFn := range c.model.syncFunctions() {
+		for _, called := range slices.SortedFunc(maps.Keys(semFn.calls), compareFuncPos) {
+			callee := semanticFunctionFor(c.model, called)
+			if callee != nil && callee.async && callee.hasBody && !isInterfaceMethod(called) {
+				diagnostics = append(diagnostics, c.syncFunctionError(semFn, semFn.function.Pos(),
+					"it calls "+c.model.functionFullName(called)+", which may suspend"))
+			}
+		}
+		for v := range semFn.packageVars {
+			if init := lazyInits[v]; init != nil && init.async {
+				diagnostics = append(diagnostics, c.syncFunctionError(semFn, semFn.function.Pos(),
+					"it reads "+v.Name()+", whose initializer may suspend"))
+			}
+		}
+	}
+	return diagnostics
+}
+
+// compareFuncPos orders functions by position, then by name.
+func compareFuncPos(a, b *types.Func) int {
+	return cmp.Or(cmp.Compare(a.Pos(), b.Pos()), cmp.Compare(a.FullName(), b.FullName()))
+}
+
+// syncFunctionError returns the error for a function that //goscript:sync
+// marks and that may suspend at pos.
+func (c *asyncColoring) syncFunctionError(semFn *semanticFunction, pos token.Pos, detail string) Diagnostic {
+	diag := Diagnostic{
+		Severity: DiagnosticSeverityError,
+		Code:     "goscript/directive:sync-suspends",
+		Message:  c.model.functionFullName(semFn.function) + " is marked " + syncDirectiveLine + ", but " + detail,
+	}
+	if fset := c.model.fileSet(); fset != nil && pos.IsValid() {
+		diag.Position = diagnosticPositionFromSource(sourcePosFromTokenPosition(fset.Position(pos)), "")
+	}
+	return diag
 }
