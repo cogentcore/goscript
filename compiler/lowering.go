@@ -1964,7 +1964,11 @@ func (o *LoweringOwner) lowerGenDecl(ctx lowerFileContext, decl *ast.GenDecl) ([
 							"if (((" + declName + ") as any) === undefined) {\n\t\t" +
 							declName + " = " + value + "\n\t}\n}"
 						decls = append(decls, loweredDecl{code: initCode, indexExport: initIndexExport})
-						decls = append(decls, loweredDecl{packageInit: &packageInitCall{obj: obj, name: initName}})
+						// A table of constant data is built when it is first read.
+						if idx >= len(typed.Values) || len(typed.Names) != len(typed.Values) ||
+							!packageVarInitIsDeferred(ctx.semPkg.source.TypesInfo, typed.Values[idx]) {
+							decls = append(decls, loweredDecl{packageInit: &packageInitCall{obj: obj, name: initName}})
+						}
 						getterCode += "if (((" + declName + ") as any) === undefined) {\n\t\t" +
 							initName + "()\n\t}\n"
 					}
@@ -2244,6 +2248,11 @@ func lazyPackageVars(semPkg *semanticPackage) map[types.Object]bool {
 				for valueIdx, name := range valueSpec.Names {
 					obj, _ := semPkg.source.TypesInfo.Defs[name].(*types.Var)
 					if obj == nil {
+						continue
+					}
+					if valueIdx < len(valueSpec.Values) && len(valueSpec.Names) == len(valueSpec.Values) &&
+						packageVarInitIsDeferred(semPkg.source.TypesInfo, valueSpec.Values[valueIdx]) {
+						lazy[obj] = true
 						continue
 					}
 					if valueIdx < len(valueSpec.Values) &&
