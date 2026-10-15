@@ -1443,8 +1443,9 @@ export function canonicalPointerIdentity(value: object): object {
 }
 
 // pointerAliasesMade records that a pointer view aliases another pointer's
-// storage, before which distinct pointers are never equal.
-let pointerAliasesMade = false
+// storage, before which distinct pointers are never equal. Compiled code
+// compares pointers with === and calls pointerEqual only once it is set.
+export let pointerAliasesMade = false
 
 function markPointerAlias(source: object, view: object): void {
   pointerAliasesMade = true
