@@ -90,9 +90,9 @@ export class point {
 		target.y = values.y
 	}
 
-	public async String(): globalThis.Promise<string> {
+	public String(): string {
 		const p = this;
-		return fmt.Sprintf("(%d, %d)", $.basicInterfaceValue(p.x, "int"), $.basicInterfaceValue(p.y, "int"))
+		return (fmt.Sprintf("(%d, %d)", $.basicInterfaceValue(p.x, "int"), $.basicInterfaceValue(p.y, "int")) as string)
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -108,14 +108,14 @@ export async function label(v: fmt.Stringer | null, n: number): globalThis.Promi
 	return fmt.Sprintf("%v/%d", (v as any), $.basicInterfaceValue(n, "int"))
 }
 
-export async function describe(p: point): globalThis.Promise<string> {
-	return fmt.Sprint("point ", $.interfaceValue((p).clone(), "main.point", "main.point"))
+export function describe(p: point): string {
+	return (fmt.Sprint("point ", $.interfaceValue((p).clone(), "main.point", "main.point")) as string)
 }
 
 export async function main(): globalThis.Promise<void> {
 	await $.println(await label($.interfaceValue<fmt.Stringer | null>(new slowName({ch: $.makeChannel<string>(1, "", "both")}, true), "main.slowName", "main.slowName"), 1))
 	await $.println(await label($.interfaceValue<fmt.Stringer | null>(new point({x: 2, y: 3}, true), "main.point", "main.point"), 4))
-	await $.println(await describe(new point({x: 5, y: 6}, true)))
+	await $.println(describe(new point({x: 5, y: 6}, true)))
 	let err = fmt.Errorf("bad %v", $.interfaceValue(new slowName({ch: $.makeChannel<string>(1, "", "both")}, true), "main.slowName", "main.slowName"))
 	await $.println((__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 }

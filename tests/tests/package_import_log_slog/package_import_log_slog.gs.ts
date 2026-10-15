@@ -9,8 +9,8 @@ import type * as io from "@goscript/io/index.js"
 export async function main(): globalThis.Promise<void> {
 	let s = slog.StringValue("hello")
 	await $.println(slog.Kind_String(s.Kind()), await s.String())
-	await $.println(await $.markAsStructValue($.cloneStructValue(slog.IntValue(42))).Int64(), await $.markAsStructValue($.cloneStructValue(slog.Int64Value(-7n))).String())
-	await $.println(await $.markAsStructValue($.cloneStructValue(slog.BoolValue(true))).Bool(), await $.markAsStructValue($.cloneStructValue(slog.Float64Value(1.5))).Float64())
+	await $.println($.markAsStructValue($.cloneStructValue(slog.IntValue(42))).Int64(), await $.markAsStructValue($.cloneStructValue(slog.Int64Value(-7n))).String())
+	await $.println($.markAsStructValue($.cloneStructValue(slog.BoolValue(true))).Bool(), $.markAsStructValue($.cloneStructValue(slog.Float64Value(1.5))).Float64())
 
 	let a = slog.String("name", "gopher")
 	await $.println(a.Key, await a.Value.String(), await a.String())
@@ -18,7 +18,7 @@ export async function main(): globalThis.Promise<void> {
 
 	let g = slog.Group("g", $.arrayToSlice<any>([$.interfaceValue(slog.String("a", "x"), "slog.Attr", "slog.Attr"), $.interfaceValue(slog.Int("b", 2), "slog.Attr", "slog.Attr")]))
 	let attrs = g.Value.Group()
-	await $.println(slog.Kind_String(g.Value.Kind()), $.sliceLen(attrs), $.arrayIndex(attrs!, 0).Key, await $.markAsStructValue($.cloneStructValue($.arrayIndex(attrs!, 1).Value)).Int64())
+	await $.println(slog.Kind_String(g.Value.Kind()), $.sliceLen(attrs), $.arrayIndex(attrs!, 0).Key, $.markAsStructValue($.cloneStructValue($.arrayIndex(attrs!, 1).Value)).Int64())
 	await $.println(await g.String())
 	await $.println(await $.markAsStructValue($.cloneStructValue(slog.StringValue("a"))).Equal(slog.StringValue("a")), await s.Equal(slog.StringValue("other")))
 

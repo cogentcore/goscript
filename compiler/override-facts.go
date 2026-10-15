@@ -7,6 +7,7 @@ import (
 	"go/ast"
 	"go/parser"
 	"go/token"
+	"go/types"
 	"io"
 	"io/fs"
 	"maps"
@@ -140,6 +141,16 @@ func (f *OverrideFacts) IsSyncInterface(pkgPath, name string) bool {
 	}
 	pkg := f.packages[pkgPath]
 	return pkg.metadata.SyncInterfaces[name]
+}
+
+// IsAsyncWhenOperands returns true when override metadata names fn as an
+// asyncWhenMethods function that calls those methods only on its operands.
+func (f *OverrideFacts) IsAsyncWhenOperands(fn *types.Func) bool {
+	if f == nil || fn == nil || fn.Pkg() == nil {
+		return false
+	}
+	pkg := f.packages[fn.Pkg().Path()]
+	return pkg.metadata.AsyncWhenOperands[fn.Name()]
 }
 
 // IsFunctionAsync returns true when override metadata marks a package-level function async.
@@ -384,6 +395,10 @@ func loadOverrideMetadata(root overridePackageRoot) (OverrideMetadata, error) {
 		case "syncInterfaces":
 			for name := iter.ReadObject(); name != ""; name = iter.ReadObject() {
 				metadata.SyncInterfaces[name] = iter.ReadBool()
+			}
+		case "asyncWhenOperands":
+			for name := iter.ReadObject(); name != ""; name = iter.ReadObject() {
+				metadata.AsyncWhenOperands[name] = iter.ReadBool()
 			}
 		case "asyncWhenMethods":
 			for function := iter.ReadObject(); function != ""; function = iter.ReadObject() {
@@ -786,6 +801,7 @@ func newOverrideMetadata() OverrideMetadata {
 		AsyncWhenMethods:       make(map[string][]string),
 		FuncValueMakers:        make(map[string]bool),
 		SyncInterfaces:         make(map[string]bool),
+		AsyncWhenOperands:      make(map[string]bool),
 	}
 }
 
@@ -800,6 +816,7 @@ func cloneOverrideMetadata(metadata OverrideMetadata) OverrideMetadata {
 		AsyncWhenMethods:       cloneStringSlicesMap(metadata.AsyncWhenMethods),
 		FuncValueMakers:        cloneBoolMap(metadata.FuncValueMakers),
 		SyncInterfaces:         cloneBoolMap(metadata.SyncInterfaces),
+		AsyncWhenOperands:      cloneBoolMap(metadata.AsyncWhenOperands),
 	}
 }
 

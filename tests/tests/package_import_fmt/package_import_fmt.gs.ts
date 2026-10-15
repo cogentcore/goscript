@@ -186,7 +186,7 @@ export async function main(): globalThis.Promise<void> {
 	let appended = (fmt.Append(new Uint8Array([98, 97, 115, 101, 45]), "tail") as $.Slice<number>)
 	fmt.Println("Append bytes:", $.bytesToString(appended))
 	let buf = $.varRef($.markAsStructValue(new bytes.Buffer()))
-	await fmt.Fprintln($.pointerValueOrNil($.interfaceValue<io.Writer | null>(buf, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer")))!, "Buffered writer")
+	fmt.Fprintln($.pointerValueOrNil($.interfaceValue<io.Writer | null>(buf, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer")))!, "Buffered writer")
 	fmt.Print(buf.value.String())
 
 	starWidthPrecision()

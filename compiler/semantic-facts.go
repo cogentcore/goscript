@@ -49,6 +49,14 @@ func (m *SemanticModel) packageFactDigests() map[string]string {
 	for fn := range m.asyncOverrideFunctions {
 		add("async-override-function", fn, "")
 	}
+	// The open methods of package-level interfaces decide the calls of
+	// format functions that format their values in other packages.
+	for fn := range m.openMethods {
+		if receiver := receiverNamedType(fn.Type().(*types.Signature).Recv().Type()); receiver != nil &&
+			receiver.Obj().Pkg() != nil && receiver.Obj().Parent() == receiver.Obj().Pkg().Scope() {
+			add("open-interface-method", fn, "")
+		}
+	}
 	for obj := range m.needsVarRef {
 		add("var-ref", obj, "")
 	}

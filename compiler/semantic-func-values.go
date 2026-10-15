@@ -348,8 +348,9 @@ func (w *funcFactsWalker) visitCall(node *semanticFunction, call *ast.CallExpr) 
 		w.immediate[lit] = true
 	}
 
-	// The callee is a declared function or a value.
-	if called := calledFunction(w.pkg, call.Fun); called != nil {
+	// The callee is a declared function or a value. A format function's
+	// operands decide it.
+	if called := calledFunction(w.pkg, call.Fun); called != nil && !w.visitFormatCall(node, call, called) {
 		node.calls[functionOriginOrSelf(called)] = true
 	}
 	if callUsesFunctionValue(w.pkg, call.Fun) || callUsesFunctionIdentifier(w.pkg, call.Fun) {
@@ -363,6 +364,32 @@ func (w *funcFactsWalker) visitCall(node *semanticFunction, call *ast.CallExpr) 
 		markOwnAsync(node, call.Pos(), kind, detail)
 	}
 	recordCallbackOverrideCall(w.pkg, w.overrideFacts, node, call, w.literalKey)
+}
+
+// visitFormatCall records a call of a format function that override
+// metadata lists in asyncWhenOperands as calls of the methods its operands'
+// static types allow, and reports whether it was one. An override method
+// that metadata marks async suspends.
+func (w *funcFactsWalker) visitFormatCall(node *semanticFunction, call *ast.CallExpr, called *types.Func) bool {
+	// Only a format function with operands that decide it qualifies.
+	if !w.overrideFacts.IsAsyncWhenOperands(called) {
+		return false
+	}
+	deps := formatCallDeps(w.pkg, called, call.Args)
+	if deps.global {
+		return false
+	}
+
+	// Each method is a call, or an override method by its metadata.
+	for _, method := range deps.methods {
+		switch {
+		case formatDepIsCall(w.overrideFacts, method):
+			node.calls[method] = true
+		case overrideMethodAsync(w.overrideFacts, method):
+			markOwnAsync(node, call.Pos(), asyncCauseOverrideCall, "formats a value whose "+method.FullName()+" is async")
+		}
+	}
+	return true
 }
 
 // visitValueCall records a call through a function value as a call of its

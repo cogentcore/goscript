@@ -389,19 +389,19 @@ export class Win {
 
 export async function main(): globalThis.Promise<void> {
 	let value = $.varRef(new Record({Count: 3, name: "hello", Inner: new Inner({Ready: true}, true)}, true))
-	await $.println(await fmt.Sprintf("%v", $.interfaceValue((value.value).clone(), "main.Record", "main.Record")))
-	await $.println(await fmt.Sprintf("%+v", $.interfaceValue((value.value).clone(), "main.Record", "main.Record")))
-	await $.println(await fmt.Sprintf("%v", $.interfaceValue(value, "*main.Record", /* @__PURE__ */ $.pointerType("main.Record"))))
-	await $.println(await fmt.Sprintf("%+v", $.interfaceValue(value, "*main.Record", /* @__PURE__ */ $.pointerType("main.Record"))))
-	await $.println(await fmt.Sprint($.interfaceValue(value, "*main.Record", /* @__PURE__ */ $.pointerType("main.Record"))))
-	await $.println(await fmt.Sprintf("%#v", $.interfaceValue((value.value).clone(), "main.Record", "main.Record")))
-	await $.println(await fmt.Sprintf("%#v", $.interfaceValue(value, "*main.Record", /* @__PURE__ */ $.pointerType("main.Record"))))
+	await $.println((fmt.Sprintf("%v", $.interfaceValue((value.value).clone(), "main.Record", "main.Record")) as string))
+	await $.println((fmt.Sprintf("%+v", $.interfaceValue((value.value).clone(), "main.Record", "main.Record")) as string))
+	await $.println((fmt.Sprintf("%v", $.interfaceValue(value, "*main.Record", /* @__PURE__ */ $.pointerType("main.Record"))) as string))
+	await $.println((fmt.Sprintf("%+v", $.interfaceValue(value, "*main.Record", /* @__PURE__ */ $.pointerType("main.Record"))) as string))
+	await $.println((fmt.Sprint($.interfaceValue(value, "*main.Record", /* @__PURE__ */ $.pointerType("main.Record"))) as string))
+	await $.println((fmt.Sprintf("%#v", $.interfaceValue((value.value).clone(), "main.Record", "main.Record")) as string))
+	await $.println((fmt.Sprintf("%#v", $.interfaceValue(value, "*main.Record", /* @__PURE__ */ $.pointerType("main.Record"))) as string))
 
 	let anonymous = $.varRef($.anonymousStructValue({Count: 4}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("Count", /* @__PURE__ */ $.basicType("int"), [0], 0, true)] }))
-	await $.println(await fmt.Sprintf("%v", $.interfaceValue($.markAsStructValue($.cloneStructValue(anonymous.value)), "struct{Count int}", { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("Count", /* @__PURE__ */ $.basicType("int"), [0], 0, true)] })))
-	await $.println(await fmt.Sprintf("%+v", $.interfaceValue($.markAsStructValue($.cloneStructValue(anonymous.value)), "struct{Count int}", { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("Count", /* @__PURE__ */ $.basicType("int"), [0], 0, true)] })))
-	await $.println(await fmt.Sprintf("%v", $.interfaceValue(anonymous, "*struct{Count int}", /* @__PURE__ */ $.pointerType({ kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("Count", /* @__PURE__ */ $.basicType("int"), [0], 0, true)] }))))
-	await $.println(await fmt.Sprintf("%+v", $.interfaceValue(anonymous, "*struct{Count int}", /* @__PURE__ */ $.pointerType({ kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("Count", /* @__PURE__ */ $.basicType("int"), [0], 0, true)] }))))
+	await $.println((fmt.Sprintf("%v", $.interfaceValue($.markAsStructValue($.cloneStructValue(anonymous.value)), "struct{Count int}", { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("Count", /* @__PURE__ */ $.basicType("int"), [0], 0, true)] })) as string))
+	await $.println((fmt.Sprintf("%+v", $.interfaceValue($.markAsStructValue($.cloneStructValue(anonymous.value)), "struct{Count int}", { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("Count", /* @__PURE__ */ $.basicType("int"), [0], 0, true)] })) as string))
+	await $.println((fmt.Sprintf("%v", $.interfaceValue(anonymous, "*struct{Count int}", /* @__PURE__ */ $.pointerType({ kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("Count", /* @__PURE__ */ $.basicType("int"), [0], 0, true)] }))) as string))
+	await $.println((fmt.Sprintf("%+v", $.interfaceValue(anonymous, "*struct{Count int}", /* @__PURE__ */ $.pointerType({ kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("Count", /* @__PURE__ */ $.basicType("int"), [0], 0, true)] }))) as string))
 
 	// Addresses differ across runtimes; their identity and surrounding text agree.
 	let count = $.varRef(7)
@@ -409,7 +409,7 @@ export async function main(): globalThis.Promise<void> {
 	pointers.value.Next = pointers
 	pointers.value.Dynamic = $.interfaceValue(pointers, "*main.Pointers", /* @__PURE__ */ $.pointerType("main.Pointers"))
 	let text = await fmt.Sprintf("%+v", $.interfaceValue(pointers, "*main.Pointers", /* @__PURE__ */ $.pointerType("main.Pointers")))
-	text = strings.ReplaceAll(text, await fmt.Sprintf("%p", $.interfaceValue(count, "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int")))), "<scalar>")
+	text = strings.ReplaceAll(text, (fmt.Sprintf("%p", $.interfaceValue(count, "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int")))) as string), "<scalar>")
 	text = strings.ReplaceAll(text, await fmt.Sprintf("%p", $.interfaceValue(pointers, "*main.Pointers", /* @__PURE__ */ $.pointerType("main.Pointers"))), "<self>")
 	await $.println(text)
 
@@ -423,11 +423,11 @@ export async function main(): globalThis.Promise<void> {
 	let win = new Win({App: app, Title: "main"});
 	;(app$ as App).Base.Windows = $.appendOne((app$ as App).Base.Windows, win, $.appendZeros.nil);
 	;(app$ as App).Base.Active = win
-	let names = strings.NewReplacer(await fmt.Sprintf("%p", $.interfaceValue(root, "*main.Node", /* @__PURE__ */ $.pointerType("main.Node"))), "<root>", await fmt.Sprintf("%p", $.interfaceValue(kid, "*main.Node", /* @__PURE__ */ $.pointerType("main.Node"))), "<kid>", await fmt.Sprintf("%p", $.interfaceValue(app, "*main.App", /* @__PURE__ */ $.pointerType("main.App"))), "<app>", await fmt.Sprintf("%p", $.interfaceValue(win, "*main.Win", /* @__PURE__ */ $.pointerType("main.Win"))), "<win>")
-	await $.println(strings.Replacer.prototype.Replace.call($.pointerValue<strings.Replacer>(names), await fmt.Sprint($.interfaceValue(root, "*main.Node", /* @__PURE__ */ $.pointerType("main.Node")))))
-	await $.println(strings.Replacer.prototype.Replace.call($.pointerValue<strings.Replacer>(names), await fmt.Sprintf("%+v", $.interfaceValue(kid, "*main.Node", /* @__PURE__ */ $.pointerType("main.Node")))))
-	await $.println(strings.Replacer.prototype.Replace.call($.pointerValue<strings.Replacer>(names), await fmt.Sprint($.interfaceValue(win, "*main.Win", /* @__PURE__ */ $.pointerType("main.Win")))))
-	await $.println(strings.Replacer.prototype.Replace.call($.pointerValue<strings.Replacer>(names), await fmt.Sprint($.interfaceValue(app, "*main.App", /* @__PURE__ */ $.pointerType("main.App")))))
+	let names = strings.NewReplacer((fmt.Sprintf("%p", $.interfaceValue(root, "*main.Node", /* @__PURE__ */ $.pointerType("main.Node"))) as string), "<root>", (fmt.Sprintf("%p", $.interfaceValue(kid, "*main.Node", /* @__PURE__ */ $.pointerType("main.Node"))) as string), "<kid>", (fmt.Sprintf("%p", $.interfaceValue(app, "*main.App", /* @__PURE__ */ $.pointerType("main.App"))) as string), "<app>", (fmt.Sprintf("%p", $.interfaceValue(win, "*main.Win", /* @__PURE__ */ $.pointerType("main.Win"))) as string), "<win>")
+	await $.println(strings.Replacer.prototype.Replace.call($.pointerValue<strings.Replacer>(names), (fmt.Sprint($.interfaceValue(root, "*main.Node", /* @__PURE__ */ $.pointerType("main.Node"))) as string)))
+	await $.println(strings.Replacer.prototype.Replace.call($.pointerValue<strings.Replacer>(names), (fmt.Sprintf("%+v", $.interfaceValue(kid, "*main.Node", /* @__PURE__ */ $.pointerType("main.Node"))) as string)))
+	await $.println(strings.Replacer.prototype.Replace.call($.pointerValue<strings.Replacer>(names), (fmt.Sprint($.interfaceValue(win, "*main.Win", /* @__PURE__ */ $.pointerType("main.Win"))) as string)))
+	await $.println(strings.Replacer.prototype.Replace.call($.pointerValue<strings.Replacer>(names), (fmt.Sprint($.interfaceValue(app, "*main.App", /* @__PURE__ */ $.pointerType("main.App"))) as string)))
 
 	// Exercise the same log field formatting used by controller shutdown warnings.
 	let output = $.varRef($.markAsStructValue(new bytes.Buffer()))

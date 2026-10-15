@@ -61,6 +61,9 @@ type SemanticModel struct {
 	// staleSummaries lists the packages whose stored body summaries did not
 	// apply. A model with stale summaries is incomplete.
 	staleSummaries []string
+	// openMethods holds the interface methods the coloring leaves open: a
+	// call of one makes its caller async, but the method stays sync.
+	openMethods map[*types.Func]bool
 	// asyncDirectives holds the //goscript:async and //goscript:sync
 	// directives of the compiled packages.
 	asyncDirectives asyncDirectives
