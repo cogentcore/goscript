@@ -618,10 +618,21 @@ func renderPositionalStructConstructor(b *strings.Builder, structType *loweredSt
 		b.WriteString("\t\tthis." + field.name + " = " + field.name + "$ ?? " + zero + "\n")
 	}
 
-	// Every instance carries the marker, false for a pointer's struct, so
-	// that all instances of a class have one shape.
-	b.WriteString("\t\t;(this as any)[" + runtimeOwner.QualifiedHelper(RuntimeHelperStructValueMarker))
-	b.WriteString("] = __goscriptValue === true\n\t}\n\n")
+	// The struct a pointer points to has the marker false (see
+	// renderStructMarker).
+	renderStructMarker(b, runtimeOwner)
+}
+
+// renderStructMarker ends a struct class constructor by setting the struct
+// value marker to false on the struct a pointer points to. A struct value
+// takes the marker true from the class prototype (see renderStructBody), so
+// constructing a value stores no marker of its own: values are the common
+// case, built by literals, copies and zero values, while pointers' structs
+// are allocated once and live longer.
+func renderStructMarker(b *strings.Builder, runtimeOwner *RuntimeContractOwner) {
+	b.WriteString("\t\tif (__goscriptValue !== true) {\n\t\t\t;(this as any)[")
+	b.WriteString(runtimeOwner.QualifiedHelper(RuntimeHelperStructValueMarker))
+	b.WriteString("] = false\n\t\t}\n\t}\n\n")
 }
 
 // renderPositionalStructClone emits the clone method of a positional struct
@@ -661,7 +672,6 @@ const structFreshInitParam = "__goscriptFresh"
 // renderStruct emits field storage, value-copy operations, methods, and metadata.
 func renderStruct(b *strings.Builder, structType *loweredStruct, runtimeOwner *RuntimeContractOwner, trimTypeInfo bool) {
 	markStructValue := runtimeOwner.QualifiedHelper(RuntimeHelperMarkAsStructValue)
-	structValueMarker := runtimeOwner.QualifiedHelper(RuntimeHelperStructValueMarker)
 	cloneStructValue := runtimeOwner.QualifiedHelper(RuntimeHelperCloneStructValue)
 	cloneArrayValue := runtimeOwner.QualifiedHelper(RuntimeHelperCloneArrayValue)
 	copyElement := runtimeOwner.QualifiedHelper(RuntimeHelperCopyElement)
@@ -781,13 +791,9 @@ func renderStruct(b *strings.Builder, structType *loweredStruct, runtimeOwner *R
 		b.WriteString("\n")
 	}
 
-	// A struct value carries the marker as its own property, set here so
-	// that each class stores it at one site. Every instance has the
-	// property, false for a pointer's struct, so that all instances of a
-	// class have one shape and marking one later changes no shape.
-	b.WriteString("\t\t;(this as any)[")
-	b.WriteString(structValueMarker)
-	b.WriteString("] = __goscriptValue === true\n\t}\n\n")
+	// The struct a pointer points to has the marker false (see
+	// renderStructMarker).
+	renderStructMarker(b, runtimeOwner)
 
 	// The clone method copies the struct through its constructor.
 	b.WriteString("\tpublic ")
@@ -813,12 +819,15 @@ func renderStructBody(b *strings.Builder, structType *loweredStruct, runtimeOwne
 		renderMethod(b, &method)
 	}
 
-	// A static block sets up the prototype.
+	// A static block gives the prototype the struct value marker and sets
+	// up the rest of the prototype.
+	b.WriteString("\n\tstatic {\n\t\t;(this.prototype as any)[")
+	b.WriteString(runtimeOwner.QualifiedHelper(RuntimeHelperStructValueMarker))
+	b.WriteString("] = true\n")
 	if structType.prototypeSetup != "" {
-		b.WriteString("\n\tstatic {\n\t\t")
-		b.WriteString(structType.prototypeSetup)
-		b.WriteString("\n\t}\n")
+		b.WriteString("\t\t" + structType.prototypeSetup + "\n")
 	}
+	b.WriteString("\t}\n")
 
 	// The type info registers the struct with the runtime.
 	b.WriteString("\n\tstatic __typeInfo = ")

@@ -1301,13 +1301,19 @@ function isNumberElementType(typeInfo: string | TypeInfo | undefined): boolean {
 }
 
 // structValueMarker is the property that marks a struct instance as a value,
-// not a pointer. The constructors of generated struct classes set it
-// themselves.
+// not a pointer. A generated struct class has it true on its prototype, and
+// its constructor sets it false on the struct a pointer points to.
 export const structValueMarker = Symbol('structValue')
 
 // markAsStructValue Mark a struct instance as representing a value (not pointer).
 export function markAsStructValue<T>(value: T): T {
-  if (typeof value === 'object' && value !== null) {
+  // A value of a generated struct class may have the marker from its
+  // prototype already, and keeps its shape.
+  if (
+    typeof value === 'object' &&
+    value !== null &&
+    (value as any)[structValueMarker] !== true
+  ) {
     ;(value as any)[structValueMarker] = true
   }
   return value
@@ -1538,6 +1544,9 @@ function destinationPointerView(
   // The view shares the fields of the struct the pointer points to, or
   // copies the properties of other storage.
   const view = Object.create(target.prototype)
+  if (structValueMarker in view) {
+    view[structValueMarker] = false
+  }
   const ref = source.ref
   if (ref !== undefined) {
     forwardStructFields(view, () => ref.value)
