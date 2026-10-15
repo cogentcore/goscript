@@ -4,6 +4,7 @@ import {
   arrayValueTypeInfo,
   cloneArrayValue,
   isArrayValue,
+  isMarkedAsStructValue,
   isTypeInfoComparable,
   pointerIdentityEqual,
   resolveTypeInfo,
@@ -410,24 +411,32 @@ export function structEqual(
   b: unknown,
   typeInfo?: TypeInfo | string,
 ): boolean {
+  // The same object is equal to itself.
   if (a === b) {
     return true
   }
-  if (!isStructValue(a) || !isStructValue(b)) {
+
+  // The operands may be a named and an unnamed struct of the same underlying
+  // type, held in different representations, so each is read by its fields.
+  const aFields = structFields(a)
+  const bFields = structFields(b)
+  if (aFields === undefined || bFields === undefined) {
     return comparableEqual(a, b)
   }
-  const info = structValueTypeInfo(a) ?? typeInfo
+
+  // The fields are compared in the order of the struct type of either side.
+  const info = structValueTypeInfo(a) ?? structValueTypeInfo(b) ?? typeInfo
   const resolved = resolveTypeInfo(info)
   if (resolved?.kind !== TypeKind.Struct) {
-    return fieldsEqual(a._fields, b._fields)
+    return fieldsEqual(aFields, bFields)
   }
   for (const field of resolved.fields) {
     const key = structFieldRuntimeKey(field)
     const fieldType = resolveTypeInfo(field.type)
     const equal =
       fieldType?.kind === TypeKind.Struct ?
-        structEqual(a._fields[key], b._fields[key], fieldType)
-      : comparableEqual(a._fields[key], b._fields[key])
+        structEqual(aFields[key], bFields[key], fieldType)
+      : comparableEqual(aFields[key], bFields[key])
     if (!equal) {
       return false
     }
@@ -491,6 +500,29 @@ function isStructValue(value: unknown): value is {
   return (
     typeof fields === 'object' && fields !== null && !isArrayOrGoSlice(fields)
   )
+}
+
+// structFields returns the object that holds the fields of a struct value:
+// the field record of a generated struct class, or an unnamed struct value
+// itself, whose fields are its own properties. It returns undefined for any
+// other value.
+function structFields(value: unknown): Record<string, unknown> | undefined {
+  // A generated struct class keeps its fields in a record.
+  if (isStructValue(value)) {
+    return value._fields
+  }
+
+  // An unnamed struct value is a plain object that is marked as a value or
+  // carries its struct type.
+  if (
+    typeof value === 'object' &&
+    value !== null &&
+    !isArrayOrGoSlice(value) &&
+    (isMarkedAsStructValue(value) || structValueTypeInfo(value) !== undefined)
+  ) {
+    return value as Record<string, unknown>
+  }
+  return undefined
 }
 
 function fieldsEqual(

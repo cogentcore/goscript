@@ -11162,12 +11162,18 @@ func (o *LoweringOwner) lowerNamedStructConversion(
 	sourceType types.Type,
 	value string,
 ) (*loweredNamedStructConversionExpr, bool) {
+	// The target is a named struct and the source a different named or an
+	// unnamed struct of the same underlying type.
 	target := namedStructType(targetType)
 	source := namedStructType(sourceType)
-	if target == nil || source == nil || types.Identical(target, source) ||
-		!types.IdenticalIgnoreTags(target.Underlying(), source.Underlying()) {
+	unnamedSource, _ := types.Unalias(sourceType).(*types.Struct)
+	if target == nil || (source == nil && unnamedSource == nil) ||
+		(source != nil && types.Identical(target, source)) ||
+		!types.IdenticalIgnoreTags(target.Underlying(), sourceType.Underlying()) {
 		return nil, false
 	}
+
+	// An override struct is only cast.
 	if o.typeUsesOverride(target) || o.typeUsesOverride(source) {
 		return &loweredNamedStructConversionExpr{
 			value: loweredExpr{
@@ -14306,6 +14312,11 @@ func (o *LoweringOwner) lowerValueForTargetTypes(
 		!types.Identical(targetType, sourceType) && types.AssignableTo(sourceType, targetType) {
 		return "(" + value + " as " + o.tsTypeFor(ctx, targetType) + ")"
 	}
+	// An unnamed struct assigned to a named struct type becomes a value of
+	// the named type.
+	if value, ok := o.lowerUnnamedToNamedStruct(ctx, targetType, sourceType, value); ok {
+		return value
+	}
 	if isStructValueType(targetType) && cloneStructValue {
 		return o.lowerStructCloneOf(targetType, value)
 	}
@@ -14551,6 +14562,26 @@ func (o *LoweringOwner) lowerPrimitiveErrorWrapper(ctx lowerFileContext, sourceT
 		"<$.GoError>(" + value + ", " + strconv.Quote(goRuntimeTypeString(sourceType)) +
 		", {\"Error\": " + o.methodFunctionExpr(ctx, named, fn, "Error") + "}, " +
 		o.runtimeTypeInfoExpr(sourceType) + ")"
+}
+
+// lowerUnnamedToNamedStruct copies value, an unnamed struct value assigned to
+// a generated struct class of the same underlying type, into a new value of
+// that class, so that the target has the methods and representation of its
+// type.
+func (o *LoweringOwner) lowerUnnamedToNamedStruct(
+	ctx lowerFileContext,
+	targetType types.Type,
+	sourceType types.Type,
+	value string,
+) (string, bool) {
+	// Only an unnamed struct assigned to a generated class is rebuilt.
+	target := namedStructType(targetType)
+	if _, unnamed := types.Unalias(sourceType).(*types.Struct); !unnamed || !o.isGeneratedStructClass(target) {
+		return "", false
+	}
+
+	// The class constructor copies the fields of its init value.
+	return "new " + o.namedTypeExpr(ctx, target) + "(" + value + ", true)", true
 }
 
 func (o *LoweringOwner) lowerStructClone(value string) string {
