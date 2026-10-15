@@ -1,4 +1,11 @@
-import { GoSlice, isArrayOrGoSlice, sliceElems, sliceSlot } from './slice.js'
+import {
+  GoSlice,
+  isArrayOrGoSlice,
+  isTypedSlice,
+  sliceElems,
+  sliceSlot,
+  type TypedSlice,
+} from './slice.js'
 import type { Slice, SliceProxy, StringHeaderData } from './slice.js'
 import {
   arrayValueTypeInfo,
@@ -50,12 +57,12 @@ export function clear<T>(
     return
   }
 
-  // A map loses its entries, and a byte slice is zeroed in place.
+  // A map loses its entries, and a typed slice is zeroed in place.
   if (v instanceof Map) {
     v.clear()
     return
   }
-  if (v instanceof Uint8Array) {
+  if (isTypedSlice(v)) {
     v.fill(0)
     return
   }
@@ -450,8 +457,8 @@ export function structEqual(
 // has no index slots, so its elements are read through sliceElems.
 function isArrayLike(
   value: unknown,
-): value is unknown[] | GoSlice<unknown> | Uint8Array {
-  return isArrayOrGoSlice(value) || value instanceof Uint8Array
+): value is unknown[] | GoSlice<unknown> | TypedSlice {
+  return isArrayOrGoSlice(value) || isTypedSlice(value)
 }
 
 function hasGoType(value: unknown): value is {
@@ -591,8 +598,10 @@ function unwrapGoValue<T>(value: T): T {
 }
 
 // Bytes represents Go byte slices, including nil and array-backed slices.
+// Its TypeScript type is that of any slice of numbers, but at run time a
+// byte slice held in a typed array is a Uint8Array, never another TypedSlice.
 export type Bytes = Uint8Array | Slice<number>
-type ByteData = Uint8Array | number[] | SliceProxy<number>
+type ByteData = TypedSlice | number[] | SliceProxy<number>
 
 const maxUint64BigInt = 0xffffffffffffffffn
 
@@ -1153,7 +1162,7 @@ function uint64Result(value: bigint): bigint {
  */
 export function normalizeBytes(
   bytes:
-    | Uint8Array
+    | TypedSlice
     | number[]
     | SliceProxy<number>
     | null
@@ -1166,6 +1175,9 @@ export function normalizeBytes(
   }
   if (bytes instanceof Uint8Array) {
     return bytes
+  }
+  if (isTypedSlice(bytes)) {
+    return new Uint8Array(bytes)
   }
 
   // An object with a data array copies the data.
@@ -1285,7 +1297,7 @@ export function bytesCompare(a: Bytes | null, b: Bytes | null): number {
 }
 
 function bytesLen(bytes: ByteData): number {
-  if (bytes instanceof Uint8Array) {
+  if (isTypedSlice(bytes)) {
     return bytes.length
   }
   if (isSliceProxy(bytes)) {
@@ -1295,7 +1307,7 @@ function bytesLen(bytes: ByteData): number {
 }
 
 function byteAt(bytes: ByteData, index: number): number {
-  if (bytes instanceof Uint8Array || Array.isArray(bytes)) {
+  if (isTypedSlice(bytes) || Array.isArray(bytes)) {
     return bytes[index] ?? 0
   }
   const meta = (bytes as SliceProxy<number>).__meta__
@@ -1309,7 +1321,7 @@ export function bytesToArray(bytes: Bytes | null): number[] {
   bytes = bytesValue(bytes) as Bytes | null
   if (bytes === null) return []
 
-  if (bytes instanceof Uint8Array) {
+  if (isTypedSlice(bytes)) {
     return Array.from(bytes)
   }
 
