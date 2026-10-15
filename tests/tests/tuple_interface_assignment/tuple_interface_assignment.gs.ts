@@ -49,7 +49,7 @@ export async function main(): globalThis.Promise<void> {
 	let __goscriptTuple0: any = makeReader()
 	r = $.interfaceValue<reader | null>(__goscriptTuple0[0], "*main.concrete", /* @__PURE__ */ $.pointerType("main.concrete"))
 	err = __goscriptTuple0[1]
-	await $.println("ok", ((__goscriptAwait = (r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? (r as Exclude<reader, null>) : $.pointerValue<Exclude<reader, null>>(r)).Read(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) == 7) && (err == null))
+	await $.println("ok", ((__goscriptAwait = (r !== null && (r as any).__isVarRef !== true && ((r as any).__goValue === undefined || (r as any).__goType?.charCodeAt(0) !== 42) ? (r as Exclude<reader, null>) : $.pointerValue<Exclude<reader, null>>(r)).Read(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) == 7) && (err == null))
 }
 
 var __goscriptAwait: any

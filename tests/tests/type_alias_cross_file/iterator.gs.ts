@@ -16,5 +16,5 @@ $.registerInterfaceType(
 );
 
 export function Read(r: Reader | null): __goscript_alias.Value {
-	return ((r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? (r as Exclude<Reader, null>) : $.pointerValue<Exclude<Reader, null>>(r)).Val() as __goscript_alias.Value)
+	return ((r !== null && (r as any).__isVarRef !== true && ((r as any).__goValue === undefined || (r as any).__goType?.charCodeAt(0) !== 42) ? (r as Exclude<Reader, null>) : $.pointerValue<Exclude<Reader, null>>(r)).Val() as __goscript_alias.Value)
 }

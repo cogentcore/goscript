@@ -70,7 +70,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("create err nil", err == null)
 	await $.println("der nonempty", $.sliceLen(der) != 0)
 	if (err != null) {
-		await $.println("create error", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+		await $.println("create error", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		return
 	}
 
@@ -80,7 +80,7 @@ export async function main(): globalThis.Promise<void> {
 	let cert$: x509.Certificate = cert == null ? $.pointerTarget<x509.Certificate>(cert) : (cert as any).__isVarRef === true ? (cert as any).value : (cert as any).__goValue === undefined ? (cert as any) : $.pointerTarget<x509.Certificate>(cert)
 	await $.println("parse err nil", err == null)
 	if (err != null) {
-		await $.println("parse error", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+		await $.println("parse error", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		return
 	}
 	let keyExt: pkix.Extension = new pkix.Extension(undefined, true)
@@ -108,7 +108,7 @@ export async function main(): globalThis.Promise<void> {
 	err = __goscriptTuple5[1]
 	await $.println("verify err nil", err == null)
 	if (err != null) {
-		await $.println("verify error", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+		await $.println("verify error", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		await $.println("verify error type", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf((err as any))).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		{
 			const __goscriptTypeSwitchValue = err

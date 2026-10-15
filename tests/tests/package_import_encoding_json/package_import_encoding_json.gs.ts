@@ -151,7 +151,7 @@ export async function main(): globalThis.Promise<void> {
 	let b: $.Slice<number> = __goscriptTuple0[0]
 	let err = __goscriptTuple0[1]
 	if (err != null) {
-		results = $.appendOne(results, "Marshal error: " + (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+		results = $.appendOne(results, "Marshal error: " + (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	} else {
 		results = $.appendOne(results, "Marshal: " + $.bytesToString(b))
 	}
@@ -159,7 +159,7 @@ export async function main(): globalThis.Promise<void> {
 	let indented: $.Slice<number> = __goscriptTuple1[0]
 	err = __goscriptTuple1[1]
 	if (err != null) {
-		results = $.appendOne(results, "MarshalIndent error: " + (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+		results = $.appendOne(results, "MarshalIndent error: " + (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	} else {
 		results = $.appendOne(results, "MarshalIndent: " + strings.ReplaceAll($.bytesToString(indented), "\n", "|"))
 	}
@@ -169,7 +169,7 @@ export async function main(): globalThis.Promise<void> {
 	{
 		let __goscriptShadow0 = (json.Unmarshal(new Uint8Array([123, 34, 110, 97, 109, 101, 34, 58, 34, 66, 111, 98, 34, 44, 34, 97, 103, 101, 34, 58, 50, 53, 44, 34, 97, 99, 116, 105, 118, 101, 34, 58, 102, 97, 108, 115, 101, 125]), $.interfaceValue(q, "*main.Person", /* @__PURE__ */ $.pointerType("main.Person"))) as $.GoError)
 		if (__goscriptShadow0 != null) {
-			results = $.appendOne(results, "Unmarshal struct error: " + (__goscriptAwait = (__goscriptShadow0 !== null && (__goscriptShadow0 as any).__isVarRef !== true && (__goscriptShadow0 as any).__goValue === undefined ? (__goscriptShadow0 as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(__goscriptShadow0)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+			results = $.appendOne(results, "Unmarshal struct error: " + (__goscriptAwait = (__goscriptShadow0 !== null && (__goscriptShadow0 as any).__isVarRef !== true && ((__goscriptShadow0 as any).__goValue === undefined || (__goscriptShadow0 as any).__goType?.charCodeAt(0) !== 42) ? (__goscriptShadow0 as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(__goscriptShadow0)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		} else {
 			results = $.appendOne(results, "Unmarshal struct: Name=" + q.value.Name + ", Age=" + strconv.Itoa(q.value.Age) + ", Active=" + strconv.FormatBool(q.value.Active))
 		}
@@ -180,7 +180,7 @@ export async function main(): globalThis.Promise<void> {
 	{
 		let __goscriptShadow1 = (json.Unmarshal(new Uint8Array([123, 34, 110, 97, 109, 101, 34, 58, 34, 67, 97, 114, 111, 108, 34, 44, 34, 97, 103, 101, 34, 58, 50, 50, 44, 34, 97, 99, 116, 105, 118, 101, 34, 58, 116, 114, 117, 101, 125]), $.interfaceValue(m, "*map[string]interface{}", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), { kind: $.TypeKind.Interface, methods: [] })))) as $.GoError)
 		if (__goscriptShadow1 != null) {
-			results = $.appendOne(results, "Unmarshal map error: " + (__goscriptAwait = (__goscriptShadow1 !== null && (__goscriptShadow1 as any).__isVarRef !== true && (__goscriptShadow1 as any).__goValue === undefined ? (__goscriptShadow1 as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(__goscriptShadow1)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+			results = $.appendOne(results, "Unmarshal map error: " + (__goscriptAwait = (__goscriptShadow1 !== null && (__goscriptShadow1 as any).__isVarRef !== true && ((__goscriptShadow1 as any).__goValue === undefined || (__goscriptShadow1 as any).__goType?.charCodeAt(0) !== 42) ? (__goscriptShadow1 as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(__goscriptShadow1)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		} else {
 			let name = $.mustTypeAssert<string>($.mapGet<string, any, any>(m.value, "name", null)[0], /* @__PURE__ */ $.basicType("string"))
 			let age = $.int($.mustTypeAssert<number>($.mapGet<string, any, any>(m.value, "age", null)[0], /* @__PURE__ */ $.basicType("float64")))
@@ -200,7 +200,7 @@ export async function main(): globalThis.Promise<void> {
 	// A Number in an interface carries all of its methods, including
 	// the json/v2 MarshalJSONTo and UnmarshalJSONFrom.
 	let num: fmt.Stringer | null = $.namedValueInterfaceValue<fmt.Stringer | null>(globalThis.String("12.5"), "json.Number", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2())
-	await $.println("Number as Stringer:", (__goscriptAwait = (num !== null && (num as any).__isVarRef !== true && (num as any).__goValue === undefined ? (num as Exclude<fmt.Stringer, null>) : $.pointerValue<Exclude<fmt.Stringer, null>>(num)).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println("Number as Stringer:", (__goscriptAwait = (num !== null && (num as any).__isVarRef !== true && ((num as any).__goValue === undefined || (num as any).__goType?.charCodeAt(0) !== 42) ? (num as Exclude<fmt.Stringer, null>) : $.pointerValue<Exclude<fmt.Stringer, null>>(num)).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
 	// Decoding an object into a non-nil map adds to the existing entries.
 	let mp: $.VarRef<globalThis.Map<string, number> | null> = $.varRef($.makeMap<string, number>([["a", 1], ["b", 2]]))

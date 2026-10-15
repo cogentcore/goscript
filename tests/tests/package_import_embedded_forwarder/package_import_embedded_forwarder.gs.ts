@@ -63,9 +63,9 @@ export function NewVerboseStore(name: string): VerboseStore | $.VarRef<VerboseSt
 }
 
 export async function useStore(store: Store | null): globalThis.Promise<void> {
-	let read = ((__goscriptAwait = (store !== null && (store as any).__isVarRef !== true && (store as any).__goValue === undefined ? (store as Exclude<Store, null>) : $.pointerValue<Exclude<Store, null>>(store)).NewTransaction(false), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as tx.Tx | $.VarRef<tx.Tx> | null)
-	let write = ((__goscriptAwait = (store !== null && (store as any).__isVarRef !== true && (store as any).__goValue === undefined ? (store as Exclude<Store, null>) : $.pointerValue<Exclude<Store, null>>(store)).NewTransaction(true), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as tx.Tx | $.VarRef<tx.Tx> | null)
-	await $.println((__goscriptAwait = (store !== null && (store as any).__isVarRef !== true && (store as any).__goValue === undefined ? (store as Exclude<Store, null>) : $.pointerValue<Exclude<Store, null>>(store)).Execute(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	let read = ((__goscriptAwait = (store !== null && (store as any).__isVarRef !== true && ((store as any).__goValue === undefined || (store as any).__goType?.charCodeAt(0) !== 42) ? (store as Exclude<Store, null>) : $.pointerValue<Exclude<Store, null>>(store)).NewTransaction(false), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as tx.Tx | $.VarRef<tx.Tx> | null)
+	let write = ((__goscriptAwait = (store !== null && (store as any).__isVarRef !== true && ((store as any).__goValue === undefined || (store as any).__goType?.charCodeAt(0) !== 42) ? (store as Exclude<Store, null>) : $.pointerValue<Exclude<Store, null>>(store)).NewTransaction(true), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as tx.Tx | $.VarRef<tx.Tx> | null)
+	await $.println((__goscriptAwait = (store !== null && (store as any).__isVarRef !== true && ((store as any).__goValue === undefined || (store as any).__goType?.charCodeAt(0) !== 42) ? (store as Exclude<Store, null>) : $.pointerValue<Exclude<Store, null>>(store)).Execute(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	await $.println($.pointerValue<dep.Tx>(read).Name)
 	await $.println($.pointerValue<dep.Tx>(write).Name)
 }

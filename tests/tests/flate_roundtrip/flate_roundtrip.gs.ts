@@ -43,7 +43,7 @@ export async function main(): globalThis.Promise<void> {
 			$.panic((err as any))
 		}
 		{
-			let __goscriptShadow2 = await (reader !== null && (reader as any).__isVarRef !== true && (reader as any).__goValue === undefined ? (reader as Exclude<io.ReadCloser, null>) : $.pointerValue<Exclude<io.ReadCloser, null>>(reader)).Close()
+			let __goscriptShadow2 = await (reader !== null && (reader as any).__isVarRef !== true && ((reader as any).__goValue === undefined || (reader as any).__goType?.charCodeAt(0) !== 42) ? (reader as Exclude<io.ReadCloser, null>) : $.pointerValue<Exclude<io.ReadCloser, null>>(reader)).Close()
 			if (__goscriptShadow2 != null) {
 				$.panic((__goscriptShadow2 as any))
 			}

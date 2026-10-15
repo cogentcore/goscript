@@ -106,7 +106,7 @@ export async function marshal(): globalThis.Promise<void> {
 
 	let __goscriptTuple2: any = $.markAsStructValue($.cloneStructValue(time.Date(10000, 1, 1, 0, 0, 0, 0, time.UTC))).MarshalJSON()
 	err = __goscriptTuple2[1]
-	await $.println("marshal json year 10000 err", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println("marshal json year 10000 err", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 }
 
 export async function timers(): globalThis.Promise<void> {

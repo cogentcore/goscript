@@ -103,11 +103,11 @@ export async function main(): globalThis.Promise<void> {
 	await $.println((fmt.Sprint($.interfaceValue(new point({x: 4, y: 5}, true), "main.point", "main.point"), "x", $.basicInterfaceValue(6, "int")) as string))
 
 	let [, err] = parse(3, "abc")
-	await $.println((__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println((__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	await $.println(message(err))
 
 	let wrapped = fmt.Errorf("wrap %v: %w", $.interfaceValue(new point({x: 7, y: 8}, true), "main.point", "main.point"), (err as any))
-	await $.println((__goscriptAwait = (wrapped !== null && (wrapped as any).__isVarRef !== true && (wrapped as any).__goValue === undefined ? (wrapped as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(wrapped)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), $.comparableEqual(errors.Unwrap($.pointerValueOrNil(wrapped)!), err))
+	await $.println((__goscriptAwait = (wrapped !== null && (wrapped as any).__isVarRef !== true && ((wrapped as any).__goValue === undefined || (wrapped as any).__goType?.charCodeAt(0) !== 42) ? (wrapped as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(wrapped)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), $.comparableEqual(errors.Unwrap($.pointerValueOrNil(wrapped)!), err))
 }
 
 var __goscriptAwait: any

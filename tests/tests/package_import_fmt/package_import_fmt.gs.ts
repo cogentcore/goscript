@@ -42,7 +42,7 @@ export class byteFormatter {
 		const b = this;
 		let buf: $.Slice<number> = $.appendSlice(new Uint8Array([]) as $.Slice<number>, b.prefix, $.byteSliceHint)
 		buf = $.append(buf, $.uint($.uint(verb, 8), 8), $.byteSliceHint);
-		;((state !== null && (state as any).__isVarRef !== true && (state as any).__goValue === undefined ? (state as Exclude<fmt.State, null>) : $.pointerValue<Exclude<fmt.State, null>>(state)).Write(buf) as [number, $.GoError])
+		;((state !== null && (state as any).__isVarRef !== true && ((state as any).__goValue === undefined || (state as any).__goType?.charCodeAt(0) !== 42) ? (state as Exclude<fmt.State, null>) : $.pointerValue<Exclude<fmt.State, null>>(state)).Write(buf) as [number, $.GoError])
 	}
 
 	static __typeInfo = $.registerStructType(

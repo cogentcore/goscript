@@ -293,8 +293,8 @@ export async function main(): globalThis.Promise<void> {
 	await rw.value.rawRW.RWMutex.RLock()
 	rw.value.rawRW.RWMutex.RUnlock()
 	let locker = rw.value.rawRW.RWMutex.RLocker()
-	await (locker !== null && (locker as any).__isVarRef !== true && (locker as any).__goValue === undefined ? (locker as Exclude<sync.Locker, null>) : $.pointerValue<Exclude<sync.Locker, null>>(locker)).Lock()
-	void (__goscriptAwait = (locker !== null && (locker as any).__isVarRef !== true && (locker as any).__goValue === undefined ? (locker as Exclude<sync.Locker, null>) : $.pointerValue<Exclude<sync.Locker, null>>(locker)).Unlock(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+	await (locker !== null && (locker as any).__isVarRef !== true && ((locker as any).__goValue === undefined || (locker as any).__goType?.charCodeAt(0) !== 42) ? (locker as Exclude<sync.Locker, null>) : $.pointerValue<Exclude<sync.Locker, null>>(locker)).Lock()
+	void (__goscriptAwait = (locker !== null && (locker as any).__isVarRef !== true && ((locker as any).__goValue === undefined || (locker as any).__goType?.charCodeAt(0) !== 42) ? (locker as Exclude<sync.Locker, null>) : $.pointerValue<Exclude<sync.Locker, null>>(locker)).Unlock(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 
 	let or = new outerRunner({rawRunner: new rawRunner({runner: $.interfaceValue<runner | null>(new runnable(undefined, true), "main.runnable", "main.runnable")}, true)}, true)
 	await $.println($.pointerValue<Exclude<runner, null>>(or.rawRunner.runner).Run())

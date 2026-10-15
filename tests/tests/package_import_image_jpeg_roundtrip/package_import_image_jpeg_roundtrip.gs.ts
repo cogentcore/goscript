@@ -19,7 +19,7 @@ export async function main(): globalThis.Promise<void> {
 	{
 		let err = await jpeg.Encode($.interfaceValue<io.Writer | null>(buf, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer")), $.interfaceValue<image.Image | null>(im, "*image.RGBA", /* @__PURE__ */ $.pointerType("image.RGBA")), new jpeg.Options({Quality: 90}))
 		if (err != null) {
-			await $.println("encode error:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+			await $.println("encode error:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 			return
 		}
 	}
@@ -33,11 +33,11 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("sum:", sum)
 	let [m, err] = await jpeg.Decode($.interfaceValue<io.Reader | null>(bytes.NewReader(b), "*bytes.Reader", /* @__PURE__ */ $.pointerType("bytes.Reader")))
 	if (err != null) {
-		await $.println("decode error:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+		await $.println("decode error:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		return
 	}
-	let [r, g, bb, ] = await $.pointerValue<Exclude<color.Color, null>>((__goscriptAwait = (m !== null && (m as any).__isVarRef !== true && (m as any).__goValue === undefined ? (m as Exclude<image.Image, null>) : $.pointerValue<Exclude<image.Image, null>>(m)).At(5, 7), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)).RGBA()
-	await $.println("bounds:", ((__goscriptAwait = (m !== null && (m as any).__isVarRef !== true && (m as any).__goValue === undefined ? (m as Exclude<image.Image, null>) : $.pointerValue<Exclude<image.Image, null>>(m)).Bounds(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as image.Rectangle).Dx(), ((__goscriptAwait = (m !== null && (m as any).__isVarRef !== true && (m as any).__goValue === undefined ? (m as Exclude<image.Image, null>) : $.pointerValue<Exclude<image.Image, null>>(m)).Bounds(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as image.Rectangle).Dy(), "px:", $.uint($.uintShr(r, 8, 32), 32), $.uint($.uintShr(g, 8, 32), 32), $.uint($.uintShr(bb, 8, 32), 32))
+	let [r, g, bb, ] = await $.pointerValue<Exclude<color.Color, null>>((__goscriptAwait = (m !== null && (m as any).__isVarRef !== true && ((m as any).__goValue === undefined || (m as any).__goType?.charCodeAt(0) !== 42) ? (m as Exclude<image.Image, null>) : $.pointerValue<Exclude<image.Image, null>>(m)).At(5, 7), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)).RGBA()
+	await $.println("bounds:", ((__goscriptAwait = (m !== null && (m as any).__isVarRef !== true && ((m as any).__goValue === undefined || (m as any).__goType?.charCodeAt(0) !== 42) ? (m as Exclude<image.Image, null>) : $.pointerValue<Exclude<image.Image, null>>(m)).Bounds(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as image.Rectangle).Dx(), ((__goscriptAwait = (m !== null && (m as any).__isVarRef !== true && ((m as any).__goValue === undefined || (m as any).__goType?.charCodeAt(0) !== 42) ? (m as Exclude<image.Image, null>) : $.pointerValue<Exclude<image.Image, null>>(m)).Bounds(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as image.Rectangle).Dy(), "px:", $.uint($.uintShr(r, 8, 32), 32), $.uint($.uintShr(g, 8, 32), 32), $.uint($.uintShr(bb, 8, 32), 32))
 }
 
 var __goscriptAwait: any

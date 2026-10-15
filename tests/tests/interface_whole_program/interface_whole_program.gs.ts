@@ -308,7 +308,7 @@ export function totalArea(shapes: $.Slice<Shape | null>): number {
 	let total = 0
 	for (let __goscriptRangeTarget0 = shapes, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
 		let shape = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as Shape | null)
-		total += (shape !== null && (shape as any).__isVarRef !== true && (shape as any).__goValue === undefined ? (shape as Exclude<Shape, null>) : $.pointerValue<Exclude<Shape, null>>(shape)).Area()
+		total += (shape !== null && (shape as any).__isVarRef !== true && ((shape as any).__goValue === undefined || (shape as any).__goType?.charCodeAt(0) !== 42) ? (shape as Exclude<Shape, null>) : $.pointerValue<Exclude<Shape, null>>(shape)).Area()
 	}
 	return total
 }
@@ -316,13 +316,13 @@ export function totalArea(shapes: $.Slice<Shape | null>): number {
 export async function sumNext(src: Source | null, count: number): globalThis.Promise<number> {
 	let sum = 0
 	for (let __goscriptRangeCount0 = count, __rangeIndex = 0; __rangeIndex < __goscriptRangeCount0; __rangeIndex++) {
-		sum += (__goscriptAwait = (src !== null && (src as any).__isVarRef !== true && (src as any).__goValue === undefined ? (src as Exclude<Source, null>) : $.pointerValue<Exclude<Source, null>>(src)).Next(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+		sum += (__goscriptAwait = (src !== null && (src as any).__isVarRef !== true && ((src as any).__goValue === undefined || (src as any).__goType?.charCodeAt(0) !== 42) ? (src as Exclude<Source, null>) : $.pointerValue<Exclude<Source, null>>(src)).Next(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 	}
 	return sum
 }
 
 export async function readGetter(g: Getter | null): globalThis.Promise<number> {
-	return (g !== null && (g as any).__isVarRef !== true && (g as any).__goValue === undefined ? (g as Exclude<Getter, null>) : $.pointerValue<Exclude<Getter, null>>(g)).Get()
+	return (g !== null && (g as any).__isVarRef !== true && ((g as any).__goValue === undefined || (g as any).__goType?.charCodeAt(0) !== 42) ? (g as Exclude<Getter, null>) : $.pointerValue<Exclude<Getter, null>>(g)).Get()
 }
 
 export function fixedLabel_Label(f: fixedLabel): string {
@@ -330,7 +330,7 @@ export function fixedLabel_Label(f: fixedLabel): string {
 }
 
 export function describe(n: Namer | null): string {
-	return (n !== null && (n as any).__isVarRef !== true && (n as any).__goValue === undefined ? (n as Exclude<Namer, null>) : $.pointerValue<Exclude<Namer, null>>(n)).Name()
+	return (n !== null && (n as any).__isVarRef !== true && ((n as any).__goValue === undefined || (n as any).__goType?.charCodeAt(0) !== 42) ? (n as Exclude<Namer, null>) : $.pointerValue<Exclude<Namer, null>>(n)).Name()
 }
 
 export async function main(): globalThis.Promise<void> {

@@ -75,7 +75,7 @@ export class Counter {
 }
 
 export function call(adder: Adder | null): number {
-	return (adder !== null && (adder as any).__isVarRef !== true && (adder as any).__goValue === undefined ? (adder as Exclude<Adder, null>) : $.pointerValue<Exclude<Adder, null>>(adder)).Add(4)
+	return (adder !== null && (adder as any).__isVarRef !== true && ((adder as any).__goValue === undefined || (adder as any).__goType?.charCodeAt(0) !== 42) ? (adder as Exclude<Adder, null>) : $.pointerValue<Exclude<Adder, null>>(adder)).Add(4)
 }
 
 export async function main(): globalThis.Promise<void> {

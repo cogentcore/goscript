@@ -46,7 +46,7 @@ export function use(v: any): string {
 	if (!ok) {
 		return "bad"
 	}
-	return (__goscriptShadow0 !== null && (__goscriptShadow0 as any).__isVarRef !== true && (__goscriptShadow0 as any).__goValue === undefined ? (__goscriptShadow0 as Exclude<dumper, null>) : $.pointerValue<Exclude<dumper, null>>(__goscriptShadow0)).Dump()
+	return (__goscriptShadow0 !== null && (__goscriptShadow0 as any).__isVarRef !== true && ((__goscriptShadow0 as any).__goValue === undefined || (__goscriptShadow0 as any).__goType?.charCodeAt(0) !== 42) ? (__goscriptShadow0 as Exclude<dumper, null>) : $.pointerValue<Exclude<dumper, null>>(__goscriptShadow0)).Dump()
 }
 
 export async function main(): globalThis.Promise<void> {

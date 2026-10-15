@@ -13,7 +13,7 @@ export async function main(): globalThis.Promise<void> {
 	let data: $.Slice<number> = __goscriptTuple0[0]
 	let err = __goscriptTuple0[1]
 	if (err != null) {
-		await $.println("error marshalling:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+		await $.println("error marshalling:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		return
 	}
 
@@ -22,7 +22,7 @@ export async function main(): globalThis.Promise<void> {
 	let out: __goscript_protobuf_lite_ts_pb_ts.ExampleMsg | $.VarRef<__goscript_protobuf_lite_ts_pb_ts.ExampleMsg> | null = new __goscript_protobuf_lite_ts_pb_ts.ExampleMsg()
 	err = (out !== null && (out as any).__isVarRef !== true && (out as any).__goValue === undefined ? ((out as any) as __goscript_protobuf_lite_ts_pb_ts.ExampleMsg).UnmarshalVT(data) : __goscript_protobuf_lite_ts_pb_ts.ExampleMsg.prototype.UnmarshalVT.call(out, data))
 	if (err != null) {
-		await $.println("error unmarshalling:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+		await $.println("error unmarshalling:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		return
 	}
 
@@ -32,7 +32,7 @@ export async function main(): globalThis.Promise<void> {
 	let jdata: $.Slice<number> = __goscriptTuple1[0]
 	err = __goscriptTuple1[1]
 	if (err != null) {
-		await $.println("error marshalling to json:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+		await $.println("error marshalling to json:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		return
 	}
 
@@ -41,7 +41,7 @@ export async function main(): globalThis.Promise<void> {
 	out = new __goscript_protobuf_lite_ts_pb_ts.ExampleMsg()
 	let err2 = (out !== null && (out as any).__isVarRef !== true && (out as any).__goValue === undefined ? ((out as any) as __goscript_protobuf_lite_ts_pb_ts.ExampleMsg).UnmarshalJSON(jdata) : __goscript_protobuf_lite_ts_pb_ts.ExampleMsg.prototype.UnmarshalJSON.call(out, jdata))
 	if (err2 != null) {
-		await $.println("error unmarshalling from json:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+		await $.println("error unmarshalling from json:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		return
 	}
 
@@ -58,7 +58,7 @@ export async function main(): globalThis.Promise<void> {
 	let oneofData: $.Slice<number> = __goscriptTuple2[0]
 	err = __goscriptTuple2[1]
 	if (err != null) {
-		await $.println("error marshalling oneof:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+		await $.println("error marshalling oneof:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		return
 	}
 	await $.println("oneof size matches:", oneofSize == $.sliceLen(oneofData))
@@ -67,7 +67,7 @@ export async function main(): globalThis.Promise<void> {
 	{
 		let __goscriptShadow0 = (oneofOut !== null && (oneofOut as any).__isVarRef !== true && (oneofOut as any).__goValue === undefined ? ((oneofOut as any) as __goscript_protobuf_lite_ts_pb_ts.ExampleMsg).UnmarshalVT(oneofData) : __goscript_protobuf_lite_ts_pb_ts.ExampleMsg.prototype.UnmarshalVT.call(oneofOut, oneofData))
 		if (__goscriptShadow0 != null) {
-			await $.println("error unmarshalling oneof:", (__goscriptAwait = (__goscriptShadow0 !== null && (__goscriptShadow0 as any).__isVarRef !== true && (__goscriptShadow0 as any).__goValue === undefined ? (__goscriptShadow0 as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(__goscriptShadow0)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+			await $.println("error unmarshalling oneof:", (__goscriptAwait = (__goscriptShadow0 !== null && (__goscriptShadow0 as any).__isVarRef !== true && ((__goscriptShadow0 as any).__goValue === undefined || (__goscriptShadow0 as any).__goType?.charCodeAt(0) !== 42) ? (__goscriptShadow0 as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(__goscriptShadow0)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 			return
 		}
 	}
@@ -79,7 +79,7 @@ export async function main(): globalThis.Promise<void> {
 	let idx = __goscriptTuple3[1]
 	err = __goscriptTuple3[2]
 	if (err != null) {
-		await $.println("error decoding uint32:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+		await $.println("error decoding uint32:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		return
 	}
 	await $.println("varint uint32:", u32, idx)
@@ -89,7 +89,7 @@ export async function main(): globalThis.Promise<void> {
 	idx = __goscriptTuple4[1]
 	err = __goscriptTuple4[2]
 	if (err != null) {
-		await $.println("error decoding int32:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+		await $.println("error decoding int32:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		return
 	}
 	await $.println("varint int32:", i32, idx)
@@ -99,7 +99,7 @@ export async function main(): globalThis.Promise<void> {
 	idx = __goscriptTuple5[1]
 	err = __goscriptTuple5[2]
 	if (err != null) {
-		await $.println("error decoding int64:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+		await $.println("error decoding int64:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		return
 	}
 	await $.println("varint int64:", i64, idx)
@@ -109,7 +109,7 @@ export async function main(): globalThis.Promise<void> {
 	idx = __goscriptTuple6[1]
 	err = __goscriptTuple6[2]
 	if (err != null) {
-		await $.println("error decoding fixed32:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+		await $.println("error decoding fixed32:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		return
 	}
 	await $.println("fixed32:", fixed32, idx)
@@ -119,7 +119,7 @@ export async function main(): globalThis.Promise<void> {
 	idx = __goscriptTuple7[1]
 	err = __goscriptTuple7[2]
 	if (err != null) {
-		await $.println("error decoding fixed64:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+		await $.println("error decoding fixed64:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		return
 	}
 	await $.println("fixed64:", fixed, idx)

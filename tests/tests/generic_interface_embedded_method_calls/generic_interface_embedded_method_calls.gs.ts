@@ -65,7 +65,7 @@ export class impl {
 }
 
 export async function read(__typeArgs: $.GenericTypeArgs | undefined, d: derived | null): globalThis.Promise<any> {
-	return $.callInterfaceMethod((d !== null && (d as any).__isVarRef !== true && (d as any).__goValue === undefined ? (d as Exclude<derived, null>) : $.pointerValue<Exclude<derived, null>>(d)), "Value", {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }})
+	return $.callInterfaceMethod((d !== null && (d as any).__isVarRef !== true && ((d as any).__goValue === undefined || (d as any).__goType?.charCodeAt(0) !== 42) ? (d as Exclude<derived, null>) : $.pointerValue<Exclude<derived, null>>(d)), "Value", {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }})
 }
 
 export async function main(): globalThis.Promise<void> {

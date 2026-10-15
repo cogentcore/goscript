@@ -46,8 +46,8 @@ export async function main(): globalThis.Promise<void> {
 	let ptr = reflect.PointerTo($.pointerValueOrNil(t)!)
 	let iface = reflect.TypeFor(__goscriptStatic1())
 
-	await $.println("MyType implements Stringer:", (__goscriptAwait = (t !== null && (t as any).__isVarRef !== true && (t as any).__goValue === undefined ? (t as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(t)).Implements($.pointerValueOrNil(iface)!), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
-	await $.println("*MyType implements Stringer:", (__goscriptAwait = (ptr !== null && (ptr as any).__isVarRef !== true && (ptr as any).__goValue === undefined ? (ptr as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(ptr)).Implements($.pointerValueOrNil(iface)!), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println("MyType implements Stringer:", (__goscriptAwait = (t !== null && (t as any).__isVarRef !== true && ((t as any).__goValue === undefined || (t as any).__goType?.charCodeAt(0) !== 42) ? (t as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(t)).Implements($.pointerValueOrNil(iface)!), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println("*MyType implements Stringer:", (__goscriptAwait = (ptr !== null && (ptr as any).__isVarRef !== true && ((ptr as any).__goValue === undefined || (ptr as any).__goType?.charCodeAt(0) !== 42) ? (ptr as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(ptr)).Implements($.pointerValueOrNil(iface)!), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 }
 
 var __goscriptStatic0$value: any

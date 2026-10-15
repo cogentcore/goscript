@@ -193,7 +193,7 @@ export async function logAll(l: Logger | null, msgs: $.Slice<string>): globalThi
 	let out = ""
 	for (let __goscriptRangeTarget0 = msgs, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
 		let msg = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as string)
-		out += (__goscriptAwait = (l !== null && (l as any).__isVarRef !== true && (l as any).__goValue === undefined ? (l as Exclude<Logger, null>) : $.pointerValue<Exclude<Logger, null>>(l)).Log(msg), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+		out += (__goscriptAwait = (l !== null && (l as any).__isVarRef !== true && ((l as any).__goValue === undefined || (l as any).__goType?.charCodeAt(0) !== 42) ? (l as Exclude<Logger, null>) : $.pointerValue<Exclude<Logger, null>>(l)).Log(msg), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 	}
 	return out
 }
@@ -201,7 +201,7 @@ export async function logAll(l: Logger | null, msgs: $.Slice<string>): globalThi
 export function fill(s: Sink | null, n: number): number {
 	let last = 0
 	for (let __goscriptRangeCount0 = n, i = 0; i < __goscriptRangeCount0; i++) {
-		last = ((s !== null && (s as any).__isVarRef !== true && (s as any).__goValue === undefined ? (s as Exclude<Sink, null>) : $.pointerValue<Exclude<Sink, null>>(s)).Put(i) as number)
+		last = ((s !== null && (s as any).__isVarRef !== true && ((s as any).__goValue === undefined || (s as any).__goType?.charCodeAt(0) !== 42) ? (s as Exclude<Sink, null>) : $.pointerValue<Exclude<Sink, null>>(s)).Put(i) as number)
 	}
 	return last
 }
