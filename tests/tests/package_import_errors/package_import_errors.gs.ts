@@ -92,9 +92,9 @@ export class wrappedErr {
 		target.err = $.assignFieldValue(target.err, values.err, "error")
 	}
 
-	public async Error(): globalThis.Promise<string> {
+	public Error(): string {
 		const e = this;
-		return "wrapped: " + (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>(e.err).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+		return "wrapped: " + ($.pointerValue<Exclude<$.GoError, null>>(e.err).Error() as string)
 	}
 
 	public Unwrap(): $.GoError {

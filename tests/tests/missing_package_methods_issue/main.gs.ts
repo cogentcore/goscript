@@ -8,11 +8,11 @@ import * as slices from "@goscript/slices/index.js"
 export async function main(): globalThis.Promise<void> {
 	// Test slices.Delete which was missing in the error output
 	let numbers: $.Slice<number> = $.arrayToSlice<number>([1, 2, 3, 4, 5])
-	await fmt.Printf("Original: %v\n", $.interfaceValue(numbers, "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"))))
+	fmt.Printf("Original: %v\n", $.interfaceValue(numbers, "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"))))
 
 	// This should work but might be missing from the slices package implementation
 	numbers = (slices.Delete(numbers, 1, 3) as $.Slice<number>)
-	await fmt.Printf("After delete: %v\n", $.interfaceValue(numbers, "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"))))
+	fmt.Printf("After delete: %v\n", $.interfaceValue(numbers, "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"))))
 
 	// Test slices.BinarySearchFunc which was also missing
 	let data = $.arrayToSlice<number>([10, 20, 30, 40, 50])
@@ -27,7 +27,7 @@ export async function main(): globalThis.Promise<void> {
 		return 0
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo)))
 
-	await fmt.Printf("Index: %d, Found: %t\n", $.basicInterfaceValue(index, "int"), found)
+	fmt.Printf("Index: %d, Found: %t\n", $.basicInterfaceValue(index, "int"), found)
 }
 
 if ($.isMainScript(import.meta)) {

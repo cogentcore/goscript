@@ -247,7 +247,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 	await $.println("json UseNumber:", kind($.mapGet<string, any, any>(obj.value, "n", null)[0]))
 
-	await $.println("fmt:", await fmt.Sprint($.namedValueInterfaceValue<any>(8, "main.MyInt", {}, /* @__PURE__ */ $.basicType("int32", "main.MyInt")), " ", $.namedValueInterfaceValue<any>("p", "main.Name", {}, /* @__PURE__ */ $.basicType("string", "main.Name")), " ", a))
+	await $.println("fmt:", (fmt.Sprint($.namedValueInterfaceValue<any>(8, "main.MyInt", {}, /* @__PURE__ */ $.basicType("int32", "main.MyInt")), " ", $.namedValueInterfaceValue<any>("p", "main.Name", {}, /* @__PURE__ */ $.basicType("string", "main.Name")), " ", a) as string))
 
 	// A named basic value equals an interface holding it.
 	let err = _get(0)

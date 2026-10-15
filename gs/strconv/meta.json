@@ -5,7 +5,12 @@
   "asyncFunctions": {
     "ParseComplex": true
   },
-  "asyncMethods": {
-    "NumError.Error": true
+  "asyncWhenMethods": {
+    "NumError.Error": [
+      "Error",
+      "Format",
+      "GoString",
+      "String"
+    ]
   }
 }

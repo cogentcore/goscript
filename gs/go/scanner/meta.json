@@ -1,9 +1,19 @@
 {
   "asyncFunctions": {
-    "ErrorList_Error": true,
     "PrintError": true
   },
-  "asyncMethods": {
-    "ErrorList.Error": true
+  "asyncWhenMethods": {
+    "ErrorList.Error": [
+      "Error",
+      "Format",
+      "GoString",
+      "String"
+    ],
+    "ErrorList_Error": [
+      "Error",
+      "Format",
+      "GoString",
+      "String"
+    ]
   }
 }

@@ -19,6 +19,7 @@ import "embed"
 //go:embed gs/builtin/hostio.ts
 //go:embed gs/builtin/index.ts
 //go:embed gs/builtin/map.ts
+//go:embed gs/builtin/meta.json
 //go:embed gs/builtin/panic.ts
 //go:embed gs/builtin/print.ts
 //go:embed gs/builtin/scheduler.ts

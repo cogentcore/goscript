@@ -45,7 +45,7 @@ export class Simple {
 
 export async function main(): globalThis.Promise<void> {
 	let s = new Simple({X: 42}, true)
-	let __goscriptTuple0: any = json.Marshal($.interfaceValue((s).clone(), "main.Simple", "main.Simple"))
+	let __goscriptTuple0: any = (json.Marshal($.interfaceValue((s).clone(), "main.Simple", "main.Simple")) as [$.Slice<number>, $.GoError])
 	let b: $.Slice<number> = __goscriptTuple0[0]
 	let err = __goscriptTuple0[1]
 	if (err != null) {

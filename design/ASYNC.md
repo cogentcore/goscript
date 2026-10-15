@@ -114,6 +114,30 @@ A library build keeps every class async. A call through a value of a sync
 class is not awaited, and its result is asserted to its Go type, since the
 TypeScript type of a function value admits a promise.
 
+### Conditionally Async Overrides
+
+Override metadata can make a function, a method or an interface method async
+only in a program with an async compiled method of given names
+(`asyncWhenMethods` in `meta.json`, keyed by a function name or
+`Type.Method`, with `builtin` holding universe objects):
+
+- The fmt print functions (`Sprint*`, `Print*`, `Append*`) depend on
+  `Error`, `Format`, `GoString` and `String`, the methods they may call. They
+  return a plain value when every operand renders synchronously. `Fprint*`
+  stay async, since they write to an `io.Writer`.
+- Override error types whose `Error` wraps another error's (`strconv.NumError`,
+  `fs.PathError`, `os.LinkError`, `os.SyscallError`, `scanner.ErrorList`,
+  `pkg/errors`, `cryptobyte.BuildError`) depend on the same names.
+- `error.Error` (in `gs/builtin/meta.json`) depends on the same names: the
+  error values override packages produce suspend only by formatting operands
+  or wrapping other errors. In a whole program, `error` is therefore closed:
+  a call of `Error` suspends only where a compiled method of one of those
+  names is async, or an override method of one is marked async.
+
+A call of such a target that the program leaves sync is not awaited, and its
+result is asserted to its Go type, since its TypeScript type admits a
+promise.
+
 ### Implementation Analysis Flow
 
 ```

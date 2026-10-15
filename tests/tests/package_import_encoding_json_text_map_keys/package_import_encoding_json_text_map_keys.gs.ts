@@ -162,20 +162,20 @@ export async function main(): globalThis.Promise<void> {
 	}
 	await $.println("comment:", $.mapGet<Tokens, string, string>($.mapGet<string, Style, Style>(d.value.Styles, "x", null)[0], 2, "")[0])
 	await $.println("kind:", Tokens_String(d.value.Kind), "kinds:", $.sliceLen(d.value.Kinds), Tokens_String($.arrayIndex(d.value.Kinds!, 0)), Tokens_String($.arrayIndex(d.value.Kinds!, 1)))
-	let __goscriptTuple0: any = json.Marshal($.interfaceValue(new Doc({Kind: 1, Kinds: $.arrayToSlice<Tokens>([2])}, true), "main.Doc", "main.Doc"))
+	let __goscriptTuple0: any = (json.Marshal($.interfaceValue(new Doc({Kind: 1, Kinds: $.arrayToSlice<Tokens>([2])}, true), "main.Doc", "main.Doc")) as [$.Slice<number>, $.GoError])
 	let b: $.Slice<number> = __goscriptTuple0[0]
 	await $.println("marshal doc:", $.bytesToString(b))
 	await $.println("counts:", $.mapGet<number, number, number>(d.value.Counts, 1, 0)[0], $.mapGet<number, number, number>(d.value.Counts, -3, 0)[0])
 	await $.println("big:", $.mapGet<bigint, string, string>(d.value.Big, 9007199254740993n, "")[0])
 
-	let __goscriptTuple1: any = json.Marshal($.interfaceValue($.makeMap<Tokens, string>([[2, "gray"], [1, "bold"]]), "main.Style", "main.Style"))
+	let __goscriptTuple1: any = (json.Marshal($.interfaceValue($.makeMap<Tokens, string>([[2, "gray"], [1, "bold"]]), "main.Style", "main.Style")) as [$.Slice<number>, $.GoError])
 	b = __goscriptTuple1[0]
 	err = __goscriptTuple1[1]
 	if (err != null) {
 		await $.println("error:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	}
 	await $.println("marshal:", $.bytesToString(b))
-	let __goscriptTuple2: any = json.Marshal($.interfaceValue($.makeMap<number, boolean>([[3, true], [1, false]]), "map[int]bool", /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("bool"))))
+	let __goscriptTuple2: any = (json.Marshal($.interfaceValue($.makeMap<number, boolean>([[3, true], [1, false]]), "map[int]bool", /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("bool")))) as [$.Slice<number>, $.GoError])
 	b = __goscriptTuple2[0]
 	await $.println("marshal ints:", $.bytesToString(b))
 

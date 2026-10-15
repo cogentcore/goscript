@@ -126,22 +126,22 @@ export async function main(): globalThis.Promise<void> {
 	let zero = $.varRef(0)
 	let falseValue = $.varRef(false)
 	let nilIface: $.VarRef<any> = $.varRef(null! as any)
-	let __goscriptTuple0: any = json.Marshal($.interfaceValue(new Payload({Ptr: zero, IfaceZero: $.basicInterfaceValue(0, "int"), IfaceFalse: false, IfaceEmptyString: "", IfaceEmptySlice: $.interfaceValue($.arrayToSlice<number>([]), "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"))), IfaceEmptyMap: $.interfaceValue($.makeMap<string, number>([]), "map[string]int", /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("int"))), PtrNilIface: nilIface, PtrBool: falseValue}, true), "main.Payload", "main.Payload"))
+	let __goscriptTuple0: any = (json.Marshal($.interfaceValue(new Payload({Ptr: zero, IfaceZero: $.basicInterfaceValue(0, "int"), IfaceFalse: false, IfaceEmptyString: "", IfaceEmptySlice: $.interfaceValue($.arrayToSlice<number>([]), "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"))), IfaceEmptyMap: $.interfaceValue($.makeMap<string, number>([]), "map[string]int", /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("int"))), PtrNilIface: nilIface, PtrBool: falseValue}, true), "main.Payload", "main.Payload")) as [$.Slice<number>, $.GoError])
 	let out: $.Slice<number> = __goscriptTuple0[0]
 	let err = __goscriptTuple0[1]
 	if (err != null) {
-		await fmt.Println("marshal error:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+		fmt.Println("marshal error:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		return
 	}
 	let text = $.bytesToString(out)
-	await fmt.Println("ptr emitted:", strings.Contains(text, "\"ptr\":"))
-	await fmt.Println("ifaceZero emitted:", strings.Contains(text, "\"ifaceZero\":"))
-	await fmt.Println("ifaceFalse emitted:", strings.Contains(text, "\"ifaceFalse\":"))
-	await fmt.Println("ifaceEmptyString emitted:", strings.Contains(text, "\"ifaceEmptyString\":"))
-	await fmt.Println("ifaceEmptySlice emitted:", strings.Contains(text, "\"ifaceEmptySlice\":"))
-	await fmt.Println("ifaceEmptyMap emitted:", strings.Contains(text, "\"ifaceEmptyMap\":"))
-	await fmt.Println("ptrNilIface emitted as null:", strings.Contains(text, "\"ptrNilIface\":null"))
-	await fmt.Println("ptrBool emitted:", strings.Contains(text, "\"ptrBool\":"))
+	fmt.Println("ptr emitted:", strings.Contains(text, "\"ptr\":"))
+	fmt.Println("ifaceZero emitted:", strings.Contains(text, "\"ifaceZero\":"))
+	fmt.Println("ifaceFalse emitted:", strings.Contains(text, "\"ifaceFalse\":"))
+	fmt.Println("ifaceEmptyString emitted:", strings.Contains(text, "\"ifaceEmptyString\":"))
+	fmt.Println("ifaceEmptySlice emitted:", strings.Contains(text, "\"ifaceEmptySlice\":"))
+	fmt.Println("ifaceEmptyMap emitted:", strings.Contains(text, "\"ifaceEmptyMap\":"))
+	fmt.Println("ptrNilIface emitted as null:", strings.Contains(text, "\"ptrNilIface\":null"))
+	fmt.Println("ptrBool emitted:", strings.Contains(text, "\"ptrBool\":"))
 }
 
 var __goscriptAwait: any

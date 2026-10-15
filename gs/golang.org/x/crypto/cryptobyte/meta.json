@@ -2,7 +2,12 @@
   "dependencies": [
     "time"
   ],
-  "asyncMethods": {
-    "BuildError.Error": true
+  "asyncWhenMethods": {
+    "BuildError.Error": [
+      "Error",
+      "Format",
+      "GoString",
+      "String"
+    ]
   }
 }

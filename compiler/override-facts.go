@@ -112,7 +112,7 @@ func (f *OverrideFacts) IsFunctionCallbackAsync(pkgPath, function string) bool {
 }
 
 // AsyncWhenMethods returns the method names whose async implementations make
-// the package-level function async, per override metadata.
+// the package-level function or Type.Method async, per override metadata.
 func (f *OverrideFacts) AsyncWhenMethods(pkgPath, function string) []string {
 	if f == nil {
 		return nil

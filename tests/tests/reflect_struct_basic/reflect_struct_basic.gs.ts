@@ -60,7 +60,7 @@ export async function main(): globalThis.Promise<void> {
 	let v = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue((p).clone(), "main.Person", "main.Person"))))
 	if ($.markAsStructValue($.cloneStructValue(v)).Kind() == 25) {
 		let f = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(v)).Field(0)))
-		await fmt.Println($.markAsStructValue($.cloneStructValue(f)).String())
+		fmt.Println($.markAsStructValue($.cloneStructValue(f)).String())
 	}
 }
 

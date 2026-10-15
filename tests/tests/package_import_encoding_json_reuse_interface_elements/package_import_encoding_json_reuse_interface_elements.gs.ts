@@ -152,8 +152,8 @@ export async function main(): globalThis.Promise<void> {
 	let a = new Node()
 	let b = new Custom()
 	let h = $.varRef(new Holder({Items: $.arrayToSlice<Named | null>([$.interfaceValue<Named | null>(a, "*main.Node", /* @__PURE__ */ $.pointerType("main.Node")), $.interfaceValue<Named | null>(b, "*main.Custom", /* @__PURE__ */ $.pointerType("main.Custom"))])}, true))
-	let err = json.Unmarshal(new Uint8Array([123, 34, 73, 116, 101, 109, 115, 34, 58, 91, 123, 34, 78, 97, 109, 101, 34, 58, 34, 120, 34, 125, 44, 34, 121, 34, 93, 125]), $.interfaceValue(h, "*main.Holder", /* @__PURE__ */ $.pointerType("main.Holder")))
-	await fmt.Println((err as any), $.basicInterfaceValue($.sliceLen(h.value.Items), "int"), $.comparableEqual($.arrayIndex(h.value.Items!, 0), $.interfaceValue<Named | null>(a, "*main.Node", /* @__PURE__ */ $.pointerType("main.Node"))), $.pointerValue<Node>(a).Name, $.comparableEqual($.arrayIndex(h.value.Items!, 1), $.interfaceValue<Named | null>(b, "*main.Custom", /* @__PURE__ */ $.pointerType("main.Custom"))), $.pointerValue<Custom>(b).Text)
+	let err = (json.Unmarshal(new Uint8Array([123, 34, 73, 116, 101, 109, 115, 34, 58, 91, 123, 34, 78, 97, 109, 101, 34, 58, 34, 120, 34, 125, 44, 34, 121, 34, 93, 125]), $.interfaceValue(h, "*main.Holder", /* @__PURE__ */ $.pointerType("main.Holder"))) as $.GoError)
+	fmt.Println((err as any), $.basicInterfaceValue($.sliceLen(h.value.Items), "int"), $.comparableEqual($.arrayIndex(h.value.Items!, 0), $.interfaceValue<Named | null>(a, "*main.Node", /* @__PURE__ */ $.pointerType("main.Node"))), $.pointerValue<Node>(a).Name, $.comparableEqual($.arrayIndex(h.value.Items!, 1), $.interfaceValue<Named | null>(b, "*main.Custom", /* @__PURE__ */ $.pointerType("main.Custom"))), $.pointerValue<Custom>(b).Text)
 }
 
 if ($.isMainScript(import.meta)) {

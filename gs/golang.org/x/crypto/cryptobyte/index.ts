@@ -241,8 +241,14 @@ export class BuildError {
     this.Err = init?.Err ?? null
   }
 
+  // Error returns the wrapped error's text, a Promise only when the wrapped
+  // Error() is async.
   public Error(): string | PromiseLike<string> {
-    return this.Err == null ? '' : Promise.resolve(this.Err.Error())
+    if (this.Err == null) {
+      return ''
+    }
+    const inner = this.Err.Error()
+    return typeof inner === 'string' ? inner : Promise.resolve(inner)
   }
 }
 

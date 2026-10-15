@@ -49,15 +49,15 @@ export function Small_UnmarshalText(s: $.VarRef<Small> | null, b: $.Slice<number
 
 export async function main(): globalThis.Promise<void> {
 	let a: $.VarRef<Act> = $.varRef(0n)
-	let err: $.GoError = json.Unmarshal(new Uint8Array([34, 78, 97, 109, 101, 34]), $.namedValueInterfaceValue<any>(a, "*main.Act", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()))
+	let err: $.GoError = (json.Unmarshal(new Uint8Array([34, 78, 97, 109, 101, 34]), $.namedValueInterfaceValue<any>(a, "*main.Act", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2())) as $.GoError)
 	await $.println(err == null, $.int64(a.value))
 	let s: $.VarRef<Small> = $.varRef(0)
-	err = json.Unmarshal(new Uint8Array([34, 97, 98, 99, 100, 101, 34]), $.namedValueInterfaceValue<any>(s, "*main.Small", __goscriptStatic3(), __goscriptStatic4(), __goscriptStatic2()))
+	err = (json.Unmarshal(new Uint8Array([34, 97, 98, 99, 100, 101, 34]), $.namedValueInterfaceValue<any>(s, "*main.Small", __goscriptStatic3(), __goscriptStatic4(), __goscriptStatic2())) as $.GoError)
 	await $.println(err == null, $.int(s.value, 32))
 	let acts: $.VarRef<$.Slice<Act>> = $.varRef(null! as $.Slice<Act>)
-	err = json.Unmarshal(new Uint8Array([91, 34, 78, 101, 120, 116, 34, 44, 34, 78, 97, 109, 101, 34, 93]), $.interfaceValue(acts, "*[]main.Act", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int64", "main.Act")))))
+	err = (json.Unmarshal(new Uint8Array([91, 34, 78, 101, 120, 116, 34, 44, 34, 78, 97, 109, 101, 34, 93]), $.interfaceValue(acts, "*[]main.Act", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int64", "main.Act"))))) as $.GoError)
 	await $.println(err == null, $.sliceLen(acts.value), $.int64($.arrayIndex(acts.value!, 0)), $.int64($.arrayIndex(acts.value!, 1)))
-	err = json.Unmarshal(new Uint8Array([34, 66, 111, 103, 117, 115, 34]), $.namedValueInterfaceValue<any>(a, "*main.Act", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()))
+	err = (json.Unmarshal(new Uint8Array([34, 66, 111, 103, 117, 115, 34]), $.namedValueInterfaceValue<any>(a, "*main.Act", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2())) as $.GoError)
 	await $.println(err != null)
 }
 

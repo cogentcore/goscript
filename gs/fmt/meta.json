@@ -1,20 +1,67 @@
 {
   "asyncFunctions": {
-    "Append": true,
-    "Appendf": true,
-    "Appendln": true,
     "Fprint": true,
     "Fprintf": true,
-    "Fprintln": true,
-    "Print": true,
-    "Printf": true,
-    "Println": true,
-    "Sprint": true,
-    "Sprintf": true,
-    "Sprintln": true
+    "Fprintln": true
   },
   "dependencies": [
     "errors",
     "strconv"
-  ]
+  ],
+  "asyncWhenMethods": {
+    "Append": [
+      "Error",
+      "Format",
+      "GoString",
+      "String"
+    ],
+    "Appendf": [
+      "Error",
+      "Format",
+      "GoString",
+      "String"
+    ],
+    "Appendln": [
+      "Error",
+      "Format",
+      "GoString",
+      "String"
+    ],
+    "Print": [
+      "Error",
+      "Format",
+      "GoString",
+      "String"
+    ],
+    "Printf": [
+      "Error",
+      "Format",
+      "GoString",
+      "String"
+    ],
+    "Println": [
+      "Error",
+      "Format",
+      "GoString",
+      "String"
+    ],
+    "Sprint": [
+      "Error",
+      "Format",
+      "GoString",
+      "String"
+    ],
+    "Sprintf": [
+      "Error",
+      "Format",
+      "GoString",
+      "String"
+    ],
+    "Sprintln": [
+      "Error",
+      "Format",
+      "GoString",
+      "String"
+    ]
+  }
 }

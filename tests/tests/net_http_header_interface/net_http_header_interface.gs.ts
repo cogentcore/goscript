@@ -10,7 +10,7 @@ export async function main(): globalThis.Promise<void> {
 	if (!$.stringEqual(await http.Header_Get(header, "x-test"), "ok")) {
 		$.panic("missing header")
 	}
-	await fmt.Sprint($.namedValueInterfaceValue<any>(header, "http.Header", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()))
+	;(fmt.Sprint($.namedValueInterfaceValue<any>(header, "http.Header", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2())) as string)
 	await $.println("ok")
 }
 
