@@ -136,7 +136,7 @@ export async function main(): globalThis.Promise<void> {
 				case $.typeAssert<x509.CertificateInvalidError>(__goscriptTypeSwitchValue, "x509.CertificateInvalidError").ok:
 					{
 						let typed: x509.CertificateInvalidError = $.markAsStructValue($.cloneStructValue($.typeAssert<x509.CertificateInvalidError>(__goscriptTypeSwitchValue, "x509.CertificateInvalidError").value))
-						await $.println("certificate invalid", $.int(typed.Reason), typed.Detail)
+						await $.println("certificate invalid", typed.Reason, typed.Detail)
 					}
 					break
 				case $.typeAssert<x509.UnknownAuthorityError>(__goscriptTypeSwitchValue, "x509.UnknownAuthorityError").ok:

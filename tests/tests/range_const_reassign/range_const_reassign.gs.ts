@@ -10,7 +10,7 @@ export async function main(): globalThis.Promise<void> {
 		if (c >= 97) {
 			c = $.int((((((c - 97) | 0)) + 10) | 0), 32)
 		}
-		await $.println($.int(c))
+		await $.println(c)
 	}
 }
 

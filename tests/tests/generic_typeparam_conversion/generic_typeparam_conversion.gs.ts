@@ -123,7 +123,7 @@ export async function main(): globalThis.Promise<void> {
 	let res = (valuesExtended(__goscriptStatic0(), $.arrayToSlice<Base>([0, 1]), $.arrayToSlice<Extended>([2, 3, 4])) as $.Slice<Base>)
 	for (let __goscriptRangeTarget1 = res, __goscriptRangeWindow1 = $.sliceRange(__goscriptRangeTarget1), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow1.length; __rangeIndex++) {
 		let v = $.int((__goscriptRangeWindow1.backing[__goscriptRangeWindow1.offset + __rangeIndex] as Base), 32)
-		await $.println($.int(v), Base_String(v))
+		await $.println(v, Base_String(v))
 	}
 	let w = (toWide(__goscriptStatic1(), 5) as Wide)
 	await $.println($.int64Mul($.int64(w), 2n), Wide_String(w))

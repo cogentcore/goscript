@@ -758,7 +758,7 @@ export async function probeStream(ctx: context.Context | null, client: srpc.Clie
 	if ($.sliceLen(data) != 1) {
 		return [$.sliceLen(data), null]
 	}
-	return [$.int($.arrayIndex(data!, 0)), null]
+	return [$.arrayIndex(data!, 0), null]
 }
 
 export function newRoutedRpcStreamClient(ctx: context.Context | null, componentID: string, getter: rpcstream.RpcStreamGetter | null, waitAck: boolean, results: $.Channel<rpcStreamServerResult> | null): srpc.Client | null {

@@ -28,7 +28,7 @@ export async function main(): globalThis.Promise<void> {
 	let sum = 0
 	for (let __goscriptRangeTarget0 = b, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), i = 0; i < __goscriptRangeWindow0.length; i++) {
 		let c = $.uint((__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + i] as number), 8)
-		sum = ((sum * 31) + ($.int(c) * (i + 1))) % 1000000007
+		sum = ((sum * 31) + (c * (i + 1))) % 1000000007
 	}
 	await $.println("sum:", sum)
 	let [m, err] = await jpeg.Decode($.interfaceValue<io.Reader | null>(bytes.NewReader(b), "*bytes.Reader", /* @__PURE__ */ $.pointerType("bytes.Reader")))
