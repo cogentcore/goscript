@@ -206,7 +206,7 @@ export function Set_Has(s: Set, __typeArgs: $.GenericTypeArgs | undefined, value
 }
 
 export async function CloneAll<T>(__typeArgs: $.GenericTypeArgs | undefined, items: $.Slice<T>): globalThis.Promise<$.Slice<T>> {
-	let clones: $.Slice<T> = $.makeSlice<T>(0, $.sliceLen(items), undefined, () => ($.genericZero(__typeArgs, "T", null) as T))
+	let clones: $.Slice<T> = $.makeSlice<T>(0, $.sliceLen(items), $.genericSliceTypeHint(__typeArgs, "T"), () => ($.genericZero(__typeArgs, "T", null) as T))
 	for (let __goscriptRangeTarget1 = items, __goscriptRangeWindow1 = $.sliceRange(__goscriptRangeTarget1), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow1.length; __rangeIndex++) {
 		let item = $.copyElement((__goscriptRangeWindow1.backing[__goscriptRangeWindow1.offset + __rangeIndex] as any))
 		clones = $.append(clones, (__goscriptAwait = $.callGenericMethod(__typeArgs, "T", "Clone", item), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), $.appendZero(() => ($.genericZero(__typeArgs, "T", null) as T)))

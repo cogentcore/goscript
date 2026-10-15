@@ -48,7 +48,7 @@ export class item {
 }
 
 export async function cloneSlice<T>(__typeArgs: $.GenericTypeArgs | undefined, items: $.Slice<T>): globalThis.Promise<$.Slice<T>> {
-	let cloned: $.Slice<T> = $.makeSlice<T>(0, $.sliceLen(items), undefined, () => ($.genericZero(__typeArgs, "T", null) as T))
+	let cloned: $.Slice<T> = $.makeSlice<T>(0, $.sliceLen(items), $.genericSliceTypeHint(__typeArgs, "T"), () => ($.genericZero(__typeArgs, "T", null) as T))
 	for (let __goscriptRangeTarget0 = items, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
 		let item = $.copyElement((__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as any))
 		cloned = $.append(cloned, (__goscriptAwait = $.callGenericMethod(__typeArgs, "T", "CloneVT", item), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), $.appendZero(() => ($.genericZero(__typeArgs, "T", null) as T)))
