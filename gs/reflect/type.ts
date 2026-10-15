@@ -1660,7 +1660,7 @@ export class Value {
     if (this._type.ChanDir() === SendDir) {
       throw new Error('reflect: recv on send-only channel')
     }
-    return this.currentValue() as $.Channel<ReflectValue> | null
+    return this.chanValue()
   }
 
   // sendChan returns the channel v holds for a send, or null for a nil
@@ -1672,7 +1672,16 @@ export class Value {
     if (this._type.ChanDir() === RecvDir) {
       throw new Error('reflect: send on recv-only channel')
     }
-    return this.currentValue() as $.Channel<ReflectValue> | null
+    return this.chanValue()
+  }
+
+  // chanValue returns the channel v holds, or null for a nil channel,
+  // including a typed nil boxed in an interface.
+  private chanValue(): $.Channel<ReflectValue> | null {
+    if (this.IsNil()) {
+      return null
+    }
+    return this.currentValue() as $.Channel<ReflectValue>
   }
 
   // SetString sets v's underlying value to x

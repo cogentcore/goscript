@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import * as $ from '../builtin/index.js'
 import { BothDir, ChanOf, Int, TypeOf, Value, ValueOf } from './type.js'
 import { SelectCase, SelectDefault, SelectRecv, SelectSend } from './types.js'
 import { MakeChan, Select } from './value.js'
@@ -42,11 +43,15 @@ describe('Select', () => {
 
   it('never selects a nil channel and takes the default', async () => {
     const nilChan = new Value(null, intChan)
+    const typedNil = ValueOf(
+      $.interfaceValue(null, '<-chan int', $.channelType('int', 'receive')),
+    )
     const [chosen, , ok] = await Select([
       new SelectCase({ Dir: SelectRecv, Chan: nilChan }),
+      new SelectCase({ Dir: SelectRecv, Chan: typedNil }),
       new SelectCase({ Dir: SelectDefault }),
     ])
-    expect(chosen).toBe(1)
+    expect(chosen).toBe(2)
     expect(ok).toBe(false)
   })
 
