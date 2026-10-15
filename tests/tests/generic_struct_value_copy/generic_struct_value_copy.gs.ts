@@ -289,12 +289,12 @@ export async function main(): globalThis.Promise<void> {
 	// Copying a generic struct copies its struct-typed fields, so assigning
 	// to a field of the original leaves the copy unchanged.
 	let orig = $.markAsStructValue(new Sides({Bottom: new Value({V: 1}, true), Top: new Value(undefined, true), Right: new Value(undefined, true), Left: new Value(undefined, true)}))
-	let cp = $.markAsStructValue($.cloneStructValue(orig))
+	let cp = (orig).clone()
 	$.assignStruct(cp.Bottom, new Value({V: 2}, true))
 	$.assignStruct(orig.Bottom, new Value({V: 3}, true))
 	await $.println("struct copy:", orig.Bottom.V, cp.Bottom.V)
 	let orig2 = $.markAsStructValue(new Sides({Top: new Value({V: 4}, true), Right: new Value(undefined, true), Bottom: new Value(undefined, true), Left: new Value(undefined, true)}))
-	let cp2 = $.markAsStructValue($.cloneStructValue(orig2))
+	let cp2 = (orig2).clone()
 	orig2.Top.Set(5)
 	await $.println("struct copy method:", orig2.Top.V, cp2.Top.V)
 

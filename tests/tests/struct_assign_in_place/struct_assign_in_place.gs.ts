@@ -192,7 +192,7 @@ export class Holder {
 
 	constructor(init?: Partial<{P?: Pair}>, __goscriptValue?: boolean) {
 		this._fields = {
-			P: init?.P ? $.markAsStructValue($.cloneStructValue(init.P)) : $.markAsStructValue(new Pair({Val: null}))
+			P: init?.P ? init.P.clone() : $.markAsStructValue(new Pair({Val: null}))
 		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
@@ -268,7 +268,7 @@ export function __goscript_set_global(__goscriptValue: Outer): void {
 }
 
 export function assignGeneric(__typeArgs: $.GenericTypeArgs | undefined, dst: Pair | $.VarRef<Pair> | null, src: Pair): void {
-	$.assignStruct($.pointerValue<Pair>(dst), $.markAsStructValue($.cloneStructValue(src)))
+	$.assignStruct($.pointerValue<Pair>(dst), (src).clone())
 }
 
 export function make1(): Outer {
@@ -312,16 +312,16 @@ export async function main(): globalThis.Promise<void> {
 	await $.println(_in.Y, a.value.In.Y)
 	let g1 = $.markAsStructValue(new Pair({Key: "a", Val: new Inner({X: 1, Y: 2}, true)}))
 	let g2: Pair = $.markAsStructValue(new Pair({Val: new Inner(undefined, true)}))
-	g2 = $.assignStruct(g2, $.markAsStructValue($.cloneStructValue(g1)))
+	g2 = $.assignStruct(g2, (g1).clone())
 	g1.Val.X = 11
 	await $.println(g2.Val.X, g1.Val.X)
 	let g3: $.VarRef<Pair> = $.varRef($.markAsStructValue(new Pair({Val: new Inner(undefined, true)})))
 	assignGeneric(__goscriptStatic0(), g3, g1)
 	g1.Val.Y = 22
 	await $.println(g3.value.Val.Y, g1.Val.Y)
-	let h1 = $.markAsStructValue(new Holder({P: $.markAsStructValue($.cloneStructValue(g1))}))
-	let h2 = $.markAsStructValue(new Holder())
-	h2 = $.assignStruct(h2, $.markAsStructValue($.cloneStructValue(h1)))
+	let h1 = $.markAsStructValue(new Holder({P: (g1).clone()}))
+	let h2: Holder = $.markAsStructValue(new Holder())
+	h2 = $.assignStruct(h2, (h1).clone())
 	h1.P.Val.X = 33
 	await $.println(h2.P.Val.X, h1.P.Val.X)
 	let m = $.makeMap<string, Outer>([["k", (a.value).clone()]])

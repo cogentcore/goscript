@@ -230,7 +230,7 @@ export class VM {
 		this._fields = {
 			pc: init?.pc ?? (0 as number),
 			steps: init?.steps ?? (0 as number),
-			stack: init?.stack ? $.markAsStructValue($.cloneStructValue(init.stack)) : $.markAsStructValue(new Stack())
+			stack: init?.stack ? init.stack.clone() : $.markAsStructValue(new Stack())
 		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
