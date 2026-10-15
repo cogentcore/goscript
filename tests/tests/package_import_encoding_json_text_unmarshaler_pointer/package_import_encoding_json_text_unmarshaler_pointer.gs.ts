@@ -53,7 +53,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println(err == null, $.int64(a.value))
 	let s: $.VarRef<Small> = $.varRef(0)
 	err = json.Unmarshal(new Uint8Array([34, 97, 98, 99, 100, 101, 34]), $.namedValueInterfaceValue<any>(s, "*main.Small", __goscriptStatic3(), __goscriptStatic4(), __goscriptStatic2()))
-	await $.println(err == null, $.int(s.value, 32))
+	await $.println(err == null, s.value)
 	let acts: $.VarRef<$.Slice<Act>> = $.varRef(null! as $.Slice<Act>)
 	err = json.Unmarshal(new Uint8Array([91, 34, 78, 101, 120, 116, 34, 44, 34, 78, 97, 109, 101, 34, 93]), $.interfaceValue(acts, "*[]main.Act", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int64", "main.Act")))))
 	await $.println(err == null, $.sliceLen(acts.value), $.int64($.arrayIndex(acts.value!, 0)), $.int64($.arrayIndex(acts.value!, 1)))

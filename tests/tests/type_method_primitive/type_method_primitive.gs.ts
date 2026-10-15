@@ -46,7 +46,7 @@ $.registerNamedValueType(
 );
 
 export function MyInt_Double(m: MyInt): number {
-	return $.int(m) * 2
+	return m * 2
 }
 
 export function MyBool_String(b: $.VarRef<MyBool> | null): string {
@@ -95,7 +95,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("Returned interface call:", (__goscriptAwait = (ret !== null && (ret as any).__isVarRef !== true && (ret as any).__goValue === undefined ? (ret as Exclude<Doubler, null>) : $.pointerValue<Exclude<Doubler, null>>(ret)).Double(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
 	let [asserted, ok] = $.typeAssertTuple<MyInt>(ret, /* @__PURE__ */ $.basicType("int", "main.MyInt"))
-	await $.println("Interface assertion:", $.int(asserted), ok)
+	await $.println("Interface assertion:", asserted, ok)
 
 	let vals: $.Slice<Doubler | null> = null! as $.Slice<Doubler | null>
 	vals = $.append(vals, $.namedValueInterfaceValue<Doubler | null>(14, "main.MyInt", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()), $.namedValueInterfaceValue<Doubler | null>(15, "main.MyInt", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()), $.appendZeros.nil)
@@ -104,7 +104,7 @@ export async function main(): globalThis.Promise<void> {
 	let __goscriptTuple0: any = assertDoubler(__goscriptStatic3(), ret)
 	let genericAsserted = (__goscriptTuple0[0] as MyInt)
 	let genericOK = __goscriptTuple0[1]
-	await $.println("Generic interface assertion:", $.int(genericAsserted), genericOK)
+	await $.println("Generic interface assertion:", genericAsserted, genericOK)
 
 	let flag = $.varRef(false)
 	let stringer: Stringer | null = $.namedValueInterfaceValue<Stringer | null>(newMyBool(true, flag), "*main.MyBool", __goscriptStatic4(), __goscriptStatic5(), __goscriptStatic6())

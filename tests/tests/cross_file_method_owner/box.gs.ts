@@ -84,7 +84,7 @@ export class pile {
 }
 
 export function box_base(b: box): number {
-	return $.int(b)
+	return b
 }
 
 var __goscriptAwait: any
