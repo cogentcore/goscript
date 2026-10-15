@@ -1,4 +1,4 @@
-import { GoSlice, isArrayOrGoSlice } from './slice.js'
+import { GoSlice, isArrayOrGoSlice, sliceElems, sliceSlot } from './slice.js'
 import type { Slice, SliceProxy, StringHeaderData } from './slice.js'
 import {
   arrayValueTypeInfo,
@@ -355,12 +355,15 @@ export function comparableEqual(a: unknown, b: unknown): boolean {
       return aType !== undefined && aType === bType
     }
   }
+  // Arrays compare element by element, read through the window of a slice.
   if (isArrayLike(a) && isArrayLike(b)) {
     if (a.length !== b.length) {
       return false
     }
+    const aElems = sliceElems(a)
+    const bElems = sliceElems(b)
     for (let i = 0; i < a.length; i++) {
-      if (!comparableEqual(a[i], b[i])) {
+      if (!comparableEqual(aElems[sliceSlot(a, i)], bElems[sliceSlot(b, i)])) {
         return false
       }
     }

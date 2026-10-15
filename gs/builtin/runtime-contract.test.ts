@@ -530,6 +530,16 @@ describe('builtin runtime contract helpers', () => {
     expect(comparableEqual(first, different)).toBe(false)
   })
 
+  it('compares the elements of slice windows', () => {
+    const backing = [1, 2, 3, 1, 2, 4]
+    const first = goSlice(backing, 0, 3)
+    const same = goSlice([0, 1, 2, 3], 1, 4)
+    const different = goSlice(backing, 3, 6)
+
+    expect(comparableEqual(first, same)).toBe(true)
+    expect(comparableEqual(first, different)).toBe(false)
+  })
+
   it('does not compare runtime internals as generated struct values', () => {
     class RuntimeType {
       constructor(
