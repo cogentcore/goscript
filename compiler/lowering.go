@@ -10610,8 +10610,10 @@ func (o *LoweringOwner) lowerFixedCallArgs(
 	if fn := calledFunction(ctx.semPkg.source, ast.Unparen(call.Fun)); fn != nil && !overrideCall {
 		if semFn := semanticFunctionFor(ctx.model, fn); semFn != nil {
 			paramsReadOnly = semFn.paramsReadOnly
-			paramsTransient = semFn.paramsTransient
 			calleeAsync = o.functionAsync(ctx, fn)
+			if !isMethodExprCall(ctx.semPkg.source, call) {
+				paramsTransient = semFn.paramsTransient
+			}
 		}
 	}
 
@@ -10619,6 +10621,7 @@ func (o *LoweringOwner) lowerFixedCallArgs(
 	args := make([]string, 0, len(call.Args))
 	var diagnostics []Diagnostic
 	for idx, expr := range call.Args {
+		// An argument without a parameter lowers untyped.
 		if idx >= params.Len() {
 			lowered, exprDiagnostics := o.lowerCallArgExpr(ctx, expr, nil, allowAsyncOverrideCallback)
 			diagnostics = append(diagnostics, exprDiagnostics...)
@@ -10626,17 +10629,11 @@ func (o *LoweringOwner) lowerFixedCallArgs(
 			continue
 		}
 
+		// Other arguments lower against their parameters, and a read-only
+		// struct parameter shares the value.
 		param := params.At(idx)
 		allowAsyncCallback := allowAsyncOverrideCallback || o.overrideAwaitsCallback(ctx, call.Fun, param.Name())
-		if idx < len(paramsTransient) && paramsTransient[idx] {
-			if selector, selection := fieldAddressOperand(ctx, expr); selector != nil {
-				lowered, exprDiagnostics := o.lowerTransientFieldAddress(ctx, selector, selection)
-				diagnostics = append(diagnostics, exprDiagnostics...)
-				args = append(args, lowered)
-				continue
-			}
-		}
-		lowered, exprDiagnostics := o.lowerCallArgExpr(ctx, expr, param.Type(), allowAsyncCallback)
+		lowered, exprDiagnostics := o.lowerFixedCallArg(ctx, expr, param.Type(), allowAsyncCallback, idx < len(paramsTransient) && paramsTransient[idx])
 		diagnostics = append(diagnostics, exprDiagnostics...)
 		if idx < len(paramsReadOnly) && !ctx.copyValues &&
 			types.Identical(ctx.semPkg.source.TypesInfo.TypeOf(expr), param.Type()) &&
@@ -10651,6 +10648,18 @@ func (o *LoweringOwner) lowerFixedCallArgs(
 		args = append(args, lowered)
 	}
 	return args, diagnostics
+}
+
+// lowerFixedCallArg lowers the argument expr of a parameter of type
+// targetType. The address of a field passed to a transient parameter is a
+// new reference to the field.
+func (o *LoweringOwner) lowerFixedCallArg(ctx lowerFileContext, expr ast.Expr, targetType types.Type, overrideCall bool, transient bool) (string, []Diagnostic) {
+	if transient {
+		if selector, selection := fieldAddressOperand(ctx, expr); selector != nil {
+			return o.lowerTransientFieldAddress(ctx, selector, selection)
+		}
+	}
+	return o.lowerCallArgExpr(ctx, expr, targetType, overrideCall)
 }
 
 // fieldAddressOperand returns the field selection x.f of expr when it is
@@ -12016,6 +12025,7 @@ func (o *LoweringOwner) lowerFieldSelectionExpr(
 	// An embedded field path selects each field in turn.
 	typ := derefPointerType(ctx.semPkg.source.TypesInfo.TypeOf(expr.X))
 	for idx, fieldIndex := range index {
+		// A path through a type that is not a struct selects the name.
 		structType := structUnderlyingType(typ)
 		if structType == nil || fieldIndex < 0 || fieldIndex >= structType.NumFields() {
 			fieldName := tsStructFieldName(expr.Sel.Name, 0)
@@ -12024,6 +12034,8 @@ func (o *LoweringOwner) lowerFieldSelectionExpr(
 			}
 			return receiver + "." + fieldName, diagnostics
 		}
+
+		// The last field of the path is the selected one.
 		field := structType.Field(fieldIndex)
 		name := tsStructFieldName(field.Name(), fieldIndex)
 		if idx == len(index)-1 {
@@ -12033,6 +12045,7 @@ func (o *LoweringOwner) lowerFieldSelectionExpr(
 			return receiver + "." + name, diagnostics
 		}
 
+		// An embedded field is the receiver of the next, through a pointer.
 		receiver += "." + name
 		typ = field.Type()
 		if pointer, ok := types.Unalias(typ).Underlying().(*types.Pointer); ok {

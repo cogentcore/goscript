@@ -291,7 +291,7 @@ func transientCallArg(pkg *packages.Package, stack []ast.Node, at int, call *ast
 		return nil, false
 	}
 	fn := calledFunction(pkg, ast.Unparen(call.Fun))
-	if fn == nil {
+	if fn == nil || isMethodExprCall(pkg, call) {
 		return nil, false
 	}
 	signature, ok := fn.Type().(*types.Signature)
@@ -353,4 +353,15 @@ func methodHasPointerReceiver(obj types.Object) bool {
 	}
 	_, pointer := types.Unalias(signature.Recv().Type()).(*types.Pointer)
 	return pointer
+}
+
+// isMethodExprCall reports whether call calls a method expression T.M, whose
+// first argument is the receiver rather than the method's first parameter.
+func isMethodExprCall(pkg *packages.Package, call *ast.CallExpr) bool {
+	selector, ok := ast.Unparen(call.Fun).(*ast.SelectorExpr)
+	if !ok {
+		return false
+	}
+	selection := pkg.TypesInfo.Selections[selector]
+	return selection != nil && selection.Kind() == types.MethodExpr
 }
