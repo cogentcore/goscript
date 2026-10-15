@@ -104,7 +104,7 @@ export async function main(): globalThis.Promise<void> {
 	let pcs = $.makeSlice<number>(0, undefined, "number")
 	await $.println("Callers empty:", runtime.Callers(0, pcs))
 	let frames = runtime.CallersFrames(pcs)
-	let [frame, more] = runtime.Frames.prototype.Next.call($.pointerValue<runtime.Frames>(frames))
+	let [frame, more] = (frames !== null && (frames as any).__isVarRef !== true && (frames as any).__goValue === undefined ? ((frames as any) as runtime.Frames).Next() : runtime.Frames.prototype.Next.call($.pointerValue<runtime.Frames>(frames)))
 	await $.println("Frames empty:", frame.Line, more)
 	await $.println("FuncForPC nil:", runtime.FuncForPC(0) == null)
 	await callers()

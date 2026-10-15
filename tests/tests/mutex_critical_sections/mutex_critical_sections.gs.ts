@@ -305,7 +305,7 @@ export function lookup(name: string): number {
 
 export async function lockWith(mu: sync.Mutex | $.VarRef<sync.Mutex> | null, f: (() => void) | null): globalThis.Promise<void> {
 	using __defer = new $.DisposableStack()
-	await sync.Mutex.prototype.Lock.call($.pointerValue<sync.Mutex>(mu))
+	await (mu !== null && (mu as any).__isVarRef !== true && (mu as any).__goValue === undefined ? ((mu as any) as sync.Mutex).Lock() : sync.Mutex.prototype.Lock.call($.pointerValue<sync.Mutex>(mu)))
 	const __goscriptDeferCallee3 = $.functionValue(((__receiver) => () => __receiver.Unlock())($.pointerValue<sync.Mutex>(mu)), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "sync.(*Mutex).Unlock-fm")
 	__defer.defer(() => { __goscriptDeferCallee3() })
 	f!()

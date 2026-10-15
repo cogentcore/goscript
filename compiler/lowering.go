@@ -11727,6 +11727,8 @@ func (o *LoweringOwner) lowerPointerReceiverMethodCall(
 	selection *types.Selection,
 	args []string,
 ) (string, []Diagnostic, bool) {
+	// Only a method declared on a pointer to a named struct, called on such
+	// a pointer, is called this way.
 	if len(selection.Index()) != 1 || !isPointerToStructType(ctx.semPkg.source.TypesInfo.TypeOf(selector.X)) {
 		return "", nil, false
 	}
@@ -11738,6 +11740,8 @@ func (o *LoweringOwner) lowerPointerReceiverMethodCall(
 	if signature == nil || signature.Recv() == nil {
 		return "", nil, false
 	}
+
+	// The receiver's named type.
 	if !isPointerToStructType(signature.Recv().Type()) {
 		return "", nil, false
 	}
@@ -11745,8 +11749,13 @@ func (o *LoweringOwner) lowerPointerReceiverMethodCall(
 	if receiver == nil {
 		return "", nil, false
 	}
+
+	// An override method takes its receiver unwrapped, since hand-written
+	// methods do not unwrap a variable reference or a boxed pointer.
 	receiverExpr, diagnostics := o.lowerExpr(ctx, selector.X)
-	if o.receiverUsesOverridePackage(signature.Recv().Type()) {
+	localReceiver := receiverExpr
+	override := o.receiverUsesOverridePackage(signature.Recv().Type())
+	if override {
 		if nilReceiverOverrideMethods[method.FullName()] {
 			receiverExpr = o.runtimeOwner.QualifiedHelper(RuntimeHelperPointerValueOrNil) + "(" + receiverExpr + ")"
 		} else {
@@ -11754,12 +11763,16 @@ func (o *LoweringOwner) lowerPointerReceiverMethodCall(
 				"<" + o.tsTypeFor(ctx, signature.Recv().Type().(*types.Pointer).Elem()) + ">(" + receiverExpr + ")"
 		}
 	}
+
+	// A receiver that lowers to the type's own name is a value of it, whose
+	// method is called on the value.
 	if receiverExpr == o.namedTypeExpr(ctx, receiver) {
 		call := o.runtimeOwner.QualifiedHelper(RuntimeHelperPointerValue) +
 			"<" + o.namedTypeExpr(ctx, receiver) + ">(" + receiverExpr + ")." +
 			methodMemberName(selector.Sel.Name) + "(" + strings.Join(args, ", ") + ")"
 		return call, diagnostics, true
 	}
+
 	// An absent receiver package has no class to import. A field of an
 	// override type holds the override's own class, not the Go type's, so the
 	// Go type's prototype would run the wrong implementation.
@@ -11788,8 +11801,15 @@ func (o *LoweringOwner) lowerPointerReceiverMethodCall(
 			"(" + strings.Join(args, ", ") + ")"
 		return call, diagnostics, true
 	}
+	// The method is called directly on a plain receiver, and otherwise
+	// through its prototype. The guard reads the local receiver itself, which
+	// an override receiver's $.pointerValue returns unchanged when the guard
+	// holds.
 	callArgs := append([]string{receiverExpr}, args...)
 	call := namedValueExpr(ctx, receiver) + ".prototype." + selector.Sel.Name + ".call(" + strings.Join(callArgs, ", ") + ")"
+	if override {
+		receiverExpr = localReceiver
+	}
 	return directPointerMethodCall(receiverExpr, o.namedTypeExpr(ctx, receiver), selector.Sel.Name, args, call), diagnostics, true
 }
 

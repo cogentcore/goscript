@@ -21,8 +21,8 @@ export async function main(): globalThis.Promise<void> {
 
 	// Also test direct make with strings.Builder
 	let builderPtr = new strings.Builder()
-	strings.Builder.prototype.WriteString.call($.pointerValue<strings.Builder>(builderPtr), "Direct make test")
-	await $.println("Direct:", strings.Builder.prototype.String.call($.pointerValue<strings.Builder>(builderPtr)))
+	void (builderPtr !== null && (builderPtr as any).__isVarRef !== true && (builderPtr as any).__goValue === undefined ? ((builderPtr as any) as strings.Builder).WriteString("Direct make test") : strings.Builder.prototype.WriteString.call($.pointerValue<strings.Builder>(builderPtr), "Direct make test"))
+	await $.println("Direct:", (builderPtr !== null && (builderPtr as any).__isVarRef !== true && (builderPtr as any).__goValue === undefined ? ((builderPtr as any) as strings.Builder).String() : strings.Builder.prototype.String.call($.pointerValue<strings.Builder>(builderPtr))))
 	await $.println("LastIndexByte:", strings.LastIndexByte("hello", 108))
 	await $.println("LastIndex:", strings.LastIndex("hello", "l"))
 
@@ -53,9 +53,9 @@ export async function splits(): globalThis.Promise<void> {
 }
 
 export async function printBuilderPointer(builder: strings.Builder | $.VarRef<strings.Builder> | null): globalThis.Promise<void> {
-	await $.println("Pointer Len Before:", strings.Builder.prototype.Len.call($.pointerValue<strings.Builder>(builder)))
-	strings.Builder.prototype.WriteString.call($.pointerValue<strings.Builder>(builder), " Pointer")
-	await $.println("Pointer Len After:", strings.Builder.prototype.Len.call($.pointerValue<strings.Builder>(builder)))
+	await $.println("Pointer Len Before:", (builder !== null && (builder as any).__isVarRef !== true && (builder as any).__goValue === undefined ? ((builder as any) as strings.Builder).Len() : strings.Builder.prototype.Len.call($.pointerValue<strings.Builder>(builder))))
+	void (builder !== null && (builder as any).__isVarRef !== true && (builder as any).__goValue === undefined ? ((builder as any) as strings.Builder).WriteString(" Pointer") : strings.Builder.prototype.WriteString.call($.pointerValue<strings.Builder>(builder), " Pointer"))
+	await $.println("Pointer Len After:", (builder !== null && (builder as any).__isVarRef !== true && (builder as any).__goValue === undefined ? ((builder as any) as strings.Builder).Len() : strings.Builder.prototype.Len.call($.pointerValue<strings.Builder>(builder))))
 }
 
 if ($.isMainScript(import.meta)) {

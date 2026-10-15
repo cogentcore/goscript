@@ -102,7 +102,7 @@ export async function newChanReader(chunks: $.Slice<string>): globalThis.Promise
 
 export async function printTokens(dec: json.Decoder | $.VarRef<json.Decoder> | null): globalThis.Promise<void> {
 	while (true) {
-		let [tok, err] = await json.Decoder.prototype.Token.call($.pointerValue<json.Decoder>(dec))
+		let [tok, err] = await (dec !== null && (dec as any).__isVarRef !== true && (dec as any).__goValue === undefined ? ((dec as any) as json.Decoder).Token() : json.Decoder.prototype.Token.call($.pointerValue<json.Decoder>(dec)))
 		if (err != null) {
 			fmt.Println("token end:", $.comparableEqual(err, io.EOF))
 			return
@@ -113,7 +113,7 @@ export async function printTokens(dec: json.Decoder | $.VarRef<json.Decoder> | n
 				case $.typeAssert<json.Delim>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.basicType("int32", "json.Delim")).ok:
 					{
 						let t: json.Delim = $.typeAssert<json.Delim>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.basicType("int32", "json.Delim")).value
-						fmt.Println("delim", json.Delim_String(t), await json.Decoder.prototype.More.call($.pointerValue<json.Decoder>(dec)))
+						fmt.Println("delim", json.Delim_String(t), await (dec !== null && (dec as any).__isVarRef !== true && (dec as any).__goValue === undefined ? ((dec as any) as json.Decoder).More() : json.Decoder.prototype.More.call($.pointerValue<json.Decoder>(dec))))
 					}
 					break
 				case $.typeAssert<string>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.basicType("string")).ok:
@@ -160,13 +160,13 @@ export async function main(): globalThis.Promise<void> {
 	// Decoder reads one value per call and buffers the rest of the stream.
 	let dec = json.NewDecoder($.pointerValueOrNil($.interfaceValue<io.Reader | null>(strings.NewReader("1 2 3"), "*strings.Reader", /* @__PURE__ */ $.pointerType("strings.Reader")))!)
 	let n = $.varRef(0)
-	while (await json.Decoder.prototype.Decode.call($.pointerValue<json.Decoder>(dec), $.interfaceValue(n, "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int")))) == null) {
+	while (await (dec !== null && (dec as any).__isVarRef !== true && (dec as any).__goValue === undefined ? ((dec as any) as json.Decoder).Decode($.interfaceValue(n, "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int")))) : json.Decoder.prototype.Decode.call($.pointerValue<json.Decoder>(dec), $.interfaceValue(n, "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int"))))) == null) {
 		fmt.Println("decoded", $.basicInterfaceValue(n.value, "int"))
 	}
 
 	// UseNumber keeps the exact source literal beyond float64 precision.
 	let und = json.NewDecoder($.pointerValueOrNil($.interfaceValue<io.Reader | null>(strings.NewReader("{\"big\":9007199254740993}"), "*strings.Reader", /* @__PURE__ */ $.pointerType("strings.Reader")))!)
-	json.Decoder.prototype.UseNumber.call($.pointerValue<json.Decoder>(und))
+	void (und !== null && (und as any).__isVarRef !== true && (und as any).__goValue === undefined ? ((und as any) as json.Decoder).UseNumber() : json.Decoder.prototype.UseNumber.call($.pointerValue<json.Decoder>(und)))
 	let m: $.VarRef<globalThis.Map<string, any> | null> = $.varRef(null! as globalThis.Map<string, any> | null)
 	await json.Decoder.prototype.Decode.call($.pointerValue<json.Decoder>(und), $.interfaceValue(m, "*map[string]interface{}", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), { kind: $.TypeKind.Interface, methods: [] }))))
 	fmt.Println("big", $.mapGet<string, any, any>(m.value, "big", null)[0])
@@ -185,11 +185,11 @@ export async function main(): globalThis.Promise<void> {
 
 	// Token advances the stream; More reports remaining container elements.
 	let mdec = json.NewDecoder($.pointerValueOrNil($.interfaceValue<io.Reader | null>(strings.NewReader("[10,20]"), "*strings.Reader", /* @__PURE__ */ $.pointerType("strings.Reader")))!)
-	await json.Decoder.prototype.Token.call($.pointerValue<json.Decoder>(mdec))
-	fmt.Println("more", await json.Decoder.prototype.More.call($.pointerValue<json.Decoder>(mdec)))
-	await json.Decoder.prototype.Token.call($.pointerValue<json.Decoder>(mdec))
-	await json.Decoder.prototype.Token.call($.pointerValue<json.Decoder>(mdec))
-	fmt.Println("more", await json.Decoder.prototype.More.call($.pointerValue<json.Decoder>(mdec)))
+	await (mdec !== null && (mdec as any).__isVarRef !== true && (mdec as any).__goValue === undefined ? ((mdec as any) as json.Decoder).Token() : json.Decoder.prototype.Token.call($.pointerValue<json.Decoder>(mdec)))
+	fmt.Println("more", await (mdec !== null && (mdec as any).__isVarRef !== true && (mdec as any).__goValue === undefined ? ((mdec as any) as json.Decoder).More() : json.Decoder.prototype.More.call($.pointerValue<json.Decoder>(mdec))))
+	await (mdec !== null && (mdec as any).__isVarRef !== true && (mdec as any).__goValue === undefined ? ((mdec as any) as json.Decoder).Token() : json.Decoder.prototype.Token.call($.pointerValue<json.Decoder>(mdec)))
+	await (mdec !== null && (mdec as any).__isVarRef !== true && (mdec as any).__goValue === undefined ? ((mdec as any) as json.Decoder).Token() : json.Decoder.prototype.Token.call($.pointerValue<json.Decoder>(mdec)))
+	fmt.Println("more", await (mdec !== null && (mdec as any).__isVarRef !== true && (mdec as any).__goValue === undefined ? ((mdec as any) as json.Decoder).More() : json.Decoder.prototype.More.call($.pointerValue<json.Decoder>(mdec))))
 
 	// A blocking reader delivers values, a number, and a multibyte character
 	// split across its chunks.
@@ -197,7 +197,7 @@ export async function main(): globalThis.Promise<void> {
 	while (true) {
 		let it: $.VarRef<item> = $.varRef(new item(true))
 		{
-			let __goscriptShadow0 = await json.Decoder.prototype.Decode.call($.pointerValue<json.Decoder>(bdec), $.interfaceValue(it, "*main.item", /* @__PURE__ */ $.pointerType("main.item")))
+			let __goscriptShadow0 = await (bdec !== null && (bdec as any).__isVarRef !== true && (bdec as any).__goValue === undefined ? ((bdec as any) as json.Decoder).Decode($.interfaceValue(it, "*main.item", /* @__PURE__ */ $.pointerType("main.item"))) : json.Decoder.prototype.Decode.call($.pointerValue<json.Decoder>(bdec), $.interfaceValue(it, "*main.item", /* @__PURE__ */ $.pointerType("main.item"))))
 			if (__goscriptShadow0 != null) {
 				fmt.Println("decode end:", $.comparableEqual(__goscriptShadow0, io.EOF))
 				break
@@ -210,7 +210,7 @@ export async function main(): globalThis.Promise<void> {
 	// json.Number values.
 	await printTokens(json.NewDecoder($.pointerValueOrNil($.interfaceValue<io.Reader | null>(await newChanReader($.arrayToSlice<string>(["[1, \"two\", ", "{\"k\": true}]"])), "*main.chanReader", /* @__PURE__ */ $.pointerType("main.chanReader")))!))
 	let ndec = json.NewDecoder($.pointerValueOrNil($.interfaceValue<io.Reader | null>(await newChanReader($.arrayToSlice<string>(["[1.5, \"s\"]"])), "*main.chanReader", /* @__PURE__ */ $.pointerType("main.chanReader")))!)
-	json.Decoder.prototype.UseNumber.call($.pointerValue<json.Decoder>(ndec))
+	void (ndec !== null && (ndec as any).__isVarRef !== true && (ndec as any).__goValue === undefined ? ((ndec as any) as json.Decoder).UseNumber() : json.Decoder.prototype.UseNumber.call($.pointerValue<json.Decoder>(ndec)))
 	await printTokens(ndec)
 
 	// A syntax error is reported without waiting for the rest of the input.
