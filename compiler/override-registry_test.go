@@ -549,7 +549,7 @@ func TestCompilePackagesAwaitsNetHTTPServeHTTPOverrideMethods(t *testing.T) {
 		"export async function Use(",
 		"await (h !== null && (h as any).__isVarRef !== true && ((h as any).__goValue === undefined || (h as any).__goType?.charCodeAt(0) !== 42) ? (h as Exclude<http.Handler, null>) : $.pointerValue<Exclude<http.Handler, null>>(h)).ServeHTTP($.pointerValueOrNil(w)!, r)",
 		"await http.HandlerFunc_ServeHTTP(hf, $.pointerValueOrNil(w)!, r)",
-		"await http.ServeMux.prototype.ServeHTTP.call($.pointerValue<http.ServeMux>(mux), $.pointerValueOrNil(w)!, r)",
+		"await (mux !== null && (mux as any).__isVarRef !== true && (mux as any).__goValue === undefined ? ((mux as any) as http.ServeMux).ServeHTTP($.pointerValueOrNil(w)!, r) : http.ServeMux.prototype.ServeHTTP.call($.pointerValue<http.ServeMux>(mux), $.pointerValueOrNil(w)!, r))",
 	} {
 		if !strings.Contains(text, want) {
 			t.Fatalf("missing %q in generated output:\n%s", want, text)

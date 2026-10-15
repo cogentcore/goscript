@@ -19,7 +19,7 @@ export async function main(): globalThis.Promise<void> {
 	let __goscriptTuple0: any = trace.NewTask($.pointerValueOrNil(context.Background())!, "task")
 	let ctx = __goscriptTuple0[0]
 	let task: trace.Task | $.VarRef<trace.Task> | null = __goscriptTuple0[1]
-	trace.Task.prototype.End.call($.pointerValue<trace.Task>(task))
+	void (task !== null && (task as any).__isVarRef !== true && (task as any).__goValue === undefined ? ((task as any) as trace.Task).End() : trace.Task.prototype.End.call($.pointerValue<trace.Task>(task)))
 	await $.println("trace:", trace.Start($.pointerValueOrNil($.interfaceValue<io.Writer | null>(traceBuf, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer")))!) != null, trace.IsEnabled())
 	trace.Log($.pointerValueOrNil(ctx)!, "category", "message")
 	trace.Stop()

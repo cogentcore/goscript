@@ -53,7 +53,7 @@ export async function main(): globalThis.Promise<void> {
 
 	let timer = time.AfterFunc(9223372036854775807n, $.functionValue(() => {
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)))
-	await $.println("max duration timer stopped", time.Timer.prototype.Stop.call($.pointerValue<time.Timer>(timer)))
+	await $.println("max duration timer stopped", (timer !== null && (timer as any).__isVarRef !== true && (timer as any).__goValue === undefined ? ((timer as any) as time.Timer).Stop() : time.Timer.prototype.Stop.call($.pointerValue<time.Timer>(timer))))
 	let maxDuration = 9223372036854775807n
 	await $.println("max duration converted", maxDuration > 0n)
 
@@ -113,9 +113,9 @@ export async function timers(): globalThis.Promise<void> {
 	let p: $.VarRef<atomic.Pointer<time.Timer>> = $.varRef($.markAsStructValue(new atomic.Pointer<time.Timer>()))
 	p.value.Store(time.NewTimer(3600000000000n))
 	let t = (p.value.Load() as time.Timer | $.VarRef<time.Timer> | null)
-	await $.println("timer stop", time.Timer.prototype.Stop.call($.pointerValue<time.Timer>(t)), time.Timer.prototype.Stop.call($.pointerValue<time.Timer>(t)))
-	await $.println("timer reset", time.Timer.prototype.Reset.call($.pointerValue<time.Timer>(t), 3600000000000n), time.Timer.prototype.Reset.call($.pointerValue<time.Timer>(t), 3600000000000n))
-	time.Timer.prototype.Stop.call($.pointerValue<time.Timer>(t))
+	await $.println("timer stop", (t !== null && (t as any).__isVarRef !== true && (t as any).__goValue === undefined ? ((t as any) as time.Timer).Stop() : time.Timer.prototype.Stop.call($.pointerValue<time.Timer>(t))), (t !== null && (t as any).__isVarRef !== true && (t as any).__goValue === undefined ? ((t as any) as time.Timer).Stop() : time.Timer.prototype.Stop.call($.pointerValue<time.Timer>(t))))
+	await $.println("timer reset", (t !== null && (t as any).__isVarRef !== true && (t as any).__goValue === undefined ? ((t as any) as time.Timer).Reset(3600000000000n) : time.Timer.prototype.Reset.call($.pointerValue<time.Timer>(t), 3600000000000n)), (t !== null && (t as any).__isVarRef !== true && (t as any).__goValue === undefined ? ((t as any) as time.Timer).Reset(3600000000000n) : time.Timer.prototype.Reset.call($.pointerValue<time.Timer>(t), 3600000000000n)))
+	void (t !== null && (t as any).__isVarRef !== true && (t as any).__goValue === undefined ? ((t as any) as time.Timer).Stop() : time.Timer.prototype.Stop.call($.pointerValue<time.Timer>(t)))
 }
 
 var __goscriptStatic0$value: any

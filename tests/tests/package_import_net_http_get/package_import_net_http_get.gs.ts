@@ -44,7 +44,7 @@ export async function main(): globalThis.Promise<void> {
 		}
 	}, ({ kind: $.TypeKind.Function, params: ["http.ResponseWriter", /* @__PURE__ */ $.pointerType("http.Request")], results: [] } as $.FunctionTypeInfo)), "http.HandlerFunc", ({ kind: $.TypeKind.Function, name: "http.HandlerFunc", params: ["http.ResponseWriter", /* @__PURE__ */ $.pointerType("http.Request")], results: [] } as $.FunctionTypeInfo)), "http.HandlerFunc", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()))!)
 	let server$: httptest.Server = server == null ? $.pointerTarget<httptest.Server>(server) : (server as any).__isVarRef === true ? (server as any).value : (server as any).__goValue === undefined ? (server as any) : $.pointerTarget<httptest.Server>(server)
-	__defer.defer(() => { httptest.Server.prototype.Close.call($.pointerValue<httptest.Server>(server)) })
+	__defer.defer(() => { (server !== null && (server as any).__isVarRef !== true && (server as any).__goValue === undefined ? ((server as any) as httptest.Server).Close() : httptest.Server.prototype.Close.call($.pointerValue<httptest.Server>(server))) })
 
 	let __goscriptTuple1: any = await http.Get((server$ as httptest.Server).URL)
 	let resp: http.Response | $.VarRef<http.Response> | null = __goscriptTuple1[0]
@@ -68,7 +68,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("get status:", (resp$ as http.Response).StatusCode)
 	await $.println("get body:", $.bytesToString(data))
 
-	let __goscriptTuple3: any = await http.Client.prototype.Get.call($.pointerValue<http.Client>(httptest.Server.prototype.Client.call($.pointerValue<httptest.Server>(server))), (server$ as httptest.Server).URL)
+	let __goscriptTuple3: any = await http.Client.prototype.Get.call($.pointerValue<http.Client>((server !== null && (server as any).__isVarRef !== true && (server as any).__goValue === undefined ? ((server as any) as httptest.Server).Client() : httptest.Server.prototype.Client.call($.pointerValue<httptest.Server>(server)))), (server$ as httptest.Server).URL)
 	let clientResp: http.Response | $.VarRef<http.Response> | null = __goscriptTuple3[0]
 	err = __goscriptTuple3[1]
 	let clientResp$: http.Response = clientResp == null ? $.pointerTarget<http.Response>(clientResp) : (clientResp as any).__isVarRef === true ? (clientResp as any).value : (clientResp as any).__goValue === undefined ? (clientResp as any) : $.pointerTarget<http.Response>(clientResp)
@@ -89,7 +89,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("client get status:", (clientResp$ as http.Response).StatusCode)
 	await $.println("client get body:", $.bytesToString(data))
 
-	let __goscriptTuple5: any = await http.Client.prototype.Head.call($.pointerValue<http.Client>(httptest.Server.prototype.Client.call($.pointerValue<httptest.Server>(server))), (server$ as httptest.Server).URL)
+	let __goscriptTuple5: any = await http.Client.prototype.Head.call($.pointerValue<http.Client>((server !== null && (server as any).__isVarRef !== true && (server as any).__goValue === undefined ? ((server as any) as httptest.Server).Client() : httptest.Server.prototype.Client.call($.pointerValue<httptest.Server>(server)))), (server$ as httptest.Server).URL)
 	let headResp: http.Response | $.VarRef<http.Response> | null = __goscriptTuple5[0]
 	err = __goscriptTuple5[1]
 	let headResp$: http.Response = headResp == null ? $.pointerTarget<http.Response>(headResp) : (headResp as any).__isVarRef === true ? (headResp as any).value : (headResp as any).__goValue === undefined ? (headResp as any) : $.pointerTarget<http.Response>(headResp)
@@ -101,7 +101,7 @@ export async function main(): globalThis.Promise<void> {
 	__defer.defer(async () => { await __goscriptDeferCallee2() })
 	await $.println("head status:", (headResp$ as http.Response).StatusCode)
 
-	let __goscriptTuple6: any = await http.Client.prototype.Post.call($.pointerValue<http.Client>(httptest.Server.prototype.Client.call($.pointerValue<httptest.Server>(server))), (server$ as httptest.Server).URL, "text/plain", $.pointerValueOrNil($.interfaceValue<io.Reader | null>(strings.NewReader("payload"), "*strings.Reader", /* @__PURE__ */ $.pointerType("strings.Reader")))!)
+	let __goscriptTuple6: any = await http.Client.prototype.Post.call($.pointerValue<http.Client>((server !== null && (server as any).__isVarRef !== true && (server as any).__goValue === undefined ? ((server as any) as httptest.Server).Client() : httptest.Server.prototype.Client.call($.pointerValue<httptest.Server>(server)))), (server$ as httptest.Server).URL, "text/plain", $.pointerValueOrNil($.interfaceValue<io.Reader | null>(strings.NewReader("payload"), "*strings.Reader", /* @__PURE__ */ $.pointerType("strings.Reader")))!)
 	let postResp: http.Response | $.VarRef<http.Response> | null = __goscriptTuple6[0]
 	err = __goscriptTuple6[1]
 	let postResp$: http.Response = postResp == null ? $.pointerTarget<http.Response>(postResp) : (postResp as any).__isVarRef === true ? (postResp as any).value : (postResp as any).__goValue === undefined ? (postResp as any) : $.pointerTarget<http.Response>(postResp)
