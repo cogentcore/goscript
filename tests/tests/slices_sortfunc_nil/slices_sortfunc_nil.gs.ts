@@ -7,13 +7,13 @@ import * as slices from "@goscript/slices/index.js"
 export class field {
 	public declare name: string
 
-	constructor(init?: Partial<{name?: string}>, __goscriptValue?: boolean) {
-		this.name = init?.name ?? ("" as string)
+	constructor(__goscriptValue?: boolean, name$?: string) {
+		this.name = name$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): field {
-		return new field(this, true)
+		return new field(true, this.name)
 	}
 
 	public __goscriptAssign(source: field): this {

@@ -6,13 +6,13 @@ import * as $ from "@goscript/builtin/index.js"
 export class helperState {
 	public declare text: string
 
-	constructor(init?: Partial<{text?: string}>, __goscriptValue?: boolean) {
-		this.text = init?.text ?? ("" as string)
+	constructor(__goscriptValue?: boolean, text$?: string) {
+		this.text = text$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): helperState {
-		return new helperState(this, true)
+		return new helperState(true, this.text)
 	}
 
 	public __goscriptAssign(source: helperState): this {
@@ -30,7 +30,7 @@ export class helperState {
 }
 
 export function newHelperState(): helperState | $.VarRef<helperState> | null {
-	return (() => { const __goscriptLiteralField0 = suffix(); return new helperState({text: __goscriptLiteralField0}) })()
+	return (() => { const __goscriptLiteralField0 = suffix(); return new helperState(false, __goscriptLiteralField0) })()
 }
 
 export function suffix(): string {

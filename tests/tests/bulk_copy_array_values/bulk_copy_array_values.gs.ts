@@ -8,13 +8,13 @@ import type * as iter from "@goscript/iter/index.js"
 export class point {
 	public declare x: number
 
-	constructor(init?: Partial<{x?: number}>, __goscriptValue?: boolean) {
-		this.x = init?.x ?? (0 as number)
+	constructor(__goscriptValue?: boolean, x$?: number) {
+		this.x = x$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): point {
-		return new point(this, true)
+		return new point(true, this.x)
 	}
 
 	public __goscriptAssign(source: point): this {
@@ -63,7 +63,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 	await $.println("values:", $.arrayIndex($.arrayIndex(src!, 0), 0))
 
-	let points = $.arrayToSlice<point[]>([$.arrayValue([new point({x: 1}, true)], /* @__PURE__ */ $.arrayType("main.point", 1))])
+	let points = $.arrayToSlice<point[]>([$.arrayValue([new point(true, 1)], /* @__PURE__ */ $.arrayType("main.point", 1))])
 	let pointCopies = $.makeSlice<point[]>(1)
 	$.copy(pointCopies, points)
 	$.arrayIndex($.arrayIndex(pointCopies!, 0), 0).x = 9

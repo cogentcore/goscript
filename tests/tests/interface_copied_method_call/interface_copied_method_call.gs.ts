@@ -14,12 +14,12 @@ $.registerInterfaceType(
 );
 
 export class task {
-	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
+	constructor(__goscriptValue?: boolean) {
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): task {
-		return new task(this, true)
+		return new task(true)
 	}
 
 	public __goscriptAssign(source: task): this {
@@ -48,7 +48,7 @@ export async function callCopied(r: runner | null): globalThis.Promise<void> {
 }
 
 export async function main(): globalThis.Promise<void> {
-	await callCopied($.interfaceValue<runner | null>(new task(undefined, true), "main.task", "main.task"))
+	await callCopied($.interfaceValue<runner | null>(new task(true), "main.task", "main.task"))
 }
 
 var __goscriptAwait: any

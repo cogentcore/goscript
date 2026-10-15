@@ -34,14 +34,14 @@ export class Pos {
 
 	public declare Char: number
 
-	constructor(init?: Partial<{Line?: number, Char?: number}>, __goscriptValue?: boolean) {
-		this.Line = init?.Line ?? (0 as number)
-		this.Char = init?.Char ?? (0 as number)
+	constructor(__goscriptValue?: boolean, Line$?: number, Char$?: number) {
+		this.Line = Line$ ?? 0
+		this.Char = Char$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Pos {
-		return new Pos(this, true)
+		return new Pos(true, this.Line, this.Char)
 	}
 
 	public __goscriptAssign(source: Pos): this {
@@ -64,14 +64,14 @@ export class Region {
 
 	public declare End: Pos
 
-	constructor(init?: Partial<{Start?: Pos, End?: Pos}>, __goscriptValue?: boolean) {
-		this.Start = init?.Start ? init.Start.clone() : new Pos(undefined, true)
-		this.End = init?.End ? init.End.clone() : new Pos(undefined, true)
+	constructor(__goscriptValue?: boolean, Start$?: Pos, End$?: Pos) {
+		this.Start = Start$ ?? new Pos(true)
+		this.End = End$ ?? new Pos(true)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Region {
-		return new Region(this, true)
+		return new Region(true, this.Start.clone(), this.End.clone())
 	}
 
 	public __goscriptAssign(source: Region): this {
@@ -107,14 +107,14 @@ export class rule {
 
 	public declare name: string
 
-	constructor(init?: Partial<{off?: boolean, name?: string}>, __goscriptValue?: boolean) {
-		this.off = init?.off ?? (false as boolean)
-		this.name = init?.name ?? ("" as string)
+	constructor(__goscriptValue?: boolean, off$?: boolean, name$?: string) {
+		this.off = off$ ?? false
+		this.name = name$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): rule {
-		return new rule(this, true)
+		return new rule(true, this.off, this.name)
 	}
 
 	public __goscriptAssign(source: rule): this {
@@ -150,7 +150,7 @@ export class rule {
 			return [false, (__goscriptBorrow === true ? scope : (scope).clone()), depth]
 		}
 		if (scope.Start.Line == scope.End.Line) {
-			return [true, new Region({Start: scope.Start, End: new Pos({Line: scope.End.Line, Char: scope.End.Char + 1}, true)}, true), depth]
+			return [true, new Region(true, (scope.Start).clone(), new Pos(true, scope.End.Line, scope.End.Char + 1)), depth]
 		}
 		return [true, (__goscriptBorrow === true ? scope : (scope).clone()), depth]
 	}
@@ -169,14 +169,14 @@ export class outer {
 
 	public declare Region: Region
 
-	constructor(init?: Partial<{rule?: rule | $.VarRef<rule> | null, Region?: Region}>, __goscriptValue?: boolean) {
-		this.rule = init?.rule ?? (null! as rule | $.VarRef<rule> | null)
-		this.Region = init?.Region ? init.Region.clone() : new Region(undefined, true)
+	constructor(__goscriptValue?: boolean, rule$?: rule | $.VarRef<rule> | null, Region$?: Region) {
+		this.rule = rule$ ?? (null! as rule | $.VarRef<rule> | null)
+		this.Region = Region$ ?? new Region(true)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): outer {
-		return new outer(this, true)
+		return new outer(true, this.rule, this.Region.clone())
 	}
 
 	public __goscriptAssign(source: outer): this {
@@ -222,7 +222,7 @@ export function __goscript_set_calls(__goscriptValue: number): void {
 
 export function first(a: Region, __goscriptBorrow?: boolean): Region {
 	if (a.Start.Line < 0) {
-		return new Region(undefined, true)
+		return new Region(true)
 	}
 	return (__goscriptBorrow === true ? a : (a).clone())
 }
@@ -276,7 +276,7 @@ export function captured(scope: Region): [Region, (() => void) | null] {
 }
 
 export function deferred(scope: Region): Region {
-	let r: Region = new Region(undefined, true)
+	let r: Region = new Region(true)
 	using __defer = new $.DisposableStack()
 	let n = (scope).clone()
 	__defer.defer(() => { (() => {
@@ -298,7 +298,7 @@ export function pick(a: Region, n: number, __goscriptBorrow?: boolean): Region {
 	if (n > 0) {
 		return (__goscriptBorrow === true ? a : (a).clone())
 	}
-	return new Region(undefined, true)
+	return new Region(true)
 }
 
 export function aliasArg(__goscriptParam0: Region): number {
@@ -332,8 +332,8 @@ export function promoted(__goscriptParam2: outer, scope: Region): number {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let r = new rule({name: "r"})
-	let scope = new Region({Start: new Pos({Line: 1, Char: 2}, true), End: new Pos({Line: 3, Char: 4}, true)}, true)
+	let r = new rule(false, undefined, "r")
+	let scope = new Region(true, new Pos(true, 1, 2), new Pos(true, 3, 4))
 
 	// a result that is only read shares nothing that changes
 	let [ok, nscope, depth] = (r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? ((r as any) as rule).match(scope, 0) : rule.prototype.match.call(r, scope, 0))
@@ -352,7 +352,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// an argument changed in a loop around the call
 	let loopArg = (scope).clone()
-	let last: Region = new Region(undefined, true)
+	let last: Region = new Region(true)
 	for (let i = 0; i < 3; i++) {
 		let [, got, ] = (r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? ((r as any) as rule).match(loopArg, 0) : rule.prototype.match.call(r, loopArg, 0))
 		if (i == 0) {
@@ -400,12 +400,12 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("at:", scope.End.Char, at.End.Char)
 
 	// the same region read through a result of an off rule
-	let off = new rule({off: true})
+	let off = new rule(false, true)
 	let [, offScope, ] = (off !== null && (off as any).__isVarRef !== true && (off as any).__goValue === undefined ? ((off as any) as rule).match(scope, 0) : rule.prototype.match.call(off, scope, 0))
 	await $.println("off:", (offScope.Start.Line === scope.Start.Line && offScope.Start.Char === scope.Start.Char && offScope.End.Line === scope.End.Line && offScope.End.Char === scope.End.Char))
 	scope.Start.Line = 21
 	await $.println("off after change:", offScope.Start.Line, scope.Start.Line)
-	let base = new Region({Start: new Pos({Line: 1, Char: 2}, true), End: new Pos({Line: 3, Char: 4}, true)}, true)
+	let base = new Region(true, new Pos(true, 1, 2), new Pos(true, 3, 4))
 	let g = grow(base)
 	g.Start.Line = 7
 	await $.println("grow:", base.End.Line, g.End.Line, g.Start.Line)
@@ -423,8 +423,8 @@ export async function main(): globalThis.Promise<void> {
 	let cp2 = changedParam((cp1).clone())
 	await $.println("changedParam:", base.Start.Line, cp1.Start.Line, cp2.Start.Line)
 	await $.println("aliasArg:", aliasArg((base).clone()), "methodArg:", methodArg((base).clone()), "aliasField:", aliasField(base))
-	await $.println("promoted:", promoted(new outer({rule: r, Region: base}, true), base))
-	await $.println("reads:", reads(r, new Region({Start: new Pos({Line: 1, Char: 2}, true), End: new Pos({Line: 3, Char: 4}, true)}, true)))
+	await $.println("promoted:", promoted(new outer(true, r, (base).clone()), base))
+	await $.println("reads:", reads(r, new Region(true, new Pos(true, 1, 2), new Pos(true, 3, 4))))
 	await $.println("calls:", calls)
 }
 

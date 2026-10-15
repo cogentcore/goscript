@@ -25,7 +25,7 @@ export async function printURL(label: string, u: url.URL | $.VarRef<url.URL> | n
 		await $.println(label, "parse:", (ref !== null && (ref as any).__isVarRef !== true && (ref as any).__goValue === undefined ? ((ref as any) as url.URL).String() : url.URL.prototype.String.call(ref)))
 	}
 
-	await $.println(label, "resolve:", url.URL.prototype.String.call((u !== null && (u as any).__isVarRef !== true && (u as any).__goValue === undefined ? ((u as any) as url.URL).ResolveReference(new url.URL({Path: "x/./y"})) : url.URL.prototype.ResolveReference.call(u, new url.URL({Path: "x/./y"})))))
+	await $.println(label, "resolve:", url.URL.prototype.String.call((u !== null && (u as any).__isVarRef !== true && (u as any).__goValue === undefined ? ((u as any) as url.URL).ResolveReference(new url.URL(false, undefined, undefined, undefined, undefined, "x/./y")) : url.URL.prototype.ResolveReference.call(u, new url.URL(false, undefined, undefined, undefined, undefined, "x/./y")))))
 	await $.println(label, "join:", url.URL.prototype.String.call((u !== null && (u as any).__isVarRef !== true && (u as any).__goValue === undefined ? ((u as any) as url.URL).JoinPath($.arrayToSlice<string>(["sub", "../z"])) : url.URL.prototype.JoinPath.call(u, $.arrayToSlice<string>(["sub", "../z"])))))
 
 	let __goscriptTuple1: any = (u !== null && (u as any).__isVarRef !== true && (u as any).__goValue === undefined ? ((u as any) as url.URL).MarshalBinary() : url.URL.prototype.MarshalBinary.call(u))

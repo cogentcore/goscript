@@ -6,13 +6,13 @@ import * as $ from "@goscript/builtin/index.js"
 export class _object {
 	public declare name: string
 
-	constructor(init?: Partial<{name?: string}>, __goscriptValue?: boolean) {
-		this.name = init?.name ?? ("" as string)
+	constructor(__goscriptValue?: boolean, name$?: string) {
+		this.name = name$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): _object {
-		return new _object(this, true)
+		return new _object(true, this.name)
 	}
 
 	public __goscriptAssign(source: _object): this {
@@ -39,14 +39,14 @@ export class Var {
 
 	public declare kind: number
 
-	constructor(init?: Partial<{_object?: _object, kind?: number}>, __goscriptValue?: boolean) {
-		this._object = init?._object ? init._object.clone() : new _object(undefined, true)
-		this.kind = init?.kind ?? (0 as number)
+	constructor(__goscriptValue?: boolean, _object$?: _object, kind$?: number) {
+		this._object = _object$ ?? new _object(true)
+		this.kind = kind$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Var {
-		return new Var(this, true)
+		return new Var(true, this._object.clone(), this.kind)
 	}
 
 	public __goscriptAssign(source: Var): this {
@@ -71,13 +71,13 @@ export class Var {
 export class _number {
 	public declare n: number
 
-	constructor(init?: Partial<{n?: number}>, __goscriptValue?: boolean) {
-		this.n = init?.n ?? (0 as number)
+	constructor(__goscriptValue?: boolean, n$?: number) {
+		this.n = n$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): _number {
-		return new _number(this, true)
+		return new _number(true, this.n)
 	}
 
 	public __goscriptAssign(source: _number): this {
@@ -99,14 +99,14 @@ export class Holder {
 
 	public declare _string: string
 
-	constructor(init?: Partial<{_number?: _number | $.VarRef<_number> | null, _string?: string}>, __goscriptValue?: boolean) {
-		this._number = init?._number ?? (null! as _number | $.VarRef<_number> | null)
-		this._string = init?._string ?? ("" as string)
+	constructor(__goscriptValue?: boolean, _number$?: _number | $.VarRef<_number> | null, _string$?: string) {
+		this._number = _number$ ?? (null! as _number | $.VarRef<_number> | null)
+		this._string = _string$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Holder {
-		return new Holder(this, true)
+		return new Holder(true, this._number, this._string)
 	}
 
 	public __goscriptAssign(source: Holder): this {
@@ -125,13 +125,13 @@ export class Holder {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let v = new Var({_object: new _object({name: "x"}, true)})
+	let v = new Var(false, new _object(true, "x"))
 	let v$: Var = v == null ? $.pointerTarget<Var>(v) : (v as any).__isVarRef === true ? (v as any).value : (v as any).__goValue === undefined ? (v as any) : $.pointerTarget<Var>(v)
 	await $.println((v$ as Var)._object.Name(), (v$ as Var)._object.name, (v$ as Var)._object.Name(), (v$ as Var)._object.name)
 	let o = $.fieldRef((v$ as Var), "_object")
 	$.pointerValue<_object>(o).name = "y"
 	await $.println((v$ as Var)._object.name)
-	let h = new Holder({_number: new _number({n: 3}), _string: "s"}, true)
+	let h = new Holder(true, new _number(false, 3), "s")
 	await $.println($.pointerValue<_number>(h._number).n, $.pointerValue<_number>(h._number).n, h._string)
 }
 

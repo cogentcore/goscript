@@ -16,13 +16,13 @@ $.registerInterfaceType(
 export class blockImpl {
 	public declare size: number
 
-	constructor(init?: Partial<{size?: number}>, __goscriptValue?: boolean) {
-		this.size = init?.size ?? (0 as number)
+	constructor(__goscriptValue?: boolean, size$?: number) {
+		this.size = size$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): blockImpl {
-		return new blockImpl(this, true)
+		return new blockImpl(true, this.size)
 	}
 
 	public __goscriptAssign(source: blockImpl): this {
@@ -45,7 +45,7 @@ export class blockImpl {
 }
 
 export function newBlock(size: number): [blockImpl | $.VarRef<blockImpl> | null, $.GoError] {
-	return [new blockImpl({size: size}), null]
+	return [new blockImpl(false, size), null]
 }
 
 export function newInterface(size: number): [Block | null, $.GoError] {

@@ -19,14 +19,14 @@ export class blockType {
 
 	public declare _constructor: (() => any | globalThis.Promise<any>) | null
 
-	constructor(init?: Partial<{typeID?: string, _constructor?: (() => any | globalThis.Promise<any>) | null}>, __goscriptValue?: boolean) {
-		this.typeID = init?.typeID ?? ("" as string)
-		this._constructor = init?._constructor ?? (null! as (() => any | globalThis.Promise<any>) | null)
+	constructor(__goscriptValue?: boolean, typeID$?: string, _constructor$?: (() => any | globalThis.Promise<any>) | null) {
+		this.typeID = typeID$ ?? ""
+		this._constructor = _constructor$ ?? (null! as (() => any | globalThis.Promise<any>) | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): blockType {
-		return new blockType(this, true)
+		return new blockType(true, this.typeID, this._constructor)
 	}
 
 	public __goscriptAssign(source: blockType): this {
@@ -55,12 +55,12 @@ export class blockType {
 }
 
 export class sampleBlock {
-	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
+	constructor(__goscriptValue?: boolean) {
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): sampleBlock {
-		return new sampleBlock(this, true)
+		return new sampleBlock(true)
 	}
 
 	public __goscriptAssign(source: sampleBlock): this {
@@ -85,7 +85,7 @@ export class sampleBlock {
 }
 
 export function NewBlockType(__typeArgs: $.GenericTypeArgs | undefined, typeID: string, _constructor: (() => any | globalThis.Promise<any>) | null): blockType | $.VarRef<blockType> | null {
-	return new blockType({typeID: typeID, _constructor: _constructor})
+	return new blockType(false, typeID, _constructor)
 }
 
 export async function main(): globalThis.Promise<void> {

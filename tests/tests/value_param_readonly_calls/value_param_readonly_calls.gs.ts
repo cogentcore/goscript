@@ -8,14 +8,14 @@ export class Pos {
 
 	public declare Char: number
 
-	constructor(init?: Partial<{Line?: number, Char?: number}>, __goscriptValue?: boolean) {
-		this.Line = init?.Line ?? (0 as number)
-		this.Char = init?.Char ?? (0 as number)
+	constructor(__goscriptValue?: boolean, Line$?: number, Char$?: number) {
+		this.Line = Line$ ?? 0
+		this.Char = Char$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Pos {
-		return new Pos(this, true)
+		return new Pos(true, this.Line, this.Char)
 	}
 
 	public __goscriptAssign(source: Pos): this {
@@ -38,14 +38,14 @@ export class Region {
 
 	public declare End: Pos
 
-	constructor(init?: Partial<{Start?: Pos, End?: Pos}>, __goscriptValue?: boolean) {
-		this.Start = init?.Start ? init.Start.clone() : new Pos(undefined, true)
-		this.End = init?.End ? init.End.clone() : new Pos(undefined, true)
+	constructor(__goscriptValue?: boolean, Start$?: Pos, End$?: Pos) {
+		this.Start = Start$ ?? new Pos(true)
+		this.End = End$ ?? new Pos(true)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Region {
-		return new Region(this, true)
+		return new Region(true, this.Start.clone(), this.End.clone())
 	}
 
 	public __goscriptAssign(source: Region): this {
@@ -72,13 +72,13 @@ export class Region {
 export class holder {
 	public declare r: Region
 
-	constructor(init?: Partial<{r?: Region}>, __goscriptValue?: boolean) {
-		this.r = init?.r ? init.r.clone() : new Region(undefined, true)
+	constructor(__goscriptValue?: boolean, r$?: Region) {
+		this.r = r$ ?? new Region(true)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): holder {
-		return new holder(this, true)
+		return new holder(true, this.r.clone())
 	}
 
 	public __goscriptAssign(source: holder): this {
@@ -95,7 +95,7 @@ export class holder {
 	)
 }
 
-export let g: Region = new Region(undefined, true)
+export let g: Region = new Region(true)
 
 export function __goscript_set_g(__goscriptValue: Region): void {
 	$.assignStruct(g, __goscriptValue)
@@ -107,7 +107,7 @@ export function __goscript_set_h(__goscriptValue: holder | $.VarRef<holder> | nu
 	h = __goscriptValue
 }
 
-export let regions: $.Slice<Region> = $.arrayToSlice<Region>([new Region(undefined, true)])
+export let regions: $.Slice<Region> = $.arrayToSlice<Region>([new Region(true)])
 
 export function __goscript_set_regions(__goscriptValue: $.Slice<Region>): void {
 	regions = __goscriptValue

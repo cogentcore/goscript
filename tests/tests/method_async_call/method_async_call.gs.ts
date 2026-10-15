@@ -9,14 +9,14 @@ export class FileTracker {
 
 	public declare lines: $.Slice<number>
 
-	constructor(init?: Partial<{mutex?: sync.Mutex, lines?: $.Slice<number>}>, __goscriptValue?: boolean) {
-		this.mutex = init?.mutex ? $.markAsStructValue($.cloneStructValue(init.mutex)) : $.markAsStructValue(new sync.Mutex())
-		this.lines = init?.lines ?? (null! as $.Slice<number>)
+	constructor(__goscriptValue?: boolean, mutex$?: sync.Mutex, lines$?: $.Slice<number>) {
+		this.mutex = mutex$ ?? $.markAsStructValue(new sync.Mutex())
+		this.lines = lines$ ?? (null! as $.Slice<number>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): FileTracker {
-		return new FileTracker(this, true)
+		return new FileTracker(true, $.markAsStructValue($.cloneStructValue(this.mutex)), this.lines)
 	}
 
 	public __goscriptAssign(source: FileTracker): this {
@@ -45,13 +45,13 @@ export class FileTracker {
 export class Scanner {
 	public declare file: FileTracker | $.VarRef<FileTracker> | null
 
-	constructor(init?: Partial<{file?: FileTracker | $.VarRef<FileTracker> | null}>, __goscriptValue?: boolean) {
-		this.file = init?.file ?? (null! as FileTracker | $.VarRef<FileTracker> | null)
+	constructor(__goscriptValue?: boolean, file$?: FileTracker | $.VarRef<FileTracker> | null) {
+		this.file = file$ ?? (null! as FileTracker | $.VarRef<FileTracker> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Scanner {
-		return new Scanner(this, true)
+		return new Scanner(true, this.file)
 	}
 
 	public __goscriptAssign(source: Scanner): this {
@@ -74,8 +74,8 @@ export class Scanner {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let tracker = new FileTracker({lines: $.arrayToSlice<number>([])})
-	let scanner = new Scanner({file: tracker})
+	let tracker = new FileTracker(false, undefined, $.arrayToSlice<number>([]))
+	let scanner = new Scanner(false, tracker)
 	void (scanner !== null && (scanner as any).__isVarRef !== true && (scanner as any).__goValue === undefined ? ((scanner as any) as Scanner).next() : Scanner.prototype.next.call(scanner))
 	await $.println($.sliceLen($.pointerValue<FileTracker>(tracker).lines))
 }

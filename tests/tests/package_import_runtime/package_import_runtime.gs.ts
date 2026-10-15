@@ -10,13 +10,13 @@ import * as strings from "@goscript/strings/index.js"
 export class counter {
 	public declare n: number
 
-	constructor(init?: Partial<{n?: number}>, __goscriptValue?: boolean) {
-		this.n = init?.n ?? (0 as number)
+	constructor(__goscriptValue?: boolean, n$?: number) {
+		this.n = n$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): counter {
-		return new counter(this, true)
+		return new counter(true, this.n)
 	}
 
 	public __goscriptAssign(source: counter): this {
@@ -46,13 +46,13 @@ export class counter {
 export class box {
 	public declare v: any
 
-	constructor(init?: Partial<{v?: any}>, __goscriptValue?: boolean, __goscriptFresh?: boolean) {
-		this.v = init?.v !== undefined ? (__goscriptFresh === true ? init.v : $.copyElement(init.v)) : (null! as any)
+	constructor(__goscriptValue?: boolean, v$?: any) {
+		this.v = v$ ?? (null! as any)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): box {
-		return new box(this, true)
+		return new box(true, $.copyElement(this.v))
 	}
 
 	public __goscriptAssign(source: box): this {
@@ -156,11 +156,11 @@ export async function funcValueNames(): globalThis.Promise<void> {
 	await $.println("FuncForPC func:", funcName($.interfaceValue($.goFunc(helperFunc, "main.helperFunc"), "func()", ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo))))
 	await $.println("FuncForPC imported:", funcName($.interfaceValue($.goFunc(strings.ToUpper, "strings.ToUpper"), "func(s string) string", ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string")], results: [/* @__PURE__ */ $.basicType("string")] } as $.FunctionTypeInfo))))
 
-	let c = new counter({n: 1})
+	let c = new counter(false, 1)
 	await $.println("FuncForPC pointer method:", funcName($.interfaceValue($.functionValue(((__receiver) => () => __receiver.PtrMethod())($.pointerValue<counter>(c)), ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo), "main.(*counter).PtrMethod-fm"), "func() int", ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))))
 	await $.println("FuncForPC value method:", funcName($.interfaceValue($.functionValue(((__receiver) => () => __receiver.ValMethod())($.markAsStructValue($.cloneStructValue($.pointerValue<counter>(c)))), ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo), "main.counter.ValMethod-fm"), "func() int", ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))))
 
-	let b = new box({v: 2})
+	let b = new box(false, 2)
 	await $.println("FuncForPC generic method:", funcName($.interfaceValue($.functionValue(((__receiver) => () => __receiver.Get(__goscriptStatic0()))($.pointerValue<box>(b)), ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo), "main.(*box[...]).Get-fm"), "func() int", ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))))
 }
 

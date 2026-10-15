@@ -19,14 +19,14 @@ export class Base {
 
 	public declare inits: number
 
-	constructor(init?: Partial<{name?: string, inits?: number}>, __goscriptValue?: boolean) {
-		this.name = init?.name ?? ("" as string)
-		this.inits = init?.inits ?? (0 as number)
+	constructor(__goscriptValue?: boolean, name$?: string, inits$?: number) {
+		this.name = name$ ?? ""
+		this.inits = inits$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Base {
-		return new Base(this, true)
+		return new Base(true, this.name, this.inits)
 	}
 
 	public __goscriptAssign(source: Base): this {
@@ -59,14 +59,14 @@ export class Widget {
 
 	public declare Text: string
 
-	constructor(init?: Partial<{Base?: Base, Text?: string}>, __goscriptValue?: boolean) {
-		this.Base = init?.Base ? init.Base.clone() : new Base(undefined, true)
-		this.Text = init?.Text ?? ("" as string)
+	constructor(__goscriptValue?: boolean, Base$?: Base, Text$?: string) {
+		this.Base = Base$ ?? new Base(true)
+		this.Text = Text$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Widget {
-		return new Widget(this, true)
+		return new Widget(true, this.Base.clone(), this.Text)
 	}
 
 	public __goscriptAssign(source: Widget): this {
@@ -126,7 +126,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("same:", $.comparableEqual($.interfaceValue(w, "*main.Widget", /* @__PURE__ */ $.pointerType("main.Widget")), (n as any)))
 
 	let p = (newNode(__goscriptStatic0()) as Widget | $.VarRef<Widget> | null)
-	store(__goscriptStatic0(), p, new Widget({Text: "stored"}, true))
+	store(__goscriptStatic0(), p, new Widget(true, undefined, "stored"))
 	await $.println("stored:", $.pointerValue<Widget>(p).Text, load(__goscriptStatic0(), p).Text)
 
 	let q = (newNode(__goscriptStatic0()) as Widget | $.VarRef<Widget> | null)
@@ -142,7 +142,7 @@ export async function main(): globalThis.Promise<void> {
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.Widget", zero: () => new Widget(undefined, true) }})
+	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.Widget", zero: () => new Widget(true) }})
 }
 
 var __goscriptStatic1$value: any

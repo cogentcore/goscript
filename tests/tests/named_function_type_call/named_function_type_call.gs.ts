@@ -48,15 +48,15 @@ export class MockFileInfo {
 
 	public declare isDir: boolean
 
-	constructor(init?: Partial<{name?: string, size?: bigint, isDir?: boolean}>, __goscriptValue?: boolean) {
-		this.name = init?.name ?? ("" as string)
-		this.size = init?.size ?? (0n as bigint)
-		this.isDir = init?.isDir ?? (false as boolean)
+	constructor(__goscriptValue?: boolean, name$?: string, size$?: bigint, isDir$?: boolean) {
+		this.name = name$ ?? ""
+		this.size = size$ ?? 0n
+		this.isDir = isDir$ ?? false
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): MockFileInfo {
-		return new MockFileInfo(this, true)
+		return new MockFileInfo(true, this.name, this.size, this.isDir)
 	}
 
 	public __goscriptAssign(source: MockFileInfo): this {
@@ -91,12 +91,12 @@ export class MockFileInfo {
 }
 
 export class MockFilesystem {
-	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
+	constructor(__goscriptValue?: boolean) {
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): MockFilesystem {
-		return new MockFilesystem(this, true)
+		return new MockFilesystem(true)
 	}
 
 	public __goscriptAssign(source: MockFilesystem): this {
@@ -105,7 +105,7 @@ export class MockFilesystem {
 
 	public ReadDir(path: string): [$.Slice<FileInfo | null>, $.GoError] {
 		const m: MockFilesystem | $.VarRef<MockFilesystem> | null = this;
-		return [$.arrayToSlice<FileInfo | null>([$.interfaceValue<FileInfo | null>(new MockFileInfo({name: "file1.txt", size: 100n, isDir: false}), "*main.MockFileInfo", /* @__PURE__ */ $.pointerType("main.MockFileInfo")), $.interfaceValue<FileInfo | null>(new MockFileInfo({name: "subdir", size: 0n, isDir: true}), "*main.MockFileInfo", /* @__PURE__ */ $.pointerType("main.MockFileInfo"))]), null]
+		return [$.arrayToSlice<FileInfo | null>([$.interfaceValue<FileInfo | null>(new MockFileInfo(false, "file1.txt", 100n, false), "*main.MockFileInfo", /* @__PURE__ */ $.pointerType("main.MockFileInfo")), $.interfaceValue<FileInfo | null>(new MockFileInfo(false, "subdir", 0n, true), "*main.MockFileInfo", /* @__PURE__ */ $.pointerType("main.MockFileInfo"))]), null]
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -120,13 +120,13 @@ export class MockFilesystem {
 export class shapeNode {
 	public declare value: number
 
-	constructor(init?: Partial<{value?: number}>, __goscriptValue?: boolean) {
-		this.value = init?.value ?? (0 as number)
+	constructor(__goscriptValue?: boolean, value$?: number) {
+		this.value = value$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): shapeNode {
-		return new shapeNode(this, true)
+		return new shapeNode(true, this.value)
 	}
 
 	public __goscriptAssign(source: shapeNode): this {
@@ -151,13 +151,13 @@ export class shapeNode {
 export class MorphismHolder {
 	public declare morphism: ((_p0: Shape | null) => Shape | null | globalThis.Promise<Shape | null>) | null
 
-	constructor(init?: Partial<{morphism?: ((_p0: Shape | null) => Shape | null | globalThis.Promise<Shape | null>) | null}>, __goscriptValue?: boolean) {
-		this.morphism = init?.morphism ?? (null! as ((_p0: Shape | null) => Shape | null | globalThis.Promise<Shape | null>) | null)
+	constructor(__goscriptValue?: boolean, morphism$?: ((_p0: Shape | null) => Shape | null | globalThis.Promise<Shape | null>) | null) {
+		this.morphism = morphism$ ?? (null! as ((_p0: Shape | null) => Shape | null | globalThis.Promise<Shape | null>) | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): MorphismHolder {
-		return new MorphismHolder(this, true)
+		return new MorphismHolder(true, this.morphism)
 	}
 
 	public __goscriptAssign(source: MorphismHolder): this {
@@ -187,13 +187,13 @@ export class MorphismHolder {
 export class morphismWorker {
 	public declare ready: $.Channel<boolean> | null
 
-	constructor(init?: Partial<{ready?: $.Channel<boolean> | null}>, __goscriptValue?: boolean) {
-		this.ready = init?.ready ?? (null! as $.Channel<boolean> | null)
+	constructor(__goscriptValue?: boolean, ready$?: $.Channel<boolean> | null) {
+		this.ready = ready$ ?? (null! as $.Channel<boolean> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): morphismWorker {
-		return new morphismWorker(this, true)
+		return new morphismWorker(true, this.ready)
 	}
 
 	public __goscriptAssign(source: morphismWorker): this {
@@ -288,16 +288,16 @@ export async function useMorphism(m: ((_p0: Shape | null) => Shape | null | glob
 }
 
 export async function newMorphismHolder(m: ((_p0: Shape | null) => Shape | null | globalThis.Promise<Shape | null>) | null): globalThis.Promise<MorphismHolder | $.VarRef<MorphismHolder> | null> {
-	return new MorphismHolder({morphism: m})
+	return new MorphismHolder(false, m)
 }
 
 export async function cloneMorphism(m: ((_p0: Shape | null) => Shape | null | globalThis.Promise<Shape | null>) | null): globalThis.Promise<MorphismHolder | $.VarRef<MorphismHolder> | null> {
-	return new MorphismHolder({morphism: m})
+	return new MorphismHolder(false, m)
 }
 
 export async function main(): globalThis.Promise<void> {
 	let fs = new MockFilesystem()
-	let fileInfo = new MockFileInfo({name: "test.txt", size: 50n, isDir: false})
+	let fileInfo = new MockFileInfo(false, "test.txt", 50n, false)
 
 	// Test the walk function with custom WalkFunc
 	let walkFunc = $.functionValue(async (path: string, info: FileInfo | null, err: $.GoError): globalThis.Promise<$.GoError> => {
@@ -337,8 +337,8 @@ export async function main(): globalThis.Promise<void> {
 		return true
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo))]), "slice")
 
-	let worker = new morphismWorker({ready: $.makeChannel<boolean>(1, false, "both")})
-	let shape = new shapeNode({value: 7})
+	let worker = new morphismWorker(false, $.makeChannel<boolean>(1, false, "both"))
+	let shape = new shapeNode(false, 7)
 	await $.println("Named morphism:", await useMorphism($.functionValue(((__receiver) => (s: Shape | null) => __receiver.lookup(s))($.pointerValue<morphismWorker>(worker)), ({ kind: $.TypeKind.Function, params: ["main.Shape"], results: ["main.Shape"] } as $.FunctionTypeInfo), "main.(*morphismWorker).lookup-fm"), $.interfaceValue<Shape | null>(shape, "*main.shapeNode", /* @__PURE__ */ $.pointerType("main.shapeNode"))))
 	let holder = await newMorphismHolder($.functionValue(((__receiver) => (s: Shape | null) => __receiver.lookup(s))($.pointerValue<morphismWorker>(worker)), ({ kind: $.TypeKind.Function, params: ["main.Shape"], results: ["main.Shape"] } as $.FunctionTypeInfo), "main.(*morphismWorker).lookup-fm"))
 	await $.println("Field morphism:", await (holder !== null && (holder as any).__isVarRef !== true && (holder as any).__goValue === undefined ? ((holder as any) as MorphismHolder).apply($.interfaceValue<Shape | null>(shape, "*main.shapeNode", /* @__PURE__ */ $.pointerType("main.shapeNode"))) : MorphismHolder.prototype.apply.call(holder, $.interfaceValue<Shape | null>(shape, "*main.shapeNode", /* @__PURE__ */ $.pointerType("main.shapeNode")))))

@@ -6,13 +6,13 @@ import * as $ from "@goscript/builtin/index.js"
 export class Result {
 	public declare ok: boolean
 
-	constructor(init?: Partial<{ok?: boolean}>, __goscriptValue?: boolean) {
-		this.ok = init?.ok ?? (false as boolean)
+	constructor(__goscriptValue?: boolean, ok$?: boolean) {
+		this.ok = ok$ ?? false
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Result {
-		return new Result(this, true)
+		return new Result(true, this.ok)
 	}
 
 	public __goscriptAssign(source: Result): this {
@@ -31,7 +31,7 @@ export class Result {
 
 export async function main(): globalThis.Promise<void> {
 	let x: any = $.basicInterfaceValue(42, "int")
-	let result = new Result(undefined, true)
+	let result = new Result(true)
 
 	// This should trigger the error: ok expression is not an identifier: *ast.SelectorExpr
 	// The 'ok' variable is result.ok (a selector expression) instead of a simple identifier

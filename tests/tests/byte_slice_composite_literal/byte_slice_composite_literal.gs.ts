@@ -6,13 +6,13 @@ import * as $ from "@goscript/builtin/index.js"
 export class holder {
 	public declare data: $.Slice<number>
 
-	constructor(init?: Partial<{data?: $.Slice<number>}>, __goscriptValue?: boolean) {
-		this.data = init?.data ?? (null! as $.Slice<number>)
+	constructor(__goscriptValue?: boolean, data$?: $.Slice<number>) {
+		this.data = data$ ?? (null! as $.Slice<number>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): holder {
-		return new holder(this, true)
+		return new holder(true, this.data)
 	}
 
 	public __goscriptAssign(source: holder): this {
@@ -40,7 +40,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// Storing the literal in a struct field and reading it back must
 	// preserve the Uint8Array backing without any append repairing it.
-	let h = new holder({data: new Uint8Array([9, 8, 7]) as $.Slice<number>}, true)
+	let h = new holder(true, new Uint8Array([9, 8, 7]) as $.Slice<number>)
 	await $.println("stored:", h.data)
 	await $.println("stored index:", $.arrayIndex(h.data!, 1))
 

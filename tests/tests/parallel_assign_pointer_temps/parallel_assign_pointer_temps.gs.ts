@@ -6,13 +6,13 @@ import * as $ from "@goscript/builtin/index.js"
 export class node {
 	public declare next: number
 
-	constructor(init?: Partial<{next?: number}>, __goscriptValue?: boolean) {
-		this.next = init?.next ?? (0 as number)
+	constructor(__goscriptValue?: boolean, next$?: number) {
+		this.next = next$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): node {
-		return new node(this, true)
+		return new node(true, this.next)
 	}
 
 	public __goscriptAssign(source: node): this {
@@ -32,13 +32,13 @@ export class node {
 export class queue {
 	public declare value: number
 
-	constructor(init?: Partial<{value?: number}>, __goscriptValue?: boolean) {
-		this.value = init?.value ?? (0 as number)
+	constructor(__goscriptValue?: boolean, value$?: number) {
+		this.value = value$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): queue {
-		return new queue(this, true)
+		return new queue(true, this.value)
 	}
 
 	public __goscriptAssign(source: queue): this {
@@ -56,15 +56,15 @@ export class queue {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let left: queue | $.VarRef<queue> | null = new queue({value: 1})
-	let right: queue | $.VarRef<queue> | null = new queue({value: 2})
+	let left: queue | $.VarRef<queue> | null = new queue(false, 1)
+	let right: queue | $.VarRef<queue> | null = new queue(false, 2)
 	let __goscriptAssign0_0: queue | $.VarRef<queue> | null = right
 	let __goscriptAssign0_1: queue | $.VarRef<queue> | null = left
 	left = __goscriptAssign0_0
 	right = __goscriptAssign0_1
 	await $.println($.pointerValue<queue>(left).value, $.pointerValue<queue>(right).value)
 
-	let nodes = $.arrayValue([new node({next: 1}, true), new node({next: 0}, true)], /* @__PURE__ */ $.arrayType("main.node", 2))
+	let nodes = $.arrayValue([new node(true, 1), new node(true, 0)], /* @__PURE__ */ $.arrayType("main.node", 2))
 	let pc = 0
 	let inst: node | $.VarRef<node> | null = $.indexRef(nodes, pc)
 	let __goscriptAssign1_0: number = $.pointerValue<node>(inst).next

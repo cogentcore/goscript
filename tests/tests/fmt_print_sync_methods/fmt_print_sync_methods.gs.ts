@@ -11,14 +11,14 @@ export class point {
 
 	public declare y: number
 
-	constructor(init?: Partial<{x?: number, y?: number}>, __goscriptValue?: boolean) {
-		this.x = init?.x ?? (0 as number)
-		this.y = init?.y ?? (0 as number)
+	constructor(__goscriptValue?: boolean, x$?: number, y$?: number) {
+		this.x = x$ ?? 0
+		this.y = y$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): point {
-		return new point(this, true)
+		return new point(true, this.x, this.y)
 	}
 
 	public __goscriptAssign(source: point): this {
@@ -46,14 +46,14 @@ export class lineError {
 
 	public declare err: $.GoError
 
-	constructor(init?: Partial<{line?: number, err?: $.GoError}>, __goscriptValue?: boolean) {
-		this.line = init?.line ?? (0 as number)
-		this.err = init?.err ?? (null! as $.GoError)
+	constructor(__goscriptValue?: boolean, line$?: number, err$?: $.GoError) {
+		this.line = line$ ?? 0
+		this.err = err$ ?? (null! as $.GoError)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): lineError {
-		return new lineError(this, true)
+		return new lineError(true, this.line, this.err)
 	}
 
 	public __goscriptAssign(source: lineError): this {
@@ -89,7 +89,7 @@ export function describe(p: point, n: number): string {
 export function parse(line: number, s: string): [bigint, $.GoError] {
 	let [n, err] = strconv.ParseInt(s, 10, 64)
 	if (err != null) {
-		return [0n, $.interfaceValue<$.GoError>(new lineError({line: line, err: err}), "*main.lineError", /* @__PURE__ */ $.pointerType("main.lineError"))]
+		return [0n, $.interfaceValue<$.GoError>(new lineError(false, line, err), "*main.lineError", /* @__PURE__ */ $.pointerType("main.lineError"))]
 	}
 	return [n, null]
 }
@@ -99,14 +99,14 @@ export function message(err: $.GoError): string {
 }
 
 export async function main(): globalThis.Promise<void> {
-	await $.println(describe(new point({x: 1, y: 2}, true), 3))
-	await $.println((fmt.Sprint($.interfaceValue(new point({x: 4, y: 5}, true), "main.point", "main.point"), "x", $.basicInterfaceValue(6, "int")) as string))
+	await $.println(describe(new point(true, 1, 2), 3))
+	await $.println((fmt.Sprint($.interfaceValue(new point(true, 4, 5), "main.point", "main.point"), "x", $.basicInterfaceValue(6, "int")) as string))
 
 	let [, err] = parse(3, "abc")
 	await $.println((__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	await $.println(message(err))
 
-	let wrapped = fmt.Errorf("wrap %v: %w", $.interfaceValue(new point({x: 7, y: 8}, true), "main.point", "main.point"), (err as any))
+	let wrapped = fmt.Errorf("wrap %v: %w", $.interfaceValue(new point(true, 7, 8), "main.point", "main.point"), (err as any))
 	await $.println((__goscriptAwait = (wrapped !== null && (wrapped as any).__isVarRef !== true && (wrapped as any).__goValue === undefined ? (wrapped as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(wrapped)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), $.comparableEqual(errors.Unwrap($.pointerValueOrNil(wrapped)!), err))
 }
 

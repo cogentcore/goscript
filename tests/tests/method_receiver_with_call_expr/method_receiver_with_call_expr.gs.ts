@@ -8,14 +8,14 @@ export class State {
 
 	public declare index: $.VarRef<number> | null
 
-	constructor(init?: Partial<{value?: number, index?: $.VarRef<number> | null}>, __goscriptValue?: boolean) {
-		this.value = init?.value ?? (0 as number)
-		this.index = init?.index ?? (null! as $.VarRef<number> | null)
+	constructor(__goscriptValue?: boolean, value$?: number, index$?: $.VarRef<number> | null) {
+		this.value = value$ ?? 0
+		this.index = index$ ?? (null! as $.VarRef<number> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): State {
-		return new State(this, true)
+		return new State(true, this.value, this.index)
 	}
 
 	public __goscriptAssign(source: State): this {

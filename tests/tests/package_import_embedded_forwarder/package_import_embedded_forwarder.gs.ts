@@ -24,14 +24,14 @@ export class VerboseStore {
 
 	public declare name: string
 
-	constructor(init?: Partial<{BaseStore?: dep.BaseStore | $.VarRef<dep.BaseStore> | null, name?: string}>, __goscriptValue?: boolean) {
-		this.BaseStore = init?.BaseStore ?? (null! as dep.BaseStore | $.VarRef<dep.BaseStore> | null)
-		this.name = init?.name ?? ("" as string)
+	constructor(__goscriptValue?: boolean, BaseStore$?: dep.BaseStore | $.VarRef<dep.BaseStore> | null, name$?: string) {
+		this.BaseStore = BaseStore$ ?? (null! as dep.BaseStore | $.VarRef<dep.BaseStore> | null)
+		this.name = name$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): VerboseStore {
-		return new VerboseStore(this, true)
+		return new VerboseStore(true, this.BaseStore, this.name)
 	}
 
 	public __goscriptAssign(source: VerboseStore): this {
@@ -59,7 +59,7 @@ export class VerboseStore {
 }
 
 export function NewVerboseStore(name: string): VerboseStore | $.VarRef<VerboseStore> | null {
-	return (() => { const __goscriptLiteralField0 = dep.NewBaseStore(name); return new VerboseStore({BaseStore: __goscriptLiteralField0, name: name}) })()
+	return (() => { const __goscriptLiteralField0 = dep.NewBaseStore(name); return new VerboseStore(false, __goscriptLiteralField0, name) })()
 }
 
 export async function useStore(store: Store | null): globalThis.Promise<void> {

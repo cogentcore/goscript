@@ -9,14 +9,14 @@ export class Wrapped {
 
 	public declare Hidden: dep.hidden
 
-	constructor(init?: Partial<{Value?: string, Hidden?: dep.hidden}>, __goscriptValue?: boolean) {
-		this.Value = init?.Value ?? ("" as string)
-		this.Hidden = init?.Hidden ? init.Hidden.clone() : new dep.hidden(undefined, true)
+	constructor(__goscriptValue?: boolean, Value$?: string, Hidden$?: dep.hidden) {
+		this.Value = Value$ ?? ""
+		this.Hidden = Hidden$ ?? new dep.hidden(true)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Wrapped {
-		return new Wrapped(this, true)
+		return new Wrapped(true, this.Value, this.Hidden.clone())
 	}
 
 	public __goscriptAssign(source: Wrapped): this {

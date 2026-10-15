@@ -8,14 +8,14 @@ export class entry {
 
 	public declare n: number
 
-	constructor(init?: Partial<{key?: $.Slice<number>, n?: number}>, __goscriptValue?: boolean) {
-		this.key = init?.key ?? (null! as $.Slice<number>)
-		this.n = init?.n ?? (0 as number)
+	constructor(__goscriptValue?: boolean, key$?: $.Slice<number>, n$?: number) {
+		this.key = key$ ?? (null! as $.Slice<number>)
+		this.n = n$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): entry {
-		return new entry(this, true)
+		return new entry(true, this.key, this.n)
 	}
 
 	public __goscriptAssign(source: entry): this {
@@ -40,15 +40,15 @@ export class tree {
 
 	public declare count: number
 
-	constructor(init?: Partial<{less?: ((a: any, b: any) => boolean | globalThis.Promise<boolean>) | null, empty?: any, count?: number}>, __goscriptValue?: boolean, __goscriptFresh?: boolean) {
-		this.less = init?.less ?? (null! as ((a: any, b: any) => boolean | globalThis.Promise<boolean>) | null)
-		this.empty = init?.empty !== undefined ? (__goscriptFresh === true ? init.empty : $.copyElement(init.empty)) : (null! as any)
-		this.count = init?.count ?? (0 as number)
+	constructor(__goscriptValue?: boolean, less$?: ((a: any, b: any) => boolean | globalThis.Promise<boolean>) | null, empty$?: any, count$?: number) {
+		this.less = less$ ?? (null! as ((a: any, b: any) => boolean | globalThis.Promise<boolean>) | null)
+		this.empty = empty$ ?? (null! as any)
+		this.count = count$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): tree {
-		return new tree(this, true)
+		return new tree(true, this.less, $.copyElement(this.empty), this.count)
 	}
 
 	public __goscriptAssign(source: tree): this {
@@ -73,17 +73,17 @@ export class tree {
 }
 
 export function newTree(__typeArgs: $.GenericTypeArgs | undefined, less: ((a: any, b: any) => boolean | globalThis.Promise<boolean>) | null): tree | $.VarRef<tree> | null {
-	let tr = new tree({empty: $.genericZero(__typeArgs, "T", null)}, undefined, true)
+	let tr = new tree(false, undefined, $.genericZero(__typeArgs, "T", null))
 	$.pointerValue<tree>(tr).less = less
 	return tr
 }
 
 export function literalTree(__typeArgs: $.GenericTypeArgs | undefined): tree {
-	return $.markAsStructValue(new tree({count: 1, empty: $.genericZero(__typeArgs, "T", null)}))
+	return new tree(true, undefined, $.genericZero(__typeArgs, "T", null), 1)
 }
 
 export function varTree(__typeArgs: $.GenericTypeArgs | undefined): tree {
-	let tr: tree = $.markAsStructValue(new tree({empty: $.genericZero(__typeArgs, "T", null)}, undefined, true))
+	let tr: tree = new tree(true, undefined, $.genericZero(__typeArgs, "T", null))
 	return tr
 }
 
@@ -101,7 +101,7 @@ export async function main(): globalThis.Promise<void> {
 	let tr = (newTree(__goscriptStatic0(), lessEntry) as tree | $.VarRef<tree> | null)
 	let e = (((tr !== null && (tr as any).__isVarRef !== true && (tr as any).__goValue === undefined ? ((tr as any) as tree)["get"](__goscriptStatic0()) : tree.prototype.get.call(tr, __goscriptStatic0()))).clone() as entry)
 	await $.println("new", e.key == null, e.n)
-	await $.println("less", ($.pointerValue<tree>(tr).less!(new entry({n: 1}, true), new entry({n: 2}, true)) as boolean))
+	await $.println("less", ($.pointerValue<tree>(tr).less!(new entry(true, undefined, 1), new entry(true, undefined, 2)) as boolean))
 
 	// Zero values of type-parameter fields in generic constructors.
 	let lit = (literalTree(__goscriptStatic0()) as tree)
@@ -118,7 +118,7 @@ export async function main(): globalThis.Promise<void> {
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.entry", zero: () => new entry(undefined, true) }})
+	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.entry", zero: () => new entry(true) }})
 }
 
 var __goscriptStatic1$value: any

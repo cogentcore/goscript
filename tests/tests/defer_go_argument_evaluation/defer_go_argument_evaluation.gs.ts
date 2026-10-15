@@ -9,14 +9,14 @@ export class R {
 
 	public declare B: number
 
-	constructor(init?: Partial<{A?: number, B?: number}>, __goscriptValue?: boolean) {
-		this.A = init?.A ?? (0 as number)
-		this.B = init?.B ?? (0 as number)
+	constructor(__goscriptValue?: boolean, A$?: number, B$?: number) {
+		this.A = A$ ?? 0
+		this.B = B$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): R {
-		return new R(this, true)
+		return new R(true, this.A, this.B)
 	}
 
 	public __goscriptAssign(source: R): this {
@@ -80,12 +80,12 @@ export async function two(a: number, b: number): globalThis.Promise<void> {
 
 export async function deferred(): globalThis.Promise<void> {
 	await using __defer = new $.AsyncDisposableStack()
-	let r = new R({A: 1, B: 2}, true)
+	let r = new R(true, 1, 2)
 	let n = 3
 	let f: ((tag: string) => void) | null = $.functionValue(async (tag: string) => {
 		await $.println(tag, "first function")
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string")], results: [] } as $.FunctionTypeInfo))
-	let p: R | $.VarRef<R> | null = new R({A: 10, B: 20})
+	let p: R | $.VarRef<R> | null = new R(false, 10, 20)
 	const __goscriptDeferArg0 = (r).clone()
 	__defer.defer(async () => { await show("arg", __goscriptDeferArg0) })
 	const __goscriptDeferCallee0 = $.functionValue(((__receiver) => (tag: string) => __receiver.Show(tag))($.markAsStructValue($.cloneStructValue(r))), ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string")], results: [] } as $.FunctionTypeInfo), "main.R.Show-fm")
@@ -97,7 +97,7 @@ export async function deferred(): globalThis.Promise<void> {
 	let mu = $.varRef($.markAsStructValue(new sync.Mutex()))
 	await mu.value.Lock()
 	__defer.defer(() => { mu.value.Unlock() })
-	let q = new R({A: 50, B: 60})
+	let q = new R(false, 50, 60)
 	__defer.defer(async () => { await (q !== null && (q as any).__isVarRef !== true && (q as any).__goValue === undefined ? ((q as any) as R).ShowPtr("fixed pointer") : R.prototype.ShowPtr.call(q, "fixed pointer")) })
 	const __goscriptDeferArg1 = n
 	const __goscriptDeferArg2 = await value(4)
@@ -116,7 +116,7 @@ export async function deferred(): globalThis.Promise<void> {
 	f = $.functionValue(async (tag: string) => {
 		await $.println(tag, "second function")
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string")], results: [] } as $.FunctionTypeInfo))
-	p = new R({A: 30, B: 40})
+	p = new R(false, 30, 40)
 	await $.println("body", r.A, n)
 	await $.println("method value", (sum!() as number))
 }
@@ -126,7 +126,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("stored", stored)
 	let wg = $.varRef($.markAsStructValue(new sync.WaitGroup()))
 	wg.value.Add(1)
-	let r = new R({A: 1, B: 2}, true)
+	let r = new R(true, 1, 2)
 	const __goscriptDeferArg5 = (r).clone()
 	queueMicrotask(async () => { await (async (r: R) => {
 		await show("go", (r).clone())

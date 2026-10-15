@@ -10,13 +10,13 @@ import "./types.gs.ts"
 export class sink {
 	public declare size: number
 
-	constructor(init?: Partial<{size?: number}>, __goscriptValue?: boolean) {
-		this.size = init?.size ?? (0 as number)
+	constructor(__goscriptValue?: boolean, size$?: number) {
+		this.size = size$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): sink {
-		return new sink(this, true)
+		return new sink(true, this.size)
 	}
 
 	public __goscriptAssign(source: sink): this {

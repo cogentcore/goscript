@@ -8,14 +8,14 @@ export class Pos {
 
 	public declare Char: number
 
-	constructor(init?: Partial<{Line?: number, Char?: number}>, __goscriptValue?: boolean) {
-		this.Line = init?.Line ?? (0 as number)
-		this.Char = init?.Char ?? (0 as number)
+	constructor(__goscriptValue?: boolean, Line$?: number, Char$?: number) {
+		this.Line = Line$ ?? 0
+		this.Char = Char$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Pos {
-		return new Pos(this, true)
+		return new Pos(true, this.Line, this.Char)
 	}
 
 	public __goscriptAssign(source: Pos): this {
@@ -38,14 +38,14 @@ export class Region {
 
 	public declare End: Pos
 
-	constructor(init?: Partial<{Start?: Pos, End?: Pos}>, __goscriptValue?: boolean) {
-		this.Start = init?.Start ? init.Start.clone() : new Pos(undefined, true)
-		this.End = init?.End ? init.End.clone() : new Pos(undefined, true)
+	constructor(__goscriptValue?: boolean, Start$?: Pos, End$?: Pos) {
+		this.Start = Start$ ?? new Pos(true)
+		this.End = End$ ?? new Pos(true)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Region {
-		return new Region(this, true)
+		return new Region(true, this.Start.clone(), this.End.clone())
 	}
 
 	public __goscriptAssign(source: Region): this {
@@ -80,14 +80,14 @@ export class State {
 
 	public declare n: number
 
-	constructor(init?: Partial<{reg?: Region, n?: number}>, __goscriptValue?: boolean) {
-		this.reg = init?.reg ? init.reg.clone() : new Region(undefined, true)
-		this.n = init?.n ?? (0 as number)
+	constructor(__goscriptValue?: boolean, reg$?: Region, n$?: number) {
+		this.reg = reg$ ?? new Region(true)
+		this.n = n$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): State {
-		return new State(this, true)
+		return new State(true, this.reg.clone(), this.n)
 	}
 
 	public __goscriptAssign(source: State): this {
@@ -145,7 +145,7 @@ export function readAfterPointer(r: Region, p: Region | $.VarRef<Region> | null)
 	return r.Start.Char
 }
 
-export let global: State = new State(undefined, true)
+export let global: State = new State(true)
 
 export function __goscript_set_global(__goscriptValue: State): void {
 	$.assignStruct(global, __goscriptValue)
@@ -157,7 +157,7 @@ export function readGlobal(r: Region): number {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let s = new State({reg: new Region({Start: new Pos({Line: 1, Char: 2}, true), End: new Pos({Line: 1, Char: 10}, true)}, true)})
+	let s = new State(false, new Region(true, new Pos(true, 1, 2), new Pos(true, 1, 10)))
 	let s$: State = s == null ? $.pointerTarget<State>(s) : (s as any).__isVarRef === true ? (s as any).value : (s as any).__goValue === undefined ? (s as any) : $.pointerTarget<State>(s)
 	await $.println(width((s$ as State).reg), (s$ as State).reg.Width())
 	await $.println(mutate(((s$ as State).reg).clone()), (s$ as State).reg.Start.Char)

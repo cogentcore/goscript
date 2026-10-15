@@ -28,13 +28,13 @@ export type Transform = ((_p0: number) => number | globalThis.Promise<number>) |
 export class prefixLogger {
 	public declare prefix: string
 
-	constructor(init?: Partial<{prefix?: string}>, __goscriptValue?: boolean) {
-		this.prefix = init?.prefix ?? ("" as string)
+	constructor(__goscriptValue?: boolean, prefix$?: string) {
+		this.prefix = prefix$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): prefixLogger {
-		return new prefixLogger(this, true)
+		return new prefixLogger(true, this.prefix)
 	}
 
 	public __goscriptAssign(source: prefixLogger): this {
@@ -59,13 +59,13 @@ export class prefixLogger {
 export class addSink {
 	public declare total: number
 
-	constructor(init?: Partial<{total?: number}>, __goscriptValue?: boolean) {
-		this.total = init?.total ?? (0 as number)
+	constructor(__goscriptValue?: boolean, total$?: number) {
+		this.total = total$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): addSink {
-		return new addSink(this, true)
+		return new addSink(true, this.total)
 	}
 
 	public __goscriptAssign(source: addSink): this {
@@ -92,13 +92,13 @@ export class addSink {
 export class chanSink {
 	public declare ch: $.Channel<number> | null
 
-	constructor(init?: Partial<{ch?: $.Channel<number> | null}>, __goscriptValue?: boolean) {
-		this.ch = init?.ch ?? (null! as $.Channel<number> | null)
+	constructor(__goscriptValue?: boolean, ch$?: $.Channel<number> | null) {
+		this.ch = ch$ ?? (null! as $.Channel<number> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): chanSink {
-		return new chanSink(this, true)
+		return new chanSink(true, this.ch)
 	}
 
 	public __goscriptAssign(source: chanSink): this {
@@ -128,14 +128,14 @@ export class Button {
 	// OnHover keeps the shape's coloring.
 	public declare OnHover: ((clicks: number) => number | globalThis.Promise<number>) | null
 
-	constructor(init?: Partial<{OnClick?: ((clicks: number) => number | globalThis.Promise<number>) | null, OnHover?: ((clicks: number) => number | globalThis.Promise<number>) | null}>, __goscriptValue?: boolean) {
-		this.OnClick = init?.OnClick ?? (null! as ((clicks: number) => number | globalThis.Promise<number>) | null)
-		this.OnHover = init?.OnHover ?? (null! as ((clicks: number) => number | globalThis.Promise<number>) | null)
+	constructor(__goscriptValue?: boolean, OnClick$?: ((clicks: number) => number | globalThis.Promise<number>) | null, OnHover$?: ((clicks: number) => number | globalThis.Promise<number>) | null) {
+		this.OnClick = OnClick$ ?? (null! as ((clicks: number) => number | globalThis.Promise<number>) | null)
+		this.OnHover = OnHover$ ?? (null! as ((clicks: number) => number | globalThis.Promise<number>) | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Button {
-		return new Button(this, true)
+		return new Button(true, this.OnClick, this.OnHover)
 	}
 
 	public __goscriptAssign(source: Button): this {
@@ -156,13 +156,13 @@ export class Button {
 export class summer {
 	public declare n: number
 
-	constructor(init?: Partial<{n?: number}>, __goscriptValue?: boolean) {
-		this.n = init?.n ?? (0 as number)
+	constructor(__goscriptValue?: boolean, n$?: number) {
+		this.n = n$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): summer {
-		return new summer(this, true)
+		return new summer(true, this.n)
 	}
 
 	public __goscriptAssign(source: summer): this {
@@ -224,7 +224,7 @@ export function countAll(f: ((_p0: number) => number | globalThis.Promise<number
 }
 
 export async function main(): globalThis.Promise<void> {
-	await $.println("log:", await logAll($.interfaceValue<Logger | null>(new prefixLogger({prefix: "> "}, true), "main.prefixLogger", "main.prefixLogger"), $.arrayToSlice<string>(["a", "b"])))
+	await $.println("log:", await logAll($.interfaceValue<Logger | null>(new prefixLogger(true, "> "), "main.prefixLogger", "main.prefixLogger"), $.arrayToSlice<string>(["a", "b"])))
 
 	let sink = new addSink()
 	await $.println("fill:", fill($.interfaceValue<Sink | null>(sink, "*main.addSink", /* @__PURE__ */ $.pointerType("main.addSink")), 4))
@@ -234,7 +234,7 @@ export async function main(): globalThis.Promise<void> {
 		let n = await $.chanRecv(ch)
 		await $.chanSend(ch, n * 10)
 	})
-	await $.println("chan put:", await chanSink.prototype.Put.call((new chanSink({ch: ch})), 3))
+	await $.println("chan put:", await chanSink.prototype.Put.call((new chanSink(false, ch)), 3))
 
 	// An async literal of Transform's shape.
 	let recv = $.functionValue(async (n: number): globalThis.Promise<number> => {
@@ -248,15 +248,15 @@ export async function main(): globalThis.Promise<void> {
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))
 	await $.println("apply:", applyAll($.arrayToSlice<Transform | null>([double, $.namedFunction(double, "main.Transform", ({ kind: $.TypeKind.Function, name: "main.Transform", params: [/* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))]), 3))
 
-	let b = new Button({OnClick: $.functionValue((clicks: number): number => {
+	let b = new Button(false, $.functionValue((clicks: number): number => {
 		return clicks + 1
-	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo)), OnHover: $.functionValue((clicks: number): number => {
+	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo)), $.functionValue((clicks: number): number => {
 		return clicks + 2
-	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))})
+	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo)))
 	await $.println("click:", await click(b, 1))
 
 	await $.println("count:", countAll(double, 4))
-	let s = new summer({n: 2})
+	let s = new summer(false, 2)
 	await $.println("sum:", (s !== null && (s as any).__isVarRef !== true && (s as any).__goValue === undefined ? ((s as any) as summer).sum($.arrayToSlice<((_p0: number) => number | globalThis.Promise<number>) | null>([double, double])) : summer.prototype.sum.call(s, $.arrayToSlice<((_p0: number) => number | globalThis.Promise<number>) | null>([double, double]))))
 }
 

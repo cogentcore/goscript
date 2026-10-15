@@ -10,14 +10,14 @@ export class sourceStruct {
 
 	public declare data: $.Slice<number>
 
-	constructor(init?: Partial<{flag?: boolean, data?: $.Slice<number>}>, __goscriptValue?: boolean) {
-		this.flag = init?.flag ?? (false as boolean)
-		this.data = init?.data ?? (null! as $.Slice<number>)
+	constructor(__goscriptValue?: boolean, flag$?: boolean, data$?: $.Slice<number>) {
+		this.flag = flag$ ?? false
+		this.data = data$ ?? (null! as $.Slice<number>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): sourceStruct {
-		return new sourceStruct(this, true)
+		return new sourceStruct(true, this.flag, this.data)
 	}
 
 	public __goscriptAssign(source: sourceStruct): this {
@@ -40,14 +40,14 @@ export class viewStruct {
 
 	public declare data: $.Slice<number>
 
-	constructor(init?: Partial<{flag?: boolean, data?: $.Slice<number>}>, __goscriptValue?: boolean) {
-		this.flag = init?.flag ?? (false as boolean)
-		this.data = init?.data ?? (null! as $.Slice<number>)
+	constructor(__goscriptValue?: boolean, flag$?: boolean, data$?: $.Slice<number>) {
+		this.flag = flag$ ?? false
+		this.data = data$ ?? (null! as $.Slice<number>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): viewStruct {
-		return new viewStruct(this, true)
+		return new viewStruct(true, this.flag, this.data)
 	}
 
 	public __goscriptAssign(source: viewStruct): this {
@@ -92,7 +92,7 @@ export async function main(): globalThis.Promise<void> {
 	$.sliceElems(inline!)[$.sliceSlot(inline!, 0)] = 9
 	await $.println("updated:", $.arrayIndex(values!, 0))
 
-	let src: $.VarRef<sourceStruct> = $.varRef(new sourceStruct(undefined, true))
+	let src: $.VarRef<sourceStruct> = $.varRef(new sourceStruct(true))
 	await $.println("struct:", markThroughView(src), src.value.flag)
 }
 

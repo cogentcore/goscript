@@ -6,13 +6,13 @@ import * as $ from "@goscript/builtin/index.js"
 export class item {
 	public declare n: number
 
-	constructor(init?: Partial<{n?: number}>, __goscriptValue?: boolean) {
-		this.n = init?.n ?? (0 as number)
+	constructor(__goscriptValue?: boolean, n$?: number) {
+		this.n = n$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): item {
-		return new item(this, true)
+		return new item(true, this.n)
 	}
 
 	public __goscriptAssign(source: item): this {
@@ -23,7 +23,7 @@ export class item {
 	public dec(): item {
 		let s: item = this;
 		if (s.n > 0) {
-			s = s.__goscriptAssign(new item({n: s.n - 1}, true))
+			s = s.__goscriptAssign(new item(true, s.n - 1))
 		}
 		return (s).clone()
 	}
@@ -38,7 +38,7 @@ export class item {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let original = new item({n: 2}, true)
+	let original = new item(true, 2)
 	let out = $.markAsStructValue($.cloneStructValue(original)).dec()
 	await $.println("original:", original.n)
 	await $.println("out:", out.n)

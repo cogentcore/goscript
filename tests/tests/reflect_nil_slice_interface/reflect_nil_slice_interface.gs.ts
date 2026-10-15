@@ -7,13 +7,13 @@ import * as reflect from "@goscript/reflect/index.js"
 export class S1 {
 	public declare Name: string
 
-	constructor(init?: Partial<{Name?: string}>, __goscriptValue?: boolean) {
-		this.Name = init?.Name ?? ("" as string)
+	constructor(__goscriptValue?: boolean, Name$?: string) {
+		this.Name = Name$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): S1 {
-		return new S1(this, true)
+		return new S1(true, this.Name)
 	}
 
 	public __goscriptAssign(source: S1): this {
@@ -39,16 +39,16 @@ export class S5 {
 
 	public declare F: (() => void) | null
 
-	constructor(init?: Partial<{K?: $.Slice<S1 | $.VarRef<S1> | null>, M?: globalThis.Map<string, number> | null, P?: S1 | $.VarRef<S1> | null, F?: (() => void) | null}>, __goscriptValue?: boolean) {
-		this.K = init?.K ?? (null! as $.Slice<S1 | $.VarRef<S1> | null>)
-		this.M = init?.M ?? (null! as globalThis.Map<string, number> | null)
-		this.P = init?.P ?? (null! as S1 | $.VarRef<S1> | null)
-		this.F = init?.F ?? (null! as (() => void) | null)
+	constructor(__goscriptValue?: boolean, K$?: $.Slice<S1 | $.VarRef<S1> | null>, M$?: globalThis.Map<string, number> | null, P$?: S1 | $.VarRef<S1> | null, F$?: (() => void) | null) {
+		this.K = K$ ?? (null! as $.Slice<S1 | $.VarRef<S1> | null>)
+		this.M = M$ ?? (null! as globalThis.Map<string, number> | null)
+		this.P = P$ ?? (null! as S1 | $.VarRef<S1> | null)
+		this.F = F$ ?? (null! as (() => void) | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): S5 {
-		return new S5(this, true)
+		return new S5(true, this.K, this.M, this.P, this.F)
 	}
 
 	public __goscriptAssign(source: S5): this {
@@ -84,7 +84,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("a == nil:", a == null)
 	await show("any", a)
 
-	let v = $.varRef(new S5(undefined, true))
+	let v = $.varRef(new S5(true))
 	let f = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(v, "*main.S5", /* @__PURE__ */ $.pointerType("main.S5"))))).Elem()))
 	for (let i = 0; i < $.markAsStructValue($.cloneStructValue(f)).NumField(); i++) {
 		await show(((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(f)).Type()).Field(i), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as reflect.StructField).Name, $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(f)).Field(i))).Interface())
@@ -107,7 +107,7 @@ export async function main(): globalThis.Promise<void> {
 	let __goscriptTuple0: any = $.typeAssertTuple<$.VarRef<$.Slice<S1 | $.VarRef<S1> | null>> | null>($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(f)).Field(0))).Addr())).Interface(), /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.pointerType("main.S1"))))
 	let kp = __goscriptTuple0[0]
 	ok = __goscriptTuple0[1]
-	kp!.value = $.appendOne($.pointerValue<$.Slice<S1 | $.VarRef<S1> | null>>(kp), new S1({Name: "x"}), $.appendZeros.nil)
+	kp!.value = $.appendOne($.pointerValue<$.Slice<S1 | $.VarRef<S1> | null>>(kp), new S1(false, "x"), $.appendZeros.nil)
 	await $.println("addr assert:", ok, $.sliceLen(v.value.K), $.pointerValue<S1>($.arrayIndex(v.value.K!, 0)).Name)
 
 	// Unnamed basic, array and slice values keep their types.

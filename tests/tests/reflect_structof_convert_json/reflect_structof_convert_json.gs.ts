@@ -10,14 +10,14 @@ export class Node {
 
 	public declare Size: number
 
-	constructor(init?: Partial<{Name?: string, Size?: number}>, __goscriptValue?: boolean) {
-		this.Name = init?.Name ?? ("" as string)
-		this.Size = init?.Size ?? (0 as number)
+	constructor(__goscriptValue?: boolean, Name$?: string, Size$?: number) {
+		this.Name = Name$ ?? ""
+		this.Size = Size$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Node {
-		return new Node(this, true)
+		return new Node(true, this.Name, this.Size)
 	}
 
 	public __goscriptAssign(source: Node): this {

@@ -8,13 +8,13 @@ import "@goscript/io/index.js"
 export class holder {
 	public declare w: io.Writer | null
 
-	constructor(init?: Partial<{w?: io.Writer | null}>, __goscriptValue?: boolean) {
-		this.w = init?.w ?? (null! as io.Writer | null)
+	constructor(__goscriptValue?: boolean, w$?: io.Writer | null) {
+		this.w = w$ ?? (null! as io.Writer | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): holder {
-		return new holder(this, true)
+		return new holder(true, this.w)
 	}
 
 	public __goscriptAssign(source: holder): this {
@@ -32,7 +32,7 @@ export class holder {
 }
 
 export function newHolder(w: io.Writer | null): holder | $.VarRef<holder> | null {
-	return new holder({w: w})
+	return new holder(false, w)
 }
 
 export async function main(): globalThis.Promise<void> {

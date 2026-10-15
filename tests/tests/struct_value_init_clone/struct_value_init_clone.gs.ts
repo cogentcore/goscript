@@ -8,14 +8,14 @@ export class Point {
 
 	public declare Y: number
 
-	constructor(init?: Partial<{X?: number, Y?: number}>, __goscriptValue?: boolean) {
-		this.X = init?.X ?? (0 as number)
-		this.Y = init?.Y ?? (0 as number)
+	constructor(__goscriptValue?: boolean, X$?: number, Y$?: number) {
+		this.X = X$ ?? 0
+		this.Y = Y$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Point {
-		return new Point(this, true)
+		return new Point(true, this.X, this.Y)
 	}
 
 	public __goscriptAssign(source: Point): this {
@@ -35,7 +35,7 @@ export class Point {
 
 export async function main(): globalThis.Promise<void> {
 	// Initialize directly
-	let p1 = new Point({X: 1, Y: 2}, true)
+	let p1 = new Point(true, 1, 2)
 	await $.println("p1:", p1.X, p1.Y)
 
 	// Assign to another variable (should trigger clone)
@@ -47,7 +47,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("p2:", p2.X, p2.Y)
 
 	// Initialize via variable assignment
-	let v = new Point({X: 3, Y: 4}, true)
+	let v = new Point(true, 3, 4)
 	let p3 = (v).clone()
 	p3.Y = 40
 

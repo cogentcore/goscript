@@ -6,13 +6,13 @@ import * as $ from "@goscript/builtin/index.js"
 export class holder {
 	public declare values: $.VarRef<$.Slice<number>> | null
 
-	constructor(init?: Partial<{values?: $.VarRef<$.Slice<number>> | null}>, __goscriptValue?: boolean) {
-		this.values = init?.values ?? (null! as $.VarRef<$.Slice<number>> | null)
+	constructor(__goscriptValue?: boolean, values$?: $.VarRef<$.Slice<number>> | null) {
+		this.values = values$ ?? (null! as $.VarRef<$.Slice<number>> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): holder {
-		return new holder(this, true)
+		return new holder(true, this.values)
 	}
 
 	public __goscriptAssign(source: holder): this {
@@ -66,7 +66,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println(x.value)
 
 	let values: $.VarRef<$.Slice<number>> = $.varRef($.arrayToSlice<number>([1, 2, 3, 4]))
-	let h = new holder({values: values})
+	let h = new holder(false, values)
 	let h$: holder = h == null ? $.pointerTarget<holder>(h) : (h as any).__isVarRef === true ? (h as any).value : (h as any).__goValue === undefined ? (h as any) : $.pointerTarget<holder>(h)
 	trim(h)
 	await $.println("len after star:", $.sliceLen($.pointerValue<$.Slice<number>>((h$ as holder).values)))

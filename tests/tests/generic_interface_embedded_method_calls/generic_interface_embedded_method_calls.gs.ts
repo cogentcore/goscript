@@ -29,14 +29,14 @@ export class impl {
 
 	public declare other: any
 
-	constructor(init?: Partial<{value?: any, other?: any}>, __goscriptValue?: boolean, __goscriptFresh?: boolean) {
-		this.value = init?.value !== undefined ? (__goscriptFresh === true ? init.value : $.copyElement(init.value)) : (null! as any)
-		this.other = init?.other !== undefined ? (__goscriptFresh === true ? init.other : $.copyElement(init.other)) : (null! as any)
+	constructor(__goscriptValue?: boolean, value$?: any, other$?: any) {
+		this.value = value$ ?? (null! as any)
+		this.other = other$ ?? (null! as any)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): impl {
-		return new impl(this, true)
+		return new impl(true, $.copyElement(this.value), $.copyElement(this.other))
 	}
 
 	public __goscriptAssign(source: impl): this {
@@ -69,7 +69,7 @@ export async function read(__typeArgs: $.GenericTypeArgs | undefined, d: derived
 }
 
 export async function main(): globalThis.Promise<void> {
-	let i = new impl({value: 7, other: "ok"})
+	let i = new impl(false, 7, "ok")
 	await $.println(await read(__goscriptStatic0(), $.namedValueInterfaceValue<derived | null>(i, "*main.impl", __goscriptStatic1(), __goscriptStatic2(), __goscriptStatic3())))
 }
 

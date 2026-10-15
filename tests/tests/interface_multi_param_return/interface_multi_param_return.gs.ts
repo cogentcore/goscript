@@ -14,12 +14,12 @@ $.registerInterfaceType(
 );
 
 export class MyProcessor {
-	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
+	constructor(__goscriptValue?: boolean) {
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): MyProcessor {
-		return new MyProcessor(this, true)
+		return new MyProcessor(true)
 	}
 
 	public __goscriptAssign(source: MyProcessor): this {
@@ -47,7 +47,7 @@ export class MyProcessor {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let processor: MultiParamReturner | null = $.interfaceValue<MultiParamReturner | null>(new MyProcessor(undefined, true), "main.MyProcessor", "main.MyProcessor")
+	let processor: MultiParamReturner | null = $.interfaceValue<MultiParamReturner | null>(new MyProcessor(true), "main.MyProcessor", "main.MyProcessor")
 
 	let data = new Uint8Array([1, 2, 3]) as $.Slice<number>
 	let [success, ] = await (processor !== null && (processor as any).__isVarRef !== true && (processor as any).__goValue === undefined ? (processor as Exclude<MultiParamReturner, null>) : $.pointerValue<Exclude<MultiParamReturner, null>>(processor)).Process(data, 5, "unused")

@@ -23,7 +23,7 @@ export function collectAssigned(value: helper.Value | null): [$.Slice<helper.Val
 export async function main(): globalThis.Promise<void> {
 	let box = (helper.Wrap(__goscriptStatic1(), 21) as helper.Box)
 	await $.println("wrapped:", box.Value)
-	let __goscriptTuple1: any = collectValues($.interfaceValue<helper.Value | null>(new helper.IntValue({N: 34}, true), "helper.IntValue", "helper.IntValue"))
+	let __goscriptTuple1: any = collectValues($.interfaceValue<helper.Value | null>(new helper.IntValue(true, 34), "helper.IntValue", "helper.IntValue"))
 	let values: $.Slice<helper.Value | null> = __goscriptTuple1[0]
 	let err = __goscriptTuple1[1]
 	if (err != null) {
@@ -31,7 +31,7 @@ export async function main(): globalThis.Promise<void> {
 		return
 	}
 	await $.println("collected:", (__goscriptAwait = $.pointerValue<Exclude<helper.Value, null>>($.arrayIndex(values!, 0)).GetValue(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
-	let __goscriptTuple2: any = collectAssigned($.interfaceValue<helper.Value | null>(new helper.IntValue({N: 35}, true), "helper.IntValue", "helper.IntValue"))
+	let __goscriptTuple2: any = collectAssigned($.interfaceValue<helper.Value | null>(new helper.IntValue(true, 35), "helper.IntValue", "helper.IntValue"))
 	let assigned: $.Slice<helper.Value | null> = __goscriptTuple2[0]
 	err = __goscriptTuple2[1]
 	if (err != null) {

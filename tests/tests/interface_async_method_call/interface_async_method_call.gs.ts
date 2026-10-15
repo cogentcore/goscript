@@ -27,13 +27,13 @@ $.registerInterfaceType(
 export class ChannelProcessor {
 	public declare ch: $.Channel<number> | null
 
-	constructor(init?: Partial<{ch?: $.Channel<number> | null}>, __goscriptValue?: boolean) {
-		this.ch = init?.ch ?? (null! as $.Channel<number> | null)
+	constructor(__goscriptValue?: boolean, ch$?: $.Channel<number> | null) {
+		this.ch = ch$ ?? (null! as $.Channel<number> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): ChannelProcessor {
-		return new ChannelProcessor(this, true)
+		return new ChannelProcessor(true, this.ch)
 	}
 
 	public __goscriptAssign(source: ChannelProcessor): this {
@@ -68,13 +68,13 @@ export class ChannelProcessor {
 export class SimpleProcessor {
 	public declare value: number
 
-	constructor(init?: Partial<{value?: number}>, __goscriptValue?: boolean) {
-		this.value = init?.value ?? (0 as number)
+	constructor(__goscriptValue?: boolean, value$?: number) {
+		this.value = value$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): SimpleProcessor {
-		return new SimpleProcessor(this, true)
+		return new SimpleProcessor(true, this.value)
 	}
 
 	public __goscriptAssign(source: SimpleProcessor): this {
@@ -107,14 +107,14 @@ export class GenericChannelStore {
 
 	public declare value: any
 
-	constructor(init?: Partial<{ch?: $.Channel<any> | null, value?: any}>, __goscriptValue?: boolean, __goscriptFresh?: boolean) {
-		this.ch = init?.ch ?? (null! as $.Channel<any> | null)
-		this.value = init?.value !== undefined ? (__goscriptFresh === true ? init.value : $.copyElement(init.value)) : (null! as any)
+	constructor(__goscriptValue?: boolean, ch$?: $.Channel<any> | null, value$?: any) {
+		this.ch = ch$ ?? (null! as $.Channel<any> | null)
+		this.value = value$ ?? (null! as any)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): GenericChannelStore {
-		return new GenericChannelStore(this, true)
+		return new GenericChannelStore(true, this.ch, $.copyElement(this.value))
 	}
 
 	public __goscriptAssign(source: GenericChannelStore): this {
@@ -150,7 +150,7 @@ export async function processViaInterface(processor: AsyncProcessor | null, inpu
 }
 
 export function newGenericStore(__typeArgs: $.GenericTypeArgs | undefined, value: any): GenericStore | null {
-	return $.namedValueInterfaceValue<GenericStore | null>(new GenericChannelStore({ch: $.makeChannel<any>(1, $.genericZero(__typeArgs, "V", null), "both"), value: $.copyElement(value)}), "*main.GenericChannelStore", {Load: (receiver: any) => $.pointerValue(receiver).Load({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, V: __typeArgs?.["V"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }})}, /* @__PURE__ */ $.pointerType("main.GenericChannelStore"), [$.methodSignature("Load", [], [{ kind: $.TypeKind.Interface, methods: [] }])])
+	return $.namedValueInterfaceValue<GenericStore | null>(new GenericChannelStore(false, $.makeChannel<any>(1, $.genericZero(__typeArgs, "V", null), "both"), $.copyElement(value)), "*main.GenericChannelStore", {Load: (receiver: any) => $.pointerValue(receiver).Load({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, V: __typeArgs?.["V"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }})}, /* @__PURE__ */ $.pointerType("main.GenericChannelStore"), [$.methodSignature("Load", [], [{ kind: $.TypeKind.Interface, methods: [] }])])
 }
 
 export async function loadGenericStore(store: GenericStore | null): globalThis.Promise<number> {
@@ -162,12 +162,12 @@ export async function main(): globalThis.Promise<void> {
 	let ch = $.makeChannel<number>(1, 0, "both")
 
 	// Test with ChannelProcessor (naturally async)
-	let channelProc = new ChannelProcessor({ch: ch})
+	let channelProc = new ChannelProcessor(false, ch)
 	let result1 = await processViaInterface($.interfaceValue<AsyncProcessor | null>(channelProc, "*main.ChannelProcessor", /* @__PURE__ */ $.pointerType("main.ChannelProcessor")), 5)
 	await $.println("ChannelProcessor result:", result1)
 
 	// Test with SimpleProcessor (forced async for compatibility)
-	let simpleProc = new SimpleProcessor({value: 100})
+	let simpleProc = new SimpleProcessor(false, 100)
 	let result2 = await processViaInterface($.interfaceValue<AsyncProcessor | null>(simpleProc, "*main.SimpleProcessor", /* @__PURE__ */ $.pointerType("main.SimpleProcessor")), 5)
 	await $.println("SimpleProcessor result:", result2)
 

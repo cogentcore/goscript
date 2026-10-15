@@ -16,13 +16,13 @@ $.registerInterfaceType(
 export class Box {
 	public declare Adder: Adder | null
 
-	constructor(init?: Partial<{Adder?: Adder | null}>, __goscriptValue?: boolean) {
-		this.Adder = init?.Adder ?? (null! as Adder | null)
+	constructor(__goscriptValue?: boolean, Adder$?: Adder | null) {
+		this.Adder = Adder$ ?? (null! as Adder | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Box {
-		return new Box(this, true)
+		return new Box(true, this.Adder)
 	}
 
 	public __goscriptAssign(source: Box): this {
@@ -46,13 +46,13 @@ export class Box {
 export class Counter {
 	public declare base: number
 
-	constructor(init?: Partial<{base?: number}>, __goscriptValue?: boolean) {
-		this.base = init?.base ?? (0 as number)
+	constructor(__goscriptValue?: boolean, base$?: number) {
+		this.base = base$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Counter {
-		return new Counter(this, true)
+		return new Counter(true, this.base)
 	}
 
 	public __goscriptAssign(source: Counter): this {
@@ -79,7 +79,7 @@ export function call(adder: Adder | null): number {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let box = new Box({Adder: $.interfaceValue<Adder | null>(new Counter({base: 3}), "*main.Counter", /* @__PURE__ */ $.pointerType("main.Counter"))})
+	let box = new Box(false, $.interfaceValue<Adder | null>(new Counter(false, 3), "*main.Counter", /* @__PURE__ */ $.pointerType("main.Counter")))
 	await $.println($.pointerValue<Exclude<Adder, null>>($.pointerValue<Box>(box).Adder).Add(5))
 	await $.println(call($.interfaceValue<Adder | null>(box, "*main.Box", /* @__PURE__ */ $.pointerType("main.Box"))))
 }

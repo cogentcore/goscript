@@ -16,12 +16,12 @@ $.registerInterfaceType(
 );
 
 export class Bus {
-	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
+	constructor(__goscriptValue?: boolean) {
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Bus {
-		return new Bus(this, true)
+		return new Bus(true)
 	}
 
 	public __goscriptAssign(source: Bus): this {
@@ -38,12 +38,12 @@ export class Bus {
 }
 
 export class factory {
-	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
+	constructor(__goscriptValue?: boolean) {
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): factory {
-		return new factory(this, true)
+		return new factory(true)
 	}
 
 	public __goscriptAssign(source: factory): this {
@@ -73,7 +73,7 @@ export async function NewFactory(b: Bus): globalThis.Promise<Factory | null> {
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "dep.Bus", zero: () => new Bus(undefined, true) }})
+	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "dep.Bus", zero: () => new Bus(true) }})
 }
 
 var __goscriptStatic1$value: any

@@ -14,12 +14,12 @@ $.registerInterfaceType(
 );
 
 export class ConcreteA {
-	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
+	constructor(__goscriptValue?: boolean) {
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): ConcreteA {
-		return new ConcreteA(this, true)
+		return new ConcreteA(true)
 	}
 
 	public __goscriptAssign(source: ConcreteA): this {
@@ -41,12 +41,12 @@ export class ConcreteA {
 }
 
 export class ConcreteB {
-	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
+	constructor(__goscriptValue?: boolean) {
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): ConcreteB {
-		return new ConcreteB(this, true)
+		return new ConcreteB(true)
 	}
 
 	public __goscriptAssign(source: ConcreteB): this {
@@ -72,14 +72,14 @@ export class Container {
 
 	public declare hasB: boolean
 
-	constructor(init?: Partial<{hasA?: boolean, hasB?: boolean}>, __goscriptValue?: boolean) {
-		this.hasA = init?.hasA ?? (false as boolean)
-		this.hasB = init?.hasB ?? (false as boolean)
+	constructor(__goscriptValue?: boolean, hasA$?: boolean, hasB$?: boolean) {
+		this.hasA = hasA$ ?? false
+		this.hasB = hasB$ ?? false
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Container {
-		return new Container(this, true)
+		return new Container(true, this.hasA, this.hasB)
 	}
 
 	public __goscriptAssign(source: Container): this {
@@ -98,7 +98,7 @@ export class Container {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let iface: Interface | null = $.interfaceValue<Interface | null>(new ConcreteA(undefined, true), "main.ConcreteA", "main.ConcreteA")
+	let iface: Interface | null = $.interfaceValue<Interface | null>(new ConcreteA(true), "main.ConcreteA", "main.ConcreteA")
 
 	let c = new Container()
 	let c$: Container = c == null ? $.pointerTarget<Container>(c) : (c as any).__isVarRef === true ? (c as any).value : (c as any).__goValue === undefined ? (c as any) : $.pointerTarget<Container>(c)

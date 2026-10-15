@@ -7,13 +7,13 @@ import * as atomic from "@goscript/sync/atomic/index.js"
 export class pointerNode {
 	public declare value: string
 
-	constructor(init?: Partial<{value?: string}>, __goscriptValue?: boolean) {
-		this.value = init?.value ?? ("" as string)
+	constructor(__goscriptValue?: boolean, value$?: string) {
+		this.value = value$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): pointerNode {
-		return new pointerNode(this, true)
+		return new pointerNode(true, this.value)
 	}
 
 	public __goscriptAssign(source: pointerNode): this {
@@ -176,7 +176,7 @@ function __goscriptStatic1(): any {
 
 var __goscriptStatic2$value: any
 function __goscriptStatic2(): any {
-	return __goscriptStatic2$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.pointerNode", zero: () => new pointerNode(undefined, true) }})
+	return __goscriptStatic2$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.pointerNode", zero: () => new pointerNode(true) }})
 }
 
 var __goscriptAwait: any

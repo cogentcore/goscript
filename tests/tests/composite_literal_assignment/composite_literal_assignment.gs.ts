@@ -10,15 +10,15 @@ export class MyStruct {
 
 	public declare myBool: boolean
 
-	constructor(init?: Partial<{MyInt?: number, MyString?: string, myBool?: boolean}>, __goscriptValue?: boolean) {
-		this.MyInt = init?.MyInt ?? (0 as number)
-		this.MyString = init?.MyString ?? ("" as string)
-		this.myBool = init?.myBool ?? (false as boolean)
+	constructor(__goscriptValue?: boolean, MyInt$?: number, MyString$?: string, myBool$?: boolean) {
+		this.MyInt = MyInt$ ?? 0
+		this.MyString = MyString$ ?? ""
+		this.myBool = myBool$ ?? false
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): MyStruct {
-		return new MyStruct(this, true)
+		return new MyStruct(true, this.MyInt, this.MyString, this.myBool)
 	}
 
 	public __goscriptAssign(source: MyStruct): this {
@@ -40,7 +40,7 @@ export class MyStruct {
 export async function main(): globalThis.Promise<void> {
 	// === Composite Literal Assignment (Value Copy) ===
 	// Creating a struct directly using a composite literal.
-	let structLiteral = new MyStruct({MyString: "composite literal"}, true)
+	let structLiteral = new MyStruct(true, undefined, "composite literal")
 	// Assigning it creates another independent copy.
 	let structLiteralCopy = (structLiteral).clone()
 	structLiteralCopy.MyString = "modified composite literal copy"

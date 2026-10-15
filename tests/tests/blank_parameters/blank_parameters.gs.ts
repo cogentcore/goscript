@@ -16,13 +16,13 @@ $.registerInterfaceType(
 export class blankImpl {
 	public declare value: number
 
-	constructor(init?: Partial<{value?: number}>, __goscriptValue?: boolean) {
-		this.value = init?.value ?? (0 as number)
+	constructor(__goscriptValue?: boolean, value$?: number) {
+		this.value = value$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): blankImpl {
-		return new blankImpl(this, true)
+		return new blankImpl(true, this.value)
 	}
 
 	public __goscriptAssign(source: blankImpl): this {
@@ -45,12 +45,12 @@ export class blankImpl {
 }
 
 export class Packer {
-	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
+	constructor(__goscriptValue?: boolean) {
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Packer {
-		return new Packer(this, true)
+		return new Packer(true)
 	}
 
 	public __goscriptAssign(source: Packer): this {
@@ -83,7 +83,7 @@ export function unicodeNames(_u3c6: number, _u3b2: number): [number, number] {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let p = new Packer(undefined, true)
+	let p = new Packer(true)
 	await $.println(blanks(1, "x"))
 	await $.println($.sliceLen(p.pack(null, null, 0)))
 

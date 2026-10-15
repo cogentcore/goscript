@@ -4,12 +4,12 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class embedded {
-	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
+	constructor(__goscriptValue?: boolean) {
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): embedded {
-		return new embedded(this, true)
+		return new embedded(true)
 	}
 
 	public __goscriptAssign(source: embedded): this {
@@ -34,14 +34,14 @@ export class holder {
 
 	public declare embedded: embedded
 
-	constructor(init?: Partial<{Database?: string, embedded?: embedded}>, __goscriptValue?: boolean) {
-		this.Database = init?.Database ?? ("" as string)
-		this.embedded = init?.embedded ? init.embedded.clone() : new embedded(undefined, true)
+	constructor(__goscriptValue?: boolean, Database$?: string, embedded$?: embedded) {
+		this.Database = Database$ ?? ""
+		this.embedded = embedded$ ?? new embedded(true)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): holder {
-		return new holder(this, true)
+		return new holder(true, this.Database, this.embedded.clone())
 	}
 
 	public __goscriptAssign(source: holder): this {
@@ -64,7 +64,7 @@ export function value(h: holder): string {
 }
 
 export async function main(): globalThis.Promise<void> {
-	await $.println(value(new holder({Database: "field"}, true)))
+	await $.println(value(new holder(true, "field")))
 }
 
 if ($.isMainScript(import.meta)) {

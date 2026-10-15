@@ -9,13 +9,13 @@ import * as time from "@goscript/time/index.js"
 export async function verifyCertificate(cert: x509.Certificate | $.VarRef<x509.Certificate> | null, now: time.Time): globalThis.Promise<$.GoError> {
 	let pool = x509.NewCertPool()
 	await (pool !== null && (pool as any).__isVarRef !== true && (pool as any).__goValue === undefined ? ((pool as any) as x509.CertPool).AddCert(cert) : x509.CertPool.prototype.AddCert.call(pool, cert))
-	let [, err] = await x509.Certificate.prototype.Verify.call(cert, new x509.VerifyOptions({Roots: pool, CurrentTime: $.markAsStructValue($.cloneStructValue(now)), KeyUsages: $.arrayToSlice<x509.ExtKeyUsage>([0])}, true))
+	let [, err] = await x509.Certificate.prototype.Verify.call(cert, new x509.VerifyOptions(true, undefined, undefined, pool, $.markAsStructValue($.cloneStructValue(now)), $.arrayToSlice<x509.ExtKeyUsage>([0])))
 	return err
 }
 
 export async function main(): globalThis.Promise<void> {
 	let now = $.markAsStructValue($.cloneStructValue(time.Unix(1700000000n, 0n)))
-	let cert = (() => { const __goscriptLiteralField0 = big.NewInt(1n); const __goscriptLiteralField1 = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(now)).Add(-3600000000000n))); const __goscriptLiteralField2 = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(now)).Add(3600000000000n))); return new x509.Certificate({Raw: new Uint8Array([99, 101, 114, 116, 105, 102, 105, 99, 97, 116, 101]), RawSubject: new Uint8Array([115, 117, 98, 106, 101, 99, 116]), RawIssuer: new Uint8Array([115, 117, 98, 106, 101, 99, 116]), SerialNumber: __goscriptLiteralField0, NotBefore: __goscriptLiteralField1, NotAfter: __goscriptLiteralField2, KeyUsage: 32, BasicConstraintsValid: true, IsCA: true}) })()
+	let cert = (() => { const __goscriptLiteralField0 = big.NewInt(1n); const __goscriptLiteralField1 = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(now)).Add(-3600000000000n))); const __goscriptLiteralField2 = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(now)).Add(3600000000000n))); return new x509.Certificate(false, new Uint8Array([99, 101, 114, 116, 105, 102, 105, 99, 97, 116, 101]), undefined, undefined, new Uint8Array([115, 117, 98, 106, 101, 99, 116]), new Uint8Array([115, 117, 98, 106, 101, 99, 116]), undefined, undefined, undefined, undefined, undefined, undefined, __goscriptLiteralField0, undefined, undefined, __goscriptLiteralField1, __goscriptLiteralField2, 32, undefined, undefined, undefined, undefined, undefined, true, true) })()
 	let err = await verifyCertificate(cert, now)
 	await $.println("verify err nil", err == null)
 }

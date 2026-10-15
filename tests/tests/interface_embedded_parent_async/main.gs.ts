@@ -16,12 +16,12 @@ $.registerInterfaceType(
 );
 
 export class impl {
-	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
+	constructor(__goscriptValue?: boolean) {
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): impl {
-		return new impl(this, true)
+		return new impl(true)
 	}
 
 	public __goscriptAssign(source: impl): this {

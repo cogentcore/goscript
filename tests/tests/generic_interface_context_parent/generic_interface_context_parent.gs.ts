@@ -35,12 +35,12 @@ $.registerInterfaceType(
 );
 
 export class handler {
-	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
+	constructor(__goscriptValue?: boolean) {
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): handler {
-		return new handler(this, true)
+		return new handler(true)
 	}
 
 	public __goscriptAssign(source: handler): this {
@@ -60,12 +60,12 @@ export class handler {
 }
 
 export class genericResolver {
-	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
+	constructor(__goscriptValue?: boolean) {
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): genericResolver {
-		return new genericResolver(this, true)
+		return new genericResolver(true)
 	}
 
 	public __goscriptAssign(source: genericResolver): this {
@@ -92,13 +92,13 @@ export class genericResolver {
 export class genericValue {
 	public declare value: number
 
-	constructor(init?: Partial<{value?: number}>, __goscriptValue?: boolean) {
-		this.value = init?.value ?? (0 as number)
+	constructor(__goscriptValue?: boolean, value$?: number) {
+		this.value = value$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): genericValue {
-		return new genericValue(this, true)
+		return new genericValue(true, this.value)
 	}
 
 	public __goscriptAssign(source: genericValue): this {
@@ -123,14 +123,14 @@ export class genericValue {
 export async function main(): globalThis.Promise<void> {
 	let resolver: Resolver | null = $.namedValueInterfaceValue<Resolver | null>(new genericResolver(), "*main.genericResolver", __goscriptStatic1(), __goscriptStatic2(), __goscriptStatic3())
 	{
-		let err = (__goscriptAwait = (resolver !== null && (resolver as any).__isVarRef !== true && (resolver as any).__goValue === undefined ? (resolver as Exclude<Resolver, null>) : $.pointerValue<Exclude<Resolver, null>>(resolver)).Resolve(context.Background(), $.interfaceValue<Handler | null>(new handler(undefined, true), "main.handler", "main.handler")), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+		let err = (__goscriptAwait = (resolver !== null && (resolver as any).__isVarRef !== true && (resolver as any).__goValue === undefined ? (resolver as Exclude<Resolver, null>) : $.pointerValue<Exclude<Resolver, null>>(resolver)).Resolve(context.Background(), $.interfaceValue<Handler | null>(new handler(true), "main.handler", "main.handler")), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 		if (err != null) {
 			await $.println("resolve failed")
 			return
 		}
 	}
 	await $.println("resolve ok")
-	let g = $.markAsStructValue(new genericValue({value: 7}))
+	let g = new genericValue(true, 7)
 	let reader: ValueReader | null = $.namedValueInterfaceValue<ValueReader | null>((g).clone(), "main.genericValue", __goscriptStatic4(), __goscriptStatic5(), __goscriptStatic6())
 	g.value = 9
 	if ((__goscriptAwait = (reader !== null && (reader as any).__isVarRef !== true && (reader as any).__goValue === undefined ? (reader as Exclude<ValueReader, null>) : $.pointerValue<Exclude<ValueReader, null>>(reader)).Get(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) != 7) {

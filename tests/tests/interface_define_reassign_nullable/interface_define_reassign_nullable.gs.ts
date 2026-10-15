@@ -17,13 +17,13 @@ $.registerInterfaceType(
 export class Square {
 	public declare Side: number
 
-	constructor(init?: Partial<{Side?: number}>, __goscriptValue?: boolean) {
-		this.Side = init?.Side ?? (0 as number)
+	constructor(__goscriptValue?: boolean, Side$?: number) {
+		this.Side = Side$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Square {
-		return new Square(this, true)
+		return new Square(true, this.Side)
 	}
 
 	public __goscriptAssign(source: Square): this {
@@ -47,13 +47,13 @@ export class Square {
 
 export function find(ok: boolean): Shape | null {
 	if (ok) {
-		return $.interfaceValue<Shape | null>(new Square({Side: 2}, true), "main.Square", "main.Square")
+		return $.interfaceValue<Shape | null>(new Square(true, 2), "main.Square", "main.Square")
 	}
 	return null
 }
 
 export function first(): Shape | null {
-	return $.interfaceValue<Shape | null>(new Square({Side: 3}, true), "main.Square", "main.Square")
+	return $.interfaceValue<Shape | null>(new Square(true, 3), "main.Square", "main.Square")
 }
 
 export async function main(): globalThis.Promise<void> {

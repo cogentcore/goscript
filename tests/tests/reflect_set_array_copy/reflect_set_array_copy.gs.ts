@@ -11,15 +11,15 @@ export class Pose {
 
 	public declare Inner: {"B": number[]}
 
-	constructor(init?: Partial<{M?: number[], A?: number[], Inner?: {"B": number[]}}>, __goscriptValue?: boolean) {
-		this.M = init?.M !== undefined ? $.cloneArrayValue(init.M, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 4)) : $.arrayValue(globalThis.Array.from({ length: 4 }, () => 0), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 4))
-		this.A = init?.A !== undefined ? $.cloneArrayValue(init.A, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2)) : $.arrayValue(globalThis.Array.from({ length: 2 }, () => 0))
-		this.Inner = init?.Inner ? $.markAsStructValue($.cloneStructValue(init.Inner)) : $.anonymousStructValue({"B": $.arrayValue(globalThis.Array.from({ length: 2 }, () => 0))}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("B", /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2), [0], 0, true)] })
+	constructor(__goscriptValue?: boolean, M$?: number[], A$?: number[], Inner$?: {"B": number[]}) {
+		this.M = M$ ?? $.arrayValue(globalThis.Array.from({ length: 4 }, () => 0), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 4))
+		this.A = A$ ?? $.arrayValue(globalThis.Array.from({ length: 2 }, () => 0))
+		this.Inner = Inner$ ?? $.anonymousStructValue({"B": $.arrayValue(globalThis.Array.from({ length: 2 }, () => 0))}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("B", /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2), [0], 0, true)] })
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Pose {
-		return new Pose(this, true)
+		return new Pose(true, $.cloneArrayValue(this.M, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 4)), $.cloneArrayValue(this.A, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2)), $.markAsStructValue($.cloneStructValue(this.Inner)))
 	}
 
 	public __goscriptAssign(source: Pose): this {
@@ -39,11 +39,11 @@ export class Pose {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let a = $.varRef(new Pose({M: $.arrayValue([1, 2, 3, 4], /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 4)), A: $.arrayValue([5, 6])}, true))
+	let a = $.varRef(new Pose(true, $.arrayValue([1, 2, 3, 4], /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 4)), $.arrayValue([5, 6])))
 	a.value.Inner.B = $.arrayValue([7, 8])
-	let b: $.VarRef<Pose> = $.varRef(new Pose(undefined, true))
-	let c: $.VarRef<Pose> = $.varRef(new Pose(undefined, true))
-	let d: $.VarRef<Pose> = $.varRef(new Pose(undefined, true))
+	let b: $.VarRef<Pose> = $.varRef(new Pose(true))
+	let c: $.VarRef<Pose> = $.varRef(new Pose(true))
+	let d: $.VarRef<Pose> = $.varRef(new Pose(true))
 	let av = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(a, "*main.Pose", /* @__PURE__ */ $.pointerType("main.Pose"))))).Elem()))
 
 	// Set an array field from another array field.

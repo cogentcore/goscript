@@ -6,13 +6,13 @@ import * as $ from "@goscript/builtin/index.js"
 export class Match {
 	public declare Size: number
 
-	constructor(init?: Partial<{Size?: number}>, __goscriptValue?: boolean) {
-		this.Size = init?.Size ?? (0 as number)
+	constructor(__goscriptValue?: boolean, Size$?: number) {
+		this.Size = Size$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Match {
-		return new Match(this, true)
+		return new Match(true, this.Size)
 	}
 
 	public __goscriptAssign(source: Match): this {
@@ -32,13 +32,13 @@ export class Match {
 export class Matcher {
 	public declare matches: $.Slice<Match>
 
-	constructor(init?: Partial<{matches?: $.Slice<Match>}>, __goscriptValue?: boolean) {
-		this.matches = init?.matches ?? (null! as $.Slice<Match>)
+	constructor(__goscriptValue?: boolean, matches$?: $.Slice<Match>) {
+		this.matches = matches$ ?? (null! as $.Slice<Match>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Matcher {
-		return new Matcher(this, true)
+		return new Matcher(true, this.matches)
 	}
 
 	public __goscriptAssign(source: Matcher): this {
@@ -71,7 +71,7 @@ export class Matcher {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let m = new Matcher({matches: $.arrayToSlice<Match>([new Match({Size: 3}, true), new Match({Size: 4}, true)])})
+	let m = new Matcher(false, $.arrayToSlice<Match>([new Match(true, 3), new Match(true, 4)]))
 	await $.println((m !== null && (m as any).__isVarRef !== true && (m as any).__goValue === undefined ? ((m as any) as Matcher).Total() : Matcher.prototype.Total.call(m)))
 }
 

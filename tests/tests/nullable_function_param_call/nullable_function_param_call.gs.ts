@@ -40,15 +40,15 @@ export class MockFileInfo {
 
 	public declare isDir: boolean
 
-	constructor(init?: Partial<{name?: string, size?: bigint, isDir?: boolean}>, __goscriptValue?: boolean) {
-		this.name = init?.name ?? ("" as string)
-		this.size = init?.size ?? (0n as bigint)
-		this.isDir = init?.isDir ?? (false as boolean)
+	constructor(__goscriptValue?: boolean, name$?: string, size$?: bigint, isDir$?: boolean) {
+		this.name = name$ ?? ""
+		this.size = size$ ?? 0n
+		this.isDir = isDir$ ?? false
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): MockFileInfo {
-		return new MockFileInfo(this, true)
+		return new MockFileInfo(true, this.name, this.size, this.isDir)
 	}
 
 	public __goscriptAssign(source: MockFileInfo): this {
@@ -83,12 +83,12 @@ export class MockFileInfo {
 }
 
 export class MockFilesystem {
-	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
+	constructor(__goscriptValue?: boolean) {
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): MockFilesystem {
-		return new MockFilesystem(this, true)
+		return new MockFilesystem(true)
 	}
 
 	public __goscriptAssign(source: MockFilesystem): this {
@@ -97,7 +97,7 @@ export class MockFilesystem {
 
 	public ReadDir(path: string): [$.Slice<FileInfo | null>, $.GoError] {
 		const m: MockFilesystem | $.VarRef<MockFilesystem> | null = this;
-		return [$.arrayToSlice<FileInfo | null>([$.interfaceValue<FileInfo | null>(new MockFileInfo({name: "file1.txt", size: 100n, isDir: false}), "*main.MockFileInfo", /* @__PURE__ */ $.pointerType("main.MockFileInfo")), $.interfaceValue<FileInfo | null>(new MockFileInfo({name: "subdir", size: 0n, isDir: true}), "*main.MockFileInfo", /* @__PURE__ */ $.pointerType("main.MockFileInfo"))]), null]
+		return [$.arrayToSlice<FileInfo | null>([$.interfaceValue<FileInfo | null>(new MockFileInfo(false, "file1.txt", 100n, false), "*main.MockFileInfo", /* @__PURE__ */ $.pointerType("main.MockFileInfo")), $.interfaceValue<FileInfo | null>(new MockFileInfo(false, "subdir", 0n, true), "*main.MockFileInfo", /* @__PURE__ */ $.pointerType("main.MockFileInfo"))]), null]
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -151,7 +151,7 @@ export function maybeProcess(input: string, processor: OptionalProcessFunc | nul
 
 export async function main(): globalThis.Promise<void> {
 	let fs = new MockFilesystem()
-	let fileInfo = new MockFileInfo({name: "test.txt", size: 50n, isDir: false})
+	let fileInfo = new MockFileInfo(false, "test.txt", 50n, false)
 
 	// Test the walk function with a callback
 	let walkFunc = $.functionValue(async (path: string, info: FileInfo | null, err: $.GoError): globalThis.Promise<$.GoError> => {

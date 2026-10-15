@@ -6,7 +6,7 @@ import * as pkix from "@goscript/crypto/x509/pkix/index.js"
 import * as asn1 from "@goscript/encoding/asn1/index.js"
 
 export async function main(): globalThis.Promise<void> {
-	let input = ($.arrayToSlice<pkix.RelativeDistinguishedNameSET>([($.arrayToSlice<pkix.AttributeTypeAndValue>([new pkix.AttributeTypeAndValue({Type: ($.arrayToSlice<number>([2, 5, 4, 3]) as asn1.ObjectIdentifier), Value: "goscript"}, true)]) as pkix.RelativeDistinguishedNameSET)]) as pkix.RDNSequence)
+	let input = ($.arrayToSlice<pkix.RelativeDistinguishedNameSET>([($.arrayToSlice<pkix.AttributeTypeAndValue>([new pkix.AttributeTypeAndValue(true, ($.arrayToSlice<number>([2, 5, 4, 3]) as asn1.ObjectIdentifier), "goscript")]) as pkix.RelativeDistinguishedNameSET)]) as pkix.RDNSequence)
 	let __goscriptTuple0: any = await asn1.Marshal($.namedValueInterfaceValue<any>(input, "pkix.RDNSequence", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()))
 	let der: $.Slice<number> = __goscriptTuple0[0]
 	let err = __goscriptTuple0[1]

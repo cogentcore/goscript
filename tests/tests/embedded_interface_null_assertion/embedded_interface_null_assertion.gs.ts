@@ -18,14 +18,14 @@ export class MyReader {
 
 	public declare name: string
 
-	constructor(init?: Partial<{Reader?: Reader | null, name?: string}>, __goscriptValue?: boolean) {
-		this.Reader = init?.Reader ?? (null! as Reader | null)
-		this.name = init?.name ?? ("" as string)
+	constructor(__goscriptValue?: boolean, Reader$?: Reader | null, name$?: string) {
+		this.Reader = Reader$ ?? (null! as Reader | null)
+		this.name = name$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): MyReader {
-		return new MyReader(this, true)
+		return new MyReader(true, this.Reader, this.name)
 	}
 
 	public __goscriptAssign(source: MyReader): this {
@@ -52,14 +52,14 @@ export class StringReader {
 
 	public declare pos: number
 
-	constructor(init?: Partial<{data?: string, pos?: number}>, __goscriptValue?: boolean) {
-		this.data = init?.data ?? ("" as string)
-		this.pos = init?.pos ?? (0 as number)
+	constructor(__goscriptValue?: boolean, data$?: string, pos$?: number) {
+		this.data = data$ ?? ""
+		this.pos = pos$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): StringReader {
-		return new StringReader(this, true)
+		return new StringReader(true, this.data, this.pos)
 	}
 
 	public __goscriptAssign(source: StringReader): this {
@@ -89,11 +89,11 @@ export class StringReader {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let mr1 = new MyReader({name: "test1"})
+	let mr1 = new MyReader(false, undefined, "test1")
 	await $.println($.pointerValue<MyReader>(mr1).Reader == null)
 
-	let sr = new StringReader({data: "hello", pos: 0})
-	let mr2 = new MyReader({Reader: $.interfaceValue<Reader | null>(sr, "*main.StringReader", /* @__PURE__ */ $.pointerType("main.StringReader")), name: "test2"})
+	let sr = new StringReader(false, "hello", 0)
+	let mr2 = new MyReader(false, $.interfaceValue<Reader | null>(sr, "*main.StringReader", /* @__PURE__ */ $.pointerType("main.StringReader")), "test2")
 	await $.println($.pointerValue<MyReader>(mr2).Reader != null)
 
 	let buf = $.makeSlice<number>(5, undefined, "byte")

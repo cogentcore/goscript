@@ -10,15 +10,15 @@ export class command {
 
 	public declare action: (() => number | globalThis.Promise<number>) | null
 
-	constructor(init?: Partial<{name?: string, flags?: $.Slice<string>, action?: (() => number | globalThis.Promise<number>) | null}>, __goscriptValue?: boolean) {
-		this.name = init?.name ?? ("" as string)
-		this.flags = init?.flags ?? (null! as $.Slice<string>)
-		this.action = init?.action ?? (null! as (() => number | globalThis.Promise<number>) | null)
+	constructor(__goscriptValue?: boolean, name$?: string, flags$?: $.Slice<string>, action$?: (() => number | globalThis.Promise<number>) | null) {
+		this.name = name$ ?? ""
+		this.flags = flags$ ?? (null! as $.Slice<string>)
+		this.action = action$ ?? (null! as (() => number | globalThis.Promise<number>) | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): command {
-		return new command(this, true)
+		return new command(true, this.name, this.flags, this.action)
 	}
 
 	public __goscriptAssign(source: command): this {
@@ -40,13 +40,13 @@ export class command {
 export class config {
 	public declare flags: ((prefix: string) => $.Slice<string> | globalThis.Promise<$.Slice<string>>) | null
 
-	constructor(init?: Partial<{flags?: ((prefix: string) => $.Slice<string> | globalThis.Promise<$.Slice<string>>) | null}>, __goscriptValue?: boolean) {
-		this.flags = init?.flags ?? (null! as ((prefix: string) => $.Slice<string> | globalThis.Promise<$.Slice<string>>) | null)
+	constructor(__goscriptValue?: boolean, flags$?: ((prefix: string) => $.Slice<string> | globalThis.Promise<$.Slice<string>>) | null) {
+		this.flags = flags$ ?? (null! as ((prefix: string) => $.Slice<string> | globalThis.Promise<$.Slice<string>>) | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): config {
-		return new config(this, true)
+		return new config(true, this.flags)
 	}
 
 	public __goscriptAssign(source: config): this {
@@ -70,14 +70,14 @@ export function __goscript_set_results(__goscriptValue: $.Channel<number> | null
 }
 
 export function newCommand(c: config): command | $.VarRef<command> | null {
-	return (() => { const __goscriptLiteralField0 = (c.flags!("--") as $.Slice<string>); return new command({name: "status", flags: __goscriptLiteralField0, action: $.functionValue(async (): globalThis.Promise<number> => {
+	return (() => { const __goscriptLiteralField0 = (c.flags!("--") as $.Slice<string>); return new command(false, "status", __goscriptLiteralField0, $.functionValue(async (): globalThis.Promise<number> => {
 		return await $.chanRecv(results)
-	}, ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))}) })()
+	}, ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))) })()
 }
 
-export let lazyCommand: command = (() => { const __goscriptLiteralField1 = defaultFlags("-"); return new command({name: "lazy", flags: __goscriptLiteralField1, action: $.functionValue(async (): globalThis.Promise<number> => {
+export let lazyCommand: command = (() => { const __goscriptLiteralField1 = defaultFlags("-"); return new command(true, "lazy", __goscriptLiteralField1, $.functionValue(async (): globalThis.Promise<number> => {
 	return await $.chanRecv(results)
-}, ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))}, true) })()
+}, ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))) })()
 
 export function __goscript_set_lazyCommand(__goscriptValue: command): void {
 	$.assignStruct(lazyCommand, __goscriptValue)
@@ -88,7 +88,7 @@ export function defaultFlags(prefix: string): $.Slice<string> {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let cmd = newCommand(new config({flags: defaultFlags}, true))
+	let cmd = newCommand(new config(true, defaultFlags))
 	let cmd$: command = cmd == null ? $.pointerTarget<command>(cmd) : (cmd as any).__isVarRef === true ? (cmd as any).value : (cmd as any).__goValue === undefined ? (cmd as any) : $.pointerTarget<command>(cmd)
 	await $.println((cmd$ as command).name, $.arrayIndex((cmd$ as command).flags!, 0))
 	await $.chanSend(results, 7)

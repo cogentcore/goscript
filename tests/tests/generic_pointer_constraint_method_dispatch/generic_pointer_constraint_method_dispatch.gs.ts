@@ -44,13 +44,13 @@ $.registerInterfaceType(
 export class pairingOffer {
 	public declare Note: string
 
-	constructor(init?: Partial<{Note?: string}>, __goscriptValue?: boolean) {
-		this.Note = init?.Note ?? ("" as string)
+	constructor(__goscriptValue?: boolean, Note$?: string) {
+		this.Note = Note$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): pairingOffer {
-		return new pairingOffer(this, true)
+		return new pairingOffer(true, this.Note)
 	}
 
 	public __goscriptAssign(source: pairingOffer): this {
@@ -120,7 +120,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 	await $.println(msg.Note)
 
-	let __goscriptTuple1: any = await encodeLocalPairing(__goscriptStatic0(), new pairingOffer({Note: "note"}))
+	let __goscriptTuple1: any = await encodeLocalPairing(__goscriptStatic0(), new pairingOffer(false, "note"))
 	let encoded: $.Slice<number> = __goscriptTuple1[0]
 	err = __goscriptTuple1[1]
 	if (err != null) {
@@ -142,7 +142,7 @@ export async function main(): globalThis.Promise<void> {
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, M: { type: /* @__PURE__ */ $.pointerType("main.pairingOffer"), zero: () => null, methods: {MarshalVT: (receiver: any) => $.pointerValue(receiver).MarshalVT(), UnmarshalVT: (receiver: any, ...args: any[]) => $.pointerValue(receiver).UnmarshalVT(...$.stripGenericTypeArgs(args))} }, T: { type: "main.pairingOffer", zero: () => new pairingOffer(undefined, true) }})
+	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, M: { type: /* @__PURE__ */ $.pointerType("main.pairingOffer"), zero: () => null, methods: {MarshalVT: (receiver: any) => $.pointerValue(receiver).MarshalVT(), UnmarshalVT: (receiver: any, ...args: any[]) => $.pointerValue(receiver).UnmarshalVT(...$.stripGenericTypeArgs(args))} }, T: { type: "main.pairingOffer", zero: () => new pairingOffer(true) }})
 }
 
 var __goscriptStatic1$value: any

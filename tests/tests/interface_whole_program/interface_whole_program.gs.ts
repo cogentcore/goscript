@@ -82,14 +82,14 @@ export class Rect {
 
 	public declare h: number
 
-	constructor(init?: Partial<{w?: number, h?: number}>, __goscriptValue?: boolean) {
-		this.w = init?.w ?? (0 as number)
-		this.h = init?.h ?? (0 as number)
+	constructor(__goscriptValue?: boolean, w$?: number, h$?: number) {
+		this.w = w$ ?? 0
+		this.h = h$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Rect {
-		return new Rect(this, true)
+		return new Rect(true, this.w, this.h)
 	}
 
 	public __goscriptAssign(source: Rect): this {
@@ -115,13 +115,13 @@ export class Rect {
 export class Square {
 	public declare side: number
 
-	constructor(init?: Partial<{side?: number}>, __goscriptValue?: boolean) {
-		this.side = init?.side ?? (0 as number)
+	constructor(__goscriptValue?: boolean, side$?: number) {
+		this.side = side$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Square {
-		return new Square(this, true)
+		return new Square(true, this.side)
 	}
 
 	public __goscriptAssign(source: Square): this {
@@ -147,13 +147,13 @@ export class Square {
 export class Counter {
 	public declare n: number
 
-	constructor(init?: Partial<{n?: number}>, __goscriptValue?: boolean) {
-		this.n = init?.n ?? (0 as number)
+	constructor(__goscriptValue?: boolean, n$?: number) {
+		this.n = n$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Counter {
-		return new Counter(this, true)
+		return new Counter(true, this.n)
 	}
 
 	public __goscriptAssign(source: Counter): this {
@@ -180,13 +180,13 @@ export class Counter {
 export class ChanSource {
 	public declare ch: $.Channel<number> | null
 
-	constructor(init?: Partial<{ch?: $.Channel<number> | null}>, __goscriptValue?: boolean) {
-		this.ch = init?.ch ?? (null! as $.Channel<number> | null)
+	constructor(__goscriptValue?: boolean, ch$?: $.Channel<number> | null) {
+		this.ch = ch$ ?? (null! as $.Channel<number> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): ChanSource {
-		return new ChanSource(this, true)
+		return new ChanSource(true, this.ch)
 	}
 
 	public __goscriptAssign(source: ChanSource): this {
@@ -213,13 +213,13 @@ export class ChanSource {
 export class chanValuer {
 	public declare ch: $.Channel<number> | null
 
-	constructor(init?: Partial<{ch?: $.Channel<number> | null}>, __goscriptValue?: boolean) {
-		this.ch = init?.ch ?? (null! as $.Channel<number> | null)
+	constructor(__goscriptValue?: boolean, ch$?: $.Channel<number> | null) {
+		this.ch = ch$ ?? (null! as $.Channel<number> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): chanValuer {
-		return new chanValuer(this, true)
+		return new chanValuer(true, this.ch)
 	}
 
 	public __goscriptAssign(source: chanValuer): this {
@@ -245,13 +245,13 @@ export class chanValuer {
 export class plusOne {
 	public declare _in: Valuer | null
 
-	constructor(init?: Partial<{_in?: Valuer | null}>, __goscriptValue?: boolean) {
-		this._in = init?._in ?? (null! as Valuer | null)
+	constructor(__goscriptValue?: boolean, _in$?: Valuer | null) {
+		this._in = _in$ ?? (null! as Valuer | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): plusOne {
-		return new plusOne(this, true)
+		return new plusOne(true, this._in)
 	}
 
 	public __goscriptAssign(source: plusOne): this {
@@ -276,13 +276,13 @@ export class plusOne {
 export class prefixNamer {
 	public declare labeler: Labeler | null
 
-	constructor(init?: Partial<{labeler?: Labeler | null}>, __goscriptValue?: boolean) {
-		this.labeler = init?.labeler ?? (null! as Labeler | null)
+	constructor(__goscriptValue?: boolean, labeler$?: Labeler | null) {
+		this.labeler = labeler$ ?? (null! as Labeler | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): prefixNamer {
-		return new prefixNamer(this, true)
+		return new prefixNamer(true, this.labeler)
 	}
 
 	public __goscriptAssign(source: prefixNamer): this {
@@ -334,14 +334,14 @@ export function describe(n: Namer | null): string {
 }
 
 export async function main(): globalThis.Promise<void> {
-	await $.println("area:", totalArea($.arrayToSlice<Shape | null>([$.interfaceValue<Shape | null>(new Rect({w: 2, h: 3}, true), "main.Rect", "main.Rect"), $.interfaceValue<Shape | null>(new Square({side: 4}), "*main.Square", /* @__PURE__ */ $.pointerType("main.Square"))])))
+	await $.println("area:", totalArea($.arrayToSlice<Shape | null>([$.interfaceValue<Shape | null>(new Rect(true, 2, 3), "main.Rect", "main.Rect"), $.interfaceValue<Shape | null>(new Square(false, 4), "*main.Square", /* @__PURE__ */ $.pointerType("main.Square"))])))
 
 	await $.println("counter:", await sumNext($.interfaceValue<Source | null>(new Counter(), "*main.Counter", /* @__PURE__ */ $.pointerType("main.Counter")), 3))
-	await $.println("chan:", await sumNext($.interfaceValue<Source | null>(new ChanSource({ch: $.makeChannel<number>(1, 0, "both")}), "*main.ChanSource", /* @__PURE__ */ $.pointerType("main.ChanSource")), 2))
+	await $.println("chan:", await sumNext($.interfaceValue<Source | null>(new ChanSource(false, $.makeChannel<number>(1, 0, "both")), "*main.ChanSource", /* @__PURE__ */ $.pointerType("main.ChanSource")), 2))
 
-	await $.println("getter:", await readGetter($.interfaceValue<Getter | null>(new plusOne({_in: $.interfaceValue<Valuer | null>(new chanValuer({ch: $.makeChannel<number>(1, 0, "both")}, true), "main.chanValuer", "main.chanValuer")}, true), "main.plusOne", "main.plusOne")))
+	await $.println("getter:", await readGetter($.interfaceValue<Getter | null>(new plusOne(true, $.interfaceValue<Valuer | null>(new chanValuer(true, $.makeChannel<number>(1, 0, "both")), "main.chanValuer", "main.chanValuer")), "main.plusOne", "main.plusOne")))
 
-	await $.println("namer:", describe($.interfaceValue<Namer | null>(new prefixNamer({labeler: __goscriptStatic3()}, true), "main.prefixNamer", "main.prefixNamer")))
+	await $.println("namer:", describe($.interfaceValue<Namer | null>(new prefixNamer(true, __goscriptStatic3()), "main.prefixNamer", "main.prefixNamer")))
 }
 
 var __goscriptStatic0$value: any

@@ -6,13 +6,13 @@ import * as $ from "@goscript/builtin/index.js"
 export class T {
 	public declare val: number
 
-	constructor(init?: Partial<{val?: number}>, __goscriptValue?: boolean) {
-		this.val = init?.val ?? (0 as number)
+	constructor(__goscriptValue?: boolean, val$?: number) {
+		this.val = val$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): T {
-		return new T(this, true)
+		return new T(true, this.val)
 	}
 
 	public __goscriptAssign(source: T): this {
@@ -22,7 +22,7 @@ export class T {
 
 	public WithDelta(delta: number): T | $.VarRef<T> | null {
 		const t: T | $.VarRef<T> | null = this;
-		return new T({val: $.pointerValue<T>(t).val + delta})
+		return new T(false, $.pointerValue<T>(t).val + delta)
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -35,7 +35,7 @@ export class T {
 }
 
 export function NewT(v: number): T | $.VarRef<T> | null {
-	return new T({val: v})
+	return new T(false, v)
 }
 
 export let Base: T | $.VarRef<T> | null = NewT(10)

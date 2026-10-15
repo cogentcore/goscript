@@ -7,13 +7,13 @@ import * as drbg2 from "@goscript/github.com/s4wave/goscript/tests/tests/import_
 export class local {
 	public declare value: number
 
-	constructor(init?: Partial<{value?: number}>, __goscriptValue?: boolean) {
-		this.value = init?.value ?? (0 as number)
+	constructor(__goscriptValue?: boolean, value$?: number) {
+		this.value = value$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): local {
-		return new local(this, true)
+		return new local(true, this.value)
 	}
 
 	public __goscriptAssign(source: local): this {
@@ -31,7 +31,7 @@ export class local {
 }
 
 export function newLocal(value: number): local | $.VarRef<local> | null {
-	return new local({value: value})
+	return new local(false, value)
 }
 
 export async function main(): globalThis.Promise<void> {

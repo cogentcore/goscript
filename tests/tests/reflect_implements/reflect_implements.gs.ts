@@ -15,12 +15,12 @@ $.registerInterfaceType(
 );
 
 export class MyType {
-	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
+	constructor(__goscriptValue?: boolean) {
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): MyType {
-		return new MyType(this, true)
+		return new MyType(true)
 	}
 
 	public __goscriptAssign(source: MyType): this {
@@ -52,7 +52,7 @@ export async function main(): globalThis.Promise<void> {
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.MyType", zero: () => new MyType(undefined, true), methods: {String: (receiver: any) => $.pointerValue(receiver).String()} }})
+	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.MyType", zero: () => new MyType(true), methods: {String: (receiver: any) => $.pointerValue(receiver).String()} }})
 }
 
 var __goscriptStatic1$value: any

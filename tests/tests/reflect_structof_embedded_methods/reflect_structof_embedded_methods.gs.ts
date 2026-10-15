@@ -7,13 +7,13 @@ import * as reflect from "@goscript/reflect/index.js"
 export class Base {
 	public declare Name: string
 
-	constructor(init?: Partial<{Name?: string}>, __goscriptValue?: boolean) {
-		this.Name = init?.Name ?? ("" as string)
+	constructor(__goscriptValue?: boolean, Name$?: string) {
+		this.Name = Name$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Base {
-		return new Base(this, true)
+		return new Base(true, this.Name)
 	}
 
 	public __goscriptAssign(source: Base): this {
@@ -45,14 +45,14 @@ export class Node {
 
 	public declare Value: number
 
-	constructor(init?: Partial<{Base?: Base, Value?: number}>, __goscriptValue?: boolean) {
-		this.Base = init?.Base ? init.Base.clone() : new Base(undefined, true)
-		this.Value = init?.Value ?? (0 as number)
+	constructor(__goscriptValue?: boolean, Base$?: Base, Value$?: number) {
+		this.Base = Base$ ?? new Base(true)
+		this.Value = Value$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Node {
-		return new Node(this, true)
+		return new Node(true, this.Base.clone(), this.Value)
 	}
 
 	public __goscriptAssign(source: Node): this {
@@ -81,7 +81,7 @@ export class Node {
 export async function main(): globalThis.Promise<void> {
 	// A struct type built from the fields of Node, whose embedded Base has
 	// methods: Go allows this when Base is the first field.
-	let nt = reflect.TypeOf($.interfaceValue(new Node(undefined, true), "main.Node", "main.Node"))
+	let nt = reflect.TypeOf($.interfaceValue(new Node(true), "main.Node", "main.Node"))
 	let fields = $.makeSlice<reflect.StructField>((__goscriptAwait = (nt !== null && (nt as any).__isVarRef !== true && (nt as any).__goValue === undefined ? (nt as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(nt)).NumField(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), undefined, undefined, () => $.markAsStructValue(new reflect.StructField()))
 	for (let __goscriptRangeTarget0 = fields, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), i = 0; i < __goscriptRangeWindow0.length; i++) {
 		$.assignStruct((__goscriptRangeWindow0.backing as any[])[__goscriptRangeWindow0.offset + i], ((__goscriptAwait = (nt !== null && (nt as any).__isVarRef !== true && (nt as any).__goValue === undefined ? (nt as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(nt)).Field(i), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as reflect.StructField))

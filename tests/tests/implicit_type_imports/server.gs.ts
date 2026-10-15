@@ -6,12 +6,12 @@ import * as io from "@goscript/io/index.js"
 import "@goscript/io/index.js"
 
 export class Server {
-	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
+	constructor(__goscriptValue?: boolean) {
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Server {
-		return new Server(this, true)
+		return new Server(true)
 	}
 
 	public __goscriptAssign(source: Server): this {

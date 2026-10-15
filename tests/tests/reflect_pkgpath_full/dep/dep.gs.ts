@@ -21,13 +21,13 @@ $.registerInterfaceType(
 export class Node {
 	public declare Name: string
 
-	constructor(init?: Partial<{Name?: string}>, __goscriptValue?: boolean) {
-		this.Name = init?.Name ?? ("" as string)
+	constructor(__goscriptValue?: boolean, Name$?: string) {
+		this.Name = Name$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Node {
-		return new Node(this, true)
+		return new Node(true, this.Name)
 	}
 
 	public __goscriptAssign(source: Node): this {
@@ -47,13 +47,13 @@ export class Node {
 export class Box {
 	public declare Value: any
 
-	constructor(init?: Partial<{Value?: any}>, __goscriptValue?: boolean, __goscriptFresh?: boolean) {
-		this.Value = init?.Value !== undefined ? (__goscriptFresh === true ? init.Value : $.copyElement(init.Value)) : (null! as any)
+	constructor(__goscriptValue?: boolean, Value$?: any) {
+		this.Value = Value$ ?? (null! as any)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Box {
-		return new Box(this, true)
+		return new Box(true, $.copyElement(this.Value))
 	}
 
 	public __goscriptAssign(source: Box): this {

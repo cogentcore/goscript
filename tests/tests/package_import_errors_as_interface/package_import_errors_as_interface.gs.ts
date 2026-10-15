@@ -18,13 +18,13 @@ $.registerInterfaceType(
 export class wrappedHealthError {
 	public declare err: $.GoError
 
-	constructor(init?: Partial<{err?: $.GoError}>, __goscriptValue?: boolean) {
-		this.err = init?.err ?? (null! as $.GoError)
+	constructor(__goscriptValue?: boolean, err$?: $.GoError) {
+		this.err = err$ ?? (null! as $.GoError)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): wrappedHealthError {
-		return new wrappedHealthError(this, true)
+		return new wrappedHealthError(true, this.err)
 	}
 
 	public __goscriptAssign(source: wrappedHealthError): this {
@@ -57,7 +57,7 @@ export class wrappedHealthError {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let err = (() => { const __goscriptLiteralField0 = errors.New("root"); return new wrappedHealthError({err: __goscriptLiteralField0}) })()
+	let err = (() => { const __goscriptLiteralField0 = errors.New("root"); return new wrappedHealthError(false, __goscriptLiteralField0) })()
 
 	let target: $.VarRef<healthError | null> = $.varRef(null! as healthError | null)
 	let ok = errors.As($.pointerValueOrNil($.interfaceValue<$.GoError>(err, "*main.wrappedHealthError", /* @__PURE__ */ $.pointerType("main.wrappedHealthError")))!, $.interfaceValue(target, "*main.healthError", /* @__PURE__ */ $.pointerType("main.healthError")))

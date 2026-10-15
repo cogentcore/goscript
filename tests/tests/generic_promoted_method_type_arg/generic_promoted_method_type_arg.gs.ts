@@ -21,14 +21,14 @@ export class Base {
 
 	public declare flags: Flags
 
-	constructor(init?: Partial<{App?: any, flags?: Flags}>, __goscriptValue?: boolean, __goscriptFresh?: boolean) {
-		this.App = init?.App !== undefined ? (__goscriptFresh === true ? init.App : $.copyElement(init.App)) : (null! as any)
-		this.flags = init?.flags ?? (0n as Flags)
+	constructor(__goscriptValue?: boolean, App$?: any, flags$?: Flags) {
+		this.App = App$ ?? (null! as any)
+		this.flags = flags$ ?? 0n
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Base {
-		return new Base(this, true)
+		return new Base(true, $.copyElement(this.App), this.flags)
 	}
 
 	public __goscriptAssign(source: Base): this {
@@ -60,13 +60,13 @@ export class Base {
 export class App {
 	public declare Name: string
 
-	constructor(init?: Partial<{Name?: string}>, __goscriptValue?: boolean) {
-		this.Name = init?.Name ?? ("" as string)
+	constructor(__goscriptValue?: boolean, Name$?: string) {
+		this.Name = Name$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): App {
-		return new App(this, true)
+		return new App(true, this.Name)
 	}
 
 	public __goscriptAssign(source: App): this {
@@ -88,14 +88,14 @@ export class Window {
 
 	public declare Title: string
 
-	constructor(init?: Partial<{Base?: Base, Title?: string}>, __goscriptValue?: boolean) {
-		this.Base = init?.Base ? init.Base.clone() : $.markAsStructValue(new Base({App: null! as App | $.VarRef<App> | null}, undefined, true))
-		this.Title = init?.Title ?? ("" as string)
+	constructor(__goscriptValue?: boolean, Base$?: Base, Title$?: string) {
+		this.Base = Base$ ?? new Base(true, null! as App | $.VarRef<App> | null)
+		this.Title = Title$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Window {
-		return new Window(this, true)
+		return new Window(true, this.Base.clone(), this.Title)
 	}
 
 	public __goscriptAssign(source: Window): this {
@@ -126,14 +126,14 @@ export class Single {
 
 	public declare Count: number
 
-	constructor(init?: Partial<{Base?: Base, Count?: number}>, __goscriptValue?: boolean) {
-		this.Base = init?.Base ? init.Base.clone() : $.markAsStructValue(new Base({App: null}, undefined, true))
-		this.Count = init?.Count ?? (0 as number)
+	constructor(__goscriptValue?: boolean, Base$?: Base, Count$?: number) {
+		this.Base = Base$ ?? new Base(true, null)
+		this.Count = Count$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Single {
-		return new Single(this, true)
+		return new Single(true, this.Base.clone(), this.Count)
 	}
 
 	public __goscriptAssign(source: Single): this {
@@ -169,7 +169,7 @@ export function asFlagger(__typeArgs: $.GenericTypeArgs | undefined, w: any): Fl
 }
 
 export async function main(): globalThis.Promise<void> {
-	let w = new Window({Title: "main"})
+	let w = new Window(false, undefined, "main")
 	await $.println("check:", check(__goscriptStatic1(), w))
 	let f = asFlagger(__goscriptStatic1(), new Window())
 	void (__goscriptAwait = (f !== null && (f as any).__isVarRef !== true && (f as any).__goValue === undefined ? (f as Exclude<Flagger, null>) : $.pointerValue<Exclude<Flagger, null>>(f)).Set(3n), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)

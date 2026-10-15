@@ -6,13 +6,13 @@ import * as $ from "@goscript/builtin/index.js"
 export class OtherStruct {
 	public declare Label: string
 
-	constructor(init?: Partial<{Label?: string}>, __goscriptValue?: boolean) {
-		this.Label = init?.Label ?? ("" as string)
+	constructor(__goscriptValue?: boolean, Label$?: string) {
+		this.Label = Label$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): OtherStruct {
-		return new OtherStruct(this, true)
+		return new OtherStruct(true, this.Label)
 	}
 
 	public __goscriptAssign(source: OtherStruct): this {

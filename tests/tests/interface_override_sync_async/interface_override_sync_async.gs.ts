@@ -9,13 +9,13 @@ import "@goscript/fmt/index.js"
 export class slowName {
 	public declare ch: $.Channel<string> | null
 
-	constructor(init?: Partial<{ch?: $.Channel<string> | null}>, __goscriptValue?: boolean) {
-		this.ch = init?.ch ?? (null! as $.Channel<string> | null)
+	constructor(__goscriptValue?: boolean, ch$?: $.Channel<string> | null) {
+		this.ch = ch$ ?? (null! as $.Channel<string> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): slowName {
-		return new slowName(this, true)
+		return new slowName(true, this.ch)
 	}
 
 	public __goscriptAssign(source: slowName): this {
@@ -48,8 +48,8 @@ export function typeName(t: reflect.Type | null): string {
 export async function main(): globalThis.Promise<void> {
 	let ch = $.makeChannel<string>(1, "", "both")
 	await $.chanSend(ch, "slow")
-	await $.println(await describeStringer($.interfaceValue<fmt.Stringer | null>(new slowName({ch: ch}, true), "main.slowName", "main.slowName")))
-	await $.println(typeName(reflect.TypeOf($.interfaceValue(new slowName(undefined, true), "main.slowName", "main.slowName"))))
+	await $.println(await describeStringer($.interfaceValue<fmt.Stringer | null>(new slowName(true, ch), "main.slowName", "main.slowName")))
+	await $.println(typeName(reflect.TypeOf($.interfaceValue(new slowName(true), "main.slowName", "main.slowName"))))
 }
 
 var __goscriptAwait: any

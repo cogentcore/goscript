@@ -16,12 +16,12 @@ $.registerInterfaceType(
 );
 
 export class impl {
-	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
+	constructor(__goscriptValue?: boolean) {
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): impl {
-		return new impl(this, true)
+		return new impl(true)
 	}
 
 	public __goscriptAssign(source: impl): this {
@@ -44,13 +44,13 @@ export class impl {
 export class Holder {
 	public declare Hidden: hidden | null
 
-	constructor(init?: Partial<{Hidden?: hidden | null}>, __goscriptValue?: boolean) {
-		this.Hidden = init?.Hidden ?? (null! as hidden | null)
+	constructor(__goscriptValue?: boolean, Hidden$?: hidden | null) {
+		this.Hidden = Hidden$ ?? (null! as hidden | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Holder {
-		return new Holder(this, true)
+		return new Holder(true, this.Hidden)
 	}
 
 	public __goscriptAssign(source: Holder): this {
@@ -68,5 +68,5 @@ export class Holder {
 }
 
 export function NewHolder(): Holder {
-	return new Holder({Hidden: $.interfaceValue<hidden | null>(new impl(undefined, true), "dep.impl", "dep.impl")}, true)
+	return new Holder(true, $.interfaceValue<hidden | null>(new impl(true), "dep.impl", "dep.impl"))
 }

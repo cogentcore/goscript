@@ -25,7 +25,7 @@ export async function main(): globalThis.Promise<void> {
 		await $.println(s, ok, await (f !== null && (f as any).__isVarRef !== true && (f as any).__goValue === undefined ? ((f as any) as big.Float).String() : big.Float.prototype.String.call(f)))
 	}
 	await $.println("newfloat", await big.Float.prototype.Text.call(await big.NewFloat(1.5), 103, 10), await big.Float.prototype.Text.call(await big.NewFloat(1.5), 98, 0))
-	let m: $.VarRef<big.Float> = $.varRef(new big.Float(undefined, true))
+	let m: $.VarRef<big.Float> = $.varRef(new big.Float(true))
 	await m.value.Mul(await big.NewFloat(3), await big.NewFloat(7))
 	await $.println("fmul", await m.value.String())
 	await $.println("rat", await big.Rat.prototype.FloatString.call(await big.NewRat(3n, 2n), 5))

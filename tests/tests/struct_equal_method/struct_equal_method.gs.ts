@@ -9,14 +9,14 @@ export class pos {
 
 	public declare Char: number
 
-	constructor(init?: Partial<{Line?: number, Char?: number}>, __goscriptValue?: boolean) {
-		this.Line = init?.Line ?? (0 as number)
-		this.Char = init?.Char ?? (0 as number)
+	constructor(__goscriptValue?: boolean, Line$?: number, Char$?: number) {
+		this.Line = Line$ ?? 0
+		this.Char = Char$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): pos {
-		return new pos(this, true)
+		return new pos(true, this.Line, this.Char)
 	}
 
 	public __goscriptAssign(source: pos): this {
@@ -39,14 +39,14 @@ export class stamp {
 
 	public declare NSec: number
 
-	constructor(init?: Partial<{Sec?: bigint, NSec?: number}>, __goscriptValue?: boolean) {
-		this.Sec = init?.Sec ?? (0n as bigint)
-		this.NSec = init?.NSec ?? (0 as number)
+	constructor(__goscriptValue?: boolean, Sec$?: bigint, NSec$?: number) {
+		this.Sec = Sec$ ?? 0n
+		this.NSec = NSec$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): stamp {
-		return new stamp(this, true)
+		return new stamp(true, this.Sec, this.NSec)
 	}
 
 	public __goscriptAssign(source: stamp): this {
@@ -71,15 +71,15 @@ export class region {
 
 	public declare Time: stamp
 
-	constructor(init?: Partial<{Start?: pos, End?: pos, Time?: stamp}>, __goscriptValue?: boolean) {
-		this.Start = init?.Start ? init.Start.clone() : new pos(undefined, true)
-		this.End = init?.End ? init.End.clone() : new pos(undefined, true)
-		this.Time = init?.Time ? init.Time.clone() : new stamp(undefined, true)
+	constructor(__goscriptValue?: boolean, Start$?: pos, End$?: pos, Time$?: stamp) {
+		this.Start = Start$ ?? new pos(true)
+		this.End = End$ ?? new pos(true)
+		this.Time = Time$ ?? new stamp(true)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): region {
-		return new region(this, true)
+		return new region(true, this.Start.clone(), this.End.clone(), this.Time.clone())
 	}
 
 	public __goscriptAssign(source: region): this {
@@ -101,13 +101,13 @@ export class region {
 export class node {
 	public declare Name: string
 
-	constructor(init?: Partial<{Name?: string}>, __goscriptValue?: boolean) {
-		this.Name = init?.Name ?? ("" as string)
+	constructor(__goscriptValue?: boolean, Name$?: string) {
+		this.Name = Name$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): node {
-		return new node(this, true)
+		return new node(true, this.Name)
 	}
 
 	public __goscriptAssign(source: node): this {
@@ -139,19 +139,19 @@ export class mixed {
 
 	public declare Inner: pos
 
-	constructor(init?: Partial<{Name?: string, F?: number, OK?: boolean, Ptr?: node | $.VarRef<node> | null, Any?: any, _blank5?: number, Inner?: pos}>, __goscriptValue?: boolean) {
-		this.Name = init?.Name ?? ("" as string)
-		this.F = init?.F ?? (0 as number)
-		this.OK = init?.OK ?? (false as boolean)
-		this.Ptr = init?.Ptr ?? (null! as node | $.VarRef<node> | null)
-		this.Any = init?.Any ?? (null! as any)
-		this._blank5 = init?._blank5 ?? (0 as number)
-		this.Inner = init?.Inner ? init.Inner.clone() : new pos(undefined, true)
+	constructor(__goscriptValue?: boolean, Name$?: string, F$?: number, OK$?: boolean, Ptr$?: node | $.VarRef<node> | null, Any$?: any, _blank5$?: number, Inner$?: pos) {
+		this.Name = Name$ ?? ""
+		this.F = F$ ?? 0
+		this.OK = OK$ ?? false
+		this.Ptr = Ptr$ ?? (null! as node | $.VarRef<node> | null)
+		this.Any = Any$ ?? (null! as any)
+		this._blank5 = _blank5$ ?? 0
+		this.Inner = Inner$ ?? new pos(true)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): mixed {
-		return new mixed(this, true)
+		return new mixed(true, this.Name, this.F, this.OK, this.Ptr, this.Any, this._blank5, this.Inner.clone())
 	}
 
 	public __goscriptAssign(source: mixed): this {
@@ -177,13 +177,13 @@ export class mixed {
 export class withArray {
 	public declare Vals: number[]
 
-	constructor(init?: Partial<{Vals?: number[]}>, __goscriptValue?: boolean) {
-		this.Vals = init?.Vals !== undefined ? $.cloneArrayValue(init.Vals, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2)) : $.arrayValue(globalThis.Array.from({ length: 2 }, () => 0))
+	constructor(__goscriptValue?: boolean, Vals$?: number[]) {
+		this.Vals = Vals$ ?? $.arrayValue(globalThis.Array.from({ length: 2 }, () => 0))
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): withArray {
-		return new withArray(this, true)
+		return new withArray(true, $.cloneArrayValue(this.Vals, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2)))
 	}
 
 	public __goscriptAssign(source: withArray): this {
@@ -202,7 +202,7 @@ export class withArray {
 
 export async function main(): globalThis.Promise<void> {
 	// Plain and nested fields.
-	let a = new region({Start: new pos({Line: 1, Char: 2}, true), End: new pos({Line: 3, Char: 4}, true), Time: new stamp({Sec: 5n, NSec: 6}, true)}, true)
+	let a = new region(true, new pos(true, 1, 2), new pos(true, 3, 4), new stamp(true, 5n, 6))
 	let b = (a).clone()
 	await $.println("equal:", (a.Start.Line === b.Start.Line && a.Start.Char === b.Start.Char && a.End.Line === b.End.Line && a.End.Char === b.End.Char && a.Time.Sec === b.Time.Sec && a.Time.NSec === b.Time.NSec), !(a.Start.Line === b.Start.Line && a.Start.Char === b.Start.Char && a.End.Line === b.End.Line && a.End.Char === b.End.Char && a.Time.Sec === b.Time.Sec && a.Time.NSec === b.Time.NSec), (a.Start.Line === b.Start.Line && a.Start.Char === b.Start.Char))
 	b.End.Char++
@@ -212,15 +212,15 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("time differs:", (a.Start.Line === b.Start.Line && a.Start.Char === b.Start.Char && a.End.Line === b.End.Line && a.End.Char === b.End.Char && a.Time.Sec === b.Time.Sec && a.Time.NSec === b.Time.NSec))
 
 	// Pointers compare by identity, interfaces by their dynamic values.
-	let n1 = new node({Name: "x"})
-	let n2 = new node({Name: "x"})
-	let m1 = new mixed({Name: "m", F: 1.5, OK: true, Ptr: n1, Any: $.interfaceValue(new pos({Line: 1, Char: 1}, true), "main.pos", "main.pos"), Inner: new pos({Line: 7, Char: 8}, true)}, true)
+	let n1 = new node(false, "x")
+	let n2 = new node(false, "x")
+	let m1 = new mixed(true, "m", 1.5, true, n1, $.interfaceValue(new pos(true, 1, 1), "main.pos", "main.pos"), undefined, new pos(true, 7, 8))
 	let m2 = (m1).clone()
 	await $.println("mixed:", (m1.Name === m2.Name && m1.F === m2.F && m1.OK === m2.OK && $.pointerEqual(m1.Ptr, m2.Ptr) && $.comparableEqual(m1.Any, m2.Any) && m1.Inner.Line === m2.Inner.Line && m1.Inner.Char === m2.Inner.Char))
 	m2.Ptr = n2
 	await $.println("other pointer:", (m1.Name === m2.Name && m1.F === m2.F && m1.OK === m2.OK && $.pointerEqual(m1.Ptr, m2.Ptr) && $.comparableEqual(m1.Any, m2.Any) && m1.Inner.Line === m2.Inner.Line && m1.Inner.Char === m2.Inner.Char))
 	m2 = m2.__goscriptAssign(m1)
-	m2.Any = $.interfaceValue(new pos({Line: 1, Char: 2}, true), "main.pos", "main.pos")
+	m2.Any = $.interfaceValue(new pos(true, 1, 2), "main.pos", "main.pos")
 	await $.println("other interface value:", (m1.Name === m2.Name && m1.F === m2.F && m1.OK === m2.OK && $.pointerEqual(m1.Ptr, m2.Ptr) && $.comparableEqual(m1.Any, m2.Any) && m1.Inner.Line === m2.Inner.Line && m1.Inner.Char === m2.Inner.Char))
 	m2.Any = "text"
 	await $.println("other interface type:", (m1.Name === m2.Name && m1.F === m2.F && m1.OK === m2.OK && $.pointerEqual(m1.Ptr, m2.Ptr) && $.comparableEqual(m1.Any, m2.Any) && m1.Inner.Line === m2.Inner.Line && m1.Inner.Char === m2.Inner.Char))
@@ -237,12 +237,12 @@ export async function main(): globalThis.Promise<void> {
 	// Comparisons of values in slices and maps.
 	let regions = $.arrayToSlice<region>([(a).clone(), (b).clone()])
 	await $.println("slice:", $.structEqual($.arrayIndex(regions!, 0), a), $.structEqual($.arrayIndex(regions!, 1), a))
-	let seen = $.makeMap<pos, boolean>([[new pos({Line: 1, Char: 2}, true), true]])
+	let seen = $.makeMap<pos, boolean>([[new pos(true, 1, 2), true]])
 	await $.println("map:", $.mapGet<pos, boolean, boolean>(seen, a.Start, false)[0], $.mapGet<pos, boolean, boolean>(seen, a.End, false)[0])
 
 	// Arrays in structs.
-	let w1 = new withArray({Vals: $.arrayValue([1, 2])}, true)
-	let w2 = new withArray({Vals: $.arrayValue([1, 2])}, true)
+	let w1 = new withArray(true, $.arrayValue([1, 2]))
+	let w2 = new withArray(true, $.arrayValue([1, 2]))
 	await $.println("array:", $.structEqual(w1, w2))
 	w2.Vals[1] = 3
 	await $.println("array differs:", $.structEqual(w1, w2))

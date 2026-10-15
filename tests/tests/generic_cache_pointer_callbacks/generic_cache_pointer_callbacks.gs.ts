@@ -6,13 +6,13 @@ import * as $ from "@goscript/builtin/index.js"
 export class cache {
 	public declare stored: any
 
-	constructor(init?: Partial<{stored?: any}>, __goscriptValue?: boolean) {
-		this.stored = init?.stored ?? (null! as any)
+	constructor(__goscriptValue?: boolean, stored$?: any) {
+		this.stored = stored$ ?? (null! as any)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): cache {
-		return new cache(this, true)
+		return new cache(true, this.stored)
 	}
 
 	public __goscriptAssign(source: cache): this {
@@ -46,13 +46,13 @@ export class cache {
 export class key {
 	public declare N: number
 
-	constructor(init?: Partial<{N?: number}>, __goscriptValue?: boolean) {
-		this.N = init?.N ?? (0 as number)
+	constructor(__goscriptValue?: boolean, N$?: number) {
+		this.N = N$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): key {
-		return new key(this, true)
+		return new key(true, this.N)
 	}
 
 	public __goscriptAssign(source: key): this {
@@ -72,13 +72,13 @@ export class key {
 export class privateKey {
 	public declare D: number
 
-	constructor(init?: Partial<{D?: number}>, __goscriptValue?: boolean) {
-		this.D = init?.D ?? (0 as number)
+	constructor(__goscriptValue?: boolean, D$?: number) {
+		this.D = D$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): privateKey {
-		return new privateKey(this, true)
+		return new privateKey(true, this.D)
 	}
 
 	public __goscriptAssign(source: privateKey): this {
@@ -95,7 +95,7 @@ export class privateKey {
 	)
 }
 
-export let privateKeyCache = $.varRef($.markAsStructValue(new cache()))
+export let privateKeyCache: $.VarRef<cache> = $.varRef(new cache(true))
 
 export function __goscript_set_privateKeyCache(__goscriptValue: cache): void {
 	$.assignStruct(privateKeyCache.value, __goscriptValue)
@@ -104,7 +104,7 @@ export function __goscript_set_privateKeyCache(__goscriptValue: cache): void {
 export function privateKeyToCache(k: key | $.VarRef<key> | null): [privateKey | $.VarRef<privateKey> | null, $.GoError] {
 	const k$: key = k == null ? $.pointerTarget<key>(k) : (k as any).__isVarRef === true ? (k as any).value : (k as any).__goValue === undefined ? (k as any) : $.pointerTarget<key>(k)
 	const __goscriptReturn0 = privateKeyCache.value.Get(__goscriptStatic0(), k, $.functionValue((): [privateKey | $.VarRef<privateKey> | null, $.GoError] => {
-		return [new privateKey({D: (k$ as key).N}), null]
+		return [new privateKey(false, (k$ as key).N), null]
 	}, ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.pointerType("main.privateKey"), "error"] } as $.FunctionTypeInfo)), $.functionValue((v: privateKey | $.VarRef<privateKey> | null): boolean => {
 		return $.pointerValue<privateKey>(v).D == (k$ as key).N
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.pointerType("main.privateKey")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo)))
@@ -113,7 +113,7 @@ export function privateKeyToCache(k: key | $.VarRef<key> | null): [privateKey | 
 }
 
 export async function main(): globalThis.Promise<void> {
-	let k = new key({N: 7})
+	let k = new key(false, 7)
 	let __goscriptTuple0: any = privateKeyToCache(k)
 	let v: privateKey | $.VarRef<privateKey> | null = __goscriptTuple0[0]
 	let err = __goscriptTuple0[1]
@@ -125,7 +125,7 @@ export async function main(): globalThis.Promise<void> {
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, K: { type: "main.key", zero: () => new key(undefined, true) }, V: { type: "main.privateKey", zero: () => new privateKey(undefined, true) }})
+	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, K: { type: "main.key", zero: () => new key(true) }, V: { type: "main.privateKey", zero: () => new privateKey(true) }})
 }
 
 if ($.isMainScript(import.meta)) {

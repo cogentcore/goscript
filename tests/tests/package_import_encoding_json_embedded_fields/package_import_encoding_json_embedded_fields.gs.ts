@@ -14,16 +14,16 @@ export class Base {
 
 	public declare Shadowed: string
 
-	constructor(init?: Partial<{Name?: string, Kids?: $.Slice<string>, hidden?: number, Shadowed?: string}>, __goscriptValue?: boolean) {
-		this.Name = init?.Name ?? ("" as string)
-		this.Kids = init?.Kids ?? (null! as $.Slice<string>)
-		this.hidden = init?.hidden ?? (0 as number)
-		this.Shadowed = init?.Shadowed ?? ("" as string)
+	constructor(__goscriptValue?: boolean, Name$?: string, Kids$?: $.Slice<string>, hidden$?: number, Shadowed$?: string) {
+		this.Name = Name$ ?? ""
+		this.Kids = Kids$ ?? (null! as $.Slice<string>)
+		this.hidden = hidden$ ?? 0
+		this.Shadowed = Shadowed$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Base {
-		return new Base(this, true)
+		return new Base(true, this.Name, this.Kids, this.hidden, this.Shadowed)
 	}
 
 	public __goscriptAssign(source: Base): this {
@@ -46,13 +46,13 @@ export class Base {
 export class inner {
 	public declare Deep: number
 
-	constructor(init?: Partial<{Deep?: number}>, __goscriptValue?: boolean) {
-		this.Deep = init?.Deep ?? (0 as number)
+	constructor(__goscriptValue?: boolean, Deep$?: number) {
+		this.Deep = Deep$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): inner {
-		return new inner(this, true)
+		return new inner(true, this.Deep)
 	}
 
 	public __goscriptAssign(source: inner): this {
@@ -72,13 +72,13 @@ export class inner {
 export class Extra {
 	public declare Note: string
 
-	constructor(init?: Partial<{Note?: string}>, __goscriptValue?: boolean) {
-		this.Note = init?.Note ?? ("" as string)
+	constructor(__goscriptValue?: boolean, Note$?: string) {
+		this.Note = Note$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Extra {
-		return new Extra(this, true)
+		return new Extra(true, this.Note)
 	}
 
 	public __goscriptAssign(source: Extra): this {
@@ -110,19 +110,19 @@ export class Node {
 
 	public declare _private: boolean
 
-	constructor(init?: Partial<{Base?: Base, Extra?: Extra | $.VarRef<Extra> | null, inner?: inner, Tagged?: Base, Shadowed?: string, Size?: number, _private?: boolean}>, __goscriptValue?: boolean) {
-		this.Base = init?.Base ? init.Base.clone() : new Base(undefined, true)
-		this.Extra = init?.Extra ?? (null! as Extra | $.VarRef<Extra> | null)
-		this.inner = init?.inner ? init.inner.clone() : new inner(undefined, true)
-		this.Tagged = init?.Tagged ? init.Tagged.clone() : new Base(undefined, true)
-		this.Shadowed = init?.Shadowed ?? ("" as string)
-		this.Size = init?.Size ?? (0 as number)
-		this._private = init?._private ?? (false as boolean)
+	constructor(__goscriptValue?: boolean, Base$?: Base, Extra$?: Extra | $.VarRef<Extra> | null, inner$?: inner, Tagged$?: Base, Shadowed$?: string, Size$?: number, _private$?: boolean) {
+		this.Base = Base$ ?? new Base(true)
+		this.Extra = Extra$ ?? (null! as Extra | $.VarRef<Extra> | null)
+		this.inner = inner$ ?? new inner(true)
+		this.Tagged = Tagged$ ?? new Base(true)
+		this.Shadowed = Shadowed$ ?? ""
+		this.Size = Size$ ?? 0
+		this._private = _private$ ?? false
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Node {
-		return new Node(this, true)
+		return new Node(true, this.Base.clone(), this.Extra, this.inner.clone(), this.Tagged.clone(), this.Shadowed, this.Size, this._private)
 	}
 
 	public __goscriptAssign(source: Node): this {
@@ -146,18 +146,18 @@ export class Node {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let n = new Node({Base: new Base({Name: "a", Kids: $.arrayToSlice<string>(["x"]), hidden: 3, Shadowed: "base"}, true), Extra: new Extra({Note: "n"}), inner: new inner({Deep: 7}, true), Shadowed: "outer", Size: 2, _private: true}, true)
+	let n = new Node(true, new Base(true, "a", $.arrayToSlice<string>(["x"]), 3, "base"), new Extra(false, "n"), new inner(true, 7), undefined, "outer", 2, true)
 	let __goscriptTuple0: any = (json.Marshal($.interfaceValue((n).clone(), "main.Node", "main.Node")) as [$.Slice<number>, $.GoError])
 	let b: $.Slice<number> = __goscriptTuple0[0]
 	let err = __goscriptTuple0[1]
 	fmt.Println($.bytesToString(b), (err as any))
 
-	let m: $.VarRef<Node> = $.varRef(new Node(undefined, true))
+	let m: $.VarRef<Node> = $.varRef(new Node(true))
 	m.value.Extra = new Extra()
 	err = (json.Unmarshal(new Uint8Array([123, 34, 78, 97, 109, 101, 34, 58, 34, 98, 34, 44, 34, 75, 105, 100, 115, 34, 58, 91, 34, 121, 34, 44, 34, 122, 34, 93, 44, 34, 78, 111, 116, 101, 34, 58, 34, 109, 34, 44, 34, 68, 101, 101, 112, 34, 58, 57, 44, 34, 83, 104, 97, 100, 111, 119, 101, 100, 34, 58, 34, 115, 34, 44, 34, 83, 105, 122, 101, 34, 58, 52, 44, 34, 116, 97, 103, 103, 101, 100, 34, 58, 123, 34, 78, 97, 109, 101, 34, 58, 34, 116, 34, 125, 125]), $.interfaceValue(m, "*main.Node", /* @__PURE__ */ $.pointerType("main.Node"))) as $.GoError)
 	fmt.Println((err as any), m.value.Base.Name, $.interfaceValue(m.value.Base.Kids, "[]string", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("string"))), $.pointerValue<Extra>(m.value.Extra).Note, $.basicInterfaceValue(m.value.inner.Deep, "int"), m.value.Shadowed, $.stringEqual(m.value.Base.Shadowed, ""), $.basicInterfaceValue(m.value.Size, "int"), m.value.Tagged.Name)
 
-	let nilExtra: Node = new Node(undefined, true)
+	let nilExtra: Node = new Node(true)
 	let __goscriptTuple1: any = (json.Marshal($.interfaceValue((nilExtra).clone(), "main.Node", "main.Node")) as [$.Slice<number>, $.GoError])
 	b = __goscriptTuple1[0]
 	fmt.Println($.bytesToString(b))

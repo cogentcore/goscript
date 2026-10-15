@@ -8,14 +8,14 @@ export class Pos {
 
 	public declare Char: number
 
-	constructor(init?: Partial<{Line?: number, Char?: number}>, __goscriptValue?: boolean) {
-		this.Line = init?.Line ?? (0 as number)
-		this.Char = init?.Char ?? (0 as number)
+	constructor(__goscriptValue?: boolean, Line$?: number, Char$?: number) {
+		this.Line = Line$ ?? 0
+		this.Char = Char$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Pos {
-		return new Pos(this, true)
+		return new Pos(true, this.Line, this.Char)
 	}
 
 	public __goscriptAssign(source: Pos): this {
@@ -38,14 +38,14 @@ export class Region {
 
 	public declare End: Pos
 
-	constructor(init?: Partial<{Start?: Pos, End?: Pos}>, __goscriptValue?: boolean) {
-		this.Start = init?.Start ? init.Start.clone() : new Pos(undefined, true)
-		this.End = init?.End ? init.End.clone() : new Pos(undefined, true)
+	constructor(__goscriptValue?: boolean, Start$?: Pos, End$?: Pos) {
+		this.Start = Start$ ?? new Pos(true)
+		this.End = End$ ?? new Pos(true)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Region {
-		return new Region(this, true)
+		return new Region(true, this.Start.clone(), this.End.clone())
 	}
 
 	public __goscriptAssign(source: Region): this {
@@ -68,14 +68,14 @@ export class Rule {
 
 	public declare pos: Pos
 
-	constructor(init?: Partial<{Name?: string, pos?: Pos}>, __goscriptValue?: boolean) {
-		this.Name = init?.Name ?? ("" as string)
-		this.pos = init?.pos ? init.pos.clone() : new Pos(undefined, true)
+	constructor(__goscriptValue?: boolean, Name$?: string, pos$?: Pos) {
+		this.Name = Name$ ?? ""
+		this.pos = pos$ ?? new Pos(true)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Rule {
-		return new Rule(this, true)
+		return new Rule(true, this.Name, this.pos.clone())
 	}
 
 	public __goscriptAssign(source: Rule): this {
@@ -108,14 +108,14 @@ export class key {
 
 	public declare b: number
 
-	constructor(init?: Partial<{a?: number, b?: number}>, __goscriptValue?: boolean) {
-		this.a = init?.a ?? (0 as number)
-		this.b = init?.b ?? (0 as number)
+	constructor(__goscriptValue?: boolean, a$?: number, b$?: number) {
+		this.a = a$ ?? 0
+		this.b = b$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): key {
-		return new key(this, true)
+		return new key(true, this.a, this.b)
 	}
 
 	public __goscriptAssign(source: key): this {
@@ -133,7 +133,7 @@ export class key {
 	)
 }
 
-export let global: Pos = new Pos(undefined, true)
+export let global: Pos = new Pos(true)
 
 export function __goscript_set_global(__goscriptValue: Pos): void {
 	$.assignStruct(global, __goscriptValue)
@@ -150,14 +150,14 @@ export function globalPos(): Pos {
 }
 
 export function named(): Pos {
-	let p: $.VarRef<Pos> = $.varRef(new Pos(undefined, true))
+	let p: $.VarRef<Pos> = $.varRef(new Pos(true))
 	saved = p
 	p.value.Line = 3
 	return (p.value).clone()
 }
 
 export function namedDefer(): Pos {
-	let p: Pos = new Pos(undefined, true)
+	let p: Pos = new Pos(true)
 	using __defer = new $.DisposableStack()
 	__defer.defer(() => { (() => {
 		p.Char = 9
@@ -171,7 +171,7 @@ export function namedDefer(): Pos {
 }
 
 export function makeRegion(l: number): Region {
-	return new Region({Start: new Pos({Line: l, Char: 1}, true), End: new Pos({Line: l, Char: 2}, true)}, true)
+	return new Region(true, new Pos(true, l, 1), new Pos(true, l, 2))
 }
 
 export function region(r: Region | $.VarRef<Region> | null): Region {
@@ -183,7 +183,7 @@ export function identity(__typeArgs: $.GenericTypeArgs | undefined, v: any): any
 }
 
 export async function main(): globalThis.Promise<void> {
-	let r = new Rule({Name: "r", pos: new Pos({Line: 1, Char: 2}, true)})
+	let r = new Rule(false, "r", new Pos(true, 1, 2))
 	let r$: Rule = r == null ? $.pointerTarget<Rule>(r) : (r as any).__isVarRef === true ? (r as any).value : (r as any).__goValue === undefined ? (r as any) : $.pointerTarget<Rule>(r)
 	let p = (r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? ((r as any) as Rule).Pos() : Rule.prototype.Pos.call(r))
 	p.Line = 10
@@ -193,7 +193,7 @@ export async function main(): globalThis.Promise<void> {
 	v.Char = 20
 	await $.println((r$ as Rule).pos.Char, v.Char)
 
-	global.__goscriptAssign(new Pos({Line: 5, Char: 6}, true))
+	global.__goscriptAssign(new Pos(true, 5, 6))
 	let g = globalPos()
 	g.Line = 50
 	await $.println(global.Line, g.Line)
@@ -209,7 +209,7 @@ export async function main(): globalThis.Promise<void> {
 	reg.Start.Line = 70
 	await $.println(reg.Start.Line, reg.End.Line)
 
-	let src = $.varRef(new Region({Start: new Pos({Line: 1, Char: 1}, true)}, true))
+	let src = $.varRef(new Region(true, new Pos(true, 1, 1)))
 	let cp = region(src)
 	cp.Start.Line = 99
 	await $.println(src.value.Start.Line, cp.Start.Line)
@@ -218,17 +218,17 @@ export async function main(): globalThis.Promise<void> {
 	id.End.Char = 42
 	await $.println(src.value.End.Char, id.End.Char)
 
-	let arr: Pos[] = $.arrayValue(globalThis.Array.from({ length: 2 }, () => new Pos(undefined, true)), /* @__PURE__ */ $.arrayType("main.Pos", 2))
+	let arr: Pos[] = $.arrayValue(globalThis.Array.from({ length: 2 }, () => new Pos(true)), /* @__PURE__ */ $.arrayType("main.Pos", 2))
 	arr[0].__goscriptAssign((r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? ((r as any) as Rule).Pos() : Rule.prototype.Pos.call(r)))
 	$.arrayIndex(arr, 0).Line = 11
 	await $.println((r$ as Rule).pos.Line, $.arrayIndex(arr, 0).Line)
 
 	let m = $.makeMap<key, number>([])
-	let k = new key({a: 1, b: 2}, true)
+	let k = new key(true, 1, 2)
 	$.mapSet(m, (k).clone(), 1)
 	k.a = 5
 	let [, ok] = $.mapGet<key, number, number>(m, k, 0)
-	await $.println($.len(m), ok, $.mapGet<key, number, number>(m, new key({a: 1, b: 2}, true), 0)[0])
+	await $.println($.len(m), ok, $.mapGet<key, number, number>(m, new key(true, 1, 2), 0)[0])
 	k.a = 1
 	await $.println($.mapGet<key, number, number>(m, k, 0)[0])
 	$.deleteMapEntry(m, (k).clone())
@@ -237,14 +237,14 @@ export async function main(): globalThis.Promise<void> {
 	let m2 = $.makeMap<Pos, Region>([])
 	$.mapSet(m2, (r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? ((r as any) as Rule).Pos() : Rule.prototype.Pos.call(r)), makeRegion(1))
 	let q = (r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? ((r as any) as Rule).Pos() : Rule.prototype.Pos.call(r))
-	let got = ($.mapGet<Pos, Region, Region>(m2, q, new Region(undefined, true))[0]).clone()
+	let got = ($.mapGet<Pos, Region, Region>(m2, q, new Region(true))[0]).clone()
 	got.Start.Line = 100
-	await $.println($.mapGet<Pos, Region, Region>(m2, q, new Region(undefined, true))[0].Start.Line, got.Start.Line)
+	await $.println($.mapGet<Pos, Region, Region>(m2, q, new Region(true))[0].Start.Line, got.Start.Line)
 }
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.Region", zero: () => new Region(undefined, true) }})
+	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.Region", zero: () => new Region(true) }})
 }
 
 if ($.isMainScript(import.meta)) {

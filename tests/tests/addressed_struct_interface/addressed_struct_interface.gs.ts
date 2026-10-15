@@ -16,13 +16,13 @@ $.registerInterfaceType(
 export class Buffer {
 	public declare data: $.Slice<number>
 
-	constructor(init?: Partial<{data?: $.Slice<number>}>, __goscriptValue?: boolean) {
-		this.data = init?.data ?? (null! as $.Slice<number>)
+	constructor(__goscriptValue?: boolean, data$?: $.Slice<number>) {
+		this.data = data$ ?? (null! as $.Slice<number>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Buffer {
-		return new Buffer(this, true)
+		return new Buffer(true, this.data)
 	}
 
 	public __goscriptAssign(source: Buffer): this {
@@ -51,7 +51,7 @@ export function use(w: Writer | null): void {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let b: $.VarRef<Buffer> = $.varRef(new Buffer(undefined, true))
+	let b: $.VarRef<Buffer> = $.varRef(new Buffer(true))
 	use($.interfaceValue<Writer | null>(b, "*main.Buffer", /* @__PURE__ */ $.pointerType("main.Buffer")))
 	await $.println($.bytesToString(b.value.data))
 }

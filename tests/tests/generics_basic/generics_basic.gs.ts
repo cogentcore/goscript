@@ -28,13 +28,13 @@ $.registerInterfaceType(
 export class Stack {
 	public declare items: $.Slice<any>
 
-	constructor(init?: Partial<{items?: $.Slice<any>}>, __goscriptValue?: boolean) {
-		this.items = init?.items ?? (null! as $.Slice<any>)
+	constructor(__goscriptValue?: boolean, items$?: $.Slice<any>) {
+		this.items = items$ ?? (null! as $.Slice<any>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Stack {
-		return new Stack(this, true)
+		return new Stack(true, this.items)
 	}
 
 	public __goscriptAssign(source: Stack): this {
@@ -77,13 +77,13 @@ export class Stack {
 export class Item {
 	public declare Name: string
 
-	constructor(init?: Partial<{Name?: string}>, __goscriptValue?: boolean) {
-		this.Name = init?.Name ?? ("" as string)
+	constructor(__goscriptValue?: boolean, Name$?: string) {
+		this.Name = Name$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Item {
-		return new Item(this, true)
+		return new Item(true, this.Name)
 	}
 
 	public __goscriptAssign(source: Item): this {
@@ -96,7 +96,7 @@ export class Item {
 		if (i == null) {
 			return null
 		}
-		return new Item({Name: $.pointerValue<Item>(i).Name + " copy"})
+		return new Item(false, $.pointerValue<Item>(i).Name + " copy")
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -111,13 +111,13 @@ export class Item {
 export class Mapper {
 	public declare values: globalThis.Map<any, any> | null
 
-	constructor(init?: Partial<{values?: globalThis.Map<any, any> | null}>, __goscriptValue?: boolean) {
-		this.values = init?.values ?? (null! as globalThis.Map<any, any> | null)
+	constructor(__goscriptValue?: boolean, values$?: globalThis.Map<any, any> | null) {
+		this.values = values$ ?? (null! as globalThis.Map<any, any> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Mapper {
-		return new Mapper(this, true)
+		return new Mapper(true, this.values)
 	}
 
 	public __goscriptAssign(source: Mapper): this {
@@ -150,14 +150,14 @@ export class Pair {
 
 	public declare Second: any
 
-	constructor(init?: Partial<{First?: any, Second?: any}>, __goscriptValue?: boolean, __goscriptFresh?: boolean) {
-		this.First = init?.First !== undefined ? (__goscriptFresh === true ? init.First : $.copyElement(init.First)) : (null! as any)
-		this.Second = init?.Second !== undefined ? (__goscriptFresh === true ? init.Second : $.copyElement(init.Second)) : (null! as any)
+	constructor(__goscriptValue?: boolean, First$?: any, Second$?: any) {
+		this.First = First$ ?? (null! as any)
+		this.Second = Second$ ?? (null! as any)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Pair {
-		return new Pair(this, true)
+		return new Pair(true, $.copyElement(this.First), $.copyElement(this.Second))
 	}
 
 	public __goscriptAssign(source: Pair): this {
@@ -168,7 +168,7 @@ export class Pair {
 
 	public Swap(__typeArgs: $.GenericTypeArgs | undefined): Pair {
 		const p = this;
-		return $.markAsStructValue(new Pair({First: $.copyElement(p.Second), Second: $.copyElement(p.First)}))
+		return new Pair(true, $.copyElement(p.Second), $.copyElement(p.First))
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -215,7 +215,7 @@ export async function CloneAll<T>(__typeArgs: $.GenericTypeArgs | undefined, ite
 }
 
 export function NewMapper(__typeArgs: $.GenericTypeArgs | undefined): Mapper | $.VarRef<Mapper> | null {
-	return new Mapper({values: $.makeMap<any, any>(undefined, __typeArgs?.["K"]?.type ?? { kind: $.TypeKind.Interface, methods: [] })})
+	return new Mapper(false, $.makeMap<any, any>(undefined, __typeArgs?.["K"]?.type ?? { kind: $.TypeKind.Interface, methods: [] }))
 }
 
 export function Apply(__typeArgs: $.GenericTypeArgs | undefined, value: any, fn: ((_p0: any) => any | globalThis.Promise<any>) | null): any {
@@ -227,7 +227,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("min:", min(__goscriptStatic0(), 8, 3), min(__goscriptStatic1(), 9, 4), min(__goscriptStatic2(), "go", "ts"))
 
 	await $.println("=== Generic stack ===")
-	let stack = $.varRef($.markAsStructValue(new Stack()))
+	let stack: $.VarRef<Stack> = $.varRef(new Stack(true))
 	stack.value.Push(__goscriptStatic0(), 10)
 	stack.value.Push(__goscriptStatic0(), 20)
 	let __goscriptTuple0: any = stack.value.Pop(__goscriptStatic0())
@@ -245,7 +245,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("set:", Set_Has(seen, __goscriptStatic2(), "go"), Set_Has(seen, __goscriptStatic2(), "rust"), $.len(seen))
 
 	await $.println("=== Interface constraint ===")
-	let items = $.arrayToSlice<Item | $.VarRef<Item> | null>([new Item({Name: "alpha"}), new Item({Name: "beta"})])
+	let items = $.arrayToSlice<Item | $.VarRef<Item> | null>([new Item(false, "alpha"), new Item(false, "beta")])
 	let clones = (await CloneAll(__goscriptStatic3(), items) as $.Slice<Item | $.VarRef<Item> | null>)
 	await $.println("clone:", $.pointerValue<Item>($.arrayIndex(clones!, 0)).Name, $.pointerValue<Item>($.arrayIndex(clones!, 1)).Name, ($.arrayIndex(clones!, 0) === $.arrayIndex(items!, 0) || $.pointerAliasesMade && $.pointerEqual($.arrayIndex(clones!, 0), $.arrayIndex(items!, 0))))
 
@@ -264,7 +264,7 @@ export async function main(): globalThis.Promise<void> {
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))) as number))
 
 	await $.println("=== Generic pair method ===")
-	let pair = $.markAsStructValue(new Pair({First: "left", Second: "right"}))
+	let pair = new Pair(true, "left", "right")
 	let swapped = (pair.Swap(__goscriptStatic2()) as Pair)
 	await $.println("pair:", swapped.First, swapped.Second)
 }

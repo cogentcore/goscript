@@ -27,13 +27,13 @@ $.registerInterfaceType(
 export class AppBase {
 	public declare Windows: $.Slice<any>
 
-	constructor(init?: Partial<{Windows?: $.Slice<any>}>, __goscriptValue?: boolean) {
-		this.Windows = init?.Windows ?? (null! as $.Slice<any>)
+	constructor(__goscriptValue?: boolean, Windows$?: $.Slice<any>) {
+		this.Windows = Windows$ ?? (null! as $.Slice<any>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): AppBase {
-		return new AppBase(this, true)
+		return new AppBase(true, this.Windows)
 	}
 
 	public __goscriptAssign(source: AppBase): this {
@@ -73,14 +73,14 @@ export class WindowBase {
 
 	public declare name: string
 
-	constructor(init?: Partial<{App?: any, name?: string}>, __goscriptValue?: boolean, __goscriptFresh?: boolean) {
-		this.App = init?.App !== undefined ? (__goscriptFresh === true ? init.App : $.copyElement(init.App)) : (null! as any)
-		this.name = init?.name ?? ("" as string)
+	constructor(__goscriptValue?: boolean, App$?: any, name$?: string) {
+		this.App = App$ ?? (null! as any)
+		this.name = name$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): WindowBase {
-		return new WindowBase(this, true)
+		return new WindowBase(true, $.copyElement(this.App), this.name)
 	}
 
 	public __goscriptAssign(source: WindowBase): this {
@@ -112,13 +112,13 @@ export class WindowBase {
 export class MyApp {
 	public declare AppBase: AppBase
 
-	constructor(init?: Partial<{AppBase?: AppBase}>, __goscriptValue?: boolean) {
-		this.AppBase = init?.AppBase ? init.AppBase.clone() : $.markAsStructValue(new AppBase())
+	constructor(__goscriptValue?: boolean, AppBase$?: AppBase) {
+		this.AppBase = AppBase$ ?? new AppBase(true)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): MyApp {
-		return new MyApp(this, true)
+		return new MyApp(true, this.AppBase.clone())
 	}
 
 	public __goscriptAssign(source: MyApp): this {
@@ -146,13 +146,13 @@ export class MyApp {
 export class MyWindow {
 	public declare WindowBase: WindowBase
 
-	constructor(init?: Partial<{WindowBase?: WindowBase}>, __goscriptValue?: boolean) {
-		this.WindowBase = init?.WindowBase ? init.WindowBase.clone() : $.markAsStructValue(new WindowBase({App: null! as MyApp | $.VarRef<MyApp> | null}, undefined, true))
+	constructor(__goscriptValue?: boolean, WindowBase$?: WindowBase) {
+		this.WindowBase = WindowBase$ ?? new WindowBase(true, null! as MyApp | $.VarRef<MyApp> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): MyWindow {
-		return new MyWindow(this, true)
+		return new MyWindow(true, this.WindowBase.clone())
 	}
 
 	public __goscriptAssign(source: MyWindow): this {
