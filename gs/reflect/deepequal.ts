@@ -165,9 +165,11 @@ export function DeepEqual(
 function sliceWindow(
   value: unknown,
 ): { backing: ArrayLike<unknown>; offset: number; length: number } | null {
-  // An array is a window over itself.
-  if (globalThis.Array.isArray(value)) {
-    return { backing: value, offset: 0, length: value.length }
+  // An array, or a typed slice, which is a view of exactly its elements, is a
+  // window over itself.
+  if (globalThis.Array.isArray(value) || ArrayBuffer.isView(value)) {
+    const elements = value as ArrayLike<unknown>
+    return { backing: elements, offset: 0, length: elements.length }
   }
 
   // A slice window carries its backing array, offset and length.
@@ -179,11 +181,12 @@ function sliceWindow(
     ).__meta__
     if (
       meta &&
-      globalThis.Array.isArray(meta.backing) &&
+      (globalThis.Array.isArray(meta.backing) ||
+        ArrayBuffer.isView(meta.backing)) &&
       typeof meta.length === 'number'
     ) {
       return {
-        backing: meta.backing,
+        backing: meta.backing as ArrayLike<unknown>,
         offset: meta.offset ?? 0,
         length: meta.length,
       }

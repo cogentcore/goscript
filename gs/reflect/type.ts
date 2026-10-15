@@ -173,6 +173,46 @@ export const String: Kind = 24
 export const Struct: Kind = 25
 export const UnsafePointer: Kind = 26
 
+// typedSliceHints names, by element kind, the typed arrays that hold slices
+// of fixed-size numeric elements, with the type hints of the compiler.
+const typedSliceHints: Partial<Record<Kind, string>> = {
+  [Uint8]: 'byte',
+  [Int8]: 'int8',
+  [Int16]: 'int16',
+  [Uint16]: 'uint16',
+  [Int32]: 'int32',
+  [Uint32]: 'uint32',
+  [Float32]: 'float32',
+  [Float64]: 'float64',
+}
+
+/**
+ * sliceTypeHint returns the type hint of the typed array that holds slices of
+ * elements of type elem, for $.makeSlice, or undefined for elements held in
+ * plain arrays.
+ */
+export function sliceTypeHint(elem: Type): string | undefined {
+  return typedSliceHints[elem.Kind()]
+}
+
+/**
+ * sliceAppendHint returns the trailing hint of $.append and $.appendSlice
+ * that keeps a slice of elements of type elem in its typed array, or
+ * undefined for elements held in plain arrays.
+ */
+export function sliceAppendHint(
+  elem: Type,
+): typeof $.byteSliceHint | $.TypedSliceHint | undefined {
+  const hint = sliceTypeHint(elem)
+  if (hint === undefined) {
+    return undefined
+  }
+  if (hint === 'byte') {
+    return $.byteSliceHint
+  }
+  return $.typedSliceHints[hint as keyof typeof $.typedSliceHints]
+}
+
 const canonicalTypes = new globalThis.Map<string, Type>()
 const constructingRegisteredTypes = new globalThis.Map<string, Type>()
 
@@ -1017,13 +1057,13 @@ export class Value {
       )
     }
     const value = this.currentValue()
-    if (value && typeof value === 'object' && '__meta__' in value) {
+    if (
+      (value && typeof value === 'object' && '__meta__' in value) ||
+      $.isTypedSlice(value)
+    ) {
       return new Value($.goSlice(value as $.Slice<unknown>, i, j), this._type)
     }
     if (globalThis.Array.isArray(value)) {
-      return new Value(value.slice(i, j), this._type)
-    }
-    if (value instanceof Uint8Array) {
       return new Value(value.slice(i, j), this._type)
     }
     if (typeof value === 'string') {
@@ -1915,7 +1955,7 @@ export class Value {
     const grown = $.makeSlice(
       len,
       Math.max(len + n, 2 * cap),
-      elemType.Kind() === Uint8 ? 'byte' : undefined,
+      sliceTypeHint(elemType),
       () => Zero(elemType).value,
     )
     $.copy(grown, value)

@@ -266,6 +266,22 @@ function formatValue(value: any, verb: string, flags = ''): string {
 }
 
 // elementTypeInfo returns the element type of a slice or array type, if known.
+// isNumberTypedSlice reports whether value is a slice of numbers other than
+// bytes held in a typed array, which formats element by element as a slice
+// held in a plain array does, where a byte slice formats as a whole.
+function isNumberTypedSlice(value: unknown): value is $.TypedSlice {
+  return $.isTypedSlice(value) && !(value instanceof Uint8Array)
+}
+
+// sliceItems returns the elements of a slice or array as an array to map.
+function sliceItems(
+  value: unknown[] | $.SliceProxy<unknown> | $.TypedSlice,
+): unknown[] {
+  return $.isTypedSlice(value) ?
+      globalThis.Array.from(value)
+    : value.map((item) => item)
+}
+
 function elementTypeInfo(
   typeInfo?: $.TypeInfo | string,
 ): $.TypeInfo | string | undefined {
@@ -460,16 +476,18 @@ function defaultFormatMaybe(
         $.formatFloat(value as number, 'g', -1, bits)
       : value.toString()
   }
-  if ($.isArrayOrGoSlice(value)) {
+  if ($.isArrayOrGoSlice(value) || isNumberTypedSlice(value)) {
     // Elements are formatted with the element type, so that pointers print
-    // as addresses.
-    const elemType = elementTypeInfo(
-      typeInfo ??
-        (value as { __goTypeInfo?: $.TypeInfo | string }).__goTypeInfo ??
-        $.arrayValueTypeInfo(value),
-    )
+    // as addresses, and the elements of a typed slice at least with the type
+    // of its typed array, so that float32 elements print as float32.
+    const elemType =
+      elementTypeInfo(
+        typeInfo ??
+          (value as { __goTypeInfo?: $.TypeInfo | string }).__goTypeInfo ??
+          $.arrayValueTypeInfo(value),
+      ) ?? $.typedSliceHintOf(value)
     return joinMaybe(
-      value.map((item) =>
+      sliceItems(value).map((item) =>
         defaultFormatMaybe(item, flags, depth + 1, elemType, allowMethods),
       ),
       ' ',
@@ -753,8 +771,11 @@ function formatOperandMaybe(
   width: string,
   precision: string,
 ): MaybeString {
-  if ($.isArrayOrGoSlice(arg) && elementwiseVerbs.has(verb)) {
-    const elems = arg.map((elem) =>
+  if (
+    ($.isArrayOrGoSlice(arg) || isNumberTypedSlice(arg)) &&
+    elementwiseVerbs.has(verb)
+  ) {
+    const elems = sliceItems(arg).map((elem) =>
       formatOperandMaybe(elem, verb, flags, width, precision),
     )
     return joinMaybe(elems, ' ', '[', ']')

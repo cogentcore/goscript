@@ -216,7 +216,7 @@ function sortInSlice<T>(slice: $.Slice<T>, compare: (a: T, b: T) => number): voi
     values.push($.index(slice, i) as T)
   }
   values.sort(compare)
-  if ($.isArrayOrGoSlice(slice)) {
+  if ($.isArrayOrGoSlice(slice) || $.isTypedSlice(slice)) {
     for (let i = 0; i < n; i++) {
       $.sliceElems(slice)[$.sliceSlot(slice, i)] = values[i]
     }
@@ -233,7 +233,7 @@ function swapInSlice<T>(slice: $.Slice<T>, i: number, j: number): void {
   if (!slice) return
   
   const temp = $.index(slice, i)
-  if ($.isArrayOrGoSlice(slice)) {
+  if ($.isArrayOrGoSlice(slice) || $.isTypedSlice(slice)) {
     const val_j = $.index(slice, j)
     const val_i = temp
     $.sliceElems(slice)[$.sliceSlot(slice, i)] = val_j as T
