@@ -11,14 +11,14 @@ export class point {
 
 	public declare y: number
 
-	constructor(init?: Partial<{x?: number, y?: number}>, __goscriptValue?: boolean) {
-		this.x = init?.x ?? (0 as number)
-		this.y = init?.y ?? (0 as number)
+	constructor(__goscriptValue?: boolean, x$?: number, y$?: number) {
+		this.x = x$ ?? 0
+		this.y = y$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): point {
-		return new point(this, true)
+		return new point(true, this.x, this.y)
 	}
 
 	public __goscriptAssign(source: point): this {
@@ -50,7 +50,7 @@ export function points(n: number): iter.Seq2<string, point> | null {
 	return $.functionValue(async (_yield: ((_p0: string, _p1: point) => boolean | globalThis.Promise<boolean>) | null) => {
 		let names = $.arrayToSlice<string>(["a", "b", "c"])
 		for (let __goscriptRangeCount1 = n, i = 0; i < __goscriptRangeCount1; i++) {
-			if (!(__goscriptAwait = _yield!($.arrayIndex(names!, i), new point({x: i, y: i * 10}, true)), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)) {
+			if (!(__goscriptAwait = _yield!($.arrayIndex(names!, i), new point(true, i, i * 10)), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)) {
 				return
 			}
 		}
@@ -141,7 +141,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("sorted:", $.arrayIndex((await slices.Sorted(numbers(3)))!, 2))
 	await $.println("append:", $.sliceLen(await slices.AppendSeq($.arrayToSlice<number>([9]), numbers(2))))
 	let m = (await maps.Collect(points(3)) as globalThis.Map<string, point> | null)
-	await $.println("map:", $.len(m), $.mapGet<string, point, point>(m, "c", new point(undefined, true))[0].y)
+	await $.println("map:", $.len(m), $.mapGet<string, point, point>(m, "c", new point(true))[0].y)
 	await maps.Insert(m, points(1))
 	await $.println("insert:", $.len(m))
 	let sortedWords = (await slices.Sorted(words) as $.Slice<string>)
@@ -186,7 +186,7 @@ function __goscriptStatic0(): any {
 
 var __goscriptStatic1$value: any
 function __goscriptStatic1(): any {
-	return __goscriptStatic1$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, K: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }, V: { type: "main.point", zero: () => new point(undefined, true) }})
+	return __goscriptStatic1$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, K: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }, V: { type: "main.point", zero: () => new point(true) }})
 }
 
 var __goscriptAwait: any
