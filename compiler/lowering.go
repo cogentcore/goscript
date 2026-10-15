@@ -13856,32 +13856,51 @@ func (o *LoweringOwner) lowerCompositeLit(
 			}
 		}
 	}
-	named := namedStructType(ctx.semPkg.source.TypesInfo.TypeOf(lit))
-	if named != nil {
+	typ := ctx.semPkg.source.TypesInfo.TypeOf(lit)
+	if named := namedStructType(typ); named != nil {
 		return o.lowerStructCompositeLit(ctx, lit, named, markStruct)
 	}
-	if ptr, ok := types.Unalias(ctx.semPkg.source.TypesInfo.TypeOf(lit)).Underlying().(*types.Pointer); ok {
+
+	// An element of a pointer type with its & elided, as in
+	// []*struct{ n int }{{1}}, is the address of a literal of the element
+	// type: a struct of a named type is its own pointer, and any other value
+	// lives in a variable reference, as lowerAddressExpr makes.
+	if ptr, ok := types.Unalias(typ).Underlying().(*types.Pointer); ok {
 		if named := namedStructType(ptr.Elem()); named != nil {
 			return o.lowerStructCompositeLit(ctx, lit, named, false)
 		}
+		if value, diagnostics, ok := o.lowerUnnamedCompositeLit(ctx, lit, ptr.Elem()); ok {
+			return o.runtimeOwner.QualifiedHelper(RuntimeHelperVarRef) + "(" + value + ")", diagnostics
+		}
 	}
-	if structType, ok := types.Unalias(ctx.semPkg.source.TypesInfo.TypeOf(lit)).Underlying().(*types.Struct); ok {
-		return o.lowerAnonymousStructCompositeLit(ctx, lit, structType)
-	}
-	if array, ok := types.Unalias(ctx.semPkg.source.TypesInfo.TypeOf(lit)).Underlying().(*types.Array); ok {
-		return o.lowerArrayCompositeLit(ctx, lit, array)
-	}
-	if slice, ok := types.Unalias(ctx.semPkg.source.TypesInfo.TypeOf(lit)).Underlying().(*types.Slice); ok {
-		return o.lowerSliceCompositeLit(ctx, lit, slice)
-	}
-	if mapType, ok := types.Unalias(ctx.semPkg.source.TypesInfo.TypeOf(lit)).Underlying().(*types.Map); ok {
-		return o.lowerMapCompositeLit(ctx, lit, mapType)
+	if value, diagnostics, ok := o.lowerUnnamedCompositeLit(ctx, lit, typ); ok {
+		return value, diagnostics
 	}
 	detail := "unsupported composite literal"
-	if typ := ctx.semPkg.source.TypesInfo.TypeOf(lit); typ != nil {
+	if typ != nil {
 		detail += " of type " + typ.String()
 	}
 	return "undefined", []Diagnostic{loweringUnsupportedAt(ctx, lit, "expression", ctx.semPkg.pkgPath, detail)}
+}
+
+// lowerUnnamedCompositeLit lowers lit as a literal of typ, an anonymous
+// struct, array, slice or map type, or reports false for any other type.
+func (o *LoweringOwner) lowerUnnamedCompositeLit(ctx lowerFileContext, lit *ast.CompositeLit, typ types.Type) (string, []Diagnostic, bool) {
+	var value string
+	var diagnostics []Diagnostic
+	switch typed := types.Unalias(typ).Underlying().(type) {
+	case *types.Struct:
+		value, diagnostics = o.lowerAnonymousStructCompositeLit(ctx, lit, typed)
+	case *types.Array:
+		value, diagnostics = o.lowerArrayCompositeLit(ctx, lit, typed)
+	case *types.Slice:
+		value, diagnostics = o.lowerSliceCompositeLit(ctx, lit, typed)
+	case *types.Map:
+		value, diagnostics = o.lowerMapCompositeLit(ctx, lit, typed)
+	default:
+		return "", nil, false
+	}
+	return value, diagnostics, true
 }
 
 func (o *LoweringOwner) lowerStructCompositeLit(

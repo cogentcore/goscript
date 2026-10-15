@@ -365,7 +365,6 @@ var expectedV2ComplianceGaps = map[string]bool{
 	"os_filemode_struct":                true,
 	"path_error_constructor":            true,
 	"pointer_circular_ref":              true,
-	"pointer_composite_literal_untyped": true,
 	"pointer_range_loop":                true,
 	"promise_return_type":               true,
 	"receiver_variable":                 true,
