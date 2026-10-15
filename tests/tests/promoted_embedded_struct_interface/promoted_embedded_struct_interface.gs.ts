@@ -105,7 +105,7 @@ export class pointerStopStream {
 }
 
 export async function closeIt(c: closer | null): globalThis.Promise<void> {
-	await $.println((__goscriptAwait = (c !== null && (c as any).__isVarRef !== true && (c as any).__goValue === undefined ? (c as Exclude<closer, null>) : $.pointerValue<Exclude<closer, null>>(c)).Close(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println((__goscriptAwait = (c !== null && (c as any).__isVarRef !== true && ((c as any).__goValue === undefined || (c as any).__goType?.charCodeAt(0) !== 42) ? (c as Exclude<closer, null>) : $.pointerValue<Exclude<closer, null>>(c)).Close(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 }
 
 export async function main(): globalThis.Promise<void> {

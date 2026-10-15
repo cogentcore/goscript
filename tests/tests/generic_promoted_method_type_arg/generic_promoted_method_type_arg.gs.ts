@@ -39,13 +39,13 @@ export class Base {
 
 	public Is(__typeArgs: $.GenericTypeArgs | undefined, flag: Flags): boolean {
 		const b: Base | $.VarRef<Base> | null = this;
-		return ($.int64And($.pointerValue<Base>(b).flags, ($.int64Shl(1n, flag)))) != 0n
+		return ($.int64And($.pointerValue<Base>(b).flags, ($.int64Bit(flag)))) != 0n
 	}
 
 	public Set(__typeArgs: $.GenericTypeArgs | undefined, flag: Flags): void {
 		let b: Base | $.VarRef<Base> | null = this;
 		const b$: Base = b == null ? $.pointerTarget<Base>(b) : (b as any).__isVarRef === true ? (b as any).value : (b as any).__goValue === undefined ? (b as any) : $.pointerTarget<Base>(b);
-		;(b$ as Base).flags = $.int64Or((b$ as Base).flags, $.int64Shl(1n, flag))
+		;(b$ as Base).flags = $.int64Or((b$ as Base).flags, $.int64Bit(flag))
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -172,8 +172,8 @@ export async function main(): globalThis.Promise<void> {
 	let w = new Window({Title: "main"})
 	await $.println("check:", check(__goscriptStatic1(), w))
 	let f = asFlagger(__goscriptStatic1(), new Window())
-	void (__goscriptAwait = (f !== null && (f as any).__isVarRef !== true && (f as any).__goValue === undefined ? (f as Exclude<Flagger, null>) : $.pointerValue<Exclude<Flagger, null>>(f)).Set(3n), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
-	await $.println("interface:", (__goscriptAwait = (f !== null && (f as any).__isVarRef !== true && (f as any).__goValue === undefined ? (f as Exclude<Flagger, null>) : $.pointerValue<Exclude<Flagger, null>>(f)).Is(3n), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = (f !== null && (f as any).__isVarRef !== true && (f as any).__goValue === undefined ? (f as Exclude<Flagger, null>) : $.pointerValue<Exclude<Flagger, null>>(f)).Is(6n), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	void (__goscriptAwait = (f !== null && (f as any).__isVarRef !== true && ((f as any).__goValue === undefined || (f as any).__goType?.charCodeAt(0) !== 42) ? (f as Exclude<Flagger, null>) : $.pointerValue<Exclude<Flagger, null>>(f)).Set(3n), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+	await $.println("interface:", (__goscriptAwait = (f !== null && (f as any).__isVarRef !== true && ((f as any).__goValue === undefined || (f as any).__goType?.charCodeAt(0) !== 42) ? (f as Exclude<Flagger, null>) : $.pointerValue<Exclude<Flagger, null>>(f)).Is(3n), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = (f !== null && (f as any).__isVarRef !== true && ((f as any).__goValue === undefined || (f as any).__goType?.charCodeAt(0) !== 42) ? (f as Exclude<Flagger, null>) : $.pointerValue<Exclude<Flagger, null>>(f)).Is(6n), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
 	let s = new Single()
 	await $.println("generic outer:", check(__goscriptStatic2(), s))

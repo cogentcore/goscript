@@ -381,7 +381,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// interface and method value calls get copies
 	let m: matcher | null = $.interfaceValue<matcher | null>(r, "*main.rule", /* @__PURE__ */ $.pointerType("main.rule"))
-	let [, viaIface, ] = await (m !== null && (m as any).__isVarRef !== true && (m as any).__goValue === undefined ? (m as Exclude<matcher, null>) : $.pointerValue<Exclude<matcher, null>>(m)).match((scope).clone(), 0)
+	let [, viaIface, ] = await (m !== null && (m as any).__isVarRef !== true && ((m as any).__goValue === undefined || (m as any).__goType?.charCodeAt(0) !== 42) ? (m as Exclude<matcher, null>) : $.pointerValue<Exclude<matcher, null>>(m)).match((scope).clone(), 0)
 	viaIface.Start.Line = 11
 	let fn: ((scope: Region, depth: number) => [boolean, Region, number] | globalThis.Promise<[boolean, Region, number]>) | null = $.functionValue(((__receiver) => (scope: Region, depth: number) => __receiver.match(scope, depth))($.pointerValue<rule>(r)), ({ kind: $.TypeKind.Function, params: ["main.Region", /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("bool"), "main.Region", /* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo), "main.(*rule).match-fm")
 	let [, viaValue, ] = (fn!((scope).clone(), 0) as [boolean, Region, number])

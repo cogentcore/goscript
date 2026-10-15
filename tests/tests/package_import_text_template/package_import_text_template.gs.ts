@@ -42,7 +42,7 @@ export async function main(): globalThis.Promise<void> {
 	{
 		let err = await template.Template.prototype.Execute.call(t, $.interfaceValue<io.Writer | null>(os.Stdout, "*os.File", /* @__PURE__ */ $.pointerType("os.File")), $.interfaceValue($.arrayToSlice<item>([new item({Name: "a", Count: 1}, true), new item({Name: "b", Count: 2}, true)]), "[]main.item", /* @__PURE__ */ $.sliceType("main.item")))
 		if (err != null) {
-			await $.println((__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+			await $.println((__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		}
 	}
 }

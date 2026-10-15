@@ -115,7 +115,7 @@ export function load(__typeArgs: $.GenericTypeArgs | undefined, p: any): any {
 
 export async function main(): globalThis.Promise<void> {
 	let n = asNode(__goscriptStatic0())
-	void (__goscriptAwait = (n !== null && (n as any).__isVarRef !== true && (n as any).__goValue === undefined ? (n as Exclude<Node, null>) : $.pointerValue<Exclude<Node, null>>(n)).SetName("text"), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+	void (__goscriptAwait = (n !== null && (n as any).__isVarRef !== true && ((n as any).__goValue === undefined || (n as any).__goType?.charCodeAt(0) !== 42) ? (n as Exclude<Node, null>) : $.pointerValue<Exclude<Node, null>>(n)).SetName("text"), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 	initAs(__goscriptStatic0(), n, $.functionValue((w: Widget | $.VarRef<Widget> | null) => {
 		$.pointerValue<Widget>(w).Text = "hello"
 		$.pointerValue<Widget>(w).Base.inits++

@@ -299,9 +299,9 @@ export async function main(): globalThis.Promise<void> {
 	let c: counter | null = $.interfaceValue<counter | null>(new chanCounter({ch: ch}), "*main.chanCounter", /* @__PURE__ */ $.pointerType("main.chanCounter"))
 	let vals = $.arrayToSlice<number>([0, 0, 0])
 	calls = 0
-	const __goscriptOperand19 = (__goscriptAwait = (c !== null && (c as any).__isVarRef !== true && (c as any).__goValue === undefined ? (c as Exclude<counter, null>) : $.pointerValue<Exclude<counter, null>>(c)).Next(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+	const __goscriptOperand19 = (__goscriptAwait = (c !== null && (c as any).__isVarRef !== true && ((c as any).__goValue === undefined || (c as any).__goType?.charCodeAt(0) !== 42) ? (c as Exclude<counter, null>) : $.pointerValue<Exclude<counter, null>>(c)).Next(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 	$.sliceElems(vals!)[$.sliceSlot(vals!, __goscriptOperand19)] += 5
-	const __goscriptOperand20 = (__goscriptAwait = (c !== null && (c as any).__isVarRef !== true && (c as any).__goValue === undefined ? (c as Exclude<counter, null>) : $.pointerValue<Exclude<counter, null>>(c)).Next(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+	const __goscriptOperand20 = (__goscriptAwait = (c !== null && (c as any).__isVarRef !== true && ((c as any).__goValue === undefined || (c as any).__goType?.charCodeAt(0) !== 42) ? (c as Exclude<counter, null>) : $.pointerValue<Exclude<counter, null>>(c)).Next(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 	$.sliceElems(vals!)[$.sliceSlot(vals!, __goscriptOperand20)] += 6
 	await $.println("async index +=", $.arrayIndex(vals!, 0), $.arrayIndex(vals!, 1), $.arrayIndex(vals!, 2), calls)
 }

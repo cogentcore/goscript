@@ -18,7 +18,7 @@ $.registerNamedValueType(
 );
 
 export function flags_has(fl: flags, f: bigint): boolean {
-	return ($.int64And($.int64(fl), ($.int64Bit($.uint(f, 32))))) != 0n
+	return ($.int64And(fl, ($.int64Bit($.uintFromWide(f, 32))))) != 0n
 }
 
 export async function main(): globalThis.Promise<void> {

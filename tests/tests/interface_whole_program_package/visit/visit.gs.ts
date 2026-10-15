@@ -29,13 +29,13 @@ export function Walk(v: Visitor | null, values: $.Slice<number>): number {
 	let sum = 0
 	for (let __goscriptRangeTarget0 = values, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
 		let n = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as number)
-		sum += (v !== null && (v as any).__isVarRef !== true && (v as any).__goValue === undefined ? (v as Exclude<Visitor, null>) : $.pointerValue<Exclude<Visitor, null>>(v)).Visit(n)
+		sum += (v !== null && (v as any).__isVarRef !== true && ((v as any).__goValue === undefined || (v as any).__goType?.charCodeAt(0) !== 42) ? (v as Exclude<Visitor, null>) : $.pointerValue<Exclude<Visitor, null>>(v)).Visit(n)
 	}
 	return sum
 }
 
 export async function Fetch(f: Fetcher | null): globalThis.Promise<number> {
-	return (__goscriptAwait = (f !== null && (f as any).__isVarRef !== true && (f as any).__goValue === undefined ? (f as Exclude<Fetcher, null>) : $.pointerValue<Exclude<Fetcher, null>>(f)).Fetch(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) * 2
+	return (__goscriptAwait = (f !== null && (f as any).__isVarRef !== true && ((f as any).__goValue === undefined || (f as any).__goType?.charCodeAt(0) !== 42) ? (f as Exclude<Fetcher, null>) : $.pointerValue<Exclude<Fetcher, null>>(f)).Fetch(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) * 2
 }
 
 var __goscriptAwait: any

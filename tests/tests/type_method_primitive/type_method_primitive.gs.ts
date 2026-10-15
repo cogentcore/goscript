@@ -89,10 +89,10 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("Method ref call:", (fn!() as number))
 
 	let d: Doubler | null = __goscriptStatic3()
-	await $.println("Interface method call:", (__goscriptAwait = (d !== null && (d as any).__isVarRef !== true && (d as any).__goValue === undefined ? (d as Exclude<Doubler, null>) : $.pointerValue<Exclude<Doubler, null>>(d)).Double(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println("Interface method call:", (__goscriptAwait = (d !== null && (d as any).__isVarRef !== true && ((d as any).__goValue === undefined || (d as any).__goType?.charCodeAt(0) !== 42) ? (d as Exclude<Doubler, null>) : $.pointerValue<Exclude<Doubler, null>>(d)).Double(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
 	let ret = asDoubler(13)
-	await $.println("Returned interface call:", (__goscriptAwait = (ret !== null && (ret as any).__isVarRef !== true && (ret as any).__goValue === undefined ? (ret as Exclude<Doubler, null>) : $.pointerValue<Exclude<Doubler, null>>(ret)).Double(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println("Returned interface call:", (__goscriptAwait = (ret !== null && (ret as any).__isVarRef !== true && ((ret as any).__goValue === undefined || (ret as any).__goType?.charCodeAt(0) !== 42) ? (ret as Exclude<Doubler, null>) : $.pointerValue<Exclude<Doubler, null>>(ret)).Double(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
 	let [asserted, ok] = $.typeAssertTuple<MyInt>(ret, /* @__PURE__ */ $.basicType("int", "main.MyInt"))
 	await $.println("Interface assertion:", asserted, ok)
@@ -108,7 +108,7 @@ export async function main(): globalThis.Promise<void> {
 
 	let flag = $.varRef(false)
 	let stringer: Stringer | null = $.namedValueInterfaceValue<Stringer | null>(newMyBool(true, flag), "*main.MyBool", __goscriptStatic7(), __goscriptStatic8(), __goscriptStatic9())
-	await $.println("Pointer primitive interface:", (__goscriptAwait = (stringer !== null && (stringer as any).__isVarRef !== true && (stringer as any).__goValue === undefined ? (stringer as Exclude<Stringer, null>) : $.pointerValue<Exclude<Stringer, null>>(stringer)).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), flag.value)
+	await $.println("Pointer primitive interface:", (__goscriptAwait = (stringer !== null && (stringer as any).__isVarRef !== true && ((stringer as any).__goValue === undefined || (stringer as any).__goType?.charCodeAt(0) !== 42) ? (stringer as Exclude<Stringer, null>) : $.pointerValue<Exclude<Stringer, null>>(stringer)).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), flag.value)
 
 	let __goscriptTuple1: any = assertStringer(__goscriptStatic10(), stringer)
 	let genericPointer: $.VarRef<MyBool> | null = (__goscriptTuple1[0] as $.VarRef<MyBool> | null)

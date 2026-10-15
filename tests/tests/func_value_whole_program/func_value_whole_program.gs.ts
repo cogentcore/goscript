@@ -181,7 +181,7 @@ export async function callWith(f: ((_p0: $.Channel<number> | null) => number | g
 export async function sum(src: Source | null, n: number): globalThis.Promise<number> {
 	let total = 0
 	for (let __goscriptRangeCount0 = n, __rangeIndex = 0; __rangeIndex < __goscriptRangeCount0; __rangeIndex++) {
-		total += (__goscriptAwait = (src !== null && (src as any).__isVarRef !== true && (src as any).__goValue === undefined ? (src as Exclude<Source, null>) : $.pointerValue<Exclude<Source, null>>(src)).Next(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+		total += (__goscriptAwait = (src !== null && (src as any).__isVarRef !== true && ((src as any).__goValue === undefined || (src as any).__goType?.charCodeAt(0) !== 42) ? (src as Exclude<Source, null>) : $.pointerValue<Exclude<Source, null>>(src)).Next(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 	}
 	return total
 }
@@ -217,7 +217,7 @@ export async function main(): globalThis.Promise<void> {
 	let inner = new chanSource({ch: $.makeChannel<number>(1, 0, "both")})
 	let src: Source | null = $.interfaceValue<Source | null>(inner, "*main.chanSource", /* @__PURE__ */ $.pointerType("main.chanSource"))
 	let outer = new fnSource({f: $.functionValue(async (): globalThis.Promise<number> => {
-		return (__goscriptAwait = (src !== null && (src as any).__isVarRef !== true && (src as any).__goValue === undefined ? (src as Exclude<Source, null>) : $.pointerValue<Exclude<Source, null>>(src)).Next(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) * 10
+		return (__goscriptAwait = (src !== null && (src as any).__isVarRef !== true && ((src as any).__goValue === undefined || (src as any).__goType?.charCodeAt(0) !== 42) ? (src as Exclude<Source, null>) : $.pointerValue<Exclude<Source, null>>(src)).Next(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) * 10
 	}, ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))})
 	await $.println("sum:", await sum($.interfaceValue<Source | null>(outer, "*main.fnSource", /* @__PURE__ */ $.pointerType("main.fnSource")), 2), await sum($.interfaceValue<Source | null>(inner, "*main.chanSource", /* @__PURE__ */ $.pointerType("main.chanSource")), 1))
 

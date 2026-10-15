@@ -53,20 +53,20 @@ export async function main(): globalThis.Promise<void> {
 	let b: Basic | null = $.interfaceValue<Basic | null>(new PathJoiner(undefined, true), "main.PathJoiner", "main.PathJoiner")
 
 	// Test with multiple arguments
-	let result1 = (__goscriptAwait = (b !== null && (b as any).__isVarRef !== true && (b as any).__goValue === undefined ? (b as Exclude<Basic, null>) : $.pointerValue<Exclude<Basic, null>>(b)).Join($.arrayToSlice<string>(["path", "to", "file"])), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+	let result1 = (__goscriptAwait = (b !== null && (b as any).__isVarRef !== true && ((b as any).__goValue === undefined || (b as any).__goType?.charCodeAt(0) !== 42) ? (b as Exclude<Basic, null>) : $.pointerValue<Exclude<Basic, null>>(b)).Join($.arrayToSlice<string>(["path", "to", "file"])), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 	await $.println("Result1:", result1)
 
 	// Test with single argument
-	let result2 = (__goscriptAwait = (b !== null && (b as any).__isVarRef !== true && (b as any).__goValue === undefined ? (b as Exclude<Basic, null>) : $.pointerValue<Exclude<Basic, null>>(b)).Join($.arrayToSlice<string>(["single"])), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+	let result2 = (__goscriptAwait = (b !== null && (b as any).__isVarRef !== true && ((b as any).__goValue === undefined || (b as any).__goType?.charCodeAt(0) !== 42) ? (b as Exclude<Basic, null>) : $.pointerValue<Exclude<Basic, null>>(b)).Join($.arrayToSlice<string>(["single"])), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 	await $.println("Result2:", result2)
 
 	// Test with no arguments
-	let result3 = (__goscriptAwait = (b !== null && (b as any).__isVarRef !== true && (b as any).__goValue === undefined ? (b as Exclude<Basic, null>) : $.pointerValue<Exclude<Basic, null>>(b)).Join(null), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+	let result3 = (__goscriptAwait = (b !== null && (b as any).__isVarRef !== true && ((b as any).__goValue === undefined || (b as any).__goType?.charCodeAt(0) !== 42) ? (b as Exclude<Basic, null>) : $.pointerValue<Exclude<Basic, null>>(b)).Join(null), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 	await $.println("Result3:", result3)
 
 	// Test with slice expansion
 	let parts = $.arrayToSlice<string>(["another", "path", "here"])
-	let result4 = (__goscriptAwait = (b !== null && (b as any).__isVarRef !== true && (b as any).__goValue === undefined ? (b as Exclude<Basic, null>) : $.pointerValue<Exclude<Basic, null>>(b)).Join(parts), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+	let result4 = (__goscriptAwait = (b !== null && (b as any).__isVarRef !== true && ((b as any).__goValue === undefined || (b as any).__goType?.charCodeAt(0) !== 42) ? (b as Exclude<Basic, null>) : $.pointerValue<Exclude<Basic, null>>(b)).Join(parts), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 	await $.println("Result4:", result4)
 }
 

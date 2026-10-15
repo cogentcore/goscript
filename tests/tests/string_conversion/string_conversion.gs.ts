@@ -93,7 +93,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println($.stringEqual($.runeToString(surrogate), "\xef\xbf\xbd"), $.stringEqual($.runeToString(negative), "\xef\xbf\xbd"), $.stringEqual($.runeToString(tooBig), "\xef\xbf\xbd"))
 	let wide = 128512n
 	let wideBad = 1099511627776n
-	await $.println($.stringEqual($.runeToString($.int(wide, 32)), "\xf0\x9f\x98\x80"), $.stringEqual($.runeToString(wide), "\xf0\x9f\x98\x80"), $.stringEqual($.runeToString(wideBad), "\xef\xbf\xbd"))
+	await $.println($.stringEqual($.runeToString($.intFromWide(wide, 32)), "\xf0\x9f\x98\x80"), $.stringEqual($.runeToString(wide), "\xf0\x9f\x98\x80"), $.stringEqual($.runeToString(wideBad), "\xef\xbf\xbd"))
 }
 
 if ($.isMainScript(import.meta)) {

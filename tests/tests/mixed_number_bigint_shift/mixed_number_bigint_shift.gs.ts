@@ -13,7 +13,7 @@ export function nonZero(buf: Uint8Array): number {
 	ret = $.uint64Or(ret, $.uint64Shr(ret, 4n))
 	ret = $.uint64Or(ret, $.uint64Shr(ret, 2n))
 	ret = $.uint64Or(ret, $.uint64Shr(ret, 1n))
-	return $.int($.uint64And(ret, 1n), 32)
+	return $.intFromWide($.uint64And(ret, 1n), 32)
 }
 
 export async function main(): globalThis.Promise<void> {

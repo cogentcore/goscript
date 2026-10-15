@@ -12,7 +12,7 @@ export async function main(): globalThis.Promise<void> {
 	{
 		let err = await os.WriteFile(fileName, new Uint8Array([99, 111, 110, 116, 101, 110, 116, 115]), 0o644)
 		if (err != null) {
-			await $.println("write error:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+			await $.println("write error:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 			return
 		}
 	}
@@ -22,11 +22,11 @@ export async function main(): globalThis.Promise<void> {
 	await (async () => {
 		let [info, err] = await os.Stat(fileName)
 		if (err != null) {
-			await $.println("stat error:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+			await $.println("stat error:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 			return
 		}
 		if (false) {
-			await $.println("size:", (__goscriptAwait = (info !== null && (info as any).__isVarRef !== true && (info as any).__goValue === undefined ? (info as Exclude<fs.FileInfo, null>) : $.pointerValue<Exclude<fs.FileInfo, null>>(info)).Size(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+			await $.println("size:", (__goscriptAwait = (info !== null && (info as any).__isVarRef !== true && ((info as any).__goValue === undefined || (info as any).__goType?.charCodeAt(0) !== 42) ? (info as Exclude<fs.FileInfo, null>) : $.pointerValue<Exclude<fs.FileInfo, null>>(info)).Size(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		} else {
 			await $.println("stat closure ok")
 		}

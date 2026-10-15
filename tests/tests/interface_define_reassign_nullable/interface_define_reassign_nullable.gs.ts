@@ -60,14 +60,14 @@ export async function main(): globalThis.Promise<void> {
 	// A variable declared from a call result keeps its interface type,
 	// so it can be assigned a nil interface later.
 	let s = first()
-	await $.println((__goscriptAwait = (s !== null && (s as any).__isVarRef !== true && (s as any).__goValue === undefined ? (s as Exclude<Shape, null>) : $.pointerValue<Exclude<Shape, null>>(s)).Area(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println((__goscriptAwait = (s !== null && (s as any).__isVarRef !== true && ((s as any).__goValue === undefined || (s as any).__goType?.charCodeAt(0) !== 42) ? (s as Exclude<Shape, null>) : $.pointerValue<Exclude<Shape, null>>(s)).Area(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	s = find(false)
 	await $.println(s == null)
 
 	// reflect.Type results, as in jinzhu/copier.
 	let elem: reflect.Type | null = (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.interfaceValue($.arrayToSlice<number>([]), "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"))))).Elem(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 	elem = reflect.PtrTo($.pointerValueOrNil(elem)!)
-	await $.println((__goscriptAwait = (elem !== null && (elem as any).__isVarRef !== true && (elem as any).__goValue === undefined ? (elem as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(elem)).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println((__goscriptAwait = (elem !== null && (elem as any).__isVarRef !== true && ((elem as any).__goValue === undefined || (elem as any).__goType?.charCodeAt(0) !== 42) ? (elem as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(elem)).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 }
 
 var __goscriptAwait: any

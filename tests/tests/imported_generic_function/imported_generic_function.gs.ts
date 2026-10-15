@@ -27,7 +27,7 @@ export async function main(): globalThis.Promise<void> {
 	let values: $.Slice<helper.Value | null> = __goscriptTuple1[0]
 	let err = __goscriptTuple1[1]
 	if (err != null) {
-		await $.println((__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+		await $.println((__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		return
 	}
 	await $.println("collected:", (__goscriptAwait = $.pointerValue<Exclude<helper.Value, null>>($.arrayIndex(values!, 0)).GetValue(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
@@ -35,7 +35,7 @@ export async function main(): globalThis.Promise<void> {
 	let assigned: $.Slice<helper.Value | null> = __goscriptTuple2[0]
 	err = __goscriptTuple2[1]
 	if (err != null) {
-		await $.println((__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+		await $.println((__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		return
 	}
 	await $.println("assigned:", (__goscriptAwait = $.pointerValue<Exclude<helper.Value, null>>($.arrayIndex(assigned!, 0)).GetValue(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))

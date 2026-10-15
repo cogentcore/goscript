@@ -58,7 +58,7 @@ export async function describe(value: any): globalThis.Promise<void> {
 		let __goscriptShadow1 = __goscriptTuple0[0]
 		let ok = __goscriptTuple0[1]
 		if (ok) {
-			await $.println("Shadowed name:", (__goscriptAwait = (__goscriptShadow1 !== null && (__goscriptShadow1 as any).__isVarRef !== true && (__goscriptShadow1 as any).__goValue === undefined ? (__goscriptShadow1 as Exclude<named, null>) : $.pointerValue<Exclude<named, null>>(__goscriptShadow1)).Name(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+			await $.println("Shadowed name:", (__goscriptAwait = (__goscriptShadow1 !== null && (__goscriptShadow1 as any).__isVarRef !== true && ((__goscriptShadow1 as any).__goValue === undefined || (__goscriptShadow1 as any).__goType?.charCodeAt(0) !== 42) ? (__goscriptShadow1 as Exclude<named, null>) : $.pointerValue<Exclude<named, null>>(__goscriptShadow1)).Name(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 			return
 		}
 	}

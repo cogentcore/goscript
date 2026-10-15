@@ -13,52 +13,19 @@ $.registerNamedValueType(
 );
 
 export class state {
-	public get fl(): flags {
-		return this._fields.fl
-	}
+	public declare fl: flags
 
-	public set fl(value: flags) {
-		this._fields.fl = value
-	}
+	public declare n: number
 
-	public get n(): number {
-		return this._fields.n
-	}
+	public declare m: number
 
-	public set n(value: number) {
-		this._fields.n = value
-	}
-
-	public get m(): number {
-		return this._fields.m
-	}
-
-	public set m(value: number) {
-		this._fields.m = value
-	}
-
-	public get c(): bigint {
-		return this._fields.c
-	}
-
-	public set c(value: bigint) {
-		this._fields.c = value
-	}
-
-	public _fields: {
-		fl: flags
-		n: number
-		m: number
-		c: bigint
-	}
+	public declare c: bigint
 
 	constructor(init?: Partial<{fl?: flags, n?: number, m?: number, c?: bigint}>, __goscriptValue?: boolean) {
-		this._fields = {
-			fl: init?.fl ?? (0n as flags),
-			n: init?.n ?? (0 as number),
-			m: init?.m ?? (0 as number),
-			c: init?.c ?? (0n as bigint)
-		}
+		this.fl = init?.fl ?? (0n as flags)
+		this.n = init?.n ?? (0 as number)
+		this.m = init?.m ?? (0 as number)
+		this.c = init?.c ?? (0n as bigint)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -66,13 +33,12 @@ export class state {
 		return new state(this, true)
 	}
 
-	public __goscriptAssign(source: state): void {
-		const target = this._fields
-		const values = source._fields
-		target.fl = values.fl
-		target.n = values.n
-		target.m = values.m
-		target.c = values.c
+	public __goscriptAssign(source: state): this {
+		this.fl = source.fl
+		this.n = source.n
+		this.m = source.m
+		this.c = source.c
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -85,11 +51,11 @@ export class state {
 }
 
 export function flags_has(f: $.VarRef<flags> | null, bit: number): boolean {
-	return ($.int64And($.int64($.pointerValue<flags>(f)), ($.int64Shl(1n, bit)))) != 0n
+	return ($.int64And($.pointerValue<flags>(f), ($.int64Bit(bit)))) != 0n
 }
 
 export function flags__set(f: $.VarRef<flags> | null, bit: number): void {
-	f!.value = $.int64Or(f!.value, $.int64Shl(1n, bit))
+	f!.value = $.int64Or(f!.value, $.int64Bit(bit))
 }
 
 export function inc(p: $.VarRef<number> | null): void {
@@ -104,7 +70,7 @@ export function incTwice(p: $.VarRef<number> | null): void {
 }
 
 export function same(a: $.VarRef<number> | null, b: $.VarRef<number> | null): boolean {
-	return $.pointerEqual(a, b)
+	return (a === b || $.pointerAliasesMade && $.pointerEqual(a, b))
 }
 
 export let kept: $.VarRef<number> | null = null! as $.VarRef<number> | null
@@ -117,7 +83,7 @@ export function ret(p: $.VarRef<number> | null): $.VarRef<number> | null {
 	return p
 }
 
-export async function through(p: $.VarRef<number> | null): globalThis.Promise<$.VarRef<number> | null> {
+export function through(p: $.VarRef<number> | null): $.VarRef<number> | null {
 	let _get = $.functionValue((): $.VarRef<number> | null => {
 		return p
 	}, ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int"))] } as $.FunctionTypeInfo))
@@ -136,25 +102,25 @@ export async function main(): globalThis.Promise<void> {
 	// Methods and functions that only read and write through a pointer.
 	let s = new state()
 	let s$: state = s == null ? $.pointerTarget<state>(s) : (s as any).__isVarRef === true ? (s as any).value : (s as any).__goValue === undefined ? (s as any) : $.pointerTarget<state>(s)
-	flags__set($.transientFieldRef((s$ as state)._fields, "fl"), 3)
-	await $.println(flags_has($.transientFieldRef((s$ as state)._fields, "fl"), 3), flags_has($.transientFieldRef((s$ as state)._fields, "fl"), 2))
-	incTwice($.transientFieldRef((s$ as state)._fields, "n"))
+	flags__set($.transientFieldRef((s$ as state), "fl"), 3)
+	await $.println(flags_has($.transientFieldRef((s$ as state), "fl"), 3), flags_has($.transientFieldRef((s$ as state), "fl"), 2))
+	incTwice($.transientFieldRef((s$ as state), "n"))
 	await $.println((s$ as state).n)
-	atomic.StoreInt64($.fieldRef((s$ as state)._fields, "c"), 7n)
-	await $.println(load($.transientFieldRef((s$ as state)._fields, "c")))
+	atomic.StoreInt64($.fieldRef((s$ as state), "c"), 7n)
+	await $.println(load($.transientFieldRef((s$ as state), "c")))
 
 	// Comparing or keeping a pointer sees the field's own address.
-	await $.println(same($.fieldRef((s$ as state)._fields, "n"), $.fieldRef((s$ as state)._fields, "n")), same($.fieldRef((s$ as state)._fields, "n"), $.fieldRef((s$ as state)._fields, "m")))
-	keep($.fieldRef((s$ as state)._fields, "n"))
-	inc($.transientFieldRef((s$ as state)._fields, "n"))
-	await $.println($.pointerValue<number>(kept), $.pointerEqual(kept, $.fieldRef((s$ as state)._fields, "n")))
-	await $.println($.pointerEqual(ret($.fieldRef((s$ as state)._fields, "n")), $.fieldRef((s$ as state)._fields, "n")), $.pointerEqual(await through($.fieldRef((s$ as state)._fields, "m")), $.fieldRef((s$ as state)._fields, "m")))
+	await $.println(same($.fieldRef((s$ as state), "n"), $.fieldRef((s$ as state), "n")), same($.fieldRef((s$ as state), "n"), $.fieldRef((s$ as state), "m")))
+	keep($.fieldRef((s$ as state), "n"))
+	inc($.transientFieldRef((s$ as state), "n"))
+	await $.println($.pointerValue<number>(kept), $.pointerEqual(kept, $.fieldRef((s$ as state), "n")))
+	await $.println($.pointerEqual(ret($.fieldRef((s$ as state), "n")), $.fieldRef((s$ as state), "n")), $.pointerEqual(through($.fieldRef((s$ as state), "m")), $.fieldRef((s$ as state), "m")))
 
 	// A struct value's fields work the same.
 	let v: state = new state(undefined, true)
-	flags__set($.transientFieldRef(v._fields, "fl"), 1)
-	incTwice($.transientFieldRef(v._fields, "m"))
-	await $.println(flags_has($.transientFieldRef(v._fields, "fl"), 1), flags_has($.transientFieldRef(v._fields, "fl"), 3), v.m)
+	flags__set($.transientFieldRef(v, "fl"), 1)
+	incTwice($.transientFieldRef(v, "m"))
+	await $.println(flags_has($.transientFieldRef(v, "fl"), 1), flags_has($.transientFieldRef(v, "fl"), 3), v.m)
 }
 
 if ($.isMainScript(import.meta)) {

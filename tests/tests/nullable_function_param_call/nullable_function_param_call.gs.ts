@@ -155,16 +155,16 @@ export async function main(): globalThis.Promise<void> {
 
 	// Test the walk function with a callback
 	let walkFunc = $.functionValue(async (path: string, info: FileInfo | null, err: $.GoError): globalThis.Promise<$.GoError> => {
-		await $.println("Walking:", path, "size:", (__goscriptAwait = (info !== null && (info as any).__isVarRef !== true && (info as any).__goValue === undefined ? (info as Exclude<FileInfo, null>) : $.pointerValue<Exclude<FileInfo, null>>(info)).Size(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+		await $.println("Walking:", path, "size:", (__goscriptAwait = (info !== null && (info as any).__isVarRef !== true && ((info as any).__goValue === undefined || (info as any).__goType?.charCodeAt(0) !== 42) ? (info as Exclude<FileInfo, null>) : $.pointerValue<Exclude<FileInfo, null>>(info)).Size(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		if (err != null) {
-			await $.println("Error:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+			await $.println("Error:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		}
 		return null
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string"), "main.FileInfo", "error"], results: ["error"] } as $.FunctionTypeInfo))
 
 	let err = await walk($.interfaceValue<Filesystem | null>(fs, "*main.MockFilesystem", /* @__PURE__ */ $.pointerType("main.MockFilesystem")), "/test", $.interfaceValue<FileInfo | null>(fileInfo, "*main.MockFileInfo", /* @__PURE__ */ $.pointerType("main.MockFileInfo")), walkFunc)
 	if (err != null) {
-		await $.println("Walk error:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+		await $.println("Walk error:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	}
 
 	// Test the process function with a callback
@@ -174,21 +174,21 @@ export async function main(): globalThis.Promise<void> {
 
 	let [result, err2] = processWithCallback("hello", processFunc)
 	if (err2 != null) {
-		await $.println("Process error:", (__goscriptAwait = (err2 !== null && (err2 as any).__isVarRef !== true && (err2 as any).__goValue === undefined ? (err2 as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err2)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+		await $.println("Process error:", (__goscriptAwait = (err2 !== null && (err2 as any).__isVarRef !== true && ((err2 as any).__goValue === undefined || (err2 as any).__goType?.charCodeAt(0) !== 42) ? (err2 as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err2)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	} else {
 		await $.println("Process result:", result)
 	}
 
 	let [result3, err3] = maybeProcess("ignored", (null as OptionalProcessFunc | null))
 	if (err3 != null) {
-		await $.println("Optional process error:", (__goscriptAwait = (err3 !== null && (err3 as any).__isVarRef !== true && (err3 as any).__goValue === undefined ? (err3 as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err3)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+		await $.println("Optional process error:", (__goscriptAwait = (err3 !== null && (err3 as any).__isVarRef !== true && ((err3 as any).__goValue === undefined || (err3 as any).__goType?.charCodeAt(0) !== 42) ? (err3 as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err3)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	} else {
 		await $.println("Optional process result:", result3)
 	}
 
 	let [result4, err4] = maybeProcess("world", processFunc)
 	if (err4 != null) {
-		await $.println("Optional process error:", (__goscriptAwait = (err4 !== null && (err4 as any).__isVarRef !== true && (err4 as any).__goValue === undefined ? (err4 as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err4)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+		await $.println("Optional process error:", (__goscriptAwait = (err4 !== null && (err4 as any).__isVarRef !== true && ((err4 as any).__goValue === undefined || (err4 as any).__goType?.charCodeAt(0) !== 42) ? (err4 as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err4)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	} else {
 		await $.println("Optional process result:", result4)
 	}

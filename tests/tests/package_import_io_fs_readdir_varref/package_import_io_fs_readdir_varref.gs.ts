@@ -43,12 +43,12 @@ export async function main(): globalThis.Promise<void> {
 	let entries: $.Slice<fs.DirEntry | null> = __goscriptTuple0[0]
 	let err = __goscriptTuple0[1]
 	if (err != null) {
-		await $.println("err:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+		await $.println("err:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		return
 	}
 	for (let __goscriptRangeTarget0 = entries, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
 		let entry = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as fs.DirEntry | null)
-		await $.println((__goscriptAwait = (entry !== null && (entry as any).__isVarRef !== true && (entry as any).__goValue === undefined ? (entry as Exclude<fs.DirEntry, null>) : $.pointerValue<Exclude<fs.DirEntry, null>>(entry)).Name(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = (entry !== null && (entry as any).__isVarRef !== true && (entry as any).__goValue === undefined ? (entry as Exclude<fs.DirEntry, null>) : $.pointerValue<Exclude<fs.DirEntry, null>>(entry)).IsDir(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+		await $.println((__goscriptAwait = (entry !== null && (entry as any).__isVarRef !== true && ((entry as any).__goValue === undefined || (entry as any).__goType?.charCodeAt(0) !== 42) ? (entry as Exclude<fs.DirEntry, null>) : $.pointerValue<Exclude<fs.DirEntry, null>>(entry)).Name(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = (entry !== null && (entry as any).__isVarRef !== true && ((entry as any).__goValue === undefined || (entry as any).__goType?.charCodeAt(0) !== 42) ? (entry as Exclude<fs.DirEntry, null>) : $.pointerValue<Exclude<fs.DirEntry, null>>(entry)).IsDir(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	}
 }
 

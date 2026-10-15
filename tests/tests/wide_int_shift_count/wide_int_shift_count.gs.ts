@@ -15,7 +15,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("byte-shr-by-uint64", v)
 
 	let w = 1
-	w = $.uint(w << ($.uint(s, 16)), 16)
+	w = $.uint(w << ($.uintFromWide(s, 16)), 16)
 	await $.println("uint16-shlassign", w)
 }
 

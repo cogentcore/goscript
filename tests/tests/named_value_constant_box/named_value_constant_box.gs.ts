@@ -89,7 +89,7 @@ export function Name_Upper(n: Name): string {
 }
 
 export function has(bits: $.VarRef<bigint> | null, f: Inter | null): boolean {
-	return ($.int64And($.pointerValue<bigint>(bits), ($.int64Shl(1n, $.uint((f !== null && (f as any).__isVarRef !== true && (f as any).__goValue === undefined ? (f as Exclude<Inter, null>) : $.pointerValue<Exclude<Inter, null>>(f)).Int64(), 32))))) != 0n
+	return ($.int64And($.pointerValue<bigint>(bits), ($.int64Bit($.uintFromWide((f !== null && (f as any).__isVarRef !== true && ((f as any).__goValue === undefined || (f as any).__goType?.charCodeAt(0) !== 42) ? (f as Exclude<Inter, null>) : $.pointerValue<Exclude<Inter, null>>(f)).Int64(), 32))))) != 0n
 }
 
 export async function main(): globalThis.Promise<void> {
@@ -113,13 +113,13 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("equal", $.comparableEqual(x, y), $.comparableEqual(x, z))
 
 	// Methods with and without arguments are called through the box.
-	await $.println("methods", (__goscriptAwait = (z !== null && (z as any).__isVarRef !== true && (z as any).__goValue === undefined ? (z as Exclude<Inter, null>) : $.pointerValue<Exclude<Inter, null>>(z)).Int64(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = (z !== null && (z as any).__isVarRef !== true && (z as any).__goValue === undefined ? (z as Exclude<Inter, null>) : $.pointerValue<Exclude<Inter, null>>(z)).Plus(5n), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = (x !== null && (x as any).__isVarRef !== true && (x as any).__goValue === undefined ? (x as Exclude<Inter, null>) : $.pointerValue<Exclude<Inter, null>>(x)).Plus(-1n), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println("methods", (__goscriptAwait = (z !== null && (z as any).__isVarRef !== true && ((z as any).__goValue === undefined || (z as any).__goType?.charCodeAt(0) !== 42) ? (z as Exclude<Inter, null>) : $.pointerValue<Exclude<Inter, null>>(z)).Int64(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = (z !== null && (z as any).__isVarRef !== true && ((z as any).__goValue === undefined || (z as any).__goType?.charCodeAt(0) !== 42) ? (z as Exclude<Inter, null>) : $.pointerValue<Exclude<Inter, null>>(z)).Plus(5n), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = (x !== null && (x as any).__isVarRef !== true && ((x as any).__goValue === undefined || (x as any).__goType?.charCodeAt(0) !== 42) ? (x as Exclude<Inter, null>) : $.pointerValue<Exclude<Inter, null>>(x)).Plus(-1n), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
 	// A boxed variable is not shared with a later value of the variable.
 	let v = 1n
 	let w: Inter | null = $.namedValueInterfaceValue<Inter | null>(v, "main.Flag", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2())
 	v = 2n
-	await $.println("variable", (__goscriptAwait = (w !== null && (w as any).__isVarRef !== true && (w as any).__goValue === undefined ? (w as Exclude<Inter, null>) : $.pointerValue<Exclude<Inter, null>>(w)).Int64(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), v)
+	await $.println("variable", (__goscriptAwait = (w !== null && (w as any).__isVarRef !== true && ((w as any).__goValue === undefined || (w as any).__goType?.charCodeAt(0) !== 42) ? (w as Exclude<Inter, null>) : $.pointerValue<Exclude<Inter, null>>(w)).Int64(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), v)
 
 	// Type switches see the dynamic type of a boxed constant.
 	{
@@ -136,7 +136,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// Strings and unsigned 64-bit values box the same way.
 	let s: Namer | null = __goscriptStatic9()
-	await $.println("string", (__goscriptAwait = (s !== null && (s as any).__isVarRef !== true && (s as any).__goValue === undefined ? (s as Exclude<Namer, null>) : $.pointerValue<Exclude<Namer, null>>(s)).Upper(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), $.comparableEqual(s, __goscriptStatic9()))
+	await $.println("string", (__goscriptAwait = (s !== null && (s as any).__isVarRef !== true && ((s as any).__goValue === undefined || (s as any).__goType?.charCodeAt(0) !== 42) ? (s as Exclude<Namer, null>) : $.pointerValue<Exclude<Namer, null>>(s)).Upper(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), $.comparableEqual(s, __goscriptStatic9()))
 
 	// 64-bit conversions between named and basic types keep the value.
 	let k = 9223372036854775813n
