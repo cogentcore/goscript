@@ -1,6 +1,7 @@
 export * from './builtin.js'
 export * from './callback.js'
 export * from './float.js'
+export * from './rand.js'
 export * from './scheduler.js'
 export * from './panic.js'
 export * from './slice.js'

@@ -32,7 +32,10 @@ import * as $ from '@goscript/builtin/index.js'
 
 import * as byteorder from '@goscript/internal/byteorder/index.js'
 
-import { block } from './block.js'
+// Package chacha8rand implements a pseudorandom generator based on ChaCha8
+// (https://c2sp.org/chacha8rand). Go implements its block function in
+// assembly; this override uses the builtin chacha8Block, a port of the
+// portable chacha8_generic.go in 32-bit arithmetic.
 
 const ctrInc = 4
 const ctrMax = 16
@@ -44,10 +47,13 @@ const reseed = 4
 // If used by multiple goroutines at a time, the goroutines
 // may see the same random values, but the code will not
 // crash or cause out-of-bounds memory accesses.
+//
+// buf and seed are uint64 arrays over buffers that bufWords and seedWords
+// view as uint32 words, which the builtin ChaCha8 block reads and writes.
 export class State {
-  declare public buf: bigint[]
+  declare public buf: BigUint64Array
 
-  declare public seed: bigint[]
+  declare public seed: BigUint64Array
 
   declare public i: number
 
@@ -55,53 +61,63 @@ export class State {
 
   declare public c: number
 
+  declare public bufWords: Uint32Array
+
+  declare public seedWords: Uint32Array
+
   constructor(
     init?: Partial<{
-      buf?: bigint[]
-      seed?: bigint[]
+      buf?: ArrayLike<bigint>
+      seed?: ArrayLike<bigint>
       i?: number
       n?: number
       c?: number
     }>,
   ) {
-    this.buf =
-      init?.buf !== undefined ?
-        $.cloneArrayValue(init.buf)
-      : Array.from({ length: 32 }, () => 0n)
-    this.seed =
-      init?.seed !== undefined ?
-        $.cloneArrayValue(init.seed)
-      : Array.from({ length: 4 }, () => 0n)
-    this.i = init?.i ?? (0 as number)
-    this.n = init?.n ?? (0 as number)
-    this.c = init?.c ?? (0 as number)
+    // The arrays and their word views share one buffer each.
+    this.buf = new BigUint64Array(chunk)
+    this.seed = new BigUint64Array(4)
+    this.bufWords = new Uint32Array(this.buf.buffer)
+    this.seedWords = new Uint32Array(this.seed.buffer)
+
+    // Copy the initial values.
+    if (init?.buf !== undefined) {
+      this.buf.set(init.buf)
+    }
+    if (init?.seed !== undefined) {
+      this.seed.set(init.seed)
+    }
+    this.i = init?.i ?? 0
+    this.n = init?.n ?? 0
+    this.c = init?.c ?? 0
   }
 
   public clone(): State {
-    const cloned = new State()
-    cloned.buf = $.cloneArrayValue(this.buf)
-    cloned.seed = $.cloneArrayValue(this.seed)
-    cloned.i = this.i
-    cloned.n = this.n
-    cloned.c = this.c
-    return $.markAsStructValue(cloned)
+    // A copy has its own buffers.
+    return $.markAsStructValue(new State(this))
   }
 
-  // Next returns the next random value, along with a boolean
-  // indicating whether one was available.
-  // If one is not available, the caller should call Refill
-  // and then repeat the call to Next.
+  public __goscriptAssign(source: State): this {
+    // Copy the values into the buffers of this state.
+    this.buf.set(source.buf)
+    this.seed.set(source.seed)
+    this.i = source.i
+    this.n = source.n
+    this.c = source.c
+    return this
+  }
+
   public Next(): [bigint, boolean] {
+    // The values from i to n are unused.
     const state = $.pointerValue<State>(this)
     const i = state.i
     if (i >= state.n) {
       return [0n, false]
     }
     state.i = i + 1
-    return [$.arrayIndex(state.buf, i & 31), true]
+    return [state.buf[i & 31], true]
   }
 
-  // Init seeds the State with the given seed value.
   public Init(seed: Uint8Array): void {
     State.prototype.Init64.call(this, [
       byteorder.LEUint64($.goSlice(seed, 0 * 8, undefined)),
@@ -111,39 +127,29 @@ export class State {
     ])
   }
 
-  // Init64 seeds the state with the given seed value.
-  // The input array is copied, so later changes to it do not
-  // affect the state.
-  public Init64(seed: bigint[]): void {
+  public Init64(seed: ArrayLike<bigint>): void {
+    // Compute the first blocks of the seed.
     const state = $.pointerValue<State>(this)
-    state.seed = $.cloneArrayValue(seed)
-    state.buf = block(state.seed, 0)
+    state.seed.set(seed)
+    $.chacha8Block(state.seedWords, 0, state.bufWords)
     state.c = 0
     state.i = 0
     state.n = chunk
   }
 
-  // Refill refills the state with more random values.
-  // After a call to Refill, an immediate call to Next will succeed
-  // (unless multiple goroutines are incorrectly sharing a state).
   public Refill(): void {
+    // Advance the counter, taking a new seed from the end of the buffer
+    // every ctrMax blocks.
     const state = $.pointerValue<State>(this)
     state.c += ctrInc
     if (state.c === ctrMax) {
-      // Reseed with generated uint64s for forward secrecy.
-      // Normally this is done immediately after computing a block,
-      // but we do it immediately before computing the next block,
-      // to allow a much smaller serialized state (just the seed plus offset).
-      // This gives a delayed benefit for the forward secrecy
-      // (you can reconstruct the recent past given a memory dump),
-      // which we deem acceptable in exchange for the reduced size.
-      state.seed[0] = state.buf[chunk - reseed + 0]
-      state.seed[1] = state.buf[chunk - reseed + 1]
-      state.seed[2] = state.buf[chunk - reseed + 2]
-      state.seed[3] = state.buf[chunk - reseed + 3]
+      state.seed.set(state.buf.subarray(chunk - reseed))
       state.c = 0
     }
-    state.buf = block(state.seed, state.c)
+
+    // Compute the next blocks; the last ones before a reseed keep their
+    // last reseed words for the seed.
+    $.chacha8Block(state.seedWords, state.c, state.bufWords)
     state.i = 0
     state.n = chunk
     if (state.c === ctrMax - ctrInc) {
@@ -151,10 +157,6 @@ export class State {
     }
   }
 
-  // Reseed reseeds the state with new random values.
-  // After a call to Reseed, any previously returned random values
-  // have been erased from the memory of the state and cannot be
-  // recovered.
   public Reseed(): void {
     const state = $.pointerValue<State>(this)
     const seed: bigint[] = Array.from({ length: 4 }, () => 0n)
@@ -325,6 +327,8 @@ export function Unmarshal(
   s: State | $.VarRef<State> | null,
   data: $.Slice<number>,
 ): $.GoError {
+  // The encoding is the "chacha8:" tag, the count of used values and the
+  // seed.
   const state = $.pointerValue<State>(s)
   if (
     $.len(data) !== 6 * 8 ||
@@ -336,6 +340,8 @@ export function Unmarshal(
       { kind: $.TypeKind.Pointer, elemType: 'chacha8rand.errUnmarshalChaCha8' },
     )
   }
+
+  // The count must leave values before the next reseed.
   const used = byteorder.BEUint64($.goSlice(data, 1 * 8, undefined))
   if (used > (ctrMax / ctrInc) * chunk - reseed) {
     return $.interfaceValue<$.GoError>(
@@ -344,12 +350,17 @@ export function Unmarshal(
       { kind: $.TypeKind.Pointer, elemType: 'chacha8rand.errUnmarshalChaCha8' },
     )
   }
+
+  // Restore the seed and recompute the blocks that held the next value.
   const usedNum = $.uint(used, 32)
   for (let i = 0; i < 4; i++) {
     state.seed[i] = byteorder.LEUint64($.goSlice(data, (2 + i) * 8, undefined))
   }
   state.c = ctrInc * Math.trunc(usedNum / chunk)
-  state.buf = block(state.seed, state.c)
+  $.chacha8Block(state.seedWords, state.c, state.bufWords)
+
+  // Continue from the next value; the last blocks before a reseed keep
+  // their reseed words.
   state.i = usedNum % chunk
   state.n = chunk
   if (state.c === ctrMax - ctrInc) {

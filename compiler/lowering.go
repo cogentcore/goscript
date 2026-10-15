@@ -4309,9 +4309,10 @@ func (o *LoweringOwner) lowerFuncDecl(ctx lowerFileContext, decl *ast.FuncDecl) 
 // linknameRuntimeBodies are the bodies of bodyless functions linked to
 // runtime functions that GoScript implements, by linkname target.
 var linknameRuntimeBodies = map[string]string{
-	// runtime.rand returns random bits for the global sources of math/rand
-	// and math/rand/v2, and for hash/maphash seeds.
-	"runtime.rand": "return globalThis.crypto.getRandomValues(new globalThis.BigUint64Array(1))[0]",
+	// runtime.rand returns random bits of the builtin ChaCha8 generator,
+	// as the runtime does, for the global sources of math/rand and
+	// math/rand/v2, and for hash/maphash seeds.
+	"runtime.rand": "return $.runtimeRand()",
 }
 
 // linknameRuntimeBody returns the body for a bodyless function declaration

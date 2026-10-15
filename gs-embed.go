@@ -22,6 +22,7 @@ import "embed"
 //go:embed gs/builtin/meta.json
 //go:embed gs/builtin/panic.ts
 //go:embed gs/builtin/print.ts
+//go:embed gs/builtin/rand.ts
 //go:embed gs/builtin/scheduler.ts
 //go:embed gs/builtin/slice.ts
 //go:embed gs/builtin/type.ts
@@ -125,7 +126,6 @@ import "embed"
 //go:embed gs/internal/abi/index.ts
 //go:embed gs/internal/bytealg/index.ts
 //go:embed gs/internal/byteorder/index.ts
-//go:embed gs/internal/chacha8rand/block.ts
 //go:embed gs/internal/chacha8rand/index.ts
 //go:embed gs/internal/flateio/checksum.ts
 //go:embed gs/internal/flateio/index.ts
