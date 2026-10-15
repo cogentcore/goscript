@@ -566,20 +566,18 @@ function defaultFormatMaybe(
     }
     if (
       info?.kind === $.TypeKind.Struct ||
-      (value._fields &&
-        typeof value._fields === 'object' &&
-        !$.isArrayOrGoSlice(value._fields)) ||
+      $.isStructObject(value) ||
       value.constructor === Object
     ) {
       const fields: $.StructFieldInfo[] =
         info?.kind === $.TypeKind.Struct ?
           info.fields
-        : Object.keys(value._fields ?? value).map((name) => ({
+        : Object.keys(value).map((name) => ({
             name,
             key: name,
             type: $.basicType('unknown'),
           }))
-      const storage = value._fields ?? value
+      const storage = value
       // A struct reached again through its own fields is reached through a
       // pointer, which prints as an address, as Go prints nested pointers.
       if (formattingStructs.has(storage)) {

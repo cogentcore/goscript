@@ -959,7 +959,7 @@ function shapeSize(shape: binShape): number {
 }
 
 function structFieldValue(instance: unknown, key: string): unknown {
-  return (instance as { _fields: Record<string, unknown> })._fields[key]
+  return (instance as Record<string, unknown>)[key]
 }
 
 function shapeEncode(
@@ -1057,7 +1057,7 @@ function shapeDecodeInto(
   shape: { tag: 'struct'; fields: { key: string; shape: binShape }[] },
   instance: unknown,
 ): void {
-  const fields = (instance as { _fields: Record<string, unknown> })._fields
+  const fields = instance as Record<string, unknown>
   let offset = 0
   for (const field of shape.fields) {
     const width = shapeSize(field.shape)

@@ -739,6 +739,7 @@ export class Value {
         !(value instanceof globalThis.Array) &&
         !(value instanceof globalThis.Map) &&
         !globalThis.ArrayBuffer.isView(value) &&
+        !$.isStructObject(value) &&
         isEmptyObject(value))
     ) {
       this._value = null
@@ -1166,7 +1167,7 @@ export class Value {
 
     // Read the field from the struct's storage, where an unset field is nil.
     const structValue = this.currentValue() as Record<string, any>
-    const parentObj = structValue._fields ?? structValue
+    const parentObj = structValue
     const fieldVal = parentObj[fieldKey] ?? null
 
     // Pass parent struct and field name so Set() can update the struct

@@ -275,30 +275,13 @@ class BinaryInputBoundMessage {
 }
 
 class TimestampBoundMessage {
-  public get Seconds(): number {
-    return this._fields.Seconds
-  }
-  public set Seconds(value: number) {
-    this._fields.Seconds = value
-  }
+  declare public Seconds: number
 
-  public get Nanos(): number {
-    return this._fields.Nanos
-  }
-  public set Nanos(value: number) {
-    this._fields.Nanos = value
-  }
-
-  public _fields: {
-    Seconds: number
-    Nanos: number
-  }
+  declare public Nanos: number
 
   constructor(init?: Partial<{ Seconds?: number; Nanos?: number }>) {
-    this._fields = {
-      Seconds: init?.Seconds ?? 0,
-      Nanos: init?.Nanos ?? 0,
-    }
+    this.Seconds = init?.Seconds ?? 0
+    this.Nanos = init?.Nanos ?? 0
   }
 }
 
@@ -313,21 +296,10 @@ const timestampMessageType = {
 }
 
 class TimestampParentBoundMessage {
-  public get Timestamp(): TimestampBoundMessage | null {
-    return this._fields.Timestamp
-  }
-  public set Timestamp(value: TimestampBoundMessage | null) {
-    this._fields.Timestamp = value
-  }
-
-  public _fields: {
-    Timestamp: TimestampBoundMessage | null
-  }
+  declare public Timestamp: TimestampBoundMessage | null
 
   constructor(init?: Partial<{ Timestamp?: TimestampBoundMessage | null }>) {
-    this._fields = {
-      Timestamp: init?.Timestamp ?? null,
-    }
+    this.Timestamp = init?.Timestamp ?? null
   }
 }
 
@@ -359,21 +331,10 @@ const oneofLeafMessageType = {
 }
 
 class OneofLeafBoundMessage {
-  public get Label(): string {
-    return this._fields.Label
-  }
-  public set Label(value: string) {
-    this._fields.Label = value
-  }
-
-  public _fields: {
-    Label: string
-  }
+  declare public Label: string
 
   constructor(init?: Partial<{ Label?: string }>) {
-    this._fields = {
-      Label: init?.Label ?? '',
-    }
+    this.Label = init?.Label ?? ''
   }
 }
 
@@ -382,40 +343,18 @@ class OneofLeafBoundMessage {
 ;(OneofLeafBoundMessage as any).__protobufTypeScriptFields = {}
 
 class OneofBoundMessage_TabSet {
-  public get TabSet(): OneofLeafBoundMessage | null {
-    return this._fields.TabSet
-  }
-  public set TabSet(value: OneofLeafBoundMessage | null) {
-    this._fields.TabSet = value
-  }
-
-  public _fields: {
-    TabSet: OneofLeafBoundMessage | null
-  }
+  declare public TabSet: OneofLeafBoundMessage | null
 
   constructor(init?: Partial<{ TabSet?: OneofLeafBoundMessage | null }>) {
-    this._fields = {
-      TabSet: init?.TabSet ?? null,
-    }
+    this.TabSet = init?.TabSet ?? null
   }
 }
 
 class OneofBoundMessage {
-  public get Node(): OneofBoundMessage_TabSet | null {
-    return this._fields.Node
-  }
-  public set Node(value: OneofBoundMessage_TabSet | null) {
-    this._fields.Node = value
-  }
-
-  public _fields: {
-    Node: OneofBoundMessage_TabSet | null
-  }
+  declare public Node: OneofBoundMessage_TabSet | null
 
   constructor(init?: Partial<{ Node?: OneofBoundMessage_TabSet | null }>) {
-    this._fields = {
-      Node: init?.Node ?? null,
-    }
+    this.Node = init?.Node ?? null
   }
 }
 
@@ -717,20 +656,11 @@ describe('protobuf-go-lite TypeScript binding helpers', () => {
 })
 
 class ViewLeafBoundMessage {
-  public _fields: {
-    Data: Uint8Array | null
-  }
-
   constructor(init?: Partial<{ Data?: Uint8Array | null }>) {
-    this._fields = { Data: init?.Data ?? null }
+    this.Data = init?.Data ?? null
   }
 
-  public get Data(): Uint8Array | null {
-    return this._fields.Data
-  }
-  public set Data(value: Uint8Array | null) {
-    this._fields.Data = value
-  }
+  declare public Data: Uint8Array | null
 }
 
 const viewLeafType = {
@@ -744,44 +674,21 @@ const viewLeafType = {
 // fields decode as subarray views into the input buffer, so every decoded
 // byte aliases the caller-owned wire buffer until copied.
 class ViewHolderBoundMessage {
-  public _fields: {
-    Leaf: ViewLeafBoundMessage | null
-    Leaves: $.Slice<ViewLeafBoundMessage | null> | null
-    Entries: Map<string, ViewLeafBoundMessage | null> | null
-  }
-
   constructor(init?: {
     Leaf?: ViewLeafBoundMessage | null
     Leaves?: $.Slice<ViewLeafBoundMessage | null> | null
     Entries?: Map<string, ViewLeafBoundMessage | null> | null
   }) {
-    this._fields = {
-      Leaf: init?.Leaf ?? null,
-      Leaves: init?.Leaves ?? null,
-      Entries: init?.Entries ?? null,
-    }
+    this.Leaf = init?.Leaf ?? null
+    this.Leaves = init?.Leaves ?? null
+    this.Entries = init?.Entries ?? null
   }
 
-  public get Leaf(): ViewLeafBoundMessage | null {
-    return this._fields.Leaf
-  }
-  public set Leaf(value: ViewLeafBoundMessage | null) {
-    this._fields.Leaf = value
-  }
+  declare public Leaf: ViewLeafBoundMessage | null
 
-  public get Leaves(): $.Slice<ViewLeafBoundMessage | null> | null {
-    return this._fields.Leaves
-  }
-  public set Leaves(value: $.Slice<ViewLeafBoundMessage | null> | null) {
-    this._fields.Leaves = value
-  }
+  declare public Leaves: $.Slice<ViewLeafBoundMessage | null> | null
 
-  public get Entries(): Map<string, ViewLeafBoundMessage | null> | null {
-    return this._fields.Entries
-  }
-  public set Entries(value: Map<string, ViewLeafBoundMessage | null> | null) {
-    this._fields.Entries = value
-  }
+  declare public Entries: Map<string, ViewLeafBoundMessage | null> | null
 }
 
 ;(ViewHolderBoundMessage as any).__protobufTypeScriptMessage = {

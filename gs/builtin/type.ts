@@ -1320,6 +1320,30 @@ export function anonymousStructValue<T extends object>(
   return markAsStructValue(value)
 }
 
+/**
+ * isStructObject reports whether value is an object of a Go struct class,
+ * whose fields are its own properties. Plain objects of anonymous struct
+ * types are not struct class objects.
+ */
+export function isStructObject(
+  value: unknown,
+): value is Record<string, unknown> {
+  // Only an object of a class with a type info can be one.
+  if (typeof value !== 'object' || value === null) {
+    return false
+  }
+  const info = (value as any).constructor?.__typeInfo
+  if (info === undefined) {
+    return false
+  }
+
+  // The class is a struct class when its type info is a struct's.
+  if (typeof info === 'object') {
+    return info.kind === TypeKind.Struct
+  }
+  return resolveTypeInfo(info)?.kind === TypeKind.Struct
+}
+
 /** structValueTypeInfo returns the descriptor a struct value carries, if any. */
 export function structValueTypeInfo(
   value: unknown,
@@ -1466,16 +1490,27 @@ export function pointerEqual(a: unknown, b: unknown): boolean {
   )
 }
 
-function pointerViewFields(source: PointerCastSource): unknown {
-  const current = source.ref !== undefined ? source.ref.value : source.object
-  if (
-    typeof current !== 'object' ||
-    current === null ||
-    !('_fields' in current)
-  ) {
-    return undefined
+// forwardStructFields defines each field of the struct that read returns as
+// a property of view that reads and writes that struct's field, so that a
+// view of another type shares the struct's storage.
+function forwardStructFields(view: object, read: () => unknown): void {
+  const current = read()
+  if (typeof current !== 'object' || current === null) {
+    return
   }
-  return current._fields
+  for (const key of Object.keys(current)) {
+    Object.defineProperty(view, key, {
+      configurable: true,
+      enumerable: true,
+      get: () => (read() as Record<string, unknown> | null)?.[key],
+      set: (value: unknown) => {
+        const target = read() as Record<string, unknown> | null
+        if (target !== null && typeof target === 'object') {
+          target[key] = value
+        }
+      },
+    })
+  }
 }
 
 function destinationPointerView(
@@ -1491,13 +1526,15 @@ function destinationPointerView(
   if (existing !== undefined) {
     return existing
   }
+  // The view shares the fields of the struct the pointer points to, or
+  // copies the properties of other storage.
   const view = Object.create(target.prototype)
-  if (source.ref !== undefined) {
-    Object.defineProperty(view, '_fields', {
-      configurable: true,
-      enumerable: true,
-      get: () => pointerViewFields(source),
-    })
+  const ref = source.ref
+  if (ref !== undefined) {
+    forwardStructFields(view, () => ref.value)
+  } else if (isStructObject(source.object)) {
+    const object = source.object
+    forwardStructFields(view, () => object)
   } else {
     Object.assign(view, source.object)
   }

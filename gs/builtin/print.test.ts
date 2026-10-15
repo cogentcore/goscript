@@ -35,10 +35,8 @@ describe('builtin println formatting', () => {
     expect(
       formatPrintedArgs([
         {
-          _fields: {
-            Name: 'hello',
-            Count: 3,
-          },
+          Name: 'hello',
+          Count: 3,
         },
       ]),
     ).toBe(`{
@@ -51,7 +49,7 @@ describe('builtin println formatting', () => {
     const storage = { Count: 3 }
     const local = varRef(4)
     const field = fieldRef(storage, 'Count')
-    const value = { _fields: { Local: local, Field: field } }
+    const value = { Local: local, Field: field }
     const expected = '{\n  Local: 4,\n  Field: 3,\n}'
     expect(formatPrintedArgs([value])).toBe(expected)
     void local.__goPointer

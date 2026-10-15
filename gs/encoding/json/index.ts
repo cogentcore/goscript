@@ -1560,8 +1560,7 @@ function marshalValue(
   if (!isStructValue(v) && anonymousFields === null) {
     return v
   }
-  const fieldValues: Record<string, unknown> =
-    isStructValue(v) ? v._fields : (v as Record<string, unknown>)
+  const fieldValues: Record<string, unknown> = v as Record<string, unknown>
 
   // Fields are addressable when the struct is or is reached via a pointer.
   const fieldsAddressable = !isStructValueType(typeInfo) || addressable
@@ -1575,7 +1574,7 @@ function marshalValue(
         owner: fieldValues,
         field,
       }))
-    : jsonStructFields(v as { _fields: Record<string, unknown> })
+    : jsonStructFields(v as Record<string, unknown>)
   for (const { jsonName, owner, field } of fields) {
     const value = owner[field.key]
     if (jsonName === '' || value === undefined) {
@@ -1964,7 +1963,7 @@ function assignDecodedValue(
     if (spelling !== null) {
       let desc: unknown = goTypeDescriptor(spelling)
       // An anonymous (inline, unnamed) struct target, e.g. `var loose
-      // struct{ Name string "json:\"name\"" }`, carries no _fields/registered
+      // struct{ Name string "json:\"name\"" }`, carries no class or registered
       // type metadata of its own to decode against, so it needs its json
       // tags read from the parsed __goType spelling instead. See
       // assignAnonymousStructFields below.
@@ -2018,7 +2017,7 @@ function assignDecodedValue(
 }
 
 function assignStructFields(
-  target: { _fields: Record<string, unknown> },
+  target: Record<string, unknown>,
   decoded: Record<string, unknown>,
   opts: decodeOptions,
 ): void {
@@ -2120,13 +2119,11 @@ type jsonStructField = {
 // without a JSON name in place of them. Of the fields with the same JSON
 // name, the least nested one is used, or the one with a JSON name among
 // those equally nested, as in Go; otherwise none is.
-function jsonStructFields(value: {
-  _fields: Record<string, unknown>
-}): jsonStructField[] {
+function jsonStructFields(value: Record<string, unknown>): jsonStructField[] {
   // The fields are collected from the struct and the structs embedded in it.
   const all: jsonStructField[] = []
   const visit = (
-    target: { _fields: Record<string, unknown> },
+    target: Record<string, unknown>,
     depth: number,
     seen: Set<object>,
   ) => {
@@ -2136,7 +2133,7 @@ function jsonStructFields(value: {
         continue
       }
       if (field.anonymous && !tagName) {
-        let inner = target._fields[field.key]
+        let inner = target[field.key]
         if ($.isVarRef(inner)) {
           inner = inner.value
         }
@@ -2156,7 +2153,7 @@ function jsonStructFields(value: {
       }
       all.push({
         jsonName: tagName || field.name,
-        owner: target._fields,
+        owner: target,
         field,
         depth,
         tagged: !!tagName,
@@ -2781,19 +2778,8 @@ function matchingBracketIndex(s: string, open: number): number {
   return -1
 }
 
-function isStructValue(
-  value: unknown,
-): value is { _fields: Record<string, unknown> } {
-  if (value === null || typeof value !== 'object') {
-    return false
-  }
-  const fields = Reflect.get(value, '_fields')
-  return (
-    fields !== null &&
-    fields !== undefined &&
-    typeof fields === 'object' &&
-    !$.isArrayOrGoSlice(fields)
-  )
+function isStructValue(value: unknown): value is Record<string, unknown> {
+  return $.isStructObject(value)
 }
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
@@ -2807,14 +2793,12 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
   )
 }
 
-function structFields(value: {
-  _fields: Record<string, unknown>
-}): fieldMetadata[] {
+function structFields(value: Record<string, unknown>): fieldMetadata[] {
   const fields = structFieldMetadata(value)
   if (fields.length !== 0) {
     return fields
   }
-  return Object.keys(value._fields).map((key) => ({ key, name: key }))
+  return Object.keys(value).map((key) => ({ key, name: key }))
 }
 
 // anonymousStructValueFields returns the fields of an anonymous struct
