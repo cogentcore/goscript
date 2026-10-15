@@ -57,7 +57,7 @@ export async function main(): globalThis.Promise<void> {
 	{
 		let err = trace.Start($.pointerValueOrNil($.interfaceValue<io.Writer | null>(sink, "*main.byteSink", /* @__PURE__ */ $.pointerType("main.byteSink")))!)
 		if (err != null) {
-			await fmt.Println("ERROR:" + (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+			fmt.Println("ERROR:" + (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 			return
 		}
 	}
@@ -72,7 +72,7 @@ export async function main(): globalThis.Promise<void> {
 
 	trace.Stop()
 
-	await fmt.Println(toHex($.pointerValue<byteSink>(sink).data))
+	fmt.Println(toHex($.pointerValue<byteSink>(sink).data))
 }
 
 var __goscriptAwait: any
