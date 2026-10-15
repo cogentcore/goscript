@@ -32,7 +32,7 @@ export class Base {
 	}
 
 	public __goscriptAssign(source: Base): this {
-		this.App = $.assignFieldValue(this.App, source.App, { kind: $.TypeKind.Interface, methods: [] })
+		this.App = $.assignFieldValue(this.App, source.App)
 		this.flags = source.flags
 		return this
 	}

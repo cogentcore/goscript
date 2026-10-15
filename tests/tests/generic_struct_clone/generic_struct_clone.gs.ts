@@ -55,10 +55,10 @@ export class sides {
 	}
 
 	public __goscriptAssign(source: sides): this {
-		this.Top = $.assignFieldValue(this.Top, source.Top, { kind: $.TypeKind.Interface, methods: [] })
-		this.Right = $.assignFieldValue(this.Right, source.Right, { kind: $.TypeKind.Interface, methods: [] })
-		this.Bottom = $.assignFieldValue(this.Bottom, source.Bottom, { kind: $.TypeKind.Interface, methods: [] })
-		this.Left = $.assignFieldValue(this.Left, source.Left, { kind: $.TypeKind.Interface, methods: [] })
+		this.Top = $.assignFieldValue(this.Top, source.Top)
+		this.Right = $.assignFieldValue(this.Right, source.Right)
+		this.Bottom = $.assignFieldValue(this.Bottom, source.Bottom)
+		this.Left = $.assignFieldValue(this.Left, source.Left)
 		return this
 	}
 
@@ -134,8 +134,8 @@ export class pair {
 	}
 
 	public __goscriptAssign(source: pair): this {
-		this.Key = $.assignFieldValue(this.Key, source.Key, { kind: $.TypeKind.Interface, methods: [] })
-		this.Val = $.assignFieldValue(this.Val, source.Val, { kind: $.TypeKind.Interface, methods: [] })
+		this.Key = $.assignFieldValue(this.Key, source.Key)
+		this.Val = $.assignFieldValue(this.Val, source.Val)
 		return this
 	}
 

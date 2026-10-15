@@ -81,7 +81,7 @@ export class embeddedStream {
 	}
 
 	public __goscriptAssign(source: embeddedStream): this {
-		this.Stream = $.assignFieldValue(this.Stream, source.Stream, "srpc.Stream")
+		this.Stream = $.assignFieldValue(this.Stream, source.Stream)
 		return this
 	}
 
@@ -130,8 +130,8 @@ export class streamOpenResult {
 	}
 
 	public __goscriptAssign(source: streamOpenResult): this {
-		this.stream = $.assignFieldValue(this.stream, source.stream, "srpc.Stream")
-		this.err = $.assignFieldValue(this.err, source.err, "error")
+		this.stream = $.assignFieldValue(this.stream, source.stream)
+		this.err = $.assignFieldValue(this.err, source.err)
 		return this
 	}
 
@@ -228,7 +228,7 @@ export class memoryRpcStream {
 	}
 
 	public __goscriptAssign(source: memoryRpcStream): this {
-		this.ctx = $.assignFieldValue(this.ctx, source.ctx, "context.Context")
+		this.ctx = $.assignFieldValue(this.ctx, source.ctx)
 		this.cancel = source.cancel
 		this.recv = source.recv
 		this.send = source.send

@@ -96,7 +96,7 @@ export class Pointers {
 	public __goscriptAssign(source: Pointers): this {
 		this.Value = source.Value
 		this.Next = source.Next
-		this.Dynamic = $.assignFieldValue(this.Dynamic, source.Dynamic, { kind: $.TypeKind.Interface, methods: [] })
+		this.Dynamic = $.assignFieldValue(this.Dynamic, source.Dynamic)
 		return this
 	}
 
@@ -160,7 +160,7 @@ export class Base {
 
 	public __goscriptAssign(source: Base): this {
 		this.Windows = source.Windows
-		this.Active = $.assignFieldValue(this.Active, source.Active, { kind: $.TypeKind.Interface, methods: [] })
+		this.Active = $.assignFieldValue(this.Active, source.Active)
 		return this
 	}
 

@@ -29,7 +29,7 @@ export class MyReader {
 	}
 
 	public __goscriptAssign(source: MyReader): this {
-		this.Reader = $.assignFieldValue(this.Reader, source.Reader, "main.Reader")
+		this.Reader = $.assignFieldValue(this.Reader, source.Reader)
 		this.name = source.name
 		return this
 	}

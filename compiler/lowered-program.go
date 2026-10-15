@@ -143,6 +143,9 @@ type loweredStructField struct {
 	// struct and array values, which are copied, and interface and type
 	// parameter values, which may hold struct or array values.
 	plainValue bool
+	// interfaceValue reports whether the field's type is an interface or a
+	// type parameter, whose values assignFieldValue copies without a type.
+	interfaceValue bool
 }
 
 type loweredFunction struct {

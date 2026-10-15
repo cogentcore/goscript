@@ -18,7 +18,7 @@ export class holder {
 	}
 
 	public __goscriptAssign(source: holder): this {
-		this.w = $.assignFieldValue(this.w, source.w, "io.Writer")
+		this.w = $.assignFieldValue(this.w, source.w)
 		return this
 	}
 

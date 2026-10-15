@@ -53,7 +53,7 @@ export class tree {
 
 	public __goscriptAssign(source: tree): this {
 		this.less = source.less
-		this.empty = $.assignFieldValue(this.empty, source.empty, { kind: $.TypeKind.Interface, methods: [] })
+		this.empty = $.assignFieldValue(this.empty, source.empty)
 		this.count = source.count
 		return this
 	}

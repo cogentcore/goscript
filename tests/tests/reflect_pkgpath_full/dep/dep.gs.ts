@@ -57,7 +57,7 @@ export class Box {
 	}
 
 	public __goscriptAssign(source: Box): this {
-		this.Value = $.assignFieldValue(this.Value, source.Value, { kind: $.TypeKind.Interface, methods: [] })
+		this.Value = $.assignFieldValue(this.Value, source.Value)
 		return this
 	}
 

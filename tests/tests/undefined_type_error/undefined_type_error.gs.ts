@@ -91,7 +91,7 @@ export class printer {
 
 	public __goscriptAssign(source: printer): this {
 		this.buf = source.buf
-		this.arg = $.assignFieldValue(this.arg, source.arg, { kind: $.TypeKind.Interface, methods: [] })
+		this.arg = $.assignFieldValue(this.arg, source.arg)
 		this.fmt.__goscriptAssign(source.fmt)
 		return this
 	}

@@ -159,7 +159,7 @@ export class mixed {
 		this.F = source.F
 		this.OK = source.OK
 		this.Ptr = source.Ptr
-		this.Any = $.assignFieldValue(this.Any, source.Any, { kind: $.TypeKind.Interface, methods: [] })
+		this.Any = $.assignFieldValue(this.Any, source.Any)
 		this._blank5 = source._blank5
 		this.Inner.__goscriptAssign(source.Inner)
 		return this

@@ -26,7 +26,7 @@ export class Box {
 	}
 
 	public __goscriptAssign(source: Box): this {
-		this.Adder = $.assignFieldValue(this.Adder, source.Adder, "main.Adder")
+		this.Adder = $.assignFieldValue(this.Adder, source.Adder)
 		return this
 	}
 

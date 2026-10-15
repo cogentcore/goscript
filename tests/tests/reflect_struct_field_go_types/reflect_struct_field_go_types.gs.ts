@@ -51,7 +51,7 @@ export class arg {
 
 	public __goscriptAssign(source: arg): this {
 		this.Name = source.Name
-		this.Value = $.assignFieldValue(this.Value, source.Value, { kind: $.TypeKind.Interface, methods: [] })
+		this.Value = $.assignFieldValue(this.Value, source.Value)
 		this.Tag = source.Tag
 		return this
 	}

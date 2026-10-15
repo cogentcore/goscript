@@ -22,7 +22,7 @@ export class FuncContainer {
 	}
 
 	public __goscriptAssign(source: FuncContainer): this {
-		this.myFunc = $.assignFieldValue(this.myFunc, source.myFunc, { kind: $.TypeKind.Interface, methods: [] })
+		this.myFunc = $.assignFieldValue(this.myFunc, source.myFunc)
 		return this
 	}
 

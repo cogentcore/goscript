@@ -30,7 +30,7 @@ export class MyStruct {
 
 	public __goscriptAssign(source: MyStruct): this {
 		this.PointerField = source.PointerField
-		this.interfaceField = $.assignFieldValue(this.interfaceField, source.interfaceField, "main.MyInterface")
+		this.interfaceField = $.assignFieldValue(this.interfaceField, source.interfaceField)
 		return this
 	}
 

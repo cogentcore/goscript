@@ -65,8 +65,8 @@ export class Frame {
 	}
 
 	public __goscriptAssign(source: Frame): this {
-		this.Frame = $.assignFieldValue(this.Frame, source.Frame, "main.wireFrame")
-		this.Handler = $.assignFieldValue(this.Handler, source.Handler, "main.FrameHandler")
+		this.Frame = $.assignFieldValue(this.Frame, source.Frame)
+		this.Handler = $.assignFieldValue(this.Handler, source.Handler)
 		return this
 	}
 

@@ -54,7 +54,7 @@ export class Holder {
 	}
 
 	public __goscriptAssign(source: Holder): this {
-		this.Hidden = $.assignFieldValue(this.Hidden, source.Hidden, "dep.hidden")
+		this.Hidden = $.assignFieldValue(this.Hidden, source.Hidden)
 		return this
 	}
 

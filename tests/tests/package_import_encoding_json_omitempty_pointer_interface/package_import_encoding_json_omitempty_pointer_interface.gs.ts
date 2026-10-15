@@ -41,11 +41,11 @@ export class Payload {
 
 	public __goscriptAssign(source: Payload): this {
 		this.Ptr = source.Ptr
-		this.IfaceZero = $.assignFieldValue(this.IfaceZero, source.IfaceZero, { kind: $.TypeKind.Interface, methods: [] })
-		this.IfaceFalse = $.assignFieldValue(this.IfaceFalse, source.IfaceFalse, { kind: $.TypeKind.Interface, methods: [] })
-		this.IfaceEmptyString = $.assignFieldValue(this.IfaceEmptyString, source.IfaceEmptyString, { kind: $.TypeKind.Interface, methods: [] })
-		this.IfaceEmptySlice = $.assignFieldValue(this.IfaceEmptySlice, source.IfaceEmptySlice, { kind: $.TypeKind.Interface, methods: [] })
-		this.IfaceEmptyMap = $.assignFieldValue(this.IfaceEmptyMap, source.IfaceEmptyMap, { kind: $.TypeKind.Interface, methods: [] })
+		this.IfaceZero = $.assignFieldValue(this.IfaceZero, source.IfaceZero)
+		this.IfaceFalse = $.assignFieldValue(this.IfaceFalse, source.IfaceFalse)
+		this.IfaceEmptyString = $.assignFieldValue(this.IfaceEmptyString, source.IfaceEmptyString)
+		this.IfaceEmptySlice = $.assignFieldValue(this.IfaceEmptySlice, source.IfaceEmptySlice)
+		this.IfaceEmptyMap = $.assignFieldValue(this.IfaceEmptyMap, source.IfaceEmptyMap)
 		this.PtrNilIface = source.PtrNilIface
 		this.PtrBool = source.PtrBool
 		return this

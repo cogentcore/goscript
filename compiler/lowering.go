@@ -3612,6 +3612,7 @@ func (o *LoweringOwner) lowerStructType(ctx lowerFileContext, semType *semanticT
 			arrayValue:     isArrayType(field.typ),
 			typeParamValue: typeParamMayHoldValueType(field.typ),
 			plainValue:     isPlainAssignType(field.typ),
+			interfaceValue: types.IsInterface(field.typ),
 		})
 	}
 
