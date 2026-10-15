@@ -179,6 +179,7 @@ const (
 	RuntimeHelperTypeSwitch                     RuntimeHelper = "type.typeSwitch"
 	RuntimeHelperTypedNil                       RuntimeHelper = "type.typedNil"
 	RuntimeHelperInterfaceValue                 RuntimeHelper = "type.interfaceValue"
+	RuntimeHelperGenericInterfaceValue          RuntimeHelper = "type.genericInterfaceValue"
 	RuntimeHelperBasicInterfaceValue            RuntimeHelper = "type.basicInterfaceValue"
 	RuntimeHelperNamedValueInterfaceValue       RuntimeHelper = "type.namedValueInterfaceValue"
 	RuntimeHelperTypeParamInterfaceValue        RuntimeHelper = "type.typeParamInterfaceValue"
@@ -465,6 +466,7 @@ func runtimeHelperContracts() []RuntimeHelperContract {
 		runtimeHelper(RuntimeHelperTypeSwitch, "typeSwitch", RuntimeHelperCategoryType),
 		runtimeHelper(RuntimeHelperTypedNil, "typedNil", RuntimeHelperCategoryType),
 		runtimeHelper(RuntimeHelperInterfaceValue, "interfaceValue", RuntimeHelperCategoryType),
+		runtimeHelper(RuntimeHelperGenericInterfaceValue, "genericInterfaceValue", RuntimeHelperCategoryType),
 		runtimeHelper(RuntimeHelperBasicInterfaceValue, "basicInterfaceValue", RuntimeHelperCategoryType),
 		runtimeHelper(RuntimeHelperNamedValueInterfaceValue, "namedValueInterfaceValue", RuntimeHelperCategoryType),
 		runtimeHelper(RuntimeHelperTypeParamInterfaceValue, "typeParamInterfaceValue", RuntimeHelperCategoryType),
