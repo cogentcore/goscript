@@ -11214,6 +11214,19 @@ func (o *LoweringOwner) lowerConversionExpr(
 		return grouped, diagnostics
 	}
 
+	// A 64-bit integer converted to a narrower integer, as uint32(f.Int64()),
+	// keeps the low bits of its bigint.
+	if isBigIntBackedType(sourceType) {
+		if bits, ok := unsignedIntegerBits(targetType); ok && bits < 64 {
+			return o.runtimeOwner.QualifiedHelper(RuntimeHelperUintFromWide) +
+				"(" + value + ", " + strconv.Itoa(bits) + ")", diagnostics
+		}
+		if bits, ok := signedIntegerBits(targetType); ok && bits < 64 {
+			return o.runtimeOwner.QualifiedHelper(RuntimeHelperIntFromWide) +
+				"(" + value + ", " + strconv.Itoa(bits) + ")", diagnostics
+		}
+	}
+
 	// Numeric conversions round to the target representation.
 	if isNumericType(targetType) {
 		if isFloatType(targetType) {

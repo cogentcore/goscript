@@ -642,6 +642,24 @@ export function int(value: number | bigint | string, bits = 0): number {
   return Math.trunc(value)
 }
 
+// intFromWide converts an int64 or uint64 to a signed integer of fewer bits,
+// as int32(x) does.
+export function intFromWide(value: number | bigint, bits: number): number {
+  // A bigint keeps its low bits, and a number converts as int does.
+  return typeof value === 'bigint' ?
+      Number(BigInt.asIntN(bits, value))
+    : int(value, bits)
+}
+
+// uintFromWide converts an int64 or uint64 to an unsigned integer of fewer
+// bits, as uint32(x) does.
+export function uintFromWide(value: number | bigint, bits: number): number {
+  // A bigint keeps its low bits, and a number converts as uint does.
+  return typeof value === 'bigint' ?
+      Number(BigInt.asUintN(bits, value))
+    : uint(value, bits)
+}
+
 // uint converts a value to an unsigned Go integer width.
 export function uint(value: number | bigint | string, bits?: number): number
 export function uint(

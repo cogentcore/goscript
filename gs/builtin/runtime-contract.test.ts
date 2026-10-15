@@ -42,6 +42,7 @@ import {
   int64Or,
   int64AndNot,
   interfaceValue,
+  intFromWide,
   comparableEqual,
   len,
   makeSlice,
@@ -75,6 +76,7 @@ import {
   typedNil,
   uint,
   uint64Add,
+  uintFromWide,
   uint64And,
   uint64AndNot,
   uint64Div,
@@ -219,6 +221,12 @@ describe('builtin runtime contract helpers', () => {
     expect(uint(42, 64)).toBe(42)
     expect(uint(-1n, 8)).toBe(255)
     expect(byte(257)).toBe(1)
+    // A 64-bit integer narrows to its low bits, as a bigint or a number.
+    expect(uintFromWide(0x8000000180008081n, 16)).toBe(0x8081)
+    expect(uintFromWide(-1n, 32)).toBe(0xffffffff)
+    expect(intFromWide(0x8000000180008081n, 8)).toBe(-127)
+    expect(intFromWide(0xffffffffn, 32)).toBe(-1)
+    expect(uintFromWide(-1, 8)).toBe(255)
     expect(uint(uint64Shl(1n, 63), 32)).toBe(0)
     expect(uint(uint64Shr(uint64Shl(1n, 63), 60), 32)).toBe(8)
     expect(uint(uint64Mul(0xffffffffffffffffn, 3), 32)).toBe(0xfffffffd)

@@ -24,6 +24,10 @@ func main() {
 	var u uint64 = 0xFFFFFFFFFFFFFFFF
 	println("int64 of max uint64:", int64(u))
 
+	// A uint64 narrows to the low bits of each width.
+	var w uint64 = 0x8000000180008081
+	println("narrow uint64:", int8(w), uint16(w), int32(w), uint32(w))
+
 	// Arithmetic narrower than 64 bits wraps to its own width before a
 	// widening conversion.
 	println("gid H:", lookup('H', 65507))
