@@ -320,7 +320,7 @@ export class App {
 
 	constructor(init?: Partial<{Base?: Base, Name?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
-			Base: init?.Base ? $.markAsStructValue($.cloneStructValue(init.Base)) : $.markAsStructValue(new Base({Active: null! as Win | $.VarRef<Win> | null})),
+			Base: init?.Base ? init.Base.clone() : $.markAsStructValue(new Base({Active: null! as Win | $.VarRef<Win> | null})),
 			Name: init?.Name ?? ("" as string)
 		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true

@@ -111,14 +111,14 @@ export class Sides {
 				case $.typeAssert<Sides>(__goscriptTypeSwitchValue, "main.Sides").ok:
 					{
 						let val: Sides = $.markAsStructValue($.cloneStructValue($.typeAssert<Sides>(__goscriptTypeSwitchValue, "main.Sides").value))
-						$.assignStruct((s$ as Sides), $.markAsStructValue($.cloneStructValue(val)))
+						$.assignStruct((s$ as Sides), (val).clone())
 						return "Sides[T]"
 					}
 					break
 				case $.typeAssert<Sides | $.VarRef<Sides> | null>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.pointerType("main.Sides")).ok:
 					{
 						let val: Sides | $.VarRef<Sides> | null = $.typeAssert<Sides | $.VarRef<Sides> | null>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.pointerType("main.Sides")).value
-						$.assignStruct((s$ as Sides), $.markAsStructValue($.cloneStructValue($.pointerValue<Sides>(val))))
+						$.assignStruct((s$ as Sides), ($.pointerValue<Sides>(val)).clone())
 						return "*Sides[T]"
 					}
 					break

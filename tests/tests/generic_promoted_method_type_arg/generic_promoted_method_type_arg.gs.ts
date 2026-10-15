@@ -140,7 +140,7 @@ export class Window {
 
 	constructor(init?: Partial<{Base?: Base, Title?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
-			Base: init?.Base ? $.markAsStructValue($.cloneStructValue(init.Base)) : $.markAsStructValue(new Base({App: null! as App | $.VarRef<App> | null})),
+			Base: init?.Base ? init.Base.clone() : $.markAsStructValue(new Base({App: null! as App | $.VarRef<App> | null})),
 			Title: init?.Title ?? ("" as string)
 		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
@@ -198,7 +198,7 @@ export class Single {
 
 	constructor(init?: Partial<{Base?: Base, Count?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
-			Base: init?.Base ? $.markAsStructValue($.cloneStructValue(init.Base)) : $.markAsStructValue(new Base({App: null})),
+			Base: init?.Base ? init.Base.clone() : $.markAsStructValue(new Base({App: null})),
 			Count: init?.Count ?? (0 as number)
 		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true

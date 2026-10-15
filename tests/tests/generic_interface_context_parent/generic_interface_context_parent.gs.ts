@@ -154,7 +154,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 	await $.println("resolve ok")
 	let g = $.markAsStructValue(new genericValue({value: 7}))
-	let reader: ValueReader | null = $.namedValueInterfaceValue<ValueReader | null>($.markAsStructValue($.cloneStructValue(g)), "main.genericValue", __goscriptStatic4(), __goscriptStatic5(), __goscriptStatic6())
+	let reader: ValueReader | null = $.namedValueInterfaceValue<ValueReader | null>((g).clone(), "main.genericValue", __goscriptStatic4(), __goscriptStatic5(), __goscriptStatic6())
 	g.value = 9
 	if ((__goscriptAwait = (reader !== null && (reader as any).__isVarRef !== true && (reader as any).__goValue === undefined ? (reader as Exclude<ValueReader, null>) : $.pointerValue<Exclude<ValueReader, null>>(reader)).Get(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) != 7) {
 		await $.println("value copy failed")
