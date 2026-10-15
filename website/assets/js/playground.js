@@ -84,7 +84,7 @@ async function shareCode() {
 
   try {
     await navigator.clipboard.writeText(window.location.href)
-    outputBody.textContent = 'Link copied to clipboard!'
+    outputBody.textContent = 'Copied the link.'
     outputBody.className = 'panel-body output-panel'
   } catch (err) {
     // Fallback for browsers that don't support clipboard API
@@ -121,8 +121,8 @@ function initMonaco() {
     inherit: true,
     rules: [],
     colors: {
-      'editor.background': '#111111',
-      'editor.lineHighlightBackground': '#111111',
+      'editor.background': '#0c0b0b',
+      'editor.lineHighlightBackground': '#151313',
     },
   })
 
@@ -148,7 +148,7 @@ function initMonaco() {
 // Initialize GoScript WASM compiler
 async function initGoscript() {
   if (compilerStatus) {
-    compilerStatus.textContent = 'Loading GoScript compiler...'
+    compilerStatus.textContent = 'Loading the GoScript compiler'
   }
 
   try {
@@ -159,7 +159,7 @@ async function initGoscript() {
     console.error('Failed to initialize GoScript WASM compiler:', err)
     if (compilerStatus) {
       compilerStatus.textContent = 'GoScript compiler failed to load'
-      compilerStatus.style.color = '#ff5f56'
+      compilerStatus.style.color = 'var(--error)'
     }
   }
 }
@@ -190,11 +190,11 @@ function updateButtonStates() {
   }
   if (compilerStatus) {
     if (goscriptReady && esbuildReady) {
-      compilerStatus.style.display = 'none'
+      compilerStatus.hidden = true
     } else if (goscriptReady) {
-      compilerStatus.textContent = 'Loading TypeScript runner...'
+      compilerStatus.textContent = 'Loading the TypeScript runner'
     } else if (esbuildReady) {
-      compilerStatus.textContent = 'Loading GoScript compiler...'
+      compilerStatus.textContent = 'Loading the GoScript compiler'
     }
   }
 }
@@ -266,7 +266,7 @@ function populateExamples() {
   // Add placeholder
   const placeholder = document.createElement('option')
   placeholder.value = ''
-  placeholder.textContent = 'Select an example...'
+  placeholder.textContent = 'Load an example'
   exampleSelect.appendChild(placeholder)
   // Add examples
   for (const example of examples) {

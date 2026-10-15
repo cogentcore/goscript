@@ -75,8 +75,8 @@ function initMonaco() {
     inherit: true,
     rules: [],
     colors: {
-      'editor.background': '#111111',
-      'editor.lineHighlightBackground': '#111111',
+      'editor.background': '#0c0b0b',
+      'editor.lineHighlightBackground': '#151313',
     },
   })
 
@@ -128,7 +128,7 @@ async function initEsbuild() {
     console.error('Failed to initialize esbuild-wasm:', err)
     if (compilerStatusText) {
       compilerStatusText.textContent = 'Failed to load compiler: ' + err.message
-      compilerStatusText.style.color = '#ff5f56'
+      compilerStatusText.style.color = 'var(--error)'
     }
   }
 }
@@ -136,7 +136,7 @@ async function initEsbuild() {
 function updateCompilerStatus() {
   if (goscriptReady && esbuildReady) {
     if (compilerStatus) {
-      compilerStatus.style.display = 'none'
+      compilerStatus.hidden = true
     }
     if (compileBtn) {
       compileBtn.disabled = !currentTest?.goCode
@@ -149,15 +149,15 @@ function updateCompilerStatus() {
     }
   } else if (goscriptReady) {
     if (compilerStatusText) {
-      compilerStatusText.textContent = 'Loading TypeScript runner...'
+      compilerStatusText.textContent = 'Loading the TypeScript runner'
     }
   } else if (esbuildReady) {
     if (compilerStatusText) {
-      compilerStatusText.textContent = 'Loading GoScript compiler...'
+      compilerStatusText.textContent = 'Loading the GoScript compiler'
     }
   } else {
     if (compilerStatusText) {
-      compilerStatusText.textContent = 'Loading compilers...'
+      compilerStatusText.textContent = 'Loading the compilers'
     }
   }
 }
@@ -199,15 +199,15 @@ async function init() {
 function getStatusIcon(status) {
   switch (status) {
     case 'passed':
-      return '<span style="color: #27c93f; margin-right: 0.5rem;">✓</span>'
+      return '<span class="test-icon passed">✓</span>'
     case 'failed':
-      return '<span style="color: #ff5f56; margin-right: 0.5rem;">✗</span>'
+      return '<span class="test-icon failed">✗</span>'
     case 'skipped':
-      return '<span style="color: var(--color-text-muted); margin-right: 0.5rem;">○</span>'
+      return '<span class="test-icon">○</span>'
     case 'running':
-      return '<span style="color: var(--color-go); margin-right: 0.5rem;">⋯</span>'
+      return '<span class="test-icon running">⋯</span>'
     default:
-      return '<span style="margin-right: 0.5rem; opacity: 0.3;">·</span>'
+      return '<span class="test-icon idle">·</span>'
   }
 }
 
@@ -259,7 +259,7 @@ function updateStats() {
 
   // Show stats bar if we have any results
   if (passed + failed + skipped > 0) {
-    statsBar.style.display = 'block'
+    statsBar.hidden = false
   }
 }
 
@@ -283,7 +283,7 @@ function selectTest(test) {
   // Update detail panel
   testName.textContent = test.name
   expectedOutput.textContent = test.expectedOutput || '(no output)'
-  actualOutput.textContent = 'Click "Run" to execute'
+  actualOutput.textContent = 'Run the test to see its output.'
   actualOutput.style.color = ''
 
   // Update Monaco editors
@@ -328,11 +328,11 @@ compileBtn.addEventListener('click', async () => {
     // Update the test's tsCode in memory so Run works
     currentTest.tsCode = tsCode
     runBtn.disabled = false
-    actualOutput.textContent = 'Compiled successfully!'
-    actualOutput.style.color = '#27c93f'
+    actualOutput.textContent = 'Compiled.'
+    actualOutput.style.color = 'var(--success)'
   } catch (err) {
     actualOutput.textContent = `Compile Error: ${err.message}`
-    actualOutput.style.color = '#ff5f56'
+    actualOutput.style.color = 'var(--error)'
   }
 })
 
@@ -351,17 +351,17 @@ runBtn.addEventListener('click', async () => {
     const actual = (output || '').trim()
 
     if (expected === actual) {
-      actualOutput.style.color = '#27c93f'
+      actualOutput.style.color = 'var(--success)'
       testResults.set(currentTest.name, 'passed')
     } else {
-      actualOutput.style.color = '#ff5f56'
+      actualOutput.style.color = 'var(--error)'
       testResults.set(currentTest.name, 'failed')
     }
     updateTestItem(currentTest.name)
     updateStats()
   } catch (err) {
     actualOutput.textContent = `Error: ${err.message}`
-    actualOutput.style.color = '#ff5f56'
+    actualOutput.style.color = 'var(--error)'
     testResults.set(currentTest.name, 'failed')
     updateTestItem(currentTest.name)
     updateStats()
@@ -375,10 +375,10 @@ runAllBtn.addEventListener('click', async () => {
   shouldStop = false
 
   // UI updates
-  runAllBtn.style.display = 'none'
-  stopBtn.style.display = 'block'
-  progressBar.style.display = 'block'
-  statsBar.style.display = 'block'
+  runAllBtn.hidden = true
+  stopBtn.hidden = false
+  progressBar.hidden = false
+  statsBar.hidden = false
 
   // Clear previous results
   testResults.clear()
@@ -439,8 +439,8 @@ runAllBtn.addEventListener('click', async () => {
 
   isRunning = false
   shouldStop = false
-  runAllBtn.style.display = 'block'
-  stopBtn.style.display = 'none'
+  runAllBtn.hidden = false
+  stopBtn.hidden = true
 })
 
 stopBtn.addEventListener('click', () => {

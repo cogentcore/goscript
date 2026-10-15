@@ -16,15 +16,60 @@
 
 </div>
 
-GoScript compiles Go packages into readable TypeScript modules. Goroutines,
-channels, `select`, `defer`, pointers, and struct copies behave as they do in
-Go, and the output is ordinary TypeScript you can import, bundle, and step
-through in a debugger.
+GoScript compiles Go packages into readable TypeScript modules. Write your
+program in Go, with its standard library, its package ecosystem, and its
+concurrency, and run it in any web browser, in Node, or in Bun.
+Goroutines, channels, `select`, `defer`, pointers, and struct copies behave as
+they do in Go, and the output is ordinary TypeScript you can import, bundle,
+and step through in a debugger.
 
 ```bash
 go install github.com/s4wave/goscript/cmd/goscript@latest
 goscript compile --package . --output ./output
 ```
+
+## Why GoScript
+
+Go gives you a strong standard library, a large ecosystem of packages, simple
+modules, and concurrency built into the language. GoScript brings all of it to
+the browser without a WebAssembly runtime. The compiled program is plain
+TypeScript, a fraction of the size of the same program built for WebAssembly:
+
+| Program                              | GoScript | Go WebAssembly | Smaller by |
+| ------------------------------------ | -------: | -------------: | ---------: |
+| Hello world with `fmt`               |    47 KB |         543 KB |        12x |
+| `encoding/json`, `sort`, `strings`   |    71 KB |         904 KB |        13x |
+| Spacewave browser core, with go-git  |   3.7 MB |        14.4 MB |         4x |
+
+Sizes are Brotli-compressed. The GoScript output is bundled with Bun and
+minified with oxc. The WebAssembly builds use Go 1.27.1 with
+`-trimpath -ldflags='-s -w'` and exclude the 17 KB `wasm_exec.js` loader.
+
+Blocking Go code meets JavaScript through standard `async` and `await`. A Go
+function that can block compiles to an `async` function, so TypeScript calls it
+with `await`, and a `js.FuncOf` callback that blocks returns a Promise to its
+JavaScript caller. Goroutines run as async tasks on the event loop, beside the
+rest of the page.
+
+Generated code also runs on the engine's own garbage collector and JIT. Go
+values are ordinary JavaScript objects, so the engine optimizes the hot paths
+and collects what the program drops. A Go WebAssembly program runs its own
+collector inside linear memory, which can grow but never shrinks, so the page
+keeps its peak heap until it reloads.
+
+Use GoScript when Go is the source of truth and part of your product runs in a
+TypeScript runtime: shared validation and business rules, TypeScript packages
+published from Go code, or a Go application running in the browser without a
+rewrite.
+
+GoScript is built against [Spacewave](https://github.com/s4wave/spacewave), a
+large Go and TypeScript application framework. Spacewave compiles its browser
+core through GoScript, including go-git and the go-mysql-server SQL engine, and
+runs its core package tests through `goscript test` in CI.
+
+[GopherJS](https://github.com/gopherjs/gopherjs) shares the goal of running Go
+in JavaScript and ships its own goroutine scheduler. GoScript emits readable
+TypeScript modules and maps goroutines onto JavaScript async functions.
 
 ## Install
 
@@ -171,7 +216,8 @@ ts, err := wasm.CompileSource(src, "main")
 - **Third-party packages:** go-git, klauspost/compress, blake3, protobuf-go-lite, and more.
 - **Go tests:** `goscript test` runs your Go tests on the output in Bun or Chromium.
 - **Large programs:** GoScript compiles Spacewave's browser core, including go-git.
-- **In the browser:** the compiler runs in the page through WebAssembly.
+- **Async interop:** blocking Go functions compile to `async` functions that TypeScript awaits.
+- **In the browser:** the compiler itself runs in the page through WebAssembly.
 
 ## How It Works
 
@@ -196,38 +242,20 @@ generated output for structs, pointers, channels, and `defer`.
 
 ## Limitations
 
-- The CLI and APIs take package patterns, not individual `.go` files.
-- Browser compilation accepts single files without imports. Compile code with
-  imports through the CLI or API.
-- `unsafe` type-checks, but `Sizeof`, `Alignof`, `Offsetof`, and pointer
-  conversions throw at runtime. Pointer arithmetic and cgo are unsupported.
-- `int`, `uint`, and integers narrower than 64 bits are JavaScript numbers.
-  `uint` and `uintptr` keep full 64-bit width, but `int` does not wrap on
-  64-bit overflow.
-- A standard-library package works when GoScript ships an override for it or
-  it compiles cleanly from Go. Sockets, processes, and plugin loading work only
-  as far as the JavaScript host supports them.
-- `reflect` covers types, values, struct fields, maps, `MakeFunc`, `FuncOf`,
-  and `DeepEqual`, but not all of the package.
-- `goscript test` supports a subset of `testing` and of the `go test` flags.
-- Async calls and `bigint` arithmetic cost more than synchronous JavaScript on
-  plain numbers.
+GoScript compiles most Go code as written. These are the known gaps:
 
-## Why GoScript
+- **Inputs:** the CLI and APIs take package patterns, not individual `.go` files.
+- **Browser compiler:** compiles a single file without imports. Use the CLI for real packages.
+- **`unsafe` and cgo:** cgo is unsupported, and `unsafe.Sizeof` and pointer conversions throw.
+- **`int`:** a JavaScript number. It loses precision past 2^53 and does not wrap at 64 bits.
+- **Standard library:** a package works when GoScript overrides it or it compiles from Go source.
+- **Host APIs:** sockets, processes, and plugins work only as far as the JavaScript host allows.
+- **`reflect`:** covers types, values, struct fields, maps, `MakeFunc`, and `DeepEqual`, not all.
+- **`goscript test`:** supports a subset of `testing` and of the `go test` flags.
+- **Speed:** async calls and `bigint` math cost more than synchronous code on plain numbers.
 
-Use GoScript when Go is the source of truth and part of your product runs in a
-TypeScript runtime: shared validation and business rules, TypeScript packages
-published from Go code, or Go framework code running in the browser without a
-rewrite.
-
-GoScript is built against [Spacewave](https://github.com/s4wave/spacewave), a
-large Go and TypeScript application framework. Spacewave compiles its browser
-core plugin through GoScript, including go-git and the go-mysql-server SQL
-engine, and runs its core package tests through `goscript test` in CI.
-
-[GopherJS](https://github.com/gopherjs/gopherjs) shares the goal of running Go
-in JavaScript and ships its own goroutine scheduler. GoScript emits readable
-TypeScript modules and maps goroutines onto JavaScript async functions.
+Use `int64` or `uint64` where a value needs exact 64-bit arithmetic: both
+compile to `bigint` and wrap as in Go.
 
 ## Development
 

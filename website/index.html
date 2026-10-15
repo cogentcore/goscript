@@ -4,282 +4,455 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="darkreader-lock" />
-    <title>GoScript - Go packages as TypeScript</title>
+    <title>GoScript: Go to TypeScript compiler</title>
     <meta
       name="description"
-      content="GoScript compiles real Go packages into readable TypeScript for Bun, browsers, and modern bundlers."
+      content="GoScript compiles Go packages into readable TypeScript. Run Go, with its standard library, packages, and goroutines, in any web browser at a fraction of the size of WebAssembly."
+    />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link
+      rel="preload"
+      href="/fonts/jost-latin-wght-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/fonts/manrope-latin-wght-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
     />
     <link rel="stylesheet" href="assets/css/style.css" />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/atom-one-dark.min.css"
-    />
-    <link
-      rel="icon"
-      type="image/svg+xml"
-      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔄</text></svg>"
-    />
   </head>
   <body>
     <header class="header">
-      <div class="container">
-        <div class="header-content">
-          <div class="logo">
-            <svg
-              class="logo-icon"
-              viewBox="0 0 100 100"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M50 5 L95 25 L95 75 L50 95 L5 75 L5 25 Z"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="8"
-              />
-              <text
-                x="50"
-                y="65"
-                font-size="40"
-                text-anchor="middle"
-                fill="currentColor"
-                font-family="sans-serif"
-                font-weight="bold"
-              >
-                GS
-              </text>
-            </svg>
-            <span>GoScript</span>
-          </div>
-          <nav class="nav">
-            <a href="playground/" class="nav-link bracket">Playground</a>
-            <a href="tests/" class="nav-link bracket">Tests</a>
-            <a
-              href="https://github.com/s4wave/goscript"
-              class="nav-link bracket"
-              target="_blank"
-              rel="noopener"
-              >GitHub</a
-            >
-          </nav>
-        </div>
+      <div class="container header-content">
+        <a href="./" class="lockup" aria-label="GoScript home">
+          <svg class="logo-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M12 2.5 20.5 7.25v9.5L12 21.5l-8.5-4.75v-9.5Z"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linejoin="round"
+            />
+            <path
+              d="m9.5 9-3 3 3 3m5-6 3 3-3 3"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          GoScript
+        </a>
+        <nav class="nav" aria-label="Site">
+          <a href="playground/" class="nav-link">Playground</a>
+          <a href="tests/" class="nav-link wide">Tests</a>
+          <a
+            href="https://github.com/s4wave/goscript/tree/master/docs"
+            class="nav-link wide"
+            >Docs</a
+          >
+          <a href="https://github.com/s4wave/goscript" class="nav-link"
+            >GitHub</a
+          >
+        </nav>
       </div>
     </header>
 
     <main>
       <section class="hero">
         <div class="container">
-          <h2>Run Go packages in TypeScript</h2>
-          <p class="hero-description">
-            GoScript compiles real Go packages into readable TypeScript, so
-            your Go algorithms, data structures, and selected runtime code can
-            run in Bun, browsers, plugins, and modern app builds without a
-            handwritten port.
-          </p>
-          <div class="hero-actions">
-            <a href="playground/" class="btn btn-primary">Playground</a>
-            <a
-              href="https://github.com/s4wave/goscript"
-              class="btn btn-secondary"
-              target="_blank"
-              rel="noopener"
-              >Source</a
-            >
-          </div>
-        </div>
-      </section>
-
-      <section class="demo">
-        <div class="container">
-          <div class="terminal-window">
-            <div class="terminal-header">
-              <div class="terminal-dot"></div>
-              <div class="terminal-dot"></div>
-              <div class="terminal-dot"></div>
-              <span class="terminal-title">goscript-demo</span>
-            </div>
-            <div class="code-comparison">
-              <div class="code-panel">
-                <div class="panel-label">
-                  <span>Input</span>
-                  <span>main.go</span>
-                </div>
-                <div class="code-content">
-                  <pre><code class="language-go">package main
-
-func send(ch chan string) {
-    ch &lt;- "ready"
-}
-
-func main() {
-    ch := make(chan string, 1)
-    go send(ch)
-
-    msg := &lt;-ch
-    println("received:", msg)
-}</code></pre>
-                </div>
-              </div>
-              <div class="comparison-divider"></div>
-              <div class="code-panel">
-                <div class="panel-label">
-                  <span>Output</span>
-                  <span>main.ts</span>
-                </div>
-                <div class="code-content">
-                  <pre><code class="language-typescript">import * as $ from "@goscript/builtin/index.js"
-
-export async function send(
-  ch: $.Channel&lt;string&gt; | null
-): globalThis.Promise&lt;void&gt; {
-  await $.chanSend(ch, "ready")
-}
-
-export async function main(): globalThis.Promise&lt;void&gt; {
-  let ch = $.makeChannel&lt;string&gt;(1, "", "both")
-  queueMicrotask(async () =&gt; { await send(ch) })
-
-  let msg = await $.chanRecv(ch)
-  $.println("received:", msg)
-}</code></pre>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="features">
-        <div class="container">
-          <h3 class="section-title">Built for real Go code</h3>
-          <div class="features-grid">
-            <div class="feature-card">
-              <div class="feature-icon">🎯</div>
-              <h4>One source of truth</h4>
-              <p>
-                Keep core logic in Go and publish generated TypeScript packages
-                for frontends, plugins, browser demos, and Bun-based tooling.
+          <div class="hero-grid">
+            <div class="rise">
+              <p class="label">Go to TypeScript compiler</p>
+              <h1><span>Write it in Go.</span><span>Run it anywhere.</span></h1>
+              <p class="lede">
+                GoScript compiles Go packages into readable TypeScript. Bring
+                the standard library, your favorite packages, and goroutines to
+                any web browser, Node, or Bun, without shipping a WebAssembly
+                runtime.
               </p>
-            </div>
-            <div class="feature-card">
-              <div class="feature-icon">✅</div>
-              <h4>Complex Go semantics</h4>
-              <p>
-                Structs, interfaces, methods, generics, channels, goroutines,
-                select, defer, pointers, slices, maps, closures, package
-                initialization, and async call propagation.
-              </p>
-            </div>
-            <div class="feature-card">
-              <div class="feature-icon">🌊</div>
-              <h4>Spacewave dogfooding</h4>
-              <p>
-                Optimized against
-                <a
-                  href="https://github.com/s4wave/spacewave"
-                  target="_blank"
-                  rel="noopener"
-                  >Spacewave</a
-                >, a large Go and TypeScript app framework with database, sync,
-                plugin, and browser-runtime workloads.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="install-section">
-        <div class="container install-container">
-          <h3 class="section-title">Install</h3>
-
-          <div class="install-tabs" data-component="tabs">
-            <div class="tab-list" role="tablist">
-              <button
-                class="tab active"
-                data-tab="go"
-                role="tab"
-                aria-selected="true"
-              >
-                go
-              </button>
-              <button
-                class="tab"
-                data-tab="npm"
-                role="tab"
-                aria-selected="false"
-              >
-                npm
-              </button>
-              <button
-                class="tab"
-                data-tab="npx"
-                role="tab"
-                aria-selected="false"
-              >
-                npx
-              </button>
-              <button
-                class="tab"
-                data-tab="bunx"
-                role="tab"
-                aria-selected="false"
-              >
-                bunx
-              </button>
-            </div>
-            <div class="tab-panels">
-              <div class="tab-panel active" data-panel="go">
-                <button
-                  class="command"
-                  data-copy="go install github.com/s4wave/goscript/cmd/goscript@latest"
-                >
-                  <span class="command-text"
-                    >go install
-                    github.com/s4wave/goscript/cmd/goscript@latest</span
+              <div class="actions">
+                <a href="playground/" class="btn btn-primary btn-lg">
+                  Open the playground
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
                   >
-                  <span class="copy-icon"></span>
-                </button>
+                    <path d="M5 12h14" />
+                    <path d="m12 5 7 7-7 7" />
+                  </svg>
+                </a>
+                <a href="#install" class="btn btn-lg">Install</a>
               </div>
-              <div class="tab-panel" data-panel="npm">
-                <button class="command" data-copy="npm install -g goscript">
-                  <span class="command-text">npm install -g goscript</span>
-                  <span class="copy-icon"></span>
-                </button>
+            </div>
+
+            <figure
+              class="hero-figure rise rise-2"
+              aria-label="Go source and the TypeScript GoScript generates from it"
+            >
+              <div class="code">
+                <div class="code-header">
+                  <i></i><i></i><i></i><span>main.go</span>
+                </div>
+                <pre><span class="k">package</span> main
+
+<span class="k">import</span> <span class="s">"fmt"</span>
+
+<span class="k">func</span> main() {
+	ch := <span class="k">make</span>(<span class="k">chan</span> string)
+	<span class="k">go func</span>() { ch &lt;- <span class="s">"Hello from a goroutine"</span> }()
+	fmt.Println(&lt;-ch)
+}</pre>
               </div>
-              <div class="tab-panel" data-panel="npx">
-                <button class="command" data-copy="npx goscript">
-                  <span class="command-text">npx goscript</span>
-                  <span class="copy-icon"></span>
-                </button>
+              <div class="code">
+                <div class="code-header">
+                  <i></i><i></i><i></i><span>main.gs.ts</span>
+                </div>
+                <pre><span class="k">export async function</span> main(): globalThis.Promise&lt;void&gt; {
+	<span class="k">let</span> ch: $.Channel&lt;string&gt; | null = $.makeChannel&lt;string&gt;(0, <span class="s">""</span>, <span class="s">"both"</span>)
+	queueMicrotask(<span class="k">async</span> () =&gt; { <span class="k">await</span> (<span class="k">async</span> (): globalThis.Promise&lt;void&gt; =&gt; {
+		<span class="k">await</span> $.chanSend(ch, <span class="s">"Hello from a goroutine"</span>)
+	})() })
+	<span class="k">await</span> fmt.Println(<span class="k">await</span> $.chanRecv(ch))
+}</pre>
               </div>
-              <div class="tab-panel" data-panel="bunx">
-                <button class="command" data-copy="bunx goscript">
-                  <span class="command-text">bunx goscript</span>
-                  <span class="copy-icon"></span>
-                </button>
+            </figure>
+          </div>
+
+          <div class="hero-foot">
+            <p>
+              <strong>12x smaller</strong> than Go WebAssembly for hello world
+            </p>
+            <p><strong>async and await</strong> at every blocking call</p>
+            <p><strong>No runtime</strong> beyond a small TypeScript library</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="why">
+        <div class="container">
+          <div class="section-head">
+            <p class="label">Why Go</p>
+            <h2>Everything Go gives you, in the browser</h2>
+            <p>
+              Write the code once in Go and keep the tools that make Go
+              pleasant. GoScript compiles the program you already have, so its
+              packages, tests, and concurrency come with it.
+            </p>
+          </div>
+          <div class="grid">
+            <div class="card">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M12 7v14" />
+                <path
+                  d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"
+                />
+              </svg>
+              <h3>Standard library</h3>
+              <p>
+                <code>fmt</code>, <code>strings</code>, <code>sync</code>,
+                <code>time</code>, <code>encoding/json</code>, and
+                <code>crypto</code> compile with your code.
+              </p>
+            </div>
+            <div class="card">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path
+                  d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"
+                />
+                <path d="M12 22V12" />
+                <path d="m3.3 7 7.703 4.734a2 2 0 0 0 1.994 0L20.7 7" />
+                <path d="m7.5 4.27 9 5.15" />
+              </svg>
+              <h3>Go packages</h3>
+              <p>
+                Import modules as usual. go-git, klauspost/compress, and blake3
+                run on the output.
+              </p>
+            </div>
+            <div class="card">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <circle cx="12" cy="18" r="3" />
+                <circle cx="6" cy="6" r="3" />
+                <circle cx="18" cy="6" r="3" />
+                <path d="M18 9v2c0 .6-.4 1-1 1H7c-.6 0-1-.4-1-1V9" />
+                <path d="M12 12v3" />
+              </svg>
+              <h3>Concurrency</h3>
+              <p>
+                Goroutines, channels, <code>select</code>, and
+                <code>sync</code> keep their Go semantics on the event loop.
+              </p>
+            </div>
+            <div class="card">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path
+                  d="M14 2v6a2 2 0 0 0 .245.96l5.51 10.08A2 2 0 0 1 18 22H6a2 2 0 0 1-1.755-2.96l5.51-10.08A2 2 0 0 0 10 8V2"
+                />
+                <path d="M6.453 15h11.094" />
+                <path d="M8.5 2h7" />
+              </svg>
+              <h3>Go tests</h3>
+              <p>
+                <code>goscript test</code> runs your Go tests on the output, in
+                Bun or in Chromium.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="size">
+        <div class="container">
+          <div class="section-head">
+            <p class="label">Bundle size</p>
+            <h2>A fraction of the bytes</h2>
+            <p>
+              GoScript output is ordinary TypeScript modules, so your bundler
+              minifies and tree-shakes it like any other code. The same Go
+              program built for WebAssembly ships the whole Go runtime.
+            </p>
+          </div>
+          <div class="sizes">
+            <div class="size">
+              <h3>Hello world with <code>fmt</code><span>12x smaller</span></h3>
+              <div class="bar gs">
+                <span>GoScript</span><b style="width: 8.6%"></b
+                ><output>47 KB</output>
+              </div>
+              <div class="bar">
+                <span>Go WebAssembly</span><b></b><output>543 KB</output>
+              </div>
+            </div>
+            <div class="size">
+              <h3>
+                <code>encoding/json</code>, <code>sort</code>, and
+                <code>strings</code><span>13x smaller</span>
+              </h3>
+              <div class="bar gs">
+                <span>GoScript</span><b style="width: 7.8%"></b
+                ><output>71 KB</output>
+              </div>
+              <div class="bar">
+                <span>Go WebAssembly</span><b></b><output>904 KB</output>
+              </div>
+            </div>
+            <div class="size">
+              <h3>
+                Spacewave browser core, with go-git<span>4x smaller</span>
+              </h3>
+              <div class="bar gs">
+                <span>GoScript</span><b style="width: 25.3%"></b
+                ><output>3.7 MB</output>
+              </div>
+              <div class="bar">
+                <span>Go WebAssembly</span><b></b><output>14.4 MB</output>
               </div>
             </div>
           </div>
+          <p class="note">
+            Sizes are Brotli-compressed. The GoScript output is bundled with Bun
+            and minified with oxc. The WebAssembly builds use Go 1.27.1 with
+            <code>-trimpath -ldflags='-s -w'</code> and exclude the 17 KB
+            <code>wasm_exec.js</code> loader.
+          </p>
+        </div>
+      </section>
 
-          <div class="install-steps">
-            <div class="install-step">
-              <span class="step-label">compile</span>
-              <button
-                class="command"
-                data-copy="goscript compile --package . --output ./dist"
-              >
-                <span class="command-text"
-                  >goscript compile --package . --output ./dist</span
-                >
-                <span class="copy-icon"></span>
-              </button>
+      <section class="section" id="runtime">
+        <div class="container split">
+          <div class="section-head">
+            <p class="label">Runs on the engine</p>
+            <h2>Plain async and await</h2>
+            <p>
+              A Go function that can block compiles to an
+              <code>async</code> function, so TypeScript calls it with
+              <code>await</code>. A <code>js.FuncOf</code> callback that blocks
+              returns a Promise to its JavaScript caller, and goroutines run as
+              async tasks beside the rest of the page.
+            </p>
+            <p>
+              Go values are ordinary JavaScript objects, so the engine's JIT
+              optimizes the hot paths and its garbage collector frees what the
+              program drops. A WebAssembly program runs its own collector inside
+              linear memory, which grows but never shrinks.
+            </p>
+          </div>
+          <div class="code">
+            <div class="code-header">
+              <i></i><i></i><i></i><span>app.ts</span>
             </div>
-            <div class="install-step">
-              <span class="step-label">run</span>
-              <button class="command" data-copy="bun run ./dist/main.js">
-                <span class="command-text">bun run ./dist/main.js</span>
-                <span class="copy-icon"></span>
-              </button>
-            </div>
+            <pre><span class="k">import</span> { NewUser } <span class="k">from</span> <span class="s">'@goscript/example.com/my/module/index.js'</span>
+
+<span class="c">// A Go function that blocks is an async function here.</span>
+<span class="k">const</span> user = <span class="k">await</span> NewUser(<span class="s">'gopher'</span>)
+console.log(user.Name)</pre>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="install">
+        <div class="container split">
+          <div class="section-head">
+            <p class="label">Install</p>
+            <h2>Compile your first package</h2>
+            <p>
+              GoScript needs the Go toolchain. Bun runs the output directly. For
+              Node and browsers, bundle it with a bundler that reads
+              <code>tsconfig.json</code> paths, such as Bun, Vite, or esbuild.
+            </p>
+            <p>
+              The npm package runs the same compiler and adds a TypeScript API:
+              <code>bun add -d goscript</code>.
+            </p>
+          </div>
+          <ol class="steps">
+            <li>
+              <p>Install the compiler</p>
+              <div class="code">
+                <div class="code-header">
+                  <i></i><i></i><i></i><span>shell</span
+                  ><button class="copy" type="button">Copy</button>
+                </div>
+                <pre><span class="p">$ </span>go install github.com/s4wave/goscript/cmd/goscript@latest</pre>
+              </div>
+            </li>
+            <li>
+              <p>Compile the package in the current directory</p>
+              <div class="code">
+                <div class="code-header">
+                  <i></i><i></i><i></i><span>shell</span
+                  ><button class="copy" type="button">Copy</button>
+                </div>
+                <pre><span class="p">$ </span>goscript compile --package . --output ./output</pre>
+              </div>
+            </li>
+            <li>
+              <p>Run it, with <code>@goscript/*</code> mapped to the output</p>
+              <div class="code">
+                <div class="code-header">
+                  <i></i><i></i><i></i><span>shell</span
+                  ><button class="copy" type="button">Copy</button>
+                </div>
+                <pre><span class="p">$ </span>bun run output/@goscript/example.com/hello/main.gs.ts</pre>
+              </div>
+            </li>
+          </ol>
+        </div>
+      </section>
+
+      <section class="section" id="limits">
+        <div class="container">
+          <div class="section-head">
+            <p class="label">Limitations</p>
+            <h2>What to know first</h2>
+            <p>
+              GoScript compiles most Go code as written. These are the known
+              gaps.
+            </p>
+          </div>
+          <div class="disclosures">
+            <details>
+              <summary>Integers</summary>
+              <div>
+                <p>
+                  <code>int</code> is a JavaScript number. It loses precision
+                  past 2<sup>53</sup> and does not wrap at 64 bits. Use
+                  <code>int64</code> or <code>uint64</code> where a value needs
+                  exact 64-bit arithmetic: both compile to <code>bigint</code>
+                  and wrap as in Go.
+                </p>
+              </div>
+            </details>
+            <details>
+              <summary>unsafe and cgo</summary>
+              <div>
+                <p>
+                  cgo and pointer arithmetic are unsupported. Code using
+                  <code>unsafe</code> type-checks, but <code>Sizeof</code>,
+                  <code>Alignof</code>, <code>Offsetof</code>, and pointer
+                  conversions throw at runtime.
+                </p>
+              </div>
+            </details>
+            <details>
+              <summary>Standard library and host APIs</summary>
+              <div>
+                <p>
+                  A standard library package works when GoScript ships an
+                  override for it or it compiles cleanly from Go source.
+                  Sockets, processes, and plugins work only as far as the
+                  JavaScript host allows. <code>reflect</code> covers types,
+                  values, struct fields, maps, <code>MakeFunc</code>, and
+                  <code>DeepEqual</code>, but not the whole package.
+                </p>
+              </div>
+            </details>
+            <details>
+              <summary>Tooling</summary>
+              <div>
+                <p>
+                  The CLI and APIs take package patterns, not individual
+                  <code>.go</code> files. The in-browser compiler behind the
+                  playground compiles a single file without imports.
+                  <code>goscript test</code> supports a subset of
+                  <code>testing</code> and of the <code>go test</code> flags.
+                </p>
+              </div>
+            </details>
+            <details>
+              <summary>Speed</summary>
+              <div>
+                <p>
+                  Async calls and <code>bigint</code> arithmetic cost more than
+                  synchronous JavaScript on plain numbers. GoScript makes a
+                  function async only when it can block.
+                </p>
+              </div>
+            </details>
           </div>
         </div>
       </section>
@@ -287,43 +460,31 @@ export async function main(): globalThis.Promise&lt;void&gt; {
 
     <footer class="footer">
       <div class="container">
-        <a href="https://github.com/s4wave/goscript">GitHub</a>
-        <span class="sep">·</span>
-        <a href="https://aperture.us">Aperture Robotics</a>
-        <span class="copyright">© 2025 Aperture Robotics, LLC</span>
+        <div>
+          <a href="./" class="lockup">GoScript</a>
+          <p>MIT licensed. Built by Aperture Robotics for Spacewave.</p>
+        </div>
+        <nav aria-label="Footer">
+          <a href="playground/">Playground</a>
+          <a href="tests/">Tests</a>
+          <a href="https://github.com/s4wave/goscript">GitHub</a>
+          <a href="https://github.com/s4wave/spacewave">Spacewave</a>
+        </nav>
       </div>
     </footer>
 
     <script>
-      // Tabs
-      document.querySelectorAll('.tab').forEach((tab) => {
-        tab.addEventListener('click', () => {
-          const tabId = tab.dataset.tab
-          const container = tab.closest('[data-component="tabs"]')
-          container.querySelectorAll('.tab').forEach((t) => {
-            t.classList.toggle('active', t.dataset.tab === tabId)
-            t.setAttribute('aria-selected', t.dataset.tab === tabId)
-          })
-          container.querySelectorAll('.tab-panel').forEach((p) => {
-            p.classList.toggle('active', p.dataset.panel === tabId)
-          })
+      document.querySelectorAll('.copy').forEach((button) => {
+        button.addEventListener('click', async () => {
+          const text = button
+            .closest('.code')
+            .querySelector('pre')
+            .textContent.replace(/^\$ /, '')
+          await navigator.clipboard.writeText(text)
+          button.textContent = 'Copied'
+          setTimeout(() => (button.textContent = 'Copy'), 1500)
         })
       })
-
-      // Copy
-      document.querySelectorAll('.command').forEach((btn) => {
-        btn.addEventListener('click', () => {
-          navigator.clipboard.writeText(btn.dataset.copy)
-          btn.classList.add('copied')
-          setTimeout(() => btn.classList.remove('copied'), 2000)
-        })
-      })
-    </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/languages/go.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/languages/typescript.min.js"></script>
-    <script>
-      hljs.highlightAll()
     </script>
   </body>
 </html>
