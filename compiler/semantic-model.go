@@ -159,7 +159,7 @@ func (o *SemanticModelOwner) Build(ctx context.Context, graph *PackageGraph, opt
 		}
 	}
 	model.collectVarRefNames()
-	markTransientPointers(model, overrideFacts)
+	markTransientPointers(model)
 
 	// Package variables that read only unchanging data initialize on first
 	// read, which the marks of every package decide.
@@ -336,15 +336,19 @@ func (o *SemanticModelOwner) buildPackage(
 		return shard, nil, o.applyBodySummary(shard, semPkg, pkg, objects, stored)
 	}
 
+	// Collect the declarations and the facts of the bodies.
 	for _, file := range pkg.Syntax {
 		tokenFile := pkg.Fset.File(file.Pos())
 		o.collectFileDeclarations(shard, semPkg, pkg, tokenFile, file)
 		o.collectFacts(shard, semPkg, pkg, tokenFile, file, nil, nil)
 	}
 	collectEffectFreeFunctions(shard, pkg)
+	collectCallFacts(shard, semPkg, pkg, overrideFacts)
 	semPkg.lazyVars = lazyPackageVars(semPkg)
 	collectFunctionFacts(shard, semPkg, pkg, overrideFacts, directives)
 	semPkg.asyncArgumentCalls = collectAsyncArgumentCalls(pkg, semPkg.literalKey, directives)
+
+	// Summarize the bodies for a later check without them.
 	if !summarize {
 		return shard, nil, true
 	}
@@ -509,9 +513,6 @@ func (o *SemanticModelOwner) collectFileDeclarations(
 			position := sourcePosInFile(tokenFile, typed.Name.Pos())
 			semFn := o.addFunction(model, semPkg, fn, position)
 			semFn.hasBody = typed.Body != nil
-			semFn.receiverReadOnly = methodReceiverReadOnly(pkg, typed)
-			semFn.paramsReadOnly = funcParamsReadOnly(pkg, typed)
-			semFn.resultBorrows = funcResultBorrows(pkg, typed, fn, semFn.paramsReadOnly)
 			semPkg.functionDecls[fn] = typed
 			semPkg.declarations = append(semPkg.declarations, semanticDeclaration{
 				kind:     "func",
@@ -2574,6 +2575,24 @@ func funcParamsReadOnly(pkg *packages.Package, decl *ast.FuncDecl) []valueReadOn
 		return nil
 	}
 	return readOnly
+}
+
+// collectCallFacts records what the package's declared functions do with
+// their receivers and parameters, which their callers read: the values they
+// only read, the results that borrow them and the transient pointer
+// candidates. The facts come from the bodies, so a package checked without
+// bodies takes them from its summary.
+func collectCallFacts(model *SemanticModel, semPkg *semanticPackage, pkg *packages.Package, overrideFacts *OverrideFacts) {
+	for fn, decl := range semPkg.functionDecls {
+		semFn := model.functions[fn]
+		if semFn == nil {
+			continue
+		}
+		semFn.receiverReadOnly = methodReceiverReadOnly(pkg, decl)
+		semFn.paramsReadOnly = funcParamsReadOnly(pkg, decl)
+		semFn.resultBorrows = funcResultBorrows(pkg, decl, fn, semFn.paramsReadOnly)
+		semFn.transientCandidates = transientCandidates(pkg, fn, decl, overrideFacts)
+	}
 }
 
 // funcResultBorrows reports, for each result of decl, the index of the

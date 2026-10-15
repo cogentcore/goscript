@@ -1001,6 +1001,62 @@ func TestCompilePackagesCacheEditsMatchFreshCompile(t *testing.T) {
 	}
 }
 
+// TestCompilePackagesCacheKeepsCallFacts edits a dependent of a package
+// whose functions only read some value parameters and pointers and keep or
+// change others. The package is then checked without bodies, so its body
+// summary must carry those facts: a cached compile that copies no value and
+// passes a new field reference where a fresh one does would let the callee
+// change the caller's value or keep a pointer that differs from &s.f.
+func TestCompilePackagesCacheKeepsCallFacts(t *testing.T) {
+	files := func(body string) map[string]string {
+		return map[string]string{
+			"go.mod": "module example.test/callfacts\n\ngo 1.25.3\n",
+			"dep/dep.go": `package dep
+
+type P struct{ X, Y int }
+
+var Saved *int
+
+func Read(p P) int { return p.X }
+
+func Bump(p P) int { p.X++; return p.X }
+
+func Has(p *int) bool { return *p != 0 }
+
+func Keep(p *int) { Saved = p }
+`,
+			"main.go": `package main
+
+import "example.test/callfacts/dep"
+
+type S struct{ f int }
+
+func main() {
+	v := dep.P{X: 1}
+	println(dep.Read(v), dep.Bump(v), v.X)
+	s := &S{}
+	println(dep.Has(&s.f))
+	dep.Keep(&s.f)
+	println(dep.Saved == &s.f)
+` + body + "}\n",
+		}
+	}
+	moduleDir := writePackageGraphFixture(t, files(""))
+	cacheRoot := filepath.Join(t.TempDir(), "cache")
+	for _, body := range []string{"", "\tprintln(1)\n"} {
+		writeFixtureFile(t, moduleDir, "main.go", files(body)["main.go"])
+		cachedOut := filepath.Join(t.TempDir(), "cached")
+		compileCacheFixtureConfig(t, Config{}, moduleDir, cachedOut, cacheRoot)
+		freshOut := filepath.Join(t.TempDir(), "fresh")
+		compileCacheFixtureConfig(t, Config{}, moduleDir, freshOut, "")
+
+		cached := outputTreeSnapshot(t, cachedOut)
+		if fresh := outputTreeSnapshot(t, freshOut); cached != fresh {
+			t.Fatalf("cached output differs from fresh compile:\ncached:\n%s\nfresh:\n%s", cached, fresh)
+		}
+	}
+}
+
 // cacheFactsArtifactKeys loads moduleDir with all dependencies and returns the
 // generated artifact key of each package.
 func cacheFactsArtifactKeys(t *testing.T, moduleDir string) map[string]string {

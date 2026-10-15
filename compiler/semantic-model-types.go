@@ -240,7 +240,11 @@ type semanticFunction struct {
 	// paramsTransient is nil when no parameter is.
 	receiverTransient bool
 	paramsTransient   []bool
-	async             bool
+	// transientCandidates holds the pointer receiver and parameters whose
+	// uses all may be transient, with the parameters they depend on (see
+	// transientCandidates).
+	transientCandidates []*transientCandidate
+	async               bool
 	// asyncCause records why the node's own code suspends, when the fact
 	// walk found it.
 	asyncCause *asyncCause

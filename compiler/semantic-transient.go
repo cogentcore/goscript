@@ -36,18 +36,16 @@ type transientCandidate struct {
 }
 
 // markTransientPointers computes the transient pointer parameters and
-// receivers of the functions of model, whose bodies it reads. The pointers
-// a function passes on are transient only if the parameters they are passed
+// receivers of the functions of model from their candidates. The pointers a
+// function passes on are transient only if the parameters they are passed
 // to are, so the facts are the greatest fixpoint over the whole program: a
 // candidate is dropped when a dependency is not a candidate, until none is.
-func markTransientPointers(model *SemanticModel, overrideFacts *OverrideFacts) {
+func markTransientPointers(model *SemanticModel) {
 	// Each pointer parameter whose uses all may be transient is a candidate.
 	candidates := make(map[transientSlot]*transientCandidate)
-	for _, semPkg := range model.packages {
-		for fn, decl := range semPkg.functionDecls {
-			for _, candidate := range transientCandidates(semPkg.source, fn, decl, overrideFacts) {
-				candidates[candidate.slot] = candidate
-			}
+	for _, semFn := range model.functions {
+		for _, candidate := range semFn.transientCandidates {
+			candidates[candidate.slot] = candidate
 		}
 	}
 

@@ -84,6 +84,26 @@ type summaryFunction struct {
 	// section node (kind section) locks.
 	locks []string
 	mutex string
+	// receiverReadOnly, paramsReadOnly, resultBorrows and transient hold
+	// the call facts of a declared function (see collectCallFacts).
+	receiverReadOnly valueReadOnlyKind
+	paramsReadOnly   []valueReadOnlyKind
+	resultBorrows    []int
+	transient        []summaryTransient
+}
+
+// summaryTransient is a transient pointer candidate by its parameter index,
+// or -1 for the receiver, with the parameters it depends on.
+type summaryTransient struct {
+	index int
+	deps  []summarySlot
+}
+
+// summarySlot names a parameter of a function by the function's key and the
+// parameter's index, or -1 for the receiver.
+type summarySlot struct {
+	fn    string
+	index int
 }
 
 // summaryFuncValue is a function value by shape and node reference.
@@ -492,17 +512,38 @@ func (s *bodySummary) addNode(k *summaryKeys, kind, key string, semFn *semanticF
 		}
 	}
 
+	// Name the transient candidates' dependencies.
+	var transient []summaryTransient
+	for _, candidate := range semFn.transientCandidates {
+		record := summaryTransient{index: candidate.slot.index}
+		for _, dep := range candidate.deps {
+			fn, ok := k.key(dep.fn)
+			if !ok {
+				return false
+			}
+			record.deps = append(record.deps, summarySlot{fn: fn, index: dep.index})
+		}
+		transient = append(transient, record)
+	}
+	slices.SortFunc(transient, func(a, b summaryTransient) int {
+		return a.index - b.index
+	})
+
 	// Record the node in a stable order.
 	slices.Sort(calls)
 	s.functions = append(s.functions, summaryFunction{
-		kind:        kind,
-		key:         key,
-		async:       semFn.async,
-		calls:       calls,
-		packageVars: packageVars,
-		valueCalls:  slices.Sorted(maps.Keys(semFn.valueCalls)),
-		locks:       locks,
-		mutex:       mutex,
+		kind:             kind,
+		key:              key,
+		async:            semFn.async,
+		calls:            calls,
+		packageVars:      packageVars,
+		valueCalls:       slices.Sorted(maps.Keys(semFn.valueCalls)),
+		locks:            locks,
+		mutex:            mutex,
+		receiverReadOnly: semFn.receiverReadOnly,
+		paramsReadOnly:   semFn.paramsReadOnly,
+		resultBorrows:    semFn.resultBorrows,
+		transient:        transient,
 	})
 	return true
 }
@@ -976,6 +1017,22 @@ func (a *bodyApplier) applyNode(semPkg *semanticPackage, semFn *semanticFunction
 			return false
 		}
 	}
+
+	// Its call facts name the functions its transient candidates depend on.
+	semFn.receiverReadOnly = summaryFn.receiverReadOnly
+	semFn.paramsReadOnly = summaryFn.paramsReadOnly
+	semFn.resultBorrows = summaryFn.resultBorrows
+	for _, record := range summaryFn.transient {
+		candidate := &transientCandidate{slot: transientSlot{semFn.function, record.index}}
+		for _, dep := range record.deps {
+			fn := a.resolveFunc(dep.fn)
+			if fn == nil {
+				return false
+			}
+			candidate.deps = append(candidate.deps, transientSlot{fn, dep.index})
+		}
+		semFn.transientCandidates = append(semFn.transientCandidates, candidate)
+	}
 	return true
 }
 
@@ -1054,6 +1111,8 @@ const (
 	summaryRecordLockSection  = "section"
 	summaryRecordLock         = "lock"
 	summaryRecordMutex        = "section-mutex"
+	summaryRecordCallFacts    = "call-facts"
+	summaryRecordTransient    = "transient"
 	summaryRecordMutexEscape  = "mutex-escape"
 	summaryRecordChangedVar   = "changed-var"
 	summaryRecordEffectFree   = "effect-free"
@@ -1092,6 +1151,17 @@ func (s *bodySummary) encode() ([]byte, bool) {
 		}
 		if fn.mutex != "" {
 			line(summaryRecordMutex, fn.mutex)
+		}
+		if fn.receiverReadOnly != valueNotReadOnly || fn.paramsReadOnly != nil || fn.resultBorrows != nil {
+			line(summaryRecordCallFacts, strconv.Itoa(int(fn.receiverReadOnly)),
+				formatInts(fn.paramsReadOnly), formatInts(fn.resultBorrows))
+		}
+		for _, record := range fn.transient {
+			fields := []string{summaryRecordTransient, strconv.Itoa(record.index)}
+			for _, dep := range record.deps {
+				fields = append(fields, dep.fn, strconv.Itoa(dep.index))
+			}
+			line(fields...)
 		}
 	}
 	for _, literal := range s.literals {
@@ -1178,6 +1248,36 @@ func decodeBodySummary(data []byte) (*bodySummary, bool) {
 				return nil, false
 			}
 			s.functions[len(s.functions)-1].mutex = key
+		case summaryRecordCallFacts:
+			if len(fields) != 4 || len(s.functions) == 0 {
+				return nil, false
+			}
+			fn := &s.functions[len(s.functions)-1]
+			receiver, err := strconv.Atoi(fields[1])
+			params, paramsOK := parseInts[valueReadOnlyKind](fields[2])
+			borrows, borrowsOK := parseInts[int](fields[3])
+			if err != nil || !paramsOK || !borrowsOK {
+				return nil, false
+			}
+			fn.receiverReadOnly, fn.paramsReadOnly, fn.resultBorrows = valueReadOnlyKind(receiver), params, borrows
+		case summaryRecordTransient:
+			if len(fields)%2 != 0 || len(s.functions) == 0 {
+				return nil, false
+			}
+			index, err := strconv.Atoi(fields[1])
+			if err != nil {
+				return nil, false
+			}
+			record := summaryTransient{index: index}
+			for idx := 2; idx < len(fields); idx += 2 {
+				depIndex, err := strconv.Atoi(fields[idx+1])
+				if err != nil {
+					return nil, false
+				}
+				record.deps = append(record.deps, summarySlot{fn: fields[idx], index: depIndex})
+			}
+			fn := &s.functions[len(s.functions)-1]
+			fn.transient = append(fn.transient, record)
 		case summaryRecordFuncValue:
 			if len(fields) != 3 {
 				return nil, false
@@ -1249,4 +1349,29 @@ func decodeBodySummary(data []byte) (*bodySummary, bool) {
 		}
 	}
 	return s, true
+}
+
+// formatInts joins values with commas.
+func formatInts[T ~int | ~uint8](values []T) string {
+	parts := make([]string, len(values))
+	for idx, value := range values {
+		parts[idx] = strconv.Itoa(int(value))
+	}
+	return strings.Join(parts, ",")
+}
+
+// parseInts splits the values formatInts joins, or returns nil for none.
+func parseInts[T ~int | ~uint8](text string) ([]T, bool) {
+	if text == "" {
+		return nil, true
+	}
+	var values []T
+	for part := range strings.SplitSeq(text, ",") {
+		value, err := strconv.Atoi(part)
+		if err != nil {
+			return nil, false
+		}
+		values = append(values, T(value))
+	}
+	return values, true
 }
