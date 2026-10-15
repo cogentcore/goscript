@@ -37,6 +37,22 @@ type AsyncReport struct {
 	// Amplifiers lists the shape classes and interface methods that are
 	// async, by spread.
 	Amplifiers []AsyncRoot `json:"amplifiers"`
+	// Cuts lists the declarations that //goscript:sync marks, in source
+	// order.
+	Cuts []AsyncCut `json:"cuts,omitempty"`
+}
+
+// AsyncCut is a declaration that //goscript:sync marks: a function or
+// method, an interface or interface method, or a func type, field or
+// variable.
+type AsyncCut struct {
+	// Subject is the declaration.
+	Subject string `json:"subject"`
+	// Position is where it is declared.
+	Position string `json:"position,omitempty"`
+	// Reason says what the directive changes: the mark it stopped, or
+	// whether calls through it would otherwise be async.
+	Reason string `json:"reason"`
 }
 
 // AsyncRoot is a root of the async coloring, or an amplifier: a class or
@@ -117,7 +133,83 @@ func (r *AsyncReport) relativeTo(dir string) *AsyncReport {
 			}
 		}
 	}
+	for idx := range r.Cuts {
+		cut := &r.Cuts[idx]
+		cut.Subject, cut.Reason, cut.Position = trim(cut.Subject), trim(cut.Reason), trim(cut.Position)
+	}
 	return r
+}
+
+// buildCuts describes each declaration that //goscript:sync marks.
+func (r *asyncReporter) buildCuts() []AsyncCut {
+	// The declarations are listed in source order.
+	var objs []types.Object
+	for obj, directive := range r.model.asyncDirectives {
+		if directive == asyncDirectiveSync {
+			objs = append(objs, obj)
+		}
+	}
+	slices.SortFunc(objs, func(a, b types.Object) int { return cmp.Compare(a.Pos(), b.Pos()) })
+
+	// Each says what it changed.
+	var cuts []AsyncCut
+	for _, obj := range objs {
+		cut := AsyncCut{Subject: obj.Name(), Position: r.position(obj.Pos())}
+		switch typed := obj.(type) {
+		case *types.Func:
+			cut.Subject = r.model.functionFullName(typed)
+			cut.Reason = r.cutReason(typed)
+		case *types.TypeName:
+			cut.Subject = typed.Pkg().Path() + "." + typed.Name()
+			cut.Reason = r.typeCutReason(typed)
+		case *types.Var:
+			cut.Reason = r.valueCutReason(typed.Type())
+		}
+		cuts = append(cuts, cut)
+	}
+	return cuts
+}
+
+// cutReason says which mark //goscript:sync stopped at a function or
+// interface method.
+func (r *asyncReporter) cutReason(fn *types.Func) string {
+	from, ok := r.cuts[fn]
+	switch {
+	case !ok:
+		return "no async mark reaches it"
+	case from == noReportNode:
+		return "keeps it sync against a root of its own"
+	}
+	return "keeps it sync against " + r.nodeName(from)
+}
+
+// typeCutReason says what //goscript:sync changed on an interface or func
+// type.
+func (r *asyncReporter) typeCutReason(typeName *types.TypeName) string {
+	// An interface's methods were each cut or not.
+	iface, ok := typeName.Type().Underlying().(*types.Interface)
+	if !ok {
+		return r.valueCutReason(typeName.Type())
+	}
+	var reasons []string
+	for method := range iface.ExplicitMethods() {
+		if _, cut := r.cuts[method]; cut {
+			reasons = append(reasons, method.Name()+": "+r.cutReason(method))
+		}
+	}
+	if len(reasons) == 0 {
+		return "no async mark reaches its methods"
+	}
+	return strings.Join(reasons, "; ")
+}
+
+// valueCutReason says whether calls through a func type, field or variable
+// of typ would be async without //goscript:sync.
+func (r *asyncReporter) valueCutReason(typ types.Type) string {
+	if r.model.shapeCallAsync(funcValueShape(typ)) {
+		return "calls through it are not awaited; other calls of its shape are async"
+	}
+	return "calls through it are not awaited; calls of its shape are sync anyway"
 }
 
 // asyncReportAmplifierValues bounds the values listed per amplifier.
@@ -157,6 +249,9 @@ func (r *asyncReporter) build() *AsyncReport {
 			report.Amplifiers = append(report.Amplifiers, entry)
 		}
 	}
+
+	// The cuts follow the declarations.
+	report.Cuts = r.buildCuts()
 
 	// Boundary roots come first, then the widest spread.
 	report.Kinds = g.kinds(r.roots)
@@ -733,6 +828,17 @@ func (r *AsyncReport) WriteText(w io.Writer) error {
 	fmt.Fprintf(&b, "\nshape classes and interface methods made async by a value or implementation (%d), by spread:\n", len(r.Amplifiers))
 	for idx, root := range r.Amplifiers {
 		writeAsyncRootText(&b, idx+1, root)
+	}
+
+	// Then the declarations //goscript:sync marks.
+	if len(r.Cuts) != 0 {
+		fmt.Fprintf(&b, "\ndeclarations %s marks (%d):\n", syncDirectiveLine, len(r.Cuts))
+	}
+	for idx, cut := range r.Cuts {
+		fmt.Fprintf(&b, "\n%d. %s\n   %s\n", idx+1, cut.Subject, cut.Reason)
+		if cut.Position != "" {
+			fmt.Fprintf(&b, "   at %s\n", cut.Position)
+		}
 	}
 	_, err := io.WriteString(w, b.String())
 	return err

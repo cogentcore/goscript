@@ -126,6 +126,21 @@ be conservative. It also lists the shape classes of function values and the
 interface methods that one async value or implementation makes async for every
 call through them. `-report-async=json` writes the same report as JSON.
 
+Two directives override the analysis. `//goscript:async` in the doc comment of
+an interface type, an interface method, a func type, or a func-typed struct
+field or package variable makes every call through it async, for
+implementations or callbacks the program does not compile, such as ones that
+JavaScript provides later. `//goscript:sync` on the same declarations makes
+calls through them sync, so the coloring stops there and their callers stay
+sync. On a function or method, `//goscript:sync` keeps the function sync: a
+channel operation, a mutex wait or another suspending operation in its own body,
+or a direct call of a function the analysis colors async, is a compile error,
+and a call through an interface method or a function value that returns a
+promise panics when it runs. `//goscript:sync` is a promise: a value or
+implementation that does suspend is not awaited. `-report-async` lists the
+`//goscript:async` declarations as roots and what each `//goscript:sync`
+declaration cut.
+
 ## Type Translation
 
 | Go type | TypeScript type |

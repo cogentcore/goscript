@@ -146,6 +146,36 @@ A call of such a target that the program leaves sync is not awaited, and its
 result is asserted to its Go type, since its TypeScript type admits a
 promise.
 
+### Directives
+
+Two directives in the doc comment of a declaration override the analysis
+(`compiler/semantic-directives.go`). The semantic model collects them from
+every compiled package before any package's facts.
+
+- `//goscript:async` on an interface type, an interface method, a func type,
+  or a func-typed struct field or package variable: the interface methods it
+  covers (an interface type covers the methods it declares, not those of the
+  interfaces it embeds) are roots of the coloring, and a call through the
+  field, variable or func type makes its caller async by itself. It is for
+  implementations and callbacks outside the compiled program.
+- `//goscript:sync` on the same declarations: a call through the field,
+  variable or func type is not a call of its class, a function argument passed
+  to a parameter of the func type does not make the callee async, and the
+  interface methods it covers are never marked, so callers stay sync. The
+  method types of such an interface admit a promise, so that implementations
+  the coloring made async stay assignable, and their calls assert the result.
+- `//goscript:sync` on a function or method: the coloring never marks it. A
+  suspending operation in its own body (a channel operation, `select`, an
+  async override call such as a mutex lock, or a deferred call that may
+  suspend) and a direct call of a compiled function or a read of a lazy
+  variable that the coloring made async are compile errors, since those
+  always return a promise. A call through an interface method or a function
+  value that may suspend is wrapped in `$.syncResult`, which panics if it
+  returns a promise.
+
+The sync directive is a promise by the programmer, and an implementation or
+value that does suspend is not awaited.
+
 ### Reporting Async Roots
 
 `-report-async` (`CompileRequest.ReportAsync`) reports where the async
@@ -158,7 +188,9 @@ and cause, its spread (the functions it reaches in that graph, by package),
 the functions only it reaches (its subtree in the dominator tree, with a
 source above every root), and one chain of marks to `main`. It sums the roots
 by kind and lists the classes and interface methods that one async value or
-implementation made async. A reporting build checks every body and does not
+implementation made async, and each `//goscript:sync` declaration with the
+mark it stopped or, for a func type, field or variable, whether other calls of
+its shape are async. A reporting build checks every body and does not
 replay the program from the cache, since body summaries do not keep causes.
 
 ### Implementation Analysis Flow

@@ -1667,8 +1667,12 @@ type lowerFileContext struct {
 	staticTypeParams              map[string]bool
 	asyncFunction                 bool
 	protobufGeneratedSyncFunction bool
-	functionTypeDepth             int
-	deferState                    *loweredDeferState
+	// syncDirectiveFunction is set in the body of a function that
+	// //goscript:sync marks, outside its function literals. Its calls that
+	// may suspend are checked to return a value instead of awaited.
+	syncDirectiveFunction bool
+	functionTypeDepth     int
+	deferState            *loweredDeferState
 	// hoistArgsCall is the call of a defer or go statement, whose arguments
 	// are evaluated into the temporaries of hoistedArgs (see lowerCallArgs).
 	hoistArgsCall *ast.CallExpr
@@ -3384,6 +3388,12 @@ func (o *LoweringOwner) tsMethodSignature(ctx lowerFileContext, method *types.Fu
 			params = hidden + ", " + params
 		}
 	}
+
+	// A method that //goscript:sync marks keeps implementations that the
+	// coloring made async assignable; its calls assert the result.
+	if ctx.model.syncDirective(method) {
+		return method.Name() + "(" + params + "): " + asyncCompatibleResultType(o.tsSignatureResultFor(ctx, signature))
+	}
 	return method.Name() + "(" + params + "): " +
 		asyncCompatibleMethodResultType(o.tsSignatureResultFor(ctx, signature), async)
 }
@@ -4079,7 +4089,8 @@ func (o *LoweringOwner) lowerNamedReceiverMethodDecl(
 		lowered.params = append(lowered.params, flag)
 	}
 	if decl.Body != nil {
-		bodyCtx := functionCtx.withAsyncFunction(async).withProtobufGeneratedSyncFunction(protobufSync).withDeferState(deferState)
+		bodyCtx := functionCtx.withAsyncFunction(async).withProtobufGeneratedSyncFunction(protobufSync).withDeferState(deferState).
+			withSyncDirectiveFunction(ctx.model.syncDirective(fnObj))
 		bodyCtx = o.withBorrowedResults(bodyCtx, decl, fnObj)
 		targets, targetDecls, prelude := o.pointerTargetLocals(bodyCtx, decl, lowered.receiverAlias)
 		if len(targets) != 0 {
@@ -4093,6 +4104,9 @@ func (o *LoweringOwner) lowerNamedReceiverMethodDecl(
 			if funcBodyUsesRecover(bodyCtx, decl.Body) {
 				deferState.recover = true
 			}
+		}
+		if deferState.async && bodyCtx.syncDirectiveFunction {
+			diagnostics = append(diagnostics, syncDirectiveSuspendsAt(bodyCtx, decl.Pos(), "a call it defers may suspend"))
 		}
 		if deferState.async && !lowered.async {
 			lowered.async = true
@@ -4246,7 +4260,8 @@ func (o *LoweringOwner) lowerFuncDecl(ctx lowerFileContext, decl *ast.FuncDecl) 
 		lowered.params = append(lowered.params, flag)
 	}
 	if decl.Body != nil {
-		bodyCtx := functionCtx.withAsyncFunction(async).withProtobufGeneratedSyncFunction(protobufSync).withDeferState(deferState)
+		bodyCtx := functionCtx.withAsyncFunction(async).withProtobufGeneratedSyncFunction(protobufSync).withDeferState(deferState).
+			withSyncDirectiveFunction(ctx.model.syncDirective(fnObj))
 		bodyCtx = o.withBorrowedResults(bodyCtx, decl, fnObj)
 		targets, targetDecls, prelude := o.pointerTargetLocals(bodyCtx, decl, lowered.receiverAlias)
 		if len(targets) != 0 {
@@ -4260,6 +4275,9 @@ func (o *LoweringOwner) lowerFuncDecl(ctx lowerFileContext, decl *ast.FuncDecl) 
 			if funcBodyUsesRecover(bodyCtx, decl.Body) {
 				deferState.recover = true
 			}
+		}
+		if deferState.async && bodyCtx.syncDirectiveFunction {
+			diagnostics = append(diagnostics, syncDirectiveSuspendsAt(bodyCtx, decl.Pos(), "a call it defers may suspend"))
 		}
 		if deferState.async && !lowered.async {
 			lowered.async = true
@@ -4577,6 +4595,11 @@ func (ctx lowerFileContext) withDeclFile(decl ast.Node) lowerFileContext {
 
 func (ctx lowerFileContext) withAsyncFunction(async bool) lowerFileContext {
 	ctx.asyncFunction = async
+	return ctx
+}
+
+func (ctx lowerFileContext) withSyncDirectiveFunction(sync bool) lowerFileContext {
+	ctx.syncDirectiveFunction = sync
 	return ctx
 }
 
@@ -9647,7 +9670,21 @@ func (o *LoweringOwner) lowerFuncLitWithAsyncCalls(
 
 func (o *LoweringOwner) lowerFuncLitCallCallee(ctx lowerFileContext, lit *ast.FuncLit) (string, bool, []Diagnostic) {
 	function, async, _, diagnostics := o.lowerFuncLitArrowWithAsyncCalls(ctx, lit, true)
+	if async && ctx.syncDirectiveFunction {
+		diagnostics = append(diagnostics, syncDirectiveSuspendsAt(ctx, lit.Pos(), "a function literal it calls may suspend"))
+	}
 	return function, async, diagnostics
+}
+
+// syncDirectiveSuspendsAt returns the error for code at pos that may suspend
+// in a function that //goscript:sync marks.
+func syncDirectiveSuspendsAt(ctx lowerFileContext, pos token.Pos, detail string) Diagnostic {
+	return Diagnostic{
+		Severity: DiagnosticSeverityError,
+		Code:     "goscript/directive:sync-suspends",
+		Message:  "function marked " + syncDirectiveLine + ", but " + detail,
+		Position: ctx.diagnosticPosition(pos),
+	}
 }
 
 func (o *LoweringOwner) lowerFuncLitArrowWithAsyncCalls(
@@ -9657,7 +9694,8 @@ func (o *LoweringOwner) lowerFuncLitArrowWithAsyncCalls(
 ) (string, bool, *types.Signature, []Diagnostic) {
 	signature, _ := ctx.semPkg.source.TypesInfo.TypeOf(lit).(*types.Signature)
 	deferState := &loweredDeferState{}
-	bodyCtx := ctx.withSignature(signature).withAsyncFunction(false).withDeferState(deferState).withoutRangeBranch()
+	bodyCtx := ctx.withSignature(signature).withAsyncFunction(false).withDeferState(deferState).withoutRangeBranch().
+		withSyncDirectiveFunction(false)
 	var nested []string
 	bodyCtx.nestedFunctions = &nested
 	litAsync := allowAsyncCalls && (ctx.model == nil || ctx.model.funcLitAsync(lit.Pos()))
@@ -16957,8 +16995,20 @@ func (o *LoweringOwner) callNeedsAwait(ctx lowerFileContext, fun ast.Expr) bool 
 
 // valueCallAsync reports whether a call through the function value fun may
 // suspend: its class reaches an async function value.
+//
+// A //goscript:async or //goscript:sync directive on the field, variable or
+// func type it calls through decides it instead.
 func (o *LoweringOwner) valueCallAsync(ctx lowerFileContext, fun ast.Expr) bool {
-	return ctx.model == nil || ctx.model.valueCallAsync(ctx.semPkg.source.TypesInfo.TypeOf(fun))
+	if ctx.model == nil {
+		return true
+	}
+	switch directive, _ := ctx.model.asyncDirectives.valueCall(ctx.semPkg.source, fun); directive {
+	case asyncDirectiveAsync:
+		return true
+	case asyncDirectiveSync:
+		return false
+	}
+	return ctx.model.valueCallAsync(ctx.semPkg.source.TypesInfo.TypeOf(fun))
 }
 
 func callUsesInterfaceMethod(pkg *packages.Package, fun ast.Expr) bool {
@@ -17050,6 +17100,13 @@ func (o *LoweringOwner) callExprNeedsAwait(ctx lowerFileContext, call *ast.CallE
 // through a function variable in a synchronous literal cannot await, so it
 // unwraps the result of a function value that returned synchronously.
 func (o *LoweringOwner) awaitCallIfNeeded(ctx lowerFileContext, call *ast.CallExpr, lowered string) string {
+	// A function that //goscript:sync marks cannot await, so its calls that
+	// may suspend must have returned a value. The semantic model reports the
+	// calls that always return a promise.
+	if ctx.syncDirectiveFunction && o.callExprNeedsAwait(ctx, call) {
+		return o.runtimeOwner.QualifiedHelper(RuntimeHelperSyncResult) + "(" + lowered + ")"
+	}
+
 	// A call through a local that always holds a lowered literal awaits only
 	// an async literal.
 	if async, ok := o.fixedFuncLocalCallAsync(ctx, call); ok && (!async || ctx.asyncFunction) {
@@ -17082,7 +17139,8 @@ func (o *LoweringOwner) awaitCallIfNeeded(ctx lowerFileContext, call *ast.CallEx
 	valueCall := callUsesFunctionValue(pkg, fun) || callUsesFunctionIdentifier(pkg, fun)
 	called := calledFunction(pkg, fun)
 	if valueCall && !o.valueCallAsync(ctx, fun) ||
-		ctx.model != nil && (ctx.model.asyncWhenTargets[called] || ctx.model.syncOverrideInterfaceMethod(called)) {
+		ctx.model != nil && (ctx.model.asyncWhenTargets[called] || ctx.model.syncOverrideInterfaceMethod(called) ||
+			ctx.model.syncDirective(called) && isInterfaceMethod(called)) {
 		return "(" + lowered + " as " + o.tsSignatureResultFor(ctx, signature) + ")"
 	}
 
