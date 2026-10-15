@@ -2385,6 +2385,85 @@ export function typedNil(
   return value
 }
 
+/**
+ * typeInfoGoString returns the Go type string of info, such as *main.T or
+ * []main.T, or undefined for a type it cannot spell, such as an unnamed
+ * struct, interface or function type.
+ */
+export function typeInfoGoString(
+  info: string | TypeInfo | undefined,
+): string | undefined {
+  // A registered type is spelled by its name, as is a named type.
+  if (info === undefined || typeof info === 'string') {
+    return info
+  }
+  const name = info.typeName || info.name
+  if (name) {
+    return name
+  }
+
+  // Composite types spell their element types.
+  switch (info.kind) {
+    case TypeKind.Pointer:
+      return prefixTypeString('*', info.elemType)
+    case TypeKind.Slice:
+      return prefixTypeString('[]', info.elemType)
+    case TypeKind.Array:
+      return prefixTypeString(`[${info.length}]`, info.elemType)
+    case TypeKind.Channel:
+      return prefixTypeString('chan ', info.elemType)
+    case TypeKind.Map: {
+      const key = typeInfoGoString(info.keyType)
+      return key === undefined ? undefined : (
+          prefixTypeString(`map[${key}]`, info.elemType)
+        )
+    }
+  }
+  return undefined
+}
+
+// dynamicTypeName returns the Go type string of info as the dynamic type of
+// a value, or undefined when info is an interface type, whose values have
+// dynamic types of their own, or cannot be spelled.
+function dynamicTypeName(
+  info: string | TypeInfo | undefined,
+): string | undefined {
+  const resolved = info === undefined ? undefined : resolveTypeInfo(info)
+  if (resolved === undefined || resolved.kind === TypeKind.Interface) {
+    return undefined
+  }
+  return typeInfoGoString(info)
+}
+
+// prefixTypeString returns the Go type string of elem after prefix, or
+// undefined if elem cannot be spelled.
+function prefixTypeString(
+  prefix: string,
+  elem: string | TypeInfo | undefined,
+): string | undefined {
+  const text = typeInfoGoString(elem)
+  return text === undefined ? undefined : prefix + text
+}
+
+/**
+ * genericInterfaceValue converts a value whose static type contains type
+ * parameters to an interface, naming its dynamic type by the instantiated
+ * type info, which the compiler resolves from the type arguments at run
+ * time, rather than by the static type name, which names the type
+ * parameters.
+ */
+export function genericInterfaceValue<T = any>(
+  value: unknown,
+  staticName: string,
+  typeInfo?: TypeInfo | string,
+): T {
+  return interfaceValue<T>(
+    value,
+    dynamicTypeName(typeInfo) ?? staticName,
+    typeInfo,
+  )
+}
+
 export function interfaceValue<T = any>(
   value: unknown,
   typeName: string,
@@ -2555,7 +2634,11 @@ export function typeParamPointerInterfaceValue<T>(
       )
     }
   }
-  return interfaceValue<T>(value, typeName, typeInfo)
+  return interfaceValue<T>(
+    value,
+    dynamicTypeName(typeInfo) ?? typeName,
+    typeInfo,
+  )
 }
 
 export function namedValueInterfaceValue<T>(
@@ -2700,6 +2783,18 @@ export function typeParamInterfaceValue<T = any>(
   value: unknown,
   descriptor: GenericTypeDescriptor | undefined,
 ): T {
+  // A struct value of a named type argument is named by it.
+  if (
+    descriptor?.type !== undefined &&
+    typeof value === 'object' &&
+    value !== null &&
+    isMarkedAsStructValue(value)
+  ) {
+    const name = dynamicTypeName(descriptor.type)
+    return name === undefined ?
+        (value as T)
+      : interfaceValue<T>(value, name, descriptor.type)
+  }
   if (descriptor?.type === undefined || !isPrimitiveValue(value)) {
     return value as T
   }

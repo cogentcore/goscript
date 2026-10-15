@@ -1,0 +1,17 @@
+*main.label false label:
+*main.icon true icon:0
+*main.label false label:
+*main.icon true icon:0
+main.label
+*main.label
+[]main.label
+map[string]main.label
+*main.label
+*main.node
+[]main.node
+map[string]main.node
+int
+*int
+[]int
+map[string]int
+switch: icon
