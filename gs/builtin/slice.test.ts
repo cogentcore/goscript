@@ -4,7 +4,16 @@ import { describe, expect, it, vi } from 'vitest'
 import { makeMap, mapGet, mapSet } from './map.js'
 import {
   append,
+  appendOne,
   appendSlice,
+  cap,
+  isTypedSlice,
+  GoSlice,
+  typedElements,
+  typedMemoryView,
+  typedSliceHintOf,
+  typedSliceOf,
+  typedSliceHints,
   appendZero,
   appendZeros,
   arrayToSlice,
@@ -492,5 +501,96 @@ describe('builtin string byte representation', () => {
         new Uint8Array([255]),
       ),
     ).toBe(0)
+  })
+})
+
+describe('typed slices', () => {
+  it('makes typed arrays for fixed-size numeric elements', () => {
+    const f = makeSlice<number>(2, 4, 'float32')
+    expect((f as GoSlice<number>).backing).toBeInstanceOf(Float32Array)
+    expect(len(f)).toBe(2)
+    expect(cap(f)).toBe(4)
+    expect(makeSlice<number>(3, undefined, 'uint32')).toBeInstanceOf(
+      Uint32Array,
+    )
+    expect(makeSlice<number>(3, undefined, 'number')).toBeInstanceOf(Array)
+  })
+
+  it('appends in place within capacity and grows a typed array', () => {
+    const base = makeSlice<number>(1, 2, 'int32')
+    const one = appendOne(base, 2 ** 31, typedSliceHints.int32)
+    expect(typedElements(one)).toEqual(new Int32Array([0, -(2 ** 31)]))
+    expect(arrayIndex(one, 1)).toBe(-(2 ** 31))
+    const grown = append(one, 5, 6, typedSliceHints.int32)
+    expect(typedSliceHintOf(grown)).toBe('int32')
+    expect(len(grown)).toBe(4)
+    expect(cap(grown)).toBeGreaterThanOrEqual(4)
+    const fromNil = append(null, 0.1, typedSliceHints.float32)
+    expect(fromNil).toBeInstanceOf(Float32Array)
+    expect(arrayIndex(fromNil, 0)).toBe(Math.fround(0.1))
+    expect(
+      appendSlice(null, new Float32Array(0), typedSliceHints.float32),
+    ).toBe(null)
+  })
+
+  it('keeps the backing of a generic window with room for a hinted append', () => {
+    const backing = [1, 2, 0]
+    const window = goSlice(backing, 0, 2)
+    const out = append(window, 3, typedSliceHints.float64)
+    expect(backing[2]).toBe(3)
+    expect(isTypedSlice(out)).toBe(false)
+  })
+
+  it('slices typed arrays into windows on them', () => {
+    const s = new Uint16Array([1, 2, 3, 4])
+    const mid = goSlice(s, 1, 2)
+    expect(mid).toBeInstanceOf(GoSlice)
+    expect(len(mid)).toBe(1)
+    expect(cap(mid)).toBe(3)
+    const ext = goSlice(mid, 0, 3)
+    sliceElems(ext)[sliceSlot(ext, 2)] = 40
+    expect(s[3]).toBe(40)
+    expect(goSlice(goSlice(s, 0, 2), 0, 4)).toBe(s)
+    expect(typedElements(ext)).toEqual(new Uint16Array([2, 3, 40]))
+    expect(typedSliceHintOf(ext)).toBe('uint16')
+  })
+
+  it('appends in place to a typed window', () => {
+    const w = makeSlice<number>(0, 3, 'float32')
+    expect(w).toBeInstanceOf(GoSlice)
+    const a = appendOne(w, 0.1, typedSliceHints.float32)
+    const b = append(a, 2, 3, typedSliceHints.float32)
+    expect(typedElements(b)).toEqual(new Float32Array([Math.fround(0.1), 2, 3]))
+    expect(typedElements(b)!.buffer).toBe(typedElements(w)!.buffer)
+    expect(arrayIndex(b, 0)).toBe(Math.fround(0.1))
+    expect(typedSliceOf(Int8Array, [127, 128])).toEqual(
+      new Int8Array([127, -128]),
+    )
+  })
+
+  it('copies between typed and plain slices', () => {
+    const dst = new Float64Array(3)
+    expect(copy(dst, [1, 2])).toBe(2)
+    expect(Array.from(dst)).toEqual([1, 2, 0])
+    const plain = [0, 0]
+    expect(copy(plain, new Float64Array([5, 6, 7]))).toBe(2)
+    expect(plain).toEqual([5, 6])
+  })
+
+  it('views the memory of a typed slice as other elements', () => {
+    const f = new Float32Array([1, 2, 3])
+    const bytes = typedMemoryView(
+      typedElements(goSlice(f, 1))!,
+      0,
+      8,
+      Uint8Array,
+    )
+    expect(bytes.length).toBe(8)
+    bytes.set(new Uint8Array(new Float32Array([5]).buffer), 0)
+    expect(f[1]).toBe(5)
+    expect(() => typedMemoryView(f, 2, 8, Uint8Array)).toThrow()
+    expect(typedSliceHintOf(f)).toBe('float32')
+    expect(typedSliceHintOf(new Uint8Array(0))).toBe('byte')
+    expect(typedSliceHintOf([1])).toBe(undefined)
   })
 })

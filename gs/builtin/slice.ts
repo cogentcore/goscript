@@ -115,10 +115,10 @@ export function sliceRange<T>(
   slice: Slice<T> | T[] | null | undefined,
 ): SliceRange<T>
 export function sliceRange(
-  slice: Uint8Array | null | undefined,
+  slice: TypedSlice | null | undefined,
 ): SliceRange<number>
 export function sliceRange<T>(
-  slice: Slice<T> | Uint8Array | null | undefined,
+  slice: Slice<T> | TypedSlice | null | undefined,
 ): SliceRange<T> | SliceRange<number> {
   // A nil slice has no elements.
   if (slice === null || slice === undefined) {
@@ -131,16 +131,16 @@ export function sliceRange<T>(
     return slice
   }
 
-  // A slice proxy has its window.
+  // A typed slice is a view of exactly its elements, and so a window over
+  // itself, with or without spare capacity.
+  if (isTypedSlice(slice)) {
+    return { backing: slice, offset: 0, length: slice.length }
+  }
+
+  // A slice proxy has its window, and a plain array is a window over itself.
   const meta = sliceMeta(slice)
   if (meta !== undefined) {
     return meta
-  }
-
-  // A byte array or a plain array is a window over itself, typed by its
-  // element.
-  if (slice instanceof Uint8Array) {
-    return { backing: slice, offset: 0, length: slice.length }
   }
   return { backing: slice, offset: 0, length: slice.length }
 }
@@ -195,9 +195,13 @@ export class GoSlice<T> {
     }
   }
 
-  // window returns a copy of the elements of the slice.
+  // window returns a copy of the elements of the slice, as a plain array
+  // also when its backing array is a typed array.
   window(): T[] {
-    return this.backing.slice(this.offset, this.offset + this.length)
+    const end = this.offset + this.length
+    return isTypedSlice(this.backing) ?
+        (Array.from(this.backing.subarray(this.offset, end)) as T[])
+      : this.backing.slice(this.offset, end)
   }
 
   slice(start?: number, end?: number): T[] {
@@ -245,6 +249,10 @@ export class GoSlice<T> {
 // sliceElems returns the array that holds the elements of a slice: the
 // backing array of a window, or the slice itself.
 export function sliceElems(slice: any): any[] {
+  // A typed slice is a view of exactly its elements.
+  if (isTypedSlice(slice)) {
+    return slice as ArrayLike<number> as any[]
+  }
   const meta = slice === null ? undefined : sliceMeta(slice)
   return meta !== undefined ? meta.backing : slice
 }
@@ -257,7 +265,14 @@ export function sliceSlot(slice: any, index: number): number {
     outOfRangeIndex(index, 0)
   }
 
-  // A window offsets the index into its backing array.
+  // A typed slice is a view of exactly its elements, and a window offsets
+  // the index into its backing array.
+  if (isTypedSlice(slice)) {
+    if (index < 0 || index >= slice.length) {
+      outOfRangeIndex(index, slice.length)
+    }
+    return index
+  }
   const meta = sliceMeta(slice)
   const length = meta !== undefined ? meta.length : slice.length
   if (index < 0 || index >= length) {
@@ -290,12 +305,171 @@ export function isArrayOrGoSlice(
  */
 export type SliceProxy<T> = GoSlice<T>
 
-type ByteSliceMeta = Omit<GoSliceObject<number>, 'backing'> & {
-  backing: Uint8Array
+/**
+ * TypedSlice is the JavaScript typed array that holds a Go slice of
+ * fixed-size numeric elements: Uint8Array for []byte, and Int8Array,
+ * Int16Array, Uint16Array, Int32Array, Uint32Array, Float32Array or
+ * Float64Array for []int8, []int16, []uint16, []int32, []uint32, []float32 or
+ * []float64. Storing an element then wraps integers and rounds float32 as Go
+ * does, and the slice's memory can be viewed as bytes without copying.
+ * int, uint, uintptr, int64 and uint64 have no such array: int and uint hold
+ * 53-bit numbers, and 64-bit values are bigints.
+ *
+ * Such slices follow the representation of other slices: a slice that
+ * covers its whole backing array is the typed array, and any other is a
+ * GoSlice window on it, which is cheap to make, as each append in place
+ * makes one. A byte slice is instead always a view of exactly its elements,
+ * a subarray of its backing array that carries its window as __meta__ when
+ * it has spare capacity, since byte strings and I/O pass byte slices to
+ * JavaScript APIs as they are.
+ */
+export type TypedSlice =
+  | Uint8Array
+  | Int8Array
+  | Int16Array
+  | Uint16Array
+  | Int32Array
+  | Uint32Array
+  | Float32Array
+  | Float64Array
+
+// TypedSliceConstructor makes the typed arrays of one element kind.
+export interface TypedSliceConstructor {
+  new (length: number): TypedSlice
+  new (buffer: ArrayBufferLike, byteOffset: number, length: number): TypedSlice
+  from(values: ArrayLike<number>): TypedSlice
+  readonly BYTES_PER_ELEMENT: number
 }
 
-type ByteSlice = Uint8Array & {
-  __meta__?: ByteSliceMeta
+// typedSliceConstructors maps the element type hints of the compiler to the
+// typed arrays that hold slices of those elements.
+const typedSliceConstructors: Record<string, TypedSliceConstructor> = {
+  byte: Uint8Array,
+  int8: Int8Array,
+  int16: Int16Array,
+  uint16: Uint16Array,
+  int32: Int32Array,
+  uint32: Uint32Array,
+  float32: Float32Array,
+  float64: Float64Array,
+}
+
+/**
+ * typedSliceConstructor returns the typed array that holds slices of the
+ * elements a compiler type hint names, or undefined for other elements.
+ */
+export function typedSliceConstructor(
+  typeHint: string | undefined,
+): TypedSliceConstructor | undefined {
+  return typeHint === undefined ? undefined : typedSliceConstructors[typeHint]
+}
+
+// typedSliceHintNames maps each typed array to the type hint that names it.
+const typedSliceHintNames = new globalThis.Map<unknown, string>(
+  Object.entries(typedSliceConstructors).map(([hint, ctor]) => [ctor, hint]),
+)
+
+/**
+ * typedSliceOf returns a typed array of ctor holding values, for a slice
+ * literal or the packed arguments of a variadic call. Filling a typed array
+ * of the length is about twice as fast as making it from an array.
+ */
+export function typedSliceOf(
+  ctor: TypedSliceConstructor,
+  values: number[],
+): TypedSlice {
+  const out = new ctor(values.length)
+  for (let i = 0; i < values.length; i++) {
+    out[i] = values[i]
+  }
+  return out
+}
+
+/**
+ * typedSliceHintOf returns the type hint of the typed array that holds a
+ * slice, for making another slice of its kind, or undefined for a slice held
+ * otherwise.
+ */
+export function typedSliceHintOf(slice: unknown): string | undefined {
+  const elements = typedElements(slice)
+  return elements === undefined ? undefined : (
+      typedSliceHintNames.get(elements.constructor)
+    )
+}
+
+/**
+ * typedElements returns the typed array that views exactly the elements of a
+ * slice held in a typed array, whether it is the typed array or a window on
+ * one, or undefined for a slice held otherwise.
+ */
+export function typedElements(slice: unknown): TypedSlice | undefined {
+  if (slice instanceof GoSlice) {
+    const backing: unknown = slice.backing
+    return isTypedSlice(backing) ?
+        backing.subarray(slice.offset, slice.offset + slice.length)
+      : undefined
+  }
+  return isTypedSlice(slice) ? slice : undefined
+}
+
+/**
+ * typedSliceHintOfBasic returns the type hint of the typed array that holds
+ * slices of elements of the Go basic type of the given name, or undefined for
+ * elements held in plain arrays.
+ */
+export function typedSliceHintOfBasic(
+  name: string | undefined,
+): string | undefined {
+  switch (name) {
+    case 'uint8':
+    case 'byte':
+      return 'byte'
+    case 'rune':
+      return 'int32'
+    case undefined:
+      return undefined
+  }
+  return name in typedSliceConstructors ? name : undefined
+}
+
+/**
+ * isTypedSlice reports whether value is a slice held in a typed array. No
+ * slice is a DataView, the only other view of an ArrayBuffer.
+ */
+export function isTypedSlice(value: unknown): value is TypedSlice {
+  return ArrayBuffer.isView(value)
+}
+
+/**
+ * TypedSliceHint marks an append whose result elements are held in typed
+ * arrays of ctor, so that the result keeps that representation even when the
+ * destination is nil or held in a plain array. The compiler passes it as a
+ * trailing argument, as it does byteSliceHint for bytes; no Go value is one.
+ */
+export class TypedSliceHint {
+  constructor(readonly ctor: TypedSliceConstructor) {}
+}
+
+/**
+ * typedSliceHints holds the append hint of each typed element kind other than
+ * bytes, by its compiler type hint.
+ */
+export const typedSliceHints = {
+  int8: new TypedSliceHint(Int8Array),
+  int16: new TypedSliceHint(Int16Array),
+  uint16: new TypedSliceHint(Uint16Array),
+  int32: new TypedSliceHint(Int32Array),
+  uint32: new TypedSliceHint(Uint32Array),
+  float32: new TypedSliceHint(Float32Array),
+  float64: new TypedSliceHint(Float64Array),
+} as const
+
+type TypedSliceMeta = Omit<GoSliceObject<number>, 'backing'> & {
+  backing: TypedSlice
+}
+
+type TypedSliceWindow = TypedSlice & {
+  __meta__?: TypedSliceMeta
 }
 
 function sliceIndexProperty(prop: string | symbol): number {
@@ -320,7 +494,7 @@ export type Slice<T> =
   | T[]
   | SliceProxy<T>
   | null
-  | (T extends number ? Uint8Array : never)
+  | (T extends number ? TypedSlice : never)
 
 // outOfRangeIndex panics with Go's index-out-of-range runtime message. Go omits
 // the "with length" suffix for negative indices and includes it otherwise, so
@@ -499,7 +673,7 @@ export function asArray<T>(slice: Slice<T>): T[] {
     return []
   }
 
-  if (slice instanceof Uint8Array) {
+  if (isTypedSlice(slice)) {
     return Array.from(slice) as T[]
   }
 
@@ -597,12 +771,13 @@ function normalizeSliceIndex(value: number | undefined): number | undefined {
   return Number(value)
 }
 
-function byteSliceMeta(slice: Uint8Array): ByteSliceMeta | undefined {
-  return (slice as ByteSlice).__meta__
+// typedSliceMeta returns the window of a typed slice with spare capacity.
+function typedSliceMeta(slice: TypedSlice): TypedSliceMeta | undefined {
+  return (slice as TypedSliceWindow).__meta__
 }
 
-/** checkByteSliceBounds validates two-index slice bounds against capacity. */
-function checkByteSliceBounds(
+/** checkTypedSliceBounds validates two-index slice bounds against capacity. */
+function checkTypedSliceBounds(
   low: number,
   high: number,
   capacity: number,
@@ -614,13 +789,45 @@ function checkByteSliceBounds(
   }
 }
 
+// typedSliceView returns the slice of length elements at offset of a typed
+// backing array, with the given capacity. A byte slice is a subarray, which
+// carries its window when it has spare capacity; another slice is its backing
+// array when it covers all of it, and a GoSlice window on it otherwise.
+function typedSliceView(
+  backing: TypedSlice,
+  offset: number,
+  length: number,
+  capacity: number,
+): TypedSlice | GoSlice<number> {
+  // A byte slice is a view of exactly its elements.
+  if (backing instanceof Uint8Array) {
+    return byteSliceView(backing, offset, length, capacity)
+  }
+
+  // Any other typed slice is held as a plain array is, by a window object
+  // that reads and writes the typed array by index, as an array.
+  if (offset === 0 && length === capacity && capacity === backing.length) {
+    return backing
+  }
+  return new GoSlice(
+    backing as ArrayLike<number> as number[],
+    offset,
+    length,
+    capacity,
+  )
+}
+
+// byteSliceView returns the byte slice of length bytes at offset of backing,
+// with the given capacity, which a view with spare capacity carries as its
+// window.
 function byteSliceView(
   backing: Uint8Array,
   offset: number,
   length: number,
   capacity: number,
 ): Uint8Array {
-  const view = backing.subarray(offset, offset + length) as ByteSlice
+  const view = backing.subarray(offset, offset + length) as TypedSliceWindow &
+    Uint8Array
   if (capacity !== length) {
     view.__meta__ = {
       backing,
@@ -648,26 +855,10 @@ export const makeSlice = <T>(
   typeHint?: string,
   zeroFactory?: () => T,
 ): Slice<T> => {
-  if (typeHint === 'byte') {
-    const actualCapacity = capacity === undefined ? length : capacity
-    if (length < 0 || actualCapacity < 0 || length > actualCapacity) {
-      runtimePanic(
-        actualCapacity < 0 ?
-          'runtime error: makeslice: cap out of range'
-        : 'runtime error: makeslice: len out of range',
-      )
-    }
-
-    if (actualCapacity === length) {
-      return new Uint8Array(length) as Slice<T>
-    }
-
-    return byteSliceView(
-      new Uint8Array(actualCapacity),
-      0,
-      length,
-      actualCapacity,
-    ) as Slice<T>
+  // Fixed-size numeric elements are held in a typed array, which is zero.
+  const typed = typedSliceConstructor(typeHint)
+  if (typed !== undefined) {
+    return makeTypedSlice(typed, length, capacity) as Slice<T>
   }
 
   const actualCapacity = capacity === undefined ? length : capacity
@@ -710,11 +901,32 @@ export const makeSlice = <T>(
   return new GoSlice(backingArr, 0, length, actualCapacity)
 }
 
+// makeTypedSlice makes a typed slice of length elements and the given
+// capacity, held in a typed array of ctor.
+function makeTypedSlice(
+  ctor: TypedSliceConstructor,
+  length: number,
+  capacity: number | undefined,
+): TypedSlice | GoSlice<number> {
+  // The length must be in range of the capacity.
+  const actualCapacity = capacity === undefined ? length : capacity
+  if (length < 0 || actualCapacity < 0 || length > actualCapacity) {
+    runtimePanic(
+      actualCapacity < 0 ?
+        'runtime error: makeslice: cap out of range'
+      : 'runtime error: makeslice: len out of range',
+    )
+  }
+
+  // The typed array of the capacity is zero, as Go zeroes it.
+  return typedSliceView(new ctor(actualCapacity), 0, length, actualCapacity)
+}
+
 /**
  * goSlice returns a shared view for s[low:high:max]. Omitted bounds use zero, length, and capacity.
  */
 export function goSlice(
-  s: Uint8Array,
+  s: TypedSlice,
   low?: number,
   high?: number,
   max?: number,
@@ -726,51 +938,19 @@ export function goSlice<T>(
   max?: number,
 ): Slice<T>
 export function goSlice<T>(
-  s: Slice<T> | Uint8Array,
+  s: Slice<T> | TypedSlice,
   low?: number,
   high?: number,
   max?: number,
 ): Slice<T> {
-  s = collectionValue(s) as Slice<T> | Uint8Array
+  s = collectionValue(s) as Slice<T> | TypedSlice
   low = normalizeSliceIndex(low)
   high = normalizeSliceIndex(high)
   max = normalizeSliceIndex(max)
 
-  if (s instanceof Uint8Array) {
-    const meta = byteSliceMeta(s)
-    const metaBacking = meta?.backing as unknown
-    const backing = metaBacking instanceof Uint8Array ? metaBacking : s
-    const baseOffset = meta?.offset ?? 0
-    const baseCapacity = meta?.capacity ?? s.length
-    const actualLow = low ?? 0
-    const actualHigh = high ?? s.length
-
-    checkByteSliceBounds(actualLow, actualHigh, baseCapacity)
-
-    const newLength = actualHigh - actualLow
-
-    if (max !== undefined) {
-      if (max < actualHigh || max > baseCapacity) {
-        runtimePanic(
-          `runtime error: slice bounds out of range [:${actualHigh}:${max}] with capacity ${baseCapacity}`,
-        )
-      }
-
-      const newCap = max - actualLow
-      return byteSliceView(
-        backing,
-        baseOffset + actualLow,
-        newLength,
-        newCap,
-      ) as Slice<T>
-    }
-
-    return byteSliceView(
-      backing,
-      baseOffset + actualLow,
-      newLength,
-      baseCapacity - actualLow,
-    ) as Slice<T>
+  // A typed slice is sliced as a window on its backing array.
+  if (isTypedSlice(s)) {
+    return sliceTyped(s, low, high, max) as Slice<T>
   }
 
   // Handle nil slices - in Go, slicing a nil slice with valid bounds returns nil
@@ -875,6 +1055,38 @@ export function goSlice<T>(
   }
 
   return new GoSlice(backing as T[], newOffset, newLength, newCap)
+}
+
+// sliceTyped returns s[low:high:max] of a typed slice, a window on its
+// backing array. Omitted bounds are zero, the length and the capacity.
+function sliceTyped(
+  s: TypedSlice,
+  low: number | undefined,
+  high: number | undefined,
+  max: number | undefined,
+): TypedSlice | GoSlice<number> {
+  // A view with spare capacity carries its window on the backing array.
+  const meta = typedSliceMeta(s)
+  const backing = meta?.backing ?? s
+  const baseOffset = meta?.offset ?? 0
+  const baseCapacity = meta?.capacity ?? s.length
+  const actualLow = low ?? 0
+  const actualHigh = high ?? s.length
+  checkTypedSliceBounds(actualLow, actualHigh, baseCapacity)
+
+  // The capacity of the result runs to max, or to that of s.
+  if (max !== undefined && (max < actualHigh || max > baseCapacity)) {
+    runtimePanic(
+      `runtime error: slice bounds out of range [:${actualHigh}:${max}] with capacity ${baseCapacity}`,
+    )
+  }
+  const newCap = (max ?? baseCapacity) - actualLow
+  return typedSliceView(
+    backing,
+    baseOffset + actualLow,
+    actualHigh - actualLow,
+    newCap,
+  )
 }
 
 /**
@@ -989,7 +1201,7 @@ export function arrayToSlice<T>(
  * type is a slice type.
  */
 export function sliceLen(
-  slice: Slice<unknown> | unknown[] | Uint8Array | null | undefined,
+  slice: Slice<unknown> | unknown[] | TypedSlice | null | undefined,
 ): number {
   // A nil slice has no elements.
   if (slice === null || slice === undefined) {
@@ -1006,6 +1218,12 @@ export function sliceLen(
     return slice.length
   }
 
+  // A typed slice is a view of exactly its elements, whose window, if any,
+  // has the same length.
+  if (isTypedSlice(slice)) {
+    return slice.length
+  }
+
   // A slice proxy knows its length.
   const meta = sliceMeta(slice)
   if (meta !== undefined) {
@@ -1013,7 +1231,7 @@ export function sliceLen(
   }
 
   // A plain array may carry a window of its own.
-  if (isArrayOrGoSlice(slice) || slice instanceof Uint8Array) {
+  if (isArrayOrGoSlice(slice)) {
     const plainMeta = (slice as any).__meta__ as
       | GoSliceObject<unknown>
       | undefined
@@ -1032,7 +1250,7 @@ export const len = <T = unknown, V = unknown>(
     | Slice<T>
     | Map<T, V>
     | Set<T>
-    | Uint8Array
+    | TypedSlice
     | { len(): number }
     | null
     | undefined,
@@ -1055,7 +1273,7 @@ export const len = <T = unknown, V = unknown>(
     return stringLen(obj)
   }
 
-  if (obj instanceof Uint8Array) {
+  if (isTypedSlice(obj)) {
     return obj.length
   }
 
@@ -1086,7 +1304,7 @@ export const len = <T = unknown, V = unknown>(
  * cap returns the available capacity of a slice.
  */
 export const cap = <T>(
-  obj: Slice<T> | Uint8Array | { cap(): number } | null | undefined,
+  obj: Slice<T> | TypedSlice | { cap(): number } | null | undefined,
 ): number => {
   obj = collectionValue(obj) as typeof obj
   if (obj === null || obj === undefined) {
@@ -1097,8 +1315,8 @@ export const cap = <T>(
     return (obj as SliceProxy<T>).__meta__.capacity
   }
 
-  if (obj instanceof Uint8Array) {
-    return obj.length // Uint8Array capacity is its length
+  if (isTypedSlice(obj)) {
+    return obj.length // A typed array without a window is its capacity
   }
 
   if (isArrayOrGoSlice(obj)) {
@@ -1162,20 +1380,74 @@ function nextAppendCapacity(
   return Math.max(oldCapacity + Math.floor(oldCapacity / 4), newLength)
 }
 
-// byteSliceFromSlice materializes a Uint8Array holding a slice's current byte
-// values. The byte hint routes nil, empty, or generically-backed []byte
-// destinations through here so append keeps a Uint8Array representation
-// regardless of how the destination happened to be stored.
-function byteSliceFromSlice(
+// TypedWindow is the window of a typed slice on its typed backing array.
+interface TypedWindow {
+  backing: TypedSlice
+  offset: number
+  length: number
+  capacity: number
+}
+
+// typedWindowFrom returns the window of a slice on a typed backing array of
+// ctor, holding a copy of the slice's elements when it is not already held in
+// one. The append hints route nil, empty, or generically-backed destinations
+// through here so append keeps a typed representation regardless of how the
+// destination happened to be stored.
+function typedWindowFrom(
   slice: Slice<number> | null | undefined,
-): Uint8Array {
-  if (slice === null || slice === undefined) {
-    return new Uint8Array(0)
+  ctor: TypedSliceConstructor,
+): TypedWindow {
+  // A window or a typed array of ctor is the window it has.
+  if (slice instanceof GoSlice) {
+    const backing: unknown = slice.backing
+    if (isTypedSlice(backing) && backing instanceof ctor) {
+      const { offset, length, capacity } = slice
+      return { backing, offset, length, capacity }
+    }
   }
-  if (slice instanceof Uint8Array) {
-    return slice
+  if (slice instanceof ctor) {
+    const meta = typedSliceMeta(slice)
+    return (
+      meta ?? {
+        backing: slice,
+        offset: 0,
+        length: slice.length,
+        capacity: slice.length,
+      }
+    )
   }
-  return Uint8Array.from(asArray(slice) as number[])
+
+  // Anything else is copied into a typed array.
+  const backing =
+    slice === null || slice === undefined ?
+      new ctor(0)
+    : ctor.from(asArray(slice) as number[])
+  return {
+    backing,
+    offset: 0,
+    length: backing.length,
+    capacity: backing.length,
+  }
+}
+
+// typedAppendConstructor returns the typed array that the result of an
+// append to slice is held in: that of its hint, or of a typed destination,
+// or undefined for a result held in a plain array.
+function typedAppendConstructor(
+  slice: unknown,
+  hint: unknown,
+): TypedSliceConstructor | undefined {
+  if (hint === byteSliceHint) {
+    return Uint8Array
+  }
+  if (hint instanceof TypedSliceHint) {
+    return hint.ctor
+  }
+  const backing: unknown = slice instanceof GoSlice ? slice.backing : slice
+  if (isTypedSlice(backing)) {
+    return backing.constructor as TypedSliceConstructor
+  }
+  return undefined
 }
 
 function appendZeroValue(sample: unknown): unknown {
@@ -1212,7 +1484,7 @@ function appendZeroValue(sample: unknown): unknown {
  * appendOne appends one value that the caller already copied, as Go copies
  * an appended struct or array, to a slice of non-byte elements. It writes into
  * spare capacity directly and leaves growth to append, with the optional
- * zero hint the compiler passes for the new capacity.
+ * zero or typed slice hint the compiler passes for the new capacity.
  */
 export function appendOne<T>(
   slice: Slice<T> | null,
@@ -1259,27 +1531,27 @@ export function appendOne<T>(
 /**
  * append returns an extended slice, sharing its backing array when capacity permits.
  */
-export function append(slice: Uint8Array, ...elements: unknown[]): Uint8Array
+export function append(slice: TypedSlice, ...elements: unknown[]): TypedSlice
 // append Null destinations carry no runtime element type, so compiler-only hint
 // values are accepted alongside the elements.
 export function append<T>(slice: null, ...elements: unknown[]): Slice<T>
 export function append<T>(slice: Slice<T>, ...elements: unknown[]): Slice<T>
 export function append<T>(
-  slice: Slice<T> | Uint8Array | null,
+  slice: Slice<T> | TypedSlice | null,
   ...elements: unknown[]
 ): Slice<T> {
-  // Byte specialization is destination-independent: a Go []byte value keeps a
-  // Uint8Array representation across append even when the destination was nil,
-  // empty, or a generically-backed array. The compiler signals byte element
-  // type with a trailing byteSliceHint, which is stripped here before the
-  // remaining elements are appended.
+  // Typed specialization is destination-independent: a Go []byte or other
+  // typed slice value keeps its typed array representation across append even
+  // when the destination was nil, empty, or a generically-backed array. The
+  // compiler signals the element type with a trailing byteSliceHint or
+  // TypedSliceHint, which is stripped here, after any zero value hint, before
+  // the remaining elements are appended.
   let zeroFactory = appendZeroValueFactory<T>(elements[elements.length - 1])
   if (zeroFactory !== undefined) {
     elements.pop()
   }
-  let byteHinted = false
-  if (elements.length > 0 && elements[elements.length - 1] === byteSliceHint) {
-    byteHinted = true
+  const hint = elements[elements.length - 1]
+  if (hint === byteSliceHint || hint instanceof TypedSliceHint) {
     elements.pop()
   }
 
@@ -1292,14 +1564,22 @@ export function append<T>(
     return slice as any
   }
 
-  // Produce a Uint8Array whenever the destination already is one or the byte
-  // hint is present; byteSliceFromSlice reallocates nil/empty/generic
-  // destinations into a Uint8Array before appending.
-  if (slice instanceof Uint8Array || byteHinted) {
-    return appendByteSlice(
-      byteSliceFromSlice(slice as Slice<number>),
-      elements,
-    ) as any
+  // Produce a typed slice whenever the destination already is one, or a
+  // hint is present and the destination has no room to keep its backing;
+  // typedSliceFrom reallocates nil/empty/generic destinations into a typed
+  // array before appending.
+  const typed = typedAppendConstructor(slice, hint)
+  if (typed !== undefined) {
+    // A window object with room takes the numbers in place, typed or not.
+    if (slice instanceof GoSlice && slice.length + numAdded <= slice.capacity) {
+      return appendNumbersInPlace(slice, elements) as any
+    }
+    if (isTypedSlice(slice) || !appendFitsWindow(slice, numAdded)) {
+      return appendTypedSlice(
+        typedWindowFrom(slice as Slice<number>, typed),
+        elements,
+      ) as any
+    }
   }
 
   let oldLength = 0
@@ -1418,42 +1698,44 @@ function copyGrownElements<T>(dst: T[], slice: Slice<T>, count: number): void {
 }
 
 export function appendSlice(
-  slice: Uint8Array,
-  elements: Uint8Array | Slice<number> | string | null | undefined,
-  elementHint?: typeof byteSliceHint | object,
-): Uint8Array
+  slice: TypedSlice,
+  elements: TypedSlice | Slice<number> | string | null | undefined,
+  elementHint?: typeof byteSliceHint | TypedSliceHint | object,
+): TypedSlice
 export function appendSlice<T>(
   slice: null,
   elements: Slice<T> | null | undefined,
-  elementHint?: typeof byteSliceHint | object,
+  elementHint?: typeof byteSliceHint | TypedSliceHint | object,
 ): Slice<T>
 export function appendSlice<T>(
   slice: Slice<T>,
   elements: Slice<T> | null | undefined,
-  elementHint?: typeof byteSliceHint | object,
+  elementHint?: typeof byteSliceHint | TypedSliceHint | object,
 ): Slice<T>
 export function appendSlice<T>(
-  slice: Slice<T> | Uint8Array | null,
-  elements: Slice<T> | Uint8Array | string | null | undefined,
-  elementHint?: typeof byteSliceHint | object,
-): Slice<T> | Uint8Array {
+  slice: Slice<T> | TypedSlice | null,
+  elements: Slice<T> | TypedSlice | string | null | undefined,
+  elementHint?: typeof byteSliceHint | TypedSliceHint | object,
+): Slice<T> | TypedSlice {
   if (elements == null) {
     return slice as any
   }
   const source =
     typeof elements === 'string' ? stringToBytes(elements) : elements
-  // A generically-backed byte slice with spare capacity must keep that
-  // backing so aliases observe the append. Byte-specialize nil, Uint8Array,
-  // and reallocating destinations.
-  const hintedComplexWithCapacity =
-    elementHint === byteSliceHint &&
-    isComplexSlice(slice) &&
-    len(slice) + len(source as Slice<T>) <= cap(slice)
+
+  // A typed destination, or a hinted one, gets a typed result, except that a
+  // generically-backed slice with spare capacity keeps that backing so
+  // aliases observe the append. Nothing appended to a slice of numbers other
+  // than bytes leaves it as it is, nil included.
+  const typed = typedAppendConstructor(slice, elementHint)
   if (
-    slice instanceof Uint8Array ||
-    (elementHint === byteSliceHint && !hintedComplexWithCapacity)
+    typed !== undefined &&
+    (isTypedSlice(slice) || !appendFitsWindow(slice, len(source as Slice<T>)))
   ) {
-    return appendByteSlice(byteSliceFromSlice(slice as Slice<number>), [
+    if (typed !== Uint8Array && len(source as Slice<T>) === 0) {
+      return slice as any
+    }
+    return appendTypedSlice(typedWindowFrom(slice as Slice<number>, typed), [
       source,
     ]) as any
   }
@@ -1502,56 +1784,81 @@ export function appendSlice<T>(
   return sliceProxyFromBacking(next, 0, newLength, newCapacity)
 }
 
-function appendByteSlice(slice: Uint8Array, elements: any[]): Uint8Array {
-  const meta = byteSliceMeta(slice)
-  const metaBacking = meta?.backing as unknown
-  const backing = metaBacking instanceof Uint8Array ? metaBacking : slice
-  const offset = meta?.offset ?? 0
-  const oldLength = slice.length
-  const oldCapacity = meta?.capacity ?? oldLength
-  let added = 0
-  for (const item of elements) {
-    added += byteElementLength(item)
+// appendNumbersInPlace appends numbers to a window object whose capacity has
+// room for them, writing them into its backing array, which keeps its kind.
+function appendNumbersInPlace(
+  slice: GoSlice<unknown>,
+  elements: unknown[],
+): GoSlice<unknown> {
+  const { backing, offset, length, capacity } = slice
+  for (let i = 0; i < elements.length; i++) {
+    backing[offset + length + i] = elements[i]
   }
-  const newLength = oldLength + added
-  if (newLength <= oldCapacity) {
-    const view = byteSliceView(backing, offset, newLength, oldCapacity)
-    writeByteElements(view, oldLength, elements)
-    return view
-  }
-  // Keep spare backing capacity so repeated appends copy only on growth.
-  const newCapacity = nextAppendCapacity(oldLength, oldCapacity, newLength)
-  const next = new Uint8Array(newCapacity)
-  next.set(slice)
-  writeByteElements(next, oldLength, elements)
-  return byteSliceView(next, 0, newLength, newCapacity)
+  return new GoSlice(backing, offset, length + elements.length, capacity)
 }
 
-function byteElementLength(item: any): number {
-  if (item instanceof Uint8Array) {
-    return item.length
+// appendFitsWindow reports whether a slice that is not typed has the spare
+// capacity to append count elements in place, which a hinted append keeps so
+// that other slices of its backing array see the new elements.
+function appendFitsWindow(slice: unknown, count: number): boolean {
+  return isComplexSlice(slice) && len(slice) + count <= cap(slice)
+}
+
+// appendTypedSlice appends elements, which are numbers or slices to spread, to
+// the window of a typed slice: in place when its capacity has room, and
+// otherwise into a grown typed array of its kind.
+function appendTypedSlice(
+  window: TypedWindow,
+  elements: any[],
+): TypedSlice | GoSlice<number> {
+  // The elements are written in place when they fit.
+  const { backing, offset, length, capacity } = window
+  let added = 0
+  for (const item of elements) {
+    added += typedElementLength(item)
+  }
+  const newLength = length + added
+  if (newLength <= capacity) {
+    writeTypedElements(backing, offset + length, elements)
+    return typedSliceView(backing, offset, newLength, capacity)
+  }
+
+  // Keep spare backing capacity so repeated appends copy only on growth.
+  const newCapacity = nextAppendCapacity(length, capacity, newLength)
+  const ctor = backing.constructor as TypedSliceConstructor
+  const next = new ctor(newCapacity)
+  next.set(backing.subarray(offset, offset + length))
+  writeTypedElements(next, length, elements)
+  return typedSliceView(next, 0, newLength, newCapacity)
+}
+
+function typedElementLength(item: any): number {
+  const typed = typedElements(item)
+  if (typed !== undefined) {
+    return typed.length
   }
   if (isComplexSlice(item) || isArrayOrGoSlice(item)) {
     return len(item as Slice<any>)
   }
   if (typeof item !== 'number') {
     throw new Error(
-      'Cannot produce Uint8Array: appended elements contain non-numbers.',
+      'Cannot produce a typed slice: appended elements contain non-numbers.',
     )
   }
   return 1
 }
 
-function writeByteElements(
-  dst: Uint8Array,
+function writeTypedElements(
+  dst: TypedSlice,
   offset: number,
   elements: any[],
 ): void {
   let cursor = offset
   for (const item of elements) {
-    if (item instanceof Uint8Array) {
-      dst.set(item, cursor)
-      cursor += item.length
+    const typed = typedElements(item)
+    if (typed !== undefined) {
+      dst.set(typed, cursor)
+      cursor += typed.length
       continue
     }
     if (isComplexSlice(item) || isArrayOrGoSlice(item)) {
@@ -1560,7 +1867,7 @@ function writeByteElements(
         const value = arrayIndex(item as any, i)
         if (typeof value !== 'number') {
           throw new Error(
-            'Cannot produce Uint8Array: appended elements contain non-numbers.',
+            'Cannot produce a typed slice: appended elements contain non-numbers.',
           )
         }
         dst[cursor] = value
@@ -1570,7 +1877,7 @@ function writeByteElements(
     }
     if (typeof item !== 'number') {
       throw new Error(
-        'Cannot produce Uint8Array: appended elements contain non-numbers.',
+        'Cannot produce a typed slice: appended elements contain non-numbers.',
       )
     }
     dst[cursor] = item
@@ -1581,13 +1888,13 @@ function writeByteElements(
 /**
  * copy copies the shared length of src and dst, preserving overlapping source values.
  */
-export function copy(dst: Uint8Array, src: Uint8Array | string): number
-export function copy(dst: Uint8Array, src: Slice<number>): number
+export function copy(dst: TypedSlice, src: TypedSlice | string): number
+export function copy(dst: TypedSlice, src: Slice<number>): number
 export function copy<T>(dst: Slice<T>, src: Slice<T>): number
 export function copy<T>(dst: Slice<T>, src: string): number
 export function copy<T>(
-  dst: Slice<T> | Uint8Array,
-  src: Slice<T> | Uint8Array | string,
+  dst: Slice<T> | TypedSlice,
+  src: Slice<T> | TypedSlice | string,
 ): number {
   if (dst === null) {
     return 0
@@ -1601,16 +1908,19 @@ export function copy<T>(
     return 0
   }
 
-  const dstLen = dst instanceof Uint8Array ? dst.length : len(dst)
-  const srcLen = src instanceof Uint8Array ? src.length : len(src)
+  const dstLen = isTypedSlice(dst) ? dst.length : len(dst)
+  const srcLen = isTypedSlice(src) ? src.length : len(src)
   const count = Math.min(dstLen, srcLen)
 
   if (count === 0) {
     return 0
   }
 
-  if (dst instanceof Uint8Array && src instanceof Uint8Array) {
-    dst.set(src.subarray(0, count))
+  // Typed slices copy their memory, overlapping or not.
+  const dstElements = typedElements(dst)
+  const srcElements = typedElements(src)
+  if (dstElements !== undefined && srcElements !== undefined) {
+    dstElements.set(srcElements.subarray(0, count))
     return count
   }
   copySliceElements(dst, 0, src, 0, count)
@@ -1634,17 +1944,17 @@ export function copyByteRanges(
     return copy(goSlice(dst, dstLow, dstHigh), goSlice(src, srcLow, srcHigh))
   }
 
-  const dstMeta = byteSliceMeta(dst)
+  const dstMeta = typedSliceMeta(dst)
   const dstBacking = dstMeta?.backing ?? dst
   const dstStart = normalizeSliceIndex(dstLow) ?? 0
   const dstEnd = normalizeSliceIndex(dstHigh) ?? dst.length
-  checkByteSliceBounds(dstStart, dstEnd, dstMeta?.capacity ?? dst.length)
+  checkTypedSliceBounds(dstStart, dstEnd, dstMeta?.capacity ?? dst.length)
 
-  const srcMeta = byteSliceMeta(src)
+  const srcMeta = typedSliceMeta(src)
   const srcBacking = srcMeta?.backing ?? src
   const srcStart = normalizeSliceIndex(srcLow) ?? 0
   const srcEnd = normalizeSliceIndex(srcHigh) ?? src.length
-  checkByteSliceBounds(srcStart, srcEnd, srcMeta?.capacity ?? src.length)
+  checkTypedSliceBounds(srcStart, srcEnd, srcMeta?.capacity ?? src.length)
 
   const count = Math.min(dstEnd - dstStart, srcEnd - srcStart)
   if (count === 0) return 0
@@ -1659,9 +1969,9 @@ export function copyByteRanges(
   return count
 }
 
-function copyFromString<T>(dst: Slice<T> | Uint8Array, src: string): number {
+function copyFromString<T>(dst: Slice<T> | TypedSlice, src: string): number {
   // Copy as many bytes as both hold.
-  const dstLen = dst instanceof Uint8Array ? dst.length : len(dst)
+  const dstLen = isTypedSlice(dst) ? dst.length : len(dst)
   const bytes = goStringBytes(src)
   const count = Math.min(dstLen, bytes.length)
   if (count === 0) {
@@ -1669,7 +1979,7 @@ function copyFromString<T>(dst: Slice<T> | Uint8Array, src: string): number {
   }
 
   // A window writes its backing array; an array or byte array itself.
-  if (dst instanceof Uint8Array) {
+  if (isTypedSlice(dst)) {
     for (let i = 0; i < count; i++) {
       dst[i] = bytes[i]
     }
@@ -1689,17 +1999,19 @@ function copyFromString<T>(dst: Slice<T> | Uint8Array, src: string): number {
 
 /** copySliceElements copies each value and traverses overlapping backing in the safe direction. */
 export function copySliceElements<T>(
-  dst: Slice<T> | Uint8Array | null,
+  dst: Slice<T> | TypedSlice | null,
   dstIndex: number,
-  src: Slice<T> | Uint8Array | null | undefined,
+  src: Slice<T> | TypedSlice | null | undefined,
   srcIndex: number,
   count: number,
 ): void {
   if (dst == null || src == null || count <= 0) {
     return
   }
-  if (dst instanceof Uint8Array && src instanceof Uint8Array) {
-    dst.set(src.subarray(srcIndex, srcIndex + count), dstIndex)
+  const dstElements = typedElements(dst)
+  const srcElements = typedElements(src)
+  if (dstElements !== undefined && srcElements !== undefined) {
+    dstElements.set(srcElements.subarray(srcIndex, srcIndex + count), dstIndex)
     return
   }
   const srcMeta = isComplexSlice(src) ? src.__meta__ : undefined
@@ -1730,11 +2042,11 @@ export function index<T>(
     runtimePanic('runtime error: index on nil or undefined collection')
   }
 
-  if (collection instanceof Uint8Array) {
+  if (isTypedSlice(collection)) {
     if (index < 0 || index >= collection.length) {
       outOfRangeIndex(index, collection.length)
     }
-    return collection[index]
+    return collection[index] as T
   } else if (isComplexSlice(collection)) {
     if (index < 0 || index >= collection.__meta__.length) {
       outOfRangeIndex(index, collection.__meta__.length)
@@ -1752,7 +2064,7 @@ export function index<T>(
 }
 
 type ArrayIndexValue<C> =
-  C extends Uint8Array ? number
+  C extends TypedSlice ? number
   : C extends readonly (infer T)[] ? T
   : C extends SliceProxy<infer T> ? T
   : C extends null | undefined ? never
@@ -1767,7 +2079,7 @@ export function arrayIndex<
     | Slice<unknown>
     | SliceProxy<unknown>
     | unknown[]
-    | Uint8Array
+    | TypedSlice
     | null
     | undefined,
 >(collection: C, index: number): ArrayIndexValue<C> {
@@ -1790,19 +2102,22 @@ export function arrayIndex<
     return collection[index] as ArrayIndexValue<C>
   }
 
-  // A slice proxy or byte view with a window reads its backing array.
+  // A typed slice is a view of exactly its elements, so it is indexed
+  // directly, also when it has a window.
+  if (isTypedSlice(collection)) {
+    if (index < 0 || index >= collection.length) {
+      outOfRangeIndex(index, collection.length)
+    }
+    return collection[index] as ArrayIndexValue<C>
+  }
+
+  // A slice proxy reads its backing array.
   const meta = sliceMeta(collection)
   if (meta !== undefined) {
     if (index < 0 || index >= meta.length) {
       outOfRangeIndex(index, meta.length)
     }
     return meta.backing[meta.offset + index] as ArrayIndexValue<C>
-  }
-  if (collection instanceof Uint8Array) {
-    if (index < 0 || index >= collection.length) {
-      outOfRangeIndex(index, collection.length)
-    }
-    return collection[index] as ArrayIndexValue<C>
   }
   if (isComplexSlice(collection)) {
     const length = collection.__meta__.length
@@ -1825,13 +2140,13 @@ export function arrayIndex<
 /**
  * indexRef returns an addressable reference to a slice or array element.
  */
-export function indexRef(collection: Uint8Array, index: number): VarRef<number>
+export function indexRef(collection: TypedSlice, index: number): VarRef<number>
 export function indexRef<T>(
   collection: Slice<T> | T[],
   index: number,
 ): VarRef<T>
 export function indexRef<T>(
-  collection: Slice<T> | T[] | Uint8Array,
+  collection: Slice<T> | T[] | TypedSlice,
   index: number,
 ): VarRef<T> {
   if (collection === null || collection === undefined) {
@@ -1858,8 +2173,9 @@ export function indexRef<T>(
     return new ArrayIndexReference(collection, index)
   }
 
-  // A byte array, a slice proxy or another array.
-  if (collection instanceof Uint8Array) {
+  // A typed slice, a view of exactly its elements, a slice proxy or another
+  // array.
+  if (isTypedSlice(collection)) {
     if (index < 0 || index >= collection.length) {
       outOfRangeIndex(index, collection.length)
     }
@@ -1984,6 +2300,32 @@ export function sliceFromOwnedPointer<T>(
 }
 
 /**
+ * typedMemoryView returns length elements of ctor that view the memory of a
+ * typed slice from its element index on, as unsafe.Slice and
+ * (*[N]T)(unsafe.Pointer(&s[i])) do in Go, sharing it without copying.
+ */
+export function typedMemoryView(
+  collection: TypedSlice,
+  index: number,
+  length: number,
+  ctor: TypedSliceConstructor,
+): TypedSlice {
+  // The view starts at the element's byte and must be aligned for its own
+  // elements and lie within the memory of the slice's backing array.
+  const byteOffset =
+    collection.byteOffset + index * collection.BYTES_PER_ELEMENT
+  const byteEnd = byteOffset + length * ctor.BYTES_PER_ELEMENT
+  if (
+    length < 0 ||
+    byteOffset % ctor.BYTES_PER_ELEMENT !== 0 ||
+    byteEnd > collection.buffer.byteLength
+  ) {
+    runtimePanic('runtime error: unsafe slice outside of the memory it views')
+  }
+  return new ctor(collection.buffer, byteOffset, length)
+}
+
+/**
  * arrayPointerFromIndexRef turns &slice[i] into a pointer to an N-element array
  * view. This models unsafe conversions such as (*[64]byte)(unsafe.Pointer(&b[0]))
  * for packages that immediately slice or index the resulting array pointer.
@@ -2005,8 +2347,11 @@ export function arrayPointerFromIndexRef<T>(
     )
   }
   const index = ref.__goIndex ?? 0
+  const typed = typedElements(collection)
   const view =
-    targetElementByteSize === 1 && sourceElementByteSize > 1 ?
+    targetElementByteSize === 1 && typed !== undefined ?
+      typedMemoryView(typed, index, length, Uint8Array)
+    : targetElementByteSize === 1 && sourceElementByteSize > 1 ?
       byteArrayFromAddress(
         indexByteAddress(collection, index, sourceElementByteSize),
         length,
@@ -2041,10 +2386,11 @@ export function indexAddress<T>(
   let backing: object
   let backingIndex: number
   let length: number
-  if (collection instanceof Uint8Array) {
-    backing = collection.buffer
-    backingIndex = collection.byteOffset + index
-    length = collection.length
+  const typed = typedElements(collection)
+  if (typed !== undefined) {
+    backing = typed.buffer
+    backingIndex = typed.byteOffset + index * typed.BYTES_PER_ELEMENT
+    length = typed.length
   } else if (isComplexSlice(collection)) {
     backing = collection.__meta__.backing
     backingIndex = collection.__meta__.offset + index
@@ -2138,12 +2484,13 @@ export function indexByteAddress<T>(
     runtimePanic('runtime error: index on nil or undefined collection')
   }
 
-  if (collection instanceof Uint8Array) {
-    if (index < 0 || index >= collection.length) {
-      outOfRangeIndex(index, collection.length)
+  const typed = typedElements(collection)
+  if (typed !== undefined) {
+    if (index < 0 || index >= typed.length) {
+      outOfRangeIndex(index, typed.length)
     }
-    const view = new Uint8Array(collection.buffer)
-    const base = byteAddressBase(collection.buffer, {
+    const view = new Uint8Array(typed.buffer)
+    const base = byteAddressBase(typed.buffer, {
       byteLength: view.length,
       getByte(offset: number): number {
         return view[offset]
@@ -2152,7 +2499,7 @@ export function indexByteAddress<T>(
         view[offset] = value
       },
     })
-    return base + collection.byteOffset + index
+    return base + typed.byteOffset + index * typed.BYTES_PER_ELEMENT
   }
 
   if (isComplexSlice(collection)) {
@@ -2718,7 +3065,7 @@ export const bytesToString = (
 ): string => {
   if (bytes === null) return ''
   if (typeof bytes === 'string') return bytes
-  if (bytes instanceof Uint8Array) return goStringFromBytes(bytes)
+  if (isTypedSlice(bytes)) return goStringFromBytes(bytes as Uint8Array)
   let byteArray: number[]
   if (isComplexSlice(bytes)) {
     byteArray = bytes.__meta__.backing.slice(
