@@ -9,7 +9,7 @@ export type Code = number
 
 export async function main(): globalThis.Promise<void> {
 	// Widening conversions keep every value.
-	let runes = $.arrayToSlice<number>([97, -1, 0x10FFFF, -2147483648, 2147483647])
+	let runes = $.typedSliceOf(Int32Array, [97, -1, 0x10FFFF, -2147483648, 2147483647]) as $.Slice<number>
 	let sum = 0
 	for (let __goscriptRangeTarget0 = runes, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
 		let r = $.int((__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as number), 32)
