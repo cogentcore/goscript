@@ -7,53 +7,40 @@ import * as unsafe from "@goscript/unsafe/index.js"
 export type PointerValue<T> = T | $.VarRef<T> | null
 
 export class Bool {
-	public get v(): number {
-		return this._fields.v
-	}
-	public set v(value: number) {
-		this._fields.v = value
-	}
-
-	public _fields: {
-		v: number;
-	}
+	public declare v: number
 
 	constructor(init?: Partial<{v?: number}>) {
-		this._fields = {
-			v: init?.v ?? 0
-		}
+		this.v = init?.v ?? 0
 	}
 
 	public clone(): Bool {
 		const cloned = new Bool()
-		cloned._fields = {
-			v: this._fields.v
-		}
+		cloned.v = this.v
 		return cloned
 	}
 
 	// Load atomically loads and returns the value stored in x.
 	public Load(): boolean {
 		const x = this
-		return LoadUint32($.fieldRef(x._fields, "v")) != 0
+		return LoadUint32($.fieldRef(x, "v")) != 0
 	}
 
 	// Store atomically stores val into x.
 	public Store(val: boolean): void {
 		const x = this
-		StoreUint32($.fieldRef(x._fields, "v"), b32(val))
+		StoreUint32($.fieldRef(x, "v"), b32(val))
 	}
 
 	// Swap atomically stores new into x and returns the previous value.
 	public Swap(_new: boolean): boolean {
 		const x = this
-		return SwapUint32($.fieldRef(x._fields, "v"), b32(_new)) != 0
+		return SwapUint32($.fieldRef(x, "v"), b32(_new)) != 0
 	}
 
 	// CompareAndSwap executes the compare-and-swap operation for the boolean value x.
 	public CompareAndSwap(old: boolean, _new: boolean): boolean {
 		const x = this
-		return CompareAndSwapUint32($.fieldRef(x._fields, "v"), b32(old), b32(_new))
+		return CompareAndSwapUint32($.fieldRef(x, "v"), b32(old), b32(_new))
 	}
 
 	// Register this type with the runtime type system
@@ -74,46 +61,32 @@ export function b32(b: boolean): number {
 	return 0
 }
 
-
 export class Pointer<T> {
-	public get v(): PointerValue<T> {
-		return this._fields.v
-	}
-	public set v(value: PointerValue<T>) {
-		this._fields.v = value
-	}
-
-	public _fields: {
-		v: PointerValue<T>;
-	}
+	public declare v: PointerValue<T>
 
 	constructor(init?: Partial<{v?: PointerValue<T>}>) {
-		this._fields = {
-			v: init?.v ?? null
-		}
+		this.v = init?.v ?? null
 	}
 
 	public clone(): Pointer<T> {
 		const cloned = new Pointer<T>()
-		cloned._fields = {
-			v: this._fields.v
-		}
+		cloned.v = this.v
 		return cloned
 	}
 
 	// Load atomically loads and returns the value stored in x.
 	public Load(): PointerValue<T> {
 		const x = this
-		return LoadPointer($.fieldRef(x._fields, "v")) as PointerValue<T>
+		return LoadPointer($.fieldRef(x, "v")) as PointerValue<T>
 	}
 
 	// Store atomically stores val into x.
 	public Store(val: PointerValue<T>): void {
 		const x = this
 		if (val === null) {
-			StorePointer($.fieldRef(x._fields, "v"), null)
+			StorePointer($.fieldRef(x, "v"), null)
 		} else {
-			StorePointer($.fieldRef(x._fields, "v"), unsafe.Pointer(val))
+			StorePointer($.fieldRef(x, "v"), unsafe.Pointer(val))
 		}
 	}
 
@@ -121,15 +94,15 @@ export class Pointer<T> {
 	public Swap(_new: PointerValue<T>): PointerValue<T> {
 		const x = this
 		if (_new === null) {
-			return SwapPointer($.fieldRef(x._fields, "v"), null) as PointerValue<T>
+			return SwapPointer($.fieldRef(x, "v"), null) as PointerValue<T>
 		}
-		return SwapPointer($.fieldRef(x._fields, "v"), unsafe.Pointer(_new)) as PointerValue<T>
+		return SwapPointer($.fieldRef(x, "v"), unsafe.Pointer(_new)) as PointerValue<T>
 	}
 
 	// CompareAndSwap executes the compare-and-swap operation for x.
 	public CompareAndSwap(old: PointerValue<T>, _new: PointerValue<T>): boolean {
 		const x = this
-		return CompareAndSwapPointer($.fieldRef(x._fields, "v"), old ? unsafe.Pointer(old) : null, _new ? unsafe.Pointer(_new) : null)
+		return CompareAndSwapPointer($.fieldRef(x, "v"), old ? unsafe.Pointer(old) : null, _new ? unsafe.Pointer(_new) : null)
 	}
 
 	// Register this type with the runtime type system
@@ -143,73 +116,60 @@ export class Pointer<T> {
 }
 
 export class Int32 {
-	public get v(): number {
-		return this._fields.v
-	}
-	public set v(value: number) {
-		this._fields.v = value
-	}
-
-	public _fields: {
-		v: number;
-	}
+	public declare v: number
 
 	constructor(init?: Partial<{v?: number}>) {
-		this._fields = {
-			v: init?.v ?? 0
-		}
+		this.v = init?.v ?? 0
 	}
 
 	public clone(): Int32 {
 		const cloned = new Int32()
-		cloned._fields = {
-			v: this._fields.v
-		}
+		cloned.v = this.v
 		return cloned
 	}
 
 	// Load atomically loads and returns the value stored in x.
 	public Load(): number {
 		const x = this
-		return LoadInt32($.fieldRef(x._fields, "v"))
+		return LoadInt32($.fieldRef(x, "v"))
 	}
 
 	// Store atomically stores val into x.
 	public Store(val: number): void {
 		const x = this
-		StoreInt32($.fieldRef(x._fields, "v"), val)
+		StoreInt32($.fieldRef(x, "v"), val)
 	}
 
 	// Swap atomically stores new into x and returns the previous value.
 	public Swap(_new: number): number {
 		const x = this
-		return SwapInt32($.fieldRef(x._fields, "v"), _new)
+		return SwapInt32($.fieldRef(x, "v"), _new)
 	}
 
 	// CompareAndSwap executes the compare-and-swap operation for x.
 	public CompareAndSwap(old: number, _new: number): boolean {
 		const x = this
-		return CompareAndSwapInt32($.fieldRef(x._fields, "v"), old, _new)
+		return CompareAndSwapInt32($.fieldRef(x, "v"), old, _new)
 	}
 
 	// Add atomically adds delta to x and returns the new value.
 	public Add(delta: number): number {
 		const x = this
-		return AddInt32($.fieldRef(x._fields, "v"), delta)
+		return AddInt32($.fieldRef(x, "v"), delta)
 	}
 
 	// And atomically performs a bitwise AND operation on x using the bitmask
 	// provided as mask and returns the old value.
 	public And(mask: number): number {
 		const x = this
-		return AndInt32($.fieldRef(x._fields, "v"), mask)
+		return AndInt32($.fieldRef(x, "v"), mask)
 	}
 
 	// Or atomically performs a bitwise OR operation on x using the bitmask
 	// provided as mask and returns the old value.
 	public Or(mask: number): number {
 		const x = this
-		return OrInt32($.fieldRef(x._fields, "v"), mask)
+		return OrInt32($.fieldRef(x, "v"), mask)
 	}
 
 	// Register this type with the runtime type system
@@ -223,73 +183,60 @@ export class Int32 {
 }
 
 export class Int64 {
-	public get v(): bigint {
-		return this._fields.v
-	}
-	public set v(value: bigint) {
-		this._fields.v = value
-	}
-
-	public _fields: {
-		v: bigint;
-	}
+	public declare v: bigint
 
 	constructor(init?: Partial<{v?: bigint}>) {
-		this._fields = {
-			v: init?.v ?? 0n
-		}
+		this.v = init?.v ?? 0n
 	}
 
 	public clone(): Int64 {
 		const cloned = new Int64()
-		cloned._fields = {
-			v: this._fields.v
-		}
+		cloned.v = this.v
 		return cloned
 	}
 
 	// Load atomically loads and returns the value stored in x.
 	public Load(): bigint {
 		const x = this
-		return LoadInt64($.fieldRef(x._fields, "v"))
+		return LoadInt64($.fieldRef(x, "v"))
 	}
 
 	// Store atomically stores val into x.
 	public Store(val: bigint): void {
 		const x = this
-		StoreInt64($.fieldRef(x._fields, "v"), val)
+		StoreInt64($.fieldRef(x, "v"), val)
 	}
 
 	// Swap atomically stores new into x and returns the previous value.
 	public Swap(_new: bigint): bigint {
 		const x = this
-		return SwapInt64($.fieldRef(x._fields, "v"), _new)
+		return SwapInt64($.fieldRef(x, "v"), _new)
 	}
 
 	// CompareAndSwap executes the compare-and-swap operation for x.
 	public CompareAndSwap(old: bigint, _new: bigint): boolean {
 		const x = this
-		return CompareAndSwapInt64($.fieldRef(x._fields, "v"), old, _new)
+		return CompareAndSwapInt64($.fieldRef(x, "v"), old, _new)
 	}
 
 	// Add atomically adds delta to x and returns the new value.
 	public Add(delta: bigint): bigint {
 		const x = this
-		return AddInt64($.fieldRef(x._fields, "v"), delta)
+		return AddInt64($.fieldRef(x, "v"), delta)
 	}
 
 	// And atomically performs a bitwise AND operation on x using the bitmask
 	// provided as mask and returns the old value.
 	public And(mask: bigint): bigint {
 		const x = this
-		return AndInt64($.fieldRef(x._fields, "v"), mask)
+		return AndInt64($.fieldRef(x, "v"), mask)
 	}
 
 	// Or atomically performs a bitwise OR operation on x using the bitmask
 	// provided as mask and returns the old value.
 	public Or(mask: bigint): bigint {
 		const x = this
-		return OrInt64($.fieldRef(x._fields, "v"), mask)
+		return OrInt64($.fieldRef(x, "v"), mask)
 	}
 
 	// Register this type with the runtime type system
@@ -303,73 +250,60 @@ export class Int64 {
 }
 
 export class Uint32 {
-	public get v(): number {
-		return this._fields.v
-	}
-	public set v(value: number) {
-		this._fields.v = value
-	}
-
-	public _fields: {
-		v: number;
-	}
+	public declare v: number
 
 	constructor(init?: Partial<{v?: number}>) {
-		this._fields = {
-			v: init?.v ?? 0
-		}
+		this.v = init?.v ?? 0
 	}
 
 	public clone(): Uint32 {
 		const cloned = new Uint32()
-		cloned._fields = {
-			v: this._fields.v
-		}
+		cloned.v = this.v
 		return cloned
 	}
 
 	// Load atomically loads and returns the value stored in x.
 	public Load(): number {
 		const x = this
-		return LoadUint32($.fieldRef(x._fields, "v"))
+		return LoadUint32($.fieldRef(x, "v"))
 	}
 
 	// Store atomically stores val into x.
 	public Store(val: number): void {
 		const x = this
-		StoreUint32($.fieldRef(x._fields, "v"), val)
+		StoreUint32($.fieldRef(x, "v"), val)
 	}
 
 	// Swap atomically stores new into x and returns the previous value.
 	public Swap(_new: number): number {
 		const x = this
-		return SwapUint32($.fieldRef(x._fields, "v"), _new)
+		return SwapUint32($.fieldRef(x, "v"), _new)
 	}
 
 	// CompareAndSwap executes the compare-and-swap operation for x.
 	public CompareAndSwap(old: number, _new: number): boolean {
 		const x = this
-		return CompareAndSwapUint32($.fieldRef(x._fields, "v"), old, _new)
+		return CompareAndSwapUint32($.fieldRef(x, "v"), old, _new)
 	}
 
 	// Add atomically adds delta to x and returns the new value.
 	public Add(delta: number): number {
 		const x = this
-		return AddUint32($.fieldRef(x._fields, "v"), delta)
+		return AddUint32($.fieldRef(x, "v"), delta)
 	}
 
 	// And atomically performs a bitwise AND operation on x using the bitmask
 	// provided as mask and returns the old value.
 	public And(mask: number): number {
 		const x = this
-		return AndUint32($.fieldRef(x._fields, "v"), mask)
+		return AndUint32($.fieldRef(x, "v"), mask)
 	}
 
 	// Or atomically performs a bitwise OR operation on x using the bitmask
 	// provided as mask and returns the old value.
 	public Or(mask: number): number {
 		const x = this
-		return OrUint32($.fieldRef(x._fields, "v"), mask)
+		return OrUint32($.fieldRef(x, "v"), mask)
 	}
 
 	// Register this type with the runtime type system
@@ -383,73 +317,60 @@ export class Uint32 {
 }
 
 export class Uint64 {
-	public get v(): bigint {
-		return this._fields.v
-	}
-	public set v(value: bigint) {
-		this._fields.v = value
-	}
-
-	public _fields: {
-		v: bigint;
-	}
+	public declare v: bigint
 
 	constructor(init?: Partial<{v?: bigint}>) {
-		this._fields = {
-			v: init?.v ?? 0n
-		}
+		this.v = init?.v ?? 0n
 	}
 
 	public clone(): Uint64 {
 		const cloned = new Uint64()
-		cloned._fields = {
-			v: this._fields.v
-		}
+		cloned.v = this.v
 		return cloned
 	}
 
 	// Load atomically loads and returns the value stored in x.
 	public Load(): bigint {
 		const x = this
-		return LoadUint64($.fieldRef(x._fields, "v"))
+		return LoadUint64($.fieldRef(x, "v"))
 	}
 
 	// Store atomically stores val into x.
 	public Store(val: bigint): void {
 		const x = this
-		StoreUint64($.fieldRef(x._fields, "v"), val)
+		StoreUint64($.fieldRef(x, "v"), val)
 	}
 
 	// Swap atomically stores new into x and returns the previous value.
 	public Swap(_new: bigint): bigint {
 		const x = this
-		return SwapUint64($.fieldRef(x._fields, "v"), _new)
+		return SwapUint64($.fieldRef(x, "v"), _new)
 	}
 
 	// CompareAndSwap executes the compare-and-swap operation for x.
 	public CompareAndSwap(old: bigint, _new: bigint): boolean {
 		const x = this
-		return CompareAndSwapUint64($.fieldRef(x._fields, "v"), old, _new)
+		return CompareAndSwapUint64($.fieldRef(x, "v"), old, _new)
 	}
 
 	// Add atomically adds delta to x and returns the new value.
 	public Add(delta: bigint): bigint {
 		const x = this
-		return AddUint64($.fieldRef(x._fields, "v"), delta)
+		return AddUint64($.fieldRef(x, "v"), delta)
 	}
 
 	// And atomically performs a bitwise AND operation on x using the bitmask
 	// provided as mask and returns the old value.
 	public And(mask: bigint): bigint {
 		const x = this
-		return AndUint64($.fieldRef(x._fields, "v"), mask)
+		return AndUint64($.fieldRef(x, "v"), mask)
 	}
 
 	// Or atomically performs a bitwise OR operation on x using the bitmask
 	// provided as mask and returns the old value.
 	public Or(mask: bigint): bigint {
 		const x = this
-		return OrUint64($.fieldRef(x._fields, "v"), mask)
+		return OrUint64($.fieldRef(x, "v"), mask)
 	}
 
 	// Register this type with the runtime type system
@@ -463,73 +384,60 @@ export class Uint64 {
 }
 
 export class Uintptr {
-	public get v(): uintptr {
-		return this._fields.v
-	}
-	public set v(value: uintptr) {
-		this._fields.v = value
-	}
-
-	public _fields: {
-		v: uintptr;
-	}
+	public declare v: uintptr
 
 	constructor(init?: Partial<{v?: uintptr}>) {
-		this._fields = {
-			v: init?.v ?? 0
-		}
+		this.v = init?.v ?? 0
 	}
 
 	public clone(): Uintptr {
 		const cloned = new Uintptr()
-		cloned._fields = {
-			v: this._fields.v
-		}
+		cloned.v = this.v
 		return cloned
 	}
 
 	// Load atomically loads and returns the value stored in x.
 	public Load(): uintptr {
 		const x = this
-		return LoadUintptr($.fieldRef(x._fields, "v"))
+		return LoadUintptr($.fieldRef(x, "v"))
 	}
 
 	// Store atomically stores val into x.
 	public Store(val: uintptr): void {
 		const x = this
-		StoreUintptr($.fieldRef(x._fields, "v"), val)
+		StoreUintptr($.fieldRef(x, "v"), val)
 	}
 
 	// Swap atomically stores new into x and returns the previous value.
 	public Swap(_new: uintptr): uintptr {
 		const x = this
-		return SwapUintptr($.fieldRef(x._fields, "v"), _new)
+		return SwapUintptr($.fieldRef(x, "v"), _new)
 	}
 
 	// CompareAndSwap executes the compare-and-swap operation for x.
 	public CompareAndSwap(old: uintptr, _new: uintptr): boolean {
 		const x = this
-		return CompareAndSwapUintptr($.fieldRef(x._fields, "v"), old, _new)
+		return CompareAndSwapUintptr($.fieldRef(x, "v"), old, _new)
 	}
 
 	// Add atomically adds delta to x and returns the new value.
 	public Add(delta: uintptr): uintptr {
 		const x = this
-		return AddUintptr($.fieldRef(x._fields, "v"), delta)
+		return AddUintptr($.fieldRef(x, "v"), delta)
 	}
 
 	// And atomically performs a bitwise AND operation on x using the bitmask
 	// provided as mask and returns the old value.
 	public And(mask: uintptr): uintptr {
 		const x = this
-		return AndUintptr($.fieldRef(x._fields, "v"), mask)
+		return AndUintptr($.fieldRef(x, "v"), mask)
 	}
 
 	// Or atomically performs a bitwise OR operation on x using the bitmask
 	// provided as mask and returns the updated value after the OR operation.
 	public Or(mask: uintptr): uintptr {
 		const x = this
-		return OrUintptr($.fieldRef(x._fields, "v"), mask)
+		return OrUintptr($.fieldRef(x, "v"), mask)
 	}
 
 	// Register this type with the runtime type system
@@ -543,17 +451,14 @@ export class Uintptr {
 }
 
 class noCopy {
-	public _fields: {
-	}
 
 	constructor(init?: Partial<{}>) {
-		this._fields = {}
+
 	}
 
 	public clone(): noCopy {
 		const cloned = new noCopy()
-		cloned._fields = {
-		}
+
 		return cloned
 	}
 
@@ -575,17 +480,14 @@ class noCopy {
 }
 
 class align64 {
-	public _fields: {
-	}
 
 	constructor(init?: Partial<{}>) {
-		this._fields = {}
+
 	}
 
 	public clone(): align64 {
 		const cloned = new align64()
-		cloned._fields = {
-		}
+
 		return cloned
 	}
 
