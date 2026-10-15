@@ -9,28 +9,15 @@ export let ErrNoHandle: $.GoError = errors.New("os: process handle unavailable")
 
 // Process Simplified Process class for JavaScript environment.
 export class Process {
-	public get Pid(): number {
-		return this._fields.Pid
-	}
-	public set Pid(value: number) {
-		this._fields.Pid = value
-	}
-
-	public _fields: {
-		Pid: number;
-	}
+	public declare Pid: number
 
 	constructor(init?: Partial<{Pid?: number}>) {
-		this._fields = {
-			Pid: init?.Pid ?? -1
-		}
+		this.Pid = init?.Pid ?? -1
 	}
 
 	public clone(): Process {
 		const cloned = new Process()
-		cloned._fields = {
-			Pid: this._fields.Pid
-		}
+		cloned.Pid = this.Pid
 		return cloned
 	}
 
@@ -68,58 +55,27 @@ export class Process {
 
 // ProcAttr Simplified ProcAttr class for JavaScript environment.
 export class ProcAttr {
-	public get Dir(): string {
-		return this._fields.Dir
-	}
-	public set Dir(value: string) {
-		this._fields.Dir = value
-	}
+	public declare Dir: string
 
-	public get Env(): $.Slice<string> {
-		return this._fields.Env
-	}
-	public set Env(value: $.Slice<string>) {
-		this._fields.Env = value
-	}
+	public declare Env: $.Slice<string>
 
-	public get Files(): $.Slice<any> {
-		return this._fields.Files
-	}
-	public set Files(value: $.Slice<any>) {
-		this._fields.Files = value
-	}
+	public declare Files: $.Slice<any>
 
-	public get Sys(): any {
-		return this._fields.Sys
-	}
-	public set Sys(value: any) {
-		this._fields.Sys = value
-	}
-
-	public _fields: {
-		Dir: string;
-		Env: $.Slice<string>;
-		Files: $.Slice<any>;
-		Sys: any;
-	}
+	public declare Sys: any
 
 	constructor(init?: Partial<{Dir?: string, Env?: $.Slice<string>, Files?: $.Slice<any>, Sys?: any}>) {
-		this._fields = {
-			Dir: init?.Dir ?? "",
-			Env: init?.Env ?? null,
-			Files: init?.Files ?? null,
-			Sys: init?.Sys ?? null
-		}
+		this.Dir = init?.Dir ?? ""
+		this.Env = init?.Env ?? null
+		this.Files = init?.Files ?? null
+		this.Sys = init?.Sys ?? null
 	}
 
 	public clone(): ProcAttr {
 		const cloned = new ProcAttr()
-		cloned._fields = {
-			Dir: this._fields.Dir,
-			Env: this._fields.Env,
-			Files: this._fields.Files,
-			Sys: this._fields.Sys
-		}
+		cloned.Dir = this.Dir
+		cloned.Env = this.Env
+		cloned.Files = this.Files
+		cloned.Sys = this.Sys
 		return cloned
 	}
 
@@ -135,10 +91,9 @@ export class ProcAttr {
 
 // ProcessState mirrors the minimal JavaScript process surface.
 export class ProcessState {
-	public _fields: {}
 
 	constructor() {
-		this._fields = {}
+
 	}
 
 	public clone(): ProcessState {

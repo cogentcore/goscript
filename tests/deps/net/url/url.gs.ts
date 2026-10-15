@@ -35,11 +35,51 @@ import "@goscript/strconv/index.js"
 import "@goscript/strings/index.js"
 import "./encoding_table.gs.ts"
 
+$.registerTypePackagePath("net/url", ["url.Error", "url.EscapeError", "url.InvalidHostError", "url.URL", "url.Userinfo", "url.Values"])
+
 export type EscapeError = string
+
+$.registerNamedValueType(
+	"url.EscapeError",
+	{Error: (receiver: any, ...args: any[]) => (EscapeError_Error as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("Error", [], [/* @__PURE__ */ $.basicType("string")])]
+);
+
+$.registerNamedValueType(
+	"*url.EscapeError",
+	{Error: (receiver: any, ...args: any[]) => (EscapeError_Error as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("Error", [], [/* @__PURE__ */ $.basicType("string")])]
+);
 
 export type InvalidHostError = string
 
+$.registerNamedValueType(
+	"url.InvalidHostError",
+	{Error: (receiver: any, ...args: any[]) => (InvalidHostError_Error as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("Error", [], [/* @__PURE__ */ $.basicType("string")])]
+);
+
+$.registerNamedValueType(
+	"*url.InvalidHostError",
+	{Error: (receiver: any, ...args: any[]) => (InvalidHostError_Error as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("Error", [], [/* @__PURE__ */ $.basicType("string")])]
+);
+
 export type Values = globalThis.Map<string, $.Slice<string>> | null
+
+$.registerNamedType("url.Values", /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("string"))));
+
+$.registerNamedValueType(
+	"url.Values",
+	{Add: (receiver: any, ...args: any[]) => (Values_Add as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Clone: (receiver: any, ...args: any[]) => (Values_Clone as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Del: (receiver: any, ...args: any[]) => (Values_Del as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Encode: (receiver: any, ...args: any[]) => (Values_Encode as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Get: (receiver: any, ...args: any[]) => (Values_Get as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Has: (receiver: any, ...args: any[]) => (Values_Has as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Set: (receiver: any, ...args: any[]) => (Values_Set as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("Add", [["key", /* @__PURE__ */ $.basicType("string")], ["value", /* @__PURE__ */ $.basicType("string")]]), $.methodSignature("Clone", [], ["url.Values"]), $.methodSignature("Del", [["key", /* @__PURE__ */ $.basicType("string")]]), $.methodSignature("Encode", [], [/* @__PURE__ */ $.basicType("string")]), $.methodSignature("Get", [["key", /* @__PURE__ */ $.basicType("string")]], [/* @__PURE__ */ $.basicType("string")]), $.methodSignature("Has", [["key", /* @__PURE__ */ $.basicType("string")]], [/* @__PURE__ */ $.basicType("bool")]), $.methodSignature("Set", [["key", /* @__PURE__ */ $.basicType("string")], ["value", /* @__PURE__ */ $.basicType("string")]])]
+);
+
+$.registerNamedValueType(
+	"*url.Values",
+	{Add: (receiver: any, ...args: any[]) => (Values_Add as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args)), Clone: (receiver: any, ...args: any[]) => (Values_Clone as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args)), Del: (receiver: any, ...args: any[]) => (Values_Del as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args)), Encode: (receiver: any, ...args: any[]) => (Values_Encode as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args)), Get: (receiver: any, ...args: any[]) => (Values_Get as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args)), Has: (receiver: any, ...args: any[]) => (Values_Has as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args)), Set: (receiver: any, ...args: any[]) => (Values_Set as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("Add", [["key", /* @__PURE__ */ $.basicType("string")], ["value", /* @__PURE__ */ $.basicType("string")]]), $.methodSignature("Clone", [], ["url.Values"]), $.methodSignature("Del", [["key", /* @__PURE__ */ $.basicType("string")]]), $.methodSignature("Encode", [], [/* @__PURE__ */ $.basicType("string")]), $.methodSignature("Get", [["key", /* @__PURE__ */ $.basicType("string")]], [/* @__PURE__ */ $.basicType("string")]), $.methodSignature("Has", [["key", /* @__PURE__ */ $.basicType("string")]], [/* @__PURE__ */ $.basicType("bool")]), $.methodSignature("Set", [["key", /* @__PURE__ */ $.basicType("string")], ["value", /* @__PURE__ */ $.basicType("string")]])]
+);
 
 export class Error {
 	public declare Op: string
@@ -48,39 +88,40 @@ export class Error {
 
 	public declare Err: $.GoError
 
-	public _fields: {
-		Op: string
-		URL: string
-		Err: $.GoError
-	}
-
-	constructor(init?: Partial<{Op?: string, URL?: string, Err?: $.GoError}>) {
-		this._fields = {
-			Op: init?.Op ?? ("" as string),
-			URL: init?.URL ?? ("" as string),
-			Err: init?.Err ?? (null! as $.GoError)
-		}
+	constructor(init?: Partial<{Op?: string, URL?: string, Err?: $.GoError}>, __goscriptValue?: boolean) {
+		this.Op = init?.Op ?? ("" as string)
+		this.URL = init?.URL ?? ("" as string)
+		this.Err = init?.Err ?? (null! as $.GoError)
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Error {
-		return $.markAsStructValue(new Error(this))
+		return new Error(this, true)
+	}
+
+	public __goscriptAssign(source: Error): this {
+		this.Op = source.Op
+		this.URL = source.URL
+		this.Err = $.assignFieldValue(this.Err, source.Err, "error")
+		return this
 	}
 
 	public async Error(): globalThis.Promise<string> {
 		const e: Error | $.VarRef<Error> | null = this;
-		return fmt.Sprintf("%s %q: %s", $.pointerValue<Error>(e).Op, $.pointerValue<Error>(e).URL, ($.pointerValue<Error>(e).Err as any))
+		const e$: Error = e == null ? $.pointerTarget<Error>(e) : (e as any).__isVarRef === true ? (e as any).value : (e as any).__goValue === undefined ? (e as any) : $.pointerTarget<Error>(e)
+		return fmt.Sprintf("%s %q: %s", (e$ as Error).Op, (e$ as Error).URL, ((e$ as Error).Err as any))
 	}
 
 	public async Temporary(): globalThis.Promise<boolean> {
 		const e: Error | $.VarRef<Error> | null = this;
 		let [t, ok] = $.typeAssertTuple<any>($.pointerValue<Error>(e).Err, { kind: $.TypeKind.Interface, methods: [{ name: "Temporary", args: [], returns: [{ name: "_r0", type: /* @__PURE__ */ $.basicType("bool") }] }] })
-		return ok && await $.pointerValue<any>(t).Temporary()
+		return ok && (__goscriptAwait = (t !== null && (t as any).__isVarRef !== true && (t as any).__goValue === undefined ? (t as any) : $.pointerValue<any>(t)).Temporary(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 	}
 
 	public async Timeout(): globalThis.Promise<boolean> {
 		const e: Error | $.VarRef<Error> | null = this;
 		let [t, ok] = $.typeAssertTuple<any>($.pointerValue<Error>(e).Err, { kind: $.TypeKind.Interface, methods: [{ name: "Timeout", args: [], returns: [{ name: "_r0", type: /* @__PURE__ */ $.basicType("bool") }] }] })
-		return ok && await $.pointerValue<any>(t).Timeout()
+		return ok && (__goscriptAwait = (t !== null && (t as any).__isVarRef !== true && (t as any).__goValue === undefined ? (t as any) : $.pointerValue<any>(t)).Timeout(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 	}
 
 	public Unwrap(): $.GoError {
@@ -88,14 +129,10 @@ export class Error {
 		return $.pointerValue<Error>(e).Err
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Op", "URL", "Err"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"url.Error",
 		() => new Error(),
-		() => [{ name: "Error", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }, { name: "Temporary", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "Timeout", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "Unwrap", args: [], returns: [{ type: "error" }] }],
+		() => [{ name: "Error", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }], pointerReceiver: true }, { name: "Temporary", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }], pointerReceiver: true }, { name: "Timeout", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }], pointerReceiver: true }, { name: "Unwrap", args: [], returns: [{ type: "error" }], pointerReceiver: true }],
 		Error,
 		() => [{ name: "Op", key: "Op", type: /* @__PURE__ */ $.basicType("string") }, { name: "URL", key: "URL", type: /* @__PURE__ */ $.basicType("string") }, { name: "Err", key: "Err", type: "error" }]
 	)
@@ -138,81 +175,84 @@ export class URL {
 	// When set, the String method will not include the host when it is empty.
 	public declare OmitHost: boolean
 
-	public _fields: {
-		Scheme: string
-		Opaque: string
-		User: Userinfo | $.VarRef<Userinfo> | null
-		Host: string
-		Path: string
-		Fragment: string
-		RawQuery: string
-		RawPath: string
-		RawFragment: string
-		ForceQuery: boolean
-		OmitHost: boolean
-	}
-
-	constructor(init?: Partial<{Scheme?: string, Opaque?: string, User?: Userinfo | $.VarRef<Userinfo> | null, Host?: string, Path?: string, Fragment?: string, RawQuery?: string, RawPath?: string, RawFragment?: string, ForceQuery?: boolean, OmitHost?: boolean}>) {
-		this._fields = {
-			Scheme: init?.Scheme ?? ("" as string),
-			Opaque: init?.Opaque ?? ("" as string),
-			User: init?.User ?? (null! as Userinfo | $.VarRef<Userinfo> | null),
-			Host: init?.Host ?? ("" as string),
-			Path: init?.Path ?? ("" as string),
-			Fragment: init?.Fragment ?? ("" as string),
-			RawQuery: init?.RawQuery ?? ("" as string),
-			RawPath: init?.RawPath ?? ("" as string),
-			RawFragment: init?.RawFragment ?? ("" as string),
-			ForceQuery: init?.ForceQuery ?? (false as boolean),
-			OmitHost: init?.OmitHost ?? (false as boolean)
-		}
+	constructor(init?: Partial<{Scheme?: string, Opaque?: string, User?: Userinfo | $.VarRef<Userinfo> | null, Host?: string, Path?: string, Fragment?: string, RawQuery?: string, RawPath?: string, RawFragment?: string, ForceQuery?: boolean, OmitHost?: boolean}>, __goscriptValue?: boolean) {
+		this.Scheme = init?.Scheme ?? ("" as string)
+		this.Opaque = init?.Opaque ?? ("" as string)
+		this.User = init?.User ?? (null! as Userinfo | $.VarRef<Userinfo> | null)
+		this.Host = init?.Host ?? ("" as string)
+		this.Path = init?.Path ?? ("" as string)
+		this.Fragment = init?.Fragment ?? ("" as string)
+		this.RawQuery = init?.RawQuery ?? ("" as string)
+		this.RawPath = init?.RawPath ?? ("" as string)
+		this.RawFragment = init?.RawFragment ?? ("" as string)
+		this.ForceQuery = init?.ForceQuery ?? (false as boolean)
+		this.OmitHost = init?.OmitHost ?? (false as boolean)
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): URL {
-		return $.markAsStructValue(new URL(this))
+		return new URL(this, true)
+	}
+
+	public __goscriptAssign(source: URL): this {
+		this.Scheme = source.Scheme
+		this.Opaque = source.Opaque
+		this.User = source.User
+		this.Host = source.Host
+		this.Path = source.Path
+		this.Fragment = source.Fragment
+		this.RawQuery = source.RawQuery
+		this.RawPath = source.RawPath
+		this.RawFragment = source.RawFragment
+		this.ForceQuery = source.ForceQuery
+		this.OmitHost = source.OmitHost
+		return this
 	}
 
 	public AppendBinary(b: $.Slice<number>): [$.Slice<number>, $.GoError] {
 		const u: URL | $.VarRef<URL> | null = this;
-		return [$.appendSlice(b, $.stringToBytes(URL.prototype.String.call(u)), $.byteSliceHint), null]
+		return [$.appendSlice(b, $.stringToBytes((u !== null && (u as any).__isVarRef !== true && (u as any).__goValue === undefined ? ((u as any) as URL).String() : URL.prototype.String.call(u))), $.byteSliceHint), null]
 	}
 
 	public Clone(): URL | $.VarRef<URL> | null {
 		const u: URL | $.VarRef<URL> | null = this;
+		const u$: URL = u == null ? $.pointerTarget<URL>(u) : (u as any).__isVarRef === true ? (u as any).value : (u as any).__goValue === undefined ? (u as any) : $.pointerTarget<URL>(u)
 		if (u == null) {
 			return null
 		}
 
-		let uc: URL | $.VarRef<URL> | null = $.varRef<URL>($.markAsStructValue($.cloneStructValue($.pointerValue<URL>(u))))
-		if ($.pointerValue<URL>(u).User != null) {
-			$.pointerValue<URL>(uc).User = $.varRef<Userinfo>($.markAsStructValue($.cloneStructValue($.pointerValue<Userinfo>($.pointerValue<URL>(u).User))))
+		let uc = $.varRef<URL>(((u$ as URL)).clone())
+		if ((u$ as URL).User != null) {
+			$.pointerValue<URL>(uc).User = $.varRef<Userinfo>(($.pointerValue<Userinfo>((u$ as URL).User)).clone())
 		}
 		return uc
 	}
 
 	public EscapedFragment(): string {
 		const u: URL | $.VarRef<URL> | null = this;
-		if ((!$.stringEqual($.pointerValue<URL>(u).RawFragment, "")) && validEncoded($.pointerValue<URL>(u).RawFragment, 64)) {
-			let [f, err] = unescape($.pointerValue<URL>(u).RawFragment, 64)
-			if ((err == null) && ($.stringEqual(f, $.pointerValue<URL>(u).Fragment))) {
-				return $.pointerValue<URL>(u).RawFragment
+		const u$: URL = u == null ? $.pointerTarget<URL>(u) : (u as any).__isVarRef === true ? (u as any).value : (u as any).__goValue === undefined ? (u as any) : $.pointerTarget<URL>(u)
+		if ((!$.stringEqual((u$ as URL).RawFragment, "")) && validEncoded((u$ as URL).RawFragment, 64)) {
+			let [f, err] = unescape((u$ as URL).RawFragment, 64)
+			if ((err == null) && ($.stringEqual(f, (u$ as URL).Fragment))) {
+				return (u$ as URL).RawFragment
 			}
 		}
-		return escape($.pointerValue<URL>(u).Fragment, 64)
+		return escape((u$ as URL).Fragment, 64)
 	}
 
 	public EscapedPath(): string {
 		const u: URL | $.VarRef<URL> | null = this;
-		if ((!$.stringEqual($.pointerValue<URL>(u).RawPath, "")) && validEncoded($.pointerValue<URL>(u).RawPath, 1)) {
-			let [p, err] = unescape($.pointerValue<URL>(u).RawPath, 1)
-			if ((err == null) && ($.stringEqual(p, $.pointerValue<URL>(u).Path))) {
-				return $.pointerValue<URL>(u).RawPath
+		const u$: URL = u == null ? $.pointerTarget<URL>(u) : (u as any).__isVarRef === true ? (u as any).value : (u as any).__goValue === undefined ? (u as any) : $.pointerTarget<URL>(u)
+		if ((!$.stringEqual((u$ as URL).RawPath, "")) && validEncoded((u$ as URL).RawPath, 1)) {
+			let [p, err] = unescape((u$ as URL).RawPath, 1)
+			if ((err == null) && ($.stringEqual(p, (u$ as URL).Path))) {
+				return (u$ as URL).RawPath
 			}
 		}
-		if ($.stringEqual($.pointerValue<URL>(u).Path, "*")) {
+		if ($.stringEqual((u$ as URL).Path, "*")) {
 			return "*"
 		}
-		return escape($.pointerValue<URL>(u).Path, 1)
+		return escape((u$ as URL).Path, 1)
 	}
 
 	public Hostname(): string {
@@ -228,7 +268,7 @@ export class URL {
 
 	public JoinPath(elem: $.Slice<string>): URL | $.VarRef<URL> | null {
 		const u: URL | $.VarRef<URL> | null = this;
-		let __goscriptTuple0: any = URL.prototype.joinPath.call(u, elem)
+		let __goscriptTuple0: any = (u !== null && (u as any).__isVarRef !== true && (u as any).__goValue === undefined ? ((u as any) as URL).joinPath(elem) : URL.prototype.joinPath.call(u, elem))
 		let url: URL | $.VarRef<URL> | null = __goscriptTuple0[0]
 		return url
 	}
@@ -237,7 +277,7 @@ export class URL {
 		const u: URL | $.VarRef<URL> | null = this;
 		let text: $.Slice<number> = null! as $.Slice<number>
 		let err: $.GoError = null! as $.GoError
-		return URL.prototype.AppendBinary.call(u, null)
+		return (u !== null && (u as any).__isVarRef !== true && (u as any).__goValue === undefined ? ((u as any) as URL).AppendBinary(null) : URL.prototype.AppendBinary.call(u, null))
 	}
 
 	public Parse(ref: string): [URL | $.VarRef<URL> | null, $.GoError] {
@@ -248,7 +288,7 @@ export class URL {
 		if (err != null) {
 			return [null, err]
 		}
-		return [URL.prototype.ResolveReference.call(u, refURL), null]
+		return [(u !== null && (u as any).__isVarRef !== true && (u as any).__goValue === undefined ? ((u as any) as URL).ResolveReference(refURL) : URL.prototype.ResolveReference.call(u, refURL)), null]
 	}
 
 	public Port(): string {
@@ -270,7 +310,7 @@ export class URL {
 			return ""
 		}
 
-		let ru = $.varRef($.markAsStructValue($.cloneStructValue($.pointerValue<URL>(u))))
+		let ru = $.varRef(($.pointerValue<URL>(u)).clone())
 		{
 			let [, has] = Userinfo.prototype.Password.call(ru.value.User)
 			if (has) {
@@ -282,119 +322,123 @@ export class URL {
 
 	public RequestURI(): string {
 		const u: URL | $.VarRef<URL> | null = this;
-		let result = $.pointerValue<URL>(u).Opaque
+		const u$: URL = u == null ? $.pointerTarget<URL>(u) : (u as any).__isVarRef === true ? (u as any).value : (u as any).__goValue === undefined ? (u as any) : $.pointerTarget<URL>(u)
+		let result = (u$ as URL).Opaque
 		if ($.stringEqual(result, "")) {
-			result = URL.prototype.EscapedPath.call(u)
+			result = (u !== null && (u as any).__isVarRef !== true && (u as any).__goValue === undefined ? ((u as any) as URL).EscapedPath() : URL.prototype.EscapedPath.call(u))
 			if ($.stringEqual(result, "")) {
 				result = "/"
 			}
 		} else {
 			if (strings.HasPrefix(result, "//")) {
-				result = ($.pointerValue<URL>(u).Scheme + ":") + result
+				result = (u$ as URL).Scheme + ":" + result
 			}
 		}
-		if ($.pointerValue<URL>(u).ForceQuery || (!$.stringEqual($.pointerValue<URL>(u).RawQuery, ""))) {
-			result = result + ("?" + $.pointerValue<URL>(u).RawQuery)
+		if ((u$ as URL).ForceQuery || (!$.stringEqual((u$ as URL).RawQuery, ""))) {
+			result += "?" + (u$ as URL).RawQuery
 		}
 		return result
 	}
 
 	public ResolveReference(ref: URL | $.VarRef<URL> | null): URL | $.VarRef<URL> | null {
 		const u: URL | $.VarRef<URL> | null = this;
-		let url = $.varRef($.markAsStructValue($.cloneStructValue($.pointerValue<URL>(ref))))
-		if ($.stringEqual($.pointerValue<URL>(ref).Scheme, "")) {
-			url.value.Scheme = $.pointerValue<URL>(u).Scheme
+		const u$: URL = u == null ? $.pointerTarget<URL>(u) : (u as any).__isVarRef === true ? (u as any).value : (u as any).__goValue === undefined ? (u as any) : $.pointerTarget<URL>(u)
+		const ref$: URL = ref == null ? $.pointerTarget<URL>(ref) : (ref as any).__isVarRef === true ? (ref as any).value : (ref as any).__goValue === undefined ? (ref as any) : $.pointerTarget<URL>(ref)
+		let url = $.varRef(((ref$ as URL)).clone())
+		if ($.stringEqual((ref$ as URL).Scheme, "")) {
+			url.value.Scheme = (u$ as URL).Scheme
 		}
-		if (((!$.stringEqual($.pointerValue<URL>(ref).Scheme, "")) || (!$.stringEqual($.pointerValue<URL>(ref).Host, ""))) || ($.pointerValue<URL>(ref).User != null)) {
+		if (((!$.stringEqual((ref$ as URL).Scheme, "")) || (!$.stringEqual((ref$ as URL).Host, ""))) || ((ref$ as URL).User != null)) {
 			// The "absoluteURI" or "net_path" cases.
 			// We can ignore the error from setPath since we know we provided a
 			// validly-escaped path.
-			url.value.setPath(resolvePath(URL.prototype.EscapedPath.call(ref), ""))
+			url.value.setPath(resolvePath((ref !== null && (ref as any).__isVarRef !== true && (ref as any).__goValue === undefined ? ((ref as any) as URL).EscapedPath() : URL.prototype.EscapedPath.call(ref)), ""))
 			return url
 		}
-		if (!$.stringEqual($.pointerValue<URL>(ref).Opaque, "")) {
+		if (!$.stringEqual((ref$ as URL).Opaque, "")) {
 			url.value.User = null
 			url.value.Host = ""
 			url.value.Path = ""
 			return url
 		}
-		if ((($.stringEqual($.pointerValue<URL>(ref).Path, "")) && !$.pointerValue<URL>(ref).ForceQuery) && ($.stringEqual($.pointerValue<URL>(ref).RawQuery, ""))) {
-			url.value.RawQuery = $.pointerValue<URL>(u).RawQuery
-			if ($.stringEqual($.pointerValue<URL>(ref).Fragment, "")) {
-				url.value.Fragment = $.pointerValue<URL>(u).Fragment
-				url.value.RawFragment = $.pointerValue<URL>(u).RawFragment
+		if ((($.stringEqual((ref$ as URL).Path, "")) && !(ref$ as URL).ForceQuery) && ($.stringEqual((ref$ as URL).RawQuery, ""))) {
+			url.value.RawQuery = (u$ as URL).RawQuery
+			if ($.stringEqual((ref$ as URL).Fragment, "")) {
+				url.value.Fragment = (u$ as URL).Fragment
+				url.value.RawFragment = (u$ as URL).RawFragment
 			}
 		}
-		if (($.stringEqual($.pointerValue<URL>(ref).Path, "")) && (!$.stringEqual($.pointerValue<URL>(u).Opaque, ""))) {
-			url.value.Opaque = $.pointerValue<URL>(u).Opaque
+		if (($.stringEqual((ref$ as URL).Path, "")) && (!$.stringEqual((u$ as URL).Opaque, ""))) {
+			url.value.Opaque = (u$ as URL).Opaque
 			url.value.User = null
 			url.value.Host = ""
 			url.value.Path = ""
 			return url
 		}
 		// The "abs_path" or "rel_path" cases.
-		url.value.Host = $.pointerValue<URL>(u).Host
-		url.value.User = $.pointerValue<URL>(u).User
-		url.value.setPath(resolvePath(URL.prototype.EscapedPath.call(u), URL.prototype.EscapedPath.call(ref)))
+		url.value.Host = (u$ as URL).Host
+		url.value.User = (u$ as URL).User
+		url.value.setPath(resolvePath((u !== null && (u as any).__isVarRef !== true && (u as any).__goValue === undefined ? ((u as any) as URL).EscapedPath() : URL.prototype.EscapedPath.call(u)), (ref !== null && (ref as any).__isVarRef !== true && (ref as any).__goValue === undefined ? ((ref as any) as URL).EscapedPath() : URL.prototype.EscapedPath.call(ref))))
 		return url
 	}
 
 	public String(): string {
 		const u: URL | $.VarRef<URL> | null = this;
+		const u$: URL = u == null ? $.pointerTarget<URL>(u) : (u as any).__isVarRef === true ? (u as any).value : (u as any).__goValue === undefined ? (u as any) : $.pointerTarget<URL>(u)
 		let buf: $.VarRef<strings.Builder> = $.varRef($.markAsStructValue(new strings.Builder()))
 
-		let n = $.len($.pointerValue<URL>(u).Scheme)
-		if (!$.stringEqual($.pointerValue<URL>(u).Opaque, "")) {
-			n = n + ($.len($.pointerValue<URL>(u).Opaque))
+		let n = $.stringLen((u$ as URL).Scheme)
+		if (!$.stringEqual((u$ as URL).Opaque, "")) {
+			n += $.stringLen((u$ as URL).Opaque)
 		} else {
-			if (!$.pointerValue<URL>(u).OmitHost && (((!$.stringEqual($.pointerValue<URL>(u).Scheme, "")) || (!$.stringEqual($.pointerValue<URL>(u).Host, ""))) || ($.pointerValue<URL>(u).User != null))) {
-				let username = Userinfo.prototype.Username.call($.pointerValue<URL>(u).User)
-				let [password, ] = Userinfo.prototype.Password.call($.pointerValue<URL>(u).User)
-				n = n + (($.len(username) + $.len(password)) + $.len($.pointerValue<URL>(u).Host))
+			if (!(u$ as URL).OmitHost && (((!$.stringEqual((u$ as URL).Scheme, "")) || (!$.stringEqual((u$ as URL).Host, ""))) || ((u$ as URL).User != null))) {
+				let username = Userinfo.prototype.Username.call((u$ as URL).User)
+				let [password, ] = Userinfo.prototype.Password.call((u$ as URL).User)
+				n += ($.stringLen(username) + $.stringLen(password)) + $.stringLen((u$ as URL).Host)
 			}
-			n = n + ($.len($.pointerValue<URL>(u).Path))
+			n += $.stringLen((u$ as URL).Path)
 		}
-		n = n + ($.len($.pointerValue<URL>(u).RawQuery) + $.len($.pointerValue<URL>(u).RawFragment))
-		n = n + (12)
+		n += $.stringLen((u$ as URL).RawQuery) + $.stringLen((u$ as URL).RawFragment)
+		n += 12
 		buf.value.Grow(n)
 
-		if (!$.stringEqual($.pointerValue<URL>(u).Scheme, "")) {
-			buf.value.WriteString($.pointerValue<URL>(u).Scheme)
+		if (!$.stringEqual((u$ as URL).Scheme, "")) {
+			buf.value.WriteString((u$ as URL).Scheme)
 			buf.value.WriteByte(58)
 		}
-		if (!$.stringEqual($.pointerValue<URL>(u).Opaque, "")) {
-			buf.value.WriteString($.pointerValue<URL>(u).Opaque)
+		if (!$.stringEqual((u$ as URL).Opaque, "")) {
+			buf.value.WriteString((u$ as URL).Opaque)
 		} else {
-			if (((!$.stringEqual($.pointerValue<URL>(u).Scheme, "")) || (!$.stringEqual($.pointerValue<URL>(u).Host, ""))) || ($.pointerValue<URL>(u).User != null)) {
-				if (($.pointerValue<URL>(u).OmitHost && ($.stringEqual($.pointerValue<URL>(u).Host, ""))) && ($.pointerValue<URL>(u).User == null)) {
+			if (((!$.stringEqual((u$ as URL).Scheme, "")) || (!$.stringEqual((u$ as URL).Host, ""))) || ((u$ as URL).User != null)) {
+				if (((u$ as URL).OmitHost && ($.stringEqual((u$ as URL).Host, ""))) && ((u$ as URL).User == null)) {
 				} else {
-					if (((!$.stringEqual($.pointerValue<URL>(u).Host, "")) || (!$.stringEqual($.pointerValue<URL>(u).Path, ""))) || ($.pointerValue<URL>(u).User != null)) {
+					if (((!$.stringEqual((u$ as URL).Host, "")) || (!$.stringEqual((u$ as URL).Path, ""))) || ((u$ as URL).User != null)) {
 						buf.value.WriteString("//")
 					}
 					{
-						let ui: Userinfo | $.VarRef<Userinfo> | null = $.pointerValue<URL>(u).User
+						let ui = (u$ as URL).User
 						if (ui != null) {
-							buf.value.WriteString(Userinfo.prototype.String.call(ui))
+							buf.value.WriteString((ui !== null && (ui as any).__isVarRef !== true && (ui as any).__goValue === undefined ? ((ui as any) as Userinfo).String() : Userinfo.prototype.String.call(ui)))
 							buf.value.WriteByte(64)
 						}
 					}
 					{
-						let h = $.pointerValue<URL>(u).Host
+						let h = (u$ as URL).Host
 						if (!$.stringEqual(h, "")) {
 							buf.value.WriteString(escape(h, 4))
 						}
 					}
 				}
 			}
-			let __goscriptShadow0 = URL.prototype.EscapedPath.call(u)
-			if ((($.pointerValue<URL>(u).OmitHost && ($.stringEqual($.pointerValue<URL>(u).Host, ""))) && ($.pointerValue<URL>(u).User == null)) && strings.HasPrefix(__goscriptShadow0, "//")) {
+			let __goscriptShadow0 = (u !== null && (u as any).__isVarRef !== true && (u as any).__goValue === undefined ? ((u as any) as URL).EscapedPath() : URL.prototype.EscapedPath.call(u))
+			if ((((u$ as URL).OmitHost && ($.stringEqual((u$ as URL).Host, ""))) && ((u$ as URL).User == null)) && strings.HasPrefix(__goscriptShadow0, "//")) {
 				// Escape the first / in a path starting with "//" and no authority
 				// so that re-parsing the URL doesn't turn the path into an authority
 				// (e.g., Path="//host/p" producing "http://host/p").
 				buf.value.WriteString("%2F")
 				__goscriptShadow0 = $.sliceStringOrBytes(__goscriptShadow0, 1, undefined)
 			}
-			if (((!$.stringEqual(__goscriptShadow0, "")) && ($.uint($.indexStringOrBytes(__goscriptShadow0, 0), 8) != 47)) && (!$.stringEqual($.pointerValue<URL>(u).Host, ""))) {
+			if (((!$.stringEqual(__goscriptShadow0, "")) && ($.indexString(__goscriptShadow0, 0) != 47)) && (!$.stringEqual((u$ as URL).Host, ""))) {
 				buf.value.WriteByte(47)
 			}
 			if (buf.value.Len() == 0) {
@@ -413,13 +457,13 @@ export class URL {
 			}
 			buf.value.WriteString(__goscriptShadow0)
 		}
-		if ($.pointerValue<URL>(u).ForceQuery || (!$.stringEqual($.pointerValue<URL>(u).RawQuery, ""))) {
+		if ((u$ as URL).ForceQuery || (!$.stringEqual((u$ as URL).RawQuery, ""))) {
 			buf.value.WriteByte(63)
-			buf.value.WriteString($.pointerValue<URL>(u).RawQuery)
+			buf.value.WriteString((u$ as URL).RawQuery)
 		}
-		if (!$.stringEqual($.pointerValue<URL>(u).Fragment, "")) {
+		if (!$.stringEqual((u$ as URL).Fragment, "")) {
 			buf.value.WriteByte(35)
-			buf.value.WriteString(URL.prototype.EscapedFragment.call(u))
+			buf.value.WriteString((u !== null && (u as any).__isVarRef !== true && (u as any).__goValue === undefined ? ((u as any) as URL).EscapedFragment() : URL.prototype.EscapedFragment.call(u)))
 		}
 		return buf.value.String()
 	}
@@ -432,13 +476,13 @@ export class URL {
 		if (err != null) {
 			return err
 		}
-		$.assignStruct($.pointerValue<URL>(u), $.markAsStructValue($.cloneStructValue($.pointerValue<URL>(u1))))
+		$.pointerValue<URL>(u).__goscriptAssign($.pointerValue<URL>(u1))
 		return null
 	}
 
 	public joinPath(elem: $.Slice<string>): [URL | $.VarRef<URL> | null, $.GoError] {
 		const u: URL | $.VarRef<URL> | null = this;
-		elem = $.appendSlice($.arrayToSlice<string>([URL.prototype.EscapedPath.call(u)]), elem)
+		elem = $.appendSlice($.arrayToSlice<string>([(u !== null && (u as any).__isVarRef !== true && (u as any).__goValue === undefined ? ((u as any) as URL).EscapedPath() : URL.prototype.EscapedPath.call(u))]), elem)
 		let p: string = ""
 		if (!strings.HasPrefix($.arrayIndex(elem!, 0), "/")) {
 			// Return a relative path if u is relative,
@@ -450,28 +494,29 @@ export class URL {
 		}
 		// path.Join will remove any trailing slashes.
 		// Preserve at least one.
-		if (strings.HasSuffix($.arrayIndex(elem!, $.len(elem) - 1), "/") && !strings.HasSuffix(p, "/")) {
-			p = p + ("/")
+		if (strings.HasSuffix($.arrayIndex(elem!, $.sliceLen(elem) - 1), "/") && !strings.HasSuffix(p, "/")) {
+			p += "/"
 		}
-		let url = $.varRef($.markAsStructValue($.cloneStructValue($.pointerValue<URL>(u))))
+		let url = $.varRef(($.pointerValue<URL>(u)).clone())
 		let err = url.value.setPath(p)
 		return [url, err]
 	}
 
 	public setFragment(f: string): $.GoError {
 		let u: URL | $.VarRef<URL> | null = this;
+		const u$: URL = u == null ? $.pointerTarget<URL>(u) : (u as any).__isVarRef === true ? (u as any).value : (u as any).__goValue === undefined ? (u as any) : $.pointerTarget<URL>(u)
 		let [frag, err] = unescape(f, 64)
 		if (err != null) {
 			return err
 		}
-		$.pointerValue<URL>(u).Fragment = frag
+		;(u$ as URL).Fragment = frag
 		{
 			let escf = escape(frag, 64)
 			if ($.stringEqual(f, escf)) {
 				// Default encoding is fine.
-				$.pointerValue<URL>(u).RawFragment = ""
+				;(u$ as URL).RawFragment = ""
 			} else {
-				$.pointerValue<URL>(u).RawFragment = f
+				;(u$ as URL).RawFragment = f
 			}
 		}
 		return null
@@ -479,31 +524,28 @@ export class URL {
 
 	public setPath(p: string): $.GoError {
 		let u: URL | $.VarRef<URL> | null = this;
+		const u$: URL = u == null ? $.pointerTarget<URL>(u) : (u as any).__isVarRef === true ? (u as any).value : (u as any).__goValue === undefined ? (u as any) : $.pointerTarget<URL>(u)
 		let [__goscriptShadow1, err] = unescape(p, 1)
 		if (err != null) {
 			return err
 		}
-		$.pointerValue<URL>(u).Path = __goscriptShadow1
+		;(u$ as URL).Path = __goscriptShadow1
 		{
 			let escp = escape(__goscriptShadow1, 1)
 			if ($.stringEqual(p, escp)) {
 				// Default encoding is fine.
-				$.pointerValue<URL>(u).RawPath = ""
+				;(u$ as URL).RawPath = ""
 			} else {
-				$.pointerValue<URL>(u).RawPath = p
+				;(u$ as URL).RawPath = p
 			}
 		}
 		return null
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["Scheme", "Opaque", "User", "Host", "Path", "Fragment", "RawQuery", "RawPath", "RawFragment", "ForceQuery", "OmitHost"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"url.URL",
 		() => new URL(),
-		() => [{ name: "AppendBinary", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }, { type: "error" }] }, { name: "Clone", args: [], returns: [{ type: /* @__PURE__ */ $.pointerType("url.URL") }] }, { name: "EscapedFragment", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }, { name: "EscapedPath", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }, { name: "Hostname", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }, { name: "IsAbs", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "JoinPath", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.pointerType("url.URL") }] }, { name: "MarshalBinary", args: [], returns: [{ type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }, { type: "error" }] }, { name: "Parse", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.pointerType("url.URL") }, { type: "error" }] }, { name: "Port", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }, { name: "Query", args: [], returns: [{ type: "url.Values" }] }, { name: "Redacted", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }, { name: "RequestURI", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }, { name: "ResolveReference", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.pointerType("url.URL") }] }, { name: "String", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }, { name: "UnmarshalBinary", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: "error" }] }, { name: "joinPath", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.pointerType("url.URL") }, { type: "error" }] }, { name: "setFragment", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: "error" }] }, { name: "setPath", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: "error" }] }],
+		() => [{ name: "AppendBinary", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }, { type: "error" }], pointerReceiver: true }, { name: "Clone", args: [], returns: [{ type: /* @__PURE__ */ $.pointerType("url.URL") }], pointerReceiver: true }, { name: "EscapedFragment", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }], pointerReceiver: true }, { name: "EscapedPath", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }], pointerReceiver: true }, { name: "Hostname", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }], pointerReceiver: true }, { name: "IsAbs", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }], pointerReceiver: true }, { name: "JoinPath", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.pointerType("url.URL") }], pointerReceiver: true }, { name: "MarshalBinary", args: [], returns: [{ type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }, { type: "error" }], pointerReceiver: true }, { name: "Parse", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.pointerType("url.URL") }, { type: "error" }], pointerReceiver: true }, { name: "Port", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }], pointerReceiver: true }, { name: "Query", args: [], returns: [{ type: "url.Values" }], pointerReceiver: true }, { name: "Redacted", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }], pointerReceiver: true }, { name: "RequestURI", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }], pointerReceiver: true }, { name: "ResolveReference", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.pointerType("url.URL") }], pointerReceiver: true }, { name: "String", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }], pointerReceiver: true }, { name: "UnmarshalBinary", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: "error" }], pointerReceiver: true }, { name: "joinPath", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.pointerType("url.URL") }, { type: "error" }], pointerReceiver: true }, { name: "setFragment", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: "error" }], pointerReceiver: true }, { name: "setPath", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: "error" }], pointerReceiver: true }],
 		URL,
 		() => [{ name: "Scheme", key: "Scheme", type: /* @__PURE__ */ $.basicType("string") }, { name: "Opaque", key: "Opaque", type: /* @__PURE__ */ $.basicType("string") }, { name: "User", key: "User", type: /* @__PURE__ */ $.pointerType("url.Userinfo") }, { name: "Host", key: "Host", type: /* @__PURE__ */ $.basicType("string") }, { name: "Path", key: "Path", type: /* @__PURE__ */ $.basicType("string") }, { name: "Fragment", key: "Fragment", type: /* @__PURE__ */ $.basicType("string") }, { name: "RawQuery", key: "RawQuery", type: /* @__PURE__ */ $.basicType("string") }, { name: "RawPath", key: "RawPath", type: /* @__PURE__ */ $.basicType("string") }, { name: "RawFragment", key: "RawFragment", type: /* @__PURE__ */ $.basicType("string") }, { name: "ForceQuery", key: "ForceQuery", type: /* @__PURE__ */ $.basicType("bool") }, { name: "OmitHost", key: "OmitHost", type: /* @__PURE__ */ $.basicType("bool") }]
 	)
@@ -516,40 +558,42 @@ export class Userinfo {
 
 	public declare passwordSet: boolean
 
-	public _fields: {
-		username: string
-		password: string
-		passwordSet: boolean
-	}
-
-	constructor(init?: Partial<{username?: string, password?: string, passwordSet?: boolean}>) {
-		this._fields = {
-			username: init?.username ?? ("" as string),
-			password: init?.password ?? ("" as string),
-			passwordSet: init?.passwordSet ?? (false as boolean)
-		}
+	constructor(init?: Partial<{username?: string, password?: string, passwordSet?: boolean}>, __goscriptValue?: boolean) {
+		this.username = init?.username ?? ("" as string)
+		this.password = init?.password ?? ("" as string)
+		this.passwordSet = init?.passwordSet ?? (false as boolean)
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Userinfo {
-		return $.markAsStructValue(new Userinfo(this))
+		return new Userinfo(this, true)
+	}
+
+	public __goscriptAssign(source: Userinfo): this {
+		this.username = source.username
+		this.password = source.password
+		this.passwordSet = source.passwordSet
+		return this
 	}
 
 	public Password(): [string, boolean] {
 		const u: Userinfo | $.VarRef<Userinfo> | null = this;
+		const u$: Userinfo = u == null ? $.pointerTarget<Userinfo>(u) : (u as any).__isVarRef === true ? (u as any).value : (u as any).__goValue === undefined ? (u as any) : $.pointerTarget<Userinfo>(u)
 		if (u == null) {
 			return ["", false]
 		}
-		return [$.pointerValue<Userinfo>(u).password, $.pointerValue<Userinfo>(u).passwordSet]
+		return [(u$ as Userinfo).password, (u$ as Userinfo).passwordSet]
 	}
 
 	public String(): string {
 		const u: Userinfo | $.VarRef<Userinfo> | null = this;
+		const u$: Userinfo = u == null ? $.pointerTarget<Userinfo>(u) : (u as any).__isVarRef === true ? (u as any).value : (u as any).__goValue === undefined ? (u as any) : $.pointerTarget<Userinfo>(u)
 		if (u == null) {
 			return ""
 		}
-		let s = escape($.pointerValue<Userinfo>(u).username, 16)
-		if ($.pointerValue<Userinfo>(u).passwordSet) {
-			s = s + (":" + escape($.pointerValue<Userinfo>(u).password, 16))
+		let s = escape((u$ as Userinfo).username, 16)
+		if ((u$ as Userinfo).passwordSet) {
+			s += ":" + escape((u$ as Userinfo).password, 16)
 		}
 		return s
 	}
@@ -562,14 +606,10 @@ export class Userinfo {
 		return $.pointerValue<Userinfo>(u).username
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["username", "password", "passwordSet"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"url.Userinfo",
 		() => new Userinfo(),
-		() => [{ name: "Password", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }, { type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "String", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }, { name: "Username", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }],
+		() => [{ name: "Password", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }, { type: /* @__PURE__ */ $.basicType("bool") }], pointerReceiver: true }, { name: "String", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }], pointerReceiver: true }, { name: "Username", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }], pointerReceiver: true }],
 		Userinfo,
 		() => [{ name: "username", key: "username", type: /* @__PURE__ */ $.basicType("string") }, { name: "password", key: "password", type: /* @__PURE__ */ $.basicType("string") }, { name: "passwordSet", key: "passwordSet", type: /* @__PURE__ */ $.basicType("bool") }]
 	)
@@ -590,7 +630,7 @@ export function ishex(c: number): boolean {
 }
 
 export function unhex(c: number): number {
-	return $.uint((9 * ($.uintShr(c, 6, 8))) + (c & 15), 8)
+	return $.uint((((9 * ($.uintShr(c, 6, 8))) + (c & 15)) & 0xff), 8)
 }
 
 export function EscapeError_Error(e: EscapeError): string {
@@ -598,7 +638,7 @@ export function EscapeError_Error(e: EscapeError): string {
 }
 
 export function InvalidHostError_Error(e: InvalidHostError): string {
-	return ("invalid character " + strconv.Quote(e)) + " in host name"
+	return "invalid character " + strconv.Quote(e) + " in host name"
 }
 
 export function shouldEscape(c: number, mode: __goscript_encoding_table.encoding): boolean {
@@ -617,14 +657,14 @@ export function unescape(s: string, mode: __goscript_encoding_table.encoding): [
 	// Count %, check that they're well-formed.
 	let n = 0
 	let hasPlus = false
-	for (let i = 0; i < $.len(s); ) {
-		switch ($.indexStringOrBytes(s, i)) {
+	for (let i = 0; i < $.stringLen(s); ) {
+		switch ($.indexString(s, i)) {
 			case 37:
 			{
 				n++
-				if ((((i + 2) >= $.len(s)) || !ishex($.uint($.indexStringOrBytes(s, i + 1), 8))) || !ishex($.uint($.indexStringOrBytes(s, i + 2), 8))) {
+				if ((((i + 2) >= $.stringLen(s)) || !ishex($.indexString(s, i + 1))) || !ishex($.indexString(s, i + 2))) {
 					s = $.sliceStringOrBytes(s, i, undefined)
-					if ($.len(s) > 3) {
+					if ($.stringLen(s) > 3) {
 						s = $.sliceStringOrBytes(s, undefined, 3)
 					}
 					return ["", $.namedValueInterfaceValue<$.GoError>(s, "url.EscapeError", {"Error": EscapeError_Error}, /* @__PURE__ */ $.basicType("string", "url.EscapeError"))]
@@ -635,10 +675,10 @@ export function unescape(s: string, mode: __goscript_encoding_table.encoding): [
 				// But https://tools.ietf.org/html/rfc6874#section-2
 				// introduces %25 being allowed to escape a percent sign
 				// in IPv6 scoped-address literals. Yay.
-				if ((($.uint(mode, 8) == 4) && ($.uint(unhex($.uint($.indexStringOrBytes(s, i + 1), 8)), 8) < 8)) && (!$.stringEqual($.sliceStringOrBytes(s, i, i + 3), "%25"))) {
+				if (((mode == 4) && (unhex($.indexString(s, i + 1)) < 8)) && (!$.stringEqual($.sliceStringOrBytes(s, i, i + 3), "%25"))) {
 					return ["", $.namedValueInterfaceValue<$.GoError>($.sliceStringOrBytes(s, i, i + 3), "url.EscapeError", {"Error": EscapeError_Error}, /* @__PURE__ */ $.basicType("string", "url.EscapeError"))]
 				}
-				if ($.uint(mode, 8) == 8) {
+				if (mode == 8) {
 					// RFC 6874 says basically "anything goes" for zone identifiers
 					// and that even non-ASCII can be redundantly escaped,
 					// but it seems prudent to restrict %-escaped bytes here to those
@@ -646,23 +686,23 @@ export function unescape(s: string, mode: __goscript_encoding_table.encoding): [
 					// That is, you can use escaping in the zone identifier but not
 					// to introduce bytes you couldn't just write directly.
 					// But Windows puts spaces here! Yay.
-					let v = $.uint((unhex($.uint($.indexStringOrBytes(s, i + 1), 8)) << 4) | unhex($.uint($.indexStringOrBytes(s, i + 2), 8)), 8)
-					if (((!$.stringEqual($.sliceStringOrBytes(s, i, i + 3), "%25")) && ($.uint(v, 8) != 32)) && shouldEscape($.uint(v, 8), 4)) {
+					let v = $.uint((((unhex($.indexString(s, i + 1)) << 4) & 0xff)) | unhex($.indexString(s, i + 2)), 8)
+					if (((!$.stringEqual($.sliceStringOrBytes(s, i, i + 3), "%25")) && (v != 32)) && shouldEscape(v, 4)) {
 						return ["", $.namedValueInterfaceValue<$.GoError>($.sliceStringOrBytes(s, i, i + 3), "url.EscapeError", {"Error": EscapeError_Error}, /* @__PURE__ */ $.basicType("string", "url.EscapeError"))]
 					}
 				}
-				i = i + (3)
+				i += 3
 				break
 			}
 			case 43:
 			{
-				hasPlus = $.uint(mode, 8) == 32
+				hasPlus = mode == 32
 				i++
 				break
 			}
 			default:
 			{
-				if (((($.uint(mode, 8) == 4) || ($.uint(mode, 8) == 8)) && ($.uint($.indexStringOrBytes(s, i), 8) < 0x80)) && shouldEscape($.uint($.indexStringOrBytes(s, i), 8), $.uint(mode, 8))) {
+				if ((((mode == 4) || (mode == 8)) && ($.indexString(s, i) < 0x80)) && shouldEscape($.indexString(s, i), mode)) {
 					return ["", $.namedValueInterfaceValue<$.GoError>($.sliceStringOrBytes(s, i, i + 1), "url.InvalidHostError", {"Error": InvalidHostError_Error}, /* @__PURE__ */ $.basicType("string", "url.InvalidHostError"))]
 				}
 				i++
@@ -689,23 +729,23 @@ export function unescape(s: string, mode: __goscript_encoding_table.encoding): [
 		}
 	}
 	let t: $.VarRef<strings.Builder> = $.varRef($.markAsStructValue(new strings.Builder()))
-	t.value.Grow($.len(s) - (2 * n))
-	for (let i = 0; i < $.len(s); i++) {
-		switch ($.indexStringOrBytes(s, i)) {
+	t.value.Grow($.stringLen(s) - (2 * n))
+	for (let i = 0; i < $.stringLen(s); i++) {
+		switch ($.indexString(s, i)) {
 			case 37:
 			{
-				t.value.WriteByte($.uint((unhex($.uint($.indexStringOrBytes(s, i + 1), 8)) << 4) | unhex($.uint($.indexStringOrBytes(s, i + 2), 8)), 8))
-				i = i + (2)
+				t.value.WriteByte($.uint((((unhex($.indexString(s, i + 1)) << 4) & 0xff)) | unhex($.indexString(s, i + 2)), 8))
+				i += 2
 				break
 			}
 			case 43:
 			{
-				t.value.WriteByte($.uint(unescapedPlusSign, 8))
+				t.value.WriteByte(unescapedPlusSign)
 				break
 			}
 			default:
 			{
-				t.value.WriteByte($.uint($.indexStringOrBytes(s, i), 8))
+				t.value.WriteByte($.indexString(s, i))
 				break
 			}
 		}
@@ -724,10 +764,10 @@ export function PathEscape(s: string): string {
 export function escape(s: string, mode: __goscript_encoding_table.encoding): string {
 	let spaceCount = 0
 	let hexCount = 0
-	for (let __goscriptRangeTarget0 = $.stringToBytes(s), __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget0); __rangeIndex++) {
-		let c = $.uint(__goscriptRangeTarget0![__rangeIndex], 8)
-		if (shouldEscape($.uint(c, 8), $.uint(mode, 8))) {
-			if (($.uint(c, 8) == 32) && ($.uint(mode, 8) == 32)) {
+	for (let __goscriptRangeTarget0 = $.stringToBytes(s), __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
+		let c = $.uint((__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as number), 8)
+		if (shouldEscape(c, mode)) {
+			if ((c == 32) && (mode == 32)) {
 				spaceCount++
 			} else {
 				hexCount++
@@ -742,7 +782,7 @@ export function escape(s: string, mode: __goscript_encoding_table.encoding): str
 	let buf: Uint8Array = $.arrayValue(new Uint8Array(64))
 	let t: $.Slice<number> = null! as $.Slice<number>
 
-	let required = $.len(s) + (2 * hexCount)
+	let required = $.stringLen(s) + (2 * hexCount)
 	if (required <= 64) {
 		t = $.goSlice(buf, undefined, required)
 	} else {
@@ -751,35 +791,35 @@ export function escape(s: string, mode: __goscript_encoding_table.encoding): str
 
 	if (hexCount == 0) {
 		$.copy(t, s)
-		for (let i = 0; i < $.len(s); i++) {
-			if ($.uint($.indexStringOrBytes(s, i), 8) == 32) {
-				$.sliceElems(t!)[$.sliceSlot(t!, i)] = 43
+		for (let __goscriptSliceWindow0 = $.sliceRange(t), i = 0; i < $.stringLen(s); i++) {
+			if ($.indexString(s, i) == 32) {
+				;(__goscriptSliceWindow0.backing as any[])[$.windowSlot(__goscriptSliceWindow0, i)] = 43
 			}
 		}
 		return $.bytesToString(t)
 	}
 
 	let j = 0
-	for (let __goscriptRangeTarget1 = $.stringToBytes(s), __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget1); __rangeIndex++) {
-		let c = $.uint(__goscriptRangeTarget1![__rangeIndex], 8)
+	for (let __goscriptRangeTarget1 = $.stringToBytes(s), __goscriptRangeWindow1 = $.sliceRange(__goscriptRangeTarget1), __goscriptSliceWindow1 = $.sliceRange(t), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow1.length; __rangeIndex++) {
+		let c = $.uint((__goscriptRangeWindow1.backing[__goscriptRangeWindow1.offset + __rangeIndex] as number), 8)
 		switch ((true as boolean)) {
-			case ($.uint(c, 8) == 32) && ($.uint(mode, 8) == 32):
+			case (c == 32) && (mode == 32):
 			{
-				$.sliceElems(t!)[$.sliceSlot(t!, j)] = 43
+				;(__goscriptSliceWindow1.backing as any[])[$.windowSlot(__goscriptSliceWindow1, j)] = 43
 				j++
 				break
 			}
-			case shouldEscape($.uint(c, 8), $.uint(mode, 8)):
+			case shouldEscape(c, mode):
 			{
-				$.sliceElems(t!)[$.sliceSlot(t!, j)] = 37
-				$.sliceElems(t!)[$.sliceSlot(t!, j + 1)] = $.uint($.indexByteString("\x30\x31\x32\x33\x34\x35\x36\x37\x38\x39\x41\x42\x43\x44\x45\x46", $.uintShr(c, 4, 8)), 8)
-				$.sliceElems(t!)[$.sliceSlot(t!, j + 2)] = $.uint($.indexByteString("\x30\x31\x32\x33\x34\x35\x36\x37\x38\x39\x41\x42\x43\x44\x45\x46", c & 15), 8)
-				j = j + (3)
+				;(__goscriptSliceWindow1.backing as any[])[$.windowSlot(__goscriptSliceWindow1, j)] = 37;
+				;(__goscriptSliceWindow1.backing as any[])[$.windowSlot(__goscriptSliceWindow1, j + 1)] = $.indexByteString("\x30\x31\x32\x33\x34\x35\x36\x37\x38\x39\x41\x42\x43\x44\x45\x46", $.uintShr(c, 4, 8));
+				;(__goscriptSliceWindow1.backing as any[])[$.windowSlot(__goscriptSliceWindow1, j + 2)] = $.indexByteString("\x30\x31\x32\x33\x34\x35\x36\x37\x38\x39\x41\x42\x43\x44\x45\x46", c & 15)
+				j += 3
 				break
 			}
 			default:
 			{
-				$.sliceElems(t!)[$.sliceSlot(t!, j)] = $.uint(c, 8)
+				;(__goscriptSliceWindow1.backing as any[])[$.windowSlot(__goscriptSliceWindow1, j)] = c
 				j++
 				break
 			}
@@ -800,21 +840,21 @@ export function getScheme(rawURL: string): [string, string, $.GoError] {
 	let scheme: string = ""
 	let path: string = ""
 	let err: $.GoError = null! as $.GoError
-	for (let i = 0; i < $.len(rawURL); i++) {
-		let c = $.uint($.indexStringOrBytes(rawURL, i), 8)
+	for (let i = 0; i < $.stringLen(rawURL); i++) {
+		let c = $.indexString(rawURL, i)
 		switch ((true as boolean)) {
-			case ((97 <= $.uint(c, 8)) && ($.uint(c, 8) <= 122)) || ((65 <= $.uint(c, 8)) && ($.uint(c, 8) <= 90)):
+			case ((97 <= c) && (c <= 122)) || ((65 <= c) && (c <= 90)):
 			{
 				break
 			}
-			case ((((48 <= $.uint(c, 8)) && ($.uint(c, 8) <= 57)) || ($.uint(c, 8) == 43)) || ($.uint(c, 8) == 45)) || ($.uint(c, 8) == 46):
+			case ((((48 <= c) && (c <= 57)) || (c == 43)) || (c == 45)) || (c == 46):
 			{
 				if (i == 0) {
 					return ["", rawURL, null]
 				}
 				break
 			}
-			case $.uint(c, 8) == 58:
+			case c == 58:
 			{
 				if (i == 0) {
 					return ["", "", errors.New("missing protocol scheme")]
@@ -845,7 +885,7 @@ export function Parse(rawURL: string): [URL | $.VarRef<URL> | null, $.GoError] {
 		return [url, null]
 	}
 	{
-		err = URL.prototype.setFragment.call(url, frag)
+		err = (url !== null && (url as any).__isVarRef !== true && (url as any).__goValue === undefined ? ((url as any) as URL).setFragment(frag) : URL.prototype.setFragment.call(url, frag))
 		if (err != null) {
 			return [null, $.interfaceValue<$.GoError>(new Error({Op: "parse", URL: rawURL, Err: err}), "*url.Error", /* @__PURE__ */ $.pointerType("url.Error"))]
 		}
@@ -874,39 +914,40 @@ export function parse(rawURL: string, viaRequest: boolean): [URL | $.VarRef<URL>
 	if (($.stringEqual(rawURL, "")) && viaRequest) {
 		return [null, errors.New("empty url")]
 	}
-	let url: URL | $.VarRef<URL> | null = new URL()
+	let url = new URL()
+	let url$: URL = url == null ? $.pointerTarget<URL>(url) : (url as any).__isVarRef === true ? (url as any).value : (url as any).__goValue === undefined ? (url as any) : $.pointerTarget<URL>(url)
 
 	if ($.stringEqual(rawURL, "*")) {
-		$.pointerValue<URL>(url).Path = "*"
+		;(url$ as URL).Path = "*"
 		return [url, null]
 	}
 
 	// Split off possible leading "http:", "mailto:", etc.
 	// Cannot contain escaped characters.
 	{
-		let __goscriptTuple6: any = getScheme(rawURL)
-		$.pointerValue<URL>(url).Scheme = __goscriptTuple6[0]
+		let __goscriptTuple6: any = getScheme(rawURL);
+		;(url$ as URL).Scheme = __goscriptTuple6[0]
 		rest = __goscriptTuple6[1]
 		err = __goscriptTuple6[2]
 		if (err != null) {
 			return [null, err]
 		}
 	}
-	$.pointerValue<URL>(url).Scheme = strings.ToLower($.pointerValue<URL>(url).Scheme)
+	;(url$ as URL).Scheme = strings.ToLower((url$ as URL).Scheme)
 
 	if (strings.HasSuffix(rest, "?") && (strings.Count(rest, "?") == 1)) {
-		$.pointerValue<URL>(url).ForceQuery = true
-		rest = $.sliceStringOrBytes(rest, undefined, $.len(rest) - 1)
+		;(url$ as URL).ForceQuery = true
+		rest = $.sliceStringOrBytes(rest, undefined, $.stringLen(rest) - 1)
 	} else {
 		let __goscriptTuple7: any = strings.Cut(rest, "?")
-		rest = __goscriptTuple7[0]
-		$.pointerValue<URL>(url).RawQuery = __goscriptTuple7[1]
+		rest = __goscriptTuple7[0];
+		;(url$ as URL).RawQuery = __goscriptTuple7[1]
 	}
 
 	if (!strings.HasPrefix(rest, "/")) {
-		if (!$.stringEqual($.pointerValue<URL>(url).Scheme, "")) {
+		if (!$.stringEqual((url$ as URL).Scheme, "")) {
 			// We consider rootless paths per RFC 3986 as opaque.
-			$.pointerValue<URL>(url).Opaque = rest
+			;(url$ as URL).Opaque = rest
 			return [url, null]
 		}
 		if (viaRequest) {
@@ -928,7 +969,7 @@ export function parse(rawURL: string, viaRequest: boolean): [URL | $.VarRef<URL>
 		}
 	}
 
-	if (((!$.stringEqual($.pointerValue<URL>(url).Scheme, "")) || (!viaRequest && !strings.HasPrefix(rest, "///"))) && strings.HasPrefix(rest, "//")) {
+	if (((!$.stringEqual((url$ as URL).Scheme, "")) || (!viaRequest && !strings.HasPrefix(rest, "///"))) && strings.HasPrefix(rest, "//")) {
 		let authority: string = ""
 		let __goscriptAssign0_0: string = $.sliceStringOrBytes(rest, 2, undefined)
 		let __goscriptAssign0_1: string = ""
@@ -943,18 +984,18 @@ export function parse(rawURL: string, viaRequest: boolean): [URL | $.VarRef<URL>
 				rest = __goscriptAssign1_1
 			}
 		}
-		let __goscriptTuple8: any = parseAuthority($.pointerValue<URL>(url).Scheme, authority)
-		$.pointerValue<URL>(url).User = __goscriptTuple8[0]
-		$.pointerValue<URL>(url).Host = __goscriptTuple8[1]
+		let __goscriptTuple8: any = parseAuthority((url$ as URL).Scheme, authority);
+		;(url$ as URL).User = __goscriptTuple8[0];
+		;(url$ as URL).Host = __goscriptTuple8[1]
 		err = __goscriptTuple8[2]
 		if (err != null) {
 			return [null, err]
 		}
 	} else {
-		if ((!$.stringEqual($.pointerValue<URL>(url).Scheme, "")) && strings.HasPrefix(rest, "/")) {
+		if ((!$.stringEqual((url$ as URL).Scheme, "")) && strings.HasPrefix(rest, "/")) {
 			// OmitHost is set to true when rawURL has an empty host (authority).
 			// See golang.org/issue/46059.
-			$.pointerValue<URL>(url).OmitHost = true
+			;(url$ as URL).OmitHost = true
 		}
 	}
 
@@ -963,7 +1004,7 @@ export function parse(rawURL: string, viaRequest: boolean): [URL | $.VarRef<URL>
 	// the default escaping of Path is equivalent, to help make sure that people
 	// don't rely on it in general.
 	{
-		let __goscriptShadow2 = URL.prototype.setPath.call(url, rest)
+		let __goscriptShadow2 = (url !== null && (url as any).__isVarRef !== true && (url as any).__goValue === undefined ? ((url as any) as URL).setPath(rest) : URL.prototype.setPath.call(url, rest))
 		if (__goscriptShadow2 != null) {
 			return [null, __goscriptShadow2]
 		}
@@ -1091,10 +1132,10 @@ export function parseHost(scheme: string, host: string): [string, $.GoError] {
 				if (err != null) {
 					return ["", fmt.Errorf("invalid host: %w", (err as any))]
 				}
-				if ($.markAsStructValue($.cloneStructValue(addr)).Is4()) {
+				if (addr.Is4()) {
 					return ["", errors.New("invalid IP-literal")]
 				}
-				return [(("[" + unescapedHostname) + "]") + unescapedColonPort, null]
+				return ["[" + unescapedHostname + "]" + unescapedColonPort, null]
 			} else {
 				{
 					let i = strings.Index(host, ":")
@@ -1147,13 +1188,13 @@ export function badSetPath(_p0: URL | $.VarRef<URL> | null, _p1: string): $.GoEr
 }
 
 export function validEncoded(s: string, mode: __goscript_encoding_table.encoding): boolean {
-	for (let i = 0; i < $.len(s); i++) {
+	for (let i = 0; i < $.stringLen(s); i++) {
 		// RFC 3986, Appendix A.
 		// pchar = unreserved / pct-encoded / sub-delims / ":" / "@".
 		// shouldEscape is not quite compliant with the RFC,
 		// so we check the sub-delims ourselves and let
 		// shouldEscape handle the others.
-		switch ($.indexStringOrBytes(s, i)) {
+		switch ($.indexString(s, i)) {
 			case 33:
 			case 36:
 			case 38:
@@ -1181,7 +1222,7 @@ export function validEncoded(s: string, mode: __goscript_encoding_table.encoding
 			}
 			default:
 			{
-				if (shouldEscape($.uint($.indexStringOrBytes(s, i), 8), $.uint(mode, 8))) {
+				if (shouldEscape($.indexString(s, i), mode)) {
 					return false
 				}
 				break
@@ -1195,11 +1236,12 @@ export function validOptionalPort(port: string): boolean {
 	if ($.stringEqual(port, "")) {
 		return true
 	}
-	if ($.uint($.indexStringOrBytes(port, 0), 8) != 58) {
+	if ($.indexString(port, 0) != 58) {
 		return false
 	}
-	for (const [__rangeIndex, b] of $.rangeString($.sliceStringOrBytes(port, 1, undefined))) {
-		if (($.int(b, 32) < 48) || ($.int(b, 32) > 57)) {
+	for (let __goscriptRunes0 = $.stringRunes($.sliceStringOrBytes(port, 1, undefined)); __goscriptRunes0.next(); ) {
+		const b = __goscriptRunes0.rune
+		if ((b < 48) || (b > 57)) {
 			return false
 		}
 	}
@@ -1207,8 +1249,8 @@ export function validOptionalPort(port: string): boolean {
 }
 
 export function Values_Get(v: Values, key: string): string {
-	let vs: $.Slice<string> = $.mapGet<string, $.Slice<string>, $.Slice<string>>(v, key, null)[0]
-	if ($.len(vs) == 0) {
+	let vs = $.mapGet<string, $.Slice<string>, $.Slice<string>>(v, key, null)[0]
+	if ($.sliceLen(vs) == 0) {
 		return ""
 	}
 	return $.arrayIndex(vs!, 0)
@@ -1219,7 +1261,7 @@ export function Values_Set(v: Values, key: string, value: string): void {
 }
 
 export function Values_Add(v: Values, key: string, value: string): void {
-	$.mapSet(v, key, $.append($.mapGet<string, $.Slice<string>, $.Slice<string>>(v, key, null)[0], value))
+	$.mapSet(v, key, $.appendOne($.mapGet<string, $.Slice<string>, $.Slice<string>>(v, key, null)[0], value))
 }
 
 export function Values_Del(v: Values, key: string): void {
@@ -1236,7 +1278,7 @@ export function Values_Clone(vs: Values): Values {
 		return null
 	}
 
-	let newVals: Values = $.makeMap<string, $.Slice<string>>()
+	let newVals = $.makeMap<string, $.Slice<string>>()
 	for (let [k, v] of vs?.entries() ?? []) {
 		$.mapSet(newVals, k, (slices.Clone(v) as $.Slice<string>))
 	}
@@ -1244,7 +1286,7 @@ export function Values_Clone(vs: Values): Values {
 }
 
 export function ParseQuery(query: string): [Values, $.GoError] {
-	let m: Values = $.makeMap<string, $.Slice<string>>()
+	let m = $.makeMap<string, $.Slice<string>>()
 	let err = parseQuery(m, query)
 	return [m, err]
 }
@@ -1309,7 +1351,7 @@ export function parseQuery(m: Values, query: string): $.GoError {
 			}
 			continue
 		}
-		$.mapSet(m, key, $.append($.mapGet<string, $.Slice<string>, $.Slice<string>>(m, key, null)[0], value))
+		$.mapSet(m, key, $.appendOne($.mapGet<string, $.Slice<string>, $.Slice<string>>(m, key, null)[0], value))
 	}
 	return err
 }
@@ -1321,19 +1363,19 @@ export function Values_Encode(v: Values): string {
 	let buf: $.VarRef<strings.Builder> = $.varRef($.markAsStructValue(new strings.Builder()))
 	// To minimize allocations, we eschew iterators and pre-size the slice in
 	// which we collect v's keys.
-	let keys: $.Slice<string> = $.makeSlice<string>($.len(v), undefined, "string")
+	let keys = $.makeSlice<string>($.len(v), undefined, "string")
 	let i: number = 0
 	for (const [k, __rangeValue] of v?.entries() ?? []) {
 		$.sliceElems(keys!)[$.sliceSlot(keys!, i)] = k
 		i++
 	}
 	slices.Sort(keys)
-	for (let __goscriptRangeTarget3 = keys, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget3); __rangeIndex++) {
-		let k = $.arrayIndex(__goscriptRangeTarget3!, __rangeIndex)
-		let vs: $.Slice<string> = $.mapGet<string, $.Slice<string>, $.Slice<string>>(v, k, null)[0]
+	for (let __goscriptRangeTarget3 = keys, __goscriptRangeWindow2 = $.sliceRange(__goscriptRangeTarget3), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow2.length; __rangeIndex++) {
+		let k = (__goscriptRangeWindow2.backing[__goscriptRangeWindow2.offset + __rangeIndex] as string)
+		let vs = $.mapGet<string, $.Slice<string>, $.Slice<string>>(v, k, null)[0]
 		let keyEscaped = QueryEscape(k)
-		for (let __goscriptRangeTarget2 = vs, __rangeIndex = 0; __rangeIndex < $.len(__goscriptRangeTarget2); __rangeIndex++) {
-			let v = $.arrayIndex(__goscriptRangeTarget2!, __rangeIndex)
+		for (let __goscriptRangeTarget2 = vs, __goscriptRangeWindow3 = $.sliceRange(__goscriptRangeTarget2), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow3.length; __rangeIndex++) {
+			let v = (__goscriptRangeWindow3.backing[__goscriptRangeWindow3.offset + __rangeIndex] as string)
 			if (buf.value.Len() > 0) {
 				buf.value.WriteByte(38)
 			}
@@ -1350,7 +1392,7 @@ export function resolvePath(base: string, ref: string): string {
 	if ($.stringEqual(ref, "")) {
 		full = base
 	} else {
-		if ($.uint($.indexStringOrBytes(ref, 0), 8) != 47) {
+		if ($.indexString(ref, 0) != 47) {
 			let i = strings.LastIndex(base, "/")
 			full = $.sliceStringOrBytes(base, undefined, i + 1) + ref
 		} else {
@@ -1361,7 +1403,7 @@ export function resolvePath(base: string, ref: string): string {
 		return ""
 	}
 
-	let dst: $.Slice<number> = $.makeSlice<number>(0, $.len(full) + 1, "byte")
+	let dst: $.Slice<number> = $.makeSlice<number>(0, $.stringLen(full) + 1, "byte")
 	dst = $.append(dst, $.uint(47, 8), $.byteSliceHint)
 	let elem = ""
 	let remaining = full
@@ -1389,7 +1431,7 @@ export function resolvePath(base: string, ref: string): string {
 						dst = $.goSlice(dst, undefined, 1)
 					}
 				}
-				first = $.len(dst) == 1
+				first = $.sliceLen(dst) == 1
 				break
 			}
 			default:
@@ -1409,7 +1451,7 @@ export function resolvePath(base: string, ref: string): string {
 	}
 
 	// We wrote an initial '/', but we don't want two.
-	if (($.len(dst) > 1) && ($.uint($.arrayIndex(dst!, 1), 8) == 47)) {
+	if (($.sliceLen(dst) > 1) && ($.arrayIndex(dst!, 1) == 47)) {
 		return $.bytesToString($.goSlice(dst, 1, undefined))
 	}
 	return $.bytesToString(dst)
@@ -1429,21 +1471,22 @@ export function splitHostPort(hostPort: string): [string, string] {
 	}
 
 	if (strings.HasPrefix(host, "[") && strings.HasSuffix(host, "]")) {
-		host = $.sliceStringOrBytes(host, 1, $.len(host) - 1)
+		host = $.sliceStringOrBytes(host, 1, $.stringLen(host) - 1)
 	}
 
 	return [host, port]
 }
 
 export function validUserinfo(s: string): boolean {
-	for (const [__rangeIndex, r] of $.rangeString(s)) {
-		if ((65 <= $.int(r, 32)) && ($.int(r, 32) <= 90)) {
+	for (let __goscriptRunes1 = $.stringRunes(s); __goscriptRunes1.next(); ) {
+		const r = __goscriptRunes1.rune
+		if ((65 <= r) && (r <= 90)) {
 			continue
 		}
-		if ((97 <= $.int(r, 32)) && ($.int(r, 32) <= 122)) {
+		if ((97 <= r) && (r <= 122)) {
 			continue
 		}
-		if ((48 <= $.int(r, 32)) && ($.int(r, 32) <= 57)) {
+		if ((48 <= r) && (r <= 57)) {
 			continue
 		}
 		switch (r) {
@@ -1484,9 +1527,9 @@ export function validUserinfo(s: string): boolean {
 }
 
 export function stringContainsCTLByte(s: string): boolean {
-	for (let i = 0; i < $.len(s); i++) {
-		let b = $.uint($.indexStringOrBytes(s, i), 8)
-		if (($.uint(b, 8) < 32) || ($.uint(b, 8) == 0x7f)) {
+	for (let i = 0; i < $.stringLen(s); i++) {
+		let b = $.indexString(s, i)
+		if ((b < 32) || (b == 0x7f)) {
 			return true
 		}
 	}
@@ -1502,11 +1545,13 @@ export function JoinPath(base: string, elem: $.Slice<string>): [string, $.GoErro
 	if (err != null) {
 		return [result, err]
 	}
-	let __goscriptTuple24: any = URL.prototype.joinPath.call(url, elem)
+	let __goscriptTuple24: any = (url !== null && (url as any).__isVarRef !== true && (url as any).__goValue === undefined ? ((url as any) as URL).joinPath(elem) : URL.prototype.joinPath.call(url, elem))
 	let res: URL | $.VarRef<URL> | null = __goscriptTuple24[0]
 	err = __goscriptTuple24[1]
 	if (err != null) {
 		return ["", err]
 	}
-	return [URL.prototype.String.call(res), null]
+	return [(res !== null && (res as any).__isVarRef !== true && (res as any).__goValue === undefined ? ((res as any) as URL).String() : URL.prototype.String.call(res)), null]
 }
+
+var __goscriptAwait: any

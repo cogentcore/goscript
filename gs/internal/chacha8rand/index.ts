@@ -45,48 +45,15 @@ const reseed = 4
 // may see the same random values, but the code will not
 // crash or cause out-of-bounds memory accesses.
 export class State {
-  public get buf(): bigint[] {
-    return this._fields.buf
-  }
-  public set buf(value: bigint[]) {
-    this._fields.buf = value
-  }
+  declare public buf: bigint[]
 
-  public get seed(): bigint[] {
-    return this._fields.seed
-  }
-  public set seed(value: bigint[]) {
-    this._fields.seed = value
-  }
+  declare public seed: bigint[]
 
-  public get i(): number {
-    return this._fields.i
-  }
-  public set i(value: number) {
-    this._fields.i = value
-  }
+  declare public i: number
 
-  public get n(): number {
-    return this._fields.n
-  }
-  public set n(value: number) {
-    this._fields.n = value
-  }
+  declare public n: number
 
-  public get c(): number {
-    return this._fields.c
-  }
-  public set c(value: number) {
-    this._fields.c = value
-  }
-
-  public _fields: {
-    buf: bigint[]
-    seed: bigint[]
-    i: number
-    n: number
-    c: number
-  }
+  declare public c: number
 
   constructor(
     init?: Partial<{
@@ -97,30 +64,26 @@ export class State {
       c?: number
     }>,
   ) {
-    this._fields = {
-      buf:
-        init?.buf !== undefined ?
-          $.cloneArrayValue(init.buf)
-        : Array.from({ length: 32 }, () => 0n),
-      seed:
-        init?.seed !== undefined ?
-          $.cloneArrayValue(init.seed)
-        : Array.from({ length: 4 }, () => 0n),
-      i: init?.i ?? (0 as number),
-      n: init?.n ?? (0 as number),
-      c: init?.c ?? (0 as number),
-    }
+    this.buf =
+      init?.buf !== undefined ?
+        $.cloneArrayValue(init.buf)
+      : Array.from({ length: 32 }, () => 0n)
+    this.seed =
+      init?.seed !== undefined ?
+        $.cloneArrayValue(init.seed)
+      : Array.from({ length: 4 }, () => 0n)
+    this.i = init?.i ?? (0 as number)
+    this.n = init?.n ?? (0 as number)
+    this.c = init?.c ?? (0 as number)
   }
 
   public clone(): State {
     const cloned = new State()
-    cloned._fields = {
-      buf: $.cloneArrayValue(this._fields.buf),
-      seed: $.cloneArrayValue(this._fields.seed),
-      i: this._fields.i,
-      n: this._fields.n,
-      c: this._fields.c,
-    }
+    cloned.buf = $.cloneArrayValue(this.buf)
+    cloned.seed = $.cloneArrayValue(this.seed)
+    cloned.i = this.i
+    cloned.n = this.n
+    cloned.c = this.c
     return $.markAsStructValue(cloned)
   }
 
@@ -311,11 +274,8 @@ export class State {
 }
 
 export class errUnmarshalChaCha8 {
-  public _fields: {} = {}
-
   public clone(): errUnmarshalChaCha8 {
     const cloned = new errUnmarshalChaCha8()
-    cloned._fields = {}
     return $.markAsStructValue(cloned)
   }
 

@@ -195,44 +195,13 @@ type lineInfo = {
 }
 
 export class Position {
-  public get Filename(): string {
-    return this._fields.Filename
-  }
+  declare public Filename: string
 
-  public set Filename(value: string) {
-    this._fields.Filename = value
-  }
+  declare public Offset: number
 
-  public get Offset(): number {
-    return this._fields.Offset
-  }
+  declare public Line: number
 
-  public set Offset(value: number) {
-    this._fields.Offset = value
-  }
-
-  public get Line(): number {
-    return this._fields.Line
-  }
-
-  public set Line(value: number) {
-    this._fields.Line = value
-  }
-
-  public get Column(): number {
-    return this._fields.Column
-  }
-
-  public set Column(value: number) {
-    this._fields.Column = value
-  }
-
-  public _fields: {
-    Filename: string
-    Offset: number
-    Line: number
-    Column: number
-  }
+  declare public Column: number
 
   constructor(
     init?: Partial<{
@@ -242,12 +211,10 @@ export class Position {
       Column: number
     }>,
   ) {
-    this._fields = {
-      Filename: init?.Filename ?? '',
-      Offset: init?.Offset ?? 0,
-      Line: init?.Line ?? 0,
-      Column: init?.Column ?? 0,
-    }
+    this.Filename = init?.Filename ?? ''
+    this.Offset = init?.Offset ?? 0
+    this.Line = init?.Line ?? 0
+    this.Column = init?.Column ?? 0
   }
 
   public clone(): Position {
