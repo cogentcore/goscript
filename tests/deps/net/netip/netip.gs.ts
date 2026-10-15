@@ -27,6 +27,8 @@ import "@goscript/strconv/index.js"
 import "@goscript/unique/index.js"
 import "./uint128.gs.ts"
 
+$.registerTypePackagePath("net/netip", ["netip.Addr", "netip.addrDetail", "netip.parseAddrError", "netip.AddrPort", "netip.Prefix", "netip.parsePrefixError"])
+
 export class Addr {
 	// addr is the hi and lo bits of an IPv6 address. If z==z4,
 	// hi and lo contain the IPv4-mapped IPv6 address.
@@ -48,20 +50,20 @@ export class Addr {
 	// Details about the address, wrapped up together and canonicalized.
 	public declare z: _unique.Handle<addrDetail>
 
-	public _fields: {
-		addr: __goscript_uint128.uint128
-		z: _unique.Handle<addrDetail>
-	}
-
-	constructor(init?: Partial<{addr?: __goscript_uint128.uint128, z?: _unique.Handle<addrDetail>}>) {
-		this._fields = {
-			addr: init?.addr ? $.markAsStructValue($.cloneStructValue(init.addr)) : $.markAsStructValue(new __goscript_uint128.uint128()),
-			z: init?.z ? $.markAsStructValue($.cloneStructValue(init.z)) : $.markAsStructValue(new _unique.Handle<addrDetail>())
-		}
+	constructor(init?: Partial<{addr?: __goscript_uint128.uint128, z?: _unique.Handle<addrDetail>}>, __goscriptValue?: boolean) {
+		this.addr = init?.addr ? init.addr.clone() : new __goscript_uint128.uint128(undefined, true)
+		this.z = init?.z ? $.markAsStructValue($.cloneStructValue(init.z)) : $.markAsStructValue(new _unique.Handle<addrDetail>())
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Addr {
-		return $.markAsStructValue(new Addr(this))
+		return new Addr(this, true)
+	}
+
+	public __goscriptAssign(source: Addr): this {
+		this.addr.__goscriptAssign(source.addr)
+		$.assignStruct(this.z, source.z)
+		return this
 	}
 
 	public AppendBinary(b: $.Slice<number>): [$.Slice<number>, $.GoError] {
@@ -73,14 +75,14 @@ export class Addr {
 			}
 			case z4:
 			{
-				b = byteorder.BEAppendUint32(b, $.uint($.uint(ip.addr.lo, 32), 32))
+				b = byteorder.BEAppendUint32(b, $.uint(ip.addr.lo, 32))
 				break
 			}
 			default:
 			{
 				b = byteorder.BEAppendUint64(b, ip.addr.hi)
 				b = byteorder.BEAppendUint64(b, ip.addr.lo)
-				b = $.appendSlice(b, $.stringToBytes($.markAsStructValue($.cloneStructValue(ip)).Zone()), $.byteSliceHint)
+				b = $.appendSlice(b, $.stringToBytes(ip.Zone()), $.byteSliceHint)
 				break
 			}
 		}
@@ -89,7 +91,7 @@ export class Addr {
 
 	public AppendText(b: $.Slice<number>): [$.Slice<number>, $.GoError] {
 		const ip = this;
-		return [$.markAsStructValue($.cloneStructValue(ip)).AppendTo(b), null]
+		return [ip.AppendTo(b), null]
 	}
 
 	public AppendTo(b: $.Slice<number>): $.Slice<number> {
@@ -102,15 +104,15 @@ export class Addr {
 			}
 			case z4:
 			{
-				return $.markAsStructValue($.cloneStructValue(ip)).appendTo4(b)
+				return ip.appendTo4(b)
 				break
 			}
 			default:
 			{
-				if ($.markAsStructValue($.cloneStructValue(ip)).Is4In6()) {
-					return $.markAsStructValue($.cloneStructValue(ip)).appendTo4In6(b)
+				if (ip.Is4In6()) {
+					return ip.appendTo4In6(b)
 				}
-				return $.markAsStructValue($.cloneStructValue(ip)).appendTo6(b)
+				return ip.appendTo6(b)
 				break
 			}
 		}
@@ -128,11 +130,11 @@ export class Addr {
 	public As4(): Uint8Array {
 		const ip = this;
 		let a4: Uint8Array = $.arrayValue(new Uint8Array(4))
-		if (($.comparableEqual(ip.z, z4)) || $.markAsStructValue($.cloneStructValue(ip)).Is4In6()) {
-			byteorder.BEPutUint32($.goSlice(a4, undefined, undefined), $.uint($.uint(ip.addr.lo, 32), 32))
+		if (($.structEqual(ip.z, z4)) || ip.Is4In6()) {
+			byteorder.BEPutUint32($.goSlice(a4, undefined, undefined), $.uint(ip.addr.lo, 32))
 			return $.cloneArrayValue(a4, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 4))
 		}
-		if ($.comparableEqual(ip.z, z0)) {
+		if ($.structEqual(ip.z, z0)) {
 			$.panic("As4 called on IP zero value")
 		}
 		$.panic("As4 called on IPv6 address")
@@ -150,7 +152,7 @@ export class Addr {
 			case z4:
 			{
 				let ret: Uint8Array = $.arrayValue(new Uint8Array(4))
-				byteorder.BEPutUint32($.goSlice(ret, undefined, undefined), $.uint($.uint(ip.addr.lo, 32), 32))
+				byteorder.BEPutUint32($.goSlice(ret, undefined, undefined), $.uint(ip.addr.lo, 32))
 				return $.goSlice(ret, undefined, undefined)
 				break
 			}
@@ -185,8 +187,8 @@ export class Addr {
 
 	public Compare(ip2: Addr): number {
 		const ip = this;
-		let f1 = $.markAsStructValue($.cloneStructValue(ip)).BitLen()
-		let f2 = $.markAsStructValue($.cloneStructValue(ip2)).BitLen()
+		let f1 = ip.BitLen()
+		let f2 = ip2.BitLen()
 		if (f1 < f2) {
 			return -1
 		}
@@ -209,9 +211,9 @@ export class Addr {
 		if (lo1 > lo2) {
 			return 1
 		}
-		if ($.markAsStructValue($.cloneStructValue(ip)).Is6()) {
-			let za = $.markAsStructValue($.cloneStructValue(ip)).Zone()
-			let zb = $.markAsStructValue($.cloneStructValue(ip2)).Zone()
+		if (ip.Is6()) {
+			let za = ip.Zone()
+			let zb = ip2.Zone()
 			if ($.stringCompare(za, zb) < 0) {
 				return -1
 			}
@@ -224,44 +226,44 @@ export class Addr {
 
 	public Is4(): boolean {
 		const ip = this;
-		return $.comparableEqual(ip.z, z4)
+		return $.structEqual(ip.z, z4)
 	}
 
 	public Is4In6(): boolean {
 		const ip = this;
-		return ($.markAsStructValue($.cloneStructValue(ip)).Is6() && (ip.addr.hi == 0n)) && (($.uint64Shr(ip.addr.lo, 32n)) == 65535n)
+		return (ip.Is6() && (ip.addr.hi == 0n)) && (($.uint64Shr(ip.addr.lo, 32n)) == 65535n)
 	}
 
 	public Is6(): boolean {
 		const ip = this;
-		return (!$.comparableEqual(ip.z, z0)) && (!$.comparableEqual(ip.z, z4))
+		return (!$.structEqual(ip.z, z0)) && (!$.structEqual(ip.z, z4))
 	}
 
 	public IsGlobalUnicast(): boolean {
 		let ip: Addr = this;
-		if ($.comparableEqual(ip.z, z0)) {
+		if ($.structEqual(ip.z, z0)) {
 			// Invalid or zero-value.
 			return false
 		}
 
-		if ($.markAsStructValue($.cloneStructValue(ip)).Is4In6()) {
-			$.assignStruct(ip, $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(ip)).Unmap())))
+		if (ip.Is4In6()) {
+			ip = ip.__goscriptAssign($.markAsStructValue($.cloneStructValue(ip)).Unmap())
 		}
 
 		// Match package net's IsGlobalUnicast logic. Notably private IPv4 addresses
 		// and ULA IPv6 addresses are still considered "global unicast".
-		if ($.markAsStructValue($.cloneStructValue(ip)).Is4() && (($.comparableEqual(ip, IPv4Unspecified())) || ($.comparableEqual(ip, AddrFrom4($.arrayValue(new Uint8Array([255, 255, 255, 255]))))))) {
+		if (ip.Is4() && (($.structEqual(ip, IPv4Unspecified())) || ($.structEqual(ip, AddrFrom4($.arrayValue(new Uint8Array([255, 255, 255, 255]))))))) {
 			return false
 		}
 
-		return (((!$.comparableEqual(ip, IPv6Unspecified())) && !$.markAsStructValue($.cloneStructValue(ip)).IsLoopback()) && !$.markAsStructValue($.cloneStructValue(ip)).IsMulticast()) && !$.markAsStructValue($.cloneStructValue(ip)).IsLinkLocalUnicast()
+		return (((!$.structEqual(ip, IPv6Unspecified())) && !$.markAsStructValue($.cloneStructValue(ip)).IsLoopback()) && !$.markAsStructValue($.cloneStructValue(ip)).IsMulticast()) && !$.markAsStructValue($.cloneStructValue(ip)).IsLinkLocalUnicast()
 	}
 
 	public IsInterfaceLocalMulticast(): boolean {
 		const ip = this;
 		// IPv6 Addressing Architecture (2.7.1. Pre-Defined Multicast Addresses)
 		// https://datatracker.ietf.org/doc/html/rfc4291#section-2.7.1
-		if ($.markAsStructValue($.cloneStructValue(ip)).Is6() && !$.markAsStructValue($.cloneStructValue(ip)).Is4In6()) {
+		if (ip.Is6() && !ip.Is4In6()) {
 			return $.uint(($.markAsStructValue($.cloneStructValue(ip)).v6u16(0) & 0xff0f), 16) == 0xff01
 		}
 		return false
@@ -269,18 +271,18 @@ export class Addr {
 
 	public IsLinkLocalMulticast(): boolean {
 		let ip: Addr = this;
-		if ($.markAsStructValue($.cloneStructValue(ip)).Is4In6()) {
-			$.assignStruct(ip, $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(ip)).Unmap())))
+		if (ip.Is4In6()) {
+			ip = ip.__goscriptAssign($.markAsStructValue($.cloneStructValue(ip)).Unmap())
 		}
 
 		// IPv4 Multicast Guidelines (4. Local Network Control Block (224.0.0/24))
 		// https://datatracker.ietf.org/doc/html/rfc5771#section-4
-		if ($.markAsStructValue($.cloneStructValue(ip)).Is4()) {
-			return (($.uint($.markAsStructValue($.cloneStructValue(ip)).v4(0), 8) == 224) && ($.uint($.markAsStructValue($.cloneStructValue(ip)).v4(1), 8) == 0)) && ($.uint($.markAsStructValue($.cloneStructValue(ip)).v4(2), 8) == 0)
+		if (ip.Is4()) {
+			return ((ip.v4(0) == 224) && (ip.v4(1) == 0)) && (ip.v4(2) == 0)
 		}
 		// IPv6 Addressing Architecture (2.7.1. Pre-Defined Multicast Addresses)
 		// https://datatracker.ietf.org/doc/html/rfc4291#section-2.7.1
-		if ($.markAsStructValue($.cloneStructValue(ip)).Is6()) {
+		if (ip.Is6()) {
 			return $.uint(($.markAsStructValue($.cloneStructValue(ip)).v6u16(0) & 0xff0f), 16) == 0xff02
 		}
 		return false
@@ -288,18 +290,18 @@ export class Addr {
 
 	public IsLinkLocalUnicast(): boolean {
 		let ip: Addr = this;
-		if ($.markAsStructValue($.cloneStructValue(ip)).Is4In6()) {
-			$.assignStruct(ip, $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(ip)).Unmap())))
+		if (ip.Is4In6()) {
+			ip = ip.__goscriptAssign($.markAsStructValue($.cloneStructValue(ip)).Unmap())
 		}
 
 		// Dynamic Configuration of IPv4 Link-Local Addresses
 		// https://datatracker.ietf.org/doc/html/rfc3927#section-2.1
-		if ($.markAsStructValue($.cloneStructValue(ip)).Is4()) {
-			return ($.uint($.markAsStructValue($.cloneStructValue(ip)).v4(0), 8) == 169) && ($.uint($.markAsStructValue($.cloneStructValue(ip)).v4(1), 8) == 254)
+		if (ip.Is4()) {
+			return (ip.v4(0) == 169) && (ip.v4(1) == 254)
 		}
 		// IP Version 6 Addressing Architecture (2.4 Address Type Identification)
 		// https://datatracker.ietf.org/doc/html/rfc4291#section-2.4
-		if ($.markAsStructValue($.cloneStructValue(ip)).Is6()) {
+		if (ip.Is6()) {
 			return $.uint(($.markAsStructValue($.cloneStructValue(ip)).v6u16(0) & 0xffc0), 16) == 0xfe80
 		}
 		return false
@@ -307,18 +309,18 @@ export class Addr {
 
 	public IsLoopback(): boolean {
 		let ip: Addr = this;
-		if ($.markAsStructValue($.cloneStructValue(ip)).Is4In6()) {
-			$.assignStruct(ip, $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(ip)).Unmap())))
+		if (ip.Is4In6()) {
+			ip = ip.__goscriptAssign($.markAsStructValue($.cloneStructValue(ip)).Unmap())
 		}
 
 		// Requirements for Internet Hosts -- Communication Layers (3.2.1.3 Addressing)
 		// https://datatracker.ietf.org/doc/html/rfc1122#section-3.2.1.3
-		if ($.markAsStructValue($.cloneStructValue(ip)).Is4()) {
-			return $.uint($.markAsStructValue($.cloneStructValue(ip)).v4(0), 8) == 127
+		if (ip.Is4()) {
+			return ip.v4(0) == 127
 		}
 		// IP Version 6 Addressing Architecture (2.4 Address Type Identification)
 		// https://datatracker.ietf.org/doc/html/rfc4291#section-2.4
-		if ($.markAsStructValue($.cloneStructValue(ip)).Is6()) {
+		if (ip.Is6()) {
 			return (ip.addr.hi == 0n) && (ip.addr.lo == 1n)
 		}
 		return false
@@ -326,18 +328,18 @@ export class Addr {
 
 	public IsMulticast(): boolean {
 		let ip: Addr = this;
-		if ($.markAsStructValue($.cloneStructValue(ip)).Is4In6()) {
-			$.assignStruct(ip, $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(ip)).Unmap())))
+		if (ip.Is4In6()) {
+			ip = ip.__goscriptAssign($.markAsStructValue($.cloneStructValue(ip)).Unmap())
 		}
 
 		// Host Extensions for IP Multicasting (4. HOST GROUP ADDRESSES)
 		// https://datatracker.ietf.org/doc/html/rfc1112#section-4
-		if ($.markAsStructValue($.cloneStructValue(ip)).Is4()) {
-			return $.uint(($.markAsStructValue($.cloneStructValue(ip)).v4(0) & 0xf0), 8) == 0xe0
+		if (ip.Is4()) {
+			return $.uint((ip.v4(0) & 0xf0), 8) == 0xe0
 		}
 		// IP Version 6 Addressing Architecture (2.4 Address Type Identification)
 		// https://datatracker.ietf.org/doc/html/rfc4291#section-2.4
-		if ($.markAsStructValue($.cloneStructValue(ip)).Is6()) {
+		if (ip.Is6()) {
 			return ($.uint64Shr(ip.addr.hi, 56n)) == 255n
 		}
 		return false
@@ -345,18 +347,18 @@ export class Addr {
 
 	public IsPrivate(): boolean {
 		let ip: Addr = this;
-		if ($.markAsStructValue($.cloneStructValue(ip)).Is4In6()) {
-			$.assignStruct(ip, $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(ip)).Unmap())))
+		if (ip.Is4In6()) {
+			ip = ip.__goscriptAssign($.markAsStructValue($.cloneStructValue(ip)).Unmap())
 		}
 
 		// Match the stdlib's IsPrivate logic.
-		if ($.markAsStructValue($.cloneStructValue(ip)).Is4()) {
+		if (ip.Is4()) {
 			// RFC 1918 allocates 10.0.0.0/8, 172.16.0.0/12, and 192.168.0.0/16 as
 			// private IPv4 address subnets.
-			return (($.uint($.markAsStructValue($.cloneStructValue(ip)).v4(0), 8) == 10) || (($.uint($.markAsStructValue($.cloneStructValue(ip)).v4(0), 8) == 172) && ($.uint(($.markAsStructValue($.cloneStructValue(ip)).v4(1) & 0xf0), 8) == 16))) || (($.uint($.markAsStructValue($.cloneStructValue(ip)).v4(0), 8) == 192) && ($.uint($.markAsStructValue($.cloneStructValue(ip)).v4(1), 8) == 168))
+			return ((ip.v4(0) == 10) || ((ip.v4(0) == 172) && ($.uint((ip.v4(1) & 0xf0), 8) == 16))) || ((ip.v4(0) == 192) && (ip.v4(1) == 168))
 		}
 
-		if ($.markAsStructValue($.cloneStructValue(ip)).Is6()) {
+		if (ip.Is6()) {
 			// RFC 4193 allocates fc00::/7 as the unique local unicast IPv6 address
 			// subnet.
 			return $.uint(($.markAsStructValue($.cloneStructValue(ip)).v6(0) & 0xfe), 8) == 0xfc
@@ -367,22 +369,22 @@ export class Addr {
 
 	public IsUnspecified(): boolean {
 		const ip = this;
-		return ($.comparableEqual(ip, IPv4Unspecified())) || ($.comparableEqual(ip, IPv6Unspecified()))
+		return ($.structEqual(ip, IPv4Unspecified())) || ($.structEqual(ip, IPv6Unspecified()))
 	}
 
 	public IsValid(): boolean {
 		const ip = this;
-		return !$.comparableEqual(ip.z, z0)
+		return !$.structEqual(ip.z, z0)
 	}
 
 	public Less(ip2: Addr): boolean {
 		const ip = this;
-		return $.markAsStructValue($.cloneStructValue(ip)).Compare($.markAsStructValue($.cloneStructValue(ip2))) == -1
+		return ip.Compare(ip2) == -1
 	}
 
 	public MarshalBinary(): [$.Slice<number>, $.GoError] {
 		const ip = this;
-		return $.markAsStructValue($.cloneStructValue(ip)).AppendBinary($.makeSlice<number>(0, $.markAsStructValue($.cloneStructValue(ip)).marshalBinarySize(), "byte"))
+		return ip.AppendBinary($.makeSlice<number>(0, ip.marshalBinarySize(), "byte"))
 	}
 
 	public MarshalText(): [$.Slice<number>, $.GoError] {
@@ -401,7 +403,7 @@ export class Addr {
 			}
 			default:
 			{
-				if ($.markAsStructValue($.cloneStructValue(ip)).Is4In6()) {
+				if (ip.Is4In6()) {
 					const maxCap: number = 29
 					buf = $.makeSlice<number>(0, 29, "byte")
 					break
@@ -411,99 +413,99 @@ export class Addr {
 				break
 			}
 		}
-		return $.markAsStructValue($.cloneStructValue(ip)).AppendText(buf)
+		return ip.AppendText(buf)
 	}
 
 	public Next(): Addr {
 		let ip: Addr = this;
-		$.assignStruct(ip.addr, $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(ip.addr)).addOne())))
-		if ($.markAsStructValue($.cloneStructValue(ip)).Is4()) {
-			if ($.uint($.uint(ip.addr.lo, 32), 32) == 0) {
+		ip.addr.__goscriptAssign(ip.addr.addOne())
+		if (ip.Is4()) {
+			if ($.uint(ip.addr.lo, 32) == 0) {
 				// Overflowed.
-				return $.markAsStructValue(new Addr())
+				return new Addr(undefined, true)
 			}
 		} else {
-			if ($.markAsStructValue($.cloneStructValue(ip.addr)).isZero()) {
+			if (ip.addr.isZero()) {
 				// Overflowed
-				return $.markAsStructValue(new Addr())
+				return new Addr(undefined, true)
 			}
 		}
-		return $.markAsStructValue($.cloneStructValue(ip))
+		return (ip).clone()
 	}
 
 	public Prefix(b: number): [Prefix, $.GoError] {
 		let ip: Addr = this;
 		if (b < 0) {
-			return [$.markAsStructValue(new Prefix()), errors.New("negative Prefix bits")]
+			return [new Prefix(undefined, true), errors.New("negative Prefix bits")]
 		}
 		let effectiveBits = b
 		switch (ip.z) {
 			case z0:
 			{
-				return [$.markAsStructValue(new Prefix()), null]
+				return [new Prefix(undefined, true), null]
 				break
 			}
 			case z4:
 			{
 				if (b > 32) {
-					return [$.markAsStructValue(new Prefix()), errors.New(("prefix length " + strconv.Itoa(b)) + " too large for IPv4")]
+					return [new Prefix(undefined, true), errors.New("prefix length " + strconv.Itoa(b) + " too large for IPv4")]
 				}
-				effectiveBits = effectiveBits + (96)
+				effectiveBits += 96
 				break
 			}
 			default:
 			{
 				if (b > 128) {
-					return [$.markAsStructValue(new Prefix()), errors.New(("prefix length " + strconv.Itoa(b)) + " too large for IPv6")]
+					return [new Prefix(undefined, true), errors.New("prefix length " + strconv.Itoa(b) + " too large for IPv6")]
 				}
 				break
 			}
 		}
-		$.assignStruct(ip.addr, $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(ip.addr)).and($.markAsStructValue($.cloneStructValue(__goscript_uint128.mask6(effectiveBits)))))))
-		return [$.markAsStructValue($.cloneStructValue(PrefixFrom($.markAsStructValue($.cloneStructValue(ip)), b))), null]
+		ip.addr.__goscriptAssign(ip.addr.and(__goscript_uint128.mask6(effectiveBits)))
+		return [PrefixFrom(ip, b), null]
 	}
 
 	public Prev(): Addr {
 		let ip: Addr = this;
-		if ($.markAsStructValue($.cloneStructValue(ip)).Is4()) {
-			if ($.uint($.uint(ip.addr.lo, 32), 32) == 0) {
-				return $.markAsStructValue(new Addr())
+		if (ip.Is4()) {
+			if ($.uint(ip.addr.lo, 32) == 0) {
+				return new Addr(undefined, true)
 			}
 		} else {
-			if ($.markAsStructValue($.cloneStructValue(ip.addr)).isZero()) {
-				return $.markAsStructValue(new Addr())
+			if (ip.addr.isZero()) {
+				return new Addr(undefined, true)
 			}
 		}
-		$.assignStruct(ip.addr, $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(ip.addr)).subOne())))
-		return $.markAsStructValue($.cloneStructValue(ip))
+		ip.addr.__goscriptAssign(ip.addr.subOne())
+		return (ip).clone()
 	}
 
 	public String(): string {
 		const ip = this;
-		if (!$.markAsStructValue($.cloneStructValue(ip)).IsValid()) {
+		if (!ip.IsValid()) {
 			return "invalid IP"
 		}
 		let b: $.Slice<number> = null! as $.Slice<number>
 		switch ((true as boolean)) {
-			case $.comparableEqual(ip.z, z4):
+			case $.structEqual(ip.z, z4):
 			{
 				const max: number = 15
 				b = $.makeSlice<number>(0, 15, "byte")
-				b = $.markAsStructValue($.cloneStructValue(ip)).appendTo4(b)
+				b = ip.appendTo4(b)
 				break
 			}
-			case $.markAsStructValue($.cloneStructValue(ip)).Is4In6():
+			case ip.Is4In6():
 			{
 				const max: number = 29
 				b = $.makeSlice<number>(0, 29, "byte")
-				b = $.markAsStructValue($.cloneStructValue(ip)).appendTo4In6(b)
+				b = ip.appendTo4In6(b)
 				break
 			}
 			default:
 			{
 				const max: number = 46
 				b = $.makeSlice<number>(0, 46, "byte")
-				b = $.markAsStructValue($.cloneStructValue(ip)).appendTo6(b)
+				b = ip.appendTo6(b)
 				break
 			}
 		}
@@ -516,63 +518,63 @@ export class Addr {
 			case z0:
 			case z4:
 			{
-				return $.markAsStructValue($.cloneStructValue(ip)).String()
+				return ip.String()
 				break
 			}
 		}
 
 		const size: number = 39
 		let ret: $.Slice<number> = $.makeSlice<number>(0, 39, "byte")
-		for (let i = 0; $.uint(i, 8) < 8; i++) {
-			if ($.uint(i, 8) > 0) {
+		for (let i = 0; i < 8; i = ((i + 1) & 0xff)) {
+			if (i > 0) {
 				ret = $.append(ret, $.uint(58, 8), $.byteSliceHint)
 			}
 
-			ret = appendHexPad(ret, $.uint($.markAsStructValue($.cloneStructValue(ip)).v6u16($.uint(i, 8)), 16))
+			ret = appendHexPad(ret, $.markAsStructValue($.cloneStructValue(ip)).v6u16(i))
 		}
 
-		if (!$.comparableEqual(ip.z, z6noz)) {
+		if (!$.structEqual(ip.z, z6noz)) {
 			// The addition of a zone will cause a second allocation, but when there
 			// is no zone the ret slice will be stack allocated.
 			ret = $.append(ret, $.uint(37, 8), $.byteSliceHint)
-			ret = $.appendSlice(ret, $.stringToBytes($.markAsStructValue($.cloneStructValue(ip)).Zone()), $.byteSliceHint)
+			ret = $.appendSlice(ret, $.stringToBytes(ip.Zone()), $.byteSliceHint)
 		}
 		return $.bytesToString(ret)
 	}
 
 	public Unmap(): Addr {
 		let ip: Addr = this;
-		if ($.markAsStructValue($.cloneStructValue(ip)).Is4In6()) {
+		if (ip.Is4In6()) {
 			$.assignStruct(ip.z, $.markAsStructValue($.cloneStructValue(z4)))
 		}
-		return $.markAsStructValue($.cloneStructValue(ip))
+		return (ip).clone()
 	}
 
 	public UnmarshalBinary(b: $.Slice<number>): $.GoError {
 		let ip: Addr | $.VarRef<Addr> | null = this;
-		let n = $.len(b)
+		let n = $.sliceLen(b)
 		switch ((true as boolean)) {
 			case n == 0:
 			{
-				$.assignStruct($.pointerValue<Addr>(ip), $.markAsStructValue(new Addr()))
+				$.pointerValue<Addr>(ip).__goscriptAssign(new Addr(undefined, true))
 				return null
 				break
 			}
 			case n == 4:
 			{
-				$.assignStruct($.pointerValue<Addr>(ip), $.markAsStructValue($.cloneStructValue(AddrFrom4($.cloneArrayValue(($.sliceToArray<number>(b, 4, "byte") as Uint8Array), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 4))))))
+				$.pointerValue<Addr>(ip).__goscriptAssign(AddrFrom4($.cloneArrayValue(($.sliceToArray<number>(b, 4, "byte") as Uint8Array), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 4))))
 				return null
 				break
 			}
 			case n == 16:
 			{
-				$.assignStruct($.pointerValue<Addr>(ip), $.markAsStructValue($.cloneStructValue(AddrFrom16($.cloneArrayValue(($.sliceToArray<number>(b, 16, "byte") as Uint8Array), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 16))))))
+				$.pointerValue<Addr>(ip).__goscriptAssign(AddrFrom16($.cloneArrayValue(($.sliceToArray<number>(b, 16, "byte") as Uint8Array), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 16))))
 				return null
 				break
 			}
 			case n > 16:
 			{
-				$.assignStruct($.pointerValue<Addr>(ip), $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(AddrFrom16($.cloneArrayValue(($.sliceToArray<number>($.goSlice(b, undefined, 16), 16, "byte") as Uint8Array), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 16))))).WithZone($.bytesToString($.goSlice(b, 16, undefined))))))
+				$.pointerValue<Addr>(ip).__goscriptAssign($.markAsStructValue($.cloneStructValue(AddrFrom16($.cloneArrayValue(($.sliceToArray<number>($.goSlice(b, undefined, 16), 16, "byte") as Uint8Array), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 16))))).WithZone($.bytesToString($.goSlice(b, 16, undefined))))
 				return null
 				break
 			}
@@ -582,8 +584,8 @@ export class Addr {
 
 	public UnmarshalText(text: $.Slice<number>): $.GoError {
 		let ip: Addr | $.VarRef<Addr> | null = this;
-		if ($.len(text) == 0) {
-			$.assignStruct($.pointerValue<Addr>(ip), $.markAsStructValue(new Addr()))
+		if ($.sliceLen(text) == 0) {
+			$.pointerValue<Addr>(ip).__goscriptAssign(new Addr(undefined, true))
 			return null
 		}
 		let err: $.GoError = null! as $.GoError
@@ -595,20 +597,20 @@ export class Addr {
 
 	public WithZone(zone: string): Addr {
 		let ip: Addr = this;
-		if (!$.markAsStructValue($.cloneStructValue(ip)).Is6()) {
-			return $.markAsStructValue($.cloneStructValue(ip))
+		if (!ip.Is6()) {
+			return (ip).clone()
 		}
 		if ($.stringEqual(zone, "")) {
 			$.assignStruct(ip.z, $.markAsStructValue($.cloneStructValue(z6noz)))
-			return $.markAsStructValue($.cloneStructValue(ip))
+			return (ip).clone()
 		}
-		$.assignStruct(ip.z, ($.markAsStructValue($.cloneStructValue(_unique.Make($.markAsStructValue(new addrDetail({isV6: true, zoneV6: zone}))))) as _unique.Handle<addrDetail>))
-		return $.markAsStructValue($.cloneStructValue(ip))
+		$.assignStruct(ip.z, ($.markAsStructValue($.cloneStructValue(_unique.Make(new addrDetail({isV6: true, zoneV6: zone}, true)))) as _unique.Handle<addrDetail>))
+		return (ip).clone()
 	}
 
 	public Zone(): string {
 		const ip = this;
-		if ($.comparableEqual(ip.z, z0)) {
+		if ($.structEqual(ip.z, z0)) {
 			return ""
 		}
 		return $.markAsStructValue($.cloneStructValue(ip.z)).Value().zoneV6
@@ -616,13 +618,13 @@ export class Addr {
 
 	public appendTo4(ret: $.Slice<number>): $.Slice<number> {
 		const ip = this;
-		ret = appendDecimal(ret, $.uint($.markAsStructValue($.cloneStructValue(ip)).v4(0), 8))
+		ret = appendDecimal(ret, ip.v4(0))
 		ret = $.append(ret, $.uint(46, 8), $.byteSliceHint)
-		ret = appendDecimal(ret, $.uint($.markAsStructValue($.cloneStructValue(ip)).v4(1), 8))
+		ret = appendDecimal(ret, ip.v4(1))
 		ret = $.append(ret, $.uint(46, 8), $.byteSliceHint)
-		ret = appendDecimal(ret, $.uint($.markAsStructValue($.cloneStructValue(ip)).v4(2), 8))
+		ret = appendDecimal(ret, ip.v4(2))
 		ret = $.append(ret, $.uint(46, 8), $.byteSliceHint)
-		ret = appendDecimal(ret, $.uint($.markAsStructValue($.cloneStructValue(ip)).v4(3), 8))
+		ret = appendDecimal(ret, ip.v4(3))
 		return ret
 	}
 
@@ -630,9 +632,9 @@ export class Addr {
 		const ip = this;
 		ret = $.appendSlice(ret, $.stringToBytes("::ffff:"), $.byteSliceHint)
 		ret = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(ip)).Unmap())).appendTo4(ret)
-		if (!$.comparableEqual(ip.z, z6noz)) {
+		if (!$.structEqual(ip.z, z6noz)) {
 			ret = $.append(ret, $.uint(37, 8), $.byteSliceHint)
-			ret = $.appendSlice(ret, $.stringToBytes($.markAsStructValue($.cloneStructValue(ip)).Zone()), $.byteSliceHint)
+			ret = $.appendSlice(ret, $.stringToBytes(ip.Zone()), $.byteSliceHint)
 		}
 		return ret
 	}
@@ -641,55 +643,55 @@ export class Addr {
 		const ip = this;
 		let zeroStart = 255
 		let zeroEnd = 255
-		for (let i = 0; $.uint(i, 8) < 8; i++) {
-			let j = $.uint(i, 8)
-			while (($.uint(j, 8) < 8) && ($.uint($.markAsStructValue($.cloneStructValue(ip)).v6u16($.uint(j, 8)), 16) == 0)) {
-				j++
+		for (let i = 0; i < 8; i = ((i + 1) & 0xff)) {
+			let j = i
+			while ((j < 8) && ($.markAsStructValue($.cloneStructValue(ip)).v6u16(j) == 0)) {
+				j = ((j + 1) & 0xff)
 			}
 			{
-				let l = $.uint(j - i, 8)
-				if (($.uint(l, 8) >= 2) && ($.uint(l, 8) > $.uint((zeroEnd - zeroStart), 8))) {
-					let __goscriptAssign0_0: number = $.uint(i, 8)
-					let __goscriptAssign0_1: number = $.uint(j, 8)
+				let l = $.uint(((j - i) & 0xff), 8)
+				if ((l >= 2) && (l > $.uint((((zeroEnd - zeroStart) & 0xff)), 8))) {
+					let __goscriptAssign0_0: number = i
+					let __goscriptAssign0_1: number = j
 					zeroStart = __goscriptAssign0_0
 					zeroEnd = __goscriptAssign0_1
 				}
 			}
 		}
 
-		for (let i = 0; $.uint(i, 8) < 8; i++) {
-			if ($.uint(i, 8) == $.uint(zeroStart, 8)) {
+		for (let i = 0; i < 8; i = ((i + 1) & 0xff)) {
+			if (i == zeroStart) {
 				ret = $.append(ret, $.uint(58, 8), $.uint(58, 8), $.byteSliceHint)
-				i = $.uint(zeroEnd, 8)
-				if ($.uint(i, 8) >= 8) {
+				i = zeroEnd
+				if (i >= 8) {
 					break
 				}
 			} else {
-				if ($.uint(i, 8) > 0) {
+				if (i > 0) {
 					ret = $.append(ret, $.uint(58, 8), $.byteSliceHint)
 				}
 			}
 
-			ret = appendHex(ret, $.uint($.markAsStructValue($.cloneStructValue(ip)).v6u16($.uint(i, 8)), 16))
+			ret = appendHex(ret, $.markAsStructValue($.cloneStructValue(ip)).v6u16(i))
 		}
 
-		if (!$.comparableEqual(ip.z, z6noz)) {
+		if (!$.structEqual(ip.z, z6noz)) {
 			ret = $.append(ret, $.uint(37, 8), $.byteSliceHint)
-			ret = $.appendSlice(ret, $.stringToBytes($.markAsStructValue($.cloneStructValue(ip)).Zone()), $.byteSliceHint)
+			ret = $.appendSlice(ret, $.stringToBytes(ip.Zone()), $.byteSliceHint)
 		}
 		return ret
 	}
 
 	public hasZone(): boolean {
 		const ip = this;
-		return ((!$.comparableEqual(ip.z, z0)) && (!$.comparableEqual(ip.z, z4))) && (!$.comparableEqual(ip.z, z6noz))
+		return ((!$.structEqual(ip.z, z0)) && (!$.structEqual(ip.z, z4))) && (!$.structEqual(ip.z, z6noz))
 	}
 
 	public isZero(): boolean {
 		const ip = this;
 		// Faster than comparing ip == Addr{}, but effectively equivalent,
 		// as there's no way to make an IP with a nil z from this package.
-		return $.comparableEqual(ip.z, z0)
+		return $.structEqual(ip.z, z0)
 	}
 
 	public marshalBinarySize(): number {
@@ -707,7 +709,7 @@ export class Addr {
 			}
 			default:
 			{
-				return 16 + $.len($.markAsStructValue($.cloneStructValue(ip)).Zone())
+				return 16 + $.stringLen(ip.Zone())
 				break
 			}
 		}
@@ -716,36 +718,32 @@ export class Addr {
 
 	public v4(i: number): number {
 		const ip = this;
-		return $.uint($.uint($.uint64Shr(ip.addr.lo, ((3 - i) * 8)), 8), 8)
+		return $.uint($.uint64Shr(ip.addr.lo, ((((3 - i) & 0xff)) * 8)), 8)
 	}
 
 	public v6(i: number): number {
 		const ip = this;
-		return $.uint($.uint($.uint64Shr($.pointerValue<bigint>(($.arrayIndex(ip.addr.halves(), (Math.trunc(i / 8)) % 2))), ((7 - (i % 8)) * 8)), 8), 8)
+		return $.uint($.uint64Shr($.pointerValue<bigint>(($.arrayIndex(ip.addr.halves(), (globalThis.Math.trunc(i / 8)) % 2))), ((((7 - (i % 8)) & 0xff)) * 8)), 8)
 	}
 
 	public v6u16(i: number): number {
 		const ip = this;
-		return $.uint($.uint($.uint64Shr($.pointerValue<bigint>(($.arrayIndex(ip.addr.halves(), (Math.trunc(i / 4)) % 2))), ((3 - (i % 4)) * 16)), 16), 16)
+		return $.uint($.uint64Shr($.pointerValue<bigint>(($.arrayIndex(ip.addr.halves(), (globalThis.Math.trunc(i / 4)) % 2))), ((((3 - (i % 4)) & 0xff)) * 16)), 16)
 	}
 
 	public withoutZone(): Addr {
 		let ip: Addr = this;
-		if (!$.markAsStructValue($.cloneStructValue(ip)).Is6()) {
-			return $.markAsStructValue($.cloneStructValue(ip))
+		if (!ip.Is6()) {
+			return (ip).clone()
 		}
 		$.assignStruct(ip.z, $.markAsStructValue($.cloneStructValue(z6noz)))
-		return $.markAsStructValue($.cloneStructValue(ip))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["addr", "z"])
+		return (ip).clone()
 	}
 
 	static __typeInfo = $.registerStructType(
 		"netip.Addr",
 		() => new Addr(),
-		() => [{ name: "AppendBinary", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }, { type: "error" }] }, { name: "AppendText", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }, { type: "error" }] }, { name: "AppendTo", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }] }, { name: "As16", args: [], returns: [{ type: /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 16) }] }, { name: "As4", args: [], returns: [{ type: /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 4) }] }, { name: "AsSlice", args: [], returns: [{ type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }] }, { name: "BitLen", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }, { name: "Compare", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }, { name: "Is4", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "Is4In6", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "Is6", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "IsGlobalUnicast", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "IsInterfaceLocalMulticast", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "IsLinkLocalMulticast", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "IsLinkLocalUnicast", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "IsLoopback", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "IsMulticast", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "IsPrivate", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "IsUnspecified", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "IsValid", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "Less", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "MarshalBinary", args: [], returns: [{ type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }, { type: "error" }] }, { name: "MarshalText", args: [], returns: [{ type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }, { type: "error" }] }, { name: "Next", args: [], returns: [{ type: "netip.Addr" }] }, { name: "Prefix", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: "netip.Prefix" }, { type: "error" }] }, { name: "Prev", args: [], returns: [{ type: "netip.Addr" }] }, { name: "String", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }, { name: "StringExpanded", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }, { name: "Unmap", args: [], returns: [{ type: "netip.Addr" }] }, { name: "UnmarshalBinary", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: "error" }] }, { name: "UnmarshalText", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: "error" }] }, { name: "WithZone", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: "netip.Addr" }] }, { name: "Zone", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }, { name: "appendTo4", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }] }, { name: "appendTo4In6", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }] }, { name: "appendTo6", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }] }, { name: "hasZone", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "isZero", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "marshalBinarySize", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }, { name: "v4", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("uint8") }] }, { name: "v6", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("uint8") }] }, { name: "v6u16", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("uint16") }] }, { name: "withoutZone", args: [], returns: [{ type: "netip.Addr" }] }],
+		() => [{ name: "AppendBinary", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }, { type: "error" }] }, { name: "AppendText", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }, { type: "error" }] }, { name: "AppendTo", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }] }, { name: "As16", args: [], returns: [{ type: /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 16) }] }, { name: "As4", args: [], returns: [{ type: /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 4) }] }, { name: "AsSlice", args: [], returns: [{ type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }] }, { name: "BitLen", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }, { name: "Compare", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }, { name: "Is4", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "Is4In6", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "Is6", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "IsGlobalUnicast", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "IsInterfaceLocalMulticast", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "IsLinkLocalMulticast", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "IsLinkLocalUnicast", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "IsLoopback", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "IsMulticast", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "IsPrivate", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "IsUnspecified", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "IsValid", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "Less", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "MarshalBinary", args: [], returns: [{ type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }, { type: "error" }] }, { name: "MarshalText", args: [], returns: [{ type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }, { type: "error" }] }, { name: "Next", args: [], returns: [{ type: "netip.Addr" }] }, { name: "Prefix", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: "netip.Prefix" }, { type: "error" }] }, { name: "Prev", args: [], returns: [{ type: "netip.Addr" }] }, { name: "String", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }, { name: "StringExpanded", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }, { name: "Unmap", args: [], returns: [{ type: "netip.Addr" }] }, { name: "UnmarshalBinary", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: "error" }], pointerReceiver: true }, { name: "UnmarshalText", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: "error" }], pointerReceiver: true }, { name: "WithZone", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: "netip.Addr" }] }, { name: "Zone", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }, { name: "appendTo4", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }] }, { name: "appendTo4In6", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }] }, { name: "appendTo6", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }] }, { name: "hasZone", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "isZero", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "marshalBinarySize", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }, { name: "v4", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("uint8") }] }, { name: "v6", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("uint8") }] }, { name: "v6u16", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("uint16") }] }, { name: "withoutZone", args: [], returns: [{ type: "netip.Addr" }] }],
 		Addr,
 		() => [{ name: "addr", key: "addr", type: "netip.uint128" }, { name: "z", key: "z", type: "unique.Handle" }]
 	)
@@ -756,24 +754,20 @@ export class addrDetail {
 
 	public declare zoneV6: string
 
-	public _fields: {
-		isV6: boolean
-		zoneV6: string
-	}
-
-	constructor(init?: Partial<{isV6?: boolean, zoneV6?: string}>) {
-		this._fields = {
-			isV6: init?.isV6 ?? (false as boolean),
-			zoneV6: init?.zoneV6 ?? ("" as string)
-		}
+	constructor(init?: Partial<{isV6?: boolean, zoneV6?: string}>, __goscriptValue?: boolean) {
+		this.isV6 = init?.isV6 ?? (false as boolean)
+		this.zoneV6 = init?.zoneV6 ?? ("" as string)
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): addrDetail {
-		return $.markAsStructValue(new addrDetail(this))
+		return new addrDetail(this, true)
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["isV6", "zoneV6"])
+	public __goscriptAssign(source: addrDetail): this {
+		this.isV6 = source.isV6
+		this.zoneV6 = source.zoneV6
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -792,35 +786,31 @@ export class parseAddrError {
 
 	public declare at: string
 
-	public _fields: {
-		_in: string
-		msg: string
-		at: string
-	}
-
-	constructor(init?: Partial<{_in?: string, msg?: string, at?: string}>) {
-		this._fields = {
-			_in: init?._in ?? ("" as string),
-			msg: init?.msg ?? ("" as string),
-			at: init?.at ?? ("" as string)
-		}
+	constructor(init?: Partial<{_in?: string, msg?: string, at?: string}>, __goscriptValue?: boolean) {
+		this._in = init?._in ?? ("" as string)
+		this.msg = init?.msg ?? ("" as string)
+		this.at = init?.at ?? ("" as string)
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): parseAddrError {
-		return $.markAsStructValue(new parseAddrError(this))
+		return new parseAddrError(this, true)
+	}
+
+	public __goscriptAssign(source: parseAddrError): this {
+		this._in = source._in
+		this.msg = source.msg
+		this.at = source.at
+		return this
 	}
 
 	public async Error(): globalThis.Promise<string> {
 		const err = this;
 		let q: ((s: string) => string | globalThis.Promise<string>) | null = strconv.Quote
 		if (!$.stringEqual(err.at, "")) {
-			return ((((("ParseAddr(" + await q!(err._in)) + "): ") + err.msg) + " (at ") + await q!(err.at)) + ")"
+			return "ParseAddr(" + (__goscriptAwait = q!(err._in), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) + "): " + err.msg + " (at " + (__goscriptAwait = q!(err.at), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) + ")"
 		}
-		return (("ParseAddr(" + await q!(err._in)) + "): ") + err.msg
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["_in", "msg", "at"])
+		return "ParseAddr(" + (__goscriptAwait = q!(err._in), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) + "): " + err.msg
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -837,41 +827,41 @@ export class AddrPort {
 
 	public declare port: number
 
-	public _fields: {
-		ip: Addr
-		port: number
-	}
-
-	constructor(init?: Partial<{ip?: Addr, port?: number}>) {
-		this._fields = {
-			ip: init?.ip ? $.markAsStructValue($.cloneStructValue(init.ip)) : $.markAsStructValue(new Addr()),
-			port: init?.port ?? (0 as number)
-		}
+	constructor(init?: Partial<{ip?: Addr, port?: number}>, __goscriptValue?: boolean) {
+		this.ip = init?.ip ? init.ip.clone() : new Addr(undefined, true)
+		this.port = init?.port ?? (0 as number)
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): AddrPort {
-		return $.markAsStructValue(new AddrPort(this))
+		return new AddrPort(this, true)
+	}
+
+	public __goscriptAssign(source: AddrPort): this {
+		this.ip.__goscriptAssign(source.ip)
+		this.port = source.port
+		return this
 	}
 
 	public Addr(): Addr {
 		const p = this;
-		return $.markAsStructValue($.cloneStructValue(p.ip))
+		return (p.ip).clone()
 	}
 
 	public AppendBinary(b: $.Slice<number>): [$.Slice<number>, $.GoError] {
 		const p = this;
-		let __goscriptTuple1: any = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(p)).Addr())).AppendBinary(b)
+		let __goscriptTuple1: any = $.markAsStructValue($.cloneStructValue(p.Addr())).AppendBinary(b)
 		b = __goscriptTuple1[0]
 		let err = __goscriptTuple1[1]
 		if (err != null) {
 			return [null, err]
 		}
-		return [byteorder.LEAppendUint16(b, $.uint($.markAsStructValue($.cloneStructValue(p)).Port(), 16)), null]
+		return [byteorder.LEAppendUint16(b, p.Port()), null]
 	}
 
 	public AppendText(b: $.Slice<number>): [$.Slice<number>, $.GoError] {
 		const p = this;
-		return [$.markAsStructValue($.cloneStructValue(p)).AppendTo(b), null]
+		return [p.AppendTo(b), null]
 	}
 
 	public AppendTo(b: $.Slice<number>): $.Slice<number> {
@@ -884,16 +874,16 @@ export class AddrPort {
 			}
 			case z4:
 			{
-				b = $.markAsStructValue($.cloneStructValue(p.ip)).appendTo4(b)
+				b = p.ip.appendTo4(b)
 				break
 			}
 			default:
 			{
 				b = $.append(b, $.uint(91, 8), $.byteSliceHint)
-				if ($.markAsStructValue($.cloneStructValue(p.ip)).Is4In6()) {
-					b = $.markAsStructValue($.cloneStructValue(p.ip)).appendTo4In6(b)
+				if (p.ip.Is4In6()) {
+					b = p.ip.appendTo4In6(b)
 				} else {
-					b = $.markAsStructValue($.cloneStructValue(p.ip)).appendTo6(b)
+					b = p.ip.appendTo6(b)
 				}
 				b = $.append(b, $.uint(93, 8), $.byteSliceHint)
 				break
@@ -907,22 +897,22 @@ export class AddrPort {
 	public Compare(p2: AddrPort): number {
 		const p = this;
 		{
-			let c = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(p)).Addr())).Compare($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(p2)).Addr())))
+			let c = $.markAsStructValue($.cloneStructValue(p.Addr())).Compare(p2.Addr())
 			if (c != 0) {
 				return c
 			}
 		}
-		return cmp.Compare($.uint($.markAsStructValue($.cloneStructValue(p)).Port(), 16), $.uint($.markAsStructValue($.cloneStructValue(p2)).Port(), 16))
+		return cmp.Compare(p.Port(), p2.Port())
 	}
 
 	public IsValid(): boolean {
 		const p = this;
-		return $.markAsStructValue($.cloneStructValue(p.ip)).IsValid()
+		return p.ip.IsValid()
 	}
 
 	public MarshalBinary(): [$.Slice<number>, $.GoError] {
 		const p = this;
-		return $.markAsStructValue($.cloneStructValue(p)).AppendBinary($.makeSlice<number>(0, $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(p)).Addr())).marshalBinarySize() + 2, "byte"))
+		return p.AppendBinary($.makeSlice<number>(0, $.markAsStructValue($.cloneStructValue(p.Addr())).marshalBinarySize() + 2, "byte"))
 	}
 
 	public MarshalText(): [$.Slice<number>, $.GoError] {
@@ -946,12 +936,12 @@ export class AddrPort {
 				break
 			}
 		}
-		return $.markAsStructValue($.cloneStructValue(p)).AppendText(buf)
+		return p.AppendText(buf)
 	}
 
 	public Port(): number {
 		const p = this;
-		return $.uint(p.port, 16)
+		return p.port
 	}
 
 	public String(): string {
@@ -967,21 +957,21 @@ export class AddrPort {
 			{
 				const max: number = 21
 				b = $.makeSlice<number>(0, 21, "byte")
-				b = $.markAsStructValue($.cloneStructValue(p.ip)).appendTo4(b)
+				b = p.ip.appendTo4(b)
 				break
 			}
 			default:
 			{
-				if ($.markAsStructValue($.cloneStructValue(p.ip)).Is4In6()) {
+				if (p.ip.Is4In6()) {
 					const max: number = 37
 					b = $.makeSlice<number>(0, 37, "byte")
 					b = $.append(b, $.uint(91, 8), $.byteSliceHint)
-					b = $.markAsStructValue($.cloneStructValue(p.ip)).appendTo4In6(b)
+					b = p.ip.appendTo4In6(b)
 				} else {
 					const max: number = 54
 					b = $.makeSlice<number>(0, 54, "byte")
 					b = $.append(b, $.uint(91, 8), $.byteSliceHint)
-					b = $.markAsStructValue($.cloneStructValue(p.ip)).appendTo6(b)
+					b = p.ip.appendTo6(b)
 				}
 				b = $.append(b, $.uint(93, 8), $.byteSliceHint)
 				break
@@ -994,22 +984,22 @@ export class AddrPort {
 
 	public UnmarshalBinary(b: $.Slice<number>): $.GoError {
 		let p: AddrPort | $.VarRef<AddrPort> | null = this;
-		if ($.len(b) < 2) {
+		if ($.sliceLen(b) < 2) {
 			return errors.New("unexpected slice size")
 		}
-		let addr: $.VarRef<Addr> = $.varRef($.markAsStructValue(new Addr()))
-		let err = addr.value.UnmarshalBinary($.goSlice(b, undefined, $.len(b) - 2))
+		let addr: $.VarRef<Addr> = $.varRef(new Addr(undefined, true))
+		let err = addr.value.UnmarshalBinary($.goSlice(b, undefined, $.sliceLen(b) - 2))
 		if (err != null) {
 			return err
 		}
-		$.assignStruct($.pointerValue<AddrPort>(p), $.markAsStructValue($.cloneStructValue(AddrPortFrom($.markAsStructValue($.cloneStructValue(addr.value)), $.uint(byteorder.LEUint16($.goSlice(b, $.len(b) - 2, undefined)), 16)))))
+		$.pointerValue<AddrPort>(p).__goscriptAssign(AddrPortFrom(addr.value, byteorder.LEUint16($.goSlice(b, $.sliceLen(b) - 2, undefined))))
 		return null
 	}
 
 	public UnmarshalText(text: $.Slice<number>): $.GoError {
 		let p: AddrPort | $.VarRef<AddrPort> | null = this;
-		if ($.len(text) == 0) {
-			$.assignStruct($.pointerValue<AddrPort>(p), $.markAsStructValue(new AddrPort()))
+		if ($.sliceLen(text) == 0) {
+			$.pointerValue<AddrPort>(p).__goscriptAssign(new AddrPort(undefined, true))
 			return null
 		}
 		let err: $.GoError = null! as $.GoError
@@ -1019,14 +1009,10 @@ export class AddrPort {
 		return err
 	}
 
-	static {
-		$.bindStructFields(this.prototype, ["ip", "port"])
-	}
-
 	static __typeInfo = $.registerStructType(
 		"netip.AddrPort",
 		() => new AddrPort(),
-		() => [{ name: "Addr", args: [], returns: [{ type: "netip.Addr" }] }, { name: "AppendBinary", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }, { type: "error" }] }, { name: "AppendText", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }, { type: "error" }] }, { name: "AppendTo", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }] }, { name: "Compare", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }, { name: "IsValid", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "MarshalBinary", args: [], returns: [{ type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }, { type: "error" }] }, { name: "MarshalText", args: [], returns: [{ type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }, { type: "error" }] }, { name: "Port", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("uint16") }] }, { name: "String", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }, { name: "UnmarshalBinary", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: "error" }] }, { name: "UnmarshalText", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: "error" }] }],
+		() => [{ name: "Addr", args: [], returns: [{ type: "netip.Addr" }] }, { name: "AppendBinary", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }, { type: "error" }] }, { name: "AppendText", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }, { type: "error" }] }, { name: "AppendTo", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }] }, { name: "Compare", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }, { name: "IsValid", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "MarshalBinary", args: [], returns: [{ type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }, { type: "error" }] }, { name: "MarshalText", args: [], returns: [{ type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }, { type: "error" }] }, { name: "Port", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("uint16") }] }, { name: "String", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }, { name: "UnmarshalBinary", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: "error" }], pointerReceiver: true }, { name: "UnmarshalText", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: "error" }], pointerReceiver: true }],
 		AddrPort,
 		() => [{ name: "ip", key: "ip", type: "netip.Addr" }, { name: "port", key: "port", type: /* @__PURE__ */ $.basicType("uint16") }]
 	)
@@ -1039,65 +1025,65 @@ export class Prefix {
 	// A Prefix is valid if and only if bitsPlusOne is non-zero.
 	public declare bitsPlusOne: number
 
-	public _fields: {
-		ip: Addr
-		bitsPlusOne: number
-	}
-
-	constructor(init?: Partial<{ip?: Addr, bitsPlusOne?: number}>) {
-		this._fields = {
-			ip: init?.ip ? $.markAsStructValue($.cloneStructValue(init.ip)) : $.markAsStructValue(new Addr()),
-			bitsPlusOne: init?.bitsPlusOne ?? (0 as number)
-		}
+	constructor(init?: Partial<{ip?: Addr, bitsPlusOne?: number}>, __goscriptValue?: boolean) {
+		this.ip = init?.ip ? init.ip.clone() : new Addr(undefined, true)
+		this.bitsPlusOne = init?.bitsPlusOne ?? (0 as number)
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Prefix {
-		return $.markAsStructValue(new Prefix(this))
+		return new Prefix(this, true)
+	}
+
+	public __goscriptAssign(source: Prefix): this {
+		this.ip.__goscriptAssign(source.ip)
+		this.bitsPlusOne = source.bitsPlusOne
+		return this
 	}
 
 	public Addr(): Addr {
 		const p = this;
-		return $.markAsStructValue($.cloneStructValue(p.ip))
+		return (p.ip).clone()
 	}
 
 	public AppendBinary(b: $.Slice<number>): [$.Slice<number>, $.GoError] {
 		const p = this;
-		let __goscriptTuple5: any = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(p)).Addr())).withoutZone())).AppendBinary(b)
+		let __goscriptTuple5: any = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(p.Addr())).withoutZone())).AppendBinary(b)
 		b = __goscriptTuple5[0]
 		let err = __goscriptTuple5[1]
 		if (err != null) {
 			return [null, err]
 		}
-		return [$.append(b, $.uint($.uint($.markAsStructValue($.cloneStructValue(p)).Bits(), 8), 8), $.byteSliceHint), null]
+		return [$.append(b, $.uint($.uint(p.Bits(), 8), 8), $.byteSliceHint), null]
 	}
 
 	public AppendText(b: $.Slice<number>): [$.Slice<number>, $.GoError] {
 		const p = this;
-		return [$.markAsStructValue($.cloneStructValue(p)).AppendTo(b), null]
+		return [p.AppendTo(b), null]
 	}
 
 	public AppendTo(b: $.Slice<number>): $.Slice<number> {
 		const p = this;
-		if ($.markAsStructValue($.cloneStructValue(p)).isZero()) {
+		if (p.isZero()) {
 			return b
 		}
-		if (!$.markAsStructValue($.cloneStructValue(p)).IsValid()) {
+		if (!p.IsValid()) {
 			return $.appendSlice(b, $.stringToBytes("invalid Prefix"), $.byteSliceHint)
 		}
 
-		if ($.comparableEqual(p.ip.z, z4)) {
-			b = $.markAsStructValue($.cloneStructValue(p.ip)).appendTo4(b)
+		if ($.structEqual(p.ip.z, z4)) {
+			b = p.ip.appendTo4(b)
 		} else {
-			if ($.markAsStructValue($.cloneStructValue(p.ip)).Is4In6()) {
+			if (p.ip.Is4In6()) {
 				b = $.appendSlice(b, $.stringToBytes("::ffff:"), $.byteSliceHint)
 				b = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(p.ip)).Unmap())).appendTo4(b)
 			} else {
-				b = $.markAsStructValue($.cloneStructValue(p.ip)).appendTo6(b)
+				b = p.ip.appendTo6(b)
 			}
 		}
 
 		b = $.append(b, $.uint(47, 8), $.byteSliceHint)
-		b = appendDecimal(b, $.uint($.uint($.markAsStructValue($.cloneStructValue(p)).Bits(), 8), 8))
+		b = appendDecimal(b, $.uint(p.Bits(), 8))
 		return b
 	}
 
@@ -1112,35 +1098,35 @@ export class Prefix {
 		// Addr.Compare also enforces the valid vs. invalid and address
 		// family ordering for the prefix.
 		{
-			let c = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(p)).Masked())).Addr())).Compare($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(p2)).Masked())).Addr())))
+			let c = $.markAsStructValue($.cloneStructValue(p.Masked().Addr())).Compare(p2.Masked().Addr())
 			if (c != 0) {
 				return c
 			}
 		}
 
 		{
-			let c = cmp.Compare($.markAsStructValue($.cloneStructValue(p)).Bits(), $.markAsStructValue($.cloneStructValue(p2)).Bits())
+			let c = cmp.Compare(p.Bits(), p2.Bits())
 			if (c != 0) {
 				return c
 			}
 		}
 
-		return $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(p)).Addr())).Compare($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(p2)).Addr())))
+		return $.markAsStructValue($.cloneStructValue(p.Addr())).Compare(p2.Addr())
 	}
 
 	public Contains(ip: Addr): boolean {
 		const p = this;
-		if (!$.markAsStructValue($.cloneStructValue(p)).IsValid() || $.markAsStructValue($.cloneStructValue(ip)).hasZone()) {
+		if (!p.IsValid() || ip.hasZone()) {
 			return false
 		}
 		{
-			let f1 = $.markAsStructValue($.cloneStructValue(p.ip)).BitLen()
-			let f2 = $.markAsStructValue($.cloneStructValue(ip)).BitLen()
+			let f1 = p.ip.BitLen()
+			let f2 = ip.BitLen()
 			if (((f1 == 0) || (f2 == 0)) || (f1 != f2)) {
 				return false
 			}
 		}
-		if ($.markAsStructValue($.cloneStructValue(ip)).Is4()) {
+		if (ip.Is4()) {
 			// xor the IP addresses together; mismatched bits are now ones.
 			// Shift away the number of bits we don't care about.
 			// Shifts in Go are more efficient if the compiler can prove
@@ -1149,30 +1135,30 @@ export class Prefix {
 			// the compiler doesn't know that, so mask with 63 to help it.
 			// Now truncate to 32 bits, because this is IPv4.
 			// If all the bits we care about are equal, the result will be zero.
-			return $.uint($.uint($.uint64Shr(($.uint64Xor(ip.addr.lo, p.ip.addr.lo)), ((32 - $.markAsStructValue($.cloneStructValue(p)).Bits()) & 63)), 32), 32) == 0
+			return $.uint($.uint64Shr(($.uint64Xor(ip.addr.lo, p.ip.addr.lo)), ((32 - p.Bits()) & 63)), 32) == 0
 		} else {
 			// xor the IP addresses together.
 			// Mask away the bits we don't care about.
 			// If all the bits we care about are equal, the result will be zero.
-			return $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(ip.addr)).xor($.markAsStructValue($.cloneStructValue(p.ip.addr))))).and($.markAsStructValue($.cloneStructValue(__goscript_uint128.mask6($.markAsStructValue($.cloneStructValue(p)).Bits())))))).isZero()
+			return ip.addr.xor(p.ip.addr).and(__goscript_uint128.mask6(p.Bits())).isZero()
 		}
 		throw new globalThis.Error("goscript: unreachable return")
 	}
 
 	public IsSingleIP(): boolean {
 		const p = this;
-		return $.markAsStructValue($.cloneStructValue(p)).IsValid() && ($.markAsStructValue($.cloneStructValue(p)).Bits() == $.markAsStructValue($.cloneStructValue(p.ip)).BitLen())
+		return p.IsValid() && (p.Bits() == p.ip.BitLen())
 	}
 
 	public IsValid(): boolean {
 		const p = this;
-		return $.uint(p.bitsPlusOne, 8) > 0
+		return p.bitsPlusOne > 0
 	}
 
 	public MarshalBinary(): [$.Slice<number>, $.GoError] {
 		const p = this;
 		// without the zone the max length is 16, plus an additional byte is 17
-		return $.markAsStructValue($.cloneStructValue(p)).AppendBinary($.makeSlice<number>(0, $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(p)).Addr())).withoutZone())).marshalBinarySize() + 1, "byte"))
+		return p.AppendBinary($.makeSlice<number>(0, $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(p.Addr())).withoutZone())).marshalBinarySize() + 1, "byte"))
 	}
 
 	public MarshalText(): [$.Slice<number>, $.GoError] {
@@ -1196,30 +1182,30 @@ export class Prefix {
 				break
 			}
 		}
-		return $.markAsStructValue($.cloneStructValue(p)).AppendText(buf)
+		return p.AppendText(buf)
 	}
 
 	public Masked(): Prefix {
 		const p = this;
-		let [m, ] = $.markAsStructValue($.cloneStructValue(p.ip)).Prefix($.markAsStructValue($.cloneStructValue(p)).Bits())
-		return $.markAsStructValue($.cloneStructValue(m))
+		let [m, ] = $.markAsStructValue($.cloneStructValue(p.ip)).Prefix(p.Bits())
+		return (m).clone()
 	}
 
 	public Overlaps(o: Prefix): boolean {
 		let p: Prefix = this;
-		if (!$.markAsStructValue($.cloneStructValue(p)).IsValid() || !$.markAsStructValue($.cloneStructValue(o)).IsValid()) {
+		if (!p.IsValid() || !o.IsValid()) {
 			return false
 		}
-		if ($.comparableEqual(p, o)) {
+		if ($.structEqual(p, o)) {
 			return true
 		}
-		if ($.markAsStructValue($.cloneStructValue(p.ip)).Is4() != $.markAsStructValue($.cloneStructValue(o.ip)).Is4()) {
+		if (p.ip.Is4() != o.ip.Is4()) {
 			return false
 		}
 		let minBits: number = 0
 		{
-			let pb = $.markAsStructValue($.cloneStructValue(p)).Bits()
-			let ob = $.markAsStructValue($.cloneStructValue(o)).Bits()
+			let pb = p.Bits()
+			let ob = o.Bits()
 			if (pb < ob) {
 				minBits = pb
 			} else {
@@ -1236,7 +1222,7 @@ export class Prefix {
 		let err: $.GoError = null! as $.GoError
 		{
 			let __goscriptTuple6: any = $.markAsStructValue($.cloneStructValue(p.ip)).Prefix(minBits)
-			$.assignStruct(p, __goscriptTuple6[0])
+			p = p.__goscriptAssign(__goscriptTuple6[0])
 			err = __goscriptTuple6[1]
 			if (err != null) {
 				return false
@@ -1244,30 +1230,30 @@ export class Prefix {
 		}
 		{
 			let __goscriptTuple7: any = $.markAsStructValue($.cloneStructValue(o.ip)).Prefix(minBits)
-			$.assignStruct(o, __goscriptTuple7[0])
+			o = o.__goscriptAssign(__goscriptTuple7[0])
 			err = __goscriptTuple7[1]
 			if (err != null) {
 				return false
 			}
 		}
-		return $.comparableEqual(p.ip, o.ip)
+		return $.structEqual(p.ip, o.ip)
 	}
 
 	public String(): string {
 		const p = this;
-		if (!$.markAsStructValue($.cloneStructValue(p)).IsValid()) {
+		if (!p.IsValid()) {
 			return "invalid Prefix"
 		}
 		let b: $.Slice<number> = null! as $.Slice<number>
 		switch ((true as boolean)) {
-			case $.comparableEqual(p.ip.z, z4):
+			case $.structEqual(p.ip.z, z4):
 			{
 				const maxCap: number = 18
 				b = $.makeSlice<number>(0, 18, "byte")
-				b = $.markAsStructValue($.cloneStructValue(p.ip)).appendTo4(b)
+				b = p.ip.appendTo4(b)
 				break
 			}
-			case $.markAsStructValue($.cloneStructValue(p.ip)).Is4In6():
+			case p.ip.Is4In6():
 			{
 				const maxCap: number = 25
 				b = $.makeSlice<number>(0, 25, "byte")
@@ -1279,33 +1265,33 @@ export class Prefix {
 			{
 				const maxCap: number = 43
 				b = $.makeSlice<number>(0, 43, "byte")
-				b = $.markAsStructValue($.cloneStructValue(p.ip)).appendTo6(b)
+				b = p.ip.appendTo6(b)
 				break
 			}
 		}
 		b = $.append(b, $.uint(47, 8), $.byteSliceHint)
-		b = appendDecimal(b, $.uint($.uint($.markAsStructValue($.cloneStructValue(p)).Bits(), 8), 8))
+		b = appendDecimal(b, $.uint(p.Bits(), 8))
 		return $.bytesToString(b)
 	}
 
 	public UnmarshalBinary(b: $.Slice<number>): $.GoError {
 		let p: Prefix | $.VarRef<Prefix> | null = this;
-		if ($.len(b) < 1) {
+		if ($.sliceLen(b) < 1) {
 			return errors.New("unexpected slice size")
 		}
-		let addr: $.VarRef<Addr> = $.varRef($.markAsStructValue(new Addr()))
-		let err = addr.value.UnmarshalBinary($.goSlice(b, undefined, $.len(b) - 1))
+		let addr: $.VarRef<Addr> = $.varRef(new Addr(undefined, true))
+		let err = addr.value.UnmarshalBinary($.goSlice(b, undefined, $.sliceLen(b) - 1))
 		if (err != null) {
 			return err
 		}
-		$.assignStruct($.pointerValue<Prefix>(p), $.markAsStructValue($.cloneStructValue(PrefixFrom($.markAsStructValue($.cloneStructValue(addr.value)), $.int($.arrayIndex(b!, $.len(b) - 1))))))
+		$.pointerValue<Prefix>(p).__goscriptAssign(PrefixFrom((addr.value).clone(), $.int($.arrayIndex(b!, $.sliceLen(b) - 1))))
 		return null
 	}
 
 	public async UnmarshalText(text: $.Slice<number>): globalThis.Promise<$.GoError> {
 		let p: Prefix | $.VarRef<Prefix> | null = this;
-		if ($.len(text) == 0) {
-			$.assignStruct($.pointerValue<Prefix>(p), $.markAsStructValue(new Prefix()))
+		if ($.sliceLen(text) == 0) {
+			$.pointerValue<Prefix>(p).__goscriptAssign(new Prefix(undefined, true))
 			return null
 		}
 		let err: $.GoError = null! as $.GoError
@@ -1317,17 +1303,13 @@ export class Prefix {
 
 	public isZero(): boolean {
 		const p = this;
-		return $.comparableEqual(p, $.markAsStructValue(new Prefix()))
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["ip", "bitsPlusOne"])
+		return $.structEqual(p, new Prefix(undefined, true))
 	}
 
 	static __typeInfo = $.registerStructType(
 		"netip.Prefix",
 		() => new Prefix(),
-		() => [{ name: "Addr", args: [], returns: [{ type: "netip.Addr" }] }, { name: "AppendBinary", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }, { type: "error" }] }, { name: "AppendText", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }, { type: "error" }] }, { name: "AppendTo", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }] }, { name: "Bits", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }, { name: "Compare", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }, { name: "Contains", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "IsSingleIP", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "IsValid", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "MarshalBinary", args: [], returns: [{ type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }, { type: "error" }] }, { name: "MarshalText", args: [], returns: [{ type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }, { type: "error" }] }, { name: "Masked", args: [], returns: [{ type: "netip.Prefix" }] }, { name: "Overlaps", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "String", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }, { name: "UnmarshalBinary", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: "error" }] }, { name: "UnmarshalText", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: "error" }] }, { name: "isZero", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }],
+		() => [{ name: "Addr", args: [], returns: [{ type: "netip.Addr" }] }, { name: "AppendBinary", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }, { type: "error" }] }, { name: "AppendText", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }, { type: "error" }] }, { name: "AppendTo", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }] }, { name: "Bits", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }, { name: "Compare", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }, { name: "Contains", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "IsSingleIP", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "IsValid", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "MarshalBinary", args: [], returns: [{ type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }, { type: "error" }] }, { name: "MarshalText", args: [], returns: [{ type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }, { type: "error" }] }, { name: "Masked", args: [], returns: [{ type: "netip.Prefix" }] }, { name: "Overlaps", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }, { name: "String", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }, { name: "UnmarshalBinary", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: "error" }], pointerReceiver: true }, { name: "UnmarshalText", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: "error" }], pointerReceiver: true }, { name: "isZero", args: [], returns: [{ type: /* @__PURE__ */ $.basicType("bool") }] }],
 		Prefix,
 		() => [{ name: "ip", key: "ip", type: "netip.Addr" }, { name: "bitsPlusOne", key: "bitsPlusOne", type: /* @__PURE__ */ $.basicType("uint8") }]
 	)
@@ -1338,29 +1320,25 @@ export class parsePrefixError {
 
 	public declare msg: string
 
-	public _fields: {
-		_in: string
-		msg: string
-	}
-
-	constructor(init?: Partial<{_in?: string, msg?: string}>) {
-		this._fields = {
-			_in: init?._in ?? ("" as string),
-			msg: init?.msg ?? ("" as string)
-		}
+	constructor(init?: Partial<{_in?: string, msg?: string}>, __goscriptValue?: boolean) {
+		this._in = init?._in ?? ("" as string)
+		this.msg = init?.msg ?? ("" as string)
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): parsePrefixError {
-		return $.markAsStructValue(new parsePrefixError(this))
+		return new parsePrefixError(this, true)
+	}
+
+	public __goscriptAssign(source: parsePrefixError): this {
+		this._in = source._in
+		this.msg = source.msg
+		return this
 	}
 
 	public Error(): string {
 		const err = this;
-		return (("netip.ParsePrefix(" + strconv.Quote(err._in)) + "): ") + err.msg
-	}
-
-	static {
-		$.bindStructFields(this.prototype, ["_in", "msg"])
+		return "netip.ParsePrefix(" + strconv.Quote(err._in) + "): " + err.msg
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -1380,49 +1358,49 @@ export function __goscript_set_z0(__goscriptValue: _unique.Handle<addrDetail>): 
 	$.assignStruct(z0, __goscriptValue)
 }
 
-export let z4: _unique.Handle<addrDetail> = $.markAsStructValue($.cloneStructValue(_unique.Make($.markAsStructValue(new addrDetail()))))
+export let z4: _unique.Handle<addrDetail> = $.markAsStructValue($.cloneStructValue(_unique.Make(new addrDetail(undefined, true))))
 
 export function __goscript_set_z4(__goscriptValue: _unique.Handle<addrDetail>): void {
 	$.assignStruct(z4, __goscriptValue)
 }
 
-export let z6noz: _unique.Handle<addrDetail> = $.markAsStructValue($.cloneStructValue(_unique.Make($.markAsStructValue(new addrDetail({isV6: true})))))
+export let z6noz: _unique.Handle<addrDetail> = $.markAsStructValue($.cloneStructValue(_unique.Make(new addrDetail({isV6: true}, true))))
 
 export function __goscript_set_z6noz(__goscriptValue: _unique.Handle<addrDetail>): void {
 	$.assignStruct(z6noz, __goscriptValue)
 }
 
 export function IPv6LinkLocalAllNodes(): Addr {
-	return $.markAsStructValue($.cloneStructValue(AddrFrom16($.arrayValue(new Uint8Array([255, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1])))))
+	return AddrFrom16($.arrayValue(new Uint8Array([255, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1])))
 }
 
 export function IPv6LinkLocalAllRouters(): Addr {
-	return $.markAsStructValue($.cloneStructValue(AddrFrom16($.arrayValue(new Uint8Array([255, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2])))))
+	return AddrFrom16($.arrayValue(new Uint8Array([255, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2])))
 }
 
 export function IPv6Loopback(): Addr {
-	return $.markAsStructValue($.cloneStructValue(AddrFrom16($.arrayValue(new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1])))))
+	return AddrFrom16($.arrayValue(new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1])))
 }
 
 export function IPv6Unspecified(): Addr {
-	return $.markAsStructValue(new Addr({z: $.markAsStructValue($.cloneStructValue(z6noz))}))
+	return new Addr({z: $.markAsStructValue($.cloneStructValue(z6noz))}, true)
 }
 
 export function IPv4Unspecified(): Addr {
-	return $.markAsStructValue($.cloneStructValue(AddrFrom4($.arrayValue(new Uint8Array(4)))))
+	return AddrFrom4($.arrayValue(new Uint8Array(4)))
 }
 
 export function AddrFrom4(addr: Uint8Array): Addr {
-	return $.markAsStructValue(new Addr({addr: $.markAsStructValue(new __goscript_uint128.uint128({hi: 0n, lo: $.uint64Or(($.uint64Or(($.uint64Or(($.uint64Or(281470681743360n, ($.uint64Shl($.uint64($.arrayIndex(addr, 0)), 24n)))), ($.uint64Shl($.uint64($.arrayIndex(addr, 1)), 16n)))), ($.uint64Shl($.uint64($.arrayIndex(addr, 2)), 8n)))), $.uint64($.arrayIndex(addr, 3)))})), z: $.markAsStructValue($.cloneStructValue(z4))}))
+	return new Addr({addr: new __goscript_uint128.uint128({hi: 0n, lo: $.uint64Or(($.uint64Or(($.uint64Or(($.uint64Or(281470681743360n, ($.uint64Shl($.uint64($.arrayIndex(addr, 0)), 24n)))), ($.uint64Shl($.uint64($.arrayIndex(addr, 1)), 16n)))), ($.uint64Shl($.uint64($.arrayIndex(addr, 2)), 8n)))), $.uint64($.arrayIndex(addr, 3)))}, true), z: $.markAsStructValue($.cloneStructValue(z4))}, true)
 }
 
 export function AddrFrom16(addr: Uint8Array): Addr {
-	return $.markAsStructValue(new Addr({addr: (() => { const __goscriptLiteralField0 = byteorder.BEUint64($.goSlice(addr, undefined, 8)); const __goscriptLiteralField1 = byteorder.BEUint64($.goSlice(addr, 8, undefined)); return $.markAsStructValue(new __goscript_uint128.uint128({hi: __goscriptLiteralField0, lo: __goscriptLiteralField1})) })(), z: $.markAsStructValue($.cloneStructValue(z6noz))}))
+	return new Addr({addr: (() => { const __goscriptLiteralField0 = byteorder.BEUint64($.goSlice(addr, undefined, 8)); const __goscriptLiteralField1 = byteorder.BEUint64($.goSlice(addr, 8, undefined)); return new __goscript_uint128.uint128({hi: __goscriptLiteralField0, lo: __goscriptLiteralField1}, true) })(), z: $.markAsStructValue($.cloneStructValue(z6noz))}, true)
 }
 
 export function ParseAddr(s: string): [Addr, $.GoError] {
-	for (let i = 0; i < $.len(s); i++) {
-		switch ($.indexStringOrBytes(s, i)) {
+	for (let i = 0; i < $.stringLen(s); i++) {
+		switch ($.indexString(s, i)) {
 			case 46:
 			{
 				return parseIPv4(s)
@@ -1435,12 +1413,12 @@ export function ParseAddr(s: string): [Addr, $.GoError] {
 			}
 			case 37:
 			{
-				return [$.markAsStructValue(new Addr()), $.interfaceValue<$.GoError>($.markAsStructValue(new parseAddrError({_in: s, msg: "missing IPv6 address"})), "netip.parseAddrError", "netip.parseAddrError")]
+				return [new Addr(undefined, true), $.interfaceValue<$.GoError>(new parseAddrError({_in: s, msg: "missing IPv6 address"}, true), "netip.parseAddrError", "netip.parseAddrError")]
 				break
 			}
 		}
 	}
-	return [$.markAsStructValue(new Addr()), $.interfaceValue<$.GoError>($.markAsStructValue(new parseAddrError({_in: s, msg: "unable to parse IP"})), "netip.parseAddrError", "netip.parseAddrError")]
+	return [new Addr(undefined, true), $.interfaceValue<$.GoError>(new parseAddrError({_in: s, msg: "unable to parse IP"}, true), "netip.parseAddrError", "netip.parseAddrError")]
 }
 
 export function MustParseAddr(s: string): Addr {
@@ -1448,7 +1426,7 @@ export function MustParseAddr(s: string): Addr {
 	if (err != null) {
 		$.panic((err as any))
 	}
-	return $.markAsStructValue($.cloneStructValue(ip))
+	return (ip).clone()
 }
 
 export function parseIPv4Fields(_in: string, off: number, end: number, fields: $.Slice<number>): $.GoError {
@@ -1456,53 +1434,53 @@ export function parseIPv4Fields(_in: string, off: number, end: number, fields: $
 	let pos: number = 0
 	let digLen: number = 0
 	let s = $.sliceStringOrBytes(_in, off, end)
-	for (let i = 0; i < $.len(s); i++) {
-		if (($.uint($.indexStringOrBytes(s, i), 8) >= 48) && ($.uint($.indexStringOrBytes(s, i), 8) <= 57)) {
+	for (let __goscriptSliceWindow0 = $.sliceRange(fields), i = 0; i < $.stringLen(s); i++) {
+		if (($.indexString(s, i) >= 48) && ($.indexString(s, i) <= 57)) {
 			if ((digLen == 1) && (val == 0)) {
-				return $.interfaceValue<$.GoError>($.markAsStructValue(new parseAddrError({_in: _in, msg: "IPv4 field has octet with leading zero"})), "netip.parseAddrError", "netip.parseAddrError")
+				return $.interfaceValue<$.GoError>(new parseAddrError({_in: _in, msg: "IPv4 field has octet with leading zero"}, true), "netip.parseAddrError", "netip.parseAddrError")
 			}
-			val = ((val * 10) + $.int($.indexStringOrBytes(s, i))) - 48
+			val = ((val * 10) + $.int($.indexString(s, i))) - 48
 			digLen++
 			if (val > 255) {
-				return $.interfaceValue<$.GoError>($.markAsStructValue(new parseAddrError({_in: _in, msg: "IPv4 field has value >255"})), "netip.parseAddrError", "netip.parseAddrError")
+				return $.interfaceValue<$.GoError>(new parseAddrError({_in: _in, msg: "IPv4 field has value >255"}, true), "netip.parseAddrError", "netip.parseAddrError")
 			}
 		} else {
-			if ($.uint($.indexStringOrBytes(s, i), 8) == 46) {
+			if ($.indexString(s, i) == 46) {
 				// .1.2.3
 				// 1.2.3.
 				// 1..2.3
-				if (((i == 0) || (i == ($.len(s) - 1))) || ($.uint($.indexStringOrBytes(s, i - 1), 8) == 46)) {
-					return $.interfaceValue<$.GoError>($.markAsStructValue(new parseAddrError({_in: _in, msg: "IPv4 field must have at least one digit", at: $.sliceStringOrBytes(s, i, undefined)})), "netip.parseAddrError", "netip.parseAddrError")
+				if (((i == 0) || (i == ($.stringLen(s) - 1))) || ($.indexString(s, i - 1) == 46)) {
+					return $.interfaceValue<$.GoError>(new parseAddrError({_in: _in, msg: "IPv4 field must have at least one digit", at: $.sliceStringOrBytes(s, i, undefined)}, true), "netip.parseAddrError", "netip.parseAddrError")
 				}
 				// 1.2.3.4.5
 				if (pos == 3) {
-					return $.interfaceValue<$.GoError>($.markAsStructValue(new parseAddrError({_in: _in, msg: "IPv4 address too long"})), "netip.parseAddrError", "netip.parseAddrError")
+					return $.interfaceValue<$.GoError>(new parseAddrError({_in: _in, msg: "IPv4 address too long"}, true), "netip.parseAddrError", "netip.parseAddrError")
 				}
-				$.sliceElems(fields!)[$.sliceSlot(fields!, pos)] = $.uint($.uint(val, 8), 8)
+				;(__goscriptSliceWindow0.backing as any[])[$.windowSlot(__goscriptSliceWindow0, pos)] = $.uint(val, 8)
 				pos++
 				val = 0
 				digLen = 0
 			} else {
-				return $.interfaceValue<$.GoError>($.markAsStructValue(new parseAddrError({_in: _in, msg: "unexpected character", at: $.sliceStringOrBytes(s, i, undefined)})), "netip.parseAddrError", "netip.parseAddrError")
+				return $.interfaceValue<$.GoError>(new parseAddrError({_in: _in, msg: "unexpected character", at: $.sliceStringOrBytes(s, i, undefined)}, true), "netip.parseAddrError", "netip.parseAddrError")
 			}
 		}
 	}
 	if (pos < 3) {
-		return $.interfaceValue<$.GoError>($.markAsStructValue(new parseAddrError({_in: _in, msg: "IPv4 address too short"})), "netip.parseAddrError", "netip.parseAddrError")
+		return $.interfaceValue<$.GoError>(new parseAddrError({_in: _in, msg: "IPv4 address too short"}, true), "netip.parseAddrError", "netip.parseAddrError")
 	}
-	$.sliceElems(fields!)[$.sliceSlot(fields!, 3)] = $.uint($.uint(val, 8), 8)
+	$.sliceElems(fields!)[$.sliceSlot(fields!, 3)] = $.uint(val, 8)
 	return null
 }
 
 export function parseIPv4(s: string): [Addr, $.GoError] {
-	let ip: Addr = $.markAsStructValue(new Addr())
+	let ip: Addr = new Addr(undefined, true)
 	let err: $.GoError = null! as $.GoError
 	let fields: Uint8Array = $.arrayValue(new Uint8Array(4))
-	err = parseIPv4Fields(s, 0, $.len(s), $.goSlice(fields, undefined, undefined))
+	err = parseIPv4Fields(s, 0, $.stringLen(s), $.goSlice(fields, undefined, undefined))
 	if (err != null) {
-		return [$.markAsStructValue(new Addr()), err]
+		return [new Addr(undefined, true), err]
 	}
-	return [$.markAsStructValue($.cloneStructValue(AddrFrom4($.cloneArrayValue(fields, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 4))))), null]
+	return [AddrFrom4($.cloneArrayValue(fields, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 4))), null]
 }
 
 export function parseIPv6(_in: string): [Addr, $.GoError] {
@@ -1521,7 +1499,7 @@ export function parseIPv6(_in: string): [Addr, $.GoError] {
 		zone = __goscriptAssign1_1
 		if ($.stringEqual(zone, "")) {
 			// Not allowed to have an empty zone if explicitly specified.
-			return [$.markAsStructValue(new Addr()), $.interfaceValue<$.GoError>($.markAsStructValue(new parseAddrError({_in: _in, msg: "zone must be a non-empty string"})), "netip.parseAddrError", "netip.parseAddrError")]
+			return [new Addr(undefined, true), $.interfaceValue<$.GoError>(new parseAddrError({_in: _in, msg: "zone must be a non-empty string"}, true), "netip.parseAddrError", "netip.parseAddrError")]
 		}
 	}
 
@@ -1529,12 +1507,12 @@ export function parseIPv6(_in: string): [Addr, $.GoError] {
 	let ellipsis = -1
 
 	// Might have leading ellipsis
-	if ((($.len(s) >= 2) && ($.uint($.indexStringOrBytes(s, 0), 8) == 58)) && ($.uint($.indexStringOrBytes(s, 1), 8) == 58)) {
+	if ((($.stringLen(s) >= 2) && ($.indexString(s, 0) == 58)) && ($.indexString(s, 1) == 58)) {
 		ellipsis = 0
 		s = $.sliceStringOrBytes(s, 2, undefined)
 		// Might be only ellipsis
-		if ($.len(s) == 0) {
-			return [$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(IPv6Unspecified())).WithZone(zone))), null]
+		if ($.stringLen(s) == 0) {
+			return [$.markAsStructValue($.cloneStructValue(IPv6Unspecified())).WithZone(zone), null]
 		}
 	}
 
@@ -1545,16 +1523,16 @@ export function parseIPv6(_in: string): [Addr, $.GoError] {
 		// parsing yields a significant performance increase.
 		let off = 0
 		let acc = 0
-		for (; off < $.len(s); off++) {
-			let c = $.uint($.indexStringOrBytes(s, off), 8)
-			if (($.uint(c, 8) >= 48) && ($.uint(c, 8) <= 57)) {
-				acc = $.uint((acc << 4) + $.uint(c - 48, 32), 32)
+		for (; off < $.stringLen(s); off++) {
+			let c = $.indexString(s, off)
+			if ((c >= 48) && (c <= 57)) {
+				acc = $.uint((((((acc << 4) >>> 0)) + $.uint($.uint(((c - 48) & 0xff), 8), 32)) >>> 0), 32)
 			} else {
-				if (($.uint(c, 8) >= 97) && ($.uint(c, 8) <= 102)) {
-					acc = $.uint((acc << 4) + $.uint((c - 97) + 10, 32), 32)
+				if ((c >= 97) && (c <= 102)) {
+					acc = $.uint((((((acc << 4) >>> 0)) + $.uint($.uint((((((c - 97) & 0xff)) + 10) & 0xff), 8), 32)) >>> 0), 32)
 				} else {
-					if (($.uint(c, 8) >= 65) && ($.uint(c, 8) <= 70)) {
-						acc = $.uint((acc << 4) + $.uint((c - 65) + 10, 32), 32)
+					if ((c >= 65) && (c <= 70)) {
+						acc = $.uint((((((acc << 4) >>> 0)) + $.uint($.uint((((((c - 65) & 0xff)) + 10) & 0xff), 8), 32)) >>> 0), 32)
 					} else {
 						break
 					}
@@ -1562,127 +1540,127 @@ export function parseIPv6(_in: string): [Addr, $.GoError] {
 			}
 			if (off > 3) {
 				//more than 4 digits in group, fail.
-				return [$.markAsStructValue(new Addr()), $.interfaceValue<$.GoError>($.markAsStructValue(new parseAddrError({_in: _in, msg: "each group must have 4 or less digits", at: s})), "netip.parseAddrError", "netip.parseAddrError")]
+				return [new Addr(undefined, true), $.interfaceValue<$.GoError>(new parseAddrError({_in: _in, msg: "each group must have 4 or less digits", at: s}, true), "netip.parseAddrError", "netip.parseAddrError")]
 			}
-			if ($.uint(acc, 32) > 65535) {
+			if (acc > 65535) {
 				// Overflow, fail.
-				return [$.markAsStructValue(new Addr()), $.interfaceValue<$.GoError>($.markAsStructValue(new parseAddrError({_in: _in, msg: "IPv6 field has value >=2^16", at: s})), "netip.parseAddrError", "netip.parseAddrError")]
+				return [new Addr(undefined, true), $.interfaceValue<$.GoError>(new parseAddrError({_in: _in, msg: "IPv6 field has value >=2^16", at: s}, true), "netip.parseAddrError", "netip.parseAddrError")]
 			}
 		}
 		if (off == 0) {
 			// No digits found, fail.
-			return [$.markAsStructValue(new Addr()), $.interfaceValue<$.GoError>($.markAsStructValue(new parseAddrError({_in: _in, msg: "each colon-separated field must have at least one digit", at: s})), "netip.parseAddrError", "netip.parseAddrError")]
+			return [new Addr(undefined, true), $.interfaceValue<$.GoError>(new parseAddrError({_in: _in, msg: "each colon-separated field must have at least one digit", at: s}, true), "netip.parseAddrError", "netip.parseAddrError")]
 		}
 
 		// If followed by dot, might be in trailing IPv4.
-		if ((off < $.len(s)) && ($.uint($.indexStringOrBytes(s, off), 8) == 46)) {
+		if ((off < $.stringLen(s)) && ($.indexString(s, off) == 46)) {
 			if ((ellipsis < 0) && (i != 12)) {
 				// Not the right place.
-				return [$.markAsStructValue(new Addr()), $.interfaceValue<$.GoError>($.markAsStructValue(new parseAddrError({_in: _in, msg: "embedded IPv4 address must replace the final 2 fields of the address", at: s})), "netip.parseAddrError", "netip.parseAddrError")]
+				return [new Addr(undefined, true), $.interfaceValue<$.GoError>(new parseAddrError({_in: _in, msg: "embedded IPv4 address must replace the final 2 fields of the address", at: s}, true), "netip.parseAddrError", "netip.parseAddrError")]
 			}
 			if ((i + 4) > 16) {
 				// Not enough room.
-				return [$.markAsStructValue(new Addr()), $.interfaceValue<$.GoError>($.markAsStructValue(new parseAddrError({_in: _in, msg: "too many hex fields to fit an embedded IPv4 at the end of the address", at: s})), "netip.parseAddrError", "netip.parseAddrError")]
+				return [new Addr(undefined, true), $.interfaceValue<$.GoError>(new parseAddrError({_in: _in, msg: "too many hex fields to fit an embedded IPv4 at the end of the address", at: s}, true), "netip.parseAddrError", "netip.parseAddrError")]
 			}
 
-			let end = $.len(_in)
-			if ($.len(zone) > 0) {
-				end = end - ($.len(zone) + 1)
+			let end = $.stringLen(_in)
+			if ($.stringLen(zone) > 0) {
+				end -= $.stringLen(zone) + 1
 			}
-			let err = parseIPv4Fields(_in, end - $.len(s), end, $.goSlice(ip, i, i + 4))
+			let err = parseIPv4Fields(_in, end - $.stringLen(s), end, $.goSlice(ip, i, i + 4))
 			if (err != null) {
-				return [$.markAsStructValue(new Addr()), err]
+				return [new Addr(undefined, true), err]
 			}
 			s = ""
-			i = i + (4)
+			i += 4
 			break
 		}
 
 		// Save this 16-bit chunk.
-		ip[i] = $.uint($.uint($.uintShr(acc, 8, 32), 8), 8)
-		ip[i + 1] = $.uint($.uint(acc, 8), 8)
-		i = i + (2)
+		ip[i] = $.uint($.uintShr(acc, 8, 32), 8)
+		ip[i + 1] = $.uint(acc, 8)
+		i += 2
 
 		// Stop at end of string.
 		s = $.sliceStringOrBytes(s, off, undefined)
-		if ($.len(s) == 0) {
+		if ($.stringLen(s) == 0) {
 			break
 		}
 
 		// Otherwise must be followed by colon and more.
-		if ($.uint($.indexStringOrBytes(s, 0), 8) != 58) {
-			return [$.markAsStructValue(new Addr()), $.interfaceValue<$.GoError>($.markAsStructValue(new parseAddrError({_in: _in, msg: "unexpected character, want colon", at: s})), "netip.parseAddrError", "netip.parseAddrError")]
+		if ($.indexString(s, 0) != 58) {
+			return [new Addr(undefined, true), $.interfaceValue<$.GoError>(new parseAddrError({_in: _in, msg: "unexpected character, want colon", at: s}, true), "netip.parseAddrError", "netip.parseAddrError")]
 		} else {
-			if ($.len(s) == 1) {
-				return [$.markAsStructValue(new Addr()), $.interfaceValue<$.GoError>($.markAsStructValue(new parseAddrError({_in: _in, msg: "colon must be followed by more characters", at: s})), "netip.parseAddrError", "netip.parseAddrError")]
+			if ($.stringLen(s) == 1) {
+				return [new Addr(undefined, true), $.interfaceValue<$.GoError>(new parseAddrError({_in: _in, msg: "colon must be followed by more characters", at: s}, true), "netip.parseAddrError", "netip.parseAddrError")]
 			}
 		}
 		s = $.sliceStringOrBytes(s, 1, undefined)
 
 		// Look for ellipsis.
-		if ($.uint($.indexStringOrBytes(s, 0), 8) == 58) {
+		if ($.indexString(s, 0) == 58) {
 			if (ellipsis >= 0) {
-				return [$.markAsStructValue(new Addr()), $.interfaceValue<$.GoError>($.markAsStructValue(new parseAddrError({_in: _in, msg: "multiple :: in address", at: s})), "netip.parseAddrError", "netip.parseAddrError")]
+				return [new Addr(undefined, true), $.interfaceValue<$.GoError>(new parseAddrError({_in: _in, msg: "multiple :: in address", at: s}, true), "netip.parseAddrError", "netip.parseAddrError")]
 			}
 			ellipsis = i
 			s = $.sliceStringOrBytes(s, 1, undefined)
-			if ($.len(s) == 0) {
+			if ($.stringLen(s) == 0) {
 				break
 			}
 		}
 	}
 
 	// Must have used entire string.
-	if ($.len(s) != 0) {
-		return [$.markAsStructValue(new Addr()), $.interfaceValue<$.GoError>($.markAsStructValue(new parseAddrError({_in: _in, msg: "trailing garbage after address", at: s})), "netip.parseAddrError", "netip.parseAddrError")]
+	if ($.stringLen(s) != 0) {
+		return [new Addr(undefined, true), $.interfaceValue<$.GoError>(new parseAddrError({_in: _in, msg: "trailing garbage after address", at: s}, true), "netip.parseAddrError", "netip.parseAddrError")]
 	}
 
 	// If didn't parse enough, expand ellipsis.
 	if (i < 16) {
 		if (ellipsis < 0) {
-			return [$.markAsStructValue(new Addr()), $.interfaceValue<$.GoError>($.markAsStructValue(new parseAddrError({_in: _in, msg: "address string too short"})), "netip.parseAddrError", "netip.parseAddrError")]
+			return [new Addr(undefined, true), $.interfaceValue<$.GoError>(new parseAddrError({_in: _in, msg: "address string too short"}, true), "netip.parseAddrError", "netip.parseAddrError")]
 		}
 		let n = 16 - i
 		for (let j = i - 1; j >= ellipsis; j--) {
-			ip[j + n] = $.uint($.arrayIndex(ip, j), 8)
+			ip[j + n] = $.arrayIndex(ip, j)
 		}
 		$.clear($.goSlice(ip, ellipsis, ellipsis + n))
 	} else {
 		if (ellipsis >= 0) {
 			// Ellipsis must represent at least one 0 group.
-			return [$.markAsStructValue(new Addr()), $.interfaceValue<$.GoError>($.markAsStructValue(new parseAddrError({_in: _in, msg: "the :: must expand to at least one field of zeros"})), "netip.parseAddrError", "netip.parseAddrError")]
+			return [new Addr(undefined, true), $.interfaceValue<$.GoError>(new parseAddrError({_in: _in, msg: "the :: must expand to at least one field of zeros"}, true), "netip.parseAddrError", "netip.parseAddrError")]
 		}
 	}
-	return [$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(AddrFrom16($.cloneArrayValue(ip, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 16))))).WithZone(zone))), null]
+	return [$.markAsStructValue($.cloneStructValue(AddrFrom16($.cloneArrayValue(ip, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 16))))).WithZone(zone), null]
 }
 
 export function AddrFromSlice(slice: $.Slice<number>): [Addr, boolean] {
-	let ip: Addr = $.markAsStructValue(new Addr())
+	let ip: Addr = new Addr(undefined, true)
 	let ok: boolean = false
-	switch ($.len(slice)) {
+	switch ($.sliceLen(slice)) {
 		case 4:
 		{
-			return [$.markAsStructValue($.cloneStructValue(AddrFrom4($.cloneArrayValue(($.sliceToArray<number>(slice, 4, "byte") as Uint8Array), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 4))))), true]
+			return [AddrFrom4($.cloneArrayValue(($.sliceToArray<number>(slice, 4, "byte") as Uint8Array), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 4))), true]
 			break
 		}
 		case 16:
 		{
-			return [$.markAsStructValue($.cloneStructValue(AddrFrom16($.cloneArrayValue(($.sliceToArray<number>(slice, 16, "byte") as Uint8Array), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 16))))), true]
+			return [AddrFrom16($.cloneArrayValue(($.sliceToArray<number>(slice, 16, "byte") as Uint8Array), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 16))), true]
 			break
 		}
 	}
-	return [$.markAsStructValue(new Addr()), false]
+	return [new Addr(undefined, true), false]
 }
 
 export function appendDecimal(b: $.Slice<number>, x: number): $.Slice<number> {
 	// Using this function rather than strconv.AppendUint makes IPv4
 	// string building 2x faster.
 
-	if ($.uint(x, 8) >= 100) {
-		b = $.append(b, $.uint($.indexByteString("\x30\x31\x32\x33\x34\x35\x36\x37\x38\x39\x61\x62\x63\x64\x65\x66", Math.trunc(x / 100)), 8), $.byteSliceHint)
+	if (x >= 100) {
+		b = $.append(b, $.uint($.indexByteString("\x30\x31\x32\x33\x34\x35\x36\x37\x38\x39\x61\x62\x63\x64\x65\x66", globalThis.Math.trunc(x / 100)), 8), $.byteSliceHint)
 	}
-	if ($.uint(x, 8) >= 10) {
-		b = $.append(b, $.uint($.indexByteString("\x30\x31\x32\x33\x34\x35\x36\x37\x38\x39\x61\x62\x63\x64\x65\x66", (Math.trunc(x / 10)) % 10), 8), $.byteSliceHint)
+	if (x >= 10) {
+		b = $.append(b, $.uint($.indexByteString("\x30\x31\x32\x33\x34\x35\x36\x37\x38\x39\x61\x62\x63\x64\x65\x66", (globalThis.Math.trunc(x / 10)) % 10), 8), $.byteSliceHint)
 	}
 	return $.append(b, $.uint($.indexByteString("\x30\x31\x32\x33\x34\x35\x36\x37\x38\x39\x61\x62\x63\x64\x65\x66", x % 10), 8), $.byteSliceHint)
 }
@@ -1691,13 +1669,13 @@ export function appendHex(b: $.Slice<number>, x: number): $.Slice<number> {
 	// Using this function rather than strconv.AppendUint makes IPv6
 	// string building 2x faster.
 
-	if ($.uint(x, 16) >= 0x1000) {
+	if (x >= 0x1000) {
 		b = $.append(b, $.uint($.indexByteString("\x30\x31\x32\x33\x34\x35\x36\x37\x38\x39\x61\x62\x63\x64\x65\x66", $.uintShr(x, 12, 16)), 8), $.byteSliceHint)
 	}
-	if ($.uint(x, 16) >= 0x100) {
+	if (x >= 0x100) {
 		b = $.append(b, $.uint($.indexByteString("\x30\x31\x32\x33\x34\x35\x36\x37\x38\x39\x61\x62\x63\x64\x65\x66", ($.uintShr(x, 8, 16)) & 0xf), 8), $.byteSliceHint)
 	}
-	if ($.uint(x, 16) >= 0x10) {
+	if (x >= 0x10) {
 		b = $.append(b, $.uint($.indexByteString("\x30\x31\x32\x33\x34\x35\x36\x37\x38\x39\x61\x62\x63\x64\x65\x66", ($.uintShr(x, 4, 16)) & 0xf), 8), $.byteSliceHint)
 	}
 	return $.append(b, $.uint($.indexByteString("\x30\x31\x32\x33\x34\x35\x36\x37\x38\x39\x61\x62\x63\x64\x65\x66", x & 0xf), 8), $.byteSliceHint)
@@ -1708,7 +1686,7 @@ export function appendHexPad(b: $.Slice<number>, x: number): $.Slice<number> {
 }
 
 export function AddrPortFrom(ip: Addr, port: number): AddrPort {
-	return $.markAsStructValue(new AddrPort({ip: $.markAsStructValue($.cloneStructValue(ip)), port: $.uint(port, 16)}))
+	return new AddrPort({ip: ip, port: port}, true)
 }
 
 export function splitAddrPort(s: string): [string, string, boolean, $.GoError] {
@@ -1725,17 +1703,17 @@ export function splitAddrPort(s: string): [string, string, boolean, $.GoError] {
 	let __goscriptAssign2_1: string = $.sliceStringOrBytes(s, i + 1, undefined)
 	ip = __goscriptAssign2_0
 	port = __goscriptAssign2_1
-	if ($.len(ip) == 0) {
+	if ($.stringLen(ip) == 0) {
 		return ["", "", false, errors.New("no IP")]
 	}
-	if ($.len(port) == 0) {
+	if ($.stringLen(port) == 0) {
 		return ["", "", false, errors.New("no port")]
 	}
-	if ($.uint($.indexStringOrBytes(ip, 0), 8) == 91) {
-		if (($.len(ip) < 2) || ($.uint($.indexStringOrBytes(ip, $.len(ip) - 1), 8) != 93)) {
+	if ($.indexString(ip, 0) == 91) {
+		if (($.stringLen(ip) < 2) || ($.indexString(ip, $.stringLen(ip) - 1) != 93)) {
 			return ["", "", false, errors.New("missing ]")]
 		}
-		ip = $.sliceStringOrBytes(ip, 1, $.len(ip) - 1)
+		ip = $.sliceStringOrBytes(ip, 1, $.stringLen(ip) - 1)
 		v6 = true
 	}
 
@@ -1743,32 +1721,32 @@ export function splitAddrPort(s: string): [string, string, boolean, $.GoError] {
 }
 
 export function ParseAddrPort(s: string): [AddrPort, $.GoError] {
-	let ipp: AddrPort = $.markAsStructValue(new AddrPort())
+	let ipp: AddrPort = new AddrPort(undefined, true)
 	let [ip, port, v6, err] = splitAddrPort(s)
 	if (err != null) {
-		return [$.markAsStructValue($.cloneStructValue(ipp)), err]
+		return [(ipp).clone(), err]
 	}
 	let __goscriptTuple3: any = strconv.ParseUint(port, 10, 16)
 	let port16 = __goscriptTuple3[0]
 	err = __goscriptTuple3[1]
 	if (err != null) {
-		return [$.markAsStructValue($.cloneStructValue(ipp)), errors.New((("invalid port " + strconv.Quote(port)) + " parsing ") + strconv.Quote(s))]
+		return [(ipp).clone(), errors.New("invalid port " + strconv.Quote(port) + " parsing " + strconv.Quote(s))]
 	}
-	ipp.port = $.uint($.uint(port16, 16), 16)
+	ipp.port = $.uint(port16, 16)
 	let __goscriptTuple4: any = ParseAddr(ip)
-	$.assignStruct(ipp.ip, __goscriptTuple4[0])
+	ipp.ip.__goscriptAssign(__goscriptTuple4[0])
 	err = __goscriptTuple4[1]
 	if (err != null) {
-		return [$.markAsStructValue(new AddrPort()), err]
+		return [new AddrPort(undefined, true), err]
 	}
-	if (v6 && $.markAsStructValue($.cloneStructValue(ipp.ip)).Is4()) {
-		return [$.markAsStructValue(new AddrPort()), errors.New(("invalid ip:port " + strconv.Quote(s)) + ", square brackets can only be used with IPv6 addresses")]
+	if (v6 && ipp.ip.Is4()) {
+		return [new AddrPort(undefined, true), errors.New("invalid ip:port " + strconv.Quote(s) + ", square brackets can only be used with IPv6 addresses")]
 	} else {
-		if (!v6 && $.markAsStructValue($.cloneStructValue(ipp.ip)).Is6()) {
-			return [$.markAsStructValue(new AddrPort()), errors.New(("invalid ip:port " + strconv.Quote(s)) + ", IPv6 addresses must be surrounded by square brackets")]
+		if (!v6 && ipp.ip.Is6()) {
+			return [new AddrPort(undefined, true), errors.New("invalid ip:port " + strconv.Quote(s) + ", IPv6 addresses must be surrounded by square brackets")]
 		}
 	}
-	return [$.markAsStructValue($.cloneStructValue(ipp)), null]
+	return [(ipp).clone(), null]
 }
 
 export function MustParseAddrPort(s: string): AddrPort {
@@ -1776,52 +1754,52 @@ export function MustParseAddrPort(s: string): AddrPort {
 	if (err != null) {
 		$.panic((err as any))
 	}
-	return $.markAsStructValue($.cloneStructValue(ip))
+	return (ip).clone()
 }
 
 export function PrefixFrom(ip: Addr, bits: number): Prefix {
 	let bitsPlusOne: number = 0
-	if ((!$.markAsStructValue($.cloneStructValue(ip)).isZero() && (bits >= 0)) && (bits <= $.markAsStructValue($.cloneStructValue(ip)).BitLen())) {
-		bitsPlusOne = $.uint($.uint(bits, 8) + 1, 8)
+	if ((!ip.isZero() && (bits >= 0)) && (bits <= ip.BitLen())) {
+		bitsPlusOne = $.uint((($.uint(bits, 8) + 1) & 0xff), 8)
 	}
-	return (() => { const __goscriptLiteralField2 = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(ip)).withoutZone())); return $.markAsStructValue(new Prefix({ip: __goscriptLiteralField2, bitsPlusOne: $.uint(bitsPlusOne, 8)})) })()
+	return (() => { const __goscriptLiteralField2 = $.markAsStructValue($.cloneStructValue(ip)).withoutZone(); return new Prefix({ip: __goscriptLiteralField2, bitsPlusOne: bitsPlusOne}, true) })()
 }
 
 export async function ParsePrefix(s: string): globalThis.Promise<[Prefix, $.GoError]> {
 	let i = bytealg.LastIndexByteString(s, 47)
 	if (i < 0) {
-		return [$.markAsStructValue(new Prefix()), $.interfaceValue<$.GoError>($.markAsStructValue(new parsePrefixError({_in: s, msg: "no '/'"})), "netip.parsePrefixError", "netip.parsePrefixError")]
+		return [new Prefix(undefined, true), $.interfaceValue<$.GoError>(new parsePrefixError({_in: s, msg: "no '/'"}, true), "netip.parsePrefixError", "netip.parsePrefixError")]
 	}
 	let [ip, err] = ParseAddr($.sliceStringOrBytes(s, undefined, i))
 	if (err != null) {
-		return [$.markAsStructValue(new Prefix()), $.interfaceValue<$.GoError>((await (async () => { const __goscriptLiteralField3 = await $.pointerValue<Exclude<$.GoError, null>>(err).Error(); return $.markAsStructValue(new parsePrefixError({_in: s, msg: __goscriptLiteralField3})) })()), "netip.parsePrefixError", "netip.parsePrefixError")]
+		return [new Prefix(undefined, true), $.interfaceValue<$.GoError>((await (async () => { const __goscriptLiteralField3 = (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait); return new parsePrefixError({_in: s, msg: __goscriptLiteralField3}, true) })()), "netip.parsePrefixError", "netip.parsePrefixError")]
 	}
 	// IPv6 zones are not allowed: https://go.dev/issue/51899
-	if ($.markAsStructValue($.cloneStructValue(ip)).Is6() && (!$.comparableEqual(ip.z, z6noz))) {
-		return [$.markAsStructValue(new Prefix()), $.interfaceValue<$.GoError>($.markAsStructValue(new parsePrefixError({_in: s, msg: "IPv6 zones cannot be present in a prefix"})), "netip.parsePrefixError", "netip.parsePrefixError")]
+	if (ip.Is6() && (!$.structEqual(ip.z, z6noz))) {
+		return [new Prefix(undefined, true), $.interfaceValue<$.GoError>(new parsePrefixError({_in: s, msg: "IPv6 zones cannot be present in a prefix"}, true), "netip.parsePrefixError", "netip.parsePrefixError")]
 	}
 
 	let bitsStr = $.sliceStringOrBytes(s, i + 1, undefined)
 
 	// strconv.Atoi accepts a leading sign and leading zeroes, but we don't want that.
-	if (($.len(bitsStr) > 1) && (($.uint($.indexStringOrBytes(bitsStr, 0), 8) < 49) || ($.uint($.indexStringOrBytes(bitsStr, 0), 8) > 57))) {
-		return [$.markAsStructValue(new Prefix()), $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField4 = "bad bits after slash: " + strconv.Quote(bitsStr); return $.markAsStructValue(new parsePrefixError({_in: s, msg: __goscriptLiteralField4})) })(), "netip.parsePrefixError", "netip.parsePrefixError")]
+	if (($.stringLen(bitsStr) > 1) && (($.indexString(bitsStr, 0) < 49) || ($.indexString(bitsStr, 0) > 57))) {
+		return [new Prefix(undefined, true), $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField4 = "bad bits after slash: " + strconv.Quote(bitsStr); return new parsePrefixError({_in: s, msg: __goscriptLiteralField4}, true) })(), "netip.parsePrefixError", "netip.parsePrefixError")]
 	}
 
 	let __goscriptTuple9: any = strconv.Atoi(bitsStr)
 	let bits = __goscriptTuple9[0]
 	err = __goscriptTuple9[1]
 	if (err != null) {
-		return [$.markAsStructValue(new Prefix()), $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField5 = "bad bits after slash: " + strconv.Quote(bitsStr); return $.markAsStructValue(new parsePrefixError({_in: s, msg: __goscriptLiteralField5})) })(), "netip.parsePrefixError", "netip.parsePrefixError")]
+		return [new Prefix(undefined, true), $.interfaceValue<$.GoError>((() => { const __goscriptLiteralField5 = "bad bits after slash: " + strconv.Quote(bitsStr); return new parsePrefixError({_in: s, msg: __goscriptLiteralField5}, true) })(), "netip.parsePrefixError", "netip.parsePrefixError")]
 	}
 	let maxBits = 32
-	if ($.markAsStructValue($.cloneStructValue(ip)).Is6()) {
+	if (ip.Is6()) {
 		maxBits = 128
 	}
 	if ((bits < 0) || (bits > maxBits)) {
-		return [$.markAsStructValue(new Prefix()), $.interfaceValue<$.GoError>($.markAsStructValue(new parsePrefixError({_in: s, msg: "prefix length out of range"})), "netip.parsePrefixError", "netip.parsePrefixError")]
+		return [new Prefix(undefined, true), $.interfaceValue<$.GoError>(new parsePrefixError({_in: s, msg: "prefix length out of range"}, true), "netip.parsePrefixError", "netip.parsePrefixError")]
 	}
-	return [$.markAsStructValue($.cloneStructValue(PrefixFrom($.markAsStructValue($.cloneStructValue(ip)), bits))), null]
+	return [PrefixFrom(ip, bits), null]
 }
 
 export async function MustParsePrefix(s: string): globalThis.Promise<Prefix> {
@@ -1829,5 +1807,12 @@ export async function MustParsePrefix(s: string): globalThis.Promise<Prefix> {
 	if (err != null) {
 		$.panic((err as any))
 	}
-	return $.markAsStructValue($.cloneStructValue(ip))
+	return (ip).clone()
 }
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "netip.addrDetail", zero: () => new addrDetail(undefined, true) }})
+}
+
+var __goscriptAwait: any

@@ -173,7 +173,7 @@ export interface RowsNextResultSet extends Rows {
 // stays opaque behind the internal accessors.
 export class ScanContext extends internal.ScanContext {
   public override clone(): ScanContext {
-    return new ScanContext({ v: this._fields.v })
+    return new ScanContext({ v: this.v })
   }
 
   static __typeInfo = $.registerStructType(

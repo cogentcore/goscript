@@ -44,28 +44,15 @@ export function Errorf(format: string, ...args: any[]): $.GoError {
 }
 
 class fundamental {
-  public get msg(): string {
-    return this._fields.msg
-  }
-  public set msg(value: string) {
-    this._fields.msg = value
-  }
-
-  public _fields: {
-    msg: string
-  }
+  declare public msg: string
 
   constructor(init?: Partial<{ msg?: string }>) {
-    this._fields = {
-      msg: init?.msg ?? '',
-    }
+    this.msg = init?.msg ?? ''
   }
 
   public clone(): fundamental {
     const cloned = new fundamental()
-    cloned._fields = {
-      msg: this._fields.msg,
-    }
+    cloned.msg = this.msg
     return cloned
   }
 
@@ -110,28 +97,15 @@ export function WithStack(err: $.GoError): $.GoError {
 }
 
 class withStack {
-  public get error(): $.GoError {
-    return this._fields.error
-  }
-  public set error(value: $.GoError) {
-    this._fields.error = value
-  }
-
-  public _fields: {
-    error: $.GoError
-  }
+  declare public error: $.GoError
 
   constructor(init?: Partial<{ error?: $.GoError }>) {
-    this._fields = {
-      error: init?.error ?? null,
-    }
+    this.error = init?.error ?? null
   }
 
   public clone(): withStack {
     const cloned = new withStack()
-    cloned._fields = {
-      error: this._fields.error,
-    }
+    cloned.error = this.error
     return cloned
   }
 
@@ -280,38 +254,19 @@ export function WithMessagef(
 }
 
 class withMessage {
-  public get cause(): $.GoError {
-    return this._fields.cause
-  }
-  public set cause(value: $.GoError) {
-    this._fields.cause = value
-  }
+  declare public cause: $.GoError
 
-  public get msg(): string {
-    return this._fields.msg
-  }
-  public set msg(value: string) {
-    this._fields.msg = value
-  }
-
-  public _fields: {
-    cause: $.GoError
-    msg: string
-  }
+  declare public msg: string
 
   constructor(init?: Partial<{ cause?: $.GoError; msg?: string }>) {
-    this._fields = {
-      cause: init?.cause ?? null,
-      msg: init?.msg ?? '',
-    }
+    this.cause = init?.cause ?? null
+    this.msg = init?.msg ?? ''
   }
 
   public clone(): withMessage {
     const cloned = new withMessage()
-    cloned._fields = {
-      cause: this._fields.cause,
-      msg: this._fields.msg,
-    }
+    cloned.cause = this.cause
+    cloned.msg = this.msg
     return cloned
   }
 

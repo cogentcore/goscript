@@ -13,50 +13,25 @@ let smallBufferSize: number = 64
 
 export class Buffer {
 	// contents are the bytes buf[off : len(buf)]
-	public get buf(): $.Bytes {
-		return this._fields.buf
-	}
-	public set buf(value: $.Bytes) {
-		this._fields.buf = value
-	}
+	public declare buf: $.Bytes
 
 	// read at &buf[off], write at &buf[len(buf)]
-	public get off(): number {
-		return this._fields.off
-	}
-	public set off(value: number) {
-		this._fields.off = value
-	}
+	public declare off: number
 
 	// last read operation, so that Unread* can work correctly.
-	public get lastRead(): readOp {
-		return this._fields.lastRead
-	}
-	public set lastRead(value: readOp) {
-		this._fields.lastRead = value
-	}
-
-	public _fields: {
-		buf: $.Bytes;
-		off: number;
-		lastRead: readOp;
-	}
+	public declare lastRead: readOp
 
 	constructor(init?: Partial<{buf?: $.Bytes, lastRead?: readOp, off?: number}>) {
-		this._fields = {
-			buf: init?.buf ?? null,
-			off: init?.off ?? 0,
-			lastRead: init?.lastRead ?? 0
-		}
+		this.buf = init?.buf ?? null
+		this.off = init?.off ?? 0
+		this.lastRead = init?.lastRead ?? 0
 	}
 
 	public clone(): Buffer {
 		const cloned = new Buffer()
-		cloned._fields = {
-			buf: this._fields.buf,
-			off: this._fields.off,
-			lastRead: this._fields.lastRead
-		}
+		cloned.buf = this.buf
+		cloned.off = this.off
+		cloned.lastRead = this.lastRead
 		return cloned
 	}
 

@@ -5,28 +5,15 @@ import * as $ from '@goscript/builtin/index.js'
 // database/sql.ConvertAssign. It mirrors internal.ScanContext: the
 // wrapped value stays opaque behind the two accessors below.
 export class ScanContext {
-  public get v(): any {
-    return this._fields.v
-  }
-  public set v(value: any) {
-    this._fields.v = value
-  }
-
-  public _fields: {
-    v: any
-  }
+  declare public v: any
 
   constructor(init?: Partial<{ v?: any }>) {
-    this._fields = {
-      v: init?.v ?? null,
-    }
+    this.v = init?.v ?? null
   }
 
   public clone(): ScanContext {
     const cloned = new ScanContext()
-    cloned._fields = {
-      v: this._fields.v,
-    }
+    cloned.v = this.v
     return cloned
   }
 
@@ -57,5 +44,5 @@ export function NewScanContext(v: any): ScanContext {
 
 // ScanContextValue unwraps the value carried by a ScanContext.
 export function ScanContextValue(c: ScanContext): any {
-  return c._fields.v
+  return c.v
 }

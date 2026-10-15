@@ -3,32 +3,13 @@ import * as token from '@goscript/go/token/index.js'
 import type * as io from '@goscript/io/index.js'
 
 export class Error {
-  public get Pos(): token.Position {
-    return this._fields.Pos
-  }
+  declare public Pos: token.Position
 
-  public set Pos(value: token.Position) {
-    this._fields.Pos = value
-  }
-
-  public get Msg(): string {
-    return this._fields.Msg
-  }
-
-  public set Msg(value: string) {
-    this._fields.Msg = value
-  }
-
-  public _fields: {
-    Pos: token.Position
-    Msg: string
-  }
+  declare public Msg: string
 
   constructor(init?: Partial<{ Pos: token.Position; Msg: string }>) {
-    this._fields = {
-      Pos: init?.Pos ?? new token.Position(),
-      Msg: init?.Msg ?? '',
-    }
+    this.Pos = init?.Pos ?? new token.Position()
+    this.Msg = init?.Msg ?? ''
   }
 
   public clone(): Error {
