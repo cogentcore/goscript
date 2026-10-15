@@ -34,6 +34,7 @@ func TestDiagnosticsSummaryUsesCompilerFormatter(t *testing.T) {
 }
 
 func TestRunnerRunsOrdinaryPackageTest(t *testing.T) {
+	// Write the fixture module.
 	moduleDir := writeFixture(t, map[string]string{
 		"go.mod": "module example.test/gotest\n\ngo 1.25.3\n",
 		"value.go": strings.Join([]string{
@@ -58,6 +59,7 @@ func TestRunnerRunsOrdinaryPackageTest(t *testing.T) {
 		}, "\n"),
 	})
 
+	// Run the fixture's tests.
 	result, err := NewRunner().Run(context.Background(), &Request{
 		Dir:      moduleDir,
 		Patterns: []string{"."},
@@ -396,6 +398,7 @@ func TestRunnerEvaluatesStructLiteralCallsBeforeFieldCopies(t *testing.T) {
 }
 
 func TestRunnerRunsExternalPackageTest(t *testing.T) {
+	// Write the fixture module.
 	moduleDir := writeFixture(t, map[string]string{
 		"go.mod": "module example.test/external\n\ngo 1.25.3\n",
 		"value.go": strings.Join([]string{
@@ -424,6 +427,7 @@ func TestRunnerRunsExternalPackageTest(t *testing.T) {
 		}, "\n"),
 	})
 
+	// Run the fixture's tests.
 	result, err := NewRunner().Run(context.Background(), &Request{
 		Dir:      moduleDir,
 		Patterns: []string{"."},
@@ -524,6 +528,7 @@ func TestRunnerBatchCompilesSamePackageTests(t *testing.T) {
 }
 
 func TestRunnerAppliesOverridesToTestImports(t *testing.T) {
+	// Write the fixture module.
 	moduleDir := writeFixture(t, map[string]string{
 		"go.mod": "module example.test/testoverride\n\ngo 1.25.3\n",
 		"dep/value.go": strings.Join([]string{
@@ -566,6 +571,7 @@ func TestRunnerAppliesOverridesToTestImports(t *testing.T) {
 		t.Fatal(err.Error())
 	}
 
+	// Run the app's tests with the override directory.
 	result, err := NewRunner().Run(context.Background(), &Request{
 		Dir:          moduleDir,
 		Patterns:     []string{"./app"},
@@ -581,11 +587,13 @@ func TestRunnerAppliesOverridesToTestImports(t *testing.T) {
 }
 
 func TestRunnerRejectsInvalidRunPattern(t *testing.T) {
+	// Write the fixture module.
 	moduleDir := writeFixture(t, map[string]string{
 		"go.mod":   "module example.test/badrun\n\ngo 1.25.3\n",
 		"value.go": "package badrun\n",
 	})
 
+	// Run with a run pattern that does not compile.
 	result, err := NewRunner().Run(context.Background(), &Request{
 		Dir:      moduleDir,
 		Patterns: []string{"."},
@@ -606,11 +614,13 @@ func TestRunnerRejectsInvalidRunPattern(t *testing.T) {
 }
 
 func TestRunnerFailsPackagePatternsWhenGraphHasOnlyDiagnostics(t *testing.T) {
+	// Write the fixture module.
 	moduleDir := writeFixture(t, map[string]string{
 		"go.mod":   "module example.test/missing\n\ngo 1.25.3\n",
 		"value.go": "package missing\n",
 	})
 
+	// Run a pattern that matches no directory.
 	result, err := NewRunner().Run(context.Background(), &Request{
 		Dir:      moduleDir,
 		Patterns: []string{"./does-not-exist"},
@@ -628,6 +638,7 @@ func TestRunnerFailsPackagePatternsWhenGraphHasOnlyDiagnostics(t *testing.T) {
 }
 
 func TestMarkAllFailuresPreservesExistingPackageOwners(t *testing.T) {
+	// Start from an owned failure, an unowned failure and a skipped package.
 	result := &Result{Packages: []PackageResult{
 		{
 			PackagePath: "example.test/broken",
@@ -645,8 +656,10 @@ func TestMarkAllFailuresPreservesExistingPackageOwners(t *testing.T) {
 		},
 	}}
 
+	// Mark every package failed by the test runner.
 	markAllFailures(result, OwnerTestRunner, "typecheck failed")
 
+	// Only the unowned failure takes the new owner; the others keep theirs.
 	if result.Packages[0].Owner != OwnerPackageGraph || result.Packages[0].Error != "load failed" {
 		t.Fatalf("package graph failure was overwritten: %#v", result.Packages[0])
 	}
@@ -659,6 +672,7 @@ func TestMarkAllFailuresPreservesExistingPackageOwners(t *testing.T) {
 }
 
 func TestRunnerScopesPackageLoadErrors(t *testing.T) {
+	// Write the fixture module.
 	moduleDir := writeFixture(t, map[string]string{
 		"go.mod": "module example.test/mixed\n\ngo 1.25.3\n",
 		"clean/value.go": strings.Join([]string{
@@ -693,6 +707,7 @@ func TestRunnerScopesPackageLoadErrors(t *testing.T) {
 		"notests/value.go": "package notests\nfunc Value() int { return 13 }\n",
 	})
 
+	// Run the fixture's tests.
 	result, err := NewRunner().Run(context.Background(), &Request{
 		Dir:      moduleDir,
 		Patterns: []string{"./..."},
@@ -702,6 +717,7 @@ func TestRunnerScopesPackageLoadErrors(t *testing.T) {
 		t.Fatalf("run mixed package tests: %v", err)
 	}
 
+	// Only the package with the load error fails.
 	clean := requirePackageResult(t, result, "example.test/mixed/clean")
 	if clean.Action != ActionPass {
 		t.Fatalf("clean package should pass independently: %#v", clean)
@@ -723,6 +739,7 @@ func TestRunnerScopesPackageLoadErrors(t *testing.T) {
 }
 
 func TestRunnerCompilesAddressOfDereferencePackage(t *testing.T) {
+	// Write the fixture module.
 	moduleDir := writeFixture(t, map[string]string{
 		"go.mod": "module example.test/mixedcompile\n\ngo 1.25.3\n",
 		"clean/value.go": strings.Join([]string{
@@ -768,6 +785,7 @@ func TestRunnerCompilesAddressOfDereferencePackage(t *testing.T) {
 		}, "\n"),
 	})
 
+	// Run the fixture's tests.
 	result, err := NewRunner().Run(context.Background(), &Request{
 		Dir:      moduleDir,
 		Patterns: []string{"./..."},
@@ -777,6 +795,7 @@ func TestRunnerCompilesAddressOfDereferencePackage(t *testing.T) {
 		t.Fatalf("run mixed compile test: %v", err)
 	}
 
+	// Both packages compile and pass.
 	clean := requirePackageResult(t, result, "example.test/mixedcompile/clean")
 	if clean.Action != ActionPass {
 		t.Fatalf("clean package should pass independently: %#v", clean)
@@ -788,6 +807,7 @@ func TestRunnerCompilesAddressOfDereferencePackage(t *testing.T) {
 }
 
 func TestRunnerSharesOneProgramAfterCompileFailure(t *testing.T) {
+	// Write the fixture module.
 	moduleDir := writeFixture(t, map[string]string{
 		"go.mod": "module example.test/sharedprogram\n\ngo 1.25.3\n",
 		"dep/dep.go": strings.Join([]string{
@@ -827,10 +847,11 @@ func TestRunnerSharesOneProgramAfterCompileFailure(t *testing.T) {
 			"",
 			"import \"testing\"",
 			"",
+			"func makeSlice[T ~[]int]() T { return make(T, 1) }",
+			"",
 			"func TestBroken(t *testing.T) {",
-			"\tvalues := []*struct{ n int }{{n: 1}}",
-			"\tif values[0].n != 1 {",
-			"\t\tt.Fatal(\"bad value\")",
+			"\tif len(makeSlice[[]int]()) != 1 {",
+			"\t\tt.Fatal(\"bad length\")",
 			"\t}",
 			"}",
 			"",
@@ -884,6 +905,7 @@ func TestRunnerSharesOneProgramAfterCompileFailure(t *testing.T) {
 }
 
 func TestRunnerDoesNotCompileDependencyTests(t *testing.T) {
+	// Write the fixture module.
 	moduleDir := writeFixture(t, map[string]string{
 		"go.mod": "module example.test/deptest\n\ngo 1.25.3\n",
 		"dep/value.go": strings.Join([]string{
@@ -927,6 +949,7 @@ func TestRunnerDoesNotCompileDependencyTests(t *testing.T) {
 		}, "\n"),
 	})
 
+	// Run only the app package.
 	result, err := NewRunner().Run(context.Background(), &Request{
 		Dir:      moduleDir,
 		Patterns: []string{"./app"},
@@ -936,6 +959,7 @@ func TestRunnerDoesNotCompileDependencyTests(t *testing.T) {
 		t.Fatalf("run dependency test isolation fixture: %v", err)
 	}
 
+	// The dependency's own tests stay out of the run.
 	app := requirePackageResult(t, result, "example.test/deptest/app")
 	if app.Action != ActionPass {
 		t.Fatalf("package under test should ignore dependency-only tests: %#v", app)
@@ -943,6 +967,7 @@ func TestRunnerDoesNotCompileDependencyTests(t *testing.T) {
 }
 
 func TestRunnerScopesPackageTypecheckErrors(t *testing.T) {
+	// Write the fixture module.
 	moduleDir := writeFixture(t, map[string]string{
 		"go.mod": "module example.test/mixedtypecheck\n\ngo 1.25.3\n",
 		"clean/value.go": strings.Join([]string{
@@ -1013,6 +1038,7 @@ func TestRunnerScopesPackageTypecheckErrors(t *testing.T) {
 		"",
 	}, "\n"))
 
+	// Run the fixture's tests.
 	result, err := NewRunner().Run(context.Background(), &Request{
 		Dir:      moduleDir,
 		Patterns: []string{"./..."},
@@ -1022,6 +1048,7 @@ func TestRunnerScopesPackageTypecheckErrors(t *testing.T) {
 		t.Fatalf("run mixed typecheck test: %v", err)
 	}
 
+	// Only the package with the type error fails.
 	clean := requirePackageResult(t, result, "example.test/mixedtypecheck/clean")
 	if clean.Action != ActionPass {
 		t.Fatalf("clean package should pass independently: %#v", clean)
@@ -1036,6 +1063,7 @@ func TestRunnerScopesPackageTypecheckErrors(t *testing.T) {
 }
 
 func TestRunnerDoesNotRepeatSharedOverrideTypecheckFailure(t *testing.T) {
+	// Write the fixture module.
 	moduleDir := writeFixture(t, map[string]string{
 		"go.mod": "module example.test/sharedoverride\n\ngo 1.25.3\n",
 		"one/value.go": strings.Join([]string{
@@ -1098,6 +1126,7 @@ func TestRunnerDoesNotRepeatSharedOverrideTypecheckFailure(t *testing.T) {
 		"",
 	}, "\n"))
 
+	// Run the fixture's tests.
 	result, err := NewRunner().Run(context.Background(), &Request{
 		Dir:      moduleDir,
 		Patterns: []string{"./..."},
@@ -1108,6 +1137,7 @@ func TestRunnerDoesNotRepeatSharedOverrideTypecheckFailure(t *testing.T) {
 		t.Fatalf("run shared override typecheck fixture: %v", err)
 	}
 
+	// Each package reports the shared override failure once.
 	one := requirePackageResult(t, result, "example.test/sharedoverride/one")
 	two := requirePackageResult(t, result, "example.test/sharedoverride/two")
 	for _, pkg := range []PackageResult{one, two} {
@@ -1129,6 +1159,7 @@ func TestRunnerDoesNotRepeatSharedOverrideTypecheckFailure(t *testing.T) {
 }
 
 func TestRunnerUsesBatchTypeScriptProject(t *testing.T) {
+	// Write the fixture module.
 	moduleDir := writeFixture(t, map[string]string{
 		"go.mod": "module example.test/packageprojects\n\ngo 1.25.3\n",
 		"one/value.go": strings.Join([]string{
@@ -1190,6 +1221,7 @@ func TestRunnerUsesBatchTypeScriptProject(t *testing.T) {
 		"",
 	}, "\n"))
 
+	// Run the fixture's tests.
 	result, err := NewRunner().Run(context.Background(), &Request{
 		Dir:         moduleDir,
 		Patterns:    []string{"./..."},
@@ -1214,6 +1246,7 @@ func TestRunnerUsesBatchTypeScriptProject(t *testing.T) {
 }
 
 func TestRunnerRunsCombinedRuntimeChunks(t *testing.T) {
+	// Write the fixture module.
 	moduleDir := writeFixture(t, map[string]string{
 		"go.mod": "module example.test/runtimechunks\n\ngo 1.25.3\n",
 		"one/value.go": strings.Join([]string{
@@ -1278,6 +1311,7 @@ func TestRunnerRunsCombinedRuntimeChunks(t *testing.T) {
 		"",
 	}, "\n"))
 
+	// Run the fixture's tests.
 	result, err := NewRunner().Run(context.Background(), &Request{
 		Dir:           moduleDir,
 		Patterns:      []string{"./..."},
@@ -1434,6 +1468,7 @@ func TestBrowserVitestConfigAPIHost(t *testing.T) {
 }
 
 func TestParseCombinedRuntimeRecordsLineProtocol(t *testing.T) {
+	// Parse output that mixes ordinary lines with result records.
 	records, ok := parseCombinedRuntimeRecords(strings.Join([]string{
 		"ordinary output",
 		combinedRuntimeResultPrefix + "example.test%2Fpkg\t1\t42\tline%201%0Aline%202%09tail",
@@ -1461,6 +1496,7 @@ func TestParseCombinedRuntimeRecordsLineProtocol(t *testing.T) {
 }
 
 func TestRunnerReportsBrowserRuntimeMissingResult(t *testing.T) {
+	// Write the fixture module.
 	moduleDir := writeFixture(t, map[string]string{
 		"go.mod": "module example.test/browsermissing\n\ngo 1.25.3\n",
 		"value_test.go": strings.Join([]string{
@@ -1481,6 +1517,7 @@ func TestRunnerReportsBrowserRuntimeMissingResult(t *testing.T) {
 		"",
 	}, "\n"))
 
+	// Run in the browser backend.
 	result, err := NewRunner().Run(context.Background(), &Request{
 		Dir:            moduleDir,
 		Patterns:       []string{"."},
@@ -1503,6 +1540,7 @@ func TestRunnerReportsBrowserRuntimeMissingResult(t *testing.T) {
 }
 
 func TestRunnerFallsBackToPackageScopedTypeScriptProjects(t *testing.T) {
+	// Write the fixture module.
 	moduleDir := writeFixture(t, map[string]string{
 		"go.mod": "module example.test/packageprojects\n\ngo 1.25.3\n",
 		"one/value.go": strings.Join([]string{
@@ -1567,6 +1605,7 @@ func TestRunnerFallsBackToPackageScopedTypeScriptProjects(t *testing.T) {
 		"",
 	}, "\n"))
 
+	// Run the fixture's tests.
 	result, err := NewRunner().Run(context.Background(), &Request{
 		Dir:         moduleDir,
 		Patterns:    []string{"./..."},
@@ -1602,6 +1641,7 @@ func TestDefaultParallelismCapsAtEight(t *testing.T) {
 }
 
 func TestNormalizeKeepsIncrementalTypeCheckExplicit(t *testing.T) {
+	// A work directory alone leaves incremental type checking off.
 	norm, err := (&Request{
 		Patterns: []string{"./..."},
 		WorkDir:  t.TempDir(),
@@ -1613,6 +1653,7 @@ func TestNormalizeKeepsIncrementalTypeCheckExplicit(t *testing.T) {
 		t.Fatalf("expected explicit workdir alone to skip incremental typecheck cache")
 	}
 
+	// The request enables it explicitly.
 	norm, err = (&Request{
 		Patterns:             []string{"./..."},
 		IncrementalTypeCheck: true,
@@ -1626,6 +1667,7 @@ func TestNormalizeKeepsIncrementalTypeCheckExplicit(t *testing.T) {
 }
 
 func TestNormalizeRuntimeBackend(t *testing.T) {
+	// The default backend is bun.
 	norm, err := (&Request{Patterns: []string{"."}}).normalize()
 	if err != nil {
 		t.Fatalf("normalize default runtime backend: %v", err)
@@ -1634,6 +1676,7 @@ func TestNormalizeRuntimeBackend(t *testing.T) {
 		t.Fatalf("runtime backend = %q, want %q", norm.RuntimeBackend, RuntimeBackendBun)
 	}
 
+	// The browser backend is accepted.
 	norm, err = (&Request{
 		Patterns:       []string{"."},
 		RuntimeBackend: RuntimeBackendBrowser,
@@ -1645,6 +1688,7 @@ func TestNormalizeRuntimeBackend(t *testing.T) {
 		t.Fatalf("runtime backend = %q, want %q", norm.RuntimeBackend, RuntimeBackendBrowser)
 	}
 
+	// An unknown backend is rejected.
 	if _, err := (&Request{
 		Patterns:       []string{"."},
 		RuntimeBackend: RuntimeBackend("deno"),
@@ -1710,6 +1754,7 @@ func TestRenderRunnerChangesToPackageSourceDir(t *testing.T) {
 }
 
 func TestRenderBrowserRunnerAvoidsProcessAPIs(t *testing.T) {
+	// Render a browser runner for one package.
 	req := &normalizedRequest{
 		RuntimeBackend: RuntimeBackendBrowser,
 	}
@@ -1722,6 +1767,7 @@ func TestRenderBrowserRunnerAvoidsProcessAPIs(t *testing.T) {
 		}},
 	}, req)
 
+	// The runner imports vitest and never touches process.
 	if strings.Contains(runner, "process.") {
 		t.Fatalf("browser runner should not use process APIs: %s", runner)
 	}
@@ -1734,6 +1780,7 @@ func TestRenderBrowserRunnerAvoidsProcessAPIs(t *testing.T) {
 }
 
 func TestRenderBrowserRunnerReportsProcessExit(t *testing.T) {
+	// Render a browser runner for one package.
 	req := &normalizedRequest{
 		RuntimeBackend: RuntimeBackendBrowser,
 	}
@@ -1746,6 +1793,7 @@ func TestRenderBrowserRunnerReportsProcessExit(t *testing.T) {
 		}},
 	}, req)
 
+	// The runner reports a process exit as a failure.
 	if !strings.Contains(runner, "__goscriptProcessExitCode") {
 		t.Fatalf("expected browser runner to classify process exit: %s", runner)
 	}
@@ -1780,6 +1828,7 @@ func TestRenderBrowserRunnerHonorsPanicOnExitZero(t *testing.T) {
 }
 
 func TestRenderCombinedRunnerChangesToEachPackageSourceDir(t *testing.T) {
+	// Render a combined runner for two packages.
 	req := &normalizedRequest{}
 	runner := renderCombinedRunner(&Result{Packages: []PackageResult{
 		{
@@ -1800,6 +1849,7 @@ func TestRenderCombinedRunnerChangesToEachPackageSourceDir(t *testing.T) {
 		},
 	}}, []int{0, 1}, req)
 
+	// Each package runs in its own source directory.
 	if !strings.Contains(runner, "await __goscriptRunPackage(\"example.test/one\", \"/workspace/one\"") {
 		t.Fatalf("expected combined runner to pass first package source dir: %s", runner)
 	}
@@ -1812,11 +1862,13 @@ func TestRenderCombinedRunnerChangesToEachPackageSourceDir(t *testing.T) {
 }
 
 func TestRenderTypeScriptProjectDisablesAmbientTypePackages(t *testing.T) {
+	// Render a package project.
 	req := &normalizedRequest{
 		WorkDir:    "/work",
 		OutputRoot: "/work/output",
 	}
 
+	// The project disables ambient type packages.
 	tsconfig := renderTypeScriptProject(req, "runner-0.ts", "tsconfig-0.json", false)
 	if !strings.Contains(tsconfig, "\"types\": []") {
 		t.Fatalf("expected generated tsconfig to disable ambient @types packages: %s", tsconfig)
@@ -1833,12 +1885,14 @@ func TestRenderTypeScriptProjectDisablesAmbientTypePackages(t *testing.T) {
 }
 
 func TestRenderBrowserTypeScriptProjectsExcludeNodeAmbientDeclarations(t *testing.T) {
+	// Render the projects for the browser backend.
 	req := &normalizedRequest{
 		WorkDir:        "/work",
 		OutputRoot:     "/work/output",
 		RuntimeBackend: RuntimeBackendBrowser,
 	}
 
+	// The package project leaves out the node declarations.
 	packageTSConfig := renderTypeScriptProject(req, "runner-0.ts", "tsconfig-0.json", false)
 	if strings.Contains(packageTSConfig, "goscript-node.d.ts") {
 		t.Fatalf("browser package tsconfig should not include node ambient declarations: %s", packageTSConfig)
@@ -1847,6 +1901,7 @@ func TestRenderBrowserTypeScriptProjectsExcludeNodeAmbientDeclarations(t *testin
 		t.Fatalf("browser package tsconfig should include browser ambient declarations: %s", packageTSConfig)
 	}
 
+	// The aggregate project leaves them out too.
 	aggregateTSConfig := renderRuntimeTypeScriptProject(req, false)
 	if strings.Contains(aggregateTSConfig, "goscript-node.d.ts") {
 		t.Fatalf("browser aggregate tsconfig should not include node ambient declarations: %s", aggregateTSConfig)
@@ -1874,11 +1929,13 @@ func TestRenderTypeScriptProjectUsesNodeTypesWhenAvailable(t *testing.T) {
 }
 
 func TestRenderRuntimeTypeScriptProjectDisablesEmit(t *testing.T) {
+	// Render the aggregate project.
 	req := &normalizedRequest{
 		WorkDir:    "/work",
 		OutputRoot: "/work/output",
 	}
 
+	// The aggregate project only type-checks.
 	tsconfig := renderRuntimeTypeScriptProject(req, false)
 	if !strings.Contains(tsconfig, "\"noEmit\": true") {
 		t.Fatalf("expected aggregate tsconfig to disable emit: %s", tsconfig)
@@ -1898,6 +1955,7 @@ func TestRenderRuntimeTypeScriptProjectDisablesEmit(t *testing.T) {
 }
 
 func TestMaterializeRuntimeModuleShimsReexportsGeneratedTypeScript(t *testing.T) {
+	// Write generated TypeScript for the runtime packages.
 	workDir := t.TempDir()
 	outputRoot := filepath.Join(workDir, "output")
 	for _, name := range []string{
@@ -1913,6 +1971,7 @@ func TestMaterializeRuntimeModuleShimsReexportsGeneratedTypeScript(t *testing.T)
 		}
 	}
 
+	// Materialize the module shims over it.
 	req := &normalizedRequest{
 		WorkDir:        workDir,
 		OutputRoot:     outputRoot,
@@ -1944,18 +2003,21 @@ func TestMaterializeRuntimeModuleShimsReexportsGeneratedTypeScript(t *testing.T)
 }
 
 func TestRenderTypeScriptProjectsCanUseIncrementalBuildInfo(t *testing.T) {
+	// Enable incremental type checking.
 	req := &normalizedRequest{
 		WorkDir:              "/work",
 		OutputRoot:           "/work/output",
 		IncrementalTypeCheck: true,
 	}
 
+	// The package project keeps its build info.
 	packageTSConfig := renderTypeScriptProject(req, "runner-0.ts", "tsconfig-0.json", false)
 	if !strings.Contains(packageTSConfig, "\"incremental\": true") ||
 		!strings.Contains(packageTSConfig, "\"tsBuildInfoFile\": \".goscript/tsconfig-0.tsbuildinfo\"") {
 		t.Fatalf("expected package tsconfig to cache package typecheck state: %s", packageTSConfig)
 	}
 
+	// The aggregate project keeps its own build info.
 	aggregateTSConfig := renderRuntimeTypeScriptProject(req, false)
 	if !strings.Contains(aggregateTSConfig, "\"incremental\": true") ||
 		!strings.Contains(aggregateTSConfig, "\"tsBuildInfoFile\": \".goscript/tsconfig.tsbuildinfo\"") {
