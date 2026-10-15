@@ -83,7 +83,8 @@ export function CompareFunc<T, U, R extends $.MaybePromise<number>>(
 
 /**
  * makeLike allocates a slice of the same representation as s, so a byte
- * slice stays a Uint8Array of zero bytes.
+ * slice stays a Uint8Array of zero bytes, and any other typed slice a typed
+ * array of its kind.
  */
 function makeLike<T>(
   s: $.Slice<T>,
@@ -91,7 +92,7 @@ function makeLike<T>(
   capacity?: number,
   zeroFactory?: () => T,
 ): $.Slice<T> {
-  const hint = s instanceof Uint8Array ? 'byte' : undefined
+  const hint = $.typedSliceHintOf(s)
   return $.makeSlice<T>(length, capacity, hint, zeroFactory)
 }
 
@@ -112,15 +113,15 @@ export function Clone<T>(s: $.Slice<T>): $.Slice<T> {
 
 export function Concat<T>(...slices: $.Slice<T>[]): $.Slice<T> {
   let size = 0
-  let byteSlice = false
+  let hint: string | undefined
   for (const slice of slices) {
     size += $.len(slice)
-    byteSlice = byteSlice || slice instanceof Uint8Array
+    hint ??= $.typedSliceHintOf(slice)
   }
   if (size === 0) {
     return null
   }
-  const out = $.makeSlice<T>(size, undefined, byteSlice ? 'byte' : undefined)
+  const out = $.makeSlice<T>(size, undefined, hint)
   let pos = 0
   for (const slice of slices) {
     const length = $.len(slice)
@@ -844,7 +845,7 @@ export function SortStableFunc<T, R extends $.MaybePromise<number>>(
 }
 
 function clearValue<T>(s: $.Slice<T>): T | null {
-  if (s instanceof Uint8Array) {
+  if ($.isTypedSlice(s)) {
     return 0 as T
   }
   for (const value of s ?? []) {

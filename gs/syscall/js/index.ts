@@ -431,8 +431,11 @@ export function ValueOf(x: unknown): Value {
   if (typeof x === 'bigint') {
     return new Value({ raw: Number(x) })
   }
-  if (x instanceof Uint8Array) {
-    return new Value({ raw: x })
+  // A slice held in a typed array is a typed array that views exactly its
+  // elements, sharing their memory, as a byte slice is a Uint8Array.
+  const typed = $.typedElements(x)
+  if (typed !== undefined) {
+    return new Value({ raw: typed })
   }
   if ($.isArrayOrGoSlice(x)) {
     return new Value({ raw: x.map((item) => ValueOf(item)._raw) })

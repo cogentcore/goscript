@@ -79,14 +79,14 @@ export function CloneBytes<S extends $.Slice<number> | Uint8Array | null>(
   return $.asArray(v).slice() as S
 }
 
-export function CloneSlice<S extends $.Slice<unknown> | Uint8Array | null>(
+export function CloneSlice<S extends $.Slice<unknown> | $.TypedSlice | null>(
   s: S,
 ): S {
   if (s == null) {
     return null as S
   }
-  if (s instanceof Uint8Array) {
-    return new Uint8Array(s) as S
+  if ($.isTypedSlice(s)) {
+    return s.slice() as S
   }
   return $.asArray(s).slice() as S
 }
