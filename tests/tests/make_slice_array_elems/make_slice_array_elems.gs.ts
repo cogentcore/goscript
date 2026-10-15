@@ -8,32 +8,13 @@ export type quad = number[]
 $.registerNamedType("main.quad", /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int32"), 4));
 
 export class point {
-	public get X(): number {
-		return this._fields.X
-	}
+	public declare X: number
 
-	public set X(value: number) {
-		this._fields.X = value
-	}
-
-	public get Y(): number {
-		return this._fields.Y
-	}
-
-	public set Y(value: number) {
-		this._fields.Y = value
-	}
-
-	public _fields: {
-		X: number
-		Y: number
-	}
+	public declare Y: number
 
 	constructor(init?: Partial<{X?: number, Y?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			X: init?.X ?? (0 as number),
-			Y: init?.Y ?? (0 as number)
-		}
+		this.X = init?.X ?? (0 as number)
+		this.Y = init?.Y ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -41,11 +22,10 @@ export class point {
 		return new point(this, true)
 	}
 
-	public __goscriptAssign(source: point): void {
-		const target = this._fields
-		const values = source._fields
-		target.X = values.X
-		target.Y = values.Y
+	public __goscriptAssign(source: point): this {
+		this.X = source.X
+		this.Y = source.Y
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

@@ -7,32 +7,13 @@ import * as binary from "@goscript/encoding/binary/index.js"
 import type * as io from "@goscript/io/index.js"
 
 export class inner {
-	public get A(): number {
-		return this._fields.A
-	}
+	public declare A: number
 
-	public set A(value: number) {
-		this._fields.A = value
-	}
-
-	public get B(): Uint8Array {
-		return this._fields.B
-	}
-
-	public set B(value: Uint8Array) {
-		this._fields.B = value
-	}
-
-	public _fields: {
-		A: number
-		B: Uint8Array
-	}
+	public declare B: Uint8Array
 
 	constructor(init?: Partial<{A?: number, B?: Uint8Array}>, __goscriptValue?: boolean) {
-		this._fields = {
-			A: init?.A ?? (0 as number),
-			B: init?.B !== undefined ? $.cloneArrayValue(init.B, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 2)) : $.arrayValue(new Uint8Array(2))
-		}
+		this.A = init?.A ?? (0 as number)
+		this.B = init?.B !== undefined ? $.cloneArrayValue(init.B, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 2)) : $.arrayValue(new Uint8Array(2))
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -40,11 +21,10 @@ export class inner {
 		return new inner(this, true)
 	}
 
-	public __goscriptAssign(source: inner): void {
-		const target = this._fields
-		const values = source._fields
-		target.A = values.A
-		target.B = $.assignFieldValue(target.B, values.B, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 2))
+	public __goscriptAssign(source: inner): this {
+		this.A = source.A
+		this.B = $.assignFieldValue(this.B, source.B, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 2))
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -57,62 +37,22 @@ export class inner {
 }
 
 export class header {
-	public get Sig(): Uint8Array {
-		return this._fields.Sig
-	}
+	public declare Sig: Uint8Array
 
-	public set Sig(value: Uint8Array) {
-		this._fields.Sig = value
-	}
+	public declare Size: number
 
-	public get Size(): number {
-		return this._fields.Size
-	}
+	public declare Res: number[]
 
-	public set Size(value: number) {
-		this._fields.Size = value
-	}
+	public declare In: inner
 
-	public get Res(): number[] {
-		return this._fields.Res
-	}
-
-	public set Res(value: number[]) {
-		this._fields.Res = value
-	}
-
-	public get In(): inner {
-		return this._fields.In
-	}
-
-	public set In(value: inner) {
-		this._fields.In = value
-	}
-
-	public get Width(): number {
-		return this._fields.Width
-	}
-
-	public set Width(value: number) {
-		this._fields.Width = value
-	}
-
-	public _fields: {
-		Sig: Uint8Array
-		Size: number
-		Res: number[]
-		In: inner
-		Width: number
-	}
+	public declare Width: number
 
 	constructor(init?: Partial<{Sig?: Uint8Array, Size?: number, Res?: number[], In?: inner, Width?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Sig: init?.Sig !== undefined ? $.cloneArrayValue(init.Sig, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 2)) : $.arrayValue(new Uint8Array(2)),
-			Size: init?.Size ?? (0 as number),
-			Res: init?.Res !== undefined ? $.cloneArrayValue(init.Res, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint16"), 2)) : $.arrayValue(globalThis.Array.from({ length: 2 }, () => 0)),
-			In: init?.In ? init.In.clone() : new inner(undefined, true),
-			Width: init?.Width ?? (0 as number)
-		}
+		this.Sig = init?.Sig !== undefined ? $.cloneArrayValue(init.Sig, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 2)) : $.arrayValue(new Uint8Array(2))
+		this.Size = init?.Size ?? (0 as number)
+		this.Res = init?.Res !== undefined ? $.cloneArrayValue(init.Res, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint16"), 2)) : $.arrayValue(globalThis.Array.from({ length: 2 }, () => 0))
+		this.In = init?.In ? init.In.clone() : new inner(undefined, true)
+		this.Width = init?.Width ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -120,14 +60,13 @@ export class header {
 		return new header(this, true)
 	}
 
-	public __goscriptAssign(source: header): void {
-		const target = this._fields
-		const values = source._fields
-		target.Sig = $.assignFieldValue(target.Sig, values.Sig, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 2))
-		target.Size = values.Size
-		target.Res = $.assignFieldValue(target.Res, values.Res, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint16"), 2))
-		$.assignStruct(target.In, values.In)
-		target.Width = values.Width
+	public __goscriptAssign(source: header): this {
+		this.Sig = $.assignFieldValue(this.Sig, source.Sig, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 2))
+		this.Size = source.Size
+		this.Res = $.assignFieldValue(this.Res, source.Res, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint16"), 2))
+		this.In.__goscriptAssign(source.In)
+		this.Width = source.Width
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -146,7 +85,7 @@ export async function main(): globalThis.Promise<void> {
 	{
 		let err = await binary.Write($.pointerValueOrNil($.interfaceValue<io.Writer | null>(buf, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer")))!, $.interfaceValue<binary.ByteOrder | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.LittleEndian))), "binary.littleEndian", "binary.littleEndian")!, $.interfaceValue(h, "*main.header", /* @__PURE__ */ $.pointerType("main.header")))
 		if (err != null) {
-			await $.println("write error:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+			await $.println("write error:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 			return
 		}
 	}
@@ -158,7 +97,7 @@ export async function main(): globalThis.Promise<void> {
 	{
 		let err = await binary.Read($.pointerValueOrNil($.interfaceValue<io.Reader | null>(bytes.NewReader(buf.value.Bytes()), "*bytes.Reader", /* @__PURE__ */ $.pointerType("bytes.Reader")))!, $.interfaceValue<binary.ByteOrder | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.LittleEndian))), "binary.littleEndian", "binary.littleEndian")!, $.interfaceValue(r, "*main.header", /* @__PURE__ */ $.pointerType("main.header")))
 		if (err != null) {
-			await $.println("read error:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+			await $.println("read error:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 			return
 		}
 	}
