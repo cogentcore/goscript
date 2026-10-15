@@ -21,61 +21,30 @@ import * as unsafe from "@goscript/unsafe/index.js"
 type uintptr = syscall.uintptr
 
 class dirInfo {
-	public get mu(): sync.Mutex {
-		return this._fields.mu
-	}
-	public set mu(value: sync.Mutex) {
-		this._fields.mu = value
-	}
+	public declare mu: sync.Mutex
 
 	// buffer for directory I/O
-	public get buf(): $.VarRef<$.Bytes> | null {
-		return this._fields.buf
-	}
-	public set buf(value: $.VarRef<$.Bytes> | null) {
-		this._fields.buf = value
-	}
+	public declare buf: $.VarRef<$.Bytes> | null
 
 	// length of buf; return value from Getdirentries
-	public get nbuf(): number {
-		return this._fields.nbuf
-	}
-	public set nbuf(value: number) {
-		this._fields.nbuf = value
-	}
+	public declare nbuf: number
 
 	// location of next record in buf.
-	public get bufp(): number {
-		return this._fields.bufp
-	}
-	public set bufp(value: number) {
-		this._fields.bufp = value
-	}
-
-	public _fields: {
-		mu: sync.Mutex;
-		buf: $.VarRef<$.Bytes> | null;
-		nbuf: number;
-		bufp: number;
-	}
+	public declare bufp: number
 
 	constructor(init?: Partial<{buf?: $.VarRef<$.Bytes> | null, bufp?: number, mu?: sync.Mutex, nbuf?: number}>) {
-		this._fields = {
-			mu: init?.mu?.clone() ?? new sync.Mutex(),
-			buf: init?.buf ?? null,
-			nbuf: init?.nbuf ?? 0,
-			bufp: init?.bufp ?? 0
-		}
+		this.mu = init?.mu?.clone() ?? new sync.Mutex()
+		this.buf = init?.buf ?? null
+		this.nbuf = init?.nbuf ?? 0
+		this.bufp = init?.bufp ?? 0
 	}
 
 	public clone(): dirInfo {
 		const cloned = new dirInfo()
-		cloned._fields = {
-			mu: this._fields.mu?.clone() ?? null,
-			buf: this._fields.buf,
-			nbuf: this._fields.nbuf,
-			bufp: this._fields.bufp
-		}
+		cloned.mu = this.mu?.clone() ?? null
+		cloned.buf = this.buf
+		cloned.nbuf = this.nbuf
+		cloned.bufp = this.bufp
 		return cloned
 	}
 

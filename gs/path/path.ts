@@ -15,48 +15,23 @@ function normalizeJoinElements(elem: JoinElement[]): string[] {
 }
 
 class lazybuf {
-  public get s(): string {
-    return this._fields.s
-  }
-  public set s(value: string) {
-    this._fields.s = value
-  }
+  declare public s: string
 
-  public get buf(): Uint8Array | null {
-    return this._fields.buf
-  }
-  public set buf(value: Uint8Array | null) {
-    this._fields.buf = value
-  }
+  declare public buf: Uint8Array | null
 
-  public get w(): number {
-    return this._fields.w
-  }
-  public set w(value: number) {
-    this._fields.w = value
-  }
-
-  public _fields: {
-    s: string
-    buf: Uint8Array | null
-    w: number
-  }
+  declare public w: number
 
   constructor(init?: Partial<{ buf?: Uint8Array; s?: string; w?: number }>) {
-    this._fields = {
-      s: init?.s ?? '',
-      buf: init?.buf ?? null,
-      w: init?.w ?? 0,
-    }
+    this.s = init?.s ?? ''
+    this.buf = init?.buf ?? null
+    this.w = init?.w ?? 0
   }
 
   public clone(): lazybuf {
     const cloned = new lazybuf()
-    cloned._fields = {
-      s: this._fields.s,
-      buf: this._fields.buf,
-      w: this._fields.w,
-    }
+    cloned.s = this.s
+    cloned.buf = this.buf
+    cloned.w = this.w
     return cloned
   }
 

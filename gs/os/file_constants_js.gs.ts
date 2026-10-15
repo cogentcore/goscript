@@ -29,48 +29,19 @@ export const SEEK_END = 2
 
 // LinkError carries details for link-related path errors.
 export class LinkError {
-	public get Op(): string {
-		return this._fields.Op
-	}
-	public set Op(value: string) {
-		this._fields.Op = value
-	}
+	public declare Op: string
 
-	public get Old(): string {
-		return this._fields.Old
-	}
-	public set Old(value: string) {
-		this._fields.Old = value
-	}
+	public declare Old: string
 
-	public get New(): string {
-		return this._fields.New
-	}
-	public set New(value: string) {
-		this._fields.New = value
-	}
+	public declare New: string
 
-	public get Err(): $.GoError {
-		return this._fields.Err
-	}
-	public set Err(value: $.GoError) {
-		this._fields.Err = value
-	}
-
-	public _fields: {
-		Op: string;
-		Old: string;
-		New: string;
-		Err: $.GoError;
-	}
+	public declare Err: $.GoError
 
 	constructor(init?: Partial<{Op?: string, Old?: string, New?: string, Err?: $.GoError}>) {
-		this._fields = {
-			Op: init?.Op ?? "",
-			Old: init?.Old ?? "",
-			New: init?.New ?? "",
-			Err: init?.Err ?? null
-		}
+		this.Op = init?.Op ?? ""
+		this.Old = init?.Old ?? ""
+		this.New = init?.New ?? ""
+		this.Err = init?.Err ?? null
 	}
 
 	public Error(): string | PromiseLike<string> {

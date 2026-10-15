@@ -73,38 +73,19 @@ export async function Sub(fsys: FS, dir: string): Promise<[FS, $.GoError]> {
 }
 
 class subFS {
-  public get fsys(): FS {
-    return this._fields.fsys
-  }
-  public set fsys(value: FS) {
-    this._fields.fsys = value
-  }
+  declare public fsys: FS
 
-  public get dir(): string {
-    return this._fields.dir
-  }
-  public set dir(value: string) {
-    this._fields.dir = value
-  }
-
-  public _fields: {
-    fsys: FS
-    dir: string
-  }
+  declare public dir: string
 
   constructor(init?: Partial<{ dir?: string; fsys?: FS }>) {
-    this._fields = {
-      fsys: init?.fsys ?? null,
-      dir: init?.dir ?? '',
-    }
+    this.fsys = init?.fsys ?? null
+    this.dir = init?.dir ?? ''
   }
 
   public clone(): subFS {
     const cloned = new subFS()
-    cloned._fields = {
-      fsys: this._fields.fsys,
-      dir: this._fields.dir,
-    }
+    cloned.fsys = this.fsys
+    cloned.dir = this.dir
     return cloned
   }
 
