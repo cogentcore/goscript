@@ -1948,8 +1948,8 @@ func TestCompilePackagesEmitsStructMethodsAndPointerAssertions(t *testing.T) {
 	text := string(content)
 	for _, want := range []string{
 		"export class Counter",
-		"// Value counts reads.\n\tpublic get Value(): number",
-		"public get ID(): ObjectID",
+		"// Value counts reads.\n\tpublic declare Value: number",
+		"public declare ID: ObjectID",
 		"public clone(): Counter",
 		"public Read(): number",
 		"public Set(v: number): void",
@@ -2208,8 +2208,8 @@ func TestCompilePackagesDoesNotEmitHiddenEmbeddedMethodOverField(t *testing.T) {
 	}
 	text := string(content)
 	for _, want := range []string{
-		"public get Database(): string",
-		"public get embedded(): embedded",
+		"public declare Database: string",
+		"public declare embedded: embedded",
 		"return h.Database",
 	} {
 		if !strings.Contains(text, want) {
@@ -2361,14 +2361,14 @@ func TestCompilePackagesClonesNestedStructFieldsWithCloneMethodCollision(t *test
 	text := string(content)
 	for _, want := range []string{
 		"public __goscriptClone(): Box",
-		"Box: init?.Box ? $.markAsStructValue($.cloneStructValue(init.Box)) : $.markAsStructValue(new Box())",
+		"this.Box = init?.Box ? $.markAsStructValue($.cloneStructValue(init.Box)) : $.markAsStructValue(new Box())",
 		"return new Holder(this, true)",
 	} {
 		if !strings.Contains(text, want) {
 			t.Fatalf("missing %q in generated output:\n%s", want, text)
 		}
 	}
-	if strings.Contains(text, "init.Box.clone()") || strings.Contains(text, "this._fields.Box.value.clone()") {
+	if strings.Contains(text, "init.Box.clone()") || strings.Contains(text, "this.Box.clone()") {
 		t.Fatalf("nested struct-field clone bypassed cloneStructValue:\n%s", text)
 	}
 }
@@ -5856,7 +5856,7 @@ func TestCompilePackagesQualifiesImportedTypesInSignaturesAndZeroValues(t *testi
 		"Header: lib.Header",
 		"Fn: ((_p0: lib.Box) => [lib.Box, $.GoError] | globalThis.Promise<[lib.Box, $.GoError]>) | null",
 		"Ptr: atomic.Pointer<(() => void) | null>",
-		"Header: init?.Header ?? (null! as lib.Header)",
+		"this.Header = init?.Header ?? (null! as lib.Header)",
 		"new lib.Box(undefined, true)",
 		"$.markAsStructValue(new atomic.Pointer<(() => void) | null>())",
 		"export async function Use(fn: ((_p0: lib.Box) => [lib.Box, $.GoError] | globalThis.Promise<[lib.Box, $.GoError]>) | null, box: lib.Box): globalThis.Promise<[lib.Box, $.GoError]>",
@@ -6186,7 +6186,7 @@ func TestCompilePackagesAddressesImportedArrayPackageVarsAsRefs(t *testing.T) {
 		t.Fatalf("missing imported array package var address:\n%s", text)
 	}
 	if strings.Contains(text, "dep.SumPtr($.pointerValue<number[]>(dep.Table))") ||
-		strings.Contains(text, "dep._fields.Table") {
+		strings.Contains(text, "$.fieldRef(dep, \"Table\")") {
 		t.Fatalf("imported array package var address was lowered as a read or field:\n%s", text)
 	}
 }
