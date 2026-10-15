@@ -1025,28 +1025,36 @@ function matchesInterfaceType(value: any, info: TypeInfo): boolean {
     return matchesInterfaceTypeUncached(value, info)
   }
 
-  // The cache of the interface type is keyed by the Go type of the value.
+  // The cache of the interface type is keyed by the class of the value, and
+  // then by its Go type, which distinguishes a struct from a pointer to it.
+  // Different classes can carry the same Go type name, as values boxed in
+  // generic code do, so a cache keyed by the name alone thrashes.
   const goType: string = value.__goType ?? ''
   let cache = (info as any)[interfaceMatchCacheKey] as
-    | Map<string, { ctor: unknown; ok: boolean }>
+    | Map<unknown, Map<string, boolean>>
     | undefined
   if (cache === undefined) {
     cache = new globalThis.Map()
     ;(info as any)[interfaceMatchCacheKey] = cache
   }
+  let byType = cache.get(ctor)
+  if (byType === undefined) {
+    byType = new globalThis.Map()
+    cache.set(ctor, byType)
+  }
 
-  // A result is reused only for the same class.
-  const cached = cache.get(goType)
-  if (cached !== undefined && cached.ctor === ctor) {
-    return cached.ok
+  // A result is computed once for each class and Go type.
+  const cached = byType.get(goType)
+  if (cached !== undefined) {
+    return cached
   }
   const ok = matchesInterfaceTypeUncached(value, info)
-  cache.set(goType, { ctor, ok })
+  byType.set(goType, ok)
   return ok
 }
 
 // interfaceMatchCacheKey holds the cache of matchesInterfaceType results on
-// an interface type info, keyed by the Go type of the value.
+// an interface type info, keyed by the class and Go type of the value.
 const interfaceMatchCacheKey = Symbol('interfaceMatchCache')
 
 function matchesInterfaceTypeUncached(value: any, info: TypeInfo): boolean {
