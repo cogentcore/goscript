@@ -1675,8 +1675,11 @@ type lowerFileContext struct {
 	deferState            *loweredDeferState
 	// hoistArgsCall is the call of a defer or go statement, whose arguments
 	// are evaluated into the temporaries of hoistedArgs (see lowerCallArgs).
+	// hoistedCallee is set when the call reads its function from a
+	// temporary too, a Go function value that takes Go-shaped arguments.
 	hoistArgsCall *ast.CallExpr
 	hoistedArgs   *[]string
+	hoistedCallee bool
 	// borrow holds the borrowed results of the function being lowered and
 	// the calls in it that borrow results (see lowering-borrowed-results.go).
 	borrow *borrowState
@@ -5832,6 +5835,7 @@ func (o *LoweringOwner) lowerStatementCall(ctx lowerFileContext, call *ast.CallE
 		hoisted = append(hoisted, "const "+calleeTemp+" = "+callee)
 
 		// The call reads the temporaries.
+		argCtx.hoistedCallee = true
 		args, argDiagnostics := o.lowerCallArgs(argCtx, call, callTargetSignature(ctx, call.Fun))
 		diagnostics = append(diagnostics, argDiagnostics...)
 		text := o.lowerCallableExpr(ctx, call.Fun, calleeTemp) + "(" + strings.Join(args, ", ") + ")"
@@ -10290,7 +10294,7 @@ func (o *LoweringOwner) lowerCallArgs(
 	// An ordinary call keeps its arguments in place, and one that may
 	// borrow its results asks for them (see collectBorrowCalls).
 	if ctx.hoistArgsCall != expr || ctx.hoistedArgs == nil {
-		args, diagnostics := o.lowerCallArgValues(ctx, expr, signature)
+		args, diagnostics := o.lowerCallArgValues(ctx, expr, signature, o.callUsesOverridePackage(ctx, expr.Fun))
 		if flag, ok := borrowCallArg(ctx, expr); ok {
 			args = append(args, flag)
 		}
@@ -10300,8 +10304,9 @@ func (o *LoweringOwner) lowerCallArgs(
 	// The arguments of a deferred or go call are evaluated where the
 	// statement runs, so each is stored in a temporary that the call reads.
 	hoisted := ctx.hoistedArgs
-	ctx.hoistArgsCall, ctx.hoistedArgs = nil, nil
-	args, diagnostics := o.lowerCallArgValues(ctx, expr, signature)
+	overrideCall := !ctx.hoistedCallee && o.callUsesOverridePackage(ctx, expr.Fun)
+	ctx.hoistArgsCall, ctx.hoistedArgs, ctx.hoistedCallee = nil, nil, false
+	args, diagnostics := o.lowerCallArgValues(ctx, expr, signature, overrideCall)
 
 	// A literal needs no temporary; the others are stored, a spread keeping
 	// its marker on the temporary.
@@ -10340,13 +10345,15 @@ func isHoistFreeArg(arg string) bool {
 }
 
 // lowerCallArgValues lowers the arguments of a call (see lowerCallArgs).
+// overrideCall is whether the call is made directly to an override package,
+// whose TypeScript signatures differ from the Go shape.
 func (o *LoweringOwner) lowerCallArgValues(
 	ctx lowerFileContext,
 	expr *ast.CallExpr,
 	signature *types.Signature,
+	overrideCall bool,
 ) ([]string, []Diagnostic) {
 	// Override callbacks may suspend only when the override awaits them.
-	overrideCall := o.callUsesOverridePackage(ctx, expr.Fun)
 	allowAsyncOverrideCallback := !overrideCall ||
 		o.overrideCallNeedsAwait(ctx, expr.Fun) ||
 		o.callbackOverrideCallNeedsAwait(ctx, expr)
@@ -12208,6 +12215,10 @@ func (o *LoweringOwner) lowerMethodValueClosure(
 		if genericArgs != "" {
 			callArgs = append(callArgs, genericArgs)
 		}
+	}
+	// An override method takes its variadic arguments as a rest parameter.
+	if len(args) != 0 && signature.Variadic() && o.methodSelectionUsesOverridePackage(ctx, selection) {
+		args[len(args)-1] = "...(" + args[len(args)-1] + " ?? [])"
 	}
 	callArgs = append(callArgs, args...)
 	closure := "((__receiver) => (" + strings.Join(params, ", ") + ") => " + callee + "(" + strings.Join(callArgs, ", ") + "))(" + receiver + ")"
