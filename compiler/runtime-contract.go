@@ -123,6 +123,8 @@ const (
 	RuntimeHelperAppendOne                    RuntimeHelper = "slice.appendOne"
 	RuntimeHelperAppendSlice                  RuntimeHelper = "slice.appendSlice"
 	RuntimeHelperByteSliceHint                RuntimeHelper = "slice.byteSliceHint"
+	RuntimeHelperTypedSliceHints              RuntimeHelper = "slice.typedSliceHints"
+	RuntimeHelperTypedSliceOf                 RuntimeHelper = "slice.typedSliceOf"
 	RuntimeHelperAppendZero                   RuntimeHelper = "slice.appendZero"
 	RuntimeHelperAppendZeros                  RuntimeHelper = "slice.appendZeros"
 	RuntimeHelperCopy                         RuntimeHelper = "slice.copy"
@@ -197,6 +199,7 @@ const (
 	RuntimeHelperNamedFunction                  RuntimeHelper = "type.namedFunction"
 	RuntimeHelperGoFunc                         RuntimeHelper = "type.goFunc"
 	RuntimeHelperGenericZero                    RuntimeHelper = "type.genericZero"
+	RuntimeHelperGenericSliceTypeHint           RuntimeHelper = "type.genericSliceTypeHint"
 	RuntimeHelperGenericNew                     RuntimeHelper = "type.genericNew"
 	RuntimeHelperGenericTypeArgsMarker          RuntimeHelper = "type.genericTypeArgsMarker"
 	RuntimeHelperGenericTypeArgsBrand           RuntimeHelper = "type.genericTypeArgsBrand"
@@ -419,6 +422,8 @@ func runtimeHelperContracts() []RuntimeHelperContract {
 		runtimeHelper(RuntimeHelperAppendOne, "appendOne", RuntimeHelperCategorySlice),
 		runtimeHelper(RuntimeHelperAppendSlice, "appendSlice", RuntimeHelperCategorySlice),
 		runtimeHelper(RuntimeHelperByteSliceHint, "byteSliceHint", RuntimeHelperCategorySlice),
+		runtimeHelper(RuntimeHelperTypedSliceHints, "typedSliceHints", RuntimeHelperCategorySlice),
+		runtimeHelper(RuntimeHelperTypedSliceOf, "typedSliceOf", RuntimeHelperCategorySlice),
 		runtimeHelper(RuntimeHelperAppendZero, "appendZero", RuntimeHelperCategorySlice),
 		runtimeHelper(RuntimeHelperAppendZeros, "appendZeros", RuntimeHelperCategorySlice),
 		runtimeHelper(RuntimeHelperCopy, "copy", RuntimeHelperCategorySlice),
@@ -490,6 +495,7 @@ func runtimeHelperContracts() []RuntimeHelperContract {
 		runtimeHelper(RuntimeHelperNamedFunction, "namedFunction", RuntimeHelperCategoryType),
 		runtimeHelper(RuntimeHelperGoFunc, "goFunc", RuntimeHelperCategoryType),
 		runtimeHelper(RuntimeHelperGenericZero, "genericZero", RuntimeHelperCategoryType),
+		runtimeHelper(RuntimeHelperGenericSliceTypeHint, "genericSliceTypeHint", RuntimeHelperCategoryType),
 		runtimeHelper(RuntimeHelperGenericNew, "genericNew", RuntimeHelperCategoryType),
 		runtimeHelper(RuntimeHelperGenericTypeArgsMarker, "genericTypeArgsMarker", RuntimeHelperCategoryType),
 		runtimeHelper(RuntimeHelperGenericTypeArgsBrand, "genericTypeArgsBrand", RuntimeHelperCategoryType),

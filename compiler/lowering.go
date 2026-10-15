@@ -10079,6 +10079,8 @@ func (o *LoweringOwner) lowerCallExpr(ctx lowerFileContext, expr *ast.CallExpr) 
 				if slice, ok := types.Unalias(ctx.semPkg.source.TypesInfo.TypeOf(expr)).Underlying().(*types.Slice); ok {
 					if isByteType(slice.Elem()) {
 						args = append(args, o.runtimeOwner.QualifiedHelper(RuntimeHelperByteSliceHint))
+					} else if _, hint := typedSliceArray(slice.Elem()); hint != "" {
+						args = append(args, o.runtimeOwner.QualifiedHelper(RuntimeHelperTypedSliceHints)+"."+hint)
 					} else if appendZeroNeedsStaticHint(slice.Elem()) {
 						zero := o.lowerDeclarationZeroValueExpr(ctx, slice.Elem())
 						zeroHint := ""
@@ -10221,6 +10223,15 @@ func (o *LoweringOwner) lowerCallExpr(ctx lowerFileContext, expr *ast.CallExpr) 
 			args = append([]string{o.genericTypeArgsExpr(ctx, fun, nil)}, args...)
 		}
 		args = o.appendSlicesGrowZeroFactory(ctx, fun, expr, args)
+		// unsafe.Slice of typed array elements views the memory that its
+		// pointer points into as those elements, so it is told their kind.
+		if unsafePackageFunction(ctx, fun, "Slice") {
+			if slice, ok := types.Unalias(ctx.semPkg.source.TypesInfo.TypeOf(expr)).Underlying().(*types.Slice); ok {
+				if _, hint := typedSliceArray(slice.Elem()); hint != "" {
+					args = append(args, strconv.Quote(hint))
+				}
+			}
+		}
 		call := o.lowerCallableExpr(ctx, fun, selector) + "(" + strings.Join(args, ", ") + ")"
 		if unsafePackageFunction(ctx, fun, "Slice") {
 			call = "(" + call + " as " + o.tsTypeFor(ctx, ctx.semPkg.source.TypesInfo.TypeOf(expr)) + ")"
@@ -10414,13 +10425,24 @@ func (o *LoweringOwner) lowerCallArgValues(
 	if len(variadicArgs) == 0 {
 		return append(args, "null"), diagnostics
 	}
-	elemType := "any"
 	if slice, ok := types.Unalias(variadicType).Underlying().(*types.Slice); ok {
-		elemType = o.tsTypeFor(ctx, slice.Elem())
+		return append(args, o.packedSliceExpr(slice.Elem(), o.tsTypeFor(ctx, slice.Elem()), variadicArgs)), diagnostics
 	}
 	args = append(args, o.runtimeOwner.QualifiedHelper(RuntimeHelperArrayToSlice)+
-		"<"+elemType+">(["+strings.Join(variadicArgs, ", ")+"])")
+		"<any>(["+strings.Join(variadicArgs, ", ")+"])")
 	return args, diagnostics
+}
+
+// packedSliceExpr returns a new slice of the lowered values, of elements of
+// type elem spelled elemType, held in the typed array of such elements other
+// than bytes if there is one, as a slice literal is.
+func (o *LoweringOwner) packedSliceExpr(elem types.Type, elemType string, values []string) string {
+	if typedArray, hint := typedSliceArray(elem); typedArray != "" && hint != "byte" {
+		return o.runtimeOwner.QualifiedHelper(RuntimeHelperTypedSliceOf) +
+			"(" + typedArray + ", [" + strings.Join(values, ", ") + "]) as $.Slice<" + elemType + ">"
+	}
+	return o.runtimeOwner.QualifiedHelper(RuntimeHelperArrayToSlice) +
+		"<" + elemType + ">([" + strings.Join(values, ", ") + "])"
 }
 
 // lowerOverrideVariadicCallArgs lowers the arguments of a variadic call to an
@@ -10525,8 +10547,7 @@ func (o *LoweringOwner) lowerTupleCallArgs(
 	if variadic && !overrideCall {
 		slice := "null"
 		if len(packed) > 0 {
-			slice = o.runtimeOwner.QualifiedHelper(RuntimeHelperArrayToSlice) +
-				"<" + o.tsTypeFor(ctx, elemType) + ">([" + strings.Join(packed, ", ") + "])"
+			slice = o.packedSliceExpr(elemType, o.tsTypeFor(ctx, elemType), packed)
 		}
 		parts = append(parts, slice)
 		partTypes = append(partTypes, o.tsTypeFor(ctx, params.At(fixedCount).Type()))
@@ -11031,8 +11052,10 @@ func (o *LoweringOwner) lowerMakeExpr(ctx lowerFileContext, expr *ast.CallExpr) 
 			if capacity == "" {
 				args = append(args, "undefined")
 			}
+			// The type argument picks the typed array of fixed-size numbers.
 			if len(args) < 3 {
-				args = append(args, "undefined")
+				args = append(args, o.runtimeOwner.QualifiedHelper(RuntimeHelperGenericSliceTypeHint)+
+					"(__typeArgs, "+strconv.Quote(typeParam.Obj().Name())+")")
 			}
 			args = append(args, "() => ("+o.lowerDeclarationZeroValueExpr(ctx, typed.Elem())+" as "+o.tsSliceElemTypeFor(ctx, typed.Elem())+")")
 		}
@@ -14270,8 +14293,10 @@ func (o *LoweringOwner) lowerSliceCompositeLit(
 		return "new Uint8Array([" + strings.Join(values, ", ") + "]) as $.Slice<" +
 			o.tsSliceElemTypeFor(ctx, slice.Elem()) + ">", diagnostics
 	}
-	return o.runtimeOwner.QualifiedHelper(RuntimeHelperArrayToSlice) +
-		"<" + o.tsSliceElemTypeFor(ctx, slice.Elem()) + ">([" + strings.Join(values, ", ") + "])", diagnostics
+
+	// Other fixed-size numeric elements are held in their typed arrays in the
+	// same way, whose stores also wrap or round each element as Go stores it.
+	return o.packedSliceExpr(slice.Elem(), o.tsSliceElemTypeFor(ctx, slice.Elem()), values), diagnostics
 }
 
 func (o *LoweringOwner) lowerMapCompositeLit(
@@ -16969,9 +16994,10 @@ func isByteType(typ types.Type) bool {
 }
 
 func sliceTypeHint(typ types.Type) string {
+	if _, hint := typedSliceArray(typ); hint != "" {
+		return hint
+	}
 	switch {
-	case isByteType(typ):
-		return "byte"
 	case isStringType(typ):
 		return "string"
 	case isNumericType(typ):
@@ -16980,6 +17006,39 @@ func sliceTypeHint(typ types.Type) string {
 		return "boolean"
 	default:
 		return ""
+	}
+}
+
+// typedSliceArray returns the JavaScript typed array that holds the slices of
+// elements of type typ and the runtime hint that names it, or two empty
+// strings for elements held in plain arrays. Fixed-size numeric elements up to
+// 32 bits and float64 have typed arrays, whose stores wrap and round as Go
+// does. int, uint and uintptr hold 53-bit numbers and the 64-bit integers
+// bigints, which no typed array represents.
+func typedSliceArray(typ types.Type) (array, hint string) {
+	basic, ok := types.Unalias(typ).Underlying().(*types.Basic)
+	if !ok {
+		return "", ""
+	}
+	switch basic.Kind() {
+	case types.Uint8:
+		return "Uint8Array", "byte"
+	case types.Int8:
+		return "Int8Array", "int8"
+	case types.Int16:
+		return "Int16Array", "int16"
+	case types.Uint16:
+		return "Uint16Array", "uint16"
+	case types.Int32:
+		return "Int32Array", "int32"
+	case types.Uint32:
+		return "Uint32Array", "uint32"
+	case types.Float32:
+		return "Float32Array", "float32"
+	case types.Float64:
+		return "Float64Array", "float64"
+	default:
+		return "", ""
 	}
 }
 
