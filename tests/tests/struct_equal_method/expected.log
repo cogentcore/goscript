@@ -1,0 +1,13 @@
+equal: true false true
+end differs: false true false
+time differs: false
+mixed: true
+other pointer: false
+other interface value: false
+other interface type: false
+NaN: false true
+zeros: true
+slice: true false
+map: true false
+array: true
+array differs: false
