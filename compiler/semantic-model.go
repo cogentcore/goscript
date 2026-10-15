@@ -2560,66 +2560,26 @@ func funcParamsReadOnly(pkg *packages.Package, decl *ast.FuncDecl) []valueReadOn
 	return readOnly
 }
 
-// callPassesOnlyValues reports whether call is a conversion, a builtin call
-// or a call whose function, receiver and arguments are values that cannot
-// refer to other storage: numbers, strings, booleans, and structs and arrays
-// of them.
-func callPassesOnlyValues(pkg *packages.Package, call *ast.CallExpr) bool {
-	// A conversion or builtin passes only its arguments.
+// callChangesNoStorage reports whether call is a conversion or a call of a
+// builtin that writes no storage. Any other call may change storage that
+// the caller can reach, such as package variables and what they refer to,
+// even when it passes only values.
+func callChangesNoStorage(pkg *packages.Package, call *ast.CallExpr) bool {
+	// A conversion changes nothing.
 	tv, ok := pkg.TypesInfo.Types[call.Fun]
 	if !ok {
 		return false
 	}
-	if tv.IsType() || tv.IsBuiltin() {
+	if tv.IsType() {
 		return true
 	}
 
-	// The function and receiver are values too.
-	fun := ast.Unparen(call.Fun)
-	switch typed := fun.(type) {
-	case *ast.Ident:
-		if _, ok := pkg.TypesInfo.Uses[typed].(*types.Func); !ok {
-			return false
-		}
-	case *ast.SelectorExpr:
-		if selection := pkg.TypesInfo.Selections[typed]; selection != nil {
-			if selection.Kind() != types.MethodVal || !isPlainValueType(pkg.TypesInfo.TypeOf(typed.X), 0) {
-				return false
-			}
-		} else if _, ok := pkg.TypesInfo.Uses[typed.Sel].(*types.Func); !ok {
-			return false
-		}
-	default:
+	// Of the builtins, copy and clear write the elements of their argument.
+	if !tv.IsBuiltin() {
 		return false
 	}
-	for _, arg := range call.Args {
-		if !isPlainValueType(pkg.TypesInfo.TypeOf(arg), 0) {
-			return false
-		}
-	}
-	return true
-}
-
-// isPlainValueType reports whether values of typ hold no references: basic
-// types, and structs and arrays of them.
-func isPlainValueType(typ types.Type, depth int) bool {
-	if typ == nil || depth > 8 {
-		return false
-	}
-	switch typed := types.Unalias(typ).Underlying().(type) {
-	case *types.Basic:
-		return typed.Kind() != types.UnsafePointer
-	case *types.Array:
-		return isPlainValueType(typed.Elem(), depth+1)
-	case *types.Struct:
-		for idx := range typed.NumFields() {
-			if !isPlainValueType(typed.Field(idx).Type(), depth+1) {
-				return false
-			}
-		}
-		return true
-	}
-	return false
+	ident, _ := ast.Unparen(call.Fun).(*ast.Ident)
+	return ident != nil && ident.Name != "copy" && ident.Name != "clear"
 }
 
 // valueReadOnlyKind says when a call can pass a value receiver or parameter
@@ -2634,7 +2594,7 @@ const (
 	// value that no other reference can reach without a copy.
 	valueReadOnlyUnaliased
 	// valueReadOnly is a value that the function only reads, while it
-	// changes no storage but its own locals.
+	// changes no storage but its own locals and calls no function.
 	valueReadOnly
 )
 
@@ -2645,9 +2605,9 @@ const (
 // receiver method on it or its fields. No function literal may refer to it,
 // since one may run after the call returns. Any caller's value can be shared
 // when the body also stores nothing except into its own local values and
-// passes no reference to a call, so that it cannot change the caller's value
-// through another reference while it reads obj; otherwise only a value that
-// no other reference reaches can be (see isUnaliasedLocalValue).
+// calls no function, which could change the caller's value through a package
+// variable or another reference while it reads obj; otherwise only a value
+// that no other reference reaches can be (see isUnaliasedLocalValue).
 func valueVarReadOnly(pkg *packages.Package, decl *ast.FuncDecl, obj types.Object) valueReadOnlyKind {
 	// rootIsVar reports whether expr reads or writes a part of obj.
 	rootIsVar := func(expr ast.Expr) bool {
@@ -2732,7 +2692,7 @@ func valueVarReadOnly(pkg *packages.Package, decl *ast.FuncDecl, obj types.Objec
 		case *ast.SendStmt, *ast.GoStmt:
 			changed = true
 		case *ast.CallExpr:
-			shared = shared || !callPassesOnlyValues(pkg, typed)
+			shared = shared || !callChangesNoStorage(pkg, typed)
 		case *ast.SelectorExpr:
 			selection := pkg.TypesInfo.Selections[typed]
 			if selection != nil && selection.Kind() == types.MethodVal && rootIsVar(typed.X) {

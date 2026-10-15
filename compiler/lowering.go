@@ -17679,6 +17679,12 @@ func loweringUnsupported(kind string, subject string, detail string) Diagnostic 
 // reference reaches (see isUnaliasedLocalValue), even across a suspension,
 // since only the caller, which waits for it, can change that value.
 func valueReadOnlyArg(ctx lowerFileContext, kind valueReadOnlyKind, async bool, expr ast.Expr) bool {
+	// A composite literal is a new value that nothing else reaches.
+	if _, ok := ast.Unparen(expr).(*ast.CompositeLit); ok && kind != valueNotReadOnly {
+		return true
+	}
+
+	// Otherwise the kind says which values the function can share.
 	switch kind {
 	case valueReadOnly:
 		return !async || isUnaliasedLocalValue(ctx, expr)
