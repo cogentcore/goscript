@@ -25,7 +25,7 @@ SimpleFold('a'): A
 
 Testing constants:
 MaxRune: 1114111
-Version: 15.0.0
+Version: 17.0.0
 
 Testing range tables:
 Is(Letter, 'A'): true
