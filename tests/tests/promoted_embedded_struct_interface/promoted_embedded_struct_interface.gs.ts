@@ -110,13 +110,13 @@ export async function closeIt(c: closer | null): globalThis.Promise<void> {
 
 export async function main(): globalThis.Promise<void> {
 	let value = new stopStream({stream: new stream({name: "value"}, true)}, true)
-	await closeIt($.interfaceValue<closer | null>((value).clone(), "main.stopStream", "main.stopStream"))
+	await closeIt($.interfaceValue<closer | null>(value, "main.stopStream", "main.stopStream"))
 
 	let ptr = new stopStream({stream: new stream({name: "pointer"}, true)})
 	await closeIt($.interfaceValue<closer | null>(ptr, "*main.stopStream", /* @__PURE__ */ $.pointerType("main.stopStream")))
 
 	let promotedPtr = new pointerStopStream({stream: new stream({name: "embedded pointer"})}, true)
-	await closeIt($.interfaceValue<closer | null>((promotedPtr).clone(), "main.pointerStopStream", "main.pointerStopStream"))
+	await closeIt($.interfaceValue<closer | null>(promotedPtr, "main.pointerStopStream", "main.pointerStopStream"))
 }
 
 var __goscriptAwait: any

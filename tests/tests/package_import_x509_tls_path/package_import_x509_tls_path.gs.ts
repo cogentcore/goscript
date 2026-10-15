@@ -41,7 +41,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 
 	let certificate = new tls.Certificate({Certificate: $.arrayToSlice<$.Slice<number>>([der]), PrivateKey: $.namedValueInterfaceValue<crypto.PrivateKey | null>(priv, "ed25519.PrivateKey", __goscriptStatic3(), __goscriptStatic4(), __goscriptStatic5()), Leaf: leaf}, true)
-	let config = new tls.Config({Certificates: $.arrayToSlice<tls.Certificate>([(certificate).clone()]), MinVersion: 771, NextProtos: $.arrayToSlice<string>(["bifrost"])})
+	let config = new tls.Config({Certificates: $.arrayToSlice<tls.Certificate>([certificate]), MinVersion: 771, NextProtos: $.arrayToSlice<string>(["bifrost"])})
 	let config$: tls.Config = config == null ? $.pointerTarget<tls.Config>(config) : (config as any).__isVarRef === true ? (config as any).value : (config as any).__goValue === undefined ? (config as any) : $.pointerTarget<tls.Config>(config)
 	await $.println("certificate count", $.sliceLen((config$ as tls.Config).Certificates))
 	await $.println("chain count", $.sliceLen($.arrayIndex((config$ as tls.Config).Certificates!, 0).Certificate))

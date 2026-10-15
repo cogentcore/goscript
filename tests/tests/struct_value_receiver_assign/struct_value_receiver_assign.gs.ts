@@ -78,7 +78,7 @@ export class outer {
 export async function main(): globalThis.Promise<void> {
 	let a = $.varRef(new tag({lang: 5, region: "a"}, true))
 	let b = $.markAsStructValue($.cloneStructValue(a.value)).reset()
-	fmt.Println($.interfaceValue((a.value).clone(), "main.tag", "main.tag"), $.interfaceValue((b).clone(), "main.tag", "main.tag"))
+	fmt.Println($.interfaceValue((a.value).clone(), "main.tag", "main.tag"), $.interfaceValue(b, "main.tag", "main.tag"))
 
 	a.value.set(9)
 	fmt.Println($.interfaceValue((a.value).clone(), "main.tag", "main.tag"))

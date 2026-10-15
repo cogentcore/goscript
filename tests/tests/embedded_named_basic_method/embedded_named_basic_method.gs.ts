@@ -102,7 +102,7 @@ export async function main(): globalThis.Promise<void> {
 	let eng = new Engineer({Level: 3, Name: "Grace"}, true)
 	await $.println("direct:", Level_Rank(eng.Level, "rank: "))
 
-	let r: Ranker | null = $.interfaceValue<Ranker | null>((eng).clone(), "main.Engineer", "main.Engineer")
+	let r: Ranker | null = $.interfaceValue<Ranker | null>(eng, "main.Engineer", "main.Engineer")
 	await $.println("interface:", (__goscriptAwait = (r !== null && (r as any).__isVarRef !== true && ((r as any).__goValue === undefined || (r as any).__goType?.charCodeAt(0) !== 42) ? (r as Exclude<Ranker, null>) : $.pointerValue<Exclude<Ranker, null>>(r)).Rank("value: "), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
 	r = $.interfaceValue<Ranker | null>(new Engineer({Level: 1, Name: "Ada"}), "*main.Engineer", /* @__PURE__ */ $.pointerType("main.Engineer"))

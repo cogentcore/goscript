@@ -106,7 +106,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println($.sliceLen(s.value), $.cap(s.value))
 	let a = $.markAsStructValue($.cloneStructValue(reflect.Append($.markAsStructValue($.cloneStructValue(sv)), $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.basicInterfaceValue(9, "int")))))))
 	await $.println($.markAsStructValue($.cloneStructValue(a)).Len(), $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(a)).Index(2))).Int())
-	let b = $.markAsStructValue($.cloneStructValue(reflect.AppendSlice($.markAsStructValue($.cloneStructValue(sv)), $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.arrayToSlice<number>([7, 8]), "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")))))))))
+	let b = $.markAsStructValue($.cloneStructValue(reflect.AppendSlice(sv, $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.arrayToSlice<number>([7, 8]), "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")))))))))
 	await $.println($.markAsStructValue($.cloneStructValue(b)).Len(), $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(b)).Index(3))).Int())
 
 	// Copy copies within the lengths of the slices.

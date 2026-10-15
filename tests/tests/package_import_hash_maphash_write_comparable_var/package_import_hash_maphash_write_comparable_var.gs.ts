@@ -9,7 +9,7 @@ export async function main(): globalThis.Promise<void> {
 	let a = $.varRef($.markAsStructValue(new maphash.Hash()))
 	let b = $.varRef($.markAsStructValue(new maphash.Hash()))
 	a.value.SetSeed($.markAsStructValue($.cloneStructValue(seed)))
-	b.value.SetSeed($.markAsStructValue($.cloneStructValue(seed)))
+	b.value.SetSeed(seed)
 	maphash.WriteComparable(a, 42)
 	maphash.WriteComparable(b, 42)
 	await $.println(a.value.Sum64() == b.value.Sum64())

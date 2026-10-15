@@ -69,7 +69,7 @@ export class Sides {
 				case $.typeAssert<Sides>(__goscriptTypeSwitchValue, "main.Sides").ok:
 					{
 						let val: Sides = $.markAsStructValue($.cloneStructValue($.typeAssert<Sides>(__goscriptTypeSwitchValue, "main.Sides").value))
-						$.assignStruct((s$ as Sides), (val).clone())
+						$.assignStruct((s$ as Sides), val)
 						return "Sides[T]"
 					}
 					break

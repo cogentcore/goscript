@@ -71,7 +71,7 @@ export async function main(): globalThis.Promise<void> {
 export async function local(): globalThis.Promise<void> {
 	let t = $.markAsStructValue($.cloneStructValue(time.Date(2026, 10, 13, 22, 30, 0, 0, time.UTC)))
 	let l = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(t)).Local()))
-	await $.println("local location", $.pointerEqual($.markAsStructValue($.cloneStructValue(l)).Location(), time.Local), $.markAsStructValue($.cloneStructValue(l)).Equal($.markAsStructValue($.cloneStructValue(t))))
+	await $.println("local location", $.pointerEqual($.markAsStructValue($.cloneStructValue(l)).Location(), time.Local), $.markAsStructValue($.cloneStructValue(l)).Equal(t))
 	let [, off] = $.markAsStructValue($.cloneStructValue(l)).Zone()
 	let wall = (((($.markAsStructValue($.cloneStructValue(l)).Hour() * 3600) + ($.markAsStructValue($.cloneStructValue(l)).Minute() * 60)) - off) + (2 * 86400)) % 86400
 	await $.println("local wall clock matches offset", wall == 81000)
@@ -101,7 +101,7 @@ export async function marshal(): globalThis.Promise<void> {
 	err = __goscriptTuple1[1]
 	await $.println("marshal text", $.bytesToString(text), err == null)
 	let v = $.varRef($.markAsStructValue(new time.Time()))
-	await $.println("unmarshal text", v.value.UnmarshalText(text) == null, $.markAsStructValue($.cloneStructValue(v.value)).Equal($.markAsStructValue($.cloneStructValue(t))))
+	await $.println("unmarshal text", v.value.UnmarshalText(text) == null, $.markAsStructValue($.cloneStructValue(v.value)).Equal(t))
 	await $.println("unmarshal bad text", v.value.UnmarshalText(new Uint8Array([98, 97, 100])) != null, $.markAsStructValue($.cloneStructValue(v.value)).IsZero())
 
 	let __goscriptTuple2: any = $.markAsStructValue($.cloneStructValue(time.Date(10000, 1, 1, 0, 0, 0, 0, time.UTC))).MarshalJSON()

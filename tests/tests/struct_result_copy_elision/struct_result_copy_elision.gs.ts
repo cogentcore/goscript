@@ -231,7 +231,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println($.len(m), ok, $.mapGet<key, number, number>(m, new key({a: 1, b: 2}, true), 0)[0])
 	k.a = 1
 	await $.println($.mapGet<key, number, number>(m, k, 0)[0])
-	$.deleteMapEntry(m, (k).clone())
+	$.deleteMapEntry(m, k)
 	await $.println($.len(m))
 
 	let m2 = $.makeMap<Pos, Region>([])

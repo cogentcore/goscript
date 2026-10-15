@@ -40,7 +40,7 @@ export class Person {
 
 export async function main(): globalThis.Promise<void> {
 	let p = new Person({Name: "Alice", Age: 30, Active: true}, true)
-	let __goscriptTuple0: any = (json.Marshal($.interfaceValue((p).clone(), "main.Person", "main.Person")) as [$.Slice<number>, $.GoError])
+	let __goscriptTuple0: any = (json.Marshal($.interfaceValue(p, "main.Person", "main.Person")) as [$.Slice<number>, $.GoError])
 	let b: $.Slice<number> = __goscriptTuple0[0]
 	let err = __goscriptTuple0[1]
 	if (err != null) {
