@@ -2482,9 +2482,17 @@ export function After(d: Duration): ChannelRef<Time> {
   return makeChannelRef(channel, 'receive')
 }
 
-// AfterFunc waits for the duration to elapse and then calls f.
-export function AfterFunc(d: Duration, f: () => void): Timer {
-  return new Timer(d, f)
+// AfterFunc waits for the duration to elapse and then calls f. A nil f
+// panics when the timer fires, as calling it would in Go.
+export function AfterFunc(d: Duration, f: (() => void) | null): Timer {
+  return new Timer(
+    d,
+    f ??
+      (() =>
+        $.runtimePanic(
+          'runtime error: invalid memory address or nil pointer dereference',
+        )),
+  )
 }
 
 // NewTimer creates a new Timer that will fire after the given duration.

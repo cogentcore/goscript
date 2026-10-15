@@ -3,7 +3,11 @@
 // low-level library routines. Higher-level synchronization is better done via
 // channels and communication.
 
-import { comparableEqual, pointerValue } from '@goscript/builtin/index.js'
+import {
+  comparableEqual,
+  pointerValue,
+  runtimePanic,
+} from '@goscript/builtin/index.js'
 
 // Locker represents an object that can be locked and unlocked.
 export interface Locker {
@@ -500,8 +504,17 @@ export class Pool {
   }
 }
 
-// OnceFunc returns a function that invokes f only once.
-export function OnceFunc(f: () => void): () => void {
+// callNil panics as calling a nil func does in Go.
+function callNil(): never {
+  runtimePanic(
+    'runtime error: invalid memory address or nil pointer dereference',
+  )
+}
+
+// OnceFunc returns a function that invokes f only once. A nil f panics on
+// the first call.
+export function OnceFunc(f: (() => void) | null): () => void {
+  const call = f ?? callNil
   let called = false
   let panicked = false
   let panicValue: unknown
@@ -514,7 +527,7 @@ export function OnceFunc(f: () => void): () => void {
     }
     called = true
     try {
-      f()
+      call()
     } catch (err) {
       panicked = true
       panicValue = err
@@ -523,8 +536,10 @@ export function OnceFunc(f: () => void): () => void {
   }
 }
 
-// OnceValue returns a function that invokes f only once and returns the value returned by f.
-export function OnceValue<T>(f: () => T): () => T {
+// OnceValue returns a function that invokes f only once and returns the value
+// returned by f. A nil f panics on the first call.
+export function OnceValue<T>(f: (() => T) | null): () => T {
+  const call = f ?? callNil
   let value: T
   let called = false
   let panicked = false
@@ -538,7 +553,7 @@ export function OnceValue<T>(f: () => T): () => T {
     }
     called = true
     try {
-      value = f()
+      value = call()
     } catch (err) {
       panicked = true
       panicValue = err
@@ -548,8 +563,10 @@ export function OnceValue<T>(f: () => T): () => T {
   }
 }
 
-// OnceValues returns a function that invokes f only once and returns the values returned by f.
-export function OnceValues<T1, T2>(f: () => [T1, T2]): () => [T1, T2] {
+// OnceValues returns a function that invokes f only once and returns the values
+// returned by f. A nil f panics on the first call.
+export function OnceValues<T1, T2>(f: (() => [T1, T2]) | null): () => [T1, T2] {
+  const call = f ?? callNil
   let value1: T1
   let value2: T2
   let called = false
@@ -564,7 +581,7 @@ export function OnceValues<T1, T2>(f: () => [T1, T2]): () => [T1, T2] {
     }
     called = true
     try {
-      ;[value1, value2] = f()
+      ;[value1, value2] = call()
     } catch (err) {
       panicked = true
       panicValue = err
