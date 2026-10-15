@@ -306,7 +306,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("=== Interface constraint ===")
 	let items = $.arrayToSlice<Item | $.VarRef<Item> | null>([new Item({Name: "alpha"}), new Item({Name: "beta"})])
 	let clones = (await CloneAll(__goscriptStatic3(), items) as $.Slice<Item | $.VarRef<Item> | null>)
-	await $.println("clone:", $.pointerValue<Item>($.arrayIndex(clones!, 0)).Name, $.pointerValue<Item>($.arrayIndex(clones!, 1)).Name, $.pointerEqual($.arrayIndex(clones!, 0), $.arrayIndex(items!, 0)))
+	await $.println("clone:", $.pointerValue<Item>($.arrayIndex(clones!, 0)).Name, $.pointerValue<Item>($.arrayIndex(clones!, 1)).Name, ($.arrayIndex(clones!, 0) === $.arrayIndex(items!, 0) || $.pointerAliasesMade && $.pointerEqual($.arrayIndex(clones!, 0), $.arrayIndex(items!, 0))))
 
 	await $.println("=== Generic struct with map field ===")
 	let mapper = (NewMapper(__goscriptStatic4()) as Mapper | $.VarRef<Mapper> | null)

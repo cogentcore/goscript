@@ -72,7 +72,7 @@ export async function cloneSlice<T>(__typeArgs: $.GenericTypeArgs | undefined, i
 export async function main(): globalThis.Promise<void> {
 	let items = $.arrayToSlice<item | $.VarRef<item> | null>([new item({value: "first"}), new item({value: "second"})])
 	let cloned = (await cloneSlice(__goscriptStatic0(), items) as $.Slice<item | $.VarRef<item> | null>)
-	await $.println($.sliceLen(cloned), $.pointerValue<item>($.arrayIndex(cloned!, 0)).value, $.pointerValue<item>($.arrayIndex(cloned!, 1)).value, $.pointerEqual($.arrayIndex(cloned!, 0), $.arrayIndex(items!, 0)))
+	await $.println($.sliceLen(cloned), $.pointerValue<item>($.arrayIndex(cloned!, 0)).value, $.pointerValue<item>($.arrayIndex(cloned!, 1)).value, ($.arrayIndex(cloned!, 0) === $.arrayIndex(items!, 0) || $.pointerAliasesMade && $.pointerEqual($.arrayIndex(cloned!, 0), $.arrayIndex(items!, 0))))
 }
 
 var __goscriptStatic0$value: any
