@@ -1,6 +1,10 @@
 {
+  "callbackAsyncFunctions": {
+    "Collect": true,
+    "Insert": true
+  },
   "dependencies": [
     "iter",
     "unsafe"
   ]
-} 
+}

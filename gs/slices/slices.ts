@@ -387,30 +387,48 @@ export function MinFunc<T, R extends $.MaybePromise<number>>(
   )
 }
 
-export function Collect<T>(seq: iter.Seq<T> | null): $.Slice<T> {
+// Collect collects the values of seq into a new slice. It returns a promise
+// when seq suspends (callbackAsyncFunctions in meta.json).
+export function Collect<T>(
+  seq: iter.Seq<T> | null,
+): $.Slice<T> | globalThis.Promise<$.Slice<T>> {
   return AppendSeq(null, seq)
 }
 
+// AppendSeq appends the values of seq to s. It returns a promise when seq
+// suspends, as one that iter.Pull's next calls does.
 export function AppendSeq<T>(
   s: $.Slice<T>,
   seq: iter.Seq<T> | null,
-): $.Slice<T> {
+): $.Slice<T> | globalThis.Promise<$.Slice<T>> {
+  // Each value is appended as seq yields it.
   if (seq == null) {
     throw new Error('slices: nil iterator')
   }
   let out = s
-  seq((value: T) => {
+  const done = seq((value: T) => {
     out = $.append(out, value)
     return true
   })
+
+  // An async seq has appended every value once it settles.
+  if (done instanceof Promise) {
+    return done.then(() => out)
+  }
   return out
 }
 
 /** Sorted collects an iterator and orders all Go ordered types, including 64-bit integers. */
-export function Sorted<T extends cmp.Ordered>(seq: iter.Seq<T>): $.Slice<T> {
+export function Sorted<T extends cmp.Ordered>(
+  seq: iter.Seq<T> | null,
+): $.Slice<T> | globalThis.Promise<$.Slice<T>> {
+  // The values are sorted once collected, after an async seq settles.
+  const sorted = (out: $.Slice<T>): $.Slice<T> => {
+    Sort(out)
+    return out
+  }
   const out = Collect<T>(seq)
-  Sort(out)
-  return out
+  return out instanceof Promise ? out.then(sorted) : sorted(out)
 }
 
 /**
@@ -418,7 +436,7 @@ export function Sorted<T extends cmp.Ordered>(seq: iter.Seq<T>): $.Slice<T> {
  * sequence or comparison. An empty sequence stays nil and never calls cmp.
  */
 export async function SortedFunc<T>(
-  seq: iter.Seq<T>,
+  seq: iter.Seq<T> | null,
   cmp: CompareCallback<T>,
 ): globalThis.Promise<$.Slice<T>> {
   const out = await collectAsync(seq)
@@ -430,7 +448,7 @@ export async function SortedFunc<T>(
 
 /** SortedStableFunc is SortedFunc, whose SortFunc merge sort is stable. */
 export function SortedStableFunc<T>(
-  seq: iter.Seq<T>,
+  seq: iter.Seq<T> | null,
   cmp: CompareCallback<T>,
 ): globalThis.Promise<$.Slice<T>> {
   return SortedFunc(seq, cmp)

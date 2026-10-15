@@ -97,7 +97,7 @@ export async function main(): globalThis.Promise<void> {
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo))) as $.Slice<number>)
 	await $.println("delete func:", $.arrayIndex(filtered!, 0), $.arrayIndex(filtered!, 1), $.arrayIndex(filtered!, 2), $.sliceLen(filtered))
 
-	let sortedKeys = (slices.Sorted(maps.Keys($.makeMap<string, number>([["c", 3], ["a", 1], ["b", 2]]))) as $.Slice<string>)
+	let sortedKeys = (await slices.Sorted(maps.Keys($.makeMap<string, number>([["c", 3], ["a", 1], ["b", 2]]))) as $.Slice<string>)
 	await $.println("sorted:", $.arrayIndex(sortedKeys!, 0), $.arrayIndex(sortedKeys!, 1), $.arrayIndex(sortedKeys!, 2))
 
 	let __goscriptRangeReturn2 = false
@@ -135,7 +135,7 @@ export async function main(): globalThis.Promise<void> {
 		return
 	}
 	await $.println("nil values:", valueCount)
-	let sortedValues = (slices.Sorted(slices.Values($.arrayToSlice<string>(["c", "a", "b"]))) as $.Slice<string>)
+	let sortedValues = (await slices.Sorted(slices.Values($.arrayToSlice<string>(["c", "a", "b"]))) as $.Slice<string>)
 	await $.println("sorted values:", $.arrayIndex(sortedValues!, 0), $.arrayIndex(sortedValues!, 1), $.arrayIndex(sortedValues!, 2))
 
 	let repeated = (slices.Repeat($.arrayToSlice<number>([7, 8]), 3) as $.Slice<number>)
@@ -276,7 +276,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("grow struct:", $.arrayIndex(growSrc!, 0).n)
 
 	let collectedMap = $.makeMap<number, cell>([[0, $.markAsStructValue(new cell({n: 1}))]])
-	let collected = (slices.Collect(maps.Values(collectedMap)) as $.Slice<cell>)
+	let collected = (await slices.Collect(maps.Values(collectedMap)) as $.Slice<cell>)
 	$.arrayIndex(collected!, 0).n = 9
 	await $.println("collect struct:", $.mapGet<number, cell, cell>(collectedMap, 0, $.markAsStructValue(new cell()))[0].n)
 
@@ -310,7 +310,7 @@ export async function main(): globalThis.Promise<void> {
 	let appendSeq = $.functionValue(async (_yield: ((_p0: cell) => boolean | globalThis.Promise<boolean>) | null) => {
 		void (__goscriptAwait = _yield!($.markAsStructValue($.cloneStructValue($.arrayIndex(appendSeqSource!, 0)))), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 	}, ({ kind: $.TypeKind.Function, params: [({ kind: $.TypeKind.Function, params: ["main.cell"], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo)], results: [] } as $.FunctionTypeInfo))
-	let appendSeqResult = (slices.AppendSeq(null, appendSeq) as $.Slice<cell>)
+	let appendSeqResult = (await slices.AppendSeq(null, appendSeq) as $.Slice<cell>)
 	$.arrayIndex(appendSeqResult!, 0).n = 9
 	await $.println("append seq struct:", $.arrayIndex(appendSeqSource!, 0).n, $.arrayIndex(appendSeqResult!, 0).n)
 
