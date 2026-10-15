@@ -9144,6 +9144,17 @@ func (o *LoweringOwner) lowerStructEqualityExpr(ctx lowerFileContext, expr *ast.
 		return "", false
 	}
 	value := o.runtimeOwner.QualifiedHelper(RuntimeHelperStructEqual) + "(" + left + ", " + right + ")"
+
+	// Small structs of the same type whose operands can be read twice are
+	// compared field by field inline (see lowerInlineStructEqual), unless
+	// the operands call runtime readers that more than two fields would
+	// repeat.
+	if types.Identical(leftType, rightType) && isRereadableStructOperand(left) && isRereadableStructOperand(right) {
+		inline, ok := o.lowerInlineStructEqual(leftType, left, right)
+		if ok && (strings.Count(inline, " && ") < 2 || !simpleOperandCalls.MatchString(left+right)) {
+			value = "(" + inline + ")"
+		}
+	}
 	if expr.Op == token.NEQ {
 		value = "!" + value
 	}
