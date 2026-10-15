@@ -9090,17 +9090,35 @@ func (o *LoweringOwner) lowerComplexEqualityExpr(ctx lowerFileContext, expr *ast
 	return value, true
 }
 
+// lowerPointerEqualityExpr compares two pointers. Pointers to the same
+// storage are the same object, until an unsafe pointer conversion makes a
+// view that aliases another pointer's storage, so operands that can be
+// evaluated twice are compared with === first, and through the runtime only
+// once such an alias exists.
 func (o *LoweringOwner) lowerPointerEqualityExpr(ctx lowerFileContext, expr *ast.BinaryExpr, left string, right string) (string, bool) {
+	// Both operands are pointers.
 	leftType := ctx.semPkg.source.TypesInfo.TypeOf(expr.X)
 	rightType := ctx.semPkg.source.TypesInfo.TypeOf(expr.Y)
 	if !isPointerType(leftType) || !isPointerType(rightType) {
 		return "", false
 	}
+
+	// Other operands are compared by the runtime alone.
 	value := o.runtimeOwner.QualifiedHelper(RuntimeHelperPointerEqual) + "(" + left + ", " + right + ")"
-	if expr.Op == token.NEQ {
-		value = "!" + value
+	if !isSimpleLoweredOperand(left) || !isSimpleLoweredOperand(right) {
+		if expr.Op == token.NEQ {
+			value = "!" + value
+		}
+		return value, true
 	}
-	return value, true
+
+	// Simple operands are compared inline, and by the runtime only after an
+	// alias was made.
+	aliases := o.runtimeOwner.QualifiedHelper(RuntimeHelperPointerAliasesMade)
+	if expr.Op == token.NEQ {
+		return "(" + left + " !== " + right + " && !(" + aliases + " && " + value + "))", true
+	}
+	return "(" + left + " === " + right + " || " + aliases + " && " + value + ")", true
 }
 
 func (o *LoweringOwner) lowerStructEqualityExpr(ctx lowerFileContext, expr *ast.BinaryExpr, left string, right string) (string, bool) {
