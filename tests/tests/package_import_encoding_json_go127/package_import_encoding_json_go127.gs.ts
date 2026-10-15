@@ -12,9 +12,9 @@ import "@goscript/io/index.js"
 export async function main(): globalThis.Promise<void> {
 	let raw: $.VarRef<json.RawMessage> = $.varRef(null! as json.RawMessage)
 	let dec = json.NewDecoder($.pointerValueOrNil($.interfaceValue<io.Reader | null>(strings.NewReader("{\"hello\": true}"), "*strings.Reader", /* @__PURE__ */ $.pointerType("strings.Reader")))!)
-	let err = await json.Decoder.prototype.Decode.call($.pointerValue<json.Decoder>(dec), $.namedValueInterfaceValue<any>(raw, "*jsontext.Value", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()))
+	let err = await (dec !== null && (dec as any).__isVarRef !== true && (dec as any).__goValue === undefined ? ((dec as any) as json.Decoder).Decode($.namedValueInterfaceValue<any>(raw, "*jsontext.Value", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2())) : json.Decoder.prototype.Decode.call($.pointerValue<json.Decoder>(dec), $.namedValueInterfaceValue<any>(raw, "*jsontext.Value", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2())))
 	await $.println("RawMessage:", $.bytesToString(raw.value), err == null)
-	await $.println("RawMessage EOF:", $.comparableEqual(await json.Decoder.prototype.Decode.call($.pointerValue<json.Decoder>(dec), $.namedValueInterfaceValue<any>(raw, "*jsontext.Value", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2())), io.EOF))
+	await $.println("RawMessage EOF:", $.comparableEqual(await (dec !== null && (dec as any).__isVarRef !== true && (dec as any).__goValue === undefined ? ((dec as any) as json.Decoder).Decode($.namedValueInterfaceValue<any>(raw, "*jsontext.Value", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2())) : json.Decoder.prototype.Decode.call($.pointerValue<json.Decoder>(dec), $.namedValueInterfaceValue<any>(raw, "*jsontext.Value", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()))), io.EOF))
 	await $.println("RawMessage valid:", jsontext.Value_IsValid(raw.value), jsontext.Value_Kind(raw.value))
 	await $.println("RawMessage format:", jsontext.Value_Format(raw) == null, $.bytesToString(raw.value))
 
