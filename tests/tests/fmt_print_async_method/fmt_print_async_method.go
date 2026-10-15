@@ -3,8 +3,9 @@ package main
 import "fmt"
 
 // slowName's String method receives from a channel, so it is async, and so
-// are the fmt print functions, which may call it, and their callers, even
-// where they format only sync values.
+// is a call of a fmt print function that may format a slowName, such as
+// label's, whose operand is a fmt.Stringer. describe formats only a point,
+// whose String method is sync, so it stays sync.
 
 type slowName struct {
 	ch chan string

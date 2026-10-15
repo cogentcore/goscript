@@ -999,43 +999,54 @@ export function Sprintln(...a: any[]): string | Promise<string> {
   return settle(sprintlnOperands(a))
 }
 
-async function writeToWriter(
+// writeToWriter writes the rendered text to w. It returns a promise only
+// when the text or w's Write does, so a call with sync operands and a sync
+// writer returns its result directly.
+function writeToWriter(
   w: any,
-  out: string,
-): Promise<[number, $.GoError | null]> {
-  if (w && w.Write) {
-    return await w.Write($.stringToBytes(out))
-  }
-  return [0, $.newError('Writer does not implement Write method')]
+  out: MaybeString,
+): [number, $.GoError | null] | Promise<[number, $.GoError | null]> {
+  return settle(
+    thenMaybe(
+      out,
+      (
+        text,
+      ):
+        | [number, $.GoError | null]
+        | PromiseLike<[number, $.GoError | null]> => {
+        if (w && w.Write) {
+          return w.Write($.stringToBytes(text))
+        }
+        return [0, $.newError('Writer does not implement Write method')]
+      },
+    ),
+  ) as [number, $.GoError | null] | Promise<[number, $.GoError | null]>
 }
 
-// Fprint functions (write to Writer). The Writer may be async, so these
-// always return a Promise.
-export async function Fprint(
+// Fprint functions (write to Writer). They suspend only when an operand's
+// formatting method or the Writer's Write does.
+export function Fprint(
   w: any,
   ...a: any[]
-): Promise<[number, $.GoError | null]> {
+): [number, $.GoError | null] | Promise<[number, $.GoError | null]> {
   // Same spacing as Print
-  const out = await sprintOperands(a)
-  return await writeToWriter(w, out)
+  return writeToWriter(w, sprintOperands(a))
 }
 
-export async function Fprintf(
+export function Fprintf(
   w: any,
   format: string,
   ...a: any[]
-): Promise<[number, $.GoError | null]> {
-  const result = await parseFormatMaybe(format, a)
-  return await writeToWriter(w, result)
+): [number, $.GoError | null] | Promise<[number, $.GoError | null]> {
+  return writeToWriter(w, parseFormatMaybe(format, a))
 }
 
-export async function Fprintln(
+export function Fprintln(
   w: any,
   ...a: any[]
-): Promise<[number, $.GoError | null]> {
+): [number, $.GoError | null] | Promise<[number, $.GoError | null]> {
   // Same behavior as Println
-  const result = await sprintlnOperands(a)
-  return await writeToWriter(w, result)
+  return writeToWriter(w, sprintlnOperands(a))
 }
 
 // Append functions (append to byte slice)

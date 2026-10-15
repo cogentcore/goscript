@@ -11,33 +11,21 @@ export type num = number
 
 $.registerNamedValueType(
 	"main.num",
-	{String: (receiver: any, ...args: any[]) => (num_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	{String: (receiver: any) => (num_String as any)(($.isVarRef(receiver) ? receiver.value : receiver))},
 	[$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])]
 );
 
 $.registerNamedValueType(
 	"*main.num",
-	{String: (receiver: any, ...args: any[]) => (num_String as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	{String: (receiver: any) => (num_String as any)($.pointerValue(receiver))},
 	[$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])]
 );
 
 export class byteFormatter {
-	public get prefix(): $.Slice<number> {
-		return this._fields.prefix
-	}
-
-	public set prefix(value: $.Slice<number>) {
-		this._fields.prefix = value
-	}
-
-	public _fields: {
-		prefix: $.Slice<number>
-	}
+	public declare prefix: $.Slice<number>
 
 	constructor(init?: Partial<{prefix?: $.Slice<number>}>, __goscriptValue?: boolean) {
-		this._fields = {
-			prefix: init?.prefix ?? (null! as $.Slice<number>)
-		}
+		this.prefix = init?.prefix ?? (null! as $.Slice<number>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -45,10 +33,9 @@ export class byteFormatter {
 		return new byteFormatter(this, true)
 	}
 
-	public __goscriptAssign(source: byteFormatter): void {
-		const target = this._fields
-		const values = source._fields
-		target.prefix = values.prefix
+	public __goscriptAssign(source: byteFormatter): this {
+		this.prefix = source.prefix
+		return this
 	}
 
 	public Format(state: fmt.State | null, verb: number): void {
@@ -68,32 +55,13 @@ export class byteFormatter {
 }
 
 export class pos {
-	public get Line(): number {
-		return this._fields.Line
-	}
+	public declare Line: number
 
-	public set Line(value: number) {
-		this._fields.Line = value
-	}
-
-	public get Char(): number {
-		return this._fields.Char
-	}
-
-	public set Char(value: number) {
-		this._fields.Char = value
-	}
-
-	public _fields: {
-		Line: number
-		Char: number
-	}
+	public declare Char: number
 
 	constructor(init?: Partial<{Line?: number, Char?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Line: init?.Line ?? (0 as number),
-			Char: init?.Char ?? (0 as number)
-		}
+		this.Line = init?.Line ?? (0 as number)
+		this.Char = init?.Char ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -101,11 +69,10 @@ export class pos {
 		return new pos(this, true)
 	}
 
-	public __goscriptAssign(source: pos): void {
-		const target = this._fields
-		const values = source._fields
-		target.Line = values.Line
-		target.Char = values.Char
+	public __goscriptAssign(source: pos): this {
+		this.Line = source.Line
+		this.Char = source.Char
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -186,7 +153,7 @@ export async function main(): globalThis.Promise<void> {
 	let appended = (fmt.Append(new Uint8Array([98, 97, 115, 101, 45]), "tail") as $.Slice<number>)
 	fmt.Println("Append bytes:", $.bytesToString(appended))
 	let buf = $.varRef($.markAsStructValue(new bytes.Buffer()))
-	await fmt.Fprintln($.pointerValueOrNil($.interfaceValue<io.Writer | null>(buf, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer")))!, "Buffered writer")
+	fmt.Fprintln($.pointerValueOrNil($.interfaceValue<io.Writer | null>(buf, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer")))!, "Buffered writer")
 	fmt.Print(buf.value.String())
 
 	starWidthPrecision()
@@ -218,7 +185,7 @@ export function starWidthPrecision(): void {
 	fmt.Println((fmt.Sprintf("[%*.*f]", $.basicInterfaceValue(8, "int"), $.basicInterfaceValue(2, "int"), $.basicInterfaceValue(3.14159, "float64")) as string))
 	fmt.Println((fmt.Sprintf("[%.*g]", $.basicInterfaceValue(7, "int"), $.basicInterfaceValue(13.333333015441895, "float32")) as string))
 	fmt.Println((fmt.Sprintf("[%.*d] [%s]", $.basicInterfaceValue(-1, "int"), $.basicInterfaceValue(5, "int"), "after") as string))
-	fmt.Println((fmt.Sprintf("[%v]", $.namedValueInterfaceValue<any>(6.666666507720947, "main.num", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2())) as string))
+	fmt.Println((fmt.Sprintf("[%v]", __goscriptStatic3()) as string))
 	fmt.Println((fmt.Sprintf("[%.*d]", "x", $.basicInterfaceValue(5, "int")) as string))
 	let err = fmt.Errorf("%*s: %w", $.basicInterfaceValue(6, "int"), "ctx", (errors.New("base") as any))
 	fmt.Println((err as any), errors.Unwrap($.pointerValueOrNil(err)!) != null)
@@ -255,7 +222,7 @@ export function scanVerbs(): void {
 	fmt.Println("1x:", $.basicInterfaceValue(n, "int"), err == null, $.basicInterfaceValue(r.value, "uint8"), $.basicInterfaceValue(g.value, "uint8"), $.basicInterfaceValue(b.value, "uint8"))
 
 	let p: pos = new pos(undefined, true)
-	let __goscriptTuple4: any = fmt.Sscanf("L12C3", "L%dC%d", $.interfaceValue($.fieldRef(p._fields, "Line"), "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int"))), $.interfaceValue($.fieldRef(p._fields, "Char"), "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int"))))
+	let __goscriptTuple4: any = fmt.Sscanf("L12C3", "L%dC%d", $.interfaceValue($.fieldRef(p, "Line"), "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int"))), $.interfaceValue($.fieldRef(p, "Char"), "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int"))))
 	n = __goscriptTuple4[0]
 	err = __goscriptTuple4[1]
 	fmt.Println("struct fields:", $.basicInterfaceValue(n, "int"), err == null, $.basicInterfaceValue(p.Line, "int"), $.basicInterfaceValue(p.Char, "int"))
@@ -299,7 +266,7 @@ export function scanVerbs(): void {
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({String: (receiver: any, ...args: any[]) => (num_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))})
+	return __goscriptStatic0$value ??= ({String: (receiver: any) => (num_String as any)(($.isVarRef(receiver) ? receiver.value : receiver))})
 }
 
 var __goscriptStatic1$value: any
@@ -310,6 +277,11 @@ function __goscriptStatic1(): any {
 var __goscriptStatic2$value: any
 function __goscriptStatic2(): any {
 	return __goscriptStatic2$value ??= ([$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])])
+}
+
+var __goscriptStatic3$value: any
+function __goscriptStatic3(): any {
+	return __goscriptStatic3$value ??= ($.namedValueInterfaceValue<any>(6.666666507720947, "main.num", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()))
 }
 
 if ($.isMainScript(import.meta)) {

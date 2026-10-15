@@ -3674,18 +3674,28 @@ func TestCompilePackagesBoxesNumericVariadicInterfaceArgs(t *testing.T) {
 	}
 }
 
+// TestCompilePackagesAwaitsFmtWriterOverrides checks that Fprintf is awaited
+// when it writes to an io.Writer, which may be a file, and not when it writes
+// to a compiled writer whose Write method is sync.
 func TestCompilePackagesAwaitsFmtWriterOverrides(t *testing.T) {
 	moduleDir := writePackageGraphFixture(t, map[string]string{
 		"go.mod": "module example.test/fmt-writer\n\ngo 1.25.3\n",
 		"main.go": strings.Join([]string{
 			"package fmtwriter",
-			"import \"fmt\"",
+			"import (",
+			"  \"fmt\"",
+			"  \"io\"",
+			")",
 			"type writer struct { buf []byte }",
 			"func (w *writer) Write(p []byte) (int, error) {",
 			"  w.buf = append(w.buf, p...)",
 			"  return len(p), nil",
 			"}",
 			"func Use(w *writer) error {",
+			"  _, err := fmt.Fprintf(w, \"%s\", \"ok\")",
+			"  return err",
+			"}",
+			"func UseWriter(w io.Writer) error {",
 			"  _, err := fmt.Fprintf(w, \"%s\", \"ok\")",
 			"  return err",
 			"}",
@@ -3708,7 +3718,9 @@ func TestCompilePackagesAwaitsFmtWriterOverrides(t *testing.T) {
 	}
 	text := string(content)
 	for _, want := range []string{
-		"export async function Use",
+		"export function Use(",
+		"\"%s\", \"ok\") as [number, $.GoError])",
+		"export async function UseWriter(",
 		"await fmt.Fprintf(",
 		";(w$ as writer).buf = $.appendSlice((w$ as writer).buf, p, $.byteSliceHint)",
 		"return err",

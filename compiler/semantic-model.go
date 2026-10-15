@@ -248,6 +248,7 @@ func (o *SemanticModelOwner) colorAsync(
 	for _, method := range openMethods {
 		openMethodSet[method] = true
 	}
+	model.openMethods = openMethodSet
 	valueGraph := buildFuncValueGraph(model, overrideFacts, values, openMethodSet, wholeProgram)
 
 	// Propagate the async marks to their fixed point.

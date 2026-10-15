@@ -129,10 +129,22 @@ only in a program with an async compiled method of given names
 (`asyncWhenMethods` in `meta.json`, keyed by a function name or
 `Type.Method`, with `builtin` holding universe objects):
 
-- The fmt print functions (`Sprint*`, `Print*`, `Append*`) depend on
-  `Error`, `Format`, `GoString` and `String`, the methods they may call. They
-  return a plain value when every operand renders synchronously. `Fprint*`
-  stay async, since they write to an `io.Writer`.
+- The fmt print functions (`Sprint*`, `Print*`, `Append*`, and `Fprint*`,
+  which also call their writer's `Write`) depend on `Error`, `Format`,
+  `GoString` and `String`, the methods they may call. They return a plain
+  value when every operand renders synchronously and the writer writes
+  synchronously. Metadata lists them in `asyncWhenOperands` as well, since
+  they call those methods only on their operands, so each call is decided
+  by the static types of its operands (`compiler/semantic-format-operands.go`):
+  a concrete type allows its own methods and those of the types fmt formats
+  inside it (struct fields, pointer, slice, array and map elements); an
+  interface with `Error()` allows `error.Error` and any `Format` or
+  `GoString` method; an interface with `String()` allows its `String`, which
+  its implementations color, `error.Error` and any `Format` or `GoString`
+  method; an `io.Writer` argument allows its static type's `Write`, an
+  interface method for `io.Writer` itself. An operand of any other interface
+  type, a type parameter or a `reflect.Value` may hold anything, and leaves
+  the call to the function's own condition.
 - Override error types whose `Error` wraps another error's (`strconv.NumError`,
   `fs.PathError`, `os.LinkError`, `os.SyscallError`, `scanner.ErrorList`,
   `pkg/errors`, `cryptobyte.BuildError`) depend on the same names.

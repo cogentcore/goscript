@@ -48,6 +48,11 @@ type OverrideMetadata struct {
 	// is closed over the graph like a compiled one, and so is any interface
 	// whose methods all appear in one.
 	SyncInterfaces map[string]bool
+	// AsyncWhenOperands names the asyncWhenMethods functions that call the
+	// methods they list only on the values of their arguments, by the rules
+	// of fmt: Error, Format, GoString and String. A call of one is async only
+	// when the static types of its operands allow an async such method.
+	AsyncWhenOperands map[string]bool
 }
 
 // OverrideRegistryOwner owns GoScript override package metadata and copy plans.

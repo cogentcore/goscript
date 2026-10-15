@@ -160,8 +160,11 @@ func (s *summaryObjects) resolve(key string) types.Object {
 		return nil
 	}
 	if pkgPath == universeFactsPackage {
-		if id == universeError.Name() {
+		switch id {
+		case universeError.Name():
 			return universeError
+		case formatAnyMethodKey.Name():
+			return formatAnyMethodKey
 		}
 		return nil
 	}

@@ -218,6 +218,13 @@ func asyncWhenMethodFunctions(model *SemanticModel, overrideFacts *OverrideFacts
 	asyncWhen := make(map[string][]*types.Func)
 	seen := make(map[*types.Func]bool)
 	for _, fn := range candidates {
+		if fn == formatAnyMethodKey && !seen[fn] {
+			seen[fn] = true
+			for _, method := range formatAnyMethodNames {
+				asyncWhen[method] = append(asyncWhen[method], fn)
+			}
+			continue
+		}
 		pkgPath, name, ok := overrideMetadataName(fn)
 		if !ok || seen[fn] {
 			continue

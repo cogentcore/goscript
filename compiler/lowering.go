@@ -17092,8 +17092,30 @@ func (o *LoweringOwner) callbackOverrideCallNeedsAwait(ctx lowerFileContext, cal
 
 // callExprNeedsAwait reports whether call may suspend, by its callee or by a
 // function argument it passes to a callback async override.
+//
+// A call of a format function that override metadata lists in
+// asyncWhenOperands is decided by its operands.
 func (o *LoweringOwner) callExprNeedsAwait(ctx lowerFileContext, call *ast.CallExpr) bool {
+	if async, ok := o.formatCallAsync(ctx, call); ok {
+		return async
+	}
 	return o.callNeedsAwait(ctx, call.Fun) || o.callbackOverrideCallNeedsAwait(ctx, call)
+}
+
+// formatCallAsync reports whether a call of a format function that override
+// metadata lists in asyncWhenOperands may suspend, by its operands. It
+// reports ok false for any other call.
+func (o *LoweringOwner) formatCallAsync(ctx lowerFileContext, call *ast.CallExpr) (async, ok bool) {
+	// Only a call of a listed format function is decided here.
+	if ctx.model == nil || ctx.semPkg == nil || ctx.semPkg.source == nil {
+		return false, false
+	}
+	pkg := ctx.semPkg.source
+	called := calledFunction(pkg, call.Fun)
+	if !o.overrideFacts().IsAsyncWhenOperands(called) {
+		return false, false
+	}
+	return ctx.model.formatCallAsync(pkg, o.overrideFacts(), called, call), true
 }
 
 // awaitCallIfNeeded awaits the lowered call when it may suspend. A call
@@ -17140,6 +17162,7 @@ func (o *LoweringOwner) awaitCallIfNeeded(ctx lowerFileContext, call *ast.CallEx
 	called := calledFunction(pkg, fun)
 	if valueCall && !o.valueCallAsync(ctx, fun) ||
 		ctx.model != nil && (ctx.model.asyncWhenTargets[called] || ctx.model.syncOverrideInterfaceMethod(called) ||
+			o.overrideFacts().IsAsyncWhenOperands(called) ||
 			ctx.model.syncDirective(called) && isInterfaceMethod(called)) {
 		return "(" + lowered + " as " + o.tsSignatureResultFor(ctx, signature) + ")"
 	}
