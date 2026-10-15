@@ -42,6 +42,10 @@ type bodySummary struct {
 	// objects.
 	addressTaken []string
 	needsVarRef  []string
+	// changedVars and effectFreeFuncs hold the package variables the package
+	// may change and its effect-free functions.
+	changedVars     []string
+	effectFreeFuncs []string
 	// localFacts holds the fact digest lines of the marks on body locals.
 	localFacts []string
 	// varRefNames holds the names of the body locals needing a variable
@@ -390,6 +394,14 @@ func summarizeBody(shard *SemanticModel, semPkg *semanticPackage, objects *summa
 		return nil, false
 	}
 	summary.needsVarRef, summary.localFacts, ok = summarizeMarks(k, region, semPkg, shard.needsVarRef, "var-ref", summary.localFacts)
+	if !ok {
+		return nil, false
+	}
+	summary.changedVars, ok = keys(k, shard.changedVars)
+	if !ok {
+		return nil, false
+	}
+	summary.effectFreeFuncs, ok = keys(k, shard.effectFreeFuncs)
 	if !ok {
 		return nil, false
 	}
@@ -747,6 +759,8 @@ func (a *bodyApplier) apply(shard *SemanticModel, semPkg *semanticPackage) bool 
 	}{
 		{a.summary.addressTaken, shard.addressTaken},
 		{a.summary.needsVarRef, shard.needsVarRef},
+		{a.summary.changedVars, shard.changedVars},
+		{a.summary.effectFreeFuncs, shard.effectFreeFuncs},
 	} {
 		for _, key := range marks.keys {
 			obj := a.keys.resolve(key)
@@ -1036,6 +1050,8 @@ const (
 	summaryRecordLock         = "lock"
 	summaryRecordMutex        = "section-mutex"
 	summaryRecordMutexEscape  = "mutex-escape"
+	summaryRecordChangedVar   = "changed-var"
+	summaryRecordEffectFree   = "effect-free"
 )
 
 // encode returns the summary's lines, or false when a field holds a tab or a
@@ -1089,6 +1105,8 @@ func (s *bodySummary) encode() ([]byte, bool) {
 		{summaryRecordAssertedFunc, s.assertedFuncShapes},
 		{summaryRecordTopCall, s.topValueCalls},
 		{summaryRecordMutexEscape, s.mutexEscapes},
+		{summaryRecordChangedVar, s.changedVars},
+		{summaryRecordEffectFree, s.effectFreeFuncs},
 	} {
 		for _, value := range records.values {
 			line(records.record, value)
@@ -1171,7 +1189,8 @@ func decodeBodySummary(data []byte) (*bodySummary, bool) {
 			s.literals = append(s.literals, summaryLiteral{file: fields[1], offset: offset})
 		case summaryRecordAddressTaken, summaryRecordNeedsVarRef, summaryRecordLocalFact,
 			summaryRecordVarRefName, summaryRecordInterface, summaryRecordLazyVar,
-			summaryRecordAssertedFunc, summaryRecordTopCall, summaryRecordMutexEscape:
+			summaryRecordAssertedFunc, summaryRecordTopCall, summaryRecordMutexEscape,
+			summaryRecordChangedVar, summaryRecordEffectFree:
 			v, ok := value(1)
 			if !ok {
 				return nil, false
@@ -1186,6 +1205,8 @@ func decodeBodySummary(data []byte) (*bodySummary, bool) {
 				summaryRecordAssertedFunc: &s.assertedFuncShapes,
 				summaryRecordTopCall:      &s.topValueCalls,
 				summaryRecordMutexEscape:  &s.mutexEscapes,
+				summaryRecordChangedVar:   &s.changedVars,
+				summaryRecordEffectFree:   &s.effectFreeFuncs,
 			}[fields[0]]
 			*target = append(*target, v)
 		case summaryRecordAssertion:

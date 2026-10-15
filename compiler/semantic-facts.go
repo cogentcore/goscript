@@ -63,11 +63,20 @@ func (m *SemanticModel) packageFactDigests() map[string]string {
 	for obj := range m.addressTaken {
 		add("address-taken", obj, "")
 	}
+	for obj := range m.changedVars {
+		add("changed-var", obj, "")
+	}
+	for obj := range m.effectFreeFuncs {
+		add("effect-free", obj, "")
+	}
 	for pkgPath, semPkg := range m.packages {
 		if len(semPkg.localFacts) != 0 {
 			facts[pkgPath] = append(facts[pkgPath], semPkg.localFacts...)
 		}
 		facts[pkgPath] = append(facts[pkgPath], m.funcValueShapeFacts(semPkg)...)
+		for obj := range semPkg.deferredVars {
+			add("deferred-var", obj, "")
+		}
 	}
 
 	digests := make(map[string]string, len(facts))
