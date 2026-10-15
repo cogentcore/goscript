@@ -4,22 +4,10 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class child {
-	public get value(): string {
-		return this._fields.value
-	}
-
-	public set value(value: string) {
-		this._fields.value = value
-	}
-
-	public _fields: {
-		value: string
-	}
+	public declare value: string
 
 	constructor(init?: Partial<{value?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			value: init?.value ?? ("" as string)
-		}
+		this.value = init?.value ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -27,10 +15,9 @@ export class child {
 		return new child(this, true)
 	}
 
-	public __goscriptAssign(source: child): void {
-		const target = this._fields
-		const values = source._fields
-		target.value = values.value
+	public __goscriptAssign(source: child): this {
+		this.value = source.value
+		return this
 	}
 
 	public Clone(): child | $.VarRef<child> | null {
@@ -51,22 +38,10 @@ export class child {
 }
 
 export class parent {
-	public get child(): child | $.VarRef<child> | null {
-		return this._fields.child
-	}
-
-	public set child(value: child | $.VarRef<child> | null) {
-		this._fields.child = value
-	}
-
-	public _fields: {
-		child: child | $.VarRef<child> | null
-	}
+	public declare child: child | $.VarRef<child> | null
 
 	constructor(init?: Partial<{child?: child | $.VarRef<child> | null}>, __goscriptValue?: boolean) {
-		this._fields = {
-			child: init?.child ?? (null! as child | $.VarRef<child> | null)
-		}
+		this.child = init?.child ?? (null! as child | $.VarRef<child> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -74,10 +49,9 @@ export class parent {
 		return new parent(this, true)
 	}
 
-	public __goscriptAssign(source: parent): void {
-		const target = this._fields
-		const values = source._fields
-		target.child = values.child
+	public __goscriptAssign(source: parent): this {
+		this.child = source.child
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

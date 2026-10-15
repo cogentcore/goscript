@@ -4,32 +4,13 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class file {
-	public get name(): string {
-		return this._fields.name
-	}
+	public declare name: string
 
-	public set name(value: string) {
-		this._fields.name = value
-	}
-
-	public get data(): $.Slice<number> {
-		return this._fields.data
-	}
-
-	public set data(value: $.Slice<number>) {
-		this._fields.data = value
-	}
-
-	public _fields: {
-		name: string
-		data: $.Slice<number>
-	}
+	public declare data: $.Slice<number>
 
 	constructor(init?: Partial<{name?: string, data?: $.Slice<number>}>, __goscriptValue?: boolean) {
-		this._fields = {
-			name: init?.name ?? ("" as string),
-			data: init?.data ?? (null! as $.Slice<number>)
-		}
+		this.name = init?.name ?? ("" as string)
+		this.data = init?.data ?? (null! as $.Slice<number>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -37,11 +18,10 @@ export class file {
 		return new file(this, true)
 	}
 
-	public __goscriptAssign(source: file): void {
-		const target = this._fields
-		const values = source._fields
-		target.name = values.name
-		target.data = values.data
+	public __goscriptAssign(source: file): this {
+		this.name = source.name
+		this.data = source.data
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -54,32 +34,13 @@ export class file {
 }
 
 export class storage {
-	public get files(): globalThis.Map<string, file | $.VarRef<file> | null> | null {
-		return this._fields.files
-	}
+	public declare files: globalThis.Map<string, file | $.VarRef<file> | null> | null
 
-	public set files(value: globalThis.Map<string, file | $.VarRef<file> | null> | null) {
-		this._fields.files = value
-	}
-
-	public get children(): globalThis.Map<string, globalThis.Map<string, file | $.VarRef<file> | null> | null> | null {
-		return this._fields.children
-	}
-
-	public set children(value: globalThis.Map<string, globalThis.Map<string, file | $.VarRef<file> | null> | null> | null) {
-		this._fields.children = value
-	}
-
-	public _fields: {
-		files: globalThis.Map<string, file | $.VarRef<file> | null> | null
-		children: globalThis.Map<string, globalThis.Map<string, file | $.VarRef<file> | null> | null> | null
-	}
+	public declare children: globalThis.Map<string, globalThis.Map<string, file | $.VarRef<file> | null> | null> | null
 
 	constructor(init?: Partial<{files?: globalThis.Map<string, file | $.VarRef<file> | null> | null, children?: globalThis.Map<string, globalThis.Map<string, file | $.VarRef<file> | null> | null> | null}>, __goscriptValue?: boolean) {
-		this._fields = {
-			files: init?.files ?? (null! as globalThis.Map<string, file | $.VarRef<file> | null> | null),
-			children: init?.children ?? (null! as globalThis.Map<string, globalThis.Map<string, file | $.VarRef<file> | null> | null> | null)
-		}
+		this.files = init?.files ?? (null! as globalThis.Map<string, file | $.VarRef<file> | null> | null)
+		this.children = init?.children ?? (null! as globalThis.Map<string, globalThis.Map<string, file | $.VarRef<file> | null> | null> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -87,11 +48,10 @@ export class storage {
 		return new storage(this, true)
 	}
 
-	public __goscriptAssign(source: storage): void {
-		const target = this._fields
-		const values = source._fields
-		target.files = values.files
-		target.children = values.children
+	public __goscriptAssign(source: storage): this {
+		this.files = source.files
+		this.children = source.children
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

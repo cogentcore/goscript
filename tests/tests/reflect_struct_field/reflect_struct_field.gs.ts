@@ -7,32 +7,13 @@ import * as reflect from "@goscript/reflect/index.js"
 import "@goscript/reflect/index.js"
 
 export class inner {
-	public get A(): number {
-		return this._fields.A
-	}
+	public declare A: number
 
-	public set A(value: number) {
-		this._fields.A = value
-	}
-
-	public get B(): string {
-		return this._fields.B
-	}
-
-	public set B(value: string) {
-		this._fields.B = value
-	}
-
-	public _fields: {
-		A: number
-		B: string
-	}
+	public declare B: string
 
 	constructor(init?: Partial<{A?: number, B?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			A: init?.A ?? (0 as number),
-			B: init?.B ?? ("" as string)
-		}
+		this.A = init?.A ?? (0 as number)
+		this.B = init?.B ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -40,11 +21,10 @@ export class inner {
 		return new inner(this, true)
 	}
 
-	public __goscriptAssign(source: inner): void {
-		const target = this._fields
-		const values = source._fields
-		target.A = values.A
-		target.B = values.B
+	public __goscriptAssign(source: inner): this {
+		this.A = source.A
+		this.B = source.B
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -57,42 +37,16 @@ export class inner {
 }
 
 export class outer {
-	public get X(): number {
-		return this._fields.X
-	}
+	public declare X: number
 
-	public set X(value: number) {
-		this._fields.X = value
-	}
+	public declare In: inner
 
-	public get In(): inner {
-		return this._fields.In
-	}
-
-	public set In(value: inner) {
-		this._fields.In = value
-	}
-
-	public get P(): inner | $.VarRef<inner> | null {
-		return this._fields.P
-	}
-
-	public set P(value: inner | $.VarRef<inner> | null) {
-		this._fields.P = value
-	}
-
-	public _fields: {
-		X: number
-		In: inner
-		P: inner | $.VarRef<inner> | null
-	}
+	public declare P: inner | $.VarRef<inner> | null
 
 	constructor(init?: Partial<{X?: number, In?: inner, P?: inner | $.VarRef<inner> | null}>, __goscriptValue?: boolean) {
-		this._fields = {
-			X: init?.X ?? (0 as number),
-			In: init?.In ? init.In.clone() : new inner(undefined, true),
-			P: init?.P ?? (null! as inner | $.VarRef<inner> | null)
-		}
+		this.X = init?.X ?? (0 as number)
+		this.In = init?.In ? init.In.clone() : new inner(undefined, true)
+		this.P = init?.P ?? (null! as inner | $.VarRef<inner> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -100,12 +54,11 @@ export class outer {
 		return new outer(this, true)
 	}
 
-	public __goscriptAssign(source: outer): void {
-		const target = this._fields
-		const values = source._fields
-		target.X = values.X
-		$.assignStruct(target.In, values.In)
-		target.P = values.P
+	public __goscriptAssign(source: outer): this {
+		this.X = source.X
+		this.In.__goscriptAssign(source.In)
+		this.P = source.P
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

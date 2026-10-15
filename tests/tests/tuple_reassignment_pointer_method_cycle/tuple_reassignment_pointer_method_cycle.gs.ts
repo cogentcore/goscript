@@ -4,22 +4,10 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class box {
-	public get value(): number {
-		return this._fields.value
-	}
-
-	public set value(value: number) {
-		this._fields.value = value
-	}
-
-	public _fields: {
-		value: number
-	}
+	public declare value: number
 
 	constructor(init?: Partial<{value?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			value: init?.value ?? (0 as number)
-		}
+		this.value = init?.value ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -27,10 +15,9 @@ export class box {
 		return new box(this, true)
 	}
 
-	public __goscriptAssign(source: box): void {
-		const target = this._fields
-		const values = source._fields
-		target.value = values.value
+	public __goscriptAssign(source: box): this {
+		this.value = source.value
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -43,12 +30,7 @@ export class box {
 }
 
 export class cursor {
-	public _fields: {
-	}
-
 	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
-		this._fields = {
-		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -56,7 +38,8 @@ export class cursor {
 		return new cursor(this, true)
 	}
 
-	public __goscriptAssign(source: cursor): void {
+	public __goscriptAssign(source: cursor): this {
+		return this
 	}
 
 	public rotate(a: box | $.VarRef<box> | null, b: box | $.VarRef<box> | null, c: box | $.VarRef<box> | null): [box | $.VarRef<box> | null, box | $.VarRef<box> | null, box | $.VarRef<box> | null] {

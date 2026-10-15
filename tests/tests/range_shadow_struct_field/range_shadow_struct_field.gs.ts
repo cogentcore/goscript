@@ -4,22 +4,10 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class Match {
-	public get Size(): number {
-		return this._fields.Size
-	}
-
-	public set Size(value: number) {
-		this._fields.Size = value
-	}
-
-	public _fields: {
-		Size: number
-	}
+	public declare Size: number
 
 	constructor(init?: Partial<{Size?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Size: init?.Size ?? (0 as number)
-		}
+		this.Size = init?.Size ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -27,10 +15,9 @@ export class Match {
 		return new Match(this, true)
 	}
 
-	public __goscriptAssign(source: Match): void {
-		const target = this._fields
-		const values = source._fields
-		target.Size = values.Size
+	public __goscriptAssign(source: Match): this {
+		this.Size = source.Size
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -43,22 +30,10 @@ export class Match {
 }
 
 export class Matcher {
-	public get matches(): $.Slice<Match> {
-		return this._fields.matches
-	}
-
-	public set matches(value: $.Slice<Match>) {
-		this._fields.matches = value
-	}
-
-	public _fields: {
-		matches: $.Slice<Match>
-	}
+	public declare matches: $.Slice<Match>
 
 	constructor(init?: Partial<{matches?: $.Slice<Match>}>, __goscriptValue?: boolean) {
-		this._fields = {
-			matches: init?.matches ?? (null! as $.Slice<Match>)
-		}
+		this.matches = init?.matches ?? (null! as $.Slice<Match>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -66,10 +41,9 @@ export class Matcher {
 		return new Matcher(this, true)
 	}
 
-	public __goscriptAssign(source: Matcher): void {
-		const target = this._fields
-		const values = source._fields
-		target.matches = values.matches
+	public __goscriptAssign(source: Matcher): this {
+		this.matches = source.matches
+		return this
 	}
 
 	public Blocks(): $.Slice<Match> {

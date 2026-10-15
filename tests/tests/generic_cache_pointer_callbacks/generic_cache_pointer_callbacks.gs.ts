@@ -4,22 +4,10 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class cache {
-	public get stored(): any {
-		return this._fields.stored
-	}
-
-	public set stored(value: any) {
-		this._fields.stored = value
-	}
-
-	public _fields: {
-		stored: any
-	}
+	public declare stored: any
 
 	constructor(init?: Partial<{stored?: any}>, __goscriptValue?: boolean) {
-		this._fields = {
-			stored: init?.stored ?? (null! as any)
-		}
+		this.stored = init?.stored ?? (null! as any)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -27,10 +15,9 @@ export class cache {
 		return new cache(this, true)
 	}
 
-	public __goscriptAssign(source: cache): void {
-		const target = this._fields
-		const values = source._fields
-		target.stored = values.stored
+	public __goscriptAssign(source: cache): this {
+		this.stored = source.stored
+		return this
 	}
 
 	public async Get(__typeArgs: $.GenericTypeArgs | undefined, k: any, _new: (() => [any, $.GoError] | globalThis.Promise<[any, $.GoError]>) | null, check: ((_p0: any) => boolean | globalThis.Promise<boolean>) | null): globalThis.Promise<[any, $.GoError]> {
@@ -57,22 +44,10 @@ export class cache {
 }
 
 export class key {
-	public get N(): number {
-		return this._fields.N
-	}
-
-	public set N(value: number) {
-		this._fields.N = value
-	}
-
-	public _fields: {
-		N: number
-	}
+	public declare N: number
 
 	constructor(init?: Partial<{N?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			N: init?.N ?? (0 as number)
-		}
+		this.N = init?.N ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -80,10 +55,9 @@ export class key {
 		return new key(this, true)
 	}
 
-	public __goscriptAssign(source: key): void {
-		const target = this._fields
-		const values = source._fields
-		target.N = values.N
+	public __goscriptAssign(source: key): this {
+		this.N = source.N
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -96,22 +70,10 @@ export class key {
 }
 
 export class privateKey {
-	public get D(): number {
-		return this._fields.D
-	}
-
-	public set D(value: number) {
-		this._fields.D = value
-	}
-
-	public _fields: {
-		D: number
-	}
+	public declare D: number
 
 	constructor(init?: Partial<{D?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			D: init?.D ?? (0 as number)
-		}
+		this.D = init?.D ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -119,10 +81,9 @@ export class privateKey {
 		return new privateKey(this, true)
 	}
 
-	public __goscriptAssign(source: privateKey): void {
-		const target = this._fields
-		const values = source._fields
-		target.D = values.D
+	public __goscriptAssign(source: privateKey): this {
+		this.D = source.D
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

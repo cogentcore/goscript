@@ -4,12 +4,7 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class BigInt {
-	public _fields: {
-	}
-
 	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
-		this._fields = {
-		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -17,7 +12,8 @@ export class BigInt {
 		return new BigInt(this, true)
 	}
 
-	public __goscriptAssign(source: BigInt): void {
+	public __goscriptAssign(source: BigInt): this {
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

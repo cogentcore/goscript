@@ -4,42 +4,16 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class padded {
-	public get _blank0(): Uint8Array {
-		return this._fields._blank0
-	}
+	public declare _blank0: Uint8Array
 
-	public set _blank0(value: Uint8Array) {
-		this._fields._blank0 = value
-	}
+	public declare Value: number
 
-	public get Value(): number {
-		return this._fields.Value
-	}
-
-	public set Value(value: number) {
-		this._fields.Value = value
-	}
-
-	public get _blank2(): Uint8Array {
-		return this._fields._blank2
-	}
-
-	public set _blank2(value: Uint8Array) {
-		this._fields._blank2 = value
-	}
-
-	public _fields: {
-		_blank0: Uint8Array
-		Value: number
-		_blank2: Uint8Array
-	}
+	public declare _blank2: Uint8Array
 
 	constructor(init?: Partial<{_blank0?: Uint8Array, Value?: number, _blank2?: Uint8Array}>, __goscriptValue?: boolean) {
-		this._fields = {
-			_blank0: init?._blank0 !== undefined ? $.cloneArrayValue(init._blank0, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 2)) : $.arrayValue(new Uint8Array(2)),
-			Value: init?.Value ?? (0 as number),
-			_blank2: init?._blank2 !== undefined ? $.cloneArrayValue(init._blank2, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 3)) : $.arrayValue(new Uint8Array(3))
-		}
+		this._blank0 = init?._blank0 !== undefined ? $.cloneArrayValue(init._blank0, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 2)) : $.arrayValue(new Uint8Array(2))
+		this.Value = init?.Value ?? (0 as number)
+		this._blank2 = init?._blank2 !== undefined ? $.cloneArrayValue(init._blank2, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 3)) : $.arrayValue(new Uint8Array(3))
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -47,12 +21,11 @@ export class padded {
 		return new padded(this, true)
 	}
 
-	public __goscriptAssign(source: padded): void {
-		const target = this._fields
-		const values = source._fields
-		target._blank0 = $.assignFieldValue(target._blank0, values._blank0, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 2))
-		target.Value = values.Value
-		target._blank2 = $.assignFieldValue(target._blank2, values._blank2, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 3))
+	public __goscriptAssign(source: padded): this {
+		this._blank0 = $.assignFieldValue(this._blank0, source._blank0, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 2))
+		this.Value = source.Value
+		this._blank2 = $.assignFieldValue(this._blank2, source._blank2, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 3))
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

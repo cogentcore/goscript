@@ -8,22 +8,10 @@ export type ObjectIdentifier = $.Slice<number>
 $.registerNamedType("main.ObjectIdentifier", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")));
 
 export class RawValue {
-	public get Tag(): number {
-		return this._fields.Tag
-	}
-
-	public set Tag(value: number) {
-		this._fields.Tag = value
-	}
-
-	public _fields: {
-		Tag: number
-	}
+	public declare Tag: number
 
 	constructor(init?: Partial<{Tag?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Tag: init?.Tag ?? (0 as number)
-		}
+		this.Tag = init?.Tag ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -31,10 +19,9 @@ export class RawValue {
 		return new RawValue(this, true)
 	}
 
-	public __goscriptAssign(source: RawValue): void {
-		const target = this._fields
-		const values = source._fields
-		target.Tag = values.Tag
+	public __goscriptAssign(source: RawValue): this {
+		this.Tag = source.Tag
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

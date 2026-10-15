@@ -21,22 +21,10 @@ $.registerInterfaceType(
 );
 
 export class Node {
-	public get Name(): string {
-		return this._fields.Name
-	}
-
-	public set Name(value: string) {
-		this._fields.Name = value
-	}
-
-	public _fields: {
-		Name: string
-	}
+	public declare Name: string
 
 	constructor(init?: Partial<{Name?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Name: init?.Name ?? ("" as string)
-		}
+		this.Name = init?.Name ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -44,10 +32,9 @@ export class Node {
 		return new Node(this, true)
 	}
 
-	public __goscriptAssign(source: Node): void {
-		const target = this._fields
-		const values = source._fields
-		target.Name = values.Name
+	public __goscriptAssign(source: Node): this {
+		this.Name = source.Name
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -60,22 +47,10 @@ export class Node {
 }
 
 export class Box {
-	public get Value(): any {
-		return this._fields.Value
-	}
-
-	public set Value(value: any) {
-		this._fields.Value = value
-	}
-
-	public _fields: {
-		Value: any
-	}
+	public declare Value: any
 
 	constructor(init?: Partial<{Value?: any}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Value: init?.Value !== undefined ? $.copyElement(init.Value) : (null! as any)
-		}
+		this.Value = init?.Value !== undefined ? $.copyElement(init.Value) : (null! as any)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -83,10 +58,9 @@ export class Box {
 		return new Box(this, true)
 	}
 
-	public __goscriptAssign(source: Box): void {
-		const target = this._fields
-		const values = source._fields
-		target.Value = $.assignFieldValue(target.Value, values.Value, { kind: $.TypeKind.Interface, methods: [] })
+	public __goscriptAssign(source: Box): this {
+		this.Value = $.assignFieldValue(this.Value, source.Value, { kind: $.TypeKind.Interface, methods: [] })
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -100,22 +74,10 @@ export class Box {
 
 export function LocalType(): reflect.Type | null {
 	class local {
-		public get A(): number {
-			return this._fields.A
-		}
-
-		public set A(value: number) {
-			this._fields.A = value
-		}
-
-		public _fields: {
-			A: number
-		}
+		public declare A: number
 
 		constructor(init?: Partial<{A?: number}>, __goscriptValue?: boolean) {
-			this._fields = {
-				A: init?.A ?? (0 as number)
-			}
+			this.A = init?.A ?? (0 as number)
 			;(this as any)[$.structValueMarker] = __goscriptValue === true
 		}
 
@@ -123,10 +85,9 @@ export function LocalType(): reflect.Type | null {
 			return new local(this, true)
 		}
 
-		public __goscriptAssign(source: local): void {
-			const target = this._fields
-			const values = source._fields
-			target.A = values.A
+		public __goscriptAssign(source: local): this {
+			this.A = source.A
+			return this
 		}
 
 		static __typeInfo = $.registerStructType(

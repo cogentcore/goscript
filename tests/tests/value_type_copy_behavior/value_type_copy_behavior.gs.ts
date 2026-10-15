@@ -4,32 +4,13 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class MyStruct {
-	public get MyInt(): number {
-		return this._fields.MyInt
-	}
+	public declare MyInt: number
 
-	public set MyInt(value: number) {
-		this._fields.MyInt = value
-	}
-
-	public get MyString(): string {
-		return this._fields.MyString
-	}
-
-	public set MyString(value: string) {
-		this._fields.MyString = value
-	}
-
-	public _fields: {
-		MyInt: number
-		MyString: string
-	}
+	public declare MyString: string
 
 	constructor(init?: Partial<{MyInt?: number, MyString?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			MyInt: init?.MyInt ?? (0 as number),
-			MyString: init?.MyString ?? ("" as string)
-		}
+		this.MyInt = init?.MyInt ?? (0 as number)
+		this.MyString = init?.MyString ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -37,11 +18,10 @@ export class MyStruct {
 		return new MyStruct(this, true)
 	}
 
-	public __goscriptAssign(source: MyStruct): void {
-		const target = this._fields
-		const values = source._fields
-		target.MyInt = values.MyInt
-		target.MyString = values.MyString
+	public __goscriptAssign(source: MyStruct): this {
+		this.MyInt = source.MyInt
+		this.MyString = source.MyString
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -54,32 +34,13 @@ export class MyStruct {
 }
 
 export class NestedStruct {
-	public get Value(): number {
-		return this._fields.Value
-	}
+	public declare Value: number
 
-	public set Value(value: number) {
-		this._fields.Value = value
-	}
-
-	public get InnerStruct(): MyStruct {
-		return this._fields.InnerStruct
-	}
-
-	public set InnerStruct(value: MyStruct) {
-		this._fields.InnerStruct = value
-	}
-
-	public _fields: {
-		Value: number
-		InnerStruct: MyStruct
-	}
+	public declare InnerStruct: MyStruct
 
 	constructor(init?: Partial<{Value?: number, InnerStruct?: MyStruct}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Value: init?.Value ?? (0 as number),
-			InnerStruct: init?.InnerStruct ? init.InnerStruct.clone() : new MyStruct(undefined, true)
-		}
+		this.Value = init?.Value ?? (0 as number)
+		this.InnerStruct = init?.InnerStruct ? init.InnerStruct.clone() : new MyStruct(undefined, true)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -87,11 +48,10 @@ export class NestedStruct {
 		return new NestedStruct(this, true)
 	}
 
-	public __goscriptAssign(source: NestedStruct): void {
-		const target = this._fields
-		const values = source._fields
-		target.Value = values.Value
-		$.assignStruct(target.InnerStruct, values.InnerStruct)
+	public __goscriptAssign(source: NestedStruct): this {
+		this.Value = source.Value
+		this.InnerStruct.__goscriptAssign(source.InnerStruct)
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

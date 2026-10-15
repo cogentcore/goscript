@@ -7,22 +7,10 @@ import * as binary from "@goscript/encoding/binary/index.js"
 import "@goscript/encoding/binary/index.js"
 
 export class attrs {
-	public get packedData(): string {
-		return this._fields.packedData
-	}
-
-	public set packedData(value: string) {
-		this._fields.packedData = value
-	}
-
-	public _fields: {
-		packedData: string
-	}
+	public declare packedData: string
 
 	constructor(init?: Partial<{packedData?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			packedData: init?.packedData ?? ("" as string)
-		}
+		this.packedData = init?.packedData ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -30,10 +18,9 @@ export class attrs {
 		return new attrs(this, true)
 	}
 
-	public __goscriptAssign(source: attrs): void {
-		const target = this._fields
-		const values = source._fields
-		target.packedData = values.packedData
+	public __goscriptAssign(source: attrs): this {
+		this.packedData = source.packedData
+		return this
 	}
 
 	public decode(): $.Slice<string> {

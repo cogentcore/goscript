@@ -9,22 +9,10 @@ import "@goscript/github.com/s4wave/goscript/tests/tests/package_import_embedded
 $.registerTypePackagePath("github.com/s4wave/goscript/tests/tests/package_import_embedded_forwarder/dep/inner", ["inner.CoreStore"])
 
 export class CoreStore {
-	public get Prefix(): string {
-		return this._fields.Prefix
-	}
-
-	public set Prefix(value: string) {
-		this._fields.Prefix = value
-	}
-
-	public _fields: {
-		Prefix: string
-	}
+	public declare Prefix: string
 
 	constructor(init?: Partial<{Prefix?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Prefix: init?.Prefix ?? ("" as string)
-		}
+		this.Prefix = init?.Prefix ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -32,10 +20,9 @@ export class CoreStore {
 		return new CoreStore(this, true)
 	}
 
-	public __goscriptAssign(source: CoreStore): void {
-		const target = this._fields
-		const values = source._fields
-		target.Prefix = values.Prefix
+	public __goscriptAssign(source: CoreStore): this {
+		this.Prefix = source.Prefix
+		return this
 	}
 
 	public NewTransaction(write: boolean): tx.Tx | $.VarRef<tx.Tx> | null {

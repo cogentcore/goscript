@@ -7,32 +7,13 @@ import * as sync from "@goscript/sync/index.js"
 import "@goscript/sync/index.js"
 
 export class embeddedMutex {
-	public get Mutex(): sync.Mutex {
-		return this._fields.Mutex
-	}
+	public declare Mutex: sync.Mutex
 
-	public set Mutex(value: sync.Mutex) {
-		this._fields.Mutex = value
-	}
-
-	public get value(): number {
-		return this._fields.value
-	}
-
-	public set value(value: number) {
-		this._fields.value = value
-	}
-
-	public _fields: {
-		Mutex: sync.Mutex
-		value: number
-	}
+	public declare value: number
 
 	constructor(init?: Partial<{Mutex?: sync.Mutex, value?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Mutex: init?.Mutex ? $.markAsStructValue($.cloneStructValue(init.Mutex)) : $.markAsStructValue(new sync.Mutex()),
-			value: init?.value ?? (0 as number)
-		}
+		this.Mutex = init?.Mutex ? $.markAsStructValue($.cloneStructValue(init.Mutex)) : $.markAsStructValue(new sync.Mutex())
+		this.value = init?.value ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -40,11 +21,10 @@ export class embeddedMutex {
 		return new embeddedMutex(this, true)
 	}
 
-	public __goscriptAssign(source: embeddedMutex): void {
-		const target = this._fields
-		const values = source._fields
-		$.assignStruct(target.Mutex, values.Mutex)
-		target.value = values.value
+	public __goscriptAssign(source: embeddedMutex): this {
+		$.assignStruct(this.Mutex, source.Mutex)
+		this.value = source.value
+		return this
 	}
 
 	public Lock(): any {
@@ -69,32 +49,13 @@ export class embeddedMutex {
 }
 
 export class embeddedRWMutex {
-	public get RWMutex(): sync.RWMutex {
-		return this._fields.RWMutex
-	}
+	public declare RWMutex: sync.RWMutex
 
-	public set RWMutex(value: sync.RWMutex) {
-		this._fields.RWMutex = value
-	}
-
-	public get value(): number {
-		return this._fields.value
-	}
-
-	public set value(value: number) {
-		this._fields.value = value
-	}
-
-	public _fields: {
-		RWMutex: sync.RWMutex
-		value: number
-	}
+	public declare value: number
 
 	constructor(init?: Partial<{RWMutex?: sync.RWMutex, value?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			RWMutex: init?.RWMutex ? $.markAsStructValue($.cloneStructValue(init.RWMutex)) : $.markAsStructValue(new sync.RWMutex()),
-			value: init?.value ?? (0 as number)
-		}
+		this.RWMutex = init?.RWMutex ? $.markAsStructValue($.cloneStructValue(init.RWMutex)) : $.markAsStructValue(new sync.RWMutex())
+		this.value = init?.value ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -102,11 +63,10 @@ export class embeddedRWMutex {
 		return new embeddedRWMutex(this, true)
 	}
 
-	public __goscriptAssign(source: embeddedRWMutex): void {
-		const target = this._fields
-		const values = source._fields
-		$.assignStruct(target.RWMutex, values.RWMutex)
-		target.value = values.value
+	public __goscriptAssign(source: embeddedRWMutex): this {
+		$.assignStruct(this.RWMutex, source.RWMutex)
+		this.value = source.value
+		return this
 	}
 
 	public Lock(): any {
@@ -147,42 +107,16 @@ export class embeddedRWMutex {
 }
 
 export class queue {
-	public get Mu(): sync.Mutex {
-		return this._fields.Mu
-	}
+	public declare Mu: sync.Mutex
 
-	public set Mu(value: sync.Mutex) {
-		this._fields.Mu = value
-	}
+	public declare Cond: sync.Cond
 
-	public get Cond(): sync.Cond {
-		return this._fields.Cond
-	}
-
-	public set Cond(value: sync.Cond) {
-		this._fields.Cond = value
-	}
-
-	public get items(): $.Slice<number> {
-		return this._fields.items
-	}
-
-	public set items(value: $.Slice<number>) {
-		this._fields.items = value
-	}
-
-	public _fields: {
-		Mu: sync.Mutex
-		Cond: sync.Cond
-		items: $.Slice<number>
-	}
+	public declare items: $.Slice<number>
 
 	constructor(init?: Partial<{Mu?: sync.Mutex, Cond?: sync.Cond, items?: $.Slice<number>}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Mu: init?.Mu ? $.markAsStructValue($.cloneStructValue(init.Mu)) : $.markAsStructValue(new sync.Mutex()),
-			Cond: init?.Cond ? $.markAsStructValue($.cloneStructValue(init.Cond)) : $.markAsStructValue(new sync.Cond()),
-			items: init?.items ?? (null! as $.Slice<number>)
-		}
+		this.Mu = init?.Mu ? $.markAsStructValue($.cloneStructValue(init.Mu)) : $.markAsStructValue(new sync.Mutex())
+		this.Cond = init?.Cond ? $.markAsStructValue($.cloneStructValue(init.Cond)) : $.markAsStructValue(new sync.Cond())
+		this.items = init?.items ?? (null! as $.Slice<number>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -190,12 +124,11 @@ export class queue {
 		return new queue(this, true)
 	}
 
-	public __goscriptAssign(source: queue): void {
-		const target = this._fields
-		const values = source._fields
-		$.assignStruct(target.Mu, values.Mu)
-		$.assignStruct(target.Cond, values.Cond)
-		target.items = values.items
+	public __goscriptAssign(source: queue): this {
+		$.assignStruct(this.Mu, source.Mu)
+		$.assignStruct(this.Cond, source.Cond)
+		this.items = source.items
+		return this
 	}
 
 	public async lockAndInit(): globalThis.Promise<void> {
@@ -203,7 +136,7 @@ export class queue {
 		const q$: queue = q == null ? $.pointerTarget<queue>(q) : (q as any).__isVarRef === true ? (q as any).value : (q as any).__goValue === undefined ? (q as any) : $.pointerTarget<queue>(q)
 		await (q$ as queue).Mu.Lock()
 		if ((q$ as queue).Cond.L == null) {
-			;(q$ as queue).Cond.L = $.interfaceValue<sync.Locker | null>($.fieldRef((q$ as queue)._fields, "Mu"), "*sync.Mutex", /* @__PURE__ */ $.pointerType("sync.Mutex"))
+			;(q$ as queue).Cond.L = $.interfaceValue<sync.Locker | null>($.fieldRef((q$ as queue), "Mu"), "*sync.Mutex", /* @__PURE__ */ $.pointerType("sync.Mutex"))
 		}
 	}
 

@@ -4,32 +4,13 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class Pos {
-	public get Line(): number {
-		return this._fields.Line
-	}
+	public declare Line: number
 
-	public set Line(value: number) {
-		this._fields.Line = value
-	}
-
-	public get Char(): number {
-		return this._fields.Char
-	}
-
-	public set Char(value: number) {
-		this._fields.Char = value
-	}
-
-	public _fields: {
-		Line: number
-		Char: number
-	}
+	public declare Char: number
 
 	constructor(init?: Partial<{Line?: number, Char?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Line: init?.Line ?? (0 as number),
-			Char: init?.Char ?? (0 as number)
-		}
+		this.Line = init?.Line ?? (0 as number)
+		this.Char = init?.Char ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -37,11 +18,10 @@ export class Pos {
 		return new Pos(this, true)
 	}
 
-	public __goscriptAssign(source: Pos): void {
-		const target = this._fields
-		const values = source._fields
-		target.Line = values.Line
-		target.Char = values.Char
+	public __goscriptAssign(source: Pos): this {
+		this.Line = source.Line
+		this.Char = source.Char
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -54,32 +34,13 @@ export class Pos {
 }
 
 export class Key {
-	public get P(): Pos {
-		return this._fields.P
-	}
+	public declare P: Pos
 
-	public set P(value: Pos) {
-		this._fields.P = value
-	}
-
-	public get Name(): string {
-		return this._fields.Name
-	}
-
-	public set Name(value: string) {
-		this._fields.Name = value
-	}
-
-	public _fields: {
-		P: Pos
-		Name: string
-	}
+	public declare Name: string
 
 	constructor(init?: Partial<{P?: Pos, Name?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			P: init?.P ? init.P.clone() : new Pos(undefined, true),
-			Name: init?.Name ?? ("" as string)
-		}
+		this.P = init?.P ? init.P.clone() : new Pos(undefined, true)
+		this.Name = init?.Name ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -87,11 +48,10 @@ export class Key {
 		return new Key(this, true)
 	}
 
-	public __goscriptAssign(source: Key): void {
-		const target = this._fields
-		const values = source._fields
-		$.assignStruct(target.P, values.P)
-		target.Name = values.Name
+	public __goscriptAssign(source: Key): this {
+		this.P.__goscriptAssign(source.P)
+		this.Name = source.Name
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

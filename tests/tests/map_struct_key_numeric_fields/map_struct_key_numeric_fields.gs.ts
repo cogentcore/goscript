@@ -4,32 +4,13 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class Pos {
-	public get Ln(): number {
-		return this._fields.Ln
-	}
+	public declare Ln: number
 
-	public set Ln(value: number) {
-		this._fields.Ln = value
-	}
-
-	public get Ch(): number {
-		return this._fields.Ch
-	}
-
-	public set Ch(value: number) {
-		this._fields.Ch = value
-	}
-
-	public _fields: {
-		Ln: number
-		Ch: number
-	}
+	public declare Ch: number
 
 	constructor(init?: Partial<{Ln?: number, Ch?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Ln: init?.Ln ?? (0 as number),
-			Ch: init?.Ch ?? (0 as number)
-		}
+		this.Ln = init?.Ln ?? (0 as number)
+		this.Ch = init?.Ch ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -37,11 +18,10 @@ export class Pos {
 		return new Pos(this, true)
 	}
 
-	public __goscriptAssign(source: Pos): void {
-		const target = this._fields
-		const values = source._fields
-		target.Ln = values.Ln
-		target.Ch = values.Ch
+	public __goscriptAssign(source: Pos): this {
+		this.Ln = source.Ln
+		this.Ch = source.Ch
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -54,52 +34,19 @@ export class Pos {
 }
 
 export class Key {
-	public get Name(): string {
-		return this._fields.Name
-	}
+	public declare Name: string
 
-	public set Name(value: string) {
-		this._fields.Name = value
-	}
+	public declare At: Pos
 
-	public get At(): Pos {
-		return this._fields.At
-	}
+	public declare On: boolean
 
-	public set At(value: Pos) {
-		this._fields.At = value
-	}
-
-	public get On(): boolean {
-		return this._fields.On
-	}
-
-	public set On(value: boolean) {
-		this._fields.On = value
-	}
-
-	public get F(): number {
-		return this._fields.F
-	}
-
-	public set F(value: number) {
-		this._fields.F = value
-	}
-
-	public _fields: {
-		Name: string
-		At: Pos
-		On: boolean
-		F: number
-	}
+	public declare F: number
 
 	constructor(init?: Partial<{Name?: string, At?: Pos, On?: boolean, F?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Name: init?.Name ?? ("" as string),
-			At: init?.At ? init.At.clone() : new Pos(undefined, true),
-			On: init?.On ?? (false as boolean),
-			F: init?.F ?? (0 as number)
-		}
+		this.Name = init?.Name ?? ("" as string)
+		this.At = init?.At ? init.At.clone() : new Pos(undefined, true)
+		this.On = init?.On ?? (false as boolean)
+		this.F = init?.F ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -107,13 +54,12 @@ export class Key {
 		return new Key(this, true)
 	}
 
-	public __goscriptAssign(source: Key): void {
-		const target = this._fields
-		const values = source._fields
-		target.Name = values.Name
-		$.assignStruct(target.At, values.At)
-		target.On = values.On
-		target.F = values.F
+	public __goscriptAssign(source: Key): this {
+		this.Name = source.Name
+		this.At.__goscriptAssign(source.At)
+		this.On = source.On
+		this.F = source.F
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -126,22 +72,10 @@ export class Key {
 }
 
 export class Rule {
-	public get Name(): string {
-		return this._fields.Name
-	}
-
-	public set Name(value: string) {
-		this._fields.Name = value
-	}
-
-	public _fields: {
-		Name: string
-	}
+	public declare Name: string
 
 	constructor(init?: Partial<{Name?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Name: init?.Name ?? ("" as string)
-		}
+		this.Name = init?.Name ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -149,10 +83,9 @@ export class Rule {
 		return new Rule(this, true)
 	}
 
-	public __goscriptAssign(source: Rule): void {
-		const target = this._fields
-		const values = source._fields
-		target.Name = values.Name
+	public __goscriptAssign(source: Rule): this {
+		this.Name = source.Name
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -165,32 +98,13 @@ export class Rule {
 }
 
 export class ScopeRule {
-	public get Scope(): Pos {
-		return this._fields.Scope
-	}
+	public declare Scope: Pos
 
-	public set Scope(value: Pos) {
-		this._fields.Scope = value
-	}
-
-	public get Rule(): Rule | $.VarRef<Rule> | null {
-		return this._fields.Rule
-	}
-
-	public set Rule(value: Rule | $.VarRef<Rule> | null) {
-		this._fields.Rule = value
-	}
-
-	public _fields: {
-		Scope: Pos
-		Rule: Rule | $.VarRef<Rule> | null
-	}
+	public declare Rule: Rule | $.VarRef<Rule> | null
 
 	constructor(init?: Partial<{Scope?: Pos, Rule?: Rule | $.VarRef<Rule> | null}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Scope: init?.Scope ? init.Scope.clone() : new Pos(undefined, true),
-			Rule: init?.Rule ?? (null! as Rule | $.VarRef<Rule> | null)
-		}
+		this.Scope = init?.Scope ? init.Scope.clone() : new Pos(undefined, true)
+		this.Rule = init?.Rule ?? (null! as Rule | $.VarRef<Rule> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -198,11 +112,10 @@ export class ScopeRule {
 		return new ScopeRule(this, true)
 	}
 
-	public __goscriptAssign(source: ScopeRule): void {
-		const target = this._fields
-		const values = source._fields
-		$.assignStruct(target.Scope, values.Scope)
-		target.Rule = values.Rule
+	public __goscriptAssign(source: ScopeRule): this {
+		this.Scope.__goscriptAssign(source.Scope)
+		this.Rule = source.Rule
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

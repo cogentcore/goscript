@@ -16,12 +16,7 @@ $.registerInterfaceType(
 );
 
 export class impl {
-	public _fields: {
-	}
-
 	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
-		this._fields = {
-		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -29,7 +24,8 @@ export class impl {
 		return new impl(this, true)
 	}
 
-	public __goscriptAssign(source: impl): void {
+	public __goscriptAssign(source: impl): this {
+		return this
 	}
 
 	public Ping(): string {
@@ -46,22 +42,10 @@ export class impl {
 }
 
 export class Holder {
-	public get Hidden(): hidden | null {
-		return this._fields.Hidden
-	}
-
-	public set Hidden(value: hidden | null) {
-		this._fields.Hidden = value
-	}
-
-	public _fields: {
-		Hidden: hidden | null
-	}
+	public declare Hidden: hidden | null
 
 	constructor(init?: Partial<{Hidden?: hidden | null}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Hidden: init?.Hidden ?? (null! as hidden | null)
-		}
+		this.Hidden = init?.Hidden ?? (null! as hidden | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -69,10 +53,9 @@ export class Holder {
 		return new Holder(this, true)
 	}
 
-	public __goscriptAssign(source: Holder): void {
-		const target = this._fields
-		const values = source._fields
-		target.Hidden = $.assignFieldValue(target.Hidden, values.Hidden, "dep.hidden")
+	public __goscriptAssign(source: Holder): this {
+		this.Hidden = $.assignFieldValue(this.Hidden, source.Hidden, "dep.hidden")
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

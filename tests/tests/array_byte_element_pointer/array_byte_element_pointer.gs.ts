@@ -4,22 +4,10 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class bitset {
-	public get bits(): Uint8Array {
-		return this._fields.bits
-	}
-
-	public set bits(value: Uint8Array) {
-		this._fields.bits = value
-	}
-
-	public _fields: {
-		bits: Uint8Array
-	}
+	public declare bits: Uint8Array
 
 	constructor(init?: Partial<{bits?: Uint8Array}>, __goscriptValue?: boolean) {
-		this._fields = {
-			bits: init?.bits !== undefined ? $.cloneArrayValue(init.bits, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 4)) : $.arrayValue(new Uint8Array(4))
-		}
+		this.bits = init?.bits !== undefined ? $.cloneArrayValue(init.bits, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 4)) : $.arrayValue(new Uint8Array(4))
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -27,10 +15,9 @@ export class bitset {
 		return new bitset(this, true)
 	}
 
-	public __goscriptAssign(source: bitset): void {
-		const target = this._fields
-		const values = source._fields
-		target.bits = $.assignFieldValue(target.bits, values.bits, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 4))
+	public __goscriptAssign(source: bitset): this {
+		this.bits = $.assignFieldValue(this.bits, source.bits, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 4))
+		return this
 	}
 
 	public has(bit: number): boolean {

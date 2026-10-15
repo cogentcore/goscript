@@ -10,32 +10,13 @@ import "@goscript/encoding/json/index.js"
 import "@goscript/reflect/index.js"
 
 export class Node {
-	public get A(): number {
-		return this._fields.A
-	}
+	public declare A: number
 
-	public set A(value: number) {
-		this._fields.A = value
-	}
-
-	public get B(): string {
-		return this._fields.B
-	}
-
-	public set B(value: string) {
-		this._fields.B = value
-	}
-
-	public _fields: {
-		A: number
-		B: string
-	}
+	public declare B: string
 
 	constructor(init?: Partial<{A?: number, B?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			A: init?.A ?? (0 as number),
-			B: init?.B ?? ("" as string)
-		}
+		this.A = init?.A ?? (0 as number)
+		this.B = init?.B ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -43,11 +24,10 @@ export class Node {
 		return new Node(this, true)
 	}
 
-	public __goscriptAssign(source: Node): void {
-		const target = this._fields
-		const values = source._fields
-		target.A = values.A
-		target.B = values.B
+	public __goscriptAssign(source: Node): this {
+		this.A = source.A
+		this.B = source.B
+		return this
 	}
 
 	public MarshalJSON(): [$.Slice<number>, $.GoError] {

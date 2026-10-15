@@ -4,32 +4,13 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class Format {
-	public get Name(): string {
-		return this._fields.Name
-	}
+	public declare Name: string
 
-	public set Name(value: string) {
-		this._fields.Name = value
-	}
-
-	public get Ext(): $.Slice<string> {
-		return this._fields.Ext
-	}
-
-	public set Ext(value: $.Slice<string>) {
-		this._fields.Ext = value
-	}
-
-	public _fields: {
-		Name: string
-		Ext: $.Slice<string>
-	}
+	public declare Ext: $.Slice<string>
 
 	constructor(init?: Partial<{Name?: string, Ext?: $.Slice<string>}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Name: init?.Name ?? ("" as string),
-			Ext: init?.Ext ?? (null! as $.Slice<string>)
-		}
+		this.Name = init?.Name ?? ("" as string)
+		this.Ext = init?.Ext ?? (null! as $.Slice<string>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -37,11 +18,10 @@ export class Format {
 		return new Format(this, true)
 	}
 
-	public __goscriptAssign(source: Format): void {
-		const target = this._fields
-		const values = source._fields
-		target.Name = values.Name
-		target.Ext = values.Ext
+	public __goscriptAssign(source: Format): this {
+		this.Name = source.Name
+		this.Ext = source.Ext
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

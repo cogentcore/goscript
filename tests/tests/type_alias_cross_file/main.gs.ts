@@ -13,12 +13,7 @@ import "./alias.gs.ts"
 import "./iterator.gs.ts"
 
 export class source {
-	public _fields: {
-	}
-
 	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
-		this._fields = {
-		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -26,7 +21,8 @@ export class source {
 		return new source(this, true)
 	}
 
-	public __goscriptAssign(source: source): void {
+	public __goscriptAssign(source: source): this {
+		return this
 	}
 
 	public Val(): __goscript_alias.Value {

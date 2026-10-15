@@ -4,32 +4,13 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class vec {
-	public get X(): number {
-		return this._fields.X
-	}
+	public declare X: number
 
-	public set X(value: number) {
-		this._fields.X = value
-	}
-
-	public get Y(): number {
-		return this._fields.Y
-	}
-
-	public set Y(value: number) {
-		this._fields.Y = value
-	}
-
-	public _fields: {
-		X: number
-		Y: number
-	}
+	public declare Y: number
 
 	constructor(init?: Partial<{X?: number, Y?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			X: init?.X ?? (0 as number),
-			Y: init?.Y ?? (0 as number)
-		}
+		this.X = init?.X ?? (0 as number)
+		this.Y = init?.Y ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -37,11 +18,10 @@ export class vec {
 		return new vec(this, true)
 	}
 
-	public __goscriptAssign(source: vec): void {
-		const target = this._fields
-		const values = source._fields
-		target.X = values.X
-		target.Y = values.Y
+	public __goscriptAssign(source: vec): this {
+		this.X = source.X
+		this.Y = source.Y
+		return this
 	}
 
 	public Bump(): number {
@@ -91,22 +71,10 @@ export class vec {
 }
 
 export class holder {
-	public get v(): vec {
-		return this._fields.v
-	}
-
-	public set v(value: vec) {
-		this._fields.v = value
-	}
-
-	public _fields: {
-		v: vec
-	}
+	public declare v: vec
 
 	constructor(init?: Partial<{v?: vec}>, __goscriptValue?: boolean) {
-		this._fields = {
-			v: init?.v ? init.v.clone() : new vec(undefined, true)
-		}
+		this.v = init?.v ? init.v.clone() : new vec(undefined, true)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -114,10 +82,9 @@ export class holder {
 		return new holder(this, true)
 	}
 
-	public __goscriptAssign(source: holder): void {
-		const target = this._fields
-		const values = source._fields
-		$.assignStruct(target.v, values.v)
+	public __goscriptAssign(source: holder): this {
+		this.v.__goscriptAssign(source.v)
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

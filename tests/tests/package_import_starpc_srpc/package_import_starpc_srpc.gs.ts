@@ -28,12 +28,7 @@ import "@goscript/github.com/aperturerobotics/starpc/srpc/index.js"
 import "@goscript/github.com/aperturerobotics/protobuf-go-lite/index.js"
 
 export class handler {
-	public _fields: {
-	}
-
 	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
-		this._fields = {
-		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -41,7 +36,8 @@ export class handler {
 		return new handler(this, true)
 	}
 
-	public __goscriptAssign(source: handler): void {
+	public __goscriptAssign(source: handler): this {
+		return this
 	}
 
 	public GetMethodIDs(): $.Slice<string> {
@@ -87,22 +83,10 @@ export class handler {
 }
 
 export class embeddedStream {
-	public get Stream(): srpc.Stream | null {
-		return this._fields.Stream
-	}
-
-	public set Stream(value: srpc.Stream | null) {
-		this._fields.Stream = value
-	}
-
-	public _fields: {
-		Stream: srpc.Stream | null
-	}
+	public declare Stream: srpc.Stream | null
 
 	constructor(init?: Partial<{Stream?: srpc.Stream | null}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Stream: init?.Stream ?? (null! as srpc.Stream | null)
-		}
+		this.Stream = init?.Stream ?? (null! as srpc.Stream | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -110,10 +94,9 @@ export class embeddedStream {
 		return new embeddedStream(this, true)
 	}
 
-	public __goscriptAssign(source: embeddedStream): void {
-		const target = this._fields
-		const values = source._fields
-		target.Stream = $.assignFieldValue(target.Stream, values.Stream, "srpc.Stream")
+	public __goscriptAssign(source: embeddedStream): this {
+		this.Stream = $.assignFieldValue(this.Stream, source.Stream, "srpc.Stream")
+		return this
 	}
 
 	public async Close(): globalThis.Promise<any> {
@@ -146,32 +129,13 @@ export class embeddedStream {
 }
 
 export class streamOpenResult {
-	public get stream(): srpc.Stream | null {
-		return this._fields.stream
-	}
+	public declare stream: srpc.Stream | null
 
-	public set stream(value: srpc.Stream | null) {
-		this._fields.stream = value
-	}
-
-	public get err(): $.GoError {
-		return this._fields.err
-	}
-
-	public set err(value: $.GoError) {
-		this._fields.err = value
-	}
-
-	public _fields: {
-		stream: srpc.Stream | null
-		err: $.GoError
-	}
+	public declare err: $.GoError
 
 	constructor(init?: Partial<{stream?: srpc.Stream | null, err?: $.GoError}>, __goscriptValue?: boolean) {
-		this._fields = {
-			stream: init?.stream ?? (null! as srpc.Stream | null),
-			err: init?.err ?? (null! as $.GoError)
-		}
+		this.stream = init?.stream ?? (null! as srpc.Stream | null)
+		this.err = init?.err ?? (null! as $.GoError)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -179,11 +143,10 @@ export class streamOpenResult {
 		return new streamOpenResult(this, true)
 	}
 
-	public __goscriptAssign(source: streamOpenResult): void {
-		const target = this._fields
-		const values = source._fields
-		target.stream = $.assignFieldValue(target.stream, values.stream, "srpc.Stream")
-		target.err = $.assignFieldValue(target.err, values.err, "error")
+	public __goscriptAssign(source: streamOpenResult): this {
+		this.stream = $.assignFieldValue(this.stream, source.stream, "srpc.Stream")
+		this.err = $.assignFieldValue(this.err, source.err, "error")
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -196,32 +159,13 @@ export class streamOpenResult {
 }
 
 export class streamProbeResult {
-	public get total(): number {
-		return this._fields.total
-	}
+	public declare total: number
 
-	public set total(value: number) {
-		this._fields.total = value
-	}
-
-	public get err(): string {
-		return this._fields.err
-	}
-
-	public set err(value: string) {
-		this._fields.err = value
-	}
-
-	public _fields: {
-		total: number
-		err: string
-	}
+	public declare err: string
 
 	constructor(init?: Partial<{total?: number, err?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			total: init?.total ?? (0 as number),
-			err: init?.err ?? ("" as string)
-		}
+		this.total = init?.total ?? (0 as number)
+		this.err = init?.err ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -229,11 +173,10 @@ export class streamProbeResult {
 		return new streamProbeResult(this, true)
 	}
 
-	public __goscriptAssign(source: streamProbeResult): void {
-		const target = this._fields
-		const values = source._fields
-		target.total = values.total
-		target.err = values.err
+	public __goscriptAssign(source: streamProbeResult): this {
+		this.total = source.total
+		this.err = source.err
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -246,22 +189,10 @@ export class streamProbeResult {
 }
 
 export class rpcStreamServerResult {
-	public get err(): string {
-		return this._fields.err
-	}
-
-	public set err(value: string) {
-		this._fields.err = value
-	}
-
-	public _fields: {
-		err: string
-	}
+	public declare err: string
 
 	constructor(init?: Partial<{err?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			err: init?.err ?? ("" as string)
-		}
+		this.err = init?.err ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -269,10 +200,9 @@ export class rpcStreamServerResult {
 		return new rpcStreamServerResult(this, true)
 	}
 
-	public __goscriptAssign(source: rpcStreamServerResult): void {
-		const target = this._fields
-		const values = source._fields
-		target.err = values.err
+	public __goscriptAssign(source: rpcStreamServerResult): this {
+		this.err = source.err
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -285,72 +215,25 @@ export class rpcStreamServerResult {
 }
 
 export class memoryRpcStream {
-	public get ctx(): context.Context | null {
-		return this._fields.ctx
-	}
+	public declare ctx: context.Context | null
 
-	public set ctx(value: context.Context | null) {
-		this._fields.ctx = value
-	}
+	public declare cancel: (() => void) | null
 
-	public get cancel(): (() => void) | null {
-		return this._fields.cancel
-	}
+	public declare recv: $.Channel<rpcstream.RpcStreamPacket | $.VarRef<rpcstream.RpcStreamPacket> | null> | null
 
-	public set cancel(value: (() => void) | null) {
-		this._fields.cancel = value
-	}
+	public declare send: $.Channel<rpcstream.RpcStreamPacket | $.VarRef<rpcstream.RpcStreamPacket> | null> | null
 
-	public get recv(): $.Channel<rpcstream.RpcStreamPacket | $.VarRef<rpcstream.RpcStreamPacket> | null> | null {
-		return this._fields.recv
-	}
+	public declare closeSend: sync.Once
 
-	public set recv(value: $.Channel<rpcstream.RpcStreamPacket | $.VarRef<rpcstream.RpcStreamPacket> | null> | null) {
-		this._fields.recv = value
-	}
-
-	public get send(): $.Channel<rpcstream.RpcStreamPacket | $.VarRef<rpcstream.RpcStreamPacket> | null> | null {
-		return this._fields.send
-	}
-
-	public set send(value: $.Channel<rpcstream.RpcStreamPacket | $.VarRef<rpcstream.RpcStreamPacket> | null> | null) {
-		this._fields.send = value
-	}
-
-	public get closeSend(): sync.Once {
-		return this._fields.closeSend
-	}
-
-	public set closeSend(value: sync.Once) {
-		this._fields.closeSend = value
-	}
-
-	public get cancelLocal(): sync.Once {
-		return this._fields.cancelLocal
-	}
-
-	public set cancelLocal(value: sync.Once) {
-		this._fields.cancelLocal = value
-	}
-
-	public _fields: {
-		ctx: context.Context | null
-		cancel: (() => void) | null
-		recv: $.Channel<rpcstream.RpcStreamPacket | $.VarRef<rpcstream.RpcStreamPacket> | null> | null
-		send: $.Channel<rpcstream.RpcStreamPacket | $.VarRef<rpcstream.RpcStreamPacket> | null> | null
-		closeSend: sync.Once
-		cancelLocal: sync.Once
-	}
+	public declare cancelLocal: sync.Once
 
 	constructor(init?: Partial<{ctx?: context.Context | null, cancel?: (() => void) | null, recv?: $.Channel<rpcstream.RpcStreamPacket | $.VarRef<rpcstream.RpcStreamPacket> | null> | null, send?: $.Channel<rpcstream.RpcStreamPacket | $.VarRef<rpcstream.RpcStreamPacket> | null> | null, closeSend?: sync.Once, cancelLocal?: sync.Once}>, __goscriptValue?: boolean) {
-		this._fields = {
-			ctx: init?.ctx ?? (null! as context.Context | null),
-			cancel: init?.cancel ?? (null! as (() => void) | null),
-			recv: init?.recv ?? (null! as $.Channel<rpcstream.RpcStreamPacket | $.VarRef<rpcstream.RpcStreamPacket> | null> | null),
-			send: init?.send ?? (null! as $.Channel<rpcstream.RpcStreamPacket | $.VarRef<rpcstream.RpcStreamPacket> | null> | null),
-			closeSend: init?.closeSend ? $.markAsStructValue($.cloneStructValue(init.closeSend)) : $.markAsStructValue(new sync.Once()),
-			cancelLocal: init?.cancelLocal ? $.markAsStructValue($.cloneStructValue(init.cancelLocal)) : $.markAsStructValue(new sync.Once())
-		}
+		this.ctx = init?.ctx ?? (null! as context.Context | null)
+		this.cancel = init?.cancel ?? (null! as (() => void) | null)
+		this.recv = init?.recv ?? (null! as $.Channel<rpcstream.RpcStreamPacket | $.VarRef<rpcstream.RpcStreamPacket> | null> | null)
+		this.send = init?.send ?? (null! as $.Channel<rpcstream.RpcStreamPacket | $.VarRef<rpcstream.RpcStreamPacket> | null> | null)
+		this.closeSend = init?.closeSend ? $.markAsStructValue($.cloneStructValue(init.closeSend)) : $.markAsStructValue(new sync.Once())
+		this.cancelLocal = init?.cancelLocal ? $.markAsStructValue($.cloneStructValue(init.cancelLocal)) : $.markAsStructValue(new sync.Once())
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -358,15 +241,14 @@ export class memoryRpcStream {
 		return new memoryRpcStream(this, true)
 	}
 
-	public __goscriptAssign(source: memoryRpcStream): void {
-		const target = this._fields
-		const values = source._fields
-		target.ctx = $.assignFieldValue(target.ctx, values.ctx, "context.Context")
-		target.cancel = values.cancel
-		target.recv = values.recv
-		target.send = values.send
-		$.assignStruct(target.closeSend, values.closeSend)
-		$.assignStruct(target.cancelLocal, values.cancelLocal)
+	public __goscriptAssign(source: memoryRpcStream): this {
+		this.ctx = $.assignFieldValue(this.ctx, source.ctx, "context.Context")
+		this.cancel = source.cancel
+		this.recv = source.recv
+		this.send = source.send
+		$.assignStruct(this.closeSend, source.closeSend)
+		$.assignStruct(this.cancelLocal, source.cancelLocal)
+		return this
 	}
 
 	public async Close(): globalThis.Promise<$.GoError> {
@@ -494,32 +376,13 @@ export class memoryRpcStream {
 }
 
 export class memoryRpcContext {
-	public get done(): $.Channel<{}> | null {
-		return this._fields.done
-	}
+	public declare done: $.Channel<{}> | null
 
-	public set done(value: $.Channel<{}> | null) {
-		this._fields.done = value
-	}
-
-	public get once(): sync.Once {
-		return this._fields.once
-	}
-
-	public set once(value: sync.Once) {
-		this._fields.once = value
-	}
-
-	public _fields: {
-		done: $.Channel<{}> | null
-		once: sync.Once
-	}
+	public declare once: sync.Once
 
 	constructor(init?: Partial<{done?: $.Channel<{}> | null, once?: sync.Once}>, __goscriptValue?: boolean) {
-		this._fields = {
-			done: init?.done ?? (null! as $.Channel<{}> | null),
-			once: init?.once ? $.markAsStructValue($.cloneStructValue(init.once)) : $.markAsStructValue(new sync.Once())
-		}
+		this.done = init?.done ?? (null! as $.Channel<{}> | null)
+		this.once = init?.once ? $.markAsStructValue($.cloneStructValue(init.once)) : $.markAsStructValue(new sync.Once())
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -527,11 +390,10 @@ export class memoryRpcContext {
 		return new memoryRpcContext(this, true)
 	}
 
-	public __goscriptAssign(source: memoryRpcContext): void {
-		const target = this._fields
-		const values = source._fields
-		target.done = values.done
-		$.assignStruct(target.once, values.once)
+	public __goscriptAssign(source: memoryRpcContext): this {
+		this.done = source.done
+		$.assignStruct(this.once, source.once)
+		return this
 	}
 
 	public Deadline(): [time.Time, boolean] {

@@ -7,12 +7,7 @@ import * as __goscript_consts from "./consts.gs.ts"
 import "./consts.gs.ts"
 
 export class thing {
-	public _fields: {
-	}
-
 	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
-		this._fields = {
-		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -20,7 +15,8 @@ export class thing {
 		return new thing(this, true)
 	}
 
-	public __goscriptAssign(source: thing): void {
+	public __goscriptAssign(source: thing): this {
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

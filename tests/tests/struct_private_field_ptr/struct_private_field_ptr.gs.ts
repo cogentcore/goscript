@@ -4,22 +4,10 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class MyStruct {
-	public get myPrivate(): $.VarRef<number> | null {
-		return this._fields.myPrivate
-	}
-
-	public set myPrivate(value: $.VarRef<number> | null) {
-		this._fields.myPrivate = value
-	}
-
-	public _fields: {
-		myPrivate: $.VarRef<number> | null
-	}
+	public declare myPrivate: $.VarRef<number> | null
 
 	constructor(init?: Partial<{myPrivate?: $.VarRef<number> | null}>, __goscriptValue?: boolean) {
-		this._fields = {
-			myPrivate: init?.myPrivate ?? (null! as $.VarRef<number> | null)
-		}
+		this.myPrivate = init?.myPrivate ?? (null! as $.VarRef<number> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -27,10 +15,9 @@ export class MyStruct {
 		return new MyStruct(this, true)
 	}
 
-	public __goscriptAssign(source: MyStruct): void {
-		const target = this._fields
-		const values = source._fields
-		target.myPrivate = values.myPrivate
+	public __goscriptAssign(source: MyStruct): this {
+		this.myPrivate = source.myPrivate
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

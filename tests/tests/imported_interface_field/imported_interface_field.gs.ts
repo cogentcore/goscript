@@ -7,22 +7,10 @@ import * as io from "@goscript/io/index.js"
 import "@goscript/io/index.js"
 
 export class holder {
-	public get w(): io.Writer | null {
-		return this._fields.w
-	}
-
-	public set w(value: io.Writer | null) {
-		this._fields.w = value
-	}
-
-	public _fields: {
-		w: io.Writer | null
-	}
+	public declare w: io.Writer | null
 
 	constructor(init?: Partial<{w?: io.Writer | null}>, __goscriptValue?: boolean) {
-		this._fields = {
-			w: init?.w ?? (null! as io.Writer | null)
-		}
+		this.w = init?.w ?? (null! as io.Writer | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -30,10 +18,9 @@ export class holder {
 		return new holder(this, true)
 	}
 
-	public __goscriptAssign(source: holder): void {
-		const target = this._fields
-		const values = source._fields
-		target.w = $.assignFieldValue(target.w, values.w, "io.Writer")
+	public __goscriptAssign(source: holder): this {
+		this.w = $.assignFieldValue(this.w, source.w, "io.Writer")
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

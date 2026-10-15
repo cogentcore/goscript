@@ -4,22 +4,10 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class descriptor {
-	public get Label(): string {
-		return this._fields.Label
-	}
-
-	public set Label(value: string) {
-		this._fields.Label = value
-	}
-
-	public _fields: {
-		Label: string
-	}
+	public declare Label: string
 
 	constructor(init?: Partial<{Label?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Label: init?.Label ?? ("" as string)
-		}
+		this.Label = init?.Label ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -27,10 +15,9 @@ export class descriptor {
 		return new descriptor(this, true)
 	}
 
-	public __goscriptAssign(source: descriptor): void {
-		const target = this._fields
-		const values = source._fields
-		target.Label = values.Label
+	public __goscriptAssign(source: descriptor): this {
+		this.Label = source.Label
+		return this
 	}
 
 	public toJS(): any {

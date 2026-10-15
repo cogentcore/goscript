@@ -4,22 +4,10 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class box {
-	public get Value(): any {
-		return this._fields.Value
-	}
-
-	public set Value(value: any) {
-		this._fields.Value = value
-	}
-
-	public _fields: {
-		Value: any
-	}
+	public declare Value: any
 
 	constructor(init?: Partial<{Value?: any}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Value: init?.Value !== undefined ? $.copyElement(init.Value) : (null! as any)
-		}
+		this.Value = init?.Value !== undefined ? $.copyElement(init.Value) : (null! as any)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -27,10 +15,9 @@ export class box {
 		return new box(this, true)
 	}
 
-	public __goscriptAssign(source: box): void {
-		const target = this._fields
-		const values = source._fields
-		target.Value = $.assignFieldValue(target.Value, values.Value, { kind: $.TypeKind.Interface, methods: [] })
+	public __goscriptAssign(source: box): this {
+		this.Value = $.assignFieldValue(this.Value, source.Value, { kind: $.TypeKind.Interface, methods: [] })
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -43,22 +30,10 @@ export class box {
 }
 
 export class point {
-	public get X(): number {
-		return this._fields.X
-	}
-
-	public set X(value: number) {
-		this._fields.X = value
-	}
-
-	public _fields: {
-		X: number
-	}
+	public declare X: number
 
 	constructor(init?: Partial<{X?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			X: init?.X ?? (0 as number)
-		}
+		this.X = init?.X ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -66,10 +41,9 @@ export class point {
 		return new point(this, true)
 	}
 
-	public __goscriptAssign(source: point): void {
-		const target = this._fields
-		const values = source._fields
-		target.X = values.X
+	public __goscriptAssign(source: point): this {
+		this.X = source.X
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

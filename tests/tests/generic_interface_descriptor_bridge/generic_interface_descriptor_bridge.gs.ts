@@ -29,12 +29,7 @@ $.registerInterfaceType(
 );
 
 export class genericBox {
-	public _fields: {
-	}
-
 	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
-		this._fields = {
-		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -42,7 +37,8 @@ export class genericBox {
 		return new genericBox(this, true)
 	}
 
-	public __goscriptAssign(source: genericBox): void {
+	public __goscriptAssign(source: genericBox): this {
+		return this
 	}
 
 	public async Count(__typeArgs: $.GenericTypeArgs | undefined, ctx: context.Context | null, values: $.Slice<any>): globalThis.Promise<number> {
@@ -65,22 +61,10 @@ export class genericBox {
 }
 
 export class intBox {
-	public get id(): number {
-		return this._fields.id
-	}
-
-	public set id(value: number) {
-		this._fields.id = value
-	}
-
-	public _fields: {
-		id: number
-	}
+	public declare id: number
 
 	constructor(init?: Partial<{id?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			id: init?.id ?? (0 as number)
-		}
+		this.id = init?.id ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -88,10 +72,9 @@ export class intBox {
 		return new intBox(this, true)
 	}
 
-	public __goscriptAssign(source: intBox): void {
-		const target = this._fields
-		const values = source._fields
-		target.id = values.id
+	public __goscriptAssign(source: intBox): this {
+		this.id = source.id
+		return this
 	}
 
 	public async Count(ctx: context.Context | null, values: $.Slice<number>): globalThis.Promise<number> {

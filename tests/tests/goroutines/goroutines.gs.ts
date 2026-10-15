@@ -4,32 +4,13 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class Message {
-	public get priority(): number {
-		return this._fields.priority
-	}
+	public declare priority: number
 
-	public set priority(value: number) {
-		this._fields.priority = value
-	}
-
-	public get text(): string {
-		return this._fields.text
-	}
-
-	public set text(value: string) {
-		this._fields.text = value
-	}
-
-	public _fields: {
-		priority: number
-		text: string
-	}
+	public declare text: string
 
 	constructor(init?: Partial<{priority?: number, text?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			priority: init?.priority ?? (0 as number),
-			text: init?.text ?? ("" as string)
-		}
+		this.priority = init?.priority ?? (0 as number)
+		this.text = init?.text ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -37,11 +18,10 @@ export class Message {
 		return new Message(this, true)
 	}
 
-	public __goscriptAssign(source: Message): void {
-		const target = this._fields
-		const values = source._fields
-		target.priority = values.priority
-		target.text = values.text
+	public __goscriptAssign(source: Message): this {
+		this.priority = source.priority
+		this.text = source.text
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -110,9 +90,9 @@ export async function main(): globalThis.Promise<void> {
 		for (let j = i + 1; j < __goscriptRangeWindow0.length; j++) {
 			if (((__goscriptRangeWindow0.backing as any[])[__goscriptRangeWindow0.offset + i] as Message).priority > ((__goscriptRangeWindow0.backing as any[])[$.windowSlot(__goscriptRangeWindow0, j)] as Message).priority) {
 				let __goscriptAssign0_0: Message = (((__goscriptRangeWindow0.backing as any[])[$.windowSlot(__goscriptRangeWindow0, j)] as Message)).clone()
-				let __goscriptAssign0_1: Message = (((__goscriptRangeWindow0.backing as any[])[__goscriptRangeWindow0.offset + i] as Message)).clone()
-				$.assignStruct((__goscriptRangeWindow0.backing as any[])[__goscriptRangeWindow0.offset + i], __goscriptAssign0_0)
-				$.assignStruct((__goscriptRangeWindow0.backing as any[])[$.windowSlot(__goscriptRangeWindow0, j)], __goscriptAssign0_1)
+				let __goscriptAssign0_1: Message = (((__goscriptRangeWindow0.backing as any[])[__goscriptRangeWindow0.offset + i] as Message)).clone();
+				;(__goscriptRangeWindow0.backing as any[])[__goscriptRangeWindow0.offset + i].__goscriptAssign(__goscriptAssign0_0);
+				;(__goscriptRangeWindow0.backing as any[])[$.windowSlot(__goscriptRangeWindow0, j)].__goscriptAssign(__goscriptAssign0_1)
 			}
 		}
 	}

@@ -10,22 +10,10 @@ import "@goscript/reflect/index.js"
 import "@goscript/strings/index.js"
 
 export class Inner {
-	public get X(): number {
-		return this._fields.X
-	}
-
-	public set X(value: number) {
-		this._fields.X = value
-	}
-
-	public _fields: {
-		X: number
-	}
+	public declare X: number
 
 	constructor(init?: Partial<{X?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			X: init?.X ?? (0 as number)
-		}
+		this.X = init?.X ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -33,10 +21,9 @@ export class Inner {
 		return new Inner(this, true)
 	}
 
-	public __goscriptAssign(source: Inner): void {
-		const target = this._fields
-		const values = source._fields
-		target.X = values.X
+	public __goscriptAssign(source: Inner): this {
+		this.X = source.X
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -49,42 +36,16 @@ export class Inner {
 }
 
 export class arg {
-	public get Name(): string {
-		return this._fields.Name
-	}
+	public declare Name: string
 
-	public set Name(value: string) {
-		this._fields.Name = value
-	}
+	public declare Value: any
 
-	public get Value(): any {
-		return this._fields.Value
-	}
-
-	public set Value(value: any) {
-		this._fields.Value = value
-	}
-
-	public get Tag(): reflect.StructTag {
-		return this._fields.Tag
-	}
-
-	public set Tag(value: reflect.StructTag) {
-		this._fields.Tag = value
-	}
-
-	public _fields: {
-		Name: string
-		Value: any
-		Tag: reflect.StructTag
-	}
+	public declare Tag: reflect.StructTag
 
 	constructor(init?: Partial<{Name?: string, Value?: any, Tag?: reflect.StructTag}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Name: init?.Name ?? ("" as string),
-			Value: init?.Value ?? (null! as any),
-			Tag: init?.Tag ?? ("" as reflect.StructTag)
-		}
+		this.Name = init?.Name ?? ("" as string)
+		this.Value = init?.Value ?? (null! as any)
+		this.Tag = init?.Tag ?? ("" as reflect.StructTag)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -92,12 +53,11 @@ export class arg {
 		return new arg(this, true)
 	}
 
-	public __goscriptAssign(source: arg): void {
-		const target = this._fields
-		const values = source._fields
-		target.Name = values.Name
-		target.Value = $.assignFieldValue(target.Value, values.Value, { kind: $.TypeKind.Interface, methods: [] })
-		target.Tag = values.Tag
+	public __goscriptAssign(source: arg): this {
+		this.Name = source.Name
+		this.Value = $.assignFieldValue(this.Value, source.Value, { kind: $.TypeKind.Interface, methods: [] })
+		this.Tag = source.Tag
+		return this
 	}
 
 	public label(): string {
@@ -115,32 +75,13 @@ export class arg {
 }
 
 export class Outer {
-	public get Inner(): Inner {
-		return this._fields.Inner
-	}
+	public declare Inner: Inner
 
-	public set Inner(value: Inner) {
-		this._fields.Inner = value
-	}
-
-	public get Name(): string {
-		return this._fields.Name
-	}
-
-	public set Name(value: string) {
-		this._fields.Name = value
-	}
-
-	public _fields: {
-		Inner: Inner
-		Name: string
-	}
+	public declare Name: string
 
 	constructor(init?: Partial<{Inner?: Inner, Name?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Inner: init?.Inner ? init.Inner.clone() : new Inner(undefined, true),
-			Name: init?.Name ?? ("" as string)
-		}
+		this.Inner = init?.Inner ? init.Inner.clone() : new Inner(undefined, true)
+		this.Name = init?.Name ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -148,11 +89,10 @@ export class Outer {
 		return new Outer(this, true)
 	}
 
-	public __goscriptAssign(source: Outer): void {
-		const target = this._fields
-		const values = source._fields
-		$.assignStruct(target.Inner, values.Inner)
-		target.Name = values.Name
+	public __goscriptAssign(source: Outer): this {
+		this.Inner.__goscriptAssign(source.Inner)
+		this.Name = source.Name
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

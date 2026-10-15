@@ -4,12 +4,7 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class embedded {
-	public _fields: {
-	}
-
 	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
-		this._fields = {
-		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -17,7 +12,8 @@ export class embedded {
 		return new embedded(this, true)
 	}
 
-	public __goscriptAssign(source: embedded): void {
+	public __goscriptAssign(source: embedded): this {
+		return this
 	}
 
 	public Database(): string {
@@ -34,32 +30,13 @@ export class embedded {
 }
 
 export class holder {
-	public get Database(): string {
-		return this._fields.Database
-	}
+	public declare Database: string
 
-	public set Database(value: string) {
-		this._fields.Database = value
-	}
-
-	public get embedded(): embedded {
-		return this._fields.embedded
-	}
-
-	public set embedded(value: embedded) {
-		this._fields.embedded = value
-	}
-
-	public _fields: {
-		Database: string
-		embedded: embedded
-	}
+	public declare embedded: embedded
 
 	constructor(init?: Partial<{Database?: string, embedded?: embedded}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Database: init?.Database ?? ("" as string),
-			embedded: init?.embedded ? init.embedded.clone() : new embedded(undefined, true)
-		}
+		this.Database = init?.Database ?? ("" as string)
+		this.embedded = init?.embedded ? init.embedded.clone() : new embedded(undefined, true)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -67,11 +44,10 @@ export class holder {
 		return new holder(this, true)
 	}
 
-	public __goscriptAssign(source: holder): void {
-		const target = this._fields
-		const values = source._fields
-		target.Database = values.Database
-		$.assignStruct(target.embedded, values.embedded)
+	public __goscriptAssign(source: holder): this {
+		this.Database = source.Database
+		this.embedded.__goscriptAssign(source.embedded)
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

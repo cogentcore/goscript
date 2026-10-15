@@ -7,52 +7,19 @@ import * as unsafe from "@goscript/unsafe/index.js"
 import "@goscript/unsafe/index.js"
 
 export class Data {
-	public get A(): number {
-		return this._fields.A
-	}
+	public declare A: number
 
-	public set A(value: number) {
-		this._fields.A = value
-	}
+	public declare B: number
 
-	public get B(): number {
-		return this._fields.B
-	}
+	public declare C: number
 
-	public set B(value: number) {
-		this._fields.B = value
-	}
-
-	public get C(): number {
-		return this._fields.C
-	}
-
-	public set C(value: number) {
-		this._fields.C = value
-	}
-
-	public get D(): number {
-		return this._fields.D
-	}
-
-	public set D(value: number) {
-		this._fields.D = value
-	}
-
-	public _fields: {
-		A: number
-		B: number
-		C: number
-		D: number
-	}
+	public declare D: number
 
 	constructor(init?: Partial<{A?: number, B?: number, C?: number, D?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			A: init?.A ?? (0 as number),
-			B: init?.B ?? (0 as number),
-			C: init?.C ?? (0 as number),
-			D: init?.D ?? (0 as number)
-		}
+		this.A = init?.A ?? (0 as number)
+		this.B = init?.B ?? (0 as number)
+		this.C = init?.C ?? (0 as number)
+		this.D = init?.D ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -60,13 +27,12 @@ export class Data {
 		return new Data(this, true)
 	}
 
-	public __goscriptAssign(source: Data): void {
-		const target = this._fields
-		const values = source._fields
-		target.A = values.A
-		target.B = values.B
-		target.C = values.C
-		target.D = values.D
+	public __goscriptAssign(source: Data): this {
+		this.A = source.A
+		this.B = source.B
+		this.C = source.C
+		this.D = source.D
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -79,42 +45,16 @@ export class Data {
 }
 
 export class Mixed {
-	public get Flag(): boolean {
-		return this._fields.Flag
-	}
+	public declare Flag: boolean
 
-	public set Flag(value: boolean) {
-		this._fields.Flag = value
-	}
+	public declare N: number
 
-	public get N(): number {
-		return this._fields.N
-	}
-
-	public set N(value: number) {
-		this._fields.N = value
-	}
-
-	public get V(): number[] {
-		return this._fields.V
-	}
-
-	public set V(value: number[]) {
-		this._fields.V = value
-	}
-
-	public _fields: {
-		Flag: boolean
-		N: number
-		V: number[]
-	}
+	public declare V: number[]
 
 	constructor(init?: Partial<{Flag?: boolean, N?: number, V?: number[]}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Flag: init?.Flag ?? (false as boolean),
-			N: init?.N ?? (0 as number),
-			V: init?.V !== undefined ? $.cloneArrayValue(init.V, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 3)) : $.arrayValue(globalThis.Array.from({ length: 3 }, () => 0), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 3))
-		}
+		this.Flag = init?.Flag ?? (false as boolean)
+		this.N = init?.N ?? (0 as number)
+		this.V = init?.V !== undefined ? $.cloneArrayValue(init.V, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 3)) : $.arrayValue(globalThis.Array.from({ length: 3 }, () => 0), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 3))
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -122,12 +62,11 @@ export class Mixed {
 		return new Mixed(this, true)
 	}
 
-	public __goscriptAssign(source: Mixed): void {
-		const target = this._fields
-		const values = source._fields
-		target.Flag = values.Flag
-		target.N = values.N
-		target.V = $.assignFieldValue(target.V, values.V, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 3))
+	public __goscriptAssign(source: Mixed): this {
+		this.Flag = source.Flag
+		this.N = source.N
+		this.V = $.assignFieldValue(this.V, source.V, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 3))
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

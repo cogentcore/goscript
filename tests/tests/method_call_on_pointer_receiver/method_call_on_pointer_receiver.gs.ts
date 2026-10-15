@@ -4,32 +4,13 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class MyStruct {
-	public get MyInt(): number {
-		return this._fields.MyInt
-	}
+	public declare MyInt: number
 
-	public set MyInt(value: number) {
-		this._fields.MyInt = value
-	}
-
-	public get MyString(): string {
-		return this._fields.MyString
-	}
-
-	public set MyString(value: string) {
-		this._fields.MyString = value
-	}
-
-	public _fields: {
-		MyInt: number
-		MyString: string
-	}
+	public declare MyString: string
 
 	constructor(init?: Partial<{MyInt?: number, MyString?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			MyInt: init?.MyInt ?? (0 as number),
-			MyString: init?.MyString ?? ("" as string)
-		}
+		this.MyInt = init?.MyInt ?? (0 as number)
+		this.MyString = init?.MyString ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -37,11 +18,10 @@ export class MyStruct {
 		return new MyStruct(this, true)
 	}
 
-	public __goscriptAssign(source: MyStruct): void {
-		const target = this._fields
-		const values = source._fields
-		target.MyInt = values.MyInt
-		target.MyString = values.MyString
+	public __goscriptAssign(source: MyStruct): this {
+		this.MyInt = source.MyInt
+		this.MyString = source.MyString
+		return this
 	}
 
 	public GetMyString(): string {
@@ -59,22 +39,10 @@ export class MyStruct {
 }
 
 export class setterStruct {
-	public get value(): number {
-		return this._fields.value
-	}
-
-	public set value(value: number) {
-		this._fields.value = value
-	}
-
-	public _fields: {
-		value: number
-	}
+	public declare value: number
 
 	constructor(init?: Partial<{value?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			value: init?.value ?? (0 as number)
-		}
+		this.value = init?.value ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -82,10 +50,9 @@ export class setterStruct {
 		return new setterStruct(this, true)
 	}
 
-	public __goscriptAssign(source: setterStruct): void {
-		const target = this._fields
-		const values = source._fields
-		target.value = values.value
+	public __goscriptAssign(source: setterStruct): this {
+		this.value = source.value
+		return this
 	}
 
 	public ["get"](): number {
@@ -108,22 +75,10 @@ export class setterStruct {
 }
 
 export class digest {
-	public get writes(): number {
-		return this._fields.writes
-	}
-
-	public set writes(value: number) {
-		this._fields.writes = value
-	}
-
-	public _fields: {
-		writes: number
-	}
+	public declare writes: number
 
 	constructor(init?: Partial<{writes?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			writes: init?.writes ?? (0 as number)
-		}
+		this.writes = init?.writes ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -131,10 +86,9 @@ export class digest {
 		return new digest(this, true)
 	}
 
-	public __goscriptAssign(source: digest): void {
-		const target = this._fields
-		const values = source._fields
-		target.writes = values.writes
+	public __goscriptAssign(source: digest): this {
+		this.writes = source.writes
+		return this
 	}
 
 	public Write(p: $.Slice<number>): void {

@@ -7,22 +7,10 @@ import * as _unique from "@goscript/unique/index.js"
 import "@goscript/unique/index.js"
 
 export class zone {
-	public get name(): string {
-		return this._fields.name
-	}
-
-	public set name(value: string) {
-		this._fields.name = value
-	}
-
-	public _fields: {
-		name: string
-	}
+	public declare name: string
 
 	constructor(init?: Partial<{name?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			name: init?.name ?? ("" as string)
-		}
+		this.name = init?.name ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -30,10 +18,9 @@ export class zone {
 		return new zone(this, true)
 	}
 
-	public __goscriptAssign(source: zone): void {
-		const target = this._fields
-		const values = source._fields
-		target.name = values.name
+	public __goscriptAssign(source: zone): this {
+		this.name = source.name
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

@@ -4,22 +4,10 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class T {
-	public get val(): number {
-		return this._fields.val
-	}
-
-	public set val(value: number) {
-		this._fields.val = value
-	}
-
-	public _fields: {
-		val: number
-	}
+	public declare val: number
 
 	constructor(init?: Partial<{val?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			val: init?.val ?? (0 as number)
-		}
+		this.val = init?.val ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -27,10 +15,9 @@ export class T {
 		return new T(this, true)
 	}
 
-	public __goscriptAssign(source: T): void {
-		const target = this._fields
-		const values = source._fields
-		target.val = values.val
+	public __goscriptAssign(source: T): this {
+		this.val = source.val
+		return this
 	}
 
 	public WithDelta(delta: number): T | $.VarRef<T> | null {

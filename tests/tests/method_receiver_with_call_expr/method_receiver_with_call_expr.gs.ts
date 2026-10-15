@@ -4,32 +4,13 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class State {
-	public get value(): number {
-		return this._fields.value
-	}
+	public declare value: number
 
-	public set value(value: number) {
-		this._fields.value = value
-	}
-
-	public get index(): $.VarRef<number> | null {
-		return this._fields.index
-	}
-
-	public set index(value: $.VarRef<number> | null) {
-		this._fields.index = value
-	}
-
-	public _fields: {
-		value: number
-		index: $.VarRef<number> | null
-	}
+	public declare index: $.VarRef<number> | null
 
 	constructor(init?: Partial<{value?: number, index?: $.VarRef<number> | null}>, __goscriptValue?: boolean) {
-		this._fields = {
-			value: init?.value ?? (0 as number),
-			index: init?.index ?? (null! as $.VarRef<number> | null)
-		}
+		this.value = init?.value ?? (0 as number)
+		this.index = init?.index ?? (null! as $.VarRef<number> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -37,11 +18,10 @@ export class State {
 		return new State(this, true)
 	}
 
-	public __goscriptAssign(source: State): void {
-		const target = this._fields
-		const values = source._fields
-		target.value = values.value
-		target.index = values.index
+	public __goscriptAssign(source: State): this {
+		this.value = source.value
+		this.index = source.index
+		return this
 	}
 
 	public async Process(): globalThis.Promise<void> {

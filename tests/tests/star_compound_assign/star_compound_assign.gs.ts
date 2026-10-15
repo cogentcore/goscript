@@ -4,22 +4,10 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class holder {
-	public get values(): $.VarRef<$.Slice<number>> | null {
-		return this._fields.values
-	}
-
-	public set values(value: $.VarRef<$.Slice<number>> | null) {
-		this._fields.values = value
-	}
-
-	public _fields: {
-		values: $.VarRef<$.Slice<number>> | null
-	}
+	public declare values: $.VarRef<$.Slice<number>> | null
 
 	constructor(init?: Partial<{values?: $.VarRef<$.Slice<number>> | null}>, __goscriptValue?: boolean) {
-		this._fields = {
-			values: init?.values ?? (null! as $.VarRef<$.Slice<number>> | null)
-		}
+		this.values = init?.values ?? (null! as $.VarRef<$.Slice<number>> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -27,10 +15,9 @@ export class holder {
 		return new holder(this, true)
 	}
 
-	public __goscriptAssign(source: holder): void {
-		const target = this._fields
-		const values = source._fields
-		target.values = values.values
+	public __goscriptAssign(source: holder): this {
+		this.values = source.values
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

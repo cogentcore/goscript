@@ -24,32 +24,13 @@ $.registerInterfaceType(
 );
 
 export class VerboseStore {
-	public get BaseStore(): dep.BaseStore | $.VarRef<dep.BaseStore> | null {
-		return this._fields.BaseStore
-	}
+	public declare BaseStore: dep.BaseStore | $.VarRef<dep.BaseStore> | null
 
-	public set BaseStore(value: dep.BaseStore | $.VarRef<dep.BaseStore> | null) {
-		this._fields.BaseStore = value
-	}
-
-	public get name(): string {
-		return this._fields.name
-	}
-
-	public set name(value: string) {
-		this._fields.name = value
-	}
-
-	public _fields: {
-		BaseStore: dep.BaseStore | $.VarRef<dep.BaseStore> | null
-		name: string
-	}
+	public declare name: string
 
 	constructor(init?: Partial<{BaseStore?: dep.BaseStore | $.VarRef<dep.BaseStore> | null, name?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			BaseStore: init?.BaseStore ?? (null! as dep.BaseStore | $.VarRef<dep.BaseStore> | null),
-			name: init?.name ?? ("" as string)
-		}
+		this.BaseStore = init?.BaseStore ?? (null! as dep.BaseStore | $.VarRef<dep.BaseStore> | null)
+		this.name = init?.name ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -57,11 +38,10 @@ export class VerboseStore {
 		return new VerboseStore(this, true)
 	}
 
-	public __goscriptAssign(source: VerboseStore): void {
-		const target = this._fields
-		const values = source._fields
-		target.BaseStore = values.BaseStore
-		target.name = values.name
+	public __goscriptAssign(source: VerboseStore): this {
+		this.BaseStore = source.BaseStore
+		this.name = source.name
+		return this
 	}
 
 	public Execute(): string {

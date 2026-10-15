@@ -14,12 +14,7 @@ $.registerInterfaceType(
 );
 
 export class Base {
-	public _fields: {
-	}
-
 	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
-		this._fields = {
-		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -27,7 +22,8 @@ export class Base {
 		return new Base(this, true)
 	}
 
-	public __goscriptAssign(source: Base): void {
+	public __goscriptAssign(source: Base): this {
+		return this
 	}
 
 	public String(): string {
@@ -44,12 +40,7 @@ export class Base {
 }
 
 export class Derived {
-	public _fields: {
-	}
-
 	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
-		this._fields = {
-		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -57,7 +48,8 @@ export class Derived {
 		return new Derived(this, true)
 	}
 
-	public __goscriptAssign(source: Derived): void {
+	public __goscriptAssign(source: Derived): this {
+		return this
 	}
 
 	public Own(): string {

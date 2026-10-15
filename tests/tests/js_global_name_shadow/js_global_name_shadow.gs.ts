@@ -8,22 +8,10 @@ export type Family = number
 export type Number = number
 
 export class Promise {
-	public get value(): string {
-		return this._fields.value
-	}
-
-	public set value(value: string) {
-		this._fields.value = value
-	}
-
-	public _fields: {
-		value: string
-	}
+	public declare value: string
 
 	constructor(init?: Partial<{value?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			value: init?.value ?? ("" as string)
-		}
+		this.value = init?.value ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -31,10 +19,9 @@ export class Promise {
 		return new Promise(this, true)
 	}
 
-	public __goscriptAssign(source: Promise): void {
-		const target = this._fields
-		const values = source._fields
-		target.value = values.value
+	public __goscriptAssign(source: Promise): this {
+		this.value = source.value
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -47,32 +34,13 @@ export class Promise {
 }
 
 export class point {
-	public get x(): number {
-		return this._fields.x
-	}
+	public declare x: number
 
-	public set x(value: number) {
-		this._fields.x = value
-	}
-
-	public get y(): number {
-		return this._fields.y
-	}
-
-	public set y(value: number) {
-		this._fields.y = value
-	}
-
-	public _fields: {
-		x: number
-		y: number
-	}
+	public declare y: number
 
 	constructor(init?: Partial<{x?: number, y?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			x: init?.x ?? (0 as number),
-			y: init?.y ?? (0 as number)
-		}
+		this.x = init?.x ?? (0 as number)
+		this.y = init?.y ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -80,11 +48,10 @@ export class point {
 		return new point(this, true)
 	}
 
-	public __goscriptAssign(source: point): void {
-		const target = this._fields
-		const values = source._fields
-		target.x = values.x
-		target.y = values.y
+	public __goscriptAssign(source: point): this {
+		this.x = source.x
+		this.y = source.y
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

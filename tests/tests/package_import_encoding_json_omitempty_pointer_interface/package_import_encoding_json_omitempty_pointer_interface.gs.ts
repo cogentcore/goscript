@@ -13,92 +13,31 @@ import "@goscript/fmt/index.js"
 import "@goscript/strings/index.js"
 
 export class Payload {
-	public get Ptr(): $.VarRef<number> | null {
-		return this._fields.Ptr
-	}
+	public declare Ptr: $.VarRef<number> | null
 
-	public set Ptr(value: $.VarRef<number> | null) {
-		this._fields.Ptr = value
-	}
+	public declare IfaceZero: any
 
-	public get IfaceZero(): any {
-		return this._fields.IfaceZero
-	}
+	public declare IfaceFalse: any
 
-	public set IfaceZero(value: any) {
-		this._fields.IfaceZero = value
-	}
+	public declare IfaceEmptyString: any
 
-	public get IfaceFalse(): any {
-		return this._fields.IfaceFalse
-	}
+	public declare IfaceEmptySlice: any
 
-	public set IfaceFalse(value: any) {
-		this._fields.IfaceFalse = value
-	}
+	public declare IfaceEmptyMap: any
 
-	public get IfaceEmptyString(): any {
-		return this._fields.IfaceEmptyString
-	}
+	public declare PtrNilIface: $.VarRef<any> | null
 
-	public set IfaceEmptyString(value: any) {
-		this._fields.IfaceEmptyString = value
-	}
-
-	public get IfaceEmptySlice(): any {
-		return this._fields.IfaceEmptySlice
-	}
-
-	public set IfaceEmptySlice(value: any) {
-		this._fields.IfaceEmptySlice = value
-	}
-
-	public get IfaceEmptyMap(): any {
-		return this._fields.IfaceEmptyMap
-	}
-
-	public set IfaceEmptyMap(value: any) {
-		this._fields.IfaceEmptyMap = value
-	}
-
-	public get PtrNilIface(): $.VarRef<any> | null {
-		return this._fields.PtrNilIface
-	}
-
-	public set PtrNilIface(value: $.VarRef<any> | null) {
-		this._fields.PtrNilIface = value
-	}
-
-	public get PtrBool(): $.VarRef<boolean> | null {
-		return this._fields.PtrBool
-	}
-
-	public set PtrBool(value: $.VarRef<boolean> | null) {
-		this._fields.PtrBool = value
-	}
-
-	public _fields: {
-		Ptr: $.VarRef<number> | null
-		IfaceZero: any
-		IfaceFalse: any
-		IfaceEmptyString: any
-		IfaceEmptySlice: any
-		IfaceEmptyMap: any
-		PtrNilIface: $.VarRef<any> | null
-		PtrBool: $.VarRef<boolean> | null
-	}
+	public declare PtrBool: $.VarRef<boolean> | null
 
 	constructor(init?: Partial<{Ptr?: $.VarRef<number> | null, IfaceZero?: any, IfaceFalse?: any, IfaceEmptyString?: any, IfaceEmptySlice?: any, IfaceEmptyMap?: any, PtrNilIface?: $.VarRef<any> | null, PtrBool?: $.VarRef<boolean> | null}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Ptr: init?.Ptr ?? (null! as $.VarRef<number> | null),
-			IfaceZero: init?.IfaceZero ?? (null! as any),
-			IfaceFalse: init?.IfaceFalse ?? (null! as any),
-			IfaceEmptyString: init?.IfaceEmptyString ?? (null! as any),
-			IfaceEmptySlice: init?.IfaceEmptySlice ?? (null! as any),
-			IfaceEmptyMap: init?.IfaceEmptyMap ?? (null! as any),
-			PtrNilIface: init?.PtrNilIface ?? (null! as $.VarRef<any> | null),
-			PtrBool: init?.PtrBool ?? (null! as $.VarRef<boolean> | null)
-		}
+		this.Ptr = init?.Ptr ?? (null! as $.VarRef<number> | null)
+		this.IfaceZero = init?.IfaceZero ?? (null! as any)
+		this.IfaceFalse = init?.IfaceFalse ?? (null! as any)
+		this.IfaceEmptyString = init?.IfaceEmptyString ?? (null! as any)
+		this.IfaceEmptySlice = init?.IfaceEmptySlice ?? (null! as any)
+		this.IfaceEmptyMap = init?.IfaceEmptyMap ?? (null! as any)
+		this.PtrNilIface = init?.PtrNilIface ?? (null! as $.VarRef<any> | null)
+		this.PtrBool = init?.PtrBool ?? (null! as $.VarRef<boolean> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -106,17 +45,16 @@ export class Payload {
 		return new Payload(this, true)
 	}
 
-	public __goscriptAssign(source: Payload): void {
-		const target = this._fields
-		const values = source._fields
-		target.Ptr = values.Ptr
-		target.IfaceZero = $.assignFieldValue(target.IfaceZero, values.IfaceZero, { kind: $.TypeKind.Interface, methods: [] })
-		target.IfaceFalse = $.assignFieldValue(target.IfaceFalse, values.IfaceFalse, { kind: $.TypeKind.Interface, methods: [] })
-		target.IfaceEmptyString = $.assignFieldValue(target.IfaceEmptyString, values.IfaceEmptyString, { kind: $.TypeKind.Interface, methods: [] })
-		target.IfaceEmptySlice = $.assignFieldValue(target.IfaceEmptySlice, values.IfaceEmptySlice, { kind: $.TypeKind.Interface, methods: [] })
-		target.IfaceEmptyMap = $.assignFieldValue(target.IfaceEmptyMap, values.IfaceEmptyMap, { kind: $.TypeKind.Interface, methods: [] })
-		target.PtrNilIface = values.PtrNilIface
-		target.PtrBool = values.PtrBool
+	public __goscriptAssign(source: Payload): this {
+		this.Ptr = source.Ptr
+		this.IfaceZero = $.assignFieldValue(this.IfaceZero, source.IfaceZero, { kind: $.TypeKind.Interface, methods: [] })
+		this.IfaceFalse = $.assignFieldValue(this.IfaceFalse, source.IfaceFalse, { kind: $.TypeKind.Interface, methods: [] })
+		this.IfaceEmptyString = $.assignFieldValue(this.IfaceEmptyString, source.IfaceEmptyString, { kind: $.TypeKind.Interface, methods: [] })
+		this.IfaceEmptySlice = $.assignFieldValue(this.IfaceEmptySlice, source.IfaceEmptySlice, { kind: $.TypeKind.Interface, methods: [] })
+		this.IfaceEmptyMap = $.assignFieldValue(this.IfaceEmptyMap, source.IfaceEmptyMap, { kind: $.TypeKind.Interface, methods: [] })
+		this.PtrNilIface = source.PtrNilIface
+		this.PtrBool = source.PtrBool
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

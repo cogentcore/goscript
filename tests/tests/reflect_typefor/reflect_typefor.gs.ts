@@ -53,32 +53,13 @@ $.registerInterfaceType(
 );
 
 export class MyStruct {
-	public get Name(): string {
-		return this._fields.Name
-	}
+	public declare Name: string
 
-	public set Name(value: string) {
-		this._fields.Name = value
-	}
-
-	public get Age(): number {
-		return this._fields.Age
-	}
-
-	public set Age(value: number) {
-		this._fields.Age = value
-	}
-
-	public _fields: {
-		Name: string
-		Age: number
-	}
+	public declare Age: number
 
 	constructor(init?: Partial<{Name?: string, Age?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Name: init?.Name ?? ("" as string),
-			Age: init?.Age ?? (0 as number)
-		}
+		this.Name = init?.Name ?? ("" as string)
+		this.Age = init?.Age ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -86,11 +67,10 @@ export class MyStruct {
 		return new MyStruct(this, true)
 	}
 
-	public __goscriptAssign(source: MyStruct): void {
-		const target = this._fields
-		const values = source._fields
-		target.Name = values.Name
-		target.Age = values.Age
+	public __goscriptAssign(source: MyStruct): this {
+		this.Name = source.Name
+		this.Age = source.Age
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -103,12 +83,7 @@ export class MyStruct {
 }
 
 export class myErr {
-	public _fields: {
-	}
-
 	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
-		this._fields = {
-		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -116,7 +91,8 @@ export class myErr {
 		return new myErr(this, true)
 	}
 
-	public __goscriptAssign(source: myErr): void {
+	public __goscriptAssign(source: myErr): this {
+		return this
 	}
 
 	public Error(): string {

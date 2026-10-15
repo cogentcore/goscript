@@ -14,22 +14,10 @@ $.registerInterfaceType(
 );
 
 export class stream {
-	public get name(): string {
-		return this._fields.name
-	}
-
-	public set name(value: string) {
-		this._fields.name = value
-	}
-
-	public _fields: {
-		name: string
-	}
+	public declare name: string
 
 	constructor(init?: Partial<{name?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			name: init?.name ?? ("" as string)
-		}
+		this.name = init?.name ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -37,10 +25,9 @@ export class stream {
 		return new stream(this, true)
 	}
 
-	public __goscriptAssign(source: stream): void {
-		const target = this._fields
-		const values = source._fields
-		target.name = values.name
+	public __goscriptAssign(source: stream): this {
+		this.name = source.name
+		return this
 	}
 
 	public Close(): string {
@@ -58,22 +45,10 @@ export class stream {
 }
 
 export class stopStream {
-	public get stream(): stream {
-		return this._fields.stream
-	}
-
-	public set stream(value: stream) {
-		this._fields.stream = value
-	}
-
-	public _fields: {
-		stream: stream
-	}
+	public declare stream: stream
 
 	constructor(init?: Partial<{stream?: stream}>, __goscriptValue?: boolean) {
-		this._fields = {
-			stream: init?.stream ? init.stream.clone() : new stream(undefined, true)
-		}
+		this.stream = init?.stream ? init.stream.clone() : new stream(undefined, true)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -81,10 +56,9 @@ export class stopStream {
 		return new stopStream(this, true)
 	}
 
-	public __goscriptAssign(source: stopStream): void {
-		const target = this._fields
-		const values = source._fields
-		$.assignStruct(target.stream, values.stream)
+	public __goscriptAssign(source: stopStream): this {
+		this.stream.__goscriptAssign(source.stream)
+		return this
 	}
 
 	public Close(): any {
@@ -101,22 +75,10 @@ export class stopStream {
 }
 
 export class pointerStopStream {
-	public get stream(): stream | $.VarRef<stream> | null {
-		return this._fields.stream
-	}
-
-	public set stream(value: stream | $.VarRef<stream> | null) {
-		this._fields.stream = value
-	}
-
-	public _fields: {
-		stream: stream | $.VarRef<stream> | null
-	}
+	public declare stream: stream | $.VarRef<stream> | null
 
 	constructor(init?: Partial<{stream?: stream | $.VarRef<stream> | null}>, __goscriptValue?: boolean) {
-		this._fields = {
-			stream: init?.stream ?? (null! as stream | $.VarRef<stream> | null)
-		}
+		this.stream = init?.stream ?? (null! as stream | $.VarRef<stream> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -124,10 +86,9 @@ export class pointerStopStream {
 		return new pointerStopStream(this, true)
 	}
 
-	public __goscriptAssign(source: pointerStopStream): void {
-		const target = this._fields
-		const values = source._fields
-		target.stream = values.stream
+	public __goscriptAssign(source: pointerStopStream): this {
+		this.stream = source.stream
+		return this
 	}
 
 	public Close(): any {

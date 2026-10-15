@@ -4,52 +4,19 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class multiplyCase {
-	public get x(): number {
-		return this._fields.x
-	}
+	public declare x: number
 
-	public set x(value: number) {
-		this._fields.x = value
-	}
+	public declare y: number
 
-	public get y(): number {
-		return this._fields.y
-	}
+	public declare unsigned: number
 
-	public set y(value: number) {
-		this._fields.y = value
-	}
-
-	public get unsigned(): number {
-		return this._fields.unsigned
-	}
-
-	public set unsigned(value: number) {
-		this._fields.unsigned = value
-	}
-
-	public get signed(): number {
-		return this._fields.signed
-	}
-
-	public set signed(value: number) {
-		this._fields.signed = value
-	}
-
-	public _fields: {
-		x: number
-		y: number
-		unsigned: number
-		signed: number
-	}
+	public declare signed: number
 
 	constructor(init?: Partial<{x?: number, y?: number, unsigned?: number, signed?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			x: init?.x ?? (0 as number),
-			y: init?.y ?? (0 as number),
-			unsigned: init?.unsigned ?? (0 as number),
-			signed: init?.signed ?? (0 as number)
-		}
+		this.x = init?.x ?? (0 as number)
+		this.y = init?.y ?? (0 as number)
+		this.unsigned = init?.unsigned ?? (0 as number)
+		this.signed = init?.signed ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -57,13 +24,12 @@ export class multiplyCase {
 		return new multiplyCase(this, true)
 	}
 
-	public __goscriptAssign(source: multiplyCase): void {
-		const target = this._fields
-		const values = source._fields
-		target.x = values.x
-		target.y = values.y
-		target.unsigned = values.unsigned
-		target.signed = values.signed
+	public __goscriptAssign(source: multiplyCase): this {
+		this.x = source.x
+		this.y = source.y
+		this.unsigned = source.unsigned
+		this.signed = source.signed
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

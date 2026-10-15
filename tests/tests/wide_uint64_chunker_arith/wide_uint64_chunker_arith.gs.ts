@@ -7,22 +7,10 @@ import * as io from "@goscript/io/index.js"
 import "@goscript/io/index.js"
 
 export class chunker {
-	public get pos(): bigint {
-		return this._fields.pos
-	}
-
-	public set pos(value: bigint) {
-		this._fields.pos = value
-	}
-
-	public _fields: {
-		pos: bigint
-	}
+	public declare pos: bigint
 
 	constructor(init?: Partial<{pos?: bigint}>, __goscriptValue?: boolean) {
-		this._fields = {
-			pos: init?.pos ?? (0n as bigint)
-		}
+		this.pos = init?.pos ?? (0n as bigint)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -30,10 +18,9 @@ export class chunker {
 		return new chunker(this, true)
 	}
 
-	public __goscriptAssign(source: chunker): void {
-		const target = this._fields
-		const values = source._fields
-		target.pos = values.pos
+	public __goscriptAssign(source: chunker): this {
+		this.pos = source.pos
+		return this
 	}
 
 	public advance(chunkSize: number): void {
@@ -52,22 +39,10 @@ export class chunker {
 }
 
 export class repeatReader {
-	public get remaining(): number {
-		return this._fields.remaining
-	}
-
-	public set remaining(value: number) {
-		this._fields.remaining = value
-	}
-
-	public _fields: {
-		remaining: number
-	}
+	public declare remaining: number
 
 	constructor(init?: Partial<{remaining?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			remaining: init?.remaining ?? (0 as number)
-		}
+		this.remaining = init?.remaining ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -75,10 +50,9 @@ export class repeatReader {
 		return new repeatReader(this, true)
 	}
 
-	public __goscriptAssign(source: repeatReader): void {
-		const target = this._fields
-		const values = source._fields
-		target.remaining = values.remaining
+	public __goscriptAssign(source: repeatReader): this {
+		this.remaining = source.remaining
+		return this
 	}
 
 	public Read(p: $.Slice<number>): [number, $.GoError] {

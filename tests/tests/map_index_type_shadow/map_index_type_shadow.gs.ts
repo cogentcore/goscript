@@ -4,22 +4,10 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class item {
-	public get values(): $.Slice<number> {
-		return this._fields.values
-	}
-
-	public set values(value: $.Slice<number>) {
-		this._fields.values = value
-	}
-
-	public _fields: {
-		values: $.Slice<number>
-	}
+	public declare values: $.Slice<number>
 
 	constructor(init?: Partial<{values?: $.Slice<number>}>, __goscriptValue?: boolean) {
-		this._fields = {
-			values: init?.values ?? (null! as $.Slice<number>)
-		}
+		this.values = init?.values ?? (null! as $.Slice<number>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -27,10 +15,9 @@ export class item {
 		return new item(this, true)
 	}
 
-	public __goscriptAssign(source: item): void {
-		const target = this._fields
-		const values = source._fields
-		target.values = values.values
+	public __goscriptAssign(source: item): this {
+		this.values = source.values
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

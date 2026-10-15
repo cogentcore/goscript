@@ -4,32 +4,13 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class holder {
-	public get values(): globalThis.Map<string, number> | null {
-		return this._fields.values
-	}
+	public declare values: globalThis.Map<string, number> | null
 
-	public set values(value: globalThis.Map<string, number> | null) {
-		this._fields.values = value
-	}
-
-	public get items(): $.Slice<item> {
-		return this._fields.items
-	}
-
-	public set items(value: $.Slice<item>) {
-		this._fields.items = value
-	}
-
-	public _fields: {
-		values: globalThis.Map<string, number> | null
-		items: $.Slice<item>
-	}
+	public declare items: $.Slice<item>
 
 	constructor(init?: Partial<{values?: globalThis.Map<string, number> | null, items?: $.Slice<item>}>, __goscriptValue?: boolean) {
-		this._fields = {
-			values: init?.values ?? (null! as globalThis.Map<string, number> | null),
-			items: init?.items ?? (null! as $.Slice<item>)
-		}
+		this.values = init?.values ?? (null! as globalThis.Map<string, number> | null)
+		this.items = init?.items ?? (null! as $.Slice<item>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -37,11 +18,10 @@ export class holder {
 		return new holder(this, true)
 	}
 
-	public __goscriptAssign(source: holder): void {
-		const target = this._fields
-		const values = source._fields
-		target.values = values.values
-		target.items = values.items
+	public __goscriptAssign(source: holder): this {
+		this.values = source.values
+		this.items = source.items
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -54,22 +34,10 @@ export class holder {
 }
 
 export class item {
-	public get value(): number {
-		return this._fields.value
-	}
-
-	public set value(value: number) {
-		this._fields.value = value
-	}
-
-	public _fields: {
-		value: number
-	}
+	public declare value: number
 
 	constructor(init?: Partial<{value?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			value: init?.value ?? (0 as number)
-		}
+		this.value = init?.value ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -77,10 +45,9 @@ export class item {
 		return new item(this, true)
 	}
 
-	public __goscriptAssign(source: item): void {
-		const target = this._fields
-		const values = source._fields
-		target.value = values.value
+	public __goscriptAssign(source: item): this {
+		this.value = source.value
+		return this
 	}
 
 	public increment(): number {

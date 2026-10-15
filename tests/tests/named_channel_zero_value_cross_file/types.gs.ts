@@ -6,22 +6,10 @@ import * as $ from "@goscript/builtin/index.js"
 export type Jobs = $.Channel<Job> | null
 
 export class Job {
-	public get Value(): string {
-		return this._fields.Value
-	}
-
-	public set Value(value: string) {
-		this._fields.Value = value
-	}
-
-	public _fields: {
-		Value: string
-	}
+	public declare Value: string
 
 	constructor(init?: Partial<{Value?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Value: init?.Value ?? ("" as string)
-		}
+		this.Value = init?.Value ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -29,10 +17,9 @@ export class Job {
 		return new Job(this, true)
 	}
 
-	public __goscriptAssign(source: Job): void {
-		const target = this._fields
-		const values = source._fields
-		target.Value = values.Value
+	public __goscriptAssign(source: Job): this {
+		this.Value = source.Value
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

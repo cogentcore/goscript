@@ -10,32 +10,13 @@ import "@goscript/reflect/index.js"
 import "@goscript/time/index.js"
 
 export class timer {
-	public get start(): time.Time {
-		return this._fields.start
-	}
+	public declare start: time.Time
 
-	public set start(value: time.Time) {
-		this._fields.start = value
-	}
-
-	public get total(): time.Duration {
-		return this._fields.total
-	}
-
-	public set total(value: time.Duration) {
-		this._fields.total = value
-	}
-
-	public _fields: {
-		start: time.Time
-		total: time.Duration
-	}
+	public declare total: time.Duration
 
 	constructor(init?: Partial<{start?: time.Time, total?: time.Duration}>, __goscriptValue?: boolean) {
-		this._fields = {
-			start: init?.start ? $.markAsStructValue($.cloneStructValue(init.start)) : $.markAsStructValue(new time.Time()),
-			total: init?.total ?? (0n as time.Duration)
-		}
+		this.start = init?.start ? $.markAsStructValue($.cloneStructValue(init.start)) : $.markAsStructValue(new time.Time())
+		this.total = init?.total ?? (0n as time.Duration)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -43,11 +24,10 @@ export class timer {
 		return new timer(this, true)
 	}
 
-	public __goscriptAssign(source: timer): void {
-		const target = this._fields
-		const values = source._fields
-		$.assignStruct(target.start, values.start)
-		target.total = values.total
+	public __goscriptAssign(source: timer): this {
+		$.assignStruct(this.start, source.start)
+		this.total = source.total
+		return this
 	}
 
 	public Start(): void {

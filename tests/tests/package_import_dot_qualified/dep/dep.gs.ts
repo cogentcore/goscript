@@ -6,22 +6,10 @@ import * as $ from "@goscript/builtin/index.js"
 $.registerTypePackagePath("github.com/s4wave/goscript/tests/tests/package_import_dot_qualified/dep", ["dep.Box"])
 
 export class Box {
-	public get N(): number {
-		return this._fields.N
-	}
-
-	public set N(value: number) {
-		this._fields.N = value
-	}
-
-	public _fields: {
-		N: number
-	}
+	public declare N: number
 
 	constructor(init?: Partial<{N?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			N: init?.N ?? (0 as number)
-		}
+		this.N = init?.N ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -29,10 +17,9 @@ export class Box {
 		return new Box(this, true)
 	}
 
-	public __goscriptAssign(source: Box): void {
-		const target = this._fields
-		const values = source._fields
-		target.N = values.N
+	public __goscriptAssign(source: Box): this {
+		this.N = source.N
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

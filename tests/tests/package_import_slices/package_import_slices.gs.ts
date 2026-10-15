@@ -60,32 +60,13 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("is sorted:", slices.IsSorted($.arrayToSlice<number>([1, 2, 3])), slices.IsSorted($.arrayToSlice<number>([1, 3, 2])))
 
 	class item {
-		public get group(): number {
-			return this._fields.group
-		}
+		public declare group: number
 
-		public set group(value: number) {
-			this._fields.group = value
-		}
-
-		public get label(): string {
-			return this._fields.label
-		}
-
-		public set label(value: string) {
-			this._fields.label = value
-		}
-
-		public _fields: {
-			group: number
-			label: string
-		}
+		public declare label: string
 
 		constructor(init?: Partial<{group?: number, label?: string}>, __goscriptValue?: boolean) {
-			this._fields = {
-				group: init?.group ?? (0 as number),
-				label: init?.label ?? ("" as string)
-			}
+			this.group = init?.group ?? (0 as number)
+			this.label = init?.label ?? ("" as string)
 			;(this as any)[$.structValueMarker] = __goscriptValue === true
 		}
 
@@ -93,11 +74,10 @@ export async function main(): globalThis.Promise<void> {
 			return new item(this, true)
 		}
 
-		public __goscriptAssign(source: item): void {
-			const target = this._fields
-			const values = source._fields
-			target.group = values.group
-			target.label = values.label
+		public __goscriptAssign(source: item): this {
+			this.group = source.group
+			this.label = source.label
+			return this
 		}
 
 		static __typeInfo = $.registerStructType(
@@ -181,22 +161,10 @@ export async function main(): globalThis.Promise<void> {
 	// Struct elements are values. Mutating a copy or a yielded loop value
 	// must leave the original slice unchanged.
 	class cell {
-		public get n(): number {
-			return this._fields.n
-		}
-
-		public set n(value: number) {
-			this._fields.n = value
-		}
-
-		public _fields: {
-			n: number
-		}
+		public declare n: number
 
 		constructor(init?: Partial<{n?: number}>, __goscriptValue?: boolean) {
-			this._fields = {
-				n: init?.n ?? (0 as number)
-			}
+			this.n = init?.n ?? (0 as number)
 			;(this as any)[$.structValueMarker] = __goscriptValue === true
 		}
 
@@ -204,10 +172,9 @@ export async function main(): globalThis.Promise<void> {
 			return new cell(this, true)
 		}
 
-		public __goscriptAssign(source: cell): void {
-			const target = this._fields
-			const values = source._fields
-			target.n = values.n
+		public __goscriptAssign(source: cell): this {
+			this.n = source.n
+			return this
 		}
 
 		static __typeInfo = $.registerStructType(

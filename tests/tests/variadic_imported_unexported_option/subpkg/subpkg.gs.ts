@@ -8,32 +8,13 @@ $.registerTypePackagePath("github.com/s4wave/goscript/tests/tests/variadic_impor
 export type option = ((_p0: Thing | $.VarRef<Thing> | null) => void) | null
 
 export class Thing {
-	public get Value(): number {
-		return this._fields.Value
-	}
+	public declare Value: number
 
-	public set Value(value: number) {
-		this._fields.Value = value
-	}
-
-	public get Label(): string {
-		return this._fields.Label
-	}
-
-	public set Label(value: string) {
-		this._fields.Label = value
-	}
-
-	public _fields: {
-		Value: number
-		Label: string
-	}
+	public declare Label: string
 
 	constructor(init?: Partial<{Value?: number, Label?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Value: init?.Value ?? (0 as number),
-			Label: init?.Label ?? ("" as string)
-		}
+		this.Value = init?.Value ?? (0 as number)
+		this.Label = init?.Label ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -41,11 +22,10 @@ export class Thing {
 		return new Thing(this, true)
 	}
 
-	public __goscriptAssign(source: Thing): void {
-		const target = this._fields
-		const values = source._fields
-		target.Value = values.Value
-		target.Label = values.Label
+	public __goscriptAssign(source: Thing): this {
+		this.Value = source.Value
+		this.Label = source.Label
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

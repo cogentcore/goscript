@@ -4,22 +4,10 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class Map {
-	public get values(): globalThis.Map<string, number> | null {
-		return this._fields.values
-	}
-
-	public set values(value: globalThis.Map<string, number> | null) {
-		this._fields.values = value
-	}
-
-	public _fields: {
-		values: globalThis.Map<string, number> | null
-	}
+	public declare values: globalThis.Map<string, number> | null
 
 	constructor(init?: Partial<{values?: globalThis.Map<string, number> | null}>, __goscriptValue?: boolean) {
-		this._fields = {
-			values: init?.values ?? (null! as globalThis.Map<string, number> | null)
-		}
+		this.values = init?.values ?? (null! as globalThis.Map<string, number> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -27,10 +15,9 @@ export class Map {
 		return new Map(this, true)
 	}
 
-	public __goscriptAssign(source: Map): void {
-		const target = this._fields
-		const values = source._fields
-		target.values = values.values
+	public __goscriptAssign(source: Map): this {
+		this.values = source.values
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

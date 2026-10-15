@@ -17,22 +17,10 @@ $.registerInterfaceType(
 );
 
 export class Square {
-	public get Side(): number {
-		return this._fields.Side
-	}
-
-	public set Side(value: number) {
-		this._fields.Side = value
-	}
-
-	public _fields: {
-		Side: number
-	}
+	public declare Side: number
 
 	constructor(init?: Partial<{Side?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Side: init?.Side ?? (0 as number)
-		}
+		this.Side = init?.Side ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -40,10 +28,9 @@ export class Square {
 		return new Square(this, true)
 	}
 
-	public __goscriptAssign(source: Square): void {
-		const target = this._fields
-		const values = source._fields
-		target.Side = values.Side
+	public __goscriptAssign(source: Square): this {
+		this.Side = source.Side
+		return this
 	}
 
 	public Area(): number {

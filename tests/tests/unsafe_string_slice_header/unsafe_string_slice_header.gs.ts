@@ -10,32 +10,13 @@ import "@goscript/reflect/index.js"
 import "@goscript/unsafe/index.js"
 
 export class localSliceHeader {
-	public get s(): string {
-		return this._fields.s
-	}
+	public declare s: string
 
-	public set s(value: string) {
-		this._fields.s = value
-	}
-
-	public get cap(): number {
-		return this._fields.cap
-	}
-
-	public set cap(value: number) {
-		this._fields.cap = value
-	}
-
-	public _fields: {
-		s: string
-		cap: number
-	}
+	public declare cap: number
 
 	constructor(init?: Partial<{s?: string, cap?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			s: init?.s ?? ("" as string),
-			cap: init?.cap ?? (0 as number)
-		}
+		this.s = init?.s ?? ("" as string)
+		this.cap = init?.cap ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -43,11 +24,10 @@ export class localSliceHeader {
 		return new localSliceHeader(this, true)
 	}
 
-	public __goscriptAssign(source: localSliceHeader): void {
-		const target = this._fields
-		const values = source._fields
-		target.s = values.s
-		target.cap = values.cap
+	public __goscriptAssign(source: localSliceHeader): this {
+		this.s = source.s
+		this.cap = source.cap
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

@@ -27,32 +27,13 @@ $.registerInterfaceType(
 );
 
 export class T {
-	public get A(): string {
-		return this._fields.A
-	}
+	public declare A: string
 
-	public set A(value: string) {
-		this._fields.A = value
-	}
-
-	public get B(): number {
-		return this._fields.B
-	}
-
-	public set B(value: number) {
-		this._fields.B = value
-	}
-
-	public _fields: {
-		A: string
-		B: number
-	}
+	public declare B: number
 
 	constructor(init?: Partial<{A?: string, B?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			A: init?.A ?? ("" as string),
-			B: init?.B ?? (0 as number)
-		}
+		this.A = init?.A ?? ("" as string)
+		this.B = init?.B ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -60,11 +41,10 @@ export class T {
 		return new T(this, true)
 	}
 
-	public __goscriptAssign(source: T): void {
-		const target = this._fields
-		const values = source._fields
-		target.A = values.A
-		target.B = values.B
+	public __goscriptAssign(source: T): this {
+		this.A = source.A
+		this.B = source.B
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -77,22 +57,10 @@ export class T {
 }
 
 export class square {
-	public get Side(): number {
-		return this._fields.Side
-	}
-
-	public set Side(value: number) {
-		this._fields.Side = value
-	}
-
-	public _fields: {
-		Side: number
-	}
+	public declare Side: number
 
 	constructor(init?: Partial<{Side?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Side: init?.Side ?? (0 as number)
-		}
+		this.Side = init?.Side ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -100,10 +68,9 @@ export class square {
 		return new square(this, true)
 	}
 
-	public __goscriptAssign(source: square): void {
-		const target = this._fields
-		const values = source._fields
-		target.Side = values.Side
+	public __goscriptAssign(source: square): this {
+		this.Side = source.Side
+		return this
 	}
 
 	public Area(): number {
@@ -121,32 +88,13 @@ export class square {
 }
 
 export class holder {
-	public get S(): shape | null {
-		return this._fields.S
-	}
+	public declare S: shape | null
 
-	public set S(value: shape | null) {
-		this._fields.S = value
-	}
-
-	public get A(): any {
-		return this._fields.A
-	}
-
-	public set A(value: any) {
-		this._fields.A = value
-	}
-
-	public _fields: {
-		S: shape | null
-		A: any
-	}
+	public declare A: any
 
 	constructor(init?: Partial<{S?: shape | null, A?: any}>, __goscriptValue?: boolean) {
-		this._fields = {
-			S: init?.S ?? (null! as shape | null),
-			A: init?.A ?? (null! as any)
-		}
+		this.S = init?.S ?? (null! as shape | null)
+		this.A = init?.A ?? (null! as any)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -154,11 +102,10 @@ export class holder {
 		return new holder(this, true)
 	}
 
-	public __goscriptAssign(source: holder): void {
-		const target = this._fields
-		const values = source._fields
-		target.S = $.assignFieldValue(target.S, values.S, "main.shape")
-		target.A = $.assignFieldValue(target.A, values.A, { kind: $.TypeKind.Interface, methods: [] })
+	public __goscriptAssign(source: holder): this {
+		this.S = $.assignFieldValue(this.S, source.S, "main.shape")
+		this.A = $.assignFieldValue(this.A, source.A, { kind: $.TypeKind.Interface, methods: [] })
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -171,32 +118,13 @@ export class holder {
 }
 
 export class base {
-	public get This(): node | null {
-		return this._fields.This
-	}
+	public declare This: node | null
 
-	public set This(value: node | null) {
-		this._fields.This = value
-	}
-
-	public get Name(): string {
-		return this._fields.Name
-	}
-
-	public set Name(value: string) {
-		this._fields.Name = value
-	}
-
-	public _fields: {
-		This: node | null
-		Name: string
-	}
+	public declare Name: string
 
 	constructor(init?: Partial<{This?: node | null, Name?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			This: init?.This ?? (null! as node | null),
-			Name: init?.Name ?? ("" as string)
-		}
+		this.This = init?.This ?? (null! as node | null)
+		this.Name = init?.Name ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -204,11 +132,10 @@ export class base {
 		return new base(this, true)
 	}
 
-	public __goscriptAssign(source: base): void {
-		const target = this._fields
-		const values = source._fields
-		target.This = $.assignFieldValue(target.This, values.This, "main.node")
-		target.Name = values.Name
+	public __goscriptAssign(source: base): this {
+		this.This = $.assignFieldValue(this.This, source.This, "main.node")
+		this.Name = source.Name
+		return this
 	}
 
 	public AsBase(): base | $.VarRef<base> | null {
@@ -231,32 +158,13 @@ export class base {
 }
 
 export class widget {
-	public get base(): base {
-		return this._fields.base
-	}
+	public declare base: base
 
-	public set base(value: base) {
-		this._fields.base = value
-	}
-
-	public get X(): number {
-		return this._fields.X
-	}
-
-	public set X(value: number) {
-		this._fields.X = value
-	}
-
-	public _fields: {
-		base: base
-		X: number
-	}
+	public declare X: number
 
 	constructor(init?: Partial<{base?: base, X?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			base: init?.base ? init.base.clone() : new base(undefined, true),
-			X: init?.X ?? (0 as number)
-		}
+		this.base = init?.base ? init.base.clone() : new base(undefined, true)
+		this.X = init?.X ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -264,11 +172,10 @@ export class widget {
 		return new widget(this, true)
 	}
 
-	public __goscriptAssign(source: widget): void {
-		const target = this._fields
-		const values = source._fields
-		$.assignStruct(target.base, values.base)
-		target.X = values.X
+	public __goscriptAssign(source: widget): this {
+		this.base.__goscriptAssign(source.base)
+		this.X = source.X
+		return this
 	}
 
 	public AsBase(): any {
@@ -289,32 +196,13 @@ export class widget {
 }
 
 export class body {
-	public get widget(): widget {
-		return this._fields.widget
-	}
+	public declare widget: widget
 
-	public set widget(value: widget) {
-		this._fields.widget = value
-	}
-
-	public get Title(): string {
-		return this._fields.Title
-	}
-
-	public set Title(value: string) {
-		this._fields.Title = value
-	}
-
-	public _fields: {
-		widget: widget
-		Title: string
-	}
+	public declare Title: string
 
 	constructor(init?: Partial<{widget?: widget, Title?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			widget: init?.widget ? init.widget.clone() : new widget(undefined, true),
-			Title: init?.Title ?? ("" as string)
-		}
+		this.widget = init?.widget ? init.widget.clone() : new widget(undefined, true)
+		this.Title = init?.Title ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -322,11 +210,10 @@ export class body {
 		return new body(this, true)
 	}
 
-	public __goscriptAssign(source: body): void {
-		const target = this._fields
-		const values = source._fields
-		$.assignStruct(target.widget, values.widget)
-		target.Title = values.Title
+	public __goscriptAssign(source: body): this {
+		this.widget.__goscriptAssign(source.widget)
+		this.Title = source.Title
+		return this
 	}
 
 	public AsBase(): any {

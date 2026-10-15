@@ -16,42 +16,16 @@ import "@goscript/errors/index.js"
 import "@goscript/io/index.js"
 
 export class segmentedReader {
-	public get data(): $.Slice<number> {
-		return this._fields.data
-	}
+	public declare data: $.Slice<number>
 
-	public set data(value: $.Slice<number>) {
-		this._fields.data = value
-	}
+	public declare offset: number
 
-	public get offset(): number {
-		return this._fields.offset
-	}
-
-	public set offset(value: number) {
-		this._fields.offset = value
-	}
-
-	public get step(): number {
-		return this._fields.step
-	}
-
-	public set step(value: number) {
-		this._fields.step = value
-	}
-
-	public _fields: {
-		data: $.Slice<number>
-		offset: number
-		step: number
-	}
+	public declare step: number
 
 	constructor(init?: Partial<{data?: $.Slice<number>, offset?: number, step?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			data: init?.data ?? (null! as $.Slice<number>),
-			offset: init?.offset ?? (0 as number),
-			step: init?.step ?? (0 as number)
-		}
+		this.data = init?.data ?? (null! as $.Slice<number>)
+		this.offset = init?.offset ?? (0 as number)
+		this.step = init?.step ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -59,12 +33,11 @@ export class segmentedReader {
 		return new segmentedReader(this, true)
 	}
 
-	public __goscriptAssign(source: segmentedReader): void {
-		const target = this._fields
-		const values = source._fields
-		target.data = values.data
-		target.offset = values.offset
-		target.step = values.step
+	public __goscriptAssign(source: segmentedReader): this {
+		this.data = source.data
+		this.offset = source.offset
+		this.step = source.step
+		return this
 	}
 
 	public Read(p: $.Slice<number>): [number, $.GoError] {
@@ -89,12 +62,7 @@ export class segmentedReader {
 }
 
 export class failingReader {
-	public _fields: {
-	}
-
 	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
-		this._fields = {
-		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -102,7 +70,8 @@ export class failingReader {
 		return new failingReader(this, true)
 	}
 
-	public __goscriptAssign(source: failingReader): void {
+	public __goscriptAssign(source: failingReader): this {
+		return this
 	}
 
 	public Read(p: $.Slice<number>): [number, $.GoError] {

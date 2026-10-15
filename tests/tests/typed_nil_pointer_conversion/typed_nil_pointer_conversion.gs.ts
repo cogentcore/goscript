@@ -4,22 +4,10 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class node {
-	public get next(): node | $.VarRef<node> | null {
-		return this._fields.next
-	}
-
-	public set next(value: node | $.VarRef<node> | null) {
-		this._fields.next = value
-	}
-
-	public _fields: {
-		next: node | $.VarRef<node> | null
-	}
+	public declare next: node | $.VarRef<node> | null
 
 	constructor(init?: Partial<{next?: node | $.VarRef<node> | null}>, __goscriptValue?: boolean) {
-		this._fields = {
-			next: init?.next ?? (null! as node | $.VarRef<node> | null)
-		}
+		this.next = init?.next ?? (null! as node | $.VarRef<node> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -27,10 +15,9 @@ export class node {
 		return new node(this, true)
 	}
 
-	public __goscriptAssign(source: node): void {
-		const target = this._fields
-		const values = source._fields
-		target.next = values.next
+	public __goscriptAssign(source: node): this {
+		this.next = source.next
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

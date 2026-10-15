@@ -4,22 +4,10 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class AsyncResource {
-	public get name(): string {
-		return this._fields.name
-	}
-
-	public set name(value: string) {
-		this._fields.name = value
-	}
-
-	public _fields: {
-		name: string
-	}
+	public declare name: string
 
 	constructor(init?: Partial<{name?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			name: init?.name ?? ("" as string)
-		}
+		this.name = init?.name ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -27,10 +15,9 @@ export class AsyncResource {
 		return new AsyncResource(this, true)
 	}
 
-	public __goscriptAssign(source: AsyncResource): void {
-		const target = this._fields
-		const values = source._fields
-		target.name = values.name
+	public __goscriptAssign(source: AsyncResource): this {
+		this.name = source.name
+		return this
 	}
 
 	public async Release(): globalThis.Promise<void> {

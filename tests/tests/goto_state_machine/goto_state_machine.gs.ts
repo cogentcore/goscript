@@ -4,42 +4,16 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class scanner {
-	public get data(): string {
-		return this._fields.data
-	}
+	public declare data: string
 
-	public set data(value: string) {
-		this._fields.data = value
-	}
+	public declare pos: number
 
-	public get pos(): number {
-		return this._fields.pos
-	}
-
-	public set pos(value: number) {
-		this._fields.pos = value
-	}
-
-	public get done(): boolean {
-		return this._fields.done
-	}
-
-	public set done(value: boolean) {
-		this._fields.done = value
-	}
-
-	public _fields: {
-		data: string
-		pos: number
-		done: boolean
-	}
+	public declare done: boolean
 
 	constructor(init?: Partial<{data?: string, pos?: number, done?: boolean}>, __goscriptValue?: boolean) {
-		this._fields = {
-			data: init?.data ?? ("" as string),
-			pos: init?.pos ?? (0 as number),
-			done: init?.done ?? (false as boolean)
-		}
+		this.data = init?.data ?? ("" as string)
+		this.pos = init?.pos ?? (0 as number)
+		this.done = init?.done ?? (false as boolean)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -47,12 +21,11 @@ export class scanner {
 		return new scanner(this, true)
 	}
 
-	public __goscriptAssign(source: scanner): void {
-		const target = this._fields
-		const values = source._fields
-		target.data = values.data
-		target.pos = values.pos
-		target.done = values.done
+	public __goscriptAssign(source: scanner): this {
+		this.data = source.data
+		this.pos = source.pos
+		this.done = source.done
+		return this
 	}
 
 	public readByte(): number {

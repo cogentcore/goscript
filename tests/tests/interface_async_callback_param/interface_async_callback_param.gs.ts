@@ -20,12 +20,7 @@ $.registerInterfaceType(
 );
 
 export class listScanner {
-	public _fields: {
-	}
-
 	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
-		this._fields = {
-		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -33,7 +28,8 @@ export class listScanner {
 		return new listScanner(this, true)
 	}
 
-	public __goscriptAssign(source: listScanner): void {
+	public __goscriptAssign(source: listScanner): this {
+		return this
 	}
 
 	public async Scan(fn: ((_p0: number) => $.GoError | globalThis.Promise<$.GoError>) | null): globalThis.Promise<$.GoError> {

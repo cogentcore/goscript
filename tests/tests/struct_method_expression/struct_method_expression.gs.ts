@@ -4,22 +4,10 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class worker {
-	public get base(): number {
-		return this._fields.base
-	}
-
-	public set base(value: number) {
-		this._fields.base = value
-	}
-
-	public _fields: {
-		base: number
-	}
+	public declare base: number
 
 	constructor(init?: Partial<{base?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			base: init?.base ?? (0 as number)
-		}
+		this.base = init?.base ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -27,10 +15,9 @@ export class worker {
 		return new worker(this, true)
 	}
 
-	public __goscriptAssign(source: worker): void {
-		const target = this._fields
-		const values = source._fields
-		target.base = values.base
+	public __goscriptAssign(source: worker): this {
+		this.base = source.base
+		return this
 	}
 
 	public add(v: number): number {

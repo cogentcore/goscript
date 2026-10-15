@@ -7,42 +7,16 @@ import * as reflect from "@goscript/reflect/index.js"
 import "@goscript/reflect/index.js"
 
 export class Pose {
-	public get M(): number[] {
-		return this._fields.M
-	}
+	public declare M: number[]
 
-	public set M(value: number[]) {
-		this._fields.M = value
-	}
+	public declare A: number[]
 
-	public get A(): number[] {
-		return this._fields.A
-	}
-
-	public set A(value: number[]) {
-		this._fields.A = value
-	}
-
-	public get Inner(): {"B": number[]} {
-		return this._fields.Inner
-	}
-
-	public set Inner(value: {"B": number[]}) {
-		this._fields.Inner = value
-	}
-
-	public _fields: {
-		M: number[]
-		A: number[]
-		Inner: {"B": number[]}
-	}
+	public declare Inner: {"B": number[]}
 
 	constructor(init?: Partial<{M?: number[], A?: number[], Inner?: {"B": number[]}}>, __goscriptValue?: boolean) {
-		this._fields = {
-			M: init?.M !== undefined ? $.cloneArrayValue(init.M, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 4)) : $.arrayValue(globalThis.Array.from({ length: 4 }, () => 0), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 4)),
-			A: init?.A !== undefined ? $.cloneArrayValue(init.A, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2)) : $.arrayValue(globalThis.Array.from({ length: 2 }, () => 0)),
-			Inner: init?.Inner ? $.markAsStructValue($.cloneStructValue(init.Inner)) : $.anonymousStructValue({"B": $.arrayValue(globalThis.Array.from({ length: 2 }, () => 0))}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("B", /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2), [0], 0, true)] })
-		}
+		this.M = init?.M !== undefined ? $.cloneArrayValue(init.M, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 4)) : $.arrayValue(globalThis.Array.from({ length: 4 }, () => 0), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 4))
+		this.A = init?.A !== undefined ? $.cloneArrayValue(init.A, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2)) : $.arrayValue(globalThis.Array.from({ length: 2 }, () => 0))
+		this.Inner = init?.Inner ? $.markAsStructValue($.cloneStructValue(init.Inner)) : $.anonymousStructValue({"B": $.arrayValue(globalThis.Array.from({ length: 2 }, () => 0))}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("B", /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2), [0], 0, true)] })
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -50,12 +24,11 @@ export class Pose {
 		return new Pose(this, true)
 	}
 
-	public __goscriptAssign(source: Pose): void {
-		const target = this._fields
-		const values = source._fields
-		target.M = $.assignFieldValue(target.M, values.M, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 4))
-		target.A = $.assignFieldValue(target.A, values.A, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2))
-		$.assignStruct(target.Inner, values.Inner)
+	public __goscriptAssign(source: Pose): this {
+		this.M = $.assignFieldValue(this.M, source.M, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 4))
+		this.A = $.assignFieldValue(this.A, source.A, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2))
+		$.assignStruct(this.Inner, source.Inner)
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

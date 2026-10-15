@@ -21,22 +21,10 @@ $.registerNamedValueType(
 );
 
 export class customErr {
-	public get msg(): string {
-		return this._fields.msg
-	}
-
-	public set msg(value: string) {
-		this._fields.msg = value
-	}
-
-	public _fields: {
-		msg: string
-	}
+	public declare msg: string
 
 	constructor(init?: Partial<{msg?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			msg: init?.msg ?? ("" as string)
-		}
+		this.msg = init?.msg ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -44,10 +32,9 @@ export class customErr {
 		return new customErr(this, true)
 	}
 
-	public __goscriptAssign(source: customErr): void {
-		const target = this._fields
-		const values = source._fields
-		target.msg = values.msg
+	public __goscriptAssign(source: customErr): this {
+		this.msg = source.msg
+		return this
 	}
 
 	public Error(): string {
@@ -65,22 +52,10 @@ export class customErr {
 }
 
 export class wrappedErr {
-	public get err(): $.GoError {
-		return this._fields.err
-	}
-
-	public set err(value: $.GoError) {
-		this._fields.err = value
-	}
-
-	public _fields: {
-		err: $.GoError
-	}
+	public declare err: $.GoError
 
 	constructor(init?: Partial<{err?: $.GoError}>, __goscriptValue?: boolean) {
-		this._fields = {
-			err: init?.err ?? (null! as $.GoError)
-		}
+		this.err = init?.err ?? (null! as $.GoError)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -88,10 +63,9 @@ export class wrappedErr {
 		return new wrappedErr(this, true)
 	}
 
-	public __goscriptAssign(source: wrappedErr): void {
-		const target = this._fields
-		const values = source._fields
-		target.err = $.assignFieldValue(target.err, values.err, "error")
+	public __goscriptAssign(source: wrappedErr): this {
+		this.err = $.assignFieldValue(this.err, source.err, "error")
+		return this
 	}
 
 	public async Error(): globalThis.Promise<string> {

@@ -37,12 +37,7 @@ $.registerInterfaceType(
 );
 
 export class handler {
-	public _fields: {
-	}
-
 	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
-		this._fields = {
-		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -50,7 +45,8 @@ export class handler {
 		return new handler(this, true)
 	}
 
-	public __goscriptAssign(source: handler): void {
+	public __goscriptAssign(source: handler): this {
+		return this
 	}
 
 	public Mark(): void {
@@ -66,12 +62,7 @@ export class handler {
 }
 
 export class genericResolver {
-	public _fields: {
-	}
-
 	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
-		this._fields = {
-		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -79,7 +70,8 @@ export class genericResolver {
 		return new genericResolver(this, true)
 	}
 
-	public __goscriptAssign(source: genericResolver): void {
+	public __goscriptAssign(source: genericResolver): this {
+		return this
 	}
 
 	public async Resolve(__typeArgs: $.GenericTypeArgs | undefined, ctx: context.Context | null, handler: Handler | null): globalThis.Promise<$.GoError> {
@@ -100,22 +92,10 @@ export class genericResolver {
 }
 
 export class genericValue {
-	public get value(): number {
-		return this._fields.value
-	}
-
-	public set value(value: number) {
-		this._fields.value = value
-	}
-
-	public _fields: {
-		value: number
-	}
+	public declare value: number
 
 	constructor(init?: Partial<{value?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			value: init?.value ?? (0 as number)
-		}
+		this.value = init?.value ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -123,10 +103,9 @@ export class genericValue {
 		return new genericValue(this, true)
 	}
 
-	public __goscriptAssign(source: genericValue): void {
-		const target = this._fields
-		const values = source._fields
-		target.value = values.value
+	public __goscriptAssign(source: genericValue): this {
+		this.value = source.value
+		return this
 	}
 
 	public Get(__typeArgs: $.GenericTypeArgs | undefined): number {

@@ -7,22 +7,10 @@ import * as reflect from "@goscript/reflect/index.js"
 import "@goscript/reflect/index.js"
 
 export class S1 {
-	public get Name(): string {
-		return this._fields.Name
-	}
-
-	public set Name(value: string) {
-		this._fields.Name = value
-	}
-
-	public _fields: {
-		Name: string
-	}
+	public declare Name: string
 
 	constructor(init?: Partial<{Name?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Name: init?.Name ?? ("" as string)
-		}
+		this.Name = init?.Name ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -30,10 +18,9 @@ export class S1 {
 		return new S1(this, true)
 	}
 
-	public __goscriptAssign(source: S1): void {
-		const target = this._fields
-		const values = source._fields
-		target.Name = values.Name
+	public __goscriptAssign(source: S1): this {
+		this.Name = source.Name
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -46,52 +33,19 @@ export class S1 {
 }
 
 export class S5 {
-	public get K(): $.Slice<S1 | $.VarRef<S1> | null> {
-		return this._fields.K
-	}
+	public declare K: $.Slice<S1 | $.VarRef<S1> | null>
 
-	public set K(value: $.Slice<S1 | $.VarRef<S1> | null>) {
-		this._fields.K = value
-	}
+	public declare M: globalThis.Map<string, number> | null
 
-	public get M(): globalThis.Map<string, number> | null {
-		return this._fields.M
-	}
+	public declare P: S1 | $.VarRef<S1> | null
 
-	public set M(value: globalThis.Map<string, number> | null) {
-		this._fields.M = value
-	}
-
-	public get P(): S1 | $.VarRef<S1> | null {
-		return this._fields.P
-	}
-
-	public set P(value: S1 | $.VarRef<S1> | null) {
-		this._fields.P = value
-	}
-
-	public get F(): (() => void) | null {
-		return this._fields.F
-	}
-
-	public set F(value: (() => void) | null) {
-		this._fields.F = value
-	}
-
-	public _fields: {
-		K: $.Slice<S1 | $.VarRef<S1> | null>
-		M: globalThis.Map<string, number> | null
-		P: S1 | $.VarRef<S1> | null
-		F: (() => void) | null
-	}
+	public declare F: (() => void) | null
 
 	constructor(init?: Partial<{K?: $.Slice<S1 | $.VarRef<S1> | null>, M?: globalThis.Map<string, number> | null, P?: S1 | $.VarRef<S1> | null, F?: (() => void) | null}>, __goscriptValue?: boolean) {
-		this._fields = {
-			K: init?.K ?? (null! as $.Slice<S1 | $.VarRef<S1> | null>),
-			M: init?.M ?? (null! as globalThis.Map<string, number> | null),
-			P: init?.P ?? (null! as S1 | $.VarRef<S1> | null),
-			F: init?.F ?? (null! as (() => void) | null)
-		}
+		this.K = init?.K ?? (null! as $.Slice<S1 | $.VarRef<S1> | null>)
+		this.M = init?.M ?? (null! as globalThis.Map<string, number> | null)
+		this.P = init?.P ?? (null! as S1 | $.VarRef<S1> | null)
+		this.F = init?.F ?? (null! as (() => void) | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -99,13 +53,12 @@ export class S5 {
 		return new S5(this, true)
 	}
 
-	public __goscriptAssign(source: S5): void {
-		const target = this._fields
-		const values = source._fields
-		target.K = values.K
-		target.M = values.M
-		target.P = values.P
-		target.F = values.F
+	public __goscriptAssign(source: S5): this {
+		this.K = source.K
+		this.M = source.M
+		this.P = source.P
+		this.F = source.F
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

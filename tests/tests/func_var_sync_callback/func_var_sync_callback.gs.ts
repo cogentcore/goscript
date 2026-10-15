@@ -10,22 +10,10 @@ import "@goscript/os/index.js"
 import "@goscript/strings/index.js"
 
 export class matcher {
-	public get match(): ((r: number) => boolean | globalThis.Promise<boolean>) | null {
-		return this._fields.match
-	}
-
-	public set match(value: ((r: number) => boolean | globalThis.Promise<boolean>) | null) {
-		this._fields.match = value
-	}
-
-	public _fields: {
-		match: ((r: number) => boolean | globalThis.Promise<boolean>) | null
-	}
+	public declare match: ((r: number) => boolean | globalThis.Promise<boolean>) | null
 
 	constructor(init?: Partial<{match?: ((r: number) => boolean | globalThis.Promise<boolean>) | null}>, __goscriptValue?: boolean) {
-		this._fields = {
-			match: init?.match ?? (null! as ((r: number) => boolean | globalThis.Promise<boolean>) | null)
-		}
+		this.match = init?.match ?? (null! as ((r: number) => boolean | globalThis.Promise<boolean>) | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -33,10 +21,9 @@ export class matcher {
 		return new matcher(this, true)
 	}
 
-	public __goscriptAssign(source: matcher): void {
-		const target = this._fields
-		const values = source._fields
-		target.match = values.match
+	public __goscriptAssign(source: matcher): this {
+		this.match = source.match
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

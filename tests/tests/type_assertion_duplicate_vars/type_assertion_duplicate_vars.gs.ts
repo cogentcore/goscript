@@ -14,12 +14,7 @@ $.registerInterfaceType(
 );
 
 export class ConcreteA {
-	public _fields: {
-	}
-
 	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
-		this._fields = {
-		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -27,7 +22,8 @@ export class ConcreteA {
 		return new ConcreteA(this, true)
 	}
 
-	public __goscriptAssign(source: ConcreteA): void {
+	public __goscriptAssign(source: ConcreteA): this {
+		return this
 	}
 
 	public Method(): string {
@@ -45,12 +41,7 @@ export class ConcreteA {
 }
 
 export class ConcreteB {
-	public _fields: {
-	}
-
 	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
-		this._fields = {
-		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -58,7 +49,8 @@ export class ConcreteB {
 		return new ConcreteB(this, true)
 	}
 
-	public __goscriptAssign(source: ConcreteB): void {
+	public __goscriptAssign(source: ConcreteB): this {
+		return this
 	}
 
 	public Method(): string {
@@ -76,32 +68,13 @@ export class ConcreteB {
 }
 
 export class Container {
-	public get hasA(): boolean {
-		return this._fields.hasA
-	}
+	public declare hasA: boolean
 
-	public set hasA(value: boolean) {
-		this._fields.hasA = value
-	}
-
-	public get hasB(): boolean {
-		return this._fields.hasB
-	}
-
-	public set hasB(value: boolean) {
-		this._fields.hasB = value
-	}
-
-	public _fields: {
-		hasA: boolean
-		hasB: boolean
-	}
+	public declare hasB: boolean
 
 	constructor(init?: Partial<{hasA?: boolean, hasB?: boolean}>, __goscriptValue?: boolean) {
-		this._fields = {
-			hasA: init?.hasA ?? (false as boolean),
-			hasB: init?.hasB ?? (false as boolean)
-		}
+		this.hasA = init?.hasA ?? (false as boolean)
+		this.hasB = init?.hasB ?? (false as boolean)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -109,11 +82,10 @@ export class Container {
 		return new Container(this, true)
 	}
 
-	public __goscriptAssign(source: Container): void {
-		const target = this._fields
-		const values = source._fields
-		target.hasA = values.hasA
-		target.hasB = values.hasB
+	public __goscriptAssign(source: Container): this {
+		this.hasA = source.hasA
+		this.hasB = source.hasB
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

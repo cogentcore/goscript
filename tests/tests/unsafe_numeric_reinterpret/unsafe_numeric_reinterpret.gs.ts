@@ -44,22 +44,10 @@ export async function main(): globalThis.Promise<void> {
 	$.unsafeNumericRef<number>(g, "float32", "uint32").value = 0x40000000
 	await $.println(g.value == 2)
 	class pair {
-		public get f(): number {
-			return this._fields.f
-		}
-
-		public set f(value: number) {
-			this._fields.f = value
-		}
-
-		public _fields: {
-			f: number
-		}
+		public declare f: number
 
 		constructor(init?: Partial<{f?: number}>, __goscriptValue?: boolean) {
-			this._fields = {
-				f: init?.f ?? (0 as number)
-			}
+			this.f = init?.f ?? (0 as number)
 			;(this as any)[$.structValueMarker] = __goscriptValue === true
 		}
 
@@ -67,10 +55,9 @@ export async function main(): globalThis.Promise<void> {
 			return new pair(this, true)
 		}
 
-		public __goscriptAssign(source: pair): void {
-			const target = this._fields
-			const values = source._fields
-			target.f = values.f
+		public __goscriptAssign(source: pair): this {
+			this.f = source.f
+			return this
 		}
 
 		static __typeInfo = $.registerStructType(
@@ -82,7 +69,7 @@ export async function main(): globalThis.Promise<void> {
 		)
 	}
 	let p = $.markAsStructValue(new pair({f: 0.5}))
-	await $.println($.unsafeNumericRef<bigint>($.fieldRef(p._fields, "f"), "float64", "uint64").value == math.Float64bits(0.5))
+	await $.println($.unsafeNumericRef<bigint>($.fieldRef(p, "f"), "float64", "uint64").value == math.Float64bits(0.5))
 }
 
 if ($.isMainScript(import.meta)) {

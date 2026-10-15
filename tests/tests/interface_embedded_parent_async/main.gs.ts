@@ -18,12 +18,7 @@ $.registerInterfaceType(
 );
 
 export class impl {
-	public _fields: {
-	}
-
 	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
-		this._fields = {
-		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -31,7 +26,8 @@ export class impl {
 		return new impl(this, true)
 	}
 
-	public __goscriptAssign(source: impl): void {
+	public __goscriptAssign(source: impl): this {
+		return this
 	}
 
 	public async Name(): globalThis.Promise<string> {

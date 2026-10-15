@@ -4,22 +4,10 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class queue {
-	public get buf(): $.Slice<any> {
-		return this._fields.buf
-	}
-
-	public set buf(value: $.Slice<any>) {
-		this._fields.buf = value
-	}
-
-	public _fields: {
-		buf: $.Slice<any>
-	}
+	public declare buf: $.Slice<any>
 
 	constructor(init?: Partial<{buf?: $.Slice<any>}>, __goscriptValue?: boolean) {
-		this._fields = {
-			buf: init?.buf ?? (null! as $.Slice<any>)
-		}
+		this.buf = init?.buf ?? (null! as $.Slice<any>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -27,10 +15,9 @@ export class queue {
 		return new queue(this, true)
 	}
 
-	public __goscriptAssign(source: queue): void {
-		const target = this._fields
-		const values = source._fields
-		target.buf = values.buf
+	public __goscriptAssign(source: queue): this {
+		this.buf = source.buf
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

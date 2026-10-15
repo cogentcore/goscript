@@ -13,12 +13,7 @@ import "@goscript/github.com/s4wave/goscript/tests/tests/method_result_imports_c
 import "./method.gs.ts"
 
 export class Holder {
-	public _fields: {
-	}
-
 	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
-		this._fields = {
-		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -26,7 +21,8 @@ export class Holder {
 		return new Holder(this, true)
 	}
 
-	public __goscriptAssign(source: Holder): void {
+	public __goscriptAssign(source: Holder): this {
+		return this
 	}
 
 	public async Run(): globalThis.Promise<void> {

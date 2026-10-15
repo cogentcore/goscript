@@ -14,12 +14,7 @@ $.registerInterfaceType(
 );
 
 export class Greeter {
-	public _fields: {
-	}
-
 	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
-		this._fields = {
-		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -27,7 +22,8 @@ export class Greeter {
 		return new Greeter(this, true)
 	}
 
-	public __goscriptAssign(source: Greeter): void {
+	public __goscriptAssign(source: Greeter): this {
+		return this
 	}
 
 	public Greet(): string {
@@ -45,12 +41,7 @@ export class Greeter {
 }
 
 export class MyStringer {
-	public _fields: {
-	}
-
 	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
-		this._fields = {
-		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -58,7 +49,8 @@ export class MyStringer {
 		return new MyStringer(this, true)
 	}
 
-	public __goscriptAssign(source: MyStringer): void {
+	public __goscriptAssign(source: MyStringer): this {
+		return this
 	}
 
 	public String(): string {

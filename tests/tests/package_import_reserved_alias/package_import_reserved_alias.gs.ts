@@ -7,22 +7,10 @@ import * as _unique from "@goscript/github.com/s4wave/goscript/tests/tests/packa
 import "@goscript/github.com/s4wave/goscript/tests/tests/package_import_reserved_alias/unique/index.js"
 
 export class Holder {
-	public get Box(): _unique.Box | $.VarRef<_unique.Box> | null {
-		return this._fields.Box
-	}
-
-	public set Box(value: _unique.Box | $.VarRef<_unique.Box> | null) {
-		this._fields.Box = value
-	}
-
-	public _fields: {
-		Box: _unique.Box | $.VarRef<_unique.Box> | null
-	}
+	public declare Box: _unique.Box | $.VarRef<_unique.Box> | null
 
 	constructor(init?: Partial<{Box?: _unique.Box | $.VarRef<_unique.Box> | null}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Box: init?.Box ?? (null! as _unique.Box | $.VarRef<_unique.Box> | null)
-		}
+		this.Box = init?.Box ?? (null! as _unique.Box | $.VarRef<_unique.Box> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -30,10 +18,9 @@ export class Holder {
 		return new Holder(this, true)
 	}
 
-	public __goscriptAssign(source: Holder): void {
-		const target = this._fields
-		const values = source._fields
-		target.Box = values.Box
+	public __goscriptAssign(source: Holder): this {
+		this.Box = source.Box
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

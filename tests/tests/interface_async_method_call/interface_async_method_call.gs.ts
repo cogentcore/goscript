@@ -25,22 +25,10 @@ $.registerInterfaceType(
 );
 
 export class ChannelProcessor {
-	public get ch(): $.Channel<number> | null {
-		return this._fields.ch
-	}
-
-	public set ch(value: $.Channel<number> | null) {
-		this._fields.ch = value
-	}
-
-	public _fields: {
-		ch: $.Channel<number> | null
-	}
+	public declare ch: $.Channel<number> | null
 
 	constructor(init?: Partial<{ch?: $.Channel<number> | null}>, __goscriptValue?: boolean) {
-		this._fields = {
-			ch: init?.ch ?? (null! as $.Channel<number> | null)
-		}
+		this.ch = init?.ch ?? (null! as $.Channel<number> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -48,10 +36,9 @@ export class ChannelProcessor {
 		return new ChannelProcessor(this, true)
 	}
 
-	public __goscriptAssign(source: ChannelProcessor): void {
-		const target = this._fields
-		const values = source._fields
-		target.ch = values.ch
+	public __goscriptAssign(source: ChannelProcessor): this {
+		this.ch = source.ch
+		return this
 	}
 
 	public GetResult(): number {
@@ -79,22 +66,10 @@ export class ChannelProcessor {
 }
 
 export class SimpleProcessor {
-	public get value(): number {
-		return this._fields.value
-	}
-
-	public set value(value: number) {
-		this._fields.value = value
-	}
-
-	public _fields: {
-		value: number
-	}
+	public declare value: number
 
 	constructor(init?: Partial<{value?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			value: init?.value ?? (0 as number)
-		}
+		this.value = init?.value ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -102,10 +77,9 @@ export class SimpleProcessor {
 		return new SimpleProcessor(this, true)
 	}
 
-	public __goscriptAssign(source: SimpleProcessor): void {
-		const target = this._fields
-		const values = source._fields
-		target.value = values.value
+	public __goscriptAssign(source: SimpleProcessor): this {
+		this.value = source.value
+		return this
 	}
 
 	public GetResult(): number {
@@ -129,32 +103,13 @@ export class SimpleProcessor {
 }
 
 export class GenericChannelStore {
-	public get ch(): $.Channel<any> | null {
-		return this._fields.ch
-	}
+	public declare ch: $.Channel<any> | null
 
-	public set ch(value: $.Channel<any> | null) {
-		this._fields.ch = value
-	}
-
-	public get value(): any {
-		return this._fields.value
-	}
-
-	public set value(value: any) {
-		this._fields.value = value
-	}
-
-	public _fields: {
-		ch: $.Channel<any> | null
-		value: any
-	}
+	public declare value: any
 
 	constructor(init?: Partial<{ch?: $.Channel<any> | null, value?: any}>, __goscriptValue?: boolean) {
-		this._fields = {
-			ch: init?.ch ?? (null! as $.Channel<any> | null),
-			value: init?.value !== undefined ? $.copyElement(init.value) : (null! as any)
-		}
+		this.ch = init?.ch ?? (null! as $.Channel<any> | null)
+		this.value = init?.value !== undefined ? $.copyElement(init.value) : (null! as any)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -162,11 +117,10 @@ export class GenericChannelStore {
 		return new GenericChannelStore(this, true)
 	}
 
-	public __goscriptAssign(source: GenericChannelStore): void {
-		const target = this._fields
-		const values = source._fields
-		target.ch = values.ch
-		target.value = $.assignFieldValue(target.value, values.value, { kind: $.TypeKind.Interface, methods: [] })
+	public __goscriptAssign(source: GenericChannelStore): this {
+		this.ch = source.ch
+		this.value = $.assignFieldValue(this.value, source.value, { kind: $.TypeKind.Interface, methods: [] })
+		return this
 	}
 
 	public async Load(__typeArgs: $.GenericTypeArgs | undefined): globalThis.Promise<any> {

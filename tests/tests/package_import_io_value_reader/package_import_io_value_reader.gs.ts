@@ -10,12 +10,7 @@ import "@goscript/io/index.js"
 import "@goscript/strings/index.js"
 
 export class zeroReader {
-	public _fields: {
-	}
-
 	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
-		this._fields = {
-		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -23,7 +18,8 @@ export class zeroReader {
 		return new zeroReader(this, true)
 	}
 
-	public __goscriptAssign(source: zeroReader): void {
+	public __goscriptAssign(source: zeroReader): this {
+		return this
 	}
 
 	public Read(p: $.Slice<number>): [number, $.GoError] {

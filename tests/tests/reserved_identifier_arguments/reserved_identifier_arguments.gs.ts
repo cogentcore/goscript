@@ -4,12 +4,7 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class Parser {
-	public _fields: {
-	}
-
 	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
-		this._fields = {
-		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -17,7 +12,8 @@ export class Parser {
 		return new Parser(this, true)
 	}
 
-	public __goscriptAssign(source: Parser): void {
+	public __goscriptAssign(source: Parser): this {
+		return this
 	}
 
 	public Parse(_arguments: $.Slice<string>): number {

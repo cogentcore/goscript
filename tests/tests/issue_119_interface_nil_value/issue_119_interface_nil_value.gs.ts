@@ -14,22 +14,10 @@ $.registerInterfaceType(
 );
 
 export class Dog {
-	public get name(): string {
-		return this._fields.name
-	}
-
-	public set name(value: string) {
-		this._fields.name = value
-	}
-
-	public _fields: {
-		name: string
-	}
+	public declare name: string
 
 	constructor(init?: Partial<{name?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			name: init?.name ?? ("" as string)
-		}
+		this.name = init?.name ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -37,10 +25,9 @@ export class Dog {
 		return new Dog(this, true)
 	}
 
-	public __goscriptAssign(source: Dog): void {
-		const target = this._fields
-		const values = source._fields
-		target.name = values.name
+	public __goscriptAssign(source: Dog): this {
+		this.name = source.name
+		return this
 	}
 
 	public Name(): string {
@@ -61,22 +48,10 @@ export class Dog {
 }
 
 export class Cat {
-	public get name(): string {
-		return this._fields.name
-	}
-
-	public set name(value: string) {
-		this._fields.name = value
-	}
-
-	public _fields: {
-		name: string
-	}
+	public declare name: string
 
 	constructor(init?: Partial<{name?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			name: init?.name ?? ("" as string)
-		}
+		this.name = init?.name ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -84,10 +59,9 @@ export class Cat {
 		return new Cat(this, true)
 	}
 
-	public __goscriptAssign(source: Cat): void {
-		const target = this._fields
-		const values = source._fields
-		target.name = values.name
+	public __goscriptAssign(source: Cat): this {
+		this.name = source.name
+		return this
 	}
 
 	public Name(): string {

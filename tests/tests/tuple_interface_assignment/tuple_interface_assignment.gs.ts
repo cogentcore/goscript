@@ -14,12 +14,7 @@ $.registerInterfaceType(
 );
 
 export class concrete {
-	public _fields: {
-	}
-
 	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
-		this._fields = {
-		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -27,7 +22,8 @@ export class concrete {
 		return new concrete(this, true)
 	}
 
-	public __goscriptAssign(source: concrete): void {
+	public __goscriptAssign(source: concrete): this {
+		return this
 	}
 
 	public Read(): number {

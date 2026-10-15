@@ -10,32 +10,13 @@ import "@goscript/encoding/json/index.js"
 import "@goscript/reflect/index.js"
 
 export class Item {
-	public get Size(): number {
-		return this._fields.Size
-	}
+	public declare Size: number
 
-	public set Size(value: number) {
-		this._fields.Size = value
-	}
-
-	public get Plain(): string {
-		return this._fields.Plain
-	}
-
-	public set Plain(value: string) {
-		this._fields.Plain = value
-	}
-
-	public _fields: {
-		Size: number
-		Plain: string
-	}
+	public declare Plain: string
 
 	constructor(init?: Partial<{Size?: number, Plain?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Size: init?.Size ?? (0 as number),
-			Plain: init?.Plain ?? ("" as string)
-		}
+		this.Size = init?.Size ?? (0 as number)
+		this.Plain = init?.Plain ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -43,11 +24,10 @@ export class Item {
 		return new Item(this, true)
 	}
 
-	public __goscriptAssign(source: Item): void {
-		const target = this._fields
-		const values = source._fields
-		target.Size = values.Size
-		target.Plain = values.Plain
+	public __goscriptAssign(source: Item): this {
+		this.Size = source.Size
+		this.Plain = source.Plain
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

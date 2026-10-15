@@ -14,12 +14,7 @@ $.registerInterfaceType(
 );
 
 export class item {
-	public _fields: {
-	}
-
 	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
-		this._fields = {
-		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -27,7 +22,8 @@ export class item {
 		return new item(this, true)
 	}
 
-	public __goscriptAssign(source: item): void {
+	public __goscriptAssign(source: item): this {
+		return this
 	}
 
 	public Dump(): string {

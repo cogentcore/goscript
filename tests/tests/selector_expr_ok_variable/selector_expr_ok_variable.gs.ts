@@ -4,22 +4,10 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class Result {
-	public get ok(): boolean {
-		return this._fields.ok
-	}
-
-	public set ok(value: boolean) {
-		this._fields.ok = value
-	}
-
-	public _fields: {
-		ok: boolean
-	}
+	public declare ok: boolean
 
 	constructor(init?: Partial<{ok?: boolean}>, __goscriptValue?: boolean) {
-		this._fields = {
-			ok: init?.ok ?? (false as boolean)
-		}
+		this.ok = init?.ok ?? (false as boolean)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -27,10 +15,9 @@ export class Result {
 		return new Result(this, true)
 	}
 
-	public __goscriptAssign(source: Result): void {
-		const target = this._fields
-		const values = source._fields
-		target.ok = values.ok
+	public __goscriptAssign(source: Result): this {
+		this.ok = source.ok
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

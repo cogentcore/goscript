@@ -10,22 +10,10 @@ import "@goscript/github.com/s4wave/goscript/tests/tests/type_alias_interface_pa
 import "./types.gs.ts"
 
 export class sink {
-	public get size(): number {
-		return this._fields.size
-	}
-
-	public set size(value: number) {
-		this._fields.size = value
-	}
-
-	public _fields: {
-		size: number
-	}
+	public declare size: number
 
 	constructor(init?: Partial<{size?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			size: init?.size ?? (0 as number)
-		}
+		this.size = init?.size ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -33,10 +21,9 @@ export class sink {
 		return new sink(this, true)
 	}
 
-	public __goscriptAssign(source: sink): void {
-		const target = this._fields
-		const values = source._fields
-		target.size = values.size
+	public __goscriptAssign(source: sink): this {
+		this.size = source.size
+		return this
 	}
 
 	public Put(v: __goscript_types.Value): void {

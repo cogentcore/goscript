@@ -10,52 +10,19 @@ import "@goscript/encoding/json/index.js"
 import "@goscript/fmt/index.js"
 
 export class Base {
-	public get Name(): string {
-		return this._fields.Name
-	}
+	public declare Name: string
 
-	public set Name(value: string) {
-		this._fields.Name = value
-	}
+	public declare Kids: $.Slice<string>
 
-	public get Kids(): $.Slice<string> {
-		return this._fields.Kids
-	}
+	public declare hidden: number
 
-	public set Kids(value: $.Slice<string>) {
-		this._fields.Kids = value
-	}
-
-	public get hidden(): number {
-		return this._fields.hidden
-	}
-
-	public set hidden(value: number) {
-		this._fields.hidden = value
-	}
-
-	public get Shadowed(): string {
-		return this._fields.Shadowed
-	}
-
-	public set Shadowed(value: string) {
-		this._fields.Shadowed = value
-	}
-
-	public _fields: {
-		Name: string
-		Kids: $.Slice<string>
-		hidden: number
-		Shadowed: string
-	}
+	public declare Shadowed: string
 
 	constructor(init?: Partial<{Name?: string, Kids?: $.Slice<string>, hidden?: number, Shadowed?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Name: init?.Name ?? ("" as string),
-			Kids: init?.Kids ?? (null! as $.Slice<string>),
-			hidden: init?.hidden ?? (0 as number),
-			Shadowed: init?.Shadowed ?? ("" as string)
-		}
+		this.Name = init?.Name ?? ("" as string)
+		this.Kids = init?.Kids ?? (null! as $.Slice<string>)
+		this.hidden = init?.hidden ?? (0 as number)
+		this.Shadowed = init?.Shadowed ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -63,13 +30,12 @@ export class Base {
 		return new Base(this, true)
 	}
 
-	public __goscriptAssign(source: Base): void {
-		const target = this._fields
-		const values = source._fields
-		target.Name = values.Name
-		target.Kids = values.Kids
-		target.hidden = values.hidden
-		target.Shadowed = values.Shadowed
+	public __goscriptAssign(source: Base): this {
+		this.Name = source.Name
+		this.Kids = source.Kids
+		this.hidden = source.hidden
+		this.Shadowed = source.Shadowed
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -82,22 +48,10 @@ export class Base {
 }
 
 export class inner {
-	public get Deep(): number {
-		return this._fields.Deep
-	}
-
-	public set Deep(value: number) {
-		this._fields.Deep = value
-	}
-
-	public _fields: {
-		Deep: number
-	}
+	public declare Deep: number
 
 	constructor(init?: Partial<{Deep?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Deep: init?.Deep ?? (0 as number)
-		}
+		this.Deep = init?.Deep ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -105,10 +59,9 @@ export class inner {
 		return new inner(this, true)
 	}
 
-	public __goscriptAssign(source: inner): void {
-		const target = this._fields
-		const values = source._fields
-		target.Deep = values.Deep
+	public __goscriptAssign(source: inner): this {
+		this.Deep = source.Deep
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -121,22 +74,10 @@ export class inner {
 }
 
 export class Extra {
-	public get Note(): string {
-		return this._fields.Note
-	}
-
-	public set Note(value: string) {
-		this._fields.Note = value
-	}
-
-	public _fields: {
-		Note: string
-	}
+	public declare Note: string
 
 	constructor(init?: Partial<{Note?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Note: init?.Note ?? ("" as string)
-		}
+		this.Note = init?.Note ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -144,10 +85,9 @@ export class Extra {
 		return new Extra(this, true)
 	}
 
-	public __goscriptAssign(source: Extra): void {
-		const target = this._fields
-		const values = source._fields
-		target.Note = values.Note
+	public __goscriptAssign(source: Extra): this {
+		this.Note = source.Note
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -160,82 +100,28 @@ export class Extra {
 }
 
 export class Node {
-	public get Base(): Base {
-		return this._fields.Base
-	}
+	public declare Base: Base
 
-	public set Base(value: Base) {
-		this._fields.Base = value
-	}
+	public declare Extra: Extra | $.VarRef<Extra> | null
 
-	public get Extra(): Extra | $.VarRef<Extra> | null {
-		return this._fields.Extra
-	}
+	public declare inner: inner
 
-	public set Extra(value: Extra | $.VarRef<Extra> | null) {
-		this._fields.Extra = value
-	}
+	public declare Tagged: Base
 
-	public get inner(): inner {
-		return this._fields.inner
-	}
+	public declare Shadowed: string
 
-	public set inner(value: inner) {
-		this._fields.inner = value
-	}
+	public declare Size: number
 
-	public get Tagged(): Base {
-		return this._fields.Tagged
-	}
-
-	public set Tagged(value: Base) {
-		this._fields.Tagged = value
-	}
-
-	public get Shadowed(): string {
-		return this._fields.Shadowed
-	}
-
-	public set Shadowed(value: string) {
-		this._fields.Shadowed = value
-	}
-
-	public get Size(): number {
-		return this._fields.Size
-	}
-
-	public set Size(value: number) {
-		this._fields.Size = value
-	}
-
-	public get _private(): boolean {
-		return this._fields._private
-	}
-
-	public set _private(value: boolean) {
-		this._fields._private = value
-	}
-
-	public _fields: {
-		Base: Base
-		Extra: Extra | $.VarRef<Extra> | null
-		inner: inner
-		Tagged: Base
-		Shadowed: string
-		Size: number
-		_private: boolean
-	}
+	public declare _private: boolean
 
 	constructor(init?: Partial<{Base?: Base, Extra?: Extra | $.VarRef<Extra> | null, inner?: inner, Tagged?: Base, Shadowed?: string, Size?: number, _private?: boolean}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Base: init?.Base ? init.Base.clone() : new Base(undefined, true),
-			Extra: init?.Extra ?? (null! as Extra | $.VarRef<Extra> | null),
-			inner: init?.inner ? init.inner.clone() : new inner(undefined, true),
-			Tagged: init?.Tagged ? init.Tagged.clone() : new Base(undefined, true),
-			Shadowed: init?.Shadowed ?? ("" as string),
-			Size: init?.Size ?? (0 as number),
-			_private: init?._private ?? (false as boolean)
-		}
+		this.Base = init?.Base ? init.Base.clone() : new Base(undefined, true)
+		this.Extra = init?.Extra ?? (null! as Extra | $.VarRef<Extra> | null)
+		this.inner = init?.inner ? init.inner.clone() : new inner(undefined, true)
+		this.Tagged = init?.Tagged ? init.Tagged.clone() : new Base(undefined, true)
+		this.Shadowed = init?.Shadowed ?? ("" as string)
+		this.Size = init?.Size ?? (0 as number)
+		this._private = init?._private ?? (false as boolean)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -243,16 +129,15 @@ export class Node {
 		return new Node(this, true)
 	}
 
-	public __goscriptAssign(source: Node): void {
-		const target = this._fields
-		const values = source._fields
-		$.assignStruct(target.Base, values.Base)
-		target.Extra = values.Extra
-		$.assignStruct(target.inner, values.inner)
-		$.assignStruct(target.Tagged, values.Tagged)
-		target.Shadowed = values.Shadowed
-		target.Size = values.Size
-		target._private = values._private
+	public __goscriptAssign(source: Node): this {
+		this.Base.__goscriptAssign(source.Base)
+		this.Extra = source.Extra
+		this.inner.__goscriptAssign(source.inner)
+		this.Tagged.__goscriptAssign(source.Tagged)
+		this.Shadowed = source.Shadowed
+		this.Size = source.Size
+		this._private = source._private
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

@@ -5,33 +5,14 @@ import * as $ from "@goscript/builtin/index.js"
 
 export class TestStruct {
 	// IntField is a commented integer field.
-	public get IntField(): number {
-		return this._fields.IntField
-	}
-
-	public set IntField(value: number) {
-		this._fields.IntField = value
-	}
+	public declare IntField: number
 
 	// StringField is a commented string field.
-	public get StringField(): string {
-		return this._fields.StringField
-	}
-
-	public set StringField(value: string) {
-		this._fields.StringField = value
-	}
-
-	public _fields: {
-		IntField: number
-		StringField: string
-	}
+	public declare StringField: string
 
 	constructor(init?: Partial<{IntField?: number, StringField?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			IntField: init?.IntField ?? (0 as number),
-			StringField: init?.StringField ?? ("" as string)
-		}
+		this.IntField = init?.IntField ?? (0 as number)
+		this.StringField = init?.StringField ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -39,11 +20,10 @@ export class TestStruct {
 		return new TestStruct(this, true)
 	}
 
-	public __goscriptAssign(source: TestStruct): void {
-		const target = this._fields
-		const values = source._fields
-		target.IntField = values.IntField
-		target.StringField = values.StringField
+	public __goscriptAssign(source: TestStruct): this {
+		this.IntField = source.IntField
+		this.StringField = source.StringField
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

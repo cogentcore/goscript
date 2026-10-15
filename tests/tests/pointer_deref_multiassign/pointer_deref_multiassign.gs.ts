@@ -4,42 +4,16 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class MyStruct {
-	public get MyInt(): number {
-		return this._fields.MyInt
-	}
+	public declare MyInt: number
 
-	public set MyInt(value: number) {
-		this._fields.MyInt = value
-	}
+	public declare MyString: string
 
-	public get MyString(): string {
-		return this._fields.MyString
-	}
-
-	public set MyString(value: string) {
-		this._fields.MyString = value
-	}
-
-	public get myBool(): boolean {
-		return this._fields.myBool
-	}
-
-	public set myBool(value: boolean) {
-		this._fields.myBool = value
-	}
-
-	public _fields: {
-		MyInt: number
-		MyString: string
-		myBool: boolean
-	}
+	public declare myBool: boolean
 
 	constructor(init?: Partial<{MyInt?: number, MyString?: string, myBool?: boolean}>, __goscriptValue?: boolean) {
-		this._fields = {
-			MyInt: init?.MyInt ?? (0 as number),
-			MyString: init?.MyString ?? ("" as string),
-			myBool: init?.myBool ?? (false as boolean)
-		}
+		this.MyInt = init?.MyInt ?? (0 as number)
+		this.MyString = init?.MyString ?? ("" as string)
+		this.myBool = init?.myBool ?? (false as boolean)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -47,12 +21,11 @@ export class MyStruct {
 		return new MyStruct(this, true)
 	}
 
-	public __goscriptAssign(source: MyStruct): void {
-		const target = this._fields
-		const values = source._fields
-		target.MyInt = values.MyInt
-		target.MyString = values.MyString
-		target.myBool = values.myBool
+	public __goscriptAssign(source: MyStruct): this {
+		this.MyInt = source.MyInt
+		this.MyString = source.MyString
+		this.myBool = source.myBool
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

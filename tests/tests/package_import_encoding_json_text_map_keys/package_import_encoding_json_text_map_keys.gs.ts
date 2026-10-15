@@ -31,62 +31,22 @@ export type Style = globalThis.Map<Tokens, string> | null
 $.registerNamedType("main.Style", /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("int32", "main.Tokens"), /* @__PURE__ */ $.basicType("string")));
 
 export class Doc {
-	public get Kind(): Tokens {
-		return this._fields.Kind
-	}
+	public declare Kind: Tokens
 
-	public set Kind(value: Tokens) {
-		this._fields.Kind = value
-	}
+	public declare Kinds: $.Slice<Tokens>
 
-	public get Kinds(): $.Slice<Tokens> {
-		return this._fields.Kinds
-	}
+	public declare Styles: globalThis.Map<string, Style> | null
 
-	public set Kinds(value: $.Slice<Tokens>) {
-		this._fields.Kinds = value
-	}
+	public declare Counts: globalThis.Map<number, number> | null
 
-	public get Styles(): globalThis.Map<string, Style> | null {
-		return this._fields.Styles
-	}
-
-	public set Styles(value: globalThis.Map<string, Style> | null) {
-		this._fields.Styles = value
-	}
-
-	public get Counts(): globalThis.Map<number, number> | null {
-		return this._fields.Counts
-	}
-
-	public set Counts(value: globalThis.Map<number, number> | null) {
-		this._fields.Counts = value
-	}
-
-	public get Big(): globalThis.Map<bigint, string> | null {
-		return this._fields.Big
-	}
-
-	public set Big(value: globalThis.Map<bigint, string> | null) {
-		this._fields.Big = value
-	}
-
-	public _fields: {
-		Kind: Tokens
-		Kinds: $.Slice<Tokens>
-		Styles: globalThis.Map<string, Style> | null
-		Counts: globalThis.Map<number, number> | null
-		Big: globalThis.Map<bigint, string> | null
-	}
+	public declare Big: globalThis.Map<bigint, string> | null
 
 	constructor(init?: Partial<{Kind?: Tokens, Kinds?: $.Slice<Tokens>, Styles?: globalThis.Map<string, Style> | null, Counts?: globalThis.Map<number, number> | null, Big?: globalThis.Map<bigint, string> | null}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Kind: init?.Kind ?? (0 as Tokens),
-			Kinds: init?.Kinds ?? (null! as $.Slice<Tokens>),
-			Styles: init?.Styles ?? (null! as globalThis.Map<string, Style> | null),
-			Counts: init?.Counts ?? (null! as globalThis.Map<number, number> | null),
-			Big: init?.Big ?? (null! as globalThis.Map<bigint, string> | null)
-		}
+		this.Kind = init?.Kind ?? (0 as Tokens)
+		this.Kinds = init?.Kinds ?? (null! as $.Slice<Tokens>)
+		this.Styles = init?.Styles ?? (null! as globalThis.Map<string, Style> | null)
+		this.Counts = init?.Counts ?? (null! as globalThis.Map<number, number> | null)
+		this.Big = init?.Big ?? (null! as globalThis.Map<bigint, string> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -94,14 +54,13 @@ export class Doc {
 		return new Doc(this, true)
 	}
 
-	public __goscriptAssign(source: Doc): void {
-		const target = this._fields
-		const values = source._fields
-		target.Kind = values.Kind
-		target.Kinds = values.Kinds
-		target.Styles = values.Styles
-		target.Counts = values.Counts
-		target.Big = values.Big
+	public __goscriptAssign(source: Doc): this {
+		this.Kind = source.Kind
+		this.Kinds = source.Kinds
+		this.Styles = source.Styles
+		this.Counts = source.Counts
+		this.Big = source.Big
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

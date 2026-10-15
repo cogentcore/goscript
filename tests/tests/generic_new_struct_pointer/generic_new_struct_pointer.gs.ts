@@ -15,32 +15,13 @@ $.registerInterfaceType(
 );
 
 export class Base {
-	public get name(): string {
-		return this._fields.name
-	}
+	public declare name: string
 
-	public set name(value: string) {
-		this._fields.name = value
-	}
-
-	public get inits(): number {
-		return this._fields.inits
-	}
-
-	public set inits(value: number) {
-		this._fields.inits = value
-	}
-
-	public _fields: {
-		name: string
-		inits: number
-	}
+	public declare inits: number
 
 	constructor(init?: Partial<{name?: string, inits?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			name: init?.name ?? ("" as string),
-			inits: init?.inits ?? (0 as number)
-		}
+		this.name = init?.name ?? ("" as string)
+		this.inits = init?.inits ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -48,11 +29,10 @@ export class Base {
 		return new Base(this, true)
 	}
 
-	public __goscriptAssign(source: Base): void {
-		const target = this._fields
-		const values = source._fields
-		target.name = values.name
-		target.inits = values.inits
+	public __goscriptAssign(source: Base): this {
+		this.name = source.name
+		this.inits = source.inits
+		return this
 	}
 
 	public Name(): string {
@@ -75,32 +55,13 @@ export class Base {
 }
 
 export class Widget {
-	public get Base(): Base {
-		return this._fields.Base
-	}
+	public declare Base: Base
 
-	public set Base(value: Base) {
-		this._fields.Base = value
-	}
-
-	public get Text(): string {
-		return this._fields.Text
-	}
-
-	public set Text(value: string) {
-		this._fields.Text = value
-	}
-
-	public _fields: {
-		Base: Base
-		Text: string
-	}
+	public declare Text: string
 
 	constructor(init?: Partial<{Base?: Base, Text?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Base: init?.Base ? init.Base.clone() : new Base(undefined, true),
-			Text: init?.Text ?? ("" as string)
-		}
+		this.Base = init?.Base ? init.Base.clone() : new Base(undefined, true)
+		this.Text = init?.Text ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -108,11 +69,10 @@ export class Widget {
 		return new Widget(this, true)
 	}
 
-	public __goscriptAssign(source: Widget): void {
-		const target = this._fields
-		const values = source._fields
-		$.assignStruct(target.Base, values.Base)
-		target.Text = values.Text
+	public __goscriptAssign(source: Widget): this {
+		this.Base.__goscriptAssign(source.Base)
+		this.Text = source.Text
+		return this
 	}
 
 	public Name(): any {

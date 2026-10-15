@@ -7,22 +7,10 @@ import * as reflect from "@goscript/reflect/index.js"
 import "@goscript/reflect/index.js"
 
 export class Base {
-	public get Name(): string {
-		return this._fields.Name
-	}
-
-	public set Name(value: string) {
-		this._fields.Name = value
-	}
-
-	public _fields: {
-		Name: string
-	}
+	public declare Name: string
 
 	constructor(init?: Partial<{Name?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Name: init?.Name ?? ("" as string)
-		}
+		this.Name = init?.Name ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -30,10 +18,9 @@ export class Base {
 		return new Base(this, true)
 	}
 
-	public __goscriptAssign(source: Base): void {
-		const target = this._fields
-		const values = source._fields
-		target.Name = values.Name
+	public __goscriptAssign(source: Base): this {
+		this.Name = source.Name
+		return this
 	}
 
 	public Label(): string {
@@ -56,32 +43,13 @@ export class Base {
 }
 
 export class Node {
-	public get Base(): Base {
-		return this._fields.Base
-	}
+	public declare Base: Base
 
-	public set Base(value: Base) {
-		this._fields.Base = value
-	}
-
-	public get Value(): number {
-		return this._fields.Value
-	}
-
-	public set Value(value: number) {
-		this._fields.Value = value
-	}
-
-	public _fields: {
-		Base: Base
-		Value: number
-	}
+	public declare Value: number
 
 	constructor(init?: Partial<{Base?: Base, Value?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Base: init?.Base ? init.Base.clone() : new Base(undefined, true),
-			Value: init?.Value ?? (0 as number)
-		}
+		this.Base = init?.Base ? init.Base.clone() : new Base(undefined, true)
+		this.Value = init?.Value ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -89,11 +57,10 @@ export class Node {
 		return new Node(this, true)
 	}
 
-	public __goscriptAssign(source: Node): void {
-		const target = this._fields
-		const values = source._fields
-		$.assignStruct(target.Base, values.Base)
-		target.Value = values.Value
+	public __goscriptAssign(source: Node): this {
+		this.Base.__goscriptAssign(source.Base)
+		this.Value = source.Value
+		return this
 	}
 
 	public Label(): any {

@@ -4,22 +4,10 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class inner {
-	public get value(): number {
-		return this._fields.value
-	}
-
-	public set value(value: number) {
-		this._fields.value = value
-	}
-
-	public _fields: {
-		value: number
-	}
+	public declare value: number
 
 	constructor(init?: Partial<{value?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			value: init?.value ?? (0 as number)
-		}
+		this.value = init?.value ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -27,10 +15,9 @@ export class inner {
 		return new inner(this, true)
 	}
 
-	public __goscriptAssign(source: inner): void {
-		const target = this._fields
-		const values = source._fields
-		target.value = values.value
+	public __goscriptAssign(source: inner): this {
+		this.value = source.value
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -43,22 +30,10 @@ export class inner {
 }
 
 export class outer {
-	public get inner(): inner {
-		return this._fields.inner
-	}
-
-	public set inner(value: inner) {
-		this._fields.inner = value
-	}
-
-	public _fields: {
-		inner: inner
-	}
+	public declare inner: inner
 
 	constructor(init?: Partial<{inner?: inner}>, __goscriptValue?: boolean) {
-		this._fields = {
-			inner: init?.inner ? init.inner.clone() : new inner(undefined, true)
-		}
+		this.inner = init?.inner ? init.inner.clone() : new inner(undefined, true)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -66,10 +41,9 @@ export class outer {
 		return new outer(this, true)
 	}
 
-	public __goscriptAssign(source: outer): void {
-		const target = this._fields
-		const values = source._fields
-		$.assignStruct(target.inner, values.inner)
+	public __goscriptAssign(source: outer): this {
+		this.inner.__goscriptAssign(source.inner)
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

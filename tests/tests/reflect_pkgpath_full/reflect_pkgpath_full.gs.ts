@@ -10,12 +10,7 @@ import "@goscript/reflect/index.js"
 import "@goscript/github.com/s4wave/goscript/tests/tests/reflect_pkgpath_full/dep/index.js"
 
 export class mainType {
-	public _fields: {
-	}
-
 	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
-		this._fields = {
-		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -23,7 +18,8 @@ export class mainType {
 		return new mainType(this, true)
 	}
 
-	public __goscriptAssign(source: mainType): void {
+	public __goscriptAssign(source: mainType): this {
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

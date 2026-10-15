@@ -14,22 +14,10 @@ $.registerInterfaceType(
 );
 
 export class listProvider {
-	public get items(): $.Slice<Group | $.VarRef<Group> | null> {
-		return this._fields.items
-	}
-
-	public set items(value: $.Slice<Group | $.VarRef<Group> | null>) {
-		this._fields.items = value
-	}
-
-	public _fields: {
-		items: $.Slice<Group | $.VarRef<Group> | null>
-	}
+	public declare items: $.Slice<Group | $.VarRef<Group> | null>
 
 	constructor(init?: Partial<{items?: $.Slice<Group | $.VarRef<Group> | null>}>, __goscriptValue?: boolean) {
-		this._fields = {
-			items: init?.items ?? (null! as $.Slice<Group | $.VarRef<Group> | null>)
-		}
+		this.items = init?.items ?? (null! as $.Slice<Group | $.VarRef<Group> | null>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -37,10 +25,9 @@ export class listProvider {
 		return new listProvider(this, true)
 	}
 
-	public __goscriptAssign(source: listProvider): void {
-		const target = this._fields
-		const values = source._fields
-		target.items = values.items
+	public __goscriptAssign(source: listProvider): this {
+		this.items = source.items
+		return this
 	}
 
 	public Items(): $.Slice<Group | $.VarRef<Group> | null> {
@@ -58,32 +45,13 @@ export class listProvider {
 }
 
 export class Group {
-	public get provider(): provider | null {
-		return this._fields.provider
-	}
+	public declare provider: provider | null
 
-	public set provider(value: provider | null) {
-		this._fields.provider = value
-	}
-
-	public get seen(): boolean {
-		return this._fields.seen
-	}
-
-	public set seen(value: boolean) {
-		this._fields.seen = value
-	}
-
-	public _fields: {
-		provider: provider | null
-		seen: boolean
-	}
+	public declare seen: boolean
 
 	constructor(init?: Partial<{provider?: provider | null, seen?: boolean}>, __goscriptValue?: boolean) {
-		this._fields = {
-			provider: init?.provider ?? (null! as provider | null),
-			seen: init?.seen ?? (false as boolean)
-		}
+		this.provider = init?.provider ?? (null! as provider | null)
+		this.seen = init?.seen ?? (false as boolean)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -91,11 +59,10 @@ export class Group {
 		return new Group(this, true)
 	}
 
-	public __goscriptAssign(source: Group): void {
-		const target = this._fields
-		const values = source._fields
-		target.provider = $.assignFieldValue(target.provider, values.provider, "main.provider")
-		target.seen = values.seen
+	public __goscriptAssign(source: Group): this {
+		this.provider = $.assignFieldValue(this.provider, source.provider, "main.provider")
+		this.seen = source.seen
+		return this
 	}
 
 	public async Build(): globalThis.Promise<void> {

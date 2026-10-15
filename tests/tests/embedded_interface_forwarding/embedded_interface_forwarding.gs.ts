@@ -14,22 +14,10 @@ $.registerInterfaceType(
 );
 
 export class Box {
-	public get Adder(): Adder | null {
-		return this._fields.Adder
-	}
-
-	public set Adder(value: Adder | null) {
-		this._fields.Adder = value
-	}
-
-	public _fields: {
-		Adder: Adder | null
-	}
+	public declare Adder: Adder | null
 
 	constructor(init?: Partial<{Adder?: Adder | null}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Adder: init?.Adder ?? (null! as Adder | null)
-		}
+		this.Adder = init?.Adder ?? (null! as Adder | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -37,10 +25,9 @@ export class Box {
 		return new Box(this, true)
 	}
 
-	public __goscriptAssign(source: Box): void {
-		const target = this._fields
-		const values = source._fields
-		target.Adder = $.assignFieldValue(target.Adder, values.Adder, "main.Adder")
+	public __goscriptAssign(source: Box): this {
+		this.Adder = $.assignFieldValue(this.Adder, source.Adder, "main.Adder")
+		return this
 	}
 
 	public Add(value: any): any {
@@ -57,22 +44,10 @@ export class Box {
 }
 
 export class Counter {
-	public get base(): number {
-		return this._fields.base
-	}
-
-	public set base(value: number) {
-		this._fields.base = value
-	}
-
-	public _fields: {
-		base: number
-	}
+	public declare base: number
 
 	constructor(init?: Partial<{base?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			base: init?.base ?? (0 as number)
-		}
+		this.base = init?.base ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -80,10 +55,9 @@ export class Counter {
 		return new Counter(this, true)
 	}
 
-	public __goscriptAssign(source: Counter): void {
-		const target = this._fields
-		const values = source._fields
-		target.base = values.base
+	public __goscriptAssign(source: Counter): this {
+		this.base = source.base
+		return this
 	}
 
 	public Add(value: number): number {

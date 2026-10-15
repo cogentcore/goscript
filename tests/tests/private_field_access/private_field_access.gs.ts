@@ -4,32 +4,13 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class MyStruct {
-	public get publicField(): string {
-		return this._fields.publicField
-	}
+	public declare publicField: string
 
-	public set publicField(value: string) {
-		this._fields.publicField = value
-	}
-
-	public get privateField(): number {
-		return this._fields.privateField
-	}
-
-	public set privateField(value: number) {
-		this._fields.privateField = value
-	}
-
-	public _fields: {
-		publicField: string
-		privateField: number
-	}
+	public declare privateField: number
 
 	constructor(init?: Partial<{publicField?: string, privateField?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			publicField: init?.publicField ?? ("" as string),
-			privateField: init?.privateField ?? (0 as number)
-		}
+		this.publicField = init?.publicField ?? ("" as string)
+		this.privateField = init?.privateField ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -37,11 +18,10 @@ export class MyStruct {
 		return new MyStruct(this, true)
 	}
 
-	public __goscriptAssign(source: MyStruct): void {
-		const target = this._fields
-		const values = source._fields
-		target.publicField = values.publicField
-		target.privateField = values.privateField
+	public __goscriptAssign(source: MyStruct): this {
+		this.publicField = source.publicField
+		this.privateField = source.privateField
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

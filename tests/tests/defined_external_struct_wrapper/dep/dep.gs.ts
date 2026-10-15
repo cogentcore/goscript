@@ -6,22 +6,10 @@ import * as $ from "@goscript/builtin/index.js"
 $.registerTypePackagePath("github.com/s4wave/goscript/tests/tests/defined_external_struct_wrapper/dep", ["dep.hidden", "dep.Public"])
 
 export class hidden {
-	public get label(): string {
-		return this._fields.label
-	}
-
-	public set label(value: string) {
-		this._fields.label = value
-	}
-
-	public _fields: {
-		label: string
-	}
+	public declare label: string
 
 	constructor(init?: Partial<{label?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			label: init?.label ?? ("" as string)
-		}
+		this.label = init?.label ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -29,10 +17,9 @@ export class hidden {
 		return new hidden(this, true)
 	}
 
-	public __goscriptAssign(source: hidden): void {
-		const target = this._fields
-		const values = source._fields
-		target.label = values.label
+	public __goscriptAssign(source: hidden): this {
+		this.label = source.label
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -45,32 +32,13 @@ export class hidden {
 }
 
 export class Public {
-	public get Value(): string {
-		return this._fields.Value
-	}
+	public declare Value: string
 
-	public set Value(value: string) {
-		this._fields.Value = value
-	}
-
-	public get Hidden(): hidden {
-		return this._fields.Hidden
-	}
-
-	public set Hidden(value: hidden) {
-		this._fields.Hidden = value
-	}
-
-	public _fields: {
-		Value: string
-		Hidden: hidden
-	}
+	public declare Hidden: hidden
 
 	constructor(init?: Partial<{Value?: string, Hidden?: hidden}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Value: init?.Value ?? ("" as string),
-			Hidden: init?.Hidden ? init.Hidden.clone() : new hidden(undefined, true)
-		}
+		this.Value = init?.Value ?? ("" as string)
+		this.Hidden = init?.Hidden ? init.Hidden.clone() : new hidden(undefined, true)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -78,11 +46,10 @@ export class Public {
 		return new Public(this, true)
 	}
 
-	public __goscriptAssign(source: Public): void {
-		const target = this._fields
-		const values = source._fields
-		target.Value = values.Value
-		$.assignStruct(target.Hidden, values.Hidden)
+	public __goscriptAssign(source: Public): this {
+		this.Value = source.Value
+		this.Hidden.__goscriptAssign(source.Hidden)
+		return this
 	}
 
 	public Label(): string {
