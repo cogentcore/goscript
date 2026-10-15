@@ -579,14 +579,12 @@ export function sliceToArrayPointer<T>(
  * isComplexSlice identifies slices with explicit backing-window metadata.
  */
 function isComplexSlice<T>(slice: unknown): slice is SliceProxy<T> {
-  // A window object is one, tested first without reading __meta__ (see
-  // sliceLen), and sliceMeta reads the window of a proxy without its has
-  // trap.
+  // sliceMeta reads the window of a proxy without its has trap. Testing
+  // instanceof GoSlice first would slow down every test of a plain array.
   return (
-    slice instanceof GoSlice ||
-    (slice !== null &&
-      typeof slice === 'object' &&
-      sliceMeta(slice) !== undefined)
+    slice !== null &&
+    typeof slice === 'object' &&
+    sliceMeta(slice) !== undefined
   )
 }
 
@@ -736,6 +734,39 @@ export function goSlice<T>(
   high = normalizeSliceIndex(high)
   max = normalizeSliceIndex(max)
 
+  // A window object and a plain array without a window, the common cases,
+  // are sliced by their windows when the bounds are in range, tested first
+  // without reading __meta__ (see sliceLen).
+  if (s instanceof GoSlice) {
+    const sliced = sliceOfWindow(
+      s.backing,
+      s.offset,
+      s.length,
+      s.capacity,
+      low,
+      high,
+      max,
+    )
+    if (sliced !== undefined) {
+      return sliced
+    }
+  } else if (Array.isArray(s) && (s as any).__meta__ === undefined) {
+    const sliced = sliceOfWindow(
+      s as T[],
+      0,
+      s.length,
+      s.length,
+      low,
+      high,
+      max,
+    )
+    if (sliced !== undefined) {
+      return sliced
+    }
+  }
+
+  // Byte slices, slice proxies, nil and out of range bounds take the
+  // general path.
   if (s instanceof Uint8Array) {
     const meta = byteSliceMeta(s)
     const metaBacking = meta?.backing as unknown
@@ -877,6 +908,48 @@ export function goSlice<T>(
   return new GoSlice(backing as T[], newOffset, newLength, newCap)
 }
 
+// sliceOfWindow returns backing[offset:offset+length][low:high:max] for a
+// window of offset, length and capacity on backing, or undefined when the
+// bounds are out of range, which the general path of goSlice reports.
+function sliceOfWindow<T>(
+  backing: T[],
+  offset: number,
+  length: number,
+  capacity: number,
+  low: number | undefined,
+  high: number | undefined,
+  max: number | undefined,
+): Slice<T> | undefined {
+  // Omitted bounds are zero, the length and the capacity.
+  const lo = low ?? 0
+  const hi = high ?? length
+  const mx = max ?? capacity
+  if (lo < 0 || hi < lo || mx < hi || mx > capacity) {
+    return undefined
+  }
+
+  // A slice that extends past the length reads spare capacity, whose empty
+  // slots get their zero values now.
+  if (hi > length) {
+    fillSpareCapacity(backing, offset + length, offset + hi)
+  }
+
+  // A slice of a whole backing array is the array, unless the array is an
+  // array value, whose marker must not make the slice copy like an array.
+  const newOffset = offset + lo
+  const newLength = hi - lo
+  const newCap = mx - lo
+  if (
+    newOffset === 0 &&
+    newLength === newCap &&
+    backing.length === newLength &&
+    !isArrayValue(backing)
+  ) {
+    return backing as Slice<T>
+  }
+  return new GoSlice(backing, newOffset, newLength, newCap)
+}
+
 /**
  * arrayToSlice converts nested arrays to shared slice views up to depth; depth one preserves the array.
  */
@@ -1006,6 +1079,12 @@ export function sliceLen(
     return slice.length
   }
 
+  // A byte slice is a view of exactly its elements, whose window, if any,
+  // has the same length.
+  if (slice instanceof Uint8Array) {
+    return slice.length
+  }
+
   // A slice proxy knows its length.
   const meta = sliceMeta(slice)
   if (meta !== undefined) {
@@ -1013,7 +1092,7 @@ export function sliceLen(
   }
 
   // A plain array may carry a window of its own.
-  if (isArrayOrGoSlice(slice) || slice instanceof Uint8Array) {
+  if (isArrayOrGoSlice(slice)) {
     const plainMeta = (slice as any).__meta__ as
       | GoSliceObject<unknown>
       | undefined
@@ -1790,19 +1869,22 @@ export function arrayIndex<
     return collection[index] as ArrayIndexValue<C>
   }
 
-  // A slice proxy or byte view with a window reads its backing array.
+  // A byte slice is a view of exactly its elements, so it is indexed
+  // directly, also when it has a window.
+  if (collection instanceof Uint8Array) {
+    if (index < 0 || index >= collection.length) {
+      outOfRangeIndex(index, collection.length)
+    }
+    return collection[index] as ArrayIndexValue<C>
+  }
+
+  // A slice proxy reads its backing array.
   const meta = sliceMeta(collection)
   if (meta !== undefined) {
     if (index < 0 || index >= meta.length) {
       outOfRangeIndex(index, meta.length)
     }
     return meta.backing[meta.offset + index] as ArrayIndexValue<C>
-  }
-  if (collection instanceof Uint8Array) {
-    if (index < 0 || index >= collection.length) {
-      outOfRangeIndex(index, collection.length)
-    }
-    return collection[index] as ArrayIndexValue<C>
   }
   if (isComplexSlice(collection)) {
     const length = collection.__meta__.length
@@ -2552,12 +2634,16 @@ export const stringToRune = (str: string): number => {
  * runesToString encodes Unicode scalar values, replacing invalid runes with U+FFFD.
  */
 export const runesToString = (runes: Slice<number>): string => {
+  // A nil or empty slice is the empty string.
   if (!runes?.length) {
     return ''
   }
+
+  // The runes are read from the window of the slice, without an iterator.
+  const { backing, offset, length } = sliceRange(runes)
   let out = ''
-  for (const r of runes) {
-    out += runeToString(r)
+  for (let i = 0; i < length; i++) {
+    out += runeToString(backing[offset + i])
   }
   return out
 }
