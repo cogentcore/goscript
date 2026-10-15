@@ -6,6 +6,10 @@ import {
   isMarkedAsStructValue,
   isTypedNilValue,
   markAsStructValue,
+  resolveTypeInfo,
+  structValueTypeInfo,
+  TypeKind,
+  type StructTypeInfo,
 } from './type.js'
 import { runtimePanic } from './panic.js'
 import {
@@ -695,9 +699,13 @@ export const makeSlice = <T>(
 
   const backingArr = new Array<T>(actualCapacity)
   // Go zero-initializes the whole backing array. Elements beyond len become
-  // observable when a slice is resliced up to cap.
+  // observable when a slice is resliced up to cap. The first struct prepares
+  // the float fields of the structs made after it.
   for (let i = 0; i < actualCapacity; i++) {
     backingArr[i] = zeroValue()
+    if (i === 0 && zeroFactory !== undefined) {
+      prepareFloatFields(backingArr[0])
+    }
   }
 
   // A slice that covers its whole backing array is the array; any other is a
@@ -706,6 +714,49 @@ export const makeSlice = <T>(
     return backingArr as Slice<T>
   }
   return new GoSlice(backingArr, 0, length, actualCapacity)
+}
+
+// preparedStructs holds the struct classes whose float fields
+// prepareFloatFields has prepared.
+const preparedStructs = new WeakSet<object>()
+
+// prepareFloatFields stores a fraction, and then zero again, in each float
+// field of zero, a zero struct, once per struct class. V8 then stores those
+// fields of the structs of the class made later as doubles. Otherwise each
+// of them holds the small integer 0, and the first fraction stored in a
+// field changes the layout of the class, which moves every struct made
+// before to the new layout when it is next used: about 200 ns per struct,
+// seconds for the millions of structs of a GPU compute buffer.
+function prepareFloatFields(zero: unknown): void {
+  // Only a struct class not prepared before is prepared.
+  const ctor = (zero as { constructor?: unknown } | null)?.constructor
+  if (typeof ctor !== 'function' || preparedStructs.has(ctor)) {
+    return
+  }
+  preparedStructs.add(ctor)
+  const info = resolveTypeInfo(structValueTypeInfo(zero))
+  if (info === undefined || info.kind !== TypeKind.Struct) {
+    return
+  }
+
+  // Float fields hold a fraction for a moment and nested structs are
+  // prepared in turn.
+  const fields = zero as Record<string, unknown>
+  for (const field of (info as StructTypeInfo).fields) {
+    const key = field.key ?? field.name
+    const type = resolveTypeInfo(field.type)
+    if (type?.kind === TypeKind.Basic && isFloatName(type.name)) {
+      fields[key] = 0.5
+      fields[key] = 0
+    } else if (type?.kind === TypeKind.Struct) {
+      prepareFloatFields(fields[key])
+    }
+  }
+}
+
+// isFloatName reports whether name is that of a float type.
+function isFloatName(name: string | undefined): boolean {
+  return name === 'float32' || name === 'float64'
 }
 
 /**
