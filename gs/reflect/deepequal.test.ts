@@ -32,13 +32,13 @@ describe('DeepEqual', () => {
 
   it('compares generated structs by their stored field values', () => {
     const left = {
-      _fields: { FullBytes: null },
+      FullBytes: null,
     }
     const equal = {
-      _fields: { FullBytes: null },
+      FullBytes: null,
     }
     const different = {
-      _fields: { FullBytes: new Uint8Array([0]) },
+      FullBytes: new Uint8Array([0]),
     }
 
     expect(DeepEqual(left, equal)).toBe(true)

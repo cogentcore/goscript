@@ -2,7 +2,43 @@ import { describe, expect, it, vi } from 'vitest'
 
 import { deleteMapEntry, makeMap, mapGet, mapHas, mapSet } from './map.js'
 import { bytesToString } from './slice.js'
-import { pointerType } from './type.js'
+import {
+  interfaceValue,
+  pointerType,
+  registerStructType,
+  TypeKind,
+} from './type.js'
+
+const stringType = { kind: TypeKind.Basic, name: 'string' } as const
+
+// edgeKey is a struct class as generated code declares it.
+class edgeKey {
+  declare public subject: string
+  declare public object: string
+
+  constructor(subject = '', object = '') {
+    this.subject = subject
+    this.object = object
+  }
+
+  static __typeInfo = registerStructType('test.edgeKey', null, [], edgeKey, [
+    { name: 'subject', type: stringType },
+    { name: 'object', type: stringType },
+  ])
+}
+
+// fieldKey is a struct class with one field.
+class fieldKey {
+  declare public field: string
+
+  constructor(field = '') {
+    this.field = field
+  }
+
+  static __typeInfo = registerStructType('test.fieldKey', null, [], fieldKey, [
+    { name: 'field', type: stringType },
+  ])
+}
 
 describe('Go map pointer keys', () => {
   it('indexes distinct equal-valued targets without reading fields or scanning', () => {
@@ -12,12 +48,12 @@ describe('Go map pointer keys', () => {
       throw new Error('pointer target read')
     })
     const first = {
-      get _fields() {
+      get Field() {
         return fields()
       },
     }
     const second = {
-      get _fields() {
+      get Field() {
         return fields()
       },
     }
@@ -73,10 +109,8 @@ describe('Go map string keys', () => {
 })
 
 describe('Go map string-struct keys', () => {
-  const edge = (subject: string, object: string, type = 'edge') => ({
-    __goType: type,
-    _fields: { subject: subject, object: object },
-  })
+  const edge = (subject: string, object: string, type = 'edge') =>
+    interfaceValue<edgeKey>(new edgeKey(subject, object), type)
 
   it('indexes value copies without scanning unrelated entries', () => {
     const first = edge('first', 'target')
@@ -99,10 +133,8 @@ describe('Go map string-struct keys', () => {
 
   it('preserves type and binary-field equality inside candidate buckets', () => {
     const binary = bytesToString(new Uint8Array([0x76, 0xff]))
-    const value = (field: string, type: string) => ({
-      __goType: type,
-      _fields: { field: field },
-    })
+    const value = (field: string, type: string) =>
+      interfaceValue<fieldKey>(new fieldKey(field), type)
     const map = makeMap<ReturnType<typeof value>, number>()
     mapSet(map, value('value', 'first'), 1)
     mapSet(map, value('value', 'second'), 2)
