@@ -23,13 +23,13 @@ $.registerNamedType("main.Names", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.
 
 $.registerNamedValueType(
 	"main.Names",
-	{First: (receiver: any, ...args: any[]) => (Names_First as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	{First: (receiver: any) => (Names_First as any)(($.isVarRef(receiver) ? receiver.value : receiver))},
 	[$.methodSignature("First", [], [/* @__PURE__ */ $.basicType("string")])]
 );
 
 $.registerNamedValueType(
 	"*main.Names",
-	{First: (receiver: any, ...args: any[]) => (Names_First as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	{First: (receiver: any) => (Names_First as any)($.pointerValue(receiver))},
 	[$.methodSignature("First", [], [/* @__PURE__ */ $.basicType("string")])]
 );
 
@@ -39,13 +39,13 @@ $.registerNamedType("main.Grid", /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.b
 
 $.registerNamedValueType(
 	"main.Grid",
-	{Sum: (receiver: any, ...args: any[]) => (Grid_Sum as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	{Sum: (receiver: any) => (Grid_Sum as any)(($.isVarRef(receiver) ? receiver.value : receiver))},
 	[$.methodSignature("Sum", [], [/* @__PURE__ */ $.basicType("int")])]
 );
 
 $.registerNamedValueType(
 	"*main.Grid",
-	{Sum: (receiver: any, ...args: any[]) => (Grid_Sum as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	{Sum: (receiver: any) => (Grid_Sum as any)($.pointerValue(receiver))},
 	[$.methodSignature("Sum", [], [/* @__PURE__ */ $.basicType("int")])]
 );
 
@@ -280,7 +280,7 @@ export async function showArray(): globalThis.Promise<void> {
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({String: (receiver: any, ...args: any[]) => (reflect.Kind_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))})
+	return __goscriptStatic0$value ??= ({String: (receiver: any) => (reflect.Kind_String as any)(($.isVarRef(receiver) ? receiver.value : receiver))})
 }
 
 var __goscriptStatic1$value: any
@@ -295,7 +295,7 @@ function __goscriptStatic2(): any {
 
 var __goscriptStatic3$value: any
 function __goscriptStatic3(): any {
-	return __goscriptStatic3$value ??= ({First: (receiver: any, ...args: any[]) => (Names_First as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))})
+	return __goscriptStatic3$value ??= ({First: (receiver: any) => (Names_First as any)(($.isVarRef(receiver) ? receiver.value : receiver))})
 }
 
 var __goscriptStatic4$value: any
@@ -310,7 +310,7 @@ function __goscriptStatic5(): any {
 
 var __goscriptStatic6$value: any
 function __goscriptStatic6(): any {
-	return __goscriptStatic6$value ??= ({Sum: (receiver: any, ...args: any[]) => (Grid_Sum as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))})
+	return __goscriptStatic6$value ??= ({Sum: (receiver: any) => (Grid_Sum as any)(($.isVarRef(receiver) ? receiver.value : receiver))})
 }
 
 var __goscriptStatic7$value: any

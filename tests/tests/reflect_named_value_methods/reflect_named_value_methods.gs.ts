@@ -9,13 +9,13 @@ export type Fruits = number
 
 $.registerNamedValueType(
 	"main.Fruits",
-	{String: (receiver: any, ...args: any[]) => (Fruits_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	{String: (receiver: any) => (Fruits_String as any)(($.isVarRef(receiver) ? receiver.value : receiver))},
 	[$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])]
 );
 
 $.registerNamedValueType(
 	"*main.Fruits",
-	{SetString: (receiver: any, ...args: any[]) => (Fruits_SetString as any)(receiver, ...$.stripGenericTypeArgs(args)), String: (receiver: any, ...args: any[]) => (Fruits_String as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	{SetString: (receiver: any, ...args: any[]) => (Fruits_SetString as any)(receiver, ...$.stripGenericTypeArgs(args)), String: (receiver: any) => (Fruits_String as any)($.pointerValue(receiver))},
 	[$.methodSignature("SetString", [["s", /* @__PURE__ */ $.basicType("string")]], ["error"]), $.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])]
 );
 
@@ -89,7 +89,7 @@ export async function main(): globalThis.Promise<void> {
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({SetString: (receiver: any, ...args: any[]) => (Fruits_SetString as any)(receiver, ...$.stripGenericTypeArgs(args)), String: (receiver: any, ...args: any[]) => (Fruits_String as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))})
+	return __goscriptStatic0$value ??= ({SetString: (receiver: any, ...args: any[]) => (Fruits_SetString as any)(receiver, ...$.stripGenericTypeArgs(args)), String: (receiver: any) => (Fruits_String as any)($.pointerValue(receiver))})
 }
 
 var __goscriptStatic1$value: any
@@ -104,7 +104,7 @@ function __goscriptStatic2(): any {
 
 var __goscriptStatic3$value: any
 function __goscriptStatic3(): any {
-	return __goscriptStatic3$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int32", "main.Fruits"), zero: () => 0, methods: {String: (receiver: any, ...args: any[]) => (Fruits_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))}, methodSignatures: [$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])] }})
+	return __goscriptStatic3$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int32", "main.Fruits"), zero: () => 0, methods: {String: (receiver: any) => (Fruits_String as any)(($.isVarRef(receiver) ? receiver.value : receiver))}, methodSignatures: [$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])] }})
 }
 
 var __goscriptAwait: any

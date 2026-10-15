@@ -11067,8 +11067,17 @@ func (o *LoweringOwner) lowerConversionExpr(
 			return converted, diagnostics
 		}
 		if isBigIntBackedType(targetType) {
+			// A bigint of the same signedness, as int64(f) of a named int64
+			// type, already has the value.
+			_, targetUnsigned := unsignedIntegerBits(targetType)
+			_, sourceUnsigned := unsignedIntegerBits(sourceType)
+			if isBigIntBackedType(sourceType) && targetUnsigned == sourceUnsigned {
+				return grouped, diagnostics
+			}
+
+			// Other values are converted to the 64 bits of the target.
 			helper := RuntimeHelperInt64
-			if _, ok := unsignedIntegerBits(targetType); ok {
+			if targetUnsigned {
 				helper = RuntimeHelperUint64
 			}
 			return o.runtimeOwner.QualifiedHelper(helper) + "(" + value + ")", diagnostics
@@ -14574,15 +14583,37 @@ func (o *LoweringOwner) lowerNamedValueInterfaceWrapper(
 
 	// Without type parameters, the method table, type info and method
 	// signatures of the type are the same each time, so they are created once.
-	if typeIsHoistable(sourceType) && typeIsHoistable(targetType) {
+	hoistable := typeIsHoistable(sourceType) && typeIsHoistable(targetType)
+	if hoistable {
 		methods = o.hoistStatic(ctx, methods)
 		typeInfo = o.hoistStatic(ctx, typeInfo)
 		signatures = o.hoistStatic(ctx, signatures)
 	}
-	return o.runtimeOwner.QualifiedHelper(RuntimeHelperNamedValueInterfaceValue) +
+	boxed := o.runtimeOwner.QualifiedHelper(RuntimeHelperNamedValueInterfaceValue) +
 		"<" + o.tsTypeFor(ctx, targetType) + ">(" + value + ", " +
 		strconv.Quote(goRuntimeTypeString(sourceType)) + ", " + methods + ", " +
 		typeInfo + ", " + signatures + ")"
+
+	// A constant, such as a bit flag passed to HasFlag, is boxed once: a box
+	// is never changed, so every use can share it.
+	if hoistable && isLiteralValueText(value) {
+		return o.hoistStatic(ctx, boxed)
+	}
+	return boxed
+}
+
+// isLiteralValueText reports whether value is the lowered text of a boolean,
+// number, bigint or string literal, whose evaluation has no effects and gives
+// the same value each time.
+func isLiteralValueText(value string) bool {
+	// Booleans and numbers are matched by their text.
+	if value == "true" || value == "false" || numericLiteralPattern.MatchString(value) {
+		return true
+	}
+
+	// A string literal is a quoted Go string.
+	_, err := strconv.Unquote(value)
+	return err == nil && strings.HasPrefix(value, `"`)
 }
 
 // lowerNamedBasicInterfaceBox boxes a value of a named basic type, or of a
@@ -17048,8 +17079,9 @@ func (o *LoweringOwner) genericMethodDescriptorsForType(
 			if genericArgs != "" {
 				callArgs = append(callArgs, genericArgs)
 			}
-			callArgs = append(callArgs, "..."+o.runtimeOwner.QualifiedHelper(RuntimeHelperStripGenericTypeArgs)+"(args)")
-			methods = append(methods, method.Name()+": (receiver: any, ...args: any[]) => "+receiverExpr+"."+method.Name()+"("+strings.Join(callArgs, ", ")+")")
+			params, rest := o.methodDescriptorParams(method)
+			callArgs = append(callArgs, rest...)
+			methods = append(methods, method.Name()+": (receiver: any"+params+") => "+receiverExpr+"."+method.Name()+"("+strings.Join(callArgs, ", ")+")")
 			continue
 		}
 		receiver := "receiver"
@@ -17069,14 +17101,30 @@ func (o *LoweringOwner) genericMethodDescriptorsForType(
 		if genericArgs != "" {
 			callArgs = append(callArgs, genericArgs)
 		}
-		callArgs = append(callArgs, "..."+o.runtimeOwner.QualifiedHelper(RuntimeHelperStripGenericTypeArgs)+"(args)")
-		methods = append(methods, method.Name()+": (receiver: any, ...args: any[]) => "+
+		params, rest := o.methodDescriptorParams(method)
+		callArgs = append(callArgs, rest...)
+		methods = append(methods, method.Name()+": (receiver: any"+params+") => "+
 			"("+o.methodFunctionExpr(ctx, named.Origin(), method, method.Name())+" as any)("+strings.Join(callArgs, ", ")+")")
 	}
 	if len(methods) == 0 {
 		return ""
 	}
 	return "{" + strings.Join(methods, ", ") + "}"
+}
+
+// methodDescriptorParams returns the parameters after the receiver of a
+// method table entry for method, and the arguments it passes on. A method
+// without parameters takes none, so that calling it spreads no arguments;
+// any other method takes the rest of its arguments, dropping generic type
+// arguments that a caller may pass first.
+func (o *LoweringOwner) methodDescriptorParams(method *types.Func) (string, []string) {
+	// A method without parameters ignores any arguments.
+	if sig, _ := method.Type().(*types.Signature); sig != nil && sig.Params().Len() == 0 {
+		return "", nil
+	}
+
+	// Other methods pass on their arguments.
+	return ", ...args: any[]", []string{"..." + o.runtimeOwner.QualifiedHelper(RuntimeHelperStripGenericTypeArgs) + "(args)"}
 }
 
 func (o *LoweringOwner) genericMethodSignatureDescriptors(typ types.Type) string {

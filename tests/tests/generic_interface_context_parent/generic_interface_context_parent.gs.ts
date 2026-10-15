@@ -182,7 +182,7 @@ function __goscriptStatic3(): any {
 
 var __goscriptStatic4$value: any
 function __goscriptStatic4(): any {
-	return __goscriptStatic4$value ??= ({Get: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Get(__goscriptStatic0(), ...$.stripGenericTypeArgs(args))})
+	return __goscriptStatic4$value ??= ({Get: (receiver: any) => $.pointerValue(receiver).Get(__goscriptStatic0())})
 }
 
 var __goscriptStatic5$value: any

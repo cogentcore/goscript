@@ -9,13 +9,13 @@ $.registerNamedType("main.flags", /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.
 
 $.registerNamedValueType(
 	"main.flags",
-	{values: (receiver: any, ...args: any[]) => (flags_values as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	{values: (receiver: any) => (flags_values as any)(($.isVarRef(receiver) ? receiver.value : receiver))},
 	[$.methodSignature("values", [], [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")])]
 );
 
 $.registerNamedValueType(
 	"*main.flags",
-	{set: (receiver: any, ...args: any[]) => (flags__set as any)(receiver, ...$.stripGenericTypeArgs(args)), values: (receiver: any, ...args: any[]) => (flags_values as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	{set: (receiver: any, ...args: any[]) => (flags__set as any)(receiver, ...$.stripGenericTypeArgs(args)), values: (receiver: any) => (flags_values as any)($.pointerValue(receiver))},
 	[$.methodSignature("set", [["idx", /* @__PURE__ */ $.basicType("int")]]), $.methodSignature("values", [], [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")])]
 );
 
@@ -25,13 +25,13 @@ $.registerNamedType("main.Matrix", /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $
 
 $.registerNamedValueType(
 	"main.Matrix",
-	{Scaled: (receiver: any, ...args: any[]) => (Matrix_Scaled as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Sum: (receiver: any, ...args: any[]) => (Matrix_Sum as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	{Scaled: (receiver: any, ...args: any[]) => (Matrix_Scaled as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Sum: (receiver: any) => (Matrix_Sum as any)(($.isVarRef(receiver) ? receiver.value : receiver))},
 	[$.methodSignature("Scaled", [["s", /* @__PURE__ */ $.basicType("float32")]], ["main.Matrix"]), $.methodSignature("Sum", [], [/* @__PURE__ */ $.basicType("float32")])]
 );
 
 $.registerNamedValueType(
 	"*main.Matrix",
-	{Scale: (receiver: any, ...args: any[]) => (Matrix_Scale as any)(receiver, ...$.stripGenericTypeArgs(args)), Scaled: (receiver: any, ...args: any[]) => (Matrix_Scaled as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args)), Sum: (receiver: any, ...args: any[]) => (Matrix_Sum as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	{Scale: (receiver: any, ...args: any[]) => (Matrix_Scale as any)(receiver, ...$.stripGenericTypeArgs(args)), Scaled: (receiver: any, ...args: any[]) => (Matrix_Scaled as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args)), Sum: (receiver: any) => (Matrix_Sum as any)($.pointerValue(receiver))},
 	[$.methodSignature("Scale", [["s", /* @__PURE__ */ $.basicType("float32")]]), $.methodSignature("Scaled", [["s", /* @__PURE__ */ $.basicType("float32")]], ["main.Matrix"]), $.methodSignature("Sum", [], [/* @__PURE__ */ $.basicType("float32")])]
 );
 

@@ -9,13 +9,13 @@ export type box = number
 
 $.registerNamedValueType(
 	"main.box",
-	{base: (receiver: any, ...args: any[]) => (box_base as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), total: (receiver: any, ...args: any[]) => (__goscript_cross_file_method_owner.box_total as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	{base: (receiver: any) => (box_base as any)(($.isVarRef(receiver) ? receiver.value : receiver)), total: (receiver: any) => (__goscript_cross_file_method_owner.box_total as any)(($.isVarRef(receiver) ? receiver.value : receiver))},
 	[$.methodSignature("base", [], [/* @__PURE__ */ $.basicType("int")]), $.methodSignature("total", [], [/* @__PURE__ */ $.basicType("int")])]
 );
 
 $.registerNamedValueType(
 	"*main.box",
-	{base: (receiver: any, ...args: any[]) => (box_base as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args)), total: (receiver: any, ...args: any[]) => (__goscript_cross_file_method_owner.box_total as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	{base: (receiver: any) => (box_base as any)($.pointerValue(receiver)), total: (receiver: any) => (__goscript_cross_file_method_owner.box_total as any)($.pointerValue(receiver))},
 	[$.methodSignature("base", [], [/* @__PURE__ */ $.basicType("int")]), $.methodSignature("total", [], [/* @__PURE__ */ $.basicType("int")])]
 );
 

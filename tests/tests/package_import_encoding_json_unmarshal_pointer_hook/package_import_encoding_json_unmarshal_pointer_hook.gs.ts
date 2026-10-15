@@ -21,7 +21,7 @@ $.registerNamedType("main.Names", /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.ba
 
 $.registerNamedValueType(
 	"*main.Names",
-	{Len: (receiver: any, ...args: any[]) => (Names_Len as any)(receiver, ...$.stripGenericTypeArgs(args))},
+	{Len: (receiver: any) => (Names_Len as any)(receiver)},
 	[$.methodSignature("Len", [], [/* @__PURE__ */ $.basicType("int")])]
 );
 
@@ -235,7 +235,7 @@ function __goscriptStatic2(): any {
 
 var __goscriptStatic3$value: any
 function __goscriptStatic3(): any {
-	return __goscriptStatic3$value ??= ({Len: (receiver: any, ...args: any[]) => (Names_Len as any)(receiver, ...$.stripGenericTypeArgs(args))})
+	return __goscriptStatic3$value ??= ({Len: (receiver: any) => (Names_Len as any)(receiver)})
 }
 
 var __goscriptStatic4$value: any

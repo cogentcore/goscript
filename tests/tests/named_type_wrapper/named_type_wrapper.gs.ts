@@ -7,13 +7,13 @@ export type MyFileMode = number
 
 $.registerNamedValueType(
 	"main.MyFileMode",
-	{String: (receiver: any, ...args: any[]) => (MyFileMode_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	{String: (receiver: any) => (MyFileMode_String as any)(($.isVarRef(receiver) ? receiver.value : receiver))},
 	[$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])]
 );
 
 $.registerNamedValueType(
 	"*main.MyFileMode",
-	{String: (receiver: any, ...args: any[]) => (MyFileMode_String as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	{String: (receiver: any) => (MyFileMode_String as any)($.pointerValue(receiver))},
 	[$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])]
 );
 

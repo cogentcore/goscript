@@ -10,13 +10,13 @@ $.registerNamedType("main.value", /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.
 
 $.registerNamedValueType(
 	"main.value",
-	{Key: (receiver: any, ...args: any[]) => (value_Key as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	{Key: (receiver: any) => (value_Key as any)(($.isVarRef(receiver) ? receiver.value : receiver))},
 	[$.methodSignature("Key", [], [{ kind: $.TypeKind.Interface, methods: [] }])]
 );
 
 $.registerNamedValueType(
 	"*main.value",
-	{Key: (receiver: any, ...args: any[]) => (value_Key as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	{Key: (receiver: any) => (value_Key as any)($.pointerValue(receiver))},
 	[$.methodSignature("Key", [], [{ kind: $.TypeKind.Interface, methods: [] }])]
 );
 
@@ -26,13 +26,13 @@ $.registerNamedType("main.Fixed", /* @__PURE__ */ $.sliceType("dep.Ref"));
 
 $.registerNamedValueType(
 	"main.Fixed",
-	{Mark: (receiver: any, ...args: any[]) => (Fixed_Mark as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	{Mark: (receiver: any) => (Fixed_Mark as any)(($.isVarRef(receiver) ? receiver.value : receiver))},
 	[$.methodSignature("Mark", [], [/* @__PURE__ */ $.basicType("bool")])]
 );
 
 $.registerNamedValueType(
 	"*main.Fixed",
-	{Mark: (receiver: any, ...args: any[]) => (Fixed_Mark as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	{Mark: (receiver: any) => (Fixed_Mark as any)($.pointerValue(receiver))},
 	[$.methodSignature("Mark", [], [/* @__PURE__ */ $.basicType("bool")])]
 );
 
@@ -160,7 +160,7 @@ export async function main(): globalThis.Promise<void> {
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({Key: (receiver: any, ...args: any[]) => (value_Key as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))})
+	return __goscriptStatic0$value ??= ({Key: (receiver: any) => (value_Key as any)(($.isVarRef(receiver) ? receiver.value : receiver))})
 }
 
 var __goscriptStatic1$value: any
@@ -175,7 +175,7 @@ function __goscriptStatic2(): any {
 
 var __goscriptStatic3$value: any
 function __goscriptStatic3(): any {
-	return __goscriptStatic3$value ??= ({Mark: (receiver: any, ...args: any[]) => (Fixed_Mark as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))})
+	return __goscriptStatic3$value ??= ({Mark: (receiver: any) => (Fixed_Mark as any)(($.isVarRef(receiver) ? receiver.value : receiver))})
 }
 
 var __goscriptStatic4$value: any

@@ -10,13 +10,13 @@ export type Tokens = number
 
 $.registerNamedValueType(
 	"main.Tokens",
-	{MarshalText: (receiver: any, ...args: any[]) => (Tokens_MarshalText as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), String: (receiver: any, ...args: any[]) => (Tokens_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	{MarshalText: (receiver: any) => (Tokens_MarshalText as any)(($.isVarRef(receiver) ? receiver.value : receiver)), String: (receiver: any) => (Tokens_String as any)(($.isVarRef(receiver) ? receiver.value : receiver))},
 	[$.methodSignature("MarshalText", [], [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")), "error"]), $.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])]
 );
 
 $.registerNamedValueType(
 	"*main.Tokens",
-	{MarshalText: (receiver: any, ...args: any[]) => (Tokens_MarshalText as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args)), String: (receiver: any, ...args: any[]) => (Tokens_String as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args)), UnmarshalText: (receiver: any, ...args: any[]) => (Tokens_UnmarshalText as any)(receiver, ...$.stripGenericTypeArgs(args))},
+	{MarshalText: (receiver: any) => (Tokens_MarshalText as any)($.pointerValue(receiver)), String: (receiver: any) => (Tokens_String as any)($.pointerValue(receiver)), UnmarshalText: (receiver: any, ...args: any[]) => (Tokens_UnmarshalText as any)(receiver, ...$.stripGenericTypeArgs(args))},
 	[$.methodSignature("MarshalText", [], [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")), "error"]), $.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")]), $.methodSignature("UnmarshalText", [["text", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))]], ["error"])]
 );
 

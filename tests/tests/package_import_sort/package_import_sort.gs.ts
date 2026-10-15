@@ -12,13 +12,13 @@ $.registerNamedType("main.byFreq", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $
 
 $.registerNamedValueType(
 	"main.byFreq",
-	{Len: (receiver: any, ...args: any[]) => (byFreq_Len as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Less: (receiver: any, ...args: any[]) => (byFreq_Less as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Swap: (receiver: any, ...args: any[]) => (byFreq_Swap as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	{Len: (receiver: any) => (byFreq_Len as any)(($.isVarRef(receiver) ? receiver.value : receiver)), Less: (receiver: any, ...args: any[]) => (byFreq_Less as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Swap: (receiver: any, ...args: any[]) => (byFreq_Swap as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
 	[$.methodSignature("Len", [], [/* @__PURE__ */ $.basicType("int")]), $.methodSignature("Less", [["i", /* @__PURE__ */ $.basicType("int")], ["j", /* @__PURE__ */ $.basicType("int")]], [/* @__PURE__ */ $.basicType("bool")]), $.methodSignature("Swap", [["i", /* @__PURE__ */ $.basicType("int")], ["j", /* @__PURE__ */ $.basicType("int")]])]
 );
 
 $.registerNamedValueType(
 	"*main.byFreq",
-	{Len: (receiver: any, ...args: any[]) => (byFreq_Len as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args)), Less: (receiver: any, ...args: any[]) => (byFreq_Less as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args)), Swap: (receiver: any, ...args: any[]) => (byFreq_Swap as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args)), sort: (receiver: any, ...args: any[]) => (byFreq_sort as any)(receiver, ...$.stripGenericTypeArgs(args))},
+	{Len: (receiver: any) => (byFreq_Len as any)($.pointerValue(receiver)), Less: (receiver: any, ...args: any[]) => (byFreq_Less as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args)), Swap: (receiver: any, ...args: any[]) => (byFreq_Swap as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args)), sort: (receiver: any, ...args: any[]) => (byFreq_sort as any)(receiver, ...$.stripGenericTypeArgs(args))},
 	[$.methodSignature("Len", [], [/* @__PURE__ */ $.basicType("int")]), $.methodSignature("Less", [["i", /* @__PURE__ */ $.basicType("int")], ["j", /* @__PURE__ */ $.basicType("int")]], [/* @__PURE__ */ $.basicType("bool")]), $.methodSignature("Swap", [["i", /* @__PURE__ */ $.basicType("int")], ["j", /* @__PURE__ */ $.basicType("int")]]), $.methodSignature("sort", [["a", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"))]])]
 );
 
@@ -28,13 +28,13 @@ $.registerNamedType("main.nameList", /* @__PURE__ */ $.sliceType(/* @__PURE__ */
 
 $.registerNamedValueType(
 	"main.nameList",
-	{First: (receiver: any, ...args: any[]) => (nameList_First as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	{First: (receiver: any) => (nameList_First as any)(($.isVarRef(receiver) ? receiver.value : receiver))},
 	[$.methodSignature("First", [], [/* @__PURE__ */ $.basicType("string")])]
 );
 
 $.registerNamedValueType(
 	"*main.nameList",
-	{First: (receiver: any, ...args: any[]) => (nameList_First as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	{First: (receiver: any) => (nameList_First as any)($.pointerValue(receiver))},
 	[$.methodSignature("First", [], [/* @__PURE__ */ $.basicType("string")])]
 );
 
@@ -256,7 +256,7 @@ export function sortedPair(a: number, b: number): number {
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({Len: (receiver: any, ...args: any[]) => (byFreq_Len as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args)), Less: (receiver: any, ...args: any[]) => (byFreq_Less as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args)), Swap: (receiver: any, ...args: any[]) => (byFreq_Swap as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args)), sort: (receiver: any, ...args: any[]) => (byFreq_sort as any)(receiver, ...$.stripGenericTypeArgs(args))})
+	return __goscriptStatic0$value ??= ({Len: (receiver: any) => (byFreq_Len as any)($.pointerValue(receiver)), Less: (receiver: any, ...args: any[]) => (byFreq_Less as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args)), Swap: (receiver: any, ...args: any[]) => (byFreq_Swap as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args)), sort: (receiver: any, ...args: any[]) => (byFreq_sort as any)(receiver, ...$.stripGenericTypeArgs(args))})
 }
 
 var __goscriptStatic1$value: any
@@ -271,7 +271,7 @@ function __goscriptStatic2(): any {
 
 var __goscriptStatic3$value: any
 function __goscriptStatic3(): any {
-	return __goscriptStatic3$value ??= ({First: (receiver: any, ...args: any[]) => (nameList_First as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))})
+	return __goscriptStatic3$value ??= ({First: (receiver: any) => (nameList_First as any)(($.isVarRef(receiver) ? receiver.value : receiver))})
 }
 
 var __goscriptStatic4$value: any
@@ -286,7 +286,7 @@ function __goscriptStatic5(): any {
 
 var __goscriptStatic6$value: any
 function __goscriptStatic6(): any {
-	return __goscriptStatic6$value ??= ({Len: (receiver: any, ...args: any[]) => (sort2.IntSlice_Len as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Less: (receiver: any, ...args: any[]) => (sort2.IntSlice_Less as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Search: (receiver: any, ...args: any[]) => (sort2.IntSlice_Search as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Sort: (receiver: any, ...args: any[]) => (sort2.IntSlice_Sort as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Swap: (receiver: any, ...args: any[]) => (sort2.IntSlice_Swap as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))})
+	return __goscriptStatic6$value ??= ({Len: (receiver: any) => (sort2.IntSlice_Len as any)(($.isVarRef(receiver) ? receiver.value : receiver)), Less: (receiver: any, ...args: any[]) => (sort2.IntSlice_Less as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Search: (receiver: any, ...args: any[]) => (sort2.IntSlice_Search as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Sort: (receiver: any) => (sort2.IntSlice_Sort as any)(($.isVarRef(receiver) ? receiver.value : receiver)), Swap: (receiver: any, ...args: any[]) => (sort2.IntSlice_Swap as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))})
 }
 
 var __goscriptStatic7$value: any

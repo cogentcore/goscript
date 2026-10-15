@@ -132,7 +132,7 @@ function __goscriptStatic0(): any {
 
 var __goscriptStatic1$value: any
 function __goscriptStatic1(): any {
-	return __goscriptStatic1$value ??= ({Value: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Value(__goscriptStatic0(), ...$.stripGenericTypeArgs(args))})
+	return __goscriptStatic1$value ??= ({Value: (receiver: any) => $.pointerValue(receiver).Value(__goscriptStatic0())})
 }
 
 var __goscriptStatic2$value: any

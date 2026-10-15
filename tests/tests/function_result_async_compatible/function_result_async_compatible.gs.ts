@@ -80,7 +80,7 @@ export async function main(): globalThis.Promise<void> {
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.pointerType("main.box"), zero: () => null, methods: {Value: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Value(...$.stripGenericTypeArgs(args))} }})
+	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.pointerType("main.box"), zero: () => null, methods: {Value: (receiver: any) => $.pointerValue(receiver).Value()} }})
 }
 
 var __goscriptAwait: any

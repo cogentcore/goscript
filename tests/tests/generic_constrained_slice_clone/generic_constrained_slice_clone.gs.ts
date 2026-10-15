@@ -77,7 +77,7 @@ export async function main(): globalThis.Promise<void> {
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.pointerType("main.item"), zero: () => null, methods: {CloneVT: (receiver: any, ...args: any[]) => $.pointerValue(receiver).CloneVT(...$.stripGenericTypeArgs(args))} }})
+	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.pointerType("main.item"), zero: () => null, methods: {CloneVT: (receiver: any) => $.pointerValue(receiver).CloneVT()} }})
 }
 
 var __goscriptAwait: any
