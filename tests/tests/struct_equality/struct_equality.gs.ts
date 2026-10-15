@@ -199,10 +199,10 @@ export async function main(): globalThis.Promise<void> {
 	let s = new S({A: "x", B: 1.5}, true)
 	let n = new S({A: "x", B: 1.5})
 	take($.interfaceValue(n, "*main.S", /* @__PURE__ */ $.pointerType("main.S")))
-	await $.println($.structEqual($.pointerValue<S>(n), s))
+	await $.println(($.pointerValue<S>(n).A === s.A && $.pointerValue<S>(n).B === s.B))
 	let m = new S({A: "x", B: 1.5})
 	keep($.interfaceValue(m, "*main.S", /* @__PURE__ */ $.pointerType("main.S")))
-	await $.println($.structEqual($.pointerValue<S>(m), s), $.structEqual(s, $.pointerValue<S>(m)))
+	await $.println(($.pointerValue<S>(m).A === s.A && $.pointerValue<S>(m).B === s.B), (s.A === $.pointerValue<S>(m).A && s.B === $.pointerValue<S>(m).B))
 	let v: any = $.interfaceValue((s).clone(), "main.S", "main.S")
 	await $.println($.structEqual($.mustTypeAssert<S>(v, "main.S"), s))
 
@@ -210,9 +210,9 @@ export async function main(): globalThis.Promise<void> {
 	let o1 = new Outer({In: new S({A: "y"}, true), N: 2}, true)
 	let o2 = new Outer({In: new S({A: "y"}, true), N: 2}, true)
 	take($.interfaceValue($.fieldRef(o1._fields, "In"), "*main.S", /* @__PURE__ */ $.pointerType("main.S")))
-	await $.println($.structEqual(o1, o2), $.structEqual(o1.In, o2.In))
+	await $.println((o1.In.A === o2.In.A && o1.In.B === o2.In.B && o1.N === o2.N), (o1.In.A === o2.In.A && o1.In.B === o2.In.B))
 	o2.In.B = 3
-	await $.println($.structEqual(o1, o2))
+	await $.println((o1.In.A === o2.In.A && o1.In.B === o2.In.B && o1.N === o2.N))
 
 	// interface comparisons keep dynamic type and pointer identity
 	let p1: any = $.interfaceValue(new S({A: "z"}), "*main.S", /* @__PURE__ */ $.pointerType("main.S"))
