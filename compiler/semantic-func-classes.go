@@ -231,9 +231,10 @@ func funcValueAsyncByItself(
 	// An override function or method follows its metadata.
 	pkgPath := key.Pkg().Path()
 	_, metadataName, _ := overrideMetadataName(key)
+	_, callsFields := overrideFacts.AsyncWhenFieldShapes(key)
 	return overrideFacts.IsFunctionAsync(pkgPath, key.Name()) ||
 		overrideFacts.IsFunctionCallbackAsync(pkgPath, metadataName) ||
-		overrideMethodAsync(overrideFacts, key)
+		overrideMethodAsync(overrideFacts, key) || callsFields
 }
 
 // appendUniqueFuncs appends the functions of add that list lacks.

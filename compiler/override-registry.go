@@ -53,6 +53,10 @@ type OverrideMetadata struct {
 	// of fmt: Error, Format, GoString and String. A call of one is async only
 	// when the static types of its operands allow an async such method.
 	AsyncWhenOperands map[string]bool
+	// AsyncWhenFields maps a Type.Method key to the func-typed fields of the
+	// receiver that the method calls, such as sync.Pool.Get's New. The method
+	// suspends exactly when a call through one of them may.
+	AsyncWhenFields map[string][]string
 }
 
 // OverrideRegistryOwner owns GoScript override package metadata and copy plans.

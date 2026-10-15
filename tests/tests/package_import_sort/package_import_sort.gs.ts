@@ -95,9 +95,9 @@ export class descending {
 	)
 }
 
-export async function byFreq_sort(s: $.VarRef<byFreq> | null, a: $.Slice<number>): globalThis.Promise<void> {
+export function byFreq_sort(s: $.VarRef<byFreq> | null, a: $.Slice<number>): void {
 	s!.value = ((a as byFreq) as byFreq)
-	await sort2.Sort($.pointerValueOrNil($.namedValueInterfaceValue<sort2.Interface | null>(s, "*main.byFreq", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()))!)
+	sort2.Sort($.pointerValueOrNil($.namedValueInterfaceValue<sort2.Interface | null>(s, "*main.byFreq", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()))!)
 }
 
 export function byFreq_Len(s: byFreq): number {
@@ -199,12 +199,12 @@ export async function main(): globalThis.Promise<void> {
 
 	// Test custom sort.Interface values.
 	let custom = new descending({values: $.arrayToSlice<number>([1, 3, 2])}, true)
-	await sort2.Sort($.interfaceValue<sort2.Interface | null>((custom).clone(), "main.descending", "main.descending")!)
+	sort2.Sort($.interfaceValue<sort2.Interface | null>((custom).clone(), "main.descending", "main.descending")!)
 	await $.println("Custom interface sort:", $.arrayIndex(custom.values!, 0), $.arrayIndex(custom.values!, 1), $.arrayIndex(custom.values!, 2))
 
 	let namedSlice = $.arrayToSlice<number>([4, 1, 3])
 	let namedSliceSorter: $.VarRef<byFreq> = $.varRef(null! as byFreq)
-	await byFreq_sort(namedSliceSorter, namedSlice)
+	byFreq_sort(namedSliceSorter, namedSlice)
 	await $.println("Named slice pointer sort:", $.arrayIndex(namedSlice!, 0), $.arrayIndex(namedSlice!, 1), $.arrayIndex(namedSlice!, 2))
 
 	// sort.Slice takes the slice as an any, such as from reflect
@@ -226,16 +226,16 @@ export async function main(): globalThis.Promise<void> {
 
 	// Test the named slice types and their methods.
 	let wordSlice = $.arrayToSlice<string>(["c", "a", "b"])
-	await sort2.StringSlice_Sort((wordSlice as sort2.StringSlice))
+	sort2.StringSlice_Sort((wordSlice as sort2.StringSlice))
 	await $.println("StringSlice sort:", $.arrayIndex(wordSlice!, 0), $.arrayIndex(wordSlice!, 1), $.arrayIndex(wordSlice!, 2), sort2.StringSlice_Search((wordSlice as sort2.StringSlice), "b"))
 	let floatSlice = ($.arrayToSlice<number>([2.5, 1.5]) as sort2.Float64Slice)
-	await sort2.Float64Slice_Sort(floatSlice)
+	sort2.Float64Slice_Sort(floatSlice)
 	await $.println("Float64Slice sort:", sort2.Float64Slice_Len(floatSlice), sort2.Float64Slice_Less(floatSlice, 0, 1), sort2.Float64Slice_Search(floatSlice, 2.5))
 	let sorter: sort2.Interface | null = $.namedValueInterfaceValue<sort2.Interface | null>(($.arrayToSlice<number>([3, 1, 2]) as sort2.IntSlice), "sort.IntSlice", __goscriptStatic6(), __goscriptStatic7(), __goscriptStatic8())
-	await sort2.Sort($.pointerValueOrNil(sorter)!)
+	sort2.Sort($.pointerValueOrNil(sorter)!)
 	let intSlice = ($.mustTypeAssert<sort2.IntSlice>(sorter, /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"), "sort.IntSlice")) as sort2.IntSlice)
 	await $.println("IntSlice interface sort:", $.arrayIndex(intSlice!, 0), $.arrayIndex(intSlice!, 1), $.arrayIndex(intSlice!, 2), (__goscriptAwait = (sorter !== null && (sorter as any).__isVarRef !== true && (sorter as any).__goValue === undefined ? (sorter as Exclude<sort2.Interface, null>) : $.pointerValue<Exclude<sort2.Interface, null>>(sorter)).Len(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
-	await sort2.Sort($.pointerValueOrNil(sort2.Reverse($.pointerValueOrNil($.namedValueInterfaceValue<sort2.Interface | null>(intSlice, "sort.IntSlice", __goscriptStatic6(), __goscriptStatic7(), __goscriptStatic8()))!))!)
+	sort2.Sort($.pointerValueOrNil(sort2.Reverse($.pointerValueOrNil($.namedValueInterfaceValue<sort2.Interface | null>(intSlice, "sort.IntSlice", __goscriptStatic6(), __goscriptStatic7(), __goscriptStatic8()))!))!)
 	sort2.IntSlice_Swap(intSlice, 0, 2)
 	await $.println("IntSlice reverse and swap:", $.arrayIndex(intSlice!, 0), $.arrayIndex(intSlice!, 1), $.arrayIndex(intSlice!, 2))
 

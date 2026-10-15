@@ -14,6 +14,8 @@ import (
 // GoString and String methods of the values they format, and those of the
 // values inside them, and return a plain value when every such call does.
 // Fprint, Fprintf and Fprintln also call their writer's Write method.
+// sort.Sort, Stable and IsSorted call only their argument's Len, Less and
+// Swap, which the same rule for interface parameters decides.
 // Override metadata lists them in asyncWhenOperands. Instead of making each
 // call async when any method of those names in the program is, a call
 // depends on the methods its operands' static types allow:
@@ -54,15 +56,18 @@ type formatOperandDeps struct {
 	added   map[*types.Func]bool
 }
 
-// formatCallDeps returns what decides a call of called, a format function,
-// with the arguments args. An argument for an io.Writer parameter is decided
-// by its Write method, and any other by the methods fmt calls on it.
+// formatCallDeps returns what decides a call of called, an asyncWhenOperands
+// function, with the arguments args. An argument for a parameter of a
+// non-empty interface type, such as fmt.Fprintf's io.Writer or sort.Sort's
+// sort.Interface, is decided by its static type's methods of that
+// interface, and any other by the methods fmt calls on the values it
+// formats.
 func formatCallDeps(pkg *packages.Package, called *types.Func, args []ast.Expr) *formatOperandDeps {
 	deps := &formatOperandDeps{seen: make(map[types.Type]bool), added: make(map[*types.Func]bool)}
 	signature, _ := called.Type().(*types.Signature)
 	for idx, arg := range args {
-		if signature != nil && idx < signature.Params().Len() && isIOWriter(signature.Params().At(idx).Type()) {
-			deps.walkWriter(pkg.TypesInfo.TypeOf(arg))
+		if iface := operandInterfaceParam(signature, idx); iface != nil {
+			deps.walkInterfaceArg(pkg.TypesInfo.TypeOf(arg), iface)
 			continue
 		}
 		deps.walk(pkg.TypesInfo.TypeOf(arg))
@@ -70,27 +75,36 @@ func formatCallDeps(pkg *packages.Package, called *types.Func, args []ast.Expr) 
 	return deps
 }
 
-// isIOWriter reports whether typ is io.Writer.
-func isIOWriter(typ types.Type) bool {
-	named, ok := types.Unalias(typ).(*types.Named)
-	return ok && named.Obj().Pkg() != nil && named.Obj().Pkg().Path() == "io" && named.Obj().Name() == "Writer"
+// operandInterfaceParam returns the non-empty interface type of the
+// parameter for argument idx, or nil.
+func operandInterfaceParam(signature *types.Signature, idx int) *types.Interface {
+	if signature == nil || idx >= signature.Params().Len() || signature.Variadic() && idx >= signature.Params().Len()-1 {
+		return nil
+	}
+	iface, ok := signature.Params().At(idx).Type().Underlying().(*types.Interface)
+	if !ok || iface.NumMethods() == 0 {
+		return nil
+	}
+	return iface
 }
 
-// walkWriter adds the Write method of a writer of static type typ: a
-// concrete type's method, or an interface's method, which the coloring
-// decides by its implementations.
-func (d *formatOperandDeps) walkWriter(typ types.Type) {
+// walkInterfaceArg adds the methods of iface that an argument of static type
+// typ has: a concrete type's methods, or an interface's methods, which the
+// coloring decides by their implementations.
+func (d *formatOperandDeps) walkInterfaceArg(typ types.Type, iface *types.Interface) {
 	if _, ok := types.Unalias(typ).(*types.TypeParam); ok || typ == nil {
 		d.global = true
 		return
 	}
-	selection := types.NewMethodSet(typ).Lookup(nil, "Write")
-	method, _ := selectionFunc(selection)
-	if method == nil {
-		d.global = true
-		return
+	methodSet := types.NewMethodSet(typ)
+	for want := range iface.Methods() {
+		method, _ := selectionFunc(methodSet.Lookup(want.Pkg(), want.Name()))
+		if method == nil {
+			d.global = true
+			return
+		}
+		d.add(method)
 	}
-	d.add(method)
 }
 
 // selectionFunc returns the method a selection selects, or nil.

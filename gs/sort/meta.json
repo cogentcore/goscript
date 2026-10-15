@@ -1,15 +1,32 @@
 {
-  "asyncFunctions": {
-    "IsSorted": true,
-    "Sort": true,
-    "Stable": true
-  },
   "callbackAsyncFunctions": {
     "Find": true,
     "Search": true,
     "Slice": true,
     "SliceIsSorted": true,
     "SliceStable": true
+  },
+  "asyncWhenMethods": {
+    "IsSorted": [
+      "Len",
+      "Less",
+      "Swap"
+    ],
+    "Sort": [
+      "Len",
+      "Less",
+      "Swap"
+    ],
+    "Stable": [
+      "Len",
+      "Less",
+      "Swap"
+    ]
+  },
+  "asyncWhenOperands": {
+    "IsSorted": true,
+    "Sort": true,
+    "Stable": true
   },
   "syncInterfaces": {
     "Interface": true
