@@ -5,32 +5,13 @@ import * as $ from "@goscript/builtin/index.js"
 import * as sync from "@goscript/sync/index.js"
 
 export class counter {
-	public get mu(): sync.Mutex {
-		return this._fields.mu
-	}
+	public declare mu: sync.Mutex
 
-	public set mu(value: sync.Mutex) {
-		this._fields.mu = value
-	}
-
-	public get n(): number {
-		return this._fields.n
-	}
-
-	public set n(value: number) {
-		this._fields.n = value
-	}
-
-	public _fields: {
-		mu: sync.Mutex
-		n: number
-	}
+	public declare n: number
 
 	constructor(init?: Partial<{mu?: sync.Mutex, n?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			mu: init?.mu ? $.markAsStructValue($.cloneStructValue(init.mu)) : $.markAsStructValue(new sync.Mutex()),
-			n: init?.n ?? (0 as number)
-		}
+		this.mu = init?.mu ? $.markAsStructValue($.cloneStructValue(init.mu)) : $.markAsStructValue(new sync.Mutex())
+		this.n = init?.n ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -38,11 +19,10 @@ export class counter {
 		return new counter(this, true)
 	}
 
-	public __goscriptAssign(source: counter): void {
-		const target = this._fields
-		const values = source._fields
-		$.assignStruct(target.mu, values.mu)
-		target.n = values.n
+	public __goscriptAssign(source: counter): this {
+		$.assignStruct(this.mu, source.mu)
+		this.n = source.n
+		return this
 	}
 
 	public add(k: number): void {
@@ -73,42 +53,16 @@ export class counter {
 }
 
 export class queue {
-	public get mu(): sync.Mutex {
-		return this._fields.mu
-	}
+	public declare mu: sync.Mutex
 
-	public set mu(value: sync.Mutex) {
-		this._fields.mu = value
-	}
+	public declare items: $.Slice<number>
 
-	public get items(): $.Slice<number> {
-		return this._fields.items
-	}
-
-	public set items(value: $.Slice<number>) {
-		this._fields.items = value
-	}
-
-	public get ready(): $.Channel<number> | null {
-		return this._fields.ready
-	}
-
-	public set ready(value: $.Channel<number> | null) {
-		this._fields.ready = value
-	}
-
-	public _fields: {
-		mu: sync.Mutex
-		items: $.Slice<number>
-		ready: $.Channel<number> | null
-	}
+	public declare ready: $.Channel<number> | null
 
 	constructor(init?: Partial<{mu?: sync.Mutex, items?: $.Slice<number>, ready?: $.Channel<number> | null}>, __goscriptValue?: boolean) {
-		this._fields = {
-			mu: init?.mu ? $.markAsStructValue($.cloneStructValue(init.mu)) : $.markAsStructValue(new sync.Mutex()),
-			items: init?.items ?? (null! as $.Slice<number>),
-			ready: init?.ready ?? (null! as $.Channel<number> | null)
-		}
+		this.mu = init?.mu ? $.markAsStructValue($.cloneStructValue(init.mu)) : $.markAsStructValue(new sync.Mutex())
+		this.items = init?.items ?? (null! as $.Slice<number>)
+		this.ready = init?.ready ?? (null! as $.Channel<number> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -116,12 +70,11 @@ export class queue {
 		return new queue(this, true)
 	}
 
-	public __goscriptAssign(source: queue): void {
-		const target = this._fields
-		const values = source._fields
-		$.assignStruct(target.mu, values.mu)
-		target.items = values.items
-		target.ready = values.ready
+	public __goscriptAssign(source: queue): this {
+		$.assignStruct(this.mu, source.mu)
+		this.items = source.items
+		this.ready = source.ready
+		return this
 	}
 
 	public async push(v: number): globalThis.Promise<void> {
@@ -153,32 +106,13 @@ export class queue {
 }
 
 export class shared {
-	public get mu(): sync.Mutex {
-		return this._fields.mu
-	}
+	public declare mu: sync.Mutex
 
-	public set mu(value: sync.Mutex) {
-		this._fields.mu = value
-	}
-
-	public get n(): number {
-		return this._fields.n
-	}
-
-	public set n(value: number) {
-		this._fields.n = value
-	}
-
-	public _fields: {
-		mu: sync.Mutex
-		n: number
-	}
+	public declare n: number
 
 	constructor(init?: Partial<{mu?: sync.Mutex, n?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			mu: init?.mu ? $.markAsStructValue($.cloneStructValue(init.mu)) : $.markAsStructValue(new sync.Mutex()),
-			n: init?.n ?? (0 as number)
-		}
+		this.mu = init?.mu ? $.markAsStructValue($.cloneStructValue(init.mu)) : $.markAsStructValue(new sync.Mutex())
+		this.n = init?.n ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -186,11 +120,10 @@ export class shared {
 		return new shared(this, true)
 	}
 
-	public __goscriptAssign(source: shared): void {
-		const target = this._fields
-		const values = source._fields
-		$.assignStruct(target.mu, values.mu)
-		target.n = values.n
+	public __goscriptAssign(source: shared): this {
+		$.assignStruct(this.mu, source.mu)
+		this.n = source.n
+		return this
 	}
 
 	public async inc(): globalThis.Promise<void> {
@@ -337,7 +270,7 @@ export async function main(): globalThis.Promise<void> {
 	let s = new shared()
 	let s$: shared = s == null ? $.pointerTarget<shared>(s) : (s as any).__isVarRef === true ? (s as any).value : (s as any).__goValue === undefined ? (s as any) : $.pointerTarget<shared>(s)
 	await (s !== null && (s as any).__isVarRef !== true && (s as any).__goValue === undefined ? ((s as any) as shared).inc() : shared.prototype.inc.call(s))
-	await lockWith($.fieldRef((s$ as shared)._fields, "mu"), $.functionValue(() => {
+	await lockWith($.fieldRef((s$ as shared), "mu"), $.functionValue(() => {
 		;(s$ as shared).n += 10
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)))
 	await $.println("shared:", (s$ as shared).n)

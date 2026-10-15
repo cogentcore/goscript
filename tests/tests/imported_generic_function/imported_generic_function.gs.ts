@@ -43,7 +43,7 @@ export async function main(): globalThis.Promise<void> {
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "helper.Value", zero: () => null, methods: {GetValue: (receiver: any, ...args: any[]) => receiver.GetValue(...$.stripGenericTypeArgs(args))} }})
+	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "helper.Value", zero: () => null, methods: {GetValue: (receiver: any) => receiver.GetValue()} }})
 }
 
 var __goscriptStatic1$value: any

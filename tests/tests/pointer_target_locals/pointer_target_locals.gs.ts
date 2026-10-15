@@ -4,42 +4,16 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class Node {
-	public get Name(): string {
-		return this._fields.Name
-	}
+	public declare Name: string
 
-	public set Name(value: string) {
-		this._fields.Name = value
-	}
+	public declare Count: number
 
-	public get Count(): number {
-		return this._fields.Count
-	}
-
-	public set Count(value: number) {
-		this._fields.Count = value
-	}
-
-	public get Next(): Node | $.VarRef<Node> | null {
-		return this._fields.Next
-	}
-
-	public set Next(value: Node | $.VarRef<Node> | null) {
-		this._fields.Next = value
-	}
-
-	public _fields: {
-		Name: string
-		Count: number
-		Next: Node | $.VarRef<Node> | null
-	}
+	public declare Next: Node | $.VarRef<Node> | null
 
 	constructor(init?: Partial<{Name?: string, Count?: number, Next?: Node | $.VarRef<Node> | null}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Name: init?.Name ?? ("" as string),
-			Count: init?.Count ?? (0 as number),
-			Next: init?.Next ?? (null! as Node | $.VarRef<Node> | null)
-		}
+		this.Name = init?.Name ?? ("" as string)
+		this.Count = init?.Count ?? (0 as number)
+		this.Next = init?.Next ?? (null! as Node | $.VarRef<Node> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -47,12 +21,11 @@ export class Node {
 		return new Node(this, true)
 	}
 
-	public __goscriptAssign(source: Node): void {
-		const target = this._fields
-		const values = source._fields
-		target.Name = values.Name
-		target.Count = values.Count
-		target.Next = values.Next
+	public __goscriptAssign(source: Node): this {
+		this.Name = source.Name
+		this.Count = source.Count
+		this.Next = source.Next
+		return this
 	}
 
 	public Fill(name: string): void {
@@ -82,22 +55,10 @@ export class Node {
 }
 
 export class Holder {
-	public get items(): $.Slice<Node> {
-		return this._fields.items
-	}
-
-	public set items(value: $.Slice<Node>) {
-		this._fields.items = value
-	}
-
-	public _fields: {
-		items: $.Slice<Node>
-	}
+	public declare items: $.Slice<Node>
 
 	constructor(init?: Partial<{items?: $.Slice<Node>}>, __goscriptValue?: boolean) {
-		this._fields = {
-			items: init?.items ?? (null! as $.Slice<Node>)
-		}
+		this.items = init?.items ?? (null! as $.Slice<Node>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -105,10 +66,9 @@ export class Holder {
 		return new Holder(this, true)
 	}
 
-	public __goscriptAssign(source: Holder): void {
-		const target = this._fields
-		const values = source._fields
-		target.items = values.items
+	public __goscriptAssign(source: Holder): this {
+		this.items = source.items
+		return this
 	}
 
 	public touch(i: number): void {

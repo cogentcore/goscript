@@ -2,12 +2,10 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as fmt from "@goscript/fmt/index.js"
-import "@goscript/fmt/index.js"
 
 export type node = {
-	Name(): string | globalThis.Promise<string>
+	Name(): string
 }
 
 $.registerInterfaceType(
@@ -27,22 +25,10 @@ $.registerInterfaceType(
 );
 
 export class label {
-	public get text(): string {
-		return this._fields.text
-	}
-
-	public set text(value: string) {
-		this._fields.text = value
-	}
-
-	public _fields: {
-		text: string
-	}
+	public declare text: string
 
 	constructor(init?: Partial<{text?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			text: init?.text ?? ("" as string)
-		}
+		this.text = init?.text ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -50,10 +36,9 @@ export class label {
 		return new label(this, true)
 	}
 
-	public __goscriptAssign(source: label): void {
-		const target = this._fields
-		const values = source._fields
-		target.text = values.text
+	public __goscriptAssign(source: label): this {
+		this.text = source.text
+		return this
 	}
 
 	public Name(): string {
@@ -71,22 +56,10 @@ export class label {
 }
 
 export class icon {
-	public get size(): number {
-		return this._fields.size
-	}
-
-	public set size(value: number) {
-		this._fields.size = value
-	}
-
-	public _fields: {
-		size: number
-	}
+	public declare size: number
 
 	constructor(init?: Partial<{size?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			size: init?.size ?? (0 as number)
-		}
+		this.size = init?.size ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -94,15 +67,14 @@ export class icon {
 		return new icon(this, true)
 	}
 
-	public __goscriptAssign(source: icon): void {
-		const target = this._fields
-		const values = source._fields
-		target.size = values.size
+	public __goscriptAssign(source: icon): this {
+		this.size = source.size
+		return this
 	}
 
-	public async Name(): globalThis.Promise<string> {
+	public Name(): string {
 		const i: icon | $.VarRef<icon> | null = this;
-		return fmt.Sprint("icon:", $.basicInterfaceValue($.pointerValue<icon>(i).size, "int"))
+		return (fmt.Sprint("icon:", $.basicInterfaceValue($.pointerValue<icon>(i).size, "int")) as string)
 	}
 
 	public Size(): number {
@@ -134,31 +106,31 @@ export async function main(): globalThis.Promise<void> {
 	for (let __goscriptRangeTarget0 = nodes, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
 		let n = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as node | null)
 		let [, isSizer] = $.typeAssertTuple<sizer | null>(n, "main.sizer")
-		await fmt.Printf("%T %v %v\n", (n as any), isSizer, (__goscriptAwait = (n !== null && (n as any).__isVarRef !== true && (n as any).__goValue === undefined ? (n as Exclude<node, null>) : $.pointerValue<Exclude<node, null>>(n)).Name(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+		fmt.Printf("%T %v %v\n", (n as any), isSizer, (__goscriptAwait = (n !== null && (n as any).__isVarRef !== true && (n as any).__goValue === undefined ? (n as Exclude<node, null>) : $.pointerValue<Exclude<node, null>>(n)).Name(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	}
 	for (let __goscriptRangeTarget1 = box(__goscriptStatic2(), new label({text: "x"}, true)), __goscriptRangeWindow1 = $.sliceRange(__goscriptRangeTarget1), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow1.length; __rangeIndex++) {
 		let v = (__goscriptRangeWindow1.backing[__goscriptRangeWindow1.offset + __rangeIndex] as any)
-		await fmt.Printf("%T\n", v)
+		fmt.Printf("%T\n", v)
 	}
 	for (let __goscriptRangeTarget2 = box(__goscriptStatic3(), $.arrayIndex(nodes!, 0)), __goscriptRangeWindow2 = $.sliceRange(__goscriptRangeTarget2), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow2.length; __rangeIndex++) {
 		let v = (__goscriptRangeWindow2.backing[__goscriptRangeWindow2.offset + __rangeIndex] as any)
-		await fmt.Printf("%T\n", v)
+		fmt.Printf("%T\n", v)
 	}
 	for (let __goscriptRangeTarget3 = box(__goscriptStatic4(), 3), __goscriptRangeWindow3 = $.sliceRange(__goscriptRangeTarget3), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow3.length; __rangeIndex++) {
 		let v = (__goscriptRangeWindow3.backing[__goscriptRangeWindow3.offset + __rangeIndex] as any)
-		await fmt.Printf("%T\n", v)
+		fmt.Printf("%T\n", v)
 	}
 	{
 		const __goscriptTypeSwitchValue = $.arrayIndex(nodes!, 1)
 		switch (true) {
 			case $.typeAssert<label | $.VarRef<label> | null>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.pointerType("main.label")).ok:
 				{
-					await fmt.Println("switch: label")
+					fmt.Println("switch: label")
 				}
 				break
 			case $.typeAssert<icon | $.VarRef<icon> | null>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.pointerType("main.icon")).ok:
 				{
-					await fmt.Println("switch: icon")
+					fmt.Println("switch: icon")
 				}
 				break
 		}
@@ -167,12 +139,12 @@ export async function main(): globalThis.Promise<void> {
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.label", zero: () => new label(undefined, true) }, PT: { type: /* @__PURE__ */ $.pointerType("main.label"), zero: () => null, methods: {Name: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Name(...$.stripGenericTypeArgs(args))} }})
+	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.label", zero: () => new label(undefined, true) }, PT: { type: /* @__PURE__ */ $.pointerType("main.label"), zero: () => null, methods: {Name: (receiver: any) => $.pointerValue(receiver).Name()} }})
 }
 
 var __goscriptStatic1$value: any
 function __goscriptStatic1(): any {
-	return __goscriptStatic1$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.icon", zero: () => new icon(undefined, true) }, PT: { type: /* @__PURE__ */ $.pointerType("main.icon"), zero: () => null, methods: {Name: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Name(...$.stripGenericTypeArgs(args)), Size: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Size(...$.stripGenericTypeArgs(args))} }})
+	return __goscriptStatic1$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.icon", zero: () => new icon(undefined, true) }, PT: { type: /* @__PURE__ */ $.pointerType("main.icon"), zero: () => null, methods: {Name: (receiver: any) => $.pointerValue(receiver).Name(), Size: (receiver: any) => $.pointerValue(receiver).Size()} }})
 }
 
 var __goscriptStatic2$value: any
@@ -182,7 +154,7 @@ function __goscriptStatic2(): any {
 
 var __goscriptStatic3$value: any
 function __goscriptStatic3(): any {
-	return __goscriptStatic3$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.node", zero: () => null, methods: {Name: (receiver: any, ...args: any[]) => receiver.Name(...$.stripGenericTypeArgs(args))} }})
+	return __goscriptStatic3$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.node", zero: () => null, methods: {Name: (receiver: any) => receiver.Name()} }})
 }
 
 var __goscriptStatic4$value: any

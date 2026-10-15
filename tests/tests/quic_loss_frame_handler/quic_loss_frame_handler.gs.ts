@@ -25,12 +25,7 @@ $.registerInterfaceType(
 );
 
 export class pingFrame {
-	public _fields: {
-	}
-
 	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
-		this._fields = {
-		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -38,7 +33,8 @@ export class pingFrame {
 		return new pingFrame(this, true)
 	}
 
-	public __goscriptAssign(source: pingFrame): void {
+	public __goscriptAssign(source: pingFrame): this {
+		return this
 	}
 
 	public Write(): void {
@@ -54,32 +50,13 @@ export class pingFrame {
 }
 
 export class Frame {
-	public get Frame(): wireFrame | null {
-		return this._fields.Frame
-	}
+	public declare Frame: wireFrame | null
 
-	public set Frame(value: wireFrame | null) {
-		this._fields.Frame = value
-	}
-
-	public get Handler(): FrameHandler | null {
-		return this._fields.Handler
-	}
-
-	public set Handler(value: FrameHandler | null) {
-		this._fields.Handler = value
-	}
-
-	public _fields: {
-		Frame: wireFrame | null
-		Handler: FrameHandler | null
-	}
+	public declare Handler: FrameHandler | null
 
 	constructor(init?: Partial<{Frame?: wireFrame | null, Handler?: FrameHandler | null}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Frame: init?.Frame ?? (null! as wireFrame | null),
-			Handler: init?.Handler ?? (null! as FrameHandler | null)
-		}
+		this.Frame = init?.Frame ?? (null! as wireFrame | null)
+		this.Handler = init?.Handler ?? (null! as FrameHandler | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -87,11 +64,10 @@ export class Frame {
 		return new Frame(this, true)
 	}
 
-	public __goscriptAssign(source: Frame): void {
-		const target = this._fields
-		const values = source._fields
-		target.Frame = $.assignFieldValue(target.Frame, values.Frame, "main.wireFrame")
-		target.Handler = $.assignFieldValue(target.Handler, values.Handler, "main.FrameHandler")
+	public __goscriptAssign(source: Frame): this {
+		this.Frame = $.assignFieldValue(this.Frame, source.Frame, "main.wireFrame")
+		this.Handler = $.assignFieldValue(this.Handler, source.Handler, "main.FrameHandler")
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -104,22 +80,10 @@ export class Frame {
 }
 
 export class packet {
-	public get Frames(): $.Slice<Frame> {
-		return this._fields.Frames
-	}
-
-	public set Frames(value: $.Slice<Frame>) {
-		this._fields.Frames = value
-	}
-
-	public _fields: {
-		Frames: $.Slice<Frame>
-	}
+	public declare Frames: $.Slice<Frame>
 
 	constructor(init?: Partial<{Frames?: $.Slice<Frame>}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Frames: init?.Frames ?? (null! as $.Slice<Frame>)
-		}
+		this.Frames = init?.Frames ?? (null! as $.Slice<Frame>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -127,10 +91,9 @@ export class packet {
 		return new packet(this, true)
 	}
 
-	public __goscriptAssign(source: packet): void {
-		const target = this._fields
-		const values = source._fields
-		target.Frames = values.Frames
+	public __goscriptAssign(source: packet): this {
+		this.Frames = source.Frames
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -143,22 +106,10 @@ export class packet {
 }
 
 export class retransmissionQueue {
-	public get lost(): number {
-		return this._fields.lost
-	}
-
-	public set lost(value: number) {
-		this._fields.lost = value
-	}
-
-	public _fields: {
-		lost: number
-	}
+	public declare lost: number
 
 	constructor(init?: Partial<{lost?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			lost: init?.lost ?? (0 as number)
-		}
+		this.lost = init?.lost ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -166,10 +117,9 @@ export class retransmissionQueue {
 		return new retransmissionQueue(this, true)
 	}
 
-	public __goscriptAssign(source: retransmissionQueue): void {
-		const target = this._fields
-		const values = source._fields
-		target.lost = values.lost
+	public __goscriptAssign(source: retransmissionQueue): this {
+		this.lost = source.lost
+		return this
 	}
 
 	public AppDataAckHandler(): FrameHandler | null {
@@ -197,22 +147,10 @@ export class retransmissionQueue {
 }
 
 export class retransmissionQueueInitialAckHandler {
-	public get lost(): number {
-		return this._fields.lost
-	}
-
-	public set lost(value: number) {
-		this._fields.lost = value
-	}
-
-	public _fields: {
-		lost: number
-	}
+	public declare lost: number
 
 	constructor(init?: Partial<{lost?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			lost: init?.lost ?? (0 as number)
-		}
+		this.lost = init?.lost ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -220,10 +158,9 @@ export class retransmissionQueueInitialAckHandler {
 		return new retransmissionQueueInitialAckHandler(this, true)
 	}
 
-	public __goscriptAssign(source: retransmissionQueueInitialAckHandler): void {
-		const target = this._fields
-		const values = source._fields
-		target.lost = values.lost
+	public __goscriptAssign(source: retransmissionQueueInitialAckHandler): this {
+		this.lost = source.lost
+		return this
 	}
 
 	public OnAcked(_p0: wireFrame | null): void {
@@ -247,22 +184,10 @@ export class retransmissionQueueInitialAckHandler {
 }
 
 export class retransmissionQueueHandshakeAckHandler {
-	public get lost(): number {
-		return this._fields.lost
-	}
-
-	public set lost(value: number) {
-		this._fields.lost = value
-	}
-
-	public _fields: {
-		lost: number
-	}
+	public declare lost: number
 
 	constructor(init?: Partial<{lost?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			lost: init?.lost ?? (0 as number)
-		}
+		this.lost = init?.lost ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -270,10 +195,9 @@ export class retransmissionQueueHandshakeAckHandler {
 		return new retransmissionQueueHandshakeAckHandler(this, true)
 	}
 
-	public __goscriptAssign(source: retransmissionQueueHandshakeAckHandler): void {
-		const target = this._fields
-		const values = source._fields
-		target.lost = values.lost
+	public __goscriptAssign(source: retransmissionQueueHandshakeAckHandler): this {
+		this.lost = source.lost
+		return this
 	}
 
 	public OnAcked(_p0: wireFrame | null): void {
@@ -297,22 +221,10 @@ export class retransmissionQueueHandshakeAckHandler {
 }
 
 export class retransmissionQueueAppDataAckHandler {
-	public get lost(): number {
-		return this._fields.lost
-	}
-
-	public set lost(value: number) {
-		this._fields.lost = value
-	}
-
-	public _fields: {
-		lost: number
-	}
+	public declare lost: number
 
 	constructor(init?: Partial<{lost?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			lost: init?.lost ?? (0 as number)
-		}
+		this.lost = init?.lost ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -320,10 +232,9 @@ export class retransmissionQueueAppDataAckHandler {
 		return new retransmissionQueueAppDataAckHandler(this, true)
 	}
 
-	public __goscriptAssign(source: retransmissionQueueAppDataAckHandler): void {
-		const target = this._fields
-		const values = source._fields
-		target.lost = values.lost
+	public __goscriptAssign(source: retransmissionQueueAppDataAckHandler): this {
+		this.lost = source.lost
+		return this
 	}
 
 	public OnAcked(_p0: wireFrame | null): void {

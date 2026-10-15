@@ -4,32 +4,13 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class unit {
-	public get V(): number {
-		return this._fields.V
-	}
+	public declare V: number
 
-	public set V(value: number) {
-		this._fields.V = value
-	}
-
-	public get U(): string {
-		return this._fields.U
-	}
-
-	public set U(value: string) {
-		this._fields.U = value
-	}
-
-	public _fields: {
-		V: number
-		U: string
-	}
+	public declare U: string
 
 	constructor(init?: Partial<{V?: number, U?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			V: init?.V ?? (0 as number),
-			U: init?.U ?? ("" as string)
-		}
+		this.V = init?.V ?? (0 as number)
+		this.U = init?.U ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -37,11 +18,10 @@ export class unit {
 		return new unit(this, true)
 	}
 
-	public __goscriptAssign(source: unit): void {
-		const target = this._fields
-		const values = source._fields
-		target.V = values.V
-		target.U = values.U
+	public __goscriptAssign(source: unit): this {
+		this.V = source.V
+		this.U = source.U
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -54,52 +34,19 @@ export class unit {
 }
 
 export class sides {
-	public get Top(): any {
-		return this._fields.Top
-	}
+	public declare Top: any
 
-	public set Top(value: any) {
-		this._fields.Top = value
-	}
+	public declare Right: any
 
-	public get Right(): any {
-		return this._fields.Right
-	}
+	public declare Bottom: any
 
-	public set Right(value: any) {
-		this._fields.Right = value
-	}
+	public declare Left: any
 
-	public get Bottom(): any {
-		return this._fields.Bottom
-	}
-
-	public set Bottom(value: any) {
-		this._fields.Bottom = value
-	}
-
-	public get Left(): any {
-		return this._fields.Left
-	}
-
-	public set Left(value: any) {
-		this._fields.Left = value
-	}
-
-	public _fields: {
-		Top: any
-		Right: any
-		Bottom: any
-		Left: any
-	}
-
-	constructor(init?: Partial<{Top?: any, Right?: any, Bottom?: any, Left?: any}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Top: init?.Top !== undefined ? $.copyElement(init.Top) : (null! as any),
-			Right: init?.Right !== undefined ? $.copyElement(init.Right) : (null! as any),
-			Bottom: init?.Bottom !== undefined ? $.copyElement(init.Bottom) : (null! as any),
-			Left: init?.Left !== undefined ? $.copyElement(init.Left) : (null! as any)
-		}
+	constructor(init?: Partial<{Top?: any, Right?: any, Bottom?: any, Left?: any}>, __goscriptValue?: boolean, __goscriptFresh?: boolean) {
+		this.Top = init?.Top !== undefined ? (__goscriptFresh === true ? init.Top : $.copyElement(init.Top)) : (null! as any)
+		this.Right = init?.Right !== undefined ? (__goscriptFresh === true ? init.Right : $.copyElement(init.Right)) : (null! as any)
+		this.Bottom = init?.Bottom !== undefined ? (__goscriptFresh === true ? init.Bottom : $.copyElement(init.Bottom)) : (null! as any)
+		this.Left = init?.Left !== undefined ? (__goscriptFresh === true ? init.Left : $.copyElement(init.Left)) : (null! as any)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -107,13 +54,12 @@ export class sides {
 		return new sides(this, true)
 	}
 
-	public __goscriptAssign(source: sides): void {
-		const target = this._fields
-		const values = source._fields
-		target.Top = $.assignFieldValue(target.Top, values.Top, { kind: $.TypeKind.Interface, methods: [] })
-		target.Right = $.assignFieldValue(target.Right, values.Right, { kind: $.TypeKind.Interface, methods: [] })
-		target.Bottom = $.assignFieldValue(target.Bottom, values.Bottom, { kind: $.TypeKind.Interface, methods: [] })
-		target.Left = $.assignFieldValue(target.Left, values.Left, { kind: $.TypeKind.Interface, methods: [] })
+	public __goscriptAssign(source: sides): this {
+		this.Top = $.assignFieldValue(this.Top, source.Top, { kind: $.TypeKind.Interface, methods: [] })
+		this.Right = $.assignFieldValue(this.Right, source.Right, { kind: $.TypeKind.Interface, methods: [] })
+		this.Bottom = $.assignFieldValue(this.Bottom, source.Bottom, { kind: $.TypeKind.Interface, methods: [] })
+		this.Left = $.assignFieldValue(this.Left, source.Left, { kind: $.TypeKind.Interface, methods: [] })
+		return this
 	}
 
 	public setAll(__typeArgs: $.GenericTypeArgs | undefined, v: any): void {
@@ -139,32 +85,13 @@ export class sides {
 }
 
 export class values {
-	public get sides(): sides {
-		return this._fields.sides
-	}
+	public declare sides: sides
 
-	public set sides(value: sides) {
-		this._fields.sides = value
-	}
-
-	public get Name(): string {
-		return this._fields.Name
-	}
-
-	public set Name(value: string) {
-		this._fields.Name = value
-	}
-
-	public _fields: {
-		sides: sides
-		Name: string
-	}
+	public declare Name: string
 
 	constructor(init?: Partial<{sides?: sides, Name?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			sides: init?.sides ? init.sides.clone() : $.markAsStructValue(new sides({Top: new unit(undefined, true), Right: new unit(undefined, true), Bottom: new unit(undefined, true), Left: new unit(undefined, true)})),
-			Name: init?.Name ?? ("" as string)
-		}
+		this.sides = init?.sides ? init.sides.clone() : $.markAsStructValue(new sides({Top: new unit(undefined, true), Right: new unit(undefined, true), Bottom: new unit(undefined, true), Left: new unit(undefined, true)}, undefined, true))
+		this.Name = init?.Name ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -172,11 +99,10 @@ export class values {
 		return new values(this, true)
 	}
 
-	public __goscriptAssign(source: values): void {
-		const target = this._fields
-		const values = source._fields
-		$.assignStruct(target.sides, values.sides)
-		target.Name = values.Name
+	public __goscriptAssign(source: values): this {
+		this.sides.__goscriptAssign(source.sides)
+		this.Name = source.Name
+		return this
 	}
 
 	public setAll(v: any): any {
@@ -193,32 +119,13 @@ export class values {
 }
 
 export class pair {
-	public get Key(): any {
-		return this._fields.Key
-	}
+	public declare Key: any
 
-	public set Key(value: any) {
-		this._fields.Key = value
-	}
+	public declare Val: any
 
-	public get Val(): any {
-		return this._fields.Val
-	}
-
-	public set Val(value: any) {
-		this._fields.Val = value
-	}
-
-	public _fields: {
-		Key: any
-		Val: any
-	}
-
-	constructor(init?: Partial<{Key?: any, Val?: any}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Key: init?.Key ?? (null! as any),
-			Val: init?.Val !== undefined ? $.copyElement(init.Val) : (null! as any)
-		}
+	constructor(init?: Partial<{Key?: any, Val?: any}>, __goscriptValue?: boolean, __goscriptFresh?: boolean) {
+		this.Key = init?.Key ?? (null! as any)
+		this.Val = init?.Val !== undefined ? (__goscriptFresh === true ? init.Val : $.copyElement(init.Val)) : (null! as any)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -226,11 +133,10 @@ export class pair {
 		return new pair(this, true)
 	}
 
-	public __goscriptAssign(source: pair): void {
-		const target = this._fields
-		const values = source._fields
-		target.Key = $.assignFieldValue(target.Key, values.Key, { kind: $.TypeKind.Interface, methods: [] })
-		target.Val = $.assignFieldValue(target.Val, values.Val, { kind: $.TypeKind.Interface, methods: [] })
+	public __goscriptAssign(source: pair): this {
+		this.Key = $.assignFieldValue(this.Key, source.Key, { kind: $.TypeKind.Interface, methods: [] })
+		this.Val = $.assignFieldValue(this.Val, source.Val, { kind: $.TypeKind.Interface, methods: [] })
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -244,7 +150,7 @@ export class pair {
 
 export function copySides(__typeArgs: $.GenericTypeArgs | undefined, s: sides): sides {
 	let c = (s).clone()
-	return (c).clone()
+	return c
 }
 
 export async function main(): globalThis.Promise<void> {
@@ -261,7 +167,7 @@ export async function main(): globalThis.Promise<void> {
 	let t = (copySides(__goscriptStatic0(), s) as sides)
 	t.Top.V = 9
 	let u = (s).clone()
-	$.assignStruct(u.Right, new unit({V: 3, U: "x"}, true))
+	u.Right.__goscriptAssign(new unit({V: 3, U: "x"}, true))
 	await $.println("instance:", s.Top.V, t.Top.V, $.stringEqual(s.Right.U, ""), u.Right.U)
 
 	// Instances with type arguments of other kinds.

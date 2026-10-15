@@ -4,22 +4,10 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class Foo {
-	public get done(): $.Channel<boolean> | null {
-		return this._fields.done
-	}
-
-	public set done(value: $.Channel<boolean> | null) {
-		this._fields.done = value
-	}
-
-	public _fields: {
-		done: $.Channel<boolean> | null
-	}
+	public declare done: $.Channel<boolean> | null
 
 	constructor(init?: Partial<{done?: $.Channel<boolean> | null}>, __goscriptValue?: boolean) {
-		this._fields = {
-			done: init?.done ?? (null! as $.Channel<boolean> | null)
-		}
+		this.done = init?.done ?? (null! as $.Channel<boolean> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -27,10 +15,9 @@ export class Foo {
 		return new Foo(this, true)
 	}
 
-	public __goscriptAssign(source: Foo): void {
-		const target = this._fields
-		const values = source._fields
-		target.done = values.done
+	public __goscriptAssign(source: Foo): this {
+		this.done = source.done
+		return this
 	}
 
 	public async Bar(): globalThis.Promise<void> {

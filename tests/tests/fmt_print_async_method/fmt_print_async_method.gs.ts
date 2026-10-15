@@ -5,22 +5,10 @@ import * as $ from "@goscript/builtin/index.js"
 import * as fmt from "@goscript/fmt/index.js"
 
 export class slowName {
-	public get ch(): $.Channel<string> | null {
-		return this._fields.ch
-	}
-
-	public set ch(value: $.Channel<string> | null) {
-		this._fields.ch = value
-	}
-
-	public _fields: {
-		ch: $.Channel<string> | null
-	}
+	public declare ch: $.Channel<string> | null
 
 	constructor(init?: Partial<{ch?: $.Channel<string> | null}>, __goscriptValue?: boolean) {
-		this._fields = {
-			ch: init?.ch ?? (null! as $.Channel<string> | null)
-		}
+		this.ch = init?.ch ?? (null! as $.Channel<string> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -28,10 +16,9 @@ export class slowName {
 		return new slowName(this, true)
 	}
 
-	public __goscriptAssign(source: slowName): void {
-		const target = this._fields
-		const values = source._fields
-		target.ch = values.ch
+	public __goscriptAssign(source: slowName): this {
+		this.ch = source.ch
+		return this
 	}
 
 	public async String(): globalThis.Promise<string> {
@@ -50,32 +37,13 @@ export class slowName {
 }
 
 export class point {
-	public get x(): number {
-		return this._fields.x
-	}
+	public declare x: number
 
-	public set x(value: number) {
-		this._fields.x = value
-	}
-
-	public get y(): number {
-		return this._fields.y
-	}
-
-	public set y(value: number) {
-		this._fields.y = value
-	}
-
-	public _fields: {
-		x: number
-		y: number
-	}
+	public declare y: number
 
 	constructor(init?: Partial<{x?: number, y?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			x: init?.x ?? (0 as number),
-			y: init?.y ?? (0 as number)
-		}
+		this.x = init?.x ?? (0 as number)
+		this.y = init?.y ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -83,11 +51,10 @@ export class point {
 		return new point(this, true)
 	}
 
-	public __goscriptAssign(source: point): void {
-		const target = this._fields
-		const values = source._fields
-		target.x = values.x
-		target.y = values.y
+	public __goscriptAssign(source: point): this {
+		this.x = source.x
+		this.y = source.y
+		return this
 	}
 
 	public String(): string {

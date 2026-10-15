@@ -10,43 +10,24 @@ $.registerNamedType("main.byLen", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.
 
 $.registerNamedValueType(
 	"main.byLen",
-	{Len: (receiver: any, ...args: any[]) => (byLen_Len as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Less: (receiver: any, ...args: any[]) => (byLen_Less as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Swap: (receiver: any, ...args: any[]) => (byLen_Swap as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	{Len: (receiver: any) => (byLen_Len as any)(($.isVarRef(receiver) ? receiver.value : receiver)), Less: (receiver: any, ...args: any[]) => (byLen_Less as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Swap: (receiver: any, ...args: any[]) => (byLen_Swap as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
 	[$.methodSignature("Len", [], [/* @__PURE__ */ $.basicType("int")]), $.methodSignature("Less", [["i", /* @__PURE__ */ $.basicType("int")], ["j", /* @__PURE__ */ $.basicType("int")]], [/* @__PURE__ */ $.basicType("bool")]), $.methodSignature("Swap", [["i", /* @__PURE__ */ $.basicType("int")], ["j", /* @__PURE__ */ $.basicType("int")]])]
 );
 
 $.registerNamedValueType(
 	"*main.byLen",
-	{Len: (receiver: any, ...args: any[]) => (byLen_Len as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args)), Less: (receiver: any, ...args: any[]) => (byLen_Less as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args)), Swap: (receiver: any, ...args: any[]) => (byLen_Swap as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	{Len: (receiver: any) => (byLen_Len as any)($.pointerValue(receiver)), Less: (receiver: any, ...args: any[]) => (byLen_Less as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args)), Swap: (receiver: any, ...args: any[]) => (byLen_Swap as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
 	[$.methodSignature("Len", [], [/* @__PURE__ */ $.basicType("int")]), $.methodSignature("Less", [["i", /* @__PURE__ */ $.basicType("int")], ["j", /* @__PURE__ */ $.basicType("int")]], [/* @__PURE__ */ $.basicType("bool")]), $.methodSignature("Swap", [["i", /* @__PURE__ */ $.basicType("int")], ["j", /* @__PURE__ */ $.basicType("int")]])]
 );
 
 export class slowInts {
-	public get xs(): $.Slice<number> {
-		return this._fields.xs
-	}
+	public declare xs: $.Slice<number>
 
-	public set xs(value: $.Slice<number>) {
-		this._fields.xs = value
-	}
-
-	public get ch(): $.Channel<number> | null {
-		return this._fields.ch
-	}
-
-	public set ch(value: $.Channel<number> | null) {
-		this._fields.ch = value
-	}
-
-	public _fields: {
-		xs: $.Slice<number>
-		ch: $.Channel<number> | null
-	}
+	public declare ch: $.Channel<number> | null
 
 	constructor(init?: Partial<{xs?: $.Slice<number>, ch?: $.Channel<number> | null}>, __goscriptValue?: boolean) {
-		this._fields = {
-			xs: init?.xs ?? (null! as $.Slice<number>),
-			ch: init?.ch ?? (null! as $.Channel<number> | null)
-		}
+		this.xs = init?.xs ?? (null! as $.Slice<number>)
+		this.ch = init?.ch ?? (null! as $.Channel<number> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -54,11 +35,10 @@ export class slowInts {
 		return new slowInts(this, true)
 	}
 
-	public __goscriptAssign(source: slowInts): void {
-		const target = this._fields
-		const values = source._fields
-		target.xs = values.xs
-		target.ch = values.ch
+	public __goscriptAssign(source: slowInts): this {
+		this.xs = source.xs
+		this.ch = source.ch
+		return this
 	}
 
 	public Len(): number {
@@ -142,7 +122,7 @@ export async function main(): globalThis.Promise<void> {
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({Len: (receiver: any, ...args: any[]) => (byLen_Len as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Less: (receiver: any, ...args: any[]) => (byLen_Less as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Swap: (receiver: any, ...args: any[]) => (byLen_Swap as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))})
+	return __goscriptStatic0$value ??= ({Len: (receiver: any) => (byLen_Len as any)(($.isVarRef(receiver) ? receiver.value : receiver)), Less: (receiver: any, ...args: any[]) => (byLen_Less as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Swap: (receiver: any, ...args: any[]) => (byLen_Swap as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))})
 }
 
 var __goscriptStatic1$value: any

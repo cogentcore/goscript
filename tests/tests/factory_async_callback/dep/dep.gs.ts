@@ -16,12 +16,7 @@ $.registerInterfaceType(
 );
 
 export class Bus {
-	public _fields: {
-	}
-
 	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
-		this._fields = {
-		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -29,7 +24,8 @@ export class Bus {
 		return new Bus(this, true)
 	}
 
-	public __goscriptAssign(source: Bus): void {
+	public __goscriptAssign(source: Bus): this {
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -42,12 +38,7 @@ export class Bus {
 }
 
 export class factory {
-	public _fields: {
-	}
-
 	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
-		this._fields = {
-		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -55,7 +46,8 @@ export class factory {
 		return new factory(this, true)
 	}
 
-	public __goscriptAssign(source: factory): void {
+	public __goscriptAssign(source: factory): this {
+		return this
 	}
 
 	public GetConfigID(__typeArgs: $.GenericTypeArgs | undefined): string {
@@ -86,7 +78,7 @@ function __goscriptStatic0(): any {
 
 var __goscriptStatic1$value: any
 function __goscriptStatic1(): any {
-	return __goscriptStatic1$value ??= ({GetConfigID: (receiver: any, ...args: any[]) => $.pointerValue(receiver).GetConfigID(__goscriptStatic0(), ...$.stripGenericTypeArgs(args))})
+	return __goscriptStatic1$value ??= ({GetConfigID: (receiver: any) => $.pointerValue(receiver).GetConfigID(__goscriptStatic0())})
 }
 
 var __goscriptStatic2$value: any

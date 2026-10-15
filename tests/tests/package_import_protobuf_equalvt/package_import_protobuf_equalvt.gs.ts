@@ -9,33 +9,21 @@ export type state = number
 
 $.registerNamedValueType(
 	"main.state",
-	{String: (receiver: any, ...args: any[]) => (state_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	{String: (receiver: any) => (state_String as any)(($.isVarRef(receiver) ? receiver.value : receiver))},
 	[$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])]
 );
 
 $.registerNamedValueType(
 	"*main.state",
-	{String: (receiver: any, ...args: any[]) => (state_String as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	{String: (receiver: any) => (state_String as any)($.pointerValue(receiver))},
 	[$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])]
 );
 
 export class msg {
-	public get v(): number {
-		return this._fields.v
-	}
-
-	public set v(value: number) {
-		this._fields.v = value
-	}
-
-	public _fields: {
-		v: number
-	}
+	public declare v: number
 
 	constructor(init?: Partial<{v?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			v: init?.v ?? (0 as number)
-		}
+		this.v = init?.v ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -43,10 +31,9 @@ export class msg {
 		return new msg(this, true)
 	}
 
-	public __goscriptAssign(source: msg): void {
-		const target = this._fields
-		const values = source._fields
-		target.v = values.v
+	public __goscriptAssign(source: msg): this {
+		this.v = source.v
+		return this
 	}
 
 	public CloneMessageVT(): protobuf_go_lite.CloneMessage | null {
@@ -129,18 +116,18 @@ export async function main(): globalThis.Promise<void> {
 		return new msg()
 	}, ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.pointerType("main.msg")] } as $.FunctionTypeInfo))))
 	let sb: $.VarRef<protobuf_go_lite.TextBuilder> = $.varRef($.markAsStructValue(new strings.Builder()))
-	protobuf_go_lite.TextWriteStringer(sb, $.namedValueInterfaceValue<any>(1, "main.state", __goscriptStatic1(), __goscriptStatic2(), __goscriptStatic3())!)
+	protobuf_go_lite.TextWriteStringer(sb, __goscriptStatic4()!)
 	await $.println("stringer:", sb.value.String())
 }
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.pointerType("main.msg"), zero: () => null, methods: {CloneMessageVT: (receiver: any, ...args: any[]) => $.pointerValue(receiver).CloneMessageVT(...$.stripGenericTypeArgs(args)), CloneVT: (receiver: any, ...args: any[]) => $.pointerValue(receiver).CloneVT(...$.stripGenericTypeArgs(args)), EqualVT: (receiver: any, ...args: any[]) => $.pointerValue(receiver).EqualVT(...$.stripGenericTypeArgs(args)), MarshalToSizedBufferVT: (receiver: any, ...args: any[]) => $.pointerValue(receiver).MarshalToSizedBufferVT(...$.stripGenericTypeArgs(args)), MarshalVT: (receiver: any, ...args: any[]) => $.pointerValue(receiver).MarshalVT(...$.stripGenericTypeArgs(args)), Reset: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Reset(...$.stripGenericTypeArgs(args)), SizeVT: (receiver: any, ...args: any[]) => $.pointerValue(receiver).SizeVT(...$.stripGenericTypeArgs(args)), UnmarshalVT: (receiver: any, ...args: any[]) => $.pointerValue(receiver).UnmarshalVT(...$.stripGenericTypeArgs(args))} }})
+	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.pointerType("main.msg"), zero: () => null, methods: {CloneMessageVT: (receiver: any) => $.pointerValue(receiver).CloneMessageVT(), CloneVT: (receiver: any) => $.pointerValue(receiver).CloneVT(), EqualVT: (receiver: any, ...args: any[]) => $.pointerValue(receiver).EqualVT(...$.stripGenericTypeArgs(args)), MarshalToSizedBufferVT: (receiver: any, ...args: any[]) => $.pointerValue(receiver).MarshalToSizedBufferVT(...$.stripGenericTypeArgs(args)), MarshalVT: (receiver: any) => $.pointerValue(receiver).MarshalVT(), Reset: (receiver: any) => $.pointerValue(receiver).Reset(), SizeVT: (receiver: any) => $.pointerValue(receiver).SizeVT(), UnmarshalVT: (receiver: any, ...args: any[]) => $.pointerValue(receiver).UnmarshalVT(...$.stripGenericTypeArgs(args))} }})
 }
 
 var __goscriptStatic1$value: any
 function __goscriptStatic1(): any {
-	return __goscriptStatic1$value ??= ({String: (receiver: any, ...args: any[]) => (state_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))})
+	return __goscriptStatic1$value ??= ({String: (receiver: any) => (state_String as any)(($.isVarRef(receiver) ? receiver.value : receiver))})
 }
 
 var __goscriptStatic2$value: any
@@ -151,6 +138,11 @@ function __goscriptStatic2(): any {
 var __goscriptStatic3$value: any
 function __goscriptStatic3(): any {
 	return __goscriptStatic3$value ??= ([$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])])
+}
+
+var __goscriptStatic4$value: any
+function __goscriptStatic4(): any {
+	return __goscriptStatic4$value ??= ($.namedValueInterfaceValue<any>(1, "main.state", __goscriptStatic1(), __goscriptStatic2(), __goscriptStatic3()))
 }
 
 if ($.isMainScript(import.meta)) {

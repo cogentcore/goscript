@@ -4,32 +4,13 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class entry {
-	public get key(): $.Slice<number> {
-		return this._fields.key
-	}
+	public declare key: $.Slice<number>
 
-	public set key(value: $.Slice<number>) {
-		this._fields.key = value
-	}
-
-	public get n(): number {
-		return this._fields.n
-	}
-
-	public set n(value: number) {
-		this._fields.n = value
-	}
-
-	public _fields: {
-		key: $.Slice<number>
-		n: number
-	}
+	public declare n: number
 
 	constructor(init?: Partial<{key?: $.Slice<number>, n?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			key: init?.key ?? (null! as $.Slice<number>),
-			n: init?.n ?? (0 as number)
-		}
+		this.key = init?.key ?? (null! as $.Slice<number>)
+		this.n = init?.n ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -37,11 +18,10 @@ export class entry {
 		return new entry(this, true)
 	}
 
-	public __goscriptAssign(source: entry): void {
-		const target = this._fields
-		const values = source._fields
-		target.key = values.key
-		target.n = values.n
+	public __goscriptAssign(source: entry): this {
+		this.key = source.key
+		this.n = source.n
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -54,42 +34,16 @@ export class entry {
 }
 
 export class tree {
-	public get less(): ((a: any, b: any) => boolean | globalThis.Promise<boolean>) | null {
-		return this._fields.less
-	}
+	public declare less: ((a: any, b: any) => boolean | globalThis.Promise<boolean>) | null
 
-	public set less(value: ((a: any, b: any) => boolean | globalThis.Promise<boolean>) | null) {
-		this._fields.less = value
-	}
+	public declare empty: any
 
-	public get empty(): any {
-		return this._fields.empty
-	}
+	public declare count: number
 
-	public set empty(value: any) {
-		this._fields.empty = value
-	}
-
-	public get count(): number {
-		return this._fields.count
-	}
-
-	public set count(value: number) {
-		this._fields.count = value
-	}
-
-	public _fields: {
-		less: ((a: any, b: any) => boolean | globalThis.Promise<boolean>) | null
-		empty: any
-		count: number
-	}
-
-	constructor(init?: Partial<{less?: ((a: any, b: any) => boolean | globalThis.Promise<boolean>) | null, empty?: any, count?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			less: init?.less ?? (null! as ((a: any, b: any) => boolean | globalThis.Promise<boolean>) | null),
-			empty: init?.empty !== undefined ? $.copyElement(init.empty) : (null! as any),
-			count: init?.count ?? (0 as number)
-		}
+	constructor(init?: Partial<{less?: ((a: any, b: any) => boolean | globalThis.Promise<boolean>) | null, empty?: any, count?: number}>, __goscriptValue?: boolean, __goscriptFresh?: boolean) {
+		this.less = init?.less ?? (null! as ((a: any, b: any) => boolean | globalThis.Promise<boolean>) | null)
+		this.empty = init?.empty !== undefined ? (__goscriptFresh === true ? init.empty : $.copyElement(init.empty)) : (null! as any)
+		this.count = init?.count ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -97,12 +51,11 @@ export class tree {
 		return new tree(this, true)
 	}
 
-	public __goscriptAssign(source: tree): void {
-		const target = this._fields
-		const values = source._fields
-		target.less = values.less
-		target.empty = $.assignFieldValue(target.empty, values.empty, { kind: $.TypeKind.Interface, methods: [] })
-		target.count = values.count
+	public __goscriptAssign(source: tree): this {
+		this.less = source.less
+		this.empty = $.assignFieldValue(this.empty, source.empty, { kind: $.TypeKind.Interface, methods: [] })
+		this.count = source.count
+		return this
 	}
 
 	public ["get"](__typeArgs: $.GenericTypeArgs | undefined): any {
@@ -120,7 +73,7 @@ export class tree {
 }
 
 export function newTree(__typeArgs: $.GenericTypeArgs | undefined, less: ((a: any, b: any) => boolean | globalThis.Promise<boolean>) | null): tree | $.VarRef<tree> | null {
-	let tr = new tree({empty: $.genericZero(__typeArgs, "T", null)})
+	let tr = new tree({empty: $.genericZero(__typeArgs, "T", null)}, undefined, true)
 	$.pointerValue<tree>(tr).less = less
 	return tr
 }
@@ -130,8 +83,8 @@ export function literalTree(__typeArgs: $.GenericTypeArgs | undefined): tree {
 }
 
 export function varTree(__typeArgs: $.GenericTypeArgs | undefined): tree {
-	let tr: tree = $.markAsStructValue(new tree({empty: $.genericZero(__typeArgs, "T", null)}))
-	return $.markAsStructValue($.cloneStructValue(tr))
+	let tr: tree = $.markAsStructValue(new tree({empty: $.genericZero(__typeArgs, "T", null)}, undefined, true))
+	return tr
 }
 
 export function zero(__typeArgs: $.GenericTypeArgs | undefined): any {

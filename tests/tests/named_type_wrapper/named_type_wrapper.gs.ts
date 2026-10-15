@@ -7,43 +7,24 @@ export type MyFileMode = number
 
 $.registerNamedValueType(
 	"main.MyFileMode",
-	{String: (receiver: any, ...args: any[]) => (MyFileMode_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	{String: (receiver: any) => (MyFileMode_String as any)(($.isVarRef(receiver) ? receiver.value : receiver))},
 	[$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])]
 );
 
 $.registerNamedValueType(
 	"*main.MyFileMode",
-	{String: (receiver: any, ...args: any[]) => (MyFileMode_String as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	{String: (receiver: any) => (MyFileMode_String as any)($.pointerValue(receiver))},
 	[$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])]
 );
 
 export class FileStatus {
-	public get mode(): MyFileMode {
-		return this._fields.mode
-	}
+	public declare mode: MyFileMode
 
-	public set mode(value: MyFileMode) {
-		this._fields.mode = value
-	}
-
-	public get size(): bigint {
-		return this._fields.size
-	}
-
-	public set size(value: bigint) {
-		this._fields.size = value
-	}
-
-	public _fields: {
-		mode: MyFileMode
-		size: bigint
-	}
+	public declare size: bigint
 
 	constructor(init?: Partial<{mode?: MyFileMode, size?: bigint}>, __goscriptValue?: boolean) {
-		this._fields = {
-			mode: init?.mode ?? (0 as MyFileMode),
-			size: init?.size ?? (0n as bigint)
-		}
+		this.mode = init?.mode ?? (0 as MyFileMode)
+		this.size = init?.size ?? (0n as bigint)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -51,11 +32,10 @@ export class FileStatus {
 		return new FileStatus(this, true)
 	}
 
-	public __goscriptAssign(source: FileStatus): void {
-		const target = this._fields
-		const values = source._fields
-		target.mode = values.mode
-		target.size = values.size
+	public __goscriptAssign(source: FileStatus): this {
+		this.mode = source.mode
+		this.size = source.size
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

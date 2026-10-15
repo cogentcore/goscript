@@ -26,7 +26,7 @@ export async function main(): globalThis.Promise<void> {
 	if ((1 as number) != 0) {
 		fmt.Println("cloexec supported")
 	}
-	fmt.Println("signals:", $.basicInterfaceValue($.int(syscall.SIGINT), "int"), $.basicInterfaceValue($.int(syscall.SIGKILL), "int"), $.basicInterfaceValue($.int(syscall.SIGTERM), "int"))
+	fmt.Println("signals:", $.basicInterfaceValue(syscall.SIGINT, "int"), $.basicInterfaceValue(syscall.SIGKILL, "int"), $.basicInterfaceValue(syscall.SIGTERM, "int"))
 	{
 		let err = syscall.Kill(1, 3)
 		if (err == null) {

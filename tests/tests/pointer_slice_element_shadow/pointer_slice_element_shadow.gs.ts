@@ -4,22 +4,10 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class entry {
-	public get key(): string {
-		return this._fields.key
-	}
-
-	public set key(value: string) {
-		this._fields.key = value
-	}
-
-	public _fields: {
-		key: string
-	}
+	public declare key: string
 
 	constructor(init?: Partial<{key?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			key: init?.key ?? ("" as string)
-		}
+		this.key = init?.key ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -27,10 +15,9 @@ export class entry {
 		return new entry(this, true)
 	}
 
-	public __goscriptAssign(source: entry): void {
-		const target = this._fields
-		const values = source._fields
-		target.key = values.key
+	public __goscriptAssign(source: entry): this {
+		this.key = source.key
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -43,22 +30,10 @@ export class entry {
 }
 
 export class _object {
-	public get entries(): $.Slice<entry> {
-		return this._fields.entries
-	}
-
-	public set entries(value: $.Slice<entry>) {
-		this._fields.entries = value
-	}
-
-	public _fields: {
-		entries: $.Slice<entry>
-	}
+	public declare entries: $.Slice<entry>
 
 	constructor(init?: Partial<{entries?: $.Slice<entry>}>, __goscriptValue?: boolean) {
-		this._fields = {
-			entries: init?.entries ?? (null! as $.Slice<entry>)
-		}
+		this.entries = init?.entries ?? (null! as $.Slice<entry>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -66,10 +41,9 @@ export class _object {
 		return new _object(this, true)
 	}
 
-	public __goscriptAssign(source: _object): void {
-		const target = this._fields
-		const values = source._fields
-		target.entries = values.entries
+	public __goscriptAssign(source: _object): this {
+		this.entries = source.entries
+		return this
 	}
 
 	public next(): entry | $.VarRef<entry> | null {

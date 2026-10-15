@@ -67,43 +67,24 @@ export type fixedLabel = string
 
 $.registerNamedValueType(
 	"main.fixedLabel",
-	{Label: (receiver: any, ...args: any[]) => (fixedLabel_Label as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	{Label: (receiver: any) => (fixedLabel_Label as any)(($.isVarRef(receiver) ? receiver.value : receiver))},
 	[$.methodSignature("Label", [], [/* @__PURE__ */ $.basicType("string")])]
 );
 
 $.registerNamedValueType(
 	"*main.fixedLabel",
-	{Label: (receiver: any, ...args: any[]) => (fixedLabel_Label as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	{Label: (receiver: any) => (fixedLabel_Label as any)($.pointerValue(receiver))},
 	[$.methodSignature("Label", [], [/* @__PURE__ */ $.basicType("string")])]
 );
 
 export class Rect {
-	public get w(): number {
-		return this._fields.w
-	}
+	public declare w: number
 
-	public set w(value: number) {
-		this._fields.w = value
-	}
-
-	public get h(): number {
-		return this._fields.h
-	}
-
-	public set h(value: number) {
-		this._fields.h = value
-	}
-
-	public _fields: {
-		w: number
-		h: number
-	}
+	public declare h: number
 
 	constructor(init?: Partial<{w?: number, h?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			w: init?.w ?? (0 as number),
-			h: init?.h ?? (0 as number)
-		}
+		this.w = init?.w ?? (0 as number)
+		this.h = init?.h ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -111,11 +92,10 @@ export class Rect {
 		return new Rect(this, true)
 	}
 
-	public __goscriptAssign(source: Rect): void {
-		const target = this._fields
-		const values = source._fields
-		target.w = values.w
-		target.h = values.h
+	public __goscriptAssign(source: Rect): this {
+		this.w = source.w
+		this.h = source.h
+		return this
 	}
 
 	public Area(): number {
@@ -133,22 +113,10 @@ export class Rect {
 }
 
 export class Square {
-	public get side(): number {
-		return this._fields.side
-	}
-
-	public set side(value: number) {
-		this._fields.side = value
-	}
-
-	public _fields: {
-		side: number
-	}
+	public declare side: number
 
 	constructor(init?: Partial<{side?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			side: init?.side ?? (0 as number)
-		}
+		this.side = init?.side ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -156,10 +124,9 @@ export class Square {
 		return new Square(this, true)
 	}
 
-	public __goscriptAssign(source: Square): void {
-		const target = this._fields
-		const values = source._fields
-		target.side = values.side
+	public __goscriptAssign(source: Square): this {
+		this.side = source.side
+		return this
 	}
 
 	public Area(): number {
@@ -178,22 +145,10 @@ export class Square {
 }
 
 export class Counter {
-	public get n(): number {
-		return this._fields.n
-	}
-
-	public set n(value: number) {
-		this._fields.n = value
-	}
-
-	public _fields: {
-		n: number
-	}
+	public declare n: number
 
 	constructor(init?: Partial<{n?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			n: init?.n ?? (0 as number)
-		}
+		this.n = init?.n ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -201,10 +156,9 @@ export class Counter {
 		return new Counter(this, true)
 	}
 
-	public __goscriptAssign(source: Counter): void {
-		const target = this._fields
-		const values = source._fields
-		target.n = values.n
+	public __goscriptAssign(source: Counter): this {
+		this.n = source.n
+		return this
 	}
 
 	public Next(): number {
@@ -224,22 +178,10 @@ export class Counter {
 }
 
 export class ChanSource {
-	public get ch(): $.Channel<number> | null {
-		return this._fields.ch
-	}
-
-	public set ch(value: $.Channel<number> | null) {
-		this._fields.ch = value
-	}
-
-	public _fields: {
-		ch: $.Channel<number> | null
-	}
+	public declare ch: $.Channel<number> | null
 
 	constructor(init?: Partial<{ch?: $.Channel<number> | null}>, __goscriptValue?: boolean) {
-		this._fields = {
-			ch: init?.ch ?? (null! as $.Channel<number> | null)
-		}
+		this.ch = init?.ch ?? (null! as $.Channel<number> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -247,10 +189,9 @@ export class ChanSource {
 		return new ChanSource(this, true)
 	}
 
-	public __goscriptAssign(source: ChanSource): void {
-		const target = this._fields
-		const values = source._fields
-		target.ch = values.ch
+	public __goscriptAssign(source: ChanSource): this {
+		this.ch = source.ch
+		return this
 	}
 
 	public async Next(): globalThis.Promise<number> {
@@ -270,22 +211,10 @@ export class ChanSource {
 }
 
 export class chanValuer {
-	public get ch(): $.Channel<number> | null {
-		return this._fields.ch
-	}
-
-	public set ch(value: $.Channel<number> | null) {
-		this._fields.ch = value
-	}
-
-	public _fields: {
-		ch: $.Channel<number> | null
-	}
+	public declare ch: $.Channel<number> | null
 
 	constructor(init?: Partial<{ch?: $.Channel<number> | null}>, __goscriptValue?: boolean) {
-		this._fields = {
-			ch: init?.ch ?? (null! as $.Channel<number> | null)
-		}
+		this.ch = init?.ch ?? (null! as $.Channel<number> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -293,10 +222,9 @@ export class chanValuer {
 		return new chanValuer(this, true)
 	}
 
-	public __goscriptAssign(source: chanValuer): void {
-		const target = this._fields
-		const values = source._fields
-		target.ch = values.ch
+	public __goscriptAssign(source: chanValuer): this {
+		this.ch = source.ch
+		return this
 	}
 
 	public async Value(): globalThis.Promise<number> {
@@ -315,22 +243,10 @@ export class chanValuer {
 }
 
 export class plusOne {
-	public get _in(): Valuer | null {
-		return this._fields._in
-	}
-
-	public set _in(value: Valuer | null) {
-		this._fields._in = value
-	}
-
-	public _fields: {
-		_in: Valuer | null
-	}
+	public declare _in: Valuer | null
 
 	constructor(init?: Partial<{_in?: Valuer | null}>, __goscriptValue?: boolean) {
-		this._fields = {
-			_in: init?._in ?? (null! as Valuer | null)
-		}
+		this._in = init?._in ?? (null! as Valuer | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -338,10 +254,9 @@ export class plusOne {
 		return new plusOne(this, true)
 	}
 
-	public __goscriptAssign(source: plusOne): void {
-		const target = this._fields
-		const values = source._fields
-		target._in = $.assignFieldValue(target._in, values._in, "main.Valuer")
+	public __goscriptAssign(source: plusOne): this {
+		this._in = $.assignFieldValue(this._in, source._in, "main.Valuer")
+		return this
 	}
 
 	public async Get(): globalThis.Promise<number> {
@@ -359,22 +274,10 @@ export class plusOne {
 }
 
 export class prefixNamer {
-	public get labeler(): Labeler | null {
-		return this._fields.labeler
-	}
-
-	public set labeler(value: Labeler | null) {
-		this._fields.labeler = value
-	}
-
-	public _fields: {
-		labeler: Labeler | null
-	}
+	public declare labeler: Labeler | null
 
 	constructor(init?: Partial<{labeler?: Labeler | null}>, __goscriptValue?: boolean) {
-		this._fields = {
-			labeler: init?.labeler ?? (null! as Labeler | null)
-		}
+		this.labeler = init?.labeler ?? (null! as Labeler | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -382,10 +285,9 @@ export class prefixNamer {
 		return new prefixNamer(this, true)
 	}
 
-	public __goscriptAssign(source: prefixNamer): void {
-		const target = this._fields
-		const values = source._fields
-		target.labeler = $.assignFieldValue(target.labeler, values.labeler, "main.Labeler")
+	public __goscriptAssign(source: prefixNamer): this {
+		this.labeler = $.assignFieldValue(this.labeler, source.labeler, "main.Labeler")
+		return this
 	}
 
 	public Name(): string {
@@ -439,12 +341,12 @@ export async function main(): globalThis.Promise<void> {
 
 	await $.println("getter:", await readGetter($.interfaceValue<Getter | null>(new plusOne({_in: $.interfaceValue<Valuer | null>(new chanValuer({ch: $.makeChannel<number>(1, 0, "both")}, true), "main.chanValuer", "main.chanValuer")}, true), "main.plusOne", "main.plusOne")))
 
-	await $.println("namer:", describe($.interfaceValue<Namer | null>(new prefixNamer({labeler: $.namedValueInterfaceValue<Labeler | null>("x", "main.fixedLabel", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2())}, true), "main.prefixNamer", "main.prefixNamer")))
+	await $.println("namer:", describe($.interfaceValue<Namer | null>(new prefixNamer({labeler: __goscriptStatic3()}, true), "main.prefixNamer", "main.prefixNamer")))
 }
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({Label: (receiver: any, ...args: any[]) => (fixedLabel_Label as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))})
+	return __goscriptStatic0$value ??= ({Label: (receiver: any) => (fixedLabel_Label as any)(($.isVarRef(receiver) ? receiver.value : receiver))})
 }
 
 var __goscriptStatic1$value: any
@@ -455,6 +357,11 @@ function __goscriptStatic1(): any {
 var __goscriptStatic2$value: any
 function __goscriptStatic2(): any {
 	return __goscriptStatic2$value ??= ([$.methodSignature("Label", [], [/* @__PURE__ */ $.basicType("string")])])
+}
+
+var __goscriptStatic3$value: any
+function __goscriptStatic3(): any {
+	return __goscriptStatic3$value ??= ($.namedValueInterfaceValue<Labeler | null>("x", "main.fixedLabel", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()))
 }
 
 var __goscriptAwait: any

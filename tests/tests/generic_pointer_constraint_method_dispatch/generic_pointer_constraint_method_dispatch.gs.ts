@@ -42,22 +42,10 @@ $.registerInterfaceType(
 );
 
 export class pairingOffer {
-	public get Note(): string {
-		return this._fields.Note
-	}
-
-	public set Note(value: string) {
-		this._fields.Note = value
-	}
-
-	public _fields: {
-		Note: string
-	}
+	public declare Note: string
 
 	constructor(init?: Partial<{Note?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Note: init?.Note ?? ("" as string)
-		}
+		this.Note = init?.Note ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -65,10 +53,9 @@ export class pairingOffer {
 		return new pairingOffer(this, true)
 	}
 
-	public __goscriptAssign(source: pairingOffer): void {
-		const target = this._fields
-		const values = source._fields
-		target.Note = values.Note
+	public __goscriptAssign(source: pairingOffer): this {
+		this.Note = source.Note
+		return this
 	}
 
 	public MarshalVT(): [$.Slice<number>, $.GoError] {
@@ -102,11 +89,11 @@ export async function encodeLocalPairing(__typeArgs: $.GenericTypeArgs | undefin
 }
 
 export function flag_Has(f: $.VarRef<flag> | null, v: bigint): boolean {
-	return ($.int64And($.int64($.pointerValue<flag>(f)), v)) != 0n
+	return ($.int64And($.pointerValue<flag>(f), v)) != 0n
 }
 
 export function flag_Set(f: $.VarRef<flag> | null, v: bigint): void {
-	f!.value = $.int64($.int64Or($.int64($.pointerValue<flag>(f)), v))
+	f!.value = ($.int64Or($.pointerValue<flag>(f), v))
 }
 
 export function countFlags(__typeArgs: $.GenericTypeArgs | undefined, __goscriptParam0: any, values: $.Slice<bigint>): bigint {
@@ -150,12 +137,12 @@ export async function main(): globalThis.Promise<void> {
 			void (__goscriptAwait = (s !== null && (s as any).__isVarRef !== true && (s as any).__goValue === undefined ? (s as Exclude<setter, null>) : $.pointerValue<Exclude<setter, null>>(s)).Set(2n), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 		}
 	}
-	await $.println("flag:", $.int64(fl.value))
+	await $.println("flag:", fl.value)
 }
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, M: { type: /* @__PURE__ */ $.pointerType("main.pairingOffer"), zero: () => null, methods: {MarshalVT: (receiver: any, ...args: any[]) => $.pointerValue(receiver).MarshalVT(...$.stripGenericTypeArgs(args)), UnmarshalVT: (receiver: any, ...args: any[]) => $.pointerValue(receiver).UnmarshalVT(...$.stripGenericTypeArgs(args))} }, T: { type: "main.pairingOffer", zero: () => new pairingOffer(undefined, true) }})
+	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, M: { type: /* @__PURE__ */ $.pointerType("main.pairingOffer"), zero: () => null, methods: {MarshalVT: (receiver: any) => $.pointerValue(receiver).MarshalVT(), UnmarshalVT: (receiver: any, ...args: any[]) => $.pointerValue(receiver).UnmarshalVT(...$.stripGenericTypeArgs(args))} }, T: { type: "main.pairingOffer", zero: () => new pairingOffer(undefined, true) }})
 }
 
 var __goscriptStatic1$value: any

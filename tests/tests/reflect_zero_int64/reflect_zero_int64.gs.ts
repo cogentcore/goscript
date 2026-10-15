@@ -6,32 +6,13 @@ import * as reflect from "@goscript/reflect/index.js"
 import * as time from "@goscript/time/index.js"
 
 export class timer {
-	public get start(): time.Time {
-		return this._fields.start
-	}
+	public declare start: time.Time
 
-	public set start(value: time.Time) {
-		this._fields.start = value
-	}
-
-	public get total(): time.Duration {
-		return this._fields.total
-	}
-
-	public set total(value: time.Duration) {
-		this._fields.total = value
-	}
-
-	public _fields: {
-		start: time.Time
-		total: time.Duration
-	}
+	public declare total: time.Duration
 
 	constructor(init?: Partial<{start?: time.Time, total?: time.Duration}>, __goscriptValue?: boolean) {
-		this._fields = {
-			start: init?.start ? $.markAsStructValue($.cloneStructValue(init.start)) : $.markAsStructValue(new time.Time()),
-			total: init?.total ?? (0n as time.Duration)
-		}
+		this.start = init?.start ? $.markAsStructValue($.cloneStructValue(init.start)) : $.markAsStructValue(new time.Time())
+		this.total = init?.total ?? (0n as time.Duration)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -39,11 +20,10 @@ export class timer {
 		return new timer(this, true)
 	}
 
-	public __goscriptAssign(source: timer): void {
-		const target = this._fields
-		const values = source._fields
-		$.assignStruct(target.start, values.start)
-		target.total = values.total
+	public __goscriptAssign(source: timer): this {
+		$.assignStruct(this.start, source.start)
+		this.total = source.total
+		return this
 	}
 
 	public Start(): void {
@@ -84,7 +64,7 @@ export async function main(): globalThis.Promise<void> {
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({Abs: (receiver: any, ...args: any[]) => (time.Duration_Abs as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Hours: (receiver: any, ...args: any[]) => (time.Duration_Hours as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Microseconds: (receiver: any, ...args: any[]) => (time.Duration_Microseconds as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Milliseconds: (receiver: any, ...args: any[]) => (time.Duration_Milliseconds as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Minutes: (receiver: any, ...args: any[]) => (time.Duration_Minutes as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Nanoseconds: (receiver: any, ...args: any[]) => (time.Duration_Nanoseconds as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Round: (receiver: any, ...args: any[]) => (time.Duration_Round as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Seconds: (receiver: any, ...args: any[]) => (time.Duration_Seconds as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), String: (receiver: any, ...args: any[]) => (time.Duration_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Truncate: (receiver: any, ...args: any[]) => (time.Duration_Truncate as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), format: (receiver: any, ...args: any[]) => (time.Duration_format as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))})
+	return __goscriptStatic0$value ??= ({Abs: (receiver: any) => (time.Duration_Abs as any)(($.isVarRef(receiver) ? receiver.value : receiver)), Hours: (receiver: any) => (time.Duration_Hours as any)(($.isVarRef(receiver) ? receiver.value : receiver)), Microseconds: (receiver: any) => (time.Duration_Microseconds as any)(($.isVarRef(receiver) ? receiver.value : receiver)), Milliseconds: (receiver: any) => (time.Duration_Milliseconds as any)(($.isVarRef(receiver) ? receiver.value : receiver)), Minutes: (receiver: any) => (time.Duration_Minutes as any)(($.isVarRef(receiver) ? receiver.value : receiver)), Nanoseconds: (receiver: any) => (time.Duration_Nanoseconds as any)(($.isVarRef(receiver) ? receiver.value : receiver)), Round: (receiver: any, ...args: any[]) => (time.Duration_Round as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Seconds: (receiver: any) => (time.Duration_Seconds as any)(($.isVarRef(receiver) ? receiver.value : receiver)), String: (receiver: any) => (time.Duration_String as any)(($.isVarRef(receiver) ? receiver.value : receiver)), Truncate: (receiver: any, ...args: any[]) => (time.Duration_Truncate as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), format: (receiver: any, ...args: any[]) => (time.Duration_format as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))})
 }
 
 var __goscriptStatic1$value: any

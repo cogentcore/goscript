@@ -9,13 +9,13 @@ $.registerNamedType("main.layers", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $
 
 $.registerNamedValueType(
 	"main.layers",
-	{Error: (receiver: any, ...args: any[]) => (layers_Error as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	{Error: (receiver: any) => (layers_Error as any)(($.isVarRef(receiver) ? receiver.value : receiver))},
 	[$.methodSignature("Error", [], [/* @__PURE__ */ $.basicType("string")])]
 );
 
 $.registerNamedValueType(
 	"*main.layers",
-	{Error: (receiver: any, ...args: any[]) => (layers_Error as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	{Error: (receiver: any) => (layers_Error as any)($.pointerValue(receiver))},
 	[$.methodSignature("Error", [], [/* @__PURE__ */ $.basicType("string")])]
 );
 

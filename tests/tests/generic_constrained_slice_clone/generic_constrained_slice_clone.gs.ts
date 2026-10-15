@@ -14,22 +14,10 @@ $.registerInterfaceType(
 );
 
 export class item {
-	public get value(): string {
-		return this._fields.value
-	}
-
-	public set value(value: string) {
-		this._fields.value = value
-	}
-
-	public _fields: {
-		value: string
-	}
+	public declare value: string
 
 	constructor(init?: Partial<{value?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			value: init?.value ?? ("" as string)
-		}
+		this.value = init?.value ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -37,10 +25,9 @@ export class item {
 		return new item(this, true)
 	}
 
-	public __goscriptAssign(source: item): void {
-		const target = this._fields
-		const values = source._fields
-		target.value = values.value
+	public __goscriptAssign(source: item): this {
+		this.value = source.value
+		return this
 	}
 
 	public CloneVT(): item | $.VarRef<item> | null {
@@ -77,7 +64,7 @@ export async function main(): globalThis.Promise<void> {
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.pointerType("main.item"), zero: () => null, methods: {CloneVT: (receiver: any, ...args: any[]) => $.pointerValue(receiver).CloneVT(...$.stripGenericTypeArgs(args))} }})
+	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.pointerType("main.item"), zero: () => null, methods: {CloneVT: (receiver: any) => $.pointerValue(receiver).CloneVT()} }})
 }
 
 var __goscriptAwait: any

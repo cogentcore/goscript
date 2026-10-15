@@ -6,32 +6,13 @@ import * as __goscript_methods from "./methods.gs.ts"
 import "./methods.gs.ts"
 
 export class storage {
-	public get bytes(): $.Slice<number> {
-		return this._fields.bytes
-	}
+	public declare bytes: $.Slice<number>
 
-	public set bytes(value: $.Slice<number>) {
-		this._fields.bytes = value
-	}
-
-	public get name(): string {
-		return this._fields.name
-	}
-
-	public set name(value: string) {
-		this._fields.name = value
-	}
-
-	public _fields: {
-		bytes: $.Slice<number>
-		name: string
-	}
+	public declare name: string
 
 	constructor(init?: Partial<{bytes?: $.Slice<number>, name?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			bytes: init?.bytes ?? (null! as $.Slice<number>),
-			name: init?.name ?? ("" as string)
-		}
+		this.bytes = init?.bytes ?? (null! as $.Slice<number>)
+		this.name = init?.name ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -39,11 +20,10 @@ export class storage {
 		return new storage(this, true)
 	}
 
-	public __goscriptAssign(source: storage): void {
-		const target = this._fields
-		const values = source._fields
-		target.bytes = values.bytes
-		target.name = values.name
+	public __goscriptAssign(source: storage): this {
+		this.bytes = source.bytes
+		this.name = source.name
+		return this
 	}
 
 	public IsEmpty(): boolean {

@@ -4,32 +4,13 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class Symbol {
-	public get Name(): string {
-		return this._fields.Name
-	}
+	public declare Name: string
 
-	public set Name(value: string) {
-		this._fields.Name = value
-	}
-
-	public get Kind(): number {
-		return this._fields.Kind
-	}
-
-	public set Kind(value: number) {
-		this._fields.Kind = value
-	}
-
-	public _fields: {
-		Name: string
-		Kind: number
-	}
+	public declare Kind: number
 
 	constructor(init?: Partial<{Name?: string, Kind?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Name: init?.Name ?? ("" as string),
-			Kind: init?.Kind ?? (0 as number)
-		}
+		this.Name = init?.Name ?? ("" as string)
+		this.Kind = init?.Kind ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -37,11 +18,10 @@ export class Symbol {
 		return new Symbol(this, true)
 	}
 
-	public __goscriptAssign(source: Symbol): void {
-		const target = this._fields
-		const values = source._fields
-		target.Name = values.Name
-		target.Kind = values.Kind
+	public __goscriptAssign(source: Symbol): this {
+		this.Name = source.Name
+		this.Kind = source.Kind
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

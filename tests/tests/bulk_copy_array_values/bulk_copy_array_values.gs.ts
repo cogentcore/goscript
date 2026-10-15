@@ -6,22 +6,10 @@ import * as slices from "@goscript/slices/index.js"
 import type * as iter from "@goscript/iter/index.js"
 
 export class point {
-	public get x(): number {
-		return this._fields.x
-	}
-
-	public set x(value: number) {
-		this._fields.x = value
-	}
-
-	public _fields: {
-		x: number
-	}
+	public declare x: number
 
 	constructor(init?: Partial<{x?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			x: init?.x ?? (0 as number)
-		}
+		this.x = init?.x ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -29,10 +17,9 @@ export class point {
 		return new point(this, true)
 	}
 
-	public __goscriptAssign(source: point): void {
-		const target = this._fields
-		const values = source._fields
-		target.x = values.x
+	public __goscriptAssign(source: point): this {
+		this.x = source.x
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

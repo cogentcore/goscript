@@ -10,13 +10,13 @@ $.registerNamedType("main.value", /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.
 
 $.registerNamedValueType(
 	"main.value",
-	{Key: (receiver: any, ...args: any[]) => (value_Key as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	{Key: (receiver: any) => (value_Key as any)(($.isVarRef(receiver) ? receiver.value : receiver))},
 	[$.methodSignature("Key", [], [{ kind: $.TypeKind.Interface, methods: [] }])]
 );
 
 $.registerNamedValueType(
 	"*main.value",
-	{Key: (receiver: any, ...args: any[]) => (value_Key as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	{Key: (receiver: any) => (value_Key as any)($.pointerValue(receiver))},
 	[$.methodSignature("Key", [], [{ kind: $.TypeKind.Interface, methods: [] }])]
 );
 
@@ -26,13 +26,13 @@ $.registerNamedType("main.Fixed", /* @__PURE__ */ $.sliceType("dep.Ref"));
 
 $.registerNamedValueType(
 	"main.Fixed",
-	{Mark: (receiver: any, ...args: any[]) => (Fixed_Mark as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	{Mark: (receiver: any) => (Fixed_Mark as any)(($.isVarRef(receiver) ? receiver.value : receiver))},
 	[$.methodSignature("Mark", [], [/* @__PURE__ */ $.basicType("bool")])]
 );
 
 $.registerNamedValueType(
 	"*main.Fixed",
-	{Mark: (receiver: any, ...args: any[]) => (Fixed_Mark as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	{Mark: (receiver: any) => (Fixed_Mark as any)($.pointerValue(receiver))},
 	[$.methodSignature("Mark", [], [/* @__PURE__ */ $.basicType("bool")])]
 );
 
@@ -47,32 +47,13 @@ $.registerInterfaceType(
 );
 
 export class Action {
-	public get Result(): number {
-		return this._fields.Result
-	}
+	public declare Result: number
 
-	public set Result(value: number) {
-		this._fields.Result = value
-	}
-
-	public get Filter(): globalThis.Map<number, dep.Ref | null> | null {
-		return this._fields.Filter
-	}
-
-	public set Filter(value: globalThis.Map<number, dep.Ref | null> | null) {
-		this._fields.Filter = value
-	}
-
-	public _fields: {
-		Result: number
-		Filter: globalThis.Map<number, dep.Ref | null> | null
-	}
+	public declare Filter: globalThis.Map<number, dep.Ref | null> | null
 
 	constructor(init?: Partial<{Result?: number, Filter?: globalThis.Map<number, dep.Ref | null> | null}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Result: init?.Result ?? (0 as number),
-			Filter: init?.Filter ?? (null! as globalThis.Map<number, dep.Ref | null> | null)
-		}
+		this.Result = init?.Result ?? (0 as number)
+		this.Filter = init?.Filter ?? (null! as globalThis.Map<number, dep.Ref | null> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -80,11 +61,10 @@ export class Action {
 		return new Action(this, true)
 	}
 
-	public __goscriptAssign(source: Action): void {
-		const target = this._fields
-		const values = source._fields
-		target.Result = values.Result
-		target.Filter = values.Filter
+	public __goscriptAssign(source: Action): this {
+		this.Result = source.Result
+		this.Filter = source.Filter
+		return this
 	}
 
 	public Mark(): boolean {
@@ -160,7 +140,7 @@ export async function main(): globalThis.Promise<void> {
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({Key: (receiver: any, ...args: any[]) => (value_Key as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))})
+	return __goscriptStatic0$value ??= ({Key: (receiver: any) => (value_Key as any)(($.isVarRef(receiver) ? receiver.value : receiver))})
 }
 
 var __goscriptStatic1$value: any
@@ -175,7 +155,7 @@ function __goscriptStatic2(): any {
 
 var __goscriptStatic3$value: any
 function __goscriptStatic3(): any {
-	return __goscriptStatic3$value ??= ({Mark: (receiver: any, ...args: any[]) => (Fixed_Mark as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))})
+	return __goscriptStatic3$value ??= ({Mark: (receiver: any) => (Fixed_Mark as any)(($.isVarRef(receiver) ? receiver.value : receiver))})
 }
 
 var __goscriptStatic4$value: any

@@ -25,32 +25,13 @@ $.registerInterfaceType(
 );
 
 export class impl {
-	public get value(): any {
-		return this._fields.value
-	}
+	public declare value: any
 
-	public set value(value: any) {
-		this._fields.value = value
-	}
+	public declare other: any
 
-	public get other(): any {
-		return this._fields.other
-	}
-
-	public set other(value: any) {
-		this._fields.other = value
-	}
-
-	public _fields: {
-		value: any
-		other: any
-	}
-
-	constructor(init?: Partial<{value?: any, other?: any}>, __goscriptValue?: boolean) {
-		this._fields = {
-			value: init?.value !== undefined ? $.copyElement(init.value) : (null! as any),
-			other: init?.other !== undefined ? $.copyElement(init.other) : (null! as any)
-		}
+	constructor(init?: Partial<{value?: any, other?: any}>, __goscriptValue?: boolean, __goscriptFresh?: boolean) {
+		this.value = init?.value !== undefined ? (__goscriptFresh === true ? init.value : $.copyElement(init.value)) : (null! as any)
+		this.other = init?.other !== undefined ? (__goscriptFresh === true ? init.other : $.copyElement(init.other)) : (null! as any)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -58,11 +39,10 @@ export class impl {
 		return new impl(this, true)
 	}
 
-	public __goscriptAssign(source: impl): void {
-		const target = this._fields
-		const values = source._fields
-		target.value = $.assignFieldValue(target.value, values.value, { kind: $.TypeKind.Interface, methods: [] })
-		target.other = $.assignFieldValue(target.other, values.other, { kind: $.TypeKind.Interface, methods: [] })
+	public __goscriptAssign(source: impl): this {
+		this.value = $.assignFieldValue(this.value, source.value, { kind: $.TypeKind.Interface, methods: [] })
+		this.other = $.assignFieldValue(this.other, source.other, { kind: $.TypeKind.Interface, methods: [] })
+		return this
 	}
 
 	public Other(__typeArgs: $.GenericTypeArgs | undefined): any {
@@ -100,7 +80,7 @@ function __goscriptStatic0(): any {
 
 var __goscriptStatic1$value: any
 function __goscriptStatic1(): any {
-	return __goscriptStatic1$value ??= ({Other: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Other(__goscriptStatic0(), ...$.stripGenericTypeArgs(args)), Value: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Value(__goscriptStatic0(), ...$.stripGenericTypeArgs(args))})
+	return __goscriptStatic1$value ??= ({Other: (receiver: any) => $.pointerValue(receiver).Other(__goscriptStatic0()), Value: (receiver: any) => $.pointerValue(receiver).Value(__goscriptStatic0())})
 }
 
 var __goscriptStatic2$value: any

@@ -25,22 +25,10 @@ $.registerInterfaceType(
 );
 
 export class AppBase {
-	public get Windows(): $.Slice<any> {
-		return this._fields.Windows
-	}
-
-	public set Windows(value: $.Slice<any>) {
-		this._fields.Windows = value
-	}
-
-	public _fields: {
-		Windows: $.Slice<any>
-	}
+	public declare Windows: $.Slice<any>
 
 	constructor(init?: Partial<{Windows?: $.Slice<any>}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Windows: init?.Windows ?? (null! as $.Slice<any>)
-		}
+		this.Windows = init?.Windows ?? (null! as $.Slice<any>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -48,10 +36,9 @@ export class AppBase {
 		return new AppBase(this, true)
 	}
 
-	public __goscriptAssign(source: AppBase): void {
-		const target = this._fields
-		const values = source._fields
-		target.Windows = values.Windows
+	public __goscriptAssign(source: AppBase): this {
+		this.Windows = source.Windows
+		return this
 	}
 
 	public FirstName(__typeArgs: $.GenericTypeArgs | undefined): string {
@@ -82,32 +69,13 @@ export class AppBase {
 }
 
 export class WindowBase {
-	public get App(): any {
-		return this._fields.App
-	}
+	public declare App: any
 
-	public set App(value: any) {
-		this._fields.App = value
-	}
+	public declare name: string
 
-	public get name(): string {
-		return this._fields.name
-	}
-
-	public set name(value: string) {
-		this._fields.name = value
-	}
-
-	public _fields: {
-		App: any
-		name: string
-	}
-
-	constructor(init?: Partial<{App?: any, name?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			App: init?.App !== undefined ? $.copyElement(init.App) : (null! as any),
-			name: init?.name ?? ("" as string)
-		}
+	constructor(init?: Partial<{App?: any, name?: string}>, __goscriptValue?: boolean, __goscriptFresh?: boolean) {
+		this.App = init?.App !== undefined ? (__goscriptFresh === true ? init.App : $.copyElement(init.App)) : (null! as any)
+		this.name = init?.name ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -115,11 +83,10 @@ export class WindowBase {
 		return new WindowBase(this, true)
 	}
 
-	public __goscriptAssign(source: WindowBase): void {
-		const target = this._fields
-		const values = source._fields
-		target.App = $.assignFieldValue(target.App, values.App, { kind: $.TypeKind.Interface, methods: [$.methodSignature("FirstName", [], [/* @__PURE__ */ $.basicType("string")]), $.methodSignature("Window", [], ["main.Window"])] })
-		target.name = values.name
+	public __goscriptAssign(source: WindowBase): this {
+		this.App = $.assignFieldValue(this.App, source.App, { kind: $.TypeKind.Interface, methods: [$.methodSignature("FirstName", [], [/* @__PURE__ */ $.basicType("string")]), $.methodSignature("Window", [], ["main.Window"])] })
+		this.name = source.name
+		return this
 	}
 
 	public AppWindowName(__typeArgs: $.GenericTypeArgs | undefined): string {
@@ -143,22 +110,10 @@ export class WindowBase {
 }
 
 export class MyApp {
-	public get AppBase(): AppBase {
-		return this._fields.AppBase
-	}
-
-	public set AppBase(value: AppBase) {
-		this._fields.AppBase = value
-	}
-
-	public _fields: {
-		AppBase: AppBase
-	}
+	public declare AppBase: AppBase
 
 	constructor(init?: Partial<{AppBase?: AppBase}>, __goscriptValue?: boolean) {
-		this._fields = {
-			AppBase: init?.AppBase ? $.markAsStructValue($.cloneStructValue(init.AppBase)) : $.markAsStructValue(new AppBase())
-		}
+		this.AppBase = init?.AppBase ? init.AppBase.clone() : $.markAsStructValue(new AppBase())
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -166,10 +121,9 @@ export class MyApp {
 		return new MyApp(this, true)
 	}
 
-	public __goscriptAssign(source: MyApp): void {
-		const target = this._fields
-		const values = source._fields
-		$.assignStruct(target.AppBase, values.AppBase)
+	public __goscriptAssign(source: MyApp): this {
+		this.AppBase.__goscriptAssign(source.AppBase)
+		return this
 	}
 
 	public FirstName(): any {
@@ -190,22 +144,10 @@ export class MyApp {
 }
 
 export class MyWindow {
-	public get WindowBase(): WindowBase {
-		return this._fields.WindowBase
-	}
-
-	public set WindowBase(value: WindowBase) {
-		this._fields.WindowBase = value
-	}
-
-	public _fields: {
-		WindowBase: WindowBase
-	}
+	public declare WindowBase: WindowBase
 
 	constructor(init?: Partial<{WindowBase?: WindowBase}>, __goscriptValue?: boolean) {
-		this._fields = {
-			WindowBase: init?.WindowBase ? $.markAsStructValue($.cloneStructValue(init.WindowBase)) : $.markAsStructValue(new WindowBase({App: null! as MyApp | $.VarRef<MyApp> | null}))
-		}
+		this.WindowBase = init?.WindowBase ? init.WindowBase.clone() : $.markAsStructValue(new WindowBase({App: null! as MyApp | $.VarRef<MyApp> | null}, undefined, true))
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -213,10 +155,9 @@ export class MyWindow {
 		return new MyWindow(this, true)
 	}
 
-	public __goscriptAssign(source: MyWindow): void {
-		const target = this._fields
-		const values = source._fields
-		$.assignStruct(target.WindowBase, values.WindowBase)
+	public __goscriptAssign(source: MyWindow): this {
+		this.WindowBase.__goscriptAssign(source.WindowBase)
+		return this
 	}
 
 	public AppWindowName(): any {
@@ -253,17 +194,17 @@ export async function main(): globalThis.Promise<void> {
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, W: { type: /* @__PURE__ */ $.pointerType("main.MyWindow"), zero: () => null, methods: {AppWindowName: (receiver: any, ...args: any[]) => $.pointerValue(receiver).AppWindowName(...$.stripGenericTypeArgs(args)), Name: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Name(...$.stripGenericTypeArgs(args))} }})
+	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, W: { type: /* @__PURE__ */ $.pointerType("main.MyWindow"), zero: () => null, methods: {AppWindowName: (receiver: any) => $.pointerValue(receiver).AppWindowName(), Name: (receiver: any) => $.pointerValue(receiver).Name()} }})
 }
 
 var __goscriptStatic1$value: any
 function __goscriptStatic1(): any {
-	return __goscriptStatic1$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, A: { type: /* @__PURE__ */ $.pointerType("main.MyApp"), zero: () => null, methods: {FirstName: (receiver: any, ...args: any[]) => $.pointerValue(receiver).FirstName(...$.stripGenericTypeArgs(args)), Window: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Window(...$.stripGenericTypeArgs(args))} }})
+	return __goscriptStatic1$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, A: { type: /* @__PURE__ */ $.pointerType("main.MyApp"), zero: () => null, methods: {FirstName: (receiver: any) => $.pointerValue(receiver).FirstName(), Window: (receiver: any) => $.pointerValue(receiver).Window()} }})
 }
 
 var __goscriptStatic2$value: any
 function __goscriptStatic2(): any {
-	return __goscriptStatic2$value ??= ({FirstName: (receiver: any, ...args: any[]) => $.pointerValue(receiver).FirstName(...$.stripGenericTypeArgs(args)), Window: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Window(...$.stripGenericTypeArgs(args))})
+	return __goscriptStatic2$value ??= ({FirstName: (receiver: any) => $.pointerValue(receiver).FirstName(), Window: (receiver: any) => $.pointerValue(receiver).Window()})
 }
 
 var __goscriptStatic3$value: any

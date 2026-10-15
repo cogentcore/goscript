@@ -7,22 +7,10 @@ import * as reflect from "@goscript/reflect/index.js"
 import "@goscript/fmt/index.js"
 
 export class slowName {
-	public get ch(): $.Channel<string> | null {
-		return this._fields.ch
-	}
-
-	public set ch(value: $.Channel<string> | null) {
-		this._fields.ch = value
-	}
-
-	public _fields: {
-		ch: $.Channel<string> | null
-	}
+	public declare ch: $.Channel<string> | null
 
 	constructor(init?: Partial<{ch?: $.Channel<string> | null}>, __goscriptValue?: boolean) {
-		this._fields = {
-			ch: init?.ch ?? (null! as $.Channel<string> | null)
-		}
+		this.ch = init?.ch ?? (null! as $.Channel<string> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -30,10 +18,9 @@ export class slowName {
 		return new slowName(this, true)
 	}
 
-	public __goscriptAssign(source: slowName): void {
-		const target = this._fields
-		const values = source._fields
-		target.ch = values.ch
+	public __goscriptAssign(source: slowName): this {
+		this.ch = source.ch
+		return this
 	}
 
 	public async String(): globalThis.Promise<string> {

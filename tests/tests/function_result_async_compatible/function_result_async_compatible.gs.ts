@@ -14,22 +14,10 @@ $.registerInterfaceType(
 );
 
 export class box {
-	public get value(): number {
-		return this._fields.value
-	}
-
-	public set value(value: number) {
-		this._fields.value = value
-	}
-
-	public _fields: {
-		value: number
-	}
+	public declare value: number
 
 	constructor(init?: Partial<{value?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			value: init?.value ?? (0 as number)
-		}
+		this.value = init?.value ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -37,10 +25,9 @@ export class box {
 		return new box(this, true)
 	}
 
-	public __goscriptAssign(source: box): void {
-		const target = this._fields
-		const values = source._fields
-		target.value = values.value
+	public __goscriptAssign(source: box): this {
+		this.value = source.value
+		return this
 	}
 
 	public Value(): number {
@@ -80,7 +67,7 @@ export async function main(): globalThis.Promise<void> {
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.pointerType("main.box"), zero: () => null, methods: {Value: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Value(...$.stripGenericTypeArgs(args))} }})
+	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.pointerType("main.box"), zero: () => null, methods: {Value: (receiver: any) => $.pointerValue(receiver).Value()} }})
 }
 
 var __goscriptAwait: any

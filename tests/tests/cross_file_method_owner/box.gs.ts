@@ -9,33 +9,21 @@ export type box = number
 
 $.registerNamedValueType(
 	"main.box",
-	{base: (receiver: any, ...args: any[]) => (box_base as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), total: (receiver: any, ...args: any[]) => (__goscript_cross_file_method_owner.box_total as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	{base: (receiver: any) => (box_base as any)(($.isVarRef(receiver) ? receiver.value : receiver)), total: (receiver: any) => (__goscript_cross_file_method_owner.box_total as any)(($.isVarRef(receiver) ? receiver.value : receiver))},
 	[$.methodSignature("base", [], [/* @__PURE__ */ $.basicType("int")]), $.methodSignature("total", [], [/* @__PURE__ */ $.basicType("int")])]
 );
 
 $.registerNamedValueType(
 	"*main.box",
-	{base: (receiver: any, ...args: any[]) => (box_base as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args)), total: (receiver: any, ...args: any[]) => (__goscript_cross_file_method_owner.box_total as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	{base: (receiver: any) => (box_base as any)($.pointerValue(receiver)), total: (receiver: any) => (__goscript_cross_file_method_owner.box_total as any)($.pointerValue(receiver))},
 	[$.methodSignature("base", [], [/* @__PURE__ */ $.basicType("int")]), $.methodSignature("total", [], [/* @__PURE__ */ $.basicType("int")])]
 );
 
 export class pile {
-	public get step(): number {
-		return this._fields.step
-	}
-
-	public set step(value: number) {
-		this._fields.step = value
-	}
-
-	public _fields: {
-		step: number
-	}
+	public declare step: number
 
 	constructor(init?: Partial<{step?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			step: init?.step ?? (0 as number)
-		}
+		this.step = init?.step ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -43,10 +31,9 @@ export class pile {
 		return new pile(this, true)
 	}
 
-	public __goscriptAssign(source: pile): void {
-		const target = this._fields
-		const values = source._fields
-		target.step = values.step
+	public __goscriptAssign(source: pile): this {
+		this.step = source.step
+		return this
 	}
 
 	public drain(items: $.Slice<number>): number {

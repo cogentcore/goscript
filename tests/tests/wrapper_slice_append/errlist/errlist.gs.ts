@@ -16,22 +16,10 @@ $.registerNamedValueType(
 );
 
 export class AStruct {
-	public get Msg(): string {
-		return this._fields.Msg
-	}
-
-	public set Msg(value: string) {
-		this._fields.Msg = value
-	}
-
-	public _fields: {
-		Msg: string
-	}
+	public declare Msg: string
 
 	constructor(init?: Partial<{Msg?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Msg: init?.Msg ?? ("" as string)
-		}
+		this.Msg = init?.Msg ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -39,10 +27,9 @@ export class AStruct {
 		return new AStruct(this, true)
 	}
 
-	public __goscriptAssign(source: AStruct): void {
-		const target = this._fields
-		const values = source._fields
-		target.Msg = values.Msg
+	public __goscriptAssign(source: AStruct): this {
+		this.Msg = source.Msg
+		return this
 	}
 
 	public Set(msg: string): void {

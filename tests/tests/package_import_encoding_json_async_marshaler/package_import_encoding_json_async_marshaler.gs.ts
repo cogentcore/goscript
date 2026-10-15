@@ -8,22 +8,10 @@ import * as strings from "@goscript/strings/index.js"
 import * as sync from "@goscript/sync/index.js"
 
 export class Image {
-	public get Name(): string {
-		return this._fields.Name
-	}
-
-	public set Name(value: string) {
-		this._fields.Name = value
-	}
-
-	public _fields: {
-		Name: string
-	}
+	public declare Name: string
 
 	constructor(init?: Partial<{Name?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Name: init?.Name ?? ("" as string)
-		}
+		this.Name = init?.Name ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -31,10 +19,9 @@ export class Image {
 		return new Image(this, true)
 	}
 
-	public __goscriptAssign(source: Image): void {
-		const target = this._fields
-		const values = source._fields
-		target.Name = values.Name
+	public __goscriptAssign(source: Image): this {
+		this.Name = source.Name
+		return this
 	}
 
 	public MarshalJSON(): [$.Slice<number>, $.GoError] {
@@ -80,42 +67,16 @@ export class Image {
 }
 
 export class Doc {
-	public get Title(): string {
-		return this._fields.Title
-	}
+	public declare Title: string
 
-	public set Title(value: string) {
-		this._fields.Title = value
-	}
+	public declare Image: Image | $.VarRef<Image> | null
 
-	public get Image(): Image | $.VarRef<Image> | null {
-		return this._fields.Image
-	}
-
-	public set Image(value: Image | $.VarRef<Image> | null) {
-		this._fields.Image = value
-	}
-
-	public get Note(): string {
-		return this._fields.Note
-	}
-
-	public set Note(value: string) {
-		this._fields.Note = value
-	}
-
-	public _fields: {
-		Title: string
-		Image: Image | $.VarRef<Image> | null
-		Note: string
-	}
+	public declare Note: string
 
 	constructor(init?: Partial<{Title?: string, Image?: Image | $.VarRef<Image> | null, Note?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Title: init?.Title ?? ("" as string),
-			Image: init?.Image ?? (null! as Image | $.VarRef<Image> | null),
-			Note: init?.Note ?? ("" as string)
-		}
+		this.Title = init?.Title ?? ("" as string)
+		this.Image = init?.Image ?? (null! as Image | $.VarRef<Image> | null)
+		this.Note = init?.Note ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -123,12 +84,11 @@ export class Doc {
 		return new Doc(this, true)
 	}
 
-	public __goscriptAssign(source: Doc): void {
-		const target = this._fields
-		const values = source._fields
-		target.Title = values.Title
-		target.Image = values.Image
-		target.Note = values.Note
+	public __goscriptAssign(source: Doc): this {
+		this.Title = source.Title
+		this.Image = source.Image
+		this.Note = source.Note
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

@@ -25,32 +25,13 @@ $.registerInterfaceType(
 );
 
 export class MyStruct {
-	public get Value1(): string {
-		return this._fields.Value1
-	}
+	public declare Value1: string
 
-	public set Value1(value: string) {
-		this._fields.Value1 = value
-	}
-
-	public get Value2(): string {
-		return this._fields.Value2
-	}
-
-	public set Value2(value: string) {
-		this._fields.Value2 = value
-	}
-
-	public _fields: {
-		Value1: string
-		Value2: string
-	}
+	public declare Value2: string
 
 	constructor(init?: Partial<{Value1?: string, Value2?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Value1: init?.Value1 ?? ("" as string),
-			Value2: init?.Value2 ?? ("" as string)
-		}
+		this.Value1 = init?.Value1 ?? ("" as string)
+		this.Value2 = init?.Value2 ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -58,11 +39,10 @@ export class MyStruct {
 		return new MyStruct(this, true)
 	}
 
-	public __goscriptAssign(source: MyStruct): void {
-		const target = this._fields
-		const values = source._fields
-		target.Value1 = values.Value1
-		target.Value2 = values.Value2
+	public __goscriptAssign(source: MyStruct): this {
+		this.Value1 = source.Value1
+		this.Value2 = source.Value2
+		return this
 	}
 
 	public MyString1(): string {

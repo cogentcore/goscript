@@ -88,8 +88,8 @@ export function Name_Upper(n: Name): string {
 	return n + "!"
 }
 
-export async function has(bits: $.VarRef<bigint> | null, f: Inter | null): globalThis.Promise<boolean> {
-	return ($.int64And($.pointerValue<bigint>(bits), ($.int64Shl(1n, $.uint((__goscriptAwait = (f !== null && (f as any).__isVarRef !== true && (f as any).__goValue === undefined ? (f as Exclude<Inter, null>) : $.pointerValue<Exclude<Inter, null>>(f)).Int64(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), 32))))) != 0n
+export function has(bits: $.VarRef<bigint> | null, f: Inter | null): boolean {
+	return ($.int64And($.pointerValue<bigint>(bits), ($.int64Shl(1n, $.uint((f !== null && (f as any).__isVarRef !== true && (f as any).__goValue === undefined ? (f as Exclude<Inter, null>) : $.pointerValue<Exclude<Inter, null>>(f)).Int64(), 32))))) != 0n
 }
 
 export async function main(): globalThis.Promise<void> {
@@ -97,10 +97,10 @@ export async function main(): globalThis.Promise<void> {
 	let bits = $.varRef(2n)
 	let n = 0
 	for (let i = 0; i < 3; i++) {
-		if (await has(bits, __goscriptStatic3())) {
+		if (has(bits, __goscriptStatic3())) {
 			n++
 		}
-		if (await has(bits, __goscriptStatic4())) {
+		if (has(bits, __goscriptStatic4())) {
 			n += 10
 		}
 	}

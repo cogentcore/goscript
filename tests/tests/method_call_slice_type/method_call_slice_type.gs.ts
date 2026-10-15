@@ -9,13 +9,13 @@ $.registerNamedType("main.MySlice", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ 
 
 $.registerNamedValueType(
 	"main.MySlice",
-	{Sum: (receiver: any, ...args: any[]) => (MySlice_Sum as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	{Sum: (receiver: any) => (MySlice_Sum as any)(($.isVarRef(receiver) ? receiver.value : receiver))},
 	[$.methodSignature("Sum", [], [/* @__PURE__ */ $.basicType("int")])]
 );
 
 $.registerNamedValueType(
 	"*main.MySlice",
-	{Add: (receiver: any, ...args: any[]) => (MySlice_Add as any)(receiver, ...$.stripGenericTypeArgs(args)), Sum: (receiver: any, ...args: any[]) => (MySlice_Sum as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	{Add: (receiver: any, ...args: any[]) => (MySlice_Add as any)(receiver, ...$.stripGenericTypeArgs(args)), Sum: (receiver: any) => (MySlice_Sum as any)($.pointerValue(receiver))},
 	[$.methodSignature("Add", [["val", /* @__PURE__ */ $.basicType("int")]]), $.methodSignature("Sum", [], [/* @__PURE__ */ $.basicType("int")])]
 );
 

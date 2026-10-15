@@ -15,32 +15,13 @@ $.registerInterfaceType(
 );
 
 export class blockType {
-	public get typeID(): string {
-		return this._fields.typeID
-	}
+	public declare typeID: string
 
-	public set typeID(value: string) {
-		this._fields.typeID = value
-	}
-
-	public get _constructor(): (() => any | globalThis.Promise<any>) | null {
-		return this._fields._constructor
-	}
-
-	public set _constructor(value: (() => any | globalThis.Promise<any>) | null) {
-		this._fields._constructor = value
-	}
-
-	public _fields: {
-		typeID: string
-		_constructor: (() => any | globalThis.Promise<any>) | null
-	}
+	public declare _constructor: (() => any | globalThis.Promise<any>) | null
 
 	constructor(init?: Partial<{typeID?: string, _constructor?: (() => any | globalThis.Promise<any>) | null}>, __goscriptValue?: boolean) {
-		this._fields = {
-			typeID: init?.typeID ?? ("" as string),
-			_constructor: init?._constructor ?? (null! as (() => any | globalThis.Promise<any>) | null)
-		}
+		this.typeID = init?.typeID ?? ("" as string)
+		this._constructor = init?._constructor ?? (null! as (() => any | globalThis.Promise<any>) | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -48,11 +29,10 @@ export class blockType {
 		return new blockType(this, true)
 	}
 
-	public __goscriptAssign(source: blockType): void {
-		const target = this._fields
-		const values = source._fields
-		target.typeID = values.typeID
-		target._constructor = values._constructor
+	public __goscriptAssign(source: blockType): this {
+		this.typeID = source.typeID
+		this._constructor = source._constructor
+		return this
 	}
 
 	public Constructor(__typeArgs: $.GenericTypeArgs | undefined): Block | null {
@@ -75,12 +55,7 @@ export class blockType {
 }
 
 export class sampleBlock {
-	public _fields: {
-	}
-
 	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
-		this._fields = {
-		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -88,7 +63,8 @@ export class sampleBlock {
 		return new sampleBlock(this, true)
 	}
 
-	public __goscriptAssign(source: sampleBlock): void {
+	public __goscriptAssign(source: sampleBlock): this {
+		return this
 	}
 
 	public MarshalBlock(): [$.Slice<number>, $.GoError] {
@@ -124,7 +100,7 @@ export async function main(): globalThis.Promise<void> {
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.pointerType("main.sampleBlock"), zero: () => null, methods: {MarshalBlock: (receiver: any, ...args: any[]) => $.pointerValue(receiver).MarshalBlock(...$.stripGenericTypeArgs(args)), UnmarshalBlock: (receiver: any, ...args: any[]) => $.pointerValue(receiver).UnmarshalBlock(...$.stripGenericTypeArgs(args))} }})
+	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.pointerType("main.sampleBlock"), zero: () => null, methods: {MarshalBlock: (receiver: any) => $.pointerValue(receiver).MarshalBlock(), UnmarshalBlock: (receiver: any, ...args: any[]) => $.pointerValue(receiver).UnmarshalBlock(...$.stripGenericTypeArgs(args))} }})
 }
 
 if ($.isMainScript(import.meta)) {

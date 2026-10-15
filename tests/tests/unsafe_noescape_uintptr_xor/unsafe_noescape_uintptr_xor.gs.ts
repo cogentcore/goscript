@@ -6,32 +6,13 @@ import * as unsafe from "@goscript/unsafe/index.js"
 import "@goscript/unsafe/index.js"
 
 export class sourceStruct {
-	public get flag(): boolean {
-		return this._fields.flag
-	}
+	public declare flag: boolean
 
-	public set flag(value: boolean) {
-		this._fields.flag = value
-	}
-
-	public get data(): $.Slice<number> {
-		return this._fields.data
-	}
-
-	public set data(value: $.Slice<number>) {
-		this._fields.data = value
-	}
-
-	public _fields: {
-		flag: boolean
-		data: $.Slice<number>
-	}
+	public declare data: $.Slice<number>
 
 	constructor(init?: Partial<{flag?: boolean, data?: $.Slice<number>}>, __goscriptValue?: boolean) {
-		this._fields = {
-			flag: init?.flag ?? (false as boolean),
-			data: init?.data ?? (null! as $.Slice<number>)
-		}
+		this.flag = init?.flag ?? (false as boolean)
+		this.data = init?.data ?? (null! as $.Slice<number>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -39,11 +20,10 @@ export class sourceStruct {
 		return new sourceStruct(this, true)
 	}
 
-	public __goscriptAssign(source: sourceStruct): void {
-		const target = this._fields
-		const values = source._fields
-		target.flag = values.flag
-		target.data = values.data
+	public __goscriptAssign(source: sourceStruct): this {
+		this.flag = source.flag
+		this.data = source.data
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -56,32 +36,13 @@ export class sourceStruct {
 }
 
 export class viewStruct {
-	public get flag(): boolean {
-		return this._fields.flag
-	}
+	public declare flag: boolean
 
-	public set flag(value: boolean) {
-		this._fields.flag = value
-	}
-
-	public get data(): $.Slice<number> {
-		return this._fields.data
-	}
-
-	public set data(value: $.Slice<number>) {
-		this._fields.data = value
-	}
-
-	public _fields: {
-		flag: boolean
-		data: $.Slice<number>
-	}
+	public declare data: $.Slice<number>
 
 	constructor(init?: Partial<{flag?: boolean, data?: $.Slice<number>}>, __goscriptValue?: boolean) {
-		this._fields = {
-			flag: init?.flag ?? (false as boolean),
-			data: init?.data ?? (null! as $.Slice<number>)
-		}
+		this.flag = init?.flag ?? (false as boolean)
+		this.data = init?.data ?? (null! as $.Slice<number>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -89,11 +50,10 @@ export class viewStruct {
 		return new viewStruct(this, true)
 	}
 
-	public __goscriptAssign(source: viewStruct): void {
-		const target = this._fields
-		const values = source._fields
-		target.flag = values.flag
-		target.data = values.data
+	public __goscriptAssign(source: viewStruct): this {
+		this.flag = source.flag
+		this.data = source.data
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

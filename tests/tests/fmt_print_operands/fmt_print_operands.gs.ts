@@ -11,33 +11,21 @@ export type celsius = number
 
 $.registerNamedValueType(
 	"main.celsius",
-	{String: (receiver: any, ...args: any[]) => (celsius_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	{String: (receiver: any) => (celsius_String as any)(($.isVarRef(receiver) ? receiver.value : receiver))},
 	[$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])]
 );
 
 $.registerNamedValueType(
 	"*main.celsius",
-	{String: (receiver: any, ...args: any[]) => (celsius_String as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	{String: (receiver: any) => (celsius_String as any)($.pointerValue(receiver))},
 	[$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])]
 );
 
 export class slowName {
-	public get ch(): $.Channel<string> | null {
-		return this._fields.ch
-	}
-
-	public set ch(value: $.Channel<string> | null) {
-		this._fields.ch = value
-	}
-
-	public _fields: {
-		ch: $.Channel<string> | null
-	}
+	public declare ch: $.Channel<string> | null
 
 	constructor(init?: Partial<{ch?: $.Channel<string> | null}>, __goscriptValue?: boolean) {
-		this._fields = {
-			ch: init?.ch ?? (null! as $.Channel<string> | null)
-		}
+		this.ch = init?.ch ?? (null! as $.Channel<string> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -45,10 +33,9 @@ export class slowName {
 		return new slowName(this, true)
 	}
 
-	public __goscriptAssign(source: slowName): void {
-		const target = this._fields
-		const values = source._fields
-		target.ch = values.ch
+	public __goscriptAssign(source: slowName): this {
+		this.ch = source.ch
+		return this
 	}
 
 	public async String(): globalThis.Promise<string> {
@@ -67,32 +54,13 @@ export class slowName {
 }
 
 export class reading {
-	public get Name(): slowName {
-		return this._fields.Name
-	}
+	public declare Name: slowName
 
-	public set Name(value: slowName) {
-		this._fields.Name = value
-	}
-
-	public get Value(): number {
-		return this._fields.Value
-	}
-
-	public set Value(value: number) {
-		this._fields.Value = value
-	}
-
-	public _fields: {
-		Name: slowName
-		Value: number
-	}
+	public declare Value: number
 
 	constructor(init?: Partial<{Name?: slowName, Value?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Name: init?.Name ? init.Name.clone() : new slowName(undefined, true),
-			Value: init?.Value ?? (0 as number)
-		}
+		this.Name = init?.Name ? init.Name.clone() : new slowName(undefined, true)
+		this.Value = init?.Value ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -100,11 +68,10 @@ export class reading {
 		return new reading(this, true)
 	}
 
-	public __goscriptAssign(source: reading): void {
-		const target = this._fields
-		const values = source._fields
-		$.assignStruct(target.Name, values.Name)
-		target.Value = values.Value
+	public __goscriptAssign(source: reading): this {
+		this.Name.__goscriptAssign(source.Name)
+		this.Value = source.Value
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -117,22 +84,10 @@ export class reading {
 }
 
 export class tag {
-	public get name(): string {
-		return this._fields.name
-	}
-
-	public set name(value: string) {
-		this._fields.name = value
-	}
-
-	public _fields: {
-		name: string
-	}
+	public declare name: string
 
 	constructor(init?: Partial<{name?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			name: init?.name ?? ("" as string)
-		}
+		this.name = init?.name ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -140,10 +95,9 @@ export class tag {
 		return new tag(this, true)
 	}
 
-	public __goscriptAssign(source: tag): void {
-		const target = this._fields
-		const values = source._fields
-		target.name = values.name
+	public __goscriptAssign(source: tag): this {
+		this.name = source.name
+		return this
 	}
 
 	public String(): string {
@@ -161,42 +115,16 @@ export class tag {
 }
 
 export class plain {
-	public get Tag(): tag {
-		return this._fields.Tag
-	}
+	public declare Tag: tag
 
-	public set Tag(value: tag) {
-		this._fields.Tag = value
-	}
+	public declare Count: number
 
-	public get Count(): number {
-		return this._fields.Count
-	}
-
-	public set Count(value: number) {
-		this._fields.Count = value
-	}
-
-	public get Tags(): $.Slice<string> {
-		return this._fields.Tags
-	}
-
-	public set Tags(value: $.Slice<string>) {
-		this._fields.Tags = value
-	}
-
-	public _fields: {
-		Tag: tag
-		Count: number
-		Tags: $.Slice<string>
-	}
+	public declare Tags: $.Slice<string>
 
 	constructor(init?: Partial<{Tag?: tag, Count?: number, Tags?: $.Slice<string>}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Tag: init?.Tag ? init.Tag.clone() : new tag(undefined, true),
-			Count: init?.Count ?? (0 as number),
-			Tags: init?.Tags ?? (null! as $.Slice<string>)
-		}
+		this.Tag = init?.Tag ? init.Tag.clone() : new tag(undefined, true)
+		this.Count = init?.Count ?? (0 as number)
+		this.Tags = init?.Tags ?? (null! as $.Slice<string>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -204,12 +132,11 @@ export class plain {
 		return new plain(this, true)
 	}
 
-	public __goscriptAssign(source: plain): void {
-		const target = this._fields
-		const values = source._fields
-		$.assignStruct(target.Tag, values.Tag)
-		target.Count = values.Count
-		target.Tags = values.Tags
+	public __goscriptAssign(source: plain): this {
+		this.Tag.__goscriptAssign(source.Tag)
+		this.Count = source.Count
+		this.Tags = source.Tags
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -222,22 +149,10 @@ export class plain {
 }
 
 export class codeError {
-	public get code(): number {
-		return this._fields.code
-	}
-
-	public set code(value: number) {
-		this._fields.code = value
-	}
-
-	public _fields: {
-		code: number
-	}
+	public declare code: number
 
 	constructor(init?: Partial<{code?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			code: init?.code ?? (0 as number)
-		}
+		this.code = init?.code ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -245,10 +160,9 @@ export class codeError {
 		return new codeError(this, true)
 	}
 
-	public __goscriptAssign(source: codeError): void {
-		const target = this._fields
-		const values = source._fields
-		target.code = values.code
+	public __goscriptAssign(source: codeError): this {
+		this.code = source.code
+		return this
 	}
 
 	public Error(): string {
@@ -309,7 +223,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println(temps(21.5, new plain({Tag: new tag({name: "t"}, true), Count: 2, Tags: $.arrayToSlice<string>(["x"])}, true)))
 	await $.println(await slow(new slowName({ch: $.makeChannel<string>(1, "", "both")}, true)))
 	await $.println(await nested(new reading({Name: new slowName({ch: $.makeChannel<string>(1, "", "both")}, true), Value: 4}, true)))
-	await $.println(await anything($.namedValueInterfaceValue<any>(1, "main.celsius", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2())))
+	await $.println(await anything(__goscriptStatic3()))
 	await $.println(await anything($.interfaceValue(new slowName({ch: $.makeChannel<string>(1, "", "both")}, true), "main.slowName", "main.slowName")))
 	await $.println(await wrap($.interfaceValue<$.GoError>(new codeError({code: 7}), "*main.codeError", /* @__PURE__ */ $.pointerType("main.codeError"))))
 	await $.print(build(5))
@@ -320,7 +234,7 @@ export async function main(): globalThis.Promise<void> {
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({String: (receiver: any, ...args: any[]) => (celsius_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))})
+	return __goscriptStatic0$value ??= ({String: (receiver: any) => (celsius_String as any)(($.isVarRef(receiver) ? receiver.value : receiver))})
 }
 
 var __goscriptStatic1$value: any
@@ -331,6 +245,11 @@ function __goscriptStatic1(): any {
 var __goscriptStatic2$value: any
 function __goscriptStatic2(): any {
 	return __goscriptStatic2$value ??= ([$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])])
+}
+
+var __goscriptStatic3$value: any
+function __goscriptStatic3(): any {
+	return __goscriptStatic3$value ??= ($.namedValueInterfaceValue<any>(1, "main.celsius", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()))
 }
 
 if ($.isMainScript(import.meta)) {

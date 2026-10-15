@@ -4,32 +4,13 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class node {
-	public get sub(): $.Slice<node | $.VarRef<node> | null> {
-		return this._fields.sub
-	}
+	public declare sub: $.Slice<node | $.VarRef<node> | null>
 
-	public set sub(value: $.Slice<node | $.VarRef<node> | null>) {
-		this._fields.sub = value
-	}
-
-	public get sub0(): (node | $.VarRef<node> | null)[] {
-		return this._fields.sub0
-	}
-
-	public set sub0(value: (node | $.VarRef<node> | null)[]) {
-		this._fields.sub0 = value
-	}
-
-	public _fields: {
-		sub: $.Slice<node | $.VarRef<node> | null>
-		sub0: (node | $.VarRef<node> | null)[]
-	}
+	public declare sub0: (node | $.VarRef<node> | null)[]
 
 	constructor(init?: Partial<{sub?: $.Slice<node | $.VarRef<node> | null>, sub0?: (node | $.VarRef<node> | null)[]}>, __goscriptValue?: boolean) {
-		this._fields = {
-			sub: init?.sub ?? (null! as $.Slice<node | $.VarRef<node> | null>),
-			sub0: init?.sub0 !== undefined ? $.cloneArrayValue(init.sub0, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.pointerType("main.node"), 1)) : $.arrayValue(globalThis.Array.from({ length: 1 }, () => null))
-		}
+		this.sub = init?.sub ?? (null! as $.Slice<node | $.VarRef<node> | null>)
+		this.sub0 = init?.sub0 !== undefined ? $.cloneArrayValue(init.sub0, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.pointerType("main.node"), 1)) : $.arrayValue(globalThis.Array.from({ length: 1 }, () => null))
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -37,11 +18,10 @@ export class node {
 		return new node(this, true)
 	}
 
-	public __goscriptAssign(source: node): void {
-		const target = this._fields
-		const values = source._fields
-		target.sub = values.sub
-		target.sub0 = $.assignFieldValue(target.sub0, values.sub0, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.pointerType("main.node"), 1))
+	public __goscriptAssign(source: node): this {
+		this.sub = source.sub
+		this.sub0 = $.assignFieldValue(this.sub0, source.sub0, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.pointerType("main.node"), 1))
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

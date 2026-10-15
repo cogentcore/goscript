@@ -11,22 +11,10 @@ import * as time from "@goscript/time/index.js"
 import "@goscript/fmt/index.js"
 
 export class Holder {
-	public get Tags(): globalThis.Map<string, number> | null {
-		return this._fields.Tags
-	}
-
-	public set Tags(value: globalThis.Map<string, number> | null) {
-		this._fields.Tags = value
-	}
-
-	public _fields: {
-		Tags: globalThis.Map<string, number> | null
-	}
+	public declare Tags: globalThis.Map<string, number> | null
 
 	constructor(init?: Partial<{Tags?: globalThis.Map<string, number> | null}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Tags: init?.Tags ?? (null! as globalThis.Map<string, number> | null)
-		}
+		this.Tags = init?.Tags ?? (null! as globalThis.Map<string, number> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -34,10 +22,9 @@ export class Holder {
 		return new Holder(this, true)
 	}
 
-	public __goscriptAssign(source: Holder): void {
-		const target = this._fields
-		const values = source._fields
-		target.Tags = values.Tags
+	public __goscriptAssign(source: Holder): this {
+		this.Tags = source.Tags
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -50,62 +37,22 @@ export class Holder {
 }
 
 export class Enc {
-	public get Width(): number {
-		return this._fields.Width
-	}
+	public declare Width: number
 
-	public set Width(value: number) {
-		this._fields.Width = value
-	}
+	public declare Image: $.Slice<number>
 
-	public get Image(): $.Slice<number> {
-		return this._fields.Image
-	}
+	public declare Frames: $.Slice<$.Slice<number>>
 
-	public set Image(value: $.Slice<number>) {
-		this._fields.Image = value
-	}
+	public declare Named: globalThis.Map<string, $.Slice<number>> | null
 
-	public get Frames(): $.Slice<$.Slice<number>> {
-		return this._fields.Frames
-	}
-
-	public set Frames(value: $.Slice<$.Slice<number>>) {
-		this._fields.Frames = value
-	}
-
-	public get Named(): globalThis.Map<string, $.Slice<number>> | null {
-		return this._fields.Named
-	}
-
-	public set Named(value: globalThis.Map<string, $.Slice<number>> | null) {
-		this._fields.Named = value
-	}
-
-	public get Nested(): Enc | $.VarRef<Enc> | null {
-		return this._fields.Nested
-	}
-
-	public set Nested(value: Enc | $.VarRef<Enc> | null) {
-		this._fields.Nested = value
-	}
-
-	public _fields: {
-		Width: number
-		Image: $.Slice<number>
-		Frames: $.Slice<$.Slice<number>>
-		Named: globalThis.Map<string, $.Slice<number>> | null
-		Nested: Enc | $.VarRef<Enc> | null
-	}
+	public declare Nested: Enc | $.VarRef<Enc> | null
 
 	constructor(init?: Partial<{Width?: number, Image?: $.Slice<number>, Frames?: $.Slice<$.Slice<number>>, Named?: globalThis.Map<string, $.Slice<number>> | null, Nested?: Enc | $.VarRef<Enc> | null}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Width: init?.Width ?? (0 as number),
-			Image: init?.Image ?? (null! as $.Slice<number>),
-			Frames: init?.Frames ?? (null! as $.Slice<$.Slice<number>>),
-			Named: init?.Named ?? (null! as globalThis.Map<string, $.Slice<number>> | null),
-			Nested: init?.Nested ?? (null! as Enc | $.VarRef<Enc> | null)
-		}
+		this.Width = init?.Width ?? (0 as number)
+		this.Image = init?.Image ?? (null! as $.Slice<number>)
+		this.Frames = init?.Frames ?? (null! as $.Slice<$.Slice<number>>)
+		this.Named = init?.Named ?? (null! as globalThis.Map<string, $.Slice<number>> | null)
+		this.Nested = init?.Nested ?? (null! as Enc | $.VarRef<Enc> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -113,14 +60,13 @@ export class Enc {
 		return new Enc(this, true)
 	}
 
-	public __goscriptAssign(source: Enc): void {
-		const target = this._fields
-		const values = source._fields
-		target.Width = values.Width
-		target.Image = values.Image
-		target.Frames = values.Frames
-		target.Named = values.Named
-		target.Nested = values.Nested
+	public __goscriptAssign(source: Enc): this {
+		this.Width = source.Width
+		this.Image = source.Image
+		this.Frames = source.Frames
+		this.Named = source.Named
+		this.Nested = source.Nested
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -133,32 +79,13 @@ export class Enc {
 }
 
 export class Event {
-	public get Name(): string {
-		return this._fields.Name
-	}
+	public declare Name: string
 
-	public set Name(value: string) {
-		this._fields.Name = value
-	}
-
-	public get At(): time.Time {
-		return this._fields.At
-	}
-
-	public set At(value: time.Time) {
-		this._fields.At = value
-	}
-
-	public _fields: {
-		Name: string
-		At: time.Time
-	}
+	public declare At: time.Time
 
 	constructor(init?: Partial<{Name?: string, At?: time.Time}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Name: init?.Name ?? ("" as string),
-			At: init?.At ? $.markAsStructValue($.cloneStructValue(init.At)) : $.markAsStructValue(new time.Time())
-		}
+		this.Name = init?.Name ?? ("" as string)
+		this.At = init?.At ? $.markAsStructValue($.cloneStructValue(init.At)) : $.markAsStructValue(new time.Time())
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -166,11 +93,10 @@ export class Event {
 		return new Event(this, true)
 	}
 
-	public __goscriptAssign(source: Event): void {
-		const target = this._fields
-		const values = source._fields
-		target.Name = values.Name
-		$.assignStruct(target.At, values.At)
+	public __goscriptAssign(source: Event): this {
+		this.Name = source.Name
+		$.assignStruct(this.At, source.At)
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -183,42 +109,16 @@ export class Event {
 }
 
 export class Person {
-	public get Name(): string {
-		return this._fields.Name
-	}
+	public declare Name: string
 
-	public set Name(value: string) {
-		this._fields.Name = value
-	}
+	public declare Age: number
 
-	public get Age(): number {
-		return this._fields.Age
-	}
-
-	public set Age(value: number) {
-		this._fields.Age = value
-	}
-
-	public get Active(): boolean {
-		return this._fields.Active
-	}
-
-	public set Active(value: boolean) {
-		this._fields.Active = value
-	}
-
-	public _fields: {
-		Name: string
-		Age: number
-		Active: boolean
-	}
+	public declare Active: boolean
 
 	constructor(init?: Partial<{Name?: string, Age?: number, Active?: boolean}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Name: init?.Name ?? ("" as string),
-			Age: init?.Age ?? (0 as number),
-			Active: init?.Active ?? (false as boolean)
-		}
+		this.Name = init?.Name ?? ("" as string)
+		this.Age = init?.Age ?? (0 as number)
+		this.Active = init?.Active ?? (false as boolean)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -226,12 +126,11 @@ export class Person {
 		return new Person(this, true)
 	}
 
-	public __goscriptAssign(source: Person): void {
-		const target = this._fields
-		const values = source._fields
-		target.Name = values.Name
-		target.Age = values.Age
-		target.Active = values.Active
+	public __goscriptAssign(source: Person): this {
+		this.Name = source.Name
+		this.Age = source.Age
+		this.Active = source.Active
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -357,7 +256,7 @@ export async function timeField(): globalThis.Promise<void> {
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({Float64: (receiver: any, ...args: any[]) => (json.Number_Float64 as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Int64: (receiver: any, ...args: any[]) => (json.Number_Int64 as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), MarshalJSONTo: (receiver: any, ...args: any[]) => (json.Number_MarshalJSONTo as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), String: (receiver: any, ...args: any[]) => (json.Number_String as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))})
+	return __goscriptStatic0$value ??= ({Float64: (receiver: any) => (json.Number_Float64 as any)(($.isVarRef(receiver) ? receiver.value : receiver)), Int64: (receiver: any) => (json.Number_Int64 as any)(($.isVarRef(receiver) ? receiver.value : receiver)), MarshalJSONTo: (receiver: any, ...args: any[]) => (json.Number_MarshalJSONTo as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), String: (receiver: any) => (json.Number_String as any)(($.isVarRef(receiver) ? receiver.value : receiver))})
 }
 
 var __goscriptStatic1$value: any

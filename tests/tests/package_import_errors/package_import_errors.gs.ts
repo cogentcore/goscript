@@ -8,33 +8,21 @@ export type scalarErr = number
 
 $.registerNamedValueType(
 	"main.scalarErr",
-	{Error: (receiver: any, ...args: any[]) => (scalarErr_Error as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	{Error: (receiver: any) => (scalarErr_Error as any)(($.isVarRef(receiver) ? receiver.value : receiver))},
 	[$.methodSignature("Error", [], [/* @__PURE__ */ $.basicType("string")])]
 );
 
 $.registerNamedValueType(
 	"*main.scalarErr",
-	{Error: (receiver: any, ...args: any[]) => (scalarErr_Error as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	{Error: (receiver: any) => (scalarErr_Error as any)($.pointerValue(receiver))},
 	[$.methodSignature("Error", [], [/* @__PURE__ */ $.basicType("string")])]
 );
 
 export class customErr {
-	public get msg(): string {
-		return this._fields.msg
-	}
-
-	public set msg(value: string) {
-		this._fields.msg = value
-	}
-
-	public _fields: {
-		msg: string
-	}
+	public declare msg: string
 
 	constructor(init?: Partial<{msg?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			msg: init?.msg ?? ("" as string)
-		}
+		this.msg = init?.msg ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -42,10 +30,9 @@ export class customErr {
 		return new customErr(this, true)
 	}
 
-	public __goscriptAssign(source: customErr): void {
-		const target = this._fields
-		const values = source._fields
-		target.msg = values.msg
+	public __goscriptAssign(source: customErr): this {
+		this.msg = source.msg
+		return this
 	}
 
 	public Error(): string {
@@ -63,22 +50,10 @@ export class customErr {
 }
 
 export class wrappedErr {
-	public get err(): $.GoError {
-		return this._fields.err
-	}
-
-	public set err(value: $.GoError) {
-		this._fields.err = value
-	}
-
-	public _fields: {
-		err: $.GoError
-	}
+	public declare err: $.GoError
 
 	constructor(init?: Partial<{err?: $.GoError}>, __goscriptValue?: boolean) {
-		this._fields = {
-			err: init?.err ?? (null! as $.GoError)
-		}
+		this.err = init?.err ?? (null! as $.GoError)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -86,10 +61,9 @@ export class wrappedErr {
 		return new wrappedErr(this, true)
 	}
 
-	public __goscriptAssign(source: wrappedErr): void {
-		const target = this._fields
-		const values = source._fields
-		target.err = $.assignFieldValue(target.err, values.err, "error")
+	public __goscriptAssign(source: wrappedErr): this {
+		this.err = $.assignFieldValue(this.err, source.err, "error")
+		return this
 	}
 
 	public Error(): string {
@@ -152,12 +126,12 @@ export async function main(): globalThis.Promise<void> {
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, E: { type: /* @__PURE__ */ $.pointerType("main.customErr"), zero: () => null, methods: {Error: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Error(...$.stripGenericTypeArgs(args))} }})
+	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, E: { type: /* @__PURE__ */ $.pointerType("main.customErr"), zero: () => null, methods: {Error: (receiver: any) => $.pointerValue(receiver).Error()} }})
 }
 
 var __goscriptStatic1$value: any
 function __goscriptStatic1(): any {
-	return __goscriptStatic1$value ??= ({Error: (receiver: any, ...args: any[]) => (scalarErr_Error as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))})
+	return __goscriptStatic1$value ??= ({Error: (receiver: any) => (scalarErr_Error as any)($.pointerValue(receiver))})
 }
 
 var __goscriptStatic2$value: any

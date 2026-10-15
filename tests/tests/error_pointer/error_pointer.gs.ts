@@ -7,13 +7,13 @@ export type customErr = string
 
 $.registerNamedValueType(
 	"main.customErr",
-	{Error: (receiver: any, ...args: any[]) => (customErr_Error as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	{Error: (receiver: any) => (customErr_Error as any)(($.isVarRef(receiver) ? receiver.value : receiver))},
 	[$.methodSignature("Error", [], [/* @__PURE__ */ $.basicType("string")])]
 );
 
 $.registerNamedValueType(
 	"*main.customErr",
-	{Error: (receiver: any, ...args: any[]) => (customErr_Error as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	{Error: (receiver: any) => (customErr_Error as any)($.pointerValue(receiver))},
 	[$.methodSignature("Error", [], [/* @__PURE__ */ $.basicType("string")])]
 );
 

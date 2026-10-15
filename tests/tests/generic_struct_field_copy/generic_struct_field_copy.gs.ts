@@ -4,32 +4,13 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class Value {
-	public get V(): number {
-		return this._fields.V
-	}
+	public declare V: number
 
-	public set V(value: number) {
-		this._fields.V = value
-	}
-
-	public get Unit(): number {
-		return this._fields.Unit
-	}
-
-	public set Unit(value: number) {
-		this._fields.Unit = value
-	}
-
-	public _fields: {
-		V: number
-		Unit: number
-	}
+	public declare Unit: number
 
 	constructor(init?: Partial<{V?: number, Unit?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			V: init?.V ?? (0 as number),
-			Unit: init?.Unit ?? (0 as number)
-		}
+		this.V = init?.V ?? (0 as number)
+		this.Unit = init?.Unit ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -37,11 +18,10 @@ export class Value {
 		return new Value(this, true)
 	}
 
-	public __goscriptAssign(source: Value): void {
-		const target = this._fields
-		const values = source._fields
-		target.V = values.V
-		target.Unit = values.Unit
+	public __goscriptAssign(source: Value): this {
+		this.V = source.V
+		this.Unit = source.Unit
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -54,52 +34,19 @@ export class Value {
 }
 
 export class Sides {
-	public get Top(): any {
-		return this._fields.Top
-	}
+	public declare Top: any
 
-	public set Top(value: any) {
-		this._fields.Top = value
-	}
+	public declare Right: any
 
-	public get Right(): any {
-		return this._fields.Right
-	}
+	public declare Bottom: any
 
-	public set Right(value: any) {
-		this._fields.Right = value
-	}
-
-	public get Bottom(): any {
-		return this._fields.Bottom
-	}
-
-	public set Bottom(value: any) {
-		this._fields.Bottom = value
-	}
-
-	public get Left(): any {
-		return this._fields.Left
-	}
-
-	public set Left(value: any) {
-		this._fields.Left = value
-	}
-
-	public _fields: {
-		Top: any
-		Right: any
-		Bottom: any
-		Left: any
-	}
+	public declare Left: any
 
 	constructor(init?: Partial<{Top?: any, Right?: any, Bottom?: any, Left?: any}>, __goscriptValue?: boolean, __goscriptFresh?: boolean) {
-		this._fields = {
-			Top: init?.Top !== undefined ? (__goscriptFresh === true ? init.Top : $.copyElement(init.Top)) : (null! as any),
-			Right: init?.Right !== undefined ? (__goscriptFresh === true ? init.Right : $.copyElement(init.Right)) : (null! as any),
-			Bottom: init?.Bottom !== undefined ? (__goscriptFresh === true ? init.Bottom : $.copyElement(init.Bottom)) : (null! as any),
-			Left: init?.Left !== undefined ? (__goscriptFresh === true ? init.Left : $.copyElement(init.Left)) : (null! as any)
-		}
+		this.Top = init?.Top !== undefined ? (__goscriptFresh === true ? init.Top : $.copyElement(init.Top)) : (null! as any)
+		this.Right = init?.Right !== undefined ? (__goscriptFresh === true ? init.Right : $.copyElement(init.Right)) : (null! as any)
+		this.Bottom = init?.Bottom !== undefined ? (__goscriptFresh === true ? init.Bottom : $.copyElement(init.Bottom)) : (null! as any)
+		this.Left = init?.Left !== undefined ? (__goscriptFresh === true ? init.Left : $.copyElement(init.Left)) : (null! as any)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -107,13 +54,12 @@ export class Sides {
 		return new Sides(this, true)
 	}
 
-	public __goscriptAssign(source: Sides): void {
-		const target = this._fields
-		const values = source._fields
-		target.Top = $.assignFieldValue(target.Top, values.Top, { kind: $.TypeKind.Interface, methods: [] })
-		target.Right = $.assignFieldValue(target.Right, values.Right, { kind: $.TypeKind.Interface, methods: [] })
-		target.Bottom = $.assignFieldValue(target.Bottom, values.Bottom, { kind: $.TypeKind.Interface, methods: [] })
-		target.Left = $.assignFieldValue(target.Left, values.Left, { kind: $.TypeKind.Interface, methods: [] })
+	public __goscriptAssign(source: Sides): this {
+		this.Top = $.assignFieldValue(this.Top, source.Top, { kind: $.TypeKind.Interface, methods: [] })
+		this.Right = $.assignFieldValue(this.Right, source.Right, { kind: $.TypeKind.Interface, methods: [] })
+		this.Bottom = $.assignFieldValue(this.Bottom, source.Bottom, { kind: $.TypeKind.Interface, methods: [] })
+		this.Left = $.assignFieldValue(this.Left, source.Left, { kind: $.TypeKind.Interface, methods: [] })
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -126,22 +72,10 @@ export class Sides {
 }
 
 export class Values {
-	public get Sides(): Sides {
-		return this._fields.Sides
-	}
-
-	public set Sides(value: Sides) {
-		this._fields.Sides = value
-	}
-
-	public _fields: {
-		Sides: Sides
-	}
+	public declare Sides: Sides
 
 	constructor(init?: Partial<{Sides?: Sides}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Sides: init?.Sides ? $.markAsStructValue($.cloneStructValue(init.Sides)) : $.markAsStructValue(new Sides({Top: new Value(undefined, true), Right: new Value(undefined, true), Bottom: new Value(undefined, true), Left: new Value(undefined, true)}, undefined, true))
-		}
+		this.Sides = init?.Sides ? init.Sides.clone() : $.markAsStructValue(new Sides({Top: new Value(undefined, true), Right: new Value(undefined, true), Bottom: new Value(undefined, true), Left: new Value(undefined, true)}, undefined, true))
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -149,10 +83,9 @@ export class Values {
 		return new Values(this, true)
 	}
 
-	public __goscriptAssign(source: Values): void {
-		const target = this._fields
-		const values = source._fields
-		$.assignStruct(target.Sides, values.Sides)
+	public __goscriptAssign(source: Values): this {
+		this.Sides.__goscriptAssign(source.Sides)
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -165,32 +98,13 @@ export class Values {
 }
 
 export class Pair {
-	public get Key(): any {
-		return this._fields.Key
-	}
+	public declare Key: any
 
-	public set Key(value: any) {
-		this._fields.Key = value
-	}
-
-	public get Val(): any {
-		return this._fields.Val
-	}
-
-	public set Val(value: any) {
-		this._fields.Val = value
-	}
-
-	public _fields: {
-		Key: any
-		Val: any
-	}
+	public declare Val: any
 
 	constructor(init?: Partial<{Key?: any, Val?: any}>, __goscriptValue?: boolean, __goscriptFresh?: boolean) {
-		this._fields = {
-			Key: init?.Key ?? (null! as any),
-			Val: init?.Val !== undefined ? (__goscriptFresh === true ? init.Val : $.copyElement(init.Val)) : (null! as any)
-		}
+		this.Key = init?.Key ?? (null! as any)
+		this.Val = init?.Val !== undefined ? (__goscriptFresh === true ? init.Val : $.copyElement(init.Val)) : (null! as any)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -198,11 +112,10 @@ export class Pair {
 		return new Pair(this, true)
 	}
 
-	public __goscriptAssign(source: Pair): void {
-		const target = this._fields
-		const values = source._fields
-		target.Key = $.assignFieldValue(target.Key, values.Key, { kind: $.TypeKind.Interface, methods: [] })
-		target.Val = $.assignFieldValue(target.Val, values.Val, { kind: $.TypeKind.Interface, methods: [] })
+	public __goscriptAssign(source: Pair): this {
+		this.Key = $.assignFieldValue(this.Key, source.Key, { kind: $.TypeKind.Interface, methods: [] })
+		this.Val = $.assignFieldValue(this.Val, source.Val, { kind: $.TypeKind.Interface, methods: [] })
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -215,32 +128,13 @@ export class Pair {
 }
 
 export class withClone {
-	public get clone(): (() => number | globalThis.Promise<number>) | null {
-		return this._fields.clone
-	}
+	public declare clone: (() => number | globalThis.Promise<number>) | null
 
-	public set clone(value: (() => number | globalThis.Promise<number>) | null) {
-		this._fields.clone = value
-	}
-
-	public get n(): number {
-		return this._fields.n
-	}
-
-	public set n(value: number) {
-		this._fields.n = value
-	}
-
-	public _fields: {
-		clone: (() => number | globalThis.Promise<number>) | null
-		n: number
-	}
+	public declare n: number
 
 	constructor(init?: Partial<{clone?: (() => number | globalThis.Promise<number>) | null, n?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			clone: init?.clone ?? (null! as (() => number | globalThis.Promise<number>) | null),
-			n: init?.n ?? (0 as number)
-		}
+		this.clone = init?.clone ?? (null! as (() => number | globalThis.Promise<number>) | null)
+		this.n = init?.n ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -248,11 +142,10 @@ export class withClone {
 		return new withClone(this, true)
 	}
 
-	public __goscriptAssign(source: withClone): void {
-		const target = this._fields
-		const values = source._fields
-		target.clone = values.clone
-		target.n = values.n
+	public __goscriptAssign(source: withClone): this {
+		this.clone = source.clone
+		this.n = source.n
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -281,16 +174,16 @@ export async function main(): globalThis.Promise<void> {
 	// copies of type argument fields of struct, array, pointer and unnamed
 	// struct types
 	let arr = $.markAsStructValue(new Sides({Top: $.arrayValue([1, 2]), Right: $.arrayValue(globalThis.Array.from({ length: 2 }, () => 0)), Bottom: $.arrayValue(globalThis.Array.from({ length: 2 }, () => 0)), Left: $.arrayValue(globalThis.Array.from({ length: 2 }, () => 0))}))
-	let arr2 = $.markAsStructValue($.cloneStructValue(arr))
+	let arr2 = (arr).clone()
 	arr2.Top[0] = 9
 	await $.println("array:", $.arrayIndex(arr.Top, 0), $.arrayIndex(arr2.Top, 0))
 	let p = new Value({V: 5})
 	let ptr = $.markAsStructValue(new Sides({Top: p, Right: null! as Value | $.VarRef<Value> | null, Bottom: null! as Value | $.VarRef<Value> | null, Left: null! as Value | $.VarRef<Value> | null}))
-	let ptr2 = $.markAsStructValue($.cloneStructValue(ptr))
+	let ptr2 = (ptr).clone()
 	$.pointerValue<Value>(ptr2.Top).V = 6
-	await $.println("pointer:", $.pointerValue<Value>(p).V, $.pointerEqual(ptr.Top, ptr2.Top))
+	await $.println("pointer:", $.pointerValue<Value>(p).V, (ptr.Top === ptr2.Top || $.pointerAliasesMade && $.pointerEqual(ptr.Top, ptr2.Top)))
 	let anon = $.markAsStructValue(new Sides({Top: $.anonymousStructValue({A: 1, B: 2}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("A", /* @__PURE__ */ $.basicType("int"), [0], 0, true), /* @__PURE__ */ $.structField("B", /* @__PURE__ */ $.basicType("int"), [1], 8, true)] }), Right: $.anonymousStructValue({"A": 0, "B": 0}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("A", /* @__PURE__ */ $.basicType("int"), [0], 0, true), /* @__PURE__ */ $.structField("B", /* @__PURE__ */ $.basicType("int"), [1], 8, true)] }), Bottom: $.anonymousStructValue({"A": 0, "B": 0}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("A", /* @__PURE__ */ $.basicType("int"), [0], 0, true), /* @__PURE__ */ $.structField("B", /* @__PURE__ */ $.basicType("int"), [1], 8, true)] }), Left: $.anonymousStructValue({"A": 0, "B": 0}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("A", /* @__PURE__ */ $.basicType("int"), [0], 0, true), /* @__PURE__ */ $.structField("B", /* @__PURE__ */ $.basicType("int"), [1], 8, true)] })}))
-	let anon2 = $.markAsStructValue($.cloneStructValue(anon))
+	let anon2 = (anon).clone()
 	anon2.Top.A = 7
 	await $.println("unnamed:", anon.Top.A, anon2.Top.A)
 
@@ -298,14 +191,14 @@ export async function main(): globalThis.Promise<void> {
 	let wc = $.markAsStructValue(new Sides({Top: $.markAsStructValue(new withClone({clone: $.functionValue((): number => {
 		return 8
 	}, ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo)), n: 1})), Right: $.markAsStructValue(new withClone()), Bottom: $.markAsStructValue(new withClone()), Left: $.markAsStructValue(new withClone())}))
-	let wc2 = $.markAsStructValue($.cloneStructValue(wc))
+	let wc2 = (wc).clone()
 	wc2.Top.n = 2
-	await $.println("field named clone:", wc.Top.n, wc2.Top.n, (__goscriptAwait = wc2.Top.clone!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println("field named clone:", wc.Top.n, wc2.Top.n, (wc2.Top.clone!() as number))
 
 	// nested generic instances
 	let pr: Pair = $.markAsStructValue(new Pair({Key: "", Val: $.markAsStructValue(new Sides({Top: new Value(undefined, true), Right: new Value(undefined, true), Bottom: new Value(undefined, true), Left: new Value(undefined, true)}, undefined, true))}, undefined, true))
 	pr.Val.Left.V = 10
-	let pr2 = $.markAsStructValue($.cloneStructValue(pr))
+	let pr2 = (pr).clone()
 	pr2.Val.Left.V = 11
 	await $.println("nested:", pr.Val.Left.V, pr2.Val.Left.V, pr2.Val.Top.Unit)
 
@@ -315,8 +208,6 @@ export async function main(): globalThis.Promise<void> {
 	$.arrayIndex(vals!, 0).Sides.Top.V = 12
 	await $.println("slice:", $.arrayIndex(vals!, 0).Sides.Top.V, $.arrayIndex(vals!, 1).Sides.Top.V, $.arrayIndex(vals!, 2).Sides.Top.V)
 }
-
-var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

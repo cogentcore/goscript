@@ -11,13 +11,13 @@ $.registerNamedType("subpkg.Value", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ 
 
 $.registerNamedValueType(
 	"subpkg.Value",
-	{Clone: (receiver: any, ...args: any[]) => (Value_Clone as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	{Clone: (receiver: any) => (Value_Clone as any)(($.isVarRef(receiver) ? receiver.value : receiver))},
 	[$.methodSignature("Clone", [], [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"), "subpkg.Value")])]
 );
 
 $.registerNamedValueType(
 	"*subpkg.Value",
-	{Clone: (receiver: any, ...args: any[]) => (Value_Clone as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	{Clone: (receiver: any) => (Value_Clone as any)($.pointerValue(receiver))},
 	[$.methodSignature("Clone", [], [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"), "subpkg.Value")])]
 );
 

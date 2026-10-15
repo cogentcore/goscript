@@ -10,22 +10,10 @@ export type Process = ((snap: Snapshot | $.VarRef<Snapshot> | null, n: number) =
 export type SnapFunc = ((n: number) => [$.VarRef<number> | null, $.Slice<number>, $.GoError] | globalThis.Promise<[$.VarRef<number> | null, $.Slice<number>, $.GoError]>) | null
 
 export class Snapshot {
-	public get base(): number {
-		return this._fields.base
-	}
-
-	public set base(value: number) {
-		this._fields.base = value
-	}
-
-	public _fields: {
-		base: number
-	}
+	public declare base: number
 
 	constructor(init?: Partial<{base?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			base: init?.base ?? (0 as number)
-		}
+		this.base = init?.base ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -33,10 +21,9 @@ export class Snapshot {
 		return new Snapshot(this, true)
 	}
 
-	public __goscriptAssign(source: Snapshot): void {
-		const target = this._fields
-		const values = source._fields
-		target.base = values.base
+	public __goscriptAssign(source: Snapshot): this {
+		this.base = source.base
+		return this
 	}
 
 	public async Apply(n: number, cb: ((n: number) => [$.VarRef<number> | null, $.Slice<number>, $.GoError] | globalThis.Promise<[$.VarRef<number> | null, $.Slice<number>, $.GoError]>) | null): globalThis.Promise<[number, $.GoError]> {
@@ -61,22 +48,10 @@ export class Snapshot {
 }
 
 export class Host {
-	public get process(): atomic.Pointer<Process> {
-		return this._fields.process
-	}
-
-	public set process(value: atomic.Pointer<Process>) {
-		this._fields.process = value
-	}
-
-	public _fields: {
-		process: atomic.Pointer<Process>
-	}
+	public declare process: atomic.Pointer<Process>
 
 	constructor(init?: Partial<{process?: atomic.Pointer<Process>}>, __goscriptValue?: boolean) {
-		this._fields = {
-			process: init?.process ? $.markAsStructValue($.cloneStructValue(init.process)) : $.markAsStructValue(new atomic.Pointer<Process>())
-		}
+		this.process = init?.process ? $.markAsStructValue($.cloneStructValue(init.process)) : $.markAsStructValue(new atomic.Pointer<Process>())
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -84,10 +59,9 @@ export class Host {
 		return new Host(this, true)
 	}
 
-	public __goscriptAssign(source: Host): void {
-		const target = this._fields
-		const values = source._fields
-		$.assignStruct(target.process, values.process)
+	public __goscriptAssign(source: Host): this {
+		$.assignStruct(this.process, source.process)
+		return this
 	}
 
 	public processor(): ((n: number) => [number, $.GoError] | globalThis.Promise<[number, $.GoError]>) | null {

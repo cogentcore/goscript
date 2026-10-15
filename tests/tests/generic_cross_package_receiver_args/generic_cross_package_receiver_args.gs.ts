@@ -16,22 +16,10 @@ $.registerInterfaceType(
 );
 
 export class wrapper {
-	public get Impl(): dep.Impl | $.VarRef<dep.Impl> | null {
-		return this._fields.Impl
-	}
-
-	public set Impl(value: dep.Impl | $.VarRef<dep.Impl> | null) {
-		this._fields.Impl = value
-	}
-
-	public _fields: {
-		Impl: dep.Impl | $.VarRef<dep.Impl> | null
-	}
+	public declare Impl: dep.Impl | $.VarRef<dep.Impl> | null
 
 	constructor(init?: Partial<{Impl?: dep.Impl | $.VarRef<dep.Impl> | null}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Impl: init?.Impl ?? (null! as dep.Impl | $.VarRef<dep.Impl> | null)
-		}
+		this.Impl = init?.Impl ?? (null! as dep.Impl | $.VarRef<dep.Impl> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -39,10 +27,9 @@ export class wrapper {
 		return new wrapper(this, true)
 	}
 
-	public __goscriptAssign(source: wrapper): void {
-		const target = this._fields
-		const values = source._fields
-		target.Impl = values.Impl
+	public __goscriptAssign(source: wrapper): this {
+		this.Impl = source.Impl
+		return this
 	}
 
 	public Other(__typeArgs: $.GenericTypeArgs | undefined): any {
@@ -96,7 +83,7 @@ function __goscriptStatic1(): any {
 
 var __goscriptStatic2$value: any
 function __goscriptStatic2(): any {
-	return __goscriptStatic2$value ??= ({Other: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Other(__goscriptStatic1(), ...$.stripGenericTypeArgs(args)), Value: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Value(__goscriptStatic1(), ...$.stripGenericTypeArgs(args))})
+	return __goscriptStatic2$value ??= ({Other: (receiver: any) => $.pointerValue(receiver).Other(__goscriptStatic1()), Value: (receiver: any) => $.pointerValue(receiver).Value(__goscriptStatic1())})
 }
 
 var __goscriptStatic3$value: any

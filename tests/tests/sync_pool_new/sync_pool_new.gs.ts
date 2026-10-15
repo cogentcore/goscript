@@ -5,22 +5,10 @@ import * as $ from "@goscript/builtin/index.js"
 import * as sync from "@goscript/sync/index.js"
 
 export class buffer {
-	public get data(): $.Slice<number> {
-		return this._fields.data
-	}
-
-	public set data(value: $.Slice<number>) {
-		this._fields.data = value
-	}
-
-	public _fields: {
-		data: $.Slice<number>
-	}
+	public declare data: $.Slice<number>
 
 	constructor(init?: Partial<{data?: $.Slice<number>}>, __goscriptValue?: boolean) {
-		this._fields = {
-			data: init?.data ?? (null! as $.Slice<number>)
-		}
+		this.data = init?.data ?? (null! as $.Slice<number>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -28,10 +16,9 @@ export class buffer {
 		return new buffer(this, true)
 	}
 
-	public __goscriptAssign(source: buffer): void {
-		const target = this._fields
-		const values = source._fields
-		target.data = values.data
+	public __goscriptAssign(source: buffer): this {
+		this.data = source.data
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -68,7 +55,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("len:", $.sliceLen((b$ as buffer).data), "cap:", $.cap((b$ as buffer).data))
 	put(b)
 	let c = _get()
-	await $.println("reused:", $.pointerEqual(c, b), $.sliceLen($.pointerValue<buffer>(c).data))
+	await $.println("reused:", (c === b || $.pointerAliasesMade && $.pointerEqual(c, b)), $.sliceLen($.pointerValue<buffer>(c).data))
 }
 
 if ($.isMainScript(import.meta)) {

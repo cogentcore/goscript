@@ -11,32 +11,13 @@ import * as time from "@goscript/time/index.js"
 import "@goscript/io/index.js"
 
 export class connector {
-	public get direct(): boolean {
-		return this._fields.direct
-	}
+	public declare direct: boolean
 
-	public set direct(value: boolean) {
-		this._fields.direct = value
-	}
-
-	public get blob(): boolean {
-		return this._fields.blob
-	}
-
-	public set blob(value: boolean) {
-		this._fields.blob = value
-	}
-
-	public _fields: {
-		direct: boolean
-		blob: boolean
-	}
+	public declare blob: boolean
 
 	constructor(init?: Partial<{direct?: boolean, blob?: boolean}>, __goscriptValue?: boolean) {
-		this._fields = {
-			direct: init?.direct ?? (false as boolean),
-			blob: init?.blob ?? (false as boolean)
-		}
+		this.direct = init?.direct ?? (false as boolean)
+		this.blob = init?.blob ?? (false as boolean)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -44,11 +25,10 @@ export class connector {
 		return new connector(this, true)
 	}
 
-	public __goscriptAssign(source: connector): void {
-		const target = this._fields
-		const values = source._fields
-		target.direct = values.direct
-		target.blob = values.blob
+	public __goscriptAssign(source: connector): this {
+		this.direct = source.direct
+		this.blob = source.blob
+		return this
 	}
 
 	public Begin(): [driver.Tx | null, $.GoError] {
@@ -74,7 +54,7 @@ export class connector {
 	public async ExecContext(_p0: context.Context | null, _p1: string, _p2: $.Slice<driver.NamedValue>): globalThis.Promise<[driver.Result | null, $.GoError]> {
 		const c = this;
 		await time.Sleep(1000000n)
-		return [$.namedValueInterfaceValue<driver.Result | null>(0n, "driver.RowsAffected", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()), null]
+		return [__goscriptStatic3(), null]
 	}
 
 	public Open(_p0: string): [driver.Conn | null, $.GoError] {
@@ -106,32 +86,13 @@ export class connector {
 }
 
 export class rows {
-	public get done(): boolean {
-		return this._fields.done
-	}
+	public declare done: boolean
 
-	public set done(value: boolean) {
-		this._fields.done = value
-	}
-
-	public get blob(): boolean {
-		return this._fields.blob
-	}
-
-	public set blob(value: boolean) {
-		this._fields.blob = value
-	}
-
-	public _fields: {
-		done: boolean
-		blob: boolean
-	}
+	public declare blob: boolean
 
 	constructor(init?: Partial<{done?: boolean, blob?: boolean}>, __goscriptValue?: boolean) {
-		this._fields = {
-			done: init?.done ?? (false as boolean),
-			blob: init?.blob ?? (false as boolean)
-		}
+		this.done = init?.done ?? (false as boolean)
+		this.blob = init?.blob ?? (false as boolean)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -139,11 +100,10 @@ export class rows {
 		return new rows(this, true)
 	}
 
-	public __goscriptAssign(source: rows): void {
-		const target = this._fields
-		const values = source._fields
-		target.done = values.done
-		target.blob = values.blob
+	public __goscriptAssign(source: rows): this {
+		this.done = source.done
+		this.blob = source.blob
+		return this
 	}
 
 	public Close(): $.GoError {
@@ -179,22 +139,10 @@ export class rows {
 }
 
 export class columnRows {
-	public get rows(): rows {
-		return this._fields.rows
-	}
-
-	public set rows(value: rows) {
-		this._fields.rows = value
-	}
-
-	public _fields: {
-		rows: rows
-	}
+	public declare rows: rows
 
 	constructor(init?: Partial<{rows?: rows}>, __goscriptValue?: boolean) {
-		this._fields = {
-			rows: init?.rows ? init.rows.clone() : new rows(undefined, true)
-		}
+		this.rows = init?.rows ? init.rows.clone() : new rows(undefined, true)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -202,10 +150,9 @@ export class columnRows {
 		return new columnRows(this, true)
 	}
 
-	public __goscriptAssign(source: columnRows): void {
-		const target = this._fields
-		const values = source._fields
-		$.assignStruct(target.rows, values.rows)
+	public __goscriptAssign(source: columnRows): this {
+		this.rows.__goscriptAssign(source.rows)
+		return this
 	}
 
 	public Next(_p0: $.Slice<driver.Value | null>): $.GoError {
@@ -305,22 +252,10 @@ export async function main(): globalThis.Promise<void> {
 
 	type namedInt = number
 	class tagged {
-		public get Value(): number {
-			return this._fields.Value
-		}
-
-		public set Value(value: number) {
-			this._fields.Value = value
-		}
-
-		public _fields: {
-			Value: number
-		}
+		public declare Value: number
 
 		constructor(init?: Partial<{Value?: number}>, __goscriptValue?: boolean) {
-			this._fields = {
-				Value: init?.Value ?? (0 as number)
-			}
+			this.Value = init?.Value ?? (0 as number)
 			;(this as any)[$.structValueMarker] = __goscriptValue === true
 		}
 
@@ -328,10 +263,9 @@ export async function main(): globalThis.Promise<void> {
 			return new tagged(this, true)
 		}
 
-		public __goscriptAssign(source: tagged): void {
-			const target = this._fields
-			const values = source._fields
-			target.Value = values.Value
+		public __goscriptAssign(source: tagged): this {
+			this.Value = source.Value
+			return this
 		}
 
 		static __typeInfo = $.registerStructType(
@@ -343,22 +277,10 @@ export async function main(): globalThis.Promise<void> {
 		)
 	}
 	class retagged {
-		public get Value(): number {
-			return this._fields.Value
-		}
-
-		public set Value(value: number) {
-			this._fields.Value = value
-		}
-
-		public _fields: {
-			Value: number
-		}
+		public declare Value: number
 
 		constructor(init?: Partial<{Value?: number}>, __goscriptValue?: boolean) {
-			this._fields = {
-				Value: init?.Value ?? (0 as number)
-			}
+			this.Value = init?.Value ?? (0 as number)
 			;(this as any)[$.structValueMarker] = __goscriptValue === true
 		}
 
@@ -366,10 +288,9 @@ export async function main(): globalThis.Promise<void> {
 			return new retagged(this, true)
 		}
 
-		public __goscriptAssign(source: retagged): void {
-			const target = this._fields
-			const values = source._fields
-			target.Value = values.Value
+		public __goscriptAssign(source: retagged): this {
+			this.Value = source.Value
+			return this
 		}
 
 		static __typeInfo = $.registerStructType(
@@ -380,17 +301,17 @@ export async function main(): globalThis.Promise<void> {
 			() => [/* @__PURE__ */ $.structField("Value", /* @__PURE__ */ $.basicType("int"), [0], 0, true, { tag: "json:\"second\"" })]
 		)
 	}
-	await $.println("named integer", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeFor({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int", "main.namedInt"), zero: () => 0 }})).ConvertibleTo($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic3()))!), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
-	await $.println("boolean string", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeFor(__goscriptStatic5())).ConvertibleTo($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic4()))!), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
-	await $.println("byte string", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeFor(__goscriptStatic6())).ConvertibleTo($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic4()))!), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
-	await $.println("slice array", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeFor(__goscriptStatic8())).ConvertibleTo($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic7()))!), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
-	await $.println("named elements", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeFor({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int", "main.namedInt")), zero: () => null }})).ConvertibleTo($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic8()))!), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println("named integer", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeFor({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int", "main.namedInt"), zero: () => 0 }})).ConvertibleTo($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic4()))!), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println("boolean string", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeFor(__goscriptStatic6())).ConvertibleTo($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic5()))!), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println("byte string", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeFor(__goscriptStatic7())).ConvertibleTo($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic5()))!), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println("slice array", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeFor(__goscriptStatic9())).ConvertibleTo($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic8()))!), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println("named elements", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeFor({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int", "main.namedInt")), zero: () => null }})).ConvertibleTo($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic9()))!), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	await $.println("struct tags", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeFor({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.tagged", zero: () => $.markAsStructValue(new tagged()) }})).ConvertibleTo($.pointerValueOrNil(reflect.TypeFor({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "main.retagged", zero: () => $.markAsStructValue(new retagged()) }}))!), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 }
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({LastInsertId: (receiver: any, ...args: any[]) => (driver.RowsAffected_LastInsertId as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), RowsAffected: (receiver: any, ...args: any[]) => (driver.RowsAffected_RowsAffected as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))})
+	return __goscriptStatic0$value ??= ({LastInsertId: (receiver: any) => (driver.RowsAffected_LastInsertId as any)(($.isVarRef(receiver) ? receiver.value : receiver)), RowsAffected: (receiver: any) => (driver.RowsAffected_RowsAffected as any)(($.isVarRef(receiver) ? receiver.value : receiver))})
 }
 
 var __goscriptStatic1$value: any
@@ -405,32 +326,37 @@ function __goscriptStatic2(): any {
 
 var __goscriptStatic3$value: any
 function __goscriptStatic3(): any {
-	return __goscriptStatic3$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int64"), zero: () => 0n }})
+	return __goscriptStatic3$value ??= ($.namedValueInterfaceValue<driver.Result | null>(0n, "driver.RowsAffected", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()))
 }
 
 var __goscriptStatic4$value: any
 function __goscriptStatic4(): any {
-	return __goscriptStatic4$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }})
+	return __goscriptStatic4$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int64"), zero: () => 0n }})
 }
 
 var __goscriptStatic5$value: any
 function __goscriptStatic5(): any {
-	return __goscriptStatic5$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("bool"), zero: () => false }})
+	return __goscriptStatic5$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }})
 }
 
 var __goscriptStatic6$value: any
 function __goscriptStatic6(): any {
-	return __goscriptStatic6$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")), zero: () => null }})
+	return __goscriptStatic6$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("bool"), zero: () => false }})
 }
 
 var __goscriptStatic7$value: any
 function __goscriptStatic7(): any {
-	return __goscriptStatic7$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2), zero: () => $.arrayValue(globalThis.Array.from({ length: 2 }, () => 0)) }})
+	return __goscriptStatic7$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")), zero: () => null }})
 }
 
 var __goscriptStatic8$value: any
 function __goscriptStatic8(): any {
-	return __goscriptStatic8$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")), zero: () => null }})
+	return __goscriptStatic8$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2), zero: () => $.arrayValue(globalThis.Array.from({ length: 2 }, () => 0)) }})
+}
+
+var __goscriptStatic9$value: any
+function __goscriptStatic9(): any {
+	return __goscriptStatic9$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")), zero: () => null }})
 }
 
 var __goscriptAwait: any

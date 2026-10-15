@@ -9,13 +9,13 @@ $.registerNamedType("main.Hash", /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.b
 
 $.registerNamedValueType(
 	"main.Hash",
-	{Valid: (receiver: any, ...args: any[]) => (Hash_Valid as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	{Valid: (receiver: any) => (Hash_Valid as any)(($.isVarRef(receiver) ? receiver.value : receiver))},
 	[$.methodSignature("Valid", [], [/* @__PURE__ */ $.basicType("bool")])]
 );
 
 $.registerNamedValueType(
 	"*main.Hash",
-	{Valid: (receiver: any, ...args: any[]) => (Hash_Valid as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	{Valid: (receiver: any) => (Hash_Valid as any)($.pointerValue(receiver))},
 	[$.methodSignature("Valid", [], [/* @__PURE__ */ $.basicType("bool")])]
 );
 

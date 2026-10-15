@@ -2,37 +2,16 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
-
 import * as math from "@goscript/math/index.js"
-import "@goscript/math/index.js"
 
 export class pos {
-	public get Line(): number {
-		return this._fields.Line
-	}
+	public declare Line: number
 
-	public set Line(value: number) {
-		this._fields.Line = value
-	}
-
-	public get Char(): number {
-		return this._fields.Char
-	}
-
-	public set Char(value: number) {
-		this._fields.Char = value
-	}
-
-	public _fields: {
-		Line: number
-		Char: number
-	}
+	public declare Char: number
 
 	constructor(init?: Partial<{Line?: number, Char?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Line: init?.Line ?? (0 as number),
-			Char: init?.Char ?? (0 as number)
-		}
+		this.Line = init?.Line ?? (0 as number)
+		this.Char = init?.Char ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -40,11 +19,10 @@ export class pos {
 		return new pos(this, true)
 	}
 
-	public __goscriptAssign(source: pos): void {
-		const target = this._fields
-		const values = source._fields
-		target.Line = values.Line
-		target.Char = values.Char
+	public __goscriptAssign(source: pos): this {
+		this.Line = source.Line
+		this.Char = source.Char
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -57,32 +35,13 @@ export class pos {
 }
 
 export class stamp {
-	public get Sec(): bigint {
-		return this._fields.Sec
-	}
+	public declare Sec: bigint
 
-	public set Sec(value: bigint) {
-		this._fields.Sec = value
-	}
-
-	public get NSec(): number {
-		return this._fields.NSec
-	}
-
-	public set NSec(value: number) {
-		this._fields.NSec = value
-	}
-
-	public _fields: {
-		Sec: bigint
-		NSec: number
-	}
+	public declare NSec: number
 
 	constructor(init?: Partial<{Sec?: bigint, NSec?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Sec: init?.Sec ?? (0n as bigint),
-			NSec: init?.NSec ?? (0 as number)
-		}
+		this.Sec = init?.Sec ?? (0n as bigint)
+		this.NSec = init?.NSec ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -90,11 +49,10 @@ export class stamp {
 		return new stamp(this, true)
 	}
 
-	public __goscriptAssign(source: stamp): void {
-		const target = this._fields
-		const values = source._fields
-		target.Sec = values.Sec
-		target.NSec = values.NSec
+	public __goscriptAssign(source: stamp): this {
+		this.Sec = source.Sec
+		this.NSec = source.NSec
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -107,42 +65,16 @@ export class stamp {
 }
 
 export class region {
-	public get Start(): pos {
-		return this._fields.Start
-	}
+	public declare Start: pos
 
-	public set Start(value: pos) {
-		this._fields.Start = value
-	}
+	public declare End: pos
 
-	public get End(): pos {
-		return this._fields.End
-	}
-
-	public set End(value: pos) {
-		this._fields.End = value
-	}
-
-	public get Time(): stamp {
-		return this._fields.Time
-	}
-
-	public set Time(value: stamp) {
-		this._fields.Time = value
-	}
-
-	public _fields: {
-		Start: pos
-		End: pos
-		Time: stamp
-	}
+	public declare Time: stamp
 
 	constructor(init?: Partial<{Start?: pos, End?: pos, Time?: stamp}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Start: init?.Start ? init.Start.clone() : new pos(undefined, true),
-			End: init?.End ? init.End.clone() : new pos(undefined, true),
-			Time: init?.Time ? init.Time.clone() : new stamp(undefined, true)
-		}
+		this.Start = init?.Start ? init.Start.clone() : new pos(undefined, true)
+		this.End = init?.End ? init.End.clone() : new pos(undefined, true)
+		this.Time = init?.Time ? init.Time.clone() : new stamp(undefined, true)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -150,12 +82,11 @@ export class region {
 		return new region(this, true)
 	}
 
-	public __goscriptAssign(source: region): void {
-		const target = this._fields
-		const values = source._fields
-		$.assignStruct(target.Start, values.Start)
-		$.assignStruct(target.End, values.End)
-		$.assignStruct(target.Time, values.Time)
+	public __goscriptAssign(source: region): this {
+		this.Start.__goscriptAssign(source.Start)
+		this.End.__goscriptAssign(source.End)
+		this.Time.__goscriptAssign(source.Time)
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -168,22 +99,10 @@ export class region {
 }
 
 export class node {
-	public get Name(): string {
-		return this._fields.Name
-	}
-
-	public set Name(value: string) {
-		this._fields.Name = value
-	}
-
-	public _fields: {
-		Name: string
-	}
+	public declare Name: string
 
 	constructor(init?: Partial<{Name?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Name: init?.Name ?? ("" as string)
-		}
+		this.Name = init?.Name ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -191,10 +110,9 @@ export class node {
 		return new node(this, true)
 	}
 
-	public __goscriptAssign(source: node): void {
-		const target = this._fields
-		const values = source._fields
-		target.Name = values.Name
+	public __goscriptAssign(source: node): this {
+		this.Name = source.Name
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -207,82 +125,28 @@ export class node {
 }
 
 export class mixed {
-	public get Name(): string {
-		return this._fields.Name
-	}
+	public declare Name: string
 
-	public set Name(value: string) {
-		this._fields.Name = value
-	}
+	public declare F: number
 
-	public get F(): number {
-		return this._fields.F
-	}
+	public declare OK: boolean
 
-	public set F(value: number) {
-		this._fields.F = value
-	}
+	public declare Ptr: node | $.VarRef<node> | null
 
-	public get OK(): boolean {
-		return this._fields.OK
-	}
+	public declare Any: any
 
-	public set OK(value: boolean) {
-		this._fields.OK = value
-	}
+	public declare _blank5: number
 
-	public get Ptr(): node | $.VarRef<node> | null {
-		return this._fields.Ptr
-	}
-
-	public set Ptr(value: node | $.VarRef<node> | null) {
-		this._fields.Ptr = value
-	}
-
-	public get Any(): any {
-		return this._fields.Any
-	}
-
-	public set Any(value: any) {
-		this._fields.Any = value
-	}
-
-	public get _blank5(): number {
-		return this._fields._blank5
-	}
-
-	public set _blank5(value: number) {
-		this._fields._blank5 = value
-	}
-
-	public get Inner(): pos {
-		return this._fields.Inner
-	}
-
-	public set Inner(value: pos) {
-		this._fields.Inner = value
-	}
-
-	public _fields: {
-		Name: string
-		F: number
-		OK: boolean
-		Ptr: node | $.VarRef<node> | null
-		Any: any
-		_blank5: number
-		Inner: pos
-	}
+	public declare Inner: pos
 
 	constructor(init?: Partial<{Name?: string, F?: number, OK?: boolean, Ptr?: node | $.VarRef<node> | null, Any?: any, _blank5?: number, Inner?: pos}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Name: init?.Name ?? ("" as string),
-			F: init?.F ?? (0 as number),
-			OK: init?.OK ?? (false as boolean),
-			Ptr: init?.Ptr ?? (null! as node | $.VarRef<node> | null),
-			Any: init?.Any ?? (null! as any),
-			_blank5: init?._blank5 ?? (0 as number),
-			Inner: init?.Inner ? init.Inner.clone() : new pos(undefined, true)
-		}
+		this.Name = init?.Name ?? ("" as string)
+		this.F = init?.F ?? (0 as number)
+		this.OK = init?.OK ?? (false as boolean)
+		this.Ptr = init?.Ptr ?? (null! as node | $.VarRef<node> | null)
+		this.Any = init?.Any ?? (null! as any)
+		this._blank5 = init?._blank5 ?? (0 as number)
+		this.Inner = init?.Inner ? init.Inner.clone() : new pos(undefined, true)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -290,16 +154,15 @@ export class mixed {
 		return new mixed(this, true)
 	}
 
-	public __goscriptAssign(source: mixed): void {
-		const target = this._fields
-		const values = source._fields
-		target.Name = values.Name
-		target.F = values.F
-		target.OK = values.OK
-		target.Ptr = values.Ptr
-		target.Any = $.assignFieldValue(target.Any, values.Any, { kind: $.TypeKind.Interface, methods: [] })
-		target._blank5 = values._blank5
-		$.assignStruct(target.Inner, values.Inner)
+	public __goscriptAssign(source: mixed): this {
+		this.Name = source.Name
+		this.F = source.F
+		this.OK = source.OK
+		this.Ptr = source.Ptr
+		this.Any = $.assignFieldValue(this.Any, source.Any, { kind: $.TypeKind.Interface, methods: [] })
+		this._blank5 = source._blank5
+		this.Inner.__goscriptAssign(source.Inner)
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -312,22 +175,10 @@ export class mixed {
 }
 
 export class withArray {
-	public get Vals(): number[] {
-		return this._fields.Vals
-	}
-
-	public set Vals(value: number[]) {
-		this._fields.Vals = value
-	}
-
-	public _fields: {
-		Vals: number[]
-	}
+	public declare Vals: number[]
 
 	constructor(init?: Partial<{Vals?: number[]}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Vals: init?.Vals !== undefined ? $.cloneArrayValue(init.Vals, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2)) : $.arrayValue(globalThis.Array.from({ length: 2 }, () => 0))
-		}
+		this.Vals = init?.Vals !== undefined ? $.cloneArrayValue(init.Vals, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2)) : $.arrayValue(globalThis.Array.from({ length: 2 }, () => 0))
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -335,10 +186,9 @@ export class withArray {
 		return new withArray(this, true)
 	}
 
-	public __goscriptAssign(source: withArray): void {
-		const target = this._fields
-		const values = source._fields
-		target.Vals = $.assignFieldValue(target.Vals, values.Vals, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2))
+	public __goscriptAssign(source: withArray): this {
+		this.Vals = $.assignFieldValue(this.Vals, source.Vals, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2))
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -357,7 +207,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("equal:", (a.Start.Line === b.Start.Line && a.Start.Char === b.Start.Char && a.End.Line === b.End.Line && a.End.Char === b.End.Char && a.Time.Sec === b.Time.Sec && a.Time.NSec === b.Time.NSec), !(a.Start.Line === b.Start.Line && a.Start.Char === b.Start.Char && a.End.Line === b.End.Line && a.End.Char === b.End.Char && a.Time.Sec === b.Time.Sec && a.Time.NSec === b.Time.NSec), (a.Start.Line === b.Start.Line && a.Start.Char === b.Start.Char))
 	b.End.Char++
 	await $.println("end differs:", (a.Start.Line === b.Start.Line && a.Start.Char === b.Start.Char && a.End.Line === b.End.Line && a.End.Char === b.End.Char && a.Time.Sec === b.Time.Sec && a.Time.NSec === b.Time.NSec), !(a.Start.Line === b.Start.Line && a.Start.Char === b.Start.Char && a.End.Line === b.End.Line && a.End.Char === b.End.Char && a.Time.Sec === b.Time.Sec && a.Time.NSec === b.Time.NSec), (a.End.Line === b.End.Line && a.End.Char === b.End.Char))
-	b = $.assignStruct(b, a)
+	b = b.__goscriptAssign(a)
 	b.Time.Sec = 1099511627776n
 	await $.println("time differs:", (a.Start.Line === b.Start.Line && a.Start.Char === b.Start.Char && a.End.Line === b.End.Line && a.End.Char === b.End.Char && a.Time.Sec === b.Time.Sec && a.Time.NSec === b.Time.NSec))
 
@@ -369,12 +219,12 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("mixed:", (m1.Name === m2.Name && m1.F === m2.F && m1.OK === m2.OK && $.pointerEqual(m1.Ptr, m2.Ptr) && $.comparableEqual(m1.Any, m2.Any) && m1.Inner.Line === m2.Inner.Line && m1.Inner.Char === m2.Inner.Char))
 	m2.Ptr = n2
 	await $.println("other pointer:", (m1.Name === m2.Name && m1.F === m2.F && m1.OK === m2.OK && $.pointerEqual(m1.Ptr, m2.Ptr) && $.comparableEqual(m1.Any, m2.Any) && m1.Inner.Line === m2.Inner.Line && m1.Inner.Char === m2.Inner.Char))
-	m2 = $.assignStruct(m2, m1)
+	m2 = m2.__goscriptAssign(m1)
 	m2.Any = $.interfaceValue(new pos({Line: 1, Char: 2}, true), "main.pos", "main.pos")
 	await $.println("other interface value:", (m1.Name === m2.Name && m1.F === m2.F && m1.OK === m2.OK && $.pointerEqual(m1.Ptr, m2.Ptr) && $.comparableEqual(m1.Any, m2.Any) && m1.Inner.Line === m2.Inner.Line && m1.Inner.Char === m2.Inner.Char))
 	m2.Any = "text"
 	await $.println("other interface type:", (m1.Name === m2.Name && m1.F === m2.F && m1.OK === m2.OK && $.pointerEqual(m1.Ptr, m2.Ptr) && $.comparableEqual(m1.Any, m2.Any) && m1.Inner.Line === m2.Inner.Line && m1.Inner.Char === m2.Inner.Char))
-	m2 = $.assignStruct(m2, m1)
+	m2 = m2.__goscriptAssign(m1)
 	m2.F = math.NaN()
 	let m3 = (m2).clone()
 	await $.println("NaN:", (m2.Name === m3.Name && m2.F === m3.F && m2.OK === m3.OK && $.pointerEqual(m2.Ptr, m3.Ptr) && $.comparableEqual(m2.Any, m3.Any) && m2.Inner.Line === m3.Inner.Line && m2.Inner.Char === m3.Inner.Char), !(m2.Name === m3.Name && m2.F === m3.F && m2.OK === m3.OK && $.pointerEqual(m2.Ptr, m3.Ptr) && $.comparableEqual(m2.Any, m3.Any) && m2.Inner.Line === m3.Inner.Line && m2.Inner.Char === m3.Inner.Char))

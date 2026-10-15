@@ -6,22 +6,10 @@ import * as __goscript_b from "./b.gs.ts"
 import * as __goscript_package_init from "./__goscript_package_init.gs.ts"
 
 export class holder {
-	public get n(): number {
-		return this._fields.n
-	}
-
-	public set n(value: number) {
-		this._fields.n = value
-	}
-
-	public _fields: {
-		n: number
-	}
+	public declare n: number
 
 	constructor(init?: Partial<{n?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			n: init?.n ?? (0 as number)
-		}
+		this.n = init?.n ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -29,10 +17,9 @@ export class holder {
 		return new holder(this, true)
 	}
 
-	public __goscriptAssign(source: holder): void {
-		const target = this._fields
-		const values = source._fields
-		target.n = values.n
+	public __goscriptAssign(source: holder): this {
+		this.n = source.n
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

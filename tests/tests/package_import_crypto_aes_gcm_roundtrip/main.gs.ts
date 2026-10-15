@@ -17,22 +17,10 @@ $.registerInterfaceType(
 );
 
 export class wrappedAEAD {
-	public get inner(): cipher.AEAD | null {
-		return this._fields.inner
-	}
-
-	public set inner(value: cipher.AEAD | null) {
-		this._fields.inner = value
-	}
-
-	public _fields: {
-		inner: cipher.AEAD | null
-	}
+	public declare inner: cipher.AEAD | null
 
 	constructor(init?: Partial<{inner?: cipher.AEAD | null}>, __goscriptValue?: boolean) {
-		this._fields = {
-			inner: init?.inner ?? (null! as cipher.AEAD | null)
-		}
+		this.inner = init?.inner ?? (null! as cipher.AEAD | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -40,10 +28,9 @@ export class wrappedAEAD {
 		return new wrappedAEAD(this, true)
 	}
 
-	public __goscriptAssign(source: wrappedAEAD): void {
-		const target = this._fields
-		const values = source._fields
-		target.inner = $.assignFieldValue(target.inner, values.inner, "cipher.AEAD")
+	public __goscriptAssign(source: wrappedAEAD): this {
+		this.inner = $.assignFieldValue(this.inner, source.inner, "cipher.AEAD")
+		return this
 	}
 
 	public async NonceSize(): globalThis.Promise<number> {
@@ -76,42 +63,16 @@ export class wrappedAEAD {
 }
 
 export class nestedSealer {
-	public get aead(): cipher.AEAD | null {
-		return this._fields.aead
-	}
+	public declare aead: cipher.AEAD | null
 
-	public set aead(value: cipher.AEAD | null) {
-		this._fields.aead = value
-	}
+	public declare nonce: $.Slice<number>
 
-	public get nonce(): $.Slice<number> {
-		return this._fields.nonce
-	}
-
-	public set nonce(value: $.Slice<number>) {
-		this._fields.nonce = value
-	}
-
-	public get aad(): $.Slice<number> {
-		return this._fields.aad
-	}
-
-	public set aad(value: $.Slice<number>) {
-		this._fields.aad = value
-	}
-
-	public _fields: {
-		aead: cipher.AEAD | null
-		nonce: $.Slice<number>
-		aad: $.Slice<number>
-	}
+	public declare aad: $.Slice<number>
 
 	constructor(init?: Partial<{aead?: cipher.AEAD | null, nonce?: $.Slice<number>, aad?: $.Slice<number>}>, __goscriptValue?: boolean) {
-		this._fields = {
-			aead: init?.aead ?? (null! as cipher.AEAD | null),
-			nonce: init?.nonce ?? (null! as $.Slice<number>),
-			aad: init?.aad ?? (null! as $.Slice<number>)
-		}
+		this.aead = init?.aead ?? (null! as cipher.AEAD | null)
+		this.nonce = init?.nonce ?? (null! as $.Slice<number>)
+		this.aad = init?.aad ?? (null! as $.Slice<number>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -119,12 +80,11 @@ export class nestedSealer {
 		return new nestedSealer(this, true)
 	}
 
-	public __goscriptAssign(source: nestedSealer): void {
-		const target = this._fields
-		const values = source._fields
-		target.aead = $.assignFieldValue(target.aead, values.aead, "cipher.AEAD")
-		target.nonce = values.nonce
-		target.aad = values.aad
+	public __goscriptAssign(source: nestedSealer): this {
+		this.aead = $.assignFieldValue(this.aead, source.aead, "cipher.AEAD")
+		this.nonce = source.nonce
+		this.aad = source.aad
+		return this
 	}
 
 	public async Seal(dst: $.Slice<number>, plaintext: $.Slice<number>): globalThis.Promise<$.Slice<number>> {

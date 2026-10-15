@@ -5,42 +5,16 @@ import * as $ from "@goscript/builtin/index.js"
 import * as json from "@goscript/encoding/json/index.js"
 
 export class Person {
-	public get Name(): string {
-		return this._fields.Name
-	}
+	public declare Name: string
 
-	public set Name(value: string) {
-		this._fields.Name = value
-	}
+	public declare Age: number
 
-	public get Age(): number {
-		return this._fields.Age
-	}
-
-	public set Age(value: number) {
-		this._fields.Age = value
-	}
-
-	public get Active(): boolean {
-		return this._fields.Active
-	}
-
-	public set Active(value: boolean) {
-		this._fields.Active = value
-	}
-
-	public _fields: {
-		Name: string
-		Age: number
-		Active: boolean
-	}
+	public declare Active: boolean
 
 	constructor(init?: Partial<{Name?: string, Age?: number, Active?: boolean}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Name: init?.Name ?? ("" as string),
-			Age: init?.Age ?? (0 as number),
-			Active: init?.Active ?? (false as boolean)
-		}
+		this.Name = init?.Name ?? ("" as string)
+		this.Age = init?.Age ?? (0 as number)
+		this.Active = init?.Active ?? (false as boolean)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -48,12 +22,11 @@ export class Person {
 		return new Person(this, true)
 	}
 
-	public __goscriptAssign(source: Person): void {
-		const target = this._fields
-		const values = source._fields
-		target.Name = values.Name
-		target.Age = values.Age
-		target.Active = values.Active
+	public __goscriptAssign(source: Person): this {
+		this.Name = source.Name
+		this.Age = source.Age
+		this.Active = source.Active
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

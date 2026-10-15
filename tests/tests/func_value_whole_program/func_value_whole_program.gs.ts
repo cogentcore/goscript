@@ -18,32 +18,13 @@ $.registerInterfaceType(
 export type labeler = ((_p0: number) => string | globalThis.Promise<string>) | null
 
 export class Rule {
-	public get name(): string {
-		return this._fields.name
-	}
+	public declare name: string
 
-	public set name(value: string) {
-		this._fields.name = value
-	}
-
-	public get act(): ((r: Rule | $.VarRef<Rule> | null, n: number) => number | globalThis.Promise<number>) | null {
-		return this._fields.act
-	}
-
-	public set act(value: ((r: Rule | $.VarRef<Rule> | null, n: number) => number | globalThis.Promise<number>) | null) {
-		this._fields.act = value
-	}
-
-	public _fields: {
-		name: string
-		act: ((r: Rule | $.VarRef<Rule> | null, n: number) => number | globalThis.Promise<number>) | null
-	}
+	public declare act: ((r: Rule | $.VarRef<Rule> | null, n: number) => number | globalThis.Promise<number>) | null
 
 	constructor(init?: Partial<{name?: string, act?: ((r: Rule | $.VarRef<Rule> | null, n: number) => number | globalThis.Promise<number>) | null}>, __goscriptValue?: boolean) {
-		this._fields = {
-			name: init?.name ?? ("" as string),
-			act: init?.act ?? (null! as ((r: Rule | $.VarRef<Rule> | null, n: number) => number | globalThis.Promise<number>) | null)
-		}
+		this.name = init?.name ?? ("" as string)
+		this.act = init?.act ?? (null! as ((r: Rule | $.VarRef<Rule> | null, n: number) => number | globalThis.Promise<number>) | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -51,11 +32,10 @@ export class Rule {
 		return new Rule(this, true)
 	}
 
-	public __goscriptAssign(source: Rule): void {
-		const target = this._fields
-		const values = source._fields
-		target.name = values.name
-		target.act = values.act
+	public __goscriptAssign(source: Rule): this {
+		this.name = source.name
+		this.act = source.act
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -68,22 +48,10 @@ export class Rule {
 }
 
 export class counter {
-	public get total(): number {
-		return this._fields.total
-	}
-
-	public set total(value: number) {
-		this._fields.total = value
-	}
-
-	public _fields: {
-		total: number
-	}
+	public declare total: number
 
 	constructor(init?: Partial<{total?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			total: init?.total ?? (0 as number)
-		}
+		this.total = init?.total ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -91,10 +59,9 @@ export class counter {
 		return new counter(this, true)
 	}
 
-	public __goscriptAssign(source: counter): void {
-		const target = this._fields
-		const values = source._fields
-		target.total = values.total
+	public __goscriptAssign(source: counter): this {
+		this.total = source.total
+		return this
 	}
 
 	public add(k: number): void {
@@ -113,22 +80,10 @@ export class counter {
 }
 
 export class chanSource {
-	public get ch(): $.Channel<number> | null {
-		return this._fields.ch
-	}
-
-	public set ch(value: $.Channel<number> | null) {
-		this._fields.ch = value
-	}
-
-	public _fields: {
-		ch: $.Channel<number> | null
-	}
+	public declare ch: $.Channel<number> | null
 
 	constructor(init?: Partial<{ch?: $.Channel<number> | null}>, __goscriptValue?: boolean) {
-		this._fields = {
-			ch: init?.ch ?? (null! as $.Channel<number> | null)
-		}
+		this.ch = init?.ch ?? (null! as $.Channel<number> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -136,10 +91,9 @@ export class chanSource {
 		return new chanSource(this, true)
 	}
 
-	public __goscriptAssign(source: chanSource): void {
-		const target = this._fields
-		const values = source._fields
-		target.ch = values.ch
+	public __goscriptAssign(source: chanSource): this {
+		this.ch = source.ch
+		return this
 	}
 
 	public async Next(): globalThis.Promise<number> {
@@ -159,22 +113,10 @@ export class chanSource {
 }
 
 export class fnSource {
-	public get f(): (() => number | globalThis.Promise<number>) | null {
-		return this._fields.f
-	}
-
-	public set f(value: (() => number | globalThis.Promise<number>) | null) {
-		this._fields.f = value
-	}
-
-	public _fields: {
-		f: (() => number | globalThis.Promise<number>) | null
-	}
+	public declare f: (() => number | globalThis.Promise<number>) | null
 
 	constructor(init?: Partial<{f?: (() => number | globalThis.Promise<number>) | null}>, __goscriptValue?: boolean) {
-		this._fields = {
-			f: init?.f ?? (null! as (() => number | globalThis.Promise<number>) | null)
-		}
+		this.f = init?.f ?? (null! as (() => number | globalThis.Promise<number>) | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -182,10 +124,9 @@ export class fnSource {
 		return new fnSource(this, true)
 	}
 
-	public __goscriptAssign(source: fnSource): void {
-		const target = this._fields
-		const values = source._fields
-		target.f = values.f
+	public __goscriptAssign(source: fnSource): this {
+		this.f = source.f
+		return this
 	}
 
 	public async Next(): globalThis.Promise<number> {

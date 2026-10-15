@@ -19,13 +19,13 @@ $.registerNamedType("main.valueHash", /* @__PURE__ */ $.arrayType(/* @__PURE__ *
 
 $.registerNamedValueType(
 	"main.valueHash",
-	{Key: (receiver: any, ...args: any[]) => (valueHash_Key as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))},
+	{Key: (receiver: any) => (valueHash_Key as any)(($.isVarRef(receiver) ? receiver.value : receiver))},
 	[$.methodSignature("Key", [], [{ kind: $.TypeKind.Interface, methods: [] }])]
 );
 
 $.registerNamedValueType(
 	"*main.valueHash",
-	{Key: (receiver: any, ...args: any[]) => (valueHash_Key as any)($.pointerValue(receiver), ...$.stripGenericTypeArgs(args))},
+	{Key: (receiver: any) => (valueHash_Key as any)($.pointerValue(receiver))},
 	[$.methodSignature("Key", [], [{ kind: $.TypeKind.Interface, methods: [] }])]
 );
 
@@ -52,7 +52,7 @@ export async function main(): globalThis.Promise<void> {
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({Key: (receiver: any, ...args: any[]) => (valueHash_Key as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))})
+	return __goscriptStatic0$value ??= ({Key: (receiver: any) => (valueHash_Key as any)(($.isVarRef(receiver) ? receiver.value : receiver))})
 }
 
 var __goscriptStatic1$value: any

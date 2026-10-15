@@ -26,22 +26,10 @@ $.registerInterfaceType(
 export type Transform = ((_p0: number) => number | globalThis.Promise<number>) | null
 
 export class prefixLogger {
-	public get prefix(): string {
-		return this._fields.prefix
-	}
-
-	public set prefix(value: string) {
-		this._fields.prefix = value
-	}
-
-	public _fields: {
-		prefix: string
-	}
+	public declare prefix: string
 
 	constructor(init?: Partial<{prefix?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			prefix: init?.prefix ?? ("" as string)
-		}
+		this.prefix = init?.prefix ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -49,10 +37,9 @@ export class prefixLogger {
 		return new prefixLogger(this, true)
 	}
 
-	public __goscriptAssign(source: prefixLogger): void {
-		const target = this._fields
-		const values = source._fields
-		target.prefix = values.prefix
+	public __goscriptAssign(source: prefixLogger): this {
+		this.prefix = source.prefix
+		return this
 	}
 
 	public Log(msg: string): string {
@@ -70,22 +57,10 @@ export class prefixLogger {
 }
 
 export class addSink {
-	public get total(): number {
-		return this._fields.total
-	}
-
-	public set total(value: number) {
-		this._fields.total = value
-	}
-
-	public _fields: {
-		total: number
-	}
+	public declare total: number
 
 	constructor(init?: Partial<{total?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			total: init?.total ?? (0 as number)
-		}
+		this.total = init?.total ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -93,10 +68,9 @@ export class addSink {
 		return new addSink(this, true)
 	}
 
-	public __goscriptAssign(source: addSink): void {
-		const target = this._fields
-		const values = source._fields
-		target.total = values.total
+	public __goscriptAssign(source: addSink): this {
+		this.total = source.total
+		return this
 	}
 
 	public Put(n: number): number {
@@ -116,22 +90,10 @@ export class addSink {
 }
 
 export class chanSink {
-	public get ch(): $.Channel<number> | null {
-		return this._fields.ch
-	}
-
-	public set ch(value: $.Channel<number> | null) {
-		this._fields.ch = value
-	}
-
-	public _fields: {
-		ch: $.Channel<number> | null
-	}
+	public declare ch: $.Channel<number> | null
 
 	constructor(init?: Partial<{ch?: $.Channel<number> | null}>, __goscriptValue?: boolean) {
-		this._fields = {
-			ch: init?.ch ?? (null! as $.Channel<number> | null)
-		}
+		this.ch = init?.ch ?? (null! as $.Channel<number> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -139,10 +101,9 @@ export class chanSink {
 		return new chanSink(this, true)
 	}
 
-	public __goscriptAssign(source: chanSink): void {
-		const target = this._fields
-		const values = source._fields
-		target.ch = values.ch
+	public __goscriptAssign(source: chanSink): this {
+		this.ch = source.ch
+		return this
 	}
 
 	public async Put(n: number): globalThis.Promise<number> {
@@ -162,33 +123,14 @@ export class chanSink {
 }
 
 export class Button {
-	public get OnClick(): ((clicks: number) => number | globalThis.Promise<number>) | null {
-		return this._fields.OnClick
-	}
-
-	public set OnClick(value: ((clicks: number) => number | globalThis.Promise<number>) | null) {
-		this._fields.OnClick = value
-	}
+	public declare OnClick: ((clicks: number) => number | globalThis.Promise<number>) | null
 
 	// OnHover keeps the shape's coloring.
-	public get OnHover(): ((clicks: number) => number | globalThis.Promise<number>) | null {
-		return this._fields.OnHover
-	}
-
-	public set OnHover(value: ((clicks: number) => number | globalThis.Promise<number>) | null) {
-		this._fields.OnHover = value
-	}
-
-	public _fields: {
-		OnClick: ((clicks: number) => number | globalThis.Promise<number>) | null
-		OnHover: ((clicks: number) => number | globalThis.Promise<number>) | null
-	}
+	public declare OnHover: ((clicks: number) => number | globalThis.Promise<number>) | null
 
 	constructor(init?: Partial<{OnClick?: ((clicks: number) => number | globalThis.Promise<number>) | null, OnHover?: ((clicks: number) => number | globalThis.Promise<number>) | null}>, __goscriptValue?: boolean) {
-		this._fields = {
-			OnClick: init?.OnClick ?? (null! as ((clicks: number) => number | globalThis.Promise<number>) | null),
-			OnHover: init?.OnHover ?? (null! as ((clicks: number) => number | globalThis.Promise<number>) | null)
-		}
+		this.OnClick = init?.OnClick ?? (null! as ((clicks: number) => number | globalThis.Promise<number>) | null)
+		this.OnHover = init?.OnHover ?? (null! as ((clicks: number) => number | globalThis.Promise<number>) | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -196,11 +138,10 @@ export class Button {
 		return new Button(this, true)
 	}
 
-	public __goscriptAssign(source: Button): void {
-		const target = this._fields
-		const values = source._fields
-		target.OnClick = values.OnClick
-		target.OnHover = values.OnHover
+	public __goscriptAssign(source: Button): this {
+		this.OnClick = source.OnClick
+		this.OnHover = source.OnHover
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -213,22 +154,10 @@ export class Button {
 }
 
 export class summer {
-	public get n(): number {
-		return this._fields.n
-	}
-
-	public set n(value: number) {
-		this._fields.n = value
-	}
-
-	public _fields: {
-		n: number
-	}
+	public declare n: number
 
 	constructor(init?: Partial<{n?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			n: init?.n ?? (0 as number)
-		}
+		this.n = init?.n ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -236,10 +165,9 @@ export class summer {
 		return new summer(this, true)
 	}
 
-	public __goscriptAssign(source: summer): void {
-		const target = this._fields
-		const values = source._fields
-		target.n = values.n
+	public __goscriptAssign(source: summer): this {
+		this.n = source.n
+		return this
 	}
 
 	public sum(fs: $.Slice<((_p0: number) => number | globalThis.Promise<number>) | null>): number {

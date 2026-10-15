@@ -7,32 +7,13 @@ import * as fmt from "@goscript/fmt/index.js"
 import * as strconv from "@goscript/strconv/index.js"
 
 export class point {
-	public get x(): number {
-		return this._fields.x
-	}
+	public declare x: number
 
-	public set x(value: number) {
-		this._fields.x = value
-	}
-
-	public get y(): number {
-		return this._fields.y
-	}
-
-	public set y(value: number) {
-		this._fields.y = value
-	}
-
-	public _fields: {
-		x: number
-		y: number
-	}
+	public declare y: number
 
 	constructor(init?: Partial<{x?: number, y?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			x: init?.x ?? (0 as number),
-			y: init?.y ?? (0 as number)
-		}
+		this.x = init?.x ?? (0 as number)
+		this.y = init?.y ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -40,11 +21,10 @@ export class point {
 		return new point(this, true)
 	}
 
-	public __goscriptAssign(source: point): void {
-		const target = this._fields
-		const values = source._fields
-		target.x = values.x
-		target.y = values.y
+	public __goscriptAssign(source: point): this {
+		this.x = source.x
+		this.y = source.y
+		return this
 	}
 
 	public String(): string {
@@ -62,32 +42,13 @@ export class point {
 }
 
 export class lineError {
-	public get line(): number {
-		return this._fields.line
-	}
+	public declare line: number
 
-	public set line(value: number) {
-		this._fields.line = value
-	}
-
-	public get err(): $.GoError {
-		return this._fields.err
-	}
-
-	public set err(value: $.GoError) {
-		this._fields.err = value
-	}
-
-	public _fields: {
-		line: number
-		err: $.GoError
-	}
+	public declare err: $.GoError
 
 	constructor(init?: Partial<{line?: number, err?: $.GoError}>, __goscriptValue?: boolean) {
-		this._fields = {
-			line: init?.line ?? (0 as number),
-			err: init?.err ?? (null! as $.GoError)
-		}
+		this.line = init?.line ?? (0 as number)
+		this.err = init?.err ?? (null! as $.GoError)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -95,11 +56,10 @@ export class lineError {
 		return new lineError(this, true)
 	}
 
-	public __goscriptAssign(source: lineError): void {
-		const target = this._fields
-		const values = source._fields
-		target.line = values.line
-		target.err = $.assignFieldValue(target.err, values.err, "error")
+	public __goscriptAssign(source: lineError): this {
+		this.line = source.line
+		this.err = $.assignFieldValue(this.err, source.err, "error")
+		return this
 	}
 
 	public Error(): string {

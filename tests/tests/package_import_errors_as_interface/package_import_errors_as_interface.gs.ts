@@ -16,22 +16,10 @@ $.registerInterfaceType(
 );
 
 export class wrappedHealthError {
-	public get err(): $.GoError {
-		return this._fields.err
-	}
-
-	public set err(value: $.GoError) {
-		this._fields.err = value
-	}
-
-	public _fields: {
-		err: $.GoError
-	}
+	public declare err: $.GoError
 
 	constructor(init?: Partial<{err?: $.GoError}>, __goscriptValue?: boolean) {
-		this._fields = {
-			err: init?.err ?? (null! as $.GoError)
-		}
+		this.err = init?.err ?? (null! as $.GoError)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -39,10 +27,9 @@ export class wrappedHealthError {
 		return new wrappedHealthError(this, true)
 	}
 
-	public __goscriptAssign(source: wrappedHealthError): void {
-		const target = this._fields
-		const values = source._fields
-		target.err = $.assignFieldValue(target.err, values.err, "error")
+	public __goscriptAssign(source: wrappedHealthError): this {
+		this.err = $.assignFieldValue(this.err, source.err, "error")
+		return this
 	}
 
 	public Error(): string {

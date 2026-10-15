@@ -10,37 +10,18 @@ $.registerNamedType("main.Line", /* @__PURE__ */ $.sliceType("main.Lex"));
 
 $.registerNamedValueType(
 	"*main.Line",
-	{String: (receiver: any, ...args: any[]) => (Line_String as any)(receiver, ...$.stripGenericTypeArgs(args))},
+	{String: (receiver: any) => (Line_String as any)(receiver)},
 	[$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])]
 );
 
 export class Lex {
-	public get Name(): string {
-		return this._fields.Name
-	}
+	public declare Name: string
 
-	public set Name(value: string) {
-		this._fields.Name = value
-	}
-
-	public get Start(): number {
-		return this._fields.Start
-	}
-
-	public set Start(value: number) {
-		this._fields.Start = value
-	}
-
-	public _fields: {
-		Name: string
-		Start: number
-	}
+	public declare Start: number
 
 	constructor(init?: Partial<{Name?: string, Start?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Name: init?.Name ?? ("" as string),
-			Start: init?.Start ?? (0 as number)
-		}
+		this.Name = init?.Name ?? ("" as string)
+		this.Start = init?.Start ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -48,11 +29,10 @@ export class Lex {
 		return new Lex(this, true)
 	}
 
-	public __goscriptAssign(source: Lex): void {
-		const target = this._fields
-		const values = source._fields
-		target.Name = values.Name
-		target.Start = values.Start
+	public __goscriptAssign(source: Lex): this {
+		this.Name = source.Name
+		this.Start = source.Start
+		return this
 	}
 
 	public String(): string {
@@ -71,22 +51,10 @@ export class Lex {
 }
 
 export class Val {
-	public get N(): number {
-		return this._fields.N
-	}
-
-	public set N(value: number) {
-		this._fields.N = value
-	}
-
-	public _fields: {
-		N: number
-	}
+	public declare N: number
 
 	constructor(init?: Partial<{N?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			N: init?.N ?? (0 as number)
-		}
+		this.N = init?.N ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -94,10 +62,9 @@ export class Val {
 		return new Val(this, true)
 	}
 
-	public __goscriptAssign(source: Val): void {
-		const target = this._fields
-		const values = source._fields
-		target.N = values.N
+	public __goscriptAssign(source: Val): this {
+		this.N = source.N
+		return this
 	}
 
 	public String(): string {
@@ -130,7 +97,7 @@ export async function main(): globalThis.Promise<void> {
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({String: (receiver: any, ...args: any[]) => (Line_String as any)(receiver, ...$.stripGenericTypeArgs(args))})
+	return __goscriptStatic0$value ??= ({String: (receiver: any) => (Line_String as any)(receiver)})
 }
 
 var __goscriptStatic1$value: any
