@@ -201,6 +201,7 @@ func (o *SemanticModelOwner) colorAsync(
 	// values override packages produce, and index the callers and the calls
 	// that pass functions.
 	overrideValues := addOverrideFuncValues(model, overridePkgs)
+	overrideValues = append(overrideValues, addSuspendingFuncValues(model)...)
 	internFuncValueClasses(model)
 	addMutexNodes(model)
 	model.functionCallers = semanticFunctionCallers(model)
