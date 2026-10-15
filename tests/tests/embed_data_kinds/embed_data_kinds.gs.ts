@@ -40,7 +40,7 @@ export function sum(data: $.Slice<number>): number {
 	let total = 0
 	for (let __goscriptRangeTarget0 = data, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), i = 0; i < __goscriptRangeWindow0.length; i++) {
 		let b = $.uint((__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + i] as number), 8)
-		total += ((i % 7) + 1) * $.int(b)
+		total += ((i % 7) + 1) * b
 	}
 	return total
 }

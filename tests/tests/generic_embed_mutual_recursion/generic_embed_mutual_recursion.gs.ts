@@ -113,7 +113,7 @@ export class MyApp {
 	public declare AppBase: AppBase
 
 	constructor(init?: Partial<{AppBase?: AppBase}>, __goscriptValue?: boolean) {
-		this.AppBase = init?.AppBase ? $.markAsStructValue($.cloneStructValue(init.AppBase)) : $.markAsStructValue(new AppBase())
+		this.AppBase = init?.AppBase ? init.AppBase.clone() : $.markAsStructValue(new AppBase())
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -122,7 +122,7 @@ export class MyApp {
 	}
 
 	public __goscriptAssign(source: MyApp): this {
-		$.assignStruct(this.AppBase, source.AppBase)
+		this.AppBase.__goscriptAssign(source.AppBase)
 		return this
 	}
 
@@ -147,7 +147,7 @@ export class MyWindow {
 	public declare WindowBase: WindowBase
 
 	constructor(init?: Partial<{WindowBase?: WindowBase}>, __goscriptValue?: boolean) {
-		this.WindowBase = init?.WindowBase ? $.markAsStructValue($.cloneStructValue(init.WindowBase)) : $.markAsStructValue(new WindowBase({App: null! as MyApp | $.VarRef<MyApp> | null}))
+		this.WindowBase = init?.WindowBase ? init.WindowBase.clone() : $.markAsStructValue(new WindowBase({App: null! as MyApp | $.VarRef<MyApp> | null}))
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -156,7 +156,7 @@ export class MyWindow {
 	}
 
 	public __goscriptAssign(source: MyWindow): this {
-		$.assignStruct(this.WindowBase, source.WindowBase)
+		this.WindowBase.__goscriptAssign(source.WindowBase)
 		return this
 	}
 

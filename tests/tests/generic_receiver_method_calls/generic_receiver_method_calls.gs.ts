@@ -48,7 +48,7 @@ export class holder {
 	public declare box: box
 
 	constructor(init?: Partial<{box?: box}>, __goscriptValue?: boolean) {
-		this.box = init?.box ? $.markAsStructValue($.cloneStructValue(init.box)) : $.markAsStructValue(new box({value: null}))
+		this.box = init?.box ? init.box.clone() : $.markAsStructValue(new box({value: null}))
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -57,7 +57,7 @@ export class holder {
 	}
 
 	public __goscriptAssign(source: holder): this {
-		$.assignStruct(this.box, source.box)
+		this.box.__goscriptAssign(source.box)
 		return this
 	}
 
@@ -95,7 +95,7 @@ export async function main(): globalThis.Promise<void> {
 	let b = new box({value: 7})
 	await $.println("direct:", direct(__goscriptStatic0(), b))
 	await $.println("interface:", await throughInterface(__goscriptStatic0(), $.namedValueInterfaceValue<reader | null>(b, "*main.box", __goscriptStatic1(), __goscriptStatic2(), __goscriptStatic3())))
-	await $.println("promoted:", promoted(__goscriptStatic0(), new holder({box: $.markAsStructValue($.cloneStructValue($.pointerValue<box>(b)))})))
+	await $.println("promoted:", promoted(__goscriptStatic0(), new holder({box: ($.pointerValue<box>(b)).clone()})))
 	await $.println("expression:", await methodExpression(__goscriptStatic0(), b))
 }
 

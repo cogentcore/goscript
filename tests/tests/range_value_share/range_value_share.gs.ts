@@ -4,32 +4,13 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class point {
-	public get X(): number {
-		return this._fields.X
-	}
+	public declare X: number
 
-	public set X(value: number) {
-		this._fields.X = value
-	}
-
-	public get Y(): number {
-		return this._fields.Y
-	}
-
-	public set Y(value: number) {
-		this._fields.Y = value
-	}
-
-	public _fields: {
-		X: number
-		Y: number
-	}
+	public declare Y: number
 
 	constructor(init?: Partial<{X?: number, Y?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			X: init?.X ?? (0 as number),
-			Y: init?.Y ?? (0 as number)
-		}
+		this.X = init?.X ?? (0 as number)
+		this.Y = init?.Y ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -37,11 +18,10 @@ export class point {
 		return new point(this, true)
 	}
 
-	public __goscriptAssign(source: point): void {
-		const target = this._fields
-		const values = source._fields
-		target.X = values.X
-		target.Y = values.Y
+	public __goscriptAssign(source: point): this {
+		this.X = source.X
+		this.Y = source.Y
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -54,42 +34,16 @@ export class point {
 }
 
 export class box {
-	public get Min(): point {
-		return this._fields.Min
-	}
+	public declare Min: point
 
-	public set Min(value: point) {
-		this._fields.Min = value
-	}
+	public declare Max: point
 
-	public get Max(): point {
-		return this._fields.Max
-	}
-
-	public set Max(value: point) {
-		this._fields.Max = value
-	}
-
-	public get Name(): string {
-		return this._fields.Name
-	}
-
-	public set Name(value: string) {
-		this._fields.Name = value
-	}
-
-	public _fields: {
-		Min: point
-		Max: point
-		Name: string
-	}
+	public declare Name: string
 
 	constructor(init?: Partial<{Min?: point, Max?: point, Name?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Min: init?.Min ? init.Min.clone() : new point(undefined, true),
-			Max: init?.Max ? init.Max.clone() : new point(undefined, true),
-			Name: init?.Name ?? ("" as string)
-		}
+		this.Min = init?.Min ? init.Min.clone() : new point(undefined, true)
+		this.Max = init?.Max ? init.Max.clone() : new point(undefined, true)
+		this.Name = init?.Name ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -97,12 +51,11 @@ export class box {
 		return new box(this, true)
 	}
 
-	public __goscriptAssign(source: box): void {
-		const target = this._fields
-		const values = source._fields
-		$.assignStruct(target.Min, values.Min)
-		$.assignStruct(target.Max, values.Max)
-		target.Name = values.Name
+	public __goscriptAssign(source: box): this {
+		this.Min.__goscriptAssign(source.Min)
+		this.Max.__goscriptAssign(source.Max)
+		this.Name = source.Name
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -170,7 +123,7 @@ export async function main(): globalThis.Promise<void> {
 		let b = ((__goscriptRangeWindow4.backing[__goscriptRangeWindow4.offset + __rangeIndex] as box)).clone()
 		let c = (b).clone()
 		c.Name = "copy"
-		last = $.assignStruct(last, b)
+		last = last.__goscriptAssign(b)
 		await $.println("copy:", b.Name, c.Name)
 	}
 	last.Min.Y = -1

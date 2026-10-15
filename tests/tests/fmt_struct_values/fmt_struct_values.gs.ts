@@ -188,7 +188,7 @@ export class App {
 	public declare Name: string
 
 	constructor(init?: Partial<{Base?: Base, Name?: string}>, __goscriptValue?: boolean) {
-		this.Base = init?.Base ? $.markAsStructValue($.cloneStructValue(init.Base)) : $.markAsStructValue(new Base({Active: null! as Win | $.VarRef<Win> | null}))
+		this.Base = init?.Base ? init.Base.clone() : $.markAsStructValue(new Base({Active: null! as Win | $.VarRef<Win> | null}))
 		this.Name = init?.Name ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
@@ -198,7 +198,7 @@ export class App {
 	}
 
 	public __goscriptAssign(source: App): this {
-		$.assignStruct(this.Base, source.Base)
+		this.Base.__goscriptAssign(source.Base)
 		this.Name = source.Name
 		return this
 	}

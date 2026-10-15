@@ -14,32 +14,13 @@ $.registerInterfaceType(
 );
 
 export class node {
-	public get Name(): string {
-		return this._fields.Name
-	}
+	public declare Name: string
 
-	public set Name(value: string) {
-		this._fields.Name = value
-	}
-
-	public get N(): number {
-		return this._fields.N
-	}
-
-	public set N(value: number) {
-		this._fields.N = value
-	}
-
-	public _fields: {
-		Name: string
-		N: number
-	}
+	public declare N: number
 
 	constructor(init?: Partial<{Name?: string, N?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Name: init?.Name ?? ("" as string),
-			N: init?.N ?? (0 as number)
-		}
+		this.Name = init?.Name ?? ("" as string)
+		this.N = init?.N ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -47,11 +28,10 @@ export class node {
 		return new node(this, true)
 	}
 
-	public __goscriptAssign(source: node): void {
-		const target = this._fields
-		const values = source._fields
-		target.Name = values.Name
-		target.N = values.N
+	public __goscriptAssign(source: node): this {
+		this.Name = source.Name
+		this.N = source.N
+		return this
 	}
 
 	public name(): string {
@@ -69,42 +49,16 @@ export class node {
 }
 
 export class tree {
-	public get Kids(): $.Slice<tree | $.VarRef<tree> | null> {
-		return this._fields.Kids
-	}
+	public declare Kids: $.Slice<tree | $.VarRef<tree> | null>
 
-	public set Kids(value: $.Slice<tree | $.VarRef<tree> | null>) {
-		this._fields.Kids = value
-	}
+	public declare Attrs: globalThis.Map<string, string> | null
 
-	public get Attrs(): globalThis.Map<string, string> | null {
-		return this._fields.Attrs
-	}
-
-	public set Attrs(value: globalThis.Map<string, string> | null) {
-		this._fields.Attrs = value
-	}
-
-	public get Up(): tree | $.VarRef<tree> | null {
-		return this._fields.Up
-	}
-
-	public set Up(value: tree | $.VarRef<tree> | null) {
-		this._fields.Up = value
-	}
-
-	public _fields: {
-		Kids: $.Slice<tree | $.VarRef<tree> | null>
-		Attrs: globalThis.Map<string, string> | null
-		Up: tree | $.VarRef<tree> | null
-	}
+	public declare Up: tree | $.VarRef<tree> | null
 
 	constructor(init?: Partial<{Kids?: $.Slice<tree | $.VarRef<tree> | null>, Attrs?: globalThis.Map<string, string> | null, Up?: tree | $.VarRef<tree> | null}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Kids: init?.Kids ?? (null! as $.Slice<tree | $.VarRef<tree> | null>),
-			Attrs: init?.Attrs ?? (null! as globalThis.Map<string, string> | null),
-			Up: init?.Up ?? (null! as tree | $.VarRef<tree> | null)
-		}
+		this.Kids = init?.Kids ?? (null! as $.Slice<tree | $.VarRef<tree> | null>)
+		this.Attrs = init?.Attrs ?? (null! as globalThis.Map<string, string> | null)
+		this.Up = init?.Up ?? (null! as tree | $.VarRef<tree> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -112,12 +66,11 @@ export class tree {
 		return new tree(this, true)
 	}
 
-	public __goscriptAssign(source: tree): void {
-		const target = this._fields
-		const values = source._fields
-		target.Kids = values.Kids
-		target.Attrs = values.Attrs
-		target.Up = values.Up
+	public __goscriptAssign(source: tree): this {
+		this.Kids = source.Kids
+		this.Attrs = source.Attrs
+		this.Up = source.Up
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

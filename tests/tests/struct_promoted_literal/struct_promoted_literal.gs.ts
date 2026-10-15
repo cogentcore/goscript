@@ -205,7 +205,7 @@ export class LiteralContainer {
 	public declare LiteralValue: LiteralValue
 
 	constructor(init?: Partial<{LiteralValue?: LiteralValue}>, __goscriptValue?: boolean) {
-		this.LiteralValue = init?.LiteralValue ? $.markAsStructValue($.cloneStructValue(init.LiteralValue)) : $.markAsStructValue(new LiteralValue({Value: null, Zero: null}))
+		this.LiteralValue = init?.LiteralValue ? init.LiteralValue.clone() : $.markAsStructValue(new LiteralValue({Value: null, Zero: null}))
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -214,7 +214,7 @@ export class LiteralContainer {
 	}
 
 	public __goscriptAssign(source: LiteralContainer): this {
-		$.assignStruct(this.LiteralValue, source.LiteralValue)
+		this.LiteralValue.__goscriptAssign(source.LiteralValue)
 		return this
 	}
 

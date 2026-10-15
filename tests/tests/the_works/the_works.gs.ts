@@ -152,7 +152,7 @@ export class VM {
 	constructor(init?: Partial<{pc?: number, steps?: number, stack?: Stack}>, __goscriptValue?: boolean) {
 		this.pc = init?.pc ?? (0 as number)
 		this.steps = init?.steps ?? (0 as number)
-		this.stack = init?.stack ? $.markAsStructValue($.cloneStructValue(init.stack)) : $.markAsStructValue(new Stack())
+		this.stack = init?.stack ? init.stack.clone() : $.markAsStructValue(new Stack())
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -163,7 +163,7 @@ export class VM {
 	public __goscriptAssign(source: VM): this {
 		this.pc = source.pc
 		this.steps = source.steps
-		$.assignStruct(this.stack, source.stack)
+		this.stack.__goscriptAssign(source.stack)
 		return this
 	}
 

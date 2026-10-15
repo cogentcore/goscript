@@ -89,7 +89,7 @@ export class Window {
 	public declare Title: string
 
 	constructor(init?: Partial<{Base?: Base, Title?: string}>, __goscriptValue?: boolean) {
-		this.Base = init?.Base ? $.markAsStructValue($.cloneStructValue(init.Base)) : $.markAsStructValue(new Base({App: null! as App | $.VarRef<App> | null}))
+		this.Base = init?.Base ? init.Base.clone() : $.markAsStructValue(new Base({App: null! as App | $.VarRef<App> | null}))
 		this.Title = init?.Title ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
@@ -99,7 +99,7 @@ export class Window {
 	}
 
 	public __goscriptAssign(source: Window): this {
-		$.assignStruct(this.Base, source.Base)
+		this.Base.__goscriptAssign(source.Base)
 		this.Title = source.Title
 		return this
 	}
@@ -127,7 +127,7 @@ export class Single {
 	public declare Count: number
 
 	constructor(init?: Partial<{Base?: Base, Count?: number}>, __goscriptValue?: boolean) {
-		this.Base = init?.Base ? $.markAsStructValue($.cloneStructValue(init.Base)) : $.markAsStructValue(new Base({App: null}))
+		this.Base = init?.Base ? init.Base.clone() : $.markAsStructValue(new Base({App: null}))
 		this.Count = init?.Count ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
@@ -137,7 +137,7 @@ export class Single {
 	}
 
 	public __goscriptAssign(source: Single): this {
-		$.assignStruct(this.Base, source.Base)
+		this.Base.__goscriptAssign(source.Base)
 		this.Count = source.Count
 		return this
 	}
