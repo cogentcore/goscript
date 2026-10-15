@@ -1,0 +1,8 @@
+text: 17 plain ascii text
+text bytes: 17 true 5453
+blob: 772 0 255 0 392869 tail
+small: 2 hi
+own: 42 0
+fs blob: true 772 392869
+fs text: true true
+fs small: true hi
