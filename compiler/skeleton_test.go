@@ -3667,8 +3667,8 @@ func TestCompilePackagesBoxesNumericVariadicInterfaceArgs(t *testing.T) {
 	text := string(content)
 	for _, want := range []string{
 		"$.basicInterfaceValue(version, \"int32\")",
-		"$.basicInterfaceValue($.uint(3, 32), \"uint32\")",
-		"$.basicInterfaceValue($.int(4, 32), \"rune\", \"int32\")",
+		"$.basicInterfaceValue(3, \"uint32\")",
+		"$.basicInterfaceValue(4, \"rune\", \"int32\")",
 	} {
 		if !strings.Contains(text, want) {
 			t.Fatalf("missing %q in generated output:\n%s", want, text)

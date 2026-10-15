@@ -28,7 +28,7 @@ export function MyError_Error(e: MyError): string {
 
 export function mayFail(n: number): $.GoError {
 	if (n < 0) {
-		return $.namedValueInterfaceValue<$.GoError>($.int(n), "main.MyError", {"Error": MyError_Error}, /* @__PURE__ */ $.basicType("int", "main.MyError"))
+		return $.namedValueInterfaceValue<$.GoError>(n, "main.MyError", {"Error": MyError_Error}, /* @__PURE__ */ $.basicType("int", "main.MyError"))
 	}
 	return null
 }

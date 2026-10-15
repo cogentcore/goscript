@@ -12,7 +12,7 @@ $.registerNamedValueType(
 );
 
 export function state__set(s: $.VarRef<state> | null, v: number): void {
-	s!.value = $.int(v)
+	s!.value = v
 }
 
 export function call(fn: (() => void) | null): void {
@@ -24,7 +24,7 @@ export async function main(): globalThis.Promise<void> {
 	call($.functionValue(() => {
 		state__set(s, 7)
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)))
-	await $.println($.int(s.value))
+	await $.println(s.value)
 }
 
 if ($.isMainScript(import.meta)) {

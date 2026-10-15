@@ -11134,6 +11134,12 @@ func (o *LoweringOwner) lowerConversionExpr(
 		return grouped, diagnostics
 	}
 
+	// An integer converted to an integer type that holds all its values,
+	// such as int(r) of a rune, keeps its value.
+	if integerConversionKeepsValue(sourceType, targetType) {
+		return grouped, diagnostics
+	}
+
 	// Numeric conversions round to the target representation.
 	if isNumericType(targetType) {
 		if isFloatType(targetType) {
@@ -16393,6 +16399,37 @@ func unsignedIntegerBits(typ types.Type) (int, bool) {
 	default:
 		return 64, true
 	}
+}
+
+// integerConversionKeepsValue reports whether converting a value of the
+// integer type source to the integer type target keeps every value, so that
+// the conversion needs no wrapping: the target has at least the bits of a
+// source of the same signedness, or more bits than an unsigned source. Both
+// must be represented as numbers, not bigints.
+func integerConversionKeepsValue(source types.Type, target types.Type) bool {
+	// Only number-represented integer types qualify.
+	if isBigIntBackedType(source) || isBigIntBackedType(target) {
+		return false
+	}
+
+	// A signed source fits a signed target at least as wide.
+	sourceBits, sourceSigned := signedIntegerBits(source)
+	targetBits, targetSigned := signedIntegerBits(target)
+	if sourceSigned && targetSigned {
+		return sourceBits <= targetBits
+	}
+
+	// An unsigned source fits an unsigned target at least as wide, or a
+	// signed target that is wider.
+	sourceBits, sourceUnsigned := unsignedIntegerBits(source)
+	if !sourceUnsigned {
+		return false
+	}
+	if targetSigned {
+		return sourceBits < targetBits
+	}
+	targetBits, targetUnsigned := unsignedIntegerBits(target)
+	return targetUnsigned && sourceBits <= targetBits
 }
 
 func signedIntegerBits(typ types.Type) (int, bool) {

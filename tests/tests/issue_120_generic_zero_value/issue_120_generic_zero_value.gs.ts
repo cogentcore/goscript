@@ -47,7 +47,7 @@ export type Pair = number[]
 $.registerNamedType("main.Pair", /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2));
 
 export function IntVal_String(i: IntVal): string {
-	return strconv.Itoa($.int(i))
+	return strconv.Itoa(i)
 }
 
 export function StringVal_String(s: StringVal): string {

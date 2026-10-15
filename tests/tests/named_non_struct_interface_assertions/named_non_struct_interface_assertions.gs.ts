@@ -136,7 +136,7 @@ export function namedArray_Add(v: namedArray, n: number): number {
 }
 
 export function namedInt_Add(v: namedInt, n: number): number {
-	return $.int(v) + n
+	return v + n
 }
 
 export function namedFunc_Add(v: namedFunc | null, n: number): number {

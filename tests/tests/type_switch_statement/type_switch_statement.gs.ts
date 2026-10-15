@@ -148,7 +148,7 @@ export async function main(): globalThis.Promise<void> {
 		}
 	}
 
-	for (let __goscriptRangeTarget0 = $.arrayToSlice<any>([$.basicInterfaceValue($.int(7, 32), "int32")]), __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
+	for (let __goscriptRangeTarget0 = $.arrayToSlice<any>([$.basicInterfaceValue(7, "int32")]), __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
 		let v = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as any)
 		{
 			const __goscriptTypeSwitchValue = v
