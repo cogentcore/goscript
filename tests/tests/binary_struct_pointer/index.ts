@@ -1,1 +1,1 @@
-export { header, inner } from "./binary_struct_pointer.gs.ts"
+export { header, inner, item, vec4 } from "./binary_struct_pointer.gs.ts"

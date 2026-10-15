@@ -1,6 +1,8 @@
 import * as $ from '@goscript/builtin/index.js'
 import * as io from '@goscript/io/index.js'
 
+import { structPlanFor } from './structs.js'
+
 export interface ByteOrder {
   Uint16(b: $.Slice<number>): number
   Uint32(b: $.Slice<number>): number
@@ -54,7 +56,13 @@ type binShape =
   | { tag: 'scalar'; kind: fixedKind }
   | { tag: 'complex'; elem: 'float32' | 'float64' }
   | { tag: 'array'; elem: binShape; count: number }
-  | { tag: 'struct'; fields: { key: string; shape: binShape }[] }
+  | {
+      tag: 'struct'
+      fields: { key: string; blank: boolean; shape: binShape }[]
+    }
+
+// structShape is the shape of a struct type.
+type structShape = Extract<binShape, { tag: 'struct' }>
 
 type decodedTarget = {
   kind: fixedKind | null
@@ -495,15 +503,20 @@ export function Encode(
   order: ByteOrder | null,
   data: unknown,
 ): [number, $.GoError] {
-  const encoded = encodeData(requireByteOrder(order), data)
-  if (encoded === null) {
+  // The data must have a fixed size that fits in buf.
+  const byteOrder = requireByteOrder(order)
+  const target = decodeTarget(data)
+  const size = target === null ? -1 : targetSize(target)
+  if (size < 0) {
     return [0, unsupportedError('Encode', data)]
   }
-  if ($.len(buf) < $.len(encoded)) {
+  if ($.len(buf) < size) {
     return [0, errBufferTooSmall]
   }
-  $.copy(buf, encoded)
-  return [$.len(encoded), null]
+
+  // It is encoded straight into buf.
+  encodeTarget($.goSlice(buf, 0, size), byteOrder, target!)
+  return [size, null]
 }
 
 export function Append(
@@ -567,12 +580,31 @@ function decodeShapeTarget(
   order: ByteOrder,
   target: decodedTarget,
 ): void {
+  // A struct is filled in place.
   const shape = target.shape!
   if (shape.tag === 'struct') {
-    // Populate the existing struct instance's fields in place.
-    shapeDecodeInto(buf, order, shape, target.value)
+    decodeStructs(buf, order, shape, [target.value], 1)
     return
   }
+
+  // A slice or array of structs is filled in place.
+  if (shape.tag === 'array' && shape.elem.tag === 'struct') {
+    decodeStructs(buf, order, shape.elem, target.value, shape.count)
+    return
+  }
+
+  // A slice of other values gets each element decoded.
+  if (shape.tag === 'array' && target.settable === null) {
+    const width = shapeSize(shape.elem)
+    for (let i = 0; i < shape.count; i++) {
+      const elemBytes = $.goSlice(buf, i * width, i * width + width)
+      $.sliceElems(target.value)[$.sliceSlot(target.value, i)] =
+        shapeDecodeValue(elemBytes, order, shape.elem)
+    }
+    return
+  }
+
+  // Any other value replaces the one the pointer target points to.
   if (target.settable === null) {
     return
   }
@@ -607,12 +639,21 @@ function encodeData(order: ByteOrder, data: unknown): $.Slice<number> | null {
     return null
   }
   const out = $.makeSlice<number>(size, undefined, 'byte')
-  if (target.shape !== undefined) {
-    shapeEncode(out, order, target.shape, target.value)
-  } else {
-    encodeFixed(out, order, target.kind as fixedKind, target.value)
-  }
+  encodeTarget(out, order, target)
   return out
+}
+
+// encodeTarget writes the encoding of target into buf, which has its size.
+function encodeTarget(
+  buf: $.Slice<number>,
+  order: ByteOrder,
+  target: decodedTarget,
+): void {
+  if (target.shape !== undefined) {
+    shapeEncode(buf, order, target.shape, target.value)
+  } else {
+    encodeFixed(buf, order, target.kind as fixedKind, target.value)
+  }
 }
 
 function encodeFixed(
@@ -730,7 +771,7 @@ function decodeTarget(data: unknown): decodedTarget | null {
         settable: setterFor(typeName, value),
       }
     }
-    return null
+    return sliceTarget(info, pointerValueForKind(typeName, value))
   }
 
   // A struct, or a pointer to one, is the struct object itself, described by
@@ -739,6 +780,16 @@ function decodeTarget(data: unknown): decodedTarget | null {
   if (structInfo !== undefined) {
     const shape = shapeFromType(structInfo)
     return shape !== null && shape.tag === 'struct' ?
+        { kind: null, shape, value, settable: null }
+      : null
+  }
+
+  // An array is passed as itself, described by the type it carries.
+  const arrayInfo =
+    Array.isArray(value) ? $.arrayValueTypeInfo(value) : undefined
+  if (arrayInfo !== undefined) {
+    const shape = shapeFromType(arrayInfo)
+    return shape !== null && shape.tag === 'array' ?
         { kind: null, shape, value, settable: null }
       : null
   }
@@ -756,6 +807,35 @@ function decodeTarget(data: unknown): decodedTarget | null {
     }
   }
   return null
+}
+
+// sliceTarget describes a slice, or a pointer to one, of fixed-size elements
+// that are not numbers, such as structs, as an array of its length.
+function sliceTarget(
+  info: $.TypeInfo | string | undefined,
+  slice: unknown,
+): decodedTarget | null {
+  // Only a slice type has elements whose shape matters here.
+  let sliceInfo = $.resolveTypeInfo(info)
+  if (sliceInfo?.kind === $.TypeKind.Pointer) {
+    sliceInfo = $.resolveTypeInfo(sliceInfo.elemType)
+  }
+  if (sliceInfo?.kind !== $.TypeKind.Slice) {
+    return null
+  }
+
+  // The elements must all have the same fixed size.
+  const elem = shapeFromType(sliceInfo.elemType)
+  if (elem === null) {
+    return null
+  }
+  const count = $.len(slice as $.Slice<unknown>)
+  return {
+    kind: null,
+    shape: { tag: 'array', elem, count },
+    value: slice,
+    settable: null,
+  }
 }
 
 function pointerValueForKind(typeName: string, value: unknown): unknown {
@@ -929,11 +1009,9 @@ function shapeFromType(info: $.TypeInfo | string | undefined): binShape | null {
       return !kind.startsWith('[]') ? { tag: 'scalar', kind } : null
     }
 
-    // A named struct type is described by its registered type.
+    // A named struct or array type is described by its registered type.
     const named = $.resolveTypeInfo(info)
-    return named !== undefined && named.kind === $.TypeKind.Struct ?
-        shapeFromType(named)
-      : null
+    return named !== undefined ? shapeFromType(named) : null
   }
   switch (info.kind) {
     case $.TypeKind.Pointer:
@@ -954,20 +1032,41 @@ function shapeFromType(info: $.TypeInfo | string | undefined): binShape | null {
           { tag: 'array', elem, count: (info as $.ArrayTypeInfo).length }
         )
     }
-    case $.TypeKind.Struct: {
-      const fields: { key: string; shape: binShape }[] = []
-      for (const field of (info as $.StructTypeInfo).fields) {
-        const shape = shapeFromType(field.type)
-        if (shape === null) {
-          return null
-        }
-        fields.push({ key: field.key ?? field.name, shape })
-      }
-      return { tag: 'struct', fields }
-    }
+    case $.TypeKind.Struct:
+      return structShapeFromType(info as $.StructTypeInfo)
     default:
       return null
   }
+}
+
+// structShapes holds the shape of each struct type, built on first use, so
+// that the struct plans of structs.ts, which are cached by shape, are built
+// once per type.
+const structShapes = new WeakMap<$.StructTypeInfo, binShape | null>()
+
+// structShapeFromType returns the shape of a struct type, or null when a field
+// is not fixed-size.
+function structShapeFromType(info: $.StructTypeInfo): binShape | null {
+  // A struct type described before has its shape.
+  const known = structShapes.get(info)
+  if (known !== undefined) {
+    return known
+  }
+
+  // Each field contributes its shape; blank fields are marked, since Go
+  // writes them as zeros and skips them on read.
+  let shape: binShape | null = { tag: 'struct', fields: [] }
+  for (const field of info.fields) {
+    const fieldShape = shapeFromType(field.type)
+    if (fieldShape === null) {
+      shape = null
+      break
+    }
+    const key = field.key ?? field.name
+    shape.fields.push({ key, blank: field.name === '_', shape: fieldShape })
+  }
+  structShapes.set(info, shape)
+  return shape
 }
 
 function shapeSize(shape: binShape): number {
@@ -1014,6 +1113,13 @@ function shapeEncode(
       return
     }
     case 'array': {
+      // Structs are encoded together by their plan.
+      if (shape.elem.tag === 'struct') {
+        encodeStructs(buf, order, shape.elem, value, shape.count)
+        return
+      }
+
+      // Other elements are encoded one by one.
       const width = shapeSize(shape.elem)
       for (let i = 0; i < shape.count; i++) {
         shapeEncode(
@@ -1025,20 +1131,105 @@ function shapeEncode(
       }
       return
     }
-    case 'struct': {
-      let offset = 0
-      for (const field of shape.fields) {
-        const width = shapeSize(field.shape)
-        shapeEncode(
-          $.goSlice(buf, offset, offset + width),
-          order,
-          field.shape,
-          structFieldValue(value, field.key),
-        )
-        offset += width
-      }
+    case 'struct':
+      encodeStructs(buf, order, shape, [value], 1)
       return
+  }
+}
+
+// planOrder returns true for little-endian and false for big-endian order,
+// which struct plans write, or null for any other ByteOrder.
+function planOrder(order: ByteOrder): boolean | null {
+  if (order instanceof littleEndian) {
+    return true
+  }
+  return order instanceof bigEndian ? false : null
+}
+
+// encodeStructs writes the first n structs of the slice or array elems.
+function encodeStructs(
+  buf: $.Slice<number>,
+  order: ByteOrder,
+  shape: structShape,
+  elems: unknown,
+  n: number,
+): void {
+  // The plan of the struct type writes them all into the bytes of buf.
+  const little = planOrder(order)
+  if (little !== null && buf instanceof Uint8Array) {
+    const view = new DataView(buf.buffer, buf.byteOffset, buf.byteLength)
+    const start = n > 0 ? $.sliceSlot(elems, 0) : 0
+    structPlanFor(shape).encode(view, 0, $.sliceElems(elems), start, n, little)
+    return
+  }
+
+  // Another ByteOrder writes each field through its methods.
+  const size = shapeSize(shape)
+  for (let i = 0; i < n; i++) {
+    const struct = $.arrayIndex(elems as $.Slice<unknown>, i)
+    encodeStructFields(
+      $.goSlice(buf, i * size, i * size + size),
+      order,
+      shape,
+      struct,
+    )
+  }
+}
+
+// encodeStructFields writes the fields of one struct in order, and zeros for
+// its blank fields.
+function encodeStructFields(
+  buf: $.Slice<number>,
+  order: ByteOrder,
+  shape: structShape,
+  value: unknown,
+): void {
+  let offset = 0
+  for (const field of shape.fields) {
+    const width = shapeSize(field.shape)
+    const fieldBytes = $.goSlice(buf, offset, offset + width)
+    if (field.blank) {
+      $.clear(fieldBytes)
+    } else {
+      shapeEncode(
+        fieldBytes,
+        order,
+        field.shape,
+        structFieldValue(value, field.key),
+      )
     }
+    offset += width
+  }
+}
+
+// decodeStructs reads the first n structs of the slice or array elems in
+// place.
+function decodeStructs(
+  buf: $.Slice<number>,
+  order: ByteOrder,
+  shape: structShape,
+  elems: unknown,
+  n: number,
+): void {
+  // The plan of the struct type reads them all from the bytes of buf.
+  const little = planOrder(order)
+  if (little !== null && buf instanceof Uint8Array) {
+    const view = new DataView(buf.buffer, buf.byteOffset, buf.byteLength)
+    const start = n > 0 ? $.sliceSlot(elems, 0) : 0
+    structPlanFor(shape).decode(view, 0, $.sliceElems(elems), start, n, little)
+    return
+  }
+
+  // Another ByteOrder reads each field through its methods.
+  const size = shapeSize(shape)
+  for (let i = 0; i < n; i++) {
+    const struct = $.arrayIndex(elems as $.Slice<unknown>, i)
+    shapeDecodeInto(
+      $.goSlice(buf, i * size, i * size + size),
+      order,
+      shape,
+      struct,
+    )
   }
 }
 
@@ -1084,16 +1275,34 @@ function shapeDecodeValue(
 function shapeDecodeInto(
   buf: $.Slice<number>,
   order: ByteOrder,
-  shape: { tag: 'struct'; fields: { key: string; shape: binShape }[] },
+  shape: structShape,
   instance: unknown,
 ): void {
+  // Each field is read from its bytes, nested structs and arrays of structs
+  // in place.
   const fields = instance as Record<string, unknown>
   let offset = 0
   for (const field of shape.fields) {
     const width = shapeSize(field.shape)
     const slice = $.goSlice(buf, offset, offset + width)
+    if (field.blank) {
+      // Go skips blank fields on read.
+      offset += width
+      continue
+    }
     if (field.shape.tag === 'struct') {
       shapeDecodeInto(slice, order, field.shape, fields[field.key])
+    } else if (
+      field.shape.tag === 'array' &&
+      field.shape.elem.tag === 'struct'
+    ) {
+      decodeStructs(
+        slice,
+        order,
+        field.shape.elem,
+        fields[field.key],
+        field.shape.count,
+      )
     } else {
       fields[field.key] = shapeDecodeValue(slice, order, field.shape)
     }

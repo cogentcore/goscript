@@ -73,6 +73,7 @@ import "embed"
 //go:embed gs/encoding/binary/index.ts
 //go:embed gs/encoding/binary/meta.json
 //go:embed gs/encoding/binary/parity.json
+//go:embed gs/encoding/binary/structs.ts
 //go:embed gs/encoding/json/index.ts
 //go:embed gs/encoding/json/jsontext/index.ts
 //go:embed gs/encoding/json/jsontext/meta.json
