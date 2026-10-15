@@ -275,12 +275,12 @@ class BinaryInputBoundMessage {
 }
 
 class TimestampBoundMessage {
-  declare public Seconds: number
+  declare public Seconds: bigint
 
   declare public Nanos: number
 
-  constructor(init?: Partial<{ Seconds?: number; Nanos?: number }>) {
-    this.Seconds = init?.Seconds ?? 0
+  constructor(init?: Partial<{ Seconds?: bigint; Nanos?: number }>) {
+    this.Seconds = init?.Seconds ?? 0n
     this.Nanos = init?.Nanos ?? 0
   }
 }
@@ -622,7 +622,7 @@ describe('protobuf-go-lite TypeScript binding helpers', () => {
     )
 
     expect(err).toBeNull()
-    expect(target.Timestamp?.Seconds).toBe(1780230896)
+    expect(target.Timestamp?.Seconds).toBe(1780230896n)
     expect(target.Timestamp?.Nanos).toBe(789000000)
   })
 

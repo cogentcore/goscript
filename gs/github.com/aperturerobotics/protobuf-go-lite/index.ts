@@ -639,7 +639,7 @@ function fromTypeScriptWellKnownMessage(
     const ms = value.getTime()
     const seconds = Math.floor(ms / 1000)
     const nanos = Math.trunc((ms - seconds * 1000) * 1000000)
-    return new ctor({ Seconds: seconds, Nanos: nanos })
+    return new ctor({ Seconds: BigInt(seconds), Nanos: nanos })
   }
   return undefined
 }
