@@ -1,0 +1,5 @@
+F(g): 1
+FH(h.r): 2
+FE(regions[0]): 3
+g.lineAfterBump(): 4
+plain(g): 9

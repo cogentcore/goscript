@@ -40,7 +40,7 @@ export class Holder {
 }
 
 export async function main(): globalThis.Promise<void> {
-	await $.markAsStructValue($.cloneStructValue(new Holder(undefined, true))).Run()
+	await new Holder(undefined, true).Run()
 }
 
 var __goscriptAwait: any
