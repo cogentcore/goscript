@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   basicType,
   methodSignature,
+  registerInterfaceType,
   registerStructType,
   type MethodSignature,
   type StructFieldInfo,
@@ -191,5 +192,58 @@ describe('interface assertions of classes that share a Go type name', () => {
       expect(is(named, namer)).toBe(true)
       expect(is(plain, namer)).toBe(false)
     }
+  })
+})
+
+describe('assertions of boxed values to types named by strings', () => {
+  it('give the same results when repeated, for each class of a type name', () => {
+    // Two classes boxed with the same type name and info, as in generic code.
+    class Speaker {
+      Speak(): string {
+        return 'hi'
+      }
+    }
+    class Mute {}
+    registerInterfaceType('test.CachedSpeaker', null, [
+      methodSignature('Speak', [], [basicType('string')]),
+    ])
+    const speaker = new Speaker()
+    const mute = new Mute()
+    for (const value of [speaker, mute]) {
+      Object.defineProperty(value, '__goType', { value: '*T' })
+      Object.defineProperty(value, '__goTypeInfo', { value: '*T' })
+    }
+
+    // The answers stay right as the classes alternate.
+    for (let i = 0; i < 3; i++) {
+      expect(typeAssert(speaker, 'test.CachedSpeaker')).toEqual({
+        value: speaker,
+        ok: true,
+      })
+      expect(typeAssert(mute, 'test.CachedSpeaker').ok).toBe(false)
+    }
+  })
+
+  it('return a new zero value for each failed assertion', () => {
+    // A failed assertion to a struct type yields its zero value.
+    class Point {
+      X = 0
+    }
+    class Other {}
+    registerStructType(
+      'test.CachedPoint',
+      () => new Point(),
+      () => [],
+      Point,
+      () => [{ name: 'X', type: basicType('int') }],
+    )
+    const other = Object.assign(new Other(), {
+      __goType: 'test.CachedOther',
+      __goTypeInfo: 'test.CachedOther',
+    })
+    const first = typeAssert<Point>(other, 'test.CachedPoint')
+    const second = typeAssert<Point>(other, 'test.CachedPoint')
+    expect([first.ok, second.ok]).toEqual([false, false])
+    expect(first.value).not.toBe(second.value)
   })
 })

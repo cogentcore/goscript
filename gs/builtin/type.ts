@@ -2128,6 +2128,127 @@ export function typeAssert<T>(
   value: any,
   typeInfo: string | TypeInfo,
 ): TypeAssertResult<T> {
+  // A value boxed with its dynamic type, asserted to a type named by a
+  // string, gets the result that its type got before. (Type info objects of
+  // other assertions are made for each call.)
+  if (
+    typeof typeInfo === 'string' &&
+    typeof value === 'object' &&
+    value !== null &&
+    value.__goTypeInfo !== undefined &&
+    typeof value.__goType === 'string' &&
+    value.__isTypedNil !== true
+  ) {
+    return typeAssertBoxed<T>(value, typeInfo)
+  }
+  return typeAssertUncached<T>(value, typeInfo)
+}
+
+// TypeAssertOutcome is how an assertion of a boxed value turns out: it
+// fails, or it succeeds with the box itself or with the value in the box.
+type TypeAssertOutcome = 0 | 1 | 2
+const typeAssertFail: TypeAssertOutcome = 0
+const typeAssertBox: TypeAssertOutcome = 1
+const typeAssertContent: TypeAssertOutcome = 2
+
+// TypeAssertCacheEntry records the outcome of asserting a box of a dynamic
+// type, identified by its type name, type info and prototype, which hold
+// its methods.
+interface TypeAssertCacheEntry {
+  typeInfo: TypeInfo | string
+  proto: object | null
+  assertedType: TypeInfo
+  outcome: TypeAssertOutcome
+}
+
+// typeAssertCache maps the name of an asserted type to the outcomes for
+// dynamic types, keyed by their type names. An outcome holds while the name
+// is registered as the same type.
+const typeAssertCache = new Map<string, Map<string, TypeAssertCacheEntry>>()
+
+// typeAssertBoxed asserts a value that carries its dynamic type, which alone
+// decides the outcome, except for map types, whose check samples entries.
+function typeAssertBoxed<T>(value: any, typeInfo: string): TypeAssertResult<T> {
+  // A cached outcome for the same dynamic type gives the result.
+  const key = value.__goType as string
+  const proto = Object.getPrototypeOf(value)
+  let table = typeAssertCache.get(typeInfo)
+  const entry = table?.get(key)
+  if (
+    entry !== undefined &&
+    sameBoxTypeInfo(entry.typeInfo, value.__goTypeInfo) &&
+    entry.proto === proto &&
+    entry.assertedType === typeRegistry.get(typeInfo)
+  ) {
+    return typeAssertOutcomeResult<T>(entry.outcome, value, typeInfo)
+  }
+
+  // Otherwise the full assertion runs.
+  const result = typeAssertUncached<T>(value, typeInfo)
+  const assertedType = typeRegistry.get(typeInfo)
+  if (assertedType === undefined || isMapTypeInfo(assertedType)) {
+    return result
+  }
+
+  // Its outcome is recorded, unless the value came from elsewhere.
+  let outcome = typeAssertFail
+  if (result.ok) {
+    outcome = result.value === value ? typeAssertBox : typeAssertContent
+  }
+  if (outcome !== typeAssertContent || result.value === value.__goValue) {
+    if (table === undefined) {
+      table = new Map()
+      typeAssertCache.set(typeInfo, table)
+    }
+    table.set(key, {
+      typeInfo: value.__goTypeInfo,
+      proto,
+      assertedType,
+      outcome,
+    })
+  }
+  return result
+}
+
+// sameBoxTypeInfo reports whether the type infos of two boxes of the same
+// type name are the same: the same string or object, or pointer descriptors
+// to the same named type, which boxing makes for each pointer.
+function sameBoxTypeInfo(a: TypeInfo | string, b: TypeInfo | string): boolean {
+  if (a === b) {
+    return true
+  }
+  return (
+    typeof a === 'object' &&
+    typeof b === 'object' &&
+    a.kind === TypeKind.Pointer &&
+    b.kind === TypeKind.Pointer &&
+    typeof a.elemType === 'string' &&
+    a.elemType === b.elemType
+  )
+}
+
+// typeAssertOutcomeResult returns the result of an assertion of value with
+// a known outcome.
+function typeAssertOutcomeResult<T>(
+  outcome: TypeAssertOutcome,
+  value: any,
+  typeInfo: string,
+): TypeAssertResult<T> {
+  switch (outcome) {
+    case typeAssertBox:
+      return { value: value as T, ok: true }
+    case typeAssertContent:
+      return { value: value.__goValue as T, ok: true }
+  }
+  return failedTypeAssert<T>(typeInfo, normalizeTypeInfo(typeInfo))
+}
+
+// typeAssertUncached performs a type assertion by the types of value and
+// typeInfo.
+function typeAssertUncached<T>(
+  value: any,
+  typeInfo: string | TypeInfo,
+): TypeAssertResult<T> {
   const normalizedType = normalizeTypeInfo(typeInfo)
 
   if (isTypedNilValue(value)) {
