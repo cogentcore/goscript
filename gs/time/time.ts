@@ -1306,7 +1306,7 @@ function localZoneAbbreviation(
   // The short name is used when the locale has a real abbreviation for the zone.
   for (const locale of ['en-US', 'en-GB']) {
     try {
-      const name = new Intl.DateTimeFormat(locale, { timeZoneName: 'short' })
+      const name = zoneNameFormat(locale)
         .formatToParts(date)
         .find((part) => part.type === 'timeZoneName')?.value
       if (name !== undefined && !/^(GMT|UTC)[+-]/.test(name)) {
@@ -1323,6 +1323,38 @@ function localZoneAbbreviation(
   const hours = String(Math.floor(abs / 3600)).padStart(2, '0')
   const minutes = Math.floor((abs % 3600) / 60)
   return sign + hours + (minutes === 0 ? '' : String(minutes).padStart(2, '0'))
+}
+
+// zoneNameFormats holds the format of short zone names for each locale, as
+// creating an Intl.DateTimeFormat takes much longer than formatting with it,
+// with the probe of the host zone it was created in.
+const zoneNameFormats = new globalThis.Map<
+  string,
+  { format: Intl.DateTimeFormat; probe: number }
+>()
+
+// zoneNameFormat returns the format of short zone names for locale. A format
+// is created again when the host zone changes, as with TZ in Node.
+function zoneNameFormat(locale: string): Intl.DateTimeFormat {
+  // A format created in the same host zone is reused.
+  const probe = hostZoneProbe()
+  const entry = zoneNameFormats.get(locale)
+  if (entry !== undefined && entry.probe === probe) {
+    return entry.format
+  }
+
+  // Otherwise the format is created for the current host zone.
+  const format = new Intl.DateTimeFormat(locale, { timeZoneName: 'short' })
+  zoneNameFormats.set(locale, { format, probe })
+  return format
+}
+
+// hostZoneProbe identifies the host zone by its offsets in January and July
+// of 2000, which change with the host zone.
+function hostZoneProbe(): number {
+  const january = new globalThis.Date(2000, 0, 1).getTimezoneOffset()
+  const july = new globalThis.Date(2000, 6, 1).getTimezoneOffset()
+  return january * 10000 + july
 }
 
 // FixedZone returns a Location that always uses the given zone name and offset (seconds east of UTC).
