@@ -5,7 +5,7 @@ import * as $ from "@goscript/builtin/index.js"
 import * as errors from "@goscript/errors/index.js"
 
 export type healthError = {
-	Error(): string | globalThis.Promise<string>
+	Error(): string
 	Health(): string
 }
 
@@ -32,9 +32,9 @@ export class wrappedHealthError {
 		return this
 	}
 
-	public async Error(): globalThis.Promise<string> {
+	public Error(): string {
 		const e: wrappedHealthError | $.VarRef<wrappedHealthError> | null = this;
-		return $.pointerValue<Exclude<$.GoError, null>>($.pointerValue<wrappedHealthError>(e).err).Error()
+		return ($.pointerValue<Exclude<$.GoError, null>>($.pointerValue<wrappedHealthError>(e).err).Error() as string)
 	}
 
 	public Health(): string {

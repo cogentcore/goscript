@@ -1,0 +1,10 @@
+{
+  "asyncWhenMethods": {
+    "error.Error": [
+      "Error",
+      "Format",
+      "GoString",
+      "String"
+    ]
+  }
+}

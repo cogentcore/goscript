@@ -8,7 +8,12 @@
     "Sub": true,
     "WalkDir": true
   },
-  "asyncMethods": {
-    "PathError.Error": true
+  "asyncWhenMethods": {
+    "PathError.Error": [
+      "Error",
+      "Format",
+      "GoString",
+      "String"
+    ]
   }
 }

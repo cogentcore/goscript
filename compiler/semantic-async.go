@@ -4,7 +4,9 @@ import (
 	"context"
 	"go/ast"
 	"go/types"
+	"maps"
 	"slices"
+	"strings"
 
 	"golang.org/x/tools/go/packages"
 )
@@ -196,19 +198,101 @@ func recordCallbackOverrideCall(
 }
 
 // asyncWhenMethodFunctions maps each method name that override metadata
-// names in asyncWhenMethods to the called override functions it makes async.
-func asyncWhenMethodFunctions(model *SemanticModel, overrideFacts *OverrideFacts) map[string][]*types.Func {
+// names in asyncWhenMethods to the targets it makes async: the override
+// functions and methods, and the interface methods, that the program calls
+// or takes as values.
+func asyncWhenMethodFunctions(model *SemanticModel, overrideFacts *OverrideFacts, values []funcValue) map[string][]*types.Func {
+	// Both called functions and function values are candidates.
+	candidates := slices.Collect(maps.Keys(model.functionCallers))
+	for _, value := range values {
+		candidates = append(candidates, value.key)
+	}
+
+	// A candidate whose metadata names methods waits on them.
 	asyncWhen := make(map[string][]*types.Func)
-	for called := range model.functionCallers {
-		signature, _ := called.Type().(*types.Signature)
-		if called.Pkg() == nil || signature == nil || signature.Recv() != nil {
+	seen := make(map[*types.Func]bool)
+	for _, fn := range candidates {
+		pkgPath, name, ok := overrideMetadataName(fn)
+		if !ok || seen[fn] {
 			continue
 		}
-		for _, method := range overrideFacts.AsyncWhenMethods(called.Pkg().Path(), called.Name()) {
-			asyncWhen[method] = append(asyncWhen[method], called)
+		seen[fn] = true
+		for _, method := range overrideFacts.AsyncWhenMethods(pkgPath, name) {
+			asyncWhen[method] = append(asyncWhen[method], fn)
 		}
 	}
 	return asyncWhen
+}
+
+// universeMetadataPackage is the package whose override metadata describes
+// universe objects, such as the error interface's Error method.
+const universeMetadataPackage = "builtin"
+
+// overrideMetadataName returns the package path and the name override
+// metadata uses for fn: a function name, or Type.Method for a method of a
+// named type.
+func overrideMetadataName(fn *types.Func) (string, string, bool) {
+	// A universe object belongs to the builtin package.
+	signature, _ := fn.Type().(*types.Signature)
+	if signature == nil {
+		return "", "", false
+	}
+	pkgPath := universeMetadataPackage
+	if fn.Pkg() != nil {
+		pkgPath = fn.Pkg().Path()
+	}
+
+	// A method is named by its receiver type.
+	if signature.Recv() == nil {
+		return pkgPath, fn.Name(), true
+	}
+	receiver := receiverNamedType(signature.Recv().Type())
+	if receiver == nil {
+		return "", "", false
+	}
+	return pkgPath, receiver.Obj().Name() + "." + fn.Name(), true
+}
+
+// asyncWhenSeeds returns the targets that override methods make async
+// whatever the program: a method name in asyncWhen that override metadata
+// marks async on a type of a package in the graph.
+func asyncWhenSeeds(asyncWhen map[string][]*types.Func, overrideFacts *OverrideFacts, overridePkgs []*types.Package) []*types.Func {
+	var seeds []*types.Func
+	for _, pkg := range overridePkgs {
+		for key, async := range overrideFacts.Metadata(pkg.Path()).AsyncMethods {
+			if _, method, ok := strings.Cut(key, "."); ok && async {
+				seeds = append(seeds, asyncWhen[method]...)
+			}
+		}
+	}
+	return seeds
+}
+
+// asyncWhenTargetSet returns the targets of asyncWhen.
+func asyncWhenTargetSet(asyncWhen map[string][]*types.Func) map[*types.Func]bool {
+	targets := make(map[*types.Func]bool)
+	for _, list := range asyncWhen {
+		for _, target := range list {
+			targets[target] = true
+		}
+	}
+	return targets
+}
+
+// asyncWhenInterfaceMethods returns the interface methods among the targets
+// of asyncWhen. Metadata decides when the override values that implement
+// them suspend, so the implementation graph and metadata color them.
+func asyncWhenInterfaceMethods(asyncWhen map[string][]*types.Func) map[*types.Func]bool {
+	methods := make(map[*types.Func]bool)
+	for _, targets := range asyncWhen {
+		for _, fn := range targets {
+			if signature, _ := fn.Type().(*types.Signature); signature != nil &&
+				signature.Recv() != nil && isInterfaceType(signature.Recv().Type()) {
+				methods[fn] = true
+			}
+		}
+	}
+	return methods
 }
 
 // asyncColoring propagates async marks to their fixpoint with one worklist.
@@ -250,6 +334,9 @@ type asyncRoots struct {
 	// values connects function values to the classes of calls that may
 	// reach them; its open classes and async values are roots.
 	values *funcValueGraph
+	// asyncWhenSeeds are the asyncWhenMethods targets that an async override
+	// method makes async.
+	asyncWhenSeeds []*types.Func
 }
 
 // colorAsyncFunctions marks every function and interface method that can
@@ -346,6 +433,9 @@ func colorAsyncFunctions(
 	for _, key := range roots.values.asyncMembers {
 		c.visit(key)
 	}
+	for _, target := range roots.asyncWhenSeeds {
+		c.markAsyncWhenTarget(target)
+	}
 
 	// Seed the callers of open interface methods. The method itself stays
 	// sync until a compiled implementation proves it can suspend.
@@ -376,10 +466,8 @@ func colorAsyncFunctions(
 		for _, semFn := range c.sitesByDep[key] {
 			c.markFunction(semFn)
 		}
-		for _, overrideFn := range c.overrideFuncsByMethod[key] {
-			if model.markOverrideFunctionAsync(overrideFn) {
-				c.visit(overrideFn)
-			}
+		for _, target := range c.overrideFuncsByMethod[key] {
+			c.markAsyncWhenTarget(target)
 		}
 		for _, class := range c.values.classesByMember[key] {
 			c.markClass(class)
@@ -423,6 +511,19 @@ func (c *asyncColoring) markFunction(semFn *semanticFunction) {
 	}
 	for _, ifaceMethod := range c.ifaceEdges[semFn] {
 		c.markInterfaceMethod(ifaceMethod)
+	}
+}
+
+// markAsyncWhenTarget marks an asyncWhenMethods target async: an interface
+// method, or an override function or method.
+func (c *asyncColoring) markAsyncWhenTarget(target *types.Func) {
+	if signature, _ := target.Type().(*types.Signature); signature != nil &&
+		signature.Recv() != nil && isInterfaceType(signature.Recv().Type()) {
+		c.markInterfaceMethod(target)
+		return
+	}
+	if c.model.markOverrideFunctionAsync(target) {
+		c.visit(target)
 	}
 }
 

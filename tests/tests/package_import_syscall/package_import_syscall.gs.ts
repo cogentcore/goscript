@@ -12,27 +12,27 @@ export async function main(): globalThis.Promise<void> {
 	{
 		let err = syscall.SetNonblock(1, true)
 		if (err != null) {
-			await fmt.Println("set true:", (err as any))
+			fmt.Println("set true:", (err as any))
 			return
 		}
 	}
 	{
 		let err = syscall.SetNonblock(1, false)
 		if (err != null) {
-			await fmt.Println("set false:", (err as any))
+			fmt.Println("set false:", (err as any))
 			return
 		}
 	}
 	if ((1 as number) != 0) {
-		await fmt.Println("cloexec supported")
+		fmt.Println("cloexec supported")
 	}
-	await fmt.Println("signals:", $.basicInterfaceValue(syscall.SIGINT, "int"), $.basicInterfaceValue(syscall.SIGKILL, "int"), $.basicInterfaceValue(syscall.SIGTERM, "int"))
+	fmt.Println("signals:", $.basicInterfaceValue(syscall.SIGINT, "int"), $.basicInterfaceValue(syscall.SIGKILL, "int"), $.basicInterfaceValue(syscall.SIGTERM, "int"))
 	{
 		let err = syscall.Kill(1, 3)
 		if (err == null) {
-			await fmt.Println("kill unexpectedly succeeded")
+			fmt.Println("kill unexpectedly succeeded")
 		} else {
-			await fmt.Println("kill:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+			fmt.Println("kill:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		}
 	}
 	if (false) {
@@ -73,7 +73,7 @@ export async function main(): globalThis.Promise<void> {
 	let addr6 = netip.AddrFrom16($.cloneArrayValue(sa6.Addr, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 16)))
 	sa6.Addr = addr6.As16()
 
-	await fmt.Println("set nonblock ok")
+	fmt.Println("set nonblock ok")
 }
 
 var __goscriptAwait: any

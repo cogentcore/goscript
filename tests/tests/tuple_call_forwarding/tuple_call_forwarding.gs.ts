@@ -210,7 +210,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("span:", span(...(() => { const __goscriptTupleArg3 = pair(5, 9); return [__goscriptTupleArg3[0], __goscriptTupleArg3[1], null] as [number, number, $.Slice<number>] })()))
 	let ts = new tabs()
 	await names(...(await (async () => { const __goscriptTupleArg4 = await (ts !== null && (ts as any).__isVarRef !== true && (ts as any).__goValue === undefined ? ((ts as any) as tabs).NewTab("Text") : tabs.prototype.NewTab.call(ts, "Text")); return [$.arrayToSlice<Node | null>([$.interfaceValue<Node | null>(__goscriptTupleArg4[0], "*main.frame", /* @__PURE__ */ $.pointerType("main.frame")), $.interfaceValue<Node | null>(__goscriptTupleArg4[1], "*main.tab", /* @__PURE__ */ $.pointerType("main.tab"))])] as [$.Slice<Node | null>] })()))
-	await $.println("sprint:", await fmt.Sprint(...(() => { const __goscriptTupleArg5 = pair(3, 4); return [$.basicInterfaceValue(__goscriptTupleArg5[0], "int"), $.basicInterfaceValue(__goscriptTupleArg5[1], "int")] as [any, any] })()))
+	await $.println("sprint:", (fmt.Sprint(...(() => { const __goscriptTupleArg5 = pair(3, 4); return [$.basicInterfaceValue(__goscriptTupleArg5[0], "int"), $.basicInterfaceValue(__goscriptTupleArg5[1], "int")] as [any, any] })()) as string))
 	await $.println("tabs:", $.pointerValue<tabs>(ts).count)
 }
 

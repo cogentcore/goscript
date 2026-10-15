@@ -24,7 +24,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("text:", text)
 
 	// fmt.Sprintf uses String() internally; a Promise would break formatting.
-	let formatted = await fmt.Sprintf("msg=%v", $.interfaceValue(msg, "*main.ExampleMsg", /* @__PURE__ */ $.pointerType("main.ExampleMsg")))
+	let formatted = (fmt.Sprintf("msg=%v", $.interfaceValue(msg, "*main.ExampleMsg", /* @__PURE__ */ $.pointerType("main.ExampleMsg"))) as string)
 	await $.println("formatted len:", $.stringLen(formatted))
 }
 

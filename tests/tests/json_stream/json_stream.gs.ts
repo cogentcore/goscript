@@ -104,7 +104,7 @@ export async function printTokens(dec: json.Decoder | $.VarRef<json.Decoder> | n
 	while (true) {
 		let [tok, err] = await json.Decoder.prototype.Token.call($.pointerValue<json.Decoder>(dec))
 		if (err != null) {
-			await fmt.Println("token end:", $.comparableEqual(err, io.EOF))
+			fmt.Println("token end:", $.comparableEqual(err, io.EOF))
 			return
 		}
 		{
@@ -113,32 +113,32 @@ export async function printTokens(dec: json.Decoder | $.VarRef<json.Decoder> | n
 				case $.typeAssert<json.Delim>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.basicType("int32", "json.Delim")).ok:
 					{
 						let t: json.Delim = $.typeAssert<json.Delim>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.basicType("int32", "json.Delim")).value
-						await fmt.Println("delim", json.Delim_String(t), await json.Decoder.prototype.More.call($.pointerValue<json.Decoder>(dec)))
+						fmt.Println("delim", json.Delim_String(t), await json.Decoder.prototype.More.call($.pointerValue<json.Decoder>(dec)))
 					}
 					break
 				case $.typeAssert<string>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.basicType("string")).ok:
 					{
 						let t: string = $.typeAssert<string>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.basicType("string")).value
-						await fmt.Println("string", t)
+						fmt.Println("string", t)
 					}
 					break
 				case $.typeAssert<number>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.basicType("float64")).ok:
 					{
 						let t: number = $.typeAssert<number>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.basicType("float64")).value
-						await fmt.Println("number", $.basicInterfaceValue(t, "float64"))
+						fmt.Println("number", $.basicInterfaceValue(t, "float64"))
 					}
 					break
 				case $.typeAssert<json.Number>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.basicType("string", "json.Number")).ok:
 					{
 						let t: json.Number = $.typeAssert<json.Number>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.basicType("string", "json.Number")).value
 						let [f, ] = json.Number_Float64(t)
-						await fmt.Println("json.Number", json.Number_String(t), $.basicInterfaceValue(f, "float64"))
+						fmt.Println("json.Number", json.Number_String(t), $.basicInterfaceValue(f, "float64"))
 					}
 					break
 				case $.typeAssert<boolean>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.basicType("bool")).ok:
 					{
 						let t: boolean = $.typeAssert<boolean>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.basicType("bool")).value
-						await fmt.Println("bool", t)
+						fmt.Println("bool", t)
 					}
 					break
 			}
@@ -150,18 +150,18 @@ export async function main(): globalThis.Promise<void> {
 	// Compact preserves number literal spelling.
 	let c = $.varRef($.markAsStructValue(new bytes.Buffer()))
 	json.Compact(c, new Uint8Array([123, 34, 110, 34, 58, 32, 49, 101, 43, 48, 48, 44, 32, 34, 98, 105, 103, 34, 58, 32, 57, 48, 48, 55, 49, 57, 57, 50, 53, 52, 55, 52, 48, 57, 57, 51, 125]))
-	await fmt.Println(c.value.String())
+	fmt.Println(c.value.String())
 
 	// Indent lays out the compact form with Go spacing.
 	let ind = $.varRef($.markAsStructValue(new bytes.Buffer()))
 	json.Indent(ind, new Uint8Array([123, 34, 97, 34, 58, 49, 44, 34, 98, 34, 58, 91, 50, 44, 51, 93, 125]), "", "  ")
-	await fmt.Println(ind.value.String())
+	fmt.Println(ind.value.String())
 
 	// Decoder reads one value per call and buffers the rest of the stream.
 	let dec = json.NewDecoder($.pointerValueOrNil($.interfaceValue<io.Reader | null>(strings.NewReader("1 2 3"), "*strings.Reader", /* @__PURE__ */ $.pointerType("strings.Reader")))!)
 	let n = $.varRef(0)
 	while (await json.Decoder.prototype.Decode.call($.pointerValue<json.Decoder>(dec), $.interfaceValue(n, "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int")))) == null) {
-		await fmt.Println("decoded", $.basicInterfaceValue(n.value, "int"))
+		fmt.Println("decoded", $.basicInterfaceValue(n.value, "int"))
 	}
 
 	// UseNumber keeps the exact source literal beyond float64 precision.
@@ -169,27 +169,27 @@ export async function main(): globalThis.Promise<void> {
 	json.Decoder.prototype.UseNumber.call($.pointerValue<json.Decoder>(und))
 	let m: $.VarRef<globalThis.Map<string, any> | null> = $.varRef(null! as globalThis.Map<string, any> | null)
 	await json.Decoder.prototype.Decode.call($.pointerValue<json.Decoder>(und), $.interfaceValue(m, "*map[string]interface{}", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), { kind: $.TypeKind.Interface, methods: [] }))))
-	await fmt.Println("big", $.mapGet<string, any, any>(m.value, "big", null)[0])
+	fmt.Println("big", $.mapGet<string, any, any>(m.value, "big", null)[0])
 
 	// A malformed document yields a *json.SyntaxError with the Go byte offset.
 	let v: $.VarRef<any> = $.varRef(null! as any)
-	let err: $.GoError = json.Unmarshal(new Uint8Array([91, 49, 44, 93]), $.interfaceValue(v, "*interface{}", /* @__PURE__ */ $.pointerType({ kind: $.TypeKind.Interface, methods: [] })))
+	let err: $.GoError = (json.Unmarshal(new Uint8Array([91, 49, 44, 93]), $.interfaceValue(v, "*interface{}", /* @__PURE__ */ $.pointerType({ kind: $.TypeKind.Interface, methods: [] }))) as $.GoError)
 	{
 		let __goscriptTuple0: any = $.typeAssertTuple<json.SyntaxError | $.VarRef<json.SyntaxError> | null>(err, /* @__PURE__ */ $.pointerType("json.SyntaxError"))
 		let se: json.SyntaxError | $.VarRef<json.SyntaxError> | null = __goscriptTuple0[0]
 		let ok = __goscriptTuple0[1]
 		if (ok) {
-			await fmt.Println("offset", $.basicInterfaceValue($.pointerValue<json.SyntaxError>(se).Offset, "int64"))
+			fmt.Println("offset", $.basicInterfaceValue($.pointerValue<json.SyntaxError>(se).Offset, "int64"))
 		}
 	}
 
 	// Token advances the stream; More reports remaining container elements.
 	let mdec = json.NewDecoder($.pointerValueOrNil($.interfaceValue<io.Reader | null>(strings.NewReader("[10,20]"), "*strings.Reader", /* @__PURE__ */ $.pointerType("strings.Reader")))!)
 	await json.Decoder.prototype.Token.call($.pointerValue<json.Decoder>(mdec))
-	await fmt.Println("more", await json.Decoder.prototype.More.call($.pointerValue<json.Decoder>(mdec)))
+	fmt.Println("more", await json.Decoder.prototype.More.call($.pointerValue<json.Decoder>(mdec)))
 	await json.Decoder.prototype.Token.call($.pointerValue<json.Decoder>(mdec))
 	await json.Decoder.prototype.Token.call($.pointerValue<json.Decoder>(mdec))
-	await fmt.Println("more", await json.Decoder.prototype.More.call($.pointerValue<json.Decoder>(mdec)))
+	fmt.Println("more", await json.Decoder.prototype.More.call($.pointerValue<json.Decoder>(mdec)))
 
 	// A blocking reader delivers values, a number, and a multibyte character
 	// split across its chunks.
@@ -199,11 +199,11 @@ export async function main(): globalThis.Promise<void> {
 		{
 			let __goscriptShadow0 = await json.Decoder.prototype.Decode.call($.pointerValue<json.Decoder>(bdec), $.interfaceValue(it, "*main.item", /* @__PURE__ */ $.pointerType("main.item")))
 			if (__goscriptShadow0 != null) {
-				await fmt.Println("decode end:", $.comparableEqual(__goscriptShadow0, io.EOF))
+				fmt.Println("decode end:", $.comparableEqual(__goscriptShadow0, io.EOF))
 				break
 			}
 		}
-		await fmt.Println(it.value.A, $.basicInterfaceValue(it.value.B, "float64"))
+		fmt.Println(it.value.A, $.basicInterfaceValue(it.value.B, "float64"))
 	}
 
 	// Token and More work on a blocking reader, and UseNumber tokens are
@@ -216,7 +216,7 @@ export async function main(): globalThis.Promise<void> {
 	// A syntax error is reported without waiting for the rest of the input.
 	let it: $.VarRef<item> = $.varRef(new item(undefined, true))
 	err = await json.Decoder.prototype.Decode.call($.pointerValue<json.Decoder>(json.NewDecoder($.pointerValueOrNil($.interfaceValue<io.Reader | null>(await newChanReader($.arrayToSlice<string>(["{\"A\": ]", " more"])), "*main.chanReader", /* @__PURE__ */ $.pointerType("main.chanReader")))!)), $.interfaceValue(it, "*main.item", /* @__PURE__ */ $.pointerType("main.item")))
-	await fmt.Println("syntax error:", err != null)
+	fmt.Println("syntax error:", err != null)
 }
 
 if ($.isMainScript(import.meta)) {

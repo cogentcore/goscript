@@ -31,10 +31,11 @@ type OverrideMetadata struct {
 	// literal passed for one lowers as an async function, so its interface
 	// calls await.
 	AsyncCallbacks map[string][]string
-	// AsyncWhenMethods maps a package-level function name to method names. The
-	// function is async in a program where a compiled method with one of those
-	// names is async, such as json.Marshal with an async MarshalJSON, and
-	// synchronous otherwise.
+	// AsyncWhenMethods maps a package-level function name or Type.Method key
+	// to method names. The function or method is async in a program where a
+	// compiled method with one of those names is async, such as json.Marshal
+	// with an async MarshalJSON, and synchronous otherwise. The builtin
+	// package's metadata keys universe objects, such as error.Error.
 	AsyncWhenMethods map[string][]string
 	// FuncValueMakers names the functions and Type.Method keys that make
 	// function values of any type at run time, such as reflect.MakeFunc. A

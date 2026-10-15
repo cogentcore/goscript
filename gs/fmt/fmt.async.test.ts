@@ -25,12 +25,23 @@ describe('fmt with async Error operands', () => {
     expect(await Sprint('prefix-', asyncError('boom'))).toBe('prefix-boom')
   })
 
-  it('Sprintf keeps synchronous Error operands synchronous in text form', () => {
-    // A sync operand must render identically to the pre-async contract; the
-    // result is a Promise only because Sprintf is declared async.
-    const rendered = Sprintf('%v', syncError('sync boom'))
+  it('Sprintf returns synchronous Error operands as a plain string', () => {
+    // The compiler calls Sprintf without await in a program whose Error,
+    // String, Format and GoString methods are all sync, so a sync operand
+    // must render without a Promise.
+    expect(Sprintf('%v', syncError('sync boom'))).toBe('sync boom')
+    expect(Sprint('a', 1, 2, 'b')).toBe('a1 2b')
+    expect(fmt.Sprintln('x', 3)).toBe('x 3\n')
+    expect(
+      $.bytesToString(fmt.Appendf($.stringToBytes('n='), '%d', 4) as $.Bytes),
+    ).toBe('n=4')
+  })
 
-    return expect(rendered).resolves.toBe('sync boom')
+  it('print functions return a Promise only for an async operand', async () => {
+    const pending = Sprintf('%v and %v', syncError('a'), asyncError('b'))
+    expect(pending).toBeInstanceOf(Promise)
+    expect(await pending).toBe('a and b')
+    expect(await fmt.Sprintln(asyncError('c'))).toBe('c\n')
   })
 
   it('Sprintf renders an async Error operand through %w formatting', async () => {

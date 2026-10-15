@@ -1,0 +1,5 @@
+(1, 2) has 3 items
+(4, 5)x6
+line 3: strconv.ParseInt: parsing "abc": invalid syntax
+error: line 3: strconv.ParseInt: parsing "abc": invalid syntax
+wrap (7, 8): line 3: strconv.ParseInt: parsing "abc": invalid syntax true

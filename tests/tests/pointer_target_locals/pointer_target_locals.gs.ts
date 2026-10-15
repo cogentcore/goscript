@@ -96,26 +96,26 @@ export function Describe(n: Node | $.VarRef<Node> | null, prefix: string): strin
 	return prefix + (n$ as Node).Name + ":" + $.runeToString($.int(48 + (n$ as Node).Count, 32))
 }
 
-export async function deref(n: Node | $.VarRef<Node> | null): globalThis.Promise<string> {
+export function deref(n: Node | $.VarRef<Node> | null): string {
 	let msg = ""
-	const __defer = new $.AsyncDisposableStack()
+	const __defer = new $.DisposableStack()
 	try {
-		__defer.defer(async () => { await (async () => {
+		__defer.defer(() => { (() => {
 			{
 				let r = $.recover()
 				if (r != null) {
-					msg = "recovered: " + (__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>($.mustTypeAssert<$.GoError>(r, "error")).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+					msg = "recovered: " + ($.pointerValue<Exclude<$.GoError, null>>($.mustTypeAssert<$.GoError>(r, "error")).Error() as string)
 				}
 			}
 		})() })
 		void (n !== null && (n as any).__isVarRef !== true && (n as any).__goValue === undefined ? ((n as any) as Node).Fill("x") : Node.prototype.Fill.call(n, "x"))
 		const __goscriptReturn0: string = $.pointerValue<Node>(n).Name
 		msg = __goscriptReturn0
-		await __defer.dispose()
+		__defer.dispose()
 		return msg
-		await __defer.dispose()
+		__defer.dispose()
 	} catch (e) {
-		await __defer.disposePanic(e)
+		__defer.disposePanic(e)
 		if (!$.recovered(e)) {
 			throw e
 		}
@@ -132,7 +132,7 @@ export async function main(): globalThis.Promise<void> {
 	let b$: Node = b == null ? $.pointerTarget<Node>(b) : (b as any).__isVarRef === true ? (b as any).value : (b as any).__goValue === undefined ? (b as any) : $.pointerTarget<Node>(b)
 	void (b !== null && (b as any).__isVarRef !== true && (b as any).__goValue === undefined ? ((b as any) as Node).Fill("hello") : Node.prototype.Fill.call(b, "hello"))
 	await $.println((b$ as Node).Name, (b$ as Node).Count)
-	await $.println(await deref(null))
+	await $.println(deref(null))
 	let nn: Node | $.VarRef<Node> | null = null! as Node | $.VarRef<Node> | null
 	await $.println((nn !== null && (nn as any).__isVarRef !== true && (nn as any).__goValue === undefined ? ((nn as any) as Node).Len() : Node.prototype.Len.call(nn)))
 
@@ -141,8 +141,6 @@ export async function main(): globalThis.Promise<void> {
 	void (h !== null && (h as any).__isVarRef !== true && (h as any).__goValue === undefined ? ((h as any) as Holder).touch(1) : Holder.prototype.touch.call(h, 1))
 	await $.println($.arrayIndex((h$ as Holder).items!, 1).Name, $.arrayIndex((h$ as Holder).items!, 1).Count)
 }
-
-var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

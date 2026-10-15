@@ -198,13 +198,25 @@ func (o *SemanticModelOwner) colorAsync(
 		return diagnostics
 	}
 
-	// The graph does not color the methods of open interfaces.
+	// Exported interfaces close over the graph of a whole program.
 	var closed map[*types.Named]bool
 	if wholeProgram {
 		closed = closedInterfaces(model, interfaceGraph, overridePkgs)
 	}
+
+	// Metadata makes some override functions and methods, and interface
+	// methods, async only in a program with async methods of given names.
+	// In a whole program such an interface method is conditional, not open.
 	values := append(programFuncValues(model), overrideValues...)
-	openMethods := openInterfaceMethods(model, interfaceGraph, anonymousInterfaceGraph, closed, values)
+	asyncWhen := asyncWhenMethodFunctions(model, overrideFacts, values)
+	model.asyncWhenTargets = asyncWhenTargetSet(asyncWhen)
+	var conditional map[*types.Func]bool
+	if wholeProgram {
+		conditional = asyncWhenInterfaceMethods(asyncWhen)
+	}
+
+	// The graph does not color the methods of open interfaces.
+	openMethods := openInterfaceMethods(model, interfaceGraph, anonymousInterfaceGraph, closed, conditional, values)
 
 	// Function values reach the classes of calls that match them.
 	openMethodSet := make(map[*types.Func]bool, len(openMethods))
@@ -219,11 +231,11 @@ func (o *SemanticModelOwner) colorAsync(
 	if diagnosticsHaveErrors(diagnostics) {
 		return diagnostics
 	}
-	asyncWhen := asyncWhenMethodFunctions(model, overrideFacts)
 	return append(diagnostics, colorAsyncFunctions(ctx, model, asyncRoots{
-		sites:       asyncArgumentSites,
-		openMethods: openMethods,
-		values:      valueGraph,
+		sites:          asyncArgumentSites,
+		openMethods:    openMethods,
+		values:         valueGraph,
+		asyncWhenSeeds: asyncWhenSeeds(asyncWhen, overrideFacts, overridePkgs),
 	}, interfaceAsyncEdges, anonymousInterfaceGraph, asyncWhen)...)
 }
 
@@ -1550,17 +1562,24 @@ func (c *interfaceCandidates) collectModel(model *SemanticModel) {
 // openInterfaceMethods returns the interface methods called or taken as
 // values that the implementation graph does not color: methods of an
 // interface that is neither package-sealed nor in closed, the interfaces a
-// whole program closes over its graph. An implementation outside the graph
-// may suspend, so each is an async root for its callers.
+// whole program closes over its graph, unless they are in conditional, the
+// methods whose override implementations suspend only as metadata says. An
+// implementation outside the graph may suspend, so each is an async root for
+// its callers.
 func openInterfaceMethods(
 	model *SemanticModel,
 	interfaceGraph []semanticInterfaceImplementationGraphEntry,
 	anonymousInterfaceGraph []semanticAnonymousInterfaceImplementation,
 	closed map[*types.Named]bool,
+	conditional map[*types.Func]bool,
 	values []funcValue,
 ) []*types.Func {
-	// The graph colors the methods a known interface declares.
-	known := make(map[*types.Func]bool)
+	// The graph colors the methods a known interface declares, and metadata
+	// the conditional ones.
+	known := maps.Clone(conditional)
+	if known == nil {
+		known = make(map[*types.Func]bool)
+	}
 	for _, graphEntry := range interfaceGraph {
 		ifaceOrigin := namedOriginOrSelf(graphEntry.iface)
 		if !interfaceKnown(ifaceOrigin, closed) {

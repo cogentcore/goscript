@@ -4737,6 +4737,9 @@ func (o *LoweringOwner) lowerStmtInto(ctx lowerFileContext, stmt ast.Stmt, out [
 		return append(out, loweredStmt{text: text}), diagnostics
 	case *ast.ExprStmt:
 		text, diagnostics := o.lowerExpr(ctx, typed.X)
+		if call, ok := typed.X.(*ast.CallExpr); ok {
+			text = o.unassertedCallResult(ctx, call, text)
+		}
 		return append(out, loweredStmt{text: expressionStmtText(text)}), diagnostics
 	case *ast.ReturnStmt:
 		text, diagnostics := o.lowerReturnStmt(ctx, typed)
@@ -4929,6 +4932,35 @@ func (o *LoweringOwner) lowerStmtInto(ctx lowerFileContext, stmt ast.Stmt, out [
 	default:
 		return out, []Diagnostic{loweringUnsupportedAt(ctx, typed, "statement", ctx.semPkg.pkgPath, "unsupported statement kind")}
 	}
+}
+
+// unassertedCallResult removes the assertion of a call's result to its Go
+// type from lowered, for a call whose result is unused.
+func (o *LoweringOwner) unassertedCallResult(ctx lowerFileContext, call *ast.CallExpr, lowered string) string {
+	// Only an assertion to the call's result type is removed.
+	signature := signatureForType(ctx.semPkg.source.TypesInfo.TypeOf(call.Fun))
+	if signature == nil || signature.Results().Len() == 0 {
+		return lowered
+	}
+	suffix := " as " + o.tsSignatureResultFor(ctx, signature) + ")"
+	if !strings.HasPrefix(lowered, "(") || !strings.HasSuffix(lowered, suffix) {
+		return lowered
+	}
+
+	// The opening parenthesis must close at the end.
+	depth := 0
+	for idx, char := range lowered {
+		switch char {
+		case '(':
+			depth++
+		case ')':
+			depth--
+		}
+		if depth == 0 && idx != len(lowered)-1 {
+			return lowered
+		}
+	}
+	return lowered[1 : len(lowered)-len(suffix)]
 }
 
 func expressionStmtText(text string) string {
@@ -17035,20 +17067,24 @@ func (o *LoweringOwner) awaitCallIfNeeded(ctx lowerFileContext, call *ast.CallEx
 		return "await " + lowered
 	}
 
-	// Only a call through a function value with results needs more.
+	// Only a call with results needs more.
 	pkg := ctx.semPkg.source
 	fun := call.Fun
 	signature := signatureForType(pkg.TypesInfo.TypeOf(fun))
-	if !callUsesFunctionValue(pkg, fun) && !callUsesFunctionIdentifier(pkg, fun) || signature.Results().Len() == 0 {
+	if signature == nil || signature.Results().Len() == 0 {
 		return lowered
 	}
 
-	// A function variable in a synchronous literal must have returned a
-	// value. A value whose class is sync returns one, but its TypeScript
-	// type admits a promise, so the result is asserted to its Go type.
-	if !o.valueCallAsync(ctx, fun) {
+	// A value whose class is sync, or a function that metadata makes async
+	// only in some programs, returns a value here, but its TypeScript type
+	// admits a promise, so the result is asserted to its Go type.
+	valueCall := callUsesFunctionValue(pkg, fun) || callUsesFunctionIdentifier(pkg, fun)
+	if valueCall && !o.valueCallAsync(ctx, fun) || ctx.model != nil && ctx.model.asyncWhenTargets[calledFunction(pkg, fun)] {
 		return "(" + lowered + " as " + o.tsSignatureResultFor(ctx, signature) + ")"
 	}
+
+	// A function variable in a synchronous literal must have returned a
+	// value.
 	if callUsesFunctionIdentifier(pkg, fun) {
 		return o.runtimeOwner.QualifiedHelper(RuntimeHelperSyncResult) + "(" + lowered + ")"
 	}

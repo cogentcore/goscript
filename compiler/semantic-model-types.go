@@ -46,6 +46,9 @@ type SemanticModel struct {
 	// valueNodes holds the literal, lazy initializer and override value nodes
 	// of the async analysis by key.
 	valueNodes map[*types.Func]*semanticFunction
+	// asyncWhenTargets holds the functions, methods and interface methods
+	// that override metadata makes async only in some programs.
+	asyncWhenTargets map[*types.Func]bool
 	// funcLitNodes holds the literal nodes by the literal's position.
 	funcLitNodes map[token.Pos]*semanticFunction
 	// summaries holds the body summaries the build extracted, by package

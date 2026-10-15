@@ -46,7 +46,6 @@
     "File.WriteAt": true,
     "File.WriteString": true,
     "File.WriteTo": true,
-    "LinkError.Error": true,
     "Root.Chmod": true,
     "Root.Chown": true,
     "Root.Chtimes": true,
@@ -66,8 +65,7 @@
     "Root.Rename": true,
     "Root.Stat": true,
     "Root.Symlink": true,
-    "Root.WriteFile": true,
-    "SyscallError.Error": true
+    "Root.WriteFile": true
   },
   "dependencies": [
     "errors",
@@ -80,5 +78,19 @@
     "syscall",
     "time",
     "unsafe"
-  ]
+  ],
+  "asyncWhenMethods": {
+    "LinkError.Error": [
+      "Error",
+      "Format",
+      "GoString",
+      "String"
+    ],
+    "SyscallError.Error": [
+      "Error",
+      "Format",
+      "GoString",
+      "String"
+    ]
+  }
 }

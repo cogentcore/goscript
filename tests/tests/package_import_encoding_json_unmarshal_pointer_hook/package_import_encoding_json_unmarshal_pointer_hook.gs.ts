@@ -121,13 +121,13 @@ export class MapItem {
 
 export function Maps_CopyFrom(km: $.VarRef<Maps> | null, cp: Maps): $.GoError {
 	km!.value = ($.makeSlice<MapItem>(0, $.sliceLen((cp as Maps)), undefined, () => new MapItem(undefined, true)) as Maps)
-	let __goscriptTuple0: any = json.Marshal($.interfaceValue(cp, "main.Maps", /* @__PURE__ */ $.sliceType("main.MapItem", "main.Maps")))
+	let __goscriptTuple0: any = (json.Marshal($.interfaceValue(cp, "main.Maps", /* @__PURE__ */ $.sliceType("main.MapItem", "main.Maps"))) as [$.Slice<number>, $.GoError])
 	let b: $.Slice<number> = __goscriptTuple0[0]
 	let err = __goscriptTuple0[1]
 	if (err != null) {
 		return err
 	}
-	return json.Unmarshal(b, $.namedValueInterfaceValue<any>(km, "*main.Maps", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()))
+	return (json.Unmarshal(b, $.namedValueInterfaceValue<any>(km, "*main.Maps", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2())) as $.GoError)
 }
 
 export function Names_Len(n: $.VarRef<Names> | null): number {
@@ -140,29 +140,29 @@ export function missingHooks(): [json.Marshaler | null, json.Unmarshaler | null]
 
 export async function main(): globalThis.Promise<void> {
 	let [marshaler, unmarshaler] = missingHooks()
-	await fmt.Println("missing hooks", marshaler == null, unmarshaler == null)
+	fmt.Println("missing hooks", marshaler == null, unmarshaler == null)
 
 	// A non-nil *T field with UnmarshalJSON must use the hook before any
 	// pointer-to-struct population path can inspect fields.
 	let box = $.varRef(new Box({Value: new Hooked({Seen: "before"})}, true))
 	{
-		let err = json.Unmarshal(new Uint8Array([123, 34, 118, 97, 108, 117, 101, 34, 58, 123, 34, 105, 103, 110, 111, 114, 101, 100, 34, 58, 48, 125, 125]), $.interfaceValue(box, "*main.Box", /* @__PURE__ */ $.pointerType("main.Box")))
+		let err = (json.Unmarshal(new Uint8Array([123, 34, 118, 97, 108, 117, 101, 34, 58, 123, 34, 105, 103, 110, 111, 114, 101, 100, 34, 58, 48, 125, 125]), $.interfaceValue(box, "*main.Box", /* @__PURE__ */ $.pointerType("main.Box"))) as $.GoError)
 		if (err != null) {
-			await fmt.Println("unmarshal error:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+			fmt.Println("unmarshal error:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 			return
 		}
 	}
-	await fmt.Printf("calls=%d seen=%s\n", $.basicInterfaceValue($.pointerValue<Hooked>(box.value.Value).Calls, "int"), $.pointerValue<Hooked>(box.value.Value).Seen)
+	fmt.Printf("calls=%d seen=%s\n", $.basicInterfaceValue($.pointerValue<Hooked>(box.value.Value).Calls, "int"), $.pointerValue<Hooked>(box.value.Value).Seen)
 
 	// A pointer to a named slice or map type with methods, but no
 	// UnmarshalJSON, decodes into the value it points to.
 	let maps: $.VarRef<Maps> = $.varRef(null! as Maps)
 	let err = Maps_CopyFrom(maps, ($.arrayToSlice<MapItem>([new MapItem({Name: "a", Map: $.makeMap<string, number>([["x", 1]])}, true), new MapItem({Name: "b"}, true)]) as Maps))
-	await fmt.Println("copy:", err == null, $.basicInterfaceValue($.sliceLen((maps.value as Maps)), "int"), $.arrayIndex(maps.value!, 0).Name, $.basicInterfaceValue($.mapGet<string, number, number>($.arrayIndex(maps.value!, 0).Map, "x", 0)[0], "int"), $.arrayIndex(maps.value!, 1).Name)
+	fmt.Println("copy:", err == null, $.basicInterfaceValue($.sliceLen((maps.value as Maps)), "int"), $.arrayIndex(maps.value!, 0).Name, $.basicInterfaceValue($.mapGet<string, number, number>($.arrayIndex(maps.value!, 0).Map, "x", 0)[0], "int"), $.arrayIndex(maps.value!, 1).Name)
 
 	let names: $.VarRef<Names> = $.varRef(null! as Names)
-	err = json.Unmarshal(new Uint8Array([123, 34, 112, 34, 58, 49, 44, 34, 113, 34, 58, 50, 125]), $.namedValueInterfaceValue<any>(names, "*main.Names", __goscriptStatic3(), __goscriptStatic4(), __goscriptStatic5()))
-	await fmt.Println("names:", err == null, $.basicInterfaceValue(Names_Len(names), "int"), $.basicInterfaceValue($.mapGet<string, number, number>(names.value, "q", 0)[0], "int"))
+	err = (json.Unmarshal(new Uint8Array([123, 34, 112, 34, 58, 49, 44, 34, 113, 34, 58, 50, 125]), $.namedValueInterfaceValue<any>(names, "*main.Names", __goscriptStatic3(), __goscriptStatic4(), __goscriptStatic5())) as $.GoError)
+	fmt.Println("names:", err == null, $.basicInterfaceValue(Names_Len(names), "int"), $.basicInterfaceValue($.mapGet<string, number, number>(names.value, "q", 0)[0], "int"))
 }
 
 var __goscriptStatic0$value: any

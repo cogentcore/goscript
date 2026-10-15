@@ -127,7 +127,9 @@ export class T {
 
   public Log(...args: unknown[]): void {
     args = goArgs(args)
-    this.pushLog(fmt.Sprintln(...args).then((text) => text.slice(0, -1)))
+    this.pushLog(
+      Promise.resolve(fmt.Sprintln(...args)).then((text) => text.slice(0, -1)),
+    )
   }
 
   public Logf(format: string, ...args: unknown[]): void {
@@ -144,11 +146,11 @@ export class T {
   // transpiled Error() or String() methods. A placeholder holds the entry's
   // position until its text resolves; flushLogs awaits every pending entry
   // before printing.
-  private pushLog(text: Promise<string>): void {
+  private pushLog(text: string | Promise<string>): void {
     const index = this.logs.length
     this.logs.push('')
     this.pendingLogText.push(
-      text.then((resolved) => {
+      Promise.resolve(text).then((resolved) => {
         this.logs[index] = resolved
       }),
     )

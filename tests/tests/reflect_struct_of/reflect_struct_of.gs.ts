@@ -17,7 +17,7 @@ export async function main(): globalThis.Promise<void> {
 	let value = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.New($.pointerValueOrNil(typ)!))).Elem()))
 	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(value)).FieldByName("Name"))).SetString("Ada")
 	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(value)).Field(1))).SetInt(3n)
-	let __goscriptTuple0: any = json.Marshal($.markAsStructValue($.cloneStructValue(value)).Interface())
+	let __goscriptTuple0: any = (json.Marshal($.markAsStructValue($.cloneStructValue(value)).Interface()) as [$.Slice<number>, $.GoError])
 	let data: $.Slice<number> = __goscriptTuple0[0]
 	let err = __goscriptTuple0[1]
 	if (err != null) {
