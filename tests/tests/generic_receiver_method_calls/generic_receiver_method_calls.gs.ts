@@ -26,9 +26,9 @@ export class box {
 		value: any
 	}
 
-	constructor(init?: Partial<{value?: any}>, __goscriptValue?: boolean) {
+	constructor(init?: Partial<{value?: any}>, __goscriptValue?: boolean, __goscriptFresh?: boolean) {
 		this._fields = {
-			value: init?.value !== undefined ? $.copyElement(init.value) : (null! as any)
+			value: init?.value !== undefined ? (__goscriptFresh === true ? init.value : $.copyElement(init.value)) : (null! as any)
 		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
@@ -72,7 +72,7 @@ export class holder {
 
 	constructor(init?: Partial<{box?: box}>, __goscriptValue?: boolean) {
 		this._fields = {
-			box: init?.box ? $.markAsStructValue($.cloneStructValue(init.box)) : $.markAsStructValue(new box({value: null}))
+			box: init?.box ? $.markAsStructValue($.cloneStructValue(init.box)) : $.markAsStructValue(new box({value: null}, undefined, true))
 		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}

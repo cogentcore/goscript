@@ -16,9 +16,9 @@ export class box {
 		Value: any
 	}
 
-	constructor(init?: Partial<{Value?: any}>, __goscriptValue?: boolean) {
+	constructor(init?: Partial<{Value?: any}>, __goscriptValue?: boolean, __goscriptFresh?: boolean) {
 		this._fields = {
-			Value: init?.Value !== undefined ? $.copyElement(init.Value) : (null! as any)
+			Value: init?.Value !== undefined ? (__goscriptFresh === true ? init.Value : $.copyElement(init.Value)) : (null! as any)
 		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
@@ -82,16 +82,16 @@ export class point {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let intBox: box = $.markAsStructValue(new box({Value: 0}))
+	let intBox: box = $.markAsStructValue(new box({Value: 0}, undefined, true))
 	await $.println("int", intBox.Value)
 
-	let stringBox: box = $.markAsStructValue(new box({Value: ""}))
+	let stringBox: box = $.markAsStructValue(new box({Value: ""}, undefined, true))
 	await $.println("string", $.stringEqual(stringBox.Value, ""))
 
-	let mapBox: box = $.markAsStructValue(new box({Value: null! as globalThis.Map<string, number> | null}))
+	let mapBox: box = $.markAsStructValue(new box({Value: null! as globalThis.Map<string, number> | null}, undefined, true))
 	await $.println("map", mapBox.Value == null)
 
-	let pointBox: box = $.markAsStructValue(new box({Value: new point(undefined, true)}))
+	let pointBox: box = $.markAsStructValue(new box({Value: new point(undefined, true)}, undefined, true))
 	await $.println("struct", pointBox.Value.X)
 
 	let explicit = $.markAsStructValue(new box({Value: 0}))

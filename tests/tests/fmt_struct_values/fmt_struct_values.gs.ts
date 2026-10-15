@@ -268,10 +268,10 @@ export class Base {
 		Active: any
 	}
 
-	constructor(init?: Partial<{Windows?: $.Slice<any>, Active?: any}>, __goscriptValue?: boolean) {
+	constructor(init?: Partial<{Windows?: $.Slice<any>, Active?: any}>, __goscriptValue?: boolean, __goscriptFresh?: boolean) {
 		this._fields = {
 			Windows: init?.Windows ?? (null! as $.Slice<any>),
-			Active: init?.Active !== undefined ? $.copyElement(init.Active) : (null! as any)
+			Active: init?.Active !== undefined ? (__goscriptFresh === true ? init.Active : $.copyElement(init.Active)) : (null! as any)
 		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
@@ -320,7 +320,7 @@ export class App {
 
 	constructor(init?: Partial<{Base?: Base, Name?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
-			Base: init?.Base ? $.markAsStructValue($.cloneStructValue(init.Base)) : $.markAsStructValue(new Base({Active: null! as Win | $.VarRef<Win> | null})),
+			Base: init?.Base ? $.markAsStructValue($.cloneStructValue(init.Base)) : $.markAsStructValue(new Base({Active: null! as Win | $.VarRef<Win> | null}, undefined, true)),
 			Name: init?.Name ?? ("" as string)
 		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true

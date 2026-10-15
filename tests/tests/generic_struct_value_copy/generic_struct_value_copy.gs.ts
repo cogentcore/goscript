@@ -98,12 +98,12 @@ export class Sides {
 		Left: any
 	}
 
-	constructor(init?: Partial<{Top?: any, Right?: any, Bottom?: any, Left?: any}>, __goscriptValue?: boolean) {
+	constructor(init?: Partial<{Top?: any, Right?: any, Bottom?: any, Left?: any}>, __goscriptValue?: boolean, __goscriptFresh?: boolean) {
 		this._fields = {
-			Top: init?.Top !== undefined ? $.copyElement(init.Top) : (null! as any),
-			Right: init?.Right !== undefined ? $.copyElement(init.Right) : (null! as any),
-			Bottom: init?.Bottom !== undefined ? $.copyElement(init.Bottom) : (null! as any),
-			Left: init?.Left !== undefined ? $.copyElement(init.Left) : (null! as any)
+			Top: init?.Top !== undefined ? (__goscriptFresh === true ? init.Top : $.copyElement(init.Top)) : (null! as any),
+			Right: init?.Right !== undefined ? (__goscriptFresh === true ? init.Right : $.copyElement(init.Right)) : (null! as any),
+			Bottom: init?.Bottom !== undefined ? (__goscriptFresh === true ? init.Bottom : $.copyElement(init.Bottom)) : (null! as any),
+			Left: init?.Left !== undefined ? (__goscriptFresh === true ? init.Left : $.copyElement(init.Left)) : (null! as any)
 		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
@@ -168,10 +168,10 @@ export class box {
 		B: any
 	}
 
-	constructor(init?: Partial<{A?: any, B?: any}>, __goscriptValue?: boolean) {
+	constructor(init?: Partial<{A?: any, B?: any}>, __goscriptValue?: boolean, __goscriptFresh?: boolean) {
 		this._fields = {
-			A: init?.A !== undefined ? $.copyElement(init.A) : (null! as any),
-			B: init?.B !== undefined ? $.copyElement(init.B) : (null! as any)
+			A: init?.A !== undefined ? (__goscriptFresh === true ? init.A : $.copyElement(init.A)) : (null! as any),
+			B: init?.B !== undefined ? (__goscriptFresh === true ? init.B : $.copyElement(init.B)) : (null! as any)
 		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
@@ -237,7 +237,7 @@ export function makeBox(__typeArgs: $.GenericTypeArgs | undefined, v: any): box 
 }
 
 export async function main(): globalThis.Promise<void> {
-	let s: $.VarRef<Sides> = $.varRef($.markAsStructValue(new Sides({Top: new Value(undefined, true), Right: new Value(undefined, true), Bottom: new Value(undefined, true), Left: new Value(undefined, true)})))
+	let s: $.VarRef<Sides> = $.varRef($.markAsStructValue(new Sides({Top: new Value(undefined, true), Right: new Value(undefined, true), Bottom: new Value(undefined, true), Left: new Value(undefined, true)}, undefined, true)))
 	s.value.SetHorizontal(__goscriptStatic0(), new Value({V: 24}, true))
 	s.value.Left.Set(16)
 	await $.println("horizontal:", s.value.Left.V, s.value.Right.V)
@@ -298,7 +298,7 @@ export async function main(): globalThis.Promise<void> {
 	orig2.Top.Set(5)
 	await $.println("struct copy method:", orig2.Top.V, cp2.Top.V)
 
-	let si: $.VarRef<Sides> = $.varRef($.markAsStructValue(new Sides({Top: 0, Right: 0, Bottom: 0, Left: 0})))
+	let si: $.VarRef<Sides> = $.varRef($.markAsStructValue(new Sides({Top: 0, Right: 0, Bottom: 0, Left: 0}, undefined, true)))
 	si.value.SetAll(__goscriptStatic1(), 4)
 	si.value.Left = 5
 	await $.println("ints:", si.value.Top, si.value.Left)

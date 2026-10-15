@@ -28,9 +28,9 @@ export class Impl {
 		Item: any
 	}
 
-	constructor(init?: Partial<{Item?: any}>, __goscriptValue?: boolean) {
+	constructor(init?: Partial<{Item?: any}>, __goscriptValue?: boolean, __goscriptFresh?: boolean) {
 		this._fields = {
-			Item: init?.Item !== undefined ? $.copyElement(init.Item) : (null! as any)
+			Item: init?.Item !== undefined ? (__goscriptFresh === true ? init.Item : $.copyElement(init.Item)) : (null! as any)
 		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}

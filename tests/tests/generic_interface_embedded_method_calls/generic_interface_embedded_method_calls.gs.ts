@@ -46,10 +46,10 @@ export class impl {
 		other: any
 	}
 
-	constructor(init?: Partial<{value?: any, other?: any}>, __goscriptValue?: boolean) {
+	constructor(init?: Partial<{value?: any, other?: any}>, __goscriptValue?: boolean, __goscriptFresh?: boolean) {
 		this._fields = {
-			value: init?.value !== undefined ? $.copyElement(init.value) : (null! as any),
-			other: init?.other !== undefined ? $.copyElement(init.other) : (null! as any)
+			value: init?.value !== undefined ? (__goscriptFresh === true ? init.value : $.copyElement(init.value)) : (null! as any),
+			other: init?.other !== undefined ? (__goscriptFresh === true ? init.other : $.copyElement(init.other)) : (null! as any)
 		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}

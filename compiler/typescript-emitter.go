@@ -512,6 +512,11 @@ func renderStructAssign(b *strings.Builder, structType *loweredStruct, runtimeOw
 	b.WriteString("\t}\n")
 }
 
+// structFreshInitParam names the constructor parameter of a generic struct
+// class that says that the values of its type parameter fields in init are
+// fresh, so that it takes them without copies.
+const structFreshInitParam = "__goscriptFresh"
+
 // renderStruct emits field storage, value-copy operations, methods, and metadata.
 func renderStruct(b *strings.Builder, structType *loweredStruct, runtimeOwner *RuntimeContractOwner, trimTypeInfo bool) {
 	markStructValue := runtimeOwner.QualifiedHelper(RuntimeHelperMarkAsStructValue)
@@ -568,8 +573,11 @@ func renderStruct(b *strings.Builder, structType *loweredStruct, runtimeOwner *R
 	}
 	b.WriteString("\t}\n\n")
 
-	// The constructor copies each initial value in by its kind.
+	// The constructor copies each initial value in by its kind. A generic
+	// struct takes values of type parameter fields as they are when the
+	// caller says that they are fresh (see lowerNamedStructZeroValueExpr).
 	b.WriteString("\tconstructor(init?: Partial<{")
+	freshParam := false
 	for idx, field := range structType.fields {
 		if idx != 0 {
 			b.WriteString(", ")
@@ -577,8 +585,13 @@ func renderStruct(b *strings.Builder, structType *loweredStruct, runtimeOwner *R
 		b.WriteString(field.name)
 		b.WriteString("?: ")
 		b.WriteString(field.typ)
+		freshParam = freshParam || field.typeParamValue
 	}
-	b.WriteString("}>, __goscriptValue?: boolean) {\n\t\tthis._fields = {\n")
+	b.WriteString("}>, __goscriptValue?: boolean")
+	if freshParam {
+		b.WriteString(", " + structFreshInitParam + "?: boolean")
+	}
+	b.WriteString(") {\n\t\tthis._fields = {\n")
 	for idx, field := range structType.fields {
 		b.WriteString("\t\t\t")
 		b.WriteString(field.name)
@@ -617,11 +630,13 @@ func renderStruct(b *strings.Builder, structType *loweredStruct, runtimeOwner *R
 			// are copied when they are one at run time.
 			b.WriteString("init?.")
 			b.WriteString(field.name)
-			b.WriteString(" !== undefined ? ")
+			b.WriteString(" !== undefined ? (" + structFreshInitParam + " === true ? init.")
+			b.WriteString(field.name)
+			b.WriteString(" : ")
 			b.WriteString(copyElement)
 			b.WriteString("(init.")
 			b.WriteString(field.name)
-			b.WriteString(") : (")
+			b.WriteString(")) : (")
 			if field.zero == "null" {
 				b.WriteString("null!")
 			} else {

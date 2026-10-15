@@ -14619,12 +14619,18 @@ func (o *LoweringOwner) lowerNamedStructZeroValueExpr(
 	ctx lowerFileContext,
 	named *types.Named,
 ) string {
+	// A struct that is not an instance has its zero values already.
 	name := o.namedTypeExpr(ctx, named)
 	if named.TypeArgs().Len() == 0 {
 		return "new " + name + "()"
 	}
+
+	// The zero values of the type parameter fields of an instance are
+	// passed in, as fresh values that the constructor need not copy.
 	structType := named.Underlying().(*types.Struct)
+	originType, _ := named.Origin().Underlying().(*types.Struct)
 	fields := make([]string, 0, structType.NumFields())
+	fresh := false
 	for idx := range structType.NumFields() {
 		if !genericStructFieldNeedsInstantiatedZero(named, idx) {
 			continue
@@ -14635,9 +14641,15 @@ func (o *LoweringOwner) lowerNamedStructZeroValueExpr(
 			tsStructFieldName(field.Name(), idx)+": "+
 				o.lowerDeclarationZeroValueExpr(ctx, field.Type()),
 		)
+		fresh = fresh || (typeParamMayHoldValueType(originType.Field(idx).Type()) && !o.typeUsesOverride(named.Origin()))
 	}
+
+	// A struct without such fields has its zero values already.
 	if len(fields) == 0 {
 		return "new " + name + "()"
+	}
+	if fresh {
+		return "new " + name + "({" + strings.Join(fields, ", ") + "}, undefined, true)"
 	}
 	return "new " + name + "({" + strings.Join(fields, ", ") + "})"
 }
