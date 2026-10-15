@@ -38,9 +38,9 @@ export class Base {
 		flags: Flags
 	}
 
-	constructor(init?: Partial<{App?: any, flags?: Flags}>, __goscriptValue?: boolean) {
+	constructor(init?: Partial<{App?: any, flags?: Flags}>, __goscriptValue?: boolean, __goscriptFresh?: boolean) {
 		this._fields = {
-			App: init?.App !== undefined ? $.copyElement(init.App) : (null! as any),
+			App: init?.App !== undefined ? (__goscriptFresh === true ? init.App : $.copyElement(init.App)) : (null! as any),
 			flags: init?.flags ?? (0n as Flags)
 		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
@@ -140,7 +140,7 @@ export class Window {
 
 	constructor(init?: Partial<{Base?: Base, Title?: string}>, __goscriptValue?: boolean) {
 		this._fields = {
-			Base: init?.Base ? init.Base.clone() : $.markAsStructValue(new Base({App: null! as App | $.VarRef<App> | null})),
+			Base: init?.Base ? $.markAsStructValue($.cloneStructValue(init.Base)) : $.markAsStructValue(new Base({App: null! as App | $.VarRef<App> | null}, undefined, true)),
 			Title: init?.Title ?? ("" as string)
 		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
@@ -198,7 +198,7 @@ export class Single {
 
 	constructor(init?: Partial<{Base?: Base, Count?: number}>, __goscriptValue?: boolean) {
 		this._fields = {
-			Base: init?.Base ? init.Base.clone() : $.markAsStructValue(new Base({App: null})),
+			Base: init?.Base ? $.markAsStructValue($.cloneStructValue(init.Base)) : $.markAsStructValue(new Base({App: null}, undefined, true)),
 			Count: init?.Count ?? (0 as number)
 		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true

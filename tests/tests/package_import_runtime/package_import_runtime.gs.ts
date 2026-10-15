@@ -69,9 +69,9 @@ export class box {
 		v: any
 	}
 
-	constructor(init?: Partial<{v?: any}>, __goscriptValue?: boolean) {
+	constructor(init?: Partial<{v?: any}>, __goscriptValue?: boolean, __goscriptFresh?: boolean) {
 		this._fields = {
-			v: init?.v !== undefined ? $.copyElement(init.v) : (null! as any)
+			v: init?.v !== undefined ? (__goscriptFresh === true ? init.v : $.copyElement(init.v)) : (null! as any)
 		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}

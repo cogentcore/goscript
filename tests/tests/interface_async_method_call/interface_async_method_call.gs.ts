@@ -150,10 +150,10 @@ export class GenericChannelStore {
 		value: any
 	}
 
-	constructor(init?: Partial<{ch?: $.Channel<any> | null, value?: any}>, __goscriptValue?: boolean) {
+	constructor(init?: Partial<{ch?: $.Channel<any> | null, value?: any}>, __goscriptValue?: boolean, __goscriptFresh?: boolean) {
 		this._fields = {
 			ch: init?.ch ?? (null! as $.Channel<any> | null),
-			value: init?.value !== undefined ? $.copyElement(init.value) : (null! as any)
+			value: init?.value !== undefined ? (__goscriptFresh === true ? init.value : $.copyElement(init.value)) : (null! as any)
 		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}

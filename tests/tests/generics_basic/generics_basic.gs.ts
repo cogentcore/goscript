@@ -206,10 +206,10 @@ export class Pair {
 		Second: any
 	}
 
-	constructor(init?: Partial<{First?: any, Second?: any}>, __goscriptValue?: boolean) {
+	constructor(init?: Partial<{First?: any, Second?: any}>, __goscriptValue?: boolean, __goscriptFresh?: boolean) {
 		this._fields = {
-			First: init?.First !== undefined ? $.copyElement(init.First) : (null! as any),
-			Second: init?.Second !== undefined ? $.copyElement(init.Second) : (null! as any)
+			First: init?.First !== undefined ? (__goscriptFresh === true ? init.First : $.copyElement(init.First)) : (null! as any),
+			Second: init?.Second !== undefined ? (__goscriptFresh === true ? init.Second : $.copyElement(init.Second)) : (null! as any)
 		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}

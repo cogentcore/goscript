@@ -307,10 +307,10 @@ export class LiteralValue {
 		Zero: any
 	}
 
-	constructor(init?: Partial<{Value?: any, Zero?: any}>, __goscriptValue?: boolean) {
+	constructor(init?: Partial<{Value?: any, Zero?: any}>, __goscriptValue?: boolean, __goscriptFresh?: boolean) {
 		this._fields = {
-			Value: init?.Value !== undefined ? $.copyElement(init.Value) : (null! as any),
-			Zero: init?.Zero !== undefined ? $.copyElement(init.Zero) : (null! as any)
+			Value: init?.Value !== undefined ? (__goscriptFresh === true ? init.Value : $.copyElement(init.Value)) : (null! as any),
+			Zero: init?.Zero !== undefined ? (__goscriptFresh === true ? init.Zero : $.copyElement(init.Zero)) : (null! as any)
 		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
@@ -350,7 +350,7 @@ export class LiteralContainer {
 
 	constructor(init?: Partial<{LiteralValue?: LiteralValue}>, __goscriptValue?: boolean) {
 		this._fields = {
-			LiteralValue: init?.LiteralValue ? init.LiteralValue.clone() : $.markAsStructValue(new LiteralValue({Value: null, Zero: null}))
+			LiteralValue: init?.LiteralValue ? $.markAsStructValue($.cloneStructValue(init.LiteralValue)) : $.markAsStructValue(new LiteralValue({Value: null, Zero: null}, undefined, true))
 		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
@@ -395,8 +395,8 @@ export async function main(): globalThis.Promise<void> {
 	// Anonymous and generic structs use the same promoted field paths.
 	let anonymous = (() => { const __goscriptStructLiteral3: {"Person": Person, "Enabled": boolean} = $.anonymousStructValue({"Person": new Person(undefined, true), "Enabled": false}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("Person", "main.Person", [0], 0, true, { anonymous: true }), /* @__PURE__ */ $.structField("Enabled", /* @__PURE__ */ $.basicType("bool"), [1], 24, true)] }); __goscriptStructLiteral3.Person = new Person(undefined, true); __goscriptStructLiteral3.Person.Name = "anonymous"; __goscriptStructLiteral3.Enabled = true; return __goscriptStructLiteral3 })()
 	await $.println(anonymous.Person.Name, anonymous.Person.Age, anonymous.Enabled)
-	let text = (() => { const __goscriptStructLiteral4: LiteralContainer = new LiteralContainer(); __goscriptStructLiteral4.LiteralValue = $.markAsStructValue(new LiteralValue({Value: "", Zero: ""})); __goscriptStructLiteral4.LiteralValue.Value = "generic"; return $.markAsStructValue(__goscriptStructLiteral4) })()
-	let wide = (() => { const __goscriptStructLiteral5: LiteralContainer = new LiteralContainer(); __goscriptStructLiteral5.LiteralValue = $.markAsStructValue(new LiteralValue({Value: 0n, Zero: 0n})); __goscriptStructLiteral5.LiteralValue.Value = 17n; return $.markAsStructValue(__goscriptStructLiteral5) })()
+	let text = (() => { const __goscriptStructLiteral4: LiteralContainer = new LiteralContainer(); __goscriptStructLiteral4.LiteralValue = $.markAsStructValue(new LiteralValue({Value: "", Zero: ""}, undefined, true)); __goscriptStructLiteral4.LiteralValue.Value = "generic"; return $.markAsStructValue(__goscriptStructLiteral4) })()
+	let wide = (() => { const __goscriptStructLiteral5: LiteralContainer = new LiteralContainer(); __goscriptStructLiteral5.LiteralValue = $.markAsStructValue(new LiteralValue({Value: 0n, Zero: 0n}, undefined, true)); __goscriptStructLiteral5.LiteralValue.Value = 17n; return $.markAsStructValue(__goscriptStructLiteral5) })()
 	await $.println(text.LiteralValue.Value, text.LiteralValue.Zero, wide.LiteralValue.Value, wide.LiteralValue.Zero)
 }
 
