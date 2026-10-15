@@ -19,7 +19,7 @@ import {
 import { writeHostStdoutText } from './hostio.js'
 import { runtimePanic } from './panic.js'
 import { formatPrintedArgs } from './print.js'
-import { isSliceProxy, runeToString } from './slice.js'
+import { isSliceProxy, runeToString, sliceRange } from './slice.js'
 import { isVarRef, type VarRef } from './varRef.js'
 
 /**
@@ -41,7 +41,10 @@ export async function println(...args: any[]): Promise<void> {
 /**
  * clear zeroes slice elements or removes every map entry.
  */
-export function clear<T>(v: Slice<T> | Map<unknown, unknown> | null): void {
+export function clear<T>(
+  v: Slice<T> | Map<unknown, unknown> | null,
+  zeroFactory?: () => T,
+): void {
   // A nil slice or map has nothing to clear.
   if (v === null || v === undefined) {
     return
@@ -54,6 +57,15 @@ export function clear<T>(v: Slice<T> | Map<unknown, unknown> | null): void {
   }
   if (v instanceof Uint8Array) {
     v.fill(0)
+    return
+  }
+
+  // Elements that are structs or arrays each get a zero value of their own.
+  if (zeroFactory !== undefined) {
+    const { backing, offset, length } = sliceRange(v as Slice<T>)
+    for (let i = 0; i < length; i++) {
+      ;(backing as T[])[offset + i] = zeroFactory()
+    }
     return
   }
 

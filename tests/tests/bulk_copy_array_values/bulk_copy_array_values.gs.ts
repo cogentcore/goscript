@@ -34,7 +34,7 @@ export class point {
 export async function main(): globalThis.Promise<void> {
 	let src = $.arrayToSlice<number[]>([$.arrayValue([1])])
 
-	let dst = $.makeSlice<number[]>(1)
+	let dst = $.makeSlice<number[]>(1, undefined, undefined, () => $.arrayValue(globalThis.Array.from({ length: 1 }, () => 0)))
 	$.copy(dst, src)
 	$.arrayIndex(dst!, 0)[0] = 9
 	await $.println("copy:", $.arrayIndex($.arrayIndex(src!, 0), 0))
@@ -64,7 +64,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("values:", $.arrayIndex($.arrayIndex(src!, 0), 0))
 
 	let points = $.arrayToSlice<point[]>([$.arrayValue([new point({x: 1}, true)], /* @__PURE__ */ $.arrayType("main.point", 1))])
-	let pointCopies = $.makeSlice<point[]>(1)
+	let pointCopies = $.makeSlice<point[]>(1, undefined, undefined, () => $.arrayValue(globalThis.Array.from({ length: 1 }, () => new point(undefined, true)), /* @__PURE__ */ $.arrayType("main.point", 1)))
 	$.copy(pointCopies, points)
 	$.arrayIndex($.arrayIndex(pointCopies!, 0), 0).x = 9
 	await $.println("struct array:", $.arrayIndex($.arrayIndex(points!, 0), 0).x)
