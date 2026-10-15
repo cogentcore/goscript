@@ -26,7 +26,7 @@ export const MaxRune = 0x10ffff
 export const ReplacementChar = 0xfffd
 export const MaxASCII = 0x7f
 export const MaxLatin1 = 0xff
-export const Version = '15.0.0'
+export const Version = '17.0.0'
 
 // UpperCase Case constants.
 export const UpperCase = 0

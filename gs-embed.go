@@ -352,6 +352,7 @@ import "embed"
 //go:embed gs/time/time.ts
 //go:embed gs/unicode/index.ts
 //go:embed gs/unicode/meta.json
+//go:embed gs/unicode/named.ts
 //go:embed gs/unicode/tables.ts
 //go:embed gs/unicode/unicode.ts
 //go:embed gs/unicode/utf8/index.ts
