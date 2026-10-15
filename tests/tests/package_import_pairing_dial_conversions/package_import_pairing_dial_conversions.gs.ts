@@ -19,22 +19,10 @@ import "@goscript/io/index.js"
 import "@goscript/net/index.js"
 
 export class recreateError {
-	public get next(): bigint {
-		return this._fields.next
-	}
-
-	public set next(value: bigint) {
-		this._fields.next = value
-	}
-
-	public _fields: {
-		next: bigint
-	}
+	public declare next: bigint
 
 	constructor(init?: Partial<{next?: bigint}>, __goscriptValue?: boolean) {
-		this._fields = {
-			next: init?.next ?? (0n as bigint)
-		}
+		this.next = init?.next ?? (0n as bigint)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -42,10 +30,9 @@ export class recreateError {
 		return new recreateError(this, true)
 	}
 
-	public __goscriptAssign(source: recreateError): void {
-		const target = this._fields
-		const values = source._fields
-		target.next = values.next
+	public __goscriptAssign(source: recreateError): this {
+		this.next = source.next
+		return this
 	}
 
 	public Error(): string {
@@ -63,12 +50,7 @@ export class recreateError {
 }
 
 export class readWriteCloser {
-	public _fields: {
-	}
-
 	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
-		this._fields = {
-		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -76,7 +58,8 @@ export class readWriteCloser {
 		return new readWriteCloser(this, true)
 	}
 
-	public __goscriptAssign(source: readWriteCloser): void {
+	public __goscriptAssign(source: readWriteCloser): this {
+		return this
 	}
 
 	public Close(): $.GoError {

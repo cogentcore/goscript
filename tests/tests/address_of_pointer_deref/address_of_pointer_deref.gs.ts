@@ -4,32 +4,13 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class Col {
-	public get Name(): string {
-		return this._fields.Name
-	}
+	public declare Name: string
 
-	public set Name(value: string) {
-		this._fields.Name = value
-	}
-
-	public get Default(): $.VarRef<number> | null {
-		return this._fields.Default
-	}
-
-	public set Default(value: $.VarRef<number> | null) {
-		this._fields.Default = value
-	}
-
-	public _fields: {
-		Name: string
-		Default: $.VarRef<number> | null
-	}
+	public declare Default: $.VarRef<number> | null
 
 	constructor(init?: Partial<{Name?: string, Default?: $.VarRef<number> | null}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Name: init?.Name ?? ("" as string),
-			Default: init?.Default ?? (null! as $.VarRef<number> | null)
-		}
+		this.Name = init?.Name ?? ("" as string)
+		this.Default = init?.Default ?? (null! as $.VarRef<number> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -37,11 +18,10 @@ export class Col {
 		return new Col(this, true)
 	}
 
-	public __goscriptAssign(source: Col): void {
-		const target = this._fields
-		const values = source._fields
-		target.Name = values.Name
-		target.Default = values.Default
+	public __goscriptAssign(source: Col): this {
+		this.Name = source.Name
+		this.Default = source.Default
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

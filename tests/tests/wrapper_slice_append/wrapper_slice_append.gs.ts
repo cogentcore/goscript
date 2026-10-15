@@ -7,32 +7,13 @@ import * as errlist from "@goscript/github.com/s4wave/goscript/tests/tests/wrapp
 import "@goscript/github.com/s4wave/goscript/tests/tests/wrapper_slice_append/errlist/index.js"
 
 export class parser {
-	public get errors(): errlist.ErrorList {
-		return this._fields.errors
-	}
+	public declare errors: errlist.ErrorList
 
-	public set errors(value: errlist.ErrorList) {
-		this._fields.errors = value
-	}
-
-	public get astruct(): errlist.AStruct {
-		return this._fields.astruct
-	}
-
-	public set astruct(value: errlist.AStruct) {
-		this._fields.astruct = value
-	}
-
-	public _fields: {
-		errors: errlist.ErrorList
-		astruct: errlist.AStruct
-	}
+	public declare astruct: errlist.AStruct
 
 	constructor(init?: Partial<{errors?: errlist.ErrorList, astruct?: errlist.AStruct}>, __goscriptValue?: boolean) {
-		this._fields = {
-			errors: init?.errors ?? (null! as errlist.ErrorList),
-			astruct: init?.astruct ? init.astruct.clone() : new errlist.AStruct(undefined, true)
-		}
+		this.errors = init?.errors ?? (null! as errlist.ErrorList)
+		this.astruct = init?.astruct ? init.astruct.clone() : new errlist.AStruct(undefined, true)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -40,11 +21,10 @@ export class parser {
 		return new parser(this, true)
 	}
 
-	public __goscriptAssign(source: parser): void {
-		const target = this._fields
-		const values = source._fields
-		target.errors = values.errors
-		$.assignStruct(target.astruct, values.astruct)
+	public __goscriptAssign(source: parser): this {
+		this.errors = source.errors
+		this.astruct.__goscriptAssign(source.astruct)
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -59,7 +39,7 @@ export class parser {
 export async function main(): globalThis.Promise<void> {
 	let p: parser = new parser(undefined, true)
 	// this Add method does not work:
-	errlist.ErrorList_Add($.fieldRef(p._fields, "errors"), "error")
+	errlist.ErrorList_Add($.fieldRef(p, "errors"), "error")
 	await $.println($.arrayIndex(p.errors!, 0))
 
 	// but it does work for a struct type:

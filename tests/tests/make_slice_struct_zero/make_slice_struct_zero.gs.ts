@@ -4,22 +4,10 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class code {
-	public get len(): number {
-		return this._fields.len
-	}
-
-	public set len(value: number) {
-		this._fields.len = value
-	}
-
-	public _fields: {
-		len: number
-	}
+	public declare len: number
 
 	constructor(init?: Partial<{len?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			len: init?.len ?? (0 as number)
-		}
+		this.len = init?.len ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -27,10 +15,9 @@ export class code {
 		return new code(this, true)
 	}
 
-	public __goscriptAssign(source: code): void {
-		const target = this._fields
-		const values = source._fields
-		target.len = values.len
+	public __goscriptAssign(source: code): this {
+		this.len = source.len
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

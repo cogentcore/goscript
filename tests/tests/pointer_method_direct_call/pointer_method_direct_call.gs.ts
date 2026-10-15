@@ -14,22 +14,10 @@ $.registerInterfaceType(
 );
 
 export class counter {
-	public get n(): number {
-		return this._fields.n
-	}
-
-	public set n(value: number) {
-		this._fields.n = value
-	}
-
-	public _fields: {
-		n: number
-	}
+	public declare n: number
 
 	constructor(init?: Partial<{n?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			n: init?.n ?? (0 as number)
-		}
+		this.n = init?.n ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -37,10 +25,9 @@ export class counter {
 		return new counter(this, true)
 	}
 
-	public __goscriptAssign(source: counter): void {
-		const target = this._fields
-		const values = source._fields
-		target.n = values.n
+	public __goscriptAssign(source: counter): this {
+		this.n = source.n
+		return this
 	}
 
 	public add(i: number): number {
@@ -100,7 +87,7 @@ export async function main(): globalThis.Promise<void> {
 		let v: $.VarRef<counter> = $.varRef(new counter(undefined, true))
 		let pv = v
 		let reset = $.functionValue(() => {
-			v.value = $.assignStruct(v.value, new counter({n: 100}, true))
+			v.value = v.value.__goscriptAssign(new counter({n: 100}, true))
 		}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo))
 		void (pv !== null && (pv as any).__isVarRef !== true && (pv as any).__goValue === undefined ? ((pv as any) as counter).add(1) : counter.prototype.add.call(pv, 1))
 		reset()

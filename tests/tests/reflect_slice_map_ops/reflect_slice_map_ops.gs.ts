@@ -10,22 +10,10 @@ import "@goscript/encoding/xml/index.js"
 import "@goscript/reflect/index.js"
 
 export class Item {
-	public get Name(): string {
-		return this._fields.Name
-	}
-
-	public set Name(value: string) {
-		this._fields.Name = value
-	}
-
-	public _fields: {
-		Name: string
-	}
+	public declare Name: string
 
 	constructor(init?: Partial<{Name?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Name: init?.Name ?? ("" as string)
-		}
+		this.Name = init?.Name ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -33,10 +21,9 @@ export class Item {
 		return new Item(this, true)
 	}
 
-	public __goscriptAssign(source: Item): void {
-		const target = this._fields
-		const values = source._fields
-		target.Name = values.Name
+	public __goscriptAssign(source: Item): this {
+		this.Name = source.Name
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -49,32 +36,13 @@ export class Item {
 }
 
 export class Holder {
-	public get S(): $.Slice<number> {
-		return this._fields.S
-	}
+	public declare S: $.Slice<number>
 
-	public set S(value: $.Slice<number>) {
-		this._fields.S = value
-	}
-
-	public get T(): $.Slice<number> {
-		return this._fields.T
-	}
-
-	public set T(value: $.Slice<number>) {
-		this._fields.T = value
-	}
-
-	public _fields: {
-		S: $.Slice<number>
-		T: $.Slice<number>
-	}
+	public declare T: $.Slice<number>
 
 	constructor(init?: Partial<{S?: $.Slice<number>, T?: $.Slice<number>}>, __goscriptValue?: boolean) {
-		this._fields = {
-			S: init?.S ?? (null! as $.Slice<number>),
-			T: init?.T ?? (null! as $.Slice<number>)
-		}
+		this.S = init?.S ?? (null! as $.Slice<number>)
+		this.T = init?.T ?? (null! as $.Slice<number>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -82,11 +50,10 @@ export class Holder {
 		return new Holder(this, true)
 	}
 
-	public __goscriptAssign(source: Holder): void {
-		const target = this._fields
-		const values = source._fields
-		target.S = values.S
-		target.T = values.T
+	public __goscriptAssign(source: Holder): this {
+		this.S = source.S
+		this.T = source.T
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -99,22 +66,10 @@ export class Holder {
 }
 
 export class Doc {
-	public get Items(): $.Slice<Item> {
-		return this._fields.Items
-	}
-
-	public set Items(value: $.Slice<Item>) {
-		this._fields.Items = value
-	}
-
-	public _fields: {
-		Items: $.Slice<Item>
-	}
+	public declare Items: $.Slice<Item>
 
 	constructor(init?: Partial<{Items?: $.Slice<Item>}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Items: init?.Items ?? (null! as $.Slice<Item>)
-		}
+		this.Items = init?.Items ?? (null! as $.Slice<Item>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -122,10 +77,9 @@ export class Doc {
 		return new Doc(this, true)
 	}
 
-	public __goscriptAssign(source: Doc): void {
-		const target = this._fields
-		const values = source._fields
-		target.Items = values.Items
+	public __goscriptAssign(source: Doc): this {
+		this.Items = source.Items
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

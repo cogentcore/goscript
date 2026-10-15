@@ -14,72 +14,25 @@ $.registerInterfaceType(
 );
 
 export class point {
-	public get X(): number {
-		return this._fields.X
-	}
+	public declare X: number
 
-	public set X(value: number) {
-		this._fields.X = value
-	}
+	public declare S: string
 
-	public get S(): string {
-		return this._fields.S
-	}
+	public declare U8: number
 
-	public set S(value: string) {
-		this._fields.S = value
-	}
+	public declare I64: bigint
 
-	public get U8(): number {
-		return this._fields.U8
-	}
+	public declare U32: number
 
-	public set U8(value: number) {
-		this._fields.U8 = value
-	}
-
-	public get I64(): bigint {
-		return this._fields.I64
-	}
-
-	public set I64(value: bigint) {
-		this._fields.I64 = value
-	}
-
-	public get U32(): number {
-		return this._fields.U32
-	}
-
-	public set U32(value: number) {
-		this._fields.U32 = value
-	}
-
-	public get F32(): number {
-		return this._fields.F32
-	}
-
-	public set F32(value: number) {
-		this._fields.F32 = value
-	}
-
-	public _fields: {
-		X: number
-		S: string
-		U8: number
-		I64: bigint
-		U32: number
-		F32: number
-	}
+	public declare F32: number
 
 	constructor(init?: Partial<{X?: number, S?: string, U8?: number, I64?: bigint, U32?: number, F32?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			X: init?.X ?? (0 as number),
-			S: init?.S ?? ("" as string),
-			U8: init?.U8 ?? (0 as number),
-			I64: init?.I64 ?? (0n as bigint),
-			U32: init?.U32 ?? (0 as number),
-			F32: init?.F32 ?? (0 as number)
-		}
+		this.X = init?.X ?? (0 as number)
+		this.S = init?.S ?? ("" as string)
+		this.U8 = init?.U8 ?? (0 as number)
+		this.I64 = init?.I64 ?? (0n as bigint)
+		this.U32 = init?.U32 ?? (0 as number)
+		this.F32 = init?.F32 ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -87,15 +40,14 @@ export class point {
 		return new point(this, true)
 	}
 
-	public __goscriptAssign(source: point): void {
-		const target = this._fields
-		const values = source._fields
-		target.X = values.X
-		target.S = values.S
-		target.U8 = values.U8
-		target.I64 = values.I64
-		target.U32 = values.U32
-		target.F32 = values.F32
+	public __goscriptAssign(source: point): this {
+		this.X = source.X
+		this.S = source.S
+		this.U8 = source.U8
+		this.I64 = source.I64
+		this.U32 = source.U32
+		this.F32 = source.F32
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -108,22 +60,10 @@ export class point {
 }
 
 export class chanCounter {
-	public get ch(): $.Channel<number> | null {
-		return this._fields.ch
-	}
-
-	public set ch(value: $.Channel<number> | null) {
-		this._fields.ch = value
-	}
-
-	public _fields: {
-		ch: $.Channel<number> | null
-	}
+	public declare ch: $.Channel<number> | null
 
 	constructor(init?: Partial<{ch?: $.Channel<number> | null}>, __goscriptValue?: boolean) {
-		this._fields = {
-			ch: init?.ch ?? (null! as $.Channel<number> | null)
-		}
+		this.ch = init?.ch ?? (null! as $.Channel<number> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -131,10 +71,9 @@ export class chanCounter {
 		return new chanCounter(this, true)
 	}
 
-	public __goscriptAssign(source: chanCounter): void {
-		const target = this._fields
-		const values = source._fields
-		target.ch = values.ch
+	public __goscriptAssign(source: chanCounter): this {
+		this.ch = source.ch
+		return this
 	}
 
 	public async Next(): globalThis.Promise<number> {
@@ -278,7 +217,7 @@ export async function main(): globalThis.Promise<void> {
 	// Dereference of a call result.
 	calls = 0
 	const __goscriptOperand9 = ptr();
-	;($.fieldRef($.pointerValue<point>(__goscriptOperand9)._fields, "X"))!.value += 2
+	;($.fieldRef($.pointerValue<point>(__goscriptOperand9), "X"))!.value += 2
 	await $.println("deref +=", $.pointerValue<point>(pt).X, calls)
 
 	// Narrow, wide, unsigned and float32 fields.

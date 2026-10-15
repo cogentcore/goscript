@@ -10,32 +10,13 @@ import "@goscript/reflect/index.js"
 import "@goscript/unsafe/index.js"
 
 export class config {
-	public get Name(): string {
-		return this._fields.Name
-	}
+	public declare Name: string
 
-	public set Name(value: string) {
-		this._fields.Name = value
-	}
-
-	public get UsesCgo(): boolean {
-		return this._fields.UsesCgo
-	}
-
-	public set UsesCgo(value: boolean) {
-		this._fields.UsesCgo = value
-	}
-
-	public _fields: {
-		Name: string
-		UsesCgo: boolean
-	}
+	public declare UsesCgo: boolean
 
 	constructor(init?: Partial<{Name?: string, UsesCgo?: boolean}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Name: init?.Name ?? ("" as string),
-			UsesCgo: init?.UsesCgo ?? (false as boolean)
-		}
+		this.Name = init?.Name ?? ("" as string)
+		this.UsesCgo = init?.UsesCgo ?? (false as boolean)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -43,11 +24,10 @@ export class config {
 		return new config(this, true)
 	}
 
-	public __goscriptAssign(source: config): void {
-		const target = this._fields
-		const values = source._fields
-		target.Name = values.Name
-		target.UsesCgo = values.UsesCgo
+	public __goscriptAssign(source: config): this {
+		this.Name = source.Name
+		this.UsesCgo = source.UsesCgo
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

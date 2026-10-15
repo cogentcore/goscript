@@ -14,12 +14,7 @@ $.registerInterfaceType(
 );
 
 export class MyProcessor {
-	public _fields: {
-	}
-
 	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
-		this._fields = {
-		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -27,7 +22,8 @@ export class MyProcessor {
 		return new MyProcessor(this, true)
 	}
 
-	public __goscriptAssign(source: MyProcessor): void {
+	public __goscriptAssign(source: MyProcessor): this {
+		return this
 	}
 
 	public async Process(data: $.Slice<number>, count: number, _p2: string): globalThis.Promise<[boolean, $.GoError]> {

@@ -4,32 +4,13 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class file {
-	public get name(): string {
-		return this._fields.name
-	}
+	public declare name: string
 
-	public set name(value: string) {
-		this._fields.name = value
-	}
-
-	public get data(): $.Slice<number> {
-		return this._fields.data
-	}
-
-	public set data(value: $.Slice<number>) {
-		this._fields.data = value
-	}
-
-	public _fields: {
-		name: string
-		data: $.Slice<number>
-	}
+	public declare data: $.Slice<number>
 
 	constructor(init?: Partial<{name?: string, data?: $.Slice<number>}>, __goscriptValue?: boolean) {
-		this._fields = {
-			name: init?.name ?? ("" as string),
-			data: init?.data ?? (null! as $.Slice<number>)
-		}
+		this.name = init?.name ?? ("" as string)
+		this.data = init?.data ?? (null! as $.Slice<number>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -37,11 +18,10 @@ export class file {
 		return new file(this, true)
 	}
 
-	public __goscriptAssign(source: file): void {
-		const target = this._fields
-		const values = source._fields
-		target.name = values.name
-		target.data = values.data
+	public __goscriptAssign(source: file): this {
+		this.name = source.name
+		this.data = source.data
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

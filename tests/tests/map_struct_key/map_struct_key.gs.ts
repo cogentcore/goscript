@@ -4,42 +4,16 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class requestKey {
-	public get soID(): string {
-		return this._fields.soID
-	}
+	public declare soID: string
 
-	public set soID(value: string) {
-		this._fields.soID = value
-	}
+	public declare inviteID: string
 
-	public get inviteID(): string {
-		return this._fields.inviteID
-	}
-
-	public set inviteID(value: string) {
-		this._fields.inviteID = value
-	}
-
-	public get peerID(): string {
-		return this._fields.peerID
-	}
-
-	public set peerID(value: string) {
-		this._fields.peerID = value
-	}
-
-	public _fields: {
-		soID: string
-		inviteID: string
-		peerID: string
-	}
+	public declare peerID: string
 
 	constructor(init?: Partial<{soID?: string, inviteID?: string, peerID?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			soID: init?.soID ?? ("" as string),
-			inviteID: init?.inviteID ?? ("" as string),
-			peerID: init?.peerID ?? ("" as string)
-		}
+		this.soID = init?.soID ?? ("" as string)
+		this.inviteID = init?.inviteID ?? ("" as string)
+		this.peerID = init?.peerID ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -47,12 +21,11 @@ export class requestKey {
 		return new requestKey(this, true)
 	}
 
-	public __goscriptAssign(source: requestKey): void {
-		const target = this._fields
-		const values = source._fields
-		target.soID = values.soID
-		target.inviteID = values.inviteID
-		target.peerID = values.peerID
+	public __goscriptAssign(source: requestKey): this {
+		this.soID = source.soID
+		this.inviteID = source.inviteID
+		this.peerID = source.peerID
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -65,32 +38,13 @@ export class requestKey {
 }
 
 export class node {
-	public get value(): string {
-		return this._fields.value
-	}
+	public declare value: string
 
-	public set value(value: string) {
-		this._fields.value = value
-	}
-
-	public get next(): node | $.VarRef<node> | null {
-		return this._fields.next
-	}
-
-	public set next(value: node | $.VarRef<node> | null) {
-		this._fields.next = value
-	}
-
-	public _fields: {
-		value: string
-		next: node | $.VarRef<node> | null
-	}
+	public declare next: node | $.VarRef<node> | null
 
 	constructor(init?: Partial<{value?: string, next?: node | $.VarRef<node> | null}>, __goscriptValue?: boolean) {
-		this._fields = {
-			value: init?.value ?? ("" as string),
-			next: init?.next ?? (null! as node | $.VarRef<node> | null)
-		}
+		this.value = init?.value ?? ("" as string)
+		this.next = init?.next ?? (null! as node | $.VarRef<node> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -98,11 +52,10 @@ export class node {
 		return new node(this, true)
 	}
 
-	public __goscriptAssign(source: node): void {
-		const target = this._fields
-		const values = source._fields
-		target.value = values.value
-		target.next = values.next
+	public __goscriptAssign(source: node): this {
+		this.value = source.value
+		this.next = source.next
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

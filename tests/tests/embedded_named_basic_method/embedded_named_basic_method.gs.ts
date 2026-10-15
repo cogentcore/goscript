@@ -28,32 +28,13 @@ $.registerInterfaceType(
 );
 
 export class Engineer {
-	public get Level(): Level {
-		return this._fields.Level
-	}
+	public declare Level: Level
 
-	public set Level(value: Level) {
-		this._fields.Level = value
-	}
-
-	public get Name(): string {
-		return this._fields.Name
-	}
-
-	public set Name(value: string) {
-		this._fields.Name = value
-	}
-
-	public _fields: {
-		Level: Level
-		Name: string
-	}
+	public declare Name: string
 
 	constructor(init?: Partial<{Level?: Level, Name?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Level: init?.Level ?? (0 as Level),
-			Name: init?.Name ?? ("" as string)
-		}
+		this.Level = init?.Level ?? (0 as Level)
+		this.Name = init?.Name ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -61,11 +42,10 @@ export class Engineer {
 		return new Engineer(this, true)
 	}
 
-	public __goscriptAssign(source: Engineer): void {
-		const target = this._fields
-		const values = source._fields
-		target.Level = values.Level
-		target.Name = values.Name
+	public __goscriptAssign(source: Engineer): this {
+		this.Level = source.Level
+		this.Name = source.Name
+		return this
 	}
 
 	public Rank(prefix: any): any {
@@ -82,22 +62,10 @@ export class Engineer {
 }
 
 export class Lead {
-	public get Engineer(): Engineer {
-		return this._fields.Engineer
-	}
-
-	public set Engineer(value: Engineer) {
-		this._fields.Engineer = value
-	}
-
-	public _fields: {
-		Engineer: Engineer
-	}
+	public declare Engineer: Engineer
 
 	constructor(init?: Partial<{Engineer?: Engineer}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Engineer: init?.Engineer ? init.Engineer.clone() : new Engineer(undefined, true)
-		}
+		this.Engineer = init?.Engineer ? init.Engineer.clone() : new Engineer(undefined, true)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -105,10 +73,9 @@ export class Lead {
 		return new Lead(this, true)
 	}
 
-	public __goscriptAssign(source: Lead): void {
-		const target = this._fields
-		const values = source._fields
-		$.assignStruct(target.Engineer, values.Engineer)
+	public __goscriptAssign(source: Lead): this {
+		this.Engineer.__goscriptAssign(source.Engineer)
+		return this
 	}
 
 	public Rank(prefix: any): any {

@@ -9,22 +9,10 @@ import "@goscript/unsafe/index.js"
 import "@goscript/sync/index.js"
 
 export class Setting {
-	public get once(): sync.Once {
-		return this._fields.once
-	}
-
-	public set once(value: sync.Once) {
-		this._fields.once = value
-	}
-
-	public _fields: {
-		once: sync.Once
-	}
+	public declare once: sync.Once
 
 	constructor(init?: Partial<{once?: sync.Once}>, __goscriptValue?: boolean) {
-		this._fields = {
-			once: init?.once ? $.markAsStructValue($.cloneStructValue(init.once)) : $.markAsStructValue(new sync.Once())
-		}
+		this.once = init?.once ? $.markAsStructValue($.cloneStructValue(init.once)) : $.markAsStructValue(new sync.Once())
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -32,10 +20,9 @@ export class Setting {
 		return new Setting(this, true)
 	}
 
-	public __goscriptAssign(source: Setting): void {
-		const target = this._fields
-		const values = source._fields
-		$.assignStruct(target.once, values.once)
+	public __goscriptAssign(source: Setting): this {
+		$.assignStruct(this.once, source.once)
+		return this
 	}
 
 	public async Value(): globalThis.Promise<string> {

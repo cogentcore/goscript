@@ -24,22 +24,10 @@ $.registerInterfaceType(
 );
 
 export class BaseStore {
-	public get CoreStore(): inner.CoreStore | $.VarRef<inner.CoreStore> | null {
-		return this._fields.CoreStore
-	}
-
-	public set CoreStore(value: inner.CoreStore | $.VarRef<inner.CoreStore> | null) {
-		this._fields.CoreStore = value
-	}
-
-	public _fields: {
-		CoreStore: inner.CoreStore | $.VarRef<inner.CoreStore> | null
-	}
+	public declare CoreStore: inner.CoreStore | $.VarRef<inner.CoreStore> | null
 
 	constructor(init?: Partial<{CoreStore?: inner.CoreStore | $.VarRef<inner.CoreStore> | null}>, __goscriptValue?: boolean) {
-		this._fields = {
-			CoreStore: init?.CoreStore ?? (null! as inner.CoreStore | $.VarRef<inner.CoreStore> | null)
-		}
+		this.CoreStore = init?.CoreStore ?? (null! as inner.CoreStore | $.VarRef<inner.CoreStore> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -47,10 +35,9 @@ export class BaseStore {
 		return new BaseStore(this, true)
 	}
 
-	public __goscriptAssign(source: BaseStore): void {
-		const target = this._fields
-		const values = source._fields
-		target.CoreStore = values.CoreStore
+	public __goscriptAssign(source: BaseStore): this {
+		this.CoreStore = source.CoreStore
+		return this
 	}
 
 	public NewTransaction(write: any): any {

@@ -29,22 +29,10 @@ $.registerNamedValueType(
 );
 
 export class byteFormatter {
-	public get prefix(): $.Slice<number> {
-		return this._fields.prefix
-	}
-
-	public set prefix(value: $.Slice<number>) {
-		this._fields.prefix = value
-	}
-
-	public _fields: {
-		prefix: $.Slice<number>
-	}
+	public declare prefix: $.Slice<number>
 
 	constructor(init?: Partial<{prefix?: $.Slice<number>}>, __goscriptValue?: boolean) {
-		this._fields = {
-			prefix: init?.prefix ?? (null! as $.Slice<number>)
-		}
+		this.prefix = init?.prefix ?? (null! as $.Slice<number>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -52,10 +40,9 @@ export class byteFormatter {
 		return new byteFormatter(this, true)
 	}
 
-	public __goscriptAssign(source: byteFormatter): void {
-		const target = this._fields
-		const values = source._fields
-		target.prefix = values.prefix
+	public __goscriptAssign(source: byteFormatter): this {
+		this.prefix = source.prefix
+		return this
 	}
 
 	public async Format(state: fmt.State | null, verb: number): globalThis.Promise<void> {
@@ -75,32 +62,13 @@ export class byteFormatter {
 }
 
 export class pos {
-	public get Line(): number {
-		return this._fields.Line
-	}
+	public declare Line: number
 
-	public set Line(value: number) {
-		this._fields.Line = value
-	}
-
-	public get Char(): number {
-		return this._fields.Char
-	}
-
-	public set Char(value: number) {
-		this._fields.Char = value
-	}
-
-	public _fields: {
-		Line: number
-		Char: number
-	}
+	public declare Char: number
 
 	constructor(init?: Partial<{Line?: number, Char?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Line: init?.Line ?? (0 as number),
-			Char: init?.Char ?? (0 as number)
-		}
+		this.Line = init?.Line ?? (0 as number)
+		this.Char = init?.Char ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -108,11 +76,10 @@ export class pos {
 		return new pos(this, true)
 	}
 
-	public __goscriptAssign(source: pos): void {
-		const target = this._fields
-		const values = source._fields
-		target.Line = values.Line
-		target.Char = values.Char
+	public __goscriptAssign(source: pos): this {
+		this.Line = source.Line
+		this.Char = source.Char
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -262,7 +229,7 @@ export async function scanVerbs(): globalThis.Promise<void> {
 	await fmt.Println("1x:", $.basicInterfaceValue(n, "int"), err == null, $.basicInterfaceValue(r.value, "uint8"), $.basicInterfaceValue(g.value, "uint8"), $.basicInterfaceValue(b.value, "uint8"))
 
 	let p: pos = new pos(undefined, true)
-	let __goscriptTuple4: any = fmt.Sscanf("L12C3", "L%dC%d", $.interfaceValue($.fieldRef(p._fields, "Line"), "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int"))), $.interfaceValue($.fieldRef(p._fields, "Char"), "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int"))))
+	let __goscriptTuple4: any = fmt.Sscanf("L12C3", "L%dC%d", $.interfaceValue($.fieldRef(p, "Line"), "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int"))), $.interfaceValue($.fieldRef(p, "Char"), "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int"))))
 	n = __goscriptTuple4[0]
 	err = __goscriptTuple4[1]
 	await fmt.Println("struct fields:", $.basicInterfaceValue(n, "int"), err == null, $.basicInterfaceValue(p.Line, "int"), $.basicInterfaceValue(p.Char, "int"))

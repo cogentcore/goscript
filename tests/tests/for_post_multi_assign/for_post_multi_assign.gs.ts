@@ -4,22 +4,10 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class frame {
-	public get name(): string {
-		return this._fields.name
-	}
-
-	public set name(value: string) {
-		this._fields.name = value
-	}
-
-	public _fields: {
-		name: string
-	}
+	public declare name: string
 
 	constructor(init?: Partial<{name?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			name: init?.name ?? ("" as string)
-		}
+		this.name = init?.name ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -27,10 +15,9 @@ export class frame {
 		return new frame(this, true)
 	}
 
-	public __goscriptAssign(source: frame): void {
-		const target = this._fields
-		const values = source._fields
-		target.name = values.name
+	public __goscriptAssign(source: frame): this {
+		this.name = source.name
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -43,22 +30,10 @@ export class frame {
 }
 
 export class iterator {
-	public get idx(): number {
-		return this._fields.idx
-	}
-
-	public set idx(value: number) {
-		this._fields.idx = value
-	}
-
-	public _fields: {
-		idx: number
-	}
+	public declare idx: number
 
 	constructor(init?: Partial<{idx?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			idx: init?.idx ?? (0 as number)
-		}
+		this.idx = init?.idx ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -66,10 +41,9 @@ export class iterator {
 		return new iterator(this, true)
 	}
 
-	public __goscriptAssign(source: iterator): void {
-		const target = this._fields
-		const values = source._fields
-		target.idx = values.idx
+	public __goscriptAssign(source: iterator): this {
+		this.idx = source.idx
+		return this
 	}
 
 	public Next(): [frame, boolean] {

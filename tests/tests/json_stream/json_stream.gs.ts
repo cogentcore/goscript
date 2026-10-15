@@ -22,32 +22,13 @@ import "@goscript/io/index.js"
 import "@goscript/strings/index.js"
 
 export class chanReader {
-	public get ch(): $.Channel<string> | null {
-		return this._fields.ch
-	}
+	public declare ch: $.Channel<string> | null
 
-	public set ch(value: $.Channel<string> | null) {
-		this._fields.ch = value
-	}
-
-	public get cur(): string {
-		return this._fields.cur
-	}
-
-	public set cur(value: string) {
-		this._fields.cur = value
-	}
-
-	public _fields: {
-		ch: $.Channel<string> | null
-		cur: string
-	}
+	public declare cur: string
 
 	constructor(init?: Partial<{ch?: $.Channel<string> | null, cur?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			ch: init?.ch ?? (null! as $.Channel<string> | null),
-			cur: init?.cur ?? ("" as string)
-		}
+		this.ch = init?.ch ?? (null! as $.Channel<string> | null)
+		this.cur = init?.cur ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -55,11 +36,10 @@ export class chanReader {
 		return new chanReader(this, true)
 	}
 
-	public __goscriptAssign(source: chanReader): void {
-		const target = this._fields
-		const values = source._fields
-		target.ch = values.ch
-		target.cur = values.cur
+	public __goscriptAssign(source: chanReader): this {
+		this.ch = source.ch
+		this.cur = source.cur
+		return this
 	}
 
 	public async Read(p: $.Slice<number>): globalThis.Promise<[number, $.GoError]> {
@@ -89,32 +69,13 @@ export class chanReader {
 }
 
 export class item {
-	public get A(): string {
-		return this._fields.A
-	}
+	public declare A: string
 
-	public set A(value: string) {
-		this._fields.A = value
-	}
-
-	public get B(): number {
-		return this._fields.B
-	}
-
-	public set B(value: number) {
-		this._fields.B = value
-	}
-
-	public _fields: {
-		A: string
-		B: number
-	}
+	public declare B: number
 
 	constructor(init?: Partial<{A?: string, B?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			A: init?.A ?? ("" as string),
-			B: init?.B ?? (0 as number)
-		}
+		this.A = init?.A ?? ("" as string)
+		this.B = init?.B ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -122,11 +83,10 @@ export class item {
 		return new item(this, true)
 	}
 
-	public __goscriptAssign(source: item): void {
-		const target = this._fields
-		const values = source._fields
-		target.A = values.A
-		target.B = values.B
+	public __goscriptAssign(source: item): this {
+		this.A = source.A
+		this.B = source.B
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

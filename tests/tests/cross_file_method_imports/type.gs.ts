@@ -13,22 +13,10 @@ import "./helper.gs.ts"
 import "./method.gs.ts"
 
 export class label {
-	public get value(): string {
-		return this._fields.value
-	}
-
-	public set value(value: string) {
-		this._fields.value = value
-	}
-
-	public _fields: {
-		value: string
-	}
+	public declare value: string
 
 	constructor(init?: Partial<{value?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			value: init?.value ?? ("" as string)
-		}
+		this.value = init?.value ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -36,10 +24,9 @@ export class label {
 		return new label(this, true)
 	}
 
-	public __goscriptAssign(source: label): void {
-		const target = this._fields
-		const values = source._fields
-		target.value = values.value
+	public __goscriptAssign(source: label): this {
+		this.value = source.value
+		return this
 	}
 
 	public Format(): string {

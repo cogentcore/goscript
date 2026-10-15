@@ -5,33 +5,14 @@ import * as $ from "@goscript/builtin/index.js"
 
 export class Person {
 	// Name is the person's name.
-	public get Name(): string {
-		return this._fields.Name
-	}
-
-	public set Name(value: string) {
-		this._fields.Name = value
-	}
+	public declare Name: string
 
 	// Age is the person's age.
-	public get Age(): number {
-		return this._fields.Age
-	}
-
-	public set Age(value: number) {
-		this._fields.Age = value
-	}
-
-	public _fields: {
-		Name: string
-		Age: number
-	}
+	public declare Age: number
 
 	constructor(init?: Partial<{Name?: string, Age?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Name: init?.Name ?? ("" as string),
-			Age: init?.Age ?? (0 as number)
-		}
+		this.Name = init?.Name ?? ("" as string)
+		this.Age = init?.Age ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -39,11 +20,10 @@ export class Person {
 		return new Person(this, true)
 	}
 
-	public __goscriptAssign(source: Person): void {
-		const target = this._fields
-		const values = source._fields
-		target.Name = values.Name
-		target.Age = values.Age
+	public __goscriptAssign(source: Person): this {
+		this.Name = source.Name
+		this.Age = source.Age
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -56,33 +36,14 @@ export class Person {
 }
 
 export class Employee {
-	public get Person(): Person {
-		return this._fields.Person
-	}
-
-	public set Person(value: Person) {
-		this._fields.Person = value
-	}
+	public declare Person: Person
 
 	// ID is the employee identifier.
-	public get ID(): number {
-		return this._fields.ID
-	}
-
-	public set ID(value: number) {
-		this._fields.ID = value
-	}
-
-	public _fields: {
-		Person: Person
-		ID: number
-	}
+	public declare ID: number
 
 	constructor(init?: Partial<{Person?: Person, ID?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Person: init?.Person ? init.Person.clone() : new Person(undefined, true),
-			ID: init?.ID ?? (0 as number)
-		}
+		this.Person = init?.Person ? init.Person.clone() : new Person(undefined, true)
+		this.ID = init?.ID ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -90,11 +51,10 @@ export class Employee {
 		return new Employee(this, true)
 	}
 
-	public __goscriptAssign(source: Employee): void {
-		const target = this._fields
-		const values = source._fields
-		$.assignStruct(target.Person, values.Person)
-		target.ID = values.ID
+	public __goscriptAssign(source: Employee): this {
+		this.Person.__goscriptAssign(source.Person)
+		this.ID = source.ID
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -108,33 +68,14 @@ export class Employee {
 
 export class Address {
 	// Street is the street address.
-	public get Street(): string {
-		return this._fields.Street
-	}
-
-	public set Street(value: string) {
-		this._fields.Street = value
-	}
+	public declare Street: string
 
 	// City is the city name.
-	public get City(): string {
-		return this._fields.City
-	}
-
-	public set City(value: string) {
-		this._fields.City = value
-	}
-
-	public _fields: {
-		Street: string
-		City: string
-	}
+	public declare City: string
 
 	constructor(init?: Partial<{Street?: string, City?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Street: init?.Street ?? ("" as string),
-			City: init?.City ?? ("" as string)
-		}
+		this.Street = init?.Street ?? ("" as string)
+		this.City = init?.City ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -142,11 +83,10 @@ export class Address {
 		return new Address(this, true)
 	}
 
-	public __goscriptAssign(source: Address): void {
-		const target = this._fields
-		const values = source._fields
-		target.Street = values.Street
-		target.City = values.City
+	public __goscriptAssign(source: Address): this {
+		this.Street = source.Street
+		this.City = source.City
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -159,54 +99,21 @@ export class Address {
 }
 
 export class Manager {
-	public get Person(): Person {
-		return this._fields.Person
-	}
+	public declare Person: Person
 
-	public set Person(value: Person) {
-		this._fields.Person = value
-	}
-
-	public get Address(): Address {
-		return this._fields.Address
-	}
-
-	public set Address(value: Address) {
-		this._fields.Address = value
-	}
+	public declare Address: Address
 
 	// Phone is the contact number.
-	public get Phone(): string {
-		return this._fields.Phone
-	}
-
-	public set Phone(value: string) {
-		this._fields.Phone = value
-	}
+	public declare Phone: string
 
 	// Level is the management level.
-	public get Level(): number {
-		return this._fields.Level
-	}
-
-	public set Level(value: number) {
-		this._fields.Level = value
-	}
-
-	public _fields: {
-		Person: Person
-		Address: Address
-		Phone: string
-		Level: number
-	}
+	public declare Level: number
 
 	constructor(init?: Partial<{Person?: Person, Address?: Address, Phone?: string, Level?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Person: init?.Person ? init.Person.clone() : new Person(undefined, true),
-			Address: init?.Address ? init.Address.clone() : new Address(undefined, true),
-			Phone: init?.Phone ?? ("" as string),
-			Level: init?.Level ?? (0 as number)
-		}
+		this.Person = init?.Person ? init.Person.clone() : new Person(undefined, true)
+		this.Address = init?.Address ? init.Address.clone() : new Address(undefined, true)
+		this.Phone = init?.Phone ?? ("" as string)
+		this.Level = init?.Level ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -214,13 +121,12 @@ export class Manager {
 		return new Manager(this, true)
 	}
 
-	public __goscriptAssign(source: Manager): void {
-		const target = this._fields
-		const values = source._fields
-		$.assignStruct(target.Person, values.Person)
-		$.assignStruct(target.Address, values.Address)
-		target.Phone = values.Phone
-		target.Level = values.Level
+	public __goscriptAssign(source: Manager): this {
+		this.Person.__goscriptAssign(source.Person)
+		this.Address.__goscriptAssign(source.Address)
+		this.Phone = source.Phone
+		this.Level = source.Level
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -233,33 +139,14 @@ export class Manager {
 }
 
 export class Team {
-	public get Employee(): Employee {
-		return this._fields.Employee
-	}
-
-	public set Employee(value: Employee) {
-		this._fields.Employee = value
-	}
+	public declare Employee: Employee
 
 	// Active records whether the team is enabled.
-	public get Active(): boolean {
-		return this._fields.Active
-	}
-
-	public set Active(value: boolean) {
-		this._fields.Active = value
-	}
-
-	public _fields: {
-		Employee: Employee
-		Active: boolean
-	}
+	public declare Active: boolean
 
 	constructor(init?: Partial<{Employee?: Employee, Active?: boolean}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Employee: init?.Employee ? init.Employee.clone() : new Employee(undefined, true),
-			Active: init?.Active ?? (false as boolean)
-		}
+		this.Employee = init?.Employee ? init.Employee.clone() : new Employee(undefined, true)
+		this.Active = init?.Active ?? (false as boolean)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -267,11 +154,10 @@ export class Team {
 		return new Team(this, true)
 	}
 
-	public __goscriptAssign(source: Team): void {
-		const target = this._fields
-		const values = source._fields
-		$.assignStruct(target.Employee, values.Employee)
-		target.Active = values.Active
+	public __goscriptAssign(source: Team): this {
+		this.Employee.__goscriptAssign(source.Employee)
+		this.Active = source.Active
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -285,33 +171,14 @@ export class Team {
 
 export class LiteralValue {
 	// Value is the initialized value.
-	public get Value(): any {
-		return this._fields.Value
-	}
-
-	public set Value(value: any) {
-		this._fields.Value = value
-	}
+	public declare Value: any
 
 	// Zero remains uninitialized.
-	public get Zero(): any {
-		return this._fields.Zero
-	}
-
-	public set Zero(value: any) {
-		this._fields.Zero = value
-	}
-
-	public _fields: {
-		Value: any
-		Zero: any
-	}
+	public declare Zero: any
 
 	constructor(init?: Partial<{Value?: any, Zero?: any}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Value: init?.Value !== undefined ? $.copyElement(init.Value) : (null! as any),
-			Zero: init?.Zero !== undefined ? $.copyElement(init.Zero) : (null! as any)
-		}
+		this.Value = init?.Value !== undefined ? $.copyElement(init.Value) : (null! as any)
+		this.Zero = init?.Zero !== undefined ? $.copyElement(init.Zero) : (null! as any)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -319,11 +186,10 @@ export class LiteralValue {
 		return new LiteralValue(this, true)
 	}
 
-	public __goscriptAssign(source: LiteralValue): void {
-		const target = this._fields
-		const values = source._fields
-		target.Value = $.assignFieldValue(target.Value, values.Value, { kind: $.TypeKind.Interface, methods: [] })
-		target.Zero = $.assignFieldValue(target.Zero, values.Zero, { kind: $.TypeKind.Interface, methods: [] })
+	public __goscriptAssign(source: LiteralValue): this {
+		this.Value = $.assignFieldValue(this.Value, source.Value, { kind: $.TypeKind.Interface, methods: [] })
+		this.Zero = $.assignFieldValue(this.Zero, source.Zero, { kind: $.TypeKind.Interface, methods: [] })
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -336,22 +202,10 @@ export class LiteralValue {
 }
 
 export class LiteralContainer {
-	public get LiteralValue(): LiteralValue {
-		return this._fields.LiteralValue
-	}
-
-	public set LiteralValue(value: LiteralValue) {
-		this._fields.LiteralValue = value
-	}
-
-	public _fields: {
-		LiteralValue: LiteralValue
-	}
+	public declare LiteralValue: LiteralValue
 
 	constructor(init?: Partial<{LiteralValue?: LiteralValue}>, __goscriptValue?: boolean) {
-		this._fields = {
-			LiteralValue: init?.LiteralValue ? $.markAsStructValue($.cloneStructValue(init.LiteralValue)) : $.markAsStructValue(new LiteralValue({Value: null, Zero: null}))
-		}
+		this.LiteralValue = init?.LiteralValue ? $.markAsStructValue($.cloneStructValue(init.LiteralValue)) : $.markAsStructValue(new LiteralValue({Value: null, Zero: null}))
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -359,10 +213,9 @@ export class LiteralContainer {
 		return new LiteralContainer(this, true)
 	}
 
-	public __goscriptAssign(source: LiteralContainer): void {
-		const target = this._fields
-		const values = source._fields
-		$.assignStruct(target.LiteralValue, values.LiteralValue)
+	public __goscriptAssign(source: LiteralContainer): this {
+		$.assignStruct(this.LiteralValue, source.LiteralValue)
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

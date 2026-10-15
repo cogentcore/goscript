@@ -5,22 +5,10 @@ import * as $ from "@goscript/builtin/index.js"
 
 export class cell {
 	// width is the number of buffered characters.
-	public get width(): number {
-		return this._fields.width
-	}
-
-	public set width(value: number) {
-		this._fields.width = value
-	}
-
-	public _fields: {
-		width: number
-	}
+	public declare width: number
 
 	constructor(init?: Partial<{width?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			width: init?.width ?? (0 as number)
-		}
+		this.width = init?.width ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -28,10 +16,9 @@ export class cell {
 		return new cell(this, true)
 	}
 
-	public __goscriptAssign(source: cell): void {
-		const target = this._fields
-		const values = source._fields
-		target.width = values.width
+	public __goscriptAssign(source: cell): this {
+		this.width = source.width
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -47,7 +34,7 @@ export async function main(): globalThis.Promise<void> {
 	// Resetting a reusable cell must leave appended entries intact.
 	let current = $.varRef(new cell({width: 7}, true))
 	let cells = $.appendOne<cell>(null, (current.value).clone())
-	current.value = $.assignStruct(current.value, new cell(undefined, true))
+	current.value = current.value.__goscriptAssign(new cell(undefined, true))
 	await $.println("cell:", $.arrayIndex(cells!, 0).width, current.value.width)
 
 	// Arrays also copy at the argument boundary.

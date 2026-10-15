@@ -10,32 +10,13 @@ import "@goscript/bytes/index.js"
 import "@goscript/io/index.js"
 
 export class fixedReader {
-	public get data(): $.Slice<number> {
-		return this._fields.data
-	}
+	public declare data: $.Slice<number>
 
-	public set data(value: $.Slice<number>) {
-		this._fields.data = value
-	}
-
-	public get size(): number {
-		return this._fields.size
-	}
-
-	public set size(value: number) {
-		this._fields.size = value
-	}
-
-	public _fields: {
-		data: $.Slice<number>
-		size: number
-	}
+	public declare size: number
 
 	constructor(init?: Partial<{data?: $.Slice<number>, size?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			data: init?.data ?? (null! as $.Slice<number>),
-			size: init?.size ?? (0 as number)
-		}
+		this.data = init?.data ?? (null! as $.Slice<number>)
+		this.size = init?.size ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -43,11 +24,10 @@ export class fixedReader {
 		return new fixedReader(this, true)
 	}
 
-	public __goscriptAssign(source: fixedReader): void {
-		const target = this._fields
-		const values = source._fields
-		target.data = values.data
-		target.size = values.size
+	public __goscriptAssign(source: fixedReader): this {
+		this.data = source.data
+		this.size = source.size
+		return this
 	}
 
 	public Read(p: $.Slice<number>): [number, $.GoError] {

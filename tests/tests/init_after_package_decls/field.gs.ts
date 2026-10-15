@@ -9,22 +9,10 @@ import * as __goscript_types from "./types.gs.ts"
 import "./types.gs.ts"
 
 export class Field {
-	public get Name(): string {
-		return this._fields.Name
-	}
-
-	public set Name(value: string) {
-		this._fields.Name = value
-	}
-
-	public _fields: {
-		Name: string
-	}
+	public declare Name: string
 
 	constructor(init?: Partial<{Name?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Name: init?.Name ?? ("" as string)
-		}
+		this.Name = init?.Name ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -32,10 +20,9 @@ export class Field {
 		return new Field(this, true)
 	}
 
-	public __goscriptAssign(source: Field): void {
-		const target = this._fields
-		const values = source._fields
-		target.Name = values.Name
+	public __goscriptAssign(source: Field): this {
+		this.Name = source.Name
+		return this
 	}
 
 	public Owner(): __goscript__type.Type | $.VarRef<__goscript__type.Type> | null {

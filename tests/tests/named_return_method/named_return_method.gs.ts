@@ -4,22 +4,10 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class content {
-	public get bytes(): $.Slice<number> {
-		return this._fields.bytes
-	}
-
-	public set bytes(value: $.Slice<number>) {
-		this._fields.bytes = value
-	}
-
-	public _fields: {
-		bytes: $.Slice<number>
-	}
+	public declare bytes: $.Slice<number>
 
 	constructor(init?: Partial<{bytes?: $.Slice<number>}>, __goscriptValue?: boolean) {
-		this._fields = {
-			bytes: init?.bytes ?? (null! as $.Slice<number>)
-		}
+		this.bytes = init?.bytes ?? (null! as $.Slice<number>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -27,10 +15,9 @@ export class content {
 		return new content(this, true)
 	}
 
-	public __goscriptAssign(source: content): void {
-		const target = this._fields
-		const values = source._fields
-		target.bytes = values.bytes
+	public __goscriptAssign(source: content): this {
+		this.bytes = source.bytes
+		return this
 	}
 
 	public ProcessData(input: number): [number, string, boolean] {

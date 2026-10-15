@@ -22,32 +22,13 @@ import "@goscript/reflect/index.js"
 import "@goscript/time/index.js"
 
 export class connector {
-	public get direct(): boolean {
-		return this._fields.direct
-	}
+	public declare direct: boolean
 
-	public set direct(value: boolean) {
-		this._fields.direct = value
-	}
-
-	public get blob(): boolean {
-		return this._fields.blob
-	}
-
-	public set blob(value: boolean) {
-		this._fields.blob = value
-	}
-
-	public _fields: {
-		direct: boolean
-		blob: boolean
-	}
+	public declare blob: boolean
 
 	constructor(init?: Partial<{direct?: boolean, blob?: boolean}>, __goscriptValue?: boolean) {
-		this._fields = {
-			direct: init?.direct ?? (false as boolean),
-			blob: init?.blob ?? (false as boolean)
-		}
+		this.direct = init?.direct ?? (false as boolean)
+		this.blob = init?.blob ?? (false as boolean)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -55,11 +36,10 @@ export class connector {
 		return new connector(this, true)
 	}
 
-	public __goscriptAssign(source: connector): void {
-		const target = this._fields
-		const values = source._fields
-		target.direct = values.direct
-		target.blob = values.blob
+	public __goscriptAssign(source: connector): this {
+		this.direct = source.direct
+		this.blob = source.blob
+		return this
 	}
 
 	public Begin(): [driver.Tx | null, $.GoError] {
@@ -117,32 +97,13 @@ export class connector {
 }
 
 export class rows {
-	public get done(): boolean {
-		return this._fields.done
-	}
+	public declare done: boolean
 
-	public set done(value: boolean) {
-		this._fields.done = value
-	}
-
-	public get blob(): boolean {
-		return this._fields.blob
-	}
-
-	public set blob(value: boolean) {
-		this._fields.blob = value
-	}
-
-	public _fields: {
-		done: boolean
-		blob: boolean
-	}
+	public declare blob: boolean
 
 	constructor(init?: Partial<{done?: boolean, blob?: boolean}>, __goscriptValue?: boolean) {
-		this._fields = {
-			done: init?.done ?? (false as boolean),
-			blob: init?.blob ?? (false as boolean)
-		}
+		this.done = init?.done ?? (false as boolean)
+		this.blob = init?.blob ?? (false as boolean)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -150,11 +111,10 @@ export class rows {
 		return new rows(this, true)
 	}
 
-	public __goscriptAssign(source: rows): void {
-		const target = this._fields
-		const values = source._fields
-		target.done = values.done
-		target.blob = values.blob
+	public __goscriptAssign(source: rows): this {
+		this.done = source.done
+		this.blob = source.blob
+		return this
 	}
 
 	public Close(): $.GoError {
@@ -190,22 +150,10 @@ export class rows {
 }
 
 export class columnRows {
-	public get rows(): rows {
-		return this._fields.rows
-	}
-
-	public set rows(value: rows) {
-		this._fields.rows = value
-	}
-
-	public _fields: {
-		rows: rows
-	}
+	public declare rows: rows
 
 	constructor(init?: Partial<{rows?: rows}>, __goscriptValue?: boolean) {
-		this._fields = {
-			rows: init?.rows ? init.rows.clone() : new rows(undefined, true)
-		}
+		this.rows = init?.rows ? init.rows.clone() : new rows(undefined, true)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -213,10 +161,9 @@ export class columnRows {
 		return new columnRows(this, true)
 	}
 
-	public __goscriptAssign(source: columnRows): void {
-		const target = this._fields
-		const values = source._fields
-		$.assignStruct(target.rows, values.rows)
+	public __goscriptAssign(source: columnRows): this {
+		this.rows.__goscriptAssign(source.rows)
+		return this
 	}
 
 	public Next(_p0: $.Slice<driver.Value | null>): $.GoError {
@@ -316,22 +263,10 @@ export async function main(): globalThis.Promise<void> {
 
 	type namedInt = number
 	class tagged {
-		public get Value(): number {
-			return this._fields.Value
-		}
-
-		public set Value(value: number) {
-			this._fields.Value = value
-		}
-
-		public _fields: {
-			Value: number
-		}
+		public declare Value: number
 
 		constructor(init?: Partial<{Value?: number}>, __goscriptValue?: boolean) {
-			this._fields = {
-				Value: init?.Value ?? (0 as number)
-			}
+			this.Value = init?.Value ?? (0 as number)
 			;(this as any)[$.structValueMarker] = __goscriptValue === true
 		}
 
@@ -339,10 +274,9 @@ export async function main(): globalThis.Promise<void> {
 			return new tagged(this, true)
 		}
 
-		public __goscriptAssign(source: tagged): void {
-			const target = this._fields
-			const values = source._fields
-			target.Value = values.Value
+		public __goscriptAssign(source: tagged): this {
+			this.Value = source.Value
+			return this
 		}
 
 		static __typeInfo = $.registerStructType(
@@ -354,22 +288,10 @@ export async function main(): globalThis.Promise<void> {
 		)
 	}
 	class retagged {
-		public get Value(): number {
-			return this._fields.Value
-		}
-
-		public set Value(value: number) {
-			this._fields.Value = value
-		}
-
-		public _fields: {
-			Value: number
-		}
+		public declare Value: number
 
 		constructor(init?: Partial<{Value?: number}>, __goscriptValue?: boolean) {
-			this._fields = {
-				Value: init?.Value ?? (0 as number)
-			}
+			this.Value = init?.Value ?? (0 as number)
 			;(this as any)[$.structValueMarker] = __goscriptValue === true
 		}
 
@@ -377,10 +299,9 @@ export async function main(): globalThis.Promise<void> {
 			return new retagged(this, true)
 		}
 
-		public __goscriptAssign(source: retagged): void {
-			const target = this._fields
-			const values = source._fields
-			target.Value = values.Value
+		public __goscriptAssign(source: retagged): this {
+			this.Value = source.Value
+			return this
 		}
 
 		static __typeInfo = $.registerStructType(

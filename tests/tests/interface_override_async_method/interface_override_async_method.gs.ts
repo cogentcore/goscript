@@ -7,22 +7,10 @@ import * as io from "@goscript/io/index.js"
 import "@goscript/io/index.js"
 
 export class asyncReader {
-	public get ch(): $.Channel<number> | null {
-		return this._fields.ch
-	}
-
-	public set ch(value: $.Channel<number> | null) {
-		this._fields.ch = value
-	}
-
-	public _fields: {
-		ch: $.Channel<number> | null
-	}
+	public declare ch: $.Channel<number> | null
 
 	constructor(init?: Partial<{ch?: $.Channel<number> | null}>, __goscriptValue?: boolean) {
-		this._fields = {
-			ch: init?.ch ?? (null! as $.Channel<number> | null)
-		}
+		this.ch = init?.ch ?? (null! as $.Channel<number> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -30,10 +18,9 @@ export class asyncReader {
 		return new asyncReader(this, true)
 	}
 
-	public __goscriptAssign(source: asyncReader): void {
-		const target = this._fields
-		const values = source._fields
-		target.ch = values.ch
+	public __goscriptAssign(source: asyncReader): this {
+		this.ch = source.ch
+		return this
 	}
 
 	public async Read(b: $.Slice<number>): globalThis.Promise<[number, $.GoError]> {

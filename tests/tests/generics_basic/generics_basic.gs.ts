@@ -26,22 +26,10 @@ $.registerInterfaceType(
 );
 
 export class Stack {
-	public get items(): $.Slice<any> {
-		return this._fields.items
-	}
-
-	public set items(value: $.Slice<any>) {
-		this._fields.items = value
-	}
-
-	public _fields: {
-		items: $.Slice<any>
-	}
+	public declare items: $.Slice<any>
 
 	constructor(init?: Partial<{items?: $.Slice<any>}>, __goscriptValue?: boolean) {
-		this._fields = {
-			items: init?.items ?? (null! as $.Slice<any>)
-		}
+		this.items = init?.items ?? (null! as $.Slice<any>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -49,10 +37,9 @@ export class Stack {
 		return new Stack(this, true)
 	}
 
-	public __goscriptAssign(source: Stack): void {
-		const target = this._fields
-		const values = source._fields
-		target.items = values.items
+	public __goscriptAssign(source: Stack): this {
+		this.items = source.items
+		return this
 	}
 
 	public Len(__typeArgs: $.GenericTypeArgs | undefined): number {
@@ -88,22 +75,10 @@ export class Stack {
 }
 
 export class Item {
-	public get Name(): string {
-		return this._fields.Name
-	}
-
-	public set Name(value: string) {
-		this._fields.Name = value
-	}
-
-	public _fields: {
-		Name: string
-	}
+	public declare Name: string
 
 	constructor(init?: Partial<{Name?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Name: init?.Name ?? ("" as string)
-		}
+		this.Name = init?.Name ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -111,10 +86,9 @@ export class Item {
 		return new Item(this, true)
 	}
 
-	public __goscriptAssign(source: Item): void {
-		const target = this._fields
-		const values = source._fields
-		target.Name = values.Name
+	public __goscriptAssign(source: Item): this {
+		this.Name = source.Name
+		return this
 	}
 
 	public Clone(): Item | $.VarRef<Item> | null {
@@ -135,22 +109,10 @@ export class Item {
 }
 
 export class Mapper {
-	public get values(): globalThis.Map<any, any> | null {
-		return this._fields.values
-	}
-
-	public set values(value: globalThis.Map<any, any> | null) {
-		this._fields.values = value
-	}
-
-	public _fields: {
-		values: globalThis.Map<any, any> | null
-	}
+	public declare values: globalThis.Map<any, any> | null
 
 	constructor(init?: Partial<{values?: globalThis.Map<any, any> | null}>, __goscriptValue?: boolean) {
-		this._fields = {
-			values: init?.values ?? (null! as globalThis.Map<any, any> | null)
-		}
+		this.values = init?.values ?? (null! as globalThis.Map<any, any> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -158,10 +120,9 @@ export class Mapper {
 		return new Mapper(this, true)
 	}
 
-	public __goscriptAssign(source: Mapper): void {
-		const target = this._fields
-		const values = source._fields
-		target.values = values.values
+	public __goscriptAssign(source: Mapper): this {
+		this.values = source.values
+		return this
 	}
 
 	public Get(__typeArgs: $.GenericTypeArgs | undefined, key: any): [any, boolean] {
@@ -185,32 +146,13 @@ export class Mapper {
 }
 
 export class Pair {
-	public get First(): any {
-		return this._fields.First
-	}
+	public declare First: any
 
-	public set First(value: any) {
-		this._fields.First = value
-	}
-
-	public get Second(): any {
-		return this._fields.Second
-	}
-
-	public set Second(value: any) {
-		this._fields.Second = value
-	}
-
-	public _fields: {
-		First: any
-		Second: any
-	}
+	public declare Second: any
 
 	constructor(init?: Partial<{First?: any, Second?: any}>, __goscriptValue?: boolean) {
-		this._fields = {
-			First: init?.First !== undefined ? $.copyElement(init.First) : (null! as any),
-			Second: init?.Second !== undefined ? $.copyElement(init.Second) : (null! as any)
-		}
+		this.First = init?.First !== undefined ? $.copyElement(init.First) : (null! as any)
+		this.Second = init?.Second !== undefined ? $.copyElement(init.Second) : (null! as any)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -218,11 +160,10 @@ export class Pair {
 		return new Pair(this, true)
 	}
 
-	public __goscriptAssign(source: Pair): void {
-		const target = this._fields
-		const values = source._fields
-		target.First = $.assignFieldValue(target.First, values.First, { kind: $.TypeKind.Interface, methods: [] })
-		target.Second = $.assignFieldValue(target.Second, values.Second, { kind: $.TypeKind.Interface, methods: [] })
+	public __goscriptAssign(source: Pair): this {
+		this.First = $.assignFieldValue(this.First, source.First, { kind: $.TypeKind.Interface, methods: [] })
+		this.Second = $.assignFieldValue(this.Second, source.Second, { kind: $.TypeKind.Interface, methods: [] })
+		return this
 	}
 
 	public Swap(__typeArgs: $.GenericTypeArgs | undefined): Pair {

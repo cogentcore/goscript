@@ -12,32 +12,13 @@ import "@goscript/os/index.js"
 import "@goscript/text/template/index.js"
 
 export class item {
-	public get Name(): string {
-		return this._fields.Name
-	}
+	public declare Name: string
 
-	public set Name(value: string) {
-		this._fields.Name = value
-	}
-
-	public get Count(): number {
-		return this._fields.Count
-	}
-
-	public set Count(value: number) {
-		this._fields.Count = value
-	}
-
-	public _fields: {
-		Name: string
-		Count: number
-	}
+	public declare Count: number
 
 	constructor(init?: Partial<{Name?: string, Count?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Name: init?.Name ?? ("" as string),
-			Count: init?.Count ?? (0 as number)
-		}
+		this.Name = init?.Name ?? ("" as string)
+		this.Count = init?.Count ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -45,11 +26,10 @@ export class item {
 		return new item(this, true)
 	}
 
-	public __goscriptAssign(source: item): void {
-		const target = this._fields
-		const values = source._fields
-		target.Name = values.Name
-		target.Count = values.Count
+	public __goscriptAssign(source: item): this {
+		this.Name = source.Name
+		this.Count = source.Count
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

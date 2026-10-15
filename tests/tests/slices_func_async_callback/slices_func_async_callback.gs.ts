@@ -7,32 +7,13 @@ import * as slices from "@goscript/slices/index.js"
 import "@goscript/slices/index.js"
 
 export class Process {
-	public get pid(): number {
-		return this._fields.pid
-	}
+	public declare pid: number
 
-	public set pid(value: number) {
-		this._fields.pid = value
-	}
-
-	public get done(): $.Channel<{}> | null {
-		return this._fields.done
-	}
-
-	public set done(value: $.Channel<{}> | null) {
-		this._fields.done = value
-	}
-
-	public _fields: {
-		pid: number
-		done: $.Channel<{}> | null
-	}
+	public declare done: $.Channel<{}> | null
 
 	constructor(init?: Partial<{pid?: number, done?: $.Channel<{}> | null}>, __goscriptValue?: boolean) {
-		this._fields = {
-			pid: init?.pid ?? (0 as number),
-			done: init?.done ?? (null! as $.Channel<{}> | null)
-		}
+		this.pid = init?.pid ?? (0 as number)
+		this.done = init?.done ?? (null! as $.Channel<{}> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -40,11 +21,10 @@ export class Process {
 		return new Process(this, true)
 	}
 
-	public __goscriptAssign(source: Process): void {
-		const target = this._fields
-		const values = source._fields
-		target.pid = values.pid
-		target.done = values.done
+	public __goscriptAssign(source: Process): this {
+		this.pid = source.pid
+		this.done = source.done
+		return this
 	}
 
 	public async exited(): globalThis.Promise<boolean> {

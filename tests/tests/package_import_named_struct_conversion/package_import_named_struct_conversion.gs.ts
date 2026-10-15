@@ -7,42 +7,16 @@ import * as time from "@goscript/time/index.js"
 import "@goscript/time/index.js"
 
 export class LocalTime {
-	public get wall(): bigint {
-		return this._fields.wall
-	}
+	public declare wall: bigint
 
-	public set wall(value: bigint) {
-		this._fields.wall = value
-	}
+	public declare ext: bigint
 
-	public get ext(): bigint {
-		return this._fields.ext
-	}
-
-	public set ext(value: bigint) {
-		this._fields.ext = value
-	}
-
-	public get loc(): time.Location | $.VarRef<time.Location> | null {
-		return this._fields.loc
-	}
-
-	public set loc(value: time.Location | $.VarRef<time.Location> | null) {
-		this._fields.loc = value
-	}
-
-	public _fields: {
-		wall: bigint
-		ext: bigint
-		loc: time.Location | $.VarRef<time.Location> | null
-	}
+	public declare loc: time.Location | $.VarRef<time.Location> | null
 
 	constructor(init?: Partial<{wall?: bigint, ext?: bigint, loc?: time.Location | $.VarRef<time.Location> | null}>, __goscriptValue?: boolean) {
-		this._fields = {
-			wall: init?.wall ?? (0n as bigint),
-			ext: init?.ext ?? (0n as bigint),
-			loc: init?.loc ?? (null! as time.Location | $.VarRef<time.Location> | null)
-		}
+		this.wall = init?.wall ?? (0n as bigint)
+		this.ext = init?.ext ?? (0n as bigint)
+		this.loc = init?.loc ?? (null! as time.Location | $.VarRef<time.Location> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -50,12 +24,11 @@ export class LocalTime {
 		return new LocalTime(this, true)
 	}
 
-	public __goscriptAssign(source: LocalTime): void {
-		const target = this._fields
-		const values = source._fields
-		target.wall = values.wall
-		target.ext = values.ext
-		target.loc = values.loc
+	public __goscriptAssign(source: LocalTime): this {
+		this.wall = source.wall
+		this.ext = source.ext
+		this.loc = source.loc
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
