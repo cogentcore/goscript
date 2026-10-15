@@ -88,7 +88,7 @@ export async function main(): globalThis.Promise<void> {
 	let pointer: source | $.VarRef<source> | null = null! as source | $.VarRef<source> | null
 	let pointerAny: any = $.interfaceValue(pointer, "*main.source", /* @__PURE__ */ $.pointerType("main.source"))
 	let [readerValue, readerOK] = $.typeAssertTuple<reader | null>(pointerAny, "main.reader")
-	let [count, err] = await (readerValue !== null && (readerValue as any).__isVarRef !== true && (readerValue as any).__goValue === undefined ? (readerValue as Exclude<reader, null>) : $.pointerValue<Exclude<reader, null>>(readerValue)).Read(new Uint8Array([1, 2]) as $.Slice<number>)
+	let [count, err] = await (readerValue !== null && (readerValue as any).__isVarRef !== true && ((readerValue as any).__goValue === undefined || (readerValue as any).__goType?.charCodeAt(0) !== 42) ? (readerValue as Exclude<reader, null>) : $.pointerValue<Exclude<reader, null>>(readerValue)).Read(new Uint8Array([1, 2]) as $.Slice<number>)
 	if (err != null) {
 		$.panic((err as any))
 	}

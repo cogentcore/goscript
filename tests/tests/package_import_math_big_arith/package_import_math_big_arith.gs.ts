@@ -30,7 +30,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("fmul", await m.value.String())
 	await $.println("rat", await big.Rat.prototype.FloatString.call(await big.NewRat(3n, 2n), 5))
 	let c = await constant.MakeFromLiteral("3.25e2", 6, 0)
-	await $.println("const", (__goscriptAwait = (c !== null && (c as any).__isVarRef !== true && (c as any).__goValue === undefined ? (c as Exclude<constant.Value, null>) : $.pointerValue<Exclude<constant.Value, null>>(c)).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = $.pointerValue<Exclude<constant.Value, null>>((await constant.BinaryOp(c, 14, constant.MakeInt64(3n)))).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println("const", (__goscriptAwait = (c !== null && (c as any).__isVarRef !== true && ((c as any).__goValue === undefined || (c as any).__goType?.charCodeAt(0) !== 42) ? (c as Exclude<constant.Value, null>) : $.pointerValue<Exclude<constant.Value, null>>(c)).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = $.pointerValue<Exclude<constant.Value, null>>((await constant.BinaryOp(c, 14, constant.MakeInt64(3n)))).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 }
 
 var __goscriptAwait: any

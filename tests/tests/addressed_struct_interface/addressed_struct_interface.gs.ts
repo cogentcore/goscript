@@ -47,7 +47,7 @@ export class Buffer {
 }
 
 export function use(w: Writer | null): void {
-	;(w !== null && (w as any).__isVarRef !== true && (w as any).__goValue === undefined ? (w as Exclude<Writer, null>) : $.pointerValue<Exclude<Writer, null>>(w)).Write(new Uint8Array([120]))
+	;(w !== null && (w as any).__isVarRef !== true && ((w as any).__goValue === undefined || (w as any).__goType?.charCodeAt(0) !== 42) ? (w as Exclude<Writer, null>) : $.pointerValue<Exclude<Writer, null>>(w)).Write(new Uint8Array([120]))
 }
 
 export async function main(): globalThis.Promise<void> {

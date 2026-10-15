@@ -8,7 +8,7 @@ import "@goscript/github.com/s4wave/goscript/tests/tests/interface_call_result_i
 
 export async function main(): globalThis.Promise<void> {
 	let v = dep1.Make()
-	await $.println((__goscriptAwait = (v !== null && (v as any).__isVarRef !== true && (v as any).__goValue === undefined ? (v as Exclude<dep2.Value, null>) : $.pointerValue<Exclude<dep2.Value, null>>(v)).Value(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println((__goscriptAwait = (v !== null && (v as any).__isVarRef !== true && ((v as any).__goValue === undefined || (v as any).__goType?.charCodeAt(0) !== 42) ? (v as Exclude<dep2.Value, null>) : $.pointerValue<Exclude<dep2.Value, null>>(v)).Value(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 }
 
 var __goscriptAwait: any

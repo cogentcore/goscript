@@ -27,7 +27,7 @@ export async function main(): globalThis.Promise<void> {
 	err = __goscriptTuple1[1]
 	await $.println("create err nil", err == null)
 	if (err != null) {
-		await $.println("create error", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+		await $.println("create error", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		return
 	}
 
@@ -36,7 +36,7 @@ export async function main(): globalThis.Promise<void> {
 	err = __goscriptTuple2[1]
 	await $.println("parse err nil", err == null)
 	if (err != null) {
-		await $.println("parse error", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+		await $.println("parse error", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		return
 	}
 
@@ -52,14 +52,14 @@ export async function main(): globalThis.Promise<void> {
 
 	let cache = tls.NewLRUClientSessionCache(2)
 	let session = new tls.ClientSessionState()
-	void (__goscriptAwait = (cache !== null && (cache as any).__isVarRef !== true && (cache as any).__goValue === undefined ? (cache as Exclude<tls.ClientSessionCache, null>) : $.pointerValue<Exclude<tls.ClientSessionCache, null>>(cache)).Put("one", session), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
-	let __goscriptTuple3: any = await (cache !== null && (cache as any).__isVarRef !== true && (cache as any).__goValue === undefined ? (cache as Exclude<tls.ClientSessionCache, null>) : $.pointerValue<Exclude<tls.ClientSessionCache, null>>(cache)).Get("one")
+	void (__goscriptAwait = (cache !== null && (cache as any).__isVarRef !== true && ((cache as any).__goValue === undefined || (cache as any).__goType?.charCodeAt(0) !== 42) ? (cache as Exclude<tls.ClientSessionCache, null>) : $.pointerValue<Exclude<tls.ClientSessionCache, null>>(cache)).Put("one", session), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+	let __goscriptTuple3: any = await (cache !== null && (cache as any).__isVarRef !== true && ((cache as any).__goValue === undefined || (cache as any).__goType?.charCodeAt(0) !== 42) ? (cache as Exclude<tls.ClientSessionCache, null>) : $.pointerValue<Exclude<tls.ClientSessionCache, null>>(cache)).Get("one")
 	let cached: tls.ClientSessionState | $.VarRef<tls.ClientSessionState> | null = __goscriptTuple3[0]
 	let ok = __goscriptTuple3[1]
 	await $.println("session cache hit", ok, (cached === session || $.pointerAliasesMade && $.pointerEqual(cached, session)))
-	void (__goscriptAwait = (cache !== null && (cache as any).__isVarRef !== true && (cache as any).__goValue === undefined ? (cache as Exclude<tls.ClientSessionCache, null>) : $.pointerValue<Exclude<tls.ClientSessionCache, null>>(cache)).Put("two", new tls.ClientSessionState()), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
-	void (__goscriptAwait = (cache !== null && (cache as any).__isVarRef !== true && (cache as any).__goValue === undefined ? (cache as Exclude<tls.ClientSessionCache, null>) : $.pointerValue<Exclude<tls.ClientSessionCache, null>>(cache)).Put("three", new tls.ClientSessionState()), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
-	let __goscriptTuple4: any = await (cache !== null && (cache as any).__isVarRef !== true && (cache as any).__goValue === undefined ? (cache as Exclude<tls.ClientSessionCache, null>) : $.pointerValue<Exclude<tls.ClientSessionCache, null>>(cache)).Get("one")
+	void (__goscriptAwait = (cache !== null && (cache as any).__isVarRef !== true && ((cache as any).__goValue === undefined || (cache as any).__goType?.charCodeAt(0) !== 42) ? (cache as Exclude<tls.ClientSessionCache, null>) : $.pointerValue<Exclude<tls.ClientSessionCache, null>>(cache)).Put("two", new tls.ClientSessionState()), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+	void (__goscriptAwait = (cache !== null && (cache as any).__isVarRef !== true && ((cache as any).__goValue === undefined || (cache as any).__goType?.charCodeAt(0) !== 42) ? (cache as Exclude<tls.ClientSessionCache, null>) : $.pointerValue<Exclude<tls.ClientSessionCache, null>>(cache)).Put("three", new tls.ClientSessionState()), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+	let __goscriptTuple4: any = await (cache !== null && (cache as any).__isVarRef !== true && ((cache as any).__goValue === undefined || (cache as any).__goType?.charCodeAt(0) !== 42) ? (cache as Exclude<tls.ClientSessionCache, null>) : $.pointerValue<Exclude<tls.ClientSessionCache, null>>(cache)).Get("one")
 	ok = __goscriptTuple4[1]
 	await $.println("session cache evicted", !ok)
 }

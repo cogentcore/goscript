@@ -61,7 +61,7 @@ export async function main(): globalThis.Promise<void> {
 	await run($.functionValue(((__receiver) => () => __receiver.Spawn())($.pointerValue<Worker>(w)), ({ kind: $.TypeKind.Function, params: [], results: ["error"] } as $.FunctionTypeInfo), "main.(*Worker).Spawn-fm"))
 
 	let s: Spawner | null = $.interfaceValue<Spawner | null>(w, "*main.Worker", /* @__PURE__ */ $.pointerType("main.Worker"))
-	let err = (__goscriptAwait = (s !== null && (s as any).__isVarRef !== true && (s as any).__goValue === undefined ? (s as Exclude<Spawner, null>) : $.pointerValue<Exclude<Spawner, null>>(s)).Spawn(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+	let err = (__goscriptAwait = (s !== null && (s as any).__isVarRef !== true && ((s as any).__goValue === undefined || (s as any).__goType?.charCodeAt(0) !== 42) ? (s as Exclude<Spawner, null>) : $.pointerValue<Exclude<Spawner, null>>(s)).Spawn(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 	if (err == null) {
 		await $.println("iface err: nil")
 	} else {

@@ -22,7 +22,7 @@ export async function main(): globalThis.Promise<void> {
 		let expr = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as string)
 		let [node, err] = await parser.ParseExpr(expr)
 		if (err != null) {
-			results = $.appendOne(results, "Error parsing " + expr + ": " + (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+			results = $.appendOne(results, "Error parsing " + expr + ": " + (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 			continue
 		}
 
@@ -80,7 +80,7 @@ export async function main(): globalThis.Promise<void> {
 	let err = __goscriptTuple1[1]
 	let file$: ast.File = file == null ? $.pointerTarget<ast.File>(file) : (file as any).__isVarRef === true ? (file as any).value : (file as any).__goValue === undefined ? (file as any) : $.pointerTarget<ast.File>(file)
 	if (err != null) {
-		results = $.appendOne(results, "Error parsing file: " + (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+		results = $.appendOne(results, "Error parsing file: " + (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	} else {
 		// Extract function names
 		for (let __goscriptRangeTarget1 = (file$ as ast.File).Decls, __goscriptRangeWindow1 = $.sliceRange(__goscriptRangeTarget1), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow1.length; __rangeIndex++) {

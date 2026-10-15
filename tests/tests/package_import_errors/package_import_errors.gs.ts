@@ -94,8 +94,8 @@ export async function main(): globalThis.Promise<void> {
 	let err1 = errors.New("first error")
 	let err2 = errors.New("second error")
 
-	await $.println("err1:", (__goscriptAwait = (err1 !== null && (err1 as any).__isVarRef !== true && (err1 as any).__goValue === undefined ? (err1 as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err1)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
-	await $.println("err2:", (__goscriptAwait = (err2 !== null && (err2 as any).__isVarRef !== true && (err2 as any).__goValue === undefined ? (err2 as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err2)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println("err1:", (__goscriptAwait = (err1 !== null && (err1 as any).__isVarRef !== true && ((err1 as any).__goValue === undefined || (err1 as any).__goType?.charCodeAt(0) !== 42) ? (err1 as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err1)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println("err2:", (__goscriptAwait = (err2 !== null && (err2 as any).__isVarRef !== true && ((err2 as any).__goValue === undefined || (err2 as any).__goType?.charCodeAt(0) !== 42) ? (err2 as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err2)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
 	// Test error comparison
 	await $.println("err1 == err2:", $.comparableEqual(err1, err2))

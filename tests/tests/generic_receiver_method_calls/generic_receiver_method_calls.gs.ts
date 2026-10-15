@@ -79,7 +79,7 @@ export function direct(__typeArgs: $.GenericTypeArgs | undefined, b: box | $.Var
 }
 
 export async function throughInterface(__typeArgs: $.GenericTypeArgs | undefined, r: reader | null): globalThis.Promise<any> {
-	return $.callInterfaceMethod((r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? (r as Exclude<reader, null>) : $.pointerValue<Exclude<reader, null>>(r)), "Value", {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }})
+	return $.callInterfaceMethod((r !== null && (r as any).__isVarRef !== true && ((r as any).__goValue === undefined || (r as any).__goType?.charCodeAt(0) !== 42) ? (r as Exclude<reader, null>) : $.pointerValue<Exclude<reader, null>>(r)), "Value", {[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }})
 }
 
 export function promoted(__typeArgs: $.GenericTypeArgs | undefined, h: holder | $.VarRef<holder> | null): any {

@@ -23,7 +23,7 @@ export class Holder {
 
 	public async Run(): globalThis.Promise<void> {
 		let v = dep1.Make()
-		await $.println((__goscriptAwait = (v !== null && (v as any).__isVarRef !== true && (v as any).__goValue === undefined ? (v as Exclude<dep2.Value, null>) : $.pointerValue<Exclude<dep2.Value, null>>(v)).Value(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+		await $.println((__goscriptAwait = (v !== null && (v as any).__isVarRef !== true && ((v as any).__goValue === undefined || (v as any).__goType?.charCodeAt(0) !== 42) ? (v as Exclude<dep2.Value, null>) : $.pointerValue<Exclude<dep2.Value, null>>(v)).Value(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	}
 
 	static __typeInfo = $.registerStructType(

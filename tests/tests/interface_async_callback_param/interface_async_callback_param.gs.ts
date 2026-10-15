@@ -42,7 +42,7 @@ export class listScanner {
 }
 
 export function run(s: scanner | null): $.GoError {
-	return (s !== null && (s as any).__isVarRef !== true && (s as any).__goValue === undefined ? (s as Exclude<scanner, null>) : $.pointerValue<Exclude<scanner, null>>(s)).Scan($.functionValue((v: number): $.GoError => {
+	return (s !== null && (s as any).__isVarRef !== true && ((s as any).__goValue === undefined || (s as any).__goType?.charCodeAt(0) !== 42) ? (s as Exclude<scanner, null>) : $.pointerValue<Exclude<scanner, null>>(s)).Scan($.functionValue((v: number): $.GoError => {
 		if (v != 7) {
 			return errors.New("wrong value")
 		}

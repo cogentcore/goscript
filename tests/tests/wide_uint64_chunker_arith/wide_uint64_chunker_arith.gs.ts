@@ -110,7 +110,7 @@ export async function main(): globalThis.Promise<void> {
 	let src = io.LimitReader($.pointerValueOrNil($.interfaceValue<io.Reader | null>(newRepeatReader(40), "*main.repeatReader", /* @__PURE__ */ $.pointerType("main.repeatReader")))!, 25n)
 	let buf = $.makeSlice<number>(8, undefined, "byte")
 	while (true) {
-		let [nr, err] = await (src !== null && (src as any).__isVarRef !== true && (src as any).__goValue === undefined ? (src as Exclude<io.Reader, null>) : $.pointerValue<Exclude<io.Reader, null>>(src)).Read(buf)
+		let [nr, err] = await (src !== null && (src as any).__isVarRef !== true && ((src as any).__goValue === undefined || (src as any).__goType?.charCodeAt(0) !== 42) ? (src as Exclude<io.Reader, null>) : $.pointerValue<Exclude<io.Reader, null>>(src)).Read(buf)
 		if (nr > 0) {
 			void (c !== null && (c as any).__isVarRef !== true && (c as any).__goValue === undefined ? ((c as any) as chunker).advance(nr) : chunker.prototype.advance.call(c, nr))
 			totalSize = $.uint64Add(totalSize, $.uint64(nr))
@@ -120,7 +120,7 @@ export async function main(): globalThis.Promise<void> {
 			break
 		}
 		if (err != null) {
-			await $.println("err", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+			await $.println("err", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 			return
 		}
 	}

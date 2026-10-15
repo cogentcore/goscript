@@ -60,7 +60,7 @@ export function newInterface(size: number): [Block | null, $.GoError] {
 export async function main(): globalThis.Promise<void> {
 	let [block, err] = newInterface(16)
 	await $.println("err nil:", err == null)
-	await $.println("size:", (__goscriptAwait = (block !== null && (block as any).__isVarRef !== true && (block as any).__goValue === undefined ? (block as Exclude<Block, null>) : $.pointerValue<Exclude<Block, null>>(block)).Size(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println("size:", (__goscriptAwait = (block !== null && (block as any).__isVarRef !== true && ((block as any).__goValue === undefined || (block as any).__goType?.charCodeAt(0) !== 42) ? (block as Exclude<Block, null>) : $.pointerValue<Exclude<Block, null>>(block)).Size(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 }
 
 var __goscriptAwait: any

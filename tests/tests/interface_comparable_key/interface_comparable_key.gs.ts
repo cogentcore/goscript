@@ -34,11 +34,11 @@ export function valueHash_Key(h: valueHash): any {
 }
 
 export function sameKey(a: ref | null, b: ref | null): boolean {
-	return $.comparableEqual((a !== null && (a as any).__isVarRef !== true && (a as any).__goValue === undefined ? (a as Exclude<ref, null>) : $.pointerValue<Exclude<ref, null>>(a)).Key(), (b !== null && (b as any).__isVarRef !== true && (b as any).__goValue === undefined ? (b as Exclude<ref, null>) : $.pointerValue<Exclude<ref, null>>(b)).Key())
+	return $.comparableEqual((a !== null && (a as any).__isVarRef !== true && ((a as any).__goValue === undefined || (a as any).__goType?.charCodeAt(0) !== 42) ? (a as Exclude<ref, null>) : $.pointerValue<Exclude<ref, null>>(a)).Key(), (b !== null && (b as any).__isVarRef !== true && ((b as any).__goValue === undefined || (b as any).__goType?.charCodeAt(0) !== 42) ? (b as Exclude<ref, null>) : $.pointerValue<Exclude<ref, null>>(b)).Key())
 }
 
 export function differentKey(a: ref | null, b: ref | null): boolean {
-	return !$.comparableEqual((a !== null && (a as any).__isVarRef !== true && (a as any).__goValue === undefined ? (a as Exclude<ref, null>) : $.pointerValue<Exclude<ref, null>>(a)).Key(), (b !== null && (b as any).__isVarRef !== true && (b as any).__goValue === undefined ? (b as Exclude<ref, null>) : $.pointerValue<Exclude<ref, null>>(b)).Key())
+	return !$.comparableEqual((a !== null && (a as any).__isVarRef !== true && ((a as any).__goValue === undefined || (a as any).__goType?.charCodeAt(0) !== 42) ? (a as Exclude<ref, null>) : $.pointerValue<Exclude<ref, null>>(a)).Key(), (b !== null && (b as any).__isVarRef !== true && ((b as any).__goValue === undefined || (b as any).__goType?.charCodeAt(0) !== 42) ? (b as Exclude<ref, null>) : $.pointerValue<Exclude<ref, null>>(b)).Key())
 }
 
 export async function main(): globalThis.Promise<void> {

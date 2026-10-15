@@ -95,13 +95,13 @@ export async function main(): globalThis.Promise<void> {
 
 		// Interface calls on a struct pointer, and on a nil interface, which panics.
 		let a: adder | null = $.interfaceValue<adder | null>(c, "*main.counter", /* @__PURE__ */ $.pointerType("main.counter"))
-		await $.println((__goscriptAwait = (a !== null && (a as any).__isVarRef !== true && (a as any).__goValue === undefined ? (a as Exclude<adder, null>) : $.pointerValue<Exclude<adder, null>>(a)).add(10), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+		await $.println((__goscriptAwait = (a !== null && (a as any).__isVarRef !== true && ((a as any).__goValue === undefined || (a as any).__goType?.charCodeAt(0) !== 42) ? (a as Exclude<adder, null>) : $.pointerValue<Exclude<adder, null>>(a)).add(10), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		a = $.interfaceValue<adder | null>(next(c), "*main.counter", /* @__PURE__ */ $.pointerType("main.counter"))
 		__defer.defer(async () => { await (async () => {
 			await $.println("recovered:", $.recover() != null)
 		})() })
 		let none: adder | null = null! as adder | null
-		await $.println((__goscriptAwait = (none !== null && (none as any).__isVarRef !== true && (none as any).__goValue === undefined ? (none as Exclude<adder, null>) : $.pointerValue<Exclude<adder, null>>(none)).add(1), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+		await $.println((__goscriptAwait = (none !== null && (none as any).__isVarRef !== true && ((none as any).__goValue === undefined || (none as any).__goType?.charCodeAt(0) !== 42) ? (none as Exclude<adder, null>) : $.pointerValue<Exclude<adder, null>>(none)).add(1), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		await __defer.dispose()
 	} catch (e) {
 		await __defer.disposePanic(e)

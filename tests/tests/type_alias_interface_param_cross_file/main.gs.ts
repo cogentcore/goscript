@@ -39,7 +39,7 @@ export class sink {
 }
 
 export function write(tx: __goscript_types.Tx | null, v: dep.Value): void {
-	void (tx !== null && (tx as any).__isVarRef !== true && (tx as any).__goValue === undefined ? (tx as Exclude<__goscript_types.Tx, null>) : $.pointerValue<Exclude<__goscript_types.Tx, null>>(tx)).Put((v as __goscript_types.Value))
+	void (tx !== null && (tx as any).__isVarRef !== true && ((tx as any).__goValue === undefined || (tx as any).__goType?.charCodeAt(0) !== 42) ? (tx as Exclude<__goscript_types.Tx, null>) : $.pointerValue<Exclude<__goscript_types.Tx, null>>(tx)).Put((v as __goscript_types.Value))
 }
 
 export async function main(): globalThis.Promise<void> {
