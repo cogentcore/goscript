@@ -670,6 +670,10 @@ function uintGeneral(
     value = BigInt(value)
   }
   if (typeof value === 'bigint') {
+    // A bigint that fits 32 bits is its number, as for uint32(x).
+    if (bits === 32 && value >= 0n && value <= 0xffffffffn) {
+      return Number(value)
+    }
     const normalized = BigInt.asUintN(Math.min(bits, 64), value)
     // Above 2^53 the value cannot round-trip through number, so keep the bigint
     // to preserve full 64-bit width; uint arithmetic routes through the
@@ -772,8 +776,22 @@ export function uint64(value: number | bigint | string): bigint {
 // Only counts below 64 can affect a 64-bit result, so Number preserves every
 // behaviorally relevant count exactly before the bigint shift.
 function wideShiftAmount(shift: number | bigint): bigint {
+  // The counts that matter for a 64-bit value are shared bigints, and
+  // other counts are converted.
+  if (
+    typeof shift === 'number' &&
+    shift >= 0 &&
+    shift <= 64 &&
+    shift % 1 === 0
+  ) {
+    return wideShiftAmounts[shift]
+  }
   return BigInt(Math.trunc(Number(shift)))
 }
+
+// wideShiftAmounts holds the shift counts 0 to 64 as bigints, so that a shift
+// of a 64-bit value allocates no bigint for its count.
+const wideShiftAmounts = Array.from({ length: 65 }, (_, idx) => BigInt(idx))
 
 export function uint64Shl(
   value: number | bigint,
@@ -909,6 +927,13 @@ export function uint64And(
   left: number | bigint,
   right: number | bigint,
 ): bigint {
+  // A bitwise operation of two bigints keeps 64 bits of the bigint result,
+  // which are those of the operation of their 64 bits.
+  if (typeof left === 'bigint' && typeof right === 'bigint') {
+    return uint64Result(left & right)
+  }
+
+  // Other operands are converted to their 64 bits first.
   return uint64Result(uint64Value(left) & uint64Value(right))
 }
 
@@ -916,6 +941,13 @@ export function int64And(
   left: number | bigint,
   right: number | bigint,
 ): bigint {
+  // A bitwise operation of two bigints keeps 64 bits of the bigint result,
+  // which are those of the operation of their 64 bits.
+  if (typeof left === 'bigint' && typeof right === 'bigint') {
+    return int64Result(left & right)
+  }
+
+  // Other operands are converted to their 64 bits first.
   return int64Result(int64Value(left) & int64Value(right))
 }
 
@@ -923,6 +955,13 @@ export function uint64AndNot(
   left: number | bigint,
   right: number | bigint,
 ): bigint {
+  // A bitwise operation of two bigints keeps 64 bits of the bigint result,
+  // which are those of the operation of their 64 bits.
+  if (typeof left === 'bigint' && typeof right === 'bigint') {
+    return uint64Result(left & ~right)
+  }
+
+  // Other operands are converted to their 64 bits first.
   return uint64Result(uint64Value(left) & ~uint64Value(right))
 }
 
@@ -930,6 +969,13 @@ export function int64AndNot(
   left: number | bigint,
   right: number | bigint,
 ): bigint {
+  // A bitwise operation of two bigints keeps 64 bits of the bigint result,
+  // which are those of the operation of their 64 bits.
+  if (typeof left === 'bigint' && typeof right === 'bigint') {
+    return int64Result(left & ~right)
+  }
+
+  // Other operands are converted to their 64 bits first.
   return int64Result(int64Value(left) & ~int64Value(right))
 }
 
@@ -937,10 +983,24 @@ export function uint64Or(
   left: number | bigint,
   right: number | bigint,
 ): bigint {
+  // A bitwise operation of two bigints keeps 64 bits of the bigint result,
+  // which are those of the operation of their 64 bits.
+  if (typeof left === 'bigint' && typeof right === 'bigint') {
+    return uint64Result(left | right)
+  }
+
+  // Other operands are converted to their 64 bits first.
   return uint64Result(uint64Value(left) | uint64Value(right))
 }
 
 export function int64Or(left: number | bigint, right: number | bigint): bigint {
+  // A bitwise operation of two bigints keeps 64 bits of the bigint result,
+  // which are those of the operation of their 64 bits.
+  if (typeof left === 'bigint' && typeof right === 'bigint') {
+    return int64Result(left | right)
+  }
+
+  // Other operands are converted to their 64 bits first.
   return int64Result(int64Value(left) | int64Value(right))
 }
 
@@ -948,6 +1008,13 @@ export function uint64Xor(
   left: number | bigint,
   right: number | bigint,
 ): bigint {
+  // A bitwise operation of two bigints keeps 64 bits of the bigint result,
+  // which are those of the operation of their 64 bits.
+  if (typeof left === 'bigint' && typeof right === 'bigint') {
+    return uint64Result(left ^ right)
+  }
+
+  // Other operands are converted to their 64 bits first.
   return uint64Result(uint64Value(left) ^ uint64Value(right))
 }
 
@@ -955,6 +1022,13 @@ export function int64Xor(
   left: number | bigint,
   right: number | bigint,
 ): bigint {
+  // A bitwise operation of two bigints keeps 64 bits of the bigint result,
+  // which are those of the operation of their 64 bits.
+  if (typeof left === 'bigint' && typeof right === 'bigint') {
+    return int64Result(left ^ right)
+  }
+
+  // Other operands are converted to their 64 bits first.
   return int64Result(int64Value(left) ^ int64Value(right))
 }
 
