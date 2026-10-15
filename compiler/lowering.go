@@ -11275,16 +11275,21 @@ func coerceWideHelperResult(runtimeOwner *RuntimeContractOwner, resultType types
 }
 
 func (o *LoweringOwner) lowerWideIntegerBinaryExpr(ctx lowerFileContext, expr *ast.BinaryExpr, left string, right string) (string, bool) {
+	// Only operations with a wide result or left operand use the helpers.
 	resultType := ctx.semPkg.source.TypesInfo.TypeOf(expr)
 	resultWide := isRuntimeWideIntegerType(resultType)
 	leftWide := isRuntimeWideIntegerType(ctx.semPkg.source.TypesInfo.TypeOf(expr.X))
 	if !resultWide && !leftWide {
 		return "", false
 	}
+
+	// The signedness picks the helper family, and constant operands are
+	// bigint literals.
 	signed := isFixedSignedWideIntegerType(resultType) ||
 		isFixedSignedWideIntegerType(ctx.semPkg.source.TypesInfo.TypeOf(expr.X))
 	left = lowerWideIntegerOperand(ctx, expr.X, left)
 	right = lowerWideIntegerOperand(ctx, expr.Y, right)
+
 	// Wide helpers coerce both operands before using JS bigint operators. Even
 	// int64/uint64 results route through them because overrides and generated
 	// fields can present number-typed operands for Go wide-integer expressions.
@@ -11294,28 +11299,11 @@ func (o *LoweringOwner) lowerWideIntegerBinaryExpr(ctx lowerFileContext, expr *a
 	helperCall := func(helper RuntimeHelper) string {
 		return wrap(o.runtimeOwner.QualifiedHelper(helper) + "(" + left + ", " + right + ")")
 	}
+
+	// Each operator has its helper, with simpler forms for some operands.
 	switch expr.Op {
 	case token.SHL, token.SHR:
-		helper := RuntimeHelperUint64Shr
-		if expr.Op == token.SHL {
-			helper = RuntimeHelperUint64Shl
-		}
-		if signed {
-			helper = RuntimeHelperInt64Shr
-			if expr.Op == token.SHL {
-				helper = RuntimeHelperInt64Shl
-			}
-		}
-		if _, ok := constantShiftAmount(ctx, expr.Y); !ok {
-			return helperCall(helper), true
-		}
-		amount, ok := constantShiftAmount(ctx, expr.Y)
-		if ok && amount >= 32 && expr.Op == token.SHL && !signed {
-			base := o.lowerWideShiftLeftOperand(ctx, expr.X, left)
-			return wrap(o.runtimeOwner.QualifiedHelper(RuntimeHelperUint64Mul) +
-				"(" + base + ", " + shiftMultiplier(amount) + ")"), true
-		}
-		return helperCall(helper), true
+		return o.lowerWideShiftExpr(ctx, expr, signed, left, right, wrap), true
 	case token.MUL:
 		return helperCall(wideIntegerHelper(signed, RuntimeHelperUint64Mul, RuntimeHelperInt64Mul)), true
 	case token.QUO:
@@ -11349,6 +11337,40 @@ func (o *LoweringOwner) lowerWideIntegerBinaryExpr(ctx lowerFileContext, expr *a
 	default:
 		return "", false
 	}
+}
+
+// lowerWideShiftExpr lowers a shift of a wide integer, whose result wrap
+// converts to the representation of the result type.
+func (o *LoweringOwner) lowerWideShiftExpr(ctx lowerFileContext, expr *ast.BinaryExpr, signed bool, left string, right string, wrap func(string) string) string {
+	// The helper is picked by the operator and the signedness.
+	helper := RuntimeHelperUint64Shr
+	if expr.Op == token.SHL {
+		helper = RuntimeHelperUint64Shl
+	}
+	if signed {
+		helper = RuntimeHelperInt64Shr
+		if expr.Op == token.SHL {
+			helper = RuntimeHelperInt64Shl
+		}
+	}
+
+	// One shifted left by a variable count, as a bit flag mask 1<<f, is a
+	// single bit, which the runtime takes from a table of bigints.
+	amount, constantAmount := constantShiftAmount(ctx, expr.Y)
+	if !constantAmount && expr.Op == token.SHL && isOneIntegerExpr(ctx, expr.X) {
+		bit := wideIntegerHelper(signed, RuntimeHelperUint64Bit, RuntimeHelperInt64Bit)
+		return wrap(o.runtimeOwner.QualifiedHelper(bit) + "(" + right + ")")
+	}
+
+	// An unsigned shift left by a constant of 32 or more multiplies.
+	if constantAmount && amount >= 32 && expr.Op == token.SHL && !signed {
+		base := o.lowerWideShiftLeftOperand(ctx, expr.X, left)
+		return wrap(o.runtimeOwner.QualifiedHelper(RuntimeHelperUint64Mul) +
+			"(" + base + ", " + shiftMultiplier(amount) + ")")
+	}
+
+	// Other shifts call the helper.
+	return wrap(o.runtimeOwner.QualifiedHelper(helper) + "(" + left + ", " + right + ")")
 }
 
 func lowerWideIntegerOperand(ctx lowerFileContext, expr ast.Expr, fallback string) string {
@@ -11414,6 +11436,12 @@ func lowIntegerBits(ctx lowerFileContext, expr ast.Expr) (int, bool) {
 		}
 	}
 	return integerBits(ctx.semPkg.source.TypesInfo.TypeOf(expr))
+}
+
+// isOneIntegerExpr reports whether expr is the integer constant 1.
+func isOneIntegerExpr(ctx lowerFileContext, expr ast.Expr) bool {
+	value := ctx.semPkg.source.TypesInfo.Types[unwrapParenExpr(expr)].Value
+	return value != nil && value.Kind() == constant.Int && constant.Compare(value, token.EQL, constant.MakeInt64(1))
 }
 
 func isZeroIntegerExpr(ctx lowerFileContext, expr ast.Expr) bool {

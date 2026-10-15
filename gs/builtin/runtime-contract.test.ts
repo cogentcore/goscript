@@ -37,6 +37,7 @@ import {
   isSliceProxy,
   int64And,
   int64Div,
+  int64Bit,
   int64Mod,
   int64Or,
   int64AndNot,
@@ -80,6 +81,7 @@ import {
   uint64Mod,
   uint64Mul,
   uint64Or,
+  uint64Bit,
   uint64Shl,
   uint64Shr,
   uint64Sub,
@@ -228,6 +230,13 @@ describe('builtin runtime contract helpers', () => {
     expect(uint(uint64Or(0xf0n, 0x0fn), 32)).toBe(0xff)
     expect(uint(uint64Xor(0xf0n, 0xffn), 32)).toBe(0x0f)
     expect(uint64AndNot(0xffn, 0x0fn)).toBe(0xf0n)
+    // A mask 1<<k comes from the bit tables, and other counts shift.
+    expect(int64Bit(0)).toBe(1n)
+    expect(int64Bit(63)).toBe(-0x8000000000000000n)
+    expect(int64Bit(64n)).toBe(0n)
+    expect(int64Bit(5n)).toBe(32n)
+    expect(uint64Bit(63n)).toBe(0x8000000000000000n)
+    expect(uint64Bit(200)).toBe(0n)
     // A constant right operand lowers to a JS number; the helper coerces it so a
     // bigint left operand never mixes with number (the Rand.Int64 1<<63 crash).
     expect(uint64AndNot(0xffffffffffffffffn, 9223372036854775808)).toBe(
