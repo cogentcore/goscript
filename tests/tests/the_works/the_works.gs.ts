@@ -28,32 +28,13 @@ $.registerInterfaceType(
 );
 
 export class Instr {
-	public get Op(): Op {
-		return this._fields.Op
-	}
+	public declare Op: Op
 
-	public set Op(value: Op) {
-		this._fields.Op = value
-	}
-
-	public get Arg(): bigint {
-		return this._fields.Arg
-	}
-
-	public set Arg(value: bigint) {
-		this._fields.Arg = value
-	}
-
-	public _fields: {
-		Op: Op
-		Arg: bigint
-	}
+	public declare Arg: bigint
 
 	constructor(init?: Partial<{Op?: Op, Arg?: bigint}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Op: init?.Op ?? (0 as Op),
-			Arg: init?.Arg ?? (0n as bigint)
-		}
+		this.Op = init?.Op ?? (0 as Op)
+		this.Arg = init?.Arg ?? (0n as bigint)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -61,11 +42,10 @@ export class Instr {
 		return new Instr(this, true)
 	}
 
-	public __goscriptAssign(source: Instr): void {
-		const target = this._fields
-		const values = source._fields
-		target.Op = values.Op
-		target.Arg = values.Arg
+	public __goscriptAssign(source: Instr): this {
+		this.Op = source.Op
+		this.Arg = source.Arg
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -78,32 +58,13 @@ export class Instr {
 }
 
 export class Program {
-	public get Name(): string {
-		return this._fields.Name
-	}
+	public declare Name: string
 
-	public set Name(value: string) {
-		this._fields.Name = value
-	}
-
-	public get Code(): $.Slice<Instr> {
-		return this._fields.Code
-	}
-
-	public set Code(value: $.Slice<Instr>) {
-		this._fields.Code = value
-	}
-
-	public _fields: {
-		Name: string
-		Code: $.Slice<Instr>
-	}
+	public declare Code: $.Slice<Instr>
 
 	constructor(init?: Partial<{Name?: string, Code?: $.Slice<Instr>}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Name: init?.Name ?? ("" as string),
-			Code: init?.Code ?? (null! as $.Slice<Instr>)
-		}
+		this.Name = init?.Name ?? ("" as string)
+		this.Code = init?.Code ?? (null! as $.Slice<Instr>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -111,11 +72,10 @@ export class Program {
 		return new Program(this, true)
 	}
 
-	public __goscriptAssign(source: Program): void {
-		const target = this._fields
-		const values = source._fields
-		target.Name = values.Name
-		target.Code = values.Code
+	public __goscriptAssign(source: Program): this {
+		this.Name = source.Name
+		this.Code = source.Code
+		return this
 	}
 
 	public Listing(): ((_yield: ((_p0: number, _p1: Instr) => boolean | globalThis.Promise<boolean>) | null) => void) | null {
@@ -140,22 +100,10 @@ export class Program {
 }
 
 export class Stack {
-	public get items(): $.Slice<any> {
-		return this._fields.items
-	}
-
-	public set items(value: $.Slice<any>) {
-		this._fields.items = value
-	}
-
-	public _fields: {
-		items: $.Slice<any>
-	}
+	public declare items: $.Slice<any>
 
 	constructor(init?: Partial<{items?: $.Slice<any>}>, __goscriptValue?: boolean) {
-		this._fields = {
-			items: init?.items ?? (null! as $.Slice<any>)
-		}
+		this.items = init?.items ?? (null! as $.Slice<any>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -163,10 +111,9 @@ export class Stack {
 		return new Stack(this, true)
 	}
 
-	public __goscriptAssign(source: Stack): void {
-		const target = this._fields
-		const values = source._fields
-		target.items = values.items
+	public __goscriptAssign(source: Stack): this {
+		this.items = source.items
+		return this
 	}
 
 	public Pop(__typeArgs: $.GenericTypeArgs | undefined): any {
@@ -196,42 +143,16 @@ export class Stack {
 }
 
 export class VM {
-	public get pc(): number {
-		return this._fields.pc
-	}
+	public declare pc: number
 
-	public set pc(value: number) {
-		this._fields.pc = value
-	}
+	public declare steps: number
 
-	public get steps(): number {
-		return this._fields.steps
-	}
-
-	public set steps(value: number) {
-		this._fields.steps = value
-	}
-
-	public get stack(): Stack {
-		return this._fields.stack
-	}
-
-	public set stack(value: Stack) {
-		this._fields.stack = value
-	}
-
-	public _fields: {
-		pc: number
-		steps: number
-		stack: Stack
-	}
+	public declare stack: Stack
 
 	constructor(init?: Partial<{pc?: number, steps?: number, stack?: Stack}>, __goscriptValue?: boolean) {
-		this._fields = {
-			pc: init?.pc ?? (0 as number),
-			steps: init?.steps ?? (0 as number),
-			stack: init?.stack ? init.stack.clone() : $.markAsStructValue(new Stack())
-		}
+		this.pc = init?.pc ?? (0 as number)
+		this.steps = init?.steps ?? (0 as number)
+		this.stack = init?.stack ? init.stack.clone() : $.markAsStructValue(new Stack())
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -239,12 +160,11 @@ export class VM {
 		return new VM(this, true)
 	}
 
-	public __goscriptAssign(source: VM): void {
-		const target = this._fields
-		const values = source._fields
-		target.pc = values.pc
-		target.steps = values.steps
-		$.assignStruct(target.stack, values.stack)
+	public __goscriptAssign(source: VM): this {
+		this.pc = source.pc
+		this.steps = source.steps
+		this.stack.__goscriptAssign(source.stack)
+		return this
 	}
 
 	public Step(code: $.Slice<Instr>): boolean {
@@ -253,7 +173,7 @@ export class VM {
 		let _in = ($.arrayIndex(code!, (vm$ as VM).pc)).clone();
 		;(vm$ as VM).pc++;
 		;(vm$ as VM).steps++
-		let s = $.fieldRef((vm$ as VM)._fields, "stack")
+		let s = $.fieldRef((vm$ as VM), "stack")
 		switch (_in.Op) {
 			case 0:
 			{
@@ -330,42 +250,16 @@ export class VM {
 }
 
 export class Answer {
-	public get Name(): string {
-		return this._fields.Name
-	}
+	public declare Name: string
 
-	public set Name(value: string) {
-		this._fields.Name = value
-	}
+	public declare Value: bigint
 
-	public get Value(): bigint {
-		return this._fields.Value
-	}
-
-	public set Value(value: bigint) {
-		this._fields.Value = value
-	}
-
-	public get Steps(): number {
-		return this._fields.Steps
-	}
-
-	public set Steps(value: number) {
-		this._fields.Steps = value
-	}
-
-	public _fields: {
-		Name: string
-		Value: bigint
-		Steps: number
-	}
+	public declare Steps: number
 
 	constructor(init?: Partial<{Name?: string, Value?: bigint, Steps?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Name: init?.Name ?? ("" as string),
-			Value: init?.Value ?? (0n as bigint),
-			Steps: init?.Steps ?? (0 as number)
-		}
+		this.Name = init?.Name ?? ("" as string)
+		this.Value = init?.Value ?? (0n as bigint)
+		this.Steps = init?.Steps ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -373,12 +267,11 @@ export class Answer {
 		return new Answer(this, true)
 	}
 
-	public __goscriptAssign(source: Answer): void {
-		const target = this._fields
-		const values = source._fields
-		target.Name = values.Name
-		target.Value = values.Value
-		target.Steps = values.Steps
+	public __goscriptAssign(source: Answer): this {
+		this.Name = source.Name
+		this.Value = source.Value
+		this.Steps = source.Steps
+		return this
 	}
 
 	public Program(): string {
@@ -396,32 +289,13 @@ export class Answer {
 }
 
 export class Fault {
-	public get Name(): string {
-		return this._fields.Name
-	}
+	public declare Name: string
 
-	public set Name(value: string) {
-		this._fields.Name = value
-	}
-
-	public get Reason(): string {
-		return this._fields.Reason
-	}
-
-	public set Reason(value: string) {
-		this._fields.Reason = value
-	}
-
-	public _fields: {
-		Name: string
-		Reason: string
-	}
+	public declare Reason: string
 
 	constructor(init?: Partial<{Name?: string, Reason?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Name: init?.Name ?? ("" as string),
-			Reason: init?.Reason ?? ("" as string)
-		}
+		this.Name = init?.Name ?? ("" as string)
+		this.Reason = init?.Reason ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -429,11 +303,10 @@ export class Fault {
 		return new Fault(this, true)
 	}
 
-	public __goscriptAssign(source: Fault): void {
-		const target = this._fields
-		const values = source._fields
-		target.Name = values.Name
-		target.Reason = values.Reason
+	public __goscriptAssign(source: Fault): this {
+		this.Name = source.Name
+		this.Reason = source.Reason
+		return this
 	}
 
 	public Program(): string {

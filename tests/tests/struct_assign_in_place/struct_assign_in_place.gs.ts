@@ -6,32 +6,13 @@ import * as $ from "@goscript/builtin/index.js"
 export type Kind = number
 
 export class Inner {
-	public get X(): number {
-		return this._fields.X
-	}
+	public declare X: number
 
-	public set X(value: number) {
-		this._fields.X = value
-	}
-
-	public get Y(): number {
-		return this._fields.Y
-	}
-
-	public set Y(value: number) {
-		this._fields.Y = value
-	}
-
-	public _fields: {
-		X: number
-		Y: number
-	}
+	public declare Y: number
 
 	constructor(init?: Partial<{X?: number, Y?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			X: init?.X ?? (0 as number),
-			Y: init?.Y ?? (0 as number)
-		}
+		this.X = init?.X ?? (0 as number)
+		this.Y = init?.Y ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -39,11 +20,10 @@ export class Inner {
 		return new Inner(this, true)
 	}
 
-	public __goscriptAssign(source: Inner): void {
-		const target = this._fields
-		const values = source._fields
-		target.X = values.X
-		target.Y = values.Y
+	public __goscriptAssign(source: Inner): this {
+		this.X = source.X
+		this.Y = source.Y
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -56,52 +36,19 @@ export class Inner {
 }
 
 export class Outer {
-	public get In(): Inner {
-		return this._fields.In
-	}
+	public declare In: Inner
 
-	public set In(value: Inner) {
-		this._fields.In = value
-	}
+	public declare Arr: number[]
 
-	public get Arr(): number[] {
-		return this._fields.Arr
-	}
+	public declare Ptr: Inner | $.VarRef<Inner> | null
 
-	public set Arr(value: number[]) {
-		this._fields.Arr = value
-	}
-
-	public get Ptr(): Inner | $.VarRef<Inner> | null {
-		return this._fields.Ptr
-	}
-
-	public set Ptr(value: Inner | $.VarRef<Inner> | null) {
-		this._fields.Ptr = value
-	}
-
-	public get N(): number {
-		return this._fields.N
-	}
-
-	public set N(value: number) {
-		this._fields.N = value
-	}
-
-	public _fields: {
-		In: Inner
-		Arr: number[]
-		Ptr: Inner | $.VarRef<Inner> | null
-		N: number
-	}
+	public declare N: number
 
 	constructor(init?: Partial<{In?: Inner, Arr?: number[], Ptr?: Inner | $.VarRef<Inner> | null, N?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			In: init?.In ? init.In.clone() : new Inner(undefined, true),
-			Arr: init?.Arr !== undefined ? $.cloneArrayValue(init.Arr, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2)) : $.arrayValue(globalThis.Array.from({ length: 2 }, () => 0)),
-			Ptr: init?.Ptr ?? (null! as Inner | $.VarRef<Inner> | null),
-			N: init?.N ?? (0 as number)
-		}
+		this.In = init?.In ? init.In.clone() : new Inner(undefined, true)
+		this.Arr = init?.Arr !== undefined ? $.cloneArrayValue(init.Arr, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2)) : $.arrayValue(globalThis.Array.from({ length: 2 }, () => 0))
+		this.Ptr = init?.Ptr ?? (null! as Inner | $.VarRef<Inner> | null)
+		this.N = init?.N ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -109,13 +56,12 @@ export class Outer {
 		return new Outer(this, true)
 	}
 
-	public __goscriptAssign(source: Outer): void {
-		const target = this._fields
-		const values = source._fields
-		$.assignStruct(target.In, values.In)
-		target.Arr = $.assignFieldValue(target.Arr, values.Arr, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2))
-		target.Ptr = values.Ptr
-		target.N = values.N
+	public __goscriptAssign(source: Outer): this {
+		this.In.__goscriptAssign(source.In)
+		this.Arr = $.assignFieldValue(this.Arr, source.Arr, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2))
+		this.Ptr = source.Ptr
+		this.N = source.N
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -128,32 +74,13 @@ export class Outer {
 }
 
 export class Pair {
-	public get Key(): string {
-		return this._fields.Key
-	}
+	public declare Key: string
 
-	public set Key(value: string) {
-		this._fields.Key = value
-	}
-
-	public get Val(): any {
-		return this._fields.Val
-	}
-
-	public set Val(value: any) {
-		this._fields.Val = value
-	}
-
-	public _fields: {
-		Key: string
-		Val: any
-	}
+	public declare Val: any
 
 	constructor(init?: Partial<{Key?: string, Val?: any}>, __goscriptValue?: boolean, __goscriptFresh?: boolean) {
-		this._fields = {
-			Key: init?.Key ?? ("" as string),
-			Val: init?.Val !== undefined ? (__goscriptFresh === true ? init.Val : $.copyElement(init.Val)) : (null! as any)
-		}
+		this.Key = init?.Key ?? ("" as string)
+		this.Val = init?.Val !== undefined ? (__goscriptFresh === true ? init.Val : $.copyElement(init.Val)) : (null! as any)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -161,11 +88,10 @@ export class Pair {
 		return new Pair(this, true)
 	}
 
-	public __goscriptAssign(source: Pair): void {
-		const target = this._fields
-		const values = source._fields
-		target.Key = values.Key
-		target.Val = $.assignFieldValue(target.Val, values.Val, { kind: $.TypeKind.Interface, methods: [] })
+	public __goscriptAssign(source: Pair): this {
+		this.Key = source.Key
+		this.Val = $.assignFieldValue(this.Val, source.Val, { kind: $.TypeKind.Interface, methods: [] })
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -178,22 +104,10 @@ export class Pair {
 }
 
 export class Holder {
-	public get P(): Pair {
-		return this._fields.P
-	}
-
-	public set P(value: Pair) {
-		this._fields.P = value
-	}
-
-	public _fields: {
-		P: Pair
-	}
+	public declare P: Pair
 
 	constructor(init?: Partial<{P?: Pair}>, __goscriptValue?: boolean) {
-		this._fields = {
-			P: init?.P ? init.P.clone() : $.markAsStructValue(new Pair({Val: null}, undefined, true))
-		}
+		this.P = init?.P ? init.P.clone() : $.markAsStructValue(new Pair({Val: null}, undefined, true))
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -201,10 +115,9 @@ export class Holder {
 		return new Holder(this, true)
 	}
 
-	public __goscriptAssign(source: Holder): void {
-		const target = this._fields
-		const values = source._fields
-		$.assignStruct(target.P, values.P)
+	public __goscriptAssign(source: Holder): this {
+		this.P.__goscriptAssign(source.P)
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -217,22 +130,10 @@ export class Holder {
 }
 
 export class Event {
-	public get Kind(): Kind {
-		return this._fields.Kind
-	}
-
-	public set Kind(value: Kind) {
-		this._fields.Kind = value
-	}
-
-	public _fields: {
-		Kind: Kind
-	}
+	public declare Kind: Kind
 
 	constructor(init?: Partial<{Kind?: Kind}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Kind: init?.Kind ?? (0 as Kind)
-		}
+		this.Kind = init?.Kind ?? (0 as Kind)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -240,10 +141,9 @@ export class Event {
 		return new Event(this, true)
 	}
 
-	public __goscriptAssign(source: Event): void {
-		const target = this._fields
-		const values = source._fields
-		target.Kind = values.Kind
+	public __goscriptAssign(source: Event): this {
+		this.Kind = source.Kind
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -282,32 +182,32 @@ export function nextEvent(k: Kind): [Event, $.GoError] {
 export async function main(): globalThis.Promise<void> {
 	let a = $.varRef(make1())
 	let b = new Outer(undefined, true)
-	b = $.assignStruct(b, a.value)
+	b = b.__goscriptAssign(a.value)
 	a.value.In.X = 10
 	a.value.Arr[0] = 30
 	await $.println(b.In.X, $.arrayIndex(b.Arr, 0), a.value.In.X, $.arrayIndex(a.value.Arr, 0))
 
 	let p: Outer | $.VarRef<Outer> | null = a
-	a.value = $.assignStruct(a.value, $.pointerValue<Outer>(p))
+	a.value = a.value.__goscriptAssign($.pointerValue<Outer>(p))
 	await $.println(a.value.In.X, a.value.N)
 
 	let s = $.arrayToSlice<Outer>([make1(), make1()])
-	$.assignStruct($.sliceElems(s!)[$.sliceSlot(s!, 0)], $.arrayIndex(s!, 1))
+	$.sliceElems(s!)[$.sliceSlot(s!, 0)].__goscriptAssign($.arrayIndex(s!, 1))
 	$.arrayIndex(s!, 1).In.Y = 20
 	await $.println($.arrayIndex(s!, 0).In.Y, $.arrayIndex(s!, 1).In.Y)
 
 	let sh = new Inner({X: 7, Y: 8})
 	a.value.Ptr = sh
-	b = $.assignStruct(b, a.value)
+	b = b.__goscriptAssign(a.value)
 	$.pointerValue<Inner>(b.Ptr).X = 70
 	await $.println($.pointerValue<Inner>(a.value.Ptr).X, $.pointerValue<Inner>(sh).X)
 
-	$.assignStruct(global, b)
+	global.__goscriptAssign(b)
 	b.N = 50
 	await $.println(global.N, b.N)
 
 	let _in: Inner = new Inner(undefined, true)
-	_in = $.assignStruct(_in, a.value.In)
+	_in = _in.__goscriptAssign(a.value.In)
 	a.value.In.Y = 99
 	await $.println(_in.Y, a.value.In.Y)
 	let g1 = $.markAsStructValue(new Pair({Key: "a", Val: new Inner({X: 1, Y: 2}, true)}))
@@ -326,7 +226,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println(h2.P.Val.X, h1.P.Val.X)
 	let m = $.makeMap<string, Outer>([["k", (a.value).clone()]])
 	let c = new Outer(undefined, true)
-	c = $.assignStruct(c, $.mapGet<string, Outer, Outer>(m, "k", new Outer(undefined, true))[0])
+	c = c.__goscriptAssign($.mapGet<string, Outer, Outer>(m, "k", new Outer(undefined, true))[0])
 	c.N = 77
 	await $.println($.mapGet<string, Outer, Outer>(m, "k", new Outer(undefined, true))[0].N, c.N)
 
@@ -338,7 +238,7 @@ export async function main(): globalThis.Promise<void> {
 	for (let __goscriptRangeTarget0 = $.arrayToSlice<Kind>([2, 3]), __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
 		let k = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as Kind)
 		let __goscriptTuple0: any = nextEvent(k)
-		ev = $.assignStruct(ev, __goscriptTuple0[0])
+		ev = ev.__goscriptAssign(__goscriptTuple0[0])
 		err = __goscriptTuple0[1]
 		switch (ev.Kind) {
 			case 2:

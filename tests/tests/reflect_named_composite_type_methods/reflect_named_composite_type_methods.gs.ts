@@ -50,22 +50,10 @@ $.registerNamedValueType(
 );
 
 export class Rule {
-	public get Pattern(): string {
-		return this._fields.Pattern
-	}
-
-	public set Pattern(value: string) {
-		this._fields.Pattern = value
-	}
-
-	public _fields: {
-		Pattern: string
-	}
+	public declare Pattern: string
 
 	constructor(init?: Partial<{Pattern?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Pattern: init?.Pattern ?? ("" as string)
-		}
+		this.Pattern = init?.Pattern ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -73,10 +61,9 @@ export class Rule {
 		return new Rule(this, true)
 	}
 
-	public __goscriptAssign(source: Rule): void {
-		const target = this._fields
-		const values = source._fields
-		target.Pattern = values.Pattern
+	public __goscriptAssign(source: Rule): this {
+		this.Pattern = source.Pattern
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -89,32 +76,13 @@ export class Rule {
 }
 
 export class xmlState {
-	public get Name(): string {
-		return this._fields.Name
-	}
+	public declare Name: string
 
-	public set Name(value: string) {
-		this._fields.Name = value
-	}
-
-	public get Rules(): $.Slice<Rule> {
-		return this._fields.Rules
-	}
-
-	public set Rules(value: $.Slice<Rule>) {
-		this._fields.Rules = value
-	}
-
-	public _fields: {
-		Name: string
-		Rules: $.Slice<Rule>
-	}
+	public declare Rules: $.Slice<Rule>
 
 	constructor(init?: Partial<{Name?: string, Rules?: $.Slice<Rule>}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Name: init?.Name ?? ("" as string),
-			Rules: init?.Rules ?? (null! as $.Slice<Rule>)
-		}
+		this.Name = init?.Name ?? ("" as string)
+		this.Rules = init?.Rules ?? (null! as $.Slice<Rule>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -122,11 +90,10 @@ export class xmlState {
 		return new xmlState(this, true)
 	}
 
-	public __goscriptAssign(source: xmlState): void {
-		const target = this._fields
-		const values = source._fields
-		target.Name = values.Name
-		target.Rules = values.Rules
+	public __goscriptAssign(source: xmlState): this {
+		this.Name = source.Name
+		this.Rules = source.Rules
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -139,22 +106,10 @@ export class xmlState {
 }
 
 export class xmlRules {
-	public get States(): $.Slice<xmlState> {
-		return this._fields.States
-	}
-
-	public set States(value: $.Slice<xmlState>) {
-		this._fields.States = value
-	}
-
-	public _fields: {
-		States: $.Slice<xmlState>
-	}
+	public declare States: $.Slice<xmlState>
 
 	constructor(init?: Partial<{States?: $.Slice<xmlState>}>, __goscriptValue?: boolean) {
-		this._fields = {
-			States: init?.States ?? (null! as $.Slice<xmlState>)
-		}
+		this.States = init?.States ?? (null! as $.Slice<xmlState>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -162,10 +117,9 @@ export class xmlRules {
 		return new xmlRules(this, true)
 	}
 
-	public __goscriptAssign(source: xmlRules): void {
-		const target = this._fields
-		const values = source._fields
-		target.States = values.States
+	public __goscriptAssign(source: xmlRules): this {
+		this.States = source.States
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -178,32 +132,13 @@ export class xmlRules {
 }
 
 export class Lexer {
-	public get Name(): string {
-		return this._fields.Name
-	}
+	public declare Name: string
 
-	public set Name(value: string) {
-		this._fields.Name = value
-	}
-
-	public get Rules(): Rules {
-		return this._fields.Rules
-	}
-
-	public set Rules(value: Rules) {
-		this._fields.Rules = value
-	}
-
-	public _fields: {
-		Name: string
-		Rules: Rules
-	}
+	public declare Rules: Rules
 
 	constructor(init?: Partial<{Name?: string, Rules?: Rules}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Name: init?.Name ?? ("" as string),
-			Rules: init?.Rules ?? (null! as Rules)
-		}
+		this.Name = init?.Name ?? ("" as string)
+		this.Rules = init?.Rules ?? (null! as Rules)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -211,11 +146,10 @@ export class Lexer {
 		return new Lexer(this, true)
 	}
 
-	public __goscriptAssign(source: Lexer): void {
-		const target = this._fields
-		const values = source._fields
-		target.Name = values.Name
-		target.Rules = values.Rules
+	public __goscriptAssign(source: Lexer): this {
+		this.Name = source.Name
+		this.Rules = source.Rules
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

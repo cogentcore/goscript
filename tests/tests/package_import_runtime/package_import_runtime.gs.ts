@@ -8,22 +8,10 @@ import * as strconv from "@goscript/strconv/index.js"
 import * as strings from "@goscript/strings/index.js"
 
 export class counter {
-	public get n(): number {
-		return this._fields.n
-	}
-
-	public set n(value: number) {
-		this._fields.n = value
-	}
-
-	public _fields: {
-		n: number
-	}
+	public declare n: number
 
 	constructor(init?: Partial<{n?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			n: init?.n ?? (0 as number)
-		}
+		this.n = init?.n ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -31,10 +19,9 @@ export class counter {
 		return new counter(this, true)
 	}
 
-	public __goscriptAssign(source: counter): void {
-		const target = this._fields
-		const values = source._fields
-		target.n = values.n
+	public __goscriptAssign(source: counter): this {
+		this.n = source.n
+		return this
 	}
 
 	public PtrMethod(): number {
@@ -57,22 +44,10 @@ export class counter {
 }
 
 export class box {
-	public get v(): any {
-		return this._fields.v
-	}
-
-	public set v(value: any) {
-		this._fields.v = value
-	}
-
-	public _fields: {
-		v: any
-	}
+	public declare v: any
 
 	constructor(init?: Partial<{v?: any}>, __goscriptValue?: boolean, __goscriptFresh?: boolean) {
-		this._fields = {
-			v: init?.v !== undefined ? (__goscriptFresh === true ? init.v : $.copyElement(init.v)) : (null! as any)
-		}
+		this.v = init?.v !== undefined ? (__goscriptFresh === true ? init.v : $.copyElement(init.v)) : (null! as any)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -80,10 +55,9 @@ export class box {
 		return new box(this, true)
 	}
 
-	public __goscriptAssign(source: box): void {
-		const target = this._fields
-		const values = source._fields
-		target.v = $.assignFieldValue(target.v, values.v, { kind: $.TypeKind.Interface, methods: [] })
+	public __goscriptAssign(source: box): this {
+		this.v = $.assignFieldValue(this.v, source.v, { kind: $.TypeKind.Interface, methods: [] })
+		return this
 	}
 
 	public Get(__typeArgs: $.GenericTypeArgs | undefined): any {

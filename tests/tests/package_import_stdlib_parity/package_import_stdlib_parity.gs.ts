@@ -23,12 +23,7 @@ import "@goscript/os/index.js"
 import "@goscript/unicode/index.js"
 
 export class xof {
-	public _fields: {
-	}
-
 	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
-		this._fields = {
-		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -36,7 +31,8 @@ export class xof {
 		return new xof(this, true)
 	}
 
-	public __goscriptAssign(source: xof): void {
+	public __goscriptAssign(source: xof): this {
+		return this
 	}
 
 	public BlockSize(): number {

@@ -5,32 +5,13 @@ import * as $ from "@goscript/builtin/index.js"
 import * as sync from "@goscript/sync/index.js"
 
 export class FileTracker {
-	public get mutex(): sync.Mutex {
-		return this._fields.mutex
-	}
+	public declare mutex: sync.Mutex
 
-	public set mutex(value: sync.Mutex) {
-		this._fields.mutex = value
-	}
-
-	public get lines(): $.Slice<number> {
-		return this._fields.lines
-	}
-
-	public set lines(value: $.Slice<number>) {
-		this._fields.lines = value
-	}
-
-	public _fields: {
-		mutex: sync.Mutex
-		lines: $.Slice<number>
-	}
+	public declare lines: $.Slice<number>
 
 	constructor(init?: Partial<{mutex?: sync.Mutex, lines?: $.Slice<number>}>, __goscriptValue?: boolean) {
-		this._fields = {
-			mutex: init?.mutex ? $.markAsStructValue($.cloneStructValue(init.mutex)) : $.markAsStructValue(new sync.Mutex()),
-			lines: init?.lines ?? (null! as $.Slice<number>)
-		}
+		this.mutex = init?.mutex ? $.markAsStructValue($.cloneStructValue(init.mutex)) : $.markAsStructValue(new sync.Mutex())
+		this.lines = init?.lines ?? (null! as $.Slice<number>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -38,11 +19,10 @@ export class FileTracker {
 		return new FileTracker(this, true)
 	}
 
-	public __goscriptAssign(source: FileTracker): void {
-		const target = this._fields
-		const values = source._fields
-		$.assignStruct(target.mutex, values.mutex)
-		target.lines = values.lines
+	public __goscriptAssign(source: FileTracker): this {
+		$.assignStruct(this.mutex, source.mutex)
+		this.lines = source.lines
+		return this
 	}
 
 	public async AddLine(offset: number): globalThis.Promise<void> {
@@ -63,22 +43,10 @@ export class FileTracker {
 }
 
 export class Scanner {
-	public get file(): FileTracker | $.VarRef<FileTracker> | null {
-		return this._fields.file
-	}
-
-	public set file(value: FileTracker | $.VarRef<FileTracker> | null) {
-		this._fields.file = value
-	}
-
-	public _fields: {
-		file: FileTracker | $.VarRef<FileTracker> | null
-	}
+	public declare file: FileTracker | $.VarRef<FileTracker> | null
 
 	constructor(init?: Partial<{file?: FileTracker | $.VarRef<FileTracker> | null}>, __goscriptValue?: boolean) {
-		this._fields = {
-			file: init?.file ?? (null! as FileTracker | $.VarRef<FileTracker> | null)
-		}
+		this.file = init?.file ?? (null! as FileTracker | $.VarRef<FileTracker> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -86,10 +54,9 @@ export class Scanner {
 		return new Scanner(this, true)
 	}
 
-	public __goscriptAssign(source: Scanner): void {
-		const target = this._fields
-		const values = source._fields
-		target.file = values.file
+	public __goscriptAssign(source: Scanner): this {
+		this.file = source.file
+		return this
 	}
 
 	public async next(): globalThis.Promise<void> {

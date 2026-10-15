@@ -20,22 +20,10 @@ $.registerNamedValueType(
 );
 
 export class msg {
-	public get v(): number {
-		return this._fields.v
-	}
-
-	public set v(value: number) {
-		this._fields.v = value
-	}
-
-	public _fields: {
-		v: number
-	}
+	public declare v: number
 
 	constructor(init?: Partial<{v?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			v: init?.v ?? (0 as number)
-		}
+		this.v = init?.v ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -43,10 +31,9 @@ export class msg {
 		return new msg(this, true)
 	}
 
-	public __goscriptAssign(source: msg): void {
-		const target = this._fields
-		const values = source._fields
-		target.v = values.v
+	public __goscriptAssign(source: msg): this {
+		this.v = source.v
+		return this
 	}
 
 	public CloneMessageVT(): protobuf_go_lite.CloneMessage | null {

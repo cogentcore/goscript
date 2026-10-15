@@ -30,32 +30,13 @@ $.registerNamedValueType(
 );
 
 export class Pos {
-	public get Line(): number {
-		return this._fields.Line
-	}
+	public declare Line: number
 
-	public set Line(value: number) {
-		this._fields.Line = value
-	}
-
-	public get Char(): number {
-		return this._fields.Char
-	}
-
-	public set Char(value: number) {
-		this._fields.Char = value
-	}
-
-	public _fields: {
-		Line: number
-		Char: number
-	}
+	public declare Char: number
 
 	constructor(init?: Partial<{Line?: number, Char?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Line: init?.Line ?? (0 as number),
-			Char: init?.Char ?? (0 as number)
-		}
+		this.Line = init?.Line ?? (0 as number)
+		this.Char = init?.Char ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -63,11 +44,10 @@ export class Pos {
 		return new Pos(this, true)
 	}
 
-	public __goscriptAssign(source: Pos): void {
-		const target = this._fields
-		const values = source._fields
-		target.Line = values.Line
-		target.Char = values.Char
+	public __goscriptAssign(source: Pos): this {
+		this.Line = source.Line
+		this.Char = source.Char
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -80,32 +60,13 @@ export class Pos {
 }
 
 export class Region {
-	public get Start(): Pos {
-		return this._fields.Start
-	}
+	public declare Start: Pos
 
-	public set Start(value: Pos) {
-		this._fields.Start = value
-	}
-
-	public get End(): Pos {
-		return this._fields.End
-	}
-
-	public set End(value: Pos) {
-		this._fields.End = value
-	}
-
-	public _fields: {
-		Start: Pos
-		End: Pos
-	}
+	public declare End: Pos
 
 	constructor(init?: Partial<{Start?: Pos, End?: Pos}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Start: init?.Start ? init.Start.clone() : new Pos(undefined, true),
-			End: init?.End ? init.End.clone() : new Pos(undefined, true)
-		}
+		this.Start = init?.Start ? init.Start.clone() : new Pos(undefined, true)
+		this.End = init?.End ? init.End.clone() : new Pos(undefined, true)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -113,11 +74,10 @@ export class Region {
 		return new Region(this, true)
 	}
 
-	public __goscriptAssign(source: Region): void {
-		const target = this._fields
-		const values = source._fields
-		$.assignStruct(target.Start, values.Start)
-		$.assignStruct(target.End, values.End)
+	public __goscriptAssign(source: Region): this {
+		this.Start.__goscriptAssign(source.Start)
+		this.End.__goscriptAssign(source.End)
+		return this
 	}
 
 	public bump(): void {
@@ -143,32 +103,13 @@ export class Region {
 }
 
 export class rule {
-	public get off(): boolean {
-		return this._fields.off
-	}
+	public declare off: boolean
 
-	public set off(value: boolean) {
-		this._fields.off = value
-	}
-
-	public get name(): string {
-		return this._fields.name
-	}
-
-	public set name(value: string) {
-		this._fields.name = value
-	}
-
-	public _fields: {
-		off: boolean
-		name: string
-	}
+	public declare name: string
 
 	constructor(init?: Partial<{off?: boolean, name?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			off: init?.off ?? (false as boolean),
-			name: init?.name ?? ("" as string)
-		}
+		this.off = init?.off ?? (false as boolean)
+		this.name = init?.name ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -176,11 +117,10 @@ export class rule {
 		return new rule(this, true)
 	}
 
-	public __goscriptAssign(source: rule): void {
-		const target = this._fields
-		const values = source._fields
-		target.off = values.off
-		target.name = values.name
+	public __goscriptAssign(source: rule): this {
+		this.off = source.off
+		this.name = source.name
+		return this
 	}
 
 	public group(scope: Region, depth: number, __goscriptBorrow?: boolean): [boolean, Region, number] {
@@ -225,32 +165,13 @@ export class rule {
 }
 
 export class outer {
-	public get rule(): rule | $.VarRef<rule> | null {
-		return this._fields.rule
-	}
+	public declare rule: rule | $.VarRef<rule> | null
 
-	public set rule(value: rule | $.VarRef<rule> | null) {
-		this._fields.rule = value
-	}
-
-	public get Region(): Region {
-		return this._fields.Region
-	}
-
-	public set Region(value: Region) {
-		this._fields.Region = value
-	}
-
-	public _fields: {
-		rule: rule | $.VarRef<rule> | null
-		Region: Region
-	}
+	public declare Region: Region
 
 	constructor(init?: Partial<{rule?: rule | $.VarRef<rule> | null, Region?: Region}>, __goscriptValue?: boolean) {
-		this._fields = {
-			rule: init?.rule ?? (null! as rule | $.VarRef<rule> | null),
-			Region: init?.Region ? init.Region.clone() : new Region(undefined, true)
-		}
+		this.rule = init?.rule ?? (null! as rule | $.VarRef<rule> | null)
+		this.Region = init?.Region ? init.Region.clone() : new Region(undefined, true)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -258,11 +179,10 @@ export class outer {
 		return new outer(this, true)
 	}
 
-	public __goscriptAssign(source: outer): void {
-		const target = this._fields
-		const values = source._fields
-		target.rule = values.rule
-		$.assignStruct(target.Region, values.Region)
+	public __goscriptAssign(source: outer): this {
+		this.rule = source.rule
+		this.Region.__goscriptAssign(source.Region)
+		return this
 	}
 
 	public group(scope: any, depth: any): any {
@@ -398,7 +318,7 @@ export function methodArg(__goscriptParam1: Region): number {
 
 export function aliasField(scope: Region): number {
 	let x = (scope).clone()
-	let p = $.fieldRef(x._fields, "Start")
+	let p = $.fieldRef(x, "Start")
 	let got = pick(x, 1)
 	$.pointerValue<Pos>(p).Line = 78
 	return got.Start.Line
@@ -436,7 +356,7 @@ export async function main(): globalThis.Promise<void> {
 	for (let i = 0; i < 3; i++) {
 		let [, got, ] = (r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? ((r as any) as rule).match(loopArg, 0) : rule.prototype.match.call(r, loopArg, 0))
 		if (i == 0) {
-			last = $.assignStruct(last, got)
+			last = last.__goscriptAssign(got)
 		}
 		loopArg.Start.Char += 10
 		await $.println("loop:", got.Start.Char, loopArg.Start.Char)

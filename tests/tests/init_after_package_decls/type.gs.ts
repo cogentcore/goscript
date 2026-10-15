@@ -6,32 +6,13 @@ import * as __goscript_field from "./field.gs.ts"
 import "./field.gs.ts"
 
 export class Type {
-	public get Name(): string {
-		return this._fields.Name
-	}
+	public declare Name: string
 
-	public set Name(value: string) {
-		this._fields.Name = value
-	}
-
-	public get Fields(): $.Slice<__goscript_field.Field> {
-		return this._fields.Fields
-	}
-
-	public set Fields(value: $.Slice<__goscript_field.Field>) {
-		this._fields.Fields = value
-	}
-
-	public _fields: {
-		Name: string
-		Fields: $.Slice<__goscript_field.Field>
-	}
+	public declare Fields: $.Slice<__goscript_field.Field>
 
 	constructor(init?: Partial<{Name?: string, Fields?: $.Slice<__goscript_field.Field>}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Name: init?.Name ?? ("" as string),
-			Fields: init?.Fields ?? (null! as $.Slice<__goscript_field.Field>)
-		}
+		this.Name = init?.Name ?? ("" as string)
+		this.Fields = init?.Fields ?? (null! as $.Slice<__goscript_field.Field>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -39,11 +20,10 @@ export class Type {
 		return new Type(this, true)
 	}
 
-	public __goscriptAssign(source: Type): void {
-		const target = this._fields
-		const values = source._fields
-		target.Name = values.Name
-		target.Fields = values.Fields
+	public __goscriptAssign(source: Type): this {
+		this.Name = source.Name
+		this.Fields = source.Fields
+		return this
 	}
 
 	public FieldNames(): $.Slice<string> {

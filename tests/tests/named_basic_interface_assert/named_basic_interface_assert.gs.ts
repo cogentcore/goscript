@@ -177,32 +177,13 @@ export async function main(): globalThis.Promise<void> {
 
 	await $.println("reflect:", kind($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.namedValueInterfaceValue<any>(7, "main.MyInt", {}, /* @__PURE__ */ $.basicType("int32", "main.MyInt"))))).Interface()), (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf(a)).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	class holder {
-		public get N(): Name {
-			return this._fields.N
-		}
+		public declare N: Name
 
-		public set N(value: Name) {
-			this._fields.N = value
-		}
-
-		public get Is(): $.Slice<MyInt> {
-			return this._fields.Is
-		}
-
-		public set Is(value: $.Slice<MyInt>) {
-			this._fields.Is = value
-		}
-
-		public _fields: {
-			N: Name
-			Is: $.Slice<MyInt>
-		}
+		public declare Is: $.Slice<MyInt>
 
 		constructor(init?: Partial<{N?: Name, Is?: $.Slice<MyInt>}>, __goscriptValue?: boolean) {
-			this._fields = {
-				N: init?.N ?? ("" as Name),
-				Is: init?.Is ?? (null! as $.Slice<MyInt>)
-			}
+			this.N = init?.N ?? ("" as Name)
+			this.Is = init?.Is ?? (null! as $.Slice<MyInt>)
 			;(this as any)[$.structValueMarker] = __goscriptValue === true
 		}
 
@@ -210,11 +191,10 @@ export async function main(): globalThis.Promise<void> {
 			return new holder(this, true)
 		}
 
-		public __goscriptAssign(source: holder): void {
-			const target = this._fields
-			const values = source._fields
-			target.N = values.N
-			target.Is = values.Is
+		public __goscriptAssign(source: holder): this {
+			this.N = source.N
+			this.Is = source.Is
+			return this
 		}
 
 		static __typeInfo = $.registerStructType(

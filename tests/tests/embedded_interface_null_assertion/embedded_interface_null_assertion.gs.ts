@@ -14,32 +14,13 @@ $.registerInterfaceType(
 );
 
 export class MyReader {
-	public get Reader(): Reader | null {
-		return this._fields.Reader
-	}
+	public declare Reader: Reader | null
 
-	public set Reader(value: Reader | null) {
-		this._fields.Reader = value
-	}
-
-	public get name(): string {
-		return this._fields.name
-	}
-
-	public set name(value: string) {
-		this._fields.name = value
-	}
-
-	public _fields: {
-		Reader: Reader | null
-		name: string
-	}
+	public declare name: string
 
 	constructor(init?: Partial<{Reader?: Reader | null, name?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Reader: init?.Reader ?? (null! as Reader | null),
-			name: init?.name ?? ("" as string)
-		}
+		this.Reader = init?.Reader ?? (null! as Reader | null)
+		this.name = init?.name ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -47,11 +28,10 @@ export class MyReader {
 		return new MyReader(this, true)
 	}
 
-	public __goscriptAssign(source: MyReader): void {
-		const target = this._fields
-		const values = source._fields
-		target.Reader = $.assignFieldValue(target.Reader, values.Reader, "main.Reader")
-		target.name = values.name
+	public __goscriptAssign(source: MyReader): this {
+		this.Reader = $.assignFieldValue(this.Reader, source.Reader, "main.Reader")
+		this.name = source.name
+		return this
 	}
 
 	public Read(p: any): any {
@@ -68,32 +48,13 @@ export class MyReader {
 }
 
 export class StringReader {
-	public get data(): string {
-		return this._fields.data
-	}
+	public declare data: string
 
-	public set data(value: string) {
-		this._fields.data = value
-	}
-
-	public get pos(): number {
-		return this._fields.pos
-	}
-
-	public set pos(value: number) {
-		this._fields.pos = value
-	}
-
-	public _fields: {
-		data: string
-		pos: number
-	}
+	public declare pos: number
 
 	constructor(init?: Partial<{data?: string, pos?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			data: init?.data ?? ("" as string),
-			pos: init?.pos ?? (0 as number)
-		}
+		this.data = init?.data ?? ("" as string)
+		this.pos = init?.pos ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -101,11 +62,10 @@ export class StringReader {
 		return new StringReader(this, true)
 	}
 
-	public __goscriptAssign(source: StringReader): void {
-		const target = this._fields
-		const values = source._fields
-		target.data = values.data
-		target.pos = values.pos
+	public __goscriptAssign(source: StringReader): this {
+		this.data = source.data
+		this.pos = source.pos
+		return this
 	}
 
 	public Read(p: $.Slice<number>): [number, $.GoError] {

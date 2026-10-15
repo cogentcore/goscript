@@ -14,12 +14,7 @@ $.registerInterfaceType(
 );
 
 export class lateType {
-	public _fields: {
-	}
-
 	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
-		this._fields = {
-		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -27,7 +22,8 @@ export class lateType {
 		return new lateType(this, true)
 	}
 
-	public __goscriptAssign(source: lateType): void {
+	public __goscriptAssign(source: lateType): this {
+		return this
 	}
 
 	public Name(): string {

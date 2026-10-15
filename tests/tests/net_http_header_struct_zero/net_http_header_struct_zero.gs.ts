@@ -5,22 +5,10 @@ import * as $ from "@goscript/builtin/index.js"
 import * as http from "@goscript/net/http/index.js"
 
 export class responseWriter {
-	public get header(): http.Header {
-		return this._fields.header
-	}
-
-	public set header(value: http.Header) {
-		this._fields.header = value
-	}
-
-	public _fields: {
-		header: http.Header
-	}
+	public declare header: http.Header
 
 	constructor(init?: Partial<{header?: http.Header}>, __goscriptValue?: boolean) {
-		this._fields = {
-			header: init?.header ?? (null! as http.Header)
-		}
+		this.header = init?.header ?? (null! as http.Header)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -28,10 +16,9 @@ export class responseWriter {
 		return new responseWriter(this, true)
 	}
 
-	public __goscriptAssign(source: responseWriter): void {
-		const target = this._fields
-		const values = source._fields
-		target.header = values.header
+	public __goscriptAssign(source: responseWriter): this {
+		this.header = source.header
+		return this
 	}
 
 	public Header(): http.Header {

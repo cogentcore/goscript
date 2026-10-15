@@ -15,32 +15,13 @@ $.registerInterfaceType(
 );
 
 export class point {
-	public get x(): number {
-		return this._fields.x
-	}
+	public declare x: number
 
-	public set x(value: number) {
-		this._fields.x = value
-	}
-
-	public get y(): number {
-		return this._fields.y
-	}
-
-	public set y(value: number) {
-		this._fields.y = value
-	}
-
-	public _fields: {
-		x: number
-		y: number
-	}
+	public declare y: number
 
 	constructor(init?: Partial<{x?: number, y?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			x: init?.x ?? (0 as number),
-			y: init?.y ?? (0 as number)
-		}
+		this.x = init?.x ?? (0 as number)
+		this.y = init?.y ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -48,11 +29,10 @@ export class point {
 		return new point(this, true)
 	}
 
-	public __goscriptAssign(source: point): void {
-		const target = this._fields
-		const values = source._fields
-		target.x = values.x
-		target.y = values.y
+	public __goscriptAssign(source: point): this {
+		this.x = source.x
+		this.y = source.y
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -65,22 +45,10 @@ export class point {
 }
 
 export class frame {
-	public get name(): string {
-		return this._fields.name
-	}
-
-	public set name(value: string) {
-		this._fields.name = value
-	}
-
-	public _fields: {
-		name: string
-	}
+	public declare name: string
 
 	constructor(init?: Partial<{name?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			name: init?.name ?? ("" as string)
-		}
+		this.name = init?.name ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -88,10 +56,9 @@ export class frame {
 		return new frame(this, true)
 	}
 
-	public __goscriptAssign(source: frame): void {
-		const target = this._fields
-		const values = source._fields
-		target.name = values.name
+	public __goscriptAssign(source: frame): this {
+		this.name = source.name
+		return this
 	}
 
 	public Name(): string {
@@ -109,22 +76,10 @@ export class frame {
 }
 
 export class tab {
-	public get name(): string {
-		return this._fields.name
-	}
-
-	public set name(value: string) {
-		this._fields.name = value
-	}
-
-	public _fields: {
-		name: string
-	}
+	public declare name: string
 
 	constructor(init?: Partial<{name?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			name: init?.name ?? ("" as string)
-		}
+		this.name = init?.name ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -132,10 +87,9 @@ export class tab {
 		return new tab(this, true)
 	}
 
-	public __goscriptAssign(source: tab): void {
-		const target = this._fields
-		const values = source._fields
-		target.name = values.name
+	public __goscriptAssign(source: tab): this {
+		this.name = source.name
+		return this
 	}
 
 	public Name(): string {
@@ -153,22 +107,10 @@ export class tab {
 }
 
 export class tabs {
-	public get count(): number {
-		return this._fields.count
-	}
-
-	public set count(value: number) {
-		this._fields.count = value
-	}
-
-	public _fields: {
-		count: number
-	}
+	public declare count: number
 
 	constructor(init?: Partial<{count?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			count: init?.count ?? (0 as number)
-		}
+		this.count = init?.count ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -176,10 +118,9 @@ export class tabs {
 		return new tabs(this, true)
 	}
 
-	public __goscriptAssign(source: tabs): void {
-		const target = this._fields
-		const values = source._fields
-		target.count = values.count
+	public __goscriptAssign(source: tabs): this {
+		this.count = source.count
+		return this
 	}
 
 	public async NewTab(name: string): globalThis.Promise<[frame | $.VarRef<frame> | null, tab | $.VarRef<tab> | null]> {

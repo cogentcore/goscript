@@ -5,32 +5,13 @@ import * as $ from "@goscript/builtin/index.js"
 import * as reflect from "@goscript/reflect/index.js"
 
 export class P {
-	public get X(): number {
-		return this._fields.X
-	}
+	public declare X: number
 
-	public set X(value: number) {
-		this._fields.X = value
-	}
-
-	public get Y(): string {
-		return this._fields.Y
-	}
-
-	public set Y(value: string) {
-		this._fields.Y = value
-	}
-
-	public _fields: {
-		X: number
-		Y: string
-	}
+	public declare Y: string
 
 	constructor(init?: Partial<{X?: number, Y?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			X: init?.X ?? (0 as number),
-			Y: init?.Y ?? ("" as string)
-		}
+		this.X = init?.X ?? (0 as number)
+		this.Y = init?.Y ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -38,11 +19,10 @@ export class P {
 		return new P(this, true)
 	}
 
-	public __goscriptAssign(source: P): void {
-		const target = this._fields
-		const values = source._fields
-		target.X = values.X
-		target.Y = values.Y
+	public __goscriptAssign(source: P): this {
+		this.X = source.X
+		this.Y = source.Y
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -69,72 +49,25 @@ export async function main(): globalThis.Promise<void> {
 	await $.println($.markAsStructValue($.cloneStructValue(reflect.ValueOf(null))).Equal($.markAsStructValue($.cloneStructValue(reflect.ValueOf(null)))), $.markAsStructValue($.cloneStructValue(reflect.ValueOf(null))).Equal($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.basicInterfaceValue(1, "int"))))))
 
 	class Z {
-		public get S(): $.Slice<number> {
-			return this._fields.S
-		}
+		public declare S: $.Slice<number>
 
-		public set S(value: $.Slice<number>) {
-			this._fields.S = value
-		}
+		public declare M: globalThis.Map<string, number> | null
 
-		public get M(): globalThis.Map<string, number> | null {
-			return this._fields.M
-		}
+		public declare P: $.VarRef<number> | null
 
-		public set M(value: globalThis.Map<string, number> | null) {
-			this._fields.M = value
-		}
+		public declare F: number
 
-		public get P(): $.VarRef<number> | null {
-			return this._fields.P
-		}
+		public declare B: boolean
 
-		public set P(value: $.VarRef<number> | null) {
-			this._fields.P = value
-		}
-
-		public get F(): number {
-			return this._fields.F
-		}
-
-		public set F(value: number) {
-			this._fields.F = value
-		}
-
-		public get B(): boolean {
-			return this._fields.B
-		}
-
-		public set B(value: boolean) {
-			this._fields.B = value
-		}
-
-		public get T(): string {
-			return this._fields.T
-		}
-
-		public set T(value: string) {
-			this._fields.T = value
-		}
-
-		public _fields: {
-			S: $.Slice<number>
-			M: globalThis.Map<string, number> | null
-			P: $.VarRef<number> | null
-			F: number
-			B: boolean
-			T: string
-		}
+		public declare T: string
 
 		constructor(init?: Partial<{S?: $.Slice<number>, M?: globalThis.Map<string, number> | null, P?: $.VarRef<number> | null, F?: number, B?: boolean, T?: string}>, __goscriptValue?: boolean) {
-			this._fields = {
-				S: init?.S ?? (null! as $.Slice<number>),
-				M: init?.M ?? (null! as globalThis.Map<string, number> | null),
-				P: init?.P ?? (null! as $.VarRef<number> | null),
-				F: init?.F ?? (0 as number),
-				B: init?.B ?? (false as boolean),
-				T: init?.T ?? ("" as string)
-			}
+			this.S = init?.S ?? (null! as $.Slice<number>)
+			this.M = init?.M ?? (null! as globalThis.Map<string, number> | null)
+			this.P = init?.P ?? (null! as $.VarRef<number> | null)
+			this.F = init?.F ?? (0 as number)
+			this.B = init?.B ?? (false as boolean)
+			this.T = init?.T ?? ("" as string)
 			;(this as any)[$.structValueMarker] = __goscriptValue === true
 		}
 
@@ -142,15 +75,14 @@ export async function main(): globalThis.Promise<void> {
 			return new Z(this, true)
 		}
 
-		public __goscriptAssign(source: Z): void {
-			const target = this._fields
-			const values = source._fields
-			target.S = values.S
-			target.M = values.M
-			target.P = values.P
-			target.F = values.F
-			target.B = values.B
-			target.T = values.T
+		public __goscriptAssign(source: Z): this {
+			this.S = source.S
+			this.M = source.M
+			this.P = source.P
+			this.F = source.F
+			this.B = source.B
+			this.T = source.T
+			return this
 		}
 
 		static __typeInfo = $.registerStructType(

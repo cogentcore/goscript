@@ -4,22 +4,10 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class A {
-	public get BB(): $.Slice<B> {
-		return this._fields.BB
-	}
-
-	public set BB(value: $.Slice<B>) {
-		this._fields.BB = value
-	}
-
-	public _fields: {
-		BB: $.Slice<B>
-	}
+	public declare BB: $.Slice<B>
 
 	constructor(init?: Partial<{BB?: $.Slice<B>}>, __goscriptValue?: boolean) {
-		this._fields = {
-			BB: init?.BB ?? (null! as $.Slice<B>)
-		}
+		this.BB = init?.BB ?? (null! as $.Slice<B>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -27,10 +15,9 @@ export class A {
 		return new A(this, true)
 	}
 
-	public __goscriptAssign(source: A): void {
-		const target = this._fields
-		const values = source._fields
-		target.BB = values.BB
+	public __goscriptAssign(source: A): this {
+		this.BB = source.BB
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -43,22 +30,10 @@ export class A {
 }
 
 export class B {
-	public get AA(): $.Slice<A> {
-		return this._fields.AA
-	}
-
-	public set AA(value: $.Slice<A>) {
-		this._fields.AA = value
-	}
-
-	public _fields: {
-		AA: $.Slice<A>
-	}
+	public declare AA: $.Slice<A>
 
 	constructor(init?: Partial<{AA?: $.Slice<A>}>, __goscriptValue?: boolean) {
-		this._fields = {
-			AA: init?.AA ?? (null! as $.Slice<A>)
-		}
+		this.AA = init?.AA ?? (null! as $.Slice<A>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -66,10 +41,9 @@ export class B {
 		return new B(this, true)
 	}
 
-	public __goscriptAssign(source: B): void {
-		const target = this._fields
-		const values = source._fields
-		target.AA = values.AA
+	public __goscriptAssign(source: B): this {
+		this.AA = source.AA
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

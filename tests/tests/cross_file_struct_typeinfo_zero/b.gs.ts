@@ -5,22 +5,10 @@ import * as $ from "@goscript/builtin/index.js"
 import * as __goscript_a from "./a.gs.ts"
 
 export class bValue {
-	public get inner(): __goscript_a.aValue {
-		return this._fields.inner
-	}
-
-	public set inner(value: __goscript_a.aValue) {
-		this._fields.inner = value
-	}
-
-	public _fields: {
-		inner: __goscript_a.aValue
-	}
+	public declare inner: __goscript_a.aValue
 
 	constructor(init?: Partial<{inner?: __goscript_a.aValue}>, __goscriptValue?: boolean) {
-		this._fields = {
-			inner: init?.inner ? init.inner.clone() : new __goscript_a.aValue(undefined, true)
-		}
+		this.inner = init?.inner ? init.inner.clone() : new __goscript_a.aValue(undefined, true)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -28,10 +16,9 @@ export class bValue {
 		return new bValue(this, true)
 	}
 
-	public __goscriptAssign(source: bValue): void {
-		const target = this._fields
-		const values = source._fields
-		$.assignStruct(target.inner, values.inner)
+	public __goscriptAssign(source: bValue): this {
+		this.inner.__goscriptAssign(source.inner)
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

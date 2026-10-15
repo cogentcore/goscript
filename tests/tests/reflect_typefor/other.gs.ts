@@ -4,22 +4,10 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class OtherStruct {
-	public get Label(): string {
-		return this._fields.Label
-	}
-
-	public set Label(value: string) {
-		this._fields.Label = value
-	}
-
-	public _fields: {
-		Label: string
-	}
+	public declare Label: string
 
 	constructor(init?: Partial<{Label?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Label: init?.Label ?? ("" as string)
-		}
+		this.Label = init?.Label ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -27,10 +15,9 @@ export class OtherStruct {
 		return new OtherStruct(this, true)
 	}
 
-	public __goscriptAssign(source: OtherStruct): void {
-		const target = this._fields
-		const values = source._fields
-		target.Label = values.Label
+	public __goscriptAssign(source: OtherStruct): this {
+		this.Label = source.Label
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

@@ -26,32 +26,13 @@ $.registerNamedValueType(
 );
 
 export class Hooked {
-	public get Calls(): number {
-		return this._fields.Calls
-	}
+	public declare Calls: number
 
-	public set Calls(value: number) {
-		this._fields.Calls = value
-	}
-
-	public get Seen(): string {
-		return this._fields.Seen
-	}
-
-	public set Seen(value: string) {
-		this._fields.Seen = value
-	}
-
-	public _fields: {
-		Calls: number
-		Seen: string
-	}
+	public declare Seen: string
 
 	constructor(init?: Partial<{Calls?: number, Seen?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Calls: init?.Calls ?? (0 as number),
-			Seen: init?.Seen ?? ("" as string)
-		}
+		this.Calls = init?.Calls ?? (0 as number)
+		this.Seen = init?.Seen ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -59,11 +40,10 @@ export class Hooked {
 		return new Hooked(this, true)
 	}
 
-	public __goscriptAssign(source: Hooked): void {
-		const target = this._fields
-		const values = source._fields
-		target.Calls = values.Calls
-		target.Seen = values.Seen
+	public __goscriptAssign(source: Hooked): this {
+		this.Calls = source.Calls
+		this.Seen = source.Seen
+		return this
 	}
 
 	public UnmarshalJSON(data: $.Slice<number>): $.GoError {
@@ -84,22 +64,10 @@ export class Hooked {
 }
 
 export class Box {
-	public get Value(): Hooked | $.VarRef<Hooked> | null {
-		return this._fields.Value
-	}
-
-	public set Value(value: Hooked | $.VarRef<Hooked> | null) {
-		this._fields.Value = value
-	}
-
-	public _fields: {
-		Value: Hooked | $.VarRef<Hooked> | null
-	}
+	public declare Value: Hooked | $.VarRef<Hooked> | null
 
 	constructor(init?: Partial<{Value?: Hooked | $.VarRef<Hooked> | null}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Value: init?.Value ?? (null! as Hooked | $.VarRef<Hooked> | null)
-		}
+		this.Value = init?.Value ?? (null! as Hooked | $.VarRef<Hooked> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -107,10 +75,9 @@ export class Box {
 		return new Box(this, true)
 	}
 
-	public __goscriptAssign(source: Box): void {
-		const target = this._fields
-		const values = source._fields
-		target.Value = values.Value
+	public __goscriptAssign(source: Box): this {
+		this.Value = source.Value
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -123,32 +90,13 @@ export class Box {
 }
 
 export class MapItem {
-	public get Name(): string {
-		return this._fields.Name
-	}
+	public declare Name: string
 
-	public set Name(value: string) {
-		this._fields.Name = value
-	}
-
-	public get Map(): globalThis.Map<string, number> | null {
-		return this._fields.Map
-	}
-
-	public set Map(value: globalThis.Map<string, number> | null) {
-		this._fields.Map = value
-	}
-
-	public _fields: {
-		Name: string
-		Map: globalThis.Map<string, number> | null
-	}
+	public declare Map: globalThis.Map<string, number> | null
 
 	constructor(init?: Partial<{Name?: string, Map?: globalThis.Map<string, number> | null}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Name: init?.Name ?? ("" as string),
-			Map: init?.Map ?? (null! as globalThis.Map<string, number> | null)
-		}
+		this.Name = init?.Name ?? ("" as string)
+		this.Map = init?.Map ?? (null! as globalThis.Map<string, number> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -156,11 +104,10 @@ export class MapItem {
 		return new MapItem(this, true)
 	}
 
-	public __goscriptAssign(source: MapItem): void {
-		const target = this._fields
-		const values = source._fields
-		target.Name = values.Name
-		target.Map = values.Map
+	public __goscriptAssign(source: MapItem): this {
+		this.Name = source.Name
+		this.Map = source.Map
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

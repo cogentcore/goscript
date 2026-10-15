@@ -5,32 +5,13 @@ import * as $ from "@goscript/builtin/index.js"
 import * as fmt from "@goscript/fmt/index.js"
 
 export class Value {
-	public get Val(): number {
-		return this._fields.Val
-	}
+	public declare Val: number
 
-	public set Val(value: number) {
-		this._fields.Val = value
-	}
-
-	public get Unit(): string {
-		return this._fields.Unit
-	}
-
-	public set Unit(value: string) {
-		this._fields.Unit = value
-	}
-
-	public _fields: {
-		Val: number
-		Unit: string
-	}
+	public declare Unit: string
 
 	constructor(init?: Partial<{Val?: number, Unit?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Val: init?.Val ?? (0 as number),
-			Unit: init?.Unit ?? ("" as string)
-		}
+		this.Val = init?.Val ?? (0 as number)
+		this.Unit = init?.Unit ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -38,11 +19,10 @@ export class Value {
 		return new Value(this, true)
 	}
 
-	public __goscriptAssign(source: Value): void {
-		const target = this._fields
-		const values = source._fields
-		target.Val = values.Val
-		target.Unit = values.Unit
+	public __goscriptAssign(source: Value): this {
+		this.Val = source.Val
+		this.Unit = source.Unit
+		return this
 	}
 
 	public async String(): globalThis.Promise<string> {
@@ -60,32 +40,13 @@ export class Value {
 }
 
 export class Sides {
-	public get Top(): any {
-		return this._fields.Top
-	}
+	public declare Top: any
 
-	public set Top(value: any) {
-		this._fields.Top = value
-	}
-
-	public get Right(): any {
-		return this._fields.Right
-	}
-
-	public set Right(value: any) {
-		this._fields.Right = value
-	}
-
-	public _fields: {
-		Top: any
-		Right: any
-	}
+	public declare Right: any
 
 	constructor(init?: Partial<{Top?: any, Right?: any}>, __goscriptValue?: boolean, __goscriptFresh?: boolean) {
-		this._fields = {
-			Top: init?.Top !== undefined ? (__goscriptFresh === true ? init.Top : $.copyElement(init.Top)) : (null! as any),
-			Right: init?.Right !== undefined ? (__goscriptFresh === true ? init.Right : $.copyElement(init.Right)) : (null! as any)
-		}
+		this.Top = init?.Top !== undefined ? (__goscriptFresh === true ? init.Top : $.copyElement(init.Top)) : (null! as any)
+		this.Right = init?.Right !== undefined ? (__goscriptFresh === true ? init.Right : $.copyElement(init.Right)) : (null! as any)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -93,11 +54,10 @@ export class Sides {
 		return new Sides(this, true)
 	}
 
-	public __goscriptAssign(source: Sides): void {
-		const target = this._fields
-		const values = source._fields
-		target.Top = $.assignFieldValue(target.Top, values.Top, { kind: $.TypeKind.Interface, methods: [] })
-		target.Right = $.assignFieldValue(target.Right, values.Right, { kind: $.TypeKind.Interface, methods: [] })
+	public __goscriptAssign(source: Sides): this {
+		this.Top = $.assignFieldValue(this.Top, source.Top, { kind: $.TypeKind.Interface, methods: [] })
+		this.Right = $.assignFieldValue(this.Right, source.Right, { kind: $.TypeKind.Interface, methods: [] })
+		return this
 	}
 
 	public async SetAny(__typeArgs: $.GenericTypeArgs | undefined, a: any): globalThis.Promise<string> {

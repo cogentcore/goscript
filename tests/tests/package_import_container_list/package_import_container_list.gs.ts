@@ -7,22 +7,10 @@ import * as fmt from "@goscript/fmt/index.js"
 import * as sync from "@goscript/sync/index.js"
 
 export class pooledElement {
-	public get Value(): any {
-		return this._fields.Value
-	}
-
-	public set Value(value: any) {
-		this._fields.Value = value
-	}
-
-	public _fields: {
-		Value: any
-	}
+	public declare Value: any
 
 	constructor(init?: Partial<{Value?: any}>, __goscriptValue?: boolean, __goscriptFresh?: boolean) {
-		this._fields = {
-			Value: init?.Value !== undefined ? (__goscriptFresh === true ? init.Value : $.copyElement(init.Value)) : (null! as any)
-		}
+		this.Value = init?.Value !== undefined ? (__goscriptFresh === true ? init.Value : $.copyElement(init.Value)) : (null! as any)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -30,10 +18,9 @@ export class pooledElement {
 		return new pooledElement(this, true)
 	}
 
-	public __goscriptAssign(source: pooledElement): void {
-		const target = this._fields
-		const values = source._fields
-		target.Value = $.assignFieldValue(target.Value, values.Value, { kind: $.TypeKind.Interface, methods: [] })
+	public __goscriptAssign(source: pooledElement): this {
+		this.Value = $.assignFieldValue(this.Value, source.Value, { kind: $.TypeKind.Interface, methods: [] })
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

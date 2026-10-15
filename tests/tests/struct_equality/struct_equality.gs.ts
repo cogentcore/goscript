@@ -6,32 +6,13 @@ import * as $ from "@goscript/builtin/index.js"
 export type Hash = ObjectID
 
 export class ObjectID {
-	public get hash(): Uint8Array {
-		return this._fields.hash
-	}
+	public declare hash: Uint8Array
 
-	public set hash(value: Uint8Array) {
-		this._fields.hash = value
-	}
-
-	public get format(): number {
-		return this._fields.format
-	}
-
-	public set format(value: number) {
-		this._fields.format = value
-	}
-
-	public _fields: {
-		hash: Uint8Array
-		format: number
-	}
+	public declare format: number
 
 	constructor(init?: Partial<{hash?: Uint8Array, format?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			hash: init?.hash !== undefined ? $.cloneArrayValue(init.hash, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 4)) : $.arrayValue(new Uint8Array(4)),
-			format: init?.format ?? (0 as number)
-		}
+		this.hash = init?.hash !== undefined ? $.cloneArrayValue(init.hash, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 4)) : $.arrayValue(new Uint8Array(4))
+		this.format = init?.format ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -39,11 +20,10 @@ export class ObjectID {
 		return new ObjectID(this, true)
 	}
 
-	public __goscriptAssign(source: ObjectID): void {
-		const target = this._fields
-		const values = source._fields
-		target.hash = $.assignFieldValue(target.hash, values.hash, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 4))
-		target.format = values.format
+	public __goscriptAssign(source: ObjectID): this {
+		this.hash = $.assignFieldValue(this.hash, source.hash, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 4))
+		this.format = source.format
+		return this
 	}
 
 	public IsZero(): boolean {
@@ -66,32 +46,13 @@ export class ObjectID {
 }
 
 export class S {
-	public get A(): string {
-		return this._fields.A
-	}
+	public declare A: string
 
-	public set A(value: string) {
-		this._fields.A = value
-	}
-
-	public get B(): number {
-		return this._fields.B
-	}
-
-	public set B(value: number) {
-		this._fields.B = value
-	}
-
-	public _fields: {
-		A: string
-		B: number
-	}
+	public declare B: number
 
 	constructor(init?: Partial<{A?: string, B?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			A: init?.A ?? ("" as string),
-			B: init?.B ?? (0 as number)
-		}
+		this.A = init?.A ?? ("" as string)
+		this.B = init?.B ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -99,11 +60,10 @@ export class S {
 		return new S(this, true)
 	}
 
-	public __goscriptAssign(source: S): void {
-		const target = this._fields
-		const values = source._fields
-		target.A = values.A
-		target.B = values.B
+	public __goscriptAssign(source: S): this {
+		this.A = source.A
+		this.B = source.B
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -116,32 +76,13 @@ export class S {
 }
 
 export class Outer {
-	public get In(): S {
-		return this._fields.In
-	}
+	public declare In: S
 
-	public set In(value: S) {
-		this._fields.In = value
-	}
-
-	public get N(): number {
-		return this._fields.N
-	}
-
-	public set N(value: number) {
-		this._fields.N = value
-	}
-
-	public _fields: {
-		In: S
-		N: number
-	}
+	public declare N: number
 
 	constructor(init?: Partial<{In?: S, N?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			In: init?.In ? init.In.clone() : new S(undefined, true),
-			N: init?.N ?? (0 as number)
-		}
+		this.In = init?.In ? init.In.clone() : new S(undefined, true)
+		this.N = init?.N ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -149,11 +90,10 @@ export class Outer {
 		return new Outer(this, true)
 	}
 
-	public __goscriptAssign(source: Outer): void {
-		const target = this._fields
-		const values = source._fields
-		$.assignStruct(target.In, values.In)
-		target.N = values.N
+	public __goscriptAssign(source: Outer): this {
+		this.In.__goscriptAssign(source.In)
+		this.N = source.N
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -209,7 +149,7 @@ export async function main(): globalThis.Promise<void> {
 	// nested struct field passed as a pointer
 	let o1 = new Outer({In: new S({A: "y"}, true), N: 2}, true)
 	let o2 = new Outer({In: new S({A: "y"}, true), N: 2}, true)
-	take($.interfaceValue($.fieldRef(o1._fields, "In"), "*main.S", /* @__PURE__ */ $.pointerType("main.S")))
+	take($.interfaceValue($.fieldRef(o1, "In"), "*main.S", /* @__PURE__ */ $.pointerType("main.S")))
 	await $.println((o1.In.A === o2.In.A && o1.In.B === o2.In.B && o1.N === o2.N), (o1.In.A === o2.In.A && o1.In.B === o2.In.B))
 	o2.In.B = 3
 	await $.println((o1.In.A === o2.In.A && o1.In.B === o2.In.B && o1.N === o2.N))

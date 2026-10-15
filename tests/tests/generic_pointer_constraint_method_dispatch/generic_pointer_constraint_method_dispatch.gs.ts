@@ -42,22 +42,10 @@ $.registerInterfaceType(
 );
 
 export class pairingOffer {
-	public get Note(): string {
-		return this._fields.Note
-	}
-
-	public set Note(value: string) {
-		this._fields.Note = value
-	}
-
-	public _fields: {
-		Note: string
-	}
+	public declare Note: string
 
 	constructor(init?: Partial<{Note?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Note: init?.Note ?? ("" as string)
-		}
+		this.Note = init?.Note ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -65,10 +53,9 @@ export class pairingOffer {
 		return new pairingOffer(this, true)
 	}
 
-	public __goscriptAssign(source: pairingOffer): void {
-		const target = this._fields
-		const values = source._fields
-		target.Note = values.Note
+	public __goscriptAssign(source: pairingOffer): this {
+		this.Note = source.Note
+		return this
 	}
 
 	public MarshalVT(): [$.Slice<number>, $.GoError] {

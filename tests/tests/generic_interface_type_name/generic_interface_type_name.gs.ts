@@ -25,22 +25,10 @@ $.registerInterfaceType(
 );
 
 export class label {
-	public get text(): string {
-		return this._fields.text
-	}
-
-	public set text(value: string) {
-		this._fields.text = value
-	}
-
-	public _fields: {
-		text: string
-	}
+	public declare text: string
 
 	constructor(init?: Partial<{text?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			text: init?.text ?? ("" as string)
-		}
+		this.text = init?.text ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -48,10 +36,9 @@ export class label {
 		return new label(this, true)
 	}
 
-	public __goscriptAssign(source: label): void {
-		const target = this._fields
-		const values = source._fields
-		target.text = values.text
+	public __goscriptAssign(source: label): this {
+		this.text = source.text
+		return this
 	}
 
 	public Name(): string {
@@ -69,22 +56,10 @@ export class label {
 }
 
 export class icon {
-	public get size(): number {
-		return this._fields.size
-	}
-
-	public set size(value: number) {
-		this._fields.size = value
-	}
-
-	public _fields: {
-		size: number
-	}
+	public declare size: number
 
 	constructor(init?: Partial<{size?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			size: init?.size ?? (0 as number)
-		}
+		this.size = init?.size ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -92,10 +67,9 @@ export class icon {
 		return new icon(this, true)
 	}
 
-	public __goscriptAssign(source: icon): void {
-		const target = this._fields
-		const values = source._fields
-		target.size = values.size
+	public __goscriptAssign(source: icon): this {
+		this.size = source.size
+		return this
 	}
 
 	public async Name(): globalThis.Promise<string> {

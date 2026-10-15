@@ -6,42 +6,16 @@ import * as reflect from "@goscript/reflect/index.js"
 import * as strings from "@goscript/strings/index.js"
 
 export class item {
-	public get Name(): string {
-		return this._fields.Name
-	}
+	public declare Name: string
 
-	public set Name(value: string) {
-		this._fields.Name = value
-	}
+	public declare Count: number
 
-	public get Count(): number {
-		return this._fields.Count
-	}
-
-	public set Count(value: number) {
-		this._fields.Count = value
-	}
-
-	public get Plain(): number {
-		return this._fields.Plain
-	}
-
-	public set Plain(value: number) {
-		this._fields.Plain = value
-	}
-
-	public _fields: {
-		Name: string
-		Count: number
-		Plain: number
-	}
+	public declare Plain: number
 
 	constructor(init?: Partial<{Name?: string, Count?: number, Plain?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Name: init?.Name ?? ("" as string),
-			Count: init?.Count ?? (0 as number),
-			Plain: init?.Plain ?? (0 as number)
-		}
+		this.Name = init?.Name ?? ("" as string)
+		this.Count = init?.Count ?? (0 as number)
+		this.Plain = init?.Plain ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -49,12 +23,11 @@ export class item {
 		return new item(this, true)
 	}
 
-	public __goscriptAssign(source: item): void {
-		const target = this._fields
-		const values = source._fields
-		target.Name = values.Name
-		target.Count = values.Count
-		target.Plain = values.Plain
+	public __goscriptAssign(source: item): this {
+		this.Name = source.Name
+		this.Count = source.Count
+		this.Plain = source.Plain
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

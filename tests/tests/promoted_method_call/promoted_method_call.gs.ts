@@ -4,22 +4,10 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class base {
-	public get value(): number {
-		return this._fields.value
-	}
-
-	public set value(value: number) {
-		this._fields.value = value
-	}
-
-	public _fields: {
-		value: number
-	}
+	public declare value: number
 
 	constructor(init?: Partial<{value?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			value: init?.value ?? (0 as number)
-		}
+		this.value = init?.value ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -27,10 +15,9 @@ export class base {
 		return new base(this, true)
 	}
 
-	public __goscriptAssign(source: base): void {
-		const target = this._fields
-		const values = source._fields
-		target.value = values.value
+	public __goscriptAssign(source: base): this {
+		this.value = source.value
+		return this
 	}
 
 	public Add(n: number): number {
@@ -48,22 +35,10 @@ export class base {
 }
 
 export class wrapper {
-	public get base(): base {
-		return this._fields.base
-	}
-
-	public set base(value: base) {
-		this._fields.base = value
-	}
-
-	public _fields: {
-		base: base
-	}
+	public declare base: base
 
 	constructor(init?: Partial<{base?: base}>, __goscriptValue?: boolean) {
-		this._fields = {
-			base: init?.base ? init.base.clone() : new base(undefined, true)
-		}
+		this.base = init?.base ? init.base.clone() : new base(undefined, true)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -71,10 +46,9 @@ export class wrapper {
 		return new wrapper(this, true)
 	}
 
-	public __goscriptAssign(source: wrapper): void {
-		const target = this._fields
-		const values = source._fields
-		$.assignStruct(target.base, values.base)
+	public __goscriptAssign(source: wrapper): this {
+		this.base.__goscriptAssign(source.base)
+		return this
 	}
 
 	public Add(n: any): any {

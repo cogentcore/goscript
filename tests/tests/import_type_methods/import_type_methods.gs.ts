@@ -5,22 +5,10 @@ import * as $ from "@goscript/builtin/index.js"
 import * as errlist from "@goscript/github.com/s4wave/goscript/tests/tests/import_type_methods/errlist/index.js"
 
 export class parser {
-	public get errors(): errlist.ErrorList {
-		return this._fields.errors
-	}
-
-	public set errors(value: errlist.ErrorList) {
-		this._fields.errors = value
-	}
-
-	public _fields: {
-		errors: errlist.ErrorList
-	}
+	public declare errors: errlist.ErrorList
 
 	constructor(init?: Partial<{errors?: errlist.ErrorList}>, __goscriptValue?: boolean) {
-		this._fields = {
-			errors: init?.errors ?? (null! as errlist.ErrorList)
-		}
+		this.errors = init?.errors ?? (null! as errlist.ErrorList)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -28,10 +16,9 @@ export class parser {
 		return new parser(this, true)
 	}
 
-	public __goscriptAssign(source: parser): void {
-		const target = this._fields
-		const values = source._fields
-		target.errors = values.errors
+	public __goscriptAssign(source: parser): this {
+		this.errors = source.errors
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

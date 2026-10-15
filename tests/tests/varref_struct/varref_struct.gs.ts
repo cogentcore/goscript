@@ -6,22 +6,10 @@ import * as reflect from "@goscript/reflect/index.js"
 
 export class MyStruct {
 	// MyInt is shared through pointers to this storage.
-	public get MyInt(): number {
-		return this._fields.MyInt
-	}
-
-	public set MyInt(value: number) {
-		this._fields.MyInt = value
-	}
-
-	public _fields: {
-		MyInt: number
-	}
+	public declare MyInt: number
 
 	constructor(init?: Partial<{MyInt?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			MyInt: init?.MyInt ?? (0 as number)
-		}
+		this.MyInt = init?.MyInt ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -29,10 +17,9 @@ export class MyStruct {
 		return new MyStruct(this, true)
 	}
 
-	public __goscriptAssign(source: MyStruct): void {
-		const target = this._fields
-		const values = source._fields
-		target.MyInt = values.MyInt
+	public __goscriptAssign(source: MyStruct): this {
+		this.MyInt = source.MyInt
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -46,44 +33,18 @@ export class MyStruct {
 
 export class Outer {
 	// Child is copied in place during assignment.
-	public get Child(): MyStruct {
-		return this._fields.Child
-	}
-
-	public set Child(value: MyStruct) {
-		this._fields.Child = value
-	}
+	public declare Child: MyStruct
 
 	// Items retains the addresses of array elements.
-	public get Items(): MyStruct[] {
-		return this._fields.Items
-	}
-
-	public set Items(value: MyStruct[]) {
-		this._fields.Items = value
-	}
+	public declare Items: MyStruct[]
 
 	// Ptr is replaced rather than copied through its pointee.
-	public get Ptr(): MyStruct | $.VarRef<MyStruct> | null {
-		return this._fields.Ptr
-	}
-
-	public set Ptr(value: MyStruct | $.VarRef<MyStruct> | null) {
-		this._fields.Ptr = value
-	}
-
-	public _fields: {
-		Child: MyStruct
-		Items: MyStruct[]
-		Ptr: MyStruct | $.VarRef<MyStruct> | null
-	}
+	public declare Ptr: MyStruct | $.VarRef<MyStruct> | null
 
 	constructor(init?: Partial<{Child?: MyStruct, Items?: MyStruct[], Ptr?: MyStruct | $.VarRef<MyStruct> | null}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Child: init?.Child ? init.Child.clone() : new MyStruct(undefined, true),
-			Items: init?.Items !== undefined ? $.cloneArrayValue(init.Items, /* @__PURE__ */ $.arrayType("main.MyStruct", 2)) : $.arrayValue(globalThis.Array.from({ length: 2 }, () => new MyStruct(undefined, true)), /* @__PURE__ */ $.arrayType("main.MyStruct", 2)),
-			Ptr: init?.Ptr ?? (null! as MyStruct | $.VarRef<MyStruct> | null)
-		}
+		this.Child = init?.Child ? init.Child.clone() : new MyStruct(undefined, true)
+		this.Items = init?.Items !== undefined ? $.cloneArrayValue(init.Items, /* @__PURE__ */ $.arrayType("main.MyStruct", 2)) : $.arrayValue(globalThis.Array.from({ length: 2 }, () => new MyStruct(undefined, true)), /* @__PURE__ */ $.arrayType("main.MyStruct", 2))
+		this.Ptr = init?.Ptr ?? (null! as MyStruct | $.VarRef<MyStruct> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -91,12 +52,11 @@ export class Outer {
 		return new Outer(this, true)
 	}
 
-	public __goscriptAssign(source: Outer): void {
-		const target = this._fields
-		const values = source._fields
-		$.assignStruct(target.Child, values.Child)
-		target.Items = $.assignFieldValue(target.Items, values.Items, /* @__PURE__ */ $.arrayType("main.MyStruct", 2))
-		target.Ptr = values.Ptr
+	public __goscriptAssign(source: Outer): this {
+		this.Child.__goscriptAssign(source.Child)
+		this.Items = $.assignFieldValue(this.Items, source.Items, /* @__PURE__ */ $.arrayType("main.MyStruct", 2))
+		this.Ptr = source.Ptr
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -132,9 +92,9 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("myIntVal:", myIntVal)
 
 	// Field pointers retain their storage identity across whole-value assignment.
-	let field = $.fieldRef(val.value._fields, "MyInt")
-	val.value = $.assignStruct(val.value, new MyStruct({MyInt: 30}, true))
-	await $.println("field after assignment:", $.pointerValue<number>(field), $.pointerEqual(field, $.fieldRef(val.value._fields, "MyInt")))
+	let field = $.fieldRef(val.value, "MyInt")
+	val.value = val.value.__goscriptAssign(new MyStruct({MyInt: 30}, true))
+	await $.println("field after assignment:", $.pointerValue<number>(field), $.pointerEqual(field, $.fieldRef(val.value, "MyInt")))
 	field!.value = 40
 	await $.println("write through field:", val.value.MyInt, (ptrToVal$ as MyStruct).MyInt)
 
@@ -148,30 +108,30 @@ export async function main(): globalThis.Promise<void> {
 	let first = new MyStruct({MyInt: 1})
 	let second = new MyStruct({MyInt: 2})
 	let outer = new Outer({Ptr: first}, true)
-	let child = $.fieldRef(outer.Child._fields, "MyInt")
-	let item = $.fieldRef($.arrayIndex(outer.Items, 0)._fields, "MyInt")
-	let ptrField = $.fieldRef(outer._fields, "Ptr")
-	outer = $.assignStruct(outer, new Outer({Child: new MyStruct({MyInt: 50}, true), Items: $.arrayValue([new MyStruct({MyInt: 60}, true), new MyStruct(undefined, true)], /* @__PURE__ */ $.arrayType("main.MyStruct", 2)), Ptr: second}, true))
+	let child = $.fieldRef(outer.Child, "MyInt")
+	let item = $.fieldRef($.arrayIndex(outer.Items, 0), "MyInt")
+	let ptrField = $.fieldRef(outer, "Ptr")
+	outer = outer.__goscriptAssign(new Outer({Child: new MyStruct({MyInt: 50}, true), Items: $.arrayValue([new MyStruct({MyInt: 60}, true), new MyStruct(undefined, true)], /* @__PURE__ */ $.arrayType("main.MyStruct", 2)), Ptr: second}, true))
 	await $.println("nested:", $.pointerValue<number>(child), $.pointerValue<number>(item), ($.pointerValue<MyStruct | $.VarRef<MyStruct> | null>(ptrField) === second || $.pointerAliasesMade && $.pointerEqual($.pointerValue<MyStruct | $.VarRef<MyStruct> | null>(ptrField), second)), $.pointerValue<MyStruct>(first).MyInt)
-	await $.println("nested identity:", $.pointerEqual(child, $.fieldRef(outer.Child._fields, "MyInt")), $.pointerEqual(item, $.fieldRef($.arrayIndex(outer.Items, 0)._fields, "MyInt")), $.pointerEqual(ptrField, $.fieldRef(outer._fields, "Ptr")))
+	await $.println("nested identity:", $.pointerEqual(child, $.fieldRef(outer.Child, "MyInt")), $.pointerEqual(item, $.fieldRef($.arrayIndex(outer.Items, 0), "MyInt")), $.pointerEqual(ptrField, $.fieldRef(outer, "Ptr")))
 
 	// Both tuple and parallel assignments update existing variable storage.
 	let __goscriptTuple0: any = pair()
-	val.value = $.assignStruct(val.value, __goscriptTuple0[0])
-	$.assignStruct(global, __goscriptTuple0[1])
+	val.value = val.value.__goscriptAssign(__goscriptTuple0[0])
+	global.__goscriptAssign(__goscriptTuple0[1])
 	await $.println("tuple:", $.pointerValue<number>(field), global.MyInt)
-	let globalField = $.fieldRef(global._fields, "MyInt")
+	let globalField = $.fieldRef(global, "MyInt")
 	let __goscriptAssign0_0: MyStruct = (global).clone()
 	let __goscriptAssign0_1: MyStruct = (val.value).clone()
-	val.value = $.assignStruct(val.value, __goscriptAssign0_0)
-	$.assignStruct(global, __goscriptAssign0_1)
+	val.value = val.value.__goscriptAssign(__goscriptAssign0_0)
+	global.__goscriptAssign(__goscriptAssign0_1)
 	await $.println("parallel:", $.pointerValue<number>(field), $.pointerValue<number>(globalField))
-	$.assignStruct(global, new MyStruct({MyInt: 90}, true))
+	global.__goscriptAssign(new MyStruct({MyInt: 90}, true))
 	await $.println("global:", $.pointerValue<number>(globalField))
 
 	// Reflection writes through the same aggregate storage as generated assignment.
 	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(val, "*main.MyStruct", /* @__PURE__ */ $.pointerType("main.MyStruct"))))).Elem())).Set($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(new MyStruct({MyInt: 100}, true), "main.MyStruct", "main.MyStruct")))))
-	await $.println("reflect:", $.pointerValue<number>(field), $.pointerEqual(field, $.fieldRef(val.value._fields, "MyInt")))
+	await $.println("reflect:", $.pointerValue<number>(field), $.pointerEqual(field, $.fieldRef(val.value, "MyInt")))
 	let reflected = $.mustTypeAssert<$.VarRef<number> | null>($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(val, "*main.MyStruct", /* @__PURE__ */ $.pointerType("main.MyStruct"))))).Elem())).FieldByName("MyInt"))).Addr())).Interface(), /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int")))
 	await $.println("reflect address:", (reflected === field || $.pointerAliasesMade && $.pointerEqual(reflected, field)))
 }

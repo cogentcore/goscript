@@ -16,22 +16,10 @@ $.registerInterfaceType(
 );
 
 export class Box {
-	public get Value(): any {
-		return this._fields.Value
-	}
-
-	public set Value(value: any) {
-		this._fields.Value = value
-	}
-
-	public _fields: {
-		Value: any
-	}
+	public declare Value: any
 
 	constructor(init?: Partial<{Value?: any}>, __goscriptValue?: boolean, __goscriptFresh?: boolean) {
-		this._fields = {
-			Value: init?.Value !== undefined ? (__goscriptFresh === true ? init.Value : $.copyElement(init.Value)) : (null! as any)
-		}
+		this.Value = init?.Value !== undefined ? (__goscriptFresh === true ? init.Value : $.copyElement(init.Value)) : (null! as any)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -39,10 +27,9 @@ export class Box {
 		return new Box(this, true)
 	}
 
-	public __goscriptAssign(source: Box): void {
-		const target = this._fields
-		const values = source._fields
-		target.Value = $.assignFieldValue(target.Value, values.Value, { kind: $.TypeKind.Interface, methods: [] })
+	public __goscriptAssign(source: Box): this {
+		this.Value = $.assignFieldValue(this.Value, source.Value, { kind: $.TypeKind.Interface, methods: [] })
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -55,22 +42,10 @@ export class Box {
 }
 
 export class IntValue {
-	public get N(): number {
-		return this._fields.N
-	}
-
-	public set N(value: number) {
-		this._fields.N = value
-	}
-
-	public _fields: {
-		N: number
-	}
+	public declare N: number
 
 	constructor(init?: Partial<{N?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			N: init?.N ?? (0 as number)
-		}
+		this.N = init?.N ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -78,10 +53,9 @@ export class IntValue {
 		return new IntValue(this, true)
 	}
 
-	public __goscriptAssign(source: IntValue): void {
-		const target = this._fields
-		const values = source._fields
-		target.N = values.N
+	public __goscriptAssign(source: IntValue): this {
+		this.N = source.N
+		return this
 	}
 
 	public GetValue(): number {

@@ -5,62 +5,22 @@ import * as $ from "@goscript/builtin/index.js"
 import * as json from "@goscript/encoding/json/index.js"
 
 export class Node {
-	public get Name(): string {
-		return this._fields.Name
-	}
+	public declare Name: string
 
-	public set Name(value: string) {
-		this._fields.Name = value
-	}
+	public declare Parent: Node | $.VarRef<Node> | null
 
-	public get Parent(): Node | $.VarRef<Node> | null {
-		return this._fields.Parent
-	}
+	public declare Label: string
 
-	public set Parent(value: Node | $.VarRef<Node> | null) {
-		this._fields.Parent = value
-	}
+	public declare Empty: string
 
-	public get Label(): string {
-		return this._fields.Label
-	}
-
-	public set Label(value: string) {
-		this._fields.Label = value
-	}
-
-	public get Empty(): string {
-		return this._fields.Empty
-	}
-
-	public set Empty(value: string) {
-		this._fields.Empty = value
-	}
-
-	public get Kept(): number {
-		return this._fields.Kept
-	}
-
-	public set Kept(value: number) {
-		this._fields.Kept = value
-	}
-
-	public _fields: {
-		Name: string
-		Parent: Node | $.VarRef<Node> | null
-		Label: string
-		Empty: string
-		Kept: number
-	}
+	public declare Kept: number
 
 	constructor(init?: Partial<{Name?: string, Parent?: Node | $.VarRef<Node> | null, Label?: string, Empty?: string, Kept?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Name: init?.Name ?? ("" as string),
-			Parent: init?.Parent ?? (null! as Node | $.VarRef<Node> | null),
-			Label: init?.Label ?? ("" as string),
-			Empty: init?.Empty ?? ("" as string),
-			Kept: init?.Kept ?? (0 as number)
-		}
+		this.Name = init?.Name ?? ("" as string)
+		this.Parent = init?.Parent ?? (null! as Node | $.VarRef<Node> | null)
+		this.Label = init?.Label ?? ("" as string)
+		this.Empty = init?.Empty ?? ("" as string)
+		this.Kept = init?.Kept ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -68,14 +28,13 @@ export class Node {
 		return new Node(this, true)
 	}
 
-	public __goscriptAssign(source: Node): void {
-		const target = this._fields
-		const values = source._fields
-		target.Name = values.Name
-		target.Parent = values.Parent
-		target.Label = values.Label
-		target.Empty = values.Empty
-		target.Kept = values.Kept
+	public __goscriptAssign(source: Node): this {
+		this.Name = source.Name
+		this.Parent = source.Parent
+		this.Label = source.Label
+		this.Empty = source.Empty
+		this.Kept = source.Kept
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

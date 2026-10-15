@@ -5,32 +5,13 @@ import * as $ from "@goscript/builtin/index.js"
 import * as sync from "@goscript/sync/index.js"
 
 export class table {
-	public get Mutex(): sync.Mutex {
-		return this._fields.Mutex
-	}
+	public declare Mutex: sync.Mutex
 
-	public set Mutex(value: sync.Mutex) {
-		this._fields.Mutex = value
-	}
-
-	public get byAddr(): globalThis.Map<string, $.Slice<string>> | null {
-		return this._fields.byAddr
-	}
-
-	public set byAddr(value: globalThis.Map<string, $.Slice<string>> | null) {
-		this._fields.byAddr = value
-	}
-
-	public _fields: {
-		Mutex: sync.Mutex
-		byAddr: globalThis.Map<string, $.Slice<string>> | null
-	}
+	public declare byAddr: globalThis.Map<string, $.Slice<string>> | null
 
 	constructor(init?: Partial<{Mutex?: sync.Mutex, byAddr?: globalThis.Map<string, $.Slice<string>> | null}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Mutex: init?.Mutex ? $.markAsStructValue($.cloneStructValue(init.Mutex)) : $.markAsStructValue(new sync.Mutex()),
-			byAddr: init?.byAddr ?? (null! as globalThis.Map<string, $.Slice<string>> | null)
-		}
+		this.Mutex = init?.Mutex ? $.markAsStructValue($.cloneStructValue(init.Mutex)) : $.markAsStructValue(new sync.Mutex())
+		this.byAddr = init?.byAddr ?? (null! as globalThis.Map<string, $.Slice<string>> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -38,11 +19,10 @@ export class table {
 		return new table(this, true)
 	}
 
-	public __goscriptAssign(source: table): void {
-		const target = this._fields
-		const values = source._fields
-		$.assignStruct(target.Mutex, values.Mutex)
-		target.byAddr = values.byAddr
+	public __goscriptAssign(source: table): this {
+		$.assignStruct(this.Mutex, source.Mutex)
+		this.byAddr = source.byAddr
+		return this
 	}
 
 	public Lock(): any {

@@ -16,22 +16,10 @@ $.registerInterfaceType(
 );
 
 export class Impl {
-	public get Item(): any {
-		return this._fields.Item
-	}
-
-	public set Item(value: any) {
-		this._fields.Item = value
-	}
-
-	public _fields: {
-		Item: any
-	}
+	public declare Item: any
 
 	constructor(init?: Partial<{Item?: any}>, __goscriptValue?: boolean, __goscriptFresh?: boolean) {
-		this._fields = {
-			Item: init?.Item !== undefined ? (__goscriptFresh === true ? init.Item : $.copyElement(init.Item)) : (null! as any)
-		}
+		this.Item = init?.Item !== undefined ? (__goscriptFresh === true ? init.Item : $.copyElement(init.Item)) : (null! as any)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -39,10 +27,9 @@ export class Impl {
 		return new Impl(this, true)
 	}
 
-	public __goscriptAssign(source: Impl): void {
-		const target = this._fields
-		const values = source._fields
-		target.Item = $.assignFieldValue(target.Item, values.Item, { kind: $.TypeKind.Interface, methods: [] })
+	public __goscriptAssign(source: Impl): this {
+		this.Item = $.assignFieldValue(this.Item, source.Item, { kind: $.TypeKind.Interface, methods: [] })
+		return this
 	}
 
 	public Value(__typeArgs: $.GenericTypeArgs | undefined): any {
@@ -60,12 +47,7 @@ export class Impl {
 }
 
 export class Keyed {
-	public _fields: {
-	}
-
 	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
-		this._fields = {
-		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -73,7 +55,8 @@ export class Keyed {
 		return new Keyed(this, true)
 	}
 
-	public __goscriptAssign(source: Keyed): void {
+	public __goscriptAssign(source: Keyed): this {
+		return this
 	}
 
 	public SetValues(__typeArgs: $.GenericTypeArgs | undefined, value: any): any {
@@ -92,22 +75,10 @@ export class Keyed {
 }
 
 export class Wrapper {
-	public get Keyed(): Keyed | $.VarRef<Keyed> | null {
-		return this._fields.Keyed
-	}
-
-	public set Keyed(value: Keyed | $.VarRef<Keyed> | null) {
-		this._fields.Keyed = value
-	}
-
-	public _fields: {
-		Keyed: Keyed | $.VarRef<Keyed> | null
-	}
+	public declare Keyed: Keyed | $.VarRef<Keyed> | null
 
 	constructor(init?: Partial<{Keyed?: Keyed | $.VarRef<Keyed> | null}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Keyed: init?.Keyed ?? (null! as Keyed | $.VarRef<Keyed> | null)
-		}
+		this.Keyed = init?.Keyed ?? (null! as Keyed | $.VarRef<Keyed> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -115,10 +86,9 @@ export class Wrapper {
 		return new Wrapper(this, true)
 	}
 
-	public __goscriptAssign(source: Wrapper): void {
-		const target = this._fields
-		const values = source._fields
-		target.Keyed = values.Keyed
+	public __goscriptAssign(source: Wrapper): this {
+		this.Keyed = source.Keyed
+		return this
 	}
 
 	public SetValues(__typeArgs: $.GenericTypeArgs | undefined, value: any): any {

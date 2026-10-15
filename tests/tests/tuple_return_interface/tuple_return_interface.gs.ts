@@ -14,22 +14,10 @@ $.registerInterfaceType(
 );
 
 export class blockImpl {
-	public get size(): number {
-		return this._fields.size
-	}
-
-	public set size(value: number) {
-		this._fields.size = value
-	}
-
-	public _fields: {
-		size: number
-	}
+	public declare size: number
 
 	constructor(init?: Partial<{size?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			size: init?.size ?? (0 as number)
-		}
+		this.size = init?.size ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -37,10 +25,9 @@ export class blockImpl {
 		return new blockImpl(this, true)
 	}
 
-	public __goscriptAssign(source: blockImpl): void {
-		const target = this._fields
-		const values = source._fields
-		target.size = values.size
+	public __goscriptAssign(source: blockImpl): this {
+		this.size = source.size
+		return this
 	}
 
 	public Size(): number {

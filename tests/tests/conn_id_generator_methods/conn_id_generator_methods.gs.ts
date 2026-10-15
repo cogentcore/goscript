@@ -40,22 +40,10 @@ $.registerNamedValueType(
 );
 
 export class transport {
-	public get values(): globalThis.Map<number, number> | null {
-		return this._fields.values
-	}
-
-	public set values(value: globalThis.Map<number, number> | null) {
-		this._fields.values = value
-	}
-
-	public _fields: {
-		values: globalThis.Map<number, number> | null
-	}
+	public declare values: globalThis.Map<number, number> | null
 
 	constructor(init?: Partial<{values?: globalThis.Map<number, number> | null}>, __goscriptValue?: boolean) {
-		this._fields = {
-			values: init?.values ?? (null! as globalThis.Map<number, number> | null)
-		}
+		this.values = init?.values ?? (null! as globalThis.Map<number, number> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -63,10 +51,9 @@ export class transport {
 		return new transport(this, true)
 	}
 
-	public __goscriptAssign(source: transport): void {
-		const target = this._fields
-		const values = source._fields
-		target.values = values.values
+	public __goscriptAssign(source: transport): this {
+		this.values = source.values
+		return this
 	}
 
 	public SourceOnly(id: number): void {
@@ -84,22 +71,10 @@ export class transport {
 }
 
 export class packetHandlerMap {
-	public get values(): globalThis.Map<number, number> | null {
-		return this._fields.values
-	}
-
-	public set values(value: globalThis.Map<number, number> | null) {
-		this._fields.values = value
-	}
-
-	public _fields: {
-		values: globalThis.Map<number, number> | null
-	}
+	public declare values: globalThis.Map<number, number> | null
 
 	constructor(init?: Partial<{values?: globalThis.Map<number, number> | null}>, __goscriptValue?: boolean) {
-		this._fields = {
-			values: init?.values ?? (null! as globalThis.Map<number, number> | null)
-		}
+		this.values = init?.values ?? (null! as globalThis.Map<number, number> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -107,10 +82,9 @@ export class packetHandlerMap {
 		return new packetHandlerMap(this, true)
 	}
 
-	public __goscriptAssign(source: packetHandlerMap): void {
-		const target = this._fields
-		const values = source._fields
-		target.values = values.values
+	public __goscriptAssign(source: packetHandlerMap): this {
+		this.values = source.values
+		return this
 	}
 
 	public Add(id: number): void {
@@ -128,22 +102,10 @@ export class packetHandlerMap {
 }
 
 export class connRunnerCallbacks {
-	public get AddConnectionID(): ((_p0: number) => void) | null {
-		return this._fields.AddConnectionID
-	}
-
-	public set AddConnectionID(value: ((_p0: number) => void) | null) {
-		this._fields.AddConnectionID = value
-	}
-
-	public _fields: {
-		AddConnectionID: ((_p0: number) => void) | null
-	}
+	public declare AddConnectionID: ((_p0: number) => void) | null
 
 	constructor(init?: Partial<{AddConnectionID?: ((_p0: number) => void) | null}>, __goscriptValue?: boolean) {
-		this._fields = {
-			AddConnectionID: init?.AddConnectionID ?? (null! as ((_p0: number) => void) | null)
-		}
+		this.AddConnectionID = init?.AddConnectionID ?? (null! as ((_p0: number) => void) | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -151,10 +113,9 @@ export class connRunnerCallbacks {
 		return new connRunnerCallbacks(this, true)
 	}
 
-	public __goscriptAssign(source: connRunnerCallbacks): void {
-		const target = this._fields
-		const values = source._fields
-		target.AddConnectionID = values.AddConnectionID
+	public __goscriptAssign(source: connRunnerCallbacks): this {
+		this.AddConnectionID = source.AddConnectionID
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -183,7 +144,7 @@ export async function testVarRefConversion(): globalThis.Promise<void> {
 	let source = value
 	let destination = $.unsafePointerCast<packetHandlerMap | $.VarRef<packetHandlerMap> | null>(source, packetHandlerMap)
 	void (destination !== null && (destination as any).__isVarRef !== true && (destination as any).__goValue === undefined ? ((destination as any) as packetHandlerMap).Add(9) : packetHandlerMap.prototype.Add.call(destination, 9))
-	value.value = $.assignStruct(value.value, new transport({values: $.makeMap<number, number>()}, true))
+	value.value = value.value.__goscriptAssign(new transport({values: $.makeMap<number, number>()}, true))
 	void (destination !== null && (destination as any).__isVarRef !== true && (destination as any).__goValue === undefined ? ((destination as any) as packetHandlerMap).Add(10) : packetHandlerMap.prototype.Add.call(destination, 10))
 	await $.println("varref destination:", $.mapGet<number, number, number>(value.value.values, 10, 0)[0])
 }

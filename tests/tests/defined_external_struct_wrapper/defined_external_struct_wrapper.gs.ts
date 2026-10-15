@@ -5,32 +5,13 @@ import * as $ from "@goscript/builtin/index.js"
 import * as dep from "@goscript/github.com/s4wave/goscript/tests/tests/defined_external_struct_wrapper/dep/index.js"
 
 export class Wrapped {
-	public get Value(): string {
-		return this._fields.Value
-	}
+	public declare Value: string
 
-	public set Value(value: string) {
-		this._fields.Value = value
-	}
-
-	public get Hidden(): dep.hidden {
-		return this._fields.Hidden
-	}
-
-	public set Hidden(value: dep.hidden) {
-		this._fields.Hidden = value
-	}
-
-	public _fields: {
-		Value: string
-		Hidden: dep.hidden
-	}
+	public declare Hidden: dep.hidden
 
 	constructor(init?: Partial<{Value?: string, Hidden?: dep.hidden}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Value: init?.Value ?? ("" as string),
-			Hidden: init?.Hidden ? init.Hidden.clone() : new dep.hidden(undefined, true)
-		}
+		this.Value = init?.Value ?? ("" as string)
+		this.Hidden = init?.Hidden ? init.Hidden.clone() : new dep.hidden(undefined, true)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -38,11 +19,10 @@ export class Wrapped {
 		return new Wrapped(this, true)
 	}
 
-	public __goscriptAssign(source: Wrapped): void {
-		const target = this._fields
-		const values = source._fields
-		target.Value = values.Value
-		$.assignStruct(target.Hidden, values.Hidden)
+	public __goscriptAssign(source: Wrapped): this {
+		this.Value = source.Value
+		this.Hidden.__goscriptAssign(source.Hidden)
+		return this
 	}
 
 	public ["public"](): dep.Public | $.VarRef<dep.Public> | null {

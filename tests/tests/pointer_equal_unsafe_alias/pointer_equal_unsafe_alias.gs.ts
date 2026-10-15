@@ -6,22 +6,10 @@ import * as unsafe from "@goscript/unsafe/index.js"
 import "@goscript/unsafe/index.js"
 
 export class first {
-	public get X(): number {
-		return this._fields.X
-	}
-
-	public set X(value: number) {
-		this._fields.X = value
-	}
-
-	public _fields: {
-		X: number
-	}
+	public declare X: number
 
 	constructor(init?: Partial<{X?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			X: init?.X ?? (0 as number)
-		}
+		this.X = init?.X ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -29,10 +17,9 @@ export class first {
 		return new first(this, true)
 	}
 
-	public __goscriptAssign(source: first): void {
-		const target = this._fields
-		const values = source._fields
-		target.X = values.X
+	public __goscriptAssign(source: first): this {
+		this.X = source.X
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -45,22 +32,10 @@ export class first {
 }
 
 export class second {
-	public get X(): number {
-		return this._fields.X
-	}
-
-	public set X(value: number) {
-		this._fields.X = value
-	}
-
-	public _fields: {
-		X: number
-	}
+	public declare X: number
 
 	constructor(init?: Partial<{X?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			X: init?.X ?? (0 as number)
-		}
+		this.X = init?.X ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -68,10 +43,9 @@ export class second {
 		return new second(this, true)
 	}
 
-	public __goscriptAssign(source: second): void {
-		const target = this._fields
-		const values = source._fields
-		target.X = values.X
+	public __goscriptAssign(source: second): this {
+		this.X = source.X
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

@@ -6,12 +6,7 @@ import * as $ from "@goscript/builtin/index.js"
 $.registerTypePackagePath("github.com/s4wave/goscript/tests/tests/import_unexported_inferred_type/dep", ["dep.hiddenError"])
 
 export class hiddenError {
-	public _fields: {
-	}
-
 	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
-		this._fields = {
-		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -19,7 +14,8 @@ export class hiddenError {
 		return new hiddenError(this, true)
 	}
 
-	public __goscriptAssign(source: hiddenError): void {
+	public __goscriptAssign(source: hiddenError): this {
+		return this
 	}
 
 	public Error(): string {

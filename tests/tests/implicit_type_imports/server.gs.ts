@@ -6,12 +6,7 @@ import * as io from "@goscript/io/index.js"
 import "@goscript/io/index.js"
 
 export class Server {
-	public _fields: {
-	}
-
 	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
-		this._fields = {
-		}
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -19,7 +14,8 @@ export class Server {
 		return new Server(this, true)
 	}
 
-	public __goscriptAssign(source: Server): void {
+	public __goscriptAssign(source: Server): this {
+		return this
 	}
 
 	public async Handle(rwc: io.ReadWriteCloser | null): globalThis.Promise<void> {

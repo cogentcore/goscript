@@ -4,22 +4,10 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export class helperState {
-	public get text(): string {
-		return this._fields.text
-	}
-
-	public set text(value: string) {
-		this._fields.text = value
-	}
-
-	public _fields: {
-		text: string
-	}
+	public declare text: string
 
 	constructor(init?: Partial<{text?: string}>, __goscriptValue?: boolean) {
-		this._fields = {
-			text: init?.text ?? ("" as string)
-		}
+		this.text = init?.text ?? ("" as string)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -27,10 +15,9 @@ export class helperState {
 		return new helperState(this, true)
 	}
 
-	public __goscriptAssign(source: helperState): void {
-		const target = this._fields
-		const values = source._fields
-		target.text = values.text
+	public __goscriptAssign(source: helperState): this {
+		this.text = source.text
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

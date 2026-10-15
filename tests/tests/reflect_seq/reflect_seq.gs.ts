@@ -6,22 +6,10 @@ import * as reflect from "@goscript/reflect/index.js"
 import type * as iter from "@goscript/iter/index.js"
 
 export class Inner {
-	public get B(): number {
-		return this._fields.B
-	}
-
-	public set B(value: number) {
-		this._fields.B = value
-	}
-
-	public _fields: {
-		B: number
-	}
+	public declare B: number
 
 	constructor(init?: Partial<{B?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			B: init?.B ?? (0 as number)
-		}
+		this.B = init?.B ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -29,10 +17,9 @@ export class Inner {
 		return new Inner(this, true)
 	}
 
-	public __goscriptAssign(source: Inner): void {
-		const target = this._fields
-		const values = source._fields
-		target.B = values.B
+	public __goscriptAssign(source: Inner): this {
+		this.B = source.B
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -45,32 +32,13 @@ export class Inner {
 }
 
 export class Outer {
-	public get Inner(): Inner | $.VarRef<Inner> | null {
-		return this._fields.Inner
-	}
+	public declare Inner: Inner | $.VarRef<Inner> | null
 
-	public set Inner(value: Inner | $.VarRef<Inner> | null) {
-		this._fields.Inner = value
-	}
-
-	public get C(): number {
-		return this._fields.C
-	}
-
-	public set C(value: number) {
-		this._fields.C = value
-	}
-
-	public _fields: {
-		Inner: Inner | $.VarRef<Inner> | null
-		C: number
-	}
+	public declare C: number
 
 	constructor(init?: Partial<{Inner?: Inner | $.VarRef<Inner> | null, C?: number}>, __goscriptValue?: boolean) {
-		this._fields = {
-			Inner: init?.Inner ?? (null! as Inner | $.VarRef<Inner> | null),
-			C: init?.C ?? (0 as number)
-		}
+		this.Inner = init?.Inner ?? (null! as Inner | $.VarRef<Inner> | null)
+		this.C = init?.C ?? (0 as number)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -78,11 +46,10 @@ export class Outer {
 		return new Outer(this, true)
 	}
 
-	public __goscriptAssign(source: Outer): void {
-		const target = this._fields
-		const values = source._fields
-		target.Inner = values.Inner
-		target.C = values.C
+	public __goscriptAssign(source: Outer): this {
+		this.Inner = source.Inner
+		this.C = source.C
+		return this
 	}
 
 	static __typeInfo = $.registerStructType(

@@ -14,22 +14,10 @@ $.registerInterfaceType(
 );
 
 export class box {
-	public get value(): any {
-		return this._fields.value
-	}
-
-	public set value(value: any) {
-		this._fields.value = value
-	}
-
-	public _fields: {
-		value: any
-	}
+	public declare value: any
 
 	constructor(init?: Partial<{value?: any}>, __goscriptValue?: boolean, __goscriptFresh?: boolean) {
-		this._fields = {
-			value: init?.value !== undefined ? (__goscriptFresh === true ? init.value : $.copyElement(init.value)) : (null! as any)
-		}
+		this.value = init?.value !== undefined ? (__goscriptFresh === true ? init.value : $.copyElement(init.value)) : (null! as any)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -37,10 +25,9 @@ export class box {
 		return new box(this, true)
 	}
 
-	public __goscriptAssign(source: box): void {
-		const target = this._fields
-		const values = source._fields
-		target.value = $.assignFieldValue(target.value, values.value, { kind: $.TypeKind.Interface, methods: [] })
+	public __goscriptAssign(source: box): this {
+		this.value = $.assignFieldValue(this.value, source.value, { kind: $.TypeKind.Interface, methods: [] })
+		return this
 	}
 
 	public Value(__typeArgs: $.GenericTypeArgs | undefined): any {
@@ -58,22 +45,10 @@ export class box {
 }
 
 export class holder {
-	public get box(): box {
-		return this._fields.box
-	}
-
-	public set box(value: box) {
-		this._fields.box = value
-	}
-
-	public _fields: {
-		box: box
-	}
+	public declare box: box
 
 	constructor(init?: Partial<{box?: box}>, __goscriptValue?: boolean) {
-		this._fields = {
-			box: init?.box ? init.box.clone() : $.markAsStructValue(new box({value: null}, undefined, true))
-		}
+		this.box = init?.box ? init.box.clone() : $.markAsStructValue(new box({value: null}, undefined, true))
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
@@ -81,10 +56,9 @@ export class holder {
 		return new holder(this, true)
 	}
 
-	public __goscriptAssign(source: holder): void {
-		const target = this._fields
-		const values = source._fields
-		$.assignStruct(target.box, values.box)
+	public __goscriptAssign(source: holder): this {
+		this.box.__goscriptAssign(source.box)
+		return this
 	}
 
 	public Value(__typeArgs: $.GenericTypeArgs | undefined): any {
