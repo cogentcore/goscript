@@ -81,7 +81,7 @@ export class Matcher {
 		const m: Matcher | $.VarRef<Matcher> | null = this;
 		let total = 0
 		for (let __goscriptRangeTarget0 = (m !== null && (m as any).__isVarRef !== true && (m as any).__goValue === undefined ? ((m as any) as Matcher).Blocks() : Matcher.prototype.Blocks.call(m)), __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
-			let __goscriptRangeShadow0 = ((__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as Match)).clone()
+			let __goscriptRangeShadow0 = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as Match)
 			total += __goscriptRangeShadow0.Size
 		}
 		return total
