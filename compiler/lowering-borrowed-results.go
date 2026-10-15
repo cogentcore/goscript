@@ -47,6 +47,9 @@ type borrowState struct {
 	paramsReadOnly []valueReadOnlyKind
 	// deferred reports whether the function has a defer statement.
 	deferred bool
+	// moves holds the reads of locals that move their values instead of
+	// copying them (see collectMoves).
+	moves map[*ast.Ident]bool
 }
 
 // borrowVarFacts holds what a function body does with its variables.
@@ -90,8 +93,10 @@ func (o *LoweringOwner) withBorrowedResults(ctx lowerFileContext, decl *ast.Func
 		state.paramsReadOnly = semFn.paramsReadOnly
 	}
 
-	// The calls of the body that may borrow results.
+	// The calls of the body that may borrow results, and the reads of locals
+	// that move their values.
 	o.collectBorrowCalls(ctx, decl, state)
+	collectMoves(ctx, decl, state)
 	ctx.borrow = state
 	return ctx
 }
