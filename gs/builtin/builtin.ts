@@ -438,7 +438,11 @@ export function structEqual(
   return true
 }
 
-function isArrayLike(value: unknown): value is ArrayLike<unknown> {
+// isArrayLike reports whether value represents a Go array or slice. A GoSlice
+// has no index slots, so its elements are read through sliceElems.
+function isArrayLike(
+  value: unknown,
+): value is unknown[] | GoSlice<unknown> | Uint8Array {
   return isArrayOrGoSlice(value) || value instanceof Uint8Array
 }
 
