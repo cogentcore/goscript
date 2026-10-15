@@ -57,6 +57,9 @@ type Request struct {
 	RuntimeGroups bool
 	// IncrementalTypeCheck reuses TypeScript build-info files inside WorkDir.
 	IncrementalTypeCheck bool
+	// ReportAsync asks for the async report of each compiled test binary in
+	// the result (see compiler.AsyncReport).
+	ReportAsync bool
 }
 
 // normalizedRequest contains validated, absolute paths and normalized test options.
@@ -82,6 +85,7 @@ type normalizedRequest struct {
 	BrowserArgs               []string
 	RuntimeGroups             bool
 	IncrementalTypeCheck      bool
+	ReportAsync               bool
 }
 
 // RuntimeBackend selects the JavaScript host used for package runtime tests.
@@ -210,6 +214,7 @@ func (r *Request) normalize() (*normalizedRequest, error) {
 		BrowserArgs:               r.BrowserArgs,
 		RuntimeGroups:             r.RuntimeGroups,
 		IncrementalTypeCheck:      r.IncrementalTypeCheck,
+		ReportAsync:               r.ReportAsync,
 	}, nil
 }
 

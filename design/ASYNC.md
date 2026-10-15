@@ -138,6 +138,21 @@ A call of such a target that the program leaves sync is not awaited, and its
 result is asserted to its Go type, since its TypeScript type admits a
 promise.
 
+### Reporting Async Roots
+
+`-report-async` (`CompileRequest.ReportAsync`) reports where the async
+functions of a program come from, without changing the output
+(`compiler/semantic-async-report.go`, `compiler/async-report.go`). Every mark
+of the coloring is made at a root or along one edge from the mark being
+propagated, so the coloring records the roots and every edge, including
+edges to functions already async. The report lists each root with its kind
+and cause, its spread (the functions it reaches in that graph, by package),
+the functions only it reaches (its subtree in the dominator tree, with a
+source above every root), and one chain of marks to `main`. It sums the roots
+by kind and lists the classes and interface methods that one async value or
+implementation made async. A reporting build checks every body and does not
+replay the program from the cache, since body summaries do not keep causes.
+
 ### Implementation Analysis Flow
 
 ```

@@ -22,6 +22,7 @@ func newCompileCommand() *cli.Command {
 	var packageBlocklist cli.StringSlice
 	var bindingRoots cli.StringSlice
 	var deferredFunctions cli.StringSlice
+	var reportAsync reportAsyncFlag
 
 	return &cli.Command{
 		Name:     "compile",
@@ -33,7 +34,12 @@ func newCompileCommand() *cli.Command {
 			config.PackageBlocklist = slices.Clone(packageBlocklist.Value())
 			config.AdditionalBindingRoots = slices.Clone(bindingRoots.Value())
 			config.DeferredFunctions = slices.Clone(deferredFunctions.Value())
-			return compilePackage(c.Context, &config, packages.Value())
+			config.ReportAsync = reportAsync.format != ""
+			result, err := compilePackage(c.Context, &config, packages.Value())
+			if err != nil || result.AsyncReport == nil {
+				return err
+			}
+			return writeAsyncReports(c.App.ErrWriter, &reportAsync, result.AsyncReport)
 		},
 		Flags: []cli.Flag{
 			&cli.StringSliceFlag{
@@ -116,6 +122,7 @@ func newCompileCommand() *cli.Command {
 				Destination: &bindingRoots,
 				EnvVars:     []string{"GOSCRIPT_BINDING_ROOT"},
 			},
+			newReportAsyncFlag(&reportAsync),
 		},
 	}
 }
@@ -140,19 +147,22 @@ func (s *rawStringSlice) Value() []string {
 	return slices.Clone(*s)
 }
 
-// compilePackage tries to compile the package.
-func compilePackage(ctx context.Context, config *compiler.Config, pkgs []string) error {
+// compilePackage tries to compile the package. An async report goes to
+// stderr, so the debug log stays off it.
+func compilePackage(ctx context.Context, config *compiler.Config, pkgs []string) (*compiler.CompilationResult, error) {
 	if len(pkgs) == 0 {
-		return errors.New("package(s) must be specified")
+		return nil, errors.New("package(s) must be specified")
 	}
 
 	logger := logrus.New()
 	logger.SetLevel(logrus.DebugLevel)
+	if config.ReportAsync {
+		logger.SetLevel(logrus.InfoLevel)
+	}
 	le := logrus.NewEntry(logger)
 	comp, err := compiler.NewCompiler(config, le, nil)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	_, err = comp.CompilePackages(ctx, pkgs...)
-	return err
+	return comp.CompilePackages(ctx, pkgs...)
 }

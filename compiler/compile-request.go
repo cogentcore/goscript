@@ -58,6 +58,9 @@ type CompileRequest struct {
 	Tests bool
 	// DisableEmitBuiltin controls whether runtime packages are emitted.
 	DisableEmitBuiltin bool
+	// ReportAsync asks for an async report in the result (see AsyncReport).
+	// It does not change the output.
+	ReportAsync bool
 }
 
 // CompileRequestOwner owns adapter input normalization and validation.
@@ -98,6 +101,7 @@ func (o *CompileRequestOwner) NewRequest(conf Config, patterns []string) *Compil
 		ProtobufTypeScriptBinding: conf.ProtobufTypeScriptBinding,
 		AdditionalBindingRoots:    slices.Clone(conf.AdditionalBindingRoots),
 		DisableEmitBuiltin:        conf.DisableEmitBuiltin,
+		ReportAsync:               conf.ReportAsync,
 	}
 }
 

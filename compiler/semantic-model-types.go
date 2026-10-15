@@ -57,6 +57,8 @@ type SemanticModel struct {
 	// staleSummaries lists the packages whose stored body summaries did not
 	// apply. A model with stale summaries is incomplete.
 	staleSummaries []string
+	// asyncReport holds the async report the build was asked for, or nil.
+	asyncReport *AsyncReport
 }
 
 // semanticPackage holds package facts built by one shard and read by lowering.
@@ -205,7 +207,10 @@ type semanticFunction struct {
 	// or -1 (see funcResultBorrows). It is nil when no result does.
 	resultBorrows []int
 	async         bool
-	deferred      bool
+	// asyncCause records why the node's own code suspends, when the fact
+	// walk found it.
+	asyncCause *asyncCause
+	deferred   bool
 	// calls holds the origins of the functions the body calls outside
 	// function literals other than immediately invoked ones.
 	calls map[*types.Func]bool

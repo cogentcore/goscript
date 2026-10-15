@@ -78,6 +78,11 @@ type overrideBoundary struct {
 	ifaces         []*types.Interface
 	ifaceIndex     map[string][]int
 	seen           map[types.Type]bool
+	// ifaceNames names each boundary interface and the override object
+	// that exposes it, for the async report.
+	ifaceNames []string
+	// source names the override object whose types are being exposed.
+	source string
 }
 
 // newOverrideBoundary collects the boundary of the override packages in the
@@ -119,6 +124,7 @@ func (b *overrideBoundary) collectPackage(pkg *types.Package) []*types.Named {
 	var concretes []*types.Named
 	for _, name := range pkg.Scope().Names() {
 		obj := pkg.Scope().Lookup(name)
+		b.source = pkg.Path() + "." + name
 
 		// A declared type is a boundary interface or a boundary concrete type.
 		if typeName, ok := obj.(*types.TypeName); ok {
@@ -181,6 +187,7 @@ func (b *overrideBoundary) expose(typ types.Type) {
 		if _, param := typ.(*types.TypeParam); !param {
 			iface.Complete()
 			b.ifaces = append(b.ifaces, iface)
+			b.ifaceNames = append(b.ifaceNames, types.TypeString(typ, nil)+" through "+b.source)
 			for method := range iface.Methods() {
 				b.expose(method.Type())
 			}
@@ -229,18 +236,27 @@ func (b *overrideBoundary) exposeTuple(tuple *types.Tuple) {
 // iface: an override type implements it, or a boundary interface has all of
 // its methods.
 func (b *overrideBoundary) reaches(iface *types.Interface) bool {
+	return b.witness(iface) != ""
+}
+
+// witness describes an override value that could implement iface, or
+// returns "" when none could.
+func (b *overrideBoundary) witness(iface *types.Interface) string {
 	// An override type implements iface.
 	methods := interfaceMethodMap(iface)
 	for _, idx := range implementationMethodSetCandidates(b.methodSetIndex, methods) {
 		if types.Implements(b.methodSets[idx].receiver, iface) {
-			return true
+			return "override type " + types.TypeString(b.methodSets[idx].receiver, nil) + " implements it"
 		}
 	}
 
 	// A boundary interface value may hold an object that implements iface.
-	return slices.ContainsFunc(implementationMethodSetCandidates(b.ifaceIndex, methods), func(idx int) bool {
-		return types.Implements(b.ifaces[idx], iface)
-	})
+	for _, idx := range implementationMethodSetCandidates(b.ifaceIndex, methods) {
+		if types.Implements(b.ifaces[idx], iface) {
+			return "an override package exposes " + b.ifaceNames[idx] + ", which has its methods"
+		}
+	}
+	return ""
 }
 
 // closedInterfaces returns the exported named interfaces of a whole program

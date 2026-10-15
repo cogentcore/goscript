@@ -114,6 +114,18 @@ async. An interface method becomes async when any implementation is. A callee
 becomes async when a caller passes it an async function argument. Every call to
 an async function is emitted with `await`.
 
+`-report-async` on `goscript compile` or `goscript test` reports where the
+async functions of a program come from, without changing the output. It lists
+each root, a cause that makes a function async by itself, with its kind (a
+channel operation, a `sync` wait, an async override call, a JavaScript call, an
+interface that override packages declare, implement or expose, and so on), the
+number of functions it makes async transitively and by package, how many only
+it makes async, and one chain of marks from it toward `main`. Roots at the
+JavaScript and override boundary come first, since they are the most likely to
+be conservative. It also lists the shape classes of function values and the
+interface methods that one async value or implementation makes async for every
+call through them. `-report-async=json` writes the same report as JSON.
+
 ## Type Translation
 
 | Go type | TypeScript type |

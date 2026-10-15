@@ -10,4 +10,7 @@ type CompilationResult struct {
 	OriginalPackages []string
 	// Diagnostics contains all diagnostics produced by the compile request.
 	Diagnostics []Diagnostic
+	// AsyncReport tells where the program's async functions come from, when
+	// the request asked for it.
+	AsyncReport *AsyncReport
 }

@@ -24,10 +24,6 @@ type asyncArgumentCallSite struct {
 // becomes async when any of them does.
 type interfaceAsyncEdges map[*semanticFunction][]*types.Func
 
-// asyncOverrideMethod stands for every override method its package's metadata
-// marks async, as the source of interface async edges.
-var asyncOverrideMethod = &semanticFunction{async: true}
-
 // add records that ifaceMethod waits on implFn, once.
 func (e interfaceAsyncEdges) add(implFn *semanticFunction, ifaceMethod *types.Func) {
 	if !slices.Contains(e[implFn], ifaceMethod) {
@@ -320,6 +316,8 @@ type asyncColoring struct {
 	values  *funcValueGraph
 	visited map[*types.Func]bool
 	queue   []*types.Func
+	// report records the roots and edges for -report-async, or is nil.
+	report *asyncReporter
 }
 
 // asyncRoots are the causes of async marks that the coloring seeds, besides
@@ -337,6 +335,8 @@ type asyncRoots struct {
 	// asyncWhenSeeds are the asyncWhenMethods targets that an async override
 	// method makes async.
 	asyncWhenSeeds []*types.Func
+	// report records the roots and edges for -report-async, or is nil.
+	report *asyncReporter
 }
 
 // colorAsyncFunctions marks every function and interface method that can
@@ -370,6 +370,7 @@ func colorAsyncFunctions(
 		visited:               make(map[*types.Func]bool),
 		overrideFuncsByMethod: make(map[*types.Func][]*types.Func),
 		values:                roots.values,
+		report:                roots.report,
 	}
 	for fn, semFn := range model.functions {
 		signature, _ := fn.Type().(*types.Signature)
@@ -411,35 +412,35 @@ func colorAsyncFunctions(
 
 	// Seed the functions that their packages marked async, and the interface
 	// methods they implement.
+	if c.report != nil {
+		c.report.addOwnRoots()
+	}
 	for key := range c.registered {
 		if model.functionAsync(key) {
 			c.visit(key)
 		}
 	}
-	for implFn, ifaceMethods := range ifaceEdges {
-		if !implFn.async {
-			continue
-		}
-		for _, ifaceMethod := range ifaceMethods {
-			c.markInterfaceMethod(ifaceMethod)
-		}
-	}
+	c.seedImplementations(ifaceEdges)
 
 	// Seed the open classes and the function values that are async by
 	// themselves.
 	for _, class := range roots.values.open {
+		c.reportRoot(func(r *asyncReporter) { r.addClassRoot(class) })
 		c.markClass(class)
 	}
 	for _, key := range roots.values.asyncMembers {
+		c.reportRoot(func(r *asyncReporter) { r.addValueRoot(key) })
 		c.visit(key)
 	}
 	for _, target := range roots.asyncWhenSeeds {
+		c.reportRoot(func(r *asyncReporter) { r.addAsyncWhenRoot(target) })
 		c.markAsyncWhenTarget(target)
 	}
 
 	// Seed the callers of open interface methods. The method itself stays
 	// sync until a compiled implementation proves it can suspend.
 	for _, method := range roots.openMethods {
+		c.reportRoot(func(r *asyncReporter) { r.addOpenMethodRoot(method) })
 		for _, caller := range model.functionCallers[method] {
 			c.markFunction(caller)
 		}
@@ -455,10 +456,12 @@ func colorAsyncFunctions(
 		}
 		key := c.queue[len(c.queue)-1]
 		c.queue = c.queue[:len(c.queue)-1]
+		c.report.fromKey(key)
 		for _, caller := range model.functionCallers[key] {
 			c.markFunction(caller)
 		}
 		for _, ifaceMethod := range c.anonMethodsByImpl[key] {
+			c.report.edgeToInterface(ifaceMethod)
 			if model.markInterfaceMethodAsync(ifaceMethod) {
 				c.visitInterfaceMethod(ifaceMethod)
 			}
@@ -473,7 +476,38 @@ func colorAsyncFunctions(
 			c.markClass(class)
 		}
 	}
+	if c.report != nil {
+		model.asyncReport = c.report.build()
+	}
 	return nil
+}
+
+// seedImplementations marks the interface methods that the implementations
+// their packages marked async implement. An override method that metadata
+// marks async is such an implementation too.
+func (c *asyncColoring) seedImplementations(ifaceEdges interfaceAsyncEdges) {
+	for implFn, ifaceMethods := range ifaceEdges {
+		if !implFn.async {
+			continue
+		}
+		c.reportRoot(func(r *asyncReporter) {
+			if r.model.functions[implFn.function] == implFn {
+				r.cur = r.semFnNode(implFn)
+			} else {
+				r.addOverrideMethodRoot(implFn)
+			}
+		})
+		for _, ifaceMethod := range ifaceMethods {
+			c.markInterfaceMethod(ifaceMethod)
+		}
+	}
+}
+
+// reportRoot records a root with the report, if any.
+func (c *asyncColoring) reportRoot(add func(r *asyncReporter)) {
+	if c.report != nil {
+		add(c.report)
+	}
 }
 
 // register indexes key by every mark that can make it report async.
@@ -503,15 +537,20 @@ func (c *asyncColoring) visit(key *types.Func) {
 // markFunction marks semFn async and visits the keys and interface methods the
 // new mark decides.
 func (c *asyncColoring) markFunction(semFn *semanticFunction) {
+	c.report.edgeToSemFn(semFn)
 	if !markFunctionAsync(semFn) {
 		return
 	}
 	for _, key := range c.keysBySemFn[semFn] {
 		c.visit(key)
 	}
+
+	// The interface methods it implements follow from it.
+	prev := c.report.fromSemFn(semFn)
 	for _, ifaceMethod := range c.ifaceEdges[semFn] {
 		c.markInterfaceMethod(ifaceMethod)
 	}
+	c.report.restore(prev)
 }
 
 // markAsyncWhenTarget marks an asyncWhenMethods target async: an interface
@@ -522,6 +561,7 @@ func (c *asyncColoring) markAsyncWhenTarget(target *types.Func) {
 		c.markInterfaceMethod(target)
 		return
 	}
+	c.report.edgeToKey(target)
 	if c.model.markOverrideFunctionAsync(target) {
 		c.visit(target)
 	}
@@ -530,6 +570,7 @@ func (c *asyncColoring) markAsyncWhenTarget(target *types.Func) {
 // markClass marks a class of calls through function values async and visits
 // it, so that its callers follow.
 func (c *asyncColoring) markClass(class *types.Func) {
+	c.report.edgeToKey(class)
 	if class == nil || c.model.asyncValueClasses[class] {
 		return
 	}
@@ -539,6 +580,7 @@ func (c *asyncColoring) markClass(class *types.Func) {
 
 // markInterfaceMethod colors an interface method whose implementation is async.
 func (c *asyncColoring) markInterfaceMethod(ifaceMethod *types.Func) {
+	c.report.edgeToInterface(ifaceMethod)
 	if c.model.markInterfaceMethodAsync(ifaceMethod) {
 		c.visitInterfaceMethod(ifaceMethod)
 	}

@@ -117,8 +117,9 @@ func (s *CompileService) Compile(ctx context.Context, req *CompileRequest) (*Com
 
 	// The program key covers every input of the override parity check, so a
 	// program stored after a verified compile replays without the full check.
-	var programReplayTried bool
-	if req.DependencyMode == DependencyModeAll {
+	// An async report needs the analysis, so it does not replay the program.
+	programReplayTried := req.ReportAsync
+	if req.DependencyMode == DependencyModeAll && !programReplayTried {
 		if cached, ok := s.cacheOwner.ReplayProgram(ctx, req, sources); ok {
 			cached.OriginalPackages = slices.Clone(result.OriginalPackages)
 			cached.Diagnostics = diagnostics
@@ -136,14 +137,23 @@ func (s *CompileService) Compile(ctx context.Context, req *CompileRequest) (*Com
 
 	// A package with a stored body summary checks without bodies. When its
 	// summary does not apply, or its artifact misses so it must be lowered,
-	// the program is checked again with that package's bodies.
-	summaries := s.cacheOwner.Summaries(req, sources)
+	// the program is checked again with that package's bodies. An async
+	// report needs the causes the body walk finds, so it checks every body.
+	summaries := make(map[string][]byte)
+	if !req.ReportAsync {
+		summaries = s.cacheOwner.Summaries(req, sources)
+	}
+
+	// The semantic build extracts a summary for each generated package
+	// without one.
 	summarize := make(map[string]bool)
 	for _, entry := range sources.packages {
 		if entry.kind == compilerCacheEntryGenerated && summaries[entry.packagePath] == nil {
 			summarize[entry.packagePath] = true
 		}
 	}
+
+	// Each pass checks the program, then builds and lowers it.
 	checkDiagnostics := diagnostics
 	var semanticModel *SemanticModel
 	var artifactEntries []compilerCacheEntry
@@ -180,6 +190,7 @@ func (s *CompileService) Compile(ctx context.Context, req *CompileRequest) (*Com
 			Summaries:         summaries,
 			Summarize:         summarize,
 			WholeProgram:      wholeProgramBuild(req, graph),
+			ReportAsync:       req.ReportAsync,
 		})
 		diagnostics = append(diagnostics, semanticDiagnostics...)
 		if diagnosticsHaveErrors(diagnostics) {
@@ -239,6 +250,7 @@ func (s *CompileService) Compile(ctx context.Context, req *CompileRequest) (*Com
 		return result, NewCompileError(diagnostics)
 	}
 	result.CompiledPackages = append(result.CompiledPackages, compiledPackages...)
+	result.AsyncReport = semanticModel.asyncReport.relativeTo(req.Dir)
 	result.CompiledPackages = slices.AppendSeq(result.CompiledPackages, maps.Keys(replayed))
 	slices.Sort(result.CompiledPackages)
 	s.cacheOwner.StoreGenerated(req, artifactEntries, loweredProgram, files)

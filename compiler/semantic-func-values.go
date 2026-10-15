@@ -151,7 +151,7 @@ func (w *funcFactsWalker) walkVarDecl(top *semanticFunction, decl *ast.GenDecl) 
 			for _, node := range nodes {
 				w.walk(node, value)
 				if w.initializerCallsOtherPackage(value) {
-					markFunctionAsync(node)
+					markOwnAsync(node, value.Pos(), asyncCauseInitOrder, "")
 				}
 			}
 			if len(nodes) == 0 {
@@ -224,11 +224,13 @@ func (w *funcFactsWalker) visit(node *semanticFunction, n ast.Node) bool {
 	case *ast.SelectorExpr:
 		w.visitSelector(node, typed)
 		return false
-	case *ast.SendStmt, *ast.SelectStmt:
-		markFunctionAsync(node)
+	case *ast.SendStmt:
+		markOwnAsync(node, typed.Pos(), asyncCauseChannel, "channel send")
+	case *ast.SelectStmt:
+		markOwnAsync(node, typed.Pos(), asyncCauseChannel, "select")
 	case *ast.UnaryExpr:
 		if typed.Op == token.ARROW {
-			markFunctionAsync(node)
+			markOwnAsync(node, typed.Pos(), asyncCauseChannel, "channel receive")
 		}
 	case *ast.RangeStmt:
 		w.visitRange(node, typed)
@@ -324,7 +326,7 @@ func (w *funcFactsWalker) visitRange(node *semanticFunction, stmt *ast.RangeStmt
 		recordValueCall(node, funcValueShape(w.pkg.TypesInfo.TypeOf(stmt.X)))
 	}
 	if rangeFunctionExprNeedsAwait(w.model, w.pkg, w.overrideFacts, stmt.X) {
-		markFunctionAsync(node)
+		markOwnAsync(node, stmt.Pos(), asyncCauseOverrideCall, "range over "+types.ExprString(stmt.X))
 	}
 
 	// The loop body is a function value of the yield type.
@@ -355,7 +357,8 @@ func (w *funcFactsWalker) visitCall(node *semanticFunction, call *ast.CallExpr) 
 	// Some callees suspend whatever the program, and callback async
 	// overrides wait on their function arguments.
 	if !node.async && callSuspends(w.pkg, w.overrideFacts, call.Fun) {
-		markFunctionAsync(node)
+		kind, detail := suspendingCallCause(w.pkg, w.overrideFacts, call.Fun)
+		markOwnAsync(node, call.Pos(), kind, detail)
 	}
 	recordCallbackOverrideCall(w.pkg, w.overrideFacts, node, call, w.literalKey)
 }

@@ -1920,3 +1920,13 @@ func writeExecutable(t *testing.T, path string, contents string) {
 		t.Fatal(err.Error())
 	}
 }
+
+func TestNormalizeKeepsReportAsync(t *testing.T) {
+	norm, err := (&Request{Patterns: []string{"."}, ReportAsync: true}).normalize()
+	if err != nil {
+		t.Fatalf("normalize request: %v", err)
+	}
+	if !norm.ReportAsync {
+		t.Fatal("expected the async report request to be kept")
+	}
+}
