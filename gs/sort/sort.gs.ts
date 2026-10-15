@@ -103,31 +103,94 @@ export function StringSlice_Sort(x: StringSlice): void {
 }
 
 // Sort sorts data in ascending order as determined by the Less method.
-// Less and Swap are awaited so an async sort.Interface implementer sorts
-// correctly; the data is fully ordered before Sort resolves.
-export async function Sort(data: Interface | null): Promise<void> {
+// It returns a promise only when a method of data does, so an async
+// sort.Interface implementer sorts correctly; the data is fully ordered
+// before that promise resolves.
+export function Sort(data: Interface | null): void | Promise<void> {
   const sortData = $.pointerValue(data)
-  // Use a simple insertion sort for now - can be optimized later
-  const n = await sortData.Len()
+  // Use a simple insertion sort for now - can be optimized later. It runs
+  // synchronously until a method of data returns a promise, and then
+  // continues asynchronously from there.
+  const n = sortData.Len()
+  if (n instanceof Promise) {
+    return n.then((count: number) => insertionSortAsync(sortData, count, 1, 1, null))
+  }
   for (let i = 1; i < n; i++) {
-    for (let j = i; j > 0 && (await sortData.Less(j, j - 1)); j--) {
+    for (let j = i; j > 0; j--) {
+      const less = sortData.Less(j, j - 1)
+      if (less instanceof Promise) {
+        return insertionSortAsync(sortData, n, i, j, less)
+      }
+      if (!less) {
+        break
+      }
+      const swapped = sortData.Swap(j, j - 1)
+      if (swapped instanceof Promise) {
+        return swapped.then(() => insertionSortAsync(sortData, n, i, j - 1, null))
+      }
+    }
+  }
+}
+
+// insertionSortAsync continues Sort at element i, position j, after a method
+// of data returned a promise. less is the pending result of Less(j, j-1), or
+// null when the comparison at j is still to be made.
+async function insertionSortAsync(
+  sortData: Interface,
+  n: number,
+  i: number,
+  j: number,
+  less: Promise<boolean> | null,
+): Promise<void> {
+  for (; i < n; i++, j = i) {
+    for (; j > 0; j--) {
+      const isLess = less !== null ? await less : await sortData.Less(j, j - 1)
+      less = null
+      if (!isLess) {
+        break
+      }
       await sortData.Swap(j, j - 1)
     }
   }
 }
 
 // Stable sorts data while keeping the original order of equal elements
-export async function Stable(data: Interface | null): Promise<void> {
+export function Stable(data: Interface | null): void | Promise<void> {
   // For simplicity, use the same sort - can be improved later
-  await Sort(data)
+  return Sort(data)
 }
 
 // IsSorted reports whether data is sorted
-export async function IsSorted(data: Interface | null): Promise<boolean> {
+export function IsSorted(data: Interface | null): boolean | Promise<boolean> {
   const sortData = $.pointerValue(data)
-  const n = await sortData.Len()
+  const n = sortData.Len()
+  if (n instanceof Promise) {
+    return n.then((count: number) => isSortedAsync(sortData, count - 1, null))
+  }
   for (let i = n - 1; i > 0; i--) {
-    if (await sortData.Less(i, i - 1)) {
+    const less = sortData.Less(i, i - 1)
+    if (less instanceof Promise) {
+      return isSortedAsync(sortData, i, less)
+    }
+    if (less) {
+      return false
+    }
+  }
+  return true
+}
+
+// isSortedAsync continues IsSorted at element i after Less returned a
+// promise, which less holds, or null when the comparison at i is still to
+// be made.
+async function isSortedAsync(
+  sortData: Interface,
+  i: number,
+  less: Promise<boolean> | null,
+): Promise<boolean> {
+  for (; i > 0; i--) {
+    const isLess = less !== null ? await less : await sortData.Less(i, i - 1)
+    less = null
+    if (isLess) {
       return false
     }
   }

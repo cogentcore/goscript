@@ -400,6 +400,12 @@ func (w *funcFactsWalker) visitCall(node *semanticFunction, call *ast.CallExpr) 
 	if w.visitLock(node, call) {
 		return
 	}
+	if shapes, ok := w.overrideFacts.AsyncWhenFieldShapes(calledFunction(w.pkg, call.Fun)); ok {
+		for _, shape := range shapes {
+			recordValueCall(node, shape)
+		}
+		return
+	}
 	if !node.async && callSuspends(w.pkg, w.overrideFacts, call.Fun) {
 		kind, detail := suspendingCallCause(w.pkg, w.overrideFacts, call.Fun)
 		markOwnAsync(node, call.Pos(), kind, detail)

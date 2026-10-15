@@ -17102,6 +17102,9 @@ func (o *LoweringOwner) callExprNeedsAwait(ctx lowerFileContext, call *ast.CallE
 	if async, ok := ctx.model.mutexCallAsync(ctx.semPkg, call); ok {
 		return async
 	}
+	if shapes, ok := o.overrideFacts().AsyncWhenFieldShapes(calledFunction(ctx.semPkg.source, call.Fun)); ok {
+		return ctx.model == nil || slices.ContainsFunc(shapes, ctx.model.shapeCallAsync)
+	}
 	return o.callNeedsAwait(ctx, call.Fun) || o.callbackOverrideCallNeedsAwait(ctx, call)
 }
 

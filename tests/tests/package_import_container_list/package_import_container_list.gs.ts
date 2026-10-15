@@ -46,8 +46,8 @@ export function newElementPool(__typeArgs: $.GenericTypeArgs | undefined): sync.
 	}, ({ kind: $.TypeKind.Function, params: [], results: [{ kind: $.TypeKind.Interface, methods: [] }] } as $.FunctionTypeInfo))})
 }
 
-export async function pushPooled(__typeArgs: $.GenericTypeArgs | undefined, pool: sync.Pool | $.VarRef<sync.Pool> | null, value: any): globalThis.Promise<pooledElement | $.VarRef<pooledElement> | null> {
-	let element = $.mustTypeAssert<pooledElement | $.VarRef<pooledElement> | null>(await sync.Pool.prototype.Get.call($.pointerValue<sync.Pool>(pool)), /* @__PURE__ */ $.pointerType("main.pooledElement"))
+export function pushPooled(__typeArgs: $.GenericTypeArgs | undefined, pool: sync.Pool | $.VarRef<sync.Pool> | null, value: any): pooledElement | $.VarRef<pooledElement> | null {
+	let element = $.mustTypeAssert<pooledElement | $.VarRef<pooledElement> | null>(sync.Pool.prototype.Get.call($.pointerValue<sync.Pool>(pool)), /* @__PURE__ */ $.pointerType("main.pooledElement"))
 	$.pointerValue<pooledElement>(element).Value = $.copyElement(value)
 	return element
 }
@@ -66,10 +66,10 @@ export async function main(): globalThis.Promise<void> {
 	fmt.Println("removed", (values !== null && (values as any).__isVarRef !== true && (values as any).__goValue === undefined ? ((values as any) as list.List).Remove(middle) : list.List.prototype.Remove.call(values, middle)))
 	printList("final", values)
 	let pool = newElementPool(__goscriptStatic0())
-	let pooled = (await pushPooled(__goscriptStatic0(), pool, "pooled") as pooledElement | $.VarRef<pooledElement> | null)
+	let pooled = (pushPooled(__goscriptStatic0(), pool, "pooled") as pooledElement | $.VarRef<pooledElement> | null)
 	fmt.Println("pool", $.pointerValue<pooledElement>(pooled).Value)
 	sync.Pool.prototype.Put.call($.pointerValue<sync.Pool>(pool), $.interfaceValue(pooled, "*main.pooledElement", /* @__PURE__ */ $.pointerType("main.pooledElement")))
-	fmt.Println("pool-reused", $.pointerValue<pooledElement>(await pushPooled(__goscriptStatic0(), pool, "reused")).Value)
+	fmt.Println("pool-reused", $.pointerValue<pooledElement>(pushPooled(__goscriptStatic0(), pool, "reused")).Value)
 }
 
 var __goscriptStatic0$value: any

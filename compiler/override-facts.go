@@ -143,6 +143,34 @@ func (f *OverrideFacts) IsSyncInterface(pkgPath, name string) bool {
 	return pkg.metadata.SyncInterfaces[name]
 }
 
+// AsyncWhenFieldShapes returns the shapes of the func-typed receiver fields
+// that override metadata says fn, an override method, calls, and reports
+// whether metadata lists fn.
+func (f *OverrideFacts) AsyncWhenFieldShapes(fn *types.Func) ([]string, bool) {
+	// Only a listed method of a struct type qualifies.
+	if f == nil || fn == nil || fn.Pkg() == nil {
+		return nil, false
+	}
+	pkgPath, name, ok := overrideMetadataName(fn)
+	fields := f.packages[pkgPath].metadata.AsyncWhenFields[name]
+	if !ok || len(fields) == 0 {
+		return nil, false
+	}
+	structType, _ := receiverNamedType(fn.Type().(*types.Signature).Recv().Type()).Underlying().(*types.Struct)
+	if structType == nil {
+		return nil, false
+	}
+
+	// Each listed field has a shape.
+	var shapes []string
+	for field := range structType.Fields() {
+		if slices.Contains(fields, field.Name()) {
+			shapes = append(shapes, funcValueShape(field.Type()))
+		}
+	}
+	return shapes, true
+}
+
 // IsAsyncWhenOperands returns true when override metadata names fn as an
 // asyncWhenMethods function that calls those methods only on its operands.
 func (f *OverrideFacts) IsAsyncWhenOperands(fn *types.Func) bool {
@@ -399,6 +427,12 @@ func loadOverrideMetadata(root overridePackageRoot) (OverrideMetadata, error) {
 		case "asyncWhenOperands":
 			for name := iter.ReadObject(); name != ""; name = iter.ReadObject() {
 				metadata.AsyncWhenOperands[name] = iter.ReadBool()
+			}
+		case "asyncWhenFields":
+			for method := iter.ReadObject(); method != ""; method = iter.ReadObject() {
+				for iter.ReadArray() {
+					metadata.AsyncWhenFields[method] = append(metadata.AsyncWhenFields[method], iter.ReadString())
+				}
 			}
 		case "asyncWhenMethods":
 			for function := iter.ReadObject(); function != ""; function = iter.ReadObject() {
@@ -802,6 +836,7 @@ func newOverrideMetadata() OverrideMetadata {
 		FuncValueMakers:        make(map[string]bool),
 		SyncInterfaces:         make(map[string]bool),
 		AsyncWhenOperands:      make(map[string]bool),
+		AsyncWhenFields:        make(map[string][]string),
 	}
 }
 
@@ -817,6 +852,7 @@ func cloneOverrideMetadata(metadata OverrideMetadata) OverrideMetadata {
 		FuncValueMakers:        cloneBoolMap(metadata.FuncValueMakers),
 		SyncInterfaces:         cloneBoolMap(metadata.SyncInterfaces),
 		AsyncWhenOperands:      cloneBoolMap(metadata.AsyncWhenOperands),
+		AsyncWhenFields:        cloneStringSlicesMap(metadata.AsyncWhenFields),
 	}
 }
 

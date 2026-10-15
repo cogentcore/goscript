@@ -185,3 +185,34 @@ func TestSemanticModelTrustsSyncOverrideInterfaces(t *testing.T) {
 		}
 	}
 }
+
+// TestOverrideBoundarySkipsUnexportedFields checks that the override boundary
+// does not walk the unexported fields of compiled types: crypto/rand.Int
+// exposes *big.Int, whose Rand method exposes *rand.Rand, but not the
+// rand.Source in its unexported src field, so a local interface with
+// Source's methods stays closed.
+func TestOverrideBoundarySkipsUnexportedFields(t *testing.T) {
+	model, diagnostics, _ := buildDirectiveModel(t, strings.Join([]string{
+		"package main",
+		"import (",
+		"  \"crypto/rand\"",
+		"  \"math/big\"",
+		")",
+		"type source interface { Int63() int64; Seed(seed int64) }",
+		"type counter struct{ n int64 }",
+		"func (c *counter) Int63() int64 { c.n++; return c.n }",
+		"func (c *counter) Seed(seed int64) { c.n = seed }",
+		"func next(s source) int64 { return s.Int63() }",
+		"func main() {",
+		"  _, _ = rand.Int(rand.Reader, big.NewInt(10))",
+		"  _ = next(&counter{})",
+		"}",
+		"",
+	}, "\n"))
+	if diagnosticsHaveErrors(diagnostics) {
+		t.Fatalf("semantic model build failed: %#v", diagnostics)
+	}
+	if semFn := model.functionsByFullName["example.test/directives.next"]; semFn == nil || semFn.async {
+		t.Fatalf("next async = %v, want false", semFn != nil && semFn.async)
+	}
+}

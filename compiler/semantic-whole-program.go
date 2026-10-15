@@ -252,8 +252,7 @@ func (b *overrideBoundary) expose(typ types.Type) {
 		b.expose(types.Unalias(typed))
 	case *types.Named:
 		if typed.Obj().Pkg() == nil || !b.pkgPaths[typed.Obj().Pkg().Path()] {
-			b.expose(typed.Underlying())
-			b.exposeMethods(typed)
+			b.exposeCompiled(typed)
 		}
 	case *types.Pointer:
 		b.expose(typed.Elem())
@@ -274,6 +273,21 @@ func (b *overrideBoundary) expose(typ types.Type) {
 			b.expose(field.Type())
 		}
 	}
+}
+
+// exposeCompiled exposes what an override can reach of a value of named, a
+// type of a compiled package: its exported methods and, for a struct, its
+// exported fields, which exposeMethods covers. An unexported field is set
+// only by the compiled package's own code, since override TypeScript fills
+// only the exported fields of a compiled struct it builds (only crypto and
+// net/url are compiled packages that overrides import), so it is not
+// walked: *big.Int's Rand method exposes *rand.Rand, but not the Source
+// in its unexported field.
+func (b *overrideBoundary) exposeCompiled(named *types.Named) {
+	if _, ok := named.Underlying().(*types.Struct); !ok {
+		b.expose(named.Underlying())
+	}
+	b.exposeMethods(named)
 }
 
 // exposeTuple exposes the types of a parameter or result list.

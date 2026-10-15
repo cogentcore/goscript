@@ -34,7 +34,7 @@ export async function main(): globalThis.Promise<void> {
 		const r = __goscriptRunes0.rune
 		await $.println("rune:", r)
 	}
-	let re = await regexp.MustCompile("^" + "[\xc2\x80-\xed\x9f\xbf\xee\x80\x80-\xef\xbf\xbd\xf0\x90\x80\x80-\xf4\x8f\xbf\xbf]" + "+$")
+	let re = regexp.MustCompile("^" + "[\xc2\x80-\xed\x9f\xbf\xee\x80\x80-\xef\xbf\xbd\xf0\x90\x80\x80-\xf4\x8f\xbf\xbf]" + "+$")
 	await $.println("match:", await (re !== null && (re as any).__isVarRef !== true && (re as any).__goValue === undefined ? ((re as any) as regexp.Regexp).MatchString("\xc3\xa9\xf0\x90\x80\x80") : regexp.Regexp.prototype.MatchString.call(re, "\xc3\xa9\xf0\x90\x80\x80")), await (re !== null && (re as any).__isVarRef !== true && (re as any).__goValue === undefined ? ((re as any) as regexp.Regexp).MatchString("a") : regexp.Regexp.prototype.MatchString.call(re, "a")))
 }
 

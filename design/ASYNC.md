@@ -72,6 +72,9 @@ distinguishes:
   implement it, and no interface that an override package declares or
   exposes in its API may have all of its methods, since override values are
   TypeScript objects whose methods may suspend without metadata saying so.
+  The exposed API is walked into the exported methods and fields of the
+  compiled types it mentions, but not their unexported fields, which only the
+  compiled package's own code sets.
   The exception is an interface that override metadata declares sync
   (`syncInterfaces` in `meta.json`, such as `reflect.Type`, `fmt.Stringer`
   and `sort.Interface`): its override values suspend only in methods of
@@ -141,10 +144,15 @@ only in a program with an async compiled method of given names
   interface with `Error()` allows `error.Error` and any `Format` or
   `GoString` method; an interface with `String()` allows its `String`, which
   its implementations color, `error.Error` and any `Format` or `GoString`
-  method; an `io.Writer` argument allows its static type's `Write`, an
-  interface method for `io.Writer` itself. An operand of any other interface
+  method; an argument for a parameter of a non-empty interface type, such as
+  `Fprintf`'s `io.Writer`, allows its static type's methods of that
+  interface, the interface's own methods for an interface argument. An operand of any other interface
   type, a type parameter or a `reflect.Value` may hold anything, and leaves
   the call to the function's own condition.
+- `sort.Sort`, `Stable` and `IsSorted` call only their argument's `Len`,
+  `Less` and `Swap`, and are listed in `asyncWhenOperands` the same way, so a
+  call is decided by its argument's static type. They return a plain value
+  when every method call does.
 - Override error types whose `Error` wraps another error's (`strconv.NumError`,
   `fs.PathError`, `os.LinkError`, `os.SyscallError`, `scanner.ErrorList`,
   `pkg/errors`, `cryptobyte.BuildError`) depend on the same names.
@@ -189,7 +197,8 @@ The runtime acquires a free lock synchronously and returns nothing, so a
 suspend, since none but `Range` calls back into Go code; `Range` and
 `Once.Do` are callback async (`callbackAsyncFunctions`, which takes
 `Type.Method` keys): they return a promise only when their function argument
-does.
+does. `Pool.Get` calls its `New` field (`asyncWhenFields`), so a call of it is
+async exactly when a call through a `func() any` value may be.
 
 ### Directives
 

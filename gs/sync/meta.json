@@ -8,11 +8,15 @@
     "RWMutex.Lock": true,
     "RWMutex.RLock": true,
     "WaitGroup.Wait": true,
-    "Cond.Wait": true,
-    "Pool.Get": true
+    "Cond.Wait": true
   },
   "callbackAsyncFunctions": {
     "Once.Do": true,
     "Map.Range": true
+  },
+  "asyncWhenFields": {
+    "Pool.Get": [
+      "New"
+    ]
   }
 }

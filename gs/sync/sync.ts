@@ -475,13 +475,14 @@ export class Pool {
     this.New = init?.New
   }
 
-  // Get selects an arbitrary item from the Pool, removes it from the Pool, and returns it to the caller
-  public async Get(): Promise<any> {
+  // Get selects an arbitrary item from the Pool, removes it from the Pool,
+  // and returns it to the caller. It returns a promise only when New does.
+  public Get(): any {
     if (this._pool.length > 0) {
       return this._pool.pop()
     }
     if (this.New) {
-      return await this.New()
+      return this.New()
     }
     return null
   }
