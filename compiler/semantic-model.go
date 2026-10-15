@@ -159,6 +159,7 @@ func (o *SemanticModelOwner) Build(ctx context.Context, graph *PackageGraph, opt
 		}
 	}
 	model.collectVarRefNames()
+	markTransientPointers(model, overrideFacts)
 	if diagnosticsHaveErrors(diagnostics) {
 		model.freeze()
 		return model, diagnostics

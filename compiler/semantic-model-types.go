@@ -225,7 +225,13 @@ type semanticFunction struct {
 	// a call that asks to borrow its results may get back without a copy,
 	// or -1 (see funcResultBorrows). It is nil when no result does.
 	resultBorrows []int
-	async         bool
+	// receiverTransient and paramsTransient report whether the pointer
+	// receiver and each pointer parameter are transient, so that a call can
+	// pass a new reference to a field (see markTransientPointers).
+	// paramsTransient is nil when no parameter is.
+	receiverTransient bool
+	paramsTransient   []bool
+	async             bool
 	// asyncCause records why the node's own code suspends, when the fact
 	// walk found it.
 	asyncCause *asyncCause

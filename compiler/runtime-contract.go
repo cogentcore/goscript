@@ -100,6 +100,7 @@ const (
 
 	RuntimeHelperVarRef                RuntimeHelper = "varref.varRef"
 	RuntimeHelperFieldRef              RuntimeHelper = "varref.fieldRef"
+	RuntimeHelperTransientFieldRef     RuntimeHelper = "varref.transientFieldRef"
 	RuntimeHelperUnref                 RuntimeHelper = "varref.unref"
 	RuntimeHelperIsVarRef              RuntimeHelper = "varref.isVarRef"
 	RuntimeHelperUnsupportedPointerRef RuntimeHelper = "varref.unsupportedPointerRef"
@@ -392,6 +393,7 @@ func runtimeHelperContracts() []RuntimeHelperContract {
 		runtimeHelper(RuntimeHelperPointerAliasesMade, "pointerAliasesMade", RuntimeHelperCategoryValue),
 		runtimeHelper(RuntimeHelperVarRef, "varRef", RuntimeHelperCategoryVarRef),
 		runtimeHelper(RuntimeHelperFieldRef, "fieldRef", RuntimeHelperCategoryVarRef),
+		runtimeHelper(RuntimeHelperTransientFieldRef, "transientFieldRef", RuntimeHelperCategoryVarRef),
 		runtimeHelper(RuntimeHelperUnref, "unref", RuntimeHelperCategoryVarRef),
 		runtimeHelper(RuntimeHelperIsVarRef, "isVarRef", RuntimeHelperCategoryVarRef),
 		runtimeHelper(RuntimeHelperUnsupportedPointerRef, "unsupportedPointerRef", RuntimeHelperCategoryVarRef),
