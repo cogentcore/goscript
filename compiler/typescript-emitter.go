@@ -330,7 +330,11 @@ func calledNamespaces(code string, imports []loweredImport) map[string]bool {
 		case char == '"' || char == '\'' || char == '`':
 			idx = skipTSString(code, idx)
 		case strings.HasPrefix(code[idx:], "//"):
-			idx += strings.IndexByte(code[idx:]+"\n", '\n')
+			end := strings.IndexByte(code[idx:], '\n')
+			if end < 0 {
+				return called
+			}
+			idx += end
 		case strings.HasPrefix(code[idx:], "/*"):
 			end := strings.Index(code[idx+2:], "*/")
 			if end < 0 {
