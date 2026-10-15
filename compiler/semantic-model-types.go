@@ -49,6 +49,10 @@ type SemanticModel struct {
 	// asyncWhenTargets holds the functions, methods and interface methods
 	// that override metadata makes async only in some programs.
 	asyncWhenTargets map[*types.Func]bool
+	// syncOverrideInterfaces holds the override interfaces that a whole
+	// program closes because metadata declares them sync. Their TypeScript
+	// method types may admit a promise.
+	syncOverrideInterfaces map[*types.Named]bool
 	// funcLitNodes holds the literal nodes by the literal's position.
 	funcLitNodes map[token.Pos]*semanticFunction
 	// summaries holds the body summaries the build extracted, by package

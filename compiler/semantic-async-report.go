@@ -169,11 +169,11 @@ type asyncReporter struct {
 const noReportNode = -1
 
 // newAsyncReporter returns a reporter for a coloring of model.
-func newAsyncReporter(model *SemanticModel, overridePkgs []*types.Package, wholeProgram bool) *asyncReporter {
+func newAsyncReporter(model *SemanticModel, boundary *overrideBoundary, wholeProgram bool) *asyncReporter {
 	return &asyncReporter{
 		model:        model,
 		wholeProgram: wholeProgram,
-		boundary:     newOverrideBoundary(overridePkgs),
+		boundary:     boundary,
 		ids:          make(map[any]int),
 		edgeSet:      make(map[[2]int]bool),
 		rootNodes:    make(map[int]bool),

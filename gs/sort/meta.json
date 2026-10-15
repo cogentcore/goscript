@@ -10,5 +10,8 @@
     "Slice": true,
     "SliceIsSorted": true,
     "SliceStable": true
+  },
+  "syncInterfaces": {
+    "Interface": true
   }
 }

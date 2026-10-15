@@ -51,11 +51,11 @@ export class byteFormatter {
 		target.prefix = values.prefix
 	}
 
-	public async Format(state: fmt.State | null, verb: number): globalThis.Promise<void> {
+	public Format(state: fmt.State | null, verb: number): void {
 		const b = this;
 		let buf: $.Slice<number> = $.appendSlice(new Uint8Array([]) as $.Slice<number>, b.prefix, $.byteSliceHint)
-		buf = $.append(buf, $.uint($.uint(verb, 8), 8), $.byteSliceHint)
-		await (state !== null && (state as any).__isVarRef !== true && (state as any).__goValue === undefined ? (state as Exclude<fmt.State, null>) : $.pointerValue<Exclude<fmt.State, null>>(state)).Write(buf)
+		buf = $.append(buf, $.uint($.uint(verb, 8), 8), $.byteSliceHint);
+		;((state !== null && (state as any).__isVarRef !== true && (state as any).__goValue === undefined ? (state as Exclude<fmt.State, null>) : $.pointerValue<Exclude<fmt.State, null>>(state)).Write(buf) as [number, $.GoError])
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -119,128 +119,128 @@ export class pos {
 
 export async function main(): globalThis.Promise<void> {
 	// Test basic Print functions
-	await fmt.Print("Hello")
-	await fmt.Print(" ")
-	await fmt.Print("World")
-	await fmt.Println()
+	fmt.Print("Hello")
+	fmt.Print(" ")
+	fmt.Print("World")
+	fmt.Println()
 
 	// Test Printf with basic formatting
 	let name = "Go"
 	let version = 1.21
-	await fmt.Printf("Welcome to %s %.2f\n", name, $.basicInterfaceValue(version, "float64"))
+	fmt.Printf("Welcome to %s %.2f\n", name, $.basicInterfaceValue(version, "float64"))
 
 	// Test Println
-	await fmt.Println("This is println")
+	fmt.Println("This is println")
 
 	// Test Sprint functions
-	let result = await fmt.Sprint("Sprint", " ", "result")
-	await fmt.Println("Sprint result:", result)
+	let result = (fmt.Sprint("Sprint", " ", "result") as string)
+	fmt.Println("Sprint result:", result)
 	let parts = $.arrayToSlice<any>(["Spread", " ", "result"])
-	let spreadResult = await fmt.Sprint(...(parts ?? []))
-	await fmt.Println("Sprint spread result:", spreadResult)
+	let spreadResult = (fmt.Sprint(...(parts ?? [])) as string)
+	fmt.Println("Sprint spread result:", spreadResult)
 
 	// Test Sprintf
-	let formatted = await fmt.Sprintf("Number: %d, String: %s", $.basicInterfaceValue(42, "int"), "test")
-	await fmt.Println("Sprintf result:", formatted)
+	let formatted = (fmt.Sprintf("Number: %d, String: %s", $.basicInterfaceValue(42, "int"), "test") as string)
+	fmt.Println("Sprintf result:", formatted)
 	let formatArgs = $.arrayToSlice<any>([$.basicInterfaceValue(7, "int"), "spread"])
-	let formattedSpread = await fmt.Sprintf("Spread Number: %d, String: %s", ...(formatArgs ?? []))
-	await fmt.Println("Sprintf spread result:", formattedSpread)
+	let formattedSpread = (fmt.Sprintf("Spread Number: %d, String: %s", ...(formatArgs ?? [])) as string)
+	fmt.Println("Sprintf spread result:", formattedSpread)
 
 	// Test Sprintln
-	let sprintln_result = await fmt.Sprintln("Sprintln", "result")
-	await fmt.Print("Sprintln result:", sprintln_result)
+	let sprintln_result = (fmt.Sprintln("Sprintln", "result") as string)
+	fmt.Print("Sprintln result:", sprintln_result)
 
 	// Test Errorf
 	let err = fmt.Errorf("error code: %d", $.basicInterfaceValue(404, "int"))
-	await fmt.Println("Error:", (err as any))
+	fmt.Println("Error:", (err as any))
 
 	// Test various format verbs
-	await fmt.Printf("Boolean: %t\n", true)
-	await fmt.Printf("Integer: %d\n", $.basicInterfaceValue(123, "int"))
-	await fmt.Printf("Float: %f\n", $.basicInterfaceValue(3.14159, "float64"))
-	await fmt.Printf("String: %s\n", "hello")
-	await fmt.Printf("Type: %T\n", $.basicInterfaceValue(42, "int"))
-	await fmt.Printf("Value: %v\n", $.interfaceValue($.arrayToSlice<number>([1, 2, 3]), "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"))))
+	fmt.Printf("Boolean: %t\n", true)
+	fmt.Printf("Integer: %d\n", $.basicInterfaceValue(123, "int"))
+	fmt.Printf("Float: %f\n", $.basicInterfaceValue(3.14159, "float64"))
+	fmt.Printf("String: %s\n", "hello")
+	fmt.Printf("Type: %T\n", $.basicInterfaceValue(42, "int"))
+	fmt.Printf("Value: %v\n", $.interfaceValue($.arrayToSlice<number>([1, 2, 3]), "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"))))
 
 	// Test width and precision
-	await fmt.Printf("Width: '%5s'\n", "hi")
-	await fmt.Printf("Precision: '%.2f'\n", $.basicInterfaceValue(3.14159, "float64"))
-	await fmt.Printf("Both: '%5.2f'\n", $.basicInterfaceValue(3.14159, "float64"))
-	await fmt.Printf("Formatter: %v\n", $.interfaceValue(new byteFormatter({prefix: new Uint8Array([98, 121, 116, 101, 45])}, true), "main.byteFormatter", "main.byteFormatter"))
+	fmt.Printf("Width: '%5s'\n", "hi")
+	fmt.Printf("Precision: '%.2f'\n", $.basicInterfaceValue(3.14159, "float64"))
+	fmt.Printf("Both: '%5.2f'\n", $.basicInterfaceValue(3.14159, "float64"))
+	fmt.Printf("Formatter: %v\n", $.interfaceValue(new byteFormatter({prefix: new Uint8Array([98, 121, 116, 101, 45])}, true), "main.byteFormatter", "main.byteFormatter"))
 	let bs = new Uint8Array([97, 98, 34, 99])
-	await fmt.Printf("Bytes: %s %q %x %X %v\n", $.interfaceValue(bs, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(bs, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(bs, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(bs, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(bs, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))))
-	await fmt.Printf("String hex: %x %X\n", "hi", "hi")
-	await fmt.Printf("Hex flags: % x %#x %# x %#v\n", $.interfaceValue(bs, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(bs, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(bs, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(bs, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))))
+	fmt.Printf("Bytes: %s %q %x %X %v\n", $.interfaceValue(bs, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(bs, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(bs, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(bs, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(bs, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))))
+	fmt.Printf("String hex: %x %X\n", "hi", "hi")
+	fmt.Printf("Hex flags: % x %#x %# x %#v\n", $.interfaceValue(bs, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(bs, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(bs, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(bs, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))))
 	let sub = $.goSlice(bs, 1, 3)
-	await fmt.Printf("Sliced bytes: %s %q %x %X %v\n", $.interfaceValue(sub, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(sub, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(sub, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(sub, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(sub, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))))
+	fmt.Printf("Sliced bytes: %s %q %x %X %v\n", $.interfaceValue(sub, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(sub, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(sub, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(sub, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(sub, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))))
 	let grown = $.append($.makeSlice<number>(0, 2, "byte"), $.uint(0xde, 8), $.uint(0xad, 8), $.uint(0xbe, 8), $.uint(0xef, 8), $.byteSliceHint)
-	await fmt.Printf("Grown bytes: %x %X % x %v\n", $.interfaceValue(grown, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(grown, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(grown, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(grown, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))))
+	fmt.Printf("Grown bytes: %x %X % x %v\n", $.interfaceValue(grown, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(grown, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(grown, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(grown, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))))
 	let arr = $.arrayValue(new Uint8Array([202, 254, 34, 65]))
 	let view = $.goSlice(arr, undefined, undefined)
-	await fmt.Printf("Array bytes: %s %q %x %X %x %v\n", $.interfaceValue(view, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(view, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(view, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(view, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))), arr, arr)
+	fmt.Printf("Array bytes: %s %q %x %X %x %v\n", $.interfaceValue(view, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(view, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(view, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(view, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))), arr, arr)
 	let none: $.Slice<number> = null! as $.Slice<number>
-	await fmt.Printf("Nil bytes: [%s] %q [%x] %v\n", $.interfaceValue(none, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(none, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(none, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(none, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))))
-	await fmt.Printf("Quoted: %q %+q %#q %q %+q\n", "tab\there", "\xc3\xa9", "raw", $.basicInterfaceValue(120, "rune", "int32"), $.basicInterfaceValue(233, "rune", "int32"))
+	fmt.Printf("Nil bytes: [%s] %q [%x] %v\n", $.interfaceValue(none, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(none, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(none, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(none, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))))
+	fmt.Printf("Quoted: %q %+q %#q %q %+q\n", "tab\there", "\xc3\xa9", "raw", $.basicInterfaceValue(120, "rune", "int32"), $.basicInterfaceValue(233, "rune", "int32"))
 	let seq = 255n
-	await fmt.Printf("Uint64: %d %x %v\n", $.basicInterfaceValue(seq, "uint64"), $.basicInterfaceValue(seq, "uint64"), $.basicInterfaceValue(seq, "uint64"))
-	let appended = await fmt.Append(new Uint8Array([98, 97, 115, 101, 45]), "tail")
-	await fmt.Println("Append bytes:", $.bytesToString(appended))
+	fmt.Printf("Uint64: %d %x %v\n", $.basicInterfaceValue(seq, "uint64"), $.basicInterfaceValue(seq, "uint64"), $.basicInterfaceValue(seq, "uint64"))
+	let appended = (fmt.Append(new Uint8Array([98, 97, 115, 101, 45]), "tail") as $.Slice<number>)
+	fmt.Println("Append bytes:", $.bytesToString(appended))
 	let buf = $.varRef($.markAsStructValue(new bytes.Buffer()))
 	await fmt.Fprintln($.pointerValueOrNil($.interfaceValue<io.Writer | null>(buf, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer")))!, "Buffered writer")
-	await fmt.Print(buf.value.String())
+	fmt.Print(buf.value.String())
 
-	await starWidthPrecision()
-	await sliceVerbs()
-	await scanVerbs()
+	starWidthPrecision()
+	sliceVerbs()
+	scanVerbs()
 
 	await $.println("test finished")
 }
 
-export async function num_String(f: num): globalThis.Promise<string> {
-	return fmt.Sprintf("%.*g", $.basicInterfaceValue(7, "int"), $.basicInterfaceValue(f, "float32"))
+export function num_String(f: num): string {
+	return (fmt.Sprintf("%.*g", $.basicInterfaceValue(7, "int"), $.basicInterfaceValue(f, "float32")) as string)
 }
 
-export async function sliceVerbs(): globalThis.Promise<void> {
-	await fmt.Printf("%q\n", $.interfaceValue($.arrayToSlice<string>(["a", "b c"]), "[]string", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("string"))))
-	await fmt.Printf("%d %4d\n", $.interfaceValue($.arrayToSlice<number>([1, 2, 3]), "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"))), $.interfaceValue($.arrayToSlice<number>([4, 5]), "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"))))
-	await fmt.Printf("%x\n", $.interfaceValue($.arrayToSlice<number>([10, 255]), "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"))))
-	await fmt.Printf("%.2f %6.1f\n", $.interfaceValue($.arrayToSlice<number>([1.5, 2.25]), "[]float64", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("float64"))), $.interfaceValue($.arrayToSlice<number>([3.25]), "[]float64", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("float64"))))
-	await fmt.Printf("%t\n", $.interfaceValue($.arrayToSlice<boolean>([true, false]), "[]bool", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("bool"))))
-	await fmt.Printf("%q\n", $.arrayValue(["x", "y"]))
-	await fmt.Printf("%q %x\n", $.interfaceValue(new Uint8Array([104, 105]), "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(new Uint8Array([104, 105]), "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))))
-	await fmt.Printf("%s %q\n", $.interfaceValue($.arrayToSlice<string>(["a", "b"]), "[]string", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("string"))), $.interfaceValue($.arrayToSlice<string>([]), "[]string", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("string"))))
+export function sliceVerbs(): void {
+	fmt.Printf("%q\n", $.interfaceValue($.arrayToSlice<string>(["a", "b c"]), "[]string", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("string"))))
+	fmt.Printf("%d %4d\n", $.interfaceValue($.arrayToSlice<number>([1, 2, 3]), "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"))), $.interfaceValue($.arrayToSlice<number>([4, 5]), "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"))))
+	fmt.Printf("%x\n", $.interfaceValue($.arrayToSlice<number>([10, 255]), "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"))))
+	fmt.Printf("%.2f %6.1f\n", $.interfaceValue($.arrayToSlice<number>([1.5, 2.25]), "[]float64", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("float64"))), $.interfaceValue($.arrayToSlice<number>([3.25]), "[]float64", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("float64"))))
+	fmt.Printf("%t\n", $.interfaceValue($.arrayToSlice<boolean>([true, false]), "[]bool", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("bool"))))
+	fmt.Printf("%q\n", $.arrayValue(["x", "y"]))
+	fmt.Printf("%q %x\n", $.interfaceValue(new Uint8Array([104, 105]), "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(new Uint8Array([104, 105]), "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))))
+	fmt.Printf("%s %q\n", $.interfaceValue($.arrayToSlice<string>(["a", "b"]), "[]string", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("string"))), $.interfaceValue($.arrayToSlice<string>([]), "[]string", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("string"))))
 }
 
-export async function starWidthPrecision(): globalThis.Promise<void> {
-	await fmt.Println(await fmt.Sprintf("[%.*f]", $.basicInterfaceValue(3, "int"), $.basicInterfaceValue(3.14159, "float64")))
-	await fmt.Println(await fmt.Sprintf("[%*d]", $.basicInterfaceValue(5, "int"), $.basicInterfaceValue(42, "int")))
-	await fmt.Println(await fmt.Sprintf("[%*d]", $.basicInterfaceValue(-5, "int"), $.basicInterfaceValue(42, "int")))
-	await fmt.Println(await fmt.Sprintf("[%*.*f]", $.basicInterfaceValue(8, "int"), $.basicInterfaceValue(2, "int"), $.basicInterfaceValue(3.14159, "float64")))
-	await fmt.Println(await fmt.Sprintf("[%.*g]", $.basicInterfaceValue(7, "int"), $.basicInterfaceValue(13.333333015441895, "float32")))
-	await fmt.Println(await fmt.Sprintf("[%.*d] [%s]", $.basicInterfaceValue(-1, "int"), $.basicInterfaceValue(5, "int"), "after"))
-	await fmt.Println(await fmt.Sprintf("[%v]", $.namedValueInterfaceValue<any>(6.666666507720947, "main.num", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2())))
-	await fmt.Println(await fmt.Sprintf("[%.*d]", "x", $.basicInterfaceValue(5, "int")))
+export function starWidthPrecision(): void {
+	fmt.Println((fmt.Sprintf("[%.*f]", $.basicInterfaceValue(3, "int"), $.basicInterfaceValue(3.14159, "float64")) as string))
+	fmt.Println((fmt.Sprintf("[%*d]", $.basicInterfaceValue(5, "int"), $.basicInterfaceValue(42, "int")) as string))
+	fmt.Println((fmt.Sprintf("[%*d]", $.basicInterfaceValue(-5, "int"), $.basicInterfaceValue(42, "int")) as string))
+	fmt.Println((fmt.Sprintf("[%*.*f]", $.basicInterfaceValue(8, "int"), $.basicInterfaceValue(2, "int"), $.basicInterfaceValue(3.14159, "float64")) as string))
+	fmt.Println((fmt.Sprintf("[%.*g]", $.basicInterfaceValue(7, "int"), $.basicInterfaceValue(13.333333015441895, "float32")) as string))
+	fmt.Println((fmt.Sprintf("[%.*d] [%s]", $.basicInterfaceValue(-1, "int"), $.basicInterfaceValue(5, "int"), "after") as string))
+	fmt.Println((fmt.Sprintf("[%v]", $.namedValueInterfaceValue<any>(6.666666507720947, "main.num", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2())) as string))
+	fmt.Println((fmt.Sprintf("[%.*d]", "x", $.basicInterfaceValue(5, "int")) as string))
 	let err = fmt.Errorf("%*s: %w", $.basicInterfaceValue(6, "int"), "ctx", (errors.New("base") as any))
-	await fmt.Println((err as any), errors.Unwrap($.pointerValueOrNil(err)!) != null)
+	fmt.Println((err as any), errors.Unwrap($.pointerValueOrNil(err)!) != null)
 }
 
-export async function scanVerbs(): globalThis.Promise<void> {
+export function scanVerbs(): void {
 	let f32 = $.varRef(0)
 	let [n, err] = fmt.Sscanf("1.0", "%g", $.interfaceValue(f32, "*float32", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("float32"))))
-	await fmt.Println("g float32:", $.basicInterfaceValue(n, "int"), err == null, $.basicInterfaceValue(f32.value, "float32"))
+	fmt.Println("g float32:", $.basicInterfaceValue(n, "int"), err == null, $.basicInterfaceValue(f32.value, "float32"))
 
 	let f64 = $.varRef(0)
 	let __goscriptTuple0: any = fmt.Sscanf(" 2.5e1 rest", "%f", $.interfaceValue(f64, "*float64", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("float64"))))
 	n = __goscriptTuple0[0]
 	err = __goscriptTuple0[1]
-	await fmt.Println("f float64:", $.basicInterfaceValue(n, "int"), err == null, $.basicInterfaceValue(f64.value, "float64"))
+	fmt.Println("f float64:", $.basicInterfaceValue(n, "int"), err == null, $.basicInterfaceValue(f64.value, "float64"))
 
 	let i64 = $.varRef(0n)
 	let u8 = $.varRef(0)
 	let __goscriptTuple1: any = fmt.Sscanf("-42,200", "%d,%d", $.interfaceValue(i64, "*int64", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int64"))), $.interfaceValue(u8, "*uint8", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("uint8"))))
 	n = __goscriptTuple1[0]
 	err = __goscriptTuple1[1]
-	await fmt.Println("d int64 uint8:", $.basicInterfaceValue(n, "int"), err == null, $.basicInterfaceValue(i64.value, "int64"), $.basicInterfaceValue(u8.value, "uint8"))
+	fmt.Println("d int64 uint8:", $.basicInterfaceValue(n, "int"), err == null, $.basicInterfaceValue(i64.value, "int64"), $.basicInterfaceValue(u8.value, "uint8"))
 
 	let r = $.varRef(0)
 	let g = $.varRef(0)
@@ -248,40 +248,40 @@ export async function scanVerbs(): globalThis.Promise<void> {
 	let __goscriptTuple2: any = fmt.Sscanf("ff8000", "%02x%02x%02x", $.interfaceValue(r, "*uint8", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(g, "*uint8", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(b, "*uint8", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("uint8"))))
 	n = __goscriptTuple2[0]
 	err = __goscriptTuple2[1]
-	await fmt.Println("02x:", $.basicInterfaceValue(n, "int"), err == null, $.basicInterfaceValue(r.value, "uint8"), $.basicInterfaceValue(g.value, "uint8"), $.basicInterfaceValue(b.value, "uint8"))
+	fmt.Println("02x:", $.basicInterfaceValue(n, "int"), err == null, $.basicInterfaceValue(r.value, "uint8"), $.basicInterfaceValue(g.value, "uint8"), $.basicInterfaceValue(b.value, "uint8"))
 	let __goscriptTuple3: any = fmt.Sscanf("f80", "%1x%1x%1x", $.interfaceValue(r, "*uint8", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(g, "*uint8", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(b, "*uint8", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("uint8"))))
 	n = __goscriptTuple3[0]
 	err = __goscriptTuple3[1]
-	await fmt.Println("1x:", $.basicInterfaceValue(n, "int"), err == null, $.basicInterfaceValue(r.value, "uint8"), $.basicInterfaceValue(g.value, "uint8"), $.basicInterfaceValue(b.value, "uint8"))
+	fmt.Println("1x:", $.basicInterfaceValue(n, "int"), err == null, $.basicInterfaceValue(r.value, "uint8"), $.basicInterfaceValue(g.value, "uint8"), $.basicInterfaceValue(b.value, "uint8"))
 
 	let p: pos = new pos(undefined, true)
 	let __goscriptTuple4: any = fmt.Sscanf("L12C3", "L%dC%d", $.interfaceValue($.fieldRef(p._fields, "Line"), "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int"))), $.interfaceValue($.fieldRef(p._fields, "Char"), "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int"))))
 	n = __goscriptTuple4[0]
 	err = __goscriptTuple4[1]
-	await fmt.Println("struct fields:", $.basicInterfaceValue(n, "int"), err == null, $.basicInterfaceValue(p.Line, "int"), $.basicInterfaceValue(p.Char, "int"))
+	fmt.Println("struct fields:", $.basicInterfaceValue(n, "int"), err == null, $.basicInterfaceValue(p.Line, "int"), $.basicInterfaceValue(p.Char, "int"))
 
 	let s = $.varRef("")
 	let v = $.varRef(0)
 	let __goscriptTuple5: any = fmt.Sscanf("name 7", "%s %v", $.interfaceValue(s, "*string", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("string"))), $.interfaceValue(v, "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int"))))
 	n = __goscriptTuple5[0]
 	err = __goscriptTuple5[1]
-	await fmt.Println("s v:", $.basicInterfaceValue(n, "int"), err == null, s.value, $.basicInterfaceValue(v.value, "int"))
+	fmt.Println("s v:", $.basicInterfaceValue(n, "int"), err == null, s.value, $.basicInterfaceValue(v.value, "int"))
 
 	let bl = $.varRef(false)
 	let __goscriptTuple6: any = fmt.Sscanf("true", "%t", $.interfaceValue(bl, "*bool", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("bool"))))
 	n = __goscriptTuple6[0]
 	err = __goscriptTuple6[1]
-	await fmt.Println("t:", $.basicInterfaceValue(n, "int"), err == null, bl.value)
+	fmt.Println("t:", $.basicInterfaceValue(n, "int"), err == null, bl.value)
 
 	let __goscriptTuple7: any = fmt.Sscanf("abc", "%d", $.interfaceValue(v, "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int"))))
 	n = __goscriptTuple7[0]
 	err = __goscriptTuple7[1]
-	await fmt.Println("bad int:", $.basicInterfaceValue(n, "int"), err != null)
+	fmt.Println("bad int:", $.basicInterfaceValue(n, "int"), err != null)
 
 	let __goscriptTuple8: any = fmt.Sscanf("12", "%d %d", $.interfaceValue(v, "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int"))), $.interfaceValue(i64, "*int64", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int64"))))
 	n = __goscriptTuple8[0]
 	err = __goscriptTuple8[1]
-	await fmt.Println("short:", $.basicInterfaceValue(n, "int"), err != null, $.basicInterfaceValue(v.value, "int"))
+	fmt.Println("short:", $.basicInterfaceValue(n, "int"), err != null, $.basicInterfaceValue(v.value, "int"))
 
 	let a = $.varRef(0)
 	let c = $.varRef(0)
@@ -289,12 +289,12 @@ export async function scanVerbs(): globalThis.Promise<void> {
 	let __goscriptTuple9: any = fmt.Sscan("3  4\n hello", $.interfaceValue(a, "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int"))), $.interfaceValue(c, "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int"))), $.interfaceValue(word, "*string", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("string"))))
 	n = __goscriptTuple9[0]
 	err = __goscriptTuple9[1]
-	await fmt.Println("Sscan:", $.basicInterfaceValue(n, "int"), err == null, $.basicInterfaceValue(a.value, "int"), $.basicInterfaceValue(c.value, "int"), word.value)
+	fmt.Println("Sscan:", $.basicInterfaceValue(n, "int"), err == null, $.basicInterfaceValue(a.value, "int"), $.basicInterfaceValue(c.value, "int"), word.value)
 	let fl = $.varRef(0)
 	let __goscriptTuple10: any = fmt.Sscan("1.25", $.interfaceValue(fl, "*float64", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("float64"))))
 	n = __goscriptTuple10[0]
 	err = __goscriptTuple10[1]
-	await fmt.Println("Sscan float:", $.basicInterfaceValue(n, "int"), err == null, $.basicInterfaceValue(fl.value, "float64"))
+	fmt.Println("Sscan float:", $.basicInterfaceValue(n, "int"), err == null, $.basicInterfaceValue(fl.value, "float64"))
 }
 
 var __goscriptStatic0$value: any

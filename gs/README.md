@@ -21,6 +21,10 @@ A package directory contains:
   `callbackAsyncFunctions` marks functions such as `slices.IndexFunc` that
   suspend only when a function argument does, so the compiler awaits only
   those calls.
+  `syncInterfaces` names interfaces, such as `reflect.Type`, whose override
+  values suspend only where `asyncMethods` says; every override that hands
+  out such a value must keep that promise (see
+  [OVERRIDES.md](../design/OVERRIDES.md)).
 - `godoc.txt`, where present, the upstream `go doc` output kept for reference.
 - `parity.json`, where present, which records each upstream symbol as `real`,
   `deferred`, or `blocked` with a reason.

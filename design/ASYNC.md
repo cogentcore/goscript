@@ -72,6 +72,14 @@ distinguishes:
   implement it, and no interface that an override package declares or
   exposes in its API may have all of its methods, since override values are
   TypeScript objects whose methods may suspend without metadata saying so.
+  The exception is an interface that override metadata declares sync
+  (`syncInterfaces` in `meta.json`, such as `reflect.Type`, `fmt.Stringer`
+  and `sort.Interface`): its override values suspend only in methods of
+  named override types that metadata marks async, which the implementation
+  graph colors. Such an interface is closed like a compiled one, even when
+  it is package-sealed or has no implementation in the graph, and an
+  override type or exposed interface that implements it does not open
+  another interface in those methods.
 - **Open interfaces**: every other interface. A call of an open interface
   method makes its caller async, but the method itself stays sync unless a
   compiled implementation is async.
