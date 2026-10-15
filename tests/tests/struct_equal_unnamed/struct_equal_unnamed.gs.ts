@@ -158,7 +158,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("map method:", $.mapGet<string, Point, Point>(m, "a", new Point(true))[0].Sum())
 
 	// as interface values, the named and unnamed types differ
-	let ia: any = $.interfaceValue((p).clone(), "main.Point", "main.Point")
+	let ia: any = $.interfaceValue(p, "main.Point", "main.Point")
 	let ib: any = $.interfaceValue($.anonymousStructValue({X: 1, Y: 2}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("X", /* @__PURE__ */ $.basicType("int"), [0], 0, true), /* @__PURE__ */ $.structField("Y", /* @__PURE__ */ $.basicType("int"), [1], 8, true)] }), "struct{X int; Y int}", { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("X", /* @__PURE__ */ $.basicType("int"), [0], 0, true), /* @__PURE__ */ $.structField("Y", /* @__PURE__ */ $.basicType("int"), [1], 8, true)] })
 	await $.println("interfaces differ:", $.comparableEqual(ia, ib))
 

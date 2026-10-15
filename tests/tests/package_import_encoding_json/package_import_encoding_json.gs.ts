@@ -155,7 +155,7 @@ export async function main(): globalThis.Promise<void> {
 	} else {
 		results = $.appendOne(results, "Marshal: " + $.bytesToString(b))
 	}
-	let __goscriptTuple1: any = (json.MarshalIndent($.interfaceValue((p).clone(), "main.Person", "main.Person"), "", "  ") as [$.Slice<number>, $.GoError])
+	let __goscriptTuple1: any = (json.MarshalIndent($.interfaceValue(p, "main.Person", "main.Person"), "", "  ") as [$.Slice<number>, $.GoError])
 	let indented: $.Slice<number> = __goscriptTuple1[0]
 	err = __goscriptTuple1[1]
 	if (err != null) {
@@ -251,7 +251,7 @@ export async function timeField(): globalThis.Promise<void> {
 	await $.println($.bytesToString(b), err == null)
 	let ev: $.VarRef<Event> = $.varRef(new Event(true))
 	err = (json.Unmarshal(b, $.interfaceValue(ev, "*main.Event", /* @__PURE__ */ $.pointerType("main.Event"))) as $.GoError)
-	await $.println("event:", err == null, ev.value.Name, $.markAsStructValue($.cloneStructValue(ev.value.At)).Equal($.markAsStructValue($.cloneStructValue(at))))
+	await $.println("event:", err == null, ev.value.Name, $.markAsStructValue($.cloneStructValue(ev.value.At)).Equal(at))
 }
 
 var __goscriptStatic0$value: any

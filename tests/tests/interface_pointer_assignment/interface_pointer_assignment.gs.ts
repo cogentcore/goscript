@@ -76,7 +76,7 @@ export async function main(): globalThis.Promise<void> {
 	let s6 = $.varRef(new MyStruct(true, 90))
 	let p6 = s6
 	let s6copy = (s6.value).clone()
-	let i6a: any = $.interfaceValue((s6copy).clone(), "main.MyStruct", "main.MyStruct")
+	let i6a: any = $.interfaceValue(s6copy, "main.MyStruct", "main.MyStruct")
 	let i6b: any = $.interfaceValue(p6, "*main.MyStruct", /* @__PURE__ */ $.pointerType("main.MyStruct"))
 	let [, ok6a] = $.typeAssertTuple<MyStruct | $.VarRef<MyStruct> | null>(i6a, /* @__PURE__ */ $.pointerType("main.MyStruct"))
 	let [, ok6b] = $.typeAssertTuple<MyStruct | $.VarRef<MyStruct> | null>(i6b, /* @__PURE__ */ $.pointerType("main.MyStruct"))

@@ -38,7 +38,7 @@ export async function main(): globalThis.Promise<void> {
 	let p = new MyStruct(false, 20)
 
 	// Type assertions - struct value
-	let i: any = $.interfaceValue((s).clone(), "main.MyStruct", "main.MyStruct")
+	let i: any = $.interfaceValue(s, "main.MyStruct", "main.MyStruct")
 	let [, ok1] = $.typeAssertTuple<MyStruct>(i, "main.MyStruct")
 	let [, ok2] = $.typeAssertTuple<MyStruct | $.VarRef<MyStruct> | null>(i, /* @__PURE__ */ $.pointerType("main.MyStruct"))
 	await $.println("struct value -> MyStruct assertion:", ok1)
