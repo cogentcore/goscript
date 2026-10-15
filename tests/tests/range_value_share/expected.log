@@ -1,0 +1,15 @@
+sum: 6
+found: 70 7
+store: 1 10
+store: 5 20
+call: 3 103
+call: 7 107
+copy: a copy
+copy: b copy
+last: b -1 6
+changed: 3 2
+changed: 7 2
+grid: 10
+grid store: 1 9
+grid store: 3 9
+held: a z
