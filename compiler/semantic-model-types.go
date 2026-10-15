@@ -2,6 +2,7 @@ package compiler
 
 import (
 	"go/ast"
+	"go/token"
 	"go/types"
 	"sync"
 
@@ -37,6 +38,16 @@ type SemanticModel struct {
 	// asyncOverrideFunctions holds the override functions that metadata makes
 	// async only in a program with an async implementation of a named method.
 	asyncOverrideFunctions map[*types.Func]bool
+	// funcValueClasses holds the key of each class of calls through function
+	// values, by shape (see funcValueShape).
+	funcValueClasses map[string]*types.Func
+	// asyncValueClasses holds the classes whose calls may suspend.
+	asyncValueClasses map[*types.Func]bool
+	// valueNodes holds the literal, lazy initializer and override value nodes
+	// of the async analysis by key.
+	valueNodes map[*types.Func]*semanticFunction
+	// funcLitNodes holds the literal nodes by the literal's position.
+	funcLitNodes map[token.Pos]*semanticFunction
 	// summaries holds the body summaries the build extracted, by package
 	// path.
 	summaries map[string][]byte
@@ -93,6 +104,20 @@ type semanticPackage struct {
 	// builds it once, on first use, from the package syntax.
 	assignments     *localAssignments
 	assignmentsOnce sync.Once
+	// funcLits holds the async analysis node of each function literal, by
+	// the literal's position.
+	funcLits map[token.Pos]*semanticFunction
+	// lazyInits holds the node of each lazily initialized variable's
+	// initializer.
+	lazyInits map[types.Object]*semanticFunction
+	// funcValues holds the function values the package takes.
+	funcValues []funcValue
+	// assertedFuncShapes holds the shapes of the func types the package
+	// asserts from interface values.
+	assertedFuncShapes map[string]bool
+	// topValueCalls holds the shapes of the function values called outside
+	// function bodies, by package initialization.
+	topValueCalls map[string]bool
 }
 
 // localAssignments holds the facts lowering reads about how the variables of
@@ -103,6 +128,14 @@ type localAssignments struct {
 	reassigned map[types.Object]bool
 	// values maps each variable declared by := to its initial value.
 	values map[types.Object]ast.Expr
+}
+
+// literalKey returns the key of lit's node, or nil.
+func (p *semanticPackage) literalKey(lit *ast.FuncLit) *types.Func {
+	if node := p.funcLits[lit.Pos()]; node != nil {
+		return node.function
+	}
+	return nil
 }
 
 type semanticDeclaration struct {
@@ -176,6 +209,9 @@ type semanticFunction struct {
 	// packageVars holds the package variables the body names in the same
 	// region as calls.
 	packageVars map[*types.Var]bool
+	// valueCalls holds the shapes of the function values the body calls in
+	// the same region as calls.
+	valueCalls map[string]bool
 }
 
 type semanticInterfaceImplementation struct {

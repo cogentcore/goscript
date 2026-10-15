@@ -11,8 +11,8 @@ export function shadowTupleInput(value: string): [string, boolean] {
 	return [value + "-inner", true]
 }
 
-export async function shadowCallbackInput(fn: ((_p0: number) => number | globalThis.Promise<number>) | null): globalThis.Promise<[number, boolean]> {
-	return [(__goscriptAwait = fn!(5), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), true]
+export function shadowCallbackInput(fn: ((_p0: number) => number | globalThis.Promise<number>) | null): [number, boolean] {
+	return [(fn!(5) as number), true]
 }
 
 export async function selectResultRedeclare(): globalThis.Promise<void> {
@@ -81,7 +81,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 
 	{
-		let __goscriptTuple2: any = await shadowCallbackInput($.functionValue((k: number): number => {
+		let __goscriptTuple2: any = shadowCallbackInput($.functionValue((k: number): number => {
 			return k + 1
 		}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo)))
 		let k = __goscriptTuple2[0]
@@ -93,8 +93,6 @@ export async function main(): globalThis.Promise<void> {
 	await typeSwitchCaseRedeclare($.basicInterfaceValue(1, "int"))
 	await typeSwitchCaseRedeclare("two")
 }
-
-var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

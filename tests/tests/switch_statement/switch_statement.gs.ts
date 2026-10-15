@@ -111,7 +111,7 @@ export async function main(): globalThis.Promise<void> {
 	// Conditions set only inside a callback are still runtime values.
 	let data: $.Slice<number> = null! as $.Slice<number>
 	let rejected = false
-	await hold($.functionValue(() => {
+	hold($.functionValue(() => {
 		data = new Uint8Array([120])
 		rejected = true
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)))
@@ -135,11 +135,9 @@ export async function main(): globalThis.Promise<void> {
 	}
 }
 
-export async function hold(fn: (() => void) | null): globalThis.Promise<void> {
-	void (__goscriptAwait = fn!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+export function hold(fn: (() => void) | null): void {
+	fn!()
 }
-
-var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

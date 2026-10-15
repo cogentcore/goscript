@@ -9,7 +9,7 @@ export async function run(ctx: context.Context | null): globalThis.Promise<void>
 	await using __defer = new $.AsyncDisposableStack()
 	let [sctx, sctxCancel] = context.WithCancel($.pointerValueOrNil(ctx)!)
 	const __goscriptDeferCallee0 = sctxCancel
-	__defer.defer(async () => { (__goscriptAwait = __goscriptDeferCallee0!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) })
+	__defer.defer(() => { __goscriptDeferCallee0!() })
 
 	let myCh = $.makeChannel<{}>(0, {}, "both")
 
@@ -42,7 +42,7 @@ export async function run(ctx: context.Context | null): globalThis.Promise<void>
 	}
 
 	// Cancel context which should trigger the goroutine
-	void (__goscriptAwait = sctxCancel!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+	sctxCancel!()
 
 	// Now myCh should become readable
 	await $.chanRecv(myCh)
@@ -57,7 +57,7 @@ export async function main(): globalThis.Promise<void> {
 
 	let [deadlineCtx, cancel] = context.WithDeadline($.pointerValueOrNil(ctx)!, $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(time.Now())).Add(3600000000000n))))
 	const __goscriptDeferCallee1 = cancel
-	__defer.defer(async () => { (__goscriptAwait = __goscriptDeferCallee1!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) })
+	__defer.defer(() => { __goscriptDeferCallee1!() })
 	let [deadline, ok] = await (deadlineCtx !== null && (deadlineCtx as any).__isVarRef !== true && (deadlineCtx as any).__goValue === undefined ? (deadlineCtx as Exclude<context.Context, null>) : $.pointerValue<Exclude<context.Context, null>>(deadlineCtx)).Deadline()
 	await $.println("deadline ok:", ok)
 	await $.println("deadline zero:", $.markAsStructValue($.cloneStructValue(deadline)).IsZero())

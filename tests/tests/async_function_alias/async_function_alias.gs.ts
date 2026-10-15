@@ -10,7 +10,7 @@ export type Opener = ((_p0: (() => $.GoError | globalThis.Promise<$.GoError>) | 
 export function newOpener(ch: $.Channel<$.GoError> | null): ((_p0: Callback) => $.GoError | globalThis.Promise<$.GoError>) | null {
 	return $.functionValue(async (cb: (() => $.GoError | globalThis.Promise<$.GoError>) | null): globalThis.Promise<$.GoError> => {
 		{
-			let err = (__goscriptAwait = cb!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+			let err = (cb!() as $.GoError)
 			if (err != null) {
 				return err
 			}

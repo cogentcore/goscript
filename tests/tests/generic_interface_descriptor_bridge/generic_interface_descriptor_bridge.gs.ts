@@ -96,7 +96,7 @@ export class intBox {
 
 export async function main(): globalThis.Promise<void> {
 	let [ctx, cancel] = context.WithCancel($.pointerValueOrNil(context.Background())!)
-	void (__goscriptAwait = cancel!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+	cancel!()
 
 	let genericGeneric: GenericWaiter | null = $.namedValueInterfaceValue<GenericWaiter | null>(new genericBox(), "*main.genericBox", __goscriptStatic1(), __goscriptStatic2(), __goscriptStatic3())
 	await $.println("generic-generic", (__goscriptAwait = $.callInterfaceMethod((genericGeneric !== null && (genericGeneric as any).__isVarRef !== true && (genericGeneric as any).__goValue === undefined ? (genericGeneric as Exclude<GenericWaiter, null>) : $.pointerValue<Exclude<GenericWaiter, null>>(genericGeneric)), "Wait", __goscriptStatic0(), ctx, 7), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = $.callInterfaceMethod((genericGeneric !== null && (genericGeneric as any).__isVarRef !== true && (genericGeneric as any).__goValue === undefined ? (genericGeneric as Exclude<GenericWaiter, null>) : $.pointerValue<Exclude<GenericWaiter, null>>(genericGeneric)), "Count", __goscriptStatic0(), ctx, $.arrayToSlice<number>([1, 2])), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))

@@ -29,21 +29,19 @@ export class item {
 	)
 }
 
-export async function fill(fn: ((_p0: number) => void) | null): globalThis.Promise<void> {
-	void (__goscriptAwait = fn!(3), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+export function fill(fn: ((_p0: number) => void) | null): void {
+	fn!(3)
 }
 
 export async function main(): globalThis.Promise<void> {
 	let values: $.Slice<item> = null! as $.Slice<item>
-	await fill($.functionValue((value: number) => {
+	fill($.functionValue((value: number) => {
 		values = $.appendOne(values, new item({Value: value}, true))
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [] } as $.FunctionTypeInfo)))
 	if ($.sliceLen(values) != 0) {
 		await $.println("first:", $.arrayIndex(values!, 0).Value)
 	}
 }
-
-var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

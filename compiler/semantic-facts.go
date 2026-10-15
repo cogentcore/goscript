@@ -38,6 +38,11 @@ func (m *SemanticModel) packageFactDigests() map[string]string {
 			strconv.FormatBool(semFn.hasBody)+"|"+
 			strconv.FormatBool(semFn.deferred))
 	}
+	for key, node := range m.valueNodes {
+		if key.Pkg() != nil {
+			add("func", key, strconv.FormatBool(node.async))
+		}
+	}
 	for fn := range m.asyncInterfaceMethodObjs {
 		add("async-interface-method", fn, "")
 	}
@@ -54,6 +59,7 @@ func (m *SemanticModel) packageFactDigests() map[string]string {
 		if len(semPkg.localFacts) != 0 {
 			facts[pkgPath] = append(facts[pkgPath], semPkg.localFacts...)
 		}
+		facts[pkgPath] = append(facts[pkgPath], m.funcValueShapeFacts(semPkg)...)
 	}
 
 	digests := make(map[string]string, len(facts))

@@ -36,6 +36,11 @@ type OverrideMetadata struct {
 	// names is async, such as json.Marshal with an async MarshalJSON, and
 	// synchronous otherwise.
 	AsyncWhenMethods map[string][]string
+	// FuncValueMakers names the functions and Type.Method keys that make
+	// function values of any type at run time, such as reflect.MakeFunc. A
+	// program that uses one can obtain such a value by asserting a func type
+	// from an interface value, so calls of that type stay async.
+	FuncValueMakers map[string]bool
 }
 
 // OverrideRegistryOwner owns GoScript override package metadata and copy plans.

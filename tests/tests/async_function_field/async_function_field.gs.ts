@@ -42,7 +42,7 @@ export function __goscript_set_cache(__goscriptValue: sync.Map): void {
 }
 
 export let defaultLoader: loader | $.VarRef<loader> | null = new loader({load: $.functionValue(async (key: string): globalThis.Promise<[any, boolean]> => {
-	return await cache.value.Load(key)
+	return cache.value.Load(key)
 }, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string")], results: [{ kind: $.TypeKind.Interface, methods: [] }, /* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo))})
 
 export function __goscript_set_defaultLoader(__goscriptValue: loader | $.VarRef<loader> | null): void {

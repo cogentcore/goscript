@@ -118,7 +118,7 @@ export async function deferred(): globalThis.Promise<void> {
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string")], results: [] } as $.FunctionTypeInfo))
 	p = new R({A: 30, B: 40})
 	await $.println("body", r.A, n)
-	await $.println("method value", (__goscriptAwait = sum!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println("method value", (sum!() as number))
 }
 
 export async function main(): globalThis.Promise<void> {

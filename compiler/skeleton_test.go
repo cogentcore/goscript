@@ -2692,7 +2692,9 @@ func TestCompilePackagesMarksPackageFunctionVariablesAsync(t *testing.T) {
 		"dep/dep.go": strings.Join([]string{
 			"package dep",
 			"func parse(raw string) (int, error) { return len(raw), nil }",
+			"func wait(raw string) (int, error) { ch := make(chan int, 1); ch <- len(raw); return <-ch, nil }",
 			"var Parse = parse",
+			"var Wait = wait",
 			"",
 		}, "\n"),
 		"main.go": strings.Join([]string{
@@ -3468,7 +3470,7 @@ func TestCompilePackagesAttachesFunctionLiteralTypeInfo(t *testing.T) {
 	text := string(content)
 	for _, want := range []string{
 		"export type Callback = ((value: number) => string | globalThis.Promise<string>) | null",
-		"export async function call(cb: ((value: number) => string | globalThis.Promise<string>) | null): globalThis.Promise<string> {\n\treturn cb!(1)",
+		"export function call(cb: Callback | null): string {\n\treturn (cb!(1) as string)",
 		"let zero: Callback | null = null! as Callback | null",
 		"let cb: Callback | null = (null as Callback | null)",
 		"$.functionValue((value: number): string => {",
@@ -5860,7 +5862,7 @@ func TestCompilePackagesQualifiesImportedTypesInSignaturesAndZeroValues(t *testi
 		"this.Header = init?.Header ?? (null! as lib.Header)",
 		"new lib.Box(undefined, true)",
 		"$.markAsStructValue(new atomic.Pointer<(() => void) | null>())",
-		"export async function Use(fn: ((_p0: lib.Box) => [lib.Box, $.GoError] | globalThis.Promise<[lib.Box, $.GoError]>) | null, box: lib.Box): globalThis.Promise<[lib.Box, $.GoError]>",
+		"export function Use(fn: ((_p0: lib.Box) => [lib.Box, $.GoError] | globalThis.Promise<[lib.Box, $.GoError]>) | null, box: lib.Box): [lib.Box, $.GoError]",
 		"$.functionValue((box: lib.Box): [lib.Box, $.GoError] => {",
 	} {
 		if !strings.Contains(text, want) {

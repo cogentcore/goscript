@@ -101,8 +101,8 @@ export function asNode(__typeArgs: $.GenericTypeArgs | undefined): Node | null {
 	return $.mustTypeAssert<Node | null>($.typeParamPointerInterfaceValue(newNode({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }}), __typeArgs?.["T"], "*T", /* @__PURE__ */ $.pointerType(__typeArgs?.["T"]?.type ?? { kind: $.TypeKind.Interface, methods: [] })), "main.Node")
 }
 
-export async function initAs(__typeArgs: $.GenericTypeArgs | undefined, n: Node | null, init: ((w: any) => void) | null): globalThis.Promise<void> {
-	void (__goscriptAwait = init!($.mustTypeAssert<any>((n as any), /* @__PURE__ */ $.pointerType(__typeArgs?.["T"]?.type ?? { kind: $.TypeKind.Interface, methods: [] }))), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+export function initAs(__typeArgs: $.GenericTypeArgs | undefined, n: Node | null, init: ((w: any) => void) | null): void {
+	init!($.mustTypeAssert<any>((n as any), /* @__PURE__ */ $.pointerType(__typeArgs?.["T"]?.type ?? { kind: $.TypeKind.Interface, methods: [] })))
 }
 
 export function store(__typeArgs: $.GenericTypeArgs | undefined, p: any, v: any): void {
@@ -116,7 +116,7 @@ export function load(__typeArgs: $.GenericTypeArgs | undefined, p: any): any {
 export async function main(): globalThis.Promise<void> {
 	let n = asNode(__goscriptStatic0())
 	void (__goscriptAwait = (n !== null && (n as any).__isVarRef !== true && (n as any).__goValue === undefined ? (n as Exclude<Node, null>) : $.pointerValue<Exclude<Node, null>>(n)).SetName("text"), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
-	await initAs(__goscriptStatic0(), n, $.functionValue((w: Widget | $.VarRef<Widget> | null) => {
+	initAs(__goscriptStatic0(), n, $.functionValue((w: Widget | $.VarRef<Widget> | null) => {
 		$.pointerValue<Widget>(w).Text = "hello"
 		$.pointerValue<Widget>(w).Base.inits++
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.pointerType("main.Widget")], results: [] } as $.FunctionTypeInfo)))

@@ -135,18 +135,18 @@ export async function walk(fs: Filesystem | null, path: string, info: FileInfo |
 	return null
 }
 
-export async function processWithCallback(input: string, processor: ((data: string) => [string, $.GoError] | globalThis.Promise<[string, $.GoError]>) | null): globalThis.Promise<[string, $.GoError]> {
+export function processWithCallback(input: string, processor: ProcessFunc | null): [string, $.GoError] {
 	// Test case 3: Function parameter with return values
 	// This should generate: processor!(input)
 	// But currently generates: processor(input) - missing !
-	return processor!(input)
+	return (processor!(input) as [string, $.GoError])
 }
 
-export async function maybeProcess(input: string, processor: ((data: string) => [string, $.GoError] | globalThis.Promise<[string, $.GoError]>) | null): globalThis.Promise<[string, $.GoError]> {
+export function maybeProcess(input: string, processor: OptionalProcessFunc | null): [string, $.GoError] {
 	if (processor == null) {
 		return ["nil processor", null]
 	}
-	return processor!(input)
+	return (processor!(input) as [string, $.GoError])
 }
 
 export async function main(): globalThis.Promise<void> {
@@ -172,21 +172,21 @@ export async function main(): globalThis.Promise<void> {
 		return ["processed: " + data, null]
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string")], results: [/* @__PURE__ */ $.basicType("string"), "error"] } as $.FunctionTypeInfo))
 
-	let [result, err2] = await processWithCallback("hello", processFunc)
+	let [result, err2] = processWithCallback("hello", processFunc)
 	if (err2 != null) {
 		await $.println("Process error:", (__goscriptAwait = (err2 !== null && (err2 as any).__isVarRef !== true && (err2 as any).__goValue === undefined ? (err2 as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err2)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	} else {
 		await $.println("Process result:", result)
 	}
 
-	let [result3, err3] = await maybeProcess("ignored", (null as OptionalProcessFunc | null))
+	let [result3, err3] = maybeProcess("ignored", (null as OptionalProcessFunc | null))
 	if (err3 != null) {
 		await $.println("Optional process error:", (__goscriptAwait = (err3 !== null && (err3 as any).__isVarRef !== true && (err3 as any).__goValue === undefined ? (err3 as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err3)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	} else {
 		await $.println("Optional process result:", result3)
 	}
 
-	let [result4, err4] = await maybeProcess("world", processFunc)
+	let [result4, err4] = maybeProcess("world", processFunc)
 	if (err4 != null) {
 		await $.println("Optional process error:", (__goscriptAwait = (err4 !== null && (err4 as any).__isVarRef !== true && (err4 as any).__goValue === undefined ? (err4 as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err4)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	} else {

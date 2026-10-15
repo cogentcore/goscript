@@ -35,9 +35,9 @@ export class blockType {
 		return this
 	}
 
-	public async Constructor(__typeArgs: $.GenericTypeArgs | undefined): globalThis.Promise<Block | null> {
+	public Constructor(__typeArgs: $.GenericTypeArgs | undefined): Block | null {
 		const t: blockType | $.VarRef<blockType> | null = this;
-		return $.typeParamInterfaceValue<Block | null>((__goscriptAwait = $.pointerValue<blockType>(t)._constructor!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [$.methodSignature("MarshalBlock", [], [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")), "error"]), $.methodSignature("UnmarshalBlock", [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))], ["error"])] }, zero: () => null })
+		return $.typeParamInterfaceValue<Block | null>(($.pointerValue<blockType>(t)._constructor!() as any), __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [$.methodSignature("MarshalBlock", [], [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")), "error"]), $.methodSignature("UnmarshalBlock", [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))], ["error"])] }, zero: () => null })
 	}
 
 	public GetBlockTypeID(__typeArgs: $.GenericTypeArgs | undefined): string {
@@ -92,7 +92,7 @@ export async function main(): globalThis.Promise<void> {
 	let bt = (NewBlockType(__goscriptStatic0(), "sample", $.functionValue((): sampleBlock | $.VarRef<sampleBlock> | null => {
 		return new sampleBlock()
 	}, ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.pointerType("main.sampleBlock")] } as $.FunctionTypeInfo))) as blockType | $.VarRef<blockType> | null)
-	let blk = await (bt !== null && (bt as any).__isVarRef !== true && (bt as any).__goValue === undefined ? ((bt as any) as blockType).Constructor(__goscriptStatic0()) : blockType.prototype.Constructor.call(bt, __goscriptStatic0()))
+	let blk = (bt !== null && (bt as any).__isVarRef !== true && (bt as any).__goValue === undefined ? ((bt as any) as blockType).Constructor(__goscriptStatic0()) : blockType.prototype.Constructor.call(bt, __goscriptStatic0()))
 	let __goscriptTuple0: any = await (blk !== null && (blk as any).__isVarRef !== true && (blk as any).__goValue === undefined ? (blk as Exclude<Block, null>) : $.pointerValue<Exclude<Block, null>>(blk)).MarshalBlock()
 	let data: $.Slice<number> = __goscriptTuple0[0]
 	await $.println((bt !== null && (bt as any).__isVarRef !== true && (bt as any).__goValue === undefined ? ((bt as any) as blockType).GetBlockTypeID(__goscriptStatic0()) : blockType.prototype.GetBlockTypeID.call(bt, __goscriptStatic0())), $.sliceLen(data))
@@ -102,8 +102,6 @@ var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
 	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.pointerType("main.sampleBlock"), zero: () => null, methods: {MarshalBlock: (receiver: any) => $.pointerValue(receiver).MarshalBlock(), UnmarshalBlock: (receiver: any, ...args: any[]) => $.pointerValue(receiver).UnmarshalBlock(...$.stripGenericTypeArgs(args))} }})
 }
-
-var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

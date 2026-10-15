@@ -72,8 +72,8 @@ export class Host {
 		}
 		return $.functionValue(async (n: number): globalThis.Promise<[number, $.GoError]> => {
 			let snap = new Snapshot({base: 10})
-			return await Snapshot.prototype.Apply.call(snap, n, $.functionValue(async (n: number): globalThis.Promise<[$.VarRef<number> | null, $.Slice<number>, $.GoError]> => {
-				return await ($.pointerValue<Process>(cb))!(snap, n)
+			return Snapshot.prototype.Apply.call(snap, n, $.functionValue(async (n: number): globalThis.Promise<[$.VarRef<number> | null, $.Slice<number>, $.GoError]> => {
+				return ($.pointerValue<Process>(cb))!(snap, n)
 			}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int")), /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")), "error"] } as $.FunctionTypeInfo)))
 		}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int"), "error"] } as $.FunctionTypeInfo))
 	}

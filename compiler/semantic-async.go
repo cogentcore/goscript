@@ -3,7 +3,6 @@ package compiler
 import (
 	"context"
 	"go/ast"
-	"go/token"
 	"go/types"
 	"slices"
 
@@ -11,12 +10,11 @@ import (
 )
 
 // asyncArgumentCallSite is a call that passes function arguments to a callee
-// with a body. The callee becomes async when the call always suspends or when
-// any function in deps becomes async.
+// with a body. The callee becomes async when any function, literal or value
+// class in deps becomes async.
 type asyncArgumentCallSite struct {
-	semFn    *semanticFunction
-	suspends bool
-	deps     []*types.Func
+	semFn *semanticFunction
+	deps  []*types.Func
 }
 
 // interfaceAsyncEdges lists the distinct interface methods that each
@@ -36,19 +34,21 @@ func (e interfaceAsyncEdges) add(implFn *semanticFunction, ifaceMethod *types.Fu
 }
 
 // asyncArgumentCall is a call in one package that passes function arguments
-// whose async marks can make the callee async.
+// whose async marks can make the callee async: declared functions and
+// literal nodes in deps, and values of the shapes in shapes.
 type asyncArgumentCall struct {
-	called   *types.Func
-	suspends bool
-	deps     []*types.Func
+	called *types.Func
+	deps   []*types.Func
+	shapes []string
 }
 
 // collectAsyncArgumentCalls finds the calls in pkg whose function arguments
-// can make the callee async.
-func collectAsyncArgumentCalls(pkg *packages.Package) []asyncArgumentCall {
+// can make the callee async. literalKey returns the key of a literal's node.
+func collectAsyncArgumentCalls(pkg *packages.Package, literalKey func(*ast.FuncLit) *types.Func) []asyncArgumentCall {
 	var calls []asyncArgumentCall
 	for _, file := range pkg.Syntax {
 		ast.Inspect(file, func(node ast.Node) bool {
+			// Only a call of a declared function qualifies.
 			expr, ok := node.(*ast.CallExpr)
 			if !ok {
 				return true
@@ -57,10 +57,12 @@ func collectAsyncArgumentCalls(pkg *packages.Package) []asyncArgumentCall {
 			if called == nil {
 				return true
 			}
+
+			// Record the call when a function argument can decide it.
 			signature, _ := called.Type().(*types.Signature)
-			suspends, deps := asyncArgumentFacts(pkg, signature, expr.Args)
-			if suspends || len(deps) != 0 {
-				calls = append(calls, asyncArgumentCall{called: called, suspends: suspends, deps: deps})
+			deps, shapes := asyncArgumentFacts(pkg, signature, expr.Args, literalKey)
+			if len(deps) != 0 || len(shapes) != 0 {
+				calls = append(calls, asyncArgumentCall{called: called, deps: deps, shapes: shapes})
 			}
 			return true
 		})
@@ -69,7 +71,7 @@ func collectAsyncArgumentCalls(pkg *packages.Package) []asyncArgumentCall {
 }
 
 // asyncArgumentCallSites resolves every package's async argument calls to the
-// callees with a body.
+// callees with a body, and their shapes to the value classes.
 func asyncArgumentCallSites(model *SemanticModel) []asyncArgumentCallSite {
 	var sites []asyncArgumentCallSite
 	for _, semPkg := range model.packages {
@@ -78,30 +80,37 @@ func asyncArgumentCallSites(model *SemanticModel) []asyncArgumentCallSite {
 			if semFn == nil || !semFn.hasBody {
 				continue
 			}
-			sites = append(sites, asyncArgumentCallSite{
-				semFn:    semFn,
-				suspends: call.suspends,
-				deps:     call.deps,
-			})
+			deps := slices.Clone(call.deps)
+			for _, shape := range call.shapes {
+				deps = append(deps, model.funcValueClasses[shape])
+			}
+			sites = append(sites, asyncArgumentCallSite{semFn: semFn, deps: deps})
 		}
 	}
 	return sites
 }
 
 // asyncArgumentFacts inspects the arguments passed to function-typed
-// parameters. It reports whether one always suspends, and otherwise the
-// functions whose async marks decide whether one needs an await. The rules
-// match exprMayNeedAwait.
+// parameters and returns what decides whether one may suspend: the declared
+// functions and literal nodes in deps, and the shapes of any other function
+// values, whose classes decide them.
 //
 // Deps are function origins. Coloring resolves a generic instance and its
 // origin to the same semantic function and full name, and an origin is a
 // declared object a body summary can name.
-func asyncArgumentFacts(pkg *packages.Package, signature *types.Signature, args []ast.Expr) (bool, []*types.Func) {
+func asyncArgumentFacts(
+	pkg *packages.Package,
+	signature *types.Signature,
+	args []ast.Expr,
+	literalKey func(*ast.FuncLit) *types.Func,
+) ([]*types.Func, []string) {
+	// Only arguments of function-typed parameters count.
 	if signature == nil || signature.Params() == nil {
-		return false, nil
+		return nil, nil
 	}
 	params := signature.Params()
 	var deps []*types.Func
+	var shapes []string
 	for idx, arg := range args {
 		paramIdx := idx
 		if signature.Variadic() && idx >= params.Len()-1 {
@@ -110,109 +119,79 @@ func asyncArgumentFacts(pkg *packages.Package, signature *types.Signature, args 
 		if paramIdx < 0 || paramIdx >= params.Len() || signatureForType(params.At(paramIdx).Type()) == nil {
 			continue
 		}
-		if called := calledFunction(pkg, arg); called != nil {
-			deps = append(deps, functionOriginOrSelf(called))
-			continue
-		}
-		lit, ok := arg.(*ast.FuncLit)
-		if !ok {
-			continue
-		}
-		suspends := false
-		ast.Inspect(lit.Body, func(node ast.Node) bool {
-			switch typed := node.(type) {
-			case *ast.FuncLit:
-				return false
-			case *ast.SendStmt, *ast.SelectStmt:
-				suspends = true
-			case *ast.UnaryExpr:
-				suspends = typed.Op == token.ARROW
-			case *ast.CallExpr:
-				if callUsesFunctionValue(pkg, typed.Fun) || callUsesFunctionIdentifier(pkg, typed.Fun) {
-					suspends = true
-				} else if called := calledFunction(pkg, typed.Fun); called != nil {
-					deps = append(deps, functionOriginOrSelf(called))
-				}
-			}
-			return !suspends
-		})
-		if suspends {
-			return true, nil
+
+		// A literal or a declared function decides itself; any other value
+		// is decided by its class.
+		if dep := asyncArgumentDep(pkg, arg, literalKey); dep != nil {
+			deps = append(deps, dep)
+		} else if shape := funcValueShape(pkg.TypesInfo.TypeOf(arg)); shape != "" {
+			shapes = append(shapes, shape)
 		}
 	}
-	return false, deps
+	return deps, shapes
 }
 
-// funcLiteralUsesAwaitableCall reports whether lit calls a function variable
-// or an interface method in its own body. Either may reach an implementation
-// that suspends, so the literal awaits it once it is lowered async.
-func funcLiteralUsesAwaitableCall(pkg *packages.Package, lit *ast.FuncLit) bool {
-	if pkg == nil || lit == nil || lit.Body == nil {
-		return false
+// asyncArgumentDep returns the node that decides whether arg may suspend
+// when called: its literal node, or the origin of the declared function or
+// method it names. It returns nil for any other value, such as a method of
+// an interface.
+func asyncArgumentDep(pkg *packages.Package, arg ast.Expr, literalKey func(*ast.FuncLit) *types.Func) *types.Func {
+	// A literal has its own node.
+	if lit, ok := ast.Unparen(arg).(*ast.FuncLit); ok {
+		return literalKey(lit)
 	}
-	uses := false
-	ast.Inspect(lit.Body, func(node ast.Node) bool {
-		switch typed := node.(type) {
-		case *ast.FuncLit:
-			return false
-		case *ast.CallExpr:
-			uses = callUsesFunctionIdentifier(pkg, typed.Fun) || callUsesInterfaceMethod(pkg, typed.Fun)
-		}
-		return !uses
-	})
-	return uses
+
+	// A declared function or method decides itself, but an interface
+	// method is any of its implementations.
+	called := calledFunction(pkg, arg)
+	if called == nil {
+		return nil
+	}
+	if signature, _ := called.Type().(*types.Signature); signature != nil &&
+		signature.Recv() != nil && isInterfaceType(signature.Recv().Type()) {
+		return nil
+	}
+	return functionOriginOrSelf(called)
 }
 
-// callbackOverrideCallFacts reports whether a call to an override function
-// that metadata marks callback async always suspends, and otherwise the
-// functions whose async marks decide whether it does. It reports ok false for
-// any other call. A function value argument always suspends, as calling it
-// does, and so does a literal that calls a function variable or an interface
-// method.
+// callbackOverrideCallFacts returns what decides whether a call to an
+// override function that metadata marks callback async suspends: the
+// declared functions and literal nodes in deps, and the classes of the
+// shapes. It reports ok false for any other call.
 func callbackOverrideCallFacts(
 	pkg *packages.Package,
 	overrideFacts *OverrideFacts,
 	call *ast.CallExpr,
-) (ok, suspends bool, deps []*types.Func) {
+	literalKey func(*ast.FuncLit) *types.Func,
+) (ok bool, deps []*types.Func, shapes []string) {
 	// Only a callback async override function qualifies.
 	called := calledFunction(pkg, call.Fun)
 	if called == nil || called.Pkg() == nil ||
 		!overrideFacts.IsFunctionCallbackAsync(called.Pkg().Path(), called.Name()) {
-		return false, false, nil
+		return false, nil, nil
 	}
 
-	// A function value always suspends; literals and declared functions decide.
+	// Its function arguments decide it.
 	signature, _ := called.Type().(*types.Signature)
-	for _, arg := range call.Args {
-		lit, _ := arg.(*ast.FuncLit)
-		if callUsesFunctionValue(pkg, arg) || callUsesFunctionIdentifier(pkg, arg) ||
-			funcLiteralUsesAwaitableCall(pkg, lit) {
-			return true, true, nil
-		}
-	}
-	suspends, deps = asyncArgumentFacts(pkg, signature, call.Args)
-	return true, suspends, deps
+	deps, shapes = asyncArgumentFacts(pkg, signature, call.Args, literalKey)
+	return true, deps, shapes
 }
 
-// recordCallbackOverrideCall colors semFn for a call to a callback async
-// override: async now when the call always suspends, and otherwise through a
-// recorded call to each function that decides it.
+// recordCallbackOverrideCall records a call to a callback async override as
+// calls of what decides it.
 func recordCallbackOverrideCall(
 	pkg *packages.Package,
 	overrideFacts *OverrideFacts,
 	semFn *semanticFunction,
 	call *ast.CallExpr,
+	literalKey func(*ast.FuncLit) *types.Func,
 ) {
-	ok, suspends, deps := callbackOverrideCallFacts(pkg, overrideFacts, call)
-	if !ok {
-		return
-	}
-	if suspends {
-		markFunctionAsync(semFn)
-		return
-	}
+	_, deps, shapes := callbackOverrideCallFacts(pkg, overrideFacts, call, literalKey)
 	for _, dep := range deps {
 		semFn.calls[dep] = true
+	}
+	for _, shape := range shapes {
+		recordValueCall(semFn, shape)
 	}
 }
 
@@ -253,8 +232,10 @@ type asyncColoring struct {
 	// overrideFuncsByMethod lists the override functions each compiled method
 	// makes async, per asyncWhenMethods metadata.
 	overrideFuncsByMethod map[*types.Func][]*types.Func
-	visited               map[*types.Func]bool
-	queue                 []*types.Func
+	// values connects function values to classes of calls through values.
+	values  *funcValueGraph
+	visited map[*types.Func]bool
+	queue   []*types.Func
 }
 
 // asyncRoots are the causes of async marks that the coloring seeds, besides
@@ -266,6 +247,9 @@ type asyncRoots struct {
 	// openMethods are the called interface methods that the implementation
 	// graph does not color; each makes its callers async.
 	openMethods []*types.Func
+	// values connects function values to the classes of calls that may
+	// reach them; its open classes and async values are roots.
+	values *funcValueGraph
 }
 
 // colorAsyncFunctions marks every function and interface method that can
@@ -298,6 +282,7 @@ func colorAsyncFunctions(
 		sitesByDep:            make(map[*types.Func][]*semanticFunction),
 		visited:               make(map[*types.Func]bool),
 		overrideFuncsByMethod: make(map[*types.Func][]*types.Func),
+		values:                roots.values,
 	}
 	for fn, semFn := range model.functions {
 		signature, _ := fn.Type().(*types.Signature)
@@ -326,6 +311,17 @@ func colorAsyncFunctions(
 		}
 	}
 
+	// Register the value nodes, the function values and the classes.
+	for key := range model.valueNodes {
+		c.register(key)
+	}
+	for _, key := range roots.values.members {
+		c.register(key)
+	}
+	for _, class := range model.funcValueClasses {
+		c.register(class)
+	}
+
 	// Seed the functions that their packages marked async, and the interface
 	// methods they implement.
 	for key := range c.registered {
@@ -342,11 +338,13 @@ func colorAsyncFunctions(
 		}
 	}
 
-	// Seed the argument sites that always suspend.
-	for _, site := range roots.sites {
-		if site.suspends {
-			c.markFunction(site.semFn)
-		}
+	// Seed the open classes and the function values that are async by
+	// themselves.
+	for _, class := range roots.values.open {
+		c.markClass(class)
+	}
+	for _, key := range roots.values.asyncMembers {
+		c.visit(key)
 	}
 
 	// Seed the callers of open interface methods. The method itself stays
@@ -359,7 +357,8 @@ func colorAsyncFunctions(
 
 	// Propagate each new mark along its edges: to callers, to the anonymous
 	// interface methods a key implements, to the callees of argument sites
-	// that pass it, and to the override functions asyncWhenMethods names.
+	// that pass it, to the override functions asyncWhenMethods names, and to
+	// the classes of calls through values that may reach it.
 	for len(c.queue) != 0 {
 		if err := ctx.Err(); err != nil {
 			return []Diagnostic{contextCanceledDiagnostic(err)}
@@ -381,6 +380,9 @@ func colorAsyncFunctions(
 			if model.markOverrideFunctionAsync(overrideFn) {
 				c.visit(overrideFn)
 			}
+		}
+		for _, class := range c.values.classesByMember[key] {
+			c.markClass(class)
 		}
 	}
 	return nil
@@ -422,6 +424,16 @@ func (c *asyncColoring) markFunction(semFn *semanticFunction) {
 	for _, ifaceMethod := range c.ifaceEdges[semFn] {
 		c.markInterfaceMethod(ifaceMethod)
 	}
+}
+
+// markClass marks a class of calls through function values async and visits
+// it, so that its callers follow.
+func (c *asyncColoring) markClass(class *types.Func) {
+	if class == nil || c.model.asyncValueClasses[class] {
+		return
+	}
+	c.model.asyncValueClasses[class] = true
+	c.visit(class)
 }
 
 // markInterfaceMethod colors an interface method whose implementation is async.

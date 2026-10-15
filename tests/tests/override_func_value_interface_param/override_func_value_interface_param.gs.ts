@@ -34,21 +34,21 @@ $.registerInterfaceType(
 export type EncoderFunc = ((w: io.Writer | null) => Encoder | null | globalThis.Promise<Encoder | null>) | null
 
 export function NewDecoderFunc(__typeArgs: $.GenericTypeArgs | undefined, f: ((r: io.Reader | null) => any | globalThis.Promise<any>) | null): DecoderFunc | null {
-	return $.functionValue(async (r: io.Reader | null): globalThis.Promise<Decoder | null> => {
-		return $.typeParamInterfaceValue<Decoder | null>((__goscriptAwait = f!(r), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [$.methodSignature("Decode", [["v", { kind: $.TypeKind.Interface, methods: [] }]], ["error"])] }, zero: () => null })
+	return $.functionValue((r: io.Reader | null): Decoder | null => {
+		return $.typeParamInterfaceValue<Decoder | null>((f!(r) as any), __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [$.methodSignature("Decode", [["v", { kind: $.TypeKind.Interface, methods: [] }]], ["error"])] }, zero: () => null })
 	}, ({ kind: $.TypeKind.Function, params: ["io.Reader"], results: ["main.Decoder"] } as $.FunctionTypeInfo))
 }
 
 export function NewEncoderFunc(__typeArgs: $.GenericTypeArgs | undefined, f: ((w: io.Writer | null) => any | globalThis.Promise<any>) | null): EncoderFunc | null {
-	return $.functionValue(async (w: io.Writer | null): globalThis.Promise<Encoder | null> => {
-		return $.typeParamInterfaceValue<Encoder | null>((__goscriptAwait = f!(w), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [$.methodSignature("Encode", [["v", { kind: $.TypeKind.Interface, methods: [] }]], ["error"])] }, zero: () => null })
+	return $.functionValue((w: io.Writer | null): Encoder | null => {
+		return $.typeParamInterfaceValue<Encoder | null>((f!(w) as any), __typeArgs?.["T"] ?? { type: { kind: $.TypeKind.Interface, methods: [$.methodSignature("Encode", [["v", { kind: $.TypeKind.Interface, methods: [] }]], ["error"])] }, zero: () => null })
 	}, ({ kind: $.TypeKind.Function, params: ["io.Writer"], results: ["main.Encoder"] } as $.FunctionTypeInfo))
 }
 
 export async function decode(f: ((r: io.Reader | null) => Decoder | null | globalThis.Promise<Decoder | null>) | null, s: string): globalThis.Promise<void> {
 	let v: $.VarRef<globalThis.Map<string, number> | null> = $.varRef(null! as globalThis.Map<string, number> | null)
 	{
-		let err = (__goscriptAwait = $.pointerValue<Exclude<Decoder, null>>((__goscriptAwait = f!($.interfaceValue<io.Reader | null>(strings.NewReader(s), "*strings.Reader", /* @__PURE__ */ $.pointerType("strings.Reader"))), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)).Decode($.interfaceValue(v, "*map[string]int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("int"))))), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+		let err = (__goscriptAwait = $.pointerValue<Exclude<Decoder, null>>((f!($.interfaceValue<io.Reader | null>(strings.NewReader(s), "*strings.Reader", /* @__PURE__ */ $.pointerType("strings.Reader"))) as Decoder | null)).Decode($.interfaceValue(v, "*map[string]int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("int"))))), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 		if (err != null) {
 			await $.println("error:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 			return
@@ -60,7 +60,7 @@ export async function decode(f: ((r: io.Reader | null) => Decoder | null | globa
 export async function writeBytes(v: any, f: ((w: io.Writer | null) => Encoder | null | globalThis.Promise<Encoder | null>) | null): globalThis.Promise<string> {
 	let b = $.varRef($.markAsStructValue(new bytes.Buffer()))
 	{
-		let err = (__goscriptAwait = $.pointerValue<Exclude<Encoder, null>>((__goscriptAwait = f!($.interfaceValue<io.Writer | null>(b, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer"))), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)).Encode(v), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+		let err = (__goscriptAwait = $.pointerValue<Exclude<Encoder, null>>((f!($.interfaceValue<io.Writer | null>(b, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer"))) as Encoder | null)).Encode(v), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 		if (err != null) {
 			return "error: " + (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 		}
@@ -73,14 +73,14 @@ export async function main(): globalThis.Promise<void> {
 
 	let newDecoder: ((r: io.Reader | null) => json.Decoder | $.VarRef<json.Decoder> | null | globalThis.Promise<json.Decoder | $.VarRef<json.Decoder> | null>) | null = ((__goscriptFn: typeof json.NewDecoder) => (__goscriptArg0: io.Reader | null) => __goscriptFn($.pointerValueOrNil(__goscriptArg0)!))(json.NewDecoder)
 	let v: $.VarRef<globalThis.Map<string, number> | null> = $.varRef(null! as globalThis.Map<string, number> | null)
-	await json.Decoder.prototype.Decode.call($.pointerValue<json.Decoder>(((__goscriptAwait = newDecoder!($.interfaceValue<io.Reader | null>(strings.NewReader("{\"a\": 2}"), "*strings.Reader", /* @__PURE__ */ $.pointerType("strings.Reader"))), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as json.Decoder | $.VarRef<json.Decoder> | null)), $.interfaceValue(v, "*map[string]int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("int")))))
+	await json.Decoder.prototype.Decode.call($.pointerValue<json.Decoder>((newDecoder!($.interfaceValue<io.Reader | null>(strings.NewReader("{\"a\": 2}"), "*strings.Reader", /* @__PURE__ */ $.pointerType("strings.Reader"))) as json.Decoder | $.VarRef<json.Decoder> | null)), $.interfaceValue(v, "*map[string]int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("int")))))
 	await $.println($.mapGet<string, number, number>(v.value, "a", 0)[0])
 
 	// The writer is a pointer to a local variable.
 	await $.print(await writeBytes($.interfaceValue($.makeMap<string, number>([["b", 3]]), "map[string]int", /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("int"))), NewEncoderFunc(__goscriptStatic1(), ((__goscriptFn: typeof json.NewEncoder) => (__goscriptArg0: io.Writer | null) => __goscriptFn($.pointerValueOrNil(__goscriptArg0)!))(json.NewEncoder))))
 	let newEncoder: ((w: io.Writer | null) => json.Encoder | $.VarRef<json.Encoder> | null | globalThis.Promise<json.Encoder | $.VarRef<json.Encoder> | null>) | null = ((__goscriptFn: typeof json.NewEncoder) => (__goscriptArg0: io.Writer | null) => __goscriptFn($.pointerValueOrNil(__goscriptArg0)!))(json.NewEncoder)
 	let buf = $.varRef($.markAsStructValue(new bytes.Buffer()))
-	await json.Encoder.prototype.Encode.call($.pointerValue<json.Encoder>(((__goscriptAwait = newEncoder!($.interfaceValue<io.Writer | null>(buf, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer"))), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as json.Encoder | $.VarRef<json.Encoder> | null)), $.interfaceValue($.arrayToSlice<number>([4, 5]), "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"))))
+	await json.Encoder.prototype.Encode.call($.pointerValue<json.Encoder>((newEncoder!($.interfaceValue<io.Writer | null>(buf, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer"))) as json.Encoder | $.VarRef<json.Encoder> | null)), $.interfaceValue($.arrayToSlice<number>([4, 5]), "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"))))
 	await $.print(buf.value.String())
 }
 

@@ -4,5 +4,10 @@
     "Value.Call": true,
     "Value.CallSlice": true,
     "Value.Recv": true
+  },
+  "funcValueMakers": {
+    "MakeFunc": true,
+    "Value.Method": true,
+    "Value.MethodByName": true
   }
 }

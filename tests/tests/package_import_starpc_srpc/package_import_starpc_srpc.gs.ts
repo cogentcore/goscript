@@ -242,7 +242,7 @@ export class memoryRpcStream {
 		const m$: memoryRpcStream = m == null ? $.pointerTarget<memoryRpcStream>(m) : (m as any).__isVarRef === true ? (m as any).value : (m as any).__goValue === undefined ? (m as any) : $.pointerTarget<memoryRpcStream>(m)
 		await (m !== null && (m as any).__isVarRef !== true && (m as any).__goValue === undefined ? ((m as any) as memoryRpcStream).CloseSend() : memoryRpcStream.prototype.CloseSend.call(m))
 		await (m$ as memoryRpcStream).cancelLocal.Do($.functionValue(async () => {
-			await (m$ as memoryRpcStream).cancel!()
+			void (__goscriptAwait = (m$ as memoryRpcStream).cancel!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 		}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)))
 		return null
 	}
@@ -623,8 +623,8 @@ export async function probeStream(ctx: context.Context | null, client: srpc.Clie
 	return [$.arrayIndex(data!, 0), null]
 }
 
-export function newRoutedRpcStreamClient(ctx: context.Context | null, componentID: string, getter: rpcstream.RpcStreamGetter | null, waitAck: boolean, results: $.Channel<rpcStreamServerResult> | null): srpc.Client | null {
-	return rpcstream.NewRpcStreamClient(__goscriptStatic0(), $.functionValue((callCtx: context.Context | null): [memoryRpcStream | $.VarRef<memoryRpcStream> | null, $.GoError] => {
+export async function newRoutedRpcStreamClient(ctx: context.Context | null, componentID: string, getter: ((ctx: context.Context | null, componentID: string, released: (() => void) | null) => [srpc.Invoker | null, (() => void) | null, $.GoError] | globalThis.Promise<[srpc.Invoker | null, (() => void) | null, $.GoError]>) | null, waitAck: boolean, results: $.Channel<rpcStreamServerResult> | null): globalThis.Promise<srpc.Client | null> {
+	return rpcstream.NewRpcStreamClient(__goscriptStatic0(), $.functionValue(async (callCtx: context.Context | null): globalThis.Promise<[memoryRpcStream | $.VarRef<memoryRpcStream> | null, $.GoError]> => {
 		let __goscriptTuple4: any = newMemoryRpcStreamPair()
 		let client: memoryRpcStream | $.VarRef<memoryRpcStream> | null = __goscriptTuple4[0]
 		let server: memoryRpcStream | $.VarRef<memoryRpcStream> | null = __goscriptTuple4[1]
@@ -696,7 +696,7 @@ export async function exerciseRpcStreamClientPressure(ctx: context.Context | nul
 		return [(mux as srpc.Invoker | null), (null as (() => void) | null), null]
 	}, ({ kind: $.TypeKind.Function, params: ["context.Context", /* @__PURE__ */ $.basicType("string"), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)], results: ["srpc.Invoker", ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "error"] } as $.FunctionTypeInfo))
 
-	let rootClient = newRoutedRpcStreamClient(ctx, "component-root", getter, true, results)
+	let rootClient = await newRoutedRpcStreamClient(ctx, "component-root", getter, true, results)
 	let __goscriptTuple5: any = await openHeldStreams(ctx, rootClient, 64)
 	let held: $.Slice<srpc.Stream | null> = __goscriptTuple5[0]
 	let ok = __goscriptTuple5[1]
@@ -704,7 +704,7 @@ export async function exerciseRpcStreamClientPressure(ctx: context.Context | nul
 		return false
 	}
 
-	let spaceClient = newRoutedRpcStreamClient(ctx, "component-space", getter, true, results)
+	let spaceClient = await newRoutedRpcStreamClient(ctx, "component-space", getter, true, results)
 	if (!await probeConcurrentStreams(ctx, spaceClient, 16)) {
 		return false
 	}
@@ -970,7 +970,7 @@ export async function main(): globalThis.Promise<void> {
 	$.functionValue(async (strm: srpc.StreamRecv | null): globalThis.Promise<$.GoError> => await recvOne(__goscriptStatic4(), strm), ({ kind: $.TypeKind.Function, params: ["srpc.StreamRecv"], results: ["error"] } as $.FunctionTypeInfo))
 	srpc.NewRawMessage(new Uint8Array([1, 2, 3]) as $.Slice<number>, true)
 	let server = srpc.NewServer((mux as srpc.Invoker | null))
-	let client = srpc.NewClient(srpc.NewServerPipe(server))
+	let client = await srpc.NewClient(srpc.NewServerPipe(server))
 	let unaryResp = srpc.NewRawMessage(null, false)
 	let err = (__goscriptAwait = (client !== null && (client as any).__isVarRef !== true && (client as any).__goValue === undefined ? (client as Exclude<srpc.Client, null>) : $.pointerValue<Exclude<srpc.Client, null>>(client)).ExecCall(ctx, "svc", "method", $.interfaceValue<srpc.Message | null>(srpc.NewRawMessage(null, false), "*srpc.RawMessage", /* @__PURE__ */ $.pointerType("srpc.RawMessage")), $.interfaceValue<srpc.Message | null>(unaryResp, "*srpc.RawMessage", /* @__PURE__ */ $.pointerType("srpc.RawMessage"))), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 	if (err != null) {

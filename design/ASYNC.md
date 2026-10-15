@@ -79,6 +79,41 @@ distinguishes:
 A library build keeps every exported interface open
 (`SemanticBuildOptions.WholeProgram` false).
 
+### Calls Through Function Values
+
+A call through a function value (a variable, field, parameter, element, call
+result or type assertion of func type) is colored by the function values the
+program takes (`compiler/semantic-func-values.go`,
+`compiler/semantic-func-classes.go`, `compiler/semantic-func-shape.go`):
+
+- The values are declared functions and methods named outside a call,
+  method values and method expressions (including interface methods),
+  function literals, and the body of each range-over-func loop, which is the
+  yield callback.
+- Calls and values are grouped by the shape of their underlying signature.
+  Each called shape is a class with a synthetic key; a call through a value
+  is a call of its class, and a class is async when a value whose shape
+  matches is async. A type parameter matches any type, so calls and values
+  in generic code match conservatively.
+- Function literals and the initializers of lazily initialized package
+  variables are nodes of the analysis like declared functions. A literal is
+  lowered async exactly when the analysis colors it async. A function that
+  reads a lazily initialized variable waits for its initializer.
+- Function values from override packages (function results, func-typed
+  fields and variables, and the callbacks an override passes to Go
+  functions) suspend only by calling the Go functions they were given: their
+  own function parameters and those of the function that produced them.
+- A func type asserted from an interface value keeps its classes async when
+  the program uses a function that override metadata lists in
+  `funcValueMakers` (`reflect.MakeFunc`, `reflect.Value.MethodByName`),
+  since reflection can make a function of any type.
+- The iteration reaches one fixed point with the interface coloring: an async
+  implementation can make a function value async and the reverse.
+
+A library build keeps every class async. A call through a value of a sync
+class is not awaited, and its result is asserted to its Go type, since the
+TypeScript type of a function value admits a promise.
+
 ### Implementation Analysis Flow
 
 ```

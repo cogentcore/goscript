@@ -13,15 +13,13 @@ export async function main(): globalThis.Promise<void> {
 	cancel1 = __goscriptAssign0_0
 	cancel2 = __goscriptAssign0_1
 	if (cancel1 != null) {
-		void (__goscriptAwait = cancel1!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+		cancel1!()
 	}
 	if (cancel2 != null) {
-		void (__goscriptAwait = cancel2!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+		cancel2!()
 	}
 	await $.println("ok")
 }
-
-var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

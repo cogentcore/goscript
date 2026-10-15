@@ -172,7 +172,7 @@ export class MorphismHolder {
 
 	public async cloneApply(s: Shape | null): globalThis.Promise<number> {
 		const h: MorphismHolder | $.VarRef<MorphismHolder> | null = this;
-		return (__goscriptAwait = $.pointerValue<Exclude<Shape, null>>((__goscriptAwait = $.pointerValue<MorphismHolder>(cloneMorphism($.pointerValue<MorphismHolder>(h).morphism)).morphism!(s), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)).Stats(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+		return (__goscriptAwait = $.pointerValue<Exclude<Shape, null>>((__goscriptAwait = $.pointerValue<MorphismHolder>(await cloneMorphism($.pointerValue<MorphismHolder>(h).morphism)).morphism!(s), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)).Stats(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -291,7 +291,7 @@ export async function newMorphismHolder(m: ((_p0: Shape | null) => Shape | null 
 	return new MorphismHolder({morphism: m})
 }
 
-export function cloneMorphism(m: Morphism | null): MorphismHolder | $.VarRef<MorphismHolder> | null {
+export async function cloneMorphism(m: ((_p0: Shape | null) => Shape | null | globalThis.Promise<Shape | null>) | null): globalThis.Promise<MorphismHolder | $.VarRef<MorphismHolder> | null> {
 	return new MorphismHolder({morphism: m})
 }
 

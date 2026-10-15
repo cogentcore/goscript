@@ -1031,10 +1031,11 @@ func cacheFactsArtifactKeys(t *testing.T, moduleDir string) map[string]string {
 }
 
 // TestCompilePackagesCacheWholeProgramRecolorsDependency compiles the facts
-// fixture as a program, where dep.Runner is closed over the compiled graph.
-// An async implementation added in the main package makes dep.Use async, so
-// the dependency's cached output must not be reused, and reverting the edit
-// makes dep.Use sync again.
+// fixture as a program, where dep.Runner is closed over the compiled graph
+// and calls through func() values reach only the program's values. An async
+// implementation added in the main package makes dep.Use async, and an async
+// callback makes dep.Call async, so the dependency's cached output must not
+// be reused, and reverting the edit makes both sync again.
 func TestCompilePackagesCacheWholeProgramRecolorsDependency(t *testing.T) {
 	// The main package completes the fixture as a program.
 	program := func(decls string) map[string]string {
@@ -1047,13 +1048,16 @@ func TestCompilePackagesCacheWholeProgramRecolorsDependency(t *testing.T) {
 
 	// Each edit compiles with and without the cache.
 	for _, edit := range []struct {
-		name     string
-		decls    string
-		asyncUse bool
+		name      string
+		decls     string
+		asyncUse  bool
+		asyncCall bool
 	}{
 		{name: "sync", decls: cacheFactsDecls},
 		{name: "async implementation", decls: cacheFactsAsyncDecls, asyncUse: true},
 		{name: "revert", decls: cacheFactsDecls},
+		{name: "async callback", decls: cacheFactsCallbackDecls, asyncCall: true},
+		{name: "revert callback", decls: cacheFactsDecls},
 	} {
 		writeFixtureFile(t, moduleDir, "main.go", program(edit.decls)["main.go"])
 		cachedOut := filepath.Join(t.TempDir(), "cached")
@@ -1061,8 +1065,8 @@ func TestCompilePackagesCacheWholeProgramRecolorsDependency(t *testing.T) {
 		freshOut := filepath.Join(t.TempDir(), "fresh")
 		compileCacheFixtureConfig(t, Config{}, moduleDir, freshOut, "")
 
-		// The cached output matches a fresh compile, and dep.Use is colored
-		// by the implementation.
+		// The cached output matches a fresh compile, dep.Use is colored by
+		// the implementation, and dep.Call by the program's func() values.
 		cached := outputTreeSnapshot(t, cachedOut)
 		if fresh := outputTreeSnapshot(t, freshOut); cached != fresh {
 			t.Fatalf("%s: cached output differs from fresh compile:\ncached:\n%s\nfresh:\n%s", edit.name, cached, fresh)
@@ -1070,6 +1074,9 @@ func TestCompilePackagesCacheWholeProgramRecolorsDependency(t *testing.T) {
 		dep := readOutputFile(t, cachedOut, "example.test/cachefacts/dep", "dep.gs.ts")
 		if got := strings.Contains(dep, "export async function Use("); got != edit.asyncUse {
 			t.Fatalf("%s: dep.Use async %v, want %v:\n%s", edit.name, got, edit.asyncUse, dep)
+		}
+		if got := strings.Contains(dep, "export async function Call("); got != edit.asyncCall {
+			t.Fatalf("%s: dep.Call async %v, want %v:\n%s", edit.name, got, edit.asyncCall, dep)
 		}
 	}
 }

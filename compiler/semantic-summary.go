@@ -4,6 +4,7 @@ import (
 	"go/ast"
 	"go/token"
 	"go/types"
+	"maps"
 	"slices"
 	"strconv"
 	"strings"
@@ -54,13 +55,31 @@ type bodySummary struct {
 	asyncArgumentCalls []summaryAsyncArgumentCall
 	// lazyVars holds the package variables initialized lazily.
 	lazyVars []string
+	// funcValues holds the function values the package takes.
+	funcValues []summaryFuncValue
+	// assertedFuncShapes and topValueCalls hold the shapes of the func types
+	// the package asserts and calls through outside function bodies.
+	assertedFuncShapes []string
+	topValueCalls      []string
 }
 
+// summaryFunction holds the facts of one node: a declared function (kind
+// func, keyed by its object key), a function literal (kind lit, keyed by its
+// file and offset) or a lazy initializer (kind init, keyed by its variable's
+// object key). Calls name nodes by summary references (see summaryKeys.ref).
 type summaryFunction struct {
+	kind        string
 	key         string
 	async       bool
 	calls       []string
 	packageVars []string
+	valueCalls  []string
+}
+
+// summaryFuncValue is a function value by shape and node reference.
+type summaryFuncValue struct {
+	shape string
+	ref   string
 }
 
 type summaryLiteral struct {
@@ -81,10 +100,17 @@ type summaryType struct {
 }
 
 type summaryAsyncArgumentCall struct {
-	called   string
-	suspends bool
-	deps     []string
+	called string
+	deps   []string
+	shapes []string
 }
+
+// Summary references to synthetic nodes start with a prefix no object key
+// has, since an object key starts with a package path.
+const (
+	summaryLiteralRefPrefix = "@lit "
+	summaryInitRefPrefix    = "@init "
+)
 
 // objectKey names obj by its package path and objectFactID.
 func objectKey(fset *token.FileSet, obj types.Object) string {
@@ -340,18 +366,13 @@ func summarizeBody(shard *SemanticModel, semPkg *semanticPackage, objects *summa
 				continue
 			}
 			key, ok := k.key(fn)
-			calls, callsOK := keys(k, semFn.calls)
-			packageVars, varsOK := keys(k, semFn.packageVars)
-			if !ok || !callsOK || !varsOK {
+			if !ok || !summary.addNode(k, summaryRecordFunction, key, semFn) {
 				return nil, false
 			}
-			summary.functions = append(summary.functions, summaryFunction{
-				key:         key,
-				async:       semFn.async,
-				calls:       calls,
-				packageVars: packageVars,
-			})
 		}
+	}
+	if !summarizeValueNodes(summary, k, semPkg) {
+		return nil, false
 	}
 
 	var ok bool
@@ -402,13 +423,13 @@ func summarizeBody(shard *SemanticModel, semPkg *semanticPackage, objects *summa
 		if !ok {
 			return nil, false
 		}
-		summaryCall := summaryAsyncArgumentCall{called: called, suspends: call.suspends}
+		summaryCall := summaryAsyncArgumentCall{called: called, shapes: call.shapes}
 		for _, dep := range call.deps {
-			key, ok := k.key(dep)
+			ref, ok := k.ref(dep)
 			if !ok {
 				return nil, false
 			}
-			summaryCall.deps = append(summaryCall.deps, key)
+			summaryCall.deps = append(summaryCall.deps, ref)
 		}
 		summary.asyncArgumentCalls = append(summary.asyncArgumentCalls, summaryCall)
 	}
@@ -417,6 +438,89 @@ func summarizeBody(shard *SemanticModel, semPkg *semanticPackage, objects *summa
 		return nil, false
 	}
 	return summary, true
+}
+
+// addNode records the facts of one node. It reports false when a call or
+// variable has no reference.
+func (s *bodySummary) addNode(k *summaryKeys, kind, key string, semFn *semanticFunction) bool {
+	// Name the calls and variables.
+	var calls []string
+	for called := range semFn.calls {
+		ref, ok := k.ref(called)
+		if !ok {
+			return false
+		}
+		calls = append(calls, ref)
+	}
+	packageVars, ok := keys(k, semFn.packageVars)
+	if !ok {
+		return false
+	}
+
+	// Record the node in a stable order.
+	slices.Sort(calls)
+	s.functions = append(s.functions, summaryFunction{
+		kind:        kind,
+		key:         key,
+		async:       semFn.async,
+		calls:       calls,
+		packageVars: packageVars,
+		valueCalls:  slices.Sorted(maps.Keys(semFn.valueCalls)),
+	})
+	return true
+}
+
+// summarizeValueNodes records the package's literal and lazy initializer
+// nodes, the function values it takes, and the func types it asserts and
+// calls through outside function bodies.
+func summarizeValueNodes(summary *bodySummary, k *summaryKeys, semPkg *semanticPackage) bool {
+	// Record the literal and initializer nodes in source order.
+	for _, pos := range slices.Sorted(maps.Keys(semPkg.funcLits)) {
+		ref, _ := k.ref(semPkg.funcLits[pos].function)
+		if !summary.addNode(k, summaryRecordFuncLit, strings.TrimPrefix(ref, summaryLiteralRefPrefix), semPkg.funcLits[pos]) {
+			return false
+		}
+	}
+	for _, obj := range slices.SortedFunc(maps.Keys(semPkg.lazyInits), compareObjectPos) {
+		key, ok := k.key(obj)
+		if !ok || !summary.addNode(k, summaryRecordLazyInit, key, semPkg.lazyInits[obj]) {
+			return false
+		}
+	}
+
+	// Record the values by reference.
+	for _, value := range semPkg.funcValues {
+		ref, ok := k.ref(value.key)
+		if !ok {
+			return false
+		}
+		summary.funcValues = append(summary.funcValues, summaryFuncValue{shape: value.shape, ref: ref})
+	}
+	summary.assertedFuncShapes = slices.Sorted(maps.Keys(semPkg.assertedFuncShapes))
+	summary.topValueCalls = slices.Sorted(maps.Keys(semPkg.topValueCalls))
+	return true
+}
+
+// compareObjectPos orders objects by position.
+func compareObjectPos(a, b types.Object) int {
+	return int(a.Pos()) - int(b.Pos())
+}
+
+// ref returns the summary reference of a node key: a literal node by its
+// file and offset, a lazy initializer by its variable's key, or any other
+// function by its object key.
+func (k *summaryKeys) ref(fn *types.Func) (string, bool) {
+	// A synthetic node is named by its position.
+	if fn.Name() == funcLitNodeName && fn.Pkg() != nil {
+		position := k.objects.fset.Position(fn.Pos())
+		return summaryLiteralRefPrefix + baseName(position.Filename) + ":" + strconv.Itoa(position.Offset), true
+	}
+	if varName, ok := strings.CutPrefix(fn.Name(), lazyInitNodeName); ok && fn.Pkg() != nil {
+		obj := fn.Pkg().Scope().Lookup(varName)
+		key, ok := k.key(obj)
+		return summaryInitRefPrefix + key, ok
+	}
+	return k.key(fn)
 }
 
 // summarizeMarks splits the marks of one kind into the keys of declared
@@ -502,6 +606,9 @@ type bodyApplier struct {
 	info     *types.Info
 	// next is the index of the next literal the fact walk reaches.
 	next int
+	// pkg and files locate the function literals of the package.
+	pkg   *packages.Package
+	files map[string]*ast.File
 }
 
 // newBodyApplier rebuilds the package's interface literals. It reports false
@@ -520,6 +627,7 @@ func newBodyApplier(summary *bodySummary, pkg *packages.Package, objects *summar
 	for _, file := range pkg.Syntax {
 		files[baseName(pkg.Fset.Position(file.Pos()).Filename)] = file
 	}
+	a.pkg, a.files = pkg, files
 	for _, ref := range summary.literals {
 		file := files[ref.file]
 		if file == nil {
@@ -588,33 +696,8 @@ func (a *bodyApplier) apply(shard *SemanticModel, semPkg *semanticPackage) bool 
 	if a.next != len(a.literals) {
 		return false
 	}
-	resolveFunc := func(key string) *types.Func {
-		fn, _ := a.keys.resolve(key).(*types.Func)
-		return fn
-	}
-	for _, summaryFn := range a.summary.functions {
-		fn := resolveFunc(summaryFn.key)
-		semFn := shard.functions[fn]
-		if semFn == nil {
-			return false
-		}
-		if summaryFn.async {
-			markFunctionAsync(semFn)
-		}
-		for _, key := range summaryFn.calls {
-			called := resolveFunc(key)
-			if called == nil {
-				return false
-			}
-			semFn.calls[called] = true
-		}
-		for _, key := range summaryFn.packageVars {
-			v, _ := a.keys.resolve(key).(*types.Var)
-			if v == nil {
-				return false
-			}
-			recordPackageVarUse(semFn, v)
-		}
+	if !a.applyNodes(shard, semPkg) {
+		return false
 	}
 	for _, marks := range []struct {
 		keys []string
@@ -658,12 +741,12 @@ func (a *bodyApplier) apply(shard *SemanticModel, semPkg *semanticPackage) bool 
 		semPkg.typeAssertions = append(semPkg.typeAssertions, semanticTypeAssertion{source: source, target: target})
 	}
 	for _, summaryCall := range a.summary.asyncArgumentCalls {
-		call := asyncArgumentCall{called: resolveFunc(summaryCall.called), suspends: summaryCall.suspends}
+		call := asyncArgumentCall{called: a.resolveFunc(summaryCall.called), shapes: summaryCall.shapes}
 		if call.called == nil {
 			return false
 		}
-		for _, key := range summaryCall.deps {
-			dep := resolveFunc(key)
+		for _, ref := range summaryCall.deps {
+			dep := a.resolveRef(semPkg, ref)
 			if dep == nil {
 				return false
 			}
@@ -678,6 +761,160 @@ func (a *bodyApplier) apply(shard *SemanticModel, semPkg *semanticPackage) bool 
 			return false
 		}
 		semPkg.lazyVars[obj] = true
+	}
+	return a.applyValues(semPkg)
+}
+
+// resolveFunc returns the function named by key, or nil.
+func (a *bodyApplier) resolveFunc(key string) *types.Func {
+	fn, _ := a.keys.resolve(key).(*types.Func)
+	return fn
+}
+
+// resolveRef returns the node key a summary reference names, or nil.
+func (a *bodyApplier) resolveRef(semPkg *semanticPackage, ref string) *types.Func {
+	if key, ok := strings.CutPrefix(ref, summaryLiteralRefPrefix); ok {
+		if node := semPkg.funcLits[a.literalPos(key)]; node != nil {
+			return node.function
+		}
+		return nil
+	}
+	if key, ok := strings.CutPrefix(ref, summaryInitRefPrefix); ok {
+		if node := semPkg.lazyInits[a.keys.resolve(key)]; node != nil {
+			return node.function
+		}
+		return nil
+	}
+	return a.resolveFunc(ref)
+}
+
+// literalPos returns the position a literal key of file and offset names,
+// or token.NoPos.
+func (a *bodyApplier) literalPos(key string) token.Pos {
+	// The key must name a known file and an offset inside it.
+	name, offsetText, ok := cutLast(key, ":")
+	offset, err := strconv.Atoi(offsetText)
+	file := a.files[name]
+	if !ok || err != nil || file == nil {
+		return token.NoPos
+	}
+	tokenFile := a.pkg.Fset.File(file.Pos())
+	if offset < 0 || offset >= tokenFile.Size() {
+		return token.NoPos
+	}
+	return tokenFile.Pos(offset)
+}
+
+// cutLast slices s around the last instance of sep.
+func cutLast(s, sep string) (string, string, bool) {
+	idx := strings.LastIndex(s, sep)
+	if idx < 0 {
+		return s, "", false
+	}
+	return s[:idx], s[idx+len(sep):], true
+}
+
+// applyNodes adds the facts of every node. The literal and initializer nodes
+// are created first, so that calls can name them.
+func (a *bodyApplier) applyNodes(shard *SemanticModel, semPkg *semanticPackage) bool {
+	// Resolve or create each node.
+	semPkg.funcLits = make(map[token.Pos]*semanticFunction)
+	semPkg.lazyInits = make(map[types.Object]*semanticFunction)
+	nodes := make([]*semanticFunction, len(a.summary.functions))
+	for idx, summaryFn := range a.summary.functions {
+		nodes[idx] = a.node(shard, semPkg, summaryFn)
+		if nodes[idx] == nil {
+			return false
+		}
+	}
+
+	// Record each node's facts.
+	for idx, summaryFn := range a.summary.functions {
+		if !a.applyNode(semPkg, nodes[idx], summaryFn) {
+			return false
+		}
+	}
+	return true
+}
+
+// node returns the node a summary function record names, creating a literal
+// or initializer node.
+func (a *bodyApplier) node(shard *SemanticModel, semPkg *semanticPackage, summaryFn summaryFunction) *semanticFunction {
+	switch summaryFn.kind {
+	case summaryRecordFuncLit:
+		pos := a.literalPos(summaryFn.key)
+		if !pos.IsValid() {
+			return nil
+		}
+		node := newSyntheticNode(pos, a.pkg.Types, funcLitNodeName)
+		semPkg.funcLits[pos] = node
+		return node
+	case summaryRecordLazyInit:
+		obj := a.keys.resolve(summaryFn.key)
+		if obj == nil {
+			return nil
+		}
+		node := newSyntheticNode(obj.Pos(), obj.Pkg(), lazyInitNodeName+obj.Name())
+		semPkg.lazyInits[obj] = node
+		return node
+	}
+	return shard.functions[a.resolveFunc(summaryFn.key)]
+}
+
+// applyNode adds a summary record's facts to its node.
+func (a *bodyApplier) applyNode(semPkg *semanticPackage, semFn *semanticFunction, summaryFn summaryFunction) bool {
+	// The node may be async by itself.
+	if summaryFn.async {
+		markFunctionAsync(semFn)
+	}
+
+	// Resolve its calls and package variables.
+	for _, ref := range summaryFn.calls {
+		called := a.resolveRef(semPkg, ref)
+		if called == nil {
+			return false
+		}
+		semFn.calls[called] = true
+	}
+	for _, key := range summaryFn.packageVars {
+		v, _ := a.keys.resolve(key).(*types.Var)
+		if v == nil {
+			return false
+		}
+		recordPackageVarUse(semFn, v)
+	}
+
+	// Its value calls are shapes.
+	for _, shape := range summaryFn.valueCalls {
+		recordValueCall(semFn, shape)
+	}
+	return true
+}
+
+// applyValues adds the function values the package takes and the shapes it
+// asserts and calls outside function bodies.
+func (a *bodyApplier) applyValues(semPkg *semanticPackage) bool {
+	// Each value names its node.
+	for _, value := range a.summary.funcValues {
+		key := a.resolveRef(semPkg, value.ref)
+		if key == nil {
+			return false
+		}
+		semPkg.funcValues = append(semPkg.funcValues, funcValue{shape: value.shape, key: key})
+	}
+
+	// The shapes apply as they are.
+	for _, shape := range a.summary.assertedFuncShapes {
+		if semPkg.assertedFuncShapes == nil {
+			semPkg.assertedFuncShapes = make(map[string]bool)
+		}
+		semPkg.assertedFuncShapes[shape] = true
+	}
+	for _, shape := range a.summary.topValueCalls {
+		if semPkg.topValueCalls == nil {
+			semPkg.topValueCalls = make(map[string]bool)
+		}
+		semPkg.topValueCalls[shape] = true
 	}
 	return true
 }
@@ -703,11 +940,20 @@ func baseName(path string) string {
 }
 
 // Summaries encode as lines of tab-separated fields. The first field names the
-// record; call and var records belong to the function record before them.
+// record; call, var and value call records belong to the node record before
+// them, and async dependency records to the async call record before them.
 const (
 	summaryRecordFunction     = "func"
+	summaryRecordFuncLit      = "lit"
+	summaryRecordLazyInit     = "init"
 	summaryRecordCall         = "call"
 	summaryRecordPackageVar   = "var"
+	summaryRecordValueCall    = "value-call"
+	summaryRecordFuncValue    = "value"
+	summaryRecordAssertedFunc = "asserted-func"
+	summaryRecordTopCall      = "top-value-call"
+	summaryRecordAsyncDep     = "async-dep"
+	summaryRecordAsyncShape   = "async-shape"
 	summaryRecordLiteral      = "literal"
 	summaryRecordAddressTaken = "address-taken"
 	summaryRecordNeedsVarRef  = "var-ref"
@@ -737,12 +983,15 @@ func (s *bodySummary) encode() ([]byte, bool) {
 		b.WriteByte('\n')
 	}
 	for _, fn := range s.functions {
-		line(summaryRecordFunction, fn.key, strconv.FormatBool(fn.async))
+		line(fn.kind, fn.key, strconv.FormatBool(fn.async))
 		for _, key := range fn.calls {
 			line(summaryRecordCall, key)
 		}
 		for _, key := range fn.packageVars {
 			line(summaryRecordPackageVar, key)
+		}
+		for _, shape := range fn.valueCalls {
+			line(summaryRecordValueCall, shape)
 		}
 	}
 	for _, literal := range s.literals {
@@ -758,10 +1007,15 @@ func (s *bodySummary) encode() ([]byte, bool) {
 		{summaryRecordVarRefName, s.varRefNames},
 		{summaryRecordInterface, s.interfaces},
 		{summaryRecordLazyVar, s.lazyVars},
+		{summaryRecordAssertedFunc, s.assertedFuncShapes},
+		{summaryRecordTopCall, s.topValueCalls},
 	} {
 		for _, value := range records.values {
 			line(records.record, value)
 		}
+	}
+	for _, value := range s.funcValues {
+		line(summaryRecordFuncValue, value.shape, value.ref)
 	}
 	for _, assertion := range s.assertions {
 		line(summaryRecordAssertion,
@@ -769,7 +1023,13 @@ func (s *bodySummary) encode() ([]byte, bool) {
 			assertion.target.key, strconv.Itoa(assertion.target.literal))
 	}
 	for _, call := range s.asyncArgumentCalls {
-		line(append([]string{summaryRecordAsyncCall, call.called, strconv.FormatBool(call.suspends)}, call.deps...)...)
+		line(summaryRecordAsyncCall, call.called)
+		for _, ref := range call.deps {
+			line(summaryRecordAsyncDep, ref)
+		}
+		for _, shape := range call.shapes {
+			line(summaryRecordAsyncShape, shape)
+		}
 	}
 	return []byte(b.String()), ok
 }
@@ -787,7 +1047,7 @@ func decodeBodySummary(data []byte) (*bodySummary, bool) {
 			return fields[n], true
 		}
 		switch fields[0] {
-		case summaryRecordFunction:
+		case summaryRecordFunction, summaryRecordFuncLit, summaryRecordLazyInit:
 			if len(fields) != 3 {
 				return nil, false
 			}
@@ -795,18 +1055,24 @@ func decodeBodySummary(data []byte) (*bodySummary, bool) {
 			if err != nil {
 				return nil, false
 			}
-			s.functions = append(s.functions, summaryFunction{key: fields[1], async: async})
-		case summaryRecordCall, summaryRecordPackageVar:
+			s.functions = append(s.functions, summaryFunction{kind: fields[0], key: fields[1], async: async})
+		case summaryRecordCall, summaryRecordPackageVar, summaryRecordValueCall:
 			key, ok := value(1)
 			if !ok || len(s.functions) == 0 {
 				return nil, false
 			}
 			fn := &s.functions[len(s.functions)-1]
-			if fields[0] == summaryRecordCall {
-				fn.calls = append(fn.calls, key)
-			} else {
-				fn.packageVars = append(fn.packageVars, key)
+			target := map[string]*[]string{
+				summaryRecordCall:       &fn.calls,
+				summaryRecordPackageVar: &fn.packageVars,
+				summaryRecordValueCall:  &fn.valueCalls,
+			}[fields[0]]
+			*target = append(*target, key)
+		case summaryRecordFuncValue:
+			if len(fields) != 3 {
+				return nil, false
 			}
+			s.funcValues = append(s.funcValues, summaryFuncValue{shape: fields[1], ref: fields[2]})
 		case summaryRecordLiteral:
 			if len(fields) != 3 {
 				return nil, false
@@ -817,7 +1083,8 @@ func decodeBodySummary(data []byte) (*bodySummary, bool) {
 			}
 			s.literals = append(s.literals, summaryLiteral{file: fields[1], offset: offset})
 		case summaryRecordAddressTaken, summaryRecordNeedsVarRef, summaryRecordLocalFact,
-			summaryRecordVarRefName, summaryRecordInterface, summaryRecordLazyVar:
+			summaryRecordVarRefName, summaryRecordInterface, summaryRecordLazyVar,
+			summaryRecordAssertedFunc, summaryRecordTopCall:
 			v, ok := value(1)
 			if !ok {
 				return nil, false
@@ -829,6 +1096,8 @@ func decodeBodySummary(data []byte) (*bodySummary, bool) {
 				summaryRecordVarRefName:   &s.varRefNames,
 				summaryRecordInterface:    &s.interfaces,
 				summaryRecordLazyVar:      &s.lazyVars,
+				summaryRecordAssertedFunc: &s.assertedFuncShapes,
+				summaryRecordTopCall:      &s.topValueCalls,
 			}[fields[0]]
 			*target = append(*target, v)
 		case summaryRecordAssertion:
@@ -845,18 +1114,22 @@ func decodeBodySummary(data []byte) (*bodySummary, bool) {
 				target: summaryType{key: fields[3], literal: targetLiteral},
 			})
 		case summaryRecordAsyncCall:
-			if len(fields) < 3 {
+			called, ok := value(1)
+			if !ok {
 				return nil, false
 			}
-			suspends, err := strconv.ParseBool(fields[2])
-			if err != nil {
+			s.asyncArgumentCalls = append(s.asyncArgumentCalls, summaryAsyncArgumentCall{called: called})
+		case summaryRecordAsyncDep, summaryRecordAsyncShape:
+			v, ok := value(1)
+			if !ok || len(s.asyncArgumentCalls) == 0 {
 				return nil, false
 			}
-			s.asyncArgumentCalls = append(s.asyncArgumentCalls, summaryAsyncArgumentCall{
-				called:   fields[1],
-				suspends: suspends,
-				deps:     slices.Clone(fields[3:]),
-			})
+			call := &s.asyncArgumentCalls[len(s.asyncArgumentCalls)-1]
+			if fields[0] == summaryRecordAsyncDep {
+				call.deps = append(call.deps, v)
+			} else {
+				call.shapes = append(call.shapes, v)
+			}
 		default:
 			return nil, false
 		}

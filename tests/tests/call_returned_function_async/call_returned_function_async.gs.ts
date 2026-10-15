@@ -21,15 +21,13 @@ export function getAsyncAdder(x: number): ((_p0: number) => number | globalThis.
 
 export async function main(): globalThis.Promise<void> {
 	// Direct call of returned function - not async
-	let result1 = (__goscriptAwait = getAdder(5)!(3), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+	let result1 = (getAdder(5)!(3) as number)
 	await $.println("Result 1:", result1)
 
 	// Direct call of returned function - with async call inside
-	let result2 = (__goscriptAwait = getAsyncAdder(10)!(7), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+	let result2 = (getAsyncAdder(10)!(7) as number)
 	await $.println("Result 2:", result2)
 }
-
-var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

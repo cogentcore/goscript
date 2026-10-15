@@ -54,7 +54,7 @@ export async function main(): globalThis.Promise<void> {
 	dep.__goscript_set_Count(7)
 	await $.println(dep.Current())
 	dep.__goscript_set_Hook($.functionValue(async (): globalThis.Promise<$.GoError> => {
-		return await dep.Wait()
+		return dep.Wait()
 	}, ({ kind: $.TypeKind.Function, params: [], results: ["error"] } as $.FunctionTypeInfo)))
 	{
 		let err = await dep.Run()
