@@ -26,6 +26,7 @@ import {
   EncodeZigzag32Packed,
   EncodeZigzag64,
   EncodeZigzag64Packed,
+  EqualBoundMessage,
   PackedFixedElementCount,
   PackedVarintElementCount,
   SkipWithin,
@@ -517,6 +518,21 @@ describe('protobuf-go-lite runtime interfaces', () => {
 })
 
 describe('protobuf-go-lite TypeScript binding helpers', () => {
+  it('compares nil messages like the generated Go EqualVT', () => {
+    const empty = new BinaryInputBoundMessage()
+
+    expect(EqualBoundMessage(BinaryInputBoundMessage, empty, null)).toBe(false)
+    expect(EqualBoundMessage(BinaryInputBoundMessage, null, empty)).toBe(false)
+    expect(EqualBoundMessage(BinaryInputBoundMessage, null, null)).toBe(true)
+    expect(
+      EqualBoundMessage(
+        BinaryInputBoundMessage,
+        empty,
+        new BinaryInputBoundMessage(),
+      ),
+    ).toBe(true)
+  })
+
   it('adds message type context to binary marshal errors', () => {
     const [, err] = MarshalBoundMessageVT(
       BrokenBoundMessage as any,

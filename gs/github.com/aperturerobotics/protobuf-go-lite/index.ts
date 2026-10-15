@@ -792,9 +792,19 @@ export function EqualBoundMessage<T>(
   a: T | $.VarRef<T> | null,
   b: T | $.VarRef<T> | null,
 ): boolean {
+  // Match the generated Go EqualVT: nil equals only nil, never an empty message.
+  const leftValue = $.pointerValueOrNil(a)
+  const rightValue = $.pointerValueOrNil(b)
+  if (leftValue === rightValue) {
+    return true
+  }
+  if (leftValue === null || rightValue === null) {
+    return false
+  }
+
   const messageType = boundMessageType(ctor)
-  const left = toTypeScriptMessage(a, messageType, ctor)
-  const right = toTypeScriptMessage(b, messageType, ctor)
+  const left = toTypeScriptMessage(leftValue, messageType, ctor)
+  const right = toTypeScriptMessage(rightValue, messageType, ctor)
   return (
     messageType.equals?.(left, right) ??
     JSON.stringify(left) === JSON.stringify(right)
