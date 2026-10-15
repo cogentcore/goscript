@@ -11,9 +11,15 @@ import (
 
 // SemanticModel is the immutable compiler semantic surface consumed by lowering.
 type SemanticModel struct {
-	packages            map[string]*semanticPackage
-	addressTaken        map[types.Object]bool
-	needsVarRef         map[types.Object]bool
+	packages     map[string]*semanticPackage
+	addressTaken map[types.Object]bool
+	needsVarRef  map[types.Object]bool
+	// changedVars holds the package variables whose storage some package
+	// may change after initialization (see recordChangedPackageVars).
+	changedVars map[types.Object]bool
+	// effectFreeFuncs holds the functions whose calls have no effects (see
+	// collectEffectFreeFunctions).
+	effectFreeFuncs     map[types.Object]bool
 	functions           map[*types.Func]*semanticFunction
 	functionCallers     map[*types.Func][]*semanticFunction
 	functionsByFullName map[string]*semanticFunction
@@ -100,6 +106,9 @@ type semanticPackage struct {
 	// lazyVars holds the package variables initialized lazily through a
 	// getter.
 	lazyVars map[types.Object]bool
+	// deferredVars holds the lazy package variables that the package
+	// initializer does not initialize (see deferPackageTables).
+	deferredVars map[types.Object]bool
 	// asyncArgumentCalls records the calls whose function arguments can make
 	// the callee async.
 	asyncArgumentCalls []asyncArgumentCall

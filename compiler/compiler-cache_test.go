@@ -1080,3 +1080,54 @@ func TestCompilePackagesCacheWholeProgramRecolorsDependency(t *testing.T) {
 		}
 	}
 }
+
+// TestCompilePackagesCacheWholeProgramDefersDependencyTable compiles a
+// program whose dependency builds a list from an exported variable that
+// points to a large table. The list is deferred while no package changes the
+// variable. An assignment added in the main package makes the dependency
+// build the list at initialization, so its cached output must not be reused,
+// and reverting the edit defers the list again.
+func TestCompilePackagesCacheWholeProgramDefersDependencyTable(t *testing.T) {
+	// The dependency's list reads Table, which points to a large table.
+	data := strings.TrimSuffix(strings.Repeat("1, ", 256), ", ")
+	program := func(body string) map[string]string {
+		return map[string]string{
+			"go.mod":  "module example.test/deferdep\n\ngo 1.25.3\n",
+			"main.go": "package main\n\nimport \"example.test/deferdep/dep\"\n\nfunc main() {\n" + body + "\n}\n",
+			"dep/dep.go": "package dep\n\ntype T struct{ Data [256]byte }\n\n" +
+				"var Table *T = &table\n\nvar table = T{Data: [256]byte{" + data + "}}\n\n" +
+				"var List = []*T{Table}\n",
+		}
+	}
+	readBody := "println(len(dep.List))"
+	moduleDir := writePackageGraphFixture(t, program(readBody))
+	cacheRoot := filepath.Join(t.TempDir(), "cache")
+
+	// Each edit compiles with and without the cache.
+	for _, edit := range []struct {
+		name     string
+		body     string
+		deferred bool
+	}{
+		{name: "read", body: readBody, deferred: true},
+		{name: "assign", body: readBody + "\ndep.Table = nil", deferred: false},
+		{name: "revert", body: readBody, deferred: true},
+	} {
+		writeFixtureFile(t, moduleDir, "main.go", program(edit.body)["main.go"])
+		cachedOut := filepath.Join(t.TempDir(), "cached")
+		compileCacheFixtureConfig(t, Config{}, moduleDir, cachedOut, cacheRoot)
+		freshOut := filepath.Join(t.TempDir(), "fresh")
+		compileCacheFixtureConfig(t, Config{}, moduleDir, freshOut, "")
+
+		// The cached output matches a fresh compile, and the list is lazy
+		// only while Table never changes.
+		cached := outputTreeSnapshot(t, cachedOut)
+		if fresh := outputTreeSnapshot(t, freshOut); cached != fresh {
+			t.Fatalf("%s: cached output differs from fresh compile:\ncached:\n%s\nfresh:\n%s", edit.name, cached, fresh)
+		}
+		dep := readOutputFile(t, cachedOut, "example.test/deferdep/dep", "dep.gs.ts")
+		if got := strings.Contains(dep, "export var List"); got != edit.deferred {
+			t.Fatalf("%s: List deferred %v, want %v:\n%s", edit.name, got, edit.deferred, dep)
+		}
+	}
+}

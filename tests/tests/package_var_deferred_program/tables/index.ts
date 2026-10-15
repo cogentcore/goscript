@@ -1,0 +1,2 @@
+export { All, Codec, CodecA, CodecB, CodecC, Count, Counter, Kind, Label, Named, WithC, WithCount, __goscript_get_All, __goscript_get_CodecA, __goscript_get_CodecB, __goscript_get_CodecC, __goscript_get_Named, __goscript_init_All, __goscript_init_CodecA, __goscript_init_CodecB, __goscript_init_CodecC, __goscript_init_Named, __goscript_set_All, __goscript_set_CodecA, __goscript_set_CodecB, __goscript_set_CodecC, __goscript_set_Count, __goscript_set_Kind, __goscript_set_Named, __goscript_set_WithC, __goscript_set_WithCount } from "./tables.gs.ts"
+import "./tables.gs.ts"

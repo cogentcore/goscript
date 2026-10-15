@@ -159,6 +159,10 @@ func (o *SemanticModelOwner) Build(ctx context.Context, graph *PackageGraph, opt
 		}
 	}
 	model.collectVarRefNames()
+
+	// Package variables that read only unchanging data initialize on first
+	// read, which the marks of every package decide.
+	model.deferPackageTables(opts.WholeProgram)
 	if diagnosticsHaveErrors(diagnostics) {
 		model.freeze()
 		return model, diagnostics
@@ -277,6 +281,8 @@ func newSemanticModel() *SemanticModel {
 		packages:                 make(map[string]*semanticPackage),
 		addressTaken:             make(map[types.Object]bool),
 		needsVarRef:              make(map[types.Object]bool),
+		changedVars:              make(map[types.Object]bool),
+		effectFreeFuncs:          make(map[types.Object]bool),
 		functions:                make(map[*types.Func]*semanticFunction),
 		functionCallers:          make(map[*types.Func][]*semanticFunction),
 		functionsByFullName:      make(map[string]*semanticFunction),
@@ -334,6 +340,7 @@ func (o *SemanticModelOwner) buildPackage(
 		o.collectFileDeclarations(shard, semPkg, pkg, tokenFile, file)
 		o.collectFacts(shard, semPkg, pkg, tokenFile, file, nil, nil)
 	}
+	collectEffectFreeFunctions(shard, pkg)
 	semPkg.lazyVars = lazyPackageVars(semPkg)
 	collectFunctionFacts(shard, semPkg, pkg, overrideFacts, directives)
 	semPkg.asyncArgumentCalls = collectAsyncArgumentCalls(pkg, semPkg.literalKey, directives)
@@ -421,8 +428,12 @@ func (m *SemanticModel) mergePackage(shard *SemanticModel) {
 	}
 	maps.Copy(m.types, shard.types)
 	maps.Copy(m.values, shard.values)
+
+	// The marks and generated imports join the program's.
 	maps.Copy(m.addressTaken, shard.addressTaken)
 	maps.Copy(m.needsVarRef, shard.needsVarRef)
+	maps.Copy(m.changedVars, shard.changedVars)
+	maps.Copy(m.effectFreeFuncs, shard.effectFreeFuncs)
 	maps.Copy(m.generatedImports, shard.generatedImports)
 	maps.Copy(m.generatedImportTypes, shard.generatedImportTypes)
 }
@@ -586,6 +597,9 @@ func (o *SemanticModelOwner) collectFacts(
 				return false
 			}
 		}
+
+		// Mark the package variables node may change, then its other facts.
+		recordChangedPackageVars(model, pkg, node)
 		switch typed := node.(type) {
 		case *ast.TypeSpec:
 			o.recordTypeSpec(model, semPkg, pkg, tokenFile, typed)
