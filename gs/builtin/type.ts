@@ -2752,6 +2752,23 @@ const namedValueBoxPrototypes = new WeakMap<object, object>()
 // make up their Go method surface.
 export const namedValueBoxMarker = Symbol('namedValueBox')
 
+// namedValueBoxMethod returns the method of a box prototype that calls the
+// method of entry with the boxed value. A method without parameters passes
+// no arguments, which avoids spreading them on every call.
+function namedValueBoxMethod(
+  entry: NamedValueMethodEntry,
+): (this: any, ...args: any[]) => any {
+  const method = entry.method
+  if (entry.signature !== undefined && entry.signature.args.length === 0) {
+    return function (this: any) {
+      return method(this.__goValue)
+    }
+  }
+  return function (this: any, ...args: any[]) {
+    return method(this.__goValue, ...args)
+  }
+}
+
 function namedValueBoxPrototype(
   methods: Record<string, (receiver: any, ...args: any[]) => any>,
 ): object | undefined {
@@ -2779,10 +2796,7 @@ function namedValueBoxPrototype(
     [namedValueBoxMarker]: true,
   }
   for (const entry of entries) {
-    const method = entry.method
-    const wrapper: any = function (this: any, ...args: any[]) {
-      return method(this.__goValue, ...args)
-    }
+    const wrapper: any = namedValueBoxMethod(entry)
     wrapper.__goscriptMethodWrapper = true
     if (entry.signature) {
       wrapper.__goscriptMethodSignature = entry.signature
