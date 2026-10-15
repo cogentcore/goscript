@@ -63,5 +63,11 @@
       "GoString",
       "String"
     ]
+  },
+  "syncInterfaces": {
+    "Formatter": true,
+    "GoStringer": true,
+    "State": true,
+    "Stringer": true
   }
 }

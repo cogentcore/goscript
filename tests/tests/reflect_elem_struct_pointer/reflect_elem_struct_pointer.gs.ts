@@ -141,9 +141,9 @@ export class base {
 		return b
 	}
 
-	public async NewInstance(): globalThis.Promise<node | null> {
+	public NewInstance(): node | null {
 		const b: base | $.VarRef<base> | null = this;
-		return $.mustTypeAssert<node | null>($.markAsStructValue($.cloneStructValue(reflect.New($.pointerValueOrNil((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf(($.pointerValue<base>(b).This as any))).Elem(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))!))).Interface(), "main.node")
+		return $.mustTypeAssert<node | null>($.markAsStructValue($.cloneStructValue(reflect.New($.pointerValueOrNil(($.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf(($.pointerValue<base>(b).This as any))).Elem() as reflect.Type | null))!))).Interface(), "main.node")
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -180,8 +180,8 @@ export class widget {
 		return $.pointerValue<base>(this.base).AsBase()
 	}
 
-	public async NewInstance(): globalThis.Promise<any> {
-		return await $.pointerValue<base>(this.base).NewInstance()
+	public NewInstance(): any {
+		return $.pointerValue<base>(this.base).NewInstance()
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -218,8 +218,8 @@ export class body {
 		return $.pointerValue<widget>(this.widget).base.AsBase()
 	}
 
-	public async NewInstance(): globalThis.Promise<any> {
-		return await $.pointerValue<widget>(this.widget).base.NewInstance()
+	public NewInstance(): any {
+		return $.pointerValue<widget>(this.widget).base.NewInstance()
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -262,7 +262,7 @@ export async function structPointers(): globalThis.Promise<void> {
 	ok = __goscriptTuple0[1]
 	await $.println("addr:", ok, (a === b || $.pointerAliasesMade && $.pointerEqual(a, b)))
 
-	let __goscriptTuple1: any = $.typeAssertTuple<body | $.VarRef<body> | null>(await $.pointerValue<body>(b).widget.base.NewInstance(), /* @__PURE__ */ $.pointerType("main.body"))
+	let __goscriptTuple1: any = $.typeAssertTuple<body | $.VarRef<body> | null>($.pointerValue<body>(b).widget.base.NewInstance(), /* @__PURE__ */ $.pointerType("main.body"))
 	let nb: body | $.VarRef<body> | null = __goscriptTuple1[0]
 	ok = __goscriptTuple1[1]
 	await $.println("new:", ok, (nb !== b && !($.pointerAliasesMade && $.pointerEqual(nb, b))), $.stringEqual($.pointerValue<body>(nb).Title, ""), $.pointerValue<body>(nb).widget.base.AsBase() != null)

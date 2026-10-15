@@ -80,6 +80,9 @@ An override package may include a `meta.json` file that defines metadata:
   },
   "asyncWhenMethods": {
     "FunctionName": ["MethodName"]
+  },
+  "syncInterfaces": {
+    "InterfaceName": true
   }
 }
 ```
@@ -91,6 +94,7 @@ An override package may include a `meta.json` file that defines metadata:
 - **callbackAsyncFunctions**: Object mapping a package-level function name to boolean indicating that it calls its function arguments before returning and suspends exactly when one of them does. Its TypeScript returns a promise only when a callback returned one. The compiler awaits a call, and colors its caller async, only when an argument may suspend: a function value, a literal that suspends, or a declared function colored async. `slices.IndexFunc` and `slices.SortFunc` use it, so a synchronous predicate keeps its caller synchronous.
 - **asyncMethods**: Object mapping `TypeName.MethodName` to boolean indicating if async
 - **asyncCallbacks**: Object mapping a function name or `TypeName.MethodName` to the names of its function-typed parameters that the runtime stores and awaits. A function literal passed for one lowers as an async function, so its interface calls are awaited. A named parameter is needed because Go often declares such a parameter with an unnamed function type, which carries no async metadata.
+- **syncInterfaces**: Object naming interfaces the package declares whose methods no override value suspends in, except the methods of named override types that `asyncMethods` marks async. It is a promise about every override package: any TypeScript object that stands for a value of the interface, including one an override returns as an interface value or wraps around another value, must suspend only where metadata says. In a whole program the compiler then closes the interface over the implementation graph like a compiled one, and also any interface, such as a local `interface{ String() string }`, whose override implementations implement a declared interface with those methods. `reflect` declares `Type`, `fmt` declares `Formatter`, `GoStringer`, `State` and `Stringer`, and `sort` declares `Interface`. A call of such an interface method that the program leaves sync is not awaited, and its result is asserted to its Go type, since its TypeScript type may admit a promise.
 - **asyncWhenMethods**: Object mapping a package-level function name to method names. The function is async in a program where a compiled method with one of those names is async, and synchronous otherwise. `encoding/json` uses it for `Marshal` and `Unmarshal`, which call a `MarshalJSON` or `UnmarshalJSON` that may suspend (for example, one that encodes an image through an `io.Writer`). The override must then return a Promise when such a method suspends, and a plain value otherwise.
 
 ### Example: sync package metadata

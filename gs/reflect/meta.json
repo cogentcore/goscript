@@ -9,5 +9,8 @@
     "MakeFunc": true,
     "Value.Method": true,
     "Value.MethodByName": true
+  },
+  "syncInterfaces": {
+    "Type": true
   }
 }

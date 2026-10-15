@@ -120,3 +120,68 @@ func TestSemanticModelClosesExportedInterfacesInWholeProgram(t *testing.T) {
 		}
 	}
 }
+
+func TestSemanticModelTrustsSyncOverrideInterfaces(t *testing.T) {
+	moduleDir := writePackageGraphFixture(t, map[string]string{
+		"go.mod": "module example.test/trusted\n\ngo 1.25.3\n",
+		"main.go": strings.Join([]string{
+			"package main",
+			"import (",
+			"  \"fmt\"",
+			"  \"os\"",
+			"  \"reflect\"",
+			"  \"time\"",
+			")",
+			// reflect.Type is declared sync by the reflect metadata.
+			"func kind(t reflect.Type) reflect.Kind { return t.Kind() }",
+			// time.Duration's String is trusted as a fmt.Stringer.
+			"type Namer interface { String() string }",
+			"func name(n Namer) string { return n.String() }",
+			"func stringer(s fmt.Stringer) string { return s.String() }",
+			// *os.File's Name is not a method of a sync interface.
+			"type Named interface { Name() string }",
+			"func fileName(n Named) string { return n.Name() }",
+			"func main() {",
+			"  _ = kind(reflect.TypeOf(0))",
+			"  _ = name(time.Second)",
+			"  _ = stringer(time.Second)",
+			"  _ = fileName(os.Stdout)",
+			"}",
+			"",
+		}, "\n"),
+	})
+	req := &CompileRequest{
+		Patterns:            []string{"."},
+		Dir:                 moduleDir,
+		OutputPath:          filepath.Join(t.TempDir(), "out"),
+		DependencyMode:      DependencyModeAll,
+		RuntimeEmissionMode: RuntimeEmissionModeEmit,
+	}
+	graph := loadPackageGraph(t, req)
+
+	for _, tc := range []struct {
+		fn               string
+		library, program bool
+	}{
+		{fn: "kind", library: true, program: false},
+		{fn: "name", library: true, program: false},
+		{fn: "stringer", library: true, program: false},
+		{fn: "fileName", library: true, program: true},
+	} {
+		for _, wholeProgram := range []bool{false, true} {
+			model, diagnostics := NewSemanticModelOwner(NewOverrideRegistryOwner()).Build(
+				context.Background(), graph, SemanticBuildOptions{WholeProgram: wholeProgram})
+			if diagnosticsHaveErrors(diagnostics) {
+				t.Fatalf("semantic model build failed: %#v", diagnostics)
+			}
+			want := tc.library
+			if wholeProgram {
+				want = tc.program
+			}
+			semFn := model.functions[requireDefinedFunc(t, graph, "example.test/trusted", tc.fn)]
+			if semFn == nil || semFn.async != want {
+				t.Fatalf("whole program %v: %s async = %v, want %v", wholeProgram, tc.fn, semFn != nil && semFn.async, want)
+			}
+		}
+	}
+}

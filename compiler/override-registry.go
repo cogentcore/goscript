@@ -42,6 +42,12 @@ type OverrideMetadata struct {
 	// program that uses one can obtain such a value by asserting a func type
 	// from an interface value, so calls of that type stay async.
 	FuncValueMakers map[string]bool
+	// SyncInterfaces names interfaces the package declares whose methods
+	// no override value suspends in, except the methods of named override
+	// types that metadata marks async. In a whole program such an interface
+	// is closed over the graph like a compiled one, and so is any interface
+	// whose methods all appear in one.
+	SyncInterfaces map[string]bool
 }
 
 // OverrideRegistryOwner owns GoScript override package metadata and copy plans.

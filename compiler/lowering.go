@@ -17075,11 +17075,14 @@ func (o *LoweringOwner) awaitCallIfNeeded(ctx lowerFileContext, call *ast.CallEx
 		return lowered
 	}
 
-	// A value whose class is sync, or a function that metadata makes async
-	// only in some programs, returns a value here, but its TypeScript type
-	// admits a promise, so the result is asserted to its Go type.
+	// A value whose class is sync, a function that metadata makes async only
+	// in some programs, or a method of an override interface that metadata
+	// declares sync returns a value here, but its TypeScript type admits a
+	// promise, so the result is asserted to its Go type.
 	valueCall := callUsesFunctionValue(pkg, fun) || callUsesFunctionIdentifier(pkg, fun)
-	if valueCall && !o.valueCallAsync(ctx, fun) || ctx.model != nil && ctx.model.asyncWhenTargets[calledFunction(pkg, fun)] {
+	called := calledFunction(pkg, fun)
+	if valueCall && !o.valueCallAsync(ctx, fun) ||
+		ctx.model != nil && (ctx.model.asyncWhenTargets[called] || ctx.model.syncOverrideInterfaceMethod(called)) {
 		return "(" + lowered + " as " + o.tsSignatureResultFor(ctx, signature) + ")"
 	}
 

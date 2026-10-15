@@ -163,7 +163,7 @@ func (o *SemanticModelOwner) Build(ctx context.Context, graph *PackageGraph, opt
 	// Color the functions that may suspend.
 	var report *asyncReporter
 	if opts.ReportAsync {
-		report = newAsyncReporter(model, overridePkgs, opts.WholeProgram)
+		report = newAsyncReporter(model, newOverrideBoundary(overridePkgs, overrideFacts), opts.WholeProgram)
 	}
 	diagnostics = append(diagnostics, o.colorAsync(ctx, model, overrideFacts, overridePkgs, opts.WholeProgram, report)...)
 	model.freeze()
@@ -208,7 +208,14 @@ func (o *SemanticModelOwner) colorAsync(
 	// Exported interfaces close over the graph of a whole program.
 	var closed map[*types.Named]bool
 	if wholeProgram {
-		closed = closedInterfaces(model, interfaceGraph, overridePkgs)
+		boundary := newOverrideBoundary(overridePkgs, overrideFacts)
+		closed = closedInterfaces(model, interfaceGraph, boundary)
+		model.syncOverrideInterfaces = make(map[*types.Named]bool)
+		for named := range closed {
+			if boundary.pkgPaths[named.Obj().Pkg().Path()] {
+				model.syncOverrideInterfaces[named] = true
+			}
+		}
 	}
 
 	// Metadata makes some override functions and methods, and interface
@@ -1583,7 +1590,8 @@ func openInterfaceMethods(
 	values []funcValue,
 ) []*types.Func {
 	// The graph colors the methods a known interface declares, and metadata
-	// the conditional ones.
+	// the conditional ones. A closed interface's methods are known even
+	// when the graph holds none of its implementations.
 	known := maps.Clone(conditional)
 	if known == nil {
 		known = make(map[*types.Func]bool)
@@ -1603,6 +1611,13 @@ func openInterfaceMethods(
 				continue
 			}
 			known[functionOriginOrSelf(method)] = true
+		}
+	}
+	for named := range closed {
+		if iface, _ := named.Underlying().(*types.Interface); iface != nil {
+			for method := range iface.ExplicitMethods() {
+				known[method] = true
+			}
 		}
 	}
 
@@ -1684,6 +1699,16 @@ func asyncOverrideMethodNode(nodes map[*types.Func]*semanticFunction, method *ty
 	node := &semanticFunction{name: method.Name(), function: method, async: true}
 	nodes[method] = node
 	return node
+}
+
+// syncOverrideInterfaceMethod reports whether fn is a method of an override
+// interface that the program closes because metadata declares it sync.
+func (m *SemanticModel) syncOverrideInterfaceMethod(fn *types.Func) bool {
+	if m == nil || fn == nil || !isInterfaceMethod(fn) {
+		return false
+	}
+	receiver := receiverNamedType(fn.Type().(*types.Signature).Recv().Type())
+	return receiver != nil && m.syncOverrideInterfaces[namedOriginOrSelf(receiver)]
 }
 
 func (m *SemanticModel) functionAsync(fn *types.Func) bool {

@@ -83,19 +83,25 @@ type overrideBoundary struct {
 	ifaceNames []string
 	// source names the override object whose types are being exposed.
 	source string
+	// syncInterfaces lists the interfaces that override metadata declares
+	// sync.
+	syncInterfaces []*types.Named
+	facts          *OverrideFacts
 }
 
 // newOverrideBoundary collects the boundary of the override packages in the
 // graph.
-func newOverrideBoundary(overridePkgs []*types.Package) *overrideBoundary {
+func newOverrideBoundary(overridePkgs []*types.Package, overrideFacts *OverrideFacts) *overrideBoundary {
 	// The override packages stop the walk of exposed types.
 	b := &overrideBoundary{
 		pkgPaths:   make(map[string]bool, len(overridePkgs)),
 		ifaceIndex: make(map[string][]int),
 		seen:       make(map[types.Type]bool),
+		facts:      overrideFacts,
 	}
 	for _, pkg := range overridePkgs {
 		b.pkgPaths[pkg.Path()] = true
+		b.collectSyncInterfaces(pkg)
 	}
 
 	// Every declared type is a boundary type, and the exported API exposes
@@ -115,6 +121,51 @@ func newOverrideBoundary(overridePkgs []*types.Package) *overrideBoundary {
 		}
 	}
 	return b
+}
+
+// collectSyncInterfaces records the interfaces pkg's metadata declares sync.
+func (b *overrideBoundary) collectSyncInterfaces(pkg *types.Package) {
+	for _, name := range pkg.Scope().Names() {
+		typeName, _ := pkg.Scope().Lookup(name).(*types.TypeName)
+		if typeName == nil || !b.facts.IsSyncInterface(pkg.Path(), name) {
+			continue
+		}
+		if named, _ := types.Unalias(typeName.Type()).(*types.Named); named != nil && types.IsInterface(named) {
+			b.syncInterfaces = append(b.syncInterfaces, named)
+		}
+	}
+}
+
+// syncDeclared reports whether override metadata declares named sync.
+func (b *overrideBoundary) syncDeclared(named *types.Named) bool {
+	return slices.Contains(b.syncInterfaces, namedOriginOrSelf(named))
+}
+
+// trustedFor reports whether a value of typ, an override type or an
+// interface it exposes, suspends in method only where metadata says: typ
+// implements an interface that metadata declares sync and that has the
+// method. Every value of typ is then a value of that interface, so it
+// suspends in the method only as a named override type that metadata marks
+// async, which the implementation graph colors.
+func (b *overrideBoundary) trustedFor(typ types.Type, method *types.Func) bool {
+	return slices.ContainsFunc(b.syncInterfaces, func(named *types.Named) bool {
+		iface := named.Underlying().(*types.Interface)
+		hasMethod := slices.ContainsFunc(slices.Collect(iface.Methods()), func(sync *types.Func) bool {
+			return sync.Name() == method.Name() && types.Identical(sync.Type(), method.Type())
+		})
+		return hasMethod && types.Implements(typ, iface)
+	})
+}
+
+// trustsAllFor reports whether a value of typ suspends in the methods of
+// iface only where metadata says.
+func (b *overrideBoundary) trustsAllFor(typ types.Type, iface *types.Interface) bool {
+	for method := range iface.Methods() {
+		if !b.trustedFor(typ, method) {
+			return false
+		}
+	}
+	return iface.NumMethods() != 0
 }
 
 // collectPackage records the interfaces pkg declares or exposes and returns
@@ -239,20 +290,21 @@ func (b *overrideBoundary) reaches(iface *types.Interface) bool {
 	return b.witness(iface) != ""
 }
 
-// witness describes an override value that could implement iface, or
-// returns "" when none could.
+// witness describes an override value that could implement iface and
+// suspend in it without metadata saying so, or returns "" when none could.
 func (b *overrideBoundary) witness(iface *types.Interface) string {
 	// An override type implements iface.
 	methods := interfaceMethodMap(iface)
 	for _, idx := range implementationMethodSetCandidates(b.methodSetIndex, methods) {
-		if types.Implements(b.methodSets[idx].receiver, iface) {
-			return "override type " + types.TypeString(b.methodSets[idx].receiver, nil) + " implements it"
+		receiver := b.methodSets[idx].receiver
+		if types.Implements(receiver, iface) && !b.trustsAllFor(receiver, iface) {
+			return "override type " + types.TypeString(receiver, nil) + " implements it"
 		}
 	}
 
 	// A boundary interface value may hold an object that implements iface.
 	for _, idx := range implementationMethodSetCandidates(b.ifaceIndex, methods) {
-		if types.Implements(b.ifaces[idx], iface) {
+		if types.Implements(b.ifaces[idx], iface) && !b.trustsAllFor(b.ifaces[idx], iface) {
 			return "an override package exposes " + b.ifaceNames[idx] + ", which has its methods"
 		}
 	}
@@ -269,17 +321,23 @@ func (b *overrideBoundary) witness(iface *types.Interface) string {
 func closedInterfaces(
 	model *SemanticModel,
 	interfaceGraph []semanticInterfaceImplementationGraphEntry,
-	overridePkgs []*types.Package,
+	boundary *overrideBoundary,
 ) map[*types.Named]bool {
-	// Group the implementations by interface.
+	// Group the implementations by interface. An interface that metadata
+	// declares sync may have only override implementations, none of them in
+	// the graph.
 	entries := make(map[*types.Named][]semanticInterfaceImplementationGraphEntry)
 	for _, graphEntry := range interfaceGraph {
 		origin := namedOriginOrSelf(graphEntry.iface)
 		entries[origin] = append(entries[origin], graphEntry)
 	}
+	for _, named := range boundary.syncInterfaces {
+		if _, ok := entries[named]; !ok {
+			entries[named] = nil
+		}
+	}
 
 	// Find the candidates and the interfaces their implementations forward to.
-	boundary := newOverrideBoundary(overridePkgs)
 	closed := make(map[*types.Named]bool)
 	forwards := make(map[*types.Named][]*types.Named)
 	for named, list := range entries {
@@ -308,26 +366,35 @@ func closedInterfaces(
 
 // closedInterfaceCandidate reports whether named is an exported, non-generic
 // method-set interface of a compiled package that no override value can
-// implement. A sealed interface is already known; a generic interface or a
-// constraint with type terms stays open.
+// implement and suspend in, or an interface of an override package whose
+// methods are all trusted. A sealed interface is already known; a generic
+// interface or a constraint with type terms stays open.
 func closedInterfaceCandidate(named *types.Named, boundary *overrideBoundary) bool {
-	// Only an interface of a compiled package can be closed.
+	// An override package's interface can be closed only when metadata
+	// declares it sync.
 	iface, _ := named.Underlying().(*types.Interface)
-	if iface == nil || named.Obj().Pkg() == nil || boundary.pkgPaths[named.Obj().Pkg().Path()] {
+	if iface == nil || named.Obj().Pkg() == nil {
+		return false
+	}
+	override := boundary.pkgPaths[named.Obj().Pkg().Path()]
+	if override && !boundary.syncDeclared(named) {
 		return false
 	}
 
-	// Generic, constraint and sealed interfaces keep their own rules.
-	if namedTypeHasParams(named) || !iface.IsMethodSet() || interfaceIsPackageSealed(iface) {
+	// Generic and constraint interfaces keep their own rules, and so does a
+	// sealed compiled one. A sealed override interface's implementations
+	// are override values, which the graph does not hold.
+	if namedTypeHasParams(named) || !iface.IsMethodSet() || interfaceIsPackageSealed(iface) && !override {
 		return false
 	}
 	return iface.NumMethods() != 0 && !boundary.reaches(iface)
 }
 
-// implementationForwards returns the interfaces of compiled packages whose
-// methods the implementations in list forward to. It reports false when an
-// implementation method is neither such an interface method nor compiled Go
-// code with a body.
+// implementationForwards returns the interfaces whose methods the
+// implementations in list forward to: interfaces of compiled packages, or
+// trusted override interfaces. It reports false when an implementation
+// method is neither such an interface method, nor compiled Go code with a
+// body, nor a trusted override method.
 func implementationForwards(
 	model *SemanticModel,
 	boundary *overrideBoundary,
@@ -341,20 +408,51 @@ func implementationForwards(
 			signature, _ := implMethod.Type().(*types.Signature)
 			if signature != nil && signature.Recv() != nil && isInterfaceType(signature.Recv().Type()) {
 				dep := receiverNamedType(signature.Recv().Type())
-				if dep == nil || dep.Obj().Pkg() == nil || boundary.pkgPaths[dep.Obj().Pkg().Path()] {
+				if !boundary.forwardable(dep) {
 					return nil, false
 				}
 				deps = append(deps, namedOriginOrSelf(dep))
 				continue
 			}
 
-			// Any other implementation must be a compiled method with a body.
-			if semFn := semanticFunctionFor(model, implMethod); semFn == nil || !semFn.hasBody {
+			// Any other implementation must be a compiled method with a body,
+			// or a trusted override method.
+			semFn := semanticFunctionFor(model, implMethod)
+			if (semFn == nil || !semFn.hasBody) && !boundary.trustsImplementation(graphEntry, implMethod) {
 				return nil, false
 			}
 		}
 	}
 	return deps, true
+}
+
+// forwardable reports whether an implementation may forward to the methods
+// of dep: an interface of a compiled package, or an override interface that
+// metadata declares sync.
+func (b *overrideBoundary) forwardable(dep *types.Named) bool {
+	if dep == nil || dep.Obj().Pkg() == nil {
+		return false
+	}
+	return !b.pkgPaths[dep.Obj().Pkg().Path()] || b.syncDeclared(dep)
+}
+
+// trustsImplementation reports whether an override method implements an
+// interface method like a compiled one: its receiver is trusted for it, and
+// metadata does not make it async only in some programs, which the
+// implementation graph would not see.
+func (b *overrideBoundary) trustsImplementation(graphEntry semanticInterfaceImplementationGraphEntry, method *types.Func) bool {
+	// Only an override method can be trusted.
+	pkgPath, name, ok := overrideMetadataName(method)
+	if !ok || !b.pkgPaths[pkgPath] || len(b.facts.AsyncWhenMethods(pkgPath, name)) != 0 {
+		return false
+	}
+
+	// Its receiver must implement a sync interface with the method.
+	var receiver types.Type = graphEntry.typ
+	if graphEntry.pointer {
+		receiver = types.NewPointer(receiver)
+	}
+	return b.trustedFor(receiver, method)
 }
 
 // interfaceKnown reports whether the implementation graph colors the methods

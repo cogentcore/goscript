@@ -1336,3 +1336,104 @@ func TestOverrideRegistryCopiesIncrementalCodecAndMarksCompressionIO(t *testing.
 		}
 	}
 }
+
+func TestOverrideRegistryReadsSyncInterfaces(t *testing.T) {
+	// The embedded metadata declares some interfaces sync and not others.
+	facts, diagnostics := NewOverrideRegistryOwner().Facts(context.Background())
+	if diagnosticsHaveErrors(diagnostics) {
+		t.Fatalf("override facts failed: %#v", diagnostics)
+	}
+	for _, tc := range []struct {
+		pkgPath, name string
+		want          bool
+	}{
+		{pkgPath: "reflect", name: "Type", want: true},
+		{pkgPath: "fmt", name: "Stringer", want: true},
+		{pkgPath: "fmt", name: "State", want: true},
+		{pkgPath: "sort", name: "Interface", want: true},
+		{pkgPath: "io", name: "Reader"},
+		{pkgPath: "fmt", name: "ScanState"},
+	} {
+		if got := facts.IsSyncInterface(tc.pkgPath, tc.name); got != tc.want {
+			t.Errorf("IsSyncInterface(%s, %s) = %v, want %v", tc.pkgPath, tc.name, got, tc.want)
+		}
+	}
+
+	// Metadata copies do not share the map.
+	metadata := facts.Metadata("reflect")
+	metadata.SyncInterfaces["Type"] = false
+	if !facts.IsSyncInterface("reflect", "Type") {
+		t.Fatal("sync interface mutation leaked back into facts")
+	}
+}
+
+// compileSyncInterfaceOverride compiles a program that calls Getter.Get of an
+// override package whose metadata declares Getter sync, with the impl
+// override's extra TypeScript and metadata, and returns the main output.
+func compileSyncInterfaceOverride(t *testing.T, extraGo, extraTS, asyncMethods string) string {
+	t.Helper()
+
+	// The impl package is an override with the given metadata.
+	moduleDir := writePackageGraphFixture(t, map[string]string{
+		"go.mod": "module example.test/syncover\n\ngo 1.25.3\n",
+		"main.go": strings.Join([]string{
+			"package main",
+			"import \"example.test/syncover/impl\"",
+			"func use(g impl.Getter) int { return g.Get() + 1 }",
+			"func main() { println(use(impl.NewFast())) }",
+			"",
+		}, "\n"),
+		"impl/impl.go": strings.Join([]string{
+			"package impl",
+			"type Getter interface { Get() int }",
+			"type Fast struct{}",
+			"func (Fast) Get() int { return 1 }",
+			"func NewFast() Getter { return Fast{} }",
+			extraGo,
+			"",
+		}, "\n"),
+	})
+	overrideDir := filepath.Join(t.TempDir(), "gs")
+	writeFixtureFile(t, overrideDir, "example.test/syncover/impl/index.ts", strings.Join([]string{
+		"export interface Getter { Get(): number | Promise<number> }",
+		"export class Fast { public Get(): number { return 1 } }",
+		"export function NewFast(): Getter { return new Fast() }",
+		extraTS,
+		"",
+	}, "\n"))
+	writeFixtureFile(t, overrideDir, "example.test/syncover/impl/meta.json",
+		`{"syncInterfaces": {"Getter": true}, "asyncMethods": {`+asyncMethods+`}}`)
+
+	// Compile the program and return its main file.
+	out := filepath.Join(t.TempDir(), "out")
+	comp, err := NewCompiler(&Config{Dir: moduleDir, OutputPath: out, OverrideDirs: []string{overrideDir}}, nil, nil)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	if _, err := comp.CompilePackages(context.Background(), "."); err != nil {
+		t.Fatal(err.Error())
+	}
+	content, err := os.ReadFile(filepath.Join(out, "@goscript", "example.test", "syncover", "main.gs.ts"))
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	return string(content)
+}
+
+func TestCompilePackagesClosesSyncOverrideInterfaces(t *testing.T) {
+	// Every override value of Getter is sync, so use is sync and asserts the
+	// result, whose TypeScript type admits a promise.
+	text := compileSyncInterfaceOverride(t, "", "", "")
+	if !strings.Contains(text, "export function use(g: impl.Getter | null): number") || !strings.Contains(text, ".Get() as number)") {
+		t.Fatalf("a call of a sync override interface was not sync:\n%s", text)
+	}
+
+	// An override type whose metadata marks Get async makes use async.
+	text = compileSyncInterfaceOverride(t,
+		"type Slow struct{}\nfunc (*Slow) Get() int { return 2 }",
+		"export class Slow { public async Get(): Promise<number> { return 2 } }",
+		`"Slow.Get": true`)
+	if !strings.Contains(text, "export async function use(g: impl.Getter | null)") {
+		t.Fatalf("an async override implementation did not make the call async:\n%s", text)
+	}
+}
