@@ -504,8 +504,8 @@ func TestCompilePackagesAwaitsOverrideAsyncInterfaceMethodCalls(t *testing.T) {
 	text := string(content)
 	for _, want := range []string{
 		"export async function Use(l: sync.Locker | null): globalThis.Promise<void>",
-		"await (l !== null && (l as any).__isVarRef !== true && (l as any).__goValue === undefined ? (l as Exclude<sync.Locker, null>) : $.pointerValue<Exclude<sync.Locker, null>>(l)).Lock()",
-		"(l !== null && (l as any).__isVarRef !== true && (l as any).__goValue === undefined ? (l as Exclude<sync.Locker, null>) : $.pointerValue<Exclude<sync.Locker, null>>(l)).Unlock()",
+		"await (l !== null && (l as any).__isVarRef !== true && ((l as any).__goValue === undefined || (l as any).__goType?.charCodeAt(0) !== 42) ? (l as Exclude<sync.Locker, null>) : $.pointerValue<Exclude<sync.Locker, null>>(l)).Lock()",
+		"(l !== null && (l as any).__isVarRef !== true && ((l as any).__goValue === undefined || (l as any).__goType?.charCodeAt(0) !== 42) ? (l as Exclude<sync.Locker, null>) : $.pointerValue<Exclude<sync.Locker, null>>(l)).Unlock()",
 	} {
 		if !strings.Contains(text, want) {
 			t.Fatalf("missing %q in generated output:\n%s", want, text)
@@ -547,7 +547,7 @@ func TestCompilePackagesAwaitsNetHTTPServeHTTPOverrideMethods(t *testing.T) {
 	text := string(content)
 	for _, want := range []string{
 		"export async function Use(",
-		"await (h !== null && (h as any).__isVarRef !== true && (h as any).__goValue === undefined ? (h as Exclude<http.Handler, null>) : $.pointerValue<Exclude<http.Handler, null>>(h)).ServeHTTP($.pointerValueOrNil(w)!, r)",
+		"await (h !== null && (h as any).__isVarRef !== true && ((h as any).__goValue === undefined || (h as any).__goType?.charCodeAt(0) !== 42) ? (h as Exclude<http.Handler, null>) : $.pointerValue<Exclude<http.Handler, null>>(h)).ServeHTTP($.pointerValueOrNil(w)!, r)",
 		"await http.HandlerFunc_ServeHTTP(hf, $.pointerValueOrNil(w)!, r)",
 		"await http.ServeMux.prototype.ServeHTTP.call($.pointerValue<http.ServeMux>(mux), $.pointerValueOrNil(w)!, r)",
 	} {
