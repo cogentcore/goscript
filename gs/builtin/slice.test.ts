@@ -33,7 +33,7 @@ import {
   stringLen,
   stringToBytes,
 } from './slice.js'
-import { markAsStructValue } from './type.js'
+import { markAsStructValue, registerStructType, TypeKind } from './type.js'
 
 describe('loop slice windows', () => {
   it('offsets checked indexes into the backing array of a window', () => {
@@ -492,5 +492,67 @@ describe('builtin string byte representation', () => {
         new Uint8Array([255]),
       ),
     ).toBe(0)
+  })
+})
+
+// floatVec and floatParticle are struct classes as generated code declares
+// them, with float fields, a nested struct and an int field.
+class floatVec {
+  declare public X: number
+
+  constructor() {
+    this.X = 0
+  }
+
+  static __typeInfo = registerStructType('test.floatVec', null, [], floatVec, [
+    { name: 'X', type: { kind: TypeKind.Basic, name: 'float32' } },
+  ])
+}
+
+class floatParticle {
+  declare public Pos: number
+  declare public Vel: floatVec
+  declare public N: number
+
+  constructor() {
+    this.Pos = 0
+    this.Vel = new floatVec()
+    this.N = 0
+  }
+
+  static __typeInfo = registerStructType(
+    'test.floatParticle',
+    null,
+    [],
+    floatParticle,
+    [
+      { name: 'Pos', type: { kind: TypeKind.Basic, name: 'float64' } },
+      { name: 'Vel', type: 'test.floatVec' },
+      { name: 'N', type: { kind: TypeKind.Basic, name: 'int' } },
+    ],
+  )
+}
+
+describe('making slices of structs', () => {
+  it('makes zero structs whose float fields were prepared', () => {
+    // Every struct is zero, the first one included, which prepared the float
+    // fields of its class.
+    for (let round = 0; round < 2; round++) {
+      const s = makeSlice(3, 4, undefined, () => new floatParticle())
+      const elems = sliceElems(s) as floatParticle[]
+      expect(elems).toHaveLength(4)
+      for (const p of elems) {
+        expect(Object.is(p.Pos, 0)).toBe(true)
+        expect(Object.is(p.Vel.X, 0)).toBe(true)
+        expect(p.N).toBe(0)
+      }
+    }
+
+    // Other zero values are made as before.
+    const arrays = makeSlice(2, undefined, undefined, () => [0, 0])
+    expect(sliceElems(arrays)).toEqual([
+      [0, 0],
+      [0, 0],
+    ])
   })
 })
