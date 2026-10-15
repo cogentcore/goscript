@@ -1677,6 +1677,11 @@ type lowerFileContext struct {
 	// statement, so that they are copied even for a method or function that
 	// only reads them.
 	copyValues bool
+	// exprTemps maps the operands of a compound assignment target that have
+	// side effects to the temporaries that hold their values, which the
+	// target reads instead of evaluating them again (see
+	// stableCompoundTarget).
+	exprTemps map[ast.Expr]string
 	// rangeElements are the slices that enclosing range loops index by their
 	// own index variable, whose elements s[i] read and write the loop's
 	// window directly (see rangeWindowElement).
@@ -4775,14 +4780,24 @@ func (o *LoweringOwner) lowerStmtInto(ctx lowerFileContext, stmt ast.Stmt, out [
 			target, diagnostics := o.lowerAssignmentTarget(ctx, typed.X, false)
 			return append(out, loweredStmt{text: target + typed.Tok.String()}), diagnostics
 		}
-		expr, diagnostics := o.lowerExpr(ctx, typed.X)
 		op := token.ADD
 		if typed.Tok == token.DEC {
 			op = token.SUB
 		}
-		if value, ok := wrapNarrowIntegerValue(ctx.semPkg.source.TypesInfo.TypeOf(typed.X), expr+" "+op.String()+" 1", op); ok {
-			return append(out, loweredStmt{text: expr + " = " + value}), diagnostics
+
+		// A narrow integer wraps, reading its target twice, so the operands
+		// of the target are evaluated once first.
+		targetType := ctx.semPkg.source.TypesInfo.TypeOf(typed.X)
+		if _, ok := wrapNarrowIntegerValue(targetType, "x", op); ok {
+			targetCtx, prelude, diagnostics := o.stableCompoundTarget(ctx, typed.X)
+			expr, exprDiagnostics := o.lowerExpr(targetCtx, typed.X)
+			value, _ := wrapNarrowIntegerValue(targetType, expr+" "+op.String()+" 1", op)
+			out = append(append(out, prelude...), loweredStmt{text: expr + " = " + value})
+			return out, append(diagnostics, exprDiagnostics...)
 		}
+
+		// Any other operand steps in place.
+		expr, diagnostics := o.lowerExpr(ctx, typed.X)
 		return append(out, loweredStmt{text: expr + typed.Tok.String()}), diagnostics
 	case *ast.BranchStmt:
 		if typed.Label != nil {
@@ -5859,6 +5874,18 @@ func (o *LoweringOwner) lowerAssignStmt(ctx lowerFileContext, stmt *ast.AssignSt
 			continue
 		}
 		isShortDecl := stmt.Tok == token.DEFINE && isShortAssignTargetNew(ctx, lhs)
+
+		// A compound assignment reads its target twice, so the operands of
+		// the target are evaluated once first; a map update has its own
+		// temporaries.
+		if !plain && !isMapIndexExpr(ctx, lhs) {
+			var prelude []loweredStmt
+			var preludeDiagnostics []Diagnostic
+			ctx, prelude, preludeDiagnostics = o.stableCompoundTarget(ctx, lhs)
+			diagnostics = append(diagnostics, preludeDiagnostics...)
+			stmts = append(stmts, prelude...)
+		}
+
 		right, rightDiagnostics := o.lowerExpr(ctx, stmt.Rhs[idx])
 		diagnostics = append(diagnostics, rightDiagnostics...)
 		targetType := assignmentTargetType(ctx, lhs)
@@ -7651,11 +7678,20 @@ func (o *LoweringOwner) lowerForPostStmt(ctx lowerFileContext, stmt ast.Stmt) (s
 		}
 		return "[" + strings.Join(lefts, ", ") + "] = [" + strings.Join(rights, ", ") + "]", diagnostics
 	}
+	// A statement that lowers to one statement is the post expression.
 	lowered, diagnostics := o.lowerStmt(ctx, stmt)
 	if len(lowered) == 0 {
 		return "", diagnostics
 	}
-	return strings.TrimSuffix(lowered[0].text, ";"), diagnostics
+	if len(lowered) == 1 && len(lowered[0].children) == 0 {
+		return strings.TrimSuffix(lowered[0].text, ";"), diagnostics
+	}
+
+	// Several statements, such as the temporaries of a compound assignment,
+	// run in a function of their own.
+	var body strings.Builder
+	renderStmts(&body, lowered, 0)
+	return minMaxIIFE([]string{strings.TrimSpace(body.String())}), diagnostics
 }
 
 func (o *LoweringOwner) lowerRangeStmt(ctx lowerFileContext, stmt *ast.RangeStmt) (loweredStmt, []Diagnostic) {
@@ -8989,6 +9025,10 @@ func binaryOperandUsesTypeParam(ctx lowerFileContext, expr ast.Expr) bool {
 }
 
 func (o *LoweringOwner) lowerExpr(ctx lowerFileContext, expr ast.Expr) (string, []Diagnostic) {
+	// An operand already evaluated into a temporary reads it.
+	if temp, ok := ctx.exprTemps[unwrapParenExpr(expr)]; ok {
+		return temp, nil
+	}
 	if tv := ctx.semPkg.source.TypesInfo.Types[unwrapParenExpr(expr)]; tv.Value != nil {
 		if tv.Value.Kind() == constant.Complex {
 			if constantValue, ok := lowerConstantValue(tv.Value); ok {
