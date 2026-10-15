@@ -590,3 +590,37 @@ describe('slices.Max', () => {
     )
   })
 })
+
+describe('slices collectors of async sequences', () => {
+  // countAsync yields 0 through n-1 and waits for each yield, as a sequence
+  // that iter.Pull also pulls does.
+  const countAsync =
+    (n: number) =>
+    async (
+      yieldValue: ((value: number) => boolean | Promise<boolean>) | null,
+    ) => {
+      for (let i = n - 1; i >= 0; i--) {
+        const more = yieldValue!(i)
+        if (!(more instanceof Promise ? await more : more)) {
+          return
+        }
+      }
+    }
+
+  it('wait for the sequence in Collect, AppendSeq and Sorted', async () => {
+    const collected = Collect(countAsync(3))
+    expect(collected).toBeInstanceOf(Promise)
+    expect(Array.from((await collected)!)).toEqual([2, 1, 0])
+    const appended = await AppendSeq($.arrayToSlice([9]), countAsync(2))
+    expect(Array.from(appended!)).toEqual([9, 1, 0])
+    expect(Array.from((await Sorted(countAsync(3)))!)).toEqual([0, 1, 2])
+  })
+
+  it('stay synchronous for a synchronous sequence', () => {
+    const sorted = Sorted<number>((yieldValue) => {
+      yieldValue!(2)
+      yieldValue!(1)
+    })
+    expect(Array.from(sorted as $.Slice<number>)).toEqual([1, 2])
+  })
+})

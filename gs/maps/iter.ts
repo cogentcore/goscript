@@ -37,26 +37,29 @@ export function Values<K extends $.Comparable | null, V>(
 
 // Insert adds the key-value pairs from seq to m.
 // If a key in seq already exists in m, its value will be overwritten.
+// It returns a promise when seq suspends (callbackAsyncFunctions in
+// meta.json).
 export function Insert<K extends $.Comparable | null, V>(
   m: Map<K, V> | null,
-  seq: iter.Seq2<K, V>,
-): void {
-  ;(() => {
-    let shouldContinue = true
-    seq!((k, v) => {
-      $.mapSet(m, k, v)
-      return shouldContinue
-    })
-  })()
+  seq: iter.Seq2<K, V> | null,
+): void | globalThis.Promise<void> {
+  return seq!((k, v) => {
+    $.mapSet(m, k, v)
+    return true
+  })
 }
 
 // Collect collects key-value pairs from seq into a new map
-// and returns it.
+// and returns it, or a promise of it when seq suspends.
 export function Collect<K extends $.Comparable | null, V>(
-  seq: iter.Seq2<K, V>,
-): Map<K, V> {
-  let m = $.makeMap<K, V>()
-  Insert(m, seq)
+  seq: iter.Seq2<K, V> | null,
+): Map<K, V> | globalThis.Promise<Map<K, V>> {
+  // An async seq has inserted every pair once it settles.
+  const m = $.makeMap<K, V>()
+  const done = Insert(m, seq)
+  if (done instanceof Promise) {
+    return done.then(() => m)
+  }
   return m
 }
 

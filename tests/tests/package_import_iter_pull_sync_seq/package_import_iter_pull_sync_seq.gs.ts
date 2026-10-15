@@ -3,6 +3,8 @@
 
 import * as $ from "@goscript/builtin/index.js"
 import * as iter from "@goscript/iter/index.js"
+import * as maps from "@goscript/maps/index.js"
+import * as slices from "@goscript/slices/index.js"
 
 export class point {
 	public declare x: number
@@ -53,6 +55,15 @@ export function points(n: number): iter.Seq2<string, point> | null {
 			}
 		}
 	}, ({ kind: $.TypeKind.Function, params: [({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string"), "main.point"], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo)], results: [] } as $.FunctionTypeInfo))
+}
+
+export async function words(_yield: ((_p0: string) => boolean | globalThis.Promise<boolean>) | null): globalThis.Promise<void> {
+	for (let __goscriptRangeTarget0 = $.arrayToSlice<string>(["b", "a"]), __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
+		let w = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as string)
+		if (!(__goscriptAwait = _yield!(w), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)) {
+			return
+		}
+	}
 }
 
 export async function sum(seq: ((_yield: ((_p0: number) => boolean | globalThis.Promise<boolean>) | null) => void) | null): globalThis.Promise<number> {
@@ -115,15 +126,26 @@ export async function zip(a: ((_yield: ((_p0: number) => boolean | globalThis.Pr
 
 export async function main(): globalThis.Promise<void> {
 	// A pulled sequence returns its values in order.
-	for (let __goscriptRangeTarget0 = await pullAll(numbers(4)), __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
-		let v = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as number)
+	for (let __goscriptRangeTarget1 = await pullAll(numbers(4)), __goscriptRangeWindow1 = $.sliceRange(__goscriptRangeTarget1), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow1.length; __rangeIndex++) {
+		let v = (__goscriptRangeWindow1.backing[__goscriptRangeWindow1.offset + __rangeIndex] as number)
 		await $.println("pulled:", v)
 	}
 	await $.println("sum:", await sum(numbers(4)))
-	for (let __goscriptRangeTarget1 = await zip(numbers(3), numbers(5)), __goscriptRangeWindow1 = $.sliceRange(__goscriptRangeTarget1), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow1.length; __rangeIndex++) {
-		let pair = $.cloneArrayValue((__goscriptRangeWindow1.backing[__goscriptRangeWindow1.offset + __rangeIndex] as number[]), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2))
+	for (let __goscriptRangeTarget2 = await zip(numbers(3), numbers(5)), __goscriptRangeWindow2 = $.sliceRange(__goscriptRangeTarget2), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow2.length; __rangeIndex++) {
+		let pair = $.cloneArrayValue((__goscriptRangeWindow2.backing[__goscriptRangeWindow2.offset + __rangeIndex] as number[]), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2))
 		await $.println("zip:", $.arrayIndex(pair, 0), $.arrayIndex(pair, 1))
 	}
+
+	// Collecting a sequence that suspends at yield waits for it.
+	await $.println("collect:", $.sliceLen(await slices.Collect(numbers(3))))
+	await $.println("sorted:", $.arrayIndex((await slices.Sorted(numbers(3)))!, 2))
+	await $.println("append:", $.sliceLen(await slices.AppendSeq($.arrayToSlice<number>([9]), numbers(2))))
+	let m = (await maps.Collect(points(3)) as globalThis.Map<string, point> | null)
+	await $.println("map:", $.len(m), $.mapGet<string, point, point>(m, "c", new point(undefined, true))[0].y)
+	await maps.Insert(m, points(1))
+	await $.println("insert:", $.len(m))
+	let sortedWords = (await slices.Sorted(words) as $.Slice<string>)
+	await $.println("words:", $.arrayIndex(sortedWords!, 0), $.arrayIndex(sortedWords!, 1))
 
 	// Pull2 returns zero values of its element types at the end.
 	let __goscriptTuple3: any = iter.Pull2(__goscriptStatic1(), points(2))
