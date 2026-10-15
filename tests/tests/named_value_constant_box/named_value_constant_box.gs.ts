@@ -89,7 +89,7 @@ export function Name_Upper(n: Name): string {
 }
 
 export function has(bits: $.VarRef<bigint> | null, f: Inter | null): boolean {
-	return ($.int64And($.pointerValue<bigint>(bits), ($.int64Shl(1n, $.uint((f !== null && (f as any).__isVarRef !== true && (f as any).__goValue === undefined ? (f as Exclude<Inter, null>) : $.pointerValue<Exclude<Inter, null>>(f)).Int64(), 32))))) != 0n
+	return ($.int64And($.pointerValue<bigint>(bits), ($.int64Bit($.uint((f !== null && (f as any).__isVarRef !== true && (f as any).__goValue === undefined ? (f as Exclude<Inter, null>) : $.pointerValue<Exclude<Inter, null>>(f)).Int64(), 32))))) != 0n
 }
 
 export async function main(): globalThis.Promise<void> {

@@ -824,6 +824,37 @@ export function int64Shr(
   return int64Result(int64Value(value) >> wideShiftAmount(shift))
 }
 
+// int64Bits and uint64Bits hold 1<<k for the counts k that keep the bit in
+// 64 bits, the 64 masks of bit flags.
+const int64Bits = Array.from({ length: 64 }, (_, k) =>
+  BigInt.asIntN(64, 1n << BigInt(k)),
+)
+const uint64Bits = Array.from({ length: 64 }, (_, k) => 1n << BigInt(k))
+
+// int64Bit returns int64(1) << shift, as for a bit flag mask 1<<f.
+export function int64Bit(shift: number | bigint): bigint {
+  // A count below 64 selects its bit, and other counts shift as usual.
+  const bit = int64Bits[wideBitIndex(shift)]
+  return bit !== undefined ? bit : int64Shl(1n, shift)
+}
+
+// uint64Bit returns uint64(1) << shift.
+export function uint64Bit(shift: number | bigint): bigint {
+  // A count below 64 selects its bit, and other counts shift as usual.
+  const bit = uint64Bits[wideBitIndex(shift)]
+  return bit !== undefined ? bit : uint64Shl(1n, shift)
+}
+
+// wideBitIndex returns the index of the bit table for a shift count, which
+// is outside the table for counts of 64 or more and negative counts.
+function wideBitIndex(shift: number | bigint): number {
+  return (
+    typeof shift === 'number' ? shift
+    : shift >= 0n && shift < 64n ? Number(shift)
+    : -1
+  )
+}
+
 export function uintShr(
   value: number | bigint,
   shift: number | bigint,

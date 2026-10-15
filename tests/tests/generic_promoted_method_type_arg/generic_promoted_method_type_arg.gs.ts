@@ -39,13 +39,13 @@ export class Base {
 
 	public Is(__typeArgs: $.GenericTypeArgs | undefined, flag: Flags): boolean {
 		const b: Base | $.VarRef<Base> | null = this;
-		return ($.int64And($.pointerValue<Base>(b).flags, ($.int64Shl(1n, flag)))) != 0n
+		return ($.int64And($.pointerValue<Base>(b).flags, ($.int64Bit(flag)))) != 0n
 	}
 
 	public Set(__typeArgs: $.GenericTypeArgs | undefined, flag: Flags): void {
 		let b: Base | $.VarRef<Base> | null = this;
 		const b$: Base = b == null ? $.pointerTarget<Base>(b) : (b as any).__isVarRef === true ? (b as any).value : (b as any).__goValue === undefined ? (b as any) : $.pointerTarget<Base>(b);
-		;(b$ as Base).flags = $.int64Or((b$ as Base).flags, $.int64Shl(1n, flag))
+		;(b$ as Base).flags = $.int64Or((b$ as Base).flags, $.int64Bit(flag))
 	}
 
 	static __typeInfo = $.registerStructType(
