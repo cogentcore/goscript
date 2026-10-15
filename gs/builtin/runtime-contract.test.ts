@@ -50,7 +50,6 @@ import {
   makeMap,
   mapGet,
   mapSet,
-  markAsStructValue,
   markReflectTypeIdentity,
   namedFunction,
   namedValueInterfaceValue,

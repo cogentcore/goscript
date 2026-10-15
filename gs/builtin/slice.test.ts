@@ -30,7 +30,6 @@ import {
   goString,
   rangeString,
   stringRunes,
-  bytesToString,
   indexByteString,
   len,
   makeSlice,
