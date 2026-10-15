@@ -1,0 +1,2 @@
+export { Changed, Index, Numbers, Replaced, Symbol, Symbols, __goscript_get_Changed, __goscript_get_Index, __goscript_get_Numbers, __goscript_get_Replaced, __goscript_get_Symbols, __goscript_init_Changed, __goscript_init_Index, __goscript_init_Numbers, __goscript_init_Replaced, __goscript_init_Symbols, __goscript_set_Changed, __goscript_set_Index, __goscript_set_Numbers, __goscript_set_Replaced, __goscript_set_Symbols } from "./package_var_deferred_table.gs.ts"
+import "./package_var_deferred_table.gs.ts"
