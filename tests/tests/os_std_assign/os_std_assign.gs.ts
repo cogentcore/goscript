@@ -12,7 +12,7 @@ export async function main(): globalThis.Promise<void> {
 	os.__goscript_set_Stdout(stderr)
 	os.__goscript_set_Stderr(stdout)
 	os.__goscript_set_Stdin(null)
-	await $.println($.pointerEqual(os.Stdout, stderr), $.pointerEqual(os.Stderr, stdout), os.Stdin == null)
+	await $.println((os.Stdout === stderr || $.pointerAliasesMade && $.pointerEqual(os.Stdout, stderr)), (os.Stderr === stdout || $.pointerAliasesMade && $.pointerEqual(os.Stderr, stdout)), os.Stdin == null)
 
 	let __goscriptAssign0_0: os.File | $.VarRef<os.File> | null = stdin
 	let __goscriptAssign0_1: os.File | $.VarRef<os.File> | null = stdout
@@ -20,12 +20,12 @@ export async function main(): globalThis.Promise<void> {
 	os.__goscript_set_Stdin(__goscriptAssign0_0)
 	os.__goscript_set_Stdout(__goscriptAssign0_1)
 	os.__goscript_set_Stderr(__goscriptAssign0_2)
-	await $.println($.pointerEqual(os.Stdin, stdin), $.pointerEqual(os.Stdout, stdout), $.pointerEqual(os.Stderr, stderr))
+	await $.println((os.Stdin === stdin || $.pointerAliasesMade && $.pointerEqual(os.Stdin, stdin)), (os.Stdout === stdout || $.pointerAliasesMade && $.pointerEqual(os.Stdout, stdout)), (os.Stderr === stderr || $.pointerAliasesMade && $.pointerEqual(os.Stderr, stderr)))
 
 	let __goscriptTuple0: any = swap(os.Stdout, os.Stderr)
 	os.__goscript_set_Stdout(__goscriptTuple0[0])
 	os.__goscript_set_Stderr(__goscriptTuple0[1])
-	await $.println($.pointerEqual(os.Stdout, stderr), $.pointerEqual(os.Stderr, stdout))
+	await $.println((os.Stdout === stderr || $.pointerAliasesMade && $.pointerEqual(os.Stdout, stderr)), (os.Stderr === stdout || $.pointerAliasesMade && $.pointerEqual(os.Stderr, stdout)))
 	let __goscriptAssign1_0: os.File | $.VarRef<os.File> | null = stdout
 	let __goscriptAssign1_1: os.File | $.VarRef<os.File> | null = stderr
 	os.__goscript_set_Stdout(__goscriptAssign1_0)
