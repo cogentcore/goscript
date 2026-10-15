@@ -1667,13 +1667,73 @@ export function generatedStructClass(value: unknown): object | undefined {
   return cloneable.constructor
 }
 
+// StructCopy copies a struct value.
+type StructCopy = (value: any) => any
+
+// structCopy keys the function that copies the struct values of a class on
+// the class prototype (see structCopyOf).
+const structCopy = Symbol('structCopy')
+
+// structCopyOf returns the function that copies the struct values of the
+// class of value, by its __goscriptClone or clone method, and records it on
+// the class prototype, or null for a value that is not an instance of a
+// class with such a method, such as an unnamed struct value.
+function structCopyOf(value: object): StructCopy | null {
+  // Only a class instance that is not an unnamed struct value has one.
+  const proto = Object.getPrototypeOf(value) as Record<PropertyKey, unknown> | null
+  if (
+    proto === null ||
+    proto === Object.prototype ||
+    Array.isArray(value) ||
+    ANONYMOUS_STRUCT_TYPE in value
+  ) {
+    return null
+  }
+
+  // The class copies by its clone method, whose result is a struct value.
+  let copy: StructCopy
+  if (typeof proto.__goscriptClone === 'function') {
+    copy = (source) => markClonedStructValue(source.__goscriptClone())
+  } else if (typeof proto.clone === 'function') {
+    copy = (source) => markClonedStructValue(source.clone())
+  } else {
+    return null
+  }
+  Object.defineProperty(proto, structCopy, { value: copy, configurable: true })
+  return copy
+}
+
+// markClonedStructValue marks a copy of a struct value as a struct value,
+// unless its clone method did.
+function markClonedStructValue<T>(copy: T): T {
+  // The clone method of a generated class marks its copy already.
+  if ((copy as any)[structValueMarker] !== true) {
+    markAsStructValue(copy)
+  }
+  return copy
+}
+
 // copyElement clones a marked struct or array value and returns every other
 // value unchanged. A marked struct with no clone method is returned unchanged
 // rather than panicking.
 export function copyElement<T>(value: T): T {
+  // A value that is not an object is copied by value.
   if (typeof value !== 'object' || value === null) {
     return value
   }
+
+  // A struct value of a class is copied as its class copies it.
+  if ((value as any)[structValueMarker] === true) {
+    let copy = (value as any)[structCopy] as StructCopy | null | undefined
+    if (copy === undefined) {
+      copy = structCopyOf(value)
+    }
+    if (copy !== null) {
+      return copy(value) as T
+    }
+  }
+
+  // An array value, or a struct value of another kind.
   if (ARRAY_VALUE_TYPE in value) {
     return cloneArrayValue(value, arrayValueTypeInfo(value))
   }

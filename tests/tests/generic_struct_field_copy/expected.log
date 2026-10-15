@@ -1,0 +1,8 @@
+zero copy: 1 2 0 3
+own zero: 4 0 0 0
+array: 1 9
+pointer: 6 true
+unnamed: 1 7
+field named clone: 1 2 8
+nested: 10 11 0
+slice: 12 0 0
