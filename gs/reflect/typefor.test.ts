@@ -244,7 +244,7 @@ describe('TypeFor', () => {
     )
   })
 
-  it('preserves channel type metadata on interface boxes', () => {
+  it('preserves channel type metadata on interface boxes', async () => {
     const ch = makeChannel<{}>(0, {}, 'both')
     const chanValue = ValueOf(interfaceValue(ch, '<-chan struct{}'))
 
@@ -252,11 +252,12 @@ describe('TypeFor', () => {
     expect(chanValue.Type().String()).toBe('<-chan struct {}')
     expect(chanValue.Type().Elem().Kind()).toBe(Struct)
 
-    const [chosen, recv, ok] = Select([
+    ch.close()
+    const [chosen, recv, ok] = await Select([
       new SelectCase({ Dir: SelectRecv, Chan: chanValue }),
     ])
     expect(chosen).toBe(0)
-    expect(ok).toBe(true)
+    expect(ok).toBe(false)
     expect(recv.Type().String()).toBe('struct {}')
   })
 

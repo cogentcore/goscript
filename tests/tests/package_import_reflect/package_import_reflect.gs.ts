@@ -283,10 +283,10 @@ export async function main(): globalThis.Promise<void> {
 	let strChan = $.markAsStructValue($.cloneStructValue(reflect.MakeChan($.pointerValueOrNil(reflect.ChanOf(3, $.pointerValueOrNil(reflect.TypeFor(__goscriptStatic1()))!))!, 1)))
 
 	// Send values to only the string channel to make select deterministic
-	$.markAsStructValue($.cloneStructValue(strChan)).Send($.markAsStructValue($.cloneStructValue(reflect.ValueOf("hello"))))
+	await $.markAsStructValue($.cloneStructValue(strChan)).Send($.markAsStructValue($.cloneStructValue(reflect.ValueOf("hello"))))
 
 	let cases = $.arrayToSlice<reflect.SelectCase>([$.markAsStructValue(new reflect.SelectCase({Dir: 2, Chan: $.markAsStructValue($.cloneStructValue(intChan))})), $.markAsStructValue(new reflect.SelectCase({Dir: 2, Chan: $.markAsStructValue($.cloneStructValue(strChan))})), $.markAsStructValue(new reflect.SelectCase({Dir: 3}))])
-	let [chosen, recv, recvOK] = reflect.Select(cases)
+	let [chosen, recv, recvOK] = await reflect.Select(cases)
 	await $.println("Select chosen:", chosen, "recvOK:", recvOK)
 	if ($.markAsStructValue($.cloneStructValue(recv)).IsValid()) {
 		await $.println("Select recv type:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(recv)).Type()).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))

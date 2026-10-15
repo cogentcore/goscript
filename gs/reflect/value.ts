@@ -25,8 +25,6 @@ import {
   Uintptr,
   Value,
   Chan,
-  BasicType,
-  Invalid,
   structFieldStorageKey,
   TypeOf,
   typeIdentityKey,
@@ -36,14 +34,10 @@ import {
   Pointer,
   ReflectValue,
   SelectCase,
-  SelectRecv,
   SelectDefault,
+  SelectRecv,
+  SelectSend,
 } from './types.js'
-
-interface ChannelObject {
-  _sendQueue?: unknown[]
-  send?: (value: unknown) => void
-}
 
 // Zero returns a Value representing the zero value for the specified type.
 export function Zero(typ: Type | null): Value {
@@ -375,82 +369,68 @@ export function MakeChan(typ: Type, buffer: number): Value {
   return new Value(channel, typ)
 }
 
-// Select executes a select operation on the provided cases.
-// It returns the index of the chosen case, the received value (if applicable), and whether the receive was successful.
-export function Select(cases: $.Slice<SelectCase>): [number, Value, boolean] {
-  // Extract the backing array from the GoScript slice
-  let selectCases: SelectCase[] = []
+// Select executes a select operation described by the list of cases. Like
+// the Go select statement, it blocks until at least one of the cases can
+// proceed, makes a uniform pseudo-random choice, and then executes that case.
+// It returns the index of the chosen case and, if that case was a receive,
+// the value received and whether it was sent on the channel rather than being
+// the zero value received because the channel is closed. A nil channel is
+// never ready.
+export async function Select(
+  cases: $.Slice<SelectCase>,
+): Promise<[number, Value, boolean]> {
+  let chosen = -1
+  let recv = new Value()
+  let recvOK = false
+  let hasDefault = false
 
-  if (cases && typeof cases === 'object') {
-    if ('__meta__' in cases) {
-      // This is a GoScript SliceProxy, extract the backing array
-      const meta = (
-        cases as {
-          __meta__?: {
-            backing?: SelectCase[]
-            offset?: number
-            length?: number
-          }
+  const selectCases: $.SelectCase<ReflectValue>[] = []
+  for (const [i, c] of $.asArray(cases).entries()) {
+    switch (c.Dir) {
+      case SelectDefault:
+        if (hasDefault) {
+          throw new Error('reflect.Select: multiple default cases')
         }
-      ).__meta__
-      if (meta && meta.backing) {
-        const offset = meta.offset ?? 0
-        const length = meta.length ?? meta.backing.length
-        selectCases = meta.backing.slice(offset, offset + length)
+        hasDefault = true
+        selectCases.push({
+          id: -1,
+          isSend: false,
+          channel: null,
+          onSelected: async () => {
+            chosen = i
+          },
+        })
+        break
+      case SelectSend:
+        selectCases.push({
+          id: i,
+          isSend: true,
+          channel: c.Chan!.sendChan(),
+          value: c.Send!.currentValue(),
+          onSelected: async () => {
+            chosen = i
+          },
+        })
+        break
+      case SelectRecv: {
+        const elem = c.Chan!.Type().Elem()
+        selectCases.push({
+          id: i,
+          isSend: false,
+          channel: c.Chan!.recvChan(),
+          onSelected: async (result) => {
+            chosen = i
+            recvOK = result.ok
+            recv = result.ok ? new Value(result.value, elem) : Zero(elem)
+          },
+        })
+        break
       }
-    } else if (globalThis.Array.isArray(cases)) {
-      // This is a plain array (optimized case where offset=0 and length=capacity)
-      selectCases = cases as SelectCase[]
+      default:
+        throw new Error('reflect.Select: invalid Dir')
     }
   }
 
-  // Check for ready channels (channels with queued values)
-  for (let i = 0; i < selectCases.length; i++) {
-    const selectCase = selectCases[i]
-    if (selectCase.Dir.valueOf() === SelectRecv.valueOf() && selectCase.Chan) {
-      const channelValue = selectCase.Chan
-      const channelObj = (channelValue as { value: unknown })
-        .value as ChannelObject
-
-      // Check if there are queued values to receive
-      if (
-        channelObj &&
-        channelObj._sendQueue &&
-        channelObj._sendQueue.length > 0
-      ) {
-        const receivedValue = channelObj._sendQueue.shift() as ReflectValue // Remove from queue
-        const elemType = channelValue.Type().Elem()
-        if (elemType) {
-          const recvVal = new Value(receivedValue, elemType)
-          return [i, recvVal, true]
-        }
-      }
-    }
-  }
-
-  // Look for default case if no channels are ready
-  for (let i = 0; i < selectCases.length; i++) {
-    const selectCase = selectCases[i]
-    if (selectCase.Dir.valueOf() === SelectDefault.valueOf()) {
-      // Default case is immediately available
-      return [i, new Value(null, new BasicType(Invalid, 'invalid')), false]
-    }
-  }
-
-  // If no channels are ready and no default case, return first case as fallback
-  if (selectCases.length > 0) {
-    const firstCase = selectCases[0]
-    if (firstCase.Dir.valueOf() === SelectRecv.valueOf() && firstCase.Chan) {
-      // Simulate receiving a zero value
-      const elemType = firstCase.Chan.Type().Elem()
-      if (elemType) {
-        const zeroVal = Zero(elemType)
-        return [0, zeroVal, true]
-      }
-    }
-    return [0, new Value(null, new BasicType(Invalid, 'invalid')), false]
-  }
-
-  // Fallback
-  return [0, new Value(null, new BasicType(Invalid, 'invalid')), false]
+  await $.selectStatement(selectCases, hasDefault)
+  return [chosen, recv, recvOK]
 }

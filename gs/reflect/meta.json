@@ -1,9 +1,13 @@
 {
   "dependencies": ["iter"],
+  "asyncFunctions": {
+    "Select": true
+  },
   "asyncMethods": {
     "Value.Call": true,
     "Value.CallSlice": true,
-    "Value.Recv": true
+    "Value.Recv": true,
+    "Value.Send": true
   },
   "funcValueMakers": {
     "MakeFunc": true,

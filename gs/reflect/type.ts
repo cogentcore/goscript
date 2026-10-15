@@ -775,8 +775,9 @@ export class Value {
 
   // currentValue returns the value v refers to. Calling a method copies a
   // Value, as in Go, so a setter on a copy updates the shared parent VarRef or
-  // struct field but not this Value's own _value; getters read through here.
-  private currentValue(): ReflectValue {
+  // struct field but not this Value's own _value; getters and Select read
+  // through here.
+  public currentValue(): ReflectValue {
     if (this._parentVarRef) {
       return this._parentVarRef.value
     }
@@ -1058,18 +1059,8 @@ export class Value {
   // value is ready. The boolean is false if the value is the zero value
   // received because the channel is closed.
   public async Recv(): Promise<[Value, boolean]> {
-    // Only a channel that can receive may be read.
-    if (this.Kind() !== Chan) {
-      throw new ValueError({ Kind: this.Kind(), Method: 'Recv' })
-    }
-    if (this._type.ChanDir() === SendDir) {
-      throw new Error('reflect: recv on send-only channel')
-    }
-
     // A closed channel yields the zero value and false.
-    const result = await $.chanRecvWithOk(
-      this.currentValue() as $.Channel<ReflectValue> | null,
-    )
+    const result = await $.chanRecvWithOk(this.recvChan())
     if (!result.ok) {
       return [Zero(this._type.Elem()), false]
     }
@@ -1645,32 +1636,43 @@ export class Value {
     return value as $.Complex
   }
 
-  // Send sends a value to a channel
-  public Send(x: Value): void {
-    if (this._type.Kind() !== Chan) {
-      throw new Error('reflect: send on non-chan type')
+  // Close closes the channel v. It panics if v is not a channel that can
+  // send.
+  public Close(): void {
+    const ch = this.sendChan()
+    if (ch === null) {
+      throw new Error('close of nil channel')
     }
+    ch.close()
+  }
 
-    // Get the underlying channel
-    const channel = this.currentValue()
-    if (!channel || typeof channel !== 'object') {
-      throw new Error('reflect: send on invalid channel')
+  // Send sends x on the channel v. It blocks until the value is sent.
+  public async Send(x: Value): Promise<void> {
+    await $.chanSend(this.sendChan(), x.currentValue())
+  }
+
+  // recvChan returns the channel v holds for a receive, or null for a nil
+  // channel. It panics if v is not a channel that can receive.
+  public recvChan(): $.Channel<ReflectValue> | null {
+    if (this.Kind() !== Chan) {
+      throw new ValueError({ Kind: this.Kind(), Method: 'Recv' })
     }
-
-    // Extract the value to send
-    const valueToSend = (x as { value: ReflectValue }).value
-
-    // For synchronous operation, we'll use a simplified send
-    // In the real implementation, this would need proper async handling
-    const channelObj = channel as any
-    if (typeof channelObj.send === 'function') {
-      // For now, just store the value in a queue or buffer
-      // This is a simplified implementation for testing
-      if (!channelObj._sendQueue) {
-        channelObj._sendQueue = []
-      }
-      channelObj._sendQueue.push(valueToSend)
+    if (this._type.ChanDir() === SendDir) {
+      throw new Error('reflect: recv on send-only channel')
     }
+    return this.currentValue() as $.Channel<ReflectValue> | null
+  }
+
+  // sendChan returns the channel v holds for a send, or null for a nil
+  // channel. It panics if v is not a channel that can send.
+  public sendChan(): $.Channel<ReflectValue> | null {
+    if (this.Kind() !== Chan) {
+      throw new ValueError({ Kind: this.Kind(), Method: 'Send' })
+    }
+    if (this._type.ChanDir() === RecvDir) {
+      throw new Error('reflect: send on recv-only channel')
+    }
+    return this.currentValue() as $.Channel<ReflectValue> | null
   }
 
   // SetString sets v's underlying value to x
