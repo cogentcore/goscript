@@ -12,8 +12,59 @@ import * as utf8 from "@goscript/unicode/utf8/index.js"
 let smallBufferSize: number = 64
 
 export class Buffer {
+	// raw is the whole capacity of a Uint8Array buf, and n its length, so that
+	// writes within the capacity store bytes without making a new view of buf
+	// for every byte. view caches buf, and is undefined after such a write.
+	// raw is null when buf is nil or not a Uint8Array, and view is then buf.
+	private _raw: Uint8Array | null = null
+	private _n: number = 0
+	private _view: $.Bytes | undefined = null
+
 	// contents are the bytes buf[off : len(buf)]
-	public declare buf: $.Bytes
+	public get buf(): $.Bytes {
+		// A view out of date is made again from raw.
+		let view = this._view
+		if (view === undefined) {
+			const raw = this._raw!
+			view = this._n === raw.length ? raw : $.goSlice(raw, 0, this._n)
+			this._view = view
+		}
+		return view
+	}
+
+	public set buf(value: $.Bytes) {
+		// A Uint8Array keeps its window of capacity in __meta__ when that
+		// differs from its length.
+		this._view = value
+		this._raw = null
+		this._n = 0
+		if (value instanceof Uint8Array) {
+			const meta = (value as any).__meta__
+			this._raw = meta === undefined ? value : meta.backing.subarray(meta.offset, meta.offset + meta.capacity)
+			this._n = value.length
+		}
+	}
+
+	// bufLen returns len(buf), without making a view of a Uint8Array.
+	private bufLen(): number {
+		return this._raw !== null ? this._n : $.len(this.buf)
+	}
+
+	// bufCap returns cap(buf).
+	private bufCap(): number {
+		return this._raw !== null ? this._raw.length : $.cap(this.buf)
+	}
+
+	// setBufLen reslices buf to length l, as buf = buf[:l], changing only the
+	// length of a Uint8Array within its capacity.
+	private setBufLen(l: number): void {
+		if (this._raw !== null && l >= 0 && l <= this._raw.length) {
+			this._n = l
+			this._view = undefined
+			return
+		}
+		this.buf = $.goSlice(this.buf, undefined, l)
+	}
 
 	// read at &buf[off], write at &buf[len(buf)]
 	public declare off: number
@@ -51,7 +102,7 @@ export class Buffer {
 	// The buffer is only valid until the next write operation on b.
 	public AvailableBuffer(): $.Bytes {
 		const b = $.pointerValue<Buffer>(this)
-		return $.goSlice(b.buf, $.len(b.buf), undefined)
+		return $.goSlice(b.buf, b.bufLen(), undefined)
 	}
 
 	// String returns the contents of the unread portion of the buffer
@@ -73,27 +124,27 @@ export class Buffer {
 	// empty reports whether the unread portion of the buffer is empty.
 	public empty(): boolean {
 		const b = $.pointerValue<Buffer>(this)
-		return $.len(b.buf) <= b.off
+		return b.bufLen() <= b.off
 	}
 
 	// Len returns the number of bytes of the unread portion of the buffer;
 	// b.Len() == len(b.Bytes()).
 	public Len(): number {
 		const b = $.pointerValue<Buffer>(this)
-		return $.len(b.buf) - b.off
+		return b.bufLen() - b.off
 	}
 
 	// Cap returns the capacity of the buffer's underlying byte slice, that is, the
 	// total space allocated for the buffer's data.
 	public Cap(): number {
 		const b = $.pointerValue<Buffer>(this)
-		return $.cap(b.buf)
+		return b.bufCap()
 	}
 
 	// Available returns how many bytes are unused in the buffer.
 	public Available(): number {
 		const b = $.pointerValue<Buffer>(this)
-		return $.cap(b.buf) - $.len(b.buf)
+		return b.bufCap() - b.bufLen()
 	}
 
 	// Truncate discards all but the first n unread bytes from the buffer
@@ -109,7 +160,7 @@ export class Buffer {
 		if (n < 0 || n > b.Len()) {
 			$.panic("bytes.Buffer: truncation out of range")
 		}
-		b.buf = $.goSlice(b.buf, undefined, b.off + n)
+		b.setBufLen(b.off + n)
 	}
 
 	// Reset resets the buffer to be empty,
@@ -117,7 +168,7 @@ export class Buffer {
 	// Reset is the same as [Buffer.Truncate](0).
 	public Reset(): void {
 		const b = $.pointerValue<Buffer>(this)
-		b.buf = $.goSlice(b.buf, undefined, 0)
+		b.setBufLen(0)
 		b.off = 0
 		b.lastRead = 0
 	}
@@ -127,6 +178,20 @@ export class Buffer {
 	// It returns the index where bytes should be written and whether it succeeded.
 	public tryGrowByReslice(n: number): [number, boolean] {
 		const b = $.pointerValue<Buffer>(this)
+
+		// A Uint8Array with room grows its length without a new view.
+		const raw = b._raw
+		if (raw !== null) {
+			const l = b._n
+			if (n <= raw.length - l) {
+				b._n = l + n
+				b._view = undefined
+				return [l, true]
+			}
+			return [0, false]
+		}
+
+		// Other slices are resliced.
 		if (b.buf === null) {
 			return [0, false]
 		}
@@ -161,7 +226,7 @@ export class Buffer {
 			b.buf = $.makeSlice<number>(n, capacity, 'byte')
 			return 0
 		}
-		let c = $.cap(b.buf)
+		let c = b.bufCap()
 		if (n <= c / 2 - m) {
 			// We can slide things down instead of allocating a new
 			// slice. We only need m+n <= c to slide, but
@@ -175,7 +240,7 @@ export class Buffer {
 			b.buf = growSlice($.goSlice(b.buf, b.off, undefined), b.off + n)
 		}
 		b.off = 0
-		b.buf = $.goSlice(b.buf, undefined, m + n)
+		b.setBufLen(m + n)
 		return m
 	}
 
@@ -190,7 +255,7 @@ export class Buffer {
 			$.panic("bytes.Buffer.Grow: negative count")
 		}
 		let m = b.grow(n)
-		b.buf = $.goSlice(b.buf, undefined, m)
+		b.setBufLen(m)
 	}
 
 	// Write appends the contents of p to the buffer, growing the buffer as
@@ -234,13 +299,13 @@ export class Buffer {
 			let n = 0n
 			for (; ; ) {
 				let i = b.grow(512)
-				b.buf = $.goSlice(b.buf, undefined, i)
+				b.setBufLen(i)
 				let [m, e] = await (r!.Read($.bytesToUint8Array($.goSlice(b.buf, i, $.cap(b.buf)))) as any)
 				if (m < 0) {
 					$.panic(errNegativeRead)
 				}
 
-				b.buf = $.goSlice(b.buf, undefined, i + m)
+				b.setBufLen(i + m)
 				n += BigInt(m as number)
 
 				// e is EOF, so return nil explicitly
@@ -294,6 +359,16 @@ export class Buffer {
 	public WriteByte(c: number): $.GoError {
 		const b = $.pointerValue<Buffer>(this)
 		b.lastRead = 0
+
+		// A byte that fits in the capacity is stored in place.
+		const raw = b._raw
+		if (raw !== null && b._n < raw.length) {
+			raw[b._n++] = c
+			b._view = undefined
+			return null
+		}
+
+		// Otherwise the buffer grows first.
 		let [m, ok] = b.tryGrowByReslice(1)
 		if (!ok) {
 			m = b.grow(1)
@@ -318,7 +393,7 @@ export class Buffer {
 			m = b.grow(utf8.UTFMax)
 		}
 		b.buf = utf8.AppendRune($.bytesToUint8Array($.goSlice(b.buf, undefined, m)), r)
-		return [$.len(b.buf) - m, null]
+		return [b.bufLen() - m, null]
 	}
 
 	// Read reads the next len(p) bytes from the buffer or until the buffer
