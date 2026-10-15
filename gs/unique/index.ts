@@ -102,14 +102,10 @@ function normalize(
         .sort(([a], [b]) => JSON.stringify(a).localeCompare(JSON.stringify(b))),
     }
   }
-  if (
-    '_fields' in value &&
-    value._fields &&
-    typeof value._fields === 'object'
-  ) {
+  if ($.isStructObject(value)) {
     return {
       $type: value.constructor.name,
-      $fields: normalize(value._fields, seen, nextID),
+      $fields: normalize({ ...value }, seen, nextID),
     }
   }
   const entries = Object.entries(value)

@@ -680,9 +680,7 @@ describe('TypeFor', () => {
   })
 
   it('interns ValueOf types before comparable reflect use', () => {
-    class RegisteredType {
-      public _fields = {}
-    }
+    class RegisteredType {}
     const typeInfo = registerStructType(
       'asn1.BitString',
       new RegisteredType(),
@@ -699,21 +697,10 @@ describe('TypeFor', () => {
 
   it('allocates registered struct zero values through the named constructor', () => {
     class RegisteredZero {
-      public get Name(): string {
-        return this._fields.Name
-      }
-      public set Name(value: string) {
-        this._fields.Name = value
-      }
-
-      public _fields: {
-        Name: ReturnType<typeof varRef<string>>
-      }
+      declare public Name: string
 
       constructor(init?: Partial<{ Name?: string }>) {
-        this._fields = {
-          Name: init?.Name ?? '',
-        }
+        this.Name = init?.Name ?? ''
       }
 
       public clone(): RegisteredZero {
