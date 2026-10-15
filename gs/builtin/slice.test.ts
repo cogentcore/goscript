@@ -9,6 +9,7 @@ import {
   appendZeros,
   arrayToSlice,
   byteSliceHint,
+  bytesFromBase64,
   bytesFromHex,
   bytesToString,
   copy,
@@ -104,6 +105,21 @@ describe('compiler byte constants', () => {
 
   it('decodes compact hexadecimal byte arrays', () => {
     expect(bytesFromHex('00ff8041')).toEqual(new Uint8Array([0, 255, 128, 65]))
+  })
+
+  it('decodes base64 byte data with and without the native decoder', () => {
+    const want = new Uint8Array([0, 255, 128, 65, 10, 251, 239])
+    expect(bytesFromBase64('AP+AQQr77w==')).toEqual(want)
+    const native = (Uint8Array as unknown as { fromBase64?: unknown })
+      .fromBase64
+    try {
+      ;(Uint8Array as unknown as { fromBase64?: unknown }).fromBase64 =
+        undefined
+      expect(bytesFromBase64('AP+AQQr77w==')).toEqual(want)
+      expect(bytesFromBase64('')).toEqual(new Uint8Array(0))
+    } finally {
+      ;(Uint8Array as unknown as { fromBase64?: unknown }).fromBase64 = native
+    }
   })
 })
 
