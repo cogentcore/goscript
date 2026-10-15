@@ -931,9 +931,11 @@ export function uint64And(
   right: number | bigint,
 ): bigint {
   // A bitwise operation of two bigints keeps 64 bits of the bigint result,
-  // which are those of the operation of their 64 bits.
+  // which are those of the operation of their 64 bits. BigInt.asIntN and
+  // asUintN of 64 bits compile to 64-bit machine operations, unlike the
+  // range checks of the results of other operations.
   if (typeof left === 'bigint' && typeof right === 'bigint') {
-    return uint64Result(left & right)
+    return BigInt.asUintN(64, left & right)
   }
 
   // Other operands are converted to their 64 bits first.
@@ -947,7 +949,7 @@ export function int64And(
   // A bitwise operation of two bigints keeps 64 bits of the bigint result,
   // which are those of the operation of their 64 bits.
   if (typeof left === 'bigint' && typeof right === 'bigint') {
-    return int64Result(left & right)
+    return BigInt.asIntN(64, left & right)
   }
 
   // Other operands are converted to their 64 bits first.
@@ -961,7 +963,7 @@ export function uint64AndNot(
   // A bitwise operation of two bigints keeps 64 bits of the bigint result,
   // which are those of the operation of their 64 bits.
   if (typeof left === 'bigint' && typeof right === 'bigint') {
-    return uint64Result(left & ~right)
+    return BigInt.asUintN(64, left & ~right)
   }
 
   // Other operands are converted to their 64 bits first.
@@ -975,7 +977,7 @@ export function int64AndNot(
   // A bitwise operation of two bigints keeps 64 bits of the bigint result,
   // which are those of the operation of their 64 bits.
   if (typeof left === 'bigint' && typeof right === 'bigint') {
-    return int64Result(left & ~right)
+    return BigInt.asIntN(64, left & ~right)
   }
 
   // Other operands are converted to their 64 bits first.
@@ -989,7 +991,7 @@ export function uint64Or(
   // A bitwise operation of two bigints keeps 64 bits of the bigint result,
   // which are those of the operation of their 64 bits.
   if (typeof left === 'bigint' && typeof right === 'bigint') {
-    return uint64Result(left | right)
+    return BigInt.asUintN(64, left | right)
   }
 
   // Other operands are converted to their 64 bits first.
@@ -1000,7 +1002,7 @@ export function int64Or(left: number | bigint, right: number | bigint): bigint {
   // A bitwise operation of two bigints keeps 64 bits of the bigint result,
   // which are those of the operation of their 64 bits.
   if (typeof left === 'bigint' && typeof right === 'bigint') {
-    return int64Result(left | right)
+    return BigInt.asIntN(64, left | right)
   }
 
   // Other operands are converted to their 64 bits first.
@@ -1014,7 +1016,7 @@ export function uint64Xor(
   // A bitwise operation of two bigints keeps 64 bits of the bigint result,
   // which are those of the operation of their 64 bits.
   if (typeof left === 'bigint' && typeof right === 'bigint') {
-    return uint64Result(left ^ right)
+    return BigInt.asUintN(64, left ^ right)
   }
 
   // Other operands are converted to their 64 bits first.
@@ -1028,7 +1030,7 @@ export function int64Xor(
   // A bitwise operation of two bigints keeps 64 bits of the bigint result,
   // which are those of the operation of their 64 bits.
   if (typeof left === 'bigint' && typeof right === 'bigint') {
-    return int64Result(left ^ right)
+    return BigInt.asIntN(64, left ^ right)
   }
 
   // Other operands are converted to their 64 bits first.
