@@ -19,13 +19,13 @@ $.registerInterfaceType(
 export class wrappedAEAD {
 	public declare inner: cipher.AEAD | null
 
-	constructor(init?: Partial<{inner?: cipher.AEAD | null}>, __goscriptValue?: boolean) {
-		this.inner = init?.inner ?? (null! as cipher.AEAD | null)
+	constructor(__goscriptValue?: boolean, inner$?: cipher.AEAD | null) {
+		this.inner = inner$ ?? (null! as cipher.AEAD | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): wrappedAEAD {
-		return new wrappedAEAD(this, true)
+		return new wrappedAEAD(true, this.inner)
 	}
 
 	public __goscriptAssign(source: wrappedAEAD): this {
@@ -69,15 +69,15 @@ export class nestedSealer {
 
 	public declare aad: $.Slice<number>
 
-	constructor(init?: Partial<{aead?: cipher.AEAD | null, nonce?: $.Slice<number>, aad?: $.Slice<number>}>, __goscriptValue?: boolean) {
-		this.aead = init?.aead ?? (null! as cipher.AEAD | null)
-		this.nonce = init?.nonce ?? (null! as $.Slice<number>)
-		this.aad = init?.aad ?? (null! as $.Slice<number>)
+	constructor(__goscriptValue?: boolean, aead$?: cipher.AEAD | null, nonce$?: $.Slice<number>, aad$?: $.Slice<number>) {
+		this.aead = aead$ ?? (null! as cipher.AEAD | null)
+		this.nonce = nonce$ ?? (null! as $.Slice<number>)
+		this.aad = aad$ ?? (null! as $.Slice<number>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): nestedSealer {
-		return new nestedSealer(this, true)
+		return new nestedSealer(true, this.aead, this.nonce, this.aad)
 	}
 
 	public __goscriptAssign(source: nestedSealer): this {
@@ -156,7 +156,7 @@ export async function main(): globalThis.Promise<void> {
 	await roundTrip($.makeSlice<number>(0, 64, "byte"))
 	let [block, ] = aes.NewCipher(new Uint8Array([48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 97, 98, 99, 100, 101, 102]))
 	let [inner, ] = cipher.NewGCM($.pointerValueOrNil(block)!)
-	let aead = $.interfaceValue<cipher.AEAD | null>(new wrappedAEAD({inner: inner}), "*main.wrappedAEAD", /* @__PURE__ */ $.pointerType("main.wrappedAEAD"))
+	let aead = $.interfaceValue<cipher.AEAD | null>(new wrappedAEAD(false, inner), "*main.wrappedAEAD", /* @__PURE__ */ $.pointerType("main.wrappedAEAD"))
 	let plaintext = $.makeSlice<number>(695, undefined, "byte")
 	for (let __goscriptRangeTarget1 = plaintext, __goscriptRangeWindow1 = $.sliceRange(__goscriptRangeTarget1), i = 0; i < __goscriptRangeWindow1.length; i++) {
 		;(__goscriptRangeWindow1.backing as any[])[__goscriptRangeWindow1.offset + i] = $.uint(i, 8)
@@ -166,7 +166,7 @@ export async function main(): globalThis.Promise<void> {
 	let aad = new Uint8Array([113, 117, 105, 99, 32, 112, 114, 111, 116, 101, 99, 116, 101, 100, 32, 104, 101, 97, 100, 101, 114])
 	let expected = await (aead !== null && (aead as any).__isVarRef !== true && ((aead as any).__goValue === undefined || (aead as any).__goType?.charCodeAt(0) !== 42) ? (aead as Exclude<cipher.AEAD, null>) : $.pointerValue<Exclude<cipher.AEAD, null>>(aead)).Seal(null, nonce, plaintext, aad)
 	$.copy($.goSlice(packet, 15, undefined), plaintext)
-	let sealer = $.interfaceValue<packetSealer | null>(new nestedSealer({aead: aead, nonce: nonce, aad: aad}), "*main.nestedSealer", /* @__PURE__ */ $.pointerType("main.nestedSealer"));
+	let sealer = $.interfaceValue<packetSealer | null>(new nestedSealer(false, aead, nonce, aad), "*main.nestedSealer", /* @__PURE__ */ $.pointerType("main.nestedSealer"));
 	;((__goscriptAwait = (sealer !== null && (sealer as any).__isVarRef !== true && ((sealer as any).__goValue === undefined || (sealer as any).__goType?.charCodeAt(0) !== 42) ? (sealer as Exclude<packetSealer, null>) : $.pointerValue<Exclude<packetSealer, null>>(sealer)).Seal($.goSlice(packet, 15, 15), $.goSlice(packet, 15, 15 + $.sliceLen(plaintext))), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as $.Slice<number>)
 	packet = $.goSlice(packet, undefined, $.sliceLen(packet) + (__goscriptAwait = (aead !== null && (aead as any).__isVarRef !== true && ((aead as any).__goValue === undefined || (aead as any).__goType?.charCodeAt(0) !== 42) ? (aead as Exclude<cipher.AEAD, null>) : $.pointerValue<Exclude<cipher.AEAD, null>>(aead)).Overhead(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	await $.println("wrapped shared backing:", bytes.Equal($.goSlice(packet, 15, 15 + $.sliceLen(expected)), expected))

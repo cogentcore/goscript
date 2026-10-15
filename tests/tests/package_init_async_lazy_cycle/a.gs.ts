@@ -8,13 +8,13 @@ import * as __goscript_package_init from "./__goscript_package_init.gs.ts"
 export class holder {
 	public declare n: number
 
-	constructor(init?: Partial<{n?: number}>, __goscriptValue?: boolean) {
-		this.n = init?.n ?? (0 as number)
+	constructor(__goscriptValue?: boolean, n$?: number) {
+		this.n = n$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): holder {
-		return new holder(this, true)
+		return new holder(true, this.n)
 	}
 
 	public __goscriptAssign(source: holder): this {

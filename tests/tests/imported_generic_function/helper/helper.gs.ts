@@ -18,13 +18,13 @@ $.registerInterfaceType(
 export class Box {
 	public declare Value: any
 
-	constructor(init?: Partial<{Value?: any}>, __goscriptValue?: boolean, __goscriptFresh?: boolean) {
-		this.Value = init?.Value !== undefined ? (__goscriptFresh === true ? init.Value : $.copyElement(init.Value)) : (null! as any)
+	constructor(__goscriptValue?: boolean, Value$?: any) {
+		this.Value = Value$ ?? (null! as any)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Box {
-		return new Box(this, true)
+		return new Box(true, $.copyElement(this.Value))
 	}
 
 	public __goscriptAssign(source: Box): this {
@@ -44,13 +44,13 @@ export class Box {
 export class IntValue {
 	public declare N: number
 
-	constructor(init?: Partial<{N?: number}>, __goscriptValue?: boolean) {
-		this.N = init?.N ?? (0 as number)
+	constructor(__goscriptValue?: boolean, N$?: number) {
+		this.N = N$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): IntValue {
-		return new IntValue(this, true)
+		return new IntValue(true, this.N)
 	}
 
 	public __goscriptAssign(source: IntValue): this {
@@ -73,7 +73,7 @@ export class IntValue {
 }
 
 export function Wrap(__typeArgs: $.GenericTypeArgs | undefined, value: any): Box {
-	return $.markAsStructValue(new Box({Value: $.copyElement(value)}))
+	return new Box(true, $.copyElement(value))
 }
 
 export function Collect<T>(__typeArgs: $.GenericTypeArgs | undefined, value: any): [$.Slice<T>, $.GoError] {

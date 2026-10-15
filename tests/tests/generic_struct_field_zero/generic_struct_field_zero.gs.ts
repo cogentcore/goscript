@@ -6,13 +6,13 @@ import * as $ from "@goscript/builtin/index.js"
 export class box {
 	public declare Value: any
 
-	constructor(init?: Partial<{Value?: any}>, __goscriptValue?: boolean, __goscriptFresh?: boolean) {
-		this.Value = init?.Value !== undefined ? (__goscriptFresh === true ? init.Value : $.copyElement(init.Value)) : (null! as any)
+	constructor(__goscriptValue?: boolean, Value$?: any) {
+		this.Value = Value$ ?? (null! as any)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): box {
-		return new box(this, true)
+		return new box(true, $.copyElement(this.Value))
 	}
 
 	public __goscriptAssign(source: box): this {
@@ -32,13 +32,13 @@ export class box {
 export class point {
 	public declare X: number
 
-	constructor(init?: Partial<{X?: number}>, __goscriptValue?: boolean) {
-		this.X = init?.X ?? (0 as number)
+	constructor(__goscriptValue?: boolean, X$?: number) {
+		this.X = X$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): point {
-		return new point(this, true)
+		return new point(true, this.X)
 	}
 
 	public __goscriptAssign(source: point): this {
@@ -56,19 +56,19 @@ export class point {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let intBox: box = $.markAsStructValue(new box({Value: 0}, undefined, true))
+	let intBox: box = new box(true, 0)
 	await $.println("int", intBox.Value)
 
-	let stringBox: box = $.markAsStructValue(new box({Value: ""}, undefined, true))
+	let stringBox: box = new box(true, "")
 	await $.println("string", $.stringEqual(stringBox.Value, ""))
 
-	let mapBox: box = $.markAsStructValue(new box({Value: null! as globalThis.Map<string, number> | null}, undefined, true))
+	let mapBox: box = new box(true, null! as globalThis.Map<string, number> | null)
 	await $.println("map", mapBox.Value == null)
 
-	let pointBox: box = $.markAsStructValue(new box({Value: new point(undefined, true)}, undefined, true))
+	let pointBox: box = new box(true, new point(true))
 	await $.println("struct", pointBox.Value.X)
 
-	let explicit = $.markAsStructValue(new box({Value: 0}))
+	let explicit = new box(true, 0)
 	await $.println("literal", explicit.Value)
 }
 

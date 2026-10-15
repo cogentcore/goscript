@@ -6,13 +6,13 @@ import * as $ from "@goscript/builtin/index.js"
 export class Worker {
 	public declare ch: $.Channel<number> | null
 
-	constructor(init?: Partial<{ch?: $.Channel<number> | null}>, __goscriptValue?: boolean) {
-		this.ch = init?.ch ?? (null! as $.Channel<number> | null)
+	constructor(__goscriptValue?: boolean, ch$?: $.Channel<number> | null) {
+		this.ch = ch$ ?? (null! as $.Channel<number> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Worker {
-		return new Worker(this, true)
+		return new Worker(true, this.ch)
 	}
 
 	public __goscriptAssign(source: Worker): this {
@@ -57,7 +57,7 @@ export function chooseLookup(value: any, worker: Worker | $.VarRef<Worker> | nul
 }
 
 export async function main(): globalThis.Promise<void> {
-	let worker = new Worker({ch: $.makeChannel<number>(1, 0, "both")})
+	let worker = new Worker(false, $.makeChannel<number>(1, 0, "both"))
 	let worker$: Worker = worker == null ? $.pointerTarget<Worker>(worker) : (worker as any).__isVarRef === true ? (worker as any).value : (worker as any).__goValue === undefined ? (worker as any) : $.pointerTarget<Worker>(worker)
 	await $.println("lookup:", chooseLookup(null, worker))
 

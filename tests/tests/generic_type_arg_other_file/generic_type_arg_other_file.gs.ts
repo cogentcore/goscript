@@ -6,7 +6,7 @@ import * as __goscript_descriptor from "./descriptor.gs.ts"
 import * as __goscript_device from "./device.gs.ts"
 
 export async function main(): globalThis.Promise<void> {
-	await $.println($.mustTypeAssert<string>(await __goscript_device.create(new __goscript_descriptor.descriptor({Label: "shader"})), /* @__PURE__ */ $.basicType("string")))
+	await $.println($.mustTypeAssert<string>(await __goscript_device.create(new __goscript_descriptor.descriptor(false, "shader")), /* @__PURE__ */ $.basicType("string")))
 	await $.println(await __goscript_device.create(null) == null)
 }
 

@@ -6,13 +6,13 @@ import * as $ from "@goscript/builtin/index.js"
 export class AsyncResource {
 	public declare name: string
 
-	constructor(init?: Partial<{name?: string}>, __goscriptValue?: boolean) {
-		this.name = init?.name ?? ("" as string)
+	constructor(__goscriptValue?: boolean, name$?: string) {
+		this.name = name$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): AsyncResource {
-		return new AsyncResource(this, true)
+		return new AsyncResource(true, this.name)
 	}
 
 	public __goscriptAssign(source: AsyncResource): this {
@@ -41,7 +41,7 @@ export class AsyncResource {
 
 export async function main(): globalThis.Promise<void> {
 	await using __defer = new $.AsyncDisposableStack()
-	let res = new AsyncResource({name: "test"})
+	let res = new AsyncResource(false, "test")
 	__defer.defer(async () => { await (res !== null && (res as any).__isVarRef !== true && (res as any).__goValue === undefined ? ((res as any) as AsyncResource).Release() : AsyncResource.prototype.Release.call(res)) })
 	await $.println("main function")
 }

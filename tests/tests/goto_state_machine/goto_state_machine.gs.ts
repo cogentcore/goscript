@@ -10,15 +10,15 @@ export class scanner {
 
 	public declare done: boolean
 
-	constructor(init?: Partial<{data?: string, pos?: number, done?: boolean}>, __goscriptValue?: boolean) {
-		this.data = init?.data ?? ("" as string)
-		this.pos = init?.pos ?? (0 as number)
-		this.done = init?.done ?? (false as boolean)
+	constructor(__goscriptValue?: boolean, data$?: string, pos$?: number, done$?: boolean) {
+		this.data = data$ ?? ""
+		this.pos = pos$ ?? 0
+		this.done = done$ ?? false
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): scanner {
-		return new scanner(this, true)
+		return new scanner(true, this.data, this.pos, this.done)
 	}
 
 	public __goscriptAssign(source: scanner): this {
@@ -171,7 +171,7 @@ export class scanner {
 export async function main(): globalThis.Promise<void> {
 	for (let __goscriptRangeTarget0 = $.arrayToSlice<string>(["a < b</script>", "x<!-- </script> -->y</script>", "<!x</script>", "no end"]), __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
 		let src = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as string)
-		let s = new scanner({data: src})
+		let s = new scanner(false, src)
 		let end = (s !== null && (s as any).__isVarRef !== true && (s as any).__goValue === undefined ? ((s as any) as scanner).readScript() : scanner.prototype.readScript.call(s))
 		await $.println($.sliceStringOrBytes(src, undefined, end))
 	}

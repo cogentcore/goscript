@@ -6,13 +6,13 @@ import * as $ from "@goscript/builtin/index.js"
 export class MyStruct {
 	public declare Value: number
 
-	constructor(init?: Partial<{Value?: number}>, __goscriptValue?: boolean) {
-		this.Value = init?.Value ?? (0 as number)
+	constructor(__goscriptValue?: boolean, Value$?: number) {
+		this.Value = Value$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): MyStruct {
-		return new MyStruct(this, true)
+		return new MyStruct(true, this.Value)
 	}
 
 	public __goscriptAssign(source: MyStruct): this {
@@ -30,9 +30,9 @@ export class MyStruct {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let s1 = new MyStruct({Value: 10}, true)
+	let s1 = new MyStruct(true, 10)
 	let p: MyStruct | $.VarRef<MyStruct> | null = null! as MyStruct | $.VarRef<MyStruct> | null
-	p = new MyStruct({Value: 20})
+	p = new MyStruct(false, 20)
 
 	// This assignment should trigger the .clone() on s1
 	// because s1 is a struct and *p is being assigned.
@@ -45,8 +45,8 @@ export async function main(): globalThis.Promise<void> {
 	await $.println($.pointerValue<MyStruct>(p).Value)
 
 	// Test assignment from a pointer to a struct (should not clone)
-	let s2 = new MyStruct({Value: 40})
-	let p2 = new MyStruct({Value: 50})
+	let s2 = new MyStruct(false, 40)
+	let p2 = new MyStruct(false, 50)
 	let p2$: MyStruct = p2 == null ? $.pointerTarget<MyStruct>(p2) : (p2 as any).__isVarRef === true ? (p2 as any).value : (p2 as any).__goValue === undefined ? (p2 as any) : $.pointerTarget<MyStruct>(p2);
 	;(p2$ as MyStruct).__goscriptAssign($.pointerValue<MyStruct>(s2))
 	await $.println((p2$ as MyStruct).Value)
@@ -57,24 +57,24 @@ export async function main(): globalThis.Promise<void> {
 	// In *p2 = *s2, *s2 is a struct value.
 
 	// Test assignment of a struct from a function call
-	let s3 = new MyStruct({Value: 70}, true)
-	let p3 = new MyStruct({Value: 80})
+	let s3 = new MyStruct(true, 70)
+	let p3 = new MyStruct(false, 80)
 	$.pointerValue<MyStruct>(p3).__goscriptAssign(getStruct())
 	await $.println($.pointerValue<MyStruct>(p3).Value)
 	await $.println(s3.Value)
 
 	// Test assignment of a struct from a pointer returned by a function call
-	let p4 = new MyStruct({Value: 90})
+	let p4 = new MyStruct(false, 90)
 	$.pointerValue<MyStruct>(p4).__goscriptAssign($.pointerValue<MyStruct>(getStructPointer()))
 	await $.println($.pointerValue<MyStruct>(p4).Value)
 }
 
 export function getStruct(): MyStruct {
-	return new MyStruct({Value: 100}, true)
+	return new MyStruct(true, 100)
 }
 
 export function getStructPointer(): MyStruct | $.VarRef<MyStruct> | null {
-	return new MyStruct({Value: 110})
+	return new MyStruct(false, 110)
 }
 
 if ($.isMainScript(import.meta)) {

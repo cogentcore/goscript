@@ -12,14 +12,14 @@ export class Thing {
 
 	public declare Label: string
 
-	constructor(init?: Partial<{Value?: number, Label?: string}>, __goscriptValue?: boolean) {
-		this.Value = init?.Value ?? (0 as number)
-		this.Label = init?.Label ?? ("" as string)
+	constructor(__goscriptValue?: boolean, Value$?: number, Label$?: string) {
+		this.Value = Value$ ?? 0
+		this.Label = Label$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Thing {
-		return new Thing(this, true)
+		return new Thing(true, this.Value, this.Label)
 	}
 
 	public __goscriptAssign(source: Thing): this {

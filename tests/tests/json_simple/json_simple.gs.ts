@@ -7,13 +7,13 @@ import * as json from "@goscript/encoding/json/index.js"
 export class Simple {
 	public declare X: number
 
-	constructor(init?: Partial<{X?: number}>, __goscriptValue?: boolean) {
-		this.X = init?.X ?? (0 as number)
+	constructor(__goscriptValue?: boolean, X$?: number) {
+		this.X = X$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Simple {
-		return new Simple(this, true)
+		return new Simple(true, this.X)
 	}
 
 	public __goscriptAssign(source: Simple): this {
@@ -31,8 +31,8 @@ export class Simple {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let s = new Simple({X: 42}, true)
-	let __goscriptTuple0: any = (json.Marshal($.interfaceValue(s, "main.Simple", "main.Simple")) as [$.Slice<number>, $.GoError])
+	let s = new Simple(true, 42)
+	let __goscriptTuple0: any = (json.Marshal($.interfaceValue((s).clone(), "main.Simple", "main.Simple")) as [$.Slice<number>, $.GoError])
 	let b: $.Slice<number> = __goscriptTuple0[0]
 	let err = __goscriptTuple0[1]
 	if (err != null) {

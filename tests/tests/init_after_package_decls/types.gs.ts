@@ -64,13 +64,13 @@ export function __goscript_set_order(__goscriptValue: $.Slice<string>): void {
 
 export function newDefault(): __goscript__type.Type | $.VarRef<__goscript__type.Type> | null {
 	__goscript_set_order($.appendOne(__goscript_get_order(), "Default"))
-	return new __goscript__type.Type({Name: "default", Fields: $.arrayToSlice<__goscript_field.Field>([new __goscript_field.Field({Name: "x"}, true)])})
+	return new __goscript__type.Type(false, "default", $.arrayToSlice<__goscript_field.Field>([new __goscript_field.Field(true, "x")]))
 }
 
 export function addBuiltin(__typeArgs: $.GenericTypeArgs | undefined, name: string): void {
 	let zero: any = $.genericZero(__typeArgs, "T", null)
 	zero
-	$.mapSet(__goscript_get_Types(), name, new __goscript__type.Type({Name: name}))
+	$.mapSet(__goscript_get_Types(), name, new __goscript__type.Type(false, name))
 }
 
 export function TypeByName(name: string): __goscript__type.Type | $.VarRef<__goscript__type.Type> | null {

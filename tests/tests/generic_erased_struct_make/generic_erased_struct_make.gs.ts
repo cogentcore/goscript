@@ -6,13 +6,13 @@ import * as $ from "@goscript/builtin/index.js"
 export class queue {
 	public declare buf: $.Slice<any>
 
-	constructor(init?: Partial<{buf?: $.Slice<any>}>, __goscriptValue?: boolean) {
-		this.buf = init?.buf ?? (null! as $.Slice<any>)
+	constructor(__goscriptValue?: boolean, buf$?: $.Slice<any>) {
+		this.buf = buf$ ?? (null! as $.Slice<any>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): queue {
-		return new queue(this, true)
+		return new queue(true, this.buf)
 	}
 
 	public __goscriptAssign(source: queue): this {
@@ -30,7 +30,7 @@ export class queue {
 }
 
 export function newQueue(__typeArgs: $.GenericTypeArgs | undefined, capacity: number): queue | $.VarRef<queue> | null {
-	return new queue({buf: $.makeSlice<any>(capacity, undefined, $.genericSliceTypeHint(__typeArgs, "T"), () => ($.genericZero(__typeArgs, "T", null) as any))})
+	return new queue(false, $.makeSlice<any>(capacity, undefined, undefined, () => ($.genericZero(__typeArgs, "T", null) as any)))
 }
 
 export async function main(): globalThis.Promise<void> {

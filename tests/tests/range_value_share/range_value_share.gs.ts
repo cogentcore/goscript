@@ -8,14 +8,14 @@ export class point {
 
 	public declare Y: number
 
-	constructor(init?: Partial<{X?: number, Y?: number}>, __goscriptValue?: boolean) {
-		this.X = init?.X ?? (0 as number)
-		this.Y = init?.Y ?? (0 as number)
+	constructor(__goscriptValue?: boolean, X$?: number, Y$?: number) {
+		this.X = X$ ?? 0
+		this.Y = Y$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): point {
-		return new point(this, true)
+		return new point(true, this.X, this.Y)
 	}
 
 	public __goscriptAssign(source: point): this {
@@ -40,15 +40,15 @@ export class box {
 
 	public declare Name: string
 
-	constructor(init?: Partial<{Min?: point, Max?: point, Name?: string}>, __goscriptValue?: boolean) {
-		this.Min = init?.Min ? init.Min.clone() : new point(undefined, true)
-		this.Max = init?.Max ? init.Max.clone() : new point(undefined, true)
-		this.Name = init?.Name ?? ("" as string)
+	constructor(__goscriptValue?: boolean, Min$?: point, Max$?: point, Name$?: string) {
+		this.Min = Min$ ?? new point(true)
+		this.Max = Max$ ?? new point(true)
+		this.Name = Name$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): box {
-		return new box(this, true)
+		return new box(true, this.Min.clone(), this.Max.clone(), this.Name)
 	}
 
 	public __goscriptAssign(source: box): this {
@@ -80,7 +80,7 @@ export function find(name: string): box {
 			return (b).clone()
 		}
 	}
-	return new box(undefined, true)
+	return new box(true)
 }
 
 export function widen(i: number): void {
@@ -88,7 +88,7 @@ export function widen(i: number): void {
 }
 
 export async function main(): globalThis.Promise<void> {
-	boxes = $.arrayToSlice<box>([new box({Min: new point({X: 1, Y: 2}, true), Max: new point({X: 3, Y: 4}, true), Name: "a"}, true), new box({Min: new point({X: 5, Y: 6}, true), Max: new point({X: 7, Y: 8}, true), Name: "b"}, true)])
+	boxes = $.arrayToSlice<box>([new box(true, new point(true, 1, 2), new point(true, 3, 4), "a"), new box(true, new point(true, 5, 6), new point(true, 7, 8), "b")])
 
 	// A value that the body only reads.
 	let sum = 0
@@ -118,7 +118,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 
 	// A copy made in the body is its own value.
-	let last: box = new box(undefined, true)
+	let last: box = new box(true)
 	for (let __goscriptRangeTarget4 = boxes, __goscriptRangeWindow4 = $.sliceRange(__goscriptRangeTarget4), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow4.length; __rangeIndex++) {
 		let b = ((__goscriptRangeWindow4.backing[__goscriptRangeWindow4.offset + __rangeIndex] as box)).clone()
 		let c = (b).clone()

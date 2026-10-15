@@ -9,7 +9,7 @@ import * as csync from "@goscript/github.com/aperturerobotics/util/csync/index.j
 
 export async function main(): globalThis.Promise<void> {
 	await using __defer = new $.AsyncDisposableStack()
-	let mtx: $.VarRef<csync.Mutex> = $.varRef(new csync.Mutex(undefined, true))
+	let mtx: $.VarRef<csync.Mutex> = $.varRef(new csync.Mutex(true))
 	let counter = 0
 	let wg = $.varRef($.markAsStructValue(new sync.WaitGroup()))
 

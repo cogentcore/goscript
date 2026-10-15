@@ -18,7 +18,7 @@ export async function show(v: any): globalThis.Promise<void> {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let fsys: fs.FS | null = $.namedValueInterfaceValue<fs.FS | null>($.makeMap<string, fstest.MapFile | $.VarRef<fstest.MapFile> | null>([["a.txt", new fstest.MapFile({Data: new Uint8Array([98, 97, 114])})]]), "fstest.MapFS", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2())
+	let fsys: fs.FS | null = $.namedValueInterfaceValue<fs.FS | null>($.makeMap<string, fstest.MapFile | $.VarRef<fstest.MapFile> | null>([["a.txt", new fstest.MapFile(false, new Uint8Array([98, 97, 114]))]]), "fstest.MapFS", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2())
 	let [file, err] = await (fsys !== null && (fsys as any).__isVarRef !== true && ((fsys as any).__goValue === undefined || (fsys as any).__goType?.charCodeAt(0) !== 42) ? (fsys as Exclude<fs.FS, null>) : $.pointerValue<Exclude<fs.FS, null>>(fsys)).Open("a.txt")
 	if (err != null) {
 		await $.println("open error:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))

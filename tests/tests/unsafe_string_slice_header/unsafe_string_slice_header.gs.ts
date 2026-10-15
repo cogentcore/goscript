@@ -12,14 +12,14 @@ export class localSliceHeader {
 
 	public declare cap: number
 
-	constructor(init?: Partial<{s?: string, cap?: number}>, __goscriptValue?: boolean) {
-		this.s = init?.s ?? ("" as string)
-		this.cap = init?.cap ?? (0 as number)
+	constructor(__goscriptValue?: boolean, s$?: string, cap$?: number) {
+		this.s = s$ ?? ""
+		this.cap = cap$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): localSliceHeader {
-		return new localSliceHeader(this, true)
+		return new localSliceHeader(true, this.s, this.cap)
 	}
 
 	public __goscriptAssign(source: localSliceHeader): this {

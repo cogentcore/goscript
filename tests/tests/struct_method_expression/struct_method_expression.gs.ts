@@ -6,13 +6,13 @@ import * as $ from "@goscript/builtin/index.js"
 export class worker {
 	public declare base: number
 
-	constructor(init?: Partial<{base?: number}>, __goscriptValue?: boolean) {
-		this.base = init?.base ?? (0 as number)
+	constructor(__goscriptValue?: boolean, base$?: number) {
+		this.base = base$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): worker {
-		return new worker(this, true)
+		return new worker(true, this.base)
 	}
 
 	public __goscriptAssign(source: worker): this {
@@ -36,7 +36,7 @@ export class worker {
 
 export async function main(): globalThis.Promise<void> {
 	let fn: ((w: worker | $.VarRef<worker> | null, v: number) => number | globalThis.Promise<number>) | null = $.functionValue((w: worker | $.VarRef<worker> | null, v: number): number => $.pointerValue<worker>(w).add(v), ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.pointerType("main.worker"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))
-	await $.println("method expr:", (fn!(new worker({base: 5}), 7) as number))
+	await $.println("method expr:", (fn!(new worker(false, 5), 7) as number))
 }
 
 if ($.isMainScript(import.meta)) {

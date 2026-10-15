@@ -7,13 +7,13 @@ export class cell {
 	// width is the number of buffered characters.
 	public declare width: number
 
-	constructor(init?: Partial<{width?: number}>, __goscriptValue?: boolean) {
-		this.width = init?.width ?? (0 as number)
+	constructor(__goscriptValue?: boolean, width$?: number) {
+		this.width = width$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): cell {
-		return new cell(this, true)
+		return new cell(true, this.width)
 	}
 
 	public __goscriptAssign(source: cell): this {
@@ -32,9 +32,9 @@ export class cell {
 
 export async function main(): globalThis.Promise<void> {
 	// Resetting a reusable cell must leave appended entries intact.
-	let current = $.varRef(new cell({width: 7}, true))
+	let current = $.varRef(new cell(true, 7))
 	let cells = $.appendOne<cell>(null, (current.value).clone())
-	current.value = current.value.__goscriptAssign(new cell(undefined, true))
+	current.value = current.value.__goscriptAssign(new cell(true))
 	await $.println("cell:", $.arrayIndex(cells!, 0).width, current.value.width)
 
 	// Arrays also copy at the argument boundary.

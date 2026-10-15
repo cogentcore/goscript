@@ -16,13 +16,13 @@ $.registerInterfaceType(
 export class stream {
 	public declare name: string
 
-	constructor(init?: Partial<{name?: string}>, __goscriptValue?: boolean) {
-		this.name = init?.name ?? ("" as string)
+	constructor(__goscriptValue?: boolean, name$?: string) {
+		this.name = name$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): stream {
-		return new stream(this, true)
+		return new stream(true, this.name)
 	}
 
 	public __goscriptAssign(source: stream): this {
@@ -47,13 +47,13 @@ export class stream {
 export class stopStream {
 	public declare stream: stream
 
-	constructor(init?: Partial<{stream?: stream}>, __goscriptValue?: boolean) {
-		this.stream = init?.stream ? init.stream.clone() : new stream(undefined, true)
+	constructor(__goscriptValue?: boolean, stream$?: stream) {
+		this.stream = stream$ ?? new stream(true)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): stopStream {
-		return new stopStream(this, true)
+		return new stopStream(true, this.stream.clone())
 	}
 
 	public __goscriptAssign(source: stopStream): this {
@@ -77,13 +77,13 @@ export class stopStream {
 export class pointerStopStream {
 	public declare stream: stream | $.VarRef<stream> | null
 
-	constructor(init?: Partial<{stream?: stream | $.VarRef<stream> | null}>, __goscriptValue?: boolean) {
-		this.stream = init?.stream ?? (null! as stream | $.VarRef<stream> | null)
+	constructor(__goscriptValue?: boolean, stream$?: stream | $.VarRef<stream> | null) {
+		this.stream = stream$ ?? (null! as stream | $.VarRef<stream> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): pointerStopStream {
-		return new pointerStopStream(this, true)
+		return new pointerStopStream(true, this.stream)
 	}
 
 	public __goscriptAssign(source: pointerStopStream): this {
@@ -109,14 +109,14 @@ export async function closeIt(c: closer | null): globalThis.Promise<void> {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let value = new stopStream({stream: new stream({name: "value"}, true)}, true)
-	await closeIt($.interfaceValue<closer | null>(value, "main.stopStream", "main.stopStream"))
+	let value = new stopStream(true, new stream(true, "value"))
+	await closeIt($.interfaceValue<closer | null>((value).clone(), "main.stopStream", "main.stopStream"))
 
-	let ptr = new stopStream({stream: new stream({name: "pointer"}, true)})
+	let ptr = new stopStream(false, new stream(true, "pointer"))
 	await closeIt($.interfaceValue<closer | null>(ptr, "*main.stopStream", /* @__PURE__ */ $.pointerType("main.stopStream")))
 
-	let promotedPtr = new pointerStopStream({stream: new stream({name: "embedded pointer"})}, true)
-	await closeIt($.interfaceValue<closer | null>(promotedPtr, "main.pointerStopStream", "main.pointerStopStream"))
+	let promotedPtr = new pointerStopStream(true, new stream(false, "embedded pointer"))
+	await closeIt($.interfaceValue<closer | null>((promotedPtr).clone(), "main.pointerStopStream", "main.pointerStopStream"))
 }
 
 var __goscriptAwait: any

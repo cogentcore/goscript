@@ -8,14 +8,14 @@ export class file {
 
 	public declare data: $.Slice<number>
 
-	constructor(init?: Partial<{name?: string, data?: $.Slice<number>}>, __goscriptValue?: boolean) {
-		this.name = init?.name ?? ("" as string)
-		this.data = init?.data ?? (null! as $.Slice<number>)
+	constructor(__goscriptValue?: boolean, name$?: string, data$?: $.Slice<number>) {
+		this.name = name$ ?? ""
+		this.data = data$ ?? (null! as $.Slice<number>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): file {
-		return new file(this, true)
+		return new file(true, this.name, this.data)
 	}
 
 	public __goscriptAssign(source: file): this {

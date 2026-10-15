@@ -4,7 +4,7 @@
 import * as $ from "@goscript/builtin/index.js"
 import * as tables from "@goscript/github.com/s4wave/goscript/tests/tests/package_var_deferred_program/tables/index.js"
 
-export let other: $.VarRef<tables.Codec> = $.varRef(new tables.Codec({Name: "other"}, true))
+export let other: $.VarRef<tables.Codec> = $.varRef(new tables.Codec(true, "other"))
 
 export function __goscript_set_other(__goscriptValue: tables.Codec): void {
 	$.assignStruct(other.value, __goscriptValue)

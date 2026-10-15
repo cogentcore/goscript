@@ -6,13 +6,13 @@ import * as $ from "@goscript/builtin/index.js"
 export class yySymType {
 	public declare value: number
 
-	constructor(init?: Partial<{value?: number}>, __goscriptValue?: boolean) {
-		this.value = init?.value ?? (0 as number)
+	constructor(__goscriptValue?: boolean, value$?: number) {
+		this.value = value$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): yySymType {
-		return new yySymType(this, true)
+		return new yySymType(true, this.value)
 	}
 
 	public __goscriptAssign(source: yySymType): this {
@@ -30,12 +30,12 @@ export class yySymType {
 }
 
 export class yyParserImpl {
-	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
+	constructor(__goscriptValue?: boolean) {
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): yyParserImpl {
-		return new yyParserImpl(this, true)
+		return new yyParserImpl(true)
 	}
 
 	public __goscriptAssign(source: yyParserImpl): this {

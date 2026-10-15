@@ -8,14 +8,14 @@ export class Message {
 
 	public declare text: string
 
-	constructor(init?: Partial<{priority?: number, text?: string}>, __goscriptValue?: boolean) {
-		this.priority = init?.priority ?? (0 as number)
-		this.text = init?.text ?? ("" as string)
+	constructor(__goscriptValue?: boolean, priority$?: number, text$?: string) {
+		this.priority = priority$ ?? 0
+		this.text = text$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Message {
-		return new Message(this, true)
+		return new Message(true, this.priority, this.text)
 	}
 
 	public __goscriptAssign(source: Message): this {
@@ -35,7 +35,7 @@ export class Message {
 
 export const totalMessages: number = 8
 
-export let messages: $.Channel<Message> | null = $.makeChannel<Message>(0, new Message(undefined, true), "both")
+export let messages: $.Channel<Message> | null = $.makeChannel<Message>(0, new Message(true), "both")
 
 export function __goscript_set_messages(__goscriptValue: $.Channel<Message> | null): void {
 	messages = __goscriptValue
@@ -43,22 +43,22 @@ export function __goscript_set_messages(__goscriptValue: $.Channel<Message> | nu
 
 export async function worker(id: number): globalThis.Promise<void> {
 	// Send worker starting message
-	await $.chanSend(messages, new Message({priority: 10 + id, text: "Worker " + $.runeToString($.int(48 + id, 32)) + " starting"}, true))
+	await $.chanSend(messages, new Message(true, 10 + id, "Worker " + $.runeToString($.int(48 + id, 32)) + " starting"))
 
 	// Send worker done message
-	await $.chanSend(messages, new Message({priority: 20 + id, text: "Worker " + $.runeToString($.int(48 + id, 32)) + " done"}, true))
+	await $.chanSend(messages, new Message(true, 20 + id, "Worker " + $.runeToString($.int(48 + id, 32)) + " done"))
 }
 
 export async function anotherWorker(name: string): globalThis.Promise<void> {
-	await $.chanSend(messages, new Message({priority: 40, text: "Another worker: " + name}, true))
+	await $.chanSend(messages, new Message(true, 40, "Another worker: " + name))
 }
 
 export async function main(): globalThis.Promise<void> {
 	// Create a slice to collect all messages
-	let allMessages: $.Slice<Message> = $.makeSlice<Message>(0, 8 + 3, undefined, () => new Message(undefined, true))
+	let allMessages: $.Slice<Message> = $.makeSlice<Message>(0, 8 + 3, undefined, () => new Message(true))
 
 	// Add initial message
-	allMessages = $.appendOne(allMessages, new Message({priority: 0, text: "Main: Starting workers"}, true))
+	allMessages = $.appendOne(allMessages, new Message(true, 0, "Main: Starting workers"))
 
 	// Start 3 worker goroutines
 	for (let i = 0; i < 3; i++) {
@@ -71,11 +71,11 @@ export async function main(): globalThis.Promise<void> {
 
 	// Start an anonymous function worker
 	queueMicrotask(async () => {
-		await $.chanSend(messages, new Message({priority: 50, text: "Anonymous function worker"}, true))
+		await $.chanSend(messages, new Message(true, 50, "Anonymous function worker"))
 	})
 
 	// Add status message
-	allMessages = $.appendOne(allMessages, new Message({priority: 1, text: "Main: Workers started"}, true))
+	allMessages = $.appendOne(allMessages, new Message(true, 1, "Main: Workers started"))
 
 	// Collect all messages from goroutines
 	for (let __rangeIndex = 0; __rangeIndex < 8; __rangeIndex++) {
@@ -83,7 +83,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 
 	// Add final message
-	allMessages = $.appendOne(allMessages, new Message({priority: 100, text: "Main: All workers completed"}, true))
+	allMessages = $.appendOne(allMessages, new Message(true, 100, "Main: All workers completed"))
 
 	// Sort messages by priority for deterministic order
 	for (let __goscriptRangeTarget0 = allMessages, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), i = 0; i < __goscriptRangeWindow0.length; i++) {

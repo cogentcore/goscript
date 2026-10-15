@@ -14,12 +14,12 @@ $.registerInterfaceType(
 );
 
 export class concrete {
-	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
+	constructor(__goscriptValue?: boolean) {
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): concrete {
-		return new concrete(this, true)
+		return new concrete(true)
 	}
 
 	public __goscriptAssign(source: concrete): this {

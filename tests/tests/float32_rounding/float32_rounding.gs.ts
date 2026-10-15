@@ -13,14 +13,14 @@ export class T {
 
 	public declare B: number
 
-	constructor(init?: Partial<{A?: string, B?: number}>, __goscriptValue?: boolean) {
-		this.A = init?.A ?? ("" as string)
-		this.B = init?.B ?? (0 as number)
+	constructor(__goscriptValue?: boolean, A$?: string, B$?: number) {
+		this.A = A$ ?? ""
+		this.B = B$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): T {
-		return new T(this, true)
+		return new T(true, this.A, this.B)
 	}
 
 	public __goscriptAssign(source: T): this {
@@ -64,8 +64,8 @@ export async function main(): globalThis.Promise<void> {
 	let [g, ] = strconv.ParseFloat("3.14", 32)
 	let h = globalThis.Math.fround(g)
 	fmt.Println(f == h, 0.10000000149011612 == globalThis.Math.fround((g / 31.4)), $.basicInterfaceValue(0.10000000149011612, "float32"))
-	let s = $.varRef(new T({A: "aaa", B: 3.140000104904175}, true))
-	let t = new T({A: "aaa", B: h}, true)
+	let s = $.varRef(new T(true, "aaa", 3.140000104904175))
+	let t = new T(true, "aaa", h)
 	fmt.Println((s.value.A === t.A && s.value.B === t.B), $.interfaceValue((s.value).clone(), "main.T", "main.T"), $.interfaceValue((t).clone(), "main.T", "main.T"))
 
 	// float32 values format with the digits needed at 32 bits
@@ -92,14 +92,14 @@ export async function main(): globalThis.Promise<void> {
 	// float32 fields decoded from JSON are rounded to float32
 	let __goscriptTuple0: any = (json.Marshal($.interfaceValue((s.value).clone(), "main.T", "main.T")) as [$.Slice<number>, $.GoError])
 	let b: $.Slice<number> = __goscriptTuple0[0]
-	let j: $.VarRef<T> = $.varRef(new T(undefined, true))
+	let j: $.VarRef<T> = $.varRef(new T(true))
 	let err: $.GoError = (json.Unmarshal(b, $.interfaceValue(j, "*main.T", /* @__PURE__ */ $.pointerType("main.T"))) as $.GoError)
 	fmt.Println($.bytesToString(b), (j.value.A === s.value.A && j.value.B === s.value.B), $.interfaceValue((j.value).clone(), "main.T", "main.T"), (err as any))
 	let buf = $.varRef($.markAsStructValue(new bytes.Buffer()))
 	let enc = json.NewEncoder($.pointerValueOrNil($.interfaceValue<io.Writer | null>(buf, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer")))!)
 	json.Encoder.prototype.SetIndent.call($.pointerValue<json.Encoder>(enc), "", "\t")
 	err = await json.Encoder.prototype.Encode.call($.pointerValue<json.Encoder>(enc), $.interfaceValue(s, "*main.T", /* @__PURE__ */ $.pointerType("main.T")))
-	let k: $.VarRef<T> = $.varRef(new T(undefined, true))
+	let k: $.VarRef<T> = $.varRef(new T(true))
 	let err2 = await json.Decoder.prototype.Decode.call($.pointerValue<json.Decoder>(json.NewDecoder($.pointerValueOrNil($.interfaceValue<io.Reader | null>(bytes.NewReader(buf.value.Bytes()), "*bytes.Reader", /* @__PURE__ */ $.pointerType("bytes.Reader")))!)), $.interfaceValue(k, "*main.T", /* @__PURE__ */ $.pointerType("main.T")))
 	fmt.Println(buf.value.Len() > 0, (k.value.A === s.value.A && k.value.B === s.value.B), $.interfaceValue((k.value).clone(), "main.T", "main.T"), (err as any), (err2 as any))
 }

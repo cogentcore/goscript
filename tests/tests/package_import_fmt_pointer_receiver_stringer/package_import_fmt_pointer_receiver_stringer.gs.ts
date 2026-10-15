@@ -19,14 +19,14 @@ export class Lex {
 
 	public declare Start: number
 
-	constructor(init?: Partial<{Name?: string, Start?: number}>, __goscriptValue?: boolean) {
-		this.Name = init?.Name ?? ("" as string)
-		this.Start = init?.Start ?? (0 as number)
+	constructor(__goscriptValue?: boolean, Name$?: string, Start$?: number) {
+		this.Name = Name$ ?? ""
+		this.Start = Start$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Lex {
-		return new Lex(this, true)
+		return new Lex(true, this.Name, this.Start)
 	}
 
 	public __goscriptAssign(source: Lex): this {
@@ -53,13 +53,13 @@ export class Lex {
 export class Val {
 	public declare N: number
 
-	constructor(init?: Partial<{N?: number}>, __goscriptValue?: boolean) {
-		this.N = init?.N ?? (0 as number)
+	constructor(__goscriptValue?: boolean, N$?: number) {
+		this.N = N$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Val {
-		return new Val(this, true)
+		return new Val(true, this.N)
 	}
 
 	public __goscriptAssign(source: Val): this {
@@ -86,13 +86,13 @@ export function Line_String(ll: $.VarRef<Line> | null): string {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let lx = $.varRef(new Lex({Name: "a", Start: 1}, true))
+	let lx = $.varRef(new Lex(true, "a", 1))
 	fmt.Println($.interfaceValue((lx.value).clone(), "main.Lex", "main.Lex"), $.interfaceValue(lx, "*main.Lex", /* @__PURE__ */ $.pointerType("main.Lex")))
-	let line: $.VarRef<Line> = $.varRef(($.arrayToSlice<Lex>([new Lex({Name: "b", Start: 2}, true), new Lex({Name: "c", Start: 3}, true)]) as Line))
+	let line: $.VarRef<Line> = $.varRef(($.arrayToSlice<Lex>([new Lex(true, "b", 2), new Lex(true, "c", 3)]) as Line))
 	fmt.Println($.interfaceValue(line.value, "main.Line", /* @__PURE__ */ $.sliceType("main.Lex", "main.Line")), $.namedValueInterfaceValue<any>(line, "*main.Line", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()))
 	fmt.Println((fmt.Sprint($.interfaceValue(line.value, "main.Line", /* @__PURE__ */ $.sliceType("main.Lex", "main.Line"))) as string))
 	let ptrs = $.arrayToSlice<Lex | $.VarRef<Lex> | null>([$.indexRef(line.value!, 0)])
-	fmt.Println($.interfaceValue($.arrayIndex(ptrs!, 0), "*main.Lex", /* @__PURE__ */ $.pointerType("main.Lex")), $.interfaceValue(new Val({N: 4}, true), "main.Val", "main.Val"), $.interfaceValue(new Val({N: 5}), "*main.Val", /* @__PURE__ */ $.pointerType("main.Val")), $.interfaceValue($.arrayToSlice<Val>([new Val({N: 6}, true)]), "[]main.Val", /* @__PURE__ */ $.sliceType("main.Val")))
+	fmt.Println($.interfaceValue($.arrayIndex(ptrs!, 0), "*main.Lex", /* @__PURE__ */ $.pointerType("main.Lex")), $.interfaceValue(new Val(true, 4), "main.Val", "main.Val"), $.interfaceValue(new Val(false, 5), "*main.Val", /* @__PURE__ */ $.pointerType("main.Val")), $.interfaceValue($.arrayToSlice<Val>([new Val(true, 6)]), "[]main.Val", /* @__PURE__ */ $.sliceType("main.Val")))
 }
 
 var __goscriptStatic0$value: any

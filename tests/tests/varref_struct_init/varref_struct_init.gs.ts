@@ -6,13 +6,13 @@ import * as $ from "@goscript/builtin/index.js"
 export class MyStruct {
 	public declare MyInt: number
 
-	constructor(init?: Partial<{MyInt?: number}>, __goscriptValue?: boolean) {
-		this.MyInt = init?.MyInt ?? (0 as number)
+	constructor(__goscriptValue?: boolean, MyInt$?: number) {
+		this.MyInt = MyInt$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): MyStruct {
-		return new MyStruct(this, true)
+		return new MyStruct(true, this.MyInt)
 	}
 
 	public __goscriptAssign(source: MyStruct): this {
@@ -32,7 +32,7 @@ export class MyStruct {
 export async function main(): globalThis.Promise<void> {
 	// Scenario 1: Value type that NeedsVarRef
 	// 'val' is a value type, but its address is taken, so it should be varrefed in TS.
-	let val = $.varRef(new MyStruct({MyInt: 10}, true))
+	let val = $.varRef(new MyStruct(true, 10))
 	let ptrToVal = val
 	let ptrToVal$: MyStruct = ptrToVal == null ? $.pointerTarget<MyStruct>(ptrToVal) : (ptrToVal as any).__isVarRef === true ? (ptrToVal as any).value : (ptrToVal as any).__goValue === undefined ? (ptrToVal as any) : $.pointerTarget<MyStruct>(ptrToVal)
 
@@ -41,7 +41,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// Scenario 2: Pointer type
 	// We never take the address of ptr so it should not be varrefed.
-	let ptr = new MyStruct({MyInt: 30})
+	let ptr = new MyStruct(false, 30)
 	let ptr$: MyStruct = ptr == null ? $.pointerTarget<MyStruct>(ptr) : (ptr as any).__isVarRef === true ? (ptr as any).value : (ptr as any).__goValue === undefined ? (ptr as any) : $.pointerTarget<MyStruct>(ptr);
 
 	// Accessing field on pointer type: Should generate ptr.MyInt

@@ -10,14 +10,14 @@ export class storage {
 
 	public declare name: string
 
-	constructor(init?: Partial<{bytes?: $.Slice<number>, name?: string}>, __goscriptValue?: boolean) {
-		this.bytes = init?.bytes ?? (null! as $.Slice<number>)
-		this.name = init?.name ?? ("" as string)
+	constructor(__goscriptValue?: boolean, bytes$?: $.Slice<number>, name$?: string) {
+		this.bytes = bytes$ ?? (null! as $.Slice<number>)
+		this.name = name$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): storage {
-		return new storage(this, true)
+		return new storage(true, this.bytes, this.name)
 	}
 
 	public __goscriptAssign(source: storage): this {
@@ -61,7 +61,7 @@ export class storage {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let s = new storage({bytes: $.makeSlice<number>(5, undefined, "byte"), name: "test"})
+	let s = new storage(false, $.makeSlice<number>(5, undefined, "byte"), "test")
 
 	await $.println("Name:", (s !== null && (s as any).__isVarRef !== true && (s as any).__goValue === undefined ? ((s as any) as storage).Name() : storage.prototype.Name.call(s)))
 	await $.println("Length:", (s !== null && (s as any).__isVarRef !== true && (s as any).__goValue === undefined ? ((s as any) as storage).Len() : storage.prototype.Len.call(s)))

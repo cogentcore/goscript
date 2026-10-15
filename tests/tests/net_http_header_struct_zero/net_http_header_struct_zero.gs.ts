@@ -7,13 +7,13 @@ import * as http from "@goscript/net/http/index.js"
 export class responseWriter {
 	public declare header: http.Header
 
-	constructor(init?: Partial<{header?: http.Header}>, __goscriptValue?: boolean) {
-		this.header = init?.header ?? (null! as http.Header)
+	constructor(__goscriptValue?: boolean, header$?: http.Header) {
+		this.header = header$ ?? (null! as http.Header)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): responseWriter {
-		return new responseWriter(this, true)
+		return new responseWriter(true, this.header)
 	}
 
 	public __goscriptAssign(source: responseWriter): this {
@@ -36,7 +36,7 @@ export class responseWriter {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let writer = new responseWriter({header: $.makeMap<string, $.Slice<string>>([])})
+	let writer = new responseWriter(false, $.makeMap<string, $.Slice<string>>([]))
 	http.Header_Set((writer !== null && (writer as any).__isVarRef !== true && (writer as any).__goValue === undefined ? ((writer as any) as responseWriter).Header() : responseWriter.prototype.Header.call(writer)), "X-Test", "ok")
 	await $.println(await http.Header_Get((writer !== null && (writer as any).__isVarRef !== true && (writer as any).__goValue === undefined ? ((writer as any) as responseWriter).Header() : responseWriter.prototype.Header.call(writer)), "x-test"))
 }

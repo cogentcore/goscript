@@ -18,14 +18,14 @@ export class node {
 
 	public declare N: number
 
-	constructor(init?: Partial<{Name?: string, N?: number}>, __goscriptValue?: boolean) {
-		this.Name = init?.Name ?? ("" as string)
-		this.N = init?.N ?? (0 as number)
+	constructor(__goscriptValue?: boolean, Name$?: string, N$?: number) {
+		this.Name = Name$ ?? ""
+		this.N = N$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): node {
-		return new node(this, true)
+		return new node(true, this.Name, this.N)
 	}
 
 	public __goscriptAssign(source: node): this {
@@ -55,15 +55,15 @@ export class tree {
 
 	public declare Up: tree | $.VarRef<tree> | null
 
-	constructor(init?: Partial<{Kids?: $.Slice<tree | $.VarRef<tree> | null>, Attrs?: globalThis.Map<string, string> | null, Up?: tree | $.VarRef<tree> | null}>, __goscriptValue?: boolean) {
-		this.Kids = init?.Kids ?? (null! as $.Slice<tree | $.VarRef<tree> | null>)
-		this.Attrs = init?.Attrs ?? (null! as globalThis.Map<string, string> | null)
-		this.Up = init?.Up ?? (null! as tree | $.VarRef<tree> | null)
+	constructor(__goscriptValue?: boolean, Kids$?: $.Slice<tree | $.VarRef<tree> | null>, Attrs$?: globalThis.Map<string, string> | null, Up$?: tree | $.VarRef<tree> | null) {
+		this.Kids = Kids$ ?? (null! as $.Slice<tree | $.VarRef<tree> | null>)
+		this.Attrs = Attrs$ ?? (null! as globalThis.Map<string, string> | null)
+		this.Up = Up$ ?? (null! as tree | $.VarRef<tree> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): tree {
-		return new tree(this, true)
+		return new tree(true, this.Kids, this.Attrs, this.Up)
 	}
 
 	public __goscriptAssign(source: tree): this {
@@ -84,8 +84,8 @@ export class tree {
 
 export async function main(): globalThis.Promise<void> {
 	// Distinct pointers with equal fields are distinct keys.
-	let a = new node({Name: "x", N: 1})
-	let b = new node({Name: "x", N: 1})
+	let a = new node(false, "x", 1)
+	let b = new node(false, "x", 1)
 	let m = $.makeMap<any, number>([])
 	$.mapSet(m, $.interfaceValue(a, "*main.node", /* @__PURE__ */ $.pointerType("main.node")), 1)
 	$.mapSet(m, $.interfaceValue(b, "*main.node", /* @__PURE__ */ $.pointerType("main.node")), 2)
@@ -109,7 +109,7 @@ export async function main(): globalThis.Promise<void> {
 	let root$: tree = root == null ? $.pointerTarget<tree>(root) : (root as any).__isVarRef === true ? (root as any).value : (root as any).__goValue === undefined ? (root as any) : $.pointerTarget<tree>(root)
 	let visits = $.makeMap<any, number>([])
 	for (let i = 0; i < 1000; i++) {
-		let kid = new tree({Up: root});
+		let kid = new tree(false, undefined, undefined, root);
 		;(root$ as tree).Kids = $.appendOne((root$ as tree).Kids, kid, $.appendZeros.nil)
 		$.mapSet(visits, $.interfaceValue(kid, "*main.tree", /* @__PURE__ */ $.pointerType("main.tree")), i)
 	}
@@ -131,9 +131,9 @@ export async function main(): globalThis.Promise<void> {
 
 	// Struct values with equal fields are the same key.
 	let v = $.makeMap<any, number>([])
-	$.mapSet(v, $.interfaceValue(new node({Name: "x", N: 1}, true), "main.node", "main.node"), 1)
-	$.mapSet(v, $.interfaceValue(new node({Name: "x", N: 1}, true), "main.node", "main.node"), 2)
-	await $.println("value keys:", $.len(v), $.mapGet<any, number, number>(v, $.interfaceValue(new node({Name: "x", N: 1}, true), "main.node", "main.node"), 0)[0])
+	$.mapSet(v, $.interfaceValue(new node(true, "x", 1), "main.node", "main.node"), 1)
+	$.mapSet(v, $.interfaceValue(new node(true, "x", 1), "main.node", "main.node"), 2)
+	await $.println("value keys:", $.len(v), $.mapGet<any, number, number>(v, $.interfaceValue(new node(true, "x", 1), "main.node", "main.node"), 0)[0])
 }
 
 if ($.isMainScript(import.meta)) {

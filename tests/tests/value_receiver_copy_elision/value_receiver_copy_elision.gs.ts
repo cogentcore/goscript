@@ -8,14 +8,14 @@ export class vec {
 
 	public declare Y: number
 
-	constructor(init?: Partial<{X?: number, Y?: number}>, __goscriptValue?: boolean) {
-		this.X = init?.X ?? (0 as number)
-		this.Y = init?.Y ?? (0 as number)
+	constructor(__goscriptValue?: boolean, X$?: number, Y$?: number) {
+		this.X = X$ ?? 0
+		this.Y = Y$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): vec {
-		return new vec(this, true)
+		return new vec(true, this.X, this.Y)
 	}
 
 	public __goscriptAssign(source: vec): this {
@@ -73,13 +73,13 @@ export class vec {
 export class holder {
 	public declare v: vec
 
-	constructor(init?: Partial<{v?: vec}>, __goscriptValue?: boolean) {
-		this.v = init?.v ? init.v.clone() : new vec(undefined, true)
+	constructor(__goscriptValue?: boolean, v$?: vec) {
+		this.v = v$ ?? new vec(true)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): holder {
-		return new holder(this, true)
+		return new holder(true, this.v.clone())
 	}
 
 	public __goscriptAssign(source: holder): this {
@@ -97,7 +97,7 @@ export class holder {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let a = $.varRef(new vec({X: 1, Y: 2}, true))
+	let a = $.varRef(new vec(true, 1, 2))
 	await $.println("sum", a.value.Sum())
 	await $.println("bump", $.markAsStructValue($.cloneStructValue(a.value)).Bump(), a.value.X)
 	await $.println("ptr", $.markAsStructValue($.cloneStructValue(a.value)).BumpViaPointer(), a.value.Y)
@@ -105,7 +105,7 @@ export async function main(): globalThis.Promise<void> {
 	let k = a.value.Keep()
 	k.X = 50
 	await $.println("keep", a.value.X, k.X)
-	let h = new holder({v: a.value}, true)
+	let h = new holder(true, (a.value).clone())
 	await $.println("field", h.v.Sum(), $.markAsStructValue($.cloneStructValue(h.v)).Bump(), h.v.X)
 	let p = a
 	await $.println("via pointer", $.pointerValue<vec>(p).Sum(), $.markAsStructValue($.cloneStructValue($.pointerValue<vec>(p))).Bump(), $.pointerValue<vec>(p).X)

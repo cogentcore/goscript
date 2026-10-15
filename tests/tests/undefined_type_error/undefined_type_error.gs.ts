@@ -26,23 +26,23 @@ export class formatter {
 
 	public declare sharpV: boolean
 
-	constructor(init?: Partial<{wid?: number, prec?: number, widPresent?: boolean, precPresent?: boolean, minus?: boolean, plus?: boolean, sharp?: boolean, space?: boolean, zero?: boolean, plusV?: boolean, sharpV?: boolean}>, __goscriptValue?: boolean) {
-		this.wid = init?.wid ?? (0 as number)
-		this.prec = init?.prec ?? (0 as number)
-		this.widPresent = init?.widPresent ?? (false as boolean)
-		this.precPresent = init?.precPresent ?? (false as boolean)
-		this.minus = init?.minus ?? (false as boolean)
-		this.plus = init?.plus ?? (false as boolean)
-		this.sharp = init?.sharp ?? (false as boolean)
-		this.space = init?.space ?? (false as boolean)
-		this.zero = init?.zero ?? (false as boolean)
-		this.plusV = init?.plusV ?? (false as boolean)
-		this.sharpV = init?.sharpV ?? (false as boolean)
+	constructor(__goscriptValue?: boolean, wid$?: number, prec$?: number, widPresent$?: boolean, precPresent$?: boolean, minus$?: boolean, plus$?: boolean, sharp$?: boolean, space$?: boolean, zero$?: boolean, plusV$?: boolean, sharpV$?: boolean) {
+		this.wid = wid$ ?? 0
+		this.prec = prec$ ?? 0
+		this.widPresent = widPresent$ ?? false
+		this.precPresent = precPresent$ ?? false
+		this.minus = minus$ ?? false
+		this.plus = plus$ ?? false
+		this.sharp = sharp$ ?? false
+		this.space = space$ ?? false
+		this.zero = zero$ ?? false
+		this.plusV = plusV$ ?? false
+		this.sharpV = sharpV$ ?? false
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): formatter {
-		return new formatter(this, true)
+		return new formatter(true, this.wid, this.prec, this.widPresent, this.precPresent, this.minus, this.plus, this.sharp, this.space, this.zero, this.plusV, this.sharpV)
 	}
 
 	public __goscriptAssign(source: formatter): this {
@@ -78,15 +78,15 @@ export class printer {
 	// Should generate proper type reference
 	public declare fmt: formatter
 
-	constructor(init?: Partial<{buf?: $.Slice<number>, arg?: any, fmt?: formatter}>, __goscriptValue?: boolean) {
-		this.buf = init?.buf ?? (null! as $.Slice<number>)
-		this.arg = init?.arg ?? (null! as any)
-		this.fmt = init?.fmt ? init.fmt.clone() : new formatter(undefined, true)
+	constructor(__goscriptValue?: boolean, buf$?: $.Slice<number>, arg$?: any, fmt$?: formatter) {
+		this.buf = buf$ ?? (null! as $.Slice<number>)
+		this.arg = arg$ ?? (null! as any)
+		this.fmt = fmt$ ?? new formatter(true)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): printer {
-		return new printer(this, true)
+		return new printer(true, this.buf, this.arg, this.fmt.clone())
 	}
 
 	public __goscriptAssign(source: printer): this {
@@ -110,7 +110,7 @@ export class printer {
 
 	public init(): void {
 		let p: printer | $.VarRef<printer> | null = this;
-		$.pointerValue<printer>(p).fmt.__goscriptAssign(new formatter(undefined, true))
+		$.pointerValue<printer>(p).fmt.__goscriptAssign(new formatter(true))
 	}
 
 	static __typeInfo = $.registerStructType(

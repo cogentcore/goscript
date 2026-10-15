@@ -6,13 +6,13 @@ import * as $ from "@goscript/builtin/index.js"
 export class MyStruct {
 	public declare Value: number
 
-	constructor(init?: Partial<{Value?: number}>, __goscriptValue?: boolean) {
-		this.Value = init?.Value ?? (0 as number)
+	constructor(__goscriptValue?: boolean, Value$?: number) {
+		this.Value = Value$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): MyStruct {
-		return new MyStruct(this, true)
+		return new MyStruct(true, this.Value)
 	}
 
 	public __goscriptAssign(source: MyStruct): this {
@@ -34,8 +34,8 @@ export async function main(): globalThis.Promise<void> {
 
 	// Scenario 1: Address-of Composite Literal vs Value Variable
 	await $.println("\n--- Scenario 1: Composite Literal vs Value Variable ---")
-	let s = new MyStruct({Value: 10}, true)
-	let p = new MyStruct({Value: 20})
+	let s = new MyStruct(true, 10)
+	let p = new MyStruct(false, 20)
 
 	// Type assertions - struct value
 	let i: any = $.interfaceValue(s, "main.MyStruct", "main.MyStruct")
@@ -53,7 +53,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// Scenario 2: Variable Aliasing
 	await $.println("\n--- Scenario 2: Variable Aliasing ---")
-	let original = $.varRef(new MyStruct({Value: 30}, true))
+	let original = $.varRef(new MyStruct(true, 30))
 	let pAlias = original
 
 	let iOriginal: any = $.interfaceValue((original.value).clone(), "main.MyStruct", "main.MyStruct")
@@ -71,7 +71,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// Scenario 3: Multiple Pointers to Same Variable
 	await $.println("\n--- Scenario 3: Multiple Pointers to Same Variable ---")
-	let shared = $.varRef(new MyStruct({Value: 40}, true))
+	let shared = $.varRef(new MyStruct(true, 40))
 	let p1 = shared
 	let p2 = shared
 
@@ -103,9 +103,9 @@ export async function main(): globalThis.Promise<void> {
 
 	// Scenario 4: Mixed Assignment Patterns
 	await $.println("\n--- Scenario 4: Mixed Assignment Patterns ---")
-	let mixed = $.varRef(new MyStruct({Value: 50}, true))
+	let mixed = $.varRef(new MyStruct(true, 50))
 	let pVar = mixed
-	let pLit = new MyStruct({Value: 60})
+	let pLit = new MyStruct(false, 60)
 
 	let iVar: any = $.interfaceValue(pVar, "*main.MyStruct", /* @__PURE__ */ $.pointerType("main.MyStruct"))
 	let iLit: any = $.interfaceValue(pLit, "*main.MyStruct", /* @__PURE__ */ $.pointerType("main.MyStruct"))
@@ -117,8 +117,8 @@ export async function main(): globalThis.Promise<void> {
 
 	// Scenario 5: Nested Type Assertions
 	await $.println("\n--- Scenario 5: Nested Type Assertions ---")
-	let nested1 = new MyStruct({Value: 70})
-	let nested2 = $.varRef(new MyStruct({Value: 80}, true))
+	let nested1 = new MyStruct(false, 70)
+	let nested2 = $.varRef(new MyStruct(true, 80))
 
 	// Array of interfaces containing both pointers and values
 	let arr = $.arrayToSlice<any>([$.interfaceValue(nested1, "*main.MyStruct", /* @__PURE__ */ $.pointerType("main.MyStruct")), $.interfaceValue((nested2.value).clone(), "main.MyStruct", "main.MyStruct"), $.interfaceValue(nested2, "*main.MyStruct", /* @__PURE__ */ $.pointerType("main.MyStruct"))])
@@ -146,7 +146,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// Scenario 6: Type Switch with Mixed Types
 	await $.println("\n--- Scenario 6: Type Switch ---")
-	let testItems = $.arrayToSlice<any>([$.interfaceValue(new MyStruct({Value: 100}, true), "main.MyStruct", "main.MyStruct"), $.interfaceValue(new MyStruct({Value: 200}), "*main.MyStruct", /* @__PURE__ */ $.pointerType("main.MyStruct")), $.basicInterfaceValue(300, "int"), "string"])
+	let testItems = $.arrayToSlice<any>([$.interfaceValue(new MyStruct(true, 100), "main.MyStruct", "main.MyStruct"), $.interfaceValue(new MyStruct(false, 200), "*main.MyStruct", /* @__PURE__ */ $.pointerType("main.MyStruct")), $.basicInterfaceValue(300, "int"), "string"])
 
 	for (let __goscriptRangeTarget1 = testItems, __goscriptRangeWindow1 = $.sliceRange(__goscriptRangeTarget1), i = 0; i < __goscriptRangeWindow1.length; i++) {
 		let item = (__goscriptRangeWindow1.backing[__goscriptRangeWindow1.offset + i] as any)

@@ -10,14 +10,14 @@ export class timer {
 
 	public declare total: time.Duration
 
-	constructor(init?: Partial<{start?: time.Time, total?: time.Duration}>, __goscriptValue?: boolean) {
-		this.start = init?.start ? $.markAsStructValue($.cloneStructValue(init.start)) : $.markAsStructValue(new time.Time())
-		this.total = init?.total ?? (0n as time.Duration)
+	constructor(__goscriptValue?: boolean, start$?: time.Time, total$?: time.Duration) {
+		this.start = start$ ?? $.markAsStructValue(new time.Time())
+		this.total = total$ ?? 0n
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): timer {
-		return new timer(this, true)
+		return new timer(true, $.markAsStructValue($.cloneStructValue(this.start)), this.total)
 	}
 
 	public __goscriptAssign(source: timer): this {
@@ -56,7 +56,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println($.markAsStructValue($.cloneStructValue(tm)).Year(), $.markAsStructValue($.cloneStructValue(tm)).String(), $.markAsStructValue($.cloneStructValue(tm)).Format("2006-01-02"))
 
 	// assigning a Time field through a pointer copies the Time
-	let t: $.VarRef<timer> = $.varRef(new timer(undefined, true))
+	let t: $.VarRef<timer> = $.varRef(new timer(true))
 	await $.println(isZero($.interfaceValue($.markAsStructValue($.cloneStructValue(t.value.start)), "time.Time", "time.Time")), isZero($.namedValueInterfaceValue<any>(t.value.total, "time.Duration", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2())))
 	t.value.Start()
 	await $.println(isZero($.interfaceValue($.markAsStructValue($.cloneStructValue(t.value.start)), "time.Time", "time.Time")), $.markAsStructValue($.cloneStructValue(t.value.start)).Year() > 2000)

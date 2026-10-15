@@ -8,13 +8,13 @@ import "./b.gs.ts"
 export class aValue {
 	public declare next: __goscript_b.bValue | $.VarRef<__goscript_b.bValue> | null
 
-	constructor(init?: Partial<{next?: __goscript_b.bValue | $.VarRef<__goscript_b.bValue> | null}>, __goscriptValue?: boolean) {
-		this.next = init?.next ?? (null! as __goscript_b.bValue | $.VarRef<__goscript_b.bValue> | null)
+	constructor(__goscriptValue?: boolean, next$?: __goscript_b.bValue | $.VarRef<__goscript_b.bValue> | null) {
+		this.next = next$ ?? (null! as __goscript_b.bValue | $.VarRef<__goscript_b.bValue> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): aValue {
-		return new aValue(this, true)
+		return new aValue(true, this.next)
 	}
 
 	public __goscriptAssign(source: aValue): this {
@@ -32,5 +32,5 @@ export class aValue {
 }
 
 export function makeA(): aValue {
-	return new aValue(undefined, true)
+	return new aValue(true)
 }

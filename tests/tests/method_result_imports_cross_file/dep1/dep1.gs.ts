@@ -8,12 +8,12 @@ import "@goscript/github.com/s4wave/goscript/tests/tests/method_result_imports_c
 $.registerTypePackagePath("github.com/s4wave/goscript/tests/tests/method_result_imports_cross_file/dep1", ["dep1.maker"])
 
 export class maker {
-	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
+	constructor(__goscriptValue?: boolean) {
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): maker {
-		return new maker(this, true)
+		return new maker(true)
 	}
 
 	public __goscriptAssign(source: maker): this {
@@ -34,5 +34,5 @@ export class maker {
 }
 
 export function Make(): dep2.Value | null {
-	return $.interfaceValue<dep2.Value | null>(new maker(undefined, true), "dep1.maker", "dep1.maker")
+	return $.interfaceValue<dep2.Value | null>(new maker(true), "dep1.maker", "dep1.maker")
 }

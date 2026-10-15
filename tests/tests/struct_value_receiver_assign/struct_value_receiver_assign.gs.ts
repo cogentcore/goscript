@@ -9,14 +9,14 @@ export class tag {
 
 	public declare region: string
 
-	constructor(init?: Partial<{lang?: number, region?: string}>, __goscriptValue?: boolean) {
-		this.lang = init?.lang ?? (0 as number)
-		this.region = init?.region ?? ("" as string)
+	constructor(__goscriptValue?: boolean, lang$?: number, region$?: string) {
+		this.lang = lang$ ?? 0
+		this.region = region$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): tag {
-		return new tag(this, true)
+		return new tag(true, this.lang, this.region)
 	}
 
 	public __goscriptAssign(source: tag): this {
@@ -27,13 +27,13 @@ export class tag {
 
 	public reset(): tag {
 		let t: tag = this;
-		t = t.__goscriptAssign(new tag({lang: 1, region: "x"}, true))
+		t = t.__goscriptAssign(new tag(true, 1, "x"))
 		return (t).clone()
 	}
 
 	public ["set"](lang: number): void {
 		let t: tag | $.VarRef<tag> | null = this;
-		$.pointerValue<tag>(t).__goscriptAssign(new tag({lang: lang, region: "p"}, true))
+		$.pointerValue<tag>(t).__goscriptAssign(new tag(true, lang, "p"))
 	}
 
 	static __typeInfo = $.registerStructType(
@@ -50,14 +50,14 @@ export class outer {
 
 	public declare n: number
 
-	constructor(init?: Partial<{t?: tag, n?: number}>, __goscriptValue?: boolean) {
-		this.t = init?.t ? init.t.clone() : new tag(undefined, true)
-		this.n = init?.n ?? (0 as number)
+	constructor(__goscriptValue?: boolean, t$?: tag, n$?: number) {
+		this.t = t$ ?? new tag(true)
+		this.n = n$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): outer {
-		return new outer(this, true)
+		return new outer(true, this.t.clone(), this.n)
 	}
 
 	public __goscriptAssign(source: outer): this {
@@ -76,7 +76,7 @@ export class outer {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let a = $.varRef(new tag({lang: 5, region: "a"}, true))
+	let a = $.varRef(new tag(true, 5, "a"))
 	let b = $.markAsStructValue($.cloneStructValue(a.value)).reset()
 	fmt.Println($.interfaceValue((a.value).clone(), "main.tag", "main.tag"), $.interfaceValue(b, "main.tag", "main.tag"))
 
@@ -84,9 +84,9 @@ export async function main(): globalThis.Promise<void> {
 	fmt.Println($.interfaceValue((a.value).clone(), "main.tag", "main.tag"))
 
 	// Nested struct fields are assigned in place.
-	let o = new outer({t: new tag({lang: 2}, true), n: 1}, true)
+	let o = new outer(true, new tag(true, 2), 1)
 	let held = $.fieldRef(o, "t")
-	o = o.__goscriptAssign(new outer({t: new tag({lang: 3, region: "o"}, true), n: 4}, true))
+	o = o.__goscriptAssign(new outer(true, new tag(true, 3, "o"), 4))
 	fmt.Println($.interfaceValue((o).clone(), "main.outer", "main.outer"), $.interfaceValue(($.pointerValue<tag>(held)).clone(), "main.tag", "main.tag"), $.pointerEqual(held, $.fieldRef(o, "t")))
 }
 

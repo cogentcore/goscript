@@ -14,12 +14,12 @@ $.registerInterfaceType(
 );
 
 export class Base {
-	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
+	constructor(__goscriptValue?: boolean) {
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Base {
-		return new Base(this, true)
+		return new Base(true)
 	}
 
 	public __goscriptAssign(source: Base): this {
@@ -40,12 +40,12 @@ export class Base {
 }
 
 export class Derived {
-	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
+	constructor(__goscriptValue?: boolean) {
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Derived {
-		return new Derived(this, true)
+		return new Derived(true)
 	}
 
 	public __goscriptAssign(source: Derived): this {
@@ -66,11 +66,11 @@ export class Derived {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let base: any = $.interfaceValue(new Base(undefined, true), "main.Base", "main.Base")
+	let base: any = $.interfaceValue(new Base(true), "main.Base", "main.Base")
 	let [, baseOK] = $.typeAssertTuple<Stringer | null>(base, "main.Stringer")
 	await $.println("base implements Stringer:", baseOK)
 
-	let derived: any = $.interfaceValue(new Derived(undefined, true), "main.Derived", "main.Derived")
+	let derived: any = $.interfaceValue(new Derived(true), "main.Derived", "main.Derived")
 	let [, derivedOK] = $.typeAssertTuple<Stringer | null>(derived, "main.Stringer")
 	await $.println("derived implements Stringer:", derivedOK)
 }

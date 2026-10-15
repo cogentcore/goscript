@@ -8,14 +8,14 @@ export class file {
 
 	public declare data: $.Slice<number>
 
-	constructor(init?: Partial<{name?: string, data?: $.Slice<number>}>, __goscriptValue?: boolean) {
-		this.name = init?.name ?? ("" as string)
-		this.data = init?.data ?? (null! as $.Slice<number>)
+	constructor(__goscriptValue?: boolean, name$?: string, data$?: $.Slice<number>) {
+		this.name = name$ ?? ""
+		this.data = data$ ?? (null! as $.Slice<number>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): file {
-		return new file(this, true)
+		return new file(true, this.name, this.data)
 	}
 
 	public __goscriptAssign(source: file): this {
@@ -38,14 +38,14 @@ export class storage {
 
 	public declare children: globalThis.Map<string, globalThis.Map<string, file | $.VarRef<file> | null> | null> | null
 
-	constructor(init?: Partial<{files?: globalThis.Map<string, file | $.VarRef<file> | null> | null, children?: globalThis.Map<string, globalThis.Map<string, file | $.VarRef<file> | null> | null> | null}>, __goscriptValue?: boolean) {
-		this.files = init?.files ?? (null! as globalThis.Map<string, file | $.VarRef<file> | null> | null)
-		this.children = init?.children ?? (null! as globalThis.Map<string, globalThis.Map<string, file | $.VarRef<file> | null> | null> | null)
+	constructor(__goscriptValue?: boolean, files$?: globalThis.Map<string, file | $.VarRef<file> | null> | null, children$?: globalThis.Map<string, globalThis.Map<string, file | $.VarRef<file> | null> | null> | null) {
+		this.files = files$ ?? (null! as globalThis.Map<string, file | $.VarRef<file> | null> | null)
+		this.children = children$ ?? (null! as globalThis.Map<string, globalThis.Map<string, file | $.VarRef<file> | null> | null> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): storage {
-		return new storage(this, true)
+		return new storage(true, this.files, this.children)
 	}
 
 	public __goscriptAssign(source: storage): this {
@@ -64,9 +64,9 @@ export class storage {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let s = new storage({files: $.makeMap<string, file | $.VarRef<file> | null>(), children: $.makeMap<string, globalThis.Map<string, file | $.VarRef<file> | null> | null>()}, true)
+	let s = new storage(true, $.makeMap<string, file | $.VarRef<file> | null>(), $.makeMap<string, globalThis.Map<string, file | $.VarRef<file> | null> | null>())
 
-	let f = new file({name: "test.txt", data: new Uint8Array([104, 101, 108, 108, 111, 32, 119, 111, 114, 108, 100])})
+	let f = new file(false, "test.txt", new Uint8Array([104, 101, 108, 108, 111, 32, 119, 111, 114, 108, 100]))
 
 	$.mapSet(s.files, "test", f)
 

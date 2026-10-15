@@ -14,13 +14,13 @@ import "@goscript/io/index.js"
 export class recreateError {
 	public declare next: bigint
 
-	constructor(init?: Partial<{next?: bigint}>, __goscriptValue?: boolean) {
-		this.next = init?.next ?? (0n as bigint)
+	constructor(__goscriptValue?: boolean, next$?: bigint) {
+		this.next = next$ ?? 0n
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): recreateError {
-		return new recreateError(this, true)
+		return new recreateError(true, this.next)
 	}
 
 	public __goscriptAssign(source: recreateError): this {
@@ -43,12 +43,12 @@ export class recreateError {
 }
 
 export class readWriteCloser {
-	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
+	constructor(__goscriptValue?: boolean) {
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): readWriteCloser {
-		return new readWriteCloser(this, true)
+		return new readWriteCloser(true)
 	}
 
 	public __goscriptAssign(source: readWriteCloser): this {
@@ -77,7 +77,7 @@ export class readWriteCloser {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let addr: net.Addr | null = $.interfaceValue<net.Addr | null>((() => { const __goscriptLiteralField0 = (net.IPv4(127, 0, 0, 1) as net.IP); return new net.UDPAddr({IP: __goscriptLiteralField0, Port: 443}) })(), "*net.UDPAddr", /* @__PURE__ */ $.pointerType("net.UDPAddr"))
+	let addr: net.Addr | null = $.interfaceValue<net.Addr | null>((() => { const __goscriptLiteralField0 = (net.IPv4(127, 0, 0, 1) as net.IP); return new net.UDPAddr(false, __goscriptLiteralField0, 443) })(), "*net.UDPAddr", /* @__PURE__ */ $.pointerType("net.UDPAddr"))
 	await $.println("addr", (__goscriptAwait = (addr !== null && (addr as any).__isVarRef !== true && ((addr as any).__goValue === undefined || (addr as any).__goType?.charCodeAt(0) !== 42) ? (addr as Exclude<net.Addr, null>) : $.pointerValue<Exclude<net.Addr, null>>(addr)).Network(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), $.pointerValue<net.UDPAddr>(((addr as any)?.__goType === "*net.UDPAddr" && (addr as any).__goValue === undefined && (addr as any).__isTypedNil !== true ? ((addr as any) as net.UDPAddr | $.VarRef<net.UDPAddr> | null) : $.mustTypeAssert<net.UDPAddr | $.VarRef<net.UDPAddr> | null>(addr, /* @__PURE__ */ $.pointerType("net.UDPAddr")))).Port)
 
 	let stream: io.ReadWriteCloser | null = $.interfaceValue<io.ReadWriteCloser | null>(new readWriteCloser(), "*main.readWriteCloser", /* @__PURE__ */ $.pointerType("main.readWriteCloser"))
@@ -90,7 +90,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("key", $.sliceLen((key as ed25519.PublicKey)), $.arrayIndex(key!, 0))
 
 	let target: $.VarRef<recreateError | $.VarRef<recreateError> | null> = $.varRef(null! as recreateError | $.VarRef<recreateError> | null)
-	let matched = errors.As($.pointerValueOrNil($.interfaceValue<$.GoError>(new recreateError({next: 7n}), "*main.recreateError", /* @__PURE__ */ $.pointerType("main.recreateError")))!, $.interfaceValue(target, "**main.recreateError", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.pointerType("main.recreateError"))))
+	let matched = errors.As($.pointerValueOrNil($.interfaceValue<$.GoError>(new recreateError(false, 7n), "*main.recreateError", /* @__PURE__ */ $.pointerType("main.recreateError")))!, $.interfaceValue(target, "**main.recreateError", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.pointerType("main.recreateError"))))
 	await $.println("error", matched, $.pointerValue<recreateError>(target.value).next)
 }
 

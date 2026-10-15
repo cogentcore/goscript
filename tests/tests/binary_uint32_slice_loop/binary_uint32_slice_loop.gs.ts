@@ -8,13 +8,13 @@ import "@goscript/encoding/binary/index.js"
 export class attrs {
 	public declare packedData: string
 
-	constructor(init?: Partial<{packedData?: string}>, __goscriptValue?: boolean) {
-		this.packedData = init?.packedData ?? ("" as string)
+	constructor(__goscriptValue?: boolean, packedData$?: string) {
+		this.packedData = packedData$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): attrs {
-		return new attrs(this, true)
+		return new attrs(true, this.packedData)
 	}
 
 	public __goscriptAssign(source: attrs): this {
@@ -51,7 +51,7 @@ export class attrs {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let a = new attrs({packedData: "\x01\x00\x00\x00a\x01\x00\x00\x00b"}, true)
+	let a = new attrs(true, "\x01\x00\x00\x00a\x01\x00\x00\x00b")
 	for (let __goscriptRangeTarget0 = a.decode(), __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
 		let s = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as string)
 		await $.println(s)

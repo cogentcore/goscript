@@ -10,14 +10,14 @@ export class TestStruct {
 	// StringField is a commented string field.
 	public declare StringField: string
 
-	constructor(init?: Partial<{IntField?: number, StringField?: string}>, __goscriptValue?: boolean) {
-		this.IntField = init?.IntField ?? (0 as number)
-		this.StringField = init?.StringField ?? ("" as string)
+	constructor(__goscriptValue?: boolean, IntField$?: number, StringField$?: string) {
+		this.IntField = IntField$ ?? 0
+		this.StringField = StringField$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): TestStruct {
-		return new TestStruct(this, true)
+		return new TestStruct(true, this.IntField, this.StringField)
 	}
 
 	public __goscriptAssign(source: TestStruct): this {
@@ -36,7 +36,7 @@ export class TestStruct {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let s = new TestStruct({IntField: 42, StringField: "hello"}, true)
+	let s = new TestStruct(true, 42, "hello")
 	await $.println("IntField:", s.IntField)
 	await $.println("StringField:", s.StringField)
 }

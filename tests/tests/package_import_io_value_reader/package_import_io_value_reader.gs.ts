@@ -6,12 +6,12 @@ import * as io from "@goscript/io/index.js"
 import * as strings from "@goscript/strings/index.js"
 
 export class zeroReader {
-	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
+	constructor(__goscriptValue?: boolean) {
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): zeroReader {
-		return new zeroReader(this, true)
+		return new zeroReader(true)
 	}
 
 	public __goscriptAssign(source: zeroReader): this {
@@ -34,13 +34,13 @@ export class zeroReader {
 
 export async function main(): globalThis.Promise<void> {
 	// Bound the unbounded value reader directly.
-	let __goscriptTuple0: any = await io.ReadAll($.pointerValueOrNil(io.LimitReader($.interfaceValue<io.Reader | null>(new zeroReader(undefined, true), "main.zeroReader", "main.zeroReader")!, 3n))!)
+	let __goscriptTuple0: any = await io.ReadAll($.pointerValueOrNil(io.LimitReader($.interfaceValue<io.Reader | null>(new zeroReader(true), "main.zeroReader", "main.zeroReader")!, 3n))!)
 	let data: $.Slice<number> = __goscriptTuple0[0]
 	let err = __goscriptTuple0[1]
 	await $.println("limit:", $.sliceLen(data), $.arrayIndex(data!, 0) == 0, err == null)
 
 	// Join a bounded zero range with a trailing reader through a spread slice.
-	let rdrs: $.Slice<io.Reader | null> = $.arrayToSlice<io.Reader | null>([io.LimitReader($.interfaceValue<io.Reader | null>(new zeroReader(undefined, true), "main.zeroReader", "main.zeroReader")!, 2n)])
+	let rdrs: $.Slice<io.Reader | null> = $.arrayToSlice<io.Reader | null>([io.LimitReader($.interfaceValue<io.Reader | null>(new zeroReader(true), "main.zeroReader", "main.zeroReader")!, 2n)])
 	rdrs = $.appendOne(rdrs, $.interfaceValue<io.Reader | null>(strings.NewReader("ab"), "*strings.Reader", /* @__PURE__ */ $.pointerType("strings.Reader")), $.appendZeros.nil)
 	let __goscriptTuple1: any = await io.ReadAll($.pointerValueOrNil(io.MultiReader(...(rdrs ?? [])))!)
 	data = __goscriptTuple1[0]

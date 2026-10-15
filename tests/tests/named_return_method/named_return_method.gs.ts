@@ -6,13 +6,13 @@ import * as $ from "@goscript/builtin/index.js"
 export class content {
 	public declare bytes: $.Slice<number>
 
-	constructor(init?: Partial<{bytes?: $.Slice<number>}>, __goscriptValue?: boolean) {
-		this.bytes = init?.bytes ?? (null! as $.Slice<number>)
+	constructor(__goscriptValue?: boolean, bytes$?: $.Slice<number>) {
+		this.bytes = bytes$ ?? (null! as $.Slice<number>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): content {
-		return new content(this, true)
+		return new content(true, this.bytes)
 	}
 
 	public __goscriptAssign(source: content): this {
@@ -71,7 +71,7 @@ export class content {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let c = new content({bytes: new Uint8Array([72, 101, 108, 108, 111, 44, 32, 87, 111, 114, 108, 100, 33])})
+	let c = new content(false, new Uint8Array([72, 101, 108, 108, 111, 44, 32, 87, 111, 114, 108, 100, 33]))
 
 	// Test ReadAt method
 	let buf = $.makeSlice<number>(5, undefined, "byte")

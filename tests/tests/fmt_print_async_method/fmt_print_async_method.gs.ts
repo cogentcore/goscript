@@ -7,13 +7,13 @@ import * as fmt from "@goscript/fmt/index.js"
 export class slowName {
 	public declare ch: $.Channel<string> | null
 
-	constructor(init?: Partial<{ch?: $.Channel<string> | null}>, __goscriptValue?: boolean) {
-		this.ch = init?.ch ?? (null! as $.Channel<string> | null)
+	constructor(__goscriptValue?: boolean, ch$?: $.Channel<string> | null) {
+		this.ch = ch$ ?? (null! as $.Channel<string> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): slowName {
-		return new slowName(this, true)
+		return new slowName(true, this.ch)
 	}
 
 	public __goscriptAssign(source: slowName): this {
@@ -41,14 +41,14 @@ export class point {
 
 	public declare y: number
 
-	constructor(init?: Partial<{x?: number, y?: number}>, __goscriptValue?: boolean) {
-		this.x = init?.x ?? (0 as number)
-		this.y = init?.y ?? (0 as number)
+	constructor(__goscriptValue?: boolean, x$?: number, y$?: number) {
+		this.x = x$ ?? 0
+		this.y = y$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): point {
-		return new point(this, true)
+		return new point(true, this.x, this.y)
 	}
 
 	public __goscriptAssign(source: point): this {
@@ -80,10 +80,10 @@ export function describe(p: point): string {
 }
 
 export async function main(): globalThis.Promise<void> {
-	await $.println(await label($.interfaceValue<fmt.Stringer | null>(new slowName({ch: $.makeChannel<string>(1, "", "both")}, true), "main.slowName", "main.slowName"), 1))
-	await $.println(await label($.interfaceValue<fmt.Stringer | null>(new point({x: 2, y: 3}, true), "main.point", "main.point"), 4))
-	await $.println(describe(new point({x: 5, y: 6}, true)))
-	let err = fmt.Errorf("bad %v", $.interfaceValue(new slowName({ch: $.makeChannel<string>(1, "", "both")}, true), "main.slowName", "main.slowName"))
+	await $.println(await label($.interfaceValue<fmt.Stringer | null>(new slowName(true, $.makeChannel<string>(1, "", "both")), "main.slowName", "main.slowName"), 1))
+	await $.println(await label($.interfaceValue<fmt.Stringer | null>(new point(true, 2, 3), "main.point", "main.point"), 4))
+	await $.println(describe(new point(true, 5, 6)))
+	let err = fmt.Errorf("bad %v", $.interfaceValue(new slowName(true, $.makeChannel<string>(1, "", "both")), "main.slowName", "main.slowName"))
 	await $.println((__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 }
 

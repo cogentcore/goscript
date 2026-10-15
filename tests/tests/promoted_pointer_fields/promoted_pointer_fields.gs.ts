@@ -6,13 +6,13 @@ import * as $ from "@goscript/builtin/index.js"
 export class counter {
 	public declare value: number
 
-	constructor(init?: Partial<{value?: number}>, __goscriptValue?: boolean) {
-		this.value = init?.value ?? (0 as number)
+	constructor(__goscriptValue?: boolean, value$?: number) {
+		this.value = value$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): counter {
-		return new counter(this, true)
+		return new counter(true, this.value)
 	}
 
 	public __goscriptAssign(source: counter): this {
@@ -39,14 +39,14 @@ export class inner {
 
 	public declare count: counter
 
-	constructor(init?: Partial<{name?: string, count?: counter}>, __goscriptValue?: boolean) {
-		this.name = init?.name ?? ("" as string)
-		this.count = init?.count ? init.count.clone() : new counter(undefined, true)
+	constructor(__goscriptValue?: boolean, name$?: string, count$?: counter) {
+		this.name = name$ ?? ""
+		this.count = count$ ?? new counter(true)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): inner {
-		return new inner(this, true)
+		return new inner(true, this.name, this.count.clone())
 	}
 
 	public __goscriptAssign(source: inner): this {
@@ -67,13 +67,13 @@ export class inner {
 export class outer {
 	public declare inner: inner | $.VarRef<inner> | null
 
-	constructor(init?: Partial<{inner?: inner | $.VarRef<inner> | null}>, __goscriptValue?: boolean) {
-		this.inner = init?.inner ?? (null! as inner | $.VarRef<inner> | null)
+	constructor(__goscriptValue?: boolean, inner$?: inner | $.VarRef<inner> | null) {
+		this.inner = inner$ ?? (null! as inner | $.VarRef<inner> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): outer {
-		return new outer(this, true)
+		return new outer(true, this.inner)
 	}
 
 	public __goscriptAssign(source: outer): this {
@@ -91,7 +91,7 @@ export class outer {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let o = new outer({inner: new inner({name: "ready", count: new counter({value: 7}, true)})})
+	let o = new outer(false, new inner(false, "ready", new counter(true, 7)))
 	let o$: outer = o == null ? $.pointerTarget<outer>(o) : (o as any).__isVarRef === true ? (o as any).value : (o as any).__goValue === undefined ? (o as any) : $.pointerTarget<outer>(o)
 
 	await $.println("name:", $.pointerValue<inner>((o$ as outer).inner).name)

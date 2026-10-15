@@ -25,14 +25,14 @@ export class slowInts {
 
 	public declare ch: $.Channel<number> | null
 
-	constructor(init?: Partial<{xs?: $.Slice<number>, ch?: $.Channel<number> | null}>, __goscriptValue?: boolean) {
-		this.xs = init?.xs ?? (null! as $.Slice<number>)
-		this.ch = init?.ch ?? (null! as $.Channel<number> | null)
+	constructor(__goscriptValue?: boolean, xs$?: $.Slice<number>, ch$?: $.Channel<number> | null) {
+		this.xs = xs$ ?? (null! as $.Slice<number>)
+		this.ch = ch$ ?? (null! as $.Channel<number> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): slowInts {
-		return new slowInts(this, true)
+		return new slowInts(true, this.xs, this.ch)
 	}
 
 	public __goscriptAssign(source: slowInts): this {
@@ -113,7 +113,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println($.sliceLen(sortWords($.arrayToSlice<string>(["ccc", "a", "bb"]))), wordsSorted($.arrayToSlice<string>(["a", "bb"])))
 	let w = stableWords($.arrayToSlice<string>(["bb", "a", "cc", "d"]))
 	await $.println($.arrayIndex(w!, 0), $.arrayIndex(w!, 1), $.arrayIndex(w!, 2), $.arrayIndex(w!, 3))
-	let s = await sortSlow(new slowInts({xs: $.arrayToSlice<number>([3, 1, 2]), ch: $.makeChannel<number>(1, 0, "both")}))
+	let s = await sortSlow(new slowInts(false, $.arrayToSlice<number>([3, 1, 2]), $.makeChannel<number>(1, 0, "both")))
 	await $.println($.arrayIndex(s!, 0), $.arrayIndex(s!, 1), $.arrayIndex(s!, 2))
 	let words = ($.arrayToSlice<string>(["xyz", "x", "xy"]) as byLen)
 	await sortAny($.namedValueInterfaceValue<sort.Interface | null>(words, "main.byLen", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()))

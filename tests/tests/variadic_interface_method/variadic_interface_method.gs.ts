@@ -15,12 +15,12 @@ $.registerInterfaceType(
 );
 
 export class PathJoiner {
-	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
+	constructor(__goscriptValue?: boolean) {
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): PathJoiner {
-		return new PathJoiner(this, true)
+		return new PathJoiner(true)
 	}
 
 	public __goscriptAssign(source: PathJoiner): this {
@@ -50,7 +50,7 @@ export class PathJoiner {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let b: Basic | null = $.interfaceValue<Basic | null>(new PathJoiner(undefined, true), "main.PathJoiner", "main.PathJoiner")
+	let b: Basic | null = $.interfaceValue<Basic | null>(new PathJoiner(true), "main.PathJoiner", "main.PathJoiner")
 
 	// Test with multiple arguments
 	let result1 = (__goscriptAwait = (b !== null && (b as any).__isVarRef !== true && ((b as any).__goValue === undefined || (b as any).__goType?.charCodeAt(0) !== 42) ? (b as Exclude<Basic, null>) : $.pointerValue<Exclude<Basic, null>>(b)).Join($.arrayToSlice<string>(["path", "to", "file"])), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)

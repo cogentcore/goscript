@@ -14,12 +14,12 @@ $.registerInterfaceType(
 );
 
 export class lateType {
-	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
+	constructor(__goscriptValue?: boolean) {
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): lateType {
-		return new lateType(this, true)
+		return new lateType(true)
 	}
 
 	public __goscriptAssign(source: lateType): this {

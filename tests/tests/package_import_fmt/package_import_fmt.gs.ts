@@ -24,13 +24,13 @@ $.registerNamedValueType(
 export class byteFormatter {
 	public declare prefix: $.Slice<number>
 
-	constructor(init?: Partial<{prefix?: $.Slice<number>}>, __goscriptValue?: boolean) {
-		this.prefix = init?.prefix ?? (null! as $.Slice<number>)
+	constructor(__goscriptValue?: boolean, prefix$?: $.Slice<number>) {
+		this.prefix = prefix$ ?? (null! as $.Slice<number>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): byteFormatter {
-		return new byteFormatter(this, true)
+		return new byteFormatter(true, this.prefix)
 	}
 
 	public __goscriptAssign(source: byteFormatter): this {
@@ -59,14 +59,14 @@ export class pos {
 
 	public declare Char: number
 
-	constructor(init?: Partial<{Line?: number, Char?: number}>, __goscriptValue?: boolean) {
-		this.Line = init?.Line ?? (0 as number)
-		this.Char = init?.Char ?? (0 as number)
+	constructor(__goscriptValue?: boolean, Line$?: number, Char$?: number) {
+		this.Line = Line$ ?? 0
+		this.Char = Char$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): pos {
-		return new pos(this, true)
+		return new pos(true, this.Line, this.Char)
 	}
 
 	public __goscriptAssign(source: pos): this {
@@ -133,7 +133,7 @@ export async function main(): globalThis.Promise<void> {
 	fmt.Printf("Width: '%5s'\n", "hi")
 	fmt.Printf("Precision: '%.2f'\n", $.basicInterfaceValue(3.14159, "float64"))
 	fmt.Printf("Both: '%5.2f'\n", $.basicInterfaceValue(3.14159, "float64"))
-	fmt.Printf("Formatter: %v\n", $.interfaceValue(new byteFormatter({prefix: new Uint8Array([98, 121, 116, 101, 45])}, true), "main.byteFormatter", "main.byteFormatter"))
+	fmt.Printf("Formatter: %v\n", $.interfaceValue(new byteFormatter(true, new Uint8Array([98, 121, 116, 101, 45])), "main.byteFormatter", "main.byteFormatter"))
 	let bs = new Uint8Array([97, 98, 34, 99])
 	fmt.Printf("Bytes: %s %q %x %X %v\n", $.interfaceValue(bs, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(bs, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(bs, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(bs, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(bs, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))))
 	fmt.Printf("String hex: %x %X\n", "hi", "hi")
@@ -221,7 +221,7 @@ export function scanVerbs(): void {
 	err = __goscriptTuple3[1]
 	fmt.Println("1x:", $.basicInterfaceValue(n, "int"), err == null, $.basicInterfaceValue(r.value, "uint8"), $.basicInterfaceValue(g.value, "uint8"), $.basicInterfaceValue(b.value, "uint8"))
 
-	let p: pos = new pos(undefined, true)
+	let p: pos = new pos(true)
 	let __goscriptTuple4: any = fmt.Sscanf("L12C3", "L%dC%d", $.interfaceValue($.fieldRef(p, "Line"), "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int"))), $.interfaceValue($.fieldRef(p, "Char"), "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int"))))
 	n = __goscriptTuple4[0]
 	err = __goscriptTuple4[1]

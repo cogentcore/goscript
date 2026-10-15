@@ -15,14 +15,14 @@ export class chanReader {
 
 	public declare cur: string
 
-	constructor(init?: Partial<{ch?: $.Channel<string> | null, cur?: string}>, __goscriptValue?: boolean) {
-		this.ch = init?.ch ?? (null! as $.Channel<string> | null)
-		this.cur = init?.cur ?? ("" as string)
+	constructor(__goscriptValue?: boolean, ch$?: $.Channel<string> | null, cur$?: string) {
+		this.ch = ch$ ?? (null! as $.Channel<string> | null)
+		this.cur = cur$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): chanReader {
-		return new chanReader(this, true)
+		return new chanReader(true, this.ch, this.cur)
 	}
 
 	public __goscriptAssign(source: chanReader): this {
@@ -62,14 +62,14 @@ export class item {
 
 	public declare B: number
 
-	constructor(init?: Partial<{A?: string, B?: number}>, __goscriptValue?: boolean) {
-		this.A = init?.A ?? ("" as string)
-		this.B = init?.B ?? (0 as number)
+	constructor(__goscriptValue?: boolean, A$?: string, B$?: number) {
+		this.A = A$ ?? ""
+		this.B = B$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): item {
-		return new item(this, true)
+		return new item(true, this.A, this.B)
 	}
 
 	public __goscriptAssign(source: item): this {
@@ -88,7 +88,7 @@ export class item {
 }
 
 export async function newChanReader(chunks: $.Slice<string>): globalThis.Promise<chanReader | $.VarRef<chanReader> | null> {
-	let r = new chanReader({ch: $.makeChannel<string>(0, "", "both")})
+	let r = new chanReader(false, $.makeChannel<string>(0, "", "both"))
 	let r$: chanReader = r == null ? $.pointerTarget<chanReader>(r) : (r as any).__isVarRef === true ? (r as any).value : (r as any).__goValue === undefined ? (r as any) : $.pointerTarget<chanReader>(r)
 	queueMicrotask(async () => {
 		for (let __goscriptRangeTarget0 = chunks, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
@@ -195,7 +195,7 @@ export async function main(): globalThis.Promise<void> {
 	// split across its chunks.
 	let bdec = json.NewDecoder($.pointerValueOrNil($.interfaceValue<io.Reader | null>(bufio.NewReader($.interfaceValue<io.Reader | null>(await newChanReader($.arrayToSlice<string>(["{\"A\": \"h", "\xc3", "\xa9llo\", \"B\": 1", "2.5}", "\n{\"A\": \"x\", \"B\": 3}"])), "*main.chanReader", /* @__PURE__ */ $.pointerType("main.chanReader"))), "*bufio.Reader", /* @__PURE__ */ $.pointerType("bufio.Reader")))!)
 	while (true) {
-		let it: $.VarRef<item> = $.varRef(new item(undefined, true))
+		let it: $.VarRef<item> = $.varRef(new item(true))
 		{
 			let __goscriptShadow0 = await json.Decoder.prototype.Decode.call($.pointerValue<json.Decoder>(bdec), $.interfaceValue(it, "*main.item", /* @__PURE__ */ $.pointerType("main.item")))
 			if (__goscriptShadow0 != null) {
@@ -214,7 +214,7 @@ export async function main(): globalThis.Promise<void> {
 	await printTokens(ndec)
 
 	// A syntax error is reported without waiting for the rest of the input.
-	let it: $.VarRef<item> = $.varRef(new item(undefined, true))
+	let it: $.VarRef<item> = $.varRef(new item(true))
 	err = await json.Decoder.prototype.Decode.call($.pointerValue<json.Decoder>(json.NewDecoder($.pointerValueOrNil($.interfaceValue<io.Reader | null>(await newChanReader($.arrayToSlice<string>(["{\"A\": ]", " more"])), "*main.chanReader", /* @__PURE__ */ $.pointerType("main.chanReader")))!)), $.interfaceValue(it, "*main.item", /* @__PURE__ */ $.pointerType("main.item")))
 	fmt.Println("syntax error:", err != null)
 }

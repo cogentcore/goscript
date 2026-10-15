@@ -9,14 +9,14 @@ export class P {
 
 	public declare Y: string
 
-	constructor(init?: Partial<{X?: number, Y?: string}>, __goscriptValue?: boolean) {
-		this.X = init?.X ?? (0 as number)
-		this.Y = init?.Y ?? ("" as string)
+	constructor(__goscriptValue?: boolean, X$?: number, Y$?: string) {
+		this.X = X$ ?? 0
+		this.Y = Y$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): P {
-		return new P(this, true)
+		return new P(true, this.X, this.Y)
 	}
 
 	public __goscriptAssign(source: P): this {
@@ -45,7 +45,7 @@ export async function main(): globalThis.Promise<void> {
 	let n1: $.VarRef<number> | null = null! as $.VarRef<number> | null
 	let n2: $.VarRef<number> | null = null! as $.VarRef<number> | null
 	await $.println($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(n1, "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int")))))).Equal($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(n2, "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int"))))))), $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(n1, "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int")))))).Equal($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(pv.value, "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int"))))))))
-	await $.println($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(new P({X: 1, Y: "a"}, true), "main.P", "main.P")))).Equal($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(new P({X: 1, Y: "a"}, true), "main.P", "main.P"))))), $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(new P({X: 1, Y: "a"}, true), "main.P", "main.P")))).Equal($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(new P({X: 1, Y: "b"}, true), "main.P", "main.P"))))))
+	await $.println($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(new P(true, 1, "a"), "main.P", "main.P")))).Equal($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(new P(true, 1, "a"), "main.P", "main.P"))))), $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(new P(true, 1, "a"), "main.P", "main.P")))).Equal($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(new P(true, 1, "b"), "main.P", "main.P"))))))
 	await $.println($.markAsStructValue($.cloneStructValue(reflect.ValueOf(null))).Equal($.markAsStructValue($.cloneStructValue(reflect.ValueOf(null)))), $.markAsStructValue($.cloneStructValue(reflect.ValueOf(null))).Equal($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.basicInterfaceValue(1, "int"))))))
 
 	class Z {

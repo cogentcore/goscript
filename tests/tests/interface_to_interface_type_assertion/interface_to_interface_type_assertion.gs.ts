@@ -26,13 +26,13 @@ $.registerInterfaceType(
 export class MyStruct {
 	public declare Value: number
 
-	constructor(init?: Partial<{Value?: number}>, __goscriptValue?: boolean) {
-		this.Value = init?.Value ?? (0 as number)
+	constructor(__goscriptValue?: boolean, Value$?: number) {
+		this.Value = Value$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): MyStruct {
-		return new MyStruct(this, true)
+		return new MyStruct(true, this.Value)
 	}
 
 	public __goscriptAssign(source: MyStruct): this {
@@ -56,8 +56,8 @@ export class MyStruct {
 
 export async function main(): globalThis.Promise<void> {
 	let i: MyInterface | null = null! as MyInterface | null
-	let s = new MyStruct({Value: 10}, true)
-	i = $.interfaceValue<MyInterface | null>(s, "main.MyStruct", "main.MyStruct")
+	let s = new MyStruct(true, 10)
+	i = $.interfaceValue<MyInterface | null>((s).clone(), "main.MyStruct", "main.MyStruct")
 
 	let [, ok] = $.typeAssertTuple<MyOtherInterface | null>(i, "main.MyOtherInterface")
 	if (ok) {

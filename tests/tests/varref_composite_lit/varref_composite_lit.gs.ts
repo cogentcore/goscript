@@ -6,13 +6,13 @@ import * as $ from "@goscript/builtin/index.js"
 export class MockInode {
 	public declare Value: number
 
-	constructor(init?: Partial<{Value?: number}>, __goscriptValue?: boolean) {
-		this.Value = init?.Value ?? (0 as number)
+	constructor(__goscriptValue?: boolean, Value$?: number) {
+		this.Value = Value$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): MockInode {
-		return new MockInode(this, true)
+		return new MockInode(true, this.Value)
 	}
 
 	public __goscriptAssign(source: MockInode): this {
@@ -38,7 +38,7 @@ export async function main(): globalThis.Promise<void> {
 	// This should generate: let childInode: MockInode | null = new MockInode({Value: 42})
 	// Not: let childInode: MockInode | null = $.varRef(new MockInode({Value: 42}))
 	// Because we're taking the address of a composite literal, not a variable
-	let childInode: MockInode | $.VarRef<MockInode> | null = new MockInode({Value: 42})
+	let childInode: MockInode | $.VarRef<MockInode> | null = new MockInode(false, 42)
 
 	// Use the pointer
 	await $.println("childInode.Value:", $.pointerValue<MockInode>(childInode).Value)

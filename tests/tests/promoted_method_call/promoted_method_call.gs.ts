@@ -6,13 +6,13 @@ import * as $ from "@goscript/builtin/index.js"
 export class base {
 	public declare value: number
 
-	constructor(init?: Partial<{value?: number}>, __goscriptValue?: boolean) {
-		this.value = init?.value ?? (0 as number)
+	constructor(__goscriptValue?: boolean, value$?: number) {
+		this.value = value$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): base {
-		return new base(this, true)
+		return new base(true, this.value)
 	}
 
 	public __goscriptAssign(source: base): this {
@@ -37,13 +37,13 @@ export class base {
 export class wrapper {
 	public declare base: base
 
-	constructor(init?: Partial<{base?: base}>, __goscriptValue?: boolean) {
-		this.base = init?.base ? init.base.clone() : new base(undefined, true)
+	constructor(__goscriptValue?: boolean, base$?: base) {
+		this.base = base$ ?? new base(true)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): wrapper {
-		return new wrapper(this, true)
+		return new wrapper(true, this.base.clone())
 	}
 
 	public __goscriptAssign(source: wrapper): this {
@@ -65,7 +65,7 @@ export class wrapper {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let w = new wrapper({base: new base({value: 3}, true)})
+	let w = new wrapper(false, new base(true, 3))
 	await $.println($.pointerValue<wrapper>(w).base.Add(4))
 
 	let add: ((n: number) => number | globalThis.Promise<number>) | null = $.functionValue(((__receiver) => (n: number) => __receiver.Add(n))($.pointerValue<wrapper>(w).base), ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo), "main.(*base).Add-fm")

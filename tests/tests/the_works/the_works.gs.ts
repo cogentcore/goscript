@@ -32,14 +32,14 @@ export class Instr {
 
 	public declare Arg: bigint
 
-	constructor(init?: Partial<{Op?: Op, Arg?: bigint}>, __goscriptValue?: boolean) {
-		this.Op = init?.Op ?? (0 as Op)
-		this.Arg = init?.Arg ?? (0n as bigint)
+	constructor(__goscriptValue?: boolean, Op$?: Op, Arg$?: bigint) {
+		this.Op = Op$ ?? 0
+		this.Arg = Arg$ ?? 0n
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Instr {
-		return new Instr(this, true)
+		return new Instr(true, this.Op, this.Arg)
 	}
 
 	public __goscriptAssign(source: Instr): this {
@@ -62,14 +62,14 @@ export class Program {
 
 	public declare Code: $.Slice<Instr>
 
-	constructor(init?: Partial<{Name?: string, Code?: $.Slice<Instr>}>, __goscriptValue?: boolean) {
-		this.Name = init?.Name ?? ("" as string)
-		this.Code = init?.Code ?? (null! as $.Slice<Instr>)
+	constructor(__goscriptValue?: boolean, Name$?: string, Code$?: $.Slice<Instr>) {
+		this.Name = Name$ ?? ""
+		this.Code = Code$ ?? (null! as $.Slice<Instr>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Program {
-		return new Program(this, true)
+		return new Program(true, this.Name, this.Code)
 	}
 
 	public __goscriptAssign(source: Program): this {
@@ -102,13 +102,13 @@ export class Program {
 export class Stack {
 	public declare items: $.Slice<any>
 
-	constructor(init?: Partial<{items?: $.Slice<any>}>, __goscriptValue?: boolean) {
-		this.items = init?.items ?? (null! as $.Slice<any>)
+	constructor(__goscriptValue?: boolean, items$?: $.Slice<any>) {
+		this.items = items$ ?? (null! as $.Slice<any>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Stack {
-		return new Stack(this, true)
+		return new Stack(true, this.items)
 	}
 
 	public __goscriptAssign(source: Stack): this {
@@ -149,15 +149,15 @@ export class VM {
 
 	public declare stack: Stack
 
-	constructor(init?: Partial<{pc?: number, steps?: number, stack?: Stack}>, __goscriptValue?: boolean) {
-		this.pc = init?.pc ?? (0 as number)
-		this.steps = init?.steps ?? (0 as number)
-		this.stack = init?.stack ? init.stack.clone() : $.markAsStructValue(new Stack())
+	constructor(__goscriptValue?: boolean, pc$?: number, steps$?: number, stack$?: Stack) {
+		this.pc = pc$ ?? 0
+		this.steps = steps$ ?? 0
+		this.stack = stack$ ?? new Stack(true)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): VM {
-		return new VM(this, true)
+		return new VM(true, this.pc, this.steps, this.stack.clone())
 	}
 
 	public __goscriptAssign(source: VM): this {
@@ -256,15 +256,15 @@ export class Answer {
 
 	public declare Steps: number
 
-	constructor(init?: Partial<{Name?: string, Value?: bigint, Steps?: number}>, __goscriptValue?: boolean) {
-		this.Name = init?.Name ?? ("" as string)
-		this.Value = init?.Value ?? (0n as bigint)
-		this.Steps = init?.Steps ?? (0 as number)
+	constructor(__goscriptValue?: boolean, Name$?: string, Value$?: bigint, Steps$?: number) {
+		this.Name = Name$ ?? ""
+		this.Value = Value$ ?? 0n
+		this.Steps = Steps$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Answer {
-		return new Answer(this, true)
+		return new Answer(true, this.Name, this.Value, this.Steps)
 	}
 
 	public __goscriptAssign(source: Answer): this {
@@ -293,14 +293,14 @@ export class Fault {
 
 	public declare Reason: string
 
-	constructor(init?: Partial<{Name?: string, Reason?: string}>, __goscriptValue?: boolean) {
-		this.Name = init?.Name ?? ("" as string)
-		this.Reason = init?.Reason ?? ("" as string)
+	constructor(__goscriptValue?: boolean, Name$?: string, Reason$?: string) {
+		this.Name = Name$ ?? ""
+		this.Reason = Reason$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): Fault {
-		return new Fault(this, true)
+		return new Fault(true, this.Name, this.Reason)
 	}
 
 	public __goscriptAssign(source: Fault): this {
@@ -360,7 +360,7 @@ export async function run(p: Program, answers: $.Channel<Answer> | null, faults:
 			{
 				let r = $.recover()
 				if (r != null) {
-					await $.chanSend(faults, new Fault({Name: p.Name, Reason: $.mustTypeAssert<string>(r, /* @__PURE__ */ $.basicType("string"))}))
+					await $.chanSend(faults, new Fault(false, p.Name, $.mustTypeAssert<string>(r, /* @__PURE__ */ $.basicType("string"))))
 				}
 			}
 		})() })
@@ -368,7 +368,7 @@ export async function run(p: Program, answers: $.Channel<Answer> | null, faults:
 		let vm$: VM = vm == null ? $.pointerTarget<VM>(vm) : (vm as any).__isVarRef === true ? (vm as any).value : (vm as any).__goValue === undefined ? (vm as any) : $.pointerTarget<VM>(vm)
 		while (!(vm !== null && (vm as any).__isVarRef !== true && (vm as any).__goValue === undefined ? ((vm as any) as VM).Step(p.Code) : VM.prototype.Step.call(vm, p.Code))) {
 		}
-		await $.chanSend(answers, (() => { const __goscriptLiteralField0 = (vm$ as VM).stack.Pop(__goscriptStatic0()); return new Answer({Name: p.Name, Value: __goscriptLiteralField0, Steps: (vm$ as VM).steps}, true) })())
+		await $.chanSend(answers, (() => { const __goscriptLiteralField0 = (vm$ as VM).stack.Pop(__goscriptStatic0()); return new Answer(true, p.Name, __goscriptLiteralField0, (vm$ as VM).steps) })())
 		await __defer.dispose()
 	} catch (e) {
 		await __defer.disposePanic(e)
@@ -379,11 +379,11 @@ export async function run(p: Program, answers: $.Channel<Answer> | null, faults:
 }
 
 export function factorial(name: string, n: bigint): Program {
-	return new Program({Name: name, Code: $.arrayToSlice<Instr>([new Instr({Op: 0, Arg: 1n}, true), new Instr({Op: 0, Arg: n}, true), new Instr({Op: 3, Arg: 0n}, true), new Instr({Op: 2, Arg: 0n}, true), new Instr({Op: 7, Arg: 0n}, true), new Instr({Op: 3, Arg: 0n}, true), new Instr({Op: 5, Arg: 0n}, true), new Instr({Op: 1, Arg: 0n}, true), new Instr({Op: 8, Arg: 2n}, true), new Instr({Op: 4, Arg: 0n}, true), new Instr({Op: 9, Arg: 0n}, true)])}, true)
+	return new Program(true, name, $.arrayToSlice<Instr>([new Instr(true, 0, 1n), new Instr(true, 0, n), new Instr(true, 3, 0n), new Instr(true, 2, 0n), new Instr(true, 7, 0n), new Instr(true, 3, 0n), new Instr(true, 5, 0n), new Instr(true, 1, 0n), new Instr(true, 8, 2n), new Instr(true, 4, 0n), new Instr(true, 9, 0n)]))
 }
 
 export async function main(): globalThis.Promise<void> {
-	let programs = $.arrayToSlice<Program>([factorial("20!", 20n), factorial("21!", 21n), new Program({Name: "broken", Code: $.arrayToSlice<Instr>([new Instr({Op: 0, Arg: 1n}, true), new Instr({Op: 6, Arg: 0n}, true), new Instr({Op: 9, Arg: 0n}, true)])}, true)])
+	let programs = $.arrayToSlice<Program>([factorial("20!", 20n), factorial("21!", 21n), new Program(true, "broken", $.arrayToSlice<Instr>([new Instr(true, 0, 1n), new Instr(true, 6, 0n), new Instr(true, 9, 0n)]))])
 
 	await $.println("listing of", $.arrayIndex(programs!, 0).Name)
 	let __goscriptRangeReturn0 = false
@@ -401,7 +401,7 @@ export async function main(): globalThis.Promise<void> {
 		return
 	}
 
-	let answers = $.makeChannel<Answer>(0, new Answer(undefined, true), "both")
+	let answers = $.makeChannel<Answer>(0, new Answer(true), "both")
 	let faults = $.makeChannel<Fault | $.VarRef<Fault> | null>(0, null! as Fault | $.VarRef<Fault> | null, "both")
 	for (let __goscriptRangeTarget1 = programs, __goscriptRangeWindow1 = $.sliceRange(__goscriptRangeTarget1), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow1.length; __rangeIndex++) {
 		let p = ((__goscriptRangeWindow1.backing[__goscriptRangeWindow1.offset + __rangeIndex] as Program)).clone()

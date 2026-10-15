@@ -13,15 +13,15 @@ export class odd {
 
 	public declare Name: string
 
-	constructor(init?: Partial<{___proto__?: number, _constructor?: string, Name?: string}>, __goscriptValue?: boolean) {
-		this.___proto__ = init?.___proto__ ?? (0 as number)
-		this._constructor = init?._constructor ?? ("" as string)
-		this.Name = init?.Name ?? ("" as string)
+	constructor(__goscriptValue?: boolean, ___proto__$?: number, _constructor$?: string, Name$?: string) {
+		this.___proto__ = ___proto__$ ?? 0
+		this._constructor = _constructor$ ?? ""
+		this.Name = Name$ ?? ""
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): odd {
-		return new odd(this, true)
+		return new odd(true, this.___proto__, this._constructor, this.Name)
 	}
 
 	public __goscriptAssign(source: odd): this {
@@ -42,7 +42,7 @@ export class odd {
 
 export async function main(): globalThis.Promise<void> {
 	// Fields named like JavaScript object internals are ordinary fields.
-	let v = new odd({___proto__: 7, _constructor: "c", Name: "n"}, true)
+	let v = new odd(true, 7, "c", "n")
 	let w = (v).clone()
 	w.___proto__ = 8
 	let p = $.fieldRef(v, "___proto__")
@@ -52,7 +52,7 @@ export async function main(): globalThis.Promise<void> {
 	// The struct keeps its type and methods.
 	fmt.Printf("%v %+v\n", $.interfaceValue((v).clone(), "main.odd", "main.odd"), $.interfaceValue(w, "main.odd", "main.odd"))
 	fmt.Println((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.interfaceValue((v).clone(), "main.odd", "main.odd"))).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), $.basicInterfaceValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue((v).clone(), "main.odd", "main.odd")))).Field(0))).Int(), "int64"), $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue((v).clone(), "main.odd", "main.odd")))).Field(1))).String())
-	fmt.Println($.structEqual(v, new odd({___proto__: 8, _constructor: "c", Name: "n"}, true)))
+	fmt.Println($.structEqual(v, new odd(true, 8, "c", "n")))
 	let __goscriptTuple0: any = (json.Marshal($.interfaceValue((v).clone(), "main.odd", "main.odd")) as [$.Slice<number>, $.GoError])
 	let data: $.Slice<number> = __goscriptTuple0[0]
 	let err = __goscriptTuple0[1]

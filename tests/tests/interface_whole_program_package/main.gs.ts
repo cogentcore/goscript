@@ -5,12 +5,12 @@ import * as $ from "@goscript/builtin/index.js"
 import * as visit from "@goscript/github.com/s4wave/goscript/tests/tests/interface_whole_program_package/visit/index.js"
 
 export class doubler {
-	constructor(init?: Partial<{}>, __goscriptValue?: boolean) {
+	constructor(__goscriptValue?: boolean) {
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): doubler {
-		return new doubler(this, true)
+		return new doubler(true)
 	}
 
 	public __goscriptAssign(source: doubler): this {
@@ -33,13 +33,13 @@ export class doubler {
 export class chanFetcher {
 	public declare ch: $.Channel<number> | null
 
-	constructor(init?: Partial<{ch?: $.Channel<number> | null}>, __goscriptValue?: boolean) {
-		this.ch = init?.ch ?? (null! as $.Channel<number> | null)
+	constructor(__goscriptValue?: boolean, ch$?: $.Channel<number> | null) {
+		this.ch = ch$ ?? (null! as $.Channel<number> | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): chanFetcher {
-		return new chanFetcher(this, true)
+		return new chanFetcher(true, this.ch)
 	}
 
 	public __goscriptAssign(source: chanFetcher): this {
@@ -64,8 +64,8 @@ export class chanFetcher {
 }
 
 export async function main(): globalThis.Promise<void> {
-	await $.println("walk:", visit.Walk($.interfaceValue<visit.Visitor | null>(new doubler(undefined, true), "main.doubler", "main.doubler"), $.arrayToSlice<number>([1, 2, 3])))
-	await $.println("fetch:", await visit.Fetch($.interfaceValue<visit.Fetcher | null>(new chanFetcher({ch: $.makeChannel<number>(1, 0, "both")}), "*main.chanFetcher", /* @__PURE__ */ $.pointerType("main.chanFetcher"))))
+	await $.println("walk:", visit.Walk($.interfaceValue<visit.Visitor | null>(new doubler(true), "main.doubler", "main.doubler"), $.arrayToSlice<number>([1, 2, 3])))
+	await $.println("fetch:", await visit.Fetch($.interfaceValue<visit.Fetcher | null>(new chanFetcher(false, $.makeChannel<number>(1, 0, "both")), "*main.chanFetcher", /* @__PURE__ */ $.pointerType("main.chanFetcher"))))
 }
 
 if ($.isMainScript(import.meta)) {
