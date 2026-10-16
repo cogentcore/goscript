@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  basicInterfaceValue,
   basicType,
   methodSignature,
   registerInterfaceType,
@@ -275,5 +276,17 @@ describe('assertions of boxed pointers to pointer descriptors', () => {
     expect(typeAssert(boxed, pointerType('test.PtrUnregistered')).ok).toBe(
       false,
     )
+  })
+})
+
+describe('boxes of basic values', () => {
+  it('share a prototype and keep their value and type', () => {
+    const a = basicInterfaceValue(1.5, 'float32')
+    const b = basicInterfaceValue(2, 'float32')
+    expect(Object.getPrototypeOf(a)).toBe(Object.getPrototypeOf(b))
+    expect(+a).toBe(1.5)
+    expect(String(b)).toBe('2')
+    expect(typeAssert(a, basicType('float32'))).toEqual({ value: 1.5, ok: true })
+    expect(typeAssert(a, basicType('float64')).ok).toBe(false)
   })
 })

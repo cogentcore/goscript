@@ -2794,16 +2794,24 @@ export function basicInterfaceValue<T = any>(
   typeName: string,
   valueTypeName = typeName,
 ): T {
-  return namedValueInterfaceValue<T>(
-    value,
-    typeName,
-    {},
-    {
-      kind: TypeKind.Basic,
-      name: valueTypeName,
-    },
-  )
+  // The type information of a basic type is made once.
+  let typeInfo = basicBoxTypeInfos.get(valueTypeName)
+  if (typeInfo === undefined) {
+    typeInfo = { kind: TypeKind.Basic, name: valueTypeName }
+    basicBoxTypeInfos.set(valueTypeName, typeInfo)
+  }
+
+  // The box has no methods, so its prototype is shared by all basic boxes.
+  const box = Object.create(basicBoxPrototype)
+  box.__goType = typeName
+  box.__goValue = value
+  box.__goTypeInfo = typeInfo
+  return box as T
 }
+
+// basicBoxTypeInfos holds the type information of the boxes of basic values,
+// such as numbers converted to an interface, by the name of their basic type.
+const basicBoxTypeInfos = new Map<string, TypeInfo>()
 
 // NamedValueMethods holds the method implementations and signatures of a
 // named non-struct type, or a pointer to one, for boxing its values.
@@ -2921,6 +2929,21 @@ const namedValueBoxPrototypes = new WeakMap<object, object>()
 // namedValueBoxMarker marks a prototype of named value boxes, whose methods
 // make up their Go method surface.
 export const namedValueBoxMarker = Symbol('namedValueBox')
+
+// basicBoxPrototype is the prototype of the boxes made by basicInterfaceValue,
+// which have no methods.
+const basicBoxPrototype: object = {
+  valueOf(this: { __goValue: unknown }) {
+    return this.__goValue
+  },
+  toString(this: { __goValue: unknown }) {
+    return String(this.__goValue)
+  },
+  [Symbol.toPrimitive](this: { __goValue: unknown }) {
+    return this.__goValue
+  },
+  [namedValueBoxMarker]: true,
+}
 
 // namedValueBoxMethod returns the method of a box prototype that calls the
 // method of entry with the boxed value. A method without parameters passes
