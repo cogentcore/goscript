@@ -32,46 +32,29 @@ export function mixedForwardBackward(limit: number): number {
 	let total = 0
 	__goscriptLoop0: while (total < limit) {
 		total++
-		let __goscriptGotoState0 = "__entry"
-		__goscriptGotoLoop0: while (true) {
-			switch (__goscriptGotoState0) {
-				case "__entry":
-				{
-					__goscriptGotoState0 = "skipVisit"
-					continue __goscriptGotoLoop0
-					__goscriptGotoState0 = "checkAndLoop"
-					continue __goscriptGotoLoop0
-					break
+		let __goscriptSkip0 = true
+		checkAndLoop: while (true) {
+			if (!__goscriptSkip0) {
+				if (total >= limit) {
+					continue __goscriptLoop0
 				}
-				case "checkAndLoop":
-				{
-					if (total >= limit) {
-						continue __goscriptLoop0
+			}
+			__goscriptSkip0 = false
+
+			skipVisit: {
+				switch (total % 3) {
+					case 0:
+					{
+						total += 2
+						continue checkAndLoop
+						break
 					}
-					__goscriptGotoState0 = "skipVisit"
-					continue __goscriptGotoLoop0
-					break
-				}
-				case "skipVisit":
-				{
-					switch (total % 3) {
-						case 0:
-						{
-							total += 2
-							__goscriptGotoState0 = "checkAndLoop"
-							continue __goscriptGotoLoop0
-							break
-						}
-						case 1:
-						{
-							total += 3
-							__goscriptGotoState0 = "checkAndLoop"
-							continue __goscriptGotoLoop0
-							break
-						}
+					case 1:
+					{
+						total += 3
+						continue checkAndLoop
+						break
 					}
-					break __goscriptGotoLoop0
-					break
 				}
 			}
 			break
@@ -117,36 +100,19 @@ export function overlappingSequentialForward(v: number): number {
 export function mixedForwardBackwardDecl(limit: number): number {
 	let total = 0
 	__goscriptLoop1: while (total < limit) {
-		let __goscriptGotoState1 = "__entry"
-		__goscriptGotoLoop1: while (true) {
-			switch (__goscriptGotoState1) {
-				case "__entry":
-				{
-					__goscriptGotoState1 = "skip"
-					continue __goscriptGotoLoop1
-					__goscriptGotoState1 = "check"
-					continue __goscriptGotoLoop1
-					break
-				}
-				case "check":
-				{
-					if (total >= limit) {
-						continue __goscriptLoop1
-					}
-					__goscriptGotoState1 = "skip"
-					continue __goscriptGotoLoop1
-					break
-				}
-				case "skip":
-				{
-					var x: number = total + 1
-					total = x
-					__goscriptGotoState1 = "check"
-					continue __goscriptGotoLoop1
-					break __goscriptGotoLoop1
-					break
+		let __goscriptSkip1 = true
+		check: while (true) {
+			if (!__goscriptSkip1) {
+				if (total >= limit) {
+					continue __goscriptLoop1
 				}
 			}
+			__goscriptSkip1 = false
+
+			skip:;
+			var x: number = total + 1
+			total = x
+			continue check
 			break
 		}
 	}
@@ -155,52 +121,46 @@ export function mixedForwardBackwardDecl(limit: number): number {
 
 export function stateMachineGoto(start: number): number {
 	let total = start
-	let __goscriptGotoState2 = "__entry"
-	__goscriptGotoLoop2: while (true) {
-		switch (__goscriptGotoState2) {
-			case "__entry":
+	let __goscriptGotoState0 = 0
+	__goscriptGotoLoop0: for (;;) {
+		switch (__goscriptGotoState0) {
+			case 0:
 			{
 				if (start == 0) {
-					__goscriptGotoState2 = "readLiteral"
-					continue __goscriptGotoLoop2
+					__goscriptGotoState0 = 1
+					continue __goscriptGotoLoop0
 				}
-				__goscriptGotoState2 = "copyHistory"
-				continue __goscriptGotoLoop2
-				__goscriptGotoState2 = "readLiteral"
-				continue __goscriptGotoLoop2
-				break
+				__goscriptGotoState0 = 2
+				continue __goscriptGotoLoop0
 			}
-			case "readLiteral":
+			case 1:
 			{
 				{
 					total++
 					if (total < 2) {
-						__goscriptGotoState2 = "readLiteral"
-						continue __goscriptGotoLoop2
+						__goscriptGotoState0 = 1
+						continue __goscriptGotoLoop0
 					}
-					__goscriptGotoState2 = "copyHistory"
-					continue __goscriptGotoLoop2
+					__goscriptGotoState0 = 2
+					continue __goscriptGotoLoop0
 				}
-				__goscriptGotoState2 = "copyHistory"
-				continue __goscriptGotoLoop2
-				break
 			}
-			case "copyHistory":
+			case 2:
 			{
 				{
 					total += 10
 					if (total < 15) {
-						__goscriptGotoState2 = "readLiteral"
-						continue __goscriptGotoLoop2
+						__goscriptGotoState0 = 1
+						continue __goscriptGotoLoop0
 					}
 				}
-				break __goscriptGotoLoop2
+				return total
 				break
 			}
 		}
 		break
 	}
-	return total
+	throw new globalThis.Error("goscript: unreachable return")
 }
 
 export function nestedBackwardGoto(limit: number): number {
@@ -287,60 +247,47 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("nested break:", nestedInnerBreakWithGoto(25))
 
 	let rangeTotal = 0
-	let __goscriptGotoState3 = "rangeRestart"
-	__goscriptGotoLoop3: while (true) {
-		switch (__goscriptGotoState3) {
-			case "rangeRestart":
-			{
-				if (rangeTotal >= 25) {
-					__goscriptGotoState3 = "rangeDone"
-					continue __goscriptGotoLoop3
-				}
-				__goscriptLoop4: while (true) {
-					rangeNext: while (true) {
-						let __goscriptRangeReturn0 = false
-						;await (async () => {
-							await rangeFuncBreakIterator!(async (v) => {
-								if (v == 0) {
-									rangeTotal += 5
-									return true
-								}
-								if (v == 1) {
-									return false
-								}
-								rangeTotal += 10
-								return true
-							})
-						})()
-						if (__goscriptRangeReturn0) {
-							return
-						}
+	rangeDone: {
+		rangeRestart: while (true) {
+			if (rangeTotal >= 25) {
+				break rangeDone
+			}
 
-						rangeTotal++
-						if (rangeTotal < 25) {
-							continue rangeNext
-						}
-						break
+			__goscriptLoop4: while (true) {
+				rangeNext: while (true) {
+					let __goscriptRangeReturn0 = false
+					;await (async () => {
+						await rangeFuncBreakIterator!(async (v) => {
+							if (v == 0) {
+								rangeTotal += 5
+								return true
+							}
+							if (v == 1) {
+								return false
+							}
+							rangeTotal += 10
+							return true
+						})
+					})()
+					if (__goscriptRangeReturn0) {
+						return
 					}
-					if (rangeTotal < 28) {
-						__goscriptGotoState3 = "rangeRestart"
-						continue __goscriptGotoLoop3
+
+					rangeTotal++
+					if (rangeTotal < 25) {
+						continue rangeNext
 					}
-					break __goscriptLoop4
+					break
 				}
-				__goscriptGotoState3 = "rangeDone"
-				continue __goscriptGotoLoop3
-				break
+				if (rangeTotal < 28) {
+					continue rangeRestart
+				}
+				break __goscriptLoop4
 			}
-			case "rangeDone":
-			{
-				await $.println("range func break:", rangeTotal)
-				break __goscriptGotoLoop3
-				break
-			}
+			break
 		}
-		break
 	}
+	await $.println("range func break:", rangeTotal)
 }
 
 var __goscriptAwait: any

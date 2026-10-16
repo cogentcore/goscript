@@ -261,6 +261,8 @@ type loweredDeferState struct {
 }
 
 type loweredSwitch struct {
+	// label names the switch for breaks from inside goto loops in its cases.
+	label string
 	value string
 	cases []loweredSwitchCase
 }
@@ -293,6 +295,8 @@ type loweredSelectCase struct {
 }
 
 type loweredTypeSwitch struct {
+	// label names the switch for breaks from inside goto loops in its cases.
+	label       string
 	value       string
 	varName     string
 	varRef      bool

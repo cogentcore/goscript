@@ -1267,6 +1267,9 @@ func writeIndentedText(b *strings.Builder, text string, indent int) {
 // renderSwitch emits grouped case labels and their lowered bodies.
 func renderSwitch(b *strings.Builder, stmt *loweredSwitch, indent int) {
 	writeIndent(b, indent)
+	if stmt.label != "" {
+		b.WriteString(stmt.label + ": ")
+	}
 	b.WriteString("switch (")
 	b.WriteString(stmt.value)
 	b.WriteString(") {\n")
@@ -1651,6 +1654,9 @@ func renderTypeSwitch(b *strings.Builder, stmt *loweredTypeSwitch, indent int) {
 	b.WriteString(stmt.value)
 	b.WriteString("\n")
 	writeIndent(b, indent+1)
+	if stmt.label != "" {
+		b.WriteString(stmt.label + ": ")
+	}
 	b.WriteString("switch (true) {\n")
 	for _, switchCase := range stmt.cases {
 		renderTypeSwitchCase(b, stmt.varName, stmt.varRef, switchCase, indent+2)
