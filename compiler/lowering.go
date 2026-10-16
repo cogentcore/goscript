@@ -1672,8 +1672,12 @@ type lowerFileContext struct {
 	// //goscript:sync marks, outside its function literals. Its calls that
 	// may suspend are checked to return a value instead of awaited.
 	syncDirectiveFunction bool
-	functionTypeDepth     int
-	deferState            *loweredDeferState
+	// callSiteFunction is set in the body of a function that
+	// //goscript:maxify marks, outside its function literals. The call sites
+	// it passes link its own (see lowering-call-sites.go).
+	callSiteFunction  bool
+	functionTypeDepth int
+	deferState        *loweredDeferState
 	// hoistArgsCall is the call of a defer or go statement, whose arguments
 	// are evaluated into the temporaries of hoistedArgs (see lowerCallArgs).
 	// hoistedCallee is set when the call reads its function from a
@@ -4103,12 +4107,15 @@ func (o *LoweringOwner) lowerNamedReceiverMethodDecl(
 		param := signature.Params().At(idx)
 		lowered.params, lowered.paramBindings = o.appendLoweredParam(functionCtx, lowered.params, lowered.paramBindings, param, idx, decl.Body == nil || async)
 	}
+	if site, ok := o.callSiteParam(ctx, fnObj); ok {
+		lowered.params = append(lowered.params, site)
+	}
 	if flag, ok := o.borrowFlagParam(ctx, fnObj); ok {
 		lowered.params = append(lowered.params, flag)
 	}
 	if decl.Body != nil {
 		bodyCtx := functionCtx.withAsyncFunction(async).withProtobufGeneratedSyncFunction(protobufSync).withDeferState(deferState).
-			withSyncDirectiveFunction(ctx.model.syncDirective(fnObj))
+			withSyncDirectiveFunction(ctx.model.syncDirective(fnObj)).withCallSiteFunction(ctx.model.maxifyFunctions[fnObj])
 		bodyCtx = o.withBorrowedResults(bodyCtx, decl, fnObj)
 		targets, targetDecls, prelude := o.pointerTargetLocals(bodyCtx, decl, lowered.receiverAlias)
 		if len(targets) != 0 {
@@ -4274,12 +4281,15 @@ func (o *LoweringOwner) lowerFuncDecl(ctx lowerFileContext, decl *ast.FuncDecl) 
 		param := signature.Params().At(idx)
 		lowered.params, lowered.paramBindings = o.appendLoweredParam(functionCtx, lowered.params, lowered.paramBindings, param, idx, decl.Body == nil || async)
 	}
+	if site, ok := o.callSiteParam(ctx, fnObj); ok {
+		lowered.params = append(lowered.params, site)
+	}
 	if flag, ok := o.borrowFlagParam(ctx, fnObj); ok {
 		lowered.params = append(lowered.params, flag)
 	}
 	if decl.Body != nil {
 		bodyCtx := functionCtx.withAsyncFunction(async).withProtobufGeneratedSyncFunction(protobufSync).withDeferState(deferState).
-			withSyncDirectiveFunction(ctx.model.syncDirective(fnObj))
+			withSyncDirectiveFunction(ctx.model.syncDirective(fnObj)).withCallSiteFunction(ctx.model.maxifyFunctions[fnObj])
 		bodyCtx = o.withBorrowedResults(bodyCtx, decl, fnObj)
 		targets, targetDecls, prelude := o.pointerTargetLocals(bodyCtx, decl, lowered.receiverAlias)
 		if len(targets) != 0 {
@@ -9715,7 +9725,7 @@ func (o *LoweringOwner) lowerFuncLitArrowWithAsyncCalls(
 	signature, _ := ctx.semPkg.source.TypesInfo.TypeOf(lit).(*types.Signature)
 	deferState := &loweredDeferState{}
 	bodyCtx := ctx.withSignature(signature).withAsyncFunction(false).withDeferState(deferState).withoutRangeBranch().
-		withSyncDirectiveFunction(false)
+		withSyncDirectiveFunction(false).withCallSiteFunction(false)
 	var nested []string
 	bodyCtx.nestedFunctions = &nested
 	litAsync := allowAsyncCalls && (ctx.model == nil || ctx.model.funcLitAsync(lit.Pos()))
@@ -10318,10 +10328,14 @@ func (o *LoweringOwner) lowerCallArgs(
 	expr *ast.CallExpr,
 	signature *types.Signature,
 ) ([]string, []Diagnostic) {
-	// An ordinary call keeps its arguments in place, and one that may
-	// borrow its results asks for them (see collectBorrowCalls).
+	// An ordinary call keeps its arguments in place, passes its position to
+	// a function that takes it (see callSiteArg), and asks for the results it
+	// may borrow (see collectBorrowCalls).
 	if ctx.hoistArgsCall != expr || ctx.hoistedArgs == nil {
 		args, diagnostics := o.lowerCallArgValues(ctx, expr, signature, o.callUsesOverridePackage(ctx, expr.Fun))
+		if site, ok := o.callSiteArg(ctx, expr); ok {
+			args = append(args, site)
+		}
 		if flag, ok := borrowCallArg(ctx, expr); ok {
 			args = append(args, flag)
 		}

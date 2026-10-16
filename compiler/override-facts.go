@@ -210,6 +210,15 @@ func (f *OverrideFacts) TakesTypeArgs(fn *types.Func) bool {
 	return f.packages[fn.Pkg().Path()].metadata.TypeArgFunctions[fn.Name()]
 }
 
+// TakesCallSite reports whether override metadata says that the
+// package-level function fn takes the call site of each direct call.
+func (f *OverrideFacts) TakesCallSite(fn *types.Func) bool {
+	if f == nil || fn == nil || fn.Pkg() == nil || fn.Signature().Recv() != nil {
+		return false
+	}
+	return f.packages[fn.Pkg().Path()].metadata.CallSiteFunctions[fn.Name()]
+}
+
 // IsFunctionAsync returns true when override metadata marks a package-level function async.
 func (f *OverrideFacts) IsFunctionAsync(pkgPath, function string) bool {
 	if f == nil {
@@ -474,6 +483,10 @@ func loadOverrideMetadata(root overridePackageRoot) (OverrideMetadata, error) {
 		case "typeArgFunctions":
 			for function := iter.ReadObject(); function != ""; function = iter.ReadObject() {
 				metadata.TypeArgFunctions[function] = iter.ReadBool()
+			}
+		case "callSiteFunctions":
+			for function := iter.ReadObject(); function != ""; function = iter.ReadObject() {
+				metadata.CallSiteFunctions[function] = iter.ReadBool()
 			}
 		case "asyncWhenMethods":
 			for function := iter.ReadObject(); function != ""; function = iter.ReadObject() {
@@ -881,6 +894,7 @@ func newOverrideMetadata() OverrideMetadata {
 		TransientPointerFunctions: make(map[string]bool),
 		SuspendingValues:          make(map[string]bool),
 		TypeArgFunctions:          make(map[string]bool),
+		CallSiteFunctions:         make(map[string]bool),
 	}
 }
 
@@ -900,6 +914,7 @@ func cloneOverrideMetadata(metadata OverrideMetadata) OverrideMetadata {
 		TransientPointerFunctions: cloneBoolMap(metadata.TransientPointerFunctions),
 		SuspendingValues:          cloneBoolMap(metadata.SuspendingValues),
 		TypeArgFunctions:          cloneBoolMap(metadata.TypeArgFunctions),
+		CallSiteFunctions:         cloneBoolMap(metadata.CallSiteFunctions),
 	}
 }
 

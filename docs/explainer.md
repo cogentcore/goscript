@@ -404,6 +404,18 @@ imports as `$`:
 Handwritten overrides for standard-library and third-party packages live
 beside it under `gs/`; [gs/README.md](../gs/README.md) describes their layout.
 
+### Call sites
+
+`runtime.Caller` reads its frames from the JavaScript stack, whose files and
+lines name the generated code. `//goscript:maxify` in the doc comment of a
+function or method makes each direct call of it pass a `$.CallSite` with the Go
+file (as `go build -trimpath` names it) and line of the call, as one more
+argument after its parameters. Calls made in a marked function link the site
+its caller passed, and a call of `runtime.Caller` there takes the chain, so it
+reports Go positions for the frames the chain reaches, even in a minified
+bundle. Code that names things by the line of its caller, such as Cogent
+Core's `tree.AutoPlanName`, marks itself and its callers this way.
+
 ## File Layout
 
 ```
