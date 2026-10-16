@@ -11,7 +11,7 @@ export type Basic = {
 $.registerInterfaceType(
 	"main.Basic",
 	null,
-	[{ name: "Join", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }]
+	[{ name: "Join", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("string") }], variadic: true }]
 );
 
 export class PathJoiner {
@@ -43,7 +43,7 @@ export class PathJoiner {
 	static __typeInfo = $.registerStructType(
 		"main.PathJoiner",
 		() => new PathJoiner(),
-		() => [{ name: "Join", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }],
+		() => [{ name: "Join", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("string") }], variadic: true }],
 		PathJoiner,
 		() => []
 	)

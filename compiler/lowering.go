@@ -3458,15 +3458,25 @@ func (o *LoweringOwner) runtimeReceiverMethodSignature(method *types.Func, point
 	helper := o.runtimeOwner.QualifiedHelper(RuntimeHelperMethodSignature)
 	args := []string{strconv.Quote(method.Name())}
 	signature, _ := method.Type().(*types.Signature)
+	variadic := signature != nil && signature.Variadic()
+
+	// The arguments are positional, so the parameters and results are given
+	// whenever a later argument is.
+	flags := pointerOnly || variadic
 	if signature != nil {
-		if signature.Params().Len() != 0 || signature.Results().Len() != 0 || pointerOnly {
+		if signature.Params().Len() != 0 || signature.Results().Len() != 0 || flags {
 			args = append(args, o.runtimeMethodParameters(signature.Params(), seen))
 		}
-		if signature.Results().Len() != 0 || pointerOnly {
+		if signature.Results().Len() != 0 || flags {
 			args = append(args, o.runtimeMethodParameters(signature.Results(), seen))
 		}
 	}
-	if pointerOnly {
+
+	// A pointer-receiver method and a variadic method are marked.
+	if flags {
+		args = append(args, strconv.FormatBool(pointerOnly))
+	}
+	if variadic {
 		args = append(args, "true")
 	}
 	return helper + "(" + strings.Join(args, ", ") + ")"
@@ -3486,9 +3496,13 @@ func (o *LoweringOwner) runtimeTrimmedReceiverMethodSignature(method *types.Func
 	if signature == nil {
 		return "{ name: " + strconv.Quote(method.Name()) + ", args: [], returns: []" + pointerReceiver + " }"
 	}
+	variadic := ""
+	if signature.Variadic() {
+		variadic = ", variadic: true"
+	}
 	return "{ name: " + strconv.Quote(method.Name()) +
 		", args: " + o.runtimeTrimmedMethodArgs(signature.Params()) +
-		", returns: " + o.runtimeTrimmedMethodReturns(signature.Results(), seen) + pointerReceiver + " }"
+		", returns: " + o.runtimeTrimmedMethodReturns(signature.Results(), seen) + pointerReceiver + variadic + " }"
 }
 
 // hasPointerReceiver reports whether method is declared with a pointer

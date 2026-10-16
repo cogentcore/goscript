@@ -52,6 +52,8 @@ export interface MethodSignature {
   // in the method set of a pointer to the type, such as a method with a
   // pointer receiver, so it is not called on a value that is not addressable.
   pointerReceiver?: boolean
+  // variadic is set for a method whose final parameter is variadic.
+  variadic?: boolean
 }
 
 /** MethodParameter encodes a type and an optional declared parameter name. */
@@ -66,6 +68,7 @@ export function methodSignature(
   args: readonly MethodParameter[] = [],
   returns: readonly MethodParameter[] = [],
   pointerReceiver = false,
+  variadic = false,
 ): MethodSignature {
   const signature: MethodSignature = {
     name,
@@ -74,6 +77,9 @@ export function methodSignature(
   }
   if (pointerReceiver) {
     signature.pointerReceiver = true
+  }
+  if (variadic) {
+    signature.variadic = true
   }
   return signature
 }

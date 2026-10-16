@@ -157,6 +157,7 @@ export function StructTag_Lookup(
 
 export class Method {
   public Name = ''
+  public PkgPath = ''
   public Type: Type | null = null
   public Func!: ReflectFunc
   public Index = 0
@@ -165,6 +166,11 @@ export class Method {
     if (init) {
       Object.assign(this, init)
     }
+  }
+
+  // clone copies the method, as Go copies a Method struct value.
+  public clone(): Method {
+    return new Method(this)
   }
 }
 
@@ -188,6 +194,15 @@ export class SelectCase {
       Object.assign(this, init)
     }
   }
+
+  // clone copies the case, as Go copies a SelectCase struct value.
+  public clone(): SelectCase {
+    return new SelectCase({
+      Dir: this.Dir,
+      Chan: this.Chan?.clone(),
+      Send: this.Send?.clone(),
+    })
+  }
 }
 
 // SelectDir Select direction constants - SelectDir is just an int in Go.
@@ -207,6 +222,11 @@ export class SliceHeader {
       Object.assign(this, init)
     }
   }
+
+  // clone copies the header, as Go copies a SliceHeader struct value.
+  public clone(): SliceHeader {
+    return new SliceHeader(this)
+  }
 }
 
 export class StringHeader {
@@ -217,6 +237,11 @@ export class StringHeader {
     if (init) {
       Object.assign(this, init)
     }
+  }
+
+  // clone copies the header, as Go copies a StringHeader struct value.
+  public clone(): StringHeader {
+    return new StringHeader(this)
   }
 }
 
