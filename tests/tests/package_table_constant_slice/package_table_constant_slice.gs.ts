@@ -152,7 +152,7 @@ export async function main(): globalThis.Promise<void> {
 	// A table changed through a slice gives the changed elements.
 	await $.println("written before:", sum($.goSlice(written, 1, undefined)))
 	clobber($.goSlice(written, 1, undefined))
-	await $.println("written after:", sum($.goSlice(written, 1, undefined)), $.arrayIndex(written, 1))
+	await $.println("written after:", sum($.goSlice(written, 1, undefined)), written[1])
 
 	// Out of range bounds panic each time the slice is taken, not before.
 	await tryShortLen()
