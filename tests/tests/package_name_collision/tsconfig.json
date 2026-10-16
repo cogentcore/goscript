@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "paths": {
+      "*": [
+        "./*"
+      ],
+      "@goscript/*": [
+        "../../../tests/tests/package_name_collision/run/output/@goscript/*",
+        "../../../gs/*",
+        "../../../tests/deps/*"
+      ],
+      "@goscript/github.com/s4wave/goscript/tests/tests/package_name_collision/*": [
+        "./*"
+      ]
+    }
+  },
+  "extends": "../../../tests/tsconfig.base.json",
+  "include": [
+    "first/ast/ast.gs.ts",
+    "first/ast/index.ts",
+    "index.ts",
+    "package_name_collision.gs.ts",
+    "second/ast/ast.gs.ts",
+    "second/ast/index.ts"
+  ]
+}

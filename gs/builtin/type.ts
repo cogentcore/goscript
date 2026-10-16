@@ -385,6 +385,16 @@ export function typePackagePath(typeName: string): string {
 }
 
 /**
+ * goTypeString returns the Go spelling of a runtime type string. The runtime
+ * names the types of packages that share a name with another package of the
+ * program by a name with a hash of the package path after a middle dot,
+ * which the Go spelling leaves out.
+ */
+export function goTypeString(name: string): string {
+  return name.includes('·') ? name.replace(/·[0-9a-z]+/g, '') : name
+}
+
+/**
  * registerNamedType registers the runtime type information of a named map,
  * slice or array type under its Go type string, so that code given only the
  * name, such as encoding/json, can resolve its key and element types.

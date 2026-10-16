@@ -224,7 +224,7 @@ function formatValue(value: any, verb: string, flags = ''): string {
     case 't': // boolean
       return value ? 'true' : 'false'
     case 'T': // type (approximate Go names for primitives we need)
-      if (hasGoTypeName(value)) return value.__goType
+      if (hasGoTypeName(value)) return $.goTypeString(value.__goType)
       if (typeof value === 'number') {
         return Number.isInteger(value) ? 'int' : 'float64'
       }
@@ -447,7 +447,7 @@ function formatStructFields(
       flags.includes('+') || flags.includes('#') ? field.name + ':' : ''
     return joinMaybe([formatted], '', prefix)
   })
-  const name = flags.includes('#') ? (info?.name ?? '') : ''
+  const name = flags.includes('#') ? $.goTypeString(info?.name ?? '') : ''
   return joinMaybe(parts, flags.includes('#') ? ', ' : ' ', name + '{', '}')
 }
 

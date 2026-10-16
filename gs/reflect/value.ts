@@ -31,6 +31,7 @@ import {
   TypeOf,
   typeIdentityKey,
   typeInfoFromReflectType,
+  runtimeTypeString,
 } from './type.js'
 import {
   Pointer,
@@ -97,7 +98,7 @@ function zeroArrayValue(typ: Type): ReflectValue {
 // newStructPointer returns a new zero struct of type typ in its pointer
 // form: an instance not marked as a struct value.
 function newStructPointer(typ: Type): ReflectValue {
-  const typeInfo = $.getTypeByName(typ.String())
+  const typeInfo = $.getTypeByName(runtimeTypeString(typ))
   if (typeInfo && $.isStructTypeInfo(typeInfo) && typeInfo.ctor) {
     return new typeInfo.ctor() as ReflectValue
   }
