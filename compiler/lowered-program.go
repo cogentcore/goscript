@@ -40,6 +40,9 @@ type loweredFile struct {
 	// typePackageNames are the runtime names of the named types declared in
 	// this file.
 	typePackageNames []string
+	// noCheck is set when a function of the file is too large for TypeScript
+	// to type check (see declTooLargeForFlowAnalysis).
+	noCheck bool
 }
 
 // packageInitCall is a call that initializes a package: the initializer of a
