@@ -565,6 +565,47 @@ describe('making slices of structs', () => {
   })
 })
 
+describe('copying slices of structs', () => {
+  // pair is a struct class like the generated ones.
+  class pair {
+    constructor(
+      public A = 0,
+      public B = 0,
+    ) {}
+    __goscriptAssign(source: pair): this {
+      this.A = source.A
+      this.B = source.B
+      return this
+    }
+  }
+
+  it('assigns struct elements in place', () => {
+    // The destination keeps its element objects.
+    const dst = arrayToSlice([new pair(), new pair(), new pair()])
+    const held = sliceElems(dst)[1] as pair
+    const src = arrayToSlice([new pair(1, 2), new pair(3, 4)])
+    expect(copy(dst, src, true)).toBe(2)
+    expect(sliceElems(dst)[1]).toBe(held)
+    expect(held.A).toBe(3)
+    expect((sliceElems(src)[1] as pair) === held).toBe(false)
+  })
+
+  it('copies overlapping windows of one backing array', () => {
+    // Shifting up by one runs backward, so each value moves once.
+    const all = arrayToSlice([1, 2, 3, 4].map((v) => new pair(v)))
+    copy(goSlice(all, 1), all, true)
+    expect((sliceElems(all) as pair[]).map((p) => p.A)).toEqual([1, 1, 2, 3])
+  })
+
+  it('stores a copy where an element is not a struct of the class', () => {
+    // A hole gets a copy of the source value.
+    const dst = arrayToSlice<pair | null>([null])
+    const src = arrayToSlice([new pair(5)])
+    copy(dst, src, true)
+    expect((sliceElems(dst)[0] as pair).A).toBe(5)
+  })
+})
+
 describe('typed slices', () => {
   it('makes typed arrays for fixed-size numeric elements', () => {
     const f = makeSlice<number>(2, 4, 'float32')
