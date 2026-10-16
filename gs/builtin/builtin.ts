@@ -67,9 +67,15 @@ export function clear<T>(
     return
   }
 
-  // Elements that are structs or arrays each get a zero value of their own.
+  // The factory knows the zero value of the element type. Elements that are
+  // structs or arrays each get a zero value of their own.
   if (zeroFactory !== undefined) {
     const { backing, offset, length } = sliceRange(v as Slice<T>)
+    const zero = zeroFactory()
+    if (typeof zero !== 'object' || zero === null) {
+      ;(backing as T[]).fill(zero, offset, offset + length)
+      return
+    }
     for (let i = 0; i < length; i++) {
       ;(backing as T[])[offset + i] = zeroFactory()
     }
@@ -99,6 +105,8 @@ function clearZeroValue<T>(v: T[]): T {
       switch (typeof item) {
         case 'number':
           return 0 as T
+        case 'bigint':
+          return 0n as T
         case 'string':
           return '' as T
         case 'boolean':

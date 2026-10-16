@@ -271,7 +271,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("replace struct:", $.arrayIndex(replaceSrc!, 0).n)
 
 	let growSrc = $.arrayToSlice<cell>([$.markAsStructValue(new cell({n: 1}))])
-	let grown = (slices.Grow(growSrc, 1) as $.Slice<cell>)
+	let grown = (slices.Grow(growSrc, 1, () => ($.markAsStructValue(new cell()) as cell)) as $.Slice<cell>)
 	$.arrayIndex(grown!, 0).n = 9
 	await $.println("grow struct:", $.arrayIndex(growSrc!, 0).n)
 

@@ -19,7 +19,7 @@ export class zeroReader {
 	}
 
 	public Read(p: $.Slice<number>): [number, $.GoError] {
-		$.clear(p)
+		$.clear(p, () => 0)
 		return [$.sliceLen(p), null]
 	}
 

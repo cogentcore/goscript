@@ -7,11 +7,11 @@ import * as slices from "@goscript/slices/index.js"
 export async function main(): globalThis.Promise<void> {
 	let s: $.Slice<number> = $.arrayToSlice<number>([1, 2, 3])
 	await $.println("Before Grow: len=", $.sliceLen(s), "cap=", $.cap(s))
-	s = (slices.Grow(s, 5) as $.Slice<number>)
+	s = (slices.Grow(s, 5, () => (0 as number)) as $.Slice<number>)
 	await $.println("After Grow: len=", $.sliceLen(s), "cap=", $.cap(s))
 
 	// Growing a byte slice exposes zero bytes past its length.
-	let b: $.Slice<number> = (slices.Grow(new Uint8Array([97, 98, 99]), 4) as $.Slice<number>)
+	let b: $.Slice<number> = (slices.Grow(new Uint8Array([97, 98, 99]), 4, () => (0 as number)) as $.Slice<number>)
 	b = $.goSlice(b, undefined, $.cap(b))
 	await $.println("byte Grow: zero tail=", $.arrayIndex(b!, $.sliceLen(b) - 1) == 0, "kept=", $.bytesToString($.goSlice(b, undefined, 3)))
 	await $.println("slices.Grow test finished")

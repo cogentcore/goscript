@@ -5,15 +5,15 @@ import * as $ from "@goscript/builtin/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	let buf = new Uint8Array([1, 2, 3]) as $.Slice<number>
-	$.clear(buf)
+	$.clear(buf, () => 0)
 	await $.println("bytes:", $.arrayIndex(buf!, 0), $.arrayIndex(buf!, 1), $.arrayIndex(buf!, 2))
 
 	let nums = $.arrayToSlice<number>([4, 5, 6, 7])
-	$.clear($.goSlice(nums, 1, 3))
+	$.clear($.goSlice(nums, 1, 3), () => 0)
 	await $.println("window:", $.arrayIndex(nums!, 0), $.arrayIndex(nums!, 1), $.arrayIndex(nums!, 2), $.arrayIndex(nums!, 3))
 
 	let words = $.arrayToSlice<string>(["a", "b"])
-	$.clear(words)
+	$.clear(words, () => "")
 	await $.println("strings:", $.stringEqual($.arrayIndex(words!, 0), ""), $.stringEqual($.arrayIndex(words!, 1), ""))
 }
 

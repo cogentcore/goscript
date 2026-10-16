@@ -10,6 +10,7 @@ import (
 	"go/token"
 	"go/types"
 	"maps"
+	"math"
 	"os"
 	"path"
 	"path/filepath"
@@ -2838,10 +2839,16 @@ func lowerConstantValue(value constant.Value) (string, bool) {
 		}
 		return value.ExactString(), true
 	case constant.Float:
+		// ExactString of a fraction is "num/denom", which loses its value
+		// to the precedence of the operator around it and to the precision of
+		// a literal with that many digits.
+		if f, _ := constant.Float64Val(value); !math.IsInf(f, 0) {
+			return strconv.FormatFloat(f, 'g', -1, 64), true
+		}
 		return value.ExactString(), true
 	case constant.Complex:
-		real := constant.Real(value).ExactString()
-		imag := constant.Imag(value).ExactString()
+		real, _ := lowerConstantValue(constant.Real(value))
+		imag, _ := lowerConstantValue(constant.Imag(value))
 		return "$.complex(" + real + ", " + imag + ")", true
 	default:
 		return "", false
@@ -10106,9 +10113,11 @@ func (o *LoweringOwner) lowerCallExpr(ctx lowerFileContext, expr *ast.CallExpr) 
 				}
 				return o.runtimeOwner.QualifiedHelper(RuntimeHelperCap) + "(" + strings.Join(args, ", ") + ")", diagnostics
 			case "clear":
-				// Struct and array elements are cleared to zero values of
-				// their own, made by a factory.
-				if sliceType, ok := types.Unalias(ctx.semPkg.source.TypesInfo.TypeOf(expr.Args[0])).Underlying().(*types.Slice); ok && makeSliceElemNeedsZeroFactory(sliceType.Elem()) {
+				// A factory gives the zero value of the element type, which
+				// the runtime cannot tell from the elements: a struct or
+				// array element is cleared to a zero value of its own, and a
+				// 64 bit word held as a bigint to the number zero.
+				if sliceType, ok := types.Unalias(ctx.semPkg.source.TypesInfo.TypeOf(expr.Args[0])).Underlying().(*types.Slice); ok && !isTypeParamType(sliceType.Elem()) {
 					args = append(args, "() => "+o.lowerZeroValueExprFor(ctx, sliceType.Elem()))
 				}
 				return o.runtimeOwner.QualifiedHelper(RuntimeHelperClear) + "(" + strings.Join(args, ", ") + ")", diagnostics
@@ -10973,6 +10982,9 @@ func (o *LoweringOwner) callUsesSlicesOverride(ctx lowerFileContext, expr ast.Ex
 	return fn != nil && fn.Pkg() != nil && fn.Pkg().Path() == "slices"
 }
 
+// appendSlicesGrowZeroFactory appends the zero value factory that slices.Grow
+// needs to fill the capacity it adds: Go zeroes that capacity, and a slice
+// resliced into it must read zeros, not the absent value of an untyped array.
 func (o *LoweringOwner) appendSlicesGrowZeroFactory(
 	ctx lowerFileContext,
 	callee ast.Expr,
@@ -10989,10 +11001,6 @@ func (o *LoweringOwner) appendSlicesGrowZeroFactory(
 	}
 	slice, ok := types.Unalias(typ).Underlying().(*types.Slice)
 	if !ok {
-		return args
-	}
-	typeParam, ok := types.Unalias(slice.Elem()).(*types.TypeParam)
-	if !ok || !typeParamInScope(ctx, typeParam) {
 		return args
 	}
 	zeroFactory := "() => (" + o.lowerDeclarationZeroValueExpr(ctx, slice.Elem()) +

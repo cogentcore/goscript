@@ -186,7 +186,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// clear zeroes the window only.
 	let z = $.typedSliceOf(Int16Array, [1, 2, 3, 4]) as $.Slice<number>
-	$.clear($.goSlice(z, 1, 3))
+	$.clear($.goSlice(z, 1, 3), () => 0)
 	await $.println("clear:", $.arrayIndex(z!, 0), $.arrayIndex(z!, 1), $.arrayIndex(z!, 2), $.arrayIndex(z!, 3))
 
 	// Pointers to elements read and write the element.

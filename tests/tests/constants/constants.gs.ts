@@ -3,7 +3,7 @@
 
 import * as $ from "@goscript/builtin/index.js"
 
-export const Pi: number = 157/50
+export const Pi: number = 3.14
 
 export const Truth: boolean = false
 
@@ -28,7 +28,7 @@ export function __goscript_set_Nothing(__goscriptValue: any): void {
 }
 
 export async function main(): globalThis.Promise<void> {
-	await $.println(157/50)
+	await $.println(3.14)
 	await $.println(false)
 	// println(Big) // Commented out until large integer handling is implemented
 	// println(Small) // Commented out as it depends on Big
