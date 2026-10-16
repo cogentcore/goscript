@@ -9,7 +9,7 @@ export async function main(): globalThis.Promise<void> {
 	let p1 = x
 	let p2 = p1
 
-	await $.println("p1==p2:", (p1 === p2 || $.pointerAliasesMade && $.pointerEqual(p1, p2)))
+	await $.println("p1==p2:", (p1 === p2 || $.pointerMayAlias(p1) && $.pointerEqual(p1, p2)))
 	await $.println("*p1:", $.pointerValue<number>(p1))
 	await $.println("*p2:", $.pointerValue<number>(p2))
 }

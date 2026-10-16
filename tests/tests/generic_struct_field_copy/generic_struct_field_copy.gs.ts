@@ -181,7 +181,7 @@ export async function main(): globalThis.Promise<void> {
 	let ptr = new Sides(true, p, null! as Value | $.VarRef<Value> | null, null! as Value | $.VarRef<Value> | null, null! as Value | $.VarRef<Value> | null)
 	let ptr2 = (ptr).clone()
 	$.pointerValue<Value>(ptr2.Top).V = 6
-	await $.println("pointer:", $.pointerValue<Value>(p).V, (ptr.Top === ptr2.Top || $.pointerAliasesMade && $.pointerEqual(ptr.Top, ptr2.Top)))
+	await $.println("pointer:", $.pointerValue<Value>(p).V, (ptr.Top === ptr2.Top || $.pointerMayAlias(ptr.Top) && $.pointerEqual(ptr.Top, ptr2.Top)))
 	let anon = new Sides(true, $.anonymousStructValue({A: 1, B: 2}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("A", /* @__PURE__ */ $.basicType("int"), [0], 0, true), /* @__PURE__ */ $.structField("B", /* @__PURE__ */ $.basicType("int"), [1], 8, true)] }), $.anonymousStructValue({"A": 0, "B": 0}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("A", /* @__PURE__ */ $.basicType("int"), [0], 0, true), /* @__PURE__ */ $.structField("B", /* @__PURE__ */ $.basicType("int"), [1], 8, true)] }), $.anonymousStructValue({"A": 0, "B": 0}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("A", /* @__PURE__ */ $.basicType("int"), [0], 0, true), /* @__PURE__ */ $.structField("B", /* @__PURE__ */ $.basicType("int"), [1], 8, true)] }), $.anonymousStructValue({"A": 0, "B": 0}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("A", /* @__PURE__ */ $.basicType("int"), [0], 0, true), /* @__PURE__ */ $.structField("B", /* @__PURE__ */ $.basicType("int"), [1], 8, true)] }))
 	let anon2 = (anon).clone()
 	anon2.Top.A = 7

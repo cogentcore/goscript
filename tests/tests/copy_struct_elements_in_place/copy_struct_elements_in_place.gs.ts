@@ -107,7 +107,7 @@ export async function main(): globalThis.Promise<void> {
 	let others = $.arrayToSlice<item | $.VarRef<item> | null>([b])
 	$.copy(others, ptrs)
 	$.pointerValue<item>($.arrayIndex(others!, 0)).Y = 8
-	fmt.Println($.basicInterfaceValue($.pointerValue<item>(a).Y, "int"), $.basicInterfaceValue($.pointerValue<item>(b).Y, "int"), ($.arrayIndex(others!, 0) === a || $.pointerAliasesMade && $.pointerEqual($.arrayIndex(others!, 0), a)))
+	fmt.Println($.basicInterfaceValue($.pointerValue<item>(a).Y, "int"), $.basicInterfaceValue($.pointerValue<item>(b).Y, "int"), ($.arrayIndex(others!, 0) === a || $.pointerMayAlias($.arrayIndex(others!, 0)) && $.pointerEqual($.arrayIndex(others!, 0), a)))
 }
 
 if ($.isMainScript(import.meta)) {

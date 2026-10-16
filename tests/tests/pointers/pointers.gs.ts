@@ -49,22 +49,22 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("--- Initial Values ---")
 	await $.println("s1.Val:", s1.value.Val)
 	await $.println("s2.Val:", s2.value.Val)
-	await $.println("p1==p2:", (p1.value === p2.value || $.pointerAliasesMade && $.pointerEqual(p1.value, p2.value)))
-	await $.println("p1==p3:", (p1.value === p3.value || $.pointerAliasesMade && $.pointerEqual(p1.value, p3.value)))
+	await $.println("p1==p2:", (p1.value === p2.value || $.pointerMayAlias(p1.value) && $.pointerEqual(p1.value, p2.value)))
+	await $.println("p1==p3:", (p1.value === p3.value || $.pointerMayAlias(p1.value) && $.pointerEqual(p1.value, p3.value)))
 
 	// --- Pointer Comparisons ---
 	await $.println("\n--- Pointer Comparisons ---")
-	await $.println("pp1==pp2:", (pp1.value === pp2 || $.pointerAliasesMade && $.pointerEqual(pp1.value, pp2)))
-	await $.println("pp1==pp3:", (pp1.value === pp3 || $.pointerAliasesMade && $.pointerEqual(pp1.value, pp3)))
-	await $.println("*pp1==*pp2:", ($.pointerValue<MyStruct | $.VarRef<MyStruct> | null>(pp1.value) === $.pointerValue<MyStruct | $.VarRef<MyStruct> | null>(pp2) || $.pointerAliasesMade && $.pointerEqual($.pointerValue<MyStruct | $.VarRef<MyStruct> | null>(pp1.value), $.pointerValue<MyStruct | $.VarRef<MyStruct> | null>(pp2))))
-	await $.println("*pp1==*pp3:", ($.pointerValue<MyStruct | $.VarRef<MyStruct> | null>(pp1.value) === $.pointerValue<MyStruct | $.VarRef<MyStruct> | null>(pp3) || $.pointerAliasesMade && $.pointerEqual($.pointerValue<MyStruct | $.VarRef<MyStruct> | null>(pp1.value), $.pointerValue<MyStruct | $.VarRef<MyStruct> | null>(pp3))))
+	await $.println("pp1==pp2:", (pp1.value === pp2 || $.pointerMayAlias(pp1.value) && $.pointerEqual(pp1.value, pp2)))
+	await $.println("pp1==pp3:", (pp1.value === pp3 || $.pointerMayAlias(pp1.value) && $.pointerEqual(pp1.value, pp3)))
+	await $.println("*pp1==*pp2:", ($.pointerValue<MyStruct | $.VarRef<MyStruct> | null>(pp1.value) === $.pointerValue<MyStruct | $.VarRef<MyStruct> | null>(pp2) || $.pointerMayAlias($.pointerValue<MyStruct | $.VarRef<MyStruct> | null>(pp1.value)) && $.pointerEqual($.pointerValue<MyStruct | $.VarRef<MyStruct> | null>(pp1.value), $.pointerValue<MyStruct | $.VarRef<MyStruct> | null>(pp2))))
+	await $.println("*pp1==*pp3:", ($.pointerValue<MyStruct | $.VarRef<MyStruct> | null>(pp1.value) === $.pointerValue<MyStruct | $.VarRef<MyStruct> | null>(pp3) || $.pointerMayAlias($.pointerValue<MyStruct | $.VarRef<MyStruct> | null>(pp1.value)) && $.pointerEqual($.pointerValue<MyStruct | $.VarRef<MyStruct> | null>(pp1.value), $.pointerValue<MyStruct | $.VarRef<MyStruct> | null>(pp3))))
 	await $.println("(**pp1).Val == (**pp2).Val:", ($.pointerValue<MyStruct>($.pointerValue<MyStruct | $.VarRef<MyStruct> | null>(pp1.value))).Val == ($.pointerValue<MyStruct>($.pointerValue<MyStruct | $.VarRef<MyStruct> | null>(pp2))).Val)
 	await $.println("(**pp1).Val == (**pp3).Val:", ($.pointerValue<MyStruct>($.pointerValue<MyStruct | $.VarRef<MyStruct> | null>(pp1.value))).Val == ($.pointerValue<MyStruct>($.pointerValue<MyStruct | $.VarRef<MyStruct> | null>(pp3))).Val)
 
 	// Triple pointer comparisons
-	await $.println("ppp1==ppp1:", (ppp1 === ppp1 || $.pointerAliasesMade && $.pointerEqual(ppp1, ppp1)))
-	await $.println("*ppp1==pp1:", ($.pointerValue<$.VarRef<MyStruct | $.VarRef<MyStruct> | null> | null>(ppp1) === pp1.value || $.pointerAliasesMade && $.pointerEqual($.pointerValue<$.VarRef<MyStruct | $.VarRef<MyStruct> | null> | null>(ppp1), pp1.value)))
-	await $.println("**ppp1==p1:", ($.pointerValue<MyStruct | $.VarRef<MyStruct> | null>($.pointerValue<$.VarRef<MyStruct | $.VarRef<MyStruct> | null> | null>(ppp1)) === p1.value || $.pointerAliasesMade && $.pointerEqual($.pointerValue<MyStruct | $.VarRef<MyStruct> | null>($.pointerValue<$.VarRef<MyStruct | $.VarRef<MyStruct> | null> | null>(ppp1)), p1.value)))
+	await $.println("ppp1==ppp1:", (ppp1 === ppp1 || $.pointerMayAlias(ppp1) && $.pointerEqual(ppp1, ppp1)))
+	await $.println("*ppp1==pp1:", ($.pointerValue<$.VarRef<MyStruct | $.VarRef<MyStruct> | null> | null>(ppp1) === pp1.value || $.pointerMayAlias($.pointerValue<$.VarRef<MyStruct | $.VarRef<MyStruct> | null> | null>(ppp1)) && $.pointerEqual($.pointerValue<$.VarRef<MyStruct | $.VarRef<MyStruct> | null> | null>(ppp1), pp1.value)))
+	await $.println("**ppp1==p1:", ($.pointerValue<MyStruct | $.VarRef<MyStruct> | null>($.pointerValue<$.VarRef<MyStruct | $.VarRef<MyStruct> | null> | null>(ppp1)) === p1.value || $.pointerMayAlias($.pointerValue<MyStruct | $.VarRef<MyStruct> | null>($.pointerValue<$.VarRef<MyStruct | $.VarRef<MyStruct> | null> | null>(ppp1))) && $.pointerEqual($.pointerValue<MyStruct | $.VarRef<MyStruct> | null>($.pointerValue<$.VarRef<MyStruct | $.VarRef<MyStruct> | null> | null>(ppp1)), p1.value)))
 	await $.println("(***ppp1).Val == s1.Val:", ($.pointerValue<MyStruct>($.pointerValue<MyStruct | $.VarRef<MyStruct> | null>($.pointerValue<$.VarRef<MyStruct | $.VarRef<MyStruct> | null> | null>(ppp1)))).Val == s1.value.Val)
 
 	// --- Modifications through Pointers ---

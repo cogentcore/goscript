@@ -2376,6 +2376,16 @@ class ArrayIndexReference<T> implements VarRef<T> {
     this.__goCollection[this.__goIndex] = value
   }
 
+  // The element is identified by the storage of the array and its index
+  // there (see elementBacking).
+  get __goElementBacking(): object {
+    return elementBacking(this.__goCollection)
+  }
+
+  get __goElementIndex(): number {
+    return elementBackingIndex(this.__goCollection, this.__goIndex)
+  }
+
   get __goPointer(): OwnedPointerHandle<T> {
     return (this.pointer ??= collectionPointer(
       this,
@@ -2412,6 +2422,16 @@ class SliceIndexReference<T> implements VarRef<T> {
     this.backing[this.backingIndex] = value
   }
 
+  // The element is identified by the storage of the backing array and its
+  // index there (see elementBacking).
+  get __goElementBacking(): object {
+    return elementBacking(this.backing)
+  }
+
+  get __goElementIndex(): number {
+    return elementBackingIndex(this.backing, this.backingIndex)
+  }
+
   get __goPointer(): OwnedPointerHandle<T> {
     return (this.pointer ??= collectionPointer(
       this,
@@ -2423,6 +2443,27 @@ class SliceIndexReference<T> implements VarRef<T> {
   get __goAddress(): () => number {
     return this.__goPointer.__goAddress
   }
+}
+
+// elementBacking returns the storage of an array that pointers to its
+// elements share: the array itself, or the ArrayBuffer of a typed array,
+// which typed slices of the same memory view.
+function elementBacking(array: object): object {
+  return ArrayBuffer.isView(array) ? array.buffer : array
+}
+
+// elementBackingIndex returns the index in elementBacking(array) of the
+// element of array at index: the index itself, or the byte offset of a typed
+// array element.
+function elementBackingIndex(array: object, index: number): number {
+  // An array element is at its own index.
+  if (!ArrayBuffer.isView(array)) {
+    return index
+  }
+
+  // A typed array element is at its byte offset in the buffer.
+  const typed = array as TypedSlice
+  return typed.byteOffset + index * typed.BYTES_PER_ELEMENT
 }
 
 function collectionPointer<T>(

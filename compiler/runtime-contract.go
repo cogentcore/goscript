@@ -100,7 +100,7 @@ const (
 	RuntimeHelperComparableEqual       RuntimeHelper = "value.comparableEqual"
 	RuntimeHelperStructEqual           RuntimeHelper = "value.structEqual"
 	RuntimeHelperPointerEqual          RuntimeHelper = "value.pointerEqual"
-	RuntimeHelperPointerAliasesMade    RuntimeHelper = "value.pointerAliasesMade"
+	RuntimeHelperPointerMayAlias       RuntimeHelper = "value.pointerMayAlias"
 
 	RuntimeHelperVarRef                RuntimeHelper = "varref.varRef"
 	RuntimeHelperFieldRef              RuntimeHelper = "varref.fieldRef"
@@ -401,7 +401,7 @@ func runtimeHelperContracts() []RuntimeHelperContract {
 		runtimeHelper(RuntimeHelperComparableEqual, "comparableEqual", RuntimeHelperCategoryValue),
 		runtimeHelper(RuntimeHelperStructEqual, "structEqual", RuntimeHelperCategoryValue),
 		runtimeHelper(RuntimeHelperPointerEqual, "pointerEqual", RuntimeHelperCategoryValue),
-		runtimeHelper(RuntimeHelperPointerAliasesMade, "pointerAliasesMade", RuntimeHelperCategoryValue),
+		runtimeHelper(RuntimeHelperPointerMayAlias, "pointerMayAlias", RuntimeHelperCategoryValue),
 		runtimeHelper(RuntimeHelperVarRef, "varRef", RuntimeHelperCategoryVarRef),
 		runtimeHelper(RuntimeHelperFieldRef, "fieldRef", RuntimeHelperCategoryVarRef),
 		runtimeHelper(RuntimeHelperTransientFieldRef, "transientFieldRef", RuntimeHelperCategoryVarRef),

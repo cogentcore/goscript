@@ -84,7 +84,7 @@ export async function main(): globalThis.Promise<void> {
 	let p = ($.indexRef(values!, 1) as any)
 	let q = noescape(p)
 
-	await $.println("same:", q == p)
+	await $.println("same:", (q === p || $.pointerMayAlias(q) && $.pointerEqual(q, p)))
 	await $.println("nil:", q == null)
 
 	let inline = inlineSlice(values)

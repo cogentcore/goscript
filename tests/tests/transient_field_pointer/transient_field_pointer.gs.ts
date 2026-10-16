@@ -70,7 +70,7 @@ export function incTwice(p: $.VarRef<number> | null): void {
 }
 
 export function same(a: $.VarRef<number> | null, b: $.VarRef<number> | null): boolean {
-	return (a === b || $.pointerAliasesMade && $.pointerEqual(a, b))
+	return (a === b || $.pointerMayAlias(a) && $.pointerEqual(a, b))
 }
 
 export let kept: $.VarRef<number> | null = null! as $.VarRef<number> | null
