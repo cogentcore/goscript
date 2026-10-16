@@ -149,9 +149,12 @@ const ops: Record<string, Op> = {
   'int.cmpabs': ([x, y]) => String(int(x).CmpAbs(int(y))),
   // The cofactors are not unique, so check the Bezout identity instead.
   'int.gcd': ([a, b]) => {
+    // Compute the gcd with its cofactors.
     const x = new Int()
     const y = new Int()
     const g = new Int().GCD(x, y, int(a), int(b))
+
+    // Verify a*x + b*y equals the gcd.
     const sum = new Int().Add(
       new Int().Mul(x, int(a)),
       new Int().Mul(y, int(b)),
@@ -348,12 +351,17 @@ describe('math/big Int', () => {
   // apd keeps a *Int's words in its own array and relies on Bits to write
   // the result of a big operation through the slice SetBits was given.
   it('writes results through the slice given to SetBits', () => {
+    // Give SetBits a one-word slice with spare capacity.
     const backing: (number | bigint)[] = [0, 0, 0, 0]
     const z = new Int().SetBits($.goSlice(backing, 0, 1))
+
+    // A value that fits two words grows the slice in place.
     z.SetString('340282366920938463463374607431768211455', 10)
     expect($.len(z.Bits())).toBe(2)
     expect(BigInt(backing[0])).toBe((1n << 64n) - 1n)
     expect(BigInt(backing[1])).toBe((1n << 64n) - 1n)
+
+    // A carry into a third word still lands in the backing array.
     z.Add(z, NewInt(1n))
     expect(z.String()).toBe('340282366920938463463374607431768211456')
     expect($.len(z.Bits())).toBe(3)
@@ -369,6 +377,7 @@ describe('math/big Int', () => {
 })
 
 describe('math/big Float', () => {
+  // panicOf returns the value fn panics with, or undefined when it returns.
   const panicOf = (fn: () => void): unknown => {
     try {
       fn()
@@ -378,15 +387,19 @@ describe('math/big Float', () => {
     return undefined
   }
 
+  // message returns the Go message of a recovered panic.
   const message = (e: unknown): string => {
     const v = $.panicValue(e)
     return v instanceof ErrNaN ? v.Error() : String(v)
   }
 
   it('panics with ErrNaN like Go', () => {
+    // Build the special operands.
     const inf = new Float().SetInf(false)
     const ninf = new Float().SetInf(true)
     const zero = NewFloat(0)
+
+    // Each undefined operation panics with the Go message.
     expect(message(panicOf(() => new Float().Add(inf, ninf)))).toBe(
       'addition of infinities with opposite signs',
     )
@@ -406,8 +419,11 @@ describe('math/big Float', () => {
   })
 
   it('applies a rounding mode to an exact sum', () => {
+    // Add a term below the 10-bit precision under ToZero.
     const z = new Float().SetPrec(10).SetMode(ToZero)
     z.Add(NewFloat(1), NewFloat(2 ** -20))
+
+    // The sum truncates to 1 and reports it was rounded down.
     expect(z.Text(103, -1)).toBe('1')
     expect(acc(z.Acc())).toBe('Below')
   })
@@ -418,6 +434,7 @@ describe('math/big Float', () => {
   })
 
   it('round trips through text', () => {
+    // Marshal a 120-bit value and unmarshal it at the same precision.
     const x = float('3.14159265358979323846264338327950288', 120)
     const back = new Float().SetPrec(120)
     expect(back.UnmarshalText(x.MarshalText()[0] as never)).toBeNull()
@@ -425,6 +442,7 @@ describe('math/big Float', () => {
   })
 
   it('reports parse errors', () => {
+    // A malformed literal yields no value.
     const [f, ok] = new Float().SetString('1.2.3')
     expect(f).toBeNull()
     expect(ok).toBe(false)
@@ -437,6 +455,7 @@ describe('math/big Rat', () => {
   })
 
   it('keeps references to the shared Int fields apart', () => {
+    // Add a copy to itself plus the original, then check the original is intact.
     const r = NewRat(1n, 3n)
     const copy = new Rat().Set(r)
     copy.Add(copy, r)

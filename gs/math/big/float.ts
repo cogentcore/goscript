@@ -861,6 +861,8 @@ export class Float {
   // usub sets z to the rounded difference |x| - |y|, ignoring the signs of x and
   // y. x and y must not be 0 or Inf. |x| must not be less than |y|.
   private usub(x: Float, y: Float): void {
+    // Subtract the mantissas at the finer of the two lsb exponents, which keeps
+    // the difference exact before rounding.
     const ex = lsbExp(x)
     const ey = lsbExp(y)
     let m: bigint
@@ -872,12 +874,16 @@ export class Float {
       m = (x._mant << BigInt(ex - ey)) - y._mant
       e = ey
     }
+
+    // An exact cancellation yields a +0 result.
     if (m === 0n) {
       this._acc = Exact
       this._form = formZero
       this._neg = false
       return
     }
+
+    // Normalize the difference and round it to z's precision.
     const [mant, s] = fnorm(m)
     this._mant = mant
     this.setExpAndRound(e + bitLen(mant) - s, 0)
@@ -894,6 +900,7 @@ export class Float {
   // uquo sets z to the rounded quotient |x| / |y|, ignoring the signs of x and
   // y. x and y must not be 0 or Inf.
   private uquo(x: Float, y: Float): void {
+    // Measure both mantissas in words.
     const lx = words(bitLen(x._mant))
     const ly = words(bitLen(y._mant))
 
@@ -904,6 +911,8 @@ export class Float {
     const xadj = d1 > 0 ? x._mant << BigInt(64 * d1) : x._mant
     const d = words(bitLen(xadj)) - ly
 
+    // Divide, and let a nonzero remainder mark the rounded result as inexact
+    // through the sticky bit.
     const q = xadj / y._mant
     const r = xadj % y._mant
     const [mant, s] = fnorm(q)
@@ -915,10 +924,12 @@ export class Float {
   // ucmp returns -1, 0, or +1, depending on whether |x| < |y|, |x| == |y|, or
   // |x| > |y|. x and y must not be 0 or Inf.
   private ucmp(y: Float): number {
+    // Order by exponent first: normalized mantissas make it decisive.
     const x = this
     if (x._exp !== y._exp) {
       return x._exp < y._exp ? -1 : 1
     }
+
     // Compare the mantissas as fractions: the shorter one is padded with zeros.
     let xm = x._mant
     let ym = y._mant
@@ -929,6 +940,8 @@ export class Float {
     } else {
       ym <<= BigInt(xb - yb)
     }
+
+    // Report the mantissa order.
     return (
       xm < ym ? -1
       : xm > ym ? 1
@@ -943,6 +956,8 @@ export class Float {
   // panics with ErrNaN if x and y are infinities with opposite signs. The value
   // of z is undefined in that case.
   public Add(x: FloatRef, y: FloatRef): Float {
+    // Resolve the operands and default z's precision to the larger operand's,
+    // as Go does when z has none.
     const z = floatOf(this)
     const a = floatOf(x)
     const b = floatOf(y)
@@ -950,6 +965,7 @@ export class Float {
       z._prec = Math.max(a._prec, b._prec)
     }
 
+    // Add two finite operands, the common case, as a signed magnitude sum.
     if (a._form === formFinite && b._form === formFinite) {
       // x + y (common case)
 
@@ -981,6 +997,7 @@ export class Float {
       return z
     }
 
+    // Reject opposite infinities, whose sum is NaN, as Go does.
     if (a._form === formInf && b._form === formInf && a._neg !== b._neg) {
       // +Inf + -Inf
       // -Inf + +Inf
@@ -991,6 +1008,7 @@ export class Float {
       $.panic(new ErrNaN({ msg: 'addition of infinities with opposite signs' }))
     }
 
+    // Sum two zeros: the result is -0 only when both are.
     if (a._form === formZero && b._form === formZero) {
       // ±0 + ±0
       z._acc = Exact
@@ -999,6 +1017,7 @@ export class Float {
       return z
     }
 
+    // Return x when it is infinite or y is zero; otherwise y wins below.
     if (a._form === formInf || b._form === formZero) {
       // ±Inf + y
       // x + ±0
@@ -1014,6 +1033,8 @@ export class Float {
   // and accuracy reporting are as for Add. Sub panics with ErrNaN if x and y are
   // infinities with equal signs. The value of z is undefined in that case.
   public Sub(x: FloatRef, y: FloatRef): Float {
+    // Resolve the operands and default z's precision to the larger operand's,
+    // as Go does when z has none.
     const z = floatOf(this)
     const a = floatOf(x)
     const b = floatOf(y)
@@ -1021,6 +1042,8 @@ export class Float {
       z._prec = Math.max(a._prec, b._prec)
     }
 
+    // Subtract two finite operands, the common case, as a signed magnitude
+    // difference.
     if (a._form === formFinite && b._form === formFinite) {
       // x - y (common case)
       const yneg = b._neg
@@ -1049,6 +1072,7 @@ export class Float {
       return z
     }
 
+    // Reject equal-signed infinities, whose difference is NaN, as Go does.
     if (a._form === formInf && b._form === formInf && a._neg === b._neg) {
       // +Inf - +Inf
       // -Inf - -Inf
@@ -1059,6 +1083,7 @@ export class Float {
       $.panic(new ErrNaN({ msg: 'subtraction of infinities with equal signs' }))
     }
 
+    // Subtract two zeros: the result is -0 only for -0 - +0.
     if (a._form === formZero && b._form === formZero) {
       // ±0 - ±0
       z._acc = Exact
@@ -1067,6 +1092,7 @@ export class Float {
       return z
     }
 
+    // Return x when it is infinite or y is zero; otherwise -y wins below.
     if (a._form === formInf || b._form === formZero) {
       // ±Inf - y
       // x - ±0
@@ -1083,6 +1109,8 @@ export class Float {
   // zero and the other operand an infinity. The value of z is undefined in that
   // case.
   public Mul(x: FloatRef, y: FloatRef): Float {
+    // Resolve the operands and default z's precision to the larger operand's,
+    // as Go does when z has none.
     const z = floatOf(this)
     const a = floatOf(x)
     const b = floatOf(y)
@@ -1090,14 +1118,17 @@ export class Float {
       z._prec = Math.max(a._prec, b._prec)
     }
 
+    // The product's sign is the xor of the operand signs, even for 0 and Inf.
     z._neg = a._neg !== b._neg
 
+    // Multiply two finite operands, the common case.
     if (a._form === formFinite && b._form === formFinite) {
       // x * y (common case)
       z.umul(a, b)
       return z
     }
 
+    // Special values multiply exactly; reject zero times infinity, which is NaN.
     z._acc = Exact
     if (
       (a._form === formZero && b._form === formInf) ||
@@ -1111,6 +1142,7 @@ export class Float {
       $.panic(new ErrNaN({ msg: 'multiplication of zero with infinity' }))
     }
 
+    // An infinite operand makes the product infinite.
     if (a._form === formInf || b._form === formInf) {
       // ±Inf * y
       // x * ±Inf
@@ -1128,6 +1160,8 @@ export class Float {
   // and accuracy reporting are as for Add. Quo panics with ErrNaN if both
   // operands are zero or infinities. The value of z is undefined in that case.
   public Quo(x: FloatRef, y: FloatRef): Float {
+    // Resolve the operands and default z's precision to the larger operand's,
+    // as Go does when z has none.
     const z = floatOf(this)
     const a = floatOf(x)
     const b = floatOf(y)
@@ -1135,14 +1169,17 @@ export class Float {
       z._prec = Math.max(a._prec, b._prec)
     }
 
+    // The quotient's sign is the xor of the operand signs, even for 0 and Inf.
     z._neg = a._neg !== b._neg
 
+    // Divide two finite operands, the common case.
     if (a._form === formFinite && b._form === formFinite) {
       // x / y (common case)
       z.uquo(a, b)
       return z
     }
 
+    // Special values divide exactly; reject 0/0 and Inf/Inf, which are NaN.
     z._acc = Exact
     if (
       (a._form === formZero && b._form === formZero) ||
@@ -1158,6 +1195,7 @@ export class Float {
       )
     }
 
+    // A zero numerator or an infinite denominator makes the quotient zero.
     if (a._form === formZero || b._form === formInf) {
       // ±0 / y
       // x / ±Inf
@@ -2270,6 +2308,7 @@ function fmtF(prec: number, d: Decimal): string {
 
 // fmtB formats x in the "p" format with a decimal mantissa of x._prec bits.
 function fmtB(x: Float): string {
+  // Print zero without an exponent.
   if (x._form === formZero) {
     return '0'
   }
@@ -2283,6 +2322,7 @@ function fmtB(x: Float): string {
     m >>= BigInt(w - x._prec)
   }
 
+  // Print the decimal mantissa with the binary exponent of its last bit.
   const e = x._exp - x._prec
   return m.toString() + 'p' + (e >= 0 ? '+' : '') + e
 }
@@ -2290,6 +2330,7 @@ function fmtB(x: Float): string {
 // fmtX formats x in the "%x" hexadecimal format with prec digits after the
 // point.
 function fmtX(x: Float, prec: number): string {
+  // Print zero as 0x0 with the requested number of zero digits.
   if (x._form === formZero) {
     let buf = '0x0'
     if (prec > 0) {
@@ -2305,6 +2346,7 @@ function fmtX(x: Float, prec: number): string {
   } else {
     n = 1 + 4 * prec
   }
+
   // n%4 == 1
   const r = new Float().SetPrec(n).SetMode(x._mode).Set(x)
 
@@ -2318,9 +2360,8 @@ function fmtX(x: Float, prec: number): string {
   }
   let exp = r._exp - 1
 
-  const hm = m.toString(16)
-
   // 1.xxx hexadecimal mantissa
+  const hm = m.toString(16)
   let buf = '0x1'
   if (hm.length > 1) {
     buf += '.' + hm.slice(1)

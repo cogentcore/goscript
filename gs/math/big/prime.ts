@@ -5,6 +5,7 @@ import { bitLen, isqrt, modPow, trailingZeroBits } from './nat.js'
 // jacobi returns the Jacobi symbol (x/y), which is 0, 1, or -1. The caller
 // guarantees that y is odd.
 export function jacobi(x: bigint, y: bigint): number {
+  // Reduce to a positive denominator: (x/-y) is -(x/y) only when x < 0.
   let a = x
   let b = y
   let j = 1
@@ -15,6 +16,7 @@ export function jacobi(x: bigint, y: bigint): number {
     b = -b
   }
 
+  // Apply quadratic reciprocity until the denominator reaches 1.
   for (;;) {
     if (b === 1n) {
       return j
@@ -88,11 +90,13 @@ const smallPrimes = [
 // >= 65. The last round uses the base 2 and the others use fixed bases, so
 // the result is deterministic.
 function millerRabin(n: bigint, reps: number): boolean {
+  // Write n-1 as q * 2**k with q odd.
   const nm1 = n - 1n
   const k = trailingZeroBits(nm1)
   const q = nm1 >> BigInt(k)
   const nm3 = nm1 - 2n
 
+  // Test each base: n is composite unless some square of base**q reaches -1.
   next: for (let i = 0; i < reps; i++) {
     const base =
       i === reps - 1 ? 2n : ((BigInt(i + 1) * 0x9e3779b97f4a7c15n) % nm3) + 2n
@@ -117,6 +121,7 @@ function millerRabin(n: bigint, reps: number): boolean {
 // lucas runs the strong Lucas probable prime test with Selfridge's parameter
 // selection on n.
 function lucas(n: bigint): boolean {
+  // Settle n <= 2 and even n, which have no Lucas parameters.
   if (n <= 1n) {
     return false
   }
@@ -148,10 +153,13 @@ function lucas(n: bigint): boolean {
     }
   }
 
+  // Write n+1 as s * 2**r with s odd.
   const r = trailingZeroBits(n + 1n)
   const s = (n + 1n) >> BigInt(r)
   const nm2 = n - 2n
 
+  // Compute V_s and V_(s+1) of the Lucas sequence with Q = 1 mod n, from the
+  // top bit of s down.
   let vk = 2n
   let vk1 = p
   for (let i = bitLen(s); i >= 0; i--) {
@@ -164,6 +172,7 @@ function lucas(n: bigint): boolean {
     }
   }
 
+  // Accept n when V_s is +-2 and V_(s+1) satisfies the strong congruence.
   if (vk === 2n || vk === nm2) {
     let t1 = vk * p
     let t2 = vk1 << 1n
@@ -175,6 +184,8 @@ function lucas(n: bigint): boolean {
     }
   }
 
+  // Square V up to r-1 times looking for V_(s*2**t) = 0 mod n; reaching 2
+  // first rules n out.
   for (let t = 0; t < r - 1; t++) {
     if (vk === 0n) {
       return true
@@ -191,6 +202,7 @@ function lucas(n: bigint): boolean {
 // it runs n+1 rounds of Miller-Rabin and a strong Lucas test, which is exact
 // for every number below 2**64.
 export function probablyPrime(x: bigint, n: number): boolean {
+  // Answer small and even x from the prime bitmask and parity.
   if (x <= 0n) {
     return false
   }
@@ -200,6 +212,8 @@ export function probablyPrime(x: bigint, n: number): boolean {
   if ((x & 1n) === 0n) {
     return false
   }
+
+  // Cheaply reject multiples of small primes, then run the probabilistic tests.
   for (const p of smallPrimes) {
     if (x % p === 0n) {
       return false

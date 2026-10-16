@@ -813,6 +813,7 @@ function formatOperandMaybe(
   if (empty !== undefined) {
     return formatOperandMaybe(empty, verb, flags, width, precision)
   }
+
   // A Formatter owns its whole output, including width and precision.
   const custom = formatWithStateMaybe(arg, verb, flags, width, precision)
   if (custom !== null) {
