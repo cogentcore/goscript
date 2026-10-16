@@ -412,7 +412,17 @@ export function comparableEqual(a: unknown, b: unknown): boolean {
       )
     }
   }
+  // A struct object that is neither marked as a value nor boxed with a value
+  // type is a pointer to a struct, which is equal only to itself (checked
+  // above), so only values compare by their fields.
   if (isStructObject(a) && isStructObject(b)) {
+    if (
+      !hasGoType(a) &&
+      !isMarkedAsStructValue(a) &&
+      !isMarkedAsStructValue(b)
+    ) {
+      return false
+    }
     return fieldsEqual(a, b)
   }
   return false
