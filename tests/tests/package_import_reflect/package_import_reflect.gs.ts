@@ -137,7 +137,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("Struct type:", (__goscriptAwait = (personType !== null && (personType as any).__isVarRef !== true && ((personType as any).__goValue === undefined || (personType as any).__goType?.charCodeAt(0) !== 42) ? (personType as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(personType)).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	await $.println("Struct kind:", reflect.Kind_String((__goscriptAwait = (personType !== null && (personType as any).__isVarRef !== true && ((personType as any).__goValue === undefined || (personType as any).__goType?.charCodeAt(0) !== 42) ? (personType as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(personType)).Kind(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)))
 
-	let personVal = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(person, "main.Person", "main.Person"))))
+	let personVal = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.structInterfaceValue(person, "main.Person", "main.Person"))))
 	await $.println("Struct value type:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(personVal)).Type()).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
 	// Test with different kinds

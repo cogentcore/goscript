@@ -37,7 +37,7 @@ export class asyncReader {
 	)
 }
 
-export let Reader: io.Reader | null = $.interfaceValue<io.Reader | null>(new asyncReader(true, $.makeChannel<number>(1, 0, "both")), "main.asyncReader", "main.asyncReader")
+export let Reader: io.Reader | null = $.structInterfaceValue<io.Reader | null>(new asyncReader(true, $.makeChannel<number>(1, 0, "both")), "main.asyncReader", "main.asyncReader")
 
 export function __goscript_set_Reader(__goscriptValue: io.Reader | null): void {
 	Reader = __goscriptValue

@@ -296,7 +296,7 @@ export async function main(): globalThis.Promise<void> {
 	await (locker !== null && (locker as any).__isVarRef !== true && ((locker as any).__goValue === undefined || (locker as any).__goType?.charCodeAt(0) !== 42) ? (locker as Exclude<sync.Locker, null>) : $.pointerValue<Exclude<sync.Locker, null>>(locker)).Lock()
 	void (__goscriptAwait = (locker !== null && (locker as any).__isVarRef !== true && ((locker as any).__goValue === undefined || (locker as any).__goType?.charCodeAt(0) !== 42) ? (locker as Exclude<sync.Locker, null>) : $.pointerValue<Exclude<sync.Locker, null>>(locker)).Unlock(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 
-	let or = new outerRunner(true, new rawRunner(true, $.interfaceValue<runner | null>(new runnable(true), "main.runnable", "main.runnable")))
+	let or = new outerRunner(true, new rawRunner(true, $.structInterfaceValue<runner | null>(new runnable(true), "main.runnable", "main.runnable")))
 	await $.println($.pointerValue<Exclude<runner, null>>(or.rawRunner.runner).Run())
 	await $.println("ok")
 }

@@ -50,7 +50,7 @@ export class PathJoiner {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let b: Basic | null = $.interfaceValue<Basic | null>(new PathJoiner(true), "main.PathJoiner", "main.PathJoiner")
+	let b: Basic | null = $.structInterfaceValue<Basic | null>(new PathJoiner(true), "main.PathJoiner", "main.PathJoiner")
 
 	// Test with multiple arguments
 	let result1 = (__goscriptAwait = (b !== null && (b as any).__isVarRef !== true && ((b as any).__goValue === undefined || (b as any).__goType?.charCodeAt(0) !== 42) ? (b as Exclude<Basic, null>) : $.pointerValue<Exclude<Basic, null>>(b)).Join($.arrayToSlice<string>(["path", "to", "file"])), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)

@@ -260,13 +260,13 @@ export async function structPointers(): globalThis.Promise<void> {
 	let __goscriptTuple0: any = $.typeAssertTuple<body | $.VarRef<body> | null>($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(b, "*main.body", /* @__PURE__ */ $.pointerType("main.body"))))).Elem())).Addr())).Interface(), /* @__PURE__ */ $.pointerType("main.body"))
 	let a: body | $.VarRef<body> | null = __goscriptTuple0[0]
 	ok = __goscriptTuple0[1]
-	await $.println("addr:", ok, (a === b || ($.pointerAliasesMade || (a as any)?.__goElementBacking !== undefined) && $.pointerEqual(a, b)))
+	await $.println("addr:", ok, (a === b || $.pointerAliasesMade && $.pointerEqual(a, b)))
 
 	let __goscriptTuple1: any = $.typeAssertTuple<body | $.VarRef<body> | null>($.pointerValue<body>(b).widget.base.NewInstance(), /* @__PURE__ */ $.pointerType("main.body"))
 	let nb: body | $.VarRef<body> | null = __goscriptTuple1[0]
 	ok = __goscriptTuple1[1]
-	await $.println("new:", ok, (nb !== b && !(($.pointerAliasesMade || (nb as any)?.__goElementBacking !== undefined) && $.pointerEqual(nb, b))), $.stringEqual($.pointerValue<body>(nb).Title, ""), $.pointerValue<body>(nb).widget.base.AsBase() != null)
-	let nv = $.markAsStructValue($.cloneStructValue(reflect.New($.pointerValueOrNil(reflect.TypeOf($.interfaceValue(new widget(true), "main.widget", "main.widget")))!)))
+	await $.println("new:", ok, (nb !== b && !($.pointerAliasesMade && $.pointerEqual(nb, b))), $.stringEqual($.pointerValue<body>(nb).Title, ""), $.pointerValue<body>(nb).widget.base.AsBase() != null)
+	let nv = $.markAsStructValue($.cloneStructValue(reflect.New($.pointerValueOrNil(reflect.TypeOf($.structInterfaceValue(new widget(true), "main.widget", "main.widget")))!)))
 	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(nv)).Elem())).FieldByName("X"))).SetInt(7n)
 	await $.println("new widget:", $.pointerValue<widget>($.mustTypeAssert<widget | $.VarRef<widget> | null>($.markAsStructValue($.cloneStructValue(nv)).Interface(), /* @__PURE__ */ $.pointerType("main.widget"))).X)
 
@@ -327,7 +327,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println(reflect.Kind_String($.markAsStructValue($.cloneStructValue(sf)).Kind()), $.markAsStructValue($.cloneStructValue(sf)).IsNil(), $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(sf)).Elem())).IsValid())
 	await $.println(reflect.Kind_String($.markAsStructValue($.cloneStructValue(underlying(sf))).Kind()), reflect.Kind_String($.markAsStructValue($.cloneStructValue(underlying($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(ev)).Field(1)))))).Kind()))
 
-	let full = $.varRef(new holder(true, $.interfaceValue<shape | null>(new square(true, 3), "main.square", "main.square"), $.interfaceValue(new square(false, 2), "*main.square", /* @__PURE__ */ $.pointerType("main.square"))))
+	let full = $.varRef(new holder(true, $.structInterfaceValue<shape | null>(new square(true, 3), "main.square", "main.square"), $.interfaceValue(new square(false, 2), "*main.square", /* @__PURE__ */ $.pointerType("main.square"))))
 	let fv = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(full, "*main.holder", /* @__PURE__ */ $.pointerType("main.holder"))))).Elem()))
 	let u = underlying($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(fv)).Field(0))))
 	await $.println(reflect.Kind_String($.markAsStructValue($.cloneStructValue(u)).Kind()), $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(u)).Field(0))).Int())

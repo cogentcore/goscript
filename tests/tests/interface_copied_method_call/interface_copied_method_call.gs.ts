@@ -48,7 +48,7 @@ export async function callCopied(r: runner | null): globalThis.Promise<void> {
 }
 
 export async function main(): globalThis.Promise<void> {
-	await callCopied($.interfaceValue<runner | null>(new task(true), "main.task", "main.task"))
+	await callCopied($.structInterfaceValue<runner | null>(new task(true), "main.task", "main.task"))
 }
 
 var __goscriptAwait: any

@@ -77,7 +77,7 @@ export async function main(): globalThis.Promise<void> {
 		}
 	}
 	await $.println("Completed successfully")
-	await describe($.interfaceValue(new item(true), "main.item", "main.item"))
+	await describe($.structInterfaceValue(new item(true), "main.item", "main.item"))
 	await describe("nope")
 }
 

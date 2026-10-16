@@ -334,14 +334,14 @@ export function describe(n: Namer | null): string {
 }
 
 export async function main(): globalThis.Promise<void> {
-	await $.println("area:", totalArea($.arrayToSlice<Shape | null>([$.interfaceValue<Shape | null>(new Rect(true, 2, 3), "main.Rect", "main.Rect"), $.interfaceValue<Shape | null>(new Square(false, 4), "*main.Square", /* @__PURE__ */ $.pointerType("main.Square"))])))
+	await $.println("area:", totalArea($.arrayToSlice<Shape | null>([$.structInterfaceValue<Shape | null>(new Rect(true, 2, 3), "main.Rect", "main.Rect"), $.interfaceValue<Shape | null>(new Square(false, 4), "*main.Square", /* @__PURE__ */ $.pointerType("main.Square"))])))
 
 	await $.println("counter:", await sumNext($.interfaceValue<Source | null>(new Counter(), "*main.Counter", /* @__PURE__ */ $.pointerType("main.Counter")), 3))
 	await $.println("chan:", await sumNext($.interfaceValue<Source | null>(new ChanSource(false, $.makeChannel<number>(1, 0, "both")), "*main.ChanSource", /* @__PURE__ */ $.pointerType("main.ChanSource")), 2))
 
-	await $.println("getter:", await readGetter($.interfaceValue<Getter | null>(new plusOne(true, $.interfaceValue<Valuer | null>(new chanValuer(true, $.makeChannel<number>(1, 0, "both")), "main.chanValuer", "main.chanValuer")), "main.plusOne", "main.plusOne")))
+	await $.println("getter:", await readGetter($.structInterfaceValue<Getter | null>(new plusOne(true, $.structInterfaceValue<Valuer | null>(new chanValuer(true, $.makeChannel<number>(1, 0, "both")), "main.chanValuer", "main.chanValuer")), "main.plusOne", "main.plusOne")))
 
-	await $.println("namer:", describe($.interfaceValue<Namer | null>(new prefixNamer(true, __goscriptStatic3()), "main.prefixNamer", "main.prefixNamer")))
+	await $.println("namer:", describe($.structInterfaceValue<Namer | null>(new prefixNamer(true, __goscriptStatic3()), "main.prefixNamer", "main.prefixNamer")))
 }
 
 var __goscriptStatic0$value: any

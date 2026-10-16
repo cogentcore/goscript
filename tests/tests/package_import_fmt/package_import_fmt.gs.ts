@@ -133,7 +133,7 @@ export async function main(): globalThis.Promise<void> {
 	fmt.Printf("Width: '%5s'\n", "hi")
 	fmt.Printf("Precision: '%.2f'\n", $.basicInterfaceValue(3.14159, "float64"))
 	fmt.Printf("Both: '%5.2f'\n", $.basicInterfaceValue(3.14159, "float64"))
-	fmt.Printf("Formatter: %v\n", $.interfaceValue(new byteFormatter(true, new Uint8Array([98, 121, 116, 101, 45])), "main.byteFormatter", "main.byteFormatter"))
+	fmt.Printf("Formatter: %v\n", $.structInterfaceValue(new byteFormatter(true, new Uint8Array([98, 121, 116, 101, 45])), "main.byteFormatter", "main.byteFormatter"))
 	let bs = new Uint8Array([97, 98, 34, 99])
 	fmt.Printf("Bytes: %s %q %x %X %v\n", $.interfaceValue(bs, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(bs, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(bs, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(bs, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))), $.interfaceValue(bs, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))))
 	fmt.Printf("String hex: %x %X\n", "hi", "hi")

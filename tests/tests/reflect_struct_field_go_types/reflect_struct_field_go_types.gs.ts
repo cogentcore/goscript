@@ -109,12 +109,12 @@ export async function main(): globalThis.Promise<void> {
 	await $.println(f.Name, (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(f.Type).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), reflect.StructTag_Get(f.Tag, "json"))
 
 	// Index is a []int that can be appended to.
-	let [_of, ] = await $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.interfaceValue(new Outer(true), "main.Outer", "main.Outer"))).FieldByName("X")
+	let [_of, ] = await $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.structInterfaceValue(new Outer(true), "main.Outer", "main.Outer"))).FieldByName("X")
 	_of.Index = $.appendSlice($.arrayToSlice<number>([9]), _of.Index)
 	await $.println($.sliceLen(_of.Index), $.arrayIndex(_of.Index!, 0), $.arrayIndex(_of.Index!, 1), $.arrayIndex(_of.Index!, 2))
 
 	// Value.FieldByNameFunc finds a field by a name predicate.
-	let val = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(new Outer(true, new Inner(true, 5), "n"), "main.Outer", "main.Outer"))))
+	let val = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.structInterfaceValue(new Outer(true, new Inner(true, 5), "n"), "main.Outer", "main.Outer"))))
 	let fv = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(val)).FieldByNameFunc($.functionValue((n: string): boolean => {
 		return strings.EqualFold(n, "name")
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo)))))

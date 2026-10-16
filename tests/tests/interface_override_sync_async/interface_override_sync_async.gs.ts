@@ -48,8 +48,8 @@ export function typeName(t: reflect.Type | null): string {
 export async function main(): globalThis.Promise<void> {
 	let ch = $.makeChannel<string>(1, "", "both")
 	await $.chanSend(ch, "slow")
-	await $.println(await describeStringer($.interfaceValue<fmt.Stringer | null>(new slowName(true, ch), "main.slowName", "main.slowName")))
-	await $.println(typeName(reflect.TypeOf($.interfaceValue(new slowName(true), "main.slowName", "main.slowName"))))
+	await $.println(await describeStringer($.structInterfaceValue<fmt.Stringer | null>(new slowName(true, ch), "main.slowName", "main.slowName")))
+	await $.println(typeName(reflect.TypeOf($.structInterfaceValue(new slowName(true), "main.slowName", "main.slowName"))))
 }
 
 var __goscriptAwait: any

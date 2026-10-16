@@ -294,7 +294,7 @@ export async function main(): globalThis.Promise<void> {
 			}
 		}
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.sliceType({ kind: $.TypeKind.Interface, methods: [] })], results: [] } as $.FunctionTypeInfo))
-	for (let __goscriptRangeTarget0 = $.arrayToSlice<$.Slice<any>>([$.arrayToSlice<any>([null, $.interfaceValue($.markAsStructValue(new cell({n: 1})), "main.cell", "main.cell")]), $.arrayToSlice<any>([$.interfaceValue(new cell(), "*main.cell", /* @__PURE__ */ $.pointerType("main.cell")), $.interfaceValue($.markAsStructValue(new cell({n: 2})), "main.cell", "main.cell")])]), __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
+	for (let __goscriptRangeTarget0 = $.arrayToSlice<$.Slice<any>>([$.arrayToSlice<any>([null, $.structInterfaceValue($.markAsStructValue(new cell({n: 1})), "main.cell", "main.cell")]), $.arrayToSlice<any>([$.interfaceValue(new cell(), "*main.cell", /* @__PURE__ */ $.pointerType("main.cell")), $.structInterfaceValue($.markAsStructValue(new cell({n: 2})), "main.cell", "main.cell")])]), __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
 		let source = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as $.Slice<any>)
 		let __goscriptShadow0 = (slices.Clone(source) as $.Slice<any>)
 		mutateSecond(__goscriptShadow0)

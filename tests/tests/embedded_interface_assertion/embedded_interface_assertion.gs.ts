@@ -71,7 +71,7 @@ export class MyStruct {
 export async function main(): globalThis.Promise<void> {
 	let rwc: ReadCloser | null = null! as ReadCloser | null
 	let s = new MyStruct(true)
-	rwc = $.interfaceValue<ReadCloser | null>(s, "main.MyStruct", "main.MyStruct")
+	rwc = $.structInterfaceValue<ReadCloser | null>(s, "main.MyStruct", "main.MyStruct")
 
 	let [, ok] = $.typeAssertTuple<ReadCloser | null>(rwc, "main.ReadCloser")
 	if (ok) {
