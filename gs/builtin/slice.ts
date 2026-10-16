@@ -2009,14 +2009,18 @@ function writeTypedElements(
 
 /**
  * copy copies the shared length of src and dst, preserving overlapping source values.
+ * structs tells that the elements are struct values, which are copied into
+ * the elements of dst in place, as Go copies memory: pointers to them, and
+ * the struct objects the generated code holds for them, then see the copy.
  */
 export function copy(dst: TypedSlice, src: TypedSlice | string): number
 export function copy(dst: TypedSlice, src: Slice<number>): number
-export function copy<T>(dst: Slice<T>, src: Slice<T>): number
+export function copy<T>(dst: Slice<T>, src: Slice<T>, structs?: boolean): number
 export function copy<T>(dst: Slice<T>, src: string): number
 export function copy<T>(
   dst: Slice<T> | TypedSlice,
   src: Slice<T> | TypedSlice | string,
+  structs?: boolean,
 ): number {
   if (dst === null) {
     return 0
@@ -2045,8 +2049,56 @@ export function copy<T>(
     dstElements.set(srcElements.subarray(0, count))
     return count
   }
-  copySliceElements(dst, 0, src, 0, count)
+  // Struct values are assigned in place, other values stored.
+  if (structs === true) {
+    copyStructElements(dst as Slice<T>, src as Slice<T>, count)
+  } else {
+    copySliceElements(dst, 0, src, 0, count)
+  }
   return count
+}
+
+/**
+ * copyStructElements copies count struct values of src into the elements of
+ * dst in place, in the direction that is safe for overlapping windows of one
+ * backing array. An element that is not a struct of the source's class, such
+ * as a hole, gets a copy of the source value instead.
+ */
+function copyStructElements<T>(
+  dst: Slice<T>,
+  src: Slice<T>,
+  count: number,
+): void {
+  // The backing arrays and the first indices in them.
+  const srcMeta = isComplexSlice(src) ? src.__meta__ : undefined
+  const dstMeta = isComplexSlice(dst) ? dst.__meta__ : undefined
+  const srcBacking = (srcMeta?.backing ?? src) as any[]
+  const dstBacking = (dstMeta?.backing ?? dst) as any[]
+  const srcStart = srcMeta?.offset ?? 0
+  const dstStart = dstMeta?.offset ?? 0
+  const backward =
+    srcBacking === dstBacking &&
+    dstStart > srcStart &&
+    dstStart < srcStart + count
+
+  // Each element is assigned by its class, or replaced by a copy.
+  for (let step = 0; step < count; step++) {
+    const i = backward ? count - 1 - step : step
+    const source = srcBacking[srcStart + i]
+    const target = dstBacking[dstStart + i]
+    if (
+      target !== null &&
+      typeof target === 'object' &&
+      source !== null &&
+      typeof source === 'object' &&
+      target.constructor === source.constructor &&
+      typeof target.__goscriptAssign === 'function'
+    ) {
+      target.__goscriptAssign(source)
+    } else {
+      dstBacking[dstStart + i] = copyElement(source)
+    }
+  }
 }
 
 /**
