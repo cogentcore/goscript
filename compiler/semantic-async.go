@@ -66,7 +66,7 @@ func collectAsyncArgumentCalls(
 
 			// Record the call when a function argument can decide it.
 			signature, _ := called.Type().(*types.Signature)
-			deps, shapes := asyncArgumentFacts(pkg, signature, expr.Args, literalKey, directives)
+			deps, shapes := asyncArgumentFacts(pkg, signature, expr.Args, literalKey, directives, nil)
 			if len(deps) != 0 || len(shapes) != 0 {
 				calls = append(calls, asyncArgumentCall{called: called, deps: deps, shapes: shapes})
 			}
@@ -104,12 +104,20 @@ func asyncArgumentCallSites(model *SemanticModel) []asyncArgumentCallSite {
 // Deps are function origins. Coloring resolves a generic instance and its
 // origin to the same semantic function and full name, and an origin is a
 // declared object a body summary can name.
+//
+// A non-nil overrideFacts marks the callee as a callback async override,
+// whose runtime calls each argument with parameters that never suspend. A
+// value that a sync override function produces calls only those parameters
+// and the function arguments of its producer, so the producer's arguments
+// decide it in place of its class: slices.Sorted(maps.Keys(m)) is sync even
+// when another sequence of its shape suspends.
 func asyncArgumentFacts(
 	pkg *packages.Package,
 	signature *types.Signature,
 	args []ast.Expr,
 	literalKey func(*ast.FuncLit) *types.Func,
 	directives asyncDirectives,
+	overrideFacts *OverrideFacts,
 ) ([]*types.Func, []string) {
 	// Only arguments of function-typed parameters count.
 	if signature == nil || signature.Params() == nil {
@@ -128,15 +136,45 @@ func asyncArgumentFacts(
 			continue
 		}
 
-		// A literal or a declared function decides itself; any other value
-		// is decided by its class.
-		if dep := asyncArgumentDep(pkg, arg, literalKey); dep != nil {
+		// A produced value is decided by its producer's arguments, a literal
+		// or a declared function by itself, and any other value by its class.
+		if producer, call := overrideProducer(pkg, overrideFacts, arg); producer != nil {
+			producerDeps, producerShapes := asyncArgumentFacts(pkg, producer, call.Args, literalKey, nil, overrideFacts)
+			deps = append(deps, producerDeps...)
+			shapes = append(shapes, producerShapes...)
+		} else if dep := asyncArgumentDep(pkg, arg, literalKey); dep != nil {
 			deps = append(deps, dep)
 		} else if shape := funcValueShape(pkg.TypesInfo.TypeOf(arg)); shape != "" {
 			shapes = append(shapes, shape)
 		}
 	}
 	return deps, shapes
+}
+
+// overrideProducer returns the signature of the sync package-level override
+// function that arg calls, and the call, or nil when arg is any other value.
+// A function value maker is excluded, since the values it makes call
+// arbitrary functions.
+func overrideProducer(
+	pkg *packages.Package,
+	overrideFacts *OverrideFacts,
+	arg ast.Expr,
+) (*types.Signature, *ast.CallExpr) {
+	call, ok := ast.Unparen(arg).(*ast.CallExpr)
+	if !ok || overrideFacts == nil {
+		return nil, nil
+	}
+	producer := calledFunction(pkg, call.Fun)
+	if producer == nil || producer.Pkg() == nil || !overrideFacts.HasPackage(producer.Pkg().Path()) {
+		return nil, nil
+	}
+	signature, _ := producer.Type().(*types.Signature)
+	pkgPath, name := producer.Pkg().Path(), producer.Name()
+	if signature == nil || signature.Recv() != nil ||
+		overrideFacts.IsFunctionAsync(pkgPath, name) || overrideFacts.IsFuncValueMaker(pkgPath, name) {
+		return nil, nil
+	}
+	return signature, call
 }
 
 // asyncArgumentDep returns the node that decides whether arg may suspend
@@ -184,7 +222,7 @@ func callbackOverrideCallFacts(
 
 	// Its function arguments decide it.
 	signature, _ := called.Type().(*types.Signature)
-	deps, shapes = asyncArgumentFacts(pkg, signature, call.Args, literalKey, nil)
+	deps, shapes = asyncArgumentFacts(pkg, signature, call.Args, literalKey, nil, overrideFacts)
 	return true, deps, shapes
 }
 

@@ -49,16 +49,17 @@ export function Insert<K extends $.Comparable | null, V>(
   })
 }
 
-// Collect collects key-value pairs from seq into a new map
-// and returns it, or a promise of it when seq suspends.
+// Collect collects key-value pairs from seq into a new map and returns it,
+// or a promise of it when seq suspends (callbackAsyncFunctions in
+// meta.json).
 export function Collect<K extends $.Comparable | null, V>(
   seq: iter.Seq2<K, V> | null,
-): Map<K, V> | globalThis.Promise<Map<K, V>> {
+): Map<K, V> {
   // An async seq has inserted every pair once it settles.
   const m = $.makeMap<K, V>()
   const done = Insert(m, seq)
   if (done instanceof Promise) {
-    return done.then(() => m)
+    return $.awaitedResult(done.then(() => m))
   }
   return m
 }

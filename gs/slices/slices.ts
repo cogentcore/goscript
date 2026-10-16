@@ -389,19 +389,18 @@ export function MinFunc<T, R extends $.MaybePromise<number>>(
 }
 
 // Collect collects the values of seq into a new slice. It returns a promise
-// when seq suspends (callbackAsyncFunctions in meta.json).
-export function Collect<T>(
-  seq: iter.Seq<T> | null,
-): $.Slice<T> | globalThis.Promise<$.Slice<T>> {
+// of the slice when seq suspends, and the compiler awaits a call whose seq
+// may suspend (callbackAsyncFunctions in meta.json).
+export function Collect<T>(seq: iter.Seq<T> | null): $.Slice<T> {
   return AppendSeq(null, seq)
 }
 
-// AppendSeq appends the values of seq to s. It returns a promise when seq
-// suspends, as one that iter.Pull's next calls does.
+// AppendSeq appends the values of seq to s. It returns a promise of the slice
+// when seq suspends, as one that iter.Pull's next calls does.
 export function AppendSeq<T>(
   s: $.Slice<T>,
   seq: iter.Seq<T> | null,
-): $.Slice<T> | globalThis.Promise<$.Slice<T>> {
+): $.Slice<T> {
   // Each value is appended as seq yields it.
   if (seq == null) {
     throw new Error('slices: nil iterator')
@@ -414,7 +413,7 @@ export function AppendSeq<T>(
 
   // An async seq has appended every value once it settles.
   if (done instanceof Promise) {
-    return done.then(() => out)
+    return $.awaitedResult(done.then(() => out))
   }
   return out
 }
@@ -422,14 +421,16 @@ export function AppendSeq<T>(
 /** Sorted collects an iterator and orders all Go ordered types, including 64-bit integers. */
 export function Sorted<T extends cmp.Ordered>(
   seq: iter.Seq<T> | null,
-): $.Slice<T> | globalThis.Promise<$.Slice<T>> {
+): $.Slice<T> {
   // The values are sorted once collected, after an async seq settles.
   const sorted = (out: $.Slice<T>): $.Slice<T> => {
     Sort(out)
     return out
   }
-  const out = Collect<T>(seq)
-  return out instanceof Promise ? out.then(sorted) : sorted(out)
+  const out: $.MaybePromise<$.Slice<T>> = Collect<T>(seq)
+  return out instanceof Promise ?
+      $.awaitedResult(out.then(sorted))
+    : sorted(out)
 }
 
 /**

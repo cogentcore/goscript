@@ -47,6 +47,17 @@ func words(yield func(string) bool) {
 	}
 }
 
+// sortedKeys collects a sequence of the shape of words that maps.Keys
+// produces. It calls only the yield of slices.Sorted, so sortedKeys stays
+// sync while words suspends.
+func sortedKeys(m map[string]int) string {
+	out := ""
+	for _, k := range slices.Sorted(maps.Keys(m)) {
+		out += k
+	}
+	return out
+}
+
 // sum ranges over seq with a loop body that never suspends.
 func sum(seq iter.Seq[int]) int {
 	total := 0
@@ -107,6 +118,7 @@ func main() {
 	println("insert:", len(m))
 	sortedWords := slices.Sorted(words)
 	println("words:", sortedWords[0], sortedWords[1])
+	println("keys:", sortedKeys(map[string]int{"b": 1, "a": 2}))
 
 	// Pull2 returns zero values of its element types at the end.
 	next, stop := iter.Pull2(points(2))

@@ -66,6 +66,15 @@ export async function words(_yield: ((_p0: string) => boolean | globalThis.Promi
 	}
 }
 
+export function sortedKeys(m: globalThis.Map<string, number> | null): string {
+	let out = ""
+	for (let __goscriptRangeTarget1 = slices.Sorted(maps.Keys(m)), __goscriptRangeWindow1 = $.sliceRange(__goscriptRangeTarget1), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow1.length; __rangeIndex++) {
+		let k = (__goscriptRangeWindow1.backing[__goscriptRangeWindow1.offset + __rangeIndex] as string)
+		out += k
+	}
+	return out
+}
+
 export async function sum(seq: ((_yield: ((_p0: number) => boolean | globalThis.Promise<boolean>) | null) => void) | null): globalThis.Promise<number> {
 	let total = 0
 	let __goscriptRangeReturn0 = false
@@ -126,13 +135,13 @@ export async function zip(a: ((_yield: ((_p0: number) => boolean | globalThis.Pr
 
 export async function main(): globalThis.Promise<void> {
 	// A pulled sequence returns its values in order.
-	for (let __goscriptRangeTarget1 = await pullAll(numbers(4)), __goscriptRangeWindow1 = $.sliceRange(__goscriptRangeTarget1), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow1.length; __rangeIndex++) {
-		let v = (__goscriptRangeWindow1.backing[__goscriptRangeWindow1.offset + __rangeIndex] as number)
+	for (let __goscriptRangeTarget2 = await pullAll(numbers(4)), __goscriptRangeWindow2 = $.sliceRange(__goscriptRangeTarget2), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow2.length; __rangeIndex++) {
+		let v = (__goscriptRangeWindow2.backing[__goscriptRangeWindow2.offset + __rangeIndex] as number)
 		await $.println("pulled:", v)
 	}
 	await $.println("sum:", await sum(numbers(4)))
-	for (let __goscriptRangeTarget2 = await zip(numbers(3), numbers(5)), __goscriptRangeWindow2 = $.sliceRange(__goscriptRangeTarget2), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow2.length; __rangeIndex++) {
-		let pair = $.cloneArrayValue((__goscriptRangeWindow2.backing[__goscriptRangeWindow2.offset + __rangeIndex] as number[]), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2))
+	for (let __goscriptRangeTarget3 = await zip(numbers(3), numbers(5)), __goscriptRangeWindow3 = $.sliceRange(__goscriptRangeTarget3), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow3.length; __rangeIndex++) {
+		let pair = $.cloneArrayValue((__goscriptRangeWindow3.backing[__goscriptRangeWindow3.offset + __rangeIndex] as number[]), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2))
 		await $.println("zip:", $.arrayIndex(pair, 0), $.arrayIndex(pair, 1))
 	}
 
@@ -146,6 +155,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("insert:", $.len(m))
 	let sortedWords = (await slices.Sorted(words) as $.Slice<string>)
 	await $.println("words:", $.arrayIndex(sortedWords!, 0), $.arrayIndex(sortedWords!, 1))
+	await $.println("keys:", sortedKeys($.makeMap<string, number>([["b", 1], ["a", 2]])))
 
 	// Pull2 returns zero values of its element types at the end.
 	let __goscriptTuple3: any = iter.Pull2(__goscriptStatic1(), points(2))
