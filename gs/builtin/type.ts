@@ -1073,6 +1073,31 @@ function matchesInterfaceType(value: any, info: TypeInfo): boolean {
 // an interface type info, keyed by the class and Go type of the value.
 const interfaceMatchCacheKey = Symbol('interfaceMatchCache')
 
+// pointerReceiverMethods returns the names of the methods that are only in
+// the method set of a pointer to the dynamic type of value, when that type is
+// a registered type that is not a pointer, or undefined otherwise.
+function pointerReceiverMethods(value: any): Set<string> | undefined {
+  // Only a value boxed with its Go type name can be told apart from a pointer.
+  const goType = value.__goType
+  if (typeof goType !== 'string' || goType.startsWith('*')) {
+    return undefined
+  }
+  const methods = (typeRegistry.get(goType) as any)?.methods
+  if (!globalThis.Array.isArray(methods)) {
+    return undefined
+  }
+
+  // The registered method set marks the methods that need a pointer.
+  let names: Set<string> | undefined
+  for (const method of methods as MethodSignature[]) {
+    if (method.pointerReceiver === true) {
+      names ??= new globalThis.Set()
+      names.add(method.name)
+    }
+  }
+  return names
+}
+
 function matchesInterfaceTypeUncached(value: any, info: TypeInfo): boolean {
   // Check basic conditions first
   if (!isInterfaceTypeInfo(info) || value === null || value === undefined) {
@@ -1094,8 +1119,15 @@ function matchesInterfaceTypeUncached(value: any, info: TypeInfo): boolean {
     return false
   }
 
+  // A value of a type that is not a pointer has only the methods with value
+  // receivers, so a method that needs a pointer receiver does not count.
+  const pointerOnly = pointerReceiverMethods(value)
+
   // For interfaces, check if the value has all the required methods with compatible signatures
   return info.methods.every((requiredMethodSig) => {
+    if (pointerOnly?.has(requiredMethodSig.name)) {
+      return false
+    }
     const actualMethod = (methodTarget as any)[requiredMethodSig.name]
 
     // Method must exist and be a function
