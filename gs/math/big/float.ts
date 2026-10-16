@@ -35,13 +35,6 @@ import {
 } from './nat.js'
 import { Rat, ratOf, type RatRef } from './rat.js'
 
-// A Float is a multi-precision floating-point number
-// 0 or ±0.mant × 2**exp, where mant is a binary fraction in [0.5, 1) held to
-// a whole number of 64-bit words, as in Go's math/big. The mantissa is a
-// bigint whose bit length is a multiple of 64 with the top bit set, and 0 for
-// a number that is not finite. Rounding to the precision follows Go's, so
-// results agree to the last bit.
-
 const formZero = 0
 const formFinite = 1
 const formInf = 2
@@ -123,6 +116,12 @@ function top64(x: Float): bigint {
   return x._mant >> BigInt(bitLen(x._mant) - 64)
 }
 
+// A Float is a multi-precision floating-point number
+// 0 or ±0.mant × 2**exp, where mant is a binary fraction in [0.5, 1) held to
+// a whole number of 64-bit words, as in Go's math/big. The mantissa is a
+// bigint whose bit length is a multiple of 64 with the top bit set, and 0 for
+// a number that is not finite. Rounding to the precision follows Go's, so
+// results agree to the last bit.
 export class Float {
   public _prec = 0
   public _mode: RoundingMode = ToNearestEven
@@ -142,6 +141,7 @@ export class Float {
   }
 
   public __goscriptAssign(src: Float): Float {
+    // Copy every field of src.
     const x = floatOf(src)
     this._prec = x._prec
     this._mode = x._mode
@@ -150,6 +150,7 @@ export class Float {
     this._neg = x._neg
     this._mant = x._mant
     this._exp = x._exp
+
     return this
   }
 
@@ -159,6 +160,7 @@ export class Float {
   // finite values to ±0; infinite values remain unchanged. If prec > MaxPrec,
   // it is set to MaxPrec.
   public SetPrec(prec: number): Float {
+    // Precision 0 maps finite values to zero; otherwise round to the new precision.
     const z = floatOf(this)
     z._acc = Exact
     if (prec === 0) {
@@ -253,6 +255,7 @@ export class Float {
   // sbit the sticky bit of any bits already discarded. A zero or infinity
   // results when exp is out of range.
   private setExpAndRound(exp: number, sbit: number): void {
+    // An out-of-range exponent gives a zero or an infinity, and otherwise z is rounded.
     if (exp < MinExp) {
       this._acc = makeAcc(this._neg)
       this._form = formZero
@@ -319,11 +322,13 @@ export class Float {
   // "sticky bit" information one might have before calling round. z's mantissa
   // must be normalized (with the msb set) or empty.
   private round(sbit: number): void {
+    // Only a finite value needs rounding.
     this._acc = Exact
     if (this._form !== formFinite) {
       return
     }
 
+    // A mantissa that fits in the precision is exact.
     const bits = bitLen(this._mant)
     if (bits <= this._prec) {
       return
@@ -396,6 +401,7 @@ export class Float {
   }
 
   private setBits64(neg: boolean, x: bigint): Float {
+    // A zero precision becomes 64 and zero has no mantissa.
     if (this._prec === 0) {
       this._prec = 64
     }
@@ -405,6 +411,8 @@ export class Float {
       this._form = formZero
       return this
     }
+
+    // Normalize x into the mantissa and round it to the precision.
     const bits = bitLen(x)
     this._form = formFinite
     this._mant = x << BigInt(64 - bits)
@@ -432,6 +440,7 @@ export class Float {
   // SetFloat64 panics with ErrNaN if x is a NaN. Note that z is not modified in
   // that case.
   public SetFloat64(x: number): Float {
+    // A zero precision becomes 53 and NaN is rejected.
     const z = floatOf(this)
     if (z._prec === 0) {
       z._prec = 53
@@ -439,6 +448,8 @@ export class Float {
     if (Number.isNaN(x)) {
       $.panic(new ErrNaN({ msg: 'Float.SetFloat64(NaN)' }))
     }
+
+    // Take the sign, then handle zero and infinity.
     z._acc = Exact
     const bits = Float64bits(x)
     z._neg = bits >> 63n !== 0n // handle -0, -Inf correctly
@@ -450,6 +461,8 @@ export class Float {
       z._form = formInf
       return z
     }
+
+    // Decompose x into frac × 2**e.
     z._form = formFinite
     const biased = Number((bits >> 52n) & 0x7ffn)
     let frac = bits & ((1n << 52n) - 1n)
@@ -457,6 +470,8 @@ export class Float {
       frac |= 1n << 52n
     }
     const e = biased === 0 ? -1074 : biased - 1075 // x == frac × 2**e
+
+    // Normalize the mantissa to 64 bits and round it to the precision.
     const n = bitLen(frac)
     z._mant = frac << BigInt(64 - n)
     z._exp = n + e
@@ -468,17 +483,22 @@ export class Float {
 
   // setBigInt sets z to the (possibly rounded) value of the integer x.
   private setBigInt(x: bigint): Float {
+    // A zero precision becomes the larger of the bit length and 64.
     const mag = abs(x)
     const bits = bitLen(mag)
     if (this._prec === 0) {
       this._prec = Math.max(bits, 64)
     }
+
+    // Zero has no mantissa.
     this._acc = Exact
     this._neg = x < 0n
     if (x === 0n) {
       this._form = formZero
       return this
     }
+
+    // Normalize the mantissa and round it to the precision.
     this._mant = fnorm(mag)[0]
     this.setExpAndRound(bits, 0)
     return this
@@ -495,11 +515,14 @@ export class Float {
   // precision is 0, it is changed to the largest of a.BitLen(), b.BitLen(), or
   // 64; with x = a/b.
   public SetRat(x: RatRef): Float {
+    // An integer needs no division.
     const z = floatOf(this)
     const r = ratOf(x)
     if (r.den === 1n) {
       return z.setBigInt(r.num)
     }
+
+    // Otherwise divide the numerator by the denominator.
     const a = new Float().setBigInt(r.num)
     const b = new Float().setBigInt(r.den)
     if (z._prec === 0) {
@@ -512,6 +535,7 @@ export class Float {
   // signbit is not set, and returns z. The precision of z is unchanged and the
   // result is always Exact.
   public SetInf(signbit: boolean): Float {
+    // Infinity is exact and keeps the precision.
     const z = floatOf(this)
     z._acc = Exact
     z._form = formInf
@@ -525,6 +549,7 @@ export class Float {
   // precision and rounding mode, but z's accuracy is not computed. Specifically,
   // the result of z.Acc() is undefined.
   public Set(x: FloatRef): Float {
+    // Copy the value unless z is x, and round if z has the lower precision.
     const z = floatOf(this)
     const f = floatOf(x)
     z._acc = Exact
@@ -816,6 +841,7 @@ export class Float {
   // uadd sets z to the rounded sum |x| + |y|, ignoring the signs of x and y. x
   // and y must not be 0 or Inf.
   private uadd(x: Float, y: Float): void {
+    // Align the operands at the lower of their lowest set bits.
     const ex = lsbExp(x)
     const ey = lsbExp(y)
     let m: bigint
@@ -1151,6 +1177,7 @@ export class Float {
   //	 0 if x == y (incl. -0 == 0, -Inf == -Inf, and +Inf == +Inf)
   //	+1 if x >  y
   public Cmp(y: FloatRef): number {
+    // Order first by class, and equal classes by magnitude.
     const x = floatOf(this)
     const b = floatOf(y)
     const mx = x.ord()
@@ -1158,6 +1185,7 @@ export class Float {
     if (mx !== my) {
       return mx < my ? -1 : 1
     }
+
     // mx == my
     switch (mx) {
       case -1:
@@ -1196,12 +1224,14 @@ export class Float {
   //
   // The function panics if z < 0. The value of z is undefined in that case.
   public Sqrt(x: FloatRef): Float {
+    // Take the precision of x unless z has one.
     const z = floatOf(this)
     const f = floatOf(x)
     if (z._prec === 0) {
       z._prec = f._prec
     }
 
+    // The square root of a negative number is undefined.
     if (f.Sign() === -1) {
       $.panic(new ErrNaN({ msg: 'square root of negative operand' }))
     }
@@ -1219,6 +1249,7 @@ export class Float {
     const b = f.MantExp(z)
     z._prec = prec
 
+    // An odd exponent leaves a factor of 2 in the mantissa.
     switch (b % 2) {
       case 1:
         z._exp++
@@ -1240,10 +1271,12 @@ export class Float {
   // Compute √x (to z.prec precision) by solving 1/t² - x = 0 for t (using
   // Newton's method), and then inverting.
   private sqrtInverse(x: Float): void {
+    // ng is one Newton step t' = ½t(3 - xt²) in the precision of t.
     const u = new Float()
     const v = new Float()
     const three = NewFloat(3)
     const ng = (t: Float): Float => {
+      // Evaluate ½t(3 - xt²).
       u._prec = t._prec
       v._prec = t._prec
       u.Mul(t, t) // u = t²
@@ -1254,6 +1287,7 @@ export class Float {
       return t.Set(u)
     }
 
+    // Start from the float64 estimate and double the precision each step.
     const [xf] = x.Float64()
     let sqi = new Float()
     sqi.SetFloat64(1 / Math.sqrt(xf))
@@ -1321,12 +1355,14 @@ export class Float {
   // '+' and ' ' for sign control, '0' for space padding, and '-' for left or
   // right justification. See the fmt package for details.
   public Format(s: State, format: number): void {
+    // Read the precision, with the defaults of fmt.
     const x = floatOf(this)
     let [prec, hasPrec] = s.Precision()
     if (!hasPrec) {
       prec = 6 // default precision for 'e', 'f'
     }
 
+    // Check the verb and map it to a format.
     switch (format) {
       case 101: // 'e'
       case 69: // 'E'
@@ -1364,6 +1400,7 @@ export class Float {
     }
     // len(buf) > 0
 
+    // Choose the sign from the output and the flags.
     let sign = ''
     switch (true) {
       case buf[0] === '-':
@@ -1386,12 +1423,14 @@ export class Float {
         break
     }
 
+    // Compute the padding from the width.
     let padding = 0
     const [width, hasWidth] = s.Width()
     if (hasWidth && width > sign.length + buf.length) {
       padding = width - sign.length - buf.length
     }
 
+    // Write the number padded as the flags say.
     switch (true) {
       case s.Flag(48) && !x.IsInf():
         // 0-padding on left
@@ -1426,6 +1465,7 @@ export class Float {
     r: ByteReader,
     base: number,
   ): [Float | null, number, $.GoError | null] {
+    // Take the precision, and leave a zero as the value in case of an error.
     const z = this
     const prec = z._prec === 0 ? 64 : z._prec
 
@@ -1468,8 +1508,8 @@ export class Float {
     let exp2 = BigInt(bitLen(res.mant))
     let exp5 = 0n
 
+    // The mantissa has a radix point ddd.dddd; adjust the exponent for it.
     if (res.count < 0) {
-      // The mantissa has a radix point ddd.dddd; adjust the exponent for it.
       const d = BigInt(res.count)
       switch (b) {
         case 10:
@@ -1490,6 +1530,7 @@ export class Float {
       }
     }
 
+    // Apply the exponent in its own base.
     switch (ebase) {
       case 10:
         exp5 += exp
@@ -1511,8 +1552,8 @@ export class Float {
     z._form = formFinite
     z._exp = Number(exp2)
 
+    // A binary exponent needs no multiplication.
     if (exp5 === 0n) {
-      // no decimal exponent contribution
       z.round(0)
       return [z, b, null]
     }
@@ -1530,18 +1571,21 @@ export class Float {
 
   // pow5 sets z to 5**n and returns z. n must not be negative.
   private pow5(n: bigint): Float {
+    // Small powers come from the table.
     const m = BigInt(pow5tab.length - 1)
     if (n <= m) {
       return this.SetUint64(pow5tab[Number(n)])
     }
     // n > m
 
+    // Start from the largest table entry.
     this.SetUint64(pow5tab[Number(m)])
     n -= m
 
     // use more bits for f than for z
     const f = new Float().SetPrec(this.Prec() + 64).SetUint64(5n)
 
+    // Multiply in 5**(2**i) for each set bit of n.
     for (; n > 0n; n >>= 1n) {
       if ((n & 1n) !== 0n) {
         this.Mul(this, f)
@@ -1600,8 +1644,8 @@ export class Float {
     s: string,
     base: number,
   ): [Float | null, number, $.GoError | null] {
+    // // scan doesn't handle ±Inf
     const z = floatOf(this)
-    // scan doesn't handle ±Inf
     if (s === 'Inf' || s === 'inf') {
       return [z.SetInf(false), 0, null]
     }
@@ -1613,11 +1657,13 @@ export class Float {
       return [z.SetInf(s[0] === '-'), 0, null]
     }
 
+    // Scan the number.
     const r = new StringReader(s)
     const res = z.scan(r, base)
     if (res[2] !== null) {
       return res
     }
+
     // entire string must have been consumed
     const ch = r.read()
     if (ch >= 0) {
@@ -1646,7 +1692,9 @@ export class Float {
   // GobEncode implements the gob.GobEncoder interface. The Float value and all
   // its attributes (precision, rounding mode, accuracy) are marshaled.
   public GobEncode(): [Uint8Array, $.GoError | null] {
+    // Encode the fields of x.
     const x = floatOf(this)
+
     // sz is version + mode|acc|form|neg (3+2+2+1 bit) + prec
     let n = 0 // number of mantissa words
     if (x._form === formFinite) {
@@ -1655,6 +1703,8 @@ export class Float {
     }
     const buf = new Uint8Array(6 + (x._form === formFinite ? 4 + 8 * n : 0))
     const view = new DataView(buf.buffer)
+
+    // Write the header: version, mode, accuracy, form, sign and precision.
     buf[0] = floatGobVersion
     let b =
       ((x._mode & 7) << 5) | (((x._acc + 1) & 3) << 3) | ((x._form & 3) << 1)
@@ -1663,6 +1713,8 @@ export class Float {
     }
     buf[1] = b
     view.setUint32(2, x._prec)
+
+    // Write the exponent and the mantissa words.
     if (x._form === formFinite) {
       view.setUint32(6, x._exp >>> 0)
       // cut off unused trailing words
@@ -1679,6 +1731,7 @@ export class Float {
   // the precision and rounding mode of z unless z's precision is 0, in which
   // case z is set exactly to the decoded value.
   public GobDecode(buf: $.Slice<number>): $.GoError | null {
+    // An empty buffer is the zero value.
     const z = floatOf(this)
     const bytes = $.bytesToUint8Array(buf)
     if (bytes.length === 0) {
@@ -1686,6 +1739,8 @@ export class Float {
       z.__goscriptAssign(new Float())
       return null
     }
+
+    // Check the header.
     if (bytes.length < 6) {
       return $.newError('Float.GobDecode: buffer too small')
     }
@@ -1695,9 +1750,11 @@ export class Float {
       )
     }
 
+    // Decode into z, then restore its precision and mode.
     const oldPrec = z._prec
     const oldMode = z._mode
 
+    // Read the mode, accuracy, form, sign and precision.
     const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.length)
     const b = bytes[1]
     z._mode = (b >> 5) & 7
@@ -1706,6 +1763,7 @@ export class Float {
     z._neg = (b & 1) !== 0
     z._prec = view.getUint32(2)
 
+    // Read the exponent and the mantissa of a finite value.
     if (z._form === formFinite) {
       if (bytes.length < 10) {
         return $.newError(
@@ -1716,11 +1774,13 @@ export class Float {
       z._mant = valueOfBytes(bytes.subarray(10))
     }
 
+    // Round to the old precision when z had one.
     if (oldPrec !== 0) {
       z._mode = oldMode
       z.SetPrec(oldPrec)
     }
 
+    // Report a malformed result.
     const msg = z.validate()
     if (msg !== '') {
       return $.newError('Float.GobDecode: ' + msg)
@@ -1731,6 +1791,7 @@ export class Float {
   // validate returns a description of how a finite z is malformed, or an empty
   // string.
   private validate(): string {
+    // Check the mantissa and the precision of a finite value.
     if (this._form !== formFinite) {
       return ''
     }
@@ -1859,6 +1920,7 @@ class Decimal {
 
   // init initializes x to the decimal representation of m × 2**shift.
   public init(m: bigint, shift: number): void {
+    // Zero has no digits.
     if (m === 0n) {
       this.mant = ''
       this.exp = 0

@@ -14,6 +14,11 @@
 // A vector is the operation name, its string arguments, and the expected
 // result, all strings. An operation that returns several values joins them
 // with "|".
+//
+// Each type has a pool of edge cases that every unary operation takes whole,
+// and a small pool, a subset that still spans each kind of edge, for the
+// binary, ternary and formatting operations. Crossing the full pools would
+// grow the file past a megabyte and churn every diff.
 package main
 
 import (
@@ -21,6 +26,7 @@ import (
 	"math"
 	"math/big"
 	"os"
+	"slices"
 	"strconv"
 	"strings"
 )
@@ -84,9 +90,22 @@ var intPool = []string{
 	"6864797660130609714981900799081393217269435300143305409394463459185543183397656052122559640661454554977296311391480858037121987999716643812574028291115057151",
 }
 
+var intSmall = []string{
+	"0", "1", "-7", "18446744073709551615",
+	"-340282366920938463463374607431768211457",
+	"1000000000000000000000000000000000000000000000000000",
+}
+
 var primePool = []string{
 	"2", "3", "5", "7", "13", "65537", "4294967311", "18446744073709551557",
 	"170141183460469231731687303715884105727",
+	"6864797660130609714981900799081393217269435300143305409394463459185543183397656052122559640661454554977296311391480858037121987999716643812574028291115057151",
+}
+
+// sqrtPrimes are the moduli of the square root vectors: primes of 3 and of 1
+// mod 4, which take different paths, up to a multi-word prime.
+var sqrtPrimes = []string{
+	"3", "13", "65537", "18446744073709551557",
 	"6864797660130609714981900799081393217269435300143305409394463459185543183397656052122559640661454554977296311391480858037121987999716643812574028291115057151",
 }
 
@@ -125,13 +144,19 @@ func genInt() {
 		if x.Sign() >= 0 {
 			emit("int.sqrt", xs, new(big.Int).Sqrt(x).String())
 		}
+	}
+
+	for _, xs := range intSmall {
+		x := bigInt(xs)
 		for _, base := range []int{2, 8, 10, 16, 36, 62} {
 			emit("int.text", xs, strconv.Itoa(base), x.Text(base))
 		}
-		for _, n := range []int{0, 1, 63, 64, 65, 200} {
+		for _, n := range []int{0, 1, 64, 200} {
 			emit("int.lsh", xs, strconv.Itoa(n), new(big.Int).Lsh(x, uint(n)).String())
 			emit("int.rsh", xs, strconv.Itoa(n), new(big.Int).Rsh(x, uint(n)).String())
 			emit("int.bit", xs, strconv.Itoa(n), strconv.Itoa(int(x.Bit(n))))
+		}
+		for _, n := range []int{0, 63, 65} {
 			emit("int.setbit", xs, strconv.Itoa(n), "1", new(big.Int).SetBit(x, n, 1).String())
 			emit("int.setbit", xs, strconv.Itoa(n), "0", new(big.Int).SetBit(x, n, 0).String())
 		}
@@ -141,7 +166,7 @@ func genInt() {
 		} {
 			emit("int.format", verb, xs, fmt.Sprintf(verb, x))
 		}
-		for _, ys := range intPool {
+		for _, ys := range intSmall {
 			y := bigInt(ys)
 			for _, op := range binary {
 				emit("int."+op.name, xs, ys, op.fn(new(big.Int), x, y).String())
@@ -167,25 +192,22 @@ func genInt() {
 				emit("int.jacobi", xs, ys, strconv.Itoa(big.Jacobi(x, y)))
 			}
 		}
-	}
-
-	for _, xs := range intPool[:9] {
-		x := bigInt(xs)
-		for _, es := range []string{"0", "1", "2", "5", "257", "-3"} {
+		for _, es := range []string{"0", "1", "5", "257", "-3"} {
 			e := bigInt(es)
-			emit("int.exp", xs, es, "0", new(big.Int).Exp(x, e, nil).String())
-			for _, ms := range []string{"1", "2", "97", "18446744073709551557", "-97"} {
+			// An unreduced power of a large base with a large exponent has
+			// thousands of digits.
+			if e.Cmp(big.NewInt(5)) <= 0 {
+				emit("int.exp", xs, es, "0", new(big.Int).Exp(x, e, nil).String())
+			}
+			for _, ms := range []string{"1", "97", "18446744073709551557", "-97"} {
 				m := bigInt(ms)
 				emit("int.exp", xs, es, ms, new(big.Int).Exp(x, e, m).String())
 			}
 		}
 	}
-	for _, ps := range primePool {
+	for _, ps := range sqrtPrimes {
 		p := bigInt(ps)
-		if p.Cmp(big.NewInt(3)) < 0 {
-			continue
-		}
-		for _, xs := range intPool {
+		for _, xs := range intSmall {
 			x := bigInt(xs)
 			// A square root is not unique: report the square it must have.
 			if r := new(big.Int).ModSqrt(x, p); r != nil {
@@ -209,7 +231,7 @@ func genInt() {
 		emit("int.mulrange", strconv.FormatInt(r[0], 10), strconv.FormatInt(r[1], 10),
 			new(big.Int).MulRange(r[0], r[1]).String())
 	}
-	for _, r := range [][2]int64{{5, 2}, {10, 0}, {10, 10}, {52, 5}, {100, 50}, {3, 5}} {
+	for _, r := range [][2]int64{{5, 2}, {10, 0}, {10, 10}, {52, 5}, {100, 50}, {3, 5}, {5, -1}, {0, -1}, {-3, -5}} {
 		emit("int.binomial", strconv.FormatInt(r[0], 10), strconv.FormatInt(r[1], 10),
 			new(big.Int).Binomial(r[0], r[1]).String())
 	}
@@ -223,6 +245,8 @@ func genInt() {
 		{"FF", 16}, {"zZ", 62}, {"zZ", 36}, {"101", 2}, {"0x1f", 0}, {"0b101", 0}, {"0o17", 0},
 		{"017", 0}, {"1_000", 0}, {"1__0", 0}, {"_1", 0}, {"", 10}, {"-", 10}, {"12a", 10},
 		{"0x", 0}, {"9", 8}, {" 1", 10}, {"1 ", 10}, {"0X1F", 0}, {"-0x1F", 0},
+		// U+0130 and U+0131 are not ASCII digits, though their low byte is.
+		{"\u0130", 10}, {"\u0131", 10}, {"1\u0131", 10}, {"0x\u0131", 0},
 	} {
 		if v, ok := new(big.Int).SetString(c.s, c.base); ok {
 			emit("int.setstring", c.s, strconv.Itoa(c.base), v.String())
@@ -258,9 +282,24 @@ var floatPool = []string{
 	"0", "1", "-1", "0.5", "3", "0.1", "-7.25", "1e10", "123456789.123456789", "1e-300",
 	"2.5e300", "0x1.8p3", "12345678901234567890123456789",
 	"0.3333333333333333333333333333333333333333",
+	"Inf", "-Inf",
+	// The float64 denormals and the largest finite values, each side of a
+	// rounding boundary: the smallest denormal, half of it (a tie that
+	// rounds to zero), three quarters of it, the largest float64, a value
+	// that rounds up to infinity, and the first value that overflows.
+	"0x1p-1074", "0x1p-1075", "0x1.8p-1075", "0x1.fffffffffffffp1023",
+	"0x1.fffffffffffff8p1023", "0x1p1024",
+	// The same for float32.
+	"0x1p-149", "0x1p-150", "0x1.8p-150", "0x1.fffffep127", "0x1.ffffffp127", "0x1p200",
 }
 
-var precs = []uint{1, 2, 24, 53, 64, 100, 200}
+var floatSmall = []string{"0", "-1", "0.1", "-7.25", "123456789.123456789", "1e-300"}
+
+// floatBinary is crossed with itself for the arithmetic operations. 1e-300
+// and 2.5e300 are far enough apart to need an exponent alignment of 1000 bits.
+var floatBinary = []string{"0", "0.1", "-7.25", "1e-300", "2.5e300"}
+
+var precs = []uint{1, 24, 53, 100}
 
 var modes = []big.RoundingMode{
 	big.ToNearestEven, big.ToNearestAway, big.ToZero, big.AwayFromZero,
@@ -287,10 +326,10 @@ func floatState(f *big.Float) string {
 }
 
 func genFloat() {
-	for _, s := range floatPool {
+	for _, s := range floatSmall {
 		x := parseFloat(s, 200)
 		for _, f := range []byte{'e', 'E', 'f', 'g', 'G', 'b', 'p', 'x'} {
-			for _, prec := range []int{-1, 0, 1, 5, 20, 60} {
+			for _, prec := range []int{-1, 0, 5, 60} {
 				emit("float.text", s, string(f), strconv.Itoa(prec), x.Text(f, prec))
 			}
 		}
@@ -300,26 +339,6 @@ func genFloat() {
 		} {
 			emit("float.format", verb, s, fmt.Sprintf(verb, x))
 		}
-		f64, acc := x.Float64()
-		emit("float.float64", s, float64Bits(f64)+"|"+accName(acc))
-		f32, acc := x.Float32()
-		emit("float.float32", s, float32Bits(f32)+"|"+accName(acc))
-		i64, acc := x.Int64()
-		emit("float.int64", s, strconv.FormatInt(i64, 10)+"|"+accName(acc))
-		u64, acc := x.Uint64()
-		emit("float.uint64", s, strconv.FormatUint(u64, 10)+"|"+accName(acc))
-		i, acc := x.Int(nil)
-		emit("float.int", s, i.String()+"|"+accName(acc))
-		r, acc := x.Rat(nil)
-		emit("float.rat", s, r.String()+"|"+accName(acc))
-		emit("float.isint", s, strconv.FormatBool(x.IsInt()))
-		emit("float.minprec", s, strconv.Itoa(int(x.MinPrec())))
-		emit("float.sign", s, strconv.Itoa(x.Sign()))
-		m := new(big.Float)
-		exp := x.MantExp(m)
-		emit("float.mantexp", s, strconv.Itoa(exp)+"|"+m.Text('p', 0))
-		gob, _ := x.GobEncode()
-		emit("float.gob", s, fmt.Sprintf("%x", gob))
 		for _, prec := range precs {
 			for _, mode := range modes {
 				r := new(big.Float).SetMode(mode).SetPrec(prec).Set(x)
@@ -332,6 +351,33 @@ func genFloat() {
 			}
 		}
 	}
+	for _, s := range floatPool {
+		x := parseFloat(s, 200)
+		f64, acc := x.Float64()
+		emit("float.float64", s, float64Bits(f64)+"|"+accName(acc))
+		f32, acc := x.Float32()
+		emit("float.float32", s, float32Bits(f32)+"|"+accName(acc))
+		i64, acc := x.Int64()
+		emit("float.int64", s, strconv.FormatInt(i64, 10)+"|"+accName(acc))
+		u64, acc := x.Uint64()
+		emit("float.uint64", s, strconv.FormatUint(u64, 10)+"|"+accName(acc))
+		i, acc := x.Int(nil)
+		emit("float.int", s, i.String()+"|"+accName(acc))
+		r, acc := x.Rat(nil)
+		if r == nil {
+			emit("float.rat", s, "<nil>|"+accName(acc))
+		} else {
+			emit("float.rat", s, r.String()+"|"+accName(acc))
+		}
+		emit("float.isint", s, strconv.FormatBool(x.IsInt()))
+		emit("float.minprec", s, strconv.Itoa(int(x.MinPrec())))
+		emit("float.sign", s, strconv.Itoa(x.Sign()))
+		m := new(big.Float)
+		exp := x.MantExp(m)
+		emit("float.mantexp", s, strconv.Itoa(exp)+"|"+m.Text('p', 0))
+		gob, _ := x.GobEncode()
+		emit("float.gob", s, fmt.Sprintf("%x", gob))
+	}
 
 	ops := []floatOp{
 		{"add", (*big.Float).Add},
@@ -339,12 +385,12 @@ func genFloat() {
 		{"mul", (*big.Float).Mul},
 		{"quo", (*big.Float).Quo},
 	}
-	for _, xs := range floatPool[:7] {
-		for _, ys := range floatPool[:7] {
+	for _, xs := range floatBinary {
+		for _, ys := range floatBinary {
 			x, y := parseFloat(xs, 200), parseFloat(ys, 200)
 			emit("float.cmp", xs, ys, strconv.Itoa(x.Cmp(y)))
 			for _, prec := range []uint{53, 100} {
-				for _, mode := range modes {
+				for _, mode := range []big.RoundingMode{big.ToNearestEven, big.ToZero} {
 					for _, op := range ops {
 						if op.name == "quo" && y.Sign() == 0 && x.Sign() == 0 {
 							continue
@@ -372,6 +418,7 @@ func genFloat() {
 		{"1e99999999999", 0}, {"1e-99999999999", 0}, {"0x1p-2147483649", 0},
 		{"ff.8", 16}, {"101.1", 2}, {"1.5", 10}, {"1__0", 0}, {"0x", 0},
 		{"1e500", 0}, {"123456789012345678901234567890e-20", 0},
+		{"\u0130", 0}, {"1\u0131", 0},
 	} {
 		for _, prec := range []uint{0, 53, 200} {
 			f, b, err := big.ParseFloat(c.s, c.base, prec, big.ToNearestEven)
@@ -403,6 +450,7 @@ func genFloat() {
 	emit("float.setfloat64", float64Bits(5e-324), floatState(new(big.Float).SetFloat64(5e-324)))
 	emit("float.setfloat64", float64Bits(math.MaxFloat64), floatState(new(big.Float).SetFloat64(math.MaxFloat64)))
 	emit("float.setfloat64", float64Bits(-0.1), floatState(new(big.Float).SetFloat64(-0.1)))
+	emit("float.setfloat64", float64Bits(math.Inf(-1)), floatState(new(big.Float).SetFloat64(math.Inf(-1))))
 	for _, s := range intPool {
 		x := bigInt(s)
 		emit("float.setint", s, floatState(new(big.Float).SetInt(x)))
@@ -413,6 +461,23 @@ func genFloat() {
 var ratPool = []string{
 	"0", "1", "-1", "1/2", "-1/3", "22/7", "355/113", "1/1000000007", "-3/4",
 	"123456789012345678901234567890/987654321098765432109876543210", "5", "-17",
+}
+
+var ratSmall = []string{"0", "-1", "1/2", "-1/3", "355/113"}
+
+// pow2 returns the decimal digits of 2**n.
+func pow2(n uint) string {
+	return new(big.Int).Lsh(big.NewInt(1), n).String()
+}
+
+// ratFloatPool holds the values that overflow or lose bits converting to a
+// float32 or float64, each side of a rounding boundary: the smallest
+// denormal, half of it (a tie that rounds to zero) and 3/2 of it (a tie that
+// rounds to even), and the first power of two that overflows.
+var ratFloatPool = []string{
+	pow2(128), pow2(200), pow2(1024), "-" + pow2(1024),
+	"1/" + pow2(149), "1/" + pow2(150), "3/" + pow2(150), "-3/" + pow2(150),
+	"1/" + pow2(1074), "1/" + pow2(1075), "3/" + pow2(1075),
 }
 
 func genRat() {
@@ -438,15 +503,11 @@ func genRat() {
 		for _, prec := range []int{0, 1, 5, 30} {
 			emit("rat.floatstring", xs, strconv.Itoa(prec), x.FloatString(prec))
 		}
-		f64, exact := x.Float64()
-		emit("rat.float64", xs, float64Bits(f64)+"|"+strconv.FormatBool(exact))
-		f32, exact := x.Float32()
-		emit("rat.float32", xs, float32Bits(f32)+"|"+strconv.FormatBool(exact))
 		fp, exact := x.FloatPrec()
 		emit("rat.floatprec", xs, strconv.Itoa(fp)+"|"+strconv.FormatBool(exact))
 		gob, _ := x.GobEncode()
 		emit("rat.gob", xs, fmt.Sprintf("%x", gob))
-		for _, ys := range ratPool {
+		for _, ys := range ratSmall {
 			y, _ := new(big.Rat).SetString(ys)
 			emit("rat.cmp", xs, ys, strconv.Itoa(x.Cmp(y)))
 			for _, op := range ops {
@@ -457,9 +518,17 @@ func genRat() {
 			}
 		}
 	}
+	for _, xs := range slices.Concat(ratFloatPool, ratPool) {
+		x, _ := new(big.Rat).SetString(xs)
+		f64, exact := x.Float64()
+		emit("rat.float64", xs, float64Bits(f64)+"|"+strconv.FormatBool(exact))
+		f32, exact := x.Float32()
+		emit("rat.float32", xs, float32Bits(f32)+"|"+strconv.FormatBool(exact))
+	}
 	for _, s := range []string{
 		"1/3", "-0.75", "1e3", "3.14159e-2", "1/0", "0x10", "0x1p-2", "1_0/3", "1.5/2", "", "/", "1/",
 		"-1e-3", ".5", "5.", "1e", "abc", "1 /2", "99999999999999999999e-5", "1e1000000000",
+		"\u0130/3", "1/\u0131",
 	} {
 		if r, ok := new(big.Rat).SetString(s); ok {
 			emit("rat.setstring", s, r.String())

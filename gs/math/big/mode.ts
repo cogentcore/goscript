@@ -11,8 +11,6 @@ export const MaxPrec = 4294967295
 // 2**53 is a bigint, as for every uint.
 export type Word = number | bigint
 
-export const wordBits = 64
-
 // Accuracy describes the rounding error produced by the most recent operation
 // that generated a Float value, relative to the exact value.
 export type Accuracy = number

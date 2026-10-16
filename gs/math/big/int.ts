@@ -48,6 +48,8 @@ export function intOf(x: IntRef): Int {
 
 // euclid returns the quotient and the non-negative remainder of x / y.
 function euclid(x: bigint, y: bigint): [bigint, bigint] {
+  // Truncated division leaves a remainder with the sign of x; move it into
+  // [0, |y|) and adjust the quotient to match.
   if (y === 0n) {
     $.panic(divisionByZero)
   }
@@ -69,6 +71,7 @@ function euclid(x: bigint, y: bigint): [bigint, bigint] {
 // the cofactors of math/big's Int.GCD. The cofactors are those of Euclid's
 // algorithm on |a| and |b|; a zero input selects the trivial cofactors.
 function gcd(a: bigint, b: bigint): [bigint, bigint, bigint] {
+  // A zero operand makes the other the divisor, with cofactors of its sign.
   if (a === 0n || b === 0n) {
     const g = abs(a === 0n ? b : a)
     return [
@@ -82,6 +85,8 @@ function gcd(a: bigint, b: bigint): [bigint, bigint, bigint] {
     ]
   }
 
+  // Run Euclid's algorithm on the magnitudes, larger first, tracking the
+  // cofactor of the first operand.
   let A = abs(a)
   let B = abs(b)
   let ua = 1n
@@ -96,6 +101,7 @@ function gcd(a: bigint, b: bigint): [bigint, bigint, bigint] {
     ;[ua, ub] = [ub, ua - q * ub]
   }
 
+  // Give the cofactor of a its sign and solve for the cofactor of b.
   const x = a < 0n ? -ua : ua
   const y = (A - abs(a) * ua) / b
   return [A, x, y]
@@ -103,6 +109,7 @@ function gcd(a: bigint, b: bigint): [bigint, bigint, bigint] {
 
 // modInverse returns the inverse of g modulo |n|, or null if there is none.
 function modInverse(g: bigint, n: bigint): bigint | null {
+  // Reduce g into [0, n) and invert it through the extended GCD cofactor.
   n = abs(n)
   if (g < 0n) {
     g = euclid(g, n)[1]
@@ -164,7 +171,7 @@ export class Int {
 
   // Sign returns -1 for x < 0, 0 for x == 0, and +1 for x > 0.
   public Sign(): number {
-    const v = intOf(this)._v
+    const v = this._v
     return (
       v === 0n ? 0
       : v < 0n ? -1
@@ -174,44 +181,45 @@ export class Int {
 
   // SetInt64 sets z to x and returns z.
   public SetInt64(x: bigint): Int {
-    intOf(this).put(BigInt.asIntN(64, BigInt(x)))
+    this.put(BigInt.asIntN(64, x))
     return this
   }
 
   // SetUint64 sets z to x and returns z.
   public SetUint64(x: number | bigint): Int {
-    intOf(this).put(BigInt.asUintN(64, BigInt(x)))
+    this.put(BigInt.asUintN(64, BigInt(x)))
     return this
   }
 
   // Set sets z to x and returns z.
   public Set(x: IntRef): Int {
-    intOf(this).put(intOf(x)._v)
+    this.put(intOf(x)._v)
     return this
   }
 
   // Bits provides raw (unchecked but fast) access to the absolute value of x
   // as a little-endian Word slice.
   public Bits(): $.Slice<Word> {
-    const z = intOf(this)
-    const words = wordsOf(abs(z._v))
-    if (z._bits !== null && $.cap(z._bits) >= words.length) {
-      if (z._dirty) {
-        z._bits = $.goSlice(z._bits, 0, words.length)
-        $.copy(z._bits, words)
-        z._dirty = false
+    // Hand out the cached slice while it fits, refreshed after a write;
+    // otherwise cache a new one.
+    const words = wordsOf(abs(this._v))
+    if (this._bits !== null && $.cap(this._bits) >= words.length) {
+      if (this._dirty) {
+        this._bits = $.goSlice(this._bits, 0, words.length)
+        $.copy(this._bits, words)
+        this._dirty = false
       }
-      return z._bits
+      return this._bits
     }
-    z._bits = words.length === 0 ? null : $.arrayToSlice(words)
-    z._dirty = false
-    return z._bits
+    this._bits = words.length === 0 ? null : $.arrayToSlice(words)
+    this._dirty = false
+    return this._bits
   }
 
   // SetBits provides raw (unchecked but fast) access to z by setting its value
   // to abs, interpreted as a little-endian Word slice, and returning z.
   public SetBits(abs: $.Slice<Word>): Int {
-    const z = intOf(this)
+    // Trim the leading zero words and adopt the slice as the backing array.
     let n = $.len(abs)
     while (n > 0 && Number($.arrayIndex(abs, n - 1)) === 0) {
       n--
@@ -220,47 +228,45 @@ export class Int {
     for (let i = 0; i < n; i++) {
       words.push($.arrayIndex(abs, i))
     }
-    z._v = fromWords(words)
-    z._bits = abs === null ? null : $.goSlice(abs, 0, n)
-    z._dirty = false
+    this._v = fromWords(words)
+    this._bits = abs === null ? null : $.goSlice(abs, 0, n)
+    this._dirty = false
     return this
   }
 
   // Abs sets z to |x| (the absolute value of x) and returns z.
   public Abs(x: IntRef): Int {
-    intOf(this).put(abs(intOf(x)._v))
+    this.put(abs(intOf(x)._v))
     return this
   }
 
   // Neg sets z to -x and returns z.
   public Neg(x: IntRef): Int {
-    intOf(this).put(-intOf(x)._v)
+    this.put(-intOf(x)._v)
     return this
   }
 
   // Add sets z to the sum x+y and returns z.
   public Add(x: IntRef, y: IntRef): Int {
-    intOf(this).put(intOf(x)._v + intOf(y)._v)
+    this.put(intOf(x)._v + intOf(y)._v)
     return this
   }
 
   // Sub sets z to the difference x-y and returns z.
   public Sub(x: IntRef, y: IntRef): Int {
-    intOf(this).put(intOf(x)._v - intOf(y)._v)
+    this.put(intOf(x)._v - intOf(y)._v)
     return this
   }
 
   // Mul sets z to the product x*y and returns z.
   public Mul(x: IntRef, y: IntRef): Int {
-    intOf(this).put(intOf(x)._v * intOf(y)._v)
+    this.put(intOf(x)._v * intOf(y)._v)
     return this
   }
 
   // MulRange sets z to the product of all integers in the range [a, b]
   // inclusively and returns z. If a > b (empty range), the result is 1.
   public MulRange(a: bigint, b: bigint): Int {
-    a = BigInt(a)
-    b = BigInt(b)
     let v = 1n
     if (a <= b) {
       if (a <= 0n && b >= 0n) {
@@ -271,15 +277,15 @@ export class Int {
         }
       }
     }
-    intOf(this).put(v)
+    this.put(v)
     return this
   }
 
   // Binomial sets z to the binomial coefficient C(n, k) and returns z.
   public Binomial(n: bigint, k: bigint): Int {
-    n = BigInt(n)
-    k = BigInt(k)
-    if (k > n) {
+    // Zero outside 0 <= k <= n; otherwise divide two range products, using
+    // the smaller of k and n-k.
+    if (k < 0n || k > n) {
       return this.SetInt64(0n)
     }
     if (k > n - k) {
@@ -297,7 +303,7 @@ export class Int {
     if (d === 0n) {
       $.panic(divisionByZero)
     }
-    intOf(this).put(intOf(x)._v / d)
+    this.put(intOf(x)._v / d)
     return this
   }
 
@@ -308,19 +314,20 @@ export class Int {
     if (d === 0n) {
       $.panic(divisionByZero)
     }
-    intOf(this).put(intOf(x)._v % d)
+    this.put(intOf(x)._v % d)
     return this
   }
 
   // QuoRem sets z to the quotient x/y and r to the remainder x%y and returns
   // the pair (z, r) for y != 0.
   public QuoRem(x: IntRef, y: IntRef, r: IntRef): [Int, Int] {
+    // Truncate the quotient and write the remainder through r.
     const a = intOf(x)._v
     const d = intOf(y)._v
     if (d === 0n) {
       $.panic(divisionByZero)
     }
-    intOf(this).put(a / d)
+    this.put(a / d)
     intOf(r).put(a % d)
     return [this, intOf(r)]
   }
@@ -328,14 +335,14 @@ export class Int {
   // Div sets z to the quotient x/y for y != 0 and returns z. Div implements
   // Euclidean division.
   public Div(x: IntRef, y: IntRef): Int {
-    intOf(this).put(euclid(intOf(x)._v, intOf(y)._v)[0])
+    this.put(euclid(intOf(x)._v, intOf(y)._v)[0])
     return this
   }
 
   // Mod sets z to the modulus x%y for y != 0 and returns z. Mod implements
   // Euclidean modulus.
   public Mod(x: IntRef, y: IntRef): Int {
-    intOf(this).put(euclid(intOf(x)._v, intOf(y)._v)[1])
+    this.put(euclid(intOf(x)._v, intOf(y)._v)[1])
     return this
   }
 
@@ -344,7 +351,7 @@ export class Int {
   // and modulus.
   public DivMod(x: IntRef, y: IntRef, m: IntRef): [Int, Int] {
     const [q, r] = euclid(intOf(x)._v, intOf(y)._v)
-    intOf(this).put(q)
+    this.put(q)
     intOf(m).put(r)
     return [this, intOf(m)]
   }
@@ -359,12 +366,15 @@ export class Int {
     r: IntRef,
     mode: RoundingMode,
   ): [Int, Int | null] {
+    // Read the operands and reject a zero divisor.
     const a = intOf(x)._v
     const d = intOf(y)._v
     if (d === 0n) {
       $.panic(divisionByZero)
     }
 
+    // Truncate, then adjust the quotient by the mode when the division is
+    // inexact.
     let q = a / d
     const rem = a % d
     if (rem !== 0n) {
@@ -395,7 +405,8 @@ export class Int {
       }
     }
 
-    intOf(this).put(q)
+    // Store the quotient and the remainder it implies.
+    this.put(q)
     if (r === null) {
       return [this, null]
     }
@@ -406,7 +417,7 @@ export class Int {
   // Cmp compares x and y and returns -1 if x < y, 0 if x == y, and +1 if
   // x > y.
   public Cmp(y: IntRef): number {
-    const a = intOf(this)._v
+    const a = this._v
     const b = intOf(y)._v
     return (
       a < b ? -1
@@ -417,7 +428,7 @@ export class Int {
 
   // CmpAbs compares the absolute values of x and y.
   public CmpAbs(y: IntRef): number {
-    const a = abs(intOf(this)._v)
+    const a = abs(this._v)
     const b = abs(intOf(y)._v)
     return (
       a < b ? -1
@@ -429,31 +440,33 @@ export class Int {
   // Int64 returns the int64 representation of x. If x cannot be represented in
   // an int64, the result is undefined.
   public Int64(): bigint {
-    return BigInt.asIntN(64, intOf(this)._v)
+    return BigInt.asIntN(64, this._v)
   }
 
   // Uint64 returns the uint64 representation of x. If x cannot be represented
   // in a uint64, the result is undefined.
   public Uint64(): bigint {
-    return low64(abs(intOf(this)._v))
+    return low64(abs(this._v))
   }
 
   // IsInt64 reports whether x can be represented as an int64.
   public IsInt64(): boolean {
-    const v = intOf(this)._v
+    const v = this._v
     return v === BigInt.asIntN(64, v)
   }
 
   // IsUint64 reports whether x can be represented as a uint64.
   public IsUint64(): boolean {
-    const v = intOf(this)._v
+    const v = this._v
     return v === BigInt.asUintN(64, v)
   }
 
   // Float64 returns the float64 value nearest x, and an indication of any
   // rounding that occurred.
   public Float64(): [number, Accuracy] {
-    const v = intOf(this)._v
+    // Convert through Number and compare its exact value with v to report
+    // the direction of the rounding.
+    const v = this._v
     const f = Number(v)
     if (!Number.isFinite(f)) {
       return [f, v < 0n ? Below : Above]
@@ -470,13 +483,13 @@ export class Int {
   // BitLen returns the length of the absolute value of x in bits. The bit
   // length of 0 is 0.
   public BitLen(): number {
-    return bitLen(abs(intOf(this)._v))
+    return bitLen(abs(this._v))
   }
 
   // TrailingZeroBits returns the number of consecutive least significant zero
   // bits of |x|.
   public TrailingZeroBits(): number {
-    const v = abs(intOf(this)._v)
+    const v = abs(this._v)
     return v === 0n ? 0 : trailingZeroBits(v)
   }
 
@@ -485,10 +498,13 @@ export class Int {
   // y < 0, and x and m are not relatively prime, z is unchanged and nil is
   // returned.
   public Exp(x: IntRef, y: IntRef, m: IntRef): Int | null {
+    // Read the operands; a nil modulus means no reduction.
     const xv = intOf(x)._v
     const yv = intOf(y)._v
     const mod = m === null ? 0n : abs(intOf(m)._v)
 
+    // A negative exponent inverts the base modulo m, and has no result
+    // without m.
     let base = abs(xv)
     if (yv < 0n) {
       if (mod === 0n) {
@@ -501,6 +517,8 @@ export class Int {
       base = inverse
     }
 
+    // Raise the base to the magnitude of the exponent, reduced when there is
+    // a modulus.
     const e = abs(yv)
     let r: bigint
     if (mod === 0n) {
@@ -509,21 +527,23 @@ export class Int {
       r = modPow(base, e, mod)
     }
 
+    // A negative base with an odd exponent negates the result, within the
+    // modulus when there is one.
     const neg = r > 0n && xv < 0n && (e & 1n) === 1n
     if (neg && mod !== 0n) {
       r = mod - r
     } else if (neg) {
       r = -r
     }
-    intOf(this).put(r)
+    this.put(r)
     return this
   }
 
-  // GCD sets z to the greatest common divisor of a and b, which both must be
-  // > 0, and returns z. If x or y are not nil, GCD sets their value such that
-  // z = a*x + b*y. a and b may be positive, zero or negative; the result is
-  // always non-negative.
+  // GCD sets z to the greatest common divisor of a and b and returns z. a and
+  // b may be positive, zero or negative; the result is always non-negative.
+  // If x or y are not nil, GCD sets their value such that z = a*x + b*y.
   public GCD(x: IntRef, y: IntRef, a: IntRef, b: IntRef): Int {
+    // Compute the divisor and store the cofactors the caller asked for.
     const [g, cx, cy] = gcd(intOf(a)._v, intOf(b)._v)
     if (x !== null) {
       intOf(x).put(cx)
@@ -531,7 +551,7 @@ export class Int {
     if (y !== null) {
       intOf(y).put(cy)
     }
-    intOf(this).put(g)
+    this.put(g)
     return this
   }
 
@@ -544,7 +564,7 @@ export class Int {
     if (inverse === null) {
       return null
     }
-    intOf(this).put(inverse)
+    this.put(inverse)
     return this
   }
 
@@ -553,6 +573,7 @@ export class Int {
   // mod p, ModSqrt leaves z unchanged and returns nil. If the modulus p is not
   // an odd prime, the function panics or returns an incorrect result.
   public ModSqrt(x: IntRef, p: IntRef): Int | null {
+    // A non-residue has no root, and zero is its own root.
     const xv = intOf(x)._v
     const pv = intOf(p)._v
     switch (jacobiOf(xv, pv)) {
@@ -562,6 +583,7 @@ export class Int {
         return this.SetInt64(0n)
     }
 
+    // Reduce x into [0, p) and pick the algorithm by the residue of p.
     const xm = xv < 0n || xv >= pv ? euclid(xv, pv)[1] : xv
     let r: bigint
     if (pv % 4n === 3n) {
@@ -571,19 +593,19 @@ export class Int {
     } else {
       r = modSqrtTonelliShanks(xm, pv)
     }
-    intOf(this).put(r)
+    this.put(r)
     return this
   }
 
   // Lsh sets z = x << n and returns z.
   public Lsh(x: IntRef, n: number): Int {
-    intOf(this).put(intOf(x)._v << BigInt(n))
+    this.put(intOf(x)._v << BigInt(n))
     return this
   }
 
   // Rsh sets z = x >> n and returns z.
   public Rsh(x: IntRef, n: number): Int {
-    intOf(this).put(intOf(x)._v >> BigInt(n))
+    this.put(intOf(x)._v >> BigInt(n))
     return this
   }
 
@@ -593,11 +615,12 @@ export class Int {
     if (i < 0) {
       $.panic('negative bit index')
     }
-    return Number((intOf(this)._v >> BigInt(i)) & 1n)
+    return Number((this._v >> BigInt(i)) & 1n)
   }
 
   // SetBit sets z to x, with x's i'th bit set to b (0 or 1) and returns z.
   public SetBit(x: IntRef, i: number, b: number): Int {
+    // Check the index and the bit, then set or clear the bit of x.
     if (i < 0) {
       $.panic('negative bit index')
     }
@@ -606,37 +629,37 @@ export class Int {
     }
     const mask = 1n << BigInt(i)
     const v = intOf(x)._v
-    intOf(this).put(b === 1 ? v | mask : v & ~mask)
+    this.put(b === 1 ? v | mask : v & ~mask)
     return this
   }
 
   // And sets z = x & y and returns z.
   public And(x: IntRef, y: IntRef): Int {
-    intOf(this).put(intOf(x)._v & intOf(y)._v)
+    this.put(intOf(x)._v & intOf(y)._v)
     return this
   }
 
   // AndNot sets z = x &^ y and returns z.
   public AndNot(x: IntRef, y: IntRef): Int {
-    intOf(this).put(intOf(x)._v & ~intOf(y)._v)
+    this.put(intOf(x)._v & ~intOf(y)._v)
     return this
   }
 
   // Or sets z = x | y and returns z.
   public Or(x: IntRef, y: IntRef): Int {
-    intOf(this).put(intOf(x)._v | intOf(y)._v)
+    this.put(intOf(x)._v | intOf(y)._v)
     return this
   }
 
   // Xor sets z = x ^ y and returns z.
   public Xor(x: IntRef, y: IntRef): Int {
-    intOf(this).put(intOf(x)._v ^ intOf(y)._v)
+    this.put(intOf(x)._v ^ intOf(y)._v)
     return this
   }
 
   // Not sets z = ^x and returns z.
   public Not(x: IntRef): Int {
-    intOf(this).put(~intOf(x)._v)
+    this.put(~intOf(x)._v)
     return this
   }
 
@@ -647,7 +670,7 @@ export class Int {
     if (v < 0n) {
       $.panic('square root of negative number')
     }
-    intOf(this).put(isqrt(v))
+    this.put(isqrt(v))
     return this
   }
 
@@ -658,15 +681,16 @@ export class Int {
     if (n < 0) {
       $.panic('negative n for ProbablyPrime')
     }
-    return probablyPrime(intOf(this)._v, n)
+    return probablyPrime(this._v, n)
   }
 
   // Rand sets z to a pseudo-random number in [0, n) and returns z. rnd is a
   // *rand.Rand, of which Rand uses Uint32.
   public Rand(rnd: { Uint32(): number }, n: IntRef): Int {
+    // A limit of zero or less gives zero.
     const limit = intOf(n)._v
     if (limit <= 0n) {
-      intOf(this).put(0n)
+      this.put(0n)
       return this
     }
 
@@ -683,7 +707,7 @@ export class Int {
       }
       v &= mask
       if (v < limit) {
-        intOf(this).put(v)
+        this.put(v)
         return this
       }
     }
@@ -691,13 +715,13 @@ export class Int {
 
   // Bytes returns the absolute value of x as a big-endian byte slice.
   public Bytes(): Uint8Array {
-    return bytesOf(abs(intOf(this)._v))
+    return bytesOf(abs(this._v))
   }
 
   // SetBytes interprets buf as the bytes of a big-endian unsigned integer, sets
   // z to that value, and returns z.
   public SetBytes(buf: $.Slice<number>): Int {
-    intOf(this).put(valueOfBytes(buf))
+    this.put(valueOfBytes(buf))
     return this
   }
 
@@ -705,7 +729,8 @@ export class Int {
   // big-endian byte slice, and returns buf. If the absolute value of x does
   // not fit in buf, FillBytes will panic.
   public FillBytes(buf: $.Slice<number>): $.Slice<number> {
-    const bytes = bytesOf(abs(intOf(this)._v))
+    // Right-align the magnitude in the buffer, padded with zeros on the left.
+    const bytes = bytesOf(abs(this._v))
     const n = $.len(buf)
     if (bytes.length > n) {
       $.panic('math/big: buffer too small to fit value')
@@ -722,7 +747,7 @@ export class Int {
   // undefined but the returned value is nil.
   public SetString(s: string, base: number): [Int | null, boolean] {
     const r = new StringReader(s)
-    const [z] = scanInt(intOf(this), r, base)
+    const [z] = scanInt(this, r, base)
     if (z === null || !r.consumed()) {
       return [null, false]
     }
@@ -759,6 +784,7 @@ export class Int {
   // specification of minimum digits precision, output field width, space or
   // zero padding, and '-' for left or right justification.
   public Format(s: State, ch: number): void {
+    // Choose the base of the verb; any other verb prints an error.
     let base: number
     switch (ch) {
       case 98: // 'b'
@@ -788,12 +814,7 @@ export class Int {
         )
         return
     }
-    if (isNil(this)) {
-      writeString(s, '<nil>')
-      return
-    }
-
-    const x = intOf(this)._v
+    const x = this._v
     let sign = ''
     if (x < 0n) {
       sign = '-'
@@ -803,6 +824,7 @@ export class Int {
       sign = ' '
     }
 
+    // The # flag adds the base prefix.
     let prefix = ''
     if (s.Flag(35)) {
       switch (ch) {
@@ -824,15 +846,19 @@ export class Int {
       prefix = '0o'
     }
 
+    // Digits of the magnitude, in upper case for %X.
     let digits = utoa(abs(x), base)
     if (ch === 88) {
       digits = digits.toUpperCase()
     }
 
+    // Padding: spaces either side of the number, and zeros after the sign
+    // and prefix.
     let left = 0 // spaces to the left of the digits for right justification
     let zeros = 0 // zeros as the left-most digits
     let right = 0 // spaces to the right of the digits for left justification
 
+    // A precision sets the minimum digits; zero digits of zero print nothing.
     const [precision, precisionSet] = s.Precision()
     if (precisionSet) {
       if (digits.length < precision) {
@@ -842,6 +868,8 @@ export class Int {
       }
     }
 
+    // A width pads with spaces on the left, on the right with -, or with
+    // zeros with 0 and no precision.
     const length = sign.length + prefix.length + zeros + digits.length
     const [width, widthSet] = s.Width()
     if (widthSet && length < width) {
@@ -855,6 +883,7 @@ export class Int {
       }
     }
 
+    // Write the sign, prefix and digits with their padding.
     writeString(
       s,
       ' '.repeat(left) +
@@ -892,7 +921,7 @@ export class Int {
       default:
         return $.newError('Int.Scan: invalid verb')
     }
-    return scanInt(intOf(this), new ScanReader(s), base)[2]
+    return scanInt(this, new ScanReader(s), base)[2]
   }
 
   // AppendText implements the encoding.TextAppender interface.
@@ -918,9 +947,6 @@ export class Int {
 
   // MarshalJSON implements the json.Marshaler interface.
   public MarshalJSON(): [Uint8Array, $.GoError | null] {
-    if (isNil(this)) {
-      return [$.stringToBytes('null'), null]
-    }
     return [$.stringToBytes(textOf(this, 10)), null]
   }
 
@@ -934,7 +960,9 @@ export class Int {
 
   // GobEncode implements the gob.GobEncoder interface.
   public GobEncode(): [Uint8Array, $.GoError | null] {
-    const v = intOf(this)._v
+    // Encode the version and sign in the first byte, then the big-endian
+    // magnitude.
+    const v = this._v
     const mag = bytesOf(abs(v))
     const buf = new Uint8Array(1 + mag.length)
     buf[0] = (intGobVersion << 1) | (v < 0n ? 1 : 0)
@@ -944,9 +972,11 @@ export class Int {
 
   // GobDecode implements the gob.GobDecoder interface.
   public GobDecode(buf: $.Slice<number>): $.GoError | null {
+    // An empty encoding is zero; otherwise check the version, then read the
+    // sign and the magnitude.
     const bytes = $.bytesToUint8Array(buf)
     if (bytes.length === 0) {
-      intOf(this).put(0n)
+      this.put(0n)
       return null
     }
     const b = bytes[0]
@@ -956,7 +986,7 @@ export class Int {
       )
     }
     const mag = valueOfBytes(bytes.subarray(1))
-    intOf(this).put((b & 1) !== 0 ? -mag : mag)
+    this.put((b & 1) !== 0 ? -mag : mag)
     return null
   }
 }
@@ -986,15 +1016,8 @@ function jacobiOf(x: bigint, y: bigint): number {
   return jacobi(x, y)
 }
 
-function isNil(x: IntRef | undefined): boolean {
-  return x === null || x === undefined
-}
-
-function textOf(x: IntRef | undefined, base: number): string {
-  if (x === null || x === undefined) {
-    return '<nil>'
-  }
-  const v = intOf(x)._v
+function textOf(x: Int, base: number): string {
+  const v = x._v
   return (v < 0n ? '-' : '') + utoa(abs(v), base)
 }
 
@@ -1006,6 +1029,8 @@ function scanInt(
   r: ByteReader,
   base: number,
 ): [Int | null, number, $.GoError | null] {
+  // Read the sign and the magnitude; an error leaves the magnitude read so
+  // far in z.
   const [neg, signErr] = scanSign(r)
   if (signErr !== null) {
     return [null, 0, signErr]
@@ -1020,6 +1045,7 @@ function scanInt(
 }
 
 function modSqrt5Mod8Prime(x: bigint, p: bigint): bigint {
+  // Compute the root with Atkin's algorithm.
   const e = p >> 3n
   const tx = x << 1n
   const alpha = modPow(tx, e, p)
@@ -1031,15 +1057,19 @@ function modSqrt5Mod8Prime(x: bigint, p: bigint): bigint {
 }
 
 function modSqrtTonelliShanks(x: bigint, p: bigint): bigint {
+  // Write p-1 as s * 2**e with s odd.
   let s = p - 1n
   const e = trailingZeroBits(s)
   s >>= BigInt(e)
 
+  // Find a quadratic non-residue n.
   let n = 2n
   while (jacobi(n, p) !== -1) {
     n += 1n
   }
 
+  // Tonelli-Shanks: reduce the order of b in steps until b is 1, when y is
+  // the root.
   let y = modPow(x, (s + 1n) >> 1n, p)
   let b = modPow(x, s, p)
   let g = modPow(n, s, p)

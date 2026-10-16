@@ -19,12 +19,13 @@ export function abs(v: bigint): bigint {
 }
 
 // toWord returns the Word value of a 64-bit magnitude.
-export function toWord(w: bigint): Word {
+function toWord(w: bigint): Word {
   return w <= maxSafe ? Number(w) : w
 }
 
 // wordsOf returns the little-endian words of v, which must not be negative.
 export function wordsOf(v: bigint): Word[] {
+  // Words below 2**53 are numbers; larger ones are read off the hex digits.
   if (v <= maxSafe) {
     return v === 0n ? [] : [Number(v)]
   }
@@ -38,6 +39,7 @@ export function wordsOf(v: bigint): Word[] {
 
 // fromWords returns the value of the little-endian words.
 export function fromWords(words: Word[]): bigint {
+  // Join the words, least significant first.
   if (words.length === 0) {
     return 0n
   }
@@ -71,6 +73,7 @@ export function bitLen(v: bigint): number {
 // trailingZeroBits returns the number of consecutive least significant zero
 // bits of v, for v > 0.
 export function trailingZeroBits(v: bigint): number {
+  // Count the zero bits below the lowest set bit from the hex digits.
   const hex = v.toString(16)
   let i = hex.length - 1
   while (hex[i] === '0') {
@@ -113,6 +116,8 @@ const digits62 =
 
 // utoa returns the representation of v in the given base, for v >= 0.
 export function utoa(v: bigint, base: number): string {
+  // Bases up to 36 have native formatting; above it the digits include
+  // upper case letters.
   if (base < 2 || base > MaxBase) {
     $.panic('invalid base')
   }
@@ -138,20 +143,28 @@ export interface ByteReader {
   unread(): void
 }
 
-// stringReader reads the bytes of a string, which holds only ASCII when it
-// is a number.
+// StringReader reads the bytes of a string, as Go's strings.Reader does: a
+// string with non-ASCII text reads as its UTF-8 bytes.
 export class StringReader implements ByteReader {
   public err: $.GoError | null = null
   private pos = 0
+  private readonly s: string
 
-  constructor(private readonly s: string) {}
+  constructor(s: string) {
+    this.s =
+      /[^\0-\x7f]/.test(s) ?
+        Array.from(new TextEncoder().encode(s), (b) =>
+          String.fromCharCode(b),
+        ).join('')
+      : s
+  }
 
   public read(): number {
     if (this.pos >= this.s.length) {
       this.err = EOF
       return -1
     }
-    return this.s.charCodeAt(this.pos++) & 0xff
+    return this.s.charCodeAt(this.pos++)
   }
 
   public unread(): void {
@@ -164,7 +177,7 @@ export class StringReader implements ByteReader {
   }
 }
 
-export interface ScanResult {
+interface ScanResult {
   mant: bigint
   base: number
   count: number
@@ -180,6 +193,7 @@ export function scanNat(
   base: number,
   fracOk: boolean,
 ): ScanResult {
+  // Reject a base the scan does not support.
   const baseOk =
     base === 0 ||
     (!fracOk && base >= 2 && base <= MaxBase) ||
@@ -188,12 +202,16 @@ export function scanNat(
     $.panic('invalid number base ' + base)
   }
 
+  // Scanning state: the previous character class tells where a separator
+  // may follow.
   const zero = 48 // '0'
   let prev = 46 // '.'
   let invalSep = false
   let count = 0
   let ch = r.read()
 
+  // A base of 0 reads the base from a 0b, 0o or 0x prefix, and 0 alone is a
+  // decimal digit.
   let b = base
   let prefix = 0
   if (base === 0) {
@@ -244,6 +262,8 @@ export function scanNat(
     chunk *= b
     n++
   }
+
+  // Scan the digits, folding each full chunk into the mantissa.
   const chunkBig = BigInt(chunk)
   let mant = 0n
   let di = 0
@@ -292,6 +312,7 @@ export function scanNat(
     ch = r.read()
   }
 
+  // Report a read error, or a separator that does not sit between digits.
   let err: $.GoError | null = null
   if (ch < 0 && r.err !== EOF) {
     err = r.err
@@ -300,6 +321,7 @@ export function scanNat(
     err = errInvalSep
   }
 
+  // A number with no digits is an error, unless a lone 0 prefix was read.
   if (count === 0) {
     if (prefix === zero) {
       return { mant: 0n, base: 10, count: 1, err }
@@ -307,6 +329,7 @@ export function scanNat(
     err = errNoDigits
   }
 
+  // Fold the digits left in the chunk and count the fraction digits.
   if (i > 0) {
     mant = mant * BigInt(b ** i) + BigInt(di)
   }
@@ -319,6 +342,7 @@ export function scanNat(
 // scanSign reads an optional sign, returning whether the number is negative,
 // or the error that ended the input.
 export function scanSign(r: ByteReader): [boolean, $.GoError | null] {
+  // An optional sign; anything else is left to the number.
   const ch = r.read()
   if (ch < 0) {
     return [false, r.err]
@@ -344,11 +368,13 @@ export function scanExponent(
   base2ok: boolean,
   sepOk: boolean,
 ): [bigint, number, $.GoError | null] {
+  // An empty input has no exponent.
   let ch = r.read()
   if (ch < 0) {
     return [0n, 10, r.err === EOF ? null : r.err]
   }
 
+  // Choose the exponent base from its marker.
   let base = 10
   if (ch === 112 || ch === 80) {
     if (!base2ok) {
@@ -361,6 +387,7 @@ export function scanExponent(
     return [0n, 10, null]
   }
 
+  // Read the optional sign of the exponent.
   let digits = ''
   ch = r.read()
   if (ch === 43 || ch === 45) {
@@ -370,6 +397,7 @@ export function scanExponent(
     ch = r.read()
   }
 
+  // Collect the decimal digits, allowing separators between them.
   let prev = 46 // '.'
   let invalSep = false
   let hasDigits = false
@@ -390,6 +418,7 @@ export function scanExponent(
     ch = r.read()
   }
 
+  // Parse the digits as an int64 and report any scan error.
   let err: $.GoError | null = null
   if (ch < 0 && r.err !== EOF) {
     err = r.err
@@ -423,9 +452,12 @@ export function gcd(a: bigint, b: bigint): bigint {
 
 // bytesOf returns the big-endian bytes of v, which must not be negative.
 export function bytesOf(v: bigint): Uint8Array {
+  // Zero has no bytes.
   if (v === 0n) {
     return new Uint8Array(0)
   }
+
+  // Pad the hex digits to whole bytes and read them pairwise.
   let hex = v.toString(16)
   if (hex.length % 2 === 1) {
     hex = '0' + hex

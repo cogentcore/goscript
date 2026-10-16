@@ -38,11 +38,13 @@ function quotToFloat(
   msize: number,
   esize: number,
 ): [number, boolean] {
+  // Derive the format constants from the mantissa and exponent sizes.
   const msize1 = msize + 1 // including the implicit 1
   const msize2 = msize1 + 1
   const ebias = 2 ** (esize - 1) - 1
   const emin = 1 - ebias
 
+  // Zero is exact.
   const alen = bitLen(a)
   if (alen === 0) {
     return [0, true]
@@ -61,6 +63,7 @@ function quotToFloat(
     b2 <<= BigInt(-shift)
   }
 
+  // Divide to get the mantissa, noting whether a remainder was lost.
   let mantissa = a2 / b2
   let haveRem = a2 % b2 !== 0n
 
@@ -73,6 +76,7 @@ function quotToFloat(
     exp++
   }
 
+  // Denormal results have fewer bits of precision.
   if (emin - msize <= exp && exp <= emin) {
     // Denormal: lose shift bits of precision.
     const lost = BigInt(emin - (exp - 1))
@@ -96,6 +100,7 @@ function quotToFloat(
   }
   mantissa >>= 1n // discard the rounding bit
 
+  // Scale the mantissa into a float64, which is inexact once it overflows.
   const f = Ldexp(Number(mantissa), exp - msize1)
   if (!Number.isFinite(f)) {
     exact = false
@@ -141,6 +146,7 @@ export class Rat {
 
   // setQuo sets the value to n/d for d != 0 in lowest terms.
   public setQuo(n: bigint, d: bigint): Rat {
+    // Keep the denominator positive and the fraction in lowest terms.
     if (d < 0n) {
       n = -n
       d = -d
@@ -162,6 +168,7 @@ export class Rat {
   // SetFloat64 sets z to exactly f and returns z. If f is not finite,
   // SetFloat64 returns nil.
   public SetFloat64(f: number): Rat | null {
+    // Split f into its sign, mantissa and exponent.
     const bits = Float64bits(f)
     const biased = Number((bits >> 52n) & 0x7ffn)
     let mantissa = bits & ((1n << 52n) - 1n)
@@ -177,6 +184,7 @@ export class Rat {
         exp = biased - 1023
     }
 
+    // The value is mantissa * 2**-shift, so scale the numerator or the denominator.
     const shift = 52 - exp
     const n = f < 0 ? -mantissa : mantissa
     return ratOf(this).setQuo(
@@ -192,7 +200,8 @@ export class Rat {
   public Float32(): [number, boolean] {
     const x = ratOf(this)
     const [f, exact] = quotToFloat(abs(x.num), x.den, 23, 8)
-    return [x.num < 0n ? -Math.fround(f) : Math.fround(f), exact]
+    const f32 = Math.fround(f)
+    return [x.num < 0n ? -f32 : f32, exact && Number.isFinite(f32)]
   }
 
   // Float64 returns the nearest float64 value for x and a bool indicating
@@ -315,6 +324,7 @@ export class Rat {
   //	 0 if x == y
   //	+1 if x >  y
   public Cmp(y: RatRef): number {
+    // Compare by cross-multiplying, as the denominators are positive.
     const x = ratOf(this)
     const q = ratOf(y)
     const l = x.num * q.den
@@ -360,6 +370,7 @@ export class Rat {
   // Scan is a support routine for fmt.Scanner. It accepts the formats 'e',
   // 'E', 'f', 'F', 'g', 'G', and 'v'. All formats are equivalent.
   public Scan(s: ScanState, ch: number): $.GoError | null {
+    // Read the token, check the verb, and parse the token as a number.
     const [tok, err] = s.Token(true, (c: number) =>
       '+-/0123456789.eE'.includes(String.fromCodePoint(c)),
     )
@@ -385,11 +396,13 @@ export class Rat {
   // just a prefix, must be valid for success. If the operation failed, the
   // value of z is undefined but the returned value is nil.
   public SetString(s: string): [Rat | null, boolean] {
+    // An empty string is invalid.
     const z = ratOf(this)
     if (s.length === 0) {
       return [null, false]
     }
 
+    // A fraction is a number over a natural number.
     const sep = s.indexOf('/')
     if (sep >= 0) {
       const [num] = new Int().SetString(s.slice(0, sep), 0)
@@ -404,12 +417,14 @@ export class Rat {
       return [z.setQuo(num._v, den.mant), true]
     }
 
+    // Otherwise read a sign, a mantissa, and an optional exponent.
     const r = new StringReader(s)
     const [neg, signErr] = scanSign(r)
     if (signErr !== null) {
       return [null, false]
     }
 
+    // The mantissa and the exponent must consume the whole string.
     const mant = scanNat(r, 0, true)
     if (mant.err !== null) {
       return [null, false]
@@ -419,6 +434,7 @@ export class Rat {
       return [null, false]
     }
 
+    // Zero needs no scaling.
     if (mant.mant === 0n) {
       return [z.setQuo(0n, 1n), true]
     }
@@ -458,6 +474,7 @@ export class Rat {
         $.panic('unexpected exponent base')
     }
 
+    // Apply the powers of 5 to the numerator or the denominator.
     let n = mant.mant
     let d = 1n
     if (exp5 !== 0n) {
@@ -472,6 +489,7 @@ export class Rat {
       }
     }
 
+    // Apply the power of 2 as a shift.
     if (exp2 < -10000000n || exp2 > 10000000n) {
       return [null, false] // avoid excessively large exponents
     }
@@ -502,6 +520,7 @@ export class Rat {
   // digits of precision after the radix point. The last digit is rounded to
   // nearest, with halves rounded away from zero.
   public FloatString(prec: number): string {
+    // An integer has no fraction to round.
     const x = ratOf(this)
     if (x.IsInt()) {
       return x.num.toString() + (prec > 0 ? '.' + '0'.repeat(prec) : '')
@@ -522,6 +541,7 @@ export class Rat {
       }
     }
 
+    // Assemble the sign, the integer part and the fraction digits.
     let s = (x.num < 0n ? '-' : '') + q.toString()
     if (prec > 0) {
       s += '.' + r.toString().padStart(prec, '0')
@@ -540,12 +560,14 @@ export class Rat {
     const p2 = trailingZeroBits(q)
     q >>= BigInt(p2)
 
+    // Tabulate the powers 5**(13*2**i) that divide q.
     const fp = 13 // f == 5**fp
     const tab: bigint[] = [] // tab[i] == 5**(fp*2**i)
     for (let f = 1220703125n; q % f === 0n; f *= f) {
       tab.push(f)
     }
 
+    // Divide out the powers of 5, largest first.
     let p5 = 0
     for (let i = tab.length - 1; i >= 0; i--) {
       if (q % tab[i] === 0n) {
@@ -562,9 +584,12 @@ export class Rat {
 
   // GobEncode implements the gob.GobEncoder interface.
   public GobEncode(): [Uint8Array, $.GoError | null] {
+    // Encode the numerator magnitude and the denominator.
     const x = ratOf(this)
     const a = bytesOf(abs(x.num))
     const b = bytesOf(x._b._v)
+
+    // Write the version and sign, the numerator length, and both numbers.
     const buf = new Uint8Array(1 + 4 + a.length + b.length)
     buf[0] = (ratGobVersion << 1) | (x.num < 0n ? 1 : 0)
     new DataView(buf.buffer).setUint32(1, a.length)
@@ -575,13 +600,18 @@ export class Rat {
 
   // GobDecode implements the gob.GobDecoder interface.
   public GobDecode(buf: $.Slice<number>): $.GoError | null {
+    // Read the buffer as bytes.
     const z = ratOf(this)
     const bytes = $.bytesToUint8Array(buf)
+
+    // An empty buffer is the zero value.
     if (bytes.length === 0) {
       z._a.put(0n)
       z._b.put(0n)
       return null
     }
+
+    // The header holds the version and sign and the numerator length.
     if (bytes.length < 5) {
       return $.newError('Rat.GobDecode: buffer too small')
     }
@@ -591,6 +621,8 @@ export class Rat {
         'Rat.GobDecode: encoding version ' + (b >> 1) + ' not supported',
       )
     }
+
+    // The numerator follows the header, and the denominator the numerator.
     const i = 5 + new DataView(bytes.buffer, bytes.byteOffset).getUint32(1)
     if (bytes.length < i) {
       return $.newError('Rat.GobDecode: buffer too small')
