@@ -6,6 +6,7 @@ import {
   interfaceValue,
   pointerType,
   registerStructType,
+  typedNil,
   TypeKind,
 } from './type.js'
 
@@ -69,6 +70,31 @@ describe('Go map pointer keys', () => {
     expect(map.size).toBe(0)
     expect(entries).not.toHaveBeenCalled()
     expect(fields).not.toHaveBeenCalled()
+  })
+})
+
+describe('Go map typed nil keys', () => {
+  it('finds the typed nil of the same type without scanning', () => {
+    // An interface-keyed map, as go/types looks up a nil *Var in objMap.
+    const map = makeMap<object, number>()
+    for (let i = 0; i < 64; i++) {
+      mapSet(
+        map,
+        interfaceValue({}, '*types.Func', pointerType('types.Func')),
+        i,
+      )
+    }
+    const entries = vi.spyOn(map, 'entries')
+    expect(mapGet(map, typedNil('*types.Var'), -1)).toEqual([-1, false])
+    mapSet(map, typedNil('*types.Var'), 64)
+    mapSet(map, typedNil('*types.Var'), 65)
+    expect(map.size).toBe(65)
+    expect(mapGet(map, typedNil('*types.Var'), -1)).toEqual([65, true])
+    expect(mapHas(map, typedNil('*types.Const'))).toBe(false)
+    deleteMapEntry(map, typedNil('*types.Var'))
+    expect(mapHas(map, typedNil('*types.Var'))).toBe(false)
+    expect(map.size).toBe(64)
+    expect(entries).not.toHaveBeenCalled()
   })
 })
 

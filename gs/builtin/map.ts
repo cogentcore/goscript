@@ -19,6 +19,9 @@ class GoMap<K, V> extends Map<K, V> {
   readonly pointerKeys: boolean
   private pointerIndex?: Map<object, K>
   private structKeys?: Map<string, K[]>
+  // typedNilKeys holds the stored typed nil key of each Go type. All typed
+  // nils of a type are equal, so the map holds at most one of them.
+  private typedNilKeys?: Map<string, K>
 
   constructor(keyType?: TypeInfo | string) {
     super()
@@ -33,6 +36,11 @@ class GoMap<K, V> extends Map<K, V> {
         this.pointerIndex ??= new Map<object, K>()
         this.pointerIndex.set(canonicalPointerIdentity(key), key)
       }
+    } else if (isTypedNilKey(key)) {
+      const stored = this.storedKey(key)
+      this.typedNilKeys ??= new Map<string, K>()
+      this.typedNilKeys.set(key.__goType, stored)
+      key = stored
     } else if (typeof key !== 'string') {
       const stored = this.structEntry(key)
       if (stored !== undefined) {
@@ -57,6 +65,9 @@ class GoMap<K, V> extends Map<K, V> {
     if (this.pointerKeys || isInterfacePointerKey(key)) {
       if (typeof key === 'object' && key !== null)
         this.pointerIndex?.delete(canonicalPointerIdentity(key))
+    } else if (isTypedNilKey(key)) {
+      if (stored === this.typedNilKeys?.get(key.__goType))
+        this.typedNilKeys?.delete(key.__goType)
     } else if (typeof key !== 'string') this.removeStructKey(stored)
     return super.delete(stored)
   }
@@ -64,6 +75,7 @@ class GoMap<K, V> extends Map<K, V> {
   override clear(): void {
     this.pointerIndex?.clear()
     this.structKeys?.clear()
+    this.typedNilKeys?.clear()
     super.clear()
   }
 
@@ -109,6 +121,13 @@ class GoMap<K, V> extends Map<K, V> {
     }
     if (typeof key === 'string') {
       return key
+    }
+
+    // A typed nil key is the stored typed nil of its type, which Go also
+    // compares equal to it.
+    if (isTypedNilKey(key)) {
+      const stored = this.typedNilKeys?.get(key.__goType)
+      return stored !== undefined && comparableEqual(stored, key) ? stored : key
     }
     return this.structEntry(key) ?? key
   }
@@ -170,6 +189,16 @@ function isInterfacePointerKey(key: unknown): key is object {
     boxed.__goType.startsWith('*') &&
     boxed.__isTypedNil !== true
   )
+}
+
+// isTypedNilKey reports whether key is a typed nil, such as a nil pointer
+// held in an interface, which comparableEqual finds equal only to the typed
+// nils of its own type. GoMap indexes such keys by their type, instead of
+// comparing them with every key of the map.
+function isTypedNilKey(key: unknown): key is { __goType: string } {
+  if (typeof key !== 'object' || key === null) return false
+  const boxed = key as { __goType?: unknown; __isTypedNil?: unknown }
+  return typeof boxed.__goType === 'string' && boxed.__isTypedNil === true
 }
 
 // makeMap receives pointer or generic key metadata from the compiler; other
@@ -258,7 +287,10 @@ function findMapEntry<K, V>(
   if (map.has(key)) {
     return { found: true, key, value: map.get(key)! }
   }
-  if (map instanceof GoMap && (map.pointerKeys || isInterfacePointerKey(key))) {
+  if (
+    map instanceof GoMap &&
+    (map.pointerKeys || isInterfacePointerKey(key) || isTypedNilKey(key))
+  ) {
     return { found: false }
   }
   if (typeof key === 'string') return { found: false }
