@@ -547,6 +547,42 @@ describe('builtin runtime contract helpers', () => {
     expect(comparableEqual(first, different)).toBe(false)
   })
 
+  it('compares pointers to structs by identity and struct values by fields', () => {
+    class Node {
+      declare public name: string
+      declare public parent: Node | null
+
+      constructor(name: string, parent: Node | null) {
+        this.name = name
+        this.parent = parent
+      }
+
+      static __typeInfo = registerStructType('example.Node', null, [], Node, [
+        { name: 'name', type: { kind: TypeKind.Basic, name: 'string' } },
+        {
+          name: 'parent',
+          type: { kind: TypeKind.Pointer, elemType: 'example.Node' },
+        },
+      ])
+    }
+
+    // Two pointers to equal structs that point at each other are different.
+    const first = new Node('leaf', null)
+    const second = new Node('leaf', first)
+    first.parent = second
+    expect(comparableEqual(first, second)).toBe(false)
+    expect(comparableEqual(first, first)).toBe(true)
+
+    // Struct values with the same fields are equal.
+    const root = new Node('root', null)
+    expect(
+      comparableEqual(
+        markAsStructValue(new Node('leaf', root)),
+        markAsStructValue(new Node('leaf', root)),
+      ),
+    ).toBe(true)
+  })
+
   it('compares the elements of slice windows', () => {
     const backing = [1, 2, 3, 1, 2, 4]
     const first = goSlice(backing, 0, 3)
