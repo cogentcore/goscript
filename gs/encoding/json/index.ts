@@ -111,10 +111,13 @@ export class SyntaxError extends jsonError {
 }
 
 // Register *json.SyntaxError so a Go `err.(*json.SyntaxError)` assertion in
-// compiled code resolves to this class and exposes the Offset field.
+// compiled code resolves to this class and exposes the Offset field. The zero
+// value is made on demand: constructing an Error while the bundle's top level
+// runs makes V8 collect the source positions of the whole bundle (it reparses
+// it, about 150 ms for a 26 MB app in Chrome).
 $.registerStructType(
   'json.SyntaxError',
-  new SyntaxError(),
+  () => new SyntaxError(),
   [
     {
       name: 'Error',
