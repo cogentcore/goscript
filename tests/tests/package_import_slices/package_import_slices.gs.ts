@@ -182,7 +182,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 	let copySrc = $.arrayToSlice<cell>([$.markAsStructValue(new cell({n: 1})), $.markAsStructValue(new cell({n: 2}))])
 	let copyDst = $.arrayToSlice<cell>([$.markAsStructValue(new cell({n: 0})), $.markAsStructValue(new cell({n: 0}))])
-	$.copy(copyDst, copySrc)
+	$.copy(copyDst, copySrc, true)
 	$.arrayIndex(copyDst!, 0).n = 9
 	await $.println("copy struct:", $.arrayIndex(copySrc!, 0).n, $.arrayIndex(copySrc!, 1).n, $.arrayIndex(copyDst!, 0).n, $.arrayIndex(copyDst!, 1).n)
 
