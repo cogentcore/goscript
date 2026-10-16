@@ -12,14 +12,14 @@ export async function main(): globalThis.Promise<void> {
 	let p2 = x
 
 	// These should be different pointers but point to the same value
-	await $.println("p1==p2:", (p1 === p2 || $.pointerAliasesMade && $.pointerEqual(p1, p2)))
+	await $.println("p1==p2:", (p1 === p2 || ($.pointerAliasesMade || (p1 as any)?.__goElementBacking !== undefined) && $.pointerEqual(p1, p2)))
 	await $.println("*p1==*p2:", $.pointerValue<number>(p1) == $.pointerValue<number>(p2))
 
 	// Now create a third pointer that's a copy of p1
 	let p3 = p1
 
 	// These should be the same pointer
-	await $.println("p1==p3:", (p1 === p3 || $.pointerAliasesMade && $.pointerEqual(p1, p3)))
+	await $.println("p1==p3:", (p1 === p3 || ($.pointerAliasesMade || (p1 as any)?.__goElementBacking !== undefined) && $.pointerEqual(p1, p3)))
 
 	// Now, let's create a scenario where one pointer is varrefed by taking its address
 	// but we compare it to itself through a different path
@@ -38,7 +38,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// This is a comparison of the same pointer through different paths
 	// but one path involves a varrefed variable and one doesn't
-	await $.println("pp1==savedPP1:", (pp1.value === savedPP1 || $.pointerAliasesMade && $.pointerEqual(pp1.value, savedPP1)))
+	await $.println("pp1==savedPP1:", (pp1.value === savedPP1 || ($.pointerAliasesMade || (pp1.value as any)?.__goElementBacking !== undefined) && $.pointerEqual(pp1.value, savedPP1)))
 
 	// Print dereferenced values to verify they're the same
 	await $.println("**pp1:", $.pointerValue<number>($.pointerValue<$.VarRef<number> | null>(pp1.value)))

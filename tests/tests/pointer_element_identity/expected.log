@@ -1,0 +1,23 @@
+struct direct true true true
+struct slice true true
+struct copy true true false
+struct map true false
+struct iface true false
+struct field true true true
+struct subslice true false
+struct generic true 1 second first first
+struct key 10 11 2
+struct pair key 2 1 true
+int true true true false
+float32 true true false
+int slice true
+array struct true true false
+array int true true false
+field true true true true true
+field local true true true
+unsafe true true
+reflect true false
+slices 1 true 2
+atomic true true
+chan true
+writes 99 55

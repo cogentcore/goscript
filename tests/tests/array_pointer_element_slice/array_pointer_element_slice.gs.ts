@@ -39,7 +39,7 @@ export async function main(): globalThis.Promise<void> {
 	let child = new node();
 	;(root$ as node).sub = $.appendOne($.goSlice((root$ as node).sub0, undefined, 0), child, $.appendZeros.nil)
 
-	await $.println($.sliceLen((root$ as node).sub), ($.arrayIndex((root$ as node).sub!, 0) === child || $.pointerAliasesMade && $.pointerEqual($.arrayIndex((root$ as node).sub!, 0), child)))
+	await $.println($.sliceLen((root$ as node).sub), ($.arrayIndex((root$ as node).sub!, 0) === child || ($.pointerAliasesMade || ($.arrayIndex((root$ as node).sub!, 0) as any)?.__goElementBacking !== undefined) && $.pointerEqual($.arrayIndex((root$ as node).sub!, 0), child)))
 }
 
 if ($.isMainScript(import.meta)) {

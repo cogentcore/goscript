@@ -98,7 +98,7 @@ export async function main(): globalThis.Promise<void> {
 	let pointers = $.arrayValue([new item(false, 1)])
 	let pointersCopy = $.cloneArrayValue(pointers, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.pointerType("main.item"), 1))
 	$.pointerValue<item>($.arrayIndex(pointersCopy, 0)).value = 7
-	await $.println("pointer sharing:", $.pointerValue<item>($.arrayIndex(pointers, 0)).value, ($.arrayIndex(pointers, 0) === $.arrayIndex(pointersCopy, 0) || $.pointerAliasesMade && $.pointerEqual($.arrayIndex(pointers, 0), $.arrayIndex(pointersCopy, 0))))
+	await $.println("pointer sharing:", $.pointerValue<item>($.arrayIndex(pointers, 0)).value, ($.arrayIndex(pointers, 0) === $.arrayIndex(pointersCopy, 0) || ($.pointerAliasesMade || ($.arrayIndex(pointers, 0) as any)?.__goElementBacking !== undefined) && $.pointerEqual($.arrayIndex(pointers, 0), $.arrayIndex(pointersCopy, 0))))
 
 	let original = new arrays(true, slices, structs)
 	let copied = (original).clone()
