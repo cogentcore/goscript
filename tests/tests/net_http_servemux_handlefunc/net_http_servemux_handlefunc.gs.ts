@@ -14,7 +14,7 @@ export async function serve(handler: http.Handler | null, target: string): globa
 	let rec = httptest.NewRecorder()
 	let rec$: httptest.ResponseRecorder = rec == null ? $.pointerTarget<httptest.ResponseRecorder>(rec) : (rec as any).__isVarRef === true ? (rec as any).value : (rec as any).__goValue === undefined ? (rec as any) : $.pointerTarget<httptest.ResponseRecorder>(rec)
 	await (handler !== null && (handler as any).__isVarRef !== true && ((handler as any).__goValue === undefined || (handler as any).__goType?.charCodeAt(0) !== 42) ? (handler as Exclude<http.Handler, null>) : $.pointerValue<Exclude<http.Handler, null>>(handler)).ServeHTTP($.pointerValueOrNil($.interfaceValue<http.ResponseWriter | null>(rec, "*httptest.ResponseRecorder", /* @__PURE__ */ $.pointerType("httptest.ResponseRecorder")))!, httptest.NewRequest(http.MethodGet, target, null!))
-	await $.println(target, "->", (rec$ as httptest.ResponseRecorder).Code, await http.Header_Get(httptest.ResponseRecorder.prototype.Header.call($.pointerValue<httptest.ResponseRecorder>(rec)), "X-Route"), $.pointerValue<bytes.Buffer>((rec$ as httptest.ResponseRecorder).Body).String())
+	await $.println(target, "->", (rec$ as httptest.ResponseRecorder).Code, await http.Header_Get((rec !== null && (rec as any).__isVarRef !== true && (rec as any).__goValue === undefined ? ((rec as any) as httptest.ResponseRecorder).Header() : httptest.ResponseRecorder.prototype.Header.call($.pointerValue<httptest.ResponseRecorder>(rec))), "X-Route"), $.pointerValue<bytes.Buffer>((rec$ as httptest.ResponseRecorder).Body).String())
 }
 
 export async function main(): globalThis.Promise<void> {

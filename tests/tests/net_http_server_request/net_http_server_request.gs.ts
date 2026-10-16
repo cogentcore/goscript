@@ -49,7 +49,7 @@ export async function main(): globalThis.Promise<void> {
 			}
 		}
 	}, ({ kind: $.TypeKind.Function, params: ["http.ResponseWriter", /* @__PURE__ */ $.pointerType("http.Request")], results: [] } as $.FunctionTypeInfo)), "http.HandlerFunc", ({ kind: $.TypeKind.Function, name: "http.HandlerFunc", params: ["http.ResponseWriter", /* @__PURE__ */ $.pointerType("http.Request")], results: [] } as $.FunctionTypeInfo)), "http.HandlerFunc", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()))!)
-	__defer.defer(() => { httptest.Server.prototype.Close.call($.pointerValue<httptest.Server>(server)) })
+	__defer.defer(() => { (server !== null && (server as any).__isVarRef !== true && (server as any).__goValue === undefined ? ((server as any) as httptest.Server).Close() : httptest.Server.prototype.Close.call($.pointerValue<httptest.Server>(server))) })
 
 	let __goscriptTuple3: any = await http.Get($.pointerValue<httptest.Server>(server).URL + "/?x=1")
 	let resp: http.Response | $.VarRef<http.Response> | null = __goscriptTuple3[0]

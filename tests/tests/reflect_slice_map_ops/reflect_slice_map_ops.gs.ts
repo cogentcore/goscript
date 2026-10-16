@@ -91,13 +91,13 @@ export async function main(): globalThis.Promise<void> {
 	// MapRange starts before the first entry and uses the map's types.
 	let it = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.makeMap<string, number>([["x", 3]]), "map[string]float32", /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("float32")))))).MapRange()
 	let n = 0
-	while (reflect.MapIter.prototype.Next.call($.pointerValue<reflect.MapIter>(it))) {
+	while ((it !== null && (it as any).__isVarRef !== true && (it as any).__goValue === undefined ? ((it as any) as reflect.MapIter).Next() : reflect.MapIter.prototype.Next.call($.pointerValue<reflect.MapIter>(it)))) {
 		n++
-		await $.println($.markAsStructValue($.cloneStructValue(reflect.MapIter.prototype.Key.call($.pointerValue<reflect.MapIter>(it)))).String(), reflect.Kind_String($.markAsStructValue($.cloneStructValue(reflect.MapIter.prototype.Value.call($.pointerValue<reflect.MapIter>(it)))).Kind()), $.markAsStructValue($.cloneStructValue(reflect.MapIter.prototype.Value.call($.pointerValue<reflect.MapIter>(it)))).Float())
+		await $.println($.markAsStructValue($.cloneStructValue((it !== null && (it as any).__isVarRef !== true && (it as any).__goValue === undefined ? ((it as any) as reflect.MapIter).Key() : reflect.MapIter.prototype.Key.call($.pointerValue<reflect.MapIter>(it))))).String(), reflect.Kind_String($.markAsStructValue($.cloneStructValue((it !== null && (it as any).__isVarRef !== true && (it as any).__goValue === undefined ? ((it as any) as reflect.MapIter).Value() : reflect.MapIter.prototype.Value.call($.pointerValue<reflect.MapIter>(it))))).Kind()), $.markAsStructValue($.cloneStructValue((it !== null && (it as any).__isVarRef !== true && (it as any).__goValue === undefined ? ((it as any) as reflect.MapIter).Value() : reflect.MapIter.prototype.Value.call($.pointerValue<reflect.MapIter>(it))))).Float())
 	}
 	await $.println(n)
 	let empty = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.makeMap<string, number>([]), "map[string]int", /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("int")))))).MapRange()
-	await $.println(reflect.MapIter.prototype.Next.call($.pointerValue<reflect.MapIter>(empty)))
+	await $.println((empty !== null && (empty as any).__isVarRef !== true && (empty as any).__goValue === undefined ? ((empty as any) as reflect.MapIter).Next() : reflect.MapIter.prototype.Next.call($.pointerValue<reflect.MapIter>(empty))))
 
 	// Append appends after the slice's length, within its capacity.
 	let s: $.VarRef<$.Slice<number>> = $.varRef($.arrayToSlice<number>([1, 2, 3]))

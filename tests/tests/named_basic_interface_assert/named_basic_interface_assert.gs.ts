@@ -217,7 +217,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("map:", ok)
 
 	let d = json.NewDecoder($.pointerValueOrNil($.interfaceValue<io.Reader | null>(strings.NewReader("{\"n\": 12}"), "*strings.Reader", /* @__PURE__ */ $.pointerType("strings.Reader")))!)
-	json.Decoder.prototype.UseNumber.call($.pointerValue<json.Decoder>(d))
+	void (d !== null && (d as any).__isVarRef !== true && (d as any).__goValue === undefined ? ((d as any) as json.Decoder).UseNumber() : json.Decoder.prototype.UseNumber.call($.pointerValue<json.Decoder>(d)))
 	let obj: $.VarRef<globalThis.Map<string, any> | null> = $.varRef(null! as globalThis.Map<string, any> | null)
 	{
 		let err = await json.Decoder.prototype.Decode.call($.pointerValue<json.Decoder>(d), $.interfaceValue(obj, "*map[string]interface{}", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), { kind: $.TypeKind.Interface, methods: [] }))))

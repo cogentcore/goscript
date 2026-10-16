@@ -47,7 +47,7 @@ export function newElementPool(__typeArgs: $.GenericTypeArgs | undefined): sync.
 }
 
 export function pushPooled(__typeArgs: $.GenericTypeArgs | undefined, pool: sync.Pool | $.VarRef<sync.Pool> | null, value: any): pooledElement | $.VarRef<pooledElement> | null {
-	let element = $.mustTypeAssert<pooledElement | $.VarRef<pooledElement> | null>(sync.Pool.prototype.Get.call($.pointerValue<sync.Pool>(pool)), /* @__PURE__ */ $.pointerType("main.pooledElement"))
+	let element = $.mustTypeAssert<pooledElement | $.VarRef<pooledElement> | null>((pool !== null && (pool as any).__isVarRef !== true && (pool as any).__goValue === undefined ? ((pool as any) as sync.Pool).Get() : sync.Pool.prototype.Get.call($.pointerValue<sync.Pool>(pool))), /* @__PURE__ */ $.pointerType("main.pooledElement"))
 	$.pointerValue<pooledElement>(element).Value = $.copyElement(value)
 	return element
 }
@@ -68,7 +68,7 @@ export async function main(): globalThis.Promise<void> {
 	let pool = newElementPool(__goscriptStatic0())
 	let pooled = (pushPooled(__goscriptStatic0(), pool, "pooled") as pooledElement | $.VarRef<pooledElement> | null)
 	fmt.Println("pool", $.pointerValue<pooledElement>(pooled).Value)
-	sync.Pool.prototype.Put.call($.pointerValue<sync.Pool>(pool), $.interfaceValue(pooled, "*main.pooledElement", /* @__PURE__ */ $.pointerType("main.pooledElement")))
+	void (pool !== null && (pool as any).__isVarRef !== true && (pool as any).__goValue === undefined ? ((pool as any) as sync.Pool).Put($.interfaceValue(pooled, "*main.pooledElement", /* @__PURE__ */ $.pointerType("main.pooledElement"))) : sync.Pool.prototype.Put.call($.pointerValue<sync.Pool>(pool), $.interfaceValue(pooled, "*main.pooledElement", /* @__PURE__ */ $.pointerType("main.pooledElement"))))
 	fmt.Println("pool-reused", $.pointerValue<pooledElement>(pushPooled(__goscriptStatic0(), pool, "reused")).Value)
 }
 

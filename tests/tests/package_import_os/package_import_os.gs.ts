@@ -106,9 +106,9 @@ export async function main(): globalThis.Promise<void> {
 		let __goscriptShadow1 = __goscriptTuple1[1]
 		if (__goscriptShadow1 == null) {
 			await $.println("CreateTemp ok")
-			await $.println("CreateTemp name empty:", $.stringEqual(os.File.prototype.Name.call($.pointerValue<os.File>(tempFile)), ""))
-			await os.File.prototype.Close.call($.pointerValue<os.File>(tempFile))
-			await os.Remove(os.File.prototype.Name.call($.pointerValue<os.File>(tempFile)))
+			await $.println("CreateTemp name empty:", $.stringEqual((tempFile !== null && (tempFile as any).__isVarRef !== true && (tempFile as any).__goValue === undefined ? ((tempFile as any) as os.File).Name() : os.File.prototype.Name.call($.pointerValue<os.File>(tempFile))), ""))
+			await (tempFile !== null && (tempFile as any).__isVarRef !== true && (tempFile as any).__goValue === undefined ? ((tempFile as any) as os.File).Close() : os.File.prototype.Close.call($.pointerValue<os.File>(tempFile)))
+			await os.Remove((tempFile !== null && (tempFile as any).__isVarRef !== true && (tempFile as any).__goValue === undefined ? ((tempFile as any) as os.File).Name() : os.File.prototype.Name.call($.pointerValue<os.File>(tempFile))))
 		} else {
 			await $.println("CreateTemp error:", (__goscriptAwait = (__goscriptShadow1 !== null && (__goscriptShadow1 as any).__isVarRef !== true && ((__goscriptShadow1 as any).__goValue === undefined || (__goscriptShadow1 as any).__goType?.charCodeAt(0) !== 42) ? (__goscriptShadow1 as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(__goscriptShadow1)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		}
