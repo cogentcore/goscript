@@ -36,6 +36,7 @@ import {
   runeToString,
   runesToString,
   sliceString,
+  sliceStringEqual,
   stringCompare,
   stringEqual,
   stringLen,
@@ -472,6 +473,18 @@ describe('builtin string byte representation', () => {
     expect(stringEqual(peerID, bytesToString(peerID))).toBe(true)
     expect(stringEqual(peerID, '')).toBe(false)
     expect(stringEqual(new Uint8Array(0), '')).toBe(true)
+  })
+
+  it('compares a slice of a string in place', () => {
+    const peerID = new Uint8Array([0, 255, 65])
+
+    expect(sliceStringEqual('func main', 0, 4, 'func')).toBe(true)
+    expect(sliceStringEqual('func main', 5, undefined, 'main')).toBe(true)
+    expect(sliceStringEqual('func main', undefined, 3, 'func')).toBe(false)
+    expect(
+      sliceStringEqual(peerID, 1, 3, bytesToString(peerID.subarray(1))),
+    ).toBe(true)
+    expect(() => sliceStringEqual('abc', 2, 4, 'x')).toThrow(/out of range/)
   })
 
   it('matches byte-backed strings as map keys', () => {

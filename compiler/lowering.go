@@ -9364,6 +9364,67 @@ func (o *LoweringOwner) lowerStringEqualityExpr(ctx lowerFileContext, expr *ast.
 	return value, true
 }
 
+// lowerStringSliceEqualityExpr lowers s[low:high] == t, and t == s[low:high]
+// when t is a constant or a variable, to a runtime comparison that checks the
+// bounds of the slice expression and compares its bytes in place, without
+// making the substring. The operands keep their order of evaluation.
+func (o *LoweringOwner) lowerStringSliceEqualityExpr(ctx lowerFileContext, expr *ast.BinaryExpr) (string, []Diagnostic, bool) {
+	// One operand is a two-index slice of a string, and the other a string.
+	info := ctx.semPkg.source.TypesInfo
+	slice, other := stringSliceOperand(info, expr.X), expr.Y
+	if slice == nil {
+		slice, other = stringSliceOperand(info, expr.Y), expr.X
+		if slice == nil || !isSimpleStringOperand(info, other) {
+			return "", nil, false
+		}
+	}
+	if !isStringType(info.TypeOf(other)) {
+		return "", nil, false
+	}
+
+	// The slice operands are lowered as lowerSliceExpr lowers them.
+	target, diagnostics := o.lowerExpr(ctx, slice.X)
+	low, lowDiagnostics := o.lowerOptionalExpr(ctx, slice.Low)
+	high, highDiagnostics := o.lowerOptionalExpr(ctx, slice.High)
+	value, valueDiagnostics := o.lowerExpr(ctx, other)
+	low = o.lowerNumberIndexValue(ctx, slice.Low, low)
+	high = o.lowerNumberIndexValue(ctx, slice.High, high)
+	diagnostics = append(append(append(diagnostics, lowDiagnostics...), highDiagnostics...), valueDiagnostics...)
+
+	// != negates the comparison.
+	call := o.runtimeOwner.QualifiedHelper(RuntimeHelperSliceStringEqual) +
+		"(" + strings.Join([]string{target, low, high, value}, ", ") + ")"
+	if expr.Op == token.NEQ {
+		call = "!" + call
+	}
+	return call, diagnostics, true
+}
+
+// stringSliceOperand returns expr as a two-index slice expression of a
+// string, or nil if it is not one.
+func stringSliceOperand(info *types.Info, expr ast.Expr) *ast.SliceExpr {
+	slice, ok := unwrapParenExpr(expr).(*ast.SliceExpr)
+	if !ok || slice.Slice3 || !isStringType(info.TypeOf(slice.X)) {
+		return nil
+	}
+	return slice
+}
+
+// isSimpleStringOperand reports whether expr is a constant or a variable,
+// whose evaluation the bounds and target of a slice may follow.
+func isSimpleStringOperand(info *types.Info, expr ast.Expr) bool {
+	expr = unwrapParenExpr(expr)
+	if info.Types[expr].Value != nil {
+		return true
+	}
+	ident, ok := expr.(*ast.Ident)
+	if !ok {
+		return false
+	}
+	_, isVar := info.Uses[ident].(*types.Var)
+	return isVar
+}
+
 // isStringConcat reports whether expr concatenates strings.
 func isStringConcat(ctx lowerFileContext, expr *ast.BinaryExpr) bool {
 	return expr.Op == token.ADD && isStringType(ctx.semPkg.source.TypesInfo.TypeOf(expr))
@@ -9557,6 +9618,9 @@ func (o *LoweringOwner) lowerExpr(ctx lowerFileContext, expr ast.Expr) (string, 
 		}
 		if isEqualityOperator(typed.Op) {
 			if value, diagnostics, ok := o.lowerAddressEqualityExpr(ctx, typed); ok {
+				return value, diagnostics
+			}
+			if value, diagnostics, ok := o.lowerStringSliceEqualityExpr(ctx, typed); ok {
 				return value, diagnostics
 			}
 		}

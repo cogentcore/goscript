@@ -3226,6 +3226,46 @@ export const sliceString = (
   return text.substring(actualLow, actualHigh)
 }
 
+// sliceStringEqual reports whether str[low:high] == other, as the compiler
+// lowers that comparison, without making the substring. The bounds are
+// checked as sliceString checks them.
+export function sliceStringEqual(
+  str: GoStringBytes,
+  low: number | undefined,
+  high: number | undefined,
+  other: GoStringBytes,
+): boolean {
+  // A string held in bytes is sliced and compared as stringEqual compares it.
+  if (typeof str !== 'string' || typeof other !== 'string') {
+    return stringEqual(sliceStringOrBytes(str as string, low, high), other)
+  }
+
+  // The bounds are in bytes, which are the string's characters.
+  const actualLow = low === undefined ? 0 : low
+  const actualHigh = high === undefined ? str.length : high
+  if (actualLow < 0 || actualHigh < actualLow || actualHigh > str.length) {
+    runtimePanic(
+      `runtime error: slice bounds out of range [${actualLow}:${actualHigh}] with length ${str.length}`,
+    )
+  }
+
+  // The bytes are compared in place: one by one for a short string, as
+  // that is faster than startsWith there.
+  const length = other.length
+  if (actualHigh - actualLow !== length) {
+    return false
+  }
+  if (length > 16) {
+    return str.startsWith(other, actualLow)
+  }
+  for (let i = 0; i < length; i++) {
+    if (str.charCodeAt(actualLow + i) !== other.charCodeAt(i)) {
+      return false
+    }
+  }
+  return true
+}
+
 /** bytesFromHex decodes compiler-emitted constant byte arrays. */
 export function bytesFromHex(hex: string): Uint8Array {
   const bytes = new Uint8Array(hex.length / 2)
