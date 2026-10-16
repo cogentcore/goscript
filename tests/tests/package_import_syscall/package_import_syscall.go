@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/netip"
+	"os"
 	"syscall"
 )
 
@@ -20,6 +21,9 @@ func main() {
 		fmt.Println("cloexec supported")
 	}
 	fmt.Println("signals:", int(syscall.SIGINT), int(syscall.SIGKILL), int(syscall.SIGTERM))
+	var sig os.Signal = syscall.SIGTERM
+	sig.Signal()
+	fmt.Println("signal named:", sig.String() != "")
 	if err := syscall.Kill(1, syscall.SIGKILL); err == nil {
 		fmt.Println("kill unexpectedly succeeded")
 	} else {
