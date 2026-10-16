@@ -1,5 +1,6 @@
 cloexec supported
 signals: 2 9 15
+signal named: true
 kill: function not implemented
 stat: 1970-01-01T00:00:05.000000007Z 3ns
 set nonblock ok

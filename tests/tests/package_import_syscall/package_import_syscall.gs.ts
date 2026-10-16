@@ -4,9 +4,11 @@
 import * as $ from "@goscript/builtin/index.js"
 import * as fmt from "@goscript/fmt/index.js"
 import * as netip from "@goscript/net/netip/index.js"
+import * as os from "@goscript/os/index.js"
 import * as syscall from "@goscript/syscall/index.js"
 import type * as sync from "@goscript/sync/index.js"
 import * as __goscript_stat_js from "./stat_js.gs.ts"
+import "@goscript/os/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	syscall.CloseOnExec(1)
@@ -28,6 +30,9 @@ export async function main(): globalThis.Promise<void> {
 		fmt.Println("cloexec supported")
 	}
 	fmt.Println("signals:", $.basicInterfaceValue(syscall.SIGINT, "int"), $.basicInterfaceValue(syscall.SIGKILL, "int"), $.basicInterfaceValue(syscall.SIGTERM, "int"))
+	let sig: os.Signal | null = $.namedValueInterfaceValue<os.Signal | null>(syscall.SIGTERM, "syscall.Signal", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2())
+	void (__goscriptAwait = (sig !== null && (sig as any).__isVarRef !== true && ((sig as any).__goValue === undefined || (sig as any).__goType?.charCodeAt(0) !== 42) ? (sig as Exclude<os.Signal, null>) : $.pointerValue<Exclude<os.Signal, null>>(sig)).Signal(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+	fmt.Println("signal named:", !$.stringEqual((__goscriptAwait = (sig !== null && (sig as any).__isVarRef !== true && ((sig as any).__goValue === undefined || (sig as any).__goType?.charCodeAt(0) !== 42) ? (sig as Exclude<os.Signal, null>) : $.pointerValue<Exclude<os.Signal, null>>(sig)).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), ""))
 	{
 		let err = syscall.Kill(1, 3)
 		if (err == null) {
@@ -77,6 +82,21 @@ export async function main(): globalThis.Promise<void> {
 	sa6.Addr = addr6.As16()
 
 	fmt.Println("set nonblock ok")
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= ({Signal: (receiver: any) => (syscall.Signal_Signal as any)(($.isVarRef(receiver) ? receiver.value : receiver)), String: (receiver: any) => (syscall.Signal_String as any)(($.isVarRef(receiver) ? receiver.value : receiver))})
+}
+
+var __goscriptStatic1$value: any
+function __goscriptStatic1(): any {
+	return __goscriptStatic1$value ??= (/* @__PURE__ */ $.basicType("int", "syscall.Signal"))
+}
+
+var __goscriptStatic2$value: any
+function __goscriptStatic2(): any {
+	return __goscriptStatic2$value ??= ([$.methodSignature("Signal"), $.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])])
 }
 
 var __goscriptAwait: any
