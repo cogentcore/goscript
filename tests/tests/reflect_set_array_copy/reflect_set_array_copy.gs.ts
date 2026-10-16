@@ -64,23 +64,23 @@ export async function main(): globalThis.Promise<void> {
 	a.value.M[0] = 100
 	a.value.A[0] = 200
 	a.value.Inner.B[0] = 300
-	await $.println("b:", $.arrayIndex(b.value.M, 0), $.arrayIndex(b.value.A, 0), $.arrayIndex(b.value.Inner.B, 0))
-	await $.println("c:", $.arrayIndex(c.value.M, 0), $.arrayIndex(c.value.A, 0), $.arrayIndex(c.value.Inner.B, 0))
-	await $.println("d:", $.arrayIndex(d.value.M, 0), $.arrayIndex(d.value.A, 0), $.arrayIndex(d.value.Inner.B, 0))
+	await $.println("b:", b.value.M[0], b.value.A[0], b.value.Inner.B[0])
+	await $.println("c:", c.value.M[0], c.value.A[0], c.value.Inner.B[0])
+	await $.println("d:", d.value.M[0], d.value.A[0], d.value.Inner.B[0])
 
 	b.value.M[1] = 9
-	await $.println("c after b:", $.arrayIndex(c.value.M, 1), $.arrayIndex(d.value.M, 1), $.arrayIndex(a.value.M, 1))
+	await $.println("c after b:", c.value.M[1], d.value.M[1], a.value.M[1])
 
 	// Index of an array element set from an array.
 	let arrs = $.varRef($.arrayValue(globalThis.Array.from({ length: 2 }, () => $.arrayValue(globalThis.Array.from({ length: 2 }, () => 0))), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2), 2)))
 	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(arrs, "*[2][2]int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2), 2)))))).Elem())).Index(0))).Set($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(av)).Field(1))))
 	a.value.A[1] = 400
-	await $.println("arrs:", $.arrayIndex($.arrayIndex(arrs.value, 0), 1))
+	await $.println("arrs:", (arrs.value[0])[1])
 
 	// Interface returns a copy of an array.
 	let x = $.cloneArrayValue($.mustTypeAssert<number[]>($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(av)).Field(1))).Interface(), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2)), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2))
 	a.value.A[1] = 500
-	await $.println("interface:", $.arrayIndex(x, 1))
+	await $.println("interface:", x[1])
 }
 
 if ($.isMainScript(import.meta)) {

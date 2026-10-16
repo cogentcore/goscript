@@ -40,7 +40,7 @@ export async function main(): globalThis.Promise<void> {
 	await recoverMsg("array:", $.functionValue(async () => {
 		let a: number[] = $.arrayValue(globalThis.Array.from({ length: 3 }, () => 0))
 		let i = 7
-		await $.println($.arrayIndex(a, i))
+		await $.println(a[$.checkArrayIndex(i, 3)])
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)))
 	await recoverMsg("negative:", $.functionValue(async () => {
 		let s = $.arrayToSlice<number>([1, 2, 3])

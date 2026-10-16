@@ -2551,7 +2551,7 @@ func TestCompilePackagesEmitsArraySliceMapStringAndNamedMethods(t *testing.T) {
 		"let empty = $.arrayToSlice<number>([])",
 		"let literal: $.Slice<number> = $.arrayToSlice<number>([1, 2])",
 		"literal = $.appendOne(literal, 3)",
-		"$.sliceElems(slice!)[$.sliceSlot(slice!, 0)] = $.arrayIndex(arr, 1)",
+		"$.sliceElems(slice!)[$.sliceSlot(slice!, 0)] = arr[1]",
 		"let m = $.makeMap<string, number>()",
 		"$.mapSet(m, \"one\", 1)",
 		"let [value, ok] = $.mapGet<string, number, number>(m, \"missing\", 0)",
@@ -6158,7 +6158,7 @@ func TestCompilePackagesUnwrapsImportedArrayPackageVarReads(t *testing.T) {
 	}
 	text := string(content)
 	for _, want := range []string{
-		"$.arrayIndex($.pointerValue<number[]>(dep.Table), 1)",
+		"($.pointerValue<number[]>(dep.Table))[1]",
 		"dep.Sum($.cloneArrayValue($.pointerValue<number[]>(dep.Table),",
 	} {
 		if !strings.Contains(text, want) {
@@ -6246,7 +6246,7 @@ func TestCompilePackagesUnwrapsAliasedArrayPackageVarReads(t *testing.T) {
 	}
 	text := string(content)
 	for _, want := range []string{
-		"$.arrayIndex($.pointerValue<number[]>(__goscript_table.Table), 1)",
+		"($.pointerValue<number[]>(__goscript_table.Table))[1]",
 		"Sum($.cloneArrayValue($.pointerValue<number[]>(__goscript_table.Table),",
 	} {
 		if !strings.Contains(text, want) {

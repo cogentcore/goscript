@@ -176,7 +176,7 @@ export async function main(): globalThis.Promise<void> {
 	let arr = new Sides(true, $.arrayValue([1, 2]), $.arrayValue(globalThis.Array.from({ length: 2 }, () => 0)), $.arrayValue(globalThis.Array.from({ length: 2 }, () => 0)), $.arrayValue(globalThis.Array.from({ length: 2 }, () => 0)))
 	let arr2 = (arr).clone()
 	arr2.Top[0] = 9
-	await $.println("array:", $.arrayIndex(arr.Top, 0), $.arrayIndex(arr2.Top, 0))
+	await $.println("array:", arr.Top[0], arr2.Top[0])
 	let p = new Value(false, 5)
 	let ptr = new Sides(true, p, null! as Value | $.VarRef<Value> | null, null! as Value | $.VarRef<Value> | null, null! as Value | $.VarRef<Value> | null)
 	let ptr2 = (ptr).clone()

@@ -21,6 +21,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"unicode"
 
 	"github.com/pkg/errors"
 	"golang.org/x/sync/errgroup"
@@ -13821,9 +13822,44 @@ func (o *LoweringOwner) lowerIndexExpr(ctx lowerFileContext, expr *ast.IndexExpr
 		return o.runtimeOwner.QualifiedHelper(RuntimeHelperIndexString) + "(" + target + ", " + o.lowerNumberIndexValue(ctx, expr.Index, index) + ")", diagnostics
 	case isMapType(targetType):
 		return o.lowerMapGetValue(ctx, expr, target, index), diagnostics
-	default:
-		return o.runtimeOwner.QualifiedHelper(RuntimeHelperArrayIndex) + "(" + o.lowerIndexTarget(ctx, target, targetType) + ", " + o.lowerNumberIndexValue(ctx, expr.Index, index) + ")", diagnostics
 	}
+
+	// Array elements are read directly; slices and the rest need arrayIndex.
+	if array, ok := types.Unalias(targetType).Underlying().(*types.Array); ok {
+		return o.lowerArrayElement(ctx, expr, target, index, array), diagnostics
+	}
+	return o.runtimeOwner.QualifiedHelper(RuntimeHelperArrayIndex) + "(" + o.lowerIndexTarget(ctx, target, targetType) + ", " + o.lowerNumberIndexValue(ctx, expr.Index, index) + ")", diagnostics
+}
+
+// lowerArrayElement lowers reading the element of an array value at an index.
+// Every representation of an array (a JS array, a typed array or an array
+// view) indexes directly, and the length of the array is static, so the read
+// needs no dispatch on the representation, unlike that of a slice element.
+func (o *LoweringOwner) lowerArrayElement(ctx lowerFileContext, expr *ast.IndexExpr, target, index string, array *types.Array) string {
+	// A constant index is in range, as the type checker rejects others.
+	indexValue := o.lowerNumberIndexValue(ctx, expr.Index, index)
+	if value := ctx.semPkg.source.TypesInfo.Types[unwrapParenExpr(expr.Index)].Value; value == nil {
+		indexValue = o.runtimeOwner.QualifiedHelper(RuntimeHelperCheckArrayIndex) + "(" + indexValue + ", " + strconv.FormatInt(array.Len(), 10) + ")"
+	}
+
+	// The target is parenthesized unless it is a name or a field of one.
+	if !isPlainPropertyPath(target) {
+		target = "(" + target + ")"
+	}
+	return target + "[" + indexValue + "]"
+}
+
+// isPlainPropertyPath returns whether the TypeScript expression is a name or
+// a chain of property accesses of one, which can be indexed as it is.
+func isPlainPropertyPath(expr string) bool {
+	// Every character must be part of a name, or a dot or digit after the first.
+	for i, r := range expr {
+		ok := r == '_' || r == '$' || unicode.IsLetter(r) || (i > 0 && (r == '.' || unicode.IsDigit(r)))
+		if !ok {
+			return false
+		}
+	}
+	return expr != "" && !strings.HasSuffix(expr, ".")
 }
 
 // lowerNumberIndexValue coerces an index or size expression to a JS number when

@@ -10,7 +10,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// Check that arr is initialized with 255 values
 	for (let i = 0; i < $.len(arr); i++) {
-		if ($.arrayIndex(arr, i) != 255) {
+		if (arr[$.checkArrayIndex(i, 10)] != 255) {
 			$.panic("copy failed")
 		}
 	}

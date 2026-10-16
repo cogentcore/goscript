@@ -130,11 +130,11 @@ export async function main(): globalThis.Promise<void> {
 	let m = $.makeMap<string, point>([["k", new point(true, 1, 2)]])
 	let p = new pair(true, new point(true, 1, 2))
 	await $.println("zero:", eq(__goscriptStatic1(), (zero).clone(), new point(true)), eq(__goscriptStatic1(), (zero).clone(), ($.arrayIndex(made!, 0)).clone()))
-	await $.println("deref:", eq(__goscriptStatic1(), (lit).clone(), ($.pointerValue<point>(ptr)).clone()), "slice:", eq(__goscriptStatic1(), (lit).clone(), ($.arrayIndex(made!, 1)).clone()), "array:", eq(__goscriptStatic1(), (lit).clone(), ($.arrayIndex(arr, 0)).clone()))
+	await $.println("deref:", eq(__goscriptStatic1(), (lit).clone(), ($.pointerValue<point>(ptr)).clone()), "slice:", eq(__goscriptStatic1(), (lit).clone(), ($.arrayIndex(made!, 1)).clone()), "array:", eq(__goscriptStatic1(), (lit).clone(), (arr[0]).clone()))
 	await $.println("map:", eq(__goscriptStatic1(), (lit).clone(), ($.mapGet<string, point, point>(m, "k", new point(true))[0]).clone()), "field:", eq(__goscriptStatic1(), (lit).clone(), (p.a).clone()), "return:", eq(__goscriptStatic1(), (lit).clone(), newPoint(1, 2)))
-	await $.println("differ:", eq(__goscriptStatic1(), (lit).clone(), ($.arrayIndex(arr, 1)).clone()), "pair:", eq(__goscriptStatic2(), p, new pair(true, (lit).clone())))
+	await $.println("differ:", eq(__goscriptStatic1(), (lit).clone(), (arr[1]).clone()), "pair:", eq(__goscriptStatic2(), p, new pair(true, (lit).clone())))
 	await $.println("index values:", slices.Index($.arrayToSlice<point>([new point(true, 3, 4), new point(true, 1, 2)]), ($.pointerValue<point>(ptr)).clone()))
-	await $.println("any values:", $.comparableEqual($.structInterfaceValue((lit).clone(), "main.point", "main.point"), $.structInterfaceValue(($.pointerValue<point>(ptr)).clone(), "main.point", "main.point")), $.comparableEqual($.structInterfaceValue((lit).clone(), "main.point", "main.point"), $.structInterfaceValue(($.arrayIndex(arr, 1)).clone(), "main.point", "main.point")))
+	await $.println("any values:", $.comparableEqual($.interfaceValue((lit).clone(), "main.point", "main.point"), $.interfaceValue(($.pointerValue<point>(ptr)).clone(), "main.point", "main.point")), $.comparableEqual($.interfaceValue((lit).clone(), "main.point", "main.point"), $.interfaceValue((arr[1]).clone(), "main.point", "main.point")))
 }
 
 var __goscriptStatic0$value: any

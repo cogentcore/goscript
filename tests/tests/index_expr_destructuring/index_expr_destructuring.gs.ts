@@ -21,7 +21,7 @@ export async function main(): globalThis.Promise<void> {
 	intArray[0] = __goscriptTuple0[0]
 	$.sliceElems(stringSlice!)[$.sliceSlot(stringSlice!, 1)] = __goscriptTuple0[1]
 
-	await $.println("intArray[0]:", $.arrayIndex(intArray, 0))
+	await $.println("intArray[0]:", intArray[0])
 	await $.println("stringSlice[1]:", $.arrayIndex(stringSlice!, 1))
 
 	// Test with more complex index expressions
@@ -30,11 +30,11 @@ export async function main(): globalThis.Promise<void> {
 	let j = 1
 
 	let __goscriptTuple1: any = returnTwoInts()
-	$.arrayIndex(matrix, i)[j] = __goscriptTuple1[0]
+	matrix[$.checkArrayIndex(i, 2)][j] = __goscriptTuple1[0]
 	intArray[1] = __goscriptTuple1[1]
 
-	await $.println("matrix[0][1]:", $.arrayIndex($.arrayIndex(matrix, 0), 1))
-	await $.println("intArray[1]:", $.arrayIndex(intArray, 1))
+	await $.println("matrix[0][1]:", (matrix[0])[1])
+	await $.println("intArray[1]:", intArray[1])
 }
 
 if ($.isMainScript(import.meta)) {

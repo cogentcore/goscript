@@ -135,7 +135,7 @@ export async function main(): globalThis.Promise<void> {
 	let pc$: outer = pc == null ? $.pointerTarget<outer>(pc) : (pc as any).__isVarRef === true ? (pc as any).value : (pc as any).__goValue === undefined ? (pc as any) : $.pointerTarget<outer>(pc);
 	;(pc$ as outer).__goscriptAssign((o).clone());
 	;(pc$ as outer).P.A[0] = 10
-	await $.println($.arrayIndex(o.P.A, 0), $.arrayIndex((pc$ as outer).P.A, 0), $.arrayIndex((pc$ as outer).P.B, 1))
+	await $.println(o.P.A[0], ((pc$ as outer).P.A)[0], ((pc$ as outer).P.B)[1])
 
 	// Struct values in type parameter fields are copied.
 	let s = new pair(true, new point(true, 5, 6), new point(true))
@@ -150,7 +150,7 @@ export async function main(): globalThis.Promise<void> {
 	let b: $.VarRef<holder> = $.varRef(new holder(true))
 	let pb = b
 	$.pointerValue<holder>(pb).__goscriptAssign(a)
-	await $.println($.arrayIndex($.mustTypeAssert<number[]>($.pointerValue<holder>(pb).Any, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2)), 1))
+	await $.println(($.mustTypeAssert<number[]>($.pointerValue<holder>(pb).Any, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2)))[1])
 }
 
 if ($.isMainScript(import.meta)) {

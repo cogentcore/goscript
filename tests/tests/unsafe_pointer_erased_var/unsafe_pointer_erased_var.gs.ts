@@ -17,7 +17,7 @@ export function acceptMatrix(_p0: $.VarRef<Uint8Array[]> | null): void {
 export async function main(): globalThis.Promise<void> {
 	let ptr = (table as any)
 	let bytes = ptr
-	await $.println($.arrayIndex(($.pointerValue<Uint8Array>(bytes)), 2))
+	await $.println((($.pointerValue<Uint8Array>(bytes)))[2])
 
 	ptr = (table as any)
 	acceptMatrix(ptr)
