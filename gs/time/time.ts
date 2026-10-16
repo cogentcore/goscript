@@ -10,17 +10,39 @@ export class Time {
   // __typeInfo registers Time with the runtime type system (see below).
   static __typeInfo: $.StructTypeInfo
 
-  private _date: globalThis.Date
-  private _nsec: number // nanoseconds within the millisecond
-  private _monotonic?: number // high-resolution monotonic timestamp in nanoseconds
+  // The wall clock is the whole milliseconds since the zero time and the
+  // nanoseconds within the millisecond, kept as numbers so that arithmetic
+  // and copies make no Date, and the zero Time has only zero fields, as in
+  // Go. The Date of the wall clock, which calendar methods read, is made
+  // when first needed and never changed. The monotonic reading is in
+  // nanoseconds, or 0 for none; Go's readings start at 1.
+  private _wallMs: number
+  private _nsec: number
+  private _monotonic: number
   private _location: Location // timezone location
+  private _wallDate?: globalThis.Date
 
   constructor(_props?: {}) {
     // Default constructor creates the zero time, January 1, year 1, 00:00:00 UTC
-    this._date = new globalThis.Date(zeroTimeMillis)
+    this._wallMs = 0
     this._nsec = 0
-    this._monotonic = undefined
+    this._monotonic = 0
     this._location = UTC
+    this._wallDate = undefined
+  }
+
+  // _date is the Date of the wall clock; setting it sets the wall clock to
+  // its whole milliseconds.
+  private get _date(): globalThis.Date {
+    return (this._wallDate ??= new globalThis.Date(
+      this._wallMs + zeroTimeMillis,
+    ))
+  }
+
+  private set _date(date: globalThis.Date) {
+    // The Date is kept as the Date of the wall clock.
+    this._wallMs = date.getTime() - zeroTimeMillis
+    this._wallDate = date
   }
 
   // create adds submillisecond precision to a wall clock and normalizes carries.
@@ -30,41 +52,77 @@ export class Time {
     monotonic?: number,
     location?: Location,
   ): Time {
+    return Time.fromMillis(
+      date.getTime() - zeroTimeMillis,
+      nsec,
+      monotonic ?? 0,
+      location,
+    )
+  }
+
+  // fromMillis returns the time ms milliseconds after the zero time plus
+  // nsec nanoseconds, carrying whole milliseconds of nsec into ms.
+  private static fromMillis(
+    ms: number,
+    nsec: number,
+    monotonic: number,
+    location: Location | undefined,
+  ): Time {
+    // Whole milliseconds of nsec, also negative ones, carry into ms.
     const time = new Time()
     const milliseconds = Math.floor(nsec / 1000000)
-    time._date = new globalThis.Date(date.getTime() + milliseconds)
+    time._wallMs = ms + milliseconds
     time._nsec = nsec - milliseconds * 1000000
     time._monotonic = monotonic
     time._location = location || UTC
     return time
   }
 
-  // clone returns a copy of this Time instance
+  // clone returns a copy of this Time instance, which shares the Date of
+  // the wall clock, since neither ever changes.
   public clone(): Time {
-    return Time.create(this._date, this._nsec, this._monotonic, this._location)
+    // The copy is a new Time with the fields of t.
+    const time = new Time()
+    time.__goscriptAssign(this)
+    return time
+  }
+
+  // __goscriptAssign copies the time u into this Time, as assignStruct does
+  // for a value of the same struct type.
+  public __goscriptAssign(u: Time): void {
+    // All fields are copied, the cached Date with them.
+    this._wallMs = u._wallMs
+    this._nsec = u._nsec
+    this._monotonic = u._monotonic
+    this._location = u._location
+    this._wallDate = u._wallDate
   }
 
   // Unix returns t as a Unix time, the number of seconds elapsed since January 1, 1970 UTC
   public Unix(): bigint {
-    return BigInt(Math.floor(this._date.getTime() / 1000))
+    return BigInt(Math.floor((this._wallMs + zeroTimeMillis) / 1000))
   }
 
   // UnixMilli returns t as a Unix time, the number of milliseconds elapsed since January 1, 1970 UTC
   public UnixMilli(): bigint {
-    return BigInt(this._date.getTime())
+    return BigInt(this._wallMs + zeroTimeMillis)
   }
 
   // UnixMicro returns t as a Unix time, the number of microseconds elapsed since January 1, 1970 UTC
   public UnixMicro(): bigint {
     return (
-      BigInt(this._date.getTime()) * 1000n +
+      BigInt(this._wallMs + zeroTimeMillis) * 1000n +
       BigInt(Math.floor(this._nsec / 1000))
     )
   }
 
   // UnixNano returns t as a Unix time, the number of nanoseconds elapsed since January 1, 1970 UTC
+  // A time outside the range of an int64 wraps, as in Go.
   public UnixNano(): bigint {
-    return BigInt(this._date.getTime()) * 1000000n + BigInt(this._nsec)
+    return BigInt.asIntN(
+      64,
+      BigInt(this._wallMs + zeroTimeMillis) * 1000000n + BigInt(this._nsec),
+    )
   }
 
   // Weekday returns the day of the week specified by t
@@ -165,20 +223,23 @@ export class Time {
 
   // Local returns t with the location set to local time.
   public Local(): Time {
-    return Time.create(this._date, this._nsec, undefined, Local)
+    return Time.fromMillis(this._wallMs, this._nsec, 0, Local)
   }
 
   // UTC returns t with the location set to UTC.
   public UTC(): Time {
-    return Time.create(this._date, this._nsec, undefined, UTC)
+    return Time.fromMillis(this._wallMs, this._nsec, 0, UTC)
   }
 
   // In returns a copy of t representing the same instant in loc.
   public In(loc: Location | $.VarRef<Location> | null): Time {
+    // A nil location panics.
     if (loc === null) {
       throw new Error('time: missing Location in call to Time.In')
     }
-    return Time.create(this._date, this._nsec, undefined, $.pointerValue(loc))
+
+    // The wall clock is kept, without the monotonic reading.
+    return Time.fromMillis(this._wallMs, this._nsec, 0, $.pointerValue(loc))
   }
 
   public AppendFormat(b: $.Bytes | null, layout: string): $.Bytes {
@@ -360,7 +421,7 @@ export class Time {
       }
       // Year patterns
       else if (remaining.startsWith('2006')) {
-        result += String(year).padStart(4, '0')
+        result += paddedInt(year, 4)
         i += 4
         matched = true
       }
@@ -461,7 +522,7 @@ export class Time {
       }
       // Two-digit patterns
       else if (remaining.startsWith('06')) {
-        result += (year % 100).toString().padStart(2, '0')
+        result += paddedInt(year % 100, 2)
         i += 2
         matched = true
       } else if (remaining.startsWith('_2')) {
@@ -647,44 +708,69 @@ export class Time {
   // setFromRFC3339 parses value in RFC 3339 format and sets t to the result,
   // which is the zero Time if value does not parse.
   private setFromRFC3339(value: string): $.GoError {
+    // The parsed wall clock and location replace those of t, without a
+    // monotonic reading.
     const [parsed, err] = Parse(RFC3339, value)
-    this._date = parsed._date
+    this._wallMs = parsed._wallMs
+    this._wallDate = parsed._wallDate
     this._nsec = parsed._nsec
-    this._monotonic = undefined
+    this._monotonic = 0
     this._location = parsed._location
     return err
   }
 
-  // Sub returns the duration t-u
-  // If both times have monotonic readings, use them for accurate duration calculation
+  // Sub returns the duration t-u. If both times have monotonic readings, the
+  // duration is that between them. A duration outside the range of Duration
+  // is the maximum or minimum Duration, as in Go.
   public Sub(u: Time): Duration {
-    // If both times have monotonic readings, use them for more accurate duration calculation
-    if (this._monotonic !== undefined && u._monotonic !== undefined) {
-      // Duration is int64 nanoseconds. Truncate defensively: BigInt() throws a
-      // RangeError on any fractional input, and this Sub/Since path is a hard
-      // crash boundary the browser asset reader hits during startup.
-      const diffNs = this._monotonic - u._monotonic
-      return BigInt(Math.trunc(diffNs))
+    // Monotonic readings are integer nanoseconds. Truncate defensively:
+    // BigInt() throws a RangeError on any fractional input, and this
+    // Sub/Since path is a hard crash boundary the browser asset reader hits
+    // during startup.
+    if (this._monotonic !== 0 && u._monotonic !== 0) {
+      return BigInt(Math.trunc(this._monotonic - u._monotonic))
     }
 
-    // Fallback to Date-based calculation
-    const diffMs = this._date.getTime() - u._date.getTime()
+    // The wall clocks of times less than about 104 days apart differ by
+    // fewer nanoseconds than a number holds exactly.
+    const diffMs = this._wallMs - u._wallMs
     const diffNs = this._nsec - u._nsec
-    return BigInt(diffMs) * 1000000n + BigInt(diffNs)
+    if (diffMs > -maxExactDiffMs && diffMs < maxExactDiffMs) {
+      return BigInt(diffMs * 1000000 + diffNs)
+    }
+
+    // Other differences are computed exactly and saturate.
+    const diff = BigInt(diffMs) * 1000000n + BigInt(diffNs)
+    if (diff > maxDurationBig) {
+      return maxDurationBig
+    }
+    return diff < minDurationBig ? minDurationBig : diff
   }
 
-  // Add adds the duration d to t, returning the sum
-  // Preserves monotonic reading if present
+  // Add adds the duration d to t, returning the sum. A monotonic reading is
+  // moved by d too.
   public Add(d: Duration): Time {
-    const duration = BigInt(d)
-    const durationNs = Number(duration)
-    const newDate = new globalThis.Date(
-      this._date.getTime() + Number(duration / 1000000n),
+    // A duration that a number holds exactly is added as a number, carrying
+    // its whole milliseconds into the milliseconds of the wall clock.
+    const durationNs = Number(d)
+    const monotonic = this._monotonic !== 0 ? this._monotonic + durationNs : 0
+    if (Number.isSafeInteger(durationNs)) {
+      const subMs = durationNs % 1000000
+      return Time.fromMillis(
+        this._wallMs + (durationNs - subMs) / 1000000,
+        this._nsec + subMs,
+        monotonic,
+        this._location,
+      )
+    }
+
+    // A longer duration is split exactly.
+    return Time.fromMillis(
+      this._wallMs + Number(d / 1000000n),
+      this._nsec + Number(d % 1000000n),
+      monotonic,
+      this._location,
     )
-    const newNsec = this._nsec + Number(duration % 1000000n)
-    const newMonotonic =
-      this._monotonic !== undefined ? this._monotonic + durationNs : undefined
-    return Time.create(newDate, newNsec, newMonotonic, this._location)
   }
 
   public AddDate(years: number, months: number, days: number): Time {
@@ -717,35 +803,45 @@ export class Time {
   // Equal reports whether t and u represent the same time instant
   // Uses monotonic clock if both times have it
   public Equal(u: Time): boolean {
-    if (this._monotonic !== undefined && u._monotonic !== undefined) {
+    // Monotonic readings compare when both times have one.
+    if (this._monotonic !== 0 && u._monotonic !== 0) {
       return this._monotonic === u._monotonic
     }
-    return this._date.getTime() === u._date.getTime() && this._nsec === u._nsec
+
+    // Otherwise the wall clocks compare.
+    return this._wallMs === u._wallMs && this._nsec === u._nsec
   }
 
+  // IsZero reports whether t is the zero time, January 1, year 1, 00:00:00 UTC.
   public IsZero(): boolean {
-    return this.Equal(new Time())
+    return this._wallMs === 0 && this._nsec === 0
   }
 
   // Before reports whether the time instant t is before u
   // Uses monotonic clock if both times have it
   public Before(u: Time): boolean {
-    if (this._monotonic !== undefined && u._monotonic !== undefined) {
+    // Monotonic readings compare when both times have one.
+    if (this._monotonic !== 0 && u._monotonic !== 0) {
       return this._monotonic < u._monotonic
     }
-    const thisMs = this._date.getTime()
-    const uMs = u._date.getTime()
+
+    // Otherwise the wall clocks compare.
+    const thisMs = this._wallMs
+    const uMs = u._wallMs
     return thisMs < uMs || (thisMs === uMs && this._nsec < u._nsec)
   }
 
   // After reports whether the time instant t is after u
   // Uses monotonic clock if both times have it
   public After(u: Time): boolean {
-    if (this._monotonic !== undefined && u._monotonic !== undefined) {
+    // Monotonic readings compare when both times have one.
+    if (this._monotonic !== 0 && u._monotonic !== 0) {
       return this._monotonic > u._monotonic
     }
-    const thisMs = this._date.getTime()
-    const uMs = u._date.getTime()
+
+    // Otherwise the wall clocks compare.
+    const thisMs = this._wallMs
+    const uMs = u._wallMs
     return thisMs > uMs || (thisMs === uMs && this._nsec > u._nsec)
   }
 
@@ -761,20 +857,42 @@ export class Time {
     return 0
   }
 
-  // Round returns the result of rounding t to the nearest multiple of d
-  // Strips monotonic reading as per Go specification
-  public Round(_d: Duration): Time {
-    // Implementation would round to nearest duration
-    // For now, simplified version that strips monotonic reading
-    return Time.create(this._date, this._nsec, undefined, this._location)
+  // Round returns the result of rounding t to the nearest multiple of d since
+  // the zero time, halfway values rounding up, without a monotonic reading.
+  // A d of zero or less returns t without the reading.
+  public Round(d: Duration): Time {
+    // The result has no monotonic reading.
+    const t = Time.fromMillis(this._wallMs, this._nsec, 0, this._location)
+    if (d <= 0n) {
+      return t
+    }
+
+    // The remainder below half of d rounds down, others up.
+    const r = t.sinceZeroModulo(d)
+    return r + r < d ? t.Add(-r) : t.Add(d - r)
   }
 
-  // Truncate returns the result of rounding t down to a multiple of d
-  // Strips monotonic reading as per Go specification
-  public Truncate(_d: Duration): Time {
-    // Implementation would truncate to duration
-    // For now, simplified version that strips monotonic reading
-    return Time.create(this._date, this._nsec, undefined, this._location)
+  // Truncate returns the result of rounding t down to a multiple of d since
+  // the zero time, without a monotonic reading. A d of zero or less returns t
+  // without the reading.
+  public Truncate(d: Duration): Time {
+    // The result has no monotonic reading.
+    const t = Time.fromMillis(this._wallMs, this._nsec, 0, this._location)
+    if (d <= 0n) {
+      return t
+    }
+
+    // The remainder is removed.
+    return t.Add(-t.sinceZeroModulo(d))
+  }
+
+  // sinceZeroModulo returns the time since the zero time modulo d, in [0, d),
+  // also for times before the zero time.
+  private sinceZeroModulo(d: Duration): Duration {
+    // The remainder of a time before the zero time is moved into [0, d).
+    const sinceZero = BigInt(this._wallMs) * 1000000n + BigInt(this._nsec)
+    const r = sinceZero % d
+    return r < 0n ? r + d : r
   }
 
   // String returns the time formatted as a string
@@ -790,7 +908,7 @@ export class Time {
     let result = `${year}-${month}-${day} ${hour}:${minute}:${second} +0000 UTC`
 
     // Include monotonic reading in debug output as per Go specification
-    if (this._monotonic !== undefined) {
+    if (this._monotonic !== 0) {
       result += ` m=${this._monotonic}`
     }
 
@@ -819,10 +937,11 @@ export class Time {
 // Duration represents a span of time (nanoseconds).
 export type Duration = bigint
 
-const maxDuration = Number(9223372036854775807n)
-const minDuration = Number(-9223372036854775808n)
 const maxDurationBig = 9223372036854775807n
 const minDurationBig = -9223372036854775808n
+// maxExactDiffMs bounds the difference of two wall clocks in milliseconds
+// whose difference in nanoseconds a number holds exactly.
+const maxExactDiffMs = 9e9
 const maxTimerDelayMilliseconds = 0x7fffffff
 const millisecondsPerDay = 24 * 60 * 60 * 1000
 const unixToInternalSeconds = 62135596800n
@@ -941,16 +1060,23 @@ export function Duration_Round(
   receiver: Duration,
   multiple: Duration,
 ): Duration {
-  const value = durationNumber(receiver)
-  const unit = durationNumber(multiple)
-  if (unit <= 0) {
+  // A multiple of zero or less leaves the duration unchanged.
+  if (multiple <= 0n) {
     return receiver
   }
-  const rounded =
-    value >= 0 ?
-      Math.floor(value / unit + 0.5) * unit
-    : Math.ceil(value / unit - 0.5) * unit
-  return BigInt(Math.max(minDuration, Math.min(maxDuration, rounded)))
+
+  // Halfway values round away from zero, and results outside the range of
+  // Duration saturate, as in Go.
+  const r = receiver < 0n ? -(receiver % multiple) : receiver % multiple
+  if (r + r < multiple) {
+    return receiver < 0n ? receiver + r : receiver - r
+  }
+  if (receiver < 0n) {
+    const rounded = receiver - multiple + r
+    return rounded < minDurationBig ? minDurationBig : rounded
+  }
+  const rounded = receiver + multiple - r
+  return rounded > maxDurationBig ? maxDurationBig : rounded
 }
 
 // Duration_Seconds returns the duration as a floating point number of seconds.
@@ -969,21 +1095,23 @@ export function Duration_Truncate(
 }
 
 export function Duration_String(receiver: Duration): string {
-  const value = durationNumber(receiver)
-  if (value === 0) {
+  // Durations under a second are shown in their largest unit.
+  if (receiver === 0n) {
     return '0s'
   }
-  const sign = value < 0 ? '-' : ''
-  let remaining = Math.abs(value)
-  if (remaining < 1e9) {
-    return sign + formatSubsecond(remaining)
+  const sign = receiver < 0n ? '-' : ''
+  const magnitude = receiver < 0n ? -receiver : receiver
+  if (magnitude < 1000000000n) {
+    return sign + formatSubsecond(Number(magnitude))
   }
-  const hours = Math.floor(remaining / 3.6e12)
-  remaining -= hours * 3.6e12
-  const minutes = Math.floor(remaining / 6e10)
-  remaining -= minutes * 6e10
-  const seconds = Math.floor(remaining / 1e9)
-  remaining -= seconds * 1e9
+
+  // Longer ones are split exactly into whole seconds, which a number holds
+  // exactly, and the nanoseconds left.
+  const totalSeconds = Number(magnitude / 1000000000n)
+  const remaining = Number(magnitude % 1000000000n)
+  const hours = Math.floor(totalSeconds / 3600)
+  const minutes = Math.floor((totalSeconds % 3600) / 60)
+  const seconds = totalSeconds % 60
 
   // As in Go, seconds are always shown, and minutes whenever there are hours.
   let out = sign
@@ -1010,6 +1138,14 @@ export function Duration_format(
     buf.value[start + idx] = bytes[idx]!
   }
   return start
+}
+
+// paddedInt formats n with at least width digits, after the sign of a
+// negative n, as the appendInt of Go's time formatting does.
+function paddedInt(n: number, width: number): string {
+  // The digits of the magnitude are padded, then signed.
+  const digits = String(Math.abs(n)).padStart(width, '0')
+  return n < 0 ? '-' + digits : digits
 }
 
 function formatSeconds(seconds: number, nanos: number): string {
@@ -1241,8 +1377,9 @@ export function Now(): Time {
     // performance.now() returns milliseconds with sub-millisecond precision.
     // Convert to nanoseconds and floor: the monotonic field is integer
     // nanoseconds, matching Go's int64 monotonic clock. A fractional value here
-    // reaches Sub/BigInt and throws a RangeError ("not an integer").
-    monotonic = Math.floor(performance.now() * 1000000)
+    // reaches Sub/BigInt and throws a RangeError ("not an integer"). A
+    // reading is at least 1, since 0 means none.
+    monotonic = Math.max(1, Math.floor(performance.now() * 1000000))
   }
 
   return Time.create(date, 0, monotonic, Local)
