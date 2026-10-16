@@ -192,6 +192,22 @@ describe('path/filepath - Path manipulation functions', () => {
       expect(err2).toBeNull()
       expect(result2).toBe(Join(process.cwd(), 'relative/path'))
     })
+
+    it('uses the os working directory without a host cwd', () => {
+      // A browser has no process.cwd, so os.Getwd reports its tracked
+      // directory, as the Go wasm port does.
+      const cwd = process.cwd
+      process.cwd = () => {
+        throw new Error('no cwd')
+      }
+      try {
+        const [result, err] = Abs('relative/path')
+        expect(err).toBeNull()
+        expect(result).toBe('/relative/path')
+      } finally {
+        process.cwd = cwd
+      }
+    })
   })
 
   describe('Rel', () => {
