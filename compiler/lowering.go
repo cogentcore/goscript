@@ -4061,7 +4061,7 @@ func (o *LoweringOwner) lowerNamedReceiverMethodDecl(
 	deferState := &loweredDeferState{}
 	lowered := &loweredFunction{
 		exported:      ctx.topLevel,
-		indexExported: ctx.topLevel && (ast.IsExported(receiver.Obj().Name()) || ast.IsExported(decl.Name.Name)),
+		indexExported: ctx.topLevel,
 		async:         async,
 		sourcePath:    sourcePos(ctx.semPkg.source, decl.Pos()).file,
 		name:          methodFunctionName(receiver, decl.Name.Name),
