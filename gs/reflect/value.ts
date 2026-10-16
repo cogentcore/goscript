@@ -71,13 +71,27 @@ function zeroReflectValue(typ: Type): ReflectValue {
     case String:
       return ''
     case Slice:
-    case Array:
       return []
+    case Array:
+      return zeroArrayValue(typ)
     case Struct:
       return $.markAsStructValue(newStructPointer(typ))
     default:
       return null
   }
+}
+
+// zeroArrayValue returns a new zero array of the array type typ, holding its
+// length of zero elements, as a byte array or a marked array value, as the
+// compiler makes them.
+function zeroArrayValue(typ: Type): ReflectValue {
+  const length = typ.Len()
+  const elem = typ.Elem()
+  if (elem.Kind() === Uint8) {
+    return $.arrayValue(new Uint8Array(length)) as ReflectValue
+  }
+  const values = globalThis.Array.from({ length }, () => zeroReflectValue(elem))
+  return $.arrayValue(values, typeInfoFromReflectType(typ)) as ReflectValue
 }
 
 // newStructPointer returns a new zero struct of type typ in its pointer
