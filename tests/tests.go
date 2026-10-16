@@ -48,9 +48,6 @@ var (
 	parentGoModulePathOnce sync.Once
 	// parentGoModulePathErr stores any error encountered while determining the parent Go module path.
 	parentGoModulePathErr error
-	// typescriptToolMutex serializes fixture runtime and typecheck tool
-	// execution (bun runners, tsgo projects) across concurrent subtests.
-	typescriptToolMutex sync.Mutex
 )
 
 const complianceToolTimeout = 30 * time.Second
@@ -459,9 +456,6 @@ func WriteTypeScriptRunner(t *testing.T, parentModulePath, testDir, tempDir stri
 func RunTypeScriptRunner(t *testing.T, workspaceDir, tempDir, tsRunner string) string {
 	t.Helper()
 
-	typescriptToolMutex.Lock()
-	defer typescriptToolMutex.Unlock()
-
 	ctx, cancel := context.WithTimeout(context.Background(), complianceToolTimeout)
 	defer cancel()
 
@@ -630,9 +624,6 @@ func WriteTypeCheckConfig(t *testing.T, parentModulePath, workspaceDir, testDir 
 func RunTypeScriptTypeCheck(t *testing.T, workspaceDir, testDir string, tsconfigPath string) {
 	t.Helper()
 	t.Run("TypeCheck", func(t *testing.T) {
-		typescriptToolMutex.Lock()
-		defer typescriptToolMutex.Unlock()
-
 		ctx, cancel := context.WithTimeout(context.Background(), complianceToolTimeout)
 		defer cancel()
 
