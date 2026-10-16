@@ -1,0 +1,26 @@
+outOfNestedLoops: 203 0
+siblingBlocks: 3014 3026 3006
+labelsInLoop: 1583 1583
+gotoLabeledLoop: 21 21
+gotoInSwitchCase: 3 49 50
+withDefer: 20
+closure: 0
+closure: 10
+closure: 20
+closure: 230
+closure: 230
+closure: 231
+closure: 231
+closures: 952
+state closure: 3
+state closure: 13
+state closure: 23
+state closure: 4
+stateClosures: 43
+dispatchInLoop: 44 56
+inner x: 31
+inner x: 35
+shadowed: 1 1
+chained: 6 1
+webStyle: 142 3
+webStyle: 387 10

@@ -1706,21 +1706,25 @@ type lowerFileContext struct {
 	// rangeElements are the slices that enclosing range loops index by their
 	// own index variable, whose elements s[i] read and write the loop's
 	// window directly (see rangeWindowElement).
-	rangeElements       []rangeElementAccess
-	rangeBranch         *loweredRangeBranch
-	rangeBreak          bool
-	rangeContinue       bool
-	gotoLabels          map[string]bool
-	forwardGotos        map[string]bool
-	gotoStateLabels     map[string]bool
-	gotoStateVar        string
-	gotoStateLoop       string
+	rangeElements []rangeElementAccess
+	rangeBranch   *loweredRangeBranch
+	rangeBreak    bool
+	rangeContinue bool
+	// gotoJumps maps the labels that gotos can reach to the statements that
+	// jump to them (see lowerStmtListAfter).
+	gotoJumps map[string]gotoJump
+	// gotoHoist holds the variables of a goto state machine declared ahead
+	// of it (see lowerGotoDispatch).
+	gotoHoist           *gotoHoist
 	functionScopedDecls bool
 	loopLabel           string
 	switchBreak         bool
-	topLevel            bool
-	protobufTSAdapter   bool
-	trimTypeInfo        bool
+	// switchLabel labels the switch that an unlabeled break leaves, when a
+	// goto loop lies between them.
+	switchLabel       string
+	topLevel          bool
+	protobufTSAdapter bool
+	trimTypeInfo      bool
 	// statics holds the static expressions of the file hoisted out of the
 	// code that would evaluate them each time (see hoistStatic).
 	statics *staticPool
@@ -1928,13 +1932,7 @@ func (o *LoweringOwner) lowerGenDecl(ctx lowerFileContext, decl *ast.GenDecl) ([
 				if _, ok := obj.(*types.Const); ok || decl.Tok == token.CONST {
 					keyword = "const"
 				}
-				variableType := o.tsVariableTypeFor(ctx, obj.Type(), ctx.model.needsVarRef[obj])
-				if signature := unnamedSignatureForType(obj.Type()); signature != nil {
-					variableType = o.tsAsyncCompatibleFunctionTypeFor(ctx, signature)
-					if ctx.model.needsVarRef[obj] {
-						variableType = "$.VarRef<" + variableType + ">"
-					}
-				}
+				variableType := o.declaredVariableType(ctx, obj)
 				declName := o.lowerIdent(ctx, name, true)
 				if name.Name == "_" {
 					declName = ctx.tempName("Blank")
@@ -1943,6 +1941,9 @@ func (o *LoweringOwner) lowerGenDecl(ctx lowerFileContext, decl *ast.GenDecl) ([
 				code := keyword + " " + declName + ": " + variableType + " = " + value
 				if keyword != "const" && o.inferredValueType(value) == variableType {
 					code = keyword + " " + declName + " = " + value
+				}
+				if o.gotoHoistedDecl(ctx, obj, declName) {
+					code = declName + " = " + value
 				}
 				if lazy {
 					keyword = "var"
@@ -4706,42 +4707,16 @@ func (ctx lowerFileContext) withoutRangeBreak() lowerFileContext {
 	return ctx
 }
 
-func (ctx lowerFileContext) withGotoLabels(labels map[string]bool) lowerFileContext {
-	if len(ctx.gotoLabels) == 0 {
-		ctx.gotoLabels = labels
+// withGotoJumps adds jumps to the labels gotos can reach.
+func (ctx lowerFileContext) withGotoJumps(jumps map[string]gotoJump) lowerFileContext {
+	if len(ctx.gotoJumps) == 0 {
+		ctx.gotoJumps = jumps
 		return ctx
 	}
-	merged := make(map[string]bool, len(ctx.gotoLabels)+len(labels))
-	for label := range ctx.gotoLabels {
-		merged[label] = true
-	}
-	for label := range labels {
-		merged[label] = true
-	}
-	ctx.gotoLabels = merged
-	return ctx
-}
-
-func (ctx lowerFileContext) withForwardGotos(labels map[string]bool) lowerFileContext {
-	if len(ctx.forwardGotos) == 0 {
-		ctx.forwardGotos = labels
-		return ctx
-	}
-	merged := make(map[string]bool, len(ctx.forwardGotos)+len(labels))
-	for label := range ctx.forwardGotos {
-		merged[label] = true
-	}
-	for label := range labels {
-		merged[label] = true
-	}
-	ctx.forwardGotos = merged
-	return ctx
-}
-
-func (ctx lowerFileContext) withGotoState(labels map[string]bool, stateVar string, loopLabel string) lowerFileContext {
-	ctx.gotoStateLabels = labels
-	ctx.gotoStateVar = stateVar
-	ctx.gotoStateLoop = loopLabel
+	merged := make(map[string]gotoJump, len(ctx.gotoJumps)+len(jumps))
+	maps.Copy(merged, ctx.gotoJumps)
+	maps.Copy(merged, jumps)
+	ctx.gotoJumps = merged
 	return ctx
 }
 
@@ -4750,13 +4725,20 @@ func (ctx lowerFileContext) withLoopLabel(label string) lowerFileContext {
 	return ctx
 }
 
+// withoutLoopLabel starts a loop body, whose unlabeled branches leave or
+// continue that loop.
 func (ctx lowerFileContext) withoutLoopLabel() lowerFileContext {
 	ctx.loopLabel = ""
+	ctx.switchBreak = false
+	ctx.switchLabel = ""
 	return ctx
 }
 
-func (ctx lowerFileContext) withSwitchBreak() lowerFileContext {
+// withSwitchBreak starts a switch case body, whose unlabeled break leaves the
+// switch, labeled by label when a goto loop lies between them.
+func (ctx lowerFileContext) withSwitchBreak(label string) lowerFileContext {
 	ctx.switchBreak = true
+	ctx.switchLabel = label
 	return ctx
 }
 
@@ -4959,17 +4941,8 @@ func (o *LoweringOwner) lowerStmtInto(ctx lowerFileContext, stmt ast.Stmt, out [
 				return append(out, loweredStmt{text: typed.Tok.String() + " " + safeIdentifier(typed.Label.Name)}), nil
 			case token.GOTO:
 				label := safeIdentifier(typed.Label.Name)
-				if ctx.gotoStateLabels[label] {
-					return append(out,
-						loweredStmt{text: ctx.gotoStateVar + " = " + strconv.Quote(label)},
-						loweredStmt{text: "continue " + ctx.gotoStateLoop},
-					), nil
-				}
-				if ctx.forwardGotos[label] {
-					return append(out, loweredStmt{text: "break " + label}), nil
-				}
-				if ctx.gotoLabels[label] {
-					return append(out, loweredStmt{text: "continue " + label}), nil
+				if jump, ok := ctx.gotoJumps[label]; ok {
+					return jump.appendTo(out), nil
 				}
 				return out, []Diagnostic{loweringUnsupportedAt(ctx, typed, "statement", ctx.semPkg.pkgPath, "unsupported goto branch to "+label)}
 			default:
@@ -4978,6 +4951,9 @@ func (o *LoweringOwner) lowerStmtInto(ctx lowerFileContext, stmt ast.Stmt, out [
 		}
 		switch typed.Tok {
 		case token.BREAK, token.CONTINUE:
+			if typed.Tok == token.BREAK && ctx.switchBreak && ctx.switchLabel != "" {
+				return append(out, loweredStmt{text: "break " + ctx.switchLabel}), nil
+			}
 			if typed.Tok == token.BREAK && ctx.loopLabel != "" && !ctx.switchBreak {
 				return append(out, loweredStmt{text: "break " + ctx.loopLabel}), nil
 			}
@@ -5073,44 +5049,42 @@ func (o *LoweringOwner) lowerStmtListAfter(
 	stmts []ast.Stmt,
 	prevEndLine int,
 ) ([]loweredStmt, []Diagnostic) {
+	// A list without gotos spares the lists nested in it their search.
 	lowered := make([]loweredStmt, 0, len(stmts))
 	var diagnostics []Diagnostic
 	hasGoto := !ctx.noGoto && stmtListHasGoto(stmts)
 	ctx.noGoto = !hasGoto
+
+	// Gotos that labeled blocks and loops cannot all reach run in a state
+	// machine from the first statement that they involve.
+	if hasGoto && !gotoShapesReach(stmts) {
+		start := gotoDispatchStart(stmts)
+		for _, stmt := range stmts[:start] {
+			var stmtDiagnostics []Diagnostic
+			lowered, ctx, prevEndLine, stmtDiagnostics = o.lowerListStmt(ctx, stmt, lowered, prevEndLine)
+			diagnostics = append(diagnostics, stmtDiagnostics...)
+		}
+		dispatch, dispatchDiagnostics := o.lowerGotoDispatch(ctx, stmts[start:], prevEndLine)
+		return append(lowered, dispatch...), append(diagnostics, dispatchDiagnostics...)
+	}
+
+	// Labels of backward gotos start loops, and those of forward gotos end
+	// blocks.
 	var gotoSpans map[string]int
-	var gotoLabels map[string]bool
 	var forwardSpans map[string]forwardGotoLabelSpan
 	if hasGoto {
 		gotoSpans = backwardGotoLabelSpans(stmts)
-		gotoLabels = make(map[string]bool, len(gotoSpans))
-		for label := range gotoSpans {
-			gotoLabels[label] = true
-		}
 		forwardSpans = forwardGotoLabelSpans(stmts, gotoSpans)
-		for label, span := range forwardSpans {
-			span.label = label
-			forwardSpans[label] = span
-		}
 	}
 	for idx := 0; idx < len(stmts); idx++ {
 		stmt := stmts[idx]
-		startLine := sourceLine(ctx, stmt.Pos())
-		leading := leadingStmtLines(ctx, prevEndLine, startLine)
 		if hasGoto {
-			if cluster, ok := gotoStateClusterAt(stmts, idx); ok {
-				clusterLowered, clusterDiagnostics := o.lowerGotoStateCluster(ctx, stmts, cluster, leading)
-				diagnostics = append(diagnostics, clusterDiagnostics...)
-				lowered = append(lowered, clusterLowered...)
-				if endLine := sourceLine(ctx, stmts[cluster.endIdx].End()); endLine != 0 {
-					prevEndLine = endLine
-				}
-				idx = cluster.endIdx
-				continue
-			}
+			// A goto into a backward loop past its first statement skips that
+			// statement on the first pass.
+			leading := leadingStmtLines(ctx, prevEndLine, sourceLine(ctx, stmt.Pos()))
 			if span, ok := leadingGotoBackwardLoopSpan(stmts, idx, gotoSpans); ok {
 				loop, loopDiagnostics := o.lowerBackwardGotoLoop(
 					ctx,
-					gotoLabels,
 					span.label,
 					span.labelIdx,
 					span.endIdx,
@@ -5126,6 +5100,8 @@ func (o *LoweringOwner) lowerStmtListAfter(
 				idx = span.endIdx
 				continue
 			}
+
+			// Forward gotos break out of the blocks that end at their labels.
 			if group, ok := forwardGotoLabelGroupAt(idx, forwardSpans); ok {
 				groupLowered, groupDiagnostics := o.lowerForwardGotoLabelGroup(
 					ctx,
@@ -5147,12 +5123,13 @@ func (o *LoweringOwner) lowerStmtListAfter(
 				idx = group.labelIdx
 				continue
 			}
+
+			// Backward gotos continue the loop that starts at their label.
 			if labeled, ok := stmt.(*ast.LabeledStmt); ok {
 				label := safeIdentifier(labeled.Label.Name)
 				if endIdx, ok := gotoSpans[label]; ok {
 					loop, loopDiagnostics := o.lowerBackwardGotoLoop(
 						ctx,
-						gotoLabels,
 						label,
 						idx,
 						endIdx,
@@ -5170,50 +5147,63 @@ func (o *LoweringOwner) lowerStmtListAfter(
 				}
 			}
 		}
-		if stmtCtx, nextCtx, ok := o.lowerDeclStatementContext(ctx, stmt); ok {
-			start := len(lowered)
-			var stmtDiagnostics []Diagnostic
-			lowered, stmtDiagnostics = o.lowerStmtInto(stmtCtx, stmt, lowered)
-			diagnostics = append(diagnostics, stmtDiagnostics...)
-			if len(lowered) > start && len(leading) != 0 {
-				lowered[start].leading = append(leading, lowered[start].leading...)
-			}
-			ctx = nextCtx
-			if endLine := sourceLine(ctx, stmt.End()); endLine != 0 {
-				prevEndLine = endLine
-			}
-			continue
-		}
-		if stmtCtx, nextCtx, prelude, ok := o.lowerShortDeclStatementContext(ctx, stmt); ok {
-			stmtLowered, stmtDiagnostics := o.lowerStmt(stmtCtx, stmt)
-			diagnostics = append(diagnostics, stmtDiagnostics...)
-			if len(prelude) != 0 {
-				if len(leading) != 0 {
-					prelude[0].leading = append(leading, prelude[0].leading...)
-				}
-				lowered = append(lowered, prelude...)
-			} else if len(stmtLowered) != 0 && len(leading) != 0 {
-				stmtLowered[0].leading = append(leading, stmtLowered[0].leading...)
-			}
-			lowered = append(lowered, stmtLowered...)
-			ctx = nextCtx
-			if endLine := sourceLine(ctx, stmt.End()); endLine != 0 {
-				prevEndLine = endLine
-			}
-			continue
-		}
-		start := len(lowered)
+
+		// Any other statement lowers by itself.
 		var stmtDiagnostics []Diagnostic
-		lowered, stmtDiagnostics = o.lowerStmtInto(ctx, stmt, lowered)
+		lowered, ctx, prevEndLine, stmtDiagnostics = o.lowerListStmt(ctx, stmt, lowered, prevEndLine)
 		diagnostics = append(diagnostics, stmtDiagnostics...)
+	}
+	return lowered, diagnostics
+}
+
+// lowerListStmt appends one statement of a list to lowered, after the source
+// lines that separate it from the previous one, and returns the context of
+// the statements that follow it and the line it ends on.
+func (o *LoweringOwner) lowerListStmt(
+	ctx lowerFileContext,
+	stmt ast.Stmt,
+	lowered []loweredStmt,
+	prevEndLine int,
+) ([]loweredStmt, lowerFileContext, int, []Diagnostic) {
+	// The statement keeps the blank lines and comments before it.
+	leading := leadingStmtLines(ctx, prevEndLine, sourceLine(ctx, stmt.Pos()))
+	if endLine := sourceLine(ctx, stmt.End()); endLine != 0 {
+		prevEndLine = endLine
+	}
+
+	// A declaration that shadows names it uses renames its variables for the
+	// statements that follow it.
+	if stmtCtx, nextCtx, ok := o.lowerDeclStatementContext(ctx, stmt); ok {
+		start := len(lowered)
+		lowered, diagnostics := o.lowerStmtInto(stmtCtx, stmt, lowered)
 		if len(lowered) > start && len(leading) != 0 {
 			lowered[start].leading = append(leading, lowered[start].leading...)
 		}
-		if endLine := sourceLine(ctx, stmt.End()); endLine != 0 {
-			prevEndLine = endLine
-		}
+		return lowered, nextCtx, prevEndLine, diagnostics
 	}
-	return lowered, diagnostics
+
+	// So does a short variable declaration, which saves the outer values it
+	// reads first.
+	if stmtCtx, nextCtx, prelude, ok := o.lowerShortDeclStatementContext(ctx, stmt); ok {
+		stmtLowered, diagnostics := o.lowerStmt(stmtCtx, stmt)
+		if len(prelude) != 0 {
+			if len(leading) != 0 {
+				prelude[0].leading = append(leading, prelude[0].leading...)
+			}
+			lowered = append(lowered, prelude...)
+		} else if len(stmtLowered) != 0 && len(leading) != 0 {
+			stmtLowered[0].leading = append(leading, stmtLowered[0].leading...)
+		}
+		return append(lowered, stmtLowered...), nextCtx, prevEndLine, diagnostics
+	}
+
+	// Any other statement lowers in the current context.
+	start := len(lowered)
+	lowered, diagnostics := o.lowerStmtInto(ctx, stmt, lowered)
+	if len(lowered) > start && len(leading) != 0 {
+		lowered[start].leading = append(leading, lowered[start].leading...)
+	}
+	return lowered, ctx, prevEndLine, diagnostics
 }
 
 func (o *LoweringOwner) lowerDeclStatementContext(
@@ -5254,215 +5244,6 @@ func (o *LoweringOwner) lowerDeclStatementContext(
 	return nextCtx, nextCtx, true
 }
 
-type gotoStateCluster struct {
-	startIdx      int
-	firstLabelIdx int
-	endIdx        int
-	labels        []gotoStateLabel
-}
-
-type gotoStateLabel struct {
-	name string
-	idx  int
-}
-
-func gotoStateClusterAt(stmts []ast.Stmt, idx int) (gotoStateCluster, bool) {
-	labelIndexes := make(map[string]int)
-	for stmtIdx, stmt := range stmts {
-		labeled, ok := stmt.(*ast.LabeledStmt)
-		if !ok {
-			continue
-		}
-		labelIndexes[safeIdentifier(labeled.Label.Name)] = stmtIdx
-	}
-	if len(labelIndexes) == 0 {
-		return gotoStateCluster{}, false
-	}
-
-	startIdx := len(stmts)
-	firstLabelIdx := len(stmts)
-	endIdx := -1
-	hasBackward := false
-	crossesSegments := false
-	for stmtIdx, stmt := range stmts {
-		ast.Inspect(stmt, func(node ast.Node) bool {
-			branch, ok := node.(*ast.BranchStmt)
-			if !ok || branch.Tok != token.GOTO || branch.Label == nil {
-				return true
-			}
-			labelIdx, ok := labelIndexes[safeIdentifier(branch.Label.Name)]
-			if !ok {
-				return true
-			}
-			if labelIdx != segmentLabelIdx(labelIndexes, stmtIdx) {
-				crossesSegments = true
-			}
-			if stmtIdx < startIdx {
-				startIdx = stmtIdx
-			}
-			if labelIdx < firstLabelIdx {
-				firstLabelIdx = labelIdx
-			}
-			if labelIdx > endIdx {
-				endIdx = labelIdx
-			}
-			if stmtIdx > endIdx {
-				endIdx = stmtIdx
-			}
-			if stmtIdx > labelIdx {
-				hasBackward = true
-			}
-			return true
-		})
-	}
-
-	// When the first target label precedes the first goto, as in a state
-	// machine whose first state jumps to the others, the cluster starts at
-	// that label. Gotos that only return to the start of their own label's
-	// segment are plain backward loops instead.
-	if firstLabelIdx < startIdx && crossesSegments {
-		startIdx = firstLabelIdx
-	}
-	if !hasBackward || startIdx != idx || endIdx < firstLabelIdx || firstLabelIdx == len(stmts) {
-		return gotoStateCluster{}, false
-	}
-
-	// The statements after the last goto or label are only reached by falling
-	// through the last label's segment. When that segment declares variables,
-	// the statements join it, so that the declarations stay in scope for them.
-	lastLabelIdx := firstLabelIdx
-	for _, labelIdx := range labelIndexes {
-		if labelIdx <= endIdx && labelIdx > lastLabelIdx {
-			lastLabelIdx = labelIdx
-		}
-	}
-	if stmtsDeclare(stmts[lastLabelIdx : endIdx+1]) {
-		endIdx = len(stmts) - 1
-	}
-
-	var labels []gotoStateLabel
-	for stmtIdx := firstLabelIdx; stmtIdx <= endIdx; stmtIdx++ {
-		labeled, ok := stmts[stmtIdx].(*ast.LabeledStmt)
-		if !ok {
-			continue
-		}
-		labels = append(labels, gotoStateLabel{name: safeIdentifier(labeled.Label.Name), idx: stmtIdx})
-	}
-	if len(labels) == 0 {
-		return gotoStateCluster{}, false
-	}
-	return gotoStateCluster{
-		startIdx:      startIdx,
-		firstLabelIdx: firstLabelIdx,
-		endIdx:        endIdx,
-		labels:        labels,
-	}, true
-}
-
-// segmentLabelIdx returns the index of the last label at or before stmtIdx,
-// whose segment holds the statement, or -1 when no label precedes it.
-func segmentLabelIdx(labelIndexes map[string]int, stmtIdx int) int {
-	segment := -1
-	for _, labelIdx := range labelIndexes {
-		if labelIdx <= stmtIdx && labelIdx > segment {
-			segment = labelIdx
-		}
-	}
-	return segment
-}
-
-// stmtsDeclare reports whether any of the given statements, or the
-// statements they label, declare variables.
-func stmtsDeclare(stmts []ast.Stmt) bool {
-	for _, stmt := range stmts {
-		for labeled, ok := stmt.(*ast.LabeledStmt); ok; labeled, ok = stmt.(*ast.LabeledStmt) {
-			stmt = labeled.Stmt
-		}
-		switch typed := stmt.(type) {
-		case *ast.DeclStmt:
-			return true
-		case *ast.AssignStmt:
-			if typed.Tok == token.DEFINE {
-				return true
-			}
-		}
-	}
-	return false
-}
-
-func (o *LoweringOwner) lowerGotoStateCluster(
-	ctx lowerFileContext,
-	stmts []ast.Stmt,
-	cluster gotoStateCluster,
-	leading []string,
-) ([]loweredStmt, []Diagnostic) {
-	stateVar := ctx.tempName("GotoState")
-	loopLabel := ctx.tempName("GotoLoop")
-	labels := make(map[string]bool, len(cluster.labels))
-	for _, label := range cluster.labels {
-		labels[label.name] = true
-	}
-	stateCtx := ctx.withGotoState(labels, stateVar, loopLabel).withFunctionScopedDecls()
-
-	var diagnostics []Diagnostic
-	initialState := cluster.labels[0].name
-	var cases []loweredSwitchCase
-	if cluster.startIdx < cluster.firstLabelIdx {
-		initialState = "__entry"
-		body, bodyDiagnostics := o.lowerStmtListAfter(stateCtx, stmts[cluster.startIdx:cluster.firstLabelIdx], 0)
-		diagnostics = append(diagnostics, bodyDiagnostics...)
-		body = append(body,
-			loweredStmt{text: stateVar + " = " + strconv.Quote(cluster.labels[0].name)},
-			loweredStmt{text: "continue " + loopLabel},
-		)
-		cases = append(cases, loweredSwitchCase{
-			values: []string{strconv.Quote(initialState)},
-			body:   body,
-		})
-	}
-
-	for idx, label := range cluster.labels {
-		nextIdx := cluster.endIdx + 1
-		nextState := ""
-		if idx+1 < len(cluster.labels) {
-			nextIdx = cluster.labels[idx+1].idx
-			nextState = cluster.labels[idx+1].name
-		}
-		labeled, _ := stmts[label.idx].(*ast.LabeledStmt)
-		segment := make([]ast.Stmt, 0, nextIdx-label.idx)
-		segment = append(segment, labeled.Stmt)
-		segment = append(segment, stmts[label.idx+1:nextIdx]...)
-		body, bodyDiagnostics := o.lowerStmtListAfter(stateCtx, segment, sourceLine(ctx, labeled.Label.End()))
-		diagnostics = append(diagnostics, bodyDiagnostics...)
-		if nextState != "" {
-			body = append(body,
-				loweredStmt{text: stateVar + " = " + strconv.Quote(nextState)},
-				loweredStmt{text: "continue " + loopLabel},
-			)
-		} else {
-			body = append(body, loweredStmt{text: "break " + loopLabel})
-		}
-		cases = append(cases, loweredSwitchCase{
-			values: []string{strconv.Quote(label.name)},
-			body:   body,
-		})
-	}
-
-	dispatch := loweredStmt{
-		hasBlock: true,
-		text:     loopLabel + ": while (true)",
-		children: []loweredStmt{
-			{switchStmt: &loweredSwitch{value: stateVar, cases: cases}},
-			{text: "break"},
-		},
-	}
-	init := loweredStmt{text: "let " + stateVar + " = " + strconv.Quote(initialState)}
-	if len(leading) != 0 {
-		init.leading = append(leading, init.leading...)
-	}
-	return []loweredStmt{init, dispatch}, diagnostics
-}
-
 func (o *LoweringOwner) lowerShortDeclStatementContext(
 	ctx lowerFileContext,
 	stmt ast.Stmt,
@@ -5481,7 +5262,6 @@ func (o *LoweringOwner) lowerShortDeclStatementContext(
 
 func (o *LoweringOwner) lowerBackwardGotoLoop(
 	ctx lowerFileContext,
-	gotoLabels map[string]bool,
 	label string,
 	labelIdx int,
 	endIdx int,
@@ -5489,15 +5269,17 @@ func (o *LoweringOwner) lowerBackwardGotoLoop(
 	stmts []ast.Stmt,
 	leading []string,
 ) ([]loweredStmt, []Diagnostic) {
+	// The gotos to the label of the loop continue it.
 	labeled, ok := stmts[labelIdx].(*ast.LabeledStmt)
 	if !ok {
 		return nil, nil
 	}
-
 	var lowered []loweredStmt
 	var body []loweredStmt
 	var diagnostics []Diagnostic
-	bodyCtx := ctx.withGotoLabels(gotoLabels).withFunctionScopedDecls()
+	bodyCtx := ctx.withGotoJumps(map[string]gotoJump{label: {branch: "continue " + label}}).withFunctionScopedDecls()
+
+	// A leading goto past the first statement skips it on the first pass.
 	if initialForwardLabel != "" {
 		skipVar := ctx.tempName("Skip")
 		init := loweredStmt{text: "let " + skipVar + " = true"}
@@ -5514,6 +5296,9 @@ func (o *LoweringOwner) lowerBackwardGotoLoop(
 		diagnostics = append(diagnostics, firstDiagnostics...)
 		body = append(body, first...)
 	}
+
+	// The loop runs the rest of its statements once, unless a goto continues
+	// it.
 	rest, restDiagnostics := o.lowerStmtListAfter(
 		bodyCtx,
 		stmts[labelIdx+1:endIdx+1],
@@ -5600,7 +5385,11 @@ func (o *LoweringOwner) lowerForwardGotoLabelGroup(
 	prevEndLine int,
 	leading []string,
 ) ([]loweredStmt, []Diagnostic) {
-	forwardCtx := ctx.withForwardGotos(group.forwardLabels)
+	jumps := make(map[string]gotoJump, len(group.forwardLabels))
+	for label := range group.forwardLabels {
+		jumps[label] = gotoJump{branch: "break " + label}
+	}
+	forwardCtx := ctx.withGotoJumps(jumps)
 	first := group.spans[0]
 	body, diagnostics := o.lowerStmtListAfter(forwardCtx, stmts[group.start:first.labelIdx], prevEndLine)
 	block := loweredStmt{hasBlock: true, text: first.label + ":", children: body}
@@ -5635,13 +5424,6 @@ type leadingGotoBackwardLoop struct {
 	labelIdx     int
 	endIdx       int
 	forwardLabel string
-}
-
-func stmtListNeedsLoopBranchLabel(stmts []ast.Stmt) bool {
-	if !stmtListHasGoto(stmts) {
-		return false
-	}
-	return len(backwardGotoLabelSpans(stmts)) != 0
 }
 
 func stmtListHasGoto(stmts []ast.Stmt) bool {
@@ -5692,6 +5474,7 @@ func backwardGotoLabelSpans(stmts []ast.Stmt) map[string]int {
 }
 
 func leadingGotoBackwardLoopSpan(stmts []ast.Stmt, idx int, backwardSpans map[string]int) (leadingGotoBackwardLoop, bool) {
+	// The goto precedes the label of a backward loop.
 	if idx+1 >= len(stmts) {
 		return leadingGotoBackwardLoop{}, false
 	}
@@ -5708,20 +5491,23 @@ func leadingGotoBackwardLoopSpan(stmts []ast.Stmt, idx int, backwardSpans map[st
 	if !ok {
 		return leadingGotoBackwardLoop{}, false
 	}
+
+	// The loop skips only the statement of its own label, so the goto must
+	// target the label right after it.
 	forwardLabel := safeIdentifier(branch.Label.Name)
-	for labelIdx := idx + 1; labelIdx <= endIdx; labelIdx++ {
-		labeled, ok := stmts[labelIdx].(*ast.LabeledStmt)
-		if !ok || safeIdentifier(labeled.Label.Name) != forwardLabel {
-			continue
-		}
-		return leadingGotoBackwardLoop{
-			label:        label,
-			labelIdx:     idx + 1,
-			endIdx:       endIdx,
-			forwardLabel: forwardLabel,
-		}, true
+	if idx+2 > endIdx {
+		return leadingGotoBackwardLoop{}, false
 	}
-	return leadingGotoBackwardLoop{}, false
+	labeled, ok := stmts[idx+2].(*ast.LabeledStmt)
+	if !ok || safeIdentifier(labeled.Label.Name) != forwardLabel {
+		return leadingGotoBackwardLoop{}, false
+	}
+	return leadingGotoBackwardLoop{
+		label:        label,
+		labelIdx:     idx + 1,
+		endIdx:       endIdx,
+		forwardLabel: forwardLabel,
+	}, true
 }
 
 func forwardGotoLabelSpans(stmts []ast.Stmt, backwardSpans map[string]int) map[string]forwardGotoLabelSpan {
@@ -5752,6 +5538,7 @@ func forwardGotoLabelSpans(stmts []ast.Stmt, backwardSpans map[string]int) map[s
 			span, ok := spans[label]
 			if !ok || idx < span.start {
 				spans[label] = forwardGotoLabelSpan{
+					label:    label,
 					start:    idx,
 					labelIdx: labelIdx,
 				}
@@ -6035,7 +5822,8 @@ func (o *LoweringOwner) lowerAssignStmt(ctx lowerFileContext, stmt *ast.AssignSt
 		prefix := ""
 		if stmt.Tok == token.DEFINE {
 			prefix = declarationKeyword(ctx)
-			if !allShortAssignTargetsNew(ctx, stmt.Lhs) || o.tupleDeclarationNeedsElementStatements(ctx, stmt) {
+			if !allShortAssignTargetsNew(ctx, stmt.Lhs) || o.tupleDeclarationNeedsElementStatements(ctx, stmt) ||
+				gotoHoistsAny(ctx, stmt.Lhs) {
 				return o.lowerTupleReassignmentStmt(ctx, stmt, right, diagnostics)
 			}
 			return []loweredStmt{{text: prefix + "[" + strings.Join(lefts, ", ") + "] = " + right}}, diagnostics
@@ -6123,6 +5911,10 @@ func (o *LoweringOwner) lowerAssignStmt(ctx lowerFileContext, stmt *ast.AssignSt
 		if isShortDecl {
 			if ident, ok := lhs.(*ast.Ident); ok {
 				right = o.lowerDeclaredValue(ctx, ident, right)
+				if o.gotoHoistedDecl(ctx, ctx.semPkg.source.TypesInfo.Defs[ident], left) {
+					stmts = append(stmts, loweredStmt{text: left + " = " + right})
+					continue
+				}
 			}
 			stmts = append(stmts, loweredStmt{text: declarationKeyword(ctx) + left + o.shortDeclTypeAnnotation(ctx, lhs, stmt.Rhs[idx]) + " = " + right})
 			continue
@@ -6776,9 +6568,12 @@ func (o *LoweringOwner) lowerTupleTargetAssignmentStmt(
 	}
 	prefix := ""
 	if declare {
+		value = o.lowerDeclaredValue(ctx, lhs, value)
+		if ident, ok := lhs.(*ast.Ident); ok && o.gotoHoistedDecl(ctx, ctx.semPkg.source.TypesInfo.Defs[ident], left) {
+			return loweredStmt{text: left + " = " + value}, diagnostics
+		}
 		prefix = declarationKeyword(ctx)
 		left += o.shortDeclTypeAnnotation(ctx, lhs, nil)
-		value = o.lowerDeclaredValue(ctx, lhs, value)
 	}
 	return loweredStmt{text: prefix + left + " = " + value}, diagnostics
 }
@@ -7247,7 +7042,7 @@ func allBlankIdents(exprs []ast.Expr) bool {
 }
 
 func labeledTextCannotPrefix(text string) bool {
-	return strings.HasPrefix(text, "let ") || strings.HasPrefix(text, "const ") || strings.HasPrefix(text, "class ")
+	return strings.HasPrefix(text, "let ") || strings.HasPrefix(text, "var ") || strings.HasPrefix(text, "const ") || strings.HasPrefix(text, "class ")
 }
 
 func isChannelReceiveExpr(expr ast.Expr) bool {
@@ -7871,7 +7666,7 @@ func (o *LoweringOwner) recoverReturnStmt(ctx lowerFileContext, signature *types
 func (o *LoweringOwner) lowerForStmt(ctx lowerFileContext, stmt *ast.ForStmt) (loweredStmt, []Diagnostic) {
 	bodyCtx := ctx.withoutRangeLoopBranches().withoutLoopLabel()
 	loopLabel := ""
-	if !ctx.noGoto && stmtListNeedsLoopBranchLabel(stmt.Body.List) {
+	if !ctx.noGoto && stmtsWrapGotoLoop(stmt.Body.List, true) {
 		loopLabel = ctx.tempName("Loop")
 		bodyCtx = bodyCtx.withLoopLabel(loopLabel)
 	}
@@ -8089,7 +7884,7 @@ func (o *LoweringOwner) lowerRangeStmt(ctx lowerFileContext, stmt *ast.RangeStmt
 	aliases := o.lowerRangeDeclShadowAliases(ctx, stmt)
 	bodyCtx := ctx.withoutLoopLabel()
 	loopPrefix := ""
-	if !ctx.noGoto && stmtListNeedsLoopBranchLabel(stmt.Body.List) {
+	if !ctx.noGoto && stmtsWrapGotoLoop(stmt.Body.List, true) {
 		loopLabel := ctx.tempName("Loop")
 		loopPrefix = loopLabel + ": "
 		bodyCtx = bodyCtx.withLoopLabel(loopLabel)
@@ -8482,8 +8277,10 @@ func (o *LoweringOwner) lowerRangeFuncStmt(
 		rangeBranch.resultType = o.tsSignatureResultFor(ctx, ctx.signature)
 	}
 
-	// Only the current iterator's label remains local to its yield callback.
+	// Only the current iterator's label remains local to its yield callback,
+	// which no goto leaves.
 	bodyCtx := ctx.withoutLoopLabel().withRangeBranch(rangeBranch)
+	bodyCtx.gotoJumps = nil
 	bodyCtx.rangeLoop = stmt
 	bodyCtx.rangeLabels = make(map[string]ast.Stmt)
 	for label, target := range ctx.rangeLabels {
@@ -8822,6 +8619,11 @@ func (o *LoweringOwner) lowerSwitchStmt(ctx lowerFileContext, stmt *ast.SwitchSt
 		value = taglessSwitchValue
 	}
 	switchIR := &loweredSwitch{value: value}
+
+	// A goto loop in a case body needs the switch labeled for its breaks.
+	if !ctx.noGoto && caseBodiesWrapGotoLoop(stmt.Body, false) {
+		switchIR.label = ctx.tempName("Switch")
+	}
 	for _, raw := range stmt.Body.List {
 		clause, ok := raw.(*ast.CaseClause)
 		if !ok {
@@ -8829,7 +8631,7 @@ func (o *LoweringOwner) lowerSwitchStmt(ctx lowerFileContext, stmt *ast.SwitchSt
 			continue
 		}
 		bodyStmts, fallsThrough := splitSwitchFallthrough(clause.Body)
-		body, bodyDiagnostics := o.lowerStmtList(ctx.withLocalScope().withoutRangeBreak().withSwitchBreak(), bodyStmts)
+		body, bodyDiagnostics := o.lowerStmtList(ctx.withLocalScope().withoutRangeBreak().withSwitchBreak(switchIR.label), bodyStmts)
 		diagnostics = append(diagnostics, bodyDiagnostics...)
 		values := make([]string, 0, len(clause.List))
 		for _, expr := range clause.List {
@@ -8952,13 +8754,18 @@ func (o *LoweringOwner) lowerTypeSwitchStmt(ctx lowerFileContext, stmt *ast.Type
 		varRef:  varRef,
 	}
 	cacheable := true
+
+	// A goto loop in a case body needs the switch labeled for its breaks.
+	if !ctx.noGoto && caseBodiesWrapGotoLoop(stmt.Body, false) {
+		switchIR.label = ctx.tempName("Switch")
+	}
 	for _, clauseStmt := range stmt.Body.List {
 		clause, ok := clauseStmt.(*ast.CaseClause)
 		if !ok {
 			diagnostics = append(diagnostics, loweringUnsupportedAt(ctx, clauseStmt, "statement", ctx.semPkg.pkgPath, "unsupported type switch clause"))
 			continue
 		}
-		body, bodyDiagnostics := o.lowerStmtList(ctx.withoutRangeBreak().withSwitchBreak(), clause.Body)
+		body, bodyDiagnostics := o.lowerStmtList(ctx.withoutRangeBreak().withSwitchBreak(switchIR.label), clause.Body)
 		diagnostics = append(diagnostics, bodyDiagnostics...)
 		if len(clause.List) == 0 {
 			switchIR.defaultBody = body

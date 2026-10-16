@@ -378,7 +378,7 @@ deferred calls are awaited.
 | `for i, v := range s {}` | an index loop over a captured copy of `s`, reading `s[i]` |
 | `for k, v := range m {}` | `for (const [k, v] of m?.entries() ?? []) {}` |
 | `for i, r := range str {}` | `for (const [i, r] of $.rangeString(str)) {}`, yielding runes |
-| `goto` and labels | a lowered state machine |
+| `goto` and labels | labeled `break` and `continue`, or a state machine |
 
 ## Runtime
 

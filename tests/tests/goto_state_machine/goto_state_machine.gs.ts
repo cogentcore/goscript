@@ -44,27 +44,23 @@ export class scanner {
 		const s: scanner | $.VarRef<scanner> | null = this;
 		const s$: scanner = s == null ? $.pointerTarget<scanner>(s) : (s as any).__isVarRef === true ? (s as any).value : (s as any).__goValue === undefined ? (s as any) : $.pointerTarget<scanner>(s)
 		let c = 0
-
-		let __goscriptGotoState0 = "scriptData"
-		__goscriptGotoLoop0: while (true) {
+		let __goscriptGotoState0 = 0
+		__goscriptGotoLoop0: for (;;) {
 			switch (__goscriptGotoState0) {
-				case "scriptData":
+				case 0:
 				{
 					c = (s !== null && (s as any).__isVarRef !== true && (s as any).__goValue === undefined ? ((s as any) as scanner).readByte() : scanner.prototype.readByte.call(s))
 					if ((s$ as scanner).done) {
 						return (s$ as scanner).pos
 					}
 					if (c == 60) {
-						__goscriptGotoState0 = "scriptDataLessThanSign"
+						__goscriptGotoState0 = 1
 						continue __goscriptGotoLoop0
 					}
-					__goscriptGotoState0 = "scriptData"
+					__goscriptGotoState0 = 0
 					continue __goscriptGotoLoop0
-					__goscriptGotoState0 = "scriptDataLessThanSign"
-					continue __goscriptGotoLoop0
-					break
 				}
-				case "scriptDataLessThanSign":
+				case 1:
 				{
 					c = (s !== null && (s as any).__isVarRef !== true && (s as any).__goValue === undefined ? ((s as any) as scanner).readByte() : scanner.prototype.readByte.call(s))
 					if ((s$ as scanner).done) {
@@ -73,49 +69,40 @@ export class scanner {
 					switch (c) {
 						case 47:
 						{
-							__goscriptGotoState0 = "scriptDataEndTagOpen"
+							__goscriptGotoState0 = 2
 							continue __goscriptGotoLoop0
 							break
 						}
 						case 33:
 						{
-							__goscriptGotoState0 = "scriptDataEscapeStart"
+							__goscriptGotoState0 = 3
 							continue __goscriptGotoLoop0
 							break
 						}
 					}
-					__goscriptGotoState0 = "scriptData"
+					__goscriptGotoState0 = 0
 					continue __goscriptGotoLoop0
-					__goscriptGotoState0 = "scriptDataEndTagOpen"
-					continue __goscriptGotoLoop0
-					break
 				}
-				case "scriptDataEndTagOpen":
+				case 2:
 				{
 					return (s$ as scanner).pos - 2
-					__goscriptGotoState0 = "scriptDataEscapeStart"
-					continue __goscriptGotoLoop0
-					break
 				}
-				case "scriptDataEscapeStart":
+				case 3:
 				{
-					for (var i = 0; i < 2; i++) {
+					for (let i = 0; i < 2; i++) {
 						c = (s !== null && (s as any).__isVarRef !== true && (s as any).__goValue === undefined ? ((s as any) as scanner).readByte() : scanner.prototype.readByte.call(s))
 						if ((s$ as scanner).done) {
 							return (s$ as scanner).pos
 						}
 						if (c != 45) {
-							__goscriptGotoState0 = "scriptData"
+							__goscriptGotoState0 = 0
 							continue __goscriptGotoLoop0
 						}
 					}
-					__goscriptGotoState0 = "scriptDataEscaped"
+					__goscriptGotoState0 = 4
 					continue __goscriptGotoLoop0
-					__goscriptGotoState0 = "scriptDataEscaped"
-					continue __goscriptGotoLoop0
-					break
 				}
-				case "scriptDataEscaped":
+				case 4:
 				{
 					c = (s !== null && (s as any).__isVarRef !== true && (s as any).__goValue === undefined ? ((s as any) as scanner).readByte() : scanner.prototype.readByte.call(s))
 					if ((s$ as scanner).done) {
@@ -124,18 +111,15 @@ export class scanner {
 					switch (c) {
 						case 45:
 						{
-							__goscriptGotoState0 = "scriptDataEscapedDash"
+							__goscriptGotoState0 = 5
 							continue __goscriptGotoLoop0
 							break
 						}
 					}
-					__goscriptGotoState0 = "scriptDataEscaped"
+					__goscriptGotoState0 = 4
 					continue __goscriptGotoLoop0
-					__goscriptGotoState0 = "scriptDataEscapedDash"
-					continue __goscriptGotoLoop0
-					break
 				}
-				case "scriptDataEscapedDash":
+				case 5:
 				{
 					c = (s !== null && (s as any).__isVarRef !== true && (s as any).__goValue === undefined ? ((s as any) as scanner).readByte() : scanner.prototype.readByte.call(s))
 					if ((s$ as scanner).done) {
@@ -144,13 +128,12 @@ export class scanner {
 					if (c == 45) {
 						c = (s !== null && (s as any).__isVarRef !== true && (s as any).__goValue === undefined ? ((s as any) as scanner).readByte() : scanner.prototype.readByte.call(s))
 						if (c == 62) {
-							__goscriptGotoState0 = "scriptData"
+							__goscriptGotoState0 = 0
 							continue __goscriptGotoLoop0
 						}
 					}
-					__goscriptGotoState0 = "scriptDataEscaped"
+					__goscriptGotoState0 = 4
 					continue __goscriptGotoLoop0
-					break __goscriptGotoLoop0
 					break
 				}
 			}
@@ -186,36 +169,29 @@ export function encode(rs: $.Slice<number>): string {
 			out += $.runeToString(r)
 			continue __goscriptLoop0
 		}
-		let __goscriptGotoState1 = "__entry"
-		__goscriptGotoLoop1: while (true) {
+		let __goscriptGotoState1 = 0
+		__goscriptGotoLoop1: for (;;) {
 			switch (__goscriptGotoState1) {
-				case "__entry":
+				case 0:
 				{
 					if (r < 0x100) {
-						__goscriptGotoState1 = "writeGB"
+						__goscriptGotoState1 = 2
 						continue __goscriptGotoLoop1
 					}
-					__goscriptGotoState1 = "terminate"
-					continue __goscriptGotoLoop1
-					break
 				}
-				case "terminate":
+				case 1:
 				{
 					out += "?"
 					continue __goscriptLoop0
-					__goscriptGotoState1 = "writeGB"
-					continue __goscriptGotoLoop1
-					break
 				}
-				case "writeGB":
+				case 2:
 				{
-					var c0 = $.uint((($.uint(r, 8) - 0x80) & 0xff), 8)
+					let c0 = $.uint((($.uint(r, 8) - 0x80) & 0xff), 8)
 					if (c0 < 0x21) {
-						__goscriptGotoState1 = "terminate"
+						__goscriptGotoState1 = 1
 						continue __goscriptGotoLoop1
 					}
 					out += "[" + $.runeToString(($.uint(((65 + (c0 % 26)) & 0xff), 8))) + "]"
-					break __goscriptGotoLoop1
 					break
 				}
 			}
