@@ -253,6 +253,17 @@ describe('fmt basic value formatting', () => {
     expect(await fmt.Sprintf('%s', nodeLike)).toBe('node-string')
   })
 
+  it('leaves width and precision to a Formatter', async () => {
+    const formatter = {
+      Format(state: fmt.State, _verb: number) {
+        const [width] = state.Width()
+        const [precision] = state.Precision()
+        state.Write($.stringToBytes(`w${width}p${precision}`))
+      },
+    }
+    expect(await fmt.Sprintf('%8.3g', formatter)).toBe('w8p3')
+  })
+
   it('allows Sprintf callers to await async stringers', async () => {
     const stringer = {
       async String() {

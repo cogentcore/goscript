@@ -813,10 +813,19 @@ function formatOperandMaybe(
   if (empty !== undefined) {
     return formatOperandMaybe(empty, verb, flags, width, precision)
   }
-  const formatted =
-    formatWithStateMaybe(arg, verb, flags, width, precision) ??
-    formatValueMaybe(arg, verb, flags)
-  return applyFormatOptions(formatted, arg, verb, flags, width, precision)
+  // A Formatter owns its whole output, including width and precision.
+  const custom = formatWithStateMaybe(arg, verb, flags, width, precision)
+  if (custom !== null) {
+    return custom
+  }
+  return applyFormatOptions(
+    formatValueMaybe(arg, verb, flags),
+    arg,
+    verb,
+    flags,
+    width,
+    precision,
+  )
 }
 
 function parseFormatMaybe(format: string, args: any[]): MaybeString {

@@ -1,0 +1,93 @@
+{
+  "schemaVersion": 1,
+  "strict": true,
+  "symbols": {
+    "Above": {
+      "status": "real"
+    },
+    "Accuracy": {
+      "status": "real"
+    },
+    "AwayFromZero": {
+      "status": "real"
+    },
+    "Below": {
+      "status": "real"
+    },
+    "Ceil": {
+      "status": "real"
+    },
+    "ErrNaN": {
+      "status": "real"
+    },
+    "Exact": {
+      "status": "real"
+    },
+    "Float": {
+      "status": "real"
+    },
+    "Floor": {
+      "status": "real"
+    },
+    "Int": {
+      "status": "real"
+    },
+    "Jacobi": {
+      "status": "real"
+    },
+    "MaxBase": {
+      "status": "real"
+    },
+    "MaxExp": {
+      "status": "real"
+    },
+    "MaxPrec": {
+      "status": "real"
+    },
+    "MinExp": {
+      "status": "real"
+    },
+    "NewFloat": {
+      "status": "real"
+    },
+    "NewInt": {
+      "status": "real"
+    },
+    "NewRat": {
+      "status": "real"
+    },
+    "ParseFloat": {
+      "status": "real"
+    },
+    "Rat": {
+      "status": "real"
+    },
+    "Round": {
+      "status": "real"
+    },
+    "RoundingMode": {
+      "status": "real"
+    },
+    "ToNearestAway": {
+      "status": "real"
+    },
+    "ToNearestEven": {
+      "status": "real"
+    },
+    "ToNegativeInf": {
+      "status": "real"
+    },
+    "ToPositiveInf": {
+      "status": "real"
+    },
+    "ToZero": {
+      "status": "real"
+    },
+    "Trunc": {
+      "status": "real"
+    },
+    "Word": {
+      "status": "real"
+    }
+  }
+}

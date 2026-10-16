@@ -165,6 +165,15 @@ import "embed"
 //go:embed gs/math/atan.gs.ts
 //go:embed gs/math/atan2.gs.ts
 //go:embed gs/math/atanh.gs.ts
+//go:embed gs/math/big/float.ts
+//go:embed gs/math/big/index.ts
+//go:embed gs/math/big/int.ts
+//go:embed gs/math/big/meta.json
+//go:embed gs/math/big/mode.ts
+//go:embed gs/math/big/nat.ts
+//go:embed gs/math/big/parity.json
+//go:embed gs/math/big/prime.ts
+//go:embed gs/math/big/rat.ts
 //go:embed gs/math/bits/index.ts
 //go:embed gs/math/bits/parity.json
 //go:embed gs/math/bits.gs.ts
