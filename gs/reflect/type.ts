@@ -3841,7 +3841,20 @@ function typeNameName(typeName: string): string {
   return dotIndex >= 0 ? typeName.substring(dotIndex + 1) : typeName
 }
 
+// typeMethods returns the method set of t. A type that is not a pointer has
+// only the methods with value receivers, as in Go, so the methods that need a
+// pointer receiver are left out of its registered methods.
 function typeMethods(t: Type): $.MethodSignature[] {
+  const methods = registeredTypeMethods(t)
+  if (t.Kind() === Ptr || !methods.some((m) => m.pointerReceiver === true)) {
+    return methods
+  }
+  return methods.filter((method) => method.pointerReceiver !== true)
+}
+
+// registeredTypeMethods returns the methods registered for t, including those
+// that are only in the method set of a pointer to it.
+function registeredTypeMethods(t: Type): $.MethodSignature[] {
   // A named non-struct type, such as a named map, slice or basic type, or a
   // pointer to one, has its method set registered by its type string.
   const named = $.namedValueMethods(runtimeTypeString(t))

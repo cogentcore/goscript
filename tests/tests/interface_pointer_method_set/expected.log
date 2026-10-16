@@ -1,0 +1,13 @@
+T Setter: false Getter: true
+*T Setter: true Getter: true
+ByValue Setter: false Getter: true
+*ByValue Setter: true Getter: true
+ByPointer Setter: true Getter: true
+Count Setter: false Getter: true
+*Count Setter: true Getter: true
+switch: Getter
+switch: Setter
+set through pointer: 5
+reflect T: false *T: true
+reflect Count: false *Count: true
+NumMethod T: 1 *T: 2
