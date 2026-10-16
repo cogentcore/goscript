@@ -111,7 +111,7 @@ export async function main(): globalThis.Promise<void> {
 	let nilF: $.Slice<number> = null! as $.Slice<number>
 	let empty = $.typedSliceOf(Float32Array, []) as $.Slice<number>
 	await $.println("nil:", nilF == null, empty == null, $.sliceLen(nilF), $.sliceLen(empty), $.cap(empty))
-	nilF = $.append(nilF, 1, 2, $.typedSliceHints.float32)
+	nilF = $.appendValues(nilF, $.typedSliceHints.float32, 1, 2)
 	await $.println("append nil:", $.sliceLen(nilF), $.arrayIndex(nilF!, 0), $.arrayIndex(nilF!, 1))
 	let nilU: $.Slice<number> = null! as $.Slice<number>
 	nilU = $.appendSlice(nilU, $.typedSliceOf(Uint16Array, []) as $.Slice<number>, $.typedSliceHints.uint16)
@@ -123,7 +123,7 @@ export async function main(): globalThis.Promise<void> {
 	let a = $.appendOne(base, 3, $.typedSliceHints.float32)
 	let b = $.appendOne(base, 4, $.typedSliceHints.float32)
 	await $.println("shared:", $.arrayIndex(a!, 2), $.arrayIndex(b!, 2), $.sliceLen(a), $.cap(a))
-	let c = $.append(a, 5, 6, $.typedSliceHints.float32)
+	let c = $.appendValues(a, $.typedSliceHints.float32, 5, 6)
 	$.sliceElems(c!)[$.sliceSlot(c!, 0)] = 9
 	await $.println("grown:", $.sliceLen(c), $.cap(c) >= 5, $.arrayIndex(a!, 0), $.arrayIndex(c!, 0), $.arrayIndex(c!, 4))
 	let grow: $.Slice<number> = null! as $.Slice<number>

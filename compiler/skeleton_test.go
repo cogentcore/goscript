@@ -3586,7 +3586,7 @@ func TestCompilePackagesPacksVariadicCalls(t *testing.T) {
 		"collect(\"none\", null)",
 		"collect(\"two\", $.arrayToSlice<string>([\"a\", \"b\"]))",
 		"collect(\"spread\", parts)",
-		"$.append(parts, \"c\", \"d\")",
+		"$.appendValues(parts, undefined, \"c\", \"d\")",
 		"maybeErr($.arrayToSlice<string>([\"ok\"]))",
 		"fn!(\"fn\", $.arrayToSlice<string>([\"x\"]))",
 		"(joiner !== null && (joiner as any).__isVarRef !== true && ((joiner as any).__goValue === undefined || (joiner as any).__goType?.charCodeAt(0) !== 42) ? (joiner as Exclude<Joiner, null>) : $.pointerValue<Exclude<Joiner, null>>(joiner)).Join($.arrayToSlice<string>([\"q\", \"r\"]))",

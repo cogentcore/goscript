@@ -1650,6 +1650,39 @@ export function appendOne<T>(
   return append(slice, value, zeroHint)
 }
 
+// appendValues appends several values, which the compiler has copied, with
+// the element hint that append takes after them, or undefined. A window
+// object with room takes them in place, so that the common case makes no
+// call of the general append.
+export function appendValues<T>(
+  slice: Slice<T> | TypedSlice | null,
+  hint: unknown,
+  ...values: unknown[]
+): Slice<T> {
+  // A window object with spare capacity takes the values in place.
+  if (
+    slice instanceof GoSlice &&
+    slice.length + values.length <= slice.capacity
+  ) {
+    const { backing, offset, length, capacity } = slice
+    for (let i = 0; i < values.length; i++) {
+      backing[offset + length + i] = values[i] as T
+    }
+    return sliceProxyFromBacking(
+      backing,
+      offset,
+      length + values.length,
+      capacity,
+    )
+  }
+
+  // Otherwise append grows the slice.
+  if (hint === undefined) {
+    return append(slice as Slice<T>, ...values)
+  }
+  return append(slice as Slice<T>, ...values, hint)
+}
+
 /**
  * append returns an extended slice, sharing its backing array when capacity permits.
  */

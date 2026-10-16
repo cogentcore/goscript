@@ -10060,12 +10060,19 @@ func (o *LoweringOwner) lowerCallExpr(ctx lowerFileContext, expr *ast.CallExpr) 
 					}
 				}
 				appendHelper := o.runtimeOwner.QualifiedHelper(RuntimeHelperAppend)
-				// One value of a type that the arguments above already copied,
-				// and that is not a byte, appends without the variadic helper.
-				if expr.Ellipsis == token.NoPos && len(args) == 2 {
+				// Values of a type that the arguments above already copied, and
+				// that is not a byte, append without the general helper: one
+				// value with appendOne, and more with appendValues, which takes
+				// the element hint before them.
+				hintFirst := false
+				if expr.Ellipsis == token.NoPos && len(args) >= 2 {
 					if slice, ok := types.Unalias(ctx.semPkg.source.TypesInfo.TypeOf(expr)).Underlying().(*types.Slice); ok &&
 						!isByteType(slice.Elem()) && !isTypeParamType(slice.Elem()) {
 						appendHelper = o.runtimeOwner.QualifiedHelper(RuntimeHelperAppendOne)
+						if len(args) > 2 {
+							appendHelper = o.runtimeOwner.QualifiedHelper(RuntimeHelperAppendValues)
+							hintFirst = true
+						}
 					}
 				}
 				if expr.Ellipsis != token.NoPos && len(args) > 1 {
@@ -10085,11 +10092,12 @@ func (o *LoweringOwner) lowerCallExpr(ctx lowerFileContext, expr *ast.CallExpr) 
 				// Most zeros are inferred from appended values. Carry static
 				// metadata only when the dynamic value can differ from the Go
 				// slice element zero.
+				elemHint := ""
 				if slice, ok := types.Unalias(ctx.semPkg.source.TypesInfo.TypeOf(expr)).Underlying().(*types.Slice); ok {
 					if isByteType(slice.Elem()) {
-						args = append(args, o.runtimeOwner.QualifiedHelper(RuntimeHelperByteSliceHint))
+						elemHint = o.runtimeOwner.QualifiedHelper(RuntimeHelperByteSliceHint)
 					} else if _, hint := typedSliceArray(slice.Elem()); hint != "" {
-						args = append(args, o.runtimeOwner.QualifiedHelper(RuntimeHelperTypedSliceHints)+"."+hint)
+						elemHint = o.runtimeOwner.QualifiedHelper(RuntimeHelperTypedSliceHints) + "." + hint
 					} else if appendZeroNeedsStaticHint(slice.Elem()) {
 						zero := o.lowerDeclarationZeroValueExpr(ctx, slice.Elem())
 						zeroHint := ""
@@ -10103,8 +10111,18 @@ func (o *LoweringOwner) lowerCallExpr(ctx lowerFileContext, expr *ast.CallExpr) 
 							zeroHint = o.runtimeOwner.QualifiedHelper(RuntimeHelperAppendZero) +
 								"(" + zeroFactory + ")"
 						}
-						args = append(args, zeroHint)
+						elemHint = zeroHint
 					}
+				}
+
+				// The hint follows the values, or precedes them for appendValues.
+				switch {
+				case hintFirst && elemHint == "":
+					args = slices.Insert(args, 1, "undefined")
+				case hintFirst:
+					args = slices.Insert(args, 1, elemHint)
+				case elemHint != "":
+					args = append(args, elemHint)
 				}
 				return appendHelper + "(" + strings.Join(args, ", ") + ")", diagnostics
 			case "cap":
