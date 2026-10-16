@@ -98,6 +98,11 @@ func (o *LoweringOwner) withBorrowedResults(ctx lowerFileContext, decl *ast.Func
 	o.collectBorrowCalls(ctx, decl, state)
 	collectMoves(ctx, decl, state)
 	ctx.borrow = state
+
+	// The slice literals of the body that keep arrays.
+	if decl.Body != nil {
+		ctx.localLiterals = collectLocalLiterals(ctx, decl.Body)
+	}
 	return ctx
 }
 
