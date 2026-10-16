@@ -1,5 +1,43 @@
 package main
 
+var calls int
+
+func bound(i int) int {
+	calls++
+	return i
+}
+
+func word() string {
+	calls++
+	return "ting"
+}
+
+// compareSlices compares slices of a string with == and !=.
+func compareSlices(src string) {
+	// Equal and different bytes, lengths and bounds.
+	println(src[0:4] == "func", src[1:5] == "func", src[0:3] == "func", src[:4] != "func", src[5:] == "main() {}")
+	key := "func"
+	println(key == src[0:4], key != src[0:4], "unc " == src[1:5], src[0:4] == src[0:4], src[0:4] == src[5:9])
+
+	// A string longer than sixteen bytes, and bytes of UTF-8 text.
+	long := "abcdefghijklmnopqrstuvwxyz"
+	println(long[2:22] == "cdefghijklmnopqrstuv", long[2:22] == "cdefghijklmnopqrstuw", long[:] == long)
+	text := "héllo, 世界"
+	println(text[1:3] == "é", text[8:11] == "世", text[8:11] == "界", text[1:2] == "\xc3")
+
+	// Bounds given by calls are evaluated once, before the other operand.
+	calls = 0
+	println("testing"[bound(3):bound(7)] == word(), word() == "testing"[bound(3):], calls)
+}
+
+// compareOutOfRange compares a slice whose bounds are out of range.
+func compareOutOfRange(src string, low, high int) {
+	defer func() {
+		println("recovered:", recover() != nil)
+	}()
+	println(src[low:high] == "x")
+}
+
 func main() {
 	myStr1 := "testing"
 	println("myStr1:", myStr1)
@@ -55,4 +93,9 @@ func main() {
 	s2 := s[1:2]
 	s3 := s[2:3]
 	println(s1, s2, s3) // Expected: a b c
+
+	compareSlices("func main() {}")
+	compareOutOfRange("abc", 2, 4)
+	compareOutOfRange("abc", 2, 1)
+	compareOutOfRange("abc", 3, 3)
 }

@@ -15,3 +15,12 @@ myStr1[1:1]:
 myStr1[0:0]: 
 myStr1[7:7]: 
 a b c
+true false false false true
+true false true true false
+true false true
+true true false true
+true true 5
+recovered: true
+recovered: true
+false
+recovered: false
