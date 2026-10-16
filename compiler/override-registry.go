@@ -72,6 +72,11 @@ type OverrideMetadata struct {
 	// TypeScript takes the descriptor of their type arguments as the first
 	// argument, as iter.Pull does to return the zero value of V.
 	TypeArgFunctions map[string]bool
+	// CallSiteFunctions names the package-level functions whose TypeScript
+	// takes the Go position of each direct call as one more argument after
+	// their parameters, as runtime.Caller does to report the frames of
+	// functions that //goscript:maxify marks (see lowering-call-sites.go).
+	CallSiteFunctions map[string]bool
 }
 
 // OverrideRegistryOwner owns GoScript override package metadata and copy plans.

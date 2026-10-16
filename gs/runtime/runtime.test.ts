@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import * as $ from '@goscript/builtin/index.js'
 
 import {
+  Caller,
   Compiler,
   FuncForPC,
   Gosched,
@@ -31,6 +32,39 @@ describe('runtime override', () => {
     )
     expect(ReadTrace()).toBeNull()
     expect(() => StopTrace()).not.toThrow()
+  })
+
+  it('reports the Go positions of a chain of call sites', () => {
+    // The chain of a caller of a marked function, a marked function and the
+    // call of Caller in it reports each frame's Go file and line.
+    const user: $.CallSite = { file: 'example.com/app/main.go', line: 12 }
+    const add: $.CallSite = {
+      file: 'example.com/ui/plan.go',
+      line: 30,
+      caller: user,
+    }
+    const site: $.CallSite = {
+      file: 'example.com/ui/plan.go',
+      line: 40,
+      caller: add,
+    }
+    expect(Caller(0, site).slice(1)).toEqual([
+      'example.com/ui/plan.go',
+      40,
+      true,
+    ])
+    expect(Caller(2, site).slice(1)).toEqual([
+      'example.com/app/main.go',
+      12,
+      true,
+    ])
+    const [pc] = Caller(2, site)
+    expect(FuncForPC(pc)?.FileLine(pc)).toEqual(['example.com/app/main.go', 12])
+
+    // A frame past the end of the chain comes from the JavaScript stack.
+    const [, file, line, ok] = Caller(3, site)
+    expect(file).not.toBe('example.com/app/main.go')
+    expect(ok && line > 0).toBe(ok)
   })
 
   it('ignores finalizer registration and clearing', () => {

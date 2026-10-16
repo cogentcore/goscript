@@ -308,6 +308,7 @@ import "embed"
 //go:embed gs/reflect/visiblefields.ts
 //go:embed gs/runtime/debug/index.ts
 //go:embed gs/runtime/index.ts
+//go:embed gs/runtime/meta.json
 //go:embed gs/runtime/parity.json
 //go:embed gs/runtime/pprof/index.ts
 //go:embed gs/runtime/pprof/meta.json
