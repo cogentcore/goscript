@@ -407,6 +407,8 @@ func (o *LoweringOwner) lowerFile(req lowerFileRequest) (*loweredFile, []Diagnos
 		}},
 	}
 	loweredFile.typePackagePath, loweredFile.typePackageNames = fileTypePackagePath(semPkg, file)
+	loweredFile.noCheck = slices.ContainsFunc(file.Decls, declTooLargeForFlowAnalysis) ||
+		slices.ContainsFunc(associatedMethods, func(decl *ast.FuncDecl) bool { return declTooLargeForFlowAnalysis(decl) })
 	importAliases := make(map[string]string)
 	importPaths := make(map[string]string)
 	importNames := make(map[string]string)
@@ -794,6 +796,38 @@ func uniqueImportAlias(alias string, pkgPath string, importAliases map[string]st
 			return candidate
 		}
 	}
+}
+
+// maxFlowBranches is the number of branches in one function past which
+// TypeScript may not follow its control flow. Its checker gives up after
+// 2000 nested steps back from a use of a variable, and each branch on the
+// way can add a few.
+const maxFlowBranches = 1000
+
+// declTooLargeForFlowAnalysis reports whether decl is a function with more
+// branches than TypeScript may follow, whose file is then not type checked:
+// the checker reports such a function and stops narrowing in the files it
+// checks after it.
+func declTooLargeForFlowAnalysis(decl ast.Decl) bool {
+	fn, ok := decl.(*ast.FuncDecl)
+	if !ok || fn.Body == nil {
+		return false
+	}
+
+	// The search stops once the function has too many.
+	branches := 0
+	ast.Inspect(fn.Body, func(node ast.Node) bool {
+		switch typed := node.(type) {
+		case *ast.IfStmt, *ast.ForStmt, *ast.RangeStmt, *ast.CaseClause, *ast.CommClause, *ast.LabeledStmt:
+			branches++
+		case *ast.BinaryExpr:
+			if typed.Op == token.LAND || typed.Op == token.LOR {
+				branches++
+			}
+		}
+		return branches <= maxFlowBranches
+	})
+	return branches > maxFlowBranches
 }
 
 func (o *LoweringOwner) methodDeclsForFileTypes(semPkg *semanticPackage, file *ast.File, methodIndex packageMethodIndex) []*ast.FuncDecl {
