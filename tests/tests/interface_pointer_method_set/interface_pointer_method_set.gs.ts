@@ -157,15 +157,15 @@ export async function check(name: string, v: any): globalThis.Promise<void> {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let x: any = $.interfaceValue(new T(true, 1), "main.T", "main.T")
+	let x: any = $.structInterfaceValue(new T(true, 1), "main.T", "main.T")
 	let px: any = $.interfaceValue(new T(false, 2), "*main.T", /* @__PURE__ */ $.pointerType("main.T"))
 
 	// A T value has only the value methods, so it is a Getter but not a Setter.
 	await check("T", x)
 	await check("*T", px)
-	await check("ByValue", $.interfaceValue(new ByValue(true), "main.ByValue", "main.ByValue"))
+	await check("ByValue", $.structInterfaceValue(new ByValue(true), "main.ByValue", "main.ByValue"))
 	await check("*ByValue", $.interfaceValue(new ByValue(), "*main.ByValue", /* @__PURE__ */ $.pointerType("main.ByValue")))
-	await check("ByPointer", $.interfaceValue(new ByPointer(true, new T()), "main.ByPointer", "main.ByPointer"))
+	await check("ByPointer", $.structInterfaceValue(new ByPointer(true, new T()), "main.ByPointer", "main.ByPointer"))
 	await check("Count", __goscriptStatic3())
 	let c = $.varRef(4)
 	await check("*Count", $.namedValueInterfaceValue<any>(c, "*main.Count", __goscriptStatic4(), __goscriptStatic5(), __goscriptStatic6()))
@@ -175,13 +175,13 @@ export async function main(): globalThis.Promise<void> {
 		let v = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as any)
 		{
 			const __goscriptTypeSwitchValue = v
-			switch (true) {
-				case $.typeAssert<Setter | null>(__goscriptTypeSwitchValue, "main.Setter").ok:
+			switch ($.typeSwitchCase(__goscriptTypeSwitchValue, __goscriptStatic7())) {
+				case 0:
 					{
 						await $.println("switch: Setter")
 					}
 					break
-				case $.typeAssert<Getter | null>(__goscriptTypeSwitchValue, "main.Getter").ok:
+				case 1:
 					{
 						await $.println("switch: Getter")
 					}
@@ -203,9 +203,9 @@ export async function main(): globalThis.Promise<void> {
 
 	// reflect agrees.
 	let setter = (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.interfaceValue(null, "*main.Setter", /* @__PURE__ */ $.pointerType("main.Setter")))).Elem(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
-	await $.println("reflect T:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.interfaceValue(new T(true), "main.T", "main.T"))).Implements($.pointerValueOrNil(setter)!), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), "*T:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.interfaceValue(new T(), "*main.T", /* @__PURE__ */ $.pointerType("main.T")))).Implements($.pointerValueOrNil(setter)!), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
-	await $.println("reflect Count:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf(__goscriptStatic7())).Implements($.pointerValueOrNil(setter)!), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), "*Count:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.namedValueInterfaceValue<any>(c, "*main.Count", __goscriptStatic4(), __goscriptStatic5(), __goscriptStatic6()))).Implements($.pointerValueOrNil(setter)!), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
-	await $.println("NumMethod T:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.interfaceValue(new T(true), "main.T", "main.T"))).NumMethod(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), "*T:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.interfaceValue(new T(), "*main.T", /* @__PURE__ */ $.pointerType("main.T")))).NumMethod(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println("reflect T:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.structInterfaceValue(new T(true), "main.T", "main.T"))).Implements($.pointerValueOrNil(setter)!), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), "*T:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.interfaceValue(new T(), "*main.T", /* @__PURE__ */ $.pointerType("main.T")))).Implements($.pointerValueOrNil(setter)!), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println("reflect Count:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf(__goscriptStatic8())).Implements($.pointerValueOrNil(setter)!), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), "*Count:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.namedValueInterfaceValue<any>(c, "*main.Count", __goscriptStatic4(), __goscriptStatic5(), __goscriptStatic6()))).Implements($.pointerValueOrNil(setter)!), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println("NumMethod T:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.structInterfaceValue(new T(true), "main.T", "main.T"))).NumMethod(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), "*T:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.interfaceValue(new T(), "*main.T", /* @__PURE__ */ $.pointerType("main.T")))).NumMethod(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 }
 
 var __goscriptStatic0$value: any
@@ -245,7 +245,12 @@ function __goscriptStatic6(): any {
 
 var __goscriptStatic7$value: any
 function __goscriptStatic7(): any {
-	return __goscriptStatic7$value ??= ($.namedValueInterfaceValue<any>(0, "main.Count", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()))
+	return __goscriptStatic7$value ??= ($.typeSwitchSite(["main.Setter", "main.Getter"]))
+}
+
+var __goscriptStatic8$value: any
+function __goscriptStatic8(): any {
+	return __goscriptStatic8$value ??= ($.namedValueInterfaceValue<any>(0, "main.Count", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()))
 }
 
 var __goscriptAwait: any
