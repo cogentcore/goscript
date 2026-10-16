@@ -58,7 +58,7 @@ export async function main(): globalThis.Promise<void> {
 	let priv: ed25519.PrivateKey = (__goscriptTuple0[1] as ed25519.PrivateKey)
 	let err = __goscriptTuple0[2]
 	await $.println("keygen err nil", err == null)
-	let __goscriptTuple1: any = await asn1.Marshal($.interfaceValue(new signedKey(true, new Uint8Array([8, 1, 18, 2, 3, 4]) as $.Slice<number>, new Uint8Array([5, 6]) as $.Slice<number>), "main.signedKey", "main.signedKey"))
+	let __goscriptTuple1: any = asn1.Marshal($.interfaceValue(new signedKey(true, new Uint8Array([8, 1, 18, 2, 3, 4]) as $.Slice<number>, new Uint8Array([5, 6]) as $.Slice<number>), "main.signedKey", "main.signedKey"))
 	let extensionDER: $.Slice<number> = __goscriptTuple1[0]
 	err = __goscriptTuple1[1]
 	await $.println("extension marshal err nil", err == null)
@@ -99,7 +99,7 @@ export async function main(): globalThis.Promise<void> {
 		}
 	}
 	let decoded: $.VarRef<signedKey> = $.varRef(new signedKey(true))
-	let __goscriptTuple4: any = await asn1.Unmarshal(keyExt.Value, $.interfaceValue(decoded, "*main.signedKey", /* @__PURE__ */ $.pointerType("main.signedKey")))
+	let __goscriptTuple4: any = asn1.Unmarshal(keyExt.Value, $.interfaceValue(decoded, "*main.signedKey", /* @__PURE__ */ $.pointerType("main.signedKey")))
 	err = __goscriptTuple4[1]
 	await $.println("extension unmarshal", err == null, $.sliceLen(decoded.value.PubKey), $.arrayIndex(decoded.value.PubKey!, 0), $.arrayIndex(decoded.value.PubKey!, 5), $.sliceLen(decoded.value.Signature))
 	let pool = x509.NewCertPool()
@@ -136,7 +136,7 @@ export async function main(): globalThis.Promise<void> {
 		return
 	}
 
-	await $.println("serial", await big.Int.prototype.String.call((cert$ as x509.Certificate).SerialNumber))
+	await $.println("serial", big.Int.prototype.String.call($.pointerValue<big.Int>((cert$ as x509.Certificate).SerialNumber)))
 	await $.println("common name", (cert$ as x509.Certificate).Subject.CommonName)
 	await $.println("organization", $.arrayIndex((cert$ as x509.Certificate).Subject.Organization!, 0))
 	await $.println("signature algorithm", x509.SignatureAlgorithm_String((cert$ as x509.Certificate).SignatureAlgorithm))
