@@ -2009,14 +2009,18 @@ function writeTypedElements(
 
 /**
  * copy copies the shared length of src and dst, preserving overlapping source values.
+ * structs tells that the elements are struct values, which are copied into
+ * the elements of dst in place, as Go copies memory: pointers to them, and
+ * the struct objects the generated code holds for them, then see the copy.
  */
 export function copy(dst: TypedSlice, src: TypedSlice | string): number
 export function copy(dst: TypedSlice, src: Slice<number>): number
-export function copy<T>(dst: Slice<T>, src: Slice<T>): number
+export function copy<T>(dst: Slice<T>, src: Slice<T>, structs?: boolean): number
 export function copy<T>(dst: Slice<T>, src: string): number
 export function copy<T>(
   dst: Slice<T> | TypedSlice,
   src: Slice<T> | TypedSlice | string,
+  structs?: boolean,
 ): number {
   if (dst === null) {
     return 0
@@ -2045,7 +2049,7 @@ export function copy<T>(
     dstElements.set(srcElements.subarray(0, count))
     return count
   }
-  copySliceElements(dst, 0, src, 0, count)
+  copySliceElements(dst, 0, src, 0, count, structs)
   return count
 }
 
@@ -2119,13 +2123,19 @@ function copyFromString<T>(dst: Slice<T> | TypedSlice, src: string): number {
   return count
 }
 
-/** copySliceElements copies each value and traverses overlapping backing in the safe direction. */
+/**
+ * copySliceElements copies each value and traverses overlapping backing in
+ * the safe direction. With structs, a struct value is assigned into the
+ * destination element of its class in place, as Go copies memory; any other
+ * element, such as a hole, is replaced by a copy.
+ */
 export function copySliceElements<T>(
   dst: Slice<T> | TypedSlice | null,
   dstIndex: number,
   src: Slice<T> | TypedSlice | null | undefined,
   srcIndex: number,
   count: number,
+  structs = false,
 ): void {
   if (dst == null || src == null || count <= 0) {
     return
@@ -2148,9 +2158,31 @@ export function copySliceElements<T>(
     dstStart < srcStart + count
   for (let step = 0; step < count; step++) {
     const i = backward ? count - 1 - step : step
-    const value = copyElement((srcBacking as T[])[srcStart + i])
-    ;(dstBacking as T[])[dstStart + i] = value
+    const source = (srcBacking as T[])[srcStart + i]
+    const target = (dstBacking as T[])[dstStart + i]
+    if (structs && assignStructInPlace(target, source)) {
+      continue
+    }
+    ;(dstBacking as T[])[dstStart + i] = copyElement(source)
   }
+}
+
+// assignStructInPlace assigns source into target when both are struct values
+// of one class, and reports whether it did.
+function assignStructInPlace(target: unknown, source: unknown): boolean {
+  if (
+    target === null ||
+    typeof target !== 'object' ||
+    source === null ||
+    typeof source !== 'object' ||
+    target.constructor !== source.constructor ||
+    !('__goscriptAssign' in target) ||
+    typeof target.__goscriptAssign !== 'function'
+  ) {
+    return false
+  }
+  target.__goscriptAssign(source)
+  return true
 }
 
 /**
