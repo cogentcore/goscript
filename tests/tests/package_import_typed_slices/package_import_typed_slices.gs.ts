@@ -17,14 +17,14 @@ export class mesh {
 
 	public declare Index: $.Slice<number>
 
-	constructor(init?: Partial<{Pos?: $.Slice<number>, Index?: $.Slice<number>}>, __goscriptValue?: boolean) {
-		this.Pos = init?.Pos ?? (null! as $.Slice<number>)
-		this.Index = init?.Index ?? (null! as $.Slice<number>)
+	constructor(__goscriptValue?: boolean, Pos$?: $.Slice<number>, Index$?: $.Slice<number>) {
+		this.Pos = Pos$ ?? (null! as $.Slice<number>)
+		this.Index = Index$ ?? (null! as $.Slice<number>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): mesh {
-		return new mesh(this, true)
+		return new mesh(true, this.Pos, this.Index)
 	}
 
 	public __goscriptAssign(source: mesh): this {
@@ -70,13 +70,13 @@ export async function main(): globalThis.Promise<void> {
 	{
 		let err = await binary.Write($.pointerValueOrNil($.interfaceValue<io.Writer | null>(buf, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer")))!, $.interfaceValue<binary.ByteOrder | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.LittleEndian))), "binary.littleEndian", "binary.littleEndian")!, $.interfaceValue($.typedSliceOf(Float32Array, [1, -2.5, globalThis.Math.fround(math.Inf(1))]) as $.Slice<number>, "[]float32", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("float32"))))
 		if (err != null) {
-			await $.println("write error:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+			await $.println("write error:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		}
 	}
 	{
 		let err = await binary.Write($.pointerValueOrNil($.interfaceValue<io.Writer | null>(buf, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer")))!, $.interfaceValue<binary.ByteOrder | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.BigEndian))), "binary.bigEndian", "binary.bigEndian")!, $.interfaceValue($.typedSliceOf(Uint16Array, [0x1234, 0xffff]) as $.Slice<number>, "[]uint16", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint16"))))
 		if (err != null) {
-			await $.println("write error:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+			await $.println("write error:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		}
 	}
 	await $.println("binary bytes:", buf.value.Len(), (fmt.Sprintf("% x", $.interfaceValue($.goSlice(buf.value.Bytes(), 4, 8), "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")))) as string), (fmt.Sprintf("% x", $.interfaceValue($.goSlice(buf.value.Bytes(), 12, undefined), "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")))) as string))
@@ -85,13 +85,13 @@ export async function main(): globalThis.Promise<void> {
 	{
 		let err = await binary.Read($.pointerValueOrNil($.interfaceValue<io.Reader | null>(buf, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer")))!, $.interfaceValue<binary.ByteOrder | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.LittleEndian))), "binary.littleEndian", "binary.littleEndian")!, $.interfaceValue(back, "[]float32", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("float32"))))
 		if (err != null) {
-			await $.println("read error:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+			await $.println("read error:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		}
 	}
 	{
 		let err = await binary.Read($.pointerValueOrNil($.interfaceValue<io.Reader | null>(buf, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer")))!, $.interfaceValue<binary.ByteOrder | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.BigEndian))), "binary.bigEndian", "binary.bigEndian")!, $.interfaceValue(backU, "[]uint16", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint16"))))
 		if (err != null) {
-			await $.println("read error:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && (err as any).__goValue === undefined ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+			await $.println("read error:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		}
 	}
 	await $.println("binary read:", $.arrayIndex(back!, 0), $.arrayIndex(back!, 1), math.IsInf($.arrayIndex(back!, 2), 1), $.arrayIndex(backU!, 0), $.arrayIndex(backU!, 1))
@@ -127,12 +127,12 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("fmt verbs:", (fmt.Sprintf("%v %.2f %d %x", $.interfaceValue($.typedSliceOf(Float32Array, [0.10000000149011612, 1.25]) as $.Slice<number>, "[]float32", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("float32"))), $.interfaceValue($.typedSliceOf(Float64Array, [1, 2.5]) as $.Slice<number>, "[]float64", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("float64"))), $.interfaceValue($.typedSliceOf(Int16Array, [-3, 4]) as $.Slice<number>, "[]int16", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int16"))), $.interfaceValue($.typedSliceOf(Uint16Array, [255, 16]) as $.Slice<number>, "[]uint16", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint16")))) as string))
 
 	// encoding/json marshals and unmarshals typed slices.
-	let m = new mesh({Pos: $.typedSliceOf(Float32Array, [0.5, 1, -2.5]) as $.Slice<number>, Index: $.typedSliceOf(Uint32Array, [0, 1, 4294967295]) as $.Slice<number>}, true)
+	let m = new mesh(true, $.typedSliceOf(Float32Array, [0.5, 1, -2.5]) as $.Slice<number>, $.typedSliceOf(Uint32Array, [0, 1, 4294967295]) as $.Slice<number>)
 	let __goscriptTuple1: any = (json.Marshal($.interfaceValue((m).clone(), "main.mesh", "main.mesh")) as [$.Slice<number>, $.GoError])
 	let data: $.Slice<number> = __goscriptTuple1[0]
 	let err = __goscriptTuple1[1]
 	await $.println("json:", $.bytesToString(data), err == null)
-	let m2: $.VarRef<mesh> = $.varRef(new mesh(undefined, true))
+	let m2: $.VarRef<mesh> = $.varRef(new mesh(true))
 	err = (json.Unmarshal(data, $.interfaceValue(m2, "*main.mesh", /* @__PURE__ */ $.pointerType("main.mesh"))) as $.GoError)
 	await $.println("json back:", err == null, $.sliceLen(m2.value.Pos), $.arrayIndex(m2.value.Pos!, 0), $.arrayIndex(m2.value.Index!, 2))
 	let fs32: $.VarRef<$.Slice<number>> = $.varRef(null! as $.Slice<number>)
