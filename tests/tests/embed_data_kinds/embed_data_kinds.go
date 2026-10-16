@@ -14,7 +14,13 @@ var blob []byte
 //go:embed small.txt
 var small []byte
 
-//go:embed blob.bin small.txt text.txt
+//go:embed unicode.txt
+var unicodeBytes []byte
+
+//go:embed unicode.txt
+var unicodeText string
+
+//go:embed blob.bin small.txt text.txt unicode.txt
 var files embed.FS
 
 // sum adds the bytes of data, weighted by position.
@@ -34,6 +40,7 @@ func main() {
 	// Binary data keeps every byte value, and is a slice of its own.
 	println("blob:", len(blob), blob[0], blob[255], blob[256], sum(blob), string(blob[len(blob)-4:]))
 	println("small:", len(small), string(small))
+	println("unicode:", len(unicodeBytes), sum(unicodeBytes), string(unicodeBytes) == unicodeText, unicodeBytes[len(unicodeBytes)-2])
 	blob[0] = 42
 	again, _ := files.ReadFile("blob.bin")
 	println("own:", blob[0], again[0])
@@ -45,4 +52,6 @@ func main() {
 	println("fs text:", err == nil, string(data) == text)
 	data, err = files.ReadFile("small.txt")
 	println("fs small:", err == nil, string(data))
+	data, err = files.ReadFile("unicode.txt")
+	println("fs unicode:", err == nil, len(data), sum(data))
 }
