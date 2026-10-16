@@ -109,33 +109,33 @@ export async function printTokens(dec: json.Decoder | $.VarRef<json.Decoder> | n
 		}
 		{
 			const __goscriptTypeSwitchValue = tok
-			switch (true) {
-				case $.typeAssert<json.Delim>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.basicType("int32", "json.Delim")).ok:
+			switch ($.typeSwitchCase(__goscriptTypeSwitchValue, __goscriptStatic0())) {
+				case 0:
 					{
 						let t: json.Delim = $.typeAssert<json.Delim>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.basicType("int32", "json.Delim")).value
 						fmt.Println("delim", json.Delim_String(t), await (dec !== null && (dec as any).__isVarRef !== true && (dec as any).__goValue === undefined ? ((dec as any) as json.Decoder).More() : json.Decoder.prototype.More.call($.pointerValue<json.Decoder>(dec))))
 					}
 					break
-				case $.typeAssert<string>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.basicType("string")).ok:
+				case 1:
 					{
 						let t: string = $.typeAssert<string>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.basicType("string")).value
 						fmt.Println("string", t)
 					}
 					break
-				case $.typeAssert<number>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.basicType("float64")).ok:
+				case 2:
 					{
 						let t: number = $.typeAssert<number>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.basicType("float64")).value
 						fmt.Println("number", $.basicInterfaceValue(t, "float64"))
 					}
 					break
-				case $.typeAssert<json.Number>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.basicType("string", "json.Number")).ok:
+				case 3:
 					{
 						let t: json.Number = $.typeAssert<json.Number>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.basicType("string", "json.Number")).value
 						let [f, ] = json.Number_Float64(t)
 						fmt.Println("json.Number", json.Number_String(t), $.basicInterfaceValue(f, "float64"))
 					}
 					break
-				case $.typeAssert<boolean>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.basicType("bool")).ok:
+				case 4:
 					{
 						let t: boolean = $.typeAssert<boolean>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.basicType("bool")).value
 						fmt.Println("bool", t)
@@ -217,6 +217,11 @@ export async function main(): globalThis.Promise<void> {
 	let it: $.VarRef<item> = $.varRef(new item(true))
 	err = await json.Decoder.prototype.Decode.call($.pointerValue<json.Decoder>(json.NewDecoder($.pointerValueOrNil($.interfaceValue<io.Reader | null>(await newChanReader($.arrayToSlice<string>(["{\"A\": ]", " more"])), "*main.chanReader", /* @__PURE__ */ $.pointerType("main.chanReader")))!)), $.interfaceValue(it, "*main.item", /* @__PURE__ */ $.pointerType("main.item")))
 	fmt.Println("syntax error:", err != null)
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= ($.typeSwitchSite([/* @__PURE__ */ $.basicType("int32", "json.Delim"), /* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("float64"), /* @__PURE__ */ $.basicType("string", "json.Number"), /* @__PURE__ */ $.basicType("bool")]))
 }
 
 if ($.isMainScript(import.meta)) {

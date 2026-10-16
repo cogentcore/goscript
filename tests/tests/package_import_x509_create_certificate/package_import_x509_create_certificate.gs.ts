@@ -112,14 +112,14 @@ export async function main(): globalThis.Promise<void> {
 		await $.println("verify error type", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf((err as any))).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		{
 			const __goscriptTypeSwitchValue = err
-			switch (true) {
-				case $.typeAssert<x509.CertificateInvalidError>(__goscriptTypeSwitchValue, "x509.CertificateInvalidError").ok:
+			switch ($.typeSwitchCase(__goscriptTypeSwitchValue, __goscriptStatic6())) {
+				case 0:
 					{
 						let typed: x509.CertificateInvalidError = $.markAsStructValue($.cloneStructValue($.typeAssert<x509.CertificateInvalidError>(__goscriptTypeSwitchValue, "x509.CertificateInvalidError").value))
 						await $.println("certificate invalid", typed.Reason, typed.Detail)
 					}
 					break
-				case $.typeAssert<x509.UnknownAuthorityError>(__goscriptTypeSwitchValue, "x509.UnknownAuthorityError").ok:
+				case 1:
 					{
 						let typed: x509.UnknownAuthorityError = $.markAsStructValue($.cloneStructValue($.typeAssert<x509.UnknownAuthorityError>(__goscriptTypeSwitchValue, "x509.UnknownAuthorityError").value))
 						await $.println("unknown authority")
@@ -172,6 +172,11 @@ function __goscriptStatic4(): any {
 var __goscriptStatic5$value: any
 function __goscriptStatic5(): any {
 	return __goscriptStatic5$value ??= ([$.methodSignature("Equal", [["x", "crypto.PrivateKey"]], [/* @__PURE__ */ $.basicType("bool")]), $.methodSignature("Public", [], ["crypto.PublicKey"]), $.methodSignature("Seed", [], [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))]), $.methodSignature("Sign", [["rand", "io.Reader"], ["message", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))], ["opts", "crypto.SignerOpts"]], [["signature", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))], ["err", "error"]])])
+}
+
+var __goscriptStatic6$value: any
+function __goscriptStatic6(): any {
+	return __goscriptStatic6$value ??= ($.typeSwitchSite(["x509.CertificateInvalidError", "x509.UnknownAuthorityError"]))
 }
 
 var __goscriptAwait: any

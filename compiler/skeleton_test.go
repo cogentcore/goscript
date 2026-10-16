@@ -1738,7 +1738,8 @@ func TestCompilePackagesEmitsSideEffectImportsForInterfaceRegistry(t *testing.T)
 		"import * as dep from \"@goscript/example.test/interface-registry/dep/index.js\"",
 		"import \"@goscript/example.test/interface-registry/dep/index.js\"",
 		"import type * as __goscript_local from \"./local.gs.ts\"",
-		"case $.typeAssert<__goscript_local.Local | null>(__goscriptTypeSwitchValue, \"main.Local\").ok",
+		"switch ($.typeSwitchCase(__goscriptTypeSwitchValue, __goscriptStatic0()))",
+		"$.typeSwitchSite([\"main.Local\"])",
 		"$.typeAssertTuple<dep.Remote | null>(v, \"dep.Remote\")",
 	} {
 		if !strings.Contains(mainText, want) {
@@ -3091,8 +3092,8 @@ func TestCompilePackagesEmitsInterfacesMethodValuesTypeSwitchesAndFunctionAssert
 		"$.interfaceValue(null, \"*struct{Name string}\",",
 		"$.pointerType({ kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField(\"Name\", /* @__PURE__ */ $.basicType(\"string\"), [0], 0, true)] })",
 		"let fn = __goscriptTuple",
-		"switch (true)",
-		"case $.typeAssert<ReadCloser | null>(__goscriptTypeSwitchValue, \"main.ReadCloser\").ok",
+		"switch ($.typeSwitchCase(__goscriptTypeSwitchValue, __goscriptStatic0()))",
+		"$.typeSwitchSite([\"main.ReadCloser\"])",
 		"let v: ReadCloser | null = $.typeAssert<ReadCloser | null>(__goscriptTypeSwitchValue, \"main.ReadCloser\").value",
 	} {
 		if !strings.Contains(text, want) {
@@ -3186,7 +3187,7 @@ func TestCompilePackagesUsesNonNilInterfaceTypeSwitchCaseVarRefs(t *testing.T) {
 	text := string(content)
 	for _, want := range []string{
 		"export type tcpConn = {",
-		"case $.typeAssert<tcpConn | null>(__goscriptTypeSwitchValue, \"main.tcpConn\").ok",
+		"$.typeSwitchSite([\"main.tcpConn\"])",
 		"let c: $.VarRef<tcpConn | null> = $.varRef($.typeAssert<tcpConn | null>(__goscriptTypeSwitchValue, \"main.tcpConn\").value)",
 		"$.pointerValue<Exclude<tcpConn, null>>(c.value).SyscallConn()",
 	} {
@@ -4044,8 +4045,8 @@ func TestCompilePackagesLowersFunctionIteratorControlFlow(t *testing.T) {
 		"for (let i = 0; i < 2; i++)",
 		"switch (v)",
 		"const __goscriptTypeSwitchValue",
-		"switch (true)",
-		"case $.typeAssert<number>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.basicType(\"int\")).ok",
+		"switch ($.typeSwitchCase(__goscriptTypeSwitchValue, __goscriptStatic0()))",
+		"$.typeSwitchSite([/* @__PURE__ */ $.basicType(\"int\")])",
 		"break",
 	} {
 		if !strings.Contains(text, want) {

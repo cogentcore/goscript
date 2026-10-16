@@ -108,8 +108,8 @@ export class Outer {
 export function take(x: any): void {
 	{
 		const __goscriptTypeSwitchValue = x
-		switch (true) {
-			case $.typeAssert<S | $.VarRef<S> | null>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.pointerType("main.S")).ok:
+		switch ($.typeSwitchCase(__goscriptTypeSwitchValue, __goscriptStatic0())) {
+			case 0:
 				{
 				}
 				break
@@ -161,6 +161,11 @@ export async function main(): globalThis.Promise<void> {
 	let i1: any = $.interfaceValue(new S(true, "z"), "main.S", "main.S")
 	let i2: any = $.interfaceValue(new S(false, "z"), "*main.S", /* @__PURE__ */ $.pointerType("main.S"))
 	await $.println($.comparableEqual(i1, i2), $.comparableEqual(i1, $.interfaceValue(new S(true, "z"), "main.S", "main.S")))
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= ($.typeSwitchSite([/* @__PURE__ */ $.pointerType("main.S")]))
 }
 
 if ($.isMainScript(import.meta)) {

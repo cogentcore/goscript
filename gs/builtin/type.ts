@@ -2258,6 +2258,86 @@ function typeAssertBoxed<T>(value: any, typeInfo: string): TypeAssertResult<T> {
   return result
 }
 
+// TypeSwitchSite is the hoisted site of a type switch whose clauses each
+// list one type: the case types in order, null for nil, and the case index
+// that boxes of each dynamic type took, while no type is registered.
+export interface TypeSwitchSite {
+  cases: (string | TypeInfo | null)[]
+  outcomes: Map<string, TypeSwitchOutcome>
+  generation: number
+}
+
+// TypeSwitchOutcome is the case a box of a dynamic type, identified by its
+// type name, type info and prototype, took at a type switch site.
+interface TypeSwitchOutcome {
+  typeInfo: TypeInfo | string
+  proto: object | null
+  index: number
+}
+
+/** typeSwitchSite makes the site of a type switch with the given case types. */
+export function typeSwitchSite(
+  cases: (string | TypeInfo | null)[],
+): TypeSwitchSite {
+  return { cases, outcomes: new Map(), generation: typeRegistryGeneration }
+}
+
+// typeSwitchCase returns the index of the first case of a type switch site
+// that value matches, or -1 for none, asserting value to each case type as
+// the clause would. The outcome for a box is remembered by its dynamic type,
+// which alone decides each assertion of a box (see typeAssertBoxed), until
+// another type is registered.
+export function typeSwitchCase(value: any, site: TypeSwitchSite): number {
+  // A box of a dynamic type seen before takes the case that type took.
+  const boxed =
+    typeof value === 'object' &&
+    value !== null &&
+    value.__goTypeInfo !== undefined &&
+    typeof value.__goType === 'string' &&
+    value.__isTypedNil !== true
+  if (boxed) {
+    if (site.generation !== typeRegistryGeneration) {
+      site.outcomes.clear()
+      site.generation = typeRegistryGeneration
+    }
+    const outcome = site.outcomes.get(value.__goType)
+    if (
+      outcome !== undefined &&
+      outcome.proto === Object.getPrototypeOf(value) &&
+      sameBoxTypeInfo(outcome.typeInfo, value.__goTypeInfo)
+    ) {
+      return outcome.index
+    }
+  }
+
+  // Otherwise the cases are asserted in order, and the outcome of a box
+  // recorded.
+  const index = typeSwitchCaseUncached(value, site.cases)
+  if (boxed) {
+    site.outcomes.set(value.__goType, {
+      typeInfo: value.__goTypeInfo,
+      proto: Object.getPrototypeOf(value),
+      index,
+    })
+  }
+  return index
+}
+
+// typeSwitchCaseUncached returns the index of the first of cases that value
+// matches, or -1 for none: nil matches only a nil interface.
+function typeSwitchCaseUncached(
+  value: any,
+  cases: (string | TypeInfo | null)[],
+): number {
+  for (let i = 0; i < cases.length; i++) {
+    const typeInfo = cases[i]
+    if (typeInfo === null ? value == null : typeAssert(value, typeInfo).ok) {
+      return i
+    }
+  }
+  return -1
+}
+
 // sameBoxTypeInfo reports whether the type infos of two boxes of the same
 // type name are the same: the same string or object, or pointer descriptors
 // to the same named type, which boxing makes for each pointer.

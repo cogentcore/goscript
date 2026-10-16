@@ -8867,6 +8867,7 @@ func (o *LoweringOwner) lowerTypeSwitchStmt(ctx lowerFileContext, stmt *ast.Type
 		varName: varName,
 		varRef:  varRef,
 	}
+	cacheable := true
 	for _, clauseStmt := range stmt.Body.List {
 		clause, ok := clauseStmt.(*ast.CaseClause)
 		if !ok {
@@ -8882,8 +8883,10 @@ func (o *LoweringOwner) lowerTypeSwitchStmt(ctx lowerFileContext, stmt *ast.Type
 		}
 		types := make([]string, 0, len(clause.List))
 		tsTypes := make([]string, 0, len(clause.List))
+		cacheable = cacheable && len(clause.List) == 1
 		for _, expr := range clause.List {
 			typ := ctx.semPkg.source.TypesInfo.TypeOf(expr)
+			cacheable = cacheable && isTypeSwitchSiteCaseType(typ)
 			if isUntypedNilType(typ) {
 				types = append(types, typeSwitchNilCase)
 				tsTypes = append(tsTypes, "any")
@@ -8909,8 +8912,42 @@ func (o *LoweringOwner) lowerTypeSwitchStmt(ctx lowerFileContext, stmt *ast.Type
 			body:    body,
 		})
 	}
+	if cacheable && len(switchIR.cases) != 0 {
+		switchIR.site = o.lowerTypeSwitchSite(ctx, switchIR)
+	}
 	lowered = append(lowered, loweredStmt{typeSwitch: switchIR})
 	return lowered, diagnostics
+}
+
+// lowerTypeSwitchSite returns the hoisted runtime site of a type switch whose
+// clauses each list one type. typeSwitchCase asserts the operand to the case
+// types in order, as the clauses would, and remembers the case that a box of
+// each dynamic type takes, which its type alone decides (see
+// isTypeSwitchSiteCaseType). Switches with the same case types share a site.
+func (o *LoweringOwner) lowerTypeSwitchSite(ctx lowerFileContext, switchIR *loweredTypeSwitch) string {
+	types := make([]string, 0, len(switchIR.cases))
+	for _, switchCase := range switchIR.cases {
+		types = append(types, switchCase.types[0])
+	}
+	site := o.runtimeOwner.QualifiedHelper(RuntimeHelperTypeSwitchSite) + "([" + strings.Join(types, ", ") + "])"
+	return o.hoistStatic(ctx, site)
+}
+
+// isTypeSwitchSiteCaseType reports whether a type switch case of type typ
+// can share a hoisted site (see lowerTypeSwitchSite): nil, or a type whose
+// descriptor can be hoisted and that is not a map type, whose assertion
+// samples the entries of the map.
+func isTypeSwitchSiteCaseType(typ types.Type) bool {
+	if typ == nil {
+		return false
+	}
+	if isUntypedNilType(typ) {
+		return true
+	}
+	if _, isMap := types.Unalias(typ).Underlying().(*types.Map); isMap {
+		return false
+	}
+	return typeIsHoistable(typ)
 }
 
 // lowerTypeSwitchBinding narrows the operand to typ for a one-type case. Go

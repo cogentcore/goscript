@@ -443,15 +443,15 @@ export async function main(): globalThis.Promise<void> {
 		let p = ((__goscriptRangeWindow2.backing[__goscriptRangeWindow2.offset + __rangeIndex] as Program)).clone()
 		{
 			const __goscriptTypeSwitchValue = $.mapGet<string, Report | null, Report | null>(reports, p.Name, null)[0]
-			switch (true) {
-				case $.typeAssert<Answer>(__goscriptTypeSwitchValue, "main.Answer").ok:
+			switch ($.typeSwitchCase(__goscriptTypeSwitchValue, __goscriptStatic1())) {
+				case 0:
 					{
 						let r: Answer = $.markAsStructValue($.cloneStructValue($.typeAssert<Answer>(__goscriptTypeSwitchValue, "main.Answer").value))
 						totalSteps += r.Steps
 						await $.println(r.Program(), "=", r.Value, "in", r.Steps, "steps")
 					}
 					break
-				case $.typeAssert<Fault | $.VarRef<Fault> | null>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.pointerType("main.Fault")).ok:
+				case 1:
 					{
 						let r: Fault | $.VarRef<Fault> | null = $.typeAssert<Fault | $.VarRef<Fault> | null>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.pointerType("main.Fault")).value
 						await $.println((r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? ((r as any) as Fault).Program() : Fault.prototype.Program.call(r)), "crashed:", $.pointerValue<Fault>(r).Reason)
@@ -466,6 +466,11 @@ export async function main(): globalThis.Promise<void> {
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
 	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int64"), zero: () => 0n }})
+}
+
+var __goscriptStatic1$value: any
+function __goscriptStatic1(): any {
+	return __goscriptStatic1$value ??= ($.typeSwitchSite(["main.Answer", /* @__PURE__ */ $.pointerType("main.Fault")]))
 }
 
 var __goscriptAwait: any

@@ -25,48 +25,48 @@ export function appendOf<T>(__typeArgs: $.GenericTypeArgs | undefined, s: $.Slic
 export function kind(v: any): string {
 	{
 		const __goscriptTypeSwitchValue = v
-		switch (true) {
-			case $.typeAssert<$.Slice<number>>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("float32"))).ok:
+		switch ($.typeSwitchCase(__goscriptTypeSwitchValue, __goscriptStatic0())) {
+			case 0:
 				{
 					return "[]float32"
 				}
 				break
-			case $.typeAssert<$.Slice<number>>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("float64"))).ok:
+			case 1:
 				{
 					return "[]float64"
 				}
 				break
-			case $.typeAssert<$.Slice<number>>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int32"))).ok:
+			case 2:
 				{
 					return "[]int32"
 				}
 				break
-			case $.typeAssert<$.Slice<number>>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint32"))).ok:
+			case 3:
 				{
 					return "[]uint32"
 				}
 				break
-			case $.typeAssert<$.Slice<number>>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int16"))).ok:
+			case 4:
 				{
 					return "[]int16"
 				}
 				break
-			case $.typeAssert<$.Slice<number>>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint16"))).ok:
+			case 5:
 				{
 					return "[]uint16"
 				}
 				break
-			case $.typeAssert<$.Slice<number>>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int8"))).ok:
+			case 6:
 				{
 					return "[]int8"
 				}
 				break
-			case $.typeAssert<$.Slice<number>>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))).ok:
+			case 7:
 				{
 					return "[]byte"
 				}
 				break
-			case $.typeAssert<$.Slice<celsius>>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("float32", "main.celsius"))).ok:
+			case 8:
 				{
 					return "[]celsius"
 				}
@@ -154,7 +154,7 @@ export async function main(): globalThis.Promise<void> {
 	let src = $.typedSliceOf(Float64Array, [1, 2, 3, 4, 5]) as $.Slice<number>
 	let n = $.copy($.goSlice(src, 1, undefined), src)
 	await $.println("overlap copy:", n, $.arrayIndex(src!, 0), $.arrayIndex(src!, 1), $.arrayIndex(src!, 4))
-	let gen: $.Slice<number> = (makeOf(__goscriptStatic0(), 3) as $.Slice<number>)
+	let gen: $.Slice<number> = (makeOf(__goscriptStatic1(), 3) as $.Slice<number>)
 	$.sliceElems(gen!)[$.sliceSlot(gen!, 0)] = 0.10000000149011612
 	n = $.copy(f32, gen)
 	await $.println("copy from generic:", n, $.arrayIndex(f32!, 0) == 0.10000000149011612, $.arrayIndex(f32!, 2))
@@ -162,7 +162,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("copy to generic:", n, $.arrayIndex(gen!, 0), $.arrayIndex(gen!, 1))
 	gen = $.appendOne(gen, 1.5, $.typedSliceHints.float32)
 	await $.println("append generic:", $.sliceLen(gen), $.arrayIndex(gen!, 3))
-	let plain: $.Slice<number> = (appendOf(__goscriptStatic0(), null, $.typedSliceOf(Float32Array, [0.10000000149011612, 2]) as $.Slice<number>) as $.Slice<number>)
+	let plain: $.Slice<number> = (appendOf(__goscriptStatic1(), null, $.typedSliceOf(Float32Array, [0.10000000149011612, 2]) as $.Slice<number>) as $.Slice<number>)
 	n = $.copy(f32, plain)
 	await $.println("copy from plain:", n, $.arrayIndex(f32!, 0) == 0.10000000149011612, $.arrayIndex(f32!, 1))
 	n = $.copy(plain, $.typedSliceOf(Float32Array, [7]) as $.Slice<number>)
@@ -208,7 +208,12 @@ export async function main(): globalThis.Promise<void> {
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("float32"), zero: () => 0 }})
+	return __goscriptStatic0$value ??= ($.typeSwitchSite([/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("float32")), /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("float64")), /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int32")), /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint32")), /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int16")), /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint16")), /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int8")), /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")), /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("float32", "main.celsius"))]))
+}
+
+var __goscriptStatic1$value: any
+function __goscriptStatic1(): any {
+	return __goscriptStatic1$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("float32"), zero: () => 0 }})
 }
 
 if ($.isMainScript(import.meta)) {
