@@ -2,6 +2,7 @@ header: X-Test text/plain 2
 proto: 2 0 true
 status: PATCH 511 Network Authentication Required
 request: PUT /path true 1
+getbody: true again
 recorder: 403 feature not supported
 
 servecontent: 200 served

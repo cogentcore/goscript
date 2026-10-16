@@ -738,6 +738,9 @@ export class Request {
   public ProtoMajor: number
   public ProtoMinor: number
   public Body: io.ReadCloser | null
+  // GetBody returns a new copy of Body. The fetch transport sends a body once
+  // and never calls it; Request keeps it for code that does.
+  public GetBody: (() => [io.ReadCloser | null, $.GoError]) | null
   public Header: Header
   public ContentLength: bigint
   public TransferEncoding: $.Slice<string>
@@ -784,6 +787,7 @@ export class Request {
     this.ProtoMajor = init?.ProtoMajor ?? 1
     this.ProtoMinor = init?.ProtoMinor ?? 1
     this.Body = init?.Body ?? null
+    this.GetBody = init?.GetBody ?? null
     this.Header = init?.Header ?? new Header()
     this.ContentLength = init?.ContentLength ?? 0n
     this.TransferEncoding = init?.TransferEncoding ?? null
@@ -823,6 +827,7 @@ export class Request {
       ProtoMajor: this.ProtoMajor,
       ProtoMinor: this.ProtoMinor,
       Body: this.Body,
+      GetBody: this.GetBody,
       Header: Header_Clone(this.Header),
       ContentLength: this.ContentLength,
       TransferEncoding: this.TransferEncoding,
