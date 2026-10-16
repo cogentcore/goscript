@@ -2547,7 +2547,7 @@ func TestCompilePackagesEmitsArraySliceMapStringAndNamedMethods(t *testing.T) {
 		"export function MySlice_Add(s: $.VarRef<MySlice> | null, v: number): void",
 		"let arr = $.arrayValue([0, 10, 0])",
 		"let slice: $.Slice<number> = $.makeSlice<number>(0, 2, \"number\")",
-		"let empty = $.typedSliceOf(Int32Array, []) as $.Slice<number>",
+		"let empty = $.arrayToSlice<number>([])",
 		"let literal: $.Slice<number> = $.arrayToSlice<number>([1, 2])",
 		"literal = $.appendOne(literal, 3)",
 		"$.sliceElems(slice!)[$.sliceSlot(slice!, 0)] = $.arrayIndex(arr, 1)",

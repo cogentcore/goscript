@@ -68,7 +68,7 @@ export async function main(): globalThis.Promise<void> {
 	$.sliceElems(gb!)[$.sliceSlot(gb!, 1)] = (($.sliceElems(gb!)[$.sliceSlot(gb!, 1)] - 1) & 0xff)
 	let gf = (appendOf(__goscriptStatic2(), null, $.typedSliceOf(Float32Array, [1.6777216e+07]) as $.Slice<number>) as $.Slice<number>)
 	$.sliceElems(gf!)[$.sliceSlot(gf!, 0)] = globalThis.Math.fround($.sliceElems(gf!)[$.sliceSlot(gf!, 0)] + 1)
-	let ti = $.typedSliceOf(Int16Array, [32767]) as $.Slice<number>
+	let ti = $.arrayToSlice<number>([32767])
 	$.sliceElems(ti!)[$.sliceSlot(ti!, 0)] = (($.sliceElems(ti!)[$.sliceSlot(ti!, 0)] + 1) << 16 >> 16)
 	let arr = $.arrayValue(new Uint8Array([255, 0]))
 	arr[0] = ((arr[0] + 1) & 0xff)
