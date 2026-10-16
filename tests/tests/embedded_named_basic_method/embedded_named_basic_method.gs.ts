@@ -27,6 +27,26 @@ $.registerInterfaceType(
 	[{ name: "Rank", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("string") }] }]
 );
 
+export type Tags = $.Slice<string>
+
+$.registerNamedType("main.Tags", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("string")));
+
+$.registerNamedValueType(
+	"*main.Tags",
+	{Add: (receiver: any, ...args: any[]) => (Tags_Add as any)(receiver, ...$.stripGenericTypeArgs(args))},
+	[$.methodSignature("Add", [["tag", /* @__PURE__ */ $.basicType("string")]], [/* @__PURE__ */ $.basicType("int")])]
+);
+
+export type Adder = {
+	Add(tag: string): number
+}
+
+$.registerInterfaceType(
+	"main.Adder",
+	null,
+	[{ name: "Add", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("int") }] }]
+);
+
 export class Engineer {
 	public declare Level: Level
 
@@ -91,11 +111,46 @@ export class Lead {
 	)
 }
 
+export class Post {
+	public declare Tags: Tags
+
+	constructor(__goscriptValue?: boolean, Tags$?: Tags) {
+		this.Tags = Tags$ ?? (null! as Tags)
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
+	}
+
+	public clone(): Post {
+		return new Post(true, this.Tags)
+	}
+
+	public __goscriptAssign(source: Post): this {
+		this.Tags = source.Tags
+		return this
+	}
+
+	public Add(tag: any): any {
+		return Tags_Add($.fieldRef(this, "Tags"), tag)
+	}
+
+	static __typeInfo = $.registerStructType(
+		"main.Post",
+		() => new Post(),
+		() => [{ name: "Add", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [{ type: /* @__PURE__ */ $.basicType("int") }], pointerReceiver: true }],
+		Post,
+		() => [{ name: "Tags", key: "Tags", type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("string"), "main.Tags"), anonymous: true }]
+	)
+}
+
 export function Level_Rank(l: Level, prefix: string): string {
 	if (l > 2) {
 		return prefix + "senior"
 	}
 	return prefix + "junior"
+}
+
+export function Tags_Add(t: $.VarRef<Tags> | null, tag: string): number {
+	t!.value = ($.appendOne(($.pointerValue<Tags>(t) as Tags), tag) as Tags)
+	return $.sliceLen(($.pointerValue<Tags>(t) as Tags))
 }
 
 export async function main(): globalThis.Promise<void> {
@@ -112,6 +167,12 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("nested direct:", Level_Rank($.pointerValue<Lead>(lead).Engineer.Level, "lead: "))
 	r = $.interfaceValue<Ranker | null>(lead, "*main.Lead", /* @__PURE__ */ $.pointerType("main.Lead"))
 	await $.println("nested interface:", (__goscriptAwait = (r !== null && (r as any).__isVarRef !== true && ((r as any).__goValue === undefined || (r as any).__goType?.charCodeAt(0) !== 42) ? (r as Exclude<Ranker, null>) : $.pointerValue<Exclude<Ranker, null>>(r)).Rank("lead: "), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+
+	let post = new Post()
+	let post$: Post = post == null ? $.pointerTarget<Post>(post) : (post as any).__isVarRef === true ? (post as any).value : (post as any).__goValue === undefined ? (post as any) : $.pointerTarget<Post>(post)
+	Tags_Add($.fieldRef((post$ as Post), "Tags"), "go")
+	let a: Adder | null = $.interfaceValue<Adder | null>(post, "*main.Post", /* @__PURE__ */ $.pointerType("main.Post"))
+	await $.println("pointer method:", (__goscriptAwait = (a !== null && (a as any).__isVarRef !== true && ((a as any).__goValue === undefined || (a as any).__goType?.charCodeAt(0) !== 42) ? (a as Exclude<Adder, null>) : $.pointerValue<Exclude<Adder, null>>(a)).Add("js"), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), $.sliceLen(((post$ as Post).Tags as Tags)), $.arrayIndex((post$ as Post).Tags!, 1))
 }
 
 var __goscriptAwait: any
