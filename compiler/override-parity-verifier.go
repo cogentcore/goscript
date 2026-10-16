@@ -95,13 +95,18 @@ func (v *OverrideParityVerifier) Verify(
 			})
 			continue
 		}
+		behaviorTests, err := facts.behaviorTestSymbols(node.PkgPath)
+		if err != nil {
+			diagnostics = append(diagnostics, overrideError("read override behavior tests", node.PkgPath, err))
+			continue
+		}
 		diagnostics = append(diagnostics, verifyOverrideParityPackage(
 			runtime.Version(),
 			node.PkgPath,
 			pkg.Types,
 			ledger,
 			exports,
-			facts.behaviorTestSymbols(node.PkgPath),
+			behaviorTests,
 		)...)
 	}
 	diagnostics = append(diagnostics, verifyBlockedOverrideUses(graph, facts)...)

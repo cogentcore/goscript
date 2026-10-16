@@ -17,6 +17,7 @@ import (
 	"regexp"
 	"slices"
 	"strings"
+	"sync"
 
 	jsoniter "github.com/aperturerobotics/json-iterator-lite"
 	gs "github.com/s4wave/goscript"
@@ -36,7 +37,7 @@ type OverrideFacts struct {
 type overridePackageFacts struct {
 	metadata            OverrideMetadata
 	parity              overrideParityLedger
-	behaviorTestSymbols map[string]bool
+	behaviorTestSymbols func() (map[string]bool, error)
 	copyPackage         overrideCopyPackage
 	dependencies        []string
 }
@@ -75,12 +76,14 @@ func (f *OverrideFacts) parityLedger(pkgPath string) overrideParityLedger {
 }
 
 // behaviorTestSymbols returns the symbols the package's behavior tests
-// exercise, or nil when its tests are unavailable.
-func (f *OverrideFacts) behaviorTestSymbols(pkgPath string) map[string]bool {
-	if f == nil {
-		return nil
+// exercise, or nil when its tests are unavailable. Only the parity check needs
+// them, so the first call for a package reads its tests.
+func (f *OverrideFacts) behaviorTestSymbols(pkgPath string) (map[string]bool, error) {
+	if f == nil || f.packages[pkgPath].behaviorTestSymbols == nil {
+		return nil, nil
 	}
-	return maps.Clone(f.packages[pkgPath].behaviorTestSymbols)
+	symbols, err := f.packages[pkgPath].behaviorTestSymbols()
+	return maps.Clone(symbols), err
 }
 
 // IsMethodAsync returns true when override metadata marks a method async.
@@ -276,12 +279,15 @@ func buildOverrideFacts(ctx context.Context, overrideDirs []string) (*OverrideFa
 	}
 	paths := slices.Sorted(maps.Keys(roots))
 
-	// Index the golden tests when the compiler runs in its source tree.
+	// Index the golden tests, once and only when the compiler runs in its
+	// source tree and a parity check asks for a package's behavior tests.
 	sourceDir, inSource := findGoscriptSourceDir()
-	var goldenBehaviorTests map[string]map[string]bool
-	if inSource {
-		goldenBehaviorTests = loadGoldenBehaviorTests(filepath.Join(sourceDir, "tests", "tests"))
-	}
+	goldenBehaviorTests := sync.OnceValue(func() map[string]map[string]bool {
+		if !inSource {
+			return nil
+		}
+		return loadGoldenBehaviorTests(filepath.Join(sourceDir, "tests", "tests"))
+	})
 
 	// Build each package's facts, stopping when the context ends.
 	facts := &OverrideFacts{packages: make(map[string]overridePackageFacts, len(paths))}
@@ -309,17 +315,19 @@ func buildOverrideFacts(ctx context.Context, overrideDirs []string) (*OverrideFa
 
 		// The embedded gs tree ships without its tests, so its packages read
 		// them from the goscript source tree and go unchecked outside it.
-		var behaviorTests map[string]bool
+		var behaviorTests func() (map[string]bool, error)
 		if root := roots[pkgPath]; !root.embedded || inSource {
 			if root.embedded {
 				root.fsys = os.DirFS(sourceDir)
 			}
-			behaviorTests, err = loadOverrideBehaviorTests(root, roots)
-			if err != nil {
-				diagnostics = append(diagnostics, overrideError("read override behavior tests", pkgPath, err))
-				continue
-			}
-			maps.Copy(behaviorTests, goldenBehaviorTests[pkgPath])
+			behaviorTests = sync.OnceValues(func() (map[string]bool, error) {
+				symbols, err := loadOverrideBehaviorTests(root, roots)
+				if err != nil {
+					return nil, err
+				}
+				maps.Copy(symbols, goldenBehaviorTests()[pkgPath])
+				return symbols, nil
+			})
 		}
 
 		// Record the package's facts.
