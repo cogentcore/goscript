@@ -44,7 +44,7 @@ The opt-in `DeferredFunctions` compiler configuration replaces selected function
         - **TypeScript:** Has its own set of reserved words (e.g., `class`, `enum`, `public`, `async`, `await`).
         - **Divergence/Considerations:**
             - **Name Clashes:** A valid Go identifier might be a TypeScript keyword (e.g., Go: `var class int`). GoScript must mangle such identifiers (e.g., to `class_` or `_class`) to avoid syntax errors in TypeScript. The `compiler.WriteIdent` function handles some of this.
-            - **`goto`:** Go supports `goto` and labels. TypeScript has no `goto`. GoScript currently does not support `goto` (no `WriteStmtGoto`). Full support would require complex and potentially unreadable code transformations (e.g., using loops and state machines).
+            - **`goto`:** Go supports `goto` and labels. TypeScript has no `goto`. GoScript lowers each `goto` to a labeled `break` or `continue`, or to a state machine (see Label scopes).
             - **Concurrency Keywords (`go`, `chan`, `select`):** These are core to Go's concurrency model. TypeScript lacks direct equivalents. GoScript translates `go` routines to asynchronous operations (e.g., `async` functions, Promises). `chan` and `select` require significant runtime support provided by `@goscript/builtin` and complex transformations.
             - **`defer`:** Go's `defer` statement schedules a function call to be run when the surrounding function returns. TypeScript uses `try...finally`. GoScript implements `defer` using a `try...finally` pattern and a list of deferred functions.
             - **`range` (on channels):** Special Go construct. Requires runtime support for channel iteration.
@@ -719,7 +719,7 @@ The opt-in `DeferredFunctions` compiler configuration replaces selected function
 
 -   **GoScript & Divergences:**
     -   **`goto`:** TypeScript does not have `goto`.
-        -   **Divergence (Major):** GoScript cannot directly translate `goto`. This is a fundamental limitation. Code using `goto` would require significant refactoring to be translatable or would be unsupported. `compiler.WriteStmtBranch` for `token.GOTO` currently notes it's not implemented.
+        -   GoScript lowers the gotos of each statement list to the labels of that list (see `lowerStmtListAfter` and `compiler/lowering-goto.go`). When labeled blocks and loops reach them all, a forward `goto` breaks out of a labeled block that ends at its label and a backward `goto` continues a labeled loop that starts at it. Otherwise the list, from the first statement that a `goto` involves, becomes a `for (;;)` loop around a `switch` on a state, with a case for each label; a `goto` sets the state and continues the loop. The variables that one state declares and another uses are declared ahead of the loop, so that each run of such a declaration assigns the same variable, which a function literal that captured it before a `goto` back to the declaration still sees. A `goto` out of the body of a range over a function is not supported.
     -   **Labeled `break` and `continue`:**
         -   Go: `break myLabel`, `continue myLabel`.
         -   TypeScript: Supports labeled `break` and `continue` for loops and blocks.
