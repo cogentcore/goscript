@@ -15,6 +15,19 @@ export interface ErrnoObject {
   Errno(): number
 }
 
+// Signal is a number describing a process signal. It implements os.Signal
+// through its Signal and String methods.
+export type Signal = number
+
+// Signal_Signal marks Signal as an os.Signal.
+export function Signal_Signal(_s: Signal): void {}
+
+// Signal_String names a signal by its number, as js/wasm Go has no signal
+// names.
+export function Signal_String(s: Signal): string {
+  return `signal ${s}`
+}
+
 // RawConn interface - stub implementation for JavaScript environment.
 export interface RawConn {
   Control(f: (fd: uintptr) => void): $.GoError
