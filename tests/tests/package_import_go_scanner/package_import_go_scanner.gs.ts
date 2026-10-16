@@ -34,23 +34,28 @@ export async function main(): globalThis.Promise<void> {
 		if (__goscriptShadow1 == 1) {
 			break
 		}
-		fmt.Printf("%s %s %q\n", $.interfaceValue($.markAsStructValue($.cloneStructValue((fset !== null && (fset as any).__isVarRef !== true && (fset as any).__goValue === undefined ? ((fset as any) as token.FileSet).Position(__goscriptShadow0) : token.FileSet.prototype.Position.call($.pointerValue<token.FileSet>(fset), __goscriptShadow0)))), "token.Position", "token.Position"), $.namedValueInterfaceValue<any>(__goscriptShadow1, "token.Token", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()), lit)
+		fmt.Printf("%s %s %q\n", $.interfaceValue($.markAsStructValue($.cloneStructValue((fset !== null && (fset as any).__isVarRef !== true && (fset as any).__goValue === undefined ? ((fset as any) as token.FileSet).Position(__goscriptShadow0) : token.FileSet.prototype.Position.call($.pointerValue<token.FileSet>(fset), __goscriptShadow0)))), "token.Position", __goscriptStatic0()), $.namedValueInterfaceValue<any>(__goscriptShadow1, "token.Token", __goscriptStatic1(), __goscriptStatic2(), __goscriptStatic3()), lit)
 	}
 }
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({IsKeyword: (receiver: any) => (token.Token_IsKeyword as any)(($.isVarRef(receiver) ? receiver.value : receiver)), IsLiteral: (receiver: any) => (token.Token_IsLiteral as any)(($.isVarRef(receiver) ? receiver.value : receiver)), IsOperator: (receiver: any) => (token.Token_IsOperator as any)(($.isVarRef(receiver) ? receiver.value : receiver)), Precedence: (receiver: any) => (token.Token_Precedence as any)(($.isVarRef(receiver) ? receiver.value : receiver)), String: (receiver: any) => (token.Token_String as any)(($.isVarRef(receiver) ? receiver.value : receiver))})
+	return __goscriptStatic0$value ??= ($.overrideTypeMethods("token.Position", "token.Position", () => [$.methodSignature("IsValid", [], [/* @__PURE__ */ $.basicType("bool")], true), $.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])]))
 }
 
 var __goscriptStatic1$value: any
 function __goscriptStatic1(): any {
-	return __goscriptStatic1$value ??= (/* @__PURE__ */ $.basicType("int", "token.Token"))
+	return __goscriptStatic1$value ??= ({IsKeyword: (receiver: any) => (token.Token_IsKeyword as any)(($.isVarRef(receiver) ? receiver.value : receiver)), IsLiteral: (receiver: any) => (token.Token_IsLiteral as any)(($.isVarRef(receiver) ? receiver.value : receiver)), IsOperator: (receiver: any) => (token.Token_IsOperator as any)(($.isVarRef(receiver) ? receiver.value : receiver)), Precedence: (receiver: any) => (token.Token_Precedence as any)(($.isVarRef(receiver) ? receiver.value : receiver)), String: (receiver: any) => (token.Token_String as any)(($.isVarRef(receiver) ? receiver.value : receiver))})
 }
 
 var __goscriptStatic2$value: any
 function __goscriptStatic2(): any {
-	return __goscriptStatic2$value ??= ([$.methodSignature("IsKeyword", [], [/* @__PURE__ */ $.basicType("bool")]), $.methodSignature("IsLiteral", [], [/* @__PURE__ */ $.basicType("bool")]), $.methodSignature("IsOperator", [], [/* @__PURE__ */ $.basicType("bool")]), $.methodSignature("Precedence", [], [/* @__PURE__ */ $.basicType("int")]), $.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])])
+	return __goscriptStatic2$value ??= (/* @__PURE__ */ $.basicType("int", "token.Token"))
+}
+
+var __goscriptStatic3$value: any
+function __goscriptStatic3(): any {
+	return __goscriptStatic3$value ??= ([$.methodSignature("IsKeyword", [], [/* @__PURE__ */ $.basicType("bool")]), $.methodSignature("IsLiteral", [], [/* @__PURE__ */ $.basicType("bool")]), $.methodSignature("IsOperator", [], [/* @__PURE__ */ $.basicType("bool")]), $.methodSignature("Precedence", [], [/* @__PURE__ */ $.basicType("int")]), $.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])])
 }
 
 if ($.isMainScript(import.meta)) {

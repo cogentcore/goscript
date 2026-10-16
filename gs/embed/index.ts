@@ -103,6 +103,10 @@ export class FS {
     )
   }
 
+  // FS is registered with the runtime type system; the compiler gives its
+  // method signatures, for reflection.
+  static __typeInfo = $.registerStructType('embed.FS', new FS(), [], FS)
+
   private dirExists(name: string): boolean {
     if (name === '.') {
       return true

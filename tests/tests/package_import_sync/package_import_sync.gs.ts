@@ -134,7 +134,7 @@ export class queue {
 		const q$: queue = q == null ? $.pointerTarget<queue>(q) : (q as any).__isVarRef === true ? (q as any).value : (q as any).__goValue === undefined ? (q as any) : $.pointerTarget<queue>(q)
 		await (q$ as queue).Mu.Lock()
 		if ((q$ as queue).Cond.L == null) {
-			;(q$ as queue).Cond.L = $.interfaceValue<sync.Locker | null>($.fieldRef((q$ as queue), "Mu"), "*sync.Mutex", /* @__PURE__ */ $.pointerType("sync.Mutex"))
+			;(q$ as queue).Cond.L = $.interfaceValue<sync.Locker | null>($.fieldRef((q$ as queue), "Mu"), "*sync.Mutex", __goscriptStatic0())
 		}
 	}
 
@@ -335,8 +335,13 @@ export async function condZeroValue(): globalThis.Promise<void> {
 		await $.println("got:", await $.chanRecv(results))
 	}
 
-	let c = sync.NewCond($.pointerValueOrNil($.interfaceValue<sync.Locker | null>(new sync.Mutex(), "*sync.Mutex", /* @__PURE__ */ $.pointerType("sync.Mutex")))!)
+	let c = sync.NewCond($.pointerValueOrNil($.interfaceValue<sync.Locker | null>(new sync.Mutex(), "*sync.Mutex", __goscriptStatic0()))!)
 	await $.println("NewCond L is nil:", $.pointerValue<sync.Cond>(c).L == null)
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= ($.overrideTypeMethods(/* @__PURE__ */ $.pointerType("sync.Mutex"), "sync.Mutex", () => [$.methodSignature("Lock", [], [], true), $.methodSignature("TryLock", [], [/* @__PURE__ */ $.basicType("bool")], true), $.methodSignature("Unlock", [], [], true)]))
 }
 
 var __goscriptAwait: any

@@ -41,11 +41,16 @@ export async function main(): globalThis.Promise<void> {
 
 	// Join a bounded zero range with a trailing reader through a spread slice.
 	let rdrs: $.Slice<io.Reader | null> = $.arrayToSlice<io.Reader | null>([io.LimitReader($.interfaceValue<io.Reader | null>(new zeroReader(true), "main.zeroReader", "main.zeroReader")!, 2n)])
-	rdrs = $.appendOne(rdrs, $.interfaceValue<io.Reader | null>(strings.NewReader("ab"), "*strings.Reader", /* @__PURE__ */ $.pointerType("strings.Reader")), $.appendZeros.nil)
+	rdrs = $.appendOne(rdrs, $.interfaceValue<io.Reader | null>(strings.NewReader("ab"), "*strings.Reader", __goscriptStatic0()), $.appendZeros.nil)
 	let __goscriptTuple1: any = await io.ReadAll($.pointerValueOrNil(io.MultiReader(...(rdrs ?? [])))!)
 	data = __goscriptTuple1[0]
 	err = __goscriptTuple1[1]
 	await $.println("multi:", $.sliceLen(data), $.arrayIndex(data!, 1) == 0, $.bytesToString($.goSlice(data, 2, undefined)), err == null)
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= ($.overrideTypeMethods(/* @__PURE__ */ $.pointerType("strings.Reader"), "strings.Reader", () => [$.methodSignature("Len", [], [/* @__PURE__ */ $.basicType("int")], true), $.methodSignature("Read", [["b", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))]], [["n", /* @__PURE__ */ $.basicType("int")], ["err", "error"]], true), $.methodSignature("ReadAt", [["b", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))], ["off", /* @__PURE__ */ $.basicType("int64")]], [["n", /* @__PURE__ */ $.basicType("int")], ["err", "error"]], true), $.methodSignature("ReadByte", [], [/* @__PURE__ */ $.basicType("uint8"), "error"], true), $.methodSignature("ReadRune", [], [["ch", /* @__PURE__ */ $.basicType("int32")], ["size", /* @__PURE__ */ $.basicType("int")], ["err", "error"]], true), $.methodSignature("Reset", [["s", /* @__PURE__ */ $.basicType("string")]], [], true), $.methodSignature("Seek", [["offset", /* @__PURE__ */ $.basicType("int64")], ["whence", /* @__PURE__ */ $.basicType("int")]], [/* @__PURE__ */ $.basicType("int64"), "error"], true), $.methodSignature("Size", [], [/* @__PURE__ */ $.basicType("int64")], true), $.methodSignature("UnreadByte", [], ["error"], true), $.methodSignature("UnreadRune", [], ["error"], true), $.methodSignature("WriteTo", [["w", "io.Writer"]], [["n", /* @__PURE__ */ $.basicType("int64")], ["err", "error"]], true)]))
 }
 
 if ($.isMainScript(import.meta)) {

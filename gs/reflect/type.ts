@@ -3499,6 +3499,10 @@ function typeInfoIdentityKey(
   info: $.TypeInfo | string,
   seen: Set<string>,
 ): string {
+  // GoError, the TypeScript name of the error interface, is error.
+  if (isGoErrorTypeInfo(info)) {
+    info = 'error'
+  }
   if (typeof info === 'string') {
     const registered = builtinGetTypeByName(info)
     if (!registered) {
@@ -5522,6 +5526,12 @@ function typeFromTypeInfoWithSeen(
   info: $.TypeInfo | string,
   seen: Set<string>,
 ): Type {
+  // The hand-written type information of override packages names the error
+  // interface by its TypeScript name.
+  if (isGoErrorTypeInfo(info)) {
+    info = 'error'
+  }
+
   // A type that typeFromTypeInfo already built is complete, so a nested use
   // of it, such as a field of another struct, takes it rather than building
   // it again.
@@ -5571,6 +5581,15 @@ function typeFromTypeInfoWithSeen(
     return internType(typ)
   }
   return internType(typeFromStructuredTypeInfoWithSeen(info, seen))
+}
+
+// isGoErrorTypeInfo reports whether info names the error interface as GoError,
+// the TypeScript type of Go errors.
+function isGoErrorTypeInfo(info: $.TypeInfo | string): boolean {
+  if (typeof info === 'string') {
+    return info === 'GoError'
+  }
+  return info.kind === $.TypeKind.Interface && info.name === 'GoError'
 }
 
 function recursiveTypeInfoName(info: $.TypeInfo): string {

@@ -114,7 +114,7 @@ export async function main(): globalThis.Promise<void> {
 	for (let __goscriptRangeTarget2 = seeds, __goscriptRangeWindow2 = $.sliceRange(__goscriptRangeTarget2), i = 0; i < __goscriptRangeWindow2.length; i++) {
 		let seed = (__goscriptRangeWindow2.backing[__goscriptRangeWindow2.offset + i] as bigint)
 		await $.println("pcg", seed)
-		await show(rand.New($.pointerValueOrNil($.interfaceValue<rand.Source | null>(rand.NewPCG(seed, ((__goscriptRangeWindow2.backing as any[])[$.windowSlot(__goscriptRangeWindow2, (i + 1) % __goscriptRangeWindow2.length)] as bigint)), "*rand.PCG", /* @__PURE__ */ $.pointerType("rand.PCG")))!))
+		await show(rand.New($.pointerValueOrNil($.interfaceValue<rand.Source | null>(rand.NewPCG(seed, ((__goscriptRangeWindow2.backing as any[])[$.windowSlot(__goscriptRangeWindow2, (i + 1) % __goscriptRangeWindow2.length)] as bigint)), "*rand.PCG", __goscriptStatic0()))!))
 	}
 
 	for (let __goscriptRangeTarget4 = new Uint8Array([0, 1, 7, 255]) as $.Slice<number>, __goscriptRangeWindow3 = $.sliceRange(__goscriptRangeTarget4), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow3.length; __rangeIndex++) {
@@ -124,7 +124,7 @@ export async function main(): globalThis.Promise<void> {
 			seed[i] = $.uint(((b + ($.uint(i, 8) * b)) & 0xff), 8)
 		}
 		await $.println("chacha8", b)
-		await show(rand.New($.pointerValueOrNil($.interfaceValue<rand.Source | null>(rand.NewChaCha8(seed), "*rand.ChaCha8", /* @__PURE__ */ $.pointerType("rand.ChaCha8")))!))
+		await show(rand.New($.pointerValueOrNil($.interfaceValue<rand.Source | null>(rand.NewChaCha8(seed), "*rand.ChaCha8", __goscriptStatic1()))!))
 	}
 
 	await $.println("splitmix")
@@ -159,6 +159,16 @@ export async function main(): globalThis.Promise<void> {
 		void (c !== null && (c as any).__isVarRef !== true && (c as any).__goValue === undefined ? ((c as any) as rand.ChaCha8).Uint64() : rand.ChaCha8.prototype.Uint64.call($.pointerValue<rand.ChaCha8>(c)))
 	}
 	await $.println("chacha8 later:", (c !== null && (c as any).__isVarRef !== true && (c as any).__goValue === undefined ? ((c as any) as rand.ChaCha8).Uint64() : rand.ChaCha8.prototype.Uint64.call($.pointerValue<rand.ChaCha8>(c))))
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= ($.overrideTypeMethods(/* @__PURE__ */ $.pointerType("rand.PCG"), "rand.PCG", () => [$.methodSignature("AppendBinary", [["b", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))]], [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")), "error"], true), $.methodSignature("MarshalBinary", [], [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")), "error"], true), $.methodSignature("Seed", [["seed1", /* @__PURE__ */ $.basicType("uint64")], ["seed2", /* @__PURE__ */ $.basicType("uint64")]], [], true), $.methodSignature("Uint64", [], [/* @__PURE__ */ $.basicType("uint64")], true), $.methodSignature("UnmarshalBinary", [["data", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))]], ["error"], true)]))
+}
+
+var __goscriptStatic1$value: any
+function __goscriptStatic1(): any {
+	return __goscriptStatic1$value ??= ($.overrideTypeMethods(/* @__PURE__ */ $.pointerType("rand.ChaCha8"), "rand.ChaCha8", () => [$.methodSignature("AppendBinary", [["b", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))]], [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")), "error"], true), $.methodSignature("MarshalBinary", [], [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")), "error"], true), $.methodSignature("Read", [["p", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))]], [["n", /* @__PURE__ */ $.basicType("int")], ["err", "error"]], true), $.methodSignature("Seed", [["seed", /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 32)]], [], true), $.methodSignature("Uint64", [], [/* @__PURE__ */ $.basicType("uint64")], true), $.methodSignature("UnmarshalBinary", [["data", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))]], ["error"], true)]))
 }
 
 if ($.isMainScript(import.meta)) {
