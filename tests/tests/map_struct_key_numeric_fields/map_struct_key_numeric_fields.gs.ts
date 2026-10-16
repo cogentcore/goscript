@@ -127,6 +127,126 @@ export class ScopeRule {
 	)
 }
 
+export class Pair {
+	public declare A: string
+
+	public declare B: string
+
+	constructor(__goscriptValue?: boolean, A$?: string, B$?: string) {
+		this.A = A$ ?? ""
+		this.B = B$ ?? ""
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
+	}
+
+	public clone(): Pair {
+		return new Pair(true, this.A, this.B)
+	}
+
+	public __goscriptAssign(source: Pair): this {
+		this.A = source.A
+		this.B = source.B
+		return this
+	}
+
+	static __typeInfo = $.registerStructType(
+		"main.Pair",
+		() => new Pair(),
+		() => [],
+		Pair,
+		() => [{ name: "A", key: "A", type: /* @__PURE__ */ $.basicType("string") }, { name: "B", key: "B", type: /* @__PURE__ */ $.basicType("string") }]
+	)
+}
+
+export class Other {
+	public declare A: string
+
+	public declare B: string
+
+	constructor(__goscriptValue?: boolean, A$?: string, B$?: string) {
+		this.A = A$ ?? ""
+		this.B = B$ ?? ""
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
+	}
+
+	public clone(): Other {
+		return new Other(true, this.A, this.B)
+	}
+
+	public __goscriptAssign(source: Other): this {
+		this.A = source.A
+		this.B = source.B
+		return this
+	}
+
+	static __typeInfo = $.registerStructType(
+		"main.Other",
+		() => new Other(),
+		() => [],
+		Other,
+		() => [{ name: "A", key: "A", type: /* @__PURE__ */ $.basicType("string") }, { name: "B", key: "B", type: /* @__PURE__ */ $.basicType("string") }]
+	)
+}
+
+export class Vec {
+	public declare X: number
+
+	public declare Y: number
+
+	constructor(__goscriptValue?: boolean, X$?: number, Y$?: number) {
+		this.X = X$ ?? 0
+		this.Y = Y$ ?? 0
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
+	}
+
+	public clone(): Vec {
+		return new Vec(true, this.X, this.Y)
+	}
+
+	public __goscriptAssign(source: Vec): this {
+		this.X = source.X
+		this.Y = source.Y
+		return this
+	}
+
+	static __typeInfo = $.registerStructType(
+		"main.Vec",
+		() => new Vec(),
+		() => [],
+		Vec,
+		() => [{ name: "X", key: "X", type: /* @__PURE__ */ $.basicType("float32") }, { name: "Y", key: "Y", type: /* @__PURE__ */ $.basicType("float32") }]
+	)
+}
+
+export class Cplx {
+	public declare C: $.Complex
+
+	public declare N: number
+
+	constructor(__goscriptValue?: boolean, C$?: $.Complex, N$?: number) {
+		this.C = C$ ?? $.complex(0, 0)
+		this.N = N$ ?? 0
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
+	}
+
+	public clone(): Cplx {
+		return new Cplx(true, this.C, this.N)
+	}
+
+	public __goscriptAssign(source: Cplx): this {
+		this.C = source.C
+		this.N = source.N
+		return this
+	}
+
+	static __typeInfo = $.registerStructType(
+		"main.Cplx",
+		() => new Cplx(),
+		() => [],
+		Cplx,
+		() => [{ name: "C", key: "C", type: /* @__PURE__ */ $.basicType("complex128") }, { name: "N", key: "N", type: /* @__PURE__ */ $.basicType("int") }]
+	)
+}
+
 export async function main(): globalThis.Promise<void> {
 	let m = $.makeMap<Key, number>([])
 	for (let i = 0; i < 2000; i++) {
@@ -153,6 +273,31 @@ export async function main(): globalThis.Promise<void> {
 	}
 	$.pointerValue<Rule>(r1).Name = "changed"
 	await $.println($.len(_set), $.mapGet<ScopeRule, boolean, boolean>(_set, new ScopeRule(true, new Pos(true, 5, 0), r1), false)[0], $.mapGet<ScopeRule, boolean, boolean>(_set, new ScopeRule(true, new Pos(true, 5, 0), r2), false)[0], $.mapGet<ScopeRule, boolean, boolean>(_set, new ScopeRule(true, new Pos(true, 5, 0), null), false)[0])
+
+	// Keys whose field values run together are still distinct keys.
+	let pairs = $.makeMap<Pair, number>([[new Pair(true, "x|s", ""), 1], [new Pair(true, "x", "|s"), 2], [new Pair(true, "", "x|s"), 3]])
+	await $.println($.len(pairs), $.mapGet<Pair, number, number>(pairs, new Pair(true, "x|s", ""), 0)[0], $.mapGet<Pair, number, number>(pairs, new Pair(true, "x", "|s"), 0)[0], $.mapGet<Pair, number, number>(pairs, new Pair(true, "", "x|s"), 0)[0], $.mapGet<Pair, number, number>(pairs, new Pair(true, "x", "s"), 0)[0])
+
+	// NaN is never equal to itself, and -0 equals 0.
+	let nan = globalThis.Math.fround(negZero)
+	nan = globalThis.Math.fround(nan / nan)
+	let vecs = $.makeMap<Vec, number>([])
+	$.mapSet(vecs, new Vec(true, nan, 1), 1)
+	$.mapSet(vecs, new Vec(true, nan, 1), 2)
+	$.mapSet(vecs, new Vec(true, 0, 1), 3)
+	$.mapSet(vecs, new Vec(true, globalThis.Math.fround(negZero), 1), 4)
+	let [, nanOK] = $.mapGet<Vec, number, number>(vecs, new Vec(true, nan, 1), 0)
+	await $.println($.len(vecs), nanOK, $.mapGet<Vec, number, number>(vecs, new Vec(true, 0, 1), 0)[0])
+
+	// Interface keys of two struct types with the same fields stay apart.
+	let anys = $.makeMap<any, number>([[$.interfaceValue(new Pair(true, "a", "b"), "main.Pair", "main.Pair"), 1], [$.interfaceValue(new Other(true, "a", "b"), "main.Other", "main.Other"), 2]])
+	$.mapSet(anys, $.interfaceValue(new Pair(true, "a", "b"), "main.Pair", "main.Pair"), 3)
+	await $.println($.len(anys), $.mapGet<any, number, number>(anys, $.interfaceValue(new Pair(true, "a", "b"), "main.Pair", "main.Pair"), 0)[0], $.mapGet<any, number, number>(anys, $.interfaceValue(new Other(true, "a", "b"), "main.Other", "main.Other"), 0)[0])
+
+	// Complex fields compare by value.
+	let cs = $.makeMap<Cplx, number>([[new Cplx(true, $.complex(1, 2), 3), 1]])
+	$.mapSet(cs, new Cplx(true, $.complex(1, 2), 3), 2)
+	await $.println($.len(cs), $.mapGet<Cplx, number, number>(cs, new Cplx(true, $.complex(1, 2), 3), 0)[0], $.mapGet<Cplx, number, number>(cs, new Cplx(true, $.complex(1, 3), 3), 0)[0])
 }
 
 if ($.isMainScript(import.meta)) {

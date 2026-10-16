@@ -5,6 +5,7 @@ import {
   isStructTypeInfo,
   resolveTypeInfo,
   structFieldRuntimeKey,
+  structValueMarker,
   TypeKind,
   type TypeInfo,
 } from './type.js'
@@ -94,8 +95,8 @@ class GoMap<K, V> extends Map<K, V> {
   structLookup(key: K, canonical: string): K | undefined {
     const bucket = this.structKeys?.get(canonical)
     if (bucket === undefined) return undefined
-    for (const member of bucket) {
-      if (comparableEqual(member, key)) return member
+    for (let i = 0; i < bucket.length; i++) {
+      if (structKeysEqual(bucket[i], key)) return bucket[i]
     }
     return undefined
   }
@@ -310,11 +311,13 @@ function findMapEntry<K, V>(
 
 // structMapKey returns the canonical index key for a struct whose fields are
 // all strings, numbers, booleans, pointers or such structs, or undefined for
-// any other value. The canonical form narrows candidates by field names and
-// values, and pointers by their identity, since what they point to may
-// change. comparableEqual still decides identity, type, and field equality
-// within a bucket. Keys with other fields, such as interfaces, remain on the
-// comparison scan.
+// any other value. The canonical form narrows candidates by field values, in
+// field name order, and pointers by their identity, since what they point to
+// may change. Equal keys give equal text, which is all the index needs:
+// structKeysEqual still decides identity, type, and field equality within a
+// bucket, so the text names no fields and needs no delimiters that its
+// values cannot contain, and stays short to build and hash. Keys with other
+// fields, such as interfaces, remain on the comparison scan.
 function structMapKey(key: unknown): string | undefined {
   // Only a struct object has a canonical key, built from its own fields; a
   // pointer in an interface is found by its storage instead.
@@ -325,17 +328,52 @@ function structMapKey(key: unknown): string | undefined {
     const field = plan[i]
     const value = structMapKeyField(key[field.name], field.kind)
     if (value === undefined) return undefined
-    text += field.prefix + value.length + ':' + value
+    text += value + '|'
   }
   return text
 }
 
+// structKeysEqual reports whether two struct keys of the same index bucket
+// are equal, as comparableEqual decides. Two values of the same class and
+// dynamic type are equal when each field is identical, and not equal when a
+// field holds two different numbers, strings, booleans or bigints, which Go
+// compares as JavaScript does; any other difference, such as two objects
+// that may be equal views, and any other pair of keys, is decided by
+// comparableEqual.
+function structKeysEqual(a: any, b: any): boolean {
+  // Only values of one class and dynamic type compare field by field. A
+  // struct object neither marked as a value nor boxed is a pointer, which
+  // comparableEqual finds equal only to itself.
+  const plan = cachedStructKeyPlan(a)
+  if (
+    plan === undefined ||
+    a.constructor !== b.constructor ||
+    a.__goType !== b.__goType ||
+    (typeof a.__goType !== 'string' &&
+      a[structValueMarker] !== true &&
+      b[structValueMarker] !== true)
+  ) {
+    return comparableEqual(a, b)
+  }
+
+  // Identical fields are equal and different primitives are not.
+  for (let i = 0; i < plan.length; i++) {
+    const x = a[plan[i].name]
+    const y = b[plan[i].name]
+    if (x === y) continue
+    if (typeof x === 'object' || typeof y === 'object') {
+      return comparableEqual(a, b)
+    }
+    return false
+  }
+  return true
+}
+
 // StructKeyField is one field of the key plan of a struct type: its runtime
-// name, its kind, and the prefix of its text in the key.
+// name and its kind.
 interface StructKeyField {
   name: string
   kind: TypeKind | undefined
-  prefix: string
 }
 
 // structKeyPlans caches the key plan of each struct class, so that
@@ -358,17 +396,20 @@ function structKeyPlan(key: object): StructKeyField[] {
   const kinds = structFieldKinds(key)
   const plan = Object.keys(key)
     .sort()
-    .map((name) => ({
-      name,
-      kind: kinds?.get(name),
-      prefix: `${name.length}:${name}`,
-    }))
+    .map((name) => ({ name, kind: kinds?.get(name) }))
 
   // A plan built without field kinds is not cached.
   if (cacheable && kinds !== undefined) {
     structKeyPlans.set(ctor, plan)
   }
   return plan
+}
+
+// cachedStructKeyPlan returns the key plan of a struct of a registered
+// class that structKeyPlan cached, or undefined.
+function cachedStructKeyPlan(key: object): StructKeyField[] | undefined {
+  const ctor = (key as { constructor?: object }).constructor
+  return ctor === undefined ? undefined : structKeyPlans.get(ctor)
 }
 
 // structFieldKinds returns the kind of each field of a struct value by its
