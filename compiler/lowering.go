@@ -14014,16 +14014,19 @@ func (o *LoweringOwner) lowerArrayPointerTarget(ctx lowerFileContext, target str
 }
 
 func (o *LoweringOwner) lowerSliceExpr(ctx lowerFileContext, expr *ast.SliceExpr) (string, []Diagnostic) {
+	// The operand and the bounds are lowered in order.
 	target, diagnostics := o.lowerExpr(ctx, expr.X)
 	low, lowDiagnostics := o.lowerOptionalExpr(ctx, expr.Low)
 	high, highDiagnostics := o.lowerOptionalExpr(ctx, expr.High)
 	max, maxDiagnostics := o.lowerOptionalExpr(ctx, expr.Max)
-	low = o.lowerNumberIndexValue(ctx, expr.Low, low)
-	high = o.lowerNumberIndexValue(ctx, expr.High, high)
-	max = o.lowerNumberIndexValue(ctx, expr.Max, max)
 	diagnostics = append(diagnostics, lowDiagnostics...)
 	diagnostics = append(diagnostics, highDiagnostics...)
 	diagnostics = append(diagnostics, maxDiagnostics...)
+
+	// The bounds are numbers, and a string slices as a string.
+	low = o.lowerNumberIndexValue(ctx, expr.Low, low)
+	high = o.lowerNumberIndexValue(ctx, expr.High, high)
+	max = o.lowerNumberIndexValue(ctx, expr.Max, max)
 	helper := RuntimeHelperGoSlice
 	targetType := ctx.semPkg.source.TypesInfo.TypeOf(expr.X)
 	if isStringType(targetType) {
@@ -14031,11 +14034,21 @@ func (o *LoweringOwner) lowerSliceExpr(ctx lowerFileContext, expr *ast.SliceExpr
 	} else {
 		target = o.lowerArrayPointerTarget(ctx, target, targetType)
 	}
+
+	// The helper takes the max bound of a full slice expression only.
 	args := []string{target, low, high}
 	if expr.Slice3 {
 		args = append(args, max)
 	}
-	return o.runtimeOwner.QualifiedHelper(helper) + "(" + strings.Join(args, ", ") + ")", diagnostics
+	slice := o.runtimeOwner.QualifiedHelper(helper) + "(" + strings.Join(args, ", ") + ")"
+
+	// A constant slice of a read-only table is the same whenever it is
+	// taken, so it is made once, on first use, which also panics where Go
+	// would.
+	if constantTableSlice(ctx, expr) && !strings.Contains(slice, "await ") {
+		return o.hoistStatic(ctx, slice), diagnostics
+	}
+	return slice, diagnostics
 }
 
 func (o *LoweringOwner) lowerOptionalExpr(ctx lowerFileContext, expr ast.Expr) (string, []Diagnostic) {
