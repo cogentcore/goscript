@@ -98,7 +98,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("Interface assertion:", asserted, ok)
 
 	let vals: $.Slice<Doubler | null> = null! as $.Slice<Doubler | null>
-	vals = $.append(vals, __goscriptStatic4(), __goscriptStatic5(), $.appendZeros.nil)
+	vals = $.appendValues(vals, $.appendZeros.nil, __goscriptStatic4(), __goscriptStatic5())
 	await $.println("Interface slice append:", sumDoublers(vals))
 
 	let __goscriptTuple0: any = assertDoubler(__goscriptStatic6(), ret)

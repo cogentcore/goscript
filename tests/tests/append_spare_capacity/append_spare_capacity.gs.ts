@@ -74,6 +74,30 @@ export async function main(): globalThis.Promise<void> {
 	let ext = $.appendSlice($.arrayToSlice<pos>([new pos(true, 1)]), $.arrayToSlice<pos>([new pos(true, 2), new pos(true, 3)]))
 	let full = $.goSlice(ext, undefined, $.cap(ext))
 	await $.println($.sliceLen(ext), $.cap(ext) >= 3, $.arrayIndex(full!, $.sliceLen(full) - 1).Line)
+
+	// Several values append in place into spare capacity, each a copy.
+	let p = new pos(true, 5)
+	let pair: $.Slice<pos> = $.appendValues($.makeSlice<pos>(0, 4, undefined, () => new pos(true)), undefined, (p).clone(), (p).clone())
+	$.arrayIndex(pair!, 0).Line = 50
+	p.Line = 500
+	let shared = $.goSlice(pair, undefined, 3)
+	pair = $.appendValues(pair, undefined, new pos(true, 6), new pos(true, 7))
+	await $.println($.sliceLen(pair), $.arrayIndex(pair!, 0).Line, $.arrayIndex(pair!, 1).Line, $.arrayIndex(pair!, 2).Line, $.arrayIndex(shared!, 2).Line, $.arrayIndex(pair!, 3).Line)
+
+	// Typed and zero-hinted elements append several values in place and
+	// when they grow.
+	let fs: $.Slice<number> = $.makeSlice<number>(0, 4, "float32")
+	let fview = $.goSlice(fs, undefined, 4)
+	fs = $.appendValues(fs, $.typedSliceHints.float32, 0.10000000149011612, 0.5, 2)
+	await $.println($.sliceLen(fs), $.cap(fs), $.arrayIndex(fview!, 0) == $.arrayIndex(fs!, 0), $.arrayIndex(fview!, 2))
+	fs = $.appendValues(fs, $.typedSliceHints.float32, 3, 4, 5)
+	$.sliceElems(fview!)[$.sliceSlot(fview!, 1)] = 9
+	await $.println($.sliceLen(fs), $.arrayIndex(fs!, 1), $.arrayIndex(fs!, 5), $.arrayIndex(fs!, 0) == 0.10000000149011612)
+	let cs: $.Slice<$.Complex> = null! as $.Slice<$.Complex>
+	cs = $.appendValues(cs, $.appendZeros.complex, $.complex(1, 2), $.complex(3, 0))
+	let nps: $.Slice<pos | $.VarRef<pos> | null> = null! as $.Slice<pos | $.VarRef<pos> | null>
+	nps = $.appendValues(nps, $.appendZeros.nil, null, new pos(false, 8))
+	await $.println($.sliceLen(cs), $.real($.arrayIndex(cs!, 0)), $.imag($.arrayIndex(cs!, 1)), $.sliceLen(nps), $.arrayIndex(nps!, 0) == null, $.pointerValue<pos>($.arrayIndex(nps!, 1)).Line)
 }
 
 if ($.isMainScript(import.meta)) {
