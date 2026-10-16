@@ -14977,7 +14977,7 @@ func (o *LoweringOwner) lowerInterfaceValueExpr(
 	// type arguments, so that reflection sees the instantiated type rather
 	// than an empty interface, and the value's dynamic type is named by it.
 	helper := o.runtimeOwner.QualifiedHelper(RuntimeHelperInterfaceValue)
-	typeInfo := o.runtimeTypeInfoExpr(sourceType)
+	typeInfo := o.overrideTypeInfo(ctx, sourceType, o.runtimeTypeInfoExpr(sourceType))
 	if typeContainsTypeParam(sourceType) {
 		helper = o.runtimeOwner.QualifiedHelper(RuntimeHelperGenericInterfaceValue)
 		typeInfo = o.runtimeTypeAssertInfoExpr(ctx, sourceType)
@@ -14990,6 +14990,57 @@ func (o *LoweringOwner) lowerInterfaceValueExpr(
 	return helper + "(" + value + ", " +
 		strconv.Quote(goRuntimeTypeString(sourceType)) + ", " +
 		typeInfo + ")"
+}
+
+// overrideTypeInfo returns typeInfo, the type information of a value of
+// sourceType converted to an interface. A struct or interface type of an
+// override package, or a pointer to one, is registered by its hand-written
+// TypeScript, whose method signatures may be missing or inexact, so the type
+// information also gives them, from the Go types, for reflection.
+func (o *LoweringOwner) overrideTypeInfo(ctx lowerFileContext, sourceType types.Type, typeInfo string) string {
+	// Only a named struct or interface type of an override package, or a
+	// pointer to one, is described.
+	named, _ := types.Unalias(derefPointerType(sourceType)).(*types.Named)
+	if named == nil || !o.typeUsesOverride(named) || named.TypeParams().Len() != 0 {
+		return typeInfo
+	}
+	var signatures []string
+	switch underlying := named.Underlying().(type) {
+	case *types.Struct:
+		signatures = o.overrideStructMethodSignatures(named)
+	case *types.Interface:
+		// Unexported methods are left out, as hand-written values may not
+		// have them.
+		for method := range underlying.Methods() {
+			if method.Exported() {
+				signatures = append(signatures, o.runtimeMethodSignature(method, make(map[types.Type]bool)))
+			}
+		}
+	}
+	if len(signatures) == 0 {
+		return typeInfo
+	}
+
+	// The signatures are given once per file.
+	return o.hoistStatic(ctx, o.runtimeOwner.QualifiedHelper(RuntimeHelperOverrideTypeMethods)+"("+typeInfo+", "+
+		strconv.Quote(runtimeNamedTypeName(named))+", () => ["+strings.Join(signatures, ", ")+"])")
+}
+
+// overrideStructMethodSignatures describes the exported methods of the method
+// set of a pointer to named, marking those not in the value's method set.
+func (o *LoweringOwner) overrideStructMethodSignatures(named *types.Named) []string {
+	methodSet := types.NewMethodSet(types.NewPointer(named))
+	valueMethods := types.NewMethodSet(named)
+	signatures := make([]string, 0, methodSet.Len())
+	for selection := range methodSet.Methods() {
+		method, _ := selection.Obj().(*types.Func)
+		if method == nil || !method.Exported() {
+			continue
+		}
+		pointerOnly := valueMethods.Lookup(method.Pkg(), method.Name()) == nil
+		signatures = append(signatures, o.runtimeReceiverMethodSignature(method, pointerOnly, make(map[types.Type]bool)))
+	}
+	return signatures
 }
 
 func (o *LoweringOwner) lowerNumericInterfaceWrapper(

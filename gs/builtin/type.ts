@@ -443,6 +443,40 @@ export const registerStructType = (
   return typeInfo
 }
 
+/**
+ * overrideTypeMethods gives the method signatures of the struct or interface
+ * type name, which an override package registers by hand, possibly without
+ * them or with inexact ones, so that reflection finds its methods. The Go
+ * signatures replace the registered ones the first time they are given.
+ *
+ * @param typeInfo The type information of a value of the type or a pointer to it.
+ * @param name The name of the type.
+ * @param methods A factory of the method signatures of the type.
+ * @returns typeInfo.
+ */
+export function overrideTypeMethods<T>(
+  typeInfo: T,
+  name: string,
+  methods: () => MethodSignature[],
+): T {
+  // A registered struct or interface takes the signatures once.
+  const registered = typeRegistry.get(name)
+  if (
+    registered === undefined ||
+    overriddenMethodTypes.has(registered) ||
+    !(isStructTypeInfo(registered) || isInterfaceTypeInfo(registered))
+  ) {
+    return typeInfo
+  }
+  overriddenMethodTypes.add(registered)
+  registered.methods = methods()
+  return typeInfo
+}
+
+// overriddenMethodTypes holds the registered types that overrideTypeMethods
+// has given their Go method signatures.
+const overriddenMethodTypes = new WeakSet<TypeInfo>()
+
 function resolveZeroValue<T>(zeroValue: any): T {
   if (typeof zeroValue === 'function') {
     return zeroValue() as T

@@ -101,7 +101,7 @@ export async function main(): globalThis.Promise<void> {
 	__defer.defer(async () => { await __goscriptDeferCallee2() })
 	await $.println("head status:", (headResp$ as http.Response).StatusCode)
 
-	let __goscriptTuple6: any = await http.Client.prototype.Post.call($.pointerValue<http.Client>((server !== null && (server as any).__isVarRef !== true && (server as any).__goValue === undefined ? ((server as any) as httptest.Server).Client() : httptest.Server.prototype.Client.call($.pointerValue<httptest.Server>(server)))), (server$ as httptest.Server).URL, "text/plain", $.pointerValueOrNil($.interfaceValue<io.Reader | null>(strings.NewReader("payload"), "*strings.Reader", /* @__PURE__ */ $.pointerType("strings.Reader")))!)
+	let __goscriptTuple6: any = await http.Client.prototype.Post.call($.pointerValue<http.Client>((server !== null && (server as any).__isVarRef !== true && (server as any).__goValue === undefined ? ((server as any) as httptest.Server).Client() : httptest.Server.prototype.Client.call($.pointerValue<httptest.Server>(server)))), (server$ as httptest.Server).URL, "text/plain", $.pointerValueOrNil($.interfaceValue<io.Reader | null>(strings.NewReader("payload"), "*strings.Reader", __goscriptStatic3()))!)
 	let postResp: http.Response | $.VarRef<http.Response> | null = __goscriptTuple6[0]
 	err = __goscriptTuple6[1]
 	let postResp$: http.Response = postResp == null ? $.pointerTarget<http.Response>(postResp) : (postResp as any).__isVarRef === true ? (postResp as any).value : (postResp as any).__goValue === undefined ? (postResp as any) : $.pointerTarget<http.Response>(postResp)
@@ -163,6 +163,11 @@ function __goscriptStatic1(): any {
 var __goscriptStatic2$value: any
 function __goscriptStatic2(): any {
 	return __goscriptStatic2$value ??= ([$.methodSignature("ServeHTTP", [["w", "http.ResponseWriter"], ["r", /* @__PURE__ */ $.pointerType("http.Request")]])])
+}
+
+var __goscriptStatic3$value: any
+function __goscriptStatic3(): any {
+	return __goscriptStatic3$value ??= ($.overrideTypeMethods(/* @__PURE__ */ $.pointerType("strings.Reader"), "strings.Reader", () => [$.methodSignature("Len", [], [/* @__PURE__ */ $.basicType("int")], true), $.methodSignature("Read", [["b", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))]], [["n", /* @__PURE__ */ $.basicType("int")], ["err", "error"]], true), $.methodSignature("ReadAt", [["b", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))], ["off", /* @__PURE__ */ $.basicType("int64")]], [["n", /* @__PURE__ */ $.basicType("int")], ["err", "error"]], true), $.methodSignature("ReadByte", [], [/* @__PURE__ */ $.basicType("uint8"), "error"], true), $.methodSignature("ReadRune", [], [["ch", /* @__PURE__ */ $.basicType("int32")], ["size", /* @__PURE__ */ $.basicType("int")], ["err", "error"]], true), $.methodSignature("Reset", [["s", /* @__PURE__ */ $.basicType("string")]], [], true), $.methodSignature("Seek", [["offset", /* @__PURE__ */ $.basicType("int64")], ["whence", /* @__PURE__ */ $.basicType("int")]], [/* @__PURE__ */ $.basicType("int64"), "error"], true), $.methodSignature("Size", [], [/* @__PURE__ */ $.basicType("int64")], true), $.methodSignature("UnreadByte", [], ["error"], true), $.methodSignature("UnreadRune", [], ["error"], true), $.methodSignature("WriteTo", [["w", "io.Writer"]], [["n", /* @__PURE__ */ $.basicType("int64")], ["err", "error"]], true)]))
 }
 
 var __goscriptAwait: any
