@@ -205,8 +205,8 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("map:", $.mapGet<string, Value, Value>(m, "a", new Value(true))[0].V, $.mapGet<string, Value, Value>(m, "b", new Value(true))[0].V)
 
 	let p = (pair(__goscriptStatic0(), new Value(true, 11)) as Value[])
-	$.arrayIndex(p, 0).Set(12)
-	await $.println("pair:", $.arrayIndex(p, 0).V, $.arrayIndex(p, 1).V)
+	p[0].Set(12)
+	await $.println("pair:", p[0].V, p[1].V)
 
 	let b = (makeBox(__goscriptStatic0(), new Value(true, 13)) as box)
 	b.A.Set(14)

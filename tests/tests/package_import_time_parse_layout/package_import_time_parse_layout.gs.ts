@@ -38,9 +38,9 @@ export async function main(): globalThis.Promise<void> {
 	let bad = $.arrayToSlice<string[]>([$.arrayValue([time.RFC3339, "2025-05-15"]), $.arrayValue(["2006-01-02", "2025-05-15T01:02"]), $.arrayValue(["2006-01-02", "2025-13-01"]), $.arrayValue(["2006-01-02", "2025-02-30"]), $.arrayValue(["15:04", "25:00"]), $.arrayValue([time.DateTime, "2025-5-15 01:10:42"])])
 	for (let __goscriptRangeTarget2 = bad, __goscriptRangeWindow2 = $.sliceRange(__goscriptRangeTarget2), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow2.length; __rangeIndex++) {
 		let b = $.cloneArrayValue((__goscriptRangeWindow2.backing[__goscriptRangeWindow2.offset + __rangeIndex] as string[]), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("string"), 2))
-		let [, err] = time.Parse($.arrayIndex(b, 0), $.arrayIndex(b, 1))
+		let [, err] = time.Parse(b[0], b[1])
 		if (err == null) {
-			await $.println("unexpected success:", $.arrayIndex(b, 0), $.arrayIndex(b, 1))
+			await $.println("unexpected success:", b[0], b[1])
 			continue
 		}
 		await $.println((__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
@@ -50,12 +50,12 @@ export async function main(): globalThis.Promise<void> {
 	let other = $.arrayToSlice<string[]>([$.arrayValue([time.RFC1123Z, "Mon, 02 Jan 2006 15:04:05 -0700"]), $.arrayValue([time.Kitchen, "3:04PM"]), $.arrayValue([time.ANSIC, "Mon Jan  2 15:04:05 2006"]), $.arrayValue(["January 2, 2006 at 3:04pm", "March 9, 2024 at 11:30am"]), $.arrayValue(["2006.002", "2024.060"]), $.arrayValue([time.StampMilli, "Jan  2 15:04:05.123"]), $.arrayValue([time.DateTime, "2025-05-15 01:10:42.25"]), $.arrayValue([time.RFC1123, "Mon, 02 Jan 2006 15:04:05 UTC"])])
 	for (let __goscriptRangeTarget3 = other, __goscriptRangeWindow3 = $.sliceRange(__goscriptRangeTarget3), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow3.length; __rangeIndex++) {
 		let o = $.cloneArrayValue((__goscriptRangeWindow3.backing[__goscriptRangeWindow3.offset + __rangeIndex] as string[]), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("string"), 2))
-		let [t, err] = time.Parse($.arrayIndex(o, 0), $.arrayIndex(o, 1))
+		let [t, err] = time.Parse(o[0], o[1])
 		if (err != null) {
 			await $.println("error:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 			continue
 		}
-		await $.println($.arrayIndex(o, 1), "=>", $.markAsStructValue($.cloneStructValue(t)).Format(time.RFC3339Nano), time.Location.prototype.String.call($.pointerValue<time.Location>($.markAsStructValue($.cloneStructValue(t)).Location())))
+		await $.println(o[1], "=>", $.markAsStructValue($.cloneStructValue(t)).Format(time.RFC3339Nano), time.Location.prototype.String.call($.pointerValue<time.Location>($.markAsStructValue($.cloneStructValue(t)).Location())))
 	}
 
 	// ParseDuration handles compound and fractional durations.

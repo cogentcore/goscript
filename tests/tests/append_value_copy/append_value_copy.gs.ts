@@ -41,7 +41,7 @@ export async function main(): globalThis.Promise<void> {
 	let row = $.arrayValue([3, 4])
 	let rows = $.appendOne<number[]>(null, $.cloneArrayValue(row, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2)))
 	row[0] = 9
-	await $.println("array:", $.arrayIndex($.arrayIndex(rows!, 0), 0), $.arrayIndex(row, 0))
+	await $.println("array:", ($.arrayIndex(rows!, 0))[0], row[0])
 
 	// Pointer elements retain their identity.
 	let pointers = $.appendOne<cell | $.VarRef<cell> | null>(null, current, $.appendZeros.nil)

@@ -58,7 +58,7 @@ export async function main(): globalThis.Promise<void> {
 		m.value.Load($.basicInterfaceValue(v, "int"))
 		return null
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: ["error"] } as $.FunctionTypeInfo))])
-	await $.println(($.arrayIndex(callbacks, 0)!(1) as $.GoError) == null)
+	await $.println((callbacks[0]!(1) as $.GoError) == null)
 }
 
 if ($.isMainScript(import.meta)) {

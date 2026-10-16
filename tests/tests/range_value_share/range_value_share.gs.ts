@@ -150,7 +150,7 @@ export async function main(): globalThis.Promise<void> {
 	for (let __goscriptRangeTarget8 = grid, __goscriptRangeWindow8 = $.sliceRange(__goscriptRangeTarget8), i = 0; i < __goscriptRangeWindow8.length; i++) {
 		let row = $.cloneArrayValue((__goscriptRangeWindow8.backing[__goscriptRangeWindow8.offset + i] as number[]), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2));
 		;((__goscriptRangeWindow8.backing as any[])[__goscriptRangeWindow8.offset + i] as number[])[0] = 9
-		await $.println("grid store:", $.arrayIndex(row, 0), $.arrayIndex(((__goscriptRangeWindow8.backing as any[])[__goscriptRangeWindow8.offset + i] as number[]), 0))
+		await $.println("grid store:", row[0], (((__goscriptRangeWindow8.backing as any[])[__goscriptRangeWindow8.offset + i] as number[]))[0])
 	}
 
 	// Interface values hold copies.

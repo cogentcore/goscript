@@ -220,8 +220,8 @@ export async function main(): globalThis.Promise<void> {
 
 	let arr: Pos[] = $.arrayValue(globalThis.Array.from({ length: 2 }, () => new Pos(true)), /* @__PURE__ */ $.arrayType("main.Pos", 2))
 	arr[0].__goscriptAssign((r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? ((r as any) as Rule).Pos() : Rule.prototype.Pos.call(r)))
-	$.arrayIndex(arr, 0).Line = 11
-	await $.println((r$ as Rule).pos.Line, $.arrayIndex(arr, 0).Line)
+	arr[0].Line = 11
+	await $.println((r$ as Rule).pos.Line, arr[0].Line)
 
 	let m = $.makeMap<key, number>([])
 	let k = new key(true, 1, 2)

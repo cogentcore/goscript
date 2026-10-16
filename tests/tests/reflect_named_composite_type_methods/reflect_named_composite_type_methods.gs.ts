@@ -198,7 +198,7 @@ export function Names_First(n: Names): string {
 }
 
 export function Grid_Sum(g: Grid): number {
-	return $.arrayIndex(g, 0) + $.arrayIndex(g, 1)
+	return g[0] + g[1]
 }
 
 export function showArray(): void {

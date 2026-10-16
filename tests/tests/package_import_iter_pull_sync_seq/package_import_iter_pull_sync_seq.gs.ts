@@ -142,7 +142,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("sum:", await sum(numbers(4)))
 	for (let __goscriptRangeTarget3 = await zip(numbers(3), numbers(5)), __goscriptRangeWindow3 = $.sliceRange(__goscriptRangeTarget3), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow3.length; __rangeIndex++) {
 		let pair = $.cloneArrayValue((__goscriptRangeWindow3.backing[__goscriptRangeWindow3.offset + __rangeIndex] as number[]), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2))
-		await $.println("zip:", $.arrayIndex(pair, 0), $.arrayIndex(pair, 1))
+		await $.println("zip:", pair[0], pair[1])
 	}
 
 	// Collecting a sequence that suspends at yield waits for it.

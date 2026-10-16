@@ -46,7 +46,7 @@ export const Peach: Fruits = 1
 export const Strawberry: Fruits = 2
 
 export function Fruits_String(f: Fruits): string {
-	return $.arrayIndex($.arrayValue(["Apple", "Peach", "Strawberry"]), f)
+	return ($.arrayValue(["Apple", "Peach", "Strawberry"]))[$.checkArrayIndex(f, 3)]
 }
 
 export function Fruits_SetString(f: $.VarRef<Fruits> | null, s: string): $.GoError {

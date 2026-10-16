@@ -87,30 +87,30 @@ export function closureArrayAddress(): number {
 export async function main(): globalThis.Promise<void> {
 	let slices = $.arrayValue([$.arrayToSlice<number>([1])])
 	let slicesCopy = $.cloneArrayValue(slices, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")), 1))
-	$.sliceElems($.arrayIndex(slicesCopy, 0)!)[$.sliceSlot($.arrayIndex(slicesCopy, 0)!, 0)] = 7
-	await $.println("slice sharing:", $.arrayIndex($.arrayIndex(slices, 0)!, 0))
+	$.sliceElems(slicesCopy[0]!)[$.sliceSlot(slicesCopy[0]!, 0)] = 7
+	await $.println("slice sharing:", $.arrayIndex(slices[0]!, 0))
 
 	let structs = $.arrayValue([new item(true, 1)], /* @__PURE__ */ $.arrayType("main.item", 1))
 	let structsCopy = $.cloneArrayValue(structs, /* @__PURE__ */ $.arrayType("main.item", 1))
-	$.arrayIndex(structsCopy, 0).value = 7
-	await $.println("struct copy:", $.arrayIndex(structs, 0).value, $.arrayIndex(structsCopy, 0).value)
+	structsCopy[0].value = 7
+	await $.println("struct copy:", structs[0].value, structsCopy[0].value)
 
 	let pointers = $.arrayValue([new item(false, 1)])
 	let pointersCopy = $.cloneArrayValue(pointers, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.pointerType("main.item"), 1))
-	$.pointerValue<item>($.arrayIndex(pointersCopy, 0)).value = 7
-	await $.println("pointer sharing:", $.pointerValue<item>($.arrayIndex(pointers, 0)).value, ($.arrayIndex(pointers, 0) === $.arrayIndex(pointersCopy, 0) || ($.pointerAliasesMade || ($.arrayIndex(pointers, 0) as any)?.__goElementBacking !== undefined) && $.pointerEqual($.arrayIndex(pointers, 0), $.arrayIndex(pointersCopy, 0))))
+	$.pointerValue<item>(pointersCopy[0]).value = 7
+	await $.println("pointer sharing:", $.pointerValue<item>(pointers[0]).value, (pointers[0] === pointersCopy[0] || $.pointerAliasesMade && $.pointerEqual(pointers[0], pointersCopy[0])))
 
 	let original = new arrays(true, slices, structs)
 	let copied = (original).clone()
-	$.sliceElems($.arrayIndex(copied.slices, 0)!)[$.sliceSlot($.arrayIndex(copied.slices, 0)!, 0)] = 8
-	$.arrayIndex(copied.items, 0).value = 8
-	await $.println("array fields:", $.arrayIndex($.arrayIndex(original.slices, 0)!, 0), $.arrayIndex(original.items, 0).value, $.arrayIndex(copied.items, 0).value)
+	$.sliceElems(copied.slices[0]!)[$.sliceSlot(copied.slices[0]!, 0)] = 8
+	copied.items[0].value = 8
+	await $.println("array fields:", $.arrayIndex(original.slices[0]!, 0), original.items[0].value, copied.items[0].value)
 
 	// Assigning an array element copies its value instead of aliasing the row.
 	let rows = $.arrayValue([$.arrayValue([1, 2]), $.arrayValue([3, 4])], /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int32"), 2), 2))
-	rows[1] = $.cloneArrayValue($.arrayIndex(rows, 0), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int32"), 2))
-	$.arrayIndex(rows, 1)[0] = 9
-	await $.println("row copy:", $.arrayIndex($.arrayIndex(rows, 0), 0), $.arrayIndex($.arrayIndex(rows, 0), 1), $.arrayIndex($.arrayIndex(rows, 1), 0), $.arrayIndex($.arrayIndex(rows, 1), 1))
+	rows[1] = $.cloneArrayValue(rows[0], /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int32"), 2))
+	rows[1][0] = 9
+	await $.println("row copy:", (rows[0])[0], (rows[0])[1], (rows[1])[0], (rows[1])[1])
 
 	let buckets: bigint[][] = $.arrayValue(globalThis.Array.from({ length: 2 }, () => $.arrayValue(globalThis.Array.from({ length: 3 }, () => 0n))), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint64"), 3), 2))
 	let cache = $.indexRef(buckets, 1)
