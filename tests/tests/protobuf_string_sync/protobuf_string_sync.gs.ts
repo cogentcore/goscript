@@ -16,7 +16,7 @@ export async function main(): globalThis.Promise<void> {
 	let str = (msg !== null && (msg as any).__isVarRef !== true && (msg as any).__goValue === undefined ? ((msg as any) as __goscript_protobuf_string_sync_pb_ts.ExampleMsg).String() : __goscript_protobuf_string_sync_pb_ts.ExampleMsg.prototype.String.call(msg))
 	await $.println("len:", $.stringLen(str))
 	await $.println("empty:", $.stringLen(str) == 0)
-	await $.println("prefix ok:", ($.stringLen(str) >= 10) && ($.stringEqual($.sliceStringOrBytes(str, undefined, 10), "ExampleMsg")))
+	await $.println("prefix ok:", ($.stringLen(str) >= 10) && ($.sliceStringEqual(str, undefined, 10, "ExampleMsg")))
 
 	// MarshalProtoText must also be synchronous.
 	let text = (msg !== null && (msg as any).__isVarRef !== true && (msg as any).__goValue === undefined ? ((msg as any) as __goscript_protobuf_string_sync_pb_ts.ExampleMsg).MarshalProtoText() : __goscript_protobuf_string_sync_pb_ts.ExampleMsg.prototype.MarshalProtoText.call(msg))
