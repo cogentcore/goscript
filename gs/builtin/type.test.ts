@@ -290,3 +290,22 @@ describe('boxes of basic values', () => {
     expect(typeAssert(a, basicType('float64')).ok).toBe(false)
   })
 })
+
+describe('assertions of tagged struct pointers to pointer descriptors', () => {
+  it('match by the name of the dynamic type', () => {
+    // A pointer to a struct is the struct object, tagged with its type.
+    class Item {}
+    const item: any = new Item()
+    item.__goType = '*test.TaggedItem'
+    item.__goTypeInfo = pointerType('test.TaggedItem')
+    expect(typeAssert(item, pointerType('test.TaggedItem'))).toEqual({
+      value: item,
+      ok: true,
+    })
+    expect(typeAssert(item, pointerType('test.TaggedItemX'))).toEqual({
+      value: null,
+      ok: false,
+    })
+    expect(typeAssert(item, pointerType('est.TaggedItem')).ok).toBe(false)
+  })
+})

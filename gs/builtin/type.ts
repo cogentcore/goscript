@@ -2322,16 +2322,47 @@ export function typeAssert<T>(
   // string, gets the result that its type got before. (Type info objects of
   // other assertions are made for each call.)
   if (
-    typeof typeInfo === 'string' &&
     typeof value === 'object' &&
     value !== null &&
     value.__goTypeInfo !== undefined &&
     typeof value.__goType === 'string' &&
     value.__isTypedNil !== true
   ) {
-    return typeAssertBoxed<T>(value, typeInfo)
+    if (typeof typeInfo === 'string') {
+      return typeAssertBoxed<T>(value, typeInfo)
+    }
+
+    // A pointer to a named type, as in a type switch on pointer types, is
+    // the dynamic type exactly when its name is the dynamic type's name.
+    if (
+      typeInfo.kind === TypeKind.Pointer &&
+      typeof typeInfo.elemType === 'string'
+    ) {
+      return typeAssertNamedPointer<T>(value, typeInfo.elemType)
+    }
   }
   return typeAssertUncached<T>(value, typeInfo)
+}
+
+// typeAssertNamedPointer asserts a value that carries its dynamic type to
+// the pointer type to the named type elemName.
+function typeAssertNamedPointer<T>(
+  value: any,
+  elemName: string,
+): TypeAssertResult<T> {
+  // The dynamic type name is "*" followed by the named type's name.
+  const name: string = value.__goType
+  if (
+    name.length !== elemName.length + 1 ||
+    name.charCodeAt(0) !== 42 ||
+    !name.endsWith(elemName)
+  ) {
+    return { value: null as T, ok: false }
+  }
+  return {
+    value: ('__goValue' in value ? value.__goValue : value) as T,
+    ok: true,
+  }
 }
 
 // TypeAssertOutcome is how an assertion of a boxed value turns out: it
