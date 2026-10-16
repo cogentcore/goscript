@@ -18,23 +18,23 @@ export async function main(): globalThis.Promise<void> {
 
 	// End reports the position after the last scanned token.
 	let fset = token.NewFileSet()
-	let file: token.File | $.VarRef<token.File> | null = token.FileSet.prototype.AddFile.call($.pointerValue<token.FileSet>(fset), "empty.go", -1, 0)
+	let file: token.File | $.VarRef<token.File> | null = (fset !== null && (fset as any).__isVarRef !== true && (fset as any).__goValue === undefined ? ((fset as any) as token.FileSet).AddFile("empty.go", -1, 0) : token.FileSet.prototype.AddFile.call($.pointerValue<token.FileSet>(fset), "empty.go", -1, 0))
 	let s: $.VarRef<scanner.Scanner> = $.varRef(new scanner.Scanner(true))
 	s.value.Init(file, null, (null as scanner.ErrorHandler | null), 0)
 	fmt.Println("End before Scan:", s.value.End() == 0)
 	let [, tok, ] = s.value.Scan()
-	fmt.Println("Scan:", token.Token_String(tok), s.value.End() == token.File.prototype.Pos.call($.pointerValue<token.File>(file), 0))
+	fmt.Println("Scan:", token.Token_String(tok), s.value.End() == (file !== null && (file as any).__isVarRef !== true && (file as any).__goValue === undefined ? ((file as any) as token.File).Pos(0) : token.File.prototype.Pos.call($.pointerValue<token.File>(file), 0)))
 
 	// Scan reads each token of a statement.
 	let src = new Uint8Array([120, 32, 58, 61, 32, 52, 50, 32, 47, 47, 32, 97, 110, 115, 119, 101, 114])
-	file = token.FileSet.prototype.AddFile.call($.pointerValue<token.FileSet>(fset), "stmt.go", -1, $.sliceLen(src))
+	file = (fset !== null && (fset as any).__isVarRef !== true && (fset as any).__goValue === undefined ? ((fset as any) as token.FileSet).AddFile("stmt.go", -1, $.sliceLen(src)) : token.FileSet.prototype.AddFile.call($.pointerValue<token.FileSet>(fset), "stmt.go", -1, $.sliceLen(src)))
 	s.value.Init(file, src, (null as scanner.ErrorHandler | null), 1)
 	while (true) {
 		let [__goscriptShadow0, __goscriptShadow1, lit] = s.value.Scan()
 		if (__goscriptShadow1 == 1) {
 			break
 		}
-		fmt.Printf("%s %s %q\n", $.interfaceValue($.markAsStructValue($.cloneStructValue(token.FileSet.prototype.Position.call($.pointerValue<token.FileSet>(fset), __goscriptShadow0))), "token.Position", "token.Position"), $.namedValueInterfaceValue<any>(__goscriptShadow1, "token.Token", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()), lit)
+		fmt.Printf("%s %s %q\n", $.interfaceValue($.markAsStructValue($.cloneStructValue((fset !== null && (fset as any).__isVarRef !== true && (fset as any).__goValue === undefined ? ((fset as any) as token.FileSet).Position(__goscriptShadow0) : token.FileSet.prototype.Position.call($.pointerValue<token.FileSet>(fset), __goscriptShadow0)))), "token.Position", "token.Position"), $.namedValueInterfaceValue<any>(__goscriptShadow1, "token.Token", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()), lit)
 	}
 }
 

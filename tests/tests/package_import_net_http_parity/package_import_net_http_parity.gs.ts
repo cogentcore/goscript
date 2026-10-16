@@ -32,7 +32,7 @@ export async function main(): globalThis.Promise<void> {
 		return
 	}
 	http.Header_Set((req$ as http.Request).Header, "Cookie", "space=wave")
-	await $.println("request:", (req$ as http.Request).Method, $.pointerValue<url.URL>((req$ as http.Request).URL).Path, http.Request.prototype.ProtoAtLeast.call($.pointerValue<http.Request>(req), 1, 1), $.sliceLen(http.Request.prototype.Cookies.call($.pointerValue<http.Request>(req))))
+	await $.println("request:", (req$ as http.Request).Method, $.pointerValue<url.URL>((req$ as http.Request).URL).Path, (req !== null && (req as any).__isVarRef !== true && (req as any).__goValue === undefined ? ((req as any) as http.Request).ProtoAtLeast(1, 1) : http.Request.prototype.ProtoAtLeast.call($.pointerValue<http.Request>(req), 1, 1)), $.sliceLen((req !== null && (req as any).__isVarRef !== true && (req as any).__goValue === undefined ? ((req as any) as http.Request).Cookies() : http.Request.prototype.Cookies.call($.pointerValue<http.Request>(req)))))
 
 	let rec: httptest.ResponseRecorder | $.VarRef<httptest.ResponseRecorder> | null = httptest.NewRecorder()
 	http.Error($.pointerValueOrNil($.interfaceValue<http.ResponseWriter | null>(rec, "*httptest.ResponseRecorder", /* @__PURE__ */ $.pointerType("httptest.ResponseRecorder")))!, http.ProtocolError.prototype.Error.call($.pointerValue<http.ProtocolError>(http.ErrNotSupported)), 403)
@@ -54,8 +54,8 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("servecontent head:", $.pointerValue<httptest.ResponseRecorder>(rec).Code, $.pointerValue<bytes.Buffer>($.pointerValue<httptest.ResponseRecorder>(rec).Body).Len())
 
 	let srv = httptest.NewTLSServer($.pointerValueOrNil(http.NotFoundHandler())!)
-	__defer.defer(() => { httptest.Server.prototype.Close.call($.pointerValue<httptest.Server>(srv)) })
-	await $.println("server:", !$.stringEqual($.pointerValue<httptest.Server>(srv).URL, ""), httptest.Server.prototype.Client.call($.pointerValue<httptest.Server>(srv)) != null, httptest.DefaultRemoteAddr)
+	__defer.defer(() => { (srv !== null && (srv as any).__isVarRef !== true && (srv as any).__goValue === undefined ? ((srv as any) as httptest.Server).Close() : httptest.Server.prototype.Close.call($.pointerValue<httptest.Server>(srv))) })
+	await $.println("server:", !$.stringEqual($.pointerValue<httptest.Server>(srv).URL, ""), (srv !== null && (srv as any).__isVarRef !== true && (srv as any).__goValue === undefined ? ((srv as any) as httptest.Server).Client() : httptest.Server.prototype.Client.call($.pointerValue<httptest.Server>(srv))) != null, httptest.DefaultRemoteAddr)
 }
 
 var __goscriptAwait: any
