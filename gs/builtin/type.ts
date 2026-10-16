@@ -689,12 +689,20 @@ function simpleTypeInfosIdentical(
   t1: string | TypeInfo,
   t2: string | TypeInfo,
 ): boolean | undefined {
-  // The same object, or a string that cannot be resolved here, is decided at once.
+  // The same object or name is the same type. A name is resolved as the
+  // full comparison resolves it, to its registered type, or else to a basic
+  // type of that name, which it then compares in the same way.
   if (t1 === t2) {
     return true
   }
-  if (typeof t1 === 'string' || typeof t2 === 'string') {
-    return undefined
+  if (typeof t1 === 'string') {
+    t1 = normalizeTypeInfo(t1)
+  }
+  if (typeof t2 === 'string') {
+    t2 = normalizeTypeInfo(t2)
+  }
+  if (t1 === t2) {
+    return true
   }
 
   // A different kind or name is a different type.
