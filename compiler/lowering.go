@@ -8771,14 +8771,7 @@ func (o *LoweringOwner) lowerSwitchStmt(ctx lowerFileContext, stmt *ast.SwitchSt
 			diagnostics = append(diagnostics, loweringUnsupportedAt(ctx, raw, "statement", ctx.semPkg.pkgPath, "unsupported switch clause"))
 			continue
 		}
-		bodyStmts := clause.Body
-		fallsThrough := false
-		if len(bodyStmts) != 0 {
-			if branch, ok := bodyStmts[len(bodyStmts)-1].(*ast.BranchStmt); ok && branch.Tok == token.FALLTHROUGH {
-				bodyStmts = bodyStmts[:len(bodyStmts)-1]
-				fallsThrough = true
-			}
-		}
+		bodyStmts, fallsThrough := splitSwitchFallthrough(clause.Body)
 		body, bodyDiagnostics := o.lowerStmtList(ctx.withLocalScope().withoutRangeBreak().withSwitchBreak(), bodyStmts)
 		diagnostics = append(diagnostics, bodyDiagnostics...)
 		values := make([]string, 0, len(clause.List))
@@ -8817,6 +8810,40 @@ func (o *LoweringOwner) lowerSwitchStmt(ctx lowerFileContext, stmt *ast.SwitchSt
 	}
 	init = append(init, lowered)
 	return []loweredStmt{{children: init}}, diagnostics
+}
+
+// splitSwitchFallthrough returns the statements of a case body without its
+// final fallthrough, and whether it had one. A labeled fallthrough, the
+// target of a goto in the case, leaves its labels on an empty statement, so
+// that the goto still jumps to the end of the case.
+func splitSwitchFallthrough(body []ast.Stmt) ([]ast.Stmt, bool) {
+	if len(body) == 0 {
+		return body, false
+	}
+
+	// Find the fallthrough under the labels of the last statement.
+	last := body[len(body)-1]
+	var labels []*ast.LabeledStmt
+	stmt := last
+	for labeled, ok := stmt.(*ast.LabeledStmt); ok; labeled, ok = stmt.(*ast.LabeledStmt) {
+		labels = append(labels, labeled)
+		stmt = labeled.Stmt
+	}
+	branch, ok := stmt.(*ast.BranchStmt)
+	if !ok || branch.Tok != token.FALLTHROUGH {
+		return body, false
+	}
+	if len(labels) == 0 {
+		return body[:len(body)-1], true
+	}
+
+	// Rebuild the labels around an empty statement in place of the fallthrough.
+	var inner ast.Stmt = &ast.EmptyStmt{Semicolon: branch.Pos(), Implicit: true}
+	for i := len(labels) - 1; i >= 0; i-- {
+		inner = &ast.LabeledStmt{Label: labels[i].Label, Colon: labels[i].Colon, Stmt: inner}
+	}
+	trimmed := append(slices.Clip(body[:len(body)-1]), inner)
+	return trimmed, true
 }
 
 func lowerConstantComparableValue(ctx lowerFileContext, expr ast.Expr, value string) string {
