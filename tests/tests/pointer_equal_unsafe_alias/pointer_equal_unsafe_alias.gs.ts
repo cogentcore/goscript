@@ -61,14 +61,14 @@ export async function main(): globalThis.Promise<void> {
 	// Distinct pointers before and after an unsafe view is made.
 	let a = new first(false, 1)
 	let other = new first(false, 1)
-	await $.println("same:", (a === a || $.pointerAliasesMade && $.pointerEqual(a, a)), (a !== a && !($.pointerAliasesMade && $.pointerEqual(a, a))))
-	await $.println("distinct:", (a === other || $.pointerAliasesMade && $.pointerEqual(a, other)), (a !== other && !($.pointerAliasesMade && $.pointerEqual(a, other))))
+	await $.println("same:", (a === a || ($.pointerAliasesMade || (a as any)?.__goElementBacking !== undefined) && $.pointerEqual(a, a)), (a !== a && !(($.pointerAliasesMade || (a as any)?.__goElementBacking !== undefined) && $.pointerEqual(a, a))))
+	await $.println("distinct:", (a === other || ($.pointerAliasesMade || (a as any)?.__goElementBacking !== undefined) && $.pointerEqual(a, other)), (a !== other && !(($.pointerAliasesMade || (a as any)?.__goElementBacking !== undefined) && $.pointerEqual(a, other))))
 
 	// A view of another type, converted back, is the same pointer.
 	let view = (a as any)
 	let back = (view as any)
-	await $.println("back:", (a === back || $.pointerAliasesMade && $.pointerEqual(a, back)), (a !== back && !($.pointerAliasesMade && $.pointerEqual(a, back))), (back === a || $.pointerAliasesMade && $.pointerEqual(back, a)))
-	await $.println("still distinct:", (a === other || $.pointerAliasesMade && $.pointerEqual(a, other)), (back !== other && !($.pointerAliasesMade && $.pointerEqual(back, other))))
+	await $.println("back:", (a === back || ($.pointerAliasesMade || (a as any)?.__goElementBacking !== undefined) && $.pointerEqual(a, back)), (a !== back && !(($.pointerAliasesMade || (a as any)?.__goElementBacking !== undefined) && $.pointerEqual(a, back))), (back === a || ($.pointerAliasesMade || (back as any)?.__goElementBacking !== undefined) && $.pointerEqual(back, a)))
+	await $.println("still distinct:", (a === other || ($.pointerAliasesMade || (a as any)?.__goElementBacking !== undefined) && $.pointerEqual(a, other)), (back !== other && !(($.pointerAliasesMade || (back as any)?.__goElementBacking !== undefined) && $.pointerEqual(back, other))))
 
 	// Fields and elements reached through the pointers agree.
 	$.pointerValue<second>(view).X = 7
@@ -77,7 +77,7 @@ export async function main(): globalThis.Promise<void> {
 	let found = -1
 	for (let __goscriptRangeTarget0 = items, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), i = 0; i < __goscriptRangeWindow0.length; i++) {
 		let item = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + i] as first | $.VarRef<first> | null)
-		if ((item === back || $.pointerAliasesMade && $.pointerEqual(item, back))) {
+		if ((item === back || ($.pointerAliasesMade || (item as any)?.__goElementBacking !== undefined) && $.pointerEqual(item, back))) {
 			found = i
 		}
 	}

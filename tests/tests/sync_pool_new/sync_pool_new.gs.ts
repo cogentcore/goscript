@@ -55,7 +55,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("len:", $.sliceLen((b$ as buffer).data), "cap:", $.cap((b$ as buffer).data))
 	put(b)
 	let c = _get()
-	await $.println("reused:", (c === b || $.pointerAliasesMade && $.pointerEqual(c, b)), $.sliceLen($.pointerValue<buffer>(c).data))
+	await $.println("reused:", (c === b || ($.pointerAliasesMade || (c as any)?.__goElementBacking !== undefined) && $.pointerEqual(c, b)), $.sliceLen($.pointerValue<buffer>(c).data))
 }
 
 if ($.isMainScript(import.meta)) {

@@ -1488,32 +1488,118 @@ function pointerCastSource(value: unknown): PointerCastSource | null {
   return { identity: value, object: value }
 }
 
-// canonicalPointerIdentity resolves the backing storage shared by pointer aliases.
+// ElementPointer is a reference to an element of a slice or array, made anew
+// by each &s[i], which names the element by the storage that backs it and
+// its index there: an array and an element index, or the ArrayBuffer of a
+// typed array and a byte offset.
+interface ElementPointer {
+  readonly __goElementBacking: object
+  readonly __goElementIndex: number
+}
+
+// elementPointer returns value as a reference to an element, or undefined if
+// it is another pointer.
+function elementPointer(value: object): ElementPointer | undefined {
+  // Only references to elements name a backing storage.
+  if ((value as Partial<ElementPointer>).__goElementBacking === undefined) {
+    return undefined
+  }
+  return value as ElementPointer
+}
+
+// elementIdentities holds, for each backing storage, the first reference
+// seen to each of its elements, which stands for that element.
+const elementIdentities = new WeakMap<object, Map<number, object>>()
+
+function elementIdentity(pointer: ElementPointer): object {
+  // The references seen to the elements of the backing storage.
+  const backing = pointer.__goElementBacking
+  let identities = elementIdentities.get(backing)
+  if (identities === undefined) {
+    identities = new Map<number, object>()
+    elementIdentities.set(backing, identities)
+  }
+
+  // The first reference seen to the element stands for it.
+  const index = pointer.__goElementIndex
+  const identity = identities.get(index)
+  if (identity !== undefined) {
+    return identity
+  }
+  identities.set(index, pointer)
+  return pointer
+}
+
+// sameElement reports whether two references name the same element.
+function sameElement(a: ElementPointer, b: ElementPointer): boolean {
+  return (
+    a.__goElementBacking === b.__goElementBacking &&
+    a.__goElementIndex === b.__goElementIndex
+  )
+}
+
+// canonicalPointerIdentity resolves the backing storage shared by pointer
+// aliases and by the references to one element.
 export function canonicalPointerIdentity(value: object): object {
+  // A pointer seen before keeps its identity.
   const identity = pointerIdentities.get(value)
   if (identity !== undefined) {
     return identity
   }
-  pointerIdentities.set(value, value)
-  return value
+
+  // A reference to an element is identified by the element, other pointers
+  // by themselves.
+  const element = elementPointer(value)
+  const canonical = element === undefined ? value : elementIdentity(element)
+  pointerIdentities.set(value, canonical)
+  return canonical
 }
 
 // pointerAliasesMade records that a pointer view aliases another pointer's
-// storage, before which distinct pointers are never equal. Compiled code
-// compares pointers with === and calls pointerEqual only once it is set.
+// storage, before which pointers are equal only as the same object or as
+// references to the same element. Compiled code compares pointers with ===
+// and calls pointerEqual only if this is set or the left one is a reference
+// to an element, which has a __goElementBacking.
 export let pointerAliasesMade = false
 
 function markPointerAlias(source: object, view: object): void {
+  // The view shares the identity of the storage of its source.
   pointerAliasesMade = true
   pointerIdentities.set(view, canonicalPointerIdentity(source))
 }
 
+// aliasIdentity returns the storage that a pointer view or a reference to an
+// element shares with other pointers, or undefined for another pointer.
+function aliasIdentity(value: object): object | undefined {
+  // A view has the identity of its source.
+  const identity = pointerIdentities.get(value)
+  if (identity !== undefined) {
+    return identity
+  }
+
+  // A reference to an element has the identity of the element.
+  const element = elementPointer(value)
+  return element === undefined ? undefined : elementIdentity(element)
+}
+
 function pointerBackingIdentityEqual(a: object, b: object): boolean {
+  // References to the same element are equal.
+  const aElement = elementPointer(a)
+  const bElement = elementPointer(b)
+  if (
+    aElement !== undefined &&
+    bElement !== undefined &&
+    sameElement(aElement, bElement)
+  ) {
+    return true
+  }
+
+  // Pointer views are equal to the pointers whose storage they share.
   if (!pointerAliasesMade) {
     return false
   }
-  const aIdentity = pointerIdentities.get(a)
-  return aIdentity !== undefined && aIdentity === pointerIdentities.get(b)
+  const aIdentity = aliasIdentity(a)
+  return aIdentity !== undefined && aIdentity === aliasIdentity(b)
 }
 
 /** pointerIdentityEqual reports alias equality for interface pointer values. */
@@ -1535,9 +1621,15 @@ export function pointerIdentityEqual(a: object, b: object): boolean {
 
 /** pointerEqual reports whether two Go pointers identify the same storage. */
 export function pointerEqual(a: unknown, b: unknown): boolean {
+  // The same pointer, or two nil pointers, are equal.
   if (a === b) {
     return true
   }
+  if (a === null || a === undefined) {
+    return b === null || b === undefined
+  }
+
+  // Other pointers are equal if they share storage.
   return (
     typeof a === 'object' &&
     a !== null &&

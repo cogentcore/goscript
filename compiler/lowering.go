@@ -8762,7 +8762,13 @@ func (o *LoweringOwner) lowerSwitchStmt(ctx lowerFileContext, stmt *ast.SwitchSt
 		tagType = ctx.semPkg.source.TypesInfo.TypeOf(stmt.Tag)
 	}
 
-	compareCases := tagType != nil && isInterfaceType(tagType)
+	// Interface and pointer tags are compared with the runtime, since equal
+	// values need not be the same JavaScript value.
+	compareCases := tagType != nil && (isInterfaceType(tagType) || isPointerType(tagType))
+	compareHelper := RuntimeHelperComparableEqual
+	if tagType != nil && isPointerType(tagType) {
+		compareHelper = RuntimeHelperPointerEqual
+	}
 	compareValue := value
 	if compareCases {
 		compareValue = ctx.tempName("Switch")
@@ -8793,7 +8799,7 @@ func (o *LoweringOwner) lowerSwitchStmt(ctx lowerFileContext, stmt *ast.SwitchSt
 			if compareCases {
 				sourceType := ctx.semPkg.source.TypesInfo.TypeOf(expr)
 				lowered = o.lowerValueForTargetTypes(ctx, tagType, sourceType, lowered, o.shouldCloneStructValue(ctx, expr))
-				lowered = o.runtimeOwner.QualifiedHelper(RuntimeHelperComparableEqual) + "(" + compareValue + ", " + lowered + ")"
+				lowered = o.runtimeOwner.QualifiedHelper(compareHelper) + "(" + compareValue + ", " + lowered + ")"
 			} else if tagType != nil && isBigIntBackedType(tagType) {
 				// A bigint-backed tag (int64/uint64) lowers to a bigint at
 				// runtime, and JS switch matches with strict ===. An integer
@@ -9208,16 +9214,17 @@ func (o *LoweringOwner) lowerComplexEqualityExpr(ctx lowerFileContext, expr *ast
 	return value, true
 }
 
-// lowerPointerEqualityExpr compares two pointers. Pointers to the same
-// storage are the same object, until an unsafe pointer conversion makes a
-// view that aliases another pointer's storage, so operands that can be
-// evaluated twice are compared with === first, and through the runtime only
-// once such an alias exists.
+// lowerPointerEqualityExpr compares two pointers, also unsafe pointers.
+// Pointers to the same storage are the same object, except references to a
+// slice or array element, which each &s[i] makes anew, and views that an
+// unsafe pointer conversion makes of another pointer's storage, so operands
+// that can be evaluated twice are compared with === first, and through the
+// runtime only if the left one is such a reference or a view was made.
 func (o *LoweringOwner) lowerPointerEqualityExpr(ctx lowerFileContext, expr *ast.BinaryExpr, left string, right string) (string, bool) {
 	// Both operands are pointers.
 	leftType := ctx.semPkg.source.TypesInfo.TypeOf(expr.X)
 	rightType := ctx.semPkg.source.TypesInfo.TypeOf(expr.Y)
-	if !isPointerType(leftType) || !isPointerType(rightType) {
+	if !isComparedPointerType(leftType) || !isComparedPointerType(rightType) {
 		return "", false
 	}
 
@@ -9230,9 +9237,12 @@ func (o *LoweringOwner) lowerPointerEqualityExpr(ctx lowerFileContext, expr *ast
 		return value, true
 	}
 
-	// Simple operands are compared inline, and by the runtime only after an
-	// alias was made.
-	aliases := o.runtimeOwner.QualifiedHelper(RuntimeHelperPointerAliasesMade)
+	// Simple operands are compared inline, and by the runtime only if the
+	// left one may alias another pointer: a view was made or it is a
+	// reference to an element. The test is inline, since calls of runtime
+	// helpers are not inlined in hot loops.
+	aliases := "(" + o.runtimeOwner.QualifiedHelper(RuntimeHelperPointerAliasesMade) +
+		" || (" + left + " as any)?.__goElementBacking !== undefined)"
 	if expr.Op == token.NEQ {
 		return "(" + left + " !== " + right + " && !(" + aliases + " && " + value + "))", true
 	}
@@ -16824,6 +16834,12 @@ func isPointerType(typ types.Type) bool {
 	}
 	_, ok := types.Unalias(typ).Underlying().(*types.Pointer)
 	return ok
+}
+
+// isComparedPointerType reports whether == compares values of typ as
+// pointers, by the storage they point to.
+func isComparedPointerType(typ types.Type) bool {
+	return isPointerType(typ) || isUnsafePointerType(typ)
 }
 
 func isUnsafePointerType(typ types.Type) bool {

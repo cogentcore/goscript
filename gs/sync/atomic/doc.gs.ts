@@ -91,7 +91,8 @@ export function CompareAndSwapUintptr(addr: $.VarRef<uintptr> | null, old: uintp
 // Consider using the more ergonomic and less error-prone [Pointer.CompareAndSwap] instead.
 export function CompareAndSwapPointer(addr: $.VarRef<Pointer> | null, old: Pointer, _new: Pointer): boolean {
 	if (!addr) return false;
-	if (addr.value === old) {
+	// Pointers to the same storage need not be the same object.
+	if ($.pointerEqual(addr.value, old)) {
 		addr.value = _new;
 		return true;
 	}

@@ -54,7 +54,7 @@ export async function main(): globalThis.Promise<void> {
 	let c = new Col(false, "c", v)
 	let out = cloneColField(c)
 	let out$: Col = out == null ? $.pointerTarget<Col>(out) : (out as any).__isVarRef === true ? (out as any).value : (out as any).__goValue === undefined ? (out as any) : $.pointerTarget<Col>(out)
-	await $.println("field alias same pointee:", ((out$ as Col).Default === $.pointerValue<Col>(c).Default || $.pointerAliasesMade && $.pointerEqual((out$ as Col).Default, $.pointerValue<Col>(c).Default)));
+	await $.println("field alias same pointee:", ((out$ as Col).Default === $.pointerValue<Col>(c).Default || ($.pointerAliasesMade || ((out$ as Col).Default as any)?.__goElementBacking !== undefined) && $.pointerEqual((out$ as Col).Default, $.pointerValue<Col>(c).Default)));
 	;(out$ as Col).Default!.value = 30
 	await $.println("field alias write:", v.value)
 }

@@ -18,7 +18,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// Compare the pointers - they should be different pointers
 	// but point to the same value
-	await $.println("p1==p2:", (p1.value === p2 || $.pointerAliasesMade && $.pointerEqual(p1.value, p2)))
+	await $.println("p1==p2:", (p1.value === p2 || ($.pointerAliasesMade || (p1.value as any)?.__goElementBacking !== undefined) && $.pointerEqual(p1.value, p2)))
 	await $.println("*p1==*p2:", $.pointerValue<number>(p1.value) == $.pointerValue<number>(p2))
 	await $.println("pp1 deref:", $.pointerValue<number>($.pointerValue<$.VarRef<number> | null>(pp1)))
 }
