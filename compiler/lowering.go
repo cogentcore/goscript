@@ -4864,10 +4864,6 @@ func (o *LoweringOwner) lowerStmtInto(ctx lowerFileContext, stmt ast.Stmt, out [
 		if isBigIntBackedType(ctx.semPkg.source.TypesInfo.TypeOf(typed.X)) {
 			oneLiteral = "1n"
 		}
-		if star, ok := unwrapParenExpr(typed.X).(*ast.StarExpr); ok {
-			expr, diagnostics := o.lowerPointerStorageExpr(ctx, star.X)
-			return append(out, loweredStmt{text: expr + typed.Tok.String()}), diagnostics
-		}
 		if index, ok := unwrapParenExpr(typed.X).(*ast.IndexExpr); ok && isMapType(ctx.semPkg.source.TypesInfo.TypeOf(index.X)) {
 			tok := token.ADD_ASSIGN
 			if typed.Tok == token.DEC {
@@ -4884,27 +4880,32 @@ func (o *LoweringOwner) lowerStmtInto(ctx lowerFileContext, stmt ast.Stmt, out [
 			}
 			return append(out, loweredStmt{text: setter + "(" + expr + " " + op + " " + oneLiteral + ")"}), diagnostics
 		}
-		if _, ok := unwrapParenExpr(typed.X).(*ast.IndexExpr); ok {
-			// Array/slice index increment needs the assignable target[index] form;
-			// the read path wraps indexing in a bounds-checked helper that cannot be
-			// an increment operand. Map index increment is handled above.
-			target, diagnostics := o.lowerAssignmentTarget(ctx, typed.X, false)
-			return append(out, loweredStmt{text: target + typed.Tok.String()}), diagnostics
-		}
 		op := token.ADD
 		if typed.Tok == token.DEC {
 			op = token.SUB
 		}
 
-		// A narrow integer wraps, reading its target twice, so the operands
-		// of the target are evaluated once first.
+		// A narrow integer wraps and a float32 rounds, also an element of a
+		// slice held in an array rather than a typed array, reading the
+		// target twice, so the operands of the target are evaluated once
+		// first.
 		targetType := ctx.semPkg.source.TypesInfo.TypeOf(typed.X)
-		if _, ok := wrapNarrowIntegerValue(targetType, "x", op); ok {
+		if _, ok := incDecStepValue(targetType, "x", op); ok {
 			targetCtx, prelude, diagnostics := o.stableCompoundTarget(ctx, typed.X)
-			expr, exprDiagnostics := o.lowerExpr(targetCtx, typed.X)
-			value, _ := wrapNarrowIntegerValue(targetType, expr+" "+op.String()+" 1", op)
+			expr, exprDiagnostics := o.lowerIncDecTarget(targetCtx, typed.X)
+			value, _ := incDecStepValue(targetType, expr+" "+op.String()+" 1", op)
 			out = append(append(out, prelude...), loweredStmt{text: expr + " = " + value})
 			return out, append(diagnostics, exprDiagnostics...)
+		}
+
+		// Other pointer and element targets step in place.
+		if _, ok := unwrapParenExpr(typed.X).(*ast.StarExpr); ok {
+			expr, diagnostics := o.lowerIncDecTarget(ctx, typed.X)
+			return append(out, loweredStmt{text: expr + typed.Tok.String()}), diagnostics
+		}
+		if _, ok := unwrapParenExpr(typed.X).(*ast.IndexExpr); ok {
+			expr, diagnostics := o.lowerIncDecTarget(ctx, typed.X)
+			return append(out, loweredStmt{text: expr + typed.Tok.String()}), diagnostics
 		}
 
 		// Any other operand steps in place.
@@ -6279,6 +6280,30 @@ func integerQuotientAssignValueExpr(targetType types.Type, left string, right st
 		return "(" + left + " / " + right + ") >>> 0", true
 	}
 	return "globalThis.Math.trunc(" + left + " / " + right + ")", true
+}
+
+// incDecStepValue returns value, the stepped value of an increment or
+// decrement of a variable of type typ, wrapped to a narrow integer type or
+// rounded to float32, and whether typ is such a type.
+func incDecStepValue(typ types.Type, value string, op token.Token) (string, bool) {
+	if isFloat32Type(typ) {
+		return "globalThis.Math.fround(" + value + ")", true
+	}
+	return wrapNarrowIntegerValue(typ, value, op)
+}
+
+// lowerIncDecTarget lowers the assignable target of an increment or
+// decrement: the storage a pointer points to, the target[index] form of an
+// array or slice element, whose read path is a bounds-checked helper, or
+// another operand.
+func (o *LoweringOwner) lowerIncDecTarget(ctx lowerFileContext, target ast.Expr) (string, []Diagnostic) {
+	switch typed := unwrapParenExpr(target).(type) {
+	case *ast.StarExpr:
+		return o.lowerPointerStorageExpr(ctx, typed.X)
+	case *ast.IndexExpr:
+		return o.lowerAssignmentTarget(ctx, typed, false)
+	}
+	return o.lowerExpr(ctx, target)
 }
 
 // wrapNarrowIntegerValue wraps the result of an addition, subtraction or
