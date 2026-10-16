@@ -50,25 +50,25 @@ export function mix(h: bigint, v: bigint): bigint {
 export function draws(r: rand.Rand | $.VarRef<rand.Rand> | null, n: number): bigint {
 	let h = 0n
 	for (let __goscriptRangeCount0 = n, __rangeIndex = 0; __rangeIndex < __goscriptRangeCount0; __rangeIndex++) {
-		h = mix(h, $.uint64(rand.Rand.prototype.Int64.call($.pointerValue<rand.Rand>(r))))
-		h = mix(h, $.uint64(rand.Rand.prototype.Uint32.call($.pointerValue<rand.Rand>(r))))
-		h = mix(h, rand.Rand.prototype.Uint64.call($.pointerValue<rand.Rand>(r)))
-		h = mix(h, $.uint64(rand.Rand.prototype.Int32.call($.pointerValue<rand.Rand>(r))))
-		h = mix(h, math.Float64bits(rand.Rand.prototype.Float64.call($.pointerValue<rand.Rand>(r))))
-		h = mix(h, $.uint64(math.Float32bits(rand.Rand.prototype.Float32.call($.pointerValue<rand.Rand>(r)))))
-		h = mix(h, $.uint64(rand.Rand.prototype.IntN.call($.pointerValue<rand.Rand>(r), 1000)))
-		h = mix(h, $.uint64(rand.Rand.prototype.IntN.call($.pointerValue<rand.Rand>(r), 1048576)))
-		h = mix(h, $.uint64(rand.Rand.prototype.IntN.call($.pointerValue<rand.Rand>(r), 3000000000)))
-		h = mix(h, $.uint64(rand.Rand.prototype.IntN.call($.pointerValue<rand.Rand>(r), 1099511627783)))
-		h = mix(h, $.uint64(rand.Rand.prototype.Int32N.call($.pointerValue<rand.Rand>(r), 7)))
-		h = mix(h, $.uint64(rand.Rand.prototype.Uint32N.call($.pointerValue<rand.Rand>(r), 4294967295)))
-		h = mix(h, $.uint64(rand.Rand.prototype.Int64N.call($.pointerValue<rand.Rand>(r), 1000000000000007n)))
-		h = mix(h, rand.Rand.prototype.Uint64N.call($.pointerValue<rand.Rand>(r), 9223372036854775813n))
-		h = mix(h, $.uint64(rand.Rand.prototype.UintN.call($.pointerValue<rand.Rand>(r), 12345)))
-		h = mix(h, $.uint64(rand.Rand.prototype.N.call($.pointerValue<rand.Rand>(r), 1000000000n)))
-		h = mix(h, $.uint64(rand.Rand.prototype.N.call($.pointerValue<rand.Rand>(r), 100)))
-		h = mix(h, math.Float64bits(rand.Rand.prototype.NormFloat64.call($.pointerValue<rand.Rand>(r))))
-		h = mix(h, math.Float64bits(rand.Rand.prototype.ExpFloat64.call($.pointerValue<rand.Rand>(r))))
+		h = mix(h, $.uint64((r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? ((r as any) as rand.Rand).Int64() : rand.Rand.prototype.Int64.call($.pointerValue<rand.Rand>(r)))))
+		h = mix(h, $.uint64((r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? ((r as any) as rand.Rand).Uint32() : rand.Rand.prototype.Uint32.call($.pointerValue<rand.Rand>(r)))))
+		h = mix(h, (r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? ((r as any) as rand.Rand).Uint64() : rand.Rand.prototype.Uint64.call($.pointerValue<rand.Rand>(r))))
+		h = mix(h, $.uint64((r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? ((r as any) as rand.Rand).Int32() : rand.Rand.prototype.Int32.call($.pointerValue<rand.Rand>(r)))))
+		h = mix(h, math.Float64bits((r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? ((r as any) as rand.Rand).Float64() : rand.Rand.prototype.Float64.call($.pointerValue<rand.Rand>(r)))))
+		h = mix(h, $.uint64(math.Float32bits((r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? ((r as any) as rand.Rand).Float32() : rand.Rand.prototype.Float32.call($.pointerValue<rand.Rand>(r))))))
+		h = mix(h, $.uint64((r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? ((r as any) as rand.Rand).IntN(1000) : rand.Rand.prototype.IntN.call($.pointerValue<rand.Rand>(r), 1000))))
+		h = mix(h, $.uint64((r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? ((r as any) as rand.Rand).IntN(1048576) : rand.Rand.prototype.IntN.call($.pointerValue<rand.Rand>(r), 1048576))))
+		h = mix(h, $.uint64((r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? ((r as any) as rand.Rand).IntN(3000000000) : rand.Rand.prototype.IntN.call($.pointerValue<rand.Rand>(r), 3000000000))))
+		h = mix(h, $.uint64((r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? ((r as any) as rand.Rand).IntN(1099511627783) : rand.Rand.prototype.IntN.call($.pointerValue<rand.Rand>(r), 1099511627783))))
+		h = mix(h, $.uint64((r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? ((r as any) as rand.Rand).Int32N(7) : rand.Rand.prototype.Int32N.call($.pointerValue<rand.Rand>(r), 7))))
+		h = mix(h, $.uint64((r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? ((r as any) as rand.Rand).Uint32N(4294967295) : rand.Rand.prototype.Uint32N.call($.pointerValue<rand.Rand>(r), 4294967295))))
+		h = mix(h, $.uint64((r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? ((r as any) as rand.Rand).Int64N(1000000000000007n) : rand.Rand.prototype.Int64N.call($.pointerValue<rand.Rand>(r), 1000000000000007n))))
+		h = mix(h, (r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? ((r as any) as rand.Rand).Uint64N(9223372036854775813n) : rand.Rand.prototype.Uint64N.call($.pointerValue<rand.Rand>(r), 9223372036854775813n)))
+		h = mix(h, $.uint64((r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? ((r as any) as rand.Rand).UintN(12345) : rand.Rand.prototype.UintN.call($.pointerValue<rand.Rand>(r), 12345))))
+		h = mix(h, $.uint64((r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? ((r as any) as rand.Rand).N(1000000000n) : rand.Rand.prototype.N.call($.pointerValue<rand.Rand>(r), 1000000000n))))
+		h = mix(h, $.uint64((r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? ((r as any) as rand.Rand).N(100) : rand.Rand.prototype.N.call($.pointerValue<rand.Rand>(r), 100))))
+		h = mix(h, math.Float64bits((r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? ((r as any) as rand.Rand).NormFloat64() : rand.Rand.prototype.NormFloat64.call($.pointerValue<rand.Rand>(r)))))
+		h = mix(h, math.Float64bits((r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? ((r as any) as rand.Rand).ExpFloat64() : rand.Rand.prototype.ExpFloat64.call($.pointerValue<rand.Rand>(r)))))
 	}
 	return h
 }
@@ -83,10 +83,10 @@ export function ints(s: $.Slice<number>): string {
 }
 
 export async function show(r: rand.Rand | $.VarRef<rand.Rand> | null): globalThis.Promise<void> {
-	await $.println("first:", rand.Rand.prototype.Int64.call($.pointerValue<rand.Rand>(r)), rand.Rand.prototype.Uint32.call($.pointerValue<rand.Rand>(r)), rand.Rand.prototype.Uint64.call($.pointerValue<rand.Rand>(r)), rand.Rand.prototype.Int32.call($.pointerValue<rand.Rand>(r)), rand.Rand.prototype.IntN.call($.pointerValue<rand.Rand>(r), 10), rand.Rand.prototype.Int32N.call($.pointerValue<rand.Rand>(r), 100), rand.Rand.prototype.Uint64N.call($.pointerValue<rand.Rand>(r), 1099511627776n))
-	await $.println("floats:", rand.Rand.prototype.Float64.call($.pointerValue<rand.Rand>(r)), math.Float32bits(rand.Rand.prototype.Float32.call($.pointerValue<rand.Rand>(r))), rand.Rand.prototype.NormFloat64.call($.pointerValue<rand.Rand>(r)), rand.Rand.prototype.ExpFloat64.call($.pointerValue<rand.Rand>(r)))
+	await $.println("first:", (r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? ((r as any) as rand.Rand).Int64() : rand.Rand.prototype.Int64.call($.pointerValue<rand.Rand>(r))), (r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? ((r as any) as rand.Rand).Uint32() : rand.Rand.prototype.Uint32.call($.pointerValue<rand.Rand>(r))), (r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? ((r as any) as rand.Rand).Uint64() : rand.Rand.prototype.Uint64.call($.pointerValue<rand.Rand>(r))), (r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? ((r as any) as rand.Rand).Int32() : rand.Rand.prototype.Int32.call($.pointerValue<rand.Rand>(r))), (r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? ((r as any) as rand.Rand).IntN(10) : rand.Rand.prototype.IntN.call($.pointerValue<rand.Rand>(r), 10)), (r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? ((r as any) as rand.Rand).Int32N(100) : rand.Rand.prototype.Int32N.call($.pointerValue<rand.Rand>(r), 100)), (r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? ((r as any) as rand.Rand).Uint64N(1099511627776n) : rand.Rand.prototype.Uint64N.call($.pointerValue<rand.Rand>(r), 1099511627776n)))
+	await $.println("floats:", (r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? ((r as any) as rand.Rand).Float64() : rand.Rand.prototype.Float64.call($.pointerValue<rand.Rand>(r))), math.Float32bits((r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? ((r as any) as rand.Rand).Float32() : rand.Rand.prototype.Float32.call($.pointerValue<rand.Rand>(r)))), (r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? ((r as any) as rand.Rand).NormFloat64() : rand.Rand.prototype.NormFloat64.call($.pointerValue<rand.Rand>(r))), (r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? ((r as any) as rand.Rand).ExpFloat64() : rand.Rand.prototype.ExpFloat64.call($.pointerValue<rand.Rand>(r))))
 	await $.println("hash:", draws(r, 500))
-	await $.println("perm:", ints(rand.Rand.prototype.Perm.call($.pointerValue<rand.Rand>(r), 12)))
+	await $.println("perm:", ints((r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? ((r as any) as rand.Rand).Perm(12) : rand.Rand.prototype.Perm.call($.pointerValue<rand.Rand>(r), 12))))
 	let s = $.arrayToSlice<number>([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
 	rand.Rand.prototype.Shuffle.call($.pointerValue<rand.Rand>(r), $.sliceLen(s), $.functionValue((i: number, j: number) => {
 		let __goscriptAssign0_0: number = $.arrayIndex(s!, j)
@@ -96,7 +96,7 @@ export async function show(r: rand.Rand | $.VarRef<rand.Rand> | null): globalThi
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")], results: [] } as $.FunctionTypeInfo)))
 	await $.println("shuffle:", ints(s))
 	let z = rand.NewZipf(r, 1.5, 2, 100n)
-	await $.println("zipf:", rand.Zipf.prototype.Uint64.call($.pointerValue<rand.Zipf>(z)), rand.Zipf.prototype.Uint64.call($.pointerValue<rand.Zipf>(z)), rand.Zipf.prototype.Uint64.call($.pointerValue<rand.Zipf>(z)), rand.Zipf.prototype.Uint64.call($.pointerValue<rand.Zipf>(z)))
+	await $.println("zipf:", (z !== null && (z as any).__isVarRef !== true && (z as any).__goValue === undefined ? ((z as any) as rand.Zipf).Uint64() : rand.Zipf.prototype.Uint64.call($.pointerValue<rand.Zipf>(z))), (z !== null && (z as any).__isVarRef !== true && (z as any).__goValue === undefined ? ((z as any) as rand.Zipf).Uint64() : rand.Zipf.prototype.Uint64.call($.pointerValue<rand.Zipf>(z))), (z !== null && (z as any).__isVarRef !== true && (z as any).__goValue === undefined ? ((z as any) as rand.Zipf).Uint64() : rand.Zipf.prototype.Uint64.call($.pointerValue<rand.Zipf>(z))), (z !== null && (z as any).__isVarRef !== true && (z as any).__goValue === undefined ? ((z as any) as rand.Zipf).Uint64() : rand.Zipf.prototype.Uint64.call($.pointerValue<rand.Zipf>(z))))
 }
 
 export function hex(b: $.Slice<number>): string {
@@ -132,33 +132,33 @@ export async function main(): globalThis.Promise<void> {
 
 	// PCG and ChaCha8 state round trips.
 	let p = rand.NewPCG(5n, 6n)
-	rand.PCG.prototype.Uint64.call($.pointerValue<rand.PCG>(p))
-	let __goscriptTuple0: any = rand.PCG.prototype.MarshalBinary.call($.pointerValue<rand.PCG>(p))
+	void (p !== null && (p as any).__isVarRef !== true && (p as any).__goValue === undefined ? ((p as any) as rand.PCG).Uint64() : rand.PCG.prototype.Uint64.call($.pointerValue<rand.PCG>(p)))
+	let __goscriptTuple0: any = (p !== null && (p as any).__isVarRef !== true && (p as any).__goValue === undefined ? ((p as any) as rand.PCG).MarshalBinary() : rand.PCG.prototype.MarshalBinary.call($.pointerValue<rand.PCG>(p)))
 	let data: $.Slice<number> = __goscriptTuple0[0]
 	await $.println("pcg state:", hex(data))
 	let p2 = $.varRef($.markAsStructValue(new rand.PCG()))
 	p2.value.UnmarshalBinary(data)
-	await $.println("pcg restored:", rand.PCG.prototype.Uint64.call($.pointerValue<rand.PCG>(p)) == p2.value.Uint64())
-	rand.PCG.prototype.Seed.call($.pointerValue<rand.PCG>(p), 9n, 10n)
-	await $.println("pcg seed:", rand.PCG.prototype.Uint64.call($.pointerValue<rand.PCG>(p)))
+	await $.println("pcg restored:", (p !== null && (p as any).__isVarRef !== true && (p as any).__goValue === undefined ? ((p as any) as rand.PCG).Uint64() : rand.PCG.prototype.Uint64.call($.pointerValue<rand.PCG>(p))) == p2.value.Uint64())
+	void (p !== null && (p as any).__isVarRef !== true && (p as any).__goValue === undefined ? ((p as any) as rand.PCG).Seed(9n, 10n) : rand.PCG.prototype.Seed.call($.pointerValue<rand.PCG>(p), 9n, 10n))
+	await $.println("pcg seed:", (p !== null && (p as any).__isVarRef !== true && (p as any).__goValue === undefined ? ((p as any) as rand.PCG).Uint64() : rand.PCG.prototype.Uint64.call($.pointerValue<rand.PCG>(p))))
 
 	let seed: Uint8Array = $.arrayValue(new Uint8Array(32))
 	let c = rand.NewChaCha8(seed)
 	let buf = $.makeSlice<number>(13, undefined, "byte")
-	rand.ChaCha8.prototype.Read.call($.pointerValue<rand.ChaCha8>(c), buf)
+	void (c !== null && (c as any).__isVarRef !== true && (c as any).__goValue === undefined ? ((c as any) as rand.ChaCha8).Read(buf) : rand.ChaCha8.prototype.Read.call($.pointerValue<rand.ChaCha8>(c), buf))
 	await $.println("chacha8 read:", hex(buf))
-	let __goscriptTuple1: any = rand.ChaCha8.prototype.MarshalBinary.call($.pointerValue<rand.ChaCha8>(c))
+	let __goscriptTuple1: any = (c !== null && (c as any).__isVarRef !== true && (c as any).__goValue === undefined ? ((c as any) as rand.ChaCha8).MarshalBinary() : rand.ChaCha8.prototype.MarshalBinary.call($.pointerValue<rand.ChaCha8>(c)))
 	data = __goscriptTuple1[0]
 	await $.println("chacha8 state:", hex(data))
 	let c2 = rand.NewChaCha8($.arrayValue(new Uint8Array([1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])))
-	await $.println("chacha8 unmarshal:", rand.ChaCha8.prototype.UnmarshalBinary.call($.pointerValue<rand.ChaCha8>(c2), data) == null)
-	rand.ChaCha8.prototype.Read.call($.pointerValue<rand.ChaCha8>(c), $.goSlice(buf, undefined, 5))
-	rand.ChaCha8.prototype.Read.call($.pointerValue<rand.ChaCha8>(c2), $.goSlice(buf, 5, 10))
-	await $.println("chacha8 restored:", hex($.goSlice(buf, undefined, 10)), rand.ChaCha8.prototype.Uint64.call($.pointerValue<rand.ChaCha8>(c)) == rand.ChaCha8.prototype.Uint64.call($.pointerValue<rand.ChaCha8>(c2)))
+	await $.println("chacha8 unmarshal:", (c2 !== null && (c2 as any).__isVarRef !== true && (c2 as any).__goValue === undefined ? ((c2 as any) as rand.ChaCha8).UnmarshalBinary(data) : rand.ChaCha8.prototype.UnmarshalBinary.call($.pointerValue<rand.ChaCha8>(c2), data)) == null)
+	void (c !== null && (c as any).__isVarRef !== true && (c as any).__goValue === undefined ? ((c as any) as rand.ChaCha8).Read($.goSlice(buf, undefined, 5)) : rand.ChaCha8.prototype.Read.call($.pointerValue<rand.ChaCha8>(c), $.goSlice(buf, undefined, 5)))
+	void (c2 !== null && (c2 as any).__isVarRef !== true && (c2 as any).__goValue === undefined ? ((c2 as any) as rand.ChaCha8).Read($.goSlice(buf, 5, 10)) : rand.ChaCha8.prototype.Read.call($.pointerValue<rand.ChaCha8>(c2), $.goSlice(buf, 5, 10)))
+	await $.println("chacha8 restored:", hex($.goSlice(buf, undefined, 10)), (c !== null && (c as any).__isVarRef !== true && (c as any).__goValue === undefined ? ((c as any) as rand.ChaCha8).Uint64() : rand.ChaCha8.prototype.Uint64.call($.pointerValue<rand.ChaCha8>(c))) == (c2 !== null && (c2 as any).__isVarRef !== true && (c2 as any).__goValue === undefined ? ((c2 as any) as rand.ChaCha8).Uint64() : rand.ChaCha8.prototype.Uint64.call($.pointerValue<rand.ChaCha8>(c2))))
 	for (let __rangeIndex = 0; __rangeIndex < 300; __rangeIndex++) {
-		rand.ChaCha8.prototype.Uint64.call($.pointerValue<rand.ChaCha8>(c))
+		void (c !== null && (c as any).__isVarRef !== true && (c as any).__goValue === undefined ? ((c as any) as rand.ChaCha8).Uint64() : rand.ChaCha8.prototype.Uint64.call($.pointerValue<rand.ChaCha8>(c)))
 	}
-	await $.println("chacha8 later:", rand.ChaCha8.prototype.Uint64.call($.pointerValue<rand.ChaCha8>(c)))
+	await $.println("chacha8 later:", (c !== null && (c as any).__isVarRef !== true && (c as any).__goValue === undefined ? ((c as any) as rand.ChaCha8).Uint64() : rand.ChaCha8.prototype.Uint64.call($.pointerValue<rand.ChaCha8>(c))))
 }
 
 if ($.isMainScript(import.meta)) {

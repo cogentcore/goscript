@@ -12,15 +12,15 @@ export async function main(): globalThis.Promise<void> {
 	}
 	let r = rand.NewChaCha8($.cloneArrayValue(seed, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 32)))
 	for (let i = 0; i < 8; i++) {
-		await $.println(rand.ChaCha8.prototype.Uint64.call($.pointerValue<rand.ChaCha8>(r)))
+		await $.println((r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? ((r as any) as rand.ChaCha8).Uint64() : rand.ChaCha8.prototype.Uint64.call($.pointerValue<rand.ChaCha8>(r))))
 	}
 	for (let i = 0; i < 124; i++) {
-		rand.ChaCha8.prototype.Uint64.call($.pointerValue<rand.ChaCha8>(r))
+		void (r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? ((r as any) as rand.ChaCha8).Uint64() : rand.ChaCha8.prototype.Uint64.call($.pointerValue<rand.ChaCha8>(r)))
 	}
 	for (let i = 0; i < 8; i++) {
-		await $.println(rand.ChaCha8.prototype.Uint64.call($.pointerValue<rand.ChaCha8>(r)))
+		await $.println((r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? ((r as any) as rand.ChaCha8).Uint64() : rand.ChaCha8.prototype.Uint64.call($.pointerValue<rand.ChaCha8>(r))))
 	}
-	let __goscriptTuple0: any = rand.ChaCha8.prototype.MarshalBinary.call($.pointerValue<rand.ChaCha8>(r))
+	let __goscriptTuple0: any = (r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? ((r as any) as rand.ChaCha8).MarshalBinary() : rand.ChaCha8.prototype.MarshalBinary.call($.pointerValue<rand.ChaCha8>(r)))
 	let b: $.Slice<number> = __goscriptTuple0[0]
 	let err = __goscriptTuple0[1]
 	if (err != null) {
@@ -33,18 +33,18 @@ export async function main(): globalThis.Promise<void> {
 	}
 	let r2 = rand.NewChaCha8($.cloneArrayValue(seed, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 32)))
 	{
-		let __goscriptShadow0 = rand.ChaCha8.prototype.UnmarshalBinary.call($.pointerValue<rand.ChaCha8>(r2), b)
+		let __goscriptShadow0 = (r2 !== null && (r2 as any).__isVarRef !== true && (r2 as any).__goValue === undefined ? ((r2 as any) as rand.ChaCha8).UnmarshalBinary(b) : rand.ChaCha8.prototype.UnmarshalBinary.call($.pointerValue<rand.ChaCha8>(r2), b))
 		if (__goscriptShadow0 != null) {
 			$.panic((__goscriptShadow0 as any))
 		}
 	}
 	for (let i = 0; i < 8; i++) {
-		await $.println(rand.ChaCha8.prototype.Uint64.call($.pointerValue<rand.ChaCha8>(r2)))
+		await $.println((r2 !== null && (r2 as any).__isVarRef !== true && (r2 as any).__goValue === undefined ? ((r2 as any) as rand.ChaCha8).Uint64() : rand.ChaCha8.prototype.Uint64.call($.pointerValue<rand.ChaCha8>(r2))))
 	}
 	let seed2 = seed
 	seed2[0] = 0xff
-	rand.ChaCha8.prototype.Seed.call($.pointerValue<rand.ChaCha8>(r), seed2)
-	await $.println(rand.ChaCha8.prototype.Uint64.call($.pointerValue<rand.ChaCha8>(r)))
+	void (r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? ((r as any) as rand.ChaCha8).Seed(seed2) : rand.ChaCha8.prototype.Seed.call($.pointerValue<rand.ChaCha8>(r), seed2))
+	await $.println((r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? ((r as any) as rand.ChaCha8).Uint64() : rand.ChaCha8.prototype.Uint64.call($.pointerValue<rand.ChaCha8>(r))))
 
 	await globalSources()
 }
