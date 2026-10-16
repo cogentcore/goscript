@@ -192,6 +192,7 @@ func (o *TypeScriptEmitOwner) EmitToMemory(
 func (o *TypeScriptEmitOwner) renderLoweredFile(pkg *loweredPackage, file *loweredFile, trimTypeInfo bool) string {
 	body := o.renderLoweredFileBody(pkg, file, trimTypeInfo)
 
+	// The header names the Go source of the file.
 	var b strings.Builder
 	b.Grow(len(body) + 128 + len(file.imports)*96)
 	if file.sourcePath != "" {
@@ -199,6 +200,13 @@ func (o *TypeScriptEmitOwner) renderLoweredFile(pkg *loweredPackage, file *lower
 		b.WriteString(filepath.Base(file.sourcePath))
 		b.WriteString("\n// Updated when compliance tests are re-run, DO NOT EDIT!\n\n")
 	}
+
+	// A file with a function too large to type check is not checked.
+	if file.noCheck {
+		b.WriteString("// @ts-nocheck\n")
+	}
+
+	// Each import binds the namespace of its package.
 	for _, imp := range file.imports {
 		if imp.bare {
 			b.WriteString("import \"")
