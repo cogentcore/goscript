@@ -124,8 +124,8 @@ export async function main(): globalThis.Promise<void> {
 	// Type switches see the dynamic type of a boxed constant.
 	{
 		const __goscriptTypeSwitchValue = z
-		switch (true) {
-			case $.typeAssert<Flag>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.basicType("int64", "main.Flag")).ok:
+		switch ($.typeSwitchCase(__goscriptTypeSwitchValue, __goscriptStatic6())) {
+			case 0:
 				{
 					let t: Flag = $.typeAssert<Flag>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.basicType("int64", "main.Flag")).value
 					await $.println("switch", t)
@@ -135,8 +135,8 @@ export async function main(): globalThis.Promise<void> {
 	}
 
 	// Strings and unsigned 64-bit values box the same way.
-	let s: Namer | null = __goscriptStatic9()
-	await $.println("string", (__goscriptAwait = (s !== null && (s as any).__isVarRef !== true && ((s as any).__goValue === undefined || (s as any).__goType?.charCodeAt(0) !== 42) ? (s as Exclude<Namer, null>) : $.pointerValue<Exclude<Namer, null>>(s)).Upper(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), $.comparableEqual(s, __goscriptStatic9()))
+	let s: Namer | null = __goscriptStatic10()
+	await $.println("string", (__goscriptAwait = (s !== null && (s as any).__isVarRef !== true && ((s as any).__goValue === undefined || (s as any).__goType?.charCodeAt(0) !== 42) ? (s as Exclude<Namer, null>) : $.pointerValue<Exclude<Namer, null>>(s)).Upper(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), $.comparableEqual(s, __goscriptStatic10()))
 
 	// 64-bit conversions between named and basic types keep the value.
 	let k = 9223372036854775813n
@@ -178,22 +178,27 @@ function __goscriptStatic5(): any {
 
 var __goscriptStatic6$value: any
 function __goscriptStatic6(): any {
-	return __goscriptStatic6$value ??= ({Upper: (receiver: any) => (Name_Upper as any)(($.isVarRef(receiver) ? receiver.value : receiver))})
+	return __goscriptStatic6$value ??= ($.typeSwitchSite([/* @__PURE__ */ $.basicType("int64", "main.Flag")]))
 }
 
 var __goscriptStatic7$value: any
 function __goscriptStatic7(): any {
-	return __goscriptStatic7$value ??= (/* @__PURE__ */ $.basicType("string", "main.Name"))
+	return __goscriptStatic7$value ??= ({Upper: (receiver: any) => (Name_Upper as any)(($.isVarRef(receiver) ? receiver.value : receiver))})
 }
 
 var __goscriptStatic8$value: any
 function __goscriptStatic8(): any {
-	return __goscriptStatic8$value ??= ([$.methodSignature("Upper", [], [/* @__PURE__ */ $.basicType("string")])])
+	return __goscriptStatic8$value ??= (/* @__PURE__ */ $.basicType("string", "main.Name"))
 }
 
 var __goscriptStatic9$value: any
 function __goscriptStatic9(): any {
-	return __goscriptStatic9$value ??= ($.namedValueInterfaceValue<Namer | null>("go", "main.Name", __goscriptStatic6(), __goscriptStatic7(), __goscriptStatic8()))
+	return __goscriptStatic9$value ??= ([$.methodSignature("Upper", [], [/* @__PURE__ */ $.basicType("string")])])
+}
+
+var __goscriptStatic10$value: any
+function __goscriptStatic10(): any {
+	return __goscriptStatic10$value ??= ($.namedValueInterfaceValue<Namer | null>("go", "main.Name", __goscriptStatic7(), __goscriptStatic8(), __goscriptStatic9()))
 }
 
 var __goscriptAwait: any

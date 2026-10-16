@@ -1,0 +1,57 @@
+0 0 nil
+0 1 int
+0 2 string a
+0 3 celsius celsius
+0 4 other
+0 5 namer square
+0 6 *Square square
+0 7 nil *Square
+0 8 []int
+0 9 func
+0 10 other
+0 11 other
+0 12 other
+0 13 namer square
+0 14 *Square square
+0 15 celsius celsius
+0 16 other
+0 17 string b
+0 18 int
+1 0 nil
+1 1 int
+1 2 string a
+1 3 celsius celsius
+1 4 other
+1 5 namer square
+1 6 *Square square
+1 7 nil *Square
+1 8 []int
+1 9 func
+1 10 other
+1 11 other
+1 12 other
+1 13 namer square
+1 14 *Square square
+1 15 celsius celsius
+1 16 other
+1 17 string b
+1 18 int
+2 0 nil
+2 1 int
+2 2 string a
+2 3 celsius celsius
+2 4 other
+2 5 namer square
+2 6 *Square square
+2 7 nil *Square
+2 8 []int
+2 9 func
+2 10 other
+2 11 other
+2 12 other
+2 13 namer square
+2 14 *Square square
+2 15 celsius celsius
+2 16 other
+2 17 string b
+2 18 int

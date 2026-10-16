@@ -38,14 +38,14 @@ export async function main(): globalThis.Promise<void> {
 	let i: any = "hello"
 	{
 		const __goscriptTypeSwitchValue = i
-		switch (true) {
-			case $.typeAssert<number>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.basicType("int")).ok:
+		switch ($.typeSwitchCase(__goscriptTypeSwitchValue, __goscriptStatic0())) {
+			case 0:
 				{
 					let v: number = $.typeAssert<number>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.basicType("int")).value
 					await $.println("int", v)
 				}
 				break
-			case $.typeAssert<string>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.basicType("string")).ok:
+			case 1:
 				{
 					let v: string = $.typeAssert<string>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.basicType("string")).value
 					await $.println("string", v)
@@ -64,13 +64,13 @@ export async function main(): globalThis.Promise<void> {
 	let x: any = $.basicInterfaceValue(123, "int")
 	{
 		const __goscriptTypeSwitchValue = x
-		switch (true) {
-			case $.typeAssert<boolean>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.basicType("bool")).ok:
+		switch ($.typeSwitchCase(__goscriptTypeSwitchValue, __goscriptStatic1())) {
+			case 0:
 				{
 					await $.println("bool")
 				}
 				break
-			case $.typeAssert<number>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.basicType("int")).ok:
+			case 1:
 				{
 					await $.println("int")
 				}
@@ -102,8 +102,8 @@ export async function main(): globalThis.Promise<void> {
 	let z = getInterface()
 	{
 		const __goscriptTypeSwitchValue = z
-		switch (true) {
-			case $.typeAssert<number>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.basicType("int")).ok:
+		switch ($.typeSwitchCase(__goscriptTypeSwitchValue, __goscriptStatic2())) {
+			case 0:
 				{
 					let v: number = $.typeAssert<number>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.basicType("int")).value
 					await $.println("z is int", v)
@@ -155,15 +155,15 @@ export async function main(): globalThis.Promise<void> {
 		let v = (__goscriptRangeWindow1.backing[__goscriptRangeWindow1.offset + __rangeIndex] as any)
 		{
 			const __goscriptTypeSwitchValue = v
-			switch (true) {
-				case $.typeAssert<string>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.basicType("string")).ok:
+			switch ($.typeSwitchCase(__goscriptTypeSwitchValue, __goscriptStatic3())) {
+				case 0:
 					{
 						let v: string = $.typeAssert<string>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.basicType("string")).value
 						await $.println("continue", v)
 						continue
 					}
 					break
-				case $.typeAssert<number>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.basicType("int")).ok:
+				case 1:
 					{
 						let v: number = $.typeAssert<number>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.basicType("int")).value
 						count += v
@@ -180,8 +180,8 @@ export async function main(): globalThis.Promise<void> {
 	let oidValue: any = $.interfaceValue(oid, "*main.ObjectIdentifier", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"), "main.ObjectIdentifier")))
 	{
 		const __goscriptTypeSwitchValue = oidValue
-		switch (true) {
-			case $.typeAssert<$.VarRef<ObjectIdentifier> | null>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"), "main.ObjectIdentifier"))).ok:
+		switch ($.typeSwitchCase(__goscriptTypeSwitchValue, __goscriptStatic4())) {
+			case 0:
 				{
 					let v: $.VarRef<ObjectIdentifier> | null = $.typeAssert<$.VarRef<ObjectIdentifier> | null>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"), "main.ObjectIdentifier"))).value
 					let __goscriptTuple0: any = parseObjectIdentifier()
@@ -197,8 +197,8 @@ export async function main(): globalThis.Promise<void> {
 	let rawValue: any = $.interfaceValue(raw, "*main.RawValue", /* @__PURE__ */ $.pointerType("main.RawValue"))
 	{
 		const __goscriptTypeSwitchValue = rawValue
-		switch (true) {
-			case $.typeAssert<RawValue | $.VarRef<RawValue> | null>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.pointerType("main.RawValue")).ok:
+		switch ($.typeSwitchCase(__goscriptTypeSwitchValue, __goscriptStatic5())) {
+			case 0:
 				{
 					let v: RawValue | $.VarRef<RawValue> | null = $.typeAssert<RawValue | $.VarRef<RawValue> | null>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.pointerType("main.RawValue")).value
 					let __goscriptTuple1: any = parseRawValue()
@@ -214,8 +214,8 @@ export async function main(): globalThis.Promise<void> {
 	let boxed: any = $.interfaceValue(new RawValue(true, 1), "main.RawValue", "main.RawValue")
 	{
 		const __goscriptTypeSwitchValue = boxed
-		switch (true) {
-			case $.typeAssert<RawValue>(__goscriptTypeSwitchValue, "main.RawValue").ok:
+		switch ($.typeSwitchCase(__goscriptTypeSwitchValue, __goscriptStatic6())) {
+			case 0:
 				{
 					let v: RawValue = $.markAsStructValue($.cloneStructValue($.typeAssert<RawValue>(__goscriptTypeSwitchValue, "main.RawValue").value))
 					v.Tag = 2
@@ -228,8 +228,8 @@ export async function main(): globalThis.Promise<void> {
 	let boxedArray: any = $.arrayValue([1, 2])
 	{
 		const __goscriptTypeSwitchValue = boxedArray
-		switch (true) {
-			case $.typeAssert<number[]>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2)).ok:
+		switch ($.typeSwitchCase(__goscriptTypeSwitchValue, __goscriptStatic7())) {
+			case 0:
 				{
 					let v: number[] = $.cloneArrayValue($.typeAssert<number[]>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2)).value, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2))
 					v[0] = 9
@@ -245,13 +245,13 @@ export async function main(): globalThis.Promise<void> {
 		let v = (__goscriptRangeWindow2.backing[__goscriptRangeWindow2.offset + __rangeIndex] as any)
 		{
 			const __goscriptTypeSwitchValue = v
-			switch (true) {
-				case __goscriptTypeSwitchValue == null:
+			switch ($.typeSwitchCase(__goscriptTypeSwitchValue, __goscriptStatic8())) {
+				case 0:
 					{
 						await $.println("nil case")
 					}
 					break
-				case $.typeAssert<RawValue | $.VarRef<RawValue> | null>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.pointerType("main.RawValue")).ok:
+				case 1:
 					{
 						await $.println("typed nil case")
 					}
@@ -287,6 +287,51 @@ export function parseObjectIdentifier(): [ObjectIdentifier, boolean] {
 
 export function parseRawValue(): [RawValue, boolean] {
 	return [new RawValue(true, 9), true]
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= ($.typeSwitchSite([/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("string")]))
+}
+
+var __goscriptStatic1$value: any
+function __goscriptStatic1(): any {
+	return __goscriptStatic1$value ??= ($.typeSwitchSite([/* @__PURE__ */ $.basicType("bool"), /* @__PURE__ */ $.basicType("int")]))
+}
+
+var __goscriptStatic2$value: any
+function __goscriptStatic2(): any {
+	return __goscriptStatic2$value ??= ($.typeSwitchSite([/* @__PURE__ */ $.basicType("int")]))
+}
+
+var __goscriptStatic3$value: any
+function __goscriptStatic3(): any {
+	return __goscriptStatic3$value ??= ($.typeSwitchSite([/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("int")]))
+}
+
+var __goscriptStatic4$value: any
+function __goscriptStatic4(): any {
+	return __goscriptStatic4$value ??= ($.typeSwitchSite([/* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"), "main.ObjectIdentifier"))]))
+}
+
+var __goscriptStatic5$value: any
+function __goscriptStatic5(): any {
+	return __goscriptStatic5$value ??= ($.typeSwitchSite([/* @__PURE__ */ $.pointerType("main.RawValue")]))
+}
+
+var __goscriptStatic6$value: any
+function __goscriptStatic6(): any {
+	return __goscriptStatic6$value ??= ($.typeSwitchSite(["main.RawValue"]))
+}
+
+var __goscriptStatic7$value: any
+function __goscriptStatic7(): any {
+	return __goscriptStatic7$value ??= ($.typeSwitchSite([/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2)]))
+}
+
+var __goscriptStatic8$value: any
+function __goscriptStatic8(): any {
+	return __goscriptStatic8$value ??= ($.typeSwitchSite([null, /* @__PURE__ */ $.pointerType("main.RawValue")]))
 }
 
 if ($.isMainScript(import.meta)) {

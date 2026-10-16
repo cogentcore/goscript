@@ -52,8 +52,8 @@ export async function main(): globalThis.Promise<void> {
 	let v: node | null = $.interfaceValue<node | null>(new branch(false, 3), "*main.branch", /* @__PURE__ */ $.pointerType("main.branch"))
 	{
 		const __goscriptTypeSwitchValue = v
-		switch (true) {
-			case $.typeAssert<branch | $.VarRef<branch> | null>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.pointerType("main.branch")).ok:
+		switch ($.typeSwitchCase(__goscriptTypeSwitchValue, __goscriptStatic0())) {
+			case 0:
 				{
 					let e: branch | $.VarRef<branch> | null = $.typeAssert<branch | $.VarRef<branch> | null>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.pointerType("main.branch")).value
 					let imprecise = $.varRef(0)
@@ -70,6 +70,11 @@ export async function main(): globalThis.Promise<void> {
 				break
 		}
 	}
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= ($.typeSwitchSite([/* @__PURE__ */ $.pointerType("main.branch")]))
 }
 
 if ($.isMainScript(import.meta)) {

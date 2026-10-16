@@ -29,20 +29,20 @@ export async function main(): globalThis.Promise<void> {
 		// Extract type information from the parsed expression
 		{
 			const __goscriptTypeSwitchValue = node
-			switch (true) {
-				case $.typeAssert<ast.BasicLit | $.VarRef<ast.BasicLit> | null>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.pointerType("ast.BasicLit")).ok:
+			switch ($.typeSwitchCase(__goscriptTypeSwitchValue, __goscriptStatic0())) {
+				case 0:
 					{
 						let n: ast.BasicLit | $.VarRef<ast.BasicLit> | null = $.typeAssert<ast.BasicLit | $.VarRef<ast.BasicLit> | null>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.pointerType("ast.BasicLit")).value
 						results = $.appendOne(results, "BasicLit: " + $.pointerValue<ast.BasicLit>(n).Value)
 					}
 					break
-				case $.typeAssert<ast.BinaryExpr | $.VarRef<ast.BinaryExpr> | null>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.pointerType("ast.BinaryExpr")).ok:
+				case 1:
 					{
 						let n: ast.BinaryExpr | $.VarRef<ast.BinaryExpr> | null = $.typeAssert<ast.BinaryExpr | $.VarRef<ast.BinaryExpr> | null>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.pointerType("ast.BinaryExpr")).value
 						results = $.appendOne(results, "BinaryExpr with operator: " + token.Token_String($.pointerValue<ast.BinaryExpr>(n).Op))
 					}
 					break
-				case $.typeAssert<ast.CallExpr | $.VarRef<ast.CallExpr> | null>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.pointerType("ast.CallExpr")).ok:
+				case 2:
 					{
 						let n: ast.CallExpr | $.VarRef<ast.CallExpr> | null = $.typeAssert<ast.CallExpr | $.VarRef<ast.CallExpr> | null>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.pointerType("ast.CallExpr")).value
 						{
@@ -55,7 +55,7 @@ export async function main(): globalThis.Promise<void> {
 						}
 					}
 					break
-				case $.typeAssert<ast.CompositeLit | $.VarRef<ast.CompositeLit> | null>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.pointerType("ast.CompositeLit")).ok:
+				case 3:
 					{
 						let n: ast.CompositeLit | $.VarRef<ast.CompositeLit> | null = $.typeAssert<ast.CompositeLit | $.VarRef<ast.CompositeLit> | null>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.pointerType("ast.CompositeLit")).value
 						results = $.appendOne(results, "CompositeLit (composite literal)")
@@ -109,6 +109,11 @@ export async function main(): globalThis.Promise<void> {
 	}
 
 	await $.println("go/parser test finished")
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= ($.typeSwitchSite([/* @__PURE__ */ $.pointerType("ast.BasicLit"), /* @__PURE__ */ $.pointerType("ast.BinaryExpr"), /* @__PURE__ */ $.pointerType("ast.CallExpr"), /* @__PURE__ */ $.pointerType("ast.CompositeLit")]))
 }
 
 var __goscriptAwait: any

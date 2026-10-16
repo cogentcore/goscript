@@ -122,13 +122,13 @@ export async function main(): globalThis.Promise<void> {
 	}
 	{
 		const __goscriptTypeSwitchValue = $.arrayIndex(nodes!, 1)
-		switch (true) {
-			case $.typeAssert<label | $.VarRef<label> | null>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.pointerType("main.label")).ok:
+		switch ($.typeSwitchCase(__goscriptTypeSwitchValue, __goscriptStatic5())) {
+			case 0:
 				{
 					fmt.Println("switch: label")
 				}
 				break
-			case $.typeAssert<icon | $.VarRef<icon> | null>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.pointerType("main.icon")).ok:
+			case 1:
 				{
 					fmt.Println("switch: icon")
 				}
@@ -160,6 +160,11 @@ function __goscriptStatic3(): any {
 var __goscriptStatic4$value: any
 function __goscriptStatic4(): any {
 	return __goscriptStatic4$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }})
+}
+
+var __goscriptStatic5$value: any
+function __goscriptStatic5(): any {
+	return __goscriptStatic5$value ??= ($.typeSwitchSite([/* @__PURE__ */ $.pointerType("main.label"), /* @__PURE__ */ $.pointerType("main.icon")]))
 }
 
 var __goscriptAwait: any

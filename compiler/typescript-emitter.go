@@ -1651,8 +1651,16 @@ func renderTypeSwitch(b *strings.Builder, stmt *loweredTypeSwitch, indent int) {
 	b.WriteString(stmt.value)
 	b.WriteString("\n")
 	writeIndent(b, indent+1)
-	b.WriteString("switch (true) {\n")
-	for _, switchCase := range stmt.cases {
+	if stmt.site != "" {
+		b.WriteString("switch ($.typeSwitchCase(" + typeSwitchValueName + ", " + stmt.site + ")) {\n")
+	} else {
+		b.WriteString("switch (true) {\n")
+	}
+	for idx, switchCase := range stmt.cases {
+		if stmt.site != "" {
+			renderTypeSwitchSiteCase(b, stmt.varName, stmt.varRef, idx, switchCase, indent+2)
+			continue
+		}
 		renderTypeSwitchCase(b, stmt.varName, stmt.varRef, switchCase, indent+2)
 	}
 	if len(stmt.defaultBody) != 0 {
@@ -1692,6 +1700,16 @@ func renderTypeSwitchCase(b *strings.Builder, varName string, varRef bool, switc
 		}
 	}
 	b.WriteString(":\n")
+	renderTypeSwitchInlineBody(b, varName, varRef || switchCase.varRef, typeSwitchCaseVariableType(switchCase), switchCase.binding, switchCase.body, indent+1)
+	writeIndent(b, indent+1)
+	b.WriteString("break\n")
+}
+
+// renderTypeSwitchSiteCase renders the clause of a switch with a site, which
+// typeSwitchCase selects by its index, and binds the narrowed value.
+func renderTypeSwitchSiteCase(b *strings.Builder, varName string, varRef bool, idx int, switchCase loweredTypeSwitchCase, indent int) {
+	writeIndent(b, indent)
+	b.WriteString("case " + strconv.Itoa(idx) + ":\n")
 	renderTypeSwitchInlineBody(b, varName, varRef || switchCase.varRef, typeSwitchCaseVariableType(switchCase), switchCase.binding, switchCase.body, indent+1)
 	writeIndent(b, indent+1)
 	b.WriteString("break\n")

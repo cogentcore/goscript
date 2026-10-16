@@ -299,6 +299,9 @@ type loweredTypeSwitch struct {
 	cases       []loweredTypeSwitchCase
 	defaultBody []loweredStmt
 	defaultRef  bool
+	// site, when set, is the hoisted runtime site of the switch, whose
+	// typeSwitchCase call picks the index of the matching case.
+	site string
 }
 
 // typeSwitchValueName holds a type switch operand, evaluated once.
