@@ -31,6 +31,12 @@ export class Time {
     this._wallDate = undefined
   }
 
+  // _locationField is the location as == compares it and reflect sees it:
+  // nil for UTC, as Go stores the location of a Time.
+  private get _locationField(): Location | null {
+    return this._location === UTC ? null : this._location
+  }
+
   // _date is the Date of the wall clock; setting it sets the wall clock to
   // its whole milliseconds.
   private get _date(): globalThis.Date {
@@ -1429,7 +1435,32 @@ export function Date(
 export const UTC = new Location('UTC', 0)
 
 // Time is registered after UTC is defined, since its zero value uses UTC.
-Time.__typeInfo = $.registerStructType('time.Time', new Time(), [], Time)
+// Its fields are the unexported state that == compares and map keys hash, as
+// Go compares the wall clock, monotonic reading and location of a Time; the
+// cached Date of the wall clock is not one.
+Time.__typeInfo = $.registerStructType(
+  'time.Time',
+  new Time(),
+  [],
+  Time,
+  () => [
+    timeField('_wallMs', $.basicType('float64'), 0),
+    timeField('_nsec', $.basicType('int'), 1),
+    timeField('_monotonic', $.basicType('float64'), 2),
+    timeField('_locationField', $.pointerType('time.Location'), 3),
+  ],
+)
+
+// timeField describes the unexported field of Time at index.
+function timeField(
+  name: string,
+  type: $.TypeInfo | string,
+  index: number,
+): $.StructFieldInfo {
+  return $.structField(name, type, [index], index * 8, false, {
+    pkgPath: 'time',
+  })
+}
 export const Local = new Location('Local')
 
 // localZoneAbbreviation returns the abbreviated name of the host's local time
