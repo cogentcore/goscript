@@ -2,14 +2,16 @@
 // Updated when compliance tests are re-run, DO NOT EDIT!
 
 import * as $ from "@goscript/builtin/index.js"
+import * as io from "@goscript/io/index.js"
 import * as http from "@goscript/net/http/index.js"
 import * as httptest from "@goscript/net/http/httptest/index.js"
 import * as strings from "@goscript/strings/index.js"
 import * as time from "@goscript/time/index.js"
 import * as bytes from "@goscript/bytes/index.js"
-import type * as io from "@goscript/io/index.js"
+import * as context from "@goscript/context/index.js"
 import * as url from "@goscript/net/url/index.js"
 import "@goscript/bytes/index.js"
+import "@goscript/context/index.js"
 import "@goscript/net/url/index.js"
 
 export async function main(): globalThis.Promise<void> {
@@ -32,7 +34,22 @@ export async function main(): globalThis.Promise<void> {
 		return
 	}
 	http.Header_Set((req$ as http.Request).Header, "Cookie", "space=wave")
-	await $.println("request:", (req$ as http.Request).Method, $.pointerValue<url.URL>((req$ as http.Request).URL).Path, (req !== null && (req as any).__isVarRef !== true && (req as any).__goValue === undefined ? ((req as any) as http.Request).ProtoAtLeast(1, 1) : http.Request.prototype.ProtoAtLeast.call($.pointerValue<http.Request>(req), 1, 1)), $.sliceLen((req !== null && (req as any).__isVarRef !== true && (req as any).__goValue === undefined ? ((req as any) as http.Request).Cookies() : http.Request.prototype.Cookies.call($.pointerValue<http.Request>(req)))))
+	await $.println("request:", (req$ as http.Request).Method, $.pointerValue<url.URL>((req$ as http.Request).URL).Path, (req !== null && (req as any).__isVarRef !== true && (req as any).__goValue === undefined ? ((req as any) as http.Request).ProtoAtLeast(1, 1) : http.Request.prototype.ProtoAtLeast.call($.pointerValue<http.Request>(req), 1, 1)), $.sliceLen((req !== null && (req as any).__isVarRef !== true && (req as any).__goValue === undefined ? ((req as any) as http.Request).Cookies() : http.Request.prototype.Cookies.call($.pointerValue<http.Request>(req)))));
+
+	;(req$ as http.Request).GetBody = $.functionValue((): [io.ReadCloser | null, $.GoError] => {
+		return [io.NopCloser($.pointerValueOrNil($.interfaceValue<io.Reader | null>(strings.NewReader("again"), "*strings.Reader", /* @__PURE__ */ $.pointerType("strings.Reader")))!), null]
+	}, ({ kind: $.TypeKind.Function, params: [], results: ["io.ReadCloser", "error"] } as $.FunctionTypeInfo))
+	let __goscriptTuple1: any = ($.pointerValue<http.Request>(http.Request.prototype.Clone.call($.pointerValue<http.Request>(req), $.pointerValueOrNil((req !== null && (req as any).__isVarRef !== true && (req as any).__goValue === undefined ? ((req as any) as http.Request).Context() : http.Request.prototype.Context.call($.pointerValue<http.Request>(req))))!)).GetBody!() as [io.ReadCloser | null, $.GoError])
+	let body = __goscriptTuple1[0]
+	err = __goscriptTuple1[1]
+	if (err != null) {
+		await $.println("getbody error:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+		return
+	}
+	let __goscriptTuple2: any = await io.ReadAll($.pointerValueOrNil((body as io.Reader | null))!)
+	let data: $.Slice<number> = __goscriptTuple2[0]
+	err = __goscriptTuple2[1]
+	await $.println("getbody:", err == null, $.bytesToString(data))
 
 	let rec: httptest.ResponseRecorder | $.VarRef<httptest.ResponseRecorder> | null = httptest.NewRecorder()
 	http.Error($.pointerValueOrNil($.interfaceValue<http.ResponseWriter | null>(rec, "*httptest.ResponseRecorder", /* @__PURE__ */ $.pointerType("httptest.ResponseRecorder")))!, http.ProtocolError.prototype.Error.call($.pointerValue<http.ProtocolError>(http.ErrNotSupported)), 403)
@@ -42,9 +59,9 @@ export async function main(): globalThis.Promise<void> {
 	await http.ServeContent($.pointerValueOrNil($.interfaceValue<http.ResponseWriter | null>(rec, "*httptest.ResponseRecorder", /* @__PURE__ */ $.pointerType("httptest.ResponseRecorder")))!, req, "content.txt", $.markAsStructValue(new time.Time()), $.pointerValueOrNil($.interfaceValue<io.ReadSeeker | null>(strings.NewReader("served"), "*strings.Reader", /* @__PURE__ */ $.pointerType("strings.Reader")))!)
 	await $.println("servecontent:", $.pointerValue<httptest.ResponseRecorder>(rec).Code, $.pointerValue<bytes.Buffer>($.pointerValue<httptest.ResponseRecorder>(rec).Body).String())
 
-	let __goscriptTuple1: any = http.NewRequest(http.MethodHead, "https://example.invalid/content.txt", $.interfaceValue<io.Reader | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(http.NoBody))), "http.noBody", "http.noBody")!)
-	let headReq: http.Request | $.VarRef<http.Request> | null = __goscriptTuple1[0]
-	err = __goscriptTuple1[1]
+	let __goscriptTuple3: any = http.NewRequest(http.MethodHead, "https://example.invalid/content.txt", $.interfaceValue<io.Reader | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(http.NoBody))), "http.noBody", "http.noBody")!)
+	let headReq: http.Request | $.VarRef<http.Request> | null = __goscriptTuple3[0]
+	err = __goscriptTuple3[1]
 	if (err != null) {
 		await $.println("head request error:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		return

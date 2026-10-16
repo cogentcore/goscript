@@ -1,6 +1,7 @@
 package main
 
 import (
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -24,6 +25,17 @@ func main() {
 	}
 	req.Header.Set("Cookie", "space=wave")
 	println("request:", req.Method, req.URL.Path, req.ProtoAtLeast(1, 1), len(req.Cookies()))
+
+	req.GetBody = func() (io.ReadCloser, error) {
+		return io.NopCloser(strings.NewReader("again")), nil
+	}
+	body, err := req.Clone(req.Context()).GetBody()
+	if err != nil {
+		println("getbody error:", err.Error())
+		return
+	}
+	data, err := io.ReadAll(body)
+	println("getbody:", err == nil, string(data))
 
 	rec := httptest.NewRecorder()
 	http.Error(rec, http.ErrNotSupported.Error(), http.StatusForbidden)
