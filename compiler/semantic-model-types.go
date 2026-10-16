@@ -131,6 +131,10 @@ type semanticPackage struct {
 	// builds it once, on first use, from the package syntax.
 	assignments     *localAssignments
 	assignmentsOnce sync.Once
+	// readOnlyTables holds the package's read-only tables, which lowering
+	// collects once, on first use (see readOnlyTablesFor).
+	readOnlyTables     map[types.Object]bool
+	readOnlyTablesOnce sync.Once
 	// funcLits holds the async analysis node of each function literal, by
 	// the literal's position.
 	funcLits map[token.Pos]*semanticFunction

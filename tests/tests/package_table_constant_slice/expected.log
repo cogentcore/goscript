@@ -1,0 +1,12 @@
+lookup total: 3968 6 6
+small: 90 30 150 210
+small len/cap: 2 4 3 4
+small first: 180 40
+word: goscript tables
+derived: 300 300 300
+replaced before: 5
+replaced after: 17
+written before: 9
+written after: 106 99
+recovered: true
+recovered: true
