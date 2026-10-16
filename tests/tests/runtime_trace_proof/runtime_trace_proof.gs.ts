@@ -68,7 +68,7 @@ export async function main(): globalThis.Promise<void> {
 	await trace.WithRegion($.pointerValueOrNil(ctx)!, "proof-region", $.functionValue(() => {
 		trace.Log($.pointerValueOrNil(ctx)!, "proof-key", "proof-value")
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)))
-	trace.Task.prototype.End.call($.pointerValue<trace.Task>(task))
+	void (task !== null && (task as any).__isVarRef !== true && (task as any).__goValue === undefined ? ((task as any) as trace.Task).End() : trace.Task.prototype.End.call($.pointerValue<trace.Task>(task)))
 
 	trace.Stop()
 

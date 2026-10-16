@@ -71,7 +71,7 @@ export async function main(): globalThis.Promise<void> {
 		let ctx = __goscriptTuple0[0]
 		let task: trace.Task | $.VarRef<trace.Task> | null = __goscriptTuple0[1]
 		trace.Log($.pointerValueOrNil(ctx)!, "multibatch-key", "multibatch-message-" + n)
-		trace.Task.prototype.End.call($.pointerValue<trace.Task>(task))
+		void (task !== null && (task as any).__isVarRef !== true && (task as any).__goValue === undefined ? ((task as any) as trace.Task).End() : trace.Task.prototype.End.call($.pointerValue<trace.Task>(task)))
 	}
 
 	trace.Stop()
