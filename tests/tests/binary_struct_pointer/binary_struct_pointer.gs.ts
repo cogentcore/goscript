@@ -181,14 +181,14 @@ export async function main(): globalThis.Promise<void> {
 			return
 		}
 	}
-	await $.println("read:", $.bytesToString($.goSlice(r.value.Sig, undefined, undefined)), r.value.Size, $.arrayIndex(r.value.Res, 1), r.value.In.A, $.arrayIndex(r.value.In.B, 1), r.value.Width)
+	await $.println("read:", $.bytesToString($.goSlice(r.value.Sig, undefined, undefined)), r.value.Size, r.value.Res[1], r.value.In.A, r.value.In.B[1], r.value.Width)
 
 	// A slice of structs is written and read as its elements, a blank field
 	// as zeros.
 	let objs = $.makeSlice<item>(3, undefined, undefined, () => new item(true))
 	for (let __goscriptRangeTarget0 = objs, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), i = 0; i < __goscriptRangeWindow0.length; i++) {
-		;((__goscriptRangeWindow0.backing as any[])[__goscriptRangeWindow0.offset + i] as item).Matrix[3] = globalThis.Math.fround(globalThis.Math.fround(i) + 0.5)
-		$.arrayIndex(((__goscriptRangeWindow0.backing as any[])[__goscriptRangeWindow0.offset + i] as item).Colors, 1).Y = globalThis.Math.fround(-i);
+		;((__goscriptRangeWindow0.backing as any[])[__goscriptRangeWindow0.offset + i] as item).Matrix[3] = globalThis.Math.fround(globalThis.Math.fround(i) + 0.5);
+		;(((__goscriptRangeWindow0.backing as any[])[__goscriptRangeWindow0.offset + i] as item).Colors)[1].Y = globalThis.Math.fround(-i);
 		;((__goscriptRangeWindow0.backing as any[])[__goscriptRangeWindow0.offset + i] as item).Index = $.int(-i, 32);
 		;((__goscriptRangeWindow0.backing as any[])[__goscriptRangeWindow0.offset + i] as item).Flags = $.uint(7 * i, 32)
 	}
@@ -200,19 +200,19 @@ export async function main(): globalThis.Promise<void> {
 	let __goscriptTuple0: any = binary.Decode(ob, $.interfaceValue<binary.ByteOrder | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.LittleEndian))), "binary.littleEndian", "binary.littleEndian")!, $.interfaceValue(back, "[]main.item", /* @__PURE__ */ $.sliceType("main.item")))
 	n = __goscriptTuple0[0]
 	err = __goscriptTuple0[1]
-	await $.println("decoded:", n, err == null, $.structEqual($.arrayIndex(back!, 0), $.arrayIndex(objs!, 1)), $.structEqual($.arrayIndex(back!, 1), $.arrayIndex(objs!, 2)), $.arrayIndex($.arrayIndex(back!, 1).Colors, 1).Y, $.arrayIndex(back!, 1).Index)
+	await $.println("decoded:", n, err == null, $.structEqual($.arrayIndex(back!, 0), $.arrayIndex(objs!, 1)), $.structEqual($.arrayIndex(back!, 1), $.arrayIndex(objs!, 2)), ($.arrayIndex(back!, 1).Colors)[1].Y, $.arrayIndex(back!, 1).Index)
 
 	// Big-endian order and arrays of structs work the same way.
 	let __goscriptTuple1: any = binary.Append(null, $.interfaceValue<binary.ByteOrder | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.BigEndian))), "binary.bigEndian", "binary.bigEndian")!, $.interfaceValue($.goSlice(objs, 2, undefined), "[]main.item", /* @__PURE__ */ $.sliceType("main.item")))
 	let be: $.Slice<number> = __goscriptTuple1[0]
 	let arr: vec4[] = $.arrayValue(globalThis.Array.from({ length: 2 }, () => new vec4(true)), /* @__PURE__ */ $.arrayType("main.vec4", 2))
-	$.arrayIndex(arr, 1).W = 3
+	arr[1].W = 3
 	let __goscriptTuple2: any = binary.Append(null, $.interfaceValue<binary.ByteOrder | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.LittleEndian))), "binary.littleEndian", "binary.littleEndian")!, arr)
 	let ab: $.Slice<number> = __goscriptTuple2[0]
 	let arr2: $.VarRef<vec4[]> = $.varRef($.arrayValue(globalThis.Array.from({ length: 2 }, () => new vec4(true)), /* @__PURE__ */ $.arrayType("main.vec4", 2)))
 	let __goscriptTuple3: any = binary.Decode(ab, $.interfaceValue<binary.ByteOrder | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.LittleEndian))), "binary.littleEndian", "binary.littleEndian")!, $.interfaceValue(arr2, "*[2]main.vec4", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.arrayType("main.vec4", 2))))
 	err = __goscriptTuple3[1]
-	await $.println("big-endian:", $.sliceLen(be), $.arrayIndex(be!, 12), $.arrayIndex(be!, 13), "array:", $.sliceLen(ab), err == null, $.arrayIndex(arr2.value, 1).W)
+	await $.println("big-endian:", $.sliceLen(be), $.arrayIndex(be!, 12), $.arrayIndex(be!, 13), "array:", $.sliceLen(ab), err == null, arr2.value[1].W)
 }
 
 var __goscriptAwait: any

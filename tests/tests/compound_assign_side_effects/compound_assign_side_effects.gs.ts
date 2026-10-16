@@ -158,11 +158,11 @@ export async function main(): globalThis.Promise<void> {
 	calls = 0
 	const __goscriptOperand2 = idx()
 	a[__goscriptOperand2] *= 7
-	await $.println("array *=", $.arrayIndex(a, 0), $.arrayIndex(a, 1), $.arrayIndex(a, 2), calls)
+	await $.println("array *=", a[0], a[1], a[2], calls)
 
 	calls = 0
 	a[idx()]--
-	await $.println("array --", $.arrayIndex(a, 0), $.arrayIndex(a, 1), $.arrayIndex(a, 2), calls)
+	await $.println("array --", a[0], a[1], a[2], calls)
 
 	// Map index from a call.
 	let m = $.makeMap<string, number>([["k", 1]])
@@ -198,7 +198,7 @@ export async function main(): globalThis.Promise<void> {
 	const __goscriptOperand5 = arr()
 	const __goscriptOperand6 = idx()
 	$.pointerValue<number[]>(__goscriptOperand5)[__goscriptOperand6] += 9
-	await $.println("array ptr +=", $.arrayIndex(backing.value, 0), $.arrayIndex(backing.value, 1), $.arrayIndex(backing.value, 2), calls)
+	await $.println("array ptr +=", backing.value[0], backing.value[1], backing.value[2], calls)
 
 	// Narrow integer element.
 	let b = new Uint8Array([250, 251, 252]) as $.Slice<number>

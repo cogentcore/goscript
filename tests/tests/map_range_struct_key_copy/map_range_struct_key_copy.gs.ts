@@ -98,7 +98,7 @@ export async function main(): globalThis.Promise<void> {
 		let a = $.cloneArrayValue(__goscriptRangeValue1, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2))
 		a[0] = 9
 	}
-	await $.println($.mapGet<string, Pos, Pos>(vals, "v", new Pos(true))[0].Line, $.arrayIndex($.mapGet<string, number[], number[]>(arrs, "a", $.arrayValue(globalThis.Array.from({ length: 2 }, () => 0)))[0], 0))
+	await $.println($.mapGet<string, Pos, Pos>(vals, "v", new Pos(true))[0].Line, ($.mapGet<string, number[], number[]>(arrs, "a", $.arrayValue(globalThis.Array.from({ length: 2 }, () => 0)))[0])[0])
 
 	let last: Pos = new Pos(true)
 	for (let [__goscriptRangeKey3, __rangeValue] of m?.entries() ?? []) {

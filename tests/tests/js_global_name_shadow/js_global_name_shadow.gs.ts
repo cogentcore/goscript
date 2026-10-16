@@ -93,8 +93,8 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("rune string:", $.stringEqual($.runeToString(r), "\xf0\x9f\x98\x80"))
 
 	let points: point[] = $.arrayValue(globalThis.Array.from({ length: 2 }, () => new point(true)), /* @__PURE__ */ $.arrayType("main.point", 2))
-	$.arrayIndex(points, 1).x = 3
-	await $.println("array:", $.arrayIndex(points, 1).x, $.arrayIndex(points, 0).y)
+	points[1].x = 3
+	await $.println("array:", points[1].x, points[0].y)
 
 	let big = 1099511627776n
 	let f: number = globalThis.Number(big)

@@ -237,7 +237,7 @@ export async function main(): globalThis.Promise<void> {
 				break
 		}
 	}
-	await $.println("array copy", $.arrayIndex($.mustTypeAssert<number[]>(boxedArray, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2)), 0))
+	await $.println("array copy", ($.mustTypeAssert<number[]>(boxedArray, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2)))[0])
 
 	// A nil case matches only a nil interface, not a typed nil.
 	let nilPtr: RawValue | $.VarRef<RawValue> | null = null! as RawValue | $.VarRef<RawValue> | null

@@ -109,11 +109,11 @@ export async function main(): globalThis.Promise<void> {
 	let second = new MyStruct(false, 2)
 	let outer = new Outer(true, undefined, undefined, first)
 	let child = $.fieldRef(outer.Child, "MyInt")
-	let item = $.fieldRef($.arrayIndex(outer.Items, 0), "MyInt")
+	let item = $.fieldRef(outer.Items[0], "MyInt")
 	let ptrField = $.fieldRef(outer, "Ptr")
 	outer = outer.__goscriptAssign(new Outer(true, new MyStruct(true, 50), $.arrayValue([new MyStruct(true, 60), new MyStruct(true)], /* @__PURE__ */ $.arrayType("main.MyStruct", 2)), second))
 	await $.println("nested:", $.pointerValue<number>(child), $.pointerValue<number>(item), ($.pointerValue<MyStruct | $.VarRef<MyStruct> | null>(ptrField) === second || $.pointerAliasesMade && $.pointerEqual($.pointerValue<MyStruct | $.VarRef<MyStruct> | null>(ptrField), second)), $.pointerValue<MyStruct>(first).MyInt)
-	await $.println("nested identity:", $.pointerEqual(child, $.fieldRef(outer.Child, "MyInt")), $.pointerEqual(item, $.fieldRef($.arrayIndex(outer.Items, 0), "MyInt")), $.pointerEqual(ptrField, $.fieldRef(outer, "Ptr")))
+	await $.println("nested identity:", $.pointerEqual(child, $.fieldRef(outer.Child, "MyInt")), $.pointerEqual(item, $.fieldRef(outer.Items[0], "MyInt")), $.pointerEqual(ptrField, $.fieldRef(outer, "Ptr")))
 
 	// Both tuple and parallel assignments update existing variable storage.
 	let __goscriptTuple0: any = pair()

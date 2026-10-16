@@ -174,12 +174,12 @@ export async function main(): globalThis.Promise<void> {
 	let arr = $.arrayValue([1, 2, 3, 4], /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 4))
 	let _as: $.Slice<number> = $.goSlice(arr, 1, 3)
 	$.sliceElems(_as!)[$.sliceSlot(_as!, 0)] = 20
-	await $.println("array slice:", $.arrayIndex(arr, 1), $.sliceLen(_as), $.cap(_as))
+	await $.println("array slice:", arr[1], $.sliceLen(_as), $.cap(_as))
 	_as = $.appendOne(_as, 30, $.typedSliceHints.float32)
-	await $.println("array append:", $.arrayIndex(arr, 3))
+	await $.println("array append:", arr[3])
 	let arr2 = $.cloneArrayValue($.sliceToArray<number>($.goSlice(w, undefined, 3), 3), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint32"), 3))
 	arr2[0] = 100
-	await $.println("slice to array:", $.arrayIndex(arr2, 0), $.arrayIndex(w!, 0), 3)
+	await $.println("slice to array:", arr2[0], $.arrayIndex(w!, 0), 3)
 	let ap = $.sliceToArrayPointer<number>($.goSlice(w, 1, undefined), 2)
 	$.pointerValue<number[]>(ap)[0] = 200
 	await $.println("array pointer:", $.arrayIndex(w!, 1))

@@ -1,0 +1,8 @@
+sum 108
+local 2.5 3.5
+grid 6 4
+field 3 100 c
+view 9 10
+high: runtime error: index out of range [8] with length 8
+negative: runtime error: index out of range [-1]
+done

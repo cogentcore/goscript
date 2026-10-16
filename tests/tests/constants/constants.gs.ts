@@ -33,7 +33,7 @@ export async function main(): globalThis.Promise<void> {
 	// println(Big) // Commented out until large integer handling is implemented
 	// println(Small) // Commented out as it depends on Big
 	await $.println("Hello, Constants!")
-	await $.println($.arrayIndex(DigestIV, 0), $.arrayIndex(DigestIV, 1), $.arrayIndex(DigestIV, 2))
+	await $.println(DigestIV[0], DigestIV[1], DigestIV[2])
 	await $.println(4)
 }
 

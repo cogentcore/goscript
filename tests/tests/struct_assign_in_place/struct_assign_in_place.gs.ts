@@ -185,7 +185,7 @@ export async function main(): globalThis.Promise<void> {
 	b = b.__goscriptAssign(a.value)
 	a.value.In.X = 10
 	a.value.Arr[0] = 30
-	await $.println(b.In.X, $.arrayIndex(b.Arr, 0), a.value.In.X, $.arrayIndex(a.value.Arr, 0))
+	await $.println(b.In.X, b.Arr[0], a.value.In.X, a.value.Arr[0])
 
 	let p: Outer | $.VarRef<Outer> | null = a
 	a.value = a.value.__goscriptAssign($.pointerValue<Outer>(p))

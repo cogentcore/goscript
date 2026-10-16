@@ -2226,6 +2226,20 @@ type ArrayIndexValue<C> =
   : any
 
 /**
+ * checkArrayIndex returns the index of an element of an array of the given
+ * length, panicking as Go does when it is out of range. The compiler reads
+ * array elements by index with it, as every representation of an array
+ * (a JS array, a typed array or an array view) indexes directly.
+ */
+export function checkArrayIndex(index: number, length: number): number {
+  // An index in range is returned, and any other panics.
+  if (index >= 0 && index < length) {
+    return index
+  }
+  outOfRangeIndex(index, length)
+}
+
+/**
  * arrayIndex reads an array or slice element with Go bounds checks.
  */
 export function arrayIndex<

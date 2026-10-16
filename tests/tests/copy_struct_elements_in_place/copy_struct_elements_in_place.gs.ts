@@ -98,7 +98,7 @@ export async function main(): globalThis.Promise<void> {
 	let arr: item[] = $.arrayValue(globalThis.Array.from({ length: 3 }, () => new item(true)), /* @__PURE__ */ $.arrayType("main.item", 3))
 	let s = $.indexRef(arr, 2)
 	$.copy($.goSlice(arr, 1, undefined), src, true)
-	fmt.Println($.basicInterfaceValue($.pointerValue<item>(r).X, "int"), $.basicInterfaceValue($.arrayIndex(named!, 1).X, "int"), $.basicInterfaceValue($.pointerValue<item>(s).X, "int"), $.basicInterfaceValue($.arrayIndex(arr, 0).X, "int"))
+	fmt.Println($.basicInterfaceValue($.pointerValue<item>(r).X, "int"), $.basicInterfaceValue($.arrayIndex(named!, 1).X, "int"), $.basicInterfaceValue($.pointerValue<item>(s).X, "int"), $.basicInterfaceValue(arr[0].X, "int"))
 
 	// Slices of pointers still copy the pointers.
 	let a = new item(false, 1)

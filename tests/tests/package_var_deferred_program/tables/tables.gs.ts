@@ -263,11 +263,11 @@ export function __goscript_set_masks(__goscriptValue: string[][]): void {
 }
 
 export function name(s: string, n: number): string {
-	return s + $.arrayIndex($.arrayIndex(masks, 1), n & 3)
+	return s + (masks[1])[$.checkArrayIndex(n & 3, 4)]
 }
 
 export function Label(s: string, n: number): string {
-	return s + $.arrayIndex($.arrayIndex(masks, 1), n & 3)
+	return s + (masks[1])[$.checkArrayIndex(n & 3, 4)]
 }
 
 export let kinds: globalThis.Map<number, string> | null = $.makeMap<number, string>([[1, "one"]])

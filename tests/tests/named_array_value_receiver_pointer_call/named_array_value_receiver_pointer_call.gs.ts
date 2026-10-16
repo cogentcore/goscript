@@ -43,7 +43,7 @@ export function flags_values(__goscriptReceiver0: flags): [number, number] {
 	let f: $.VarRef<flags> = $.varRef($.cloneArrayValue(__goscriptReceiver0, "main.flags"))
 	flags__set(f, 0)
 	flags__set(f, 1)
-	return [$.arrayIndex(f.value, 0), $.arrayIndex(f.value, 1) + 1]
+	return [f.value[0], f.value[1] + 1]
 }
 
 export function Matrix_Scaled(__goscriptReceiver1: Matrix, s: number): Matrix {
@@ -62,7 +62,7 @@ export function Matrix_Sum(__goscriptReceiver2: Matrix): number {
 	let m: Matrix = $.cloneArrayValue(__goscriptReceiver2, "main.Matrix")
 	let t = 0
 	for (let __goscriptRangeTarget1 = m, __goscriptRangeWindow1 = $.sliceRange(__goscriptRangeTarget1), i = 0; i < __goscriptRangeWindow1.length; i++) {
-		t = globalThis.Math.fround(t + ($.arrayIndex(m, i)))
+		t = globalThis.Math.fround(t + (m[$.checkArrayIndex(i, 4)]))
 		m[i] = 0
 	}
 	return t
@@ -80,10 +80,10 @@ export async function receiverCopies(): globalThis.Promise<void> {
 	let m = $.varRef($.arrayValue([1, 2, 3, 4], /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 4)))
 	let original = $.cloneArrayValue(m.value, "main.Matrix")
 	let r = Matrix_Scaled(m.value, 2)
-	await $.println("m:", $.arrayIndex(m.value, 0), $.arrayIndex(m.value, 1), $.arrayIndex(m.value, 2), $.arrayIndex(m.value, 3))
-	await $.println("r:", $.arrayIndex(r, 0), $.arrayIndex(r, 1), $.arrayIndex(r, 2), $.arrayIndex(r, 3))
+	await $.println("m:", m.value[0], m.value[1], m.value[2], m.value[3])
+	await $.println("r:", r[0], r[1], r[2], r[3])
 	await $.println("original equal:", $.arrayEqual(original, m.value))
-	await $.println("sum:", Matrix_Sum(m.value), $.arrayIndex(m.value, 0))
+	await $.println("sum:", Matrix_Sum(m.value), m.value[0])
 	let p = m
 	await $.println("ptr sum:", Matrix_Sum($.pointerValue<Matrix>(p)), $.arrayIndex($.pointerValue<number[]>(p), 0))
 }

@@ -37,19 +37,19 @@ export async function main(): globalThis.Promise<void> {
 	let dst = $.makeSlice<number[]>(1, undefined, undefined, () => $.arrayValue(globalThis.Array.from({ length: 1 }, () => 0)))
 	$.copy(dst, src)
 	$.arrayIndex(dst!, 0)[0] = 9
-	await $.println("copy:", $.arrayIndex($.arrayIndex(src!, 0), 0))
+	await $.println("copy:", ($.arrayIndex(src!, 0))[0])
 
 	let appended = $.appendSlice<number[]>(null, src)
 	$.arrayIndex(appended!, 0)[0] = 9
-	await $.println("append:", $.arrayIndex($.arrayIndex(src!, 0), 0))
+	await $.println("append:", ($.arrayIndex(src!, 0))[0])
 
 	let cloned = (slices.Clone(src) as $.Slice<number[]>)
 	$.arrayIndex(cloned!, 0)[0] = 9
-	await $.println("clone:", $.arrayIndex($.arrayIndex(src!, 0), 0))
+	await $.println("clone:", ($.arrayIndex(src!, 0))[0])
 
 	let concat = (slices.Concat(src, src) as $.Slice<number[]>)
 	$.arrayIndex(concat!, 1)[0] = 9
-	await $.println("concat:", $.arrayIndex($.arrayIndex(src!, 0), 0))
+	await $.println("concat:", ($.arrayIndex(src!, 0))[0])
 
 	let __goscriptRangeReturn0 = false
 	;await (async () => {
@@ -61,18 +61,18 @@ export async function main(): globalThis.Promise<void> {
 	if (__goscriptRangeReturn0) {
 		return
 	}
-	await $.println("values:", $.arrayIndex($.arrayIndex(src!, 0), 0))
+	await $.println("values:", ($.arrayIndex(src!, 0))[0])
 
 	let points = $.arrayToSlice<point[]>([$.arrayValue([new point(true, 1)], /* @__PURE__ */ $.arrayType("main.point", 1))])
 	let pointCopies = $.makeSlice<point[]>(1, undefined, undefined, () => $.arrayValue(globalThis.Array.from({ length: 1 }, () => new point(true)), /* @__PURE__ */ $.arrayType("main.point", 1)))
-	$.copy(pointCopies, points)
-	$.arrayIndex($.arrayIndex(pointCopies!, 0), 0).x = 9
-	await $.println("struct array:", $.arrayIndex($.arrayIndex(points!, 0), 0).x)
+	$.copy(pointCopies, points);
+	;($.arrayIndex(pointCopies!, 0))[0].x = 9
+	await $.println("struct array:", ($.arrayIndex(points!, 0))[0].x)
 
 	let nested = $.arrayToSlice<number[][]>([$.arrayValue([$.arrayValue([1])], /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 1), 1))])
-	let nestedCopies = (slices.Clone(nested) as $.Slice<number[][]>)
-	$.arrayIndex($.arrayIndex(nestedCopies!, 0), 0)[0] = 9
-	await $.println("nested:", $.arrayIndex($.arrayIndex($.arrayIndex(nested!, 0), 0), 0))
+	let nestedCopies = (slices.Clone(nested) as $.Slice<number[][]>);
+	;($.arrayIndex(nestedCopies!, 0))[0][0] = 9
+	await $.println("nested:", (($.arrayIndex(nested!, 0))[0])[0])
 
 	let shared = $.arrayToSlice<$.Slice<number>>([$.arrayToSlice<number>([1])])
 	let sharedCopies = (slices.Clone(shared) as $.Slice<$.Slice<number>>)

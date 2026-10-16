@@ -47,7 +47,7 @@ export async function main(): globalThis.Promise<void> {
 	let b: $.VarRef<bitset> = $.varRef(new bitset(true))
 	b.value.set(3)
 	b.value.set(30)
-	await $.println(b.value.has(3), b.value.has(4), b.value.has(30), $.arrayIndex(b.value.bits, 0), $.arrayIndex(b.value.bits, 3))
+	await $.println(b.value.has(3), b.value.has(4), b.value.has(30), b.value.bits[0], b.value.bits[3])
 }
 
 if ($.isMainScript(import.meta)) {

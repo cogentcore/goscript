@@ -101,7 +101,7 @@ export async function main(): globalThis.Promise<void> {
 	// Test 6: T{} returns the instantiated array zero value.
 	let zeroPair = ($.cloneArrayValue(ZeroArrayLiteral(__goscriptStatic2()), "main.Pair") as Pair)
 	await $.println("ZeroArrayLiteral[Pair] len:", 2)
-	await $.println("ZeroArrayLiteral[Pair] zero:", ($.arrayIndex(zeroPair, 0) == 0) && ($.arrayIndex(zeroPair, 1) == 0))
+	await $.println("ZeroArrayLiteral[Pair] zero:", (zeroPair[0] == 0) && (zeroPair[1] == 0))
 }
 
 var __goscriptStatic0$value: any

@@ -11,8 +11,8 @@ import "@goscript/io/index.js"
 export async function main(): globalThis.Promise<void> {
 	let sum = $.cloneArrayValue(await sha1.Sum(new Uint8Array([97, 98, 99])), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uint8"), 20))
 	await $.println("sum len", 20)
-	await $.println("sum first", $.arrayIndex(sum, 0))
-	await $.println("sum last", $.arrayIndex(sum, 19))
+	await $.println("sum first", sum[0])
+	await $.println("sum last", sum[19])
 
 	let h: hash.Hash | null = sha1.New()
 	let [n, err] = await (h !== null && (h as any).__isVarRef !== true && ((h as any).__goValue === undefined || (h as any).__goType?.charCodeAt(0) !== 42) ? (h as Exclude<hash.Hash, null>) : $.pointerValue<Exclude<hash.Hash, null>>(h)).Write(new Uint8Array([97]))

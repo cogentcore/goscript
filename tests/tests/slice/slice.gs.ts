@@ -70,13 +70,13 @@ export async function main(): globalThis.Promise<void> {
 	let modArr = $.arrayValue([10, 20, 30])
 	let modSlice = $.goSlice(modArr, undefined, undefined)
 	$.sliceElems(modSlice!)[$.sliceSlot(modSlice!, 1)] = 25
-	await $.println($.arrayIndex(modArr, 1))
+	await $.println(modArr[1])
 	await $.println($.arrayIndex(modSlice!, 1))
 
 	// Modify array, check slice
 	await $.println("--- Modify array, check slice ---")
 	modArr[0] = 15
-	await $.println($.arrayIndex(modArr, 0))
+	await $.println(modArr[0])
 	await $.println($.arrayIndex(modSlice!, 0))
 
 	// Append to sub-slice within capacity
@@ -89,7 +89,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println($.sliceLen(appendSlice2))
 	await $.println($.cap(appendSlice2))
 	await $.println($.arrayIndex(appendSlice2!, 2))
-	await $.println($.arrayIndex(appendArr, 2))
+	await $.println(appendArr[2])
 
 	// Append to sub-slice exceeding capacity
 	await $.println("--- Append sub-slice exceed capacity ---")
@@ -103,11 +103,11 @@ export async function main(): globalThis.Promise<void> {
 	await $.println($.arrayIndex(appendSlice4!, 1))
 	await $.println($.arrayIndex(appendSlice4!, 2))
 	// Original array should NOT be modified beyond its bounds by this append
-	await $.println($.arrayIndex(appendArr, 0))
-	await $.println($.arrayIndex(appendArr, 1))
-	await $.println($.arrayIndex(appendArr, 2))
-	await $.println($.arrayIndex(appendArr, 3))
-	await $.println($.arrayIndex(appendArr, 4))
+	await $.println(appendArr[0])
+	await $.println(appendArr[1])
+	await $.println(appendArr[2])
+	await $.println(appendArr[3])
+	await $.println(appendArr[4])
 
 	// Slicing a slice
 	await $.println("--- Slicing a slice ---")
@@ -138,13 +138,13 @@ export async function main(): globalThis.Promise<void> {
 	await $.println($.sliceLen(threeIndexSlice))
 	await $.println($.cap(threeIndexSlice))
 	await $.println($.arrayIndex(threeIndexSlice!, 2))
-	await $.println($.arrayIndex(threeIndexArr, 3))
+	await $.println(threeIndexArr[3])
 	// Appending again should reallocate
 	threeIndexSlice = $.appendOne(threeIndexSlice, 101)
 	await $.println($.sliceLen(threeIndexSlice))
 	await $.println($.cap(threeIndexSlice))
 	await $.println($.arrayIndex(threeIndexSlice!, 3))
-	await $.println($.arrayIndex(threeIndexArr, 4))
+	await $.println(threeIndexArr[4])
 
 	// --- Additional Tests for Full Coverage ---
 	await $.println("--- Additional Tests ---")
