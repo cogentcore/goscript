@@ -1,0 +1,11 @@
+index a: 0
+index b: 1
+contains root: false
+eq a b: false eq a a: true
+any a b: false any a a: true
+zero: true true
+deref: true slice: true array: true
+map: true field: true return: true
+differ: false pair: true
+index values: 1
+any values: true false
