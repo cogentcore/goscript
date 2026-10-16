@@ -2498,7 +2498,7 @@ func sourcePosFromTokenPosition(pos token.Position) sourcePosition {
 
 // methodReceiverReadOnly reports whether decl is a method with a value
 // receiver that a call can pass without copying it (see valueVarReadOnly).
-func methodReceiverReadOnly(pkg *packages.Package, decl *ast.FuncDecl) valueReadOnlyKind {
+func methodReceiverReadOnly(pkg *packages.Package, decl *ast.FuncDecl, effectFree map[types.Object]bool) valueReadOnlyKind {
 	// Only a method with a body and one receiver can be checked.
 	if pkg == nil || decl == nil || decl.Body == nil || decl.Recv == nil || len(decl.Recv.List) != 1 {
 		return valueNotReadOnly
@@ -2520,7 +2520,7 @@ func methodReceiverReadOnly(pkg *packages.Package, decl *ast.FuncDecl) valueRead
 	if recv == nil {
 		return valueNotReadOnly
 	}
-	return valueVarReadOnly(pkg, decl, recv)
+	return valueVarReadOnly(pkg, decl, recv, effectFree)
 }
 
 // exprRootIdent returns the identifier that expr reads or writes a part of
@@ -2548,7 +2548,7 @@ func exprRootIdent(expr ast.Expr) *ast.Ident {
 // funcParamsReadOnly reports, for each parameter of decl, whether it is a
 // struct value that a call can pass without copying it (see
 // valueVarReadOnly).
-func funcParamsReadOnly(pkg *packages.Package, decl *ast.FuncDecl) []valueReadOnlyKind {
+func funcParamsReadOnly(pkg *packages.Package, decl *ast.FuncDecl, effectFree map[types.Object]bool) []valueReadOnlyKind {
 	// A function without a body or parameters has none to share.
 	if pkg == nil || decl == nil || decl.Body == nil || decl.Type.Params == nil {
 		return nil
@@ -2566,7 +2566,7 @@ func funcParamsReadOnly(pkg *packages.Package, decl *ast.FuncDecl) []valueReadOn
 		for _, name := range names {
 			kind := valueNotReadOnly
 			if obj := pkg.TypesInfo.Defs[name]; obj != nil && name.Name != "_" && isStructValueType(obj.Type()) {
-				kind = valueVarReadOnly(pkg, decl, obj)
+				kind = valueVarReadOnly(pkg, decl, obj, effectFree)
 			}
 			readOnly = append(readOnly, kind)
 			anyReadOnly = anyReadOnly || kind != valueNotReadOnly
@@ -2589,8 +2589,8 @@ func collectCallFacts(model *SemanticModel, semPkg *semanticPackage, pkg *packag
 		if semFn == nil {
 			continue
 		}
-		semFn.receiverReadOnly = methodReceiverReadOnly(pkg, decl)
-		semFn.paramsReadOnly = funcParamsReadOnly(pkg, decl)
+		semFn.receiverReadOnly = methodReceiverReadOnly(pkg, decl, model.effectFreeFuncs)
+		semFn.paramsReadOnly = funcParamsReadOnly(pkg, decl, model.effectFreeFuncs)
 		semFn.resultBorrows = funcResultBorrows(pkg, decl, fn, semFn.paramsReadOnly)
 		semFn.transientCandidates = transientCandidates(pkg, fn, decl, overrideFacts)
 	}
@@ -2671,17 +2671,23 @@ func bodyHasDefer(body *ast.BlockStmt) bool {
 	return found
 }
 
-// callChangesNoStorage reports whether call is a conversion or a call of a
-// builtin that writes no storage. Any other call may change storage that
-// the caller can reach, such as package variables and what they refer to,
-// even when it passes only values.
-func callChangesNoStorage(pkg *packages.Package, call *ast.CallExpr) bool {
+// callChangesNoStorage reports whether call is a conversion, a call of a
+// builtin that writes no storage, or a call of a function of effectFree (see
+// collectEffectFreeFunctions). Any other call may change storage that the
+// caller can reach, such as package variables and what they refer to, even
+// when it passes only values.
+func callChangesNoStorage(pkg *packages.Package, call *ast.CallExpr, effectFree map[types.Object]bool) bool {
 	// A conversion changes nothing.
 	tv, ok := pkg.TypesInfo.Types[call.Fun]
 	if !ok {
 		return false
 	}
 	if tv.IsType() {
+		return true
+	}
+
+	// An effect-free function changes nothing.
+	if fn, ok := calledObject(pkg.TypesInfo, call.Fun).(*types.Func); ok && effectFree[fn] {
 		return true
 	}
 
@@ -2719,7 +2725,7 @@ const (
 // calls no function, which could change the caller's value through a package
 // variable or another reference while it reads obj; otherwise only a value
 // that no other reference reaches can be (see isUnaliasedLocalValue).
-func valueVarReadOnly(pkg *packages.Package, decl *ast.FuncDecl, obj types.Object) valueReadOnlyKind {
+func valueVarReadOnly(pkg *packages.Package, decl *ast.FuncDecl, obj types.Object, effectFree map[types.Object]bool) valueReadOnlyKind {
 	// rootIsVar reports whether expr reads or writes a part of obj.
 	rootIsVar := func(expr ast.Expr) bool {
 		return pkg.TypesInfo.Uses[exprRootIdent(expr)] == obj
@@ -2803,7 +2809,7 @@ func valueVarReadOnly(pkg *packages.Package, decl *ast.FuncDecl, obj types.Objec
 		case *ast.SendStmt, *ast.GoStmt:
 			changed = true
 		case *ast.CallExpr:
-			shared = shared || !callChangesNoStorage(pkg, typed)
+			shared = shared || !callChangesNoStorage(pkg, typed, effectFree)
 		case *ast.SelectorExpr:
 			selection := pkg.TypesInfo.Selections[typed]
 			if selection != nil && selection.Kind() == types.MethodVal && rootIsVar(typed.X) {
