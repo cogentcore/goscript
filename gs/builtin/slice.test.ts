@@ -19,6 +19,7 @@ import {
   arrayToSlice,
   byteSliceHint,
   bytesFromBase64,
+  bytesFromText,
   bytesFromHex,
   bytesToString,
   copy,
@@ -114,6 +115,16 @@ describe('compiler byte constants', () => {
 
   it('decodes compact hexadecimal byte arrays', () => {
     expect(bytesFromHex('00ff8041')).toEqual(new Uint8Array([0, 255, 128, 65]))
+  })
+
+  it('encodes the text of byte data as UTF-8', () => {
+    // Text of any script gives back its UTF-8 bytes.
+    const text = 'a"\\\n\u2028é漢😀'
+    expect(bytesFromText(text)).toEqual(new TextEncoder().encode(text))
+    expect(Array.from(bytesFromText('é'))).toEqual([0xc3, 0xa9])
+
+    // Empty text is empty data.
+    expect(bytesFromText('')).toEqual(new Uint8Array(0))
   })
 
   it('decodes base64 byte data with and without the native decoder', () => {

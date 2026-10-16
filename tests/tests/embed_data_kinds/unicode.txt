@@ -1,0 +1,4 @@
+Embedded UTF-8 text: "quotes", \backslashes\, tabs	and
+CRLF lines.
+Accents: é à ü ñ; CJK: 漢字かな; emoji: 😀🎉; separators:    ; control: .
+<lexer><config><name>Go</name><alias>go</alias></config></lexer>

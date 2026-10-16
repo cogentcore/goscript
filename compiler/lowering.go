@@ -22,6 +22,7 @@ import (
 	"strings"
 	"sync"
 	"unicode"
+	"unicode/utf8"
 
 	"github.com/pkg/errors"
 	"golang.org/x/sync/errgroup"
@@ -3213,13 +3214,70 @@ func isEmbedFSType(typ types.Type) bool {
 const embeddedBytesLiteralMin = 128
 
 // embeddedBytesLiteral returns a new Uint8Array of the bytes of an embedded
-// file. Large files are decoded from base64 text, which is about a third of
-// the size of an array literal and much faster for the engine to parse.
+// file. Large files are decoded from text, which is about a third of the size
+// of an array literal and much faster for the engine to parse: UTF-8 files
+// from a string literal of their characters, which is smaller than base64 and
+// compresses much better, and other files from base64.
 func (o *LoweringOwner) embeddedBytesLiteral(data []byte) string {
+	// Small files are array literals.
 	if len(data) < embeddedBytesLiteralMin {
 		return byteSliceLiteral(data)
 	}
-	return o.runtimeOwner.QualifiedHelper(RuntimeHelperBytesFromBase64) + "(\"" + base64.StdEncoding.EncodeToString(data) + "\")"
+
+	// UTF-8 text is a string literal, unless its escapes make it longer than base64.
+	encoded := base64.StdEncoding.EncodeToString(data)
+	if text, ok := embeddedTextLiteral(data, len(encoded)+2); ok {
+		return o.runtimeOwner.QualifiedHelper(RuntimeHelperBytesFromText) + "(" + text + ")"
+	}
+	return o.runtimeOwner.QualifiedHelper(RuntimeHelperBytesFromBase64) + "(\"" + encoded + "\")"
+}
+
+// embeddedTextLiteral returns a JavaScript string literal of the characters of
+// the UTF-8 text data, whose UTF-8 encoding is data again. It reports false
+// when data is not valid UTF-8 or the literal would be longer than limit.
+func embeddedTextLiteral(data []byte, limit int) (string, bool) {
+	// Only valid UTF-8 encodes back to the same bytes.
+	if !utf8.Valid(data) {
+		return "", false
+	}
+	var b strings.Builder
+	b.Grow(len(data) + 2)
+	b.WriteByte('"')
+
+	// Each character is written as itself or an escape, while the literal fits.
+	for _, r := range string(data) {
+		writeTextLiteralRune(&b, r)
+		if b.Len() > limit {
+			return "", false
+		}
+	}
+
+	// The closing quote ends the literal.
+	b.WriteByte('"')
+	return b.String(), b.Len() <= limit
+}
+
+// writeTextLiteralRune writes the character r into a double-quoted JavaScript
+// string literal, escaping quotes, backslashes, control characters and the
+// line and paragraph separators.
+func writeTextLiteralRune(b *strings.Builder, r rune) {
+	switch {
+	case r == '"':
+		b.WriteString(`\"`)
+	case r == '\\':
+		b.WriteString(`\\`)
+	case r == '\n':
+		b.WriteString(`\n`)
+	case r == '\r':
+		b.WriteString(`\r`)
+	case r == '\t':
+		b.WriteString(`\t`)
+	case r < 0x20 || r == 0x7f || r == 0x2028 || r == 0x2029:
+		hexDigits := strconv.FormatInt(int64(r), 16)
+		b.WriteString(`\u` + strings.Repeat("0", 4-len(hexDigits)) + hexDigits)
+	default:
+		b.WriteRune(r)
+	}
 }
 
 func byteSliceLiteral(data []byte) string {
