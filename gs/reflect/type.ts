@@ -331,7 +331,7 @@ function mergeTypeMetadata(target: Type, source: Type): void {
 // identical in Go.
 export function typeIdentityKey(t: Type, seen = new Set<Type>()): string {
   if (seen.has(t)) {
-    return `${t.Kind()}:${t.PkgPath()}:${t.Name()}:${t.String()}`
+    return `${t.Kind()}:${t.PkgPath()}:${t.Name()}:${runtimeTypeString(t)}`
   }
   seen.add(t)
   if (t instanceof StructType) {
@@ -343,7 +343,7 @@ export function typeIdentityKey(t: Type, seen = new Set<Type>()): string {
     case Chan:
     case Ptr:
     case Slice:
-      return `${t.Kind()}:${t.String()}:${typeIdentityKey(t.Elem(), seen)}`
+      return `${t.Kind()}:${runtimeTypeString(t)}:${typeIdentityKey(t.Elem(), seen)}`
     case Map:
       return `${t.Kind()}:${typeIdentityKey(t.Key(), seen)}:${typeIdentityKey(t.Elem(), seen)}`
     case Func: {
@@ -358,16 +358,16 @@ export function typeIdentityKey(t: Type, seen = new Set<Type>()): string {
         { length: t.NumOut() },
         (_unused, idx) => typeIdentityKey(t.Out(idx), seen),
       )
-      return `${t.Kind()}:${t.PkgPath()}:${t.Name()}:${t.String()}:${t.IsVariadic()}:${params.join(',')}:${results.join(',')}`
+      return `${t.Kind()}:${t.PkgPath()}:${t.Name()}:${runtimeTypeString(t)}:${t.IsVariadic()}:${params.join(',')}:${results.join(',')}`
     }
     default:
-      return `${t.Kind()}:${t.PkgPath()}:${t.Name()}:${t.String()}`
+      return `${t.Kind()}:${t.PkgPath()}:${t.Name()}:${runtimeTypeString(t)}`
   }
 }
 
 function typeUnderlyingIdentityKey(t: Type, seen = new Set<Type>()): string {
   if (seen.has(t)) {
-    return `${t.Kind()}:${t.PkgPath()}:${t.Name()}:${t.String()}`
+    return `${t.Kind()}:${t.PkgPath()}:${t.Name()}:${runtimeTypeString(t)}`
   }
   seen.add(t)
   if (t instanceof BasicType) {
@@ -380,7 +380,7 @@ function typeUnderlyingIdentityKey(t: Type, seen = new Set<Type>()): string {
     case Array:
       return `array:${t.Len()}:${typeIdentityKey(t.Elem(), seen)}`
     case Chan:
-      return `chan:${t.String()}:${typeIdentityKey(t.Elem(), seen)}`
+      return `chan:${runtimeTypeString(t)}:${typeIdentityKey(t.Elem(), seen)}`
     case Ptr:
       return `ptr:${typeIdentityKey(t.Elem(), seen)}`
     case Slice:
@@ -404,7 +404,7 @@ function typeUnderlyingIdentityKey(t: Type, seen = new Set<Type>()): string {
     case Interface:
       return `interface:${typeMethods(t).map(methodSignatureIdentityKey).join('|')}`
     default:
-      return `${t.Kind()}:${t.PkgPath()}:${t.Name()}:${t.String()}`
+      return `${t.Kind()}:${t.PkgPath()}:${t.Name()}:${runtimeTypeString(t)}`
   }
 }
 
@@ -415,7 +415,7 @@ function isInterfaceLiteral(name: string): boolean {
 
 function typeIsNamed(t: Type): boolean {
   if (t.Kind() === Interface) {
-    return !isInterfaceLiteral(t.String())
+    return !isInterfaceLiteral(runtimeTypeString(t))
   }
   if (t.Kind() === Struct || t.Kind() === Func) {
     return t.Name() !== ''
@@ -515,6 +515,9 @@ export interface Type {
   // NumMethod returns the number of methods in the type's method set
   NumMethod(): number
 
+  // Method returns the i'th method in the type's method set.
+  Method(i: number): Method
+
   // MethodByName returns the method with that name in the type's method set.
   MethodByName(name: string): [Method, boolean]
 
@@ -528,6 +531,9 @@ export interface Type {
 
   // Comparable reports whether values of this type are comparable.
   Comparable(): boolean
+
+  // runtimeString returns the runtime type string (see runtimeTypeString).
+  runtimeString?(): string
 
   // ChanDir returns a channel type's direction.
   // Panics if the type's Kind is not Chan.
@@ -705,6 +711,9 @@ class InvalidTypeClass implements Type {
   }
   NumMethod(): number {
     return 0
+  }
+  Method(i: number): Method {
+    return typeMethod(this, i)
   }
   MethodByName(_name: string): [Method, boolean] {
     return [zeroMethod(), false]
@@ -1212,11 +1221,13 @@ export class Value {
   }
 
   public FieldByIndex(index: $.Slice<number>): Value {
-    let current: Value = this
-    for (const fieldIndex of $.asArray(index)) {
-      current = current.Field(fieldIndex)
+    // Step through embedded struct pointers as Go does, panicking on a nil
+    // one.
+    const [field, err] = this.FieldByIndexErr(index)
+    if (err !== null) {
+      $.panic(err)
     }
-    return current
+    return field
   }
 
   // FieldByIndexErr returns the nested field corresponding to index, or an
@@ -1411,9 +1422,15 @@ export class Value {
   }
 
   public CanSet(): boolean {
-    // Simplified: all valid values are settable in GoScript since we handle
-    // pointer semantics through VarRef. This enables JSON unmarshaling to work.
-    return this.IsValid()
+    // A value with storage can be set: an addressable value, such as the
+    // element of a pointer or slice, or a variable or field. A value made by
+    // ValueOf has none, so, as in Go, it cannot be set.
+    return (
+      this.IsValid() &&
+      (this._addressable ||
+        this._parentVarRef !== undefined ||
+        this._parentStruct !== undefined)
+    )
   }
 
   public Set(x: Value): void {
@@ -1436,17 +1453,23 @@ export class Value {
       return this._interfaceValue
     }
 
-    // Find whether the type or its pointer element is named.
+    // An interface Value holds its dynamic value, which is already boxed with
+    // its own type.
     const current = this.currentValue()
+    if (this._type.Kind() === Interface) {
+      return current
+    }
+
+    // Find whether the type or its pointer element is named.
     const typeInfo = typeInfoFromReflectType(this._type)
     const namedType =
       this._type.Name() !== '' &&
-      (this._type.PkgPath() !== '' || this._type.String().includes('.'))
+      (this._type.PkgPath() !== '' || runtimeTypeString(this._type).includes('.'))
     const elemType = this._type.Kind() === Ptr ? this._type.Elem() : null
     const namedElemType =
       elemType !== null &&
       elemType.Name() !== '' &&
-      (elemType.PkgPath() !== '' || elemType.String().includes('.'))
+      (elemType.PkgPath() !== '' || runtimeTypeString(elemType).includes('.'))
 
     // A pointer to a struct is the struct object itself, whose methods
     // satisfy interfaces, so it is tagged with its type but not boxed.
@@ -1460,7 +1483,7 @@ export class Value {
       }
       return $.interfaceValue<ReflectValue>(
         target ?? null,
-        this._type.String(),
+        runtimeTypeString(this._type),
         typeInfo,
       )
     }
@@ -1469,7 +1492,7 @@ export class Value {
     if (this._type.Kind() === Struct && namedType) {
       return $.interfaceValue<ReflectValue>(
         current,
-        this._type.String(),
+        runtimeTypeString(this._type),
         typeInfo,
       )
     }
@@ -1478,60 +1501,94 @@ export class Value {
       (this._type.Kind() === Ptr && namedElemType)
     ) {
       // Use the registered method set, so the box satisfies interfaces.
-      const registered = $.namedValueMethods(this._type.String())
+      const registered = $.namedValueMethods(runtimeTypeString(this._type))
       return $.namedValueInterfaceValue<ReflectValue>(
         current,
-        this._type.String(),
+        runtimeTypeString(this._type),
         registered?.methods ?? {},
         typeInfo,
         registered?.signatures,
       )
     }
 
+    // A number of a sized kind, such as float32 or int8, is boxed with its
+    // kind, as the compiler boxes it, so that it keeps its type; int and
+    // float64 are the kinds of a raw number.
+    const kind = this._type.Kind()
+    if (kind >= Int8 && kind <= Float32 && kind !== Int64 && kind !== Uint64 && kind !== Uintptr) {
+      return $.basicInterfaceValue<ReflectValue>(current, runtimeTypeString(this._type))
+    }
+
     // Box an unnamed value with its type, as the compiler does when it
     // converts the value to an interface. A nil slice, map, func, chan or
     // pointer then keeps its type, so the interface is not nil, and a
     // pointer such as *[]T reports its type to reflect.ValueOf.
-    if (this._type.Kind() !== Interface) {
-      return $.interfaceValue<ReflectValue>(
-        current,
-        this._type.String(),
-        typeInfo,
-      )
-    }
-    return current
+    return $.interfaceValue<ReflectValue>(
+      current,
+      runtimeTypeString(this._type),
+      typeInfo,
+    )
   }
 
   public MethodByName(name: string): Value {
     if (!this.IsValid()) {
       return new Value()
     }
-    const receiver = $.isVarRef(this._value) ? this._value.value : this._value
-    if (
-      receiver === null ||
-      receiver === undefined ||
-      (typeof receiver !== 'object' && typeof receiver !== 'function')
-    ) {
+    const bound = this.boundMethod(name)
+    if (bound === undefined) {
       return new Value()
     }
-    const method = (receiver as Record<string, unknown>)[name]
-    if (typeof method !== 'function') {
-      return new Value()
-    }
+
+    // The method value has the method's signature without the receiver.
     const [signature] = methodSignatureByName(this.Type(), name)
     const methodType =
       signature ?
         methodTypeFromSignature(signature, this.Type(), false)
       : new FunctionType('func')
-    return new Value(method.bind(receiver), methodType)
+    return new Value(bound, methodType)
+  }
+
+  // Method returns a function value for the i'th method of the method set of
+  // v's type, with v bound as its receiver.
+  public Method(i: number): Value {
+    return this.MethodByName(this.Type().Method(i).Name)
+  }
+
+  // boundMethod returns the method called name bound to the value, or
+  // undefined if the value has no such method.
+  private boundMethod(name: string): ((...args: any[]) => any) | undefined {
+    // A struct or other object receiver carries its methods.
+    const current = this.currentValue()
+    const receiver = $.isVarRef(current) ? current.value : current
+    if (receiver === null || receiver === undefined) {
+      return undefined
+    }
+    const method =
+      typeof receiver === 'object' || typeof receiver === 'function' ?
+        (receiver as Record<string, unknown>)[name]
+      : undefined
+    if (typeof method === 'function') {
+      return method.bind(receiver)
+    }
+
+    // A named non-struct type, such as a named int or slice, has its methods
+    // in the method table registered under its type string.
+    const named = $.namedValueMethods(runtimeTypeString(this.Type()))?.methods[name]
+    if (named === undefined) {
+      return undefined
+    }
+    return (...args: any[]) => named(current, ...args)
   }
 
   public async Call(inArgs: $.Slice<Value>): Promise<$.Slice<Value>> {
-    if (this.Kind() !== Func || typeof this._value !== 'function') {
+    // A settable func Value, such as an element of a slice, holds its
+    // function in the variable or field it refers to.
+    const fn = this.currentValue()
+    if (this.Kind() !== Func || typeof fn !== 'function') {
       throw new ValueError({ Kind: this.Kind(), Method: 'Call' })
     }
     return await callReflectFunction(
-      this._value as (...args: unknown[]) => unknown,
+      fn as (...args: unknown[]) => unknown,
       this._type,
       inArgs,
       'Call',
@@ -1539,11 +1596,14 @@ export class Value {
   }
 
   public async CallSlice(inArgs: $.Slice<Value>): Promise<$.Slice<Value>> {
-    if (this.Kind() !== Func || typeof this._value !== 'function') {
+    // A settable func Value, such as an element of a slice, holds its
+    // function in the variable or field it refers to.
+    const fn = this.currentValue()
+    if (this.Kind() !== Func || typeof fn !== 'function') {
       throw new ValueError({ Kind: this.Kind(), Method: 'CallSlice' })
     }
     return await callReflectFunction(
-      this._value as (...args: unknown[]) => unknown,
+      fn as (...args: unknown[]) => unknown,
       this._type,
       inArgs,
       'CallSlice',
@@ -1913,10 +1973,9 @@ export class Value {
 
   // SetMapIndex sets the element associated with key in the map v to elem
   public SetMapIndex(key: Value, elem: Value): void {
-    if (!this.CanSet()) {
-      throw new Error(
-        'reflect: call of reflect.Value.SetMapIndex on unaddressable value',
-      )
+    // A map is changed in place, so, as in Go, it need not be settable.
+    if (!this.IsValid()) {
+      throw new ValueError({ Kind: Invalid, Method: 'SetMapIndex' })
     }
     if (this.Kind() !== Map) {
       throw new Error(
@@ -1987,7 +2046,10 @@ export class Value {
 
   // NumMethod returns the number of methods in the value's method set
   public NumMethod(): number {
-    return 0 // Simplified - methods not fully implemented
+    if (!this.IsValid()) {
+      return 0
+    }
+    return this.Type().NumMethod()
   }
 
   // Equal reports whether v is equal to u, as the == operator would report
@@ -2133,6 +2195,10 @@ export class BasicType implements Type {
   ) {}
 
   public String(): string {
+    return $.goTypeString(this.runtimeString())
+  }
+
+  public runtimeString(): string {
     return this._typeName || this._name
   }
 
@@ -2302,6 +2368,9 @@ export class BasicType implements Type {
   public NumMethod(): number {
     return typeMethods(this).length
   }
+  public Method(i: number): Method {
+    return typeMethod(this, i)
+  }
   public MethodByName(name: string): [Method, boolean] {
     return typeMethodByName(this, name)
   }
@@ -2377,7 +2446,11 @@ class SliceType implements Type {
   ) {}
 
   public String(): string {
-    return this._typeName || '[]' + this._elemType.String()
+    return $.goTypeString(this.runtimeString())
+  }
+
+  public runtimeString(): string {
+    return this._typeName || '[]' + runtimeTypeString(this._elemType)
   }
 
   public Kind(): Kind {
@@ -2487,6 +2560,9 @@ class SliceType implements Type {
   public NumMethod(): number {
     return typeMethods(this).length
   }
+  public Method(i: number): Method {
+    return typeMethod(this, i)
+  }
   public MethodByName(name: string): [Method, boolean] {
     return typeMethodByName(this, name)
   }
@@ -2521,7 +2597,11 @@ class ArrayType implements Type {
   ) {}
 
   public String(): string {
-    return this._typeName || `[${this._len}]${this._elemType.String()}`
+    return $.goTypeString(this.runtimeString())
+  }
+
+  public runtimeString(): string {
+    return this._typeName || `[${this._len}]${runtimeTypeString(this._elemType)}`
   }
 
   public Kind(): Kind {
@@ -2635,6 +2715,9 @@ class ArrayType implements Type {
   public NumMethod(): number {
     return typeMethods(this).length
   }
+  public Method(i: number): Method {
+    return typeMethod(this, i)
+  }
   public MethodByName(name: string): [Method, boolean] {
     return typeMethodByName(this, name)
   }
@@ -2664,7 +2747,11 @@ class PointerType implements Type {
   ) {}
 
   public String(): string {
-    return '*' + this._elemType.String()
+    return $.goTypeString(this.runtimeString())
+  }
+
+  public runtimeString(): string {
+    return '*' + runtimeTypeString(this._elemType)
   }
 
   public Kind(): Kind {
@@ -2779,6 +2866,9 @@ class PointerType implements Type {
   public NumMethod(): number {
     return typeMethods(this).length
   }
+  public Method(i: number): Method {
+    return typeMethod(this, i)
+  }
   public MethodByName(name: string): [Method, boolean] {
     return typeMethodByName(this, name)
   }
@@ -2858,10 +2948,11 @@ class FunctionType implements Type {
   }
 
   public String(): string {
-    if (this._name !== '') {
-      return this._name
-    }
-    return this._signature
+    return $.goTypeString(this.runtimeString())
+  }
+
+  public runtimeString(): string {
+    return this._name !== '' ? this._name : this._signature
   }
 
   public Kind(): Kind {
@@ -2988,6 +3079,9 @@ class FunctionType implements Type {
   public NumMethod(): number {
     return typeMethods(this).length
   }
+  public Method(i: number): Method {
+    return typeMethod(this, i)
+  }
   public MethodByName(name: string): [Method, boolean] {
     return typeMethodByName(this, name)
   }
@@ -3038,7 +3132,7 @@ function formatFunctionSignature(
   variadic: boolean,
 ): string {
   const paramStrings = params.map((param, index) => {
-    const typeName = param.String()
+    const typeName = runtimeTypeString(param)
     if (!variadic || index !== params.length - 1) {
       return typeName
     }
@@ -3049,9 +3143,9 @@ function formatFunctionSignature(
   })
   let signature = `func(${paramStrings.join(', ')})`
   if (results.length === 1) {
-    signature += ` ${results[0].String()}`
+    signature += ` ${runtimeTypeString(results[0])}`
   } else if (results.length > 1) {
-    signature += ` (${results.map((result) => result.String()).join(', ')})`
+    signature += ` (${results.map((result) => runtimeTypeString(result)).join(', ')})`
   }
   return signature
 }
@@ -3105,7 +3199,11 @@ function reflectCallRawArgs(
       )
     }
   }
-  rawArgs.push($.arrayToSlice(variadicValues.map((value) => value.Interface())))
+  rawArgs.push(
+    $.arrayToSlice(
+      variadicValues.map((value) => valueForTarget(value, variadicElemType)),
+    ),
+  )
   return rawArgs
 }
 
@@ -3139,7 +3237,7 @@ function reflectCallValueInterface(
       `reflect: ${op} using ${value.Type().String()} as type ${target.String()}`,
     )
   }
-  return value.Interface()
+  return valueForTarget(value, target)
 }
 
 function validateReflectCallInputCount(fnType: Type, actual: number): void {
@@ -3205,10 +3303,10 @@ export function MakeFunc(
       return undefined
     }
     if (typ.NumOut() === 1) {
-      return makeFuncReturnInterface(resultValues[0], typ.Out(0))
+      return valueForTarget(resultValues[0], typ.Out(0))
     }
     return resultValues.map((value, index) =>
-      makeFuncReturnInterface(value, typ.Out(index)),
+      valueForTarget(value, typ.Out(index)),
     )
   }, typeInfo)
   return new Value(wrapper, typ)
@@ -3217,8 +3315,14 @@ export function MakeFunc(
 function makeFuncArgs(typ: Type, rawArgs: unknown[]): Value[] {
   validateReflectCallInputCount(typ, rawArgs.length)
   return rawArgs.map((arg, index) => {
-    const value = ValueOf(arg as ReflectValue)
+    // An argument of a concrete type is a value of the parameter's type, such
+    // as a struct object for a pointer to a struct; an interface argument has
+    // its dynamic type.
     const target = typ.In(index)
+    if (target.Kind() !== Interface) {
+      return new Value(arg as ReflectValue, target)
+    }
+    const value = ValueOf(arg as ReflectValue)
     if (!value.Type().AssignableTo(target)) {
       throw new Error(
         `reflect.MakeFunc: cannot use ${value.Type().String()} as type ${target.String()} in argument ${index}`,
@@ -3249,7 +3353,10 @@ function validateMakeFuncResults(typ: Type, resultValues: Value[]): void {
   }
 }
 
-function makeFuncReturnInterface(value: Value, target: Type): unknown {
+// valueForTarget returns the value v holds as passed to or returned from a
+// function as the target type: boxed with its type for an interface target,
+// and the raw value otherwise.
+function valueForTarget(value: Value, target: Type): unknown {
   const raw = value.Interface()
   if (target.Kind() === Interface) {
     return raw
@@ -3278,9 +3385,13 @@ class MapType implements Type {
   ) {}
 
   public String(): string {
+    return $.goTypeString(this.runtimeString())
+  }
+
+  public runtimeString(): string {
     return (
       this._typeName ||
-      `map[${this._keyType.String()}]${this._elemType.String()}`
+      `map[${runtimeTypeString(this._keyType)}]${runtimeTypeString(this._elemType)}`
     )
   }
 
@@ -3391,6 +3502,9 @@ class MapType implements Type {
   public NumMethod(): number {
     return typeMethods(this).length
   }
+  public Method(i: number): Method {
+    return typeMethod(this, i)
+  }
   public MethodByName(name: string): [Method, boolean] {
     return typeMethodByName(this, name)
   }
@@ -3499,6 +3613,10 @@ function typeInfoIdentityKey(
   info: $.TypeInfo | string,
   seen: Set<string>,
 ): string {
+  // GoError, the TypeScript name of the error interface, is error.
+  if (isGoErrorTypeInfo(info)) {
+    info = 'error'
+  }
   if (typeof info === 'string') {
     const registered = builtinGetTypeByName(info)
     if (!registered) {
@@ -3659,12 +3777,10 @@ export function visibleStructFields(t: Type): StructField[] {
 }
 
 function zeroMethod(): Method {
-  return {
-    Name: '',
+  return new Method({
     Type: new BasicType(Invalid, '<invalid>'),
     Func: () => undefined,
-    Index: 0,
-  }
+  })
 }
 
 function methodFromSignature(
@@ -3672,7 +3788,7 @@ function methodFromSignature(
   index: number,
   receiver: Type,
 ): Method {
-  return {
+  return new Method({
     Name: signature.name,
     Type: methodTypeFromSignature(
       signature,
@@ -3681,7 +3797,7 @@ function methodFromSignature(
     ),
     Func: () => undefined,
     Index: index,
-  }
+  })
 }
 
 function methodTypeFromSignature(
@@ -3696,11 +3812,19 @@ function methodTypeFromSignature(
   return new FunctionType({
     params,
     results: signature.returns.map(methodArgType),
+    variadic: signature.variadic === true,
   })
 }
 
 function methodArgType(arg: $.MethodArg): Type {
   return typeFromTypeInfoWithSeen(arg.type, new Set())
+}
+
+// runtimeTypeString returns the runtime type string of t, which names the
+// types of packages that share a name with another package by the package's
+// runtime name (see goTypeString), for looking up and identifying types.
+export function runtimeTypeString(t: Type): string {
+  return t.runtimeString !== undefined ? t.runtimeString() : t.String()
 }
 
 // typeNamePkgPath returns the package path of a qualified type name such as
@@ -3720,16 +3844,16 @@ function typeNameName(typeName: string): string {
 function typeMethods(t: Type): $.MethodSignature[] {
   // A named non-struct type, such as a named map, slice or basic type, or a
   // pointer to one, has its method set registered by its type string.
-  const named = $.namedValueMethods(t.String())
+  const named = $.namedValueMethods(runtimeTypeString(t))
   if (named !== undefined) {
     return named.signatures
   }
 
   // Any other type is looked up by name: its own, its element's if it is a
   // pointer, or the registered name of an interface.
-  let typeInfo = builtinGetTypeByName(t.String())
+  let typeInfo = builtinGetTypeByName(runtimeTypeString(t))
   if (!typeInfo && t.Kind() === Ptr) {
-    typeInfo = builtinGetTypeByName(t.Elem().String())
+    typeInfo = builtinGetTypeByName(runtimeTypeString(t.Elem()))
   }
   if (!typeInfo && t instanceof InterfaceType) {
     const registeredName = t.registeredName()
@@ -3755,11 +3879,21 @@ function typeMethods(t: Type): $.MethodSignature[] {
     return []
   }
 
-  // A registered struct or interface lists its methods in its type info.
-  if (isStructTypeInfo(typeInfo) || isInterfaceTypeInfo(typeInfo)) {
+  // A registered interface, or a pointer to a registered struct, has all the
+  // methods listed in its type info.
+  if (isInterfaceTypeInfo(typeInfo)) {
     return typeInfo.methods || []
   }
-  return []
+  if (!isStructTypeInfo(typeInfo)) {
+    return []
+  }
+  const methods = typeInfo.methods || []
+  if (t.Kind() === Ptr) {
+    return methods
+  }
+
+  // A struct value has only the methods with value receivers.
+  return methods.filter((method) => !method.pointerReceiver)
 }
 
 function methodSignatureByName(
@@ -3772,6 +3906,16 @@ function methodSignatureByName(
     return [undefined, -1]
   }
   return [methods[index], index]
+}
+
+// typeMethod returns the i'th method of the method set of t, and panics, as
+// Go does, when i is out of range.
+function typeMethod(t: Type, i: number): Method {
+  const methods = typeMethods(t)
+  if (i < 0 || i >= methods.length) {
+    throw new Error('reflect: Method index out of range')
+  }
+  return methodFromSignature(methods[i], i, t)
 }
 
 function typeMethodByName(t: Type, name: string): [Method, boolean] {
@@ -4020,6 +4164,10 @@ class StructType implements Type {
   ) {}
 
   public String(): string {
+    return $.goTypeString(this.runtimeString())
+  }
+
+  public runtimeString(): string {
     return this._string
   }
 
@@ -4214,6 +4362,9 @@ class StructType implements Type {
     return typeMethods(this).length
   }
 
+  public Method(i: number): Method {
+    return typeMethod(this, i)
+  }
   public MethodByName(name: string): [Method, boolean] {
     return typeMethodByName(this, name)
   }
@@ -4414,8 +4565,12 @@ class ChannelType implements Type {
   ) {}
 
   public String(): string {
+    return $.goTypeString(this.runtimeString())
+  }
+
+  public runtimeString(): string {
     // Format: chan T, <-chan T, or chan<- T
-    const elem = this._elemType.String()
+    const elem = runtimeTypeString(this._elemType)
     switch (this._dir) {
       case RecvDir:
         return `<-chan ${elem}`
@@ -4540,6 +4695,9 @@ class ChannelType implements Type {
   public NumMethod(): number {
     return 0
   }
+  public Method(i: number): Method {
+    return typeMethod(this, i)
+  }
   public MethodByName(_name: string): [Method, boolean] {
     return [zeroMethod(), false]
   }
@@ -4571,6 +4729,10 @@ class InterfaceType implements Type {
 
   public String(): string {
     // Go spells the empty interface type with a space.
+    return $.goTypeString(this.runtimeString())
+  }
+
+  public runtimeString(): string {
     return this._name === 'interface{}' ? 'interface {}' : this._name
   }
 
@@ -4699,6 +4861,9 @@ class InterfaceType implements Type {
     return typeMethods(this).length
   }
 
+  public Method(i: number): Method {
+    return typeMethod(this, i)
+  }
   public MethodByName(name: string): [Method, boolean] {
     return typeMethodByName(this, name)
   }
@@ -5522,6 +5687,12 @@ function typeFromTypeInfoWithSeen(
   info: $.TypeInfo | string,
   seen: Set<string>,
 ): Type {
+  // The hand-written type information of override packages names the error
+  // interface by its TypeScript name.
+  if (isGoErrorTypeInfo(info)) {
+    info = 'error'
+  }
+
   // A type that typeFromTypeInfo already built is complete, so a nested use
   // of it, such as a field of another struct, takes it rather than building
   // it again.
@@ -5571,6 +5742,15 @@ function typeFromTypeInfoWithSeen(
     return internType(typ)
   }
   return internType(typeFromStructuredTypeInfoWithSeen(info, seen))
+}
+
+// isGoErrorTypeInfo reports whether info names the error interface as GoError,
+// the TypeScript type of Go errors.
+function isGoErrorTypeInfo(info: $.TypeInfo | string): boolean {
+  if (typeof info === 'string') {
+    return info === 'GoError'
+  }
+  return info.kind === $.TypeKind.Interface && info.name === 'GoError'
 }
 
 function recursiveTypeInfoName(info: $.TypeInfo): string {
@@ -5694,7 +5874,7 @@ function functionTypeInfoFromType(typ: Type): $.FunctionTypeInfo {
     results,
   }
   if (typ.Name() !== '') {
-    info.name = typ.String()
+    info.name = runtimeTypeString(typ)
   }
   if (typ.IsVariadic()) {
     info.isVariadic = true
@@ -5703,7 +5883,7 @@ function functionTypeInfoFromType(typ: Type): $.FunctionTypeInfo {
 }
 
 export function typeInfoFromReflectType(typ: Type): string | $.TypeInfo {
-  const typeName = typ.PkgPath() !== '' && typ.Name() !== '' ? typ.String() : ''
+  const typeName = typ.PkgPath() !== '' && typ.Name() !== '' ? runtimeTypeString(typ) : ''
   if (typeName !== '' && typ.Kind() === Struct) {
     return typeName
   }
@@ -5791,7 +5971,7 @@ export function typeInfoFromReflectType(typ: Type): string | $.TypeInfo {
           })
       return {
         kind: $.TypeKind.Struct,
-        name: typ.Name() === '' ? '' : typ.String(),
+        name: typ.Name() === '' ? '' : runtimeTypeString(typ),
         methods: [],
         fields: fields.map((field) => ({
           name: field.name,
@@ -5807,7 +5987,7 @@ export function typeInfoFromReflectType(typ: Type): string | $.TypeInfo {
       }
     }
     default:
-      return typ.String()
+      return runtimeTypeString(typ)
   }
 }
 

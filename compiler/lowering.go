@@ -89,6 +89,7 @@ func (o *LoweringOwner) Build(ctx context.Context, model *SemanticModel, opts ..
 	}
 
 	program := &LoweredProgram{trimTypeInfo: options.TrimTypeInfo}
+	defer setRuntimePackageNames(model)()
 	asyncLazyCache := newAsyncLazyCache()
 	runtimeMethodSets := newRuntimeMethodSetCache()
 	semPkgs := make([]*semanticPackage, 0, len(model.packages))
@@ -3462,15 +3463,25 @@ func (o *LoweringOwner) runtimeReceiverMethodSignature(method *types.Func, point
 	helper := o.runtimeOwner.QualifiedHelper(RuntimeHelperMethodSignature)
 	args := []string{strconv.Quote(method.Name())}
 	signature, _ := method.Type().(*types.Signature)
+	variadic := signature != nil && signature.Variadic()
+
+	// The arguments are positional, so the parameters and results are given
+	// whenever a later argument is.
+	flags := pointerOnly || variadic
 	if signature != nil {
-		if signature.Params().Len() != 0 || signature.Results().Len() != 0 || pointerOnly {
+		if signature.Params().Len() != 0 || signature.Results().Len() != 0 || flags {
 			args = append(args, o.runtimeMethodParameters(signature.Params(), seen))
 		}
-		if signature.Results().Len() != 0 || pointerOnly {
+		if signature.Results().Len() != 0 || flags {
 			args = append(args, o.runtimeMethodParameters(signature.Results(), seen))
 		}
 	}
-	if pointerOnly {
+
+	// A pointer-receiver method and a variadic method are marked.
+	if flags {
+		args = append(args, strconv.FormatBool(pointerOnly))
+	}
+	if variadic {
 		args = append(args, "true")
 	}
 	return helper + "(" + strings.Join(args, ", ") + ")"
@@ -3490,9 +3501,13 @@ func (o *LoweringOwner) runtimeTrimmedReceiverMethodSignature(method *types.Func
 	if signature == nil {
 		return "{ name: " + strconv.Quote(method.Name()) + ", args: [], returns: []" + pointerReceiver + " }"
 	}
+	variadic := ""
+	if signature.Variadic() {
+		variadic = ", variadic: true"
+	}
 	return "{ name: " + strconv.Quote(method.Name()) +
 		", args: " + o.runtimeTrimmedMethodArgs(signature.Params()) +
-		", returns: " + o.runtimeTrimmedMethodReturns(signature.Results(), seen) + pointerReceiver + " }"
+		", returns: " + o.runtimeTrimmedMethodReturns(signature.Results(), seen) + pointerReceiver + variadic + " }"
 }
 
 // hasPointerReceiver reports whether method is declared with a pointer
@@ -15080,7 +15095,7 @@ func (o *LoweringOwner) lowerInterfaceValueExpr(
 	// type arguments, so that reflection sees the instantiated type rather
 	// than an empty interface, and the value's dynamic type is named by it.
 	helper := o.runtimeOwner.QualifiedHelper(RuntimeHelperInterfaceValue)
-	typeInfo := o.runtimeTypeInfoExpr(sourceType)
+	typeInfo := o.overrideTypeInfo(ctx, sourceType, o.runtimeTypeInfoExpr(sourceType))
 	if typeContainsTypeParam(sourceType) {
 		helper = o.runtimeOwner.QualifiedHelper(RuntimeHelperGenericInterfaceValue)
 		typeInfo = o.runtimeTypeAssertInfoExpr(ctx, sourceType)
@@ -15093,6 +15108,57 @@ func (o *LoweringOwner) lowerInterfaceValueExpr(
 	return helper + "(" + value + ", " +
 		strconv.Quote(goRuntimeTypeString(sourceType)) + ", " +
 		typeInfo + ")"
+}
+
+// overrideTypeInfo returns typeInfo, the type information of a value of
+// sourceType converted to an interface. A struct or interface type of an
+// override package, or a pointer to one, is registered by its hand-written
+// TypeScript, whose method signatures may be missing or inexact, so the type
+// information also gives them, from the Go types, for reflection.
+func (o *LoweringOwner) overrideTypeInfo(ctx lowerFileContext, sourceType types.Type, typeInfo string) string {
+	// Only a named struct or interface type of an override package, or a
+	// pointer to one, is described.
+	named, _ := types.Unalias(derefPointerType(sourceType)).(*types.Named)
+	if named == nil || !o.typeUsesOverride(named) || named.TypeParams().Len() != 0 {
+		return typeInfo
+	}
+	var signatures []string
+	switch underlying := named.Underlying().(type) {
+	case *types.Struct:
+		signatures = o.overrideStructMethodSignatures(named)
+	case *types.Interface:
+		// Unexported methods are left out, as hand-written values may not
+		// have them.
+		for method := range underlying.Methods() {
+			if method.Exported() {
+				signatures = append(signatures, o.runtimeMethodSignature(method, make(map[types.Type]bool)))
+			}
+		}
+	}
+	if len(signatures) == 0 {
+		return typeInfo
+	}
+
+	// The signatures are given once per file.
+	return o.hoistStatic(ctx, o.runtimeOwner.QualifiedHelper(RuntimeHelperOverrideTypeMethods)+"("+typeInfo+", "+
+		strconv.Quote(runtimeNamedTypeName(named))+", () => ["+strings.Join(signatures, ", ")+"])")
+}
+
+// overrideStructMethodSignatures describes the exported methods of the method
+// set of a pointer to named, marking those not in the value's method set.
+func (o *LoweringOwner) overrideStructMethodSignatures(named *types.Named) []string {
+	methodSet := types.NewMethodSet(types.NewPointer(named))
+	valueMethods := types.NewMethodSet(named)
+	signatures := make([]string, 0, methodSet.Len())
+	for selection := range methodSet.Methods() {
+		method, _ := selection.Obj().(*types.Func)
+		if method == nil || !method.Exported() {
+			continue
+		}
+		pointerOnly := valueMethods.Lookup(method.Pkg(), method.Name()) == nil
+		signatures = append(signatures, o.runtimeReceiverMethodSignature(method, pointerOnly, make(map[types.Type]bool)))
+	}
+	return signatures
 }
 
 func (o *LoweringOwner) lowerNumericInterfaceWrapper(
@@ -18188,7 +18254,7 @@ func runtimeNamedTypeName(named *types.Named) string {
 	if named.Obj().Pkg() == nil {
 		return named.Obj().Name()
 	}
-	return named.Obj().Pkg().Name() + "." + named.Obj().Name()
+	return runtimePackageName(named.Obj().Pkg()) + "." + named.Obj().Name()
 }
 
 func goRuntimeTypeString(typ types.Type) string {
@@ -18214,9 +18280,7 @@ func goRuntimeTypeString(typ types.Type) string {
 			return "chan " + goRuntimeTypeString(typed.Elem())
 		}
 	default:
-		return types.TypeString(typ, func(pkg *types.Package) string {
-			return pkg.Name()
-		})
+		return types.TypeString(typ, runtimePackageName)
 	}
 }
 

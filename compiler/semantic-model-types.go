@@ -11,6 +11,10 @@ import (
 
 // SemanticModel is the immutable compiler semantic surface consumed by lowering.
 type SemanticModel struct {
+	// runtimePackageNames are the runtime names of the packages that share
+	// their name with another package of the program (see sharedPackageNames).
+	runtimePackageNames map[string]string
+
 	packages     map[string]*semanticPackage
 	addressTaken map[types.Object]bool
 	needsVarRef  map[types.Object]bool

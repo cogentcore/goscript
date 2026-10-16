@@ -28,7 +28,7 @@ export async function main(): globalThis.Promise<void> {
 	h.value.Write(new Uint8Array([119, 111, 114, 108, 100]))
 	await $.println(h.value.Sum64() == whole)
 
-	let hh: hash.Hash64 | null = $.interfaceValue<hash.Hash64 | null>(h, "*maphash.Hash", /* @__PURE__ */ $.pointerType("maphash.Hash"))
+	let hh: hash.Hash64 | null = $.interfaceValue<hash.Hash64 | null>(h, "*maphash.Hash", __goscriptStatic0())
 	await $.println((__goscriptAwait = (hh !== null && (hh as any).__isVarRef !== true && ((hh as any).__goValue === undefined || (hh as any).__goType?.charCodeAt(0) !== 42) ? (hh as Exclude<hash.Hash64, null>) : $.pointerValue<Exclude<hash.Hash64, null>>(hh)).Size(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = (hh !== null && (hh as any).__isVarRef !== true && ((hh as any).__goValue === undefined || (hh as any).__goType?.charCodeAt(0) !== 42) ? (hh as Exclude<hash.Hash64, null>) : $.pointerValue<Exclude<hash.Hash64, null>>(hh)).BlockSize(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), $.sliceLen(((__goscriptAwait = (hh !== null && (hh as any).__isVarRef !== true && ((hh as any).__goValue === undefined || (hh as any).__goType?.charCodeAt(0) !== 42) ? (hh as Exclude<hash.Hash64, null>) : $.pointerValue<Exclude<hash.Hash64, null>>(hh)).Sum(null), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as $.Slice<number>)))
 
 	h.value.Reset()
@@ -41,6 +41,11 @@ export async function main(): globalThis.Promise<void> {
 	await $.println(zero.value.Sum64() == maphash.String($.markAsStructValue($.cloneStructValue(zero.value.Seed())), "abc"))
 
 	await $.println(stripe("block") == stripe("block"), stripe("block") < 4096n)
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= ($.overrideTypeMethods(/* @__PURE__ */ $.pointerType("maphash.Hash"), "maphash.Hash", () => [$.methodSignature("BlockSize", [], [/* @__PURE__ */ $.basicType("int")], true), $.methodSignature("Clone", [], ["hash.Cloner", "error"], true), $.methodSignature("Reset", [], [], true), $.methodSignature("Seed", [], ["maphash.Seed"], true), $.methodSignature("SetSeed", [["seed", "maphash.Seed"]], [], true), $.methodSignature("Size", [], [/* @__PURE__ */ $.basicType("int")], true), $.methodSignature("Sum", [["b", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))]], [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))], true), $.methodSignature("Sum64", [], [/* @__PURE__ */ $.basicType("uint64")], true), $.methodSignature("Write", [["b", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))]], [/* @__PURE__ */ $.basicType("int"), "error"], true), $.methodSignature("WriteByte", [["b", /* @__PURE__ */ $.basicType("uint8")]], ["error"], true), $.methodSignature("WriteString", [["s", /* @__PURE__ */ $.basicType("string")]], [/* @__PURE__ */ $.basicType("int"), "error"], true)]))
 }
 
 var __goscriptAwait: any

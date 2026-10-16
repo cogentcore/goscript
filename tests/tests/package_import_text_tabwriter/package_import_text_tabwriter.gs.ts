@@ -9,7 +9,7 @@ import type * as io from "@goscript/io/index.js"
 export async function main(): globalThis.Promise<void> {
 	// Buffer multiple rows through the standard table formatter.
 	let output = $.varRef($.markAsStructValue(new strings.Builder()))
-	let writer = tabwriter.NewWriter($.interfaceValue<io.Writer | null>(output, "*strings.Builder", /* @__PURE__ */ $.pointerType("strings.Builder")), 0, 0, 2, 32, 0)
+	let writer = tabwriter.NewWriter($.interfaceValue<io.Writer | null>(output, "*strings.Builder", __goscriptStatic0()), 0, 0, 2, 32, 0)
 	{
 		let [, err] = await tabwriter.Writer.prototype.Write.call(writer, new Uint8Array([73, 68, 9, 78, 65, 77, 69, 10, 49, 9, 67, 97, 110, 118, 97, 115, 10, 50, 50, 9, 83, 116, 111, 114, 101, 10]))
 		if (err != null) {
@@ -27,6 +27,11 @@ export async function main(): globalThis.Promise<void> {
 
 	// Print through the fixture's ordinary output boundary.
 	await $.print(output.value.String())
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= ($.overrideTypeMethods(/* @__PURE__ */ $.pointerType("strings.Builder"), "strings.Builder", () => [$.methodSignature("Cap", [], [/* @__PURE__ */ $.basicType("int")], true), $.methodSignature("Grow", [["n", /* @__PURE__ */ $.basicType("int")]], [], true), $.methodSignature("Len", [], [/* @__PURE__ */ $.basicType("int")], true), $.methodSignature("Reset", [], [], true), $.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")], true), $.methodSignature("Write", [["p", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))]], [/* @__PURE__ */ $.basicType("int"), "error"], true), $.methodSignature("WriteByte", [["c", /* @__PURE__ */ $.basicType("uint8")]], ["error"], true), $.methodSignature("WriteRune", [["r", /* @__PURE__ */ $.basicType("int32")]], [/* @__PURE__ */ $.basicType("int"), "error"], true), $.methodSignature("WriteString", [["s", /* @__PURE__ */ $.basicType("string")]], [/* @__PURE__ */ $.basicType("int"), "error"], true)]))
 }
 
 var __goscriptAwait: any

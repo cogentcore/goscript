@@ -89,7 +89,7 @@ export function __goscript_set_errReaderFailed(__goscriptValue: $.GoError): void
 
 export async function main(): globalThis.Promise<void> {
 	let deterministicBytes = bytes.Repeat(new Uint8Array([42]) as $.Slice<number>, 64)
-	let __goscriptTuple0: any = await $.pointerValue<Exclude<ecdh.Curve, null>>(ecdh.X25519()).GenerateKey($.pointerValueOrNil($.interfaceValue<io.Reader | null>(bytes.NewReader(deterministicBytes), "*bytes.Reader", /* @__PURE__ */ $.pointerType("bytes.Reader")))!)
+	let __goscriptTuple0: any = await $.pointerValue<Exclude<ecdh.Curve, null>>(ecdh.X25519()).GenerateKey($.pointerValueOrNil($.interfaceValue<io.Reader | null>(bytes.NewReader(deterministicBytes), "*bytes.Reader", __goscriptStatic0()))!)
 	let deterministic: ecdh.PrivateKey | $.VarRef<ecdh.PrivateKey> | null = __goscriptTuple0[0]
 	let err = __goscriptTuple0[1]
 	await $.println("deterministic err nil", err == null)
@@ -104,7 +104,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("segmented private matches", bytes.Equal((segmented !== null && (segmented as any).__isVarRef !== true && (segmented as any).__goValue === undefined ? ((segmented as any) as ecdh.PrivateKey).Bytes() : ecdh.PrivateKey.prototype.Bytes.call($.pointerValue<ecdh.PrivateKey>(segmented))), $.goSlice(segmentedBytes, undefined, 32)))
 	await $.println("segmented public len", $.sliceLen(ecdh.PublicKey.prototype.Bytes.call($.pointerValue<ecdh.PublicKey>((segmented !== null && (segmented as any).__isVarRef !== true && (segmented as any).__goValue === undefined ? ((segmented as any) as ecdh.PrivateKey).PublicKey() : ecdh.PrivateKey.prototype.PublicKey.call($.pointerValue<ecdh.PrivateKey>(segmented)))))))
 
-	let __goscriptTuple2: any = await $.pointerValue<Exclude<ecdh.Curve, null>>(ecdh.X25519()).GenerateKey($.pointerValueOrNil($.interfaceValue<io.Reader | null>(bytes.NewReader($.goSlice(deterministicBytes, undefined, 31)), "*bytes.Reader", /* @__PURE__ */ $.pointerType("bytes.Reader")))!)
+	let __goscriptTuple2: any = await $.pointerValue<Exclude<ecdh.Curve, null>>(ecdh.X25519()).GenerateKey($.pointerValueOrNil($.interfaceValue<io.Reader | null>(bytes.NewReader($.goSlice(deterministicBytes, undefined, 31)), "*bytes.Reader", __goscriptStatic0()))!)
 	let short: ecdh.PrivateKey | $.VarRef<ecdh.PrivateKey> | null = __goscriptTuple2[0]
 	err = __goscriptTuple2[1]
 	await $.println("premature key nil", short == null)
@@ -115,6 +115,11 @@ export async function main(): globalThis.Promise<void> {
 	err = __goscriptTuple3[1]
 	await $.println("explicit key nil", failed == null)
 	await $.println("explicit error propagated", errors.Is($.pointerValueOrNil(err)!, $.pointerValueOrNil(errReaderFailed)!))
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= ($.overrideTypeMethods(/* @__PURE__ */ $.pointerType("bytes.Reader"), "bytes.Reader", () => [$.methodSignature("Len", [], [/* @__PURE__ */ $.basicType("int")], true), $.methodSignature("Read", [["b", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))]], [["n", /* @__PURE__ */ $.basicType("int")], ["err", "error"]], true), $.methodSignature("ReadAt", [["b", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))], ["off", /* @__PURE__ */ $.basicType("int64")]], [["n", /* @__PURE__ */ $.basicType("int")], ["err", "error"]], true), $.methodSignature("ReadByte", [], [/* @__PURE__ */ $.basicType("uint8"), "error"], true), $.methodSignature("ReadRune", [], [["ch", /* @__PURE__ */ $.basicType("int32")], ["size", /* @__PURE__ */ $.basicType("int")], ["err", "error"]], true), $.methodSignature("Reset", [["b", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))]], [], true), $.methodSignature("Seek", [["offset", /* @__PURE__ */ $.basicType("int64")], ["whence", /* @__PURE__ */ $.basicType("int")]], [/* @__PURE__ */ $.basicType("int64"), "error"], true), $.methodSignature("Size", [], [/* @__PURE__ */ $.basicType("int64")], true), $.methodSignature("UnreadByte", [], ["error"], true), $.methodSignature("UnreadRune", [], ["error"], true), $.methodSignature("WriteTo", [["w", "io.Writer"]], [["n", /* @__PURE__ */ $.basicType("int64")], ["err", "error"]], true)]))
 }
 
 if ($.isMainScript(import.meta)) {

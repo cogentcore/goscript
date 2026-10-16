@@ -1,0 +1,6 @@
+list item para item list
+parent list true
+b list is a node false 3
+ast.Type ast.Type 1 Kind
+*ast.List *ast.List ast.Type{Kind:2}
+a list is a b node false true

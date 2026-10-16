@@ -53,11 +53,11 @@ export async function main(): globalThis.Promise<void> {
 	let buf = $.makeSlice<number>(2, undefined, "byte")
 	let [n, err] = await io.ReadFull($.pointerValueOrNil($.interfaceValue<io.Reader | null>(new fixedReader(false, new Uint8Array([97, 98, 99])), "*main.fixedReader", /* @__PURE__ */ $.pointerType("main.fixedReader")))!, buf)
 	await $.println("read:", n, $.bytesToString(buf), err == null)
-	let __goscriptTuple0: any = await io.ReadFull($.pointerValueOrNil($.interfaceValue<io.Reader | null>(bytes.NewReader(null), "*bytes.Reader", /* @__PURE__ */ $.pointerType("bytes.Reader")))!, buf)
+	let __goscriptTuple0: any = await io.ReadFull($.pointerValueOrNil($.interfaceValue<io.Reader | null>(bytes.NewReader(null), "*bytes.Reader", __goscriptStatic0()))!, buf)
 	n = __goscriptTuple0[0]
 	err = __goscriptTuple0[1]
 	await $.println("empty:", n, $.comparableEqual(err, io.EOF))
-	let __goscriptTuple1: any = await io.ReadFull($.pointerValueOrNil($.interfaceValue<io.Reader | null>(bytes.NewReader(new Uint8Array([120])), "*bytes.Reader", /* @__PURE__ */ $.pointerType("bytes.Reader")))!, buf)
+	let __goscriptTuple1: any = await io.ReadFull($.pointerValueOrNil($.interfaceValue<io.Reader | null>(bytes.NewReader(new Uint8Array([120])), "*bytes.Reader", __goscriptStatic0()))!, buf)
 	n = __goscriptTuple1[0]
 	err = __goscriptTuple1[1]
 	await $.println("short:", n, $.bytesToString($.goSlice(buf, undefined, 1)), $.comparableEqual(err, io.ErrUnexpectedEOF))
@@ -65,6 +65,11 @@ export async function main(): globalThis.Promise<void> {
 	let all: $.Slice<number> = __goscriptTuple2[0]
 	err = __goscriptTuple2[1]
 	await $.println("readall:", $.bytesToString(all), err == null)
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= ($.overrideTypeMethods(/* @__PURE__ */ $.pointerType("bytes.Reader"), "bytes.Reader", () => [$.methodSignature("Len", [], [/* @__PURE__ */ $.basicType("int")], true), $.methodSignature("Read", [["b", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))]], [["n", /* @__PURE__ */ $.basicType("int")], ["err", "error"]], true), $.methodSignature("ReadAt", [["b", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))], ["off", /* @__PURE__ */ $.basicType("int64")]], [["n", /* @__PURE__ */ $.basicType("int")], ["err", "error"]], true), $.methodSignature("ReadByte", [], [/* @__PURE__ */ $.basicType("uint8"), "error"], true), $.methodSignature("ReadRune", [], [["ch", /* @__PURE__ */ $.basicType("int32")], ["size", /* @__PURE__ */ $.basicType("int")], ["err", "error"]], true), $.methodSignature("Reset", [["b", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))]], [], true), $.methodSignature("Seek", [["offset", /* @__PURE__ */ $.basicType("int64")], ["whence", /* @__PURE__ */ $.basicType("int")]], [/* @__PURE__ */ $.basicType("int64"), "error"], true), $.methodSignature("Size", [], [/* @__PURE__ */ $.basicType("int64")], true), $.methodSignature("UnreadByte", [], ["error"], true), $.methodSignature("UnreadRune", [], ["error"], true), $.methodSignature("WriteTo", [["w", "io.Writer"]], [["n", /* @__PURE__ */ $.basicType("int64")], ["err", "error"]], true)]))
 }
 
 if ($.isMainScript(import.meta)) {

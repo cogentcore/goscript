@@ -52,6 +52,8 @@ export interface MethodSignature {
   // in the method set of a pointer to the type, such as a method with a
   // pointer receiver, so it is not called on a value that is not addressable.
   pointerReceiver?: boolean
+  // variadic is set for a method whose final parameter is variadic.
+  variadic?: boolean
 }
 
 /** MethodParameter encodes a type and an optional declared parameter name. */
@@ -66,6 +68,7 @@ export function methodSignature(
   args: readonly MethodParameter[] = [],
   returns: readonly MethodParameter[] = [],
   pointerReceiver = false,
+  variadic = false,
 ): MethodSignature {
   const signature: MethodSignature = {
     name,
@@ -74,6 +77,9 @@ export function methodSignature(
   }
   if (pointerReceiver) {
     signature.pointerReceiver = true
+  }
+  if (variadic) {
+    signature.variadic = true
   }
   return signature
 }
@@ -379,6 +385,16 @@ export function typePackagePath(typeName: string): string {
 }
 
 /**
+ * goTypeString returns the Go spelling of a runtime type string. The runtime
+ * names the types of packages that share a name with another package of the
+ * program by a name with a hash of the package path after a middle dot,
+ * which the Go spelling leaves out.
+ */
+export function goTypeString(name: string): string {
+  return name.includes('·') ? name.replace(/·[0-9a-z]+/g, '') : name
+}
+
+/**
  * registerNamedType registers the runtime type information of a named map,
  * slice or array type under its Go type string, so that code given only the
  * name, such as encoding/json, can resolve its key and element types.
@@ -436,6 +452,40 @@ export const registerStructType = (
   registerTypeInfo(name, typeInfo)
   return typeInfo
 }
+
+/**
+ * overrideTypeMethods gives the method signatures of the struct or interface
+ * type name, which an override package registers by hand, possibly without
+ * them or with inexact ones, so that reflection finds its methods. The Go
+ * signatures replace the registered ones the first time they are given.
+ *
+ * @param typeInfo The type information of a value of the type or a pointer to it.
+ * @param name The name of the type.
+ * @param methods A factory of the method signatures of the type.
+ * @returns typeInfo.
+ */
+export function overrideTypeMethods<T>(
+  typeInfo: T,
+  name: string,
+  methods: () => MethodSignature[],
+): T {
+  // A registered struct or interface takes the signatures once.
+  const registered = typeRegistry.get(name)
+  if (
+    registered === undefined ||
+    overriddenMethodTypes.has(registered) ||
+    !(isStructTypeInfo(registered) || isInterfaceTypeInfo(registered))
+  ) {
+    return typeInfo
+  }
+  overriddenMethodTypes.add(registered)
+  registered.methods = methods()
+  return typeInfo
+}
+
+// overriddenMethodTypes holds the registered types that overrideTypeMethods
+// has given their Go method signatures.
+const overriddenMethodTypes = new WeakSet<TypeInfo>()
 
 function resolveZeroValue<T>(zeroValue: any): T {
   if (typeof zeroValue === 'function') {

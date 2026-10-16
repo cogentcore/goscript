@@ -171,6 +171,7 @@ func (o *CompilerCacheOwner) ArtifactEntries(
 			writeKeyField(&b, "source-key", entry.key)
 			writeKeyField(&b, "closure-facts", facts.digest(entry.packagePath))
 			writeKeyField(&b, "universe-facts", facts.facts[universeFactsPackage])
+			writeKeyField(&b, "shared-package-names", sharedPackageNamesDigest(model.runtimePackageNames))
 			writeKeyField(&b, "trim-type-info", strconv.FormatBool(trimTypeInfo))
 			entry.key = sha256String(b.String())
 		}

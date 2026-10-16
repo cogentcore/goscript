@@ -197,6 +197,7 @@ func (s *CompileService) Compile(ctx context.Context, req *CompileRequest) (*Com
 			result.Diagnostics = diagnostics
 			return result, NewCompileError(diagnostics)
 		}
+		semanticModel.runtimePackageNames = sharedPackageNames(graph)
 		if len(semanticModel.staleSummaries) != 0 {
 			for _, pkgPath := range semanticModel.staleSummaries {
 				delete(summaries, pkgPath)
