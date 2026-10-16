@@ -237,7 +237,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("Length of innerSliceExceedCap:", $.sliceLen(innerSliceExceedCap))
 	await $.println("Capacity of innerSliceExceedCap:", $.cap(innerSliceExceedCap))
 
-	innerSliceExceedCap = $.append(innerSliceExceedCap, 10, 20)
+	innerSliceExceedCap = $.appendValues(innerSliceExceedCap, undefined, 10, 20)
 	await $.println("Length of innerSliceExceedCap after append:", $.sliceLen(innerSliceExceedCap))
 	await $.println("Capacity of innerSliceExceedCap after append:", $.cap(innerSliceExceedCap))
 	await $.println("innerSliceExceedCap[3]:", $.arrayIndex(innerSliceExceedCap!, 3))
