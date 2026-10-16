@@ -1684,6 +1684,10 @@ type lowerFileContext struct {
 	// borrow holds the borrowed results of the function being lowered and
 	// the calls in it that borrow results (see lowering-borrowed-results.go).
 	borrow *borrowState
+	// localLiterals holds the slice literals of the function declaration
+	// being lowered, also those of its function literals, that keep arrays
+	// (see lowering-local-literals.go).
+	localLiterals map[*ast.CompositeLit]bool
 	// copyValues is whether the struct values lowered are read after the
 	// expression that lowers them, as by a method value or a defer or go
 	// statement, so that they are copied even for a method or function that
@@ -14392,9 +14396,17 @@ func (o *LoweringOwner) lowerSliceCompositeLit(
 			o.tsSliceElemTypeFor(ctx, slice.Elem()) + ">", diagnostics
 	}
 
+	// A literal that only its function indexes keeps an array (see
+	// lowering-local-literals.go).
+	elemType := o.tsSliceElemTypeFor(ctx, slice.Elem())
+	if ctx.localLiterals[lit] {
+		return o.runtimeOwner.QualifiedHelper(RuntimeHelperArrayToSlice) +
+			"<" + elemType + ">([" + strings.Join(values, ", ") + "])", diagnostics
+	}
+
 	// Other fixed-size numeric elements are held in their typed arrays in the
 	// same way, whose stores also wrap or round each element as Go stores it.
-	return o.packedSliceExpr(slice.Elem(), o.tsSliceElemTypeFor(ctx, slice.Elem()), values), diagnostics
+	return o.packedSliceExpr(slice.Elem(), elemType, values), diagnostics
 }
 
 func (o *LoweringOwner) lowerMapCompositeLit(

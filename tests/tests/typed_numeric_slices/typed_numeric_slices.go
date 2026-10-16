@@ -46,7 +46,48 @@ func kind(v any) string {
 	return "other"
 }
 
+// localLiterals uses slice literals that only it indexes, which may be held
+// in plain arrays: their elements must still wrap and round as Go stores them.
+func localLiterals() {
+	big := int32(2147483647)
+	i32 := []int32{big, -big - 1, 7}
+	i32[0]++
+	i32[1]--
+	i32[2] *= 1 << 30
+	u8s := []int8{127, -128}
+	u8s[0] += 2
+	u16 := []uint16{65535, 3}
+	u16[0]++
+	u16[1] -= 4
+	println("local wrap:", i32[0], i32[1], i32[2], u8s[0], u16[0], u16[1])
+	f := []float32{0.1, 16777216}
+	f[0] *= 3
+	f[1]++
+	x := 0.1
+	f[0] = f[0] + float32(x)
+	println("local float32:", f[0] == float32(0.3)+float32(0.1), f[1] == 16777216, len(f), cap(f))
+	var t float32
+	for i := range 100 {
+		v := []float32{float32(i) / 3, 1, 2}
+		t += v[0] + v[2]
+	}
+	acc := []uint32{0, 0}
+	add := func(n uint32) { acc[0] += n; acc[1] = acc[0] * 3 }
+	add(0x80000000)
+	add(0x80000001)
+	println("local loop:", t, acc[0], acc[1])
+	sum := 0.0
+	for i, e := range []float64{0.5, 0.25} {
+		sum += float64(i) + e
+	}
+	w := []int16{1, 2}
+	w = []int16{32767}
+	w[0]++
+	println("local range:", sum, w[0], len(w))
+}
+
 func main() {
+	localLiterals()
 	// Integer elements wrap around, as Go stores them.
 	i32 := []int32{2147483647}
 	i32[0]++

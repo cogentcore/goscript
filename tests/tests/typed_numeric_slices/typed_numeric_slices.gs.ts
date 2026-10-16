@@ -76,23 +76,66 @@ export function kind(v: any): string {
 	return "other"
 }
 
+export async function localLiterals(): globalThis.Promise<void> {
+	let big = 2147483647
+	let i32 = $.arrayToSlice<number>([big, $.int(((-big - 1) | 0), 32), 7])
+	$.sliceElems(i32!)[$.sliceSlot(i32!, 0)] = (($.sliceElems(i32!)[$.sliceSlot(i32!, 0)] + 1) | 0)
+	$.sliceElems(i32!)[$.sliceSlot(i32!, 1)] = (($.sliceElems(i32!)[$.sliceSlot(i32!, 1)] - 1) | 0)
+	$.sliceElems(i32!)[$.sliceSlot(i32!, 2)] = globalThis.Math.imul($.sliceElems(i32!)[$.sliceSlot(i32!, 2)], 1073741824)
+	let u8s = $.arrayToSlice<number>([127, -128])
+	$.sliceElems(u8s!)[$.sliceSlot(u8s!, 0)] = $.int($.sliceElems(u8s!)[$.sliceSlot(u8s!, 0)] + (2), 8)
+	let u16 = $.arrayToSlice<number>([65535, 3])
+	$.sliceElems(u16!)[$.sliceSlot(u16!, 0)] = (($.sliceElems(u16!)[$.sliceSlot(u16!, 0)] + 1) & 0xffff)
+	$.sliceElems(u16!)[$.sliceSlot(u16!, 1)] = $.uint($.sliceElems(u16!)[$.sliceSlot(u16!, 1)] - (4), 16)
+	await $.println("local wrap:", $.arrayIndex(i32!, 0), $.arrayIndex(i32!, 1), $.arrayIndex(i32!, 2), $.arrayIndex(u8s!, 0), $.arrayIndex(u16!, 0), $.arrayIndex(u16!, 1))
+	let f = $.arrayToSlice<number>([0.10000000149011612, 1.6777216e+07])
+	$.sliceElems(f!)[$.sliceSlot(f!, 0)] = globalThis.Math.fround($.sliceElems(f!)[$.sliceSlot(f!, 0)] * (3))
+	$.sliceElems(f!)[$.sliceSlot(f!, 1)] = globalThis.Math.fround($.sliceElems(f!)[$.sliceSlot(f!, 1)] + 1)
+	let x = 0.1
+	$.sliceElems(f!)[$.sliceSlot(f!, 0)] = globalThis.Math.fround($.arrayIndex(f!, 0) + globalThis.Math.fround(x))
+	await $.println("local float32:", $.arrayIndex(f!, 0) == (0.4000000059604645), $.arrayIndex(f!, 1) == 1.6777216e+07, $.sliceLen(f), $.cap(f))
+	let t = 0
+	for (let i = 0; i < 100; i++) {
+		let v = $.arrayToSlice<number>([globalThis.Math.fround(globalThis.Math.fround(i) / 3), 1, 2])
+		t = globalThis.Math.fround(t + (globalThis.Math.fround($.arrayIndex(v!, 0) + $.arrayIndex(v!, 2))))
+	}
+	let acc = $.arrayToSlice<number>([0, 0])
+	let add = $.functionValue((n: number) => {
+		$.sliceElems(acc!)[$.sliceSlot(acc!, 0)] = $.uint($.sliceElems(acc!)[$.sliceSlot(acc!, 0)] + (n), 32)
+		$.sliceElems(acc!)[$.sliceSlot(acc!, 1)] = $.uint(globalThis.Math.imul($.arrayIndex(acc!, 0), 3) >>> 0, 32)
+	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("uint32")], results: [] } as $.FunctionTypeInfo))
+	add(0x80000000)
+	add(0x80000001)
+	await $.println("local loop:", t, $.arrayIndex(acc!, 0), $.arrayIndex(acc!, 1))
+	let __goscriptShadow0 = 0.0
+	for (let __goscriptRangeTarget1 = $.typedSliceOf(Float64Array, [0.5, 0.25]) as $.Slice<number>, __goscriptRangeWindow1 = $.sliceRange(__goscriptRangeTarget1), i = 0; i < __goscriptRangeWindow1.length; i++) {
+		let e = (__goscriptRangeWindow1.backing[__goscriptRangeWindow1.offset + i] as number)
+		__goscriptShadow0 += i + e
+	}
+	let w: $.Slice<number> = $.arrayToSlice<number>([1, 2])
+	w = $.typedSliceOf(Int16Array, [32767]) as $.Slice<number>
+	$.sliceElems(w!)[$.sliceSlot(w!, 0)] = (($.sliceElems(w!)[$.sliceSlot(w!, 0)] + 1) << 16 >> 16)
+	await $.println("local range:", __goscriptShadow0, $.arrayIndex(w!, 0), $.sliceLen(w))
+}
+
 export async function main(): globalThis.Promise<void> {
+	await localLiterals()
 	// Integer elements wrap around, as Go stores them.
 	let i32 = $.typedSliceOf(Int32Array, [2147483647]) as $.Slice<number>
-	$.sliceElems(i32!)[$.sliceSlot(i32!, 0)]++
+	$.sliceElems(i32!)[$.sliceSlot(i32!, 0)] = (($.sliceElems(i32!)[$.sliceSlot(i32!, 0)] + 1) | 0)
 	await $.println("int32 wrap:", $.arrayIndex(i32!, 0))
 	let u32 = $.makeSlice<number>(2, undefined, "uint32")
-	$.sliceElems(u32!)[$.sliceSlot(u32!, 0)]--
+	$.sliceElems(u32!)[$.sliceSlot(u32!, 0)] = (($.sliceElems(u32!)[$.sliceSlot(u32!, 0)] - 1) >>> 0)
 	$.sliceElems(u32!)[$.sliceSlot(u32!, 1)] = 2147483648
 	$.sliceElems(u32!)[$.sliceSlot(u32!, 1)] = globalThis.Math.imul($.sliceElems(u32!)[$.sliceSlot(u32!, 1)], 2) >>> 0
 	await $.println("uint32 wrap:", $.arrayIndex(u32!, 0), $.arrayIndex(u32!, 1))
 	let i16 = $.typedSliceOf(Int16Array, [32767, -32768]) as $.Slice<number>
-	$.sliceElems(i16!)[$.sliceSlot(i16!, 0)]++
-	$.sliceElems(i16!)[$.sliceSlot(i16!, 1)]--
+	$.sliceElems(i16!)[$.sliceSlot(i16!, 0)] = (($.sliceElems(i16!)[$.sliceSlot(i16!, 0)] + 1) << 16 >> 16)
+	$.sliceElems(i16!)[$.sliceSlot(i16!, 1)] = (($.sliceElems(i16!)[$.sliceSlot(i16!, 1)] - 1) << 16 >> 16)
 	let u16 = $.typedSliceOf(Uint16Array, [65535]) as $.Slice<number>
 	$.sliceElems(u16!)[$.sliceSlot(u16!, 0)] = $.uint($.sliceElems(u16!)[$.sliceSlot(u16!, 0)] + (2), 16)
 	let i8 = $.typedSliceOf(Int8Array, [127]) as $.Slice<number>
-	$.sliceElems(i8!)[$.sliceSlot(i8!, 0)]++
+	$.sliceElems(i8!)[$.sliceSlot(i8!, 0)] = (($.sliceElems(i8!)[$.sliceSlot(i8!, 0)] + 1) << 24 >> 24)
 	await $.println("small wrap:", $.arrayIndex(i16!, 0), $.arrayIndex(i16!, 1), $.arrayIndex(u16!, 0), $.arrayIndex(i8!, 0))
 
 	// float32 elements round to float32, float64 elements do not.
@@ -144,8 +187,8 @@ export async function main(): globalThis.Promise<void> {
 	let clipped: $.Slice<number> = $.goSlice(w, 1, 3, 3)
 	clipped = $.appendOne(clipped, $.uint(99, 32), $.typedSliceHints.uint32)
 	await $.println("clipped:", $.arrayIndex(w!, 3), $.arrayIndex(clipped!, 2), $.cap(clipped) >= 3)
-	for (let __goscriptRangeTarget1 = $.goSlice(w, 4, undefined), __goscriptRangeWindow1 = $.sliceRange(__goscriptRangeTarget1), i = 0; i < __goscriptRangeWindow1.length; i++) {
-		let v = $.uint((__goscriptRangeWindow1.backing[__goscriptRangeWindow1.offset + i] as number), 32)
+	for (let __goscriptRangeTarget2 = $.goSlice(w, 4, undefined), __goscriptRangeWindow2 = $.sliceRange(__goscriptRangeTarget2), i = 0; i < __goscriptRangeWindow2.length; i++) {
+		let v = $.uint((__goscriptRangeWindow2.backing[__goscriptRangeWindow2.offset + i] as number), 32)
 		await $.println("range:", i, v)
 	}
 

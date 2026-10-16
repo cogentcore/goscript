@@ -23,7 +23,7 @@ export function flags_has(fl: flags, f: bigint): boolean {
 
 export async function main(): globalThis.Promise<void> {
 	// Masks of int64 for counts of each kind, up to the sign bit and past it.
-	let counts: $.Slice<number> = $.typedSliceOf(Uint32Array, [0, 1, 31, 32, 53, 62, 63, 64, 65, 200]) as $.Slice<number>
+	let counts: $.Slice<number> = $.arrayToSlice<number>([0, 1, 31, 32, 53, 62, 63, 64, 65, 200])
 	for (let __goscriptRangeTarget0 = counts, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
 		let k = $.uint((__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as number), 32)
 		let m: bigint = $.int64Bit(k)
