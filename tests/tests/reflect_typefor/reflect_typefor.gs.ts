@@ -173,7 +173,7 @@ export async function describePointer(__typeArgs: $.GenericTypeArgs | undefined,
 
 export async function genericComposites(): globalThis.Promise<void> {
 	await describe(__goscriptStatic15(), $.arrayToSlice<MyStruct>([new MyStruct(true, "a", 1)]))
-	await describe(__goscriptStatic16(), $.arrayToSlice<number>([1, 2, 3]))
+	await describe(__goscriptStatic16(), $.typedSliceOf(Float32Array, [1, 2, 3]) as $.Slice<number>)
 	await describe(__goscriptStatic17(), $.arrayToSlice<number>([]))
 	await describeMap(__goscriptStatic18(), $.makeMap<string, MyStruct>([]))
 	await describePointer(__goscriptStatic15(), new MyStruct())

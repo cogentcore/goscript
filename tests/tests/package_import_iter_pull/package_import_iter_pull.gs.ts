@@ -9,14 +9,14 @@ export class pullIterator {
 
 	public declare stop: (() => void) | null
 
-	constructor(init?: Partial<{next?: (() => [number, boolean] | globalThis.Promise<[number, boolean]>) | null, stop?: (() => void) | null}>, __goscriptValue?: boolean) {
-		this.next = init?.next ?? (null! as (() => [number, boolean] | globalThis.Promise<[number, boolean]>) | null)
-		this.stop = init?.stop ?? (null! as (() => void) | null)
+	constructor(__goscriptValue?: boolean, next$?: (() => [number, boolean] | globalThis.Promise<[number, boolean]>) | null, stop$?: (() => void) | null) {
+		this.next = next$ ?? (null! as (() => [number, boolean] | globalThis.Promise<[number, boolean]>) | null)
+		this.stop = stop$ ?? (null! as (() => void) | null)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): pullIterator {
-		return new pullIterator(this, true)
+		return new pullIterator(true, this.next, this.stop)
 	}
 
 	public __goscriptAssign(source: pullIterator): this {
@@ -37,13 +37,13 @@ export class pullIterator {
 export class lexer {
 	public declare stack: $.Slice<pullIterator>
 
-	constructor(init?: Partial<{stack?: $.Slice<pullIterator>}>, __goscriptValue?: boolean) {
-		this.stack = init?.stack ?? (null! as $.Slice<pullIterator>)
+	constructor(__goscriptValue?: boolean, stack$?: $.Slice<pullIterator>) {
+		this.stack = stack$ ?? (null! as $.Slice<pullIterator>)
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): lexer {
-		return new lexer(this, true)
+		return new lexer(true, this.stack)
 	}
 
 	public __goscriptAssign(source: lexer): this {
@@ -79,7 +79,7 @@ export class lexer {
 		let __goscriptTuple0: any = iter.Pull(__goscriptStatic0(), seq)
 		let next: (() => [number, boolean] | globalThis.Promise<[number, boolean]>) | null = (__goscriptTuple0[0] as (() => [number, boolean] | globalThis.Promise<[number, boolean]>) | null)
 		let stop: (() => void) | null = __goscriptTuple0[1];
-		;(l$ as lexer).stack = $.appendOne((l$ as lexer).stack, new pullIterator({next: next, stop: stop}, true))
+		;(l$ as lexer).stack = $.appendOne((l$ as lexer).stack, new pullIterator(true, next, stop))
 	}
 
 	public async stopAll(): globalThis.Promise<void> {

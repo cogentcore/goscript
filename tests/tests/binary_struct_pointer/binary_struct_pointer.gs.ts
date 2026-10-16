@@ -45,16 +45,16 @@ export class vec4 {
 
 	public declare W: number
 
-	constructor(init?: Partial<{X?: number, Y?: number, Z?: number, W?: number}>, __goscriptValue?: boolean) {
-		this.X = init?.X ?? (0 as number)
-		this.Y = init?.Y ?? (0 as number)
-		this.Z = init?.Z ?? (0 as number)
-		this.W = init?.W ?? (0 as number)
+	constructor(__goscriptValue?: boolean, X$?: number, Y$?: number, Z$?: number, W$?: number) {
+		this.X = X$ ?? 0
+		this.Y = Y$ ?? 0
+		this.Z = Z$ ?? 0
+		this.W = W$ ?? 0
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): vec4 {
-		return new vec4(this, true)
+		return new vec4(true, this.X, this.Y, this.Z, this.W)
 	}
 
 	public __goscriptAssign(source: vec4): this {
@@ -85,17 +85,17 @@ export class item {
 
 	public declare _blank4: number[]
 
-	constructor(init?: Partial<{Matrix?: number[], Colors?: vec4[], Index?: number, Flags?: number, _blank4?: number[]}>, __goscriptValue?: boolean) {
-		this.Matrix = init?.Matrix !== undefined ? $.cloneArrayValue(init.Matrix, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 4)) : $.arrayValue(globalThis.Array.from({ length: 4 }, () => 0), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 4))
-		this.Colors = init?.Colors !== undefined ? $.cloneArrayValue(init.Colors, /* @__PURE__ */ $.arrayType("main.vec4", 2)) : $.arrayValue(globalThis.Array.from({ length: 2 }, () => new vec4(undefined, true)), /* @__PURE__ */ $.arrayType("main.vec4", 2))
-		this.Index = init?.Index ?? (0 as number)
-		this.Flags = init?.Flags ?? (0 as number)
-		this._blank4 = init?._blank4 !== undefined ? $.cloneArrayValue(init._blank4, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 2)) : $.arrayValue(globalThis.Array.from({ length: 2 }, () => 0), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 2))
+	constructor(__goscriptValue?: boolean, Matrix$?: number[], Colors$?: vec4[], Index$?: number, Flags$?: number, _blank4$?: number[]) {
+		this.Matrix = Matrix$ ?? $.arrayValue(globalThis.Array.from({ length: 4 }, () => 0), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 4))
+		this.Colors = Colors$ ?? $.arrayValue(globalThis.Array.from({ length: 2 }, () => new vec4(true)), /* @__PURE__ */ $.arrayType("main.vec4", 2))
+		this.Index = Index$ ?? 0
+		this.Flags = Flags$ ?? 0
+		this._blank4 = _blank4$ ?? $.arrayValue(globalThis.Array.from({ length: 2 }, () => 0), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 2))
 		;(this as any)[$.structValueMarker] = __goscriptValue === true
 	}
 
 	public clone(): item {
-		return new item(this, true)
+		return new item(true, $.cloneArrayValue(this.Matrix, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 4)), $.cloneArrayValue(this.Colors, /* @__PURE__ */ $.arrayType("main.vec4", 2)), this.Index, this.Flags, $.cloneArrayValue(this._blank4, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 2)))
 	}
 
 	public __goscriptAssign(source: item): this {
@@ -185,7 +185,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// A slice of structs is written and read as its elements, a blank field
 	// as zeros.
-	let objs = $.makeSlice<item>(3, undefined, undefined, () => new item(undefined, true))
+	let objs = $.makeSlice<item>(3, undefined, undefined, () => new item(true))
 	for (let __goscriptRangeTarget0 = objs, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), i = 0; i < __goscriptRangeWindow0.length; i++) {
 		;((__goscriptRangeWindow0.backing as any[])[__goscriptRangeWindow0.offset + i] as item).Matrix[3] = globalThis.Math.fround(globalThis.Math.fround(i) + 0.5)
 		$.arrayIndex(((__goscriptRangeWindow0.backing as any[])[__goscriptRangeWindow0.offset + i] as item).Colors, 1).Y = globalThis.Math.fround(-i);
@@ -196,7 +196,7 @@ export async function main(): globalThis.Promise<void> {
 	$.sliceElems(ob!)[$.sliceSlot(ob!, $.sliceLen(ob) - 1)] = 9
 	let [n, err] = binary.Encode(ob, $.interfaceValue<binary.ByteOrder | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.LittleEndian))), "binary.littleEndian", "binary.littleEndian")!, $.interfaceValue($.goSlice(objs, 1, undefined), "[]main.item", /* @__PURE__ */ $.sliceType("main.item")))
 	await $.println("objects:", binary.Size($.interfaceValue(objs, "[]main.item", /* @__PURE__ */ $.sliceType("main.item"))), n, err == null, $.arrayIndex(ob!, 12), $.arrayIndex(ob!, 13), $.arrayIndex(ob!, 14), $.arrayIndex(ob!, 15), $.arrayIndex(ob!, 48), $.arrayIndex(ob!, 52), $.arrayIndex(ob!, 64), $.arrayIndex(ob!, $.sliceLen(ob) - 1))
-	let back = $.makeSlice<item>(2, undefined, undefined, () => new item(undefined, true))
+	let back = $.makeSlice<item>(2, undefined, undefined, () => new item(true))
 	let __goscriptTuple0: any = binary.Decode(ob, $.interfaceValue<binary.ByteOrder | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.LittleEndian))), "binary.littleEndian", "binary.littleEndian")!, $.interfaceValue(back, "[]main.item", /* @__PURE__ */ $.sliceType("main.item")))
 	n = __goscriptTuple0[0]
 	err = __goscriptTuple0[1]
@@ -205,11 +205,11 @@ export async function main(): globalThis.Promise<void> {
 	// Big-endian order and arrays of structs work the same way.
 	let __goscriptTuple1: any = binary.Append(null, $.interfaceValue<binary.ByteOrder | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.BigEndian))), "binary.bigEndian", "binary.bigEndian")!, $.interfaceValue($.goSlice(objs, 2, undefined), "[]main.item", /* @__PURE__ */ $.sliceType("main.item")))
 	let be: $.Slice<number> = __goscriptTuple1[0]
-	let arr: vec4[] = $.arrayValue(globalThis.Array.from({ length: 2 }, () => new vec4(undefined, true)), /* @__PURE__ */ $.arrayType("main.vec4", 2))
+	let arr: vec4[] = $.arrayValue(globalThis.Array.from({ length: 2 }, () => new vec4(true)), /* @__PURE__ */ $.arrayType("main.vec4", 2))
 	$.arrayIndex(arr, 1).W = 3
 	let __goscriptTuple2: any = binary.Append(null, $.interfaceValue<binary.ByteOrder | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.LittleEndian))), "binary.littleEndian", "binary.littleEndian")!, arr)
 	let ab: $.Slice<number> = __goscriptTuple2[0]
-	let arr2: $.VarRef<vec4[]> = $.varRef($.arrayValue(globalThis.Array.from({ length: 2 }, () => new vec4(undefined, true)), /* @__PURE__ */ $.arrayType("main.vec4", 2)))
+	let arr2: $.VarRef<vec4[]> = $.varRef($.arrayValue(globalThis.Array.from({ length: 2 }, () => new vec4(true)), /* @__PURE__ */ $.arrayType("main.vec4", 2)))
 	let __goscriptTuple3: any = binary.Decode(ab, $.interfaceValue<binary.ByteOrder | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.LittleEndian))), "binary.littleEndian", "binary.littleEndian")!, $.interfaceValue(arr2, "*[2]main.vec4", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.arrayType("main.vec4", 2))))
 	err = __goscriptTuple3[1]
 	await $.println("big-endian:", $.sliceLen(be), $.arrayIndex(be!, 12), $.arrayIndex(be!, 13), "array:", $.sliceLen(ab), err == null, $.arrayIndex(arr2.value, 1).W)
