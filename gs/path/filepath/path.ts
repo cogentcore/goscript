@@ -1,12 +1,11 @@
 // Package filepath implements utility routines for manipulating filename paths
 // in a way compatible with the target operating system-defined file paths.
 import * as $ from '@goscript/builtin/index.js'
-import { getCurrentWorkingDirectory } from '@goscript/builtin/hostio.js'
 import type { DirEntry, FileInfo } from '@goscript/io/fs/fs.js'
 import { ModeSymlink, ValidPath } from '@goscript/io/fs/fs.js'
 import { FileInfoToDirEntry } from '@goscript/io/fs/readdir.js'
 import { SkipAll, SkipDir } from '@goscript/io/fs/walk.js'
-import { Lstat, ReadDir, Readlink } from '@goscript/os/index.js'
+import { Getwd, Lstat, ReadDir, Readlink } from '@goscript/os/index.js'
 
 type JoinElement = string | $.Slice<string>
 
@@ -265,15 +264,15 @@ export function HasPrefix(p: string, prefix: string): boolean {
 
 // Abs returns an absolute representation of path. If the path is not absolute
 // it is joined with the current working directory to turn it into an absolute
-// path, then Cleaned. This mirrors Go's filepath.Abs, which calls os.Getwd for
-// relative inputs rather than fabricating a root.
+// path, then Cleaned. As Go's filepath.Abs, it takes the working directory
+// from os.Getwd, which is the tracked directory in a browser.
 export function Abs(path: string): [string, $.GoError] {
   if (IsAbs(path)) {
     return [Clean(path), null]
   }
-  const wd = getCurrentWorkingDirectory()
-  if (wd === null) {
-    return ['', $.newError('filepath: cannot determine working directory')]
+  const [wd, err] = Getwd()
+  if (err !== null) {
+    return ['', err]
   }
   return [Join(wd, path), null]
 }
