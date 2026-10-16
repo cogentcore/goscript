@@ -98,7 +98,7 @@ export class Container {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let iface: Interface | null = $.interfaceValue<Interface | null>(new ConcreteA(true), "main.ConcreteA", "main.ConcreteA")
+	let iface: Interface | null = $.structInterfaceValue<Interface | null>(new ConcreteA(true), "main.ConcreteA", "main.ConcreteA")
 
 	let c = new Container()
 	let c$: Container = c == null ? $.pointerTarget<Container>(c) : (c as any).__isVarRef === true ? (c as any).value : (c as any).__goValue === undefined ? (c as any) : $.pointerTarget<Container>(c)

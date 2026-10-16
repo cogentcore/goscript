@@ -64,7 +64,7 @@ export class chanFetcher {
 }
 
 export async function main(): globalThis.Promise<void> {
-	await $.println("walk:", visit.Walk($.interfaceValue<visit.Visitor | null>(new doubler(true), "main.doubler", "main.doubler"), $.arrayToSlice<number>([1, 2, 3])))
+	await $.println("walk:", visit.Walk($.structInterfaceValue<visit.Visitor | null>(new doubler(true), "main.doubler", "main.doubler"), $.arrayToSlice<number>([1, 2, 3])))
 	await $.println("fetch:", await visit.Fetch($.interfaceValue<visit.Fetcher | null>(new chanFetcher(false, $.makeChannel<number>(1, 0, "both")), "*main.chanFetcher", /* @__PURE__ */ $.pointerType("main.chanFetcher"))))
 }
 

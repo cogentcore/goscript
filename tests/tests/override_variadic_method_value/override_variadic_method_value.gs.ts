@@ -55,7 +55,7 @@ export async function main(): globalThis.Promise<void> {
 	const __goscriptDeferCallee3 = $.functionValue(((__receiver) => () => __receiver.Release())($.markAsStructValue($.cloneStructValue(hit))), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "syscall/js.Func.Release-fm")
 	__defer.defer(() => { __goscriptDeferCallee3() })
 	let obj = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(js.Global())).Get("Object"))).New()))
-	$.markAsStructValue($.cloneStructValue(obj)).Set("hit", $.interfaceValue($.markAsStructValue($.cloneStructValue(hit)), "js.Func", __goscriptStatic0()))
+	$.markAsStructValue($.cloneStructValue(obj)).Set("hit", $.structInterfaceValue($.markAsStructValue($.cloneStructValue(hit)), "js.Func", "js.Func"))
 
 	// A method value takes its variadic arguments as a slice.
 	let call: ((m: string, args: $.Slice<any>) => js.Value | globalThis.Promise<js.Value>) | null = $.functionValue(((__receiver) => (m: string, args: $.Slice<any>) => __receiver.Call(m, ...(args ?? [])))($.markAsStructValue($.cloneStructValue(obj))), ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.sliceType({ kind: $.TypeKind.Interface, methods: [] })], results: ["js.Value"], isVariadic: true } as $.FunctionTypeInfo), "syscall/js.Value.Call-fm")
@@ -65,11 +65,6 @@ export async function main(): globalThis.Promise<void> {
 
 	let r = new recorder(false, $.markAsStructValue($.cloneStructValue(obj)))
 	void (r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? ((r as any) as recorder).flush() : recorder.prototype.flush.call(r))
-}
-
-var __goscriptStatic0$value: any
-function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ($.overrideTypeMethods("js.Func", "js.Func", () => [$.methodSignature("Bool", [], [/* @__PURE__ */ $.basicType("bool")]), $.methodSignature("Call", [["m", /* @__PURE__ */ $.basicType("string")], ["args", /* @__PURE__ */ $.sliceType({ kind: $.TypeKind.Interface, methods: [] })]], ["js.Value"], false, true), $.methodSignature("Delete", [["p", /* @__PURE__ */ $.basicType("string")]]), $.methodSignature("Equal", [["w", "js.Value"]], [/* @__PURE__ */ $.basicType("bool")]), $.methodSignature("Float", [], [/* @__PURE__ */ $.basicType("float64")]), $.methodSignature("Get", [["p", /* @__PURE__ */ $.basicType("string")]], ["js.Value"]), $.methodSignature("Index", [["i", /* @__PURE__ */ $.basicType("int")]], ["js.Value"]), $.methodSignature("InstanceOf", [["t", "js.Value"]], [/* @__PURE__ */ $.basicType("bool")]), $.methodSignature("Int", [], [/* @__PURE__ */ $.basicType("int")]), $.methodSignature("Invoke", [["args", /* @__PURE__ */ $.sliceType({ kind: $.TypeKind.Interface, methods: [] })]], ["js.Value"], false, true), $.methodSignature("IsNaN", [], [/* @__PURE__ */ $.basicType("bool")]), $.methodSignature("IsNull", [], [/* @__PURE__ */ $.basicType("bool")]), $.methodSignature("IsUndefined", [], [/* @__PURE__ */ $.basicType("bool")]), $.methodSignature("Length", [], [/* @__PURE__ */ $.basicType("int")]), $.methodSignature("New", [["args", /* @__PURE__ */ $.sliceType({ kind: $.TypeKind.Interface, methods: [] })]], ["js.Value"], false, true), $.methodSignature("Release"), $.methodSignature("Set", [["p", /* @__PURE__ */ $.basicType("string")], ["x", { kind: $.TypeKind.Interface, methods: [] }]]), $.methodSignature("SetIndex", [["i", /* @__PURE__ */ $.basicType("int")], ["x", { kind: $.TypeKind.Interface, methods: [] }]]), $.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")]), $.methodSignature("Truthy", [], [/* @__PURE__ */ $.basicType("bool")]), $.methodSignature("Type", [], [/* @__PURE__ */ $.basicType("int", "js.Type")])]))
 }
 
 if ($.isMainScript(import.meta)) {

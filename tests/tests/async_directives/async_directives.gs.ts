@@ -224,7 +224,7 @@ export function countAll(f: ((_p0: number) => number | globalThis.Promise<number
 }
 
 export async function main(): globalThis.Promise<void> {
-	await $.println("log:", await logAll($.interfaceValue<Logger | null>(new prefixLogger(true, "> "), "main.prefixLogger", "main.prefixLogger"), $.arrayToSlice<string>(["a", "b"])))
+	await $.println("log:", await logAll($.structInterfaceValue<Logger | null>(new prefixLogger(true, "> "), "main.prefixLogger", "main.prefixLogger"), $.arrayToSlice<string>(["a", "b"])))
 
 	let sink = new addSink()
 	await $.println("fill:", fill($.interfaceValue<Sink | null>(sink, "*main.addSink", /* @__PURE__ */ $.pointerType("main.addSink")), 4))

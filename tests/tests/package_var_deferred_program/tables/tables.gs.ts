@@ -250,7 +250,7 @@ export function __goscript_set_WithC(__goscriptValue: $.Slice<Codec | $.VarRef<C
 	WithC = __goscriptValue
 }
 
-export let WithCount: $.Slice<any> = $.arrayToSlice<any>([$.interfaceValue(__goscript_get_CodecA(), "*tables.Codec", /* @__PURE__ */ $.pointerType("tables.Codec")), $.interfaceValue((Count.value).clone(), "tables.Counter", "tables.Counter")])
+export let WithCount: $.Slice<any> = $.arrayToSlice<any>([$.interfaceValue(__goscript_get_CodecA(), "*tables.Codec", /* @__PURE__ */ $.pointerType("tables.Codec")), $.structInterfaceValue((Count.value).clone(), "tables.Counter", "tables.Counter")])
 
 export function __goscript_set_WithCount(__goscriptValue: $.Slice<any>): void {
 	WithCount = __goscriptValue

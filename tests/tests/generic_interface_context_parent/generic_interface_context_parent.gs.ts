@@ -123,7 +123,7 @@ export class genericValue {
 export async function main(): globalThis.Promise<void> {
 	let resolver: Resolver | null = $.namedValueInterfaceValue<Resolver | null>(new genericResolver(), "*main.genericResolver", __goscriptStatic1(), __goscriptStatic2(), __goscriptStatic3())
 	{
-		let err = (__goscriptAwait = (resolver !== null && (resolver as any).__isVarRef !== true && ((resolver as any).__goValue === undefined || (resolver as any).__goType?.charCodeAt(0) !== 42) ? (resolver as Exclude<Resolver, null>) : $.pointerValue<Exclude<Resolver, null>>(resolver)).Resolve(context.Background(), $.interfaceValue<Handler | null>(new handler(true), "main.handler", "main.handler")), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+		let err = (__goscriptAwait = (resolver !== null && (resolver as any).__isVarRef !== true && ((resolver as any).__goValue === undefined || (resolver as any).__goType?.charCodeAt(0) !== 42) ? (resolver as Exclude<Resolver, null>) : $.pointerValue<Exclude<Resolver, null>>(resolver)).Resolve(context.Background(), $.structInterfaceValue<Handler | null>(new handler(true), "main.handler", "main.handler")), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 		if (err != null) {
 			await $.println("resolve failed")
 			return

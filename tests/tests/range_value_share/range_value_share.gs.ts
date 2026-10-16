@@ -157,7 +157,7 @@ export async function main(): globalThis.Promise<void> {
 	let held: $.Slice<any> = null! as $.Slice<any>
 	for (let __goscriptRangeTarget9 = boxes, __goscriptRangeWindow9 = $.sliceRange(__goscriptRangeTarget9), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow9.length; __rangeIndex++) {
 		let b = ((__goscriptRangeWindow9.backing[__goscriptRangeWindow9.offset + __rangeIndex] as box)).clone()
-		let v: any = $.interfaceValue((b).clone(), "main.box", "main.box")
+		let v: any = $.structInterfaceValue((b).clone(), "main.box", "main.box")
 		held = $.appendOne(held, v, $.appendZeros.nil)
 	}
 	$.arrayIndex(boxes!, 0).Name = "z"

@@ -235,12 +235,12 @@ export class Win {
 
 export async function main(): globalThis.Promise<void> {
 	let value = $.varRef(new Record(true, 3, "hello", new Inner(true, true)))
-	await $.println((fmt.Sprintf("%v", $.interfaceValue((value.value).clone(), "main.Record", "main.Record")) as string))
-	await $.println((fmt.Sprintf("%+v", $.interfaceValue((value.value).clone(), "main.Record", "main.Record")) as string))
+	await $.println((fmt.Sprintf("%v", $.structInterfaceValue((value.value).clone(), "main.Record", "main.Record")) as string))
+	await $.println((fmt.Sprintf("%+v", $.structInterfaceValue((value.value).clone(), "main.Record", "main.Record")) as string))
 	await $.println((fmt.Sprintf("%v", $.interfaceValue(value, "*main.Record", /* @__PURE__ */ $.pointerType("main.Record"))) as string))
 	await $.println((fmt.Sprintf("%+v", $.interfaceValue(value, "*main.Record", /* @__PURE__ */ $.pointerType("main.Record"))) as string))
 	await $.println((fmt.Sprint($.interfaceValue(value, "*main.Record", /* @__PURE__ */ $.pointerType("main.Record"))) as string))
-	await $.println((fmt.Sprintf("%#v", $.interfaceValue((value.value).clone(), "main.Record", "main.Record")) as string))
+	await $.println((fmt.Sprintf("%#v", $.structInterfaceValue((value.value).clone(), "main.Record", "main.Record")) as string))
 	await $.println((fmt.Sprintf("%#v", $.interfaceValue(value, "*main.Record", /* @__PURE__ */ $.pointerType("main.Record"))) as string))
 
 	let anonymous = $.varRef($.anonymousStructValue({Count: 4}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("Count", /* @__PURE__ */ $.basicType("int"), [0], 0, true)] }))

@@ -121,7 +121,7 @@ export class outer {
 
 export async function main(): globalThis.Promise<void> {
 	// Interface fields keep their values through an assignment through a pointer.
-	let h = new holder(true, $.interfaceValue(new point(true, 1, 2), "main.point", "main.point"), "h")
+	let h = new holder(true, $.structInterfaceValue(new point(true, 1, 2), "main.point", "main.point"), "h")
 	let g: $.VarRef<holder> = $.varRef(new holder(true))
 	let pg = g
 	let pg$: holder = pg == null ? $.pointerTarget<holder>(pg) : (pg as any).__isVarRef === true ? (pg as any).value : (pg as any).__goValue === undefined ? (pg as any) : $.pointerTarget<holder>(pg);

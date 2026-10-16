@@ -147,7 +147,7 @@ export class Node {
 
 export async function main(): globalThis.Promise<void> {
 	let n = new Node(true, new Base(true, "a", $.arrayToSlice<string>(["x"]), 3, "base"), new Extra(false, "n"), new inner(true, 7), undefined, "outer", 2, true)
-	let __goscriptTuple0: any = (json.Marshal($.interfaceValue(n, "main.Node", "main.Node")) as [$.Slice<number>, $.GoError])
+	let __goscriptTuple0: any = (json.Marshal($.structInterfaceValue(n, "main.Node", "main.Node")) as [$.Slice<number>, $.GoError])
 	let b: $.Slice<number> = __goscriptTuple0[0]
 	let err = __goscriptTuple0[1]
 	fmt.Println($.bytesToString(b), (err as any))
@@ -158,7 +158,7 @@ export async function main(): globalThis.Promise<void> {
 	fmt.Println((err as any), m.value.Base.Name, $.interfaceValue(m.value.Base.Kids, "[]string", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("string"))), $.pointerValue<Extra>(m.value.Extra).Note, $.basicInterfaceValue(m.value.inner.Deep, "int"), m.value.Shadowed, $.stringEqual(m.value.Base.Shadowed, ""), $.basicInterfaceValue(m.value.Size, "int"), m.value.Tagged.Name)
 
 	let nilExtra: Node = new Node(true)
-	let __goscriptTuple1: any = (json.Marshal($.interfaceValue(nilExtra, "main.Node", "main.Node")) as [$.Slice<number>, $.GoError])
+	let __goscriptTuple1: any = (json.Marshal($.structInterfaceValue(nilExtra, "main.Node", "main.Node")) as [$.Slice<number>, $.GoError])
 	b = __goscriptTuple1[0]
 	fmt.Println($.bytesToString(b))
 }

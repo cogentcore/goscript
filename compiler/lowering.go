@@ -15109,6 +15109,11 @@ func (o *LoweringOwner) lowerValueForTargetTypes(
 		if wrapper := o.lowerNamedValueInterfaceWrapper(ctx, targetType, sourceType, value); wrapper != "" {
 			return wrapper
 		}
+		// A named struct value is boxed by structInterfaceValue, which may
+		// copy it into a box of its class.
+		if namedStructType(sourceType) != nil && !typeContainsTypeParam(sourceType) {
+			return o.lowerInterfaceValueCall(ctx, RuntimeHelperStructInterfaceValue, targetType, sourceType, value, o.overrideTypeInfo(ctx, sourceType, o.runtimeTypeInfoExpr(sourceType)))
+		}
 		return o.lowerInterfaceValueExpr(ctx, targetType, sourceType, value)
 	}
 	if wrapper := o.lowerNamedValueInterfaceWrapper(ctx, targetType, sourceType, value); wrapper != "" {
@@ -15213,18 +15218,28 @@ func (o *LoweringOwner) lowerInterfaceValueExpr(
 	// Type parameters in scope, such as E in []E, resolve from the runtime
 	// type arguments, so that reflection sees the instantiated type rather
 	// than an empty interface, and the value's dynamic type is named by it.
-	helper := o.runtimeOwner.QualifiedHelper(RuntimeHelperInterfaceValue)
-	typeInfo := o.overrideTypeInfo(ctx, sourceType, o.runtimeTypeInfoExpr(sourceType))
 	if typeContainsTypeParam(sourceType) {
-		helper = o.runtimeOwner.QualifiedHelper(RuntimeHelperGenericInterfaceValue)
-		typeInfo = o.runtimeTypeAssertInfoExpr(ctx, sourceType)
+		return o.lowerInterfaceValueCall(ctx, RuntimeHelperGenericInterfaceValue, targetType, sourceType, value, o.runtimeTypeAssertInfoExpr(ctx, sourceType))
 	}
+	return o.lowerInterfaceValueCall(ctx, RuntimeHelperInterfaceValue, targetType, sourceType, value, o.overrideTypeInfo(ctx, sourceType, o.runtimeTypeInfoExpr(sourceType)))
+}
 
+// lowerInterfaceValueCall calls helper, an interfaceValue helper, to convert
+// value to an interface with the type of sourceType, described by typeInfo.
+func (o *LoweringOwner) lowerInterfaceValueCall(
+	ctx lowerFileContext,
+	helper RuntimeHelper,
+	targetType types.Type,
+	sourceType types.Type,
+	value string,
+	typeInfo string,
+) string {
 	// The helper names the target type when it is narrower than any.
+	call := o.runtimeOwner.QualifiedHelper(helper)
 	if target := o.tsTypeFor(ctx, targetType); target != "any" {
-		helper += "<" + target + ">"
+		call += "<" + target + ">"
 	}
-	return helper + "(" + value + ", " +
+	return call + "(" + value + ", " +
 		strconv.Quote(goRuntimeTypeString(sourceType)) + ", " +
 		typeInfo + ")"
 }

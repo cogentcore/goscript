@@ -188,15 +188,15 @@ export function basics(n: number, s: string, f: number): string {
 }
 
 export function temps(c: celsius, p: plain): string {
-	return (fmt.Sprint($.namedValueInterfaceValue<any>(c, "main.celsius", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()), " ", $.interfaceValue((p).clone(), "main.plain", "main.plain")) as string)
+	return (fmt.Sprint($.namedValueInterfaceValue<any>(c, "main.celsius", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()), " ", $.structInterfaceValue((p).clone(), "main.plain", "main.plain")) as string)
 }
 
 export async function slow(s: slowName): globalThis.Promise<string> {
-	return fmt.Sprintf("<%v>", $.interfaceValue((s).clone(), "main.slowName", "main.slowName"))
+	return fmt.Sprintf("<%v>", $.structInterfaceValue((s).clone(), "main.slowName", "main.slowName"))
 }
 
 export async function nested(r: reading): globalThis.Promise<string> {
-	return fmt.Sprintf("%v", $.interfaceValue((r).clone(), "main.reading", "main.reading"))
+	return fmt.Sprintf("%v", $.structInterfaceValue((r).clone(), "main.reading", "main.reading"))
 }
 
 export async function anything(v: any): globalThis.Promise<string> {
@@ -209,8 +209,8 @@ export async function wrap(err: $.GoError): globalThis.Promise<string> {
 
 export function build(c: celsius): string {
 	let b = $.varRef($.markAsStructValue(new strings.Builder()))
-	fmt.Fprintf($.pointerValueOrNil($.interfaceValue<io.Writer | null>(b, "*strings.Builder", __goscriptStatic3()))!, "[%v]", $.namedValueInterfaceValue<any>(c, "main.celsius", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()))
-	fmt.Fprintln($.pointerValueOrNil($.interfaceValue<io.Writer | null>(b, "*strings.Builder", __goscriptStatic3()))!, "done")
+	fmt.Fprintf($.pointerValueOrNil($.interfaceValue<io.Writer | null>(b, "*strings.Builder", /* @__PURE__ */ $.pointerType("strings.Builder")))!, "[%v]", $.namedValueInterfaceValue<any>(c, "main.celsius", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()))
+	fmt.Fprintln($.pointerValueOrNil($.interfaceValue<io.Writer | null>(b, "*strings.Builder", /* @__PURE__ */ $.pointerType("strings.Builder")))!, "done")
 	return b.value.String()
 }
 
@@ -223,12 +223,12 @@ export async function main(): globalThis.Promise<void> {
 	await $.println(temps(21.5, new plain(true, new tag(true, "t"), 2, $.arrayToSlice<string>(["x"]))))
 	await $.println(await slow(new slowName(true, $.makeChannel<string>(1, "", "both"))))
 	await $.println(await nested(new reading(true, new slowName(true, $.makeChannel<string>(1, "", "both")), 4)))
-	await $.println(await anything(__goscriptStatic4()))
-	await $.println(await anything($.interfaceValue(new slowName(true, $.makeChannel<string>(1, "", "both")), "main.slowName", "main.slowName")))
+	await $.println(await anything(__goscriptStatic3()))
+	await $.println(await anything($.structInterfaceValue(new slowName(true, $.makeChannel<string>(1, "", "both")), "main.slowName", "main.slowName")))
 	await $.println(await wrap($.interfaceValue<$.GoError>(new codeError(false, 7), "*main.codeError", /* @__PURE__ */ $.pointerType("main.codeError"))))
 	await $.print(build(5))
 	let b = $.varRef($.markAsStructValue(new strings.Builder()))
-	await write($.interfaceValue<io.Writer | null>(b, "*strings.Builder", __goscriptStatic3()), 6)
+	await write($.interfaceValue<io.Writer | null>(b, "*strings.Builder", /* @__PURE__ */ $.pointerType("strings.Builder")), 6)
 	await $.print(b.value.String())
 }
 
@@ -249,12 +249,7 @@ function __goscriptStatic2(): any {
 
 var __goscriptStatic3$value: any
 function __goscriptStatic3(): any {
-	return __goscriptStatic3$value ??= ($.overrideTypeMethods(/* @__PURE__ */ $.pointerType("strings.Builder"), "strings.Builder", () => [$.methodSignature("Cap", [], [/* @__PURE__ */ $.basicType("int")], true), $.methodSignature("Grow", [["n", /* @__PURE__ */ $.basicType("int")]], [], true), $.methodSignature("Len", [], [/* @__PURE__ */ $.basicType("int")], true), $.methodSignature("Reset", [], [], true), $.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")], true), $.methodSignature("Write", [["p", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))]], [/* @__PURE__ */ $.basicType("int"), "error"], true), $.methodSignature("WriteByte", [["c", /* @__PURE__ */ $.basicType("uint8")]], ["error"], true), $.methodSignature("WriteRune", [["r", /* @__PURE__ */ $.basicType("int32")]], [/* @__PURE__ */ $.basicType("int"), "error"], true), $.methodSignature("WriteString", [["s", /* @__PURE__ */ $.basicType("string")]], [/* @__PURE__ */ $.basicType("int"), "error"], true)]))
-}
-
-var __goscriptStatic4$value: any
-function __goscriptStatic4(): any {
-	return __goscriptStatic4$value ??= ($.namedValueInterfaceValue<any>(1, "main.celsius", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()))
+	return __goscriptStatic3$value ??= ($.namedValueInterfaceValue<any>(1, "main.celsius", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()))
 }
 
 if ($.isMainScript(import.meta)) {

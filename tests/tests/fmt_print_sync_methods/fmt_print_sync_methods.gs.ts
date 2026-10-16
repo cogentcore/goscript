@@ -83,7 +83,7 @@ export class lineError {
 }
 
 export function describe(p: point, n: number): string {
-	return (fmt.Sprintf("%v has %d items", $.interfaceValue((p).clone(), "main.point", "main.point"), $.basicInterfaceValue(n, "int")) as string)
+	return (fmt.Sprintf("%v has %d items", $.structInterfaceValue((p).clone(), "main.point", "main.point"), $.basicInterfaceValue(n, "int")) as string)
 }
 
 export function parse(line: number, s: string): [bigint, $.GoError] {
@@ -100,13 +100,13 @@ export function message(err: $.GoError): string {
 
 export async function main(): globalThis.Promise<void> {
 	await $.println(describe(new point(true, 1, 2), 3))
-	await $.println((fmt.Sprint($.interfaceValue(new point(true, 4, 5), "main.point", "main.point"), "x", $.basicInterfaceValue(6, "int")) as string))
+	await $.println((fmt.Sprint($.structInterfaceValue(new point(true, 4, 5), "main.point", "main.point"), "x", $.basicInterfaceValue(6, "int")) as string))
 
 	let [, err] = parse(3, "abc")
 	await $.println((__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	await $.println(message(err))
 
-	let wrapped = fmt.Errorf("wrap %v: %w", $.interfaceValue(new point(true, 7, 8), "main.point", "main.point"), (err as any))
+	let wrapped = fmt.Errorf("wrap %v: %w", $.structInterfaceValue(new point(true, 7, 8), "main.point", "main.point"), (err as any))
 	await $.println((__goscriptAwait = (wrapped !== null && (wrapped as any).__isVarRef !== true && ((wrapped as any).__goValue === undefined || (wrapped as any).__goType?.charCodeAt(0) !== 42) ? (wrapped as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(wrapped)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), $.comparableEqual(errors.Unwrap($.pointerValueOrNil(wrapped)!), err))
 }
 

@@ -68,5 +68,5 @@ export class Holder {
 }
 
 export function NewHolder(): Holder {
-	return new Holder(true, $.interfaceValue<hidden | null>(new impl(true), "dep.impl", "dep.impl"))
+	return new Holder(true, $.structInterfaceValue<hidden | null>(new impl(true), "dep.impl", "dep.impl"))
 }
