@@ -446,6 +446,27 @@ func genFloat() {
 		emit("float.text1700", s, "f", "30", z.Text('f', 30))
 	}
 
+	// MarshalText writes the shortest decimal form that identifies the value
+	// at its precision, with a sign on an infinity.
+	for _, c := range []struct {
+		s    string
+		prec uint
+	}{
+		{"3.14159265358979323846264338327950288", 120},
+		{"0.1", 53},
+		{"1.5", 53},
+		{"0", 53},
+		{"-0", 53},
+		{"Inf", 53},
+		{"-Inf", 53},
+	} {
+		text, err := parseFloat(c.s, c.prec).MarshalText()
+		if err != nil {
+			panic(err)
+		}
+		emit("float.marshaltext", c.s, strconv.Itoa(int(c.prec)), string(text))
+	}
+
 	emit("float.setfloat64", float64Bits(math.Pi), floatState(new(big.Float).SetFloat64(math.Pi)))
 	emit("float.setfloat64", float64Bits(5e-324), floatState(new(big.Float).SetFloat64(5e-324)))
 	emit("float.setfloat64", float64Bits(math.MaxFloat64), floatState(new(big.Float).SetFloat64(math.MaxFloat64)))

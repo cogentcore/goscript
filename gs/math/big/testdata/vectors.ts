@@ -7659,6 +7659,18 @@ export const vectors: string[][] = [
   ['float.text1700', '7e-1000', 'g', '500', '7e-1000'],
   ['float.text1700', '7e-1000', 'f', '30', '0.000000000000000000000000000000'],
   [
+    'float.marshaltext',
+    '3.14159265358979323846264338327950288',
+    '120',
+    '3.14159265358979323846264338327950288',
+  ],
+  ['float.marshaltext', '0.1', '53', '0.1'],
+  ['float.marshaltext', '1.5', '53', '1.5'],
+  ['float.marshaltext', '0', '53', '0'],
+  ['float.marshaltext', '-0', '53', '-0'],
+  ['float.marshaltext', 'Inf', '53', '+Inf'],
+  ['float.marshaltext', '-Inf', '53', '-Inf'],
+  [
     'float.setfloat64',
     '400921fb54442d18',
     '0x.c90fdaa22168cp+2|3.141592653589793|Exact',

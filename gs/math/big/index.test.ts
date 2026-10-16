@@ -228,6 +228,8 @@ const ops: Record<string, Op> = {
     return exp + '|' + m.Text(112, 0)
   },
   'float.gob': ([s]) => hex(float(s).GobEncode()[0]),
+  'float.marshaltext': ([s, prec]) =>
+    new TextDecoder().decode(float(s, fromBase(prec)).MarshalText()[0]),
   'float.round': ([s, prec, mode]) => {
     const r = new Float()
       .SetMode(fromBase(mode))
