@@ -40,7 +40,7 @@ export async function main(): globalThis.Promise<void> {
 		let __goscriptTuple2: any = await io.ReadAll($.pointerValueOrNil(($.pointerValue<http.Request>(r).Body as io.Reader | null))!)
 		let data: $.Slice<number> = __goscriptTuple2[0]
 		let err = __goscriptTuple2[1]
-		await $.println("server:", $.pointerValue<http.Request>(r).Method, $.comparableEqual($.pointerValue<http.Request>(r).Body, $.structInterfaceValue<io.ReadCloser | null>($.pointerValue<any>(http.NoBody), "http.noBody", "http.noBody")), $.sliceLen(data), err == null, url.Values_Get($.pointerValue<http.Request>(r).URL.Query(), "x"), $.pointerValue<http.Request>(r).URL.RequestURI())
+		await $.println("server:", $.pointerValue<http.Request>(r).Method, $.comparableEqual($.pointerValue<http.Request>(r).Body, $.structInterfaceValue<io.ReadCloser | null>($.pointerValue<any>(http.NoBody), "http.noBody", __goscriptStatic0())), $.sliceLen(data), err == null, url.Values_Get($.pointerValue<http.Request>(r).URL.Query(), "x"), $.pointerValue<http.Request>(r).URL.RequestURI())
 		await printURL("server", $.pointerValue<http.Request>(r).URL)
 		{
 			let [, __goscriptShadow0] = await (w !== null && (w as any).__isVarRef !== true && ((w as any).__goValue === undefined || (w as any).__goType?.charCodeAt(0) !== 42) ? (w as Exclude<http.ResponseWriter, null>) : $.pointerValue<Exclude<http.ResponseWriter, null>>(w)).Write(new Uint8Array([111, 107]))
@@ -48,7 +48,7 @@ export async function main(): globalThis.Promise<void> {
 				await $.println("write error:", (__goscriptAwait = (__goscriptShadow0 !== null && (__goscriptShadow0 as any).__isVarRef !== true && ((__goscriptShadow0 as any).__goValue === undefined || (__goscriptShadow0 as any).__goType?.charCodeAt(0) !== 42) ? (__goscriptShadow0 as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(__goscriptShadow0)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 			}
 		}
-	}, ({ kind: $.TypeKind.Function, params: ["http.ResponseWriter", /* @__PURE__ */ $.pointerType("http.Request")], results: [] } as $.FunctionTypeInfo)), "http.HandlerFunc", ({ kind: $.TypeKind.Function, name: "http.HandlerFunc", params: ["http.ResponseWriter", /* @__PURE__ */ $.pointerType("http.Request")], results: [] } as $.FunctionTypeInfo)), "http.HandlerFunc", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()))!)
+	}, ({ kind: $.TypeKind.Function, params: ["http.ResponseWriter", /* @__PURE__ */ $.pointerType("http.Request")], results: [] } as $.FunctionTypeInfo)), "http.HandlerFunc", ({ kind: $.TypeKind.Function, name: "http.HandlerFunc", params: ["http.ResponseWriter", /* @__PURE__ */ $.pointerType("http.Request")], results: [] } as $.FunctionTypeInfo)), "http.HandlerFunc", __goscriptStatic1(), __goscriptStatic2(), __goscriptStatic3()))!)
 	__defer.defer(() => { (server !== null && (server as any).__isVarRef !== true && (server as any).__goValue === undefined ? ((server as any) as httptest.Server).Close() : httptest.Server.prototype.Close.call($.pointerValue<httptest.Server>(server))) })
 
 	let __goscriptTuple3: any = await http.Get($.pointerValue<httptest.Server>(server).URL + "/?x=1")
@@ -107,17 +107,22 @@ export async function main(): globalThis.Promise<void> {
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({ServeHTTP: (receiver: any, ...args: any[]) => (http.HandlerFunc_ServeHTTP as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))})
+	return __goscriptStatic0$value ??= ($.overrideTypeMethods("http.noBody", "http.noBody", () => [$.methodSignature("Close", [], ["error"]), $.methodSignature("Read", [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))], [/* @__PURE__ */ $.basicType("int"), "error"]), $.methodSignature("WriteTo", ["io.Writer"], [/* @__PURE__ */ $.basicType("int64"), "error"])]))
 }
 
 var __goscriptStatic1$value: any
 function __goscriptStatic1(): any {
-	return __goscriptStatic1$value ??= (({ kind: $.TypeKind.Function, name: "http.HandlerFunc", params: ["http.ResponseWriter", /* @__PURE__ */ $.pointerType("http.Request")], results: [] } as $.FunctionTypeInfo))
+	return __goscriptStatic1$value ??= ({ServeHTTP: (receiver: any, ...args: any[]) => (http.HandlerFunc_ServeHTTP as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args))})
 }
 
 var __goscriptStatic2$value: any
 function __goscriptStatic2(): any {
-	return __goscriptStatic2$value ??= ([$.methodSignature("ServeHTTP", [["w", "http.ResponseWriter"], ["r", /* @__PURE__ */ $.pointerType("http.Request")]])])
+	return __goscriptStatic2$value ??= (({ kind: $.TypeKind.Function, name: "http.HandlerFunc", params: ["http.ResponseWriter", /* @__PURE__ */ $.pointerType("http.Request")], results: [] } as $.FunctionTypeInfo))
+}
+
+var __goscriptStatic3$value: any
+function __goscriptStatic3(): any {
+	return __goscriptStatic3$value ??= ([$.methodSignature("ServeHTTP", [["w", "http.ResponseWriter"], ["r", /* @__PURE__ */ $.pointerType("http.Request")]])])
 }
 
 var __goscriptAwait: any

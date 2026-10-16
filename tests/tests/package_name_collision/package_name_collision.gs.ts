@@ -10,18 +10,18 @@ import * as bast from "@goscript/github.com/s4wave/goscript/tests/tests/package_
 export function kind(n: aast.Node | null): string {
 	{
 		const __goscriptTypeSwitchValue = n
-		switch (true) {
-			case $.typeAssert<aast.List | $.VarRef<aast.List> | null>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.pointerType("ast·122t5xq.List")).ok:
+		switch ($.typeSwitchCase(__goscriptTypeSwitchValue, __goscriptStatic0())) {
+			case 0:
 				{
 					return "list"
 				}
 				break
-			case $.typeAssert<aast.ListItem | $.VarRef<aast.ListItem> | null>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.pointerType("ast·122t5xq.ListItem")).ok:
+			case 1:
 				{
 					return "item"
 				}
 				break
-			case $.typeAssert<aast.Paragraph | $.VarRef<aast.Paragraph> | null>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.pointerType("ast·122t5xq.Paragraph")).ok:
+			case 2:
 				{
 					return "para"
 				}
@@ -45,10 +45,15 @@ export async function main(): globalThis.Promise<void> {
 	let bn: bast.Node | null = $.interfaceValue<bast.Node | null>(new bast.List(false, 3), "*ast·123smei.List", /* @__PURE__ */ $.pointerType("ast·123smei.List"))
 	let [, isA] = $.typeAssertTuple<aast.Node | null>((bn as any), "ast·122t5xq.Node")
 	fmt.Println("b list is a node", isA, $.basicInterfaceValue((__goscriptAwait = (bn !== null && (bn as any).__isVarRef !== true && ((bn as any).__goValue === undefined || (bn as any).__goType?.charCodeAt(0) !== 42) ? (bn as Exclude<bast.Node, null>) : $.pointerValue<Exclude<bast.Node, null>>(bn)).Pos(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), "int"))
-	fmt.Println((reflect.TypeOf($.interfaceValue(new aast.Type(true), "ast·122t5xq.Type", "ast·122t5xq.Type")) as any), (reflect.TypeOf($.interfaceValue(new bast.Type(true), "ast·123smei.Type", "ast·123smei.Type")) as any), $.basicInterfaceValue((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.interfaceValue(new aast.Type(true), "ast·122t5xq.Type", "ast·122t5xq.Type"))).NumField(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), "int"), ((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.interfaceValue(new bast.Type(true), "ast·123smei.Type", "ast·123smei.Type"))).Field(0), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as reflect.StructField).Name)
-	fmt.Printf("%T %T %#v\n", $.interfaceValue(l, "*ast·122t5xq.List", /* @__PURE__ */ $.pointerType("ast·122t5xq.List")), (bn as any), $.interfaceValue(new bast.Type(true, 2), "ast·123smei.Type", "ast·123smei.Type"))
+	fmt.Println((reflect.TypeOf($.structInterfaceValue(new aast.Type(true), "ast·122t5xq.Type", "ast·122t5xq.Type")) as any), (reflect.TypeOf($.structInterfaceValue(new bast.Type(true), "ast·123smei.Type", "ast·123smei.Type")) as any), $.basicInterfaceValue((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.structInterfaceValue(new aast.Type(true), "ast·122t5xq.Type", "ast·122t5xq.Type"))).NumField(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), "int"), ((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.structInterfaceValue(new bast.Type(true), "ast·123smei.Type", "ast·123smei.Type"))).Field(0), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as reflect.StructField).Name)
+	fmt.Printf("%T %T %#v\n", $.interfaceValue(l, "*ast·122t5xq.List", /* @__PURE__ */ $.pointerType("ast·122t5xq.List")), (bn as any), $.structInterfaceValue(new bast.Type(true, 2), "ast·123smei.Type", "ast·123smei.Type"))
 	let [, isB] = $.typeAssertTuple<bast.Node | null>($.interfaceValue(l, "*ast·122t5xq.List", /* @__PURE__ */ $.pointerType("ast·122t5xq.List")), "ast·123smei.Node")
 	fmt.Println("a list is a b node", isB, !$.stringEqual((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.interfaceValue(l, "*ast·122t5xq.List", /* @__PURE__ */ $.pointerType("ast·122t5xq.List")))).Elem(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)).PkgPath(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf((bn as any))).Elem(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)).PkgPath(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)))
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= ($.typeSwitchSite([/* @__PURE__ */ $.pointerType("ast·122t5xq.List"), /* @__PURE__ */ $.pointerType("ast·122t5xq.ListItem"), /* @__PURE__ */ $.pointerType("ast·122t5xq.Paragraph")]))
 }
 
 var __goscriptAwait: any

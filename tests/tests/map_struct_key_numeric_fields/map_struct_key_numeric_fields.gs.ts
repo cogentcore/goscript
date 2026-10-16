@@ -290,9 +290,9 @@ export async function main(): globalThis.Promise<void> {
 	await $.println($.len(vecs), nanOK, $.mapGet<Vec, number, number>(vecs, new Vec(true, 0, 1), 0)[0])
 
 	// Interface keys of two struct types with the same fields stay apart.
-	let anys = $.makeMap<any, number>([[$.interfaceValue(new Pair(true, "a", "b"), "main.Pair", "main.Pair"), 1], [$.interfaceValue(new Other(true, "a", "b"), "main.Other", "main.Other"), 2]])
-	$.mapSet(anys, $.interfaceValue(new Pair(true, "a", "b"), "main.Pair", "main.Pair"), 3)
-	await $.println($.len(anys), $.mapGet<any, number, number>(anys, $.interfaceValue(new Pair(true, "a", "b"), "main.Pair", "main.Pair"), 0)[0], $.mapGet<any, number, number>(anys, $.interfaceValue(new Other(true, "a", "b"), "main.Other", "main.Other"), 0)[0])
+	let anys = $.makeMap<any, number>([[$.structInterfaceValue(new Pair(true, "a", "b"), "main.Pair", "main.Pair"), 1], [$.structInterfaceValue(new Other(true, "a", "b"), "main.Other", "main.Other"), 2]])
+	$.mapSet(anys, $.structInterfaceValue(new Pair(true, "a", "b"), "main.Pair", "main.Pair"), 3)
+	await $.println($.len(anys), $.mapGet<any, number, number>(anys, $.structInterfaceValue(new Pair(true, "a", "b"), "main.Pair", "main.Pair"), 0)[0], $.mapGet<any, number, number>(anys, $.structInterfaceValue(new Other(true, "a", "b"), "main.Other", "main.Other"), 0)[0])
 
 	// Complex fields compare by value.
 	let cs = $.makeMap<Cplx, number>([[new Cplx(true, $.complex(1, 2), 3), 1]])

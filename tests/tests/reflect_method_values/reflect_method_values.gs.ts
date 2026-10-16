@@ -146,7 +146,7 @@ export async function main(): globalThis.Promise<void> {
 		let m = $.markAsStructValue($.cloneStructValue(((__goscriptAwait = (pt !== null && (pt as any).__isVarRef !== true && ((pt as any).__goValue === undefined || (pt as any).__goType?.charCodeAt(0) !== 42) ? (pt as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(pt)).Method(i), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as reflect.Method)))
 		fmt.Println("ptr method", $.basicInterfaceValue(i, "int"), m.Name, $.basicInterfaceValue(m.Index, "int"), (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(m.Type).IsVariadic(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	}
-	let vt = reflect.TypeOf($.interfaceValue(new Widget(true), "main.Widget", "main.Widget"))
+	let vt = reflect.TypeOf($.structInterfaceValue(new Widget(true), "main.Widget", "main.Widget"))
 	fmt.Println("value methods", $.basicInterfaceValue((__goscriptAwait = (vt !== null && (vt as any).__isVarRef !== true && ((vt as any).__goValue === undefined || (vt as any).__goType?.charCodeAt(0) !== 42) ? (vt as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(vt)).NumMethod(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), "int"), ((__goscriptAwait = (vt !== null && (vt as any).__isVarRef !== true && ((vt as any).__goValue === undefined || (vt as any).__goType?.charCodeAt(0) !== 42) ? (vt as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(vt)).Method(0), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as reflect.Method).Name)
 
 	// A method of a pointer held in a settable Value is called by index.
@@ -186,7 +186,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// FieldByIndex steps through an embedded struct pointer.
 	let o = new Outer(true, new Inner(false, 7))
-	fmt.Println("embedded", $.basicInterfaceValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(o, "main.Outer", "main.Outer")))).FieldByIndex($.arrayToSlice<number>([0, 0])))).Int(), "int64"))
+	fmt.Println("embedded", $.basicInterfaceValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.structInterfaceValue(o, "main.Outer", "main.Outer")))).FieldByIndex($.arrayToSlice<number>([0, 0])))).Int(), "int64"))
 
 	// A sized number keeps its type through Interface.
 	let f32 = (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.functionValue((w: Widget): string => $.pointerValue<Widget>(w).Upper(), ({ kind: $.TypeKind.Function, params: ["main.Widget"], results: [/* @__PURE__ */ $.basicType("string")] } as $.FunctionTypeInfo)), "func(main.Widget) string", ({ kind: $.TypeKind.Function, params: ["main.Widget"], results: [/* @__PURE__ */ $.basicType("string")] } as $.FunctionTypeInfo))))).Type()).NumIn(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
