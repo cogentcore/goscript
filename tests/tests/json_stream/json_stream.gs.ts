@@ -109,33 +109,33 @@ export async function printTokens(dec: json.Decoder | $.VarRef<json.Decoder> | n
 		}
 		{
 			const __goscriptTypeSwitchValue = tok
-			switch (true) {
-				case $.typeAssert<json.Delim>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.basicType("int32", "json.Delim")).ok:
+			switch ($.typeSwitchCase(__goscriptTypeSwitchValue, __goscriptStatic0())) {
+				case 0:
 					{
 						let t: json.Delim = $.typeAssert<json.Delim>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.basicType("int32", "json.Delim")).value
 						fmt.Println("delim", json.Delim_String(t), await (dec !== null && (dec as any).__isVarRef !== true && (dec as any).__goValue === undefined ? ((dec as any) as json.Decoder).More() : json.Decoder.prototype.More.call($.pointerValue<json.Decoder>(dec))))
 					}
 					break
-				case $.typeAssert<string>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.basicType("string")).ok:
+				case 1:
 					{
 						let t: string = $.typeAssert<string>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.basicType("string")).value
 						fmt.Println("string", t)
 					}
 					break
-				case $.typeAssert<number>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.basicType("float64")).ok:
+				case 2:
 					{
 						let t: number = $.typeAssert<number>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.basicType("float64")).value
 						fmt.Println("number", $.basicInterfaceValue(t, "float64"))
 					}
 					break
-				case $.typeAssert<json.Number>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.basicType("string", "json.Number")).ok:
+				case 3:
 					{
 						let t: json.Number = $.typeAssert<json.Number>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.basicType("string", "json.Number")).value
 						let [f, ] = json.Number_Float64(t)
 						fmt.Println("json.Number", json.Number_String(t), $.basicInterfaceValue(f, "float64"))
 					}
 					break
-				case $.typeAssert<boolean>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.basicType("bool")).ok:
+				case 4:
 					{
 						let t: boolean = $.typeAssert<boolean>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.basicType("bool")).value
 						fmt.Println("bool", t)
@@ -158,14 +158,14 @@ export async function main(): globalThis.Promise<void> {
 	fmt.Println(ind.value.String())
 
 	// Decoder reads one value per call and buffers the rest of the stream.
-	let dec = json.NewDecoder($.pointerValueOrNil($.interfaceValue<io.Reader | null>(strings.NewReader("1 2 3"), "*strings.Reader", __goscriptStatic0()))!)
+	let dec = json.NewDecoder($.pointerValueOrNil($.interfaceValue<io.Reader | null>(strings.NewReader("1 2 3"), "*strings.Reader", /* @__PURE__ */ $.pointerType("strings.Reader")))!)
 	let n = $.varRef(0)
 	while (await (dec !== null && (dec as any).__isVarRef !== true && (dec as any).__goValue === undefined ? ((dec as any) as json.Decoder).Decode($.interfaceValue(n, "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int")))) : json.Decoder.prototype.Decode.call($.pointerValue<json.Decoder>(dec), $.interfaceValue(n, "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int"))))) == null) {
 		fmt.Println("decoded", $.basicInterfaceValue(n.value, "int"))
 	}
 
 	// UseNumber keeps the exact source literal beyond float64 precision.
-	let und = json.NewDecoder($.pointerValueOrNil($.interfaceValue<io.Reader | null>(strings.NewReader("{\"big\":9007199254740993}"), "*strings.Reader", __goscriptStatic0()))!)
+	let und = json.NewDecoder($.pointerValueOrNil($.interfaceValue<io.Reader | null>(strings.NewReader("{\"big\":9007199254740993}"), "*strings.Reader", /* @__PURE__ */ $.pointerType("strings.Reader")))!)
 	void (und !== null && (und as any).__isVarRef !== true && (und as any).__goValue === undefined ? ((und as any) as json.Decoder).UseNumber() : json.Decoder.prototype.UseNumber.call($.pointerValue<json.Decoder>(und)))
 	let m: $.VarRef<globalThis.Map<string, any> | null> = $.varRef(null! as globalThis.Map<string, any> | null)
 	await json.Decoder.prototype.Decode.call($.pointerValue<json.Decoder>(und), $.interfaceValue(m, "*map[string]interface{}", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), { kind: $.TypeKind.Interface, methods: [] }))))
@@ -184,7 +184,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 
 	// Token advances the stream; More reports remaining container elements.
-	let mdec = json.NewDecoder($.pointerValueOrNil($.interfaceValue<io.Reader | null>(strings.NewReader("[10,20]"), "*strings.Reader", __goscriptStatic0()))!)
+	let mdec = json.NewDecoder($.pointerValueOrNil($.interfaceValue<io.Reader | null>(strings.NewReader("[10,20]"), "*strings.Reader", /* @__PURE__ */ $.pointerType("strings.Reader")))!)
 	await (mdec !== null && (mdec as any).__isVarRef !== true && (mdec as any).__goValue === undefined ? ((mdec as any) as json.Decoder).Token() : json.Decoder.prototype.Token.call($.pointerValue<json.Decoder>(mdec)))
 	fmt.Println("more", await (mdec !== null && (mdec as any).__isVarRef !== true && (mdec as any).__goValue === undefined ? ((mdec as any) as json.Decoder).More() : json.Decoder.prototype.More.call($.pointerValue<json.Decoder>(mdec))))
 	await (mdec !== null && (mdec as any).__isVarRef !== true && (mdec as any).__goValue === undefined ? ((mdec as any) as json.Decoder).Token() : json.Decoder.prototype.Token.call($.pointerValue<json.Decoder>(mdec)))
@@ -221,7 +221,7 @@ export async function main(): globalThis.Promise<void> {
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ($.overrideTypeMethods(/* @__PURE__ */ $.pointerType("strings.Reader"), "strings.Reader", () => [$.methodSignature("Len", [], [/* @__PURE__ */ $.basicType("int")], true), $.methodSignature("Read", [["b", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))]], [["n", /* @__PURE__ */ $.basicType("int")], ["err", "error"]], true), $.methodSignature("ReadAt", [["b", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))], ["off", /* @__PURE__ */ $.basicType("int64")]], [["n", /* @__PURE__ */ $.basicType("int")], ["err", "error"]], true), $.methodSignature("ReadByte", [], [/* @__PURE__ */ $.basicType("uint8"), "error"], true), $.methodSignature("ReadRune", [], [["ch", /* @__PURE__ */ $.basicType("int32")], ["size", /* @__PURE__ */ $.basicType("int")], ["err", "error"]], true), $.methodSignature("Reset", [["s", /* @__PURE__ */ $.basicType("string")]], [], true), $.methodSignature("Seek", [["offset", /* @__PURE__ */ $.basicType("int64")], ["whence", /* @__PURE__ */ $.basicType("int")]], [/* @__PURE__ */ $.basicType("int64"), "error"], true), $.methodSignature("Size", [], [/* @__PURE__ */ $.basicType("int64")], true), $.methodSignature("UnreadByte", [], ["error"], true), $.methodSignature("UnreadRune", [], ["error"], true), $.methodSignature("WriteTo", [["w", "io.Writer"]], [["n", /* @__PURE__ */ $.basicType("int64")], ["err", "error"]], true)]))
+	return __goscriptStatic0$value ??= ($.typeSwitchSite([/* @__PURE__ */ $.basicType("int32", "json.Delim"), /* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("float64"), /* @__PURE__ */ $.basicType("string", "json.Number"), /* @__PURE__ */ $.basicType("bool")]))
 }
 
 if ($.isMainScript(import.meta)) {

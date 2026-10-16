@@ -105,15 +105,15 @@ export async function main(): globalThis.Promise<void> {
 		let shape = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as Shape | null)
 		{
 			const __goscriptTypeSwitchValue = shape
-			switch (true) {
-				case $.typeAssert<Fixed>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.sliceType("dep.Ref", "main.Fixed")).ok:
+			switch ($.typeSwitchCase(__goscriptTypeSwitchValue, __goscriptStatic6())) {
+				case 0:
 					{
 						let shape: Fixed = $.typeAssert<Fixed>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.sliceType("dep.Ref", "main.Fixed")).value
 						shape = ($.appendOne((shape as Fixed), $.namedValueInterfaceValue<dep.Ref | null>($.arrayValue(new Uint8Array([3, 4])), "main.value", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()), $.appendZeros.nil) as Fixed)
 						fixed = $.appendOne(fixed, (shape as Fixed), $.appendZeros.nil)
 					}
 					break
-				case $.typeAssert<Action>(__goscriptTypeSwitchValue, "main.Action").ok:
+				case 1:
 					{
 						let shape: $.VarRef<Action> = $.varRef($.markAsStructValue($.cloneStructValue($.typeAssert<Action>(__goscriptTypeSwitchValue, "main.Action").value)))
 						let fix = ($.arrayIndex(fixed!, 0) as Fixed)
@@ -166,6 +166,11 @@ function __goscriptStatic4(): any {
 var __goscriptStatic5$value: any
 function __goscriptStatic5(): any {
 	return __goscriptStatic5$value ??= ([$.methodSignature("Mark", [], [/* @__PURE__ */ $.basicType("bool")])])
+}
+
+var __goscriptStatic6$value: any
+function __goscriptStatic6(): any {
+	return __goscriptStatic6$value ??= ($.typeSwitchSite([/* @__PURE__ */ $.sliceType("dep.Ref", "main.Fixed"), "main.Action"]))
 }
 
 if ($.isMainScript(import.meta)) {

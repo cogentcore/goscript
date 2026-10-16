@@ -67,14 +67,14 @@ export class MyStruct {
 export async function processInterface(i: any): globalThis.Promise<void> {
 	{
 		const __goscriptTypeSwitchValue = i
-		switch (true) {
-			case $.typeAssert<MyInterface1 | null>(__goscriptTypeSwitchValue, "main.MyInterface1").ok:
+		switch ($.typeSwitchCase(__goscriptTypeSwitchValue, __goscriptStatic0())) {
+			case 0:
 				{
 					let v: MyInterface1 | null = $.typeAssert<MyInterface1 | null>(__goscriptTypeSwitchValue, "main.MyInterface1").value
 					await $.println("MyInterface1:", (__goscriptAwait = (v !== null && (v as any).__isVarRef !== true && ((v as any).__goValue === undefined || (v as any).__goType?.charCodeAt(0) !== 42) ? (v as Exclude<MyInterface1, null>) : $.pointerValue<Exclude<MyInterface1, null>>(v)).MyString1(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = (v !== null && (v as any).__isVarRef !== true && ((v as any).__goValue === undefined || (v as any).__goType?.charCodeAt(0) !== 42) ? (v as Exclude<MyInterface1, null>) : $.pointerValue<Exclude<MyInterface1, null>>(v)).MyString2(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 				}
 				break
-			case $.typeAssert<MyInterface2 | null>(__goscriptTypeSwitchValue, "main.MyInterface2").ok:
+			case 1:
 				{
 					let v: MyInterface2 | null = $.typeAssert<MyInterface2 | null>(__goscriptTypeSwitchValue, "main.MyInterface2").value
 					await $.println("MyInterface2:", (__goscriptAwait = (v !== null && (v as any).__isVarRef !== true && ((v as any).__goValue === undefined || (v as any).__goType?.charCodeAt(0) !== 42) ? (v as Exclude<MyInterface2, null>) : $.pointerValue<Exclude<MyInterface2, null>>(v)).MyString1(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
@@ -108,14 +108,14 @@ export async function main(): globalThis.Promise<void> {
 	let i3: any = (i1 as any)
 	{
 		const __goscriptTypeSwitchValue = i3
-		switch (true) {
-			case $.typeAssert<MyInterface2 | null>(__goscriptTypeSwitchValue, "main.MyInterface2").ok:
+		switch ($.typeSwitchCase(__goscriptTypeSwitchValue, __goscriptStatic1())) {
+			case 0:
 				{
 					let v: MyInterface2 | null = $.typeAssert<MyInterface2 | null>(__goscriptTypeSwitchValue, "main.MyInterface2").value
 					await $.println("Matched MyInterface2 from i1:", (__goscriptAwait = (v !== null && (v as any).__isVarRef !== true && ((v as any).__goValue === undefined || (v as any).__goType?.charCodeAt(0) !== 42) ? (v as Exclude<MyInterface2, null>) : $.pointerValue<Exclude<MyInterface2, null>>(v)).MyString1(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 				}
 				break
-			case $.typeAssert<MyInterface1 | null>(__goscriptTypeSwitchValue, "main.MyInterface1").ok:
+			case 1:
 				{
 					let v: MyInterface1 | null = $.typeAssert<MyInterface1 | null>(__goscriptTypeSwitchValue, "main.MyInterface1").value
 					await $.println("Matched MyInterface1 from i1:", (__goscriptAwait = (v !== null && (v as any).__isVarRef !== true && ((v as any).__goValue === undefined || (v as any).__goType?.charCodeAt(0) !== 42) ? (v as Exclude<MyInterface1, null>) : $.pointerValue<Exclude<MyInterface1, null>>(v)).MyString1(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = (v !== null && (v as any).__isVarRef !== true && ((v as any).__goValue === undefined || (v as any).__goType?.charCodeAt(0) !== 42) ? (v as Exclude<MyInterface1, null>) : $.pointerValue<Exclude<MyInterface1, null>>(v)).MyString2(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
@@ -129,6 +129,16 @@ export async function main(): globalThis.Promise<void> {
 				break
 		}
 	}
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= ($.typeSwitchSite(["main.MyInterface1", "main.MyInterface2"]))
+}
+
+var __goscriptStatic1$value: any
+function __goscriptStatic1(): any {
+	return __goscriptStatic1$value ??= ($.typeSwitchSite(["main.MyInterface2", "main.MyInterface1"]))
 }
 
 var __goscriptAwait: any

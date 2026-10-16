@@ -34,8 +34,8 @@ export async function main(): globalThis.Promise<void> {
 	let x: any = $.interfaceValue($.anonymousStructValue({N: 1}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("N", /* @__PURE__ */ $.basicType("int"), [0], 0, true)] }), "struct{N int}", { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("N", /* @__PURE__ */ $.basicType("int"), [0], 0, true)] })
 	{
 		const __goscriptTypeSwitchValue = x
-		switch (true) {
-			case $.typeAssert<{"N": number}>(__goscriptTypeSwitchValue, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("N", /* @__PURE__ */ $.basicType("int"), [0], 0, true)] }).ok:
+		switch ($.typeSwitchCase(__goscriptTypeSwitchValue, __goscriptStatic0())) {
+			case 0:
 				{
 					let v: {"N": number} = $.markAsStructValue($.cloneStructValue($.typeAssert<{"N": number}>(__goscriptTypeSwitchValue, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("N", /* @__PURE__ */ $.basicType("int"), [0], 0, true)] }).value))
 					v.N = 9
@@ -55,6 +55,11 @@ export async function main(): globalThis.Promise<void> {
 		r.N = 9
 	}
 	await $.println("range:", $.arrayIndex(s!, 0).N)
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= ($.typeSwitchSite([{ kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("N", /* @__PURE__ */ $.basicType("int"), [0], 0, true)] }]))
 }
 
 if ($.isMainScript(import.meta)) {

@@ -152,26 +152,26 @@ export async function main(): globalThis.Promise<void> {
 		let item = (__goscriptRangeWindow1.backing[__goscriptRangeWindow1.offset + i] as any)
 		{
 			const __goscriptTypeSwitchValue = item
-			switch (true) {
-				case $.typeAssert<MyStruct>(__goscriptTypeSwitchValue, "main.MyStruct").ok:
+			switch ($.typeSwitchCase(__goscriptTypeSwitchValue, __goscriptStatic0())) {
+				case 0:
 					{
 						let v: MyStruct = $.markAsStructValue($.cloneStructValue($.typeAssert<MyStruct>(__goscriptTypeSwitchValue, "main.MyStruct").value))
 						await $.println("testItems[", i, "] is MyStruct value:", v.Value)
 					}
 					break
-				case $.typeAssert<MyStruct | $.VarRef<MyStruct> | null>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.pointerType("main.MyStruct")).ok:
+				case 1:
 					{
 						let v: MyStruct | $.VarRef<MyStruct> | null = $.typeAssert<MyStruct | $.VarRef<MyStruct> | null>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.pointerType("main.MyStruct")).value
 						await $.println("testItems[", i, "] is *MyStruct pointer:", $.pointerValue<MyStruct>(v).Value)
 					}
 					break
-				case $.typeAssert<number>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.basicType("int")).ok:
+				case 2:
 					{
 						let v: number = $.typeAssert<number>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.basicType("int")).value
 						await $.println("testItems[", i, "] is int:", v)
 					}
 					break
-				case $.typeAssert<string>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.basicType("string")).ok:
+				case 3:
 					{
 						let v: string = $.typeAssert<string>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.basicType("string")).value
 						await $.println("testItems[", i, "] is string:", v)
@@ -188,6 +188,11 @@ export async function main(): globalThis.Promise<void> {
 	}
 
 	await $.println("\n=== Test Complete ===")
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= ($.typeSwitchSite(["main.MyStruct", /* @__PURE__ */ $.pointerType("main.MyStruct"), /* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("string")]))
 }
 
 if ($.isMainScript(import.meta)) {

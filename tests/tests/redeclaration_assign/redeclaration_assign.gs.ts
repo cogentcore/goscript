@@ -37,14 +37,14 @@ export async function selectResultRedeclare(): globalThis.Promise<void> {
 export async function typeSwitchCaseRedeclare(value: any): globalThis.Promise<void> {
 	{
 		const __goscriptTypeSwitchValue = value
-		switch (true) {
-			case $.typeAssert<number>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.basicType("int")).ok:
+		switch ($.typeSwitchCase(__goscriptTypeSwitchValue, __goscriptStatic0())) {
+			case 0:
 				{
 					let hashed = "int"
 					await $.println("type hashed:", hashed)
 				}
 				break
-			case $.typeAssert<string>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.basicType("string")).ok:
+			case 1:
 				{
 					let hashed = "string"
 					await $.println("type hashed:", hashed)
@@ -92,6 +92,11 @@ export async function main(): globalThis.Promise<void> {
 	await selectResultRedeclare()
 	await typeSwitchCaseRedeclare($.basicInterfaceValue(1, "int"))
 	await typeSwitchCaseRedeclare("two")
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= ($.typeSwitchSite([/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("string")]))
 }
 
 if ($.isMainScript(import.meta)) {
