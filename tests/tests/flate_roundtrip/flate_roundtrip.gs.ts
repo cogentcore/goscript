@@ -15,7 +15,7 @@ export async function main(): globalThis.Promise<void> {
 	for (let __goscriptRangeTarget1 = $.arrayToSlice<number>([1, -1, 9]), __goscriptRangeWindow1 = $.sliceRange(__goscriptRangeTarget1), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow1.length; __rangeIndex++) {
 		let level = (__goscriptRangeWindow1.backing[__goscriptRangeWindow1.offset + __rangeIndex] as number)
 		let compressed = $.varRef($.markAsStructValue(new bytes.Buffer()))
-		let __goscriptTuple0: any = flate.NewWriter($.interfaceValue<io.Writer | null>(compressed, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer")), level)
+		let __goscriptTuple0: any = flate.NewWriter($.interfaceValue<io.Writer | null>(compressed, "*bytes.Buffer", __goscriptStatic0()), level)
 		let writer: flate.Writer | $.VarRef<flate.Writer> | null = __goscriptTuple0[0]
 		let err = __goscriptTuple0[1]
 		if (err != null) {
@@ -35,7 +35,7 @@ export async function main(): globalThis.Promise<void> {
 		}
 
 		// The decoded bytes must retain the complete original payload.
-		let reader = flate.NewReader($.interfaceValue<io.Reader | null>(compressed, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer")))
+		let reader = flate.NewReader($.interfaceValue<io.Reader | null>(compressed, "*bytes.Buffer", __goscriptStatic0()))
 		let __goscriptTuple1: any = await io.ReadAll($.pointerValueOrNil((reader as io.Reader | null))!)
 		let output: $.Slice<number> = __goscriptTuple1[0]
 		err = __goscriptTuple1[1]
@@ -50,6 +50,11 @@ export async function main(): globalThis.Promise<void> {
 		}
 		await $.println(level, $.sliceLen(output), bytes.Equal(input, output))
 	}
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= ($.overrideTypeMethods(/* @__PURE__ */ $.pointerType("bytes.Buffer"), "bytes.Buffer", () => [$.methodSignature("Available", [], [/* @__PURE__ */ $.basicType("int")], true), $.methodSignature("AvailableBuffer", [], [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))], true), $.methodSignature("Bytes", [], [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))], true), $.methodSignature("Cap", [], [/* @__PURE__ */ $.basicType("int")], true), $.methodSignature("Grow", [["n", /* @__PURE__ */ $.basicType("int")]], [], true), $.methodSignature("Len", [], [/* @__PURE__ */ $.basicType("int")], true), $.methodSignature("Next", [["n", /* @__PURE__ */ $.basicType("int")]], [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))], true), $.methodSignature("Peek", [["n", /* @__PURE__ */ $.basicType("int")]], [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")), "error"], true), $.methodSignature("Read", [["p", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))]], [["n", /* @__PURE__ */ $.basicType("int")], ["err", "error"]], true), $.methodSignature("ReadByte", [], [/* @__PURE__ */ $.basicType("uint8"), "error"], true), $.methodSignature("ReadBytes", [["delim", /* @__PURE__ */ $.basicType("uint8")]], [["line", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))], ["err", "error"]], true), $.methodSignature("ReadFrom", [["r", "io.Reader"]], [["n", /* @__PURE__ */ $.basicType("int64")], ["err", "error"]], true), $.methodSignature("ReadRune", [], [["r", /* @__PURE__ */ $.basicType("int32")], ["size", /* @__PURE__ */ $.basicType("int")], ["err", "error"]], true), $.methodSignature("ReadString", [["delim", /* @__PURE__ */ $.basicType("uint8")]], [["line", /* @__PURE__ */ $.basicType("string")], ["err", "error"]], true), $.methodSignature("Reset", [], [], true), $.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")], true), $.methodSignature("Truncate", [["n", /* @__PURE__ */ $.basicType("int")]], [], true), $.methodSignature("UnreadByte", [], ["error"], true), $.methodSignature("UnreadRune", [], ["error"], true), $.methodSignature("Write", [["p", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))]], [["n", /* @__PURE__ */ $.basicType("int")], ["err", "error"]], true), $.methodSignature("WriteByte", [["c", /* @__PURE__ */ $.basicType("uint8")]], ["error"], true), $.methodSignature("WriteRune", [["r", /* @__PURE__ */ $.basicType("int32")]], [["n", /* @__PURE__ */ $.basicType("int")], ["err", "error"]], true), $.methodSignature("WriteString", [["s", /* @__PURE__ */ $.basicType("string")]], [["n", /* @__PURE__ */ $.basicType("int")], ["err", "error"]], true), $.methodSignature("WriteTo", [["w", "io.Writer"]], [["n", /* @__PURE__ */ $.basicType("int64")], ["err", "error"]], true)]))
 }
 
 if ($.isMainScript(import.meta)) {

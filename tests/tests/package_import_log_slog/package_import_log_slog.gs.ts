@@ -23,7 +23,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println(await $.markAsStructValue($.cloneStructValue(slog.StringValue("a"))).Equal(slog.StringValue("a")), await s.Equal(slog.StringValue("other")))
 
 	let buf = $.varRef($.markAsStructValue(new bytes.Buffer()))
-	let logger = slog.New($.interfaceValue<slog.Handler | null>(slog.NewTextHandler($.interfaceValue<io.Writer | null>(buf, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer")), new slog.HandlerOptions(false, undefined, undefined, $.functionValue((groups: $.Slice<string>, a: slog.Attr): slog.Attr => {
+	let logger = slog.New($.interfaceValue<slog.Handler | null>(slog.NewTextHandler($.interfaceValue<io.Writer | null>(buf, "*bytes.Buffer", __goscriptStatic0()), new slog.HandlerOptions(false, undefined, undefined, $.functionValue((groups: $.Slice<string>, a: slog.Attr): slog.Attr => {
 		if (($.stringEqual(a.Key, slog.TimeKey)) && ($.sliceLen(groups) == 0)) {
 			return new slog.Attr(true)
 		}
@@ -33,7 +33,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.print(buf.value.String())
 
 	buf.value.Reset()
-	let jl = slog.New($.interfaceValue<slog.Handler | null>(slog.NewJSONHandler($.interfaceValue<io.Writer | null>(buf, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer")), new slog.HandlerOptions(false, undefined, $.namedValueInterfaceValue<slog.Leveler | null>(slog.LevelDebug, "slog.Level", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()), $.functionValue((groups: $.Slice<string>, a: slog.Attr): slog.Attr => {
+	let jl = slog.New($.interfaceValue<slog.Handler | null>(slog.NewJSONHandler($.interfaceValue<io.Writer | null>(buf, "*bytes.Buffer", __goscriptStatic0()), new slog.HandlerOptions(false, undefined, $.namedValueInterfaceValue<slog.Leveler | null>(slog.LevelDebug, "slog.Level", __goscriptStatic1(), __goscriptStatic2(), __goscriptStatic3()), $.functionValue((groups: $.Slice<string>, a: slog.Attr): slog.Attr => {
 		if (($.stringEqual(a.Key, slog.TimeKey)) && ($.sliceLen(groups) == 0)) {
 			return new slog.Attr(true)
 		}
@@ -53,17 +53,22 @@ export async function main(): globalThis.Promise<void> {
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({AppendText: (receiver: any, ...args: any[]) => (slog.Level_AppendText as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Level: (receiver: any) => (slog.Level_Level as any)(($.isVarRef(receiver) ? receiver.value : receiver)), MarshalJSON: (receiver: any) => (slog.Level_MarshalJSON as any)(($.isVarRef(receiver) ? receiver.value : receiver)), MarshalText: (receiver: any) => (slog.Level_MarshalText as any)(($.isVarRef(receiver) ? receiver.value : receiver)), String: (receiver: any) => (slog.Level_String as any)(($.isVarRef(receiver) ? receiver.value : receiver))})
+	return __goscriptStatic0$value ??= ($.overrideTypeMethods(/* @__PURE__ */ $.pointerType("bytes.Buffer"), "bytes.Buffer", () => [$.methodSignature("Available", [], [/* @__PURE__ */ $.basicType("int")], true), $.methodSignature("AvailableBuffer", [], [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))], true), $.methodSignature("Bytes", [], [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))], true), $.methodSignature("Cap", [], [/* @__PURE__ */ $.basicType("int")], true), $.methodSignature("Grow", [["n", /* @__PURE__ */ $.basicType("int")]], [], true), $.methodSignature("Len", [], [/* @__PURE__ */ $.basicType("int")], true), $.methodSignature("Next", [["n", /* @__PURE__ */ $.basicType("int")]], [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))], true), $.methodSignature("Peek", [["n", /* @__PURE__ */ $.basicType("int")]], [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")), "error"], true), $.methodSignature("Read", [["p", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))]], [["n", /* @__PURE__ */ $.basicType("int")], ["err", "error"]], true), $.methodSignature("ReadByte", [], [/* @__PURE__ */ $.basicType("uint8"), "error"], true), $.methodSignature("ReadBytes", [["delim", /* @__PURE__ */ $.basicType("uint8")]], [["line", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))], ["err", "error"]], true), $.methodSignature("ReadFrom", [["r", "io.Reader"]], [["n", /* @__PURE__ */ $.basicType("int64")], ["err", "error"]], true), $.methodSignature("ReadRune", [], [["r", /* @__PURE__ */ $.basicType("int32")], ["size", /* @__PURE__ */ $.basicType("int")], ["err", "error"]], true), $.methodSignature("ReadString", [["delim", /* @__PURE__ */ $.basicType("uint8")]], [["line", /* @__PURE__ */ $.basicType("string")], ["err", "error"]], true), $.methodSignature("Reset", [], [], true), $.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")], true), $.methodSignature("Truncate", [["n", /* @__PURE__ */ $.basicType("int")]], [], true), $.methodSignature("UnreadByte", [], ["error"], true), $.methodSignature("UnreadRune", [], ["error"], true), $.methodSignature("Write", [["p", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))]], [["n", /* @__PURE__ */ $.basicType("int")], ["err", "error"]], true), $.methodSignature("WriteByte", [["c", /* @__PURE__ */ $.basicType("uint8")]], ["error"], true), $.methodSignature("WriteRune", [["r", /* @__PURE__ */ $.basicType("int32")]], [["n", /* @__PURE__ */ $.basicType("int")], ["err", "error"]], true), $.methodSignature("WriteString", [["s", /* @__PURE__ */ $.basicType("string")]], [["n", /* @__PURE__ */ $.basicType("int")], ["err", "error"]], true), $.methodSignature("WriteTo", [["w", "io.Writer"]], [["n", /* @__PURE__ */ $.basicType("int64")], ["err", "error"]], true)]))
 }
 
 var __goscriptStatic1$value: any
 function __goscriptStatic1(): any {
-	return __goscriptStatic1$value ??= (/* @__PURE__ */ $.basicType("int", "slog.Level"))
+	return __goscriptStatic1$value ??= ({AppendText: (receiver: any, ...args: any[]) => (slog.Level_AppendText as any)(($.isVarRef(receiver) ? receiver.value : receiver), ...$.stripGenericTypeArgs(args)), Level: (receiver: any) => (slog.Level_Level as any)(($.isVarRef(receiver) ? receiver.value : receiver)), MarshalJSON: (receiver: any) => (slog.Level_MarshalJSON as any)(($.isVarRef(receiver) ? receiver.value : receiver)), MarshalText: (receiver: any) => (slog.Level_MarshalText as any)(($.isVarRef(receiver) ? receiver.value : receiver)), String: (receiver: any) => (slog.Level_String as any)(($.isVarRef(receiver) ? receiver.value : receiver))})
 }
 
 var __goscriptStatic2$value: any
 function __goscriptStatic2(): any {
-	return __goscriptStatic2$value ??= ([$.methodSignature("AppendText", [["b", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))]], [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")), "error"]), $.methodSignature("Level", [], [/* @__PURE__ */ $.basicType("int", "slog.Level")]), $.methodSignature("MarshalJSON", [], [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")), "error"]), $.methodSignature("MarshalText", [], [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")), "error"]), $.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])])
+	return __goscriptStatic2$value ??= (/* @__PURE__ */ $.basicType("int", "slog.Level"))
+}
+
+var __goscriptStatic3$value: any
+function __goscriptStatic3(): any {
+	return __goscriptStatic3$value ??= ([$.methodSignature("AppendText", [["b", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))]], [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")), "error"]), $.methodSignature("Level", [], [/* @__PURE__ */ $.basicType("int", "slog.Level")]), $.methodSignature("MarshalJSON", [], [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")), "error"]), $.methodSignature("MarshalText", [], [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")), "error"]), $.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])])
 }
 
 if ($.isMainScript(import.meta)) {

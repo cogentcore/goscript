@@ -216,7 +216,7 @@ export async function main(): globalThis.Promise<void> {
 	ok = __goscriptTuple3[1]
 	await $.println("map:", ok)
 
-	let d = json.NewDecoder($.pointerValueOrNil($.interfaceValue<io.Reader | null>(strings.NewReader("{\"n\": 12}"), "*strings.Reader", /* @__PURE__ */ $.pointerType("strings.Reader")))!)
+	let d = json.NewDecoder($.pointerValueOrNil($.interfaceValue<io.Reader | null>(strings.NewReader("{\"n\": 12}"), "*strings.Reader", __goscriptStatic7()))!)
 	void (d !== null && (d as any).__isVarRef !== true && (d as any).__goValue === undefined ? ((d as any) as json.Decoder).UseNumber() : json.Decoder.prototype.UseNumber.call($.pointerValue<json.Decoder>(d)))
 	let obj: $.VarRef<globalThis.Map<string, any> | null> = $.varRef(null! as globalThis.Map<string, any> | null)
 	{
@@ -236,8 +236,8 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("other:", $.comparableEqual(_get(1), $.namedValueInterfaceValue<$.GoError>(errMissing, "main.FormatError", {"Error": FormatError_Error}, /* @__PURE__ */ $.basicType("string", "main.FormatError"))), $.comparableEqual(_get(2), $.namedValueInterfaceValue<$.GoError>(3, "main.Code", {"Error": Code_Error}, /* @__PURE__ */ $.basicType("int", "main.Code"))), $.comparableEqual(_get(2), $.namedValueInterfaceValue<$.GoError>(4, "main.Code", {"Error": Code_Error}, /* @__PURE__ */ $.basicType("int", "main.Code"))))
 	let e2: $.GoError = $.namedValueInterfaceValue<$.GoError>("missing", "main.FormatError", {"Error": FormatError_Error}, /* @__PURE__ */ $.basicType("string", "main.FormatError"))
 	await $.println("boxed eq:", $.comparableEqual(err, e2))
-	let ae: any = $.namedValueInterfaceValue<any>(errMissing, "main.FormatError", __goscriptStatic7(), __goscriptStatic8(), __goscriptStatic9())
-	await $.println("any eq:", $.comparableEqual(ae, $.namedValueInterfaceValue<any>(errMissing, "main.FormatError", __goscriptStatic7(), __goscriptStatic8(), __goscriptStatic9())), $.comparableEqual(ae, "missing"))
+	let ae: any = $.namedValueInterfaceValue<any>(errMissing, "main.FormatError", __goscriptStatic8(), __goscriptStatic9(), __goscriptStatic10())
+	await $.println("any eq:", $.comparableEqual(ae, $.namedValueInterfaceValue<any>(errMissing, "main.FormatError", __goscriptStatic8(), __goscriptStatic9(), __goscriptStatic10())), $.comparableEqual(ae, "missing"))
 }
 
 var __goscriptStatic0$value: any
@@ -277,17 +277,22 @@ function __goscriptStatic6(): any {
 
 var __goscriptStatic7$value: any
 function __goscriptStatic7(): any {
-	return __goscriptStatic7$value ??= ({Error: (receiver: any) => (FormatError_Error as any)(($.isVarRef(receiver) ? receiver.value : receiver))})
+	return __goscriptStatic7$value ??= ($.overrideTypeMethods(/* @__PURE__ */ $.pointerType("strings.Reader"), "strings.Reader", () => [$.methodSignature("Len", [], [/* @__PURE__ */ $.basicType("int")], true), $.methodSignature("Read", [["b", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))]], [["n", /* @__PURE__ */ $.basicType("int")], ["err", "error"]], true), $.methodSignature("ReadAt", [["b", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))], ["off", /* @__PURE__ */ $.basicType("int64")]], [["n", /* @__PURE__ */ $.basicType("int")], ["err", "error"]], true), $.methodSignature("ReadByte", [], [/* @__PURE__ */ $.basicType("uint8"), "error"], true), $.methodSignature("ReadRune", [], [["ch", /* @__PURE__ */ $.basicType("int32")], ["size", /* @__PURE__ */ $.basicType("int")], ["err", "error"]], true), $.methodSignature("Reset", [["s", /* @__PURE__ */ $.basicType("string")]], [], true), $.methodSignature("Seek", [["offset", /* @__PURE__ */ $.basicType("int64")], ["whence", /* @__PURE__ */ $.basicType("int")]], [/* @__PURE__ */ $.basicType("int64"), "error"], true), $.methodSignature("Size", [], [/* @__PURE__ */ $.basicType("int64")], true), $.methodSignature("UnreadByte", [], ["error"], true), $.methodSignature("UnreadRune", [], ["error"], true), $.methodSignature("WriteTo", [["w", "io.Writer"]], [["n", /* @__PURE__ */ $.basicType("int64")], ["err", "error"]], true)]))
 }
 
 var __goscriptStatic8$value: any
 function __goscriptStatic8(): any {
-	return __goscriptStatic8$value ??= (/* @__PURE__ */ $.basicType("string", "main.FormatError"))
+	return __goscriptStatic8$value ??= ({Error: (receiver: any) => (FormatError_Error as any)(($.isVarRef(receiver) ? receiver.value : receiver))})
 }
 
 var __goscriptStatic9$value: any
 function __goscriptStatic9(): any {
-	return __goscriptStatic9$value ??= ([$.methodSignature("Error", [], [/* @__PURE__ */ $.basicType("string")])])
+	return __goscriptStatic9$value ??= (/* @__PURE__ */ $.basicType("string", "main.FormatError"))
+}
+
+var __goscriptStatic10$value: any
+function __goscriptStatic10(): any {
+	return __goscriptStatic10$value ??= ([$.methodSignature("Error", [], [/* @__PURE__ */ $.basicType("string")])])
 }
 
 var __goscriptAwait: any

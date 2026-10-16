@@ -28,7 +28,7 @@ export async function serve(mux: http.ServeMux | $.VarRef<http.ServeMux> | null,
 	const req$: http.Request = req == null ? $.pointerTarget<http.Request>(req) : (req as any).__isVarRef === true ? (req as any).value : (req as any).__goValue === undefined ? (req as any) : $.pointerTarget<http.Request>(req)
 	let rec = httptest.NewRecorder()
 	let rec$: httptest.ResponseRecorder = rec == null ? $.pointerTarget<httptest.ResponseRecorder>(rec) : (rec as any).__isVarRef === true ? (rec as any).value : (rec as any).__goValue === undefined ? (rec as any) : $.pointerTarget<httptest.ResponseRecorder>(rec)
-	await http.ServeMux.prototype.ServeHTTP.call($.pointerValue<http.ServeMux>(mux), $.pointerValueOrNil($.interfaceValue<http.ResponseWriter | null>(rec, "*httptest.ResponseRecorder", /* @__PURE__ */ $.pointerType("httptest.ResponseRecorder")))!, req)
+	await http.ServeMux.prototype.ServeHTTP.call($.pointerValue<http.ServeMux>(mux), $.pointerValueOrNil($.interfaceValue<http.ResponseWriter | null>(rec, "*httptest.ResponseRecorder", __goscriptStatic3()))!, req)
 	await $.println((req$ as http.Request).Method, (req$ as http.Request).Host, $.pointerValue<url.URL>((req$ as http.Request).URL).Path, "->", (rec$ as httptest.ResponseRecorder).Code, $.pointerValue<bytes.Buffer>((rec$ as httptest.ResponseRecorder).Body).String(), await http.Header_Get((rec !== null && (rec as any).__isVarRef !== true && (rec as any).__goValue === undefined ? ((rec as any) as httptest.ResponseRecorder).Header() : httptest.ResponseRecorder.prototype.Header.call($.pointerValue<httptest.ResponseRecorder>(rec))), "Allow"), await http.Header_Get((rec !== null && (rec as any).__isVarRef !== true && (rec as any).__goValue === undefined ? ((rec as any) as httptest.ResponseRecorder).Header() : httptest.ResponseRecorder.prototype.Header.call($.pointerValue<httptest.ResponseRecorder>(rec))), "Location"))
 }
 
@@ -130,6 +130,11 @@ function __goscriptStatic1(): any {
 var __goscriptStatic2$value: any
 function __goscriptStatic2(): any {
 	return __goscriptStatic2$value ??= ([$.methodSignature("ServeHTTP", [["w", "http.ResponseWriter"], ["r", /* @__PURE__ */ $.pointerType("http.Request")]])])
+}
+
+var __goscriptStatic3$value: any
+function __goscriptStatic3(): any {
+	return __goscriptStatic3$value ??= ($.overrideTypeMethods(/* @__PURE__ */ $.pointerType("httptest.ResponseRecorder"), "httptest.ResponseRecorder", () => [$.methodSignature("Flush", [], [], true), $.methodSignature("Header", [], ["http.Header"], true), $.methodSignature("Result", [], [/* @__PURE__ */ $.pointerType("http.Response")], true), $.methodSignature("Write", [["buf", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))]], [/* @__PURE__ */ $.basicType("int"), "error"], true), $.methodSignature("WriteHeader", [["code", /* @__PURE__ */ $.basicType("int")]], [], true), $.methodSignature("WriteString", [["str", /* @__PURE__ */ $.basicType("string")]], [/* @__PURE__ */ $.basicType("int"), "error"], true)]))
 }
 
 var __goscriptAwait: any

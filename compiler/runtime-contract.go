@@ -178,6 +178,7 @@ const (
 	RuntimeHelperRegisterInterfaceType          RuntimeHelper = "type.registerInterfaceType"
 	RuntimeHelperRegisterTypePackagePath        RuntimeHelper = "type.registerTypePackagePath"
 	RuntimeHelperRegisterNamedValueType         RuntimeHelper = "type.registerNamedValueType"
+	RuntimeHelperOverrideTypeMethods            RuntimeHelper = "type.overrideTypeMethods"
 	RuntimeHelperRegisterNamedType              RuntimeHelper = "type.registerNamedType"
 	RuntimeHelperGetTypeByName                  RuntimeHelper = "type.getTypeByName"
 	RuntimeHelperTypeAssert                     RuntimeHelper = "type.typeAssert"
@@ -473,6 +474,7 @@ func runtimeHelperContracts() []RuntimeHelperContract {
 		runtimeHelper(RuntimeHelperRegisterStructType, "registerStructType", RuntimeHelperCategoryType),
 		runtimeHelper(RuntimeHelperRegisterInterfaceType, "registerInterfaceType", RuntimeHelperCategoryType),
 		runtimeHelper(RuntimeHelperRegisterNamedValueType, "registerNamedValueType", RuntimeHelperCategoryType),
+		runtimeHelper(RuntimeHelperOverrideTypeMethods, "overrideTypeMethods", RuntimeHelperCategoryType),
 		runtimeHelper(RuntimeHelperRegisterNamedType, "registerNamedType", RuntimeHelperCategoryType),
 		runtimeHelper(RuntimeHelperRegisterTypePackagePath, "registerTypePackagePath", RuntimeHelperCategoryType),
 		runtimeHelper(RuntimeHelperGetTypeByName, "getTypeByName", RuntimeHelperCategoryType),
