@@ -96,5 +96,5 @@ export function LocalType(): reflect.Type | null {
 			() => [/* @__PURE__ */ $.structField("A", /* @__PURE__ */ $.basicType("int"), [0], 0, true)]
 		)
 	}
-	return reflect.TypeOf($.interfaceValue($.markAsStructValue(new local()), "dep.local", "dep.local"))
+	return reflect.TypeOf($.structInterfaceValue($.markAsStructValue(new local()), "dep.local", "dep.local"))
 }

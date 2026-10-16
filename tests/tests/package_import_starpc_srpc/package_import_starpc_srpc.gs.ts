@@ -681,7 +681,7 @@ export async function newRoutedRpcStreamClient(ctx: context.Context | null, comp
 export async function exerciseRpcStreamClientPressure(ctx: context.Context | null): globalThis.Promise<boolean> {
 	let mux = srpc.NewMux(null)
 	{
-		let err = (__goscriptAwait = (mux !== null && (mux as any).__isVarRef !== true && ((mux as any).__goValue === undefined || (mux as any).__goType?.charCodeAt(0) !== 42) ? (mux as Exclude<srpc.Mux, null>) : $.pointerValue<Exclude<srpc.Mux, null>>(mux)).Register($.interfaceValue<srpc.Handler | null>(new handler(true), "main.handler", "main.handler")), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+		let err = (__goscriptAwait = (mux !== null && (mux as any).__isVarRef !== true && ((mux as any).__goValue === undefined || (mux as any).__goType?.charCodeAt(0) !== 42) ? (mux as Exclude<srpc.Mux, null>) : $.pointerValue<Exclude<srpc.Mux, null>>(mux)).Register($.structInterfaceValue<srpc.Handler | null>(new handler(true), "main.handler", "main.handler")), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 		if (err != null) {
 			await $.println("rpcstream pressure register error:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 			return false
@@ -885,7 +885,7 @@ export async function exercisePushablePacketWriter(): globalThis.Promise<boolean
 	const __goscriptDeferCallee1 = $.functionValue(((__receiver) => () => __receiver.Release())($.markAsStructValue($.cloneStructValue(endFn))), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "syscall/js.Func.Release-fm")
 	__defer.defer(() => { __goscriptDeferCallee1() })
 
-	let writer = srpc.NewPushablePacketWriter(js.ValueOf($.interfaceValue($.makeMap<string, any>([["push", $.interfaceValue($.markAsStructValue($.cloneStructValue(pushFn)), "js.Func", "js.Func")], ["end", $.interfaceValue($.markAsStructValue($.cloneStructValue(endFn)), "js.Func", "js.Func")]]), "map[string]interface{}", /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), { kind: $.TypeKind.Interface, methods: [] }))))
+	let writer = srpc.NewPushablePacketWriter(js.ValueOf($.interfaceValue($.makeMap<string, any>([["push", $.structInterfaceValue($.markAsStructValue($.cloneStructValue(pushFn)), "js.Func", "js.Func")], ["end", $.structInterfaceValue($.markAsStructValue($.cloneStructValue(endFn)), "js.Func", "js.Func")]]), "map[string]interface{}", /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), { kind: $.TypeKind.Interface, methods: [] }))))
 	{
 		let err = (writer !== null && (writer as any).__isVarRef !== true && (writer as any).__goValue === undefined ? ((writer as any) as srpc.PushablePacketWriter).WritePacket(srpc.NewCallStartPacket("svc", "push", new Uint8Array([7, 8, 9]) as $.Slice<number>, false)) : srpc.PushablePacketWriter.prototype.WritePacket.call(writer, srpc.NewCallStartPacket("svc", "push", new Uint8Array([7, 8, 9]) as $.Slice<number>, false)))
 		if (err != null) {
@@ -964,7 +964,7 @@ export async function main(): globalThis.Promise<void> {
 	__defer.defer(async () => { (__goscriptAwait = __goscriptDeferCallee2!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) })
 
 	let mux = srpc.NewMux(null);
-	;(__goscriptAwait = (mux !== null && (mux as any).__isVarRef !== true && ((mux as any).__goValue === undefined || (mux as any).__goType?.charCodeAt(0) !== 42) ? (mux as Exclude<srpc.Mux, null>) : $.pointerValue<Exclude<srpc.Mux, null>>(mux)).Register($.interfaceValue<srpc.Handler | null>(new handler(true), "main.handler", "main.handler")), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+	;(__goscriptAwait = (mux !== null && (mux as any).__isVarRef !== true && ((mux as any).__goValue === undefined || (mux as any).__goType?.charCodeAt(0) !== 42) ? (mux as Exclude<srpc.Mux, null>) : $.pointerValue<Exclude<srpc.Mux, null>>(mux)).Register($.structInterfaceValue<srpc.Handler | null>(new handler(true), "main.handler", "main.handler")), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 	await (mux !== null && (mux as any).__isVarRef !== true && ((mux as any).__goValue === undefined || (mux as any).__goType?.charCodeAt(0) !== 42) ? (mux as Exclude<srpc.Mux, null>) : $.pointerValue<Exclude<srpc.Mux, null>>(mux)).InvokeMethod("svc", "method", null)
 	closeEmbedded
 	$.functionValue(async (strm: srpc.StreamRecv | null): globalThis.Promise<$.GoError> => await recvOne(__goscriptStatic4(), strm), ({ kind: $.TypeKind.Function, params: ["srpc.StreamRecv"], results: ["error"] } as $.FunctionTypeInfo))

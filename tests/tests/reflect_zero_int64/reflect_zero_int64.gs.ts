@@ -50,16 +50,16 @@ export async function main(): globalThis.Promise<void> {
 	let d: time.Duration = 0n
 	await $.println(isZero($.namedValueInterfaceValue<any>(d, "time.Duration", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2())))
 	let tm = $.markAsStructValue(new time.Time())
-	await $.println(isZero($.interfaceValue($.markAsStructValue($.cloneStructValue(tm)), "time.Time", "time.Time")))
-	await $.println(isZero($.interfaceValue($.markAsStructValue(new time.Time()), "time.Time", "time.Time")))
-	await $.println($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.namedValueInterfaceValue<any>(d, "time.Duration", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2())))).IsZero(), $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.markAsStructValue($.cloneStructValue(tm)), "time.Time", "time.Time")))).IsZero())
+	await $.println(isZero($.structInterfaceValue($.markAsStructValue($.cloneStructValue(tm)), "time.Time", "time.Time")))
+	await $.println(isZero($.structInterfaceValue($.markAsStructValue(new time.Time()), "time.Time", "time.Time")))
+	await $.println($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.namedValueInterfaceValue<any>(d, "time.Duration", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2())))).IsZero(), $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.structInterfaceValue($.markAsStructValue($.cloneStructValue(tm)), "time.Time", "time.Time")))).IsZero())
 	await $.println($.markAsStructValue($.cloneStructValue(tm)).Year(), $.markAsStructValue($.cloneStructValue(tm)).String(), $.markAsStructValue($.cloneStructValue(tm)).Format("2006-01-02"))
 
 	// assigning a Time field through a pointer copies the Time
 	let t: $.VarRef<timer> = $.varRef(new timer(true))
-	await $.println(isZero($.interfaceValue($.markAsStructValue($.cloneStructValue(t.value.start)), "time.Time", "time.Time")), isZero($.namedValueInterfaceValue<any>(t.value.total, "time.Duration", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2())))
+	await $.println(isZero($.structInterfaceValue($.markAsStructValue($.cloneStructValue(t.value.start)), "time.Time", "time.Time")), isZero($.namedValueInterfaceValue<any>(t.value.total, "time.Duration", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2())))
 	t.value.Start()
-	await $.println(isZero($.interfaceValue($.markAsStructValue($.cloneStructValue(t.value.start)), "time.Time", "time.Time")), $.markAsStructValue($.cloneStructValue(t.value.start)).Year() > 2000)
+	await $.println(isZero($.structInterfaceValue($.markAsStructValue($.cloneStructValue(t.value.start)), "time.Time", "time.Time")), $.markAsStructValue($.cloneStructValue(t.value.start)).Year() > 2000)
 }
 
 var __goscriptStatic0$value: any

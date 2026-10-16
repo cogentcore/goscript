@@ -214,13 +214,13 @@ export async function main(): globalThis.Promise<void> {
 	// Pointers compare by identity, interfaces by their dynamic values.
 	let n1 = new node(false, "x")
 	let n2 = new node(false, "x")
-	let m1 = new mixed(true, "m", 1.5, true, n1, $.interfaceValue(new pos(true, 1, 1), "main.pos", "main.pos"), undefined, new pos(true, 7, 8))
+	let m1 = new mixed(true, "m", 1.5, true, n1, $.structInterfaceValue(new pos(true, 1, 1), "main.pos", "main.pos"), undefined, new pos(true, 7, 8))
 	let m2 = (m1).clone()
 	await $.println("mixed:", (m1.Name === m2.Name && m1.F === m2.F && m1.OK === m2.OK && $.pointerEqual(m1.Ptr, m2.Ptr) && $.comparableEqual(m1.Any, m2.Any) && m1.Inner.Line === m2.Inner.Line && m1.Inner.Char === m2.Inner.Char))
 	m2.Ptr = n2
 	await $.println("other pointer:", (m1.Name === m2.Name && m1.F === m2.F && m1.OK === m2.OK && $.pointerEqual(m1.Ptr, m2.Ptr) && $.comparableEqual(m1.Any, m2.Any) && m1.Inner.Line === m2.Inner.Line && m1.Inner.Char === m2.Inner.Char))
 	m2 = m2.__goscriptAssign(m1)
-	m2.Any = $.interfaceValue(new pos(true, 1, 2), "main.pos", "main.pos")
+	m2.Any = $.structInterfaceValue(new pos(true, 1, 2), "main.pos", "main.pos")
 	await $.println("other interface value:", (m1.Name === m2.Name && m1.F === m2.F && m1.OK === m2.OK && $.pointerEqual(m1.Ptr, m2.Ptr) && $.comparableEqual(m1.Any, m2.Any) && m1.Inner.Line === m2.Inner.Line && m1.Inner.Char === m2.Inner.Char))
 	m2.Any = "text"
 	await $.println("other interface type:", (m1.Name === m2.Name && m1.F === m2.F && m1.OK === m2.OK && $.pointerEqual(m1.Ptr, m2.Ptr) && $.comparableEqual(m1.Any, m2.Any) && m1.Inner.Line === m2.Inner.Line && m1.Inner.Char === m2.Inner.Char))

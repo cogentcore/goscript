@@ -99,7 +99,7 @@ export function Fixed_Mark(f: Fixed): boolean {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let shapes = $.arrayToSlice<Shape | null>([$.namedValueInterfaceValue<Shape | null>($.arrayToSlice<dep.Ref | null>([$.namedValueInterfaceValue<dep.Ref | null>($.arrayValue(new Uint8Array([1, 2])), "main.value", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2())]), "main.Fixed", __goscriptStatic3(), __goscriptStatic4(), __goscriptStatic5()), $.interfaceValue<Shape | null>(new Action(true, 1, $.makeMap<number, dep.Ref | null>([[1, $.namedValueInterfaceValue<dep.Ref | null>($.arrayValue(new Uint8Array([1, 2])), "main.value", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2())]])), "main.Action", "main.Action")])
+	let shapes = $.arrayToSlice<Shape | null>([$.namedValueInterfaceValue<Shape | null>($.arrayToSlice<dep.Ref | null>([$.namedValueInterfaceValue<dep.Ref | null>($.arrayValue(new Uint8Array([1, 2])), "main.value", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2())]), "main.Fixed", __goscriptStatic3(), __goscriptStatic4(), __goscriptStatic5()), $.structInterfaceValue<Shape | null>(new Action(true, 1, $.makeMap<number, dep.Ref | null>([[1, $.namedValueInterfaceValue<dep.Ref | null>($.arrayValue(new Uint8Array([1, 2])), "main.value", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2())]])), "main.Action", "main.Action")])
 	let fixed: $.Slice<Fixed> = null! as $.Slice<Fixed>
 	for (let __goscriptRangeTarget0 = shapes, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
 		let shape = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as Shape | null)

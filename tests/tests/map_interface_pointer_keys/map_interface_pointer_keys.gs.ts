@@ -131,9 +131,9 @@ export async function main(): globalThis.Promise<void> {
 
 	// Struct values with equal fields are the same key.
 	let v = $.makeMap<any, number>([])
-	$.mapSet(v, $.interfaceValue(new node(true, "x", 1), "main.node", "main.node"), 1)
-	$.mapSet(v, $.interfaceValue(new node(true, "x", 1), "main.node", "main.node"), 2)
-	await $.println("value keys:", $.len(v), $.mapGet<any, number, number>(v, $.interfaceValue(new node(true, "x", 1), "main.node", "main.node"), 0)[0])
+	$.mapSet(v, $.structInterfaceValue(new node(true, "x", 1), "main.node", "main.node"), 1)
+	$.mapSet(v, $.structInterfaceValue(new node(true, "x", 1), "main.node", "main.node"), 2)
+	await $.println("value keys:", $.len(v), $.mapGet<any, number, number>(v, $.structInterfaceValue(new node(true, "x", 1), "main.node", "main.node"), 0)[0])
 }
 
 if ($.isMainScript(import.meta)) {

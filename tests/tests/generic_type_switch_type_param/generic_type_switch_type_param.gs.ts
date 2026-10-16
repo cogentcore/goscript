@@ -139,10 +139,10 @@ export class Sides {
 export async function main(): globalThis.Promise<void> {
 	let s: $.VarRef<Sides> = $.varRef(new Sides(true, new Value(true), new Value(true)))
 	await $.println(s.value.SetAny(__goscriptStatic0(), "3px"))
-	await $.println(s.value.SetAny(__goscriptStatic0(), $.interfaceValue(new Value(true, 1, "px"), "main.Value", "main.Value")), $.markAsStructValue($.cloneStructValue(s.value.Top)).String())
+	await $.println(s.value.SetAny(__goscriptStatic0(), $.structInterfaceValue(new Value(true, 1, "px"), "main.Value", "main.Value")), $.markAsStructValue($.cloneStructValue(s.value.Top)).String())
 	await $.println(s.value.SetAny(__goscriptStatic0(), $.interfaceValue(new Value(false, 2, "em"), "*main.Value", /* @__PURE__ */ $.pointerType("main.Value"))), $.markAsStructValue($.cloneStructValue(s.value.Right)).String())
 	await $.println(s.value.SetAny(__goscriptStatic0(), $.interfaceValue($.arrayToSlice<Value>([new Value(true, 3, "a"), new Value(true, 4, "b")]), "[]main.Value", /* @__PURE__ */ $.sliceType("main.Value"))), $.markAsStructValue($.cloneStructValue(s.value.Top)).String(), $.markAsStructValue($.cloneStructValue(s.value.Right)).String())
-	await $.println(s.value.SetAny(__goscriptStatic0(), $.interfaceValue(new Sides(true, new Value(true, 5, "c"), new Value(true)), "main.Sides", "main.Sides")), $.markAsStructValue($.cloneStructValue(s.value.Top)).String())
+	await $.println(s.value.SetAny(__goscriptStatic0(), $.structInterfaceValue(new Sides(true, new Value(true, 5, "c"), new Value(true)), "main.Sides", "main.Sides")), $.markAsStructValue($.cloneStructValue(s.value.Top)).String())
 	await $.println(s.value.SetAny(__goscriptStatic0(), $.namedValueInterfaceValue<any>(new Sides(false, new Value(true), new Value(true, 6, "d")), "*main.Sides", __goscriptStatic1(), __goscriptStatic2(), __goscriptStatic3())), $.markAsStructValue($.cloneStructValue(s.value.Right)).String())
 	await $.println(s.value.SetAny(__goscriptStatic0(), $.basicInterfaceValue(7, "int")))
 

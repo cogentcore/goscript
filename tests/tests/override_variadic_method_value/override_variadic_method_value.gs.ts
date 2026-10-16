@@ -55,7 +55,7 @@ export async function main(): globalThis.Promise<void> {
 	const __goscriptDeferCallee3 = $.functionValue(((__receiver) => () => __receiver.Release())($.markAsStructValue($.cloneStructValue(hit))), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "syscall/js.Func.Release-fm")
 	__defer.defer(() => { __goscriptDeferCallee3() })
 	let obj = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(js.Global())).Get("Object"))).New()))
-	$.markAsStructValue($.cloneStructValue(obj)).Set("hit", $.interfaceValue($.markAsStructValue($.cloneStructValue(hit)), "js.Func", "js.Func"))
+	$.markAsStructValue($.cloneStructValue(obj)).Set("hit", $.structInterfaceValue($.markAsStructValue($.cloneStructValue(hit)), "js.Func", "js.Func"))
 
 	// A method value takes its variadic arguments as a slice.
 	let call: ((m: string, args: $.Slice<any>) => js.Value | globalThis.Promise<js.Value>) | null = $.functionValue(((__receiver) => (m: string, args: $.Slice<any>) => __receiver.Call(m, ...(args ?? [])))($.markAsStructValue($.cloneStructValue(obj))), ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.sliceType({ kind: $.TypeKind.Interface, methods: [] })], results: ["js.Value"], isVariadic: true } as $.FunctionTypeInfo), "syscall/js.Value.Call-fm")

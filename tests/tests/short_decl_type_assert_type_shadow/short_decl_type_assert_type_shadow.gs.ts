@@ -50,7 +50,7 @@ export function use(v: any): string {
 }
 
 export async function main(): globalThis.Promise<void> {
-	await $.println(use($.interfaceValue(new item(true), "main.item", "main.item")))
+	await $.println(use($.structInterfaceValue(new item(true), "main.item", "main.item")))
 }
 
 if ($.isMainScript(import.meta)) {

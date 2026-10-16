@@ -76,14 +76,14 @@ export async function label(v: fmt.Stringer | null, n: number): globalThis.Promi
 }
 
 export function describe(p: point): string {
-	return (fmt.Sprint("point ", $.interfaceValue((p).clone(), "main.point", "main.point")) as string)
+	return (fmt.Sprint("point ", $.structInterfaceValue((p).clone(), "main.point", "main.point")) as string)
 }
 
 export async function main(): globalThis.Promise<void> {
-	await $.println(await label($.interfaceValue<fmt.Stringer | null>(new slowName(true, $.makeChannel<string>(1, "", "both")), "main.slowName", "main.slowName"), 1))
-	await $.println(await label($.interfaceValue<fmt.Stringer | null>(new point(true, 2, 3), "main.point", "main.point"), 4))
+	await $.println(await label($.structInterfaceValue<fmt.Stringer | null>(new slowName(true, $.makeChannel<string>(1, "", "both")), "main.slowName", "main.slowName"), 1))
+	await $.println(await label($.structInterfaceValue<fmt.Stringer | null>(new point(true, 2, 3), "main.point", "main.point"), 4))
 	await $.println(describe(new point(true, 5, 6)))
-	let err = fmt.Errorf("bad %v", $.interfaceValue(new slowName(true, $.makeChannel<string>(1, "", "both")), "main.slowName", "main.slowName"))
+	let err = fmt.Errorf("bad %v", $.structInterfaceValue(new slowName(true, $.makeChannel<string>(1, "", "both")), "main.slowName", "main.slowName"))
 	await $.println((__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 }
 

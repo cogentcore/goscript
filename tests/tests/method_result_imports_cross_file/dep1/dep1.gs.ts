@@ -34,5 +34,5 @@ export class maker {
 }
 
 export function Make(): dep2.Value | null {
-	return $.interfaceValue<dep2.Value | null>(new maker(true), "dep1.maker", "dep1.maker")
+	return $.structInterfaceValue<dep2.Value | null>(new maker(true), "dep1.maker", "dep1.maker")
 }

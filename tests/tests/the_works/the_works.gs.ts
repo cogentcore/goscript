@@ -420,7 +420,7 @@ export async function main(): globalThis.Promise<void> {
 				channel: answers,
 				onSelected: async (__goscriptSelect0Result) => {
 					let a = __goscriptSelect0Result.value
-					$.mapSet(reports, a.Name, $.interfaceValue<Report | null>((a).clone(), "main.Answer", "main.Answer"))
+					$.mapSet(reports, a.Name, $.structInterfaceValue<Report | null>((a).clone(), "main.Answer", "main.Answer"))
 				}
 			},
 			{

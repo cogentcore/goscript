@@ -2694,6 +2694,125 @@ export function genericInterfaceValue<T = any>(
   )
 }
 
+// structBoxClass keys, on the prototype of a struct class, the class of the
+// boxes of its values (see structValueBox), or null if it has none.
+const structBoxClass = Symbol('structBoxClass')
+
+// StructBoxClass constructs the zero box of a struct class.
+type StructBoxClass = new () => { __goscriptAssign(source: object): object }
+
+// structValueBox returns a copy of a struct value, an instance of the class
+// of value, made as the box of the value in an interface with the dynamic
+// type typeName: an instance of a subclass whose prototype holds the type
+// name and info that interfaceValue would define on the value, which it
+// does much faster. Go copies a value into an interface, so the box need
+// not be the value itself. It returns undefined for a value that is not of
+// the struct class registered as typeName, or of a class that has nested
+// struct or array fields, which the zero box would allocate, or no
+// __goscriptAssign method to copy the fields.
+function structValueBox(value: object, typeName: string): object | undefined {
+  // The box class of the value's class is made once.
+  const proto = Object.getPrototypeOf(value) as Record<PropertyKey, unknown>
+  let boxClass =
+    Object.prototype.hasOwnProperty.call(proto, structBoxClass) ?
+      (proto[structBoxClass] as StructBoxClass | null)
+    : undefined
+  if (boxClass === undefined) {
+    boxClass = makeStructBoxClass(proto)
+    Object.defineProperty(proto, structBoxClass, {
+      value: boxClass,
+      configurable: true,
+    })
+  }
+
+  // The box is a zero box of the class, marked as a value and assigned the
+  // fields of value.
+  if (boxClass === null || (boxClass as any).prototype.__goType !== typeName) {
+    return undefined
+  }
+  const box = new boxClass()
+  ;(box as any)[structValueMarker] = true
+  box.__goscriptAssign(value)
+  return box
+}
+
+// makeStructBoxClass returns the box class of the struct class with the
+// given prototype (see structValueBox), or null if it can have none.
+function makeStructBoxClass(
+  proto: Record<PropertyKey, unknown>,
+): StructBoxClass | null {
+  // The class is a registered struct class, whose fields are neither
+  // structs nor arrays, with a method to assign its fields.
+  const ctor = proto.constructor as
+    | (StructBoxClass & { __typeInfo?: TypeInfo | string })
+    | undefined
+  const info = resolveTypeInfo(ctor?.__typeInfo)
+  if (
+    ctor === undefined ||
+    ctor.prototype !== proto ||
+    info === undefined ||
+    !isStructTypeInfo(info) ||
+    info.name === undefined ||
+    typeof proto.__goscriptAssign !== 'function' ||
+    !info.fields.every((field) => isFlatStructFieldType(field.type))
+  ) {
+    return null
+  }
+
+  // The box class is a subclass that reports the class as its constructor
+  // and holds the type of its boxes.
+  const boxClass = class extends ctor {}
+  for (const [key, value] of [
+    ['constructor', ctor],
+    ['__goType', info.name],
+    ['__goTypeInfo', info.name],
+  ] as const) {
+    Object.defineProperty(boxClass.prototype, key, {
+      value,
+      writable: true,
+      configurable: true,
+    })
+  }
+  return boxClass
+}
+
+// isFlatStructFieldType reports whether a field of the given type is set by
+// assignment alone: it is of a known kind other than a struct or an array.
+function isFlatStructFieldType(type: TypeInfo | string): boolean {
+  const kind = resolveTypeInfo(type)?.kind
+  return (
+    kind !== undefined && kind !== TypeKind.Struct && kind !== TypeKind.Array
+  )
+}
+
+/**
+ * structInterfaceValue converts a struct value that the compiler has copied
+ * to an interface, as interfaceValue does, except that a value of a class
+ * with a box class (see structValueBox), boxed as the type the class is
+ * registered as, is copied into a box instead of having its type defined on
+ * it.
+ */
+export function structInterfaceValue<T = any>(
+  value: unknown,
+  typeName: string,
+  typeInfo?: TypeInfo | string,
+): T {
+  // Only a struct value boxed as its own registered type takes a box.
+  if (
+    typeInfo === typeName &&
+    typeof value === 'object' &&
+    value !== null &&
+    (value as any)[structValueMarker] === true &&
+    (value as any).__goType !== typeName
+  ) {
+    const box = structValueBox(value, typeName)
+    if (box !== undefined) {
+      return box as T
+    }
+  }
+  return interfaceValue<T>(value, typeName, typeInfo)
+}
+
 export function interfaceValue<T = any>(
   value: unknown,
   typeName: string,

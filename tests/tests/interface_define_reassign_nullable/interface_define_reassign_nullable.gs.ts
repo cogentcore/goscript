@@ -47,13 +47,13 @@ export class Square {
 
 export function find(ok: boolean): Shape | null {
 	if (ok) {
-		return $.interfaceValue<Shape | null>(new Square(true, 2), "main.Square", "main.Square")
+		return $.structInterfaceValue<Shape | null>(new Square(true, 2), "main.Square", "main.Square")
 	}
 	return null
 }
 
 export function first(): Shape | null {
-	return $.interfaceValue<Shape | null>(new Square(true, 3), "main.Square", "main.Square")
+	return $.structInterfaceValue<Shape | null>(new Square(true, 3), "main.Square", "main.Square")
 }
 
 export async function main(): globalThis.Promise<void> {

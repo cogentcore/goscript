@@ -147,7 +147,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// Marshal a simple struct
 	let p = new Person(true, "Alice", 30, true)
-	let __goscriptTuple0: any = (json.Marshal($.interfaceValue((p).clone(), "main.Person", "main.Person")) as [$.Slice<number>, $.GoError])
+	let __goscriptTuple0: any = (json.Marshal($.structInterfaceValue((p).clone(), "main.Person", "main.Person")) as [$.Slice<number>, $.GoError])
 	let b: $.Slice<number> = __goscriptTuple0[0]
 	let err = __goscriptTuple0[1]
 	if (err != null) {
@@ -155,7 +155,7 @@ export async function main(): globalThis.Promise<void> {
 	} else {
 		results = $.appendOne(results, "Marshal: " + $.bytesToString(b))
 	}
-	let __goscriptTuple1: any = (json.MarshalIndent($.interfaceValue(p, "main.Person", "main.Person"), "", "  ") as [$.Slice<number>, $.GoError])
+	let __goscriptTuple1: any = (json.MarshalIndent($.structInterfaceValue(p, "main.Person", "main.Person"), "", "  ") as [$.Slice<number>, $.GoError])
 	let indented: $.Slice<number> = __goscriptTuple1[0]
 	err = __goscriptTuple1[1]
 	if (err != null) {
@@ -245,7 +245,7 @@ export async function byteSliceFields(): globalThis.Promise<void> {
 
 export async function timeField(): globalThis.Promise<void> {
 	let at = $.markAsStructValue($.cloneStructValue(time.Date(2025, 5, 15, 1, 10, 42, 123456789, time.UTC)))
-	let __goscriptTuple3: any = (json.Marshal($.interfaceValue(new Event(true, "win", $.markAsStructValue($.cloneStructValue(at))), "main.Event", "main.Event")) as [$.Slice<number>, $.GoError])
+	let __goscriptTuple3: any = (json.Marshal($.structInterfaceValue(new Event(true, "win", $.markAsStructValue($.cloneStructValue(at))), "main.Event", "main.Event")) as [$.Slice<number>, $.GoError])
 	let b: $.Slice<number> = __goscriptTuple3[0]
 	let err = __goscriptTuple3[1]
 	await $.println($.bytesToString(b), err == null)

@@ -163,7 +163,7 @@ export async function main(): globalThis.Promise<void> {
 	let h = new header(false, $.arrayValue(new Uint8Array([66, 77])), 70, $.arrayValue([1, 2]), new inner(true, 0x0102, $.arrayValue(new Uint8Array([3, 4]))), -5)
 	let buf = $.varRef($.markAsStructValue(new bytes.Buffer()))
 	{
-		let err = await binary.Write($.pointerValueOrNil($.interfaceValue<io.Writer | null>(buf, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer")))!, $.interfaceValue<binary.ByteOrder | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.LittleEndian))), "binary.littleEndian", "binary.littleEndian")!, $.interfaceValue(h, "*main.header", /* @__PURE__ */ $.pointerType("main.header")))
+		let err = await binary.Write($.pointerValueOrNil($.interfaceValue<io.Writer | null>(buf, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer")))!, $.structInterfaceValue<binary.ByteOrder | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.LittleEndian))), "binary.littleEndian", "binary.littleEndian")!, $.interfaceValue(h, "*main.header", /* @__PURE__ */ $.pointerType("main.header")))
 		if (err != null) {
 			await $.println("write error:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 			return
@@ -175,7 +175,7 @@ export async function main(): globalThis.Promise<void> {
 	// Reading into a pointer to a struct fills its fields.
 	let r: $.VarRef<header> = $.varRef(new header(true))
 	{
-		let err = await binary.Read($.pointerValueOrNil($.interfaceValue<io.Reader | null>(bytes.NewReader(buf.value.Bytes()), "*bytes.Reader", /* @__PURE__ */ $.pointerType("bytes.Reader")))!, $.interfaceValue<binary.ByteOrder | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.LittleEndian))), "binary.littleEndian", "binary.littleEndian")!, $.interfaceValue(r, "*main.header", /* @__PURE__ */ $.pointerType("main.header")))
+		let err = await binary.Read($.pointerValueOrNil($.interfaceValue<io.Reader | null>(bytes.NewReader(buf.value.Bytes()), "*bytes.Reader", /* @__PURE__ */ $.pointerType("bytes.Reader")))!, $.structInterfaceValue<binary.ByteOrder | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.LittleEndian))), "binary.littleEndian", "binary.littleEndian")!, $.interfaceValue(r, "*main.header", /* @__PURE__ */ $.pointerType("main.header")))
 		if (err != null) {
 			await $.println("read error:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 			return
@@ -194,23 +194,23 @@ export async function main(): globalThis.Promise<void> {
 	}
 	let ob = $.makeSlice<number>(binary.Size($.interfaceValue(objs, "[]main.item", /* @__PURE__ */ $.sliceType("main.item"))) + 1, undefined, "byte")
 	$.sliceElems(ob!)[$.sliceSlot(ob!, $.sliceLen(ob) - 1)] = 9
-	let [n, err] = binary.Encode(ob, $.interfaceValue<binary.ByteOrder | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.LittleEndian))), "binary.littleEndian", "binary.littleEndian")!, $.interfaceValue($.goSlice(objs, 1, undefined), "[]main.item", /* @__PURE__ */ $.sliceType("main.item")))
+	let [n, err] = binary.Encode(ob, $.structInterfaceValue<binary.ByteOrder | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.LittleEndian))), "binary.littleEndian", "binary.littleEndian")!, $.interfaceValue($.goSlice(objs, 1, undefined), "[]main.item", /* @__PURE__ */ $.sliceType("main.item")))
 	await $.println("objects:", binary.Size($.interfaceValue(objs, "[]main.item", /* @__PURE__ */ $.sliceType("main.item"))), n, err == null, $.arrayIndex(ob!, 12), $.arrayIndex(ob!, 13), $.arrayIndex(ob!, 14), $.arrayIndex(ob!, 15), $.arrayIndex(ob!, 48), $.arrayIndex(ob!, 52), $.arrayIndex(ob!, 64), $.arrayIndex(ob!, $.sliceLen(ob) - 1))
 	let back = $.makeSlice<item>(2, undefined, undefined, () => new item(true))
-	let __goscriptTuple0: any = binary.Decode(ob, $.interfaceValue<binary.ByteOrder | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.LittleEndian))), "binary.littleEndian", "binary.littleEndian")!, $.interfaceValue(back, "[]main.item", /* @__PURE__ */ $.sliceType("main.item")))
+	let __goscriptTuple0: any = binary.Decode(ob, $.structInterfaceValue<binary.ByteOrder | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.LittleEndian))), "binary.littleEndian", "binary.littleEndian")!, $.interfaceValue(back, "[]main.item", /* @__PURE__ */ $.sliceType("main.item")))
 	n = __goscriptTuple0[0]
 	err = __goscriptTuple0[1]
 	await $.println("decoded:", n, err == null, $.structEqual($.arrayIndex(back!, 0), $.arrayIndex(objs!, 1)), $.structEqual($.arrayIndex(back!, 1), $.arrayIndex(objs!, 2)), $.arrayIndex($.arrayIndex(back!, 1).Colors, 1).Y, $.arrayIndex(back!, 1).Index)
 
 	// Big-endian order and arrays of structs work the same way.
-	let __goscriptTuple1: any = binary.Append(null, $.interfaceValue<binary.ByteOrder | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.BigEndian))), "binary.bigEndian", "binary.bigEndian")!, $.interfaceValue($.goSlice(objs, 2, undefined), "[]main.item", /* @__PURE__ */ $.sliceType("main.item")))
+	let __goscriptTuple1: any = binary.Append(null, $.structInterfaceValue<binary.ByteOrder | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.BigEndian))), "binary.bigEndian", "binary.bigEndian")!, $.interfaceValue($.goSlice(objs, 2, undefined), "[]main.item", /* @__PURE__ */ $.sliceType("main.item")))
 	let be: $.Slice<number> = __goscriptTuple1[0]
 	let arr: vec4[] = $.arrayValue(globalThis.Array.from({ length: 2 }, () => new vec4(true)), /* @__PURE__ */ $.arrayType("main.vec4", 2))
 	$.arrayIndex(arr, 1).W = 3
-	let __goscriptTuple2: any = binary.Append(null, $.interfaceValue<binary.ByteOrder | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.LittleEndian))), "binary.littleEndian", "binary.littleEndian")!, arr)
+	let __goscriptTuple2: any = binary.Append(null, $.structInterfaceValue<binary.ByteOrder | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.LittleEndian))), "binary.littleEndian", "binary.littleEndian")!, arr)
 	let ab: $.Slice<number> = __goscriptTuple2[0]
 	let arr2: $.VarRef<vec4[]> = $.varRef($.arrayValue(globalThis.Array.from({ length: 2 }, () => new vec4(true)), /* @__PURE__ */ $.arrayType("main.vec4", 2)))
-	let __goscriptTuple3: any = binary.Decode(ab, $.interfaceValue<binary.ByteOrder | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.LittleEndian))), "binary.littleEndian", "binary.littleEndian")!, $.interfaceValue(arr2, "*[2]main.vec4", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.arrayType("main.vec4", 2))))
+	let __goscriptTuple3: any = binary.Decode(ab, $.structInterfaceValue<binary.ByteOrder | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.LittleEndian))), "binary.littleEndian", "binary.littleEndian")!, $.interfaceValue(arr2, "*[2]main.vec4", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.arrayType("main.vec4", 2))))
 	err = __goscriptTuple3[1]
 	await $.println("big-endian:", $.sliceLen(be), $.arrayIndex(be!, 12), $.arrayIndex(be!, 13), "array:", $.sliceLen(ab), err == null, $.arrayIndex(arr2.value, 1).W)
 }

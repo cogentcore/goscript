@@ -38,7 +38,7 @@ export async function main(): globalThis.Promise<void> {
 	let p = new MyStruct(false, 20)
 
 	// Type assertions - struct value
-	let i: any = $.interfaceValue(s, "main.MyStruct", "main.MyStruct")
+	let i: any = $.structInterfaceValue(s, "main.MyStruct", "main.MyStruct")
 	let [, ok1] = $.typeAssertTuple<MyStruct>(i, "main.MyStruct")
 	let [, ok2] = $.typeAssertTuple<MyStruct | $.VarRef<MyStruct> | null>(i, /* @__PURE__ */ $.pointerType("main.MyStruct"))
 	await $.println("struct value -> MyStruct assertion:", ok1)
@@ -56,7 +56,7 @@ export async function main(): globalThis.Promise<void> {
 	let original = $.varRef(new MyStruct(true, 30))
 	let pAlias = original
 
-	let iOriginal: any = $.interfaceValue((original.value).clone(), "main.MyStruct", "main.MyStruct")
+	let iOriginal: any = $.structInterfaceValue((original.value).clone(), "main.MyStruct", "main.MyStruct")
 	let jAlias: any = $.interfaceValue(pAlias, "*main.MyStruct", /* @__PURE__ */ $.pointerType("main.MyStruct"))
 
 	let [, ok5] = $.typeAssertTuple<MyStruct>(iOriginal, "main.MyStruct")
@@ -121,7 +121,7 @@ export async function main(): globalThis.Promise<void> {
 	let nested2 = $.varRef(new MyStruct(true, 80))
 
 	// Array of interfaces containing both pointers and values
-	let arr = $.arrayToSlice<any>([$.interfaceValue(nested1, "*main.MyStruct", /* @__PURE__ */ $.pointerType("main.MyStruct")), $.interfaceValue((nested2.value).clone(), "main.MyStruct", "main.MyStruct"), $.interfaceValue(nested2, "*main.MyStruct", /* @__PURE__ */ $.pointerType("main.MyStruct"))])
+	let arr = $.arrayToSlice<any>([$.interfaceValue(nested1, "*main.MyStruct", /* @__PURE__ */ $.pointerType("main.MyStruct")), $.structInterfaceValue((nested2.value).clone(), "main.MyStruct", "main.MyStruct"), $.interfaceValue(nested2, "*main.MyStruct", /* @__PURE__ */ $.pointerType("main.MyStruct"))])
 
 	for (let __goscriptRangeTarget0 = arr, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), i = 0; i < __goscriptRangeWindow0.length; i++) {
 		let item = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + i] as any)
@@ -146,7 +146,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// Scenario 6: Type Switch with Mixed Types
 	await $.println("\n--- Scenario 6: Type Switch ---")
-	let testItems = $.arrayToSlice<any>([$.interfaceValue(new MyStruct(true, 100), "main.MyStruct", "main.MyStruct"), $.interfaceValue(new MyStruct(false, 200), "*main.MyStruct", /* @__PURE__ */ $.pointerType("main.MyStruct")), $.basicInterfaceValue(300, "int"), "string"])
+	let testItems = $.arrayToSlice<any>([$.structInterfaceValue(new MyStruct(true, 100), "main.MyStruct", "main.MyStruct"), $.interfaceValue(new MyStruct(false, 200), "*main.MyStruct", /* @__PURE__ */ $.pointerType("main.MyStruct")), $.basicInterfaceValue(300, "int"), "string"])
 
 	for (let __goscriptRangeTarget1 = testItems, __goscriptRangeWindow1 = $.sliceRange(__goscriptRangeTarget1), i = 0; i < __goscriptRangeWindow1.length; i++) {
 		let item = (__goscriptRangeWindow1.backing[__goscriptRangeWindow1.offset + i] as any)

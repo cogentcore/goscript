@@ -160,16 +160,16 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("slice3", $.markAsStructValue($.cloneStructValue(s3)).Len(), $.markAsStructValue($.cloneStructValue(s3)).Cap(), $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(s3)).Index(0))).Int())
 
 	let o: Outer = new Outer(true)
-	let [, err] = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue((o).clone(), "main.Outer", "main.Outer")))).FieldByIndexErr($.arrayToSlice<number>([0, 0]))
+	let [, err] = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.structInterfaceValue((o).clone(), "main.Outer", "main.Outer")))).FieldByIndexErr($.arrayToSlice<number>([0, 0]))
 	await $.println("nil embedded", err != null)
 	o.Inner = new Inner(false, 9)
-	let __goscriptTuple1: any = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(o, "main.Outer", "main.Outer")))).FieldByIndexErr($.arrayToSlice<number>([0, 0]))
+	let __goscriptTuple1: any = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.structInterfaceValue(o, "main.Outer", "main.Outer")))).FieldByIndexErr($.arrayToSlice<number>([0, 0]))
 	let f = __goscriptTuple1[0]
 	err = __goscriptTuple1[1]
 	await $.println("embedded", $.markAsStructValue($.cloneStructValue(f)).Int(), err == null)
 
 	// A type assertion to reflect.Value, as in text/template.
-	for (let __goscriptRangeTarget0 = $.arrayToSlice<any>([$.interfaceValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.basicInterfaceValue(5, "int")))), "reflect.Value", "reflect.Value"), $.basicInterfaceValue(6, "int")]), __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
+	for (let __goscriptRangeTarget0 = $.arrayToSlice<any>([$.structInterfaceValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.basicInterfaceValue(5, "int")))), "reflect.Value", "reflect.Value"), $.basicInterfaceValue(6, "int")]), __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
 		let data = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as any)
 		let [value, __goscriptShadow0] = $.typeAssertTuple<reflect.Value>(data, "reflect.Value")
 		if (!__goscriptShadow0) {

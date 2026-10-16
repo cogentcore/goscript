@@ -211,7 +211,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("raw", raw.value.Tag, ok)
 
 	// A case variable holds a copy of a struct or array dynamic value.
-	let boxed: any = $.interfaceValue(new RawValue(true, 1), "main.RawValue", "main.RawValue")
+	let boxed: any = $.structInterfaceValue(new RawValue(true, 1), "main.RawValue", "main.RawValue")
 	{
 		const __goscriptTypeSwitchValue = boxed
 		switch (true) {

@@ -188,15 +188,15 @@ export function basics(n: number, s: string, f: number): string {
 }
 
 export function temps(c: celsius, p: plain): string {
-	return (fmt.Sprint($.namedValueInterfaceValue<any>(c, "main.celsius", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()), " ", $.interfaceValue((p).clone(), "main.plain", "main.plain")) as string)
+	return (fmt.Sprint($.namedValueInterfaceValue<any>(c, "main.celsius", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()), " ", $.structInterfaceValue((p).clone(), "main.plain", "main.plain")) as string)
 }
 
 export async function slow(s: slowName): globalThis.Promise<string> {
-	return fmt.Sprintf("<%v>", $.interfaceValue((s).clone(), "main.slowName", "main.slowName"))
+	return fmt.Sprintf("<%v>", $.structInterfaceValue((s).clone(), "main.slowName", "main.slowName"))
 }
 
 export async function nested(r: reading): globalThis.Promise<string> {
-	return fmt.Sprintf("%v", $.interfaceValue((r).clone(), "main.reading", "main.reading"))
+	return fmt.Sprintf("%v", $.structInterfaceValue((r).clone(), "main.reading", "main.reading"))
 }
 
 export async function anything(v: any): globalThis.Promise<string> {
@@ -224,7 +224,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println(await slow(new slowName(true, $.makeChannel<string>(1, "", "both"))))
 	await $.println(await nested(new reading(true, new slowName(true, $.makeChannel<string>(1, "", "both")), 4)))
 	await $.println(await anything(__goscriptStatic3()))
-	await $.println(await anything($.interfaceValue(new slowName(true, $.makeChannel<string>(1, "", "both")), "main.slowName", "main.slowName")))
+	await $.println(await anything($.structInterfaceValue(new slowName(true, $.makeChannel<string>(1, "", "both")), "main.slowName", "main.slowName")))
 	await $.println(await wrap($.interfaceValue<$.GoError>(new codeError(false, 7), "*main.codeError", /* @__PURE__ */ $.pointerType("main.codeError"))))
 	await $.print(build(5))
 	let b = $.varRef($.markAsStructValue(new strings.Builder()))

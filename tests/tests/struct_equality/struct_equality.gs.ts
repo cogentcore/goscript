@@ -143,7 +143,7 @@ export async function main(): globalThis.Promise<void> {
 	let m = new S(false, "x", 1.5)
 	keep($.interfaceValue(m, "*main.S", /* @__PURE__ */ $.pointerType("main.S")))
 	await $.println(($.pointerValue<S>(m).A === s.A && $.pointerValue<S>(m).B === s.B), (s.A === $.pointerValue<S>(m).A && s.B === $.pointerValue<S>(m).B))
-	let v: any = $.interfaceValue((s).clone(), "main.S", "main.S")
+	let v: any = $.structInterfaceValue((s).clone(), "main.S", "main.S")
 	await $.println($.structEqual($.mustTypeAssert<S>(v, "main.S"), s))
 
 	// nested struct field passed as a pointer
@@ -158,9 +158,9 @@ export async function main(): globalThis.Promise<void> {
 	let p1: any = $.interfaceValue(new S(false, "z"), "*main.S", /* @__PURE__ */ $.pointerType("main.S"))
 	let p2: any = $.interfaceValue(new S(false, "z"), "*main.S", /* @__PURE__ */ $.pointerType("main.S"))
 	await $.println($.comparableEqual(p1, p2), $.comparableEqual(p1, p1))
-	let i1: any = $.interfaceValue(new S(true, "z"), "main.S", "main.S")
+	let i1: any = $.structInterfaceValue(new S(true, "z"), "main.S", "main.S")
 	let i2: any = $.interfaceValue(new S(false, "z"), "*main.S", /* @__PURE__ */ $.pointerType("main.S"))
-	await $.println($.comparableEqual(i1, i2), $.comparableEqual(i1, $.interfaceValue(new S(true, "z"), "main.S", "main.S")))
+	await $.println($.comparableEqual(i1, i2), $.comparableEqual(i1, $.structInterfaceValue(new S(true, "z"), "main.S", "main.S")))
 }
 
 if ($.isMainScript(import.meta)) {

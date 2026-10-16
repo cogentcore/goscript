@@ -16,7 +16,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println(a.Key, await a.Value.String(), await a.String())
 	await $.println(await $.markAsStructValue($.cloneStructValue(slog.Int("n", 3))).String(), await $.markAsStructValue($.cloneStructValue(slog.Any("x", $.interfaceValue($.arrayToSlice<number>([1, 2]), "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")))))).String())
 
-	let g = slog.Group("g", $.arrayToSlice<any>([$.interfaceValue(slog.String("a", "x"), "slog.Attr", "slog.Attr"), $.interfaceValue(slog.Int("b", 2), "slog.Attr", "slog.Attr")]))
+	let g = slog.Group("g", $.arrayToSlice<any>([$.structInterfaceValue(slog.String("a", "x"), "slog.Attr", "slog.Attr"), $.structInterfaceValue(slog.Int("b", 2), "slog.Attr", "slog.Attr")]))
 	let attrs = g.Value.Group()
 	await $.println(slog.Kind_String(g.Value.Kind()), $.sliceLen(attrs), $.arrayIndex(attrs!, 0).Key, $.markAsStructValue($.cloneStructValue($.arrayIndex(attrs!, 1).Value)).Int64())
 	await $.println(await g.String())
@@ -29,7 +29,7 @@ export async function main(): globalThis.Promise<void> {
 		}
 		return (a).clone()
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("string")), "slog.Attr"], results: ["slog.Attr"] } as $.FunctionTypeInfo)))), "*slog.TextHandler", /* @__PURE__ */ $.pointerType("slog.TextHandler")))
-	await slog.Logger.prototype.Info.call(logger, "text message", $.arrayToSlice<any>(["count", $.basicInterfaceValue(3, "int"), "name", "go pher", $.interfaceValue(slog.Group("grp", $.arrayToSlice<any>(["k", "v"])), "slog.Attr", "slog.Attr")]))
+	await slog.Logger.prototype.Info.call(logger, "text message", $.arrayToSlice<any>(["count", $.basicInterfaceValue(3, "int"), "name", "go pher", $.structInterfaceValue(slog.Group("grp", $.arrayToSlice<any>(["k", "v"])), "slog.Attr", "slog.Attr")]))
 	await $.print(buf.value.String())
 
 	buf.value.Reset()
@@ -39,7 +39,7 @@ export async function main(): globalThis.Promise<void> {
 		}
 		return (a).clone()
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("string")), "slog.Attr"], results: ["slog.Attr"] } as $.FunctionTypeInfo)))), "*slog.JSONHandler", /* @__PURE__ */ $.pointerType("slog.JSONHandler")))
-	await slog.Logger.prototype.Debug.call(jl, "json message", $.arrayToSlice<any>(["ok", true, $.interfaceValue(slog.Group("grp", $.arrayToSlice<any>([$.interfaceValue(slog.Int("i", 1), "slog.Attr", "slog.Attr")])), "slog.Attr", "slog.Attr")]))
+	await slog.Logger.prototype.Debug.call(jl, "json message", $.arrayToSlice<any>(["ok", true, $.structInterfaceValue(slog.Group("grp", $.arrayToSlice<any>([$.structInterfaceValue(slog.Int("i", 1), "slog.Attr", "slog.Attr")])), "slog.Attr", "slog.Attr")]))
 	await slog.Logger.prototype.Warn.call(slog.Logger.prototype.WithGroup.call(await (jl !== null && (jl as any).__isVarRef !== true && (jl as any).__goValue === undefined ? ((jl as any) as slog.Logger).With($.arrayToSlice<any>(["w", "x"])) : slog.Logger.prototype.With.call(jl, $.arrayToSlice<any>(["w", "x"]))), "sub"), "with", $.arrayToSlice<any>(["y", $.basicInterfaceValue(2.5, "float64")]))
 	await $.print(buf.value.String())
 

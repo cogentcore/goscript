@@ -186,7 +186,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// Test custom sort.Interface values.
 	let custom = new descending(true, $.arrayToSlice<number>([1, 3, 2]))
-	sort2.Sort($.interfaceValue<sort2.Interface | null>((custom).clone(), "main.descending", "main.descending")!)
+	sort2.Sort($.structInterfaceValue<sort2.Interface | null>((custom).clone(), "main.descending", "main.descending")!)
 	await $.println("Custom interface sort:", $.arrayIndex(custom.values!, 0), $.arrayIndex(custom.values!, 1), $.arrayIndex(custom.values!, 2))
 
 	let namedSlice = $.arrayToSlice<number>([4, 1, 3])

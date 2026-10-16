@@ -34,7 +34,7 @@ export async function main(): globalThis.Promise<void> {
 		if (__goscriptShadow1 == 1) {
 			break
 		}
-		fmt.Printf("%s %s %q\n", $.interfaceValue($.markAsStructValue($.cloneStructValue((fset !== null && (fset as any).__isVarRef !== true && (fset as any).__goValue === undefined ? ((fset as any) as token.FileSet).Position(__goscriptShadow0) : token.FileSet.prototype.Position.call($.pointerValue<token.FileSet>(fset), __goscriptShadow0)))), "token.Position", "token.Position"), $.namedValueInterfaceValue<any>(__goscriptShadow1, "token.Token", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()), lit)
+		fmt.Printf("%s %s %q\n", $.structInterfaceValue($.markAsStructValue($.cloneStructValue((fset !== null && (fset as any).__isVarRef !== true && (fset as any).__goValue === undefined ? ((fset as any) as token.FileSet).Position(__goscriptShadow0) : token.FileSet.prototype.Position.call($.pointerValue<token.FileSet>(fset), __goscriptShadow0)))), "token.Position", "token.Position"), $.namedValueInterfaceValue<any>(__goscriptShadow1, "token.Token", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()), lit)
 	}
 }
 

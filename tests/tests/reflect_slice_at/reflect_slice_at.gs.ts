@@ -83,7 +83,7 @@ export function fieldValue(obj: any, fld: reflect.StructField): reflect.Value {
 }
 
 export async function newAtOffsets(): globalThis.Promise<void> {
-	let typ = reflect.TypeOf($.interfaceValue((pt.value).clone(), "main.T", "main.T"))
+	let typ = reflect.TypeOf($.structInterfaceValue((pt.value).clone(), "main.T", "main.T"))
 	let [fld, ] = await (typ !== null && (typ as any).__isVarRef !== true && ((typ as any).__goValue === undefined || (typ as any).__goType?.charCodeAt(0) !== 42) ? (typ as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(typ)).FieldByName("Mbr2")
 	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(fieldValue($.interfaceValue(pt, "*main.T", /* @__PURE__ */ $.pointerType("main.T")), fld))).Elem())).Set($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.basicInterfaceValue(10, "int")))))
 	await $.println("newat-offset:", pt.value.Mbr2)

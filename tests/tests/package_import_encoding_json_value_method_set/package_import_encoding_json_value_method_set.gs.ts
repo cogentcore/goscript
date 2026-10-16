@@ -52,7 +52,7 @@ export async function main(): globalThis.Promise<void> {
 	let err = __goscriptTuple1[1]
 	await $.println($.bytesToString(b), err == null)
 
-	let __goscriptTuple2: any = (json.Marshal($.interfaceValue(new Node(true, 2, "y"), "main.Node", "main.Node")) as [$.Slice<number>, $.GoError])
+	let __goscriptTuple2: any = (json.Marshal($.structInterfaceValue(new Node(true, 2, "y"), "main.Node", "main.Node")) as [$.Slice<number>, $.GoError])
 	b = __goscriptTuple2[0]
 	err = __goscriptTuple2[1]
 	await $.println($.bytesToString(b), err == null)

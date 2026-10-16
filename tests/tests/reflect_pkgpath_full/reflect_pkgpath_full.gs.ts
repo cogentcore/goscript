@@ -32,13 +32,13 @@ export async function show(label: string, t: reflect.Type | null): globalThis.Pr
 }
 
 export async function main(): globalThis.Promise<void> {
-	await show("struct", reflect.TypeOf($.interfaceValue(new dep.Node(true), "dep.Node", "dep.Node")))
+	await show("struct", reflect.TypeOf($.structInterfaceValue(new dep.Node(true), "dep.Node", "dep.Node")))
 	await show("pointer elem", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.interfaceValue(new dep.Node(), "*dep.Node", /* @__PURE__ */ $.pointerType("dep.Node")))).Elem(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	await show("basic", reflect.TypeOf($.namedValueInterfaceValue<any>(1, "dep.Level", {}, /* @__PURE__ */ $.basicType("int", "dep.Level"))))
 	await show("interface", reflect.TypeFor(__goscriptStatic0()))
 	await show("local", dep.LocalType())
-	await show("main", reflect.TypeOf($.interfaceValue(new mainType(true), "main.mainType", "main.mainType")))
-	await $.println("generic:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.interfaceValue(new dep.Box(true, 0), "dep.Box", "dep.Box"))).PkgPath(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await show("main", reflect.TypeOf($.structInterfaceValue(new mainType(true), "main.mainType", "main.mainType")))
+	await $.println("generic:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.structInterfaceValue(new dep.Box(true, 0), "dep.Box", "dep.Box"))).PkgPath(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	await $.println("unnamed:", $.stringEqual((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.interfaceValue($.arrayToSlice<dep.Node>([]), "[]dep.Node", /* @__PURE__ */ $.sliceType("dep.Node")))).PkgPath(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), ""))
 }
 

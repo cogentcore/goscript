@@ -81,7 +81,7 @@ export async function main(): globalThis.Promise<void> {
 	await scanner.PrintError($.interfaceValue<io.Writer | null>(scan, "*bytes.Buffer", /* @__PURE__ */ $.pointerType("bytes.Buffer")), errors.New("scan failed"))
 	await $.println("scanner:", strings.TrimSpace(scan.value.String()))
 
-	let h: hash.XOF | null = $.interfaceValue<hash.XOF | null>(new xof(true), "main.xof", "main.xof")
+	let h: hash.XOF | null = $.structInterfaceValue<hash.XOF | null>(new xof(true), "main.xof", "main.xof")
 	await $.println("hash:", (__goscriptAwait = (h !== null && (h as any).__isVarRef !== true && ((h as any).__goValue === undefined || (h as any).__goType?.charCodeAt(0) !== 42) ? (h as Exclude<hash.XOF, null>) : $.pointerValue<Exclude<hash.XOF, null>>(h)).BlockSize(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 }
 

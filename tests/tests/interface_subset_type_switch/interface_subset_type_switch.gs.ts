@@ -94,15 +94,15 @@ export async function main(): globalThis.Promise<void> {
 	let s = new MyStruct(true, "hello", "world")
 
 	// Test with MyInterface1
-	let i1: MyInterface1 | null = $.interfaceValue<MyInterface1 | null>((s).clone(), "main.MyStruct", "main.MyStruct")
+	let i1: MyInterface1 | null = $.structInterfaceValue<MyInterface1 | null>((s).clone(), "main.MyStruct", "main.MyStruct")
 	await processInterface((i1 as any))
 
 	// Test with MyInterface2
-	let i2: MyInterface2 | null = $.interfaceValue<MyInterface2 | null>((s).clone(), "main.MyStruct", "main.MyStruct")
+	let i2: MyInterface2 | null = $.structInterfaceValue<MyInterface2 | null>((s).clone(), "main.MyStruct", "main.MyStruct")
 	await processInterface((i2 as any))
 
 	// Test with concrete type
-	await processInterface($.interfaceValue(s, "main.MyStruct", "main.MyStruct"))
+	await processInterface($.structInterfaceValue(s, "main.MyStruct", "main.MyStruct"))
 
 	// Type switch with subset casting
 	let i3: any = (i1 as any)
