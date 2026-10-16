@@ -2,9 +2,14 @@ package main
 
 import (
 	"math"
+	"reflect"
 	"time"
 )
 
+type stamped struct {
+	Name string
+	At   time.Time
+}
 
 func show(label string, t time.Time) {
 	println(label, t.Format(time.RFC3339Nano), t.UnixNano())
@@ -33,6 +38,19 @@ func main() {
 		time.Date(1500, 1, 1, 0, 0, 0, 0, time.UTC).Sub(time.Date(2500, 1, 1, 0, 0, 0, 0, time.UTC)) == math.MinInt64)
 	println("compare", t.After(t0), t.Before(t0), t0.Add(1).Equal(t0), t0.Add(1).Add(-1).Equal(t0), t0.Compare(t0.Add(1)))
 
+	// == compares the wall clock, monotonic reading and location, and map
+	// keys are found by them.
+	a, b := time.Unix(1, 0).UTC(), time.Unix(2, 0).UTC()
+	println("equal", a == b, a == time.Unix(1, 0).UTC(), a.Add(time.Second) == b, a == a.In(time.FixedZone("Y", 0)), reflect.DeepEqual(a, b))
+	println("equal fields", stamped{"x", a} == stamped{"x", b}, stamped{"x", a} == stamped{"x", time.Unix(1, 0).UTC()}, any(a) == any(b))
+	seen := map[time.Time]int{a: 1}
+	seen[b] = 2
+	seen[time.Unix(1, 0).UTC()]++
+	println("map", len(seen), seen[a], seen[b], seen[a.Add(time.Nanosecond)])
+	var zero time.Time
+	println("zero", zero == time.Time{}, zero.IsZero(), a == time.Time{}, reflect.ValueOf(zero).IsZero(), reflect.ValueOf(a).IsZero())
+	println("utc", time.Unix(5, 0).UTC() == time.Date(1970, 1, 1, 0, 0, 5, 0, time.UTC), t0.In(time.UTC) == t0, t0.Local().UTC() == t0)
+
 	// Round and Truncate to multiples since the zero time; halfway rounds up.
 	for _, d := range []time.Duration{0, -1, 1, time.Microsecond, time.Millisecond, 1500 * time.Millisecond, time.Second, time.Minute, 7 * time.Minute, time.Hour, 24 * time.Hour, 1<<62 + 3} {
 		show("round "+d.String(), t0.Round(d))
@@ -58,6 +76,6 @@ func main() {
 	now := time.Now()
 	later := now.Add(1500 * time.Millisecond)
 	println("mono", later.Sub(now), now.Sub(later), later.After(now))
-	println("mono stripped", now.Round(0).Equal(now))
+	println("mono stripped", now.Round(0).Equal(now), now.Truncate(0) == now.Round(0), now.Round(0) == now)
 	println("mono string", len(now.Round(0).String()) < len(now.String()))
 }

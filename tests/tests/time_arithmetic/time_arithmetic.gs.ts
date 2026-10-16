@@ -3,8 +3,39 @@
 
 import * as $ from "@goscript/builtin/index.js"
 import * as math from "@goscript/math/index.js"
+import * as reflect from "@goscript/reflect/index.js"
 import * as time from "@goscript/time/index.js"
 import "@goscript/math/index.js"
+
+export class stamped {
+	public declare Name: string
+
+	public declare At: time.Time
+
+	constructor(__goscriptValue?: boolean, Name$?: string, At$?: time.Time) {
+		this.Name = Name$ ?? ""
+		this.At = At$ ?? $.markAsStructValue(new time.Time())
+		;(this as any)[$.structValueMarker] = __goscriptValue === true
+	}
+
+	public clone(): stamped {
+		return new stamped(true, this.Name, $.markAsStructValue($.cloneStructValue(this.At)))
+	}
+
+	public __goscriptAssign(source: stamped): this {
+		this.Name = source.Name
+		$.assignStruct(this.At, source.At)
+		return this
+	}
+
+	static __typeInfo = $.registerStructType(
+		"main.stamped",
+		() => new stamped(),
+		() => [],
+		stamped,
+		() => [/* @__PURE__ */ $.structField("Name", /* @__PURE__ */ $.basicType("string"), [0], 0, true), /* @__PURE__ */ $.structField("At", "time.Time", [1], 16, true)]
+	)
+}
 
 export async function show(label: string, t: time.Time): globalThis.Promise<void> {
 	await $.println(label, $.markAsStructValue($.cloneStructValue(t)).Format(time.RFC3339Nano), $.markAsStructValue($.cloneStructValue(t)).UnixNano())
@@ -31,6 +62,22 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("sub long", $.markAsStructValue($.cloneStructValue(far)).Sub($.markAsStructValue($.cloneStructValue(t0))), $.markAsStructValue($.cloneStructValue(t0)).Sub($.markAsStructValue($.cloneStructValue(far))))
 	await $.println("sub saturates", $.markAsStructValue($.cloneStructValue(time.Date(2500, 1, 1, 0, 0, 0, 0, time.UTC))).Sub($.markAsStructValue($.cloneStructValue(time.Date(1500, 1, 1, 0, 0, 0, 0, time.UTC)))) == 9223372036854775807n, $.markAsStructValue($.cloneStructValue(time.Date(1500, 1, 1, 0, 0, 0, 0, time.UTC))).Sub($.markAsStructValue($.cloneStructValue(time.Date(2500, 1, 1, 0, 0, 0, 0, time.UTC)))) == -9223372036854775808n)
 	await $.println("compare", $.markAsStructValue($.cloneStructValue(t)).After($.markAsStructValue($.cloneStructValue(t0))), $.markAsStructValue($.cloneStructValue(t)).Before($.markAsStructValue($.cloneStructValue(t0))), $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(t0)).Add(1n))).Equal($.markAsStructValue($.cloneStructValue(t0))), $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(t0)).Add(1n))).Add(-1n))).Equal($.markAsStructValue($.cloneStructValue(t0))), $.markAsStructValue($.cloneStructValue(t0)).Compare($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(t0)).Add(1n)))))
+
+	// == compares the wall clock, monotonic reading and location, and map
+	// keys are found by them.
+	let a = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(time.Unix(1n, 0n))).UTC()))
+	let b = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(time.Unix(2n, 0n))).UTC()))
+	await $.println("equal", $.structEqual(a, b), $.structEqual(a, $.markAsStructValue($.cloneStructValue(time.Unix(1n, 0n))).UTC()), $.structEqual($.markAsStructValue($.cloneStructValue(a)).Add(1000000000n), b), $.structEqual(a, $.markAsStructValue($.cloneStructValue(a)).In(time.FixedZone("Y", 0))), reflect.DeepEqual($.interfaceValue($.markAsStructValue($.cloneStructValue(a)), "time.Time", "time.Time"), $.interfaceValue($.markAsStructValue($.cloneStructValue(b)), "time.Time", "time.Time")))
+	await $.println("equal fields", $.structEqual(new stamped(true, "x", $.markAsStructValue($.cloneStructValue(a))), new stamped(true, "x", $.markAsStructValue($.cloneStructValue(b)))), $.structEqual(new stamped(true, "x", $.markAsStructValue($.cloneStructValue(a))), (() => { const __goscriptLiteralField0 = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(time.Unix(1n, 0n))).UTC())); return new stamped(true, "x", __goscriptLiteralField0) })()), $.comparableEqual($.interfaceValue($.markAsStructValue($.cloneStructValue(a)), "time.Time", "time.Time"), $.interfaceValue($.markAsStructValue($.cloneStructValue(b)), "time.Time", "time.Time")))
+	let seen = $.makeMap<time.Time, number>([[$.markAsStructValue($.cloneStructValue(a)), 1]])
+	$.mapSet(seen, $.markAsStructValue($.cloneStructValue(b)), 2)
+	const __goscriptMap0 = seen
+	const __goscriptMapKey0 = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(time.Unix(1n, 0n))).UTC()))
+	$.mapSet(__goscriptMap0, __goscriptMapKey0, $.mapGet<time.Time, number, number>(__goscriptMap0, __goscriptMapKey0, 0)[0] + (1))
+	await $.println("map", $.len(seen), $.mapGet<time.Time, number, number>(seen, a, 0)[0], $.mapGet<time.Time, number, number>(seen, b, 0)[0], $.mapGet<time.Time, number, number>(seen, $.markAsStructValue($.cloneStructValue(a)).Add(1n), 0)[0])
+	let zero = $.markAsStructValue(new time.Time())
+	await $.println("zero", $.structEqual(zero, $.markAsStructValue(new time.Time())), $.markAsStructValue($.cloneStructValue(zero)).IsZero(), $.structEqual(a, $.markAsStructValue(new time.Time())), $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.markAsStructValue($.cloneStructValue(zero)), "time.Time", "time.Time")))).IsZero(), $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.markAsStructValue($.cloneStructValue(a)), "time.Time", "time.Time")))).IsZero())
+	await $.println("utc", $.structEqual($.markAsStructValue($.cloneStructValue(time.Unix(5n, 0n))).UTC(), time.Date(1970, 1, 1, 0, 0, 5, 0, time.UTC)), $.structEqual($.markAsStructValue($.cloneStructValue(t0)).In(time.UTC), t0), $.structEqual($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(t0)).Local())).UTC(), t0))
 
 	// Round and Truncate to multiples since the zero time; halfway rounds up.
 	for (let __goscriptRangeTarget0 = $.arrayToSlice<time.Duration>([0n, -1n, 1n, 1000n, 1000000n, 1500000000n, 1000000000n, 60000000000n, 420000000000n, 3600000000000n, 86400000000000n, 4611686018427387907n]), __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
@@ -59,7 +106,7 @@ export async function main(): globalThis.Promise<void> {
 	let now = $.markAsStructValue($.cloneStructValue(time.Now()))
 	let later = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(now)).Add(1500000000n)))
 	await $.println("mono", $.markAsStructValue($.cloneStructValue(later)).Sub($.markAsStructValue($.cloneStructValue(now))), $.markAsStructValue($.cloneStructValue(now)).Sub($.markAsStructValue($.cloneStructValue(later))), $.markAsStructValue($.cloneStructValue(later)).After($.markAsStructValue($.cloneStructValue(now))))
-	await $.println("mono stripped", $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(now)).Round(0n))).Equal($.markAsStructValue($.cloneStructValue(now))))
+	await $.println("mono stripped", $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(now)).Round(0n))).Equal($.markAsStructValue($.cloneStructValue(now))), $.structEqual($.markAsStructValue($.cloneStructValue(now)).Truncate(0n), $.markAsStructValue($.cloneStructValue(now)).Round(0n)), $.structEqual($.markAsStructValue($.cloneStructValue(now)).Round(0n), now))
 	await $.println("mono string", $.stringLen($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(now)).Round(0n))).String()) < $.stringLen($.markAsStructValue($.cloneStructValue(now)).String()))
 }
 
