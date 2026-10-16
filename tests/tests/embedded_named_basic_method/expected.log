@@ -3,3 +3,4 @@ interface: value: senior
 pointer: pointer: junior
 nested direct: lead: senior
 nested interface: lead: senior
+pointer method: 2 2 js

@@ -3836,8 +3836,8 @@ func (o *LoweringOwner) lowerEmbeddedMethodForwarders(
 	}
 
 	// Methods of a named non-struct type lower to free functions taking the
-	// receiver value, so its forwarders pass the field value instead of
-	// selecting a method on it. Only value methods are promoted this way.
+	// receiver, so its forwarders pass the field value, or a reference to the
+	// field for a pointer method, instead of selecting a method on it.
 	var valueReceiver *types.Named
 	var valueMethodSet *types.MethodSet
 	methodSetType := field.typ
@@ -3850,6 +3850,8 @@ func (o *LoweringOwner) lowerEmbeddedMethodForwarders(
 		methodSetType = field.typ
 	} else if named, ok := types.Unalias(field.typ).(*types.Named); ok {
 		valueReceiver = named.Origin()
+		methodSetType = types.NewPointer(field.typ)
+		valueMethodSet = types.NewMethodSet(field.typ)
 	} else {
 		return nil
 	}
@@ -3904,7 +3906,12 @@ func (o *LoweringOwner) lowerEmbeddedMethodForwarders(
 		}
 		// A value method of a named non-struct type, the field's own or one
 		// promoted from deeper in it, is a free function taking the receiver.
+		// A pointer method of the field's own type takes a reference to the
+		// field, so that it can change the field.
 		receiver, target := valueReceiver, "this."+tsStructFieldName(field.name, 0)
+		if receiver != nil && isPointerType(signature.Recv().Type()) {
+			target = o.runtimeOwner.QualifiedHelper(RuntimeHelperFieldRef) + "(this, " + strconv.Quote(tsStructFieldName(field.name, 0)) + ")"
+		}
 		if receiver == nil {
 			targetType := o.tsEmbeddedForwarderTargetType(ctx, field.typ)
 			target = o.embeddedForwarderTargetExpr(ctx, field, selection, targetType)
@@ -11892,7 +11899,13 @@ func (o *LoweringOwner) lowerNamedReceiverForMethod(
 		}
 	}
 	if receiverPointer {
-		if isPointerType(ctx.semPkg.source.TypesInfo.TypeOf(expr)) {
+		// A pointer method promoted from an embedded field takes a reference
+		// to that field.
+		exprType := ctx.semPkg.source.TypesInfo.TypeOf(expr)
+		if index := selection.Index(); len(index) > 1 && !o.receiverUsesOverridePackage(exprType) {
+			return o.lowerPromotedFieldAddress(ctx, expr, index[:len(index)-1])
+		}
+		if isPointerType(exprType) {
 			return o.lowerExpr(ctx, expr)
 		}
 		if ident, ok := expr.(*ast.Ident); ok {
@@ -11911,6 +11924,36 @@ func (o *LoweringOwner) lowerNamedReceiverForMethod(
 		return o.runtimeOwner.QualifiedHelper(RuntimeHelperPointerValue) + "<" + o.tsTypeFor(ctx, receiverType) + ">(" + receiver + ")", diagnostics
 	}
 	return receiver, diagnostics
+}
+
+// lowerPromotedFieldAddress returns a reference to the embedded field that
+// fields, a path of embedded field indices, selects from expr, as the
+// receiver of a pointer method promoted from the field.
+func (o *LoweringOwner) lowerPromotedFieldAddress(ctx lowerFileContext, expr ast.Expr, fields []int) (string, []Diagnostic) {
+	// Select the struct that holds the last embedded field.
+	exprType := ctx.semPkg.source.TypesInfo.TypeOf(expr)
+	var base string
+	var diagnostics []Diagnostic
+	if isPointerToStructType(exprType) {
+		base, diagnostics = o.lowerPointerValueExpr(ctx, expr)
+	} else {
+		base, diagnostics = o.lowerExpr(ctx, expr)
+		base = parenthesizeAwaitedExpr(base)
+	}
+	parent, parentType := o.lowerPromotedMethodReceiver(ctx, base, exprType, fields[:len(fields)-1])
+
+	// An embedded pointer is the reference; a value field is referenced.
+	structType := structUnderlyingType(derefPointerType(parentType))
+	last := fields[len(fields)-1]
+	if structType == nil || last < 0 || last >= structType.NumFields() {
+		return base, diagnostics
+	}
+	field := structType.Field(last)
+	name := tsStructFieldName(field.Name(), last)
+	if isPointerType(field.Type()) {
+		return parent + "." + name, diagnostics
+	}
+	return o.runtimeOwner.QualifiedHelper(RuntimeHelperFieldRef) + "(" + parent + ", " + strconv.Quote(name) + ")", diagnostics
 }
 
 // lowerSelectorExpr resolves package exports, methods, and field selections.
