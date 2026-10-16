@@ -11390,6 +11390,14 @@ func (o *LoweringOwner) lowerConversionExpr(
 		}
 		return o.runtimeOwner.QualifiedHelper(RuntimeHelperInt) + "(" + value + ")", diagnostics
 	}
+
+	// The unsafe functions that return pointers, such as unsafe.Add, return
+	// unknown values, which keep their values as pointers of the target type.
+	call, isCall := ast.Unparen(expr.Args[0]).(*ast.CallExpr)
+	if isCall && !ctx.semPkg.source.TypesInfo.Types[call.Fun].IsType() &&
+		isUnsafePointerType(sourceType) && isPointerType(targetType) {
+		return "(" + value + " as " + o.tsTypeFor(ctx, targetType) + ")", diagnostics
+	}
 	return grouped, diagnostics
 }
 
