@@ -331,7 +331,7 @@ function mergeTypeMetadata(target: Type, source: Type): void {
 // identical in Go.
 export function typeIdentityKey(t: Type, seen = new Set<Type>()): string {
   if (seen.has(t)) {
-    return `${t.Kind()}:${t.PkgPath()}:${t.Name()}:${t.String()}`
+    return `${t.Kind()}:${t.PkgPath()}:${t.Name()}:${runtimeTypeString(t)}`
   }
   seen.add(t)
   if (t instanceof StructType) {
@@ -343,7 +343,7 @@ export function typeIdentityKey(t: Type, seen = new Set<Type>()): string {
     case Chan:
     case Ptr:
     case Slice:
-      return `${t.Kind()}:${t.String()}:${typeIdentityKey(t.Elem(), seen)}`
+      return `${t.Kind()}:${runtimeTypeString(t)}:${typeIdentityKey(t.Elem(), seen)}`
     case Map:
       return `${t.Kind()}:${typeIdentityKey(t.Key(), seen)}:${typeIdentityKey(t.Elem(), seen)}`
     case Func: {
@@ -358,16 +358,16 @@ export function typeIdentityKey(t: Type, seen = new Set<Type>()): string {
         { length: t.NumOut() },
         (_unused, idx) => typeIdentityKey(t.Out(idx), seen),
       )
-      return `${t.Kind()}:${t.PkgPath()}:${t.Name()}:${t.String()}:${t.IsVariadic()}:${params.join(',')}:${results.join(',')}`
+      return `${t.Kind()}:${t.PkgPath()}:${t.Name()}:${runtimeTypeString(t)}:${t.IsVariadic()}:${params.join(',')}:${results.join(',')}`
     }
     default:
-      return `${t.Kind()}:${t.PkgPath()}:${t.Name()}:${t.String()}`
+      return `${t.Kind()}:${t.PkgPath()}:${t.Name()}:${runtimeTypeString(t)}`
   }
 }
 
 function typeUnderlyingIdentityKey(t: Type, seen = new Set<Type>()): string {
   if (seen.has(t)) {
-    return `${t.Kind()}:${t.PkgPath()}:${t.Name()}:${t.String()}`
+    return `${t.Kind()}:${t.PkgPath()}:${t.Name()}:${runtimeTypeString(t)}`
   }
   seen.add(t)
   if (t instanceof BasicType) {
@@ -380,7 +380,7 @@ function typeUnderlyingIdentityKey(t: Type, seen = new Set<Type>()): string {
     case Array:
       return `array:${t.Len()}:${typeIdentityKey(t.Elem(), seen)}`
     case Chan:
-      return `chan:${t.String()}:${typeIdentityKey(t.Elem(), seen)}`
+      return `chan:${runtimeTypeString(t)}:${typeIdentityKey(t.Elem(), seen)}`
     case Ptr:
       return `ptr:${typeIdentityKey(t.Elem(), seen)}`
     case Slice:
@@ -404,7 +404,7 @@ function typeUnderlyingIdentityKey(t: Type, seen = new Set<Type>()): string {
     case Interface:
       return `interface:${typeMethods(t).map(methodSignatureIdentityKey).join('|')}`
     default:
-      return `${t.Kind()}:${t.PkgPath()}:${t.Name()}:${t.String()}`
+      return `${t.Kind()}:${t.PkgPath()}:${t.Name()}:${runtimeTypeString(t)}`
   }
 }
 
@@ -415,7 +415,7 @@ function isInterfaceLiteral(name: string): boolean {
 
 function typeIsNamed(t: Type): boolean {
   if (t.Kind() === Interface) {
-    return !isInterfaceLiteral(t.String())
+    return !isInterfaceLiteral(runtimeTypeString(t))
   }
   if (t.Kind() === Struct || t.Kind() === Func) {
     return t.Name() !== ''
@@ -531,6 +531,9 @@ export interface Type {
 
   // Comparable reports whether values of this type are comparable.
   Comparable(): boolean
+
+  // runtimeString returns the runtime type string (see runtimeTypeString).
+  runtimeString?(): string
 
   // ChanDir returns a channel type's direction.
   // Panics if the type's Kind is not Chan.
@@ -1461,12 +1464,13 @@ export class Value {
     const typeInfo = typeInfoFromReflectType(this._type)
     const namedType =
       this._type.Name() !== '' &&
-      (this._type.PkgPath() !== '' || this._type.String().includes('.'))
+      (this._type.PkgPath() !== '' ||
+        runtimeTypeString(this._type).includes('.'))
     const elemType = this._type.Kind() === Ptr ? this._type.Elem() : null
     const namedElemType =
       elemType !== null &&
       elemType.Name() !== '' &&
-      (elemType.PkgPath() !== '' || elemType.String().includes('.'))
+      (elemType.PkgPath() !== '' || runtimeTypeString(elemType).includes('.'))
 
     // A pointer to a struct is the struct object itself, whose methods
     // satisfy interfaces, so it is tagged with its type but not boxed.
@@ -1480,7 +1484,7 @@ export class Value {
       }
       return $.interfaceValue<ReflectValue>(
         target ?? null,
-        this._type.String(),
+        runtimeTypeString(this._type),
         typeInfo,
       )
     }
@@ -1489,7 +1493,7 @@ export class Value {
     if (this._type.Kind() === Struct && namedType) {
       return $.interfaceValue<ReflectValue>(
         current,
-        this._type.String(),
+        runtimeTypeString(this._type),
         typeInfo,
       )
     }
@@ -1498,10 +1502,10 @@ export class Value {
       (this._type.Kind() === Ptr && namedElemType)
     ) {
       // Use the registered method set, so the box satisfies interfaces.
-      const registered = $.namedValueMethods(this._type.String())
+      const registered = $.namedValueMethods(runtimeTypeString(this._type))
       return $.namedValueInterfaceValue<ReflectValue>(
         current,
-        this._type.String(),
+        runtimeTypeString(this._type),
         registered?.methods ?? {},
         typeInfo,
         registered?.signatures,
@@ -1512,8 +1516,17 @@ export class Value {
     // kind, as the compiler boxes it, so that it keeps its type; int and
     // float64 are the kinds of a raw number.
     const kind = this._type.Kind()
-    if (kind >= Int8 && kind <= Float32 && kind !== Int64 && kind !== Uint64 && kind !== Uintptr) {
-      return $.basicInterfaceValue<ReflectValue>(current, this._type.String())
+    if (
+      kind >= Int8 &&
+      kind <= Float32 &&
+      kind !== Int64 &&
+      kind !== Uint64 &&
+      kind !== Uintptr
+    ) {
+      return $.basicInterfaceValue<ReflectValue>(
+        current,
+        runtimeTypeString(this._type),
+      )
     }
 
     // Box an unnamed value with its type, as the compiler does when it
@@ -1522,7 +1535,7 @@ export class Value {
     // pointer such as *[]T reports its type to reflect.ValueOf.
     return $.interfaceValue<ReflectValue>(
       current,
-      this._type.String(),
+      runtimeTypeString(this._type),
       typeInfo,
     )
   }
@@ -1570,7 +1583,9 @@ export class Value {
 
     // A named non-struct type, such as a named int or slice, has its methods
     // in the method table registered under its type string.
-    const named = $.namedValueMethods(this.Type().String())?.methods[name]
+    const named = $.namedValueMethods(runtimeTypeString(this.Type()))?.methods[
+      name
+    ]
     if (named === undefined) {
       return undefined
     }
@@ -2192,6 +2207,10 @@ export class BasicType implements Type {
   ) {}
 
   public String(): string {
+    return $.goTypeString(this.runtimeString())
+  }
+
+  public runtimeString(): string {
     return this._typeName || this._name
   }
 
@@ -2439,7 +2458,11 @@ class SliceType implements Type {
   ) {}
 
   public String(): string {
-    return this._typeName || '[]' + this._elemType.String()
+    return $.goTypeString(this.runtimeString())
+  }
+
+  public runtimeString(): string {
+    return this._typeName || '[]' + runtimeTypeString(this._elemType)
   }
 
   public Kind(): Kind {
@@ -2586,7 +2609,13 @@ class ArrayType implements Type {
   ) {}
 
   public String(): string {
-    return this._typeName || `[${this._len}]${this._elemType.String()}`
+    return $.goTypeString(this.runtimeString())
+  }
+
+  public runtimeString(): string {
+    return (
+      this._typeName || `[${this._len}]${runtimeTypeString(this._elemType)}`
+    )
   }
 
   public Kind(): Kind {
@@ -2732,7 +2761,11 @@ class PointerType implements Type {
   ) {}
 
   public String(): string {
-    return '*' + this._elemType.String()
+    return $.goTypeString(this.runtimeString())
+  }
+
+  public runtimeString(): string {
+    return '*' + runtimeTypeString(this._elemType)
   }
 
   public Kind(): Kind {
@@ -2929,10 +2962,11 @@ class FunctionType implements Type {
   }
 
   public String(): string {
-    if (this._name !== '') {
-      return this._name
-    }
-    return this._signature
+    return $.goTypeString(this.runtimeString())
+  }
+
+  public runtimeString(): string {
+    return this._name !== '' ? this._name : this._signature
   }
 
   public Kind(): Kind {
@@ -3112,7 +3146,7 @@ function formatFunctionSignature(
   variadic: boolean,
 ): string {
   const paramStrings = params.map((param, index) => {
-    const typeName = param.String()
+    const typeName = runtimeTypeString(param)
     if (!variadic || index !== params.length - 1) {
       return typeName
     }
@@ -3123,9 +3157,9 @@ function formatFunctionSignature(
   })
   let signature = `func(${paramStrings.join(', ')})`
   if (results.length === 1) {
-    signature += ` ${results[0].String()}`
+    signature += ` ${runtimeTypeString(results[0])}`
   } else if (results.length > 1) {
-    signature += ` (${results.map((result) => result.String()).join(', ')})`
+    signature += ` (${results.map((result) => runtimeTypeString(result)).join(', ')})`
   }
   return signature
 }
@@ -3365,9 +3399,13 @@ class MapType implements Type {
   ) {}
 
   public String(): string {
+    return $.goTypeString(this.runtimeString())
+  }
+
+  public runtimeString(): string {
     return (
       this._typeName ||
-      `map[${this._keyType.String()}]${this._elemType.String()}`
+      `map[${runtimeTypeString(this._keyType)}]${runtimeTypeString(this._elemType)}`
     )
   }
 
@@ -3796,6 +3834,13 @@ function methodArgType(arg: $.MethodArg): Type {
   return typeFromTypeInfoWithSeen(arg.type, new Set())
 }
 
+// runtimeTypeString returns the runtime type string of t, which names the
+// types of packages that share a name with another package by the package's
+// runtime name (see goTypeString), for looking up and identifying types.
+export function runtimeTypeString(t: Type): string {
+  return t.runtimeString !== undefined ? t.runtimeString() : t.String()
+}
+
 // typeNamePkgPath returns the package path of a qualified type name such as
 // "pkg.Name", or '' for an unnamed type.
 function typeNamePkgPath(typeName: string): string {
@@ -3813,16 +3858,16 @@ function typeNameName(typeName: string): string {
 function typeMethods(t: Type): $.MethodSignature[] {
   // A named non-struct type, such as a named map, slice or basic type, or a
   // pointer to one, has its method set registered by its type string.
-  const named = $.namedValueMethods(t.String())
+  const named = $.namedValueMethods(runtimeTypeString(t))
   if (named !== undefined) {
     return named.signatures
   }
 
   // Any other type is looked up by name: its own, its element's if it is a
   // pointer, or the registered name of an interface.
-  let typeInfo = builtinGetTypeByName(t.String())
+  let typeInfo = builtinGetTypeByName(runtimeTypeString(t))
   if (!typeInfo && t.Kind() === Ptr) {
-    typeInfo = builtinGetTypeByName(t.Elem().String())
+    typeInfo = builtinGetTypeByName(runtimeTypeString(t.Elem()))
   }
   if (!typeInfo && t instanceof InterfaceType) {
     const registeredName = t.registeredName()
@@ -4133,6 +4178,10 @@ class StructType implements Type {
   ) {}
 
   public String(): string {
+    return $.goTypeString(this.runtimeString())
+  }
+
+  public runtimeString(): string {
     return this._string
   }
 
@@ -4530,8 +4579,12 @@ class ChannelType implements Type {
   ) {}
 
   public String(): string {
+    return $.goTypeString(this.runtimeString())
+  }
+
+  public runtimeString(): string {
     // Format: chan T, <-chan T, or chan<- T
-    const elem = this._elemType.String()
+    const elem = runtimeTypeString(this._elemType)
     switch (this._dir) {
       case RecvDir:
         return `<-chan ${elem}`
@@ -4690,6 +4743,10 @@ class InterfaceType implements Type {
 
   public String(): string {
     // Go spells the empty interface type with a space.
+    return $.goTypeString(this.runtimeString())
+  }
+
+  public runtimeString(): string {
     return this._name === 'interface{}' ? 'interface {}' : this._name
   }
 
@@ -5831,7 +5888,7 @@ function functionTypeInfoFromType(typ: Type): $.FunctionTypeInfo {
     results,
   }
   if (typ.Name() !== '') {
-    info.name = typ.String()
+    info.name = runtimeTypeString(typ)
   }
   if (typ.IsVariadic()) {
     info.isVariadic = true
@@ -5840,7 +5897,8 @@ function functionTypeInfoFromType(typ: Type): $.FunctionTypeInfo {
 }
 
 export function typeInfoFromReflectType(typ: Type): string | $.TypeInfo {
-  const typeName = typ.PkgPath() !== '' && typ.Name() !== '' ? typ.String() : ''
+  const typeName =
+    typ.PkgPath() !== '' && typ.Name() !== '' ? runtimeTypeString(typ) : ''
   if (typeName !== '' && typ.Kind() === Struct) {
     return typeName
   }
@@ -5928,7 +5986,7 @@ export function typeInfoFromReflectType(typ: Type): string | $.TypeInfo {
           })
       return {
         kind: $.TypeKind.Struct,
-        name: typ.Name() === '' ? '' : typ.String(),
+        name: typ.Name() === '' ? '' : runtimeTypeString(typ),
         methods: [],
         fields: fields.map((field) => ({
           name: field.name,
@@ -5944,7 +6002,7 @@ export function typeInfoFromReflectType(typ: Type): string | $.TypeInfo {
       }
     }
     default:
-      return typ.String()
+      return runtimeTypeString(typ)
   }
 }
 
