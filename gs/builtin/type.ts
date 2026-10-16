@@ -706,17 +706,27 @@ function simpleTypeInfosIdentical(
     return false
   }
 
-  // Only a basic type or an element named by a string is decided here.
+  // Only a basic type or an element named by a string is decided here. Two
+  // element names are decided by the types registered under them, so that
+  // asserting a pointer to one named type against another, as go/types does
+  // in Unalias for every type, takes no full comparison.
   switch (t1.kind) {
     case TypeKind.Basic:
       return t1.name !== undefined ? true : undefined
     case TypeKind.Pointer:
     case TypeKind.Slice: {
       const e1 = (t1 as PointerTypeInfo | SliceTypeInfo).elemType
-      if (typeof e1 === 'string' && e1 === (t2 as PointerTypeInfo).elemType) {
+      const e2 = (t2 as PointerTypeInfo | SliceTypeInfo).elemType
+      if (typeof e1 !== 'string' || typeof e2 !== 'string') {
+        return undefined
+      }
+      if (e1 === e2) {
         return true
       }
-      return undefined
+      return simpleTypeInfosIdentical(
+        normalizeTypeInfo(e1),
+        normalizeTypeInfo(e2),
+      )
     }
   }
   return undefined

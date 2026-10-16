@@ -9,6 +9,7 @@ import {
   type StructFieldInfo,
   is,
   type MapTypeInfo,
+  pointerType,
   type SliceTypeInfo,
   typeAssert,
   TypeKind,
@@ -245,5 +246,34 @@ describe('assertions of boxed values to types named by strings', () => {
     const second = typeAssert<Point>(other, 'test.CachedPoint')
     expect([first.ok, second.ok]).toEqual([false, false])
     expect(first.value).not.toBe(second.value)
+  })
+})
+
+describe('assertions of boxed pointers to pointer descriptors', () => {
+  it('match the pointer to the same named type only', () => {
+    // Two struct types, as go/types has Alias and Basic.
+    class Alias {}
+    class Basic {}
+    registerStructType('test.PtrAlias', () => new Alias(), [], Alias)
+    registerStructType('test.PtrBasic', () => new Basic(), [], Basic)
+    const basic = new Basic()
+    const boxed = {
+      __goType: '*test.PtrBasic',
+      __goTypeInfo: pointerType('test.PtrBasic'),
+      __goValue: basic,
+    }
+
+    // Each assertion takes a new descriptor, as generated code makes them.
+    expect(typeAssert(boxed, pointerType('test.PtrBasic'))).toEqual({
+      value: basic,
+      ok: true,
+    })
+    expect(typeAssert(boxed, pointerType('test.PtrAlias'))).toEqual({
+      value: null,
+      ok: false,
+    })
+    expect(typeAssert(boxed, pointerType('test.PtrUnregistered')).ok).toBe(
+      false,
+    )
   })
 })
