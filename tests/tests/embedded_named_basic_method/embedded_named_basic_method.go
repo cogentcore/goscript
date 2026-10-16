@@ -25,6 +25,23 @@ type Lead struct {
 	Engineer
 }
 
+// Tags is a named slice type with a pointer method.
+type Tags []string
+
+func (t *Tags) Add(tag string) int {
+	*t = append(*t, tag)
+	return len(*t)
+}
+
+type Adder interface {
+	Add(tag string) int
+}
+
+// Post promotes the pointer method Add of its embedded Tags.
+type Post struct {
+	Tags
+}
+
 func main() {
 	eng := Engineer{Level: 3, Name: "Grace"}
 	println("direct:", eng.Rank("rank: "))
@@ -39,4 +56,9 @@ func main() {
 	println("nested direct:", lead.Rank("lead: "))
 	r = lead
 	println("nested interface:", r.Rank("lead: "))
+
+	post := &Post{}
+	post.Add("go")
+	var a Adder = post
+	println("pointer method:", a.Add("js"), len(post.Tags), post.Tags[1])
 }
