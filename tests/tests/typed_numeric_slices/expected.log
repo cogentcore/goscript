@@ -1,3 +1,7 @@
+local wrap: -2147483648 2147483647 -1073741824 -127 0 65535
+local float32: true true 2 2
+local loop: 1850 1 3
+local range: 1.75 -32768 1
 int32 wrap: -2147483648
 uint32 wrap: 4294967295 0
 small wrap: -32768 32767 1 -128
