@@ -179,9 +179,27 @@ function currentFrames(limit: number): stackFrame[] {
 }
 
 // Caller returns the program counter, file and line of a function on the
-// calling goroutine's stack, using the JavaScript stack trace: skip 0 is
-// the caller of Caller. File and line refer to the generated JavaScript.
-export function Caller(skip: number): [number, string, number, boolean] {
+// calling goroutine's stack: skip 0 is the caller of Caller. A call made in
+// a function that //goscript:maxify marks passes its call site, which links
+// the call sites of the marked functions that called it, and the frames that
+// chain reaches report their Go file and line. Other frames come from the
+// JavaScript stack trace, and their file and line refer to the generated
+// JavaScript.
+export function Caller(
+  skip: number,
+  site?: $.CallSite,
+): [number, string, number, boolean] {
+  // Walk the chain of call sites to the frame, if it reaches that far.
+  let frameSite = site
+  for (let i = 0; i < skip && frameSite !== undefined; i++) {
+    frameSite = frameSite.caller
+  }
+  if (frameSite !== undefined) {
+    const { file, line } = frameSite
+    return [framePC({ name: '', file, line }), file, line, true]
+  }
+
+  // Otherwise read the frame from the JavaScript stack.
   const frames = currentFrames(skip + 2)
   const frame = frames[skip + 1]
   if (frame === undefined) {

@@ -3677,6 +3677,16 @@ export type GenericTypeArgs = Record<string, GenericTypeDescriptor> & {
   [genericTypeArgsMarker]?: GenericTypeDescriptor
 }
 
+// CallSite is the Go position of a call that the compiler passes to a
+// function that //goscript:maxify marks, or to runtime.Caller: the file, as
+// go build -trimpath names it, and the line. caller is the call site of the
+// function that made the call, when the directive marks that function too.
+export interface CallSite {
+  file: string
+  line: number
+  caller?: CallSite
+}
+
 // stripGenericTypeArgs removes a hidden descriptor before interface dispatch.
 export function stripGenericTypeArgs(args: unknown[]): unknown[] {
   const first = args[0]
