@@ -1,0 +1,11 @@
+Write: 0 true
+WriteString: 0 true
+Read: 0 true
+Seek: true
+Stat: true
+ReadDir: true
+Close: true
+Sync: true
+Fd: true
+Fprintln: true
+io.Copy: true
