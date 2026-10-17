@@ -168,7 +168,7 @@ export class retransmissionQueueInitialAckHandler {
 	}
 
 	public async OnLost(_p0: wireFrame | null): globalThis.Promise<void> {
-		let q: retransmissionQueueInitialAckHandler | $.VarRef<retransmissionQueueInitialAckHandler> | null = this;
+		const q: retransmissionQueueInitialAckHandler | $.VarRef<retransmissionQueueInitialAckHandler> | null = this;
 		const q$: retransmissionQueueInitialAckHandler = q == null ? $.pointerTarget<retransmissionQueueInitialAckHandler>(q) : (q as any).__isVarRef === true ? (q as any).value : (q as any).__goValue === undefined ? (q as any) : $.pointerTarget<retransmissionQueueInitialAckHandler>(q);
 		;(q$ as retransmissionQueueInitialAckHandler).lost++
 		await $.println("initial")
@@ -205,7 +205,7 @@ export class retransmissionQueueHandshakeAckHandler {
 	}
 
 	public async OnLost(_p0: wireFrame | null): globalThis.Promise<void> {
-		let q: retransmissionQueueHandshakeAckHandler | $.VarRef<retransmissionQueueHandshakeAckHandler> | null = this;
+		const q: retransmissionQueueHandshakeAckHandler | $.VarRef<retransmissionQueueHandshakeAckHandler> | null = this;
 		const q$: retransmissionQueueHandshakeAckHandler = q == null ? $.pointerTarget<retransmissionQueueHandshakeAckHandler>(q) : (q as any).__isVarRef === true ? (q as any).value : (q as any).__goValue === undefined ? (q as any) : $.pointerTarget<retransmissionQueueHandshakeAckHandler>(q);
 		;(q$ as retransmissionQueueHandshakeAckHandler).lost++
 		await $.println("handshake")
@@ -242,7 +242,7 @@ export class retransmissionQueueAppDataAckHandler {
 	}
 
 	public async OnLost(_p0: wireFrame | null): globalThis.Promise<void> {
-		let q: retransmissionQueueAppDataAckHandler | $.VarRef<retransmissionQueueAppDataAckHandler> | null = this;
+		const q: retransmissionQueueAppDataAckHandler | $.VarRef<retransmissionQueueAppDataAckHandler> | null = this;
 		const q$: retransmissionQueueAppDataAckHandler = q == null ? $.pointerTarget<retransmissionQueueAppDataAckHandler>(q) : (q as any).__isVarRef === true ? (q as any).value : (q as any).__goValue === undefined ? (q as any) : $.pointerTarget<retransmissionQueueAppDataAckHandler>(q);
 		;(q$ as retransmissionQueueAppDataAckHandler).lost++
 		await $.println("app")

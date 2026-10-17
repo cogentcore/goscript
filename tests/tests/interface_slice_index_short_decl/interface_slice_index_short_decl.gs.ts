@@ -73,7 +73,7 @@ export class Action {
 	}
 
 	public SetFilter(k: number, v: dep.Ref | null): void {
-		let a: Action | $.VarRef<Action> | null = this;
+		const a: Action | $.VarRef<Action> | null = this;
 		const a$: Action = a == null ? $.pointerTarget<Action>(a) : (a as any).__isVarRef === true ? (a as any).value : (a as any).__goValue === undefined ? (a as any) : $.pointerTarget<Action>(a)
 		if ((a$ as Action).Filter == null) {
 			;(a$ as Action).Filter = $.makeMap<number, dep.Ref | null>()

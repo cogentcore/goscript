@@ -61,7 +61,7 @@ export class setterStruct {
 	}
 
 	public ["set"](value: number): void {
-		let s: setterStruct | $.VarRef<setterStruct> | null = this;
+		const s: setterStruct | $.VarRef<setterStruct> | null = this;
 		$.pointerValue<setterStruct>(s).value = value
 	}
 
@@ -92,7 +92,7 @@ export class digest {
 	}
 
 	public Write(p: $.Slice<number>): void {
-		let d: digest | $.VarRef<digest> | null = this;
+		const d: digest | $.VarRef<digest> | null = this;
 		const d$: digest = d == null ? $.pointerTarget<digest>(d) : (d as any).__isVarRef === true ? (d as any).value : (d as any).__goValue === undefined ? (d as any) : $.pointerTarget<digest>(d);
 		;(d$ as digest).writes += $.sliceLen(p)
 	}

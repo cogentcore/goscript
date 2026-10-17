@@ -26,7 +26,7 @@ export class FileTracker {
 	}
 
 	public AddLine(offset: number): void {
-		let f: FileTracker | $.VarRef<FileTracker> | null = this;
+		const f: FileTracker | $.VarRef<FileTracker> | null = this;
 		const f$: FileTracker = f == null ? $.pointerTarget<FileTracker>(f) : (f as any).__isVarRef === true ? (f as any).value : (f as any).__goValue === undefined ? (f as any) : $.pointerTarget<FileTracker>(f)
 		void (f$ as FileTracker).mutex.Lock();
 		;(f$ as FileTracker).lines = $.appendOne((f$ as FileTracker).lines, offset)

@@ -25,7 +25,7 @@ export class vec {
 	}
 
 	public Bump(): number {
-		let v: vec = this;
+		const v = this;
 		v.X++
 		return v.X
 	}
@@ -40,7 +40,7 @@ export class vec {
 	}
 
 	public BumpViaPointer(): number {
-		const v = $.varRef(this);
+		const v = $.varRef<vec>(this);
 		v.value.inc()
 		return v.value.Y
 	}
@@ -56,7 +56,7 @@ export class vec {
 	}
 
 	public inc(): void {
-		let v: vec | $.VarRef<vec> | null = this;
+		const v: vec | $.VarRef<vec> | null = this;
 		const v$: vec = v == null ? $.pointerTarget<vec>(v) : (v as any).__isVarRef === true ? (v as any).value : (v as any).__goValue === undefined ? (v as any) : $.pointerTarget<vec>(v);
 		;(v$ as vec).Y++
 	}

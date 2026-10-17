@@ -130,7 +130,7 @@ export class queue {
 	}
 
 	public async lockAndInit(): globalThis.Promise<void> {
-		let q: queue | $.VarRef<queue> | null = this;
+		const q: queue | $.VarRef<queue> | null = this;
 		const q$: queue = q == null ? $.pointerTarget<queue>(q) : (q as any).__isVarRef === true ? (q as any).value : (q as any).__goValue === undefined ? (q as any) : $.pointerTarget<queue>(q)
 		await (q$ as queue).Mu.Lock()
 		if ((q$ as queue).Cond.L == null) {
@@ -139,7 +139,7 @@ export class queue {
 	}
 
 	public async pop(): globalThis.Promise<number> {
-		let q: queue | $.VarRef<queue> | null = this;
+		const q: queue | $.VarRef<queue> | null = this;
 		using __defer = new $.DisposableStack()
 		const q$: queue = q == null ? $.pointerTarget<queue>(q) : (q as any).__isVarRef === true ? (q as any).value : (q as any).__goValue === undefined ? (q as any) : $.pointerTarget<queue>(q)
 		await (q !== null && (q as any).__isVarRef !== true && (q as any).__goValue === undefined ? ((q as any) as queue).lockAndInit() : queue.prototype.lockAndInit.call(q))
@@ -154,7 +154,7 @@ export class queue {
 	}
 
 	public async push(v: number): globalThis.Promise<void> {
-		let q: queue | $.VarRef<queue> | null = this;
+		const q: queue | $.VarRef<queue> | null = this;
 		const q$: queue = q == null ? $.pointerTarget<queue>(q) : (q as any).__isVarRef === true ? (q as any).value : (q as any).__goValue === undefined ? (q as any) : $.pointerTarget<queue>(q)
 		await (q !== null && (q as any).__isVarRef !== true && (q as any).__goValue === undefined ? ((q as any) as queue).lockAndInit() : queue.prototype.lockAndInit.call(q));
 		;(q$ as queue).items = $.appendOne((q$ as queue).items, v)

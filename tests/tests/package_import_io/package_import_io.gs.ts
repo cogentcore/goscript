@@ -87,7 +87,7 @@ export class staticReader {
 	}
 
 	public Read(p: $.Slice<number>): [number, $.GoError] {
-		let r: staticReader | $.VarRef<staticReader> | null = this;
+		const r: staticReader | $.VarRef<staticReader> | null = this;
 		const r$: staticReader = r == null ? $.pointerTarget<staticReader>(r) : (r as any).__isVarRef === true ? (r as any).value : (r as any).__goValue === undefined ? (r as any) : $.pointerTarget<staticReader>(r)
 		if ((r$ as staticReader).done) {
 			return [0, io.EOF]
@@ -124,7 +124,7 @@ export class asyncReader {
 	}
 
 	public Read(p: $.Slice<number>): [number, $.GoError] {
-		let r: asyncReader | $.VarRef<asyncReader> | null = this;
+		const r: asyncReader | $.VarRef<asyncReader> | null = this;
 		const r$: asyncReader = r == null ? $.pointerTarget<asyncReader>(r) : (r as any).__isVarRef === true ? (r as any).value : (r as any).__goValue === undefined ? (r as any) : $.pointerTarget<asyncReader>(r)
 		asyncWrites.value.Load("read")
 		if ((r$ as asyncReader).done) {

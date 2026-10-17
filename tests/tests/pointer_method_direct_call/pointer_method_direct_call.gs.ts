@@ -31,7 +31,7 @@ export class counter {
 	}
 
 	public add(i: number): number {
-		let c: counter | $.VarRef<counter> | null = this;
+		const c: counter | $.VarRef<counter> | null = this;
 		const c$: counter = c == null ? $.pointerTarget<counter>(c) : (c as any).__isVarRef === true ? (c as any).value : (c as any).__goValue === undefined ? (c as any) : $.pointerTarget<counter>(c)
 		if (c == null) {
 			return -1

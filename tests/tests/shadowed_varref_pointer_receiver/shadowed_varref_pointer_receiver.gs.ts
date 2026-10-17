@@ -21,7 +21,7 @@ export class locked {
 	}
 
 	public Inc(): void {
-		let l: locked | $.VarRef<locked> | null = this;
+		const l: locked | $.VarRef<locked> | null = this;
 		const l$: locked = l == null ? $.pointerTarget<locked>(l) : (l as any).__isVarRef === true ? (l as any).value : (l as any).__goValue === undefined ? (l as any) : $.pointerTarget<locked>(l);
 		;(l$ as locked).value++
 	}

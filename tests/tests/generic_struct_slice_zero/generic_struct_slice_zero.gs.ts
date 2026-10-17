@@ -48,7 +48,7 @@ export class arena {
 	}
 
 	public New(__typeArgs: $.GenericTypeArgs | undefined): any {
-		let a: arena | $.VarRef<arena> | null = this;
+		const a: arena | $.VarRef<arena> | null = this;
 		const a$: arena = a == null ? $.pointerTarget<arena>(a) : (a as any).__isVarRef === true ? (a as any).value : (a as any).__goValue === undefined ? (a as any) : $.pointerTarget<arena>(a)
 		if ($.sliceLen((a$ as arena).data) == $.cap((a$ as arena).data)) {
 			let nextSize = 1;

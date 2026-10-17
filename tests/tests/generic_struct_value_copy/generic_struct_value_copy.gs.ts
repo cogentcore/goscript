@@ -25,7 +25,7 @@ export class Value {
 	}
 
 	public Set(x: number): void {
-		let v: Value | $.VarRef<Value> | null = this;
+		const v: Value | $.VarRef<Value> | null = this;
 		$.pointerValue<Value>(v).V = x
 	}
 
@@ -68,7 +68,7 @@ export class Sides {
 	}
 
 	public SetAll(__typeArgs: $.GenericTypeArgs | undefined, val: any): void {
-		let s: Sides | $.VarRef<Sides> | null = this;
+		const s: Sides | $.VarRef<Sides> | null = this;
 		const s$: Sides = s == null ? $.pointerTarget<Sides>(s) : (s as any).__isVarRef === true ? (s as any).value : (s as any).__goValue === undefined ? (s as any) : $.pointerTarget<Sides>(s);
 		;(s$ as Sides).Top = $.copyElement(val);
 		;(s$ as Sides).Right = $.copyElement(val);
@@ -77,7 +77,7 @@ export class Sides {
 	}
 
 	public SetHorizontal(__typeArgs: $.GenericTypeArgs | undefined, val: any): void {
-		let s: Sides | $.VarRef<Sides> | null = this;
+		const s: Sides | $.VarRef<Sides> | null = this;
 		const s$: Sides = s == null ? $.pointerTarget<Sides>(s) : (s as any).__isVarRef === true ? (s as any).value : (s as any).__goValue === undefined ? (s as any) : $.pointerTarget<Sides>(s);
 		;(s$ as Sides).Right = $.copyElement(val);
 		;(s$ as Sides).Left = $.copyElement(val)

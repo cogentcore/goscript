@@ -109,7 +109,7 @@ export class printer {
 	}
 
 	public init(): void {
-		let p: printer | $.VarRef<printer> | null = this;
+		const p: printer | $.VarRef<printer> | null = this;
 		$.pointerValue<printer>(p).fmt.__goscriptAssign(new formatter(true))
 	}
 

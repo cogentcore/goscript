@@ -26,7 +26,7 @@ export class Plan {
 	}
 
 	public Add(__goscriptCaller?: $.CallSite): Plan | $.VarRef<Plan> | null {
-		let p: Plan | $.VarRef<Plan> | null = this;
+		const p: Plan | $.VarRef<Plan> | null = this;
 		const p$: Plan = p == null ? $.pointerTarget<Plan>(p) : (p as any).__isVarRef === true ? (p as any).value : (p as any).__goValue === undefined ? (p as any) : $.pointerTarget<Plan>(p);
 		;(p$ as Plan).Names = $.appendOne((p$ as Plan).Names, Name(2, { file: "github.com/s4wave/goscript/tests/tests/runtime_caller_maxify/subpkg/subpkg.go", line: 42, caller: __goscriptCaller }))
 		return p

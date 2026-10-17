@@ -162,7 +162,7 @@ export class Counter {
 	}
 
 	public Next(): number {
-		let c: Counter | $.VarRef<Counter> | null = this;
+		const c: Counter | $.VarRef<Counter> | null = this;
 		const c$: Counter = c == null ? $.pointerTarget<Counter>(c) : (c as any).__isVarRef === true ? (c as any).value : (c as any).__goValue === undefined ? (c as any) : $.pointerTarget<Counter>(c);
 		;(c$ as Counter).n++
 		return (c$ as Counter).n

@@ -42,12 +42,12 @@ export class storage {
 	}
 
 	public SetName(name: string): void {
-		let s: storage | $.VarRef<storage> | null = this;
+		const s: storage | $.VarRef<storage> | null = this;
 		$.pointerValue<storage>(s).name = name
 	}
 
 	public Truncate(): void {
-		let s: storage | $.VarRef<storage> | null = this;
+		const s: storage | $.VarRef<storage> | null = this;
 		$.pointerValue<storage>(s).bytes = $.makeSlice<number>(0, undefined, "byte")
 	}
 

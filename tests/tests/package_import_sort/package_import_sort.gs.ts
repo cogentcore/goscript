@@ -66,7 +66,7 @@ export class descending {
 	}
 
 	public Swap(i: number, j: number): void {
-		let d: descending = this;
+		const d = this;
 		let __goscriptAssign0_0: number = $.arrayIndex(d.values!, j)
 		let __goscriptAssign0_1: number = $.arrayIndex(d.values!, i)
 		$.sliceElems(d.values!)[$.sliceSlot(d.values!, i)] = __goscriptAssign0_0

@@ -26,7 +26,7 @@ export class MyStruct {
 	}
 
 	public SetValue(v: number): void {
-		let m: MyStruct | $.VarRef<MyStruct> | null = this;
+		const m: MyStruct | $.VarRef<MyStruct> | null = this;
 		$.pointerValue<MyStruct>(m).MyInt = v
 	}
 

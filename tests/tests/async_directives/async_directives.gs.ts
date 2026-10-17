@@ -74,7 +74,7 @@ export class addSink {
 	}
 
 	public Put(n: number): number {
-		let s: addSink | $.VarRef<addSink> | null = this;
+		const s: addSink | $.VarRef<addSink> | null = this;
 		const s$: addSink = s == null ? $.pointerTarget<addSink>(s) : (s as any).__isVarRef === true ? (s as any).value : (s as any).__goValue === undefined ? (s as any) : $.pointerTarget<addSink>(s);
 		;(s$ as addSink).total += n
 		return (s$ as addSink).total

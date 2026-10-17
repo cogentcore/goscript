@@ -124,7 +124,7 @@ export class tabs {
 	}
 
 	public async NewTab(name: string): globalThis.Promise<[frame | $.VarRef<frame> | null, tab | $.VarRef<tab> | null]> {
-		let ts: tabs | $.VarRef<tabs> | null = this;
+		const ts: tabs | $.VarRef<tabs> | null = this;
 		const ts$: tabs = ts == null ? $.pointerTarget<tabs>(ts) : (ts as any).__isVarRef === true ? (ts as any).value : (ts as any).__goValue === undefined ? (ts as any) : $.pointerTarget<tabs>(ts);
 		;(ts$ as tabs).count++
 		await $.println("new tab:", name)

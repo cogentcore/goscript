@@ -1,1 +1,1 @@
-export { item } from "./method_receiver_reassign.gs.ts"
+export { item, list } from "./method_receiver_reassign.gs.ts"

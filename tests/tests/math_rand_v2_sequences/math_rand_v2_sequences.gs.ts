@@ -25,7 +25,7 @@ export class splitmix {
 	}
 
 	public Uint64(): bigint {
-		let s: splitmix | $.VarRef<splitmix> | null = this;
+		const s: splitmix | $.VarRef<splitmix> | null = this;
 		const s$: splitmix = s == null ? $.pointerTarget<splitmix>(s) : (s as any).__isVarRef === true ? (s as any).value : (s as any).__goValue === undefined ? (s as any) : $.pointerTarget<splitmix>(s);
 		;(s$ as splitmix).x = $.uint64Add((s$ as splitmix).x, 11400714819323198485n)
 		let z = (s$ as splitmix).x

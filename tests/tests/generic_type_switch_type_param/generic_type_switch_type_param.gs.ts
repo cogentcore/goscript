@@ -61,7 +61,7 @@ export class Sides {
 	}
 
 	public SetAny(__typeArgs: $.GenericTypeArgs | undefined, a: any): string {
-		let s: Sides | $.VarRef<Sides> | null = this;
+		const s: Sides | $.VarRef<Sides> | null = this;
 		const s$: Sides = s == null ? $.pointerTarget<Sides>(s) : (s as any).__isVarRef === true ? (s as any).value : (s as any).__goValue === undefined ? (s as any) : $.pointerTarget<Sides>(s)
 		{
 			const __goscriptTypeSwitchValue = a

@@ -21,7 +21,7 @@ export class cache {
 	}
 
 	public Get(__typeArgs: $.GenericTypeArgs | undefined, k: any, _new: (() => [any, $.GoError] | globalThis.Promise<[any, $.GoError]>) | null, check: ((_p0: any) => boolean | globalThis.Promise<boolean>) | null): [any, $.GoError] {
-		let c: cache | $.VarRef<cache> | null = this;
+		const c: cache | $.VarRef<cache> | null = this;
 		const c$: cache = c == null ? $.pointerTarget<cache>(c) : (c as any).__isVarRef === true ? (c as any).value : (c as any).__goValue === undefined ? (c as any) : $.pointerTarget<cache>(c)
 		if (((c$ as cache).stored != null) && (check!((c$ as cache).stored) as boolean)) {
 			return [(c$ as cache).stored, null]

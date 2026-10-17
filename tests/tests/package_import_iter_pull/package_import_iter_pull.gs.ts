@@ -52,7 +52,7 @@ export class lexer {
 	}
 
 	public async drain(_yield: ((_p0: number) => boolean | globalThis.Promise<boolean>) | null): globalThis.Promise<boolean> {
-		let l: lexer | $.VarRef<lexer> | null = this;
+		const l: lexer | $.VarRef<lexer> | null = this;
 		const l$: lexer = l == null ? $.pointerTarget<lexer>(l) : (l as any).__isVarRef === true ? (l as any).value : (l as any).__goValue === undefined ? (l as any) : $.pointerTarget<lexer>(l)
 		while ($.sliceLen((l$ as lexer).stack) > 0) {
 			let n = $.sliceLen((l$ as lexer).stack) - 1
@@ -74,7 +74,7 @@ export class lexer {
 	}
 
 	public async push(seq: ((_yield: ((_p0: number) => boolean | globalThis.Promise<boolean>) | null) => void) | null): globalThis.Promise<void> {
-		let l: lexer | $.VarRef<lexer> | null = this;
+		const l: lexer | $.VarRef<lexer> | null = this;
 		const l$: lexer = l == null ? $.pointerTarget<lexer>(l) : (l as any).__isVarRef === true ? (l as any).value : (l as any).__goValue === undefined ? (l as any) : $.pointerTarget<lexer>(l)
 		let __goscriptTuple0: any = iter.Pull(__goscriptStatic0(), seq)
 		let next: (() => [number, boolean] | globalThis.Promise<[number, boolean]>) | null = (__goscriptTuple0[0] as (() => [number, boolean] | globalThis.Promise<[number, boolean]>) | null)
@@ -83,7 +83,7 @@ export class lexer {
 	}
 
 	public async stopAll(): globalThis.Promise<void> {
-		let l: lexer | $.VarRef<lexer> | null = this;
+		const l: lexer | $.VarRef<lexer> | null = this;
 		const l$: lexer = l == null ? $.pointerTarget<lexer>(l) : (l as any).__isVarRef === true ? (l as any).value : (l as any).__goValue === undefined ? (l as any) : $.pointerTarget<lexer>(l)
 		for (let __goscriptRangeTarget0 = (l$ as lexer).stack, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
 			let entry = ((__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as pullIterator)).clone()
