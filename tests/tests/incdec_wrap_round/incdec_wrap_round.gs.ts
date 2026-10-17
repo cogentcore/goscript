@@ -73,7 +73,7 @@ export async function main(): globalThis.Promise<void> {
 	let arr = $.arrayValue(new Uint8Array([255, 0]))
 	arr[0] = ((arr[0] + 1) & 0xff)
 	arr[1] = ((arr[1] - 1) & 0xff)
-	await $.println("elements:", $.arrayIndex(gi!, 0), $.arrayIndex(gb!, 0), $.arrayIndex(gb!, 1), $.arrayIndex(gf!, 0) == 1.6777216e+07, $.arrayIndex(ti!, 0), $.arrayIndex(arr, 0), $.arrayIndex(arr, 1))
+	await $.println("elements:", $.arrayIndex(gi!, 0), $.arrayIndex(gb!, 0), $.arrayIndex(gb!, 1), $.arrayIndex(gf!, 0) == 1.6777216e+07, $.arrayIndex(ti!, 0), arr[0], arr[1])
 
 	// Through pointers, with the target evaluated once.
 	let pi = $.indexRef(gi!, 0)

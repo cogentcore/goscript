@@ -184,20 +184,20 @@ export async function main(): globalThis.Promise<void> {
 		let x = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as any)
 		{
 			const __goscriptTypeSwitchValue = x
-			switch (true) {
-				case $.typeAssert<Vec>(__goscriptTypeSwitchValue, "main.Vec").ok:
+			switch ($.typeSwitchCase(__goscriptTypeSwitchValue, __goscriptStatic0())) {
+				case 0:
 					{
 						let t: Vec = $.markAsStructValue($.cloneStructValue($.typeAssert<Vec>(__goscriptTypeSwitchValue, "main.Vec").value))
 						await $.println("Vec", t.Sum())
 					}
 					break
-				case $.typeAssert<Celsius>(__goscriptTypeSwitchValue, "main.Celsius").ok:
+				case 1:
 					{
 						let t: Celsius = $.markAsStructValue($.cloneStructValue($.typeAssert<Celsius>(__goscriptTypeSwitchValue, "main.Celsius").value))
 						await $.println("Celsius", t.X)
 					}
 					break
-				case $.typeAssert<Vec | $.VarRef<Vec> | null>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.pointerType("main.Vec")).ok:
+				case 2:
 					{
 						let t: Vec | $.VarRef<Vec> | null = $.typeAssert<Vec | $.VarRef<Vec> | null>(__goscriptTypeSwitchValue, /* @__PURE__ */ $.pointerType("main.Vec")).value
 						await $.println("*Vec", $.pointerValue<Vec>(t).Sum())
@@ -212,6 +212,11 @@ export async function main(): globalThis.Promise<void> {
 			}
 		}
 	}
+}
+
+var __goscriptStatic0$value: any
+function __goscriptStatic0(): any {
+	return __goscriptStatic0$value ??= ($.typeSwitchSite(["main.Vec", "main.Celsius", /* @__PURE__ */ $.pointerType("main.Vec")]))
 }
 
 var __goscriptAwait: any
