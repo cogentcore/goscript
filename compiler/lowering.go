@@ -2936,6 +2936,17 @@ func lowerFloat32ConstantValue(value constant.Value) (string, bool) {
 	return strconv.FormatFloat(float64(float32(f)), 'g', -1, 64), true
 }
 
+// isWideIntegerConstantExpr reports whether expr is an integer constant
+// beyond the safe integers of JavaScript (see lowerWideIntegerConstantValue).
+func isWideIntegerConstantExpr(ctx lowerFileContext, expr ast.Expr) bool {
+	tv, ok := ctx.semPkg.source.TypesInfo.Types[unwrapParenExpr(expr)]
+	if !ok {
+		return false
+	}
+	_, wide := lowerWideIntegerConstantValue(tv.Value)
+	return wide
+}
+
 func lowerWideIntegerConstantValue(value constant.Value) (string, bool) {
 	if value == nil || value.Kind() != constant.Int || constant.BitLen(value) <= 53 {
 		return "", false
@@ -8768,6 +8779,11 @@ func (o *LoweringOwner) lowerSwitchStmt(ctx lowerFileContext, stmt *ast.SwitchSt
 						lowered = bigLit
 					}
 				}
+			} else if tagType != nil && isWideIntegerConstantExpr(ctx, expr) {
+				// A constant beyond the safe integers of a number-backed tag
+				// (such as ^uint(0)) is a bigint at runtime, as conversions
+				// and comparisons lower it, so the case is lowered as they do.
+				lowered = o.lowerValueForTarget(ctx, expr, tagType, lowered)
 			}
 			values = append(values, lowered)
 		}
