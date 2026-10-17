@@ -68,7 +68,7 @@ export async function main(): globalThis.Promise<void> {
 	for (let i = 0; i < 4000; i++) {
 		let n = strconv.Itoa(i)
 		let __goscriptTuple0: any = trace.NewTask($.pointerValueOrNil(context.Background())!, "multibatch-task-" + n)
-		let ctx = __goscriptTuple0[0]
+		let ctx: context.Context | null = __goscriptTuple0[0]
 		let task: trace.Task | $.VarRef<trace.Task> | null = __goscriptTuple0[1]
 		trace.Log($.pointerValueOrNil(ctx)!, "multibatch-key", "multibatch-message-" + n)
 		void (task !== null && (task as any).__isVarRef !== true && (task as any).__goValue === undefined ? ((task as any) as trace.Task).End() : trace.Task.prototype.End.call($.pointerValue<trace.Task>(task)))

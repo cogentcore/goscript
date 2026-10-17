@@ -63,7 +63,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 
 	let __goscriptTuple0: any = trace.NewTask($.pointerValueOrNil(context.Background())!, "proof-task")
-	let ctx = __goscriptTuple0[0]
+	let ctx: context.Context | null = __goscriptTuple0[0]
 	let task: trace.Task | $.VarRef<trace.Task> | null = __goscriptTuple0[1]
 	await trace.WithRegion($.pointerValueOrNil(ctx)!, "proof-region", $.functionValue(() => {
 		trace.Log($.pointerValueOrNil(ctx)!, "proof-key", "proof-value")
