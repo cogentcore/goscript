@@ -732,6 +732,7 @@ func packageTestCompileRequest(req *normalizedRequest, packagePaths []string, ou
 		RuntimeEmissionMode:       compiler.RuntimeEmissionModeEmit,
 		Tests:                     true,
 		ReportAsync:               req.ReportAsync,
+		EliminateDeadCode:         req.EliminateDeadCode,
 	}
 }
 

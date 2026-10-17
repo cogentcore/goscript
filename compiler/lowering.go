@@ -165,8 +165,9 @@ func (o *LoweringOwner) lowerPackage(
 	options LoweringOptions,
 ) (*loweredPackage, []Diagnostic) {
 	loweredPkg := &loweredPackage{
-		pkgPath: semPkg.pkgPath,
-		name:    semPkg.name,
+		pkgPath:     semPkg.pkgPath,
+		name:        semPkg.name,
+		moduleIndex: model.liveCode != nil,
 	}
 	declFiles := packageDeclFiles(semPkg)
 	outputNames := packageOutputNames(semPkg)
@@ -1895,6 +1896,11 @@ func (o *LoweringOwner) lowerDecl(ctx lowerFileContext, decl ast.Decl) ([]lowere
 		}
 		return o.lowerGenDecl(ctx, typed)
 	case *ast.FuncDecl:
+		// Dead code elimination leaves out unreachable functions and the
+		// free functions of unreachable methods of named non-struct types.
+		if !ctx.model.funcDeclLive(ctx.semPkg, typed) {
+			return nil, nil
+		}
 		if typed.Recv != nil {
 			if receiver := receiverNamedTypeFromDecl(ctx, typed); receiver != nil && namedStructType(receiver) == nil {
 				fn, diagnostics := o.lowerNamedReceiverMethodDecl(ctx, typed, receiver)
@@ -3764,6 +3770,11 @@ func (o *LoweringOwner) lowerStructType(ctx lowerFileContext, semType *semanticT
 	}
 	var diagnostics []Diagnostic
 	for _, methodDecl := range methodDecls {
+		// An unreachable method keeps only its runtime metadata.
+		if dead, ok := o.deadMethodMetadata(ctx, semType.named, methodDecl); ok {
+			lowered.methods = append(lowered.methods, dead)
+			continue
+		}
 		lowerDecl := methodDecl
 		methodSourcePath := sourcePos(ctx.semPkg.source, methodDecl.Pos()).file
 		if ctx.protobufTSAdapter &&
@@ -3784,6 +3795,7 @@ func (o *LoweringOwner) lowerStructType(ctx lowerFileContext, semType *semanticT
 	for _, field := range semType.fields {
 		methods := o.lowerEmbeddedMethodForwarders(
 			ctx.withReceiverTypeParams(genericReceiverTypeParams(semType.named)),
+			semType.named,
 			field,
 			explicitMethods,
 		)
@@ -3797,6 +3809,26 @@ func (o *LoweringOwner) lowerStructType(ctx lowerFileContext, semType *semanticT
 	}
 	lowered.positional = o.hasGeneratedClassShape(semType.named)
 	return lowered, diagnostics
+}
+
+// deadMethodMetadata returns the metadata-only lowering of a method of a
+// struct type that dead code elimination found unreachable, and whether it is.
+func (o *LoweringOwner) deadMethodMetadata(ctx lowerFileContext, named *types.Named, decl *ast.FuncDecl) (loweredFunction, bool) {
+	// A reachable method or one without type information is lowered.
+	fnObj, _ := ctx.semPkg.source.TypesInfo.Defs[decl.Name].(*types.Func)
+	if fnObj == nil || ctx.model.methodLive(named, decl.Name.Name) {
+		return loweredFunction{}, false
+	}
+
+	// The type's method list describes the method as before.
+	pointerOnly := hasPointerReceiver(fnObj)
+	return loweredFunction{
+		metadataOnly:            true,
+		name:                    methodMemberName(decl.Name.Name),
+		runtimeName:             decl.Name.Name,
+		runtimeSignature:        o.runtimeReceiverMethodSignature(fnObj, pointerOnly, make(map[types.Type]bool)),
+		runtimeTrimmedSignature: o.runtimeTrimmedReceiverMethodSignature(fnObj, pointerOnly, make(map[types.Type]bool)),
+	}, true
 }
 
 func protobufTypeScriptAdapterOneofBranch(semType *semanticType) bool {
@@ -3944,6 +3976,7 @@ func (o *LoweringOwner) protobufTypeScriptAdapterNamedTypeHasCustomJSON(
 
 func (o *LoweringOwner) lowerEmbeddedMethodForwarders(
 	ctx lowerFileContext,
+	outer *types.Named,
 	field semanticField,
 	explicitMethods map[string]bool,
 ) []loweredFunction {
@@ -4003,6 +4036,14 @@ func (o *LoweringOwner) lowerEmbeddedMethodForwarders(
 			runtimeTrimmedSignature: o.runtimeTrimmedReceiverMethodSignature(method, pointerOnly, make(map[types.Type]bool)),
 			result:                  asyncResultType("any", async),
 			deferState:              &loweredDeferState{},
+		}
+
+		// An unreachable forwarder keeps only its runtime metadata.
+		if !ctx.model.methodLive(outer, method.Name()) {
+			lowered.metadataOnly = true
+			methods = append(methods, lowered)
+			explicitMethods[method.Name()] = true
+			continue
 		}
 		var genericArgs string
 		if valueReceiver == nil {
@@ -18086,6 +18127,10 @@ func (o *LoweringOwner) genericMethodDescriptorsForType(
 	for selection := range methodSet.Methods() {
 		method, _ := selection.Obj().(*types.Func)
 		if method == nil {
+			continue
+		}
+		// An unreachable method has no function or class method to call.
+		if !isInterfaceType(named) && !ctx.model.methodLive(named, method.Name()) {
 			continue
 		}
 		// A promoted method is called through the embedding type's
