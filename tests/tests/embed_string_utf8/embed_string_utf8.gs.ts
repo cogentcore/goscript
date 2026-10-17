@@ -45,7 +45,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("invalid:", $.stringLen(invalid), utf8.ValidString(invalid), $.indexString(invalid, 4), $.indexString(invalid, 5))
 
 	// The names of embedded files are UTF-8 too.
-	let __goscriptTuple0: any = $.markAsStructValue($.cloneStructValue(files)).ReadFile("d\xc3\xa9.txt")
+	let __goscriptTuple0: any = await $.markAsStructValue($.cloneStructValue(files)).ReadFile("d\xc3\xa9.txt")
 	let data: $.Slice<number> = __goscriptTuple0[0]
 	let err: $.GoError = __goscriptTuple0[1]
 	await $.println("file:", err == null, $.stringEqual($.bytesToString(data), "accent\n"))

@@ -320,6 +320,53 @@ func TestCompilePackagesCacheInvalidatesEmbedFileChange(t *testing.T) {
 	}
 }
 
+func TestCompilePackagesWritesExternalEmbeds(t *testing.T) {
+	// A large PNG is external; a small PNG and a large text file stay inline.
+	big := strings.Repeat("png", 100)
+	moduleDir := writePackageGraphFixture(t, map[string]string{
+		"go.mod":           "module example.test/extembed\n\ngo 1.25.3\n",
+		"media/big #1.png": big,
+		"media/small.png":  "png",
+		"media/notes.txt":  strings.Repeat("text", 100),
+		"main.go":          "package extembed\n\nimport \"embed\"\n\n//go:embed media\nvar Media embed.FS\n",
+	})
+	config := Config{ExternalEmbeds: []string{"*.png"}, ExternalEmbedMinSize: 100}
+	cacheRoot := filepath.Join(t.TempDir(), "cache")
+	outputDir := filepath.Join(t.TempDir(), "out")
+	compileCacheFixtureConfig(t, config, moduleDir, outputDir, cacheRoot)
+
+	// The external file is listed with its size and URL, and written beside
+	// the module.
+	name := externalEmbedName(goEmbedFile{path: "media/big #1.png", data: []byte(big)})
+	text := readOutputFile(t, outputDir, "example.test/extembed", "main.gs.ts")
+	entry := `["media/big #1.png", 300, new URL("./@embed/` + strings.ReplaceAll(name, " #", "%20%23") + `", import.meta.url).href]`
+	if !strings.Contains(text, entry) {
+		t.Fatalf("external embed entry %s was not emitted:\n%s", entry, text)
+	}
+	if !strings.Contains(text, `["media/small.png", new Uint8Array(`) || !strings.Contains(text, `["media/notes.txt", `) {
+		t.Fatalf("small and text files were not inline:\n%s", text)
+	}
+	if got := readOutputFile(t, outputDir, "example.test/extembed", "@embed/"+name); got != big {
+		t.Fatalf("external embed file holds %q", got)
+	}
+
+	// A cached compile writes the external file again.
+	if err := os.RemoveAll(outputDir); err != nil {
+		t.Fatal(err)
+	}
+	compileCacheFixtureConfig(t, config, moduleDir, outputDir, cacheRoot)
+	if got := readOutputFile(t, outputDir, "example.test/extembed", "@embed/"+name); got != big {
+		t.Fatalf("replayed external embed file holds %q", got)
+	}
+
+	// Without the policy, the file is inline again.
+	compileCacheFixtureConfig(t, Config{}, moduleDir, outputDir, cacheRoot)
+	text = readOutputFile(t, outputDir, "example.test/extembed", "main.gs.ts")
+	if strings.Contains(text, "import.meta.url") {
+		t.Fatalf("file was external without the policy:\n%s", text)
+	}
+}
+
 func TestCompilePackagesCacheInvalidatesAdditionalBindingRoots(t *testing.T) {
 	moduleDir := t.TempDir()
 	dependencyDir := t.TempDir()

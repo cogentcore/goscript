@@ -16,7 +16,7 @@ export function __goscript_set_files(__goscriptValue: embed.FS): void {
 
 export async function main(): globalThis.Promise<void> {
 	await using __defer = new $.AsyncDisposableStack()
-	let [f, err] = $.markAsStructValue($.cloneStructValue(files)).Open("data.txt")
+	let [f, err] = await $.markAsStructValue($.cloneStructValue(files)).Open("data.txt")
 	if (err != null) {
 		await $.println("open error:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		return
@@ -56,7 +56,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("seek invalid:", err != null)
 
 	// A directory does not.
-	let [d, ] = $.markAsStructValue($.cloneStructValue(files)).Open(".")
+	let [d, ] = await $.markAsStructValue($.cloneStructValue(files)).Open(".")
 	let [, dirReaderAt] = $.typeAssertTuple<io.ReaderAt | null>(d, "io.ReaderAt")
 	await $.println("dir readerat:", dirReaderAt)
 }

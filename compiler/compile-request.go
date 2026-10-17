@@ -64,6 +64,8 @@ type CompileRequest struct {
 	// EliminateDeadCode leaves unreachable functions and methods of a
 	// program build out of the output.
 	EliminateDeadCode bool
+	// ExternalEmbeds selects the embedded files written as separate files.
+	ExternalEmbeds *ExternalEmbedPolicy
 }
 
 // CompileRequestOwner owns adapter input normalization and validation.
@@ -112,7 +114,24 @@ func (o *CompileRequestOwner) NewRequest(conf Config, patterns []string) *Compil
 		DisableEmitBuiltin:        conf.DisableEmitBuiltin,
 		ReportAsync:               conf.ReportAsync,
 		EliminateDeadCode:         conf.EliminateDeadCode,
+		ExternalEmbeds:            normalizeExternalEmbeds(conf.ExternalEmbeds, conf.ExternalEmbedMinSize),
 	}
+}
+
+// normalizeExternalEmbeds returns the policy for the given patterns, sorted
+// and without duplicates, or nil if there are none.
+func normalizeExternalEmbeds(patterns []string, minSize int64) *ExternalEmbedPolicy {
+	var cleaned []string
+	for _, pattern := range patterns {
+		if pattern = strings.TrimSpace(pattern); pattern != "" {
+			cleaned = append(cleaned, pattern)
+		}
+	}
+	if len(cleaned) == 0 {
+		return nil
+	}
+	slices.Sort(cleaned)
+	return &ExternalEmbedPolicy{Patterns: slices.Compact(cleaned), MinSize: minSize}
 }
 
 // Validate returns request diagnostics that must stop compilation before output.

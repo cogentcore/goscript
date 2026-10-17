@@ -426,9 +426,10 @@ func (o *CompilerCacheOwner) StoreGenerated(
 		}
 		for filePath, contents := range files {
 			// A nested package's files share the prefix but belong to its
-			// own entry, keyed by its own sources.
+			// own entry, keyed by its own sources. The external embedded
+			// files of the package are in its own directory for them.
 			name, ok := strings.CutPrefix(filePath, prefix)
-			if !ok || strings.Contains(name, "/") {
+			if !ok || (strings.Contains(name, "/") && !strings.HasPrefix(name, externalEmbedDir+"/")) {
 				continue
 			}
 			manifest.files = append(manifest.files, compilerCacheManifestFile{
@@ -869,6 +870,9 @@ func (o *compilerCacheKeyOwner) sharedIdentity() string {
 	}
 	for _, path := range req.PackageBlocklist {
 		writeKeyField(&b, "blocklist", path)
+	}
+	if key := req.ExternalEmbeds.key(); key != "" {
+		writeKeyField(&b, "external-embeds", key)
 	}
 	writeKeyField(&b, "dependency-mode", string(req.DependencyMode))
 	writeKeyField(&b, "runtime-mode", string(req.RuntimeEmissionMode))
