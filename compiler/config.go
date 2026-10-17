@@ -41,6 +41,14 @@ type Config struct {
 	// build cannot reach out of the output (see semantic-dead-code.go). It
 	// applies only to builds of main packages, and disables the cache.
 	EliminateDeadCode bool
+	// ExternalEmbeds are path.Match patterns of the base names of the files of
+	// embed.FS variables that are written as separate files beside the package
+	// output, which the runtime fetches when they are first opened (see
+	// ExternalEmbedPolicy).
+	ExternalEmbeds []string
+	// ExternalEmbedMinSize is the size in bytes from which a file that matches
+	// ExternalEmbeds is written as a separate file.
+	ExternalEmbedMinSize int64
 }
 
 // Validate checks the config and initializes owned defaults.
