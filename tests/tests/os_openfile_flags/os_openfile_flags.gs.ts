@@ -14,8 +14,8 @@ export async function write(name: string, flag: number, data: string): globalThi
 		await $.println("open error:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		return
 	}
-	await (f !== null && (f as any).__isVarRef !== true && (f as any).__goValue === undefined ? ((f as any) as os.File).WriteString(data) : os.File.prototype.WriteString.call($.pointerValue<os.File>(f), data))
-	await (f !== null && (f as any).__isVarRef !== true && (f as any).__goValue === undefined ? ((f as any) as os.File).Close() : os.File.prototype.Close.call($.pointerValue<os.File>(f)))
+	await os.File.prototype.WriteString.call($.pointerValueOrNil(f), data)
+	await os.File.prototype.Close.call($.pointerValueOrNil(f))
 }
 
 export async function read(name: string): globalThis.Promise<string> {
@@ -43,8 +43,8 @@ export async function main(): globalThis.Promise<void> {
 	await os.WriteFile(name, new Uint8Array([97, 32, 109, 117, 99, 104, 32, 108, 111, 110, 103, 101, 114, 32, 102, 105, 114, 115, 116, 32, 108, 105, 110, 101]), 0o644)
 	let __goscriptTuple2: any = await os.Create(name)
 	let f: os.File | $.VarRef<os.File> | null = __goscriptTuple2[0]
-	await (f !== null && (f as any).__isVarRef !== true && (f as any).__goValue === undefined ? ((f as any) as os.File).WriteString("short") : os.File.prototype.WriteString.call($.pointerValue<os.File>(f), "short"))
-	await (f !== null && (f as any).__isVarRef !== true && (f as any).__goValue === undefined ? ((f as any) as os.File).Close() : os.File.prototype.Close.call($.pointerValue<os.File>(f)))
+	await os.File.prototype.WriteString.call($.pointerValueOrNil(f), "short")
+	await os.File.prototype.Close.call($.pointerValueOrNil(f))
 	await $.println(await read(name))
 
 	// WriteFile also truncates.

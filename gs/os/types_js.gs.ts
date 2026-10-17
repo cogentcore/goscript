@@ -478,6 +478,10 @@ export class File {
 	}
 
 	public async Readdir(n: number): Promise<[$.Slice<fs.FileInfo>, $.GoError]> {
+		// A nil *File is invalid, as Go's checkValid reports.
+		if (this == null) {
+			return [null, ErrInvalid]
+		}
 		if (this.closed) {
 			return [null, ErrClosed]
 		}
@@ -495,6 +499,10 @@ export class File {
 	}
 
 	public async Readdirnames(n: number): Promise<[$.Slice<string>, $.GoError]> {
+		// A nil *File is invalid, as Go's checkValid reports.
+		if (this == null) {
+			return [null, ErrInvalid]
+		}
 		const [infos, err] = await this.Readdir(n)
 		if (err !== null) {
 			return [null, err]
@@ -503,6 +511,10 @@ export class File {
 	}
 
 	public async ReadDir(n: number): Promise<[$.Slice<fs.DirEntry>, $.GoError]> {
+		// A nil *File is invalid, as Go's checkValid reports.
+		if (this == null) {
+			return [null, ErrInvalid]
+		}
 		if (this.closed) {
 			return [null, ErrClosed]
 		}
@@ -537,6 +549,10 @@ export class File {
 	}
 
 	public async Read(b: $.Bytes): Promise<[number, $.GoError]> {
+		// A nil *File is invalid, as Go's checkValid reports.
+		if (this == null) {
+			return [0, ErrInvalid]
+		}
 		if (this.closed) {
 			return [0, ErrClosed]
 		}
@@ -566,6 +582,10 @@ export class File {
 	}
 
 	public async ReadAt(b: $.Bytes, off: bigint): Promise<[number, $.GoError]> {
+		// A nil *File is invalid, as Go's checkValid reports.
+		if (this == null) {
+			return [0, ErrInvalid]
+		}
 		if (this.closed) {
 			return [0, ErrClosed]
 		}
@@ -622,6 +642,10 @@ export class File {
 	}
 
 	public async ReadFrom(r: io.Reader): Promise<[bigint, $.GoError]> {
+		// A nil *File is invalid, as Go's checkValid reports.
+		if (this == null) {
+			return [0n, ErrInvalid]
+		}
 		if (this.closed) {
 			return [0n, ErrClosed]
 		}
@@ -652,6 +676,10 @@ export class File {
 	}
 
 	public async Write(b: $.Bytes): Promise<[number, $.GoError]> {
+		// A nil *File is invalid, as Go's checkValid reports.
+		if (this == null) {
+			return [0, ErrInvalid]
+		}
 		if (this.closed) {
 			return [0, ErrClosed]
 		}
@@ -675,6 +703,10 @@ export class File {
 	}
 
 	public async WriteAt(b: $.Bytes, off: bigint): Promise<[number, $.GoError]> {
+		// A nil *File is invalid, as Go's checkValid reports.
+		if (this == null) {
+			return [0, ErrInvalid]
+		}
 		if (this.closed) {
 			return [0, ErrClosed]
 		}
@@ -713,6 +745,10 @@ export class File {
 	}
 
 	public async WriteTo(w: io.Writer): Promise<[bigint, $.GoError]> {
+		// A nil *File is invalid, as Go's checkValid reports.
+		if (this == null) {
+			return [0n, ErrInvalid]
+		}
 		if (this.closed) {
 			return [0n, ErrClosed]
 		}
@@ -743,6 +779,10 @@ export class File {
 	}
 
 	public async Seek(offset: bigint, whence: number): Promise<[bigint, $.GoError]> {
+		// A nil *File is invalid, as Go's checkValid reports.
+		if (this == null) {
+			return [0n, ErrInvalid]
+		}
 		if (this.callback !== null) {
 			return this.callbackSeek(Number(offset), whence)
 		}
@@ -787,10 +827,18 @@ export class File {
 	}
 
 	public WriteString(s: string): Promise<[number, $.GoError]> {
+		// A nil *File is invalid, as Go's checkValid reports.
+		if (this == null) {
+			return Promise.resolve([0, ErrInvalid])
+		}
 		return this.Write($.stringToBytes(s))
 	}
 
 	public async Chmod(mode: number): Promise<$.GoError> {
+		// A nil *File is invalid, as Go's checkValid reports.
+		if (this == null) {
+			return ErrInvalid
+		}
 		if (this.closed) {
 			return ErrClosed
 		}
@@ -823,18 +871,34 @@ export class File {
 	}
 
 	public SetDeadline(t: time.Time): $.GoError {
+		// A nil *File is invalid, as Go's checkValid reports.
+		if (this == null) {
+			return ErrInvalid
+		}
 		return ErrUnimplemented
 	}
 
 	public SetReadDeadline(t: time.Time): $.GoError {
+		// A nil *File is invalid, as Go's checkValid reports.
+		if (this == null) {
+			return ErrInvalid
+		}
 		return ErrUnimplemented
 	}
 
 	public SetWriteDeadline(t: time.Time): $.GoError {
+		// A nil *File is invalid, as Go's checkValid reports.
+		if (this == null) {
+			return ErrInvalid
+		}
 		return ErrUnimplemented
 	}
 
 	public SyscallConn(): [any, $.GoError] {
+		// A nil *File is invalid, as Go's checkValid reports.
+		if (this == null) {
+			return [null, ErrInvalid]
+		}
 		if (this.closed) {
 			return [null, ErrClosed]
 		}
@@ -845,6 +909,10 @@ export class File {
 	}
 
 	public async Close(): Promise<$.GoError> {
+		// A nil *File is invalid, as Go's checkValid reports.
+		if (this == null) {
+			return ErrInvalid
+		}
 		if (this.closed) {
 			return ErrClosed
 		}
@@ -875,6 +943,10 @@ export class File {
 	}
 
 	public async Chown(uid: number, gid: number): Promise<$.GoError> {
+		// A nil *File is invalid, as Go's checkValid reports.
+		if (this == null) {
+			return ErrInvalid
+		}
 		if (this.closed) {
 			return ErrClosed
 		}
@@ -907,6 +979,10 @@ export class File {
 	}
 
 	public async Truncate(size: bigint): Promise<$.GoError> {
+		// A nil *File is invalid, as Go's checkValid reports.
+		if (this == null) {
+			return ErrInvalid
+		}
 		if (this.callback !== null) {
 			const [, err] = await this.callbackCall("ftruncate", Number(size))
 			return err
@@ -933,6 +1009,10 @@ export class File {
 	}
 
 	public async Sync(): Promise<$.GoError> {
+		// A nil *File is invalid, as Go's checkValid reports.
+		if (this == null) {
+			return ErrInvalid
+		}
 		if (this.callback !== null) {
 			const [, err] = await this.callbackCall("fsync")
 			return err
@@ -959,6 +1039,10 @@ export class File {
 	}
 
 	public Chdir(): $.GoError {
+		// A nil *File is invalid, as Go's checkValid reports.
+		if (this == null) {
+			return ErrInvalid
+		}
 		if (this.callback !== null) {
 			callbackFSSetwd(this.name)
 			return null
@@ -985,10 +1069,18 @@ export class File {
 	}
 
 	public Fd(): syscall.uintptr {
+		// The descriptor of a nil *File is ^uintptr(0), as in Go.
+		if (this == null) {
+			return $.uint("18446744073709551615", 64)
+		}
 		return this.fd
 	}
 
 	public async Stat(): Promise<[fs.FileInfo, $.GoError]> {
+		// A nil *File is invalid, as Go's checkValid reports.
+		if (this == null) {
+			return [null, ErrInvalid]
+		}
 		if (this.callback !== null) {
 			const [stat, err] = await this.callbackCall("fstat")
 			return err !== null ? [null, err] : [createFileInfo(this.name, stat as HostStatLike), null]
