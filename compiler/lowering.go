@@ -8760,13 +8760,9 @@ func (o *LoweringOwner) lowerSwitchStmt(ctx lowerFileContext, stmt *ast.SwitchSt
 		tagType = ctx.semPkg.source.TypesInfo.TypeOf(stmt.Tag)
 	}
 
-	// Interface and pointer tags are compared with the runtime, since equal
-	// values need not be the same JavaScript value.
-	compareCases := tagType != nil && (isInterfaceType(tagType) || isPointerType(tagType))
-	compareHelper := RuntimeHelperComparableEqual
-	if tagType != nil && isPointerType(tagType) {
-		compareHelper = RuntimeHelperPointerEqual
-	}
+	// A tag that === cannot compare is evaluated once, and each case becomes
+	// the condition tag == case.
+	compareCases := tagType != nil && isValueSwitchTagType(tagType)
 	compareValue := value
 	if compareCases {
 		compareValue = ctx.tempName("Switch")
@@ -8793,9 +8789,15 @@ func (o *LoweringOwner) lowerSwitchStmt(ctx lowerFileContext, stmt *ast.SwitchSt
 			lowered, exprDiagnostics := o.lowerExpr(ctx, expr)
 			diagnostics = append(diagnostics, exprDiagnostics...)
 			if compareCases {
-				sourceType := ctx.semPkg.source.TypesInfo.TypeOf(expr)
-				lowered = o.lowerValueForTargetTypes(ctx, tagType, sourceType, lowered, o.shouldCloneStructValue(ctx, expr))
-				lowered = o.runtimeOwner.QualifiedHelper(compareHelper) + "(" + compareValue + ", " + lowered + ")"
+				// Comparisons the typed equality declines, such as case nil,
+				// lower as a binary == does.
+				eq := &ast.BinaryExpr{X: stmt.Tag, OpPos: expr.Pos(), Op: token.EQL, Y: expr}
+				if value, ok := o.lowerTypedEqualityExpr(ctx, eq, compareValue, lowered); ok {
+					lowered = value
+				} else {
+					left, right := o.lowerEqualityOperands(ctx, eq, compareValue, lowered)
+					lowered = left + " == " + right
+				}
 			} else if tagType != nil && isBigIntBackedType(tagType) {
 				// A bigint-backed tag (int64/uint64) lowers to a bigint at
 				// runtime, and JS switch matches with strict ===. An integer
@@ -9260,6 +9262,34 @@ func (o *LoweringOwner) lowerEqualityOperands(ctx lowerFileContext, expr *ast.Bi
 	return left, right
 }
 
+// lowerTypedEqualityExpr compares the lowered operands of an == or != whose
+// type JavaScript === does not compare as Go does: arrays, complex numbers, and
+// structs by value, pointers across unsafe aliases, strings by their bytes, and
+// interfaces by their dynamic values. It reports false for operands === compares.
+func (o *LoweringOwner) lowerTypedEqualityExpr(ctx lowerFileContext, expr *ast.BinaryExpr, left string, right string) (string, bool) {
+	for _, lower := range []func(lowerFileContext, *ast.BinaryExpr, string, string) (string, bool){
+		o.lowerArrayEqualityExpr,
+		o.lowerPointerEqualityExpr,
+		o.lowerComplexEqualityExpr,
+		o.lowerStructEqualityExpr,
+		o.lowerStringEqualityExpr,
+		o.lowerInterfaceEqualityExpr,
+	} {
+		if value, ok := lower(ctx, expr, left, right); ok {
+			return value, true
+		}
+	}
+	return "", false
+}
+
+// isValueSwitchTagType reports whether a switch on a tag of typ compares each
+// case through the equality its type needs. A JavaScript switch matches with
+// ===, which compares arrays, complex numbers, and structs by identity,
+// interfaces by their boxes, and pointers without their unsafe aliases.
+func isValueSwitchTagType(typ types.Type) bool {
+	return isInterfaceType(typ) || isPointerType(typ) || isArrayType(typ) || isComplexType(typ) || isStructComparableType(typ)
+}
+
 func (o *LoweringOwner) lowerArrayEqualityExpr(ctx lowerFileContext, expr *ast.BinaryExpr, left string, right string) (string, bool) {
 	leftType := ctx.semPkg.source.TypesInfo.TypeOf(expr.X)
 	rightType := ctx.semPkg.source.TypesInfo.TypeOf(expr.Y)
@@ -9639,22 +9669,7 @@ func (o *LoweringOwner) lowerExpr(ctx lowerFileContext, expr ast.Expr) (string, 
 			return left + " & ~(" + right + ")", append(leftDiagnostics, rightDiagnostics...)
 		}
 		if isEqualityOperator(typed.Op) {
-			if value, ok := o.lowerArrayEqualityExpr(ctx, typed, left, right); ok {
-				return value, append(leftDiagnostics, rightDiagnostics...)
-			}
-			if value, ok := o.lowerPointerEqualityExpr(ctx, typed, left, right); ok {
-				return value, append(leftDiagnostics, rightDiagnostics...)
-			}
-			if value, ok := o.lowerComplexEqualityExpr(ctx, typed, left, right); ok {
-				return value, append(leftDiagnostics, rightDiagnostics...)
-			}
-			if value, ok := o.lowerStructEqualityExpr(ctx, typed, left, right); ok {
-				return value, append(leftDiagnostics, rightDiagnostics...)
-			}
-			if value, ok := o.lowerStringEqualityExpr(ctx, typed, left, right); ok {
-				return value, append(leftDiagnostics, rightDiagnostics...)
-			}
-			if value, ok := o.lowerInterfaceEqualityExpr(ctx, typed, left, right); ok {
+			if value, ok := o.lowerTypedEqualityExpr(ctx, typed, left, right); ok {
 				return value, append(leftDiagnostics, rightDiagnostics...)
 			}
 			left, right = o.lowerEqualityOperands(ctx, typed, left, right)

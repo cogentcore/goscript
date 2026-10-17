@@ -15,3 +15,20 @@ positive
 
 Switch on conditions set in a callback:
 found
+
+Array switch:
+three four
+empty
+
+Struct switch:
+one two
+
+Complex switch:
+one plus two i
+
+Binary string switch:
+binary
+
+Nil pointer and interface switch:
+nil pointer
+nil error

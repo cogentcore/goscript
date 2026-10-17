@@ -1290,6 +1290,69 @@ describe('encoding/json override', () => {
     expect(target.value.Age).toBe(3)
   })
 
+  it('reads a large value in small chunks in linear time', async () => {
+    // Each read gives 1 KiB of a 4 MiB string in an array; parsing the
+    // value again after each read would take minutes.
+    const text = '["' + 'ab\\"'.repeat(1 << 20) + '"]'
+    const data = $.stringToBytes(text)
+    let off = 0
+    let reads = 0
+    const reader = {
+      Read: async (p: $.Bytes): Promise<[number, $.GoError]> => {
+        reads++
+        if (off >= $.len(data)) {
+          return [0, io.EOF]
+        }
+        const n = $.copy(
+          p,
+          $.goSlice(data, off, Math.min(off + 1024, $.len(data))),
+        )
+        off += n
+        return [n, null]
+      },
+    }
+    const target = $.varRef<unknown>(null)
+    const start = performance.now()
+    expect(await NewDecoder(reader).Decode(target)).toBeNull()
+    expect(performance.now() - start).toBeLessThan(2000)
+    expect((target.value as unknown[])[0]).toBe('ab"'.repeat(1 << 20))
+    expect(reads).toBe(Math.ceil($.len(data) / 1024))
+  })
+
+  it('finds the end of a value across escapes split between reads', async () => {
+    // The escaped quote is split between two reads, and then the reader
+    // blocks forever, so the value must end where it does.
+    const chunks = ['["a\\', '"b"]']
+    const reader = {
+      Read: (p: $.Bytes): Promise<[number, $.GoError]> => {
+        const chunk = chunks.shift()
+        if (chunk === undefined) {
+          return new Promise(() => {})
+        }
+        return Promise.resolve([$.copy(p, $.stringToBytes(chunk)), null])
+      },
+    }
+    const target = $.varRef<unknown>(null)
+    expect(await NewDecoder(reader).Decode(target)).toBeNull()
+    expect(target.value).toEqual(['a"b'])
+  })
+
+  it('reports a syntax error in a value that has not ended', async () => {
+    // The reader blocks forever after the malformed start of an array.
+    let sent = false
+    const reader = {
+      Read: (p: $.Bytes): Promise<[number, $.GoError]> => {
+        if (sent) {
+          return new Promise(() => {})
+        }
+        sent = true
+        return Promise.resolve([$.copy(p, $.stringToBytes('[1,x,')), null])
+      },
+    }
+    const err = await NewDecoder(reader).Decode($.varRef<unknown>(null))
+    expect(err).toBeInstanceOf(JSONSyntaxError)
+  })
+
   it('marshals a RawMessage field without normalizing its token spelling', () => {
     class RawHolder {
       public R = $.stringToBytes('1e+00')
