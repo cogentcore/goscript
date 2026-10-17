@@ -345,6 +345,17 @@ describe('encoding/json override', () => {
     expect(value.UnmarshalJSON($.stringToBytes('{}'))).toBeNull()
   })
 
+  it('registers the SyntaxError zero value without making an Error at import', () => {
+    // The registration holds a factory, so loading the package makes no Error.
+    const info = $.getTypeByName('json.SyntaxError') as { zeroValue?: unknown }
+    expect(typeof info.zeroValue).toBe('function')
+
+    // The factory still makes a zero SyntaxError.
+    const zero = (info.zeroValue as () => unknown)()
+    expect(zero).toBeInstanceOf(JSONSyntaxError)
+    expect((zero as InstanceType<typeof JSONSyntaxError>).Offset).toBe(0)
+  })
+
   it('exposes JSON error structs as Go errors', () => {
     for (const err of [
       new JSONSyntaxError(),
