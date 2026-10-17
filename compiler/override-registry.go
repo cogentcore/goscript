@@ -75,7 +75,7 @@ type OverrideMetadata struct {
 	// CallSiteFunctions names the package-level functions whose TypeScript
 	// takes the Go position of each direct call as one more argument after
 	// their parameters, as runtime.Caller does to report the frames of
-	// functions that //goscript:maxify marks (see lowering-call-sites.go).
+	// functions that //goscript:callsite marks (see lowering-call-sites.go).
 	CallSiteFunctions map[string]bool
 }
 
