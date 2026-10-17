@@ -48,7 +48,7 @@ export class Stack {
 	}
 
 	public Pop(__typeArgs: $.GenericTypeArgs | undefined): [any, boolean] {
-		let s: Stack | $.VarRef<Stack> | null = this;
+		const s: Stack | $.VarRef<Stack> | null = this;
 		const s$: Stack = s == null ? $.pointerTarget<Stack>(s) : (s as any).__isVarRef === true ? (s as any).value : (s as any).__goValue === undefined ? (s as any) : $.pointerTarget<Stack>(s)
 		if ($.sliceLen((s$ as Stack).items) == 0) {
 			$.panic("pop from empty stack")
@@ -60,7 +60,7 @@ export class Stack {
 	}
 
 	public Push(__typeArgs: $.GenericTypeArgs | undefined, value: any): void {
-		let s: Stack | $.VarRef<Stack> | null = this;
+		const s: Stack | $.VarRef<Stack> | null = this;
 		const s$: Stack = s == null ? $.pointerTarget<Stack>(s) : (s as any).__isVarRef === true ? (s as any).value : (s as any).__goValue === undefined ? (s as any) : $.pointerTarget<Stack>(s);
 		;(s$ as Stack).items = $.append((s$ as Stack).items, value, $.appendZero(() => ($.genericZero(__typeArgs, "T", null) as any)))
 	}
@@ -132,7 +132,7 @@ export class Mapper {
 	}
 
 	public Put(__typeArgs: $.GenericTypeArgs | undefined, key: any, value: any): void {
-		let m: Mapper | $.VarRef<Mapper> | null = this;
+		const m: Mapper | $.VarRef<Mapper> | null = this;
 		$.mapSet($.pointerValue<Mapper>(m).values, key, $.copyElement(value))
 	}
 

@@ -21,7 +21,7 @@ export class cursor {
 	}
 
 	public next(): number {
-		let c: cursor | $.VarRef<cursor> | null = this;
+		const c: cursor | $.VarRef<cursor> | null = this;
 		const c$: cursor = c == null ? $.pointerTarget<cursor>(c) : (c as any).__isVarRef === true ? (c as any).value : (c as any).__goValue === undefined ? (c as any) : $.pointerTarget<cursor>(c);
 		;(c$ as cursor).pos++
 		return (c$ as cursor).pos * 10

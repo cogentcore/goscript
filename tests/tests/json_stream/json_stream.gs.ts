@@ -32,7 +32,7 @@ export class chanReader {
 	}
 
 	public async Read(p: $.Slice<number>): globalThis.Promise<[number, $.GoError]> {
-		let r: chanReader | $.VarRef<chanReader> | null = this;
+		const r: chanReader | $.VarRef<chanReader> | null = this;
 		const r$: chanReader = r == null ? $.pointerTarget<chanReader>(r) : (r as any).__isVarRef === true ? (r as any).value : (r as any).__goValue === undefined ? (r as any) : $.pointerTarget<chanReader>(r)
 		if ($.stringEqual((r$ as chanReader).cur, "")) {
 			let __goscriptRecv0 = await $.chanRecvWithOk((r$ as chanReader).ch)

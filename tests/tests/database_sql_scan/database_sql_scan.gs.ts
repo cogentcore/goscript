@@ -115,7 +115,7 @@ export class rows {
 	}
 
 	public Next(dest: $.Slice<driver.Value | null>): $.GoError {
-		let r: rows | $.VarRef<rows> | null = this;
+		const r: rows | $.VarRef<rows> | null = this;
 		const r$: rows = r == null ? $.pointerTarget<rows>(r) : (r as any).__isVarRef === true ? (r as any).value : (r as any).__goValue === undefined ? (r as any) : $.pointerTarget<rows>(r)
 		if ((r$ as rows).done) {
 			return io.EOF
@@ -161,7 +161,7 @@ export class columnRows {
 	}
 
 	public NextRow(): $.GoError {
-		let r: columnRows | $.VarRef<columnRows> | null = this;
+		const r: columnRows | $.VarRef<columnRows> | null = this;
 		const r$: columnRows = r == null ? $.pointerTarget<columnRows>(r) : (r as any).__isVarRef === true ? (r as any).value : (r as any).__goValue === undefined ? (r as any) : $.pointerTarget<columnRows>(r)
 		if ((r$ as columnRows).rows.done) {
 			return io.EOF

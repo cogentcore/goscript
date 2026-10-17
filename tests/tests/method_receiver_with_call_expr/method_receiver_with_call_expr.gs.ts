@@ -34,7 +34,7 @@ export class State {
 	}
 
 	public markIndex(): void {
-		let s: State | $.VarRef<State> | null = this;
+		const s: State | $.VarRef<State> | null = this;
 		// The first body statement begins with a parenthesized pointer expression.
 		$.pointerValue<State>(s).index!.value = -1
 	}

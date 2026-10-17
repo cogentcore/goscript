@@ -22,7 +22,7 @@ export class chunker {
 	}
 
 	public advance(chunkSize: number): void {
-		let c: chunker | $.VarRef<chunker> | null = this;
+		const c: chunker | $.VarRef<chunker> | null = this;
 		const c$: chunker = c == null ? $.pointerTarget<chunker>(c) : (c as any).__isVarRef === true ? (c as any).value : (c as any).__goValue === undefined ? (c as any) : $.pointerTarget<chunker>(c);
 		;(c$ as chunker).pos = $.uint64Add((c$ as chunker).pos, $.uint64(chunkSize))
 	}
@@ -54,7 +54,7 @@ export class repeatReader {
 	}
 
 	public Read(p: $.Slice<number>): [number, $.GoError] {
-		let r: repeatReader | $.VarRef<repeatReader> | null = this;
+		const r: repeatReader | $.VarRef<repeatReader> | null = this;
 		const r$: repeatReader = r == null ? $.pointerTarget<repeatReader>(r) : (r as any).__isVarRef === true ? (r as any).value : (r as any).__goValue === undefined ? (r as any) : $.pointerTarget<repeatReader>(r)
 		if ((r$ as repeatReader).remaining == 0) {
 			return [0, io.EOF]

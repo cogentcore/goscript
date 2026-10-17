@@ -1,2 +1,10 @@
 original: 2
 out: 1
+addrDec: 11 2
+add nil: 3
+add again: true 7
+last: 6 7
+lastFunc: 6 7
+addr: 5
+addr set: 7 5
+sum: 12

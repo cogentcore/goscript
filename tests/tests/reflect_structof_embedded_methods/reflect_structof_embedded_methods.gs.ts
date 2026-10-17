@@ -27,7 +27,7 @@ export class Base {
 	}
 
 	public SetName(name: string): void {
-		let b: Base | $.VarRef<Base> | null = this;
+		const b: Base | $.VarRef<Base> | null = this;
 		$.pointerValue<Base>(b).Name = name
 	}
 

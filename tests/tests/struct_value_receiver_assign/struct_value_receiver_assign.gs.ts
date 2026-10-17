@@ -32,7 +32,7 @@ export class tag {
 	}
 
 	public ["set"](lang: number): void {
-		let t: tag | $.VarRef<tag> | null = this;
+		const t: tag | $.VarRef<tag> | null = this;
 		$.pointerValue<tag>(t).__goscriptAssign(new tag(true, lang, "p"))
 	}
 

@@ -26,7 +26,7 @@ export class counter {
 	}
 
 	public add(k: number): void {
-		let c: counter | $.VarRef<counter> | null = this;
+		const c: counter | $.VarRef<counter> | null = this;
 		const c$: counter = c == null ? $.pointerTarget<counter>(c) : (c as any).__isVarRef === true ? (c as any).value : (c as any).__goValue === undefined ? (c as any) : $.pointerTarget<counter>(c)
 		void (c$ as counter).mu.Lock();
 		;(c$ as counter).n += k
@@ -78,7 +78,7 @@ export class queue {
 	}
 
 	public async push(v: number): globalThis.Promise<void> {
-		let q: queue | $.VarRef<queue> | null = this;
+		const q: queue | $.VarRef<queue> | null = this;
 		const q$: queue = q == null ? $.pointerTarget<queue>(q) : (q as any).__isVarRef === true ? (q as any).value : (q as any).__goValue === undefined ? (q as any) : $.pointerTarget<queue>(q)
 		await (q$ as queue).mu.Lock();
 		;(q$ as queue).items = $.appendOne((q$ as queue).items, v)
@@ -127,7 +127,7 @@ export class shared {
 	}
 
 	public async inc(): globalThis.Promise<void> {
-		let s: shared | $.VarRef<shared> | null = this;
+		const s: shared | $.VarRef<shared> | null = this;
 		const s$: shared = s == null ? $.pointerTarget<shared>(s) : (s as any).__isVarRef === true ? (s as any).value : (s as any).__goValue === undefined ? (s as any) : $.pointerTarget<shared>(s)
 		await (s$ as shared).mu.Lock();
 		;(s$ as shared).n++
@@ -173,7 +173,7 @@ export class gate {
 	}
 
 	public async open(): globalThis.Promise<void> {
-		let g: gate | $.VarRef<gate> | null = this;
+		const g: gate | $.VarRef<gate> | null = this;
 		const g$: gate = g == null ? $.pointerTarget<gate>(g) : (g as any).__isVarRef === true ? (g as any).value : (g as any).__goValue === undefined ? (g as any) : $.pointerTarget<gate>(g)
 		await (g$ as gate).mu.Lock();
 		;(g$ as gate).log = $.appendOne((g$ as gate).log, "open")
@@ -181,7 +181,7 @@ export class gate {
 	}
 
 	public async poll(): globalThis.Promise<void> {
-		let g: gate | $.VarRef<gate> | null = this;
+		const g: gate | $.VarRef<gate> | null = this;
 		const g$: gate = g == null ? $.pointerTarget<gate>(g) : (g as any).__isVarRef === true ? (g as any).value : (g as any).__goValue === undefined ? (g as any) : $.pointerTarget<gate>(g)
 		if ((g$ as gate).mu.TryLock()) {
 			;(g$ as gate).log = $.appendOne((g$ as gate).log, "poll start")
@@ -231,7 +231,7 @@ export class relay {
 	}
 
 	public async begin(hold: boolean): globalThis.Promise<boolean> {
-		let r: relay | $.VarRef<relay> | null = this;
+		const r: relay | $.VarRef<relay> | null = this;
 		const r$: relay = r == null ? $.pointerTarget<relay>(r) : (r as any).__isVarRef === true ? (r as any).value : (r as any).__goValue === undefined ? (r as any) : $.pointerTarget<relay>(r)
 		await (r$ as relay).mu.Lock()
 		if (!hold) {
@@ -243,14 +243,14 @@ export class relay {
 	}
 
 	public end(): void {
-		let r: relay | $.VarRef<relay> | null = this;
+		const r: relay | $.VarRef<relay> | null = this;
 		const r$: relay = r == null ? $.pointerTarget<relay>(r) : (r as any).__isVarRef === true ? (r as any).value : (r as any).__goValue === undefined ? (r as any) : $.pointerTarget<relay>(r);
 		;(r$ as relay).log = $.appendOne((r$ as relay).log, "end")
 		void (r$ as relay).mu.Unlock()
 	}
 
 	public async open(): globalThis.Promise<void> {
-		let r: relay | $.VarRef<relay> | null = this;
+		const r: relay | $.VarRef<relay> | null = this;
 		const r$: relay = r == null ? $.pointerTarget<relay>(r) : (r as any).__isVarRef === true ? (r as any).value : (r as any).__goValue === undefined ? (r as any) : $.pointerTarget<relay>(r)
 		await (r$ as relay).mu.Lock();
 		;(r$ as relay).log = $.appendOne((r$ as relay).log, "open")

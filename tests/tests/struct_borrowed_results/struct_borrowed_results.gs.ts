@@ -81,7 +81,7 @@ export class Region {
 	}
 
 	public bump(): void {
-		let r: Region | $.VarRef<Region> | null = this;
+		const r: Region | $.VarRef<Region> | null = this;
 		$.pointerValue<Region>(r).Start.Line++
 	}
 

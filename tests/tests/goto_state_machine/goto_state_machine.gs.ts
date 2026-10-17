@@ -29,7 +29,7 @@ export class scanner {
 	}
 
 	public readByte(): number {
-		let s: scanner | $.VarRef<scanner> | null = this;
+		const s: scanner | $.VarRef<scanner> | null = this;
 		const s$: scanner = s == null ? $.pointerTarget<scanner>(s) : (s as any).__isVarRef === true ? (s as any).value : (s as any).__goValue === undefined ? (s as any) : $.pointerTarget<scanner>(s)
 		if ((s$ as scanner).pos >= $.stringLen((s$ as scanner).data)) {
 			;(s$ as scanner).done = true

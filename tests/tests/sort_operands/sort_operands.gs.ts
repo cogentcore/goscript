@@ -54,7 +54,7 @@ export class slowInts {
 	}
 
 	public Swap(i: number, j: number): void {
-		let s: slowInts | $.VarRef<slowInts> | null = this;
+		const s: slowInts | $.VarRef<slowInts> | null = this;
 		const s$: slowInts = s == null ? $.pointerTarget<slowInts>(s) : (s as any).__isVarRef === true ? (s as any).value : (s as any).__goValue === undefined ? (s as any) : $.pointerTarget<slowInts>(s)
 		let __goscriptAssign1_0: number = $.arrayIndex((s$ as slowInts).xs!, j)
 		let __goscriptAssign1_1: number = $.arrayIndex((s$ as slowInts).xs!, i)

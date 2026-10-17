@@ -61,7 +61,7 @@ export class T {
 	}
 
 	public Set(v: number): void {
-		let t: T | $.VarRef<T> | null = this;
+		const t: T | $.VarRef<T> | null = this;
 		$.pointerValue<T>(t).v = v
 	}
 

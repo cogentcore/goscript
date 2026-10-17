@@ -47,7 +47,7 @@ export class iterator {
 	}
 
 	public Next(): [frame, boolean] {
-		let it: iterator | $.VarRef<iterator> | null = this;
+		const it: iterator | $.VarRef<iterator> | null = this;
 		const it$: iterator = it == null ? $.pointerTarget<iterator>(it) : (it as any).__isVarRef === true ? (it as any).value : (it as any).__goValue === undefined ? (it as any) : $.pointerTarget<iterator>(it);
 		;(it$ as iterator).idx++
 		switch ((it$ as iterator).idx) {

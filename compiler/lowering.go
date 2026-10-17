@@ -4454,21 +4454,7 @@ func (o *LoweringOwner) lowerFuncDecl(ctx lowerFileContext, decl *ast.FuncDecl) 
 		})
 	}
 	if decl.Recv != nil && len(decl.Recv.List) != 0 && len(decl.Recv.List[0].Names) != 0 {
-		receiverName := decl.Recv.List[0].Names[0]
-		lowered.receiverAlias = safeIdentifier(receiverName.Name)
-		lowered.receiverValue = "this"
-		recvObj := ctx.semPkg.source.TypesInfo.Defs[receiverName]
-		lowered.receiverMutable = objectAssignedInBlock(ctx, recvObj, decl.Body)
-		_, receiverPointer := signature.Recv().Type().(*types.Pointer)
-		if receiverPointer {
-			lowered.receiverType = o.tsReceiverTypeFor(ctx, signature.Recv().Type())
-		} else if lowered.receiverMutable {
-			lowered.receiverType = o.tsReceiverTypeFor(ctx, signature.Recv().Type())
-		}
-		if recvObj != nil && ctx.model.needsVarRef[recvObj] {
-			lowered.receiverType = ""
-			lowered.receiverValue = o.runtimeOwner.QualifiedHelper(RuntimeHelperVarRef) + "(this)"
-		}
+		o.lowerMethodReceiver(ctx, lowered, decl, signature)
 	}
 	if len(receiverTypeParams) != 0 {
 		lowered.params = append(lowered.params, loweredParam{
@@ -4554,37 +4540,63 @@ func linknameRuntimeBody(decl *ast.FuncDecl) (string, bool) {
 	return "", false
 }
 
+// lowerMethodReceiver sets the local that binds the named receiver of the
+// method decl to this: a let when the body or a closure in it assigns the
+// receiver, and otherwise a const.
+func (o *LoweringOwner) lowerMethodReceiver(ctx lowerFileContext, lowered *loweredFunction, decl *ast.FuncDecl, signature *types.Signature) {
+	// The local is named after the receiver and set to this.
+	receiverName := decl.Recv.List[0].Names[0]
+	recvObj := ctx.semPkg.source.TypesInfo.Defs[receiverName]
+	lowered.receiverAlias = safeIdentifier(receiverName.Name)
+	lowered.receiverValue = "this"
+	lowered.receiverMutable = objectAssignedInBlock(ctx, recvObj, decl.Body)
+
+	// A pointer receiver, or a value receiver that is assigned, is typed as
+	// the receiver type rather than as this, so that it can be reassigned.
+	_, receiverPointer := signature.Recv().Type().(*types.Pointer)
+	if receiverPointer || lowered.receiverMutable {
+		lowered.receiverType = o.tsReceiverTypeFor(ctx, signature.Recv().Type())
+	}
+
+	// A receiver whose address is taken lives in a variable reference, which
+	// is typed as the receiver type for the same reason. Assignments set the
+	// value of the reference, so its local stays a const.
+	if recvObj != nil && ctx.model.needsVarRef[recvObj] {
+		lowered.receiverValue = o.runtimeOwner.QualifiedHelper(RuntimeHelperVarRef) + "<" + o.tsReceiverTypeFor(ctx, signature.Recv().Type()) + ">(this)"
+		lowered.receiverType = ""
+		lowered.receiverMutable = false
+	}
+}
+
+// objectAssignedInBlock reports whether body, including the closures in it,
+// assigns to obj itself, so that its local must be declared with let.
+// Assignments to the fields or elements of obj do not rebind its local.
 func objectAssignedInBlock(ctx lowerFileContext, obj types.Object, body *ast.BlockStmt) bool {
+	// Nothing is assigned without an object, a body, or type information.
 	if obj == nil || body == nil || ctx.semPkg == nil || ctx.semPkg.source == nil {
 		return false
 	}
+
+	// An assignment rebinds the local only when its target is obj itself.
+	info := ctx.semPkg.source.TypesInfo
+	rebinds := func(expr ast.Expr) bool {
+		ident, ok := ast.Unparen(expr).(*ast.Ident)
+		return ok && (info.Uses[ident] == obj || info.Defs[ident] == obj)
+	}
+
+	// Closures share the local with the body, so their assignments count.
+	// Once an assignment is found, the false returns prune the rest of the walk.
 	assigned := false
 	ast.Inspect(body, func(node ast.Node) bool {
-		if assigned {
-			return false
-		}
 		switch typed := node.(type) {
-		case *ast.FuncLit:
-			return false
 		case *ast.AssignStmt:
-			for _, lhs := range typed.Lhs {
-				if expressionUsesObject(ctx, lhs, obj) {
-					assigned = true
-					return false
-				}
-			}
+			assigned = assigned || slices.ContainsFunc(typed.Lhs, rebinds)
 		case *ast.IncDecStmt:
-			if expressionUsesObject(ctx, typed.X, obj) {
-				assigned = true
-				return false
-			}
+			assigned = assigned || rebinds(typed.X)
 		case *ast.RangeStmt:
-			if expressionUsesObject(ctx, typed.Key, obj) || expressionUsesObject(ctx, typed.Value, obj) {
-				assigned = true
-				return false
-			}
+			assigned = assigned || rebinds(typed.Key) || rebinds(typed.Value)
 		}
-		return true
+		return !assigned
 	})
 	return assigned
 }
@@ -8265,29 +8277,6 @@ func (o *LoweringOwner) lowerRangeStmt(ctx lowerFileContext, stmt *ast.RangeStmt
 	}, diagnostics
 }
 
-// identAssignedInNode reports whether node assigns the variable obj itself,
-// also in a function literal, as opposed to an element or field of it.
-func identAssignedInNode(ctx lowerFileContext, obj types.Object, node ast.Node) bool {
-	info := ctx.semPkg.source.TypesInfo
-	isObj := func(expr ast.Expr) bool {
-		ident, ok := ast.Unparen(expr).(*ast.Ident)
-		return ok && info.ObjectOf(ident) == obj
-	}
-	assigned := false
-	ast.Inspect(node, func(node ast.Node) bool {
-		switch typed := node.(type) {
-		case *ast.AssignStmt:
-			assigned = assigned || slices.ContainsFunc(typed.Lhs, isObj)
-		case *ast.IncDecStmt:
-			assigned = assigned || isObj(typed.X)
-		case *ast.RangeStmt:
-			assigned = assigned || typed.Tok == token.ASSIGN && (isObj(typed.Key) || isObj(typed.Value))
-		}
-		return !assigned
-	})
-	return assigned
-}
-
 // rangeCounter returns the counter of a range loop over an integer, slice or
 // array whose key is named keyName, and the body with the key bound to it. A
 // key that the body assigns, or that needs a variable reference, is a copy of
@@ -8300,7 +8289,7 @@ func (o *LoweringOwner) rangeCounter(ctx lowerFileContext, stmt *ast.RangeStmt, 
 		return keyName, body
 	}
 	key := rangeBindingObject(ctx, stmt.Key)
-	if key == nil || (!ctx.model.needsVarRef[key] && !identAssignedInNode(ctx, key, stmt.Body)) {
+	if key == nil || (!ctx.model.needsVarRef[key] && !objectAssignedInBlock(ctx, key, stmt.Body)) {
 		return keyName, body
 	}
 

@@ -29,14 +29,14 @@ export class Node {
 	}
 
 	public Fill(name: string): void {
-		let n: Node | $.VarRef<Node> | null = this;
+		const n: Node | $.VarRef<Node> | null = this;
 		const n$: Node = n == null ? $.pointerTarget<Node>(n) : (n as any).__isVarRef === true ? (n as any).value : (n as any).__goValue === undefined ? (n as any) : $.pointerTarget<Node>(n);
 		;(n$ as Node).Name = name;
 		;(n$ as Node).Count = $.stringLen(name)
 	}
 
 	public Len(): number {
-		let n: Node | $.VarRef<Node> | null = this;
+		const n: Node | $.VarRef<Node> | null = this;
 		const n$: Node = n == null ? $.pointerTarget<Node>(n) : (n as any).__isVarRef === true ? (n as any).value : (n as any).__goValue === undefined ? (n as any) : $.pointerTarget<Node>(n)
 		if (n == null) {
 			return 0

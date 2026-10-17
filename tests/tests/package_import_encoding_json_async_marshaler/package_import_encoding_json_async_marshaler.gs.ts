@@ -38,7 +38,7 @@ export class Image {
 	}
 
 	public UnmarshalJSON(b: $.Slice<number>): $.GoError {
-		let im: Image | $.VarRef<Image> | null = this;
+		const im: Image | $.VarRef<Image> | null = this;
 		using __defer = new $.DisposableStack()
 		mu.value.Lock()
 		const __goscriptDeferCallee1 = $.functionValue(((__receiver) => () => __receiver.Unlock())(mu.value), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "sync.(*Mutex).Unlock-fm")

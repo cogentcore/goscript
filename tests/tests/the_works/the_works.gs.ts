@@ -117,7 +117,7 @@ export class Stack {
 	}
 
 	public Pop(__typeArgs: $.GenericTypeArgs | undefined): any {
-		let s: Stack | $.VarRef<Stack> | null = this;
+		const s: Stack | $.VarRef<Stack> | null = this;
 		const s$: Stack = s == null ? $.pointerTarget<Stack>(s) : (s as any).__isVarRef === true ? (s as any).value : (s as any).__goValue === undefined ? (s as any) : $.pointerTarget<Stack>(s)
 		if ($.sliceLen((s$ as Stack).items) == 0) {
 			$.panic("stack underflow")
@@ -128,7 +128,7 @@ export class Stack {
 	}
 
 	public Push(__typeArgs: $.GenericTypeArgs | undefined, v: any): void {
-		let s: Stack | $.VarRef<Stack> | null = this;
+		const s: Stack | $.VarRef<Stack> | null = this;
 		const s$: Stack = s == null ? $.pointerTarget<Stack>(s) : (s as any).__isVarRef === true ? (s as any).value : (s as any).__goValue === undefined ? (s as any) : $.pointerTarget<Stack>(s);
 		;(s$ as Stack).items = $.append((s$ as Stack).items, v, $.appendZero(() => ($.genericZero(__typeArgs, "T", null) as any)))
 	}
@@ -168,7 +168,7 @@ export class VM {
 	}
 
 	public Step(code: $.Slice<Instr>): boolean {
-		let vm: VM | $.VarRef<VM> | null = this;
+		const vm: VM | $.VarRef<VM> | null = this;
 		const vm$: VM = vm == null ? $.pointerTarget<VM>(vm) : (vm as any).__isVarRef === true ? (vm as any).value : (vm as any).__goValue === undefined ? (vm as any) : $.pointerTarget<VM>(vm)
 		let _in = ($.arrayIndex(code!, (vm$ as VM).pc)).clone();
 		;(vm$ as VM).pc++;

@@ -21,7 +21,7 @@ export class entry {
 	}
 
 	public add(value: number): void {
-		let e: entry | $.VarRef<entry> | null = this;
+		const e: entry | $.VarRef<entry> | null = this;
 		const e$: entry = e == null ? $.pointerTarget<entry>(e) : (e as any).__isVarRef === true ? (e as any).value : (e as any).__goValue === undefined ? (e as any) : $.pointerTarget<entry>(e);
 		;(e$ as entry).value += value
 	}

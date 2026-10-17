@@ -63,7 +63,7 @@ export class sides {
 	}
 
 	public setAll(__typeArgs: $.GenericTypeArgs | undefined, v: any): void {
-		let s: sides | $.VarRef<sides> | null = this;
+		const s: sides | $.VarRef<sides> | null = this;
 		const s$: sides = s == null ? $.pointerTarget<sides>(s) : (s as any).__isVarRef === true ? (s as any).value : (s as any).__goValue === undefined ? (s as any) : $.pointerTarget<sides>(s)
 		let __goscriptAssign0_0: any = $.copyElement(v)
 		let __goscriptAssign0_1: any = $.copyElement(v)

@@ -22,7 +22,7 @@ export class recorder {
 	}
 
 	public flush(): void {
-		let r: recorder | $.VarRef<recorder> | null = this;
+		const r: recorder | $.VarRef<recorder> | null = this;
 		using __defer = new $.DisposableStack()
 		const r$: recorder = r == null ? $.pointerTarget<recorder>(r) : (r as any).__isVarRef === true ? (r as any).value : (r as any).__goValue === undefined ? (r as any) : $.pointerTarget<recorder>(r)
 		const __goscriptDeferCallee0 = $.functionValue(((__receiver) => (m: string, args: $.Slice<any>) => __receiver.Call(m, ...(args ?? [])))($.markAsStructValue($.cloneStructValue((r$ as recorder).obj))), ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.sliceType({ kind: $.TypeKind.Interface, methods: [] })], results: ["js.Value"], isVariadic: true } as $.FunctionTypeInfo), "syscall/js.Value.Call-fm")

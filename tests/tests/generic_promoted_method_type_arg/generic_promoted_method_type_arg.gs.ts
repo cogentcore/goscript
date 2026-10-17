@@ -43,7 +43,7 @@ export class Base {
 	}
 
 	public Set(__typeArgs: $.GenericTypeArgs | undefined, flag: Flags): void {
-		let b: Base | $.VarRef<Base> | null = this;
+		const b: Base | $.VarRef<Base> | null = this;
 		const b$: Base = b == null ? $.pointerTarget<Base>(b) : (b as any).__isVarRef === true ? (b as any).value : (b as any).__goValue === undefined ? (b as any) : $.pointerTarget<Base>(b);
 		;(b$ as Base).flags = $.int64Or((b$ as Base).flags, $.int64Bit(flag))
 	}

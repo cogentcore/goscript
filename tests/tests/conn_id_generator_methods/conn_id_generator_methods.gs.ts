@@ -57,7 +57,7 @@ export class transport {
 	}
 
 	public SourceOnly(id: number): void {
-		let h: transport | $.VarRef<transport> | null = this;
+		const h: transport | $.VarRef<transport> | null = this;
 		$.mapSet($.pointerValue<transport>(h).values, id, id)
 	}
 
@@ -88,7 +88,7 @@ export class packetHandlerMap {
 	}
 
 	public Add(id: number): void {
-		let h: packetHandlerMap | $.VarRef<packetHandlerMap> | null = this;
+		const h: packetHandlerMap | $.VarRef<packetHandlerMap> | null = this;
 		$.mapSet($.pointerValue<packetHandlerMap>(h).values, id, id)
 	}
 

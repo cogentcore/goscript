@@ -44,13 +44,13 @@ export class Widget {
 	}
 
 	public SetLab(l: Label): Widget | $.VarRef<Widget> | null {
-		let w: Widget | $.VarRef<Widget> | null = this;
+		const w: Widget | $.VarRef<Widget> | null = this;
 		$.pointerValue<Widget>(w).Lab = l
 		return w
 	}
 
 	public SetText(s: string): Widget | $.VarRef<Widget> | null {
-		let w: Widget | $.VarRef<Widget> | null = this;
+		const w: Widget | $.VarRef<Widget> | null = this;
 		$.pointerValue<Widget>(w).Text = s
 		return w
 	}

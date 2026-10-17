@@ -97,7 +97,7 @@ export class State {
 	}
 
 	public ["set"](c: number): void {
-		let s: State | $.VarRef<State> | null = this;
+		const s: State | $.VarRef<State> | null = this;
 		$.pointerValue<State>(s).reg.Start.Char = c
 	}
 

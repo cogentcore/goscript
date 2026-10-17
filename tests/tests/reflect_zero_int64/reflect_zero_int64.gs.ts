@@ -27,7 +27,7 @@ export class timer {
 	}
 
 	public Start(): void {
-		let t: timer | $.VarRef<timer> | null = this;
+		const t: timer | $.VarRef<timer> | null = this;
 		$.assignStruct($.pointerValue<timer>(t).start, time.Now())
 	}
 

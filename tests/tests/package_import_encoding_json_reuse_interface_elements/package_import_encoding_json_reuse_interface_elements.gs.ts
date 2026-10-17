@@ -69,7 +69,7 @@ export class Custom {
 	}
 
 	public UnmarshalJSON(b: $.Slice<number>): $.GoError {
-		let c: Custom | $.VarRef<Custom> | null = this;
+		const c: Custom | $.VarRef<Custom> | null = this;
 		$.pointerValue<Custom>(c).Text = "custom:" + $.bytesToString(b)
 		return null
 	}

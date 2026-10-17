@@ -27,7 +27,7 @@ export class fixedReader {
 	}
 
 	public Read(p: $.Slice<number>): [number, $.GoError] {
-		let r: fixedReader | $.VarRef<fixedReader> | null = this;
+		const r: fixedReader | $.VarRef<fixedReader> | null = this;
 		const r$: fixedReader = r == null ? $.pointerTarget<fixedReader>(r) : (r as any).__isVarRef === true ? (r as any).value : (r as any).__goValue === undefined ? (r as any) : $.pointerTarget<fixedReader>(r)
 		if ($.sliceLen((r$ as fixedReader).data) == 0) {
 			return [0, io.EOF]

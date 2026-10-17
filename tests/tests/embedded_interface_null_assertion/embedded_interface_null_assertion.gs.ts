@@ -69,7 +69,7 @@ export class StringReader {
 	}
 
 	public Read(p: $.Slice<number>): [number, $.GoError] {
-		let s: StringReader | $.VarRef<StringReader> | null = this;
+		const s: StringReader | $.VarRef<StringReader> | null = this;
 		const s$: StringReader = s == null ? $.pointerTarget<StringReader>(s) : (s as any).__isVarRef === true ? (s as any).value : (s as any).__goValue === undefined ? (s as any) : $.pointerTarget<StringReader>(s)
 		if ((s$ as StringReader).pos >= $.stringLen((s$ as StringReader).data)) {
 			return [0, null]
