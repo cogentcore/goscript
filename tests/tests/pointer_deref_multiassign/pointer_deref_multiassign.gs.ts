@@ -43,7 +43,9 @@ export async function main(): globalThis.Promise<void> {
 	// === Pointer Dereference and Multi-Assignment ===
 	// Dereference structPointer to get a copy of the struct.
 	// Also demonstrates multi-variable assignment and the use of the blank identifier '_'.
-	let dereferencedStructCopy = ((structPointer$ as MyStruct)).clone()
+	let dereferencedStructCopy = ((structPointer$ as MyStruct)).clone();
+	;(structPointer$ as MyStruct).myBool;
+	;(structPointer$ as MyStruct).MyInt
 	let unusedString = "hello"
 	unusedString
 	dereferencedStructCopy
