@@ -12672,6 +12672,32 @@ func (o *LoweringOwner) isOverrideFieldValue(ctx lowerFileContext, expr ast.Expr
 // override method handles it instead of the call panicking.
 var nilReceiverOverrideMethods = map[string]bool{
 	"(*runtime.Func).Name": true,
+
+	// The methods of a nil *os.File report os.ErrInvalid, as Go's
+	// checkValid does, so they take the nil receiver.
+	"(*os.File).Chdir":            true,
+	"(*os.File).Chmod":            true,
+	"(*os.File).Chown":            true,
+	"(*os.File).Close":            true,
+	"(*os.File).Fd":               true,
+	"(*os.File).Read":             true,
+	"(*os.File).ReadAt":           true,
+	"(*os.File).ReadDir":          true,
+	"(*os.File).ReadFrom":         true,
+	"(*os.File).Readdir":          true,
+	"(*os.File).Readdirnames":     true,
+	"(*os.File).Seek":             true,
+	"(*os.File).SetDeadline":      true,
+	"(*os.File).SetReadDeadline":  true,
+	"(*os.File).SetWriteDeadline": true,
+	"(*os.File).Stat":             true,
+	"(*os.File).Sync":             true,
+	"(*os.File).SyscallConn":      true,
+	"(*os.File).Truncate":         true,
+	"(*os.File).Write":            true,
+	"(*os.File).WriteAt":          true,
+	"(*os.File).WriteString":      true,
+	"(*os.File).WriteTo":          true,
 }
 
 func (o *LoweringOwner) receiverUsesOverridePackage(typ types.Type) bool {
