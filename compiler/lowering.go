@@ -1710,7 +1710,7 @@ type lowerFileContext struct {
 	// may suspend are checked to return a value instead of awaited.
 	syncDirectiveFunction bool
 	// callSiteFunction is set in the body of a function that
-	// //goscript:maxify marks, outside its function literals. The call sites
+	// //goscript:callsite marks, outside its function literals. The call sites
 	// it passes link its own (see lowering-call-sites.go).
 	callSiteFunction  bool
 	functionTypeDepth int
@@ -4235,7 +4235,7 @@ func (o *LoweringOwner) lowerNamedReceiverMethodDecl(
 	}
 	if decl.Body != nil {
 		bodyCtx := functionCtx.withAsyncFunction(async).withProtobufGeneratedSyncFunction(protobufSync).withDeferState(deferState).
-			withSyncDirectiveFunction(ctx.model.syncDirective(fnObj)).withCallSiteFunction(ctx.model.maxifyFunctions[fnObj])
+			withSyncDirectiveFunction(ctx.model.syncDirective(fnObj)).withCallSiteFunction(ctx.model.callSiteFunctions[fnObj])
 		bodyCtx = o.withBorrowedResults(bodyCtx, decl, fnObj)
 		targets, targetDecls, prelude := o.pointerTargetLocals(bodyCtx, decl, lowered.receiverAlias)
 		if len(targets) != 0 {
@@ -4409,7 +4409,7 @@ func (o *LoweringOwner) lowerFuncDecl(ctx lowerFileContext, decl *ast.FuncDecl) 
 	}
 	if decl.Body != nil {
 		bodyCtx := functionCtx.withAsyncFunction(async).withProtobufGeneratedSyncFunction(protobufSync).withDeferState(deferState).
-			withSyncDirectiveFunction(ctx.model.syncDirective(fnObj)).withCallSiteFunction(ctx.model.maxifyFunctions[fnObj])
+			withSyncDirectiveFunction(ctx.model.syncDirective(fnObj)).withCallSiteFunction(ctx.model.callSiteFunctions[fnObj])
 		bodyCtx = o.withBorrowedResults(bodyCtx, decl, fnObj)
 		targets, targetDecls, prelude := o.pointerTargetLocals(bodyCtx, decl, lowered.receiverAlias)
 		if len(targets) != 0 {

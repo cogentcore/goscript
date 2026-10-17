@@ -109,11 +109,11 @@ func (o *SemanticModelOwner) Build(ctx context.Context, graph *PackageGraph, opt
 	diagnostics = append(diagnostics, directiveDiagnostics...)
 	model.asyncDirectives = directives
 
-	// So are the functions that //goscript:maxify marks, whose calls in any
+	// So are the functions that //goscript:callsite marks, whose calls in any
 	// package pass their positions.
-	maxify, maxifyDiagnostics := collectMaxifyDirectives(sources)
-	diagnostics = append(diagnostics, maxifyDiagnostics...)
-	model.maxifyFunctions = maxify
+	callSites, callSiteDiagnostics := collectCallSiteDirectives(sources)
+	diagnostics = append(diagnostics, callSiteDiagnostics...)
+	model.callSiteFunctions = callSites
 
 	var objects *summaryObjects
 	if len(opts.Summaries) != 0 || len(opts.Summarize) != 0 {

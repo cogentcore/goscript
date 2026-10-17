@@ -3678,7 +3678,7 @@ export type GenericTypeArgs = Record<string, GenericTypeDescriptor> & {
 }
 
 // CallSite is the Go position of a call that the compiler passes to a
-// function that //goscript:maxify marks, or to runtime.Caller: the file, as
+// function that //goscript:callsite marks, or to runtime.Caller: the file, as
 // go build -trimpath names it, and the line. caller is the call site of the
 // function that made the call, when the directive marks that function too.
 export interface CallSite {

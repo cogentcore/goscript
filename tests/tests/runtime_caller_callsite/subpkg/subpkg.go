@@ -9,7 +9,7 @@ import (
 // Name names its caller's caller by its directory, file and line, as
 // Cogent Core's tree.AutoPlanName names the widgets that each line adds.
 //
-//goscript:maxify
+//goscript:callsite
 func Name(level int) string {
 	_, file, line, ok := runtime.Caller(level)
 	if !ok {
@@ -20,14 +20,14 @@ func Name(level int) string {
 
 // Add names the line that calls it.
 //
-//goscript:maxify
+//goscript:callsite
 func Add(names *[]string, init func()) {
 	*names = append(*names, Name(2))
 }
 
 // AddOf names the line that calls it, for any type.
 //
-//goscript:maxify
+//goscript:callsite
 func AddOf[T any](names *[]string, value T) {
 	*names = append(*names, Name(2))
 }
@@ -37,7 +37,7 @@ type Plan struct{ Names []string }
 
 // Add names the line that calls it.
 //
-//goscript:maxify
+//goscript:callsite
 func (p *Plan) Add() *Plan {
 	p.Names = append(p.Names, Name(2))
 	return p

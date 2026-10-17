@@ -407,7 +407,7 @@ beside it under `gs/`; [gs/README.md](../gs/README.md) describes their layout.
 ### Call sites
 
 `runtime.Caller` reads its frames from the JavaScript stack, whose files and
-lines name the generated code. `//goscript:maxify` in the doc comment of a
+lines name the generated code. `//goscript:callsite` in the doc comment of a
 function or method makes each direct call of it pass a `$.CallSite` with the Go
 file (as `go build -trimpath` names it) and line of the call, as one more
 argument after its parameters. Calls made in a marked function link the site

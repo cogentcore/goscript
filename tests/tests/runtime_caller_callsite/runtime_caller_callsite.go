@@ -1,12 +1,12 @@
 package main
 
 import (
-	"github.com/s4wave/goscript/tests/tests/runtime_caller_maxify/subpkg"
+	"github.com/s4wave/goscript/tests/tests/runtime_caller_callsite/subpkg"
 )
 
 // local names the line that calls it.
 //
-//goscript:maxify
+//goscript:callsite
 func local(names *[]string) {
 	*names = append(*names, subpkg.Name(2))
 }
