@@ -6025,7 +6025,12 @@ func (o *LoweringOwner) lowerAssignStmt(ctx lowerFileContext, stmt *ast.AssignSt
 		if idx >= len(stmt.Rhs) {
 			break
 		}
+
+		// A blank target still evaluates its value, in order.
 		if ident, ok := lhs.(*ast.Ident); ok && ident.Name == "_" {
+			right, rightDiagnostics := o.lowerExpr(ctx, stmt.Rhs[idx])
+			diagnostics = append(diagnostics, rightDiagnostics...)
+			stmts = append(stmts, loweredStmt{text: right})
 			continue
 		}
 		isShortDecl := stmt.Tok == token.DEFINE && isShortAssignTargetNew(ctx, lhs)
