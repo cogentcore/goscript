@@ -12,7 +12,7 @@ export async function main(): globalThis.Promise<void> {
 	// A channel registered for signals receives none, and the program keeps
 	// running timers.
 	let c = $.makeChannel<os.Signal | null>(1, null! as os.Signal | null, "both")
-	await signal.Notify(c, $.arrayToSlice<os.Signal | null>([os.Interrupt]))
+	signal.Notify(c, $.pointerValueOrNil(os.Interrupt)!)
 	const [__goscriptSelect0HasReturn, __goscriptSelect0Value] = await $.selectStatement<any, void>([
 		{
 			id: 0,
@@ -34,14 +34,14 @@ export async function main(): globalThis.Promise<void> {
 	if (__goscriptSelect0HasReturn) {
 		return __goscriptSelect0Value
 	}
-	await signal.Stop(c)
-	await signal.Reset($.arrayToSlice<os.Signal | null>([os.Interrupt]))
-	await $.println("ignored:", signal.Ignored(os.Interrupt))
+	signal.Stop(c)
+	signal.Reset($.pointerValueOrNil(os.Interrupt)!)
+	await $.println("ignored:", signal.Ignored($.pointerValueOrNil(os.Interrupt)!))
 
 	// The context of NotifyContext is done when it is stopped.
-	let [ctx, stop] = await signal.NotifyContext(context.Background(), $.arrayToSlice<os.Signal | null>([os.Interrupt]))
+	let [ctx, stop] = signal.NotifyContext($.pointerValueOrNil(context.Background())!, $.pointerValueOrNil(os.Interrupt)!)
 	await $.println("before stop:", (__goscriptAwait = (ctx !== null && (ctx as any).__isVarRef !== true && ((ctx as any).__goValue === undefined || (ctx as any).__goType?.charCodeAt(0) !== 42) ? (ctx as Exclude<context.Context, null>) : $.pointerValue<Exclude<context.Context, null>>(ctx)).Err(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) == null)
-	void (__goscriptAwait = stop!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+	stop!()
 	await $.chanRecv(((__goscriptAwait = (ctx !== null && (ctx as any).__isVarRef !== true && ((ctx as any).__goValue === undefined || (ctx as any).__goType?.charCodeAt(0) !== 42) ? (ctx as Exclude<context.Context, null>) : $.pointerValue<Exclude<context.Context, null>>(ctx)).Done(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as $.Channel<{}> | null))
 	await $.println("after stop:", $.comparableEqual((__goscriptAwait = (ctx !== null && (ctx as any).__isVarRef !== true && ((ctx as any).__goValue === undefined || (ctx as any).__goType?.charCodeAt(0) !== 42) ? (ctx as Exclude<context.Context, null>) : $.pointerValue<Exclude<context.Context, null>>(ctx)).Err(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), context.Canceled))
 }
