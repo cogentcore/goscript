@@ -3731,3 +3731,5 @@ function requestBodyInfo(
   }
   return { Body: readCloserForBody(body), ContentLength: unknownLength }
 }
+
+export * from './stubs.gs.js'

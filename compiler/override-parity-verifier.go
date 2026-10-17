@@ -331,14 +331,10 @@ func verifyBlockedOverrideUses(graph *PackageGraph, facts *OverrideFacts) []Diag
 // effectiveTypeScriptExports returns the exports reachable from the override
 // package's index.ts through its re-exports.
 func (f *OverrideFacts) effectiveTypeScriptExports(pkgPath string) (map[string]typeScriptExport, error) {
-	// Index the package's sources by path.
-	pkg, _, ok := f.copyPackage(pkgPath)
-	if !ok {
-		return nil, errors.Errorf("override package %q is missing", pkgPath)
-	}
-	files := make(map[string]string, len(pkg.files))
-	for _, file := range pkg.files {
-		files[path.Clean(file.path)] = string(file.data)
+	// Index the sources the package can re-export.
+	files, err := f.overrideExportFiles(pkgPath)
+	if err != nil {
+		return nil, err
 	}
 
 	// Follow the exports from the package entry file.
@@ -348,6 +344,36 @@ func (f *OverrideFacts) effectiveTypeScriptExports(pkgPath string) (map[string]t
 		return nil, err
 	}
 	return exports, nil
+}
+
+// overrideExportFiles returns the sources of the override package pkgPath and
+// of the override packages it depends on, directly or not, by path. A package
+// can re-export another, as crypto/internal/fips140deps/byteorder does
+// internal/byteorder.
+func (f *OverrideFacts) overrideExportFiles(pkgPath string) (map[string]string, error) {
+	// Require the package itself.
+	if _, _, ok := f.copyPackage(pkgPath); !ok {
+		return nil, errors.Errorf("override package %q is missing", pkgPath)
+	}
+
+	// Add the sources of each package once, then those of its dependencies.
+	files := make(map[string]string)
+	pending := []string{pkgPath}
+	seen := map[string]bool{pkgPath: true}
+	for len(pending) != 0 {
+		pkg, dependencies, _ := f.copyPackage(pending[0])
+		pending = pending[1:]
+		for _, file := range pkg.files {
+			files[path.Clean(file.path)] = string(file.data)
+		}
+		for _, dependency := range dependencies {
+			if !seen[dependency] {
+				seen[dependency] = true
+				pending = append(pending, dependency)
+			}
+		}
+	}
+	return files, nil
 }
 
 // collectTypeScriptExports adds the exports of filePath in files to exports,
@@ -385,7 +411,7 @@ func collectTypeScriptExports(
 			continue
 		}
 		target, ok := resolveOverrideExportPath(filePath, match[3])
-		if !ok {
+		if _, present := files[target]; !ok || !present && !strings.HasPrefix(match[3], ".") {
 			continue
 		}
 		targetExports := make(map[string]typeScriptExport)
@@ -410,10 +436,11 @@ func collectTypeScriptExports(
 		}
 	}
 
-	// Add every export of each star re-export.
+	// Add every export of each star re-export, skipping a package whose
+	// sources files lacks.
 	for _, match := range overrideExportAllPattern.FindAllStringSubmatch(data, -1) {
 		target, ok := resolveOverrideExportPath(filePath, match[1])
-		if ok {
+		if _, present := files[target]; ok && (present || strings.HasPrefix(match[1], ".")) {
 			if err := collectTypeScriptExports(target, files, exports, visited); err != nil {
 				return err
 			}
@@ -516,11 +543,22 @@ func parseNamedTypeScriptExports(list string, statementTypeOnly bool) []namedTyp
 	return exports
 }
 
+// resolveOverrideExportPath returns the source file that the module specifier
+// spec of currentFile names: a relative path, or an override package's
+// module under @goscript/.
 func resolveOverrideExportPath(currentFile, spec string) (string, bool) {
-	if !strings.HasPrefix(spec, ".") {
+	// Resolve the specifier to a path in the override tree.
+	var target string
+	switch {
+	case strings.HasPrefix(spec, "."):
+		target = path.Clean(path.Join(path.Dir(currentFile), spec))
+	case strings.HasPrefix(spec, "@goscript/"):
+		target = path.Clean(strings.TrimPrefix(spec, "@goscript/"))
+	default:
 		return "", false
 	}
-	target := path.Clean(path.Join(path.Dir(currentFile), spec))
+
+	// Name the TypeScript source of a module or a package.
 	switch path.Ext(target) {
 	case ".js", ".ts":
 		target = strings.TrimSuffix(target, path.Ext(target)) + ".ts"

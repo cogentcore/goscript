@@ -65,6 +65,13 @@ export function panic(...args: unknown[]): never {
   throw goPanic
 }
 
+// notImplemented panics for a Go export that its override package does not
+// implement. The compiler declares each such export as a stub that calls it,
+// so a program that refers to one loads, and fails only when it calls it.
+export function notImplemented(name: string): never {
+  panic(`goscript: ${name} is not implemented`)
+}
+
 // runtimePanic raises a Go runtime panic carrying a RuntimeError with the given
 // Go-formatted message (for example "runtime error: index out of range [5] with
 // length 3"). Every runtime fault routes through here so recover() observes a

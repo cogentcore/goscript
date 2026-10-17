@@ -824,17 +824,21 @@ func TestOverrideParityVerifierResolvesEffectiveTypeScriptExports(t *testing.T) 
 			"export { RenamedSource as Renamed } from './named.js'",
 			"export type { TypeShape } from './types.js'",
 			"export * from './star.js'",
+			"export * from '@goscript/example.test/other/index.js'",
+			"export { Picked } from '@goscript/example.test/other/index.js'",
+			"export * from '@goscript/example.test/absent/index.js'",
 			"",
 		}, "\n"),
-		"example.test/lib/named.ts": "export function RenamedSource(): void {}\n",
-		"example.test/lib/star.ts":  "export class Star {}\n",
-		"example.test/lib/types.ts": "export interface TypeShape {}\n",
+		"example.test/lib/named.ts":   "export function RenamedSource(): void {}\n",
+		"example.test/lib/star.ts":    "export class Star {}\n",
+		"example.test/lib/types.ts":   "export interface TypeShape {}\n",
+		"example.test/other/index.ts": "export function Other(): void {}\nexport function Picked(): void {}\n",
 	}
 	exports := make(map[string]typeScriptExport)
 	if err := collectTypeScriptExports("example.test/lib/index.ts", files, exports, make(map[string]bool)); err != nil {
 		t.Fatal(err.Error())
 	}
-	for _, name := range []string{"Renamed", "TypeShape", "Star"} {
+	for _, name := range []string{"Renamed", "TypeShape", "Star", "Other", "Picked"} {
 		if !exports[name].present() {
 			t.Fatalf("effective TypeScript exports missing %s: %v", name, exports)
 		}
