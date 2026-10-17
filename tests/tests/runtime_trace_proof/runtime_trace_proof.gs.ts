@@ -25,7 +25,7 @@ export class byteSink {
 	}
 
 	public Write(p: $.Slice<number>): [number, $.GoError] {
-		let s: byteSink | $.VarRef<byteSink> | null = this;
+		const s: byteSink | $.VarRef<byteSink> | null = this;
 		const s$: byteSink = s == null ? $.pointerTarget<byteSink>(s) : (s as any).__isVarRef === true ? (s as any).value : (s as any).__goValue === undefined ? (s as any) : $.pointerTarget<byteSink>(s);
 		;(s$ as byteSink).data = $.appendSlice((s$ as byteSink).data, p, $.byteSliceHint)
 		return [$.sliceLen(p), null]

@@ -47,7 +47,7 @@ export class Calc {
 	}
 
 	public Reset(): void {
-		let c: Calc | $.VarRef<Calc> | null = this;
+		const c: Calc | $.VarRef<Calc> | null = this;
 		$.pointerValue<Calc>(c).base = 0
 	}
 

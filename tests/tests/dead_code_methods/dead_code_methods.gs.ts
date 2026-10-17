@@ -135,13 +135,13 @@ export class Counter {
 	}
 
 	public Dec(): void {
-		let c: Counter | $.VarRef<Counter> | null = this;
+		const c: Counter | $.VarRef<Counter> | null = this;
 		const c$: Counter = c == null ? $.pointerTarget<Counter>(c) : (c as any).__isVarRef === true ? (c as any).value : (c as any).__goValue === undefined ? (c as any) : $.pointerTarget<Counter>(c);
 		;(c$ as Counter).n--
 	}
 
 	public Inc(): void {
-		let c: Counter | $.VarRef<Counter> | null = this;
+		const c: Counter | $.VarRef<Counter> | null = this;
 		const c$: Counter = c == null ? $.pointerTarget<Counter>(c) : (c as any).__isVarRef === true ? (c as any).value : (c as any).__goValue === undefined ? (c as any) : $.pointerTarget<Counter>(c);
 		;(c$ as Counter).n++
 	}
@@ -183,7 +183,7 @@ export class Inner {
 	}
 
 	public SetLabel(s: string): void {
-		let i: Inner | $.VarRef<Inner> | null = this;
+		const i: Inner | $.VarRef<Inner> | null = this;
 		$.pointerValue<Inner>(i).label = s
 	}
 
