@@ -22,6 +22,7 @@ func newCompileCommand() *cli.Command {
 	var packageBlocklist cli.StringSlice
 	var bindingRoots cli.StringSlice
 	var deferredFunctions cli.StringSlice
+	var externalEmbeds cli.StringSlice
 	var reportAsync reportAsyncFlag
 
 	return &cli.Command{
@@ -34,6 +35,7 @@ func newCompileCommand() *cli.Command {
 			config.PackageBlocklist = slices.Clone(packageBlocklist.Value())
 			config.AdditionalBindingRoots = slices.Clone(bindingRoots.Value())
 			config.DeferredFunctions = slices.Clone(deferredFunctions.Value())
+			config.ExternalEmbeds = slices.Clone(externalEmbeds.Value())
 			config.ReportAsync = reportAsync.format != ""
 			result, err := compilePackage(c.Context, &config, packages.Value())
 			if err != nil || result.AsyncReport == nil {
@@ -121,6 +123,18 @@ func newCompileCommand() *cli.Command {
 				Usage:       "additional root containing protobuf TypeScript bindings (repeatable)",
 				Destination: &bindingRoots,
 				EnvVars:     []string{"GOSCRIPT_BINDING_ROOT"},
+			},
+			&cli.StringSliceFlag{
+				Name:        "external-embed",
+				Usage:       "base name pattern (path.Match, such as *.png) of embed.FS files to write beside the output and fetch when first opened (repeatable)",
+				Destination: &externalEmbeds,
+				EnvVars:     []string{"GOSCRIPT_EXTERNAL_EMBED"},
+			},
+			&cli.Int64Flag{
+				Name:        "external-embed-min-size",
+				Usage:       "size in bytes from which a file that matches --external-embed is written beside the output",
+				Destination: &config.ExternalEmbedMinSize,
+				EnvVars:     []string{"GOSCRIPT_EXTERNAL_EMBED_MIN_SIZE"},
 			},
 			newReportAsyncFlag(&reportAsync),
 		},

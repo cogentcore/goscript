@@ -110,6 +110,7 @@ func (o *TypeScriptEmitOwner) WriteFiles(
 			if err := writeOutputFile(path, files[filePath]); err != nil {
 				diagnostics = append(diagnostics, emitError("write TypeScript file", path, err))
 			}
+			diagnostics = append(diagnostics, writeAssets(pkgDir, file.assets)...)
 		}
 		indexPath := "@goscript/" + pkg.pkgPath + "/index.ts"
 		if err := writeOutputFile(filepath.Join(pkgDir, "index.ts"), files[indexPath]); err != nil {
@@ -119,6 +120,23 @@ func (o *TypeScriptEmitOwner) WriteFiles(
 		compiled = append(compiled, pkg.pkgPath)
 	}
 	return compiled, diagnostics
+}
+
+// writeAssets writes the external embedded files of a lowered file (see
+// [ExternalEmbedPolicy]) into the package output directory pkgDir.
+func writeAssets(pkgDir string, assets map[string][]byte) []Diagnostic {
+	var diagnostics []Diagnostic
+	for name, data := range assets {
+		path := filepath.Join(pkgDir, filepath.FromSlash(name))
+		err := os.MkdirAll(filepath.Dir(path), 0o755)
+		if err == nil {
+			err = writeOutputFile(path, string(data))
+		}
+		if err != nil {
+			diagnostics = append(diagnostics, emitError("write embedded file", path, err))
+		}
+	}
+	return diagnostics
 }
 
 // writeOutputFile replaces an output file and reports write, truncation, or
@@ -171,6 +189,9 @@ func (o *TypeScriptEmitOwner) EmitToMemory(
 			pkgFiles := make(map[string]string, len(pkg.files)+1)
 			for _, file := range pkg.files {
 				pkgFiles["@goscript/"+pkg.pkgPath+"/"+file.outputName] = o.renderLoweredFile(pkg, file, program.trimTypeInfo)
+				for name, data := range file.assets {
+					pkgFiles["@goscript/"+pkg.pkgPath+"/"+name] = string(data)
+				}
 			}
 			pkgFiles["@goscript/"+pkg.pkgPath+"/index.ts"] = renderIndex(pkg)
 			rendered[idx] = pkgFiles

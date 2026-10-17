@@ -65,24 +65,24 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("small:", $.sliceLen(small), $.bytesToString(small))
 	await $.println("unicode:", $.sliceLen(unicodeBytes), sum(unicodeBytes), $.stringEqual($.bytesToString(unicodeBytes), unicodeText), $.arrayIndex(unicodeBytes!, $.sliceLen(unicodeBytes) - 2))
 	$.sliceElems(blob!)[$.sliceSlot(blob!, 0)] = 42
-	let __goscriptTuple0: any = $.markAsStructValue($.cloneStructValue(files)).ReadFile("blob.bin")
+	let __goscriptTuple0: any = await $.markAsStructValue($.cloneStructValue(files)).ReadFile("blob.bin")
 	let again: $.Slice<number> = __goscriptTuple0[0]
 	await $.println("own:", $.arrayIndex(blob!, 0), $.arrayIndex(again!, 0))
 
 	// Files read from an embedded file system match.
-	let __goscriptTuple1: any = $.markAsStructValue($.cloneStructValue(files)).ReadFile("blob.bin")
+	let __goscriptTuple1: any = await $.markAsStructValue($.cloneStructValue(files)).ReadFile("blob.bin")
 	let data: $.Slice<number> = __goscriptTuple1[0]
 	let err: $.GoError = __goscriptTuple1[1]
 	await $.println("fs blob:", err == null, $.sliceLen(data), sum(data))
-	let __goscriptTuple2: any = $.markAsStructValue($.cloneStructValue(files)).ReadFile("text.txt")
+	let __goscriptTuple2: any = await $.markAsStructValue($.cloneStructValue(files)).ReadFile("text.txt")
 	data = __goscriptTuple2[0]
 	err = __goscriptTuple2[1]
 	await $.println("fs text:", err == null, $.stringEqual($.bytesToString(data), text))
-	let __goscriptTuple3: any = $.markAsStructValue($.cloneStructValue(files)).ReadFile("small.txt")
+	let __goscriptTuple3: any = await $.markAsStructValue($.cloneStructValue(files)).ReadFile("small.txt")
 	data = __goscriptTuple3[0]
 	err = __goscriptTuple3[1]
 	await $.println("fs small:", err == null, $.bytesToString(data))
-	let __goscriptTuple4: any = $.markAsStructValue($.cloneStructValue(files)).ReadFile("unicode.txt")
+	let __goscriptTuple4: any = await $.markAsStructValue($.cloneStructValue(files)).ReadFile("unicode.txt")
 	data = __goscriptTuple4[0]
 	err = __goscriptTuple4[1]
 	await $.println("fs unicode:", err == null, $.sliceLen(data), sum(data))
