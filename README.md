@@ -239,6 +239,9 @@ JavaScript event loop, and no WebAssembly runtime ships with your code.
 
 [docs/explainer.md](./docs/explainer.md) walks through each stage with
 generated output for structs, pointers, channels, and `defer`.
+[docs/performance.md](./docs/performance.md) explains where Go semantics cost
+extra work in JavaScript, and how GopherJS and WebAssembly handle the same
+cases.
 
 ## Limitations
 
