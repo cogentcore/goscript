@@ -42,7 +42,7 @@ export async function main(): globalThis.Promise<void> {
 	let p = new Person(true, "Alice", 30, true)
 	let __goscriptTuple0: any = (json.Marshal($.structInterfaceValue(p, "main.Person", "main.Person")) as [$.Slice<number>, $.GoError])
 	let b: $.Slice<number> = __goscriptTuple0[0]
-	let err = __goscriptTuple0[1]
+	let err: $.GoError = __goscriptTuple0[1]
 	if (err != null) {
 		await $.println("Marshal error:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	} else {

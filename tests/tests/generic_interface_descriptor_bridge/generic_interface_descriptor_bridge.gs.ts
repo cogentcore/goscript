@@ -122,7 +122,7 @@ export async function main(): globalThis.Promise<void> {
 	let nilInterface: IntWaiter | null = $.interfaceValue<IntWaiter | null>(nilPointer, "*main.intBox", /* @__PURE__ */ $.pointerType("main.intBox"))
 	let __goscriptTuple0: any = $.typeAssertTuple<intBox | $.VarRef<intBox> | null>(nilInterface, /* @__PURE__ */ $.pointerType("main.intBox"))
 	let assertedPointer: intBox | $.VarRef<intBox> | null = __goscriptTuple0[0]
-	let assertedOK = __goscriptTuple0[1]
+	let assertedOK: boolean = __goscriptTuple0[1]
 	await $.println("typed-nil", nilInterface == null, assertedPointer == null, assertedOK, (__goscriptAwait = (nilInterface !== null && (nilInterface as any).__isVarRef !== true && ((nilInterface as any).__goValue === undefined || (nilInterface as any).__goType?.charCodeAt(0) !== 42) ? (nilInterface as Exclude<IntWaiter, null>) : $.pointerValue<Exclude<IntWaiter, null>>(nilInterface)).Wait(ctx, 13), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
 	let retypedGeneric: GenericWaiter | null = (genericPlain as GenericWaiter | null)

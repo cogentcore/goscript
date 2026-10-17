@@ -48,7 +48,7 @@ export async function main(): globalThis.Promise<void> {
 
 	let __goscriptTuple1: any = await http.Get((server$ as httptest.Server).URL)
 	let resp: http.Response | $.VarRef<http.Response> | null = __goscriptTuple1[0]
-	let err = __goscriptTuple1[1]
+	let err: $.GoError = __goscriptTuple1[1]
 	let resp$: http.Response = resp == null ? $.pointerTarget<http.Response>(resp) : (resp as any).__isVarRef === true ? (resp as any).value : (resp as any).__goValue === undefined ? (resp as any) : $.pointerTarget<http.Response>(resp)
 	if (err != null) {
 		await $.println("get error:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))

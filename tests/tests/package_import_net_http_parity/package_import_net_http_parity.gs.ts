@@ -27,7 +27,7 @@ export async function main(): globalThis.Promise<void> {
 
 	let __goscriptTuple0: any = http.NewRequest(http.MethodPut, "https://example.invalid/path?q=1", $.structInterfaceValue<io.Reader | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(http.NoBody))), "http.noBody", __goscriptStatic0())!)
 	let req: http.Request | $.VarRef<http.Request> | null = __goscriptTuple0[0]
-	let err = __goscriptTuple0[1]
+	let err: $.GoError = __goscriptTuple0[1]
 	let req$: http.Request = req == null ? $.pointerTarget<http.Request>(req) : (req as any).__isVarRef === true ? (req as any).value : (req as any).__goValue === undefined ? (req as any) : $.pointerTarget<http.Request>(req)
 	if (err != null) {
 		await $.println("request error:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
@@ -40,7 +40,7 @@ export async function main(): globalThis.Promise<void> {
 		return [io.NopCloser($.pointerValueOrNil($.interfaceValue<io.Reader | null>(strings.NewReader("again"), "*strings.Reader", __goscriptStatic1()))!), null]
 	}, ({ kind: $.TypeKind.Function, params: [], results: ["io.ReadCloser", "error"] } as $.FunctionTypeInfo))
 	let __goscriptTuple1: any = ($.pointerValue<http.Request>(http.Request.prototype.Clone.call($.pointerValue<http.Request>(req), $.pointerValueOrNil((req !== null && (req as any).__isVarRef !== true && (req as any).__goValue === undefined ? ((req as any) as http.Request).Context() : http.Request.prototype.Context.call($.pointerValue<http.Request>(req))))!)).GetBody!() as [io.ReadCloser | null, $.GoError])
-	let body = __goscriptTuple1[0]
+	let body: io.ReadCloser | null = __goscriptTuple1[0]
 	err = __goscriptTuple1[1]
 	if (err != null) {
 		await $.println("getbody error:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))

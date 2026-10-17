@@ -18,7 +18,7 @@ export async function main(): globalThis.Promise<void> {
 	let __goscriptTuple0: any = await ed25519.GenerateKey($.pointerValueOrNil(rand.Reader)!)
 	let pub: ed25519.PublicKey = (__goscriptTuple0[0] as ed25519.PublicKey)
 	let priv: ed25519.PrivateKey = (__goscriptTuple0[1] as ed25519.PrivateKey)
-	let err = __goscriptTuple0[2]
+	let err: $.GoError = __goscriptTuple0[2]
 	await $.println("keygen err nil", err == null)
 
 	let template = (() => { const __goscriptLiteralField0 = big.NewInt(84n); const __goscriptLiteralField1 = $.markAsStructValue($.cloneStructValue(time.Unix(1700000000n, 0n))); const __goscriptLiteralField2 = $.markAsStructValue($.cloneStructValue(time.Unix(1700003600n, 0n))); return new x509.Certificate(false, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, __goscriptLiteralField0, undefined, new pkix.Name(true, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, "bifrost.goscript.test"), __goscriptLiteralField1, __goscriptLiteralField2, 1, undefined, undefined, undefined, $.arrayToSlice<x509.ExtKeyUsage>([1, 2]), undefined, true) })()
@@ -55,7 +55,7 @@ export async function main(): globalThis.Promise<void> {
 	void (__goscriptAwait = (cache !== null && (cache as any).__isVarRef !== true && ((cache as any).__goValue === undefined || (cache as any).__goType?.charCodeAt(0) !== 42) ? (cache as Exclude<tls.ClientSessionCache, null>) : $.pointerValue<Exclude<tls.ClientSessionCache, null>>(cache)).Put("one", session), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 	let __goscriptTuple3: any = await (cache !== null && (cache as any).__isVarRef !== true && ((cache as any).__goValue === undefined || (cache as any).__goType?.charCodeAt(0) !== 42) ? (cache as Exclude<tls.ClientSessionCache, null>) : $.pointerValue<Exclude<tls.ClientSessionCache, null>>(cache)).Get("one")
 	let cached: tls.ClientSessionState | $.VarRef<tls.ClientSessionState> | null = __goscriptTuple3[0]
-	let ok = __goscriptTuple3[1]
+	let ok: boolean = __goscriptTuple3[1]
 	await $.println("session cache hit", ok, (cached === session || ($.pointerAliasesMade || (cached as any)?.__goElementBacking !== undefined) && $.pointerEqual(cached, session)))
 	void (__goscriptAwait = (cache !== null && (cache as any).__isVarRef !== true && ((cache as any).__goValue === undefined || (cache as any).__goType?.charCodeAt(0) !== 42) ? (cache as Exclude<tls.ClientSessionCache, null>) : $.pointerValue<Exclude<tls.ClientSessionCache, null>>(cache)).Put("two", new tls.ClientSessionState()), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 	void (__goscriptAwait = (cache !== null && (cache as any).__isVarRef !== true && ((cache as any).__goValue === undefined || (cache as any).__goType?.charCodeAt(0) !== 42) ? (cache as Exclude<tls.ClientSessionCache, null>) : $.pointerValue<Exclude<tls.ClientSessionCache, null>>(cache)).Put("three", new tls.ClientSessionState()), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)

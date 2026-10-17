@@ -231,7 +231,7 @@ export async function main(): globalThis.Promise<void> {
 
 	let ch = $.makeChannel<number>(0, 0, "both")
 	queueMicrotask(async () => {
-		let n = await $.chanRecv(ch)
+		let n: number = await $.chanRecv(ch)
 		await $.chanSend(ch, n * 10)
 	})
 	await $.println("chan put:", await chanSink.prototype.Put.call((new chanSink(false, ch)), 3))

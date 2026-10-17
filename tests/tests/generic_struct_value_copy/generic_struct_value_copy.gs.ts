@@ -179,8 +179,8 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("copyOf:", v.V, c.value.V)
 
 	let __goscriptTuple0: any = twoCopies(__goscriptStatic0(), new Value(true, 15))
-	let a1 = $.varRef((__goscriptTuple0[0] as Value))
-	let b1 = (__goscriptTuple0[1] as Value)
+	let a1: $.VarRef<Value> = $.varRef((__goscriptTuple0[0] as Value))
+	let b1: Value = (__goscriptTuple0[1] as Value)
 	a1.value.Set(16)
 	await $.println("twoCopies:", a1.value.V, b1.V)
 

@@ -236,8 +236,8 @@ export async function main(): globalThis.Promise<void> {
 	let chClose = $.makeChannel<boolean>(0, false, "both")
 	chClose.close()
 	let __goscriptRecv0 = await $.chanRecvWithOk(chClose)
-	let val = __goscriptRecv0.value
-	let ok = __goscriptRecv0.ok
+	let val: boolean = __goscriptRecv0.value
+	let ok: boolean = __goscriptRecv0.ok
 	if (!ok) {
 		await $.println("TEST9: Channel is closed, ok is false, val:", val)
 	} else {

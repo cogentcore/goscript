@@ -52,7 +52,7 @@ export class ChannelProcessor {
 		const p$: ChannelProcessor = p == null ? $.pointerTarget<ChannelProcessor>(p) : (p as any).__isVarRef === true ? (p as any).value : (p as any).__goValue === undefined ? (p as any) : $.pointerTarget<ChannelProcessor>(p)
 		// Channel operation makes this function async
 		await $.chanSend((p$ as ChannelProcessor).ch, data)
-		let result = await $.chanRecv((p$ as ChannelProcessor).ch)
+		let result: number = await $.chanRecv((p$ as ChannelProcessor).ch)
 		return result * 2
 	}
 

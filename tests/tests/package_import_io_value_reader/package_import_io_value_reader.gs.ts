@@ -36,7 +36,7 @@ export async function main(): globalThis.Promise<void> {
 	// Bound the unbounded value reader directly.
 	let __goscriptTuple0: any = await io.ReadAll($.pointerValueOrNil(io.LimitReader($.structInterfaceValue<io.Reader | null>(new zeroReader(true), "main.zeroReader", "main.zeroReader")!, 3n))!)
 	let data: $.Slice<number> = __goscriptTuple0[0]
-	let err = __goscriptTuple0[1]
+	let err: $.GoError = __goscriptTuple0[1]
 	await $.println("limit:", $.sliceLen(data), $.arrayIndex(data!, 0) == 0, err == null)
 
 	// Join a bounded zero range with a trailing reader through a spread slice.

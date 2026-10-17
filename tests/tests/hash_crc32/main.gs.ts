@@ -92,12 +92,12 @@ export async function main(): globalThis.Promise<void> {
 	}
 	let __goscriptTuple0: any = await (marshaler !== null && (marshaler as any).__isVarRef !== true && ((marshaler as any).__goValue === undefined || (marshaler as any).__goType?.charCodeAt(0) !== 42) ? (marshaler as Exclude<encoding.BinaryMarshaler, null>) : $.pointerValue<Exclude<encoding.BinaryMarshaler, null>>(marshaler)).MarshalBinary()
 	let state: $.Slice<number> = __goscriptTuple0[0]
-	let err = __goscriptTuple0[1]
+	let err: $.GoError = __goscriptTuple0[1]
 	if (err != null) {
 		$.panic((__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	}
 	let __goscriptTuple1: any = $.typeAssertTuple<encoding.BinaryAppender | null>(ieee, "encoding.BinaryAppender")
-	let appender = __goscriptTuple1[0]
+	let appender: encoding.BinaryAppender | null = __goscriptTuple1[0]
 	ok = __goscriptTuple1[1]
 	if (!ok) {
 		$.panic("BinaryAppender")
@@ -117,7 +117,7 @@ export async function main(): globalThis.Promise<void> {
 
 	let restored = crc32.NewIEEE()
 	let __goscriptTuple3: any = $.typeAssertTuple<encoding.BinaryUnmarshaler | null>(restored, "encoding.BinaryUnmarshaler")
-	let unmarshaler = __goscriptTuple3[0]
+	let unmarshaler: encoding.BinaryUnmarshaler | null = __goscriptTuple3[0]
 	ok = __goscriptTuple3[1]
 	if (!ok) {
 		$.panic("BinaryUnmarshaler")
@@ -168,13 +168,13 @@ export async function main(): globalThis.Promise<void> {
 	let cloneSource = crc32.NewIEEE()
 	await (cloneSource !== null && (cloneSource as any).__isVarRef !== true && ((cloneSource as any).__goValue === undefined || (cloneSource as any).__goType?.charCodeAt(0) !== 42) ? (cloneSource as Exclude<hash.Hash32, null>) : $.pointerValue<Exclude<hash.Hash32, null>>(cloneSource)).Write(new Uint8Array([112, 114, 101, 102, 105, 120]))
 	let __goscriptTuple4: any = $.typeAssertTuple<hash.Cloner | null>(cloneSource, "hash.Cloner")
-	let cloner = __goscriptTuple4[0]
+	let cloner: hash.Cloner | null = __goscriptTuple4[0]
 	ok = __goscriptTuple4[1]
 	if (!ok) {
 		$.panic("Cloner")
 	}
 	let __goscriptTuple5: any = await (cloner !== null && (cloner as any).__isVarRef !== true && ((cloner as any).__goValue === undefined || (cloner as any).__goType?.charCodeAt(0) !== 42) ? (cloner as Exclude<hash.Cloner, null>) : $.pointerValue<Exclude<hash.Cloner, null>>(cloner)).Clone()
-	let clonedHash = __goscriptTuple5[0]
+	let clonedHash: hash.Cloner | null = __goscriptTuple5[0]
 	err = __goscriptTuple5[1]
 	if (err != null) {
 		$.panic((__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))

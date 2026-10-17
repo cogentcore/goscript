@@ -178,8 +178,8 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("Interface value type:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(ifaceVal)).Type()).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	await $.println("Interface kind:", reflect.Kind_String($.markAsStructValue($.cloneStructValue(ifaceVal)).Kind()))
 	let __goscriptTuple0: any = reflect.TypeAssert(__goscriptStatic1(), $.markAsStructValue($.cloneStructValue(reflect.ValueOf("typed"))))
-	let assertedString = (__goscriptTuple0[0] as string)
-	let assertedOK = __goscriptTuple0[1]
+	let assertedString: string = (__goscriptTuple0[0] as string)
+	let assertedOK: boolean = __goscriptTuple0[1]
 	await $.println("TypeAssert string:", assertedString, assertedOK)
 	let [, assertedIntOK] = reflect.TypeAssert(__goscriptStatic0(), $.markAsStructValue($.cloneStructValue(reflect.ValueOf("typed"))))
 	await $.println("TypeAssert int:", assertedIntOK)

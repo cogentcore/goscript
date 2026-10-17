@@ -17,7 +17,7 @@ export async function main(): globalThis.Promise<void> {
 		let compressed = $.varRef($.markAsStructValue(new bytes.Buffer()))
 		let __goscriptTuple0: any = flate.NewWriter($.interfaceValue<io.Writer | null>(compressed, "*bytes.Buffer", __goscriptStatic0()), level)
 		let writer: flate.Writer | $.VarRef<flate.Writer> | null = __goscriptTuple0[0]
-		let err = __goscriptTuple0[1]
+		let err: $.GoError = __goscriptTuple0[1]
 		if (err != null) {
 			$.panic((err as any))
 		}

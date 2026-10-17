@@ -91,7 +91,7 @@ export async function main(): globalThis.Promise<void> {
 	let deterministicBytes = bytes.Repeat(new Uint8Array([42]) as $.Slice<number>, 64)
 	let __goscriptTuple0: any = await $.pointerValue<Exclude<ecdh.Curve, null>>(ecdh.X25519()).GenerateKey($.pointerValueOrNil($.interfaceValue<io.Reader | null>(bytes.NewReader(deterministicBytes), "*bytes.Reader", __goscriptStatic0()))!)
 	let deterministic: ecdh.PrivateKey | $.VarRef<ecdh.PrivateKey> | null = __goscriptTuple0[0]
-	let err = __goscriptTuple0[1]
+	let err: $.GoError = __goscriptTuple0[1]
 	await $.println("deterministic err nil", err == null)
 	await $.println("deterministic private matches", bytes.Equal((deterministic !== null && (deterministic as any).__isVarRef !== true && (deterministic as any).__goValue === undefined ? ((deterministic as any) as ecdh.PrivateKey).Bytes() : ecdh.PrivateKey.prototype.Bytes.call($.pointerValue<ecdh.PrivateKey>(deterministic))), $.goSlice(deterministicBytes, undefined, 32)))
 	await $.println("deterministic public len", $.sliceLen(ecdh.PublicKey.prototype.Bytes.call($.pointerValue<ecdh.PublicKey>((deterministic !== null && (deterministic as any).__isVarRef !== true && (deterministic as any).__goValue === undefined ? ((deterministic as any) as ecdh.PrivateKey).PublicKey() : ecdh.PrivateKey.prototype.PublicKey.call($.pointerValue<ecdh.PrivateKey>(deterministic)))))))

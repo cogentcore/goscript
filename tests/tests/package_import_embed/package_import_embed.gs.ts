@@ -31,7 +31,7 @@ export async function main(): globalThis.Promise<void> {
 
 	let b = $.makeSlice<number>(8, undefined, "byte")
 	let __goscriptTuple0: any = await (ra !== null && (ra as any).__isVarRef !== true && ((ra as any).__goValue === undefined || (ra as any).__goType?.charCodeAt(0) !== 42) ? (ra as Exclude<io.ReaderAt, null>) : $.pointerValue<Exclude<io.ReaderAt, null>>(ra)).ReadAt(b, 7n)
-	let n = __goscriptTuple0[0]
+	let n: number = __goscriptTuple0[0]
 	err = __goscriptTuple0[1]
 	await $.println("readat:", n, err == null, $.bytesToString($.goSlice(b, undefined, n)))
 	let __goscriptTuple1: any = await (ra !== null && (ra as any).__isVarRef !== true && ((ra as any).__goValue === undefined || (ra as any).__goType?.charCodeAt(0) !== 42) ? (ra as Exclude<io.ReaderAt, null>) : $.pointerValue<Exclude<io.ReaderAt, null>>(ra)).ReadAt(b, 16n)
@@ -40,7 +40,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("readat end:", n, $.comparableEqual(err, io.EOF), $.bytesToString($.goSlice(b, undefined, n)))
 
 	let __goscriptTuple2: any = await (sk !== null && (sk as any).__isVarRef !== true && ((sk as any).__goValue === undefined || (sk as any).__goType?.charCodeAt(0) !== 42) ? (sk as Exclude<io.Seeker, null>) : $.pointerValue<Exclude<io.Seeker, null>>(sk)).Seek(-5n, 2)
-	let pos = __goscriptTuple2[0]
+	let pos: bigint = __goscriptTuple2[0]
 	err = __goscriptTuple2[1]
 	await $.println("seek end:", pos, err == null)
 	let __goscriptTuple3: any = await (f !== null && (f as any).__isVarRef !== true && ((f as any).__goValue === undefined || (f as any).__goType?.charCodeAt(0) !== 42) ? (f as Exclude<fs.File, null>) : $.pointerValue<Exclude<fs.File, null>>(f)).Read(b)

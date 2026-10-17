@@ -9,7 +9,7 @@ export async function main(): globalThis.Promise<void> {
 
 	let __goscriptTuple0: any = $.typeAssertTuple<globalThis.Map<string, number> | null>(i, /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("int")))
 	let m: globalThis.Map<string, number> | null = __goscriptTuple0[0]
-	let ok = __goscriptTuple0[1]
+	let ok: boolean = __goscriptTuple0[1]
 	if (ok) {
 		await $.println("Age:", $.mapGet<string, number, number>(m, "age", 0)[0])
 	} else {

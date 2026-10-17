@@ -25,7 +25,7 @@ export function words_Rsh(w: $.VarRef<words> | null, n: number): bigint {
 export async function main(): globalThis.Promise<void> {
 	let __goscriptTuple0: any = setWords($.varRef<words>($.arrayValue(globalThis.Array.from({ length: 1 }, () => 0n))))
 	let w: $.VarRef<words> | null = __goscriptTuple0[0]
-	let ok = __goscriptTuple0[1]
+	let ok: boolean = __goscriptTuple0[1]
 	if (!ok) {
 		await $.println("missing")
 		return

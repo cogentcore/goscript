@@ -77,7 +77,7 @@ export async function main(): globalThis.Promise<void> {
 	let nilInterface: MyInterface | null = null! as MyInterface | null
 	let __goscriptTuple1: any = $.typeAssertTuple<MyStruct | $.VarRef<MyStruct> | null>(nilInterface, /* @__PURE__ */ $.pointerType("main.MyStruct"))
 	let nilVal: MyStruct | $.VarRef<MyStruct> | null = __goscriptTuple1[0]
-	let ok3 = __goscriptTuple1[1]
+	let ok3: boolean = __goscriptTuple1[1]
 	if (ok3 && ($.pointerValue<MyStruct>(nilVal).Value == 0)) {
 		await $.println("nil interface pointer assertion succeeded")
 	} else {

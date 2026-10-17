@@ -29,9 +29,9 @@ export class Snapshot {
 	public async Apply(n: number, cb: ((n: number) => [$.VarRef<number> | null, $.Slice<number>, $.GoError] | globalThis.Promise<[$.VarRef<number> | null, $.Slice<number>, $.GoError]>) | null): globalThis.Promise<[number, $.GoError]> {
 		const s: Snapshot | $.VarRef<Snapshot> | null = this;
 		let __goscriptTuple0: any = await cb!($.pointerValue<Snapshot>(s).base + n)
-		let next = __goscriptTuple0[0]
+		let next: $.VarRef<number> | null = __goscriptTuple0[0]
 		let results: $.Slice<number> = __goscriptTuple0[1]
-		let err = __goscriptTuple0[2]
+		let err: $.GoError = __goscriptTuple0[2]
 		if (err != null) {
 			return [0, err]
 		}

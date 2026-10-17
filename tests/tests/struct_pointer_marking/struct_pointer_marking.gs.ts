@@ -87,12 +87,12 @@ export async function main(): globalThis.Promise<void> {
 	{
 		let __goscriptTuple0: any = $.typeAssertTuple<MyStruct | $.VarRef<MyStruct> | null>(i1, /* @__PURE__ */ $.pointerType("main.MyStruct"))
 		let structPtr1: MyStruct | $.VarRef<MyStruct> | null = __goscriptTuple0[0]
-		let ok = __goscriptTuple0[1]
+		let ok: boolean = __goscriptTuple0[1]
 		if (ok) {
 			{
 				let __goscriptTuple1: any = $.typeAssertTuple<MyStruct | $.VarRef<MyStruct> | null>(i2, /* @__PURE__ */ $.pointerType("main.MyStruct"))
 				let structPtr2: MyStruct | $.VarRef<MyStruct> | null = __goscriptTuple1[0]
-				let __goscriptShadow0 = __goscriptTuple1[1]
+				let __goscriptShadow0: boolean = __goscriptTuple1[1]
 				if (__goscriptShadow0) {
 					$.pointerValue<MyStruct>(structPtr1).Value = 99
 					await $.println("shared modification check:", $.pointerValue<MyStruct>(structPtr2).Value)
@@ -133,7 +133,7 @@ export async function main(): globalThis.Promise<void> {
 				{
 					let __goscriptTuple2: any = $.typeAssertTuple<MyStruct | $.VarRef<MyStruct> | null>(item, /* @__PURE__ */ $.pointerType("main.MyStruct"))
 					let ptr: MyStruct | $.VarRef<MyStruct> | null = __goscriptTuple2[0]
-					let __goscriptShadow1 = __goscriptTuple2[1]
+					let __goscriptShadow1: boolean = __goscriptTuple2[1]
 					if (__goscriptShadow1) {
 						await $.println("arr[", i, "] is *MyStruct with value:", $.pointerValue<MyStruct>(ptr).Value)
 					} else {

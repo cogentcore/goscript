@@ -9,7 +9,7 @@ export async function main(): globalThis.Promise<void> {
 	let input = ($.arrayToSlice<pkix.RelativeDistinguishedNameSET>([($.arrayToSlice<pkix.AttributeTypeAndValue>([new pkix.AttributeTypeAndValue(true, ($.arrayToSlice<number>([2, 5, 4, 3]) as asn1.ObjectIdentifier), "goscript")]) as pkix.RelativeDistinguishedNameSET)]) as pkix.RDNSequence)
 	let __goscriptTuple0: any = asn1.Marshal($.namedValueInterfaceValue<any>(input, "pkix.RDNSequence", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()))
 	let der: $.Slice<number> = __goscriptTuple0[0]
-	let err = __goscriptTuple0[1]
+	let err: $.GoError = __goscriptTuple0[1]
 	await $.println("marshal err nil", err == null)
 	await $.println("der len", $.sliceLen(der))
 

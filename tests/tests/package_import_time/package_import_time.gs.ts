@@ -88,7 +88,7 @@ export async function marshal(): globalThis.Promise<void> {
 	let t = $.markAsStructValue($.cloneStructValue(time.Date(2025, 5, 15, 1, 10, 42, 123456789, time.UTC)))
 	let __goscriptTuple0: any = $.markAsStructValue($.cloneStructValue(t)).MarshalJSON()
 	let b: $.Slice<number> = __goscriptTuple0[0]
-	let err = __goscriptTuple0[1]
+	let err: $.GoError = __goscriptTuple0[1]
 	await $.println("marshal json", $.bytesToString(b), err == null)
 	let u = $.varRef($.markAsStructValue(new time.Time()))
 	err = u.value.UnmarshalJSON(b)

@@ -69,7 +69,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("json:", json.Valid(rawBytes), $.bytesToString(rawBytes), num)
 
 	let __goscriptTuple1: any = mime.ParseMediaType("text/plain; charset=utf-8")
-	let mediaType = __goscriptTuple1[0]
+	let mediaType: string = __goscriptTuple1[0]
 	let params: globalThis.Map<string, string> | null = __goscriptTuple1[1]
 	await $.println("mime:", mediaType, $.mapGet<string, string, string>(params, "charset", "")[0], mime.TypeByExtension(".json"), mime.WordEncoder_Encode(mime.BEncoding, "utf-8", "hi"))
 

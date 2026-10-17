@@ -22,7 +22,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 	let __goscriptTuple0: any = (r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? ((r as any) as rand.ChaCha8).MarshalBinary() : rand.ChaCha8.prototype.MarshalBinary.call($.pointerValue<rand.ChaCha8>(r)))
 	let b: $.Slice<number> = __goscriptTuple0[0]
-	let err = __goscriptTuple0[1]
+	let err: $.GoError = __goscriptTuple0[1]
 	if (err != null) {
 		$.panic((err as any))
 	}

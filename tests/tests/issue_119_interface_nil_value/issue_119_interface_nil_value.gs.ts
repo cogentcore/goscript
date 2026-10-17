@@ -126,7 +126,7 @@ export async function main(): globalThis.Promise<void> {
 	{
 		let __goscriptTuple0: any = $.typeAssertTuple<Dog | $.VarRef<Dog> | null>(animal, /* @__PURE__ */ $.pointerType("main.Dog"))
 		let d: Dog | $.VarRef<Dog> | null = __goscriptTuple0[0]
-		let ok = __goscriptTuple0[1]
+		let ok: boolean = __goscriptTuple0[1]
 		if (ok && (d == null)) {
 			await $.println("typed nil dog assertion ok")
 		} else {
@@ -136,7 +136,7 @@ export async function main(): globalThis.Promise<void> {
 	{
 		let __goscriptTuple1: any = $.typeAssertTuple<Cat | $.VarRef<Cat> | null>(animal, /* @__PURE__ */ $.pointerType("main.Cat"))
 		let c: Cat | $.VarRef<Cat> | null = __goscriptTuple1[0]
-		let ok = __goscriptTuple1[1]
+		let ok: boolean = __goscriptTuple1[1]
 		if (ok || (c != null)) {
 			await $.println("typed nil cat assertion accepted")
 		} else {

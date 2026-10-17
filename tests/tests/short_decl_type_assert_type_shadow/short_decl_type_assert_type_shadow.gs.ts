@@ -41,8 +41,8 @@ export class item {
 
 export function use(v: any): string {
 	let __goscriptTuple0: any = $.typeAssertTuple<dumper | null>(v, "main.dumper")
-	let __goscriptShadow0 = __goscriptTuple0[0]
-	let ok = __goscriptTuple0[1]
+	let __goscriptShadow0: dumper | null = __goscriptTuple0[0]
+	let ok: boolean = __goscriptTuple0[1]
 	if (!ok) {
 		return "bad"
 	}

@@ -30,7 +30,7 @@ export class Node {
 		const n: Node | $.VarRef<Node> | null = this;
 		let __goscriptTuple0: any = (json.Marshal($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(n, "*main.Node", /* @__PURE__ */ $.pointerType("main.Node"))))).Elem())).Interface()) as [$.Slice<number>, $.GoError])
 		let b: $.Slice<number> = __goscriptTuple0[0]
-		let err = __goscriptTuple0[1]
+		let err: $.GoError = __goscriptTuple0[1]
 		if (err != null) {
 			return [null, err]
 		}
@@ -49,7 +49,7 @@ export class Node {
 export async function main(): globalThis.Promise<void> {
 	let __goscriptTuple1: any = (json.Marshal($.interfaceValue(new Node(false, 1, "x"), "*main.Node", /* @__PURE__ */ $.pointerType("main.Node"))) as [$.Slice<number>, $.GoError])
 	let b: $.Slice<number> = __goscriptTuple1[0]
-	let err = __goscriptTuple1[1]
+	let err: $.GoError = __goscriptTuple1[1]
 	await $.println($.bytesToString(b), err == null)
 
 	let __goscriptTuple2: any = (json.Marshal($.structInterfaceValue(new Node(true, 2, "y"), "main.Node", "main.Node")) as [$.Slice<number>, $.GoError])

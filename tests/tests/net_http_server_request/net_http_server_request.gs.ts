@@ -18,7 +18,7 @@ export async function printURL(label: string, u: url.URL | $.VarRef<url.URL> | n
 
 	let __goscriptTuple0: any = (u !== null && (u as any).__isVarRef !== true && (u as any).__goValue === undefined ? ((u as any) as url.URL).Parse("../d/e?k=v#top") : url.URL.prototype.Parse.call(u, "../d/e?k=v#top"))
 	let ref: url.URL | $.VarRef<url.URL> | null = __goscriptTuple0[0]
-	let err = __goscriptTuple0[1]
+	let err: $.GoError = __goscriptTuple0[1]
 	if (err != null) {
 		await $.println(label, "parse error:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	} else {
@@ -39,7 +39,7 @@ export async function main(): globalThis.Promise<void> {
 	let server = httptest.NewServer($.pointerValueOrNil($.namedValueInterfaceValue<http.Handler | null>($.namedFunction($.functionValue(async (w: http.ResponseWriter | null, r: http.Request | $.VarRef<http.Request> | null) => {
 		let __goscriptTuple2: any = await io.ReadAll($.pointerValueOrNil(($.pointerValue<http.Request>(r).Body as io.Reader | null))!)
 		let data: $.Slice<number> = __goscriptTuple2[0]
-		let err = __goscriptTuple2[1]
+		let err: $.GoError = __goscriptTuple2[1]
 		await $.println("server:", $.pointerValue<http.Request>(r).Method, $.comparableEqual($.pointerValue<http.Request>(r).Body, $.structInterfaceValue<io.ReadCloser | null>($.pointerValue<any>(http.NoBody), "http.noBody", __goscriptStatic0())), $.sliceLen(data), err == null, url.Values_Get($.pointerValue<http.Request>(r).URL.Query(), "x"), $.pointerValue<http.Request>(r).URL.RequestURI())
 		await printURL("server", $.pointerValue<http.Request>(r).URL)
 		{
@@ -53,7 +53,7 @@ export async function main(): globalThis.Promise<void> {
 
 	let __goscriptTuple3: any = await http.Get($.pointerValue<httptest.Server>(server).URL + "/?x=1")
 	let resp: http.Response | $.VarRef<http.Response> | null = __goscriptTuple3[0]
-	let err = __goscriptTuple3[1]
+	let err: $.GoError = __goscriptTuple3[1]
 	let resp$: http.Response = resp == null ? $.pointerTarget<http.Response>(resp) : (resp as any).__isVarRef === true ? (resp as any).value : (resp as any).__goValue === undefined ? (resp as any) : $.pointerTarget<http.Response>(resp)
 	if (err != null) {
 		await $.println("get error:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
@@ -89,7 +89,7 @@ export async function main(): globalThis.Promise<void> {
 		let target = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as string)
 		let __goscriptTuple5: any = http.NewRequest(http.MethodGet, target, null!)
 		let __goscriptShadow1: http.Request | $.VarRef<http.Request> | null = __goscriptTuple5[0]
-		let __goscriptShadow2 = __goscriptTuple5[1]
+		let __goscriptShadow2: $.GoError = __goscriptTuple5[1]
 		if (__goscriptShadow2 != null) {
 			await $.println("new request error:", (__goscriptAwait = (__goscriptShadow2 !== null && (__goscriptShadow2 as any).__isVarRef !== true && ((__goscriptShadow2 as any).__goValue === undefined || (__goscriptShadow2 as any).__goType?.charCodeAt(0) !== 42) ? (__goscriptShadow2 as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(__goscriptShadow2)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 			continue

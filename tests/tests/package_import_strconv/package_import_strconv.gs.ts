@@ -17,7 +17,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// Test ParseInt
 	let __goscriptTuple0: any = strconv.ParseInt("456", 10, 64)
-	let i64 = __goscriptTuple0[0]
+	let i64: bigint = __goscriptTuple0[0]
 	err = __goscriptTuple0[1]
 	if (err == null) {
 		await $.println("ParseInt result:", i64)
@@ -29,7 +29,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// Test ParseFloat
 	let __goscriptTuple1: any = strconv.ParseFloat("3.14", 64)
-	let f = __goscriptTuple1[0]
+	let f: number = __goscriptTuple1[0]
 	err = __goscriptTuple1[1]
 	if (err == null) {
 		await $.println("ParseFloat result:", strconv.FormatFloat(f, 102, 2, 64))
@@ -41,7 +41,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// Test ParseBool
 	let __goscriptTuple2: any = strconv.ParseBool("true")
-	let b = __goscriptTuple2[0]
+	let b: boolean = __goscriptTuple2[0]
 	err = __goscriptTuple2[1]
 	if (err == null) {
 		await $.println("ParseBool result:", b)
@@ -57,7 +57,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// Test Unquote
 	let __goscriptTuple3: any = strconv.Unquote("\"hello world\"")
-	let unquoted = __goscriptTuple3[0]
+	let unquoted: string = __goscriptTuple3[0]
 	err = __goscriptTuple3[1]
 	if (err == null) {
 		await $.println("Unquote result:", unquoted)

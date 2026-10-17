@@ -36,7 +36,7 @@ export async function main(): globalThis.Promise<void> {
 
 	let __goscriptTuple0: any = $.typeAssertTuple<$.Slice<item | $.VarRef<item> | null>>(boxed, /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.pointerType("main.item")))
 	let commaOK: $.Slice<item | $.VarRef<item> | null> = __goscriptTuple0[0]
-	let ok = __goscriptTuple0[1]
+	let ok: boolean = __goscriptTuple0[1]
 	await $.println(ok, commaOK == null)
 }
 

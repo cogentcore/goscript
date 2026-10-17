@@ -123,7 +123,7 @@ export function Maps_CopyFrom(km: $.VarRef<Maps> | null, cp: Maps): $.GoError {
 	km!.value = ($.makeSlice<MapItem>(0, $.sliceLen((cp as Maps)), undefined, () => new MapItem(true)) as Maps)
 	let __goscriptTuple0: any = (json.Marshal($.interfaceValue(cp, "main.Maps", /* @__PURE__ */ $.sliceType("main.MapItem", "main.Maps"))) as [$.Slice<number>, $.GoError])
 	let b: $.Slice<number> = __goscriptTuple0[0]
-	let err = __goscriptTuple0[1]
+	let err: $.GoError = __goscriptTuple0[1]
 	if (err != null) {
 		return err
 	}

@@ -10,7 +10,7 @@ export async function main(): globalThis.Promise<void> {
 		await $.chanSend(messages, "ping")
 	})
 
-	let msg = await $.chanRecv(messages)
+	let msg: string = await $.chanRecv(messages)
 	await $.println(msg)
 
 	// A compound assignment keeps its operator when the operand is a receive.

@@ -67,7 +67,7 @@ export async function main(): globalThis.Promise<void> {
 		await $.println((__goscriptAwait = (st !== null && (st as any).__isVarRef !== true && ((st as any).__goValue === undefined || (st as any).__goType?.charCodeAt(0) !== 42) ? (st as Exclude<stringer, null>) : $.pointerValue<Exclude<stringer, null>>(st)).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	}
 	let __goscriptTuple0: any = $.typeAssertTuple<setStringer | null>($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(ev)).Addr())).Interface(), "main.setStringer")
-	let ss = __goscriptTuple0[0]
+	let ss: setStringer | null = __goscriptTuple0[0]
 	ok = __goscriptTuple0[1]
 	await $.println(ok)
 	if (ok) {

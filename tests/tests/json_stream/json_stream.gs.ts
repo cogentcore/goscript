@@ -36,8 +36,8 @@ export class chanReader {
 		const r$: chanReader = r == null ? $.pointerTarget<chanReader>(r) : (r as any).__isVarRef === true ? (r as any).value : (r as any).__goValue === undefined ? (r as any) : $.pointerTarget<chanReader>(r)
 		if ($.stringEqual((r$ as chanReader).cur, "")) {
 			let __goscriptRecv0 = await $.chanRecvWithOk((r$ as chanReader).ch)
-			let s = __goscriptRecv0.value
-			let ok = __goscriptRecv0.ok
+			let s: string = __goscriptRecv0.value
+			let ok: boolean = __goscriptRecv0.ok
 			if (!ok) {
 				return [0, io.EOF]
 			}
@@ -177,7 +177,7 @@ export async function main(): globalThis.Promise<void> {
 	{
 		let __goscriptTuple0: any = $.typeAssertTuple<json.SyntaxError | $.VarRef<json.SyntaxError> | null>(err, /* @__PURE__ */ $.pointerType("json.SyntaxError"))
 		let se: json.SyntaxError | $.VarRef<json.SyntaxError> | null = __goscriptTuple0[0]
-		let ok = __goscriptTuple0[1]
+		let ok: boolean = __goscriptTuple0[1]
 		if (ok) {
 			fmt.Println("offset", $.basicInterfaceValue($.pointerValue<json.SyntaxError>(se).Offset, "int64"))
 		}

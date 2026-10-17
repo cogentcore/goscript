@@ -47,7 +47,7 @@ export async function main(): globalThis.Promise<void> {
 	// The names of embedded files are UTF-8 too.
 	let __goscriptTuple0: any = $.markAsStructValue($.cloneStructValue(files)).ReadFile("d\xc3\xa9.txt")
 	let data: $.Slice<number> = __goscriptTuple0[0]
-	let err = __goscriptTuple0[1]
+	let err: $.GoError = __goscriptTuple0[1]
 	await $.println("file:", err == null, $.stringEqual($.bytesToString(data), "accent\n"))
 	let __goscriptTuple1: any = $.markAsStructValue($.cloneStructValue(files)).ReadDir(".")
 	let entries: $.Slice<fs.DirEntry | null> = __goscriptTuple1[0]

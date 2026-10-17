@@ -13,7 +13,7 @@ export function collectValues(value: helper.Value | null): [$.Slice<helper.Value
 export function collectAssigned(value: helper.Value | null): [$.Slice<helper.Value | null>, $.GoError] {
 	let __goscriptTuple0: any = helper.Collect(__goscriptStatic0(), value)
 	let values: $.Slice<helper.Value | null> = (__goscriptTuple0[0] as $.Slice<helper.Value | null>)
-	let err = __goscriptTuple0[1]
+	let err: $.GoError = __goscriptTuple0[1]
 	if (err != null) {
 		return [null, err]
 	}
@@ -25,7 +25,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("wrapped:", box.Value)
 	let __goscriptTuple1: any = collectValues($.structInterfaceValue<helper.Value | null>(new helper.IntValue(true, 34), "helper.IntValue", "helper.IntValue"))
 	let values: $.Slice<helper.Value | null> = __goscriptTuple1[0]
-	let err = __goscriptTuple1[1]
+	let err: $.GoError = __goscriptTuple1[1]
 	if (err != null) {
 		await $.println((__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		return

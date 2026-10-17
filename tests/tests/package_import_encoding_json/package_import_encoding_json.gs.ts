@@ -149,7 +149,7 @@ export async function main(): globalThis.Promise<void> {
 	let p = new Person(true, "Alice", 30, true)
 	let __goscriptTuple0: any = (json.Marshal($.structInterfaceValue((p).clone(), "main.Person", "main.Person")) as [$.Slice<number>, $.GoError])
 	let b: $.Slice<number> = __goscriptTuple0[0]
-	let err = __goscriptTuple0[1]
+	let err: $.GoError = __goscriptTuple0[1]
 	if (err != null) {
 		results = $.appendOne(results, "Marshal error: " + (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	} else {
@@ -227,7 +227,7 @@ export async function byteSliceFields(): globalThis.Promise<void> {
 	let e = new Enc(false, 2, new Uint8Array([1, 2, 250]) as $.Slice<number>, $.arrayToSlice<$.Slice<number>>([new Uint8Array([3]) as $.Slice<number>, new Uint8Array([4, 5]) as $.Slice<number>]), $.makeMap<string, $.Slice<number>>([["a", new Uint8Array([6, 7]) as $.Slice<number>]]), new Enc(false, undefined, new Uint8Array([104, 105])))
 	let __goscriptTuple2: any = (json.Marshal($.interfaceValue(e, "*main.Enc", /* @__PURE__ */ $.pointerType("main.Enc"))) as [$.Slice<number>, $.GoError])
 	let b: $.Slice<number> = __goscriptTuple2[0]
-	let err = __goscriptTuple2[1]
+	let err: $.GoError = __goscriptTuple2[1]
 	await $.println($.bytesToString(b), err == null)
 
 	let d = new Enc()
@@ -247,7 +247,7 @@ export async function timeField(): globalThis.Promise<void> {
 	let at = $.markAsStructValue($.cloneStructValue(time.Date(2025, 5, 15, 1, 10, 42, 123456789, time.UTC)))
 	let __goscriptTuple3: any = (json.Marshal($.structInterfaceValue(new Event(true, "win", $.markAsStructValue($.cloneStructValue(at))), "main.Event", "main.Event")) as [$.Slice<number>, $.GoError])
 	let b: $.Slice<number> = __goscriptTuple3[0]
-	let err = __goscriptTuple3[1]
+	let err: $.GoError = __goscriptTuple3[1]
 	await $.println($.bytesToString(b), err == null)
 	let ev: $.VarRef<Event> = $.varRef(new Event(true))
 	err = (json.Unmarshal(b, $.interfaceValue(ev, "*main.Event", /* @__PURE__ */ $.pointerType("main.Event"))) as $.GoError)

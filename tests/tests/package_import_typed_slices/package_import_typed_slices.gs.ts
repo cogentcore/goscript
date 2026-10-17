@@ -130,7 +130,7 @@ export async function main(): globalThis.Promise<void> {
 	let m = new mesh(true, $.typedSliceOf(Float32Array, [0.5, 1, -2.5]) as $.Slice<number>, $.typedSliceOf(Uint32Array, [0, 1, 4294967295]) as $.Slice<number>)
 	let __goscriptTuple1: any = (json.Marshal($.structInterfaceValue((m).clone(), "main.mesh", "main.mesh")) as [$.Slice<number>, $.GoError])
 	let data: $.Slice<number> = __goscriptTuple1[0]
-	let err = __goscriptTuple1[1]
+	let err: $.GoError = __goscriptTuple1[1]
 	await $.println("json:", $.bytesToString(data), err == null)
 	let m2: $.VarRef<mesh> = $.varRef(new mesh(true))
 	err = (json.Unmarshal(data, $.interfaceValue(m2, "*main.mesh", /* @__PURE__ */ $.pointerType("main.mesh"))) as $.GoError)

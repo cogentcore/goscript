@@ -149,7 +149,7 @@ export async function main(): globalThis.Promise<void> {
 	let n = new Node(true, new Base(true, "a", $.arrayToSlice<string>(["x"]), 3, "base"), new Extra(false, "n"), new inner(true, 7), undefined, "outer", 2, true)
 	let __goscriptTuple0: any = (json.Marshal($.structInterfaceValue(n, "main.Node", "main.Node")) as [$.Slice<number>, $.GoError])
 	let b: $.Slice<number> = __goscriptTuple0[0]
-	let err = __goscriptTuple0[1]
+	let err: $.GoError = __goscriptTuple0[1]
 	fmt.Println($.bytesToString(b), (err as any))
 
 	let m: $.VarRef<Node> = $.varRef(new Node(true))

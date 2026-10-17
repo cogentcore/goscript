@@ -66,7 +66,7 @@ export async function main(): globalThis.Promise<void> {
 	let nilIface: $.VarRef<any> = $.varRef(null! as any)
 	let __goscriptTuple0: any = (json.Marshal($.structInterfaceValue(new Payload(true, zero, $.basicInterfaceValue(0, "int"), false, "", $.interfaceValue($.arrayToSlice<number>([]), "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"))), $.interfaceValue($.makeMap<string, number>([]), "map[string]int", /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("int"))), nilIface, falseValue), "main.Payload", "main.Payload")) as [$.Slice<number>, $.GoError])
 	let out: $.Slice<number> = __goscriptTuple0[0]
-	let err = __goscriptTuple0[1]
+	let err: $.GoError = __goscriptTuple0[1]
 	if (err != null) {
 		fmt.Println("marshal error:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		return

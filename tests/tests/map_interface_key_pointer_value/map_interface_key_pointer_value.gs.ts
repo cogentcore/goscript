@@ -50,7 +50,7 @@ export async function main(): globalThis.Promise<void> {
 	{
 		let __goscriptTuple0: any = $.typeAssertTuple<Table | $.VarRef<Table> | null>(node, /* @__PURE__ */ $.pointerType("main.Table"))
 		let table: Table | $.VarRef<Table> | null = __goscriptTuple0[0]
-		let ok = __goscriptTuple0[1]
+		let ok: boolean = __goscriptTuple0[1]
 		if (ok) {
 			let [value, found] = $.mapGet<Node | null, boolean, boolean>(seen, $.interfaceValue<Node | null>(table, "*main.Table", /* @__PURE__ */ $.pointerType("main.Table")), false)
 			await $.println(value, found)

@@ -65,7 +65,7 @@ export async function main(): globalThis.Promise<void> {
 	{
 		let __goscriptTuple0: any = await os.ReadFile(fileName)
 		let data: $.Slice<number> = __goscriptTuple0[0]
-		let readErr = __goscriptTuple0[1]
+		let readErr: $.GoError = __goscriptTuple0[1]
 		if (readErr == null) {
 			await $.println("ReadFile data:", $.bytesToString(data))
 		} else {
@@ -103,7 +103,7 @@ export async function main(): globalThis.Promise<void> {
 	{
 		let __goscriptTuple1: any = await os.CreateTemp("", "os-temp-file-*")
 		let tempFile: os.File | $.VarRef<os.File> | null = __goscriptTuple1[0]
-		let __goscriptShadow1 = __goscriptTuple1[1]
+		let __goscriptShadow1: $.GoError = __goscriptTuple1[1]
 		if (__goscriptShadow1 == null) {
 			await $.println("CreateTemp ok")
 			await $.println("CreateTemp name empty:", $.stringEqual((tempFile !== null && (tempFile as any).__isVarRef !== true && (tempFile as any).__goValue === undefined ? ((tempFile as any) as os.File).Name() : os.File.prototype.Name.call($.pointerValue<os.File>(tempFile))), ""))

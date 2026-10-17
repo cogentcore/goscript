@@ -112,8 +112,8 @@ export function countFlags(__typeArgs: $.GenericTypeArgs | undefined, __goscript
 
 export async function main(): globalThis.Promise<void> {
 	let __goscriptTuple0: any = await decodeLocalPairing(__goscriptStatic0(), new Uint8Array([104, 105]))
-	let msg = (__goscriptTuple0[0] as pairingOffer)
-	let err = __goscriptTuple0[1]
+	let msg: pairingOffer = (__goscriptTuple0[0] as pairingOffer)
+	let err: $.GoError = __goscriptTuple0[1]
 	if (err != null) {
 		await $.println("decode error")
 		return

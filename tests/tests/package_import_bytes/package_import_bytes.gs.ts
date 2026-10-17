@@ -115,16 +115,16 @@ export async function main(): globalThis.Promise<void> {
 	let off = 2n
 	let __goscriptTuple1: any = (reader !== null && (reader as any).__isVarRef !== true && (reader as any).__goValue === undefined ? ((reader as any) as bytes.Reader).ReadAt(at, off) : bytes.Reader.prototype.ReadAt.call($.pointerValue<bytes.Reader>(reader), at, off))
 	n = __goscriptTuple1[0]
-	let err = __goscriptTuple1[1]
+	let err: $.GoError = __goscriptTuple1[1]
 	await $.println("Reader ReadAt", n, "bytes:", $.bytesToString($.goSlice(at, undefined, n)), "err:", err == null)
 	let __goscriptTuple2: any = (reader !== null && (reader as any).__isVarRef !== true && (reader as any).__goValue === undefined ? ((reader as any) as bytes.Reader).Seek(off, 0) : bytes.Reader.prototype.Seek.call($.pointerValue<bytes.Reader>(reader), off, 0))
-	let pos = __goscriptTuple2[0]
+	let pos: bigint = __goscriptTuple2[0]
 	err = __goscriptTuple2[1]
 	await $.println("Reader Seek", pos, "err:", err == null)
 	await $.println("Reader Size", (reader !== null && (reader as any).__isVarRef !== true && (reader as any).__goValue === undefined ? ((reader as any) as bytes.Reader).Size() : bytes.Reader.prototype.Size.call($.pointerValue<bytes.Reader>(reader))))
 	let writeDst = $.varRef($.markAsStructValue(new bytes.Buffer()))
 	let __goscriptTuple3: any = await (reader !== null && (reader as any).__isVarRef !== true && (reader as any).__goValue === undefined ? ((reader as any) as bytes.Reader).WriteTo($.pointerValueOrNil($.interfaceValue<io.Writer | null>(writeDst, "*bytes.Buffer", __goscriptStatic0()))!) : bytes.Reader.prototype.WriteTo.call($.pointerValue<bytes.Reader>(reader), $.pointerValueOrNil($.interfaceValue<io.Writer | null>(writeDst, "*bytes.Buffer", __goscriptStatic0()))!))
-	let n64 = __goscriptTuple3[0]
+	let n64: bigint = __goscriptTuple3[0]
 	err = __goscriptTuple3[1]
 	await $.println("Reader WriteTo", n64, "bytes:", writeDst.value.String(), "err:", err == null)
 

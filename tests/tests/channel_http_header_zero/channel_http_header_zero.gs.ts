@@ -10,7 +10,7 @@ export async function main(): globalThis.Promise<void> {
 	channel.close()
 	let __goscriptRecv0 = await $.chanRecvWithOk(channel)
 	let header: http.Header = __goscriptRecv0.value
-	let ok = __goscriptRecv0.ok
+	let ok: boolean = __goscriptRecv0.ok
 	await $.println(header == null, ok)
 }
 

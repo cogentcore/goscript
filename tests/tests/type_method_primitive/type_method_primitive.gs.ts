@@ -102,8 +102,8 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("Interface slice append:", sumDoublers(vals))
 
 	let __goscriptTuple0: any = assertDoubler(__goscriptStatic6(), ret)
-	let genericAsserted = (__goscriptTuple0[0] as MyInt)
-	let genericOK = __goscriptTuple0[1]
+	let genericAsserted: MyInt = (__goscriptTuple0[0] as MyInt)
+	let genericOK: boolean = __goscriptTuple0[1]
 	await $.println("Generic interface assertion:", genericAsserted, genericOK)
 
 	let flag = $.varRef(false)
@@ -112,7 +112,7 @@ export async function main(): globalThis.Promise<void> {
 
 	let __goscriptTuple1: any = assertStringer(__goscriptStatic10(), stringer)
 	let genericPointer: $.VarRef<MyBool> | null = (__goscriptTuple1[0] as $.VarRef<MyBool> | null)
-	let genericPointerOK = __goscriptTuple1[1]
+	let genericPointerOK: boolean = __goscriptTuple1[1]
 	await $.println("Generic pointer interface assertion:", MyBool_String(genericPointer), genericPointerOK)
 }
 

@@ -62,7 +62,7 @@ export async function main(): globalThis.Promise<void> {
 	// err is a new variable being declared.
 	let __goscriptTuple0: any = returnsOneIntOneBool()
 	i = __goscriptTuple0[0]
-	let err = __goscriptTuple0[1]
+	let err: boolean = __goscriptTuple0[1]
 
 	await $.println("after assign i:", i)
 	if (err) {
@@ -75,8 +75,8 @@ export async function main(): globalThis.Promise<void> {
 	{
 		let __goscriptShadow0 = value
 		let __goscriptTuple1: any = shadowTupleInput(__goscriptShadow0)
-		let __goscriptShadow1 = __goscriptTuple1[0]
-		let ok = __goscriptTuple1[1]
+		let __goscriptShadow1: string = __goscriptTuple1[0]
+		let ok: boolean = __goscriptTuple1[1]
 		await $.println("shadow tuple:", __goscriptShadow1, ok)
 	}
 
@@ -84,8 +84,8 @@ export async function main(): globalThis.Promise<void> {
 		let __goscriptTuple2: any = shadowCallbackInput($.functionValue((k: number): number => {
 			return k + 1
 		}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo)))
-		let k = __goscriptTuple2[0]
-		let ok = __goscriptTuple2[1]
+		let k: number = __goscriptTuple2[0]
+		let ok: boolean = __goscriptTuple2[1]
 		await $.println("callback shadow:", k, ok)
 	}
 

@@ -72,7 +72,7 @@ export async function main(): globalThis.Promise<void> {
 	// Files read from an embedded file system match.
 	let __goscriptTuple1: any = $.markAsStructValue($.cloneStructValue(files)).ReadFile("blob.bin")
 	let data: $.Slice<number> = __goscriptTuple1[0]
-	let err = __goscriptTuple1[1]
+	let err: $.GoError = __goscriptTuple1[1]
 	await $.println("fs blob:", err == null, $.sliceLen(data), sum(data))
 	let __goscriptTuple2: any = $.markAsStructValue($.cloneStructValue(files)).ReadFile("text.txt")
 	data = __goscriptTuple2[0]

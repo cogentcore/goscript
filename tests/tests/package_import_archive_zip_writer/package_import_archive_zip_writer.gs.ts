@@ -12,7 +12,7 @@ export async function main(): globalThis.Promise<void> {
 	let [w, err] = await (zw !== null && (zw as any).__isVarRef !== true && (zw as any).__goValue === undefined ? ((zw as any) as zip.Writer).Create("hello.txt") : zip.Writer.prototype.Create.call(zw, "hello.txt"))
 	await $.println("create", err == null)
 	let __goscriptTuple0: any = await (w !== null && (w as any).__isVarRef !== true && ((w as any).__goValue === undefined || (w as any).__goType?.charCodeAt(0) !== 42) ? (w as Exclude<io.Writer, null>) : $.pointerValue<Exclude<io.Writer, null>>(w)).Write(new Uint8Array([104, 101, 108, 108, 111]))
-	let n = __goscriptTuple0[0]
+	let n: number = __goscriptTuple0[0]
 	err = __goscriptTuple0[1]
 	await $.println("write", n, err == null)
 	err = await (zw !== null && (zw as any).__isVarRef !== true && (zw as any).__goValue === undefined ? ((zw as any) as zip.Writer).Close() : zip.Writer.prototype.Close.call(zw))
@@ -28,7 +28,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 	await $.println("open", err == null, $.sliceLen((zr$ as zip.Reader).File))
 	let __goscriptTuple2: any = await zip.File.prototype.Open.call($.arrayIndex((zr$ as zip.Reader).File!, 0))
-	let rc = __goscriptTuple2[0]
+	let rc: io.ReadCloser | null = __goscriptTuple2[0]
 	err = __goscriptTuple2[1]
 	await $.println("file open", err == null)
 	let __goscriptTuple3: any = await io.ReadAll($.pointerValueOrNil((rc as io.Reader | null))!)

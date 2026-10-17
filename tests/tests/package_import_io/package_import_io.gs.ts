@@ -258,7 +258,7 @@ export async function main(): globalThis.Promise<void> {
 	await (buf !== null && (buf as any).__isVarRef !== true && (buf as any).__goValue === undefined ? ((buf as any) as asyncBuffer).Reset($.interfaceValue<io.Writer | null>(buf, "*main.asyncBuffer", /* @__PURE__ */ $.pointerType("main.asyncBuffer"))) : asyncBuffer.prototype.Reset.call(buf, $.interfaceValue<io.Writer | null>(buf, "*main.asyncBuffer", /* @__PURE__ */ $.pointerType("main.asyncBuffer"))))
 	await (buf !== null && (buf as any).__isVarRef !== true && (buf as any).__goValue === undefined ? ((buf as any) as asyncBuffer).Reset(null) : asyncBuffer.prototype.Reset.call(buf, null))
 	let __goscriptTuple1: any = await copyInterfaces(io.Discard, $.interfaceValue<io.Reader | null>(new staticReader(), "*main.staticReader", /* @__PURE__ */ $.pointerType("main.staticReader")))
-	let n64 = __goscriptTuple1[0]
+	let n64: bigint = __goscriptTuple1[0]
 	err = __goscriptTuple1[1]
 	await $.println("Copy interface - bytes:", n64, "err:", err == null)
 	let __goscriptTuple2: any = await io.Copy($.pointerValueOrNil(io.Discard)!, $.interfaceValue<io.Reader | null>($.anonymousStructValue({Reader: $.interfaceValue<io.Reader | null>(new staticReader(), "*main.staticReader", /* @__PURE__ */ $.pointerType("main.staticReader"))}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("Reader", "io.Reader", [0], 0, true, { anonymous: true })] }), "struct{io.Reader}", { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("Reader", "io.Reader", [0], 0, true, { anonymous: true })] })!)
@@ -319,8 +319,8 @@ export async function main(): globalThis.Promise<void> {
 	err = (writer !== null && (writer as any).__isVarRef !== true && (writer as any).__goValue === undefined ? ((writer as any) as io.PipeWriter).Close() : io.PipeWriter.prototype.Close.call($.pointerValue<io.PipeWriter>(writer)))
 	await $.println("Pipe close err:", err == null)
 	await $.chanRecv(done)
-	let firstRead = await $.chanRecv(pipeReads)
-	let eofRead = await $.chanRecv(pipeReads)
+	let firstRead: pipeReadResult = await $.chanRecv(pipeReads)
+	let eofRead: pipeReadResult = await $.chanRecv(pipeReads)
 	await $.println("Pipe read - bytes:", firstRead.n, "data:", firstRead.data, "err:", firstRead.errNil)
 	await $.println("Pipe read EOF - bytes:", eofRead.n, "err EOF:", eofRead.errEOF)
 	let __goscriptTuple13: any = await (writer !== null && (writer as any).__isVarRef !== true && (writer as any).__goValue === undefined ? ((writer as any) as io.PipeWriter).Write(new Uint8Array([97, 103, 97, 105, 110])) : io.PipeWriter.prototype.Write.call($.pointerValue<io.PipeWriter>(writer), new Uint8Array([97, 103, 97, 105, 110])))
@@ -343,7 +343,7 @@ export async function main(): globalThis.Promise<void> {
 	let __goscriptTuple15: any = await (writer !== null && (writer as any).__isVarRef !== true && (writer as any).__goValue === undefined ? ((writer as any) as io.PipeWriter).Write(new Uint8Array([108, 97, 116, 101, 114])) : io.PipeWriter.prototype.Write.call($.pointerValue<io.PipeWriter>(writer), new Uint8Array([108, 97, 116, 101, 114])))
 	n = __goscriptTuple15[0]
 	err = __goscriptTuple15[1]
-	let delayed = await $.chanRecv(readResult)
+	let delayed: pipeReadResult = await $.chanRecv(readResult)
 	await $.println("Pipe delayed write - bytes:", n, "err:", err == null)
 	await $.println("Pipe delayed read - bytes:", delayed.n, "data:", delayed.data, "err:", delayed.errNil, "err EOF:", delayed.errEOF)
 	err = (writer !== null && (writer as any).__isVarRef !== true && (writer as any).__goValue === undefined ? ((writer as any) as io.PipeWriter).Close() : io.PipeWriter.prototype.Close.call($.pointerValue<io.PipeWriter>(writer)))

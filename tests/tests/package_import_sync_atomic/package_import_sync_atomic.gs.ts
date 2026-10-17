@@ -104,7 +104,7 @@ export async function main(): globalThis.Promise<void> {
 	let fnPtr: $.VarRef<atomic.Pointer<(() => void) | null>> = $.varRef($.markAsStructValue(new atomic.Pointer<(() => void) | null>()))
 	let __goscriptTuple0: any = makeAtomicCallback()
 	let callback: $.VarRef<(() => void) | null> = $.varRef(__goscriptTuple0[0])
-	let callbackErr = __goscriptTuple0[1]
+	let callbackErr: $.GoError = __goscriptTuple0[1]
 	if (callbackErr != null) {
 		await $.println("Pointer function error:", (__goscriptAwait = (callbackErr !== null && (callbackErr as any).__isVarRef !== true && ((callbackErr as any).__goValue === undefined || (callbackErr as any).__goType?.charCodeAt(0) !== 42) ? (callbackErr as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(callbackErr)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	} else {

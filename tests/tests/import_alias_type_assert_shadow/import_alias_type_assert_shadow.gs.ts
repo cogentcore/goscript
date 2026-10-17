@@ -8,7 +8,7 @@ export function unwrap(v: any): number {
 	{
 		let __goscriptTuple0: any = $.typeAssertTuple<dep2.Thing | $.VarRef<dep2.Thing> | null>(v, /* @__PURE__ */ $.pointerType("dep.Thing"))
 		let __goscriptShadow0: dep2.Thing | $.VarRef<dep2.Thing> | null = __goscriptTuple0[0]
-		let ok = __goscriptTuple0[1]
+		let ok: boolean = __goscriptTuple0[1]
 		if (ok) {
 			return $.pointerValue<dep2.Thing>(__goscriptShadow0).Value
 		}

@@ -70,14 +70,14 @@ export async function main(): globalThis.Promise<void> {
 	let mappedAny: any = $.interfaceValue(mapped, "map[string]int", /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("int")))
 	let __goscriptTuple0: any = $.typeAssertTuple<globalThis.Map<string, number> | null>(mappedAny, /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("int")))
 	let mappedValue: globalThis.Map<string, number> | null = __goscriptTuple0[0]
-	let mappedOK = __goscriptTuple0[1]
+	let mappedOK: boolean = __goscriptTuple0[1]
 	await $.println("map", mappedOK, mappedValue == null)
 
 	let channel: $.Channel<number> | null = null! as $.Channel<number> | null
 	let channelAny: any = $.interfaceValue(channel, "chan int", /* @__PURE__ */ $.channelType(/* @__PURE__ */ $.basicType("int"), "both"))
 	let __goscriptTuple1: any = $.typeAssertTuple<$.Channel<number> | null>(channelAny, /* @__PURE__ */ $.channelType(/* @__PURE__ */ $.basicType("int"), "both"))
 	let channelValue: $.Channel<number> | null = __goscriptTuple1[0]
-	let channelOK = __goscriptTuple1[1]
+	let channelOK: boolean = __goscriptTuple1[1]
 	await $.println("chan", channelOK, channelValue == null)
 
 	let callback: (() => void) | null = null! as (() => void) | null

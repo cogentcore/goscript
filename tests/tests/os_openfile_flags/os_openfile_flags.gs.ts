@@ -9,7 +9,7 @@ import type * as fs from "@goscript/io/fs/index.js"
 export async function write(name: string, flag: number, data: string): globalThis.Promise<void> {
 	let __goscriptTuple0: any = await os.OpenFile(name, flag, 0o644)
 	let f: os.File | $.VarRef<os.File> | null = __goscriptTuple0[0]
-	let err = __goscriptTuple0[1]
+	let err: $.GoError = __goscriptTuple0[1]
 	if (err != null) {
 		await $.println("open error:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		return
@@ -21,7 +21,7 @@ export async function write(name: string, flag: number, data: string): globalThi
 export async function read(name: string): globalThis.Promise<string> {
 	let __goscriptTuple1: any = await os.ReadFile(name)
 	let b: $.Slice<number> = __goscriptTuple1[0]
-	let err = __goscriptTuple1[1]
+	let err: $.GoError = __goscriptTuple1[1]
 	if (err != null) {
 		return "read error: " + (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 	}

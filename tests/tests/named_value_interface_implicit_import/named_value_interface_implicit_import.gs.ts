@@ -40,12 +40,12 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("multi-value return:", (__goscriptAwait = (looked !== null && (looked as any).__isVarRef !== true && ((looked as any).__goValue === undefined || (looked as any).__goType?.charCodeAt(0) !== 42) ? (looked as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(looked)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), ok)
 
 	let __goscriptTuple0: any = __goscript_multi_assign.assignLookup()
-	let multi = __goscriptTuple0[0]
+	let multi: $.GoError = __goscriptTuple0[0]
 	ok = __goscriptTuple0[1]
 	await $.println("multi-value assign:", (__goscriptAwait = (multi !== null && (multi as any).__isVarRef !== true && ((multi as any).__goValue === undefined || (multi as any).__goType?.charCodeAt(0) !== 42) ? (multi as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(multi)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), ok)
 
 	let __goscriptTuple1: any = __goscript_local_lookup.localLookup()
-	let local = __goscriptTuple1[0]
+	let local: $.GoError = __goscriptTuple1[0]
 	ok = __goscriptTuple1[1]
 	await $.println("local multi-value return:", (__goscriptAwait = (local !== null && (local as any).__isVarRef !== true && ((local as any).__goValue === undefined || (local as any).__goType?.charCodeAt(0) !== 42) ? (local as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(local)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), ok)
 }

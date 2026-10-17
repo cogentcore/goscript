@@ -10,7 +10,7 @@ export async function show(v: any): globalThis.Promise<void> {
 	{
 		let __goscriptTuple0: any = $.typeAssertTuple<$.Slice<number>>(v, /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")))
 		let b: $.Slice<number> = __goscriptTuple0[0]
-		let ok = __goscriptTuple0[1]
+		let ok: boolean = __goscriptTuple0[1]
 		if (ok) {
 			await $.println("show:", $.bytesToString(b))
 		}
@@ -26,7 +26,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 	let data = $.makeSlice<number>(3, undefined, "byte")
 	let __goscriptTuple1: any = await (file !== null && (file as any).__isVarRef !== true && ((file as any).__goValue === undefined || (file as any).__goType?.charCodeAt(0) !== 42) ? (file as Exclude<fs.File, null>) : $.pointerValue<Exclude<fs.File, null>>(file)).Read(data)
-	let n = __goscriptTuple1[0]
+	let n: number = __goscriptTuple1[0]
 	err = __goscriptTuple1[1]
 	await $.println(n, err == null, $.bytesToString(data))
 	await show($.interfaceValue(data, "[]byte", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))))

@@ -7,8 +7,8 @@ import * as __goscript_trie from "./trie.gs.ts"
 export async function main(): globalThis.Promise<void> {
 	let tr = $.makeMap<number, string>()
 	let __goscriptTuple0: any = __goscript_trie.trie_insert(tr, __goscriptStatic0(), 1, "a")
-	let old = (__goscriptTuple0[0] as string)
-	let n = __goscriptTuple0[1]
+	let old: string = (__goscriptTuple0[0] as string)
+	let n: number = __goscriptTuple0[1]
 	await $.println($.stringEqual(old, ""), n)
 	let __goscriptTuple1: any = __goscript_trie.trie_insert(tr, __goscriptStatic0(), 1, "b")
 	old = (__goscriptTuple1[0] as string)

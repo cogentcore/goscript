@@ -29,7 +29,7 @@ export async function main(): globalThis.Promise<void> {
 	{
 		let __goscriptTuple0: any = $.typeAssertTuple<filters>(value, /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"), "main.filters"))
 		let c: filters = (__goscriptTuple0[0] as filters)
-		let ok = __goscriptTuple0[1]
+		let ok: boolean = __goscriptTuple0[1]
 		if (ok) {
 			out = ($.goSlice(c, undefined, $.sliceLen((c as filters)), $.sliceLen((c as filters))) as filters)
 		}

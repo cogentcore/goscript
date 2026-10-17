@@ -4,7 +4,7 @@
 import * as $ from "@goscript/builtin/index.js"
 
 export async function receiveFromChan(ch: $.Channel<number> | null): globalThis.Promise<number> {
-	let val = await $.chanRecv(ch)
+	let val: number = await $.chanRecv(ch)
 	return val
 }
 

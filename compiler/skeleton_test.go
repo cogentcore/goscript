@@ -3091,7 +3091,7 @@ func TestCompilePackagesEmitsInterfacesMethodValuesTypeSwitchesAndFunctionAssert
 		"results: [/* @__PURE__ */ $.basicType(\"string\")]",
 		"$.interfaceValue(null, \"*struct{Name string}\",",
 		"$.pointerType({ kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField(\"Name\", /* @__PURE__ */ $.basicType(\"string\"), [0], 0, true)] })",
-		"let fn = __goscriptTuple",
+		"let fn: Greeter | null = __goscriptTuple",
 		"switch ($.typeSwitchCase(__goscriptTypeSwitchValue, __goscriptStatic0()))",
 		"$.typeSwitchSite([\"main.ReadCloser\"])",
 		"let v: ReadCloser | null = $.typeAssert<ReadCloser | null>(__goscriptTypeSwitchValue, \"main.ReadCloser\").value",

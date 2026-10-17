@@ -18,7 +18,7 @@ export async function main(): globalThis.Promise<void> {
 	let __goscriptTuple0: any = await ed25519.GenerateKey($.pointerValueOrNil(rand.Reader)!)
 	let pub: ed25519.PublicKey = (__goscriptTuple0[0] as ed25519.PublicKey)
 	let priv: ed25519.PrivateKey = (__goscriptTuple0[1] as ed25519.PrivateKey)
-	let err = __goscriptTuple0[2]
+	let err: $.GoError = __goscriptTuple0[2]
 	await $.println("generate err nil", err == null)
 	await $.println("pub len", $.sliceLen((pub as ed25519.PublicKey)))
 	await $.println("priv len", $.sliceLen((priv as ed25519.PrivateKey)))

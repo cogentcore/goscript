@@ -266,7 +266,7 @@ export class memoryRpcStream {
 		while (true) {
 			let __goscriptTuple0: any = await (m !== null && (m as any).__isVarRef !== true && (m as any).__goValue === undefined ? ((m as any) as memoryRpcStream).Recv() : memoryRpcStream.prototype.Recv.call(m))
 			let pkt: rpcstream.RpcStreamPacket | $.VarRef<rpcstream.RpcStreamPacket> | null = __goscriptTuple0[0]
-			let err = __goscriptTuple0[1]
+			let err: $.GoError = __goscriptTuple0[1]
 			if (err != null) {
 				return err
 			}
@@ -283,7 +283,7 @@ export class memoryRpcStream {
 		const m: memoryRpcStream | $.VarRef<memoryRpcStream> | null = this;
 		let __goscriptTuple1: any = await (msg !== null && (msg as any).__isVarRef !== true && ((msg as any).__goValue === undefined || (msg as any).__goType?.charCodeAt(0) !== 42) ? (msg as Exclude<protobuf_go_lite.Message, null>) : $.pointerValue<Exclude<protobuf_go_lite.Message, null>>(msg)).MarshalVT()
 		let data: $.Slice<number> = __goscriptTuple1[0]
-		let err = __goscriptTuple1[1]
+		let err: $.GoError = __goscriptTuple1[1]
 		if (err != null) {
 			return err
 		}
@@ -699,7 +699,7 @@ export async function exerciseRpcStreamClientPressure(ctx: context.Context | nul
 	let rootClient = await newRoutedRpcStreamClient(ctx, "component-root", getter, true, results)
 	let __goscriptTuple5: any = await openHeldStreams(ctx, rootClient, 64)
 	let held: $.Slice<srpc.Stream | null> = __goscriptTuple5[0]
-	let ok = __goscriptTuple5[1]
+	let ok: boolean = __goscriptTuple5[1]
 	if (!ok) {
 		return false
 	}
@@ -768,7 +768,7 @@ export async function exerciseRpcStreamHandle(): globalThis.Promise<boolean> {
 
 	let __goscriptTuple7: any = await (client !== null && (client as any).__isVarRef !== true && (client as any).__goValue === undefined ? ((client as any) as memoryRpcStream).Recv() : memoryRpcStream.prototype.Recv.call(client))
 	let ack: rpcstream.RpcStreamPacket | $.VarRef<rpcstream.RpcStreamPacket> | null = __goscriptTuple7[0]
-	let err = __goscriptTuple7[1]
+	let err: $.GoError = __goscriptTuple7[1]
 	if (err != null) {
 		await $.println("rpcstream ack recv error:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		return false
@@ -979,7 +979,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 	await $.println("exec bytes:", $.sliceLen((unaryResp !== null && (unaryResp as any).__isVarRef !== true && (unaryResp as any).__goValue === undefined ? ((unaryResp as any) as srpc.RawMessage).GetData() : srpc.RawMessage.prototype.GetData.call(unaryResp))))
 	let __goscriptTuple10: any = await (client !== null && (client as any).__isVarRef !== true && ((client as any).__goValue === undefined || (client as any).__goType?.charCodeAt(0) !== 42) ? (client as Exclude<srpc.Client, null>) : $.pointerValue<Exclude<srpc.Client, null>>(client)).NewStream(ctx, "svc", "stream", null)
-	let strm = __goscriptTuple10[0]
+	let strm: srpc.Stream | null = __goscriptTuple10[0]
 	err = __goscriptTuple10[1]
 	if (err != null) {
 		await $.println("stream open error:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
@@ -1014,7 +1014,7 @@ export async function main(): globalThis.Promise<void> {
 
 	let __goscriptTuple11: any = await openHeldStreams(ctx, client, 32)
 	let held: $.Slice<srpc.Stream | null> = __goscriptTuple11[0]
-	let ok = __goscriptTuple11[1]
+	let ok: boolean = __goscriptTuple11[1]
 	if (!ok) {
 		return
 	}

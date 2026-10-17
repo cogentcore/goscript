@@ -48,7 +48,7 @@ export async function main(): globalThis.Promise<void> {
 						{
 							let __goscriptTuple0: any = $.typeAssertTuple<ast.Ident | $.VarRef<ast.Ident> | null>($.pointerValue<ast.CallExpr>(n).Fun, /* @__PURE__ */ $.pointerType("ast.Ident"))
 							let ident: ast.Ident | $.VarRef<ast.Ident> | null = __goscriptTuple0[0]
-							let ok = __goscriptTuple0[1]
+							let ok: boolean = __goscriptTuple0[1]
 							if (ok) {
 								results = $.appendOne(results, "CallExpr: " + $.pointerValue<ast.Ident>(ident).Name)
 							}
@@ -77,7 +77,7 @@ export async function main(): globalThis.Promise<void> {
 	// Parse the source code
 	let __goscriptTuple1: any = await parser.ParseFile(fset, "test.go", src, 4)
 	let file: ast.File | $.VarRef<ast.File> | null = __goscriptTuple1[0]
-	let err = __goscriptTuple1[1]
+	let err: $.GoError = __goscriptTuple1[1]
 	let file$: ast.File = file == null ? $.pointerTarget<ast.File>(file) : (file as any).__isVarRef === true ? (file as any).value : (file as any).__goValue === undefined ? (file as any) : $.pointerTarget<ast.File>(file)
 	if (err != null) {
 		results = $.appendOne(results, "Error parsing file: " + (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
@@ -88,7 +88,7 @@ export async function main(): globalThis.Promise<void> {
 			{
 				let __goscriptTuple2: any = $.typeAssertTuple<ast.FuncDecl | $.VarRef<ast.FuncDecl> | null>(decl, /* @__PURE__ */ $.pointerType("ast.FuncDecl"))
 				let fn: ast.FuncDecl | $.VarRef<ast.FuncDecl> | null = __goscriptTuple2[0]
-				let ok = __goscriptTuple2[1]
+				let ok: boolean = __goscriptTuple2[1]
 				if (ok) {
 					results = $.appendOne(results, "Function: " + $.pointerValue<ast.Ident>($.pointerValue<ast.FuncDecl>(fn).Name).Name)
 				}

@@ -55,7 +55,7 @@ export async function main(): globalThis.Promise<void> {
 	fmt.Println($.structEqual(v, new odd(true, 8, "c", "n")))
 	let __goscriptTuple0: any = (json.Marshal($.structInterfaceValue((v).clone(), "main.odd", "main.odd")) as [$.Slice<number>, $.GoError])
 	let data: $.Slice<number> = __goscriptTuple0[0]
-	let err = __goscriptTuple0[1]
+	let err: $.GoError = __goscriptTuple0[1]
 	fmt.Println($.bytesToString(data), err == null)
 }
 

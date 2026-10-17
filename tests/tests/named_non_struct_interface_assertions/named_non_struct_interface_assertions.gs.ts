@@ -157,8 +157,8 @@ export function pointerMap_Add(v: $.VarRef<pointerMap> | null, n: number): numbe
 
 export async function check(value: any): globalThis.Promise<void> {
 	let __goscriptTuple0: any = $.typeAssertTuple<adder | null>(value, "main.adder")
-	let __goscriptShadow0 = __goscriptTuple0[0]
-	let ok = __goscriptTuple0[1]
+	let __goscriptShadow0: adder | null = __goscriptTuple0[0]
+	let ok: boolean = __goscriptTuple0[1]
 	if (!ok) {
 		await $.println(false)
 		return

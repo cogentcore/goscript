@@ -109,7 +109,7 @@ export function __goscript_set_mu(__goscriptValue: sync.Mutex): void {
 export async function main(): globalThis.Promise<void> {
 	let __goscriptTuple0: any = (json.Marshal($.interfaceValue(new Image(false, "top"), "*main.Image", /* @__PURE__ */ $.pointerType("main.Image"))) as [$.Slice<number>, $.GoError])
 	let b: $.Slice<number> = __goscriptTuple0[0]
-	let err = __goscriptTuple0[1]
+	let err: $.GoError = __goscriptTuple0[1]
 	await $.println("top:", $.bytesToString(b), err == null)
 
 	let im = new Image()

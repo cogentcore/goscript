@@ -6381,14 +6381,20 @@ func (o *LoweringOwner) shortDeclTypeAnnotation(ctx lowerFileContext, lhs ast.Ex
 		return ": " + o.tsVariableTypeFor(ctx, obj.Type(), ctx.model.needsVarRef[obj])
 	}
 
-	// A nil-able local takes its Go type, so a later nil assignment
-	// typechecks. One that is never assigned again keeps the type inferred
-	// from its value; an untyped tuple element has none to infer.
+	// A value without its own expression, such as an element of an untyped
+	// tuple or a received value, has no type to infer and always takes its Go
+	// type. Otherwise a nil-able local takes its Go type, so a later nil
+	// assignment typechecks, and one that is never assigned again keeps the
+	// type inferred from its value.
+	typ := ": " + o.tsVariableTypeFor(ctx, obj.Type(), ctx.model.needsVarRef[obj])
+	if rhs == nil {
+		return typ
+	}
 	if !shortDeclNeedsTypeAnnotation(obj.Type()) ||
-		(rhs != nil && !ctx.model.needsVarRef[obj] && !isReassignedLocal(ctx, obj)) {
+		(!ctx.model.needsVarRef[obj] && !isReassignedLocal(ctx, obj)) {
 		return ""
 	}
-	return ": " + o.tsVariableTypeFor(ctx, obj.Type(), ctx.model.needsVarRef[obj])
+	return typ
 }
 
 // callsOverridePackage reports whether expr is a call to a function or method

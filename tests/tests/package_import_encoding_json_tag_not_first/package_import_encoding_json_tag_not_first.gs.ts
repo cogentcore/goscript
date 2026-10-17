@@ -51,7 +51,7 @@ export async function main(): globalThis.Promise<void> {
 	$.pointerValue<Node>(n).Parent = n
 	let __goscriptTuple0: any = (json.Marshal($.interfaceValue(n, "*main.Node", /* @__PURE__ */ $.pointerType("main.Node"))) as [$.Slice<number>, $.GoError])
 	let b: $.Slice<number> = __goscriptTuple0[0]
-	let err = __goscriptTuple0[1]
+	let err: $.GoError = __goscriptTuple0[1]
 	await $.println($.bytesToString(b), err == null)
 
 	let m: $.VarRef<Node> = $.varRef(new Node(true))

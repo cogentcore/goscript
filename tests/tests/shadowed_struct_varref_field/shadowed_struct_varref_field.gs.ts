@@ -68,7 +68,7 @@ export function lookup(addr: string): $.Slice<string> {
 		{
 			let __goscriptTuple0: any = $.mapGet<string, $.Slice<string>, $.Slice<string>>(__goscriptShadow0.byAddr, addr, null)
 			let __goscriptShadow1: $.Slice<string> = __goscriptTuple0[0]
-			let ok = __goscriptTuple0[1]
+			let ok: boolean = __goscriptTuple0[1]
 			if (ok) {
 				return __goscriptShadow1
 			}
@@ -87,7 +87,7 @@ export function lookupNamed(addr: string): $.Slice<string> {
 		{
 			let __goscriptTuple1: any = $.mapGet<string, $.Slice<string>, $.Slice<string>>(__goscriptShadow2.byAddr, addr, null)
 			let __goscriptShadow3: $.Slice<string> = __goscriptTuple1[0]
-			let ok = __goscriptTuple1[1]
+			let ok: boolean = __goscriptTuple1[1]
 			if (ok) {
 				return __goscriptShadow3
 			}
@@ -108,7 +108,7 @@ export function lookupLocal(addr: string): $.Slice<string> {
 	{
 		let __goscriptTuple2: any = $.mapGet<string, $.Slice<string>, $.Slice<string>>(__goscriptShadow4.byAddr, addr, null)
 		let __goscriptShadow5: $.Slice<string> = __goscriptTuple2[0]
-		let ok = __goscriptTuple2[1]
+		let ok: boolean = __goscriptTuple2[1]
 		if (ok) {
 			return __goscriptShadow5
 		}

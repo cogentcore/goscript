@@ -231,8 +231,8 @@ export async function main(): globalThis.Promise<void> {
 	stack.value.Push(__goscriptStatic0(), 10)
 	stack.value.Push(__goscriptStatic0(), 20)
 	let __goscriptTuple0: any = stack.value.Pop(__goscriptStatic0())
-	let value = (__goscriptTuple0[0] as number)
-	let ok = __goscriptTuple0[1]
+	let value: number = (__goscriptTuple0[0] as number)
+	let ok: boolean = __goscriptTuple0[1]
 	await $.println("pop:", value, ok, stack.value.Len(__goscriptStatic0()))
 	let __goscriptTuple1: any = stack.value.Pop(__goscriptStatic0())
 	value = (__goscriptTuple1[0] as number)
@@ -253,8 +253,8 @@ export async function main(): globalThis.Promise<void> {
 	let mapper = (NewMapper(__goscriptStatic4()) as Mapper | $.VarRef<Mapper> | null)
 	void (mapper !== null && (mapper as any).__isVarRef !== true && (mapper as any).__goValue === undefined ? ((mapper as any) as Mapper).Put(__goscriptStatic4(), "answer", 42) : Mapper.prototype.Put.call(mapper, __goscriptStatic4(), "answer", 42))
 	let __goscriptTuple2: any = (mapper !== null && (mapper as any).__isVarRef !== true && (mapper as any).__goValue === undefined ? ((mapper as any) as Mapper).Get(__goscriptStatic4(), "answer") : Mapper.prototype.Get.call(mapper, __goscriptStatic4(), "answer"))
-	let answer = (__goscriptTuple2[0] as number)
-	let found = __goscriptTuple2[1]
+	let answer: number = (__goscriptTuple2[0] as number)
+	let found: boolean = __goscriptTuple2[1]
 	await $.println("mapper:", answer, found)
 
 	await $.println("=== Function instantiation ===")
