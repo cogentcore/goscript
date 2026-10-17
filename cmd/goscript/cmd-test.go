@@ -42,6 +42,7 @@ func newTestCommand() *cli.Command {
 	var incrementalTypeCheck bool
 	var protobufTypeScriptBinding bool
 	var reportAsync reportAsyncFlag
+	var eliminateDeadCode bool
 
 	return &cli.Command{
 		Name:     "test",
@@ -70,6 +71,7 @@ func newTestCommand() *cli.Command {
 				IncrementalTypeCheck:      incrementalTypeCheck,
 				ProtobufTypeScriptBinding: protobufTypeScriptBinding,
 				ReportAsync:               reportAsync.format != "",
+				EliminateDeadCode:         eliminateDeadCode,
 			}
 			stopProfile, err := startCPUProfile(cpuProfile)
 			if err != nil {
@@ -209,6 +211,12 @@ func newTestCommand() *cli.Command {
 				Name:        "memprofile",
 				Usage:       "write a Go heap profile for the goscript test process",
 				Destination: &memProfile,
+			},
+			&cli.BoolFlag{
+				Name:        "eliminate-dead-code",
+				Usage:       "leave the functions and methods that a test binary cannot reach out of its dependencies",
+				Destination: &eliminateDeadCode,
+				EnvVars:     []string{"GOSCRIPT_ELIMINATE_DEAD_CODE"},
 			},
 			newReportAsyncFlag(&reportAsync),
 		},

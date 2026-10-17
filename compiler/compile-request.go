@@ -61,6 +61,9 @@ type CompileRequest struct {
 	// ReportAsync asks for an async report in the result (see AsyncReport).
 	// It does not change the output.
 	ReportAsync bool
+	// EliminateDeadCode leaves unreachable functions and methods of a
+	// program build out of the output.
+	EliminateDeadCode bool
 }
 
 // CompileRequestOwner owns adapter input normalization and validation.
@@ -82,6 +85,12 @@ func (o *CompileRequestOwner) NewRequest(conf Config, patterns []string) *Compil
 	if conf.SkipDependencies {
 		dependencyMode = DependencyModeRequested
 	}
+	// Dead code elimination depends on the whole program, which the cache
+	// of package artifacts does not key on, so it compiles without it.
+	cacheRoot := strings.TrimSpace(conf.CacheRoot)
+	if conf.EliminateDeadCode {
+		cacheRoot = ""
+	}
 	runtimeEmissionMode := RuntimeEmissionModeEmit
 	if conf.DisableEmitBuiltin {
 		runtimeEmissionMode = RuntimeEmissionModeReference
@@ -91,7 +100,7 @@ func (o *CompileRequestOwner) NewRequest(conf Config, patterns []string) *Compil
 		Patterns:                  normalizePatterns(patterns),
 		Dir:                       strings.TrimSpace(dir),
 		OutputPath:                strings.TrimSpace(conf.OutputPath),
-		CacheRoot:                 strings.TrimSpace(conf.CacheRoot),
+		CacheRoot:                 cacheRoot,
 		BuildFlags:                slices.Clone(conf.BuildFlags),
 		OverrideDirs:              slices.Clone(conf.OverrideDirs),
 		PackageBlocklist:          normalizePackageBlocklist(conf.PackageBlocklist),
@@ -102,6 +111,7 @@ func (o *CompileRequestOwner) NewRequest(conf Config, patterns []string) *Compil
 		AdditionalBindingRoots:    slices.Clone(conf.AdditionalBindingRoots),
 		DisableEmitBuiltin:        conf.DisableEmitBuiltin,
 		ReportAsync:               conf.ReportAsync,
+		EliminateDeadCode:         conf.EliminateDeadCode,
 	}
 }
 

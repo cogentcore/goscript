@@ -223,6 +223,15 @@ func (s *CompileService) Compile(ctx context.Context, req *CompileRequest) (*Com
 			break
 		}
 	}
+	// A program built with dead code elimination keeps only reachable code.
+	// Protobuf bindings call methods from TypeScript that the analysis does
+	// not see.
+	if req.EliminateDeadCode && !req.ProtobufTypeScriptBinding && wholeProgramBuild(req, graph) {
+		roots := overrideDeadCodeRoots(overrideFacts, graph)
+		roots.functions = req.DeferredFunctions
+		roots.addTestPackages(req, graph)
+		semanticModel.liveCode = collectLiveCode(semanticModel, roots)
+	}
 	loweredProgram, loweringDiagnostics := s.loweringOwner.Build(ctx, semanticModel, LoweringOptions{
 		SourceRoot:                protobufTypeScriptBindingRoot(req.Dir),
 		DisplayRoot:               req.Dir,

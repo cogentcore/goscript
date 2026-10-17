@@ -83,6 +83,10 @@ type SemanticModel struct {
 	// callSiteFunctions holds the functions and methods that
 	// //goscript:callsite marks (see lowering-call-sites.go).
 	callSiteFunctions map[*types.Func]bool
+	// liveCode holds the reachable functions and methods of a program built
+	// with dead code elimination, or nil when every function is kept (see
+	// semantic-dead-code.go).
+	liveCode *liveCode
 	// asyncReport holds the async report the build was asked for, or nil.
 	asyncReport *AsyncReport
 }

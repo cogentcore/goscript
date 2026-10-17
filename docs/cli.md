@@ -24,6 +24,7 @@ goscript compile --package ./my-go-package --output ./output
 | `--protobuf-ts-binding` | Bind `.pb.go` files to sibling `.pb.ts` files instead of compiling them to `.pb.gs.ts`. |
 | `--binding-root <dir>` | Extra root that holds protobuf TypeScript bindings. Repeatable. |
 | `--deferred-function <package/path.Function>` | Load an exported, non-generic function on its first call. Repeatable. |
+| `--eliminate-dead-code` | Leave out the functions and methods that the program cannot reach, as the Go linker does (also `GOSCRIPT_ELIMINATE_DEAD_CODE=1`). Applies to builds of main packages and disables the compiler cache. |
 | `-report-async`, `-report-async=json` | Write to stderr where the async functions come from (see [async coloring](explainer.md#async-coloring)). The output does not change. |
 
 ### Deferred functions
@@ -70,4 +71,5 @@ at the version goscript pins and installs it with `bun install`.
 | `--incremental-typecheck` | Reuse TypeScript build-info files in the workdir. |
 | `--protobuf-ts-binding` | Bind `.pb.go` files to sibling `.pb.ts` files. |
 | `--cpuprofile <file>`, `--memprofile <file>` | Write Go CPU or heap profiles of the `goscript test` process. |
+| `--eliminate-dead-code` | Leave out the code of the dependencies that a test binary cannot reach; the packages under test keep all of theirs. |
 | `-report-async`, `-report-async=json` | Write to stderr where the async functions of each compiled test binary come from. |
