@@ -1,3 +1,10 @@
 10
 11
 12
+slice: 0 a
+slice: 2 c
+slice: 3 d
+int: 16
+array: 100 5
+array: 101 6
+array: 102 7
