@@ -3343,6 +3343,17 @@ export function bytesFromBase64(data: string): Uint8Array {
   return bytes
 }
 
+// textBytesEncoder encodes the text of byte data compiled into the program.
+let textBytesEncoder: TextEncoder | undefined
+
+// bytesFromText returns the UTF-8 bytes of the text of byte data compiled into
+// the program, such as embedded text files, which is smaller than base64 and
+// compresses much better.
+export function bytesFromText(text: string): Uint8Array {
+  textBytesEncoder ??= new TextEncoder()
+  return textBytesEncoder.encode(text)
+}
+
 /**
  * bytesToString encodes byte values as a Go string without losing invalid UTF-8.
  */
