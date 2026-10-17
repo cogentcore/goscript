@@ -1,0 +1,4 @@
+no signal
+ignored: false
+before stop: true
+after stop: true

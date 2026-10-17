@@ -273,6 +273,8 @@ import "embed"
 //go:embed gs/os/root_js.gs.ts
 //go:embed gs/os/root_nonwindows.gs.ts
 //go:embed gs/os/root_noopenat.gs.ts
+//go:embed gs/os/signal/index.ts
+//go:embed gs/os/signal/meta.json
 //go:embed gs/os/stat.gs.ts
 //go:embed gs/os/stat_js.gs.ts
 //go:embed gs/os/stat_unix_js.gs.ts
