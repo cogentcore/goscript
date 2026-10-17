@@ -675,7 +675,12 @@ export function int(value: number | bigint | string, bits = 0): number {
 // intFromWide converts an int64 or uint64 to a signed integer of fewer bits,
 // as int32(x) does.
 export function intFromWide(value: number | bigint, bits: number): number {
-  // A bigint keeps its low bits, and a number converts as int does.
+  // A bigint keeps the bits of its low word, read through the words of
+  // wideValue, and a number converts as int does.
+  if (typeof value === 'bigint' && bits <= 32) {
+    wideValue[0] = value
+    return (wideWords[0] << (32 - bits)) >> (32 - bits)
+  }
   return typeof value === 'bigint' ?
       Number(BigInt.asIntN(bits, value))
     : int(value, bits)
@@ -684,10 +689,32 @@ export function intFromWide(value: number | bigint, bits: number): number {
 // uintFromWide converts an int64 or uint64 to an unsigned integer of fewer
 // bits, as uint32(x) does.
 export function uintFromWide(value: number | bigint, bits: number): number {
-  // A bigint keeps its low bits, and a number converts as uint does.
+  // A bigint keeps the bits of its low word, read through the words of
+  // wideValue, and a number converts as uint does.
+  if (typeof value === 'bigint' && bits <= 32) {
+    wideValue[0] = value
+    return (wideWords[0] << (32 - bits)) >>> (32 - bits)
+  }
   return typeof value === 'bigint' ?
       Number(BigInt.asUintN(bits, value))
     : uint(value, bits)
+}
+
+// wideValue holds a 64-bit value whose two 32-bit words, low word first on
+// the little-endian hosts that run GoScript, are wideWords. Conversions
+// between bigints and numbers through them avoid the BigInt and Number calls,
+// which V8 does not compile to machine operations.
+const wideValue = new BigInt64Array(1)
+const wideWords = new Int32Array(wideValue.buffer)
+
+// wideFromSafeInteger returns a safe integer as a bigint, through its words.
+function wideFromSafeInteger(value: number): bigint {
+  // The high word is the floor of the value over 2^32, and the low word the
+  // rest, which the Int32Array wraps to its 32 bits.
+  const high = Math.floor(value / 4294967296)
+  wideWords[1] = high
+  wideWords[0] = value - high * 4294967296
+  return wideValue[0]
 }
 
 // uint converts a value to an unsigned Go integer width.
@@ -817,6 +844,10 @@ export function genericConvert<T>(
 // bigint with two's-complement wraparound. int64 and uint64 are the Go types
 // GoScript represents as TypeScript bigint; narrower ints stay number.
 export function int64(value: number | bigint | string): bigint {
+  // A number whose integer part is safe converts through its words.
+  if (typeof value === 'number' && isSafeNumber(value)) {
+    return wideFromSafeInteger(Math.trunc(value))
+  }
   if (typeof value === 'string') {
     value = BigInt(value)
   }
@@ -826,10 +857,21 @@ export function int64(value: number | bigint | string): bigint {
 // uint64 converts a value to a Go uint64, preserving the full 64-bit range as a
 // bigint with modular wraparound.
 export function uint64(value: number | bigint | string): bigint {
+  // A non-negative number whose integer part is safe converts through its
+  // words.
+  if (typeof value === 'number' && value > -1 && isSafeNumber(value)) {
+    return wideFromSafeInteger(Math.trunc(value))
+  }
   if (typeof value === 'string') {
     value = BigInt(value)
   }
   return uint64Result(uint64Value(value))
+}
+
+// isSafeNumber reports whether the integer part of a number converts to a
+// bigint exactly, which is false for NaN.
+function isSafeNumber(value: number): boolean {
+  return value > -9007199254740992 && value < 9007199254740992
 }
 
 // wideShiftAmount converts a Go shift count into the JavaScript bigint domain.
@@ -846,6 +888,12 @@ function wideShiftAmount(shift: number | bigint): bigint {
   ) {
     return wideShiftAmounts[shift]
   }
+
+  // A larger count shifts every bit out as 64 does, without making the
+  // bigint of a huge shift left.
+  if (shift > 64) {
+    return wideShiftAmounts[64]
+  }
   return BigInt(Math.trunc(Number(shift)))
 }
 
@@ -853,10 +901,30 @@ function wideShiftAmount(shift: number | bigint): bigint {
 // of a 64-bit value allocates no bigint for its count.
 const wideShiftAmounts = Array.from({ length: 65 }, (_, idx) => BigInt(idx))
 
+// wideShiftCount returns a shift count below 64 as a bigint, or undefined
+// for other counts.
+function wideShiftCount(shift: number | bigint): bigint | undefined {
+  // A bigint count is its own bigint, and a number count indexes the table,
+  // which has no entry for negative or fractional counts.
+  if (typeof shift === 'bigint') {
+    return shift >= 0n && shift < 64n ? shift : undefined
+  }
+  return shift < 64 ? wideShiftAmounts[shift] : undefined
+}
+
 export function uint64Shl(
   value: number | bigint,
   shift: number | bigint,
 ): bigint {
+  // A bigint shifted by a count below 64 keeps 64 bits of the bigint shift.
+  if (typeof value === 'bigint') {
+    const amount = wideShiftCount(shift)
+    if (amount !== undefined) {
+      return BigInt.asUintN(64, value << amount)
+    }
+  }
+
+  // Other operands are converted to their 64 bits first.
   return uint64Result(uint64Value(value) << wideShiftAmount(shift))
 }
 
@@ -864,6 +932,15 @@ export function uint64Shr(
   value: number | bigint,
   shift: number | bigint,
 ): bigint {
+  // A bigint shifted by a count below 64 shifts its 64 bits.
+  if (typeof value === 'bigint') {
+    const amount = wideShiftCount(shift)
+    if (amount !== undefined) {
+      return BigInt.asUintN(64, value) >> amount
+    }
+  }
+
+  // Other operands are converted to their 64 bits first.
   return uint64Value(value) >> wideShiftAmount(shift)
 }
 
@@ -871,6 +948,15 @@ export function int64Shl(
   value: number | bigint,
   shift: number | bigint,
 ): bigint {
+  // A bigint shifted by a count below 64 keeps 64 bits of the bigint shift.
+  if (typeof value === 'bigint') {
+    const amount = wideShiftCount(shift)
+    if (amount !== undefined) {
+      return BigInt.asIntN(64, value << amount)
+    }
+  }
+
+  // Other operands are converted to their 64 bits first.
   return int64Result(int64Value(value) << wideShiftAmount(shift))
 }
 
@@ -878,6 +964,15 @@ export function int64Shr(
   value: number | bigint,
   shift: number | bigint,
 ): bigint {
+  // A bigint shifted by a count below 64 shifts its 64 bits.
+  if (typeof value === 'bigint') {
+    const amount = wideShiftCount(shift)
+    if (amount !== undefined) {
+      return BigInt.asIntN(64, value) >> amount
+    }
+  }
+
+  // Other operands are converted to their 64 bits first.
   return int64Result(int64Value(value) >> wideShiftAmount(shift))
 }
 
@@ -932,6 +1027,13 @@ export function uint64Mul(
   left: number | bigint,
   right: number | bigint,
 ): bigint {
+  // Two bigints keep 64 bits of the bigint result, which V8 compiles to a
+  // 64-bit machine operation.
+  if (typeof left === 'bigint' && typeof right === 'bigint') {
+    return BigInt.asUintN(64, left * right)
+  }
+
+  // Other operands are converted to their 64 bits first.
   return uint64Result(uint64Value(left) * uint64Value(right))
 }
 
@@ -939,6 +1041,13 @@ export function int64Mul(
   left: number | bigint,
   right: number | bigint,
 ): bigint {
+  // Two bigints keep 64 bits of the bigint result, which V8 compiles to a
+  // 64-bit machine operation.
+  if (typeof left === 'bigint' && typeof right === 'bigint') {
+    return BigInt.asIntN(64, left * right)
+  }
+
+  // Other operands are converted to their 64 bits first.
   return int64Result(int64Value(left) * int64Value(right))
 }
 
@@ -946,6 +1055,16 @@ export function uint64Div(
   left: number | bigint,
   right: number | bigint,
 ): bigint {
+  // Two bigints divide as their 64 bits, which V8 compiles to a 64-bit
+  // machine operation.
+  if (typeof left === 'bigint' && typeof right === 'bigint') {
+    const divisor = BigInt.asUintN(64, right)
+    if (divisor !== 0n) {
+      return BigInt.asUintN(64, BigInt.asUintN(64, left) / divisor)
+    }
+  }
+
+  // Other operands are converted to their 64 bits first.
   const divisor = uint64Value(right)
   if (divisor === 0n) {
     runtimePanic('runtime error: integer divide by zero')
@@ -957,6 +1076,16 @@ export function int64Div(
   left: number | bigint,
   right: number | bigint,
 ): bigint {
+  // Two bigints divide as their 64 bits, which V8 compiles to a 64-bit
+  // machine operation.
+  if (typeof left === 'bigint' && typeof right === 'bigint') {
+    const divisor = BigInt.asIntN(64, right)
+    if (divisor !== 0n) {
+      return BigInt.asIntN(64, BigInt.asIntN(64, left) / divisor)
+    }
+  }
+
+  // Other operands are converted to their 64 bits first.
   const divisor = int64Value(right)
   if (divisor === 0n) {
     runtimePanic('runtime error: integer divide by zero')
@@ -968,6 +1097,16 @@ export function uint64Mod(
   left: number | bigint,
   right: number | bigint,
 ): bigint {
+  // Two bigints divide as their 64 bits, which V8 compiles to a 64-bit
+  // machine operation.
+  if (typeof left === 'bigint' && typeof right === 'bigint') {
+    const divisor = BigInt.asUintN(64, right)
+    if (divisor !== 0n) {
+      return BigInt.asUintN(64, BigInt.asUintN(64, left) % divisor)
+    }
+  }
+
+  // Other operands are converted to their 64 bits first.
   const divisor = uint64Value(right)
   if (divisor === 0n) {
     runtimePanic('runtime error: integer divide by zero')
@@ -979,6 +1118,16 @@ export function int64Mod(
   left: number | bigint,
   right: number | bigint,
 ): bigint {
+  // Two bigints divide as their 64 bits, which V8 compiles to a 64-bit
+  // machine operation.
+  if (typeof left === 'bigint' && typeof right === 'bigint') {
+    const divisor = BigInt.asIntN(64, right)
+    if (divisor !== 0n) {
+      return BigInt.asIntN(64, BigInt.asIntN(64, left) % divisor)
+    }
+  }
+
+  // Other operands are converted to their 64 bits first.
   const divisor = int64Value(right)
   if (divisor === 0n) {
     runtimePanic('runtime error: integer divide by zero')
@@ -990,6 +1139,13 @@ export function uint64Add(
   left: number | bigint,
   right: number | bigint,
 ): bigint {
+  // Two bigints keep 64 bits of the bigint result, which V8 compiles to a
+  // 64-bit machine operation.
+  if (typeof left === 'bigint' && typeof right === 'bigint') {
+    return BigInt.asUintN(64, left + right)
+  }
+
+  // Other operands are converted to their 64 bits first.
   return uint64Result(uint64Value(left) + uint64Value(right))
 }
 
@@ -997,6 +1153,13 @@ export function int64Add(
   left: number | bigint,
   right: number | bigint,
 ): bigint {
+  // Two bigints keep 64 bits of the bigint result, which V8 compiles to a
+  // 64-bit machine operation.
+  if (typeof left === 'bigint' && typeof right === 'bigint') {
+    return BigInt.asIntN(64, left + right)
+  }
+
+  // Other operands are converted to their 64 bits first.
   return int64Result(int64Value(left) + int64Value(right))
 }
 
@@ -1004,6 +1167,13 @@ export function uint64Sub(
   left: number | bigint,
   right: number | bigint,
 ): bigint {
+  // Two bigints keep 64 bits of the bigint result, which V8 compiles to a
+  // 64-bit machine operation.
+  if (typeof left === 'bigint' && typeof right === 'bigint') {
+    return BigInt.asUintN(64, left - right)
+  }
+
+  // Other operands are converted to their 64 bits first.
   return uint64Result(uint64Value(left) - uint64Value(right))
 }
 
@@ -1011,6 +1181,13 @@ export function int64Sub(
   left: number | bigint,
   right: number | bigint,
 ): bigint {
+  // Two bigints keep 64 bits of the bigint result, which V8 compiles to a
+  // 64-bit machine operation.
+  if (typeof left === 'bigint' && typeof right === 'bigint') {
+    return BigInt.asIntN(64, left - right)
+  }
+
+  // Other operands are converted to their 64 bits first.
   return int64Result(int64Value(left) - int64Value(right))
 }
 

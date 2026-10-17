@@ -1,21 +1,33 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  int64,
+  int64Add,
   int64And,
   int64AndNot,
+  int64Div,
+  int64Mod,
+  int64Mul,
   int64Or,
   int64Shl,
   int64Shr,
+  int64Sub,
   int64Xor,
+  intFromWide,
   uint,
   uint64,
   uint64Add,
   uint64And,
   uint64AndNot,
+  uint64Div,
+  uint64Mod,
+  uint64Mul,
   uint64Or,
   uint64Shl,
   uint64Shr,
+  uint64Sub,
   uint64Xor,
+  uintFromWide,
 } from './builtin.js'
 import type { StringHeaderData } from './slice.js'
 
@@ -138,5 +150,94 @@ describe('64-bit bitwise operations', () => {
     expect(uint(0xffffffffn, 32)).toBe(0xffffffff)
     expect(uint(-1n, 32)).toBe(0xffffffff)
     expect(uint(0x100000001n, 32)).toBe(1)
+  })
+})
+
+describe('64-bit arithmetic', () => {
+  const big = 2n ** 64n
+  const values = [
+    0n,
+    1n,
+    -1n,
+    7n,
+    -3n,
+    -0x8000000000000000n,
+    0x7fffffffffffffffn,
+  ]
+
+  it('matches the operations of the 64-bit values of their operands', () => {
+    // Out-of-range bigints act as their 64 bits.
+    for (const a of values) {
+      for (const b of values) {
+        const sa = BigInt.asIntN(64, a)
+        const ua = BigInt.asUintN(64, a)
+        expect(int64Add(a + big, b)).toBe(BigInt.asIntN(64, a + b))
+        expect(int64Sub(a, b - big)).toBe(BigInt.asIntN(64, a - b))
+        expect(int64Mul(a, b + big)).toBe(BigInt.asIntN(64, a * b))
+        expect(uint64Add(a, b)).toBe(BigInt.asUintN(64, a + b))
+        expect(uint64Sub(a - big, b)).toBe(BigInt.asUintN(64, a - b))
+        expect(uint64Mul(a, b)).toBe(BigInt.asUintN(64, a * b))
+        if (b === 0n) {
+          continue
+        }
+        const sb = BigInt.asIntN(64, b)
+        const ub = BigInt.asUintN(64, b)
+        expect(int64Div(ua, b + big)).toBe(BigInt.asIntN(64, sa / sb))
+        expect(int64Mod(ua, b)).toBe(sa % sb)
+        expect(uint64Div(a, b - big)).toBe(ua / ub)
+        expect(uint64Mod(a, b)).toBe(ua % ub)
+      }
+    }
+    expect(int64Add(6, 3n)).toBe(9n)
+    expect(uint64Mul(4, 5)).toBe(20n)
+  })
+
+  it('panics when dividing by zero', () => {
+    // A divisor whose 64 bits are zero divides by zero.
+    expect(() => int64Div(5n, 0n)).toThrow('integer divide by zero')
+    expect(() => int64Mod(5n, big)).toThrow('integer divide by zero')
+    expect(() => uint64Div(5n, 0n)).toThrow('integer divide by zero')
+    expect(() => uint64Mod(5n, -big)).toThrow('integer divide by zero')
+  })
+
+  it('shifts the 64 bits of out-of-range operands', () => {
+    // Right shifts see the 64 bits, and huge counts shift every bit out.
+    expect(int64Shr(0xffffffffffffffffn, 4n)).toBe(-1n)
+    expect(uint64Shr(-1n, 60n)).toBe(15n)
+    expect(uint64Shr(-1n, 60)).toBe(15n)
+    expect(int64Shl(1n, 2n ** 40n)).toBe(0n)
+    expect(uint64Shl(1n, 64n)).toBe(0n)
+    expect(int64Shr(-5n, 1000n)).toBe(-1n)
+  })
+})
+
+describe('64-bit conversions', () => {
+  it('convert numbers to their 64 bits', () => {
+    // Numbers truncate toward zero, and unsafe numbers wrap.
+    expect(int64(-1)).toBe(-1n)
+    expect(int64(-0)).toBe(0n)
+    expect(int64(2.75)).toBe(2n)
+    expect(int64(-2.75)).toBe(-2n)
+    expect(int64(-4294967296)).toBe(-4294967296n)
+    expect(int64(9007199254740991)).toBe(9007199254740991n)
+    expect(int64(-9007199254740991)).toBe(-9007199254740991n)
+    expect(int64(2 ** 63)).toBe(-0x8000000000000000n)
+    expect(uint64(-0.5)).toBe(0n)
+    expect(uint64(4294967295.5)).toBe(4294967295n)
+    expect(uint64(-1)).toBe(0xffffffffffffffffn)
+  })
+
+  it('narrow bigints to their low bits', () => {
+    // A narrow conversion keeps the low bits of the 64 bits.
+    const v = 0x123456789abcdef0n
+    expect(intFromWide(v, 32)).toBe(-1698898192)
+    expect(uintFromWide(v, 32)).toBe(0x9abcdef0)
+    expect(intFromWide(v, 16)).toBe(-8464)
+    expect(uintFromWide(v, 16)).toBe(0xdef0)
+    expect(intFromWide(v, 8)).toBe(-16)
+    expect(uintFromWide(v, 8)).toBe(0xf0)
+    expect(uintFromWide(-1n, 32)).toBe(0xffffffff)
+    expect(intFromWide(2n ** 64n + 5n, 32)).toBe(5)
+    expect(uintFromWide(-7, 32)).toBe(0xfffffff9)
   })
 })
