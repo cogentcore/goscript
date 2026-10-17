@@ -18,6 +18,10 @@ type loweredPackage struct {
 	// initModule is whether the package has a package init module
 	// (see [lowerPackageInit]).
 	initModule bool
+	// moduleIndex is whether the index stays a module when it has nothing
+	// to export, as when dead code elimination leaves out every
+	// declaration of a package that other packages still import.
+	moduleIndex bool
 }
 
 type loweredFile struct {
@@ -160,6 +164,9 @@ type loweredStructField struct {
 }
 
 type loweredFunction struct {
+	// metadataOnly marks an unreachable method of a struct, of which the
+	// class keeps only the runtime method metadata.
+	metadataOnly            bool
 	exported                bool
 	indexExported           bool
 	prototypeDeclaration    bool

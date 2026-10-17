@@ -815,6 +815,9 @@ func renderStructBody(b *strings.Builder, structType *loweredStruct, runtimeOwne
 	// The assign method and the methods follow the clone method.
 	renderStructAssign(b, structType, runtimeOwner)
 	for _, method := range structType.methods {
+		if method.metadataOnly {
+			continue
+		}
 		b.WriteString("\n")
 		renderMethod(b, &method)
 	}
@@ -1820,6 +1823,9 @@ func renderIndex(pkg *loweredPackage) string {
 		lines = append(lines,
 			"import { __goscript_package_init } from \"./"+packageInitModule+"\"",
 			"await __goscript_package_init()")
+	}
+	if len(lines) == 0 && pkg.moduleIndex {
+		return "export {}\n"
 	}
 	if len(lines) == 0 {
 		return ""

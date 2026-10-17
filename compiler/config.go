@@ -37,6 +37,10 @@ type Config struct {
 	// ReportAsync asks for an async report in the compilation result (see
 	// AsyncReport). It does not change the output.
 	ReportAsync bool
+	// EliminateDeadCode leaves the functions and methods that a program
+	// build cannot reach out of the output (see semantic-dead-code.go). It
+	// applies only to builds of main packages, and disables the cache.
+	EliminateDeadCode bool
 }
 
 // Validate checks the config and initializes owned defaults.

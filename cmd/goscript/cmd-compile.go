@@ -122,6 +122,12 @@ func newCompileCommand() *cli.Command {
 				Destination: &bindingRoots,
 				EnvVars:     []string{"GOSCRIPT_BINDING_ROOT"},
 			},
+			&cli.BoolFlag{
+				Name:        "eliminate-dead-code",
+				Usage:       "leave the functions and methods that a program cannot reach out of the output",
+				Destination: &config.EliminateDeadCode,
+				EnvVars:     []string{"GOSCRIPT_ELIMINATE_DEAD_CODE"},
+			},
 			newReportAsyncFlag(&reportAsync),
 		},
 	}

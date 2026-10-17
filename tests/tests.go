@@ -171,7 +171,18 @@ func CompileGoToTypeScript(t *testing.T, parentModulePath, testDir, tempDir, out
 		t.Fatalf("failed to check for protobuf-ts-binding marker in %s: %v", testDir, err)
 	}
 
+	// A fixture with an eliminate-dead-code marker builds with dead code
+	// elimination; GOSCRIPT_TEST_ELIMINATE_DEAD_CODE builds every fixture
+	// with it, which checks that it changes no output.
+	eliminateDeadCode := os.Getenv("GOSCRIPT_TEST_ELIMINATE_DEAD_CODE") != ""
+	if _, err := os.Stat(filepath.Join(testDir, "eliminate-dead-code")); err == nil {
+		eliminateDeadCode = true
+	} else if !os.IsNotExist(err) {
+		t.Fatalf("failed to check for eliminate-dead-code marker in %s: %v", testDir, err)
+	}
+
 	conf := &compiler.Config{
+		EliminateDeadCode:         eliminateDeadCode,
 		Dir:                       testDir,
 		OutputPath:                outputDir,
 		SkipDependencies:          skipDependencies,

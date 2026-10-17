@@ -60,6 +60,9 @@ type Request struct {
 	// ReportAsync asks for the async report of each compiled test binary in
 	// the result (see compiler.AsyncReport).
 	ReportAsync bool
+	// EliminateDeadCode compiles each test binary with dead code
+	// elimination, keeping all of the code of the packages under test.
+	EliminateDeadCode bool
 }
 
 // normalizedRequest contains validated, absolute paths and normalized test options.
@@ -86,6 +89,7 @@ type normalizedRequest struct {
 	RuntimeGroups             bool
 	IncrementalTypeCheck      bool
 	ReportAsync               bool
+	EliminateDeadCode         bool
 }
 
 // RuntimeBackend selects the JavaScript host used for package runtime tests.
@@ -215,6 +219,7 @@ func (r *Request) normalize() (*normalizedRequest, error) {
 		RuntimeGroups:             r.RuntimeGroups,
 		IncrementalTypeCheck:      r.IncrementalTypeCheck,
 		ReportAsync:               r.ReportAsync,
+		EliminateDeadCode:         r.EliminateDeadCode,
 	}, nil
 }
 
