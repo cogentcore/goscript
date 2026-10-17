@@ -801,13 +801,18 @@ func protobufTypeScriptBindingProtoCamel(name string) string {
 }
 
 // protobufTypeScriptBindingMessageType resolves message identity from Go types,
-// independently of the emitted reflection descriptor representation.
+// independently of the emitted reflection descriptor representation. It names
+// the message by its Go package name, as the binding spells the constructor,
+// not by the runtime package name, which is hashed when packages share a name.
 func protobufTypeScriptBindingMessageType(typ types.Type) string {
 	seen := make(map[types.Type]bool)
 	for typ != nil && !seen[typ] {
 		seen[typ] = true
 		if named := namedStructType(typ); named != nil {
-			return runtimeNamedTypeName(named)
+			if named.Obj().Pkg() == nil {
+				return named.Obj().Name()
+			}
+			return named.Obj().Pkg().Name() + "." + named.Obj().Name()
 		}
 		switch typed := types.Unalias(typ).Underlying().(type) {
 		case *types.Pointer:
