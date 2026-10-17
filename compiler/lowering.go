@@ -6220,6 +6220,15 @@ func lowerCompoundAssignValue(
 		}
 		return value
 	}
+
+	// The JavaScript bitwise operators return int32s, which a uint32 target
+	// converts back to its unsigned value.
+	wrapUint32 := func(value string) string {
+		if bits, ok := unsignedIntegerBits(targetType); ok && bits == 32 {
+			return "(" + value + ") >>> 0"
+		}
+		return value
+	}
 	switch tok {
 	case token.ADD_ASSIGN:
 		value := left + " + " + right
@@ -6248,11 +6257,11 @@ func lowerCompoundAssignValue(
 	case token.REM_ASSIGN:
 		return left + " % " + right
 	case token.AND_ASSIGN:
-		return left + " & " + right
+		return wrapUint32(left + " & " + right)
 	case token.OR_ASSIGN:
-		return left + " | " + right
+		return wrapUint32(left + " | " + right)
 	case token.XOR_ASSIGN:
-		return left + " ^ " + right
+		return wrapUint32(left + " ^ " + right)
 	case token.SHL_ASSIGN:
 		return wrapNarrow(left + " << " + right)
 	case token.SHR_ASSIGN:
@@ -6261,7 +6270,7 @@ func lowerCompoundAssignValue(
 		}
 		return left + " >> " + right
 	case token.AND_NOT_ASSIGN:
-		return left + " & ~(" + right + ")"
+		return wrapUint32(left + " & ~(" + right + ")")
 	default:
 		return right
 	}
