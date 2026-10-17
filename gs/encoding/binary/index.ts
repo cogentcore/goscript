@@ -101,11 +101,7 @@ class littleEndian implements ByteOrder, AppendByteOrder {
 
   public Uint64(b: $.Slice<number>): bigint {
     requireLen(b, 8)
-    let value = 0n
-    for (let i = 0; i < 8; i++) {
-      value |= BigInt(byteAt(b, i)) << BigInt(8 * i)
-    }
-    return uint64Result(value)
+    return uint64FromWords(littleWord(b, 0), littleWord(b, 4))
   }
 
   public PutUint16(b: $.Slice<number>, v: number): void {
@@ -125,10 +121,9 @@ class littleEndian implements ByteOrder, AppendByteOrder {
 
   public PutUint64(b: $.Slice<number>, v: number | bigint): void {
     requireLen(b, 8)
-    const value = toUint64(v)
-    for (let i = 0; i < 8; i++) {
-      setByte(b, i, Number((value >> BigInt(8 * i)) & 0xffn))
-    }
+    wideValue[0] = toUint64(v)
+    putLittleWord(b, 0, wideWords[0])
+    putLittleWord(b, 4, wideWords[1])
   }
 
   public AppendUint16(b: $.Slice<number>, v: number): $.Slice<number> {
@@ -147,12 +142,8 @@ class littleEndian implements ByteOrder, AppendByteOrder {
   }
 
   public AppendUint64(b: $.Slice<number>, v: number | bigint): $.Slice<number> {
-    let out = b
-    const value = toUint64(v)
-    for (let i = 0; i < 8; i++) {
-      out = $.append(out, Number((value >> BigInt(8 * i)) & 0xffn))
-    }
-    return out
+    wideValue[0] = toUint64(v)
+    return $.append(b, ...wordBytes(wideWords[0]), ...wordBytes(wideWords[1]))
   }
 
   public String(): string {
@@ -191,11 +182,7 @@ class bigEndian implements ByteOrder, AppendByteOrder {
 
   public Uint64(b: $.Slice<number>): bigint {
     requireLen(b, 8)
-    let value = 0n
-    for (let i = 0; i < 8; i++) {
-      value = (value << 8n) | BigInt(byteAt(b, i))
-    }
-    return uint64Result(value)
+    return uint64FromWords(bigWord(b, 4), bigWord(b, 0))
   }
 
   public PutUint16(b: $.Slice<number>, v: number): void {
@@ -215,10 +202,9 @@ class bigEndian implements ByteOrder, AppendByteOrder {
 
   public PutUint64(b: $.Slice<number>, v: number | bigint): void {
     requireLen(b, 8)
-    const value = toUint64(v)
-    for (let i = 0; i < 8; i++) {
-      setByte(b, i, Number((value >> BigInt(56 - 8 * i)) & 0xffn))
-    }
+    wideValue[0] = toUint64(v)
+    putBigWord(b, 0, wideWords[1])
+    putBigWord(b, 4, wideWords[0])
   }
 
   public AppendUint16(b: $.Slice<number>, v: number): $.Slice<number> {
@@ -237,12 +223,12 @@ class bigEndian implements ByteOrder, AppendByteOrder {
   }
 
   public AppendUint64(b: $.Slice<number>, v: number | bigint): $.Slice<number> {
-    let out = b
-    const value = toUint64(v)
-    for (let i = 0; i < 8; i++) {
-      out = $.append(out, Number((value >> BigInt(56 - 8 * i)) & 0xffn))
-    }
-    return out
+    wideValue[0] = toUint64(v)
+    return $.append(
+      b,
+      ...wordBytes(wideWords[1]).reverse(),
+      ...wordBytes(wideWords[0]).reverse(),
+    )
   }
 
   public String(): string {
@@ -1405,6 +1391,62 @@ function requireLen(b: $.Slice<number>, n: number): void {
       `runtime error: index out of range [${n - 1}] with length ${length}`,
     )
   }
+}
+
+// wideValue holds a uint64 whose two 32-bit words, low word first on the
+// little-endian hosts that run GoScript, are wideWords. A 64-bit value is
+// read and written through its words, with one bigint conversion.
+const wideValue = new BigUint64Array(1)
+const wideWords = new Uint32Array(wideValue.buffer)
+
+// uint64FromWords returns the uint64 of its low and high 32-bit words.
+function uint64FromWords(low: number, high: number): bigint {
+  wideWords[0] = low
+  wideWords[1] = high
+  return wideValue[0]
+}
+
+// littleWord returns the little-endian 32-bit word of b at offset i.
+function littleWord(b: $.Slice<number>, i: number): number {
+  return (
+    (byteAt(b, i) |
+      (byteAt(b, i + 1) << 8) |
+      (byteAt(b, i + 2) << 16) |
+      (byteAt(b, i + 3) << 24)) >>>
+    0
+  )
+}
+
+// bigWord returns the big-endian 32-bit word of b at offset i.
+function bigWord(b: $.Slice<number>, i: number): number {
+  return (
+    (byteAt(b, i + 3) |
+      (byteAt(b, i + 2) << 8) |
+      (byteAt(b, i + 1) << 16) |
+      (byteAt(b, i) << 24)) >>>
+    0
+  )
+}
+
+// putLittleWord stores a 32-bit word in b at offset i, low byte first.
+function putLittleWord(b: $.Slice<number>, i: number, word: number): void {
+  setByte(b, i, word)
+  setByte(b, i + 1, word >>> 8)
+  setByte(b, i + 2, word >>> 16)
+  setByte(b, i + 3, word >>> 24)
+}
+
+// putBigWord stores a 32-bit word in b at offset i, high byte first.
+function putBigWord(b: $.Slice<number>, i: number, word: number): void {
+  setByte(b, i, word >>> 24)
+  setByte(b, i + 1, word >>> 16)
+  setByte(b, i + 2, word >>> 8)
+  setByte(b, i + 3, word)
+}
+
+// wordBytes returns the bytes of a 32-bit word, low byte first.
+function wordBytes(word: number): number[] {
+  return [word & 0xff, (word >>> 8) & 0xff, (word >>> 16) & 0xff, word >>> 24]
 }
 
 function byteAt(b: $.Slice<number>, i: number): number {
