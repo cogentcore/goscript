@@ -8121,10 +8121,11 @@ func (o *LoweringOwner) lowerRangeStmt(ctx lowerFileContext, stmt *ast.RangeStmt
 		if keyName == "" {
 			keyName = "__rangeIndex"
 		}
+		counter, body := o.rangeCounter(ctx, stmt, keyName, body)
 
 		// The counter takes the range type's representation. Go evaluates
 		// the count once, so a count that is not constant is held in a temp.
-		init := keyName + " = 0"
+		init := counter + " = 0"
 		if isBigIntBackedType(rangeType) {
 			init += "n"
 		}
@@ -8136,7 +8137,7 @@ func (o *LoweringOwner) lowerRangeStmt(ctx lowerFileContext, stmt *ast.RangeStmt
 		init = strings.Join(append(windowDecls, init), ", ")
 		return loweredStmt{
 			hasBlock: true,
-			text:     loopPrefix + "for (let " + init + "; " + keyName + " < " + bound + "; " + keyName + "++)",
+			text:     loopPrefix + "for (let " + init + "; " + counter + " < " + bound + "; " + counter + "++)",
 			children: body,
 		}, diagnostics
 	}
@@ -8239,13 +8240,13 @@ func (o *LoweringOwner) lowerRangeStmt(ctx lowerFileContext, stmt *ast.RangeStmt
 	diagnostics = append(diagnostics, bodyDiagnostics...)
 	rangeTarget := ctx.tempName("RangeTarget")
 	rangeTargetValue := o.lowerArrayPointerTarget(ctx, rangeValue, rangeType)
-	children := body
+	counter, children := o.rangeCounter(ctx, stmt, indexName, body)
 	if valueName != "" {
 		// The value variable holds a copy of the element, so struct and array
 		// elements are cloned, unless the variable can share the element
 		// (see rangeValueSharesElement).
 		valueType := ctx.semPkg.source.TypesInfo.TypeOf(stmt.Value)
-		element := "(" + rangeWindow + ".backing[" + rangeWindow + ".offset + " + indexName + "] as " + o.tsTypeFor(ctx, valueType) + ")"
+		element := "(" + rangeWindow + ".backing[" + rangeWindow + ".offset + " + counter + "] as " + o.tsTypeFor(ctx, valueType) + ")"
 		value := o.lowerValueForTargetTypes(ctx, valueType, valueType, element, !rangeValueSharesElement(ctx, stmt, rangeType))
 		if typeParamMayHoldValueType(valueType) {
 			value = o.runtimeOwner.QualifiedHelper(RuntimeHelperCopyElement) + "(" + value + ")"
@@ -8253,15 +8254,60 @@ func (o *LoweringOwner) lowerRangeStmt(ctx lowerFileContext, stmt *ast.RangeStmt
 		if stmt.Tok == token.DEFINE {
 			value = o.lowerDeclaredValue(ctx, stmt.Value, value)
 		}
-		children = append([]loweredStmt{{text: "let " + valueName + " = " + value}}, body...)
+		children = append([]loweredStmt{{text: "let " + valueName + " = " + value}}, children...)
 	}
 	return loweredStmt{
 		hasBlock: true,
 		text: loopPrefix + "for (let " + rangeTarget + " = " + rangeTargetValue + ", " +
 			rangeWindow + " = " + o.runtimeOwner.QualifiedHelper(RuntimeHelperSliceRange) + "(" + rangeTarget + "), " +
-			strings.Join(append(windowDecls, indexName+" = 0"), ", ") + "; " + indexName + " < " + rangeWindow + ".length; " + indexName + "++)",
+			strings.Join(append(windowDecls, counter+" = 0"), ", ") + "; " + counter + " < " + rangeWindow + ".length; " + counter + "++)",
 		children: children,
 	}, diagnostics
+}
+
+// identAssignedInNode reports whether node assigns the variable obj itself,
+// also in a function literal, as opposed to an element or field of it.
+func identAssignedInNode(ctx lowerFileContext, obj types.Object, node ast.Node) bool {
+	info := ctx.semPkg.source.TypesInfo
+	isObj := func(expr ast.Expr) bool {
+		ident, ok := ast.Unparen(expr).(*ast.Ident)
+		return ok && info.ObjectOf(ident) == obj
+	}
+	assigned := false
+	ast.Inspect(node, func(node ast.Node) bool {
+		switch typed := node.(type) {
+		case *ast.AssignStmt:
+			assigned = assigned || slices.ContainsFunc(typed.Lhs, isObj)
+		case *ast.IncDecStmt:
+			assigned = assigned || isObj(typed.X)
+		case *ast.RangeStmt:
+			assigned = assigned || typed.Tok == token.ASSIGN && (isObj(typed.Key) || isObj(typed.Value))
+		}
+		return !assigned
+	})
+	return assigned
+}
+
+// rangeCounter returns the counter of a range loop over an integer, slice or
+// array whose key is named keyName, and the body with the key bound to it. A
+// key that the body assigns, or that needs a variable reference, is a copy of
+// a hidden counter, bound at the start of each iteration, since in Go a change
+// of the key does not change the iterations, which a change of the counter of
+// the JavaScript loop would.
+func (o *LoweringOwner) rangeCounter(ctx lowerFileContext, stmt *ast.RangeStmt, keyName string, body []loweredStmt) (string, []loweredStmt) {
+	// A key that only the loop changes is the counter.
+	if stmt.Tok != token.DEFINE || stmt.Key == nil {
+		return keyName, body
+	}
+	key := rangeBindingObject(ctx, stmt.Key)
+	if key == nil || (!ctx.model.needsVarRef[key] && !identAssignedInNode(ctx, key, stmt.Body)) {
+		return keyName, body
+	}
+
+	// Otherwise the key is declared from the hidden counter.
+	counter := ctx.tempName("RangeIndex")
+	binding := loweredStmt{text: "let " + keyName + " = " + o.lowerDeclaredValue(ctx, stmt.Key, counter)}
+	return counter, append([]loweredStmt{binding}, body...)
 }
 
 // rangeElementAccess is a slice variable that a range loop over it indexes
