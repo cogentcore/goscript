@@ -5,11 +5,11 @@
         "./*"
       ],
       "@goscript/*": [
-        "../../../tests/tests/runtime_caller_maxify/run/output/@goscript/*",
+        "../../../tests/tests/runtime_caller_callsite/run/output/@goscript/*",
         "../../../gs/*",
         "../../../tests/deps/*"
       ],
-      "@goscript/github.com/s4wave/goscript/tests/tests/runtime_caller_maxify/*": [
+      "@goscript/github.com/s4wave/goscript/tests/tests/runtime_caller_callsite/*": [
         "./*"
       ]
     }
@@ -17,7 +17,7 @@
   "extends": "../../../tests/tsconfig.base.json",
   "include": [
     "index.ts",
-    "runtime_caller_maxify.gs.ts",
+    "runtime_caller_callsite.gs.ts",
     "subpkg/index.ts",
     "subpkg/subpkg.gs.ts"
   ]

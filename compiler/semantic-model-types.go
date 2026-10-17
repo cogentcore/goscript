@@ -80,9 +80,9 @@ type SemanticModel struct {
 	// asyncDirectives holds the //goscript:async and //goscript:sync
 	// directives of the compiled packages.
 	asyncDirectives asyncDirectives
-	// maxifyFunctions holds the functions and methods that
-	// //goscript:maxify marks (see lowering-call-sites.go).
-	maxifyFunctions map[*types.Func]bool
+	// callSiteFunctions holds the functions and methods that
+	// //goscript:callsite marks (see lowering-call-sites.go).
+	callSiteFunctions map[*types.Func]bool
 	// asyncReport holds the async report the build was asked for, or nil.
 	asyncReport *AsyncReport
 }

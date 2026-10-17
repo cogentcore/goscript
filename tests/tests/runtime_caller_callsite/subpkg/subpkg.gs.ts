@@ -6,7 +6,7 @@ import * as filepath from "@goscript/path/filepath/index.js"
 import * as runtime from "@goscript/runtime/index.js"
 import * as strconv from "@goscript/strconv/index.js"
 
-$.registerTypePackagePath("github.com/s4wave/goscript/tests/tests/runtime_caller_maxify/subpkg", ["subpkg.Plan"])
+$.registerTypePackagePath("github.com/s4wave/goscript/tests/tests/runtime_caller_callsite/subpkg", ["subpkg.Plan"])
 
 export class Plan {
 	public declare Names: $.Slice<string>
@@ -28,7 +28,7 @@ export class Plan {
 	public Add(__goscriptCaller?: $.CallSite): Plan | $.VarRef<Plan> | null {
 		let p: Plan | $.VarRef<Plan> | null = this;
 		const p$: Plan = p == null ? $.pointerTarget<Plan>(p) : (p as any).__isVarRef === true ? (p as any).value : (p as any).__goValue === undefined ? (p as any) : $.pointerTarget<Plan>(p);
-		;(p$ as Plan).Names = $.appendOne((p$ as Plan).Names, Name(2, { file: "github.com/s4wave/goscript/tests/tests/runtime_caller_maxify/subpkg/subpkg.go", line: 42, caller: __goscriptCaller }))
+		;(p$ as Plan).Names = $.appendOne((p$ as Plan).Names, Name(2, { file: "github.com/s4wave/goscript/tests/tests/runtime_caller_callsite/subpkg/subpkg.go", line: 42, caller: __goscriptCaller }))
 		return p
 	}
 
@@ -42,7 +42,7 @@ export class Plan {
 }
 
 export function Name(level: number, __goscriptCaller?: $.CallSite): string {
-	let [, file, line, ok] = runtime.Caller(level, { file: "github.com/s4wave/goscript/tests/tests/runtime_caller_maxify/subpkg/subpkg.go", line: 14, caller: __goscriptCaller })
+	let [, file, line, ok] = runtime.Caller(level, { file: "github.com/s4wave/goscript/tests/tests/runtime_caller_callsite/subpkg/subpkg.go", line: 14, caller: __goscriptCaller })
 	if (!ok) {
 		return "unknown"
 	}
@@ -50,13 +50,13 @@ export function Name(level: number, __goscriptCaller?: $.CallSite): string {
 }
 
 export function Add(names: $.VarRef<$.Slice<string>> | null, init: (() => void) | null, __goscriptCaller?: $.CallSite): void {
-	names!.value = $.appendOne($.pointerValue<$.Slice<string>>(names), Name(2, { file: "github.com/s4wave/goscript/tests/tests/runtime_caller_maxify/subpkg/subpkg.go", line: 25, caller: __goscriptCaller }))
+	names!.value = $.appendOne($.pointerValue<$.Slice<string>>(names), Name(2, { file: "github.com/s4wave/goscript/tests/tests/runtime_caller_callsite/subpkg/subpkg.go", line: 25, caller: __goscriptCaller }))
 }
 
 export function AddOf(__typeArgs: $.GenericTypeArgs | undefined, names: $.VarRef<$.Slice<string>> | null, value: any, __goscriptCaller?: $.CallSite): void {
-	names!.value = $.appendOne($.pointerValue<$.Slice<string>>(names), Name(2, { file: "github.com/s4wave/goscript/tests/tests/runtime_caller_maxify/subpkg/subpkg.go", line: 32, caller: __goscriptCaller }))
+	names!.value = $.appendOne($.pointerValue<$.Slice<string>>(names), Name(2, { file: "github.com/s4wave/goscript/tests/tests/runtime_caller_callsite/subpkg/subpkg.go", line: 32, caller: __goscriptCaller }))
 }
 
 export function Unmarked(): string {
-	return Name(2, { file: "github.com/s4wave/goscript/tests/tests/runtime_caller_maxify/subpkg/subpkg.go", line: 49 })
+	return Name(2, { file: "github.com/s4wave/goscript/tests/tests/runtime_caller_callsite/subpkg/subpkg.go", line: 49 })
 }
