@@ -52,6 +52,8 @@ type LoweringOptions struct {
 	TrimTypeInfo bool
 	// SkipPackages names packages whose output is already available and must not be lowered.
 	SkipPackages map[string]bool
+	// ExternalEmbeds selects the embedded files written as separate files.
+	ExternalEmbeds *ExternalEmbedPolicy
 }
 
 // NewLoweringOwner creates the lowering owner.
@@ -202,6 +204,7 @@ func (o *LoweringOwner) lowerPackage(
 				protobufTypeScriptAdapter: protobufAdapter,
 				trimTypeInfo:              options.TrimTypeInfo,
 				displayRoot:               options.DisplayRoot,
+				externalEmbeds:            options.ExternalEmbeds,
 			})
 			diagnostics = append(diagnostics, fileDiagnostics...)
 			diagnostics = append(diagnostics, rewriteProtobufTypeScriptBindingFile(loweredFile, binding, semPkg.name)...)
@@ -223,6 +226,7 @@ func (o *LoweringOwner) lowerPackage(
 			runtimeMethodSets: runtimeMethodSets,
 			trimTypeInfo:      options.TrimTypeInfo,
 			displayRoot:       options.DisplayRoot,
+			externalEmbeds:    options.ExternalEmbeds,
 		})
 		diagnostics = append(diagnostics, fileDiagnostics...)
 		if loweredFile != nil {
@@ -376,6 +380,7 @@ type lowerFileRequest struct {
 	protobufTypeScriptAdapter bool
 	trimTypeInfo              bool
 	displayRoot               string
+	externalEmbeds            *ExternalEmbedPolicy
 }
 
 func (o *LoweringOwner) lowerFile(req lowerFileRequest) (*loweredFile, []Diagnostic) {
@@ -408,6 +413,9 @@ func (o *LoweringOwner) lowerFile(req lowerFileRequest) (*loweredFile, []Diagnos
 			alias:  o.runtimeOwner.BuiltinImport().Alias,
 			source: o.runtimeOwner.BuiltinImport().Source,
 		}},
+	}
+	if req.externalEmbeds.enabled() {
+		loweredFile.assets = make(map[string][]byte)
 	}
 	loweredFile.typePackagePath, loweredFile.typePackageNames = fileTypePackagePath(semPkg, file)
 	loweredFile.noCheck = slices.ContainsFunc(file.Decls, declTooLargeForFlowAnalysis) ||
@@ -539,6 +547,8 @@ func (o *LoweringOwner) lowerFile(req lowerFileRequest) (*loweredFile, []Diagnos
 	loweredFile.imports = append(loweredFile.imports, localImports...)
 
 	ctx := lowerFileContext{
+		externalEmbeds:    req.externalEmbeds,
+		embedAssets:       loweredFile.assets,
 		model:             model,
 		semPkg:            semPkg,
 		file:              file,
@@ -1679,7 +1689,11 @@ func safeParamName(param *types.Var, idx int) string {
 // lowerFileContext carries source and scope facts through lowering.
 type lowerFileContext struct {
 	// tokenFile resolves positions in the current file without a shared FileSet lookup.
-	tokenFile       *token.File
+	tokenFile *token.File
+	// externalEmbeds selects the embedded files that are written as separate
+	// files, which are recorded in embedAssets (see [loweredFile.assets]).
+	externalEmbeds  *ExternalEmbedPolicy
+	embedAssets     map[string][]byte
 	model           *SemanticModel
 	semPkg          *semanticPackage
 	file            *ast.File
@@ -3042,12 +3056,25 @@ func (o *LoweringOwner) lowerGoEmbedFSValue(ctx lowerFileContext, diagPos token.
 		paths = append(paths, path)
 	}
 	slices.Sort(paths)
+
+	// Each file is inline, or external as the policy selects (see
+	// [ExternalEmbedPolicy]), and listed after the inline files.
 	entries := make([]string, 0, len(paths))
+	var external []string
 	for _, path := range paths {
-		entries = append(entries, "["+lowerGoStringLiteral(path)+", "+o.embeddedBytesLiteral(filesByPath[path])+"]")
+		file := goEmbedFile{path: path, data: filesByPath[path]}
+		if ctx.externalEmbeds.external(file) {
+			external = append(external, externalEmbedEntry(file, ctx.embedAssets))
+			continue
+		}
+		entries = append(entries, "["+lowerGoStringLiteral(path)+", "+o.embeddedBytesLiteral(file.data)+"]")
+	}
+	files := "new globalThis.Map<string, Uint8Array>([" + strings.Join(entries, ", ") + "])"
+	if len(external) != 0 {
+		files += ", [" + strings.Join(external, ", ") + "]"
 	}
 	builtinAlias := o.runtimeOwner.BuiltinImport().Alias
-	return builtinAlias + ".markAsStructValue(new " + embedAlias + ".FS(new globalThis.Map<string, Uint8Array>([" + strings.Join(entries, ", ") + "])))", nil
+	return builtinAlias + ".markAsStructValue(new " + embedAlias + ".FS(" + files + "))", nil
 }
 
 type goEmbedFile struct {

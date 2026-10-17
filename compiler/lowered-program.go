@@ -43,6 +43,9 @@ type loweredFile struct {
 	// noCheck is set when a function of the file is too large for TypeScript
 	// to type check (see declTooLargeForFlowAnalysis).
 	noCheck bool
+	// assets are the contents of the external embedded files of the file
+	// (see [ExternalEmbedPolicy]), by their path in the package output.
+	assets map[string][]byte
 }
 
 // packageInitCall is a call that initializes a package: the initializer of a

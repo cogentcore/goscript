@@ -231,6 +231,7 @@ func (s *CompileService) Compile(ctx context.Context, req *CompileRequest) (*Com
 		AdditionalBindingRoots:    slices.Clone(req.AdditionalBindingRoots),
 		TrimTypeInfo:              trimTypeInfo,
 		SkipPackages:              replayed,
+		ExternalEmbeds:            req.ExternalEmbeds,
 	})
 	diagnostics = append(diagnostics, loweringDiagnostics...)
 	if diagnosticsHaveErrors(diagnostics) {

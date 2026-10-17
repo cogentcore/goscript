@@ -3,11 +3,73 @@ import * as io from '@goscript/io/index.js'
 import * as fs from '@goscript/io/fs/index.js'
 import * as time from '@goscript/time/index.js'
 
-export class FS {
-  private files: Map<string, Uint8Array>
+// ExternalFile is an embedded file that the compiler wrote as a separate file
+// (goscript compile --external-embed), as its path, its size and the URL
+// of its contents.
+export type ExternalFile = [path: string, size: number, url: string]
 
-  constructor(files?: Map<string, Uint8Array>) {
+// externalFile holds the contents of an external file once they are loaded.
+// The loads of its FS value and its copies share it.
+class externalFile {
+  data: Uint8Array | null = null
+  private loading: Promise<Uint8Array> | null = null
+
+  constructor(
+    readonly size: number,
+    readonly url: string,
+  ) {}
+
+  // load returns the contents, which it fetches on the first call: from the
+  // host filesystem for a file URL, else with fetch, so a page loads them
+  // from beside its script. The bytes are only returned once they are loaded.
+  load(): io.Awaitable<Uint8Array> {
+    if (this.data !== null) {
+      return this.data
+    }
+    const nodeFS = $.getHostRuntime().nodeFS
+    if (this.url.startsWith('file:') && nodeFS?.readFileSync) {
+      this.data = new Uint8Array(nodeFS.readFileSync(fileURLPath(this.url)))
+      return this.data
+    }
+    this.loading ??= fetchBytes(this.url).then(
+      (data) => (this.data = data),
+      (err) => {
+        this.loading = null
+        throw err
+      },
+    )
+    return this.loading
+  }
+}
+
+// fetchBytes fetches the bytes at url.
+async function fetchBytes(url: string): Promise<Uint8Array> {
+  const response = await fetch(url)
+  if (!response.ok) {
+    throw new Error(`${response.status} ${response.statusText}`)
+  }
+  return new Uint8Array(await response.arrayBuffer())
+}
+
+// fileURLPath returns the host path of a file URL.
+function fileURLPath(url: string): string {
+  const pathname = decodeURIComponent(new URL(url).pathname)
+  return /^\/[A-Za-z]:/.test(pathname) ? pathname.slice(1) : pathname
+}
+
+// entry is the contents of an embedded file, inline or external.
+type entry = Uint8Array | externalFile
+
+export class FS {
+  private files: Map<string, entry>
+
+  // The inline files are given by path, and the external files are listed
+  // after them.
+  constructor(files?: Map<string, entry>, external?: ExternalFile[]) {
     this.files = files ?? new Map()
+    for (const [path, size, url] of external ?? []) {
+      this.files.set(path, new externalFile(size, url))
+    }
   }
 
   // clone shares the files, which an FS never changes and copies when it
@@ -16,14 +78,14 @@ export class FS {
     return $.markAsStructValue(new FS(this.files))
   }
 
-  Open(name: string): [fs.File, $.GoError] {
+  Open(name: string): io.Awaitable<[fs.File, $.GoError]> {
     const err = validatePath('open', name)
     if (err != null) {
       return [null, err]
     }
     const data = this.files.get(name)
     if (data !== undefined) {
-      return [new openFile(name, data), null]
+      return loaded(data, 'open', name, null, (b) => new openFile(name, b))
     }
     const entries = this.dirEntries(name)
     if (entries === null) {
@@ -44,7 +106,7 @@ export class FS {
     return [entries, null]
   }
 
-  ReadFile(name: string): [Uint8Array, $.GoError] {
+  ReadFile(name: string): io.Awaitable<[Uint8Array, $.GoError]> {
     const err = validatePath('read', name)
     if (err != null) {
       return [new Uint8Array(0), err]
@@ -54,7 +116,7 @@ export class FS {
       const err = this.dirExists(name) ? fs.ErrInvalid : fs.ErrNotExist
       return [new Uint8Array(0), pathError('read', name, err)]
     }
-    return [data.slice(), null]
+    return loaded(data, 'read', name, new Uint8Array(0), (b) => b.slice())
   }
 
   Stat(name: string): [fs.FileInfo, $.GoError] {
@@ -64,7 +126,7 @@ export class FS {
     }
     const data = this.files.get(name)
     if (data !== undefined) {
-      return [new embedFileInfo(baseName(name), data.byteLength, 0o444), null]
+      return [new embedFileInfo(baseName(name), entrySize(data), 0o444), null]
     }
     if (!this.dirExists(name)) {
       return [null, pathError('stat', name, fs.ErrNotExist)]
@@ -95,7 +157,7 @@ export class FS {
       const info =
         isDir ?
           new embedFileInfo(childName, 0, fs.ModeDir | 0o555)
-        : new embedFileInfo(childName, data.byteLength, 0o444)
+        : new embedFileInfo(childName, entrySize(data), 0o444)
       entries.set(childName, new embedDirEntry(info))
     }
     return Array.from(entries.values()).sort((a, b) =>
@@ -119,6 +181,36 @@ export class FS {
     }
     return false
   }
+}
+
+// entrySize returns the size of the contents of a file.
+function entrySize(data: entry): number {
+  return data instanceof externalFile ? data.size : data.byteLength
+}
+
+// loaded returns the result of use with the contents of a file, once they
+// are loaded, or zero and the error of a failed load for operation op on name.
+function loaded<T>(
+  data: entry,
+  op: string,
+  name: string,
+  zero: T,
+  use: (bytes: Uint8Array) => T,
+): io.Awaitable<[T, $.GoError]> {
+  // Inline and loaded contents are used now.
+  const bytes = data instanceof externalFile ? data.load() : data
+  if (!io.isAsync(bytes)) {
+    return [use(bytes), null]
+  }
+
+  // Otherwise the result waits for the load.
+  return Promise.resolve(bytes).then(
+    (bytes): [T, $.GoError] => [use(bytes), null],
+    (err): [T, $.GoError] => [
+      zero,
+      pathError(op, name, $.newError(`embed: loading ${name}: ${err}`)),
+    ],
+  )
 }
 
 // openFile is an open regular file, which implements io.Seeker and
