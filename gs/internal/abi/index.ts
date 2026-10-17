@@ -49,3 +49,5 @@ export function FuncPCABI0(_f: any): number {
 export function FuncPCABIInternal(_f: any): number {
   return 0 // Placeholder
 }
+
+export * from './stubs.gs.js'

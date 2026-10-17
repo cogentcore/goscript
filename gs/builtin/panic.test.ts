@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
-import { int64Div, pointerValue } from './builtin.js'
+import { callOverrideMethod, int64Div, pointerValue } from './builtin.js'
+import { varRef } from './varRef.js'
 import {
   GoPanic,
+  notImplemented,
   RuntimeError,
   panic,
   panicValue,
@@ -226,5 +228,39 @@ describe('recover consumes the in-flight panic', () => {
 
     expect(seen).toBe('boom')
     expect(recover()).toBeNull()
+  })
+})
+
+describe('override stubs', () => {
+  it('panics with the name of a Go export that is not implemented', () => {
+    const err = captureThrow(() => notImplemented('runtime.MemProfile'))
+
+    expect(err).toBeInstanceOf(GoPanic)
+    expect((err as GoPanic).value).toBe(
+      'goscript: runtime.MemProfile is not implemented',
+    )
+  })
+
+  it('calls the method of an override class value or reference', () => {
+    class Case {
+      constructor(private readonly suffix: string) {}
+      Upper(s: string): string {
+        return s.toUpperCase() + this.suffix
+      }
+    }
+    const value = new Case('!')
+
+    expect(callOverrideMethod(value, 'Upper', 'lib.Case.Upper', ['a'])).toBe(
+      'A!',
+    )
+    expect(
+      callOverrideMethod(varRef(value), 'Upper', 'lib.Case.Upper', ['b']),
+    ).toBe('B!')
+    const err = captureThrow(() =>
+      callOverrideMethod(value, 'lower', 'lib.Case.lower', []),
+    )
+    expect((err as GoPanic).value).toBe(
+      'goscript: lib.Case.lower is not implemented',
+    )
   })
 })

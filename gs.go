@@ -6,6 +6,7 @@ import (
 	"errors"
 )
 
+//go:generate go test ./compiler -run TestOverrideStubsCurrent -update
 //go:generate go test -run TestGsEmbedCurrent -update .
 
 // packageJSON is the goscript npm package manifest. Its dependencies are the

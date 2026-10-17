@@ -8,8 +8,13 @@ import {
   FuncForPC,
   Gosched,
   MemStats,
+  NumCgoCall,
   ReadMemStats,
   ReadTrace,
+  SetBlockProfileRate,
+  SetCPUProfileRate,
+  SetDefaultGOMAXPROCS,
+  SetMutexProfileFraction,
   SetFinalizer,
   Stack,
   StartTrace,
@@ -95,5 +100,15 @@ describe('runtime override', () => {
     await Gosched()
     order.push('after-gosched')
     expect(order).toEqual(['pending-task', 'after-gosched'])
+  })
+
+  it('keeps the profiling settings that have no effect', () => {
+    expect(SetMutexProfileFraction(5)).toBe(0)
+    expect(SetMutexProfileFraction(-1)).toBe(5)
+    expect(SetMutexProfileFraction(0)).toBe(5)
+    SetBlockProfileRate(1)
+    SetCPUProfileRate(100)
+    SetDefaultGOMAXPROCS()
+    expect(NumCgoCall()).toBe(0n)
   })
 })

@@ -41,6 +41,34 @@ export function NumCPU(): number {
   return 1
 }
 
+// mutexProfileFraction is the rate SetMutexProfileFraction last set. No
+// profile is collected, so the rates below have no other effect.
+let mutexProfileFraction = 0
+
+// SetMutexProfileFraction sets the rate of mutex contention profiling and
+// returns the previous rate; a negative rate only reads it.
+export function SetMutexProfileFraction(rate: number): number {
+  const previous = mutexProfileFraction
+  if (rate >= 0) {
+    mutexProfileFraction = rate
+  }
+  return previous
+}
+
+// SetBlockProfileRate sets the rate of blocking profiling.
+export function SetBlockProfileRate(_rate: number): void {}
+
+// SetCPUProfileRate sets the rate of CPU profiling.
+export function SetCPUProfileRate(_hz: number): void {}
+
+// SetDefaultGOMAXPROCS restores the default GOMAXPROCS, which is fixed at 1.
+export function SetDefaultGOMAXPROCS(): void {}
+
+// NumCgoCall returns the number of cgo calls, which JavaScript never makes.
+export function NumCgoCall(): bigint {
+  return 0n
+}
+
 // GC runs a garbage collection and blocks the caller until the
 // garbage collection is complete. In JavaScript, we can suggest GC but not force it.
 export function GC(): void {

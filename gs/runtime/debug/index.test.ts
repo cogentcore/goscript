@@ -5,9 +5,16 @@ import { resetHostRuntimeForTests } from '@goscript/builtin/hostio.js'
 import {
   BuildInfo,
   BuildSetting,
+  FreeOSMemory,
   Module,
   PrintStack,
   ReadBuildInfo,
+  SetGCPercent,
+  SetMaxStack,
+  SetMaxThreads,
+  SetMemoryLimit,
+  SetPanicOnFault,
+  SetTraceback,
   Stack,
 } from './index.js'
 
@@ -69,5 +76,18 @@ describe('runtime/debug override', () => {
     expect(info.Deps?.[0]).toBe(module)
     expect(info.Settings?.[0]?.Value).toBe('js')
     expect(ReadBuildInfo()).toEqual([null, false])
+  })
+
+  it('returns the previous runtime settings, which have no effect', () => {
+    expect(SetGCPercent(50)).toBe(100)
+    expect(SetGCPercent(100)).toBe(50)
+    expect(SetMemoryLimit(1024n)).toBe(9223372036854775807n)
+    expect(SetMemoryLimit(-1n)).toBe(1024n)
+    expect(SetMaxStack(1 << 20)).toBe(1000000000)
+    expect(SetMaxThreads(5)).toBe(10000)
+    expect(SetPanicOnFault(true)).toBe(false)
+    expect(SetPanicOnFault(false)).toBe(true)
+    SetTraceback('all')
+    FreeOSMemory()
   })
 })

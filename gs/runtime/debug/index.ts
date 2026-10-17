@@ -97,3 +97,58 @@ export function PrintStack(): void {
 export function ReadBuildInfo(): [BuildInfo | null, boolean] {
   return [null, false]
 }
+
+// The settings below configure a Go runtime's collector, stacks and threads,
+// which JavaScript hosts manage themselves, so they have no effect. Each still
+// returns its previous setting, as in Go, starting from Go's defaults.
+let gcPercent = 100
+let memoryLimit = 9223372036854775807n
+let maxStack = 1000000000
+let maxThreads = 10000
+let panicOnFault = false
+
+// SetGCPercent sets the garbage collection target percentage.
+export function SetGCPercent(percent: number): number {
+  const previous = gcPercent
+  gcPercent = percent
+  return previous
+}
+
+// SetMemoryLimit sets the soft memory limit; a negative limit only reads it.
+export function SetMemoryLimit(limit: bigint): bigint {
+  const previous = memoryLimit
+  if (limit >= 0n) {
+    memoryLimit = limit
+  }
+  return previous
+}
+
+// SetMaxStack sets the maximum stack size of a goroutine.
+export function SetMaxStack(bytes: number): number {
+  const previous = maxStack
+  maxStack = bytes
+  return previous
+}
+
+// SetMaxThreads sets the maximum number of operating system threads.
+export function SetMaxThreads(threads: number): number {
+  const previous = maxThreads
+  maxThreads = threads
+  return previous
+}
+
+// SetPanicOnFault sets whether an unexpected fault address panics.
+export function SetPanicOnFault(enabled: boolean): boolean {
+  const previous = panicOnFault
+  panicOnFault = enabled
+  return previous
+}
+
+// SetTraceback sets how much a crash prints, which the host decides.
+export function SetTraceback(_level: string): void {}
+
+// FreeOSMemory forces a collection and returns memory to the system, which
+// the host does on its own schedule.
+export function FreeOSMemory(): void {}
+
+export * from './stubs.gs.js'

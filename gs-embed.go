@@ -33,6 +33,7 @@ import "embed"
 //go:embed gs/bytes/iter.gs.ts
 //go:embed gs/bytes/meta.json
 //go:embed gs/bytes/reader.gs.ts
+//go:embed gs/bytes/stubs.gs.ts
 //go:embed gs/cmp/index.ts
 //go:embed gs/compress/gzip/index.ts
 //go:embed gs/compress/gzip/meta.json
@@ -79,6 +80,7 @@ import "embed"
 //go:embed gs/encoding/json/jsontext/index.ts
 //go:embed gs/encoding/json/jsontext/meta.json
 //go:embed gs/encoding/json/jsontext/parity.json
+//go:embed gs/encoding/json/jsontext/stubs.gs.ts
 //go:embed gs/encoding/json/meta.json
 //go:embed gs/encoding/json/parity.json
 //go:embed gs/errors/errors.ts
@@ -124,7 +126,9 @@ import "embed"
 //go:embed gs/hash/meta.json
 //go:embed gs/hash/parity.json
 //go:embed gs/internal/abi/index.ts
+//go:embed gs/internal/abi/stubs.gs.ts
 //go:embed gs/internal/bytealg/index.ts
+//go:embed gs/internal/bytealg/stubs.gs.ts
 //go:embed gs/internal/byteorder/index.ts
 //go:embed gs/internal/chacha8rand/index.ts
 //go:embed gs/internal/flateio/checksum.ts
@@ -232,6 +236,7 @@ import "embed"
 //go:embed gs/math/unsafe.gs.ts
 //go:embed gs/mime/index.ts
 //go:embed gs/mime/parity.json
+//go:embed gs/mime/stubs.gs.ts
 //go:embed gs/net/http/httptest/index.ts
 //go:embed gs/net/http/httptest/parity.json
 //go:embed gs/net/http/index.ts
@@ -239,6 +244,7 @@ import "embed"
 //go:embed gs/net/http/parity.json
 //go:embed gs/net/http/pattern.ts
 //go:embed gs/net/http/pprof/index.ts
+//go:embed gs/net/http/stubs.gs.ts
 //go:embed gs/os/callbackfs.ts
 //go:embed gs/os/dir.gs.ts
 //go:embed gs/os/dir_unix.gs.ts
@@ -307,16 +313,20 @@ import "embed"
 //go:embed gs/reflect/value.ts
 //go:embed gs/reflect/visiblefields.ts
 //go:embed gs/runtime/debug/index.ts
+//go:embed gs/runtime/debug/stubs.gs.ts
 //go:embed gs/runtime/index.ts
 //go:embed gs/runtime/meta.json
 //go:embed gs/runtime/parity.json
 //go:embed gs/runtime/pprof/index.ts
 //go:embed gs/runtime/pprof/meta.json
 //go:embed gs/runtime/pprof/parity.json
+//go:embed gs/runtime/pprof/stubs.gs.ts
 //go:embed gs/runtime/runtime.ts
+//go:embed gs/runtime/stubs.gs.ts
 //go:embed gs/runtime/trace/index.ts
 //go:embed gs/runtime/trace/meta.json
 //go:embed gs/runtime/trace/parity.json
+//go:embed gs/runtime/trace/stubs.gs.ts
 //go:embed gs/slices/index.ts
 //go:embed gs/slices/meta.json
 //go:embed gs/slices/slices.ts
@@ -365,12 +375,15 @@ import "embed"
 //go:embed gs/syscall/js/index.ts
 //go:embed gs/syscall/js/meta.json
 //go:embed gs/syscall/rawconn.ts
+//go:embed gs/syscall/stubs.gs.ts
 //go:embed gs/syscall/types.ts
 //go:embed gs/testing/index.ts
 //go:embed gs/testing/meta.json
 //go:embed gs/testing/runner.ts
+//go:embed gs/testing/stubs.gs.ts
 //go:embed gs/testing/synctest/index.ts
 //go:embed gs/testing/synctest/meta.json
+//go:embed gs/testing/synctest/stubs.gs.ts
 //go:embed gs/testing/testing.ts
 //go:embed gs/time/index.ts
 //go:embed gs/time/meta.json
@@ -379,6 +392,7 @@ import "embed"
 //go:embed gs/unicode/index.ts
 //go:embed gs/unicode/meta.json
 //go:embed gs/unicode/named.ts
+//go:embed gs/unicode/stubs.gs.ts
 //go:embed gs/unicode/tables.ts
 //go:embed gs/unicode/unicode.ts
 //go:embed gs/unicode/utf8/index.ts

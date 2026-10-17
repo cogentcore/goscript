@@ -24,7 +24,7 @@ import {
   namedValueBoxMarker,
 } from './type.js'
 import { writeHostStdoutText } from './hostio.js'
-import { runtimePanic } from './panic.js'
+import { notImplemented, runtimePanic } from './panic.js'
 import { formatPrintedArgs } from './print.js'
 import { isSliceProxy, runeToString, sliceRange } from './slice.js'
 import { isVarRef, type VarRef } from './varRef.js'
@@ -291,6 +291,27 @@ const nilPointerTarget: object = new Proxy(
     },
   },
 )
+
+// callOverrideMethod calls method on the value of an override class, for the
+// method function Type_Method that the compiler declares when the override
+// does not. A pointer receiver arrives as a reference to the value. A class
+// without the method panics with name, its Go method.
+export function callOverrideMethod(
+  receiver: unknown,
+  method: string,
+  name: string,
+  args: unknown[],
+): unknown {
+  // Find the method on the value the receiver holds.
+  const target = pointerValue(receiver) as Record<string, unknown>
+  const fn = target[method]
+  if (typeof fn !== 'function') {
+    notImplemented(name)
+  }
+
+  // Call it with the value as this.
+  return fn.apply(target, args)
+}
 
 /**
  * pointerTarget returns the struct that a pointer points to, for a function
