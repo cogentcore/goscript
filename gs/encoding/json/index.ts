@@ -254,6 +254,10 @@ export class Decoder {
   private readErr: $.GoError = null
   private chunk = $.makeSlice<number>(decoderReadSize, undefined, 'byte')
 
+  // end searches each read for the end of the composite value or string at
+  // pos, so that the value is not parsed again after each read.
+  private end = new valueEnd()
+
   public constructor(private readonly reader: io.Reader) {}
 
   // readChunk reads the next chunk of input into buf. It returns a Promise
@@ -262,7 +266,9 @@ export class Decoder {
     return io.mapResult(this.reader.Read(this.chunk), ([n, err]) => {
       // The buffer holds the bytes read as a Go string.
       if (n > 0) {
-        this.buf += $.bytesToString($.goSlice(this.chunk, 0, n))
+        const text = $.bytesToString($.goSlice(this.chunk, 0, n))
+        this.buf += text
+        this.end.feed(text)
       }
 
       // Any error ends the input; only io.EOF is not reported.
@@ -276,12 +282,16 @@ export class Decoder {
   }
 
   // run calls step, reading more input while it returns needMore, so the
-  // result is synchronous for a synchronous reader.
+  // result is synchronous for a synchronous reader. While the value at pos
+  // has not ended, run reads more without calling step, which would make the
+  // buffer one string again.
   private run<T>(step: () => T | typeof needMore): io.Awaitable<T> {
     while (true) {
-      const result = step()
-      if (result !== needMore) {
-        return result
+      if (this.eof || !this.end.waiting()) {
+        const result = step()
+        if (result !== needMore) {
+          return result
+        }
       }
       const read = this.readChunk()
       if (io.isAsync(read)) {
@@ -293,6 +303,8 @@ export class Decoder {
   // scanValue scans the value at pos, returning needMore if the input so
   // far may end before the value does.
   private scanValue(): [unknown, number] | typeof needMore {
+    // The search for the end of the value starts with its first parse.
+    this.end.parse(this.buf, this.pos)
     try {
       // Only a number that reaches the end of the input may continue.
       const [value, end] = scanJSONValue(this.buf, this.pos, this.useNumber)
@@ -309,18 +321,20 @@ export class Decoder {
       if (
         !this.eof &&
         err instanceof SyntaxError &&
-        Number(err.Offset) >= jsonByteOffset(this.buf, this.buf.length)
+        Number(err.Offset) >= this.buf.length
       ) {
         return needMore
       }
+      this.end.stop()
       throw err
     }
   }
 
   // consume advances past the scanned input up to end.
   private consume(end: number): void {
+    this.end.stop()
     this.pos = end
-    this.inputOffset = jsonByteOffset(this.buf, end)
+    this.inputOffset = end
   }
 
   public Decode(v: unknown): io.Awaitable<$.GoError> {
@@ -340,13 +354,15 @@ export class Decoder {
         return needMore
       }
 
-      // Consume the value and decode it into v.
+      // Consume the value and decode it into v, which assigns the value
+      // parsed by the scan, unless an UnmarshalJSON method takes the bytes.
       const raw = $.stringToBytes(this.buf.slice(this.pos, scanned[1]))
       this.consume(scanned[1])
-      return decode(raw, v, {
+      const opts = {
         disallowUnknownFields: this.disallowUnknownFields,
         useNumber: this.useNumber,
-      })
+      }
+      return decode(raw, v, opts, scanned)
     })
   }
 
@@ -732,14 +748,95 @@ function encodeJSON(v: unknown): string {
 
 const JSON_WHITESPACE = ' \t\n\r'
 
-// jsonByteOffset returns the Go byte offset (UTF-8) of character index i, so a
-// SyntaxError reports the same Offset Go would for multibyte input.
-function jsonByteOffset(text: string, i: number): number {
-  return $.len($.stringToBytes(text.slice(0, i)))
+// valueEnd searches the input that a Decoder reads for the end of the
+// composite value or string it is decoding, so that the value is parsed only
+// once it ends, or once the input read for it has doubled since it was last
+// parsed, which reports a syntax error in it before its end. The value is
+// then parsed in time linear in its size.
+class valueEnd {
+  private start = -1
+  private searching = false
+  private depth = 0
+  private inString = false
+  private escaped = false
+  private parsedLength = 0
+  private unparsed = 0
+
+  // parse records a parse of the value at start in text, starting the
+  // search for its end at its first parse. A number or literal is short, so
+  // it is parsed again after each read.
+  parse(text: string, start: number): void {
+    // A parse of the same value only counts the input read since the last.
+    if (start === this.start) {
+      this.parsedLength += this.unparsed
+      this.unparsed = 0
+      return
+    }
+
+    // The first parse of a composite value or string starts the search.
+    const c = text[start]
+    this.start = start
+    this.searching = c === '{' || c === '[' || c === '"'
+    this.depth = 0
+    this.inString = false
+    this.escaped = false
+    this.feed(text.slice(start))
+    this.parsedLength = text.length - start
+    this.unparsed = 0
+  }
+
+  // stop ends the search, once the value is consumed or malformed.
+  stop(): void {
+    this.start = -1
+    this.searching = false
+  }
+
+  // waiting reports whether the value has not ended and the input read
+  // since its last parse is shorter than the input it had then.
+  waiting(): boolean {
+    return this.searching && this.unparsed < this.parsedLength
+  }
+
+  // feed continues the search through text read for the value.
+  feed(text: string): void {
+    this.unparsed += text.length
+    for (let i = 0; this.searching && i < text.length; i++) {
+      this.next(text.charCodeAt(i))
+    }
+  }
+
+  // next continues the search with the next character code c, which ends
+  // the value when it closes its string or balances its brackets.
+  private next(c: number): void {
+    // In a string, an escape skips the next character, and an unescaped
+    // quote ends the string.
+    if (this.inString) {
+      if (this.escaped) {
+        this.escaped = false
+      } else if (c === 0x5c) {
+        this.escaped = true
+      } else if (c === 0x22) {
+        this.inString = false
+        this.searching = this.depth > 0
+      }
+      return
+    }
+
+    // Outside strings, the brackets nest.
+    if (c === 0x22) {
+      this.inString = true
+    } else if (c === 0x7b || c === 0x5b) {
+      this.depth++
+    } else if (c === 0x7d || c === 0x5d) {
+      this.searching = --this.depth > 0
+    }
+  }
 }
 
-function jsonSyntaxError(text: string, i: number, msg: string): SyntaxError {
-  return new SyntaxError({ Offset: jsonByteOffset(text, i), Message: msg })
+// jsonSyntaxError returns a SyntaxError at index i of the input, which is its
+// Go byte offset, as a Go string has a character for each byte.
+function jsonSyntaxError(i: number, msg: string): SyntaxError {
+  return new SyntaxError({ Offset: i, Message: msg })
 }
 
 function skipJSONWhitespace(text: string, i: number): number {
@@ -766,24 +863,25 @@ function scanJSONValue(
   const fail = (msg = 'invalid character'): never => {
     // Go's Offset counts bytes read up to and including the offending byte.
     const at = Math.min(i + 1, text.length)
-    throw jsonSyntaxError(text, at, msg)
+    throw jsonSyntaxError(at, msg)
   }
   const parseString = (): string => {
-    let raw = text[i++] // opening quote
+    // The literal is sliced from the text once its closing quote is found.
+    const start = i++
     while (i < text.length) {
-      const c = text[i++]
-      raw += c
-      if (c === '\\') {
-        raw += text[i++] ?? ''
-      } else if (c === '"') {
+      const c = text.charCodeAt(i++)
+      if (c === 0x5c) {
+        i++
+      } else if (c === 0x22) {
         try {
-          return parseJSONStringLiteral(raw)
+          return parseJSONStringLiteral(text.slice(start, i))
         } catch {
-          i -= raw.length
+          i = start
           return fail('invalid string literal')
         }
       }
     }
+    i = Math.min(i, text.length)
     return fail('unexpected end of JSON input')
   }
   const parseValue = (): unknown => {
@@ -1012,11 +1110,13 @@ export function Unmarshal(data: $.Slice<number>, v: unknown): $.GoError {
 // decode decodes data into v. When an UnmarshalJSON suspends, it returns a
 // Promise of the error instead: the compiler awaits Unmarshal in a program
 // with an async UnmarshalJSON method (see asyncWhenMethods in meta.json), and
-// Decoder.Decode is async.
+// Decoder.Decode is async. The value parsed from data may be given as the
+// first element of parsed, so that data is not parsed again.
 function decode(
   data: $.Slice<number>,
   v: unknown,
   opts: decodeOptions,
+  parsed: [unknown, ...unknown[]] | null = null,
 ): $.GoError {
   // Assign the decoded value, collecting the UnmarshalJSON calls that suspend.
   const pending: Promise<$.GoError>[] = []
@@ -1031,7 +1131,8 @@ function decode(
     if (unmarshaler !== null) {
       callUnmarshalJSON(unmarshaler, data)
     } else {
-      assignDecodedValue(v, parseJSON(data, opts), opts)
+      const value = parsed !== null ? parsed[0] : parseJSON(data, opts)
+      assignDecodedValue(v, value, opts)
     }
   } catch (err) {
     return goError(err)
@@ -1899,11 +2000,7 @@ function parseJSON(data: $.Slice<number>, opts: decodeOptions): unknown {
   const [value, end] = scanJSONValue(text, 0, !!opts.useNumber)
   const rest = skipJSONWhitespace(text, end)
   if (rest !== text.length) {
-    throw jsonSyntaxError(
-      text,
-      rest + 1,
-      'invalid character after top-level value',
-    )
+    throw jsonSyntaxError(rest + 1, 'invalid character after top-level value')
   }
   return value
 }
