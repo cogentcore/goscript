@@ -437,3 +437,5 @@ function encodeTrace(r: recorder): Uint8Array {
 
   return new Uint8Array(out)
 }
+
+export * from './stubs.gs.js'

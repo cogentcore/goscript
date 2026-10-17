@@ -15,3 +15,4 @@ export * from './errors.js'
 
 // Re-export RawConn implementation
 export * from './rawconn.js'
+export * from './stubs.gs.js'

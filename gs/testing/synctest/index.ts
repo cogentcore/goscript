@@ -20,3 +20,5 @@ export function Test(
 export function Wait(): void {
   $.panic('goroutine is not in a bubble')
 }
+
+export * from './stubs.gs.js'

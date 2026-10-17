@@ -482,3 +482,5 @@ export function Value_Canonicalize(
     opts,
   )
 }
+
+export * from './stubs.gs.js'

@@ -67,3 +67,5 @@ export {
   SplitSeq,
 } from './iter.gs.js'
 export { NewReader, Reader } from './reader.gs.js'
+
+export * from './stubs.gs.js'

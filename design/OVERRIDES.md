@@ -44,7 +44,8 @@ JS/WASM Go package and classifies each symbol:
 ```
 
 `real` means the effective TypeScript package export exists. The verifier
-resolves `index.ts`, named re-exports, and `export *` chains using the same
+resolves `index.ts`, named re-exports, and `export *` chains, including
+re-exports of other override packages through `@goscript/`, using the same
 override package roots as copy planning. `blocked` means the symbol is not
 exported and carries the reason callers cannot use it yet. If Go source selects
 a blocked symbol, compilation fails with a structured parity diagnostic before
@@ -52,6 +53,32 @@ TypeScript typechecking or bundling sees an undefined import.
 
 `deferred` is accepted only while a ledger is being seeded. Package-local tests
 should keep checked-in ledgers at zero deferred symbols.
+
+## Generated Stubs
+
+Compiled code can refer to any export of a Go package, even one it never
+calls: yaegi's symbol tables take the value of every exported function and
+variable, and a method table of a named non-struct type lists the method
+function `Type_Method` of each of its methods, including unexported ones. So
+that each such reference resolves, `TestOverrideStubsCurrent`
+(`compiler/override-stubs_test.go`) compares each standard library override
+package with the exported API of its Go package for the js/wasm port and
+generates `stubs.gs.ts`, which `index.ts` re-exports, declaring what the
+hand-written TypeScript lacks:
+
+- a missing function panics with `goscript: <pkg>.<Name> is not implemented`
+  when called (`$.notImplemented`);
+- a missing variable holds its zero value;
+- a missing struct type is a class that panics when constructed, and any
+  other missing type is `any`;
+- a missing method function of a type the override declares as a class calls
+  the class's method (`$.callOverrideMethod`), and panics as above if the
+  class lacks it; that of any other type panics.
+
+Constants are inlined, and symbols a parity ledger blocks get no stub. Each
+stub is a plain declaration, so a bundler drops those a program does not use.
+Run `go generate` after changing an override's exports: the test fails while
+a stub module is stale.
 
 ## Metadata System
 

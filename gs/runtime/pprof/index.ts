@@ -132,3 +132,5 @@ function writerFromArg(w: WriterArg): io.Writer | null {
 }
 
 const customProfiles = new Map<string, Profile>()
+
+export * from './stubs.gs.js'

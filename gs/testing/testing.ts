@@ -594,6 +594,17 @@ export function Short(): boolean {
   return shortMode
 }
 
+// verboseMode is whether the running tests were asked for verbose output.
+let verboseMode = false
+
+// Verbose reports whether the tests run with verbose output, as -test.v asks.
+export function Verbose(): boolean {
+  return verboseMode
+}
+
+// Init has nothing to do: the test runner reads its options without flags.
+export function Init(): void {}
+
 // testBinary is whether the program is a test runner (see runner.ts).
 let testBinary = false
 
@@ -614,7 +625,9 @@ export async function runTests(
   options: RunOptions = {},
 ): Promise<RunResult> {
   const previousShortMode = shortMode
+  const previousVerboseMode = verboseMode
   shortMode = options.short ?? false
+  verboseMode = options.verbose ?? false
   const count = options.count ?? 1
   let failed = 0
   let skipped = 0
@@ -687,6 +700,7 @@ export async function runTests(
     return { ok: false, failed, skipped }
   } finally {
     shortMode = previousShortMode
+    verboseMode = previousVerboseMode
   }
 }
 

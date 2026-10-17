@@ -1,9 +1,9 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { existsSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 import * as $ from '@goscript/builtin/index.js'
-import { B, F, Short, T, type TB } from './testing.js'
+import { B, F, Init, Short, T, type TB, Verbose } from './testing.js'
 import { runTests } from './testing.js'
 
 describe('testing.T', () => {
@@ -183,6 +183,30 @@ describe('testing.T', () => {
     expect(result.ok).toBe(true)
     expect(observed).toBe(true)
     expect(Short()).toBe(false)
+  })
+
+  it('reports verbose mode while a verbose run is active', async () => {
+    let observed = false
+    const log = vi.spyOn(console, 'log').mockImplementation(() => {})
+
+    Init()
+    const result = await runTests(
+      'example.test/verbose',
+      [
+        {
+          name: 'TestVerbose',
+          fn: () => {
+            observed = Verbose()
+          },
+        },
+      ],
+      { verbose: true },
+    )
+    log.mockRestore()
+
+    expect(result.ok).toBe(true)
+    expect(observed).toBe(true)
+    expect(Verbose()).toBe(false)
   })
 
   it('accepts parallel tests in the sequential runner', () => {

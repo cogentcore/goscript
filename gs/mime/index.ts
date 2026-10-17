@@ -428,3 +428,5 @@ function decodeWord(word: string): string | null {
   }
   return qDecode(body)
 }
+
+export * from './stubs.gs.js'
