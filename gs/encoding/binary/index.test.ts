@@ -162,6 +162,31 @@ describe('encoding/binary override', () => {
     }
   })
 
+  it('lays out the bytes of 64-bit values in both orders', () => {
+    // Values with high bits set, numbers and negative bigints keep their 64
+    // bits.
+    const bytes = [0xf1, 0xe2, 0xd3, 0xc4, 0xb5, 0xa6, 0x97, 0x88]
+    const value = 0x8897a6b5c4d3e2f1n
+    const little = $.makeSlice<number>(8, undefined, 'byte')
+    LittleEndian.PutUint64(little, value)
+    expect(Array.from($.bytesToUint8Array(little))).toEqual(bytes)
+    expect(LittleEndian.Uint64(little)).toBe(value)
+    const big = $.makeSlice<number>(8, undefined, 'byte')
+    BigEndian.PutUint64(big, value - (1n << 64n))
+    expect(Array.from($.bytesToUint8Array(big))).toEqual([...bytes].reverse())
+    expect(BigEndian.Uint64(big)).toBe(value)
+
+    // Appends lay out the same bytes, and numbers convert.
+    const out = LittleEndian.AppendUint64(null, value)
+    expect(Array.from($.bytesToUint8Array(out))).toEqual(bytes)
+    const outBig = BigEndian.AppendUint64(null, 0x01020304050607)
+    expect(Array.from($.bytesToUint8Array(outBig))).toEqual([
+      0, 1, 2, 3, 4, 5, 6, 7,
+    ])
+    LittleEndian.PutUint64(little, 2 ** 40 + 3)
+    expect(LittleEndian.Uint64(little)).toBe(2n ** 40n + 3n)
+  })
+
   it('appends endian integers', () => {
     let out = BigEndian.AppendUint16(null, 0x1234)
     out = LittleEndian.AppendUint32(out, 0x01020304)
