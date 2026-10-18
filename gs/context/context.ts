@@ -14,8 +14,9 @@ export type Context = null | {
   // Deadline returns the time when work done on behalf of this context should be canceled
   Deadline(): [time.Time, boolean]
 
-  // Done returns a channel that's closed when work done on behalf of this context should be canceled
-  Done(): $.Channel<{}>
+  // Done returns a channel that's closed when work done on behalf of this
+  // context should be canceled, or null if this context can never be canceled.
+  Done(): $.Channel<{}> | null
 
   // Err returns a non-nil error value after Done is closed
   Err(): $.GoError
@@ -30,25 +31,19 @@ export type ContextNonNil = Exclude<Context, null>
 // Base implementation for all contexts
 abstract class baseContext implements ContextNonNil {
   abstract Deadline(): [time.Time, boolean]
-  abstract Done(): $.Channel<{}>
+  abstract Done(): $.Channel<{}> | null
   abstract Err(): $.GoError
   abstract Value(key: any): any
 }
 
 // Background/TODO context that is never canceled
 class backgroundContext extends baseContext {
-  private static readonly neverClosedChannel = $.makeChannel<{}>(0, {}, 'both')
-
-  static getNeverClosedChannel(): $.Channel<{}> {
-    return backgroundContext.neverClosedChannel
-  }
-
   Deadline(): [time.Time, boolean] {
     return [new time.Time(), false]
   }
 
-  Done(): $.Channel<{}> {
-    return backgroundContext.neverClosedChannel
+  Done(): $.Channel<{}> | null {
+    return null
   }
 
   Err(): $.GoError {
@@ -78,7 +73,7 @@ class valueContext extends baseContext {
     return this.parent.Deadline()
   }
 
-  Done(): $.Channel<{}> {
+  Done(): $.Channel<{}> | null {
     return this.parent.Done()
   }
 
@@ -152,7 +147,14 @@ class cancelContext extends baseContext {
     }
   }
 
+  // propagateCancel arranges for the parent's cancellation to cancel this
+  // context. A parent that can never be canceled needs nothing.
   propagateCancel(): void {
+    const parentDone = this.parent.Done()
+    if (parentDone === null) {
+      return
+    }
+
     // Find parent cancelContext if any
     let parent = this.parent
     while (parent instanceof valueContext) {
@@ -172,25 +174,22 @@ class cancelContext extends baseContext {
         }
       }
     } else {
-      // Watch parent's Done channel
-      this.watchParentDone()
+      this.watchParentDone(parentDone)
     }
   }
 
-  private watchParentDone(): void {
-    const parentDone = this.parent.Done()
-    ;(async () => {
-      try {
-        await parentDone.receive()
-      } catch {
-        // Channel closed
-      }
-      // Parent is done, cancel this context
+  // watchParentDone cancels this context when parentDone closes. The wait is
+  // withdrawn when this context is canceled first, so a canceled child is not
+  // retained by a long-lived parent.
+  private watchParentDone(parentDone: $.Channel<{}>): void {
+    const stopWait = new AbortController()
+    this.removeFromParent = () => stopWait.abort()
+    void parentDone.selectReceive(0, stopWait.signal).then(() => {
       const parentErr = this.parent.Err()
       if (parentErr && this.err === null) {
         this.cancel(false, parentErr, null)
       }
-    })()
+    })
   }
 }
 
@@ -241,8 +240,8 @@ class withoutCancelContext extends baseContext {
     return [new time.Time(), false]
   }
 
-  Done(): $.Channel<{}> {
-    return backgroundContext.getNeverClosedChannel()
+  Done(): $.Channel<{}> | null {
+    return null
   }
 
   Err(): $.GoError {
@@ -394,11 +393,22 @@ export function AfterFunc(ctx: Context, f: (() => void) | null): () => boolean {
     throw new Error('cannot create context from nil parent')
   }
 
-  // The wait commits synchronously when ctx is done, before f runs.
+  // A context that can never be done never runs f.
   let settled = false
+  const done = ctx.Done()
+  if (done === null) {
+    return () => {
+      if (settled) {
+        return false
+      }
+      settled = true
+      return true
+    }
+  }
+
+  // The wait commits synchronously when ctx is done, before f runs.
   const stopWait = new AbortController()
-  void ctx
-    .Done()
+  void done
     .selectReceive(0, stopWait.signal, () => {
       settled = true
     })

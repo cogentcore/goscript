@@ -1545,15 +1545,16 @@ function newFetchContext(requestContext: context.Context): {
       controller.abort(requestContext?.Err?.() ?? context.Canceled)
     }
   }
+  const requestDone = requestContext?.Done() ?? null
   const donePromise =
-    requestContext == null ? null : (
+    requestDone == null ? null : (
       (async (): Promise<$.GoError> => {
         try {
-          await requestContext.Done().selectReceive(0, watchController?.signal)
+          await requestDone.selectReceive(0, watchController?.signal)
         } catch {
           // Closed channels and receive wakeups both mean the context is done.
         }
-        const err = requestContext.Err() ?? context.Canceled
+        const err = requestContext?.Err() ?? context.Canceled
         if (!stopped) {
           abort()
         }
