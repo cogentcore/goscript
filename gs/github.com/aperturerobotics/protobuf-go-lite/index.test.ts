@@ -1,3 +1,9 @@
+import {
+  createMessageType,
+  FieldFlag,
+  MAP_KEY_SHIFT,
+} from '@aptre/protobuf-es-lite'
+import { Timestamp } from '@aptre/protobuf-es-lite/google/protobuf/timestamp'
 import { describe, expect, it } from 'vitest'
 
 import * as $ from '../../../builtin/index.js'
@@ -194,12 +200,12 @@ class TestCloneMessage implements CloneMessage {
   }
 }
 
+// BrokenBoundMessage's type fails to encode, as a type does for a value its
+// field cannot hold.
 class BrokenBoundMessage {}
 
 ;(BrokenBoundMessage as any).__protobufTypeScriptMessage = {
-  typeName: 'test.BrokenBoundMessage',
-  fields: { list: () => [] },
-  fromBinary: () => ({}),
+  ...createMessageType('test.BrokenBoundMessage', () => []),
   toBinary: () => {
     throw new Error('invalid uint 32: undefined')
   },
@@ -213,18 +219,10 @@ class BytesBoundMessage {
   }
 }
 
-;(BytesBoundMessage as any).__protobufTypeScriptMessage = {
-  typeName: 'test.BytesBoundMessage',
-  fields: {
-    list: () => [{ localName: 'config', kind: 'scalar', T: 12 }],
-  },
-  fromBinary: () => ({}),
-  toBinary: (value: { config?: Uint8Array }) => {
-    expect(value.config).toBeInstanceOf(Uint8Array)
-    expect(Array.from(value.config ?? [])).toEqual([1, 2, 3])
-    return new Uint8Array([9])
-  },
-}
+;(BytesBoundMessage as any).__protobufTypeScriptMessage = createMessageType(
+  'test.BytesBoundMessage',
+  () => [[1, 'config', 12]],
+)
 
 class TextBoundMessage {
   Name = ''
@@ -235,42 +233,24 @@ class TextBoundMessage {
   }
 }
 
-// textMessageType encodes like protobuf-es-lite: its strings are JavaScript
-// text, written to the wire as UTF-8.
-const textMessageType = {
-  typeName: 'test.TextBoundMessage',
-  fields: {
-    list: () => [
-      { localName: 'name', kind: 'scalar', T: 9 },
-      {
-        localName: 'labels',
-        kind: 'map',
-        V: { localName: 'value', kind: 'scalar', T: 9 },
-      },
-    ],
-  },
-  toBinary: (value: unknown) =>
-    new TextEncoder().encode(textMessageType.toJsonString(value)),
-  fromBinary: (bytes: Uint8Array | null | undefined) =>
-    textMessageType.fromJsonString(
-      new TextDecoder().decode(bytes ?? undefined),
-    ),
-  toJsonString: (value: unknown) => JSON.stringify(value),
-  fromJsonString: (text: string | null | undefined) => JSON.parse(text ?? '{}'),
-}
+const textMessageType = createMessageType<{
+  name?: string
+  labels?: Record<string, string>
+}>('test.TextBoundMessage', () => [
+  [1, 'name', 9],
+  [2, 'labels', 9, FieldFlag.MAP | (9 << MAP_KEY_SHIFT)],
+])
 ;(TextBoundMessage as any).__protobufTypeScriptMessage = textMessageType
 
 class BinaryInputBoundMessage {
   static lastInput: Uint8Array | null | undefined
 
   static __protobufTypeScriptMessage = {
-    typeName: 'test.BinaryInputBoundMessage',
-    fields: { list: () => [] },
+    ...createMessageType('test.BinaryInputBoundMessage', () => []),
     fromBinary: (bytes: Uint8Array | null | undefined) => {
       BinaryInputBoundMessage.lastInput = bytes
       return {}
     },
-    toBinary: () => new Uint8Array(),
   }
 }
 
@@ -285,16 +265,6 @@ class TimestampBoundMessage {
   }
 }
 
-const timestampMessageType = {
-  typeName: 'google.protobuf.Timestamp',
-  fields: {
-    list: () => [
-      { localName: 'seconds', kind: 'scalar' },
-      { localName: 'nanos', kind: 'scalar' },
-    ],
-  },
-}
-
 class TimestampParentBoundMessage {
   declare public Timestamp: TimestampBoundMessage | null
 
@@ -303,32 +273,20 @@ class TimestampParentBoundMessage {
   }
 }
 
-;(TimestampParentBoundMessage as any).__protobufTypeScriptMessage = {
-  typeName: 'test.TimestampParentBoundMessage',
-  fields: {
-    list: () => [
-      {
-        localName: 'timestamp',
-        kind: 'message',
-        T: timestampMessageType,
-      },
-    ],
-  },
-  fromBinary: () => ({
-    timestamp: new Date(Date.UTC(2026, 4, 31, 12, 34, 56, 789)),
-  }),
-  toBinary: () => new Uint8Array(),
-}
+const timestampParentType = createMessageType<{ timestamp?: Date }>(
+  'test.TimestampParentBoundMessage',
+  () => [[1, 'timestamp', 11, 0, Timestamp.codec]],
+)
+;(TimestampParentBoundMessage as any).__protobufTypeScriptMessage =
+  timestampParentType
 ;(TimestampParentBoundMessage as any).__protobufTypeScriptFields = {
   timestamp: TimestampBoundMessage,
 }
 
-const oneofLeafMessageType = {
-  typeName: 'test.OneofLeafBoundMessage',
-  fields: {
-    list: () => [{ localName: 'label', kind: 'scalar' }],
-  },
-}
+const oneofLeafMessageType = createMessageType(
+  'test.OneofLeafBoundMessage',
+  () => [[1, 'label', 9]],
+)
 
 class OneofLeafBoundMessage {
   declare public Label: string
@@ -358,35 +316,58 @@ class OneofBoundMessage {
   }
 }
 
-;(OneofBoundMessage as any).__protobufTypeScriptMessage = {
-  typeName: 'test.OneofBoundMessage',
-  fields: {
-    list: () => [
-      {
-        localName: 'tabSet',
-        kind: 'message',
-        T: oneofLeafMessageType,
-        oneof: { localName: 'node' },
-      },
-    ],
-  },
-  fromBinary: () => ({
-    node: { case: 'tabSet', value: { label: 'files' } },
-  }),
-  toBinary: (value: {
-    node?: { case: string; value?: { label?: string } }
-  }) => {
-    expect(value.node?.case).toBe('tabSet')
-    expect(value.node?.value?.label).toBe('files')
-    return new Uint8Array([7])
-  },
-}
+const oneofMessageType = createMessageType<{
+  node?: { case: 'tabSet'; value: { label?: string } }
+}>('test.OneofBoundMessage', () => [
+  [1, 'tab_set', 11, 0, oneofLeafMessageType.codec, 'node'],
+])
+;(OneofBoundMessage as any).__protobufTypeScriptMessage = oneofMessageType
 ;(OneofBoundMessage as any).__protobufTypeScriptFields = {
   tabSet: OneofLeafBoundMessage,
 }
 ;(OneofBoundMessage as any).__protobufTypeScriptOneofFields = {
   node: { tabSet: OneofBoundMessage_TabSet },
 }
+
+// StartBoundMessage has the shape of a plugin's start info: several string
+// fields whose Go names differ from their proto names.
+class StartBoundMessage {
+  InstanceId = ''
+  PluginId = ''
+
+  constructor(init?: Partial<StartBoundMessage>) {
+    Object.assign(this, init)
+  }
+}
+
+const startMessageType = createMessageType<{
+  instanceId?: string
+  pluginId?: string
+}>('test.StartBoundMessage', () => [
+  [1, 'instance_id', 9],
+  [2, 'plugin_id', 9],
+])
+;(StartBoundMessage as any).__protobufTypeScriptMessage = startMessageType
+
+// KeyedBoundMessage holds a packed list and a map with 64-bit keys, whose Go
+// keys are bigints and whose TypeScript record keys are text.
+class KeyedBoundMessage {
+  Counts: $.Slice<number> = null
+  ById: Map<bigint, string> | null = null
+
+  constructor(init?: Partial<KeyedBoundMessage>) {
+    Object.assign(this, init)
+  }
+}
+
+const keyedMessageType = createMessageType<{
+  counts?: number[]
+  byId?: Record<string, string>
+}>('test.KeyedBoundMessage', () => [
+  [1, 'counts', 5, FieldFlag.REPEATED | FieldFlag.PACKED],
+  [2, 'by_id', 9, FieldFlag.MAP | (3 << MAP_KEY_SHIFT)],
+])
+;(KeyedBoundMessage as any).__protobufTypeScriptMessage = keyedMessageType
 
 describe('protobuf-go-lite EqualVT helpers', () => {
   it('accepts compiler-emitted runtime type arguments', () => {
@@ -522,7 +503,11 @@ describe('protobuf-go-lite TypeScript binding helpers', () => {
   it('converts Go strings and map keys to text across the binding', () => {
     const name = $.goString('🌻')
     const labels = new Map([[$.goString('🌳'), $.goString('💎')]])
-    const wire = new TextEncoder().encode(
+    const wire = textMessageType.toBinary({
+      name: '🌻',
+      labels: { '🌳': '💎' },
+    })
+    const jsonWire = new TextEncoder().encode(
       JSON.stringify({ name: '🌻', labels: { '🌳': '💎' } }),
     )
 
@@ -549,7 +534,7 @@ describe('protobuf-go-lite TypeScript binding helpers', () => {
       target,
     )
     expect(jsonErr).toBeNull()
-    expect(Array.from(json ?? [])).toEqual(Array.from(wire))
+    expect(Array.from(json ?? [])).toEqual(Array.from(jsonWire))
     const fromJSON = new TextBoundMessage()
     expect(
       UnmarshalBoundMessageJSON(TextBoundMessage as any, fromJSON, json),
@@ -564,7 +549,7 @@ describe('protobuf-go-lite TypeScript binding helpers', () => {
     )
 
     expect(err).toBeNull()
-    expect(Array.from(bytes ?? [])).toEqual([9])
+    expect(Array.from(bytes ?? [])).toEqual([10, 3, 1, 2, 3])
   })
 
   it('passes byte slices to binary unmarshal as typed-array views', () => {
@@ -600,7 +585,7 @@ describe('protobuf-go-lite TypeScript binding helpers', () => {
   })
 
   it('returns bytes written after marshaling into a sized buffer', () => {
-    const target = new Uint8Array([0, 0, 0])
+    const target = new Uint8Array(7)
     const [n, err] = MarshalBoundMessageToSizedBufferVT(
       BytesBoundMessage as any,
       new BytesBoundMessage([1, 2, 3]),
@@ -608,47 +593,122 @@ describe('protobuf-go-lite TypeScript binding helpers', () => {
     )
 
     expect(err).toBeNull()
-    expect(n).toBe(1)
-    expect(Array.from(target)).toEqual([0, 0, 9])
+    expect(n).toBe(5)
+    expect(Array.from(target)).toEqual([0, 0, 10, 3, 1, 2, 3])
   })
 
-  it('hydrates protobuf-es-lite timestamp Date fields into Go timestamp structs', () => {
+  it('converts protobuf-es-lite timestamp Dates to and from Go timestamp structs', () => {
+    // Decode a Date field into the Go timestamp struct.
+    const wire = timestampParentType.toBinary({
+      timestamp: new Date(Date.UTC(2026, 4, 31, 12, 34, 56, 789)),
+    })
     const target = new TimestampParentBoundMessage()
-
-    const err = UnmarshalBoundMessageVT(
-      TimestampParentBoundMessage as any,
-      target,
-      new Uint8Array(),
-    )
-
-    expect(err).toBeNull()
+    expect(
+      UnmarshalBoundMessageVT(TimestampParentBoundMessage as any, target, wire),
+    ).toBeNull()
     expect(target.Timestamp?.Seconds).toBe(1780230896n)
     expect(target.Timestamp?.Nanos).toBe(789000000)
+
+    // Encode the struct back to the same wire bytes.
+    const [bytes, err] = MarshalBoundMessageVT(
+      TimestampParentBoundMessage as any,
+      target,
+    )
+    expect(err).toBeNull()
+    expect(Array.from(bytes ?? [])).toEqual(Array.from(wire))
+  })
+
+  // A binding that reads no fields would decode every message as empty, so
+  // each field of a non-empty message must arrive in its Go field.
+  it('decodes every field of a non-empty message', () => {
+    // Decode the binary form.
+    const fields = { instanceId: 'web-1', pluginId: 'spacewave-wasivm' }
+    const fromVT = new StartBoundMessage()
+    expect(
+      UnmarshalBoundMessageVT(
+        StartBoundMessage as any,
+        fromVT,
+        startMessageType.toBinary(fields),
+      ),
+    ).toBeNull()
+    expect(fromVT).toMatchObject({
+      InstanceId: $.goString('web-1'),
+      PluginId: $.goString('spacewave-wasivm'),
+    })
+
+    // Decode the JSON form to the same fields.
+    const fromJSON = new StartBoundMessage()
+    const json = $.stringToBytes(
+      $.goString(startMessageType.toJsonString(fields)),
+    )
+    expect(
+      UnmarshalBoundMessageJSON(StartBoundMessage as any, fromJSON, json),
+    ).toBeNull()
+    expect(fromJSON).toEqual(fromVT)
+  })
+
+  it('converts lists and 64-bit map keys', () => {
+    // Encode a Go slice and a map keyed by int64.
+    const source = new KeyedBoundMessage({
+      Counts: $.arrayToSlice([1, 2, 3]),
+      ById: new Map([[7n, $.goString('seven')]]),
+    })
+    const [bytes, err] = MarshalBoundMessageVT(KeyedBoundMessage as any, source)
+    expect(err).toBeNull()
+    expect(keyedMessageType.fromBinary(bytes as Uint8Array)).toEqual({
+      counts: [1, 2, 3],
+      byId: { '7': 'seven' },
+    })
+
+    // Decode them back, with the map's text keys as bigints.
+    const target = new KeyedBoundMessage()
+    expect(
+      UnmarshalBoundMessageVT(KeyedBoundMessage as any, target, bytes),
+    ).toBeNull()
+    expect(Array.from($.asArray(target.Counts))).toEqual([1, 2, 3])
+    expect(Array.from(target.ById ?? [])).toEqual([[7n, $.goString('seven')]])
+  })
+
+  it('rejects a message type whose codec lists no fields', () => {
+    // Bind a type shaped like protobuf-es-lite 1.2.2, whose codec has no
+    // field list.
+    class OldBoundMessage {}
+    ;(OldBoundMessage as any).__protobufTypeScriptMessage = {
+      ...startMessageType,
+      codec: { typeName: 'test.OldBoundMessage' },
+    }
+
+    // Decoding fails instead of leaving every field unset.
+    const err = UnmarshalBoundMessageVT(
+      OldBoundMessage as any,
+      new OldBoundMessage(),
+      startMessageType.toBinary({ instanceId: 'web-1' }),
+    )
+    expect(err?.Error()).toMatch(/needs @aptre\/protobuf-es-lite 1.2.3/)
   })
 
   it('preserves protobuf oneof branches in bound binary helpers', () => {
+    // Encode a Go oneof member to the bytes protobuf-es-lite writes for it.
     const source = new OneofBoundMessage({
       Node: new OneofBoundMessage_TabSet({
         TabSet: new OneofLeafBoundMessage({ Label: 'files' }),
       }),
     })
-
+    const wire = oneofMessageType.toBinary({
+      node: { case: 'tabSet', value: { label: 'files' } },
+    })
     const [bytes, marshalErr] = MarshalBoundMessageVT(
       OneofBoundMessage as any,
       source,
     )
-
     expect(marshalErr).toBeNull()
-    expect(Array.from(bytes ?? [])).toEqual([7])
+    expect(Array.from(bytes ?? [])).toEqual(Array.from(wire))
 
+    // Decode them back into the member's Go wrapper struct.
     const target = new OneofBoundMessage()
-    const unmarshalErr = UnmarshalBoundMessageVT(
-      OneofBoundMessage as any,
-      target,
-      new Uint8Array([7]),
-    )
-
-    expect(unmarshalErr).toBeNull()
+    expect(
+      UnmarshalBoundMessageVT(OneofBoundMessage as any, target, wire),
+    ).toBeNull()
     expect(target.Node).toBeInstanceOf(OneofBoundMessage_TabSet)
     expect(target.Node?.TabSet).toBeInstanceOf(OneofLeafBoundMessage)
     expect(target.Node?.TabSet?.Label).toBe('files')
@@ -663,16 +723,11 @@ class ViewLeafBoundMessage {
   declare public Data: Uint8Array | null
 }
 
-const viewLeafType = {
-  typeName: 'test.ViewLeaf',
-  fields: {
-    list: () => [{ localName: 'data', kind: 'scalar', T: 12 }],
-  },
-}
+const viewLeafType = createMessageType('test.ViewLeaf', () => [[1, 'data', 12]])
 
-// ViewHolderBoundMessage mimics protobuf-es-lite decode semantics: bytes
-// fields decode as subarray views into the input buffer, so every decoded
-// byte aliases the caller-owned wire buffer until copied.
+// ViewHolderBoundMessage decodes through protobuf-es-lite, whose bytes fields
+// decode as subarray views into the input buffer, so every decoded byte
+// aliases the caller-owned wire buffer until copied.
 class ViewHolderBoundMessage {
   constructor(init?: {
     Leaf?: ViewLeafBoundMessage | null
@@ -691,64 +746,16 @@ class ViewHolderBoundMessage {
   declare public Entries: Map<string, ViewLeafBoundMessage | null> | null
 }
 
-;(ViewHolderBoundMessage as any).__protobufTypeScriptMessage = {
-  typeName: 'test.ViewHolder',
-  fields: {
-    list: () => [
-      { localName: 'leaf', kind: 'message', T: viewLeafType },
-      {
-        localName: 'leaves',
-        kind: 'message',
-        T: viewLeafType,
-        repeated: true,
-      },
-      {
-        localName: 'entries',
-        kind: 'map',
-        V: { kind: 'message', T: viewLeafType },
-      },
-    ],
-  },
-  fromBinary: (bytes: Uint8Array | null | undefined) => {
-    const b = bytes ?? new Uint8Array()
-    return {
-      leaf: { data: b.subarray(0, 4) },
-      leaves: [{ data: b.subarray(0, 4) }, { data: b.subarray(4, 8) }],
-      entries: {
-        first: { data: b.subarray(0, 4) },
-        second: { data: b.subarray(4, 8) },
-      },
-    }
-  },
-  toBinary: (value: {
-    leaf?: { data?: Uint8Array | null } | null
-    leaves?: ({ data?: Uint8Array | null } | null)[] | null
-    entries?: Record<string, { data?: Uint8Array | null } | null>
-  }) => {
-    const parts: Uint8Array[] = []
-    if (value.leaf?.data != null) {
-      parts.push(value.leaf.data)
-    }
-    for (const leaf of value.leaves ?? []) {
-      if (leaf?.data != null) {
-        parts.push(leaf.data)
-      }
-    }
-    for (const key of Object.keys(value.entries ?? {}).sort()) {
-      const leaf = (value.entries ?? {})[key]
-      if (leaf?.data != null) {
-        parts.push(leaf.data)
-      }
-    }
-    const out = new Uint8Array(parts.reduce((n, p) => n + p.length, 0))
-    let offset = 0
-    for (const part of parts) {
-      out.set(part, offset)
-      offset += part.length
-    }
-    return out
-  },
-}
+const viewHolderType = createMessageType<{
+  leaf?: { data?: Uint8Array }
+  leaves?: { data?: Uint8Array }[]
+  entries?: Record<string, { data?: Uint8Array }>
+}>('test.ViewHolder', () => [
+  [1, 'leaf', 11, 0, viewLeafType.codec],
+  [2, 'leaves', 11, FieldFlag.REPEATED, viewLeafType.codec],
+  [3, 'entries', 11, FieldFlag.MAP | (9 << MAP_KEY_SHIFT), viewLeafType.codec],
+])
+;(ViewHolderBoundMessage as any).__protobufTypeScriptMessage = viewHolderType
 ;(ViewHolderBoundMessage as any).__protobufTypeScriptFields = {
   leaf: ViewLeafBoundMessage,
   leaves: ViewLeafBoundMessage,
@@ -759,10 +766,16 @@ describe('protobuf-go-lite bound unmarshal owns decoded bytes', () => {
   it('retains singular, nested, repeated, and map bytes after scrubbing the input', () => {
     // The payload sits at a nonzero offset inside a larger buffer so an
     // aliased view keeps pointing at live memory even when lengths survive.
-    const backing = new Uint8Array(20)
-    backing.set([1, 2, 3, 4], 4)
-    backing.set([5, 6, 7, 8], 8)
-    const view = backing.subarray(4, 12)
+    const first = Uint8Array.of(1, 2, 3, 4)
+    const second = Uint8Array.of(5, 6, 7, 8)
+    const wire = viewHolderType.toBinary({
+      leaf: { data: first },
+      leaves: [{ data: first }, { data: second }],
+      entries: { first: { data: first }, second: { data: second } },
+    })
+    const backing = new Uint8Array(wire.length + 8)
+    backing.set(wire, 4)
+    const view = backing.subarray(4, 4 + wire.length)
 
     const target = new ViewHolderBoundMessage()
     expect(
@@ -1128,9 +1141,7 @@ describe('generated method installation', () => {
   it('uses the declaring constructor for nil and borrowed receivers and preserves custom methods', () => {
     class Installed {
       static __protobufTypeScriptMessage = {
-        typeName: 'test.Installed',
-        fields: { list: () => [] },
-        fromBinary: () => ({}),
+        ...createMessageType('test.Installed', () => []),
         toBinary: () => new Uint8Array([7]),
       }
       declare MarshalVT: () => [$.Slice<number>, $.GoError]

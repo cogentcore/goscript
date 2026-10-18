@@ -399,27 +399,56 @@ export function EqualVTMapImplicit<K, V extends EqualVT<V>>(
   return true
 }
 
+// BoundMessageType is the part of a protobuf-es-lite MessageType the bindings
+// use: the generated TypeScript type a Go message delegates to.
 type BoundMessageType = {
-  typeName?: string
-  fields?: { list(): readonly BoundFieldInfo[] }
-  clone?: (value: any) => any
-  equals?: (a: any, b: any) => boolean
-  fromBinary: (bytes: Uint8Array | null | undefined) => any
-  fromJson?: (value: unknown) => any
-  fromJsonString?: (value: string | null | undefined) => any
-  toBinary: (value: any) => Uint8Array
-  toJson?: (value: any) => unknown
-  toJsonString?: (value: any) => string
+  readonly typeName: string
+  readonly codec: BoundCodec
+  clone(value: any): any
+  equals(a: any, b: any): boolean
+  fromBinary(bytes: Uint8Array | null | undefined): any
+  toBinary(value: any): Uint8Array
+  fromJson(value: unknown): any
+  fromJsonString(value: string | null | undefined): any
+  toJsonString(value: any): string
 }
 
-type BoundFieldInfo = {
-  localName: string
-  kind: string
-  repeated?: boolean
-  oneof?: { localName: string }
-  T?: any
-  V?: BoundFieldInfo
+// BoundCodec is the part of a protobuf-es-lite MessageCodec the bindings use:
+// the message's resolved fields, and for a well-known type held as a plain
+// value, such as a Timestamp held as a Date, the conversions to that value.
+type BoundCodec = {
+  readonly typeName: string
+  readonly unwrap: ((m: any) => unknown) | undefined
+  readonly wrap: ((v: unknown) => any) | undefined
+  fields(): { readonly list: readonly BoundField[] }
 }
+
+// BoundField is the part of a protobuf-es-lite FieldInfo the bindings use. For
+// a map, kind, scalar, str and msg describe its values and key its keys.
+type BoundField = {
+  readonly local: string
+  readonly shape: number
+  readonly kind: number
+  readonly scalar: number
+  readonly str: boolean
+  readonly key: number
+  readonly oneof: string
+  readonly msg: BoundCodec | undefined
+}
+
+// The FieldShape, FieldKind and scalar type values of protobuf-es-lite that
+// the bindings branch on.
+const shapeList = 2
+const shapeMap = 3
+const shapeOneof = 4
+const kindMessage = 2
+const kindValue = 3
+const scalarBool = 8
+const scalarString = 9
+const scalarBytes = 12
+
+// longScalars holds the 64-bit integer scalar types, which Go holds as bigint.
+const longScalars = new Set([3, 4, 6, 16, 18])
 
 type BoundMessageCtor<T = any> = {
   new (init?: any): T
@@ -432,150 +461,212 @@ type BoundMessageCtor<T = any> = {
   __protobufTypeScriptMessage?: BoundMessageType
 }
 
-const protobufScalarTypeBytes = 12
-
+// boundMessageType returns the TypeScript type bound to ctor. It throws when
+// the type predates protobuf-es-lite 1.2.3, whose codecs list their fields;
+// without the list every field would convert as unset.
 function boundMessageType(ctor: BoundMessageCtor): BoundMessageType {
   const messageType = ctor.__protobufTypeScriptMessage
   if (messageType == null) {
     throw new Error('protobuf TypeScript binding is missing message type')
   }
+  if (typeof messageType.codec?.fields !== 'function') {
+    throw new Error(
+      `protobuf TypeScript binding for ${messageType.typeName} needs @aptre/protobuf-es-lite 1.2.3 or later`,
+    )
+  }
   return messageType
 }
 
-function resolveBoundMessageType(value: any): BoundMessageType {
-  return typeof value === 'function' ? value() : value
+// goFieldName returns the Go struct field name for a protobuf-es-lite local
+// name.
+function goFieldName(local: string): string {
+  return local.length === 0 ? local : local[0].toUpperCase() + local.slice(1)
 }
 
-function boundFieldGoName(field: BoundFieldInfo): string {
-  if (field.localName.length === 0) {
-    return field.localName
-  }
-  return field.localName[0].toUpperCase() + field.localName.slice(1)
-}
-
-function boundFieldValue(source: any, field: BoundFieldInfo): any {
-  if (source == null) {
-    return undefined
-  }
-  const local = source[field.localName]
-  if (local !== undefined) {
-    return local
-  }
-  return source[boundFieldGoName(field)]
-}
-
-function boundOneofGroupGoName(field: BoundFieldInfo): string {
-  return boundFieldGoName({ ...field, localName: field.oneof?.localName ?? '' })
-}
-
-// toTypeScriptScalarValue converts a Go scalar to its protobuf-es-lite form: a
-// Go string, held as its UTF-8 bytes, becomes JavaScript text.
-function toTypeScriptScalarValue(value: any, field?: BoundFieldInfo): any {
-  const unwrapped = $.pointerValueOrNil(value)
-  if (typeof unwrapped === 'string') {
-    return $.jsString(unwrapped)
-  }
-  if (
-    field?.kind === 'scalar' &&
-    field.T === protobufScalarTypeBytes &&
-    unwrapped != null &&
-    !(unwrapped instanceof Uint8Array)
-  ) {
-    return Uint8Array.from($.asArray(unwrapped))
-  }
-  return unwrapped
-}
-
-function toTypeScriptFieldValue(
-  field: BoundFieldInfo,
-  value: any,
-  ctor?: BoundMessageCtor,
-): any {
+// toTypeScriptMessage converts the Go message value to the protobuf-es-lite
+// message of codec, leaving unset fields out.
+function toTypeScriptMessage(value: any, codec: BoundCodec): any {
+  // A nil Go message converts as unset.
   value = $.pointerValueOrNil(value)
   if (value == null) {
     return undefined
   }
-  if (field.repeated) {
-    return $.asArray(value).map((item) =>
-      toTypeScriptFieldValue({ ...field, repeated: false }, item, ctor),
-    )
+  const out: Record<string, unknown> = {}
+  for (const field of codec.fields().list) {
+    // A oneof holds its set member as a struct with that member's field.
+    if (field.shape === shapeOneof) {
+      const group = $.pointerValueOrNil(value[goFieldName(field.oneof)])
+      const raw = group?.[goFieldName(field.local)]
+      if (raw == null || out[field.oneof] !== undefined) {
+        continue
+      }
+      out[field.oneof] = {
+        case: field.local,
+        value: toTypeScriptValue(field, raw),
+      }
+      continue
+    }
+    const raw = value[goFieldName(field.local)]
+    if (raw == null) {
+      continue
+    }
+    out[field.local] = toTypeScriptFieldValue(field, raw)
   }
-  if (field.kind === 'map') {
+  return out
+}
+
+// toTypeScriptFieldValue converts the Go value of a set field: a slice, a map
+// or a single value.
+function toTypeScriptFieldValue(field: BoundField, value: any): any {
+  if (field.shape === shapeList) {
+    return $.asArray(value).map((item) => toTypeScriptValue(field, item))
+  }
+  if (field.shape === shapeMap) {
     const out: Record<string, unknown> = {}
-    const valueInfo = field.V
-    const entries =
-      value instanceof Map ? Array.from(value.entries()) : Object.entries(value)
-    for (const [key, item] of entries) {
+    for (const [key, item] of $.pointerValueOrNil(value)?.entries() ?? []) {
       out[typeof key === 'string' ? $.jsString(key) : String(key)] =
-        valueInfo != null ?
-          toTypeScriptFieldValue(valueInfo, item, ctor)
-        : toTypeScriptScalarValue(item)
+        toTypeScriptValue(field, item)
     }
     return out
   }
-  if (field.kind === 'message') {
-    const messageType = resolveBoundMessageType(field.T)
-    return toTypeScriptMessage(value, messageType, ctor)
-  }
-  return toTypeScriptScalarValue(value, field)
+  return toTypeScriptValue(field, value)
 }
 
-function toTypeScriptMessage(
-  value: any,
-  messageType: BoundMessageType,
-  ctor?: BoundMessageCtor,
-): any {
+// toTypeScriptValue converts one Go value of field. Go strings, held as their
+// UTF-8 bytes, become JavaScript text, and a message held as a plain value
+// becomes that value.
+function toTypeScriptValue(field: BoundField, value: any): any {
+  // A nil pointer converts as unset.
   value = $.pointerValueOrNil(value)
   if (value == null) {
     return undefined
   }
-  const fields = messageType.fields?.list()
-  if (fields == null) {
-    return value
+  if (field.kind === kindMessage) {
+    return toTypeScriptMessage(value, field.msg!)
   }
-  const fieldCtors = ctor?.__protobufTypeScriptFields ?? {}
-  const out: Record<string, unknown> = {}
-  for (const field of fields) {
-    if (field.oneof != null) {
-      const groupName = field.oneof.localName
-      const group = boundFieldValue(value, {
-        ...field,
-        localName: groupName,
-        oneof: undefined,
-      })
-      if (group == null || out[groupName] !== undefined) {
+  if (field.kind === kindValue) {
+    return field.msg!.unwrap!(toTypeScriptMessage(value, field.msg!))
+  }
+  if (typeof value === 'string') {
+    return $.jsString(value)
+  }
+  if (field.str) {
+    return String(value)
+  }
+  if (field.scalar === scalarBytes && !(value instanceof Uint8Array)) {
+    return Uint8Array.from($.asArray(value))
+  }
+  return value
+}
+
+// fromTypeScriptMessage converts the protobuf-es-lite message of codec to a
+// new Go message built by ctor. fieldCtors and oneofCtors in ctor give the Go
+// constructors of its message fields and oneof members.
+function fromTypeScriptMessage(
+  value: any,
+  ctor: BoundMessageCtor,
+  codec: BoundCodec,
+): any {
+  // An unset message converts to a nil Go message.
+  if (value == null) {
+    return null
+  }
+  const out = new ctor()
+  const fieldCtors = ctor.__protobufTypeScriptFields ?? {}
+  const oneofCtors = ctor.__protobufTypeScriptOneofFields ?? {}
+  for (const field of codec.fields().list) {
+    // A oneof holds { case, value }; Go holds the set member as a struct.
+    if (field.shape === shapeOneof) {
+      const raw = value[field.oneof]
+      if (raw?.case !== field.local) {
         continue
       }
-      const raw = boundFieldValue(group, field)
-      if (raw === undefined || raw === null) {
-        continue
-      }
-      out[groupName] = {
-        case: field.localName,
-        value: toTypeScriptFieldValue(
+      const member = {
+        [goFieldName(field.local)]: fromTypeScriptValue(
           field,
-          raw,
-          fieldCtors[field.localName] ?? raw?.constructor,
+          raw.value,
+          fieldCtors[field.local],
         ),
       }
+      const memberCtor = oneofCtors[field.oneof]?.[field.local]
+      out[goFieldName(field.oneof)] =
+        memberCtor == null ? member : new memberCtor(member)
       continue
     }
-    const raw = boundFieldValue(value, field)
-    if (raw === undefined || raw === null) {
+    const raw = value[field.local]
+    if (raw == null) {
       continue
     }
-    out[field.localName] = toTypeScriptFieldValue(
+    out[goFieldName(field.local)] = fromTypeScriptFieldValue(
       field,
       raw,
-      fieldCtors[field.localName],
+      fieldCtors[field.local],
     )
   }
   return out
 }
 
-// fromTypeScriptScalarValue converts a protobuf-es-lite scalar to its Go form:
-// JavaScript text becomes a Go string of its UTF-8 bytes.
-function fromTypeScriptScalarValue(value: any): any {
+// fromTypeScriptFieldValue converts the protobuf-es-lite value of a set field:
+// an array, a map record or a single value.
+function fromTypeScriptFieldValue(
+  field: BoundField,
+  value: any,
+  ctor: BoundMessageCtor | undefined,
+): any {
+  if (field.shape === shapeList) {
+    return $.arrayToSlice(
+      value.map((item: any) => fromTypeScriptValue(field, item, ctor)),
+    )
+  }
+  if (field.shape === shapeMap) {
+    const out = new Map<any, any>()
+    for (const [key, item] of Object.entries(value)) {
+      out.set(
+        fromTypeScriptMapKey(field.key, key),
+        fromTypeScriptValue(field, item, ctor),
+      )
+    }
+    return out
+  }
+  return fromTypeScriptValue(field, value, ctor)
+}
+
+// fromTypeScriptMapKey converts a map record key to the Go key of its scalar
+// type.
+function fromTypeScriptMapKey(scalar: number, key: string): any {
+  if (scalar === scalarString) {
+    return $.goString(key)
+  }
+  if (scalar === scalarBool) {
+    return key === 'true'
+  }
+  return longScalars.has(scalar) ? BigInt(key) : Number(key)
+}
+
+// fromTypeScriptValue converts one protobuf-es-lite value of field. Text
+// becomes a Go string of its UTF-8 bytes, and a plain value held in place of
+// a message becomes that message.
+function fromTypeScriptValue(
+  field: BoundField,
+  value: any,
+  ctor: BoundMessageCtor | undefined,
+): any {
+  // An unset value converts to Go nil.
+  if (value == null) {
+    return null
+  }
+  if (field.kind === kindMessage || field.kind === kindValue) {
+    if (ctor == null) {
+      throw new Error(
+        `protobuf TypeScript binding has no Go type for field ${field.local} of ${field.msg!.typeName}`,
+      )
+    }
+    const message = field.kind === kindValue ? field.msg!.wrap!(value) : value
+    return fromTypeScriptMessage(message, ctor, field.msg!)
+  }
+  if (field.str) {
+    return BigInt(value)
+  }
   if (typeof value === 'string') {
     return $.goString(value)
   }
@@ -587,113 +678,6 @@ function fromTypeScriptScalarValue(value: any): any {
     return value.slice()
   }
   return value
-}
-
-function fromTypeScriptFieldValue(
-  field: BoundFieldInfo,
-  value: any,
-  ctor?: BoundMessageCtor,
-): any {
-  if (value == null) {
-    return null
-  }
-  if (field.repeated) {
-    return $.arrayToSlice(
-      value.map((item: any) =>
-        fromTypeScriptFieldValue({ ...field, repeated: false }, item, ctor),
-      ),
-    )
-  }
-  if (field.kind === 'map') {
-    const valueInfo = field.V
-    const out = new Map<any, any>()
-    for (const [key, item] of Object.entries(value)) {
-      out.set(
-        $.goString(key),
-        valueInfo != null ?
-          fromTypeScriptFieldValue(valueInfo, item, ctor)
-        : fromTypeScriptScalarValue(item),
-      )
-    }
-    return out
-  }
-  if (field.kind === 'message') {
-    const messageType = resolveBoundMessageType(field.T)
-    if (ctor == null) {
-      return value
-    }
-    return fromTypeScriptMessage(value, ctor, messageType)
-  }
-  return fromTypeScriptScalarValue(value)
-}
-
-function fromTypeScriptWellKnownMessage(
-  value: any,
-  ctor: BoundMessageCtor,
-  messageType?: BoundMessageType,
-): any {
-  if (
-    messageType?.typeName === 'google.protobuf.Timestamp' &&
-    value instanceof Date
-  ) {
-    const ms = value.getTime()
-    const seconds = Math.floor(ms / 1000)
-    const nanos = Math.trunc((ms - seconds * 1000) * 1000000)
-    return new ctor({ Seconds: BigInt(seconds), Nanos: nanos })
-  }
-  return undefined
-}
-
-function fromTypeScriptMessage(
-  value: any,
-  ctor: BoundMessageCtor,
-  messageType?: BoundMessageType,
-): any {
-  if (value == null) {
-    return null
-  }
-  const wellKnown = fromTypeScriptWellKnownMessage(value, ctor, messageType)
-  if (wellKnown !== undefined) {
-    return wellKnown
-  }
-  const out = new ctor()
-  const fields = (messageType ?? boundMessageType(ctor)).fields?.list()
-  if (fields == null) {
-    return Object.assign(out, value)
-  }
-  const fieldCtors = ctor.__protobufTypeScriptFields ?? {}
-  const oneofCtors = ctor.__protobufTypeScriptOneofFields ?? {}
-  for (const field of fields) {
-    if (field.oneof != null) {
-      const groupName = field.oneof.localName
-      const raw = value[groupName]
-      if (raw?.case !== field.localName) {
-        continue
-      }
-      const branchCtor = oneofCtors[groupName]?.[field.localName]
-      const branchValue = fromTypeScriptFieldValue(
-        field,
-        raw.value,
-        fieldCtors[field.localName],
-      )
-      const branchFieldName = boundFieldGoName(field)
-      out[boundOneofGroupGoName(field)] =
-        branchCtor == null ?
-          { [branchFieldName]: branchValue }
-        : new branchCtor({ [branchFieldName]: branchValue })
-      continue
-    }
-    const raw = value[field.localName]
-    if (raw === undefined || raw === null) {
-      continue
-    }
-    out[boundFieldGoName(field)] = fromTypeScriptFieldValue(
-      field,
-      raw,
-      fieldCtors[field.localName],
-    )
-  }
-  return out
 }
 
 /**
@@ -789,9 +773,9 @@ export function CloneBoundMessage<T>(
   value: T | $.VarRef<T> | null,
 ): T | null {
   const messageType = boundMessageType(ctor)
-  const encoded = toTypeScriptMessage(value, messageType, ctor)
-  const cloned = messageType.clone?.(encoded) ?? structuredClone(encoded)
-  return fromTypeScriptMessage(cloned, ctor, messageType)
+  const encoded = toTypeScriptMessage(value, messageType.codec)
+  const cloned = messageType.clone(encoded)
+  return fromTypeScriptMessage(cloned, ctor, messageType.codec)
 }
 
 export function EqualBoundMessage<T>(
@@ -810,12 +794,9 @@ export function EqualBoundMessage<T>(
   }
 
   const messageType = boundMessageType(ctor)
-  const left = toTypeScriptMessage(leftValue, messageType, ctor)
-  const right = toTypeScriptMessage(rightValue, messageType, ctor)
-  return (
-    messageType.equals?.(left, right) ??
-    JSON.stringify(left) === JSON.stringify(right)
-  )
+  const left = toTypeScriptMessage(leftValue, messageType.codec)
+  const right = toTypeScriptMessage(rightValue, messageType.codec)
+  return messageType.equals(left, right)
 }
 
 export function MarshalBoundMessageVT<T>(
@@ -825,9 +806,9 @@ export function MarshalBoundMessageVT<T>(
   let typeName = ctor.name
   try {
     const messageType = boundMessageType(ctor)
-    typeName = messageType.typeName ?? typeName
+    typeName = messageType.typeName
     return [
-      messageType.toBinary(toTypeScriptMessage(value, messageType, ctor)),
+      messageType.toBinary(toTypeScriptMessage(value, messageType.codec)),
       null,
     ]
   } catch (err) {
@@ -870,7 +851,7 @@ export function UnmarshalBoundMessageVT<T>(
   try {
     const messageType = boundMessageType(ctor)
     const decoded = messageType.fromBinary($.bytesToUint8Array(data))
-    const next = fromTypeScriptMessage(decoded, ctor, messageType)
+    const next = fromTypeScriptMessage(decoded, ctor, messageType.codec)
     $.assignStruct($.pointerValue(target), $.markAsStructValue(next))
     return null
   } catch (err) {
@@ -884,10 +865,8 @@ export function MarshalBoundMessageJSON<T>(
 ): [$.Slice<number>, $.GoError] {
   try {
     const messageType = boundMessageType(ctor)
-    const encoded = toTypeScriptMessage(value, messageType, ctor)
-    const json =
-      messageType.toJsonString?.(encoded) ??
-      JSON.stringify(messageType.toJson?.(encoded) ?? encoded)
+    const encoded = toTypeScriptMessage(value, messageType.codec)
+    const json = messageType.toJsonString(encoded)
     return [$.stringToBytes($.goString(json)), null]
   } catch (err) {
     return [null, $.toGoError(err as Error)]
@@ -902,10 +881,8 @@ export function UnmarshalBoundMessageJSON<T>(
   try {
     const messageType = boundMessageType(ctor)
     const text = $.jsString($.bytesToString(data))
-    const decoded =
-      messageType.fromJsonString?.(text) ??
-      messageType.fromJson?.(JSON.parse(text))
-    const next = fromTypeScriptMessage(decoded, ctor, messageType)
+    const decoded = messageType.fromJsonString(text)
+    const next = fromTypeScriptMessage(decoded, ctor, messageType.codec)
     $.assignStruct($.pointerValue(target), $.markAsStructValue(next))
     return null
   } catch (err) {
@@ -942,8 +919,8 @@ export function UnmarshalBoundMessageProtoJSON<T>(
   }
   try {
     const messageType = boundMessageType(ctor)
-    const decoded = messageType.fromJson?.(jsStringsDeep((state as any).value))
-    const next = fromTypeScriptMessage(decoded, ctor, messageType)
+    const decoded = messageType.fromJson(jsStringsDeep((state as any).value))
+    const next = fromTypeScriptMessage(decoded, ctor, messageType.codec)
     $.assignStruct($.pointerValue(target), $.markAsStructValue(next))
   } catch (err) {
     state.SetError($.toGoError(err as Error))
