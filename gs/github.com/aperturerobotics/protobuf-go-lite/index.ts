@@ -772,8 +772,13 @@ export function CloneBoundMessage<T>(
   ctor: BoundMessageCtor<T>,
   value: T | $.VarRef<T> | null,
 ): T | null {
+  // Match the generated Go CloneVT: a nil message clones to nil, where
+  // protobuf-es-lite would clone it to an empty message.
   const messageType = boundMessageType(ctor)
   const encoded = toTypeScriptMessage(value, messageType.codec)
+  if (encoded === undefined) {
+    return null
+  }
   const cloned = messageType.clone(encoded)
   return fromTypeScriptMessage(cloned, ctor, messageType.codec)
 }
@@ -793,6 +798,7 @@ export function EqualBoundMessage<T>(
     return false
   }
 
+  // Compare both messages as protobuf-es-lite values.
   const messageType = boundMessageType(ctor)
   const left = toTypeScriptMessage(leftValue, messageType.codec)
   const right = toTypeScriptMessage(rightValue, messageType.codec)

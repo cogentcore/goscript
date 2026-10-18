@@ -11,6 +11,7 @@ import { Builder } from '../../../strings/index.js'
 import {
   AppendVarint,
   BindMessageMethods,
+  CloneBoundMessage,
   DecodeBytes,
   DecodeBytesAppend,
   DecodeFloat32,
@@ -487,6 +488,16 @@ describe('protobuf-go-lite TypeScript binding helpers', () => {
         new BinaryInputBoundMessage(),
       ),
     ).toBe(true)
+  })
+
+  // Generated Go CloneVT returns nil for a nil receiver; callers clone
+  // optional message fields without checking them first.
+  it('clones nil messages like the generated Go CloneVT', () => {
+    const empty = new BinaryInputBoundMessage()
+
+    expect(CloneBoundMessage(BinaryInputBoundMessage, null)).toBeNull()
+    expect(CloneBoundMessage(BinaryInputBoundMessage, empty)).not.toBeNull()
+    expect(CloneBoundMessage(BinaryInputBoundMessage, empty)).not.toBe(empty)
   })
 
   it('adds message type context to binary marshal errors', () => {
