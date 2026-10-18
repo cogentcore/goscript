@@ -21,12 +21,11 @@ export class GoPanic extends Error {
   }
 }
 
-// panicStack holds GoPanics that have been thrown but not yet cleared by a
-// recover-aware catch. activeRecoverPanic is set only while a defer stack is
-// disposing the exact GoPanic caught by that frame; recover() outside that
-// dynamic scope returns nil, so unrelated async panics cannot be recovered by
-// another task.
-const panicStack: GoPanic[] = []
+// activeRecoverPanic is set only while a defer stack is disposing the exact
+// GoPanic caught by that frame; recover() outside that dynamic scope returns
+// nil, so unrelated async panics cannot be recovered by another task. No other
+// runtime state refers to a GoPanic, so a panic that JavaScript code catches
+// without a Go recover is collected with everything its stack trace retains.
 let activeRecoverPanic: GoPanic | null = null
 
 export function withRecoveringPanic<T>(err: unknown, fn: () => T): T {
@@ -60,9 +59,7 @@ export class RuntimeError extends Error {
  */
 export function panic(...args: unknown[]): never {
   const value = args.length === 1 ? args[0] : args
-  const goPanic = new GoPanic(value)
-  panicStack.push(goPanic)
-  throw goPanic
+  throw new GoPanic(value)
 }
 
 // notImplemented panics for a Go export that its override package does not
@@ -77,9 +74,7 @@ export function notImplemented(name: string): never {
 // length 3"). Every runtime fault routes through here so recover() observes a
 // GoPanic whose value is a runtime.Error, matching Go.
 export function runtimePanic(message: string): never {
-  const goPanic = new GoPanic(new RuntimeError(message))
-  panicStack.push(goPanic)
-  throw goPanic
+  throw new GoPanic(new RuntimeError(message))
 }
 
 export function panicValue(value: unknown): unknown {
@@ -131,25 +126,14 @@ export function recover(): any {
     return null
   }
   goPanic.recovered = true
-  const idx = panicStack.indexOf(goPanic)
-  if (idx !== -1) {
-    panicStack.splice(idx, 1)
-  }
   return goPanic.value
 }
 
-// recovered reports whether err is a GoPanic that a deferred recover() consumed,
-// and removes it from the in-flight stack. The catch block generated for a
+// recovered reports whether err is a GoPanic that a deferred recover() consumed.
+// The catch block generated for a
 // defer+recover function calls this: true means swallow the panic and return the
 // function's named results; false means rethrow so an outer frame can recover or
 // the program crashes with the Go panic message.
 export function recovered(err: unknown): boolean {
-  if (err instanceof GoPanic && err.recovered) {
-    const idx = panicStack.indexOf(err)
-    if (idx !== -1) {
-      panicStack.splice(idx, 1)
-    }
-    return true
-  }
-  return false
+  return err instanceof GoPanic && err.recovered
 }
