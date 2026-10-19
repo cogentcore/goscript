@@ -1,0 +1,5 @@
+rpc svc/Method true
+label client a
+label pid 7
+value 17
+outer rpc false

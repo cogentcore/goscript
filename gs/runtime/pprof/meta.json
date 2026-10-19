@@ -1,6 +1,11 @@
 {
   "dependencies": [
+    "context",
     "errors",
     "io"
-  ]
+  ],
+  "callbackAsyncFunctions": {
+    "Do": true,
+    "ForLabels": true
+  }
 }

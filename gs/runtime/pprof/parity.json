@@ -2,6 +2,21 @@
   "schemaVersion": 1,
   "strict": false,
   "symbols": {
+    "Do": {
+      "status": "real"
+    },
+    "ForLabels": {
+      "status": "real"
+    },
+    "Label": {
+      "status": "real"
+    },
+    "LabelSet": {
+      "status": "real"
+    },
+    "Labels": {
+      "status": "real"
+    },
     "Lookup": {
       "status": "real"
     },
@@ -14,10 +29,16 @@
     "Profiles": {
       "status": "real"
     },
+    "SetGoroutineLabels": {
+      "status": "real"
+    },
     "StartCPUProfile": {
       "status": "real"
     },
     "StopCPUProfile": {
+      "status": "real"
+    },
+    "WithLabels": {
       "status": "real"
     },
     "WriteHeapProfile": {

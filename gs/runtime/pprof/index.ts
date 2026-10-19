@@ -1,4 +1,5 @@
 import * as $ from '@goscript/builtin/index.js'
+import * as context from '@goscript/context/index.js'
 import * as errors from '@goscript/errors/index.js'
 import * as io from '@goscript/io/index.js'
 
@@ -103,34 +104,105 @@ export function WriteHeapProfile(w: WriterArg): $.GoError {
   return unsupportedProfileError
 }
 
-export function SetGoroutineLabels(_ctx: unknown): void {}
+export function SetGoroutineLabels(_ctx: context.Context): void {}
 
-export function Do(
-  _ctx: unknown,
-  _labels: unknown,
-  fn: (() => void) | null,
-): void {
-  fn?.()
+// LabelSet is a set of profiler labels, sorted by key with one value per key.
+export class LabelSet {
+  public list: Array<[string, string]>
+
+  constructor(list: Array<[string, string]> = []) {
+    this.list = list
+  }
+
+  public clone(): LabelSet {
+    return $.markAsStructValue(new LabelSet(this.list))
+  }
+
+  public __goscriptAssign(source: LabelSet): this {
+    this.list = source.list
+    return this
+  }
 }
 
-export function ForLabels(_ctx: unknown, _f: unknown): void {}
-
-export function WithLabels(ctx: unknown, _labels: unknown): unknown {
-  return ctx
-}
-
-export function Labels(...args: string[]): Map<string, string> {
+// Labels takes an even number of strings as key, value pairs; a later value
+// replaces an earlier one with the same key.
+export function Labels(...args: string[]): LabelSet {
+  if (args.length % 2 === 1) {
+    throw new Error('uneven number of arguments to pprof.Labels')
+  }
   const labels = new Map<string, string>()
-  for (let i = 0; i + 1 < args.length; i += 2) {
+  for (let i = 0; i < args.length; i += 2) {
     labels.set(args[i], args[i + 1])
   }
-  return labels
+  return sortedLabelSet(labels)
 }
+
+// WithLabels returns a context carrying the context's labels merged with
+// labels, where labels wins on a shared key.
+export function WithLabels(
+  ctx: context.Context,
+  labels: LabelSet,
+): context.Context {
+  const merged = new Map(contextLabels(ctx).list)
+  for (const [key, value] of labels.list) {
+    merged.set(key, value)
+  }
+  return context.WithValue(ctx, labelContextKey, sortedLabelSet(merged))
+}
+
+export function Label(ctx: context.Context, key: string): [string, boolean] {
+  const found = contextLabels(ctx).list.find(([k]) => k === key)
+  return found === undefined ? ['', false] : [found[1], true]
+}
+
+// ForLabels calls f with each label in ctx in key order until f returns false.
+export function ForLabels<R extends $.MaybePromise<boolean>>(
+  ctx: context.Context,
+  f: ((key: string, value: string) => R) | null,
+): $.CallbackResult<R, void> {
+  const list = contextLabels(ctx).list
+  return $.runCallbacks(
+    (function* () {
+      for (const [key, value] of list) {
+        if (!(yield f!(key, value))) {
+          return
+        }
+      }
+    })(),
+  )
+}
+
+// Do calls f with a copy of ctx carrying labels and returns f's promise when
+// f suspends. GoScript has no profiler, so the labels are visible only
+// through Label and ForLabels.
+export function Do<R extends void | globalThis.Promise<void>>(
+  ctx: context.Context,
+  labels: LabelSet,
+  f: ((ctx: context.Context) => R) | null,
+): R {
+  return f!(WithLabels(ctx, labels))
+}
+
+// labelContextKey is the context key holding a context's LabelSet.
+const labelContextKey = {}
+
+function contextLabels(ctx: context.Context): LabelSet {
+  return (ctx?.Value(labelContextKey) as LabelSet | null) ?? emptyLabelSet
+}
+
+function sortedLabelSet(labels: Map<string, string>): LabelSet {
+  const list = Array.from(labels).sort(([a], [b]) =>
+    a < b ? -1
+    : a > b ? 1
+    : 0,
+  )
+  return $.markAsStructValue(new LabelSet(list))
+}
+
+const emptyLabelSet = new LabelSet()
 
 function writerFromArg(w: WriterArg): io.Writer | null {
   return $.pointerValueOrNil(w)
 }
 
 const customProfiles = new Map<string, Profile>()
-
-export * from './stubs.gs.js'

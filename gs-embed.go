@@ -322,7 +322,6 @@ import "embed"
 //go:embed gs/runtime/pprof/index.ts
 //go:embed gs/runtime/pprof/meta.json
 //go:embed gs/runtime/pprof/parity.json
-//go:embed gs/runtime/pprof/stubs.gs.ts
 //go:embed gs/runtime/runtime.ts
 //go:embed gs/runtime/stubs.gs.ts
 //go:embed gs/runtime/trace/index.ts
