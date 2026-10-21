@@ -129,7 +129,7 @@ export class Box {
 	}
 
 	public clone(): Box {
-		return new Box(true, this.values)
+		return $.copyGenericInstance(this, new Box(true, this.values))
 	}
 
 	public __goscriptAssign(source: Box): this {
@@ -221,7 +221,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("method value:", (_is!($.fieldRef(item.value, "Child")) as boolean))
 
 	// Generic code and slices keep the pointers rather than copies.
-	let box: $.VarRef<Box> = $.varRef(new Box(true))
+	let box: $.VarRef<Box> = $.varRef($.genericInstance(new Box(true), __goscriptStatic1))
 	box.value.Add(__goscriptStatic0(), item.value.Child.self)
 	$.pointerValue<Node>(box.value.Get(__goscriptStatic0(), 0)).name = "boxed"
 	let clone = (slices.Clone(registry) as $.Slice<Node | $.VarRef<Node> | null>)
@@ -232,6 +232,11 @@ export async function main(): globalThis.Promise<void> {
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
 	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.pointerType("main.Node"), zero: () => null, methods: {Is: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Is(...$.stripGenericTypeArgs(args)), Register: (receiver: any) => $.pointerValue(receiver).Register(), Rename: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Rename(...$.stripGenericTypeArgs(args))} }})
+}
+
+var __goscriptStatic1$value: any
+function __goscriptStatic1(): any {
+	return __goscriptStatic1$value ??= ([{Add: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Add(__goscriptStatic0(), ...$.stripGenericTypeArgs(args)), Get: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Get(__goscriptStatic0(), ...$.stripGenericTypeArgs(args))}, [$.methodSignature("Add", [/* @__PURE__ */ $.pointerType("main.Node")], [], true, false), $.methodSignature("Get", [/* @__PURE__ */ $.basicType("int")], [/* @__PURE__ */ $.pointerType("main.Node")], true, false)]])
 }
 
 var __goscriptAwait: any

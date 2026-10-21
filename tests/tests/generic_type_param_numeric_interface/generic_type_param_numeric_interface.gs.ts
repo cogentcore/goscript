@@ -15,7 +15,7 @@ export class Base {
 	}
 
 	public clone(): Base {
-		return new Base(true, this.Values)
+		return $.copyGenericInstance(this, new Base(true, this.Values))
 	}
 
 	public __goscriptAssign(source: Base): this {
@@ -82,12 +82,12 @@ export function typeSwitch(__typeArgs: $.GenericTypeArgs | undefined, v: any): s
 }
 
 export async function main(): globalThis.Promise<void> {
-	await $.println(reflect.Kind_String(Base.prototype.Kind.call((new Base()), __goscriptStatic1())), reflect.Kind_String(Base.prototype.Kind.call((new Base()), __goscriptStatic2())), reflect.Kind_String(Base.prototype.Kind.call((new Base()), __goscriptStatic3())))
-	await $.println(reflect.Kind_String(Base.prototype.Kind.call((new Base()), __goscriptStatic4())), reflect.Kind_String(Base.prototype.Kind.call((new Base()), __goscriptStatic5())), reflect.Kind_String(Base.prototype.Kind.call((new Base()), __goscriptStatic6())))
-	await $.println(kindOf(__goscriptStatic1(), 0.0), kindOf(__goscriptStatic2(), 2), kindOf(__goscriptStatic3(), 3), kindOf(__goscriptStatic4(), 4n), kindOf(__goscriptStatic7(), 5))
-	await $.println(typeSwitch(__goscriptStatic1(), 1.0), typeSwitch(__goscriptStatic2(), 1), typeSwitch(__goscriptStatic3(), 1), typeSwitch(__goscriptStatic4(), 1n), typeSwitch(__goscriptStatic5(), 1), typeSwitch(__goscriptStatic6(), "s"))
+	await $.println(reflect.Kind_String(Base.prototype.Kind.call(($.genericInstance(new Base(), __goscriptStatic2)), __goscriptStatic1())), reflect.Kind_String(Base.prototype.Kind.call(($.genericInstance(new Base(), __goscriptStatic4)), __goscriptStatic3())), reflect.Kind_String(Base.prototype.Kind.call(($.genericInstance(new Base(), __goscriptStatic6)), __goscriptStatic5())))
+	await $.println(reflect.Kind_String(Base.prototype.Kind.call(($.genericInstance(new Base(), __goscriptStatic8)), __goscriptStatic7())), reflect.Kind_String(Base.prototype.Kind.call(($.genericInstance(new Base(), __goscriptStatic10)), __goscriptStatic9())), reflect.Kind_String(Base.prototype.Kind.call(($.genericInstance(new Base(), __goscriptStatic12)), __goscriptStatic11())))
+	await $.println(kindOf(__goscriptStatic1(), 0.0), kindOf(__goscriptStatic3(), 2), kindOf(__goscriptStatic5(), 3), kindOf(__goscriptStatic7(), 4n), kindOf(__goscriptStatic13(), 5))
+	await $.println(typeSwitch(__goscriptStatic1(), 1.0), typeSwitch(__goscriptStatic3(), 1), typeSwitch(__goscriptStatic5(), 1), typeSwitch(__goscriptStatic7(), 1n), typeSwitch(__goscriptStatic9(), 1), typeSwitch(__goscriptStatic11(), "s"))
 	let x: any = $.basicInterfaceValue(2.5, "float64")
-	await $.println(typeSwitch(__goscriptStatic8(), x))
+	await $.println(typeSwitch(__goscriptStatic14(), x))
 }
 
 var __goscriptStatic0$value: any
@@ -102,37 +102,67 @@ function __goscriptStatic1(): any {
 
 var __goscriptStatic2$value: any
 function __goscriptStatic2(): any {
-	return __goscriptStatic2$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("float32"), zero: () => 0 }})
+	return __goscriptStatic2$value ??= ([{Kind: (receiver: any) => $.pointerValue(receiver).Kind(__goscriptStatic1())}, [$.methodSignature("Kind", [], [/* @__PURE__ */ $.basicType("uint", "reflect.Kind")], true, false)]])
 }
 
 var __goscriptStatic3$value: any
 function __goscriptStatic3(): any {
-	return __goscriptStatic3$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }})
+	return __goscriptStatic3$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("float32"), zero: () => 0 }})
 }
 
 var __goscriptStatic4$value: any
 function __goscriptStatic4(): any {
-	return __goscriptStatic4$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int64"), zero: () => 0n }})
+	return __goscriptStatic4$value ??= ([{Kind: (receiver: any) => $.pointerValue(receiver).Kind(__goscriptStatic3())}, [$.methodSignature("Kind", [], [/* @__PURE__ */ $.basicType("uint", "reflect.Kind")], true, false)]])
 }
 
 var __goscriptStatic5$value: any
 function __goscriptStatic5(): any {
-	return __goscriptStatic5$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("uint8"), zero: () => 0 }})
+	return __goscriptStatic5$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }})
 }
 
 var __goscriptStatic6$value: any
 function __goscriptStatic6(): any {
-	return __goscriptStatic6$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }})
+	return __goscriptStatic6$value ??= ([{Kind: (receiver: any) => $.pointerValue(receiver).Kind(__goscriptStatic5())}, [$.methodSignature("Kind", [], [/* @__PURE__ */ $.basicType("uint", "reflect.Kind")], true, false)]])
 }
 
 var __goscriptStatic7$value: any
 function __goscriptStatic7(): any {
-	return __goscriptStatic7$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("float64", "main.Celsius"), zero: () => 0 }})
+	return __goscriptStatic7$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int64"), zero: () => 0n }})
 }
 
 var __goscriptStatic8$value: any
 function __goscriptStatic8(): any {
-	return __goscriptStatic8$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }})
+	return __goscriptStatic8$value ??= ([{Kind: (receiver: any) => $.pointerValue(receiver).Kind(__goscriptStatic7())}, [$.methodSignature("Kind", [], [/* @__PURE__ */ $.basicType("uint", "reflect.Kind")], true, false)]])
+}
+
+var __goscriptStatic9$value: any
+function __goscriptStatic9(): any {
+	return __goscriptStatic9$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("uint8"), zero: () => 0 }})
+}
+
+var __goscriptStatic10$value: any
+function __goscriptStatic10(): any {
+	return __goscriptStatic10$value ??= ([{Kind: (receiver: any) => $.pointerValue(receiver).Kind(__goscriptStatic9())}, [$.methodSignature("Kind", [], [/* @__PURE__ */ $.basicType("uint", "reflect.Kind")], true, false)]])
+}
+
+var __goscriptStatic11$value: any
+function __goscriptStatic11(): any {
+	return __goscriptStatic11$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }})
+}
+
+var __goscriptStatic12$value: any
+function __goscriptStatic12(): any {
+	return __goscriptStatic12$value ??= ([{Kind: (receiver: any) => $.pointerValue(receiver).Kind(__goscriptStatic11())}, [$.methodSignature("Kind", [], [/* @__PURE__ */ $.basicType("uint", "reflect.Kind")], true, false)]])
+}
+
+var __goscriptStatic13$value: any
+function __goscriptStatic13(): any {
+	return __goscriptStatic13$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("float64", "main.Celsius"), zero: () => 0 }})
+}
+
+var __goscriptStatic14$value: any
+function __goscriptStatic14(): any {
+	return __goscriptStatic14$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }})
 }
 
 if ($.isMainScript(import.meta)) {

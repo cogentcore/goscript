@@ -63,7 +63,7 @@ export class Inner {
 	}
 
 	public clone(): Inner {
-		return new Inner(true, $.copyElement(this.v))
+		return $.copyGenericInstance(this, new Inner(true, $.copyElement(this.v)))
 	}
 
 	public __goscriptAssign(source: Inner): this {
@@ -100,7 +100,7 @@ export class Outer {
 	}
 
 	public clone(): Outer {
-		return new Outer(true, this.Meta.clone(), this.Inner, $.copyElement(this.v))
+		return $.copyGenericInstance(this, new Outer(true, this.Meta.clone(), this.Inner, $.copyElement(this.v)))
 	}
 
 	public __goscriptAssign(source: Outer): this {
@@ -137,21 +137,21 @@ export function both(__typeArgs: $.GenericTypeArgs | undefined, p: any): string 
 }
 
 export async function main(): globalThis.Promise<void> {
-	let o = new Outer(false, new Meta(true, "a"), new Inner(false, 1), 2.5)
+	let o = $.genericInstance(new Outer(false, new Meta(true, "a"), $.genericInstance(new Inner(false, 1), __goscriptStatic1), 2.5), __goscriptStatic3)
 
 	// Direct calls.
-	await $.println($.pointerValue<Outer>(o).Meta.Name("d:"), $.pointerValue<Inner>($.pointerValue<Outer>(o).Inner).Label(__goscriptStatic1(), "d:"))
+	await $.println($.pointerValue<Outer>(o).Meta.Name("d:"), $.pointerValue<Inner>($.pointerValue<Outer>(o).Inner).Label(__goscriptStatic2(), "d:"))
 
 	// Calls through interfaces of the promoted methods, which take their
 	// own arguments and no type arguments.
-	let n: namer | null = $.namedValueInterfaceValue<namer | null>(o, "*main.Outer", __goscriptStatic2(), __goscriptStatic3(), __goscriptStatic4())
-	let l: labeler | null = $.namedValueInterfaceValue<labeler | null>(o, "*main.Outer", __goscriptStatic2(), __goscriptStatic3(), __goscriptStatic4())
+	let n: namer | null = $.namedValueInterfaceValue<namer | null>(o, "*main.Outer", __goscriptStatic4(), __goscriptStatic5(), __goscriptStatic6())
+	let l: labeler | null = $.namedValueInterfaceValue<labeler | null>(o, "*main.Outer", __goscriptStatic4(), __goscriptStatic5(), __goscriptStatic6())
 	await $.println((__goscriptAwait = (n !== null && (n as any).__isVarRef !== true && ((n as any).__goValue === undefined || (n as any).__goType?.charCodeAt(0) !== 42) ? (n as Exclude<namer, null>) : $.pointerValue<Exclude<namer, null>>(n)).Name("i:"), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = (l !== null && (l as any).__isVarRef !== true && ((l as any).__goValue === undefined || (l as any).__goType?.charCodeAt(0) !== 42) ? (l as Exclude<labeler, null>) : $.pointerValue<Exclude<labeler, null>>(l)).Label("i:"), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
-	let x: any = $.namedValueInterfaceValue<any>(o, "*main.Outer", __goscriptStatic2(), __goscriptStatic3(), __goscriptStatic4())
+	let x: any = $.namedValueInterfaceValue<any>(o, "*main.Outer", __goscriptStatic4(), __goscriptStatic5(), __goscriptStatic6())
 	await $.println((__goscriptAwait = $.pointerValue<Exclude<namer, null>>($.mustTypeAssert<namer | null>(x, "main.namer")).Name("a:"), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = $.pointerValue<Exclude<labeler, null>>($.mustTypeAssert<labeler | null>(x, "main.labeler")).Label("a:"), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
 	// Calls through a type parameter's constraint.
-	await $.println(both(__goscriptStatic5(), o))
+	await $.println(both(__goscriptStatic7(), o))
 }
 
 var __goscriptStatic0$value: any
@@ -161,27 +161,37 @@ function __goscriptStatic0(): any {
 
 var __goscriptStatic1$value: any
 function __goscriptStatic1(): any {
-	return __goscriptStatic1$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("float64"), zero: () => 0 }})
+	return __goscriptStatic1$value ??= ([{Label: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Label(__goscriptStatic0(), ...$.stripGenericTypeArgs(args))}, [$.methodSignature("Label", [/* @__PURE__ */ $.basicType("string")], [/* @__PURE__ */ $.basicType("string")], true, false)]])
 }
 
 var __goscriptStatic2$value: any
 function __goscriptStatic2(): any {
-	return __goscriptStatic2$value ??= ({Get: (receiver: any) => $.pointerValue(receiver).Get(__goscriptStatic1()), Label: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Label(...$.stripGenericTypeArgs(args)), Name: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Name(...$.stripGenericTypeArgs(args))})
+	return __goscriptStatic2$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("float64"), zero: () => 0 }})
 }
 
 var __goscriptStatic3$value: any
 function __goscriptStatic3(): any {
-	return __goscriptStatic3$value ??= (/* @__PURE__ */ $.pointerType("main.Outer"))
+	return __goscriptStatic3$value ??= ([{Get: (receiver: any) => $.pointerValue(receiver).Get(__goscriptStatic2()), Label: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Label(...$.stripGenericTypeArgs(args)), Name: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Name(...$.stripGenericTypeArgs(args))}, [$.methodSignature("Get", [], [/* @__PURE__ */ $.basicType("float64")], true, false), $.methodSignature("Label", [/* @__PURE__ */ $.basicType("string")], [/* @__PURE__ */ $.basicType("string")], false, false), $.methodSignature("Name", [/* @__PURE__ */ $.basicType("string")], [/* @__PURE__ */ $.basicType("string")], true, false)]])
 }
 
 var __goscriptStatic4$value: any
 function __goscriptStatic4(): any {
-	return __goscriptStatic4$value ??= ([$.methodSignature("Get", [], [/* @__PURE__ */ $.basicType("float64")]), $.methodSignature("Label", [["p", /* @__PURE__ */ $.basicType("string")]], [/* @__PURE__ */ $.basicType("string")]), $.methodSignature("Name", [["p", /* @__PURE__ */ $.basicType("string")]], [/* @__PURE__ */ $.basicType("string")])])
+	return __goscriptStatic4$value ??= ({Get: (receiver: any) => $.pointerValue(receiver).Get(__goscriptStatic2()), Label: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Label(...$.stripGenericTypeArgs(args)), Name: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Name(...$.stripGenericTypeArgs(args))})
 }
 
 var __goscriptStatic5$value: any
 function __goscriptStatic5(): any {
-	return __goscriptStatic5$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, P: { type: /* @__PURE__ */ $.pointerType("main.Outer"), zero: () => null, methods: {Get: (receiver: any) => $.pointerValue(receiver).Get(__goscriptStatic1()), Label: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Label(...$.stripGenericTypeArgs(args)), Name: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Name(...$.stripGenericTypeArgs(args))} }})
+	return __goscriptStatic5$value ??= (/* @__PURE__ */ $.pointerType("main.Outer"))
+}
+
+var __goscriptStatic6$value: any
+function __goscriptStatic6(): any {
+	return __goscriptStatic6$value ??= ([$.methodSignature("Get", [], [/* @__PURE__ */ $.basicType("float64")]), $.methodSignature("Label", [["p", /* @__PURE__ */ $.basicType("string")]], [/* @__PURE__ */ $.basicType("string")]), $.methodSignature("Name", [["p", /* @__PURE__ */ $.basicType("string")]], [/* @__PURE__ */ $.basicType("string")])])
+}
+
+var __goscriptStatic7$value: any
+function __goscriptStatic7(): any {
+	return __goscriptStatic7$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, P: { type: /* @__PURE__ */ $.pointerType("main.Outer"), zero: () => null, methods: {Get: (receiver: any) => $.pointerValue(receiver).Get(__goscriptStatic2()), Label: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Label(...$.stripGenericTypeArgs(args)), Name: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Name(...$.stripGenericTypeArgs(args))} }})
 }
 
 var __goscriptAwait: any
