@@ -1832,7 +1832,7 @@ func TestCompilePackagesLowersUnsafeBytePointerArithmetic(t *testing.T) {
 		t.Fatal(err.Error())
 	}
 	text := string(content)
-	if !strings.Contains(text, "$.indexByteAddress(bits!, globalThis.Number($.uint64Shr(idx, 6n)), 8)") {
+	if !strings.Contains(text, "$.indexByteAddress(bits!, $.uint64ToNumber($.uint64Shr(idx, 6n)), 8)") {
 		t.Fatalf("missing byte-addressed unsafe pointer root:\n%s", text)
 	}
 	if !strings.Contains(text, "$.unsafePointerRef<number>(ptr).value |=") {
