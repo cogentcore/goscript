@@ -82,7 +82,7 @@ console.log('initialization passed')
 			if phase := workspace.EnsureNodeAmbientTypes(); phase.Failed() {
 				t.Fatal(phase.Error)
 			}
-			typecheck := workspace.RunTool(t.Context(), tsworkspace.PhaseTypeCheck, dir, "tsgo", "--noEmit", "--project", "tsconfig.json")
+			typecheck := workspace.RunTool(t.Context(), tsworkspace.PhaseTypeCheck, dir, "tsrs", "--noEmit", "--project", "tsconfig.json")
 			if typecheck.Failed() {
 				t.Fatalf("typecheck: %v\n%s", typecheck.Error, typecheck.Output)
 			}

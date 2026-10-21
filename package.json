@@ -42,7 +42,7 @@
     }
   },
   "scripts": {
-    "build": "bun run build:updategover && tsgo -p tsconfig.build.json",
+    "build": "bun run build:updategover && tsrs -p tsconfig.build.json",
     "build:updategover": "bun run scripts/update-go-version.ts",
     "prepublishOnly": "bun run build",
     "example": "cd ./example/simple && bash run.bash",
@@ -53,7 +53,7 @@
     "test:js": "bun run typecheck && vitest run",
     "test:browser": "bun run scripts/generate-browser-tests.ts && vitest run --config vitest.browser.config.ts",
     "test:browser:ui": "bun run scripts/generate-browser-tests.ts && vitest --config vitest.browser.config.ts --ui",
-    "typecheck": "tsgo --noEmit -p tsconfig.build.json",
+    "typecheck": "tsrs --noEmit -p tsconfig.build.json",
     "format": "bun run format:go && bun run format:js && bun run format:config",
     "format:config": "prettier --write tsconfig.json package.json",
     "format:go": "gofumpt -w .",
@@ -103,7 +103,7 @@
     "@types/node": "^26.0.0",
     "@typescript-eslint/eslint-plugin": "^8.58.0",
     "@typescript-eslint/parser": "^8.58.0",
-    "@typescript/native-preview": "^7.0.0-dev.20260404.1",
+    "tsrs": "0.18.0-ts7.1.0-dev.20260929",
     "@vitest/browser": "^4.1.2",
     "@vitest/browser-playwright": "^4.1.2",
     "@vitest/browser-preview": "^4.1.2",

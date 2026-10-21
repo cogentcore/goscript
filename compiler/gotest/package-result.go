@@ -36,7 +36,7 @@ type PackagePhases struct {
 	Compile PhaseStatus
 	// Emit covers TypeScript emit/copy output work.
 	Emit PhaseStatus
-	// TypeCheck covers tsgo execution.
+	// TypeCheck covers tsrs execution.
 	TypeCheck PhaseStatus
 	// Runtime covers Bun test execution.
 	Runtime PhaseStatus

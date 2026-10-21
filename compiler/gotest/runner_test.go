@@ -1007,7 +1007,7 @@ func TestRunnerScopesPackageTypecheckErrors(t *testing.T) {
 			"",
 		}, "\n"),
 	})
-	writeExecutable(t, filepath.Join(moduleDir, "node_modules", ".bin", "tsgo"), strings.Join([]string{
+	writeExecutable(t, filepath.Join(moduleDir, "node_modules", ".bin", "tsrs"), strings.Join([]string{
 		"#!/bin/sh",
 		"project=",
 		"while [ \"$#\" -gt 0 ]; do",
@@ -1105,7 +1105,7 @@ func TestRunnerDoesNotRepeatSharedOverrideTypecheckFailure(t *testing.T) {
 	})
 	workDir := filepath.Join(moduleDir, "work")
 	projectLog := filepath.Join(moduleDir, "projects.log")
-	writeExecutable(t, filepath.Join(moduleDir, "node_modules", ".bin", "tsgo"), strings.Join([]string{
+	writeExecutable(t, filepath.Join(moduleDir, "node_modules", ".bin", "tsrs"), strings.Join([]string{
 		"#!/bin/sh",
 		"project=",
 		"while [ \"$#\" -gt 0 ]; do",
@@ -1201,7 +1201,7 @@ func TestRunnerUsesBatchTypeScriptProject(t *testing.T) {
 	})
 	workDir := filepath.Join(moduleDir, ".tmp", "package-projects")
 	projectLog := filepath.Join(moduleDir, "projects.log")
-	writeExecutable(t, filepath.Join(moduleDir, "node_modules", ".bin", "tsgo"), strings.Join([]string{
+	writeExecutable(t, filepath.Join(moduleDir, "node_modules", ".bin", "tsrs"), strings.Join([]string{
 		"#!/bin/sh",
 		"project=",
 		"while [ \"$#\" -gt 0 ]; do",
@@ -1288,7 +1288,7 @@ func TestRunnerRunsCombinedRuntimeChunks(t *testing.T) {
 	})
 	workDir := filepath.Join(moduleDir, ".tmp", "runtime-chunks")
 	runtimeLog := filepath.Join(moduleDir, "runtime.log")
-	writeExecutable(t, filepath.Join(moduleDir, "node_modules", ".bin", "tsgo"), strings.Join([]string{
+	writeExecutable(t, filepath.Join(moduleDir, "node_modules", ".bin", "tsrs"), strings.Join([]string{
 		"#!/bin/sh",
 		"exit 0",
 		"",
@@ -1398,7 +1398,7 @@ func TestRunnerReportsBrowserRuntimeFailureRecord(t *testing.T) {
 			"",
 		}, "\n"),
 	})
-	writeExecutable(t, filepath.Join(moduleDir, "node_modules", ".bin", "tsgo"), "#!/bin/sh\nexit 0\n")
+	writeExecutable(t, filepath.Join(moduleDir, "node_modules", ".bin", "tsrs"), "#!/bin/sh\nexit 0\n")
 	writeBrowserTestPackages(t, moduleDir)
 	writeExecutable(t, filepath.Join(moduleDir, "node_modules", ".bin", "vitest"), strings.Join([]string{
 		"#!/bin/sh",
@@ -1508,7 +1508,7 @@ func TestRunnerReportsBrowserRuntimeMissingResult(t *testing.T) {
 			"",
 		}, "\n"),
 	})
-	writeExecutable(t, filepath.Join(moduleDir, "node_modules", ".bin", "tsgo"), "#!/bin/sh\nexit 0\n")
+	writeExecutable(t, filepath.Join(moduleDir, "node_modules", ".bin", "tsrs"), "#!/bin/sh\nexit 0\n")
 	writeBrowserTestPackages(t, moduleDir)
 	writeExecutable(t, filepath.Join(moduleDir, "node_modules", ".bin", "vitest"), strings.Join([]string{
 		"#!/bin/sh",
@@ -1582,7 +1582,7 @@ func TestRunnerFallsBackToPackageScopedTypeScriptProjects(t *testing.T) {
 	})
 	workDir := filepath.Join(moduleDir, ".tmp", "package-projects")
 	projectLog := filepath.Join(moduleDir, "projects.log")
-	writeExecutable(t, filepath.Join(moduleDir, "node_modules", ".bin", "tsgo"), strings.Join([]string{
+	writeExecutable(t, filepath.Join(moduleDir, "node_modules", ".bin", "tsrs"), strings.Join([]string{
 		"#!/bin/sh",
 		"project=",
 		"while [ \"$#\" -gt 0 ]; do",
