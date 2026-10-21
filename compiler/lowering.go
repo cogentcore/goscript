@@ -6318,8 +6318,14 @@ func lowerCompoundAssignValue(
 	case token.XOR_ASSIGN:
 		return wrapUint32(left + " ^ " + right)
 	case token.SHL_ASSIGN:
+		if value, ok := lowerNarrowShiftAssignValue(runtimeOwner, targetType, left, right, tok, wrapNarrow); ok {
+			return value
+		}
 		return wrapNarrow(left + " << " + right)
 	case token.SHR_ASSIGN:
+		if value, ok := lowerNarrowShiftAssignValue(runtimeOwner, targetType, left, right, tok, wrapNarrow); ok {
+			return value
+		}
 		if bits, ok := unsignedIntegerBits(targetType); ok && bits <= 32 {
 			return "(" + left + " >>> " + right + ") >>> 0"
 		}
@@ -9910,6 +9916,10 @@ func (o *LoweringOwner) lowerExpr(ctx lowerFileContext, expr ast.Expr) (string, 
 		// an & with a mask.
 		mask := isInt32Mask(ctx, typed.X) || isInt32Mask(ctx, typed.Y)
 		if value, ok := lowerIntBitwiseValue(o.runtimeOwner, ctx.semPkg.source.TypesInfo.TypeOf(typed), typed.Op, left, right, mask); ok {
+			return value, append(leftDiagnostics, rightDiagnostics...)
+		}
+		// Narrow integers shifted by counts that may be 32 or more shift all bits out.
+		if value, ok := o.lowerNarrowShiftExpr(ctx, typed, left, right); ok {
 			return value, append(leftDiagnostics, rightDiagnostics...)
 		}
 		if typed.Op == token.ADD || typed.Op == token.SUB || typed.Op == token.SHL {

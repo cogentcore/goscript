@@ -1177,6 +1177,20 @@ export function intShr(value: number, count: number): number {
   return Math.floor(value / 2 ** Math.min(count, 63))
 }
 
+// narrowShl returns value << shift for Go integers of 32 bits or fewer, as
+// an int32 that the caller wraps to the width of its type. Go shifts all bits
+// out for a count of 32 or more, which the JavaScript operator takes modulo 32.
+export function narrowShl(value: number, shift: number): number {
+  return shift < 32 ? value << shift : 0
+}
+
+// narrowShr returns value >> shift for signed Go integers of 32 bits or
+// fewer. A count of 32 or more fills the value with its sign bit, as a shift
+// by 31 does, where the JavaScript operator takes the count modulo 32.
+export function narrowShr(value: number, shift: number): number {
+  return value >> (shift < 32 ? shift : 31)
+}
+
 export function uint64Mul(
   left: number | bigint,
   right: number | bigint,

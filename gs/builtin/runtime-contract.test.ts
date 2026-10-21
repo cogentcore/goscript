@@ -96,6 +96,8 @@ import {
   intShl,
   intShr,
   intXor,
+  narrowShl,
+  narrowShr,
   unref,
   unsupportedPointerRef,
   unsafePointerRef,
@@ -281,6 +283,12 @@ describe('builtin runtime contract helpers', () => {
     expect(uintShr(0x80000000, 31, 32)).toBe(1)
     expect(uintShr(0x80000000, 32, 32)).toBe(0)
     expect(uintShr(0xff, 4, 8)).toBe(15)
+    expect(narrowShl(1, 31)).toBe(-2147483648)
+    expect(narrowShl(1, 32)).toBe(0)
+    expect(narrowShl(3, 33)).toBe(0)
+    expect(narrowShr(-8, 2)).toBe(-2)
+    expect(narrowShr(-8, 32)).toBe(-1)
+    expect(narrowShr(8, 40)).toBe(0)
 
     // Int bitwise operations keep the bits above 32 of their numbers.
     const wide = 2 ** 40
