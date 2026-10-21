@@ -220,6 +220,8 @@ const (
 	RuntimeHelperGenericTypeArgsMarker          RuntimeHelper = "type.genericTypeArgsMarker"
 	RuntimeHelperGenericTypeArgsBrand           RuntimeHelper = "type.genericTypeArgsBrand"
 	RuntimeHelperStripGenericTypeArgs           RuntimeHelper = "type.stripGenericTypeArgs"
+	RuntimeHelperGenericInstance                RuntimeHelper = "type.genericInstance"
+	RuntimeHelperCopyGenericInstance            RuntimeHelper = "type.copyGenericInstance"
 	RuntimeHelperCallGenericMethod              RuntimeHelper = "type.callGenericMethod"
 
 	RuntimeHelperMakeChannel     RuntimeHelper = "channel.makeChannel"
@@ -532,6 +534,8 @@ func runtimeHelperContracts() []RuntimeHelperContract {
 		runtimeHelper(RuntimeHelperGenericTypeArgsMarker, "genericTypeArgsMarker", RuntimeHelperCategoryType),
 		runtimeHelper(RuntimeHelperGenericTypeArgsBrand, "genericTypeArgsBrand", RuntimeHelperCategoryType),
 		runtimeHelper(RuntimeHelperStripGenericTypeArgs, "stripGenericTypeArgs", RuntimeHelperCategoryType),
+		runtimeHelper(RuntimeHelperGenericInstance, "genericInstance", RuntimeHelperCategoryType),
+		runtimeHelper(RuntimeHelperCopyGenericInstance, "copyGenericInstance", RuntimeHelperCategoryType),
 		runtimeHelper(RuntimeHelperCallGenericMethod, "callGenericMethod", RuntimeHelperCategoryType),
 		runtimeHelper(RuntimeHelperMakeChannel, "makeChannel", RuntimeHelperCategoryChannel),
 		runtimeHelper(RuntimeHelperMakeChannelRef, "makeChannelRef", RuntimeHelperCategoryChannel),
