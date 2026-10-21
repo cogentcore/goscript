@@ -15094,7 +15094,13 @@ func (o *LoweringOwner) lowerValueForTarget(
 	if sameIntegerRepresentation(targetType, sourceType) && isNormalizedIntegerExpr(ctx, expr) {
 		return value
 	}
-	if adapted, ok := o.lowerOverrideFunctionValue(ctx, expr, targetType, value); ok {
+
+	// A function of an override package is adapted to the calls of function
+	// values: a variadic one takes a slice, and another one converts its
+	// interface arguments.
+	if adapted, ok := o.lowerOverrideVariadicFunctionValue(ctx, expr, value); ok {
+		value = adapted
+	} else if adapted, ok := o.lowerOverrideFunctionValue(ctx, expr, targetType, value); ok {
 		return adapted
 	}
 	if isInterfaceType(targetType) {
@@ -15199,6 +15205,42 @@ func goRuntimePackageName(pkg *types.Package) string {
 		return "main"
 	}
 	return pkg.Path()
+}
+
+// lowerOverrideVariadicFunctionValue returns value, the value of a variadic
+// function of an override package, as a function that takes its variadic
+// arguments as a slice, as the values of Go functions do, and passes them to
+// the function as the rest arguments that its TypeScript signature takes. It
+// reports false for any other value.
+func (o *LoweringOwner) lowerOverrideVariadicFunctionValue(ctx lowerFileContext, expr ast.Expr, value string) (string, bool) {
+	// Only a reference to a plain variadic function of an override package
+	// takes rest arguments.
+	expr = unwrapParenExpr(expr)
+	switch expr.(type) {
+	case *ast.Ident, *ast.SelectorExpr:
+	default:
+		return "", false
+	}
+	fn := calledFunction(ctx.semPkg.source, expr)
+	if fn == nil || !o.callUsesOverridePackage(ctx, expr) {
+		return "", false
+	}
+	signature := fn.Signature()
+	if !signature.Variadic() || signature.Recv() != nil || signature.TypeParams().Len() > 0 {
+		return "", false
+	}
+
+	// The wrapper spreads the slice of variadic arguments after the others.
+	params := make([]string, 0, signature.Params().Len())
+	args := make([]string, 0, signature.Params().Len())
+	for idx := range signature.Params().Len() {
+		name := "__goscriptArg" + strconv.Itoa(idx)
+		params = append(params, name+": "+o.tsTypeFor(ctx, signature.Params().At(idx).Type()))
+		args = append(args, name)
+	}
+	args[len(args)-1] = "...(" + args[len(args)-1] + " ?? [])"
+	return "((__goscriptFn: typeof " + value + ") => (" + strings.Join(params, ", ") + ") => __goscriptFn(" +
+		strings.Join(args, ", ") + "))(" + value + ")", true
 }
 
 // lowerOverrideFunctionValue adapts a function of an override package with a
