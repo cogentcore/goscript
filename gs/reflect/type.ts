@@ -2683,7 +2683,7 @@ class ArrayType implements Type {
   }
 
   public PkgPath(): string {
-    return typeNamePkgPath(this._typeName)
+    return $.typePackagePath(this._typeName)
   }
 
   public Name(): string {
@@ -3567,7 +3567,7 @@ class MapType implements Type {
   }
 
   public PkgPath(): string {
-    return typeNamePkgPath(this._typeName)
+    return $.typePackagePath(this._typeName)
   }
 
   public Name(): string {
@@ -3954,19 +3954,18 @@ export function runtimeTypeString(t: Type): string {
   return t.runtimeString !== undefined ? t.runtimeString() : t.String()
 }
 
-// typeNamePkgPath returns the package path of a qualified type name such as
-// "pkg.Name", or '' for an unnamed type.
-function typeNamePkgPath(typeName: string): string {
-  const dotIndex = typeName.lastIndexOf('.')
-  return dotIndex > 0 ? typeName.substring(0, dotIndex) : ''
-}
-
 // typeNameName returns the Go name of a named type from its runtime name:
 // the part after the package qualifier, without the hash that the runtime
 // name of a local type has when another type of its package has its name.
 function typeNameName(typeName: string): string {
-  const dotIndex = typeName.lastIndexOf('.')
-  return $.goTypeString(dotIndex >= 0 ? typeName.substring(dotIndex + 1) : typeName)
+  // The type arguments of an instantiated type follow its qualified name.
+  const bracket = typeName.indexOf('[')
+  const baseName = bracket >= 0 ? typeName.substring(0, bracket) : typeName
+  const typeArgs = bracket >= 0 ? typeName.substring(bracket) : ''
+  const dotIndex = baseName.lastIndexOf('.')
+  return $.goTypeString(
+    (dotIndex >= 0 ? baseName.substring(dotIndex + 1) : baseName) + typeArgs,
+  )
 }
 
 // typeMethods returns the method set of t. A type that is not a pointer has
