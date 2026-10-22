@@ -703,6 +703,9 @@ func (o *LoweringOwner) lowerFile(req lowerFileRequest) (*loweredFile, []Diagnos
 			}
 			if decl.function != nil && decl.function.indexExported && decl.function.name != "main" {
 				loweredFile.exports = append(loweredFile.exports, decl.function.name)
+				if decl.function.twin != nil {
+					loweredFile.exports = append(loweredFile.exports, decl.function.twin.name)
+				}
 			}
 			if decl.structType != nil && decl.structType.indexExported {
 				loweredFile.exports = append(loweredFile.exports, decl.structType.name)
@@ -1790,6 +1793,9 @@ func methodMemberName(value string) string {
 	if safeIdentifier(value) == value {
 		return value
 	}
+	if twin, ok := reflectTwinMemberName(value); ok {
+		return twin
+	}
 	return "[" + strconv.Quote(value) + "]"
 }
 
@@ -1846,6 +1852,12 @@ type lowerFileContext struct {
 	callSiteFunction  bool
 	functionTypeDepth int
 	deferState        *loweredDeferState
+	// reflectTwin holds the callback parameters of the function whose twin
+	// is being lowered, and twinCallee the callee of the call being lowered
+	// when the call passes one of them on to the twin of the callee (see
+	// lowering-reflect-twins.go).
+	reflectTwin map[types.Object]bool
+	twinCallee  ast.Expr
 	// hoistArgsCall is the call of a defer or go statement, whose arguments
 	// are evaluated into the temporaries of hoistedArgs (see lowerCallArgs).
 	// hoistedCallee is set when the call reads its function from a
@@ -4248,39 +4260,110 @@ func (o *LoweringOwner) lowerEmbeddedMethodForwarders(
 				receiver = named.Origin()
 			}
 		}
-		var call string
-		var body []loweredStmt
-		if receiver != nil {
-			callArgs := append([]string{target}, args...)
-			call = o.methodFunctionExpr(ctx, receiver, method, method.Name()) + "(" + strings.Join(callArgs, ", ") + ")"
-		} else {
-			callArgs := args
-			if genericArgs != "" {
-				callArgs = append([]string{genericArgs}, callArgs...)
-			}
-			call = target + "." + method.Name() + "(" + strings.Join(callArgs, ", ") + ")"
 
-			// A method that observes its receiver gets the reference to the
-			// embedded field, through the prototype of its class when the
-			// file can name it.
-			if ref, ok := o.embeddedForwarderIdentityReceiver(ctx, field, selection, method); ok {
-				if prototype, ok := o.pointerMethodPrototype(ctx, method); ok {
-					call = prototype + ".call(" + strings.Join(append([]string{ref}, callArgs...), ", ") + ")"
-				} else {
-					body = append(body, loweredStmt{text: "const __receiver = " + ref})
-					callArgs = append([]string{"__receiver"}, callArgs...)
-					call = identityReceiverCallee("__receiver", method.Name()) + "(" + strings.Join(callArgs, ", ") + ")"
-				}
-			}
-		}
+		// The forwarder calls the method, and its twin the method's twin.
+		forward := embeddedForwarderTarget{field: field, selection: selection, method: method, receiver: receiver, target: target, genericArgs: genericArgs, args: args}
+		call, body := o.embeddedForwarderCall(ctx, forward, method.Name())
 		if async {
 			call = "await " + call
 		}
 		lowered.body = append(body, loweredStmt{text: "return " + call})
+		lowered.twin = o.embeddedForwarderTwin(ctx, lowered, forward)
 		methods = append(methods, lowered)
 		explicitMethods[method.Name()] = true
 	}
 	return methods
+}
+
+// embeddedForwarderTarget is the method that the forwarder of a promoted
+// method calls: the embedded field it is promoted from, the selection of the
+// method, the named non-struct type whose method function takes the receiver,
+// if any, the receiver expression, and the arguments.
+type embeddedForwarderTarget struct {
+	field       semanticField
+	selection   *types.Selection
+	method      *types.Func
+	receiver    *types.Named
+	target      string
+	genericArgs string
+	args        []string
+}
+
+// embeddedForwarderCall returns the call of the method member name, the
+// method or its twin, that the forwarder of forward makes, and the statements
+// that precede it.
+func (o *LoweringOwner) embeddedForwarderCall(ctx lowerFileContext, forward embeddedForwarderTarget, name string) (string, []loweredStmt) {
+	// A method of a named non-struct type is a function taking the receiver.
+	if forward.receiver != nil {
+		callArgs := append([]string{forward.target}, forward.args...)
+		return o.methodFunctionExpr(ctx, forward.receiver, forward.method, forward.method.Name()) + "(" + strings.Join(callArgs, ", ") + ")", nil
+	}
+
+	// Any other method is a member of the receiver.
+	callArgs := forward.args
+	if forward.genericArgs != "" {
+		callArgs = append([]string{forward.genericArgs}, callArgs...)
+	}
+	call := forward.target + "." + name + "(" + strings.Join(callArgs, ", ") + ")"
+
+	// A method that observes its receiver gets the reference to the embedded
+	// field, through the prototype of its class when the file can name it.
+	ref, ok := o.embeddedForwarderIdentityReceiver(ctx, forward.field, forward.selection, forward.method)
+	if !ok {
+		return call, nil
+	}
+	if prototype, ok := o.pointerMethodPrototype(ctx, forward.method, name); ok {
+		return prototype + ".call(" + strings.Join(append([]string{ref}, callArgs...), ", ") + ")", nil
+	}
+	callArgs = append([]string{"__receiver"}, callArgs...)
+	body := []loweredStmt{{text: "const __receiver = " + ref}}
+	return identityReceiverCallee("__receiver", name) + "(" + strings.Join(callArgs, ", ") + ")", body
+}
+
+// embeddedForwarderTwin returns the twin of fwd, the forwarder of a promoted
+// method, which reflect.Value.Call calls: it calls the twin of a method of a
+// struct type that has one, or of an interface method the one of the dynamic
+// value, if it has one. It is nil when the method has none.
+func (o *LoweringOwner) embeddedForwarderTwin(ctx lowerFileContext, fwd loweredFunction, forward embeddedForwarderTarget) *loweredFunction {
+	// Only a program with twins has them, and a method of a named non-struct
+	// type has none.
+	if ctx.model.reflectTwins == nil || forward.receiver != nil {
+		return nil
+	}
+
+	// The twin calls the method's twin, found when the program runs for an
+	// interface method with a func parameter.
+	var call string
+	var body []loweredStmt
+	switch {
+	case isInterfaceMethod(forward.method) && signatureHasFuncParam(forward.method.Type().(*types.Signature)):
+		callArgs := append([]string{forward.target, strconv.Quote(forward.method.Name())}, forward.args...)
+		call = o.runtimeOwner.QualifiedHelper(RuntimeHelperCallReflectTwin) + "(" + strings.Join(callArgs, ", ") + ")"
+	case ctx.model.reflectTwin(forward.method):
+		call, body = o.embeddedForwarderCall(ctx, forward, forward.method.Name()+reflectTwinSuffix)
+	default:
+		return nil
+	}
+
+	// It is an async copy of the forwarder.
+	twin := fwd
+	twin.name = methodMemberName(forward.method.Name() + reflectTwinSuffix)
+	twin.async = true
+	twin.result = asyncResultType("any", true)
+	twin.body = append(body, loweredStmt{text: "return await " + call})
+	twin.deferState = &loweredDeferState{}
+	return &twin
+}
+
+// signatureHasFuncParam reports whether a parameter of signature has a func
+// type.
+func signatureHasFuncParam(signature *types.Signature) bool {
+	for param := range signature.Params().Variables() {
+		if _, ok := types.Unalias(param.Type()).Underlying().(*types.Signature); ok {
+			return true
+		}
+	}
+	return false
 }
 
 func (o *LoweringOwner) embeddedForwarderTargetExpr(
@@ -4537,7 +4620,19 @@ func bodyAssignsTo(ctx lowerFileContext, body *ast.BlockStmt, obj types.Object) 
 	return found
 }
 
+// lowerFuncDecl lowers a declared function or method, with its twin when it
+// has one (see lowering-reflect-twins.go).
 func (o *LoweringOwner) lowerFuncDecl(ctx lowerFileContext, decl *ast.FuncDecl) (*loweredFunction, []Diagnostic) {
+	lowered, diagnostics := o.lowerFuncDeclBody(ctx, decl)
+	if lowered != nil {
+		lowered.twin = o.lowerReflectTwin(ctx, decl, lowered)
+	}
+	return lowered, diagnostics
+}
+
+// lowerFuncDeclBody lowers a declared function or method, or its twin when
+// ctx has the twin's callback parameters.
+func (o *LoweringOwner) lowerFuncDeclBody(ctx lowerFileContext, decl *ast.FuncDecl) (*loweredFunction, []Diagnostic) {
 	fnObj, _ := ctx.semPkg.source.TypesInfo.Defs[decl.Name].(*types.Func)
 	if fnObj == nil {
 		return nil, nil
@@ -4551,7 +4646,7 @@ func (o *LoweringOwner) lowerFuncDecl(ctx lowerFileContext, decl *ast.FuncDecl) 
 	if protobufSync {
 		async = false
 	}
-	if decl.Name.Name == "main" {
+	if decl.Name.Name == "main" || ctx.reflectTwin != nil {
 		async = true
 	}
 	functionCtx := ctx.withSignature(signature)
@@ -4575,6 +4670,11 @@ func (o *LoweringOwner) lowerFuncDecl(ctx lowerFileContext, decl *ast.FuncDecl) 
 	if decl.Recv != nil && !blankName {
 		name = methodMemberName(decl.Name.Name)
 		runtimeName = decl.Name.Name
+	}
+	if ctx.reflectTwin != nil && decl.Recv != nil {
+		name = methodMemberName(decl.Name.Name + reflectTwinSuffix)
+	} else if ctx.reflectTwin != nil {
+		name += reflectTwinSuffix
 	}
 	lowered := &loweredFunction{
 		exported:      ctx.topLevel && !blankName && !initFunc,
@@ -4621,7 +4721,7 @@ func (o *LoweringOwner) lowerFuncDecl(ctx lowerFileContext, decl *ast.FuncDecl) 
 	}
 	if decl.Body != nil {
 		bodyCtx := functionCtx.withAsyncFunction(async).withProtobufGeneratedSyncFunction(protobufSync).withDeferState(deferState).
-			withSyncDirectiveFunction(ctx.model.syncDirective(fnObj)).withCallSiteFunction(ctx.model.callSiteFunctions[fnObj])
+			withSyncDirectiveFunction(ctx.model.syncDirective(fnObj) && ctx.reflectTwin == nil).withCallSiteFunction(ctx.model.callSiteFunctions[fnObj])
 		bodyCtx = o.withBorrowedResults(bodyCtx, decl, fnObj)
 		targets, targetDecls, prelude := o.pointerTargetLocals(bodyCtx, decl, lowered.receiverAlias)
 		if len(targets) != 0 {
@@ -10624,7 +10724,9 @@ func (o *LoweringOwner) lowerCallExpr(ctx lowerFileContext, expr *ast.CallExpr) 
 		return o.lowerConversionExpr(ctx, expr, targetType)
 	}
 
+	// A call that passes a callback parameter on calls the twin of its callee.
 	args, diagnostics := o.lowerCallArgs(ctx, expr, callTargetSignature(ctx, expr.Fun))
+	ctx.twinCallee = reflectTwinCallee(ctx, expr)
 	if fun, ok := unwrapParenExpr(expr.Fun).(*ast.FuncLit); ok {
 		callee, async, calleeDiagnostics := o.lowerFuncLitCallCallee(ctx, fun)
 		call := "(" + callee + ")(" + strings.Join(args, ", ") + ")"
@@ -10815,7 +10917,7 @@ func (o *LoweringOwner) lowerCallExpr(ctx lowerFileContext, expr *ast.CallExpr) 
 		if genericFunctionSignature(ctx, fun) != nil {
 			args = append([]string{o.genericTypeArgsExpr(ctx, fun, nil)}, args...)
 		}
-		callee := o.lowerCallableExpr(ctx, fun, o.lowerIdent(ctx, fun, false))
+		callee := o.lowerCallableExpr(ctx, fun, reflectTwinCallName(ctx, fun, o.lowerIdent(ctx, fun, false)))
 		call := callee + "(" + strings.Join(args, ", ") + ")"
 		return o.awaitCallIfNeeded(ctx, expr, call), diagnostics
 	case *ast.SelectorExpr:
@@ -10867,10 +10969,11 @@ func (o *LoweringOwner) lowerCallExpr(ctx lowerFileContext, expr *ast.CallExpr) 
 			}
 			receiverExpr, receiverDiagnostics := o.lowerMethodReceiverExpr(ctx, fun.X, selection)
 			diagnostics = append(diagnostics, receiverDiagnostics...)
-			call := receiverExpr + "." + fun.Sel.Name + "(" + strings.Join(args, ", ") + ")"
+			call := receiverExpr + "." + reflectTwinCallName(ctx, fun, fun.Sel.Name) + "(" + strings.Join(args, ", ") + ")"
 			return o.awaitCallIfNeeded(ctx, expr, call), diagnostics
 		}
 		selector, selectorDiagnostics := o.lowerSelectorExpr(ctx, fun)
+		selector = reflectTwinCallName(ctx, fun, selector)
 		if genericFunctionSignature(ctx, fun) != nil &&
 			(!o.callUsesOverridePackage(ctx, fun) || o.overrideFacts().TakesTypeArgs(calledFunction(ctx.semPkg.source, fun))) {
 			args = append([]string{o.genericTypeArgsExpr(ctx, fun, nil)}, args...)
@@ -12493,7 +12596,7 @@ func (o *LoweringOwner) lowerPointerReceiverMethodCall(
 		return "", nil, false
 	}
 
-	// The receiver's named type.
+	// The receiver's named type, and the name of the method, or of its twin.
 	if !isPointerToStructType(signature.Recv().Type()) {
 		return "", nil, false
 	}
@@ -12501,6 +12604,7 @@ func (o *LoweringOwner) lowerPointerReceiverMethodCall(
 	if receiver == nil {
 		return "", nil, false
 	}
+	name := reflectTwinCallName(ctx, selector, selector.Sel.Name)
 
 	// An override method takes its receiver unwrapped, since hand-written
 	// methods do not unwrap a variable reference or a boxed pointer.
@@ -12521,7 +12625,7 @@ func (o *LoweringOwner) lowerPointerReceiverMethodCall(
 	if receiverExpr == o.namedTypeExpr(ctx, receiver) {
 		call := o.runtimeOwner.QualifiedHelper(RuntimeHelperPointerValue) +
 			"<" + o.namedTypeExpr(ctx, receiver) + ">(" + receiverExpr + ")." +
-			methodMemberName(selector.Sel.Name) + "(" + strings.Join(args, ", ") + ")"
+			methodMemberName(name) + "(" + strings.Join(args, ", ") + ")"
 		return call, diagnostics, true
 	}
 
@@ -12535,11 +12639,11 @@ func (o *LoweringOwner) lowerPointerReceiverMethodCall(
 		// its receiver may be nil, which has no methods to call.
 		if !absent && nilReceiverOverrideMethods[method.FullName()] {
 			callArgs := append([]string{receiverExpr}, args...)
-			call := namedValueExpr(ctx, receiver) + ".prototype." + selector.Sel.Name + ".call(" + strings.Join(callArgs, ", ") + ")"
+			call := namedValueExpr(ctx, receiver) + ".prototype." + name + ".call(" + strings.Join(callArgs, ", ") + ")"
 			return call, diagnostics, true
 		}
 		if absent || o.isOverrideFieldValue(ctx, selector.X) {
-			call := receiverExpr + "." + methodMemberName(selector.Sel.Name) + "(" + strings.Join(args, ", ") + ")"
+			call := receiverExpr + "." + methodMemberName(name) + "(" + strings.Join(args, ", ") + ")"
 			return call, diagnostics, true
 		}
 	}
@@ -12549,7 +12653,7 @@ func (o *LoweringOwner) lowerPointerReceiverMethodCall(
 	// across the package boundary, so dispatch through the runtime value helper.
 	if crossPackageUnexportedNamedType(ctx, receiver) {
 		call := o.runtimeOwner.QualifiedHelper(RuntimeHelperPointerValue) +
-			"<any>(" + receiverExpr + ")." + methodMemberName(selector.Sel.Name) +
+			"<any>(" + receiverExpr + ")." + methodMemberName(name) +
 			"(" + strings.Join(args, ", ") + ")"
 		return call, diagnostics, true
 	}
@@ -12558,11 +12662,11 @@ func (o *LoweringOwner) lowerPointerReceiverMethodCall(
 	// an override receiver's $.pointerValue returns unchanged when the guard
 	// holds.
 	callArgs := append([]string{receiverExpr}, args...)
-	call := namedValueExpr(ctx, receiver) + ".prototype." + selector.Sel.Name + ".call(" + strings.Join(callArgs, ", ") + ")"
+	call := namedValueExpr(ctx, receiver) + ".prototype." + name + ".call(" + strings.Join(callArgs, ", ") + ")"
 	if override {
 		receiverExpr = localReceiver
 	}
-	return directPointerMethodCall(receiverExpr, o.namedTypeExpr(ctx, receiver), selector.Sel.Name, args, call), diagnostics, true
+	return directPointerMethodCall(receiverExpr, o.namedTypeExpr(ctx, receiver), name, args, call), diagnostics, true
 }
 
 // directPointerMethodCall returns a call of the pointer method name on the
@@ -18594,7 +18698,7 @@ func (o *LoweringOwner) callNeedsAwait(ctx lowerFileContext, fun ast.Expr) bool 
 // A //goscript:async or //goscript:sync directive on the field, variable or
 // func type it calls through decides it instead.
 func (o *LoweringOwner) valueCallAsync(ctx lowerFileContext, fun ast.Expr) bool {
-	if ctx.model == nil {
+	if ctx.model == nil || reflectTwinParamCall(ctx, fun) {
 		return true
 	}
 	switch directive, _ := ctx.model.asyncDirectives.valueCall(ctx.semPkg.source, fun); directive {
@@ -18723,6 +18827,11 @@ func (o *LoweringOwner) formatCallAsync(ctx lowerFileContext, call *ast.CallExpr
 // through a function variable in a synchronous literal cannot await, so it
 // unwraps the result of a function value that returned synchronously.
 func (o *LoweringOwner) awaitCallIfNeeded(ctx lowerFileContext, call *ast.CallExpr, lowered string) string {
+	// A call of a twin awaits it.
+	if ctx.twinCallee != nil && ctx.twinCallee == call.Fun {
+		return "await " + lowered
+	}
+
 	// A function that //goscript:sync marks cannot await, so its calls that
 	// may suspend must have returned a value. The semantic model reports the
 	// calls that always return a promise.

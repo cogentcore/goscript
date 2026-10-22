@@ -96,14 +96,15 @@ func (o *LoweringOwner) lowerIdentityReceiverMethodCall(
 		return "", nil, false
 	}
 
-	// The method of the struct's class is called with the address as its
-	// receiver.
-	if prototype, ok := o.pointerMethodPrototype(ctx, method); ok {
+	// The method of the struct's class, or its twin, is called with the
+	// address as its receiver.
+	name := reflectTwinCallName(ctx, selector, method.Name())
+	if prototype, ok := o.pointerMethodPrototype(ctx, method, name); ok {
 		return prototype + ".call(" + strings.Join(append([]string{address}, args...), ", ") + ")", diagnostics, true
 	}
 
 	// A class the file cannot name is found from the struct.
-	callArgs := append([]string{address, strconv.Quote(method.Name())}, args...)
+	callArgs := append([]string{address, strconv.Quote(name)}, args...)
 	call := o.runtimeOwner.QualifiedHelper(RuntimeHelperCallPointerMethod) + "(" + strings.Join(callArgs, ", ") + ")"
 	return call, diagnostics, true
 }
@@ -125,20 +126,21 @@ func (o *LoweringOwner) lowerIdentityReceiverMethodValue(ctx lowerFileContext, e
 	// The bound address is the receiver of the method of the struct's
 	// class.
 	callee := identityReceiverCallee("__receiver", method.Name())
-	if prototype, ok := o.pointerMethodPrototype(ctx, method); ok {
+	if prototype, ok := o.pointerMethodPrototype(ctx, method, method.Name()); ok {
 		callee = prototype + ".call"
 	}
 	return o.lowerMethodValueClosure(ctx, selection, address, callee, true), diagnostics, true
 }
 
-// pointerMethodPrototype returns the pointer method of a struct type read
-// from the prototype of the struct's class, as in T.prototype.M, through
+// pointerMethodPrototype returns the pointer method of a struct type, or
+// the member name of its twin, read from the prototype of the struct's
+// class, as in T.prototype.M, through
 // which a call with a reference to the struct as its receiver finds the
 // method directly rather than on the struct that the reference refers to.
 // It reports false when the file cannot name the class at run time: an
 // override, a type of a package that the file does not import as a value
 // or defers, or an unexported type of another package.
-func (o *LoweringOwner) pointerMethodPrototype(ctx lowerFileContext, method *types.Func) (string, bool) {
+func (o *LoweringOwner) pointerMethodPrototype(ctx lowerFileContext, method *types.Func, name string) (string, bool) {
 	// The struct type that declares the method, of no override.
 	receiver := methodReceiverNamedType(method)
 	if receiver == nil || receiver.Obj() == nil || receiver.Obj().Pkg() == nil || o.receiverUsesOverridePackage(receiver) {
@@ -161,7 +163,7 @@ func (o *LoweringOwner) pointerMethodPrototype(ctx lowerFileContext, method *typ
 	}
 
 	// The prototype of its class holds the method.
-	member := methodMemberName(method.Name())
+	member := methodMemberName(name)
 	if !strings.HasPrefix(member, "[") {
 		member = "." + member
 	}
