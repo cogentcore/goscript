@@ -93,7 +93,7 @@ export class Item {
 	}
 
 	public clone(): Item {
-		return new Item(true, this.Node.clone(), this.Child.clone(), $.markAsStructValue($.cloneStructValue(this.Group)), this.List, $.cloneArrayValue(this.Pair, /* @__PURE__ */ $.arrayType("main.Node", 2)))
+		return new Item(true, this.Node.clone(), this.Child.clone(), $.markAsStructValue($.cloneStructValue(this.Group)), this.List, $.cloneArrayValue(this.Pair, __goscriptStatic0()))
 	}
 
 	public __goscriptAssign(source: Item): this {
@@ -101,7 +101,7 @@ export class Item {
 		this.Child.__goscriptAssign(source.Child)
 		$.assignStruct(this.Group, source.Group)
 		this.List = source.List
-		this.Pair = $.assignFieldValue(this.Pair, source.Pair, /* @__PURE__ */ $.arrayType("main.Node", 2))
+		this.Pair = $.assignFieldValue(this.Pair, source.Pair, __goscriptStatic0())
 		return this
 	}
 
@@ -310,12 +310,12 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("method value:", (_is!($.fieldRef(item.value, "Child")) as boolean))
 
 	// Generic code and slices keep the pointers rather than copies.
-	let box: $.VarRef<Box> = $.varRef($.genericInstance(new Box(true), __goscriptStatic1))
-	box.value.Add(__goscriptStatic0(), item.value.Child.self)
-	$.pointerValue<Node>(box.value.Get(__goscriptStatic0(), 0)).name = "boxed"
+	let box: $.VarRef<Box> = $.varRef($.genericInstance(new Box(true), __goscriptStatic2))
+	box.value.Add(__goscriptStatic1(), item.value.Child.self)
+	$.pointerValue<Node>(box.value.Get(__goscriptStatic1(), 0)).name = "boxed"
 	let clone = (slices.Clone(registry) as $.Slice<Node | $.VarRef<Node> | null>)
 	$.pointerValue<Node>($.arrayIndex(clone!, 0)).name += "+cloned"
-	await $.println("generic:", item.value.Child.name, $.pointerEqual(box.value.Get(__goscriptStatic0(), 0), $.fieldRef(item.value, "Child")))
+	await $.println("generic:", item.value.Child.name, $.pointerEqual(box.value.Get(__goscriptStatic1(), 0), $.fieldRef(item.value, "Child")))
 
 	// Methods promoted from two levels down, called directly and as a value.
 	let outer: $.VarRef<Outer> = $.varRef(new Outer(true))
@@ -326,8 +326,8 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("promoted method value:", $.pointerEqual($.arrayIndex(registry!, $.sliceLen(registry) - 1), $.fieldRef(outer.value.Item, "Node")), $.mapGet<Node | $.VarRef<Node> | null, number, number>(counts, $.fieldRef(outer.value.Item, "Node"), 0)[0])
 
 	// A generic struct field and an async method keep the field's address.
-	let holder: {"B": Self} = $.anonymousStructValue({"B": $.genericInstance(new Self(true, undefined, 0), __goscriptStatic3)}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("B", "main.Self", [0], 0, true)] })
-	Self.prototype.Keep.call($.fieldRef(holder, "B"), __goscriptStatic2(), 5)
+	let holder: {"B": Self} = $.anonymousStructValue({"B": $.genericInstance(new Self(true, undefined, 0), __goscriptStatic4)}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("B", /* @__PURE__ */ $.genericStructType("main.Self", "main.Self[int]", () => [/* @__PURE__ */ $.structField("self", /* @__PURE__ */ $.pointerType("main.Self[int]"), [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/field_pointer_receiver_identity" }), /* @__PURE__ */ $.structField("v", /* @__PURE__ */ $.basicType("int"), [1], 8, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/field_pointer_receiver_identity" })]), [0], 0, true)] })
+	Self.prototype.Keep.call($.fieldRef(holder, "B"), __goscriptStatic3(), 5)
 	await $.println("generic field:", $.pointerEqual(holder.B.self, $.fieldRef(holder, "B")), holder.B.v)
 	let ch = $.makeChannel<boolean>(1, false, "both")
 	await $.chanSend(ch, true)
@@ -336,22 +336,27 @@ export async function main(): globalThis.Promise<void> {
 
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
-	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.pointerType("main.Node"), zero: () => null, methods: {Is: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Is(...$.stripGenericTypeArgs(args)), Register: (receiver: any) => $.pointerValue(receiver).Register(), Rename: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Rename(...$.stripGenericTypeArgs(args)), Wait: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Wait(...$.stripGenericTypeArgs(args))} }})
+	return __goscriptStatic0$value ??= (/* @__PURE__ */ $.arrayType("main.Node", 2))
 }
 
 var __goscriptStatic1$value: any
 function __goscriptStatic1(): any {
-	return __goscriptStatic1$value ??= ([{Add: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Add(__goscriptStatic0(), ...$.stripGenericTypeArgs(args)), Get: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Get(__goscriptStatic0(), ...$.stripGenericTypeArgs(args))}, [$.methodSignature("Add", [/* @__PURE__ */ $.pointerType("main.Node")], [], true, false), $.methodSignature("Get", [/* @__PURE__ */ $.basicType("int")], [/* @__PURE__ */ $.pointerType("main.Node")], true, false)]])
+	return __goscriptStatic1$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.pointerType("main.Node"), zero: () => null, methods: {Is: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Is(...$.stripGenericTypeArgs(args)), Register: (receiver: any) => $.pointerValue(receiver).Register(), Rename: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Rename(...$.stripGenericTypeArgs(args)), Wait: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Wait(...$.stripGenericTypeArgs(args))} }})
 }
 
 var __goscriptStatic2$value: any
 function __goscriptStatic2(): any {
-	return __goscriptStatic2$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }})
+	return __goscriptStatic2$value ??= ([{Add: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Add(__goscriptStatic1(), ...$.stripGenericTypeArgs(args)), Get: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Get(__goscriptStatic1(), ...$.stripGenericTypeArgs(args))}, [$.methodSignature("Add", [/* @__PURE__ */ $.pointerType("main.Node")], [], true, false), $.methodSignature("Get", [/* @__PURE__ */ $.basicType("int")], [/* @__PURE__ */ $.pointerType("main.Node")], true, false)]])
 }
 
 var __goscriptStatic3$value: any
 function __goscriptStatic3(): any {
-	return __goscriptStatic3$value ??= ([{Keep: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Keep(__goscriptStatic2(), ...$.stripGenericTypeArgs(args))}, [$.methodSignature("Keep", [/* @__PURE__ */ $.basicType("int")], [], true, false)]])
+	return __goscriptStatic3$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }})
+}
+
+var __goscriptStatic4$value: any
+function __goscriptStatic4(): any {
+	return __goscriptStatic4$value ??= ([{Keep: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Keep(__goscriptStatic3(), ...$.stripGenericTypeArgs(args))}, [$.methodSignature("Keep", [/* @__PURE__ */ $.basicType("int")], [], true, false)]])
 }
 
 var __goscriptAwait: any
