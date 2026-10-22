@@ -25,7 +25,7 @@ export async function main(): globalThis.Promise<void> {
 	let u8 = 1
 	await $.println("uint32 << 32", $.uint((n < 32 ? ((u32 << n) >>> 0) : 0), 32), "int32 << 32", $.int((n < 32 ? (i32 << n) : 0), 32), "uint16 << 32", $.uint((n < 32 ? ((u16 << n) & 0xffff) : 0), 16), "uint8 << 32", $.uint((n < 32 ? ((u8 << n) & 0xff) : 0), 8))
 	await $.println("int32 >> 32", $.int((i32 >> (n < 32 ? n : 31)), 32), "negative int32 >> 32", $.int((neg >> (n < 32 ? n : 31)), 32), "int8 >> 32", $.int((i8 >> (n < 32 ? n : 31)), 8))
-	await $.println("uint32 << 31", $.uint((($.uint($.uint64Sub(n, 1n), 64)) < 32 ? ((u32 << ($.uint($.uint64Sub(n, 1n), 64))) >>> 0) : 0), 32), "int32 << 31", $.int((($.uint($.uint64Sub(n, 1n), 64)) < 32 ? (i32 << ($.uint($.uint64Sub(n, 1n), 64))) : 0), 32))
+	await $.println("uint32 << 31", $.uint((($.wideUintSub(n, 1)) < 32 ? ((u32 << ($.wideUintSub(n, 1))) >>> 0) : 0), 32), "int32 << 31", $.int((($.wideUintSub(n, 1)) < 32 ? (i32 << ($.wideUintSub(n, 1))) : 0), 32))
 	await $.println("uint32 << call", $.uint((($.narrowShl(u32, count())) >>> 0), 32), "int32 >> call", $.int((($.narrowShr(neg, count())) | 0), 32))
 
 	// Compound assignments shift the same way.
