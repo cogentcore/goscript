@@ -125,20 +125,10 @@ func protobufTypeScriptBindings(semPkg *semanticPackage, options LoweringOptions
 			})
 			continue
 		}
-		importSource, err := protobufTypeScriptBindingImportSource(options.OutputPath, semPkg.pkgPath, tsPath)
-		if err != nil {
-			diagnostics = append(diagnostics, Diagnostic{
-				Severity: DiagnosticSeverityError,
-				Code:     "goscript/protobuf-ts-binding:import-source",
-				Message:  "failed to compute protobuf TypeScript binding import",
-				Detail:   err.Error(),
-			})
-			continue
-		}
 		bindings[sourcePath] = protobufTypeScriptBinding{
 			sourcePath:   sourcePath,
 			outputName:   strings.TrimSuffix(filepath.Base(sourcePath), ".go") + ".ts",
-			importSource: importSource,
+			importSource: protobufTypeScriptBindingImportSource(semPkg.pkgPath, tsPath),
 			messageNames: messageNames,
 			hasOneof:     protobufTypeScriptBindingHasOneof(syntax),
 		}
@@ -222,21 +212,13 @@ func protobufTypeScriptBindingInRoot(root, sourceAbs string) bool {
 	return true
 }
 
-func protobufTypeScriptBindingImportSource(outputPath, pkgPath, tsPath string) (string, error) {
-	outputDir := filepath.Join(outputPath, "@goscript", filepath.FromSlash(pkgPath))
-	outputDir, err := filepath.Abs(outputDir)
-	if err != nil {
-		return "", err
-	}
-	rel, err := filepath.Rel(outputDir, tsPath)
-	if err != nil {
-		return "", err
-	}
-	rel = filepath.ToSlash(rel)
-	if !strings.HasPrefix(rel, ".") {
-		rel = "./" + rel
-	}
-	return strings.TrimSuffix(rel, ".ts") + ".js", nil
+// protobufTypeScriptBindingImportSource names the generated .pb.ts sibling of
+// a bound file by its Go package path, as generated .pb.ts files import each
+// other: @go/<package path>/<file>.pb.js. The bundler resolves it from the
+// local module, vendor or the module cache, so the binding names the same
+// module wherever the output and the checkout live.
+func protobufTypeScriptBindingImportSource(pkgPath, tsPath string) string {
+	return "@go/" + pkgPath + "/" + strings.TrimSuffix(filepath.Base(tsPath), ".ts") + ".js"
 }
 
 func protobufTypeScriptBindingHasOneof(file *ast.File) bool {
@@ -585,15 +567,7 @@ func lowerProtobufSRPCTypeScriptBindingStub(semPkg *semanticPackage, sourcePath 
 			Detail:   err.Error(),
 		}}
 	}
-	importSource, err := protobufTypeScriptBindingImportSource(options.OutputPath, semPkg.pkgPath, tsPath)
-	if err != nil {
-		return nil, []Diagnostic{{
-			Severity: DiagnosticSeverityError,
-			Code:     "goscript/protobuf-ts-binding:srpc-import-source",
-			Message:  "failed to compute SRPC TypeScript binding import",
-			Detail:   err.Error(),
-		}}
-	}
+	importSource := protobufTypeScriptBindingImportSource(semPkg.pkgPath, tsPath)
 	return &loweredFile{
 		sourcePath: sourcePath,
 		outputName: sourceOutputName(sourcePath),

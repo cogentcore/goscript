@@ -243,7 +243,6 @@ func (s *CompileService) Compile(ctx context.Context, req *CompileRequest) (*Com
 	loweredProgram, loweringDiagnostics := s.loweringOwner.Build(ctx, semanticModel, LoweringOptions{
 		SourceRoot:                protobufTypeScriptBindingRoot(req.Dir),
 		DisplayRoot:               req.Dir,
-		OutputPath:                req.OutputPath,
 		ProtobufTypeScriptBinding: req.ProtobufTypeScriptBinding,
 		AdditionalBindingRoots:    slices.Clone(req.AdditionalBindingRoots),
 		TrimTypeInfo:              trimTypeInfo,

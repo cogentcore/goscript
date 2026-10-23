@@ -3,11 +3,9 @@ package compiler
 import (
 	"go/types"
 	"hash/fnv"
-	"maps"
 	"path/filepath"
 	"slices"
 	"strconv"
-	"strings"
 	"sync"
 )
 
@@ -60,16 +58,6 @@ func packagePathHash(pkgPath string) string {
 	h := fnv.New32a()
 	h.Write([]byte(pkgPath))
 	return strconv.FormatUint(uint64(h.Sum32()), 36)
-}
-
-// sharedPackageNamesDigest returns a cache key field for names, which change
-// the output of the packages that use the types of the renamed packages.
-func sharedPackageNamesDigest(names map[string]string) string {
-	var b strings.Builder
-	for _, pkgPath := range slices.Sorted(maps.Keys(names)) {
-		b.WriteString(pkgPath + "=" + names[pkgPath] + "\n")
-	}
-	return b.String()
 }
 
 // runtimePackageNames maps each package being lowered that has a runtime

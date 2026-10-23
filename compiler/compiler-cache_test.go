@@ -91,9 +91,27 @@ func TestCompilePackagesCacheReplaysAcrossCheckouts(t *testing.T) {
 	compileCacheFixture(t, writePackageGraphFixture(t, files), filepath.Join(t.TempDir(), "first"), cacheRoot)
 	manifests := countCacheManifests(t, cacheRoot)
 
-	compileCacheFixture(t, writePackageGraphFixture(t, files), filepath.Join(t.TempDir(), "second"), cacheRoot)
+	second := writePackageGraphFixture(t, files)
+	compileCacheFixture(t, second, filepath.Join(t.TempDir(), "second"), cacheRoot)
 	if got := countCacheManifests(t, cacheRoot); got != manifests {
 		t.Fatalf("cache manifests after second checkout = %d, want %d", got, manifests)
+	}
+
+	// Another program of the same checkout, requested from its package
+	// directory, adds its program manifest and replays the package it shares.
+	comp, err := NewCompiler(&Config{
+		Dir:        filepath.Join(second, "sub"),
+		OutputPath: filepath.Join(t.TempDir(), "sub"),
+		CacheRoot:  cacheRoot,
+	}, nil, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := comp.CompilePackages(context.Background(), "."); err != nil {
+		t.Fatal(err)
+	}
+	if got := countCacheManifests(t, cacheRoot); got != manifests+1 {
+		t.Fatalf("cache manifests after second program = %d, want %d", got, manifests+1)
 	}
 }
 
@@ -499,7 +517,7 @@ func TestCompilerCacheKeyChangesWithSemanticsVersion(t *testing.T) {
 	}
 }
 
-func TestCompilerCacheKeyTracksOverridesAndProtobufOutputRelation(t *testing.T) {
+func TestCompilerCacheKeyTracksOverridesAndProtobufBindings(t *testing.T) {
 	moduleDir := writePackageGraphFixture(t, map[string]string{
 		"go.mod":    "module example.test/cachekeypb\n\ngo 1.25.3\n",
 		"foo.pb.go": "package cachekeypb\ntype Foo struct{}\n",
@@ -519,10 +537,17 @@ func TestCompilerCacheKeyTracksOverridesAndProtobufOutputRelation(t *testing.T) 
 	graph.Nodes[0].GoFiles = graph.Nodes[0].CompiledGoFiles
 	baseKey := generatedCacheKey(t, req, graph)
 
+	// The output root and patterns belong to the program: a package's output
+	// names its bindings by Go package path, so its key ignores them.
 	outputReq := *req
 	outputReq.OutputPath = filepath.Join(t.TempDir(), "out-b")
-	if key := generatedCacheKey(t, &outputReq, graph); key == baseKey {
-		t.Fatal("protobuf output root relation did not change generated package key")
+	outputReq.Patterns = []string{"./..."}
+	if key := generatedCacheKey(t, &outputReq, graph); key != baseKey {
+		t.Fatal("protobuf output root or patterns changed generated package key")
+	}
+	writeFixtureFile(t, moduleDir, "foo.pb.ts", "export const Foo = \"second\";\n")
+	if key := generatedCacheKey(t, req, graph); key == baseKey {
+		t.Fatal("protobuf TypeScript binding content did not change generated package key")
 	}
 
 	plan := &overrideCopyPlan{packages: []overrideCopyPackage{{

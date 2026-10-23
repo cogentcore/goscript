@@ -70,6 +70,14 @@ func (m *SemanticModel) packageFactDigests() map[string]string {
 	for obj := range m.effectFreeFuncs {
 		add("effect-free", obj, "")
 	}
+
+	// A renamed package's runtime name is in the output of every package
+	// that names its types, all of which import it.
+	for pkgPath, name := range m.runtimePackageNames {
+		facts[pkgPath] = append(facts[pkgPath], "runtime-name|"+name)
+	}
+
+	// Each package adds the facts it computed itself.
 	for pkgPath, semPkg := range m.packages {
 		if len(semPkg.localFacts) != 0 {
 			facts[pkgPath] = append(facts[pkgPath], semPkg.localFacts...)

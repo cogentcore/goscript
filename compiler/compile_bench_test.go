@@ -48,7 +48,6 @@ func BenchmarkCompilePipelineStages(b *testing.B) {
 	loweringOpts := LoweringOptions{
 		SourceRoot:  protobufTypeScriptBindingRoot(req.Dir),
 		DisplayRoot: req.Dir,
-		OutputPath:  req.OutputPath,
 	}
 
 	b.ReportAllocs()

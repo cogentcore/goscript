@@ -61,9 +61,9 @@ func NewFoo() Foo {
 		t.Fatalf("bound protobuf file should not emit foo.pb.gs.ts, stat err=%v", err)
 	}
 	binding := readTestFile(t, filepath.Join(pkgDir, "foo.pb.ts"))
-	if !strings.Contains(binding, `import * as __protobuf_ts`) || !strings.Contains(binding, `foo.pb.js`) ||
+	if !strings.Contains(binding, `import * as __protobuf_ts`) || !strings.Contains(binding, `from "@go/example.test/protobufbinding/foo.pb.js"`) ||
 		!strings.Contains(binding, `class Foo`) || !strings.Contains(binding, `__protobufTypeScriptMessage = __protobuf_ts.Foo`) {
-		t.Fatalf("binding file should adapt sibling foo.pb.js, got:\n%s", binding)
+		t.Fatalf("binding file should adapt @go/example.test/protobufbinding/foo.pb.js, got:\n%s", binding)
 	}
 	if !strings.Contains(binding, `class Object`) || !strings.Contains(binding, `__protobufTypeScriptMessage = __protobuf_ts.Object$`) {
 		t.Fatalf("binding file should use protobuf-es-lite safe identifier for Object, got:\n%s", binding)
@@ -592,7 +592,6 @@ func TestProtobufTypeScriptBindingSkipsFilesOutsideSourceRoot(t *testing.T) {
 	}
 	bindings, diagnostics := protobufTypeScriptBindings(semPkg, LoweringOptions{
 		SourceRoot:                dir,
-		OutputPath:                filepath.Join(dir, "out"),
 		ProtobufTypeScriptBinding: true,
 	})
 	if len(diagnostics) != 0 {
@@ -623,7 +622,6 @@ type Dep struct{}
 	}
 	bindings, diagnostics := protobufTypeScriptBindings(semPkg, LoweringOptions{
 		SourceRoot:                dir,
-		OutputPath:                filepath.Join(dir, "out"),
 		ProtobufTypeScriptBinding: true,
 	})
 	if len(diagnostics) != 0 {
@@ -675,7 +673,6 @@ func TestProtobufTypeScriptBindingUsesAdditionalRoot(t *testing.T) {
 	bindings, diagnostics := protobufTypeScriptBindings(semPkg, LoweringOptions{
 		SourceRoot:                root,
 		AdditionalBindingRoots:    []string{additionalRoot},
-		OutputPath:                filepath.Join(root, "out"),
 		ProtobufTypeScriptBinding: true,
 	})
 	if len(diagnostics) != 0 {

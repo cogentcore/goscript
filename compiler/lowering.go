@@ -42,8 +42,6 @@ type LoweringOptions struct {
 	SourceRoot string
 	// DisplayRoot is the request root used to format source file names in diagnostics.
 	DisplayRoot string
-	// OutputPath is the TypeScript output root used for generated relative imports.
-	OutputPath string
 	// ProtobufTypeScriptBinding binds .pb.go files to sibling .pb.ts files.
 	ProtobufTypeScriptBinding bool
 	// AdditionalBindingRoots extends the roots searched for protobuf TypeScript bindings.

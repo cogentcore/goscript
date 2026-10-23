@@ -32,7 +32,7 @@ const compilerCacheSchema = "goscript-package-artifact-v2"
 // compilerSemanticsVersion versions emitted-output semantics. Bump this value
 // with every behavior-changing compiler commit so artifacts cached by an
 // older binary miss and rebuild instead of replaying stale bytes.
-const compilerSemanticsVersion = "40"
+const compilerSemanticsVersion = "41"
 
 type compilerCacheEntryKind string
 
@@ -144,6 +144,10 @@ func (o *CompilerCacheOwner) Entries(
 		writeKeyField(&program, string(entry.kind)+"|"+entry.packagePath, entry.key)
 	}
 	writeKeyField(&program, "identity", keyOwner.identity)
+	for _, pattern := range req.Patterns {
+		writeKeyField(&program, "pattern", pattern)
+	}
+	writeKeyField(&program, "dir", keyOwner.keyPath(req.Dir))
 	sources.program = compilerCacheEntry{
 		key:  sha256String(program.String()),
 		kind: compilerCacheEntryProgram,
@@ -174,7 +178,6 @@ func (o *CompilerCacheOwner) ArtifactEntries(
 			writeKeyField(&b, "source-key", entry.key)
 			writeKeyField(&b, "closure-facts", facts.digest(entry.packagePath))
 			writeKeyField(&b, "universe-facts", facts.facts[universeFactsPackage])
-			writeKeyField(&b, "shared-package-names", sharedPackageNamesDigest(model.runtimePackageNames))
 			writeKeyField(&b, "trim-type-info", strconv.FormatBool(trimTypeInfo))
 			entry.key = sha256String(b.String())
 		}
@@ -785,7 +788,8 @@ type compilerCacheKeyOwner struct {
 	// sources digests source file contents.
 	sources *sourceDigests
 	// identity digests the schema, compiler and request fields every key
-	// shares.
+	// shares. It leaves out the request's patterns, directory and output
+	// root, so programs that share a package share its artifacts.
 	identity string
 	// ownDigests holds the digest of each node's own files and side inputs.
 	ownDigests map[string]string
@@ -938,12 +942,7 @@ func (o *compilerCacheKeyOwner) sharedIdentity() string {
 	writeKeyField(&b, "schema", compilerCacheSchema)
 	writeCompilerIdentity(&b)
 	req := o.req
-	for _, pattern := range req.Patterns {
-		writeKeyField(&b, "pattern", pattern)
-	}
-	writeKeyField(&b, "dir", o.keyPath(req.Dir))
 	if req.ProtobufTypeScriptBinding {
-		writeKeyField(&b, "protobuf-output", o.keyPath(req.OutputPath))
 		for _, root := range req.AdditionalBindingRoots {
 			writeKeyField(&b, "protobuf-binding-root", o.keyPath(root))
 		}
@@ -1051,7 +1050,6 @@ func (o *compilerCacheKeyOwner) nodeOwnDigest(node *PackageGraphNode, moduleIden
 	writeKeyField(&b, "name", node.Name)
 	writeKeyField(&b, "module-path", node.ModulePath)
 	writeKeyField(&b, "for-test", node.ForTest)
-	writeKeyField(&b, "requested", strconv.FormatBool(node.Requested))
 	writeKeyField(&b, "override-candidate", strconv.FormatBool(node.OverrideCandidate))
 
 	identities := make(map[string]string, len(node.CompiledGoFiles))
