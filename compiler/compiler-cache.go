@@ -100,6 +100,11 @@ func (o *CompilerCacheOwner) Enabled(req *CompileRequest) bool {
 type compilerCacheSources struct {
 	program  compilerCacheEntry
 	packages []compilerCacheEntry
+	// request digests the key identity with the request's patterns and
+	// directory. It keys body summaries, which are shared only by compiles
+	// of the same request: another program's facts and liveness differ, so
+	// its artifacts would miss and it would check the program twice.
+	request string
 }
 
 // Entries returns the source entries of a package graph and its override copy
@@ -143,11 +148,14 @@ func (o *CompilerCacheOwner) Entries(
 	for _, entry := range sources.packages {
 		writeKeyField(&program, string(entry.kind)+"|"+entry.packagePath, entry.key)
 	}
-	writeKeyField(&program, "identity", keyOwner.identity)
+	var request strings.Builder
+	writeKeyField(&request, "identity", keyOwner.identity)
 	for _, pattern := range req.Patterns {
-		writeKeyField(&program, "pattern", pattern)
+		writeKeyField(&request, "pattern", pattern)
 	}
-	writeKeyField(&program, "dir", keyOwner.keyPath(req.Dir))
+	writeKeyField(&request, "dir", keyOwner.keyPath(req.Dir))
+	sources.request = sha256String(request.String())
+	writeKeyField(&program, "request", sources.request)
 	sources.program = compilerCacheEntry{
 		key:  sha256String(program.String()),
 		kind: compilerCacheEntryProgram,
@@ -221,7 +229,7 @@ func (o *CompilerCacheOwner) ReplayProgram(
 	for _, entry := range sources.packages {
 		if entry.kind == compilerCacheEntryGenerated {
 			group.Go(func() error {
-				o.markSummaryUsed(req, entry)
+				o.markSummaryUsed(req, sources.request, entry)
 				return nil
 			})
 		}
@@ -333,11 +341,13 @@ func (o *CompilerCacheOwner) StoreProgram(
 	})
 }
 
-// summaryEntry returns the summary entry of a generated source entry.
-func summaryEntry(entry compilerCacheEntry) compilerCacheEntry {
+// summaryEntry returns the summary entry of a generated source entry within
+// a request.
+func summaryEntry(request string, entry compilerCacheEntry) compilerCacheEntry {
 	var b strings.Builder
 	writeKeyField(&b, "schema", compilerCacheSchema)
 	writeKeyField(&b, "kind", string(compilerCacheEntrySummary))
+	writeKeyField(&b, "request", request)
 	writeKeyField(&b, "source-key", entry.key)
 	return compilerCacheEntry{
 		key:         sha256String(b.String()),
@@ -361,7 +371,7 @@ func (o *CompilerCacheOwner) Summaries(req *CompileRequest, sources compilerCach
 			continue
 		}
 		group.Go(func() error {
-			entry := summaryEntry(entry)
+			entry := summaryEntry(sources.request, entry)
 			manifest, ok := o.readManifest(req, entry)
 			if !ok || manifest.kind != entry.kind || manifest.packagePath != entry.packagePath || len(manifest.files) != 1 {
 				return nil
@@ -396,7 +406,7 @@ func (o *CompilerCacheOwner) StoreSummaries(
 		if !ok || entry.kind != compilerCacheEntryGenerated {
 			continue
 		}
-		entry := summaryEntry(entry)
+		entry := summaryEntry(sources.request, entry)
 		o.storeManifest(req, compilerCacheManifest{
 			schema:      compilerCacheSchema,
 			key:         entry.key,
@@ -433,8 +443,8 @@ func (o *CompilerCacheOwner) replayEntry(
 // markSummaryUsed marks the body summary of a generated source entry. A
 // program replay never reads summaries, so it marks them to keep trim from
 // removing them while the program stays in use. A fresh mark costs one stat.
-func (o *CompilerCacheOwner) markSummaryUsed(req *CompileRequest, entry compilerCacheEntry) {
-	summary := summaryEntry(entry)
+func (o *CompilerCacheOwner) markSummaryUsed(req *CompileRequest, request string, entry compilerCacheEntry) {
+	summary := summaryEntry(request, entry)
 	info, err := os.Stat(filepath.Join(o.entryDir(req, summary.key), "manifest.json"))
 	if err != nil || time.Since(info.ModTime()) < compilerCacheMarkInterval {
 		return

@@ -98,7 +98,9 @@ func TestCompilePackagesCacheReplaysAcrossCheckouts(t *testing.T) {
 	}
 
 	// Another program of the same checkout, requested from its package
-	// directory, adds its program manifest and replays the package it shares.
+	// directory, replays the package artifact it shares and adds only its
+	// program manifest and its own body summary, which another request's
+	// facts would not let it use.
 	comp, err := NewCompiler(&Config{
 		Dir:        filepath.Join(second, "sub"),
 		OutputPath: filepath.Join(t.TempDir(), "sub"),
@@ -110,8 +112,8 @@ func TestCompilePackagesCacheReplaysAcrossCheckouts(t *testing.T) {
 	if _, err := comp.CompilePackages(context.Background(), "."); err != nil {
 		t.Fatal(err)
 	}
-	if got := countCacheManifests(t, cacheRoot); got != manifests+1 {
-		t.Fatalf("cache manifests after second program = %d, want %d", got, manifests+1)
+	if got := countCacheManifests(t, cacheRoot); got != manifests+2 {
+		t.Fatalf("cache manifests after second program = %d, want %d", got, manifests+2)
 	}
 }
 
