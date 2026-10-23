@@ -224,9 +224,9 @@ func (s *CompileService) Compile(ctx context.Context, req *CompileRequest) (*Com
 		}
 	}
 	// A program built with dead code elimination keeps only reachable code.
-	// Protobuf bindings call methods from TypeScript that the analysis does
-	// not see.
-	if req.EliminateDeadCode && !req.ProtobufTypeScriptBinding && wholeProgramBuild(req, graph) {
+	// The protobuf binding runtime is an override package, so the methods it
+	// calls on bound messages are among the override roots.
+	if req.EliminateDeadCode && wholeProgramBuild(req, graph) {
 		roots := overrideDeadCodeRoots(overrideFacts, graph)
 		roots.functions = req.DeferredFunctions
 		roots.addTestPackages(req, graph)
