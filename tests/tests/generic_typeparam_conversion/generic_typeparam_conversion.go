@@ -61,7 +61,7 @@ func main() {
 	w := toWide[Wide](Extended(5))
 	println(int64(w)*2, w.String())
 	a, b := fromConst[Wide](9)
-	println(int64(a)+int64(b))
+	println(int64(a) + int64(b))
 	c, d := fromConst[uint8](300)
 	println(c, d)
 }

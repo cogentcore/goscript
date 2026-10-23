@@ -59,8 +59,12 @@ func main() {
 	var nilSquare *Square
 	sq := &Square{S: 2}
 	values := []any{
-		nil, 1, "a", Celsius(3), Count(4), Square{S: 2}, sq, nilSquare,
-		[]int{1}, func() int { return 1 }, 2.5, localA(), localB(), Square{S: 3},
+		nil, 1, "a", Celsius(3), Count(4),
+		Square{S: 2},
+		sq, nilSquare,
+		[]int{1},
+		func() int { return 1 }, 2.5, localA(), localB(),
+		Square{S: 3},
 		&Square{S: 5}, Celsius(6), Count(7), "b", 8,
 	}
 

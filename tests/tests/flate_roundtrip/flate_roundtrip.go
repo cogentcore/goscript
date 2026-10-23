@@ -10,7 +10,7 @@ func main() {
 	// Mixed repeated and distinct bytes exercise dynamic Huffman blocks.
 	input := make([]byte, 4096)
 	for i := range input {
-		input[i] = byte((i*31) ^ (i >> 5))
+		input[i] = byte((i * 31) ^ (i >> 5))
 	}
 	for _, level := range []int{flate.BestSpeed, flate.DefaultCompression, flate.BestCompression} {
 		var compressed bytes.Buffer

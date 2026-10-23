@@ -8,9 +8,11 @@ import (
 
 const benchIterations = 200_000
 
-var leadingZeros64Sink int
-var mul32HiSink uint64
-var mul32LoSink uint64
+var (
+	leadingZeros64Sink int
+	mul32HiSink        uint64
+	mul32LoSink        uint64
+)
 
 var leadingZeros64Inputs = [...]uint64{
 	0,

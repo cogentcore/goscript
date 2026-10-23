@@ -35,5 +35,4 @@ func main() {
 	println("RawMessage surrogate replacement:", surrogate.Format(jsontext.AllowInvalidUTF8(true)) == nil, string(surrogate))
 	ordered := json.RawMessage(`{"a":2,"a":1,"b":-0}`)
 	println("RawMessage duplicate ordering:", ordered.Canonicalize(jsontext.AllowDuplicateNames(true), jsontext.CanonicalizeRawInts(false)) == nil, string(ordered))
-
 }

@@ -42,5 +42,4 @@ func main() {
 	p.N = &Node{A: 6}
 	b, err = json.Marshal(p)
 	println(string(b), err == nil)
-
 }

@@ -13,8 +13,10 @@ type Rule struct {
 	pos  Pos
 }
 
-var global Pos
-var saved *Pos
+var (
+	global Pos
+	saved  *Pos
+)
 
 func (r *Rule) Pos() Pos { return r.pos }
 

@@ -149,9 +149,17 @@ func run(p Program, answers chan<- Answer, faults chan<- *Fault) {
 // factorial builds a program that computes n! with a loop.
 func factorial(name string, n int64) Program {
 	return Program{Name: name, Code: []Instr{
-		{Push, 1}, {Push, n},
-		{Swap, 0}, {Over, 0}, {Mul, 0}, {Swap, 0}, {Dec, 0}, {Dup, 0}, {Jnz, 2},
-		{Drop, 0}, {Halt, 0},
+		{Push, 1},
+		{Push, n},
+		{Swap, 0},
+		{Over, 0},
+		{Mul, 0},
+		{Swap, 0},
+		{Dec, 0},
+		{Dup, 0},
+		{Jnz, 2},
+		{Drop, 0},
+		{Halt, 0},
 	}}
 }
 

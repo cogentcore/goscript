@@ -10,7 +10,7 @@ func (fl flags) has(f int64) bool {
 
 func main() {
 	// Masks of int64 for counts of each kind, up to the sign bit and past it.
-	var counts = []uint32{0, 1, 31, 32, 53, 62, 63, 64, 65, 200}
+	counts := []uint32{0, 1, 31, 32, 53, 62, 63, 64, 65, 200}
 	for _, k := range counts {
 		var m int64 = 1 << k
 		println("int64", k, m)

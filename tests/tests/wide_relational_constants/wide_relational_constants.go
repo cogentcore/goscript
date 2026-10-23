@@ -1,7 +1,9 @@
 package main
 
-type Signed int64
-type Unsigned uint64
+type (
+	Signed   int64
+	Unsigned uint64
+)
 
 func main() {
 	var s Signed = -9007199254740993

@@ -53,11 +53,11 @@ func main() {
 	var plainPlain IntWaiter = &intBox{}
 	var retypedPlainGeneric GenericWaiter[int] = plainPlain
 	println("retyped-plain-generic", retypedPlainGeneric.Wait(ctx, 12), retypedPlainGeneric.Count(ctx, 1, 2, 3, 4, 5, 6, 7))
-	var methodValue = retypedPlainGeneric.Wait
+	methodValue := retypedPlainGeneric.Wait
 	println("method-value", methodValue(ctx, 14))
-	var methodExpression = GenericWaiter[int].Wait
+	methodExpression := GenericWaiter[int].Wait
 	println("method-expression", methodExpression(retypedPlainGeneric, ctx, 15))
-	var samePointer = &intBox{}
+	samePointer := &intBox{}
 	var samePointerA IntWaiter = samePointer
 	var samePointerB IntWaiter = samePointer
 	var differentPointer IntWaiter = &intBox{}

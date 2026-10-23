@@ -113,7 +113,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("method-value", (__goscriptAwait = methodValue!(ctx, 14), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	let methodExpression: ((_p0: GenericWaiter | null, ctx: context.Context | null, old: number) => number | globalThis.Promise<number>) | null = $.functionValue(async (_p0: GenericWaiter | null, ctx: context.Context | null, old: number): globalThis.Promise<number> => await $.callInterfaceMethod(_p0, "Wait", __goscriptStatic0(), ctx, old), ({ kind: $.TypeKind.Function, params: ["main.GenericWaiter", "context.Context", /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))
 	await $.println("method-expression", (__goscriptAwait = methodExpression!(retypedPlainGeneric, ctx, 15), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
-	let samePointer: intBox | $.VarRef<intBox> | null = new intBox()
+	let samePointer = new intBox()
 	let samePointerA: IntWaiter | null = $.interfaceValue<IntWaiter | null>(samePointer, "*main.intBox", /* @__PURE__ */ $.pointerType("main.intBox"))
 	let samePointerB: IntWaiter | null = $.interfaceValue<IntWaiter | null>(samePointer, "*main.intBox", /* @__PURE__ */ $.pointerType("main.intBox"))
 	let differentPointer: IntWaiter | null = $.interfaceValue<IntWaiter | null>(new intBox(), "*main.intBox", /* @__PURE__ */ $.pointerType("main.intBox"))

@@ -6,8 +6,10 @@ type Getter interface{ Get() int }
 
 func (t *T) Get() int { return t.N }
 
-var registry []Getter
-var ptrs []*T
+var (
+	registry []Getter
+	ptrs     []*T
+)
 
 // Register records t, as a widget registers itself with its scene: t points
 // to the struct it was called on, also when that is a field.

@@ -7,10 +7,12 @@ type T struct{ A int }
 
 // Line is a named slice type, Ints and Bytes named slices of basic types,
 // and M a named map type, whose nil values fmt prints as empty ones.
-type Line []T
-type Ints []int
-type Bytes []byte
-type M map[string]int
+type (
+	Line  []T
+	Ints  []int
+	Bytes []byte
+	M     map[string]int
+)
 
 func main() {
 	var l Line

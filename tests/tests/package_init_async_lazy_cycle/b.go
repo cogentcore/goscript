@@ -2,8 +2,10 @@ package main
 
 import "sync"
 
-var lock sync.Mutex
-var first = makeFirst()
+var (
+	lock  sync.Mutex
+	first = makeFirst()
+)
 
 func makeFirst() holder {
 	lock.Lock()

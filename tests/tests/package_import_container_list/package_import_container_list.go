@@ -46,5 +46,4 @@ func main() {
 	fmt.Println("pool", pooled.Value)
 	pool.Put(pooled)
 	fmt.Println("pool-reused", pushPooled(pool, "reused").Value)
-
 }
