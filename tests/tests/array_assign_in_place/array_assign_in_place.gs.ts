@@ -177,7 +177,7 @@ export async function main(): globalThis.Promise<void> {
 	captured = $.assignFieldValue(captured, $.arrayValue([27, 28]), __goscriptStatic5())
 	await $.println("captured:", read())
 	let elems = $.arrayValue(globalThis.Array.from({ length: 2 }, () => new T(true)), /* @__PURE__ */ $.arrayType("main.T", 2))
-	$.callPointerMethod($.indexRef(elems, 1), "keep")
+	T.prototype.keep.call($.indexRef(elems, 1))
 	elems = $.assignFieldValue(elems, pair(29, 30), __goscriptStatic0())
 	elems[0].v = 31
 	await $.println("kept receiver:", $.pointerValue<T>(kept).v, elems[0].v)
