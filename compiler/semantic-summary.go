@@ -70,6 +70,9 @@ type bodySummary struct {
 	suspendingValueShapes []string
 	// mutexEscapes holds the mutexes the package lets escape the analysis.
 	mutexEscapes []string
+	// deadCode holds the references of the package's functions and variable
+	// initializers when the build eliminates dead code.
+	deadCode []summaryDeadCode
 }
 
 // summaryFunction holds the facts of one node: a declared function (kind
@@ -496,6 +499,10 @@ func summarizeBody(shard *SemanticModel, semPkg *semanticPackage, objects *summa
 	if !ok {
 		return nil, false
 	}
+	summary.deadCode, ok = summarizeDeadCode(k, semPkg.deadCode)
+	if !ok {
+		return nil, false
+	}
 	return summary, true
 }
 
@@ -910,6 +917,9 @@ func (a *bodyApplier) apply(shard *SemanticModel, semPkg *semanticPackage) bool 
 		}
 		semPkg.recordMutexEscape(mutex, mutex.Pos())
 	}
+	if !a.applyDeadCode(semPkg) {
+		return false
+	}
 	return a.applyValues(semPkg)
 }
 
@@ -1181,6 +1191,11 @@ const (
 	summaryRecordMutexEscape  = "mutex-escape"
 	summaryRecordChangedVar   = "changed-var"
 	summaryRecordEffectFree   = "effect-free"
+	summaryRecordReach        = "reach"
+	summaryRecordReachFunc    = "reach-func"
+	summaryRecordReachMember  = "reach-member"
+	summaryRecordReachName    = "reach-name"
+	summaryRecordReachType    = "reach-type"
 )
 
 // encode returns the summary's lines, or false when a field holds a tab or a
@@ -1275,6 +1290,21 @@ func (s *bodySummary) encode() ([]byte, bool) {
 		}
 		for _, shape := range call.shapes {
 			line(summaryRecordAsyncShape, shape)
+		}
+	}
+	for _, refs := range s.deadCode {
+		line(summaryRecordReach, refs.fn, strconv.FormatBool(refs.reflect))
+		for _, key := range refs.funcs {
+			line(summaryRecordReachFunc, key)
+		}
+		for _, member := range refs.members {
+			line(summaryRecordReachMember, member.named, member.name)
+		}
+		for _, name := range refs.names {
+			line(summaryRecordReachName, name)
+		}
+		for _, key := range refs.types {
+			line(summaryRecordReachType, key)
 		}
 	}
 	return []byte(b.String()), ok
@@ -1424,6 +1454,11 @@ func decodeBodySummary(data []byte) (*bodySummary, bool) {
 				call.deps = append(call.deps, v)
 			} else {
 				call.shapes = append(call.shapes, v)
+			}
+		case summaryRecordReach, summaryRecordReachFunc, summaryRecordReachMember,
+			summaryRecordReachName, summaryRecordReachType:
+			if !s.decodeDeadCode(fields) {
+				return nil, false
 			}
 		default:
 			return nil, false

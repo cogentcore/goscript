@@ -179,6 +179,7 @@ func (o *LoweringOwner) lowerPackage(
 		outputNames[sourcePath] = binding.outputName
 	}
 	methodIndex := buildPackageMethodIndex(semPkg)
+	liveQueries := newLiveQueries(model, semPkg)
 	diagnostics := slices.Clone(bindingDiagnostics)
 	for idx, file := range semPkg.source.Syntax {
 		sourcePath := sourceFilePath(semPkg, idx, file)
@@ -203,6 +204,7 @@ func (o *LoweringOwner) lowerPackage(
 				lazyPackageVars:           semPkg.lazyVars,
 				asyncLazy:                 asyncLazy,
 				runtimeMethodSets:         runtimeMethodSets,
+				liveQueries:               liveQueries,
 				protobufTypeScriptAdapter: protobufAdapter,
 				trimTypeInfo:              options.TrimTypeInfo,
 				displayRoot:               options.DisplayRoot,
@@ -226,6 +228,7 @@ func (o *LoweringOwner) lowerPackage(
 			lazyPackageVars:   semPkg.lazyVars,
 			asyncLazy:         asyncLazy,
 			runtimeMethodSets: runtimeMethodSets,
+			liveQueries:       liveQueries,
 			trimTypeInfo:      options.TrimTypeInfo,
 			displayRoot:       options.DisplayRoot,
 			externalEmbeds:    options.ExternalEmbeds,
@@ -242,6 +245,7 @@ func (o *LoweringOwner) lowerPackage(
 	})
 	importMainFileSideEffects(loweredPkg)
 	lowerPackageInit(semPkg, loweredPkg)
+	loweredPkg.liveness = liveQueries.entries()
 	return loweredPkg, diagnostics
 }
 
@@ -490,6 +494,7 @@ type lowerFileRequest struct {
 	lazyPackageVars           map[types.Object]bool
 	asyncLazy                 *asyncLazyState
 	runtimeMethodSets         *runtimeMethodSetCache
+	liveQueries               *liveQueries
 	protobufTypeScriptAdapter bool
 	trimTypeInfo              bool
 	displayRoot               string
@@ -663,6 +668,7 @@ func (o *LoweringOwner) lowerFile(req lowerFileRequest) (*loweredFile, []Diagnos
 		externalEmbeds:    req.externalEmbeds,
 		embedAssets:       loweredFile.assets,
 		model:             model,
+		liveQueries:       req.liveQueries,
 		semPkg:            semPkg,
 		file:              file,
 		tokenFile:         semPkg.source.Fset.File(file.Pos()),
@@ -1812,9 +1818,12 @@ type lowerFileContext struct {
 	tokenFile *token.File
 	// externalEmbeds selects the embedded files that are written as separate
 	// files, which are recorded in embedAssets (see [loweredFile.assets]).
-	externalEmbeds  *ExternalEmbedPolicy
-	embedAssets     map[string][]byte
-	model           *SemanticModel
+	externalEmbeds *ExternalEmbedPolicy
+	embedAssets    map[string][]byte
+	model          *SemanticModel
+	// liveQueries records the reachability answers the package's lowering
+	// reads.
+	liveQueries     *liveQueries
 	semPkg          *semanticPackage
 	file            *ast.File
 	importAliases   map[string]string
@@ -2040,7 +2049,7 @@ func (o *LoweringOwner) lowerDecl(ctx lowerFileContext, decl ast.Decl) ([]lowere
 	case *ast.FuncDecl:
 		// Dead code elimination leaves out unreachable functions and the
 		// free functions of unreachable methods of named non-struct types.
-		if !ctx.model.funcDeclLive(ctx.semPkg, typed) {
+		if !ctx.liveQueries.funcDeclLive(ctx.model, ctx.semPkg, typed) {
 			return nil, nil
 		}
 		if typed.Recv != nil {
@@ -2635,10 +2644,11 @@ func (o *LoweringOwner) packageVarHasAsyncLazyInit(ctx lowerFileContext, obj typ
 
 	// Find the initializer among the package's var declarations.
 	initCtx := lowerFileContext{
-		model:     ctx.model,
-		semPkg:    semPkg,
-		asyncLazy: ctx.asyncLazy,
-		topLevel:  true,
+		model:       ctx.model,
+		liveQueries: ctx.liveQueries,
+		semPkg:      semPkg,
+		asyncLazy:   ctx.asyncLazy,
+		topLevel:    true,
 	}
 	for _, file := range semPkg.source.Syntax {
 		for _, decl := range file.Decls {
@@ -3999,7 +4009,7 @@ func (o *LoweringOwner) lowerStructType(ctx lowerFileContext, semType *semanticT
 func (o *LoweringOwner) deadMethodMetadata(ctx lowerFileContext, named *types.Named, decl *ast.FuncDecl) (loweredFunction, bool) {
 	// A reachable method or one without type information is lowered.
 	fnObj, _ := ctx.semPkg.source.TypesInfo.Defs[decl.Name].(*types.Func)
-	if fnObj == nil || ctx.model.methodLive(named, decl.Name.Name) {
+	if fnObj == nil || ctx.liveQueries.methodLive(ctx.model, named, decl.Name.Name) {
 		return loweredFunction{}, false
 	}
 
@@ -4222,7 +4232,7 @@ func (o *LoweringOwner) lowerEmbeddedMethodForwarders(
 		}
 
 		// An unreachable forwarder keeps only its runtime metadata.
-		if !ctx.model.methodLive(outer, method.Name()) {
+		if !ctx.liveQueries.methodLive(ctx.model, outer, method.Name()) {
 			lowered.metadataOnly = true
 			methods = append(methods, lowered)
 			explicitMethods[method.Name()] = true
@@ -19098,7 +19108,7 @@ func (o *LoweringOwner) genericMethodDescriptorsForType(
 			continue
 		}
 		// An unreachable method has no function or class method to call.
-		if !isInterfaceType(named) && !ctx.model.methodLive(named, method.Name()) {
+		if !isInterfaceType(named) && !ctx.liveQueries.methodLive(ctx.model, named, method.Name()) {
 			continue
 		}
 		// A promoted method is called through the embedding type's

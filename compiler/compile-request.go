@@ -87,12 +87,7 @@ func (o *CompileRequestOwner) NewRequest(conf Config, patterns []string) *Compil
 	if conf.SkipDependencies {
 		dependencyMode = DependencyModeRequested
 	}
-	// Dead code elimination depends on the whole program, which the cache
-	// of package artifacts does not key on, so it compiles without it.
 	cacheRoot := strings.TrimSpace(conf.CacheRoot)
-	if conf.EliminateDeadCode {
-		cacheRoot = ""
-	}
 	runtimeEmissionMode := RuntimeEmissionModeEmit
 	if conf.DisableEmitBuiltin {
 		runtimeEmissionMode = RuntimeEmissionModeReference

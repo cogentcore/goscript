@@ -118,6 +118,10 @@ type semanticPackage struct {
 	// functionDecls indexes exact function objects, including methods and init declarations.
 	// It is populated during declaration collection and immutable during lowering.
 	functionDecls map[*types.Func]*ast.FuncDecl
+	// deadCode holds what the package's functions and variable initializers
+	// reference, which dead code elimination follows. It is set only when the
+	// build eliminates dead code.
+	deadCode *packageDeadCodeRefs
 	// initOrder records package variables in declaration order.
 	initOrder []types.Object
 	// lazyVars holds the package variables initialized lazily through a

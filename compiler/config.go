@@ -39,7 +39,7 @@ type Config struct {
 	ReportAsync bool
 	// EliminateDeadCode leaves the functions and methods that a program
 	// build cannot reach out of the output (see semantic-dead-code.go). It
-	// applies only to builds of main packages, and disables the cache.
+	// applies only to builds of main packages.
 	EliminateDeadCode bool
 	// ExternalEmbeds are path.Match patterns of the base names of the files of
 	// embed.FS variables that are written as separate files beside the package

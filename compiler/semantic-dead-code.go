@@ -5,24 +5,30 @@ import (
 	"go/constant"
 	"go/token"
 	"go/types"
+	"maps"
 	"regexp"
+	"slices"
+	"strconv"
 	"strings"
+	"sync"
+
+	"golang.org/x/tools/go/packages"
 )
 
 // Dead code elimination.
 //
 // A program build can leave out the functions and methods that no execution
-// of the program can reach, as the Go linker does. The analysis walks the
-// bodies of the reachable functions from the roots: the main function, the
+// of the program can reach, as the Go linker does. The analysis follows what
+// the reachable functions reference from the roots: the main function, the
 // package initializers and the functions that hand-written TypeScript can
-// call. Calls and references of functions make them reachable directly. A
-// method is reachable when it is called or referenced through its type, or
-// when it can be called dynamically: its type is used by reachable code (so
-// that a value of it can exist) and a method of the same name is called
-// through an interface or a type parameter, named by an interface type that
-// reachable code uses (a type assertion can check for it), or named in the
-// TypeScript of an override package. When reachable code looks up methods
-// by reflection (reflect Value.Method, Value.MethodByName, Type.Method and
+// call. References of functions make them reachable directly. A method is
+// reachable when it is called or referenced through its type, or when it can
+// be called dynamically: its type is used by reachable code (so that a value
+// of it can exist) and a method of the same name is called through an
+// interface or a type parameter, named by an interface type that reachable
+// code uses (a type assertion can check for it), or named in the TypeScript
+// of an override package. When reachable code looks up methods by reflection
+// (reflect Value.Method, Value.MethodByName, Type.Method and
 // Type.MethodByName), every exported method of a used type is reachable,
 // which is the Go linker's rule for reflect method lookups.
 //
@@ -30,6 +36,13 @@ import (
 // needed, never fewer. Types are used when any reachable code mentions them,
 // with the types of their fields and elements, which also over-approximates
 // the types that values can have at run time.
+//
+// The semantic build records what each function references (see
+// deadCodeRefs) from its body, or takes it from the package's body summary
+// when the package was checked without bodies, so the analysis itself never
+// walks a body. A function-local type declares no methods, so its members are
+// promoted forwarders: they are always kept, and the references through them
+// name the package-level types they promote from.
 //
 // Lowering leaves out the unreachable functions and the bodies of the
 // unreachable methods, and keeps the method metadata of the types, so that
@@ -40,6 +53,11 @@ import (
 type liveCode struct {
 	funcs   map[*types.Func]bool
 	members map[liveMember]bool
+	// fset positions the object keys of keyed.
+	fset *token.FileSet
+	// keyed holds the liveQueries keys of funcs and members (see keys).
+	keysOnce sync.Once
+	keyed    map[string]bool
 }
 
 // liveMember is a method of the method set of a pointer to a named type:
@@ -60,12 +78,20 @@ func (m *SemanticModel) functionLive(fn *types.Func) bool {
 
 // methodLive reports whether the method called name of the method set of a
 // pointer to named is reachable, so that the type's method or forwarder for
-// it is emitted.
+// it is emitted. The members of a function-local type are always kept.
 func (m *SemanticModel) methodLive(named *types.Named, name string) bool {
-	if m == nil || m.liveCode == nil || named == nil {
+	if m == nil || m.liveCode == nil || named == nil || !packageLevelNamed(named) {
 		return true
 	}
 	return m.liveCode.members[liveMember{named: named.Origin(), name: name}]
+}
+
+// packageLevelNamed reports whether a named type is declared at package
+// level, so that an object key names it, rather than in the universe or a
+// function body.
+func packageLevelNamed(named *types.Named) bool {
+	obj := named.Obj()
+	return obj.Pkg() != nil && obj.Parent() == obj.Pkg().Scope()
 }
 
 // deadCodeRoots are the inputs of the analysis beyond the compiled Go code.
@@ -80,50 +106,340 @@ type deadCodeRoots struct {
 	functions []string
 }
 
-// deadCodeDecl is a function declaration with the type information of its
-// package.
-type deadCodeDecl struct {
-	decl *ast.FuncDecl
-	info *types.Info
+// deadCodeRefs is what one function, or the variable initializers of a
+// package, references. Every named type in it is declared at package level:
+// recording flattens composite, universe and function-local types into the
+// package-level types and method names they are made of, so a body summary
+// can name each reference by object key.
+type deadCodeRefs struct {
+	// funcs are the functions called or referenced, and the methods
+	// selected through an unnamed type that embeds them.
+	funcs []*types.Func
+	// members are the methods selected through a package-level named type.
+	members []liveMember
+	// names are the method names that can be called dynamically.
+	names []string
+	// types are the package-level named types used.
+	types []*types.Named
+	// reflect is set when the code looks up methods by reflection with a
+	// name known only at run time.
+	reflect bool
+}
+
+// packageDeadCodeRefs holds the references of one package's functions and of
+// its variable initializers, which run when the program starts.
+type packageDeadCodeRefs struct {
+	funcs map[*types.Func]*deadCodeRefs
+	vars  *deadCodeRefs
+}
+
+// collectPackageDeadCodeRefs records the references of a package checked
+// with bodies.
+func collectPackageDeadCodeRefs(pkg *packages.Package) *packageDeadCodeRefs {
+	// Variable initializers share one record; each function has its own.
+	refs := &packageDeadCodeRefs{funcs: make(map[*types.Func]*deadCodeRefs)}
+	vars, fns := newDeadCodeRecorder(pkg.TypesInfo), newDeadCodeRecorder(pkg.TypesInfo)
+	for _, file := range pkg.Syntax {
+		for _, decl := range file.Decls {
+			switch typed := decl.(type) {
+			case *ast.GenDecl:
+				if typed.Tok == token.VAR {
+					vars.walk(typed)
+				}
+			case *ast.FuncDecl:
+				if fn, _ := pkg.TypesInfo.Defs[typed.Name].(*types.Func); fn != nil {
+					fns.walk(typed)
+					refs.funcs[fn] = fns.take()
+				}
+			}
+		}
+	}
+	refs.vars = vars.take()
+	return refs
+}
+
+// deadCodeRecorder collects the references of the code it walks until take.
+type deadCodeRecorder struct {
+	info    *types.Info
+	funcs   map[*types.Func]bool
+	members map[liveMember]bool
+	names   map[string]bool
+	types   map[*types.Named]bool
+	reflect bool
+	// seen holds the types already recorded.
+	seen map[types.Type]bool
+	// lookups holds the selectors of MethodByName calls with a constant
+	// name.
+	lookups map[*ast.SelectorExpr]bool
+}
+
+func newDeadCodeRecorder(info *types.Info) *deadCodeRecorder {
+	return &deadCodeRecorder{
+		info:    info,
+		funcs:   make(map[*types.Func]bool),
+		members: make(map[liveMember]bool),
+		names:   make(map[string]bool),
+		types:   make(map[*types.Named]bool),
+		seen:    make(map[types.Type]bool),
+		lookups: make(map[*ast.SelectorExpr]bool),
+	}
+}
+
+// take returns the references recorded since the last take.
+func (r *deadCodeRecorder) take() *deadCodeRefs {
+	// Copy out the references.
+	refs := &deadCodeRefs{
+		funcs:   slices.Collect(maps.Keys(r.funcs)),
+		members: slices.Collect(maps.Keys(r.members)),
+		names:   slices.Collect(maps.Keys(r.names)),
+		types:   slices.Collect(maps.Keys(r.types)),
+		reflect: r.reflect,
+	}
+
+	// Reset the recorder for the next function.
+	clear(r.funcs)
+	clear(r.members)
+	clear(r.names)
+	clear(r.types)
+	clear(r.seen)
+	clear(r.lookups)
+	r.reflect = false
+	return refs
+}
+
+// walk records what the code of a node references: functions, methods, used
+// types and dynamically called method names.
+func (r *deadCodeRecorder) walk(node ast.Node) {
+	ast.Inspect(node, func(n ast.Node) bool {
+		// The type of every expression is used.
+		if expr, ok := n.(ast.Expr); ok {
+			if tv, ok := r.info.Types[expr]; ok {
+				r.recordType(tv.Type)
+			}
+		}
+		switch typed := n.(type) {
+		case *ast.Ident:
+			r.ident(typed)
+		case *ast.SelectorExpr:
+			r.selector(typed)
+		case *ast.CallExpr:
+			r.constantMethodLookup(typed)
+		}
+		return true
+	})
+}
+
+// constantMethodLookup handles a call of reflect MethodByName with a
+// constant name, which only reaches the methods of that name, as in the Go
+// linker. The walk of its selector then does not count as a lookup.
+func (r *deadCodeRecorder) constantMethodLookup(call *ast.CallExpr) {
+	// Only reflect MethodByName with a constant string argument qualifies.
+	fun, _ := ast.Unparen(call.Fun).(*ast.SelectorExpr)
+	if fun == nil || len(call.Args) != 1 || !isReflectMethodLookup(r.info, fun, "MethodByName") {
+		return
+	}
+	tv, ok := r.info.Types[call.Args[0]]
+	if !ok || tv.Value == nil || tv.Value.Kind() != constant.String {
+		return
+	}
+	r.names[constant.StringVal(tv.Value)] = true
+	r.lookups[fun] = true
+}
+
+// isReflectMethodLookup reports whether a selector selects the reflect
+// method called name of reflect.Value or reflect.Type.
+func isReflectMethodLookup(info *types.Info, expr *ast.SelectorExpr, name string) bool {
+	sel, ok := info.Selections[expr]
+	if !ok || sel.Kind() == types.FieldVal || sel.Obj().Name() != name {
+		return false
+	}
+	pkg := sel.Obj().Pkg()
+	return pkg != nil && pkg.Path() == "reflect"
+}
+
+// ident records the object an identifier defines or uses: a function is
+// referenced, a type or the type of a variable is used, and an instance of a
+// generic function uses its type arguments.
+func (r *deadCodeRecorder) ident(id *ast.Ident) {
+	// A generic instance uses its type arguments.
+	if inst, ok := r.info.Instances[id]; ok {
+		for arg := range inst.TypeArgs.Types() {
+			r.recordType(arg)
+		}
+	}
+	obj := r.info.Uses[id]
+	if obj == nil {
+		obj = r.info.Defs[id]
+	}
+	if obj == nil {
+		return
+	}
+
+	// A method is reached through its selector.
+	r.recordType(obj.Type())
+	if fn, _ := obj.(*types.Func); fn != nil && fn.Signature().Recv() == nil {
+		r.funcs[fn.Origin()] = true
+	}
+}
+
+// selector records the method that a method value, method expression or
+// method call selects: through an interface or a type parameter, every
+// method of that name can run; otherwise the member of the receiver type.
+func (r *deadCodeRecorder) selector(expr *ast.SelectorExpr) {
+	// Only method selections select methods.
+	sel, ok := r.info.Selections[expr]
+	if !ok || sel.Kind() == types.FieldVal {
+		return
+	}
+	name := sel.Obj().Name()
+	if !r.lookups[expr] && (isReflectMethodLookup(r.info, expr, "Method") || isReflectMethodLookup(r.info, expr, "MethodByName")) {
+		r.reflect = true
+	}
+
+	// A selection through an interface, a type parameter or an unnamed type
+	// is dynamic. A concrete method selected through an unnamed type that
+	// embeds it runs too.
+	recv := sel.Recv()
+	named := receiverNamedType(recv)
+	if named == nil || isInterfaceType(named) || isInterfaceType(derefPointerType(recv)) {
+		r.names[name] = true
+		if fn, _ := sel.Obj().(*types.Func); fn != nil && !isInterfaceType(fn.Signature().Recv().Type()) {
+			r.funcs[fn.Origin()] = true
+		}
+		return
+	}
+	r.recordType(recv)
+	r.member(named, sel.Index(), name)
+}
+
+// member records the member called name of the method set of a pointer to
+// named, selected through the path of embedded fields index. A member of a
+// function-local type is promoted, so the member it forwards to is recorded.
+func (r *deadCodeRecorder) member(named *types.Named, index []int, name string) {
+	// An object key names a member of a package-level type.
+	origin := named.Origin()
+	if packageLevelNamed(origin) {
+		r.members[liveMember{named: origin, name: name}] = true
+		return
+	}
+
+	// Follow the embedded field to the type that the member promotes from.
+	st, _ := origin.Underlying().(*types.Struct)
+	if st == nil || len(index) < 2 || index[0] >= st.NumFields() {
+		r.names[name] = true
+		return
+	}
+	fieldType := st.Field(index[0]).Type()
+	embedded := receiverNamedType(fieldType)
+	if embedded == nil || isInterfaceType(embedded) {
+		r.names[name] = true
+		return
+	}
+	r.recordType(fieldType)
+	r.member(embedded, index[1:], name)
+}
+
+// recordType records the package-level named types and the interface method
+// names that a used type is made of.
+func (r *deadCodeRecorder) recordType(typ types.Type) {
+	if typ == nil || r.seen[typ] {
+		return
+	}
+	r.seen[typ] = true
+
+	// Composite, universe and function-local types record their parts.
+	switch typed := typ.(type) {
+	case *types.Alias:
+		r.recordType(types.Unalias(typed))
+	case *types.Named:
+		for arg := range typed.TypeArgs().Types() {
+			r.recordType(arg)
+		}
+		origin := typed.Origin()
+		if packageLevelNamed(origin) {
+			r.types[origin] = true
+			return
+		}
+		r.recordType(origin.Underlying())
+	case *types.Pointer:
+		r.recordType(typed.Elem())
+	case *types.Slice:
+		r.recordType(typed.Elem())
+	case *types.Array:
+		r.recordType(typed.Elem())
+	case *types.Chan:
+		r.recordType(typed.Elem())
+	case *types.Map:
+		r.recordType(typed.Key())
+		r.recordType(typed.Elem())
+	default:
+		r.recordOtherType(typ)
+	}
+}
+
+// recordOtherType handles the types that recordType does not: structs,
+// signatures, tuples, interfaces and type parameters.
+func (r *deadCodeRecorder) recordOtherType(typ types.Type) {
+	switch typed := typ.(type) {
+	case *types.Struct:
+		for field := range typed.Fields() {
+			r.recordType(field.Type())
+		}
+	case *types.Signature:
+		r.recordType(typed.Params())
+		r.recordType(typed.Results())
+	case *types.Tuple:
+		for v := range typed.Variables() {
+			r.recordType(v.Type())
+		}
+	case *types.Interface:
+		for fn := range typed.Methods() {
+			r.names[fn.Name()] = true
+			r.recordType(fn.Type())
+		}
+		for embedded := range typed.EmbeddedTypes() {
+			r.recordType(embedded)
+		}
+	case *types.TypeParam:
+		r.recordType(typed.Constraint())
+	}
 }
 
 // deadCodeAnalysis is the state of one dead code elimination.
 type deadCodeAnalysis struct {
 	live       *liveCode
-	decls      map[*types.Func]deadCodeDecl
-	work       []deadCodeDecl
+	refs       map[*types.Func]*deadCodeRefs
+	work       []*deadCodeRefs
 	seenTypes  map[types.Type]bool
 	usedNamed  map[*types.Named]bool
 	names      map[string]bool
 	byName     map[string][]*types.Named
 	methodSets map[*types.Named]*types.MethodSet
 	reflect    bool
-	// lookups holds the selectors of MethodByName calls with a constant
-	// name.
-	lookups map[*ast.SelectorExpr]bool
 }
 
 // collectLiveCode computes the reachable functions and methods of a whole
-// program from its compiled packages and the override roots.
+// program from the references of its compiled packages and the override
+// roots.
 func collectLiveCode(model *SemanticModel, roots deadCodeRoots) *liveCode {
-	// Index the declarations of every compiled function and method.
+	// Index the references of every compiled function and method.
 	a := &deadCodeAnalysis{
 		live:       &liveCode{funcs: make(map[*types.Func]bool), members: make(map[liveMember]bool)},
-		decls:      make(map[*types.Func]deadCodeDecl),
+		refs:       make(map[*types.Func]*deadCodeRefs),
 		seenTypes:  make(map[types.Type]bool),
 		usedNamed:  make(map[*types.Named]bool),
 		names:      make(map[string]bool),
 		byName:     make(map[string][]*types.Named),
 		methodSets: make(map[*types.Named]*types.MethodSet),
-		lookups:    make(map[*ast.SelectorExpr]bool),
 	}
 	for _, semPkg := range model.packages {
-		for fn, decl := range semPkg.functionDecls {
-			a.decls[fn.Origin()] = deadCodeDecl{decl: decl, info: semPkg.source.TypesInfo}
+		a.live.fset = semPkg.source.Fset
+		if semPkg.deadCode != nil {
+			maps.Copy(a.refs, semPkg.deadCode.funcs)
 		}
 	}
 
-	// Mark the roots, then walk the reachable bodies until nothing changes.
+	// Mark the roots, then follow the references until nothing changes.
 	for name := range roots.names {
 		a.addName(name)
 	}
@@ -131,53 +447,55 @@ func collectLiveCode(model *SemanticModel, roots deadCodeRoots) *liveCode {
 		a.markPackageRoots(semPkg, roots)
 	}
 	a.markFunctionRoots(model, roots.functions)
-	a.drain()
+	for len(a.work) != 0 {
+		next := a.work[len(a.work)-1]
+		a.work = a.work[:len(a.work)-1]
+		a.apply(next)
+	}
 	return a.live
 }
 
-// markPackageRoots marks the roots of one compiled package: its init
-// functions, package variable initializers, main function and linknamed
-// functions, or every function and method of a package that override
-// TypeScript imports.
+// markPackageRoots marks the roots of one compiled package: its variable
+// initializers, init functions, main function and linknamed functions, or
+// every function and method of a package that override TypeScript imports.
 func (a *deadCodeAnalysis) markPackageRoots(semPkg *semanticPackage, roots deadCodeRoots) {
+	// Package variables initialize when the program starts.
+	if semPkg.deadCode != nil {
+		a.work = append(a.work, semPkg.deadCode.vars)
+	}
+
 	// A package that TypeScript uses keeps all of its code.
 	info := semPkg.source.TypesInfo
 	keepAll := roots.packages[semPkg.pkgPath]
 	for _, file := range semPkg.source.Syntax {
 		linknamed := linknamedFunctions(file)
 		for _, decl := range file.Decls {
-			a.markDeclRoot(semPkg, info, decl, keepAll || linknamed[declFuncName(decl)])
+			if fnDecl, ok := decl.(*ast.FuncDecl); ok {
+				a.markFuncDeclRoot(semPkg, info, fnDecl, keepAll || linknamed[declFuncName(decl)])
+			}
 		}
 	}
 }
 
-// markDeclRoot marks one top-level declaration if it is a root: package
-// variable initializers run at init, as do init functions, and main runs
-// the program. keep marks any function or method.
-func (a *deadCodeAnalysis) markDeclRoot(semPkg *semanticPackage, info *types.Info, decl ast.Decl, keep bool) {
-	// Package variables initialize when the program starts.
-	switch typed := decl.(type) {
-	case *ast.GenDecl:
-		if typed.Tok == token.VAR {
-			a.walk(info, typed)
-		}
+// markFuncDeclRoot marks a function declaration if it is a root: init
+// functions run at init and main runs the program. keep marks any function
+// or method.
+func (a *deadCodeAnalysis) markFuncDeclRoot(semPkg *semanticPackage, info *types.Info, decl *ast.FuncDecl, keep bool) {
+	// Only a declaration with type information and a root role counts.
+	fn, _ := info.Defs[decl.Name].(*types.Func)
+	if fn == nil {
 		return
-	case *ast.FuncDecl:
-		fn, _ := info.Defs[typed.Name].(*types.Func)
-		if fn == nil {
-			return
-		}
-		root := keep || typed.Recv == nil && (typed.Name.Name == "init" || semPkg.name == "main" && typed.Name.Name == "main")
-		if !root {
-			return
-		}
-		a.markFunc(fn)
+	}
+	root := keep || decl.Recv == nil && (decl.Name.Name == "init" || semPkg.name == "main" && decl.Name.Name == "main")
+	if !root {
+		return
+	}
+	a.markFunc(fn)
 
-		// A kept method keeps its member of the receiver's method set.
-		if named := methodReceiverNamedType(fn); named != nil {
-			a.markTypeUsed(named)
-			a.markMember(named.Origin(), fn.Name())
-		}
+	// A kept method keeps its member of the receiver's method set.
+	if named := methodReceiverNamedType(fn); named != nil {
+		a.markTypeUsed(named)
+		a.markMember(named.Origin(), fn.Name())
 	}
 }
 
@@ -222,20 +540,31 @@ func linknamedFunctions(file *ast.File) map[string]bool {
 	return names
 }
 
-// drain walks the bodies of the reachable functions until no more become
-// reachable.
-func (a *deadCodeAnalysis) drain() {
-	for len(a.work) != 0 {
-		next := a.work[len(a.work)-1]
-		a.work = a.work[:len(a.work)-1]
-		a.walk(next.info, next.decl)
+// apply marks what reachable code references.
+func (a *deadCodeAnalysis) apply(refs *deadCodeRefs) {
+	// Each kind of reference marks through its own primitive.
+	for _, fn := range refs.funcs {
+		a.markFunc(fn)
+	}
+	for _, name := range refs.names {
+		a.addName(name)
+	}
+	for _, named := range refs.types {
+		a.markTypeUsed(named)
+	}
+	for _, member := range refs.members {
+		a.markMember(member.named, member.name)
+	}
+	if refs.reflect {
+		a.markReflect()
 	}
 }
 
 // markFunc makes a function or method declaration reachable and queues its
-// body. An interface method has no body; calling it calls the methods of the
-// same name.
+// references. An interface method has no body; calling it calls the methods
+// of the same name.
 func (a *deadCodeAnalysis) markFunc(fn *types.Func) {
+	// Mark the generic origin once.
 	fn = fn.Origin()
 	if a.live.funcs[fn] {
 		return
@@ -244,8 +573,8 @@ func (a *deadCodeAnalysis) markFunc(fn *types.Func) {
 	if sig, _ := fn.Type().(*types.Signature); sig != nil && sig.Recv() != nil && isInterfaceType(sig.Recv().Type()) {
 		a.addName(fn.Name())
 	}
-	if decl, ok := a.decls[fn]; ok {
-		a.work = append(a.work, decl)
+	if refs, ok := a.refs[fn]; ok {
+		a.work = append(a.work, refs)
 	}
 }
 
@@ -427,113 +756,6 @@ func (a *deadCodeAnalysis) markNamedUsed(named *types.Named) {
 	}
 }
 
-// walk marks what the code of a node references: functions, methods, used
-// types and dynamically called method names.
-func (a *deadCodeAnalysis) walk(info *types.Info, node ast.Node) {
-	ast.Inspect(node, func(n ast.Node) bool {
-		// The type of every expression is used.
-		if expr, ok := n.(ast.Expr); ok {
-			if tv, ok := info.Types[expr]; ok {
-				a.markTypeUsed(tv.Type)
-			}
-		}
-		switch typed := n.(type) {
-		case *ast.Ident:
-			a.walkIdent(info, typed)
-		case *ast.SelectorExpr:
-			a.walkSelector(info, typed)
-		case *ast.CallExpr:
-			a.walkConstantMethodLookup(info, typed)
-		}
-		return true
-	})
-}
-
-// walkConstantMethodLookup handles a call of reflect MethodByName with a
-// constant name, which only reaches the methods of that name, as in the Go
-// linker. The walk of its selector then does not count as a lookup.
-func (a *deadCodeAnalysis) walkConstantMethodLookup(info *types.Info, call *ast.CallExpr) {
-	// Only reflect MethodByName with a constant string argument qualifies.
-	fun, _ := ast.Unparen(call.Fun).(*ast.SelectorExpr)
-	if fun == nil || len(call.Args) != 1 || !isReflectMethodLookup(info, fun, "MethodByName") {
-		return
-	}
-	tv, ok := info.Types[call.Args[0]]
-	if !ok || tv.Value == nil || tv.Value.Kind() != constant.String {
-		return
-	}
-	a.addName(constant.StringVal(tv.Value))
-	a.lookups[fun] = true
-}
-
-// isReflectMethodLookup reports whether a selector selects the reflect
-// method called name of reflect.Value or reflect.Type.
-func isReflectMethodLookup(info *types.Info, expr *ast.SelectorExpr, name string) bool {
-	sel, ok := info.Selections[expr]
-	if !ok || sel.Kind() == types.FieldVal || sel.Obj().Name() != name {
-		return false
-	}
-	pkg := sel.Obj().Pkg()
-	return pkg != nil && pkg.Path() == "reflect"
-}
-
-// walkIdent marks the object an identifier defines or uses: a function is
-// reachable, a type or the type of a variable is used, and an instance of a
-// generic function uses its type arguments.
-func (a *deadCodeAnalysis) walkIdent(info *types.Info, id *ast.Ident) {
-	// A generic instance uses its type arguments.
-	if inst, ok := info.Instances[id]; ok {
-		for arg := range inst.TypeArgs.Types() {
-			a.markTypeUsed(arg)
-		}
-	}
-	obj := info.Uses[id]
-	if obj == nil {
-		obj = info.Defs[id]
-	}
-	if obj == nil {
-		return
-	}
-
-	// A method is reached through its selector.
-	a.markTypeUsed(obj.Type())
-	fn, _ := obj.(*types.Func)
-	if fn == nil {
-		return
-	}
-	if sig, _ := fn.Type().(*types.Signature); sig != nil && sig.Recv() == nil {
-		a.markFunc(fn)
-	}
-}
-
-// walkSelector marks the method that a method value, method expression or
-// method call selects: through an interface or a type parameter, every
-// method of that name can run; otherwise the member of the receiver type.
-func (a *deadCodeAnalysis) walkSelector(info *types.Info, expr *ast.SelectorExpr) {
-	// Only method selections select methods.
-	sel, ok := info.Selections[expr]
-	if !ok || sel.Kind() == types.FieldVal {
-		return
-	}
-	name := sel.Obj().Name()
-	if !a.lookups[expr] && (isReflectMethodLookup(info, expr, "Method") || isReflectMethodLookup(info, expr, "MethodByName")) {
-		a.markReflect()
-	}
-
-	// A selection through an interface or type parameter is dynamic.
-	recv := sel.Recv()
-	named := receiverNamedType(recv)
-	if named == nil || isInterfaceType(named) || isInterfaceType(derefPointerType(recv)) {
-		a.addName(name)
-		if fn, _ := sel.Obj().(*types.Func); fn != nil {
-			a.markFunc(fn)
-		}
-		return
-	}
-	a.markTypeUsed(recv)
-	a.markMember(named.Origin(), name)
-}
-
 // overrideMemberNamePattern matches the identifiers that TypeScript can call
 // as methods: property accesses and quoted names.
 var overrideMemberNamePattern = regexp.MustCompile(`\.\s*([A-Za-z_$][\w$]*)|["'\x60]([A-Za-z_$][\w$]*)["'\x60]`)
@@ -587,22 +809,6 @@ func (r *deadCodeRoots) addOverridePackage(facts *OverrideFacts, pkgPath string)
 	return dependencies
 }
 
-// funcDeclLive reports whether a function or method declaration of a
-// package is reachable. A declaration without type information is kept.
-func (m *SemanticModel) funcDeclLive(semPkg *semanticPackage, decl *ast.FuncDecl) bool {
-	if m == nil || m.liveCode == nil || semPkg == nil || decl == nil {
-		return true
-	}
-	fn, _ := semPkg.source.TypesInfo.Defs[decl.Name].(*types.Func)
-	if fn == nil {
-		return true
-	}
-	if named := methodReceiverNamedType(fn); named != nil {
-		return m.methodLive(named, fn.Name())
-	}
-	return m.functionLive(fn)
-}
-
 // addTestPackages keeps all of the code of the packages under test of a test
 // binary, whose tests, benchmarks, examples and fuzz targets the test runner
 // calls by name.
@@ -615,4 +821,316 @@ func (r *deadCodeRoots) addTestPackages(req *CompileRequest, graph *PackageGraph
 			r.packages[node.PkgPath] = true
 		}
 	}
+}
+
+// summaryDeadCodeVars keys the references of the variable initializers in a
+// body summary.
+const summaryDeadCodeVars = "@vars"
+
+// summaryDeadCode holds the references of one function, keyed by its object
+// key, or of the package's variable initializers, keyed summaryDeadCodeVars.
+type summaryDeadCode struct {
+	fn      string
+	funcs   []string
+	members []summaryMember
+	names   []string
+	types   []string
+	reflect bool
+}
+
+// summaryMember is a liveMember with its named type keyed.
+type summaryMember struct {
+	named string
+	name  string
+}
+
+// summarizeDeadCode keys the references of a package. It reports false when
+// an object has no key.
+func summarizeDeadCode(k *summaryKeys, refs *packageDeadCodeRefs) ([]summaryDeadCode, bool) {
+	// A build without dead code elimination records no references.
+	if refs == nil {
+		return nil, true
+	}
+
+	// Key the variable initializers, then each function, in key order.
+	out := make([]summaryDeadCode, 0, len(refs.funcs)+1)
+	vars, ok := summarizeDeadCodeRefs(k, summaryDeadCodeVars, refs.vars)
+	if !ok {
+		return nil, false
+	}
+	out = append(out, vars)
+	for fn, fnRefs := range refs.funcs {
+		key, ok := k.key(fn)
+		if !ok {
+			return nil, false
+		}
+		summarized, ok := summarizeDeadCodeRefs(k, key, fnRefs)
+		if !ok {
+			return nil, false
+		}
+		out = append(out, summarized)
+	}
+	slices.SortFunc(out, func(a, b summaryDeadCode) int { return strings.Compare(a.fn, b.fn) })
+	return out, true
+}
+
+// summarizeDeadCodeRefs keys the references of one function.
+func summarizeDeadCodeRefs(k *summaryKeys, fn string, refs *deadCodeRefs) (summaryDeadCode, bool) {
+	// Key each referenced object; the encoding is sorted to be stable.
+	out := summaryDeadCode{fn: fn, names: slices.Sorted(slices.Values(refs.names)), reflect: refs.reflect}
+	for _, ref := range refs.funcs {
+		key, ok := k.key(ref)
+		if !ok {
+			return summaryDeadCode{}, false
+		}
+		out.funcs = append(out.funcs, key)
+	}
+	for _, named := range refs.types {
+		key, ok := k.key(named.Obj())
+		if !ok {
+			return summaryDeadCode{}, false
+		}
+		out.types = append(out.types, key)
+	}
+	for _, member := range refs.members {
+		key, ok := k.key(member.named.Obj())
+		if !ok {
+			return summaryDeadCode{}, false
+		}
+		out.members = append(out.members, summaryMember{named: key, name: member.name})
+	}
+	slices.Sort(out.funcs)
+	slices.Sort(out.types)
+	slices.SortFunc(out.members, func(a, b summaryMember) int {
+		if c := strings.Compare(a.named, b.named); c != 0 {
+			return c
+		}
+		return strings.Compare(a.name, b.name)
+	})
+	return out, true
+}
+
+// decodeDeadCode parses a reach record, or a reference record of the reach
+// record before it. It reports false on a malformed record.
+func (s *bodySummary) decodeDeadCode(fields []string) bool {
+	// A reach record starts the references of one function.
+	if fields[0] == summaryRecordReach {
+		if len(fields) != 3 {
+			return false
+		}
+		reflect, err := strconv.ParseBool(fields[2])
+		if err != nil {
+			return false
+		}
+		s.deadCode = append(s.deadCode, summaryDeadCode{fn: fields[1], reflect: reflect})
+		return true
+	}
+
+	// The other records add to the reach record before them.
+	if len(s.deadCode) == 0 {
+		return false
+	}
+	refs := &s.deadCode[len(s.deadCode)-1]
+	if fields[0] == summaryRecordReachMember {
+		if len(fields) != 3 {
+			return false
+		}
+		refs.members = append(refs.members, summaryMember{named: fields[1], name: fields[2]})
+		return true
+	}
+	if len(fields) != 2 {
+		return false
+	}
+	target := map[string]*[]string{
+		summaryRecordReachFunc: &refs.funcs,
+		summaryRecordReachName: &refs.names,
+		summaryRecordReachType: &refs.types,
+	}[fields[0]]
+	*target = append(*target, fields[1])
+	return true
+}
+
+// applyDeadCode resolves the summarized references of the package. It
+// reports false when a key does not resolve.
+func (a *bodyApplier) applyDeadCode(semPkg *semanticPackage) bool {
+	// A summary of a build without dead code elimination has no references.
+	if len(a.summary.deadCode) == 0 {
+		return true
+	}
+
+	// Resolve the references of each function and of the initializers.
+	refs := &packageDeadCodeRefs{funcs: make(map[*types.Func]*deadCodeRefs, len(a.summary.deadCode))}
+	for _, summarized := range a.summary.deadCode {
+		resolved, ok := a.resolveDeadCodeRefs(summarized)
+		if !ok {
+			return false
+		}
+		if summarized.fn == summaryDeadCodeVars {
+			refs.vars = resolved
+			continue
+		}
+		fn := a.resolveFunc(summarized.fn)
+		if fn == nil {
+			return false
+		}
+		refs.funcs[fn] = resolved
+	}
+	if refs.vars == nil {
+		return false
+	}
+	semPkg.deadCode = refs
+	return true
+}
+
+// resolveDeadCodeRefs resolves the references of one function.
+func (a *bodyApplier) resolveDeadCodeRefs(summarized summaryDeadCode) (*deadCodeRefs, bool) {
+	// Every key must resolve in the current check.
+	refs := &deadCodeRefs{names: summarized.names, reflect: summarized.reflect}
+	for _, key := range summarized.funcs {
+		fn := a.resolveFunc(key)
+		if fn == nil {
+			return nil, false
+		}
+		refs.funcs = append(refs.funcs, fn)
+	}
+	for _, key := range summarized.types {
+		named := a.resolveNamed(key)
+		if named == nil {
+			return nil, false
+		}
+		refs.types = append(refs.types, named)
+	}
+	for _, member := range summarized.members {
+		named := a.resolveNamed(member.named)
+		if named == nil {
+			return nil, false
+		}
+		refs.members = append(refs.members, liveMember{named: named, name: member.name})
+	}
+	return refs, true
+}
+
+// resolveNamed returns the named type whose type name key names, or nil.
+func (a *bodyApplier) resolveNamed(key string) *types.Named {
+	typeName, _ := a.keys.resolve(key).(*types.TypeName)
+	if typeName == nil {
+		return nil
+	}
+	named, _ := typeName.Type().(*types.Named)
+	return named
+}
+
+// liveQueries records the reachability answers that lowering one package
+// reads, so that the package's cached artifact replays only while each answer
+// still holds. Entries are "+key" for a reachable function or member and
+// "-key" for an unreachable one, keyed as liveKeys keys them. A nil
+// liveQueries answers without recording.
+type liveQueries struct {
+	fset    *token.FileSet
+	answers map[string]bool
+}
+
+// newLiveQueries returns the recorder of a package lowered by a build with
+// dead code elimination, or nil.
+func newLiveQueries(model *SemanticModel, semPkg *semanticPackage) *liveQueries {
+	if model == nil || model.liveCode == nil {
+		return nil
+	}
+	return &liveQueries{fset: semPkg.source.Fset, answers: make(map[string]bool)}
+}
+
+// methodLive answers SemanticModel.methodLive and records the answer.
+func (q *liveQueries) methodLive(model *SemanticModel, named *types.Named, name string) bool {
+	live := model.methodLive(named, name)
+	if q != nil && model.liveCode != nil && packageLevelNamed(named) {
+		q.answers[liveMemberKey(q.fset, named.Origin(), name)] = live
+	}
+	return live
+}
+
+// funcDeclLive reports whether a function or method declaration of a
+// package is reachable and records the answer. A declaration without type
+// information is kept.
+func (q *liveQueries) funcDeclLive(model *SemanticModel, semPkg *semanticPackage, decl *ast.FuncDecl) bool {
+	// A method is a member of its receiver's method set.
+	fn, _ := semPkg.source.TypesInfo.Defs[decl.Name].(*types.Func)
+	if fn == nil {
+		return true
+	}
+	if named := methodReceiverNamedType(fn); named != nil {
+		return q.methodLive(model, named, fn.Name())
+	}
+	live := model.functionLive(fn)
+	if q != nil && model.liveCode != nil {
+		q.answers[liveFuncKey(q.fset, fn.Origin())] = live
+	}
+	return live
+}
+
+// entries returns the recorded answers, sorted.
+func (q *liveQueries) entries() []string {
+	// Prefix each key with its answer.
+	if q == nil {
+		return nil
+	}
+	out := make([]string, 0, len(q.answers))
+	for key, live := range q.answers {
+		if live {
+			out = append(out, "+"+key)
+		} else {
+			out = append(out, "-"+key)
+		}
+	}
+	slices.Sort(out)
+	return out
+}
+
+// liveFuncKey keys a function for liveQueries.
+func liveFuncKey(fset *token.FileSet, fn *types.Func) string {
+	return "f " + objectKey(fset, fn)
+}
+
+// liveMemberKey keys a member of a package-level named type for
+// liveQueries.
+func liveMemberKey(fset *token.FileSet, named *types.Named, name string) string {
+	return "m " + objectKey(fset, named.Obj()) + " " + name
+}
+
+// liveAnswersHold reports whether every answer recorded by liveQueries
+// still holds for the model's reachable code.
+func (m *SemanticModel) liveAnswersHold(entries []string) bool {
+	// No answers always hold; answers need a build with reachable code.
+	if len(entries) == 0 {
+		return true
+	}
+	if m == nil || m.liveCode == nil {
+		return false
+	}
+	keys := m.liveCode.keys()
+	for _, entry := range entries {
+		live, key := entry[0] == '+', entry[1:]
+		if keys[key] != live {
+			return false
+		}
+	}
+	return true
+}
+
+// keys returns the liveQueries keys of the reachable functions and members,
+// computed on first use.
+func (l *liveCode) keys() map[string]bool {
+	l.keysOnce.Do(func() {
+		l.keyed = make(map[string]bool, len(l.funcs)+len(l.members))
+		for fn := range l.funcs {
+			if fn.Signature().Recv() == nil {
+				l.keyed[liveFuncKey(l.fset, fn)] = true
+			}
+		}
+		for member := range l.members {
+			if packageLevelNamed(member.named) {
+				l.keyed[liveMemberKey(l.fset, member.named, member.name)] = true
+			}
+		}
+	})
+	return l.keyed
 }

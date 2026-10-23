@@ -153,6 +153,17 @@ func (s *CompileService) Compile(ctx context.Context, req *CompileRequest) (*Com
 		}
 	}
 
+	// A program built with dead code elimination keeps only reachable code.
+	// The protobuf binding runtime is an override package, so the methods it
+	// calls on bound messages are among the override roots.
+	eliminateDeadCode := req.EliminateDeadCode && wholeProgramBuild(req, graph)
+	var deadCodeRoots deadCodeRoots
+	if eliminateDeadCode {
+		deadCodeRoots = overrideDeadCodeRoots(overrideFacts, graph)
+		deadCodeRoots.functions = req.DeferredFunctions
+		deadCodeRoots.addTestPackages(req, graph)
+	}
+
 	// Each pass checks the program, then builds and lowers it.
 	checkDiagnostics := diagnostics
 	var semanticModel *SemanticModel
@@ -191,6 +202,7 @@ func (s *CompileService) Compile(ctx context.Context, req *CompileRequest) (*Com
 			Summarize:         summarize,
 			WholeProgram:      wholeProgramBuild(req, graph),
 			ReportAsync:       req.ReportAsync,
+			EliminateDeadCode: eliminateDeadCode,
 		})
 		diagnostics = append(diagnostics, semanticDiagnostics...)
 		if diagnosticsHaveErrors(diagnostics) {
@@ -206,11 +218,16 @@ func (s *CompileService) Compile(ctx context.Context, req *CompileRequest) (*Com
 			continue
 		}
 
-		// Packages whose closure sources and closure facts are unchanged
-		// replay from the cache; only the rest are lowered and emitted.
+		if eliminateDeadCode {
+			semanticModel.liveCode = collectLiveCode(semanticModel, deadCodeRoots)
+		}
+
+		// Packages whose closure sources and closure facts are unchanged,
+		// and whose reachability answers hold, replay from the cache; only
+		// the rest are lowered and emitted.
 		trimTypeInfo = !packageGraphContainsPackage(graph, "reflect")
 		artifactEntries = s.cacheOwner.ArtifactEntries(graph, sources, semanticModel, trimTypeInfo)
-		replayed = s.cacheOwner.ReplayGenerated(ctx, req, artifactEntries)
+		replayed, artifactEntries = s.cacheOwner.ReplayGenerated(ctx, req, artifactEntries, semanticModel)
 		var unreplayed bool
 		for pkgPath := range summaries {
 			if !replayed[pkgPath] {
@@ -222,15 +239,6 @@ func (s *CompileService) Compile(ctx context.Context, req *CompileRequest) (*Com
 		if !unreplayed {
 			break
 		}
-	}
-	// A program built with dead code elimination keeps only reachable code.
-	// The protobuf binding runtime is an override package, so the methods it
-	// calls on bound messages are among the override roots.
-	if req.EliminateDeadCode && wholeProgramBuild(req, graph) {
-		roots := overrideDeadCodeRoots(overrideFacts, graph)
-		roots.functions = req.DeferredFunctions
-		roots.addTestPackages(req, graph)
-		semanticModel.liveCode = collectLiveCode(semanticModel, roots)
 	}
 	loweredProgram, loweringDiagnostics := s.loweringOwner.Build(ctx, semanticModel, LoweringOptions{
 		SourceRoot:                protobufTypeScriptBindingRoot(req.Dir),
@@ -264,7 +272,7 @@ func (s *CompileService) Compile(ctx context.Context, req *CompileRequest) (*Com
 	result.AsyncReport = semanticModel.asyncReport.relativeTo(req.Dir)
 	result.CompiledPackages = slices.AppendSeq(result.CompiledPackages, maps.Keys(replayed))
 	slices.Sort(result.CompiledPackages)
-	s.cacheOwner.StoreGenerated(req, artifactEntries, loweredProgram, files)
+	artifactEntries = s.cacheOwner.StoreGenerated(req, artifactEntries, loweredProgram, files)
 
 	copiedPackages, copyDiagnostics := s.overrideOwner.CopyPackages(ctx, req, overridePlan)
 	result.CopiedPackages = append(result.CopiedPackages, copiedPackages...)

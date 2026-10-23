@@ -22,6 +22,9 @@ type loweredPackage struct {
 	// to export, as when dead code elimination leaves out every
 	// declaration of a package that other packages still import.
 	moduleIndex bool
+	// liveness holds the reachability answers that lowering the package
+	// read (see liveQueries).
+	liveness []string
 }
 
 type loweredFile struct {

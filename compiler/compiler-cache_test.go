@@ -1234,3 +1234,78 @@ func TestCompilePackagesCacheWholeProgramDefersDependencyTable(t *testing.T) {
 		}
 	}
 }
+
+// TestCompilePackagesCacheDeadCodeEditsMatchFreshCompile edits a program
+// built with dead code elimination so that the reachable code of an unchanged
+// dependency changes. The dependency is checked without bodies, so its
+// references come from its body summary, and its artifact replays only while
+// the reachability answers it was lowered with hold.
+func TestCompilePackagesCacheDeadCodeEditsMatchFreshCompile(t *testing.T) {
+	files := func(body string) map[string]string {
+		return map[string]string{
+			"go.mod": "module example.test/deadcache\n\ngo 1.25.3\n",
+			"dep/dep.go": `package dep
+
+type Namer interface{ Name() string }
+
+type T struct{ n int }
+
+func (t *T) Name() string { return helper(t.n) }
+
+func (t *T) Size() int { return t.n }
+
+func helper(n int) string {
+	if n > 1 {
+		return "many"
+	}
+	return "one"
+}
+
+func New(n int) *T { return &T{n: n} }
+
+func Unused() int { return 7 }
+`,
+			"main.go": `package main
+
+import "example.test/deadcache/dep"
+
+func main() {
+	t := dep.New(2)
+` + body + "}\n",
+		}
+	}
+	edits := []struct {
+		name string
+		body string
+	}{
+		{name: "base", body: "\t_ = t\n"},
+		{name: "direct method", body: "\tprintln(t.Size())\n"},
+		{name: "interface method", body: "\tvar n dep.Namer = t\n\tprintln(n.Name())\n"},
+		{name: "function", body: "\t_ = t\n\tprintln(dep.Unused())\n"},
+		{name: "revert", body: "\t_ = t\n"},
+	}
+	config := Config{EliminateDeadCode: true}
+	moduleDir := writePackageGraphFixture(t, files(edits[0].body))
+	cacheRoot := filepath.Join(t.TempDir(), "cache")
+	deps := make(map[string]string)
+	for _, edit := range edits {
+		writeFixtureFile(t, moduleDir, "main.go", files(edit.body)["main.go"])
+		freshOut := filepath.Join(t.TempDir(), "fresh")
+		compileCacheFixtureConfig(t, config, moduleDir, freshOut, "")
+		fresh := outputTreeSnapshot(t, freshOut)
+		for pass := range 2 {
+			cachedOut := filepath.Join(t.TempDir(), "cached")
+			compileCacheFixtureConfig(t, config, moduleDir, cachedOut, cacheRoot)
+			if cached := outputTreeSnapshot(t, cachedOut); cached != fresh {
+				t.Fatalf("%s pass %d: cached output differs from fresh compile:\ncached:\n%s\nfresh:\n%s", edit.name, pass, cached, fresh)
+			}
+		}
+		dep := readOutputFile(t, freshOut, "example.test/deadcache/dep", "dep.gs.ts")
+		for name, other := range deps {
+			if other == dep && name != "base" {
+				t.Fatalf("%s: dependency output matches %s; the edit did not change its reachable code", edit.name, name)
+			}
+		}
+		deps[edit.name] = dep
+	}
+}

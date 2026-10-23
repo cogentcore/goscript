@@ -32,7 +32,7 @@ const compilerCacheSchema = "goscript-package-artifact-v2"
 // compilerSemanticsVersion versions emitted-output semantics. Bump this value
 // with every behavior-changing compiler commit so artifacts cached by an
 // older binary miss and rebuild instead of replaying stale bytes.
-const compilerSemanticsVersion = "39"
+const compilerSemanticsVersion = "40"
 
 type compilerCacheEntryKind string
 
@@ -73,6 +73,9 @@ type compilerCacheManifest struct {
 	files            []compilerCacheManifestFile
 	// artifacts lists the artifact entries of a program manifest.
 	artifacts []compilerCacheEntry
+	// liveness holds the reachability answers a generated package's
+	// lowering read (see liveQueries); it replays only while they hold.
+	liveness []string
 }
 
 type compilerCacheManifestFile struct {
@@ -204,7 +207,7 @@ func (o *CompilerCacheOwner) ReplayProgram(
 			if err := groupCtx.Err(); err != nil {
 				return err
 			}
-			entryManifest, ok := o.replayEntry(req, artifact)
+			entryManifest, ok := o.replayEntry(req, artifact, programLivenessHolds)
 			if !ok {
 				return errCompilerCacheMiss
 			}
@@ -232,39 +235,81 @@ func (o *CompilerCacheOwner) ReplayProgram(
 	return result, true
 }
 
-// ReplayGenerated replays every generated artifact entry found in the cache and
-// returns the replayed package paths. Packages that miss must be compiled.
+// programLivenessHolds accepts the reachability answers of an artifact that a
+// program replay lists: the program's sources decide its reachable code, so
+// the answers the artifact was lowered with still hold.
+func programLivenessHolds([]string) bool { return true }
+
+// compilerCacheGeneratedVariants bounds the artifacts kept for one generated
+// source entry. Dead code elimination lowers a package by the reachable code
+// of the whole program, so the same sources lower to one artifact per set of
+// reachability answers. Each variant is an immutable entry of its own (see
+// generatedVariant), probed in order.
+const compilerCacheGeneratedVariants = 8
+
+// generatedVariant returns the entry of variant slot of a generated artifact
+// entry. Slot 0 is the entry itself.
+func generatedVariant(entry compilerCacheEntry, slot int) compilerCacheEntry {
+	// The first variant keeps the artifact key.
+	if slot == 0 {
+		return entry
+	}
+
+	// Later variants key by the artifact key and slot.
+	var b strings.Builder
+	writeKeyField(&b, "artifact-key", entry.key)
+	writeKeyField(&b, "variant", strconv.Itoa(slot))
+	return compilerCacheEntry{key: sha256String(b.String()), kind: entry.kind, packagePath: entry.packagePath}
+}
+
+// ReplayGenerated replays, for every generated artifact entry, the first
+// variant found in the cache whose reachability answers hold for the model.
+// It returns the replayed package paths and the artifact entries with each
+// replayed package's entry replaced by the variant it replayed. Packages that
+// miss must be compiled.
 func (o *CompilerCacheOwner) ReplayGenerated(
 	ctx context.Context,
 	req *CompileRequest,
 	artifactEntries []compilerCacheEntry,
-) map[string]bool {
+	model *SemanticModel,
+) (map[string]bool, []compilerCacheEntry) {
+	// Without a cache nothing replays.
 	if !o.Enabled(req) {
-		return nil
+		return nil, artifactEntries
 	}
+
+	// Probe the variants of each generated entry in parallel.
+	entries := slices.Clone(artifactEntries)
 	var mtx sync.Mutex
 	replayed := make(map[string]bool)
 	var group errgroup.Group
 	group.SetLimit(runtime.GOMAXPROCS(0))
-	for _, entry := range artifactEntries {
+	for idx, entry := range entries {
 		if entry.kind != compilerCacheEntryGenerated {
 			continue
 		}
 		group.Go(func() error {
-			if ctx.Err() != nil {
-				return nil
-			}
-			if _, ok := o.replayEntry(req, entry); ok {
-				mtx.Lock()
-				replayed[entry.packagePath] = true
-				mtx.Unlock()
+			// The first variant whose answers hold replays.
+			for slot := range compilerCacheGeneratedVariants {
+				if ctx.Err() != nil {
+					return nil
+				}
+				variant := generatedVariant(entry, slot)
+				if _, ok := o.replayEntry(req, variant, model.liveAnswersHold); ok {
+					mtx.Lock()
+					replayed[entry.packagePath] = true
+					entries[idx] = variant
+					mtx.Unlock()
+					return nil
+				}
 			}
 			return nil
 		})
 	}
+
 	// Workers report misses through replayed, never through the group.
 	_ = group.Wait()
-	return replayed
+	return replayed, entries
 }
 
 // StoreProgram records the artifact entries of a complete compile under the
@@ -365,10 +410,15 @@ func (o *CompilerCacheOwner) StoreSummaries(
 	}
 }
 
-// replayEntry writes one package entry's files to the output tree.
-func (o *CompilerCacheOwner) replayEntry(req *CompileRequest, entry compilerCacheEntry) (compilerCacheManifest, bool) {
+// replayEntry writes one package entry's files to the output tree when holds
+// accepts its reachability answers.
+func (o *CompilerCacheOwner) replayEntry(
+	req *CompileRequest,
+	entry compilerCacheEntry,
+	holds func(liveness []string) bool,
+) (compilerCacheManifest, bool) {
 	manifest, ok := o.readManifest(req, entry)
-	if !ok || manifest.kind != entry.kind || manifest.packagePath != entry.packagePath {
+	if !ok || manifest.kind != entry.kind || manifest.packagePath != entry.packagePath || !holds(manifest.liveness) {
 		return compilerCacheManifest{}, false
 	}
 	if !o.replayManifest(req, manifest) {
@@ -401,28 +451,51 @@ func (o *CompilerCacheOwner) markSummaryUsed(req *CompileRequest, entry compiler
 	}
 }
 
+// StoreGenerated stores the artifacts of the lowered packages, each in the
+// first variant of its entry that holds the same reachability answers or is
+// free. It returns the artifact entries with each stored package's entry
+// replaced by its variant.
 func (o *CompilerCacheOwner) StoreGenerated(
 	req *CompileRequest,
 	entries []compilerCacheEntry,
 	program *LoweredProgram,
 	files map[string]string,
-) {
+) []compilerCacheEntry {
+	// Without a cache or output nothing is stored.
 	if !o.Enabled(req) || program == nil || len(files) == 0 {
-		return
+		return entries
 	}
-	entriesByPackage := entriesByKindAndPackage(entries, compilerCacheEntryGenerated)
+
+	// Index the generated entries by package.
+	entries = slices.Clone(entries)
+	entryIndex := make(map[string]int, len(entries))
+	for idx, entry := range entries {
+		if entry.kind == compilerCacheEntryGenerated {
+			entryIndex[entry.packagePath] = idx
+		}
+	}
+
+	// Store each lowered package in its variant.
 	for _, pkg := range program.packages {
-		entry, ok := entriesByPackage[pkg.pkgPath]
+		idx, ok := entryIndex[pkg.pkgPath]
 		if !ok {
 			continue
 		}
+		variant, ok := o.generatedSlot(req, entries[idx], pkg.liveness)
+		if !ok {
+			// No key names the artifact, so the program manifest misses.
+			entries[idx].key = ""
+			continue
+		}
+		entries[idx] = variant
 		prefix := "@goscript/" + pkg.pkgPath + "/"
 		manifest := compilerCacheManifest{
 			schema:           compilerCacheSchema,
-			key:              entry.key,
+			key:              variant.key,
 			kind:             compilerCacheEntryGenerated,
 			packagePath:      pkg.pkgPath,
 			compiledPackages: []string{pkg.pkgPath},
+			liveness:         pkg.liveness,
 		}
 		for filePath, contents := range files {
 			// A nested package's files share the prefix but belong to its
@@ -445,6 +518,22 @@ func (o *CompilerCacheOwner) StoreGenerated(
 		})
 		o.storeManifest(req, manifest)
 	}
+	return entries
+}
+
+// generatedSlot returns the variant of a generated entry that an artifact
+// with the given reachability answers belongs in: the first that holds the
+// same answers or is free. It reports false when every variant holds other
+// answers.
+func (o *CompilerCacheOwner) generatedSlot(req *CompileRequest, entry compilerCacheEntry, liveness []string) (compilerCacheEntry, bool) {
+	for slot := range compilerCacheGeneratedVariants {
+		variant := generatedVariant(entry, slot)
+		manifest, ok := o.readManifest(req, variant)
+		if !ok || slices.Equal(manifest.liveness, liveness) {
+			return variant, true
+		}
+	}
+	return compilerCacheEntry{}, false
 }
 
 func (o *CompilerCacheOwner) StoreCopied(
@@ -878,6 +967,7 @@ func (o *compilerCacheKeyOwner) sharedIdentity() string {
 	writeKeyField(&b, "runtime-mode", string(req.RuntimeEmissionMode))
 	writeKeyField(&b, "protobuf-ts-binding", strconv.FormatBool(req.ProtobufTypeScriptBinding))
 	writeKeyField(&b, "tests", strconv.FormatBool(req.Tests))
+	writeKeyField(&b, "eliminate-dead-code", strconv.FormatBool(req.EliminateDeadCode))
 	for _, key := range goLoaderEnvKeys() {
 		writeKeyField(&b, "env-"+key, os.Getenv(key))
 	}
@@ -1290,6 +1380,8 @@ func formatCompilerCacheManifest(manifest compilerCacheManifest) []byte {
 	stream.WriteMore()
 	writeStringArray(stream, "copiedPackages", manifest.copiedPackages)
 	stream.WriteMore()
+	writeStringArray(stream, "liveness", manifest.liveness)
+	stream.WriteMore()
 	stream.WriteObjectField("files")
 	stream.WriteArrayStart()
 	for idx, file := range manifest.files {
@@ -1369,6 +1461,8 @@ func parseCompilerCacheManifest(data []byte) compilerCacheManifest {
 			manifest.compiledPackages = readStringArray(iter)
 		case "copiedPackages":
 			manifest.copiedPackages = readStringArray(iter)
+		case "liveness":
+			manifest.liveness = readStringArray(iter)
 		case "files":
 			for iter.ReadArray() {
 				manifest.files = append(manifest.files, readManifestFile(iter))

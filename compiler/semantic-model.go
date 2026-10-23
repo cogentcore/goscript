@@ -46,6 +46,9 @@ type SemanticBuildOptions struct {
 	WholeProgram bool
 	// ReportAsync asks for an async report (see AsyncReport).
 	ReportAsync bool
+	// EliminateDeadCode records what each function references, which dead
+	// code elimination follows.
+	EliminateDeadCode bool
 }
 
 // Build constructs semantic facts for a package graph.
@@ -133,6 +136,7 @@ func (o *SemanticModelOwner) Build(ctx context.Context, graph *PackageGraph, opt
 				objects,
 				opts.Summaries[pkgPath],
 				opts.Summarize[pkgPath],
+				opts.EliminateDeadCode,
 			)
 		}
 	})
@@ -326,7 +330,8 @@ func newSemanticModel() *SemanticModel {
 // collects the declaration region and applies the summary. It reports false
 // when the summary does not apply. Otherwise, when summarize is set, it
 // returns the package's body summary, or nil when the package cannot be
-// summarized.
+// summarized. deadCode records the references of the package's code, from its
+// bodies or its summary.
 func (o *SemanticModelOwner) buildPackage(
 	node *PackageGraphNode,
 	pkg *packages.Package,
@@ -335,6 +340,7 @@ func (o *SemanticModelOwner) buildPackage(
 	objects *summaryObjects,
 	stored []byte,
 	summarize bool,
+	deadCode bool,
 ) (*SemanticModel, []byte, bool) {
 	shard := newSemanticModel()
 	semPkg := &semanticPackage{
@@ -346,7 +352,8 @@ func (o *SemanticModelOwner) buildPackage(
 	}
 	shard.packages[node.PkgPath] = semPkg
 	if stored != nil {
-		return shard, nil, o.applyBodySummary(shard, semPkg, pkg, objects, stored)
+		applied := o.applyBodySummary(shard, semPkg, pkg, objects, stored)
+		return shard, nil, applied && (!deadCode || semPkg.deadCode != nil)
 	}
 
 	// Collect the declarations and the facts of the bodies.
@@ -360,6 +367,9 @@ func (o *SemanticModelOwner) buildPackage(
 	semPkg.lazyVars = lazyPackageVars(semPkg)
 	collectFunctionFacts(shard, semPkg, pkg, overrideFacts, directives)
 	semPkg.asyncArgumentCalls = collectAsyncArgumentCalls(pkg, semPkg.literalKey, directives)
+	if deadCode {
+		semPkg.deadCode = collectPackageDeadCodeRefs(pkg)
+	}
 
 	// Summarize the bodies for a later check without them.
 	if !summarize {
