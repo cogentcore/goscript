@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "paths": {
+      "*": [
+        "./*"
+      ],
+      "@go/github.com/s4wave/goscript/*": [
+        "../../../*"
+      ],
+      "@goscript/*": [
+        "../../../tests/tests/package_import_time_parse_error/run/output/@goscript/*",
+        "../../../gs/*",
+        "../../../tests/deps/*"
+      ],
+      "@goscript/github.com/s4wave/goscript/tests/tests/package_import_time_parse_error/*": [
+        "./*"
+      ]
+    }
+  },
+  "extends": "../../../tests/tsconfig.base.json",
+  "include": [
+    "index.ts",
+    "package_import_time_parse_error.gs.ts"
+  ]
+}

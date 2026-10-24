@@ -1259,30 +1259,68 @@ export function Weekday_String(w: Weekday): string {
   return WeekdayString(w)
 }
 
-// ParseError describes a problem parsing a time string.
-export class ParseError extends Error {
-  public layout: string
-  public value: string
-  public layoutElem: string
-  public valueElem: string
-  public message: string
+// ParseError describes a problem parsing a time string. It has the exported
+// fields of Go's ParseError, so Go code can make one with a composite literal
+// and match one with errors.As.
+export class ParseError {
+  public Layout: string
+  public Value: string
+  public LayoutElem: string
+  public ValueElem: string
+  public Message: string
 
   constructor(
-    layout: string,
-    value: string,
-    layoutElem: string,
-    valueElem: string,
-    message: string,
+    init?: Partial<{
+      Layout: string
+      Value: string
+      LayoutElem: string
+      ValueElem: string
+      Message: string
+    }>,
   ) {
-    super(message)
-    this.layout = layout
-    this.value = value
-    this.layoutElem = layoutElem
-    this.valueElem = valueElem
-    this.message = message
-    this.name = 'ParseError'
+    this.Layout = init?.Layout ?? ''
+    this.Value = init?.Value ?? ''
+    this.LayoutElem = init?.LayoutElem ?? ''
+    this.ValueElem = init?.ValueElem ?? ''
+    this.Message = init?.Message ?? ''
   }
+
+  public clone(): ParseError {
+    return new ParseError(this)
+  }
+
+  // Error returns the string representation of a ParseError, as Go does.
+  public Error(): string {
+    if (this.Message === '') {
+      return (
+        'parsing time ' +
+        quoteParseValue(this.Value) +
+        ' as ' +
+        quoteParseValue(this.Layout) +
+        ': cannot parse ' +
+        quoteParseValue(this.ValueElem) +
+        ' as ' +
+        quoteParseValue(this.LayoutElem)
+      )
+    }
+    return 'parsing time ' + quoteParseValue(this.Value) + this.Message
+  }
+
+  static __typeInfo: $.StructTypeInfo
 }
+
+// ParseError registers with the runtime type system, so that *ParseError
+// implements error for type assertions and errors.As.
+ParseError.__typeInfo = $.registerStructType(
+  'time.ParseError',
+  new ParseError(),
+  [{ name: 'Error', args: [], returns: [{ type: $.basicType('string') }] }],
+  ParseError,
+  () =>
+    ['Layout', 'Value', 'LayoutElem', 'ValueElem', 'Message'].map((name, i) =>
+      $.structField(name, $.basicType('string'), [i], i * 16, true),
+    ),
+)
 
 // Timer represents a single event timer. A Timer made without a duration is
 // the zero Timer, which does not run until it is Reset.
@@ -2185,18 +2223,13 @@ function newParseError(
   valueElem: string,
   message: string,
 ): $.GoError {
-  const text =
-    message === '' ?
-      'parsing time ' +
-      quoteParseValue(value) +
-      ' as ' +
-      quoteParseValue(layout) +
-      ': cannot parse ' +
-      quoteParseValue(valueElem) +
-      ' as ' +
-      quoteParseValue(layoutElem)
-    : 'parsing time ' + quoteParseValue(value) + message
-  return $.toGoError(new ParseError(layout, value, layoutElem, valueElem, text))
+  return new ParseError({
+    Layout: layout,
+    Value: value,
+    LayoutElem: layoutElem,
+    ValueElem: valueElem,
+    Message: message,
+  })
 }
 
 function isLeap(year: number): boolean {
