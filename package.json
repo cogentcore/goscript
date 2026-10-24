@@ -1,7 +1,7 @@
 {
   "name": "goscript",
   "description": "Go to TypeScript transpiler",
-  "version": "0.4.6",
+  "version": "0.5.0",
   "author": {
     "name": "Aperture Robotics LLC.",
     "email": "support@aperture.us",
