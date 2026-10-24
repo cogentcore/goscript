@@ -558,6 +558,25 @@ describe('builtin runtime contract helpers', () => {
     )
   })
 
+  it('returns the same field reference across interleaved fieldRef calls', () => {
+    // The last reference is cached, which must not change which reference
+    // each target and field gets.
+    const a = { x: 1, y: 2 }
+    const b = { x: 3, y: 4 }
+    const ax = fieldRef(a, 'x')
+    const bx = fieldRef(b, 'x')
+    const ay = fieldRef(a, 'y')
+    expect(fieldRef(a, 'x')).toBe(ax)
+    expect(fieldRef(a, 'x')).toBe(ax)
+    expect(fieldRef(b, 'x')).toBe(bx)
+    expect(fieldRef(a, 'y')).toBe(ay)
+    expect(ax).not.toBe(bx)
+    expect(ax).not.toBe(ay)
+    ax.value = 5
+    expect(a.x).toBe(5)
+    expect(fieldRef(a, 'x').value).toBe(5)
+  })
+
   it('matches struct map keys by Go comparable value', () => {
     class Key {
       declare public name: string
