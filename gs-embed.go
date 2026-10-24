@@ -83,6 +83,9 @@ import "embed"
 //go:embed gs/encoding/json/jsontext/stubs.gs.ts
 //go:embed gs/encoding/json/meta.json
 //go:embed gs/encoding/json/parity.json
+//go:embed gs/encoding/json/v2/index.ts
+//go:embed gs/encoding/json/v2/meta.json
+//go:embed gs/encoding/json/v2/parity.json
 //go:embed gs/errors/errors.ts
 //go:embed gs/errors/index.ts
 //go:embed gs/fmt/fmt.ts

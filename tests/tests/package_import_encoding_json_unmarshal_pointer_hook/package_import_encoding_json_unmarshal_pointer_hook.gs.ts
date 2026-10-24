@@ -4,6 +4,7 @@
 import * as $ from "@goscript/builtin/index.js"
 import * as json from "@goscript/encoding/json/index.js"
 import * as fmt from "@goscript/fmt/index.js"
+import type * as v2 from "@goscript/encoding/json/v2/index.js"
 
 export type Maps = $.Slice<MapItem>
 
