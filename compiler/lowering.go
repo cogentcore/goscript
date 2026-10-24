@@ -11506,8 +11506,9 @@ func fieldSelectionOperand(ctx lowerFileContext, expr ast.Expr) (*ast.SelectorEx
 // lowerTransientFieldAddress lowers the address of the field of selector,
 // passed to a transient pointer parameter, as a new reference to the field.
 func (o *LoweringOwner) lowerTransientFieldAddress(ctx lowerFileContext, selector *ast.SelectorExpr, selection *types.Selection) (string, []Diagnostic) {
-	// A struct field is its own struct object, which needs no reference.
-	if isStructValueType(ctx.semPkg.source.TypesInfo.TypeOf(selector)) {
+	// A field of a named struct type is its own struct object, which needs no
+	// reference. A pointer to an anonymous struct is always a reference.
+	if namedStructType(ctx.semPkg.source.TypesInfo.TypeOf(selector)) != nil {
 		return o.lowerFieldSelectionExpr(ctx, selector, selection, false)
 	}
 
