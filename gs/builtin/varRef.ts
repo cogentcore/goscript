@@ -124,6 +124,31 @@ export function fieldRef<T extends object, K extends keyof T>(
   target: T,
   key: K,
 ): VarRef<T[K]> {
+  // A loop usually takes the address of the same field again and again, as
+  // a method returning &s.field does, so the last reference is remembered,
+  // which avoids the two map lookups. References are never replaced, so it
+  // is always the one that the maps hold.
+  if (target === lastFieldTarget && key === lastFieldKey) {
+    return lastFieldRef as VarRef<T[K]>
+  }
+  const ref = fieldRefLookup(target, key)
+  lastFieldTarget = target
+  lastFieldKey = key
+  lastFieldRef = ref
+  return ref
+}
+
+// lastFieldTarget, lastFieldKey and lastFieldRef are the arguments and result
+// of the last fieldRef call. Only this one target is kept alive by them.
+let lastFieldTarget: object | undefined
+let lastFieldKey: PropertyKey | undefined
+let lastFieldRef: VarRef<unknown> | undefined
+
+// fieldRefLookup finds or makes the reference of fieldRef in fieldReferences.
+function fieldRefLookup<T extends object, K extends keyof T>(
+  target: T,
+  key: K,
+): VarRef<T[K]> {
   let references = fieldReferences.get(target)
   if (references === undefined) {
     references = new globalThis.Map<PropertyKey, VarRef<unknown>>()
