@@ -10331,6 +10331,11 @@ func (o *LoweringOwner) lowerExpr(ctx lowerFileContext, expr ast.Expr) (string, 
 	case *ast.TypeAssertExpr:
 		return o.lowerTypeAssertExpr(ctx, typed)
 	case *ast.IndexListExpr:
+		// A generic function instantiated with several type arguments, used
+		// as a value, keeps them, as lowerIndexExpr does for one.
+		if signature := genericFunctionSignature(ctx, typed.X); signature != nil {
+			return o.lowerGenericFunctionValue(ctx, typed.X, typed.Indices, signature)
+		}
 		return o.lowerExpr(ctx, typed.X)
 	default:
 		return "undefined", []Diagnostic{loweringUnsupportedAt(ctx, typed, "expression", ctx.semPkg.pkgPath, "unsupported expression kind")}
@@ -14705,7 +14710,14 @@ func (o *LoweringOwner) lowerGenericFunctionValue(
 	typeArgExprs []ast.Expr,
 	signature *types.Signature,
 ) (string, []Diagnostic) {
+	// An override function that takes no type arguments, such as those of
+	// the slices override, is its own value, as calls of it pass none.
 	calleeExpr, diagnostics := o.lowerExpr(ctx, callee)
+	if o.callUsesOverridePackage(ctx, callee) && !o.overrideFacts().TakesTypeArgs(calledFunction(ctx.semPkg.source, callee)) {
+		return calleeExpr, diagnostics
+	}
+
+	// Otherwise the value calls the function with the type arguments.
 	typeArgs := o.genericTypeArgsExpr(ctx, callee, typeArgExprs)
 	signatureCtx := ctx.withFunctionTypeDepth(ctx.functionTypeDepth + 1)
 	params := o.tsSignatureParamsFor(signatureCtx, signature, false)
