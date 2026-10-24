@@ -977,13 +977,17 @@ func cacheFactsFixture(decls string) map[string]string {
 			"type runner struct{}\n\n" + decls,
 		"dep/dep.go": strings.Join([]string{
 			"package dep",
+			"import \"example.test/cachefacts/dep/num\"",
 			"var Var int",
 			"type Runner interface { Run() }",
 			"func Use(r Runner) { r.Run() }",
-			"func Double(x int) int { return x * 2 }",
+			"func Double(x int) int { return num.Add(x, x) }",
 			"func Call(f func()) { f() }",
 			"",
 		}, "\n"),
+		// No edit changes num's closure facts, so a compile that lowers dep
+		// again keeps num's check.
+		"dep/num/num.go": "package num\n\nfunc Add(a, b int) int { return a + b }\n",
 	}
 }
 

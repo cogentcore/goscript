@@ -26,8 +26,12 @@ import (
 // Only lowered nodes outside bodiless have their function bodies checked.
 // Every other package contributes only its declarations: override candidates
 // and their dependencies are never lowered, and a bodiless node's body facts
-// come from its stored summary. Checking the graph again replaces every
-// package's types and reuses the parsed syntax.
+// come from its stored summary.
+//
+// Checking the graph again keeps each package checked in the same mode whose
+// imports were all kept, so its types and objects stay those of the first
+// check. Every other package is checked again from the parsed syntax: a new
+// check of an import gives it new objects, which its dependents must see.
 //
 // The identity load already listed every package and its files, so the check
 // reads sources directly instead of loading the graph a second time. Each
@@ -43,31 +47,53 @@ func (o *PackageGraphOwner) Check(ctx context.Context, graph *PackageGraph, bodi
 			sizes:  goScriptTypeSizes(),
 			work:   make(chan struct{}, runtime.GOMAXPROCS(0)),
 			parsed: make(map[string]*parsedFile),
+			modes:  make(map[*packages.Package]bool),
 		}
 	}
 	checker := graph.checker
 
-	// Check each package in its own goroutine once its imports are done.
-	done := make(map[*packages.Package]chan struct{}, len(pkgs))
+	// Check each package in its own goroutine once its imports are done. Each
+	// goroutine writes only its own pass entry, and readers wait for done.
+	passes := make(map[*packages.Package]*packagePass, len(pkgs))
 	for _, pkg := range pkgs {
-		done[pkg] = make(chan struct{})
+		node := graph.NodesByPackagePath[pkg.PkgPath]
+		passes[pkg] = &packagePass{
+			done:   make(chan struct{}),
+			bodies: node != nil && !node.OverrideCandidate && !bodiless[pkg.PkgPath],
+		}
 	}
 	var wg sync.WaitGroup
 	for _, pkg := range pkgs {
 		wg.Go(func() {
-			defer close(done[pkg])
-			node := graph.NodesByPackagePath[pkg.PkgPath]
-			bodies := node != nil && !node.OverrideCandidate && !bodiless[pkg.PkgPath]
-			checker.check(ctx, pkg, bodies, func() {
+			// waitImports reports whether every import was kept.
+			pass := passes[pkg]
+			defer close(pass.done)
+			waitImports := func() bool {
+				kept := true
 				for _, imp := range pkg.Imports {
-					<-done[imp]
+					<-passes[imp].done
+					kept = kept && !passes[imp].checked
 				}
-			})
+				return kept
+			}
+
+			// Keep a package checked in this mode whose imports were kept. A
+			// package never checked in this mode parses while its imports check.
+			if bodies, ok := checker.modes[pkg]; ok && bodies == pass.bodies && waitImports() {
+				return
+			}
+			pass.checked = true
+			checker.check(ctx, pkg, pass.bodies, func() { waitImports() })
 		})
 	}
 	wg.Wait()
 	if err := ctx.Err(); err != nil {
+		// A canceled check leaves packages incomplete, so none is kept.
+		clear(checker.modes)
 		return []Diagnostic{contextCanceledDiagnostic(err)}
+	}
+	for pkg, pass := range passes {
+		checker.modes[pkg] = pass.bodies
 	}
 
 	// Lowering assumes complete type information, so every lowered node must
@@ -119,6 +145,20 @@ type packageChecker struct {
 	mu sync.Mutex
 	// parsed shares each file's syntax between the test variants that list it.
 	parsed map[string]*parsedFile
+
+	// modes records whether each checked package's bodies were checked. The
+	// package goroutines read it, and Check writes it after they finish.
+	modes map[*packages.Package]bool
+}
+
+// packagePass is one package's state during one Check.
+type packagePass struct {
+	// done closes once the package is checked or kept.
+	done chan struct{}
+	// bodies is set when this pass checks the package's function bodies.
+	bodies bool
+	// checked is set when this pass checked the package instead of keeping it.
+	checked bool
 }
 
 // parsedFile holds one file's syntax once ready is closed.
