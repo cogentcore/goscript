@@ -16234,7 +16234,12 @@ func (o *LoweringOwner) lowerNamedValueInterfaceWrapper(
 	if signatures == "" {
 		return ""
 	}
+	// A type with type parameters in scope is described by its instantiation,
+	// so that a type assertion to the instantiated type matches the box.
 	typeInfo := o.runtimeTypeInfoExpr(sourceType)
+	if typeContainsTypeParam(sourceType) {
+		typeInfo = o.runtimeTypeAssertInfoExpr(ctx, sourceType)
+	}
 
 	// Without type parameters, the method table, type info and method
 	// signatures of the type are the same each time, so they are created once.
