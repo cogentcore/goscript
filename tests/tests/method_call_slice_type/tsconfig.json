@@ -4,6 +4,9 @@
       "*": [
         "./*"
       ],
+      "@go/github.com/s4wave/goscript/*": [
+        "../../../*"
+      ],
       "@goscript/*": [
         "../../../tests/tests/method_call_slice_type/run/output/@goscript/*",
         "../../../gs/*",
