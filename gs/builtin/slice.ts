@@ -269,6 +269,22 @@ export class GoSlice<T> {
 // sliceElems returns the array that holds the elements of a slice: the
 // backing array of a window, or the slice itself.
 export function sliceElems(slice: any): any[] {
+  // A window object, a typed slice and a plain array are handled here, in a
+  // function small enough for engines to inline into element stores.
+  if (slice instanceof GoSlice) {
+    return slice.backing
+  }
+  if (ArrayBuffer.isView(slice)) {
+    return slice as unknown as any[]
+  }
+  if (Array.isArray(slice) && (slice as any).__meta__ === undefined) {
+    return slice
+  }
+  return sliceElemsSlow(slice)
+}
+
+// sliceElemsSlow is sliceElems for nil and proxied slices.
+function sliceElemsSlow(slice: any): any[] {
   // A typed slice is a view of exactly its elements.
   if (isTypedSlice(slice)) {
     return slice as ArrayLike<number> as any[]
@@ -280,6 +296,28 @@ export function sliceElems(slice: any): any[] {
 // sliceSlot returns the index in sliceElems(slice) of element index of the
 // slice, which it checks against the slice's length.
 export function sliceSlot(slice: any, index: number): number {
+  // An index in range of a window object, a typed slice or a plain array is
+  // handled here, in a function small enough for engines to inline;
+  // sliceSlotSlow handles the other slices and panics.
+  if (slice instanceof GoSlice) {
+    if (index >= 0 && index < slice.length) {
+      return slice.offset + index
+    }
+  } else if (ArrayBuffer.isView(slice)) {
+    if (index >= 0 && index < (slice as TypedSlice).length) {
+      return index
+    }
+  } else if (Array.isArray(slice) && (slice as any).__meta__ === undefined) {
+    if (index >= 0 && index < slice.length) {
+      return index
+    }
+  }
+  return sliceSlotSlow(slice, index)
+}
+
+// sliceSlotSlow is sliceSlot for the slices and indexes that its fast path
+// does not handle.
+function sliceSlotSlow(slice: any, index: number): number {
   // A nil slice has no elements.
   if (slice === null || slice === undefined) {
     outOfRangeIndex(index, 0)
