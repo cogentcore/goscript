@@ -7,7 +7,9 @@
     "Value.Call": true,
     "Value.CallSlice": true,
     "Value.Recv": true,
-    "Value.Send": true
+    "Value.Send": true,
+    "Value.TryRecv": true,
+    "Value.TrySend": true
   },
   "funcValueMakers": {
     "MakeFunc": true,

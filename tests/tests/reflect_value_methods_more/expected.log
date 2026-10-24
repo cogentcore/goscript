@@ -1,0 +1,11 @@
+can: true false true true true false
+overflow: true false
+comparable: false true
+clear: 0 0 2 4
+field: A int
+field: B string
+method: Sum 3
+iter: k 7
+trysend: true false
+tryrecv: 3 true
+empty: false false

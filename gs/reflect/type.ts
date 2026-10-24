@@ -1986,6 +1986,184 @@ export class Value {
   }
 
   // SetZero sets v to be the zero value of v's type
+  // SetIterKey assigns to v the key of iter's current map entry, as
+  // v.Set(iter.Key()) does.
+  public SetIterKey(iter: MapIter<unknown, unknown> | null): void {
+    this.Set(iter!.Key())
+  }
+
+  // SetIterValue assigns to v the value of iter's current map entry, as
+  // v.Set(iter.Value()) does.
+  public SetIterValue(iter: MapIter<unknown, unknown> | null): void {
+    this.Set(iter!.Value())
+  }
+
+  // SetCap sets v's capacity to n. It panics if v's Kind is not Slice, or if
+  // n is smaller than the length or greater than the capacity of the slice.
+  public SetCap(n: number): void {
+    if (!this.CanSet()) {
+      throw new Error(
+        'reflect: call of reflect.Value.SetCap on unaddressable value',
+      )
+    }
+    if (this.Kind() !== Slice) {
+      throw new ValueError({ Kind: this.Kind(), Method: 'SetCap' })
+    }
+    const value = this.currentValue() as $.Slice<unknown>
+    if (n < $.len(value) || n > $.cap(value)) {
+      throw new Error('reflect: slice capacity out of range in SetCap')
+    }
+    this.storeValue($.goSlice(value, 0, $.len(value), n) as ReflectValue)
+  }
+
+  // Clear clears the contents of a map or zeros the contents of a slice, as
+  // the clear builtin does.
+  public Clear(): void {
+    const k = this.Kind()
+    if (k === Map) {
+      ;(this.currentValue() as globalThis.Map<unknown, unknown> | null)?.clear()
+      return
+    }
+    if (k !== Slice) {
+      throw new ValueError({ Kind: k, Method: 'Clear' })
+    }
+    for (let i = 0; i < this.Len(); i++) {
+      this.Index(i).SetZero()
+    }
+  }
+
+  // CanInt reports whether Int can be used without panicking.
+  public CanInt(): boolean {
+    const k = this.Kind()
+    return k === Int || k === Int8 || k === Int16 || k === Int32 || k === Int64
+  }
+
+  // CanUint reports whether Uint can be used without panicking.
+  public CanUint(): boolean {
+    const k = this.Kind()
+    return (
+      k === Uint ||
+      k === Uint8 ||
+      k === Uint16 ||
+      k === Uint32 ||
+      k === Uint64 ||
+      k === Uintptr
+    )
+  }
+
+  // CanFloat reports whether Float can be used without panicking.
+  public CanFloat(): boolean {
+    const k = this.Kind()
+    return k === Float32 || k === Float64
+  }
+
+  // CanComplex reports whether Complex can be used without panicking.
+  public CanComplex(): boolean {
+    const k = this.Kind()
+    return k === Complex64 || k === Complex128
+  }
+
+  // OverflowComplex reports whether the complex128 x cannot be represented by
+  // v's type. It panics if v's Kind is not Complex64 or Complex128.
+  public OverflowComplex(x: $.Complex): boolean {
+    const k = this.Kind()
+    if (k === Complex64) {
+      const f32max = 3.4028234663852886e38
+      const overflows = (f: number) => isFinite(f) && Math.abs(f) > f32max
+      return overflows($.real(x)) || overflows($.imag(x))
+    }
+    if (k === Complex128) {
+      return false
+    }
+    throw new ValueError({ Kind: k, Method: 'OverflowComplex' })
+  }
+
+  // Comparable reports whether v is comparable. For an interface, array or
+  // struct, it depends on the values it holds, as in Go.
+  public Comparable(): boolean {
+    switch (this.Kind()) {
+      case Invalid:
+        return false
+      case Interface:
+        return this.IsNil() || this.Elem().Comparable()
+      case Array:
+      case Struct: {
+        const n = this.Kind() === Array ? this.Len() : this.NumField()
+        for (let i = 0; i < n; i++) {
+          const elem = this.Kind() === Array ? this.Index(i) : this.Field(i)
+          if (!elem.Comparable()) {
+            return false
+          }
+        }
+        return true
+      }
+      default:
+        return this.Type().Comparable()
+    }
+  }
+
+  // Fields returns an iterator over the fields of the struct v, yielding
+  // each field's StructField and Value.
+  public Fields(): iter.Seq2<StructField, Value> {
+    return async (
+      _yield: ((f: StructField, v: Value) => iter.YieldResult) | null,
+    ) => {
+      const t = this.Type()
+      for (let i = 0; i < this.NumField(); i++) {
+        if (!(await _yield!(t.Field(i), this.Field(i)))) {
+          return
+        }
+      }
+    }
+  }
+
+  // Methods returns an iterator over the exported methods of v, yielding
+  // each method's Method and its value bound to v.
+  public Methods(): iter.Seq2<Method, Value> {
+    return async (
+      _yield: ((m: Method, v: Value) => iter.YieldResult) | null,
+    ) => {
+      const t = this.Type()
+      for (let i = 0; i < this.NumMethod(); i++) {
+        if (!(await _yield!(t.Method(i), this.Method(i)))) {
+          return
+        }
+      }
+    }
+  }
+
+  // TryRecv receives a value from the channel v if it can without blocking,
+  // reporting whether it did; ok is false for a closed channel.
+  public async TryRecv(): Promise<[Value, boolean]> {
+    const ch = this.recvChan()
+    if (ch === null || !ch.canReceiveNonBlocking()) {
+      return [new Value(null, invalidTypeInstance), false]
+    }
+    return this.Recv()
+  }
+
+  // TrySend sends x on the channel v if it can without blocking, reporting
+  // whether it did.
+  public async TrySend(x: Value): Promise<boolean> {
+    const ch = this.sendChan()
+    if (ch === null || !ch.canSendNonBlocking()) {
+      return false
+    }
+    await this.Send(x)
+    return true
+  }
+
+  // InterfaceData is deprecated and needs the memory layout of an interface,
+  // which values do not have here.
+  public InterfaceData(): number[] {
+    throw new Error('reflect: InterfaceData is not supported')
+  }
+
+  // SetPointer needs unsafe pointers, which values do not have here.
+  public SetPointer(_x: unknown): void {
+    throw new Error('reflect: SetPointer is not supported')
+  }
+
   public SetZero(): void {
     if (!this.CanSet()) {
       throw new Error(
