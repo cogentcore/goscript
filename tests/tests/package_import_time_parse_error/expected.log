@@ -1,0 +1,5 @@
+as: true
+fields: 2006-01-02 2024-13-01 : month out of range
+error: parsing time "2024-13-01": month out of range
+literal: parsing time "x" as "15:04": cannot parse "x" as "15"
+message: parsing time "y": bad
