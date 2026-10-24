@@ -590,7 +590,8 @@ func WriteTypeCheckConfig(t *testing.T, parentModulePath, workspaceDir, testDir 
 	compilerOptions["paths"] = map[string][]string{
 		"*": {"./*"},
 		fmt.Sprintf("@goscript/%s/*", testPkgGoPathPrefix): {"./*"},
-		"@goscript/*": {runOutputRelPath, builtinTsRelPath, depsRelPath},
+		"@goscript/*":                    {runOutputRelPath, builtinTsRelPath, depsRelPath},
+		"@go/" + parentModulePath + "/*": {filepath.ToSlash(filepath.Join(relWorkspacePath, "*"))},
 	}
 	tsconfig["compilerOptions"] = compilerOptions
 
@@ -719,9 +720,17 @@ func RunGoScriptTestDir(t *testing.T, workspaceDir, testDir string) {
 	// tsconfig.json for the runner execution in tempDir
 	runnerTsConfig := maps.Clone(baseTsConfig)
 	runnerCompilerOptions := maps.Clone(runnerTsConfig["compilerOptions"].(map[string]any))
+
+	// Protobuf bindings import their generated .pb.ts siblings by Go package
+	// path, which resolve to the fixture sources in the workspace.
+	relWorkspaceRoot, err := filepath.Rel(tempDir, workspaceDir)
+	if err != nil {
+		t.Fatalf("failed to calculate relative path from tempDir (%s) to workspace (%s): %v", tempDir, workspaceDir, err)
+	}
 	runnerCompilerOptions["paths"] = map[string][]string{
-		"*":           {"./*"},
-		"@goscript/*": {"./output/@goscript/*", relGsBuiltinPath, relDepsPath},
+		"*":                           {"./*"},
+		"@goscript/*":                 {"./output/@goscript/*", relGsBuiltinPath, relDepsPath},
+		"@go/" + parentModPath + "/*": {filepath.ToSlash(relWorkspaceRoot) + "/*"},
 	}
 	runnerTsConfig["compilerOptions"] = runnerCompilerOptions
 
@@ -933,6 +942,9 @@ func WriteGlobalTypeCheckConfig(t *testing.T, parentModulePath, workspaceDir str
 			filepath.ToSlash(filepath.Join(relWorkspacePath, "tests/tests/*")),
 		},
 		"@goscript/*": {builtinTsRelPath},
+		"@go/" + parentModulePath + "/*": {
+			filepath.ToSlash(filepath.Join(relWorkspacePath, "*")),
+		},
 	}
 
 	compilerOptions["paths"] = testsPaths
