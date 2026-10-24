@@ -1,6 +1,7 @@
 {
   "dependencies": [
     "encoding/json/jsontext",
+    "encoding/json/v2",
     "io"
   ],
   "asyncMethods": {
