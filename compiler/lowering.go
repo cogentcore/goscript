@@ -9275,10 +9275,11 @@ const taglessSwitchValue = "(true as boolean)"
 func (o *LoweringOwner) lowerSwitchStmt(ctx lowerFileContext, stmt *ast.SwitchStmt) ([]loweredStmt, []Diagnostic) {
 	var diagnostics []Diagnostic
 	var init []loweredStmt
+	var prelude []loweredStmt
 	if stmt.Init != nil {
-		lowered, initDiagnostics := o.lowerStmt(ctx, stmt.Init)
+		var initDiagnostics []Diagnostic
+		ctx, prelude, init, initDiagnostics = o.lowerSwitchInit(ctx, stmt.Init)
 		diagnostics = append(diagnostics, initDiagnostics...)
-		init = append(init, lowered...)
 	}
 
 	value := taglessSwitchValue
@@ -9361,7 +9362,25 @@ func (o *LoweringOwner) lowerSwitchStmt(ctx lowerFileContext, stmt *ast.SwitchSt
 		return []loweredStmt{lowered}, diagnostics
 	}
 	init = append(init, lowered)
-	return []loweredStmt{{children: init}}, diagnostics
+	return append(prelude, loweredStmt{children: init}), diagnostics
+}
+
+// lowerSwitchInit lowers the init statement of a switch or type switch, as
+// lowerStmt does for an if init. A short declaration that redeclares a name
+// its initializer reads, as in switch pos, err := f(pos), saves the outer
+// value in prelude, to emit before the block of the switch. It returns the
+// context for the rest of the switch, in which the new names are visible.
+func (o *LoweringOwner) lowerSwitchInit(
+	ctx lowerFileContext,
+	init ast.Stmt,
+) (lowerFileContext, []loweredStmt, []loweredStmt, []Diagnostic) {
+	initCtx := ctx
+	var prelude []loweredStmt
+	if stmtCtx, nextCtx, aliasPrelude, ok := o.lowerShortDeclStatementContext(ctx, init); ok {
+		initCtx, ctx, prelude = stmtCtx, nextCtx, aliasPrelude
+	}
+	lowered, diagnostics := o.lowerStmt(initCtx, init)
+	return ctx, prelude, lowered, diagnostics
 }
 
 // splitSwitchFallthrough returns the statements of a case body without its
@@ -9429,8 +9448,11 @@ func constantComparableType(ctx lowerFileContext, expr ast.Expr) string {
 func (o *LoweringOwner) lowerTypeSwitchStmt(ctx lowerFileContext, stmt *ast.TypeSwitchStmt) ([]loweredStmt, []Diagnostic) {
 	var lowered []loweredStmt
 	var diagnostics []Diagnostic
+	var prelude []loweredStmt
 	if stmt.Init != nil {
-		init, initDiagnostics := o.lowerStmt(ctx, stmt.Init)
+		var init []loweredStmt
+		var initDiagnostics []Diagnostic
+		ctx, prelude, init, initDiagnostics = o.lowerSwitchInit(ctx, stmt.Init)
 		diagnostics = append(diagnostics, initDiagnostics...)
 		lowered = append(lowered, init...)
 	}
@@ -9500,7 +9522,7 @@ func (o *LoweringOwner) lowerTypeSwitchStmt(ctx lowerFileContext, stmt *ast.Type
 		switchIR.site = o.lowerTypeSwitchSite(ctx, switchIR)
 	}
 	lowered = append(lowered, loweredStmt{typeSwitch: switchIR})
-	return lowered, diagnostics
+	return append(prelude, lowered...), diagnostics
 }
 
 // lowerTypeSwitchSite returns the hoisted runtime site of a type switch whose

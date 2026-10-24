@@ -1,0 +1,6 @@
+switchInit: 2
+ifInit: 2
+block: 2
+single: 4
+forInit: 3
+typeSwitchInit: 5
