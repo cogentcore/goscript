@@ -74,6 +74,12 @@ func main() {
 
 	genericComposites()
 
+	// The fmt scanning interfaces are interface types.
+	scanState := reflect.TypeFor[fmt.ScanState]()
+	println("fmt.ScanState:", scanState.String(), scanState.Kind().String(), scanState.NumMethod())
+	scanner := reflect.TypeFor[fmt.Scanner]()
+	println("fmt.Scanner:", scanner.String(), scanner.Kind().String(), scanner.NumMethod())
+
 	println("reflect_typefor test finished")
 }
 

@@ -87,6 +87,46 @@ $.registerInterfaceType('fmt.Formatter', null, [
     ['verb', $.basicType('int32')],
   ]),
 ])
+$.registerInterfaceType('fmt.ScanState', null, [
+  $.methodSignature(
+    'Read',
+    [['buf', $.sliceType($.basicType('uint8'))]],
+    [$.basicType('int'), 'error'],
+  ),
+  $.methodSignature(
+    'ReadRune',
+    [],
+    [$.basicType('int32'), $.basicType('int'), 'error'],
+  ),
+  $.methodSignature('SkipSpace'),
+  $.methodSignature(
+    'Token',
+    [
+      ['skipSpace', $.basicType('bool')],
+      [
+        'f',
+        {
+          kind: $.TypeKind.Function,
+          params: [$.basicType('int32')],
+          results: [$.basicType('bool')],
+        },
+      ],
+    ],
+    [$.sliceType($.basicType('uint8')), 'error'],
+  ),
+  $.methodSignature('UnreadRune', [], ['error']),
+  $.methodSignature('Width', [], [$.basicType('int'), $.basicType('bool')]),
+])
+$.registerInterfaceType('fmt.Scanner', null, [
+  $.methodSignature(
+    'Scan',
+    [
+      ['state', 'fmt.ScanState'],
+      ['verb', $.basicType('int32')],
+    ],
+    ['error'],
+  ),
+])
 
 // basicValue returns the primitive inside a boxed basic interface value, or
 // value itself when it is not boxed.
