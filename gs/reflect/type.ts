@@ -524,6 +524,21 @@ export interface Type {
   // NumMethod returns the number of methods in the type's method set
   NumMethod(): number
 
+  // Methods returns an iterator over the methods of the type's method set.
+  Methods(): iter.Seq<Method>
+
+  // Fields returns an iterator over the fields of a struct type.
+  // Panics if the type's Kind is not Struct.
+  Fields(): iter.Seq<StructField>
+
+  // Ins returns an iterator over the input types of a function type.
+  // Panics if the type's Kind is not Func.
+  Ins(): iter.Seq<Type>
+
+  // Outs returns an iterator over the output types of a function type.
+  // Panics if the type's Kind is not Func.
+  Outs(): iter.Seq<Type>
+
   // Method returns the i'th method in the type's method set.
   Method(i: number): Method
 
@@ -555,6 +570,63 @@ export interface Type {
   // CanSeq2 reports whether a Value with this type can be iterated over
   // using Value.Seq2.
   CanSeq2(): boolean
+}
+
+// typeMethodsSeq returns an iterator over the methods of the method set of
+// t, as Type.Methods does.
+function typeMethodsSeq(t: Type): iter.Seq<Method> {
+  return async (_yield: ((m: Method) => iter.YieldResult) | null) => {
+    for (let i = 0; i < t.NumMethod(); i++) {
+      if (!(await _yield!(t.Method(i)))) {
+        return
+      }
+    }
+  }
+}
+
+// typeFieldsSeq returns an iterator over the fields of the struct type t, as
+// Type.Fields does.
+function typeFieldsSeq(t: Type): iter.Seq<StructField> {
+  if (t.Kind() !== Struct) {
+    throw new Error('reflect: Fields of non-struct type ' + t.String())
+  }
+  return async (_yield: ((f: StructField) => iter.YieldResult) | null) => {
+    for (let i = 0; i < t.NumField(); i++) {
+      if (!(await _yield!(t.Field(i)))) {
+        return
+      }
+    }
+  }
+}
+
+// typeInsSeq returns an iterator over the input types of the function type
+// t, as Type.Ins does.
+function typeInsSeq(t: Type): iter.Seq<Type> {
+  if (t.Kind() !== Func) {
+    throw new Error('reflect: Ins of non-func type ' + t.String())
+  }
+  return async (_yield: ((in_: Type) => iter.YieldResult) | null) => {
+    for (let i = 0; i < t.NumIn(); i++) {
+      if (!(await _yield!(t.In(i)))) {
+        return
+      }
+    }
+  }
+}
+
+// typeOutsSeq returns an iterator over the output types of the function
+// type t, as Type.Outs does.
+function typeOutsSeq(t: Type): iter.Seq<Type> {
+  if (t.Kind() !== Func) {
+    throw new Error('reflect: Outs of non-func type ' + t.String())
+  }
+  return async (_yield: ((out: Type) => iter.YieldResult) | null) => {
+    for (let i = 0; i < t.NumOut(); i++) {
+      if (!(await _yield!(t.Out(i)))) {
+        return
+      }
+    }
+  }
 }
 
 // nonChanTypePanic panics for ChanDir on a type that is not a channel.
@@ -717,6 +789,18 @@ class InvalidTypeClass implements Type {
   }
   OverflowFloat(_x: number): boolean {
     throw new Error('reflect: OverflowFloat of invalid type')
+  }
+  Methods(): iter.Seq<Method> {
+    return typeMethodsSeq(this)
+  }
+  Fields(): iter.Seq<StructField> {
+    return typeFieldsSeq(this)
+  }
+  Ins(): iter.Seq<Type> {
+    return typeInsSeq(this)
+  }
+  Outs(): iter.Seq<Type> {
+    return typeOutsSeq(this)
   }
   NumMethod(): number {
     return 0
@@ -2594,6 +2678,22 @@ export class BasicType implements Type {
     )
   }
 
+  public Methods(): iter.Seq<Method> {
+    return typeMethodsSeq(this)
+  }
+
+  public Fields(): iter.Seq<StructField> {
+    return typeFieldsSeq(this)
+  }
+
+  public Ins(): iter.Seq<Type> {
+    return typeInsSeq(this)
+  }
+
+  public Outs(): iter.Seq<Type> {
+    return typeOutsSeq(this)
+  }
+
   public NumMethod(): number {
     return typeMethods(this).length
   }
@@ -2783,6 +2883,22 @@ class SliceType implements Type {
     throw new Error('reflect: call of reflect.Type.OverflowFloat on slice Type')
   }
 
+  public Methods(): iter.Seq<Method> {
+    return typeMethodsSeq(this)
+  }
+
+  public Fields(): iter.Seq<StructField> {
+    return typeFieldsSeq(this)
+  }
+
+  public Ins(): iter.Seq<Type> {
+    return typeInsSeq(this)
+  }
+
+  public Outs(): iter.Seq<Type> {
+    return typeOutsSeq(this)
+  }
+
   public NumMethod(): number {
     return typeMethods(this).length
   }
@@ -2940,6 +3056,22 @@ class ArrayType implements Type {
     throw new Error('reflect: call of reflect.Type.OverflowFloat on array Type')
   }
 
+  public Methods(): iter.Seq<Method> {
+    return typeMethodsSeq(this)
+  }
+
+  public Fields(): iter.Seq<StructField> {
+    return typeFieldsSeq(this)
+  }
+
+  public Ins(): iter.Seq<Type> {
+    return typeInsSeq(this)
+  }
+
+  public Outs(): iter.Seq<Type> {
+    return typeOutsSeq(this)
+  }
+
   public NumMethod(): number {
     return typeMethods(this).length
   }
@@ -3089,6 +3221,22 @@ class PointerType implements Type {
     throw new Error(
       'reflect: call of reflect.Type.OverflowFloat on pointer Type',
     )
+  }
+
+  public Methods(): iter.Seq<Method> {
+    return typeMethodsSeq(this)
+  }
+
+  public Fields(): iter.Seq<StructField> {
+    return typeFieldsSeq(this)
+  }
+
+  public Ins(): iter.Seq<Type> {
+    return typeInsSeq(this)
+  }
+
+  public Outs(): iter.Seq<Type> {
+    return typeOutsSeq(this)
   }
 
   public NumMethod(): number {
@@ -3298,6 +3446,22 @@ class FunctionType implements Type {
 
   public OverflowFloat(_x: number): boolean {
     throw new Error('reflect: call of reflect.Type.OverflowFloat on func Type')
+  }
+
+  public Methods(): iter.Seq<Method> {
+    return typeMethodsSeq(this)
+  }
+
+  public Fields(): iter.Seq<StructField> {
+    return typeFieldsSeq(this)
+  }
+
+  public Ins(): iter.Seq<Type> {
+    return typeInsSeq(this)
+  }
+
+  public Outs(): iter.Seq<Type> {
+    return typeOutsSeq(this)
   }
 
   public NumMethod(): number {
@@ -3820,6 +3984,22 @@ class MapType implements Type {
 
   public OverflowFloat(_x: number): boolean {
     throw new Error('reflect: call of reflect.Type.OverflowFloat on map Type')
+  }
+
+  public Methods(): iter.Seq<Method> {
+    return typeMethodsSeq(this)
+  }
+
+  public Fields(): iter.Seq<StructField> {
+    return typeFieldsSeq(this)
+  }
+
+  public Ins(): iter.Seq<Type> {
+    return typeInsSeq(this)
+  }
+
+  public Outs(): iter.Seq<Type> {
+    return typeOutsSeq(this)
   }
 
   public NumMethod(): number {
@@ -4690,6 +4870,22 @@ class StructType implements Type {
     )
   }
 
+  public Methods(): iter.Seq<Method> {
+    return typeMethodsSeq(this)
+  }
+
+  public Fields(): iter.Seq<StructField> {
+    return typeFieldsSeq(this)
+  }
+
+  public Ins(): iter.Seq<Type> {
+    return typeInsSeq(this)
+  }
+
+  public Outs(): iter.Seq<Type> {
+    return typeOutsSeq(this)
+  }
+
   public NumMethod(): number {
     return typeMethods(this).length
   }
@@ -5024,6 +5220,22 @@ class ChannelType implements Type {
     throw new Error('reflect: call of reflect.Type.OverflowFloat on chan Type')
   }
 
+  public Methods(): iter.Seq<Method> {
+    return typeMethodsSeq(this)
+  }
+
+  public Fields(): iter.Seq<StructField> {
+    return typeFieldsSeq(this)
+  }
+
+  public Ins(): iter.Seq<Type> {
+    return typeInsSeq(this)
+  }
+
+  public Outs(): iter.Seq<Type> {
+    return typeOutsSeq(this)
+  }
+
   public NumMethod(): number {
     return 0
   }
@@ -5183,6 +5395,22 @@ class InterfaceType implements Type {
     throw new Error(
       'reflect: call of reflect.Type.OverflowFloat on interface Type',
     )
+  }
+
+  public Methods(): iter.Seq<Method> {
+    return typeMethodsSeq(this)
+  }
+
+  public Fields(): iter.Seq<StructField> {
+    return typeFieldsSeq(this)
+  }
+
+  public Ins(): iter.Seq<Type> {
+    return typeInsSeq(this)
+  }
+
+  public Outs(): iter.Seq<Type> {
+    return typeOutsSeq(this)
   }
 
   public NumMethod(): number {

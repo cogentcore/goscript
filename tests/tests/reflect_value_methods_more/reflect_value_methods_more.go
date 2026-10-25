@@ -1,6 +1,9 @@
 package main
 
-import "reflect"
+import (
+	"reflect"
+	"strings"
+)
 
 type pair struct {
 	A int
@@ -36,6 +39,22 @@ func main() {
 	}
 	for meth, v := range reflect.ValueOf(p).Methods() {
 		println("method:", meth.Name, v.Call(nil)[0].Int())
+	}
+
+	// The Type iterators yield fields, methods, and function inputs and outputs.
+	pt := reflect.TypeOf(p)
+	for sf := range pt.Fields() {
+		println("type field:", sf.Name, sf.Type.String())
+	}
+	for meth := range pt.Methods() {
+		println("type method:", meth.Name, meth.Type.String())
+	}
+	ft := reflect.TypeOf(strings.Repeat)
+	for in := range ft.Ins() {
+		println("in:", in.String())
+	}
+	for out := range ft.Outs() {
+		println("out:", out.String())
 	}
 
 	// SetIterKey and SetIterValue copy the current map entry.
