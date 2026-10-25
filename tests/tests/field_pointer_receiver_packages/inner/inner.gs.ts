@@ -13,7 +13,7 @@ export class Base {
 	constructor(__goscriptValue?: boolean, Self$?: Base | $.VarRef<Base> | null, N$?: number) {
 		this.Self = Self$ ?? (null! as Base | $.VarRef<Base> | null)
 		this.N = N$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Base {
@@ -47,7 +47,7 @@ export class base {
 
 	constructor(__goscriptValue?: boolean, self$?: base | $.VarRef<base> | null) {
 		this.self = self$ ?? (null! as base | $.VarRef<base> | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): base {
@@ -83,7 +83,7 @@ export class Mid {
 	constructor(__goscriptValue?: boolean, Base$?: Base, base$?: base) {
 		this.Base = Base$ ?? new Base(true)
 		this.base = base$ ?? new base(true)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Mid {

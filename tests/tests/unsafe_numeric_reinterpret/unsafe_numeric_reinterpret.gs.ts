@@ -45,7 +45,7 @@ export async function main(): globalThis.Promise<void> {
 
 		constructor(init?: Partial<{f?: number}>, __goscriptValue?: boolean) {
 			this.f = init?.f ?? (0 as number)
-			;(this as any)[$.structValueMarker] = __goscriptValue === true
+			;(this as any).__goStructValue = __goscriptValue === true
 		}
 
 		public clone(): pair {

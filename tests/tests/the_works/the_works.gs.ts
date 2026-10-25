@@ -35,7 +35,7 @@ export class Instr {
 	constructor(__goscriptValue?: boolean, Op$?: Op, Arg$?: bigint) {
 		this.Op = Op$ ?? 0
 		this.Arg = Arg$ ?? 0n
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Instr {
@@ -65,7 +65,7 @@ export class Program {
 	constructor(__goscriptValue?: boolean, Name$?: string, Code$?: $.Slice<Instr>) {
 		this.Name = Name$ ?? ""
 		this.Code = Code$ ?? (null! as $.Slice<Instr>)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Program {
@@ -104,7 +104,7 @@ export class Stack {
 
 	constructor(__goscriptValue?: boolean, items$?: $.Slice<any>) {
 		this.items = items$ ?? (null! as $.Slice<any>)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Stack {
@@ -153,7 +153,7 @@ export class VM {
 		this.pc = pc$ ?? 0
 		this.steps = steps$ ?? 0
 		this.stack = stack$ ?? $.genericInstance(new Stack(true), __goscriptStatic1)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): VM {
@@ -260,7 +260,7 @@ export class Answer {
 		this.Name = Name$ ?? ""
 		this.Value = Value$ ?? 0n
 		this.Steps = Steps$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Answer {
@@ -296,7 +296,7 @@ export class Fault {
 	constructor(__goscriptValue?: boolean, Name$?: string, Reason$?: string) {
 		this.Name = Name$ ?? ""
 		this.Reason = Reason$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Fault {

@@ -18,7 +18,7 @@ export class listProvider {
 
 	constructor(__goscriptValue?: boolean, items$?: $.Slice<Group | $.VarRef<Group> | null>) {
 		this.items = items$ ?? (null! as $.Slice<Group | $.VarRef<Group> | null>)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): listProvider {
@@ -52,7 +52,7 @@ export class Group {
 	constructor(__goscriptValue?: boolean, provider$?: provider | null, seen$?: boolean) {
 		this.provider = provider$ ?? (null! as provider | null)
 		this.seen = seen$ ?? false
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Group {

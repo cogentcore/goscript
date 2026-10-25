@@ -18,7 +18,7 @@ export class T {
 
 	constructor(__goscriptValue?: boolean, N$?: number) {
 		this.N = N$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): T {
@@ -58,7 +58,7 @@ export class Outer {
 	constructor(__goscriptValue?: boolean, T$?: T, X$?: number) {
 		this.T = T$ ?? new T(true)
 		this.X = X$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Outer {
@@ -96,7 +96,7 @@ export class Pair {
 	constructor(__goscriptValue?: boolean, A$?: T, B$?: T) {
 		this.A = A$ ?? new T(true)
 		this.B = B$ ?? new T(true)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Pair {

@@ -19,7 +19,7 @@ export class raw {
 
 	constructor(__goscriptValue?: boolean, Mutex$?: sync.Mutex) {
 		this.Mutex = Mutex$ ?? $.markAsStructValue(new sync.Mutex())
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): raw {
@@ -57,7 +57,7 @@ export class outer {
 
 	constructor(__goscriptValue?: boolean, raw$?: raw) {
 		this.raw = raw$ ?? new raw(true)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): outer {
@@ -95,7 +95,7 @@ export class rawRW {
 
 	constructor(__goscriptValue?: boolean, RWMutex$?: sync.RWMutex) {
 		this.RWMutex = RWMutex$ ?? $.markAsStructValue(new sync.RWMutex())
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): rawRW {
@@ -149,7 +149,7 @@ export class outerRW {
 
 	constructor(__goscriptValue?: boolean, rawRW$?: rawRW) {
 		this.rawRW = rawRW$ ?? new rawRW(true)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): outerRW {
@@ -203,7 +203,7 @@ export class rawRunner {
 
 	constructor(__goscriptValue?: boolean, runner$?: runner | null) {
 		this.runner = runner$ ?? (null! as runner | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): rawRunner {
@@ -233,7 +233,7 @@ export class outerRunner {
 
 	constructor(__goscriptValue?: boolean, rawRunner$?: rawRunner) {
 		this.rawRunner = rawRunner$ ?? new rawRunner(true)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): outerRunner {
@@ -260,7 +260,7 @@ export class outerRunner {
 
 export class runnable {
 	constructor(__goscriptValue?: boolean) {
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): runnable {

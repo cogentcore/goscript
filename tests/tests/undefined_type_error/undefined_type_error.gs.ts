@@ -38,7 +38,7 @@ export class formatter {
 		this.zero = zero$ ?? false
 		this.plusV = plusV$ ?? false
 		this.sharpV = sharpV$ ?? false
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): formatter {
@@ -82,7 +82,7 @@ export class printer {
 		this.buf = buf$ ?? (null! as $.Slice<number>)
 		this.arg = arg$ ?? (null! as any)
 		this.fmt = fmt$ ?? new formatter(true)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): printer {

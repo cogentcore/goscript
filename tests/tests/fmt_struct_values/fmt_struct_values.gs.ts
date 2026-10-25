@@ -14,7 +14,7 @@ export class Inner {
 
 	constructor(__goscriptValue?: boolean, Ready$?: boolean) {
 		this.Ready = Ready$ ?? false
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Inner {
@@ -49,7 +49,7 @@ export class Record {
 		this.Count = Count$ ?? 0
 		this.name = name$ ?? ""
 		this.Inner = Inner$ ?? new Inner(true)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Record {
@@ -86,7 +86,7 @@ export class Pointers {
 		this.Value = Value$ ?? (null! as $.VarRef<number> | null)
 		this.Next = Next$ ?? (null! as Pointers | $.VarRef<Pointers> | null)
 		this.Dynamic = Dynamic$ ?? (null! as any)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Pointers {
@@ -120,7 +120,7 @@ export class Node {
 		this.Name = Name$ ?? ""
 		this.Parent = Parent$ ?? (null! as Node | $.VarRef<Node> | null)
 		this.Kids = Kids$ ?? (null! as $.Slice<Node | $.VarRef<Node> | null>)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Node {
@@ -151,7 +151,7 @@ export class Base {
 	constructor(__goscriptValue?: boolean, Windows$?: $.Slice<any>, Active$?: any) {
 		this.Windows = Windows$ ?? (null! as $.Slice<any>)
 		this.Active = Active$ ?? (null! as any)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Base {
@@ -181,7 +181,7 @@ export class App {
 	constructor(__goscriptValue?: boolean, Base$?: Base, Name$?: string) {
 		this.Base = Base$ ?? new Base(true, undefined, null! as Win | $.VarRef<Win> | null)
 		this.Name = Name$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): App {
@@ -211,7 +211,7 @@ export class Win {
 	constructor(__goscriptValue?: boolean, App$?: App | $.VarRef<App> | null, Title$?: string) {
 		this.App = App$ ?? (null! as App | $.VarRef<App> | null)
 		this.Title = Title$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Win {

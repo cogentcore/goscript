@@ -54,7 +54,7 @@ export class Action {
 	constructor(__goscriptValue?: boolean, Result$?: number, Filter$?: globalThis.Map<number, dep.Ref | null> | null) {
 		this.Result = Result$ ?? 0
 		this.Filter = Filter$ ?? (null! as globalThis.Map<number, dep.Ref | null> | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Action {

@@ -12,7 +12,7 @@ export class inner {
 	constructor(__goscriptValue?: boolean, A$?: number, B$?: string) {
 		this.A = A$ ?? 0
 		this.B = B$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): inner {
@@ -45,7 +45,7 @@ export class outer {
 		this.X = X$ ?? 0
 		this.In = In$ ?? new inner(true)
 		this.P = P$ ?? (null! as inner | $.VarRef<inner> | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): outer {

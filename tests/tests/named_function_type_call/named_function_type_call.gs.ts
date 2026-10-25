@@ -52,7 +52,7 @@ export class MockFileInfo {
 		this.name = name$ ?? ""
 		this.size = size$ ?? 0n
 		this.isDir = isDir$ ?? false
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): MockFileInfo {
@@ -92,7 +92,7 @@ export class MockFileInfo {
 
 export class MockFilesystem {
 	constructor(__goscriptValue?: boolean) {
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): MockFilesystem {
@@ -122,7 +122,7 @@ export class shapeNode {
 
 	constructor(__goscriptValue?: boolean, value$?: number) {
 		this.value = value$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): shapeNode {
@@ -153,7 +153,7 @@ export class MorphismHolder {
 
 	constructor(__goscriptValue?: boolean, morphism$?: ((_p0: Shape | null) => Shape | null | globalThis.Promise<Shape | null>) | null) {
 		this.morphism = morphism$ ?? (null! as ((_p0: Shape | null) => Shape | null | globalThis.Promise<Shape | null>) | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): MorphismHolder {
@@ -189,7 +189,7 @@ export class morphismWorker {
 
 	constructor(__goscriptValue?: boolean, ready$?: $.Channel<boolean> | null) {
 		this.ready = ready$ ?? (null! as $.Channel<boolean> | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): morphismWorker {

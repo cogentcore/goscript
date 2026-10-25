@@ -11,7 +11,7 @@ export class CoreStore {
 
 	constructor(__goscriptValue?: boolean, Prefix$?: string) {
 		this.Prefix = Prefix$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): CoreStore {

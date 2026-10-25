@@ -32,7 +32,7 @@ export class Payload {
 		this.IfaceEmptyMap = IfaceEmptyMap$ ?? (null! as any)
 		this.PtrNilIface = PtrNilIface$ ?? (null! as $.VarRef<any> | null)
 		this.PtrBool = PtrBool$ ?? (null! as $.VarRef<boolean> | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Payload {

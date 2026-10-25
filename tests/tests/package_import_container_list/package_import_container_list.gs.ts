@@ -11,7 +11,7 @@ export class pooledElement {
 
 	constructor(__goscriptValue?: boolean, Value$?: any) {
 		this.Value = Value$ ?? (null! as any)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): pooledElement {

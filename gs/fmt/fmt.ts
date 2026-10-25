@@ -629,7 +629,7 @@ function defaultFormatMaybe(
       const fields: $.StructFieldInfo[] =
         info?.kind === $.TypeKind.Struct ?
           info.fields
-        : Object.keys(value).map((name) => ({
+        : $.ownKeys(value).map((name) => ({
             name,
             key: name,
             type: $.basicType('unknown'),
@@ -685,15 +685,15 @@ function defaultFormatMaybe(
       (value as any).constructor?.name &&
       (value as any).constructor.name !== 'Object'
     ) {
-      const parts = Object.entries(value as Record<string, any>).map(
-        ([k, v]) => {
+      const parts = $.ownKeys(value)
+        .map((key) => [key, value[key]] as const)
+        .map(([k, v]) => {
           const formatted = defaultFormatMaybe(v, flags, depth + 1)
           if (isPromiseLike(formatted)) {
             return formatted.then((resolved) => `${k}:${resolved}`)
           }
           return `${k}:${formatted}`
-        },
-      )
+        })
       return joinMaybe(parts, ' ', '{', '}')
     }
     try {

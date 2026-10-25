@@ -34,7 +34,7 @@ export class Hooked {
 	constructor(__goscriptValue?: boolean, Calls$?: number, Seen$?: string) {
 		this.Calls = Calls$ ?? 0
 		this.Seen = Seen$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Hooked {
@@ -69,7 +69,7 @@ export class Box {
 
 	constructor(__goscriptValue?: boolean, Value$?: Hooked | $.VarRef<Hooked> | null) {
 		this.Value = Value$ ?? (null! as Hooked | $.VarRef<Hooked> | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Box {
@@ -98,7 +98,7 @@ export class MapItem {
 	constructor(__goscriptValue?: boolean, Name$?: string, Map$?: globalThis.Map<string, number> | null) {
 		this.Name = Name$ ?? ""
 		this.Map = Map$ ?? (null! as globalThis.Map<string, number> | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): MapItem {

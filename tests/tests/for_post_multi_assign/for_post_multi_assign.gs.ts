@@ -8,7 +8,7 @@ export class frame {
 
 	constructor(__goscriptValue?: boolean, name$?: string) {
 		this.name = name$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): frame {
@@ -34,7 +34,7 @@ export class iterator {
 
 	constructor(__goscriptValue?: boolean, idx$?: number) {
 		this.idx = idx$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): iterator {

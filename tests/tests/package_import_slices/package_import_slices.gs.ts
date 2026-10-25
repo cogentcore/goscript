@@ -62,7 +62,7 @@ export async function main(): globalThis.Promise<void> {
 		constructor(init?: Partial<{group?: number, label?: string}>, __goscriptValue?: boolean) {
 			this.group = init?.group ?? (0 as number)
 			this.label = init?.label ?? ("" as string)
-			;(this as any)[$.structValueMarker] = __goscriptValue === true
+			;(this as any).__goStructValue = __goscriptValue === true
 		}
 
 		public clone(): item {
@@ -160,7 +160,7 @@ export async function main(): globalThis.Promise<void> {
 
 		constructor(init?: Partial<{n?: number}>, __goscriptValue?: boolean) {
 			this.n = init?.n ?? (0 as number)
-			;(this as any)[$.structValueMarker] = __goscriptValue === true
+			;(this as any).__goStructValue = __goscriptValue === true
 		}
 
 		public clone(): cell {

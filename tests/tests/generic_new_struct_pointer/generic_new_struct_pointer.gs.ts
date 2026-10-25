@@ -22,7 +22,7 @@ export class Base {
 	constructor(__goscriptValue?: boolean, name$?: string, inits$?: number) {
 		this.name = name$ ?? ""
 		this.inits = inits$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Base {
@@ -62,7 +62,7 @@ export class Widget {
 	constructor(__goscriptValue?: boolean, Base$?: Base, Text$?: string) {
 		this.Base = Base$ ?? new Base(true)
 		this.Text = Text$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Widget {

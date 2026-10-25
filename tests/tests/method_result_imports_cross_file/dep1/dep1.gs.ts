@@ -9,7 +9,7 @@ $.registerTypePackagePath("github.com/s4wave/goscript/tests/tests/method_result_
 
 export class maker {
 	constructor(__goscriptValue?: boolean) {
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): maker {

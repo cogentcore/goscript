@@ -10,7 +10,7 @@ export class asyncReader {
 
 	constructor(__goscriptValue?: boolean, ch$?: $.Channel<number> | null) {
 		this.ch = ch$ ?? (null! as $.Channel<number> | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): asyncReader {

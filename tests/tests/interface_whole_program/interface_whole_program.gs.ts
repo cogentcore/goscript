@@ -85,7 +85,7 @@ export class Rect {
 	constructor(__goscriptValue?: boolean, w$?: number, h$?: number) {
 		this.w = w$ ?? 0
 		this.h = h$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Rect {
@@ -117,7 +117,7 @@ export class Square {
 
 	constructor(__goscriptValue?: boolean, side$?: number) {
 		this.side = side$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Square {
@@ -149,7 +149,7 @@ export class Counter {
 
 	constructor(__goscriptValue?: boolean, n$?: number) {
 		this.n = n$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Counter {
@@ -182,7 +182,7 @@ export class ChanSource {
 
 	constructor(__goscriptValue?: boolean, ch$?: $.Channel<number> | null) {
 		this.ch = ch$ ?? (null! as $.Channel<number> | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): ChanSource {
@@ -215,7 +215,7 @@ export class chanValuer {
 
 	constructor(__goscriptValue?: boolean, ch$?: $.Channel<number> | null) {
 		this.ch = ch$ ?? (null! as $.Channel<number> | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): chanValuer {
@@ -247,7 +247,7 @@ export class plusOne {
 
 	constructor(__goscriptValue?: boolean, _in$?: Valuer | null) {
 		this._in = _in$ ?? (null! as Valuer | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): plusOne {
@@ -278,7 +278,7 @@ export class prefixNamer {
 
 	constructor(__goscriptValue?: boolean, labeler$?: Labeler | null) {
 		this.labeler = labeler$ ?? (null! as Labeler | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): prefixNamer {

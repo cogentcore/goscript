@@ -13,7 +13,7 @@ export class Type {
 	constructor(__goscriptValue?: boolean, Name$?: string, Fields$?: $.Slice<__goscript_field.Field>) {
 		this.Name = Name$ ?? ""
 		this.Fields = Fields$ ?? (null! as $.Slice<__goscript_field.Field>)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Type {

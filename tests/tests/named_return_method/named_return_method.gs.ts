@@ -8,7 +8,7 @@ export class content {
 
 	constructor(__goscriptValue?: boolean, bytes$?: $.Slice<number>) {
 		this.bytes = bytes$ ?? (null! as $.Slice<number>)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): content {

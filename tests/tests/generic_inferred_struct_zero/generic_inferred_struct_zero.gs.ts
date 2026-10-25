@@ -11,7 +11,7 @@ export class entry {
 	constructor(__goscriptValue?: boolean, key$?: $.Slice<number>, n$?: number) {
 		this.key = key$ ?? (null! as $.Slice<number>)
 		this.n = n$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): entry {
@@ -44,7 +44,7 @@ export class tree {
 		this.less = less$ ?? (null! as ((a: any, b: any) => boolean | globalThis.Promise<boolean>) | null)
 		this.empty = empty$ ?? (null! as any)
 		this.count = count$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): tree {

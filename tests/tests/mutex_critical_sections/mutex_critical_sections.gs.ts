@@ -12,7 +12,7 @@ export class counter {
 	constructor(__goscriptValue?: boolean, mu$?: sync.Mutex, n$?: number) {
 		this.mu = mu$ ?? $.markAsStructValue(new sync.Mutex())
 		this.n = n$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): counter {
@@ -63,7 +63,7 @@ export class queue {
 		this.mu = mu$ ?? $.markAsStructValue(new sync.Mutex())
 		this.items = items$ ?? (null! as $.Slice<number>)
 		this.ready = ready$ ?? (null! as $.Channel<number> | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): queue {
@@ -113,7 +113,7 @@ export class shared {
 	constructor(__goscriptValue?: boolean, mu$?: sync.Mutex, n$?: number) {
 		this.mu = mu$ ?? $.markAsStructValue(new sync.Mutex())
 		this.n = n$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): shared {
@@ -157,7 +157,7 @@ export class gate {
 		this.started = started$ ?? (null! as $.Channel<number> | null)
 		this.wake = wake$ ?? (null! as $.Channel<number> | null)
 		this.log = log$ ?? (null! as $.Slice<string>)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): gate {
@@ -215,7 +215,7 @@ export class relay {
 		this.started = started$ ?? (null! as $.Channel<number> | null)
 		this.wake = wake$ ?? (null! as $.Channel<number> | null)
 		this.log = log$ ?? (null! as $.Slice<string>)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): relay {

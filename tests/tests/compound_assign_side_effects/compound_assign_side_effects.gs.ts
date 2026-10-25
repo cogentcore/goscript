@@ -33,7 +33,7 @@ export class point {
 		this.I64 = I64$ ?? 0n
 		this.U32 = U32$ ?? 0
 		this.F32 = F32$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): point {
@@ -64,7 +64,7 @@ export class chanCounter {
 
 	constructor(__goscriptValue?: boolean, ch$?: $.Channel<number> | null) {
 		this.ch = ch$ ?? (null! as $.Channel<number> | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): chanCounter {

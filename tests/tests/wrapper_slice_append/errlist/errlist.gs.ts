@@ -20,7 +20,7 @@ export class AStruct {
 
 	constructor(__goscriptValue?: boolean, Msg$?: string) {
 		this.Msg = Msg$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): AStruct {

@@ -15,7 +15,7 @@ export class Person {
 		this.Name = Name$ ?? ""
 		this.Age = Age$ ?? 0
 		this.Active = Active$ ?? false
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Person {

@@ -12,7 +12,7 @@ export class Inner {
 	constructor(__goscriptValue?: boolean, Name$?: string, N$?: number) {
 		this.Name = Name$ ?? ""
 		this.N = N$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Inner {
@@ -57,7 +57,7 @@ export class Outer {
 		this.PM = PM$ ?? (null! as globalThis.Map<string, Inner | $.VarRef<Inner> | null> | null)
 		this.In = In$ ?? new Inner(true)
 		this.Ptrs = Ptrs$ ?? (null! as $.Slice<$.VarRef<number> | null>)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Outer {
@@ -152,7 +152,7 @@ export async function main(): globalThis.Promise<void> {
 		constructor(init?: Partial<{A?: any, B?: any}>, __goscriptValue?: boolean) {
 			this.A = init?.A ?? (null! as any)
 			this.B = init?.B ?? (null! as any)
-			;(this as any)[$.structValueMarker] = __goscriptValue === true
+			;(this as any).__goStructValue = __goscriptValue === true
 		}
 
 		public clone(): Holder {

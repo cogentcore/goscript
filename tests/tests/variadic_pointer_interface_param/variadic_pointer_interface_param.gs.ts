@@ -18,7 +18,7 @@ export class lit {
 
 	constructor(__goscriptValue?: boolean, n$?: number) {
 		this.n = n$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): lit {

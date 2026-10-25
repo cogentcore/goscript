@@ -10,7 +10,7 @@ export class Setting {
 
 	constructor(__goscriptValue?: boolean, once$?: sync.Once) {
 		this.once = once$ ?? $.markAsStructValue(new sync.Once())
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Setting {

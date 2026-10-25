@@ -28,7 +28,7 @@ export class Meta {
 
 	constructor(__goscriptValue?: boolean, name$?: string) {
 		this.name = name$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Meta {
@@ -59,7 +59,7 @@ export class Inner {
 
 	constructor(__goscriptValue?: boolean, v$?: any) {
 		this.v = v$ ?? (null! as any)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Inner {
@@ -96,7 +96,7 @@ export class Outer {
 		this.Meta = Meta$ ?? new Meta(true)
 		this.Inner = Inner$ ?? (null! as Inner | $.VarRef<Inner> | null)
 		this.v = v$ ?? (null! as any)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Outer {

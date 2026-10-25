@@ -11,7 +11,7 @@ export class file {
 	constructor(__goscriptValue?: boolean, name$?: string, data$?: $.Slice<number>) {
 		this.name = name$ ?? ""
 		this.data = data$ ?? (null! as $.Slice<number>)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): file {
@@ -41,7 +41,7 @@ export class storage {
 	constructor(__goscriptValue?: boolean, files$?: globalThis.Map<string, file | $.VarRef<file> | null> | null, children$?: globalThis.Map<string, globalThis.Map<string, file | $.VarRef<file> | null> | null> | null) {
 		this.files = files$ ?? (null! as globalThis.Map<string, file | $.VarRef<file> | null> | null)
 		this.children = children$ ?? (null! as globalThis.Map<string, globalThis.Map<string, file | $.VarRef<file> | null> | null> | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): storage {

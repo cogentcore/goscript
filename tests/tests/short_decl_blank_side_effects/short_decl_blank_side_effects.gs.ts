@@ -8,7 +8,7 @@ export class cursor {
 
 	constructor(__goscriptValue?: boolean, pos$?: number) {
 		this.pos = pos$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): cursor {

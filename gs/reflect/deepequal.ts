@@ -49,7 +49,12 @@
 // values that have been compared before, it treats the values as
 // equal rather than examining the values to which they point.
 // This ensures that DeepEqual terminates.
-import { isNamedValueBox, isStructObject, isVarRef } from '../builtin/index.js'
+import {
+  isNamedValueBox,
+  isStructObject,
+  isVarRef,
+  ownKeys,
+} from '../builtin/index.js'
 import { ReflectValue } from './types.js'
 
 export function DeepEqual(
@@ -163,8 +168,8 @@ export function DeepEqual(
       return false
     }
 
-    const keysX = Object.keys(x)
-    const keysY = Object.keys(y)
+    const keysX = ownKeys(x)
+    const keysY = ownKeys(y)
     if (keysX.length !== keysY.length) {
       return false
     }

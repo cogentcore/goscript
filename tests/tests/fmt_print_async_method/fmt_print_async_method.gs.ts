@@ -9,7 +9,7 @@ export class slowName {
 
 	constructor(__goscriptValue?: boolean, ch$?: $.Channel<string> | null) {
 		this.ch = ch$ ?? (null! as $.Channel<string> | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): slowName {
@@ -44,7 +44,7 @@ export class point {
 	constructor(__goscriptValue?: boolean, x$?: number, y$?: number) {
 		this.x = x$ ?? 0
 		this.y = y$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): point {

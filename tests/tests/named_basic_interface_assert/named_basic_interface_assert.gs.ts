@@ -184,7 +184,7 @@ export async function main(): globalThis.Promise<void> {
 		constructor(init?: Partial<{N?: Name, Is?: $.Slice<MyInt>}>, __goscriptValue?: boolean) {
 			this.N = init?.N ?? ("" as Name)
 			this.Is = init?.Is ?? (null! as $.Slice<MyInt>)
-			;(this as any)[$.structValueMarker] = __goscriptValue === true
+			;(this as any).__goStructValue = __goscriptValue === true
 		}
 
 		public clone(): holder {

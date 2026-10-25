@@ -1,5 +1,5 @@
 import { asArray, isSliceProxy, type Slice } from './slice.js'
-import { isStructObject } from './type.js'
+import { isStructObject, ownKeys } from './type.js'
 import { isVarRef } from './varRef.js'
 
 // A transpiled Go Error(), String(), or GoString() method may be async, so
@@ -210,7 +210,7 @@ function formatObject(
 function getObjectEntries(value: Record<string, any>): [string, any][] {
   // The fields of a struct are its own properties, functions included.
   if (isStructObject(value)) {
-    return Object.entries(value)
+    return ownKeys(value).map((key) => [key, value[key]])
   }
 
   return Object.entries(value).filter(

@@ -11,7 +11,7 @@ export class holder {
 	constructor(__goscriptValue?: boolean, values$?: globalThis.Map<string, number> | null, items$?: $.Slice<item>) {
 		this.values = values$ ?? (null! as globalThis.Map<string, number> | null)
 		this.items = items$ ?? (null! as $.Slice<item>)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): holder {
@@ -38,7 +38,7 @@ export class item {
 
 	constructor(__goscriptValue?: boolean, value$?: number) {
 		this.value = value$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): item {

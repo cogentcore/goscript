@@ -11,7 +11,7 @@ export class MyStruct {
 	constructor(__goscriptValue?: boolean, MyInt$?: number, MyString$?: string) {
 		this.MyInt = MyInt$ ?? 0
 		this.MyString = MyString$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): MyStruct {
@@ -43,7 +43,7 @@ export class setterStruct {
 
 	constructor(__goscriptValue?: boolean, value$?: number) {
 		this.value = value$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): setterStruct {
@@ -79,7 +79,7 @@ export class digest {
 
 	constructor(__goscriptValue?: boolean, writes$?: number) {
 		this.writes = writes$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): digest {

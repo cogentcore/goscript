@@ -21,7 +21,7 @@ export class Vec {
 	constructor(__goscriptValue?: boolean, X$?: number, Y$?: number) {
 		this.X = X$ ?? 0
 		this.Y = Y$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Vec {
@@ -59,7 +59,7 @@ export class Named {
 		this.Name = Name$ ?? ""
 		this.Tags = Tags$ ?? (null! as $.Slice<string>)
 		this.Next = Next$ ?? (null! as Named | $.VarRef<Named> | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Named {
@@ -90,7 +90,7 @@ export class Outer {
 	constructor(__goscriptValue?: boolean, In$?: Vec, N$?: number) {
 		this.In = In$ ?? new Vec(true)
 		this.N = N$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Outer {
@@ -120,7 +120,7 @@ export class Celsius {
 	constructor(__goscriptValue?: boolean, X$?: number, Y$?: number) {
 		this.X = X$ ?? 0
 		this.Y = Y$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Celsius {

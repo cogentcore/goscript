@@ -8,7 +8,7 @@ export class inner {
 
 	constructor(__goscriptValue?: boolean, value$?: number) {
 		this.value = value$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): inner {
@@ -34,7 +34,7 @@ export class outer {
 
 	constructor(__goscriptValue?: boolean, inner$?: inner) {
 		this.inner = inner$ ?? new inner(true)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): outer {
@@ -66,7 +66,7 @@ export class pair {
 		this.first = first$ ?? new inner(true)
 		this.second = second$ ?? 0
 		this.third = third$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): pair {

@@ -15,7 +15,7 @@ export class localSliceHeader {
 	constructor(__goscriptValue?: boolean, s$?: string, cap$?: number) {
 		this.s = s$ ?? ""
 		this.cap = cap$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): localSliceHeader {

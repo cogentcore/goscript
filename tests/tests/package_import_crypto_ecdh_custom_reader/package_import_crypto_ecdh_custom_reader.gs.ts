@@ -19,7 +19,7 @@ export class segmentedReader {
 		this.data = data$ ?? (null! as $.Slice<number>)
 		this.offset = offset$ ?? 0
 		this.step = step$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): segmentedReader {
@@ -56,7 +56,7 @@ export class segmentedReader {
 
 export class failingReader {
 	constructor(__goscriptValue?: boolean) {
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): failingReader {

@@ -9,7 +9,7 @@ export class parser {
 
 	constructor(__goscriptValue?: boolean, errors$?: errlist.ErrorList) {
 		this.errors = errors$ ?? (null! as errlist.ErrorList)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): parser {

@@ -24,7 +24,7 @@ export class Base {
 	constructor(__goscriptValue?: boolean, App$?: any, flags$?: Flags) {
 		this.App = App$ ?? (null! as any)
 		this.flags = flags$ ?? 0n
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Base {
@@ -62,7 +62,7 @@ export class App {
 
 	constructor(__goscriptValue?: boolean, Name$?: string) {
 		this.Name = Name$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): App {
@@ -91,7 +91,7 @@ export class Window {
 	constructor(__goscriptValue?: boolean, Base$?: Base, Title$?: string) {
 		this.Base = Base$ ?? $.genericInstance(new Base(true, null! as App | $.VarRef<App> | null), __goscriptStatic1)
 		this.Title = Title$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Window {
@@ -129,7 +129,7 @@ export class Single {
 	constructor(__goscriptValue?: boolean, Base$?: Base, Count$?: number) {
 		this.Base = Base$ ?? $.genericInstance(new Base(true, null), () => [{Is: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Is({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, A: { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }}, ...$.stripGenericTypeArgs(args)), Set: (receiver: any, ...args: any[]) => $.pointerValue(receiver).Set({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, A: { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }}, ...$.stripGenericTypeArgs(args))}, [$.methodSignature("Is", [/* @__PURE__ */ $.basicType("int64", "main.Flags")], [/* @__PURE__ */ $.basicType("bool")], true, false), $.methodSignature("Set", [/* @__PURE__ */ $.basicType("int64", "main.Flags")], [], true, false)]])
 		this.Count = Count$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Single {

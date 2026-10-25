@@ -10,6 +10,7 @@ import type { Slice, SliceProxy, StringHeaderData } from './slice.js'
 import {
   arrayValueTypeInfo,
   cloneArrayValue,
+  ownKeys,
   isArrayValue,
   isMarkedAsStructValue,
   isTypeInfoComparable,
@@ -581,8 +582,8 @@ function fieldsEqual(
   a: Record<string, unknown>,
   b: Record<string, unknown>,
 ): boolean {
-  const aKeys = Object.keys(a)
-  const bKeys = Object.keys(b)
+  const aKeys = ownKeys(a)
+  const bKeys = ownKeys(b)
   if (aKeys.length !== bKeys.length) {
     return false
   }

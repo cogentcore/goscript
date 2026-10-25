@@ -15,7 +15,7 @@ export class stamped {
 	constructor(__goscriptValue?: boolean, Name$?: string, At$?: time.Time) {
 		this.Name = Name$ ?? ""
 		this.At = At$ ?? $.markAsStructValue(new time.Time())
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): stamped {

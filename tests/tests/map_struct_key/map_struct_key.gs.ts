@@ -14,7 +14,7 @@ export class requestKey {
 		this.soID = soID$ ?? ""
 		this.inviteID = inviteID$ ?? ""
 		this.peerID = peerID$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): requestKey {
@@ -45,7 +45,7 @@ export class node {
 	constructor(__goscriptValue?: boolean, value$?: string, next$?: node | $.VarRef<node> | null) {
 		this.value = value$ ?? ""
 		this.next = next$ ?? (null! as node | $.VarRef<node> | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): node {

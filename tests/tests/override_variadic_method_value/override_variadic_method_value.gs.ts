@@ -9,7 +9,7 @@ export class recorder {
 
 	constructor(__goscriptValue?: boolean, obj$?: js.Value) {
 		this.obj = obj$ ?? $.markAsStructValue(new js.Value())
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): recorder {

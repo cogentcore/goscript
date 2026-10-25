@@ -14,7 +14,7 @@ export class inner {
 	constructor(__goscriptValue?: boolean, A$?: number, B$?: Uint8Array) {
 		this.A = A$ ?? 0
 		this.B = B$ ?? $.arrayValue(new Uint8Array(2))
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): inner {
@@ -50,7 +50,7 @@ export class vec4 {
 		this.Y = Y$ ?? 0
 		this.Z = Z$ ?? 0
 		this.W = W$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): vec4 {
@@ -91,7 +91,7 @@ export class item {
 		this.Index = Index$ ?? 0
 		this.Flags = Flags$ ?? 0
 		this._blank4 = _blank4$ ?? $.arrayValue(globalThis.Array.from({ length: 2 }, () => 0), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 2))
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): item {
@@ -133,7 +133,7 @@ export class header {
 		this.Res = Res$ ?? $.arrayValue(globalThis.Array.from({ length: 2 }, () => 0))
 		this.In = In$ ?? new inner(true)
 		this.Width = Width$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): header {

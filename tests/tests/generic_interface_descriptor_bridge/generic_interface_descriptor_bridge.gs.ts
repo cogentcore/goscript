@@ -28,7 +28,7 @@ $.registerInterfaceType(
 
 export class genericBox {
 	constructor(__goscriptValue?: boolean) {
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): genericBox {
@@ -63,7 +63,7 @@ export class intBox {
 
 	constructor(__goscriptValue?: boolean, id$?: number) {
 		this.id = id$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): intBox {

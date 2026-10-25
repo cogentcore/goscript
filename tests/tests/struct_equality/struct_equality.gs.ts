@@ -13,7 +13,7 @@ export class ObjectID {
 	constructor(__goscriptValue?: boolean, hash$?: Uint8Array, format$?: number) {
 		this.hash = hash$ ?? $.arrayValue(new Uint8Array(4))
 		this.format = format$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): ObjectID {
@@ -53,7 +53,7 @@ export class S {
 	constructor(__goscriptValue?: boolean, A$?: string, B$?: number) {
 		this.A = A$ ?? ""
 		this.B = B$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): S {
@@ -83,7 +83,7 @@ export class Outer {
 	constructor(__goscriptValue?: boolean, In$?: S, N$?: number) {
 		this.In = In$ ?? new S(true)
 		this.N = N$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Outer {

@@ -3,6 +3,7 @@ import {
   canonicalPointerIdentity,
   isStructObject,
   isStructTypeInfo,
+  ownKeys,
   resolveTypeInfo,
   structFieldRuntimeKey,
   structValueMarker,
@@ -394,7 +395,7 @@ function structKeyPlan(key: object): StructKeyField[] {
 
   // The fields are sorted by name so equal keys give equal text.
   const kinds = structFieldKinds(key)
-  const plan = Object.keys(key)
+  const plan = ownKeys(key)
     .sort()
     .map((name) => ({ name, kind: kinds?.get(name) }))
 

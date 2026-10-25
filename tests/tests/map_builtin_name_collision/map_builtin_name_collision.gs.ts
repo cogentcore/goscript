@@ -8,7 +8,7 @@ export class Map {
 
 	constructor(__goscriptValue?: boolean, values$?: globalThis.Map<string, number> | null) {
 		this.values = values$ ?? (null! as globalThis.Map<string, number> | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Map {

@@ -30,7 +30,7 @@ export class Widget {
 	constructor(__goscriptValue?: boolean, Text$?: string, Lab$?: Label) {
 		this.Text = Text$ ?? ""
 		this.Lab = Lab$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Widget {
@@ -84,7 +84,7 @@ export class Inner {
 
 	constructor(__goscriptValue?: boolean, X$?: number) {
 		this.X = X$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Inner {
@@ -110,7 +110,7 @@ export class Outer {
 
 	constructor(__goscriptValue?: boolean, Inner$?: Inner | $.VarRef<Inner> | null) {
 		this.Inner = Inner$ ?? (null! as Inner | $.VarRef<Inner> | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Outer {

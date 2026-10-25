@@ -13,7 +13,7 @@ export class TestStruct {
 	constructor(__goscriptValue?: boolean, IntField$?: number, StringField$?: string) {
 		this.IntField = IntField$ ?? 0
 		this.StringField = StringField$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): TestStruct {

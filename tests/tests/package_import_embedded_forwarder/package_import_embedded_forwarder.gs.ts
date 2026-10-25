@@ -27,7 +27,7 @@ export class VerboseStore {
 	constructor(__goscriptValue?: boolean, BaseStore$?: dep.BaseStore | $.VarRef<dep.BaseStore> | null, name$?: string) {
 		this.BaseStore = BaseStore$ ?? (null! as dep.BaseStore | $.VarRef<dep.BaseStore> | null)
 		this.name = name$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): VerboseStore {

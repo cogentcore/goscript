@@ -15,7 +15,7 @@ export class MyStruct {
 		this.closed = closed$ ?? $.markAsStructValue(new atomic.Bool())
 		this.count = count$ ?? $.markAsStructValue(new atomic.Int32())
 		this.flag = flag$ ?? $.markAsStructValue(new atomic.Uint32())
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): MyStruct {

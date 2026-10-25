@@ -12,7 +12,7 @@ export class Value {
 	constructor(__goscriptValue?: boolean, Val$?: number, Unit$?: string) {
 		this.Val = Val$ ?? 0
 		this.Unit = Unit$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Value {
@@ -47,7 +47,7 @@ export class Sides {
 	constructor(__goscriptValue?: boolean, Top$?: any, Right$?: any) {
 		this.Top = Top$ ?? (null! as any)
 		this.Right = Right$ ?? (null! as any)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Sides {

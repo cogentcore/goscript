@@ -8,7 +8,7 @@ export class item {
 
 	constructor(__goscriptValue?: boolean, n$?: number) {
 		this.n = n$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): item {
@@ -54,7 +54,7 @@ export class list {
 	constructor(__goscriptValue?: boolean, n$?: number, next$?: list | $.VarRef<list> | null) {
 		this.n = n$ ?? 0
 		this.next = next$ ?? (null! as list | $.VarRef<list> | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): list {

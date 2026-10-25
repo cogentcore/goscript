@@ -8,7 +8,7 @@ export class Box {
 
 	constructor(init?: Partial<{Value?: number}>, __goscriptValue?: boolean) {
 		this.Value = init?.Value ?? (0 as number)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public __goscriptClone(): Box {

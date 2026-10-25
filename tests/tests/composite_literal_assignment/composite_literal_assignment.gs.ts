@@ -14,7 +14,7 @@ export class MyStruct {
 		this.MyInt = MyInt$ ?? 0
 		this.MyString = MyString$ ?? ""
 		this.myBool = myBool$ ?? false
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): MyStruct {

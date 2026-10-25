@@ -8,7 +8,7 @@ export class entry {
 
 	constructor(__goscriptValue?: boolean, key$?: string) {
 		this.key = key$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): entry {
@@ -34,7 +34,7 @@ export class _object {
 
 	constructor(__goscriptValue?: boolean, entries$?: $.Slice<entry>) {
 		this.entries = entries$ ?? (null! as $.Slice<entry>)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): _object {

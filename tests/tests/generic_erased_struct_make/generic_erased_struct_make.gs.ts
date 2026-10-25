@@ -8,7 +8,7 @@ export class queue {
 
 	constructor(__goscriptValue?: boolean, buf$?: $.Slice<any>) {
 		this.buf = buf$ ?? (null! as $.Slice<any>)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): queue {

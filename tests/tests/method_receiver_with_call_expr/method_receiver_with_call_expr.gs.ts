@@ -11,7 +11,7 @@ export class State {
 	constructor(__goscriptValue?: boolean, value$?: number, index$?: $.VarRef<number> | null) {
 		this.value = value$ ?? 0
 		this.index = index$ ?? (null! as $.VarRef<number> | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): State {

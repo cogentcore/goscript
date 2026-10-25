@@ -8,7 +8,7 @@ export class bitset {
 
 	constructor(__goscriptValue?: boolean, bits$?: Uint8Array) {
 		this.bits = bits$ ?? $.arrayValue(new Uint8Array(4))
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): bitset {

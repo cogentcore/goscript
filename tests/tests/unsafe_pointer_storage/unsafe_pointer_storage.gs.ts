@@ -10,7 +10,7 @@ export class word {
 
 	constructor(__goscriptValue?: boolean, data$?: Uint8Array) {
 		this.data = data$ ?? $.arrayValue(new Uint8Array(4))
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): word {

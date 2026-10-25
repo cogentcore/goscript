@@ -8,7 +8,7 @@ export class Foo {
 
 	constructor(__goscriptValue?: boolean, done$?: $.Channel<boolean> | null) {
 		this.done = done$ ?? (null! as $.Channel<boolean> | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Foo {

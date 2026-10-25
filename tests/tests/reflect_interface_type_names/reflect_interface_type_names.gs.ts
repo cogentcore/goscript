@@ -39,7 +39,7 @@ export class Tree {
 		this.ByName = ByName$ ?? (null! as globalThis.Map<string, Node | null> | null)
 		this.Props = Props$ ?? (null! as $.Slice<Props>)
 		this.Grids = Grids$ ?? (null! as $.Slice<Grid>)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Tree {

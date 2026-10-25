@@ -8,7 +8,7 @@ export class item {
 
 	constructor(__goscriptValue?: boolean, value$?: number) {
 		this.value = value$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): item {
@@ -37,7 +37,7 @@ export class arrays {
 	constructor(__goscriptValue?: boolean, slices$?: $.Slice<number>[], items$?: item[]) {
 		this.slices = slices$ ?? $.arrayValue(globalThis.Array.from({ length: 1 }, () => null))
 		this.items = items$ ?? $.arrayValue(globalThis.Array.from({ length: 1 }, () => new item(true)), /* @__PURE__ */ $.arrayType("main.item", 1))
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): arrays {

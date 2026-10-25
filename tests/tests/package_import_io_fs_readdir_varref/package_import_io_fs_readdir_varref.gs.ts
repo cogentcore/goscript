@@ -10,7 +10,7 @@ export class openOnlyFS {
 
 	constructor(__goscriptValue?: boolean, fsys$?: fstest.MapFS) {
 		this.fsys = fsys$ ?? (null! as fstest.MapFS)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): openOnlyFS {

@@ -13,7 +13,7 @@ export class inner {
 
 	constructor(__goscriptValue?: boolean, N$?: number[]) {
 		this.N = N$ ?? $.arrayValue(globalThis.Array.from({ length: 2 }, () => 0))
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): inner {
@@ -45,7 +45,7 @@ export class item {
 		this.X = X$ ?? 0
 		this.Y = Y$ ?? 0
 		this.In = In$ ?? new inner(true)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): item {

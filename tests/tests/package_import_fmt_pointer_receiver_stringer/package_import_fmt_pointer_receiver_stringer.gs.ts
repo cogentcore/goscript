@@ -22,7 +22,7 @@ export class Lex {
 	constructor(__goscriptValue?: boolean, Name$?: string, Start$?: number) {
 		this.Name = Name$ ?? ""
 		this.Start = Start$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Lex {
@@ -55,7 +55,7 @@ export class Val {
 
 	constructor(__goscriptValue?: boolean, N$?: number) {
 		this.N = N$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Val {

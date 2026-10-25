@@ -12,7 +12,7 @@ export class pullIterator {
 	constructor(__goscriptValue?: boolean, next$?: (() => [number, boolean] | globalThis.Promise<[number, boolean]>) | null, stop$?: (() => void) | null) {
 		this.next = next$ ?? (null! as (() => [number, boolean] | globalThis.Promise<[number, boolean]>) | null)
 		this.stop = stop$ ?? (null! as (() => void) | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): pullIterator {
@@ -39,7 +39,7 @@ export class lexer {
 
 	constructor(__goscriptValue?: boolean, stack$?: $.Slice<pullIterator>) {
 		this.stack = stack$ ?? (null! as $.Slice<pullIterator>)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): lexer {

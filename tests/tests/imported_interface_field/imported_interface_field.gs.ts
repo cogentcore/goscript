@@ -10,7 +10,7 @@ export class holder {
 
 	constructor(__goscriptValue?: boolean, w$?: io.Writer | null) {
 		this.w = w$ ?? (null! as io.Writer | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): holder {

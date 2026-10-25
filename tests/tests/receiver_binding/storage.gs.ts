@@ -13,7 +13,7 @@ export class storage {
 	constructor(__goscriptValue?: boolean, bytes$?: $.Slice<number>, name$?: string) {
 		this.bytes = bytes$ ?? (null! as $.Slice<number>)
 		this.name = name$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): storage {

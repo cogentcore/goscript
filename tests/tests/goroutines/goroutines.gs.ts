@@ -11,7 +11,7 @@ export class Message {
 	constructor(__goscriptValue?: boolean, priority$?: number, text$?: string) {
 		this.priority = priority$ ?? 0
 		this.text = text$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Message {

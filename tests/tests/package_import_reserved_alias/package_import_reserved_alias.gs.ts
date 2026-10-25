@@ -9,7 +9,7 @@ export class Holder {
 
 	constructor(__goscriptValue?: boolean, Box$?: _unique.Box | $.VarRef<_unique.Box> | null) {
 		this.Box = Box$ ?? (null! as _unique.Box | $.VarRef<_unique.Box> | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Holder {

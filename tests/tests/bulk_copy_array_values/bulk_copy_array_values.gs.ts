@@ -10,7 +10,7 @@ export class point {
 
 	constructor(__goscriptValue?: boolean, x$?: number) {
 		this.x = x$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): point {

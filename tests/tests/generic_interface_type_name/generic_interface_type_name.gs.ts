@@ -29,7 +29,7 @@ export class label {
 
 	constructor(__goscriptValue?: boolean, text$?: string) {
 		this.text = text$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): label {
@@ -60,7 +60,7 @@ export class icon {
 
 	constructor(__goscriptValue?: boolean, size$?: number) {
 		this.size = size$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): icon {

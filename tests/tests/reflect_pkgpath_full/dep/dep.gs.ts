@@ -23,7 +23,7 @@ export class Node {
 
 	constructor(__goscriptValue?: boolean, Name$?: string) {
 		this.Name = Name$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Node {
@@ -49,7 +49,7 @@ export class Box {
 
 	constructor(__goscriptValue?: boolean, Value$?: any) {
 		this.Value = Value$ ?? (null! as any)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Box {
@@ -76,7 +76,7 @@ export function LocalType(): reflect.Type | null {
 
 		constructor(init?: Partial<{A?: number}>, __goscriptValue?: boolean) {
 			this.A = init?.A ?? (0 as number)
-			;(this as any)[$.structValueMarker] = __goscriptValue === true
+			;(this as any).__goStructValue = __goscriptValue === true
 		}
 
 		public clone(): local {

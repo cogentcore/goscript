@@ -7,7 +7,7 @@ import * as dep from "@goscript/github.com/s4wave/goscript/tests/tests/reflect_p
 
 export class mainType {
 	constructor(__goscriptValue?: boolean) {
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): mainType {

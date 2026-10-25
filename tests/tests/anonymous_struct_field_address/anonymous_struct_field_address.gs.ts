@@ -8,7 +8,7 @@ export class entry {
 
 	constructor(__goscriptValue?: boolean, value$?: number) {
 		this.value = value$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): entry {
@@ -40,7 +40,7 @@ export class config {
 
 	constructor(__goscriptValue?: boolean, core$?: {"bare": boolean, "name": string}) {
 		this.core = core$ ?? $.anonymousStructValue({"bare": false, "name": ""}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("bare", /* @__PURE__ */ $.basicType("bool"), [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/anonymous_struct_field_address" }), /* @__PURE__ */ $.structField("name", /* @__PURE__ */ $.basicType("string"), [1], 8, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/anonymous_struct_field_address" })] })
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): config {

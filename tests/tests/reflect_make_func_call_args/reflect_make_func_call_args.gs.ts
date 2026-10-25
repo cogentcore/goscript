@@ -9,7 +9,7 @@ export class Values {
 
 	constructor(__goscriptValue?: boolean, vals$?: $.Slice<number>) {
 		this.vals = vals$ ?? (null! as $.Slice<number>)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Values {

@@ -12,7 +12,7 @@ export class P {
 	constructor(__goscriptValue?: boolean, X$?: number, Y$?: string) {
 		this.X = X$ ?? 0
 		this.Y = Y$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): P {
@@ -68,7 +68,7 @@ export async function main(): globalThis.Promise<void> {
 			this.F = init?.F ?? (0 as number)
 			this.B = init?.B ?? (false as boolean)
 			this.T = init?.T ?? ("" as string)
-			;(this as any)[$.structValueMarker] = __goscriptValue === true
+			;(this as any).__goStructValue = __goscriptValue === true
 		}
 
 		public clone(): Z {

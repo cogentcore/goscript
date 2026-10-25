@@ -11,7 +11,7 @@ export class writerHolder {
 
 	constructor(__goscriptValue?: boolean, w$?: io.Writer | null) {
 		this.w = w$ ?? (null! as io.Writer | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): writerHolder {
@@ -34,7 +34,7 @@ export class writerHolder {
 
 export class asyncBuffer {
 	constructor(__goscriptValue?: boolean) {
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): asyncBuffer {
@@ -74,7 +74,7 @@ export class staticReader {
 
 	constructor(__goscriptValue?: boolean, done$?: boolean) {
 		this.done = done$ ?? false
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): staticReader {
@@ -111,7 +111,7 @@ export class asyncReader {
 
 	constructor(__goscriptValue?: boolean, done$?: boolean) {
 		this.done = done$ ?? false
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): asyncReader {
@@ -149,7 +149,7 @@ export class asyncReaderAt {
 
 	constructor(__goscriptValue?: boolean, data$?: $.Slice<number>) {
 		this.data = data$ ?? (null! as $.Slice<number>)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): asyncReaderAt {
@@ -198,7 +198,7 @@ export class pipeReadResult {
 		this.data = data$ ?? ""
 		this.errNil = errNil$ ?? false
 		this.errEOF = errEOF$ ?? false
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): pipeReadResult {

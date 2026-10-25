@@ -8,7 +8,7 @@ export class helperState {
 
 	constructor(__goscriptValue?: boolean, text$?: string) {
 		this.text = text$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): helperState {

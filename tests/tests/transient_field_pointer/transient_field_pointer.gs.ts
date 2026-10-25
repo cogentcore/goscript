@@ -26,7 +26,7 @@ export class state {
 		this.n = n$ ?? 0
 		this.m = m$ ?? 0
 		this.c = c$ ?? 0n
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): state {

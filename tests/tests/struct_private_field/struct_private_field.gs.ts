@@ -8,7 +8,7 @@ export class MyStruct {
 
 	constructor(__goscriptValue?: boolean, myPrivate$?: number) {
 		this.myPrivate = myPrivate$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): MyStruct {

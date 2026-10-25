@@ -9,7 +9,7 @@ export class item {
 
 	constructor(__goscriptValue?: boolean, Text$?: string) {
 		this.Text = Text$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): item {
@@ -35,7 +35,7 @@ export class arena {
 
 	constructor(__goscriptValue?: boolean, data$?: $.Slice<any>) {
 		this.data = data$ ?? (null! as $.Slice<any>)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): arena {

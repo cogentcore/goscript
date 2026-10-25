@@ -21,7 +21,7 @@ export class Node {
 		this.Label = Label$ ?? ""
 		this.Empty = Empty$ ?? ""
 		this.Kept = Kept$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Node {

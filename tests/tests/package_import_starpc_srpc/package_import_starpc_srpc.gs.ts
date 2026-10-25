@@ -15,7 +15,7 @@ import "@goscript/github.com/aperturerobotics/protobuf-go-lite/index.js"
 
 export class handler {
 	constructor(__goscriptValue?: boolean) {
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): handler {
@@ -73,7 +73,7 @@ export class embeddedStream {
 
 	constructor(__goscriptValue?: boolean, Stream$?: srpc.Stream | null) {
 		this.Stream = Stream$ ?? (null! as srpc.Stream | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): embeddedStream {
@@ -122,7 +122,7 @@ export class streamOpenResult {
 	constructor(__goscriptValue?: boolean, stream$?: srpc.Stream | null, err$?: $.GoError) {
 		this.stream = stream$ ?? (null! as srpc.Stream | null)
 		this.err = err$ ?? (null! as $.GoError)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): streamOpenResult {
@@ -152,7 +152,7 @@ export class streamProbeResult {
 	constructor(__goscriptValue?: boolean, total$?: number, err$?: string) {
 		this.total = total$ ?? 0
 		this.err = err$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): streamProbeResult {
@@ -179,7 +179,7 @@ export class rpcStreamServerResult {
 
 	constructor(__goscriptValue?: boolean, err$?: string) {
 		this.err = err$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): rpcStreamServerResult {
@@ -220,7 +220,7 @@ export class memoryRpcStream {
 		this.send = send$ ?? (null! as $.Channel<rpcstream.RpcStreamPacket | $.VarRef<rpcstream.RpcStreamPacket> | null> | null)
 		this.closeSend = closeSend$ ?? $.markAsStructValue(new sync.Once())
 		this.cancelLocal = cancelLocal$ ?? $.markAsStructValue(new sync.Once())
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): memoryRpcStream {
@@ -369,7 +369,7 @@ export class memoryRpcContext {
 	constructor(__goscriptValue?: boolean, done$?: $.Channel<{}> | null, once$?: sync.Once) {
 		this.done = done$ ?? (null! as $.Channel<{}> | null)
 		this.once = once$ ?? $.markAsStructValue(new sync.Once())
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): memoryRpcContext {

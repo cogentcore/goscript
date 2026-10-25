@@ -11,7 +11,7 @@ export class point {
 	constructor(__goscriptValue?: boolean, x$?: number, y$?: number) {
 		this.x = x$ ?? 0
 		this.y = y$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): point {
@@ -41,7 +41,7 @@ export class holder {
 	constructor(__goscriptValue?: boolean, points$?: point[], names$?: string[]) {
 		this.points = points$ ?? $.arrayValue(globalThis.Array.from({ length: 2 }, () => new point(true)), /* @__PURE__ */ $.arrayType("main.point", 2))
 		this.names = names$ ?? $.arrayValue(globalThis.Array.from({ length: 3 }, () => ""))
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): holder {

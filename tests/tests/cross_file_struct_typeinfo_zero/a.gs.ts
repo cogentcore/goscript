@@ -10,7 +10,7 @@ export class aValue {
 
 	constructor(__goscriptValue?: boolean, next$?: __goscript_b.bValue | $.VarRef<__goscript_b.bValue> | null) {
 		this.next = next$ ?? (null! as __goscript_b.bValue | $.VarRef<__goscript_b.bValue> | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): aValue {

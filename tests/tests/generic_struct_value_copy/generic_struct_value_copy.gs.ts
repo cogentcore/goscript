@@ -11,7 +11,7 @@ export class Value {
 	constructor(__goscriptValue?: boolean, V$?: number, U$?: number) {
 		this.V = V$ ?? 0
 		this.U = U$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Value {
@@ -52,7 +52,7 @@ export class Sides {
 		this.Right = Right$ ?? (null! as any)
 		this.Bottom = Bottom$ ?? (null! as any)
 		this.Left = Left$ ?? (null! as any)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Sides {
@@ -100,7 +100,7 @@ export class box {
 	constructor(__goscriptValue?: boolean, A$?: any, B$?: any) {
 		this.A = A$ ?? (null! as any)
 		this.B = B$ ?? (null! as any)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): box {

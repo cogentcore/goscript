@@ -8,7 +8,7 @@ export class node {
 
 	constructor(__goscriptValue?: boolean, next$?: number) {
 		this.next = next$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): node {
@@ -34,7 +34,7 @@ export class queue {
 
 	constructor(__goscriptValue?: boolean, value$?: number) {
 		this.value = value$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): queue {

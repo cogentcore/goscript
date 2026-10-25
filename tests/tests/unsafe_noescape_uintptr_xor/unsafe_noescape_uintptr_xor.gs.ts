@@ -13,7 +13,7 @@ export class sourceStruct {
 	constructor(__goscriptValue?: boolean, flag$?: boolean, data$?: $.Slice<number>) {
 		this.flag = flag$ ?? false
 		this.data = data$ ?? (null! as $.Slice<number>)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): sourceStruct {
@@ -43,7 +43,7 @@ export class viewStruct {
 	constructor(__goscriptValue?: boolean, flag$?: boolean, data$?: $.Slice<number>) {
 		this.flag = flag$ ?? false
 		this.data = data$ ?? (null! as $.Slice<number>)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): viewStruct {

@@ -16,7 +16,7 @@ export class recreateError {
 
 	constructor(__goscriptValue?: boolean, next$?: bigint) {
 		this.next = next$ ?? 0n
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): recreateError {
@@ -44,7 +44,7 @@ export class recreateError {
 
 export class readWriteCloser {
 	constructor(__goscriptValue?: boolean) {
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): readWriteCloser {

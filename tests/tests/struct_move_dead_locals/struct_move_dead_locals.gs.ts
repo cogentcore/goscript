@@ -11,7 +11,7 @@ export class pos {
 	constructor(__goscriptValue?: boolean, Line$?: number, Char$?: number) {
 		this.Line = Line$ ?? 0
 		this.Char = Char$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): pos {
@@ -41,7 +41,7 @@ export class token {
 	constructor(__goscriptValue?: boolean, Kind$?: number, At$?: pos) {
 		this.Kind = Kind$ ?? 0
 		this.At = At$ ?? new pos(true)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): token {

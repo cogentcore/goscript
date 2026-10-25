@@ -8,7 +8,7 @@ export class Match {
 
 	constructor(__goscriptValue?: boolean, Size$?: number) {
 		this.Size = Size$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Match {
@@ -34,7 +34,7 @@ export class Matcher {
 
 	constructor(__goscriptValue?: boolean, matches$?: $.Slice<Match>) {
 		this.matches = matches$ ?? (null! as $.Slice<Match>)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Matcher {

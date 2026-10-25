@@ -12,7 +12,7 @@ export class tag {
 	constructor(__goscriptValue?: boolean, lang$?: number, region$?: string) {
 		this.lang = lang$ ?? 0
 		this.region = region$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): tag {
@@ -53,7 +53,7 @@ export class outer {
 	constructor(__goscriptValue?: boolean, t$?: tag, n$?: number) {
 		this.t = t$ ?? new tag(true)
 		this.n = n$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): outer {

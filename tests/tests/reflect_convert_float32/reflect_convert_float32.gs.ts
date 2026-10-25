@@ -12,7 +12,7 @@ export class T {
 	constructor(__goscriptValue?: boolean, A$?: string, B$?: number) {
 		this.A = A$ ?? ""
 		this.B = B$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): T {

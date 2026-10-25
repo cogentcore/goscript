@@ -11,7 +11,7 @@ export class MyStruct {
 	constructor(__goscriptValue?: boolean, MyInt$?: number, MyString$?: string) {
 		this.MyInt = MyInt$ ?? 0
 		this.MyString = MyString$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): MyStruct {
@@ -41,7 +41,7 @@ export class NestedStruct {
 	constructor(__goscriptValue?: boolean, Value$?: number, InnerStruct$?: MyStruct) {
 		this.Value = Value$ ?? 0
 		this.InnerStruct = InnerStruct$ ?? new MyStruct(true)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): NestedStruct {

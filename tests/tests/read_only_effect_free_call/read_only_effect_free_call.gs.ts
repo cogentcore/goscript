@@ -11,7 +11,7 @@ export class vec {
 	constructor(__goscriptValue?: boolean, x$?: number, y$?: number) {
 		this.x = x$ ?? 0
 		this.y = y$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): vec {
@@ -54,7 +54,7 @@ export class holder {
 
 	constructor(__goscriptValue?: boolean, pos$?: vec) {
 		this.pos = pos$ ?? new vec(true)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): holder {

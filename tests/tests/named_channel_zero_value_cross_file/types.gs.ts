@@ -10,7 +10,7 @@ export class Job {
 
 	constructor(__goscriptValue?: boolean, Value$?: string) {
 		this.Value = Value$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Job {

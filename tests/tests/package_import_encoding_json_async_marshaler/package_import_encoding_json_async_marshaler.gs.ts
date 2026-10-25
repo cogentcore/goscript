@@ -12,7 +12,7 @@ export class Image {
 
 	constructor(__goscriptValue?: boolean, Name$?: string) {
 		this.Name = Name$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Image {
@@ -77,7 +77,7 @@ export class Doc {
 		this.Title = Title$ ?? ""
 		this.Image = Image$ ?? (null! as Image | $.VarRef<Image> | null)
 		this.Note = Note$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Doc {

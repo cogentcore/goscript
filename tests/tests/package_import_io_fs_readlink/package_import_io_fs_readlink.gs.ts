@@ -6,7 +6,7 @@ import * as fs from "@goscript/io/fs/index.js"
 
 export class emptyFS {
 	constructor(__goscriptValue?: boolean) {
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): emptyFS {
@@ -32,7 +32,7 @@ export class emptyFS {
 
 export class linkFS {
 	constructor(__goscriptValue?: boolean) {
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): linkFS {

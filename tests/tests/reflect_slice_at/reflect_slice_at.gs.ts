@@ -14,7 +14,7 @@ export class Sub {
 	constructor(__goscriptValue?: boolean, X$?: number, Y$?: string) {
 		this.X = X$ ?? 0
 		this.Y = Y$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Sub {
@@ -47,7 +47,7 @@ export class T {
 		this.Mbr1 = Mbr1$ ?? ""
 		this.Mbr2 = Mbr2$ ?? 0
 		this.S = S$ ?? new Sub(true)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): T {
@@ -118,7 +118,7 @@ export async function main(): globalThis.Promise<void> {
 
 		constructor(init?: Partial<{Count?: number}>, __goscriptValue?: boolean) {
 			this.Count = init?.Count ?? (0 as number)
-			;(this as any)[$.structValueMarker] = __goscriptValue === true
+			;(this as any).__goStructValue = __goscriptValue === true
 		}
 
 		public clone(): holder {

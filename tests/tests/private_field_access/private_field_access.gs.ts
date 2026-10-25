@@ -11,7 +11,7 @@ export class MyStruct {
 	constructor(__goscriptValue?: boolean, publicField$?: string, privateField$?: number) {
 		this.publicField = publicField$ ?? ""
 		this.privateField = privateField$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): MyStruct {

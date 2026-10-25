@@ -20,7 +20,7 @@ export class wrappedHealthError {
 
 	constructor(__goscriptValue?: boolean, err$?: $.GoError) {
 		this.err = err$ ?? (null! as $.GoError)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): wrappedHealthError {

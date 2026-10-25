@@ -9,7 +9,7 @@ export class responseWriter {
 
 	constructor(__goscriptValue?: boolean, header$?: http.Header) {
 		this.header = header$ ?? (null! as http.Header)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): responseWriter {

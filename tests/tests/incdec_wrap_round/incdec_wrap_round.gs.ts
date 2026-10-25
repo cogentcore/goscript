@@ -14,7 +14,7 @@ export class counters {
 		this.I8 = I8$ ?? 0
 		this.U16 = U16$ ?? 0
 		this.F = F$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): counters {

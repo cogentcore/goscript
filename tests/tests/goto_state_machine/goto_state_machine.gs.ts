@@ -14,7 +14,7 @@ export class scanner {
 		this.data = data$ ?? ""
 		this.pos = pos$ ?? 0
 		this.done = done$ ?? false
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): scanner {

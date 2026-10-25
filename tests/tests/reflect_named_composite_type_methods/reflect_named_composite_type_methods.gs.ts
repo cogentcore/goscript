@@ -54,7 +54,7 @@ export class Rule {
 
 	constructor(__goscriptValue?: boolean, Pattern$?: string) {
 		this.Pattern = Pattern$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Rule {
@@ -83,7 +83,7 @@ export class xmlState {
 	constructor(__goscriptValue?: boolean, Name$?: string, Rules$?: $.Slice<Rule>) {
 		this.Name = Name$ ?? ""
 		this.Rules = Rules$ ?? (null! as $.Slice<Rule>)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): xmlState {
@@ -110,7 +110,7 @@ export class xmlRules {
 
 	constructor(__goscriptValue?: boolean, States$?: $.Slice<xmlState>) {
 		this.States = States$ ?? (null! as $.Slice<xmlState>)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): xmlRules {
@@ -139,7 +139,7 @@ export class Lexer {
 	constructor(__goscriptValue?: boolean, Name$?: string, Rules$?: Rules) {
 		this.Name = Name$ ?? ""
 		this.Rules = Rules$ ?? (null! as Rules)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Lexer {

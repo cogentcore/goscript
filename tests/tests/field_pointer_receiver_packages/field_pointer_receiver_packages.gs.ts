@@ -17,7 +17,7 @@ export class Outer {
 	constructor(__goscriptValue?: boolean, Mid$?: inner.Mid, Local$?: __goscript_widget.Widget) {
 		this.Mid = Mid$ ?? new inner.Mid(true)
 		this.Local = Local$ ?? new __goscript_widget.Widget(true)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Outer {

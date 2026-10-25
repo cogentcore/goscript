@@ -105,7 +105,11 @@ function normalize(
   if ($.isStructObject(value)) {
     return {
       $type: value.constructor.name,
-      $fields: normalize({ ...value }, seen, nextID),
+      $fields: normalize(
+        Object.fromEntries($.ownKeys(value).map((k) => [k, value[k]])),
+        seen,
+        nextID,
+      ),
     }
   }
   const entries = Object.entries(value)
