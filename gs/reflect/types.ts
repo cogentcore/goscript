@@ -293,11 +293,42 @@ export class ValueError extends Error {
   public Method: string
 
   constructor(init: { Kind: Kind; Method: string }) {
-    super(
-      `reflect: call of reflect.Value.${init.Method} on ${Kind_String(init.Kind)} Value`,
-    )
+    // Go calls a Value of kind Invalid the zero Value.
+    const kind = init.Kind === 0 ? 'zero' : Kind_String(init.Kind)
+    super(`reflect: call of reflect.Value.${init.Method} on ${kind} Value`)
     this.Kind = init.Kind
     this.Method = init.Method
     this.name = 'ValueError'
   }
+
+  // Error returns the message, as the Error method of *ValueError.
+  Error(): string {
+    return this.message
+  }
+
+  // Register the type, so that a recovered *ValueError asserts as one.
+  static __typeInfo = $.registerStructType(
+    'reflect.ValueError',
+    null,
+    [
+      {
+        name: 'Error',
+        args: [],
+        returns: [{ type: { kind: $.TypeKind.Basic, name: 'string' } }],
+      },
+    ],
+    ValueError,
+    [
+      {
+        name: 'Kind',
+        key: 'Kind',
+        type: { kind: $.TypeKind.Basic, name: 'int' },
+      },
+      {
+        name: 'Method',
+        key: 'Method',
+        type: { kind: $.TypeKind.Basic, name: 'string' },
+      },
+    ],
+  )
 }

@@ -30,12 +30,42 @@ let activeRecoverPanic: GoPanic | null = null
 
 export function withRecoveringPanic<T>(err: unknown, fn: () => T): T {
   const previous = activeRecoverPanic
-  activeRecoverPanic = err instanceof GoPanic ? err : null
+  activeRecoverPanic = asGoPanic(err)
   try {
     return fn()
   } finally {
     activeRecoverPanic = previous
   }
+}
+
+// errorPanics holds the GoPanic that stands for a JavaScript error thrown
+// without panic, such as a reflect.ValueError of the reflect package or a
+// TypeError, which Go code recovers as it does a panic. It is keyed by the
+// error, which the generated catch block passes to recovered.
+const errorPanics = new WeakMap<Error, GoPanic>()
+
+// asGoPanic returns the GoPanic that err unwinds as, or null if err is not
+// a panic: runtime.Goexit and os.Exit throw errors that recover does not
+// stop. The value of a panic from an error without an Error method is the
+// error's message.
+function asGoPanic(err: unknown): GoPanic | null {
+  if (err instanceof GoPanic) {
+    return err
+  }
+  if (
+    !(err instanceof Error) ||
+    err.name === 'GoexitError' ||
+    err.name === 'ProcessExitError'
+  ) {
+    return null
+  }
+  let goPanic = errorPanics.get(err)
+  if (goPanic === undefined) {
+    const hasError = typeof (err as { Error?: unknown }).Error === 'function'
+    goPanic = new GoPanic(hasError ? err : err.message)
+    errorPanics.set(err, goPanic)
+  }
+  return goPanic
 }
 
 // RuntimeError is the value carried by a panic from a Go runtime fault: index
@@ -132,11 +162,11 @@ export function recover(): any {
   return goPanic.value
 }
 
-// recovered reports whether err is a GoPanic that a deferred recover() consumed.
+// recovered reports whether err is a panic that a deferred recover() consumed.
 // The catch block generated for a
 // defer+recover function calls this: true means swallow the panic and return the
 // function's named results; false means rethrow so an outer frame can recover or
 // the program crashes with the Go panic message.
 export function recovered(err: unknown): boolean {
-  return err instanceof GoPanic && err.recovered
+  return asGoPanic(err)?.recovered === true
 }

@@ -17,7 +17,6 @@ import { mapSet } from './map.js'
 import { goSlice, index, makeSlice } from './slice.js'
 import { DisposableStack } from './defer.js'
 
-
 // captureThrow returns whatever value the callback throws, or undefined if it
 // did not throw. Go panics surface as a thrown GoPanic in the transpiled
 // runtime, so tests assert on the caught value's shape. Catching here models a
@@ -237,6 +236,54 @@ describe('recover consumes the in-flight panic', () => {
     expect((seen as RuntimeError).Error()).toBe(
       'runtime error: integer divide by zero',
     )
+  })
+
+  it('recovers a JavaScript error thrown without panic', () => {
+    // An error with an Error method is the value, as reflect.ValueError.
+    class valueError extends Error {
+      Error(): string {
+        return this.message
+      }
+    }
+    const thrown = new valueError('reflect: call on zero Value')
+    let seen: unknown = 'unset'
+    const outcome = runWithRecover(
+      () => {
+        throw thrown
+      },
+      () => {
+        seen = recover()
+      },
+    )
+    expect(seen).toBe(thrown)
+    expect(outcome.finished).toBe(true)
+
+    // Another error is its message.
+    runWithRecover(
+      () => {
+        throw new TypeError('x is undefined')
+      },
+      () => {
+        seen = recover()
+      },
+    )
+    expect(seen).toBe('x is undefined')
+  })
+
+  it('does not recover runtime.Goexit', () => {
+    const goexit = new Error('runtime.Goexit')
+    goexit.name = 'GoexitError'
+    let seen: unknown = 'unset'
+    const outcome = runWithRecover(
+      () => {
+        throw goexit
+      },
+      () => {
+        seen = recover()
+      },
+    )
+    expect(seen).toBeNull()
+    expect(outcome.rethrew).toBe(goexit)
   })
 
   it('normal defer disposal cannot recover an unrelated panic', () => {
