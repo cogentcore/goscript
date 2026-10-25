@@ -115,6 +115,10 @@ export function toWide(__typeArgs: $.GenericTypeArgs | undefined, e: any): any {
 	return $.genericConvert<any>(__typeArgs, "T", e)
 }
 
+export function fromUint64(__typeArgs: $.GenericTypeArgs | undefined, u: bigint): any {
+	return $.genericConvert<any>(__typeArgs, "T", u)
+}
+
 export function fromConst(__typeArgs: $.GenericTypeArgs | undefined, i: number): [any, any] {
 	return [$.genericConvert<any>(__typeArgs, "T", 7), $.genericConvert<any>(__typeArgs, "T", i)]
 }
@@ -135,6 +139,9 @@ export async function main(): globalThis.Promise<void> {
 	let c: number = (__goscriptTuple1[0] as number)
 	let d: number = (__goscriptTuple1[1] as number)
 	await $.println(c, d)
+	let u = 18446744073709551609n
+	await $.println(fromUint64(__goscriptStatic4(), u), fromUint64(__goscriptStatic5(), u), fromUint64(__goscriptStatic6(), u))
+	await $.println(fromUint64(__goscriptStatic4(), u) % 3)
 }
 
 var __goscriptStatic0$value: any
@@ -155,6 +162,21 @@ function __goscriptStatic2(): any {
 var __goscriptStatic3$value: any
 function __goscriptStatic3(): any {
 	return __goscriptStatic3$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("uint8"), zero: () => 0 }})
+}
+
+var __goscriptStatic4$value: any
+function __goscriptStatic4(): any {
+	return __goscriptStatic4$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }})
+}
+
+var __goscriptStatic5$value: any
+function __goscriptStatic5(): any {
+	return __goscriptStatic5$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int64"), zero: () => 0n }})
+}
+
+var __goscriptStatic6$value: any
+function __goscriptStatic6(): any {
+	return __goscriptStatic6$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int32"), zero: () => 0 }})
 }
 
 if ($.isMainScript(import.meta)) {

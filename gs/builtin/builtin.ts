@@ -894,7 +894,8 @@ export function genericConvert<T>(
     case 'rune':
       return int(value, 32) as T
     case 'int':
-      return int(value) as T
+      // int is 64 bits, so a uint64 beyond its range wraps as in Go.
+      return int(value, 64) as T
     case 'uint8':
     case 'byte':
       return uint(value, 8) as T
