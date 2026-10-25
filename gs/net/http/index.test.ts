@@ -480,7 +480,7 @@ describe('net/http override', () => {
     expect(written.Len()).toBe(0)
     Header_Del(null, 'Content-Type')
     expect(() => Header_Set(null, 'Content-Type', 'text/plain')).toThrow(
-      'assign to nil map',
+      'assignment to entry in nil map',
     )
   })
 
