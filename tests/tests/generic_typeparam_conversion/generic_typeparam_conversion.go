@@ -48,6 +48,12 @@ func toWide[T, E EnumConstraint](e E) T {
 	return T(e)
 }
 
+// fromUint64 converts a uint64 to a type parameter, which wraps a value
+// beyond the range of the type.
+func fromUint64[T Integer](u uint64) T {
+	return T(u)
+}
+
 // fromConst converts a constant and a basic value to a type parameter.
 func fromConst[T Integer](i int) (T, T) {
 	return T(7), T(i)
@@ -64,4 +70,7 @@ func main() {
 	println(int64(a) + int64(b))
 	c, d := fromConst[uint8](300)
 	println(c, d)
+	u := uint64(1<<64 - 7)
+	println(fromUint64[int](u), fromUint64[int64](u), fromUint64[int32](u))
+	println(fromUint64[int](u) % 3)
 }
