@@ -21,3 +21,5 @@ Cleanup stopped
 Finalizer ignored
 locked goroutine ran
 main unlocked
+PanicNilError: runtime error: panic called with nil argument true
+recovered runtime.Error: true

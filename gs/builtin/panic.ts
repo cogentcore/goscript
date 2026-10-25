@@ -51,6 +51,9 @@ export class RuntimeError extends Error {
   Error(): string {
     return this.message
   }
+
+  // RuntimeError marks the value as a runtime.Error, as in Go.
+  RuntimeError(): void {}
 }
 
 /**

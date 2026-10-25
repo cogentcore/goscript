@@ -58,6 +58,7 @@ func main() {
 	println("Finalizer ignored")
 
 	lockOSThread()
+	panicNilError()
 }
 
 // callers reports frames of its own stack and names a function value.
@@ -123,4 +124,19 @@ func lockOSThread() {
 	<-done
 	runtime.UnlockOSThread()
 	println("main unlocked")
+}
+
+// panicNilError checks the value Go panics with for panic(nil).
+func panicNilError() {
+	var err error = &runtime.PanicNilError{}
+	_, isRuntime := err.(runtime.Error)
+	println("PanicNilError:", err.Error(), isRuntime)
+
+	defer func() {
+		_, ok := recover().(runtime.Error)
+		println("recovered runtime.Error:", ok)
+	}()
+	var s []int
+	i := 5
+	_ = s[i]
 }

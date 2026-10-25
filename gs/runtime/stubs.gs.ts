@@ -46,14 +46,6 @@ export function MutexProfile(..._args: any[]): any {
   return $.notImplemented("runtime.MutexProfile")
 }
 
-export class PanicNilError {
-  [field: string]: any
-
-  constructor(..._args: any[]) {
-    $.notImplemented("runtime.PanicNilError")
-  }
-}
-
 export class Pinner {
   [field: string]: any
 
