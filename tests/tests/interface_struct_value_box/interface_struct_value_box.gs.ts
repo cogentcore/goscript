@@ -173,7 +173,7 @@ export async function main(): globalThis.Promise<void> {
 	n.Name = "changed"
 	$.sliceElems(n.Tags!)[$.sliceSlot(n.Tags!, 0)] = "y"
 	let got = ($.mustTypeAssert<Named>(na, "main.Named")).clone()
-	await $.println(got.Name, $.arrayIndex(got.Tags!, 0), $.pointerValue<Named>(got.Next).Name)
+	await $.println(got.Name, $.plainSliceIndex(got.Tags!, 0), $.pointerValue<Named>(got.Next).Name)
 	let o = new Outer(true, new Vec(true, 5, 6), 7)
 	let oa: any = $.structInterfaceValue((o).clone(), "main.Outer", "main.Outer")
 	o.In.X = 50

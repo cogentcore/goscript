@@ -142,16 +142,16 @@ export async function main(): globalThis.Promise<void> {
 	calls = 0
 	const __goscriptOperand0 = idx()
 	$.sliceElems(s!)[$.sliceSlot(s!, __goscriptOperand0)] += 5
-	await $.println("slice +=", $.arrayIndex(s!, 0), $.arrayIndex(s!, 1), $.arrayIndex(s!, 2), calls)
+	await $.println("slice +=", $.plainSliceIndex(s!, 0), $.plainSliceIndex(s!, 1), $.plainSliceIndex(s!, 2), calls)
 
 	calls = 0
 	$.sliceElems(s!)[$.sliceSlot(s!, idx())]++
-	await $.println("slice ++", $.arrayIndex(s!, 0), $.arrayIndex(s!, 1), $.arrayIndex(s!, 2), calls)
+	await $.println("slice ++", $.plainSliceIndex(s!, 0), $.plainSliceIndex(s!, 1), $.plainSliceIndex(s!, 2), calls)
 
 	calls = 0
 	const __goscriptOperand1 = idx()
 	$.sliceElems(s!)[$.sliceSlot(s!, __goscriptOperand1)] = $.intShl($.sliceElems(s!)[$.sliceSlot(s!, __goscriptOperand1)], 1)
-	await $.println("slice <<=", $.arrayIndex(s!, 0), $.arrayIndex(s!, 1), $.arrayIndex(s!, 2), calls)
+	await $.println("slice <<=", $.plainSliceIndex(s!, 0), $.plainSliceIndex(s!, 1), $.plainSliceIndex(s!, 2), calls)
 
 	// Array index from a call.
 	let a = $.arrayValue([1, 2, 3])
@@ -205,14 +205,14 @@ export async function main(): globalThis.Promise<void> {
 	calls = 0
 	const __goscriptOperand7 = idx()
 	$.sliceElems(b!)[$.sliceSlot(b!, __goscriptOperand7)] = $.uint($.sliceElems(b!)[$.sliceSlot(b!, __goscriptOperand7)] + (10), 8)
-	await $.println("byte +=", $.arrayIndex(b!, 0), $.arrayIndex(b!, 1), $.arrayIndex(b!, 2), calls)
+	await $.println("byte +=", $.typedSliceIndex(b!, 0), $.typedSliceIndex(b!, 1), $.typedSliceIndex(b!, 2), calls)
 
 	// String element.
 	let ss = $.arrayToSlice<string>(["a", "b", "c"])
 	calls = 0
 	const __goscriptOperand8 = idx()
 	$.sliceElems(ss!)[$.sliceSlot(ss!, __goscriptOperand8)] += "z"
-	await $.println("string +=", $.arrayIndex(ss!, 0), $.arrayIndex(ss!, 1), $.arrayIndex(ss!, 2), calls)
+	await $.println("string +=", $.plainSliceIndex(ss!, 0), $.plainSliceIndex(ss!, 1), $.plainSliceIndex(ss!, 2), calls)
 
 	// Dereference of a call result.
 	calls = 0
@@ -249,12 +249,12 @@ export async function main(): globalThis.Promise<void> {
 	calls = 0
 	const __goscriptOperand14 = idx()
 	$.sliceElems(q!)[$.sliceSlot(q!, __goscriptOperand14)] = globalThis.Math.trunc($.sliceElems(q!)[$.sliceSlot(q!, __goscriptOperand14)] / 2)
-	await $.println("int /=", $.arrayIndex(q!, 0), $.arrayIndex(q!, 1), $.arrayIndex(q!, 2), calls)
+	await $.println("int /=", $.plainSliceIndex(q!, 0), $.plainSliceIndex(q!, 1), $.plainSliceIndex(q!, 2), calls)
 
 	calls = 0
 	const __goscriptOperand15 = idx()
 	$.sliceElems(q!)[$.sliceSlot(q!, __goscriptOperand15)] %= 4
-	await $.println("int %=", $.arrayIndex(q!, 0), $.arrayIndex(q!, 1), $.arrayIndex(q!, 2), calls)
+	await $.println("int %=", $.plainSliceIndex(q!, 0), $.plainSliceIndex(q!, 1), $.plainSliceIndex(q!, 2), calls)
 
 	// A for loop post statement and an if statement init.
 	let sum = $.arrayToSlice<number>([0, 0, 0])
@@ -263,7 +263,7 @@ export async function main(): globalThis.Promise<void> {
 	;(__goscriptSliceWindow0.backing as any[])[$.windowSlot(__goscriptSliceWindow0, __goscriptOperand16)] += n })()) {
 		n++
 	}
-	await $.println("for post", $.arrayIndex(sum!, 0), $.arrayIndex(sum!, 1), $.arrayIndex(sum!, 2), calls)
+	await $.println("for post", $.plainSliceIndex(sum!, 0), $.plainSliceIndex(sum!, 1), $.plainSliceIndex(sum!, 2), calls)
 
 	calls = 0
 	for (let n = 0; n < 3; (() => { const __goscriptMap2 = m
@@ -277,8 +277,8 @@ export async function main(): globalThis.Promise<void> {
 	{
 		const __goscriptOperand17 = idx()
 		$.sliceElems(s!)[$.sliceSlot(s!, __goscriptOperand17)] -= 1
-		if ($.arrayIndex(s!, 1) > 0) {
-			await $.println("if init", $.arrayIndex(s!, 0), $.arrayIndex(s!, 1), $.arrayIndex(s!, 2), calls)
+		if ($.plainSliceIndex(s!, 1) > 0) {
+			await $.println("if init", $.plainSliceIndex(s!, 0), $.plainSliceIndex(s!, 1), $.plainSliceIndex(s!, 2), calls)
 		}
 	}
 
@@ -290,7 +290,7 @@ export async function main(): globalThis.Promise<void> {
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo))
 	calls = 0
 	bump()
-	await $.println("closure +=", $.arrayIndex(captured!, 0), $.arrayIndex(captured!, 1), $.arrayIndex(captured!, 2), calls)
+	await $.println("closure +=", $.plainSliceIndex(captured!, 0), $.plainSliceIndex(captured!, 1), $.plainSliceIndex(captured!, 2), calls)
 
 	// An index from an async interface method.
 	let ch = $.makeChannel<number>(3, 0, "both")
@@ -303,7 +303,7 @@ export async function main(): globalThis.Promise<void> {
 	$.sliceElems(vals!)[$.sliceSlot(vals!, __goscriptOperand19)] += 5
 	const __goscriptOperand20 = (__goscriptAwait = (c !== null && (c as any).__isVarRef !== true && ((c as any).__goValue === undefined || (c as any).__goType?.charCodeAt(0) !== 42) ? (c as Exclude<counter, null>) : $.pointerValue<Exclude<counter, null>>(c)).Next(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 	$.sliceElems(vals!)[$.sliceSlot(vals!, __goscriptOperand20)] += 6
-	await $.println("async index +=", $.arrayIndex(vals!, 0), $.arrayIndex(vals!, 1), $.arrayIndex(vals!, 2), calls)
+	await $.println("async index +=", $.plainSliceIndex(vals!, 0), $.plainSliceIndex(vals!, 1), $.plainSliceIndex(vals!, 2), calls)
 }
 
 var __goscriptStatic0$value: any

@@ -61,13 +61,13 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("text bytes:", $.sliceLen(textBytes), $.stringEqual($.bytesToString(textBytes), text), sum(textBytes))
 
 	// Binary data keeps every byte value, and is a slice of its own.
-	await $.println("blob:", $.sliceLen(blob), $.arrayIndex(blob!, 0), $.arrayIndex(blob!, 255), $.arrayIndex(blob!, 256), sum(blob), $.bytesToString($.goSlice(blob, $.sliceLen(blob) - 4, undefined)))
+	await $.println("blob:", $.sliceLen(blob), $.typedSliceIndex(blob!, 0), $.typedSliceIndex(blob!, 255), $.typedSliceIndex(blob!, 256), sum(blob), $.bytesToString($.goSlice(blob, $.sliceLen(blob) - 4, undefined)))
 	await $.println("small:", $.sliceLen(small), $.bytesToString(small))
-	await $.println("unicode:", $.sliceLen(unicodeBytes), sum(unicodeBytes), $.stringEqual($.bytesToString(unicodeBytes), unicodeText), $.arrayIndex(unicodeBytes!, $.sliceLen(unicodeBytes) - 2))
+	await $.println("unicode:", $.sliceLen(unicodeBytes), sum(unicodeBytes), $.stringEqual($.bytesToString(unicodeBytes), unicodeText), $.typedSliceIndex(unicodeBytes!, $.sliceLen(unicodeBytes) - 2))
 	$.sliceElems(blob!)[$.sliceSlot(blob!, 0)] = 42
 	let __goscriptTuple0: any = await $.markAsStructValue($.cloneStructValue(files)).ReadFile("blob.bin")
 	let again: $.Slice<number> = __goscriptTuple0[0]
-	await $.println("own:", $.arrayIndex(blob!, 0), $.arrayIndex(again!, 0))
+	await $.println("own:", $.typedSliceIndex(blob!, 0), $.typedSliceIndex(again!, 0))
 
 	// Files read from an embedded file system match.
 	let __goscriptTuple1: any = await $.markAsStructValue($.cloneStructValue(files)).ReadFile("blob.bin")

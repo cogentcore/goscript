@@ -57,7 +57,7 @@ export async function main(): globalThis.Promise<void> {
 	// Set an element of a slice of byte slices.
 	d.value.Parts = $.makeSlice<$.Slice<number>>(2)
 	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(dv)).Field(2))).Index(1))).SetBytes(new Uint8Array([112, 97, 114, 116]))
-	await $.println("Parts:", $.sliceLen($.arrayIndex(d.value.Parts!, 0)), $.bytesToString($.arrayIndex(d.value.Parts!, 1)))
+	await $.println("Parts:", $.sliceLen($.plainSliceIndex(d.value.Parts!, 0)), $.bytesToString($.plainSliceIndex(d.value.Parts!, 1)))
 
 	// Set a byte slice variable through a pointer.
 	let b: $.VarRef<$.Slice<number>> = $.varRef(null! as $.Slice<number>)

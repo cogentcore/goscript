@@ -170,7 +170,7 @@ export async function main(): globalThis.Promise<void> {
 		}
 	}
 	await $.println("size:", binary.Size($.interfaceValue(h, "*main.header", /* @__PURE__ */ $.pointerType("main.header"))), "written:", buf.value.Len())
-	await $.println("bytes:", $.uint($.arrayIndex(buf.value.Bytes()!, 0), 8), $.uint($.arrayIndex(buf.value.Bytes()!, 1), 8), $.uint($.arrayIndex(buf.value.Bytes()!, 2), 8), $.uint($.arrayIndex(buf.value.Bytes()!, 10), 8), $.uint($.arrayIndex(buf.value.Bytes()!, 12), 8))
+	await $.println("bytes:", $.uint($.typedSliceIndex(buf.value.Bytes()!, 0), 8), $.uint($.typedSliceIndex(buf.value.Bytes()!, 1), 8), $.uint($.typedSliceIndex(buf.value.Bytes()!, 2), 8), $.uint($.typedSliceIndex(buf.value.Bytes()!, 10), 8), $.uint($.typedSliceIndex(buf.value.Bytes()!, 12), 8))
 
 	// Reading into a pointer to a struct fills its fields.
 	let r: $.VarRef<header> = $.varRef(new header(true))
@@ -195,12 +195,12 @@ export async function main(): globalThis.Promise<void> {
 	let ob = $.makeSlice<number>(binary.Size($.interfaceValue(objs, "[]main.item", /* @__PURE__ */ $.sliceType("main.item"))) + 1, undefined, "byte")
 	$.sliceElems(ob!)[$.sliceSlot(ob!, $.sliceLen(ob) - 1)] = 9
 	let [n, err] = binary.Encode(ob, $.structInterfaceValue<binary.ByteOrder | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.LittleEndian))), "binary.littleEndian", __goscriptStatic6())!, $.interfaceValue($.goSlice(objs, 1, undefined), "[]main.item", /* @__PURE__ */ $.sliceType("main.item")))
-	await $.println("objects:", binary.Size($.interfaceValue(objs, "[]main.item", /* @__PURE__ */ $.sliceType("main.item"))), n, err == null, $.arrayIndex(ob!, 12), $.arrayIndex(ob!, 13), $.arrayIndex(ob!, 14), $.arrayIndex(ob!, 15), $.arrayIndex(ob!, 48), $.arrayIndex(ob!, 52), $.arrayIndex(ob!, 64), $.arrayIndex(ob!, $.sliceLen(ob) - 1))
+	await $.println("objects:", binary.Size($.interfaceValue(objs, "[]main.item", /* @__PURE__ */ $.sliceType("main.item"))), n, err == null, $.typedSliceIndex(ob!, 12), $.typedSliceIndex(ob!, 13), $.typedSliceIndex(ob!, 14), $.typedSliceIndex(ob!, 15), $.typedSliceIndex(ob!, 48), $.typedSliceIndex(ob!, 52), $.typedSliceIndex(ob!, 64), $.typedSliceIndex(ob!, $.sliceLen(ob) - 1))
 	let back = $.makeSlice<item>(2, undefined, undefined, () => new item(true))
 	let __goscriptTuple0: any = binary.Decode(ob, $.structInterfaceValue<binary.ByteOrder | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.LittleEndian))), "binary.littleEndian", __goscriptStatic6())!, $.interfaceValue(back, "[]main.item", /* @__PURE__ */ $.sliceType("main.item")))
 	n = __goscriptTuple0[0]
 	err = __goscriptTuple0[1]
-	await $.println("decoded:", n, err == null, $.structEqual($.arrayIndex(back!, 0), $.arrayIndex(objs!, 1)), $.structEqual($.arrayIndex(back!, 1), $.arrayIndex(objs!, 2)), ($.arrayIndex(back!, 1).Colors)[1].Y, $.arrayIndex(back!, 1).Index)
+	await $.println("decoded:", n, err == null, $.structEqual($.plainSliceIndex(back!, 0), $.plainSliceIndex(objs!, 1)), $.structEqual($.plainSliceIndex(back!, 1), $.plainSliceIndex(objs!, 2)), ($.plainSliceIndex(back!, 1).Colors)[1].Y, $.plainSliceIndex(back!, 1).Index)
 
 	// Big-endian order and arrays of structs work the same way.
 	let __goscriptTuple1: any = binary.Append(null, $.structInterfaceValue<binary.ByteOrder | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.BigEndian))), "binary.bigEndian", __goscriptStatic8())!, $.interfaceValue($.goSlice(objs, 2, undefined), "[]main.item", /* @__PURE__ */ $.sliceType("main.item")))
@@ -212,7 +212,7 @@ export async function main(): globalThis.Promise<void> {
 	let arr2: $.VarRef<vec4[]> = $.varRef($.arrayValue(globalThis.Array.from({ length: 2 }, () => new vec4(true)), /* @__PURE__ */ $.arrayType("main.vec4", 2)))
 	let __goscriptTuple3: any = binary.Decode(ab, $.structInterfaceValue<binary.ByteOrder | null>($.markAsStructValue($.cloneStructValue($.pointerValue<any>(binary.LittleEndian))), "binary.littleEndian", __goscriptStatic6())!, $.interfaceValue(arr2, "*[2]main.vec4", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.arrayType("main.vec4", 2))))
 	err = __goscriptTuple3[1]
-	await $.println("big-endian:", $.sliceLen(be), $.arrayIndex(be!, 12), $.arrayIndex(be!, 13), "array:", $.sliceLen(ab), err == null, arr2.value[1].W)
+	await $.println("big-endian:", $.sliceLen(be), $.typedSliceIndex(be!, 12), $.typedSliceIndex(be!, 13), "array:", $.sliceLen(ab), err == null, arr2.value[1].W)
 }
 
 var __goscriptStatic0$value: any

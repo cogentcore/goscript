@@ -153,7 +153,7 @@ export async function main(): globalThis.Promise<void> {
 	let pr2 = new Pair(true, ((__goscriptSource) => new Point(true, __goscriptSource.X, __goscriptSource.Y))($.anonymousStructValue({X: 5, Y: 6}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("X", /* @__PURE__ */ $.basicType("int"), [0], 0, true), /* @__PURE__ */ $.structField("Y", /* @__PURE__ */ $.basicType("int"), [1], 8, true)] })))
 	await $.println("field method:", pr2.A.Sum())
 	let ps = $.arrayToSlice<Point>([((__goscriptSource) => new Point(true, __goscriptSource.X, __goscriptSource.Y))($.anonymousStructValue({X: 7, Y: 8}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("X", /* @__PURE__ */ $.basicType("int"), [0], 0, true), /* @__PURE__ */ $.structField("Y", /* @__PURE__ */ $.basicType("int"), [1], 8, true)] }))])
-	await $.println("element method:", $.arrayIndex(ps!, 0).Sum())
+	await $.println("element method:", $.plainSliceIndex(ps!, 0).Sum())
 	let m = $.makeMap<string, Point>([["a", ((__goscriptSource) => new Point(true, __goscriptSource.X, __goscriptSource.Y))($.anonymousStructValue({X: 1, Y: 1}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("X", /* @__PURE__ */ $.basicType("int"), [0], 0, true), /* @__PURE__ */ $.structField("Y", /* @__PURE__ */ $.basicType("int"), [1], 8, true)] }))]])
 	await $.println("map method:", $.mapGet<string, Point, Point>(m, "a", new Point(true))[0].Sum())
 

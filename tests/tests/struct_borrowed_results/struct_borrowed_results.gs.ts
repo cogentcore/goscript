@@ -231,7 +231,7 @@ export function Lines_at(l: Lines, reg: Region, __goscriptBorrow?: boolean): Reg
 	if ($.sliceLen((l as Lines)) == 0) {
 		return (__goscriptBorrow === true ? reg : (reg).clone())
 	}
-	return ($.arrayIndex(l!, 0)).clone()
+	return ($.plainSliceIndex(l!, 0)).clone()
 }
 
 export function reads(r: rule | $.VarRef<rule> | null, scope: Region): number {

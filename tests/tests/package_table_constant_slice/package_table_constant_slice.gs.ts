@@ -23,7 +23,7 @@ export function __goscript_set_nibbles(__goscriptValue: Uint8Array): void {
 }
 
 export function bits4(a: $.Slice<number>, i: number): number {
-	return $.uint(($.uintShr($.arrayIndex(a!, $.intShr(i, 1)), ($.intShl((i & 1), 2)), 8)) & 0b1111, 8)
+	return $.uint(($.uintShr($.typedSliceIndex(a!, $.intShr(i, 1)), ($.intShl((i & 1), 2)), 8)) & 0b1111, 8)
 }
 
 export function lookup(u: number): number {
@@ -46,7 +46,7 @@ export function sum(a: $.Slice<number>): number {
 }
 
 export function first(a: $.Slice<number>): number {
-	return $.arrayIndex(a!, 0) + sum($.goSlice(a, 1, undefined))
+	return $.plainSliceIndex(a!, 0) + sum($.goSlice(a, 1, undefined))
 }
 
 export let word: $.Slice<number> = new Uint8Array([103, 111, 115, 99, 114, 105, 112, 116, 32, 116, 97, 98, 108, 101, 115])
@@ -138,11 +138,11 @@ export async function main(): globalThis.Promise<void> {
 	// deferred.
 	await $.println("small:", sum(__goscriptStatic8()), sum(__goscriptStatic9()), sum(__goscriptStatic10()), sum(__goscriptStatic11()))
 	await $.println("small len/cap:", $.sliceLen(__goscriptStatic12()), $.cap(__goscriptStatic12()), $.sliceLen(__goscriptStatic13()), $.cap(__goscriptStatic13()))
-	await $.println("small first:", first(__goscriptStatic14()), $.arrayIndex(__goscriptStatic15()!, 2))
+	await $.println("small first:", first(__goscriptStatic14()), $.plainSliceIndex(__goscriptStatic15()!, 2))
 	await $.println("word:", $.bytesToString(__goscriptStatic16()), $.bytesToString(__goscriptStatic17()))
 
 	// A table read during initialization.
-	await $.println("derived:", derived, sum(__goscriptStatic4()), $.arrayIndex(__goscriptStatic18()!, 2))
+	await $.println("derived:", derived, sum(__goscriptStatic4()), $.plainSliceIndex(__goscriptStatic18()!, 2))
 
 	// A reassigned table gives the new elements.
 	await $.println("replaced before:", sum($.goSlice(replaced, 1, undefined)))

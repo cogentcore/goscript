@@ -139,7 +139,7 @@ export async function main(): globalThis.Promise<void> {
 	let h = new Holder(false, $.arrayToSlice<Node>([new Node(true, "p"), new Node(true, "q")]))
 	let h$: Holder = h == null ? $.pointerTarget<Holder>(h) : (h as any).__isVarRef === true ? (h as any).value : (h as any).__goValue === undefined ? (h as any) : $.pointerTarget<Holder>(h)
 	void (h !== null && (h as any).__isVarRef !== true && (h as any).__goValue === undefined ? ((h as any) as Holder).touch(1) : Holder.prototype.touch.call(h, 1))
-	await $.println($.arrayIndex((h$ as Holder).items!, 1).Name, $.arrayIndex((h$ as Holder).items!, 1).Count)
+	await $.println($.plainSliceIndex((h$ as Holder).items!, 1).Name, $.plainSliceIndex((h$ as Holder).items!, 1).Count)
 }
 
 if ($.isMainScript(import.meta)) {

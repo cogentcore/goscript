@@ -35,18 +35,18 @@ export async function main(): globalThis.Promise<void> {
 	let current = $.varRef(new cell(true, 7))
 	let cells = $.appendOne<cell>(null, (current.value).clone())
 	current.value = current.value.__goscriptAssign(new cell(true))
-	await $.println("cell:", $.arrayIndex(cells!, 0).width, current.value.width)
+	await $.println("cell:", $.plainSliceIndex(cells!, 0).width, current.value.width)
 
 	// Arrays also copy at the argument boundary.
 	let row = $.arrayValue([3, 4])
 	let rows = $.appendOne<number[]>(null, $.cloneArrayValue(row, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2)))
 	row[0] = 9
-	await $.println("array:", ($.arrayIndex(rows!, 0))[0], row[0])
+	await $.println("array:", ($.plainSliceIndex(rows!, 0))[0], row[0])
 
 	// Pointer elements retain their identity.
 	let pointers = $.appendOne<cell | $.VarRef<cell> | null>(null, current, $.appendZeros.nil)
 	current.value.width = 11
-	await $.println("pointer:", $.pointerValue<cell>($.arrayIndex(pointers!, 0)).width)
+	await $.println("pointer:", $.pointerValue<cell>($.plainSliceIndex(pointers!, 0)).width)
 }
 
 if ($.isMainScript(import.meta)) {

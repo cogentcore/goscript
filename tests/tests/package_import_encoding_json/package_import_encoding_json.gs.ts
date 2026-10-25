@@ -234,9 +234,9 @@ export async function byteSliceFields(): globalThis.Promise<void> {
 	let d$: Enc = d == null ? $.pointerTarget<Enc>(d) : (d as any).__isVarRef === true ? (d as any).value : (d as any).__goValue === undefined ? (d as any) : $.pointerTarget<Enc>(d)
 	err = (json.Unmarshal(b, $.interfaceValue(d, "*main.Enc", /* @__PURE__ */ $.pointerType("main.Enc"))) as $.GoError)
 	await $.println("err:", err == null, "width:", (d$ as Enc).Width)
-	await $.println("image:", $.sliceLen((d$ as Enc).Image), $.arrayIndex((d$ as Enc).Image!, 0), $.arrayIndex((d$ as Enc).Image!, 2))
-	await $.println("frames:", $.sliceLen((d$ as Enc).Frames), $.sliceLen($.arrayIndex((d$ as Enc).Frames!, 1)), $.arrayIndex($.arrayIndex((d$ as Enc).Frames!, 1)!, 1))
-	await $.println("named:", $.sliceLen($.mapGet<string, $.Slice<number>, $.Slice<number>>((d$ as Enc).Named, "a", null)[0]), $.arrayIndex($.mapGet<string, $.Slice<number>, $.Slice<number>>((d$ as Enc).Named, "a", null)[0]!, 1))
+	await $.println("image:", $.sliceLen((d$ as Enc).Image), $.typedSliceIndex((d$ as Enc).Image!, 0), $.typedSliceIndex((d$ as Enc).Image!, 2))
+	await $.println("frames:", $.sliceLen((d$ as Enc).Frames), $.sliceLen($.plainSliceIndex((d$ as Enc).Frames!, 1)), $.typedSliceIndex($.plainSliceIndex((d$ as Enc).Frames!, 1)!, 1))
+	await $.println("named:", $.sliceLen($.mapGet<string, $.Slice<number>, $.Slice<number>>((d$ as Enc).Named, "a", null)[0]), $.typedSliceIndex($.mapGet<string, $.Slice<number>, $.Slice<number>>((d$ as Enc).Named, "a", null)[0]!, 1))
 	await $.println("nested:", $.bytesToString($.pointerValue<Enc>((d$ as Enc).Nested).Image))
 
 	err = (json.Unmarshal(new Uint8Array([123, 34, 73, 109, 97, 103, 101, 34, 58, 110, 117, 108, 108, 125]), $.interfaceValue(d, "*main.Enc", /* @__PURE__ */ $.pointerType("main.Enc"))) as $.GoError)

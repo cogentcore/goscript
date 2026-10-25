@@ -35,7 +35,7 @@ export async function main(): globalThis.Promise<void> {
 	await recoverMsg("slice:", $.functionValue(async () => {
 		let s = $.arrayToSlice<number>([1, 2, 3])
 		let i = 5
-		await $.println($.arrayIndex(s!, i))
+		await $.println($.plainSliceIndex(s!, i))
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)))
 	await recoverMsg("array:", $.functionValue(async () => {
 		let a: number[] = $.arrayValue(globalThis.Array.from({ length: 3 }, () => 0))
@@ -45,7 +45,7 @@ export async function main(): globalThis.Promise<void> {
 	await recoverMsg("negative:", $.functionValue(async () => {
 		let s = $.arrayToSlice<number>([1, 2, 3])
 		let i = -1
-		await $.println($.arrayIndex(s!, i))
+		await $.println($.plainSliceIndex(s!, i))
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)))
 	await recoverMsg("string:", $.functionValue(async () => {
 		let s = "abc"
@@ -60,7 +60,7 @@ export async function main(): globalThis.Promise<void> {
 	await recoverMsg("bytes-negative:", $.functionValue(async () => {
 		let b = new Uint8Array([97, 98, 99])
 		let i = -1
-		await $.println($.arrayIndex(b!, i))
+		await $.println($.typedSliceIndex(b!, i))
 	}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo)))
 	await $.println("done")
 }

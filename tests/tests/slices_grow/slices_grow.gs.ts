@@ -13,7 +13,7 @@ export async function main(): globalThis.Promise<void> {
 	// Growing a byte slice exposes zero bytes past its length.
 	let b: $.Slice<number> = (slices.Grow(new Uint8Array([97, 98, 99]), 4, () => (0 as number)) as $.Slice<number>)
 	b = $.goSlice(b, undefined, $.cap(b))
-	await $.println("byte Grow: zero tail=", $.arrayIndex(b!, $.sliceLen(b) - 1) == 0, "kept=", $.bytesToString($.goSlice(b, undefined, 3)))
+	await $.println("byte Grow: zero tail=", $.typedSliceIndex(b!, $.sliceLen(b) - 1) == 0, "kept=", $.bytesToString($.goSlice(b, undefined, 3)))
 	await $.println("slices.Grow test finished")
 }
 

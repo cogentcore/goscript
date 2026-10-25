@@ -15,9 +15,9 @@ export async function main(): globalThis.Promise<void> {
 	let slice = $.arrayToSlice<number>([1, 2, 3])
 	modifyGenericSlice(__goscriptStatic0(), slice, 1, 42)
 
-	await $.println("slice[0]:", $.arrayIndex(slice!, 0))
-	await $.println("slice[1]:", $.arrayIndex(slice!, 1))
-	await $.println("slice[2]:", $.arrayIndex(slice!, 2))
+	await $.println("slice[0]:", $.plainSliceIndex(slice!, 0))
+	await $.println("slice[1]:", $.plainSliceIndex(slice!, 1))
+	await $.println("slice[2]:", $.plainSliceIndex(slice!, 2))
 	await $.println("test finished")
 }
 

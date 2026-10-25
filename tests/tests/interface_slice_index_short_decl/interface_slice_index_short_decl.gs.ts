@@ -116,8 +116,8 @@ export async function main(): globalThis.Promise<void> {
 				case 1:
 					{
 						let shape: $.VarRef<Action> = $.varRef($.markAsStructValue($.cloneStructValue($.typeAssert<Action>(__goscriptTypeSwitchValue, "main.Action").value)))
-						let fix = ($.arrayIndex(fixed!, 0) as Fixed)
-						let fv = $.arrayIndex(fix!, 0)
+						let fix = ($.plainSliceIndex(fixed!, 0) as Fixed)
+						let fv = $.plainSliceIndex(fix!, 0)
 						{
 							let v = $.mapGet<number, dep.Ref | null, dep.Ref | null>(shape.value.Filter, shape.value.Result, null)[0]
 							if (v != null) {
@@ -131,8 +131,8 @@ export async function main(): globalThis.Promise<void> {
 			}
 		}
 	}
-	let fix = ($.arrayIndex(fixed!, 0) as Fixed)
-	let fv = $.arrayIndex(fix!, 0)
+	let fix = ($.plainSliceIndex(fixed!, 0) as Fixed)
+	let fv = $.plainSliceIndex(fix!, 0)
 	if (dep.ToKey(fv) != null) {
 		await $.println("ok")
 	}

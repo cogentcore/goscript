@@ -40,37 +40,37 @@ export class point {
 export async function main(): globalThis.Promise<void> {
 	// Elements of a made slice of arrays are zero arrays that can be written.
 	let a = $.makeSlice<number[]>(3, undefined, undefined, () => $.arrayValue(globalThis.Array.from({ length: 4 }, () => 0)))
-	$.arrayIndex(a!, 1)[2] = 5
-	await $.println("arrays:", ($.arrayIndex(a!, 0))[0], ($.arrayIndex(a!, 1))[2], 4)
+	$.plainSliceIndex(a!, 1)[2] = 5
+	await $.println("arrays:", ($.plainSliceIndex(a!, 0))[0], ($.plainSliceIndex(a!, 1))[2], 4)
 
 	// Arrays of structs and named array types too.
 	let b = $.makeSlice<point[]>(2, undefined, undefined, () => $.arrayValue(globalThis.Array.from({ length: 2 }, () => new point(true)), /* @__PURE__ */ $.arrayType("main.point", 2)));
-	;($.arrayIndex(b!, 1))[1].X = 3
+	;($.plainSliceIndex(b!, 1))[1].X = 3
 	let q = $.makeSlice<quad>(1, undefined, undefined, () => $.arrayValue(globalThis.Array.from({ length: 4 }, () => 0)))
-	$.arrayIndex(q!, 0)[3] = 9
-	await $.println("struct arrays:", ($.arrayIndex(b!, 0))[0].X, ($.arrayIndex(b!, 1))[1].X, ($.arrayIndex(q!, 0))[3])
+	$.plainSliceIndex(q!, 0)[3] = 9
+	await $.println("struct arrays:", ($.plainSliceIndex(b!, 0))[0].X, ($.plainSliceIndex(b!, 1))[1].X, ($.plainSliceIndex(q!, 0))[3])
 
 	// Unnamed struct elements are zero structs.
 	let u = $.makeSlice<{"A": number, "B": number}>(2, undefined, undefined, () => $.anonymousStructValue({"A": 0, "B": 0}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("A", /* @__PURE__ */ $.basicType("int"), [0], 0, true), /* @__PURE__ */ $.structField("B", /* @__PURE__ */ $.basicType("int"), [1], 8, true)] }))
-	$.arrayIndex(u!, 1).B = 4
-	await $.println("unnamed structs:", $.arrayIndex(u!, 0).A, $.arrayIndex(u!, 1).B)
+	$.plainSliceIndex(u!, 1).B = 4
+	await $.println("unnamed structs:", $.plainSliceIndex(u!, 0).A, $.plainSliceIndex(u!, 1).B)
 
 	// Spare capacity holds zero arrays as well.
 	let c: $.Slice<number[]> = $.makeSlice<number[]>(2, 5, undefined, () => $.arrayValue(globalThis.Array.from({ length: 4 }, () => 0)))
 	c = $.goSlice(c, undefined, 4)
-	$.arrayIndex(c!, 3)[0] = 7
-	await $.println("spare capacity:", ($.arrayIndex(c!, 2))[1], ($.arrayIndex(c!, 3))[0])
+	$.plainSliceIndex(c!, 3)[0] = 7
+	await $.println("spare capacity:", ($.plainSliceIndex(c!, 2))[1], ($.plainSliceIndex(c!, 3))[0])
 
 	// Each element is its own array.
-	$.arrayIndex(a!, 0)[0] = 1
-	await $.println("distinct:", ($.arrayIndex(a!, 0))[0], ($.arrayIndex(a!, 2))[0])
+	$.plainSliceIndex(a!, 0)[0] = 1
+	await $.println("distinct:", ($.plainSliceIndex(a!, 0))[0], ($.plainSliceIndex(a!, 2))[0])
 
 	// Clearing a slice of arrays or structs leaves zero values to write to.
 	$.clear(a, () => $.arrayValue(globalThis.Array.from({ length: 4 }, () => 0)))
-	$.arrayIndex(a!, 2)[1] = 6
+	$.plainSliceIndex(a!, 2)[1] = 6
 	$.clear($.goSlice(u, 1, undefined), () => $.anonymousStructValue({"A": 0, "B": 0}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("A", /* @__PURE__ */ $.basicType("int"), [0], 0, true), /* @__PURE__ */ $.structField("B", /* @__PURE__ */ $.basicType("int"), [1], 8, true)] }))
-	$.arrayIndex(u!, 1).A = 8
-	await $.println("cleared:", ($.arrayIndex(a!, 0))[0], ($.arrayIndex(a!, 1))[2], ($.arrayIndex(a!, 2))[1], $.arrayIndex(u!, 1).A, $.arrayIndex(u!, 1).B)
+	$.plainSliceIndex(u!, 1).A = 8
+	await $.println("cleared:", ($.plainSliceIndex(a!, 0))[0], ($.plainSliceIndex(a!, 1))[2], ($.plainSliceIndex(a!, 2))[1], $.plainSliceIndex(u!, 1).A, $.plainSliceIndex(u!, 1).B)
 }
 
 if ($.isMainScript(import.meta)) {

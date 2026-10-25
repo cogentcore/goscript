@@ -8,7 +8,7 @@ import "@goscript/os/index.js"
 export async function main(): globalThis.Promise<void> {
 	// The program name comes first on every platform, so programs may index
 	// os.Args[0] and slice the arguments after it.
-	await $.println("has name:", ($.sliceLen(os.Args) > 0) && (!$.stringEqual($.arrayIndex(os.Args!, 0), "")))
+	await $.println("has name:", ($.sliceLen(os.Args) > 0) && (!$.stringEqual($.plainSliceIndex(os.Args!, 0), "")))
 	await $.println("args:", $.sliceLen($.goSlice(os.Args, 1, undefined)))
 }
 

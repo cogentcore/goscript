@@ -8,13 +8,13 @@ export type word = number
 export async function main(): globalThis.Promise<void> {
 	let words = $.arrayToSlice<word>([$.uint("9223372036854775808", 64), 5, $.uint("18446744073709551615", 64)])
 	$.clear($.goSlice(words, undefined, 2), () => 0)
-	await $.println("words", $.arrayIndex(words!, 0), $.arrayIndex(words!, 1), $.arrayIndex(words!, 2) == $.uint("18446744073709551615", 64))
+	await $.println("words", $.plainSliceIndex(words!, 0), $.plainSliceIndex(words!, 1), $.plainSliceIndex(words!, 2) == $.uint("18446744073709551615", 64))
 	$.clear(words, () => 0)
-	await $.println("words", $.arrayIndex(words!, 0), $.arrayIndex(words!, 1), $.arrayIndex(words!, 2))
+	await $.println("words", $.plainSliceIndex(words!, 0), $.plainSliceIndex(words!, 1), $.plainSliceIndex(words!, 2))
 
 	let wide = $.arrayToSlice<bigint>([9223372036854775808n, 4611686018427387904n])
 	$.clear(wide, () => 0n)
-	await $.println("wide", $.arrayIndex(wide!, 0), $.arrayIndex(wide!, 1), $.arrayIndex(wide!, 0) == 0n)
+	await $.println("wide", $.plainSliceIndex(wide!, 0), $.plainSliceIndex(wide!, 1), $.plainSliceIndex(wide!, 0) == 0n)
 }
 
 if ($.isMainScript(import.meta)) {

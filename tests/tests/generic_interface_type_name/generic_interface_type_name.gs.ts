@@ -112,7 +112,7 @@ export async function main(): globalThis.Promise<void> {
 		let v = (__goscriptRangeWindow1.backing[__goscriptRangeWindow1.offset + __rangeIndex] as any)
 		fmt.Printf("%T\n", v)
 	}
-	for (let __goscriptRangeTarget2 = box(__goscriptStatic3(), $.arrayIndex(nodes!, 0)), __goscriptRangeWindow2 = $.sliceRange(__goscriptRangeTarget2), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow2.length; __rangeIndex++) {
+	for (let __goscriptRangeTarget2 = box(__goscriptStatic3(), $.plainSliceIndex(nodes!, 0)), __goscriptRangeWindow2 = $.sliceRange(__goscriptRangeTarget2), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow2.length; __rangeIndex++) {
 		let v = (__goscriptRangeWindow2.backing[__goscriptRangeWindow2.offset + __rangeIndex] as any)
 		fmt.Printf("%T\n", v)
 	}
@@ -121,7 +121,7 @@ export async function main(): globalThis.Promise<void> {
 		fmt.Printf("%T\n", v)
 	}
 	{
-		const __goscriptTypeSwitchValue = $.arrayIndex(nodes!, 1)
+		const __goscriptTypeSwitchValue = $.plainSliceIndex(nodes!, 1)
 		switch ($.typeSwitchCase(__goscriptTypeSwitchValue, __goscriptStatic5())) {
 			case 0:
 				{

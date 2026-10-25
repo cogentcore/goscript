@@ -50,7 +50,7 @@ export function points(n: number): iter.Seq2<string, point> | null {
 	return $.functionValue(async (_yield: ((_p0: string, _p1: point) => boolean | globalThis.Promise<boolean>) | null) => {
 		let names = $.arrayToSlice<string>(["a", "b", "c"])
 		for (let __goscriptRangeCount1 = n, i = 0; i < __goscriptRangeCount1; i++) {
-			if (!(__goscriptAwait = _yield!($.arrayIndex(names!, i), new point(true, i, i * 10)), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)) {
+			if (!(__goscriptAwait = _yield!($.plainSliceIndex(names!, i), new point(true, i, i * 10)), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)) {
 				return
 			}
 		}
@@ -147,14 +147,14 @@ export async function main(): globalThis.Promise<void> {
 
 	// Collecting a sequence that suspends at yield waits for it.
 	await $.println("collect:", $.sliceLen(await slices.Collect(numbers(3))))
-	await $.println("sorted:", $.arrayIndex((await slices.Sorted(numbers(3)))!, 2))
+	await $.println("sorted:", $.plainSliceIndex((await slices.Sorted(numbers(3)))!, 2))
 	await $.println("append:", $.sliceLen(await slices.AppendSeq($.arrayToSlice<number>([9]), numbers(2))))
 	let m = (await maps.Collect(points(3)) as globalThis.Map<string, point> | null)
 	await $.println("map:", $.len(m), $.mapGet<string, point, point>(m, "c", new point(true))[0].y)
 	await maps.Insert(m, points(1))
 	await $.println("insert:", $.len(m))
 	let sortedWords = (await slices.Sorted(words) as $.Slice<string>)
-	await $.println("words:", $.arrayIndex(sortedWords!, 0), $.arrayIndex(sortedWords!, 1))
+	await $.println("words:", $.plainSliceIndex(sortedWords!, 0), $.plainSliceIndex(sortedWords!, 1))
 	await $.println("keys:", sortedKeys($.makeMap<string, number>([["b", 1], ["a", 2]])))
 
 	// Pull2 returns zero values of its element types at the end.

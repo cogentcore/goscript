@@ -22,7 +22,7 @@ export async function main(): globalThis.Promise<void> {
 	$.sliceElems(stringSlice!)[$.sliceSlot(stringSlice!, 1)] = __goscriptTuple0[1]
 
 	await $.println("intArray[0]:", intArray[0])
-	await $.println("stringSlice[1]:", $.arrayIndex(stringSlice!, 1))
+	await $.println("stringSlice[1]:", $.plainSliceIndex(stringSlice!, 1))
 
 	// Test with more complex index expressions
 	let matrix: number[][] = $.arrayValue(globalThis.Array.from({ length: 2 }, () => $.arrayValue(globalThis.Array.from({ length: 2 }, () => 0))), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2), 2))

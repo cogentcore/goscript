@@ -194,7 +194,7 @@ export async function main(): globalThis.Promise<void> {
 }
 
 export function Names_First(n: Names): string {
-	return $.arrayIndex(n!, 0)
+	return $.plainSliceIndex(n!, 0)
 }
 
 export function Grid_Sum(g: Grid): number {

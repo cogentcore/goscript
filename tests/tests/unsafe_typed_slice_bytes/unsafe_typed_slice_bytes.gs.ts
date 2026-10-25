@@ -20,29 +20,29 @@ export async function main(): globalThis.Promise<void> {
 	// The bytes are the little-endian encoding of the elements.
 	let f = $.typedSliceOf(Float32Array, [1, -2, 0.5]) as $.Slice<number>
 	let b = floatBytes(f)
-	await $.println("float bytes:", $.sliceLen(b), $.arrayIndex(b!, 2), $.arrayIndex(b!, 3), $.arrayIndex(b!, 7), $.arrayIndex(b!, 11))
+	await $.println("float bytes:", $.sliceLen(b), $.typedSliceIndex(b!, 2), $.typedSliceIndex(b!, 3), $.typedSliceIndex(b!, 7), $.typedSliceIndex(b!, 11))
 
 	// Writes through either side are seen by the other.
 	$.sliceElems(b!)[$.sliceSlot(b!, 3)] = 0x40
 	$.sliceElems(f!)[$.sliceSlot(f!, 2)] = 2
-	await $.println("shared:", $.arrayIndex(f!, 0), $.arrayIndex(b!, 11))
+	await $.println("shared:", $.typedSliceIndex(f!, 0), $.typedSliceIndex(b!, 11))
 
 	// A window views only its own elements.
 	let u = $.typedSliceOf(Uint32Array, [0x01020304, 0x05060708, 0x090a0b0c]) as $.Slice<number>
 	let w = uintBytes($.goSlice(u, 1, undefined))
-	await $.println("window:", $.sliceLen(w), $.arrayIndex(w!, 0), $.arrayIndex(w!, 4))
+	await $.println("window:", $.sliceLen(w), $.typedSliceIndex(w!, 0), $.typedSliceIndex(w!, 4))
 	$.sliceElems(w!)[$.sliceSlot(w!, 0)] = 0xff
-	await $.println("window write:", $.arrayIndex(u!, 1) == 0x050607ff)
+	await $.println("window write:", $.typedSliceIndex(u!, 1) == 0x050607ff)
 
 	// The element pointer is that of the slice.
 	let e = (unsafe.Slice!($.indexRef(u!, 1), 2, "uint32") as $.Slice<number>)
 	$.sliceElems(e!)[$.sliceSlot(e!, 1)] = 7
-	await $.println("same kind:", $.arrayIndex(u!, 2), $.sliceLen(e), $.cap(e))
+	await $.println("same kind:", $.typedSliceIndex(u!, 2), $.sliceLen(e), $.cap(e))
 
 	// The bytes of an int16 slice, and back from bytes to elements.
 	let i = $.typedSliceOf(Int16Array, [-1, 256]) as $.Slice<number>
 	let ib = (unsafe.Slice!(($.indexRef(i!, 0) as any), 4, "byte") as $.Slice<number>)
-	await $.println("int16 bytes:", $.arrayIndex(ib!, 0), $.arrayIndex(ib!, 1), $.arrayIndex(ib!, 2), $.arrayIndex(ib!, 3))
+	await $.println("int16 bytes:", $.typedSliceIndex(ib!, 0), $.typedSliceIndex(ib!, 1), $.typedSliceIndex(ib!, 2), $.typedSliceIndex(ib!, 3))
 	await $.println("nil:", floatBytes(null) == null)
 }
 

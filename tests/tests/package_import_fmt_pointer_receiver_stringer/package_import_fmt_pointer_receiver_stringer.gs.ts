@@ -92,7 +92,7 @@ export async function main(): globalThis.Promise<void> {
 	fmt.Println($.interfaceValue(line.value, "main.Line", /* @__PURE__ */ $.sliceType("main.Lex", "main.Line")), $.namedValueInterfaceValue<any>(line, "*main.Line", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()))
 	fmt.Println((fmt.Sprint($.interfaceValue(line.value, "main.Line", /* @__PURE__ */ $.sliceType("main.Lex", "main.Line"))) as string))
 	let ptrs = $.arrayToSlice<Lex | $.VarRef<Lex> | null>([$.indexRef(line.value!, 0)])
-	fmt.Println($.interfaceValue($.arrayIndex(ptrs!, 0), "*main.Lex", /* @__PURE__ */ $.pointerType("main.Lex")), $.structInterfaceValue(new Val(true, 4), "main.Val", "main.Val"), $.interfaceValue(new Val(false, 5), "*main.Val", /* @__PURE__ */ $.pointerType("main.Val")), $.interfaceValue($.arrayToSlice<Val>([new Val(true, 6)]), "[]main.Val", /* @__PURE__ */ $.sliceType("main.Val")))
+	fmt.Println($.interfaceValue($.plainSliceIndex(ptrs!, 0), "*main.Lex", /* @__PURE__ */ $.pointerType("main.Lex")), $.structInterfaceValue(new Val(true, 4), "main.Val", "main.Val"), $.interfaceValue(new Val(false, 5), "*main.Val", /* @__PURE__ */ $.pointerType("main.Val")), $.interfaceValue($.arrayToSlice<Val>([new Val(true, 6)]), "[]main.Val", /* @__PURE__ */ $.sliceType("main.Val")))
 }
 
 var __goscriptStatic0$value: any

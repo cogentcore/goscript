@@ -74,14 +74,14 @@ export async function printInterfaceSpareZero(): globalThis.Promise<void> {
 	let values: $.Slice<any> = $.makeSlice<any>(0, 2)
 	values = $.appendOne(values, $.structInterfaceValue(new entry(true, "value"), "main.entry", "main.entry"), $.appendZeros.nil)
 	values = $.goSlice(values, undefined, 2)
-	await $.println($.arrayIndex(values!, 1) == null)
+	await $.println($.plainSliceIndex(values!, 1) == null)
 }
 
 export async function printInterfaceAppendSliceSpareZero(): globalThis.Promise<void> {
 	let values: $.Slice<any> = $.makeSlice<any>(0, 2)
 	values = $.appendSlice(values, $.arrayToSlice<any>([$.structInterfaceValue(new entry(true, "value"), "main.entry", "main.entry")]), $.appendZeros.nil)
 	values = $.goSlice(values, undefined, 2)
-	await $.println($.arrayIndex(values!, 1) == null)
+	await $.println($.plainSliceIndex(values!, 1) == null)
 }
 
 export async function main(): globalThis.Promise<void> {

@@ -107,10 +107,10 @@ export async function main(): globalThis.Promise<void> {
 	let original = new msg(false, 7)
 	let cloned = (protobuf_go_lite.CloneVTValue(__goscriptStatic0(), original) as msg | $.VarRef<msg> | null)
 	await $.println("clone:", (cloned !== original && !(($.pointerAliasesMade || (cloned as any)?.__goElementBacking !== undefined) && $.pointerEqual(cloned, original))), (cloned !== null && (cloned as any).__isVarRef !== true && (cloned as any).__goValue === undefined ? ((cloned as any) as msg).EqualVT(original) : msg.prototype.EqualVT.call(cloned, original)))
-	await $.println("clone-slice:", !$.pointerEqual($.arrayIndex(protobuf_go_lite.CloneVTSlice($.arrayToSlice<msg | $.VarRef<msg> | null>([original]))!, 0), original))
+	await $.println("clone-slice:", !$.pointerEqual($.plainSliceIndex(protobuf_go_lite.CloneVTSlice($.arrayToSlice<msg | $.VarRef<msg> | null>([original]))!, 0), original))
 	let enumSlice = $.typedSliceOf(Int32Array, [1, 0]) as $.Slice<state>
 	let clonedEnumSlice = (protobuf_go_lite.CloneSlice(enumSlice) as $.Slice<state>)
-	await $.println("clone-enum-slice:", $.arrayIndex(clonedEnumSlice!, 0), $.arrayIndex(clonedEnumSlice!, 1))
+	await $.println("clone-enum-slice:", $.typedSliceIndex(clonedEnumSlice!, 0), $.typedSliceIndex(clonedEnumSlice!, 1))
 	await $.println("equal:", protobuf_go_lite.IsEqualVT(__goscriptStatic0(), original, new msg(false, 7)))
 	await $.println("equal-slice-implicit:", protobuf_go_lite.EqualVTSliceImplicit($.arrayToSlice<msg | $.VarRef<msg> | null>([null, original]), $.arrayToSlice<msg | $.VarRef<msg> | null>([new msg(), new msg(false, 7)]), $.functionValue((): msg | $.VarRef<msg> | null => {
 		return new msg()

@@ -8,7 +8,7 @@ export async function main(): globalThis.Promise<void> {
 	// Test creating reflect.SelectCase struct literals
 	let cases = $.arrayToSlice<reflect.SelectCase>([$.markAsStructValue(new reflect.SelectCase({Dir: 3}))])
 	await $.println("Cases len:", $.sliceLen(cases))
-	await $.println("First case dir:", $.arrayIndex(cases!, 0).Dir)
+	await $.println("First case dir:", $.plainSliceIndex(cases!, 0).Dir)
 }
 
 if ($.isMainScript(import.meta)) {

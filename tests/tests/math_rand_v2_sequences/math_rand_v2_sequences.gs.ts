@@ -89,8 +89,8 @@ export async function show(r: rand.Rand | $.VarRef<rand.Rand> | null): globalThi
 	await $.println("perm:", ints((r !== null && (r as any).__isVarRef !== true && (r as any).__goValue === undefined ? ((r as any) as rand.Rand).Perm(12) : rand.Rand.prototype.Perm.call($.pointerValue<rand.Rand>(r), 12))))
 	let s = $.arrayToSlice<number>([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
 	rand.Rand.prototype.Shuffle.call($.pointerValue<rand.Rand>(r), $.sliceLen(s), $.functionValue((i: number, j: number) => {
-		let __goscriptAssign0_0: number = $.arrayIndex(s!, j)
-		let __goscriptAssign0_1: number = $.arrayIndex(s!, i)
+		let __goscriptAssign0_0: number = $.plainSliceIndex(s!, j)
+		let __goscriptAssign0_1: number = $.plainSliceIndex(s!, i)
 		$.sliceElems(s!)[$.sliceSlot(s!, i)] = __goscriptAssign0_0
 		$.sliceElems(s!)[$.sliceSlot(s!, j)] = __goscriptAssign0_1
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")], results: [] } as $.FunctionTypeInfo)))

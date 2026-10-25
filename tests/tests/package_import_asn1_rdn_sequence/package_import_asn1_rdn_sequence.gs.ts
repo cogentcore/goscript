@@ -20,9 +20,9 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("unmarshal err nil", err == null)
 	await $.println("rest len", $.sliceLen(rest))
 	await $.println("rdn count", $.sliceLen((output.value as pkix.RDNSequence)))
-	await $.println("set count", $.sliceLen(($.arrayIndex(output.value!, 0) as pkix.RelativeDistinguishedNameSET)))
-	await $.println("oid", asn1.ObjectIdentifier_String($.arrayIndex($.arrayIndex(output.value!, 0)!, 0).Type))
-	await $.println("value", $.mustTypeAssert<string>($.arrayIndex($.arrayIndex(output.value!, 0)!, 0).Value, /* @__PURE__ */ $.basicType("string")))
+	await $.println("set count", $.sliceLen(($.plainSliceIndex(output.value!, 0) as pkix.RelativeDistinguishedNameSET)))
+	await $.println("oid", asn1.ObjectIdentifier_String($.plainSliceIndex($.plainSliceIndex(output.value!, 0)!, 0).Type))
+	await $.println("value", $.mustTypeAssert<string>($.plainSliceIndex($.plainSliceIndex(output.value!, 0)!, 0).Value, /* @__PURE__ */ $.basicType("string")))
 }
 
 var __goscriptStatic0$value: any

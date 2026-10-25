@@ -101,7 +101,7 @@ export async function main(): globalThis.Promise<void> {
 	let decoded: $.VarRef<signedKey> = $.varRef(new signedKey(true))
 	let __goscriptTuple4: any = asn1.Unmarshal(keyExt.Value, $.interfaceValue(decoded, "*main.signedKey", /* @__PURE__ */ $.pointerType("main.signedKey")))
 	err = __goscriptTuple4[1]
-	await $.println("extension unmarshal", err == null, $.sliceLen(decoded.value.PubKey), $.arrayIndex(decoded.value.PubKey!, 0), $.arrayIndex(decoded.value.PubKey!, 5), $.sliceLen(decoded.value.Signature))
+	await $.println("extension unmarshal", err == null, $.sliceLen(decoded.value.PubKey), $.typedSliceIndex(decoded.value.PubKey!, 0), $.typedSliceIndex(decoded.value.PubKey!, 5), $.sliceLen(decoded.value.Signature))
 	let pool = x509.NewCertPool()
 	await (pool !== null && (pool as any).__isVarRef !== true && (pool as any).__goValue === undefined ? ((pool as any) as x509.CertPool).AddCert(cert) : x509.CertPool.prototype.AddCert.call(pool, cert))
 	let __goscriptTuple5: any = await (cert !== null && (cert as any).__isVarRef !== true && (cert as any).__goValue === undefined ? ((cert as any) as x509.Certificate).Verify(new x509.VerifyOptions(true, undefined, undefined, pool)) : x509.Certificate.prototype.Verify.call(cert, new x509.VerifyOptions(true, undefined, undefined, pool)))
@@ -138,7 +138,7 @@ export async function main(): globalThis.Promise<void> {
 
 	await $.println("serial", big.Int.prototype.String.call($.pointerValue<big.Int>((cert$ as x509.Certificate).SerialNumber)))
 	await $.println("common name", (cert$ as x509.Certificate).Subject.CommonName)
-	await $.println("organization", $.arrayIndex((cert$ as x509.Certificate).Subject.Organization!, 0))
+	await $.println("organization", $.plainSliceIndex((cert$ as x509.Certificate).Subject.Organization!, 0))
 	await $.println("signature algorithm", x509.SignatureAlgorithm_String((cert$ as x509.Certificate).SignatureAlgorithm))
 	await $.println("public key algorithm", x509.PublicKeyAlgorithm_String((cert$ as x509.Certificate).PublicKeyAlgorithm))
 	await $.println("public key equal", ed25519.PublicKey_Equal($.mustTypeAssert<ed25519.PublicKey>((cert$ as x509.Certificate).PublicKey, /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"), "ed25519.PublicKey")), $.namedValueInterfaceValue<crypto.PublicKey | null>(pub, "ed25519.PublicKey", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2())))

@@ -31,7 +31,7 @@ export async function main(): globalThis.Promise<void> {
 	// Calls the chain does not reach still find a frame.
 	let add: ((names: $.VarRef<$.Slice<string>> | null, init: (() => void) | null) => void) | null = subpkg.Add
 	add!(names, (null as (() => void) | null))
-	await $.println("value call named:", !$.stringEqual($.arrayIndex(names.value!, $.sliceLen(names.value) - 1), ""))
+	await $.println("value call named:", !$.stringEqual($.plainSliceIndex(names.value!, $.sliceLen(names.value) - 1), ""))
 	await $.println("unmarked named:", !$.stringEqual(subpkg.Unmarked(), ""))
 }
 

@@ -147,12 +147,12 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("bytes:", $.markAsStructValue($.cloneStructValue(bytes)).Len(), $.markAsStructValue($.cloneStructValue(bytes)).Cap(), $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(bytes)).Index(0))).Uint(), $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(bytes)).Index(1))).Uint())
 	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(bytes)).Index(0))).SetUint(9n)
 	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(bytes)).Index(1))).SetUint(8n)
-	await $.println("buf:", $.arrayIndex(buf!, 0), $.arrayIndex(buf!, 1), $.arrayIndex(buf!, 2), $.arrayIndex(buf!, 3))
+	await $.println("buf:", $.typedSliceIndex(buf!, 0), $.typedSliceIndex(buf!, 1), $.typedSliceIndex(buf!, 2), $.typedSliceIndex(buf!, 3))
 
 	let ints = $.arrayToSlice<number>([10, 20, 30, 40])
 	let intSlice = $.markAsStructValue($.cloneStructValue(reflect.SliceAt($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic0()))!, ($.indexRef(ints!, 1) as any), 2)))
 	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(intSlice)).Index(1))).SetInt(77n)
-	await $.println("ints:", $.arrayIndex(ints!, 0), $.arrayIndex(ints!, 1), $.arrayIndex(ints!, 2), $.arrayIndex(ints!, 3), $.markAsStructValue($.cloneStructValue(intSlice)).Len(), $.markAsStructValue($.cloneStructValue(intSlice)).Cap())
+	await $.println("ints:", $.plainSliceIndex(ints!, 0), $.plainSliceIndex(ints!, 1), $.plainSliceIndex(ints!, 2), $.plainSliceIndex(ints!, 3), $.markAsStructValue($.cloneStructValue(intSlice)).Len(), $.markAsStructValue($.cloneStructValue(intSlice)).Cap())
 
 	let empty = $.markAsStructValue($.cloneStructValue(reflect.SliceAt($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic0()))!, (null as any), 0)))
 	await $.println("empty:", $.markAsStructValue($.cloneStructValue(empty)).IsNil(), $.markAsStructValue($.cloneStructValue(empty)).Len(), $.markAsStructValue($.cloneStructValue(empty)).Cap())

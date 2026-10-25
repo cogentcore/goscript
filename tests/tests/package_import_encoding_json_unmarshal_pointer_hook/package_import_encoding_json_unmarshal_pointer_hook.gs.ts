@@ -159,7 +159,7 @@ export async function main(): globalThis.Promise<void> {
 	// UnmarshalJSON, decodes into the value it points to.
 	let maps: $.VarRef<Maps> = $.varRef(null! as Maps)
 	let err = Maps_CopyFrom(maps, ($.arrayToSlice<MapItem>([new MapItem(true, "a", $.makeMap<string, number>([["x", 1]])), new MapItem(true, "b")]) as Maps))
-	fmt.Println("copy:", err == null, $.basicInterfaceValue($.sliceLen((maps.value as Maps)), "int"), $.arrayIndex(maps.value!, 0).Name, $.basicInterfaceValue($.mapGet<string, number, number>($.arrayIndex(maps.value!, 0).Map, "x", 0)[0], "int"), $.arrayIndex(maps.value!, 1).Name)
+	fmt.Println("copy:", err == null, $.basicInterfaceValue($.sliceLen((maps.value as Maps)), "int"), $.plainSliceIndex(maps.value!, 0).Name, $.basicInterfaceValue($.mapGet<string, number, number>($.plainSliceIndex(maps.value!, 0).Map, "x", 0)[0], "int"), $.plainSliceIndex(maps.value!, 1).Name)
 
 	let names: $.VarRef<Names> = $.varRef(null! as Names)
 	err = (json.Unmarshal(new Uint8Array([123, 34, 112, 34, 58, 49, 44, 34, 113, 34, 58, 50, 125]), $.namedValueInterfaceValue<any>(names, "*main.Names", __goscriptStatic3(), __goscriptStatic4(), __goscriptStatic5())) as $.GoError)

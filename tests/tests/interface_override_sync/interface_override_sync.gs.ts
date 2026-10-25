@@ -72,12 +72,12 @@ export function byLen_Len(s: byLen): number {
 }
 
 export function byLen_Less(s: byLen, i: number, j: number): boolean {
-	return $.stringLen($.arrayIndex(s!, i)) < $.stringLen($.arrayIndex(s!, j))
+	return $.stringLen($.plainSliceIndex(s!, i)) < $.stringLen($.plainSliceIndex(s!, j))
 }
 
 export function byLen_Swap(s: byLen, i: number, j: number): void {
-	let __goscriptAssign0_0: string = $.arrayIndex(s!, j)
-	let __goscriptAssign0_1: string = $.arrayIndex(s!, i)
+	let __goscriptAssign0_0: string = $.plainSliceIndex(s!, j)
+	let __goscriptAssign0_1: string = $.plainSliceIndex(s!, i)
 	$.sliceElems(s!)[$.sliceSlot(s!, i)] = __goscriptAssign0_0
 	$.sliceElems(s!)[$.sliceSlot(s!, j)] = __goscriptAssign0_1
 }

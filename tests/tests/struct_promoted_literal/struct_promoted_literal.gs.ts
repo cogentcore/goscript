@@ -243,7 +243,7 @@ export async function main(): globalThis.Promise<void> {
 	copy.Employee.Person.Name = "copy"
 	await $.println((team$ as Team).Employee.Person.Name, copy.Employee.Person.Name, (team$ as Team).Employee.Person.Age, (team$ as Team).Employee.ID, (team$ as Team).Active)
 	let items = $.arrayToSlice<Team | $.VarRef<Team> | null>([(() => { const __goscriptStructLiteral2: Team = new Team(); __goscriptStructLiteral2.Employee = new Employee(true); __goscriptStructLiteral2.Employee.Person = new Person(true); __goscriptStructLiteral2.Employee.Person.Name = "inferred"; return __goscriptStructLiteral2 })()])
-	await $.println($.pointerValue<Team>($.arrayIndex(items!, 0)).Employee.Person.Name, $.pointerValue<Team>($.arrayIndex(items!, 0)).Employee.ID)
+	await $.println($.pointerValue<Team>($.plainSliceIndex(items!, 0)).Employee.Person.Name, $.pointerValue<Team>($.plainSliceIndex(items!, 0)).Employee.ID)
 
 	// Anonymous and generic structs use the same promoted field paths.
 	let anonymous = (() => { const __goscriptStructLiteral3: {"Person": Person, "Enabled": boolean} = $.anonymousStructValue({"Person": new Person(true), "Enabled": false}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("Person", "main.Person", [0], 0, true, { anonymous: true }), /* @__PURE__ */ $.structField("Enabled", /* @__PURE__ */ $.basicType("bool"), [1], 24, true)] }); __goscriptStructLiteral3.Person = new Person(true); __goscriptStructLiteral3.Person.Name = "anonymous"; __goscriptStructLiteral3.Enabled = true; return __goscriptStructLiteral3 })()

@@ -84,7 +84,7 @@ export function find(name: string): box {
 }
 
 export function widen(i: number): void {
-	$.arrayIndex(boxes!, i).Max.X += 100
+	$.plainSliceIndex(boxes!, i).Max.X += 100
 }
 
 export async function main(): globalThis.Promise<void> {
@@ -101,7 +101,7 @@ export async function main(): globalThis.Promise<void> {
 	// A returned value is a copy of the element.
 	let found = find("b")
 	found.Max.X = 70
-	await $.println("found:", found.Max.X, $.arrayIndex(boxes!, 1).Max.X)
+	await $.println("found:", found.Max.X, $.plainSliceIndex(boxes!, 1).Max.X)
 
 	// A store into the element leaves the value as it was.
 	for (let __goscriptRangeTarget2 = boxes, __goscriptRangeWindow2 = $.sliceRange(__goscriptRangeTarget2), i = 0; i < __goscriptRangeWindow2.length; i++) {
@@ -127,13 +127,13 @@ export async function main(): globalThis.Promise<void> {
 		await $.println("copy:", b.Name, c.Name)
 	}
 	last.Min.Y = -1
-	await $.println("last:", last.Name, last.Min.Y, $.arrayIndex(boxes!, 1).Min.Y)
+	await $.println("last:", last.Name, last.Min.Y, $.plainSliceIndex(boxes!, 1).Min.Y)
 
 	// A changed value is its own copy.
 	for (let __goscriptRangeTarget5 = boxes, __goscriptRangeWindow5 = $.sliceRange(__goscriptRangeTarget5), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow5.length; __rangeIndex++) {
 		let b = ((__goscriptRangeWindow5.backing[__goscriptRangeWindow5.offset + __rangeIndex] as box)).clone()
 		b.Min.Y++
-		await $.println("changed:", b.Min.Y, $.arrayIndex(boxes!, 0).Min.Y)
+		await $.println("changed:", b.Min.Y, $.plainSliceIndex(boxes!, 0).Min.Y)
 	}
 
 	// Array elements.
@@ -160,8 +160,8 @@ export async function main(): globalThis.Promise<void> {
 		let v: any = $.structInterfaceValue((b).clone(), "main.box", "main.box")
 		held = $.appendOne(held, v, $.appendZeros.nil)
 	}
-	$.arrayIndex(boxes!, 0).Name = "z"
-	await $.println("held:", $.mustTypeAssert<box>($.arrayIndex(held!, 0), "main.box").Name, $.arrayIndex(boxes!, 0).Name)
+	$.plainSliceIndex(boxes!, 0).Name = "z"
+	await $.println("held:", $.mustTypeAssert<box>($.plainSliceIndex(held!, 0), "main.box").Name, $.plainSliceIndex(boxes!, 0).Name)
 }
 
 if ($.isMainScript(import.meta)) {

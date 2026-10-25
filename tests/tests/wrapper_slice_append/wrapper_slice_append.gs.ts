@@ -38,7 +38,7 @@ export async function main(): globalThis.Promise<void> {
 	let p: parser = new parser(true)
 	// this Add method does not work:
 	errlist.ErrorList_Add($.fieldRef(p, "errors"), "error")
-	await $.println($.arrayIndex(p.errors!, 0))
+	await $.println($.plainSliceIndex(p.errors!, 0))
 
 	// but it does work for a struct type:
 	p.astruct.Set("astruct")

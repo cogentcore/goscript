@@ -13,14 +13,14 @@ export async function main(): globalThis.Promise<void> {
 	let buf = new Uint8Array([9, 1, 2, 3, 4]) as $.Slice<number>
 	let ptr = $.unsafePointerCast<$.VarRef<Uint8Array> | null>($.arrayPointerFromIndexRef<number>($.indexRef(buf!, 1), 4, 1, 1))
 	let view = $.goSlice($.pointerValue<Uint8Array>(ptr), undefined, undefined)
-	await $.println($.sliceLen(view), $.arrayIndex(view!, 0), $.arrayIndex(view!, 3))
+	await $.println($.sliceLen(view), $.typedSliceIndex(view!, 0), $.typedSliceIndex(view!, 3))
 	$.pointerValue<Uint8Array>(ptr)[2] = 7
-	await $.println($.arrayIndex(buf!, 3))
+	await $.println($.typedSliceIndex(buf!, 3))
 
 	let __goscriptShadow0: $.VarRef<Uint8Array> = $.varRef($.arrayValue(new Uint8Array(4)))
 	fill(__goscriptShadow0)
 	let shadowView = $.goSlice(__goscriptShadow0.value, undefined, undefined)
-	await $.println($.sliceLen(shadowView), $.arrayIndex(shadowView!, 0), $.arrayIndex(shadowView!, 3))
+	await $.println($.sliceLen(shadowView), $.typedSliceIndex(shadowView!, 0), $.typedSliceIndex(shadowView!, 3))
 }
 
 export function fill(out: $.VarRef<Uint8Array> | null): void {

@@ -14,7 +14,7 @@ export async function main(): globalThis.Promise<void> {
 		await $.println("a", i, v)
 	}
 	let d = $.appendOne(a, 9)
-	await $.println($.arrayIndex(b!, 1), $.arrayIndex(d!, 1), $.sliceLen(d))
+	await $.println($.plainSliceIndex(b!, 1), $.plainSliceIndex(d!, 1), $.sliceLen(d))
 
 	let x = $.varRef(5)
 	let p: $.Slice<$.VarRef<number> | null> = null! as $.Slice<$.VarRef<number> | null>
@@ -27,9 +27,9 @@ export async function main(): globalThis.Promise<void> {
 	let u = $.goSlice(t, undefined, 1)
 	let v = $.appendOne(u, "x")
 	let w = $.appendOne(v, "y")
-	await $.println($.sliceLen(u), $.sliceLen(v), $.sliceLen(w), $.arrayIndex(t!, 1), $.arrayIndex(t!, 2))
+	await $.println($.sliceLen(u), $.sliceLen(v), $.sliceLen(w), $.plainSliceIndex(t!, 1), $.plainSliceIndex(t!, 2))
 	$.copy(u, $.arrayToSlice<string>(["z"]))
-	await $.println($.arrayIndex(t!, 0), $.arrayIndex(v!, 0), $.arrayIndex(w!, 0))
+	await $.println($.plainSliceIndex(t!, 0), $.plainSliceIndex(v!, 0), $.plainSliceIndex(w!, 0))
 }
 
 if ($.isMainScript(import.meta)) {

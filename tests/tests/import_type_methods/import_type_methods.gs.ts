@@ -33,7 +33,7 @@ export class parser {
 export async function main(): globalThis.Promise<void> {
 	let p: parser = new parser(true)
 	p.errors = (errlist.ErrorList_Add(p.errors, "error") as errlist.ErrorList)
-	await $.println($.arrayIndex(p.errors!, 0))
+	await $.println($.plainSliceIndex(p.errors!, 0))
 }
 
 if ($.isMainScript(import.meta)) {

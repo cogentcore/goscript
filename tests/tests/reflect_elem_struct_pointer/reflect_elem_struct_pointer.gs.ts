@@ -292,9 +292,9 @@ export async function main(): globalThis.Promise<void> {
 
 	// Field Values copied into a slice read back what was set through them.
 	let fields = $.arrayToSlice<reflect.Value>([$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(e)).Field(0))), $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(e)).Field(1)))])
-	$.markAsStructValue($.cloneStructValue($.arrayIndex(fields!, 0))).SetString("ccc")
-	$.markAsStructValue($.cloneStructValue($.arrayIndex(fields!, 1))).SetFloat(1.5)
-	await $.println($.markAsStructValue($.cloneStructValue($.arrayIndex(fields!, 0))).String(), $.markAsStructValue($.cloneStructValue($.arrayIndex(fields!, 1))).Float(), $.pointerValue<T>(s.value).A, $.pointerValue<T>(s.value).B)
+	$.markAsStructValue($.cloneStructValue($.plainSliceIndex(fields!, 0))).SetString("ccc")
+	$.markAsStructValue($.cloneStructValue($.plainSliceIndex(fields!, 1))).SetFloat(1.5)
+	await $.println($.markAsStructValue($.cloneStructValue($.plainSliceIndex(fields!, 0))).String(), $.markAsStructValue($.cloneStructValue($.plainSliceIndex(fields!, 1))).Float(), $.pointerValue<T>(s.value).A, $.pointerValue<T>(s.value).B)
 
 	// Values made by New read back what was set through them, as decoders
 	// building map keys do.

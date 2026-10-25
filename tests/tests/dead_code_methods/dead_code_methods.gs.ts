@@ -352,12 +352,12 @@ export function byLen_Len(s: byLen): number {
 }
 
 export function byLen_Less(s: byLen, i: number, j: number): boolean {
-	return $.stringLen($.arrayIndex(s!, i)) < $.stringLen($.arrayIndex(s!, j))
+	return $.stringLen($.plainSliceIndex(s!, i)) < $.stringLen($.plainSliceIndex(s!, j))
 }
 
 export function byLen_Swap(s: byLen, i: number, j: number): void {
-	let __goscriptAssign0_0: string = $.arrayIndex(s!, j)
-	let __goscriptAssign0_1: string = $.arrayIndex(s!, i)
+	let __goscriptAssign0_0: string = $.plainSliceIndex(s!, j)
+	let __goscriptAssign0_1: string = $.plainSliceIndex(s!, i)
 	$.sliceElems(s!)[$.sliceSlot(s!, i)] = __goscriptAssign0_0
 	$.sliceElems(s!)[$.sliceSlot(s!, j)] = __goscriptAssign0_1
 }
@@ -371,7 +371,7 @@ export async function main(): globalThis.Promise<void> {
 	let [, ok] = $.typeAssertTuple<checker | null>(v, "main.checker")
 	fmt.Println("checker:", ok)
 
-	fmt.Println($.structInterfaceValue($.markAsStructValue($.cloneStructValue($.arrayIndex((await $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(d, "*main.Dog", /* @__PURE__ */ $.pointerType("main.Dog"))))).MethodByName("Ping"))).Call(null))!, 0))), "reflect.Value", __goscriptStatic0()))
+	fmt.Println($.structInterfaceValue($.markAsStructValue($.cloneStructValue($.plainSliceIndex((await $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(d, "*main.Dog", /* @__PURE__ */ $.pointerType("main.Dog"))))).MethodByName("Ping"))).Call(null))!, 0))), "reflect.Value", __goscriptStatic0()))
 
 	let c = new Counter()
 	let inc: (() => void) | null = $.functionValue(((__receiver) => () => __receiver.Inc())($.pointerValue<Counter>(c)), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "main.(*Counter).Inc-fm")

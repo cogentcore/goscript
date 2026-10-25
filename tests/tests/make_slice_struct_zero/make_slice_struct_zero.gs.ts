@@ -31,9 +31,9 @@ export class code {
 
 export async function main(): globalThis.Promise<void> {
 	let codes = $.makeSlice<code>(2, undefined, undefined, () => new code(true))
-	$.arrayIndex(codes!, 0).len = 3
-	await $.println("first:", $.arrayIndex(codes!, 0).len)
-	await $.println("second:", $.arrayIndex(codes!, 1).len)
+	$.plainSliceIndex(codes!, 0).len = 3
+	await $.println("first:", $.plainSliceIndex(codes!, 0).len)
+	await $.println("second:", $.plainSliceIndex(codes!, 1).len)
 }
 
 if ($.isMainScript(import.meta)) {

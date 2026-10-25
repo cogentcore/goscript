@@ -112,7 +112,7 @@ export async function main(): globalThis.Promise<void> {
 	// Copy copies within the lengths of the slices.
 	let c = $.arrayToSlice<number>([1, 2, 3, 4])
 	let copied = reflect.Copy($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.goSlice(c, 2, undefined), "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")))))), $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.arrayToSlice<number>([8, 9, 10]), "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")))))))
-	await $.println(copied, $.arrayIndex(c!, 0), $.arrayIndex(c!, 2), $.arrayIndex(c!, 3))
+	await $.println(copied, $.plainSliceIndex(c!, 0), $.plainSliceIndex(c!, 2), $.plainSliceIndex(c!, 3))
 
 	// Values read after a Set through the same Value see the new contents.
 	let m: $.VarRef<globalThis.Map<string, number> | null> = $.varRef($.makeMap<string, number>([["old", 0]]))
@@ -124,7 +124,7 @@ export async function main(): globalThis.Promise<void> {
 	let tv = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(t, "*[]int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"))))))).Elem()))
 	$.markAsStructValue($.cloneStructValue(tv)).Set($.markAsStructValue($.cloneStructValue(reflect.MakeSlice($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic1()))!, 2, 2))))
 	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(tv)).Index(1))).SetInt(4n)
-	await $.println($.arrayIndex(t.value!, 1), $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(tv)).Slice(1, 2))).Index(0))).Int())
+	await $.println($.plainSliceIndex(t.value!, 1), $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(tv)).Slice(1, 2))).Index(0))).Int())
 
 	// Grow then SetLen, as encoding/xml and encoding/json do.
 	let h = new Holder(false, undefined, $.makeSlice<number>(1, 10, "number"))
@@ -136,7 +136,7 @@ export async function main(): globalThis.Promise<void> {
 		$.markAsStructValue($.cloneStructValue(hs)).SetLen(__goscriptShadow0 + 1)
 		$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(hs)).Index(__goscriptShadow0))).SetInt($.int64(i * 10))
 	}
-	await $.println("grown:", $.sliceLen((h$ as Holder).S), $.arrayIndex((h$ as Holder).S!, 0), $.arrayIndex((h$ as Holder).S!, 4), $.cap((h$ as Holder).S) >= 5)
+	await $.println("grown:", $.sliceLen((h$ as Holder).S), $.plainSliceIndex((h$ as Holder).S!, 0), $.plainSliceIndex((h$ as Holder).S!, 4), $.cap((h$ as Holder).S) >= 5)
 
 	// Grow keeps capacity when it is already large enough.
 	let ht = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(h, "*main.Holder", /* @__PURE__ */ $.pointerType("main.Holder"))))).Elem())).Field(1)))
@@ -152,13 +152,13 @@ export async function main(): globalThis.Promise<void> {
 	// MakeSlice of bytes.
 	let bs = $.markAsStructValue($.cloneStructValue(reflect.MakeSlice($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic3()))!, 3, 3)))
 	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(bs)).Index(1))).SetUint(7n)
-	await $.println("bytes:", $.sliceLen($.markAsStructValue($.cloneStructValue(bs)).Bytes()), $.uint($.arrayIndex($.markAsStructValue($.cloneStructValue(bs)).Bytes()!, 1), 8))
+	await $.println("bytes:", $.sliceLen($.markAsStructValue($.cloneStructValue(bs)).Bytes()), $.uint($.typedSliceIndex($.markAsStructValue($.cloneStructValue(bs)).Bytes()!, 1), 8))
 
 	let d: $.VarRef<Doc> = $.varRef(new Doc(true))
 	let err = await xml.Unmarshal(new Uint8Array([60, 100, 111, 99, 62, 60, 105, 116, 101, 109, 62, 60, 78, 97, 109, 101, 62, 120, 60, 47, 78, 97, 109, 101, 62, 60, 47, 105, 116, 101, 109, 62, 60, 105, 116, 101, 109, 62, 60, 78, 97, 109, 101, 62, 121, 60, 47, 78, 97, 109, 101, 62, 60, 47, 105, 116, 101, 109, 62, 60, 47, 100, 111, 99, 62]), $.interfaceValue(d, "*main.Doc", /* @__PURE__ */ $.pointerType("main.Doc")))
 	await $.println("xml:", err == null, $.sliceLen(d.value.Items))
 	if ($.sliceLen(d.value.Items) == 2) {
-		await $.println("xml items:", $.arrayIndex(d.value.Items!, 0).Name, $.arrayIndex(d.value.Items!, 1).Name)
+		await $.println("xml items:", $.plainSliceIndex(d.value.Items!, 0).Name, $.plainSliceIndex(d.value.Items!, 1).Name)
 	}
 }
 

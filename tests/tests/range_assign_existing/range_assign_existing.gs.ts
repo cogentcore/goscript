@@ -126,7 +126,7 @@ export async function main(): globalThis.Promise<void> {
 		v = v.__goscriptAssign((__goscriptRangeValue0).clone())
 		v.Y = 9
 	}
-	await $.println("slice:", p.I, v.X, v.Y, $.arrayIndex(vs!, 1).Y)
+	await $.println("slice:", p.I, v.X, v.Y, $.plainSliceIndex(vs!, 1).Y)
 	let r = 0
 	for (let __goscriptRunes0 = $.stringRunes("h\xc3\xa9"); __goscriptRunes0.next(); ) {
 		const __goscriptRangeKey8 = __goscriptRunes0.index

@@ -77,8 +77,8 @@ export async function main(): globalThis.Promise<void> {
 		tok.At.Line = i * 10
 		toks = $.appendOne(toks, tok)
 	}
-	$.arrayIndex(toks!, 0).At.Line = 99
-	await $.println($.arrayIndex(toks!, 0).At.Line, $.arrayIndex(toks!, 1).At.Line, $.arrayIndex(toks!, 2).At.Line)
+	$.plainSliceIndex(toks!, 0).At.Line = 99
+	await $.println($.plainSliceIndex(toks!, 0).At.Line, $.plainSliceIndex(toks!, 1).At.Line, $.plainSliceIndex(toks!, 2).At.Line)
 
 	// A local declared outside the loop is copied at each append.
 	let outer: $.Slice<token> = null! as $.Slice<token>
@@ -87,7 +87,7 @@ export async function main(): globalThis.Promise<void> {
 		cur.At.Char = i
 		outer = $.appendOne(outer, (cur).clone())
 	}
-	await $.println($.arrayIndex(outer!, 0).At.Char, $.arrayIndex(outer!, 1).At.Char, $.arrayIndex(outer!, 2).At.Char)
+	await $.println($.plainSliceIndex(outer!, 0).At.Char, $.plainSliceIndex(outer!, 1).At.Char, $.plainSliceIndex(outer!, 2).At.Char)
 
 	// A later reference in the same statement keeps the copy.
 	let v = new pos(true, 1)
@@ -134,8 +134,8 @@ export async function main(): globalThis.Promise<void> {
 		let p = ((__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as pos)).clone()
 		copies = $.appendOne(copies, (p).clone())
 	}
-	$.arrayIndex(copies!, 0).Line = 9
-	await $.println($.arrayIndex(copies!, 0).Line, $.arrayIndex(copies!, 1).Line)
+	$.plainSliceIndex(copies!, 0).Line = 9
+	await $.println($.plainSliceIndex(copies!, 0).Line, $.plainSliceIndex(copies!, 1).Line)
 
 	// A function literal parameter is copied.
 	let src = $.arrayToSlice<pos>([new pos(true, 1)])
@@ -143,8 +143,8 @@ export async function main(): globalThis.Promise<void> {
 	each(src, $.functionValue((p: pos) => {
 		kept = $.appendOne(kept, (p).clone())
 	}, ({ kind: $.TypeKind.Function, params: ["main.pos"], results: [] } as $.FunctionTypeInfo)))
-	$.arrayIndex(kept!, 0).Line = 5
-	await $.println($.arrayIndex(src!, 0).Line, $.arrayIndex(kept!, 0).Line)
+	$.plainSliceIndex(kept!, 0).Line = 5
+	await $.println($.plainSliceIndex(src!, 0).Line, $.plainSliceIndex(kept!, 0).Line)
 }
 
 export function each(s: $.Slice<pos>, f: ((_p0: pos) => void) | null): void {

@@ -49,15 +49,15 @@ export class slowInts {
 	public async Less(i: number, j: number): globalThis.Promise<boolean> {
 		const s: slowInts | $.VarRef<slowInts> | null = this;
 		const s$: slowInts = s == null ? $.pointerTarget<slowInts>(s) : (s as any).__isVarRef === true ? (s as any).value : (s as any).__goValue === undefined ? (s as any) : $.pointerTarget<slowInts>(s)
-		await $.chanSend((s$ as slowInts).ch, $.arrayIndex((s$ as slowInts).xs!, i))
-		return await $.chanRecv((s$ as slowInts).ch) < $.arrayIndex((s$ as slowInts).xs!, j)
+		await $.chanSend((s$ as slowInts).ch, $.plainSliceIndex((s$ as slowInts).xs!, i))
+		return await $.chanRecv((s$ as slowInts).ch) < $.plainSliceIndex((s$ as slowInts).xs!, j)
 	}
 
 	public Swap(i: number, j: number): void {
 		const s: slowInts | $.VarRef<slowInts> | null = this;
 		const s$: slowInts = s == null ? $.pointerTarget<slowInts>(s) : (s as any).__isVarRef === true ? (s as any).value : (s as any).__goValue === undefined ? (s as any) : $.pointerTarget<slowInts>(s)
-		let __goscriptAssign1_0: number = $.arrayIndex((s$ as slowInts).xs!, j)
-		let __goscriptAssign1_1: number = $.arrayIndex((s$ as slowInts).xs!, i)
+		let __goscriptAssign1_0: number = $.plainSliceIndex((s$ as slowInts).xs!, j)
+		let __goscriptAssign1_1: number = $.plainSliceIndex((s$ as slowInts).xs!, i)
 		$.sliceElems((s$ as slowInts).xs!)[$.sliceSlot((s$ as slowInts).xs!, i)] = __goscriptAssign1_0
 		$.sliceElems((s$ as slowInts).xs!)[$.sliceSlot((s$ as slowInts).xs!, j)] = __goscriptAssign1_1
 	}
@@ -76,12 +76,12 @@ export function byLen_Len(s: byLen): number {
 }
 
 export function byLen_Less(s: byLen, i: number, j: number): boolean {
-	return $.stringLen($.arrayIndex(s!, i)) < $.stringLen($.arrayIndex(s!, j))
+	return $.stringLen($.plainSliceIndex(s!, i)) < $.stringLen($.plainSliceIndex(s!, j))
 }
 
 export function byLen_Swap(s: byLen, i: number, j: number): void {
-	let __goscriptAssign0_0: string = $.arrayIndex(s!, j)
-	let __goscriptAssign0_1: string = $.arrayIndex(s!, i)
+	let __goscriptAssign0_0: string = $.plainSliceIndex(s!, j)
+	let __goscriptAssign0_1: string = $.plainSliceIndex(s!, i)
 	$.sliceElems(s!)[$.sliceSlot(s!, i)] = __goscriptAssign0_0
 	$.sliceElems(s!)[$.sliceSlot(s!, j)] = __goscriptAssign0_1
 }
@@ -112,12 +112,12 @@ export async function sortAny(data: sort.Interface | null): globalThis.Promise<v
 export async function main(): globalThis.Promise<void> {
 	await $.println($.sliceLen(sortWords($.arrayToSlice<string>(["ccc", "a", "bb"]))), wordsSorted($.arrayToSlice<string>(["a", "bb"])))
 	let w = stableWords($.arrayToSlice<string>(["bb", "a", "cc", "d"]))
-	await $.println($.arrayIndex(w!, 0), $.arrayIndex(w!, 1), $.arrayIndex(w!, 2), $.arrayIndex(w!, 3))
+	await $.println($.plainSliceIndex(w!, 0), $.plainSliceIndex(w!, 1), $.plainSliceIndex(w!, 2), $.plainSliceIndex(w!, 3))
 	let s = await sortSlow(new slowInts(false, $.arrayToSlice<number>([3, 1, 2]), $.makeChannel<number>(1, 0, "both")))
-	await $.println($.arrayIndex(s!, 0), $.arrayIndex(s!, 1), $.arrayIndex(s!, 2))
+	await $.println($.plainSliceIndex(s!, 0), $.plainSliceIndex(s!, 1), $.plainSliceIndex(s!, 2))
 	let words = ($.arrayToSlice<string>(["xyz", "x", "xy"]) as byLen)
 	await sortAny($.namedValueInterfaceValue<sort.Interface | null>(words, "main.byLen", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()))
-	await $.println($.arrayIndex(words!, 0), $.arrayIndex(words!, 1), $.arrayIndex(words!, 2), (sort.IsSorted($.pointerValueOrNil($.namedValueInterfaceValue<sort.Interface | null>(words, "main.byLen", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()))!) as boolean))
+	await $.println($.plainSliceIndex(words!, 0), $.plainSliceIndex(words!, 1), $.plainSliceIndex(words!, 2), (sort.IsSorted($.pointerValueOrNil($.namedValueInterfaceValue<sort.Interface | null>(words, "main.byLen", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()))!) as boolean))
 }
 
 var __goscriptStatic0$value: any

@@ -78,18 +78,18 @@ export async function main(): globalThis.Promise<void> {
 	fmt.Println($.basicInterfaceValue(n, "int"), $.basicInterfaceValue((p$ as item).X, "int"), $.basicInterfaceValue((p$ as item).Y, "int"), $.interfaceValue($.cloneArrayValue((p$ as item).In.N, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2)), "[2]int", /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2)))
 
 	// The copies are values: changing the source leaves dst alone.
-	$.arrayIndex(src!, 1).X = 50
-	$.arrayIndex(src!, 1).In.N[0] = 70
-	fmt.Println($.basicInterfaceValue($.arrayIndex(dst!, 1).X, "int"), $.interfaceValue($.cloneArrayValue($.arrayIndex(dst!, 1).In.N, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2)), "[2]int", /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2)), $.basicInterfaceValue((p$ as item).X, "int"))
+	$.plainSliceIndex(src!, 1).X = 50
+	$.plainSliceIndex(src!, 1).In.N[0] = 70
+	fmt.Println($.basicInterfaceValue($.plainSliceIndex(dst!, 1).X, "int"), $.interfaceValue($.cloneArrayValue($.plainSliceIndex(dst!, 1).In.N, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2)), "[2]int", /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2)), $.basicInterfaceValue((p$ as item).X, "int"))
 
 	// Overlapping copies within one backing array, forward and backward.
 	let all = $.arrayToSlice<item>([new item(true, 1), new item(true, 2), new item(true, 3), new item(true, 4)])
 	let q = $.indexRef(all!, 3)
 	let q$: item = q == null ? $.pointerTarget<item>(q) : (q as any).__isVarRef === true ? (q as any).value : (q as any).__goValue === undefined ? (q as any) : $.pointerTarget<item>(q)
 	$.copy($.goSlice(all, 1, undefined), all, true)
-	fmt.Println($.basicInterfaceValue($.arrayIndex(all!, 0).X, "int"), $.basicInterfaceValue($.arrayIndex(all!, 1).X, "int"), $.basicInterfaceValue($.arrayIndex(all!, 2).X, "int"), $.basicInterfaceValue($.arrayIndex(all!, 3).X, "int"), $.basicInterfaceValue((q$ as item).X, "int"))
+	fmt.Println($.basicInterfaceValue($.plainSliceIndex(all!, 0).X, "int"), $.basicInterfaceValue($.plainSliceIndex(all!, 1).X, "int"), $.basicInterfaceValue($.plainSliceIndex(all!, 2).X, "int"), $.basicInterfaceValue($.plainSliceIndex(all!, 3).X, "int"), $.basicInterfaceValue((q$ as item).X, "int"))
 	$.copy(all, $.goSlice(all, 2, undefined), true)
-	fmt.Println($.basicInterfaceValue($.arrayIndex(all!, 0).X, "int"), $.basicInterfaceValue($.arrayIndex(all!, 1).X, "int"), $.basicInterfaceValue($.arrayIndex(all!, 2).X, "int"), $.basicInterfaceValue($.arrayIndex(all!, 3).X, "int"), $.basicInterfaceValue((q$ as item).X, "int"))
+	fmt.Println($.basicInterfaceValue($.plainSliceIndex(all!, 0).X, "int"), $.basicInterfaceValue($.plainSliceIndex(all!, 1).X, "int"), $.basicInterfaceValue($.plainSliceIndex(all!, 2).X, "int"), $.basicInterfaceValue($.plainSliceIndex(all!, 3).X, "int"), $.basicInterfaceValue((q$ as item).X, "int"))
 
 	// A named slice type, an array window and a shorter source.
 	let named: items = ($.makeSlice<item>(2, undefined, undefined, () => new item(true)) as items)
@@ -98,7 +98,7 @@ export async function main(): globalThis.Promise<void> {
 	let arr: item[] = $.arrayValue(globalThis.Array.from({ length: 3 }, () => new item(true)), /* @__PURE__ */ $.arrayType("main.item", 3))
 	let s = $.indexRef(arr, 2)
 	$.copy($.goSlice(arr, 1, undefined), src, true)
-	fmt.Println($.basicInterfaceValue($.pointerValue<item>(r).X, "int"), $.basicInterfaceValue($.arrayIndex(named!, 1).X, "int"), $.basicInterfaceValue($.pointerValue<item>(s).X, "int"), $.basicInterfaceValue(arr[0].X, "int"))
+	fmt.Println($.basicInterfaceValue($.pointerValue<item>(r).X, "int"), $.basicInterfaceValue($.plainSliceIndex(named!, 1).X, "int"), $.basicInterfaceValue($.pointerValue<item>(s).X, "int"), $.basicInterfaceValue(arr[0].X, "int"))
 
 	// Slices of pointers still copy the pointers.
 	let a = new item(false, 1)
@@ -106,8 +106,8 @@ export async function main(): globalThis.Promise<void> {
 	let ptrs = $.arrayToSlice<item | $.VarRef<item> | null>([a])
 	let others = $.arrayToSlice<item | $.VarRef<item> | null>([b])
 	$.copy(others, ptrs)
-	$.pointerValue<item>($.arrayIndex(others!, 0)).Y = 8
-	fmt.Println($.basicInterfaceValue($.pointerValue<item>(a).Y, "int"), $.basicInterfaceValue($.pointerValue<item>(b).Y, "int"), ($.arrayIndex(others!, 0) === a || ($.pointerAliasesMade || ($.arrayIndex(others!, 0) as any)?.__goElementBacking !== undefined) && $.pointerEqual($.arrayIndex(others!, 0), a)))
+	$.pointerValue<item>($.plainSliceIndex(others!, 0)).Y = 8
+	fmt.Println($.basicInterfaceValue($.pointerValue<item>(a).Y, "int"), $.basicInterfaceValue($.pointerValue<item>(b).Y, "int"), ($.plainSliceIndex(others!, 0) === a || ($.pointerAliasesMade || ($.plainSliceIndex(others!, 0) as any)?.__goElementBacking !== undefined) && $.pointerEqual($.plainSliceIndex(others!, 0), a)))
 }
 
 var __goscriptStatic0$value: any

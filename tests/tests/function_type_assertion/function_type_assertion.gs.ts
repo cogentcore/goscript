@@ -141,7 +141,7 @@ export async function main(): globalThis.Promise<void> {
 	$.sliceElems(funcSlice!)[$.sliceSlot(funcSlice!, 0)] = $.interfaceValue($.namedFunction(greet, "main.Greeter", ({ kind: $.TypeKind.Function, name: "main.Greeter", params: [/* @__PURE__ */ $.basicType("string")], results: [/* @__PURE__ */ $.basicType("string")] } as $.FunctionTypeInfo)), "main.Greeter", ({ kind: $.TypeKind.Function, name: "main.Greeter", params: [/* @__PURE__ */ $.basicType("string")], results: [/* @__PURE__ */ $.basicType("string")] } as $.FunctionTypeInfo))
 	$.sliceElems(funcSlice!)[$.sliceSlot(funcSlice!, 1)] = $.interfaceValue($.namedFunction(add, "main.Adder", ({ kind: $.TypeKind.Function, name: "main.Adder", params: [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo)), "main.Adder", ({ kind: $.TypeKind.Function, name: "main.Adder", params: [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))
 
-	let __goscriptTuple7: any = $.typeAssertTuple<((name: string) => string | globalThis.Promise<string>) | null>($.arrayIndex(funcSlice!, 0), ({ kind: $.TypeKind.Function, name: "main.Greeter", params: [/* @__PURE__ */ $.basicType("string")], results: [/* @__PURE__ */ $.basicType("string")] } as $.FunctionTypeInfo))
+	let __goscriptTuple7: any = $.typeAssertTuple<((name: string) => string | globalThis.Promise<string>) | null>($.plainSliceIndex(funcSlice!, 0), ({ kind: $.TypeKind.Function, name: "main.Greeter", params: [/* @__PURE__ */ $.basicType("string")], results: [/* @__PURE__ */ $.basicType("string")] } as $.FunctionTypeInfo))
 	let sliceFn: Greeter | null = __goscriptTuple7[0]
 	ok = __goscriptTuple7[1]
 	if (ok) {
@@ -149,7 +149,7 @@ export async function main(): globalThis.Promise<void> {
 	} else {
 		await $.println("Slice function assertion failed")
 	}
-	let __goscriptTuple8: any = $.typeAssertTuple<((a: number, b: number) => number | globalThis.Promise<number>) | null>($.arrayIndex(funcSlice!, 1), ({ kind: $.TypeKind.Function, name: "main.Adder", params: [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))
+	let __goscriptTuple8: any = $.typeAssertTuple<((a: number, b: number) => number | globalThis.Promise<number>) | null>($.plainSliceIndex(funcSlice!, 1), ({ kind: $.TypeKind.Function, name: "main.Adder", params: [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))
 	let sliceAdderFn: Adder | null = __goscriptTuple8[0]
 	ok = __goscriptTuple8[1]
 	if (ok) {

@@ -529,7 +529,7 @@ export async function closeHeldStreams(streams: $.Slice<srpc.Stream | null>): gl
 				return false
 			}
 		}
-		if (($.sliceLen((resp !== null && (resp as any).__isVarRef !== true && (resp as any).__goValue === undefined ? ((resp as any) as srpc.RawMessage).GetData() : srpc.RawMessage.prototype.GetData.call(resp))) != 1) || ($.uint($.arrayIndex((resp !== null && (resp as any).__isVarRef !== true && (resp as any).__goValue === undefined ? ((resp as any) as srpc.RawMessage).GetData() : srpc.RawMessage.prototype.GetData.call(resp))!, 0), 8) != 1)) {
+		if (($.sliceLen((resp !== null && (resp as any).__isVarRef !== true && (resp as any).__goValue === undefined ? ((resp as any) as srpc.RawMessage).GetData() : srpc.RawMessage.prototype.GetData.call(resp))) != 1) || ($.uint($.typedSliceIndex((resp !== null && (resp as any).__isVarRef !== true && (resp as any).__goValue === undefined ? ((resp as any) as srpc.RawMessage).GetData() : srpc.RawMessage.prototype.GetData.call(resp))!, 0), 8) != 1)) {
 			await $.println("hold response mismatch")
 			return false
 		}
@@ -620,7 +620,7 @@ export async function probeStream(ctx: context.Context | null, client: srpc.Clie
 	if ($.sliceLen(data) != 1) {
 		return [$.sliceLen(data), null]
 	}
-	return [$.arrayIndex(data!, 0), null]
+	return [$.typedSliceIndex(data!, 0), null]
 }
 
 export async function newRoutedRpcStreamClient(ctx: context.Context | null, componentID: string, getter: ((ctx: context.Context | null, componentID: string, released: (() => void) | null) => [srpc.Invoker | null, (() => void) | null, $.GoError] | globalThis.Promise<[srpc.Invoker | null, (() => void) | null, $.GoError]>) | null, waitAck: boolean, results: $.Channel<rpcStreamServerResult> | null): globalThis.Promise<srpc.Client | null> {
@@ -871,8 +871,8 @@ export async function exercisePushablePacketWriter(): globalThis.Promise<boolean
 			await $.println("push arg count:", $.sliceLen(args))
 			return null
 		}
-		let data = $.makeSlice<number>($.markAsStructValue($.cloneStructValue($.arrayIndex(args!, 0))).Length(), undefined, "byte")
-		js.CopyBytesToGo(data, $.markAsStructValue($.cloneStructValue($.arrayIndex(args!, 0))))
+		let data = $.makeSlice<number>($.markAsStructValue($.cloneStructValue($.plainSliceIndex(args!, 0))).Length(), undefined, "byte")
+		js.CopyBytesToGo(data, $.markAsStructValue($.cloneStructValue($.plainSliceIndex(args!, 0))))
 		pushed = $.appendOne(pushed, data, $.appendZeros.nil)
 		return null
 	}, ({ kind: $.TypeKind.Function, params: ["js.Value", /* @__PURE__ */ $.sliceType("js.Value")], results: [{ kind: $.TypeKind.Interface, methods: [] }] } as $.FunctionTypeInfo)))))
@@ -926,7 +926,7 @@ export async function exercisePushablePacketWriter(): globalThis.Promise<boolean
 		return null
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.pointerType("srpc.Packet")], results: ["error"] } as $.FunctionTypeInfo)))
 	{
-		let err = (__goscriptAwait = startHandler!($.arrayIndex(pushed!, 0)), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+		let err = (__goscriptAwait = startHandler!($.plainSliceIndex(pushed!, 0)), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 		if (err != null) {
 			await $.println("pushable start decode error:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 			return false
@@ -943,7 +943,7 @@ export async function exercisePushablePacketWriter(): globalThis.Promise<boolean
 		return null
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.pointerType("srpc.Packet")], results: ["error"] } as $.FunctionTypeInfo)))
 	{
-		let err = (__goscriptAwait = cancelHandler!($.arrayIndex(pushed!, 1)), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
+		let err = (__goscriptAwait = cancelHandler!($.plainSliceIndex(pushed!, 1)), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)
 		if (err != null) {
 			await $.println("pushable cancel decode error:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 			return false
@@ -1001,7 +1001,7 @@ export async function main(): globalThis.Promise<void> {
 		await $.println("stream response length:", $.sliceLen(data))
 		return
 	}
-	await $.println("stream bytes:", $.arrayIndex(data!, 0))
+	await $.println("stream bytes:", $.typedSliceIndex(data!, 0))
 	let emptyResp = srpc.NewRawMessage(null, false)
 	{
 		let __goscriptShadow6 = (__goscriptAwait = (client !== null && (client as any).__isVarRef !== true && ((client as any).__goValue === undefined || (client as any).__goType?.charCodeAt(0) !== 42) ? (client as Exclude<srpc.Client, null>) : $.pointerValue<Exclude<srpc.Client, null>>(client)).ExecCall(ctx, "svc", "empty", $.interfaceValue<srpc.Message | null>(srpc.NewRawMessage(null, false), "*srpc.RawMessage", /* @__PURE__ */ $.pointerType("srpc.RawMessage")), $.interfaceValue<srpc.Message | null>(emptyResp, "*srpc.RawMessage", /* @__PURE__ */ $.pointerType("srpc.RawMessage"))), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)

@@ -88,7 +88,7 @@ export async function main(): globalThis.Promise<void> {
 	let slices = $.arrayValue([$.arrayToSlice<number>([1])])
 	let slicesCopy = $.cloneArrayValue(slices, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")), 1))
 	$.sliceElems(slicesCopy[0]!)[$.sliceSlot(slicesCopy[0]!, 0)] = 7
-	await $.println("slice sharing:", $.arrayIndex(slices[0]!, 0))
+	await $.println("slice sharing:", $.plainSliceIndex(slices[0]!, 0))
 
 	let structs = $.arrayValue([new item(true, 1)], __goscriptStatic1())
 	let structsCopy = $.cloneArrayValue(structs, /* @__PURE__ */ $.arrayType("main.item", 1))
@@ -104,7 +104,7 @@ export async function main(): globalThis.Promise<void> {
 	let copied = (original).clone()
 	$.sliceElems(copied.slices[0]!)[$.sliceSlot(copied.slices[0]!, 0)] = 8
 	copied.items[0].value = 8
-	await $.println("array fields:", $.arrayIndex(original.slices[0]!, 0), original.items[0].value, copied.items[0].value)
+	await $.println("array fields:", $.plainSliceIndex(original.slices[0]!, 0), original.items[0].value, copied.items[0].value)
 
 	// Assigning an array element copies its value instead of aliasing the row.
 	let rows = $.arrayValue([$.arrayValue([1, 2]), $.arrayValue([3, 4])], __goscriptStatic2())
@@ -127,11 +127,11 @@ export async function main(): globalThis.Promise<void> {
 	}
 
 	let view = $.goSlice($.pointerValue<bigint[]>(cache), undefined, undefined)
-	await $.println("slice:", $.sliceLen(view), $.arrayIndex(view!, 2))
+	await $.println("slice:", $.sliceLen(view), $.plainSliceIndex(view!, 2))
 
 	let buf = new Uint8Array([9, 0, 0, 0, 0]) as $.Slice<number>
 	fillArray(($.sliceToArrayPointer<number>($.goSlice(buf, 1, undefined), 4, "byte") as $.VarRef<Uint8Array> | null))
-	await $.println("converted:", $.arrayIndex(buf!, 0), $.arrayIndex(buf!, 1), $.arrayIndex(buf!, 2), $.arrayIndex(buf!, 3), $.arrayIndex(buf!, 4))
+	await $.println("converted:", $.typedSliceIndex(buf!, 0), $.typedSliceIndex(buf!, 1), $.typedSliceIndex(buf!, 2), $.typedSliceIndex(buf!, 3), $.typedSliceIndex(buf!, 4))
 	await $.println("converted sum:", sumArray(($.sliceToArrayPointer<number>($.goSlice(buf, 1, undefined), 4, "byte") as $.VarRef<Uint8Array> | null)))
 
 	let literal = $.varRef($.arrayValue(new Uint8Array([4, 3, 2, 1])))

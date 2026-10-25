@@ -16,7 +16,7 @@ export async function main(): globalThis.Promise<void> {
 		await $.println("length:", $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(obj)).Get("nums"))).Length())
 
 		let cb = $.markAsStructValue($.cloneStructValue(js.FuncOf($.functionValue((_this: js.Value, args: $.Slice<js.Value>): any => {
-			return $.basicInterfaceValue($.markAsStructValue($.cloneStructValue($.arrayIndex(args!, 0))).Int() + 1, "int")
+			return $.basicInterfaceValue($.markAsStructValue($.cloneStructValue($.plainSliceIndex(args!, 0))).Int() + 1, "int")
 		}, ({ kind: $.TypeKind.Function, params: ["js.Value", /* @__PURE__ */ $.sliceType("js.Value")], results: [{ kind: $.TypeKind.Interface, methods: [] }] } as $.FunctionTypeInfo)))))
 		const __goscriptDeferCallee0 = $.functionValue(((__receiver) => () => __receiver.Release())($.markAsStructValue($.cloneStructValue(cb))), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "syscall/js.Func.Release-fm")
 		__defer.defer(() => { __goscriptDeferCallee0() })
@@ -74,7 +74,7 @@ export async function wrap(fn: ((_this: js.Value, args: $.Slice<js.Value>) => an
 export async function funcOfValues(): globalThis.Promise<void> {
 	await using __defer = new $.AsyncDisposableStack()
 	let add = await wrap($.functionValue((_this: js.Value, args: $.Slice<js.Value>): any => {
-		return $.basicInterfaceValue($.markAsStructValue($.cloneStructValue($.arrayIndex(args!, 0))).Int() + $.markAsStructValue($.cloneStructValue($.arrayIndex(args!, 1))).Int(), "int")
+		return $.basicInterfaceValue($.markAsStructValue($.cloneStructValue($.plainSliceIndex(args!, 0))).Int() + $.markAsStructValue($.cloneStructValue($.plainSliceIndex(args!, 1))).Int(), "int")
 	}, ({ kind: $.TypeKind.Function, params: ["js.Value", /* @__PURE__ */ $.sliceType("js.Value")], results: [{ kind: $.TypeKind.Interface, methods: [] }] } as $.FunctionTypeInfo)))
 	const __goscriptDeferCallee1 = $.functionValue(((__receiver) => () => __receiver.Release())($.markAsStructValue($.cloneStructValue(add))), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "syscall/js.Func.Release-fm")
 	__defer.defer(() => { __goscriptDeferCallee1() })
@@ -98,7 +98,7 @@ export async function funcOfSuspend(): globalThis.Promise<void> {
 		using __defer = new $.DisposableStack()
 		await mu.value.Lock()
 		__defer.defer(() => { mu.value.Unlock() })
-		await $.chanSend(done, "handled " + $.markAsStructValue($.cloneStructValue($.arrayIndex(args!, 0))).String())
+		await $.chanSend(done, "handled " + $.markAsStructValue($.cloneStructValue($.plainSliceIndex(args!, 0))).String())
 		return null
 	}, ({ kind: $.TypeKind.Function, params: ["js.Value", /* @__PURE__ */ $.sliceType("js.Value")], results: [{ kind: $.TypeKind.Interface, methods: [] }] } as $.FunctionTypeInfo)))
 	const __goscriptDeferCallee3 = $.functionValue(((__receiver) => () => __receiver.Release())($.markAsStructValue($.cloneStructValue(handler))), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "syscall/js.Func.Release-fm")

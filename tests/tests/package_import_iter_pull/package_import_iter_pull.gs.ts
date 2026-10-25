@@ -56,9 +56,9 @@ export class lexer {
 		const l$: lexer = l == null ? $.pointerTarget<lexer>(l) : (l as any).__isVarRef === true ? (l as any).value : (l as any).__goValue === undefined ? (l as any) : $.pointerTarget<lexer>(l)
 		while ($.sliceLen((l$ as lexer).stack) > 0) {
 			let n = $.sliceLen((l$ as lexer).stack) - 1
-			let [v, ok] = await $.arrayIndex((l$ as lexer).stack!, n).next!()
+			let [v, ok] = await $.plainSliceIndex((l$ as lexer).stack!, n).next!()
 			if (!ok) {
-				void (__goscriptAwait = $.arrayIndex((l$ as lexer).stack!, n).stop!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait);
+				void (__goscriptAwait = $.plainSliceIndex((l$ as lexer).stack!, n).stop!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait);
 				;(l$ as lexer).stack = $.goSlice((l$ as lexer).stack, undefined, n)
 				continue
 			}

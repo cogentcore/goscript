@@ -170,7 +170,7 @@ export class VM {
 	public Step(code: $.Slice<Instr>): boolean {
 		const vm: VM | $.VarRef<VM> | null = this;
 		const vm$: VM = vm == null ? $.pointerTarget<VM>(vm) : (vm as any).__isVarRef === true ? (vm as any).value : (vm as any).__goValue === undefined ? (vm as any) : $.pointerTarget<VM>(vm)
-		let _in = ($.arrayIndex(code!, (vm$ as VM).pc)).clone();
+		let _in = ($.plainSliceIndex(code!, (vm$ as VM).pc)).clone();
 		;(vm$ as VM).pc++;
 		;(vm$ as VM).steps++
 		let s = $.fieldRef((vm$ as VM), "stack")
@@ -385,10 +385,10 @@ export function factorial(name: string, n: bigint): Program {
 export async function main(): globalThis.Promise<void> {
 	let programs = $.arrayToSlice<Program>([factorial("20!", 20n), factorial("21!", 21n), new Program(true, "broken", $.arrayToSlice<Instr>([new Instr(true, 0, 1n), new Instr(true, 6, 0n), new Instr(true, 9, 0n)]))])
 
-	await $.println("listing of", $.arrayIndex(programs!, 0).Name)
+	await $.println("listing of", $.plainSliceIndex(programs!, 0).Name)
 	let __goscriptRangeReturn0 = false
 	;await (async () => {
-		await $.markAsStructValue($.cloneStructValue($.arrayIndex(programs!, 0))).Listing()!(async (pc, _in) => {
+		await $.markAsStructValue($.cloneStructValue($.plainSliceIndex(programs!, 0))).Listing()!(async (pc, _in) => {
 			if ((_in.Op == 0) || (_in.Op == 8)) {
 				await $.println(" ", pc, Op_String(_in.Op), _in.Arg)
 				return true

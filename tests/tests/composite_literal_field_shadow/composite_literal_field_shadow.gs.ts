@@ -36,7 +36,7 @@ export function newBuffer(data: $.Slice<number>): buffer | $.VarRef<buffer> | nu
 
 export async function main(): globalThis.Promise<void> {
 	let buf = newBuffer(new Uint8Array([7]) as $.Slice<number>)
-	await $.println($.arrayIndex($.pointerValue<buffer>(buf).buf!, 0))
+	await $.println($.typedSliceIndex($.pointerValue<buffer>(buf).buf!, 0))
 }
 
 if ($.isMainScript(import.meta)) {

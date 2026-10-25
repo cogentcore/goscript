@@ -239,13 +239,13 @@ export async function main(): globalThis.Promise<void> {
 	// the function literals of its code.
 	let names: $.Slice<string> = null! as $.Slice<string>
 	let visit = $.markAsStructValue($.cloneStructValue(reflect.MakeFunc($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic0()))!, $.functionValue((args: $.Slice<reflect.Value>): $.Slice<reflect.Value> => {
-		let n = $.mustTypeAssert<Node | $.VarRef<Node> | null>($.markAsStructValue($.cloneStructValue($.arrayIndex(args!, 0))).Interface(), /* @__PURE__ */ $.pointerType("main.Node"))
+		let n = $.mustTypeAssert<Node | $.VarRef<Node> | null>($.markAsStructValue($.cloneStructValue($.plainSliceIndex(args!, 0))).Interface(), /* @__PURE__ */ $.pointerType("main.Node"))
 		let n$: Node = n == null ? $.pointerTarget<Node>(n) : (n as any).__isVarRef === true ? (n as any).value : (n as any).__goValue === undefined ? (n as any) : $.pointerTarget<Node>(n)
 		names = $.appendOne(names, (n$ as Node).Name)
 		return $.arrayToSlice<reflect.Value>([$.markAsStructValue($.cloneStructValue(reflect.ValueOf(!$.stringEqual((n$ as Node).Name, "b"))))])
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.sliceType("reflect.Value")], results: [/* @__PURE__ */ $.sliceType("reflect.Value")] } as $.FunctionTypeInfo)))))
 	let short = $.markAsStructValue($.cloneStructValue(reflect.MakeFunc($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic0()))!, $.functionValue((args: $.Slice<reflect.Value>): $.Slice<reflect.Value> => {
-		return $.arrayToSlice<reflect.Value>([$.markAsStructValue($.cloneStructValue(reflect.ValueOf($.stringLen($.pointerValue<Node>($.mustTypeAssert<Node | $.VarRef<Node> | null>($.markAsStructValue($.cloneStructValue($.arrayIndex(args!, 0))).Interface(), /* @__PURE__ */ $.pointerType("main.Node"))).Name) <= 2)))])
+		return $.arrayToSlice<reflect.Value>([$.markAsStructValue($.cloneStructValue(reflect.ValueOf($.stringLen($.pointerValue<Node>($.mustTypeAssert<Node | $.VarRef<Node> | null>($.markAsStructValue($.cloneStructValue($.plainSliceIndex(args!, 0))).Interface(), /* @__PURE__ */ $.pointerType("main.Node"))).Name) <= 2)))])
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.sliceType("reflect.Value")], results: [/* @__PURE__ */ $.sliceType("reflect.Value")] } as $.FunctionTypeInfo)))))
 	let root = new Node(false, "root", $.arrayToSlice<Node | $.VarRef<Node> | null>([new Node(false, "a"), new Node(false, "b", $.arrayToSlice<Node | $.VarRef<Node> | null>([new Node(false, "bc")])), new Node(false, "c")]))
 	let root$: Node = root == null ? $.pointerTarget<Node>(root) : (root as any).__isVarRef === true ? (root as any).value : (root as any).__goValue === undefined ? (root as any) : $.pointerTarget<Node>(root)
@@ -253,8 +253,8 @@ export async function main(): globalThis.Promise<void> {
 	// reflect.Value.Call passes them to an exported method and an exported
 	// function, which passes it to a helper.
 	await $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(root, "*main.Node", /* @__PURE__ */ $.pointerType("main.Node"))))).MethodByName("Walk"))).Call($.arrayToSlice<reflect.Value>([$.markAsStructValue($.cloneStructValue(visit))]))
-	await $.println($.sliceLen(names), $.arrayIndex(names!, 0), $.arrayIndex(names!, $.sliceLen(names) - 1))
-	await $.println($.markAsStructValue($.cloneStructValue($.arrayIndex((await $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.goFunc(Count, "main.Count"), "func(n *main.Node, keep func(n *main.Node) bool) int", ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.pointerType("main.Node"), ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.pointerType("main.Node")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo)], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))))).Call($.arrayToSlice<reflect.Value>([$.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(root, "*main.Node", /* @__PURE__ */ $.pointerType("main.Node"))))), short])))!, 0))).Int())
+	await $.println($.sliceLen(names), $.plainSliceIndex(names!, 0), $.plainSliceIndex(names!, $.sliceLen(names) - 1))
+	await $.println($.markAsStructValue($.cloneStructValue($.plainSliceIndex((await $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.goFunc(Count, "main.Count"), "func(n *main.Node, keep func(n *main.Node) bool) int", ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.pointerType("main.Node"), ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.pointerType("main.Node")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo)], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))))).Call($.arrayToSlice<reflect.Value>([$.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(root, "*main.Node", /* @__PURE__ */ $.pointerType("main.Node"))))), short])))!, 0))).Int())
 
 	// The method reached through an interface, and promoted from an embedded
 	// pointer and an embedded interface.
@@ -263,16 +263,16 @@ export async function main(): globalThis.Promise<void> {
 	await $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(w, "*main.Walker", /* @__PURE__ */ $.pointerType("main.Walker"))))).Elem())).MethodByName("Walk"))).Call($.arrayToSlice<reflect.Value>([$.markAsStructValue($.cloneStructValue(visit))]))
 	await $.println($.sliceLen(names))
 	names = null
-	await $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(new Tree(false, $.arrayIndex((root$ as Node).Kids!, 1), "t"), "*main.Tree", /* @__PURE__ */ $.pointerType("main.Tree"))))).MethodByName("Walk"))).Call($.arrayToSlice<reflect.Value>([$.markAsStructValue($.cloneStructValue(visit))]))
-	await $.println($.sliceLen(names), $.arrayIndex(names!, 0))
+	await $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(new Tree(false, $.plainSliceIndex((root$ as Node).Kids!, 1), "t"), "*main.Tree", /* @__PURE__ */ $.pointerType("main.Tree"))))).MethodByName("Walk"))).Call($.arrayToSlice<reflect.Value>([$.markAsStructValue($.cloneStructValue(visit))]))
+	await $.println($.sliceLen(names), $.plainSliceIndex(names!, 0))
 	names = null
-	await $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.structInterfaceValue(new Doc(true, $.interfaceValue<Walker | null>($.arrayIndex((root$ as Node).Kids!, 0), "*main.Node", /* @__PURE__ */ $.pointerType("main.Node"))), "main.Doc", "main.Doc")))).MethodByName("Walk"))).Call($.arrayToSlice<reflect.Value>([visit]))
-	await $.println($.sliceLen(names), $.arrayIndex(names!, 0))
+	await $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.structInterfaceValue(new Doc(true, $.interfaceValue<Walker | null>($.plainSliceIndex((root$ as Node).Kids!, 0), "*main.Node", /* @__PURE__ */ $.pointerType("main.Node"))), "main.Doc", "main.Doc")))).MethodByName("Walk"))).Call($.arrayToSlice<reflect.Value>([visit]))
+	await $.println($.sliceLen(names), $.plainSliceIndex(names!, 0))
 
 	// A function that reflection made, stored by a method that reflection
 	// calls, is called later by compiled code.
 	let label = $.markAsStructValue($.cloneStructValue(reflect.MakeFunc($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic1()))!, $.functionValue((args: $.Slice<reflect.Value>): $.Slice<reflect.Value> => {
-		return $.arrayToSlice<reflect.Value>([$.markAsStructValue($.cloneStructValue(reflect.ValueOf("click " + $.runeToString($.intFromWide($.int64Add(48n, $.markAsStructValue($.cloneStructValue($.arrayIndex(args!, 0))).Int()), 32)))))])
+		return $.arrayToSlice<reflect.Value>([$.markAsStructValue($.cloneStructValue(reflect.ValueOf("click " + $.runeToString($.intFromWide($.int64Add(48n, $.markAsStructValue($.cloneStructValue($.plainSliceIndex(args!, 0))).Int()), 32)))))])
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.sliceType("reflect.Value")], results: [/* @__PURE__ */ $.sliceType("reflect.Value")] } as $.FunctionTypeInfo)))))
 	let b = new Button()
 	await $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(b, "*main.Button", /* @__PURE__ */ $.pointerType("main.Button"))))).MethodByName("OnClick"))).Call($.arrayToSlice<reflect.Value>([label]))

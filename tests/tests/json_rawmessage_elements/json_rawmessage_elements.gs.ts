@@ -13,7 +13,7 @@ export async function main(): globalThis.Promise<void> {
 
 	let kids: $.VarRef<$.Slice<json.RawMessage>> = $.varRef(null! as $.Slice<json.RawMessage>)
 	err = (json.Unmarshal($.mapGet<string, json.RawMessage, json.RawMessage>(fields.value, "kids", null)[0], $.interfaceValue(kids, "*[]jsontext.Value", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"), "jsontext.Value"))))) as $.GoError)
-	await $.println("slice:", err == null, $.sliceLen(kids.value), $.bytesToString($.arrayIndex(kids.value!, 0)), $.bytesToString($.arrayIndex(kids.value!, 1)))
+	await $.println("slice:", err == null, $.sliceLen(kids.value), $.bytesToString($.plainSliceIndex(kids.value!, 0)), $.bytesToString($.plainSliceIndex(kids.value!, 1)))
 
 	let name = $.varRef("")
 	err = (json.Unmarshal($.mapGet<string, json.RawMessage, json.RawMessage>(fields.value, "name", null)[0], $.interfaceValue(name, "*string", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("string")))) as $.GoError)

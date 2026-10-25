@@ -86,7 +86,7 @@ export async function main(): globalThis.Promise<void> {
 		saved = $.appendOne(saved, (k).clone())
 		k.P.Line = 9
 	}
-	await $.println($.mapGet<Key, number, number>(n, new Key(true, new Pos(true, 3, 4), "x"), 0)[0], $.arrayIndex(saved!, 0).P.Line)
+	await $.println($.mapGet<Key, number, number>(n, new Key(true, new Pos(true, 3, 4), "x"), 0)[0], $.plainSliceIndex(saved!, 0).P.Line)
 
 	let vals = $.makeMap<string, Pos>([["v", new Pos(true, 5, 6)]])
 	for (const [__rangeKey, __goscriptRangeValue0] of vals?.entries() ?? []) {
