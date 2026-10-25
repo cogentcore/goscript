@@ -407,6 +407,17 @@ export interface Error {
   Error(): string | PromiseLike<string>
 }
 
+// Error is registered with the runtime type system, so type assertions to
+// runtime.Error see its methods.
+$.registerInterfaceType('runtime.Error', null, [
+  {
+    name: 'Error',
+    args: [],
+    returns: [{ type: { kind: $.TypeKind.Basic, name: 'string' } }],
+  },
+  { name: 'RuntimeError', args: [], returns: [] },
+])
+
 // TypeAssertionError represents a failed type assertion.
 export class TypeAssertionError implements Error {
   constructor(
@@ -422,6 +433,31 @@ export class TypeAssertionError implements Error {
     }
     return `interface conversion: ${this.interfaceType} is ${this.concrete}, not ${this.assertedType}`
   }
+}
+
+// PanicNilError is the value of a panic called with a nil argument, as Go
+// 1.21 and later panic with.
+export class PanicNilError {
+  constructor(_init?: Partial<{}>) {}
+
+  public clone(): PanicNilError {
+    return new PanicNilError()
+  }
+
+  public Error(): string {
+    return 'runtime error: panic called with nil argument'
+  }
+
+  public RuntimeError(): void {}
+
+  // PanicNilError is registered with the runtime type system; the compiler
+  // gives its method signatures, for reflection.
+  static __typeInfo = $.registerStructType(
+    'runtime.PanicNilError',
+    new PanicNilError(),
+    [],
+    PanicNilError,
+  )
 }
 
 // PanicError represents a panic.

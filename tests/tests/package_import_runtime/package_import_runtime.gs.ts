@@ -125,6 +125,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("Finalizer ignored")
 
 	await lockOSThread()
+	await panicNilError()
 }
 
 export async function callers(): globalThis.Promise<void> {
@@ -178,6 +179,29 @@ export async function lockOSThread(): globalThis.Promise<void> {
 	await $.println("main unlocked")
 }
 
+export async function panicNilError(): globalThis.Promise<void> {
+	const __defer = new $.AsyncDisposableStack()
+	try {
+		let err: $.GoError = $.interfaceValue<$.GoError>(new runtime.PanicNilError(), "*runtime.PanicNilError", __goscriptStatic2())
+		let [, isRuntime] = $.typeAssertTuple<runtime.Error | null>(err, "runtime.Error")
+		await $.println("PanicNilError:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), isRuntime)
+
+		__defer.defer(async () => { await (async () => {
+			let [, ok] = $.typeAssertTuple<runtime.Error | null>($.recover(), "runtime.Error")
+			await $.println("recovered runtime.Error:", ok)
+		})() })
+		let s: $.Slice<number> = null! as $.Slice<number>
+		let i = 5
+		$.arrayIndex(s!, i)
+		await __defer.dispose()
+	} catch (e) {
+		await __defer.disposePanic(e)
+		if (!$.recovered(e)) {
+			throw e
+		}
+	}
+}
+
 var __goscriptStatic0$value: any
 function __goscriptStatic0(): any {
 	return __goscriptStatic0$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, E: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }})
@@ -187,6 +211,13 @@ var __goscriptStatic1$value: any
 function __goscriptStatic1(): any {
 	return __goscriptStatic1$value ??= ([{Get: (receiver: any) => $.pointerValue(receiver).Get(__goscriptStatic0())}, [$.methodSignature("Get", [], [/* @__PURE__ */ $.basicType("int")], true, false)]])
 }
+
+var __goscriptStatic2$value: any
+function __goscriptStatic2(): any {
+	return __goscriptStatic2$value ??= ($.overrideTypeMethods(/* @__PURE__ */ $.pointerType("runtime.PanicNilError"), "runtime.PanicNilError", () => [$.methodSignature("Error", [], [/* @__PURE__ */ $.basicType("string")], true), $.methodSignature("RuntimeError", [], [], true)]))
+}
+
+var __goscriptAwait: any
 
 __goscriptInit0()
 
