@@ -152,6 +152,12 @@ export async function main(): globalThis.Promise<void> {
 
 	await genericComposites()
 
+	// The fmt scanning interfaces are interface types.
+	let scanState = reflect.TypeFor(__goscriptStatic15())
+	await $.println("fmt.ScanState:", (__goscriptAwait = (scanState !== null && (scanState as any).__isVarRef !== true && ((scanState as any).__goValue === undefined || (scanState as any).__goType?.charCodeAt(0) !== 42) ? (scanState as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(scanState)).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), reflect.Kind_String((__goscriptAwait = (scanState !== null && (scanState as any).__isVarRef !== true && ((scanState as any).__goValue === undefined || (scanState as any).__goType?.charCodeAt(0) !== 42) ? (scanState as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(scanState)).Kind(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)), (__goscriptAwait = (scanState !== null && (scanState as any).__isVarRef !== true && ((scanState as any).__goValue === undefined || (scanState as any).__goType?.charCodeAt(0) !== 42) ? (scanState as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(scanState)).NumMethod(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	let scanner = reflect.TypeFor(__goscriptStatic16())
+	await $.println("fmt.Scanner:", (__goscriptAwait = (scanner !== null && (scanner as any).__isVarRef !== true && ((scanner as any).__goValue === undefined || (scanner as any).__goType?.charCodeAt(0) !== 42) ? (scanner as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(scanner)).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), reflect.Kind_String((__goscriptAwait = (scanner !== null && (scanner as any).__isVarRef !== true && ((scanner as any).__goValue === undefined || (scanner as any).__goType?.charCodeAt(0) !== 42) ? (scanner as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(scanner)).Kind(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)), (__goscriptAwait = (scanner !== null && (scanner as any).__isVarRef !== true && ((scanner as any).__goValue === undefined || (scanner as any).__goType?.charCodeAt(0) !== 42) ? (scanner as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(scanner)).NumMethod(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+
 	await $.println("reflect_typefor test finished")
 }
 
@@ -172,11 +178,11 @@ export async function describePointer(__typeArgs: $.GenericTypeArgs | undefined,
 }
 
 export async function genericComposites(): globalThis.Promise<void> {
-	await describe(__goscriptStatic15(), $.arrayToSlice<MyStruct>([new MyStruct(true, "a", 1)]))
-	await describe(__goscriptStatic16(), $.typedSliceOf(Float32Array, [1, 2, 3]) as $.Slice<number>)
-	await describe(__goscriptStatic17(), $.arrayToSlice<number>([]))
-	await describeMap(__goscriptStatic18(), $.makeMap<string, MyStruct>([]))
-	await describePointer(__goscriptStatic15(), new MyStruct())
+	await describe(__goscriptStatic17(), $.arrayToSlice<MyStruct>([new MyStruct(true, "a", 1)]))
+	await describe(__goscriptStatic18(), $.typedSliceOf(Float32Array, [1, 2, 3]) as $.Slice<number>)
+	await describe(__goscriptStatic19(), $.arrayToSlice<number>([]))
+	await describeMap(__goscriptStatic20(), $.makeMap<string, MyStruct>([]))
+	await describePointer(__goscriptStatic17(), new MyStruct())
 }
 
 var __goscriptStatic0$value: any
@@ -256,22 +262,32 @@ function __goscriptStatic14(): any {
 
 var __goscriptStatic15$value: any
 function __goscriptStatic15(): any {
-	return __goscriptStatic15$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, E: { type: "main.MyStruct", zero: () => new MyStruct(true) }})
+	return __goscriptStatic15$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "fmt.ScanState", zero: () => null, methods: {Read: (receiver: any, ...args: any[]) => receiver.Read(...$.stripGenericTypeArgs(args)), ReadRune: (receiver: any) => receiver.ReadRune(), SkipSpace: (receiver: any) => receiver.SkipSpace(), Token: (receiver: any, ...args: any[]) => receiver.Token(...$.stripGenericTypeArgs(args)), UnreadRune: (receiver: any) => receiver.UnreadRune(), Width: (receiver: any) => receiver.Width()} }})
 }
 
 var __goscriptStatic16$value: any
 function __goscriptStatic16(): any {
-	return __goscriptStatic16$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, E: { type: /* @__PURE__ */ $.basicType("float32"), zero: () => 0 }})
+	return __goscriptStatic16$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "fmt.Scanner", zero: () => null, methods: {Scan: (receiver: any, ...args: any[]) => receiver.Scan(...$.stripGenericTypeArgs(args))} }})
 }
 
 var __goscriptStatic17$value: any
 function __goscriptStatic17(): any {
-	return __goscriptStatic17$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, E: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }})
+	return __goscriptStatic17$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, E: { type: "main.MyStruct", zero: () => new MyStruct(true) }})
 }
 
 var __goscriptStatic18$value: any
 function __goscriptStatic18(): any {
-	return __goscriptStatic18$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, K: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }, V: { type: "main.MyStruct", zero: () => new MyStruct(true) }})
+	return __goscriptStatic18$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, E: { type: /* @__PURE__ */ $.basicType("float32"), zero: () => 0 }})
+}
+
+var __goscriptStatic19$value: any
+function __goscriptStatic19(): any {
+	return __goscriptStatic19$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, E: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }})
+}
+
+var __goscriptStatic20$value: any
+function __goscriptStatic20(): any {
+	return __goscriptStatic20$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, K: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }, V: { type: "main.MyStruct", zero: () => new MyStruct(true) }})
 }
 
 var __goscriptAwait: any

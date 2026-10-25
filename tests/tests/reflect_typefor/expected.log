@@ -21,4 +21,6 @@ index kind: float32
 type: []int elem kind: int len: 0
 map type: map[string]main.MyStruct
 pointer type: *main.MyStruct
+fmt.ScanState: fmt.ScanState interface 6
+fmt.Scanner: fmt.Scanner interface 1
 reflect_typefor test finished
