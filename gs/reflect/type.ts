@@ -4277,7 +4277,7 @@ export function visibleStructFields(t: Type): StructField[] {
 function zeroMethod(): Method {
   return new Method({
     Type: new BasicType(Invalid, '<invalid>'),
-    Func: () => undefined,
+    Func: new Value(),
   })
 }
 
@@ -4286,16 +4286,25 @@ function methodFromSignature(
   index: number,
   receiver: Type,
 ): Method {
+  const iface = receiver.Kind() === Interface
+  const type = methodTypeFromSignature(signature, receiver, !iface)
   return new Method({
     Name: signature.name,
-    Type: methodTypeFromSignature(
-      signature,
-      receiver,
-      receiver.Kind() !== Interface,
-    ),
-    Func: () => undefined,
+    Type: type,
+    Func: iface ? new Value() : methodFuncValue(signature.name, receiver, type),
     Index: index,
   })
+}
+
+// methodFuncValue returns the method name of the type receiver as a function
+// of type type, which takes the receiver as its first argument, as
+// Method.Func is.
+function methodFuncValue(name: string, receiver: Type, type: Type): Value {
+  const fn = (recv: ReflectValue, ...args: unknown[]): unknown => {
+    const bound = new Value(recv, receiver).MethodByName(name).currentValue()
+    return (bound as (...args: unknown[]) => unknown)(...args)
+  }
+  return new Value(fn, type)
 }
 
 function methodTypeFromSignature(

@@ -12,6 +12,8 @@ type pair struct {
 
 func (p pair) Sum() int { return p.A + len(p.B) }
 
+func (p *pair) Add(n int) { p.A += n }
+
 func main() {
 	// The Can methods report the kinds that their accessors accept.
 	i, u, f, c := reflect.ValueOf(1), reflect.ValueOf(uint8(2)), reflect.ValueOf(1.5), reflect.ValueOf(1i)
@@ -49,6 +51,12 @@ func main() {
 	for meth := range pt.Methods() {
 		println("type method:", meth.Name, meth.Type.String(), meth.IsExported())
 	}
+	// Method.Func takes the receiver as its first argument.
+	sum, _ := pt.MethodByName("Sum")
+	println("func:", sum.Func.Type().String(), sum.Func.Call([]reflect.Value{reflect.ValueOf(p)})[0].Int())
+	addm, _ := reflect.TypeOf(&p).MethodByName("Add")
+	addm.Func.Call([]reflect.Value{reflect.ValueOf(&p), reflect.ValueOf(5)})
+	println("ptr func:", addm.Func.Type().String(), p.A)
 	ft := reflect.TypeOf(strings.Repeat)
 	for in := range ft.Ins() {
 		println("in:", in.String())

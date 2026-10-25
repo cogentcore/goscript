@@ -8,6 +8,8 @@ method: Sum 3
 type field: A int
 type field: B string
 type method: Sum func(main.pair) int true
+func: func(main.pair) int 3
+ptr func: func(*main.pair, int) 6
 in: string
 in: int
 out: string

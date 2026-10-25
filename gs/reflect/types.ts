@@ -159,7 +159,9 @@ export class Method {
   public Name = ''
   public PkgPath = ''
   public Type: Type | null = null
-  public Func!: ReflectFunc
+  // Func is the method as a function taking the receiver first; it is the
+  // zero Value for an interface type.
+  public Func!: Value
   public Index = 0
 
   constructor(init?: Partial<Method>) {

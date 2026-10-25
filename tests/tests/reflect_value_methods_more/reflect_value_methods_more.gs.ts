@@ -28,6 +28,12 @@ export class pair {
 		return this
 	}
 
+	public Add(n: number): void {
+		const p: pair | $.VarRef<pair> | null = this;
+		const p$: pair = p == null ? $.pointerTarget<pair>(p) : (p as any).__isVarRef === true ? (p as any).value : (p as any).__goValue === undefined ? (p as any) : $.pointerTarget<pair>(p);
+		;(p$ as pair).A += n
+	}
+
 	public Sum(): number {
 		const p = this;
 		return p.A + $.stringLen(p.B)
@@ -36,7 +42,7 @@ export class pair {
 	static __typeInfo = $.registerStructType(
 		"main.pair",
 		() => new pair(),
-		() => [$.methodSignature("Sum", [], [/* @__PURE__ */ $.basicType("int")])],
+		() => [$.methodSignature("Add", [["n", /* @__PURE__ */ $.basicType("int")]], [], true), $.methodSignature("Sum", [], [/* @__PURE__ */ $.basicType("int")])],
 		pair,
 		() => [/* @__PURE__ */ $.structField("A", /* @__PURE__ */ $.basicType("int"), [0], 0, true), /* @__PURE__ */ $.structField("B", /* @__PURE__ */ $.basicType("string"), [1], 8, true)]
 	)
@@ -66,10 +72,10 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("clear:", $.len(m), $.arrayIndex(s.value!, 0), $.sliceLen(s.value), $.cap(s.value))
 
 	// Fields and Methods iterate with names and values.
-	let p = new pair(true, 1, "xy")
+	let p = $.varRef(new pair(true, 1, "xy"))
 	let __goscriptRangeReturn0 = false
 	;await (async () => {
-		await $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.structInterfaceValue((p).clone(), "main.pair", "main.pair")))).Fields()!(async (sf, v) => {
+		await $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.structInterfaceValue((p.value).clone(), "main.pair", "main.pair")))).Fields()!(async (sf, v) => {
 			await $.println("field:", sf.Name, reflect.Kind_String($.markAsStructValue($.cloneStructValue(v)).Kind()))
 			return true
 		})
@@ -79,7 +85,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 	let __goscriptRangeReturn1 = false
 	;await (async () => {
-		await $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.structInterfaceValue((p).clone(), "main.pair", "main.pair")))).Methods()!(async (meth, v) => {
+		await $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.structInterfaceValue((p.value).clone(), "main.pair", "main.pair")))).Methods()!(async (meth, v) => {
 			await $.println("method:", meth.Name, $.markAsStructValue($.cloneStructValue($.arrayIndex((await $.markAsStructValue($.cloneStructValue(v)).Call(null))!, 0))).Int())
 			return true
 		})
@@ -89,7 +95,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 
 	// The Type iterators yield fields, methods, and function inputs and outputs.
-	let pt = reflect.TypeOf($.structInterfaceValue(p, "main.pair", "main.pair"))
+	let pt = reflect.TypeOf($.structInterfaceValue((p.value).clone(), "main.pair", "main.pair"))
 	let __goscriptRangeReturn2 = false
 	;await (async () => {
 		await ((__goscriptAwait = (pt !== null && (pt as any).__isVarRef !== true && ((pt as any).__goValue === undefined || (pt as any).__goType?.charCodeAt(0) !== 42) ? (pt as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(pt)).Fields(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as iter.Seq<reflect.StructField> | null)!(async (sf) => {
@@ -110,6 +116,12 @@ export async function main(): globalThis.Promise<void> {
 	if (__goscriptRangeReturn3) {
 		return
 	}
+	// Method.Func takes the receiver as its first argument.
+	let [sum, ] = await (pt !== null && (pt as any).__isVarRef !== true && ((pt as any).__goValue === undefined || (pt as any).__goType?.charCodeAt(0) !== 42) ? (pt as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(pt)).MethodByName("Sum")
+	await $.println("func:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(sum.Func)).Type()).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), $.markAsStructValue($.cloneStructValue($.arrayIndex((await $.markAsStructValue($.cloneStructValue(sum.Func)).Call($.arrayToSlice<reflect.Value>([$.markAsStructValue($.cloneStructValue(reflect.ValueOf($.structInterfaceValue((p.value).clone(), "main.pair", "main.pair"))))])))!, 0))).Int())
+	let [addm, ] = await $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.interfaceValue(p, "*main.pair", /* @__PURE__ */ $.pointerType("main.pair")))).MethodByName("Add")
+	await $.markAsStructValue($.cloneStructValue(addm.Func)).Call($.arrayToSlice<reflect.Value>([$.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(p, "*main.pair", /* @__PURE__ */ $.pointerType("main.pair"))))), $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.basicInterfaceValue(5, "int"))))]))
+	await $.println("ptr func:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(addm.Func)).Type()).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), p.value.A)
 	let ft = reflect.TypeOf($.interfaceValue($.goFunc(strings.Repeat, "strings.Repeat"), "func(s string, count int) string", ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("string")] } as $.FunctionTypeInfo)))
 	let __goscriptRangeReturn4 = false
 	;await (async () => {
