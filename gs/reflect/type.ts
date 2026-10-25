@@ -1200,10 +1200,21 @@ export class Value {
     if (this.Kind() !== Struct) {
       throw new ValueError({ Kind: this.Kind(), Method: 'Field' })
     }
-    const field = this.Type().Field(i)
-    const fieldKey = structFieldStorageKey(this.Type(), i)
-    if (!field) {
-      throw new Error('reflect: struct field index out of range')
+    // A StructType gives the field's type and storage key directly, without
+    // making a StructField.
+    const typ = this.Type()
+    let fieldType: Type
+    let fieldKey: string
+    if (typ instanceof StructType) {
+      fieldType = typ.fieldType(i)
+      fieldKey = typ.fieldKey(i)
+    } else {
+      const field = typ.Field(i)
+      if (!field) {
+        throw new Error('reflect: struct field index out of range')
+      }
+      fieldType = field.Type!
+      fieldKey = structFieldStorageKey(typ, i)
     }
 
     // Read the field from the struct's storage, where an unset field is nil.
@@ -1214,7 +1225,7 @@ export class Value {
     // Pass parent struct and field name so Set() can update the struct
     return new Value(
       fieldVal,
-      field.Type,
+      fieldType,
       undefined,
       parentObj,
       fieldKey,
@@ -4257,6 +4268,10 @@ function typeAssignableTo(t: Type, u: Type | null): boolean {
   if (u === null) {
     return false
   }
+  // A type is assignable to itself, which needs no identity keys.
+  if (t === u) {
+    return true
+  }
   if (typeIdentityKey(t) === typeIdentityKey(u)) {
     return true
   }
@@ -4572,6 +4587,15 @@ class StructType implements Type {
       Index: [...f.index],
       Anonymous: f.anonymous,
     })
+  }
+
+  public fieldType(i: number): Type {
+    if (i < 0 || i >= this.NumField()) {
+      throw new Error(
+        `reflect: Field index out of range [${i}] with length ${this.NumField()}`,
+      )
+    }
+    return this._fields[i].type
   }
 
   public fieldKey(i: number): string {
