@@ -14,10 +14,10 @@ export async function main(): globalThis.Promise<void> {
 	let typ = reflect.StructOf(fields)
 	await $.println("type:", (__goscriptAwait = (typ !== null && (typ as any).__isVarRef !== true && ((typ as any).__goValue === undefined || (typ as any).__goType?.charCodeAt(0) !== 42) ? (typ as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(typ)).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = (typ !== null && (typ as any).__isVarRef !== true && ((typ as any).__goValue === undefined || (typ as any).__goType?.charCodeAt(0) !== 42) ? (typ as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(typ)).Name(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = (typ !== null && (typ as any).__isVarRef !== true && ((typ as any).__goValue === undefined || (typ as any).__goType?.charCodeAt(0) !== 42) ? (typ as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(typ)).PkgPath(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = (typ !== null && (typ as any).__isVarRef !== true && ((typ as any).__goValue === undefined || (typ as any).__goType?.charCodeAt(0) !== 42) ? (typ as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(typ)).NumField(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), ((__goscriptAwait = (typ !== null && (typ as any).__isVarRef !== true && ((typ as any).__goValue === undefined || (typ as any).__goType?.charCodeAt(0) !== 42) ? (typ as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(typ)).Field(1), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as reflect.StructField).Offset > 0, (__goscriptAwait = (typ !== null && (typ as any).__isVarRef !== true && ((typ as any).__goValue === undefined || (typ as any).__goType?.charCodeAt(0) !== 42) ? (typ as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(typ)).Comparable(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
-	let value = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.New($.pointerValueOrNil(typ)!))).Elem()))
-	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(value)).FieldByName("Name"))).SetString("Ada")
-	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(value)).Field(1))).SetInt(3n)
-	let __goscriptTuple0: any = (json.Marshal($.markAsStructValue($.cloneStructValue(value)).Interface()) as [$.Slice<number>, $.GoError])
+	let value = reflect.New($.pointerValueOrNil(typ)!).Elem()
+	value.FieldByName("Name").SetString("Ada")
+	value.Field(1).SetInt(3n)
+	let __goscriptTuple0: any = (json.Marshal(value.Interface()) as [$.Slice<number>, $.GoError])
 	let data: $.Slice<number> = __goscriptTuple0[0]
 	let err: $.GoError = __goscriptTuple0[1]
 	if (err != null) {
@@ -34,9 +34,9 @@ export async function main(): globalThis.Promise<void> {
 	let visible = reflect.VisibleFields($.pointerValueOrNil(outer)!)
 	await $.println("visible:", $.sliceLen(visible), $.plainSliceIndex(visible!, 0).Name, $.sliceLen($.plainSliceIndex(visible!, 1).Index), $.plainSliceIndex($.plainSliceIndex(visible!, 1).Index!, 0), $.plainSliceIndex($.plainSliceIndex(visible!, 1).Index!, 1))
 
-	let outerValue = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.New($.pointerValueOrNil(outer)!))).Elem()))
-	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(outerValue)).FieldByIndex($.arrayToSlice<number>([0, 0])))).SetInt(9n)
-	await $.println("promoted:", $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(outerValue)).FieldByName("ID"))).Int())
+	let outerValue = reflect.New($.pointerValueOrNil(outer)!).Elem()
+	outerValue.FieldByIndex($.arrayToSlice<number>([0, 0])).SetInt(9n)
+	await $.println("promoted:", outerValue.FieldByName("ID").Int())
 
 	await $.println("same:", $.comparableEqual(typ, reflect.StructOf(fields)))
 	await $.println("different-pkg:", $.comparableEqual(reflect.StructOf($.arrayToSlice<reflect.StructField>([$.markAsStructValue(new reflect.StructField({Name: "x", PkgPath: "a", Type: intType}))])), reflect.StructOf($.arrayToSlice<reflect.StructField>([$.markAsStructValue(new reflect.StructField({Name: "x", PkgPath: "b", Type: intType}))]))))

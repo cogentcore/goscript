@@ -9782,6 +9782,9 @@ func isPlainAssignType(typ types.Type) bool {
 	if _, ok := types.Unalias(typ).(*types.TypeParam); ok {
 		return false
 	}
+	if isSharedValueType(typ) {
+		return true
+	}
 	switch types.Unalias(typ).Underlying().(type) {
 	case *types.Basic, *types.Pointer, *types.Slice, *types.Map, *types.Signature, *types.Chan:
 		return true
@@ -15945,8 +15948,9 @@ func (o *LoweringOwner) lowerValueForTargetTypes(
 	if wrapper := o.lowerTypeParamPointerInterfaceValue(ctx, targetType, sourceType, value); wrapper != "" {
 		return wrapper
 	}
-	if isInterfaceType(targetType) && isStructValueType(sourceType) {
-		if cloneStructValue {
+	if isInterfaceType(targetType) && (isStructValueType(sourceType) || isSharedValueType(sourceType)) {
+		// A shared value is boxed as it is, uncopied.
+		if cloneStructValue && !isSharedValueType(sourceType) {
 			value = o.lowerStructCloneOf(sourceType, value)
 		}
 		if wrapper := o.lowerNamedValueInterfaceWrapper(ctx, targetType, sourceType, value); wrapper != "" {
@@ -16597,7 +16601,7 @@ func genericStructFieldNeedsInstantiatedZero(named *types.Named, idx int) bool {
 }
 
 func (o *LoweringOwner) lowerZeroValueExprFor(ctx lowerFileContext, typ types.Type) string {
-	if named := namedStructType(typ); named != nil && isStructValueType(typ) {
+	if named := namedStructType(typ); named != nil && (isStructValueType(typ) || isSharedValueType(typ)) {
 		if !o.canSpellNamedType(ctx, named) {
 			return "undefined as any"
 		}
@@ -18060,6 +18064,9 @@ func makeSliceElemNeedsZeroFactory(elem types.Type) bool {
 }
 
 func isStructValueType(typ types.Type) bool {
+	if isSharedValueType(typ) {
+		return false
+	}
 	if namedStructType(typ) != nil {
 		return true
 	}
@@ -19793,3 +19800,16 @@ func isSimpleLoweredOperand(value string) bool {
 
 // simpleOperandCalls matches the callee of each call in a lowered expression.
 var simpleOperandCalls = regexp.MustCompile(`([\w$.]+)(?:<[^()]*>)?\(`)
+
+// isSharedValueType reports whether typ is reflect.Value, a struct type whose
+// override values are never modified in place, so that copies of a value
+// can share it instead of cloning it, as Go copies share the variable a
+// reflect.Value refers to.
+func isSharedValueType(typ types.Type) bool {
+	named, ok := types.Unalias(typ).(*types.Named)
+	if !ok {
+		return false
+	}
+	obj := named.Obj()
+	return obj.Pkg() != nil && obj.Pkg().Path() == "reflect" && obj.Name() == "Value"
+}

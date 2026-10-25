@@ -45,34 +45,34 @@ export class Person {
 }
 
 export function reflectOverlap(x: $.Slice<number>, y: $.Slice<number>): boolean {
-	return ((($.sliceLen(x) > 0) && ($.sliceLen(y) > 0)) && ($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.indexRef(x!, 0), "*byte", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("uint8")))))).Pointer() <= $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.indexRef(y!, $.sliceLen(y) - 1), "*byte", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("uint8")))))).Pointer())) && ($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.indexRef(y!, 0), "*byte", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("uint8")))))).Pointer() <= $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.indexRef(x!, $.sliceLen(x) - 1), "*byte", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("uint8")))))).Pointer())
+	return ((($.sliceLen(x) > 0) && ($.sliceLen(y) > 0)) && (reflect.ValueOf($.interfaceValue($.indexRef(x!, 0), "*byte", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("uint8")))).Pointer() <= reflect.ValueOf($.interfaceValue($.indexRef(y!, $.sliceLen(y) - 1), "*byte", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("uint8")))).Pointer())) && (reflect.ValueOf($.interfaceValue($.indexRef(y!, 0), "*byte", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("uint8")))).Pointer() <= reflect.ValueOf($.interfaceValue($.indexRef(x!, $.sliceLen(x) - 1), "*byte", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("uint8")))).Pointer())
 }
 
 export function reflectSameStart(x: $.Slice<number>, y: $.Slice<number>): boolean {
-	return (($.sliceLen(x) > 0) && ($.sliceLen(y) > 0)) && ($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.indexRef(x!, 0), "*byte", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("uint8")))))).Pointer() == $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.indexRef(y!, 0), "*byte", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("uint8")))))).Pointer())
+	return (($.sliceLen(x) > 0) && ($.sliceLen(y) > 0)) && (reflect.ValueOf($.interfaceValue($.indexRef(x!, 0), "*byte", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("uint8")))).Pointer() == reflect.ValueOf($.interfaceValue($.indexRef(y!, 0), "*byte", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("uint8")))).Pointer())
 }
 
 export async function main(): globalThis.Promise<void> {
 	// Test basic reflect functions
 	let x = 42
-	let v = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.basicInterfaceValue(x, "int"))))
+	let v = reflect.ValueOf($.basicInterfaceValue(x, "int"))
 	await $.println("Type:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeFor(__goscriptStatic0())).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
-	await $.println("Value:", $.markAsStructValue($.cloneStructValue(v)).Int())
-	await $.println("Kind:", reflect.Kind_String($.markAsStructValue($.cloneStructValue(v)).Kind()))
+	await $.println("Value:", v.Int())
+	await $.println("Kind:", reflect.Kind_String(v.Kind()))
 
 	// Test with string
 	let s = "hello"
-	let sv = $.markAsStructValue($.cloneStructValue(reflect.ValueOf(s)))
+	let sv = reflect.ValueOf(s)
 	await $.println("String type:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeFor(__goscriptStatic1())).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
-	await $.println("String value:", $.markAsStructValue($.cloneStructValue(sv)).String())
-	await $.println("String kind:", reflect.Kind_String($.markAsStructValue($.cloneStructValue(sv)).Kind()))
+	await $.println("String value:", sv.String())
+	await $.println("String kind:", reflect.Kind_String(sv.Kind()))
 
 	// Test with slice
 	let slice = $.arrayToSlice<number>([1, 2, 3])
-	let sliceV = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(slice, "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"))))))
+	let sliceV = reflect.ValueOf($.interfaceValue(slice, "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"))))
 	await $.println("Slice type:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeFor(__goscriptStatic2())).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
-	await $.println("Slice len:", $.markAsStructValue($.cloneStructValue(sliceV)).Len())
-	await $.println("Slice kind:", reflect.Kind_String($.markAsStructValue($.cloneStructValue(sliceV)).Kind()))
+	await $.println("Slice len:", sliceV.Len())
+	await $.println("Slice kind:", reflect.Kind_String(sliceV.Kind()))
 
 	// Test DeepEqual
 	let a = $.arrayToSlice<number>([1, 2, 3])
@@ -82,8 +82,8 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("DeepEqual a==c:", reflect.DeepEqual($.interfaceValue(a, "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"))), $.interfaceValue(c, "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")))))
 
 	// Test Zero value
-	let zeroInt = $.markAsStructValue($.cloneStructValue(reflect.Zero($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic0()))!)))
-	await $.println("Zero int:", $.markAsStructValue($.cloneStructValue(zeroInt)).Int())
+	let zeroInt = reflect.Zero($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic0()))!)
+	await $.println("Zero int:", zeroInt.Int())
 
 	// Test type construction functions
 	let intType = reflect.TypeFor(__goscriptStatic0())
@@ -103,17 +103,17 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("PtrTo int:", (__goscriptAwait = (ptrType2 !== null && (ptrType2 as any).__isVarRef !== true && ((ptrType2 as any).__goValue === undefined || (ptrType2 as any).__goType?.charCodeAt(0) !== 42) ? (ptrType2 as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(ptrType2)).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
 	// Test New and Indirect
-	let newVal = $.markAsStructValue($.cloneStructValue(reflect.New($.pointerValueOrNil(intType)!)))
-	await $.println("New int type:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(newVal)).Type()).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
-	let indirectVal = $.markAsStructValue($.cloneStructValue(reflect.Indirect(newVal)))
-	await $.println("Indirect type:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(indirectVal)).Type()).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	let newVal = reflect.New($.pointerValueOrNil(intType)!)
+	await $.println("New int type:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(newVal.Type()).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	let indirectVal = reflect.Indirect(newVal)
+	await $.println("Indirect type:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(indirectVal.Type()).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
 	// Test Zero values for different types
-	let zeroString = $.markAsStructValue($.cloneStructValue(reflect.Zero($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic1()))!)))
-	await $.println("Zero string:", $.markAsStructValue($.cloneStructValue(zeroString)).String())
+	let zeroString = reflect.Zero($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic1()))!)
+	await $.println("Zero string:", zeroString.String())
 
-	let zeroBool = $.markAsStructValue($.cloneStructValue(reflect.Zero($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic3()))!)))
-	await $.println("Zero bool:", $.markAsStructValue($.cloneStructValue(zeroBool)).String())
+	let zeroBool = reflect.Zero($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic3()))!)
+	await $.println("Zero bool:", zeroBool.String())
 
 	// Test Swapper function
 	let testSlice = $.arrayToSlice<number>([1, 2, 3, 4, 5])
@@ -125,8 +125,8 @@ export async function main(): globalThis.Promise<void> {
 	// Test Copy function
 	let src = $.arrayToSlice<number>([10, 20, 30])
 	let dst = $.makeSlice<number>(2, undefined, "number")
-	let srcVal = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(src, "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"))))))
-	let dstVal = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(dst, "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"))))))
+	let srcVal = reflect.ValueOf($.interfaceValue(src, "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"))))
+	let dstVal = reflect.ValueOf($.interfaceValue(dst, "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"))))
 	let copied = reflect.Copy(dstVal, srcVal)
 	await $.println("Copied elements:", copied)
 	await $.println("Dst after copy:", $.plainSliceIndex(dst!, 0), $.plainSliceIndex(dst!, 1))
@@ -137,17 +137,17 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("Struct type:", (__goscriptAwait = (personType !== null && (personType as any).__isVarRef !== true && ((personType as any).__goValue === undefined || (personType as any).__goType?.charCodeAt(0) !== 42) ? (personType as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(personType)).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	await $.println("Struct kind:", reflect.Kind_String((__goscriptAwait = (personType !== null && (personType as any).__isVarRef !== true && ((personType as any).__goValue === undefined || (personType as any).__goType?.charCodeAt(0) !== 42) ? (personType as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(personType)).Kind(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)))
 
-	let personVal = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.structInterfaceValue(person, "main.Person", "main.Person"))))
-	await $.println("Struct value type:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(personVal)).Type()).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	let personVal = reflect.ValueOf($.structInterfaceValue(person, "main.Person", "main.Person"))
+	await $.println("Struct value type:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(personVal.Type()).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
 	// Test with different kinds
 	let f = 3.14
-	let fVal = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.basicInterfaceValue(f, "float64"))))
-	await $.println("Float kind:", reflect.Kind_String($.markAsStructValue($.cloneStructValue(fVal)).Kind()))
+	let fVal = reflect.ValueOf($.basicInterfaceValue(f, "float64"))
+	await $.println("Float kind:", reflect.Kind_String(fVal.Kind()))
 
 	let boolVal = true
-	let bVal = $.markAsStructValue($.cloneStructValue(reflect.ValueOf(boolVal)))
-	await $.println("Bool kind:", reflect.Kind_String($.markAsStructValue($.cloneStructValue(bVal)).Kind()))
+	let bVal = reflect.ValueOf(boolVal)
+	await $.println("Bool kind:", reflect.Kind_String(bVal.Kind()))
 
 	// Test type equality
 	let intType1 = reflect.TypeFor(__goscriptStatic0())
@@ -174,41 +174,41 @@ export async function main(): globalThis.Promise<void> {
 
 	// Test interface type
 	let iface: any = "hello"
-	let ifaceVal = $.markAsStructValue($.cloneStructValue(reflect.ValueOf(iface)))
-	await $.println("Interface value type:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(ifaceVal)).Type()).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
-	await $.println("Interface kind:", reflect.Kind_String($.markAsStructValue($.cloneStructValue(ifaceVal)).Kind()))
-	let __goscriptTuple0: any = reflect.TypeAssert(__goscriptStatic1(), $.markAsStructValue($.cloneStructValue(reflect.ValueOf("typed"))))
+	let ifaceVal = reflect.ValueOf(iface)
+	await $.println("Interface value type:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(ifaceVal.Type()).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println("Interface kind:", reflect.Kind_String(ifaceVal.Kind()))
+	let __goscriptTuple0: any = reflect.TypeAssert(__goscriptStatic1(), reflect.ValueOf("typed"))
 	let assertedString: string = (__goscriptTuple0[0] as string)
 	let assertedOK: boolean = __goscriptTuple0[1]
 	await $.println("TypeAssert string:", assertedString, assertedOK)
-	let [, assertedIntOK] = reflect.TypeAssert(__goscriptStatic0(), $.markAsStructValue($.cloneStructValue(reflect.ValueOf("typed"))))
+	let [, assertedIntOK] = reflect.TypeAssert(__goscriptStatic0(), reflect.ValueOf("typed"))
 	await $.println("TypeAssert int:", assertedIntOK)
 	let complexValue = $.complex(3, -2)
-	let complexReflect = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.basicInterfaceValue(complexValue, "complex128"))))
-	await $.println("Complex value kind:", reflect.Kind_String($.markAsStructValue($.cloneStructValue(complexReflect)).Kind()))
-	await $.println("Complex real:", $.int($.real($.markAsStructValue($.cloneStructValue(complexReflect)).Complex())))
-	await $.println("Complex imag:", $.int($.imag($.markAsStructValue($.cloneStructValue(complexReflect)).Complex())))
+	let complexReflect = reflect.ValueOf($.basicInterfaceValue(complexValue, "complex128"))
+	await $.println("Complex value kind:", reflect.Kind_String(complexReflect.Kind()))
+	await $.println("Complex real:", $.int($.real(complexReflect.Complex())))
+	await $.println("Complex imag:", $.int($.imag(complexReflect.Complex())))
 	let complexTarget: $.VarRef<$.Complex> = $.varRef($.complex(0, 0))
-	let complexTargetValue = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(complexTarget, "*complex128", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("complex128")))))).Elem()))
-	$.markAsStructValue($.cloneStructValue(complexTargetValue)).SetComplex($.complex(7, 8))
-	await $.println("SetComplex real:", $.int($.real($.markAsStructValue($.cloneStructValue(complexTargetValue)).Complex())))
-	await $.println("SetComplex imag:", $.int($.imag($.markAsStructValue($.cloneStructValue(complexTargetValue)).Complex())))
+	let complexTargetValue = reflect.ValueOf($.interfaceValue(complexTarget, "*complex128", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("complex128")))).Elem()
+	complexTargetValue.SetComplex($.complex(7, 8))
+	await $.println("SetComplex real:", $.int($.real(complexTargetValue.Complex())))
+	await $.println("SetComplex imag:", $.int($.imag(complexTargetValue.Complex())))
 	await $.println("Array type len:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.ArrayOf(3, $.pointerValueOrNil(reflect.TypeFor(__goscriptStatic0()))!)).Len(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
 	// Test function type
 	let fn = $.functionValue((_p0: number): string => {
 		return ""
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("string")] } as $.FunctionTypeInfo))
-	let fnVal = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(fn, "func(int) string", ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("string")] } as $.FunctionTypeInfo)))))
-	await $.println("Function type:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(fnVal)).Type()).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
-	await $.println("Function kind:", reflect.Kind_String($.markAsStructValue($.cloneStructValue(fnVal)).Kind()))
+	let fnVal = reflect.ValueOf($.interfaceValue(fn, "func(int) string", ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("string")] } as $.FunctionTypeInfo)))
+	await $.println("Function type:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(fnVal.Type()).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println("Function kind:", reflect.Kind_String(fnVal.Kind()))
 
 	// Test more complex types
 	let complexSlice = $.arrayToSlice<$.Slice<number>>([$.arrayToSlice<number>([1, 2]), $.arrayToSlice<number>([3, 4])])
-	let complexVal = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(complexSlice, "[][]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")))))))
-	await $.println("Complex slice type:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(complexVal)).Type()).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
-	await $.println("Complex slice kind:", reflect.Kind_String($.markAsStructValue($.cloneStructValue(complexVal)).Kind()))
-	await $.println("Complex slice len:", $.markAsStructValue($.cloneStructValue(complexVal)).Len())
+	let complexVal = reflect.ValueOf($.interfaceValue(complexSlice, "[][]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")))))
+	await $.println("Complex slice type:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(complexVal.Type()).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println("Complex slice kind:", reflect.Kind_String(complexVal.Kind()))
+	await $.println("Complex slice len:", complexVal.Len())
 
 	// Test type methods
 	await $.println("Type size methods:")
@@ -221,19 +221,19 @@ export async function main(): globalThis.Promise<void> {
 
 	// Test MakeSlice
 	let sliceTypeInt = reflect.SliceOf($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic0()))!)
-	let newSlice = $.markAsStructValue($.cloneStructValue(reflect.MakeSlice($.pointerValueOrNil(sliceTypeInt)!, 3, 5)))
-	await $.println("MakeSlice len:", $.markAsStructValue($.cloneStructValue(newSlice)).Len())
-	await $.println("MakeSlice type:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(newSlice)).Type()).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	let newSlice = reflect.MakeSlice($.pointerValueOrNil(sliceTypeInt)!, 3, 5)
+	await $.println("MakeSlice len:", newSlice.Len())
+	await $.println("MakeSlice type:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(newSlice.Type()).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
 	// Test MakeMap
 	let mapTypeStr = reflect.MapOf($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic1()))!, $.pointerValueOrNil(reflect.TypeFor(__goscriptStatic0()))!)
-	let newMap = $.markAsStructValue($.cloneStructValue(reflect.MakeMap($.pointerValueOrNil(mapTypeStr)!)))
-	await $.println("MakeMap type:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(newMap)).Type()).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	let newMap = reflect.MakeMap($.pointerValueOrNil(mapTypeStr)!)
+	await $.println("MakeMap type:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(newMap.Type()).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
 	// Test Append
-	let originalSlice = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.arrayToSlice<number>([1, 2]), "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"))))))
-	let appendedSlice = $.markAsStructValue($.cloneStructValue(reflect.Append(originalSlice, $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.basicInterfaceValue(3, "int")))))))
-	await $.println("Append result len:", $.markAsStructValue($.cloneStructValue(appendedSlice)).Len())
+	let originalSlice = reflect.ValueOf($.interfaceValue($.arrayToSlice<number>([1, 2]), "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"))))
+	let appendedSlice = reflect.Append(originalSlice, reflect.ValueOf($.basicInterfaceValue(3, "int")))
+	await $.println("Append result len:", appendedSlice.Len())
 
 	// Test channel types
 	let chanType = reflect.ChanOf(3, $.pointerValueOrNil(reflect.TypeFor(__goscriptStatic0()))!)
@@ -241,8 +241,8 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("ChanOf kind:", reflect.Kind_String((__goscriptAwait = (chanType !== null && (chanType as any).__isVarRef !== true && ((chanType as any).__goValue === undefined || (chanType as any).__goType?.charCodeAt(0) !== 42) ? (chanType as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(chanType)).Kind(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)))
 
 	// Test MakeChan
-	let newChan = $.markAsStructValue($.cloneStructValue(reflect.MakeChan($.pointerValueOrNil(chanType)!, 0)))
-	await $.println("MakeChan type:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(newChan)).Type()).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	let newChan = reflect.MakeChan($.pointerValueOrNil(chanType)!, 0)
+	await $.println("MakeChan type:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(newChan.Type()).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
 	// Test different channel directions
 	let sendOnlyChan = reflect.ChanOf(2, $.pointerValueOrNil(reflect.TypeFor(__goscriptStatic1()))!)
@@ -253,15 +253,15 @@ export async function main(): globalThis.Promise<void> {
 
 	// Test channels with different element types
 	let stringChanType = reflect.ChanOf(3, $.pointerValueOrNil(reflect.TypeFor(__goscriptStatic1()))!)
-	let stringChan = $.markAsStructValue($.cloneStructValue(reflect.MakeChan($.pointerValueOrNil(stringChanType)!, 5)))
-	await $.println("String chan type:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(stringChan)).Type()).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
-	await $.println("String chan elem type:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(stringChan)).Type()).Elem(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	let stringChan = reflect.MakeChan($.pointerValueOrNil(stringChanType)!, 5)
+	await $.println("String chan type:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(stringChan.Type()).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println("String chan elem type:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(stringChan.Type()).Elem(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
 	// Test buffered vs unbuffered channels
-	let unbufferedChan = $.markAsStructValue($.cloneStructValue(reflect.MakeChan($.pointerValueOrNil(chanType)!, 0)))
-	let bufferedChan = $.markAsStructValue($.cloneStructValue(reflect.MakeChan($.pointerValueOrNil(chanType)!, 10)))
-	await $.println("Unbuffered chan type:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(unbufferedChan)).Type()).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
-	await $.println("Buffered chan type:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(bufferedChan)).Type()).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	let unbufferedChan = reflect.MakeChan($.pointerValueOrNil(chanType)!, 0)
+	let bufferedChan = reflect.MakeChan($.pointerValueOrNil(chanType)!, 10)
+	await $.println("Unbuffered chan type:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(unbufferedChan.Type()).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println("Buffered chan type:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(bufferedChan.Type()).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
 	// Test channel reflection properties
 	await $.println("Chan elem type:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>((__goscriptAwait = (chanType !== null && (chanType as any).__isVarRef !== true && ((chanType as any).__goValue === undefined || (chanType as any).__goType?.charCodeAt(0) !== 42) ? (chanType as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(chanType)).Elem(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
@@ -279,23 +279,23 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("Pointer different:", reflectSameStart(pointerLeft, pointerRight))
 
 	// Test Select functionality
-	let intChan = $.markAsStructValue($.cloneStructValue(reflect.MakeChan($.pointerValueOrNil(reflect.ChanOf(3, $.pointerValueOrNil(reflect.TypeFor(__goscriptStatic0()))!))!, 1)))
-	let strChan = $.markAsStructValue($.cloneStructValue(reflect.MakeChan($.pointerValueOrNil(reflect.ChanOf(3, $.pointerValueOrNil(reflect.TypeFor(__goscriptStatic1()))!))!, 1)))
+	let intChan = reflect.MakeChan($.pointerValueOrNil(reflect.ChanOf(3, $.pointerValueOrNil(reflect.TypeFor(__goscriptStatic0()))!))!, 1)
+	let strChan = reflect.MakeChan($.pointerValueOrNil(reflect.ChanOf(3, $.pointerValueOrNil(reflect.TypeFor(__goscriptStatic1()))!))!, 1)
 
 	// Send values to only the string channel to make select deterministic
-	await $.markAsStructValue($.cloneStructValue(strChan)).Send($.markAsStructValue($.cloneStructValue(reflect.ValueOf("hello"))))
+	await strChan.Send(reflect.ValueOf("hello"))
 
 	let cases = $.arrayToSlice<reflect.SelectCase>([$.markAsStructValue(new reflect.SelectCase({Dir: 2, Chan: intChan})), $.markAsStructValue(new reflect.SelectCase({Dir: 2, Chan: strChan})), $.markAsStructValue(new reflect.SelectCase({Dir: 3}))])
 	let [chosen, recv, recvOK] = await reflect.Select(cases)
 	await $.println("Select chosen:", chosen, "recvOK:", recvOK)
-	if ($.markAsStructValue($.cloneStructValue(recv)).IsValid()) {
-		await $.println("Select recv type:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(recv)).Type()).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	if (recv.IsValid()) {
+		await $.println("Select recv type:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(recv.Type()).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 		// Print the actual received value
 		if (chosen == 0) {
-			await $.println("Select recv value:", $.markAsStructValue($.cloneStructValue(recv)).Int())
+			await $.println("Select recv value:", recv.Int())
 		} else {
 			if (chosen == 1) {
-				await $.println("Select recv value:", $.markAsStructValue($.cloneStructValue(recv)).String())
+				await $.println("Select recv value:", recv.String())
 			}
 		}
 	} else {

@@ -40,8 +40,8 @@ export class Person {
 
 export async function main(): globalThis.Promise<void> {
 	let p = new Person(true, "Alice", 30, true)
-	let v = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.structInterfaceValue(p, "main.Person", "main.Person"))))
-	let t = $.markAsStructValue($.cloneStructValue(v)).Type()
+	let v = reflect.ValueOf($.structInterfaceValue(p, "main.Person", "main.Person"))
+	let t = v.Type()
 
 	await $.println("Type:", (__goscriptAwait = (t !== null && (t as any).__isVarRef !== true && ((t as any).__goValue === undefined || (t as any).__goType?.charCodeAt(0) !== 42) ? (t as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(t)).Name(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	await $.println("Kind:", reflect.Kind_String((__goscriptAwait = (t !== null && (t as any).__isVarRef !== true && ((t as any).__goValue === undefined || (t as any).__goType?.charCodeAt(0) !== 42) ? (t as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(t)).Kind(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)))
@@ -49,16 +49,16 @@ export async function main(): globalThis.Promise<void> {
 
 	for (let i = 0; i < (__goscriptAwait = (t !== null && (t as any).__isVarRef !== true && ((t as any).__goValue === undefined || (t as any).__goType?.charCodeAt(0) !== 42) ? (t as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(t)).NumField(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait); i++) {
 		let sf = $.markAsStructValue($.cloneStructValue(((__goscriptAwait = (t !== null && (t as any).__isVarRef !== true && ((t as any).__goValue === undefined || (t as any).__goType?.charCodeAt(0) !== 42) ? (t as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(t)).Field(i), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as reflect.StructField)))
-		let fv = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(v)).Field(i)))
+		let fv = v.Field(i)
 
 		await $.println("Field", i, ":", sf.Name)
-		await $.println("  FieldValue Kind:", reflect.Kind_String($.markAsStructValue($.cloneStructValue(fv)).Kind()))
-		await $.println("  FieldValue CanInterface:", $.markAsStructValue($.cloneStructValue(fv)).CanInterface())
+		await $.println("  FieldValue Kind:", reflect.Kind_String(fv.Kind()))
+		await $.println("  FieldValue CanInterface:", fv.CanInterface())
 
-		switch ($.markAsStructValue($.cloneStructValue(fv)).Kind()) {
+		switch (fv.Kind()) {
 			case reflect.String:
 			{
-				await $.println("  Value:", $.markAsStructValue($.cloneStructValue(fv)).String())
+				await $.println("  Value:", fv.String())
 				break
 			}
 			case reflect.Int:
@@ -67,12 +67,12 @@ export async function main(): globalThis.Promise<void> {
 			case reflect.Int32:
 			case reflect.Int64:
 			{
-				await $.println("  Value:", $.markAsStructValue($.cloneStructValue(fv)).Int())
+				await $.println("  Value:", fv.Int())
 				break
 			}
 			case reflect.Bool:
 			{
-				await $.println("  Value:", $.markAsStructValue($.cloneStructValue(fv)).Bool())
+				await $.println("  Value:", fv.Bool())
 				break
 			}
 		}

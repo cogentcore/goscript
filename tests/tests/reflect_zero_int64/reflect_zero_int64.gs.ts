@@ -41,7 +41,7 @@ export class timer {
 }
 
 export function isZero(x: any): boolean {
-	return reflect.DeepEqual(x, $.markAsStructValue($.cloneStructValue(reflect.Zero($.pointerValueOrNil(reflect.TypeOf(x))!))).Interface())
+	return reflect.DeepEqual(x, reflect.Zero($.pointerValueOrNil(reflect.TypeOf(x))!).Interface())
 }
 
 export async function main(): globalThis.Promise<void> {
@@ -52,7 +52,7 @@ export async function main(): globalThis.Promise<void> {
 	let tm = $.markAsStructValue(new time.Time())
 	await $.println(isZero($.structInterfaceValue($.markAsStructValue($.cloneStructValue(tm)), "time.Time", __goscriptStatic3())))
 	await $.println(isZero($.structInterfaceValue($.markAsStructValue(new time.Time()), "time.Time", __goscriptStatic3())))
-	await $.println($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.namedValueInterfaceValue<any>(d, "time.Duration", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2())))).IsZero(), $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.structInterfaceValue($.markAsStructValue($.cloneStructValue(tm)), "time.Time", __goscriptStatic3())))).IsZero())
+	await $.println(reflect.ValueOf($.namedValueInterfaceValue<any>(d, "time.Duration", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2())).IsZero(), reflect.ValueOf($.structInterfaceValue($.markAsStructValue($.cloneStructValue(tm)), "time.Time", __goscriptStatic3())).IsZero())
 	await $.println($.markAsStructValue($.cloneStructValue(tm)).Year(), $.markAsStructValue($.cloneStructValue(tm)).String(), $.markAsStructValue($.cloneStructValue(tm)).Format("2006-01-02"))
 
 	// assigning a Time field through a pointer copies the Time

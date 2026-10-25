@@ -39,14 +39,14 @@ export async function main(): globalThis.Promise<void> {
 	let w = $.varRef(1)
 	let pv = $.varRef(v)
 	let pw = w
-	await $.println($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(pv.value, "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int")))))).Equal($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(pv.value, "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int"))))))), $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(pv.value, "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int")))))).Equal($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(pw, "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int"))))))))
-	await $.println($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.basicInterfaceValue(v.value, "int")))).Equal($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.basicInterfaceValue(w.value, "int"))))), $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.basicInterfaceValue(1n, "int64")))).Equal($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.basicInterfaceValue(1, "int"))))))
-	await $.println($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(pv, "**int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int"))))))).Elem())).Equal($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(pv.value, "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int"))))))))
+	await $.println(reflect.ValueOf($.interfaceValue(pv.value, "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int")))).Equal(reflect.ValueOf($.interfaceValue(pv.value, "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int"))))), reflect.ValueOf($.interfaceValue(pv.value, "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int")))).Equal(reflect.ValueOf($.interfaceValue(pw, "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int"))))))
+	await $.println(reflect.ValueOf($.basicInterfaceValue(v.value, "int")).Equal(reflect.ValueOf($.basicInterfaceValue(w.value, "int"))), reflect.ValueOf($.basicInterfaceValue(1n, "int64")).Equal(reflect.ValueOf($.basicInterfaceValue(1, "int"))))
+	await $.println(reflect.ValueOf($.interfaceValue(pv, "**int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int"))))).Elem().Equal(reflect.ValueOf($.interfaceValue(pv.value, "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int"))))))
 	let n1: $.VarRef<number> | null = null! as $.VarRef<number> | null
 	let n2: $.VarRef<number> | null = null! as $.VarRef<number> | null
-	await $.println($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(n1, "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int")))))).Equal($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(n2, "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int"))))))), $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(n1, "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int")))))).Equal($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(pv.value, "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int"))))))))
-	await $.println($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.structInterfaceValue(new P(true, 1, "a"), "main.P", "main.P")))).Equal($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.structInterfaceValue(new P(true, 1, "a"), "main.P", "main.P"))))), $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.structInterfaceValue(new P(true, 1, "a"), "main.P", "main.P")))).Equal($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.structInterfaceValue(new P(true, 1, "b"), "main.P", "main.P"))))))
-	await $.println($.markAsStructValue($.cloneStructValue(reflect.ValueOf(null))).Equal($.markAsStructValue($.cloneStructValue(reflect.ValueOf(null)))), $.markAsStructValue($.cloneStructValue(reflect.ValueOf(null))).Equal($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.basicInterfaceValue(1, "int"))))))
+	await $.println(reflect.ValueOf($.interfaceValue(n1, "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int")))).Equal(reflect.ValueOf($.interfaceValue(n2, "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int"))))), reflect.ValueOf($.interfaceValue(n1, "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int")))).Equal(reflect.ValueOf($.interfaceValue(pv.value, "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int"))))))
+	await $.println(reflect.ValueOf($.structInterfaceValue(new P(true, 1, "a"), "main.P", "main.P")).Equal(reflect.ValueOf($.structInterfaceValue(new P(true, 1, "a"), "main.P", "main.P"))), reflect.ValueOf($.structInterfaceValue(new P(true, 1, "a"), "main.P", "main.P")).Equal(reflect.ValueOf($.structInterfaceValue(new P(true, 1, "b"), "main.P", "main.P"))))
+	await $.println(reflect.ValueOf(null).Equal(reflect.ValueOf(null)), reflect.ValueOf(null).Equal(reflect.ValueOf($.basicInterfaceValue(1, "int"))))
 
 	class Z {
 		public declare S: $.Slice<number>
@@ -94,12 +94,12 @@ export async function main(): globalThis.Promise<void> {
 		)
 	}
 	let z = $.markAsStructValue(new Z())
-	let zv = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.structInterfaceValue(z, "main.Z", "main.Z"))))
-	for (let i = 0; i < $.markAsStructValue($.cloneStructValue(zv)).NumField(); i++) {
-		await $.println(((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(zv)).Type()).Field(i), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as reflect.StructField).Name, $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(zv)).Field(i))).IsZero())
+	let zv = reflect.ValueOf($.structInterfaceValue(z, "main.Z", "main.Z"))
+	for (let i = 0; i < zv.NumField(); i++) {
+		await $.println(((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(zv.Type()).Field(i), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as reflect.StructField).Name, zv.Field(i).IsZero())
 	}
-	await $.println($.markAsStructValue($.cloneStructValue(zv)).IsZero(), $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.structInterfaceValue($.markAsStructValue(new Z({T: "x"})), "main.Z", "main.Z")))).IsZero())
-	await $.println($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.arrayToSlice<number>([]), "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")))))).IsZero(), $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.makeMap<string, number>([]), "map[string]int", /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("int")))))).IsZero())
+	await $.println(zv.IsZero(), reflect.ValueOf($.structInterfaceValue($.markAsStructValue(new Z({T: "x"})), "main.Z", "main.Z")).IsZero())
+	await $.println(reflect.ValueOf($.interfaceValue($.arrayToSlice<number>([]), "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")))).IsZero(), reflect.ValueOf($.interfaceValue($.makeMap<string, number>([]), "map[string]int", /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("int")))).IsZero())
 }
 
 var __goscriptAwait: any

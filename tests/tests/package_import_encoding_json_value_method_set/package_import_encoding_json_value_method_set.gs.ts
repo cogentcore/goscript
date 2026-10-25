@@ -28,7 +28,7 @@ export class Node {
 
 	public MarshalJSON(): [$.Slice<number>, $.GoError] {
 		const n: Node | $.VarRef<Node> | null = this;
-		let __goscriptTuple0: any = (json.Marshal($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(n, "*main.Node", /* @__PURE__ */ $.pointerType("main.Node"))))).Elem())).Interface()) as [$.Slice<number>, $.GoError])
+		let __goscriptTuple0: any = (json.Marshal(reflect.ValueOf($.interfaceValue(n, "*main.Node", /* @__PURE__ */ $.pointerType("main.Node"))).Elem().Interface()) as [$.Slice<number>, $.GoError])
 		let b: $.Slice<number> = __goscriptTuple0[0]
 		let err: $.GoError = __goscriptTuple0[1]
 		if (err != null) {

@@ -62,11 +62,11 @@ export class Outer {
 }
 
 export async function main(): globalThis.Promise<void> {
-	let s = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.arrayToSlice<string>(["a", "b"]), "[]string", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("string"))))))
+	let s = reflect.ValueOf($.interfaceValue($.arrayToSlice<string>(["a", "b"]), "[]string", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("string"))))
 	let __goscriptRangeReturn0 = false
 	;await (async () => {
-		await $.markAsStructValue($.cloneStructValue(s)).Seq()!(async (i) => {
-			await $.println("slice index", $.markAsStructValue($.cloneStructValue(i)).Int())
+		await s.Seq()!(async (i) => {
+			await $.println("slice index", i.Int())
 			return true
 		})
 	})()
@@ -75,8 +75,8 @@ export async function main(): globalThis.Promise<void> {
 	}
 	let __goscriptRangeReturn1 = false
 	;await (async () => {
-		await $.markAsStructValue($.cloneStructValue(s)).Seq2()!(async (i, e) => {
-			await $.println("slice", $.markAsStructValue($.cloneStructValue(i)).Int(), $.markAsStructValue($.cloneStructValue(e)).String())
+		await s.Seq2()!(async (i, e) => {
+			await $.println("slice", i.Int(), e.String())
 			return true
 		})
 	})()
@@ -85,8 +85,8 @@ export async function main(): globalThis.Promise<void> {
 	}
 	let __goscriptRangeReturn2 = false
 	;await (async () => {
-		await $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.basicInterfaceValue(3, "int")))).Seq()!(async (i) => {
-			await $.println("int", $.markAsStructValue($.cloneStructValue(i)).Int())
+		await reflect.ValueOf($.basicInterfaceValue(3, "int")).Seq()!(async (i) => {
+			await $.println("int", i.Int())
 			return true
 		})
 	})()
@@ -95,8 +95,8 @@ export async function main(): globalThis.Promise<void> {
 	}
 	let __goscriptRangeReturn3 = false
 	;await (async () => {
-		await $.markAsStructValue($.cloneStructValue(reflect.ValueOf("h\xc3\xa9!"))).Seq2()!(async (i, r) => {
-			await $.println("string", $.markAsStructValue($.cloneStructValue(i)).Int(), $.markAsStructValue($.cloneStructValue(r)).Int())
+		await reflect.ValueOf("h\xc3\xa9!").Seq2()!(async (i, r) => {
+			await $.println("string", i.Int(), r.Int())
 			return true
 		})
 	})()
@@ -105,8 +105,8 @@ export async function main(): globalThis.Promise<void> {
 	}
 	let __goscriptRangeReturn4 = false
 	;await (async () => {
-		await $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.makeMap<string, number>([["x", 1]]), "map[string]int", /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("int")))))).Seq2()!(async (k, e) => {
-			await $.println("map", $.markAsStructValue($.cloneStructValue(k)).String(), $.markAsStructValue($.cloneStructValue(e)).Int())
+		await reflect.ValueOf($.interfaceValue($.makeMap<string, number>([["x", 1]]), "map[string]int", /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("int")))).Seq2()!(async (k, e) => {
+			await $.println("map", k.String(), e.Int())
 			return true
 		})
 	})()
@@ -120,8 +120,8 @@ export async function main(): globalThis.Promise<void> {
 	ch.close()
 	let __goscriptRangeReturn5 = false
 	;await (async () => {
-		await $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(ch, "chan int", /* @__PURE__ */ $.channelType(/* @__PURE__ */ $.basicType("int"), "both"))))).Seq()!(async (e) => {
-			await $.println("chan", $.markAsStructValue($.cloneStructValue(e)).Int())
+		await reflect.ValueOf($.interfaceValue(ch, "chan int", /* @__PURE__ */ $.channelType(/* @__PURE__ */ $.basicType("int"), "both"))).Seq()!(async (e) => {
+			await $.println("chan", e.Int())
 			return true
 		})
 	})()
@@ -130,13 +130,13 @@ export async function main(): globalThis.Promise<void> {
 	}
 	let rc = $.makeChannel<number>(1, 0, "both")
 	await $.chanSend(rc, 8)
-	let [v, ok] = await $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(rc, "chan int", /* @__PURE__ */ $.channelType(/* @__PURE__ */ $.basicType("int"), "both"))))).Recv()
-	await $.println("recv", $.markAsStructValue($.cloneStructValue(v)).Int(), ok)
+	let [v, ok] = await reflect.ValueOf($.interfaceValue(rc, "chan int", /* @__PURE__ */ $.channelType(/* @__PURE__ */ $.basicType("int"), "both"))).Recv()
+	await $.println("recv", v.Int(), ok)
 	rc.close()
-	let __goscriptTuple0: any = await $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(rc, "chan int", /* @__PURE__ */ $.channelType(/* @__PURE__ */ $.basicType("int"), "both"))))).Recv()
-	v = $.assignStruct(v, __goscriptTuple0[0])
+	let __goscriptTuple0: any = await reflect.ValueOf($.interfaceValue(rc, "chan int", /* @__PURE__ */ $.channelType(/* @__PURE__ */ $.basicType("int"), "both"))).Recv()
+	v = __goscriptTuple0[0]
 	ok = __goscriptTuple0[1]
-	await $.println("recv closed", $.markAsStructValue($.cloneStructValue(v)).Int(), ok)
+	await $.println("recv closed", v.Int(), ok)
 
 	await $.println((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.interfaceValue(ch, "chan int", /* @__PURE__ */ $.channelType(/* @__PURE__ */ $.basicType("int"), "both")))).ChanDir(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) == 3, reflect.ChanDir_String((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.interfaceValue(null, "<-chan int", /* @__PURE__ */ $.channelType(/* @__PURE__ */ $.basicType("int"), "receive")))).ChanDir(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)))
 	await $.println((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.basicInterfaceValue(1, "int"))).CanSeq(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.basicInterfaceValue(1, "int"))).CanSeq2(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf("")).CanSeq2(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.basicInterfaceValue(1.5, "float64"))).CanSeq(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
@@ -147,8 +147,8 @@ export async function main(): globalThis.Promise<void> {
 	await $.println((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.interfaceValue(seq, "func(yield func(int) bool)", ({ kind: $.TypeKind.Function, params: [({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo)], results: [] } as $.FunctionTypeInfo)))).CanSeq(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.interfaceValue(seq, "func(yield func(int) bool)", ({ kind: $.TypeKind.Function, params: [({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo)], results: [] } as $.FunctionTypeInfo)))).CanSeq2(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	let __goscriptRangeReturn6 = false
 	;await (async () => {
-		await $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(seq, "func(yield func(int) bool)", ({ kind: $.TypeKind.Function, params: [({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo)], results: [] } as $.FunctionTypeInfo))))).Seq()!(async (x) => {
-			await $.println("func", $.markAsStructValue($.cloneStructValue(x)).Int())
+		await reflect.ValueOf($.interfaceValue(seq, "func(yield func(int) bool)", ({ kind: $.TypeKind.Function, params: [({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo)], results: [] } as $.FunctionTypeInfo))).Seq()!(async (x) => {
+			await $.println("func", x.Int())
 			return true
 		})
 	})()
@@ -156,26 +156,26 @@ export async function main(): globalThis.Promise<void> {
 		return
 	}
 
-	let s3 = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.arrayToSlice<number>([1, 2, 3, 4]), "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")))))).Slice3(1, 2, 3)))
-	await $.println("slice3", $.markAsStructValue($.cloneStructValue(s3)).Len(), $.markAsStructValue($.cloneStructValue(s3)).Cap(), $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(s3)).Index(0))).Int())
+	let s3 = reflect.ValueOf($.interfaceValue($.arrayToSlice<number>([1, 2, 3, 4]), "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")))).Slice3(1, 2, 3)
+	await $.println("slice3", s3.Len(), s3.Cap(), s3.Index(0).Int())
 
 	let o: Outer = new Outer(true)
-	let [, err] = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.structInterfaceValue((o).clone(), "main.Outer", "main.Outer")))).FieldByIndexErr($.arrayToSlice<number>([0, 0]))
+	let [, err] = reflect.ValueOf($.structInterfaceValue((o).clone(), "main.Outer", "main.Outer")).FieldByIndexErr($.arrayToSlice<number>([0, 0]))
 	await $.println("nil embedded", err != null)
 	o.Inner = new Inner(false, 9)
-	let __goscriptTuple1: any = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.structInterfaceValue(o, "main.Outer", "main.Outer")))).FieldByIndexErr($.arrayToSlice<number>([0, 0]))
+	let __goscriptTuple1: any = reflect.ValueOf($.structInterfaceValue(o, "main.Outer", "main.Outer")).FieldByIndexErr($.arrayToSlice<number>([0, 0]))
 	let f: reflect.Value = __goscriptTuple1[0]
 	err = __goscriptTuple1[1]
-	await $.println("embedded", $.markAsStructValue($.cloneStructValue(f)).Int(), err == null)
+	await $.println("embedded", f.Int(), err == null)
 
 	// A type assertion to reflect.Value, as in text/template.
-	for (let __goscriptRangeTarget0 = $.arrayToSlice<any>([$.structInterfaceValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.basicInterfaceValue(5, "int")))), "reflect.Value", __goscriptStatic0()), $.basicInterfaceValue(6, "int")]), __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
+	for (let __goscriptRangeTarget0 = $.arrayToSlice<any>([$.structInterfaceValue(reflect.ValueOf($.basicInterfaceValue(5, "int")), "reflect.Value", __goscriptStatic0()), $.basicInterfaceValue(6, "int")]), __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
 		let data = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as any)
 		let [value, __goscriptShadow0] = $.typeAssertTuple<reflect.Value>(data, "reflect.Value")
 		if (!__goscriptShadow0) {
-			value = $.assignStruct(value, reflect.ValueOf(data))
+			value = reflect.ValueOf(data)
 		}
-		await $.println("assert", __goscriptShadow0, $.markAsStructValue($.cloneStructValue(value)).Int())
+		await $.println("assert", __goscriptShadow0, value.Int())
 	}
 }
 

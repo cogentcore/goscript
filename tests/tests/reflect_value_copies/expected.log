@@ -1,0 +1,5 @@
+copy set: 2 2 2
+struct copy: 1 2 3 3
+stack: 5 a false
+field: 10 10 2
+zero: false invalid

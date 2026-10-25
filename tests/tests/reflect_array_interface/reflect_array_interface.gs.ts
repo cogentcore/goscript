@@ -49,17 +49,17 @@ export class Grid {
 export async function main(): globalThis.Promise<void> {
 	// Set array fields from array values converted to interfaces.
 	let g: $.VarRef<Grid> = $.varRef(new Grid(true))
-	let v = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(g, "*main.Grid", /* @__PURE__ */ $.pointerType("main.Grid"))))).Elem()))
-	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(v)).Field(0))).Set($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.arrayValue([3, 4]), "[2]int", /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2))))))
+	let v = reflect.ValueOf($.interfaceValue(g, "*main.Grid", /* @__PURE__ */ $.pointerType("main.Grid"))).Elem()
+	v.Field(0).Set(reflect.ValueOf($.interfaceValue($.arrayValue([3, 4]), "[2]int", /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2))))
 	let f = $.arrayValue([1, 2, 3], __goscriptStatic1())
-	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(v)).Field(1))).Set($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.cloneArrayValue(f, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 3)), "[3]float32", /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 3))))))
+	v.Field(1).Set(reflect.ValueOf($.interfaceValue($.cloneArrayValue(f, /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 3)), "[3]float32", /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 3))))
 	let b: any = $.interfaceValue($.arrayValue([true, false]), "[2]bool", /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("bool"), 2))
-	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(v)).Field(2))).Set($.markAsStructValue($.cloneStructValue(reflect.ValueOf(b))))
+	v.Field(2).Set(reflect.ValueOf(b))
 	await $.println("fields:", g.value.N[0], g.value.N[1], g.value.F[2], g.value.B[0], g.value.B[1])
 
 	// Set a whole array through a pointer.
 	let arr: $.VarRef<number[]> = $.varRef($.arrayValue(globalThis.Array.from({ length: 2 }, () => 0)))
-	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(arr, "*[2]int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2)))))).Elem())).Set($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.arrayValue([5, 6]), "[2]int", /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2))))))
+	reflect.ValueOf($.interfaceValue(arr, "*[2]int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2)))).Elem().Set(reflect.ValueOf($.interfaceValue($.arrayValue([5, 6]), "[2]int", /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2))))
 	await $.println("array:", arr.value[0], arr.value[1])
 
 	// Array types keep their length and element type, and named array and

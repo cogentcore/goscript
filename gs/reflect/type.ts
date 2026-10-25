@@ -846,6 +846,11 @@ function isEmptyObject(value: object): boolean {
 }
 
 // Value is the reflection interface to a Go value.
+//
+// The compiler shares a Value between the copies of it instead of cloning
+// it (see isSharedValueType), so a method must not change the value it
+// refers to in place: setters write through to its storage, as the copies of
+// a Go reflect.Value share the variable it refers to.
 export class Value {
   // __typeInfo is the runtime type of reflect.Value, registered after the
   // class is defined.

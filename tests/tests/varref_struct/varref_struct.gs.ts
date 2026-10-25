@@ -130,9 +130,9 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("global:", $.pointerValue<number>(globalField))
 
 	// Reflection writes through the same aggregate storage as generated assignment.
-	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(val, "*main.MyStruct", /* @__PURE__ */ $.pointerType("main.MyStruct"))))).Elem())).Set($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.structInterfaceValue(new MyStruct(true, 100), "main.MyStruct", "main.MyStruct")))))
+	reflect.ValueOf($.interfaceValue(val, "*main.MyStruct", /* @__PURE__ */ $.pointerType("main.MyStruct"))).Elem().Set(reflect.ValueOf($.structInterfaceValue(new MyStruct(true, 100), "main.MyStruct", "main.MyStruct")))
 	await $.println("reflect:", $.pointerValue<number>(field), $.pointerEqual(field, $.fieldRef(val.value, "MyInt")))
-	let reflected = $.mustTypeAssert<$.VarRef<number> | null>($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(val, "*main.MyStruct", /* @__PURE__ */ $.pointerType("main.MyStruct"))))).Elem())).FieldByName("MyInt"))).Addr())).Interface(), /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int")))
+	let reflected = $.mustTypeAssert<$.VarRef<number> | null>(reflect.ValueOf($.interfaceValue(val, "*main.MyStruct", /* @__PURE__ */ $.pointerType("main.MyStruct"))).Elem().FieldByName("MyInt").Addr().Interface(), /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int")))
 	await $.println("reflect address:", (reflected === field || ($.pointerAliasesMade || (reflected as any)?.__goElementBacking !== undefined) && $.pointerEqual(reflected, field)))
 }
 

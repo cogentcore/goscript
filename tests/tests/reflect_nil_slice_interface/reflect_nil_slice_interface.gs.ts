@@ -69,12 +69,12 @@ export class S5 {
 }
 
 export async function show(name: string, v: any): globalThis.Promise<void> {
-	let rv = $.markAsStructValue($.cloneStructValue(reflect.ValueOf(v)))
-	if (!$.markAsStructValue($.cloneStructValue(rv)).IsValid()) {
+	let rv = reflect.ValueOf(v)
+	if (!rv.IsValid()) {
 		await $.println(name, "invalid")
 		return
 	}
-	await $.println(name, reflect.Kind_String($.markAsStructValue($.cloneStructValue(rv)).Kind()), $.markAsStructValue($.cloneStructValue(rv)).IsNil(), (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(rv)).Type()).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println(name, reflect.Kind_String(rv.Kind()), rv.IsNil(), (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(rv.Type()).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 }
 
 export async function main(): globalThis.Promise<void> {
@@ -85,39 +85,39 @@ export async function main(): globalThis.Promise<void> {
 	await show("any", a)
 
 	let v = $.varRef(new S5(true))
-	let f = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(v, "*main.S5", /* @__PURE__ */ $.pointerType("main.S5"))))).Elem()))
-	for (let i = 0; i < $.markAsStructValue($.cloneStructValue(f)).NumField(); i++) {
-		await show(((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(f)).Type()).Field(i), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as reflect.StructField).Name, $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(f)).Field(i))).Interface())
+	let f = reflect.ValueOf($.interfaceValue(v, "*main.S5", /* @__PURE__ */ $.pointerType("main.S5"))).Elem()
+	for (let i = 0; i < f.NumField(); i++) {
+		await show(((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(f.Type()).Field(i), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as reflect.StructField).Name, f.Field(i).Interface())
 	}
-	let k = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(f)).Field(0))).Interface()
+	let k = f.Field(0).Interface()
 	let [, ok] = $.typeAssertTuple<$.Slice<S1 | $.VarRef<S1> | null>>(k, /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.pointerType("main.S1")))
 	await $.println("assert:", ok, k == null)
 
 	// A nil value keeps a zero Pointer after a round trip through Interface.
-	for (let i = 0; i < $.markAsStructValue($.cloneStructValue(f)).NumField(); i++) {
-		await $.println("pointer", ((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(f)).Type()).Field(i), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as reflect.StructField).Name, $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(f)).Field(i))).Interface()))).Pointer() == 0)
+	for (let i = 0; i < f.NumField(); i++) {
+		await $.println("pointer", ((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(f.Type()).Field(i), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as reflect.StructField).Name, reflect.ValueOf(f.Field(i).Interface()).Pointer() == 0)
 	}
 
 	// The address of an unnamed field keeps its pointer type.
-	for (let i = 0; i < $.markAsStructValue($.cloneStructValue(f)).NumField(); i++) {
-		let p = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(f)).Field(i))).Addr())).Interface()
-		let pv = $.markAsStructValue($.cloneStructValue(reflect.ValueOf(p)))
-		await $.println("addr", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(pv)).Type()).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(pv)).Elem())).Type()).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	for (let i = 0; i < f.NumField(); i++) {
+		let p = f.Field(i).Addr().Interface()
+		let pv = reflect.ValueOf(p)
+		await $.println("addr", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(pv.Type()).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(pv.Elem().Type()).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	}
-	let __goscriptTuple0: any = $.typeAssertTuple<$.VarRef<$.Slice<S1 | $.VarRef<S1> | null>> | null>($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(f)).Field(0))).Addr())).Interface(), /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.pointerType("main.S1"))))
+	let __goscriptTuple0: any = $.typeAssertTuple<$.VarRef<$.Slice<S1 | $.VarRef<S1> | null>> | null>(f.Field(0).Addr().Interface(), /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.pointerType("main.S1"))))
 	let kp: $.VarRef<$.Slice<S1 | $.VarRef<S1> | null>> | null = __goscriptTuple0[0]
 	ok = __goscriptTuple0[1]
 	kp!.value = $.appendOne($.pointerValue<$.Slice<S1 | $.VarRef<S1> | null>>(kp), new S1(false, "x"), $.appendZeros.nil)
 	await $.println("addr assert:", ok, $.sliceLen(v.value.K), $.pointerValue<S1>($.plainSliceIndex(v.value.K!, 0)).Name)
 
 	// Unnamed basic, array and slice values keep their types.
-	await show2("int", $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.basicInterfaceValue(3, "int")))))
-	await show2("slice", $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.arrayToSlice<string>(["a"]), "[]string", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("string")))))))
-	await show2("map", $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.makeMap<string, number>([["a", 1]]), "map[string]int", /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("int")))))))
+	await show2("int", reflect.ValueOf($.basicInterfaceValue(3, "int")))
+	await show2("slice", reflect.ValueOf($.interfaceValue($.arrayToSlice<string>(["a"]), "[]string", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("string")))))
+	await show2("map", reflect.ValueOf($.interfaceValue($.makeMap<string, number>([["a", 1]]), "map[string]int", /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("int")))))
 }
 
 export async function show2(name: string, v: reflect.Value): globalThis.Promise<void> {
-	await $.println(name, (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.markAsStructValue($.cloneStructValue(v)).Interface()))).Type()).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println(name, (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.ValueOf(v.Interface()).Type()).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 }
 
 var __goscriptAwait: any

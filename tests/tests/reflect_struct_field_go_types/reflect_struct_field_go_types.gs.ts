@@ -114,15 +114,15 @@ export async function main(): globalThis.Promise<void> {
 	await $.println($.sliceLen(_of.Index), $.plainSliceIndex(_of.Index!, 0), $.plainSliceIndex(_of.Index!, 1), $.plainSliceIndex(_of.Index!, 2))
 
 	// Value.FieldByNameFunc finds a field by a name predicate.
-	let val = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.structInterfaceValue(new Outer(true, new Inner(true, 5), "n"), "main.Outer", "main.Outer"))))
-	let fv = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(val)).FieldByNameFunc($.functionValue((n: string): boolean => {
+	let val = reflect.ValueOf($.structInterfaceValue(new Outer(true, new Inner(true, 5), "n"), "main.Outer", "main.Outer"))
+	let fv = val.FieldByNameFunc($.functionValue((n: string): boolean => {
 		return strings.EqualFold(n, "name")
-	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo)))))
-	await $.println($.markAsStructValue($.cloneStructValue(fv)).String())
-	let missing = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(val)).FieldByNameFunc($.functionValue((n: string): boolean => {
+	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo)))
+	await $.println(fv.String())
+	let missing = val.FieldByNameFunc($.functionValue((n: string): boolean => {
 		return false
-	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo)))))
-	await $.println($.markAsStructValue($.cloneStructValue(missing)).IsValid())
+	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo)))
+	await $.println(missing.IsValid())
 
 	// The zero StructField has a nil Type and an empty Index.
 	let zero = $.markAsStructValue(new reflect.StructField())

@@ -44,22 +44,22 @@ export async function main(): globalThis.Promise<void> {
 	let b: $.VarRef<Pose> = $.varRef(new Pose(true))
 	let c: $.VarRef<Pose> = $.varRef(new Pose(true))
 	let d: $.VarRef<Pose> = $.varRef(new Pose(true))
-	let av = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(a, "*main.Pose", /* @__PURE__ */ $.pointerType("main.Pose"))))).Elem()))
+	let av = reflect.ValueOf($.interfaceValue(a, "*main.Pose", /* @__PURE__ */ $.pointerType("main.Pose"))).Elem()
 
 	// Set an array field from another array field.
-	let bv = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(b, "*main.Pose", /* @__PURE__ */ $.pointerType("main.Pose"))))).Elem()))
-	for (let i = 0; i < $.markAsStructValue($.cloneStructValue(av)).NumField(); i++) {
-		$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(bv)).Field(i))).Set($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(av)).Field(i))))
+	let bv = reflect.ValueOf($.interfaceValue(b, "*main.Pose", /* @__PURE__ */ $.pointerType("main.Pose"))).Elem()
+	for (let i = 0; i < av.NumField(); i++) {
+		bv.Field(i).Set(av.Field(i))
 	}
 
 	// Set an array field from a converted array field.
-	let cv = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(c, "*main.Pose", /* @__PURE__ */ $.pointerType("main.Pose"))))).Elem()))
-	for (let i = 0; i < $.markAsStructValue($.cloneStructValue(av)).NumField(); i++) {
-		$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(cv)).Field(i))).Set($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(av)).Field(i))).Convert($.pointerValueOrNil($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(cv)).Field(i))).Type())!))))
+	let cv = reflect.ValueOf($.interfaceValue(c, "*main.Pose", /* @__PURE__ */ $.pointerType("main.Pose"))).Elem()
+	for (let i = 0; i < av.NumField(); i++) {
+		cv.Field(i).Set(av.Field(i).Convert($.pointerValueOrNil(cv.Field(i).Type())!))
 	}
 
 	// Set a whole struct.
-	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(d, "*main.Pose", /* @__PURE__ */ $.pointerType("main.Pose"))))).Elem())).Set($.markAsStructValue($.cloneStructValue(av)))
+	reflect.ValueOf($.interfaceValue(d, "*main.Pose", /* @__PURE__ */ $.pointerType("main.Pose"))).Elem().Set(av)
 
 	a.value.M[0] = 100
 	a.value.A[0] = 200
@@ -73,12 +73,12 @@ export async function main(): globalThis.Promise<void> {
 
 	// Index of an array element set from an array.
 	let arrs = $.varRef($.arrayValue(globalThis.Array.from({ length: 2 }, () => $.arrayValue(globalThis.Array.from({ length: 2 }, () => 0))), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2), 2)))
-	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(arrs, "*[2][2]int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2), 2)))))).Elem())).Index(0))).Set($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(av)).Field(1))))
+	reflect.ValueOf($.interfaceValue(arrs, "*[2][2]int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2), 2)))).Elem().Index(0).Set(av.Field(1))
 	a.value.A[1] = 400
 	await $.println("arrs:", (arrs.value[0])[1])
 
 	// Interface returns a copy of an array.
-	let x = $.cloneArrayValue($.mustTypeAssert<number[]>($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(av)).Field(1))).Interface(), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2)), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2))
+	let x = $.cloneArrayValue($.mustTypeAssert<number[]>(av.Field(1).Interface(), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2)), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2))
 	a.value.A[1] = 500
 	await $.println("interface:", x[1])
 }
