@@ -5,6 +5,12 @@ clear: 0 0 2 4
 field: A int
 field: B string
 method: Sum 3
+type field: A int
+type field: B string
+type method: Sum func(main.pair) int
+in: string
+in: int
+out: string
 iter: k 7
 trysend: true false
 tryrecv: 3 true
