@@ -43,7 +43,7 @@ export class NumError {
 
 	// Register this type with the runtime type system
 	static __typeInfo = $.registerStructType(
-		'NumError',
+		'strconv.NumError',
 		new NumError(),
 		[{ name: "Error", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }, { name: "Unwrap", args: [], returns: [{ type: { kind: $.TypeKind.Interface, name: 'GoError', methods: [{ name: 'Error', args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: 'string' } }] }] } }] }],
 		NumError,

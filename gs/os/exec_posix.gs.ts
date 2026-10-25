@@ -62,7 +62,7 @@ export class ProcessState {
 
 	// Register this type with the runtime type system
 	static __typeInfo = $.registerStructType(
-		'ProcessState',
+		'os.ProcessState',
 		new ProcessState(),
 		[
 			{ name: "UserTime", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "any" } }] },

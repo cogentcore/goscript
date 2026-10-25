@@ -221,7 +221,7 @@ export class Root {
 	}
 
 	static __typeInfo = $.registerStructType(
-		'Root',
+		'os.Root',
 		new Root(),
 		[
 			{ name: "Name", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: 'string' } }] },

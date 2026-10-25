@@ -106,7 +106,7 @@ export class Builder {
 
   // Register this type with the runtime type system
   static __typeInfo = $.registerStructType(
-    'Builder',
+    'strings.Builder',
     new Builder(),
     [
       {

@@ -67,7 +67,7 @@ class lazybuf {
 
   // Register this type with the runtime type system
   static __typeInfo = $.registerStructType(
-    'lazybuf',
+    'path.lazybuf',
     new lazybuf(),
     [
       {

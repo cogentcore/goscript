@@ -148,7 +148,7 @@ class dirInfo {
 
   // Register this type with the runtime type system
   static __typeInfo = $.registerStructType(
-    'dirInfo',
+    'fs.dirInfo',
     new dirInfo(),
     [
       {

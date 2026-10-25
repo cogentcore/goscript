@@ -102,7 +102,7 @@ export class SyscallError {
 
 	// Register this type with the runtime type system
 	static __typeInfo = $.registerStructType(
-	  'SyscallError',
+	  'os.SyscallError',
 	  new SyscallError(),
 	  [{ name: "Error", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "string" } }] }, { name: "Unwrap", args: [], returns: [{ type: { kind: $.TypeKind.Interface, name: 'GoError', methods: [{ name: 'Error', args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: 'string' } }] }] } }] }, { name: "Timeout", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "boolean" } }] }],
 	  SyscallError,

@@ -45,7 +45,7 @@ export class Bool {
 
 	// Register this type with the runtime type system
 	static __typeInfo = $.registerStructType(
-	  'Bool',
+	  'atomic.Bool',
 	  new Bool(),
 	  [{ name: "Load", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "boolean" } }] }, { name: "Store", args: [{ name: "val", type: { kind: $.TypeKind.Basic, name: "boolean" } }], returns: [] }, { name: "Swap", args: [{ name: "new", type: { kind: $.TypeKind.Basic, name: "boolean" } }], returns: [{ type: { kind: $.TypeKind.Basic, name: "boolean" } }] }, { name: "CompareAndSwap", args: [{ name: "old", type: { kind: $.TypeKind.Basic, name: "boolean" } }, { name: "new", type: { kind: $.TypeKind.Basic, name: "boolean" } }], returns: [{ type: { kind: $.TypeKind.Basic, name: "boolean" } }] }],
 	  Bool,
@@ -107,7 +107,7 @@ export class Pointer<T> {
 
 	// Register this type with the runtime type system
 	static __typeInfo = $.registerStructType(
-	  'Pointer',
+	  'atomic.Pointer',
 	  new Pointer(),
 	  [{ name: "Load", args: [], returns: [{ type: { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Interface, methods: [] } } }] }, { name: "Store", args: [{ name: "val", type: { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Interface, methods: [] } } }], returns: [] }, { name: "Swap", args: [{ name: "new", type: { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Interface, methods: [] } } }], returns: [{ type: { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Interface, methods: [] } } }] }, { name: "CompareAndSwap", args: [{ name: "old", type: { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Interface, methods: [] } } }, { name: "new", type: { kind: $.TypeKind.Pointer, elemType: { kind: $.TypeKind.Interface, methods: [] } } }], returns: [{ type: { kind: $.TypeKind.Basic, name: "boolean" } }] }],
 	  Pointer,
@@ -442,7 +442,7 @@ export class Uintptr {
 
 	// Register this type with the runtime type system
 	static __typeInfo = $.registerStructType(
-	  'Uintptr',
+	  'atomic.Uintptr',
 	  new Uintptr(),
 	  [{ name: "Load", args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: "uintptr" } }] }, { name: "Store", args: [{ name: "val", type: { kind: $.TypeKind.Basic, name: "uintptr" } }], returns: [] }, { name: "Swap", args: [{ name: "new", type: { kind: $.TypeKind.Basic, name: "uintptr" } }], returns: [{ type: { kind: $.TypeKind.Basic, name: "uintptr" } }] }, { name: "CompareAndSwap", args: [{ name: "old", type: { kind: $.TypeKind.Basic, name: "uintptr" } }, { name: "new", type: { kind: $.TypeKind.Basic, name: "uintptr" } }], returns: [{ type: { kind: $.TypeKind.Basic, name: "boolean" } }] }, { name: "Add", args: [{ name: "delta", type: { kind: $.TypeKind.Basic, name: "uintptr" } }], returns: [{ type: { kind: $.TypeKind.Basic, name: "uintptr" } }] }, { name: "And", args: [{ name: "mask", type: { kind: $.TypeKind.Basic, name: "uintptr" } }], returns: [{ type: { kind: $.TypeKind.Basic, name: "uintptr" } }] }, { name: "Or", args: [{ name: "mask", type: { kind: $.TypeKind.Basic, name: "uintptr" } }], returns: [{ type: { kind: $.TypeKind.Basic, name: "uintptr" } }] }],
 	  Uintptr,
@@ -471,7 +471,7 @@ class noCopy {
 
 	// Register this type with the runtime type system
 	static __typeInfo = $.registerStructType(
-	  'noCopy',
+	  'atomic.noCopy',
 	  new noCopy(),
 	  [{ name: "Lock", args: [], returns: [] }, { name: "Unlock", args: [], returns: [] }],
 	  noCopy,

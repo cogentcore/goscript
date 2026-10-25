@@ -567,7 +567,7 @@ export class PathError {
 
   // Register this type with the runtime type system
   static __typeInfo = $.registerStructType(
-    'PathError',
+    'fs.PathError',
     new PathError(),
     [
       {

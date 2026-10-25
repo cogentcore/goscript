@@ -1,10 +1,12 @@
 package main
 
 import (
+	"bytes"
 	"embed"
 	"fmt"
 	"io/fs"
 	"reflect"
+	"strings"
 	"time"
 )
 
@@ -21,4 +23,11 @@ func main() {
 	var efs embed.FS
 	fsType := reflect.TypeOf((*fs.FS)(nil)).Elem()
 	fmt.Println("embed FS", reflect.TypeOf(efs).Implements(fsType), reflect.TypeOf(&efs).Implements(fsType))
+
+	// Pointers to override struct types, reached only by reflection, have
+	// the methods of their Go types.
+	for _, v := range []reflect.Value{reflect.ValueOf((*strings.Builder)(nil)), reflect.ValueOf((*bytes.Buffer)(nil)), reflect.ValueOf((*strings.Reader)(nil))} {
+		_, ok := v.Type().MethodByName("Len")
+		fmt.Println("methods", v.Type(), v.Type().NumMethod() > 0, ok)
+	}
 }
