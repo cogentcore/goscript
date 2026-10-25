@@ -300,6 +300,10 @@ function convertValue(x: ReflectValue, ft: Type, t: Type): ReflectValue {
 }
 
 function internType(t: Type): Type {
+  // A canonical type interns to itself, so it needs no identity key.
+  if (internedTypes.has(t)) {
+    return t
+  }
   const key = typeIdentityKey(t)
   $.markReflectTypeIdentity(t, key)
   const existing = canonicalTypes.get(key)
@@ -309,8 +313,12 @@ function internType(t: Type): Type {
     return existing
   }
   canonicalTypes.set(key, t)
+  internedTypes.add(t)
   return t
 }
+
+// internedTypes holds the canonical types, which internType returned.
+const internedTypes = new WeakSet<Type>()
 
 function mergeTypeMetadata(target: Type, source: Type): void {
   if (target instanceof BasicType && source instanceof BasicType) {
@@ -805,14 +813,15 @@ export class Value {
   }
 
   public clone(): Value {
-    const cloned = new Value(
-      this._value,
-      this._type,
-      this._parentVarRef,
-      this._parentStruct,
-      this._fieldName,
-      this._interfaceValue,
-    )
+    // The fields of a constructed Value are already normalized, so the copy
+    // takes them as they are rather than checking them again.
+    const cloned = new Value()
+    cloned._value = this._value
+    cloned._type = this._type
+    cloned._parentVarRef = this._parentVarRef
+    cloned._parentStruct = this._parentStruct
+    cloned._fieldName = this._fieldName
+    cloned._interfaceValue = this._interfaceValue
     cloned._addressable = this._addressable
     return cloned
   }
@@ -5575,13 +5584,29 @@ export function ArrayOf(length: number, elem: Type): Type {
   return internType(new ArrayType(elem, length))
 }
 
+// sliceTypes and pointerTypes cache the slice and pointer type of each
+// type, which SliceOf and PointerTo would otherwise intern again on every
+// call, as reflect.New does.
+const sliceTypes = new WeakMap<Type, Type>()
+const pointerTypes = new WeakMap<Type, Type>()
+
 export function SliceOf(t: Type): Type {
-  return internType(new SliceType(t))
+  let st = sliceTypes.get(t)
+  if (st === undefined) {
+    st = internType(new SliceType(t))
+    sliceTypes.set(t, st)
+  }
+  return st
 }
 
 export function PointerTo(t: Type | null): Type | null {
   if (t === null) return null
-  return internType(new PointerType(t))
+  let pt = pointerTypes.get(t)
+  if (pt === undefined) {
+    pt = internType(new PointerType(t))
+    pointerTypes.set(t, pt)
+  }
+  return pt
 }
 
 export function PtrTo(t: Type | null): Type | null {

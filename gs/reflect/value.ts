@@ -109,22 +109,32 @@ function newStructPointer(typ: Type): ReflectValue {
 // newStructValue returns a new zero struct of the type typ, which has no
 // registered constructor, such as an anonymous struct type.
 function newStructValue(typ: Type): ReflectValue {
-  type StructValueInstance = Record<string, ReflectValue>
+  const StructValue = structValueClass(typ)
+  return new StructValue() as ReflectValue
+}
 
-  // The fields are own properties of the struct object, starting at zero.
-  const initFields = (value: StructValueInstance): void => {
-    for (let i = 0; i < typ.NumField(); i++) {
-      const field = typ.Field(i)
-      const key = structFieldStorageKey(typ, i)
-      value[key] = zeroReflectValue(field.Type!)
-    }
+type StructValueInstance = Record<string, ReflectValue>
+
+// structValueClasses caches the class of the values of each struct type
+// without a registered constructor, so its values share one shape.
+const structValueClasses = new WeakMap<Type, new () => StructValueInstance>()
+
+// structValueClass returns the class of the values of the struct type typ.
+// Like a generated struct class, its constructor makes a zero value.
+function structValueClass(typ: Type): new () => StructValueInstance {
+  const cached = structValueClasses.get(typ)
+  if (cached !== undefined) {
+    return cached
   }
 
   // A clone copies each field.
   const StructValue = class {
+    constructor() {
+      initStructFields(typ, this as unknown as StructValueInstance)
+    }
+
     public clone(): unknown {
       const cloned = new StructValue() as unknown as StructValueInstance
-      initFields(cloned)
       for (const key of Object.keys(this)) {
         cloned[key] = (this as unknown as StructValueInstance)[key]
       }
@@ -135,10 +145,19 @@ function newStructValue(typ: Type): ReflectValue {
   Object.defineProperty(StructValue, '__typeInfo', {
     value: typeInfoFromReflectType(typ),
   })
+  const ctor = StructValue as unknown as new () => StructValueInstance
+  structValueClasses.set(typ, ctor)
+  return ctor
+}
 
-  const value = new StructValue() as unknown as StructValueInstance
-  initFields(value)
-  return value as ReflectValue
+// initStructFields sets the fields of the struct value of type typ to zero,
+// as own properties of the struct object.
+function initStructFields(typ: Type, value: StructValueInstance): void {
+  for (let i = 0; i < typ.NumField(); i++) {
+    const field = typ.Field(i)
+    const key = structFieldStorageKey(typ, i)
+    value[key] = zeroReflectValue(field.Type!)
+  }
 }
 
 // Copy copies the contents of src to dst until either dst has been filled
