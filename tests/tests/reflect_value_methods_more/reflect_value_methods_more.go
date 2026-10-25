@@ -47,7 +47,7 @@ func main() {
 		println("type field:", sf.Name, sf.Type.String())
 	}
 	for meth := range pt.Methods() {
-		println("type method:", meth.Name, meth.Type.String())
+		println("type method:", meth.Name, meth.Type.String(), meth.IsExported())
 	}
 	ft := reflect.TypeOf(strings.Repeat)
 	for in := range ft.Ins() {

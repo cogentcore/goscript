@@ -7,7 +7,7 @@ field: B string
 method: Sum 3
 type field: A int
 type field: B string
-type method: Sum func(main.pair) int
+type method: Sum func(main.pair) int true
 in: string
 in: int
 out: string

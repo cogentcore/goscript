@@ -103,7 +103,7 @@ export async function main(): globalThis.Promise<void> {
 	let __goscriptRangeReturn3 = false
 	;await (async () => {
 		await ((__goscriptAwait = (pt !== null && (pt as any).__isVarRef !== true && ((pt as any).__goValue === undefined || (pt as any).__goType?.charCodeAt(0) !== 42) ? (pt as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(pt)).Methods(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as iter.Seq<reflect.Method> | null)!(async (meth) => {
-			await $.println("type method:", meth.Name, (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(meth.Type).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+			await $.println("type method:", meth.Name, (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(meth.Type).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), $.markAsStructValue($.cloneStructValue(meth)).IsExported())
 			return true
 		})
 	})()
