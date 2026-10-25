@@ -72,8 +72,6 @@ function zeroReflectValue(typ: Type): ReflectValue {
       return 0n
     case String:
       return ''
-    case Slice:
-      return []
     case Array:
       return zeroArrayValue(typ)
     case Struct:

@@ -1138,7 +1138,11 @@ export class Value {
 
   public IsNil(): boolean {
     const value = this.currentValue()
-    return value === null || value === undefined || $.isTypedNilValue(value)
+    if (value === null || value === undefined) {
+      return true
+    }
+    // An interface holding a typed nil has a dynamic type, so it is not nil.
+    return this.Kind() !== Interface && $.isTypedNilValue(value)
   }
 
   public Index(i: number): Value {
@@ -1845,13 +1849,15 @@ export class Value {
     if (this.Kind() !== Map) {
       throw new ValueError({ Kind: this.Kind(), Method: 'MapIndex' })
     }
+    // A key that is not in the map gives the zero Value. The key is looked
+    // up as SetMapIndex stores it: not boxed, as Interface boxes a number.
     const value = this.currentValue()
     if (!(value instanceof globalThis.Map)) {
-      return new Value(null, new BasicType(Invalid, 'invalid'))
+      return new Value()
     }
-    const rawKey = key.Interface()
+    const rawKey = key.value
     if (!value.has(rawKey)) {
-      return new Value(null, new BasicType(Invalid, 'invalid'))
+      return new Value()
     }
     return new Value(value.get(rawKey) as ReflectValue, this.Type().Elem())
   }
