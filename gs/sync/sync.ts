@@ -5,7 +5,9 @@
 
 import {
   comparableEqual,
+  methodSignature,
   pointerValue,
+  registerInterfaceType,
   runtimePanic,
 } from '@goscript/builtin/index.js'
 
@@ -14,6 +16,13 @@ export interface Locker {
   Lock(): void | Promise<void>
   Unlock(): void
 }
+
+// Locker is registered with the runtime type system, so reflection sees an
+// interface type with its methods.
+registerInterfaceType('sync.Locker', null, [
+  methodSignature('Lock'),
+  methodSignature('Unlock'),
+])
 
 // Mutex is a mutual exclusion lock.
 export class Mutex implements Locker {

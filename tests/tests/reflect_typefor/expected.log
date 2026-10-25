@@ -23,4 +23,6 @@ map type: map[string]main.MyStruct
 pointer type: *main.MyStruct
 fmt.ScanState: fmt.ScanState interface 6
 fmt.Scanner: fmt.Scanner interface 1
+interface: sort.Interface interface 3
+interface: sync.Locker interface 2
 reflect_typefor test finished

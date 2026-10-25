@@ -5,10 +5,14 @@ import * as $ from "@goscript/builtin/index.js"
 import * as fmt from "@goscript/fmt/index.js"
 import * as io from "@goscript/io/index.js"
 import * as reflect from "@goscript/reflect/index.js"
+import * as sort from "@goscript/sort/index.js"
+import * as sync from "@goscript/sync/index.js"
 import * as time from "@goscript/time/index.js"
 import * as __goscript_other from "./other.gs.ts"
 import "@goscript/fmt/index.js"
 import "@goscript/io/index.js"
+import "@goscript/sort/index.js"
+import "@goscript/sync/index.js"
 
 export type MyInterface = {
 	SomeMethod(): void
@@ -157,6 +161,10 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("fmt.ScanState:", (__goscriptAwait = (scanState !== null && (scanState as any).__isVarRef !== true && ((scanState as any).__goValue === undefined || (scanState as any).__goType?.charCodeAt(0) !== 42) ? (scanState as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(scanState)).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), reflect.Kind_String((__goscriptAwait = (scanState !== null && (scanState as any).__isVarRef !== true && ((scanState as any).__goValue === undefined || (scanState as any).__goType?.charCodeAt(0) !== 42) ? (scanState as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(scanState)).Kind(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)), (__goscriptAwait = (scanState !== null && (scanState as any).__isVarRef !== true && ((scanState as any).__goValue === undefined || (scanState as any).__goType?.charCodeAt(0) !== 42) ? (scanState as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(scanState)).NumMethod(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	let scanner = reflect.TypeFor(__goscriptStatic16())
 	await $.println("fmt.Scanner:", (__goscriptAwait = (scanner !== null && (scanner as any).__isVarRef !== true && ((scanner as any).__goValue === undefined || (scanner as any).__goType?.charCodeAt(0) !== 42) ? (scanner as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(scanner)).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), reflect.Kind_String((__goscriptAwait = (scanner !== null && (scanner as any).__isVarRef !== true && ((scanner as any).__goValue === undefined || (scanner as any).__goType?.charCodeAt(0) !== 42) ? (scanner as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(scanner)).Kind(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)), (__goscriptAwait = (scanner !== null && (scanner as any).__isVarRef !== true && ((scanner as any).__goValue === undefined || (scanner as any).__goType?.charCodeAt(0) !== 42) ? (scanner as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(scanner)).NumMethod(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	for (let __goscriptRangeTarget0 = $.arrayToSlice<reflect.Type | null>([reflect.TypeFor(__goscriptStatic17()), reflect.TypeFor(__goscriptStatic18())]), __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
+		let t = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as reflect.Type | null)
+		await $.println("interface:", (__goscriptAwait = (t !== null && (t as any).__isVarRef !== true && ((t as any).__goValue === undefined || (t as any).__goType?.charCodeAt(0) !== 42) ? (t as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(t)).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), reflect.Kind_String((__goscriptAwait = (t !== null && (t as any).__isVarRef !== true && ((t as any).__goValue === undefined || (t as any).__goType?.charCodeAt(0) !== 42) ? (t as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(t)).Kind(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)), (__goscriptAwait = (t !== null && (t as any).__isVarRef !== true && ((t as any).__goValue === undefined || (t as any).__goType?.charCodeAt(0) !== 42) ? (t as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(t)).NumMethod(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	}
 
 	await $.println("reflect_typefor test finished")
 }
@@ -178,11 +186,11 @@ export async function describePointer(__typeArgs: $.GenericTypeArgs | undefined,
 }
 
 export async function genericComposites(): globalThis.Promise<void> {
-	await describe(__goscriptStatic17(), $.arrayToSlice<MyStruct>([new MyStruct(true, "a", 1)]))
-	await describe(__goscriptStatic18(), $.typedSliceOf(Float32Array, [1, 2, 3]) as $.Slice<number>)
-	await describe(__goscriptStatic19(), $.arrayToSlice<number>([]))
-	await describeMap(__goscriptStatic20(), $.makeMap<string, MyStruct>([]))
-	await describePointer(__goscriptStatic17(), new MyStruct())
+	await describe(__goscriptStatic19(), $.arrayToSlice<MyStruct>([new MyStruct(true, "a", 1)]))
+	await describe(__goscriptStatic20(), $.typedSliceOf(Float32Array, [1, 2, 3]) as $.Slice<number>)
+	await describe(__goscriptStatic21(), $.arrayToSlice<number>([]))
+	await describeMap(__goscriptStatic22(), $.makeMap<string, MyStruct>([]))
+	await describePointer(__goscriptStatic19(), new MyStruct())
 }
 
 var __goscriptStatic0$value: any
@@ -272,22 +280,32 @@ function __goscriptStatic16(): any {
 
 var __goscriptStatic17$value: any
 function __goscriptStatic17(): any {
-	return __goscriptStatic17$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, E: { type: "main.MyStruct", zero: () => new MyStruct(true) }})
+	return __goscriptStatic17$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "sort.Interface", zero: () => null, methods: {Len: (receiver: any) => receiver.Len(), Less: (receiver: any, ...args: any[]) => receiver.Less(...$.stripGenericTypeArgs(args)), Swap: (receiver: any, ...args: any[]) => receiver.Swap(...$.stripGenericTypeArgs(args))} }})
 }
 
 var __goscriptStatic18$value: any
 function __goscriptStatic18(): any {
-	return __goscriptStatic18$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, E: { type: /* @__PURE__ */ $.basicType("float32"), zero: () => 0 }})
+	return __goscriptStatic18$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: "sync.Locker", zero: () => null, methods: {Lock: (receiver: any) => receiver.Lock(), Unlock: (receiver: any) => receiver.Unlock()} }})
 }
 
 var __goscriptStatic19$value: any
 function __goscriptStatic19(): any {
-	return __goscriptStatic19$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, E: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }})
+	return __goscriptStatic19$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, E: { type: "main.MyStruct", zero: () => new MyStruct(true) }})
 }
 
 var __goscriptStatic20$value: any
 function __goscriptStatic20(): any {
-	return __goscriptStatic20$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, K: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }, V: { type: "main.MyStruct", zero: () => new MyStruct(true) }})
+	return __goscriptStatic20$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, E: { type: /* @__PURE__ */ $.basicType("float32"), zero: () => 0 }})
+}
+
+var __goscriptStatic21$value: any
+function __goscriptStatic21(): any {
+	return __goscriptStatic21$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, E: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }})
+}
+
+var __goscriptStatic22$value: any
+function __goscriptStatic22(): any {
+	return __goscriptStatic22$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, K: { type: /* @__PURE__ */ $.basicType("string"), zero: () => "" }, V: { type: "main.MyStruct", zero: () => new MyStruct(true) }})
 }
 
 var __goscriptAwait: any
