@@ -349,19 +349,73 @@ function floatBits(value: unknown, typeInfo?: $.TypeInfo | string): number {
   return 0
 }
 
-// formatFloatVerb formats a float for the e, E, f, F, g and G verbs, with an
-// optional precision, as in Go.
+// formatFloatVerb formats a float or complex number for the e, E, f, F, g
+// and G verbs, with an optional precision, as in Go.
 function formatFloatVerb(
   value: unknown,
   verb: string,
   precision: string,
 ): string {
-  const bits = floatBits(value) || 64
   let prec = precision === '' ? -1 : parseInt(precision)
   if (prec < 0 && verb !== 'g' && verb !== 'G') {
     prec = 6
   }
-  return $.formatFloat(Number(value), verb === 'F' ? 'f' : verb, prec, bits)
+  const fmtVerb = verb === 'F' ? 'f' : verb
+  const cbits = complexBits(value)
+  if (cbits !== 0) {
+    return formatComplex(basicValue(value) as $.Complex, fmtVerb, prec, cbits)
+  }
+  const bits = floatBits(value) || 64
+  return $.formatFloat(Number(value), fmtVerb, prec, bits)
+}
+
+// complexBits returns 64 or 128 if value is a complex64 or complex128, as
+// the given type, the type it is boxed with or else its form tells, or 0
+// otherwise.
+function complexBits(value: unknown, typeInfo?: $.TypeInfo | string): number {
+  const info =
+    typeInfo ??
+    (value !== null && typeof value === 'object' ?
+      (value as { __goTypeInfo?: $.TypeInfo | string }).__goTypeInfo
+    : undefined)
+  const name =
+    typeof info === 'string' ? info
+    : info?.kind === $.TypeKind.Basic ? info.name
+    : undefined
+  if (name === 'complex64') return 64
+  if (name === 'complex128') return 128
+  if (name !== undefined) return 0
+  const kind = typeof info === 'object' ? info.kind : undefined
+  if (kind !== undefined && kind !== $.TypeKind.Interface) return 0
+
+  // A complex number is a plain object of its two parts.
+  const v = basicValue(value) as { real?: unknown; imag?: unknown } | null
+  return (
+      v !== null &&
+        typeof v === 'object' &&
+        Object.getPrototypeOf(v) === Object.prototype &&
+        typeof v.real === 'number' &&
+        typeof v.imag === 'number'
+    ) ?
+      128
+    : 0
+}
+
+// formatComplex formats the complex number value of bits bits as Go does:
+// its parts formatted as floats of half its size, the imaginary one always
+// signed, in parentheses.
+function formatComplex(
+  value: $.Complex,
+  verb: string,
+  prec: number,
+  bits: number,
+): string {
+  const re = $.formatFloat(value.real, verb, prec, bits / 2)
+  let im = $.formatFloat(value.imag, verb, prec, bits / 2)
+  if (!im.startsWith('-') && !im.startsWith('+')) {
+    im = '+' + im
+  }
+  return '(' + re + im + 'i)'
 }
 
 function hasGoTypeName(value: unknown): value is { __goType: string } {
@@ -672,6 +726,10 @@ function defaultFormatMaybe(
         typeInfo ?? value.__goTypeInfo,
         allowMethods,
       )
+    }
+    const cbits = complexBits(value, typeInfo)
+    if (cbits !== 0) {
+      return formatComplex(value, 'g', -1, cbits)
     }
     if (
       info?.kind === $.TypeKind.Struct ||

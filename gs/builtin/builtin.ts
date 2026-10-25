@@ -628,6 +628,112 @@ export function complex64(
   return { real: float32(valueOrReal), imag: float32(imag) }
 }
 
+// complexOperand returns the complex number of an operand of a complex
+// operation, which is a number for a constant of an integer or float value.
+function complexOperand(value: Complex | number | bigint): Complex {
+  return typeof value === 'object' ? value : { real: Number(value), imag: 0 }
+}
+
+// complexAdd returns a + b.
+export function complexAdd(
+  a: Complex | number | bigint,
+  b: Complex | number | bigint,
+): Complex {
+  const x = complexOperand(a)
+  const y = complexOperand(b)
+  return { real: x.real + y.real, imag: x.imag + y.imag }
+}
+
+// complexSub returns a - b.
+export function complexSub(
+  a: Complex | number | bigint,
+  b: Complex | number | bigint,
+): Complex {
+  const x = complexOperand(a)
+  const y = complexOperand(b)
+  return { real: x.real - y.real, imag: x.imag - y.imag }
+}
+
+// complexMul returns a * b.
+export function complexMul(
+  a: Complex | number | bigint,
+  b: Complex | number | bigint,
+): Complex {
+  const x = complexOperand(a)
+  const y = complexOperand(b)
+  return {
+    real: x.real * y.real - x.imag * y.imag,
+    imag: x.real * y.imag + x.imag * y.real,
+  }
+}
+
+// complexDiv returns a / b as the Go runtime computes it (complex128div):
+// by Smith's algorithm, with the infinities and zeros of C99 Annex G when
+// both parts of the quotient are NaN. A division by zero does not panic.
+export function complexDiv(
+  a: Complex | number | bigint,
+  b: Complex | number | bigint,
+): Complex {
+  const n = complexOperand(a)
+  const m = complexOperand(b)
+  let e: number
+  let f: number
+  if (Math.abs(m.real) >= Math.abs(m.imag)) {
+    const ratio = m.imag / m.real
+    const denom = m.real + ratio * m.imag
+    e = (n.real + n.imag * ratio) / denom
+    f = (n.imag - n.real * ratio) / denom
+  } else {
+    const ratio = m.real / m.imag
+    const denom = m.imag + ratio * m.real
+    e = (n.real * ratio + n.imag) / denom
+    f = (n.imag * ratio - n.real) / denom
+  }
+  if (!Number.isNaN(e) || !Number.isNaN(f)) {
+    return { real: e, imag: f }
+  }
+
+  // Correct the result to infinities and zeros where they apply.
+  let [x, y, c, d] = [n.real, n.imag, m.real, m.imag]
+  const isInf = (v: number): boolean => v === Infinity || v === -Infinity
+  if (c === 0 && d === 0 && (!Number.isNaN(x) || !Number.isNaN(y))) {
+    e = copySign(Infinity, c) * x
+    f = copySign(Infinity, c) * y
+  } else if (
+    (isInf(x) || isInf(y)) &&
+    Number.isFinite(c) &&
+    Number.isFinite(d)
+  ) {
+    x = copySign(isInf(x) ? 1 : 0, x)
+    y = copySign(isInf(y) ? 1 : 0, y)
+    e = Infinity * (x * c + y * d)
+    f = Infinity * (y * c - x * d)
+  } else if (
+    (isInf(c) || isInf(d)) &&
+    Number.isFinite(x) &&
+    Number.isFinite(y)
+  ) {
+    c = copySign(isInf(c) ? 1 : 0, c)
+    d = copySign(isInf(d) ? 1 : 0, d)
+    e = 0 * (x * c + y * d)
+    f = 0 * (y * c - x * d)
+  }
+  return { real: e, imag: f }
+}
+
+// copySign returns a value with the magnitude of v and the sign of sign,
+// a negative zero counting as negative.
+function copySign(v: number, sign: number): number {
+  const negative = sign < 0 || Object.is(sign, -0)
+  return negative ? -Math.abs(v) : Math.abs(v)
+}
+
+// complexNeg returns -a.
+export function complexNeg(a: Complex | number | bigint): Complex {
+  const x = complexOperand(a)
+  return { real: -x.real, imag: -x.imag }
+}
+
 export function real(value: number | Complex | null | undefined): number {
   value = unwrapGoValue(value)
   if (typeof value === 'number') {

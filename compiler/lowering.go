@@ -6469,8 +6469,11 @@ func lowerCompoundAssignValue(
 	tok token.Token,
 	mask bool,
 ) string {
-	// Wide integers, int bitwise operations, 32-bit products and integer
-	// quotients have helpers.
+	// Complex numbers, wide integers, int bitwise operations, 32-bit
+	// products and integer quotients have helpers.
+	if helper, ok := complexArithmeticHelper(targetType, tok); ok {
+		return complexHelperCall(runtimeOwner, targetType, helper, left, right)
+	}
 	if helper, ok := wideIntegerAssignHelper(targetType, tok); ok {
 		return wideIntegerHelperCall(runtimeOwner, targetType, helper, left, right)
 	}
@@ -9877,6 +9880,46 @@ func (o *LoweringOwner) lowerComplexEqualityExpr(ctx lowerFileContext, expr *ast
 	return value, true
 }
 
+// lowerComplexArithmeticExpr lowers an arithmetic operation of complex
+// numbers, which are objects of their parts, to its runtime helper.
+func (o *LoweringOwner) lowerComplexArithmeticExpr(ctx lowerFileContext, expr *ast.BinaryExpr, left string, right string) (string, bool) {
+	resultType := ctx.semPkg.source.TypesInfo.TypeOf(expr)
+	helper, ok := complexArithmeticHelper(resultType, expr.Op)
+	if !ok {
+		return "", false
+	}
+	return complexHelperCall(o.runtimeOwner, resultType, helper, left, right), true
+}
+
+// complexArithmeticHelper returns the runtime helper of the arithmetic
+// operator op, or its assignment form, on complex numbers of type typ.
+func complexArithmeticHelper(typ types.Type, op token.Token) (RuntimeHelper, bool) {
+	if !isComplexType(typ) {
+		return "", false
+	}
+	switch op {
+	case token.ADD, token.ADD_ASSIGN:
+		return RuntimeHelperComplexAdd, true
+	case token.SUB, token.SUB_ASSIGN:
+		return RuntimeHelperComplexSub, true
+	case token.MUL, token.MUL_ASSIGN:
+		return RuntimeHelperComplexMul, true
+	case token.QUO, token.QUO_ASSIGN:
+		return RuntimeHelperComplexDiv, true
+	}
+	return "", false
+}
+
+// complexHelperCall calls the complex helper with the operands, rounding a
+// complex64 result to the precision of its float32 parts.
+func complexHelperCall(runtimeOwner *RuntimeContractOwner, typ types.Type, helper RuntimeHelper, operands ...string) string {
+	call := runtimeOwner.QualifiedHelper(helper) + "(" + strings.Join(operands, ", ") + ")"
+	if basic, ok := types.Unalias(typ).Underlying().(*types.Basic); ok && basic.Kind() == types.Complex64 {
+		return runtimeOwner.QualifiedHelper(RuntimeHelperComplex64) + "(" + call + ")"
+	}
+	return call
+}
+
 // lowerPointerEqualityExpr compares two pointers, also unsafe pointers.
 // Pointers to the same storage are the same object, except references to a
 // slice or array element, which each &s[i] makes anew, and views that an
@@ -10219,6 +10262,9 @@ func (o *LoweringOwner) lowerExpr(ctx lowerFileContext, expr ast.Expr) (string, 
 		if _, ok := typed.Y.(*ast.BinaryExpr); ok {
 			right = "(" + right + ")"
 		}
+		if value, ok := o.lowerComplexArithmeticExpr(ctx, typed, left, right); ok {
+			return value, append(leftDiagnostics, rightDiagnostics...)
+		}
 		if typed.Op == token.AND_NOT {
 			// Wide (int64/uint64) operands lower to bigint, and a Go constant like
 			// 1<<63 lowers to a JS number whose raw ~ collapses to -1, so the raw
@@ -10305,6 +10351,11 @@ func (o *LoweringOwner) lowerExpr(ctx lowerFileContext, expr ast.Expr) (string, 
 			return "await " + o.runtimeOwner.QualifiedHelper(RuntimeHelperChanRecv) + "(" + value + ")", diagnostics
 		}
 		value, diagnostics := o.lowerExpr(ctx, typed.X)
+		if typed.Op == token.SUB {
+			if resultType := ctx.semPkg.source.TypesInfo.TypeOf(typed); isComplexType(resultType) {
+				return complexHelperCall(o.runtimeOwner, resultType, RuntimeHelperComplexNeg, value), diagnostics
+			}
+		}
 		if typed.Op == token.NOT || typed.Op == token.SUB || typed.Op == token.ADD {
 			return lowerPrefixUnaryExpr(typed.Op, value), diagnostics
 		}
