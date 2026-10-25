@@ -14,7 +14,7 @@ export class padded {
 		this._blank0 = _blank0$ ?? $.arrayValue(new Uint8Array(2))
 		this.Value = Value$ ?? 0
 		this._blank2 = _blank2$ ?? $.arrayValue(new Uint8Array(3))
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): padded {

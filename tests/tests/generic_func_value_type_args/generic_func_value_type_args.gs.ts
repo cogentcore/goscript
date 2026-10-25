@@ -8,7 +8,7 @@ import "@goscript/slices/index.js"
 
 export class Sim {
 	constructor(__goscriptValue?: boolean) {
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Sim {
@@ -36,7 +36,7 @@ export class Config {
 	constructor(__goscriptValue?: boolean, BaseConfig$?: lib.BaseConfig, Rate$?: number) {
 		this.BaseConfig = BaseConfig$ ?? new lib.BaseConfig(true)
 		this.Rate = Rate$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Config {

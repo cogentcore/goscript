@@ -10,7 +10,7 @@ export class hidden {
 
 	constructor(__goscriptValue?: boolean, label$?: string) {
 		this.label = label$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): hidden {
@@ -39,7 +39,7 @@ export class Public {
 	constructor(__goscriptValue?: boolean, Value$?: string, Hidden$?: hidden) {
 		this.Value = Value$ ?? ""
 		this.Hidden = Hidden$ ?? new hidden(true)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Public {

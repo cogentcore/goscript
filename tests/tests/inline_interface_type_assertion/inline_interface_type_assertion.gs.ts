@@ -15,7 +15,7 @@ $.registerInterfaceType(
 
 export class Greeter {
 	constructor(__goscriptValue?: boolean) {
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Greeter {
@@ -42,7 +42,7 @@ export class Greeter {
 
 export class MyStringer {
 	constructor(__goscriptValue?: boolean) {
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): MyStringer {

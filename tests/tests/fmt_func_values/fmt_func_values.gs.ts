@@ -13,7 +13,7 @@ export class Tiered {
 	constructor(__goscriptValue?: boolean, First$?: $.Slice<(() => void) | null>, Normal$?: $.Slice<(() => void) | null>) {
 		this.First = First$ ?? (null! as $.Slice<(() => void) | null>)
 		this.Normal = Normal$ ?? (null! as $.Slice<(() => void) | null>)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Tiered {

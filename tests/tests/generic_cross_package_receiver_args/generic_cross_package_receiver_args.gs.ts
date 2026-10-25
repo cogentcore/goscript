@@ -20,7 +20,7 @@ export class wrapper {
 
 	constructor(__goscriptValue?: boolean, Impl$?: dep.Impl | $.VarRef<dep.Impl> | null) {
 		this.Impl = Impl$ ?? (null! as dep.Impl | $.VarRef<dep.Impl> | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): wrapper {

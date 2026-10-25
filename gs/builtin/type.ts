@@ -1061,7 +1061,7 @@ function matchesStructType(value: any, info: TypeInfo): boolean {
   if (typeof value === 'object' && value !== null && info.fields) {
     const fields = info.fields || []
     const fieldNames = fields.map((field) => structFieldRuntimeKey(field))
-    const valueFields = Object.keys(value)
+    const valueFields = ownKeys(value)
 
     const fieldsExist = fieldNames.every((field) => field in value)
     const sameFieldCount = valueFields.length === fieldNames.length
@@ -1446,8 +1446,22 @@ function typedElementMatches(
 
 // structValueMarker is the property that marks a struct instance as a value,
 // not a pointer. The constructors of generated struct classes set it
-// themselves.
-export const structValueMarker = Symbol('structValue')
+// themselves, by this name. It is a string key, which JavaScriptCore stores
+// as fast as a field, where a symbol key on a new object made every struct
+// value about ten times slower to make; ownKeys leaves it out of the keys of
+// an object.
+export const structValueMarker = '__goStructValue'
+
+// ownKeys returns the own enumerable keys of value, as Object.keys does,
+// without the struct value marker.
+export function ownKeys(value: object): string[] {
+  const keys = Object.keys(value)
+  const i = keys.lastIndexOf(structValueMarker)
+  if (i >= 0) {
+    keys.splice(i, 1)
+  }
+  return keys
+}
 
 // markAsStructValue Mark a struct instance as representing a value (not pointer).
 export function markAsStructValue<T>(value: T): T {
@@ -1743,7 +1757,7 @@ function forwardStructFields(view: object, read: () => unknown): void {
   if (typeof current !== 'object' || current === null) {
     return
   }
-  for (const key of Object.keys(current)) {
+  for (const key of ownKeys(current)) {
     Object.defineProperty(view, key, {
       configurable: true,
       enumerable: true,

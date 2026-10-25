@@ -163,7 +163,7 @@ export async function main(): globalThis.Promise<void> {
 		constructor(init?: Partial<{x?: number, y?: number}>, __goscriptValue?: boolean) {
 			this.x = init?.x ?? (0 as number)
 			this.y = init?.y ?? (0 as number)
-			;(this as any)[$.structValueMarker] = __goscriptValue === true
+			;(this as any).__goStructValue = __goscriptValue === true
 		}
 
 		public clone(): point {

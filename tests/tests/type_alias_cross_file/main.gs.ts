@@ -9,7 +9,7 @@ import "./alias.gs.ts"
 
 export class source {
 	constructor(__goscriptValue?: boolean) {
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): source {

@@ -10,7 +10,7 @@ export class MyStruct {
 
 	constructor(__goscriptValue?: boolean, MyInt$?: number) {
 		this.MyInt = MyInt$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): MyStruct {
@@ -45,7 +45,7 @@ export class Outer {
 		this.Child = Child$ ?? new MyStruct(true)
 		this.Items = Items$ ?? $.arrayValue(globalThis.Array.from({ length: 2 }, () => new MyStruct(true)), /* @__PURE__ */ $.arrayType("main.MyStruct", 2))
 		this.Ptr = Ptr$ ?? (null! as MyStruct | $.VarRef<MyStruct> | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Outer {

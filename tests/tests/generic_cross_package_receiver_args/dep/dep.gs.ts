@@ -20,7 +20,7 @@ export class Impl {
 
 	constructor(__goscriptValue?: boolean, Item$?: any) {
 		this.Item = Item$ ?? (null! as any)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Impl {
@@ -48,7 +48,7 @@ export class Impl {
 
 export class Keyed {
 	constructor(__goscriptValue?: boolean) {
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Keyed {
@@ -79,7 +79,7 @@ export class Wrapper {
 
 	constructor(__goscriptValue?: boolean, Keyed$?: Keyed | $.VarRef<Keyed> | null) {
 		this.Keyed = Keyed$ ?? (null! as Keyed | $.VarRef<Keyed> | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Wrapper {

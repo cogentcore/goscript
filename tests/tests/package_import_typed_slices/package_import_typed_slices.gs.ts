@@ -20,7 +20,7 @@ export class mesh {
 	constructor(__goscriptValue?: boolean, Pos$?: $.Slice<number>, Index$?: $.Slice<number>) {
 		this.Pos = Pos$ ?? (null! as $.Slice<number>)
 		this.Index = Index$ ?? (null! as $.Slice<number>)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): mesh {

@@ -13,7 +13,7 @@ export class storage {
 	constructor(__goscriptValue?: boolean, files$?: globalThis.Map<string, __goscript_memory.file | $.VarRef<__goscript_memory.file> | null> | null, children$?: globalThis.Map<string, globalThis.Map<string, __goscript_memory.file | $.VarRef<__goscript_memory.file> | null> | null> | null) {
 		this.files = files$ ?? (null! as globalThis.Map<string, __goscript_memory.file | $.VarRef<__goscript_memory.file> | null> | null)
 		this.children = children$ ?? (null! as globalThis.Map<string, globalThis.Map<string, __goscript_memory.file | $.VarRef<__goscript_memory.file> | null> | null> | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): storage {

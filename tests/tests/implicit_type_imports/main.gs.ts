@@ -10,7 +10,7 @@ import "./stream.gs.ts"
 
 export class localReadWriteCloser {
 	constructor(__goscriptValue?: boolean) {
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): localReadWriteCloser {

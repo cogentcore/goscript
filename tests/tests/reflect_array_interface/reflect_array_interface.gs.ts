@@ -23,7 +23,7 @@ export class Grid {
 		this.N = N$ ?? $.arrayValue(globalThis.Array.from({ length: 2 }, () => 0))
 		this.F = F$ ?? $.arrayValue(globalThis.Array.from({ length: 3 }, () => 0), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 3))
 		this.B = B$ ?? $.arrayValue(globalThis.Array.from({ length: 2 }, () => false))
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Grid {

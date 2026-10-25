@@ -12,7 +12,7 @@ export class label {
 
 	constructor(__goscriptValue?: boolean, value$?: string) {
 		this.value = value$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): label {

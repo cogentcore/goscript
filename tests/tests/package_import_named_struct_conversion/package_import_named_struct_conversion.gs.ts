@@ -15,7 +15,7 @@ export class LocalTime {
 		this.wall = wall$ ?? 0n
 		this.ext = ext$ ?? 0n
 		this.loc = loc$ ?? (null! as time.Location | $.VarRef<time.Location> | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): LocalTime {

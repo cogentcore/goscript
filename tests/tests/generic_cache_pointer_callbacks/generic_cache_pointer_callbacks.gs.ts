@@ -8,7 +8,7 @@ export class cache {
 
 	constructor(__goscriptValue?: boolean, stored$?: any) {
 		this.stored = stored$ ?? (null! as any)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): cache {
@@ -48,7 +48,7 @@ export class key {
 
 	constructor(__goscriptValue?: boolean, N$?: number) {
 		this.N = N$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): key {
@@ -74,7 +74,7 @@ export class privateKey {
 
 	constructor(__goscriptValue?: boolean, D$?: number) {
 		this.D = D$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): privateKey {

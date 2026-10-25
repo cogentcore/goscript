@@ -24,7 +24,7 @@ export class pile {
 
 	constructor(__goscriptValue?: boolean, step$?: number) {
 		this.step = step$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): pile {

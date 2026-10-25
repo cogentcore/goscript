@@ -14,7 +14,7 @@ export class Widget {
 	constructor(__goscriptValue?: boolean, Base$?: __goscript_types.Base, name$?: string) {
 		this.Base = Base$ ?? new __goscript_types.Base(true)
 		this.name = name$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Widget {

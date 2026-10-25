@@ -8,7 +8,7 @@ export class box {
 
 	constructor(__goscriptValue?: boolean, value$?: number) {
 		this.value = value$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): box {
@@ -31,7 +31,7 @@ export class box {
 
 export class cursor {
 	constructor(__goscriptValue?: boolean) {
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): cursor {

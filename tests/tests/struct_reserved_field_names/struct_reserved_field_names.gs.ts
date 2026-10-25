@@ -17,7 +17,7 @@ export class odd {
 		this.___proto__ = ___proto__$ ?? 0
 		this._constructor = _constructor$ ?? ""
 		this.Name = Name$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): odd {

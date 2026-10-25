@@ -20,7 +20,7 @@ export class Type {
 
 	constructor(__goscriptValue?: boolean, Kind$?: number) {
 		this.Kind = Kind$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Type {
@@ -46,7 +46,7 @@ export class List {
 
 	constructor(__goscriptValue?: boolean, N$?: number) {
 		this.N = N$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): List {

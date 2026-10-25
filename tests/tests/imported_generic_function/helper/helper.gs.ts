@@ -20,7 +20,7 @@ export class Box {
 
 	constructor(__goscriptValue?: boolean, Value$?: any) {
 		this.Value = Value$ ?? (null! as any)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Box {
@@ -46,7 +46,7 @@ export class IntValue {
 
 	constructor(__goscriptValue?: boolean, N$?: number) {
 		this.N = N$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): IntValue {

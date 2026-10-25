@@ -738,7 +738,8 @@ function encodeJSON(v: unknown): string {
   }
   if (t === 'object') {
     const parts: string[] = []
-    for (const [key, value] of Object.entries(v as Record<string, unknown>)) {
+    for (const key of $.ownKeys(v as object)) {
+      const value = (v as Record<string, unknown>)[key]
       parts.push(JSON.stringify(key) + ':' + encodeJSON(value))
     }
     return '{' + parts.join(',') + '}'
@@ -2920,7 +2921,7 @@ function structFields(value: Record<string, unknown>): fieldMetadata[] {
   if (fields.length !== 0) {
     return fields
   }
-  return Object.keys(value).map((key) => ({ key, name: key }))
+  return $.ownKeys(value).map((key) => ({ key, name: key }))
 }
 
 // anonymousStructValueFields returns the fields of an anonymous struct

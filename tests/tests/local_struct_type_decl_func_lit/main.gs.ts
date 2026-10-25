@@ -13,7 +13,7 @@ export async function main(): globalThis.Promise<void> {
 			constructor(init?: Partial<{name?: string, count?: number}>, __goscriptValue?: boolean) {
 				this.name = init?.name ?? ("" as string)
 				this.count = init?.count ?? (0 as number)
-				;(this as any)[$.structValueMarker] = __goscriptValue === true
+				;(this as any).__goStructValue = __goscriptValue === true
 			}
 
 			public clone(): item {

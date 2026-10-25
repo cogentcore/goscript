@@ -15,7 +15,7 @@ export class Pose {
 		this.M = M$ ?? $.arrayValue(globalThis.Array.from({ length: 4 }, () => 0), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 4))
 		this.A = A$ ?? $.arrayValue(globalThis.Array.from({ length: 2 }, () => 0))
 		this.Inner = Inner$ ?? $.anonymousStructValue({"B": $.arrayValue(globalThis.Array.from({ length: 2 }, () => 0))}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("B", /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("int"), 2), [0], 0, true)] })
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Pose {

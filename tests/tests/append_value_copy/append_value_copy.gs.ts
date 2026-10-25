@@ -9,7 +9,7 @@ export class cell {
 
 	constructor(__goscriptValue?: boolean, width$?: number) {
 		this.width = width$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): cell {

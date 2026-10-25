@@ -26,7 +26,7 @@ $.registerInterfaceType(
 
 export class pingFrame {
 	constructor(__goscriptValue?: boolean) {
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): pingFrame {
@@ -57,7 +57,7 @@ export class Frame {
 	constructor(__goscriptValue?: boolean, Frame$?: wireFrame | null, Handler$?: FrameHandler | null) {
 		this.Frame = Frame$ ?? (null! as wireFrame | null)
 		this.Handler = Handler$ ?? (null! as FrameHandler | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Frame {
@@ -84,7 +84,7 @@ export class packet {
 
 	constructor(__goscriptValue?: boolean, Frames$?: $.Slice<Frame>) {
 		this.Frames = Frames$ ?? (null! as $.Slice<Frame>)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): packet {
@@ -110,7 +110,7 @@ export class retransmissionQueue {
 
 	constructor(__goscriptValue?: boolean, lost$?: number) {
 		this.lost = lost$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): retransmissionQueue {
@@ -151,7 +151,7 @@ export class retransmissionQueueInitialAckHandler {
 
 	constructor(__goscriptValue?: boolean, lost$?: number) {
 		this.lost = lost$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): retransmissionQueueInitialAckHandler {
@@ -188,7 +188,7 @@ export class retransmissionQueueHandshakeAckHandler {
 
 	constructor(__goscriptValue?: boolean, lost$?: number) {
 		this.lost = lost$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): retransmissionQueueHandshakeAckHandler {
@@ -225,7 +225,7 @@ export class retransmissionQueueAppDataAckHandler {
 
 	constructor(__goscriptValue?: boolean, lost$?: number) {
 		this.lost = lost$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): retransmissionQueueAppDataAckHandler {

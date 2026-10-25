@@ -8,7 +8,7 @@ export class child {
 
 	constructor(__goscriptValue?: boolean, value$?: string) {
 		this.value = value$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): child {
@@ -42,7 +42,7 @@ export class parent {
 
 	constructor(__goscriptValue?: boolean, child$?: child | $.VarRef<child> | null) {
 		this.child = child$ ?? (null! as child | $.VarRef<child> | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): parent {

@@ -17,7 +17,7 @@ export class T {
 	constructor(__goscriptValue?: boolean, A$?: number, B$?: number) {
 		this.A = A$ ?? 0
 		this.B = B$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): T {
@@ -44,7 +44,7 @@ export class Inner {
 
 	constructor(__goscriptValue?: boolean, X$?: number) {
 		this.X = X$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Inner {
@@ -76,7 +76,7 @@ export class Outer {
 		this.N = N$ ?? 0
 		this.In = In$ ?? new Inner(true)
 		this.Ts = Ts$ ?? $.arrayValue(globalThis.Array.from({ length: 2 }, () => new T(true)), /* @__PURE__ */ $.arrayType("main.T", 2))
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Outer {
@@ -104,7 +104,7 @@ export class holder {
 
 	constructor(__goscriptValue?: boolean, p$?: T | $.VarRef<T> | null) {
 		this.p = p$ ?? (null! as T | $.VarRef<T> | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): holder {
@@ -194,7 +194,7 @@ export async function main(): globalThis.Promise<void> {
 
 		constructor(init?: Partial<{p?: T | $.VarRef<T> | null}>, __goscriptValue?: boolean) {
 			this.p = init?.p ?? (null! as T | $.VarRef<T> | null)
-			;(this as any)[$.structValueMarker] = __goscriptValue === true
+			;(this as any).__goStructValue = __goscriptValue === true
 		}
 
 		public clone(): pair {

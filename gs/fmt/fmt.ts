@@ -645,8 +645,8 @@ function compareMapKeys(a: unknown, b: unknown): number {
   }
 
   // Arrays compare by element, and structs by field, in order.
-  const xs = $.isArrayOrGoSlice(a) ? sliceItems(a) : Object.values(a as object)
-  const ys = $.isArrayOrGoSlice(b) ? sliceItems(b) : Object.values(b as object)
+  const xs = $.isArrayOrGoSlice(a) ? sliceItems(a) : $.ownKeys(a as object).map((k) => (a as any)[k])
+  const ys = $.isArrayOrGoSlice(b) ? sliceItems(b) : $.ownKeys(b as object).map((k) => (b as any)[k])
   for (let i = 0; i < Math.min(xs.length, ys.length); i++) {
     const c = compareMapKeys(xs[i], ys[i])
     if (c !== 0) {
@@ -810,7 +810,7 @@ function defaultFormatMaybe(
       const fields: $.StructFieldInfo[] =
         info?.kind === $.TypeKind.Struct ?
           info.fields
-        : Object.keys(value).map((name) => ({
+        : $.ownKeys(value).map((name) => ({
             name,
             key: name,
             type: $.basicType('unknown'),
@@ -881,15 +881,13 @@ function defaultFormatMaybe(
       (value as any).constructor?.name &&
       (value as any).constructor.name !== 'Object'
     ) {
-      const parts = Object.entries(value as Record<string, any>).map(
-        ([k, v]) => {
-          const formatted = defaultFormatMaybe(v, flags, depth + 1)
-          if (isPromiseLike(formatted)) {
-            return formatted.then((resolved) => `${k}:${resolved}`)
-          }
-          return `${k}:${formatted}`
-        },
-      )
+      const parts = $.ownKeys(value).map((k) => {
+        const formatted = defaultFormatMaybe(value[k], flags, depth + 1)
+        if (isPromiseLike(formatted)) {
+          return formatted.then((resolved) => `${k}:${resolved}`)
+        }
+        return `${k}:${formatted}`
+      })
       return joinMaybe(parts, ' ', '{', '}')
     }
     try {

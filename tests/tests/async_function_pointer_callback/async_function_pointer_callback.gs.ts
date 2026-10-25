@@ -14,7 +14,7 @@ export class Snapshot {
 
 	constructor(__goscriptValue?: boolean, base$?: number) {
 		this.base = base$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Snapshot {
@@ -52,7 +52,7 @@ export class Host {
 
 	constructor(__goscriptValue?: boolean, process$?: atomic.Pointer<Process>) {
 		this.process = process$ ?? $.markAsStructValue(new atomic.Pointer<Process>())
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Host {

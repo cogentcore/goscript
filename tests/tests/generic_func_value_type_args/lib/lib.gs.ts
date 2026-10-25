@@ -21,7 +21,7 @@ export class BaseConfig {
 
 	constructor(__goscriptValue?: boolean, Name$?: string) {
 		this.Name = Name$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): BaseConfig {

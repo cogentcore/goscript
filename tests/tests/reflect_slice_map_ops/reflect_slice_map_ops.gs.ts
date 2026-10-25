@@ -10,7 +10,7 @@ export class Item {
 
 	constructor(__goscriptValue?: boolean, Name$?: string) {
 		this.Name = Name$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Item {
@@ -39,7 +39,7 @@ export class Holder {
 	constructor(__goscriptValue?: boolean, S$?: $.Slice<number>, T$?: $.Slice<number>) {
 		this.S = S$ ?? (null! as $.Slice<number>)
 		this.T = T$ ?? (null! as $.Slice<number>)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Holder {
@@ -66,7 +66,7 @@ export class Doc {
 
 	constructor(__goscriptValue?: boolean, Items$?: $.Slice<Item>) {
 		this.Items = Items$ ?? (null! as $.Slice<Item>)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Doc {

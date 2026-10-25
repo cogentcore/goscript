@@ -18,7 +18,7 @@ export class stream {
 
 	constructor(__goscriptValue?: boolean, name$?: string) {
 		this.name = name$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): stream {
@@ -49,7 +49,7 @@ export class stopStream {
 
 	constructor(__goscriptValue?: boolean, stream$?: stream) {
 		this.stream = stream$ ?? new stream(true)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): stopStream {
@@ -79,7 +79,7 @@ export class pointerStopStream {
 
 	constructor(__goscriptValue?: boolean, stream$?: stream | $.VarRef<stream> | null) {
 		this.stream = stream$ ?? (null! as stream | $.VarRef<stream> | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): pointerStopStream {

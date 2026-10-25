@@ -11,7 +11,7 @@ export class Format {
 	constructor(__goscriptValue?: boolean, Name$?: string, Ext$?: $.Slice<string>) {
 		this.Name = Name$ ?? ""
 		this.Ext = Ext$ ?? (null! as $.Slice<string>)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Format {

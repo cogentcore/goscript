@@ -22,7 +22,7 @@ export class blockType {
 	constructor(__goscriptValue?: boolean, typeID$?: string, _constructor$?: (() => any | globalThis.Promise<any>) | null) {
 		this.typeID = typeID$ ?? ""
 		this._constructor = _constructor$ ?? (null! as (() => any | globalThis.Promise<any>) | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): blockType {
@@ -56,7 +56,7 @@ export class blockType {
 
 export class sampleBlock {
 	constructor(__goscriptValue?: boolean) {
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): sampleBlock {

@@ -838,7 +838,7 @@ const invalidTypeInstance = new InvalidTypeClass()
 // without listing them all as Object.keys would.
 function isEmptyObject(value: object): boolean {
   for (const key in value) {
-    if (globalThis.Object.hasOwn(value, key)) {
+    if (key !== $.structValueMarker && globalThis.Object.hasOwn(value, key)) {
       return false
     }
   }

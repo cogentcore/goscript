@@ -12,7 +12,7 @@ export class splitmix {
 
 	constructor(__goscriptValue?: boolean, x$?: bigint) {
 		this.x = x$ ?? 0n
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): splitmix {

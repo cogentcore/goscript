@@ -43,7 +43,7 @@ export class T {
 
 	constructor(__goscriptValue?: boolean, v$?: number) {
 		this.v = v$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): T {
@@ -79,7 +79,7 @@ export class ByValue {
 
 	constructor(__goscriptValue?: boolean, T$?: T) {
 		this.T = T$ ?? new T(true)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): ByValue {
@@ -113,7 +113,7 @@ export class ByPointer {
 
 	constructor(__goscriptValue?: boolean, T$?: T | $.VarRef<T> | null) {
 		this.T = T$ ?? (null! as T | $.VarRef<T> | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): ByPointer {

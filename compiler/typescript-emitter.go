@@ -648,8 +648,7 @@ func renderPositionalStructConstructor(b *strings.Builder, structType *loweredSt
 
 	// Every instance carries the marker, false for a pointer's struct, so
 	// that all instances of a class have one shape.
-	b.WriteString("\t\t;(this as any)[" + runtimeOwner.QualifiedHelper(RuntimeHelperStructValueMarker))
-	b.WriteString("] = __goscriptValue === true\n\t}\n\n")
+	b.WriteString("\t\t;(this as any).__goStructValue = __goscriptValue === true\n\t}\n\n")
 }
 
 // renderPositionalStructClone emits the clone method of a positional struct
@@ -709,7 +708,6 @@ const structFreshInitParam = "__goscriptFresh"
 // renderStruct emits field storage, value-copy operations, methods, and metadata.
 func renderStruct(b *strings.Builder, structType *loweredStruct, runtimeOwner *RuntimeContractOwner, trimTypeInfo bool) {
 	markStructValue := runtimeOwner.QualifiedHelper(RuntimeHelperMarkAsStructValue)
-	structValueMarker := runtimeOwner.QualifiedHelper(RuntimeHelperStructValueMarker)
 	cloneStructValue := runtimeOwner.QualifiedHelper(RuntimeHelperCloneStructValue)
 	cloneArrayValue := runtimeOwner.QualifiedHelper(RuntimeHelperCloneArrayValue)
 	copyElement := runtimeOwner.QualifiedHelper(RuntimeHelperCopyElement)
@@ -833,9 +831,7 @@ func renderStruct(b *strings.Builder, structType *loweredStruct, runtimeOwner *R
 	// that each class stores it at one site. Every instance has the
 	// property, false for a pointer's struct, so that all instances of a
 	// class have one shape and marking one later changes no shape.
-	b.WriteString("\t\t;(this as any)[")
-	b.WriteString(structValueMarker)
-	b.WriteString("] = __goscriptValue === true\n\t}\n\n")
+	b.WriteString("\t\t;(this as any).__goStructValue = __goscriptValue === true\n\t}\n\n")
 
 	// The clone method copies the struct through its constructor.
 	b.WriteString("\tpublic ")

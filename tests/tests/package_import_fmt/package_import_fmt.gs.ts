@@ -27,7 +27,7 @@ export class byteFormatter {
 
 	constructor(__goscriptValue?: boolean, prefix$?: $.Slice<number>) {
 		this.prefix = prefix$ ?? (null! as $.Slice<number>)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): byteFormatter {
@@ -63,7 +63,7 @@ export class pos {
 	constructor(__goscriptValue?: boolean, Line$?: number, Char$?: number) {
 		this.Line = Line$ ?? 0
 		this.Char = Char$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): pos {

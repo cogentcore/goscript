@@ -82,7 +82,7 @@ export class Dog {
 
 	constructor(__goscriptValue?: boolean, name$?: string) {
 		this.name = name$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Dog {
@@ -122,7 +122,7 @@ export class Counter {
 
 	constructor(__goscriptValue?: boolean, n$?: number) {
 		this.n = n$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Counter {
@@ -165,7 +165,7 @@ export class Inner {
 
 	constructor(__goscriptValue?: boolean, label$?: string) {
 		this.label = label$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Inner {
@@ -204,7 +204,7 @@ export class Outer {
 	constructor(__goscriptValue?: boolean, Inner$?: Inner | $.VarRef<Inner> | null, Speaker$?: Speaker | null) {
 		this.Inner = Inner$ ?? (null! as Inner | $.VarRef<Inner> | null)
 		this.Speaker = Speaker$ ?? (null! as Speaker | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Outer {
@@ -240,7 +240,7 @@ export class Outer {
 
 export class Cat {
 	constructor(__goscriptValue?: boolean) {
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Cat {
@@ -273,7 +273,7 @@ export class Box {
 
 	constructor(__goscriptValue?: boolean, v$?: any) {
 		this.v = v$ ?? (null! as any)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Box {
@@ -304,7 +304,7 @@ export class myErr {
 
 	constructor(__goscriptValue?: boolean, code$?: number) {
 		this.code = code$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): myErr {

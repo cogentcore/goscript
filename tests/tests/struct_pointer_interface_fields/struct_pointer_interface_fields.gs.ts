@@ -21,7 +21,7 @@ export class MyStruct {
 	constructor(__goscriptValue?: boolean, PointerField$?: $.VarRef<number> | null, interfaceField$?: MyInterface | null) {
 		this.PointerField = PointerField$ ?? (null! as $.VarRef<number> | null)
 		this.interfaceField = interfaceField$ ?? (null! as MyInterface | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): MyStruct {

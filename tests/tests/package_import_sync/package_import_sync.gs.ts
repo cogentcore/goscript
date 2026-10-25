@@ -12,7 +12,7 @@ export class embeddedMutex {
 	constructor(__goscriptValue?: boolean, Mutex$?: sync.Mutex, value$?: number) {
 		this.Mutex = Mutex$ ?? $.markAsStructValue(new sync.Mutex())
 		this.value = value$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): embeddedMutex {
@@ -54,7 +54,7 @@ export class embeddedRWMutex {
 	constructor(__goscriptValue?: boolean, RWMutex$?: sync.RWMutex, value$?: number) {
 		this.RWMutex = RWMutex$ ?? $.markAsStructValue(new sync.RWMutex())
 		this.value = value$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): embeddedRWMutex {
@@ -115,7 +115,7 @@ export class queue {
 		this.Mu = Mu$ ?? $.markAsStructValue(new sync.Mutex())
 		this.Cond = Cond$ ?? $.markAsStructValue(new sync.Cond())
 		this.items = items$ ?? (null! as $.Slice<number>)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): queue {

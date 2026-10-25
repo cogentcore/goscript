@@ -11,7 +11,7 @@ export class Base {
 
 	constructor(__goscriptValue?: boolean, Values$?: $.Slice<any>) {
 		this.Values = Values$ ?? (null! as $.Slice<any>)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Base {

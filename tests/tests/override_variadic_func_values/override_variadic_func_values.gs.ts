@@ -12,7 +12,7 @@ export class printer {
 
 	constructor(__goscriptValue?: boolean, print$?: ((a: $.Slice<any>) => string | globalThis.Promise<string>) | null) {
 		this.print = print$ ?? (null! as ((a: $.Slice<any>) => string | globalThis.Promise<string>) | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): printer {

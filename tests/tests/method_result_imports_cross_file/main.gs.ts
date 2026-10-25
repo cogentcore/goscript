@@ -10,7 +10,7 @@ import "./method.gs.ts"
 
 export class Holder {
 	constructor(__goscriptValue?: boolean) {
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Holder {

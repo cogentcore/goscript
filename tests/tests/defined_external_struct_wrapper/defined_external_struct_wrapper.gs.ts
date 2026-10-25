@@ -12,7 +12,7 @@ export class Wrapped {
 	constructor(__goscriptValue?: boolean, Value$?: string, Hidden$?: dep.hidden) {
 		this.Value = Value$ ?? ""
 		this.Hidden = Hidden$ ?? new dep.hidden(true)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Wrapped {

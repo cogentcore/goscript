@@ -13,7 +13,7 @@ export class interval {
 	constructor(__goscriptValue?: boolean, start$?: number, end$?: number) {
 		this.start = start$ ?? 0
 		this.end = end$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): interval {
@@ -40,7 +40,7 @@ export class sorter {
 
 	constructor(__goscriptValue?: boolean, gaps$?: list.List | $.VarRef<list.List> | null) {
 		this.gaps = gaps$ ?? (null! as list.List | $.VarRef<list.List> | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): sorter {

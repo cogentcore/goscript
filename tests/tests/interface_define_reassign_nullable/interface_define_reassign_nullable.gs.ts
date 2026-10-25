@@ -19,7 +19,7 @@ export class Square {
 
 	constructor(__goscriptValue?: boolean, Side$?: number) {
 		this.Side = Side$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Square {

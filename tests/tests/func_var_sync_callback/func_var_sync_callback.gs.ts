@@ -10,7 +10,7 @@ export class matcher {
 
 	constructor(__goscriptValue?: boolean, match$?: ((r: number) => boolean | globalThis.Promise<boolean>) | null) {
 		this.match = match$ ?? (null! as ((r: number) => boolean | globalThis.Promise<boolean>) | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): matcher {

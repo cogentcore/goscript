@@ -8,7 +8,7 @@ export class node {
 
 	constructor(__goscriptValue?: boolean, next$?: node | $.VarRef<node> | null) {
 		this.next = next$ ?? (null! as node | $.VarRef<node> | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): node {

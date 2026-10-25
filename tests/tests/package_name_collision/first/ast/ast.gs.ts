@@ -23,7 +23,7 @@ export class Container {
 	constructor(__goscriptValue?: boolean, Parent$?: Node | null, Children$?: $.Slice<Node | null>) {
 		this.Parent = Parent$ ?? (null! as Node | null)
 		this.Children = Children$ ?? (null! as $.Slice<Node | null>)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Container {
@@ -58,7 +58,7 @@ export class List {
 	constructor(__goscriptValue?: boolean, Container$?: Container, Tight$?: boolean) {
 		this.Container = Container$ ?? new Container(true)
 		this.Tight = Tight$ ?? false
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): List {
@@ -89,7 +89,7 @@ export class ListItem {
 
 	constructor(__goscriptValue?: boolean, Container$?: Container) {
 		this.Container = Container$ ?? new Container(true)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): ListItem {
@@ -119,7 +119,7 @@ export class Paragraph {
 
 	constructor(__goscriptValue?: boolean, Container$?: Container) {
 		this.Container = Container$ ?? new Container(true)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Paragraph {
@@ -149,7 +149,7 @@ export class Type {
 
 	constructor(__goscriptValue?: boolean, IDName$?: string) {
 		this.IDName = IDName$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Type {

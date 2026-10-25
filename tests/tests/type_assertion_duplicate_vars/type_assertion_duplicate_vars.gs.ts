@@ -15,7 +15,7 @@ $.registerInterfaceType(
 
 export class ConcreteA {
 	constructor(__goscriptValue?: boolean) {
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): ConcreteA {
@@ -42,7 +42,7 @@ export class ConcreteA {
 
 export class ConcreteB {
 	constructor(__goscriptValue?: boolean) {
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): ConcreteB {
@@ -75,7 +75,7 @@ export class Container {
 	constructor(__goscriptValue?: boolean, hasA$?: boolean, hasB$?: boolean) {
 		this.hasA = hasA$ ?? false
 		this.hasB = hasB$ ?? false
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Container {

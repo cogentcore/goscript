@@ -11,7 +11,7 @@ export class namedItem {
 	constructor(__goscriptValue?: boolean, key$?: string, data$?: $.Slice<number>) {
 		this.key = key$ ?? ""
 		this.data = data$ ?? (null! as $.Slice<number>)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): namedItem {

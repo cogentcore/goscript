@@ -19,7 +19,7 @@ export class Doc {
 		this.Data = Data$ ?? (null! as $.Slice<number>)
 		this.Named = Named$ ?? (null! as Blob)
 		this.Parts = Parts$ ?? (null! as $.Slice<$.Slice<number>>)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Doc {

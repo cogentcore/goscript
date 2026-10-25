@@ -14,7 +14,7 @@ export class FuncContainer {
 
 	constructor(__goscriptValue?: boolean, myFunc$?: any) {
 		this.myFunc = myFunc$ ?? (null! as any)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): FuncContainer {

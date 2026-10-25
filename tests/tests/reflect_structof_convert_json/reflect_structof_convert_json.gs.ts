@@ -14,7 +14,7 @@ export class Node {
 	constructor(__goscriptValue?: boolean, Name$?: string, Size$?: number) {
 		this.Name = Name$ ?? ""
 		this.Size = Size$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Node {

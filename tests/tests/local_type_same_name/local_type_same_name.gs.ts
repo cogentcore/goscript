@@ -10,7 +10,7 @@ export class person {
 
 	constructor(__goscriptValue?: boolean, ID$?: number) {
 		this.ID = ID$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): person {
@@ -49,7 +49,7 @@ export function a(): any {
 		constructor(init?: Partial<{Name?: string, Age?: number}>, __goscriptValue?: boolean) {
 			this.Name = init?.Name ?? ("" as string)
 			this.Age = init?.Age ?? (0 as number)
-			;(this as any)[$.structValueMarker] = __goscriptValue === true
+			;(this as any).__goStructValue = __goscriptValue === true
 		}
 
 		public clone(): person {
@@ -79,7 +79,7 @@ export function b(): any {
 
 		constructor(init?: Partial<{Title?: string}>, __goscriptValue?: boolean) {
 			this.Title = init?.Title ?? ("" as string)
-			;(this as any)[$.structValueMarker] = __goscriptValue === true
+			;(this as any).__goStructValue = __goscriptValue === true
 		}
 
 		public clone(): person {

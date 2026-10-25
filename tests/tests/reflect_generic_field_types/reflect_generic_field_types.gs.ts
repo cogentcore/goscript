@@ -12,7 +12,7 @@ export class Item {
 	constructor(__goscriptValue?: boolean, Name$?: string, N$?: number) {
 		this.Name = Name$ ?? ""
 		this.N = N$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Item {
@@ -42,7 +42,7 @@ export class Option {
 	constructor(__goscriptValue?: boolean, Value$?: any, Valid$?: boolean) {
 		this.Value = Value$ ?? (null! as any)
 		this.Valid = Valid$ ?? false
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Option {
@@ -75,7 +75,7 @@ export class List {
 		this.Values = Values$ ?? (null! as $.Slice<any>)
 		this.Keys = Keys$ ?? (null! as $.Slice<any>)
 		this.index = index$ ?? (null! as globalThis.Map<any, number> | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): List {
@@ -109,7 +109,7 @@ export class Pair {
 		this.First = First$ ?? (null! as any)
 		this.Second = Second$ ?? (null! as any)
 		this.Both = Both$ ?? (null! as globalThis.Map<string, any> | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Pair {
@@ -146,7 +146,7 @@ export class Data {
 		this.List = List$ ?? new List(true)
 		this.Pair = Pair$ ?? new Pair(true, 0)
 		this.OptP = OptP$ ?? (null! as Option | $.VarRef<Option> | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Data {

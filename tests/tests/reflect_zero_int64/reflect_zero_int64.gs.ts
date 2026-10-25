@@ -13,7 +13,7 @@ export class timer {
 	constructor(__goscriptValue?: boolean, start$?: time.Time, total$?: time.Duration) {
 		this.start = start$ ?? $.markAsStructValue(new time.Time())
 		this.total = total$ ?? 0n
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): timer {

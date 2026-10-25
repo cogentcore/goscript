@@ -20,7 +20,7 @@ export class Element {
 		this.prev = prev$ ?? (null! as Element | $.VarRef<Element> | null)
 		this.list = list$ ?? (null! as List | $.VarRef<List> | null)
 		this.Value = Value$ ?? (null! as any)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Element {
@@ -84,7 +84,7 @@ export class List {
 		this.root = root$ ?? $.genericInstance(new Element(true, undefined, undefined, undefined, null), () => [{List: (receiver: any) => $.pointerValue(receiver).List({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }}), Next: (receiver: any) => $.pointerValue(receiver).Next({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }}), Prev: (receiver: any) => $.pointerValue(receiver).Prev({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }})}, [$.methodSignature("List", [], [/* @__PURE__ */ $.pointerType("list.List")], true, false), $.methodSignature("Next", [], [/* @__PURE__ */ $.pointerType("list.Element")], true, false), $.methodSignature("Prev", [], [/* @__PURE__ */ $.pointerType("list.Element")], true, false)]])
 		this.len = len$ ?? 0
 		this.pool = pool$ ?? (null! as sync.Pool | $.VarRef<sync.Pool> | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): List {

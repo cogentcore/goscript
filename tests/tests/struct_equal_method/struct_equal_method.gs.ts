@@ -12,7 +12,7 @@ export class pos {
 	constructor(__goscriptValue?: boolean, Line$?: number, Char$?: number) {
 		this.Line = Line$ ?? 0
 		this.Char = Char$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): pos {
@@ -42,7 +42,7 @@ export class stamp {
 	constructor(__goscriptValue?: boolean, Sec$?: bigint, NSec$?: number) {
 		this.Sec = Sec$ ?? 0n
 		this.NSec = NSec$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): stamp {
@@ -75,7 +75,7 @@ export class region {
 		this.Start = Start$ ?? new pos(true)
 		this.End = End$ ?? new pos(true)
 		this.Time = Time$ ?? new stamp(true)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): region {
@@ -103,7 +103,7 @@ export class node {
 
 	constructor(__goscriptValue?: boolean, Name$?: string) {
 		this.Name = Name$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): node {
@@ -147,7 +147,7 @@ export class mixed {
 		this.Any = Any$ ?? (null! as any)
 		this._blank5 = _blank5$ ?? 0
 		this.Inner = Inner$ ?? new pos(true)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): mixed {
@@ -179,7 +179,7 @@ export class withArray {
 
 	constructor(__goscriptValue?: boolean, Vals$?: number[]) {
 		this.Vals = Vals$ ?? $.arrayValue(globalThis.Array.from({ length: 2 }, () => 0))
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): withArray {

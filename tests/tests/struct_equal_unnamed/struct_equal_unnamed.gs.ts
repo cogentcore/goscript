@@ -11,7 +11,7 @@ export class Point {
 	constructor(__goscriptValue?: boolean, X$?: number, Y$?: number) {
 		this.X = X$ ?? 0
 		this.Y = Y$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Point {
@@ -49,7 +49,7 @@ export class Box {
 		this.Min = Min$ ?? new Point(true)
 		this.Max = Max$ ?? new Point(true)
 		this.Name = Name$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Box {
@@ -80,7 +80,7 @@ export class Pair {
 	constructor(__goscriptValue?: boolean, A$?: Point, B$?: {"X": number, "Y": number}) {
 		this.A = A$ ?? new Point(true)
 		this.B = B$ ?? $.anonymousStructValue({"X": 0, "Y": 0}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("X", /* @__PURE__ */ $.basicType("int"), [0], 0, true), /* @__PURE__ */ $.structField("Y", /* @__PURE__ */ $.basicType("int"), [1], 8, true)] })
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Pair {

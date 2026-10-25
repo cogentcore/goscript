@@ -11,7 +11,7 @@ export class unit {
 	constructor(__goscriptValue?: boolean, V$?: number, U$?: string) {
 		this.V = V$ ?? 0
 		this.U = U$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): unit {
@@ -47,7 +47,7 @@ export class sides {
 		this.Right = Right$ ?? (null! as any)
 		this.Bottom = Bottom$ ?? (null! as any)
 		this.Left = Left$ ?? (null! as any)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): sides {
@@ -92,7 +92,7 @@ export class values {
 	constructor(__goscriptValue?: boolean, sides$?: sides, Name$?: string) {
 		this.sides = sides$ ?? $.genericInstance(new sides(true, new unit(true), new unit(true), new unit(true), new unit(true)), __goscriptStatic1)
 		this.Name = Name$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): values {
@@ -126,7 +126,7 @@ export class pair {
 	constructor(__goscriptValue?: boolean, Key$?: any, Val$?: any) {
 		this.Key = Key$ ?? (null! as any)
 		this.Val = Val$ ?? (null! as any)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): pair {

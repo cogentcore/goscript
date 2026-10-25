@@ -44,7 +44,7 @@ export class transport {
 
 	constructor(__goscriptValue?: boolean, values$?: globalThis.Map<number, number> | null) {
 		this.values = values$ ?? (null! as globalThis.Map<number, number> | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): transport {
@@ -75,7 +75,7 @@ export class packetHandlerMap {
 
 	constructor(__goscriptValue?: boolean, values$?: globalThis.Map<number, number> | null) {
 		this.values = values$ ?? (null! as globalThis.Map<number, number> | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): packetHandlerMap {
@@ -106,7 +106,7 @@ export class connRunnerCallbacks {
 
 	constructor(__goscriptValue?: boolean, AddConnectionID$?: ((_p0: number) => void) | null) {
 		this.AddConnectionID = AddConnectionID$ ?? (null! as ((_p0: number) => void) | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): connRunnerCallbacks {

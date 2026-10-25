@@ -43,7 +43,7 @@ export class descending {
 
 	constructor(__goscriptValue?: boolean, values$?: $.Slice<number>) {
 		this.values = values$ ?? (null! as $.Slice<number>)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): descending {

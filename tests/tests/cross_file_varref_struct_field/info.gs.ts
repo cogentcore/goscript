@@ -11,7 +11,7 @@ export class floatInfo {
 	constructor(__goscriptValue?: boolean, mantbits$?: number, expbits$?: number) {
 		this.mantbits = mantbits$ ?? 0
 		this.expbits = expbits$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): floatInfo {

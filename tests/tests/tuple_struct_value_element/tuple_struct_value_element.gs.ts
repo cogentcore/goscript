@@ -11,7 +11,7 @@ export class order {
 	constructor(__goscriptValue?: boolean, keys$?: $.Slice<$.Slice<number>>, done$?: number) {
 		this.keys = keys$ ?? (null! as $.Slice<$.Slice<number>>)
 		this.done = done$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): order {

@@ -11,7 +11,7 @@ export class file {
 	constructor(__goscriptValue?: boolean, name$?: string, data$?: $.Slice<number>) {
 		this.name = name$ ?? ""
 		this.data = data$ ?? (null! as $.Slice<number>)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): file {

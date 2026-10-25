@@ -36,7 +36,7 @@ $.registerInterfaceType(
 
 export class handler {
 	constructor(__goscriptValue?: boolean) {
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): handler {
@@ -61,7 +61,7 @@ export class handler {
 
 export class genericResolver {
 	constructor(__goscriptValue?: boolean) {
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): genericResolver {
@@ -94,7 +94,7 @@ export class genericValue {
 
 	constructor(__goscriptValue?: boolean, value$?: number) {
 		this.value = value$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): genericValue {

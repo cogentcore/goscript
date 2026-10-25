@@ -8,7 +8,7 @@ export class _object {
 
 	constructor(__goscriptValue?: boolean, name$?: string) {
 		this.name = name$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): _object {
@@ -42,7 +42,7 @@ export class Var {
 	constructor(__goscriptValue?: boolean, _object$?: _object, kind$?: number) {
 		this._object = _object$ ?? new _object(true)
 		this.kind = kind$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Var {
@@ -73,7 +73,7 @@ export class _number {
 
 	constructor(__goscriptValue?: boolean, n$?: number) {
 		this.n = n$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): _number {
@@ -102,7 +102,7 @@ export class Holder {
 	constructor(__goscriptValue?: boolean, _number$?: _number | $.VarRef<_number> | null, _string$?: string) {
 		this._number = _number$ ?? (null! as _number | $.VarRef<_number> | null)
 		this._string = _string$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Holder {

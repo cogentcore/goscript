@@ -24,7 +24,7 @@ export class signedKey {
 	constructor(__goscriptValue?: boolean, PubKey$?: $.Slice<number>, Signature$?: $.Slice<number>) {
 		this.PubKey = PubKey$ ?? (null! as $.Slice<number>)
 		this.Signature = Signature$ ?? (null! as $.Slice<number>)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): signedKey {

@@ -21,7 +21,7 @@ export class node {
 	constructor(__goscriptValue?: boolean, Name$?: string, N$?: number) {
 		this.Name = Name$ ?? ""
 		this.N = N$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): node {
@@ -59,7 +59,7 @@ export class tree {
 		this.Kids = Kids$ ?? (null! as $.Slice<tree | $.VarRef<tree> | null>)
 		this.Attrs = Attrs$ ?? (null! as globalThis.Map<string, string> | null)
 		this.Up = Up$ ?? (null! as tree | $.VarRef<tree> | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): tree {

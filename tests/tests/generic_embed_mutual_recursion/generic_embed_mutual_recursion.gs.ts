@@ -29,7 +29,7 @@ export class AppBase {
 
 	constructor(__goscriptValue?: boolean, Windows$?: $.Slice<any>) {
 		this.Windows = Windows$ ?? (null! as $.Slice<any>)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): AppBase {
@@ -76,7 +76,7 @@ export class WindowBase {
 	constructor(__goscriptValue?: boolean, App$?: any, name$?: string) {
 		this.App = App$ ?? (null! as any)
 		this.name = name$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): WindowBase {
@@ -114,7 +114,7 @@ export class MyApp {
 
 	constructor(__goscriptValue?: boolean, AppBase$?: AppBase) {
 		this.AppBase = AppBase$ ?? $.genericInstance(new AppBase(true), __goscriptStatic1)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): MyApp {
@@ -148,7 +148,7 @@ export class MyWindow {
 
 	constructor(__goscriptValue?: boolean, WindowBase$?: WindowBase) {
 		this.WindowBase = WindowBase$ ?? $.genericInstance(new WindowBase(true, null! as MyApp | $.VarRef<MyApp> | null), __goscriptStatic3)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): MyWindow {

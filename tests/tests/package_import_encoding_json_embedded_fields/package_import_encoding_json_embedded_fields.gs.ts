@@ -19,7 +19,7 @@ export class Base {
 		this.Kids = Kids$ ?? (null! as $.Slice<string>)
 		this.hidden = hidden$ ?? 0
 		this.Shadowed = Shadowed$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Base {
@@ -48,7 +48,7 @@ export class inner {
 
 	constructor(__goscriptValue?: boolean, Deep$?: number) {
 		this.Deep = Deep$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): inner {
@@ -74,7 +74,7 @@ export class Extra {
 
 	constructor(__goscriptValue?: boolean, Note$?: string) {
 		this.Note = Note$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Extra {
@@ -118,7 +118,7 @@ export class Node {
 		this.Shadowed = Shadowed$ ?? ""
 		this.Size = Size$ ?? 0
 		this._private = _private$ ?? false
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Node {

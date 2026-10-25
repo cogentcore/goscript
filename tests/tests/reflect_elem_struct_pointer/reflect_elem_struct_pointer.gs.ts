@@ -32,7 +32,7 @@ export class T {
 	constructor(__goscriptValue?: boolean, A$?: string, B$?: number) {
 		this.A = A$ ?? ""
 		this.B = B$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): T {
@@ -59,7 +59,7 @@ export class square {
 
 	constructor(__goscriptValue?: boolean, Side$?: number) {
 		this.Side = Side$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): square {
@@ -93,7 +93,7 @@ export class holder {
 	constructor(__goscriptValue?: boolean, S$?: shape | null, A$?: any) {
 		this.S = S$ ?? (null! as shape | null)
 		this.A = A$ ?? (null! as any)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): holder {
@@ -123,7 +123,7 @@ export class base {
 	constructor(__goscriptValue?: boolean, This$?: node | null, Name$?: string) {
 		this.This = This$ ?? (null! as node | null)
 		this.Name = Name$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): base {
@@ -163,7 +163,7 @@ export class widget {
 	constructor(__goscriptValue?: boolean, base$?: base, X$?: number) {
 		this.base = base$ ?? new base(true)
 		this.X = X$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): widget {
@@ -201,7 +201,7 @@ export class body {
 	constructor(__goscriptValue?: boolean, widget$?: widget, Title$?: string) {
 		this.widget = widget$ ?? new widget(true)
 		this.Title = Title$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): body {

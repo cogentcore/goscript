@@ -5,7 +5,7 @@ import * as $ from "@goscript/builtin/index.js"
 
 export class embedded {
 	constructor(__goscriptValue?: boolean) {
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): embedded {
@@ -37,7 +37,7 @@ export class holder {
 	constructor(__goscriptValue?: boolean, Database$?: string, embedded$?: embedded) {
 		this.Database = Database$ ?? ""
 		this.embedded = embedded$ ?? new embedded(true)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): holder {

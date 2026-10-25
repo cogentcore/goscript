@@ -26,7 +26,7 @@ export class slowName {
 
 	constructor(__goscriptValue?: boolean, ch$?: $.Channel<string> | null) {
 		this.ch = ch$ ?? (null! as $.Channel<string> | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): slowName {
@@ -61,7 +61,7 @@ export class reading {
 	constructor(__goscriptValue?: boolean, Name$?: slowName, Value$?: number) {
 		this.Name = Name$ ?? new slowName(true)
 		this.Value = Value$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): reading {
@@ -88,7 +88,7 @@ export class tag {
 
 	constructor(__goscriptValue?: boolean, name$?: string) {
 		this.name = name$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): tag {
@@ -125,7 +125,7 @@ export class plain {
 		this.Tag = Tag$ ?? new tag(true)
 		this.Count = Count$ ?? 0
 		this.Tags = Tags$ ?? (null! as $.Slice<string>)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): plain {
@@ -153,7 +153,7 @@ export class codeError {
 
 	constructor(__goscriptValue?: boolean, code$?: number) {
 		this.code = code$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): codeError {

@@ -41,7 +41,7 @@ export class Doc {
 		this.Styles = Styles$ ?? (null! as globalThis.Map<string, Style> | null)
 		this.Counts = Counts$ ?? (null! as globalThis.Map<number, number> | null)
 		this.Big = Big$ ?? (null! as globalThis.Map<bigint, string> | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Doc {

@@ -12,7 +12,7 @@ export class table {
 	constructor(__goscriptValue?: boolean, Mutex$?: sync.Mutex, byAddr$?: globalThis.Map<string, $.Slice<string>> | null) {
 		this.Mutex = Mutex$ ?? $.markAsStructValue(new sync.Mutex())
 		this.byAddr = byAddr$ ?? (null! as globalThis.Map<string, $.Slice<string>> | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): table {

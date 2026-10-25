@@ -29,7 +29,7 @@ export class ChannelProcessor {
 
 	constructor(__goscriptValue?: boolean, ch$?: $.Channel<number> | null) {
 		this.ch = ch$ ?? (null! as $.Channel<number> | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): ChannelProcessor {
@@ -70,7 +70,7 @@ export class SimpleProcessor {
 
 	constructor(__goscriptValue?: boolean, value$?: number) {
 		this.value = value$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): SimpleProcessor {
@@ -110,7 +110,7 @@ export class GenericChannelStore {
 	constructor(__goscriptValue?: boolean, ch$?: $.Channel<any> | null, value$?: any) {
 		this.ch = ch$ ?? (null! as $.Channel<any> | null)
 		this.value = value$ ?? (null! as any)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): GenericChannelStore {

@@ -25,7 +25,7 @@ export class Rule {
 	constructor(__goscriptValue?: boolean, name$?: string, act$?: ((r: Rule | $.VarRef<Rule> | null, n: number) => number | globalThis.Promise<number>) | null) {
 		this.name = name$ ?? ""
 		this.act = act$ ?? (null! as ((r: Rule | $.VarRef<Rule> | null, n: number) => number | globalThis.Promise<number>) | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Rule {
@@ -52,7 +52,7 @@ export class counter {
 
 	constructor(__goscriptValue?: boolean, total$?: number) {
 		this.total = total$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): counter {
@@ -84,7 +84,7 @@ export class chanSource {
 
 	constructor(__goscriptValue?: boolean, ch$?: $.Channel<number> | null) {
 		this.ch = ch$ ?? (null! as $.Channel<number> | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): chanSource {
@@ -117,7 +117,7 @@ export class fnSource {
 
 	constructor(__goscriptValue?: boolean, f$?: (() => number | globalThis.Promise<number>) | null) {
 		this.f = f$ ?? (null! as (() => number | globalThis.Promise<number>) | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): fnSource {

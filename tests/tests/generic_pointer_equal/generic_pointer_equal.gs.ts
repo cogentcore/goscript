@@ -15,7 +15,7 @@ export class node {
 		this.name = name$ ?? ""
 		this.parent = parent$ ?? (null! as node | $.VarRef<node> | null)
 		this.children = children$ ?? (null! as $.Slice<node | $.VarRef<node> | null>)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): node {
@@ -46,7 +46,7 @@ export class point {
 	constructor(__goscriptValue?: boolean, x$?: number, y$?: number) {
 		this.x = x$ ?? 0
 		this.y = y$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): point {
@@ -76,7 +76,7 @@ export class pair {
 	constructor(__goscriptValue?: boolean, a$?: point, b$?: point) {
 		this.a = a$ ?? new point(true)
 		this.b = b$ ?? new point(true)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): pair {

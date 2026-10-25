@@ -8,7 +8,7 @@ export class worker {
 
 	constructor(__goscriptValue?: boolean, base$?: number) {
 		this.base = base$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): worker {

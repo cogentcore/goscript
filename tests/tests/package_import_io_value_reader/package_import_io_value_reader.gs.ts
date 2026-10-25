@@ -7,7 +7,7 @@ import * as strings from "@goscript/strings/index.js"
 
 export class zeroReader {
 	constructor(__goscriptValue?: boolean) {
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): zeroReader {

@@ -14,7 +14,7 @@ export class config {
 	constructor(__goscriptValue?: boolean, Name$?: string, UsesCgo$?: boolean) {
 		this.Name = Name$ ?? ""
 		this.UsesCgo = UsesCgo$ ?? false
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): config {

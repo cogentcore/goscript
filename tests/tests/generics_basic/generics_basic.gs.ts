@@ -30,7 +30,7 @@ export class Stack {
 
 	constructor(__goscriptValue?: boolean, items$?: $.Slice<any>) {
 		this.items = items$ ?? (null! as $.Slice<any>)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Stack {
@@ -79,7 +79,7 @@ export class Item {
 
 	constructor(__goscriptValue?: boolean, Name$?: string) {
 		this.Name = Name$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Item {
@@ -113,7 +113,7 @@ export class Mapper {
 
 	constructor(__goscriptValue?: boolean, values$?: globalThis.Map<any, any> | null) {
 		this.values = values$ ?? (null! as globalThis.Map<any, any> | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Mapper {
@@ -153,7 +153,7 @@ export class Pair {
 	constructor(__goscriptValue?: boolean, First$?: any, Second$?: any) {
 		this.First = First$ ?? (null! as any)
 		this.Second = Second$ ?? (null! as any)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Pair {

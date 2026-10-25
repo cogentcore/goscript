@@ -18,7 +18,7 @@ export class connector {
 	constructor(__goscriptValue?: boolean, direct$?: boolean, blob$?: boolean) {
 		this.direct = direct$ ?? false
 		this.blob = blob$ ?? false
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): connector {
@@ -93,7 +93,7 @@ export class rows {
 	constructor(__goscriptValue?: boolean, done$?: boolean, blob$?: boolean) {
 		this.done = done$ ?? false
 		this.blob = blob$ ?? false
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): rows {
@@ -143,7 +143,7 @@ export class columnRows {
 
 	constructor(__goscriptValue?: boolean, rows$?: rows) {
 		this.rows = rows$ ?? new rows(true)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): columnRows {
@@ -256,7 +256,7 @@ export async function main(): globalThis.Promise<void> {
 
 		constructor(init?: Partial<{Value?: number}>, __goscriptValue?: boolean) {
 			this.Value = init?.Value ?? (0 as number)
-			;(this as any)[$.structValueMarker] = __goscriptValue === true
+			;(this as any).__goStructValue = __goscriptValue === true
 		}
 
 		public clone(): tagged {
@@ -281,7 +281,7 @@ export async function main(): globalThis.Promise<void> {
 
 		constructor(init?: Partial<{Value?: number}>, __goscriptValue?: boolean) {
 			this.Value = init?.Value ?? (0 as number)
-			;(this as any)[$.structValueMarker] = __goscriptValue === true
+			;(this as any).__goStructValue = __goscriptValue === true
 		}
 
 		public clone(): retagged {

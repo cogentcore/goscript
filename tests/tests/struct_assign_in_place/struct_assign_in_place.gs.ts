@@ -13,7 +13,7 @@ export class Inner {
 	constructor(__goscriptValue?: boolean, X$?: number, Y$?: number) {
 		this.X = X$ ?? 0
 		this.Y = Y$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Inner {
@@ -49,7 +49,7 @@ export class Outer {
 		this.Arr = Arr$ ?? $.arrayValue(globalThis.Array.from({ length: 2 }, () => 0))
 		this.Ptr = Ptr$ ?? (null! as Inner | $.VarRef<Inner> | null)
 		this.N = N$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Outer {
@@ -81,7 +81,7 @@ export class Pair {
 	constructor(__goscriptValue?: boolean, Key$?: string, Val$?: any) {
 		this.Key = Key$ ?? ""
 		this.Val = Val$ ?? (null! as any)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Pair {
@@ -108,7 +108,7 @@ export class Holder {
 
 	constructor(__goscriptValue?: boolean, P$?: Pair) {
 		this.P = P$ ?? new Pair(true, undefined, null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Holder {
@@ -134,7 +134,7 @@ export class Event {
 
 	constructor(__goscriptValue?: boolean, Kind$?: Kind) {
 		this.Kind = Kind$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Event {

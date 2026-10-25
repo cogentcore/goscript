@@ -9,7 +9,7 @@ export class loader {
 
 	constructor(__goscriptValue?: boolean, load$?: ((_p0: string) => [any, boolean] | globalThis.Promise<[any, boolean]>) | null) {
 		this.load = load$ ?? (null! as ((_p0: string) => [any, boolean] | globalThis.Promise<[any, boolean]>) | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): loader {

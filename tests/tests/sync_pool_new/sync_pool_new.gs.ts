@@ -9,7 +9,7 @@ export class buffer {
 
 	constructor(__goscriptValue?: boolean, data$?: $.Slice<number>) {
 		this.data = data$ ?? (null! as $.Slice<number>)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): buffer {

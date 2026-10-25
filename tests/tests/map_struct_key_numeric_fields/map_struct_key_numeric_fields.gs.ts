@@ -11,7 +11,7 @@ export class Pos {
 	constructor(__goscriptValue?: boolean, Ln$?: number, Ch$?: number) {
 		this.Ln = Ln$ ?? 0
 		this.Ch = Ch$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Pos {
@@ -47,7 +47,7 @@ export class Key {
 		this.At = At$ ?? new Pos(true)
 		this.On = On$ ?? false
 		this.F = F$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Key {
@@ -76,7 +76,7 @@ export class Rule {
 
 	constructor(__goscriptValue?: boolean, Name$?: string) {
 		this.Name = Name$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Rule {
@@ -105,7 +105,7 @@ export class ScopeRule {
 	constructor(__goscriptValue?: boolean, Scope$?: Pos, Rule$?: Rule | $.VarRef<Rule> | null) {
 		this.Scope = Scope$ ?? new Pos(true)
 		this.Rule = Rule$ ?? (null! as Rule | $.VarRef<Rule> | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): ScopeRule {
@@ -135,7 +135,7 @@ export class Pair {
 	constructor(__goscriptValue?: boolean, A$?: string, B$?: string) {
 		this.A = A$ ?? ""
 		this.B = B$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Pair {
@@ -165,7 +165,7 @@ export class Other {
 	constructor(__goscriptValue?: boolean, A$?: string, B$?: string) {
 		this.A = A$ ?? ""
 		this.B = B$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Other {
@@ -195,7 +195,7 @@ export class Vec {
 	constructor(__goscriptValue?: boolean, X$?: number, Y$?: number) {
 		this.X = X$ ?? 0
 		this.Y = Y$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Vec {
@@ -225,7 +225,7 @@ export class Cplx {
 	constructor(__goscriptValue?: boolean, C$?: $.Complex, N$?: number) {
 		this.C = C$ ?? $.complex(0, 0)
 		this.N = N$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Cplx {

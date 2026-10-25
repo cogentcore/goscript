@@ -11,7 +11,7 @@ export class Pos {
 	constructor(__goscriptValue?: boolean, Line$?: number, Char$?: number) {
 		this.Line = Line$ ?? 0
 		this.Char = Char$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Pos {
@@ -41,7 +41,7 @@ export class Region {
 	constructor(__goscriptValue?: boolean, Start$?: Pos, End$?: Pos) {
 		this.Start = Start$ ?? new Pos(true)
 		this.End = End$ ?? new Pos(true)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Region {
@@ -83,7 +83,7 @@ export class State {
 	constructor(__goscriptValue?: boolean, reg$?: Region, n$?: number) {
 		this.reg = reg$ ?? new Region(true)
 		this.n = n$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): State {

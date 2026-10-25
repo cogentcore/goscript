@@ -13,7 +13,7 @@ export class Item {
 	constructor(__goscriptValue?: boolean, Size$?: number, Plain$?: string) {
 		this.Size = Size$ ?? 0
 		this.Plain = Plain$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Item {

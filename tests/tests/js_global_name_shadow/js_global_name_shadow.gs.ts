@@ -12,7 +12,7 @@ export class Promise {
 
 	constructor(__goscriptValue?: boolean, value$?: string) {
 		this.value = value$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Promise {
@@ -41,7 +41,7 @@ export class point {
 	constructor(__goscriptValue?: boolean, x$?: number, y$?: number) {
 		this.x = x$ ?? 0
 		this.y = y$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): point {

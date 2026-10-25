@@ -13,7 +13,7 @@ export class Base {
 	constructor(__goscriptValue?: boolean, self$?: Base | $.VarRef<Base> | null, n$?: number) {
 		this.self = self$ ?? (null! as Base | $.VarRef<Base> | null)
 		this.n = n$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Base {

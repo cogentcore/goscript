@@ -7,7 +7,7 @@ import "./consts.gs.ts"
 
 export class thing {
 	constructor(__goscriptValue?: boolean) {
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): thing {

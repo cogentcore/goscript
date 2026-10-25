@@ -46,7 +46,7 @@ export class pairingOffer {
 
 	constructor(__goscriptValue?: boolean, Note$?: string) {
 		this.Note = Note$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): pairingOffer {

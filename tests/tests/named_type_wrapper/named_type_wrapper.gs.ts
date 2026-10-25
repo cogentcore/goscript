@@ -25,7 +25,7 @@ export class FileStatus {
 	constructor(__goscriptValue?: boolean, mode$?: MyFileMode, size$?: bigint) {
 		this.mode = mode$ ?? 0
 		this.size = size$ ?? 0n
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): FileStatus {

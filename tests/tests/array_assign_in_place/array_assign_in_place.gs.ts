@@ -8,7 +8,7 @@ export class T {
 
 	constructor(__goscriptValue?: boolean, v$?: number) {
 		this.v = v$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): T {
@@ -42,7 +42,7 @@ export class S {
 	constructor(__goscriptValue?: boolean, A$?: T[], N$?: number[]) {
 		this.A = A$ ?? $.arrayValue(globalThis.Array.from({ length: 2 }, () => new T(true)), /* @__PURE__ */ $.arrayType("main.T", 2))
 		this.N = N$ ?? $.arrayValue(globalThis.Array.from({ length: 3 }, () => 0))
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): S {

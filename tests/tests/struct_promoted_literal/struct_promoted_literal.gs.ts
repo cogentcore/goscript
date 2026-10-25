@@ -13,7 +13,7 @@ export class Person {
 	constructor(__goscriptValue?: boolean, Name$?: string, Age$?: number) {
 		this.Name = Name$ ?? ""
 		this.Age = Age$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Person {
@@ -44,7 +44,7 @@ export class Employee {
 	constructor(__goscriptValue?: boolean, Person$?: Person, ID$?: number) {
 		this.Person = Person$ ?? new Person(true)
 		this.ID = ID$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Employee {
@@ -76,7 +76,7 @@ export class Address {
 	constructor(__goscriptValue?: boolean, Street$?: string, City$?: string) {
 		this.Street = Street$ ?? ""
 		this.City = City$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Address {
@@ -114,7 +114,7 @@ export class Manager {
 		this.Address = Address$ ?? new Address(true)
 		this.Phone = Phone$ ?? ""
 		this.Level = Level$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Manager {
@@ -147,7 +147,7 @@ export class Team {
 	constructor(__goscriptValue?: boolean, Employee$?: Employee, Active$?: boolean) {
 		this.Employee = Employee$ ?? new Employee(true)
 		this.Active = Active$ ?? false
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Team {
@@ -179,7 +179,7 @@ export class LiteralValue {
 	constructor(__goscriptValue?: boolean, Value$?: any, Zero$?: any) {
 		this.Value = Value$ ?? (null! as any)
 		this.Zero = Zero$ ?? (null! as any)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): LiteralValue {
@@ -206,7 +206,7 @@ export class LiteralContainer {
 
 	constructor(__goscriptValue?: boolean, LiteralValue$?: LiteralValue) {
 		this.LiteralValue = LiteralValue$ ?? new LiteralValue(true, null, null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): LiteralContainer {

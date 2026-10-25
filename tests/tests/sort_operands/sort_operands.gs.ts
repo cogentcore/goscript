@@ -28,7 +28,7 @@ export class slowInts {
 	constructor(__goscriptValue?: boolean, xs$?: $.Slice<number>, ch$?: $.Channel<number> | null) {
 		this.xs = xs$ ?? (null! as $.Slice<number>)
 		this.ch = ch$ ?? (null! as $.Channel<number> | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): slowInts {

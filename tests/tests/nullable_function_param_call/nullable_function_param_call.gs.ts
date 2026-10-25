@@ -44,7 +44,7 @@ export class MockFileInfo {
 		this.name = name$ ?? ""
 		this.size = size$ ?? 0n
 		this.isDir = isDir$ ?? false
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): MockFileInfo {
@@ -84,7 +84,7 @@ export class MockFileInfo {
 
 export class MockFilesystem {
 	constructor(__goscriptValue?: boolean) {
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): MockFilesystem {

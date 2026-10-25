@@ -23,7 +23,7 @@ export class Node {
 	constructor(__goscriptValue?: boolean, name$?: string, self$?: Node | $.VarRef<Node> | null) {
 		this.name = name$ ?? ""
 		this.self = self$ ?? (null! as Node | $.VarRef<Node> | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Node {
@@ -89,7 +89,7 @@ export class Item {
 		this.Group = Group$ ?? $.anonymousStructValue({"Leaf": new Node(true)}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("Leaf", "main.Node", [0], 0, true)] })
 		this.List = List$ ?? (null! as $.Slice<Node>)
 		this.Pair = Pair$ ?? $.arrayValue(globalThis.Array.from({ length: 2 }, () => new Node(true)), /* @__PURE__ */ $.arrayType("main.Node", 2))
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Item {
@@ -135,7 +135,7 @@ export class Outer {
 
 	constructor(__goscriptValue?: boolean, Item$?: Item) {
 		this.Item = Item$ ?? new Item(true)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Outer {
@@ -180,7 +180,7 @@ export class Self {
 	constructor(__goscriptValue?: boolean, self$?: Self | $.VarRef<Self> | null, v$?: any) {
 		this.self = self$ ?? (null! as Self | $.VarRef<Self> | null)
 		this.v = v$ ?? (null! as any)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Self {
@@ -214,7 +214,7 @@ export class Box {
 
 	constructor(__goscriptValue?: boolean, values$?: $.Slice<any>) {
 		this.values = values$ ?? (null! as $.Slice<any>)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Box {

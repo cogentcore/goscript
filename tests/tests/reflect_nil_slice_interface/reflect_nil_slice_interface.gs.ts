@@ -9,7 +9,7 @@ export class S1 {
 
 	constructor(__goscriptValue?: boolean, Name$?: string) {
 		this.Name = Name$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): S1 {
@@ -44,7 +44,7 @@ export class S5 {
 		this.M = M$ ?? (null! as globalThis.Map<string, number> | null)
 		this.P = P$ ?? (null! as S1 | $.VarRef<S1> | null)
 		this.F = F$ ?? (null! as (() => void) | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): S5 {

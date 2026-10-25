@@ -11,7 +11,7 @@ export class Col {
 	constructor(__goscriptValue?: boolean, Name$?: string, Default$?: $.VarRef<number> | null) {
 		this.Name = Name$ ?? ""
 		this.Default = Default$ ?? (null! as $.VarRef<number> | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Col {

@@ -12,7 +12,7 @@ export class Process {
 	constructor(__goscriptValue?: boolean, pid$?: number, done$?: $.Channel<{}> | null) {
 		this.pid = pid$ ?? 0
 		this.done = done$ ?? (null! as $.Channel<{}> | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Process {

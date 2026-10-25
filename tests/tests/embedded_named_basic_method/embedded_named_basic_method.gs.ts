@@ -55,7 +55,7 @@ export class Engineer {
 	constructor(__goscriptValue?: boolean, Level$?: Level, Name$?: string) {
 		this.Level = Level$ ?? 0
 		this.Name = Name$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Engineer {
@@ -86,7 +86,7 @@ export class Lead {
 
 	constructor(__goscriptValue?: boolean, Engineer$?: Engineer) {
 		this.Engineer = Engineer$ ?? new Engineer(true)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Lead {
@@ -116,7 +116,7 @@ export class Post {
 
 	constructor(__goscriptValue?: boolean, Tags$?: Tags) {
 		this.Tags = Tags$ ?? (null! as Tags)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Post {

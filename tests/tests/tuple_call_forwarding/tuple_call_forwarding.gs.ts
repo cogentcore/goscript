@@ -22,7 +22,7 @@ export class point {
 	constructor(__goscriptValue?: boolean, x$?: number, y$?: number) {
 		this.x = x$ ?? 0
 		this.y = y$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): point {
@@ -49,7 +49,7 @@ export class frame {
 
 	constructor(__goscriptValue?: boolean, name$?: string) {
 		this.name = name$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): frame {
@@ -80,7 +80,7 @@ export class tab {
 
 	constructor(__goscriptValue?: boolean, name$?: string) {
 		this.name = name$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): tab {
@@ -111,7 +111,7 @@ export class tabs {
 
 	constructor(__goscriptValue?: boolean, count$?: number) {
 		this.count = count$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): tabs {

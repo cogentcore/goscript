@@ -8,7 +8,7 @@ export class counter {
 
 	constructor(__goscriptValue?: boolean, value$?: number) {
 		this.value = value$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): counter {
@@ -42,7 +42,7 @@ export class inner {
 	constructor(__goscriptValue?: boolean, name$?: string, count$?: counter) {
 		this.name = name$ ?? ""
 		this.count = count$ ?? new counter(true)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): inner {
@@ -69,7 +69,7 @@ export class outer {
 
 	constructor(__goscriptValue?: boolean, inner$?: inner | $.VarRef<inner> | null) {
 		this.inner = inner$ ?? (null! as inner | $.VarRef<inner> | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): outer {

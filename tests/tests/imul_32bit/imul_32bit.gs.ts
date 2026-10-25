@@ -17,7 +17,7 @@ export class multiplyCase {
 		this.y = y$ ?? 0
 		this.unsigned = unsigned$ ?? 0
 		this.signed = signed$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): multiplyCase {

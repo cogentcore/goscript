@@ -25,7 +25,7 @@ export class BaseStore {
 
 	constructor(__goscriptValue?: boolean, CoreStore$?: inner.CoreStore | $.VarRef<inner.CoreStore> | null) {
 		this.CoreStore = CoreStore$ ?? (null! as inner.CoreStore | $.VarRef<inner.CoreStore> | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): BaseStore {

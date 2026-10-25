@@ -9,7 +9,7 @@ export class Simple {
 
 	constructor(__goscriptValue?: boolean, X$?: number) {
 		this.X = X$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Simple {

@@ -18,7 +18,7 @@ export class blankImpl {
 
 	constructor(__goscriptValue?: boolean, value$?: number) {
 		this.value = value$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): blankImpl {
@@ -46,7 +46,7 @@ export class blankImpl {
 
 export class Packer {
 	constructor(__goscriptValue?: boolean) {
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Packer {

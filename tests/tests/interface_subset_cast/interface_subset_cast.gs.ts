@@ -32,7 +32,7 @@ export class MyStruct {
 	constructor(__goscriptValue?: boolean, Value1$?: string, Value2$?: string) {
 		this.Value1 = Value1$ ?? ""
 		this.Value2 = Value2$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): MyStruct {

@@ -21,7 +21,7 @@ export class MyReader {
 	constructor(__goscriptValue?: boolean, Reader$?: Reader | null, name$?: string) {
 		this.Reader = Reader$ ?? (null! as Reader | null)
 		this.name = name$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): MyReader {
@@ -55,7 +55,7 @@ export class StringReader {
 	constructor(__goscriptValue?: boolean, data$?: string, pos$?: number) {
 		this.data = data$ ?? ""
 		this.pos = pos$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): StringReader {

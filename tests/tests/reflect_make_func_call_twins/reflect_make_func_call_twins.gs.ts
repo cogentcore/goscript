@@ -24,7 +24,7 @@ export class Node {
 	constructor(__goscriptValue?: boolean, Name$?: string, Kids$?: $.Slice<Node | $.VarRef<Node> | null>) {
 		this.Name = Name$ ?? ""
 		this.Kids = Kids$ ?? (null! as $.Slice<Node | $.VarRef<Node> | null>)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Node {
@@ -76,7 +76,7 @@ export class Tree {
 	constructor(__goscriptValue?: boolean, Node$?: Node | $.VarRef<Node> | null, Title$?: string) {
 		this.Node = Node$ ?? (null! as Node | $.VarRef<Node> | null)
 		this.Title = Title$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Tree {
@@ -111,7 +111,7 @@ export class Doc {
 
 	constructor(__goscriptValue?: boolean, Walker$?: Walker | null) {
 		this.Walker = Walker$ ?? (null! as Walker | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Doc {
@@ -148,7 +148,7 @@ export class Button {
 	constructor(__goscriptValue?: boolean, onClick$?: ((n: number) => string | globalThis.Promise<string>) | null, clicks$?: number) {
 		this.onClick = onClick$ ?? (null! as ((n: number) => string | globalThis.Promise<string>) | null)
 		this.clicks = clicks$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Button {

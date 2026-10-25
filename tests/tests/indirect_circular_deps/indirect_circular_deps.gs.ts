@@ -8,7 +8,7 @@ export class A {
 
 	constructor(__goscriptValue?: boolean, BB$?: $.Slice<B>) {
 		this.BB = BB$ ?? (null! as $.Slice<B>)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): A {
@@ -34,7 +34,7 @@ export class B {
 
 	constructor(__goscriptValue?: boolean, AA$?: $.Slice<A>) {
 		this.AA = AA$ ?? (null! as $.Slice<A>)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): B {

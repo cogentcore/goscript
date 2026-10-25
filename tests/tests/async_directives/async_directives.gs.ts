@@ -30,7 +30,7 @@ export class prefixLogger {
 
 	constructor(__goscriptValue?: boolean, prefix$?: string) {
 		this.prefix = prefix$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): prefixLogger {
@@ -61,7 +61,7 @@ export class addSink {
 
 	constructor(__goscriptValue?: boolean, total$?: number) {
 		this.total = total$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): addSink {
@@ -94,7 +94,7 @@ export class chanSink {
 
 	constructor(__goscriptValue?: boolean, ch$?: $.Channel<number> | null) {
 		this.ch = ch$ ?? (null! as $.Channel<number> | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): chanSink {
@@ -131,7 +131,7 @@ export class Button {
 	constructor(__goscriptValue?: boolean, OnClick$?: ((clicks: number) => number | globalThis.Promise<number>) | null, OnHover$?: ((clicks: number) => number | globalThis.Promise<number>) | null) {
 		this.OnClick = OnClick$ ?? (null! as ((clicks: number) => number | globalThis.Promise<number>) | null)
 		this.OnHover = OnHover$ ?? (null! as ((clicks: number) => number | globalThis.Promise<number>) | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Button {
@@ -158,7 +158,7 @@ export class summer {
 
 	constructor(__goscriptValue?: boolean, n$?: number) {
 		this.n = n$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): summer {

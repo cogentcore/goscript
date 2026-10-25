@@ -11,7 +11,7 @@ export class Value {
 	constructor(__goscriptValue?: boolean, V$?: number, Unit$?: number) {
 		this.V = V$ ?? 0
 		this.Unit = Unit$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Value {
@@ -47,7 +47,7 @@ export class Sides {
 		this.Right = Right$ ?? (null! as any)
 		this.Bottom = Bottom$ ?? (null! as any)
 		this.Left = Left$ ?? (null! as any)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Sides {
@@ -76,7 +76,7 @@ export class Values {
 
 	constructor(__goscriptValue?: boolean, Sides$?: Sides) {
 		this.Sides = Sides$ ?? new Sides(true, new Value(true), new Value(true), new Value(true), new Value(true))
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Values {
@@ -105,7 +105,7 @@ export class Pair {
 	constructor(__goscriptValue?: boolean, Key$?: any, Val$?: any) {
 		this.Key = Key$ ?? (null! as any)
 		this.Val = Val$ ?? (null! as any)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Pair {
@@ -135,7 +135,7 @@ export class withClone {
 	constructor(init?: Partial<{clone?: (() => number | globalThis.Promise<number>) | null, n?: number}>, __goscriptValue?: boolean) {
 		this.clone = init?.clone ?? (null! as (() => number | globalThis.Promise<number>) | null)
 		this.n = init?.n ?? (0 as number)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public __goscriptClone(): withClone {

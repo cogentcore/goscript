@@ -14,7 +14,7 @@ export class command {
 		this.name = name$ ?? ""
 		this.flags = flags$ ?? (null! as $.Slice<string>)
 		this.action = action$ ?? (null! as (() => number | globalThis.Promise<number>) | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): command {
@@ -42,7 +42,7 @@ export class config {
 
 	constructor(__goscriptValue?: boolean, flags$?: ((prefix: string) => $.Slice<string> | globalThis.Promise<$.Slice<string>>) | null) {
 		this.flags = flags$ ?? (null! as ((prefix: string) => $.Slice<string> | globalThis.Promise<$.Slice<string>>) | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): config {

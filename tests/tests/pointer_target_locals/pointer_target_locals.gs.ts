@@ -14,7 +14,7 @@ export class Node {
 		this.Name = Name$ ?? ""
 		this.Count = Count$ ?? 0
 		this.Next = Next$ ?? (null! as Node | $.VarRef<Node> | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Node {
@@ -59,7 +59,7 @@ export class Holder {
 
 	constructor(__goscriptValue?: boolean, items$?: $.Slice<Node>) {
 		this.items = items$ ?? (null! as $.Slice<Node>)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Holder {

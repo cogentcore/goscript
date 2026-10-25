@@ -9,7 +9,7 @@ export class bValue {
 
 	constructor(__goscriptValue?: boolean, inner$?: __goscript_a.aValue) {
 		this.inner = inner$ ?? new __goscript_a.aValue(true)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): bValue {

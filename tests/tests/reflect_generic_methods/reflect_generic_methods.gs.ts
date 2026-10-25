@@ -29,7 +29,7 @@ export class Base {
 
 	constructor(__goscriptValue?: boolean, Vals$?: $.Slice<any>) {
 		this.Vals = Vals$ ?? (null! as $.Slice<any>)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Base {
@@ -92,7 +92,7 @@ export class Number {
 
 	constructor(__goscriptValue?: boolean, Base$?: Base | $.VarRef<Base> | null) {
 		this.Base = Base$ ?? (null! as Base | $.VarRef<Base> | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Number {
@@ -146,7 +146,7 @@ export class Pair {
 	constructor(__goscriptValue?: boolean, A$?: any, B$?: any) {
 		this.A = A$ ?? (null! as any)
 		this.B = B$ ?? (null! as any)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Pair {
@@ -233,7 +233,7 @@ export async function main(): globalThis.Promise<void> {
 
 		constructor(init?: Partial<{N?: Number | $.VarRef<Number> | null}>, __goscriptValue?: boolean) {
 			this.N = init?.N ?? (null! as Number | $.VarRef<Number> | null)
-			;(this as any)[$.structValueMarker] = __goscriptValue === true
+			;(this as any).__goStructValue = __goscriptValue === true
 		}
 
 		public clone(): holder {

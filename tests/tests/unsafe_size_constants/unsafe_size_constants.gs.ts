@@ -19,7 +19,7 @@ export class Data {
 		this.B = B$ ?? 0
 		this.C = C$ ?? 0
 		this.D = D$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Data {
@@ -54,7 +54,7 @@ export class Mixed {
 		this.Flag = Flag$ ?? false
 		this.N = N$ ?? 0
 		this.V = V$ ?? $.arrayValue(globalThis.Array.from({ length: 3 }, () => 0), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("float32"), 3))
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Mixed {

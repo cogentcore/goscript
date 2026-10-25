@@ -10,7 +10,7 @@ export class attrs {
 
 	constructor(__goscriptValue?: boolean, packedData$?: string) {
 		this.packedData = packedData$ ?? ""
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): attrs {

@@ -8,7 +8,7 @@ export class holder {
 
 	constructor(__goscriptValue?: boolean, values$?: $.VarRef<$.Slice<number>> | null) {
 		this.values = values$ ?? (null! as $.VarRef<$.Slice<number>> | null)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): holder {

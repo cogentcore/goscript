@@ -18,7 +18,7 @@ export class box {
 
 	constructor(__goscriptValue?: boolean, value$?: any) {
 		this.value = value$ ?? (null! as any)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): box {
@@ -49,7 +49,7 @@ export class holder {
 
 	constructor(__goscriptValue?: boolean, box$?: box) {
 		this.box = box$ ?? $.genericInstance(new box(true, null), () => [{Value: (receiver: any) => $.pointerValue(receiver).Value({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: { kind: $.TypeKind.Interface, methods: [] }, zero: () => null }})}, [$.methodSignature("Value", [], [{ kind: $.TypeKind.Interface, methods: [] }], true, false)]])
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): holder {

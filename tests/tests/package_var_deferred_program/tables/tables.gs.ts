@@ -13,7 +13,7 @@ export class Codec {
 	constructor(__goscriptValue?: boolean, Name$?: string, Decode$?: Uint8Array) {
 		this.Name = Name$ ?? ""
 		this.Decode = Decode$ ?? $.arrayValue(new Uint8Array(256))
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Codec {
@@ -40,7 +40,7 @@ export class Counter {
 
 	constructor(__goscriptValue?: boolean, N$?: number) {
 		this.N = N$ ?? 0
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): Counter {
