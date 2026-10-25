@@ -120,7 +120,7 @@ class subFS {
     {
       let { value: e, ok: ok } = $.typeAssert<PathError | null>(err, {
         kind: $.TypeKind.Pointer,
-        elemType: 'PathError',
+        elemType: 'fs.PathError',
       })
       if (ok) {
         {
@@ -222,7 +222,7 @@ class subFS {
 
   // Register this type with the runtime type system
   static __typeInfo = $.registerStructType(
-    'subFS',
+    'fs.subFS',
     new subFS(),
     [
       {

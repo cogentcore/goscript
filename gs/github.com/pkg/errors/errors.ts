@@ -66,7 +66,7 @@ class fundamental {
   }
 
   static __typeInfo = $.registerStructType(
-    'fundamental',
+    'errors.fundamental',
     new fundamental(),
     [
       {
@@ -137,7 +137,7 @@ class withStack {
   }
 
   static __typeInfo = $.registerStructType(
-    'withStack',
+    'errors.withStack',
     new withStack(),
     [
       {
@@ -289,7 +289,7 @@ class withMessage {
   }
 
   static __typeInfo = $.registerStructType(
-    'withMessage',
+    'errors.withMessage',
     new withMessage(),
     [
       {

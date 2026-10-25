@@ -195,7 +195,7 @@ export class Reader {
 
   // Register this type with the runtime type system
   static __typeInfo = $.registerStructType(
-    'Reader',
+    'strings.Reader',
     new Reader(),
     [
       {

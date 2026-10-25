@@ -58,7 +58,7 @@ class dirInfo {
 
 	// Register this type with the runtime type system
 	static __typeInfo = $.registerStructType(
-	  'dirInfo',
+	  'os.dirInfo',
 	  new dirInfo(),
 	  [{ name: "close", args: [], returns: [] }],
 	  dirInfo,

@@ -79,7 +79,7 @@ export class Value {
 
 	// Register this type with the runtime type system
 	static __typeInfo = $.registerStructType(
-	  'Value',
+	  'atomic.Value',
 	  new Value(),
 	  [{ name: "Load", args: [], returns: [{ type: { kind: $.TypeKind.Interface, methods: [] } }] }, { name: "Store", args: [{ name: "val", type: { kind: $.TypeKind.Interface, methods: [] } }], returns: [] }, { name: "Swap", args: [{ name: "new", type: { kind: $.TypeKind.Interface, methods: [] } }], returns: [{ type: { kind: $.TypeKind.Interface, methods: [] } }] }, { name: "CompareAndSwap", args: [{ name: "old", type: { kind: $.TypeKind.Interface, methods: [] } }, { name: "new", type: { kind: $.TypeKind.Interface, methods: [] } }], returns: [{ type: { kind: $.TypeKind.Basic, name: "boolean" } }] }],
 	  Value,
@@ -106,7 +106,7 @@ class efaceWords {
 
 	// Register this type with the runtime type system
 	static __typeInfo = $.registerStructType(
-	  'efaceWords',
+	  'atomic.efaceWords',
 	  new efaceWords(),
 	  [],
 	  efaceWords,

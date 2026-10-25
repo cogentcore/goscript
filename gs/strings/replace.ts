@@ -146,7 +146,7 @@ export class Replacer {
 
   // Register this type with the runtime type system
   static __typeInfo = $.registerStructType(
-    'Replacer',
+    'strings.Replacer',
     new Replacer(),
     [
       { name: 'buildOnce', args: [], returns: [] },

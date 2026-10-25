@@ -40,12 +40,12 @@ export class Process {
 
 	// Register this type with the runtime type system
 	static __typeInfo = $.registerStructType(
-		'Process',
+		'os.Process',
 		new Process(),
 		[
 			{ name: "Release", args: [], returns: [{ type: { kind: $.TypeKind.Interface, name: 'GoError', methods: [{ name: 'Error', args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: 'string' } }] }] } }] },
 			{ name: "Kill", args: [], returns: [{ type: { kind: $.TypeKind.Interface, name: 'GoError', methods: [{ name: 'Error', args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: 'string' } }] }] } }] },
-			{ name: "Wait", args: [], returns: [{ type: { kind: $.TypeKind.Pointer, elemType: "ProcessState" } }, { type: { kind: $.TypeKind.Interface, name: 'GoError', methods: [{ name: 'Error', args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: 'string' } }] }] } }] },
+			{ name: "Wait", args: [], returns: [{ type: { kind: $.TypeKind.Pointer, elemType: "os.ProcessState" } }, { type: { kind: $.TypeKind.Interface, name: 'GoError', methods: [{ name: 'Error', args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: 'string' } }] }] } }] },
 			{ name: "Signal", args: [{ name: "sig", type: "Signal" }], returns: [{ type: { kind: $.TypeKind.Interface, name: 'GoError', methods: [{ name: 'Error', args: [], returns: [{ type: { kind: $.TypeKind.Basic, name: 'string' } }] }] } }] }
 		],
 		Process,
@@ -81,7 +81,7 @@ export class ProcAttr {
 
 	// Register this type with the runtime type system
 	static __typeInfo = $.registerStructType(
-		'ProcAttr',
+		'os.ProcAttr',
 		new ProcAttr(),
 		[],
 		ProcAttr,
@@ -102,7 +102,7 @@ export class ProcessState {
 
 	// Register this type with the runtime type system
 	static __typeInfo = $.registerStructType(
-		'ProcessState',
+		'os.ProcessState',
 		new ProcessState(),
 		[],
 		ProcessState,
