@@ -331,6 +331,12 @@ const duplicateTypeRegistry = new Map<string, TypeInfo[]>()
 // results that depend on the registry can tell when it has changed.
 let typeRegistryGeneration = 0
 
+// typeRegistryVersion returns the number of type registrations so far, for
+// caches of other packages that depend on the registry.
+export function typeRegistryVersion(): number {
+  return typeRegistryGeneration
+}
+
 function registerTypeInfo(name: string, typeInfo: TypeInfo): void {
   typeRegistryGeneration++
   const existing = typeRegistry.get(name)

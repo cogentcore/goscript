@@ -1469,16 +1469,8 @@ export class Value {
     }
 
     // Find whether the type or its pointer element is named.
-    const typeInfo = typeInfoFromReflectType(this._type)
-    const namedType =
-      this._type.Name() !== '' &&
-      (this._type.PkgPath() !== '' ||
-        runtimeTypeString(this._type).includes('.'))
-    const elemType = this._type.Kind() === Ptr ? this._type.Elem() : null
-    const namedElemType =
-      elemType !== null &&
-      elemType.Name() !== '' &&
-      (elemType.PkgPath() !== '' || runtimeTypeString(elemType).includes('.'))
+    const { typeInfo, typeString, namedType, elemType, namedElemType } =
+      boxingInfo(this._type)
 
     // An instance of a generic struct type is boxed with the methods of its
     // instantiated type, as the compiler boxes it, since its methods take
@@ -1487,7 +1479,7 @@ export class Value {
     if (generic !== undefined) {
       return $.namedValueInterfaceValue<ReflectValue>(
         $.isVarRef(current) ? current.value : current,
-        runtimeTypeString(this._type),
+        typeString,
         generic.methods,
         typeInfo,
         generic.signatures,
@@ -1506,28 +1498,24 @@ export class Value {
       }
       return $.interfaceValue<ReflectValue>(
         target ?? null,
-        runtimeTypeString(this._type),
+        typeString,
         typeInfo,
       )
     }
 
     // Box a named value with its type.
     if (this._type.Kind() === Struct && namedType) {
-      return $.interfaceValue<ReflectValue>(
-        current,
-        runtimeTypeString(this._type),
-        typeInfo,
-      )
+      return $.interfaceValue<ReflectValue>(current, typeString, typeInfo)
     }
     if (
       (namedType && this._type.Kind() !== Struct) ||
       (this._type.Kind() === Ptr && namedElemType)
     ) {
       // Use the registered method set, so the box satisfies interfaces.
-      const registered = $.namedValueMethods(runtimeTypeString(this._type))
+      const registered = $.namedValueMethods(typeString)
       return $.namedValueInterfaceValue<ReflectValue>(
         current,
-        runtimeTypeString(this._type),
+        typeString,
         registered?.methods ?? {},
         typeInfo,
         registered?.signatures,
@@ -1546,21 +1534,14 @@ export class Value {
       kind !== Uint64 &&
       kind !== Uintptr
     ) {
-      return $.basicInterfaceValue<ReflectValue>(
-        current,
-        runtimeTypeString(this._type),
-      )
+      return $.basicInterfaceValue<ReflectValue>(current, typeString)
     }
 
     // Box an unnamed value with its type, as the compiler does when it
     // converts the value to an interface. A nil slice, map, func, chan or
     // pointer then keeps its type, so the interface is not nil, and a
     // pointer such as *[]T reports its type to reflect.ValueOf.
-    return $.interfaceValue<ReflectValue>(
-      current,
-      runtimeTypeString(this._type),
-      typeInfo,
-    )
+    return $.interfaceValue<ReflectValue>(current, typeString, typeInfo)
   }
 
   public MethodByName(name: string): Value {
@@ -3668,6 +3649,48 @@ function typeArgumentType(
   return t.Kind() !== Interface ? t : undefined
 }
 
+// BoxingInfo is what Interface needs to know about a type to box a value
+// of it.
+interface BoxingInfo {
+  typeInfo: $.TypeInfo | string
+  typeString: string
+  namedType: boolean
+  elemType: Type | null
+  namedElemType: boolean
+}
+
+// boxingInfos caches the BoxingInfo of each type, with the version of the
+// type registry it was worked out at: registering a type can name another.
+const boxingInfos = new WeakMap<Type, [number, BoxingInfo]>()
+
+// boxingInfo returns the BoxingInfo of t: its type info and runtime name,
+// and whether it, or the element of a pointer type, is named.
+function boxingInfo(t: Type): BoxingInfo {
+  const version = $.typeRegistryVersion()
+  const cached = boxingInfos.get(t)
+  if (cached !== undefined && cached[0] === version) {
+    return cached[1]
+  }
+  // The type info is made first: making it can register t, which can
+  // change its runtime name.
+  const typeInfo = typeInfoFromReflectType(t)
+  const typeString = runtimeTypeString(t)
+  const elemType = t.Kind() === Ptr ? t.Elem() : null
+  const info: BoxingInfo = {
+    typeInfo,
+    typeString,
+    namedType:
+      t.Name() !== '' && (t.PkgPath() !== '' || typeString.includes('.')),
+    elemType,
+    namedElemType:
+      elemType !== null &&
+      elemType.Name() !== '' &&
+      (elemType.PkgPath() !== '' || runtimeTypeString(elemType).includes('.')),
+  }
+  boxingInfos.set(t, [version, info])
+  return info
+}
+
 // genericInstanceMethodSet returns the method set of typ, a struct type or a
 // pointer to one, when value, a value of typ, is an instance of a generic
 // struct type, else undefined.
@@ -4114,7 +4137,46 @@ function methodFromSignature(
   })
 }
 
+// MethodTypes holds the method types made from a signature, at a version
+// of the type registry: the one without receiver, and those with each
+// receiver.
+interface MethodTypes {
+  version: number
+  bare?: Type
+  byReceiver: WeakMap<Type, Type>
+}
+
+// methodTypes caches the method types made from each signature, which
+// resolve its types by name, so registering a type empties it.
+const methodTypes = new WeakMap<$.MethodSignature, MethodTypes>()
+
+// methodTypeFromSignature returns the type of the method of signature, with
+// receiver as its first parameter when includeReceiver is set.
 function methodTypeFromSignature(
+  signature: $.MethodSignature,
+  receiver: Type,
+  includeReceiver: boolean,
+): Type {
+  const version = $.typeRegistryVersion()
+  let cached = methodTypes.get(signature)
+  if (cached === undefined || cached.version !== version) {
+    cached = { version, byReceiver: new WeakMap() }
+    methodTypes.set(signature, cached)
+  }
+  if (!includeReceiver) {
+    cached.bare ??= makeMethodType(signature, receiver, false)
+    return cached.bare
+  }
+  let typ = cached.byReceiver.get(receiver)
+  if (typ === undefined) {
+    typ = makeMethodType(signature, receiver, true)
+    cached.byReceiver.set(receiver, typ)
+  }
+  return typ
+}
+
+// makeMethodType makes the type that methodTypeFromSignature returns.
+function makeMethodType(
   signature: $.MethodSignature,
   receiver: Type,
   includeReceiver: boolean,
@@ -4256,6 +4318,12 @@ function typeMethodByName(t: Type, name: string): [Method, boolean] {
 function typeAssignableTo(t: Type, u: Type | null): boolean {
   if (u === null) {
     return false
+  }
+
+  // Identical types have one kind, so a type is assignable to a type of
+  // another kind only if that is an interface it implements.
+  if (t.Kind() !== u.Kind()) {
+    return u.Kind() === Interface && t.Implements(u)
   }
   if (typeIdentityKey(t) === typeIdentityKey(u)) {
     return true
@@ -5536,7 +5604,69 @@ export function TypeOf(i: ReflectValue): Type | null {
   if (i === null || i === undefined) {
     return null
   }
-  return internType(getTypeOf(i))
+  return internedTypeOf(i)
+}
+
+// boxedTypes holds the canonical type of the values boxed with each type
+// name and type info name, which depends only on them. Registering a type
+// can change the type they give, so the cache is emptied when the registry
+// changes.
+const boxedTypes = new globalThis.Map<string, Type>()
+let boxedTypesVersion = -1
+
+// internedTypeOf returns the canonical type of i. The type of a value boxed
+// with a type name is cached by the name, since working it out and finding
+// its canonical type, by a key of its whole structure, is slow. A named
+// value box is not cached: the method signatures it carries can grow.
+function internedTypeOf(i: ReflectValue): Type {
+  const key = boxedTypeKey(i)
+  if (key === undefined) {
+    return internType(getTypeOf(i))
+  }
+  const version = $.typeRegistryVersion()
+  if (version !== boxedTypesVersion) {
+    boxedTypes.clear()
+    boxedTypesVersion = version
+  }
+  let typ = boxedTypes.get(key)
+  if (typ === undefined) {
+    typ = internType(getTypeOf(i))
+    boxedTypes.set(key, typ)
+  }
+  return typ
+}
+
+// boxedTypeKey returns the key of the type that the object i is boxed
+// with: its type name and the name of its type info, or of the element of a
+// pointer type info, or undefined for another value. The type name alone
+// does not tell apart the instances of a generic type boxed in generic code.
+function boxedTypeKey(i: ReflectValue): string | undefined {
+  if (
+    typeof i !== 'object' ||
+    i === null ||
+    $.isVarRef(i) ||
+    $.isNamedValueBox(i) ||
+    $.isTypedNilValue(i)
+  ) {
+    return undefined
+  }
+  const boxed = i as {
+    __goType?: unknown
+    __goTypeInfo?: $.TypeInfo | string
+  }
+  const info = boxed.__goTypeInfo
+  if (typeof boxed.__goType !== 'string' || info === undefined) {
+    return undefined
+  }
+  let infoName: string | undefined
+  if (typeof info === 'string') {
+    infoName = info
+  } else if (info.name) {
+    infoName = info.name
+  } else if ($.isPointerTypeInfo(info) && typeof info.elemType === 'string') {
+    infoName = '*' + info.elemType
+  }
+  return infoName === undefined ? undefined : boxed.__goType + ' ' + infoName
 }
 
 // ValueOf returns a Value holding i, or the zero Value for a nil interface
@@ -5545,7 +5675,7 @@ export function ValueOf(i: ReflectValue): Value {
   if (i === null || i === undefined) {
     return new Value()
   }
-  const typ = internType(getTypeOf(i))
+  const typ = internedTypeOf(i)
   if ($.isNamedValueBox(i)) {
     // Named interface boxes contain Go values, which are all reflectable.
     return new Value(
