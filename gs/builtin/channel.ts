@@ -1,3 +1,4 @@
+import { GoPanic, RuntimeError, runtimePanic } from './panic.js'
 import { queueTask } from './scheduler.js'
 
 /**
@@ -371,6 +372,12 @@ export async function chanRecvWithOk<T>(
  * @param direction Optional direction for the channel. Default is 'both' (bidirectional).
  * @returns A new channel instance or channel reference.
  */
+// closedSendPanic returns the Go runtime panic of a send on a closed channel,
+// to throw or to reject a waiting send with.
+function closedSendPanic(): GoPanic {
+  return new GoPanic(new RuntimeError('send on closed channel'))
+}
+
 export function makeChannel<T>(
   bufferSize: number,
   zeroValue: T,
@@ -391,6 +398,10 @@ export function makeChannel<T>(
   zeroValue: T,
   direction: 'send' | 'receive' | 'both' = 'both',
 ): Channel<T> | ChannelRef<T> {
+  // A negative size panics as in Go, so recover sees a runtime.Error.
+  if (bufferSize < 0) {
+    runtimePanic('makechan: size out of range')
+  }
   const channel = new BufferedChannel<T>(bufferSize, zeroValue)
 
   if (direction === 'send') {
@@ -439,7 +450,7 @@ class BufferedChannel<T> implements Channel<T> {
 
   async send(value: T): Promise<void> {
     if (this.closed) {
-      throw new Error('send on closed channel')
+      throw closedSendPanic()
     }
 
     // Attempt to hand off to a waiting receiver (rendezvous)
@@ -627,7 +638,7 @@ class BufferedChannel<T> implements Channel<T> {
 
   trySelectSend(value: T, id: number): SelectResult<boolean> | undefined {
     if (this.closed) {
-      throw new Error('send on closed channel')
+      throw closedSendPanic()
     }
     // Sends must hand off to already waiting receivers before using spare
     // buffer capacity, including through the select fast path.
@@ -662,7 +673,7 @@ class BufferedChannel<T> implements Channel<T> {
       onCommit?.()
       // A select case sending on a closed channel panics in Go.
       // This will cause Promise.race in selectStatement to reject.
-      throw new Error('send on closed channel')
+      throw closedSendPanic()
     }
 
     if (this.receivers.length > 0) {
@@ -736,16 +747,14 @@ class BufferedChannel<T> implements Channel<T> {
 
   close(): void {
     if (this.closed) {
-      throw new Error('close of closed channel')
+      runtimePanic('close of closed channel')
     }
     this.closed = true
 
     const sendersToNotify = [...this.senders] // Shallow copy for iteration
     this.senders = []
     for (const senderTask of sendersToNotify) {
-      scheduleClosedChannelWake(() =>
-        senderTask.rejectSend(new Error('send on closed channel')),
-      )
+      scheduleClosedChannelWake(() => senderTask.rejectSend(closedSendPanic()))
     }
 
     const receiversToNotify = [...this.receivers]

@@ -12,6 +12,8 @@ import {
   recovered,
   runtimePanic,
 } from './panic.js'
+import { makeChannel } from './channel.js'
+import { mapSet } from './map.js'
 import { goSlice, index, makeSlice } from './slice.js'
 import { DisposableStack } from './defer.js'
 
@@ -90,6 +92,50 @@ describe('runtime panics route through GoPanic', () => {
     expect(((caught as GoPanic).value as RuntimeError).Error()).toBe(
       'runtime error: makeslice: cap out of range',
     )
+  })
+
+  it('makechan with negative size panics with the Go message', () => {
+    const caught = captureThrow(() => makeChannel(-1, 0, 'both'))
+
+    expect(caught).toBeInstanceOf(GoPanic)
+    expect(((caught as GoPanic).value as RuntimeError).Error()).toBe(
+      'makechan: size out of range',
+    )
+  })
+
+  it('assignment to a nil map panics with the Go message', () => {
+    const caught = captureThrow(() => mapSet(null, 'k', 1))
+
+    expect(caught).toBeInstanceOf(GoPanic)
+    expect(((caught as GoPanic).value as RuntimeError).Error()).toBe(
+      'assignment to entry in nil map',
+    )
+  })
+
+  it('close of a closed channel panics with the Go message', () => {
+    const ch = makeChannel(0, 0, 'both')
+    ch.close()
+    const caught = captureThrow(() => ch.close())
+
+    expect(caught).toBeInstanceOf(GoPanic)
+    expect(((caught as GoPanic).value as RuntimeError).Error()).toBe(
+      'close of closed channel',
+    )
+  })
+
+  it('send on a closed channel panics with the Go message', async () => {
+    const ch = makeChannel(1, 0, 'both')
+    ch.close()
+    const caught = await ch.send(1).then(
+      () => undefined,
+      (e: unknown) => e,
+    )
+
+    expect(caught).toBeInstanceOf(GoPanic)
+    expect(((caught as GoPanic).value as RuntimeError).Error()).toBe(
+      'send on closed channel',
+    )
+    recovered(caught as GoPanic)
   })
 
   it('panic carries an arbitrary value that panicValue unwraps', () => {

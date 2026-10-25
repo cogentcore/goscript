@@ -1,4 +1,5 @@
 import { comparableEqual } from './builtin.js'
+import { runtimePanic } from './panic.js'
 import {
   canonicalPointerIdentity,
   isStructObject,
@@ -230,7 +231,7 @@ export function mapGet<K, V, D>(
 // mapSet preserves the existing equal key when replacing its value.
 export const mapSet = <K, V>(map: Map<K, V> | null, key: K, value: V): void => {
   if (!map) {
-    throw new Error('assign to nil map')
+    runtimePanic('assignment to entry in nil map')
   }
   const canonical = goMapStructKey(map, key)
   if (canonical !== undefined) {
