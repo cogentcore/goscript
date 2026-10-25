@@ -168,6 +168,11 @@ export class Method {
     }
   }
 
+  // IsExported reports whether the method is exported.
+  public IsExported(): boolean {
+    return this.PkgPath === ''
+  }
+
   // clone copies the method, as Go copies a Method struct value.
   public clone(): Method {
     return new Method(this)
