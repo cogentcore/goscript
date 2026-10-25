@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"io"
 	"reflect"
+	"sort"
+	"sync"
 	"time"
 )
 
@@ -79,6 +81,9 @@ func main() {
 	println("fmt.ScanState:", scanState.String(), scanState.Kind().String(), scanState.NumMethod())
 	scanner := reflect.TypeFor[fmt.Scanner]()
 	println("fmt.Scanner:", scanner.String(), scanner.Kind().String(), scanner.NumMethod())
+	for _, t := range []reflect.Type{reflect.TypeFor[sort.Interface](), reflect.TypeFor[sync.Locker]()} {
+		println("interface:", t.String(), t.Kind().String(), t.NumMethod())
+	}
 
 	println("reflect_typefor test finished")
 }

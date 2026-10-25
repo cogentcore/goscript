@@ -13,6 +13,24 @@ export interface Interface {
   Swap(i: number, j: number): void | Promise<void>
 }
 
+// Interface is registered with the runtime type system, so reflection sees
+// an interface type with its methods.
+$.registerInterfaceType('sort.Interface', null, [
+  $.methodSignature('Len', [], [$.basicType('int')]),
+  $.methodSignature(
+    'Less',
+    [
+      ['i', $.basicType('int')],
+      ['j', $.basicType('int')],
+    ],
+    [$.basicType('bool')],
+  ),
+  $.methodSignature('Swap', [
+    ['i', $.basicType('int')],
+    ['j', $.basicType('int')],
+  ]),
+])
+
 // Helper type for slice metadata
 interface SliceMetadata<T> {
   backing: T[]
