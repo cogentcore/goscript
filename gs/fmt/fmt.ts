@@ -522,6 +522,15 @@ function nilString(
   return '<nil>'
 }
 
+// reflectValueOperand returns the value that an operand that is a valid
+// reflect.Value holds, which fmt formats in its place, as Go's fmt does. An
+// invalid Value stays, to format as <invalid reflect.Value>.
+function reflectValueOperand(operand: any): any {
+  return operand instanceof Value && operand.IsValid() ?
+      operand.Interface()
+    : operand
+}
+
 /** defaultFormatMaybe renders Go values without exposing their runtime storage. */
 function defaultFormatMaybe(
   value: any,
@@ -530,6 +539,9 @@ function defaultFormatMaybe(
   typeInfo?: $.TypeInfo | string,
   allowMethods = true,
 ): MaybeString {
+  if (depth === 0) {
+    value = reflectValueOperand(value)
+  }
   if (value === null || value === undefined) {
     return nilString(typeInfo, flags)
   }
@@ -850,6 +862,7 @@ function formatOperandMaybe(
   width: string,
   precision: string,
 ): MaybeString {
+  arg = reflectValueOperand(arg)
   if (
     ($.isArrayOrGoSlice(arg) || isNumberTypedSlice(arg)) &&
     elementwiseVerbs.has(verb)

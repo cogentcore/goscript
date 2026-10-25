@@ -5,6 +5,7 @@ import * as $ from "@goscript/builtin/index.js"
 import * as bytes from "@goscript/bytes/index.js"
 import * as errors from "@goscript/errors/index.js"
 import * as fmt from "@goscript/fmt/index.js"
+import * as reflect from "@goscript/reflect/index.js"
 import type * as io from "@goscript/io/index.js"
 
 export type num = number
@@ -48,9 +49,9 @@ export class byteFormatter {
 	static __typeInfo = $.registerStructType(
 		"main.byteFormatter",
 		() => new byteFormatter(),
-		() => [{ name: "Format", args: [{ type: { kind: $.TypeKind.Basic, name: "unknown" } }, { type: { kind: $.TypeKind.Basic, name: "unknown" } }], returns: [] }],
+		() => [$.methodSignature("Format", [["state", "fmt.State"], ["verb", /* @__PURE__ */ $.basicType("int32")]])],
 		byteFormatter,
-		() => [{ name: "prefix", key: "prefix", type: /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")) }]
+		() => [/* @__PURE__ */ $.structField("prefix", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8")), [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/package_import_fmt" })]
 	)
 }
 
@@ -80,7 +81,7 @@ export class pos {
 		() => new pos(),
 		() => [],
 		pos,
-		() => [{ name: "Line", key: "Line", type: /* @__PURE__ */ $.basicType("int") }, { name: "Char", key: "Char", type: /* @__PURE__ */ $.basicType("int") }]
+		() => [/* @__PURE__ */ $.structField("Line", /* @__PURE__ */ $.basicType("int"), [0], 0, true), /* @__PURE__ */ $.structField("Char", /* @__PURE__ */ $.basicType("int"), [1], 8, true)]
 	)
 }
 
@@ -160,6 +161,40 @@ export async function main(): globalThis.Promise<void> {
 	sliceVerbs()
 	scanVerbs()
 
+	// A reflect.Value operand formats as the value it holds.
+	class pt {
+		public declare X: number
+
+		public declare Y: number
+
+		constructor(init?: Partial<{X?: number, Y?: number}>, __goscriptValue?: boolean) {
+			this.X = init?.X ?? (0 as number)
+			this.Y = init?.Y ?? (0 as number)
+			;(this as any)[$.structValueMarker] = __goscriptValue === true
+		}
+
+		public clone(): pt {
+			return new pt(this, true)
+		}
+
+		public __goscriptAssign(source: pt): this {
+			this.X = source.X
+			this.Y = source.Y
+			return this
+		}
+
+		static __typeInfo = $.registerStructType(
+			"main.pt",
+			() => new pt(),
+			() => [],
+			pt,
+			() => [/* @__PURE__ */ $.structField("X", /* @__PURE__ */ $.basicType("int"), [0], 0, true), /* @__PURE__ */ $.structField("Y", /* @__PURE__ */ $.basicType("int"), [1], 8, true)]
+		)
+	}
+	let rv = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.basicInterfaceValue(5, "int"))))
+	fmt.Printf("reflect: %v %d %s %+v\n", $.structInterfaceValue($.markAsStructValue($.cloneStructValue(rv)), "reflect.Value", __goscriptStatic1()), $.structInterfaceValue($.markAsStructValue($.cloneStructValue(rv)), "reflect.Value", __goscriptStatic1()), $.structInterfaceValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf("hi"))), "reflect.Value", __goscriptStatic1()), $.structInterfaceValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.structInterfaceValue($.markAsStructValue(new pt({X: 1, Y: 2})), "main.pt", "main.pt")))), "reflect.Value", __goscriptStatic1()))
+	fmt.Println("reflect:", $.structInterfaceValue(rv, "reflect.Value", __goscriptStatic1()), $.structInterfaceValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.arrayToSlice<number>([1, 2]), "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")))))), "reflect.Value", __goscriptStatic1()), $.structInterfaceValue($.markAsStructValue(new reflect.Value()), "reflect.Value", __goscriptStatic1()))
+
 	await $.println("test finished")
 }
 
@@ -185,7 +220,7 @@ export function starWidthPrecision(): void {
 	fmt.Println((fmt.Sprintf("[%*.*f]", $.basicInterfaceValue(8, "int"), $.basicInterfaceValue(2, "int"), $.basicInterfaceValue(3.14159, "float64")) as string))
 	fmt.Println((fmt.Sprintf("[%.*g]", $.basicInterfaceValue(7, "int"), $.basicInterfaceValue(13.333333015441895, "float32")) as string))
 	fmt.Println((fmt.Sprintf("[%.*d] [%s]", $.basicInterfaceValue(-1, "int"), $.basicInterfaceValue(5, "int"), "after") as string))
-	fmt.Println((fmt.Sprintf("[%v]", __goscriptStatic4()) as string))
+	fmt.Println((fmt.Sprintf("[%v]", __goscriptStatic5()) as string))
 	fmt.Println((fmt.Sprintf("[%.*d]", "x", $.basicInterfaceValue(5, "int")) as string))
 	let err = fmt.Errorf("%*s: %w", $.basicInterfaceValue(6, "int"), "ctx", (errors.New("base") as any))
 	fmt.Println((err as any), errors.Unwrap($.pointerValueOrNil(err)!) != null)
@@ -271,22 +306,27 @@ function __goscriptStatic0(): any {
 
 var __goscriptStatic1$value: any
 function __goscriptStatic1(): any {
-	return __goscriptStatic1$value ??= ({String: (receiver: any) => (num_String as any)(($.isVarRef(receiver) ? receiver.value : receiver))})
+	return __goscriptStatic1$value ??= ($.overrideTypeMethods("reflect.Value", "reflect.Value", () => [$.methodSignature("Addr", [], ["reflect.Value"]), $.methodSignature("Bool", [], [/* @__PURE__ */ $.basicType("bool")]), $.methodSignature("Bytes", [], [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))]), $.methodSignature("Call", [["in", /* @__PURE__ */ $.sliceType("reflect.Value")]], [/* @__PURE__ */ $.sliceType("reflect.Value")]), $.methodSignature("CallSlice", [["in", /* @__PURE__ */ $.sliceType("reflect.Value")]], [/* @__PURE__ */ $.sliceType("reflect.Value")]), $.methodSignature("CanAddr", [], [/* @__PURE__ */ $.basicType("bool")]), $.methodSignature("CanComplex", [], [/* @__PURE__ */ $.basicType("bool")]), $.methodSignature("CanConvert", [["t", "reflect.Type"]], [/* @__PURE__ */ $.basicType("bool")]), $.methodSignature("CanFloat", [], [/* @__PURE__ */ $.basicType("bool")]), $.methodSignature("CanInt", [], [/* @__PURE__ */ $.basicType("bool")]), $.methodSignature("CanInterface", [], [/* @__PURE__ */ $.basicType("bool")]), $.methodSignature("CanSet", [], [/* @__PURE__ */ $.basicType("bool")]), $.methodSignature("CanUint", [], [/* @__PURE__ */ $.basicType("bool")]), $.methodSignature("Cap", [], [/* @__PURE__ */ $.basicType("int")]), $.methodSignature("Clear"), $.methodSignature("Close"), $.methodSignature("Comparable", [], [/* @__PURE__ */ $.basicType("bool")]), $.methodSignature("Complex", [], [/* @__PURE__ */ $.basicType("complex128")]), $.methodSignature("Convert", [["t", "reflect.Type"]], ["reflect.Value"]), $.methodSignature("Elem", [], ["reflect.Value"]), $.methodSignature("Equal", [["u", "reflect.Value"]], [/* @__PURE__ */ $.basicType("bool")]), $.methodSignature("Field", [["i", /* @__PURE__ */ $.basicType("int")]], ["reflect.Value"]), $.methodSignature("FieldByIndex", [["index", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"))]], ["reflect.Value"]), $.methodSignature("FieldByIndexErr", [["index", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"))]], ["reflect.Value", "error"]), $.methodSignature("FieldByName", [["name", /* @__PURE__ */ $.basicType("string")]], ["reflect.Value"]), $.methodSignature("FieldByNameFunc", [["match", ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo)]], ["reflect.Value"]), $.methodSignature("Fields", [], [({ kind: $.TypeKind.Function, name: "iter.Seq2", params: [({ kind: $.TypeKind.Function, params: ["reflect.StructField", "reflect.Value"], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo)], results: [] } as $.FunctionTypeInfo)]), $.methodSignature("Float", [], [/* @__PURE__ */ $.basicType("float64")]), $.methodSignature("Grow", [["n", /* @__PURE__ */ $.basicType("int")]]), $.methodSignature("Index", [["i", /* @__PURE__ */ $.basicType("int")]], ["reflect.Value"]), $.methodSignature("Int", [], [/* @__PURE__ */ $.basicType("int64")]), $.methodSignature("Interface", [], [["i", { kind: $.TypeKind.Interface, methods: [] }]]), $.methodSignature("InterfaceData", [], [/* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.basicType("uintptr"), 2)]), $.methodSignature("IsNil", [], [/* @__PURE__ */ $.basicType("bool")]), $.methodSignature("IsValid", [], [/* @__PURE__ */ $.basicType("bool")]), $.methodSignature("IsZero", [], [/* @__PURE__ */ $.basicType("bool")]), $.methodSignature("Kind", [], [/* @__PURE__ */ $.basicType("uint", "reflect.Kind")]), $.methodSignature("Len", [], [/* @__PURE__ */ $.basicType("int")]), $.methodSignature("MapIndex", [["key", "reflect.Value"]], ["reflect.Value"]), $.methodSignature("MapKeys", [], [/* @__PURE__ */ $.sliceType("reflect.Value")]), $.methodSignature("MapRange", [], [/* @__PURE__ */ $.pointerType("reflect.MapIter")]), $.methodSignature("Method", [["i", /* @__PURE__ */ $.basicType("int")]], ["reflect.Value"]), $.methodSignature("MethodByName", [["name", /* @__PURE__ */ $.basicType("string")]], ["reflect.Value"]), $.methodSignature("Methods", [], [({ kind: $.TypeKind.Function, name: "iter.Seq2", params: [({ kind: $.TypeKind.Function, params: ["reflect.Method", "reflect.Value"], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo)], results: [] } as $.FunctionTypeInfo)]), $.methodSignature("NumField", [], [/* @__PURE__ */ $.basicType("int")]), $.methodSignature("NumMethod", [], [/* @__PURE__ */ $.basicType("int")]), $.methodSignature("OverflowComplex", [["x", /* @__PURE__ */ $.basicType("complex128")]], [/* @__PURE__ */ $.basicType("bool")]), $.methodSignature("OverflowFloat", [["x", /* @__PURE__ */ $.basicType("float64")]], [/* @__PURE__ */ $.basicType("bool")]), $.methodSignature("OverflowInt", [["x", /* @__PURE__ */ $.basicType("int64")]], [/* @__PURE__ */ $.basicType("bool")]), $.methodSignature("OverflowUint", [["x", /* @__PURE__ */ $.basicType("uint64")]], [/* @__PURE__ */ $.basicType("bool")]), $.methodSignature("Pointer", [], [/* @__PURE__ */ $.basicType("uintptr")]), $.methodSignature("Recv", [], [["x", "reflect.Value"], ["ok", /* @__PURE__ */ $.basicType("bool")]]), $.methodSignature("Send", [["x", "reflect.Value"]]), $.methodSignature("Seq", [], [({ kind: $.TypeKind.Function, name: "iter.Seq", params: [({ kind: $.TypeKind.Function, params: ["reflect.Value"], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo)], results: [] } as $.FunctionTypeInfo)]), $.methodSignature("Seq2", [], [({ kind: $.TypeKind.Function, name: "iter.Seq2", params: [({ kind: $.TypeKind.Function, params: ["reflect.Value", "reflect.Value"], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo)], results: [] } as $.FunctionTypeInfo)]), $.methodSignature("Set", [["x", "reflect.Value"]]), $.methodSignature("SetBool", [["x", /* @__PURE__ */ $.basicType("bool")]]), $.methodSignature("SetBytes", [["x", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))]]), $.methodSignature("SetCap", [["n", /* @__PURE__ */ $.basicType("int")]]), $.methodSignature("SetComplex", [["x", /* @__PURE__ */ $.basicType("complex128")]]), $.methodSignature("SetFloat", [["x", /* @__PURE__ */ $.basicType("float64")]]), $.methodSignature("SetInt", [["x", /* @__PURE__ */ $.basicType("int64")]]), $.methodSignature("SetIterKey", [["iter", /* @__PURE__ */ $.pointerType("reflect.MapIter")]]), $.methodSignature("SetIterValue", [["iter", /* @__PURE__ */ $.pointerType("reflect.MapIter")]]), $.methodSignature("SetLen", [["n", /* @__PURE__ */ $.basicType("int")]]), $.methodSignature("SetMapIndex", [["key", "reflect.Value"], ["elem", "reflect.Value"]]), $.methodSignature("SetPointer", [["x", /* @__PURE__ */ $.basicType("unknown")]]), $.methodSignature("SetString", [["x", /* @__PURE__ */ $.basicType("string")]]), $.methodSignature("SetUint", [["x", /* @__PURE__ */ $.basicType("uint64")]]), $.methodSignature("SetZero"), $.methodSignature("Slice", [["i", /* @__PURE__ */ $.basicType("int")], ["j", /* @__PURE__ */ $.basicType("int")]], ["reflect.Value"]), $.methodSignature("Slice3", [["i", /* @__PURE__ */ $.basicType("int")], ["j", /* @__PURE__ */ $.basicType("int")], ["k", /* @__PURE__ */ $.basicType("int")]], ["reflect.Value"]), $.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")]), $.methodSignature("TryRecv", [], [["x", "reflect.Value"], ["ok", /* @__PURE__ */ $.basicType("bool")]]), $.methodSignature("TrySend", [["x", "reflect.Value"]], [/* @__PURE__ */ $.basicType("bool")]), $.methodSignature("Type", [], ["reflect.Type"]), $.methodSignature("Uint", [], [/* @__PURE__ */ $.basicType("uint64")]), $.methodSignature("UnsafeAddr", [], [/* @__PURE__ */ $.basicType("uintptr")]), $.methodSignature("UnsafePointer", [], [/* @__PURE__ */ $.basicType("unknown")])]))
 }
 
 var __goscriptStatic2$value: any
 function __goscriptStatic2(): any {
-	return __goscriptStatic2$value ??= (/* @__PURE__ */ $.basicType("float32", "main.num"))
+	return __goscriptStatic2$value ??= ({String: (receiver: any) => (num_String as any)(($.isVarRef(receiver) ? receiver.value : receiver))})
 }
 
 var __goscriptStatic3$value: any
 function __goscriptStatic3(): any {
-	return __goscriptStatic3$value ??= ([$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])])
+	return __goscriptStatic3$value ??= (/* @__PURE__ */ $.basicType("float32", "main.num"))
 }
 
 var __goscriptStatic4$value: any
 function __goscriptStatic4(): any {
-	return __goscriptStatic4$value ??= ($.namedValueInterfaceValue<any>(6.666666507720947, "main.num", __goscriptStatic1(), __goscriptStatic2(), __goscriptStatic3()))
+	return __goscriptStatic4$value ??= ([$.methodSignature("String", [], [/* @__PURE__ */ $.basicType("string")])])
+}
+
+var __goscriptStatic5$value: any
+function __goscriptStatic5(): any {
+	return __goscriptStatic5$value ??= ($.namedValueInterfaceValue<any>(6.666666507720947, "main.num", __goscriptStatic2(), __goscriptStatic3(), __goscriptStatic4()))
 }
 
 if ($.isMainScript(import.meta)) {
