@@ -79,7 +79,7 @@ export function __goscript_set_Array(__goscriptValue: $.Slice<string>): void {
 
 export async function main(): globalThis.Promise<void> {
 	let p = new Promise(true, "Promise")
-	await $.println("names:", 1, 1.5, String(1), $.arrayIndex(Array!, 0), p.value)
+	await $.println("names:", 1, 1.5, String(1), $.plainSliceIndex(Array!, 0), p.value)
 
 	let a = 7
 	let b = 2

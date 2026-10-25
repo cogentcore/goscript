@@ -8,7 +8,7 @@ export function last(a: $.Slice<number>): number {
 	for (let __goscriptSliceWindow0 = $.sliceRange(a), i = 0; i < __goscriptShadow0; i++) {
 		;(__goscriptSliceWindow0.backing as any[])[$.windowSlot(__goscriptSliceWindow0, i + 1)] += ((__goscriptSliceWindow0.backing as any[])[$.windowSlot(__goscriptSliceWindow0, i)] as number)
 	}
-	return $.arrayIndex(a!, __goscriptShadow0)
+	return $.plainSliceIndex(a!, __goscriptShadow0)
 }
 
 export function capacity(a: $.Slice<number>): number {

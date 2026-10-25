@@ -81,10 +81,10 @@ export async function main(): globalThis.Promise<void> {
 
 	let prefix = new Uint8Array([9, 8, 7]) as $.Slice<number>
 	let summed = ((__goscriptAwait = (ieee !== null && (ieee as any).__isVarRef !== true && ((ieee as any).__goValue === undefined || (ieee as any).__goType?.charCodeAt(0) !== 42) ? (ieee as Exclude<hash.Hash32, null>) : $.pointerValue<Exclude<hash.Hash32, null>>(ieee)).Sum($.goSlice(prefix, undefined, $.sliceLen(prefix), $.sliceLen(prefix))), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as $.Slice<number>)
-	if (((($.sliceLen(summed) != ($.sliceLen(prefix) + crc32.Size)) || ($.arrayIndex(summed!, 0) != 9)) || ($.arrayIndex(summed!, 1) != 8)) || ($.arrayIndex(summed!, 2) != 7)) {
+	if (((($.sliceLen(summed) != ($.sliceLen(prefix) + crc32.Size)) || ($.typedSliceIndex(summed!, 0) != 9)) || ($.typedSliceIndex(summed!, 1) != 8)) || ($.typedSliceIndex(summed!, 2) != 7)) {
 		$.panic("prefix-preserving Sum")
 	}
-	await $.println("sum", $.sliceLen(summed), $.arrayIndex(summed!, 3), $.arrayIndex(summed!, 4), $.arrayIndex(summed!, 5), $.arrayIndex(summed!, 6))
+	await $.println("sum", $.sliceLen(summed), $.typedSliceIndex(summed!, 3), $.typedSliceIndex(summed!, 4), $.typedSliceIndex(summed!, 5), $.typedSliceIndex(summed!, 6))
 
 	let [marshaler, ok] = $.typeAssertTuple<encoding.BinaryMarshaler | null>(ieee, "encoding.BinaryMarshaler")
 	if (!ok) {
@@ -105,7 +105,7 @@ export async function main(): globalThis.Promise<void> {
 	let __goscriptTuple2: any = await (appender !== null && (appender as any).__isVarRef !== true && ((appender as any).__goValue === undefined || (appender as any).__goType?.charCodeAt(0) !== 42) ? (appender as Exclude<encoding.BinaryAppender, null>) : $.pointerValue<Exclude<encoding.BinaryAppender, null>>(appender)).AppendBinary(new Uint8Array([4, 5]) as $.Slice<number>)
 	let appended: $.Slice<number> = __goscriptTuple2[0]
 	err = __goscriptTuple2[1]
-	if ((((err != null) || ($.sliceLen(appended) != ($.sliceLen(state) + 2))) || ($.arrayIndex(appended!, 0) != 4)) || ($.arrayIndex(appended!, 1) != 5)) {
+	if ((((err != null) || ($.sliceLen(appended) != ($.sliceLen(state) + 2))) || ($.typedSliceIndex(appended!, 0) != 4)) || ($.typedSliceIndex(appended!, 1) != 5)) {
 		$.panic("AppendBinary")
 	}
 	for (let __goscriptRangeTarget3 = state, __goscriptRangeWindow3 = $.sliceRange(__goscriptRangeTarget3), __goscriptSliceWindow0 = $.sliceRange(appended), i = 0; i < __goscriptRangeWindow3.length; i++) {
@@ -113,7 +113,7 @@ export async function main(): globalThis.Promise<void> {
 			$.panic("AppendBinary state")
 		}
 	}
-	await $.println("state", $.sliceLen(state), $.arrayIndex(state!, 0), $.arrayIndex(state!, 1), $.arrayIndex(state!, 2), $.arrayIndex(state!, 3))
+	await $.println("state", $.sliceLen(state), $.typedSliceIndex(state!, 0), $.typedSliceIndex(state!, 1), $.typedSliceIndex(state!, 2), $.typedSliceIndex(state!, 3))
 
 	let restored = crc32.NewIEEE()
 	let __goscriptTuple3: any = $.typeAssertTuple<encoding.BinaryUnmarshaler | null>(restored, "encoding.BinaryUnmarshaler")

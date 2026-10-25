@@ -90,10 +90,10 @@ export function defaultFlags(prefix: string): $.Slice<string> {
 export async function main(): globalThis.Promise<void> {
 	let cmd = newCommand(new config(true, defaultFlags))
 	let cmd$: command = cmd == null ? $.pointerTarget<command>(cmd) : (cmd as any).__isVarRef === true ? (cmd as any).value : (cmd as any).__goValue === undefined ? (cmd as any) : $.pointerTarget<command>(cmd)
-	await $.println((cmd$ as command).name, $.arrayIndex((cmd$ as command).flags!, 0))
+	await $.println((cmd$ as command).name, $.plainSliceIndex((cmd$ as command).flags!, 0))
 	await $.chanSend(results, 7)
 	await $.println((__goscriptAwait = (cmd$ as command).action!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
-	await $.println(lazyCommand.name, $.arrayIndex(lazyCommand.flags!, 0))
+	await $.println(lazyCommand.name, $.plainSliceIndex(lazyCommand.flags!, 0))
 	await $.chanSend(results, 9)
 	await $.println((__goscriptAwait = lazyCommand.action!(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 }

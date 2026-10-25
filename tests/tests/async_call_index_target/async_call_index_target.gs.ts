@@ -18,7 +18,7 @@ export async function mapped(): globalThis.Promise<globalThis.Map<number, number
 }
 
 export async function main(): globalThis.Promise<void> {
-	await $.println($.arrayIndex((await values())!, 0))
+	await $.println($.plainSliceIndex((await values())!, 0))
 	for (const [k, v] of (await mapped())?.entries() ?? []) {
 		await $.println(k, v)
 	}

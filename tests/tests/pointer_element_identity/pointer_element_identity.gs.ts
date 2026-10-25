@@ -173,9 +173,9 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("struct direct", $.indexAddress(_in!, 0) == $.indexAddress(_in!, 0), $.pointerEqual(p, $.indexRef(_in!, 0)), $.indexAddress(_in!, 0) != $.indexAddress(_in!, 1))
 	let dst = $.makeSlice<T | $.VarRef<T> | null>(2)
 	$.sliceElems(dst!)[$.sliceSlot(dst!, 0)] = p
-	await $.println("struct slice", $.pointerEqual($.arrayIndex(dst!, 0), $.indexRef(_in!, 0)), ($.arrayIndex(dst!, 0) === p || ($.pointerAliasesMade || ($.arrayIndex(dst!, 0) as any)?.__goElementBacking !== undefined) && $.pointerEqual($.arrayIndex(dst!, 0), p)))
+	await $.println("struct slice", $.pointerEqual($.plainSliceIndex(dst!, 0), $.indexRef(_in!, 0)), ($.plainSliceIndex(dst!, 0) === p || ($.pointerAliasesMade || ($.plainSliceIndex(dst!, 0) as any)?.__goElementBacking !== undefined) && $.pointerEqual($.plainSliceIndex(dst!, 0), p)))
 	$.copy(dst, $.arrayToSlice<T | $.VarRef<T> | null>([$.indexRef(_in!, 0), $.indexRef(_in!, 1)]))
-	await $.println("struct copy", $.pointerEqual($.arrayIndex(dst!, 0), $.indexRef(_in!, 0)), $.pointerEqual($.arrayIndex(dst!, 1), $.indexRef(_in!, 1)), ($.arrayIndex(dst!, 0) === $.arrayIndex(dst!, 1) || ($.pointerAliasesMade || ($.arrayIndex(dst!, 0) as any)?.__goElementBacking !== undefined) && $.pointerEqual($.arrayIndex(dst!, 0), $.arrayIndex(dst!, 1))))
+	await $.println("struct copy", $.pointerEqual($.plainSliceIndex(dst!, 0), $.indexRef(_in!, 0)), $.pointerEqual($.plainSliceIndex(dst!, 1), $.indexRef(_in!, 1)), ($.plainSliceIndex(dst!, 0) === $.plainSliceIndex(dst!, 1) || ($.pointerAliasesMade || ($.plainSliceIndex(dst!, 0) as any)?.__goElementBacking !== undefined) && $.pointerEqual($.plainSliceIndex(dst!, 0), $.plainSliceIndex(dst!, 1))))
 	let m = $.makeMap<string, T | $.VarRef<T> | null>([["a", $.indexRef(_in!, 0)]])
 	await $.println("struct map", $.pointerEqual($.mapGet<string, T | $.VarRef<T> | null, T | $.VarRef<T> | null>(m, "a", null)[0], $.indexRef(_in!, 0)), $.pointerEqual($.mapGet<string, T | $.VarRef<T> | null, T | $.VarRef<T> | null>(m, "a", null)[0], $.indexRef(_in!, 1)))
 	let e1: any = $.interfaceValue($.indexRef(_in!, 0), "*main.T", /* @__PURE__ */ $.pointerType("main.T"))
@@ -185,7 +185,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("struct field", $.pointerEqual(h.p, $.indexRef(_in!, 1)), $.pointerEqual(h.p, elemPtr(_in, 1)), $.pointerEqual(elemPtr(_in, 0), elemPtr(_in, 0)))
 	let sub = $.goSlice(_in, 1, undefined)
 	await $.println("struct subslice", $.indexAddress(sub!, 0) == $.indexAddress(_in!, 1), $.indexAddress(sub!, 0) == $.indexAddress(_in!, 0))
-	await $.println("struct generic", same(__goscriptStatic1(), $.arrayIndex(dst!, 1), $.indexRef(_in!, 1)), index(__goscriptStatic1(), dst, $.indexRef(_in!, 1)), which($.arrayIndex(dst!, 1), _in), which($.indexRef(_in!, 1), $.goSlice(_in, 1, undefined)), which($.indexRef(_in!, 0), _in))
+	await $.println("struct generic", same(__goscriptStatic1(), $.plainSliceIndex(dst!, 1), $.indexRef(_in!, 1)), index(__goscriptStatic1(), dst, $.indexRef(_in!, 1)), which($.plainSliceIndex(dst!, 1), _in), which($.indexRef(_in!, 1), $.goSlice(_in, 1, undefined)), which($.indexRef(_in!, 0), _in))
 	let keys = $.makeMap<T | $.VarRef<T> | null, number>([[$.indexRef(_in!, 0), 10]], /* @__PURE__ */ $.pointerType("main.T"))
 	$.mapSet(keys, $.indexRef(_in!, 1), 11)
 	await $.println("struct key", $.mapGet<T | $.VarRef<T> | null, number, number>(keys, $.indexRef(_in!, 0), 0)[0], $.mapGet<T | $.VarRef<T> | null, number, number>(keys, elemPtr(_in, 1), 0)[0], $.len(keys))
@@ -229,13 +229,13 @@ export async function main(): globalThis.Promise<void> {
 	let fsub = $.goSlice(fs, 1, 3)
 	await $.println("float32", $.pointerEqual(fp, $.indexRef(fs!, 2)), $.pointerEqual($.indexRef(fsub!, 1), fp), $.pointerEqual($.indexRef(fsub!, 0), fp))
 	let ips = $.arrayToSlice<$.VarRef<number> | null>([$.indexRef(ints!, 0)])
-	await $.println("int slice", $.pointerEqual($.arrayIndex(ips!, 0), $.indexRef(ints!, 0)))
+	await $.println("int slice", $.pointerEqual($.plainSliceIndex(ips!, 0), $.indexRef(ints!, 0)))
 
 	// Pointers to array elements.
 	let arr = $.arrayValue([new T(true, 1, 1), new T(true, 2, 2), new T(true, 3, 3)], __goscriptStatic2())
 	let ap = $.indexRef(arr, 1)
 	let aps = $.arrayToSlice<T | $.VarRef<T> | null>([$.indexRef(arr, 1)])
-	await $.println("array struct", $.pointerEqual(ap, $.indexRef(arr, 1)), ($.arrayIndex(aps!, 0) === ap || ($.pointerAliasesMade || ($.arrayIndex(aps!, 0) as any)?.__goElementBacking !== undefined) && $.pointerEqual($.arrayIndex(aps!, 0), ap)), $.pointerEqual($.indexRef(arr, 0), ap))
+	await $.println("array struct", $.pointerEqual(ap, $.indexRef(arr, 1)), ($.plainSliceIndex(aps!, 0) === ap || ($.pointerAliasesMade || ($.plainSliceIndex(aps!, 0) as any)?.__goElementBacking !== undefined) && $.pointerEqual($.plainSliceIndex(aps!, 0), ap)), $.pointerEqual($.indexRef(arr, 0), ap))
 	let nums = $.arrayValue([1, 2, 3])
 	let np = $.indexRef(nums, 2)
 	let ne: any = $.interfaceValue(np, "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int")))
@@ -267,9 +267,9 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("chan", $.pointerEqual(await $.chanRecv(ch), $.indexRef(_in!, 0)))
 
 	// Writes through one pointer are seen through an equal one.
-	$.pointerValue<T>($.arrayIndex(dst!, 0)).A = 99
-	$.arrayIndex(ips!, 0)!.value = 55
-	await $.println("writes", $.arrayIndex(_in!, 0).A, $.arrayIndex(ints!, 0))
+	$.pointerValue<T>($.plainSliceIndex(dst!, 0)).A = 99
+	$.plainSliceIndex(ips!, 0)!.value = 55
+	await $.println("writes", $.plainSliceIndex(_in!, 0).A, $.plainSliceIndex(ints!, 0))
 }
 
 var __goscriptStatic0$value: any

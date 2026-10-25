@@ -84,7 +84,7 @@ export async function main(): globalThis.Promise<void> {
 	let words = (slices.Delete($.arrayToSlice<string>(["a", "b"]), 0, 1, () => ("" as string)) as $.Slice<string>)
 	let values = (slices.Delete($.arrayToSlice<any>([$.basicInterfaceValue(1, "int"), $.structInterfaceValue(new T(true), "main.T", "main.T")]), 0, 1, () => (null! as any as any)) as $.Slice<any>)
 	let arrays = (slices.Delete($.arrayToSlice<number[]>([$.arrayValue([1, 2]), $.arrayValue([3, 4])]), 0, 1, () => ($.arrayValue(globalThis.Array.from({ length: 2 }, () => 0)) as number[])) as $.Slice<number[]>)
-	await $.println("others:", $.stringEqual($.arrayIndex($.goSlice(words, undefined, 2)!, 1), ""), $.arrayIndex($.goSlice(values, undefined, 2)!, 1) == null, ($.arrayIndex($.goSlice(arrays, undefined, 2)!, 1))[0])
+	await $.println("others:", $.stringEqual($.plainSliceIndex($.goSlice(words, undefined, 2)!, 1), ""), $.plainSliceIndex($.goSlice(values, undefined, 2)!, 1) == null, ($.plainSliceIndex($.goSlice(arrays, undefined, 2)!, 1))[0])
 }
 
 var __goscriptStatic0$value: any

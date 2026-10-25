@@ -19,7 +19,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("grow:", $.sliceLen(grown), $.cap(grown))
 
 	let values = (siblings(__goscriptStatic0(), 7) as $.Slice<number>)
-	await $.println("siblings:", $.sliceLen(values), $.arrayIndex(values!, 0))
+	await $.println("siblings:", $.sliceLen(values), $.plainSliceIndex(values!, 0))
 }
 
 var __goscriptStatic0$value: any

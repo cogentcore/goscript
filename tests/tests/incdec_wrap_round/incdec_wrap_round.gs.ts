@@ -73,7 +73,7 @@ export async function main(): globalThis.Promise<void> {
 	let arr = $.arrayValue(new Uint8Array([255, 0]))
 	arr[0] = ((arr[0] + 1) & 0xff)
 	arr[1] = ((arr[1] - 1) & 0xff)
-	await $.println("elements:", $.arrayIndex(gi!, 0), $.arrayIndex(gb!, 0), $.arrayIndex(gb!, 1), $.arrayIndex(gf!, 0) == 1.6777216e+07, $.arrayIndex(ti!, 0), arr[0], arr[1])
+	await $.println("elements:", $.typedSliceIndex(gi!, 0), $.typedSliceIndex(gb!, 0), $.typedSliceIndex(gb!, 1), $.typedSliceIndex(gf!, 0) == 1.6777216e+07, $.typedSliceIndex(ti!, 0), arr[0], arr[1])
 
 	// Through pointers, with the target evaluated once.
 	let pi = $.indexRef(gi!, 0)
@@ -85,7 +85,7 @@ export async function main(): globalThis.Promise<void> {
 	let gu = (appendOf(__goscriptStatic3(), null, $.typedSliceOf(Uint32Array, [0]) as $.Slice<number>) as $.Slice<number>)
 	const __goscriptOperand0 = await index()
 	$.sliceElems(gu!)[$.sliceSlot(gu!, __goscriptOperand0)] = (($.sliceElems(gu!)[$.sliceSlot(gu!, __goscriptOperand0)] - 1) >>> 0)
-	await $.println("pointers:", $.arrayIndex(gi!, 0), vf.value == 1.6777216e+07, c.U16, $.arrayIndex(gu!, 0))
+	await $.println("pointers:", $.typedSliceIndex(gi!, 0), vf.value == 1.6777216e+07, c.U16, $.typedSliceIndex(gu!, 0))
 }
 
 var __goscriptStatic0$value: any

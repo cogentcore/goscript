@@ -119,7 +119,7 @@ export async function main(): globalThis.Promise<void> {
 		let kid = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as tree | $.VarRef<tree> | null)
 		sum += $.mapGet<any, number, number>(visits, $.interfaceValue(kid, "*main.tree", /* @__PURE__ */ $.pointerType("main.tree")), 0)[0]
 	}
-	await $.println("tree keys:", $.len(visits), $.mapGet<any, number, number>(visits, $.interfaceValue(root, "*main.tree", /* @__PURE__ */ $.pointerType("main.tree")), 0)[0], sum, $.mapGet<any, number, number>(visits, $.interfaceValue($.arrayIndex((root$ as tree).Kids!, 7), "*main.tree", /* @__PURE__ */ $.pointerType("main.tree")), 0)[0])
+	await $.println("tree keys:", $.len(visits), $.mapGet<any, number, number>(visits, $.interfaceValue(root, "*main.tree", /* @__PURE__ */ $.pointerType("main.tree")), 0)[0], sum, $.mapGet<any, number, number>(visits, $.interfaceValue($.plainSliceIndex((root$ as tree).Kids!, 7), "*main.tree", /* @__PURE__ */ $.pointerType("main.tree")), 0)[0])
 
 	// Typed nil pointers of the same type are equal keys.
 	let n1: node | $.VarRef<node> | null = null! as node | $.VarRef<node> | null

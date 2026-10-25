@@ -117,11 +117,11 @@ export function lookupLocal(addr: string): $.Slice<string> {
 }
 
 export async function main(): globalThis.Promise<void> {
-	await $.println($.arrayIndex(lookupLocal("127.0.0.1")!, 0))
+	await $.println($.plainSliceIndex(lookupLocal("127.0.0.1")!, 0))
 	hosts.value.byAddr = $.makeMap<string, $.Slice<string>>([["127.0.0.1", $.arrayToSlice<string>(["localhost"])]])
 	named.value.byAddr = hosts.value.byAddr
-	await $.println($.arrayIndex(lookup("127.0.0.1")!, 0))
-	await $.println($.arrayIndex(lookupNamed("127.0.0.1")!, 0))
+	await $.println($.plainSliceIndex(lookup("127.0.0.1")!, 0))
+	await $.println($.plainSliceIndex(lookupNamed("127.0.0.1")!, 0))
 	await $.println($.sliceLen(lookup("::1")))
 }
 

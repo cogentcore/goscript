@@ -192,9 +192,9 @@ export async function main(): globalThis.Promise<void> {
 	await $.println(a.value.In.X, a.value.N)
 
 	let s = $.arrayToSlice<Outer>([make1(), make1()])
-	$.sliceElems(s!)[$.sliceSlot(s!, 0)].__goscriptAssign($.arrayIndex(s!, 1))
-	$.arrayIndex(s!, 1).In.Y = 20
-	await $.println($.arrayIndex(s!, 0).In.Y, $.arrayIndex(s!, 1).In.Y)
+	$.sliceElems(s!)[$.sliceSlot(s!, 0)].__goscriptAssign($.plainSliceIndex(s!, 1))
+	$.plainSliceIndex(s!, 1).In.Y = 20
+	await $.println($.plainSliceIndex(s!, 0).In.Y, $.plainSliceIndex(s!, 1).In.Y)
 
 	let sh = new Inner(false, 7, 8)
 	a.value.Ptr = sh

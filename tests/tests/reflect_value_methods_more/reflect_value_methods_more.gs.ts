@@ -61,7 +61,7 @@ export async function main(): globalThis.Promise<void> {
 	let sv = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(s, "*[]int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"))))))).Elem()))
 	$.markAsStructValue($.cloneStructValue(sv)).Clear()
 	$.markAsStructValue($.cloneStructValue(sv)).SetCap(4)
-	await $.println("clear:", $.len(m), $.arrayIndex(s.value!, 0), $.sliceLen(s.value), $.cap(s.value))
+	await $.println("clear:", $.len(m), $.plainSliceIndex(s.value!, 0), $.sliceLen(s.value), $.cap(s.value))
 
 	// Fields and Methods iterate with names and values.
 	let p = new pair(true, 1, "xy")
@@ -78,7 +78,7 @@ export async function main(): globalThis.Promise<void> {
 	let __goscriptRangeReturn1 = false
 	;await (async () => {
 		await $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.structInterfaceValue((p).clone(), "main.pair", "main.pair")))).Methods()!(async (meth, v) => {
-			await $.println("method:", meth.Name, $.markAsStructValue($.cloneStructValue($.arrayIndex((await $.markAsStructValue($.cloneStructValue(v)).Call(null))!, 0))).Int())
+			await $.println("method:", meth.Name, $.markAsStructValue($.cloneStructValue($.plainSliceIndex((await $.markAsStructValue($.cloneStructValue(v)).Call(null))!, 0))).Int())
 			return true
 		})
 	})()

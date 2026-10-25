@@ -39,7 +39,7 @@ export async function main(): globalThis.Promise<void> {
 		values = $.appendOne(values, new item(true, value))
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [] } as $.FunctionTypeInfo)))
 	if ($.sliceLen(values) != 0) {
-		await $.println("first:", $.arrayIndex(values!, 0).Value)
+		await $.println("first:", $.plainSliceIndex(values!, 0).Value)
 	}
 }
 

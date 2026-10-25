@@ -32,11 +32,11 @@ export async function main(): globalThis.Promise<void> {
 
 	// Test slice with keyed elements
 	let slice1 = $.arrayToSlice<string>(["", "", "second", "", "fourth"])
-	await $.println("slice1[0]:", $.arrayIndex(slice1!, 0))
-	await $.println("slice1[1]:", $.arrayIndex(slice1!, 1))
-	await $.println("slice1[2]:", $.arrayIndex(slice1!, 2))
-	await $.println("slice1[3]:", $.arrayIndex(slice1!, 3))
-	await $.println("slice1[4]:", $.arrayIndex(slice1!, 4))
+	await $.println("slice1[0]:", $.plainSliceIndex(slice1!, 0))
+	await $.println("slice1[1]:", $.plainSliceIndex(slice1!, 1))
+	await $.println("slice1[2]:", $.plainSliceIndex(slice1!, 2))
+	await $.println("slice1[3]:", $.plainSliceIndex(slice1!, 3))
+	await $.println("slice1[4]:", $.plainSliceIndex(slice1!, 4))
 
 	await $.println("keyed array literal test completed")
 }

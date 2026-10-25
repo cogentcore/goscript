@@ -120,7 +120,7 @@ export async function main(): globalThis.Promise<void> {
 	$.assignFieldValue($.pointerValue<T[]>(pa), pair(14, 15), __goscriptStatic0())
 	await $.println("deref:", $.pointerValue<T>(e).v)
 	let slice = $.arrayToSlice<T[]>([$.arrayValue(globalThis.Array.from({ length: 2 }, () => new T(true)), /* @__PURE__ */ $.arrayType("main.T", 2))])
-	let f = $.indexRef($.arrayIndex(slice!, 0), 0)
+	let f = $.indexRef($.plainSliceIndex(slice!, 0), 0)
 	$.assignFieldValue($.sliceElems(slice!)[$.sliceSlot(slice!, 0)], pair(16, 17), __goscriptStatic0())
 	await $.println("slice element:", $.pointerValue<T>(f).v)
 	let nested = $.arrayValue(globalThis.Array.from({ length: 2 }, () => $.arrayValue(globalThis.Array.from({ length: 2 }, () => new T(true)), /* @__PURE__ */ $.arrayType("main.T", 2))), /* @__PURE__ */ $.arrayType(/* @__PURE__ */ $.arrayType("main.T", 2), 2))
@@ -169,7 +169,7 @@ export async function main(): globalThis.Promise<void> {
 	let sliced = $.arrayValue(globalThis.Array.from({ length: 2 }, () => new T(true)), /* @__PURE__ */ $.arrayType("main.T", 2))
 	let view = $.goSlice(sliced, undefined, undefined)
 	sliced = $.assignFieldValue(sliced, pair(25, 26), __goscriptStatic0())
-	await $.println("sliced:", $.arrayIndex(view!, 0).v, $.arrayIndex(view!, 1).v)
+	await $.println("sliced:", $.plainSliceIndex(view!, 0).v, $.plainSliceIndex(view!, 1).v)
 	let captured = $.arrayValue(globalThis.Array.from({ length: 2 }, () => 0))
 	let read = $.functionValue((): number => {
 		return captured[1]

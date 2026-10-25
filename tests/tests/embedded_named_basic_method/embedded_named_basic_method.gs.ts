@@ -172,7 +172,7 @@ export async function main(): globalThis.Promise<void> {
 	let post$: Post = post == null ? $.pointerTarget<Post>(post) : (post as any).__isVarRef === true ? (post as any).value : (post as any).__goValue === undefined ? (post as any) : $.pointerTarget<Post>(post)
 	Tags_Add($.fieldRef((post$ as Post), "Tags"), "go")
 	let a: Adder | null = $.interfaceValue<Adder | null>(post, "*main.Post", /* @__PURE__ */ $.pointerType("main.Post"))
-	await $.println("pointer method:", (__goscriptAwait = (a !== null && (a as any).__isVarRef !== true && ((a as any).__goValue === undefined || (a as any).__goType?.charCodeAt(0) !== 42) ? (a as Exclude<Adder, null>) : $.pointerValue<Exclude<Adder, null>>(a)).Add("js"), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), $.sliceLen(((post$ as Post).Tags as Tags)), $.arrayIndex((post$ as Post).Tags!, 1))
+	await $.println("pointer method:", (__goscriptAwait = (a !== null && (a as any).__isVarRef !== true && ((a as any).__goValue === undefined || (a as any).__goType?.charCodeAt(0) !== 42) ? (a as Exclude<Adder, null>) : $.pointerValue<Exclude<Adder, null>>(a)).Add("js"), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), $.sliceLen(((post$ as Post).Tags as Tags)), $.plainSliceIndex((post$ as Post).Tags!, 1))
 }
 
 var __goscriptAwait: any

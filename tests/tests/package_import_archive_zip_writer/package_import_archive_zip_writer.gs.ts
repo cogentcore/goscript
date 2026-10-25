@@ -27,14 +27,14 @@ export async function main(): globalThis.Promise<void> {
 		return
 	}
 	await $.println("open", err == null, $.sliceLen((zr$ as zip.Reader).File))
-	let __goscriptTuple2: any = await zip.File.prototype.Open.call($.arrayIndex((zr$ as zip.Reader).File!, 0))
+	let __goscriptTuple2: any = await zip.File.prototype.Open.call($.plainSliceIndex((zr$ as zip.Reader).File!, 0))
 	let rc: io.ReadCloser | null = __goscriptTuple2[0]
 	err = __goscriptTuple2[1]
 	await $.println("file open", err == null)
 	let __goscriptTuple3: any = await io.ReadAll($.pointerValueOrNil((rc as io.Reader | null))!)
 	let data: $.Slice<number> = __goscriptTuple3[0]
 	err = __goscriptTuple3[1]
-	await $.println("file", $.pointerValue<zip.File>($.arrayIndex((zr$ as zip.Reader).File!, 0)).FileHeader.Name, $.bytesToString(data), err == null)
+	await $.println("file", $.pointerValue<zip.File>($.plainSliceIndex((zr$ as zip.Reader).File!, 0)).FileHeader.Name, $.bytesToString(data), err == null)
 	err = await (rc !== null && (rc as any).__isVarRef !== true && ((rc as any).__goValue === undefined || (rc as any).__goType?.charCodeAt(0) !== 42) ? (rc as Exclude<io.ReadCloser, null>) : $.pointerValue<Exclude<io.ReadCloser, null>>(rc)).Close()
 	await $.println("file close", err == null)
 }

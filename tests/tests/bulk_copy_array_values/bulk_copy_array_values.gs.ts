@@ -36,20 +36,20 @@ export async function main(): globalThis.Promise<void> {
 
 	let dst = $.makeSlice<number[]>(1, undefined, undefined, () => $.arrayValue(globalThis.Array.from({ length: 1 }, () => 0)))
 	$.copy(dst, src)
-	$.arrayIndex(dst!, 0)[0] = 9
-	await $.println("copy:", ($.arrayIndex(src!, 0))[0])
+	$.plainSliceIndex(dst!, 0)[0] = 9
+	await $.println("copy:", ($.plainSliceIndex(src!, 0))[0])
 
 	let appended = $.appendSlice<number[]>(null, src)
-	$.arrayIndex(appended!, 0)[0] = 9
-	await $.println("append:", ($.arrayIndex(src!, 0))[0])
+	$.plainSliceIndex(appended!, 0)[0] = 9
+	await $.println("append:", ($.plainSliceIndex(src!, 0))[0])
 
 	let cloned = (slices.Clone(src) as $.Slice<number[]>)
-	$.arrayIndex(cloned!, 0)[0] = 9
-	await $.println("clone:", ($.arrayIndex(src!, 0))[0])
+	$.plainSliceIndex(cloned!, 0)[0] = 9
+	await $.println("clone:", ($.plainSliceIndex(src!, 0))[0])
 
 	let concat = (slices.Concat(src, src) as $.Slice<number[]>)
-	$.arrayIndex(concat!, 1)[0] = 9
-	await $.println("concat:", ($.arrayIndex(src!, 0))[0])
+	$.plainSliceIndex(concat!, 1)[0] = 9
+	await $.println("concat:", ($.plainSliceIndex(src!, 0))[0])
 
 	let __goscriptRangeReturn0 = false
 	;await (async () => {
@@ -61,23 +61,23 @@ export async function main(): globalThis.Promise<void> {
 	if (__goscriptRangeReturn0) {
 		return
 	}
-	await $.println("values:", ($.arrayIndex(src!, 0))[0])
+	await $.println("values:", ($.plainSliceIndex(src!, 0))[0])
 
 	let points = $.arrayToSlice<point[]>([$.arrayValue([new point(true, 1)], __goscriptStatic0())])
 	let pointCopies = $.makeSlice<point[]>(1, undefined, undefined, () => $.arrayValue(globalThis.Array.from({ length: 1 }, () => new point(true)), /* @__PURE__ */ $.arrayType("main.point", 1)))
 	$.copy(pointCopies, points);
-	;($.arrayIndex(pointCopies!, 0))[0].x = 9
-	await $.println("struct array:", ($.arrayIndex(points!, 0))[0].x)
+	;($.plainSliceIndex(pointCopies!, 0))[0].x = 9
+	await $.println("struct array:", ($.plainSliceIndex(points!, 0))[0].x)
 
 	let nested = $.arrayToSlice<number[][]>([$.arrayValue([$.arrayValue([1])], __goscriptStatic1())])
 	let nestedCopies = (slices.Clone(nested) as $.Slice<number[][]>);
-	;($.arrayIndex(nestedCopies!, 0))[0][0] = 9
-	await $.println("nested:", (($.arrayIndex(nested!, 0))[0])[0])
+	;($.plainSliceIndex(nestedCopies!, 0))[0][0] = 9
+	await $.println("nested:", (($.plainSliceIndex(nested!, 0))[0])[0])
 
 	let shared = $.arrayToSlice<$.Slice<number>>([$.arrayToSlice<number>([1])])
 	let sharedCopies = (slices.Clone(shared) as $.Slice<$.Slice<number>>)
-	$.sliceElems($.arrayIndex(sharedCopies!, 0)!)[$.sliceSlot($.arrayIndex(sharedCopies!, 0)!, 0)] = 9
-	await $.println("slice elements share:", $.arrayIndex($.arrayIndex(shared!, 0)!, 0))
+	$.sliceElems($.plainSliceIndex(sharedCopies!, 0)!)[$.sliceSlot($.plainSliceIndex(sharedCopies!, 0)!, 0)] = 9
+	await $.println("slice elements share:", $.plainSliceIndex($.plainSliceIndex(shared!, 0)!, 0))
 }
 
 var __goscriptStatic0$value: any

@@ -2556,7 +2556,7 @@ func TestCompilePackagesEmitsArraySliceMapStringAndNamedMethods(t *testing.T) {
 		"$.mapSet(m, \"one\", 1)",
 		"let [value, ok] = $.mapGet<string, number, number>(m, \"missing\", 0)",
 		"$.sliceSlot(slice!, 0)",
-		"$.arrayIndex(literal!, 2)",
+		"$.plainSliceIndex(literal!, 2)",
 		"let list: $.VarRef<MySlice> = $.varRef(null! as MySlice)",
 		"MySlice_Add(list, 7)",
 		"$.indexString(text, 0)",

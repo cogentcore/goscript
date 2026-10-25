@@ -111,7 +111,7 @@ export async function main(): globalThis.Promise<void> {
 	// Index is a []int that can be appended to.
 	let [_of, ] = await $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.structInterfaceValue(new Outer(true), "main.Outer", "main.Outer"))).FieldByName("X")
 	_of.Index = $.appendSlice($.arrayToSlice<number>([9]), _of.Index)
-	await $.println($.sliceLen(_of.Index), $.arrayIndex(_of.Index!, 0), $.arrayIndex(_of.Index!, 1), $.arrayIndex(_of.Index!, 2))
+	await $.println($.sliceLen(_of.Index), $.plainSliceIndex(_of.Index!, 0), $.plainSliceIndex(_of.Index!, 1), $.plainSliceIndex(_of.Index!, 2))
 
 	// Value.FieldByNameFunc finds a field by a name predicate.
 	let val = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.structInterfaceValue(new Outer(true, new Inner(true, 5), "n"), "main.Outer", "main.Outer"))))

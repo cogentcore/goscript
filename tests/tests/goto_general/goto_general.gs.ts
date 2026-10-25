@@ -353,7 +353,7 @@ export function webStyle(input: $.Slice<number>): [number, number] {
 					__goscriptGotoState5 = 3
 					continue __goscriptGotoLoop5
 				}
-				q = $.arrayIndex(input!, p)
+				q = $.plainSliceIndex(input!, p)
 				switch ((true as boolean)) {
 					case q < 0:
 					{

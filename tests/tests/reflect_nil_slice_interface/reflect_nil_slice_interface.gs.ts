@@ -108,7 +108,7 @@ export async function main(): globalThis.Promise<void> {
 	let kp: $.VarRef<$.Slice<S1 | $.VarRef<S1> | null>> | null = __goscriptTuple0[0]
 	ok = __goscriptTuple0[1]
 	kp!.value = $.appendOne($.pointerValue<$.Slice<S1 | $.VarRef<S1> | null>>(kp), new S1(false, "x"), $.appendZeros.nil)
-	await $.println("addr assert:", ok, $.sliceLen(v.value.K), $.pointerValue<S1>($.arrayIndex(v.value.K!, 0)).Name)
+	await $.println("addr assert:", ok, $.sliceLen(v.value.K), $.pointerValue<S1>($.plainSliceIndex(v.value.K!, 0)).Name)
 
 	// Unnamed basic, array and slice values keep their types.
 	await show2("int", $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.basicInterfaceValue(3, "int")))))

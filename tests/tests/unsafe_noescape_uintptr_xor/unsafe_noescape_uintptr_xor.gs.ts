@@ -88,9 +88,9 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("nil:", q == null)
 
 	let inline = inlineSlice(values)
-	await $.println("inline:", $.arrayIndex(inline!, 0), $.arrayIndex(inline!, 1))
+	await $.println("inline:", $.plainSliceIndex(inline!, 0), $.plainSliceIndex(inline!, 1))
 	$.sliceElems(inline!)[$.sliceSlot(inline!, 0)] = 9
-	await $.println("updated:", $.arrayIndex(values!, 0))
+	await $.println("updated:", $.plainSliceIndex(values!, 0))
 
 	let src: $.VarRef<sourceStruct> = $.varRef(new sourceStruct(true))
 	await $.println("struct:", markThroughView(src), src.value.flag)

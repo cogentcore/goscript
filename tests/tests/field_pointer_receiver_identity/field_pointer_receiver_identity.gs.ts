@@ -279,7 +279,7 @@ export async function main(): globalThis.Promise<void> {
 	Node.prototype.Register.call($.fieldRef(item.value, "Node"))
 	await $.println("embedded:", $.pointerEqual(item.value.Node.self, $.fieldRef(item.value, "Node")), Node.prototype.Is.call($.fieldRef(item.value, "Node"), $.fieldRef(item.value, "Node")))
 	let namer: Namer | null = $.interfaceValue<Namer | null>(item, "*main.Item", /* @__PURE__ */ $.pointerType("main.Item"))
-	await $.println("interface:", (__goscriptAwait = (namer !== null && (namer as any).__isVarRef !== true && ((namer as any).__goValue === undefined || (namer as any).__goType?.charCodeAt(0) !== 42) ? (namer as Exclude<Namer, null>) : $.pointerValue<Exclude<Namer, null>>(namer)).Is($.fieldRef(item.value, "Node")), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), $.pointerEqual($.arrayIndex(registry!, 1), $.fieldRef(item.value, "Node")))
+	await $.println("interface:", (__goscriptAwait = (namer !== null && (namer as any).__isVarRef !== true && ((namer as any).__goValue === undefined || (namer as any).__goType?.charCodeAt(0) !== 42) ? (namer as Exclude<Namer, null>) : $.pointerValue<Exclude<Namer, null>>(namer)).Is($.fieldRef(item.value, "Node")), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), $.pointerEqual($.plainSliceIndex(registry!, 1), $.fieldRef(item.value, "Node")))
 
 	// Nested fields, fields reached through a pointer, slice and array
 	// elements.
@@ -290,7 +290,7 @@ export async function main(): globalThis.Promise<void> {
 	void (ptr$ as Item).Child.Rename("child")
 	await $.println("through pointer:", Node.prototype.Is.call($.fieldRef((ptr$ as Item), "Child"), $.fieldRef(item.value, "Child")), item.value.Child.name)
 	Node.prototype.Register.call($.indexRef(item.value.List!, 1))
-	await $.println("slice element:", $.pointerEqual($.arrayIndex(item.value.List!, 1).self, $.indexRef(item.value.List!, 1)), Node.prototype.Is.call($.indexRef(item.value.List!, 1), $.indexRef(item.value.List!, 1)))
+	await $.println("slice element:", $.pointerEqual($.plainSliceIndex(item.value.List!, 1).self, $.indexRef(item.value.List!, 1)), Node.prototype.Is.call($.indexRef(item.value.List!, 1), $.indexRef(item.value.List!, 1)))
 	Node.prototype.Register.call($.indexRef(item.value.Pair, 0))
 	await $.println("array element:", $.pointerEqual(item.value.Pair[0].self, $.indexRef(item.value.Pair, 0)))
 
@@ -300,7 +300,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("local:", (local.value.self === local || ($.pointerAliasesMade || (local.value.self as any)?.__goElementBacking !== undefined) && $.pointerEqual(local.value.self, local)), Node.prototype.Is.call(global, global))
 
 	// The registry, a pointer-keyed map and interfaces hold the same pointers.
-	await $.println("registry:", $.pointerEqual($.arrayIndex(registry!, 0), $.fieldRef(item.value, "Child")), $.mapGet<Node | $.VarRef<Node> | null, number, number>(counts, $.fieldRef(item.value, "Child"), 0)[0], $.mapGet<Node | $.VarRef<Node> | null, number, number>(counts, local, 0)[0], $.len(counts))
+	await $.println("registry:", $.pointerEqual($.plainSliceIndex(registry!, 0), $.fieldRef(item.value, "Child")), $.mapGet<Node | $.VarRef<Node> | null, number, number>(counts, $.fieldRef(item.value, "Child"), 0)[0], $.mapGet<Node | $.VarRef<Node> | null, number, number>(counts, local, 0)[0], $.len(counts))
 	let a: any = $.interfaceValue($.fieldRef(item.value, "Child"), "*main.Node", /* @__PURE__ */ $.pointerType("main.Node"))
 	let b: any = $.interfaceValue(item.value.Child.self, "*main.Node", /* @__PURE__ */ $.pointerType("main.Node"))
 	await $.println("any:", $.comparableEqual(a, b))
@@ -314,16 +314,16 @@ export async function main(): globalThis.Promise<void> {
 	box.value.Add(__goscriptStatic1(), item.value.Child.self)
 	$.pointerValue<Node>(box.value.Get(__goscriptStatic1(), 0)).name = "boxed"
 	let clone = (slices.Clone(registry) as $.Slice<Node | $.VarRef<Node> | null>)
-	$.pointerValue<Node>($.arrayIndex(clone!, 0)).name += "+cloned"
+	$.pointerValue<Node>($.plainSliceIndex(clone!, 0)).name += "+cloned"
 	await $.println("generic:", item.value.Child.name, $.pointerEqual(box.value.Get(__goscriptStatic1(), 0), $.fieldRef(item.value, "Child")))
 
 	// Methods promoted from two levels down, called directly and as a value.
 	let outer: $.VarRef<Outer> = $.varRef(new Outer(true))
 	Node.prototype.Register.call($.fieldRef(outer.value.Item, "Node"))
-	await $.println("two levels:", $.pointerEqual(outer.value.Item.Node.self, $.fieldRef(outer.value.Item, "Node")), $.pointerEqual($.arrayIndex(registry!, $.sliceLen(registry) - 1), $.fieldRef(outer.value.Item, "Node")))
+	await $.println("two levels:", $.pointerEqual(outer.value.Item.Node.self, $.fieldRef(outer.value.Item, "Node")), $.pointerEqual($.plainSliceIndex(registry!, $.sliceLen(registry) - 1), $.fieldRef(outer.value.Item, "Node")))
 	let register: (() => void) | null = $.functionValue(((__receiver) => () => Node.prototype.Register.call(__receiver))($.fieldRef(outer.value.Item, "Node")), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "main.(*Node).Register-fm")
 	register!()
-	await $.println("promoted method value:", $.pointerEqual($.arrayIndex(registry!, $.sliceLen(registry) - 1), $.fieldRef(outer.value.Item, "Node")), $.mapGet<Node | $.VarRef<Node> | null, number, number>(counts, $.fieldRef(outer.value.Item, "Node"), 0)[0])
+	await $.println("promoted method value:", $.pointerEqual($.plainSliceIndex(registry!, $.sliceLen(registry) - 1), $.fieldRef(outer.value.Item, "Node")), $.mapGet<Node | $.VarRef<Node> | null, number, number>(counts, $.fieldRef(outer.value.Item, "Node"), 0)[0])
 
 	// A generic struct field and an async method keep the field's address.
 	let holder: {"B": Self} = $.anonymousStructValue({"B": $.genericInstance(new Self(true, undefined, 0), __goscriptStatic4)}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("B", /* @__PURE__ */ $.genericStructType("main.Self", "main.Self[int]", () => [/* @__PURE__ */ $.structField("self", /* @__PURE__ */ $.pointerType("main.Self[int]"), [0], 0, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/field_pointer_receiver_identity" }), /* @__PURE__ */ $.structField("v", /* @__PURE__ */ $.basicType("int"), [1], 8, false, { pkgPath: "github.com/s4wave/goscript/tests/tests/field_pointer_receiver_identity" })]), [0], 0, true)] })

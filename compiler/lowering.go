@@ -14675,11 +14675,33 @@ func (o *LoweringOwner) lowerIndexExpr(ctx lowerFileContext, expr *ast.IndexExpr
 		return o.lowerMapGetValue(ctx, expr, target, index), diagnostics
 	}
 
-	// Array elements are read directly; slices and the rest need arrayIndex.
+	// Array elements are read directly; slices and the rest need arrayIndex,
+	// or a version of it for the representations of a kind of slice.
 	if array, ok := types.Unalias(targetType).Underlying().(*types.Array); ok {
 		return o.lowerArrayElement(ctx, expr, target, index, array), diagnostics
 	}
-	return o.runtimeOwner.QualifiedHelper(RuntimeHelperArrayIndex) + "(" + o.lowerIndexTarget(ctx, target, targetType) + ", " + o.lowerNumberIndexValue(ctx, expr.Index, index) + ")", diagnostics
+	helper := sliceIndexHelper(targetType)
+	return o.runtimeOwner.QualifiedHelper(helper) + "(" + o.lowerIndexTarget(ctx, target, targetType) + ", " + o.lowerNumberIndexValue(ctx, expr.Index, index) + ")", diagnostics
+}
+
+// sliceIndexHelper returns the runtime helper that reads an element of a
+// value of the given type at an index. A slice of a concrete type is a typed
+// array if its element type is held in one (see typedSliceArray), and is
+// otherwise a plain array or a window object, so typedSliceIndex or
+// plainSliceIndex test that representation first, which is much faster than
+// the general arrayIndex when the call is not inlined. Each of them is
+// arrayIndex for the other representations, so the choice only affects the
+// speed. A slice whose element type has a type parameter, and every other
+// type, uses arrayIndex.
+func sliceIndexHelper(typ types.Type) RuntimeHelper {
+	slice, ok := types.Unalias(typ).Underlying().(*types.Slice)
+	if !ok || typeContainsTypeParam(slice.Elem()) {
+		return RuntimeHelperArrayIndex
+	}
+	if array, _ := typedSliceArray(slice.Elem()); array != "" {
+		return RuntimeHelperTypedSliceIndex
+	}
+	return RuntimeHelperPlainSliceIndex
 }
 
 // lowerArrayElement lowers reading the element of an array value at an index.
@@ -19753,7 +19775,7 @@ func isSimpleLoweredOperand(value string) bool {
 	// The only calls are of runtime readers without side effects.
 	for _, call := range simpleOperandCalls.FindAllStringSubmatch(value, -1) {
 		switch call[1] {
-		case "$.pointerValue", "$.pointerTarget", "$.arrayIndex":
+		case "$.pointerValue", "$.pointerTarget", "$.arrayIndex", "$.plainSliceIndex", "$.typedSliceIndex":
 		default:
 			return false
 		}

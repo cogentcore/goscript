@@ -280,7 +280,7 @@ export async function multiCallback(walkFn: ((path: string, info: FileInfo | nul
 }
 
 export async function indexedCallback(cbs: $.Slice<((_p0: string) => boolean | globalThis.Promise<boolean>) | null>, value: string): globalThis.Promise<boolean> {
-	return $.arrayIndex(cbs!, 0)!(value)
+	return $.plainSliceIndex(cbs!, 0)!(value)
 }
 
 export async function useMorphism(m: ((_p0: Shape | null) => Shape | null | globalThis.Promise<Shape | null>) | null, s: Shape | null): globalThis.Promise<number> {

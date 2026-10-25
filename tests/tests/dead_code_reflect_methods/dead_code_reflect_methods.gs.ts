@@ -80,7 +80,7 @@ export async function call(v: any, name: string, args: $.Slice<any>): globalThis
 export async function main(): globalThis.Promise<void> {
 	let c = new Calc(false, 5)
 	let names = $.arrayToSlice<string>(["Add", "Double"])
-	fmt.Println($.basicInterfaceValue($.markAsStructValue($.cloneStructValue($.arrayIndex((await call($.interfaceValue(c, "*main.Calc", /* @__PURE__ */ $.pointerType("main.Calc")), $.arrayIndex(names!, 0), $.arrayToSlice<any>([$.basicInterfaceValue(3, "int")])))!, 0))).Int(), "int64"), $.basicInterfaceValue($.markAsStructValue($.cloneStructValue($.arrayIndex((await call($.interfaceValue(c, "*main.Calc", /* @__PURE__ */ $.pointerType("main.Calc")), $.arrayIndex(names!, 1), null))!, 0))).Int(), "int64"))
+	fmt.Println($.basicInterfaceValue($.markAsStructValue($.cloneStructValue($.plainSliceIndex((await call($.interfaceValue(c, "*main.Calc", /* @__PURE__ */ $.pointerType("main.Calc")), $.plainSliceIndex(names!, 0), $.arrayToSlice<any>([$.basicInterfaceValue(3, "int")])))!, 0))).Int(), "int64"), $.basicInterfaceValue($.markAsStructValue($.cloneStructValue($.plainSliceIndex((await call($.interfaceValue(c, "*main.Calc", /* @__PURE__ */ $.pointerType("main.Calc")), $.plainSliceIndex(names!, 1), null))!, 0))).Int(), "int64"))
 
 	let t = reflect.TypeOf($.interfaceValue(c, "*main.Calc", /* @__PURE__ */ $.pointerType("main.Calc")))
 	for (let i = 0; i < (__goscriptAwait = (t !== null && (t as any).__isVarRef !== true && ((t as any).__goValue === undefined || (t as any).__goType?.charCodeAt(0) !== 42) ? (t as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(t)).NumMethod(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait); i++) {
@@ -88,7 +88,7 @@ export async function main(): globalThis.Promise<void> {
 	}
 	let v = $.markAsStructValue($.cloneStructValue(reflect.ValueOf(__goscriptStatic3())))
 	for (let i = 0; i < $.markAsStructValue($.cloneStructValue(v)).NumMethod(); i++) {
-		fmt.Println(((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(v)).Type()).Method(i), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as reflect.Method).Name, $.markAsStructValue($.cloneStructValue($.arrayIndex((await $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(v)).Method(i))).Call(null))!, 0))).String())
+		fmt.Println(((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(v)).Type()).Method(i), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as reflect.Method).Name, $.markAsStructValue($.cloneStructValue($.plainSliceIndex((await $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(v)).Method(i))).Call(null))!, 0))).String())
 	}
 	await call($.interfaceValue(c, "*main.Calc", /* @__PURE__ */ $.pointerType("main.Calc")), "Reset", null)
 	fmt.Println($.basicInterfaceValue($.pointerValue<Calc>(c).base, "int"))

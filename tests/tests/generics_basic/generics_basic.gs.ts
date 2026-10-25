@@ -247,7 +247,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("=== Interface constraint ===")
 	let items = $.arrayToSlice<Item | $.VarRef<Item> | null>([new Item(false, "alpha"), new Item(false, "beta")])
 	let clones = (await CloneAll(__goscriptStatic4(), items) as $.Slice<Item | $.VarRef<Item> | null>)
-	await $.println("clone:", $.pointerValue<Item>($.arrayIndex(clones!, 0)).Name, $.pointerValue<Item>($.arrayIndex(clones!, 1)).Name, ($.arrayIndex(clones!, 0) === $.arrayIndex(items!, 0) || ($.pointerAliasesMade || ($.arrayIndex(clones!, 0) as any)?.__goElementBacking !== undefined) && $.pointerEqual($.arrayIndex(clones!, 0), $.arrayIndex(items!, 0))))
+	await $.println("clone:", $.pointerValue<Item>($.plainSliceIndex(clones!, 0)).Name, $.pointerValue<Item>($.plainSliceIndex(clones!, 1)).Name, ($.plainSliceIndex(clones!, 0) === $.plainSliceIndex(items!, 0) || ($.pointerAliasesMade || ($.plainSliceIndex(clones!, 0) as any)?.__goElementBacking !== undefined) && $.pointerEqual($.plainSliceIndex(clones!, 0), $.plainSliceIndex(items!, 0))))
 
 	await $.println("=== Generic struct with map field ===")
 	let mapper = (NewMapper(__goscriptStatic5()) as Mapper | $.VarRef<Mapper> | null)

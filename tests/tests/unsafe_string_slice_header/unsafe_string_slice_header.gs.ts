@@ -60,9 +60,9 @@ export function samePointers(s: $.VarRef<string> | null, b: $.VarRef<$.Slice<num
 
 export async function main(): globalThis.Promise<void> {
 	let b = stringBytes("abc")
-	await $.println($.sliceLen(b), $.cap(b), $.arrayIndex(b!, 0), $.arrayIndex(b!, 1), $.arrayIndex(b!, 2))
+	await $.println($.sliceLen(b), $.cap(b), $.typedSliceIndex(b!, 0), $.typedSliceIndex(b!, 1), $.typedSliceIndex(b!, 2))
 	let local = localStringBytes("wxyz")
-	await $.println($.sliceLen(local), $.cap(local), $.arrayIndex(local!, 0), $.arrayIndex(local!, 3))
+	await $.println($.sliceLen(local), $.cap(local), $.typedSliceIndex(local!, 0), $.typedSliceIndex(local!, 3))
 	let str = $.varRef("pointer")
 	let bytes: $.VarRef<$.Slice<number>> = $.varRef(new Uint8Array([103, 111]))
 	let [sp, bp] = samePointers(str, bytes)

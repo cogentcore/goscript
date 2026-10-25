@@ -236,7 +236,7 @@ export async function main(): globalThis.Promise<void> {
 
 	// Comparisons of values in slices and maps.
 	let regions = $.arrayToSlice<region>([(a).clone(), b])
-	await $.println("slice:", $.structEqual($.arrayIndex(regions!, 0), a), $.structEqual($.arrayIndex(regions!, 1), a))
+	await $.println("slice:", $.structEqual($.plainSliceIndex(regions!, 0), a), $.structEqual($.plainSliceIndex(regions!, 1), a))
 	let seen = $.makeMap<pos, boolean>([[new pos(true, 1, 2), true]])
 	await $.println("map:", $.mapGet<pos, boolean, boolean>(seen, a.Start, false)[0], $.mapGet<pos, boolean, boolean>(seen, a.End, false)[0])
 

@@ -148,7 +148,7 @@ export class queue {
 		while ($.sliceLen((q$ as queue).items) == 0) {
 			await (q$ as queue).Cond.Wait()
 		}
-		let v = $.arrayIndex((q$ as queue).items!, 0);
+		let v = $.plainSliceIndex((q$ as queue).items!, 0);
 		;(q$ as queue).items = $.goSlice((q$ as queue).items, 1, undefined)
 		return v
 	}

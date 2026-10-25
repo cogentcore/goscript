@@ -8,30 +8,30 @@ export async function main(): globalThis.Promise<void> {
 	let right = $.arrayToSlice<number>([1, 2, 3, 4, 5])
 	let n = $.copy($.goSlice(right, 2, undefined), $.goSlice(right, 1, 4))
 	await $.println("right count:", n)
-	await $.println("right:", $.arrayIndex(right!, 0), $.arrayIndex(right!, 1), $.arrayIndex(right!, 2), $.arrayIndex(right!, 3), $.arrayIndex(right!, 4))
+	await $.println("right:", $.plainSliceIndex(right!, 0), $.plainSliceIndex(right!, 1), $.plainSliceIndex(right!, 2), $.plainSliceIndex(right!, 3), $.plainSliceIndex(right!, 4))
 
 	let left = $.arrayToSlice<number>([1, 2, 3, 4, 5])
 	n = $.copy($.goSlice(left, 1, undefined), $.goSlice(left, 2, undefined))
 	await $.println("left count:", n)
-	await $.println("left:", $.arrayIndex(left!, 0), $.arrayIndex(left!, 1), $.arrayIndex(left!, 2), $.arrayIndex(left!, 3), $.arrayIndex(left!, 4))
+	await $.println("left:", $.plainSliceIndex(left!, 0), $.plainSliceIndex(left!, 1), $.plainSliceIndex(left!, 2), $.plainSliceIndex(left!, 3), $.plainSliceIndex(left!, 4))
 
 	// Byte ranges copy in both directions without exposing temporary views.
 	let bytes = new Uint8Array([1, 2, 3, 4, 5]) as $.Slice<number>
 	let start = 1
 	let stop = 4
 	n = $.copyByteRanges(bytes, start + 1, undefined, bytes, start, stop)
-	await $.println("byte right:", n, $.arrayIndex(bytes!, 0), $.arrayIndex(bytes!, 1), $.arrayIndex(bytes!, 2), $.arrayIndex(bytes!, 3), $.arrayIndex(bytes!, 4))
+	await $.println("byte right:", n, $.typedSliceIndex(bytes!, 0), $.typedSliceIndex(bytes!, 1), $.typedSliceIndex(bytes!, 2), $.typedSliceIndex(bytes!, 3), $.typedSliceIndex(bytes!, 4))
 	n = $.copyByteRanges(bytes, undefined, stop - 1, bytes, start + 1, undefined)
-	await $.println("byte left:", n, $.arrayIndex(bytes!, 0), $.arrayIndex(bytes!, 1), $.arrayIndex(bytes!, 2), $.arrayIndex(bytes!, 3), $.arrayIndex(bytes!, 4))
+	await $.println("byte left:", n, $.typedSliceIndex(bytes!, 0), $.typedSliceIndex(bytes!, 1), $.typedSliceIndex(bytes!, 2), $.typedSliceIndex(bytes!, 3), $.typedSliceIndex(bytes!, 4))
 
 	// Explicit high bounds may extend into spare capacity; omitted highs may not.
 	let backing = new Uint8Array([10, 11, 12, 13, 14, 15]) as $.Slice<number>
 	let dst = $.goSlice(backing, 1, 2, 5)
 	let src = new Uint8Array([7, 8, 9]) as $.Slice<number>
 	n = $.copyByteRanges(dst, 1, 4, src, undefined, undefined)
-	await $.println("capacity:", n, $.arrayIndex(backing!, 0), $.arrayIndex(backing!, 1), $.arrayIndex(backing!, 2), $.arrayIndex(backing!, 3), $.arrayIndex(backing!, 4), $.arrayIndex(backing!, 5))
+	await $.println("capacity:", n, $.typedSliceIndex(backing!, 0), $.typedSliceIndex(backing!, 1), $.typedSliceIndex(backing!, 2), $.typedSliceIndex(backing!, 3), $.typedSliceIndex(backing!, 4), $.typedSliceIndex(backing!, 5))
 	n = $.copyByteRanges(dst, undefined, undefined, src, undefined, undefined)
-	await $.println("length:", n, $.arrayIndex(backing!, 1), $.arrayIndex(backing!, 2))
+	await $.println("length:", n, $.typedSliceIndex(backing!, 1), $.typedSliceIndex(backing!, 2))
 
 	// Bounds with calls preserve their observable evaluation sequence.
 	n = $.copy($.goSlice(dst, await bound(0), undefined), $.goSlice(src, await bound(1), undefined))

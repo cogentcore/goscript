@@ -61,7 +61,7 @@ export function asDoubler(v: MyInt): Doubler | null {
 }
 
 export function sumDoublers(vals: $.Slice<Doubler | null>): number {
-	return $.pointerValue<Exclude<Doubler, null>>($.arrayIndex(vals!, 0)).Double() + $.pointerValue<Exclude<Doubler, null>>($.arrayIndex(vals!, 1)).Double()
+	return $.pointerValue<Exclude<Doubler, null>>($.plainSliceIndex(vals!, 0)).Double() + $.pointerValue<Exclude<Doubler, null>>($.plainSliceIndex(vals!, 1)).Double()
 }
 
 export function assertDoubler(__typeArgs: $.GenericTypeArgs | undefined, v: Doubler | null): [any, boolean] {

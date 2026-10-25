@@ -2410,6 +2410,66 @@ export function arrayIndex<
   return arrayIndexSlow(collection, index)
 }
 
+/**
+ * typedSliceIndex is arrayIndex for a slice whose element type is held in a
+ * typed array (see TypedSlice), which the compiler knows from its type. It
+ * tests that representation first, in one condition that engines optimize
+ * well even where they do not inline it, and is otherwise arrayIndex.
+ */
+export function typedSliceIndex<
+  C extends
+    | Slice<unknown>
+    | SliceProxy<unknown>
+    | unknown[]
+    | TypedSlice
+    | null
+    | undefined,
+>(collection: C, index: number): ArrayIndexValue<C> {
+  if (
+    ArrayBuffer.isView(collection) &&
+    index >= 0 &&
+    index < (collection as TypedSlice).length
+  ) {
+    return (collection as TypedSlice)[index] as ArrayIndexValue<C>
+  }
+  return arrayIndex(collection, index)
+}
+
+/**
+ * plainSliceIndex is arrayIndex for a slice whose element type is not held in
+ * a typed array, which the compiler knows from its type, and which is then
+ * usually a plain array, or else a window object. It tests those
+ * representations first, a plain array in one condition that engines
+ * optimize well even where they do not inline it, and is otherwise
+ * arrayIndex.
+ */
+export function plainSliceIndex<
+  C extends
+    | Slice<unknown>
+    | SliceProxy<unknown>
+    | unknown[]
+    | TypedSlice
+    | null
+    | undefined,
+>(collection: C, index: number): ArrayIndexValue<C> {
+  if (
+    Array.isArray(collection) &&
+    index >= 0 &&
+    index < collection.length &&
+    (collection as any).__meta__ === undefined
+  ) {
+    return collection[index] as ArrayIndexValue<C>
+  }
+  if (
+    collection instanceof GoSlice &&
+    index >= 0 &&
+    index < collection.length
+  ) {
+    return collection.backing[collection.offset + index] as ArrayIndexValue<C>
+  }
+  return arrayIndex(collection, index)
+}
+
 // arrayIndexSlow is arrayIndex for the representations and indexes that its
 // fast path does not handle.
 function arrayIndexSlow<

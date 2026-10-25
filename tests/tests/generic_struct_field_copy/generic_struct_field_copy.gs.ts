@@ -205,8 +205,8 @@ export async function main(): globalThis.Promise<void> {
 	// slices of instances grow with zero values of their own
 	let vals: $.Slice<Values> = $.makeSlice<Values>(2, undefined, undefined, () => new Values(true))
 	vals = $.appendOne(vals, new Values(true))
-	$.arrayIndex(vals!, 0).Sides.Top.V = 12
-	await $.println("slice:", $.arrayIndex(vals!, 0).Sides.Top.V, $.arrayIndex(vals!, 1).Sides.Top.V, $.arrayIndex(vals!, 2).Sides.Top.V)
+	$.plainSliceIndex(vals!, 0).Sides.Top.V = 12
+	await $.println("slice:", $.plainSliceIndex(vals!, 0).Sides.Top.V, $.plainSliceIndex(vals!, 1).Sides.Top.V, $.plainSliceIndex(vals!, 2).Sides.Top.V)
 }
 
 if ($.isMainScript(import.meta)) {

@@ -1,4 +1,11 @@
-import { arrayIndex, sliceElems, sliceSlot, windowSlot } from './slice.js'
+import {
+  arrayIndex,
+  plainSliceIndex,
+  sliceElems,
+  sliceSlot,
+  typedSliceIndex,
+  windowSlot,
+} from './slice.js'
 import { describe, expect, it, vi } from 'vitest'
 
 import { makeMap, mapGet, mapSet } from './map.js'
@@ -718,5 +725,47 @@ describe('typed slices', () => {
     expect(typedSliceHintOf(f)).toBe('float32')
     expect(typedSliceHintOf(new Uint8Array(0))).toBe('byte')
     expect(typedSliceHintOf([1])).toBe(undefined)
+  })
+})
+
+describe('type-directed slice indexing', () => {
+  // typedSliceIndex and plainSliceIndex only test some representations
+  // first, so they read every slice as arrayIndex does.
+  const slices: [string, any][] = [
+    ['plain array', [1, 2, 3]],
+    ['window', goSlice([0, 1, 2, 3, 4], 1, 4)],
+    ['typed array', new Float32Array([1, 2, 3])],
+    ['typed window', goSlice(new Int32Array([0, 1, 2, 3, 4]), 1, 4)],
+    ['proxy', arrayToSlice([[1], [2], [3]], 2)],
+  ]
+  for (const [name, slice] of slices) {
+    it(`reads a ${name} as arrayIndex does`, () => {
+      for (let i = 0; i < 3; i++) {
+        expect(typedSliceIndex(slice, i)).toEqual(arrayIndex(slice, i))
+        expect(plainSliceIndex(slice, i)).toEqual(arrayIndex(slice, i))
+      }
+    })
+  }
+
+  it('panics on nil slices and indexes out of range as arrayIndex does', () => {
+    // Each case panics with the same message as arrayIndex.
+    const cases: [any, number][] = [
+      [null, 0],
+      [[1, 2], 2],
+      [[1, 2], -1],
+      [new Float32Array(2), 2],
+      [goSlice([0, 1, 2, 3], 1, 3), 2],
+    ]
+    for (const [slice, i] of cases) {
+      let want = ''
+      try {
+        arrayIndex(slice, i)
+      } catch (e) {
+        want = String(e)
+      }
+      expect(want).not.toBe('')
+      expect(() => typedSliceIndex(slice, i)).toThrow(want.replace(/^.*?: /, ''))
+      expect(() => plainSliceIndex(slice, i)).toThrow(want.replace(/^.*?: /, ''))
+    }
   })
 })

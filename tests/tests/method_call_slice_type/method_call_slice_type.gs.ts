@@ -38,8 +38,8 @@ export async function main(): globalThis.Promise<void> {
 	MySlice_Add(myList, 20)
 	let ptr = myList
 	await $.println("length:", $.sliceLen((myList.value as MySlice)))
-	await $.println("first:", $.arrayIndex(myList.value!, 0))
-	await $.println("second:", $.arrayIndex(myList.value!, 1))
+	await $.println("first:", $.plainSliceIndex(myList.value!, 0))
+	await $.println("second:", $.plainSliceIndex(myList.value!, 1))
 	await $.println("sum:", MySlice_Sum($.pointerValue<MySlice>(ptr)))
 }
 

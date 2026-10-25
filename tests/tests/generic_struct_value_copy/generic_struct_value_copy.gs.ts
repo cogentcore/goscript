@@ -190,12 +190,12 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("store:", v.V, d.value.V)
 
 	let xs = (fill(__goscriptStatic0(), 2, new Value(true, 5)) as $.Slice<Value>)
-	$.arrayIndex(xs!, 0).Set(6)
-	await $.println("fill:", $.arrayIndex(xs!, 0).V, $.arrayIndex(xs!, 1).V)
+	$.plainSliceIndex(xs!, 0).Set(6)
+	await $.println("fill:", $.plainSliceIndex(xs!, 0).V, $.plainSliceIndex(xs!, 1).V)
 
 	let ys = (appendTwice(__goscriptStatic0(), null, new Value(true, 7)) as $.Slice<Value>)
-	$.arrayIndex(ys!, 0).Set(8)
-	await $.println("append:", $.arrayIndex(ys!, 0).V, $.arrayIndex(ys!, 1).V)
+	$.plainSliceIndex(ys!, 0).Set(8)
+	await $.println("append:", $.plainSliceIndex(ys!, 0).V, $.plainSliceIndex(ys!, 1).V)
 
 	let m = $.makeMap<string, Value>([])
 	setTwo(__goscriptStatic0(), m, new Value(true, 9))

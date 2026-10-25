@@ -175,8 +175,8 @@ export async function main(): globalThis.Promise<void> {
 	let q = (p).clone()
 	q.Val.Left = 40
 	let ps = $.arrayToSlice<pair>([(p).clone(), (q).clone()])
-	$.arrayIndex(ps!, 0).Val.Top = 10
-	await $.println("pair:", p.Val.Left, q.Val.Left, $.arrayIndex(ps!, 0).Val.Top, p.Val.Top, $.arrayIndex(ps!, 1).Val.Left)
+	$.plainSliceIndex(ps!, 0).Val.Top = 10
+	await $.println("pair:", p.Val.Left, q.Val.Left, $.plainSliceIndex(ps!, 0).Val.Top, p.Val.Top, $.plainSliceIndex(ps!, 1).Val.Left)
 }
 
 var __goscriptStatic0$value: any

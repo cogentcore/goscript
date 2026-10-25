@@ -62,7 +62,7 @@ export async function main(): globalThis.Promise<void> {
 			;((__goscriptSliceWindow1.backing as any[])[$.windowSlot(__goscriptSliceWindow1, j)] as pos).Line += i;
 			;((__goscriptSliceWindow1.backing as any[])[$.windowSlot(__goscriptSliceWindow1, j)] as pos).Char = ((__goscriptSliceWindow1.backing as any[])[$.windowSlot(__goscriptSliceWindow1, j)] as pos).Line * 2
 		}
-		await $.println($.arrayIndex(ps!, 0).Line, $.arrayIndex(ps!, 1).Char, $.arrayIndex(ps!, 3).Line)
+		await $.println($.plainSliceIndex(ps!, 0).Line, $.plainSliceIndex(ps!, 1).Char, $.plainSliceIndex(ps!, 3).Line)
 
 		// A compound assignment reads and writes the same element.
 		let counts = $.arrayToSlice<number>([0, 0, 0])
@@ -70,7 +70,7 @@ export async function main(): globalThis.Promise<void> {
 			let k = next();
 			;(__goscriptSliceWindow2.backing as any[])[$.windowSlot(__goscriptSliceWindow2, k)] += 10
 		}
-		await $.println($.arrayIndex(counts!, 0), $.arrayIndex(counts!, 1), $.arrayIndex(counts!, 2), calls)
+		await $.println($.plainSliceIndex(counts!, 0), $.plainSliceIndex(counts!, 1), $.plainSliceIndex(counts!, 2), calls)
 
 		// A slice window offsets into its backing array, and a nil slice has none.
 		let base = $.arrayToSlice<number>([1, 2, 3, 4, 5, 6])
@@ -81,14 +81,14 @@ export async function main(): globalThis.Promise<void> {
 		for (let __goscriptSliceWindow3 = $.sliceRange(sub), i = 0; i < __goscriptSliceWindow3.length; i++) {
 			;(__goscriptSliceWindow3.backing as any[])[$.windowSlot(__goscriptSliceWindow3, i)] *= 10
 		}
-		await $.println($.arrayIndex(base!, 1), $.arrayIndex(base!, 2), $.arrayIndex(base!, 4), $.arrayIndex(base!, 5))
+		await $.println($.plainSliceIndex(base!, 1), $.plainSliceIndex(base!, 2), $.plainSliceIndex(base!, 4), $.plainSliceIndex(base!, 5))
 
 		// A slice assigned in the loop is read through the slice each time.
 		let grow: $.Slice<number> = $.arrayToSlice<number>([1])
 		for (let i = 0; i < 4; i++) {
-			grow = $.appendOne(grow, $.arrayIndex(grow!, i) * 2)
+			grow = $.appendOne(grow, $.plainSliceIndex(grow!, i) * 2)
 		}
-		await $.println($.sliceLen(grow), $.arrayIndex(grow!, 4))
+		await $.println($.sliceLen(grow), $.plainSliceIndex(grow!, 4))
 
 		// A slice that a closure assigns is not windowed.
 		let shrink: $.Slice<number> = $.arrayToSlice<number>([5, 6, 7])
@@ -97,7 +97,7 @@ export async function main(): globalThis.Promise<void> {
 		}, ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo))
 		let n = 0
 		while ($.sliceLen(shrink) > 0) {
-			n += $.arrayIndex(shrink!, 0)
+			n += $.plainSliceIndex(shrink!, 0)
 			cut()
 		}
 		await $.println(n)
@@ -137,7 +137,7 @@ export async function main(): globalThis.Promise<void> {
 		let acc = 0
 		for (let __goscriptSliceWindow8 = $.sliceRange(grid), i = 0; i < __goscriptSliceWindow8.length; i++) {
 			let r: $.Slice<number> = ((__goscriptSliceWindow8.backing as any[])[$.windowSlot(__goscriptSliceWindow8, i)] as $.Slice<number>)
-			acc += $.arrayIndex(r!, 1)
+			acc += $.plainSliceIndex(r!, 1)
 		}
 		await $.println(acc)
 
@@ -147,7 +147,7 @@ export async function main(): globalThis.Promise<void> {
 		let read = $.functionValue((): number => {
 			let t = 0
 			for (let i = 0; i < 3; i++) {
-				t += $.arrayIndex(shared!, i)
+				t += $.plainSliceIndex(shared!, i)
 			}
 			return t
 		}, ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))

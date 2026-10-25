@@ -138,18 +138,18 @@ function __goscriptInit0(): void {
 
 export async function main(): globalThis.Promise<void> {
 	// Values of the tables are their literals.
-	await $.println("numbers", $.sliceLen(__goscript_get_Numbers()), $.arrayIndex(__goscript_get_Numbers()!, 0), $.arrayIndex(__goscript_get_Numbers()!, 299))
-	await $.println("symbols", $.sliceLen(__goscript_get_Symbols()), $.pointerValue<Symbol>($.arrayIndex(__goscript_get_Symbols()!, 5)).Name, $.pointerValue<Symbol>($.arrayIndex(__goscript_get_Symbols()!, 259)).Kind)
+	await $.println("numbers", $.sliceLen(__goscript_get_Numbers()), $.plainSliceIndex(__goscript_get_Numbers()!, 0), $.plainSliceIndex(__goscript_get_Numbers()!, 299))
+	await $.println("symbols", $.sliceLen(__goscript_get_Symbols()), $.pointerValue<Symbol>($.plainSliceIndex(__goscript_get_Symbols()!, 5)).Name, $.pointerValue<Symbol>($.plainSliceIndex(__goscript_get_Symbols()!, 259)).Kind)
 	await $.println("index", $.len(__goscript_get_Index()), $.mapGet<string, number, number>(__goscript_get_Index(), "k7", 0)[0], $.mapGet<string, number, number>(__goscript_get_Index(), "k259", 0)[0])
 
 	// Reads see the same pointers each time.
-	let p = $.arrayIndex(__goscript_get_Symbols()!, 3)
+	let p = $.plainSliceIndex(__goscript_get_Symbols()!, 3)
 	$.pointerValue<Symbol>(p).Kind = 42
-	await $.println("same", $.pointerEqual($.arrayIndex(__goscript_get_Symbols()!, 3), p), $.pointerValue<Symbol>($.arrayIndex(__goscript_get_Symbols()!, 3)).Kind)
+	await $.println("same", $.pointerEqual($.plainSliceIndex(__goscript_get_Symbols()!, 3), p), $.pointerValue<Symbol>($.plainSliceIndex(__goscript_get_Symbols()!, 3)).Kind)
 
 	// Writes before and after the first read are kept.
-	await $.println("replaced", $.sliceLen(__goscript_get_Replaced()), $.arrayIndex(__goscript_get_Replaced()!, 2))
-	await $.println("changed", $.arrayIndex(__goscript_get_Changed()!, 0), $.arrayIndex(__goscript_get_Changed()!, 1))
+	await $.println("replaced", $.sliceLen(__goscript_get_Replaced()), $.plainSliceIndex(__goscript_get_Replaced()!, 2))
+	await $.println("changed", $.plainSliceIndex(__goscript_get_Changed()!, 0), $.plainSliceIndex(__goscript_get_Changed()!, 1))
 }
 
 __goscriptInit0()

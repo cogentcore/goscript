@@ -122,7 +122,7 @@ export function bumpH(): void {
 }
 
 export function bumpElem(): void {
-	$.arrayIndex(regions!, 0).Start.Line = 5
+	$.plainSliceIndex(regions!, 0).Start.Line = 5
 }
 
 export function F(r: Region): number {
@@ -149,8 +149,8 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("F(g):", F((g).clone()))
 	$.pointerValue<holder>(h).r.Start.Line = 2
 	await $.println("FH(h.r):", FH(($.pointerValue<holder>(h).r).clone()))
-	$.arrayIndex(regions!, 0).Start.Line = 3
-	await $.println("FE(regions[0]):", FE(($.arrayIndex(regions!, 0)).clone()))
+	$.plainSliceIndex(regions!, 0).Start.Line = 3
+	await $.println("FE(regions[0]):", FE(($.plainSliceIndex(regions!, 0)).clone()))
 	g.Start.Line = 4
 	await $.println("g.lineAfterBump():", $.markAsStructValue($.cloneStructValue(g)).lineAfterBump())
 	await $.println("plain(g):", plain(g))

@@ -18,7 +18,7 @@ export async function main(): globalThis.Promise<void> {
 
 	let g = slog.Group("g", $.arrayToSlice<any>([$.structInterfaceValue(slog.String("a", "x"), "slog.Attr", "slog.Attr"), $.structInterfaceValue(slog.Int("b", 2), "slog.Attr", "slog.Attr")]))
 	let attrs = g.Value.Group()
-	await $.println(slog.Kind_String(g.Value.Kind()), $.sliceLen(attrs), $.arrayIndex(attrs!, 0).Key, $.markAsStructValue($.cloneStructValue($.arrayIndex(attrs!, 1).Value)).Int64())
+	await $.println(slog.Kind_String(g.Value.Kind()), $.sliceLen(attrs), $.plainSliceIndex(attrs!, 0).Key, $.markAsStructValue($.cloneStructValue($.plainSliceIndex(attrs!, 1).Value)).Int64())
 	await $.println(await g.String())
 	await $.println(await $.markAsStructValue($.cloneStructValue(slog.StringValue("a"))).Equal(slog.StringValue("a")), await s.Equal(slog.StringValue("other")))
 

@@ -37,14 +37,14 @@ export async function main(): globalThis.Promise<void> {
 	let m = $.makeMap<string, $.Slice<number>>([["a", $.arrayToSlice<number>([1])], ["b", $.arrayToSlice<number>([2, 3])], ["c", null]])
 	let ks = (Keys(__goscriptStatic0(), m) as $.Slice<string>)
 	slices.Sort(ks)
-	await $.println($.sliceLen(ks), $.arrayIndex(ks!, 0), $.arrayIndex(ks!, 1), $.arrayIndex(ks!, 2))
+	await $.println($.sliceLen(ks), $.plainSliceIndex(ks!, 0), $.plainSliceIndex(ks!, 1), $.plainSliceIndex(ks!, 2))
 	let n = $.makeMap<string, number>([["x", 1], ["y", 2]])
 	let vs = (Values(__goscriptStatic1(), n) as $.Slice<number>)
 	slices.Sort(vs)
-	await $.println($.sliceLen(vs), $.arrayIndex(vs!, 0), $.arrayIndex(vs!, 1))
+	await $.println($.sliceLen(vs), $.plainSliceIndex(vs!, 0), $.plainSliceIndex(vs!, 1))
 	let nk = (Keys(__goscriptStatic1(), n) as $.Slice<string>)
 	slices.Sort(nk)
-	await $.println($.arrayIndex(nk!, 0), $.arrayIndex(nk!, 1))
+	await $.println($.plainSliceIndex(nk!, 0), $.plainSliceIndex(nk!, 1))
 	await $.println(Sum(__goscriptStatic2(), $.arrayToSlice<number>([1, 2, 3])))
 }
 

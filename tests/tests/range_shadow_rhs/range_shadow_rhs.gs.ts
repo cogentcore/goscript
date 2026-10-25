@@ -78,7 +78,7 @@ export async function main(): globalThis.Promise<void> {
 		let __goscriptRangeShadow1 = $.varRef(((__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as item)).clone())
 		await $.println(__goscriptRangeShadow1.value.increment())
 	}
-	await $.println($.arrayIndex(items.items!, 0).value, $.arrayIndex(items.items!, 1).value)
+	await $.println($.plainSliceIndex(items.items!, 0).value, $.plainSliceIndex(items.items!, 1).value)
 }
 
 if ($.isMainScript(import.meta)) {

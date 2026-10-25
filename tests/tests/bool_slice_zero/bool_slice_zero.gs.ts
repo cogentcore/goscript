@@ -5,9 +5,9 @@ import * as $ from "@goscript/builtin/index.js"
 
 export async function main(): globalThis.Promise<void> {
 	let values = $.makeSlice<boolean>(3, undefined, "boolean")
-	await $.println($.arrayIndex(values!, 0), $.arrayIndex(values!, 1), $.arrayIndex(values!, 2))
+	await $.println($.plainSliceIndex(values!, 0), $.plainSliceIndex(values!, 1), $.plainSliceIndex(values!, 2))
 	$.sliceElems(values!)[$.sliceSlot(values!, 1)] = true
-	await $.println($.arrayIndex(values!, 0), $.arrayIndex(values!, 1), $.arrayIndex(values!, 2))
+	await $.println($.plainSliceIndex(values!, 0), $.plainSliceIndex(values!, 1), $.plainSliceIndex(values!, 2))
 }
 
 if ($.isMainScript(import.meta)) {

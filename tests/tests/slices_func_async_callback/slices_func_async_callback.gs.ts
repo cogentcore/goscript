@@ -94,7 +94,7 @@ export async function main(): globalThis.Promise<void> {
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))
 	let values = $.arrayToSlice<number>([3, 1, 2])
 	await slices.SortStableFunc(values, cmp)
-	await $.println("sorted:", $.arrayIndex(values!, 0), $.arrayIndex(values!, 1), $.arrayIndex(values!, 2))
+	await $.println("sorted:", $.plainSliceIndex(values!, 0), $.plainSliceIndex(values!, 1), $.plainSliceIndex(values!, 2))
 
 	let pred: ((v: number) => boolean | globalThis.Promise<boolean>) | null = isEven
 	await $.println("max odd:", slices.MaxFunc($.arrayToSlice<number>([5, 9, 7]), $.functionValue((a: number, b: number): number => {

@@ -31,9 +31,9 @@ export async function main(): globalThis.Promise<void> {
 
 	// conversions
 	let runes = $.stringToRunes(s)
-	await $.println($.sliceLen(runes), $.arrayIndex(runes!, 7), $.arrayIndex(runes!, 9))
+	await $.println($.sliceLen(runes), $.typedSliceIndex(runes!, 7), $.typedSliceIndex(runes!, 9))
 	let bs = $.stringToBytes(s)
-	await $.println($.sliceLen(bs), $.arrayIndex(bs!, 7), $.stringEqual($.bytesToString(bs), s))
+	await $.println($.sliceLen(bs), $.typedSliceIndex(bs!, 7), $.stringEqual($.bytesToString(bs), s))
 	await $.println($.stringLen($.runesToString(runes)), $.stringEqual($.runesToString(runes), "BadUTF8\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd"))
 
 	// building from runes
@@ -76,7 +76,7 @@ export async function main(): globalThis.Promise<void> {
 	await $.println(strings.HasPrefix(key, "block:"), ok, $.stringLen(rest), $.indexString(rest, 0), $.indexString(rest, 1))
 	let keys = $.arrayToSlice<string>(["gcroot", key])
 	slices.Sort(keys)
-	await $.println($.stringEqual($.arrayIndex(keys!, 0), key), $.stringCompare(key, "gcroot") < 0, strings.Compare(key, "gcroot"))
+	await $.println($.stringEqual($.plainSliceIndex(keys!, 0), key), $.stringCompare(key, "gcroot") < 0, strings.Compare(key, "gcroot"))
 	let keyed = $.makeMap<string, number>([[key, 1]])
 	await $.println($.mapGet<string, number, number>(keyed, "block:\x01\xff\x80", 0)[0], $.mapGet<string, number, number>(keyed, $.bytesToString($.stringToBytes(key)), 0)[0])
 

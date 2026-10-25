@@ -151,8 +151,8 @@ export async function main(): globalThis.Promise<void> {
 
 	// A method of a pointer held in a settable Value is called by index.
 	let out = await $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.goFunc(NewWidget, "main.NewWidget"), "func() *main.Widget", ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.pointerType("main.Widget")] } as $.FunctionTypeInfo))))).Call(null)
-	let slot = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.New($.pointerValueOrNil($.markAsStructValue($.cloneStructValue($.arrayIndex(out!, 0))).Type())!))).Elem()))
-	$.markAsStructValue($.cloneStructValue(slot)).Set($.markAsStructValue($.cloneStructValue($.arrayIndex(out!, 0))))
+	let slot = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.New($.pointerValueOrNil($.markAsStructValue($.cloneStructValue($.plainSliceIndex(out!, 0))).Type())!))).Elem()))
+	$.markAsStructValue($.cloneStructValue(slot)).Set($.markAsStructValue($.cloneStructValue($.plainSliceIndex(out!, 0))))
 	let [m, ] = await (pt !== null && (pt as any).__isVarRef !== true && ((pt as any).__goValue === undefined || (pt as any).__goType?.charCodeAt(0) !== 42) ? (pt as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(pt)).MethodByName("SetText")
 	await $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(slot)).Method(m.Index))).Call($.arrayToSlice<reflect.Value>([$.markAsStructValue($.cloneStructValue(reflect.ValueOf("abc")))]))
 	fmt.Println("text", $.pointerValue<Widget>($.mustTypeAssert<Widget | $.VarRef<Widget> | null>($.markAsStructValue($.cloneStructValue(slot)).Interface(), /* @__PURE__ */ $.pointerType("main.Widget"))).Text, $.basicInterfaceValue($.markAsStructValue($.cloneStructValue(slot)).NumMethod(), "int"))
@@ -166,22 +166,22 @@ export async function main(): globalThis.Promise<void> {
 
 	// A variadic method takes its arguments one by one.
 	let sum = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(slot)).MethodByName("Sum")))
-	fmt.Println("variadic", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(sum)).Type()).IsVariadic(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), $.basicInterfaceValue($.markAsStructValue($.cloneStructValue($.arrayIndex((await $.markAsStructValue($.cloneStructValue(sum)).Call($.arrayToSlice<reflect.Value>([$.markAsStructValue($.cloneStructValue(reflect.ValueOf(__goscriptStatic3()))), $.markAsStructValue($.cloneStructValue(reflect.ValueOf(__goscriptStatic4())))])))!, 0))).Int(), "int64"))
+	fmt.Println("variadic", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(sum)).Type()).IsVariadic(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), $.basicInterfaceValue($.markAsStructValue($.cloneStructValue($.plainSliceIndex((await $.markAsStructValue($.cloneStructValue(sum)).Call($.arrayToSlice<reflect.Value>([$.markAsStructValue($.cloneStructValue(reflect.ValueOf(__goscriptStatic3()))), $.markAsStructValue($.cloneStructValue(reflect.ValueOf(__goscriptStatic4())))])))!, 0))).Int(), "int64"))
 
 	// A method of a named int is bound to its value.
 	let double = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf(__goscriptStatic5()))).Method(0)))
-	fmt.Println("double", $.basicInterfaceValue($.markAsStructValue($.cloneStructValue($.arrayIndex((await $.markAsStructValue($.cloneStructValue(double)).Call(null))!, 0))).Int(), "int64"))
+	fmt.Println("double", $.basicInterfaceValue($.markAsStructValue($.cloneStructValue($.plainSliceIndex((await $.markAsStructValue($.cloneStructValue(double)).Call(null))!, 0))).Int(), "int64"))
 
 	// A func stored in a settable Value can be called.
 	let fn = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.New($.pointerValueOrNil(reflect.TypeOf($.interfaceValue($.goFunc(strings.ToUpper, "strings.ToUpper"), "func(s string) string", ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string")], results: [/* @__PURE__ */ $.basicType("string")] } as $.FunctionTypeInfo))))!))).Elem()))
 	$.markAsStructValue($.cloneStructValue(fn)).Set($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.goFunc(strings.ToUpper, "strings.ToUpper"), "func(s string) string", ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string")], results: [/* @__PURE__ */ $.basicType("string")] } as $.FunctionTypeInfo))))))
-	fmt.Println("func", $.markAsStructValue($.cloneStructValue($.arrayIndex((await $.markAsStructValue($.cloneStructValue(fn)).Call($.arrayToSlice<reflect.Value>([$.markAsStructValue($.cloneStructValue(reflect.ValueOf("up")))])))!, 0))).String())
+	fmt.Println("func", $.markAsStructValue($.cloneStructValue($.plainSliceIndex((await $.markAsStructValue($.cloneStructValue(fn)).Call($.arrayToSlice<reflect.Value>([$.markAsStructValue($.cloneStructValue(reflect.ValueOf("up")))])))!, 0))).String())
 
 	// Method and SelectCase values are copied as structs.
 	let methods = $.arrayToSlice<reflect.Method>([$.markAsStructValue($.cloneStructValue(((__goscriptAwait = (pt !== null && (pt as any).__isVarRef !== true && ((pt as any).__goValue === undefined || (pt as any).__goType?.charCodeAt(0) !== 42) ? (pt as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(pt)).Method(0), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as reflect.Method)))])
-	let first = $.markAsStructValue($.cloneStructValue($.arrayIndex(methods!, 0)))
+	let first = $.markAsStructValue($.cloneStructValue($.plainSliceIndex(methods!, 0)))
 	let cases = $.arrayToSlice<reflect.SelectCase>([$.markAsStructValue(new reflect.SelectCase({Dir: 3}))])
-	let c = $.markAsStructValue($.cloneStructValue($.arrayIndex(cases!, 0)))
+	let c = $.markAsStructValue($.cloneStructValue($.plainSliceIndex(cases!, 0)))
 	fmt.Println("copies", first.Name, c.Dir == 3)
 
 	// FieldByIndex steps through an embedded struct pointer.
@@ -201,9 +201,9 @@ export async function main(): globalThis.Promise<void> {
 	let mf = $.markAsStructValue($.cloneStructValue(reflect.MakeFunc($.pointerValueOrNil(reflect.TypeOf($.interfaceValue($.functionValue((_p0: Widget | $.VarRef<Widget> | null): string => {
 		return ""
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.pointerType("main.Widget")], results: [/* @__PURE__ */ $.basicType("string")] } as $.FunctionTypeInfo)), "func(*main.Widget) string", ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.pointerType("main.Widget")], results: [/* @__PURE__ */ $.basicType("string")] } as $.FunctionTypeInfo))))!, $.functionValue((args: $.Slice<reflect.Value>): $.Slice<reflect.Value> => {
-		return $.arrayToSlice<reflect.Value>([$.markAsStructValue($.cloneStructValue(reflect.ValueOf(($.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue($.arrayIndex(args!, 0))).Type()).String() as string))))])
+		return $.arrayToSlice<reflect.Value>([$.markAsStructValue($.cloneStructValue(reflect.ValueOf(($.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue($.plainSliceIndex(args!, 0))).Type()).String() as string))))])
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.sliceType("reflect.Value")], results: [/* @__PURE__ */ $.sliceType("reflect.Value")] } as $.FunctionTypeInfo)))))
-	fmt.Println("makefunc", $.markAsStructValue($.cloneStructValue($.arrayIndex((await $.markAsStructValue($.cloneStructValue(mf)).Call($.arrayToSlice<reflect.Value>([$.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(new Widget(), "*main.Widget", /* @__PURE__ */ $.pointerType("main.Widget")))))])))!, 0))).String())
+	fmt.Println("makefunc", $.markAsStructValue($.cloneStructValue($.plainSliceIndex((await $.markAsStructValue($.cloneStructValue(mf)).Call($.arrayToSlice<reflect.Value>([$.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(new Widget(), "*main.Widget", /* @__PURE__ */ $.pointerType("main.Widget")))))])))!, 0))).String())
 }
 
 var __goscriptStatic0$value: any

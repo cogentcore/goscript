@@ -87,7 +87,7 @@ export async function main(): globalThis.Promise<void> {
 	let keys = $.makeChannel<crypto.PublicKey | null>(1, null! as crypto.PublicKey | null, "both")
 	await $.chanSend(keys, $.namedValueInterfaceValue<crypto.PublicKey | null>(new Uint8Array([1, 2, 3]) as $.Slice<number>, "ed25519.PublicKey", __goscriptStatic0(), __goscriptStatic1(), __goscriptStatic2()))
 	let key = ($.mustTypeAssert<ed25519.PublicKey>((await $.chanRecv(keys)), /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"), "ed25519.PublicKey")) as ed25519.PublicKey)
-	await $.println("key", $.sliceLen((key as ed25519.PublicKey)), $.arrayIndex(key!, 0))
+	await $.println("key", $.sliceLen((key as ed25519.PublicKey)), $.typedSliceIndex(key!, 0))
 
 	let target: $.VarRef<recreateError | $.VarRef<recreateError> | null> = $.varRef(null! as recreateError | $.VarRef<recreateError> | null)
 	let matched = errors.As($.pointerValueOrNil($.interfaceValue<$.GoError>(new recreateError(false, 7n), "*main.recreateError", /* @__PURE__ */ $.pointerType("main.recreateError")))!, $.interfaceValue(target, "**main.recreateError", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.pointerType("main.recreateError"))))

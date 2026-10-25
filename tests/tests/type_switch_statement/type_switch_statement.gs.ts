@@ -191,7 +191,7 @@ export async function main(): globalThis.Promise<void> {
 				break
 		}
 	}
-	await $.println("oid", $.sliceLen((oid.value as ObjectIdentifier)), $.arrayIndex(oid.value!, 0), ok)
+	await $.println("oid", $.sliceLen((oid.value as ObjectIdentifier)), $.plainSliceIndex(oid.value!, 0), ok)
 
 	let raw: $.VarRef<RawValue> = $.varRef(new RawValue(true))
 	let rawValue: any = $.interfaceValue(raw, "*main.RawValue", /* @__PURE__ */ $.pointerType("main.RawValue"))

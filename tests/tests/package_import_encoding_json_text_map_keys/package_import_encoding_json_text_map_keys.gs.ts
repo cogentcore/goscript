@@ -79,7 +79,7 @@ export function __goscript_set_tokenNames(__goscriptValue: $.Slice<string>): voi
 }
 
 export function Tokens_String(t: Tokens): string {
-	return $.arrayIndex(tokenNames!, t)
+	return $.plainSliceIndex(tokenNames!, t)
 }
 
 export function Tokens_MarshalText(t: Tokens): [$.Slice<number>, $.GoError] {
@@ -120,7 +120,7 @@ export async function main(): globalThis.Promise<void> {
 		await $.println("error:", (__goscriptAwait = (err !== null && (err as any).__isVarRef !== true && ((err as any).__goValue === undefined || (err as any).__goType?.charCodeAt(0) !== 42) ? (err as Exclude<$.GoError, null>) : $.pointerValue<Exclude<$.GoError, null>>(err)).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	}
 	await $.println("comment:", $.mapGet<Tokens, string, string>($.mapGet<string, Style, Style>(d.value.Styles, "x", null)[0], 2, "")[0])
-	await $.println("kind:", Tokens_String(d.value.Kind), "kinds:", $.sliceLen(d.value.Kinds), Tokens_String($.arrayIndex(d.value.Kinds!, 0)), Tokens_String($.arrayIndex(d.value.Kinds!, 1)))
+	await $.println("kind:", Tokens_String(d.value.Kind), "kinds:", $.sliceLen(d.value.Kinds), Tokens_String($.typedSliceIndex(d.value.Kinds!, 0)), Tokens_String($.typedSliceIndex(d.value.Kinds!, 1)))
 	let __goscriptTuple0: any = (json.Marshal($.structInterfaceValue(new Doc(true, 1, $.typedSliceOf(Int32Array, [2]) as $.Slice<Tokens>), "main.Doc", "main.Doc")) as [$.Slice<number>, $.GoError])
 	let b: $.Slice<number> = __goscriptTuple0[0]
 	await $.println("marshal doc:", $.bytesToString(b))
@@ -147,7 +147,7 @@ export async function main(): globalThis.Promise<void> {
 		keys = $.appendOne(keys, k)
 	}
 	sort.Strings(keys)
-	await $.println("styles keys:", $.sliceLen(keys), $.arrayIndex(keys!, 0))
+	await $.println("styles keys:", $.sliceLen(keys), $.plainSliceIndex(keys!, 0))
 }
 
 var __goscriptAwait: any

@@ -23,13 +23,13 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("write bc", n, err == null)
 	let stream = await (h !== null && (h as any).__isVarRef !== true && ((h as any).__goValue === undefined || (h as any).__goType?.charCodeAt(0) !== 42) ? (h as Exclude<hash.Hash, null>) : $.pointerValue<Exclude<hash.Hash, null>>(h)).Sum(new Uint8Array([1, 2]) as $.Slice<number>)
 	await $.println("stream len", $.sliceLen(stream))
-	await $.println("stream prefix", $.arrayIndex(stream!, 0), $.arrayIndex(stream!, 1))
-	await $.println("stream digest", $.arrayIndex(stream!, 2), $.arrayIndex(stream!, 33))
+	await $.println("stream prefix", $.typedSliceIndex(stream!, 0), $.typedSliceIndex(stream!, 1))
+	await $.println("stream digest", $.typedSliceIndex(stream!, 2), $.typedSliceIndex(stream!, 33))
 
 	let backing = $.makeSlice<number>(sha256.Size, undefined, "byte")
 	let backed = await (h !== null && (h as any).__isVarRef !== true && ((h as any).__goValue === undefined || (h as any).__goType?.charCodeAt(0) !== 42) ? (h as Exclude<hash.Hash, null>) : $.pointerValue<Exclude<hash.Hash, null>>(h)).Sum($.goSlice(backing, undefined, 0))
 	await $.println("backed len", $.sliceLen(backed), $.sliceLen(backing))
-	await $.println("backed digest", $.arrayIndex(backing!, 0), $.arrayIndex(backing!, 31), $.arrayIndex(backed!, 0), $.arrayIndex(backed!, 31))
+	await $.println("backed digest", $.typedSliceIndex(backing!, 0), $.typedSliceIndex(backing!, 31), $.typedSliceIndex(backed!, 0), $.typedSliceIndex(backed!, 31))
 }
 
 if ($.isMainScript(import.meta)) {
