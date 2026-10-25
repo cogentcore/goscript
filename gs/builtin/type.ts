@@ -2947,8 +2947,37 @@ export function typeInfoGoString(
           prefixTypeString(`map[${key}]`, info.elemType)
         )
     }
+    case TypeKind.Function:
+      return functionTypeString(info)
+    case TypeKind.Interface:
+      return info.methods.length === 0 ? 'interface {}' : undefined
   }
   return undefined
+}
+
+// functionTypeString returns the Go type string of the function type info,
+// such as func(int, ...string) (bool, error), or undefined if one of its
+// types cannot be spelled.
+function functionTypeString(info: FunctionTypeInfo): string | undefined {
+  const params = (info.params ?? []).map(typeInfoGoString)
+  const results = (info.results ?? []).map(typeInfoGoString)
+  if ([...params, ...results].some((t) => t === undefined)) {
+    return undefined
+  }
+
+  // The last parameter of a variadic function is spelled ...T, not []T.
+  const last = params.length - 1
+  if (info.isVariadic && last >= 0 && params[last]!.startsWith('[]')) {
+    params[last] = '...' + params[last]!.substring(2)
+  }
+  const text = 'func(' + params.join(', ') + ')'
+  if (results.length === 0) {
+    return text
+  }
+  if (results.length === 1) {
+    return text + ' ' + results[0]
+  }
+  return text + ' (' + results.join(', ') + ')'
 }
 
 // dynamicTypeName returns the Go type string of info as the dynamic type of

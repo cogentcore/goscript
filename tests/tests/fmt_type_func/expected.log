@@ -1,0 +1,3 @@
+func(int) string|func(int, int) int|main.handler|func(...interface {}) (int, error)
+func()
+func(int) string
