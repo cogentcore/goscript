@@ -18,7 +18,7 @@ export function field(v: reflect.Value): string {
 				}
 			}
 		})() })
-		const __goscriptReturn0: string = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(v)).Field(0))).String()
+		const __goscriptReturn0: string = v.Field(0).String()
 		s = __goscriptReturn0
 		__defer.dispose()
 		return s
@@ -38,7 +38,7 @@ export async function main(): globalThis.Promise<void> {
 
 		constructor(init?: Partial<{S?: string}>, __goscriptValue?: boolean) {
 			this.S = init?.S ?? ("" as string)
-			;(this as any)[$.structValueMarker] = __goscriptValue === true
+			;(this as any).__goStructValue = __goscriptValue === true
 		}
 
 		public clone(): T {
@@ -58,7 +58,7 @@ export async function main(): globalThis.Promise<void> {
 			() => [/* @__PURE__ */ $.structField("S", /* @__PURE__ */ $.basicType("string"), [0], 0, true)]
 		)
 	}
-	await $.println(field($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.structInterfaceValue($.markAsStructValue(new T({S: "ok"})), "main.T", "main.T"))))))
+	await $.println(field(reflect.ValueOf($.structInterfaceValue($.markAsStructValue(new T({S: "ok"})), "main.T", "main.T"))))
 	await $.println(field($.markAsStructValue(new reflect.Value())))
 }
 

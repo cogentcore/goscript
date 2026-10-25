@@ -3,7 +3,9 @@
 
 import * as $ from "@goscript/builtin/index.js"
 import * as reflect from "@goscript/reflect/index.js"
+import * as strings from "@goscript/strings/index.js"
 import type * as iter from "@goscript/iter/index.js"
+import "@goscript/strings/index.js"
 
 export class pair {
 	public declare A: number
@@ -26,6 +28,12 @@ export class pair {
 		return this
 	}
 
+	public Add(n: number): void {
+		const p: pair | $.VarRef<pair> | null = this;
+		const p$: pair = p == null ? $.pointerTarget<pair>(p) : (p as any).__isVarRef === true ? (p as any).value : (p as any).__goValue === undefined ? (p as any) : $.pointerTarget<pair>(p);
+		;(p$ as pair).A += n
+	}
+
 	public Sum(): number {
 		const p = this;
 		return p.A + $.stringLen(p.B)
@@ -34,7 +42,7 @@ export class pair {
 	static __typeInfo = $.registerStructType(
 		"main.pair",
 		() => new pair(),
-		() => [$.methodSignature("Sum", [], [/* @__PURE__ */ $.basicType("int")])],
+		() => [$.methodSignature("Add", [["n", /* @__PURE__ */ $.basicType("int")]], [], true), $.methodSignature("Sum", [], [/* @__PURE__ */ $.basicType("int")])],
 		pair,
 		() => [/* @__PURE__ */ $.structField("A", /* @__PURE__ */ $.basicType("int"), [0], 0, true), /* @__PURE__ */ $.structField("B", /* @__PURE__ */ $.basicType("string"), [1], 8, true)]
 	)
@@ -61,13 +69,13 @@ export async function main(): globalThis.Promise<void> {
 	let sv = reflect.ValueOf($.interfaceValue(s, "*[]int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"))))).Elem()
 	sv.Clear()
 	sv.SetCap(4)
-	await $.println("clear:", $.len(m), $.arrayIndex(s.value!, 0), $.sliceLen(s.value), $.cap(s.value))
+	await $.println("clear:", $.len(m), $.plainSliceIndex(s.value!, 0), $.sliceLen(s.value), $.cap(s.value))
 
 	// Fields and Methods iterate with names and values.
-	let p = new pair(true, 1, "xy")
+	let p = $.varRef(new pair(true, 1, "xy"))
 	let __goscriptRangeReturn0 = false
 	;await (async () => {
-		await reflect.ValueOf($.structInterfaceValue((p).clone(), "main.pair", "main.pair")).Fields()!(async (sf, v) => {
+		await reflect.ValueOf($.structInterfaceValue((p.value).clone(), "main.pair", "main.pair")).Fields()!(async (sf, v) => {
 			await $.println("field:", sf.Name, reflect.Kind_String(v.Kind()))
 			return true
 		})
@@ -77,12 +85,62 @@ export async function main(): globalThis.Promise<void> {
 	}
 	let __goscriptRangeReturn1 = false
 	;await (async () => {
-		await reflect.ValueOf($.structInterfaceValue((p).clone(), "main.pair", "main.pair")).Methods()!(async (meth, v) => {
-			await $.println("method:", meth.Name, $.arrayIndex((await v.Call(null))!, 0).Int())
+		await reflect.ValueOf($.structInterfaceValue((p.value).clone(), "main.pair", "main.pair")).Methods()!(async (meth, v) => {
+			await $.println("method:", meth.Name, $.plainSliceIndex((await v.Call(null))!, 0).Int())
 			return true
 		})
 	})()
 	if (__goscriptRangeReturn1) {
+		return
+	}
+
+	// The Type iterators yield fields, methods, and function inputs and outputs.
+	let pt = reflect.TypeOf($.structInterfaceValue((p.value).clone(), "main.pair", "main.pair"))
+	let __goscriptRangeReturn2 = false
+	;await (async () => {
+		await ((__goscriptAwait = (pt !== null && (pt as any).__isVarRef !== true && ((pt as any).__goValue === undefined || (pt as any).__goType?.charCodeAt(0) !== 42) ? (pt as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(pt)).Fields(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as iter.Seq<reflect.StructField> | null)!(async (sf) => {
+			await $.println("type field:", sf.Name, (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(sf.Type).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+			return true
+		})
+	})()
+	if (__goscriptRangeReturn2) {
+		return
+	}
+	let __goscriptRangeReturn3 = false
+	;await (async () => {
+		await ((__goscriptAwait = (pt !== null && (pt as any).__isVarRef !== true && ((pt as any).__goValue === undefined || (pt as any).__goType?.charCodeAt(0) !== 42) ? (pt as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(pt)).Methods(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as iter.Seq<reflect.Method> | null)!(async (meth) => {
+			await $.println("type method:", meth.Name, (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(meth.Type).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), $.markAsStructValue($.cloneStructValue(meth)).IsExported())
+			return true
+		})
+	})()
+	if (__goscriptRangeReturn3) {
+		return
+	}
+	// Method.Func takes the receiver as its first argument.
+	let [sum, ] = await (pt !== null && (pt as any).__isVarRef !== true && ((pt as any).__goValue === undefined || (pt as any).__goType?.charCodeAt(0) !== 42) ? (pt as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(pt)).MethodByName("Sum")
+	await $.println("func:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(sum.Func.Type()).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), $.plainSliceIndex((await sum.Func.Call($.arrayToSlice<reflect.Value>([reflect.ValueOf($.structInterfaceValue((p.value).clone(), "main.pair", "main.pair"))])))!, 0).Int())
+	let [addm, ] = await $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf($.interfaceValue(p, "*main.pair", /* @__PURE__ */ $.pointerType("main.pair")))).MethodByName("Add")
+	await addm.Func.Call($.arrayToSlice<reflect.Value>([reflect.ValueOf($.interfaceValue(p, "*main.pair", /* @__PURE__ */ $.pointerType("main.pair"))), reflect.ValueOf($.basicInterfaceValue(5, "int"))]))
+	await $.println("ptr func:", (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(addm.Func.Type()).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), p.value.A)
+	let ft = reflect.TypeOf($.interfaceValue($.goFunc(strings.Repeat, "strings.Repeat"), "func(s string, count int) string", ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("string")] } as $.FunctionTypeInfo)))
+	let __goscriptRangeReturn4 = false
+	;await (async () => {
+		await ((__goscriptAwait = (ft !== null && (ft as any).__isVarRef !== true && ((ft as any).__goValue === undefined || (ft as any).__goType?.charCodeAt(0) !== 42) ? (ft as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(ft)).Ins(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as iter.Seq<reflect.Type | null> | null)!(async (_in) => {
+			await $.println("in:", (__goscriptAwait = (_in !== null && (_in as any).__isVarRef !== true && ((_in as any).__goValue === undefined || (_in as any).__goType?.charCodeAt(0) !== 42) ? (_in as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(_in)).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+			return true
+		})
+	})()
+	if (__goscriptRangeReturn4) {
+		return
+	}
+	let __goscriptRangeReturn5 = false
+	;await (async () => {
+		await ((__goscriptAwait = (ft !== null && (ft as any).__isVarRef !== true && ((ft as any).__goValue === undefined || (ft as any).__goType?.charCodeAt(0) !== 42) ? (ft as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(ft)).Outs(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as iter.Seq<reflect.Type | null> | null)!(async (out) => {
+			await $.println("out:", (__goscriptAwait = (out !== null && (out as any).__isVarRef !== true && ((out as any).__goValue === undefined || (out as any).__goType?.charCodeAt(0) !== 42) ? (out as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(out)).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+			return true
+		})
+	})()
+	if (__goscriptRangeReturn5) {
 		return
 	}
 
@@ -116,6 +174,8 @@ var __goscriptStatic1$value: any
 function __goscriptStatic1(): any {
 	return __goscriptStatic1$value ??= ({[$.genericTypeArgsMarker]: $.genericTypeArgsBrand, T: { type: /* @__PURE__ */ $.basicType("int"), zero: () => 0 }})
 }
+
+var __goscriptAwait: any
 
 if ($.isMainScript(import.meta)) {
 	await main()

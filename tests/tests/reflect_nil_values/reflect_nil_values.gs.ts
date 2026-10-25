@@ -10,7 +10,7 @@ export class S {
 
 	constructor(__goscriptValue?: boolean, V$?: $.Slice<string>) {
 		this.V = V$ ?? (null! as $.Slice<string>)
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): S {
@@ -34,30 +34,30 @@ export class S {
 export async function main(): globalThis.Promise<void> {
 	// The zero value of a slice type is a nil slice.
 	let st = reflect.TypeOf($.interfaceValue(null, "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"))))
-	let z = $.markAsStructValue($.cloneStructValue(reflect.Zero($.pointerValueOrNil(st)!)))
-	let n = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.New($.pointerValueOrNil(st)!))).Elem()))
-	fmt.Println($.markAsStructValue($.cloneStructValue(z)).IsNil(), $.markAsStructValue($.cloneStructValue(n)).IsNil(), $.basicInterfaceValue($.markAsStructValue($.cloneStructValue(n)).Len(), "int"), $.markAsStructValue($.cloneStructValue(reflect.MakeSlice($.pointerValueOrNil(st)!, 0, 0))).IsNil())
+	let z = reflect.Zero($.pointerValueOrNil(st)!)
+	let n = reflect.New($.pointerValueOrNil(st)!).Elem()
+	fmt.Println(z.IsNil(), n.IsNil(), $.basicInterfaceValue(n.Len(), "int"), reflect.MakeSlice($.pointerValueOrNil(st)!, 0, 0).IsNil())
 	let bs: $.VarRef<$.Slice<number>> = $.varRef(null! as $.Slice<number>)
-	let p = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(bs, "*[]byte", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))))))).Elem()))
-	$.markAsStructValue($.cloneStructValue(p)).Set($.markAsStructValue($.cloneStructValue(reflect.Zero($.pointerValueOrNil($.markAsStructValue($.cloneStructValue(p)).Type())!))))
-	fmt.Println($.markAsStructValue($.cloneStructValue(p)).IsNil(), bs.value == null)
+	let p = reflect.ValueOf($.interfaceValue(bs, "*[]byte", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("uint8"))))).Elem()
+	p.Set(reflect.Zero($.pointerValueOrNil(p.Type())!))
+	fmt.Println(p.IsNil(), bs.value == null)
 
 	// An interface holding a nil slice is not nil.
-	let x = $.varRef($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(new S(), "*main.S", /* @__PURE__ */ $.pointerType("main.S"))))).Elem())).Field(0))).Interface())
-	fmt.Println(x.value == null, $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(x, "*interface{}", /* @__PURE__ */ $.pointerType({ kind: $.TypeKind.Interface, methods: [] }))))).Elem())).IsNil())
+	let x = $.varRef(reflect.ValueOf($.interfaceValue(new S(), "*main.S", /* @__PURE__ */ $.pointerType("main.S"))).Elem().Field(0).Interface())
+	fmt.Println(x.value == null, reflect.ValueOf($.interfaceValue(x, "*interface{}", /* @__PURE__ */ $.pointerType({ kind: $.TypeKind.Interface, methods: [] }))).Elem().IsNil())
 	let e: $.VarRef<any> = $.varRef(null! as any)
-	fmt.Println($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(e, "*interface{}", /* @__PURE__ */ $.pointerType({ kind: $.TypeKind.Interface, methods: [] }))))).Elem())).IsNil())
+	fmt.Println(reflect.ValueOf($.interfaceValue(e, "*interface{}", /* @__PURE__ */ $.pointerType({ kind: $.TypeKind.Interface, methods: [] }))).Elem().IsNil())
 
 	// MapIndex finds a key however its Value was made, and gives the zero
 	// Value for a missing one.
 	let m = $.makeMap<number, string>([[0, "a"]])
-	let mv = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(m, "map[int]string", /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("string"))))))
-	let k = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.New($.pointerValueOrNil(reflect.TypeOf($.basicInterfaceValue(0, "int")))!))).Elem()))
-	$.markAsStructValue($.cloneStructValue(k)).SetInt(0n)
-	fmt.Println($.structInterfaceValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(mv)).MapIndex($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.basicInterfaceValue(0, "int"))))))), "reflect.Value", __goscriptStatic0()), $.structInterfaceValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(mv)).MapIndex($.markAsStructValue($.cloneStructValue(k))))), "reflect.Value", __goscriptStatic0()))
-	fmt.Println($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(mv)).MapIndex($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.basicInterfaceValue(5, "int"))))))).IsValid())
+	let mv = reflect.ValueOf($.interfaceValue(m, "map[int]string", /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("string"))))
+	let k = reflect.New($.pointerValueOrNil(reflect.TypeOf($.basicInterfaceValue(0, "int")))!).Elem()
+	k.SetInt(0n)
+	fmt.Println($.structInterfaceValue(mv.MapIndex(reflect.ValueOf($.basicInterfaceValue(0, "int"))), "reflect.Value", __goscriptStatic0()), $.structInterfaceValue(mv.MapIndex(k), "reflect.Value", __goscriptStatic0()))
+	fmt.Println(mv.MapIndex(reflect.ValueOf($.basicInterfaceValue(5, "int"))).IsValid())
 	let nilMap: globalThis.Map<number, string> | null = null! as globalThis.Map<number, string> | null
-	fmt.Println($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(nilMap, "map[int]string", /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("string")))))).MapIndex(k))).IsValid())
+	fmt.Println(reflect.ValueOf($.interfaceValue(nilMap, "map[int]string", /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("string")))).MapIndex(k).IsValid())
 }
 
 var __goscriptStatic0$value: any

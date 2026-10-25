@@ -29,10 +29,10 @@ export async function main(): globalThis.Promise<void> {
 
 	// Pointers to override struct types, reached only by reflection, have
 	// the methods of their Go types.
-	for (let __goscriptRangeTarget0 = $.arrayToSlice<reflect.Value>([$.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(null, "*strings.Builder", __goscriptStatic8())))), $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(null, "*bytes.Buffer", __goscriptStatic9())))), $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(null, "*strings.Reader", __goscriptStatic10()))))]), __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
-		let v = $.markAsStructValue($.cloneStructValue((__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as reflect.Value)))
-		let [, __goscriptShadow0] = await $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(v)).Type()).MethodByName("Len")
-		fmt.Println("methods", ($.markAsStructValue($.cloneStructValue(v)).Type() as any), (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(v)).Type()).NumMethod(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) > 0, __goscriptShadow0)
+	for (let __goscriptRangeTarget0 = $.arrayToSlice<reflect.Value>([reflect.ValueOf($.interfaceValue(null, "*strings.Builder", __goscriptStatic8())), reflect.ValueOf($.interfaceValue(null, "*bytes.Buffer", __goscriptStatic9())), reflect.ValueOf($.interfaceValue(null, "*strings.Reader", __goscriptStatic10()))]), __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __rangeIndex = 0; __rangeIndex < __goscriptRangeWindow0.length; __rangeIndex++) {
+		let v = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + __rangeIndex] as reflect.Value)
+		let [, __goscriptShadow0] = await $.pointerValue<Exclude<reflect.Type, null>>(v.Type()).MethodByName("Len")
+		fmt.Println("methods", (v.Type() as any), (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(v.Type()).NumMethod(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) > 0, __goscriptShadow0)
 	}
 }
 

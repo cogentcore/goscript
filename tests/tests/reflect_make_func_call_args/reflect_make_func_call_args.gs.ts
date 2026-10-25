@@ -78,15 +78,15 @@ export async function main(): globalThis.Promise<void> {
 	// makes the function literals of its code, passed by reflect.Value.Call
 	// to an exported method and function, which call it.
 	let keep = reflect.MakeFunc($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic0()))!, $.functionValue((args: $.Slice<reflect.Value>): $.Slice<reflect.Value> => {
-		return $.arrayToSlice<reflect.Value>([reflect.ValueOf($.arrayIndex(args!, 0).Int() > 4n)])
+		return $.arrayToSlice<reflect.Value>([reflect.ValueOf($.plainSliceIndex(args!, 0).Int() > 4n)])
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.sliceType("reflect.Value")], results: [/* @__PURE__ */ $.sliceType("reflect.Value")] } as $.FunctionTypeInfo)))
 	let values = new Values(false, $.arrayToSlice<number>([1, 5, 7, 2]))
 	let values$: Values = values == null ? $.pointerTarget<Values>(values) : (values as any).__isVarRef === true ? (values as any).value : (values as any).__goValue === undefined ? (values as any) : $.pointerTarget<Values>(values)
-	await $.println($.arrayIndex((await reflect.ValueOf($.interfaceValue(values, "*main.Values", /* @__PURE__ */ $.pointerType("main.Values"))).MethodByName("Count").Call($.arrayToSlice<reflect.Value>([keep])))!, 0).Int())
+	await $.println($.plainSliceIndex((await reflect.ValueOf($.interfaceValue(values, "*main.Values", /* @__PURE__ */ $.pointerType("main.Values"))).MethodByName("Count").Call($.arrayToSlice<reflect.Value>([keep])))!, 0).Int())
 	let double = reflect.MakeFunc($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic1()))!, $.functionValue((args: $.Slice<reflect.Value>): $.Slice<reflect.Value> => {
-		return $.arrayToSlice<reflect.Value>([reflect.ValueOf($.basicInterfaceValue(2 * $.int64ToNumber($.arrayIndex(args!, 0).Int()), "int"))])
+		return $.arrayToSlice<reflect.Value>([reflect.ValueOf($.basicInterfaceValue(2 * $.int64ToNumber($.plainSliceIndex(args!, 0).Int()), "int"))])
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.sliceType("reflect.Value")], results: [/* @__PURE__ */ $.sliceType("reflect.Value")] } as $.FunctionTypeInfo)))
-	await $.println($.arrayIndex((await reflect.ValueOf($.interfaceValue($.goFunc(Sum, "main.Sum"), "func(vals []int, f func(v int) int) int", ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")), ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo)], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))).Call($.arrayToSlice<reflect.Value>([reflect.ValueOf($.interfaceValue((values$ as Values).vals, "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")))), double])))!, 0).Int())
+	await $.println($.plainSliceIndex((await reflect.ValueOf($.interfaceValue($.goFunc(Sum, "main.Sum"), "func(vals []int, f func(v int) int) int", ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")), ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo)], results: [/* @__PURE__ */ $.basicType("int")] } as $.FunctionTypeInfo))).Call($.arrayToSlice<reflect.Value>([reflect.ValueOf($.interfaceValue((values$ as Values).vals, "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")))), double])))!, 0).Int())
 
 	// Compiled calls are unchanged.
 	await $.println(Values.prototype.Count.call(values, $.functionValue((v: number): boolean => {

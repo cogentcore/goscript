@@ -292,9 +292,9 @@ export async function main(): globalThis.Promise<void> {
 
 	// Field Values copied into a slice read back what was set through them.
 	let fields = $.arrayToSlice<reflect.Value>([e.Field(0), e.Field(1)])
-	$.arrayIndex(fields!, 0).SetString("ccc")
-	$.arrayIndex(fields!, 1).SetFloat(1.5)
-	await $.println($.arrayIndex(fields!, 0).String(), $.arrayIndex(fields!, 1).Float(), $.pointerValue<T>(s.value).A, $.pointerValue<T>(s.value).B)
+	$.plainSliceIndex(fields!, 0).SetString("ccc")
+	$.plainSliceIndex(fields!, 1).SetFloat(1.5)
+	await $.println($.plainSliceIndex(fields!, 0).String(), $.plainSliceIndex(fields!, 1).Float(), $.pointerValue<T>(s.value).A, $.pointerValue<T>(s.value).B)
 
 	// Values made by New read back what was set through them, as decoders
 	// building map keys do.

@@ -12,7 +12,7 @@ export class slot {
 	constructor(__goscriptValue?: boolean, n$?: number, ref$?: reflect.Value) {
 		this.n = n$ ?? 0
 		this.ref = ref$ ?? $.markAsStructValue(new reflect.Value())
-		;(this as any)[$.structValueMarker] = __goscriptValue === true
+		;(this as any).__goStructValue = __goscriptValue === true
 	}
 
 	public clone(): slot {
@@ -52,9 +52,9 @@ export async function main(): globalThis.Promise<void> {
 	// A slice of slots copies Values on assignment.
 	let stack = $.makeSlice<slot>(3, undefined, undefined, () => new slot(true))
 	$.sliceElems(stack!)[$.sliceSlot(stack!, 0)].__goscriptAssign((() => { const __goscriptLiteralField0 = reflect.ValueOf("a"); return new slot(true, undefined, __goscriptLiteralField0) })())
-	$.sliceElems(stack!)[$.sliceSlot(stack!, 1)].__goscriptAssign($.arrayIndex(stack!, 0))
+	$.sliceElems(stack!)[$.sliceSlot(stack!, 1)].__goscriptAssign($.plainSliceIndex(stack!, 0))
 	$.sliceElems(stack!)[$.sliceSlot(stack!, 0)].__goscriptAssign((() => { const __goscriptLiteralField1 = reflect.ValueOf($.basicInterfaceValue(5, "int")); return new slot(true, undefined, __goscriptLiteralField1) })())
-	await $.println("stack:", $.arrayIndex(stack!, 0).ref.Int(), $.arrayIndex(stack!, 1).ref.String(), $.arrayIndex(stack!, 2).ref.IsValid())
+	await $.println("stack:", $.plainSliceIndex(stack!, 0).ref.Int(), $.plainSliceIndex(stack!, 1).ref.String(), $.plainSliceIndex(stack!, 2).ref.IsValid())
 
 	// A Value of a struct field reads and writes the field.
 	class pair {
@@ -65,7 +65,7 @@ export async function main(): globalThis.Promise<void> {
 		constructor(init?: Partial<{A?: number, B?: number}>, __goscriptValue?: boolean) {
 			this.A = init?.A ?? (0 as number)
 			this.B = init?.B ?? (0 as number)
-			;(this as any)[$.structValueMarker] = __goscriptValue === true
+			;(this as any).__goStructValue = __goscriptValue === true
 		}
 
 		public clone(): pair {

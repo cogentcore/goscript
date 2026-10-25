@@ -192,7 +192,7 @@ export async function panicNilError(): globalThis.Promise<void> {
 		})() })
 		let s: $.Slice<number> = null! as $.Slice<number>
 		let i = 5
-		$.arrayIndex(s!, i)
+		$.plainSliceIndex(s!, i)
 		await __defer.dispose()
 	} catch (e) {
 		await __defer.disposePanic(e)

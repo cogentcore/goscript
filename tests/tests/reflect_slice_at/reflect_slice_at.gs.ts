@@ -147,12 +147,12 @@ export async function main(): globalThis.Promise<void> {
 	await $.println("bytes:", bytes.Len(), bytes.Cap(), bytes.Index(0).Uint(), bytes.Index(1).Uint())
 	bytes.Index(0).SetUint(9n)
 	bytes.Index(1).SetUint(8n)
-	await $.println("buf:", $.arrayIndex(buf!, 0), $.arrayIndex(buf!, 1), $.arrayIndex(buf!, 2), $.arrayIndex(buf!, 3))
+	await $.println("buf:", $.typedSliceIndex(buf!, 0), $.typedSliceIndex(buf!, 1), $.typedSliceIndex(buf!, 2), $.typedSliceIndex(buf!, 3))
 
 	let ints = $.arrayToSlice<number>([10, 20, 30, 40])
 	let intSlice = reflect.SliceAt($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic0()))!, ($.indexRef(ints!, 1) as any), 2)
 	intSlice.Index(1).SetInt(77n)
-	await $.println("ints:", $.arrayIndex(ints!, 0), $.arrayIndex(ints!, 1), $.arrayIndex(ints!, 2), $.arrayIndex(ints!, 3), intSlice.Len(), intSlice.Cap())
+	await $.println("ints:", $.plainSliceIndex(ints!, 0), $.plainSliceIndex(ints!, 1), $.plainSliceIndex(ints!, 2), $.plainSliceIndex(ints!, 3), intSlice.Len(), intSlice.Cap())
 
 	let empty = reflect.SliceAt($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic0()))!, (null as any), 0)
 	await $.println("empty:", empty.IsNil(), empty.Len(), empty.Cap())

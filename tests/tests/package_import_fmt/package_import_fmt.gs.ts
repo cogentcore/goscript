@@ -170,7 +170,7 @@ export async function main(): globalThis.Promise<void> {
 		constructor(init?: Partial<{X?: number, Y?: number}>, __goscriptValue?: boolean) {
 			this.X = init?.X ?? (0 as number)
 			this.Y = init?.Y ?? (0 as number)
-			;(this as any)[$.structValueMarker] = __goscriptValue === true
+			;(this as any).__goStructValue = __goscriptValue === true
 		}
 
 		public clone(): pt {
@@ -191,9 +191,9 @@ export async function main(): globalThis.Promise<void> {
 			() => [/* @__PURE__ */ $.structField("X", /* @__PURE__ */ $.basicType("int"), [0], 0, true), /* @__PURE__ */ $.structField("Y", /* @__PURE__ */ $.basicType("int"), [1], 8, true)]
 		)
 	}
-	let rv = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.basicInterfaceValue(5, "int"))))
-	fmt.Printf("reflect: %v %d %s %+v\n", $.structInterfaceValue($.markAsStructValue($.cloneStructValue(rv)), "reflect.Value", __goscriptStatic1()), $.structInterfaceValue($.markAsStructValue($.cloneStructValue(rv)), "reflect.Value", __goscriptStatic1()), $.structInterfaceValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf("hi"))), "reflect.Value", __goscriptStatic1()), $.structInterfaceValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.structInterfaceValue($.markAsStructValue(new pt({X: 1, Y: 2})), "main.pt", "main.pt")))), "reflect.Value", __goscriptStatic1()))
-	fmt.Println("reflect:", $.structInterfaceValue(rv, "reflect.Value", __goscriptStatic1()), $.structInterfaceValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.arrayToSlice<number>([1, 2]), "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")))))), "reflect.Value", __goscriptStatic1()), $.structInterfaceValue($.markAsStructValue(new reflect.Value()), "reflect.Value", __goscriptStatic1()))
+	let rv = reflect.ValueOf($.basicInterfaceValue(5, "int"))
+	fmt.Printf("reflect: %v %d %s %+v\n", $.structInterfaceValue(rv, "reflect.Value", __goscriptStatic1()), $.structInterfaceValue(rv, "reflect.Value", __goscriptStatic1()), $.structInterfaceValue(reflect.ValueOf("hi"), "reflect.Value", __goscriptStatic1()), $.structInterfaceValue(reflect.ValueOf($.structInterfaceValue($.markAsStructValue(new pt({X: 1, Y: 2})), "main.pt", "main.pt")), "reflect.Value", __goscriptStatic1()))
+	fmt.Println("reflect:", $.structInterfaceValue(rv, "reflect.Value", __goscriptStatic1()), $.structInterfaceValue(reflect.ValueOf($.interfaceValue($.arrayToSlice<number>([1, 2]), "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")))), "reflect.Value", __goscriptStatic1()), $.structInterfaceValue($.markAsStructValue(new reflect.Value()), "reflect.Value", __goscriptStatic1()))
 
 	await $.println("test finished")
 }

@@ -215,16 +215,16 @@ export async function main(): globalThis.Promise<void> {
 	// such as yaegi call them, have the methods of their instantiated types.
 	for (let __goscriptRangeTarget3 = $.arrayToSlice<any>([$.interfaceValue($.goFunc(NewFloat32, "main.NewFloat32"), "func() *main.Number[float32]", ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.genericStructType("main.Number", "main.Number[float32]", () => [/* @__PURE__ */ $.structField("Base", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.genericStructType("main.Base", "main.Base[float32]", () => [/* @__PURE__ */ $.structField("Vals", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("float32")), [0], 0, true)])), [0], 0, true, { anonymous: true })]))] } as $.FunctionTypeInfo)), $.interfaceValue($.functionValue((): Number | $.VarRef<Number> | null => NewNumber(__goscriptStatic2()), ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.pointerType("main.Number")] } as $.FunctionTypeInfo)), "func() *main.Number[int]", ({ kind: $.TypeKind.Function, params: [], results: [/* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.genericStructType("main.Number", "main.Number[int]", () => [/* @__PURE__ */ $.structField("Base", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.genericStructType("main.Base", "main.Base[int]", () => [/* @__PURE__ */ $.structField("Vals", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")), [0], 0, true)])), [0], 0, true, { anonymous: true })]))] } as $.FunctionTypeInfo))]), __goscriptRangeWindow3 = $.sliceRange(__goscriptRangeTarget3), i = 0; i < __goscriptRangeWindow3.length; i++) {
 		let f = (__goscriptRangeWindow3.backing[__goscriptRangeWindow3.offset + i] as any)
-		let r = $.arrayIndex((await reflect.ValueOf(f).Call(null))!, 0)
-		await $.println($.arrayIndex((await r.MethodByName("Kind").Call(null))!, 0).String())
+		let r = $.plainSliceIndex((await reflect.ValueOf(f).Call(null))!, 0)
+		await $.println($.plainSliceIndex((await r.MethodByName("Kind").Call(null))!, 0).String())
 		await $.println((__goscriptAwait = $.pointerValue<Exclude<kinder, null>>($.mustTypeAssert<kinder | null>(r.Interface(), "main.kinder")).Kind(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), (__goscriptAwait = $.pointerValue<Exclude<stringer, null>>($.mustTypeAssert<stringer | null>(r.Interface(), "main.stringer")).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
-		await $.println($.arrayIndex((await reflect.ValueOf($.interfaceValue($.goFunc(describe, "main.describe"), "func(n main.kinder) string", ({ kind: $.TypeKind.Function, params: ["main.kinder"], results: [/* @__PURE__ */ $.basicType("string")] } as $.FunctionTypeInfo))).Call($.arrayToSlice<reflect.Value>([r])))!, 0).String())
+		await $.println($.plainSliceIndex((await reflect.ValueOf($.interfaceValue($.goFunc(describe, "main.describe"), "func(n main.kinder) string", ({ kind: $.TypeKind.Function, params: ["main.kinder"], results: [/* @__PURE__ */ $.basicType("string")] } as $.FunctionTypeInfo))).Call($.arrayToSlice<reflect.Value>([r])))!, 0).String())
 		await r.MethodByName("Set").Call($.arrayToSlice<reflect.Value>([reflect.ValueOf($.basicInterfaceValue(2.5, "float64")), reflect.ValueOf($.basicInterfaceValue(2, "int"))]))
 		let vals = r.Elem().Field(0).Elem().Field(0)
-		await $.println(vals.Len(), typeName($.arrayIndex((await r.MethodByName("First").Call(null))!, 0).Interface()))
-		let fill = $.arrayIndex($.arrayToSlice<any>([$.basicInterfaceValue(1.5, "float32"), $.basicInterfaceValue(3, "int")])!, i)
+		await $.println(vals.Len(), typeName($.plainSliceIndex((await r.MethodByName("First").Call(null))!, 0).Interface()))
+		let fill = $.plainSliceIndex($.arrayToSlice<any>([$.basicInterfaceValue(1.5, "float32"), $.basicInterfaceValue(3, "int")])!, i)
 		await r.MethodByName("Fill").Call($.arrayToSlice<reflect.Value>([reflect.ValueOf(fill)]))
-		await $.println($.arrayIndex((await r.MethodByName("Sum").Call(null))!, 0).Float())
+		await $.println($.plainSliceIndex((await r.MethodByName("Sum").Call(null))!, 0).Float())
 	}
 
 	// The same for a value made in generic code and taken from a field.
@@ -260,7 +260,7 @@ export async function main(): globalThis.Promise<void> {
 	let p = $.genericInstance(new Pair(true, 1, 2), __goscriptStatic3)
 	let q = $.varRef(p)
 	let pv = reflect.ValueOf($.namedValueInterfaceValue<any>((q.value).clone(), "main.Pair", __goscriptStatic4(), __goscriptStatic5(), __goscriptStatic6()))
-	await $.println($.arrayIndex((await pv.MethodByName("Kind").Call(null))!, 0).String(), (__goscriptAwait = $.pointerValue<Exclude<kinder, null>>($.mustTypeAssert<kinder | null>(pv.Interface(), "main.kinder")).Kind(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println($.plainSliceIndex((await pv.MethodByName("Kind").Call(null))!, 0).String(), (__goscriptAwait = $.pointerValue<Exclude<kinder, null>>($.mustTypeAssert<kinder | null>(pv.Interface(), "main.kinder")).Kind(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	await $.println((__goscriptAwait = $.pointerValue<Exclude<kinder, null>>($.mustTypeAssert<kinder | null>(reflect.ValueOf($.namedValueInterfaceValue<any>(q, "*main.Pair", __goscriptStatic4(), __goscriptStatic7(), __goscriptStatic6())).Elem().Interface(), "main.kinder")).Kind(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 }
 

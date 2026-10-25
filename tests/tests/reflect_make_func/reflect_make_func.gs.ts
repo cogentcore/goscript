@@ -11,12 +11,12 @@ export async function main(): globalThis.Promise<void> {
 
 	let unaryType = reflect.FuncOf($.arrayToSlice<reflect.Type | null>([intType]), $.arrayToSlice<reflect.Type | null>([stringType]), false)
 	let unaryValue = reflect.MakeFunc($.pointerValueOrNil(unaryType)!, $.functionValue((args: $.Slice<reflect.Value>): $.Slice<reflect.Value> => {
-		return $.arrayToSlice<reflect.Value>([reflect.ValueOf("value-" + $.runeToString($.intFromWide($.int64Add(48n, $.arrayIndex(args!, 0).Int()), 32)))])
+		return $.arrayToSlice<reflect.Value>([reflect.ValueOf("value-" + $.runeToString($.intFromWide($.int64Add(48n, $.plainSliceIndex(args!, 0).Int()), 32)))])
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.sliceType("reflect.Value")], results: [/* @__PURE__ */ $.sliceType("reflect.Value")] } as $.FunctionTypeInfo)))
 	let unary: ((_p0: number) => string | globalThis.Promise<string>) | null = $.mustTypeAssert<((_p0: number) => string | globalThis.Promise<string>) | null>(unaryValue.Interface(), ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("string")] } as $.FunctionTypeInfo))
 	await $.println("direct:", (__goscriptAwait = unary!(7), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	let reflectedUnary = await unaryValue.Call($.arrayToSlice<reflect.Value>([reflect.ValueOf($.basicInterfaceValue(8, "int"))]))
-	await $.println("reflected:", $.arrayIndex(reflectedUnary!, 0).String())
+	await $.println("reflected:", $.plainSliceIndex(reflectedUnary!, 0).String())
 	let [, wrong] = $.typeAssertTuple<((_p0: string) => string | globalThis.Promise<string>) | null>(unaryValue.Interface(), ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string")], results: [/* @__PURE__ */ $.basicType("string")] } as $.FunctionTypeInfo))
 	await $.println("wrong assertion:", wrong)
 
@@ -37,18 +37,18 @@ export async function main(): globalThis.Promise<void> {
 	let [_number, ok] = await tuple!()
 	await $.println("tuple direct:", _number, ok)
 	let reflectedTuple = await tupleValue.Call(null)
-	await $.println("tuple reflected:", $.arrayIndex(reflectedTuple!, 0).Int(), $.arrayIndex(reflectedTuple!, 1).Bool())
+	await $.println("tuple reflected:", $.plainSliceIndex(reflectedTuple!, 0).Int(), $.plainSliceIndex(reflectedTuple!, 1).Bool())
 
 	let variadicType = reflect.FuncOf($.arrayToSlice<reflect.Type | null>([intType, reflect.SliceOf($.pointerValueOrNil(stringType)!)]), $.arrayToSlice<reflect.Type | null>([intType]), true)
 	let variadicValue = reflect.MakeFunc($.pointerValueOrNil(variadicType)!, $.functionValue((args: $.Slice<reflect.Value>): $.Slice<reflect.Value> => {
-		return $.arrayToSlice<reflect.Value>([reflect.ValueOf($.basicInterfaceValue($.int64ToNumber($.arrayIndex(args!, 0).Int()) + $.arrayIndex(args!, 1).Len(), "int"))])
+		return $.arrayToSlice<reflect.Value>([reflect.ValueOf($.basicInterfaceValue($.int64ToNumber($.plainSliceIndex(args!, 0).Int()) + $.plainSliceIndex(args!, 1).Len(), "int"))])
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.sliceType("reflect.Value")], results: [/* @__PURE__ */ $.sliceType("reflect.Value")] } as $.FunctionTypeInfo)))
 	let variadic: ((_p0: number, _p1: $.Slice<string>) => number | globalThis.Promise<number>) | null = $.mustTypeAssert<((_p0: number, _p1: $.Slice<string>) => number | globalThis.Promise<number>) | null>(variadicValue.Interface(), ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("string"))], results: [/* @__PURE__ */ $.basicType("int")], isVariadic: true } as $.FunctionTypeInfo))
 	await $.println("variadic direct:", (__goscriptAwait = variadic!(10, $.arrayToSlice<string>(["a", "b"])), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	let reflectedVariadic = await variadicValue.Call($.arrayToSlice<reflect.Value>([reflect.ValueOf($.basicInterfaceValue(20, "int")), reflect.ValueOf("a"), reflect.ValueOf("b"), reflect.ValueOf("c")]))
-	await $.println("variadic reflected:", $.arrayIndex(reflectedVariadic!, 0).Int())
+	await $.println("variadic reflected:", $.plainSliceIndex(reflectedVariadic!, 0).Int())
 	let reflectedSlice = await variadicValue.CallSlice($.arrayToSlice<reflect.Value>([reflect.ValueOf($.basicInterfaceValue(30, "int")), reflect.ValueOf($.interfaceValue($.arrayToSlice<string>(["a", "b"]), "[]string", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("string"))))]))
-	await $.println("variadic callslice:", $.arrayIndex(reflectedSlice!, 0).Int())
+	await $.println("variadic callslice:", $.plainSliceIndex(reflectedSlice!, 0).Int())
 
 	await $.println("reflect_make_func test finished")
 }

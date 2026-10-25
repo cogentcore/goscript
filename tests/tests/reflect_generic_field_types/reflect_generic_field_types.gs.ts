@@ -190,11 +190,11 @@ export async function main(): globalThis.Promise<void> {
 	let sl = reflect.MakeSlice($.pointerValueOrNil(ov.Type())!, 1, 1)
 	sl.Index(0).Field(0).SetString("x")
 	ov.Set(sl)
-	await $.println("opt:", $.sliceLen(d.value.Opt.Value), $.arrayIndex(d.value.Opt.Value!, 0).Name)
+	await $.println("opt:", $.sliceLen(d.value.Opt.Value), $.plainSliceIndex(d.value.Opt.Value!, 0).Name)
 	let lv = reflect.ValueOf($.interfaceValue(d, "*main.Data", /* @__PURE__ */ $.pointerType("main.Data"))).Elem().Field(1).Field(0)
 	lv.Set(reflect.Append(lv, reflect.New($.pointerValueOrNil((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(lv.Type()).Elem(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait)).Elem(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))!)))
-	$.pointerValue<Item>($.arrayIndex(d.value.List.Values!, 0)).N = 3
-	await $.println("list:", $.pointerValue<Item>($.arrayIndex(d.value.List.Values!, 0)).N)
+	$.pointerValue<Item>($.plainSliceIndex(d.value.List.Values!, 0)).N = 3
+	await $.println("list:", $.pointerValue<Item>($.plainSliceIndex(d.value.List.Values!, 0)).N)
 
 	// Values of the instantiated types report the same field types.
 	let o = new Option(true, 4, true)

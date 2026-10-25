@@ -53,8 +53,8 @@ export async function main(): globalThis.Promise<void> {
 	await $.println(kind(i.Interface()), isFloat32)
 
 	// The same for arguments of interface type passed by Call.
-	await $.println($.arrayIndex((await reflect.ValueOf($.interfaceValue($.goFunc(kind, "main.kind"), "func(v any) string", ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Interface, methods: [] }], results: [/* @__PURE__ */ $.basicType("string")] } as $.FunctionTypeInfo))).Call($.arrayToSlice<reflect.Value>([v])))!, 0).String())
-	await $.println($.arrayIndex((await reflect.ValueOf($.interfaceValue($.goFunc(kinds, "main.kinds"), "func(vals ...any) string", ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.sliceType({ kind: $.TypeKind.Interface, methods: [] })], results: [/* @__PURE__ */ $.basicType("string")], isVariadic: true } as $.FunctionTypeInfo))).Call($.arrayToSlice<reflect.Value>([v, reflect.ValueOf($.basicInterfaceValue(1, "int"))])))!, 0).String())
+	await $.println($.plainSliceIndex((await reflect.ValueOf($.interfaceValue($.goFunc(kind, "main.kind"), "func(v any) string", ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Interface, methods: [] }], results: [/* @__PURE__ */ $.basicType("string")] } as $.FunctionTypeInfo))).Call($.arrayToSlice<reflect.Value>([v])))!, 0).String())
+	await $.println($.plainSliceIndex((await reflect.ValueOf($.interfaceValue($.goFunc(kinds, "main.kinds"), "func(vals ...any) string", ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.sliceType({ kind: $.TypeKind.Interface, methods: [] })], results: [/* @__PURE__ */ $.basicType("string")], isVariadic: true } as $.FunctionTypeInfo))).Call($.arrayToSlice<reflect.Value>([v, reflect.ValueOf($.basicInterfaceValue(1, "int"))])))!, 0).String())
 
 	// And for values stored in interface elements, fields and map values.
 	let s = reflect.MakeSlice($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic3()))!, 1, 1)
