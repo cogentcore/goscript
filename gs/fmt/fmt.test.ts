@@ -145,12 +145,9 @@ describe('fmt basic value formatting', () => {
     const m = new Map<any, any>()
     m.set('a', 1)
     m.set('b', 2)
-    const out = await fmt.Sprintf('%v', m)
-    // Order in Map iteration is insertion order; verify shape
-    expect(out.startsWith('{')).toBe(true)
-    expect(out.includes('a:1')).toBe(true)
-    expect(out.includes('b:2')).toBe(true)
-    expect(out.endsWith('}')).toBe(true)
+    m.set('', 0)
+    // A map formats as in Go, sorted by key.
+    expect(await fmt.Sprintf('%v', m)).toBe('map[:0 a:1 b:2]')
 
     const s = new Set<any>([1, 2, 3])
     expect(await fmt.Sprintf('%v', s)).toBe('[1 2 3]')

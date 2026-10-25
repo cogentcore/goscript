@@ -265,6 +265,12 @@ function formatValue(value: any, verb: string, flags = ''): string {
       return value ? 'true' : 'false'
     case 'T': // type (approximate Go names for primitives we need)
       if (hasGoTypeName(value)) return $.goTypeString(value.__goType)
+      if (typeof value === 'function') {
+        // A function value has the type information of its signature.
+        const info = (value as { __typeInfo?: $.TypeInfo }).__typeInfo
+        const name = $.typeInfoGoString(info)
+        if (name !== undefined) return name
+      }
       if (typeof value === 'number') {
         return Number.isInteger(value) ? 'int' : 'float64'
       }
@@ -585,6 +591,71 @@ function reflectValueOperand(operand: any): any {
     : operand
 }
 
+// compareMapKeys orders two map keys as Go's fmt sorts them: numbers by
+// value, with NaN first, strings lexically, false before true, and arrays
+// and structs by their elements in order. Keys of different kinds, such as
+// those of an interface map, are ordered by kind.
+function compareMapKeys(a: unknown, b: unknown): number {
+  a = basicValue(a)
+  b = basicValue(b)
+  const ka = typeof a
+  const kb = typeof b
+  if (
+    (ka === 'number' || ka === 'bigint') &&
+    (kb === 'number' || kb === 'bigint')
+  ) {
+    if (ka === 'bigint' && kb === 'bigint') {
+      return (
+        (a as bigint) < (b as bigint) ? -1
+        : (a as bigint) > (b as bigint) ? 1
+        : 0
+      )
+    }
+    const x = Number(a)
+    const y = Number(b)
+    if (Number.isNaN(x) || Number.isNaN(y)) {
+      return (
+        Number.isNaN(x) && Number.isNaN(y) ? 0
+        : Number.isNaN(x) ? -1
+        : 1
+      )
+    }
+    return (
+      x < y ? -1
+      : x > y ? 1
+      : 0
+    )
+  }
+  if (ka !== kb) {
+    return ka < kb ? -1 : 1
+  }
+  if (ka === 'string' || ka === 'boolean') {
+    return (
+      (a as string) < (b as string) ? -1
+      : (a as string) > (b as string) ? 1
+      : 0
+    )
+  }
+  if (a === null || b === null || ka !== 'object') {
+    return (
+      a === b ? 0
+      : a === null ? -1
+      : 1
+    )
+  }
+
+  // Arrays compare by element, and structs by field, in order.
+  const xs = $.isArrayOrGoSlice(a) ? sliceItems(a) : Object.values(a as object)
+  const ys = $.isArrayOrGoSlice(b) ? sliceItems(b) : Object.values(b as object)
+  for (let i = 0; i < Math.min(xs.length, ys.length); i++) {
+    const c = compareMapKeys(xs[i], ys[i])
+    if (c !== 0) {
+      return c
+    }
+  }
+  return xs.length - ys.length
+}
+
 /** defaultFormatMaybe renders Go values without exposing their runtime storage. */
 function defaultFormatMaybe(
   value: any,
@@ -765,23 +836,38 @@ function defaultFormatMaybe(
         formattingStructs.delete(storage)
       }
     }
-    // Basic Map/Set rendering
+    // A map formats as map[k:v ...], with its entries sorted by key as Go
+    // sorts them, or in Go syntax for %#v.
     if (value instanceof Map) {
-      const parts: MaybeString[] = []
-      for (const [k, v] of (value as Map<any, any>).entries()) {
-        const key = defaultFormatMaybe(k, flags, depth + 1)
-        const elem = defaultFormatMaybe(v, flags, depth + 1)
+      const mapInfo = info?.kind === $.TypeKind.Map ? info : undefined
+      const entries = [...(value as Map<unknown, unknown>).entries()].sort(
+        ([a], [b]) => compareMapKeys(a, b),
+      )
+      const parts = entries.map(([k, v]): MaybeString => {
+        const key = defaultFormatMaybe(
+          k,
+          flags,
+          depth + 1,
+          mapInfo?.keyType,
+          allowMethods,
+        )
+        const elem = defaultFormatMaybe(
+          v,
+          flags,
+          depth + 1,
+          mapInfo?.elemType,
+          allowMethods,
+        )
         if (isPromiseLike(key) || isPromiseLike(elem)) {
-          parts.push(
-            Promise.all([Promise.resolve(key), Promise.resolve(elem)]).then(
-              ([resolvedKey, resolvedElem]) => `${resolvedKey}:${resolvedElem}`,
-            ),
-          )
-        } else {
-          parts.push(`${key}:${elem}`)
+          return Promise.all([key, elem]).then(([rk, re]) => `${rk}:${re}`)
         }
+        return `${key}:${elem}`
+      })
+      if (flags.includes('#')) {
+        const name = $.typeInfoGoString(mapInfo) ?? 'map'
+        return joinMaybe(parts, ', ', name + '{', '}')
       }
-      return joinMaybe(parts, ' ', '{', '}')
+      return joinMaybe(parts, ' ', 'map[', ']')
     }
     if (value instanceof Set) {
       const parts: MaybeString[] = []

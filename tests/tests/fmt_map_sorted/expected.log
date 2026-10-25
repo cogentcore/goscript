@@ -1,0 +1,9 @@
+map[-1:a 2:b 3:c] map[NaN:false -1:true 2.5:true]
+map[-1:a 2:b 3:c] map[-1:a 2:b 3:c] map[int]string{-1:"a", 2:"b", 3:"c"}
+map[:0 a:1 b:2]
+map[false:0 true:1]
+map[[1 9]:x [2 1]:y]
+map[{1 a}:1 {1 b}:2 {2 a}:3]
+map[x:1 y:s] map[1:map[2:3]]
+map[] map[string]int(nil) map[]
+map[k:1] map[k:1]
