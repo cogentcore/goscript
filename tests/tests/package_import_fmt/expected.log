@@ -57,4 +57,6 @@ bad int: 0 true
 short: 1 true 12
 Sscan: 3 true 3 4 hello
 Sscan float: 1 true 1.25
+reflect: 5 5 hi {X:1 Y:2}
+reflect: 5 [1 2] <invalid reflect.Value>
 test finished

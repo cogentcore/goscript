@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"reflect"
 )
 
 type byteFormatter struct {
@@ -91,6 +92,12 @@ func main() {
 	starWidthPrecision()
 	sliceVerbs()
 	scanVerbs()
+
+	// A reflect.Value operand formats as the value it holds.
+	type pt struct{ X, Y int }
+	rv := reflect.ValueOf(5)
+	fmt.Printf("reflect: %v %d %s %+v\n", rv, rv, reflect.ValueOf("hi"), reflect.ValueOf(pt{1, 2}))
+	fmt.Println("reflect:", rv, reflect.ValueOf([]int{1, 2}), reflect.Value{})
 
 	println("test finished")
 }
