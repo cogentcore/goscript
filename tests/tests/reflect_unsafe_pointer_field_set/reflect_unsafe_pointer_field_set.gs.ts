@@ -38,8 +38,8 @@ export class config {
 
 export async function main(): globalThis.Promise<void> {
 	let c = new config(false, "x")
-	let f = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(c, "*main.config", /* @__PURE__ */ $.pointerType("main.config"))))).Elem())).FieldByName("UsesCgo")))
-	$.unsafePointerRef<boolean>($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(f)).Addr())).UnsafePointer()).value = true
+	let f = reflect.ValueOf($.interfaceValue(c, "*main.config", /* @__PURE__ */ $.pointerType("main.config"))).Elem().FieldByName("UsesCgo")
+	$.unsafePointerRef<boolean>(f.Addr().UnsafePointer()).value = true
 	await $.println($.pointerValue<config>(c).UsesCgo)
 
 	let b = $.varRef(false)

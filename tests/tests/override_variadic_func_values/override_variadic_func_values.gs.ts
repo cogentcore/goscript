@@ -54,8 +54,8 @@ export async function main(): globalThis.Promise<void> {
 
 	// So does reflect, which calls them as Go function values, as
 	// interpreters such as yaegi do.
-	let call = await $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.goFunc(((__goscriptFn: typeof fmt.Sprintf) => (__goscriptArg0: string, __goscriptArg1: $.Slice<any>) => __goscriptFn(__goscriptArg0, ...(__goscriptArg1 ?? [])))(fmt.Sprintf), "fmt.Sprintf"), "func(format string, a ...any) string", ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.sliceType({ kind: $.TypeKind.Interface, methods: [] })], results: [/* @__PURE__ */ $.basicType("string")], isVariadic: true } as $.FunctionTypeInfo))))).Call($.arrayToSlice<reflect.Value>([$.markAsStructValue($.cloneStructValue(reflect.ValueOf("%v-%v"))), $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.basicInterfaceValue(8, "int")))), $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.basicInterfaceValue(9, "int"))))]))
-	await $.println($.markAsStructValue($.cloneStructValue($.arrayIndex(call!, 0))).String())
+	let call = await reflect.ValueOf($.interfaceValue($.goFunc(((__goscriptFn: typeof fmt.Sprintf) => (__goscriptArg0: string, __goscriptArg1: $.Slice<any>) => __goscriptFn(__goscriptArg0, ...(__goscriptArg1 ?? [])))(fmt.Sprintf), "fmt.Sprintf"), "func(format string, a ...any) string", ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.sliceType({ kind: $.TypeKind.Interface, methods: [] })], results: [/* @__PURE__ */ $.basicType("string")], isVariadic: true } as $.FunctionTypeInfo))).Call($.arrayToSlice<reflect.Value>([reflect.ValueOf("%v-%v"), reflect.ValueOf($.basicInterfaceValue(8, "int")), reflect.ValueOf($.basicInterfaceValue(9, "int"))]))
+	await $.println($.arrayIndex(call!, 0).String())
 
 	// Direct calls are unchanged.
 	await $.println((fmt.Sprintf("%v-%v", $.basicInterfaceValue(10, "int"), $.basicInterfaceValue(11, "int")) as string), (fmt.Sprint(...(args ?? [])) as string))

@@ -9,7 +9,7 @@ export function hello(): void {
 }
 
 export function funcName(f: any): string {
-	return runtime.Func.prototype.Name.call($.pointerValueOrNil(runtime.FuncForPC($.markAsStructValue($.cloneStructValue(reflect.ValueOf(f))).Pointer())))
+	return runtime.Func.prototype.Name.call($.pointerValueOrNil(runtime.FuncForPC(reflect.ValueOf(f).Pointer())))
 }
 
 export async function main(): globalThis.Promise<void> {

@@ -37,10 +37,10 @@ export class Person {
 
 export async function main(): globalThis.Promise<void> {
 	let p = new Person(true, "Alice", 30)
-	let v = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.structInterfaceValue(p, "main.Person", "main.Person"))))
-	if ($.markAsStructValue($.cloneStructValue(v)).Kind() == 25) {
-		let f = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(v)).Field(0)))
-		fmt.Println($.markAsStructValue($.cloneStructValue(f)).String())
+	let v = reflect.ValueOf($.structInterfaceValue(p, "main.Person", "main.Person"))
+	if (v.Kind() == 25) {
+		let f = v.Field(0)
+		fmt.Println(f.String())
 	}
 }
 

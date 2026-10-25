@@ -36,25 +36,25 @@ export class S {
 
 export async function main(): globalThis.Promise<void> {
 	// A nil interface has no type and no value.
-	await $.println(reflect.TypeOf(null) == null, $.markAsStructValue($.cloneStructValue(reflect.ValueOf(null))).IsValid())
+	await $.println(reflect.TypeOf(null) == null, reflect.ValueOf(null).IsValid())
 
 	// A *any keeps its interface element type.
 	let a = $.varRef($.basicInterfaceValue(1, "int"))
-	let pa = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(a, "*interface{}", /* @__PURE__ */ $.pointerType({ kind: $.TypeKind.Interface, methods: [] })))))
-	await $.println($.comparableEqual($.markAsStructValue($.cloneStructValue(pa)).Type(), reflect.TypeFor(__goscriptStatic0())), reflect.Kind_String($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(pa)).Elem())).Kind()), reflect.Kind_String($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(pa)).Elem())).Elem())).Kind()))
+	let pa = reflect.ValueOf($.interfaceValue(a, "*interface{}", /* @__PURE__ */ $.pointerType({ kind: $.TypeKind.Interface, methods: [] })))
+	await $.println($.comparableEqual(pa.Type(), reflect.TypeFor(__goscriptStatic0())), reflect.Kind_String(pa.Elem().Kind()), reflect.Kind_String(pa.Elem().Elem().Kind()))
 	await $.println($.comparableEqual((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeFor(__goscriptStatic0())).Elem(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait), reflect.TypeFor(__goscriptStatic1())))
 
 	// Only values reached through a pointer or slice are addressable.
 	let v = $.varRef(1)
-	await $.println($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.basicInterfaceValue(v.value, "int")))).CanAddr(), $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(v, "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int")))))).CanAddr(), $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(v, "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int")))))).Elem())).CanAddr())
+	await $.println(reflect.ValueOf($.basicInterfaceValue(v.value, "int")).CanAddr(), reflect.ValueOf($.interfaceValue(v, "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int")))).CanAddr(), reflect.ValueOf($.interfaceValue(v, "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int")))).Elem().CanAddr())
 	let s = $.varRef(new S(true))
-	await $.println($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.structInterfaceValue((s.value).clone(), "main.S", "main.S")))).Field(0))).CanAddr(), $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(s, "*main.S", /* @__PURE__ */ $.pointerType("main.S"))))).Elem())).Field(0))).CanAddr())
-	await $.println($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.arrayToSlice<number>([1]), "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")))))).Index(0))).CanAddr())
+	await $.println(reflect.ValueOf($.structInterfaceValue((s.value).clone(), "main.S", "main.S")).Field(0).CanAddr(), reflect.ValueOf($.interfaceValue(s, "*main.S", /* @__PURE__ */ $.pointerType("main.S"))).Elem().Field(0).CanAddr())
+	await $.println(reflect.ValueOf($.interfaceValue($.arrayToSlice<number>([1]), "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")))).Index(0).CanAddr())
 
 	// Addr of an addressable value points at it.
-	let e = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(s, "*main.S", /* @__PURE__ */ $.pointerType("main.S"))))).Elem())).Field(0)))
-	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(e)).Addr())).Elem())).SetInt(5n)
-	await $.println(s.value.A, (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(e)).Addr())).Type()).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	let e = reflect.ValueOf($.interfaceValue(s, "*main.S", /* @__PURE__ */ $.pointerType("main.S"))).Elem().Field(0)
+	e.Addr().Elem().SetInt(5n)
+	await $.println(s.value.A, (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(e.Addr().Type()).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 }
 
 var __goscriptStatic0$value: any

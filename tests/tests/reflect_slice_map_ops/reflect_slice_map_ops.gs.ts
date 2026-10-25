@@ -89,70 +89,70 @@ export class Doc {
 
 export async function main(): globalThis.Promise<void> {
 	// MapRange starts before the first entry and uses the map's types.
-	let it = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.makeMap<string, number>([["x", 3]]), "map[string]float32", /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("float32")))))).MapRange()
+	let it = reflect.ValueOf($.interfaceValue($.makeMap<string, number>([["x", 3]]), "map[string]float32", /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("float32")))).MapRange()
 	let n = 0
 	while ((it !== null && (it as any).__isVarRef !== true && (it as any).__goValue === undefined ? ((it as any) as reflect.MapIter).Next() : reflect.MapIter.prototype.Next.call($.pointerValue<reflect.MapIter>(it)))) {
 		n++
-		await $.println($.markAsStructValue($.cloneStructValue((it !== null && (it as any).__isVarRef !== true && (it as any).__goValue === undefined ? ((it as any) as reflect.MapIter).Key() : reflect.MapIter.prototype.Key.call($.pointerValue<reflect.MapIter>(it))))).String(), reflect.Kind_String($.markAsStructValue($.cloneStructValue((it !== null && (it as any).__isVarRef !== true && (it as any).__goValue === undefined ? ((it as any) as reflect.MapIter).Value() : reflect.MapIter.prototype.Value.call($.pointerValue<reflect.MapIter>(it))))).Kind()), $.markAsStructValue($.cloneStructValue((it !== null && (it as any).__isVarRef !== true && (it as any).__goValue === undefined ? ((it as any) as reflect.MapIter).Value() : reflect.MapIter.prototype.Value.call($.pointerValue<reflect.MapIter>(it))))).Float())
+		await $.println((it !== null && (it as any).__isVarRef !== true && (it as any).__goValue === undefined ? ((it as any) as reflect.MapIter).Key() : reflect.MapIter.prototype.Key.call($.pointerValue<reflect.MapIter>(it))).String(), reflect.Kind_String((it !== null && (it as any).__isVarRef !== true && (it as any).__goValue === undefined ? ((it as any) as reflect.MapIter).Value() : reflect.MapIter.prototype.Value.call($.pointerValue<reflect.MapIter>(it))).Kind()), (it !== null && (it as any).__isVarRef !== true && (it as any).__goValue === undefined ? ((it as any) as reflect.MapIter).Value() : reflect.MapIter.prototype.Value.call($.pointerValue<reflect.MapIter>(it))).Float())
 	}
 	await $.println(n)
-	let empty = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.makeMap<string, number>([]), "map[string]int", /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("int")))))).MapRange()
+	let empty = reflect.ValueOf($.interfaceValue($.makeMap<string, number>([]), "map[string]int", /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("int")))).MapRange()
 	await $.println((empty !== null && (empty as any).__isVarRef !== true && (empty as any).__goValue === undefined ? ((empty as any) as reflect.MapIter).Next() : reflect.MapIter.prototype.Next.call($.pointerValue<reflect.MapIter>(empty))))
 
 	// Append appends after the slice's length, within its capacity.
 	let s: $.VarRef<$.Slice<number>> = $.varRef($.arrayToSlice<number>([1, 2, 3]))
-	let sv = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(s, "*[]int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"))))))).Elem()))
-	$.markAsStructValue($.cloneStructValue(sv)).SetLen(2)
+	let sv = reflect.ValueOf($.interfaceValue(s, "*[]int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"))))).Elem()
+	sv.SetLen(2)
 	await $.println($.sliceLen(s.value), $.cap(s.value))
-	let a = $.markAsStructValue($.cloneStructValue(reflect.Append($.markAsStructValue($.cloneStructValue(sv)), $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.basicInterfaceValue(9, "int")))))))
-	await $.println($.markAsStructValue($.cloneStructValue(a)).Len(), $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(a)).Index(2))).Int())
-	let b = $.markAsStructValue($.cloneStructValue(reflect.AppendSlice(sv, $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.arrayToSlice<number>([7, 8]), "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")))))))))
-	await $.println($.markAsStructValue($.cloneStructValue(b)).Len(), $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(b)).Index(3))).Int())
+	let a = reflect.Append(sv, reflect.ValueOf($.basicInterfaceValue(9, "int")))
+	await $.println(a.Len(), a.Index(2).Int())
+	let b = reflect.AppendSlice(sv, reflect.ValueOf($.interfaceValue($.arrayToSlice<number>([7, 8]), "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")))))
+	await $.println(b.Len(), b.Index(3).Int())
 
 	// Copy copies within the lengths of the slices.
 	let c = $.arrayToSlice<number>([1, 2, 3, 4])
-	let copied = reflect.Copy($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.goSlice(c, 2, undefined), "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")))))), $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.arrayToSlice<number>([8, 9, 10]), "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")))))))
+	let copied = reflect.Copy(reflect.ValueOf($.interfaceValue($.goSlice(c, 2, undefined), "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")))), reflect.ValueOf($.interfaceValue($.arrayToSlice<number>([8, 9, 10]), "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")))))
 	await $.println(copied, $.arrayIndex(c!, 0), $.arrayIndex(c!, 2), $.arrayIndex(c!, 3))
 
 	// Values read after a Set through the same Value see the new contents.
 	let m: $.VarRef<globalThis.Map<string, number> | null> = $.varRef($.makeMap<string, number>([["old", 0]]))
-	let mv = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(m, "*map[string]int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("int"))))))).Elem()))
-	$.markAsStructValue($.cloneStructValue(mv)).Set($.markAsStructValue($.cloneStructValue(reflect.MakeMap($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic0()))!))))
-	$.markAsStructValue($.cloneStructValue(mv)).SetMapIndex($.markAsStructValue($.cloneStructValue(reflect.ValueOf("k"))), $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.basicInterfaceValue(1, "int")))))
-	await $.println($.len(m.value), $.markAsStructValue($.cloneStructValue(mv)).Len())
+	let mv = reflect.ValueOf($.interfaceValue(m, "*map[string]int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), /* @__PURE__ */ $.basicType("int"))))).Elem()
+	mv.Set(reflect.MakeMap($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic0()))!))
+	mv.SetMapIndex(reflect.ValueOf("k"), reflect.ValueOf($.basicInterfaceValue(1, "int")))
+	await $.println($.len(m.value), mv.Len())
 	let t: $.VarRef<$.Slice<number>> = $.varRef($.arrayToSlice<number>([0]))
-	let tv = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(t, "*[]int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"))))))).Elem()))
-	$.markAsStructValue($.cloneStructValue(tv)).Set($.markAsStructValue($.cloneStructValue(reflect.MakeSlice($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic1()))!, 2, 2))))
-	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(tv)).Index(1))).SetInt(4n)
-	await $.println($.arrayIndex(t.value!, 1), $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(tv)).Slice(1, 2))).Index(0))).Int())
+	let tv = reflect.ValueOf($.interfaceValue(t, "*[]int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int"))))).Elem()
+	tv.Set(reflect.MakeSlice($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic1()))!, 2, 2))
+	tv.Index(1).SetInt(4n)
+	await $.println($.arrayIndex(t.value!, 1), tv.Slice(1, 2).Index(0).Int())
 
 	// Grow then SetLen, as encoding/xml and encoding/json do.
 	let h = new Holder(false, undefined, $.makeSlice<number>(1, 10, "number"))
 	let h$: Holder = h == null ? $.pointerTarget<Holder>(h) : (h as any).__isVarRef === true ? (h as any).value : (h as any).__goValue === undefined ? (h as any) : $.pointerTarget<Holder>(h)
-	let hs = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(h, "*main.Holder", /* @__PURE__ */ $.pointerType("main.Holder"))))).Elem())).Field(0)))
+	let hs = reflect.ValueOf($.interfaceValue(h, "*main.Holder", /* @__PURE__ */ $.pointerType("main.Holder"))).Elem().Field(0)
 	for (let i = 0; i < 5; i++) {
-		let __goscriptShadow0 = $.markAsStructValue($.cloneStructValue(hs)).Len()
-		$.markAsStructValue($.cloneStructValue(hs)).Grow(1)
-		$.markAsStructValue($.cloneStructValue(hs)).SetLen(__goscriptShadow0 + 1)
-		$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(hs)).Index(__goscriptShadow0))).SetInt($.int64(i * 10))
+		let __goscriptShadow0 = hs.Len()
+		hs.Grow(1)
+		hs.SetLen(__goscriptShadow0 + 1)
+		hs.Index(__goscriptShadow0).SetInt($.int64(i * 10))
 	}
 	await $.println("grown:", $.sliceLen((h$ as Holder).S), $.arrayIndex((h$ as Holder).S!, 0), $.arrayIndex((h$ as Holder).S!, 4), $.cap((h$ as Holder).S) >= 5)
 
 	// Grow keeps capacity when it is already large enough.
-	let ht = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(h, "*main.Holder", /* @__PURE__ */ $.pointerType("main.Holder"))))).Elem())).Field(1)))
-	$.markAsStructValue($.cloneStructValue(ht)).Grow(3)
-	await $.println("cap kept:", $.markAsStructValue($.cloneStructValue(ht)).Cap())
+	let ht = reflect.ValueOf($.interfaceValue(h, "*main.Holder", /* @__PURE__ */ $.pointerType("main.Holder"))).Elem().Field(1)
+	ht.Grow(3)
+	await $.println("cap kept:", ht.Cap())
 
 	// MakeSlice honors the capacity and zeroes each struct element.
-	let ms = $.markAsStructValue($.cloneStructValue(reflect.MakeSlice($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic2()))!, 2, 4)))
-	await $.println("makeslice:", $.markAsStructValue($.cloneStructValue(ms)).Len(), $.markAsStructValue($.cloneStructValue(ms)).Cap())
-	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(ms)).Index(0))).Field(0))).SetString("a")
-	await $.println("distinct:", $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(ms)).Index(0))).Field(0))).String(), $.stringEqual($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(ms)).Index(1))).Field(0))).String(), ""))
+	let ms = reflect.MakeSlice($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic2()))!, 2, 4)
+	await $.println("makeslice:", ms.Len(), ms.Cap())
+	ms.Index(0).Field(0).SetString("a")
+	await $.println("distinct:", ms.Index(0).Field(0).String(), $.stringEqual(ms.Index(1).Field(0).String(), ""))
 
 	// MakeSlice of bytes.
-	let bs = $.markAsStructValue($.cloneStructValue(reflect.MakeSlice($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic3()))!, 3, 3)))
-	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(bs)).Index(1))).SetUint(7n)
-	await $.println("bytes:", $.sliceLen($.markAsStructValue($.cloneStructValue(bs)).Bytes()), $.uint($.arrayIndex($.markAsStructValue($.cloneStructValue(bs)).Bytes()!, 1), 8))
+	let bs = reflect.MakeSlice($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic3()))!, 3, 3)
+	bs.Index(1).SetUint(7n)
+	await $.println("bytes:", $.sliceLen(bs.Bytes()), $.uint($.arrayIndex(bs.Bytes()!, 1), 8))
 
 	let d: $.VarRef<Doc> = $.varRef(new Doc(true))
 	let err = await xml.Unmarshal(new Uint8Array([60, 100, 111, 99, 62, 60, 105, 116, 101, 109, 62, 60, 78, 97, 109, 101, 62, 120, 60, 47, 78, 97, 109, 101, 62, 60, 47, 105, 116, 101, 109, 62, 60, 105, 116, 101, 109, 62, 60, 78, 97, 109, 101, 62, 121, 60, 47, 78, 97, 109, 101, 62, 60, 47, 105, 116, 101, 109, 62, 60, 47, 100, 111, 99, 62]), $.interfaceValue(d, "*main.Doc", /* @__PURE__ */ $.pointerType("main.Doc")))

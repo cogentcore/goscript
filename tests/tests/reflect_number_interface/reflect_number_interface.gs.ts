@@ -40,32 +40,32 @@ export function kinds(vals: $.Slice<any>): string {
 export async function main(): globalThis.Promise<void> {
 	// A float64 with an integer value keeps its type through Interface, as
 	// interpreters such as yaegi make their constants and variables.
-	let v = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.New($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic1()))!))).Elem()))
-	$.markAsStructValue($.cloneStructValue(v)).SetFloat(3)
-	await $.println(kind($.markAsStructValue($.cloneStructValue(v)).Interface()))
-	await $.println(kind($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.basicInterfaceValue(2, "int")))).Convert($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic1()))!))).Interface()))
+	let v = reflect.New($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic1()))!).Elem()
+	v.SetFloat(3)
+	await $.println(kind(v.Interface()))
+	await $.println(kind(reflect.ValueOf($.basicInterfaceValue(2, "int")).Convert($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic1()))!).Interface()))
 
 	// An int keeps its type too: a type switch with a float32 case before
 	// the int case takes it for an int.
-	let i = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.New($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic2()))!))).Elem()))
-	$.markAsStructValue($.cloneStructValue(i)).SetInt(3n)
-	let [, isFloat32] = $.typeAssertTuple<number>($.markAsStructValue($.cloneStructValue(i)).Interface(), /* @__PURE__ */ $.basicType("float32"))
-	await $.println(kind($.markAsStructValue($.cloneStructValue(i)).Interface()), isFloat32)
+	let i = reflect.New($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic2()))!).Elem()
+	i.SetInt(3n)
+	let [, isFloat32] = $.typeAssertTuple<number>(i.Interface(), /* @__PURE__ */ $.basicType("float32"))
+	await $.println(kind(i.Interface()), isFloat32)
 
 	// The same for arguments of interface type passed by Call.
-	await $.println($.markAsStructValue($.cloneStructValue($.arrayIndex((await $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.goFunc(kind, "main.kind"), "func(v any) string", ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Interface, methods: [] }], results: [/* @__PURE__ */ $.basicType("string")] } as $.FunctionTypeInfo))))).Call($.arrayToSlice<reflect.Value>([$.markAsStructValue($.cloneStructValue(v))])))!, 0))).String())
-	await $.println($.markAsStructValue($.cloneStructValue($.arrayIndex((await $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.goFunc(kinds, "main.kinds"), "func(vals ...any) string", ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.sliceType({ kind: $.TypeKind.Interface, methods: [] })], results: [/* @__PURE__ */ $.basicType("string")], isVariadic: true } as $.FunctionTypeInfo))))).Call($.arrayToSlice<reflect.Value>([$.markAsStructValue($.cloneStructValue(v)), $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.basicInterfaceValue(1, "int"))))])))!, 0))).String())
+	await $.println($.arrayIndex((await reflect.ValueOf($.interfaceValue($.goFunc(kind, "main.kind"), "func(v any) string", ({ kind: $.TypeKind.Function, params: [{ kind: $.TypeKind.Interface, methods: [] }], results: [/* @__PURE__ */ $.basicType("string")] } as $.FunctionTypeInfo))).Call($.arrayToSlice<reflect.Value>([v])))!, 0).String())
+	await $.println($.arrayIndex((await reflect.ValueOf($.interfaceValue($.goFunc(kinds, "main.kinds"), "func(vals ...any) string", ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.sliceType({ kind: $.TypeKind.Interface, methods: [] })], results: [/* @__PURE__ */ $.basicType("string")], isVariadic: true } as $.FunctionTypeInfo))).Call($.arrayToSlice<reflect.Value>([v, reflect.ValueOf($.basicInterfaceValue(1, "int"))])))!, 0).String())
 
 	// And for values stored in interface elements, fields and map values.
-	let s = $.markAsStructValue($.cloneStructValue(reflect.MakeSlice($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic3()))!, 1, 1)))
-	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(s)).Index(0))).Set($.markAsStructValue($.cloneStructValue(v)))
-	s = $.assignStruct(s, reflect.Append($.markAsStructValue($.cloneStructValue(s)), $.markAsStructValue($.cloneStructValue(v))))
-	await $.println(kinds($.mustTypeAssert<$.Slice<any>>($.markAsStructValue($.cloneStructValue(s)).Interface(), /* @__PURE__ */ $.sliceType({ kind: $.TypeKind.Interface, methods: [] }))))
-	let m = $.markAsStructValue($.cloneStructValue(reflect.MakeMap($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic4()))!)))
-	$.markAsStructValue($.cloneStructValue(m)).SetMapIndex($.markAsStructValue($.cloneStructValue(reflect.ValueOf("k"))), $.markAsStructValue($.cloneStructValue(v)))
-	await $.println(kind($.mapGet<string, any, any>($.mustTypeAssert<globalThis.Map<string, any> | null>($.markAsStructValue($.cloneStructValue(m)).Interface(), /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), { kind: $.TypeKind.Interface, methods: [] })), "k", null)[0]))
+	let s = reflect.MakeSlice($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic3()))!, 1, 1)
+	s.Index(0).Set(v)
+	s = reflect.Append(s, v)
+	await $.println(kinds($.mustTypeAssert<$.Slice<any>>(s.Interface(), /* @__PURE__ */ $.sliceType({ kind: $.TypeKind.Interface, methods: [] }))))
+	let m = reflect.MakeMap($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic4()))!)
+	m.SetMapIndex(reflect.ValueOf("k"), v)
+	await $.println(kind($.mapGet<string, any, any>($.mustTypeAssert<globalThis.Map<string, any> | null>(m.Interface(), /* @__PURE__ */ $.mapType(/* @__PURE__ */ $.basicType("string"), { kind: $.TypeKind.Interface, methods: [] })), "k", null)[0]))
 	let x: $.VarRef<{"F": any}> = $.varRef($.anonymousStructValue({"F": null}, { kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("F", { kind: $.TypeKind.Interface, methods: [] }, [0], 0, true)] }))
-	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(x, "*struct{F any}", /* @__PURE__ */ $.pointerType({ kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("F", { kind: $.TypeKind.Interface, methods: [] }, [0], 0, true)] }))))).Elem())).Field(0))).Set(v)
+	reflect.ValueOf($.interfaceValue(x, "*struct{F any}", /* @__PURE__ */ $.pointerType({ kind: $.TypeKind.Struct, methods: [], fields: [/* @__PURE__ */ $.structField("F", { kind: $.TypeKind.Interface, methods: [] }, [0], 0, true)] }))).Elem().Field(0).Set(v)
 	await $.println(kind(x.value.F))
 }
 

@@ -196,11 +196,11 @@ export async function main(): globalThis.Promise<void> {
 
 	// sort.Slice takes the slice as an any, such as from reflect
 	let anySlice = $.arrayToSlice<number>([3, 1, 2])
-	sort2.Slice($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(anySlice, "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")))))).Interface(), $.functionValue((i: number, j: number): boolean => {
+	sort2.Slice(reflect.ValueOf($.interfaceValue(anySlice, "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")))).Interface(), $.functionValue((i: number, j: number): boolean => {
 		return $.arrayIndex(anySlice!, i) < $.arrayIndex(anySlice!, j)
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo)))
 	await $.println("Any slice sort:", $.arrayIndex(anySlice!, 0), $.arrayIndex(anySlice!, 1), $.arrayIndex(anySlice!, 2))
-	await $.println("Any slice sorted:", sort2.SliceIsSorted($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(anySlice, "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")))))).Interface(), $.functionValue((i: number, j: number): boolean => {
+	await $.println("Any slice sorted:", sort2.SliceIsSorted(reflect.ValueOf($.interfaceValue(anySlice, "[]int", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int")))).Interface(), $.functionValue((i: number, j: number): boolean => {
 		return $.arrayIndex(anySlice!, i) < $.arrayIndex(anySlice!, j)
 	}, ({ kind: $.TypeKind.Function, params: [/* @__PURE__ */ $.basicType("int"), /* @__PURE__ */ $.basicType("int")], results: [/* @__PURE__ */ $.basicType("bool")] } as $.FunctionTypeInfo))))
 

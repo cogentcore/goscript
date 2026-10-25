@@ -69,26 +69,26 @@ export function Greeting_Bye(g: Greeting): string {
 }
 
 export async function call(v: any, name: string, args: $.Slice<any>): globalThis.Promise<$.Slice<reflect.Value>> {
-	let _in = $.makeSlice<reflect.Value>($.sliceLen(args), undefined, undefined, () => $.markAsStructValue(new reflect.Value()))
+	let _in = $.makeSlice<reflect.Value>($.sliceLen(args))
 	for (let __goscriptRangeTarget0 = args, __goscriptRangeWindow0 = $.sliceRange(__goscriptRangeTarget0), __goscriptSliceWindow0 = $.sliceRange(_in), i = 0; i < __goscriptRangeWindow0.length; i++) {
-		let a = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + i] as any)
-		$.assignStruct((__goscriptSliceWindow0.backing as any[])[$.windowSlot(__goscriptSliceWindow0, i)], reflect.ValueOf(a))
+		let a = (__goscriptRangeWindow0.backing[__goscriptRangeWindow0.offset + i] as any);
+		;(__goscriptSliceWindow0.backing as any[])[$.windowSlot(__goscriptSliceWindow0, i)] = reflect.ValueOf(a)
 	}
-	return $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf(v))).MethodByName(name))).Call(_in)
+	return reflect.ValueOf(v).MethodByName(name).Call(_in)
 }
 
 export async function main(): globalThis.Promise<void> {
 	let c = new Calc(false, 5)
 	let names = $.arrayToSlice<string>(["Add", "Double"])
-	fmt.Println($.basicInterfaceValue($.markAsStructValue($.cloneStructValue($.arrayIndex((await call($.interfaceValue(c, "*main.Calc", /* @__PURE__ */ $.pointerType("main.Calc")), $.arrayIndex(names!, 0), $.arrayToSlice<any>([$.basicInterfaceValue(3, "int")])))!, 0))).Int(), "int64"), $.basicInterfaceValue($.markAsStructValue($.cloneStructValue($.arrayIndex((await call($.interfaceValue(c, "*main.Calc", /* @__PURE__ */ $.pointerType("main.Calc")), $.arrayIndex(names!, 1), null))!, 0))).Int(), "int64"))
+	fmt.Println($.basicInterfaceValue($.arrayIndex((await call($.interfaceValue(c, "*main.Calc", /* @__PURE__ */ $.pointerType("main.Calc")), $.arrayIndex(names!, 0), $.arrayToSlice<any>([$.basicInterfaceValue(3, "int")])))!, 0).Int(), "int64"), $.basicInterfaceValue($.arrayIndex((await call($.interfaceValue(c, "*main.Calc", /* @__PURE__ */ $.pointerType("main.Calc")), $.arrayIndex(names!, 1), null))!, 0).Int(), "int64"))
 
 	let t = reflect.TypeOf($.interfaceValue(c, "*main.Calc", /* @__PURE__ */ $.pointerType("main.Calc")))
 	for (let i = 0; i < (__goscriptAwait = (t !== null && (t as any).__isVarRef !== true && ((t as any).__goValue === undefined || (t as any).__goType?.charCodeAt(0) !== 42) ? (t as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(t)).NumMethod(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait); i++) {
 		fmt.Println($.basicInterfaceValue(i, "int"), ((__goscriptAwait = (t !== null && (t as any).__isVarRef !== true && ((t as any).__goValue === undefined || (t as any).__goType?.charCodeAt(0) !== 42) ? (t as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(t)).Method(i), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as reflect.Method).Name)
 	}
-	let v = $.markAsStructValue($.cloneStructValue(reflect.ValueOf(__goscriptStatic3())))
-	for (let i = 0; i < $.markAsStructValue($.cloneStructValue(v)).NumMethod(); i++) {
-		fmt.Println(((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>($.markAsStructValue($.cloneStructValue(v)).Type()).Method(i), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as reflect.Method).Name, $.markAsStructValue($.cloneStructValue($.arrayIndex((await $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(v)).Method(i))).Call(null))!, 0))).String())
+	let v = reflect.ValueOf(__goscriptStatic3())
+	for (let i = 0; i < v.NumMethod(); i++) {
+		fmt.Println(((__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(v.Type()).Method(i), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait) as reflect.Method).Name, $.arrayIndex((await v.Method(i).Call(null))!, 0).String())
 	}
 	await call($.interfaceValue(c, "*main.Calc", /* @__PURE__ */ $.pointerType("main.Calc")), "Reset", null)
 	fmt.Println($.basicInterfaceValue($.pointerValue<Calc>(c).base, "int"))

@@ -12,8 +12,8 @@ export async function main(): globalThis.Promise<void> {
 	// change how other uses of the variable read it.
 	let p = $.varRef(time.UTC)
 	await $.println(time.Location.prototype.String.call($.pointerValue<time.Location>(($.pointerValue<time.Location | $.VarRef<time.Location> | null>(p)))))
-	let e = $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue($.varRef(strconv.ErrRange), "*error", /* @__PURE__ */ $.pointerType("error"))))).Elem()))
-	await $.println((__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>($.mustTypeAssert<$.GoError>($.markAsStructValue($.cloneStructValue(e)).Interface(), "error")).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	let e = reflect.ValueOf($.interfaceValue($.varRef(strconv.ErrRange), "*error", /* @__PURE__ */ $.pointerType("error"))).Elem()
+	await $.println((__goscriptAwait = $.pointerValue<Exclude<$.GoError, null>>($.mustTypeAssert<$.GoError>(e.Interface(), "error")).Error(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 
 	let t = $.markAsStructValue($.cloneStructValue(time.Date(2000, 1, 2, 3, 4, 5, 0, time.UTC)))
 	await $.println($.markAsStructValue($.cloneStructValue(t)).Year(), time.Location.prototype.String.call($.pointerValue<time.Location>($.markAsStructValue($.cloneStructValue(t)).Location())))

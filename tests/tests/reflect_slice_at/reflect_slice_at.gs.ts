@@ -77,40 +77,40 @@ export function __goscript_set_pt(__goscriptValue: T): void {
 }
 
 export function fieldValue(obj: any, fld: reflect.StructField): reflect.Value {
-	let ov = $.markAsStructValue($.cloneStructValue(reflect.ValueOf(obj)))
-	let f = ($.wideUintAdd($.markAsStructValue($.cloneStructValue(ov)).Pointer(), fld.Offset) as any)
-	return $.markAsStructValue($.cloneStructValue(reflect.NewAt($.pointerValueOrNil(fld.Type)!, f)))
+	let ov = reflect.ValueOf(obj)
+	let f = ($.wideUintAdd(ov.Pointer(), fld.Offset) as any)
+	return reflect.NewAt($.pointerValueOrNil(fld.Type)!, f)
 }
 
 export async function newAtOffsets(): globalThis.Promise<void> {
 	let typ = reflect.TypeOf($.structInterfaceValue((pt.value).clone(), "main.T", "main.T"))
 	let [fld, ] = await (typ !== null && (typ as any).__isVarRef !== true && ((typ as any).__goValue === undefined || (typ as any).__goType?.charCodeAt(0) !== 42) ? (typ as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(typ)).FieldByName("Mbr2")
-	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(fieldValue($.interfaceValue(pt, "*main.T", /* @__PURE__ */ $.pointerType("main.T")), fld))).Elem())).Set($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.basicInterfaceValue(10, "int")))))
+	fieldValue($.interfaceValue(pt, "*main.T", /* @__PURE__ */ $.pointerType("main.T")), fld).Elem().Set(reflect.ValueOf($.basicInterfaceValue(10, "int")))
 	await $.println("newat-offset:", pt.value.Mbr2)
 
 	let __goscriptTuple0: any = await (typ !== null && (typ as any).__isVarRef !== true && ((typ as any).__goValue === undefined || (typ as any).__goType?.charCodeAt(0) !== 42) ? (typ as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(typ)).FieldByName("Mbr1")
 	fld = $.assignStruct(fld, __goscriptTuple0[0])
-	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(fieldValue($.interfaceValue(pt, "*main.T", /* @__PURE__ */ $.pointerType("main.T")), fld))).Elem())).Set($.markAsStructValue($.cloneStructValue(reflect.ValueOf("new"))))
+	fieldValue($.interfaceValue(pt, "*main.T", /* @__PURE__ */ $.pointerType("main.T")), fld).Elem().Set(reflect.ValueOf("new"))
 	await $.println("newat-offset:", pt.value.Mbr1, pt.value.Mbr2)
 
 	let [sf, ] = await (typ !== null && (typ as any).__isVarRef !== true && ((typ as any).__goValue === undefined || (typ as any).__goType?.charCodeAt(0) !== 42) ? (typ as Exclude<reflect.Type, null>) : $.pointerValue<Exclude<reflect.Type, null>>(typ)).FieldByName("S")
 	let [yf, ] = await $.pointerValue<Exclude<reflect.Type, null>>(sf.Type).FieldByName("Y")
-	let ov = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(pt, "*main.T", /* @__PURE__ */ $.pointerType("main.T")))))
-	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.NewAt($.pointerValueOrNil(yf.Type)!, ($.wideUintAdd(($.wideUintAdd($.markAsStructValue($.cloneStructValue(ov)).Pointer(), sf.Offset)), yf.Offset) as any)))).Elem())).SetString("sub")
+	let ov = reflect.ValueOf($.interfaceValue(pt, "*main.T", /* @__PURE__ */ $.pointerType("main.T")))
+	reflect.NewAt($.pointerValueOrNil(yf.Type)!, ($.wideUintAdd(($.wideUintAdd(ov.Pointer(), sf.Offset)), yf.Offset) as any)).Elem().SetString("sub")
 	await $.println("newat-offset:", pt.value.S.Y)
 
 	let local = new T()
-	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(fieldValue($.interfaceValue(local, "*main.T", /* @__PURE__ */ $.pointerType("main.T")), fld))).Elem())).SetString("loc")
+	fieldValue($.interfaceValue(local, "*main.T", /* @__PURE__ */ $.pointerType("main.T")), fld).Elem().SetString("loc")
 	await $.println("newat-offset:", $.pointerValue<T>(local).Mbr1)
 
 	let v = $.varRef(3)
-	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.NewAt($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic0()))!, ($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(v, "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int")))))).Pointer() as any)))).Elem())).SetInt(4n)
+	reflect.NewAt($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic0()))!, (reflect.ValueOf($.interfaceValue(v, "*int", /* @__PURE__ */ $.pointerType(/* @__PURE__ */ $.basicType("int")))).Pointer() as any)).Elem().SetInt(4n)
 	await $.println("newat-offset:", v.value)
 }
 
 export async function main(): globalThis.Promise<void> {
 	let local = $.varRef(41)
-	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.NewAt($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic0()))!, (local as any)))).Elem())).SetInt(42n)
+	reflect.NewAt($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic0()))!, (local as any)).Elem().SetInt(42n)
 	await $.println("newat-local:", local.value)
 
 	class holder {
@@ -139,23 +139,23 @@ export async function main(): globalThis.Promise<void> {
 		)
 	}
 	let h = $.markAsStructValue(new holder({Count: 5}))
-	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.NewAt($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic0()))!, ($.fieldRef(h, "Count") as any)))).Elem())).SetInt(6n)
+	reflect.NewAt($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic0()))!, ($.fieldRef(h, "Count") as any)).Elem().SetInt(6n)
 	await $.println("newat-field:", h.Count)
 
 	let buf = new Uint8Array([1, 2, 3, 4]) as $.Slice<number>
-	let bytes = $.markAsStructValue($.cloneStructValue(reflect.SliceAt($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic1()))!, ($.indexRef(buf!, 1) as any), 2)))
-	await $.println("bytes:", $.markAsStructValue($.cloneStructValue(bytes)).Len(), $.markAsStructValue($.cloneStructValue(bytes)).Cap(), $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(bytes)).Index(0))).Uint(), $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(bytes)).Index(1))).Uint())
-	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(bytes)).Index(0))).SetUint(9n)
-	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(bytes)).Index(1))).SetUint(8n)
+	let bytes = reflect.SliceAt($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic1()))!, ($.indexRef(buf!, 1) as any), 2)
+	await $.println("bytes:", bytes.Len(), bytes.Cap(), bytes.Index(0).Uint(), bytes.Index(1).Uint())
+	bytes.Index(0).SetUint(9n)
+	bytes.Index(1).SetUint(8n)
 	await $.println("buf:", $.arrayIndex(buf!, 0), $.arrayIndex(buf!, 1), $.arrayIndex(buf!, 2), $.arrayIndex(buf!, 3))
 
 	let ints = $.arrayToSlice<number>([10, 20, 30, 40])
-	let intSlice = $.markAsStructValue($.cloneStructValue(reflect.SliceAt($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic0()))!, ($.indexRef(ints!, 1) as any), 2)))
-	$.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(intSlice)).Index(1))).SetInt(77n)
-	await $.println("ints:", $.arrayIndex(ints!, 0), $.arrayIndex(ints!, 1), $.arrayIndex(ints!, 2), $.arrayIndex(ints!, 3), $.markAsStructValue($.cloneStructValue(intSlice)).Len(), $.markAsStructValue($.cloneStructValue(intSlice)).Cap())
+	let intSlice = reflect.SliceAt($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic0()))!, ($.indexRef(ints!, 1) as any), 2)
+	intSlice.Index(1).SetInt(77n)
+	await $.println("ints:", $.arrayIndex(ints!, 0), $.arrayIndex(ints!, 1), $.arrayIndex(ints!, 2), $.arrayIndex(ints!, 3), intSlice.Len(), intSlice.Cap())
 
-	let empty = $.markAsStructValue($.cloneStructValue(reflect.SliceAt($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic0()))!, (null as any), 0)))
-	await $.println("empty:", $.markAsStructValue($.cloneStructValue(empty)).IsNil(), $.markAsStructValue($.cloneStructValue(empty)).Len(), $.markAsStructValue($.cloneStructValue(empty)).Cap())
+	let empty = reflect.SliceAt($.pointerValueOrNil(reflect.TypeFor(__goscriptStatic0()))!, (null as any), 0)
+	await $.println("empty:", empty.IsNil(), empty.Len(), empty.Cap())
 
 	await newAtOffsets()
 

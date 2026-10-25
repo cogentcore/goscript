@@ -175,7 +175,7 @@ export async function main(): globalThis.Promise<void> {
 	ok = __goscriptTuple2[1]
 	await $.println("generic any stringer:", ok)
 
-	await $.println("reflect:", kind($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.namedValueInterfaceValue<any>(7, "main.MyInt", {}, /* @__PURE__ */ $.basicType("int32", "main.MyInt"))))).Interface()), (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf(a)).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
+	await $.println("reflect:", kind(reflect.ValueOf($.namedValueInterfaceValue<any>(7, "main.MyInt", {}, /* @__PURE__ */ $.basicType("int32", "main.MyInt"))).Interface()), (__goscriptAwait = $.pointerValue<Exclude<reflect.Type, null>>(reflect.TypeOf(a)).String(), __goscriptAwait instanceof Promise ? await __goscriptAwait : __goscriptAwait))
 	class holder {
 		public declare N: Name
 
@@ -205,8 +205,8 @@ export async function main(): globalThis.Promise<void> {
 			() => [/* @__PURE__ */ $.structField("N", /* @__PURE__ */ $.basicType("string", "main.Name"), [0], 0, true), /* @__PURE__ */ $.structField("Is", /* @__PURE__ */ $.sliceType(/* @__PURE__ */ $.basicType("int32", "main.MyInt")), [1], 16, true)]
 		)
 	}
-	let hv = $.markAsStructValue($.cloneStructValue(reflect.ValueOf($.structInterfaceValue($.markAsStructValue(new holder({N: "h", Is: $.typedSliceOf(Int32Array, [9]) as $.Slice<MyInt>})), "main.holder", "main.holder"))))
-	await $.println("reflect field:", kind($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(hv)).Field(0))).Interface()), kind($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(hv)).Field(1))).Index(0))).Interface()))
+	let hv = reflect.ValueOf($.structInterfaceValue($.markAsStructValue(new holder({N: "h", Is: $.typedSliceOf(Int32Array, [9]) as $.Slice<MyInt>})), "main.holder", "main.holder"))
+	await $.println("reflect field:", kind(hv.Field(0).Interface()), kind(hv.Field(1).Index(0).Interface()))
 
 	await $.println("equal:", $.comparableEqual(a, $.namedValueInterfaceValue<any>(5, "main.MyInt", {}, /* @__PURE__ */ $.basicType("int32", "main.MyInt"))), $.comparableEqual(a, b), $.comparableEqual(a, $.namedValueInterfaceValue<any>(6, "main.MyInt", {}, /* @__PURE__ */ $.basicType("int32", "main.MyInt"))))
 

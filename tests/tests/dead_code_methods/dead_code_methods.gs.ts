@@ -371,7 +371,7 @@ export async function main(): globalThis.Promise<void> {
 	let [, ok] = $.typeAssertTuple<checker | null>(v, "main.checker")
 	fmt.Println("checker:", ok)
 
-	fmt.Println($.structInterfaceValue($.markAsStructValue($.cloneStructValue($.arrayIndex((await $.markAsStructValue($.cloneStructValue($.markAsStructValue($.cloneStructValue(reflect.ValueOf($.interfaceValue(d, "*main.Dog", /* @__PURE__ */ $.pointerType("main.Dog"))))).MethodByName("Ping"))).Call(null))!, 0))), "reflect.Value", __goscriptStatic0()))
+	fmt.Println($.structInterfaceValue($.arrayIndex((await reflect.ValueOf($.interfaceValue(d, "*main.Dog", /* @__PURE__ */ $.pointerType("main.Dog"))).MethodByName("Ping").Call(null))!, 0), "reflect.Value", __goscriptStatic0()))
 
 	let c = new Counter()
 	let inc: (() => void) | null = $.functionValue(((__receiver) => () => __receiver.Inc())($.pointerValue<Counter>(c)), ({ kind: $.TypeKind.Function, params: [], results: [] } as $.FunctionTypeInfo), "main.(*Counter).Inc-fm")
