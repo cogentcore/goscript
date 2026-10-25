@@ -55,6 +55,11 @@ const (
 	RuntimeHelperMax            RuntimeHelper = "builtin.max"
 	RuntimeHelperComplex        RuntimeHelper = "builtin.complex"
 	RuntimeHelperComplex64      RuntimeHelper = "builtin.complex64"
+	RuntimeHelperComplexAdd     RuntimeHelper = "builtin.complexAdd"
+	RuntimeHelperComplexSub     RuntimeHelper = "builtin.complexSub"
+	RuntimeHelperComplexMul     RuntimeHelper = "builtin.complexMul"
+	RuntimeHelperComplexDiv     RuntimeHelper = "builtin.complexDiv"
+	RuntimeHelperComplexNeg     RuntimeHelper = "builtin.complexNeg"
 	RuntimeHelperReal           RuntimeHelper = "builtin.real"
 	RuntimeHelperImag           RuntimeHelper = "builtin.imag"
 	RuntimeHelperUint64Shl      RuntimeHelper = "builtin.uint64Shl"
@@ -393,6 +398,11 @@ func runtimeHelperContracts() []RuntimeHelperContract {
 		runtimeHelper(RuntimeHelperMax, "max", RuntimeHelperCategoryBuiltin),
 		runtimeHelper(RuntimeHelperComplex, "complex", RuntimeHelperCategoryBuiltin),
 		runtimeHelper(RuntimeHelperComplex64, "complex64", RuntimeHelperCategoryBuiltin),
+		runtimeHelper(RuntimeHelperComplexAdd, "complexAdd", RuntimeHelperCategoryBuiltin),
+		runtimeHelper(RuntimeHelperComplexSub, "complexSub", RuntimeHelperCategoryBuiltin),
+		runtimeHelper(RuntimeHelperComplexMul, "complexMul", RuntimeHelperCategoryBuiltin),
+		runtimeHelper(RuntimeHelperComplexDiv, "complexDiv", RuntimeHelperCategoryBuiltin),
+		runtimeHelper(RuntimeHelperComplexNeg, "complexNeg", RuntimeHelperCategoryBuiltin),
 		runtimeHelper(RuntimeHelperReal, "real", RuntimeHelperCategoryBuiltin),
 		runtimeHelper(RuntimeHelperImag, "imag", RuntimeHelperCategoryBuiltin),
 		runtimeHelper(RuntimeHelperUint64Shl, "uint64Shl", RuntimeHelperCategoryBuiltin),
