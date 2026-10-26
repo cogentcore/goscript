@@ -2452,6 +2452,8 @@ func lazyPackageVars(semPkg *semanticPackage) map[types.Object]bool {
 	}
 	funcRefs := packageVarsReferencedFromOtherFileTopLevelCalls(semPkg, declFiles)
 	lazy := make(map[types.Object]bool)
+	otherFile := make(map[types.Object]bool)
+	var inits []packageVarInit
 	for idx, file := range semPkg.source.Syntax {
 		sourcePath := sourceFilePath(semPkg, idx, file)
 		for _, decl := range file.Decls {
@@ -2483,11 +2485,13 @@ func lazyPackageVars(semPkg *semanticPackage) map[types.Object]bool {
 					if valueIdx < len(valueSpec.Values) &&
 						initializerReferencesOtherFileObject(semPkg, declFiles, sourcePath, valueSpec.Values[valueIdx]) {
 						lazy[obj] = true
+						otherFile[obj] = true
 						continue
 					}
 					if valueIdx < len(valueSpec.Values) &&
 						initializerCallsFunctionReferencingOtherFileObject(semPkg, declFiles, sourcePath, valueSpec.Values[valueIdx]) {
 						lazy[obj] = true
+						otherFile[obj] = true
 						continue
 					}
 					if valueIdx < len(valueSpec.Values) &&
@@ -2498,18 +2502,88 @@ func lazyPackageVars(semPkg *semanticPackage) map[types.Object]bool {
 					if valueIdx >= len(valueSpec.Values) &&
 						zeroValueReferencesOtherFileObject(semPkg, declFiles, sourcePath, obj.Type()) {
 						lazy[obj] = true
+						otherFile[obj] = true
 						continue
 					}
 					if funcRefs[obj] &&
 						(valueIdx >= len(valueSpec.Values) ||
 							!initializerMayHaveRuntimeEffects(lowerFileContext{semPkg: semPkg}, valueSpec.Values[valueIdx])) {
 						lazy[obj] = true
+						continue
+					}
+
+					// The other initializers may read variables that need other files (see markLazyReaders).
+					if valueIdx < len(valueSpec.Values) && len(valueSpec.Names) == len(valueSpec.Values) {
+						inits = append(inits, packageVarInit{obj: obj, expr: valueSpec.Values[valueIdx]})
 					}
 				}
 			}
 		}
 	}
+	markLazyReaders(semPkg, lazy, otherFile, inits)
 	return lazy
+}
+
+// packageVarInit is a package variable and its initializer.
+type packageVarInit struct {
+	obj  *types.Var
+	expr ast.Expr
+}
+
+// markLazyReaders marks as lazy the variables of the given initializers that
+// read a variable of otherFile, the lazy variables whose initializers need
+// declarations of other files, and adds them to otherFile, until no more are
+// marked. Reading such a variable runs its initializer, which may need a
+// declaration, such as a class, of a file that is not evaluated yet, when the
+// file of the reader is evaluated first. Initializers with runtime effects
+// stay eager, so they still run at package initialization, as do those of
+// blank variables, which are never read.
+func markLazyReaders(semPkg *semanticPackage, lazy, otherFile map[types.Object]bool, inits []packageVarInit) {
+	// Each pass marks the readers of the variables marked so far.
+	ctx := lowerFileContext{semPkg: semPkg}
+	for changed := true; changed; {
+		changed = false
+		for _, init := range inits {
+			// Skip the variables that are lazy, never read, or not readers.
+			if lazy[init.obj] || init.obj.Name() == "_" || !initializerReadsVar(semPkg, otherFile, init.expr) {
+				continue
+			}
+
+			// Mark a reader whose initializer has no runtime effects.
+			if initializerMayHaveRuntimeEffects(ctx, init.expr) {
+				continue
+			}
+			lazy[init.obj] = true
+			otherFile[init.obj] = true
+			changed = true
+		}
+	}
+}
+
+// initializerReadsVar returns whether expr reads a package variable of vars
+// outside of function literals, which run later.
+func initializerReadsVar(semPkg *semanticPackage, vars map[types.Object]bool, expr ast.Expr) bool {
+	reads := false
+	ast.Inspect(expr, func(node ast.Node) bool {
+		// Stop after a read, and skip function literals, which do not run
+		// when the variable is initialized.
+		if reads {
+			return false
+		}
+		if _, ok := node.(*ast.FuncLit); ok {
+			return false
+		}
+
+		// An identifier may use a variable of vars.
+		ident, ok := node.(*ast.Ident)
+		if !ok {
+			return true
+		}
+		obj, ok := semPkg.source.TypesInfo.Uses[ident].(*types.Var)
+		reads = ok && vars[obj]
+		return !reads
+	})
+	return reads
 }
 
 func packageVarsReferencedFromOtherFileTopLevelCalls(

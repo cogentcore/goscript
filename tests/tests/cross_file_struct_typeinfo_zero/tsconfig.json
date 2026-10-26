@@ -19,8 +19,10 @@
   },
   "extends": "../../../tests/tsconfig.base.json",
   "include": [
+    "__goscript_package_init.gs.ts",
     "a.gs.ts",
     "b.gs.ts",
+    "c.gs.ts",
     "cross_file_struct_typeinfo_zero.gs.ts",
     "index.ts"
   ]

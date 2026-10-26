@@ -3,6 +3,7 @@
 
 import * as $ from "@goscript/builtin/index.js"
 import * as __goscript_a from "./a.gs.ts"
+import * as __goscript_c from "./c.gs.ts"
 
 export class bValue {
 	public declare inner: __goscript_a.aValue
@@ -32,4 +33,8 @@ export class bValue {
 
 export function makeB(): bValue {
 	return new bValue(true)
+}
+
+export function countC(): number {
+	return $.sliceLen(__goscript_c.__goscript_get_cCopy())
 }
