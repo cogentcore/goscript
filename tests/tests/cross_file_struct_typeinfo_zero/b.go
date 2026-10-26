@@ -7,3 +7,7 @@ type bValue struct {
 func makeB() bValue {
 	return bValue{}
 }
+
+func countC() int {
+	return len(cCopy)
+}
