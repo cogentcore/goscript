@@ -8657,7 +8657,9 @@ func (o *LoweringOwner) lowerRangeStmt(ctx lowerFileContext, stmt *ast.RangeStmt
 		if signature == nil {
 			return loweredStmt{}, append(diagnostics, loweringUnsupportedAt(ctx, stmt, "statement", ctx.semPkg.pkgPath, "unsupported function range signature"))
 		}
-		lowered, funcDiagnostics := o.lowerRangeFuncStmt(ctx, stmt, rangeValue, signature)
+		// An async call that returns the iterator is awaited before the
+		// iterator is called.
+		lowered, funcDiagnostics := o.lowerRangeFuncStmt(ctx, stmt, parenthesizeAwaitedExpr(rangeValue), signature)
 		diagnostics = append(diagnostics, funcDiagnostics...)
 		return lowered, diagnostics
 	}
