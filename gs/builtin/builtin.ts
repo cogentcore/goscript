@@ -199,17 +199,26 @@ export function assignFieldValue(
     if (target === null || target === undefined) {
       return cloneArrayValue(source, info)
     }
+    // Either side may be an unsafe view of another array, a window into its
+    // backing, so elements are read and written through their slots.
     // Plain elements are copied as they are; the others are assigned in
     // place, with their type resolved once.
     const elem = resolveTypeInfo(info.elemType)
+    const targetElems = sliceElems(target)
+    const sourceElems = sliceElems(source)
     if (isPlainElementType(elem)) {
       for (let i = 0; i < info.length; i++) {
-        target[i] = source[i]
+        targetElems[sliceSlot(target, i)] = sourceElems[sliceSlot(source, i)]
       }
       return target
     }
     for (let i = 0; i < info.length; i++) {
-      target[i] = assignFieldValue(target[i], source[i], elem)
+      const slot = sliceSlot(target, i)
+      targetElems[slot] = assignFieldValue(
+        targetElems[slot],
+        sourceElems[sliceSlot(source, i)],
+        elem,
+      )
     }
     return target
   }
