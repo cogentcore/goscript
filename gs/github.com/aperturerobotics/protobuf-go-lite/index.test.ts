@@ -979,6 +979,16 @@ describe('protobuf-go-lite encode helpers', () => {
     expect(Array.from(decoded as Uint8Array)).toEqual([9, 8, 7])
   })
 
+  it('copies raw bytes between slice windows', () => {
+    const backing = new Uint8Array([0, 0, 0, 0, 0, 0])
+    const dst = $.goSlice(backing, 1, 5)
+    const src = $.goSlice(new Uint8Array([7, 1, 2, 7]), 1, 3)
+    expect(EncodeRawBytes(dst, 3, src)).toBe(1)
+    expect(Array.from(backing)).toEqual([0, 0, 1, 2, 0, 0])
+    expect(EncodeRawBytes(dst, 2, null)).toBe(2)
+    expect(() => EncodeRawBytes(dst, 1, src)).toThrow()
+  })
+
   it('round-trips strings including multibyte runes', () => {
     const buf = new Uint8Array(8)
     const off = EncodeString(buf, 8, 'héllo')

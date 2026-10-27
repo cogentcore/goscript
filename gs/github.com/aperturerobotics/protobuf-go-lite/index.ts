@@ -1464,8 +1464,11 @@ export function EncodeRawBytes(
 ): number {
   const n = $.len(v)
   offset -= n
-  for (let i = 0; i < n; i++) {
-    setByte(dAtA, offset + i, $.indexStringOrBytes(v!, i))
+  if (n > 0) {
+    if (dAtA == null) {
+      throw new Error('assignment to nil byte slice')
+    }
+    $.copyByteRanges(dAtA, offset, offset + n, v!, 0, n)
   }
   return offset
 }
